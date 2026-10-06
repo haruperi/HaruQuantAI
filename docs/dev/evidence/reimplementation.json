@@ -43,12 +43,28 @@
       "locators": [
         "app/host/README.md",
         "docs/dev/evidence",
-        "docs/dev/sqx-full-application-roadmap.md"
+        "docs/dev/sqx-full-application-roadmap.md",
+        "docs/PROJECT.md",
+        "docs/ARCHITECTURE.md"
       ],
       "scope": "Target decisions and source-bound current static observations",
       "confidence": "high",
       "limitations": [
         "Proposals do not register application capabilities or qualify runtime parity."
+      ]
+    },
+    "E-T01": {
+      "title": "Official PyInstaller archive-format family",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://raw.githubusercontent.com/pyinstaller/pyinstaller/develop/PyInstaller/archive/readers.py",
+        "https://pyinstaller.org/en/stable/advanced-topics.html#carchive"
+      ],
+      "scope": "Cookie and TOC format interpretation only; no exact producer release claim.",
+      "confidence": "high",
+      "limitations": [
+        "Current official format documentation is context; observed installer bytes identify compatibility, not donor runtime behavior."
       ]
     }
   },
@@ -3754,7 +3770,7 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "bccc0f8a766ca5878638c4f9619d35b2a3372ac8a8416496cf832bfab6d11ae0"
+            "value": "dee9ea740a2460a0cc1c24ccf494568866dcbfc3049fa722a408dcb790fd659e"
           },
           "accessed_at": "2026-10-06"
         }
@@ -3795,7 +3811,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3999,8 +4015,3909 @@
         "current_reference",
         "static"
       ]
+    },
+    "SQX145-EV-000174": {
+      "topic": "host.evidence.sqx145_static_gate_recheck",
+      "title": "SQX145 static qualification gate recheck",
+      "question": "SQX145 static qualification gate recheck?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "reference_tooling"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The current SQX145 static qualification CLI with --check-donor exited zero during the read-only P00 reassessment.",
+        "confidence": "high",
+        "limitations": [
+          "This is static archive/evidence integrity, not body semantics, runtime parity, activation or whole-host readiness. The capture precedes these documentation-only updates."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/p00-review.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/checks/donor_gate",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3d805399dba0e28f7063b02750130a4f7079bb0e1826cdea9a432f81e41f1797"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-QUALIFICATION-CLI"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Run uv run python -m tests.reference.validate --check-donor with explicit SQX_145_REFERENCE_ROOT.",
+        "expected_observation": "Exit 0; current static baseline accepted. Runtime qualification remains blocked.",
+        "actual_observation": "Exit 0 observed; captured output reports static baseline valid and runtime blocked.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/p00-review.json"
+        ],
+        "executed_at": "2026-10-06T20:07:08.367387+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:18:02.290643+00:00",
+        "updated_at": "2026-10-06T20:20:44.871060+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static"
+      ]
+    },
+    "SQX145-EV-000175": {
+      "topic": "host.evidence.sqx145_reference_regression_recheck",
+      "title": "SQX145 reference regression recheck",
+      "question": "SQX145 reference regression recheck?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "reference_tooling"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "All 109 existing focused reference-tool tests passed during the SQX145 P00 reassessment.",
+        "confidence": "high",
+        "limitations": [
+          "Reference-tool regression checks exercise integrity/failure/logging gates. They do not establish application coverage or donor/runtime parity; --no-cov was used."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/p00-review.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/checks/reference_tests",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3d805399dba0e28f7063b02750130a4f7079bb0e1826cdea9a432f81e41f1797"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-QUALIFICATION-CLI"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "uv run pytest tests/unit/test_reference_manifest.py tests/unit/test_reference_fixtures.py tests/unit/test_reference_validation.py --no-cov -q",
+        "expected_observation": "109 passed and exit 0.",
+        "actual_observation": "109 passed in 19.67s; exit 0.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/p00-review.json"
+        ],
+        "executed_at": "2026-10-06T20:07:13.388969+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:18:02.290643+00:00",
+        "updated_at": "2026-10-06T20:20:44.871060+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static"
+      ]
+    },
+    "SQX145-EV-000176": {
+      "topic": "host.evidence.sqx145_unresolved_type_scope",
+      "title": "SQX145 wider standalone type-reference census",
+      "question": "SQX145 wider standalone type-reference census?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "reference_tooling"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "669 distinct constant-pool type-reference names beginning com/strategyquant/ lack a matching declared class name in the complete inspected current standalone JAR member corpus.",
+        "confidence": "high",
+        "limitations": [
+          "Literal structural references are not executed callsites or proven missing runtime implementations. Native/embedded/encrypted/alternate/runtime provision and actual feature consumption remain unverified.",
+          "This extends research scope without superseding the explicitly selected 26-symbol artifact or creating automatic unrelated-feature blockers."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/p00-review.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/unresolved_type_census",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3d805399dba0e28f7063b02750130a4f7079bb0e1826cdea9a432f81e41f1797"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Read every current member shard; compute distinct class_references beginning com/strategyquant/ minus distinct declared class names and compare exact sorted symbol sets.",
+        "expected_observation": "669 exact literal unresolved type names; the separate selected 26-symbol list and consumer sets still match.",
+        "actual_observation": "All 51,713 class occurrences inspected; exact set difference contained 669 distinct names. All 26 selected missing-symbol consumer sets matched.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/p00-review.json"
+        ],
+        "executed_at": "2026-10-06T20:07:07.066599+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:18:02.290643+00:00",
+        "updated_at": "2026-10-06T20:20:44.871060+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static"
+      ]
+    },
+    "SQX145-EV-000177": {
+      "topic": "host.core.packaging.launcher_protector_sections",
+      "title": "All three inspected current host launchers have a PE section named .themida.",
+      "question": "All three inspected current host launchers have a PE section named .themida.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "All three inspected current host launchers have a PE section named .themida.",
+        "confidence": "high",
+        "limitations": [
+          "Section markers do not establish protector version, XBundler enablement or hidden Java-core location."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "PE section table: .themida",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/native_packaging/0/sections/16",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/StrategyQuantX.exe; SHA-256 31c351c64daa065b2939cbc82569ffe4fc0bacbe8a9ebb0dda7b033c5be1c395. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "PE section table: .themida",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/native_packaging/1/sections/16",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/sqcli.exe; SHA-256 afa68ccb614633373b8201b1bf1f83a60b94af8596a5b1d6ce9f48f48be4a14f. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "PE section table: .themida",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/native_packaging/2/sections/16",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/CodeEditor.exe; SHA-256 ed5d260daeb8a97c96ca79e23609f9803f41f545162a8a8b9526b60201dd7024. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F1",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Parse the current PE section tables and compare exact section names.",
+        "expected_observation": "Three launcher section tables contain .themida.",
+        "actual_observation": "Three launcher section tables contain .themida.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000178": {
+      "topic": "host.core.packaging.launcher_class_magic",
+      "title": "The complete bytes of all three inspected current host launchers contain zero raw CA FE BA BE class-file magic matches.",
+      "question": "The complete bytes of all three inspected current host launchers contain zero raw CA FE BA BE class-file magic matches.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The complete bytes of all three inspected current host launchers contain zero raw CA FE BA BE class-file magic matches.",
+        "confidence": "high",
+        "limitations": [
+          "Compressed, encrypted or transformed content is outside this byte-pattern observation."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "Complete file bytes: CA FE BA BE search",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/native_packaging/0/patterns/class_magic",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/StrategyQuantX.exe; SHA-256 31c351c64daa065b2939cbc82569ffe4fc0bacbe8a9ebb0dda7b033c5be1c395. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "Complete file bytes: CA FE BA BE search",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/native_packaging/1/patterns/class_magic",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/sqcli.exe; SHA-256 afa68ccb614633373b8201b1bf1f83a60b94af8596a5b1d6ce9f48f48be4a14f. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "Complete file bytes: CA FE BA BE search",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/native_packaging/2/patterns/class_magic",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/CodeEditor.exe; SHA-256 ed5d260daeb8a97c96ca79e23609f9803f41f545162a8a8b9526b60201dd7024. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F2",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Scan each complete source-pinned launcher for the four-byte Java class-file prefix.",
+        "expected_observation": "Zero raw class-file magic matches in each of the three launchers.",
+        "actual_observation": "Zero raw class-file magic matches in each of the three launchers.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000179": {
+      "topic": "host.core.packaging.installer_carchive",
+      "title": "The current installer overlay contains a valid PyInstaller-compatible CArchive cookie and TOC.",
+      "question": "The current installer overlay contains a valid PyInstaller-compatible CArchive cookie and TOC.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The current installer overlay contains a valid PyInstaller-compatible CArchive cookie and TOC.",
+        "confidence": "high",
+        "limitations": [
+          "No exact PyInstaller release or executed installer behavior is established."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "Overlay offset 324096; cookie offset 21676559 within overlay; TOC offset 21618271, size 58288",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/installer_package/location",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/SQ_Installer.exe; SHA-256 b0587c256cd4460a871ddb65139bb9b1104d5657fd84109a1ff60a6428ae5b5f. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-T01",
+          "artifact_locator": "https://raw.githubusercontent.com/pyinstaller/pyinstaller/develop/PyInstaller/archive/readers.py",
+          "location": {
+            "section": "CArchiveReader cookie and TOC field formats",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e5cf8a33bc68ed2c94d52da68780094b5c359f4c38cf35af004edc90016a3613"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F3",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Compare cookie/TOC fields to the maintainer format; validate each entry boundary and bounded decompression.",
+        "expected_observation": "1042 valid CArchive entries; cookie Python version field 312.",
+        "actual_observation": "1042 valid CArchive entries; cookie Python version field 312.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000180": {
+      "topic": "host.core.packaging.installer_target_name_scan",
+      "title": "None of the 1042 inspected installer CArchive entries contains a MainApp, AppSettings, CpuInfo or SQLib byte-name match after bounded entry decompression.",
+      "question": "None of the 1042 inspected installer CArchive entries contains a MainApp, AppSettings, CpuInfo or SQLib byte-name match after bounded entry decompression.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "None of the 1042 inspected installer CArchive entries contains a MainApp, AppSettings, CpuInfo or SQLib byte-name match after bounded entry decompression.",
+        "confidence": "high",
+        "limitations": [
+          "Nested PYZ module semantics, dynamic downloads and transformed names were not inspected."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "CArchive TOC and decoded entry bytes",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/installer_package/target_name_matches",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/SQ_Installer.exe; SHA-256 b0587c256cd4460a871ddb65139bb9b1104d5657fd84109a1ff60a6428ae5b5f. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F4",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Scan each bounded-decoded CArchive entry for the four exact target byte strings.",
+        "expected_observation": "Zero matches for each of the four target names across 1042 entries.",
+        "actual_observation": "Zero matches for each of the four target names across 1042 entries.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000181": {
+      "topic": "host.core.packaging.jar_resource_candidates",
+      "title": "The 289-archive resource-prefix/name/extension scan found no recognizable nested candidate with a target MainApp/AppSettings/CpuInfo entry name.",
+      "question": "The 289-archive resource-prefix/name/extension scan found no recognizable nested candidate with a target MainApp/AppSettings/CpuInfo entry name.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The 289-archive resource-prefix/name/extension scan found no recognizable nested candidate with a target MainApp/AppSettings/CpuInfo entry name.",
+        "confidence": "high",
+        "limitations": [
+          "Only specified resource prefixes, extensions and names were tested; arbitrary encoded resources are unqualified."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/p00-inventory.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/artifacts",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "archive_inventory",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "7e7bbf37e688f3b79d7c5b8c62a9fe276cbdb1e3dd9cc5ffe1d2c551ffa4f1f3"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F5",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Check every non-class ZIP resource prefix; inspect recognized magic/extension/name candidates and nested ZIP entries.",
+        "expected_observation": "289 matching archive hashes; three resource candidates; no target host entry-name match.",
+        "actual_observation": "289 matching archive hashes; three resource candidates; no target host entry-name match.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000182": {
+      "topic": "host.core.packaging.runtime_image_target_entries",
+      "title": "The current j64/lib/modules entry listing contains none of the three exact selected host class entry names.",
+      "question": "The current j64/lib/modules entry listing contains none of the three exact selected host class entry names.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The current j64/lib/modules entry listing contains none of the three exact selected host class entry names.",
+        "confidence": "high",
+        "limitations": [
+          "Classes loaded later by external/custom loaders remain unverified."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": "Exact jimage list entry-name comparison",
+            "symbol": "MainApp.class; AppSettings.class; CpuInfo.class",
+            "line_range": null,
+            "json_pointer": "/runtime_image/target_matches",
+            "xpath": null,
+            "notes": "Underlying SQX_145_REFERENCE_ROOT/j64/lib/modules; SHA-256 140bfccdee9e7c1b509d0e8e961dd3432168ad11e3d96b0bb6e2659ff6e6ad2c. "
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F6",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Run jimage list and compare the three fully qualified slash-separated class entries exactly.",
+        "expected_observation": "Zero exact target entries and zero com/strategyquant/ namespace entries in the listing.",
+        "actual_observation": "Zero exact target entries and zero com/strategyquant/ namespace entries in the listing.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000183": {
+      "topic": "host.core.consumption.mainapp",
+      "title": "The selected current MainApp consumer set has 218 direct target-member instructions across 71 classes.",
+      "question": "The selected current MainApp consumer set has 218 direct target-member instructions across 71 classes.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The selected current MainApp consumer set has 218 direct target-member instructions across 71 classes.",
+        "confidence": "high",
+        "limitations": [
+          "Static instructions are not observed execution; selected structural consumers do not exhaust reflection/dynamic use.",
+          "Per-target class sets overlap; the union is 73 classes in 53 archives."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/libs/Snippets.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "SQ/Blocks/Indicators/Other/DataLoggingIndy; SQ/Internal/AbstractChart; SQ/Strategies/TestIndyStrategy; SQ/Strategies/TestOHLCDailyStrategy; SQ/Strategies/TestStrategyAskBid",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "6815d5acd6e411d078a423f80b605940e2778736d901cade987ea3f421d52924"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/AppCodeEditor/AppCodeEditor.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/App/impl/CodeEditor/CodeEditorAppPlugin$1",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "df88cbdf4baae6ee27892d389cefd6349fee81962f12d21ff45b663094826a15"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/AppDebugConsole/AppDebugConsole.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/App/impl/DebugConsole/DebugConsoleAppPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "aaaf875f1a4897aa3ea0a415bdca4da672b166bd0ea117bad9f5276723330394"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager; com/strategyquant/plugin/App/impl/Marketplace/MarketplaceManager$1; com/strategyquant/plugin/App/impl/Marketplace/MarketplaceServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ba60e1e5c65eca7809dc9bc43c16e64c88280e41e434a90246176b5fcfef747c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/AppSQXBusiness/AppSQXBusiness.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/App/impl/SQXBusiness/SQXBusinessServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c5d8346793a02923de19a4dbe7d146e21772af3f2d8bb29460d636be16892373"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/CodeEditor/impl/ImportExport/ExtensionManager; com/strategyquant/plugin/CodeEditor/impl/ImportExport/ImportExportServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "64d2f79b52a571d08aa90f0e56071bbc5fe1bfee5b30865bab8f18b1822ba990"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ConnectionMT4/ConnectionMT4.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Connection/impl/MT4/MT4ConnectionPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e197dc620cdeb9bccc53742aa8c3aa6a3a9bc41aea320f3e95eb3b052e503d7d"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DashboardResults/DashboardResults.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Dashboard/impl/Results/DashboardResultsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b2d127ddb067181677a79498cc6fb77f14b43397fe4b044d0626fb8f636ddde0"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataManagerBasket/DataManagerBasket.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataManager/impl/Basket/BasketServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "15d1dee0a9a962a2302f5eabf025c5486452ccfba39f9f57023c1642ba903c60"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataManagerBroker/DataManagerBroker.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataManager/impl/Broker/BrokerServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "84d9f257022e864c7fd738ef335783557b059f3367e61fedc2de3d5982af0c45"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataManager/impl/CustomData/CustomDataServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4339edcc665b0b9b540cfc2802c8ef207a8e3180931a314c70a7d0ebccdae316"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet; com/strategyquant/plugin/DataManager/impl/Data/DataServlet$4",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4970124bec1bc7aead64d019b242d6895686981f9c338b4bee1d832aef28bcd5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataManager/impl/Instruments/InstrumentsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e820bd7438ff1482c3233b12bb47454b4e57e3dfa3482f3904f1c67e0815a223"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Crypto/DataSourceCryptoServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0fc7ef50935978a05bd392601a7a22eb1a1a67e541300eae56386acfb3790d79"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager; com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexServlet; com/strategyquant/plugin/DataSource/impl/Darwinex/importdata/DarwinexImportJob",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "572bfd20f193133a71cd02ffffccaaa69d9b46ca0463dfc4ce8b74fb911b8e3a"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet; com/strategyquant/plugin/DataSource/impl/Files/job/DataImporter; com/strategyquant/plugin/DataSource/impl/Files/job/DataMassImporter",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "952be70cb76b5293fd6f110df9679eec6bbf1393139ae77f6f3cc5b0c3621783"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Mt5Api/DataSourceMt5ApiServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0e9a2fcba6c8457afbf3412a09c50572f207d04290e96469cefa9858f33aaf64"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/SQEquityData/SQEquityDataServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "872584251e604ec4d6dc7a8837a5a674fc30daef5251891090d1fb0b85365e53"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/SQFuturesData/SQFuturesDataServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ae170dfb47e1a0b7bacebb47b8575ac7a33976d613784c84a96abf5507a38a3f"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Yahoo/DataSourceYahooServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4a9d64a03e668d1563a14e179c041721779a83b440c7ada56097fb9d28f54a3d"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/EquityChartBenchmark/EquityChartBenchmark.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/EquityChart/impl/Benchmark/Benchmark",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c65c9be9aeb5d138615e44f463226419c856d192a6f309ba41c30cbcfa0261dc"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/HomeAbout/HomeAbout.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Home/impl/About/AboutServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "950092f1f3abff3ca23295d9fccd464a05d3d4605d8b9d1c1162d03e8ad1b5bd"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/LoaderSQ3/LoaderSQ3.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Loader/impl/SQ3/SQ3FileLoaderOldXml",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "5821dfc918051a68cb9e191209479d0041cf56271ac66f4588416525cdd57fe0"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/LoaderSQ4/LoaderSQ4.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Loader/impl/SQ4/SQ4LoaderPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "fdfae28061c503d76a141611891151148f4f5940541ae2ab331c9023b260a909"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/PortfolioComposer/PortfolioComposer.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Portfolio/impl/Composer/PortfolioComposerServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "46998223c28fb3ddce99dcf44bb5009fef53a8c7df0d09889a455b4aac0a1e16"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b14b83a58c5191fb5a4b7d9b79ec0c81ae70b31263f07d12a19ea559aec8181f"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "070932946751314323159f9a5a84d499b1b66924907a093d582f0ce9a7812c54"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet; com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "03f223f91b4aa45a3172fa39d409194f91741df7ac045d1625c9dbdb5c68fc0d"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet; com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c82ecb7d211e28b40b5e635ddde834bf09f67f54514b85d5997bf97e2f5aad4f"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/SourceCode/SourceCodeServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3e7fcf22b7a4c6e0b38875853ceefb14592837cd8f82ce71a43715aeaaa406e6"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsSysParamPermutation/ResultsSysParamPermutation.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/SysParamPermutation/SysParamPermutationServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a93d9519154a9761ea6226b14b7997c2e75418bb9c9cf899d11d5e077549fc8c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9a1309f63797d1b206527f3bd32f43fca8011c64eb8d7c815384b6844c70e108"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/TradeList/TradeListServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e59bc5ef621f7b03c02ae1f096b16056db67fe4ac50f8ad553a7b554d59006b5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f2ffc14b248085148f5c7d8cd69baf41d82ac6d7ee55e8e77bd752ab34e4029e"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet; com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f35a0ece39d090656ace5996fadc12ae1c0ddfd028952054f2b8c6ddf801964a"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SaverHTML/SaverHTML.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Saver/impl/HTML/HTMLReportPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1159ff22c6d8210a59b97b48ee0489c67b4647f5efe93b447d7a363a8c129675"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SaverPDF/SaverPDF.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Saver/impl/PDF/PDFReportPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "030ecc3ebcef0358672b151f15c848d0194ac6375bd018d39bedda723f714e81"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SaverSQ3/SaverSQ3.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Saver/impl/SQ3/SQ3FileSaver",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f8c9e0d4853ee53e732fe2fcdf057296770b79fd7a9e0aa26fc585b991b9f0cc"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Saver/impl/StrategyTrades/StrategyTradesSaverPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f8419ae945fc288763ebbc667dd65e14f9140859d2cd7c3bb3daf87409238348"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "40595742e8d58ca30f84671dcfd5280d15a6a42222166c510efffc444a29de45"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeAutoCompleteManager; com/strategyquant/plugin/Servlet/impl/CodeEditor/CodeEditorServlet; com/strategyquant/plugin/Servlet/impl/CodeEditor/FileMap; com/strategyquant/plugin/Servlet/impl/CodeEditor/templates/Templates",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ad9b7062db2f6bc617a5e865b01b049f03f21d28f2db61b35976c122c0edbef7"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletConstants/ServletConstants.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "188e5c2312faf36246d0c7d71a2312a9a51f21c2049bec9cd30b98fedec07e24"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletProject/ServletProject.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "39cb9a77afca650b62226815fe1a5e43f465da620b291eab0a9f0be98036d7ed"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletRenameTool/ServletRenameTool.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/RenameTool/RenameToolSettings",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0117bc047a4a69c16530c78b263df70f607d19bef32dcca40fda647f0e886caf"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/SQAI/SQAIServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "545ec37398014a9bec74760dd6f4b1886f5c1b30c7e2fb63c50d2e27df5a382b"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Settings/impl/CrossChecks/CrossChecksPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "12ed3ab90da9476cdd55e57d00d67ef8f913a0af4963abe3a54070c03dc3515e"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SettingsNotification/SettingsNotification.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Settings/impl/Notification/NotificationPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "24c1973db874306ab3b8fa40ae1c64dde32ae7c2de0f22f51536f13ca655b148"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Settings/impl/WhatToBuild/WhatToBuildSettingsPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b836d5729770602d51b99f1b73edeaaa370518e003fc45bd54fcc4cfd8217518"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/TaskAutomaticPortfolioBuilder/TaskAutomaticPortfolioBuilder.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Task/impl/AutomaticPortfolioBuilder/AutomaticPortfolioBuilder",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "63a15c31d3c44356a360c32c988b22e30b8c8ddfe581a9bc7ac62050e887e8ce"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/TaskBuild/TaskBuild.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Task/impl/Build/BuildTask; com/strategyquant/plugin/Task/impl/Build/RandomBuildEngine",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "38d7920fafa619f5521a5d147f2f57d2bc265f251aae02d6076bd972c49643d4"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/TaskOptimize/TaskOptimize.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/MainApp member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Task/impl/Optimize/OptimizeTask",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "026673159e7365b15e877ecd9123bf4187f49218d4db3855a6c0fed6a3735bc5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F7",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Disassemble each source-pinned selected consumer with explicit per-archive origins; count matching direct method/field instructions.",
+        "expected_observation": "218 direct target-member instructions across 71 classes.",
+        "actual_observation": "218 direct target-member instructions across 71 classes.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX145-EV-000159"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000184": {
+      "topic": "host.core.consumption.appsettings",
+      "title": "The selected current AppSettings consumer set has 82 direct target-member instructions across 23 classes.",
+      "question": "The selected current AppSettings consumer set has 82 direct target-member instructions across 23 classes.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The selected current AppSettings consumer set has 82 direct target-member instructions across 23 classes.",
+        "confidence": "high",
+        "limitations": [
+          "Static instructions are not observed execution; selected structural consumers do not exhaust reflection/dynamic use.",
+          "Per-target class sets overlap; the union is 73 classes in 53 archives."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DashboardResults/DashboardResults.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Dashboard/impl/Results/DashboardResultsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b2d127ddb067181677a79498cc6fb77f14b43397fe4b044d0626fb8f636ddde0"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataManager/impl/Data/DataServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4970124bec1bc7aead64d019b242d6895686981f9c338b4bee1d832aef28bcd5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Darwinex/DarwinexDataManager",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "572bfd20f193133a71cd02ffffccaaa69d9b46ca0463dfc4ce8b74fb911b8e3a"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Files/DataSourceFilesServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "952be70cb76b5293fd6f110df9679eec6bbf1393139ae77f6f3cc5b0c3621783"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/DatabankActions/DatabankActionsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b14b83a58c5191fb5a4b7d9b79ec0c81ae70b31263f07d12a19ea559aec8181f"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/EquityChart/EquityChartServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "070932946751314323159f9a5a84d499b1b66924907a093d582f0ce9a7812c54"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/OptimizationProfile/OptimizationProfileServlet; com/strategyquant/plugin/Results/impl/OptimizationProfile/results/OptResultsViewsManager",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "03f223f91b4aa45a3172fa39d409194f91741df7ac045d1625c9dbdb5c68fc0d"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/RobustnessTests/RobustnessTestsServlet; com/strategyquant/plugin/Results/impl/RobustnessTests/views/RTViewsManager",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c82ecb7d211e28b40b5e635ddde834bf09f67f54514b85d5997bf97e2f5aad4f"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/SourceCode/SourceCodeServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3e7fcf22b7a4c6e0b38875853ceefb14592837cd8f82ce71a43715aeaaa406e6"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsSysParamPermutation/ResultsSysParamPermutation.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/SysParamPermutation/SysParamPermutationServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a93d9519154a9761ea6226b14b7997c2e75418bb9c9cf899d11d5e077549fc8c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/TradeAnalysis/TradeAnalysisServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9a1309f63797d1b206527f3bd32f43fca8011c64eb8d7c815384b6844c70e108"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/TradeList/TradeListServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e59bc5ef621f7b03c02ae1f096b16056db67fe4ac50f8ad553a7b554d59006b5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/TradelistViews/TradelistViewsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f2ffc14b248085148f5c7d8cd69baf41d82ac6d7ee55e8e77bd752ab34e4029e"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/WalkForward/WalkForwardServlet; com/strategyquant/plugin/Results/impl/WalkForward/views/WFViewsManager",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f35a0ece39d090656ace5996fadc12ae1c0ddfd028952054f2b8c6ddf801964a"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Saver/impl/StrategyTrades/StrategyTradesSaverPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f8419ae945fc288763ebbc667dd65e14f9140859d2cd7c3bb3daf87409238348"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/AlgoWizard/AlgoWizardServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "40595742e8d58ca30f84671dcfd5280d15a6a42222166c510efffc444a29de45"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletConstants/ServletConstants.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/Constants/ConstantsServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "188e5c2312faf36246d0c7d71a2312a9a51f21c2049bec9cd30b98fedec07e24"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ServletProject/ServletProject.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Servlet/impl/Project/ProjectServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "39cb9a77afca650b62226815fe1a5e43f465da620b291eab0a9f0be98036d7ed"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/SettingsNotification/SettingsNotification.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/app/AppSettings member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Settings/impl/Notification/NotificationPlugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "24c1973db874306ab3b8fa40ae1c64dde32ae7c2de0f22f51536f13ca655b148"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F8",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Disassemble each source-pinned selected consumer with explicit per-archive origins; count matching direct method/field instructions.",
+        "expected_observation": "82 direct target-member instructions across 23 classes.",
+        "actual_observation": "82 direct target-member instructions across 23 classes.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX145-EV-000158"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000185": {
+      "topic": "host.core.consumption.cpuinfo",
+      "title": "The selected current CpuInfo consumer set has 2 direct target-member instructions across 2 classes.",
+      "question": "The selected current CpuInfo consumer set has 2 direct target-member instructions across 2 classes.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The selected current CpuInfo consumer set has 2 direct target-member instructions across 2 classes.",
+        "confidence": "high",
+        "limitations": [
+          "Static instructions are not observed execution; selected structural consumers do not exhaust reflection/dynamic use.",
+          "Per-target class sets overlap; the union is 73 classes in 53 archives."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+          "location": {
+            "section": "Direct com/strategyquant/lib/memory/CpuInfo member instructions; exact method/offsets and class hashes in capture",
+            "symbol": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer; com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "cb2351d4e02219f853d36abb08ffbacb19b71fbd7c730cf5105273fa359e40f5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F9",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Disassemble each source-pinned selected consumer with explicit per-archive origins; count matching direct method/field instructions.",
+        "expected_observation": "2 direct target-member instructions across 2 classes.",
+        "actual_observation": "2 direct target-member instructions across 2 classes.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX145-EV-000160"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000186": {
+      "topic": "data.dukascopy.settings.parallel_download_fallback_argument",
+      "title": "DukasServlet.onGetParallelDownload supplies string 3 as the fallback argument for parallelDownload.",
+      "question": "DukasServlet.onGetParallelDownload supplies string 3 as the fallback argument for parallelDownload.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "data_download_settings"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "DukasServlet.onGetParallelDownload supplies string 3 as the fallback argument for parallelDownload.",
+        "confidence": "high",
+        "limitations": [
+          "This establishes caller-supplied arguments only; hidden AppSettings lookup/default semantics and runtime output are unknown."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+          "location": {
+            "section": "bytecode offsets 20-30",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.onGetParallelDownload()Ljava/lang/String;",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Entry com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.class; SHA-256 0739e3d30655c464f49b5f87e9e73fbe93edc8c59d2e6da50796420996579fb3"
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F10",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY"
+        ],
+        "requirement_ids": [
+          "FR-DATA-SOURCE-DATA-SOURCE-DUKASCOPY-DUKAS-SERVLET-CONTRACT"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature/class seed is proposed; exact getter/setter requirements remain unregistered.",
+        "proposed_owner_readme": "app/plugins/data_source/DataSourceDukascopy/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect the complete caller method and its operand arguments to AppSettings.get(String,String).",
+        "expected_observation": "The parallelDownload lookup is supplied string 3 as its second argument.",
+        "actual_observation": "The parallelDownload lookup is supplied string 3 as its second argument.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000187": {
+      "topic": "data.dukascopy.settings.cdn_parallel_download_fallback_argument",
+      "title": "DukasServlet.onGetParallelDownload supplies string 3 as the fallback argument for cdnParallelDownload.",
+      "question": "DukasServlet.onGetParallelDownload supplies string 3 as the fallback argument for cdnParallelDownload.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "data_download_settings"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "DukasServlet.onGetParallelDownload supplies string 3 as the fallback argument for cdnParallelDownload.",
+        "confidence": "high",
+        "limitations": [
+          "This establishes caller-supplied arguments only; hidden AppSettings lookup/default semantics and runtime output are unknown."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+          "location": {
+            "section": "bytecode offsets 37-47",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.onGetParallelDownload()Ljava/lang/String;",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Entry com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.class; SHA-256 0739e3d30655c464f49b5f87e9e73fbe93edc8c59d2e6da50796420996579fb3"
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F11",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY"
+        ],
+        "requirement_ids": [
+          "FR-DATA-SOURCE-DATA-SOURCE-DUKASCOPY-DUKAS-SERVLET-CONTRACT"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature/class seed is proposed; exact getter/setter requirements remain unregistered.",
+        "proposed_owner_readme": "app/plugins/data_source/DataSourceDukascopy/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect the complete caller method and its operand arguments to AppSettings.get(String,String).",
+        "expected_observation": "The cdnParallelDownload lookup is supplied string 3 as its second argument.",
+        "actual_observation": "The cdnParallelDownload lookup is supplied string 3 as its second argument.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000188": {
+      "topic": "data.dukascopy.settings.update_order",
+      "title": "DukasServlet.onSetParallelDownload places the queue-size update before its three settings updates and save call.",
+      "question": "DukasServlet.onSetParallelDownload places the queue-size update before its three settings updates and save call.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "data_download_settings"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "DukasServlet.onSetParallelDownload places the queue-size update before its three settings updates and save call.",
+        "confidence": "high",
+        "limitations": [
+          "Call ordering does not prove transactionality, durable success, rollback or outer HTTP error behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+          "location": {
+            "section": "bytecode offsets 31-82",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.onSetParallelDownload(Ljava/util/Map;)Ljava/lang/String;",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Entry com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.class; SHA-256 0739e3d30655c464f49b5f87e9e73fbe93edc8c59d2e6da50796420996579fb3"
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F12",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY"
+        ],
+        "requirement_ids": [
+          "FR-DATA-SOURCE-DATA-SOURCE-DUKASCOPY-DUKAS-SERVLET-CONTRACT"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature/class seed is proposed; exact getter/setter requirements remain unregistered.",
+        "proposed_owner_readme": "app/plugins/data_source/DataSourceDukascopy/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect the full caller method and compare queue-size, settings-set and save instruction order.",
+        "expected_observation": "Queue-size update precedes three settings-set calls and the settings-save call.",
+        "actual_observation": "Queue-size update precedes three settings-set calls and the settings-save call.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000189": {
+      "topic": "data.dukascopy.lifecycle.console_preload_branch",
+      "title": "DukasServlet starts its preload helper only on the false-result branch of MainApp.runInConsole().",
+      "question": "DukasServlet starts its preload helper only on the false-result branch of MainApp.runInConsole().?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "data_download_settings"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "DukasServlet starts its preload helper only on the false-result branch of MainApp.runInConsole().",
+        "confidence": "high",
+        "limitations": [
+          "Console-mode derivation and preload helper execution/outcomes remain unknown."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+          "location": {
+            "section": "bytecode offsets 0-17",
+            "symbol": "com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.preloadAvailableDataResponse()V",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Entry com/strategyquant/plugin/DataSource/impl/Dukascopy/DukasServlet.class; SHA-256 0739e3d30655c464f49b5f87e9e73fbe93edc8c59d2e6da50796420996579fb3"
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "40b61a3670af7fcf1265fa2d07889d6c75df100b96dd1d73b64c8de793e6913c"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F13",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY"
+        ],
+        "requirement_ids": [
+          "FR-DATA-SOURCE-DATA-SOURCE-DUKASCOPY-DUKAS-SERVLET-CONTRACT"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature/class seed is proposed; exact getter/setter requirements remain unregistered.",
+        "proposed_owner_readme": "app/plugins/data_source/DataSourceDukascopy/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect the conditional jump and preload-helper construction/start instructions.",
+        "expected_observation": "True console result branches to return; false result reaches preload-helper start.",
+        "actual_observation": "True console result branches to return; false result reaches preload-helper start.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000190": {
+      "topic": "portfolio.correlation.portfolio_correlation.cpu_pool_input",
+      "title": "PortfolioCorrelationComputer passes the CpuInfo return value directly as its fixed-thread-pool size.",
+      "question": "PortfolioCorrelationComputer passes the CpuInfo return value directly as its fixed-thread-pool size.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "portfolio_correlation"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "PortfolioCorrelationComputer passes the CpuInfo return value directly as its fixed-thread-pool size.",
+        "confidence": "high",
+        "limitations": [
+          "CPU detection, settings overrides, caching and valid return range remain unknown; no global CPU policy inferred."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+          "location": {
+            "section": "bytecode offsets 27-37",
+            "symbol": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer.public org.json.JSONObject compute(com.strategyquant.tradinglib.ResultsGroup, int, com.strategyquant.tradinglib.CorrelationType, boolean, boolean, com.strategyquant.plugin.Results.impl.PortfolioCorrelation.PortfolioCorrelationResultsSender) throws java.lang.Exception;",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Entry com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer.class; SHA-256 7e26869e874b099f46f4a3f2782c759313625040df2c174d898cf5266bce0bdf"
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "cb2351d4e02219f853d36abb08ffbacb19b71fbd7c730cf5105273fa359e40f5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F14",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "portfolio",
+        "feature_ids": [
+          "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature is proposed; current requirement seeds concern the servlet, not worker CPU/lifecycle methods. No worker FR is registered.",
+        "proposed_owner_readme": "app/plugins/portfolio/ResultsPortfolioCorrelation/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect the compute method from CpuInfo.getAvailableProcessors through Executors.newFixedThreadPool.",
+        "expected_observation": "The CPU return integer is passed directly to the fixed-thread-pool constructor call.",
+        "actual_observation": "The CPU return integer is passed directly to the fixed-thread-pool constructor call.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000191": {
+      "topic": "portfolio.correlation.overlapping_trades.cpu_pool_input",
+      "title": "OverlappingTradesComputer passes the CpuInfo return value directly as its fixed-thread-pool size.",
+      "question": "OverlappingTradesComputer passes the CpuInfo return value directly as its fixed-thread-pool size.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "portfolio_correlation"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "OverlappingTradesComputer passes the CpuInfo return value directly as its fixed-thread-pool size.",
+        "confidence": "high",
+        "limitations": [
+          "CPU detection, settings overrides, caching and valid return range remain unknown; no global CPU policy inferred."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+          "location": {
+            "section": "bytecode offsets 5-13",
+            "symbol": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer.public org.json.JSONObject compute(com.strategyquant.tradinglib.ResultsGroup, com.strategyquant.plugin.Results.impl.PortfolioCorrelation.PortfolioCorrelationResultsSender) throws java.lang.Exception;",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Entry com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer.class; SHA-256 8e5ff4744cdc4a93bcb488fa4c79e82a4d77dff6aca2fd1dae376ac03e52a386"
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "cb2351d4e02219f853d36abb08ffbacb19b71fbd7c730cf5105273fa359e40f5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F15",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "portfolio",
+        "feature_ids": [
+          "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature is proposed; current requirement seeds concern the servlet, not worker CPU/lifecycle methods. No worker FR is registered.",
+        "proposed_owner_readme": "app/plugins/portfolio/ResultsPortfolioCorrelation/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect the compute method from CpuInfo.getAvailableProcessors through Executors.newFixedThreadPool.",
+        "expected_observation": "The CPU return integer is passed directly to the fixed-thread-pool constructor call.",
+        "actual_observation": "The CPU return integer is passed directly to the fixed-thread-pool constructor call.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000192": {
+      "topic": "portfolio.correlation.portfolio_correlation.interruption_cleanup_call",
+      "title": "PortfolioCorrelationComputer calls shutdownNow on its explicit portfolio-interruption handler path.",
+      "question": "PortfolioCorrelationComputer calls shutdownNow on its explicit portfolio-interruption handler path.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "portfolio_correlation"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "PortfolioCorrelationComputer calls shutdownNow on its explicit portfolio-interruption handler path.",
+        "confidence": "high",
+        "limitations": [
+          "No general cleanup guarantee, normal-completion shutdown behavior or hidden host thread lifecycle is established."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+          "location": {
+            "section": "bytecode offsets 466-478; exception range 39-465",
+            "symbol": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer.compute: PortfolioCorrelationInterruptException handler",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Entry com/strategyquant/plugin/Results/impl/PortfolioCorrelation/correlation/PortfolioCorrelationComputer.class; SHA-256 7e26869e874b099f46f4a3f2782c759313625040df2c174d898cf5266bce0bdf"
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "cb2351d4e02219f853d36abb08ffbacb19b71fbd7c730cf5105273fa359e40f5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F16",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "portfolio",
+        "feature_ids": [
+          "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature is proposed; current requirement seeds concern the servlet, not worker CPU/lifecycle methods. No worker FR is registered.",
+        "proposed_owner_readme": "app/plugins/portfolio/ResultsPortfolioCorrelation/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect the full compute method and its exception table/handler instructions.",
+        "expected_observation": "The explicit portfolio-interruption handler invokes ExecutorService.shutdownNow before the rethrow instruction.",
+        "actual_observation": "The explicit portfolio-interruption handler invokes ExecutorService.shutdownNow before the rethrow instruction.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000193": {
+      "topic": "portfolio.correlation.overlapping_trades.interruption_cleanup_call",
+      "title": "OverlappingTradesComputer calls shutdownNow on its explicit portfolio-interruption handler path.",
+      "question": "OverlappingTradesComputer calls shutdownNow on its explicit portfolio-interruption handler path.?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "portfolio_correlation"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "OverlappingTradesComputer calls shutdownNow on its explicit portfolio-interruption handler path.",
+        "confidence": "high",
+        "limitations": [
+          "No general cleanup guarantee, normal-completion shutdown behavior or hidden host thread lifecycle is established."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+          "location": {
+            "section": "bytecode offsets 412-424; exception range 15-411",
+            "symbol": "com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer.compute: PortfolioCorrelationInterruptException handler",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Entry com/strategyquant/plugin/Results/impl/PortfolioCorrelation/overlappingTrades/OverlappingTradesComputer.class; SHA-256 8e5ff4744cdc4a93bcb488fa4c79e82a4d77dff6aca2fd1dae376ac03e52a386"
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "cb2351d4e02219f853d36abb08ffbacb19b71fbd7c730cf5105273fa359e40f5"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/observations/F17",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "portfolio",
+        "feature_ids": [
+          "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature is proposed; current requirement seeds concern the servlet, not worker CPU/lifecycle methods. No worker FR is registered.",
+        "proposed_owner_readme": "app/plugins/portfolio/ResultsPortfolioCorrelation/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect the full compute method and its exception table/handler instructions.",
+        "expected_observation": "The explicit portfolio-interruption handler invokes ExecutorService.shutdownNow before the rethrow instruction.",
+        "actual_observation": "The explicit portfolio-interruption handler invokes ExecutorService.shutdownNow before the rethrow instruction.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/host-core-research.json"
+        ],
+        "executed_at": "2026-10-06T20:40:23.714970+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "static",
+        "host_core_research"
+      ]
+    },
+    "SQX145-EV-000194": {
+      "topic": "host.evidence.p00_closure_boundary",
+      "title": "DEC-HOST-P00-CLOSURE-BOUNDARY",
+      "question": "What target decision owns this disposition?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "P00 accepts verified reference tooling/inventory, reconciled ownership proposals and explicit gap dispositions. Application registration, execution and applicable independent runtime comparisons belong to owning feature plans and release gates; P00 closure grants no runtime/parity authority.",
+        "confidence": "high",
+        "limitations": [
+          "Owner-approved HaruQuantAI target decision, not an SQX fact or a donor/runtime validation pass.",
+          "Application registration, exact target policies and implementation still require owning feature plans."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "app/host/README.md",
+          "location": {
+            "section": null,
+            "symbol": "DEC-HOST-P00-CLOSURE-BOUNDARY",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "owner_decision",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "dee9ea740a2460a0cc1c24ccf494568866dcbfc3049fa722a408dcb790fd659e"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/approval",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-OWNERSHIP-GATES"
+        ],
+        "decision_ids": [
+          "DEC-HOST-P00-CLOSURE-BOUNDARY"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "not_required",
+        "kind": "authority",
+        "procedure": "Owner explicitly approved closure plan version 2 with APPROVED: EXECUTE on 2026-10-06; ratified decision text is in the owning host README.",
+        "expected_observation": null,
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "normative",
+        "p00_closure"
+      ]
+    },
+    "SQX145-EV-000195": {
+      "topic": "host.core.unavailable_source_target_disposition",
+      "title": "DEC-HOST-P00-UNAVAILABLE-HOST-SOURCE",
+      "question": "What target decision owns this disposition?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "host_core_reference"
+        ],
+        "conditions": [
+          "Current downloaded artifacts; static inspection, no donor runtime."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "The audited MainApp/AppSettings/CpuInfo host-service bodies receive an accepted source limitation. HaruQuantAI may implement its own universal lifecycle/settings/path/CPU contracts, informed by directly inspected callers, through approved feature plans. Unsupported semantics are explicit normative target decisions. This exception covers no missing numerical, trading, AI or domain algorithm and grants no exact-translation/parity claim.",
+        "confidence": "high",
+        "limitations": [
+          "Owner-approved HaruQuantAI target decision, not an SQX fact or a donor/runtime validation pass.",
+          "Application registration, exact target policies and implementation still require owning feature plans."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "app/host/README.md",
+          "location": {
+            "section": null,
+            "symbol": "DEC-HOST-P00-UNAVAILABLE-HOST-SOURCE",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "owner_decision",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "dee9ea740a2460a0cc1c24ccf494568866dcbfc3049fa722a408dcb790fd659e"
+          },
+          "accessed_at": "2026-10-06"
+        },
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/host-core-research.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/approval",
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71"
+          },
+          "accessed_at": "2026-10-06"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-OWNERSHIP-GATES"
+        ],
+        "decision_ids": [
+          "DEC-HOST-P00-UNAVAILABLE-HOST-SOURCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "not_required",
+        "kind": "authority",
+        "procedure": "Owner explicitly approved closure plan version 2 with APPROVED: EXECUTE on 2026-10-06; ratified decision text is in the owning host README.",
+        "expected_observation": null,
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
+        "created_at": "2026-10-06T20:53:39.187903+00:00",
+        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "current_reference",
+        "normative",
+        "p00_closure"
+      ]
     }
   },
   "minimum_record_number": 132,
-  "allocation_high_water_mark": 173
+  "allocation_high_water_mark": 195
 }

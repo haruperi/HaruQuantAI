@@ -81,6 +81,13 @@ absent and cannot be presented as current executable acceptance checks.
 Future application source must restore >=80% branch-aware application coverage and
 its feature-specific architecture/removal checks through approved plans.
 
-MainApp/AppSettings/SQLib/CpuInfo remain missing donor implementations. Do not infer
-algorithms, configuration precedence, product activation or packaging from consumer
-references. Observe body semantics and obtain conflict decisions before translation.
+MainApp/AppSettings/CpuInfo remain unavailable within the audited current static
+boundary; SQLib/core packaging is unresolved. The owner-approved
+DEC-HOST-P00-UNAVAILABLE-HOST-SOURCE permits target-owned universal host contracts
+through approved feature plans. Settings precedence, CPU policy, lifecycle and
+paths must be explicit target decisions rather than inferred SQX facts. This
+exception covers no missing numerical, trading, AI or domain algorithm.
+Donor-derived translation/parity claims still require supporting body semantics
+and applicable independent observations; product activation remains unverified.
+P00 closure establishes reference readiness and dispositions only. Application
+registration and runtime qualification belong to owning feature/integration plans.

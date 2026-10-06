@@ -57,13 +57,19 @@ are unverified; runtime JAR version is not product-version evidence.
 
 P00 delivers inventories, current-source evidence, proposed ownership and
 reference validation. Exact SHA/count/order comparisons use zero tolerance.
-Common-core algorithms, donor runtime output fixtures, product activation and
-P01-P19 application execution remain blocked/unqualified. See the
+The approved P00 closure boundary accepts explicit source-gap dispositions.
+MainApp/AppSettings/CpuInfo universal host services may follow approved target
+contracts; their hidden donor semantics remain unknown. Missing domain algorithms,
+applicable donor runtime fixtures, product activation and P01-P19 application
+execution remain unqualified and gated by their owning features. See the
 [release matrix](dev/evidence/p00-release-matrix.md).
 
-A future feature requires complete body-derived behavior, ratified owner/FEAT/FR/
-DEC mappings, independent normal/boundary/failure observations, focused tests,
-explicit FR log verification and candidate checks. Full application parity cannot
+A future feature requires evidence-supported donor behavior, ratified owner/FEAT/FR/
+DEC mappings, applicable independent normal/boundary/failure observations, focused
+tests, explicit FR log verification and candidate checks. The narrowly approved
+source-unavailable universal host services instead require explicit target-owned
+contracts/defaults/failures and independent target tests; they cannot claim exact
+SQX translation or parity. Application registrations occur in owning feature plans. Full application parity cannot
 be claimed from structural inventory, coverage or a similar UI.
 
 ## Persistence and external effects

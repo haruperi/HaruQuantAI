@@ -19,33 +19,46 @@
 
 ## 1. Objective
 
-- **Goal:** Qualify sole-cohort evidence, ownership and unavailable common-core prerequisites before host implementation.
-- **Context / Problem Solved:** Reference tooling exists; structural completeness does not supply missing application bodies or runtime fixtures.
+- **Goal:** Complete SQX145 reference readiness and explicit dispositions for known source gaps before planned application work.
+- **Context / Problem Solved:** Static evidence is requalified; the bounded host-core search is finished. The owner-approved closure boundary permits explicit target-owned universal host contracts and assigns application/runtime obligations to their feature plans.
+- **Owner:** Registered `FEAT-HOST-EVIDENCE` and its seven FRs in `app/host/README.md`; application allocations remain proposals.
+- **Status:** P00 complete for reference readiness and approved gap dispositions; publication/static checks passed. Completion records disposition, not recovered bodies, application delivery or runtime parity.
 
 ## 2. Research and donors
 
-- **Donors:** `SQX_145_REFERENCE_ROOT/internal/libs`, `internal/plugins` and shipped static resources; [common-core gaps](../evidence/p00-common-core.md).
-- **Authority:** `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `app/host/README.md`, current ledger/schema, inventory/member indices and target UI READMEs.
-- **Gap:** 26 structural core-symbol references lack current standalone definitions; installed build/activation and donor runtime qualification remain unavailable.
+- **Donors:** `SQX_145_REFERENCE_ROOT/internal/libs`, `internal/plugins`, three host launchers, installer packaging and `j64/lib/modules`.
+- **Authority:** `AGENTS.md`, project/architecture, host README, unchanged ledger/schema, current inventory/member/ownership artifacts and target UI READMEs.
+- **Static evidence:** [Earlier P00 review](../evidence/sqx145/p00-review.json); 289 JARs / 51,713 class occurrences / 874 member shards / 807 representative FR seeds.
+- **Completed audit:** [Host-core research](../evidence/p00-host-core-research.md); 302 direct member instructions across 73 distinct classes in 53 archives. Selected caller arguments, branches, order and worker pool inputs are inspected; execution is unobserved.
+- **Accepted host gap:** MainApp/AppSettings/CpuInfo bodies remain unavailable within the bounded static search. Target lifecycle/settings/path/CPU contracts require explicit normative decisions and independent target tests in approved feature plans.
+- **Scope:** The 26 selected structural gaps comprise three host and 23 AI symbols; the wider 669-name census is not proof of missing runtime calls or an automatic global blocker.
+- **AI/domain gates:** Q obligations belong to [P19.1](phase-19-agentic-research.md#191-q-prerequisites---core-packaging-contracts-and-source-authority). The host exception covers no missing trading, numerical, AI or other domain algorithm.
+- **Known limits:** Hidden core semantics, installed activation and runtime/numerical parity remain unqualified. No donor/installer launch or database read/write occurred.
+- **Policy history:** Earlier mandatory body-recovery/global application-registration/runtime prerequisite wording is superseded by owner-approved closure plan version 2; the source facts remain unchanged. The header's missing-body prerequisite applies to donor-derived claims; the named host exception is explicit here.
 
 ## 3. File Changes
 
-- **Modify:** `tests/reference/{manifest,fixtures,validate}.py` — existing evidence qualification tooling, not a runtime substitute.
-- **Modify:** `docs/dev/evidence/{reimplementation.json,reimplementation.schema.json,p00-common-core.md,p00-release-matrix.md}` — fresh atomic observations and unresolved gates.
-- **Modify:** `app/host/README.md` — existing evidence capability status and approved reference decisions.
+- **Retain:** `tests/reference/{manifest,fixtures,validate}.py`, schema and previous captures — unchanged evidence tooling and history.
+- **Create:** `docs/dev/evidence/{p00-host-core-research.md,sqx145/host-core-research.json}` — paraphrased research, source pins, approved decisions and actual static results.
+- **Modify:** `docs/dev/evidence/{reimplementation.json,p00-common-core.md,p00-release-matrix.md,README.md}` — atomic observations, normative records and truthful gate dispositions.
+- **Modify:** `app/host/README.md`, `docs/{PROJECT,ARCHITECTURE}.md` — approved closure/limited host-source decisions; no application FEAT/FR registration.
+- **Modify:** `docs/dev/phases/implementation_checklist.md` — complete 1.1 only after actual candidate checks; all application tasks remain unchecked.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Verify the current inventory/member/ownership gates and isolated static fixtures; inspect every unresolved current core caller.
-- [ ] **Step 2:** Locate missing bodies using authorized current artifacts or applicable official sources; do not reconstruct unavailable formulas from declarations.
-- [ ] **Step 3:** Ratify owning features/descriptive FRs/decisions before application implementation; allocate new atomic current-source evidence IDs.
-- [ ] **Step 4:** Obtain independent normal/boundary/failure donor observations and distinguish static inspection from runtime qualification.
-- [ ] **Step 5:** Keep this prerequisite unchecked until required common-core/runtime gates pass; update the master tracker after actual completion.
+- [x] **Step 1:** Requalify sole SQX145 inventory, complete member metadata, source/record/schema links and isolated static fixtures; preserve actual donor-gate observations.
+- [x] **Step 2:** Reconcile archive/resource proposals and FR seeds; verify the evidence registration. Application proposals remain unregistered.
+- [x] **Step 3:** Run focused reference regression checks and preserve actual commands, timestamps and outputs; no application/runtime tests claimed.
+- [x] **Step 4:** Reconcile selected consumer sets and the wider standalone type-name census; structural research only.
+- [x] **Step 5:** Publish bounded packaging/caller research and explicitly dispose the three unavailable host bodies under the approved target-contract exception; no body recovery claimed.
+- [x] **Step 6:** Ratify evidence ownership/closure decisions and assign actual application FEAT/FR/DEC registration to owning feature plans; AI obligations remain in P19.1.
+- [x] **Step 7:** Classify and assign applicable runtime/activation/parity observations to owning feature/release tasks. This disposition claims no executed donor observation or runtime pass.
+- [x] **Step 8:** Passed publication/static checks and recorded actual results; owning status/master progress reconcile. P00 closure qualifies reference readiness and dispositions only.
 
 ## 5. Verification & Testing
 
-- **Automated Tests:** `uv run python -m tests.reference.validate`; explicit donor check with `--check-donor`; focused reference pytest, Ruff and strict Mypy.
-- **Manual / Browser Verification:** Review unresolved core bodies and source/target ownership; no connected UI or runtime parity is qualified by P00 tooling.
+- **Automated Tests:** `uv run python -m tests.reference.validate`; explicit current-root `--check-donor`; `uv run pytest tests/unit/test_reference_manifest.py tests/unit/test_reference_fixtures.py tests/unit/test_reference_validation.py --no-cov -q`. Final results belong to the [closure capture](../evidence/sqx145/host-core-research.json).
+- **Manual / Browser Verification:** Review source locations, preserved historical facts, approved exception bounds and ownership mappings. No donor runtime, UI connection, activation or parity verification is claimed; applicable acceptance belongs to owning implementation tasks.
 
 
 # 1.2 FEAT-HOST-COMMONS-BEANUTILS - commons-beanutils-1.9.2.jar

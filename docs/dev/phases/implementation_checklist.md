@@ -1,19 +1,20 @@
 # SQX145 implementation checklist
 
 ```text
-Progress Bar   [--------------------] 0%
-Completed      0/366
-Current Task   Not started — next: 1.1 P00 prerequisites
+Progress Bar   [--------------------] 0.27%
+Completed      1/366
+Current Task   1.2 FEAT-HOST-COMMONS-BEANUTILS
 ```
 
 - Count child tasks only; phase checkboxes are rollups.
-- Check a feature only after its requirements, backend and applicable prebuilt UI connection pass.
+- **1.1:** Complete for reference readiness and owner-approved gap dispositions. [Owning host status](../../../app/host/README.md), [P00 observations](../evidence/sqx145/p00-review.json) and [closure research](../evidence/p00-host-core-research.md). No application/runtime completion claimed.
+- Check an application feature only after its requirements, backend and applicable prebuilt UI connection pass. Administrative prerequisite 1.1 closes under its approved reference-readiness/disposition criteria; it implements no application workflow.
 - Update this file after every completed task; recalculate progress/current task and phase rollups.
 - Domain READMEs own status. Published plans and static evidence are not completed application tasks.
 - Execute P19 before final P18 qualification. Numbers identify current tasks, not execution chronology.
 
 - [ ] 1. [Phase 1 — Host bootstrap, logging, configuration and diagnostics](phase-01-host-foundation.md)
-    - [ ] 1.1 [P00 prerequisites — evidence, ownership and missing common core](phase-01-host-foundation.md#11-p00-prerequisites--evidence-ownership-and-missing-common-core)
+    - [x] 1.1 [P00 prerequisites — evidence, ownership and missing common core](phase-01-host-foundation.md#11-p00-prerequisites--evidence-ownership-and-missing-common-core)
     - [ ] 1.2 [FEAT-HOST-COMMONS-BEANUTILS](phase-01-host-foundation.md#12-feat-host-commons-beanutils---commons-beanutils-192jar)
     - [ ] 1.3 [FEAT-HOST-COMMONS-CODEC](phase-01-host-foundation.md#13-feat-host-commons-codec---commons-codec-1171jar)
     - [ ] 1.4 [FEAT-HOST-COMMONS-COLLECTIONS](phase-01-host-foundation.md#14-feat-host-commons-collections---commons-collections-321jar)
