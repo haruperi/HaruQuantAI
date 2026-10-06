@@ -23,7 +23,7 @@ Purpose:
     [Feature identifier and technical feature scope. Follow the feature naming
     convention: FEAT-<SUBSYSTEM>-<NAME> (e.g. FEAT-HOST-BOOT, FEAT-DATA-DUKASCOPY).]
 
-Capabilities:
+Key Capabilities:
     - FR-<SUBSYSTEM>-<CAPABILITY-SLUG>: [Descriptive capability summary]
       Associated: `[Class.method()]`, `[function()]`
       Logging: [Explicit description of the log emission when this requirement fires.

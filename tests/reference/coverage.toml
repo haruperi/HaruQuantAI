@@ -1,0 +1,9 @@
+[run]
+source = ["tests.reference"]
+branch = true
+data_file = ".agents/logs/20261006_175657_p00-prerequisites/coverage.data"
+
+[report]
+fail_under = 80
+show_missing = true
+exclude_lines = ["if __name__ == .__main__.:"]

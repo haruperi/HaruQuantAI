@@ -1,10 +1,11 @@
-"""Qualify retained tooling and the frontend before pushing the reset baseline.
+"""Qualify retained tooling, P00 references and the frontend.
 
 Description:
     The pre-push hook invokes this module to validate retained Python tooling and
     the React frontend. `main()` resolves npm and runs checks in sequence,
     preserving child diagnostics and stopping at the first failure. Deleted
-    application and test directories are outside this reset baseline.
+    application runtime is outside this baseline. Reference tests use temporary
+    files, and offline evidence checks never require an SQX installation.
 
 Purpose:
     FEAT-DEV-QUALIFICATION: Qualify the current repository before publication.
@@ -20,7 +21,7 @@ Key Capabilities:
       failures or nonzero exit codes. Events identify command and exit status.
     - FR-DEV-QUALIFICATION-RESULT: Stop on failure or report full success.
       Associated: `main()`
-      Logging: ERROR identifies the blocking check; INFO confirms all six pass.
+      Logging: ERROR identifies the blocking check; INFO confirms all checks pass.
 
 Python API Usage:
     ```python
@@ -56,6 +57,20 @@ def main() -> int:
         logger.error("FR-DEV-RESOLVE-NPM: npm launcher not found")
         return 1
     logger.info("FR-DEV-RESOLVE-NPM: npm launcher resolved")
+    audit = root / ".agents/logs/20261006_175657_p00-prerequisites"
+    try:
+        audit.mkdir(parents=True, exist_ok=True)
+    except OSError as error:
+        logger.error(  # noqa: TRY400
+            "FR-DEV-QUALIFICATION-RESULT: audit directory unavailable (errno=%s)",
+            error.errno,
+        )
+        return 1
+    tests = (
+        "tests/unit/test_reference_manifest.py",
+        "tests/unit/test_reference_fixtures.py",
+        "tests/unit/test_reference_validation.py",
+    )
     commands = (
         (sys.executable, "-m", "ruff", "check", "scripts"),
         (sys.executable, "-m", "ruff", "format", "--check", "scripts"),
@@ -65,6 +80,30 @@ def main() -> int:
             "mypy",
             "--explicit-package-bases",
             "scripts",
+        ),
+        (sys.executable, "-m", "ruff", "check", "tests"),
+        (sys.executable, "-m", "ruff", "format", "--check", "tests"),
+        (
+            sys.executable,
+            "-m",
+            "mypy",
+            "--strict",
+            "--explicit-package-bases",
+            "tests/reference",
+            "tests/unit",
+        ),
+        (sys.executable, "-m", "tests.reference.validate"),
+        (
+            sys.executable,
+            "-m",
+            "pytest",
+            *tests,
+            "--cov=tests.reference",
+            "--cov-config=tests/reference/coverage.toml",
+            "--cov-branch",
+            "--cov-fail-under=80",
+            "--cov-report=term-missing",
+            "--cov-report=json:.agents/logs/20261006_175657_p00-prerequisites/coverage.json",
         ),
         (npm, "--prefix", "ui", "run", "typecheck"),
         (npm, "--prefix", "ui", "run", "test"),
@@ -90,7 +129,7 @@ def main() -> int:
             )
             return result.returncode
         logger.info("FR-DEV-RUN-CHECKS: passed %s (exit=0)", " ".join(command))
-    logger.info("FR-DEV-QUALIFICATION-RESULT: all six checks passed")
+    logger.info("FR-DEV-QUALIFICATION-RESULT: all checks passed")
     return 0
 
 

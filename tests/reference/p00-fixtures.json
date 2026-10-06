@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "144.2953",
+  "runtime_status": "unavailable",
+  "cases": [
+    {
+      "case_id": "installed-class-count",
+      "feature_id": "FEAT-HOST-EVIDENCE",
+      "requirement_id": "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION",
+      "decision_ids": [
+        "DEC-HOST-P00-RELEASE-GATES",
+        "DEC-HOST-P00-BOUNDED-FIXTURES"
+      ],
+      "evidence_ids": [
+        "SQX144-EV-000091"
+      ],
+      "artifact": "docs/dev/evidence/p00-inventory.json",
+      "artifact_sha256": "09d69b6e619e7dde058a57cff3877f07f4183023dac4dab83aa1e33cdb82c2ae",
+      "location": "/totals/classes",
+      "observation_kind": "static",
+      "inspection_method": "archive_inventory",
+      "captured_at": "2026-10-06T15:07:57.025762+00:00",
+      "capture_artifact": "docs/dev/evidence/p00-inventory.json",
+      "input": {
+        "method": "read-only independent static observation"
+      },
+      "expected": 41512,
+      "actual": 41512,
+      "units": "class entries",
+      "tolerance": 0,
+      "failure_behavior": "Missing/changed source or unavailable runtime authority fails closed.",
+      "limitations": [
+        "Static expected outputs are derived from actual inspection, not a donor execution fixture."
+      ]
+    },
+    {
+      "case_id": "fallback-port-order",
+      "feature_id": "FEAT-HOST-EVIDENCE",
+      "requirement_id": "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION",
+      "decision_ids": [
+        "DEC-HOST-P00-RELEASE-GATES",
+        "DEC-HOST-P00-BOUNDED-FIXTURES"
+      ],
+      "evidence_ids": [
+        "SQX144-EV-000094"
+      ],
+      "artifact": "internal/libs/SQWebGUILib.jar",
+      "artifact_sha256": "3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af",
+      "location": "com.strategyquant.webguilib.server.AbstractUIWebServer.start offsets 89-232",
+      "observation_kind": "static",
+      "inspection_method": "bytecode_inspection",
+      "captured_at": "2026-10-06T15:07:57.025762+00:00",
+      "capture_artifact": "docs/dev/evidence/p00-common-core.md",
+      "input": {
+        "method": "read-only independent static observation"
+      },
+      "expected": [
+        8080,
+        8081,
+        8082,
+        8083,
+        8084,
+        8085,
+        8086,
+        8087,
+        8088,
+        8089,
+        8090
+      ],
+      "actual": [
+        8080,
+        8081,
+        8082,
+        8083,
+        8084,
+        8085,
+        8086,
+        8087,
+        8088,
+        8089,
+        8090
+      ],
+      "units": "TCP port numbers",
+      "tolerance": 0,
+      "failure_behavior": "Missing/changed source or unavailable runtime authority fails closed.",
+      "limitations": [
+        "Static expected outputs are derived from actual inspection, not a donor execution fixture."
+      ]
+    }
+  ]
+}

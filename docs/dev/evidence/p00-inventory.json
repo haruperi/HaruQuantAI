@@ -1,0 +1,2873 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-10-06T15:07:57.025762+00:00",
+  "reference_cohort": "144.2953",
+  "installed_build": null,
+  "activation_status": "unverified",
+  "source_head": "7c4436185f74b5e615c4a35160e60b6a902029c7",
+  "roadmap": {
+    "locator": "docs/dev/sqx-full-application-roadmap.md",
+    "sha256": "9abec0aa2faf6bd78b39e80c2dcfb7dfcae62ae412d9b56a77904de6a7b5a54c"
+  },
+  "artifacts": [
+    {
+      "locator": "internal/libs/activation.jar",
+      "sha256": "31c68a8743f42ac43b439a382e9b4c9116ba392dbb2d30bdebfb3529c23c753a",
+      "class_count": 38,
+      "family": "library",
+      "feature_id": "FEAT-PROJECT-ACTIVATION",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/libs/affinity.jar",
+      "sha256": "66d40c208001d33b0223a528b661a962be424b69b089b42581548b2bbcb71b49",
+      "class_count": 52,
+      "family": "library",
+      "feature_id": "FEAT-COMPUTE-AFFINITY",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/libs/artemis-commons.jar",
+      "sha256": "9134161c80f5972dece8f7c933075ee33cf557a42e2d24bed7f9f2d1cc249a00",
+      "class_count": 153,
+      "family": "library",
+      "feature_id": "FEAT-COMPUTE-ARTEMIS-COMMONS",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/libs/artemis-core-client.jar",
+      "sha256": "14d38e4e405f3b597dfa23a82544664140dcd67e86bbc174e2b7d1c59770087f",
+      "class_count": 359,
+      "family": "library",
+      "feature_id": "FEAT-COMPUTE-ARTEMIS-CORE-CLIENT",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/libs/artemis-jms-client.jar",
+      "sha256": "4222e99981a27e0d096b3f27433b0e4149a01c45fc0ddd8251aa0f7ed5c21bec",
+      "class_count": 92,
+      "family": "library",
+      "feature_id": "FEAT-COMPUTE-ARTEMIS-JMS-CLIENT",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/libs/artemis-selector.jar",
+      "sha256": "e078da2c298014b047e963c5ae88cb885ba9092deb141e55e8fefb2b25edca17",
+      "class_count": 56,
+      "family": "library",
+      "feature_id": "FEAT-COMPUTE-ARTEMIS-SELECTOR",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/libs/caffeine-2.8.5.jar",
+      "sha256": "814b15a9bf598e0fa854dd70ba9f6e03a413a97979de0c3f49317295e4352bc8",
+      "class_count": 690,
+      "family": "library",
+      "feature_id": "FEAT-HOST-CAFFEINE-2-8-5",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/commons-beanutils.jar",
+      "sha256": "23729e3a2677ed5fb164ec999ba3fcdde3f8460e5ed086b6a43d8b5d46998d42",
+      "class_count": 137,
+      "family": "library",
+      "feature_id": "FEAT-HOST-COMMONS-BEANUTILS",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/commons-codec.jar",
+      "sha256": "ad19d2601c3abf0b946b5c3a4113e226a8c1e3305e395b90013b78dd94a723ce",
+      "class_count": 85,
+      "family": "library",
+      "feature_id": "FEAT-HOST-COMMONS-CODEC",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/commons-collections.jar",
+      "sha256": "87363a4c94eaabeefd8b930cb059f66b64c9f7d632862f23de3012da7660047b",
+      "class_count": 458,
+      "family": "library",
+      "feature_id": "FEAT-HOST-COMMONS-COLLECTIONS",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/commons-email.jar",
+      "sha256": "ee8479906abb2c355a46a0a9845cfa1803bcc3c520a34baea4a6cf4e1f0f0cc1",
+      "class_count": 21,
+      "family": "library",
+      "feature_id": "FEAT-PROJECT-COMMONS-EMAIL",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/libs/commons-exec.jar",
+      "sha256": "cb49812dc1bfb0ea4f20f398bcae1a88c6406e213e67f7524fb10d4f8ad9347b",
+      "class_count": 37,
+      "family": "library",
+      "feature_id": "FEAT-PROJECT-COMMONS-EXEC",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/libs/commons-imaging.jar",
+      "sha256": "0a2b0b98142e6624ae9c6dae6f84478127aa7fd8278353baa4d09c8543eca31a",
+      "class_count": 412,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-COMMONS-IMAGING",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/commons-io-icm.jar",
+      "sha256": "cc6a41dc3eaacc9e440a6bd0d2890b20d36b4ee408fe2d67122f328bb6e01581",
+      "class_count": 110,
+      "family": "library",
+      "feature_id": "FEAT-HOST-COMMONS-IO-ICM",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/commons-io.jar",
+      "sha256": "cc6a41dc3eaacc9e440a6bd0d2890b20d36b4ee408fe2d67122f328bb6e01581",
+      "class_count": 110,
+      "family": "library",
+      "feature_id": "FEAT-HOST-COMMONS-IO",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/commons-lang3.jar",
+      "sha256": "8ac96fc686512d777fca85e144f196cd7cfe0c0aec23127229497d1a38ff651c",
+      "class_count": 260,
+      "family": "library",
+      "feature_id": "FEAT-HOST-COMMONS-LANG3",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/commons-logging.jar",
+      "sha256": "70903f6fc82e9908c8da9f20443f61d90f0870a312642991fe8462a0b9391784",
+      "class_count": 28,
+      "family": "library",
+      "feature_id": "FEAT-HOST-COMMONS-LOGGING",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/commons-math3-3.6.1.jar",
+      "sha256": "1e56d7b058d28b65abd256b8458e3885b674c1d588fa43cd7d1cbb9c7ef2b308",
+      "class_count": 1301,
+      "family": "library",
+      "feature_id": "FEAT-BUILDER-COMMONS-MATH3-3-6-1",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/libs/conscrypt-openjdk-uber.jar",
+      "sha256": "7ff18e73fe4ae752735db191108b23d90f52cc792bf3bdc5a1b774c01c809f64",
+      "class_count": 306,
+      "family": "library",
+      "feature_id": "FEAT-HOST-CONSCRYPT-OPENJDK-UBER",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/fastutil.jar",
+      "sha256": "77249efd4f23d039515bcc0bfc973cf65ee560da0a26a9db7fa2532e11deb4e7",
+      "class_count": 10777,
+      "family": "library",
+      "feature_id": "FEAT-HOST-FASTUTIL",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/freemarker.jar",
+      "sha256": "de92d103d3a86c2287307218ff50dc1c941de283f7b9e1fb23e93fc7220838bf",
+      "class_count": 1124,
+      "family": "library",
+      "feature_id": "FEAT-AUTHORING-FREEMARKER",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/libs/fst.jar",
+      "sha256": "ba57fdc0673ec3726921e5f113d906587d7f7000ba3981dfb79cc082929af3c1",
+      "class_count": 220,
+      "family": "library",
+      "feature_id": "FEAT-HOST-FST",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/geronimo-jms.jar",
+      "sha256": "62a109edef3de718b0cb600bf040b4be5e32c683a57ee16f9f8a89537bf5da51",
+      "class_count": 81,
+      "family": "library",
+      "feature_id": "FEAT-COMPUTE-GERONIMO-JMS",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/libs/geronimo-json.jar",
+      "sha256": "9ad66832295ebfb21e168f29e9411924e13e233ee2ddc61b9a9b09a3f18dc183",
+      "class_count": 29,
+      "family": "library",
+      "feature_id": "FEAT-HOST-GERONIMO-JSON",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/guava.jar",
+      "sha256": "a0e9cabad665bc20bcd2b01f108e5fc03f756e13aea80abaadb9f407033bea2c",
+      "class_count": 1951,
+      "family": "library",
+      "feature_id": "FEAT-HOST-GUAVA",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/h2.jar",
+      "sha256": "7c3e3b93ffaf617393126870be7f8e1708bbe8e05b931c51c638a8cb03f79a36",
+      "class_count": 499,
+      "family": "library",
+      "feature_id": "FEAT-HOST-H2",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/httpasyncclient.jar",
+      "sha256": "50e981a8e567a16ebdad104605b156540a863459fa127b8ba647f310dfc83ef8",
+      "class_count": 86,
+      "family": "library",
+      "feature_id": "FEAT-DATA-SOURCE-HTTPASYNCCLIENT",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/libs/httpclient-cache.jar",
+      "sha256": "66cefdee7475985256af680bf3ae7cd5d7d42e8fdeb939a6277922e1bdeed43a",
+      "class_count": 83,
+      "family": "library",
+      "feature_id": "FEAT-DATA-SOURCE-HTTPCLIENT-CACHE",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/libs/httpclient.jar",
+      "sha256": "6fe9026a566c6a5001608cf3fc32196641f6c1e5e1986d1037ccdbd5f31ef743",
+      "class_count": 470,
+      "family": "library",
+      "feature_id": "FEAT-DATA-SOURCE-HTTPCLIENT",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/libs/httpcore-nio.jar",
+      "sha256": "71fcfbe869002c48563cc5979fc734571c8d0d167ccce42970c932f337981f19",
+      "class_count": 242,
+      "family": "library",
+      "feature_id": "FEAT-DATA-SOURCE-HTTPCORE-NIO",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/libs/httpcore.jar",
+      "sha256": "e06e89d40943245fcfa39ec537cdbfce3762aecde8f9c597780d2b00c2b43424",
+      "class_count": 253,
+      "family": "library",
+      "feature_id": "FEAT-DATA-SOURCE-HTTPCORE",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/libs/image4j.jar",
+      "sha256": "93b02ca70ae019d327846489dd3534e7dfbf7595b719441af3a3dfbbce4b04e3",
+      "class_count": 25,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-IMAGE4J",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/jackson-annotations.jar",
+      "sha256": "959a2ffb2d591436f51f183c6a521fc89347912f711bf0cae008cdf045d95319",
+      "class_count": 74,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JACKSON-ANNOTATIONS",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jackson-core.jar",
+      "sha256": "ffab4d957daa2796cf24cb66d0b78a7090f1bcbe17c3a4578f09affaaf137089",
+      "class_count": 221,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JACKSON-CORE",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jackson-databind.jar",
+      "sha256": "34bbeb4526fff4f8565b12106bf85a6afcbae858966d489b54214ac46b2e26e8",
+      "class_count": 809,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JACKSON-DATABIND",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/java-image-scaling-0.8.6.jar",
+      "sha256": "fabd02916eed5cd1cd5881d94970ea3c74e140b4c21acc6b640ddf3ed1472b95",
+      "class_count": 31,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-JAVA-IMAGE-SCALING-0-8-6",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/javassist.jar",
+      "sha256": "59531c00f3e3aa1ff48b3a8cf4ead47d203ab0e2fd9e0ad401f764e05947e252",
+      "class_count": 402,
+      "family": "library",
+      "feature_id": "FEAT-AUTHORING-JAVASSIST",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/libs/javax-mail.jar",
+      "sha256": "45b515e7104944c09e45b9c7bb1ce5dff640486374852dd2b2e80cc3752dfa11",
+      "class_count": 340,
+      "family": "library",
+      "feature_id": "FEAT-PROJECT-JAVAX-MAIL",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/libs/jdom.jar",
+      "sha256": "1345f11ba606d15603d6740551a8c21947c0215640770ec67271fe78bea97cf5",
+      "class_count": 195,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JDOM",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jetty-all-uber.jar",
+      "sha256": "7ce8b3a1ed9852b9d7b16ba10a9db9a4fb42151845fd3fa3f9f45ac2ee416a98",
+      "class_count": 1703,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JETTY-ALL-UBER",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jetty-alpn-conscrypt-server.jar",
+      "sha256": "62d26efc17624827dc228fdaa4a13e5eb30df299a78293c247cfebe9e324a889",
+      "class_count": 3,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JETTY-ALPN-CONSCRYPT-SERVER",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jetty-alpn-java-server.jar",
+      "sha256": "3965c15329624b4b761f1af10121b0c5f57da7bbefe4a722d8f956fa1736ce82",
+      "class_count": 3,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JETTY-ALPN-JAVA-SERVER",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jetty-alpn-server.jar",
+      "sha256": "a60f7cfcdc365a2b6c2f01ccc8d3122f5ff6ee6fd3e8331979ac0da71d9204ab",
+      "class_count": 2,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JETTY-ALPN-SERVER",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jfx_2.4.9_sq.jar",
+      "sha256": "b05ca416555206d0dc5282431cd690c088d6481cf07c1d4a24ec91737bd8b2d5",
+      "class_count": 261,
+      "family": "library",
+      "feature_id": "FEAT-PRODUCT-JFX-2-4-9-SQ",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/libs/jna-platform.jar",
+      "sha256": "474d7b88f6e97009b6ec1d98c3024dd95c23187c65dabfbc35331bcac3d173dd",
+      "class_count": 1282,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JNA-PLATFORM",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/jna.jar",
+      "sha256": "66d4f819a062a51a1d5627bffc23fac55d1677f0e0a1feba144aabdd670a64bb",
+      "class_count": 125,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JNA",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/joda-time.jar",
+      "sha256": "602fd8006641f8b3afd589acbd9c9b356712bdcf0f9323557ec8648cd234983b",
+      "class_count": 232,
+      "family": "library",
+      "feature_id": "FEAT-DATA-JODA-TIME",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/libs/jProcesses.jar",
+      "sha256": "57f61d01102f0e88e87c4a3cae6ccea3e5b390a38aeb3abd2ed20b06f25466ea",
+      "class_count": 12,
+      "family": "library",
+      "feature_id": "FEAT-HOST-J-PROCESSES",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/json-schema-validator.jar",
+      "sha256": "ee940241043ae01801df5954bc3744bf723c449ff0da719f97e1b9a6889739d7",
+      "class_count": 313,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JSON-SCHEMA-VALIDATOR",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/json.jar",
+      "sha256": "38c21b9c3d6d24919cd15d027d20afab0a019ac9205f7ed9083b32bdd42a2353",
+      "class_count": 18,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JSON",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jspf.core.jar",
+      "sha256": "94f287909bc8fb0970819f165cf091b08f1787053c9875824b6deb9a12ea0185",
+      "class_count": 295,
+      "family": "library",
+      "feature_id": "FEAT-HOST-JSPF-CORE",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/jspf.remote.jar",
+      "sha256": "9987cca1d084129a024a5c7132e561a039c9ec933cc8ebe8697bf89e79412652",
+      "class_count": 6,
+      "family": "library",
+      "feature_id": "FEAT-COMPUTE-JSPF-REMOTE",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/libs/logback-classic.jar",
+      "sha256": "b4ecaf8bd993f5df004e44cd7869af6184342db51fccf3c2e03757b8e1d3f149",
+      "class_count": 173,
+      "family": "library",
+      "feature_id": "FEAT-HOST-LOGBACK-CLASSIC",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/logback-core.jar",
+      "sha256": "0252340d20a44cf2c49ed3fecd16cdf4582442981c6f6e11cbf0b84a4ece1f10",
+      "class_count": 355,
+      "family": "library",
+      "feature_id": "FEAT-HOST-LOGBACK-CORE",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/lzma.jar",
+      "sha256": "4d389ab352c55955c790a54b3f93ebbbcb0b0936acbd2bec24aba587d0b2f99b",
+      "class_count": 30,
+      "family": "library",
+      "feature_id": "FEAT-HOST-LZMA",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/mcp-core.jar",
+      "sha256": "f6eb396f98b5f8f1ef6d7bea1ce79c9914c6b99d8f10f918579c6fb8992ee9d7",
+      "class_count": 301,
+      "family": "library",
+      "feature_id": "FEAT-PRODUCT-MCP-CORE",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/libs/mcp-json-jackson2.jar",
+      "sha256": "eda0173d9183e272576cc5581ae58ff437bdadd9e6d0c3410045f86e3de10c8a",
+      "class_count": 5,
+      "family": "library",
+      "feature_id": "FEAT-PRODUCT-MCP-JSON-JACKSON2",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/libs/objenesis.jar",
+      "sha256": "5e168368fbc250af3c79aa5fef0c3467a2d64e5a7bd74005f25d8399aeb0708d",
+      "class_count": 43,
+      "family": "library",
+      "feature_id": "FEAT-HOST-OBJENESIS",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/oshi-core.jar",
+      "sha256": "59c4bde18e4c19a29d2b996cb7a018da2f8d2b1f39cb0d73a78855c0673cc94f",
+      "class_count": 569,
+      "family": "library",
+      "feature_id": "FEAT-HOST-OSHI-CORE",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/pd4ml.jar",
+      "sha256": "679254d54d47d2373a2c3fe0f34a3658d583c06c51777a07c03abb2a0527d7d2",
+      "class_count": 397,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-PD4ML",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/pngj.jar",
+      "sha256": "6278c81c54106c78c0725718f73f80e5bfee2acea149eafab4c24a451cd6fc3c",
+      "class_count": 113,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-PNGJ",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/poi-ooxml-schemas.jar",
+      "sha256": "6bc4a179f61447559bafee3ecbe3c4de7ba4b5c3954ded909cd477783c7db275",
+      "class_count": 2383,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-POI-OOXML-SCHEMAS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/poi-ooxml.jar",
+      "sha256": "02db7dd9db4a71bd48452aee87e5691bae2a0f26e7fea264a8f271a42d32599e",
+      "class_count": 562,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-POI-OOXML",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/poi.jar",
+      "sha256": "1412f527ed0a766a6a3697c81705381fa1c34aecc15c4cdcca12a1e52de24d0e",
+      "class_count": 1358,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-POI",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/PSUtils.jar",
+      "sha256": "03ebfabefe9cb716e29757e64bd020bb78cfa0cb5d6088d622c16a5dc3e35da5",
+      "class_count": 1,
+      "family": "library",
+      "feature_id": "FEAT-HOST-PS-UTILS",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/reactive-streams.jar",
+      "sha256": "f75ca597789b3dac58f61857b9ac2e1034a68fa672db35055a8fb4509e325f28",
+      "class_count": 13,
+      "family": "library",
+      "feature_id": "FEAT-HOST-REACTIVE-STREAMS",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/reactor-core.jar",
+      "sha256": "14aebad4882def1f88389656cf9b46177f6b090bb00a0707025d76aeacaaead2",
+      "class_count": 946,
+      "family": "library",
+      "feature_id": "FEAT-HOST-REACTOR-CORE",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/slf4j-api.jar",
+      "sha256": "3c5b5c3411e1cf2d1f44513d7280eb72180875cbb5d4c924bb378cf3b7968267",
+      "class_count": 24,
+      "family": "library",
+      "feature_id": "FEAT-HOST-SLF4J-API",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/libs/Snippets.jar",
+      "sha256": "d6dcad795f670b1b12cbbe772ec6f15d98c2fb5ab265f0f63505eb0e589229a0",
+      "class_count": 948,
+      "family": "library",
+      "feature_id": "FEAT-SHARED-SNIPPETS",
+      "phase": "P05"
+    },
+    {
+      "locator": "internal/libs/SQDataLib.jar",
+      "sha256": "8bf892b35becda5070dc153f4a5fed955d9d724c78686ebb354776fd3a408829",
+      "class_count": 195,
+      "family": "library",
+      "feature_id": "FEAT-DATA-SQ-DATA-LIB",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/libs/SQGridLib2.jar",
+      "sha256": "dd1851fada0ebe511c16fd422472d938465b0d3a971a5718d4448ee9c4183673",
+      "class_count": 81,
+      "family": "library",
+      "feature_id": "FEAT-COMPUTE-SQ-GRID-LIB2",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/libs/SQJobsLib.jar",
+      "sha256": "90a7d687dd4df30964512d8cd2cebf865f0bdcd9798b1310ed54007bf388ab5e",
+      "class_count": 11,
+      "family": "library",
+      "feature_id": "FEAT-HOST-SQ-JOBS-LIB",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/sqlite-jdbc.jar",
+      "sha256": "5454be00f3a04b4d67ef6179121aa900a904da53b9cbffea742d548d737f0ebc",
+      "class_count": 129,
+      "family": "library",
+      "feature_id": "FEAT-HOST-SQLITE-JDBC",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/SQPluginLib.jar",
+      "sha256": "40c962d2087d68aadb4bc4a3b9bb2363a453cb57830fd672c50716d502e771c3",
+      "class_count": 18,
+      "family": "library",
+      "feature_id": "FEAT-HOST-SQ-PLUGIN-LIB",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/SQTradingLib.jar",
+      "sha256": "9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3",
+      "class_count": 945,
+      "family": "library",
+      "feature_id": "FEAT-SHARED-SQ-TRADING-LIB",
+      "phase": "P06"
+    },
+    {
+      "locator": "internal/libs/SQWebGUILib.jar",
+      "sha256": "3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af",
+      "class_count": 34,
+      "family": "library",
+      "feature_id": "FEAT-HOST-SQ-WEB-GUI-LIB",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/libs/SQWizardBusiness.jar",
+      "sha256": "3f908f6dc5c057d204e7688d093f89f9c0cf6bc5f55891e044993cb7098d71ee",
+      "class_count": 24,
+      "family": "library",
+      "feature_id": "FEAT-AUTHORING-SQ-WIZARD-BUSINESS",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/libs/swingx.jar",
+      "sha256": "78d9b983a58e2e218e98414e2b25e3a6594bc6014a272ccd49f175dfd4af9a25",
+      "class_count": 958,
+      "family": "library",
+      "feature_id": "FEAT-PRODUCT-SWINGX",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/libs/ta-lib.jar",
+      "sha256": "6495cc4f5ed2ed6220686dd7051c6f42ebeafeab46689b16b5763cffe34a0574",
+      "class_count": 48,
+      "family": "library",
+      "feature_id": "FEAT-STRATEGY-TA-LIB",
+      "phase": "P05"
+    },
+    {
+      "locator": "internal/libs/uncommons-maths.jar",
+      "sha256": "b013f2741f7f6a4ea21be0bb511f54503bac321659b6878bafab5d14db0e11f3",
+      "class_count": 35,
+      "family": "library",
+      "feature_id": "FEAT-BUILDER-UNCOMMONS-MATHS",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/libs/watchmaker-framework.jar",
+      "sha256": "3408409623497b46fd70eb6acab62824c9961f3db36b2f79286514f078aff07e",
+      "class_count": 74,
+      "family": "library",
+      "feature_id": "FEAT-BUILDER-WATCHMAKER-FRAMEWORK",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/libs/weblaf.jar",
+      "sha256": "a9f586d858fb731c1301f18cc67535855247f66502de5ac56c506df1b3ac1e94",
+      "class_count": 1706,
+      "family": "library",
+      "feature_id": "FEAT-PRODUCT-WEBLAF",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/libs/xmlbeans.jar",
+      "sha256": "c77974359688b2823b48fa9a33da68559d64f8474441480d9df4f9e254332a96",
+      "class_count": 1531,
+      "family": "library",
+      "feature_id": "FEAT-RESULTS-XMLBEANS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/libs/zip4j.jar",
+      "sha256": "92524aa1bf716f1d15e75fb66c2212ee903e118677ca625506f94487628317f7",
+      "class_count": 60,
+      "family": "library",
+      "feature_id": "FEAT-HOST-ZIP4J",
+      "phase": "P02"
+    },
+    {
+      "locator": "internal/plugins/AppBuilder/AppBuilder.jar",
+      "sha256": "43e6ae1fcdc978c8c25b7fec1940c1c903fd3d711d08e3afa5b4d206c8000d4b",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-APP-BUILDER",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/AppCodeEditor/AppCodeEditor.jar",
+      "sha256": "55e2e1254d7ac8ed935e40eb09007d3f369279156077c98986fa00b9f463dc08",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-APP-CODE-EDITOR",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/AppDataManager/AppDataManager.jar",
+      "sha256": "3e0b8898e1bb8c9c7c91eb17ec7a99a481fae83e37c935c7595b2c71d1f25447",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-APP-DATA-MANAGER",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/AppDebugConsole/AppDebugConsole.jar",
+      "sha256": "67385f439772238bec088a089cc88437dfd58d29fae8ae397fb1dbacfb34e1da",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-HOST-APP-DEBUG-CONSOLE",
+      "phase": "P01"
+    },
+    {
+      "locator": "internal/plugins/AppGridControl/AppGridControl.jar",
+      "sha256": "1e71d9a8e6c722b542ceea77c98ebf4496f119756fd4596753ba8917c5252e4f",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-COMPUTE-APP-GRID-CONTROL",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/plugins/AppGridTest/AppGridTest.jar",
+      "sha256": "8d0b4a1b3f095fb57652b98b4ca870754d02e8fff6d8992c753e9120c3c5c78b",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-COMPUTE-APP-GRID-TEST",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/plugins/AppHelp/AppHelp.jar",
+      "sha256": "a94608f3b7ba05e1b6f17a2c2fe45ab0e5f8ba435cc4f62c0c5e21ecb7a75ffa",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-APP-HELP",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/AppHome/AppHome.jar",
+      "sha256": "d03a78caf34de8f78c5cda2649fea7728e6fdd59c7046c4680f1e40e498b499b",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-APP-HOME",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar",
+      "sha256": "f20b8d1412bed668ef1b39a3cf1fc5e418b20ee433c65bc021f6afd0a7a2169e",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-NEURAL-APP-NEURAL-NETWORK",
+      "phase": "P15"
+    },
+    {
+      "locator": "internal/plugins/AppOptimizer/AppOptimizer.jar",
+      "sha256": "9f684b0cad7d363472a82907f07c9ea33b8ff45b2a10036d47ce80e58dc6e3e1",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-APP-OPTIMIZER",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/AppPaymentDialog/AppPaymentDialog.jar",
+      "sha256": "a94608f3b7ba05e1b6f17a2c2fe45ab0e5f8ba435cc4f62c0c5e21ecb7a75ffa",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-APP-PAYMENT-DIALOG",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/AppPortfolioComposer/AppPortfolioComposer.jar",
+      "sha256": "53fe64ae3bede7cc0334e4225e569383b8b19e58c3a2be1b0aaf518d85682d4f",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-APP-PORTFOLIO-COMPOSER",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/AppPortfolioMaster/AppPortfolioMaster.jar",
+      "sha256": "dc383514c68569ddf10e9b4b96141807d4849844e9add50dc2a4b7107a2d488e",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-APP-PORTFOLIO-MASTER",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/AppQuantDataManager/AppQuantDataManager.jar",
+      "sha256": "234080d1be94dfc801ede5b8fe287a2142b1d152da4d4a18cad37a6f8fc4cad3",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-APP-QUANT-DATA-MANAGER",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/AppResults/AppResults.jar",
+      "sha256": "af4b02953d5d15b61c15cb28b6dcd80b3f3b1cbdedeacecb7fa1ede9aedf3821",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-APP-RESULTS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/AppRetester/AppRetester.jar",
+      "sha256": "f92947a7e0740396fd214099f8a3746a0b187b64183bf2ac73af29c12d91c5ec",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-APP-RETESTER",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/AppSQXBusiness/AppSQXBusiness.jar",
+      "sha256": "1629d659fc78cb2553b16103616b4fd321f12e5096f0c6f50ab18f8c4f0c2530",
+      "class_count": 10,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-APP-SQX-BUSINESS",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/AppSQXHome/AppSQXHome.jar",
+      "sha256": "46d2b8e1068a9df0bacac2ff33c02c6b5e00d4edd58a1bf8d13df0e4c8d113ef",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-APP-SQX-HOME",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/AppStrategyQuant/AppStrategyQuant.jar",
+      "sha256": "a103c73636b10f550ce969796703d910b3e4a0cc6df2b13c4d1045430d3ece6c",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-APP-STRATEGY-QUANT",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/AppTaskManager/AppTaskManager.jar",
+      "sha256": "b6f06d8c73fe74ddbb08bbcc2219551c1300c508703f5ac7ca4e1b1fb79fbd80",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-APP-TASK-MANAGER",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/AppWizard/AppWizard.jar",
+      "sha256": "051f00bcfa2fc60de169faa4a1de99a478b3386f927cb74b6ce9961aa10b6f2f",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-APP-WIZARD",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar",
+      "sha256": "c2a0f530874c947e743e82c5ac98793e40e5d45764e1632e85a0396a3f830dbb",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/CodeEditorIndicatorTester/CodeEditorIndicatorTester.jar",
+      "sha256": "0a9dae03be5a30d26bc68da2289b33010af52c833ce239979b8338fec5dd233b",
+      "class_count": 7,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-CODE-EDITOR-INDICATOR-TESTER",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/ConnectionLiveTest/ConnectionLiveTest.jar",
+      "sha256": "0b91dd781b045416678bf1ad771cf67746b4ce0bc66cf479e77dd6fa854253eb",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-CONNECTION-CONNECTION-LIVE-TEST",
+      "phase": "P16"
+    },
+    {
+      "locator": "internal/plugins/ConnectionMT4/ConnectionMT4.jar",
+      "sha256": "fdf875eaf15af4256ff2d74f823e9745addd64d40838ad8d1436eb2dc4cf126c",
+      "class_count": 7,
+      "family": "plugin",
+      "feature_id": "FEAT-CONNECTION-CONNECTION-MT4",
+      "phase": "P16"
+    },
+    {
+      "locator": "internal/plugins/ConnectionTest/ConnectionTest.jar",
+      "sha256": "1187a1ba55948383199187e74960e993d741279ef0f2c9d9ac9ef8b9a92469d3",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-CONNECTION-CONNECTION-TEST",
+      "phase": "P16"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckMonteCarloManipulation/CrossCheckMonteCarloManipulation.jar",
+      "sha256": "90124230d9193aca301b0bd01e80d7954664977d79795e7c211418995b409155",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-MANIPULATION",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckMonteCarloRetest/CrossCheckMonteCarloRetest.jar",
+      "sha256": "94fa7d1ee09ca5daa6031e4c3149b0cfb46aa36938df0e1d792423eccaa500ca",
+      "class_count": 7,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-RETEST",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckOptProfileSysParamPermutation/CrossCheckOptProfileSysParamPermutation.jar",
+      "sha256": "0989ee5ab3d156aee9c8be77d8cdbd095a99999af61753c8c134e5eba36b0b1a",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-OPT-PROFILE-SYS-PARAM-PERMUTATION",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckRetestOnAdditionalMarkets/CrossCheckRetestOnAdditionalMarkets.jar",
+      "sha256": "531c66823aef77bd1f04b344a9f5e1da9de842bbd17926d3844a91cfcc200e25",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-ON-ADDITIONAL-MARKETS",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckRetestWithHigherPrecision/CrossCheckRetestWithHigherPrecision.jar",
+      "sha256": "bb44c67411968855e01e99a9e00a8245d686f223929c38d7ea95c75972aac388",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-WITH-HIGHER-PRECISION",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckSequentialOptimization/CrossCheckSequentialOptimization.jar",
+      "sha256": "8afb96fe06d9378832563bab6068636ef807cf0c32122949191271c1a2548537",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-SEQUENTIAL-OPTIMIZATION",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckWalkForwardMatrix/CrossCheckWalkForwardMatrix.jar",
+      "sha256": "5022a6b0988f531f575ce94a1372c6f01274a9e619e60ea8392feac34ee1cee3",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-MATRIX",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckWalkForwardOptimization/CrossCheckWalkForwardOptimization.jar",
+      "sha256": "760b5d0b261914e97225bb7f58fe2f76bacf3f30cf7b13152e26635aa0cdf06e",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-OPTIMIZATION",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CrossCheckWhatIf/CrossCheckWhatIf.jar",
+      "sha256": "fbde3b92796f43ec8a077d20b2c8b6986653c72b9b2f925ddd5e37da509e1d73",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-WHAT-IF",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar",
+      "sha256": "99b53a0dbc21b2ccf8fe35e317c4cbc75aa64038a5e20b5bde544272ee33859c",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/CryptoExchangeBinanceCoinM/CryptoExchangeBinanceCoinM.jar",
+      "sha256": "8882924f07601d9314d7d2eb1cf6c45fb73576960f7ec541b90dfe4050cbc266",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-COIN-M",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/CryptoExchangeBinanceUsdtM/CryptoExchangeBinanceUsdtM.jar",
+      "sha256": "9f5fbc9dd3f23b21979f1e678d09e7bdef50aed3cf2d6d82ac94ec0b62837724",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-USDT-M",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/CryptoExchangeBitfinex/CryptoExchangeBitfinex.jar",
+      "sha256": "60afbc9d91cca5c963d145004818351a8c56fd778ea952fb3667e2bcfee06e41",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BITFINEX",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/CryptoExchangeCoinbasePro/CryptoExchangeCoinbasePro.jar",
+      "sha256": "3c8a95130c0cedb1e258fc84c6291857c9d92769db626dc9dfdc17a248399ac5",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-COINBASE-PRO",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/CryptoExchangePoloniex/CryptoExchangePoloniex.jar",
+      "sha256": "eee8d474a85f56652e1008344876c81c88f4f423b272c4f2423b59b0fd67efa7",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-POLONIEX",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DashboardResults/DashboardResults.jar",
+      "sha256": "1025b2652a1da807b8e1c707c9001d9200167c6adb02a52e0106b59c0ef3fd88",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-DASHBOARD-RESULTS",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/DatabankFilterByCorrelation/DatabankFilterByCorrelation.jar",
+      "sha256": "e2dcd26a6e9046a16eba7654b1c090ae2087cf1eb2b4ecc1fd22c25541c8bd26",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-DATABANK-FILTER-BY-CORRELATION",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/DatabankRename/DatabankRename.jar",
+      "sha256": "f3fa6e90b8a222f61a608081bec6d71ba3d6b234099cb37064299441b8a08b84",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-DATABANK-RENAME",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/DataManagerBasket/DataManagerBasket.jar",
+      "sha256": "7878ca809dcc933f462fbc1f203ea7fb2d994af4e7af80f070ecf8c073ab322d",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-DATA-MANAGER-BASKET",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/DataManagerBroker/DataManagerBroker.jar",
+      "sha256": "ddf4ef361c3b9b52333c4ba93a74cd0f6f2a4ab190878c4c521ae04944ae55fd",
+      "class_count": 6,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-DATA-MANAGER-BROKER",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/DataManagerConnections/DataManagerConnections.jar",
+      "sha256": "8978514482bcc046e28887fea63697c880dcaa3340fb62b9084ab71400300ab8",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-CONNECTION-DATA-MANAGER-CONNECTIONS",
+      "phase": "P16"
+    },
+    {
+      "locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
+      "sha256": "6fd3ed5e49ae80ff29fd08498ce46644b17a38c17c829503788c9bb4cf9f91d9",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-DATA-MANAGER-CUSTOM-DATA",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+      "sha256": "5a050f2411038160bd386a58942c80a209df75612c0aabdd85c4f307817d8ad0",
+      "class_count": 35,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-DATA-MANAGER-DATA",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/DataManagerHome/DataManagerHome.jar",
+      "sha256": "3cf66b96908d25488981371c8dffeba035b2ce638f4082cb7d1065b8e982d7f3",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-DATA-MANAGER-HOME",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar",
+      "sha256": "8703d07e0f552af045ee4af196a533a8469e18bafe7bc9afa88044b48dc012a8",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-DATA-MANAGER-INSTRUMENTS",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
+      "sha256": "8b954d0b88762c75ba4d2cb77536a81d1651370cd75085a57d64fd9355e7067d",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-DATA-MANAGER-SESSIONS",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
+      "sha256": "ffd8a08dd99ea2ffc96b9b107911cafeeeb56866f5d39160d40b2f4d9ea7abe1",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-CRYPTO",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
+      "sha256": "8c0440e30abd2e2478b39bd0525f82426a7d909135a782c21c22f8f3180c6c88",
+      "class_count": 8,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-DARWINEX",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
+      "sha256": "df1d953afd25874724953ac4793cc856698960f41a30e29db60ec02fc1502cf4",
+      "class_count": 6,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+      "sha256": "9a92311be05e36e7cdf68dfc0b916751e0ed2bac7302c465db60d2d75eaaf686",
+      "class_count": 10,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-FILES",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+      "sha256": "d9868bb340541b513341d0fdef81a76823bb6b8c022face241a4d2de7424d37d",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-MT5-API",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
+      "sha256": "4775cfdc7055c32fb6368e60d4e755f8e1c1e71945b316994b0db3038251107c",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-SQ-EQUITY-DATA",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
+      "sha256": "8c56d64a1dab0739f077faa1fc960c9c7bbacb514a9229afdcba698549704809",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-SQ-FUTURES-DATA",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DataSourceTD/DataSourceTD.jar",
+      "sha256": "8db468d20ca5644cdec4aaa637be00542b2809298b3bd1e378d1e7e3b5d63496",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-TD",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+      "sha256": "30216203401f5014f82d67f53c965c812a83dd1a2dae700550a370698ce6016b",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-YAHOO",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/EnginePanel/EnginePanel.jar",
+      "sha256": "e10c17face0f953e75b3e36bdbc23c81941592665b0c7329eb9494bb1f2f45e1",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-ENGINE-PANEL",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/EquityChartBenchmark/EquityChartBenchmark.jar",
+      "sha256": "d04a9b53951cf574b7bb0bf58bc0b9c39820fca334f55cf7f429d541dd1a8877",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-EQUITY-CHART-BENCHMARK",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/EquityChartDailyChart/EquityChartDailyChart.jar",
+      "sha256": "5be9e3fbc72c350e9c1d8a06e3493900286338193e3a1ac0620df5ad07c1e797",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-EQUITY-CHART-DAILY-CHART",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/EquityChartDrawdown/EquityChartDrawdown.jar",
+      "sha256": "5d0f0861a80c860dc3a5c2e77a503639e990b146c376c7ba5e611c2a96022b7c",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-EQUITY-CHART-DRAWDOWN",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/EquityChartVolatility/EquityChartVolatility.jar",
+      "sha256": "dd60204046dca5a6cdead97460cb7854eb2ad63f745cc216bc8f2bc824152608",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-EQUITY-CHART-VOLATILITY",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/EquityChartVolume/EquityChartVolume.jar",
+      "sha256": "5cf96acea98addb47b86d599117d0e97c77321230250ec94a18f05a3588da8a8",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-EQUITY-CHART-VOLUME",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolio.jar",
+      "sha256": "f9e7d2b86e7f666b3e9568363571c2004c36a2137cb2dc9c28aab456aa1442c1",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-FITNESS-METHOD-EXISTING-PORTFOLIO",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar",
+      "sha256": "d873f8b2800a34cf815706a98f8951fc80981406e9fccf95a0ebc671c0ee023e",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-FITNESS-METHOD-STRATEGY-RESULT",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/FitnessMethodWFResult/FitnessMethodWFResult.jar",
+      "sha256": "67db6d1897747953524e8c79b180e1a0566599d337026aea8885d0cf6f3017fa",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-FITNESS-METHOD-WF-RESULT",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/HomeAbout/HomeAbout.jar",
+      "sha256": "b874cd7ea9634c21fe493b37b508a5b1d64f288e8b6225b959a568f913c34c53",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-HOME-ABOUT",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/LoaderSQ3/LoaderSQ3.jar",
+      "sha256": "ea5d85eda47ef76feb832232af9ca8581d9be8860385b59bf45478b6ed6c7da8",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-LOADER-SQ3",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/LoaderSQ4/LoaderSQ4.jar",
+      "sha256": "4a22421e5c16dc07a0d7da0ea3d5116e71b46a3751001df8a03392ee8c3b86a9",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-LOADER-SQ4",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/PortfolioComposer/PortfolioComposer.jar",
+      "sha256": "f16ea1e94a8f7d134e103372d96cd96f60d8dedfe5970d02413fedc393766cc9",
+      "class_count": 15,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-PORTFOLIO-COMPOSER",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/ProjectConditionCyclesCount/ProjectConditionCyclesCount.jar",
+      "sha256": "b1bc4d71172494dbd135988f9d5192aa12c32414d15ac4753b827ed20b659059",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-CYCLES-COUNT",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/ProjectConditionDuration/ProjectConditionDuration.jar",
+      "sha256": "7c46091c3f541197d3e76b5acada3ff01f72deaee69bb35a8c8c9a45fdf5cb0a",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-DURATION",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/ProjectConditionGoToActivated/ProjectConditionGoToActivated.jar",
+      "sha256": "ffecb497c1fcb03e33221d48341006e27bcaac9572af2b2710e54dc1041d4944",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-GO-TO-ACTIVATED",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/ProjectConditionGoToEvaluated/ProjectConditionGoToEvaluated.jar",
+      "sha256": "0fafc05ab85a4672612fe3ca2e3c551508abb83a39f609134328de1844416f11",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-GO-TO-EVALUATED",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/ProjectConditionResultsCount/ProjectConditionResultsCount.jar",
+      "sha256": "da8fb2b019cf93d5cd4c338141cea1b1cd79dbd30b836fd28b3919db3d2d2211",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-RESULTS-COUNT",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/ProjectConditionRunTime/ProjectConditionRunTime.jar",
+      "sha256": "6cdece3f97fa852e2a16b2a903c7c513278ccc2865a93da098337a09c081c8b8",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-RUN-TIME",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/ProjectOptimizer/ProjectOptimizer.jar",
+      "sha256": "a1bbc8087afb5abee155219a6f6972aea37606fb790bfdd3c121a81aa31c1e3b",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-PROJECT-OPTIMIZER",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/ProjectRetester/ProjectRetester.jar",
+      "sha256": "df42d7e4a97ed687ce1e935533f337994ace0edf6db0955ef6b6c63852c68ba1",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-PROJECT-RETESTER",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/ResultsChart/ResultsChart.jar",
+      "sha256": "33cca54b95a76fd447a1664d2def1b46d9f2da1f429c788df6c0b76597a793ba",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-CHART",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
+      "sha256": "2542b663f56004be15797da27f223903b78eea4a0208a28754d741737755cc74",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-DATABANK-ACTIONS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsDatabankViews/ResultsDatabankViews.jar",
+      "sha256": "22fe5655735ae9dda9226304966ea67c38f47b1ef7244d5dfed0c9249a61ed20",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-DATABANK-VIEWS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+      "sha256": "d13f1ffdd75ec94f33d7c383b5a8239f3f1a28700b4aed2303041cbd936e4645",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-EQUITY-CHART",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsExplore/ResultsExplore.jar",
+      "sha256": "06bea0feab6aa8553d15a038440421129a9456309d6f8b948f47c50e80507847",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-EXPLORE",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+      "sha256": "f3fbf5808631df75cf45cdac71080efb9b1c05dfb5d0d800b4fd56a56cd4c62f",
+      "class_count": 12,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-RESULTS-OPTIMIZATION-PROFILE",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/ResultsOverview/ResultsOverview.jar",
+      "sha256": "9a97ec7cf2324e744f87a5e5039e7365cb162713ca4ff5b0cc324a6bf7dcfa23",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-OVERVIEW",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsPlugins/ResultsPlugins.jar",
+      "sha256": "419272195dd39a87631f6e46df6319121235acf412935b94620f79365345830a",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-PLUGINS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsPortfolioComposerChart/ResultsPortfolioComposerChart.jar",
+      "sha256": "a8e2bdc14fa34fa6e4d02eb06feebba4822e4f01550bb04be28ce06d62f61b6e",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-CHART",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/ResultsPortfolioComposerLog/ResultsPortfolioComposerLog.jar",
+      "sha256": "66866d35008ef208b009439c77ef11a2b923ca2bb9360f876c0539098f202d41",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-LOG",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+      "sha256": "8cc910853b04b570650a4805917d30b8319c87c7b44cb9f23988e04564e1116b",
+      "class_count": 13,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/ResultsProfileChart/ResultsProfileChart.jar",
+      "sha256": "1c0cbb510a72e0b4515803886440ce10c11a6173b9e1ee9b8de46fa7feec84cd",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-RESULTS-PROFILE-CHART",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
+      "sha256": "ca78fea41989e25555b43f2042b775befbe015807c5bc3de4b8416e3909bc0d9",
+      "class_count": 7,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-RESULTS-ROBUSTNESS-TESTS",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/ResultsSequentialOptimization/ResultsSequentialOptimization.jar",
+      "sha256": "5f8e06aac5494fa88fa6c3f416de208005b056216002cd964e81441714716d5b",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-RESULTS-SEQUENTIAL-OPTIMIZATION",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
+      "sha256": "fdab52cc9a0e0c535b881ee56b58771e71bab86385d78a32a8346fc868b39794",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-RESULTS-SOURCE-CODE",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/ResultsSPOverview/ResultsSPOverview.jar",
+      "sha256": "68c7cadc03dcd867ff506c74654b427e4de3d38f027ddcb458500ef60b99d34b",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-SP-OVERVIEW",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsStockpicker/ResultsStockpicker.jar",
+      "sha256": "5b616da0ab1bb4e0ef5d2fd77c59ac5a40e0e409460f35e25527d258e4a9f8a8",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-STOCKPICKER",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsStrategyConfig/ResultsStrategyConfig.jar",
+      "sha256": "6409614e40da9c8afeee39bbde288ca87194eba4c77fbf1c7104d6c0f7dfba2d",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-STRATEGY-CONFIG",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsSysParamPermutation/ResultsSysParamPermutation.jar",
+      "sha256": "c3758eff4b80cc64109fb9f90e44fac51e9f019696d5e21e5c99ad520b82c0bf",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-RESULTS-SYS-PARAM-PERMUTATION",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+      "sha256": "7c7ba403d569744e36cd88fa4e8e62640249db056c36171fe781e58e30a17816",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-TRADE-ANALYSIS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
+      "sha256": "0f44d384771374d1f42497dde2b6f5663024767e931f0ef58da1c208a95ec317",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-TRADE-LIST",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
+      "sha256": "f0b240c1d0907dc879d423d426dff448569f01d2e7b6c67427f4b21fc4feddd7",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-RESULTS-TRADELIST-VIEWS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
+      "sha256": "f6ac8d923375b7997431ac365e906e232bd7dc554601ba9cd98ed15c28e6abea",
+      "class_count": 5,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-RESULTS-WALK-FORWARD",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/SaverHTML/SaverHTML.jar",
+      "sha256": "87f11f13c3a7691d2ae656ec844926160419c5af6763fe8a9f18912d70310ce9",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-SAVER-HTML",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/SaverPDF/SaverPDF.jar",
+      "sha256": "cce4a187ee04a39eae19850545da96c001e0ca8f39b62e2c525121d90e41add0",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-SAVER-PDF",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/SaverSQ3/SaverSQ3.jar",
+      "sha256": "e1e12388a0232cd9cad0615bbe2e076e01b51304230e9bcefb2b13cb1a5b666a",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-SAVER-SQ3",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar",
+      "sha256": "cac2b8ccfbbda049ccfbbdfa016488fde36dc5ea4ca93ddaba07eb39b75f2e35",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-SAVER-STRATEGY-TRADES",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
+      "sha256": "c6b7b2f21b9a299759a3d760d611646f460fab39e8dd173a78f17a9f806ff541",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-SERVLET-ALGO-WIZARD",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/ServletBuilder/ServletBuilder.jar",
+      "sha256": "f5abf10d91cc265fefc4a4ec89ca43e70800bc100d9f51b9855faea621c49e82",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-SERVLET-BUILDER",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
+      "sha256": "2950747967d42710cad4df45cef4aaf0d3317df5261964c788eb147138e9744e",
+      "class_count": 13,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-SERVLET-CODE-EDITOR",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/ServletConnection/ServletConnection.jar",
+      "sha256": "7e254197a8e29bad9601b7235af0e58ef696c159508c96170465c847b48cd54b",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-CONNECTION-SERVLET-CONNECTION",
+      "phase": "P16"
+    },
+    {
+      "locator": "internal/plugins/ServletConstants/ServletConstants.jar",
+      "sha256": "0269ef64e3e4318025b53301ebb61eeef39c585f751ad4a5dd11425687928acf",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-STRATEGY-SERVLET-CONSTANTS",
+      "phase": "P05"
+    },
+    {
+      "locator": "internal/plugins/ServletDatabankViews/ServletDatabankViews.jar",
+      "sha256": "bed7a5051a0eee40bfc64876d5a0e38ff322a61759545f7d647ce990571790f6",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-SERVLET-DATABANK-VIEWS",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ServletGridControl/ServletGridControl.jar",
+      "sha256": "0d5288f68c62da3e1ddbdbae2b1ba2221b3822045c50bb74613c3b3d4af51476",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-COMPUTE-SERVLET-GRID-CONTROL",
+      "phase": "P14"
+    },
+    {
+      "locator": "internal/plugins/ServletIndicatorTester/ServletIndicatorTester.jar",
+      "sha256": "f6bdd59758b3df89d4163a268a11b1da550583fcef508737c2c3b7b9c23e2685",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-SERVLET-INDICATOR-TESTER",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/ServletMCP/ServletMCP.jar",
+      "sha256": "a61879f1a764312fa9d1614020a7538b38a2529cb2049f856b67add9689b1685",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PRODUCT-SERVLET-MCP",
+      "phase": "P17"
+    },
+    {
+      "locator": "internal/plugins/ServletProject/ServletProject.jar",
+      "sha256": "60935843ba2ddf41a57f589f778c8bda1adbd4ff79a1e0469d9fc7d9f22255c4",
+      "class_count": 13,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SERVLET-PROJECT",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/ServletProjectOld/ServletProjectOld.jar",
+      "sha256": "7324b8a1cd65a4648a8a6deae01b16ba533a81159d22f49fdaacd92a40d4942f",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SERVLET-PROJECT-OLD",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/ServletRenameTool/ServletRenameTool.jar",
+      "sha256": "ebe6f9347a0c34737dafa1df96f5c381ccc532d3c431940189de4952bd638388",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-RESULTS-SERVLET-RENAME-TOOL",
+      "phase": "P08"
+    },
+    {
+      "locator": "internal/plugins/ServletStrategy/ServletStrategy.jar",
+      "sha256": "03907ceeeaf800838cc8e17d458c4f6bb5c958c043489f517d043071705a7260",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-SERVLET-STRATEGY",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/ServletWizard/ServletWizard.jar",
+      "sha256": "1b452b3b77ca15997aa9d5461c858869ed3106068a6600b3c451b0b473fcc91e",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-AUTHORING-SERVLET-WIZARD",
+      "phase": "P07"
+    },
+    {
+      "locator": "internal/plugins/ServletYahoo/ServletYahoo.jar",
+      "sha256": "a2f07d5cbb0b9768e0bcce53e23fc80c9fb626faa9f981a6a6af5e47966042e0",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SOURCE-SERVLET-YAHOO",
+      "phase": "P04"
+    },
+    {
+      "locator": "internal/plugins/SettingsAdvancedTM/SettingsAdvancedTM.jar",
+      "sha256": "a3cf16125b42b41df82e5ceebd1b74d1380e6eef82a7179188023f94d7e1e460",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-SIMULATOR-SETTINGS-ADVANCED-TM",
+      "phase": "P06"
+    },
+    {
+      "locator": "internal/plugins/SettingsApplyMassConfig/SettingsApplyMassConfig.jar",
+      "sha256": "d0a003545047c922a4d7d957cda69540fde1f2b2b5e36861f7830e9049095ba6",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-APPLY-MASS-CONFIG",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsAutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilder.jar",
+      "sha256": "f3bdfb79409f2b8eaf179626cef9462733a669c34f0ea05fb15ddad1219171d7",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-SETTINGS-AUTOMATIC-PORTFOLIO-BUILDER",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/SettingsAutoRetestData/SettingsAutoRetestData.jar",
+      "sha256": "387f7c85e9267a282607dbcffb8c880ddf0715b65577cd692e5656b8d6541f79",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-SETTINGS-AUTO-RETEST-DATA",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/SettingsBlocks/SettingsBlocks.jar",
+      "sha256": "34983dd20362d2b1c0645fe1dd87250f8c154bf8763904e61d736a509f72d31d",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-STRATEGY-SETTINGS-BLOCKS",
+      "phase": "P05"
+    },
+    {
+      "locator": "internal/plugins/SettingsCallExternalScript/SettingsCallExternalScript.jar",
+      "sha256": "f2b82f3c269f7f4f5d34ceb44697713a72a203953093c5a06cc2227dd8966a36",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-CALL-EXTERNAL-SCRIPT",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsClearDatabanks/SettingsClearDatabanks.jar",
+      "sha256": "233ceafc6ab1822f3a2d19765753bb940b071388d32a3a9e1fc5dd194cbe0243",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-CLEAR-DATABANKS",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsCreatePortfolio/SettingsCreatePortfolio.jar",
+      "sha256": "817623e2523694139a6d23e2944eb323d81a510bfcf959c97c6b46aefc07e4b7",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-SETTINGS-CREATE-PORTFOLIO",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
+      "sha256": "090d0d2f0a10bbbdb3b25602651594239b72033aa3e2588779040f6977faa51e",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-SETTINGS-CROSS-CHECKS",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/SettingsCustomAnalysis/SettingsCustomAnalysis.jar",
+      "sha256": "2014e1848e5e44ee88dd0d785d6b6955ec420c510724db77eaee7a0ba31c616a",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-CUSTOM-ANALYSIS",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsData/SettingsData.jar",
+      "sha256": "69be16089a6f5ec0e6160e9f4980abf384b8ac57449de32a687fc8e0e8fdd3f1",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-DATA-SETTINGS-DATA",
+      "phase": "P03"
+    },
+    {
+      "locator": "internal/plugins/SettingsDatabanks/SettingsDatabanks.jar",
+      "sha256": "dc097f070f4aee60c81ba35a2fa071297a66e29a571be8b1f20dee47325cd556",
+      "class_count": 0,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-DATABANKS",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsDeleteFile/SettingsDeleteFile.jar",
+      "sha256": "9b0097abd3e0fe10f963481171cb14e52b0d3538e73523316cd08e584d127d46",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-DELETE-FILE",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsFiltering/SettingsFiltering.jar",
+      "sha256": "2b4909843e77e93393835c55cbb787cd5e30393ef0e7a9ac78e188f75f90c780",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-FILTERING",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsGoToTask/SettingsGoToTask.jar",
+      "sha256": "65a839042f98e71f8b63f660e6067fa5c4c2326a87ed005fea7caa51972ccb86",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-GO-TO-TASK",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsLoadFromFiles/SettingsLoadFromFiles.jar",
+      "sha256": "629dc57ef3d62662411a24d6144d6b7c491aba908b155b54ffe30cf1ac2f0a89",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-LOAD-FROM-FILES",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsLogDatabankStats/SettingsLogDatabankStats.jar",
+      "sha256": "8e4a151303e2580d408670f9179bec73526e5ee37bf4acc7805e70319c20f1f2",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-LOG-DATABANK-STATS",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsMoneyManagement/SettingsMoneyManagement.jar",
+      "sha256": "d67b40d82bf1925b5b1cb8b47c4aa57c7956dea074d2138b9700da38a431045b",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-SIMULATOR-SETTINGS-MONEY-MANAGEMENT",
+      "phase": "P06"
+    },
+    {
+      "locator": "internal/plugins/SettingsNotes/SettingsNotes.jar",
+      "sha256": "bd9fb36e69240c03bbfae7499aa2b102d957505616d0f4b77d861506965c0272",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-NOTES",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsNotification/SettingsNotification.jar",
+      "sha256": "3c6bc47ce8196c989f660a491d138429da886ca96db6f0aa6e90b95c3978e5aa",
+      "class_count": 3,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-NOTIFICATION",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsOptimization/SettingsOptimization.jar",
+      "sha256": "4bd3b12f7d40c41489b58ac67e6d90191080825446921bd0373a11c74a7eb40d",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-SETTINGS-OPTIMIZATION",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/SettingsOptions/SettingsOptions.jar",
+      "sha256": "05ccd670b25beb681bde41255b8453b44aa517ccfa198ba7ea5685dd6faab046",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-SIMULATOR-SETTINGS-OPTIONS",
+      "phase": "P06"
+    },
+    {
+      "locator": "internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar",
+      "sha256": "31de31b3ea68df6a2c9313d4c1e25469087c8ac0b178da947a03f4a21460636d",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-SETTINGS-PARTS-TO-IMPROVE",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/SettingsRankings/SettingsRankings.jar",
+      "sha256": "66c06308f8a352bfd31f1e95643b51df017f80827c0beb4e0d7fb4f02bb592db",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-SETTINGS-RANKINGS",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/SettingsSaveToFiles/SettingsSaveToFiles.jar",
+      "sha256": "7d294a5d608c415c3d44a3c790b4a5a6091178f2a2fbe803ad414ca0e67539a8",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-SAVE-TO-FILES",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsStopAndStart/SettingsStopAndStart.jar",
+      "sha256": "71649d7db652eb2ce2e9356733368bab75c8f93686785166063d9540f0708602",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-STOP-AND-START",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsUpdateData/SettingsUpdateData.jar",
+      "sha256": "c4331b96cf043eb9a29f83a183486bc289175194e2ef6d3d7b25deac2ca3a1f0",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-UPDATE-DATA",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsWaitFor/SettingsWaitFor.jar",
+      "sha256": "aa507733110171f3f9074602ed6eef809be814f43f4c53eaa88f66ccb561873d",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-SETTINGS-WAIT-FOR",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar",
+      "sha256": "a186a61db5e20a129a2845d3a3e079c391013fa530d2f507b44dd95f6b6f0f51",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-SETTINGS-WHAT-TO-BUILD",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/SettingsWhatToRetest/SettingsWhatToRetest.jar",
+      "sha256": "76253f516c5db8bb347893ee33df1b1b40ac96f31fd520fe814cd827a79f8794",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-SETTINGS-WHAT-TO-RETEST",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/TaskApplyMassConfig/TaskApplyMassConfig.jar",
+      "sha256": "ac4a1b6bb630cd6f326157ff63357041fe3127144fde20397cab5b7f3e3edf81",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-APPLY-MASS-CONFIG",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskAutomaticPortfolioBuilder/TaskAutomaticPortfolioBuilder.jar",
+      "sha256": "450ba385bf39bba43abaf92faa06dec7f30d2a8aca1daffb03ce4c24fae4a2d6",
+      "class_count": 27,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-TASK-AUTOMATIC-PORTFOLIO-BUILDER",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/TaskAutomaticRetest/TaskAutomaticRetest.jar",
+      "sha256": "55b8703b11756d6bb17a27464d96d35e78f4f7513b299a63d4c11027bdda5db8",
+      "class_count": 6,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-TASK-AUTOMATIC-RETEST",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/TaskBuild/TaskBuild.jar",
+      "sha256": "e5d2f688ef7820d3e46d2de9bd2e0d6bdcf93b39df74532573d0957eca1a3f70",
+      "class_count": 11,
+      "family": "plugin",
+      "feature_id": "FEAT-BUILDER-TASK-BUILD",
+      "phase": "P09"
+    },
+    {
+      "locator": "internal/plugins/TaskCallExternalScript/TaskCallExternalScript.jar",
+      "sha256": "c5addbaacb182f7aeaac86f666fc283a019641207f2a0720b261afbbe24c18e2",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-CALL-EXTERNAL-SCRIPT",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskClearDatabanks/TaskClearDatabanks.jar",
+      "sha256": "8e607eed55b134b7cfbeb8549fe7fb274a1b0a7bf40172489e962cc3ba7bba46",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-CLEAR-DATABANKS",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskCreatePortfolio/TaskCreatePortfolio.jar",
+      "sha256": "939f4c1b46c4c87abe8294370b17d41f75cb1cd18d9cdfd913914bb6d8766c00",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PORTFOLIO-TASK-CREATE-PORTFOLIO",
+      "phase": "P12"
+    },
+    {
+      "locator": "internal/plugins/TaskCustomAnalysis/TaskCustomAnalysis.jar",
+      "sha256": "4c3b57a15910fddc9ecedb2dd705ca211d7438ded737490fdf3e2bdfb09610e1",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-CUSTOM-ANALYSIS",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskDeleteFile/TaskDeleteFile.jar",
+      "sha256": "b9d41645306dd25c981fafc5c41c18c3aabf6699a30291ec67a81215e0fef124",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-DELETE-FILE",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskFiltering/TaskFiltering.jar",
+      "sha256": "a8c0774c1fdec537b8b8de218f650b43622486a4df239593b73b25663217066d",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-FILTERING",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskGoToTask/TaskGoToTask.jar",
+      "sha256": "193d01b583617106ba2644aa9e60aad38b6ccd1a3980656bace7bc4ee82e489e",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-GO-TO-TASK",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskLoadFromFiles/TaskLoadFromFiles.jar",
+      "sha256": "c16da8329e61459143b013fa8ea953e684e7aed67c735c780a63972e1de3250f",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-LOAD-FROM-FILES",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskLogDatabankStats/TaskLogDatabankStats.jar",
+      "sha256": "2a903db425c206f8ffaa3c22a97cca1f95fbde6379caf12f970c7954fd228188",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-LOG-DATABANK-STATS",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskManagerProjects/TaskManagerProjects.jar",
+      "sha256": "6d07140b3c697f54bfebeb17f503347b341f1f10a36abc3ab21ba3793af9fd91",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-MANAGER-PROJECTS",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar",
+      "sha256": "86b5b1a68f20fc9cf2025ce903bfc09f69a7b49b647af061387efd9bc743ae64",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER",
+      "phase": "P15"
+    },
+    {
+      "locator": "internal/plugins/TaskNotification/TaskNotification.jar",
+      "sha256": "18e4129e84815d9806d35901011fe9f1311e28bda374b1bd590adcea8bfbe8b3",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-NOTIFICATION",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskOptimize/TaskOptimize.jar",
+      "sha256": "9ca3f14b146b90fbe431f341cb0d9cf3528ff8c8fa3f7d8ddbfcd7511b409e69",
+      "class_count": 10,
+      "family": "plugin",
+      "feature_id": "FEAT-OPTIMIZER-TASK-OPTIMIZE",
+      "phase": "P10"
+    },
+    {
+      "locator": "internal/plugins/TaskRetest/TaskRetest.jar",
+      "sha256": "1e1b514c469b07e5aa5a50895caaf1bdfe7323abe7817e810dfe22077eb50193",
+      "class_count": 4,
+      "family": "plugin",
+      "feature_id": "FEAT-ROBUSTNESS-TASK-RETEST",
+      "phase": "P11"
+    },
+    {
+      "locator": "internal/plugins/TaskSaveToFiles/TaskSaveToFiles.jar",
+      "sha256": "9cadabab1f360b8d3ec1db9f11bcb3af244298ec13d683fceaa9af5028b20e52",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-SAVE-TO-FILES",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskStopAndStart/TaskStopAndStart.jar",
+      "sha256": "1179ec5df70066f2f0bfdc60458ec3a656c074f514c5ccffc707fbce7387c99a",
+      "class_count": 1,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-STOP-AND-START",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskUpdateData/TaskUpdateData.jar",
+      "sha256": "3d34fcd874c184c8252011f964cc0c3d7d2f841dd8c8954376db356555507b08",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-UPDATE-DATA",
+      "phase": "P13"
+    },
+    {
+      "locator": "internal/plugins/TaskWaitFor/TaskWaitFor.jar",
+      "sha256": "ce277abb4da154cd5a7a0cbe9183ba0f8105c2ce81db8c62d61329319357e3c0",
+      "class_count": 2,
+      "family": "plugin",
+      "feature_id": "FEAT-PROJECT-TASK-WAIT-FOR",
+      "phase": "P13"
+    },
+    {
+      "locator": "j64/lib/jrt-fs.jar",
+      "sha256": "1db242eab55fb04e456d042ebc9b1c6192e5c755357567496d43b3c9da75a701",
+      "class_count": 57,
+      "family": "runtime",
+      "feature_id": "FEAT-HOST-JRT-FS",
+      "phase": "P00"
+    }
+  ],
+  "resources": [
+    {
+      "locator": "internal/plugins/CustomDatabankActions",
+      "feature_id": "FEAT-UI-CUSTOM-DATABANK-ACTIONS",
+      "requirement_id": "FR-UI-CUSTOM-DATABANK-ACTIONS-RESOURCE-WORKFLOW",
+      "phase": "P08",
+      "files": [
+        {
+          "locator": "internal/plugins/CustomDatabankActions/delete/module.js",
+          "sha256": "b5a1366f88f19aa4255ffda746a628c0dedca8fe21e56e08707a1e28714c86ed"
+        },
+        {
+          "locator": "internal/plugins/CustomDatabankActions/moveLeft/module.js",
+          "sha256": "0265ff467370772e74ad15bf2b52a67c7720d13a478e4bc98e96f437a59493c2"
+        },
+        {
+          "locator": "internal/plugins/CustomDatabankActions/moveRight/module.js",
+          "sha256": "aa4c93bea9ae48bd8ed9d67bf01f1fe14d7dab123bcbc4b576d0ca77e83a6168"
+        },
+        {
+          "locator": "internal/plugins/CustomDatabankActions/moveToPosition/module.js",
+          "sha256": "eec6a802e3eea128790bd1de15c5756acd77edd033f792cda0498bf21580d2e2"
+        },
+        {
+          "locator": "internal/plugins/CustomDatabankActions/rename/module.js",
+          "sha256": "b9a3442edb0b70c33ffeb2a96c46b2fbe8fe847097a93839129e112928ec0385"
+        },
+        {
+          "locator": "internal/plugins/CustomDatabankActions/rename/renameDatabankPopup.html",
+          "sha256": "ecb05b096ca3818994aac156165211988a432451a536090023924c28352df772"
+        },
+        {
+          "locator": "internal/plugins/CustomDatabankActions/rename/RenameDatabankPopupCtrl.js",
+          "sha256": "3bd4dcc158fa09f199e7153f2047b6c0ff886ffdfbacf4d86809431ca5834545"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/CustomResultsPluginActions",
+      "feature_id": "FEAT-UI-CUSTOM-RESULTS-PLUGIN-ACTIONS",
+      "requirement_id": "FR-UI-CUSTOM-RESULTS-PLUGIN-ACTIONS-RESOURCE-WORKFLOW",
+      "phase": "P08",
+      "files": [
+        {
+          "locator": "internal/plugins/CustomResultsPluginActions/delete/module.js",
+          "sha256": "0583e54cf0395aca66677275f34bf689791aaefd8ec064311280cc8cb858c4f3"
+        },
+        {
+          "locator": "internal/plugins/CustomResultsPluginActions/rename/module.js",
+          "sha256": "26eb9e98f2e459b0825996a801c24bcb91144abdfe559db0fee96c4824d8c97a"
+        },
+        {
+          "locator": "internal/plugins/CustomResultsPluginActions/rename/renameResultsPluginPopup.html",
+          "sha256": "2bc26c9532e1ab33b409f8a1a04c69e21d8cb4a899d6ed73f79f7a77f6edf201"
+        },
+        {
+          "locator": "internal/plugins/CustomResultsPluginActions/rename/RenameResultsPluginPopupCtrl.js",
+          "sha256": "3ff546c20aae1283bffb01af0b7931fb56ab38c6dde464fc8fc35e96d7d6d065"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/DashboardPanel",
+      "feature_id": "FEAT-UI-DASHBOARD-PANEL",
+      "requirement_id": "FR-UI-DASHBOARD-PANEL-RESOURCE-WORKFLOW",
+      "phase": "P09",
+      "files": [
+        {
+          "locator": "internal/plugins/DashboardPanel/dashboard.html",
+          "sha256": "9128e92566eb0f23c6ec581c78c54b878003231620661950cff318671638c4ec"
+        },
+        {
+          "locator": "internal/plugins/DashboardPanel/DashboardCtrl.js",
+          "sha256": "2fe274d16916c0d9c0845812eff0672fabfc4a640f5e0d7a923fdc2eb8f85621"
+        },
+        {
+          "locator": "internal/plugins/DashboardPanel/module.js",
+          "sha256": "191022f9bd2c15ccdb456584c2316e53a4556caaafe81da119ace2e5322ef543"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/DataManagerActions",
+      "feature_id": "FEAT-UI-DATA-MANAGER-ACTIONS",
+      "requirement_id": "FR-UI-DATA-MANAGER-ACTIONS-RESOURCE-WORKFLOW",
+      "phase": "P03",
+      "files": [
+        {
+          "locator": "internal/plugins/DataManagerActions/brData/module.js",
+          "sha256": "ab1ea9f755135b18dc81fd48013796da47c888cf42da8c4e1f8a38c32e833bc5"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/brDataUpdate/module.js",
+          "sha256": "7ebb8c2e8a1771b52d55cb8da0cb4dba9b73af1d1e7be24f94029e703196a6de"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/cloneToTimezone/cloneToTimezone.html",
+          "sha256": "5e7f9664857b2e9f47b038eb7358055f554e1ae7fd0e3a4cfb1b4408cfd17a19"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/cloneToTimezone/CloneToTimezoneCtrl.js",
+          "sha256": "7f6b75f53e761c1d00dedfedad83275e55eab4a455ae6d853357bbe3ca21bbe4"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/cloneToTimezone/module.js",
+          "sha256": "116262eb04e18a01a67ea2d5cce585316d8947b8e648ad19918594653454ff4f"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/delete/module.js",
+          "sha256": "fc1008d3d8b27d1398e3732d0c7265fc41afcb5cd3146612993a3896be76d30a"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToCsv/exportToCSV.html",
+          "sha256": "6e8dca1b84c42abc74030b5457fc0a694eac42ad35c4a6bd55f3c1112fdbcb1a"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToCsv/ExportToCsvCtrl.js",
+          "sha256": "7468183ab9062517987e7c8f6067f89e7c9f93d07254b12b03a0221de27f5297"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToCsv/ExportToCsvService.js",
+          "sha256": "6bce40679e5abbe211b8d9226932665e5985fa9b37b5ebce37bed7588e061377"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToCsv/module.js",
+          "sha256": "e5ad0d38e02a65c0c6fd17ed49e7ebad7840ed58b325a16c216521e86f1f3a74"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToCsv/newFormatPopup.html",
+          "sha256": "8c654bce5ba97a75fdad65cd094bacc1c44adb3c1ae70c9f646a3af116c80948"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToCsv/styles.css",
+          "sha256": "623f6fc60768214240d99f5dee5aa0efd5e43c1ff5209a2c35549f8dd9957dc3"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT4/exportToMT4.html",
+          "sha256": "7e44bfbb8ecf21ba6884f0a8de0e74698cb0aef628d39cefef76ffbedeb8cd59"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT4/ExportToMT4Ctrl.js",
+          "sha256": "bbfc03b745f02ee4f4c69d6a96008901d88430f7c53bdb22177f03012df45f1a"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT4/ExportToMT4Service.js",
+          "sha256": "b90bd318b1afa494bc4f13b6c9c2870042eb48f7f66ac62fc694ed7344d76cd7"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT4/module.js",
+          "sha256": "ccf2f689478a678093c6b9db70baece7d06367f486fdae6a03793d7c92bb125a"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT4/style.css",
+          "sha256": "f45489e845d704554b3c8a211d65d00145fb0c5d0190e643f19ee53903ec954c"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT5/exportToMT5.html",
+          "sha256": "b5b89c74114f14b94a3f401c51b2ed2fb2481ef1b0dfb8afaf7f3d7637e1067f"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT5/ExportToMT5Ctrl.js",
+          "sha256": "c9bd5cc8ed3a007d72d77da3a5cc288f1b5717ff3eaf42d15d0ebee019f0cc37"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT5/ExportToMT5Service.js",
+          "sha256": "e21c18ce39d4196c7b5f96bea6c14d8fd41ea62b26fd21ea70086ac579c2a78f"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT5/module.js",
+          "sha256": "52b48623ff8326d4f2771f11175bf26e3a23f5163a9738dcef98470e95058eb8"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/exportToMT5/styles.css",
+          "sha256": "b95d1094bdf9131bec2df2dc48c58816d96adf112ae065dc749b16227462d12c"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/load/module.js",
+          "sha256": "c633a1dcd7174cb4c25b7d149fb0e573d3086f301a94591ec2e361b56ea6fdc1"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/chart/reviewChart.html",
+          "sha256": "4d239783ed717431c321c1d98973d23766f7761ed379c89fa24fe688bdf68201"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/chart/ReviewChartCtrl.js",
+          "sha256": "cc7313bcc93ddfe6418128e430ee549de7435e5a1d43c855955becb8fb9a0203"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/data/reviewData.html",
+          "sha256": "08812bd22d91799c86ed63f267513dec447dc937acfeb9f3deeb9e9560624b44"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/data/ReviewDataCtrl.js",
+          "sha256": "f32a7c961d7c8855e608549abfc4a5f35a169c1dbc31f589a3bafadd3ab7a5a5"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/module.js",
+          "sha256": "dfba3f024733e4a49759df0332b7b7a7461422370e988dd22e409d230c1f5767"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/quality/quality.html",
+          "sha256": "eeb92d020540841f69717e08d8323673da325cb1b2b66ad97a094acedf64a389"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/quality/QualityCtrl.js",
+          "sha256": "cb74d2742efd653ec27cfe46e1834aef409accd55f178bd520df5bf10442d8b9"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/review.html",
+          "sha256": "dfdab0b21b9aaf362565f6e5505a4b9fc7dcf85eeb5c19fc4fc1ccdc0dab21a9"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/ReviewCtrl.js",
+          "sha256": "2a0a87e63942c667161d8bc228afe8d1ea489891606cff2018b5a630416f4517"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/review/styles.css",
+          "sha256": "977c64fc9fe79795b20c9dd95df08b958f7102f43a913b646d73c694c7699c43"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/save/module.js",
+          "sha256": "65e1b5b1430c9813646571e0ead2c6796f7a7a67727b788cf340c10538f644a2"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/styles.css",
+          "sha256": "00d30b543c1b3f200ca2e612a7f7494dfd8d034f9550ecb038a80ad38da79a78"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/updateAll/module.js",
+          "sha256": "542abb7fc7131d4ff14a572cba19c6dc7942cc7607514c8775d70a6733ebf7bf"
+        },
+        {
+          "locator": "internal/plugins/DataManagerActions/updateSelected/module.js",
+          "sha256": "3728bdf149cd50213c6ec348de1e9a6295340fbe7059d48d00429fd7b6019d1b"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/DataManagerHelp",
+      "feature_id": "FEAT-UI-DATA-MANAGER-HELP",
+      "requirement_id": "FR-UI-DATA-MANAGER-HELP-RESOURCE-WORKFLOW",
+      "phase": "P03",
+      "files": [
+        {
+          "locator": "internal/plugins/DataManagerHelp/help.html",
+          "sha256": "6fd583ee03625d5452757293cfa2d7e07d1962519a2309513a9b04a87f288396"
+        },
+        {
+          "locator": "internal/plugins/DataManagerHelp/module.js",
+          "sha256": "4d76fc2c087349a82d8378adb0928a7ae3f10ae7f6afccae06027f30bb6751d4"
+        },
+        {
+          "locator": "internal/plugins/DataManagerHelp/styles.css",
+          "sha256": "a06a06032e6ff6101181ab9b90a4a9e12373ae715867b61ed1b368f0801f6c78"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/DataManagerLog",
+      "feature_id": "FEAT-UI-DATA-MANAGER-LOG",
+      "requirement_id": "FR-UI-DATA-MANAGER-LOG-RESOURCE-WORKFLOW",
+      "phase": "P04",
+      "files": [
+        {
+          "locator": "internal/plugins/DataManagerLog/dataLog.html",
+          "sha256": "369038c23f6582d2800b89a2103422e17b398e78da8646a4ae36acd925ad2a8c"
+        },
+        {
+          "locator": "internal/plugins/DataManagerLog/DataManagerLog.css",
+          "sha256": "45a2bc419a0d735c0cc7865f67eef0e40e1e17629d58f439ad9f7c7906d18626"
+        },
+        {
+          "locator": "internal/plugins/DataManagerLog/DMDataLogCtrl.js",
+          "sha256": "e5520842e047242180ab71b01ea8df13d5d29bf54ca5ac37e51271e9f8a0ea86"
+        },
+        {
+          "locator": "internal/plugins/DataManagerLog/module.js",
+          "sha256": "2c813977835c9bf1b1aa6ea57596355ea8e6fcc8c6e1b5d7d1c264b04d6a8ee9"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/ProjectDatabanks",
+      "feature_id": "FEAT-UI-PROJECT-DATABANKS",
+      "requirement_id": "FR-UI-PROJECT-DATABANKS-RESOURCE-WORKFLOW",
+      "phase": "P08",
+      "files": [
+        {
+          "locator": "internal/plugins/ProjectDatabanks/DatabankCtrl.js",
+          "sha256": "a11653b3ad6cfd068ecf87f09ab399fc707197c4913bad9e94f8afcf8593fb94"
+        },
+        {
+          "locator": "internal/plugins/ProjectDatabanks/DatabanksCtrl.js",
+          "sha256": "9c5d0eb2c98f12a0804d2c37cea2069902b340d0e564fa383b1b68b95c071cd0"
+        },
+        {
+          "locator": "internal/plugins/ProjectDatabanks/DatabankService.js",
+          "sha256": "92fa6885bd1ec6e3549087d5f1439e34e870580c05a4b151f5f58d15b4cbf618"
+        },
+        {
+          "locator": "internal/plugins/ProjectDatabanks/module.js",
+          "sha256": "5d087bc1330091602de0a2b90f82b3e0ca7edc6e55d0bea5230a6670b27f4269"
+        },
+        {
+          "locator": "internal/plugins/ProjectDatabanks/styles.css",
+          "sha256": "09ab526e3e80059aa2ddf59158eb5a8a1de75fcd365a97219ea7438a2f63179c"
+        },
+        {
+          "locator": "internal/plugins/ProjectDatabanks/views/databank.html",
+          "sha256": "a3c3d2eddafa1f161adfb1bf524baa87cfd6f0814d1268fd055a55b512c890b0"
+        },
+        {
+          "locator": "internal/plugins/ProjectDatabanks/views/databanks.html",
+          "sha256": "c5fcf2668bb1961359c709d68178b56307a683665d2f5b0e9a28368acac6ea95"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/ProjectResources",
+      "feature_id": "FEAT-UI-PROJECT-RESOURCES",
+      "requirement_id": "FR-UI-PROJECT-RESOURCES-RESOURCE-WORKFLOW",
+      "phase": "P07",
+      "files": [
+        {
+          "locator": "internal/plugins/ProjectResources/addedResourcesPopup.html",
+          "sha256": "edc8377fd841095eea49694b4e03aea23e49334a77ddbb08456ad8666b7ceb20"
+        },
+        {
+          "locator": "internal/plugins/ProjectResources/AddedResourcesPopupCtrl.js",
+          "sha256": "63fb176445ef82c1f028c2cd2c06fd2b9e4e52babfbea32ebfcaa149b862e688"
+        },
+        {
+          "locator": "internal/plugins/ProjectResources/diffResourcesPopup.html",
+          "sha256": "84938ead7dece443981982088d1fec2d2d34836c8d6320f2c2f976a1beb2566d"
+        },
+        {
+          "locator": "internal/plugins/ProjectResources/module.js",
+          "sha256": "411bea0e1ab21753741fea67bfeacfb0da76f12cb4320136eadd93c3bb91c1e0"
+        },
+        {
+          "locator": "internal/plugins/ProjectResources/resolveCustomResourcesPopup.html",
+          "sha256": "6fdf6f3a81047e5540fb2b0e03865265a40703574ffa0de668c699748de890bf"
+        },
+        {
+          "locator": "internal/plugins/ProjectResources/ResolveCustomResourcesPopupCtrl.js",
+          "sha256": "f195ec85028cbdeb3673f63b3de4cdd438907c31e9eb88cd022c0c4b94d4a303"
+        },
+        {
+          "locator": "internal/plugins/ProjectResources/resolveResourcesPopup.html",
+          "sha256": "740965e1dc85f9137a0f6e19b8aeded37c7eb16d866a7ca8378d1e263cb22729"
+        },
+        {
+          "locator": "internal/plugins/ProjectResources/ResolveResourcesPopupCtrl.js",
+          "sha256": "3b22c9298d698f9d12244a1f064fb6c2a06c0cd324887795f4e4eff41fc7ea19"
+        },
+        {
+          "locator": "internal/plugins/ProjectResources/styles.css",
+          "sha256": "a52d9c6b92ad3ee021a67329c1c416de4d92cd90adc1eb1270ef1261de71d8a6"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/ProjectResults",
+      "feature_id": "FEAT-UI-PROJECT-RESULTS",
+      "requirement_id": "FR-UI-PROJECT-RESULTS-RESOURCE-WORKFLOW",
+      "phase": "P08",
+      "files": [
+        {
+          "locator": "internal/plugins/ProjectResults/module.js",
+          "sha256": "3d5866cf4849d7160d9ac8785f1991597910864d0efbdbc68af2ed0e6d95df2e"
+        },
+        {
+          "locator": "internal/plugins/ProjectResults/newCustomPluginModal.html",
+          "sha256": "cad3fa81634142c93719e88e9694dce18ee8d0610050afc5d6f279fda84b1b14"
+        },
+        {
+          "locator": "internal/plugins/ProjectResults/results.html",
+          "sha256": "0119886e9484e1b19165eb9c365fa75d5128e8b4073f98be4e6148a83a434e08"
+        },
+        {
+          "locator": "internal/plugins/ProjectResults/ResultsCtrl.js",
+          "sha256": "5b233c5b43300080460c642864ee68d5cd8529e41ed5dc0cbc8bd5d0df533e3c"
+        },
+        {
+          "locator": "internal/plugins/ProjectResults/styles.css",
+          "sha256": "aadf5fc926bbfcc68582653d904075758ab0b0277ab1dda330c49a1833808c13"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/ProjectSettings",
+      "feature_id": "FEAT-UI-PROJECT-SETTINGS",
+      "requirement_id": "FR-UI-PROJECT-SETTINGS-RESOURCE-WORKFLOW",
+      "phase": "P13",
+      "files": [
+        {
+          "locator": "internal/plugins/ProjectSettings/module.js",
+          "sha256": "771b6aa5a998912cddc55a7ed273b2eb7103c5ea8c4a3e2678ec779650709c77"
+        },
+        {
+          "locator": "internal/plugins/ProjectSettings/SettingsCtrl.js",
+          "sha256": "ff5f1ee9f03f23f8d1777721a6f9cb098e1984c194b9b04ecb208f763fe8242a"
+        },
+        {
+          "locator": "internal/plugins/ProjectSettings/SettingsService.js",
+          "sha256": "12d730406524f61b500e73980fd8f75b8fc2709e2e9d7de875874d34d7fe4d7a"
+        },
+        {
+          "locator": "internal/plugins/ProjectSettings/styles.css",
+          "sha256": "e77c42c662ce1842f6df9b2fb2e4336f558f5948afedc5bea1fa5f9c5e1cda28"
+        },
+        {
+          "locator": "internal/plugins/ProjectSettings/views/settings.html",
+          "sha256": "d6495f228c2c40f1099859194150fe11625fafa849799323e209d1df10177eb4"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/ResultsReport",
+      "feature_id": "FEAT-UI-RESULTS-REPORT",
+      "requirement_id": "FR-UI-RESULTS-REPORT-RESOURCE-WORKFLOW",
+      "phase": "P08",
+      "files": [
+        {
+          "locator": "internal/plugins/ResultsReport/module.js",
+          "sha256": "8df61883e01fc280127bbea826e80e9be4b8fe1c93e60506bb3c5a0bf99f0bb0"
+        },
+        {
+          "locator": "internal/plugins/ResultsReport/report.html",
+          "sha256": "4b5c11ae7eafc202fc005cc06f9c08a82a3779a8bfc7a353780f1a79c7264b92"
+        },
+        {
+          "locator": "internal/plugins/ResultsReport/ReportCtrl.js",
+          "sha256": "9d08302527e4a1857321a84c7bd2d9aa4e71f01f53dac6f0eb72f1a782033306"
+        },
+        {
+          "locator": "internal/plugins/ResultsReport/styles.css",
+          "sha256": "01f22332d8fbd448a03039138f585f7ded78e1a9c47340a71b30e65385e5e703"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/SettingsAutomaticRetest",
+      "feature_id": "FEAT-UI-SETTINGS-AUTOMATIC-RETEST",
+      "requirement_id": "FR-UI-SETTINGS-AUTOMATIC-RETEST-RESOURCE-WORKFLOW",
+      "phase": "P11",
+      "files": [
+        {
+          "locator": "internal/plugins/SettingsAutomaticRetest/automaticRetest.html",
+          "sha256": "6c277e657846bd9bfdeabc460f81f18678301c2b232bf45554ff6c6b2b596ec8"
+        },
+        {
+          "locator": "internal/plugins/SettingsAutomaticRetest/module.js",
+          "sha256": "751885f9088c38632ddb7a54fb9d1e1589e65229d1c582b40cce0256b7df8978"
+        },
+        {
+          "locator": "internal/plugins/SettingsAutomaticRetest/SettingsAutomaticRetestCtrl.js",
+          "sha256": "57ff4a14775248dc15e6364f4e0433be992313ae77057c250f04ddbc59dc822c"
+        },
+        {
+          "locator": "internal/plugins/SettingsAutomaticRetest/styles.css",
+          "sha256": "8976ee7fd7797cb89570f380849e2be650b6a5e9b07529a3b4ad1d118435e30b"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/SettingsGeneticOptions",
+      "feature_id": "FEAT-UI-SETTINGS-GENETIC-OPTIONS",
+      "requirement_id": "FR-UI-SETTINGS-GENETIC-OPTIONS-RESOURCE-WORKFLOW",
+      "phase": "P09",
+      "files": [
+        {
+          "locator": "internal/plugins/SettingsGeneticOptions/module.js",
+          "sha256": "7a40cc41aeeb4ac396bcd250f2ea1eab1fc84feb89b11eb6f7bc00e98e118df3"
+        },
+        {
+          "locator": "internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsCtrl.js",
+          "sha256": "33ec94cc5f725a6b7bd07b4878c3b3e8cc9ec70c6a035a7fc5cb3f7b8de70d1b"
+        },
+        {
+          "locator": "internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js",
+          "sha256": "75299ebf65f27d3657f09b7c4d6b21c2efaa98fc1f87de2176d900907d2f89b5"
+        },
+        {
+          "locator": "internal/plugins/SettingsGeneticOptions/styles.css",
+          "sha256": "b73d8b6d6cfa7728b14f34936aa6f0dca8c47ceb6028997df14b830e611fa6e1"
+        },
+        {
+          "locator": "internal/plugins/SettingsGeneticOptions/views/geneticOptions.html",
+          "sha256": "f236581feb5e144d089feae7a653437ee567f7555648d6c70785ab86dd723adb"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/SettingsPanel",
+      "feature_id": "FEAT-UI-SETTINGS-PANEL",
+      "requirement_id": "FR-UI-SETTINGS-PANEL-RESOURCE-WORKFLOW",
+      "phase": "P13",
+      "files": [
+        {
+          "locator": "internal/plugins/SettingsPanel/module.js",
+          "sha256": "bdef8c12d95a6bce81b3ac3b01ef9c303e4e8b1383045f0dfb2c92126b88a37e"
+        },
+        {
+          "locator": "internal/plugins/SettingsPanel/settings.html",
+          "sha256": "9cd0333c2f30730712c1dd21fc4a4f2b46ff5c12a4cb0b310bba1930f75daaef"
+        },
+        {
+          "locator": "internal/plugins/SettingsPanel/SettingsPanelCtrl.js",
+          "sha256": "d399231bff1d1188f5dc521dcec7bd2d4fd3335e87e4a886fc91148874831ddb"
+        },
+        {
+          "locator": "internal/plugins/SettingsPanel/styles.css",
+          "sha256": "8b653192ce55feb16beea7aa0e821f66633549935ec4007fbefaab38ba67546d"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/SkinDark",
+      "feature_id": "FEAT-UI-SKIN-DARK",
+      "requirement_id": "FR-UI-SKIN-DARK-RESOURCE-WORKFLOW",
+      "phase": "P17",
+      "files": [
+        {
+          "locator": "internal/plugins/SkinDark/dark.skin.css",
+          "sha256": "449aa97f7bb7fa9268290f14c26ef9ff7f47de6aeb57e8b86269243c1135eb0c"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/arrow-menu-sel.png",
+          "sha256": "a94019a01fb192399900d4a8dce89f6aab4380028ce69c8668037cccd06c9e40"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/aw-action-preview.png",
+          "sha256": "1af52c642ae9bc5340440e9e67028b6fd436ff4867a47dc0a65ccbd980030a30"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/aw-condition-preview.png",
+          "sha256": "7bbf48c1f4acb4f36c964f7100ca507ba5d31cf2f93e69140282eb57c95a410f"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/aw-rule-preview.png",
+          "sha256": "d8bb2dc9be35c5f1a22cdcf2e3ec40a7c56cbd199c93f015854b75ab8be55da4"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/aw-signal-preview.png",
+          "sha256": "76e7f1b9f2db0f64519fa7c50c40bf487405bc871b1b4989e1c200787eca5764"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/expandbtn.png",
+          "sha256": "ccd24e1d26d595bcb11b4a4bd55d719d01cdbf185cd7653827437b0fe5496c63"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/hidebtn.png",
+          "sha256": "b6231c44e72b1e6c4938a8978a0e1765afb41f8ed82f9cdadbd8c41f5779c33e"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/ico-h-editor.png",
+          "sha256": "d3817fb789c8eb0b823cf75c15743e119a41201b1a1cce26d33f756358cbb2dd"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/ico-h-manager.png",
+          "sha256": "658e39a867c8f6d3df2be82879d63d66a66ae08e431f1e0db0a4b4b2176ec0db"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/ico-h-trader.png",
+          "sha256": "48612c322c6d8b36e5486cd37e00427dd360985fe4d0be149c401c448f701705"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/ico-h-wizard.png",
+          "sha256": "ccc2bf549d34d2d1e8663cb57eb57ce887eaa97057b909670f701151475156d1"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/ico-proj-build.png",
+          "sha256": "74432e9b1cb568a9d3f56edc9d9281605e4ca0386da7cacf1cc449aa639214b9"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/ico-proj-optimize.png",
+          "sha256": "7500a34139b9d4b2ae4a50a0a319ee5a5769417f72ee02bd29ea24575368993e"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/ico-proj-retest.png",
+          "sha256": "6c5a43c8f96e3fcefe098de9816ce745fa804f09f4a99fb5c2ef5dc3b730cd3b"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/logo-bg.png",
+          "sha256": "a83f7abb5b5f9de28ecbaca3672e10e4fa4f1c85514bf7124dcd4e34a4c4041d"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/menu-highlighted-hover.png",
+          "sha256": "d2553457c1431e663edd9606ea1d5dad9e545cfda6aded3a1f4f045883ed32a2"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/menu-highlighted.png",
+          "sha256": "42e854a781a8aff80a7fe36d4278787a6e7885318a54fcb8a644e13bb784c62f"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/split-divider-small.png",
+          "sha256": "88de4066cc2621698b6ac91435ab39c4fc4159da64b8015d50c3c5f50f60a9f1"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-checkbox-c.png",
+          "sha256": "36497b5276928a471efdb0e8dbc4d4c6430c589efbfda1083efee6ab7a7feeb9"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-checkbox-d.png",
+          "sha256": "d7a14ad6394060b935d1f29cf7b79a11e380b0523e551ddf4bd38fb9b1771643"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-checkbox-o.png",
+          "sha256": "bb7496b9e6a72d93afc116b26515b9b44b229c7099a610f8712558150b5379d2"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-minus.png",
+          "sha256": "0c004d0762ecb1536a6c8e5d79ac85dffb381e77d076673ea91a8af73b5f81b2"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-plus.png",
+          "sha256": "1b734ad3f2d90b4b114159eb28987c1902f13df70c8eb1e6cea38cf4df1aed58"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-radio-c.png",
+          "sha256": "b6b40e8b3683849609ca902bb2f1655f1e6dd392415d94591be38e99c559ab9a"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-radio-d.png",
+          "sha256": "5b27ae65f5914d8eb4e21d52b7bf1e5df3b2ccb649d1804f6b2e08dbf2f17841"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-radio-o.png",
+          "sha256": "04f8a6814d5c4e87f12cf158e0f2d02123878f7451793194581646790ed2e704"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-select.png",
+          "sha256": "13e23d9bbf7be9af8f97f3c73c9746a5ed0175167d8df99160f937198db20b8e"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-switch-active.png",
+          "sha256": "9a64f32ce19c89943ceb8546c98fbef1f60039c26d171fc28a0ea31f79d97584"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/sq-switch.png",
+          "sha256": "4c2581efdad372c235b32b7015e0a0ea80eb83c45a644a88a3b3a51ad6fa57d5"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/tab-ico-delete-h-smaller.png",
+          "sha256": "8b95be6b8a90871dc65339abc0192768175894d9f051ad1f576200a85a17dbf1"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/tab-ico-delete-h.png",
+          "sha256": "21aa8c145aee33f9adf6e722f960e6c9ef1a5baba5fe3e3e667947af050ec315"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/tab-ico-delete-smaller.png",
+          "sha256": "66bcce26de5f87ce9bafd97acbcf45fcf867831371c66f426d9d51a66136cac8"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/img/tab-ico-delete.png",
+          "sha256": "7816e1c3965067fb9f226292316d931a3fcc2ca07acdd16a4eac1ce9c1df1645"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/module.js",
+          "sha256": "0e803fa98112fcd894ff92a5e85e2bdb67b7f0af76fb9639a035a27a79ae552e"
+        },
+        {
+          "locator": "internal/plugins/SkinDark/preview.png",
+          "sha256": "fe096b7bd8a1896da0ef9bbf40d576143f1bb53ca9b3b3d0fb6ef67bd8f2f801"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/SkinLight",
+      "feature_id": "FEAT-UI-SKIN-LIGHT",
+      "requirement_id": "FR-UI-SKIN-LIGHT-RESOURCE-WORKFLOW",
+      "phase": "P17",
+      "files": [
+        {
+          "locator": "internal/plugins/SkinLight/light.skin.css",
+          "sha256": "0d98a9fec15044f8b5473f6e89f42cf82d409f0c4ffa1d407a853e6a4575a8f7"
+        },
+        {
+          "locator": "internal/plugins/SkinLight/module.js",
+          "sha256": "ba7618e042ba4dc33089e94a4a880872ccf2999aeadd67b0ce83f638feb4cb94"
+        },
+        {
+          "locator": "internal/plugins/SkinLight/preview.png",
+          "sha256": "94468397f47c199661b74ee8e54fd381e9c3c4e20ea0508c82ac0dbd520b123b"
+        }
+      ],
+      "activation_status": "unverified"
+    },
+    {
+      "locator": "internal/plugins/TaskManagerTasks",
+      "feature_id": "FEAT-UI-TASK-MANAGER-TASKS",
+      "requirement_id": "FR-UI-TASK-MANAGER-TASKS-RESOURCE-WORKFLOW",
+      "phase": "P13",
+      "files": [
+        {
+          "locator": "internal/plugins/TaskManagerTasks/copyFromTaskPopup.html",
+          "sha256": "8f992a9f4b3f0e70fef515c50d31322f4178d4949ce4ced224d16e07f0df8226"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/copyToTasksPopup.html",
+          "sha256": "32652037d6404f6b9ea5f3d628ffde966c62f833425a6272f52ea03a76ed6bde"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/directives/tmtask/tmtask.html",
+          "sha256": "b86578ecc41d76cc4e1b040b291321ced6815108ebbbad5e77f4a39131dd7864"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/directives/tmtask/TMTask.js",
+          "sha256": "206e7740e585e44c798cafcc9286185786f36b5010d498d415b56fec74ade071"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/directives/tmtask/TMTaskCtrl.js",
+          "sha256": "da8b0d775a23df90e40e077cd0b122ab7da5ef92b2bc955172a9aa4043e13409"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/module.js",
+          "sha256": "76735c18dd2cb2b8cdf7f2c5e836a95295a787513ef187943a7b20e835561ce9"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/newTaskPopup.html",
+          "sha256": "65b6a619fec4720b3bd5798c2258b5b740d8badad20276fe904f2180d465b51f"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/renameTaskPopup.html",
+          "sha256": "c186324c9d1a25c819a4692789121989fe2ada280d9781065ce5bf18cf7a0d5d"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/styles.css",
+          "sha256": "55983fe5a38bbeae31d4529485621af8a94f0a6a884f9672f47411481af042b3"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/tasks.html",
+          "sha256": "2d003e687d4ce72b50d84f3f318b8429b34683b4a9aac719083689a125b7002e"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/TMTasksCtrl.js",
+          "sha256": "dbf3fd1ab6d15d4d1c1902f5bcae41c7f99ee57c477df3145eb401e9f5986f6b"
+        },
+        {
+          "locator": "internal/plugins/TaskManagerTasks/TMTasksService.js",
+          "sha256": "7f10c1f2398d9bbb3912f1d04d662c644ba350938b1e0942a8400275c86d41e2"
+        }
+      ],
+      "activation_status": "unverified"
+    }
+  ],
+  "totals": {
+    "archives": 261,
+    "classes": 41512,
+    "resources": 17,
+    "library": 84,
+    "plugin": 176,
+    "runtime": 1
+  }
+}

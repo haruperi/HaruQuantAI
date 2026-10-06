@@ -14,13 +14,14 @@
 ## 1. Objective
 
 - **Goal:** Ratify a recoverable evidence/architecture baseline before P01 source execution.
-- **Context / Problem Solved:** P00 is folded into P01 to keep exactly 18 files; canonical backend authority and ledger/schema are absent from the audited tree.
+- **Context / Problem Solved:** P00 is folded into P01 to keep exactly 18 files. The owner-approved P00 plan restores reset-aware authority and reference tooling; common-core/runtime prerequisites remain blocked.
+- **Delivery status:** P00 evidence baseline delivered under plan version 1, approved `APPROVED: EXECUTE` on 2026-10-06. This is not completion of all P00 runtime prerequisites or qualification of P01. See `docs/dev/evidence/p00-release-matrix.md` and `.agents/logs/20261006_175657_p00-prerequisites/walkthrough.md` for recorded candidate checks.
 
 ## 2. Research and donors
 
 - **Donors:** SQX launcher/configuration, internal JAR manifests, Extending_SQX.pdf and user settings/projects/strategies/customdata under SQX_REFERENCE_ROOT.
-- **Audit:** backend app/ and tests/ are absent; docs/PROJECT.md, docs/ARCHITECTURE.md and root reimplementation ledger/schema are absent. UI typed clients are provisional.
-- **Conflict:** docs/templates/PYTHON_MODULE.md contains a `Capabilities:` sample while AGENTS.md requires `Key Capabilities:`; use the constitutional heading and reconcile through approval.
+- **Audit:** backend Python runtime remains absent. Reset-aware docs/PROJECT.md, docs/ARCHITECTURE.md, app/host/README.md and tests/reference tooling now exist. Current ledger/schema are `docs/dev/evidence/reimplementation.{json,schema.json}`; 88 historical records and their original schema are preserved at `docs/dev/evidence/history/3ede688/`. UI typed clients remain provisional.
+- **Conflict resolved:** docs/templates/PYTHON_MODULE.md now uses the constitutional `Key Capabilities:` sample heading under `DEC-HOST-P00-MODULE-HEADING`.
 - **Gap:** MainApp/AppSettings and launcher SQLib.jar packaging remain unresolved; manifest/class lookup and runtime validation must establish the owner.
 - **Commands:** `git status --short`; `rg --files docs ui scripts`; inspect StrategyQuantX.config/sqcli.config and `jar tf` using logical-root variables.
 
@@ -40,12 +41,16 @@
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Freeze the 261-JAR/17-resource inventory and source roadmap hash; resolve active/inactive products and unresolved core symbols.
-- [ ] **Step 2:** Locate historical specification/ledger authority read-only; propose restoration/new schema paths for owner approval before writing them.
-- [ ] **Step 3:** Map each proposed FEAT/FR to its owning README; retain existing IDs, identify registration gaps and ratify decision IDs.
+- [x] **Step 2:** Locate historical specification/ledger authority read-only; propose restoration/new schema paths for owner approval before writing them. Original ledger/schema snapshots and source fingerprints are preserved; schema v2 evolution was explicitly approved.
+- [x] **Step 3:** Map each proposed FEAT/FR to its owning README; retain existing IDs, identify registration gaps and ratify decision IDs. `p00-ownership.json` maps 261 feature proposals, 667 seeds and 17 resources with proposed README paths and missing registrations. Only FEAT-HOST-EVIDENCE and its seven FRs/nine decisions are registered; existing UI registries are preserved.
 - [ ] **Step 4:** Enumerate consumed classes/functions beyond the 667 seeds; write paraphrased behavioral specifications and versioned expected outputs.
-- [ ] **Step 5:** When ledger edits are approved, read ledger/schema, allocate highest ID + 1, record atomic claims with fingerprints/locations/limits/review and link supersessions.
-- [ ] **Step 6:** Preserve clean-room flags; keep proprietary source outside repository evidence; validate ledger schema, source/record references and registry IDs.
+- [x] **Step 5:** When ledger edits are approved, read ledger/schema, allocate highest ID + 1, record atomic claims with fingerprints/locations/limits/review and link supersessions. New atomic records are SQX144-EV-000089 through SQX144-EV-000117; history keeps original identities/relationships and historical validation states. New source observations remain unreviewed.
+- [x] **Step 6:** Preserve clean-room flags; keep proprietary source outside repository evidence; validate ledger schema, source/record references and registry IDs. Full Draft 2020-12, lineage, registered identity and negative-gate checks execute through tests/reference/validate.py; bytecode is paraphrased, not published.
 - [ ] **Step 7:** Ratify release cohort, numerical tolerances, dependency decisions, external/destructive authority and future exact ALLOWED_WRITE_PATHS.
+
+- **Remaining Step 1:** The 261-JAR/17-resource inventory and roadmap hash are frozen and rechecked. Installed product build/activation and missing SQLib/MainApp/AppSettings/CpuInfo implementation remain unresolved.
+- **Remaining Step 4:** A 182-class/58-archive structural consumer index and selected body-derived traces extend the seeds. Initial fixtures record actual static count/order observations. Complete consumed-method closure and independent donor runtime outputs remain unavailable.
+- **Remaining Step 7:** P00 evidence-only release, exact static comparisons, two dev validation dependencies, tooling logging adapter and exact writes were approved. Future numerical policies, runtime contracts, external/destructive effects and P01 write paths require their own decisions/plans. No blanket tolerance or operational store activation was ratified.
 
 ## 5. Verification & Testing
 

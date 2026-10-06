@@ -1,79 +1,50 @@
 # HaruQuantAI
 
-HaruQuantAI is a local-first quantitative research workstation being rebuilt
-around a shared host, workspace pairs, and focused plugins. The Python host
-and React UI shell can run together now. Most quantitative workspace screens
-still use fixtures or local simulation; they are not evidence of completed
-backend algorithms or trading integration.
+HaruQuantAI is a local-first quantitative research workstation at a backend-reset
+baseline. The retained React UI includes fixtures and local simulations. Backend
+runtime services and quantitative algorithms are absent; no application startup or
+SQX parity is claimed.
 
-## Prerequisites
+[Project charter](docs/PROJECT.md), [architecture](docs/ARCHITECTURE.md) and
+[contributor constitution](AGENTS.md) define authority. The
+[host README](app/host/README.md) registers P00 reference tooling only.
 
-Run these commands from the repository root. Install Python 3.14,
-[uv](https://docs.astral.sh/uv/), and Node.js with npm. The commands below
-install this repository's declared Python and UI dependencies.
+## Development
 
-## Run backend and frontend for development
-
-Open two PowerShell terminals at the repository root.
-
-**Terminal 1 — backend host**
+Use Python >=3.14, uv, and Node.js/npm from the repository root.
 
 ```powershell
-uv sync
-uv run python -m app.main
+uv sync --locked
+npm --prefix ui install
+npm --prefix ui run dev
 ```
 
-The host listens on http://127.0.0.1:8000 by default. Its unauthenticated
-health endpoint is http://127.0.0.1:8000/api/v1/health.
+No `app.main` backend entrypoint is available. UI host connection and domain
+clients remain provisional until separately approved backend contracts qualify.
 
-**Terminal 2 — frontend UI**
-
-```powershell
-npm --prefix app/ui install
-npm --prefix app/ui run dev
-```
-
-Open http://127.0.0.1:3000. The Vite UI connects to the host at
-127.0.0.1:8000. If HARUQUANTAI_HOST_PASSWORD is unset, the local research
-host issues a passwordless session. If that environment variable is set
-before starting the host, the UI prompts for the password. The browser
-session token stays in memory. Stop each server with Ctrl+C in its terminal.
-
-Global Settings menu preferences are saved by the host in
-`data/database/haruquantai.db` (`host_settings`). Future feature-owned JSON presets belong in
-`data/presets/`.
-
-The default ports can be changed through host configuration, but the
-development UI currently targets port 8000 when served on Vite's port 3000.
-A different backend port requires matching UI deployment or proxy
-configuration. Host settings and other overrides are documented in the
-[backend host README](app/host/README.md).
-
-## Serve a built UI from the backend
-
-To use one server instead of Vite, build the UI and start the host:
+## Reference qualification
 
 ```powershell
-uv sync
-npm --prefix app/ui install
-npm --prefix app/ui run build
-uv run python -m app.main
-```
-
-Open http://127.0.0.1:8000. The host serves app/ui/dist by default when
-the build is present. Rebuild the UI after frontend source changes.
-
-## Verify the candidate
-
-```powershell
+uv run python -m tests.reference.validate
 uv run python scripts/ci_check.py
-npm --prefix app/ui run typecheck
-npm --prefix app/ui run test
-npm --prefix app/ui run build
 ```
 
-The CI command runs the current Python lint, formatting, type, architecture,
-and branch-aware test-coverage checks. UI commands run separately. For
-change-scoped test guidance and the plan/approval/walkthrough gates, follow
-[AGENTS.md](AGENTS.md). Workspace and plugin implementations require their
-own approved plans and owning READMEs.
+The first command checks offline evidence lineage, inventory/ownership proposals,
+and fixtures. The second also qualifies typed Python tooling, reference tests and
+branch coverage, plus UI typecheck/tests/build. Actual donor inventory comparison
+requires an explicitly configured `SQX_REFERENCE_ROOT` and runs read-only:
+
+```powershell
+uv run python -m tests.reference.validate --check-donor
+```
+
+[Evidence procedure](docs/dev/evidence/README.md) preserves historical records and
+separates static observations from donor runtime validation. SQLib/MainApp/
+AppSettings implementations, actual installed product build/activation and runtime
+output fixtures remain unavailable. P00 baseline delivery does not complete those
+prerequisites or qualify later runtime phases. See the
+[release matrix](docs/dev/evidence/p00-release-matrix.md).
+
+No live database or donor user state is modified by P00. Future development follows
+research, documented plan, owner approval, implementation, focused verification,
+walkthrough and separate owner commit authorization.
