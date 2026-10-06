@@ -1,0 +1,36 @@
+import hashlib
+import json
+from pathlib import Path
+from datetime import datetime, timezone
+import sys
+
+root = Path.cwd()
+log = root / '.agents/logs/20261006_135038_data-source-td-alignment'
+base = root / 'ui/app/plugins/data_source/TickDownloader'
+donor = Path(sys.argv[1])
+baseline = json.loads((log / 'baseline.json').read_text())
+allowed = {'plugins/data_source/Common/dataSourceRibbon.ts', 'workspace/DataManager/DataManager.tsx'}
+for path, fingerprint in baseline.items():
+    if path.startswith('plugins/data_source/TickDownloader/') or path in allowed:
+        continue
+    assert hashlib.sha256((root / 'ui/app' / path).read_bytes()).hexdigest() == fingerprint, path
+assert hashlib.sha256((base / 'tickDownloader.ts').read_bytes()).hexdigest() == baseline['plugins/data_source/TickDownloader/tickDownloader.ts']
+assert hashlib.sha256((base / 'styles.css').read_bytes()).hexdigest() == baseline['plugins/data_source/TickDownloader/tickDownloader.css']
+manifest = json.loads((base / 'source-map.json').read_text())
+actual = {p.relative_to(donor).as_posix() for p in donor.rglob('*') if p.is_file()}
+assert actual == {s['relative_path'] for s in manifest['sources']}
+for source in manifest['sources']:
+    assert hashlib.sha256((donor / source['relative_path']).read_bytes()).hexdigest() == source['sha256']
+    if source['target'] is not None:
+        assert (base / source['target']).is_file()
+assert len(actual) == 7
+assert sum(s['target'] is not None for s in manifest['sources']) == 6
+files = {p.relative_to(base).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in base.rglob('*') if p.is_file()}
+assert len(files) == 9
+assert set(files) == {s['target'] for s in manifest['sources'] if s['target'] is not None} | {s['path'] for s in manifest['target_only']}
+registry = (base / 'README.md').read_text()
+for key in [manifest['owner']['feature'], manifest['owner']['decision'], *manifest['owner']['requirements']]:
+    assert key in registry
+(log / 'after-inventory.json').write_text(json.dumps(files, indent=2) + '\n', encoding='utf-8')
+(log / 'mapping-verification.json').write_text(json.dumps(dict(timestamp=datetime.now(timezone.utc).isoformat(), result='passed', donor_artifacts=7, mapped=6, excluded=1, target_files=9, target_only=3, donor_hashes='all match inspected files', protected_ui='all baseline application files outside approved scope unchanged', protected_rules_and_shared_store='unchanged', relocated_stylesheet='byte-identical'), indent=2) + '\n', encoding='utf-8')
+print('Mapping, fingerprints and protected application verification passed.')

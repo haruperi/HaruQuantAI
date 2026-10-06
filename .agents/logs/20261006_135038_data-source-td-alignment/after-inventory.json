@@ -1,0 +1,11 @@
+{
+  "DataSourceTDService.ts": "99c0ea17bed094cc504ec6d2ff6c2894051cbda6391afcc7dde487f18206e86d",
+  "module.ts": "b179db7dba51ebd9fad5e09c1dba61c4c7c2cbeca6167c409a6624fa21e9df5f",
+  "README.md": "244d73646a9be537c8bbccf17cf04a8e3f049be777b08e19a56262f2dcb79072",
+  "source-map.json": "c084f560b418be4526317769b3e24223a818c2024ae18da9f37237c4d115727b",
+  "styles.css": "242f7587f34de112f7372d190a14b1df891643bcfb329fea9b04d55cbd1988fc",
+  "tickDownloader.ts": "119aa9b9166f1448eb5f897bb46cf90f9c6d188a572109288fe11fb04614b8a7",
+  "import/DataSourceTDImportCtrl.ts": "c0cc064259767ccc443976f0997b36b06bf0470f2799f3e09cecf7595f21aaf0",
+  "import/importPopup.tsx": "0121540f41c2b3f2e781ed9a1d92a802f4a493e5b667cef32d0f62e2eb0c955a",
+  "import/module.ts": "6946f4593ffe22230c48f7d71f12cc8c1698cd386f85473d26b9cf620187155a"
+}

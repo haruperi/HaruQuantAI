@@ -12,7 +12,7 @@ async function fixture(info: TestInfo) {
 }
 async function open(page: Page) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
+  await page.getByRole('button', { name: 'Data Manager', exact: true }).and(page.locator('[aria-label]')).click();
   await page.getByRole('button', { name: 'TickDownloader import', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Import TickDownloader data', exact: true }).click();
   return page.getByRole('dialog', { name: 'Import data from TickDownloader', exact: true });
@@ -83,4 +83,18 @@ test('light layout, empty folder, cancellation and failed storage', async ({ pag
   await expect(dialog.getByRole('alert')).toContainText('No import was started');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('table', { name: 'Historical data', exact: true })).not.toContainText('GBPUSD_FAIL');
+});
+
+test('initial focus, keyboard boundaries and Escape retain the import dialog workflow', async ({ page }) => {
+  const dialog = await open(page);
+  const first = dialog.getByRole('button', { name: 'Close', exact: true }).first();
+  const last = dialog.getByRole('button', { name: 'Start import', exact: true });
+  await expect(first).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(last).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(first).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'TickDownloader import', exact: true })).toBeEnabled();
 });

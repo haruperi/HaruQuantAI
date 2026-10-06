@@ -1,0 +1,33 @@
+{
+  "recorded_at": "2026-10-06T10:55:46.010897+00:00",
+  "source_head": "30128b58bbc7ac495f33a860ba7d31d603eecec5",
+  "focused_unit": {
+    "exit": 0,
+    "files": 2,
+    "tests": 9
+  },
+  "typecheck": {
+    "exit": 0
+  },
+  "full_unit": {
+    "exit": 0,
+    "files": 76,
+    "tests": 340
+  },
+  "build": {
+    "exit": 0,
+    "modules": 2075,
+    "warning": "existing large chunk"
+  },
+  "browser": {
+    "exit": 0,
+    "tests": 3,
+    "seconds": 20.2
+  },
+  "visual_review": {
+    "normal_and_740x650": "reviewed; dialog/footer fit",
+    "light_skin": "selection exercised; image dark; appearance unverified"
+  },
+  "mapping": "passed; see mapping-verification.json",
+  "diff_check": 0
+}

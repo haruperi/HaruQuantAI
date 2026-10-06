@@ -1,3 +1,4 @@
+import { tdProvider } from '../TickDownloader/module';
 import { equityProvider } from '../SQData/Equity/module';
 import { futuresProvider } from '../SQData/Futures/module';
 import { mt5Provider } from '../MetaTrader/module';
@@ -84,11 +85,7 @@ export interface DataSourceContextAction {
 
 export const dataSourceProviders: readonly DataSourceProvider[] = [
   dukascopyProvider,
-  {
-    id: 'tickdownloader',
-    label: 'TickDownloader import',
-    commands: [{ id: 'tickdownloader-import', label: 'Import TickDownloader data', icon: 'folder-import', dialog: 'tickdownloader-import' }],
-  },
+  tdProvider,
   filesProvider,
   equityProvider,
   futuresProvider,

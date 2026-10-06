@@ -51,7 +51,7 @@ import { BrokerStocksDialog } from '../../plugins/data_source/Catalogs/BrokerPro
 import { BrokerRecordImportDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerRecordImportDialog';
 import { BrokerTransferDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerTransferDialog';
 import { brokerCounts, serializeBrokersJson, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
-import { TickDownloaderImportDialog } from '../../plugins/data_source/TickDownloader/TickDownloaderImportDialog';
+import { TickDownloaderImportDialog } from '../../plugins/data_source/TickDownloader/module';
 import { useTickDownloader } from '../../plugins/data_source/Common/dataManagerStore';
 import { ImportPopup } from '../../plugins/data_source/Dukascopy/import/module';
 import { DisclaimerPopup } from '../../plugins/data_source/Dukascopy/disclaimer/module';
