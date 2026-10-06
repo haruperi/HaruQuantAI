@@ -1,0 +1,3 @@
+.sqr-sp-content{border-top:1px solid var(--sqx-tab-border,#777777)}
+.sqr-sp-treemap-title{display:flex;align-items:center;justify-content:space-between;margin:0 10px 10px 10px;padding:6px 10px;border:1px solid var(--sqx-tab-border,#777777);font-weight:600}
+.sqr-sp-treemap-title .title{font-size:12px}

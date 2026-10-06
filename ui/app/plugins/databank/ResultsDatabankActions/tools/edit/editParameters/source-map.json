@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only Tools/edit/editParameters bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editParameters",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editParameters",
+  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1,
+    "state": "owner-approved-plan"
+  },
+  "owner": {
+    "decision": "DEC-UI-DATABANK-COMPARE-EDITING-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ],
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "domain": "plugins/databank"
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-tools-edit-editparameters-ui",
+      "family": "bounded installed Tools artifacts",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editParameters"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-editparameters-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editParameters/EditParametersCtrl.js",
+      "relative_path": "EditParametersCtrl.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "92dd2c6cc19fa2a5c026931d64b17b10f4facfdb16b4d0e8b81ab5d848a35549",
+      "target": "EditParametersCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Independent existing menu, deferred action or local comparison responsibility"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-editparameters-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editParameters/EditParametersPopup.html",
+      "relative_path": "EditParametersPopup.html",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "5403a7edf193c72d0be2c418ed7cff78ec1fe2960d4c4643edd0a5e1f18c48d0",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing corresponding dialog/service/backend or separately owned CSS; preserve absent/deferred behavior"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-editparameters-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editParameters/EditParametersService.js",
+      "relative_path": "EditParametersService.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "fa60a0a2813922a1e3448f54cbb64c1fed466b3e9747a815cf50f36081272b36",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing corresponding dialog/service/backend or separately owned CSS; preserve absent/deferred behavior"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-editparameters-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editParameters/EditParamsPopupCtrl.js",
+      "relative_path": "EditParamsPopupCtrl.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "32aceaf199490f8fd2df9bf436bf3f96b5de27188274638aab3962614d2b0791",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing corresponding dialog/service/backend or separately owned CSS; preserve absent/deferred behavior"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-editparameters-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editParameters/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "b1a9758b2fb0544a71541a5e9794b7d7e8041c92f7eff5b6aa9f2b92366204a2",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Independent existing menu, deferred action or local comparison responsibility"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-editparameters-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editParameters/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "7e46ea907a1638016a847b8841118ae26ce2d09160461198b54a1486716c443a",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing corresponding dialog/service/backend or separately owned CSS; preserve absent/deferred behavior"
+    }
+  ],
+  "target_only": [
+    {
+      "reason": "Structural manifest, not behavioral ledger",
+      "path": "source-map.json"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+export { AtmTab } from './advancedTM';

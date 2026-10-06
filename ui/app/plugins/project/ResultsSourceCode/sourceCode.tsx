@@ -1,44 +1,14 @@
-import { downloadText, type ResultDocument } from '../resultsModel';
-import { useEffect, useRef, useState } from 'react';
+import { downloadText, type ResultDocument } from '../ProjectWorkbench/results/resultsModel';
+import { useSourceCode } from './SourceCodeCtrl';
 import { RefreshCw } from 'lucide-react';
-import { SqrDropdown } from '../ResultsChrome';
-import { SqdCheckbox, SqdRadio } from '../../settings/SettingsControls';
-import { sourceCodeDescriptions, sourceCodeGenerators, sourceCodeMmTypes, sourceCodeParamsDefaults, type SourceCodeParamsConfig, } from '../resultsFixtures';
+import { SqrDropdown } from '../ProjectWorkbench/results/ResultsChrome';
+import { SqdCheckbox, SqdRadio } from '../ProjectWorkbench/settings/SettingsControls';
+import { sourceCodeDescriptions, sourceCodeGenerators, sourceCodeMmTypes, } from '../ProjectWorkbench/results/resultsFixtures';
 /** Source Code tab: generator select, save/copy buttons, variables menu, code area. */
 export function SourceCodeTab({ result }: {
     result: ResultDocument | null;
 }) {
-    const [copyError, setCopyError] = useState("");
-    const [revision, setRevision] = useState(0);
-    const [type, setType] = useState(sourceCodeGenerators[0]);
-    const [mmType, setMmType] = useState(sourceCodeMmTypes[0].value);
-    const [config, setConfig] = useState<SourceCodeParamsConfig>(sourceCodeParamsDefaults);
-    const [varsOpen, setVarsOpen] = useState(false);
-    const [copied, setCopied] = useState(false);
-    const copyTimer = useRef<number | undefined>(undefined);
-    useEffect(() => () => window.clearTimeout(copyTimer.current), []);
-    const set = <K extends keyof SourceCodeParamsConfig>(key: K, value: SourceCodeParamsConfig[K]) => setConfig(c => ({ ...c, [key]: value }));
-    const code = result ? `// Local mock preview; not executable trading code
-// ${result.name}
-// Format: ${type}
-// Money management: ${mmType}
-// Parameters: ${JSON.stringify(config)}
-// Revision: ${revision}
-IF fast moving average crosses above slow moving average
-THEN enter long on next bar` : '';
-    const onCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(code);
-            setCopyError('');
-        }
-        catch {
-            setCopyError('Clipboard access unavailable. Select the preview and copy manually.');
-            return;
-        }
-        setCopied(true);
-        window.clearTimeout(copyTimer.current);
-        copyTimer.current = window.setTimeout(() => setCopied(false), 2500);
-    };
+    const { copyError, setRevision, type, setType, mmType, setMmType, config, set, varsOpen, setVarsOpen, copied, code, onCopy } = useSourceCode(result);
     return (<div className="sqr-tab sqr-sourcecode">
       <div className="sqr-sourcecode-form">
         <label>Source code type</label>

@@ -127,10 +127,6 @@
   ],
   "target_only": [
     {
-      "path": "CompareStrategiesModal.tsx",
-      "reason": "Retained ResultsDatabankActions/tools/compareStrategies presentation dependency; separate future cohort"
-    },
-    {
       "path": "databankColumns.ts",
       "reason": "Existing shared target catalogue/view rules; related ResultsDatabankViews ownership pending audit"
     },
@@ -191,6 +187,10 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/module.ts",
       "relation": "Mapped Tools descriptors, existing metric-based selection and latent note guards/application; childless menu rendering stays inactive."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/module.ts",
+      "relation": "Existing latent comparison presentation and independent local calculations relocated; inactive toolbar leaf retained."
     }
   ],
   "inventory_review": {

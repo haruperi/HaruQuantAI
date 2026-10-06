@@ -20,3 +20,14 @@ Bounded inventories preserve existing mock and deferred behavior. No new backend
 - `FR-UI-PROJECT-clean-room`
 - `FR-UI-PROJECT-source-mapping`
 - `FR-UI-PROJECT-workflow-preservation`
+
+## Wave3 structural ownership
+
+- `DEC-UI-PROJECT-ATM-STRUCTURAL-OWNERSHIP`
+- `DEC-UI-PROJECT-MONEY-MANAGEMENT-STRUCTURAL-OWNERSHIP`
+- `DEC-UI-PROJECT-TRADING-OPTIONS-STRUCTURAL-OWNERSHIP`
+- `DEC-UI-SECONDARY-RESULTS-STRUCTURAL-OWNERSHIP`
+- `FEAT-UI-PROJECT_WORKBENCH`
+- `FR-UI-PROJECT-clean-room`
+- `FR-UI-PROJECT-source-mapping`
+- `FR-UI-PROJECT-workflow-preservation`

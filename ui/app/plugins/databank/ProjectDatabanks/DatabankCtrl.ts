@@ -1,3 +1,6 @@
+import { requestCompareStrategies } from '../ResultsDatabankActions/tools/compareStrategies/module';
+import { handleEditItem } from '../ResultsDatabankActions/tools/edit/module';
+import { requestRunCa } from '../ResultsDatabankActions/tools/runCa/module';
 import { handleSelectItem, requestSetNote } from '../ResultsDatabankActions/tools/module';
 export { strategyPassesMockChecks } from '../ResultsDatabankActions/tools/module';
 import { getCurrentDatabankStrategy, requestClearAllConfirmation, refreshDatabank } from '../ResultsDatabankActions/module';
@@ -98,9 +101,11 @@ export function useDatabankPanel() {
       return;
     }
     if (item === 'Compare') {
-      setIsCompareOpen(true);
+      requestCompareStrategies(() => setIsCompareOpen(true));
       return;
     }
+    if (handleEditItem(item, deferred)) return;
+    if (item === 'Run CA') { requestRunCa(deferred); return; }
     deferred(`Tools: ${item}`);
   };
 

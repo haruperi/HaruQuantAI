@@ -12,7 +12,7 @@ import {
 import { StrategyTable } from '../StrategyTable';
 import { ManageViewsDialog } from '../../ResultsDatabankViews/module';
 import { FilterByCorrelationModal } from '../../DatabankFilterByCorrelation/module';
-import { CompareStrategiesModal } from '../CompareStrategiesModal';
+import { CompareStrategiesModal } from '../../ResultsDatabankActions/tools/compareStrategies/module';
 
 import { useDatabankPanel } from '../DatabankCtrl';
 

@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsSourceCode bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsSourceCode",
+  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH",
+    "decision": "DEC-UI-SECONDARY-RESULTS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ]
+  },
+  "clean_room": {
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultssourcecode-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode",
+      "family": "bounded installed frontend plugin artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultssourcecode-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/customIndicatorsPopup.html",
+      "relative_path": "customIndicatorsPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "2d37c9f13ef0b0d834444995af35e72be1ecb2803b72f2506baed057e774e04e",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing custom-indicator or terminal-configuration popup counterpart; behavior not added."
+    },
+    {
+      "catalog_id": "sqx-resultssourcecode-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "ecb331159890d92ed12bbde3e9abf68691e46e252956e7d60f4f818f8a0a6818",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    },
+    {
+      "catalog_id": "sqx-resultssourcecode-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
+      "relative_path": "ResultsSourceCode.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "fdab52cc9a0e0c535b881ee56b58771e71bab86385d78a32a8346fc868b39794",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary excluded from frontend-only scope."
+    },
+    {
+      "catalog_id": "sqx-resultssourcecode-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/sourceCode.html",
+      "relative_path": "sourceCode.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "af2ca6b36a5cd1da9220338fcb502d6137fb9a0a1b4ab798903cce5e957a68c4",
+      "target": "sourceCode.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    },
+    {
+      "catalog_id": "sqx-resultssourcecode-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeCtrl.js",
+      "relative_path": "SourceCodeCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "64c37caa57bda9bf107394f20e6478c0f0ce076c507f1e78b01a6dc1a293ab70",
+      "target": "SourceCodeCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    },
+    {
+      "catalog_id": "sqx-resultssourcecode-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeService.js",
+      "relative_path": "SourceCodeService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "2afb56f397b4865f50b6c024e8ab6bc579245d97b44495d7353279db1d6debe4",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations."
+    },
+    {
+      "catalog_id": "sqx-resultssourcecode-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "63b60e99c4d6c91293513743c1931b89948f1de77ce581185feb3e14b0d9f627",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    },
+    {
+      "catalog_id": "sqx-resultssourcecode-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/terminalConfigPopup.html",
+      "relative_path": "terminalConfigPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "341997df02ab37ce553ca97fe671153852157d9fb7d7de941a66e835f1179009",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing custom-indicator or terminal-configuration popup counterpart; behavior not added."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest, not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned scope documentation"
+    }
+  ],
+  "retained_support": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+      "reason": "Shared independent synthetic plot renderer"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts",
+      "reason": "Shared result contracts/filter/download helpers"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts",
+      "reason": "Shared defaults and mock selections"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsChrome.tsx",
+      "reason": "Shared toolbar/dropdown/segmented controls"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/settings/SettingsControls.tsx",
+      "reason": "Shared independently authored checkbox/radio controls"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/SmallTabs.tsx",
+      "reason": "Coordinator-owned combined source; CustomAnalysisTab remains explicit target-only exception"
+    }
+  ],
+  "limitations": [
+    "No backend, executable strategy generation, live report/profile retrieval or persistence mutation.",
+    "Charts/reports/configuration remain approximate current local fixtures; no SQX parity claim.",
+    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs."
+  ]
+}

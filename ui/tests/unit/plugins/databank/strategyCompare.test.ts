@@ -1,37 +1,43 @@
-import { describe, it, expect } from 'vitest';
-import { strategies } from '../../../../app/plugins/databank/fixtures';
+import { describe, expect, it } from "vitest";
+import { strategies } from "../../../../app/plugins/databank/fixtures";
+import { buildComparisonModel } from "../../../../app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/CompareStrategiesService";
 
-describe('Compare Strategies Logic & Equity Normalization', () => {
-  it('correctly extracts comparative metrics between two strategies', () => {
-    const s1 = strategies[0];
-    const s2 = strategies[1] || strategies[0];
-
-    expect(s1.metrics.netProfit).toBeDefined();
-    expect(s2.metrics.netProfit).toBeDefined();
-
-    const diff = s1.metrics.netProfit - s2.metrics.netProfit;
-    expect(typeof diff).toBe('number');
+describe("actual local comparison calculations", () => {
+  it("uses fixture metrics and retains lower-is-better drawdown semantics", () => {
+    const model = buildComparisonModel(strategies[0], strategies[1]);
+    expect(model.kpis.find((row) => row.label === "Net profit")?.v1).toBe(
+      strategies[0].metrics.netProfit,
+    );
+    expect(
+      model.kpis.find((row) => row.label === "Max drawdown")?.isHigherBetter,
+    ).toBe(false);
+    expect(
+      model.kpis.find((row) => row.label === "Profit factor")?.format(1.2),
+    ).toBe("1.20");
   });
-
-  it('normalizes equity series across different lengths for dual svg overlay', () => {
-    const s1 = strategies[0];
-    const s2 = strategies[1] || strategies[0];
-
-    const eq1 = s1.equity.map(e => e.value);
-    const eq2 = s2.equity.map(e => e.value);
-
-    const minVal = Math.min(...eq1, ...eq2);
-    const maxVal = Math.max(...eq1, ...eq2);
-    const range = maxVal - minVal || 1;
-
-    expect(range).toBeGreaterThan(0);
-
-    const norm1 = eq1.map(v => (v - minVal) / range);
-    const norm2 = eq2.map(v => (v - minVal) / range);
-
-    expect(Math.min(...norm1)).toBeGreaterThanOrEqual(0);
-    expect(Math.max(...norm1)).toBeLessThanOrEqual(1.0);
-    expect(Math.min(...norm2)).toBeGreaterThanOrEqual(0);
-    expect(Math.max(...norm2)).toBeLessThanOrEqual(1.0);
+  it("places unequal curves on one scale and retains single-point omission", () => {
+    const first = {
+      ...strategies[0],
+      equity: [
+        { time: "2025-01-01", value: 100, drawdown: 0 },
+        { time: "2025-01-02", value: 200, drawdown: 0 },
+      ],
+    };
+    const second = {
+      ...strategies[1],
+      equity: [
+        { time: "2025-01-01", value: 150, drawdown: 0 },
+        { time: "2025-01-02", value: 300, drawdown: 0 },
+      ],
+    };
+    const model = buildComparisonModel(first, second);
+    expect(model.points1).toBe("12.0,138.0 668.0,75.0");
+    expect(model.points2).toBe("12.0,106.5 668.0,12.0");
+    expect(
+      buildComparisonModel(
+        { ...first, equity: first.equity.slice(0, 1) },
+        second,
+      ).points1,
+    ).toBe("");
   });
 });

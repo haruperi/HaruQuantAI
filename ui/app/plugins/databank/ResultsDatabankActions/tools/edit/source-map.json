@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only Tools/edit bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/edit",
+  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1,
+    "state": "owner-approved-plan"
+  },
+  "owner": {
+    "decision": "DEC-UI-DATABANK-COMPARE-EDITING-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ],
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "domain": "plugins/databank"
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-tools-edit-ui",
+      "family": "bounded installed Tools artifacts",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "b955f6296576b8ef8b63aa6a5ca3dcf2c2934ed10c9620617da5fe9e84b73ae8",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Independent existing menu, deferred action or local comparison responsibility"
+    }
+  ],
+  "target_only": [
+    {
+      "reason": "Structural manifest, not behavioral ledger",
+      "path": "source-map.json"
+    }
+  ]
+}

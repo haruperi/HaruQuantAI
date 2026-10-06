@@ -10,8 +10,12 @@ import { DeleteAnalysisModal, RenameAnalysisModal, } from '../ProjectWorkbench/r
 import { OverviewTab } from '../ResultsOverview/module';
 import { TradeListTab } from '../ResultsTradeList/module';
 import { EquityChartTab } from '../ResultsEquityChart/module';
-import { SourceCodeTab } from '../ProjectWorkbench/results/tabs/SourceCodeTab';
-import { CustomAnalysisTab, ProfileChartTab, SpOverviewTab, StrategyConfigTab, TradeAnalysisTab, } from '../ProjectWorkbench/results/tabs/SmallTabs';
+import { SourceCodeTab } from '../ResultsSourceCode/module';
+import { CustomAnalysisTab } from '../ProjectWorkbench/results/tabs/SmallTabs';
+import { ProfileChartTab } from '../ResultsProfileChart/module';
+import { SpOverviewTab } from '../ResultsSPOverview/module';
+import { StrategyConfigTab } from '../ResultsStrategyConfig/module';
+import { TradeAnalysisTab } from '../ResultsTradeAnalysis/module';
 /**
  * Builder Results tab (FEAT-UI-BUILDER_RESULTS_TAB).
  *

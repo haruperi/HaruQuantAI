@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only Tools/edit/editStrategy bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/edit/editStrategy",
+  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1,
+    "state": "owner-approved-plan"
+  },
+  "owner": {
+    "decision": "DEC-UI-DATABANK-COMPARE-EDITING-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ],
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "domain": "plugins/databank"
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-tools-edit-editstrategy-ui",
+      "family": "bounded installed Tools artifacts",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-editstrategy-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy/EditStrategyCtrl.js",
+      "relative_path": "EditStrategyCtrl.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "49472c1b3e5fbe01ce135c5f39ea0fdf3be8cb355802b37bd69029a87a95e5d1",
+      "target": "EditStrategyCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Independent existing menu, deferred action or local comparison responsibility"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-edit-editstrategy-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/edit/editStrategy/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "Independent existing mock frontend counterpart or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "9e10e3a19f584d3c2a30281a72fe63ee23850fca52c52c63b9cc21875cf83886",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Independent existing menu, deferred action or local comparison responsibility"
+    }
+  ],
+  "target_only": [
+    {
+      "reason": "Structural manifest, not behavioral ledger",
+      "path": "source-map.json"
+    }
+  ]
+}

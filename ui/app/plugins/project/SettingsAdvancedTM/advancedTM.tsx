@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { SqdCheckbox, SqdFieldset, SqdSpinner } from './SettingsControls';
-import { SqdModal } from '../ProjectModal';
-import { atmDefaults, type AtmMethod } from './sharedSettingsFixtures';
+import { useAdvancedTMController } from './AdvancedTMCtrl';
+import { AddNewExitPopup } from './addNewExitPopup';
+import { SqdCheckbox, SqdFieldset, SqdSpinner } from '../ProjectWorkbench/settings/SettingsControls';
 
 /**
  * "ATM" tab (donor evidence SQX144-EV-000042): Advanced Trade Management
@@ -10,17 +9,7 @@ import { atmDefaults, type AtmMethod } from './sharedSettingsFixtures';
  * derived from the exit formulas of the Build template.
  */
 export function AtmTab() {
-  const [adding, setAdding] = useState(false);
-  const [selected, setSelected] = useState(atmDefaults[0].key);
-  const [methods, setMethods] = useState<AtmMethod[]>(atmDefaults);
-
-  const patchMethod = (key: string, part: Partial<AtmMethod>) =>
-    setMethods(current => current.map(m => (m.key === key ? { ...m, ...part } : m)));
-
-  const patchParam = (key: string, paramKey: string, value: number) =>
-    setMethods(current =>
-      current.map(m => (m.key === key ? { ...m, params: m.params.map(p => (p.key === paramKey ? { ...p, value } : p)) } : m)),
-    );
+  const { adding, setAdding, selected, setSelected, methods, patchMethod, patchParam, addExit } = useAdvancedTMController();
 
   return (
     <div className="sqd-tab-content sqd-atm">
@@ -58,10 +47,7 @@ export function AtmTab() {
         </div>
         <button type="button" className="sqd-btn" onClick={() => setAdding(true)}>Add new exit method</button>
       </SqdFieldset>
-      {adding && <SqdModal title="Add new exit method" onClose={()=>setAdding(false)} footer={<button type="button" className="sqd-btn sqd-btn-primary" onClick={()=>{const method=atmDefaults.find(m=>m.key===selected)!;setMethods(items=>[...items,{...structuredClone(method),key:`local-${Date.now()}`,use:true}]);setAdding(false);}}>Add</button>}>
-        <p className="sqd-gen-help">Local UI demo: choose an exit method from the fixture catalog.</p>
-        <select aria-label="Exit method" value={selected} onChange={e=>setSelected(e.target.value)}>{atmDefaults.map(m=><option key={m.key} value={m.key}>{m.label}</option>)}</select>
-      </SqdModal>}
+      {adding && <AddNewExitPopup selected={selected} setSelected={setSelected} setAdding={setAdding} addExit={addExit} />}
     </div>
   );
 }

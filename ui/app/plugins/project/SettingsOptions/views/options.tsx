@@ -1,13 +1,10 @@
-import { useState } from 'react';
-import { SqdFieldset, SqdSelect, SqdSpinner } from './SettingsControls';
-import { formatTimeOfDay, tradingOptionsDefaults, type TradingOptionProperty } from './sharedSettingsFixtures';
+import { useOptionsController } from '../OptionsCtrl';
+import { SqdFieldset, SqdSelect, SqdSpinner } from '../../ProjectWorkbench/settings/SettingsControls';
+import { formatTimeOfDay } from '../../ProjectWorkbench/settings/sharedSettingsFixtures';
 
 /** "Trading options" tab (donor evidence SQX144-EV-000041): the property grid. */
 export function TradingOptionsTab() {
-  const [properties, setProperties] = useState<TradingOptionProperty[]>(tradingOptionsDefaults);
-
-  const setProperty = (key: string, value: boolean | number | string) =>
-    setProperties(current => current.map(p => (p.key === key ? { ...p, value } : p)));
+  const { properties, setProperty } = useOptionsController();
 
   return (
     <div id="optionsTab" className="sqd-tab-content">

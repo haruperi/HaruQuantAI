@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsTradeAnalysis bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsTradeAnalysis",
+  "source_head": "a6c66edc4583d20480dd7ad551f928e60a0a2749",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH",
+    "decision": "DEC-UI-SECONDARY-RESULTS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ]
+  },
+  "clean_room": {
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultstradeanalysis-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis",
+      "family": "bounded installed frontend plugin artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/controllers/TradeAnalysisCtrl.js",
+      "relative_path": "controllers/TradeAnalysisCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "0884b270c33638f11ce5fd4b08da4fb8a126f3382d7c7fcf1c3cd1bd5f0bfb1c",
+      "target": "controllers/TradeAnalysisCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    },
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/tradeAnalysisPanel.html",
+      "relative_path": "directives/tradeAnalysisPanel.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "572242e55bd727d83f8e040396d47dbfef5b88f4253520d5be9c6f00918b1521",
+      "target": "directives/tradeAnalysisPanel.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    },
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanel.js",
+      "relative_path": "directives/TradeAnalysisPanel.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "94aabb543d97f3b6fcd8a93cf4cc01b5ca675ca6c70befbf47fd0374eddf866d",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+    },
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanelCtrl.js",
+      "relative_path": "directives/TradeAnalysisPanelCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "54325b1eb665bec5ade14742ec8847d720e8a9b3e4f4ddd36fdfc265e8461588",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Donor stock lists, true tree maps, top reports or directive/controller lifecycle has no distinct existing counterpart; no placeholders introduced."
+    },
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "77b533a3f983858dca302d3f4def900dea0fd89c861ae06c2443f586e0fcc1a2",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    },
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
+      "relative_path": "ResultsTradeAnalysis.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "7c7ba403d569744e36cd88fa4e8e62640249db056c36171fe781e58e30a17816",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary excluded from frontend-only scope."
+    },
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js",
+      "relative_path": "services/TradeAnalysisService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "9ed855a4573a998550cf41ac30e8c395b920f863e451ed3d2236de9ca969bd81",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/live report transport absent; local mock fixtures are not service implementations."
+    },
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/styles/TradeAnalysis.css",
+      "relative_path": "styles/TradeAnalysis.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "cad9367b16729a17ef64a84328fff9abe727b4bf893a58f249ea5df498f1913e",
+      "target": "styles/TradeAnalysis.css",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    },
+    {
+      "catalog_id": "sqx-resultstradeanalysis-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/views/tradeAnalysis.html",
+      "relative_path": "views/tradeAnalysis.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "9eb224b3e2a2a8506f5bc8fd483fae6b8bacc7ac36f2acfde0d95707012109a7",
+      "target": "views/tradeAnalysis.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock presentation only; no donor runtime parity. Preserve current previews, state, clipboard/download and timer behavior."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest, not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned scope documentation"
+    }
+  ],
+  "retained_support": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+      "reason": "Shared independent synthetic plot renderer"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts",
+      "reason": "Shared result contracts/filter/download helpers"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts",
+      "reason": "Shared defaults and mock selections"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsChrome.tsx",
+      "reason": "Shared toolbar/dropdown/segmented controls"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/settings/SettingsControls.tsx",
+      "reason": "Shared independently authored checkbox/radio controls"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/SmallTabs.tsx",
+      "reason": "Coordinator-owned combined source; CustomAnalysisTab remains explicit target-only exception"
+    }
+  ],
+  "limitations": [
+    "No backend, executable strategy generation, live report/profile retrieval or persistence mutation.",
+    "Charts/reports/configuration remain approximate current local fixtures; no SQX parity claim.",
+    "Canonical behavioral ledger/schema absent; no substitute ledger or new EV IDs."
+  ]
+}

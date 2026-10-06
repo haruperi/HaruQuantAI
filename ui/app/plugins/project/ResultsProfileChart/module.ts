@@ -1,0 +1,1 @@
+export { ProfileChartTab } from './profileChart';

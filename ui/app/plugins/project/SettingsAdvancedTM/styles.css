@@ -1,0 +1,5 @@
+.sqd-atm-table{max-width:760px}
+.sqd-atm-head,.sqd-atm-row{display:grid;grid-template-columns:220px 1fr}
+.sqd-atm-head{border-bottom:2px solid var(--sqx-menu-border,#888888);font-weight:600;padding:4px 8px}
+.sqd-atm-row{border-bottom:1px solid var(--sqx-grid-row-border,#4a4a4a);padding:6px 8px;align-items:center}
+.sqd-atm-params{display:flex;flex-wrap:wrap;gap:6px 16px}

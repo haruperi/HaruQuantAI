@@ -49,3 +49,5 @@ portfolio metrics. Workspace READMEs own their task-specific status and limitati
 The stable index forwards ProjectSettings to ../ProjectSettings/module and ProjectProgress to ../EnginePanel/module. SettingsPanel owns shared settings presentation. Contracts, project frame, modal lifecycle, local preview clock and result charts remain shared support.
 
 Wave2 forwards DataTab and ProjectResults to bounded SettingsData and ProjectResults modules; primary reports and trade-view drafts keep shared fixtures/charts/model/modal dependencies.
+
+Wave3 structural extraction retains explicit shared contracts, fixtures, modal lifecycle, charts/model and compatibility adapters. Approved source-map inventories distinguish unsupported donor artifacts; no backend behavior or parity claim added.

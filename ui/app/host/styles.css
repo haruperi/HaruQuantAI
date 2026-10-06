@@ -1,3 +1,10 @@
+@import '../plugins/project/SettingsOptions/styles.css';
+@import '../plugins/project/SettingsAdvancedTM/styles.css';
+@import '../plugins/project/SettingsMoneyManagement/styles.css';
+@import '../plugins/project/ResultsSourceCode/styles.css';
+@import '../plugins/project/ResultsStrategyConfig/styles.css';
+@import '../plugins/project/ResultsTradeAnalysis/styles/TradeAnalysis.css';
+@import '../plugins/project/ResultsSPOverview/styles.css';
 @import '../plugins/project/SettingsData/styles.css';
 @import '../plugins/project/ProjectResults/styles.css';
 @import '../plugins/project/ResultsOverview/styles.css';
@@ -478,7 +485,6 @@
 /* property grid */
 .sqd-prop-grid{max-width:560px}
 .sqd-prop-row{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--sqx-grid-row-border,#4a4a4a);padding:5px 4px}
-.sqd-prop-control{display:flex;align-items:center;gap:6px}
 /* blocks */
 .sqd-blocks-grids{display:flex;flex-wrap:wrap;gap:0 24px;max-width:1201px}
 .sqd-blocks-col{flex:1 1 420px;min-width:0}
@@ -499,17 +505,7 @@
 .sqd-blocks-empty{padding:14px;text-align:center;color:var(--sqx-empty,#9aa4b0);font-size:11px}
 .sqd-blocks-sepaline{height:1px;background:var(--sqx-tab-border,#777777);margin:0 0 10px 0}
 /* atm + money management */
-.sqd-atm-table,.sqd-mm-grid{max-width:760px}
-.sqd-atm-head,.sqd-atm-row{display:grid;grid-template-columns:220px 1fr}
-.sqd-atm-head{border-bottom:2px solid var(--sqx-menu-border,#888888);font-weight:600;padding:4px 8px}
-.sqd-atm-row{border-bottom:1px solid var(--sqx-grid-row-border,#4a4a4a);padding:6px 8px;align-items:center}
-.sqd-atm-params{display:flex;flex-wrap:wrap;gap:6px 16px}
-.sqd-mm-row{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid var(--sqx-grid-row-border,#4a4a4a);padding:6px 8px;align-items:center}
-.sqd-mm-select{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
-.sqd-mm-select input{position:absolute;opacity:0}
-.sqd-mm-params{display:flex;flex-wrap:wrap;gap:6px 14px}
-.sqd-mm-param{display:inline-flex;align-items:center;gap:6px}
-.sqd-mm-value{display:inline-block;min-width:52px;text-align:center;padding:0 6px;height:20px;line-height:18px;border:1px solid var(--sqx-input-border,#696969);background:var(--sqx-input-bg,#3b3b3b);font-size:11px}
+
 /* cross checks */
 .sqd-cc-actions{position:absolute;top:8px;right:12px;display:flex;gap:6px}
 .sqd-cc-titles{display:grid;grid-template-columns:340px 1fr 1fr;border-bottom:2px solid var(--sqx-menu-border,#888888);padding-bottom:2px;margin-top:12px}
@@ -578,12 +574,8 @@
 /* Content areas and empty states. */
 .sqr-content{flex:1;min-height:0;position:relative;background:var(--sqx-card,#3b3b3b)}
 .sqr-info-label{display:block;padding:8px;color:var(--sqx-text-muted,#ababab);font-size:12px}
-.sqr-config-content{display:flex;align-items:flex-start}
-.sqr-ta-content,.sqr-profile-content{border-top:1px solid var(--sqx-tab-border,#777777)}
-.sqr-sp-content{border-top:1px solid var(--sqx-tab-border,#777777)}
+.sqr-profile-content{border-top:1px solid var(--sqx-tab-border,#777777)}
 .sqr-sp-stats{height:90px;border:1px solid var(--sqx-tab-border,#777777);margin:10px}
-.sqr-sp-treemap-title{display:flex;align-items:center;justify-content:space-between;margin:0 10px 10px 10px;padding:6px 10px;border:1px solid var(--sqx-tab-border,#777777);font-weight:600}
-.sqr-sp-treemap-title .title{font-size:12px}
 .sqr-sp-treemap{position:absolute;top:180px;left:10px;right:10px;bottom:10px;border:1px solid var(--sqx-tab-border,#777777)}
 .sqr-custom-content{display:flex;align-items:flex-start;justify-content:center;padding-top:40px}
 .sqr-custom-box{max-width:520px;border:1px solid var(--sqx-tab-border,#777777);padding:16px 20px;background:var(--sqx-panel,#292929)}
@@ -596,26 +588,6 @@
 .sqr-icon-btn{padding:0 8px}
 
 /* Source Code tab. */
-.sqr-sourcecode{background:var(--sqx-card,#3b3b3b);padding:8px}
-.sqr-sourcecode-form{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.sqr-sourcecode-form>label{color:var(--sqx-text,#cccccc)}
-.sqr-sourcecode-select{min-width:230px;width:auto}
-.sqr-sourcecode-right{margin-left:auto;display:inline-flex;align-items:center;gap:8px}
-.sqr-vars-dd>a{color:var(--sqx-link,#4290d8);cursor:pointer;font-size:12px}
-.sqr-refresh-link{color:var(--sqx-text-muted,#ababab);display:inline-flex;align-items:center;padding:2px}
-.sqr-refresh-link:hover{color:#ffffff}
-.sqr-copied{color:var(--sqx-text-muted,#ababab);font-size:11px}
-.sqr-sourcecode-desc{padding:6px 0;color:var(--sqx-text-muted,#ababab);font-size:11.5px}
-.sqr-sourcecode-editor{flex:1;min-height:0;margin:0;border:1px solid var(--sqx-input-border,#696969);background:var(--sqx-panel,#292929);overflow:auto}
-.sqr-vars-menu{left:auto;min-width:460px;padding:12px 16px;max-height:420px;overflow:auto}
-.sqr-vars-menu>strong{display:block;margin-bottom:8px;font-size:12px}
-.sqr-vars-radios .radio{margin:0 0 6px 0}
-.sqr-wradio-line{display:flex;flex-direction:column;gap:3px}
-.sqr-data-help{color:var(--sqx-text-muted,#ababab);font-size:11px;font-weight:400}
-.sqr-vars-categories{display:flex;flex-wrap:wrap;margin:6px 0 6px 20px}
-.sqr-vars-col{display:flex;flex-direction:column;gap:5px;padding-right:18px}
-.sqr-vars-col-full{flex-basis:100%}
-.sqr-vars-col hr{margin:6px 0;width:100%;border:0;border-top:1px solid var(--sqx-tab-border,#777777)}
 
 /* Modals. */
 .sqr-newanalysis-body p{margin:0 0 8px 0;color:var(--sqx-text,#cccccc);font-size:12px;line-height:1.5}
@@ -726,11 +698,10 @@
 :is(.builder-workspace,.project-workspace) .sqr-mock-chart h3{font-size:13px;font-weight:400;margin:0 0 6px}
 :is(.builder-workspace,.project-workspace) .sqr-mock-chart svg{width:100%;max-height:310px;display:block}
 :is(.builder-workspace,.project-workspace) .sqr-mock-chart output{font-size:11px;color:var(--sqx-text-muted)}
-:is(.builder-workspace,.project-workspace) .sqr-analysis-grid{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:10px}
 :is(.builder-workspace,.project-workspace) .sqr-content h2{font-size:17px}:is(.builder-workspace,.project-workspace) .sqr-content pre{white-space:pre-wrap}
 :is(.builder-workspace,.project-workspace) .sqr-toolbar select{background:var(--sqd-header-bg);border:1px solid var(--sqx-tab-border);color:var(--sqx-text);height:24px}
 :is(.builder-workspace,.project-workspace) .sqr-toolbar button:disabled{opacity:.4;cursor:default}
-@media(max-width:1050px){:is(.builder-workspace,.project-workspace) .sqr-metric-cards{grid-template-columns:repeat(3,minmax(110px,1fr))}:is(.builder-workspace,.project-workspace) .sqr-analysis-grid{grid-template-columns:1fr}}
+@media(max-width:1050px){:is(.builder-workspace,.project-workspace) .sqr-metric-cards{grid-template-columns:repeat(3,minmax(110px,1fr))}}
 
 /* Results charts stack their subcharts beneath the main equity plot. */
 

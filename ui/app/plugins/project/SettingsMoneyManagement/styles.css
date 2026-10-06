@@ -1,0 +1,7 @@
+.sqd-mm-grid{max-width:760px}
+.sqd-mm-row{display:grid;grid-template-columns:220px 1fr;border-bottom:1px solid var(--sqx-grid-row-border,#4a4a4a);padding:6px 8px;align-items:center}
+.sqd-mm-select{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.sqd-mm-select input{position:absolute;opacity:0}
+.sqd-mm-params{display:flex;flex-wrap:wrap;gap:6px 14px}
+.sqd-mm-param{display:inline-flex;align-items:center;gap:6px}
+.sqd-mm-value{display:inline-block;min-width:52px;text-align:center;padding:0 6px;height:20px;line-height:18px;border:1px solid var(--sqx-input-border,#696969);background:var(--sqx-input-bg,#3b3b3b);font-size:11px}

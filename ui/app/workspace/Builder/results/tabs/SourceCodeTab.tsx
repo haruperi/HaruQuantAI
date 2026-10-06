@@ -1,1 +1,1 @@
-export * from '../../../../plugins/project/ProjectWorkbench/results/tabs/SourceCodeTab';
+export * from '../../../../plugins/project/ResultsSourceCode/module';

@@ -1,0 +1,1 @@
+export { StrategyConfigTab } from './strategyconfig';

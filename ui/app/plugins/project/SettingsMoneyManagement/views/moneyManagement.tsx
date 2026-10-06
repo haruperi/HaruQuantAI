@@ -1,14 +1,9 @@
-import { useState } from 'react';
-import { SqdFieldset, SqdSpinner } from './SettingsControls';
-import { moneyManagementDefaults, type MmMethod } from './sharedSettingsFixtures';
+import { useMoneyManagementController } from '../MoneyManagementCtrl';
+import { SqdFieldset, SqdSpinner } from '../../ProjectWorkbench/settings/SettingsControls';
 
 /** "Money management" tab (donor evidence SQX144-EV-000041). */
 export function MoneyManagementTab() {
-  const [initialCapital, setInitialCapital] = useState(moneyManagementDefaults.initialCapital);
-  const [methods, setMethods] = useState<MmMethod[]>(moneyManagementDefaults.methods);
-
-  const patch = (key: string, part: Partial<MmMethod>) =>
-    setMethods(current => current.map(m => (m.key === key ? { ...m, ...part } : m)));
+  const { initialCapital, setInitialCapital, methods, setMethods, patch } = useMoneyManagementController();
 
   return (
     <div className="money-management sqd-tab-content">

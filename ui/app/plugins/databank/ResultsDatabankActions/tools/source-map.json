@@ -52,5 +52,12 @@
       "reason": "Structural manifest; not behavioral ledger",
       "path": "source-map.json"
     }
+  ],
+  "child_manifests": [
+    "select/source-map.json",
+    "setNote/source-map.json",
+    "compareStrategies/source-map.json",
+    "edit/source-map.json",
+    "runCa/source-map.json"
   ]
 }

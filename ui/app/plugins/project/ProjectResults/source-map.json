@@ -139,5 +139,27 @@
     "No backend, persistence migration, real generated reports/benchmark feeds or SQX runtime parity claim.",
     "Views/analyses remain session-only; reports/charts are precomputed approximations.",
     "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence."
+  ],
+  "external_dependencies": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsSourceCode/module.ts",
+      "relation": "Extracted independently authored secondary presentation; existing tab identity and mounted draft lifetime retained."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsStrategyConfig/module.ts",
+      "relation": "Extracted independently authored secondary presentation; existing tab identity and mounted draft lifetime retained."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsTradeAnalysis/module.ts",
+      "relation": "Extracted independently authored secondary presentation; existing tab identity and mounted draft lifetime retained."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsProfileChart/module.ts",
+      "relation": "Extracted independently authored secondary presentation; existing tab identity and mounted draft lifetime retained."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsSPOverview/module.ts",
+      "relation": "Extracted independently authored secondary presentation; existing tab identity and mounted draft lifetime retained."
+    }
   ]
 }
