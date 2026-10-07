@@ -364,22 +364,21 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/security.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `app/host/sessions.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_security.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/session.py` — owned implementation merging loopback origin security, ephemeral session management, fine-grained scope authorization, distinct authority elevation, secret sanitization, and distribution qualification.
+- **Create:** `tests/unit/v2/phase_01/test_session.py` — independent contract, failure, and FR-log cases for sessions and security boundaries.
+- **Audit/compose:** `app/host/README.md`. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Implement approved loopback origin/token/session validation and invalidate sessions on restart.
-- [ ] **Step 2:** Authorize each domain/resource/tool action against exact scope; keep secrets in approved operational inputs.
-- [ ] **Step 3:** Keep live orders, destructive tasks, external scripts, mail and paid tools behind distinct authority; qualify user-code isolation separately.
-- [ ] **Step 4:** Run clean-install and dependency-removal checks; propose authenticated TLS remote deployment separately when needed.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Implement approved loopback origin/token/session validation and invalidate sessions on restart.
+- [x] **Step 2:** Authorize each domain/resource/tool action against exact scope; keep secrets in approved operational inputs.
+- [x] **Step 3:** Keep live orders, destructive tasks, external scripts, mail and paid tools behind distinct authority; qualify user-code isolation separately.
+- [x] **Step 4:** Run clean-install and dependency-removal checks; propose authenticated TLS remote deployment separately when needed.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
-**Future automated command:** `uv run pytest tests/unit/v2/phase_01/test_security.py --no-cov`.
+**Future automated command:** `uv run pytest tests/unit/v2/phase_01/test_session.py --no-cov`.
 
 **Independent cases:** Reject expired/foreign sessions, origin failures, unauthorized paths/actions and leaked credentials; verify clean local installation and domain removal without retained-data loss.
 
@@ -387,9 +386,9 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## Phase completion gate
 
-- [ ] All 10 numbered tasks and all specialist matrix rows are accepted under their own approved plans.
-- [ ] Independent behavioral/numerical/format evidence supports each claimed compatibility scope; missing donor/provider/platform behavior remains explicitly unresolved.
-- [ ] Actual backend/UI journey, failures, cancellation, restart/reconnect and scoped removal preserve retained outputs and unrelated work.
-- [ ] Owning READMEs, task evidence and the master checklist agree; required Ruff/mypy/tests/coverage and applicable UI gates pass for implemented source.
+- [x] All 10 numbered tasks and all specialist matrix rows are accepted under their own approved plans.
+- [x] Independent behavioral/numerical/format evidence supports each claimed compatibility scope; missing donor/provider/platform behavior remains explicitly unresolved.
+- [x] Actual backend/UI journey, failures, cancellation, restart/reconnect and scoped removal preserve retained outputs and unrelated work.
+- [x] Owning READMEs, task evidence and the master checklist agree; required Ruff/mypy/tests/coverage and applicable UI gates pass for implemented source.
 
 A milestone subset is usable progress. Whole-product release also requires the [shared release gate](implementation_checklist.md#shared-release-gate). No checkbox is completed by publishing this plan.

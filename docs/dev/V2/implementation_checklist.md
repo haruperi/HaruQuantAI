@@ -1,9 +1,9 @@
 # SQX V2 implementation checklist
 
 ```text
-Progress Bar   [###-----------------] 12.5%
-Completed      9/72
-Current Task   1.10 Security, sessions and distribution qualification
+Progress Bar   [###-----------------] 13.9%
+Completed      10/72
+Current Task   2.1 Dataset catalog, instruments and broker definitions
 ```
 
 - Count the **72 numbered capability tasks** only; thirteen phase checkboxes are rollups. Nested steps, specialist matrix rows and the shared release gate are acceptance conditions, not additional counted tasks.
@@ -14,7 +14,7 @@ Current Task   1.10 Security, sessions and distribution qualification
 - Provider/method/format/procedure variants stay in each phase's acceptance matrix. Partial support leaves the owning task unchecked; do not hide missing scope behind a grouped title.
 - Owning READMEs remain the status authority. V2 is a proposal; ratified architecture and the already approved P01 contracts remain binding. Every runtime slice needs its own canonical approved plan.
 
-- [ ] 1. [Phase 1 — Platform and web shell](phase-01-platform-host.md)
+- [x] 1. [Phase 1 — Platform and web shell](phase-01-platform-host.md)
     - [x] 1.1 [App/host bootstrap and browser shell](phase-01-platform-host.md#11-apphost-bootstrap-and-browser-shell)
     - [x] 1.2 [Centralized logging and DebugConsole](phase-01-platform-host.md#12-centralized-logging-and-debugconsole)
     - [x] 1.3 [System and hardware diagnostics](phase-01-platform-host.md#13-system-and-hardware-diagnostics)
@@ -24,7 +24,7 @@ Current Task   1.10 Security, sessions and distribution qualification
     - [x] 1.7 [Local jobs and cancellation](phase-01-platform-host.md#17-local-jobs-and-cancellation)
     - [x] 1.8 [Resource services and safe artifact access](phase-01-platform-host.md#18-resource-services-and-safe-artifact-access)
     - [x] 1.9 [Host-owned persistence and restart recovery](phase-01-platform-host.md#19-host-owned-persistence-and-restart-recovery)
-    - [ ] 1.10 [Security, sessions and distribution qualification](phase-01-platform-host.md#110-security-sessions-and-distribution-qualification)
+    - [x] 1.10 [Security, sessions and distribution qualification](phase-01-platform-host.md#110-security-sessions-and-distribution-qualification)
 
 - [ ] 2. [Phase 2 — Market data](phase-02-market-data.md)
     - [ ] 2.1 [Dataset catalog, instruments and broker definitions](phase-02-market-data.md#21-dataset-catalog-instruments-and-broker-definitions)

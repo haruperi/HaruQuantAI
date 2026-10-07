@@ -23,6 +23,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-JOBS` | Hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, restart reconciliation, and event broadcasting in `app/host/jobs.py` | Implemented and verified; Phase 1 task 1.7 qualified |
 | `FEAT-HOST-RESOURCES` | Immutable artifact custody, content-addressed storage, path containment, Zip-Slip/expansion bomb prevention, bounded caching, and REST management in `app/host/resources.py` | Implemented and verified; Phase 1 task 1.8 qualified |
 | `FEAT-HOST-PERSISTENCE` | Central SQLite persistence authority, schema migrations, narrow typed repositories, optimistic revision concurrency, cooperative leases, and restart reconciliation in `app/host/persistence.py` | Implemented and verified; Phase 1 task 1.9 qualified |
+| `FEAT-HOST-SESSION` | Central security authority, loopback origin validation, ephemeral session lifecycle, fine-grained scope authorization, distinct authority elevation, and distribution qualification in `app/host/session.py` | Implemented and verified; Phase 1 task 1.10 qualified |
 
 ## Registered functional requirements
 
@@ -106,6 +107,13 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-PERSISTENCE-LEASE-COORDINATION` | Cooperative distributed worker leases with atomic acquisition, heartbeats/renewal, and TTL expiration. | Emits INFO on acquire/renew/release; WARNING on conflict contention. |
 | `FR-HOST-PERSISTENCE-RESTART-RECOVERY` | Startup reconciliation auditing physical integrity, schema readiness, and pruning dead/expired worker leases. | Emits INFO on audit start and completion; ERROR on failed integrity checks. |
 | `FR-HOST-PERSISTENCE-REST-PROJECTION` | FastAPI REST projection endpoints exposing database status, schema migrations, integrity checks, and leases. | Emits DEBUG on router composition; INFO on lease and recovery actions. |
+| `FR-HOST-SESS-LOOPBACK-ORIGIN` | Loopback origin validation and DNS rebinding prevention for local workstation HTTP endpoints. | Emits DEBUG on verified loopback request; WARNING on rejected foreign origins or DNS rebinding attempts. |
+| `FR-HOST-SESS-LIFECYCLE` | Ephemeral session token generation, sliding TTL, explicit revocation, and host-restart invalidation. | Emits INFO on session creation and revocation; WARNING on expired or unknown tokens; INFO on restart invalidation. |
+| `FR-HOST-SESS-SCOPE-AUTHORIZATION` | Granular scope checking (`<resource>:<action>` and wildcards) across domains, resources, and tools. | Emits DEBUG on authorized actions; WARNING on permission denial with structured fr_id and requested scope. |
+| `FR-HOST-SESS-DISTINCT-AUTHORITY` | Explicit time-bounded elevation grants for dangerous tasks (live orders, destructive tasks, scripts, mail, paid tools). | Emits WARNING on elevation grant issuance and expiration; ERROR on unauthorized dangerous task attempts. |
+| `FR-HOST-SESS-SECRET-SANITIZATION` | Masked credential isolation and operational input sanitization preventing plaintext leakage in logs and projections. | Sanitizes dictionary inputs, replacing sensitive keys with SHA-256 redaction digests. |
+| `FR-HOST-SESS-DISTRIBUTION-QUALIFICATION` | Clean-installation checks, domain removal state preservation, and authenticated remote TLS deployment proposal. | Emits INFO on qualification assessments; ERROR on residual leaks. |
+| `FR-HOST-SESS-REST-PROJECTION` | FastAPI router exposing session lifecycle, elevation, scope checks, distribution qualification, and TLS proposals. | Emits DEBUG on router composition; INFO on session mutations. |
 
 ## Ratified reference decisions
 
@@ -147,6 +155,10 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-ZERO-RAW-SQL-EXPOSURE` | Domain plugins and workspaces access storage exclusively through typed `PersistenceAccess` facades and `TypedRepository[T]`; raw SQL execution and direct SQLite handles are strictly forbidden. |
 | `DEC-HOST-SERIALIZED-WRITE-TRANSACTIONS` | Write transactions enforce `BEGIN IMMEDIATE;` to serialize concurrent writers at transaction start, eliminating SQLite deadlock upgrades under WAL mode. |
 | `DEC-HOST-OPTIMISTIC-REVISION-CONCURRENCY` | Entity updates and deletions require monotonic revision validation (`expected_revision`), raising `RevisionConflictError` on divergence to prevent split-brain overwrites. |
+| `DEC-HOST-SINGLE-SESSION-MODULE` | Merged loopback origin security, ephemeral session management, scope authorization, distinct authority, secret sanitization, and distribution qualification into a single canonical module `app/host/session.py`. |
+| `DEC-HOST-LOOPBACK-ORIGIN-BOUND` | Local workstation HTTP requests must originate from verified loopback addresses (`127.0.0.1`, `localhost`, `[::1]`); foreign origins and DNS rebinding attacks are rejected with 403 Forbidden. |
+| `DEC-HOST-EPHEMERAL-SESSION-RESTART` | Sessions are held in memory and bound strictly to the host runtime instance; host restart unconditionally invalidates all active sessions to prevent stale or orphaned session persistence. |
+| `DEC-HOST-DISTINCT-AUTHORITY-ELEVATION` | Live trading, destructive database actions, external scripts, external mail, and paid tools are denied by default under standard operator sessions and require explicit, time-bounded distinct authority grants with confirmation phrases. |
 
 ## Ownership and release boundaries
 
