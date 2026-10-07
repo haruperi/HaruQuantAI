@@ -18,6 +18,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-LOGGING` | Centralized application telemetry, multi-sink routing, credential/path redaction, in-memory ring buffer, and DebugConsole projection in `app/host/logging.py` | Implemented and verified; Phase 1 task 1.2 qualified |
 | `FEAT-HOST-DIAG` | System capacity, process health, hardware capability inspection, and computational benchmarking in `app/host/diagnostics.py` | Implemented and verified; Phase 1 task 1.3 qualified |
 | `FEAT-HOST-SETTINGS` | Authoritative host configuration settings, schema validation, transactional SQLite storage in `data/database/haruquantai.db` (`host_settings` table), dot-accessible configuration interface, revision-checked updates, and FastAPI REST projection in `app/host/settings.py` | Implemented and verified; Phase 1 task 1.4 qualified |
+| `FEAT-HOST-DISCOVERY` | Workspace and plugin discovery, manifest verification, containment security, extension slot registration, dependency resolution, and typed lifecycle attachment in `app/host/discovery.py` | Implemented and verified; Phase 1 task 1.5 qualified |
 
 ## Registered functional requirements
 
@@ -62,6 +63,13 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-SETTINGS-UPDATE` | Atomic batch upsert with monotonic revision and conflict detection. | Emits INFO on committed batch with changed count and updated revision. |
 | `FR-HOST-SETTINGS-PATH-VALIDATION` | Validate configured workspace filesystem paths on disk. | Emits INFO when path exists; WARNING when path is absent. |
 | `FR-HOST-SETTINGS-PROJECTION` | FastAPI REST endpoints for settings snapshot and updates. | Emits DEBUG on query; INFO on settings updates. |
+| `FR-HOST-DISC-MANIFEST-SCHEMA` | Package identity, semver, contained entrypoints, slot declarations, and dependency metadata schema validation. | INFO on valid manifest discovery; ERROR on validation failure. |
+| `FR-HOST-DISC-CONTAINMENT-SECURITY` | Strict directory containment, forbidding path traversal (`..`), symbolic link escapes, and uncontained entrypoints. | WARNING/ERROR with security violation details. |
+| `FR-HOST-DISC-SLOT-REGISTRATION` | Typed host extension slots registry and attachment cardinality validation. | INFO on slot registration; WARNING on incompatible slot request. |
+| `FR-HOST-DISC-DEPENDENCY-RESOLUTION` | Topological dependency ordering, missing dependency detection, and circular dependency prevention. | INFO on resolved DAG; ERROR on missing dependency or cycle. |
+| `FR-HOST-DISC-CAPABILITY-INJECTION` | Typed host capability context injection into plugin factories via `PluginHostContext`. | INFO on successful capability binding and factory invocation. |
+| `FR-HOST-DISC-LIFECYCLE-MANAGEMENT` | Safe attachment, activation, controlled disabling, reload, and uninstallation with resource cleanup. | INFO on lifecycle state transitions; ERROR on factory failure. |
+| `FR-HOST-DISC-BROWSER-PROJECTION` | FastAPI REST projection endpoints exposing discovered packages, status, slot bindings, and lifecycle operations. | DEBUG on status queries; INFO on state mutations. |
 
 ## Ratified reference decisions
 
@@ -90,6 +98,9 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-REAL-BENCHMARK-MEASUREMENT` | Hardware diagnostic benchmarks perform actual bounded CPU-bound workload execution with duration and throughput measurement; synthetic or fabricated benchmark scores are prohibited. |
 | `DEC-HOST-SINGLE-SETTINGS-MODULE` | Merged settings persistence store, dot-access node, validation, workspace path checks, and FastAPI router into a single canonical module `app/host/settings.py`. |
 | `DEC-HOST-SQLITE-SETTINGS-STORE` | Authoritative persistence for host settings is backed by the `host_settings` table in `data/database/haruquantai.db` with atomic `BEGIN IMMEDIATE` transactions and monotonic revision tracking. |
+| `DEC-HOST-SINGLE-DISCOVERY-MODULE` | Merged plugin discovery, manifest verification, slot registry, dependency resolution, capability injection, lifecycle management, and REST API projections into a single canonical module `app/host/discovery.py`. |
+| `DEC-HOST-CONTAINED-PLUGIN-EXECUTION` | Plugin manifests and entrypoints are strictly bounded within declared package directories; path traversal, symlink escapes, and unverified global module paths are rejected to guarantee host security and tenant isolation. |
+| `DEC-HOST-ZERO-PLUGIN-RESILIENCE` | The host runtime and browser workspaces operate seamlessly with zero installed plugins; missing or incompatible plugins degrade gracefully without blocking host boot or execution. |
 
 ## Ownership and release boundaries
 

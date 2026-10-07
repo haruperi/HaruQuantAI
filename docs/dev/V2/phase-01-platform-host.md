@@ -191,18 +191,17 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/discovery.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `app/host/attachments.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_discovery.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/discovery.py` — owned implementation merging plugin discovery, manifest verification, slot registry, dependency resolution, capability injection, lifecycle management, and REST API projections.
+- **Create:** `tests/unit/v2/phase_01/test_discovery.py` — independent contract, failure and FR-log cases for this task.
+- **Audit/compose:** `app/host/README.md` and applicable workspace/client listed above. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Define identity/version, contained entrypoint, dependency and slot metadata owned by each package.
-- [ ] **Step 2:** Validate the full attachment before executing its explicit factory with injected host capabilities.
-- [ ] **Step 3:** Publish available/unavailable/incompatible states to the browser and keep zero-plugin workspaces usable.
-- [ ] **Step 4:** Implement controlled disable/restart/removal with owned route/job/subscription cleanup; add reload only where required.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Define identity/version, contained entrypoint, dependency and slot metadata owned by each package.
+- [x] **Step 2:** Validate the full attachment before executing its explicit factory with injected host capabilities.
+- [x] **Step 3:** Publish available/unavailable/incompatible states to the browser and keep zero-plugin workspaces usable.
+- [x] **Step 4:** Implement controlled disable/restart/removal with owned route/job/subscription cleanup; add reload only where required.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
