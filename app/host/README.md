@@ -22,6 +22,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-TRANSPORT` | Unified HTTP transport middleware, request correlation, session authentication, in-memory event bus, and Server-Sent Events streaming in `app/host/transport.py` | Implemented and verified; Phase 1 task 1.6 qualified |
 | `FEAT-HOST-JOBS` | Hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, restart reconciliation, and event broadcasting in `app/host/jobs.py` | Implemented and verified; Phase 1 task 1.7 qualified |
 | `FEAT-HOST-RESOURCES` | Immutable artifact custody, content-addressed storage, path containment, Zip-Slip/expansion bomb prevention, bounded caching, and REST management in `app/host/resources.py` | Implemented and verified; Phase 1 task 1.8 qualified |
+| `FEAT-HOST-PERSISTENCE` | Central SQLite persistence authority, schema migrations, narrow typed repositories, optimistic revision concurrency, cooperative leases, and restart reconciliation in `app/host/persistence.py` | Implemented and verified; Phase 1 task 1.9 qualified |
 
 ## Registered functional requirements
 
@@ -98,6 +99,13 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-RESOURCES-HTTPX-ACQUISITION` | Bounded remote artifact streaming download via httpx with size limits, timeouts, and orphan rollback. | Emits INFO on acquisition success; ERROR on HTTP failures or byte ceiling violations. |
 | `FR-HOST-RESOURCES-ORPHAN-CLEANUP` | Automated garbage collection of abandoned or expired staging directories to bound disk usage. | Emits INFO recording count of purged staging directories. |
 | `FR-HOST-RESOURCES-REST-PROJECTION` | FastAPI REST projection endpoints exposing staging, publishing, retrieval, inspection, extraction, and cache status. | Emits DEBUG on router composition; INFO on resource mutations and query invocations. |
+| `FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION` | Versioned schema migration ledger, checksum verification, and physical `PRAGMA integrity_check`. | Emits INFO on initialization and migrations; ERROR on schema drift or corruption. |
+| `FR-HOST-PERSISTENCE-TRANSACTIONS` | Serialized ACID write transactions using `BEGIN IMMEDIATE` and `COMMIT;` with operational busy timeout handling. | Emits DEBUG on begin/commit; WARNING on rollback; ERROR on contention timeout. |
+| `FR-HOST-PERSISTENCE-TYPED-REPOSITORY` | Narrow typed CRUD repository mapping Pydantic models to JSON payload envelopes with keyset pagination. | Emits DEBUG on queries/reads; INFO on entity creation and mutations. |
+| `FR-HOST-PERSISTENCE-REVISION-CONCURRENCY` | Optimistic monotonic revision checks asserting persisted revision matches `expected_revision`. | Emits WARNING on revision conflict without silent data overwrites. |
+| `FR-HOST-PERSISTENCE-LEASE-COORDINATION` | Cooperative distributed worker leases with atomic acquisition, heartbeats/renewal, and TTL expiration. | Emits INFO on acquire/renew/release; WARNING on conflict contention. |
+| `FR-HOST-PERSISTENCE-RESTART-RECOVERY` | Startup reconciliation auditing physical integrity, schema readiness, and pruning dead/expired worker leases. | Emits INFO on audit start and completion; ERROR on failed integrity checks. |
+| `FR-HOST-PERSISTENCE-REST-PROJECTION` | FastAPI REST projection endpoints exposing database status, schema migrations, integrity checks, and leases. | Emits DEBUG on router composition; INFO on lease and recovery actions. |
 
 ## Ratified reference decisions
 
@@ -135,6 +143,10 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-SINGLE-JOBS-MODULE` | Merged hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, SQLite durability, restart reconciliation, and REST endpoints into a single canonical module `app/host/jobs.py`. |
 | `DEC-HOST-RESOURCE-BUDGET-ADMISSION` | Background compute jobs declare worker and memory budgets guarded by hard capacity ceilings (`CapacityExceededError`, `BudgetExceededError`) to prevent host resource starvation. |
 | `DEC-HOST-RESTART-RECONCILIATION` | On coordinator initialization, active in-flight jobs (`queued`, `running`, `cancellation_requested`) stored in SQLite are reconciled to `interrupted` without fabricating false success or hanging indefinitely. |
+| `DEC-HOST-SINGLE-PERSISTENCE-MODULE` | Merged database engine, connection pragmas, schema migrations, typed repositories, cooperative leases, restart recovery, and REST routes into a single canonical module `app/host/persistence.py`. |
+| `DEC-HOST-ZERO-RAW-SQL-EXPOSURE` | Domain plugins and workspaces access storage exclusively through typed `PersistenceAccess` facades and `TypedRepository[T]`; raw SQL execution and direct SQLite handles are strictly forbidden. |
+| `DEC-HOST-SERIALIZED-WRITE-TRANSACTIONS` | Write transactions enforce `BEGIN IMMEDIATE;` to serialize concurrent writers at transaction start, eliminating SQLite deadlock upgrades under WAL mode. |
+| `DEC-HOST-OPTIMISTIC-REVISION-CONCURRENCY` | Entity updates and deletions require monotonic revision validation (`expected_revision`), raising `RevisionConflictError` on divergence to prevent split-brain overwrites. |
 
 ## Ownership and release boundaries
 

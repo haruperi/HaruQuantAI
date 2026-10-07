@@ -336,11 +336,11 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Preserve approved atomic preferences; obtain separate ratification for operational schema/root before activation.
-- [ ] **Step 2:** Define narrow typed repositories for domain-owned schemas, revisions, leases and retention.
-- [ ] **Step 3:** Use SQLite control records plus immutable artifacts only as the current V2 proposal, with transactional publication/recovery policy.
-- [ ] **Step 4:** Reconcile interrupted writes, missing/orphan artifacts and concurrent updates; forbid plugin SQL/raw handles or automatic adoption of active stores.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Preserve approved atomic preferences; obtain separate ratification for operational schema/root before activation.
+- [x] **Step 2:** Define narrow typed repositories for domain-owned schemas, revisions, leases and retention.
+- [x] **Step 3:** Use SQLite control records plus immutable artifacts only as the current V2 proposal, with transactional publication/recovery policy.
+- [x] **Step 4:** Reconcile interrupted writes, missing/orphan artifacts and concurrent updates; forbid plugin SQL/raw handles or automatic adoption of active stores.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
