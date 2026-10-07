@@ -1,9 +1,9 @@
 # SQX V2 implementation checklist
 
 ```text
-Progress Bar   [--------------------] 4.2%
-Completed      3/72
-Current Task   1.4 Settings and configurations
+Progress Bar   [#-------------------] 5.6%
+Completed      4/72
+Current Task   1.5 Workspace and plugin discovery
 ```
 
 - Count the **72 numbered capability tasks** only; thirteen phase checkboxes are rollups. Nested steps, specialist matrix rows and the shared release gate are acceptance conditions, not additional counted tasks.
@@ -18,7 +18,7 @@ Current Task   1.4 Settings and configurations
     - [x] 1.1 [App/host bootstrap and browser shell](phase-01-platform-host.md#11-apphost-bootstrap-and-browser-shell)
     - [x] 1.2 [Centralized logging and DebugConsole](phase-01-platform-host.md#12-centralized-logging-and-debugconsole)
     - [x] 1.3 [System and hardware diagnostics](phase-01-platform-host.md#13-system-and-hardware-diagnostics)
-    - [ ] 1.4 [Settings and configurations](phase-01-platform-host.md#14-settings-and-configurations)
+    - [x] 1.4 [Settings and configurations](phase-01-platform-host.md#14-settings-and-configurations)
     - [ ] 1.5 [Workspace and plugin discovery](phase-01-platform-host.md#15-workspace-and-plugin-discovery)
     - [ ] 1.6 [HTTP and event transport](phase-01-platform-host.md#16-http-and-event-transport)
     - [ ] 1.7 [Local jobs and cancellation](phase-01-platform-host.md#17-local-jobs-and-cancellation)

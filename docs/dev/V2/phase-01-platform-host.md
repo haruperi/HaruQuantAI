@@ -157,18 +157,17 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/settings.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `app/host/preferences.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_settings.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/settings.py` — owned implementation merging settings persistence, schema verification, dot-accessible navigation, validation, and REST API projections.
+- **Create:** `tests/unit/v2/phase_01/test_settings.py` — independent contract, failure and FR-log cases for this task.
+- **Audit/compose:** `app/host/README.md` and applicable workspace/client. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Separate bind/data-root/credential inputs, user preferences and domain experiment settings.
-- [ ] **Step 2:** Define defaults, precedence, finite-value/type validation and schema compatibility.
-- [ ] **Step 3:** Implement the approved atomic preferences.json write/reload/conflict behavior in a new marked root.
-- [ ] **Step 4:** Connect existing settings controls to their owner schemas; keep credentials out of saved projections and service activation separate from preference edits.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Separate bind/data-root/credential inputs, user preferences and domain experiment settings.
+- [x] **Step 2:** Define defaults, precedence, finite-value/type validation and schema compatibility.
+- [x] **Step 3:** Implement the approved atomic preferences.json write/reload/conflict behavior in a new marked root.
+- [x] **Step 4:** Connect existing settings controls to their owner schemas; keep credentials out of saved projections and service activation separate from preference edits.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 

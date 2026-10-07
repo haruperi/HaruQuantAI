@@ -17,6 +17,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-BOOT` | Universal host bootstrap, lifespan stages, reverse-order shutdown, readiness assessment, and browser shell HTTP composition in `app/host/bootstrap.py` | Implemented and verified; Phase 1 task 1.1 qualified |
 | `FEAT-HOST-LOGGING` | Centralized application telemetry, multi-sink routing, credential/path redaction, in-memory ring buffer, and DebugConsole projection in `app/host/logging.py` | Implemented and verified; Phase 1 task 1.2 qualified |
 | `FEAT-HOST-DIAG` | System capacity, process health, hardware capability inspection, and computational benchmarking in `app/host/diagnostics.py` | Implemented and verified; Phase 1 task 1.3 qualified |
+| `FEAT-HOST-SETTINGS` | Authoritative host configuration settings, schema validation, transactional SQLite storage in `data/database/haruquantai.db` (`host_settings` table), dot-accessible configuration interface, revision-checked updates, and FastAPI REST projection in `app/host/settings.py` | Implemented and verified; Phase 1 task 1.4 qualified |
 
 ## Registered functional requirements
 
@@ -54,6 +55,13 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-DIAG-GPU-QUALIFICATION` | Inspect GPU acceleration availability safely without crashing or blocking host startup. | DEBUG detailing GPU device detection status. |
 | `FR-HOST-DIAG-BENCHMARK-EXECUTION` | Execute bounded real computational benchmarks with wall-clock throughput measurement and cooperative cancellation. | INFO on benchmark start, completion, and cancellation; never synthesizes fake scores. |
 | `FR-HOST-DIAG-PROJECTION` | Expose FastAPI REST endpoints for real-time system diagnostics and benchmark lifecycle management. | DEBUG on routine diagnostic inspection; INFO on benchmark jobs. |
+| `FR-HOST-SETTINGS-SCHEMA` | Transactional SQLite `host_settings` table initialization and schema constraint verification. | Emits INFO on table creation; DEBUG on verification. |
+| `FR-HOST-SETTINGS-LOAD` | Query and parse scoped configuration records into memory with defaults initialization. | Emits INFO on loading records with item count and discovered scopes. |
+| `FR-HOST-SETTINGS-DOT-ACCESS` | Recursive dot-notation and dictionary-style attribute navigation. | Emits DEBUG when accessing setting attributes or namespaces. |
+| `FR-HOST-SETTINGS-VALIDATION` | Validate type, range, finite values, and credentials according to ratified rules. | Emits WARNING with reason when validation rejects a payload. |
+| `FR-HOST-SETTINGS-UPDATE` | Atomic batch upsert with monotonic revision and conflict detection. | Emits INFO on committed batch with changed count and updated revision. |
+| `FR-HOST-SETTINGS-PATH-VALIDATION` | Validate configured workspace filesystem paths on disk. | Emits INFO when path exists; WARNING when path is absent. |
+| `FR-HOST-SETTINGS-PROJECTION` | FastAPI REST endpoints for settings snapshot and updates. | Emits DEBUG on query; INFO on settings updates. |
 
 ## Ratified reference decisions
 
@@ -80,6 +88,8 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-ZIP-ROTATION-WINDOWS` | Rotating file sinks close open file handles prior to renaming to guarantee compatibility with Windows file-locking semantics, compressing rotated logs to deflated `.zip` archives. |
 | `DEC-HOST-SINGLE-DIAGNOSTICS-MODULE` | Merged system probes, CPU/memory/disk/process diagnostics, worker capacity derivation, thread affinity, GPU qualification, and computational benchmarks into a single canonical module `app/host/diagnostics.py`. |
 | `DEC-HOST-REAL-BENCHMARK-MEASUREMENT` | Hardware diagnostic benchmarks perform actual bounded CPU-bound workload execution with duration and throughput measurement; synthetic or fabricated benchmark scores are prohibited. |
+| `DEC-HOST-SINGLE-SETTINGS-MODULE` | Merged settings persistence store, dot-access node, validation, workspace path checks, and FastAPI router into a single canonical module `app/host/settings.py`. |
+| `DEC-HOST-SQLITE-SETTINGS-STORE` | Authoritative persistence for host settings is backed by the `host_settings` table in `data/database/haruquantai.db` with atomic `BEGIN IMMEDIATE` transactions and monotonic revision tracking. |
 
 ## Ownership and release boundaries
 
