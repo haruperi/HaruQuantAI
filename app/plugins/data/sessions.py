@@ -277,7 +277,7 @@ class SessionService:
             )
             return None
 
-        windows = []
+        windows: list[SessionWindow] = []
         if row.get("windows_json"):
             try:
                 raw_windows = json.loads(str(row["windows_json"]))
@@ -287,7 +287,7 @@ class SessionService:
                     "Failed parsing windows_json for session '%s': %s", name, exc
                 )
 
-        holidays = []
+        holidays: list[TradingHoliday] = []
         if row.get("holidays_json"):
             try:
                 raw_holidays = json.loads(str(row["holidays_json"]))
@@ -449,7 +449,7 @@ class SessionService:
             if not source_path.exists():
                 raise FileNotFoundError(f"XML path not found: {source_path}")
             return source_path.read_text(encoding="utf-8")
-        return str(xml_source)
+        return xml_source
 
     def _parse_nt_node(self, node: ET.Element) -> TradingSessionDefinition | None:
         """Parse a single TradingHours XML element."""

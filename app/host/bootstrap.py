@@ -71,7 +71,7 @@ import inspect
 import sys
 import time
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -909,7 +909,7 @@ def create_host_app(
     )
 
     @asynccontextmanager
-    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         app.state.runtime = resolved_runtime
         app.state.settings = resolved_settings
         logger.info(

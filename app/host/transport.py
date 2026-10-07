@@ -692,10 +692,10 @@ def register_transport_exception_handlers(app: FastAPI) -> None:
         req_id = request.headers.get("x-request-id") or f"req-{int(time.time() * 1000)}"
         err = StandardError(
             code=f"HTTP_{exc.status_code}",
-            message=str(exc.detail),
+            message=exc.detail,
         )
         resp = StandardResponse.failure(
-            message=str(exc.detail),
+            message=exc.detail,
             error=err,
             request_id=req_id,
         )

@@ -372,7 +372,7 @@ class SessionContext(BaseModel):
         if "*" in self.scopes or required_scope in self.scopes:
             return True
         # Check wildcard e.g. "jobs:*" matches "jobs:read"
-        return bool(
+        return (
             ":" in required_scope
             and f"{required_scope.split(':', 1)[0]}:*" in self.scopes
         )

@@ -204,7 +204,7 @@ def parse_log_level(level: int | str) -> int:
     """Normalize integer or string log level representation to standard integer."""
     if isinstance(level, str):
         return LEVEL_NUMBERS.get(level.strip().upper(), logging.INFO)
-    return int(level)
+    return level
 
 
 # ============================================================================

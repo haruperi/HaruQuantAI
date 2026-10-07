@@ -129,7 +129,7 @@ class BasketService:
                     "VALUES (?, ?, ?);",
                     (basket.name, basket.description, 0),
                 )
-                group_id = int(cur.lastrowid or 0)
+                group_id = cur.lastrowid or 0
 
             for item in basket.items:
                 cur.execute(

@@ -129,7 +129,10 @@ from dataclasses import asdict, is_dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
+
+if TYPE_CHECKING:
+    from app.host.jobs import JobRecord
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
@@ -1769,7 +1772,7 @@ class LeaseManager:
                 "DELETE FROM host_leases WHERE expires_at_utc <= ?;",
                 (now_str,),
             )
-            return int(cur.rowcount)
+            return cur.rowcount
 
 
 # ============================================================================
@@ -2429,15 +2432,14 @@ class JobStore:
         """
         self.initialize()
         budget_attr = getattr(record, "budget", {})
-        budget_dict = (
-            asdict(budget_attr)
-            if is_dataclass(budget_attr) and not isinstance(budget_attr, type)
-            else (
-                budget_attr.model_dump(mode="json")
-                if hasattr(budget_attr, "model_dump")
-                else getattr(budget_attr, "__dict__", {})
-            )
-        )
+        if is_dataclass(budget_attr) and not isinstance(budget_attr, type):
+            budget_dict = asdict(budget_attr)
+        elif isinstance(budget_attr, BaseModel):
+            budget_dict = budget_attr.model_dump(mode="json")
+        elif isinstance(budget_attr, dict):
+            budget_dict = budget_attr
+        else:
+            budget_dict = getattr(budget_attr, "__dict__", {})
         budget_json = json.dumps(budget_dict)
         child_ids = getattr(record, "child_job_ids", [])
         child_json = json.dumps(child_ids)
@@ -2478,7 +2480,7 @@ class JobStore:
                 ),
             )
 
-    def get_job(self, job_id: str) -> Any | None:
+    def get_job(self, job_id: str) -> JobRecord | None:
         """Query job record by job_id.
 
         Args:
@@ -2501,7 +2503,7 @@ class JobStore:
         owner: str | None = None,
         status: Any | None = None,
         limit: int = 100,
-    ) -> list[Any]:
+    ) -> list[JobRecord]:
         """List job records matching optional filters."""
         self.initialize()
         params: list[Any] = []
@@ -2565,23 +2567,27 @@ class JobStore:
             )
         return count
 
-    def _row_to_record(self, row: Mapping[str, Any]) -> Any:
+    def _row_to_record(self, row: Mapping[str, Any]) -> JobRecord:
         """Convert SQLite row to typed JobRecord model."""
         if self._record_factory is not None:
-            return self._record_factory(row)
+            return cast("JobRecord", self._record_factory(row))
 
         from app.host.jobs import Budget, JobRecord, JobStatus
 
         row_dict = dict(row)
         raw_budget = row_dict.get("budget_json", "{}")
-        budget_data = json.loads(raw_budget) if raw_budget else {}
-        if not isinstance(budget_data, dict):
-            budget_data = {}
+        budget_data: dict[str, Any] = {}
+        if raw_budget:
+            parsed_budget = json.loads(raw_budget)
+            if isinstance(parsed_budget, dict):
+                budget_data = parsed_budget
 
         raw_children = row_dict.get("child_job_ids_json", "[]")
-        child_ids = json.loads(raw_children) if raw_children else []
-        if not isinstance(child_ids, list):
-            child_ids = []
+        child_ids: list[str] = []
+        if raw_children:
+            parsed_children = json.loads(raw_children)
+            if isinstance(parsed_children, list):
+                child_ids = [str(item) for item in parsed_children]
         return JobRecord(
             job_id=str(row_dict["job_id"]),
             owner=str(row_dict["owner"]),
@@ -2700,7 +2706,7 @@ class InstrumentPersistence:
             last_id,
             extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
         )
-        return int(last_id)
+        return last_id
 
     def get_by_symbol(self, symbol: str) -> dict[str, Any] | None:
         """Retrieve instrument record by symbol name."""
@@ -2833,7 +2839,7 @@ class SessionPersistence:
             last_id,
             extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
         )
-        return int(last_id)
+        return last_id
 
     def get_by_name(self, name: str) -> dict[str, Any] | None:
         """Retrieve session record by name."""

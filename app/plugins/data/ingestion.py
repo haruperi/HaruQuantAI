@@ -224,8 +224,8 @@ class DataIngestionService:
                 continue
 
             reader = csv.reader(StringIO(line), delimiter=delimiter)
-            fields = next(reader, [])
-            if len(fields) < MIN_FIELD_COUNT:
+            fields = next(reader, None)
+            if fields is None or len(fields) < MIN_FIELD_COUNT:
                 continue
 
             bar = self._parse_fields_into_bar(fields, source_tz, target_tz)

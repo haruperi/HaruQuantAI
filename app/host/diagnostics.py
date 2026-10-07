@@ -397,9 +397,9 @@ def probe_memory() -> MemoryObservation:
     """
     try:
         mem = psutil.virtual_memory()
-        total_b = int(mem.total)
-        avail_b = int(mem.available)
-        used_b = int(mem.used)
+        total_b = mem.total
+        avail_b = mem.available
+        used_b = mem.used
         used_pct = round(max(0.0, min(100.0, float(mem.percent))), 2)
         total_mb = round(total_b / (1024 * 1024), 2)
         avail_mb = round(avail_b / (1024 * 1024), 2)
@@ -449,9 +449,9 @@ def probe_disk(target_path: Path | str = ".") -> DiskObservation:
     path_obj = Path(target_path).resolve()
     try:
         disk = psutil.disk_usage(str(path_obj))
-        total_b = int(disk.total)
-        free_b = int(disk.free)
-        used_b = int(disk.used)
+        total_b = disk.total
+        free_b = disk.free
+        used_b = disk.used
         free_pct = round(max(0.0, min(100.0, (free_b / total_b) * 100.0)), 2)
 
         sanitized_mount = redact_paths(str(path_obj.anchor or path_obj))
@@ -476,7 +476,7 @@ def probe_disk(target_path: Path | str = ".") -> DiskObservation:
             extra={"fr_id": "FR-HOST-DIAG-SYSTEM-PROBE"},
         )
         return DiskObservation(
-            mount_point=redact_paths(str(path_obj.anchor or ".")),
+            mount_point=redact_paths(path_obj.anchor or "."),
             total_bytes=0,
             free_bytes=0,
             used_bytes=0,
@@ -498,7 +498,7 @@ def probe_process() -> ProcessObservation:
         cpu_val = round(max(0.0, float(cpu)), 2)
 
         mem_info = p.memory_info()
-        rss_bytes = int(mem_info.rss)
+        rss_bytes = mem_info.rss
         rss_mb = round(rss_bytes / (1024 * 1024), 2)
         threads = p.num_threads()
 
@@ -587,7 +587,7 @@ def calculate_worker_allocation(
     Returns:
         Integer worker allocation, guaranteed >= 1.
     """
-    safe_cores = max(1, int(total_cores))
+    safe_cores = max(1, total_cores)
     normalized_mode = mode.strip().lower().replace("_", "-")
 
     if normalized_mode in ("single", "1"):
@@ -595,7 +595,7 @@ def calculate_worker_allocation(
     elif normalized_mode in ("maximum", "all"):
         allocation = safe_cores
     elif normalized_mode == "custom":
-        allocation = min(max(1, int(custom_cores)), safe_cores)
+        allocation = min(max(1, custom_cores), safe_cores)
     else:
         # Default policy: reserve-one / all-except-one
         allocation = max(1, safe_cores - 1)
@@ -702,7 +702,7 @@ def get_worker_capacity(
     total = cpu_obs.total_logical_cores
     workers = calculate_worker_allocation(total, mode=mode, custom_cores=custom_cores)
     affinity_supported, current_affinity = inspect_thread_affinity()
-    affinity_active = bool(affinity_supported and current_affinity is not None)
+    affinity_active = affinity_supported and current_affinity is not None
     gpu_available = inspect_gpu_qualification()
 
     return WorkerCapacity(
