@@ -27,6 +27,9 @@ mt5 = [
     "metatrader5==5.0.6231 ; sys_platform == 'win32'",
 ]
 
+[project.scripts]
+haruquantai = "app.main:main"
+
 [dependency-groups]
 dev = [
     "pytest>=8,<10",

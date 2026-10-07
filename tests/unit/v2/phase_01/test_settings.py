@@ -37,20 +37,42 @@ def temp_db(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def initialized_store(temp_db: Path) -> SettingsStore:
-    """Provide an initialized SettingsStore on an isolated temporary database."""
+    """Provide an initialized SettingsStore on an isolated temporary database with test records."""
     store = SettingsStore(temp_db)
     store.initialize()
+    conn = sqlite3.connect(temp_db)
+    conn.execute(
+        """
+        INSERT INTO host_settings (scope, key, value_json, schema_version, updated_at_utc)
+        VALUES
+            ('app.general', 'theme', '"dark"', 1, '2026-10-07T00:00:00Z'),
+            ('app.general', 'language', '"en"', 1, '2026-10-07T00:00:00Z'),
+            ('app.general', 'zoom', '1.0', 1, '2026-10-07T00:00:00Z'),
+            ('config.global', 'advanced_file_chooser', 'true', 1, '2026-10-07T00:00:00Z'),
+            ('config.global', 'default_result_to_display', '"Portfolio"', 1, '2026-10-07T00:00:00Z'),
+            ('config.global', 'sounds_off', 'false', 1, '2026-10-07T00:00:00Z'),
+            ('config.cpu', 'core_usage', '"all_except_one"', 1, '2026-10-07T00:00:00Z'),
+            ('config.cpu', 'custom_cores', '7', 1, '2026-10-07T00:00:00Z'),
+            ('config.memory', 'memory_limit_gb', '10', 1, '2026-10-07T00:00:00Z'),
+            ('workspace_paths', 'configs_dir', '"data/configs"', 1, '2026-10-07T00:00:00Z'),
+            ('workspace_paths', 'data_dir', '"data"', 1, '2026-10-07T00:00:00Z'),
+            ('workspace_paths', 'projects_dir', '"data/projects"', 1, '2026-10-07T00:00:00Z'),
+            ('workspace_paths', 'strategies_dir', '"data/strategies"', 1, '2026-10-07T00:00:00Z')
+        """
+    )
+    conn.commit()
+    conn.close()
     return store
 
 
 @pytest.fixture
-def host_settings(temp_db: Path) -> HostSettings:
+def host_settings(initialized_store: SettingsStore, temp_db: Path) -> HostSettings:
     """Provide a HostSettings instance connected to an isolated temporary database."""
     return HostSettings(temp_db, auto_load=True)
 
 
 def test_settings_store_initialize_and_seed(temp_db: Path) -> None:
-    """Test table creation and default configuration seeding."""
+    """Test table creation and schema initialization."""
     store = SettingsStore(temp_db)
     assert not temp_db.exists()
 
@@ -68,7 +90,7 @@ def test_settings_store_initialize_and_seed(temp_db: Path) -> None:
 
     cur.execute("SELECT COUNT(*) FROM host_settings")
     count = cur.fetchone()[0]
-    assert count > 10  # Seeded defaults present
+    assert count >= 1  # Revision key present
     conn.close()
 
     # Re-initialization should be idempotent
@@ -479,11 +501,15 @@ def test_settings_store_edge_cases(tmp_path: Path) -> None:
 def test_host_settings_lazy_loading(tmp_path: Path) -> None:
     """Test HostSettings auto_load=False deferred loading."""
     db_file = tmp_path / "lazy.db"
+    store = SettingsStore(db_file)
+    store.initialize()
+    store.update_settings("app.general", {"theme": "dark"}, expected_revision=1)
+
     hs = HostSettings(db_file, auto_load=False)
     assert not bool(hs._loaded)
 
     # Access triggers load and schema init
-    assert hs.revision == 1
+    assert hs.revision == 2
     assert bool(hs._loaded)
     assert hs.app_general.theme == "dark"
 
@@ -492,13 +518,6 @@ def test_host_settings_default_workspace_paths(tmp_path: Path) -> None:
     """Test validate_workspace_paths when workspace_paths is None/unconfigured."""
     db_file = tmp_path / "paths_default.db"
     hs = HostSettings(db_file)
-    # Delete workspace_paths key from store
-    conn = sqlite3.connect(db_file)
-    conn.execute("DELETE FROM host_settings WHERE scope = 'workspace_paths'")
-    conn.commit()
-    conn.close()
-    hs.reload()
-
     statuses = hs.validate_workspace_paths()
     assert isinstance(statuses, dict)
     assert "Configs" in statuses

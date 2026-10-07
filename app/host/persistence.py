@@ -2,34 +2,35 @@
 
 Description:
     Provides the central transactional SQLite persistence authority, schema migration
-    manager, narrow typed entity repositories, distributed cooperative leases, and
-    restart reconciliation services for the HaruQuantAI platform host. In quantitative
-    trading platforms, concurrent strategy updates, backtest results, and tenant
-    configurations require ACID transactional guarantees, optimistic concurrency
-    controls, and crash resilience. Domain plugins and workspaces must never execute
-    raw SQL or manipulate physical database handles directly. This module acts as the
-    sole persistence gateway, enforcing connection-per-operation safety,
-    `BEGIN IMMEDIATE` write serialization, WAL journaling, foreign keys, and
-    busy timeout management.
+    manager, narrow typed entity repositories, authoritative scoped settings store,
+    durable compute job store, distributed cooperative leases, and restart
+    reconciliation services for the HaruQuantAI platform host. All SQLite database
+    connections, transactions, migrations, and queries across the entire platform are
+    strictly centralized within this module. Domain plugins, host configuration
+    managers (app.host.settings), compute coordinators (app.host.jobs), and security
+    boundaries (app.host.session) never open SQLite handles or execute raw SQL
+    directly. This module acts as the sole persistence gateway, enforcing
+    connection-per-operation safety, `BEGIN IMMEDIATE` write serialization,
+    WAL journaling, foreign keys, and busy timeout management.
 
     Externally, it participates in four critical host lifecycles: (1) host bootstrap
     calls `DatabaseManager.initialize()` and `RecoveryManager.reconcile_on_startup()`
     during early startup to verify schema integrity, recover interrupted transactions,
-    and prune expired leases; (2) domain workspaces and plugins interact via scoped
-    `PersistenceAccess` capability facades to access typed repositories
-    (`TypedRepository`) without SQL exposure; (3) background worker pools and job
-    admission controllers coordinate multi-worker tasks through `LeaseManager`
-    without split-brain lockouts; and (4) the browser shell and DevOps tooling
-    inspect storage metrics and run physical database integrity checks via
-    `create_persistence_router()`.
+    and prune expired leases; (2) domain workspaces and host modules interact via
+    `SettingsStore`, `JobStore`, and scoped `PersistenceAccess` capability facades
+    without SQL exposure; (3) background worker pools and job admission controllers
+    coordinate multi-worker tasks through `LeaseManager` without split-brain lockouts;
+    and (4) the browser shell and DevOps tooling inspect storage metrics and run
+    physical database integrity checks via `create_persistence_router()`.
 
     Internally, `DatabaseManager` manages SQLite connections, transaction blocks, and
     WAL settings; `SchemaManager` enforces immutable migration history and runs
-    `PRAGMA integrity_check`; `TypedRepository[T]` maps Pydantic models to versioned
-    JSON payload records with monotonic revision checks (`expected_revision`);
-    `LeaseManager` provides atomic lease acquisition, heartbeats, and TTL reclamation;
-    and `RecoveryManager` audits control tables after reboot to reconcile transient
-    states without fabricating false data.
+    `PRAGMA integrity_check`; `SettingsStore` provides transactional settings CRUD;
+    `JobStore` manages compute job state transitions and startup reconciliation;
+    `TypedRepository[T]` maps Pydantic models to versioned JSON payload records with
+    monotonic revision checks (`expected_revision`); `LeaseManager` provides atomic
+    lease acquisition and heartbeats; and `RecoveryManager` audits control tables after
+    reboot to reconcile transient states without fabricating false data.
 
 Purpose:
     FEAT-HOST-PERSISTENCE: Authoritative Host Persistence, Repositories, and Recovery.
@@ -121,7 +122,9 @@ import json
 import re
 import sqlite3
 import sys
-from collections.abc import Generator
+import threading
+from collections.abc import Callable, Generator, Mapping
+from dataclasses import asdict, is_dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
@@ -139,14 +142,29 @@ logger = get_logger(__name__)
 # Canonical envelope alias matching transport conventions
 ApiResponse = StandardResponse
 
+DEFAULT_DATABASE_PATH: Path = (
+    Path(__file__).resolve().parents[2] / "data" / "database" / "haruquantai.db"
+)
+MAX_BATCH_SIZE: int = 100
+MAX_READ_LIMIT: int = 1000
+DEFAULT_READ_LIMIT: int = 50
+SCHEMA_VERSION: int = 1
+
 __all__ = [
+    "DEFAULT_DATABASE_PATH",
+    "DEFAULT_READ_LIMIT",
+    "MAX_BATCH_SIZE",
+    "MAX_READ_LIMIT",
+    "SCHEMA_VERSION",
     "AcquireLeaseRequest",
     "ApiResponse",
     "CorruptDataError",
     "DatabaseManager",
     "DatabaseStatus",
     "EntityRecord",
+    "HostSettingsSnapshot",
     "IncompatibleSchemaError",
+    "JobStore",
     "LeaseExpiredError",
     "LeaseManager",
     "LeaseRecord",
@@ -160,12 +178,16 @@ __all__ = [
     "RenewLeaseRequest",
     "RevisionConflictError",
     "SchemaManager",
+    "SettingRecord",
+    "SettingsPage",
+    "SettingsStore",
     "StorageBusyError",
     "TypedRepository",
     "ValidationError",
     "canonical_json",
     "create_persistence_router",
     "main",
+    "now_utc_iso",
     "validate_identifier",
     "validate_json_depth",
 ]
@@ -280,6 +302,30 @@ class ReleaseLeaseRequest(BaseModel):
 
     lease_key: str = Field(min_length=1)
     holder_id: str = Field(min_length=1)
+
+
+class SettingRecord(BaseModel):
+    """Auditable record for a scoped configuration setting."""
+
+    scope: str
+    key: str
+    value: Any
+    schema_version: int = 1
+    updated_at_utc: str
+
+
+class SettingsPage(BaseModel):
+    """Paginated slice of setting records."""
+
+    items: list[SettingRecord]
+    next_key: str | None = None
+
+
+class HostSettingsSnapshot(BaseModel):
+    """Point-in-time snapshot of the entire host settings dictionary."""
+
+    revision: int
+    values: dict[str, dict[str, Any]]
 
 
 # ============================================================================
@@ -404,6 +450,11 @@ def canonical_json(obj: Any) -> str:
     return encoded
 
 
+def now_utc_iso() -> str:
+    """Return current UTC timestamp in ISO 8601 format."""
+    return datetime.now(UTC).isoformat()
+
+
 # ============================================================================
 # Database Connection & Transaction Manager
 # ============================================================================
@@ -412,17 +463,51 @@ def canonical_json(obj: Any) -> str:
 class DatabaseManager:
     """Central host authority for SQLite database connections, WAL, and transactions."""
 
-    def __init__(self, database_path: Path) -> None:
-        """Initialize DatabaseManager with database file path.
+    def __init__(
+        self,
+        database_path: Path | str | None = None,
+        *,
+        busy_timeout: float = _BUSY_TIMEOUT_SECONDS,
+    ) -> None:
+        """Initialize DatabaseManager with database file path or ':memory:'.
 
         Args:
-            database_path: Filesystem path to SQLite database file.
+            database_path: Filesystem path to SQLite database or ':memory:'. Defaults
+                to DEFAULT_DATABASE_PATH.
+            busy_timeout: Lock timeout in seconds.
         """
-        self.database_path = database_path.resolve()
-        self.database_path.parent.mkdir(parents=True, exist_ok=True)
+        self._is_memory = str(database_path) == ":memory:"
+        self._busy_timeout = busy_timeout
+        self._lock = threading.Lock()
+
+        if self._is_memory:
+            self.database_path = Path(":memory:")
+            self._mem_conn: sqlite3.Connection | None = sqlite3.connect(
+                ":memory:", check_same_thread=False, autocommit=True
+            )
+            self._mem_conn.row_factory = sqlite3.Row
+            self._mem_conn.execute("PRAGMA foreign_keys = ON;")
+            self._mem_conn.execute(
+                f"PRAGMA busy_timeout = {int(self._busy_timeout * 1000)};"
+            )
+        else:
+            self._mem_conn = None
+            resolved = (
+                Path(database_path).resolve()
+                if database_path is not None
+                else DEFAULT_DATABASE_PATH.resolve()
+            )
+            self.database_path = resolved
+            self.database_path.parent.mkdir(parents=True, exist_ok=True)
+
         self.schema = SchemaManager(self)
         self.leases = LeaseManager(self)
         self.recovery = RecoveryManager(self)
+
+    @property
+    def is_memory(self) -> bool:
+        """Return True if database connection is backed by in-memory SQLite store."""
+        return self._is_memory
 
     def connect(self) -> sqlite3.Connection:
         """Establish a new configured SQLite connection with pragmas applied.
@@ -430,26 +515,71 @@ class DatabaseManager:
         Returns:
             Configured sqlite3.Connection instance.
         """
+        if self._is_memory and self._mem_conn is not None:
+            return self._mem_conn
         conn = sqlite3.connect(
             str(self.database_path),
-            timeout=_BUSY_TIMEOUT_SECONDS,
+            timeout=self._busy_timeout,
             autocommit=True,
         )
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode = WAL;")
         conn.execute("PRAGMA synchronous = NORMAL;")
         conn.execute("PRAGMA foreign_keys = ON;")
-        conn.execute(f"PRAGMA busy_timeout = {_BUSY_TIMEOUT_MS};")
+        conn.execute(f"PRAGMA busy_timeout = {int(self._busy_timeout * 1000)};")
         return conn
 
     @contextlib.contextmanager
-    def connection(self) -> Generator[sqlite3.Connection]:
-        """Context manager providing an active SQLite connection, closed on exit."""
-        conn = self.connect()
-        try:
-            yield conn
-        finally:
-            conn.close()
+    def connection(self, *, query_only: bool = False) -> Generator[sqlite3.Connection]:
+        """Context manager providing an active SQLite connection, closed on exit.
+
+        Args:
+            query_only: If True, opens connection in read-only mode for persistent db.
+
+        Yields:
+            Configured sqlite3.Connection instance.
+        """
+        if self._is_memory and self._mem_conn is not None:
+            with self._lock:
+                yield self._mem_conn
+        elif query_only:
+            uri = f"file:{self.database_path.as_posix()}?mode=ro"
+            try:
+                conn = sqlite3.connect(
+                    uri,
+                    timeout=self._busy_timeout,
+                    uri=True,
+                    autocommit=True,
+                )
+            except sqlite3.OperationalError as exc:
+                if "busy" in str(exc).lower() or "locked" in str(exc).lower():
+                    raise StorageBusyError(
+                        "Database connection timed out under lock"
+                    ) from exc
+                raise PersistenceError("Failed to open database connection") from exc
+
+            conn.row_factory = sqlite3.Row
+            try:
+                conn.execute(f"PRAGMA busy_timeout = {int(self._busy_timeout * 1000)};")
+                conn.execute("PRAGMA foreign_keys = ON;")
+                conn.execute("PRAGMA synchronous = NORMAL;")
+                conn.execute("PRAGMA query_only = ON;")
+                yield conn
+            finally:
+                conn.close()
+        else:
+            try:
+                conn = self.connect()
+            except sqlite3.OperationalError as exc:
+                if "busy" in str(exc).lower() or "locked" in str(exc).lower():
+                    raise StorageBusyError(
+                        "Database connection timed out under lock"
+                    ) from exc
+                raise PersistenceError("Failed to open database connection") from exc
+            try:
+                yield conn
+            finally:
+                conn.close()
 
     @contextlib.contextmanager
     def transaction(self) -> Generator[sqlite3.Connection]:
@@ -462,43 +592,64 @@ class DatabaseManager:
             StorageBusyError: If the database is locked or busy.
             PersistenceError: If a database error occurs during execution.
         """
-        conn = self.connect()
-        try:
-            conn.execute("BEGIN IMMEDIATE;")
-            logger.debug(
-                "Transaction started",
-                extra={"fr_id": "FR-HOST-PERSISTENCE-TRANSACTIONS"},
-            )
-            yield conn
-            conn.execute("COMMIT;")
-            logger.debug(
-                "Transaction committed",
-                extra={"fr_id": "FR-HOST-PERSISTENCE-TRANSACTIONS"},
-            )
-        except sqlite3.OperationalError as exc:
-            with contextlib.suppress(sqlite3.Error):
-                conn.execute("ROLLBACK;")
-            if "locked" in str(exc).lower() or "busy" in str(exc).lower():
+        if self._is_memory and self._mem_conn is not None:
+            with self._lock:
+                conn = self._mem_conn
+                try:
+                    conn.execute("BEGIN IMMEDIATE;")
+                    yield conn
+                    conn.execute("COMMIT;")
+                except Exception:
+                    with contextlib.suppress(sqlite3.Error):
+                        conn.execute("ROLLBACK;")
+                    raise
+        else:
+            conn = self.connect()
+            try:
+                conn.execute("BEGIN IMMEDIATE;")
+                logger.debug(
+                    "Transaction started",
+                    extra={"fr_id": "FR-HOST-PERSISTENCE-TRANSACTIONS"},
+                )
+                yield conn
+                conn.execute("COMMIT;")
+                logger.debug(
+                    "Transaction committed",
+                    extra={"fr_id": "FR-HOST-PERSISTENCE-TRANSACTIONS"},
+                )
+            except sqlite3.OperationalError as exc:
+                with contextlib.suppress(sqlite3.Error):
+                    conn.execute("ROLLBACK;")
+                if "locked" in str(exc).lower() or "busy" in str(exc).lower():
+                    logger.exception(
+                        "Database busy timeout during transaction",
+                        extra={"error": str(exc)},
+                    )
+                    raise StorageBusyError(
+                        f"Database contention timeout: {exc}"
+                    ) from exc
                 logger.exception(
-                    "Database busy timeout during transaction",
+                    "Operational error during transaction",
                     extra={"error": str(exc)},
                 )
-                raise StorageBusyError(f"Database contention timeout: {exc}") from exc
-            logger.exception(
-                "Operational error during transaction",
-                extra={"error": str(exc)},
-            )
-            raise PersistenceError(f"Database operational error: {exc}") from exc
-        except Exception as exc:
-            with contextlib.suppress(sqlite3.Error):
-                conn.execute("ROLLBACK;")
-            logger.warning(
-                "Transaction rolled back due to error",
-                extra={"error": str(exc)},
-            )
-            raise
-        finally:
-            conn.close()
+                raise PersistenceError(f"Database operational error: {exc}") from exc
+            except Exception as exc:
+                with contextlib.suppress(sqlite3.Error):
+                    conn.execute("ROLLBACK;")
+                logger.warning(
+                    "Transaction rolled back due to error",
+                    extra={"error": str(exc)},
+                )
+                raise
+            finally:
+                conn.close()
+
+    def close(self) -> None:
+        """Close connection if in-memory."""
+        if self._is_memory and self._mem_conn is not None:
+            with self._lock:
+                self._mem_conn.close()
+                self._mem_conn = None
 
     def check_integrity(self) -> str:
         """Run SQLite PRAGMA integrity_check and return status string.
@@ -569,7 +720,7 @@ class DatabaseManager:
                     s_row = cur.fetchone()
                     if s_row:
                         schema_version = int(s_row[0])
-        except (sqlite3.Error, OSError) as exc:
+        except (sqlite3.Error, OSError, PersistenceError) as exc:
             logger.warning("Failed to query database status", extra={"error": str(exc)})
 
         integrity = self.check_integrity() if is_connected else "disconnected"
@@ -598,9 +749,12 @@ class SchemaManager:
 
     def __init__(self, db: DatabaseManager) -> None:
         self._db = db
+        self._initialized = False
 
-    def initialize(self) -> None:
+    def initialize(self, force: bool = False) -> None:
         """Initialize migration ledger and create authoritative control tables."""
+        if self._initialized and not force:
+            return
         with self._db.transaction() as conn:
             conn.execute(
                 """
@@ -650,6 +804,82 @@ class SchemaManager:
                 ON host_leases (expires_at_utc);
                 """
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS host_settings (
+                    scope TEXT NOT NULL,
+                    key TEXT NOT NULL,
+                    value_json TEXT NOT NULL,
+                    schema_version INTEGER NOT NULL DEFAULT 1,
+                    updated_at_utc TEXT NOT NULL,
+                    PRIMARY KEY (scope, key)
+                );
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS host_jobs (
+                    job_id TEXT PRIMARY KEY,
+                    owner TEXT NOT NULL,
+                    kind TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    progress REAL NOT NULL DEFAULT 0.0,
+                    accepted INTEGER NOT NULL DEFAULT 0,
+                    rejected INTEGER NOT NULL DEFAULT 0,
+                    message TEXT NOT NULL DEFAULT '',
+                    attempt_id INTEGER NOT NULL DEFAULT 1,
+                    max_retries INTEGER NOT NULL DEFAULT 0,
+                    retry_count INTEGER NOT NULL DEFAULT 0,
+                    dedup_key TEXT,
+                    parent_job_id TEXT,
+                    child_job_ids_json TEXT NOT NULL DEFAULT '[]',
+                    budget_json TEXT NOT NULL DEFAULT '{}',
+                    submitted_at_utc TEXT NOT NULL DEFAULT '',
+                    started_at_utc TEXT,
+                    finished_at_utc TEXT,
+                    error_message TEXT,
+                    error_location TEXT
+                );
+                """
+            )
+            # Ensure columns and backward-compatibility for host_jobs
+            table_info = conn.execute("PRAGMA table_info(host_jobs);").fetchall()
+            cols = {r["name"] for r in table_info}
+            required_cols = {
+                "owner": "TEXT NOT NULL DEFAULT 'default'",
+                "kind": "TEXT NOT NULL DEFAULT 'compute'",
+                "status": "TEXT NOT NULL DEFAULT 'completed'",
+                "progress": "REAL NOT NULL DEFAULT 0.0",
+                "accepted": "INTEGER NOT NULL DEFAULT 0",
+                "rejected": "INTEGER NOT NULL DEFAULT 0",
+                "message": "TEXT NOT NULL DEFAULT ''",
+                "attempt_id": "INTEGER NOT NULL DEFAULT 1",
+                "max_retries": "INTEGER NOT NULL DEFAULT 0",
+                "retry_count": "INTEGER NOT NULL DEFAULT 0",
+                "dedup_key": "TEXT",
+                "parent_job_id": "TEXT",
+                "child_job_ids_json": "TEXT NOT NULL DEFAULT '[]'",
+                "budget_json": "TEXT NOT NULL DEFAULT '{}'",
+                "submitted_at_utc": "TEXT NOT NULL DEFAULT ''",
+                "error_message": "TEXT",
+                "error_location": "TEXT",
+            }
+            for col_name, col_def in required_cols.items():
+                if col_name not in cols:
+                    conn.execute(
+                        f"ALTER TABLE host_jobs ADD COLUMN {col_name} {col_def};"
+                    )
+
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_host_jobs_owner ON host_jobs(owner);"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_host_jobs_status ON host_jobs(status);"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_host_jobs_dedup "
+                "ON host_jobs(dedup_key);"
+            )
 
             # Record initial schema version if not recorded
             cur = conn.cursor()
@@ -665,6 +895,7 @@ class SchemaManager:
                     (now_str,),
                 )
 
+        self._initialized = True
         logger.info(
             "Host database schema initialized",
             extra={
@@ -1477,6 +1708,718 @@ class PersistenceAccess:
         """Release a held lease."""
         scoped_key = f"{self.scope}:{lease_key}"
         return self._db.leases.release(scoped_key, self.owner_id)
+
+
+# ============================================================================
+# Authoritative Settings Store
+# ============================================================================
+
+
+class SettingsStore:
+    """Authoritative SQLite persistence manager for scoped host settings.
+
+    Provides transactional, parameterized CRUD operations against the `host_settings`
+    table with strict connection lifecycles, concurrency serialization, and
+    isolated storage paths.
+    """
+
+    def __init__(
+        self,
+        db_path: Path | str | None = None,
+        *,
+        busy_timeout: float = _BUSY_TIMEOUT_SECONDS,
+        db: DatabaseManager | None = None,
+        validator: Callable[[str, str, Any], None] | None = None,
+    ) -> None:
+        """Initialize SettingsStore with an authoritative database file path or manager.
+
+        Args:
+            db_path: Optional path to the SQLite database file or ':memory:'.
+            busy_timeout: Timeout in seconds for SQLite lock waits.
+            db: Optional preexisting DatabaseManager instance.
+            validator: Optional callback validating setting value constraints.
+        """
+        self._db: DatabaseManager = db or DatabaseManager(
+            db_path, busy_timeout=busy_timeout
+        )
+        self._busy_timeout: float = busy_timeout
+        self._validator: Callable[[str, str, Any], None] | None = validator
+
+    @property
+    def db_path(self) -> Path:
+        """Return the resolved database file path."""
+        return self._db.database_path
+
+    @property
+    def db(self) -> DatabaseManager:
+        """Return the underlying DatabaseManager instance."""
+        return self._db
+
+    def initialize(self) -> None:
+        """Verify existing database schema or create required table transactionally.
+
+        Raises:
+            IncompatibleSchemaError: If the existing table schema is incompatible.
+            PersistenceError: If table creation or schema verification fails.
+        """
+        self._db.schema.initialize()
+        with self._db.connection(query_only=False) as conn:
+            try:
+                row = conn.execute(
+                    "SELECT sql FROM sqlite_master WHERE type = 'table' "
+                    "AND name = 'host_settings'"
+                ).fetchone()
+
+                if row is None:
+                    self._create_settings_table(conn)
+                    self._ensure_revision_exists(conn)
+                    logger.info(
+                        "FR-HOST-SETTINGS-SCHEMA: Initialized host_settings table.",
+                        extra={
+                            "db_path": str(self._db.database_path),
+                            "fr_id": "FR-HOST-SETTINGS-SCHEMA",
+                        },
+                    )
+                    return
+
+                self._verify_existing_schema(conn)
+                self._ensure_revision_exists(conn)
+                logger.debug(
+                    "FR-HOST-SETTINGS-SCHEMA: Verified host_settings schema.",
+                    extra={"fr_id": "FR-HOST-SETTINGS-SCHEMA"},
+                )
+            except sqlite3.OperationalError as exc:
+                if "busy" in str(exc).lower() or "locked" in str(exc).lower():
+                    raise StorageBusyError(
+                        "Database is busy during schema initialization"
+                    ) from exc
+                raise PersistenceError("Failed to initialize database schema") from exc
+
+    def _create_settings_table(self, conn: sqlite3.Connection) -> None:
+        """Create the host_settings table inside an immediate transaction."""
+        conn.execute("BEGIN IMMEDIATE")
+        conn.execute(
+            """
+            CREATE TABLE host_settings (
+                scope TEXT NOT NULL,
+                key TEXT NOT NULL,
+                value_json TEXT NOT NULL,
+                schema_version INTEGER NOT NULL DEFAULT 1,
+                updated_at_utc TEXT NOT NULL,
+                PRIMARY KEY (scope, key)
+            )
+            """
+        )
+        conn.execute("COMMIT")
+
+    def _verify_existing_schema(self, conn: sqlite3.Connection) -> None:
+        """Verify columns and constraints of existing host_settings table.
+
+        Raises:
+            IncompatibleSchemaError: If any column definition or constraint mismatches.
+        """
+        info_rows = conn.execute("PRAGMA table_info(host_settings)").fetchall()
+        cols: dict[str, sqlite3.Row] = {r["name"]: r for r in info_rows}
+        required: dict[str, tuple[str, int, int]] = {
+            "scope": ("TEXT", 1, 1),
+            "key": ("TEXT", 1, 2),
+            "value_json": ("TEXT", 1, 0),
+            "schema_version": ("INTEGER", 1, 0),
+            "updated_at_utc": ("TEXT", 1, 0),
+        }
+
+        for col_name, (expected_type, notnull, pk) in required.items():
+            if col_name not in cols:
+                raise IncompatibleSchemaError(
+                    f"Missing required column '{col_name}' in host_settings"
+                )
+            col = cols[col_name]
+            if (
+                col["type"].upper() != expected_type
+                or col["notnull"] != notnull
+                or col["pk"] != pk
+            ):
+                raise IncompatibleSchemaError(
+                    f"Incompatible column definition for '{col_name}' in host_settings"
+                )
+
+    def _ensure_revision_exists(self, conn: sqlite3.Connection) -> None:
+        """Ensure the internal _system:revision key exists in host_settings."""
+        row = conn.execute(
+            "SELECT value_json FROM host_settings "
+            "WHERE scope = '_system' AND key = 'revision'"
+        ).fetchone()
+        if row is None:
+            now_ts = now_utc_iso()
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO host_settings (
+                    scope, key, value_json, schema_version, updated_at_utc
+                )
+                VALUES ('_system', 'revision', '1', ?, ?)
+                """,
+                (SCHEMA_VERSION, now_ts),
+            )
+            conn.execute("COMMIT")
+
+    def get_revision(self) -> int:
+        """Query current monotonic revision counter."""
+        if not self._db.is_memory and not self._db.database_path.exists():
+            return 1
+        with self._db.connection(query_only=True) as conn:
+            try:
+                row = conn.execute(
+                    "SELECT value_json FROM host_settings "
+                    "WHERE scope = '_system' AND key = 'revision'"
+                ).fetchone()
+                if row is not None:
+                    return int(json.loads(row["value_json"]))
+            except (sqlite3.Error, ValueError, TypeError) as exc:
+                logger.debug(
+                    "FR-HOST-SETTINGS-LOAD: Revision query fallback (%s)",
+                    exc,
+                    extra={"fr_id": "FR-HOST-SETTINGS-LOAD"},
+                )
+        return 1
+
+    def read_settings(
+        self,
+        scope: str,
+        *,
+        key: str | None = None,
+        after_key: str | None = None,
+        limit: int = DEFAULT_READ_LIMIT,
+    ) -> SettingsPage:
+        """Query scoped host settings with pagination and optional single key lookup."""
+        validate_identifier(scope, "scope")
+        if key is not None:
+            validate_identifier(key, "key")
+        if after_key is not None:
+            validate_identifier(after_key, "after_key")
+        if not (1 <= limit <= MAX_READ_LIMIT):
+            raise ValidationError(
+                f"limit must be between 1 and {MAX_READ_LIMIT}, got {limit}"
+            )
+
+        if not self._db.is_memory and not self._db.database_path.exists():
+            return SettingsPage(items=[], next_key=None)
+
+        with self._db.connection(query_only=True) as conn:
+            try:
+                if key is not None:
+                    return self._read_single_key(conn, scope, key)
+                return self._read_paginated_keys(conn, scope, after_key, limit)
+            except sqlite3.OperationalError as exc:
+                if "busy" in str(exc).lower() or "locked" in str(exc).lower():
+                    raise StorageBusyError(
+                        "Database is busy while reading settings"
+                    ) from exc
+                raise PersistenceError("Failed to query host settings") from exc
+
+    def _read_single_key(
+        self, conn: sqlite3.Connection, scope: str, key: str
+    ) -> SettingsPage:
+        """Read a single key from host_settings."""
+        row = conn.execute(
+            """
+            SELECT scope, key, value_json, schema_version, updated_at_utc
+            FROM host_settings
+            WHERE scope = ? AND key = ?
+            """,
+            (scope, key),
+        ).fetchone()
+        if row is None:
+            return SettingsPage(items=[], next_key=None)
+
+        record = self._row_to_record(row)
+        return SettingsPage(items=[record], next_key=None)
+
+    def _read_paginated_keys(
+        self,
+        conn: sqlite3.Connection,
+        scope: str,
+        after_key: str | None,
+        limit: int,
+    ) -> SettingsPage:
+        """Read a keyset-paginated slice of settings."""
+        if after_key is not None:
+            rows = conn.execute(
+                """
+                SELECT scope, key, value_json, schema_version, updated_at_utc
+                FROM host_settings
+                WHERE scope = ? AND key > ?
+                ORDER BY key ASC
+                LIMIT ?
+                """,
+                (scope, after_key, limit + 1),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                """
+                SELECT scope, key, value_json, schema_version, updated_at_utc
+                FROM host_settings
+                WHERE scope = ?
+                ORDER BY key ASC
+                LIMIT ?
+                """,
+                (scope, limit + 1),
+            ).fetchall()
+
+        has_more = len(rows) > limit
+        display_rows = rows[:limit] if has_more else rows
+        next_cursor = display_rows[-1]["key"] if has_more and display_rows else None
+
+        records = [self._row_to_record(r) for r in display_rows]
+        return SettingsPage(items=records, next_key=next_cursor)
+
+    def read_all_scoped(self) -> tuple[int, dict[str, dict[str, Any]]]:
+        """Read all scoped settings records grouped by scope, plus revision number."""
+        if not self._db.is_memory and not self._db.database_path.exists():
+            return 1, {}
+
+        with self._db.connection(query_only=True) as conn:
+            try:
+                rows = conn.execute(
+                    """
+                    SELECT scope, key, value_json, schema_version, updated_at_utc
+                    FROM host_settings
+                    ORDER BY scope ASC, key ASC
+                    """
+                ).fetchall()
+            except sqlite3.OperationalError:
+                return 1, {}
+
+        revision = 1
+        values: dict[str, dict[str, Any]] = {}
+        for row in rows:
+            scope = str(row["scope"])
+            key = str(row["key"])
+            try:
+                val = json.loads(row["value_json"])
+            except (ValueError, TypeError) as exc:
+                logger.debug(
+                    "FR-HOST-SETTINGS-LOAD: Skipping corrupt row (%s)",
+                    exc,
+                    extra={"fr_id": "FR-HOST-SETTINGS-LOAD"},
+                )
+                continue
+
+            if scope == "_system" and key == "revision":
+                if isinstance(val, int):
+                    revision = val
+                continue
+
+            if scope not in values:
+                values[scope] = {}
+            values[scope][key] = val
+
+        return revision, values
+
+    def get_snapshot(self) -> HostSettingsSnapshot:
+        """Return full host settings snapshot including revision and values."""
+        rev, vals = self.read_all_scoped()
+        return HostSettingsSnapshot(revision=rev, values=vals)
+
+    def update_settings(
+        self,
+        scope: str,
+        values: dict[str, Any],
+        *,
+        expected_revision: int | None = None,
+    ) -> HostSettingsSnapshot:
+        """Convenience method to update settings within a single scope."""
+        return self.update_batch({scope: values}, expected_revision=expected_revision)
+
+    def _validate_batch_changes(
+        self, changes: dict[str, dict[str, Any]]
+    ) -> list[tuple[str, str, Any, str]]:
+        """Validate all items in a batch update mapping."""
+        total_items = sum(len(v) for v in changes.values() if isinstance(v, dict))
+        if total_items > MAX_BATCH_SIZE:
+            raise ValidationError(
+                f"Total batch items {total_items} exceeds limit {MAX_BATCH_SIZE}"
+            )
+
+        validated_items: list[tuple[str, str, Any, str]] = []
+        for scope, scope_changes in changes.items():
+            validate_identifier(scope, "scope")
+            if not isinstance(scope_changes, dict):
+                raise ValidationError(
+                    f"Scope changes for '{scope}' must be a dictionary"
+                )
+            for key, val in scope_changes.items():
+                validate_identifier(key, "key")
+                if self._validator is not None:
+                    self._validator(scope, key, val)
+                encoded = canonical_json(val)
+                validated_items.append((scope, key, val, encoded))
+
+        return validated_items
+
+    def _check_revision_match(
+        self, expected_revision: int | None, current_revision: int
+    ) -> None:
+        """Verify that expected revision matches current revision."""
+        if expected_revision is not None and expected_revision != current_revision:
+            logger.warning(
+                "FR-HOST-SETTINGS-UPDATE: Revision conflict. Current: %d, Expected: %d",
+                current_revision,
+                expected_revision,
+                extra={"fr_id": "FR-HOST-SETTINGS-UPDATE"},
+            )
+            raise RevisionConflictError(
+                f"Settings revision conflict: expected {expected_revision}, "
+                f"but current is {current_revision}"
+            )
+
+    def update_batch(
+        self,
+        changes: dict[str, dict[str, Any]],
+        *,
+        expected_revision: int | None = None,
+    ) -> HostSettingsSnapshot:
+        """Atomically update multiple scoped settings with optimistic locking."""
+        if not changes:
+            return self.get_snapshot()
+
+        validated_items = self._validate_batch_changes(changes)
+
+        with self._db.transaction() as conn:
+            self._check_table_exists(conn)
+
+            rev_row = conn.execute(
+                "SELECT value_json FROM host_settings "
+                "WHERE scope = '_system' AND key = 'revision'"
+            ).fetchone()
+            current_revision = (
+                int(json.loads(rev_row["value_json"])) if rev_row is not None else 1
+            )
+
+            self._check_revision_match(expected_revision, current_revision)
+
+            now_ts = now_utc_iso()
+            changed_count = 0
+            for scope, key, _val, raw_json in validated_items:
+                existing = conn.execute(
+                    "SELECT value_json FROM host_settings WHERE scope = ? AND key = ?",
+                    (scope, key),
+                ).fetchone()
+                if existing is not None and existing["value_json"] == raw_json:
+                    continue
+
+                conn.execute(
+                    """
+                    INSERT INTO host_settings (
+                        scope, key, value_json, schema_version, updated_at_utc
+                    )
+                    VALUES (?, ?, ?, ?, ?)
+                    ON CONFLICT(scope, key) DO UPDATE SET
+                        value_json = excluded.value_json,
+                        schema_version = excluded.schema_version,
+                        updated_at_utc = excluded.updated_at_utc
+                    """,
+                    (scope, key, raw_json, SCHEMA_VERSION, now_ts),
+                )
+                changed_count += 1
+
+            new_revision = (
+                current_revision + 1 if changed_count > 0 else current_revision
+            )
+            if changed_count > 0:
+                conn.execute(
+                    """
+                    INSERT INTO host_settings (
+                        scope, key, value_json, schema_version, updated_at_utc
+                    )
+                    VALUES ('_system', 'revision', ?, ?, ?)
+                    ON CONFLICT(scope, key) DO UPDATE SET
+                        value_json = excluded.value_json,
+                        schema_version = excluded.schema_version,
+                        updated_at_utc = excluded.updated_at_utc
+                    """,
+                    (json.dumps(new_revision), SCHEMA_VERSION, now_ts),
+                )
+
+        logger.info(
+            "FR-HOST-SETTINGS-UPDATE: Atomically updated %d setting(s). Revision: %d",
+            changed_count,
+            new_revision,
+            extra={
+                "changed_count": changed_count,
+                "revision": new_revision,
+                "fr_id": "FR-HOST-SETTINGS-UPDATE",
+            },
+        )
+        return self.get_snapshot()
+
+    def _check_table_exists(self, conn: sqlite3.Connection) -> None:
+        """Verify that the host_settings table exists."""
+        row = conn.execute(
+            "SELECT 1 FROM sqlite_master WHERE type = 'table' "
+            "AND name = 'host_settings'"
+        ).fetchone()
+        if row is None:
+            raise IncompatibleSchemaError(
+                "Table 'host_settings' does not exist in target database"
+            )
+
+    @staticmethod
+    def _row_to_record(row: sqlite3.Row) -> SettingRecord:
+        """Convert SQLite Row to SettingRecord."""
+        if row["schema_version"] != SCHEMA_VERSION:
+            raise CorruptDataError(
+                f"Unsupported schema version {row['schema_version']} "
+                f"for key '{row['key']}'"
+            )
+        try:
+            value = json.loads(row["value_json"])
+        except (ValueError, TypeError) as exc:
+            raise CorruptDataError(
+                f"Corrupt JSON payload in row for key '{row['key']}'"
+            ) from exc
+
+        return SettingRecord(
+            scope=str(row["scope"]),
+            key=str(row["key"]),
+            value=value,
+            schema_version=int(row["schema_version"]),
+            updated_at_utc=str(row["updated_at_utc"]),
+        )
+
+
+# ============================================================================
+# Authoritative Job Store
+# ============================================================================
+
+
+class JobStore:
+    """Authoritative SQLite persistence manager for compute job records.
+
+    Provides transactional, parameterized CRUD operations against the `host_jobs`
+    table and startup reconciliation for interrupted jobs.
+    """
+
+    def __init__(
+        self,
+        db_path: Path | str | None = None,
+        *,
+        busy_timeout: float = _BUSY_TIMEOUT_SECONDS,
+        db: DatabaseManager | None = None,
+        record_factory: Callable[[Mapping[str, Any]], Any] | None = None,
+    ) -> None:
+        """Initialize JobStore with a database path or manager.
+
+        Args:
+            db_path: Optional path to SQLite file or ':memory:'.
+            busy_timeout: Lock timeout in seconds.
+            db: Optional preexisting DatabaseManager instance.
+            record_factory: Optional deserialization factory from mapping to
+                domain record.
+        """
+        self._db: DatabaseManager = db or DatabaseManager(
+            db_path, busy_timeout=busy_timeout
+        )
+        self._busy_timeout: float = busy_timeout
+        self._record_factory: Callable[[Mapping[str, Any]], Any] | None = record_factory
+
+    @property
+    def db_path(self) -> Path | str:
+        """Return the resolved database path or ':memory:'."""
+        return ":memory:" if self._db.is_memory else self._db.database_path
+
+    @property
+    def db(self) -> DatabaseManager:
+        """Return the underlying DatabaseManager instance."""
+        return self._db
+
+    def initialize(self) -> None:
+        """Ensure host_jobs schema and indexes exist."""
+        self._db.schema.initialize()
+
+    def upsert_job(self, record: Any) -> None:
+        """Insert or replace a job record.
+
+        Args:
+            record: Job record model instance to persist.
+        """
+        self.initialize()
+        budget_attr = getattr(record, "budget", {})
+        budget_dict = (
+            asdict(budget_attr)
+            if is_dataclass(budget_attr) and not isinstance(budget_attr, type)
+            else (
+                budget_attr.model_dump(mode="json")
+                if hasattr(budget_attr, "model_dump")
+                else getattr(budget_attr, "__dict__", {})
+            )
+        )
+        budget_json = json.dumps(budget_dict)
+        child_ids = getattr(record, "child_job_ids", [])
+        child_json = json.dumps(child_ids)
+
+        with self._db.transaction() as conn:
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO host_jobs (
+                    job_id, owner, kind, status, progress, accepted, rejected,
+                    message, attempt_id, max_retries, retry_count, dedup_key,
+                    parent_job_id, child_job_ids_json, budget_json, submitted_at_utc,
+                    started_at_utc, finished_at_utc, error_message, error_location
+                ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                );
+                """,
+                (
+                    str(record.job_id),
+                    str(record.owner),
+                    str(record.kind),
+                    str(record.status),
+                    float(record.progress),
+                    int(record.accepted),
+                    int(record.rejected),
+                    str(record.message),
+                    int(record.attempt_id),
+                    int(record.max_retries),
+                    int(record.retry_count),
+                    record.dedup_key,
+                    record.parent_job_id,
+                    child_json,
+                    budget_json,
+                    str(record.submitted_at_utc),
+                    record.started_at_utc,
+                    record.finished_at_utc,
+                    record.error_message,
+                    record.error_location,
+                ),
+            )
+
+    def get_job(self, job_id: str) -> Any | None:
+        """Query job record by job_id.
+
+        Args:
+            job_id: Task identifier string.
+
+        Returns:
+            Job record instance if found, None otherwise.
+        """
+        self.initialize()
+        with self._db.connection() as conn:
+            row = conn.execute(
+                "SELECT * FROM host_jobs WHERE job_id = ?;", (job_id,)
+            ).fetchone()
+            if row is None:
+                return None
+            return self._row_to_record(row)
+
+    def list_jobs(
+        self,
+        owner: str | None = None,
+        status: Any | None = None,
+        limit: int = 100,
+    ) -> list[Any]:
+        """List job records matching optional filters."""
+        self.initialize()
+        params: list[Any] = []
+        if owner is not None and status is not None:
+            query = (
+                "SELECT * FROM host_jobs WHERE owner = ? AND status = ? "
+                "ORDER BY submitted_at_utc DESC LIMIT ?;"
+            )
+            params = [owner, str(status), limit]
+        elif owner is not None:
+            query = (
+                "SELECT * FROM host_jobs WHERE owner = ? "
+                "ORDER BY submitted_at_utc DESC LIMIT ?;"
+            )
+            params = [owner, limit]
+        elif status is not None:
+            query = (
+                "SELECT * FROM host_jobs WHERE status = ? "
+                "ORDER BY submitted_at_utc DESC LIMIT ?;"
+            )
+            params = [str(status), limit]
+        else:
+            query = "SELECT * FROM host_jobs ORDER BY submitted_at_utc DESC LIMIT ?;"
+            params = [limit]
+
+        with self._db.connection() as conn:
+            rows = conn.execute(query, params).fetchall()
+            return [self._row_to_record(r) for r in rows]
+
+    def reconcile_on_startup(self) -> int:
+        """Reconcile uncompleted jobs from previous runs to INTERRUPTED state."""
+        self.initialize()
+        now_utc = datetime.now(UTC).isoformat()
+        with self._db.transaction() as conn:
+            cols = {
+                r["name"]
+                for r in conn.execute("PRAGMA table_info(host_jobs)").fetchall()
+            }
+            if "status" not in cols:
+                return 0
+            cursor = conn.execute(
+                """
+                UPDATE host_jobs
+                SET status = 'interrupted',
+                    finished_at_utc = ?,
+                    error_message = ?
+                WHERE status IN ('queued', 'running', 'cancellation_requested');
+                """,
+                (now_utc, "Host restarted while job was in-flight."),
+            )
+            count = cursor.rowcount
+
+        if count > 0:
+            logger.info(
+                "Startup reconciliation: marked %d orphaned jobs as INTERRUPTED",
+                count,
+                extra={
+                    "reconciled_count": count,
+                    "requirement": "FR-HOST-JOBS-RESTART-RECONCILIATION",
+                },
+            )
+        return count
+
+    def _row_to_record(self, row: Mapping[str, Any]) -> Any:
+        """Convert SQLite row to typed JobRecord model."""
+        if self._record_factory is not None:
+            return self._record_factory(row)
+
+        from app.host.jobs import Budget, JobRecord, JobStatus
+
+        row_dict = dict(row)
+        raw_budget = row_dict.get("budget_json", "{}")
+        budget_data = json.loads(raw_budget) if raw_budget else {}
+        if not isinstance(budget_data, dict):
+            budget_data = {}
+
+        raw_children = row_dict.get("child_job_ids_json", "[]")
+        child_ids = json.loads(raw_children) if raw_children else []
+        if not isinstance(child_ids, list):
+            child_ids = []
+        return JobRecord(
+            job_id=str(row_dict["job_id"]),
+            owner=str(row_dict["owner"]),
+            kind=str(row_dict["kind"]),
+            status=JobStatus(row_dict["status"]),
+            progress=float(row_dict["progress"]),
+            accepted=int(row_dict["accepted"]),
+            rejected=int(row_dict["rejected"]),
+            message=str(row_dict["message"]),
+            attempt_id=int(row_dict["attempt_id"]),
+            max_retries=int(row_dict["max_retries"]),
+            retry_count=int(row_dict["retry_count"]),
+            dedup_key=row_dict["dedup_key"],
+            parent_job_id=row_dict["parent_job_id"],
+            child_job_ids=child_ids,
+            budget=Budget(**budget_data),
+            submitted_at_utc=str(row_dict["submitted_at_utc"]),
+            started_at_utc=row_dict["started_at_utc"],
+            finished_at_utc=row_dict["finished_at_utc"],
+            error_message=row_dict["error_message"],
+            error_location=row_dict["error_location"],
+        )
 
 
 # ============================================================================

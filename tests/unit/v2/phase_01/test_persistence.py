@@ -8,11 +8,13 @@ FastAPI REST routes, and CLI diagnostics.
 
 from __future__ import annotations
 
+import ast
 import sqlite3
 import sys
 from collections.abc import Generator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -20,10 +22,12 @@ from app.host.persistence import (
     CorruptDataError,
     DatabaseManager,
     IncompatibleSchemaError,
+    JobStore,
     LeaseExpiredError,
     PersistenceAccess,
     PersistenceError,
     RevisionConflictError,
+    SettingsStore,
     StorageBusyError,
     TypedRepository,
     ValidationError,
@@ -842,3 +846,136 @@ def test_cli_main_exception(
     ):
         code = main()
         assert code == 2
+
+
+# ==============================================================================
+# Architectural Isolation & Store Integration Tests
+# ==============================================================================
+
+
+def test_sqlite3_import_isolation() -> None:
+    """Assert that sqlite3 is imported ONLY within app/host/persistence.py across app/."""
+    app_root = Path(__file__).resolve().parents[4] / "app"
+    assert app_root.is_dir(), f"Expected app directory at {app_root}"
+
+    violating_imports: list[str] = []
+
+    for py_file in app_root.rglob("*.py"):
+        rel_path = py_file.relative_to(app_root.parent).as_posix()
+        # app/host/persistence.py is the sole authorized SQLite module
+        if rel_path == "app/host/persistence.py":
+            continue
+
+        try:
+            tree = ast.parse(py_file.read_text(encoding="utf-8"), filename=str(py_file))
+        except SyntaxError:
+            continue
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name == "sqlite3" or alias.name.startswith("sqlite3."):
+                        violating_imports.append(
+                            f"{rel_path}:{node.lineno} ('import {alias.name}')"
+                        )
+            elif isinstance(node, ast.ImportFrom):
+                if node.module and (
+                    node.module == "sqlite3" or node.module.startswith("sqlite3.")
+                ):
+                    violating_imports.append(
+                        f"{rel_path}:{node.lineno} ('from {node.module} import ...')"
+                    )
+
+    assert not violating_imports, (
+        "Architectural violation: sqlite3 must ONLY be imported within "
+        "app/host/persistence.py. Found unauthorized imports in: "
+        f"{violating_imports}"
+    )
+
+
+def test_persistence_settings_store_crud(temp_db_path: Path) -> None:
+    """Validate SettingsStore operations directly in app.host.persistence."""
+    store = SettingsStore(db_path=temp_db_path)
+    store.initialize()
+
+    # Initial snapshot revision
+    snapshot = store.get_snapshot()
+    assert snapshot.revision == 1
+
+    # Insert setting via update_settings
+    snap_after_write = store.update_settings(
+        "workspace_paths",
+        {"data_dir": "data"},
+        expected_revision=1,
+    )
+    assert snap_after_write.revision == 2
+
+    # Query key via read_settings
+    page = store.read_settings("workspace_paths", key="data_dir")
+    assert len(page.items) == 1
+    assert page.items[0].value == "data"
+
+    # Batch updates via update_settings
+    updated_snap = store.update_settings(
+        "workspace_paths",
+        {"data_dir": "custom_data"},
+        expected_revision=2,
+    )
+    assert updated_snap.revision == 3
+    assert updated_snap.values["workspace_paths"]["data_dir"] == "custom_data"
+
+    # Verify updated values via read_settings
+    page_updated = store.read_settings("workspace_paths", key="data_dir")
+    assert len(page_updated.items) == 1
+    assert page_updated.items[0].value == "custom_data"
+
+
+def test_persistence_job_store_crud(temp_db_path: Path) -> None:
+    """Validate JobStore operations directly in app.host.persistence."""
+    store = JobStore(db_path=temp_db_path)
+    store.initialize()
+
+    from dataclasses import dataclass, field
+
+    @dataclass
+    class MockJobRecord:
+        job_id: str
+        owner: str = "worker-1"
+        kind: str = "compute"
+        status: str = "running"
+        progress: float = 25.0
+        accepted: int = 10
+        rejected: int = 0
+        message: str = "Processing batch 1"
+        attempt_id: int = 1
+        max_retries: int = 3
+        retry_count: int = 0
+        dedup_key: str | None = "dedup-batch-1"
+        parent_job_id: str | None = None
+        child_job_ids: list[str] = field(default_factory=list)
+        budget: dict[str, Any] = field(default_factory=dict)
+        submitted_at_utc: str = "2026-10-07T12:00:00Z"
+        started_at_utc: str | None = "2026-10-07T12:00:01Z"
+        finished_at_utc: str | None = None
+        error_message: str | None = None
+        error_location: str | None = None
+
+    rec = MockJobRecord(job_id="job-test-001")
+    store.upsert_job(rec)
+
+    fetched = store.get_job("job-test-001")
+    assert fetched is not None
+    assert fetched.job_id == "job-test-001"
+    assert fetched.owner == "worker-1"
+
+    listed = store.list_jobs(owner="worker-1")
+    assert len(listed) == 1
+    assert listed[0].job_id == "job-test-001"
+
+    # Startup reconciliation marks running jobs interrupted
+    reconciled = store.reconcile_on_startup()
+    assert reconciled == 1
+
+    post_rec = store.get_job("job-test-001")
+    assert post_rec is not None
+    assert post_rec.status == "interrupted"

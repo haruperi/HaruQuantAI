@@ -277,6 +277,10 @@ def test_response_logging_emissions() -> None:
     # Serialization log
     resp.to_dict()
 
+    from app.host.logging import flush
+
+    flush()
+
     requirements = [e.context.get("requirement") for e in engine.ring_buffer._entries]
 
     assert "FR-HOST-RESPONSE-SUCCESS-ENVELOPE" in requirements

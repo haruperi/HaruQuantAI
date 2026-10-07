@@ -24,10 +24,11 @@ Description:
     success or hanging indefinitely.
 
     Internally, `diagnostics()` queries `psutil`; `create_pool()` constructs worker
-    pools bounded for platform safety; `JobStore` persists job states and budgets to
-    SQLite (`host_jobs` table); `JobContext` coordinates cooperative cancellation and
-    incremental progress reporting; and `JobManager` validates `Budget` constraints,
-    tracks worker/memory reservations, executes asynchronous tasks with timeout
+    pools bounded for platform safety; `JobStore` delegates persistence of job
+    states and budgets to `app.host.persistence.DatabaseManager` (`host_jobs` table);
+    `JobContext` coordinates cooperative cancellation and incremental progress
+    reporting; and `JobManager` validates `Budget` constraints, tracks
+    worker/memory reservations, executes asynchronous tasks with timeout
     supervision, and broadcasts `jobs.changed` updates to the central `EventBus`.
 
 Purpose:
@@ -110,13 +111,11 @@ import multiprocessing
 import os
 import platform
 import secrets
-import sqlite3
 import sys
 import threading
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Mapping
 from concurrent.futures import Executor, Future, ProcessPoolExecutor
-from contextlib import contextmanager
-from dataclasses import asdict, dataclass, is_dataclass
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
@@ -128,6 +127,9 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.host.logging import get_logger
+from app.host.persistence import (
+    JobStore as _PersistenceJobStore,
+)
 from app.host.response import StandardError, StandardResponse
 
 if TYPE_CHECKING:
@@ -539,189 +541,60 @@ class JobContext:
 # ==============================================================================
 
 
-class JobStore:
-    """Authoritative SQLite persistence manager for job records.
-
-    Provides transactional, parameterized CRUD operations against the `host_jobs`
-    table and startup reconciliation for interrupted jobs.
-    """
+class JobStore(_PersistenceJobStore):
+    """Host compute job persistence facade delegating to central DatabaseManager."""
 
     def __init__(
         self,
         db_path: Path | str | None = None,
         *,
         busy_timeout: float = 5.0,
+        db: Any = None,
     ) -> None:
-        """Initialize JobStore with a database path.
+        """Initialize JobStore with a database path or DatabaseManager.
 
         Args:
             db_path: Optional path to SQLite file or ':memory:'. Defaults to
                 'data/database/haruquantai.db'.
             busy_timeout: Lock timeout in seconds.
+            db: Optional preexisting DatabaseManager instance.
         """
-        self._is_memory = str(db_path) == ":memory:"
-        self._db_path = (
-            Path(db_path).resolve()
-            if db_path and not self._is_memory
-            else (None if self._is_memory else DEFAULT_DATABASE_PATH.resolve())
+        super().__init__(
+            db_path=db_path,
+            busy_timeout=busy_timeout,
+            db=db,
+            record_factory=self._row_to_record,
         )
-        self._busy_timeout = busy_timeout
-        self._lock = threading.Lock()
-        self._mem_conn: sqlite3.Connection | None = (
-            sqlite3.connect(":memory:", check_same_thread=False)
-            if self._is_memory
-            else None
+
+    @override
+    def _row_to_record(self, row: Mapping[str, Any]) -> JobRecord:
+        """Convert row mapping to typed JobRecord model."""
+        budget_data = json.loads(row["budget_json"])
+        child_ids = json.loads(row["child_job_ids_json"])
+        return JobRecord(
+            job_id=str(row["job_id"]),
+            owner=str(row["owner"]),
+            kind=str(row["kind"]),
+            status=JobStatus(row["status"]),
+            progress=float(row["progress"]),
+            accepted=int(row["accepted"]),
+            rejected=int(row["rejected"]),
+            message=str(row["message"]),
+            attempt_id=int(row["attempt_id"]),
+            max_retries=int(row["max_retries"]),
+            retry_count=int(row["retry_count"]),
+            dedup_key=row["dedup_key"],
+            parent_job_id=row["parent_job_id"],
+            child_job_ids=child_ids,
+            budget=Budget(**budget_data),
+            submitted_at_utc=str(row["submitted_at_utc"]),
+            started_at_utc=row["started_at_utc"],
+            finished_at_utc=row["finished_at_utc"],
+            error_message=row["error_message"],
+            error_location=row["error_location"],
         )
-        if self._mem_conn:
-            self._mem_conn.row_factory = sqlite3.Row
 
-    @property
-    def db_path(self) -> Path | str:
-        """Return the resolved database path or ':memory:'."""
-        return ":memory:" if self._is_memory else (self._db_path or "")
-
-    @contextmanager
-    def _connect(self) -> Generator[sqlite3.Connection]:
-        """Context manager providing thread-safe SQLite connection."""
-        with self._lock:
-            if self._is_memory and self._mem_conn:
-                yield self._mem_conn
-            else:
-                if self._db_path is None:
-                    raise RuntimeError("Database path cannot be None for persistent db")
-                self._db_path.parent.mkdir(parents=True, exist_ok=True)
-                conn = sqlite3.connect(
-                    self._db_path,
-                    timeout=self._busy_timeout,
-                    autocommit=True,
-                )
-                conn.row_factory = sqlite3.Row
-                try:
-                    conn.execute(
-                        f"PRAGMA busy_timeout = {int(self._busy_timeout * 1000)}"
-                    )
-                    conn.execute("PRAGMA foreign_keys = ON")
-                    yield conn
-                finally:
-                    conn.close()
-
-    def initialize(self) -> None:
-        """Ensure host_jobs schema and indexes exist."""
-        with self._connect() as conn:
-            conn.execute(
-                """
-                CREATE TABLE IF NOT EXISTS host_jobs (
-                    job_id TEXT PRIMARY KEY,
-                    owner TEXT NOT NULL,
-                    kind TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    progress REAL NOT NULL DEFAULT 0.0,
-                    accepted INTEGER NOT NULL DEFAULT 0,
-                    rejected INTEGER NOT NULL DEFAULT 0,
-                    message TEXT NOT NULL DEFAULT '',
-                    attempt_id INTEGER NOT NULL DEFAULT 1,
-                    max_retries INTEGER NOT NULL DEFAULT 0,
-                    retry_count INTEGER NOT NULL DEFAULT 0,
-                    dedup_key TEXT,
-                    parent_job_id TEXT,
-                    child_job_ids_json TEXT NOT NULL DEFAULT '[]',
-                    budget_json TEXT NOT NULL,
-                    submitted_at_utc TEXT NOT NULL,
-                    started_at_utc TEXT,
-                    finished_at_utc TEXT,
-                    error_message TEXT,
-                    error_location TEXT
-                );
-                """
-            )
-            # Ensure backward-compatibility if legacy table exists
-            table_info = conn.execute("PRAGMA table_info(host_jobs);").fetchall()
-            cols = {r["name"] for r in table_info}
-            required_cols = {
-                "owner": "TEXT NOT NULL DEFAULT 'default'",
-                "kind": "TEXT NOT NULL DEFAULT 'compute'",
-                "progress": "REAL NOT NULL DEFAULT 0.0",
-                "accepted": "INTEGER NOT NULL DEFAULT 0",
-                "rejected": "INTEGER NOT NULL DEFAULT 0",
-                "message": "TEXT NOT NULL DEFAULT ''",
-                "attempt_id": "INTEGER NOT NULL DEFAULT 1",
-                "max_retries": "INTEGER NOT NULL DEFAULT 0",
-                "retry_count": "INTEGER NOT NULL DEFAULT 0",
-                "dedup_key": "TEXT",
-                "parent_job_id": "TEXT",
-                "child_job_ids_json": "TEXT NOT NULL DEFAULT '[]'",
-                "budget_json": "TEXT NOT NULL DEFAULT '{}'",
-                "submitted_at_utc": "TEXT NOT NULL DEFAULT ''",
-                "error_message": "TEXT",
-                "error_location": "TEXT",
-            }
-            for col_name, col_def in required_cols.items():
-                if col_name not in cols:
-                    conn.execute(
-                        f"ALTER TABLE host_jobs ADD COLUMN {col_name} {col_def};"
-                    )
-
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_host_jobs_owner ON host_jobs(owner);"
-            )
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_host_jobs_status ON host_jobs(status);"
-            )
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_host_jobs_dedup "
-                "ON host_jobs(dedup_key);"
-            )
-
-    def upsert_job(self, record: JobRecord) -> None:
-        """Insert or replace a job record.
-
-        Args:
-            record: JobRecord model instance to persist.
-        """
-        self.initialize()
-        budget_dict = (
-            asdict(record.budget)
-            if is_dataclass(record.budget)
-            else record.budget.__dict__
-        )
-        budget_json = json.dumps(budget_dict)
-        child_json = json.dumps(record.child_job_ids)
-        with self._connect() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO host_jobs (
-                    job_id, owner, kind, status, progress, accepted, rejected,
-                    message, attempt_id, max_retries, retry_count, dedup_key,
-                    parent_job_id, child_job_ids_json, budget_json, submitted_at_utc,
-                    started_at_utc, finished_at_utc, error_message, error_location
-                ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-                );
-                """,
-                (
-                    record.job_id,
-                    record.owner,
-                    record.kind,
-                    str(record.status),
-                    record.progress,
-                    record.accepted,
-                    record.rejected,
-                    record.message,
-                    record.attempt_id,
-                    record.max_retries,
-                    record.retry_count,
-                    record.dedup_key,
-                    record.parent_job_id,
-                    child_json,
-                    budget_json,
-                    record.submitted_at_utc,
-                    record.started_at_utc,
-                    record.finished_at_utc,
-                    record.error_message,
-                    record.error_location,
-                ),
-            )
-
+    @override
     def get_job(self, job_id: str) -> JobRecord | None:
         """Query job record by job_id.
 
@@ -731,117 +604,30 @@ class JobStore:
         Returns:
             JobRecord instance if found, None otherwise.
         """
-        self.initialize()
-        with self._connect() as conn:
-            row = conn.execute(
-                "SELECT * FROM host_jobs WHERE job_id = ?;", (job_id,)
-            ).fetchone()
-            if row is None:
-                return None
-            return self._row_to_record(row)
+        record = super().get_job(job_id)
+        if isinstance(record, JobRecord):
+            return record
+        return None
 
+    @override
     def list_jobs(
         self,
         owner: str | None = None,
-        status: JobStatus | None = None,
+        status: Any | None = None,
         limit: int = 100,
     ) -> list[JobRecord]:
         """List job records matching optional filters.
 
         Args:
             owner: Filter by owner identifier.
-            status: Filter by job lifecycle status.
-            limit: Maximum records to return.
+            status: Filter by status value.
+            limit: Maximum count.
 
         Returns:
             List of matching JobRecord instances.
         """
-        self.initialize()
-        params: list[Any] = []
-        if owner is not None and status is not None:
-            query = (
-                "SELECT * FROM host_jobs WHERE owner = ? AND status = ? "
-                "ORDER BY submitted_at_utc DESC LIMIT ?;"
-            )
-            params = [owner, str(status), limit]
-        elif owner is not None:
-            query = (
-                "SELECT * FROM host_jobs WHERE owner = ? "
-                "ORDER BY submitted_at_utc DESC LIMIT ?;"
-            )
-            params = [owner, limit]
-        elif status is not None:
-            query = (
-                "SELECT * FROM host_jobs WHERE status = ? "
-                "ORDER BY submitted_at_utc DESC LIMIT ?;"
-            )
-            params = [str(status), limit]
-        else:
-            query = "SELECT * FROM host_jobs ORDER BY submitted_at_utc DESC LIMIT ?;"
-            params = [limit]
-
-        with self._connect() as conn:
-            rows = conn.execute(query, params).fetchall()
-            return [self._row_to_record(r) for r in rows]
-
-    def reconcile_on_startup(self) -> int:
-        """Reconcile uncompleted jobs from previous runs to INTERRUPTED state.
-
-        Returns:
-            Count of reconciled jobs.
-        """
-        self.initialize()
-        now_utc = datetime.now(UTC).isoformat()
-        with self._connect() as conn:
-            cursor = conn.execute(
-                """
-                UPDATE host_jobs
-                SET status = 'interrupted',
-                    finished_at_utc = ?,
-                    error_message = ?
-                WHERE status IN ('queued', 'running', 'cancellation_requested');
-                """,
-                (now_utc, "Host restarted while job was in-flight."),
-            )
-            count = cursor.rowcount
-
-        if count > 0:
-            logger.info(
-                "Startup reconciliation: marked %d orphaned jobs as INTERRUPTED",
-                count,
-                extra={
-                    "reconciled_count": count,
-                    "requirement": "FR-HOST-JOBS-RESTART-RECONCILIATION",
-                },
-            )
-        return count
-
-    def _row_to_record(self, row: sqlite3.Row) -> JobRecord:
-        """Convert SQLite row to typed JobRecord model."""
-        budget_data = json.loads(row["budget_json"])
-        child_ids = json.loads(row["child_job_ids_json"])
-        return JobRecord(
-            job_id=row["job_id"],
-            owner=row["owner"],
-            kind=row["kind"],
-            status=JobStatus(row["status"]),
-            progress=float(row["progress"]),
-            accepted=int(row["accepted"]),
-            rejected=int(row["rejected"]),
-            message=row["message"],
-            attempt_id=int(row["attempt_id"]),
-            max_retries=int(row["max_retries"]),
-            retry_count=int(row["retry_count"]),
-            dedup_key=row["dedup_key"],
-            parent_job_id=row["parent_job_id"],
-            child_job_ids=child_ids,
-            budget=Budget(**budget_data),
-            submitted_at_utc=row["submitted_at_utc"],
-            started_at_utc=row["started_at_utc"],
-            finished_at_utc=row["finished_at_utc"],
-            error_message=row["error_message"],
-            error_location=row["error_location"],
-        )
+        records = super().list_jobs(owner=owner, status=status, limit=limit)
+        return [r for r in records if isinstance(r, JobRecord)]
 
 
 # ==============================================================================
@@ -905,6 +691,7 @@ class JobManager:
         self._timers: dict[str, threading.Timer] = {}
         self._owner_jobs: dict[str, set[str]] = {}
         self._active_dedup_keys: dict[str, str] = {}
+        self._reclaimed_future_ids: set[str] = set()
         self._closed: bool = False
 
         if auto_reconcile:
@@ -977,6 +764,71 @@ class JobManager:
                 is_closed=self._closed,
             )
 
+    def _check_dedup(self, job_id: str, dedup_key: str | None) -> None:
+        """Verify and record active task deduplication key."""
+        if dedup_key is None:
+            return
+        if dedup_key in self._active_dedup_keys:
+            active_id = self._active_dedup_keys[dedup_key]
+            logger.warning(
+                "Rejected duplicate job submission for key '%s'; active job: %s",
+                dedup_key,
+                active_id,
+                extra={
+                    "dedup_key": dedup_key,
+                    "active_job_id": active_id,
+                    "requirement": "FR-HOST-JOBS-DEDUPLICATION",
+                },
+            )
+            raise DuplicateJobError(
+                f"Job with dedup_key '{dedup_key}' is active: {active_id}"
+            )
+        self._active_dedup_keys[dedup_key] = job_id
+        logger.info(
+            "Registered dedup_key '%s' for job %s",
+            dedup_key,
+            job_id,
+            extra={
+                "dedup_key": dedup_key,
+                "job_id": job_id,
+                "requirement": "FR-HOST-JOBS-DEDUPLICATION",
+            },
+        )
+
+    def _reclaim_finished_reservations(self) -> None:
+        """Reclaim worker and memory reservations for completed futures."""
+        for finished_jid, fut in list(self._futures.items()):
+            if fut.done() and finished_jid not in self._reclaimed_future_ids:
+                self._reclaimed_future_ids.add(finished_jid)
+                fin_rec = self._jobs.get(finished_jid)
+                if fin_rec is not None:
+                    self._reserved_workers = max(
+                        0, self._reserved_workers - fin_rec.budget.workers
+                    )
+                    self._reserved_memory_bytes = max(
+                        0,
+                        self._reserved_memory_bytes - fin_rec.budget.memory_bytes,
+                    )
+                    if fin_rec.dedup_key is not None:
+                        self._active_dedup_keys.pop(fin_rec.dedup_key, None)
+
+    def _check_capacity(self, task_budget: Budget, dedup_key: str | None) -> None:
+        """Ensure current reservations plus requested budget do not exceed capacity."""
+        if (
+            self._reserved_workers + task_budget.workers > self._max_workers
+            or self._reserved_memory_bytes + task_budget.memory_bytes
+            > self._max_memory_bytes
+        ):
+            if dedup_key is not None:
+                self._active_dedup_keys.pop(dedup_key, None)
+            raise CapacityExceededError(
+                f"Insufficient capacity: requested {task_budget.workers} workers "
+                f"and {task_budget.memory_bytes} bytes, but only "
+                f"{self._max_workers - self._reserved_workers} workers and "
+                f"{self._max_memory_bytes - self._reserved_memory_bytes} bytes "
+                f"available"
+            )
+
     def submit(
         self,
         owner: str,
@@ -1023,51 +875,9 @@ class JobManager:
                     "JobManager is closed; task submission rejected"
                 )
 
-            # Deduplication check
-            if dedup_key is not None:
-                if dedup_key in self._active_dedup_keys:
-                    active_id = self._active_dedup_keys[dedup_key]
-                    logger.warning(
-                        "Rejected duplicate job submission for key '%s'; "
-                        "active job: %s",
-                        dedup_key,
-                        active_id,
-                        extra={
-                            "dedup_key": dedup_key,
-                            "active_job_id": active_id,
-                            "requirement": "FR-HOST-JOBS-DEDUPLICATION",
-                        },
-                    )
-                    raise DuplicateJobError(
-                        f"Job with dedup_key '{dedup_key}' is active: {active_id}"
-                    )
-                self._active_dedup_keys[dedup_key] = job_id
-                logger.info(
-                    "Registered dedup_key '%s' for job %s",
-                    dedup_key,
-                    job_id,
-                    extra={
-                        "dedup_key": dedup_key,
-                        "job_id": job_id,
-                        "requirement": "FR-HOST-JOBS-DEDUPLICATION",
-                    },
-                )
-
-            # Capacity check
-            if (
-                self._reserved_workers + task_budget.workers > self._max_workers
-                or self._reserved_memory_bytes + task_budget.memory_bytes
-                > self._max_memory_bytes
-            ):
-                if dedup_key is not None:
-                    self._active_dedup_keys.pop(dedup_key, None)
-                raise CapacityExceededError(
-                    f"Insufficient capacity: requested {task_budget.workers} workers "
-                    f"and {task_budget.memory_bytes} bytes, but only "
-                    f"{self._max_workers - self._reserved_workers} workers and "
-                    f"{self._max_memory_bytes - self._reserved_memory_bytes} bytes "
-                    f"available"
-                )
+            self._check_dedup(job_id, dedup_key)
+            self._reclaim_finished_reservations()
+            self._check_capacity(task_budget, dedup_key)
 
             self._reserved_workers += task_budget.workers
             self._reserved_memory_bytes += task_budget.memory_bytes
@@ -1260,35 +1070,6 @@ class JobManager:
         error_msg: str | None = None
         new_status: JobStatus
 
-        with self._lock:
-            timer = self._timers.pop(job_id, None)
-            if timer is not None:
-                timer.cancel()
-
-            self._futures.pop(job_id, None)
-            self._contexts.pop(job_id, None)
-            record = self._jobs.get(job_id)
-
-            if record is not None:
-                self._reserved_workers = max(
-                    0, self._reserved_workers - record.budget.workers
-                )
-                self._reserved_memory_bytes = max(
-                    0, self._reserved_memory_bytes - record.budget.memory_bytes
-                )
-                if record.dedup_key is not None:
-                    self._active_dedup_keys.pop(record.dedup_key, None)
-                    logger.info(
-                        "Released dedup_key '%s' for completed job %s",
-                        record.dedup_key,
-                        job_id,
-                        extra={
-                            "dedup_key": record.dedup_key,
-                            "job_id": job_id,
-                            "requirement": "FR-HOST-JOBS-DEDUPLICATION",
-                        },
-                    )
-
         if future.cancelled():
             new_status = JobStatus.CANCELLED
             logger.info(
@@ -1347,7 +1128,36 @@ class JobManager:
             )
 
         with self._lock:
+            timer = self._timers.pop(job_id, None)
+            if timer is not None:
+                timer.cancel()
+
+            self._futures.pop(job_id, None)
+            self._contexts.pop(job_id, None)
+            record = self._jobs.get(job_id)
+
             if record is not None:
+                if job_id not in self._reclaimed_future_ids:
+                    self._reclaimed_future_ids.add(job_id)
+                    self._reserved_workers = max(
+                        0, self._reserved_workers - record.budget.workers
+                    )
+                    self._reserved_memory_bytes = max(
+                        0, self._reserved_memory_bytes - record.budget.memory_bytes
+                    )
+                    if record.dedup_key is not None:
+                        self._active_dedup_keys.pop(record.dedup_key, None)
+                        logger.info(
+                            "Released dedup_key '%s' for completed job %s",
+                            record.dedup_key,
+                            job_id,
+                            extra={
+                                "dedup_key": record.dedup_key,
+                                "job_id": job_id,
+                                "requirement": "FR-HOST-JOBS-DEDUPLICATION",
+                            },
+                        )
+
                 updated = record.model_copy(
                     update={
                         "status": new_status,
@@ -1475,6 +1285,7 @@ class JobManager:
             self._reserved_workers = 0
             self._reserved_memory_bytes = 0
             self._active_dedup_keys.clear()
+            self._reclaimed_future_ids.clear()
 
         logger.info(
             "JobManager closed; pool shut down within %.2f second limit",
@@ -1516,7 +1327,21 @@ class JobManager:
         """
         with self._lock:
             if job_id in self._jobs:
-                return self._jobs[job_id]
+                record = self._jobs[job_id]
+                fut = self._futures.get(job_id)
+                if (
+                    fut is not None
+                    and fut.done()
+                    and record.status == JobStatus.CANCELLATION_REQUESTED
+                ) and (
+                    fut.cancelled()
+                    or (
+                        fut.exception() is not None
+                        and isinstance(fut.exception(), JobCancelledError)
+                    )
+                ):
+                    return record.model_copy(update={"status": JobStatus.CANCELLED})
+                return record
 
         stored = self._store.get_job(job_id)
         if stored is not None:

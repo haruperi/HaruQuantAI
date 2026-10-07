@@ -16,6 +16,10 @@ Description:
     live broker order placement, database wipes, or arbitrary subprocess execution)
     are denied by default and require time-bounded distinct authority grants.
 
+    In accordance with platform persistence isolation principles, session data is
+    strictly ephemeral and held in-memory; any durable host state must route
+    exclusively through `app.host.persistence.DatabaseManager`.
+
 Purpose:
     FEAT-HOST-SESSION: Host-Owned Sessions, Security Boundaries, and Distribution.
     Enforces loopback isolation, ephemeral session tokens, scoped capability

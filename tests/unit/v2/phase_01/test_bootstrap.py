@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import sqlite3
+from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
@@ -19,6 +21,8 @@ from app.host.bootstrap import (
     ReadinessState,
     create_host_app,
 )
+from app.host.settings import HostSettings as AppSettings
+from app.host.settings import SettingsStore
 from fastapi.testclient import TestClient
 
 
@@ -195,14 +199,31 @@ def test_readiness_snapshot_behavior(caplog: pytest.LogCaptureFixture) -> None:
 
 def test_fastapi_shell_endpoints_and_lifespan(
     caplog: pytest.LogCaptureFixture,
+    tmp_path: Path,
 ) -> None:
     """Verify FastAPI composition and shell endpoints via TestClient."""
     caplog.set_level(logging.INFO)
+    db_file = tmp_path / "test_bootstrap_settings.db"
+    store = SettingsStore(db_file)
+    store.initialize()
+    conn = sqlite3.connect(db_file)
+    conn.execute(
+        """
+        INSERT INTO host_settings (scope, key, value_json, schema_version, updated_at_utc)
+        VALUES
+            ('app.general', 'theme', '"dark"', 1, '2026-10-07T00:00:00Z'),
+            ('app.general', 'zoom', '1.0', 1, '2026-10-07T00:00:00Z')
+        """
+    )
+    conn.commit()
+    conn.close()
+    app_config = AppSettings(db_file, auto_load=True)
+
     settings = HostSettings(
         title="Test Shell", version="2.1.0", reference_cohort="SQX145 Dev 1"
     )
     runtime = HostRuntime(settings)
-    app = create_host_app(settings, runtime=runtime)
+    app = create_host_app(settings, runtime=runtime, configuration=app_config)
 
     comp_logs = [
         r.message for r in caplog.records if "FR-HOST-BOOT-APP-COMPOSITION" in r.message
@@ -361,3 +382,63 @@ def test_bootstrap_state_property() -> None:
     """Verify state property returns current state."""
     runtime = HostRuntime()
     assert runtime.state == ReadinessState.NOT_STARTED
+
+
+def test_cors_and_transport_middleware() -> None:
+    """Verify CORS headers and TransportMiddleware timing/request headers."""
+    settings = HostSettings()
+    runtime = HostRuntime(settings)
+    app = create_host_app(settings, runtime=runtime)
+
+    with TestClient(app) as client:
+        resp = client.get(
+            "/api/v1/status",
+            headers={"Origin": "http://127.0.0.1:3000"},
+        )
+        assert resp.status_code == 200
+        assert (
+            resp.headers.get("access-control-allow-origin") == "http://127.0.0.1:3000"
+        )
+        assert "x-request-id" in resp.headers
+        assert "x-response-time-ms" in resp.headers
+
+
+def test_mounted_capability_routers(tmp_path: Path) -> None:
+    """Verify diagnostics, debugconsole, persistence, and jobs routers are mounted."""
+    db_file = tmp_path / "test_mounted_routers.db"
+    store = SettingsStore(db_file)
+    store.initialize()
+    app_config = AppSettings(db_file, auto_load=True)
+
+    settings = HostSettings()
+    runtime = HostRuntime(settings)
+    app = create_host_app(settings, runtime=runtime, configuration=app_config)
+
+    with TestClient(app) as client:
+        diag_resp = client.get("/api/v1/diagnostics/system")
+        assert diag_resp.status_code == 200
+
+        dbg_resp = client.get("/api/v1/debugconsole/categories")
+        assert dbg_resp.status_code == 200
+
+        pers_resp = client.get("/api/v1/persistence/status")
+        assert pers_resp.status_code == 200
+
+        jobs_resp = client.get("/api/v1/jobs/capacity")
+        assert jobs_resp.status_code == 200
+
+
+def test_bootstrap_cli_main() -> None:
+    """Verify bootstrap.main parses CLI flags and invokes uvicorn with settings."""
+    from app.host.bootstrap import main as bootstrap_main
+
+    with (
+        patch("uvicorn.run") as mock_uvicorn,
+        patch("app.host.bootstrap.shutdown") as mock_shutdown,
+    ):
+        bootstrap_main(["--host", "127.0.0.1", "--port", "7777", "--debug"])
+        assert mock_uvicorn.called
+        call_args, call_kwargs = mock_uvicorn.call_args
+        assert call_kwargs["host"] == "127.0.0.1"
+        assert call_kwargs["port"] == 7777
+        assert mock_shutdown.called

@@ -80,77 +80,31 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.host.logging import configure_host_logging, get_logger
+from app.host.diagnostics import create_diagnostics_router
+from app.host.discovery import create_discovery_router
+from app.host.jobs import JobManager, create_jobs_router
+from app.host.logging import (
+    configure_host_logging,
+    create_debug_console_router,
+    get_logger,
+    shutdown,
+)
+from app.host.persistence import DatabaseManager, create_persistence_router
+from app.host.resources import ResourceManager, create_resources_router
+from app.host.session import create_sessions_router
+from app.host.settings import create_settings_router
+from app.host.settings import settings as default_host_settings
+from app.host.transport import (
+    TransportMiddleware,
+    create_transport_router,
+    register_transport_exception_handlers,
+)
 
 logger = get_logger(__name__)
-
-DEFAULT_SHELL_PREFERENCES: dict[str, Any] = {
-    "revision": 1,
-    "values": {
-        "app.general": {
-            "theme": "dark",
-            "language": "en",
-            "zoom": 1.0,
-        },
-        "config.global": {
-            "theme": "dark",
-            "language": "en",
-            "sounds_off": False,
-            "advanced_file_chooser": False,
-            "show_control_orders": False,
-            "header_custom_text": "",
-            "footer_custom_text": "",
-            "default_result_to_display": "Portfolio",
-        },
-        "config.cpu": {
-            "core_usage": "all_except_one",
-            "custom_cores": 1,
-            "high_priority": False,
-            "thread_affinity": False,
-        },
-        "config.performance": {
-            "compute_pips_metrics": False,
-            "compute_pcts_metrics": False,
-            "compute_separate_metrics": True,
-        },
-        "config.memory": {
-            "gc_type": "ParallelGC",
-            "automatic_memory": False,
-            "memory_limit_gb": 4,
-            "dont_store_pending_orders": True,
-            "memory_cleanup": False,
-            "cleanup_interval_mins": 15,
-        },
-        "config.databanks": {
-            "databank_sync_interval_mins": 15,
-            "sync_databanks_after_task_done": True,
-            "store_chart_data": False,
-        },
-        "config.optimizations": {
-            "dont_store_op_3d_charts_data": True,
-        },
-        "config.troubleshooting": {
-            "gpu_accelerated": True,
-            "memory_protection": True,
-            "debug_level_active": False,
-        },
-        "connect.remote": {
-            "allow": False,
-            "require_password": False,
-        },
-        "notify.email": {
-            "smtp_server": "",
-            "smtp_port": 587,
-            "use_ssl": False,
-            "use_tls": True,
-            "username": "",
-            "from_address": "",
-        },
-    },
-}
 
 
 class LifespanStage(StrEnum):
@@ -248,6 +202,9 @@ class HostRuntime:
         self._stop_time: float | None = None
         self._lock: asyncio.Lock = asyncio.Lock()
         self._app_loaded_acknowledged: bool = False
+        self.db_manager: DatabaseManager | None = None
+        self.job_manager: JobManager | None = None
+        self.resource_manager: ResourceManager | None = None
 
     @property
     def state(self) -> ReadinessState:
@@ -457,6 +414,26 @@ class HostRuntime:
 
             await self._rollback_stages()
 
+            if self.job_manager is not None:
+                try:
+                    self.job_manager.close(timeout=5.0)
+                except Exception:
+                    logger.exception(
+                        "FR-HOST-BOOT-REVERSE-SHUTDOWN: Error closing job manager.",
+                        extra={"fr_id": "FR-HOST-BOOT-REVERSE-SHUTDOWN"},
+                    )
+                self.job_manager = None
+
+            if self.db_manager is not None:
+                try:
+                    self.db_manager.close()
+                except Exception:
+                    logger.exception(
+                        "FR-HOST-BOOT-REVERSE-SHUTDOWN: Error closing db manager.",
+                        extra={"fr_id": "FR-HOST-BOOT-REVERSE-SHUTDOWN"},
+                    )
+                self.db_manager = None
+
             self._state = ReadinessState.STOPPED
             self._active_stage = LifespanStage.STOPPED
             self._stop_time = time.monotonic()
@@ -477,9 +454,7 @@ class HostRuntime:
         )
 
 
-def _create_shell_router(
-    settings: HostSettings, preferences: dict[str, Any]
-) -> APIRouter:
+def _create_shell_router(settings: HostSettings) -> APIRouter:
     """Create shell endpoints under the configured API prefix."""
     router = APIRouter(prefix=settings.api_prefix)
 
@@ -577,38 +552,6 @@ def _create_shell_router(
             },
         )
 
-    @router.get("/settings")
-    async def get_settings() -> JSONResponse:
-        """Retrieve current shell settings and preferences snapshot."""
-        logger.debug(
-            "FR-HOST-BOOT-SHELL-PROJECTION: Delivering /settings.",
-            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"status": "success", "data": preferences},
-        )
-
-    @router.put("/settings")
-    async def put_settings(request: Request) -> JSONResponse:
-        """Update shell preferences in memory."""
-        body = await request.json()
-        changes = body.get("changes", {})
-        values = preferences["values"]
-        for section, section_changes in changes.items():
-            if section in values and isinstance(section_changes, dict):
-                values[section].update(section_changes)
-        preferences["revision"] += 1
-        logger.info(
-            "FR-HOST-BOOT-SHELL-PROJECTION: Updated settings revision to %d.",
-            preferences["revision"],
-            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"status": "success", "data": preferences},
-        )
-
     @router.post("/auth/login")
     async def post_login() -> JSONResponse:
         """Issue initial loopback session token for browser shell handshake."""
@@ -630,9 +573,80 @@ def _create_shell_router(
     return router
 
 
+def _mount_host_routers(
+    app: FastAPI,
+    resolved_settings: HostSettings,
+    resolved_runtime: HostRuntime,
+    resolved_config: Any,
+) -> None:
+    """Mount all host capability routers and initialize service custody."""
+    # 1. Shell Router (/api/v1/status, /api/v1/readiness, /api/v1/about, etc.)
+    shell_router = _create_shell_router(resolved_settings)
+    app.include_router(shell_router)
+
+    # 2. Settings Router (/api/v1/settings, /api/v1/settings/paths/validate)
+    settings_router = create_settings_router(resolved_config)
+    app.include_router(settings_router, prefix=resolved_settings.api_prefix)
+
+    # 3. Transport Router (/events, /auth/status, /events/publish, /events/snapshot)
+    transport_router = create_transport_router()
+    app.include_router(transport_router)
+    app.include_router(transport_router, prefix=resolved_settings.api_prefix)
+
+    # 4. Debug Console Router (/debugconsole/..., /api/v1/debugconsole/...)
+    debug_console_router = create_debug_console_router()
+    app.include_router(debug_console_router)
+
+    # 5. Diagnostics Router (/api/v1/diagnostics/...)
+    diagnostics_router = create_diagnostics_router()
+    app.include_router(diagnostics_router)
+
+    # 6. Discovery Router (/api/v1/discovery/...)
+    discovery_router = create_discovery_router()
+    app.include_router(discovery_router, prefix=resolved_settings.api_prefix)
+
+    # 7. Sessions Router (/api/v1/sessions/...)
+    sessions_router = create_sessions_router()
+    app.include_router(sessions_router, prefix=resolved_settings.api_prefix)
+
+    # 8. Persistence Router (/api/v1/persistence/...)
+    db_path = getattr(resolved_config, "db_path", Path("data/database/haruquantai.db"))
+    if resolved_runtime.db_manager is None:
+        resolved_runtime.db_manager = DatabaseManager(Path(db_path))
+    persistence_router = create_persistence_router(resolved_runtime.db_manager)
+    app.include_router(persistence_router, prefix=resolved_settings.api_prefix)
+
+    # 9. Jobs Router (/api/v1/jobs/...)
+    if resolved_runtime.job_manager is None:
+        max_workers = 4
+        if hasattr(resolved_config, "config_cpu"):
+            max_workers = int(resolved_config.config_cpu.get("custom_cores", 4))
+        resolved_runtime.job_manager = JobManager(
+            max_workers=max_workers,
+            db_path=Path(db_path),
+            auto_reconcile=False,
+        )
+    jobs_router = create_jobs_router(resolved_runtime.job_manager)
+    app.include_router(jobs_router, prefix=resolved_settings.api_prefix)
+
+    # 10. Resources Router (/api/v1/resources/...)
+    if resolved_runtime.resource_manager is None:
+        res_dir = Path("data/resources")
+        if hasattr(resolved_config, "workspace_paths"):
+            res_dir = (
+                Path(resolved_config.workspace_paths.get("data_dir", "data"))
+                / "resources"
+            )
+        resolved_runtime.resource_manager = ResourceManager(root_dir=res_dir)
+    resources_router = create_resources_router(resolved_runtime.resource_manager)
+    app.include_router(resources_router, prefix=resolved_settings.api_prefix)
+
+
 def create_host_app(
     settings: HostSettings | None = None,
     runtime: HostRuntime | None = None,
+    *,
+    configuration: Any | None = None,
 ) -> FastAPI:
     """Create and compose the FastAPI application without import-time work.
 
@@ -640,6 +654,7 @@ def create_host_app(
     """
     resolved_settings = settings or HostSettings()
     resolved_runtime = runtime or HostRuntime(resolved_settings)
+    resolved_config = configuration or default_host_settings
 
     logger.info(
         "FR-HOST-BOOT-APP-COMPOSITION: Composing host FastAPI application.",
@@ -673,13 +688,22 @@ def create_host_app(
     app.state.runtime = resolved_runtime
     app.state.settings = resolved_settings
 
-    preferences_store = {
-        "revision": DEFAULT_SHELL_PREFERENCES["revision"],
-        "values": {k: dict(v) for k, v in DEFAULT_SHELL_PREFERENCES["values"].items()},
-    }
+    # Middleware: CORS for browser shell & Vite UI (port 3000)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://127.0.0.1:3000",
+            "http://localhost:3000",
+            f"http://{resolved_settings.host}:{resolved_settings.port}",
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    app.add_middleware(TransportMiddleware)
+    register_transport_exception_handlers(app)
 
-    shell_router = _create_shell_router(resolved_settings, preferences_store)
-    app.include_router(shell_router)
+    _mount_host_routers(app, resolved_settings, resolved_runtime, resolved_config)
 
     logger.info(
         "FR-HOST-BOOT-APP-COMPOSITION: Host FastAPI application composed "
@@ -690,25 +714,40 @@ def create_host_app(
     return app
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     """CLI entrypoint for host bootstrap."""
     parser = argparse.ArgumentParser(description="HaruQuantAI Platform Host Bootstrap")
-    parser.add_argument("--host", default="127.0.0.1", help="Bind IP address")
-    parser.add_argument("--port", type=int, default=8000, help="Bind port number")
-    parser.add_argument("--debug", action="store_true", help="Enable debug diagnostics")
-    args = parser.parse_args()
+    parser.add_argument("--host", default=None, help="Bind IP address")
+    parser.add_argument("--port", type=int, default=None, help="Bind port number")
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        default=None,
+        help="Enable debug diagnostics",
+    )
+    args = parser.parse_args(argv)
 
-    configure_host_logging(level="DEBUG" if args.debug else "INFO")
+    db_host = str(default_host_settings.app_general.get("host", "127.0.0.1"))
+    db_port = int(default_host_settings.app_general.get("backend_port", 8000))
+    db_debug = bool(
+        default_host_settings.config_troubleshooting.get("debug_level_active", False)
+    )
+
+    host: str = args.host if args.host is not None else db_host
+    port: int = args.port if args.port is not None else db_port
+    debug: bool = args.debug if args.debug is not None else db_debug
+
+    configure_host_logging(level="DEBUG" if debug else "INFO")
     logger.info(
         "FR-HOST-BOOT-LIFECYCLE-STAGES: Initializing host from CLI: "
         "host=%s port=%d debug=%s",
-        args.host,
-        args.port,
-        args.debug,
+        host,
+        port,
+        debug,
         extra={"fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES"},
     )
 
-    settings = HostSettings(host=args.host, port=args.port, debug=args.debug)
+    settings = HostSettings(host=host, port=port, debug=debug)
     runtime = HostRuntime(settings)
     app = create_host_app(settings, runtime=runtime)
 
@@ -721,6 +760,8 @@ def main() -> None:
             "uvicorn is required to run the host CLI. "
             "Please ensure dependencies are installed."
         )
+    finally:
+        shutdown(timeout=5.0)
 
 
 if __name__ == "__main__":
