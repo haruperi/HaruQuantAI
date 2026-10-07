@@ -16,6 +16,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-EVIDENCE` | Host-governed reference manifests, fixtures and qualification in tests/reference | Implemented tooling; P00 reference readiness/disposition complete with recorded static passes; application/runtime qualification belongs to owning features |
 | `FEAT-HOST-BOOT` | Universal host bootstrap, lifespan stages, reverse-order shutdown, readiness assessment, and browser shell HTTP composition in `app/host/bootstrap.py` | Implemented and verified; Phase 1 task 1.1 qualified |
 | `FEAT-HOST-LOGGING` | Centralized application telemetry, multi-sink routing, credential/path redaction, in-memory ring buffer, and DebugConsole projection in `app/host/logging.py` | Implemented and verified; Phase 1 task 1.2 qualified |
+| `FEAT-HOST-DIAG` | System capacity, process health, hardware capability inspection, and computational benchmarking in `app/host/diagnostics.py` | Implemented and verified; Phase 1 task 1.3 qualified |
 
 ## Registered functional requirements
 
@@ -47,6 +48,12 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-LOG-ASYNC-QUEUE` | Non-blocking bounded queue worker with backpressure drop tracking. | Discards events non-blockingly on saturation and tracks drop metrics. |
 | `FR-HOST-LOG-LIBRARY-BRIDGE` | Forward and sanitize third-party standard-library loggers through telemetry engine. | Intercepts foreign logging records and routes through telemetry engine. |
 | `FR-HOST-LOG-LIFECYCLE-SYNC` | Clean shutdown, queue draining, atexit cleanup, and test isolation resets. | Synchronizes queued events, releases file handles, and resets singleton state. |
+| `FR-HOST-DIAG-SYSTEM-PROBE` | Probe CPU, memory, disk, and process metrics with bounded execution and explicit zero-vs-unavailable discrimination. | DEBUG on successful probes; WARNING with error details when degraded or unavailable. |
+| `FR-HOST-DIAG-WORKER-ALLOCATION` | Derive worker concurrency limits from hardware capacity and validated configuration profiles. | INFO with core allocation, active mode, and bounds. |
+| `FR-HOST-DIAG-THREAD-AFFINITY` | Inspect and apply process CPU core affinity where supported by OS and privilege boundaries. | INFO on affinity application; WARNING when unsupported. |
+| `FR-HOST-DIAG-GPU-QUALIFICATION` | Inspect GPU acceleration availability safely without crashing or blocking host startup. | DEBUG detailing GPU device detection status. |
+| `FR-HOST-DIAG-BENCHMARK-EXECUTION` | Execute bounded real computational benchmarks with wall-clock throughput measurement and cooperative cancellation. | INFO on benchmark start, completion, and cancellation; never synthesizes fake scores. |
+| `FR-HOST-DIAG-PROJECTION` | Expose FastAPI REST endpoints for real-time system diagnostics and benchmark lifecycle management. | DEBUG on routine diagnostic inspection; INFO on benchmark jobs. |
 
 ## Ratified reference decisions
 
@@ -71,6 +78,8 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-SINGLE-LOGGING-MODULE` | Merged centralized logging, redaction filtering, rotating ZIP sinks, in-memory ring buffer, and DebugConsole projections into a single canonical module `app/host/logging.py`. |
 | `DEC-HOST-SECRET-FINGERPRINTING` | Sensitive credentials are deterministically hashed with SHA-256 and redacted as `[REDACTED:<digest:12>]`, preserving auditability of repeated secrets without exposing plaintext. |
 | `DEC-HOST-ZIP-ROTATION-WINDOWS` | Rotating file sinks close open file handles prior to renaming to guarantee compatibility with Windows file-locking semantics, compressing rotated logs to deflated `.zip` archives. |
+| `DEC-HOST-SINGLE-DIAGNOSTICS-MODULE` | Merged system probes, CPU/memory/disk/process diagnostics, worker capacity derivation, thread affinity, GPU qualification, and computational benchmarks into a single canonical module `app/host/diagnostics.py`. |
+| `DEC-HOST-REAL-BENCHMARK-MEASUREMENT` | Hardware diagnostic benchmarks perform actual bounded CPU-bound workload execution with duration and throughput measurement; synthetic or fabricated benchmark scores are prohibited. |
 
 ## Ownership and release boundaries
 

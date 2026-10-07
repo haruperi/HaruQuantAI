@@ -123,17 +123,17 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/diagnostics.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_diagnostics.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/diagnostics.py` — owned implementation merging CPU, memory, disk, process probes, worker allocation, thread affinity, GPU qualification, and computational benchmarks.
+- **Create:** `tests/unit/v2/phase_01/test_diagnostics.py` — independent contract, failure and FR-log cases for this task.
+- **Audit/compose:** `app/host/README.md` and applicable workspace/client. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Define CPU, memory, disk, runtime and process observations with explicit unavailable states.
-- [ ] **Step 2:** Adapt psutil/OS calls with bounded probe time and safe projections.
-- [ ] **Step 3:** Derive worker limits from qualified capacity and validated settings, retaining source units.
-- [ ] **Step 4:** Run any benchmark as a bounded diagnostic job with environment/workload metadata; activate affinity/GPU flags only for qualified consumers.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Define CPU, memory, disk, runtime and process observations with explicit unavailable states.
+- [x] **Step 2:** Adapt psutil/OS calls with bounded probe time and safe projections.
+- [x] **Step 3:** Derive worker limits from qualified capacity and validated settings, retaining source units.
+- [x] **Step 4:** Run any benchmark as a bounded diagnostic job with environment/workload metadata; activate affinity/GPU flags only for qualified consumers.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
