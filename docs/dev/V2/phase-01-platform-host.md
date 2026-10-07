@@ -261,18 +261,17 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/jobs.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `app/host/workers.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_jobs.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/jobs.py` — owned implementation merging hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, deduplication, restart reconciliation, and REST endpoints.
+- **Create:** `tests/unit/v2/phase_01/test_jobs.py` — independent contract, failure, and FR-log cases for jobs coordinator.
+- **Audit/compose:** `app/host/README.md`. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Specify queued/running/succeeded/failed/cancelled and cancellation-request/interrupted states with attempt IDs.
-- [ ] **Step 2:** Apply admission, queue, retry and duplicate-submission policies by operation.
-- [ ] **Step 3:** Use bounded processes for trusted CPU work and async tasks for I/O; domains provide validated specs and checkpoint hooks.
-- [ ] **Step 4:** Own child jobs/progress/publication; record durable history when required and reconcile interrupted jobs after restart.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Specify queued/running/succeeded/failed/cancelled and cancellation-request/interrupted states with attempt IDs.
+- [x] **Step 2:** Apply admission, queue, retry and duplicate-submission policies by operation.
+- [x] **Step 3:** Use bounded processes for trusted CPU work and async tasks for I/O; domains provide validated specs and checkpoint hooks.
+- [x] **Step 4:** Own child jobs/progress/publication; record durable history when required and reconcile interrupted jobs after restart.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 

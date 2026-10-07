@@ -1,9 +1,9 @@
 # SQX V2 implementation checklist
 
 ```text
-Progress Bar   [##------------------] 8.3%
-Completed      6/72
-Current Task   1.7 Local jobs and cancellation
+Progress Bar   [##------------------] 9.7%
+Completed      7/72
+Current Task   1.8 Resource services and safe artifact access
 ```
 
 - Count the **72 numbered capability tasks** only; thirteen phase checkboxes are rollups. Nested steps, specialist matrix rows and the shared release gate are acceptance conditions, not additional counted tasks.
@@ -21,7 +21,7 @@ Current Task   1.7 Local jobs and cancellation
     - [x] 1.4 [Settings and configurations](phase-01-platform-host.md#14-settings-and-configurations)
     - [x] 1.5 [Workspace and plugin discovery](phase-01-platform-host.md#15-workspace-and-plugin-discovery)
     - [x] 1.6 [HTTP and event transport](phase-01-platform-host.md#16-http-and-event-transport)
-    - [ ] 1.7 [Local jobs and cancellation](phase-01-platform-host.md#17-local-jobs-and-cancellation)
+    - [x] 1.7 [Local jobs and cancellation](phase-01-platform-host.md#17-local-jobs-and-cancellation)
     - [ ] 1.8 [Resource services and safe artifact access](phase-01-platform-host.md#18-resource-services-and-safe-artifact-access)
     - [ ] 1.9 [Host-owned persistence and restart recovery](phase-01-platform-host.md#19-host-owned-persistence-and-restart-recovery)
     - [ ] 1.10 [Security, sessions and distribution qualification](phase-01-platform-host.md#110-security-sessions-and-distribution-qualification)

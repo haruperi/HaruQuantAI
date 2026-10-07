@@ -20,6 +20,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-DISCOVERY` | Workspace and plugin discovery, manifest verification, containment security, extension slot registration, dependency resolution, and typed lifecycle attachment in `app/host/discovery.py` | Implemented and verified; Phase 1 task 1.5 qualified |
 | `FEAT-HOST-RESPONSE` | Universal immutable response envelope, structured error taxonomy, and execution metadata in `app/host/response.py` | Implemented and verified; Phase 1 task 1.6 qualified |
 | `FEAT-HOST-TRANSPORT` | Unified HTTP transport middleware, request correlation, session authentication, in-memory event bus, and Server-Sent Events streaming in `app/host/transport.py` | Implemented and verified; Phase 1 task 1.6 qualified |
+| `FEAT-HOST-JOBS` | Hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, restart reconciliation, and event broadcasting in `app/host/jobs.py` | Implemented and verified; Phase 1 task 1.7 qualified |
 
 ## Registered functional requirements
 
@@ -79,6 +80,15 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-TRANSPORT-EVENT-BUS` | In-memory multi-channel event broker with monotonic cursors, ring buffer history, and slow-consumer drop protection. | Emits DEBUG on publication; INFO on subscriber registration and unregistration. |
 | `FR-HOST-TRANSPORT-SSE-STREAMING` | Server-Sent Events streaming with channel demux, cursor replay, snapshot gap detection, and clean disconnects. | Emits INFO on stream connect/disconnect; WARNING on queue saturation and backpressure drops. |
 | `FR-HOST-TRANSPORT-REST-PROJECTION` | FastAPI transport router exposing `/auth/login`, `/auth/status`, `/events`, `/events/publish`, and `/events/snapshot`. | Emits DEBUG on transport router composition. |
+| `FR-HOST-JOBS-HARDWARE-DIAGNOSTICS` | System metrics sampling (CPU cores, RAM bytes, OS platform, Python version). | Emits INFO log when hardware diagnostics are collected. |
+| `FR-HOST-JOBS-POOL-ALLOCATION` | Platform-bounded multiprocessing worker pool allocation. | Emits INFO log with allocated worker counts upon process pool creation. |
+| `FR-HOST-JOBS-BUDGET-ADMISSION` | Resource-guarded task admission validating worker slots and memory reservations. | Emits INFO log detailing task ID, owner, worker budget, memory reservation, and timeout. |
+| `FR-HOST-JOBS-EXECUTION-LIFECYCLE` | Asynchronous task execution, timeout supervision, and lifecycle state transitions. | Emits INFO/WARNING/ERROR logs on lifecycle transitions; failures include safe code locations omitting secrets. |
+| `FR-HOST-JOBS-COOPERATIVE-CANCELLATION` | Owner-scoped and job-level cooperative cancellation via JobContext checkpoints. | Emits INFO log when cancellation is requested and acknowledged. |
+| `FR-HOST-JOBS-DEDUPLICATION` | Concurrent task deduplication preventing duplicate execution of identical dedup_keys. | Emits INFO when dedup key is registered or released; WARNING when duplicate submission is rejected. |
+| `FR-HOST-JOBS-RESTART-RECONCILIATION` | Durable SQLite storage (`host_jobs`) reconciling orphaned or active jobs to INTERRUPTED on reboot. | Emits INFO when orphaned or active jobs from previous runs are reconciled. |
+| `FR-HOST-JOBS-EVENT-BROADCAST` | Real-time broadcasting of job state updates and progress reports to the EventBus. | Emits DEBUG when job lifecycle updates and progress reports are broadcast. |
+| `FR-HOST-JOBS-REST-API` | FastAPI jobs router exposing endpoints for capacity, job submission, querying, and cancellation. | Emits DEBUG when jobs router is constructed and endpoints are invoked. |
 
 ## Ratified reference decisions
 
@@ -113,6 +123,9 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-CANONICAL-RESPONSE-ENVELOPE` | Universal immutable result envelope `StandardResponse[T]`, error taxonomy `StandardError`, and execution metadata `ResponseMetadata` in `app/host/response.py` serve as the foundational contract across host lifecycle services, HTTP transport, and domain clients. |
 | `DEC-HOST-SINGLE-TRANSPORT-MODULE` | Merged HTTP transport middleware, request correlation, error handling, session authentication, in-memory event bus, and SSE streaming into a single canonical module `app/host/transport.py`. |
 | `DEC-HOST-BOUNDED-SSE-STREAMING` | SSE event streams enforce bounded per-subscriber queues (`asyncio.Queue(maxsize=256)`) and monotonic cursor tracking; saturated consumers drop events without blocking server dispatch and clean up immediately upon client disconnect. |
+| `DEC-HOST-SINGLE-JOBS-MODULE` | Merged hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, SQLite durability, restart reconciliation, and REST endpoints into a single canonical module `app/host/jobs.py`. |
+| `DEC-HOST-RESOURCE-BUDGET-ADMISSION` | Background compute jobs declare worker and memory budgets guarded by hard capacity ceilings (`CapacityExceededError`, `BudgetExceededError`) to prevent host resource starvation. |
+| `DEC-HOST-RESTART-RECONCILIATION` | On coordinator initialization, active in-flight jobs (`queued`, `running`, `cancellation_requested`) stored in SQLite are reconciled to `interrupted` without fabricating false success or hanging indefinitely. |
 
 ## Ownership and release boundaries
 
