@@ -17,8 +17,9 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-BOOT` | Universal host bootstrap, lifespan stages, reverse-order shutdown, readiness assessment, and browser shell HTTP composition in `app/host/bootstrap.py` | Implemented and verified; Phase 1 task 1.1 qualified |
 | `FEAT-HOST-LOGGING` | Centralized application telemetry, multi-sink routing, credential/path redaction, in-memory ring buffer, and DebugConsole projection in `app/host/logging.py` | Implemented and verified; Phase 1 task 1.2 qualified |
 | `FEAT-HOST-DIAG` | System capacity, process health, hardware capability inspection, and computational benchmarking in `app/host/diagnostics.py` | Implemented and verified; Phase 1 task 1.3 qualified |
-| `FEAT-HOST-SETTINGS` | Authoritative host configuration settings, schema validation, transactional SQLite storage in `data/database/haruquantai.db` (`host_settings` table), dot-accessible configuration interface, revision-checked updates, and FastAPI REST projection in `app/host/settings.py` | Implemented and verified; Phase 1 task 1.4 qualified |
 | `FEAT-HOST-DISCOVERY` | Workspace and plugin discovery, manifest verification, containment security, extension slot registration, dependency resolution, and typed lifecycle attachment in `app/host/discovery.py` | Implemented and verified; Phase 1 task 1.5 qualified |
+| `FEAT-HOST-RESPONSE` | Universal immutable response envelope, structured error taxonomy, and execution metadata in `app/host/response.py` | Implemented and verified; Phase 1 task 1.6 qualified |
+| `FEAT-HOST-TRANSPORT` | Unified HTTP transport middleware, request correlation, session authentication, in-memory event bus, and Server-Sent Events streaming in `app/host/transport.py` | Implemented and verified; Phase 1 task 1.6 qualified |
 
 ## Registered functional requirements
 
@@ -70,6 +71,14 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-DISC-CAPABILITY-INJECTION` | Typed host capability context injection into plugin factories via `PluginHostContext`. | INFO on successful capability binding and factory invocation. |
 | `FR-HOST-DISC-LIFECYCLE-MANAGEMENT` | Safe attachment, activation, controlled disabling, reload, and uninstallation with resource cleanup. | INFO on lifecycle state transitions; ERROR on factory failure. |
 | `FR-HOST-DISC-BROWSER-PROJECTION` | FastAPI REST projection endpoints exposing discovered packages, status, slot bindings, and lifecycle operations. | DEBUG on status queries; INFO on state mutations. |
+| `FR-HOST-RESPONSE-SUCCESS-ENVELOPE` | Success envelope instantiation with automatic UTC timestamps, duration, and telemetry logging. | Emits INFO log with summary, duration, and correlation ID. |
+| `FR-HOST-RESPONSE-ERROR-ENVELOPE` | Error envelope instantiation with structured error codes, messages, and retryability semantics. | Emits WARNING log with machine-readable error code, message, and correlation ID. |
+| `FR-HOST-RESPONSE-SERIALIZATION` | Dictionary and JSON transformation of standard response envelopes with field validation. | Emits DEBUG log when serializing envelope. |
+| `FR-HOST-TRANSPORT-MIDDLEWARE` | ASGI middleware injecting X-Request-Id, response timing, and mapping unhandled exceptions to StandardResponse. | Emits INFO on request completion with duration and req_id; ERROR on unhandled server exceptions. |
+| `FR-HOST-TRANSPORT-SESSION-AUTH` | In-memory session token creation, expiration verification, and Bearer token authentication. | Emits INFO on token creation; WARNING on missing, invalid, or expired credentials. |
+| `FR-HOST-TRANSPORT-EVENT-BUS` | In-memory multi-channel event broker with monotonic cursors, ring buffer history, and slow-consumer drop protection. | Emits DEBUG on publication; INFO on subscriber registration and unregistration. |
+| `FR-HOST-TRANSPORT-SSE-STREAMING` | Server-Sent Events streaming with channel demux, cursor replay, snapshot gap detection, and clean disconnects. | Emits INFO on stream connect/disconnect; WARNING on queue saturation and backpressure drops. |
+| `FR-HOST-TRANSPORT-REST-PROJECTION` | FastAPI transport router exposing `/auth/login`, `/auth/status`, `/events`, `/events/publish`, and `/events/snapshot`. | Emits DEBUG on transport router composition. |
 
 ## Ratified reference decisions
 
@@ -101,6 +110,9 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-SINGLE-DISCOVERY-MODULE` | Merged plugin discovery, manifest verification, slot registry, dependency resolution, capability injection, lifecycle management, and REST API projections into a single canonical module `app/host/discovery.py`. |
 | `DEC-HOST-CONTAINED-PLUGIN-EXECUTION` | Plugin manifests and entrypoints are strictly bounded within declared package directories; path traversal, symlink escapes, and unverified global module paths are rejected to guarantee host security and tenant isolation. |
 | `DEC-HOST-ZERO-PLUGIN-RESILIENCE` | The host runtime and browser workspaces operate seamlessly with zero installed plugins; missing or incompatible plugins degrade gracefully without blocking host boot or execution. |
+| `DEC-HOST-CANONICAL-RESPONSE-ENVELOPE` | Universal immutable result envelope `StandardResponse[T]`, error taxonomy `StandardError`, and execution metadata `ResponseMetadata` in `app/host/response.py` serve as the foundational contract across host lifecycle services, HTTP transport, and domain clients. |
+| `DEC-HOST-SINGLE-TRANSPORT-MODULE` | Merged HTTP transport middleware, request correlation, error handling, session authentication, in-memory event bus, and SSE streaming into a single canonical module `app/host/transport.py`. |
+| `DEC-HOST-BOUNDED-SSE-STREAMING` | SSE event streams enforce bounded per-subscriber queues (`asyncio.Queue(maxsize=256)`) and monotonic cursor tracking; saturated consumers drop events without blocking server dispatch and clean up immediately upon client disconnect. |
 
 ## Ownership and release boundaries
 

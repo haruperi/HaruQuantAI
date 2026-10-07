@@ -225,18 +225,19 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/transport.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `app/host/events.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_transport.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/response.py` — owned implementation of canonical StandardResponse envelope, StandardError taxonomy, and ResponseMetadata.
+- **Create:** `app/host/transport.py` — owned implementation merging HTTP transport middleware, request correlation, error handling, session authentication, in-memory event bus, and SSE streaming.
+- **Create:** `tests/unit/v2/phase_01/test_response.py` — independent contract, failure and FR-log cases for response envelope.
+- **Create:** `tests/unit/v2/phase_01/test_transport.py` — independent contract, failure and FR-log cases for transport and event streaming.
+- **Audit/compose:** `app/host/README.md` and applicable workspace/client. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Preserve /api/v1, request IDs, approved payload/deadline bounds and stable error envelopes.
-- [ ] **Step 2:** Keep domain schemas/routes locally owned behind the existing UI transport factory.
-- [ ] **Step 3:** Use HTTP commands/queries plus bounded SSE where sufficient; specify event order, retention and snapshots.
-- [ ] **Step 4:** Recover reconnects from authoritative snapshots; expire sessions and release slow-consumer resources.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Preserve /api/v1, request IDs, approved payload/deadline bounds and stable error envelopes.
+- [x] **Step 2:** Keep domain schemas/routes locally owned behind the existing UI transport factory.
+- [x] **Step 3:** Use HTTP commands/queries plus bounded SSE where sufficient; specify event order, retention and snapshots.
+- [x] **Step 4:** Recover reconnects from authoritative snapshots; expire sessions and release slow-consumer resources.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
