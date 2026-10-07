@@ -1,193 +1,209 @@
-# HaruQuantAI architecture
+# HaruQuantAI Architecture
 
-Status: ratified structural constraints at the reset-aware P00 baseline, 2026-10-06.
-Historical source: Git commit `3ede688544b1c161984573cdc25e7a36b01d4a37`,
-`docs/ARCHITECTURE.md`, SHA-256
-`8fdf5bb3d15386333e9bace6ad99a7eb4c6987b4ea2fd95cf43d192cbd437bb3`.
-Removed implementation and historical interface versions are not current contracts.
+Status: Ratified 3-Tier Architecture (Host, Workspaces, Dynamic Plugins), 2026-10-07.
+Baseline: Phase 1 (Host Platform) and Phase 2 (Data Manager Workspace + Dynamic Plugins) operational at Commit `dd12535`.
+Authorities: [PROJECT.md](PROJECT.md) governs scope and delivery milestones; [AGENTS.md](../AGENTS.md) governs constitutional rules and contributor gates.
 
-[PROJECT.md](PROJECT.md) owns scope; [AGENTS.md](../AGENTS.md) owns contributor
-process; local owning READMEs own feature/FR/decision identities and status.
-[Evidence procedure](dev/evidence/README.md) distinguishes observations and decisions.
+---
 
-V2 alignment, 2026-10-07: target organization below extends the structural baseline;
-existing approvals and implementation/parity gates remain binding.
+## 1. Executive Summary & Architectural Vision
 
-## V2 target system and planning boundary
+HaruQuantAI is a high-performance quantitative research, strategy generation, and backtesting workstation engineered in Python. It faithfully mirrors the robust, modular 3-tier architecture of **StrategyQuant X (SQX-145)**:
 
-The [V2 implementation plan](dev/V2/README.md) organizes the Python web workstation
-into thirteen feature groups and 72 capability tasks. Its [nine delivery milestones](dev/V2/delivery-plan.md)
-sequence usable slices; feature/phase numbers identify ownership rather than a
-strict serial dependency chain. The [planned file structure](dev/V2/README.md#full-v2-planned-file-structure)
-shows proposed locations, retained UI entry points and unresolved composition files.
-Those paths and F/H labels do not register capabilities or freeze package contracts.
+1. **Host Platform (`app/host/`):** The pure platform foundation. Contains zero quantitative or trading logic. Governs the application lifecycle, settings, unified logging, resource custody, persistence, async transports, job coordination, and dynamic plugin discovery.
+2. **Domain Workspaces (`app/workspace/`):** Domain-specific operation centers that house business logic, quantitative pipelines, and domain REST routers. The initial authoritative workspace is the **Data Manager** (`app/workspace/data_manager/`), mirroring all 11 SQX Data Manager donor components. Future workspaces (Strategy Builder, Retester, Optimizer, Custom Projects) plug into this tier without altering the host.
+3. **Dynamic Plugins (`app/plugins/`):** Fully decoupled, modular add-on packages declaring explicit extension slots (such as `slot: "data.provider"`). Plugins are dynamically scanned, verified, and loaded at runtime by the Host's discovery engine and attached to the appropriate workspace manager.
 
-Target one local Python application serving the API and built React frontend.
-Keep configuration, lifecycle and service composition explicit. HTTP handles
-commands/queries; bounded authenticated events and authoritative snapshots support
-progress, logs and reconnect. Reuse the declared Pydantic/FastAPI/Uvicorn stack,
-standard-library utilities and qualified numerical/data libraries. Package names
-alone do not qualify behavior or Python/runtime compatibility.
+```
++-----------------------------------------------------------------------------------+
+|                               UI Layer (React)                                    |
++-----------------------------------------------------------------------------------+
+                                         |
+                                  REST API / Events
+                                         v
++-----------------------------------------------------------------------------------+
+|                        Tier 1: Host Platform (app/host)                           |
+|  +--------------------+  +--------------------+  +-----------------------------+  |
+|  | Bootstrap/Lifecycle|  | Discovery Engine   |  | Persistence (SQLite WAL)    |  |
+|  +--------------------+  +--------------------+  +-----------------------------+  |
+|  +--------------------+  +--------------------+  +-----------------------------+  |
+|  | Resource Custody   |  | Transport / Events |  | Background Jobs Coordinator |  |
+|  +--------------------+  +--------------------+  +-----------------------------+  |
++-----------------------------------------------------------------------------------+
+                                         |
+                       Registers & Mounts Workspace Routers
+                                         v
++-----------------------------------------------------------------------------------+
+|                      Tier 2: Workspaces (app/workspace)                           |
+|                                                                                   |
+|  +-----------------------------------------------------------------------------+  |
+|  | Data Manager Workspace (app/workspace/data_manager)                         |  |
+|  |  * Home & Storage Health (home.py)        * Data Ingestion & Catalog (data.py)|  |
+|  |  * Instruments & Specs (instruments.py)   * Sessions & Windows (sessions.py)  |  |
+|  |  * Baskets & Weighting (baskets.py)       * Broker Profiles (broker.py)       |  |
+|  |  * Connections & Queue (connections.py)   * Custom Data & COT (custom_data.py)|  |
+|  |  * Audit Log (log.py)                     * Documentation Index (help.py)     |  |
+|  |  * Quality Review (actions/review/)       * Bar Transforms (actions/transform)|  |
+|  |  * REST Router: /api/v2/data/... (routes.py)                                |  |
+|  +-----------------------------------------------------------------------------+  |
+|                                                                                   |
+|  [Future Workspaces: Strategy Builder | Retester/Backtest | Optimizer | Projects] |
++-----------------------------------------------------------------------------------+
+                                         ^
+                        Attaches via Slot: "data.provider"
+                                         |
++-----------------------------------------------------------------------------------+
+|                      Tier 3: Dynamic Plugins (app/plugins)                        |
+|                                                                                   |
+|  +-----------------------------------------------------------------------------+  |
+|  | Market Data Providers (app/plugins/data_source/)                            |  |
+|  |  * dukascopy        * darwinex        * metatrader        * sq_equity       |  |
+|  |  * sq_futures       * crypto          * files             * yahoo           |  |
+|  |  * tick_downloader                                                          |  |
+|  +-----------------------------------------------------------------------------+  |
++-----------------------------------------------------------------------------------+
+```
 
-F01 groups ten host capabilities in one lifecycle: bootstrap/web shell, centralized
-logging, diagnostics, settings, discovery, transport, jobs, resources, persistence,
-and security/sessions. Optional domains fail unavailable only at their declared
-consumers. Local research precedes remote workers and advanced integrations.
+---
 
-The previously approved P01 host contract remains the foundation: `/api/v1`,
-the versioned envelope, loopback session/origin rules, bounded projections/events
-and atomic revision-checked `preferences.json` in an explicitly owned new root.
-Its approved iterations remain binding. V2 adds an organizing target, not evidence
-of implementation or permission to change those contracts. Full jobs, discovery,
-operational storage and remote deployment still need their own approved plans.
+## 2. Five Laws of Spatial Composability
 
-## Five laws of spatial composability
+Every module, workspace, and plugin in HaruQuantAI strictly complies with the **Five Laws of Spatial Composability**:
 
-- SC-01 Locality: one quantitative concept has one cohesive owner. Its calculation,
-  configuration, defaults, typed schema, bounds, units, metadata and lowering hooks
-  remain together. Universal primitives do not centralize domain business semantics.
-- SC-02 Orthogonality: adding/disabling/removing a package cannot require unrelated
-  peer or central-registry edits. Failures block only declared dependencies; retained
-  artifacts remain inspectable with an explicit unavailable producer.
-- SC-03 Explicit typed slots: collaborate through declared, versioned capabilities
-  and immutable documents. No private sibling imports, ambient global registry,
-  implicit settings singleton, fixture substitute or import-time side effect.
-- SC-04 Hierarchical/algebraic composition: typed primitives compose pinned trees,
-  pipelines, workspaces and finite project tasks. Editors, generators, simulators
-  and exporters share semantic documents; UI labels cannot redefine algorithms.
-- SC-05 Schema-driven description: package-owned identity, compatibility, schemas,
-  defaults, constraints, units, slots and presentation metadata drive discovery and
-  a bounded renderer. Hosts do not maintain manual catalogs of domain concepts.
+* **SC-01 Locality:** One quantitative concept has one cohesive owner. Its calculation, configuration, defaults, typed schema, bounds, units, metadata, and lowering hooks remain together. Universal primitives do not centralize domain business semantics.
+* **SC-02 Orthogonality:** Adding, disabling, or removing a package cannot require editing unrelated peer modules or a central registry. Failures block only declared consumers; retained artifacts remain inspectable with an explicit unavailable producer.
+* **SC-03 Explicit Typed Slots:** Components collaborate exclusively through declared, versioned capabilities and immutable documents. No private sibling imports, ambient global state, implicit singletons, fixture substitutes, or import-time side effects.
+* **SC-04 Hierarchical/Algebraic Composition:** Typed primitives compose pinned trees, pipelines, workspaces, and finite project tasks. Editors, generators, simulators, and exporters share semantic documents; UI labels cannot redefine algorithms.
+* **SC-05 Schema-Driven Description:** Package-owned identity, compatibility, schemas, defaults, constraints, units, slots, and presentation metadata drive discovery and UI rendering. The host does not maintain hard-coded catalogs of domain concepts.
 
-## Spatial ownership
+---
 
-| Owner | Backend target | Retained UI counterpart | Responsibility |
-| --- | --- | --- | --- |
-| Host | `app/host/` | `ui/app/host/` | Universal lifecycle, sessions, discovery, envelopes, jobs, telemetry and resource custody; no domain algorithms |
-| Workspace | `app/workspace/<Domain>/` | `ui/app/workspace/<Domain>/` | Workflow, typed slots, zero-plugin fallback and local presentation |
-| Plugin | Per-feature approved backend path | `ui/app/plugins/<family>/<concept>/` | One focused capability and optional paired presentation |
-| Primitives | `app/kernel/` target | `ui/app/components/` | Universal runtime/math or UI primitives; no domain contracts |
+## 3. Spatial Ownership
 
-Plugin path casing/singular/plural variants in historical documents and V2 are
-proposals requiring individual ratification. P00 creates no plugin package.
-The approved P01 envelope/session/preferences/minimum-attachment contracts are
-explicit target decisions. Further domain schemas, full discovery and mounting
-contracts remain future decisions; provisional UI clients cannot ratify them.
+| Tier | Backend Path | UI Counterpart | Architectural Responsibility |
+| :--- | :--- | :--- | :--- |
+| **Host** | `app/host/` | `ui/app/host/` | Universal lifecycle, session authentication, plugin discovery, envelopes, background jobs, telemetry, resource custody, and persistence isolation. Zero domain/trading algorithms. |
+| **Workspace** | `app/workspace/<domain>/` | `ui/app/workspace/<domain>/` | Complete business domain workflow, typed slot management, fallback behavior, and REST routing (e.g. `data_manager`). |
+| **Dynamic Plugin** | `app/plugins/<slot_family>/<name>/` | `ui/app/plugins/<family>/<name>/` | Modular add-on declaring a concrete extension slot (e.g. `data.provider`) and providing self-contained adapter logic. |
+| **Primitives** | `app/kernel/` | `ui/app/components/` | Reusable mathematical algorithms, numerical routines, and shared UI presentation primitives. |
 
-Group work by accepted user capability, not dependency archive. One replaceable
-provider, indicator, method or format may own a typed contribution; ordinary
-internal functions need no plugin framework. Settings schemas and execution stay
-with the same semantic owner. The host runtime index derives from validated
-contributions rather than a manually maintained domain catalog.
+---
 
-## Dependencies and lifecycle
+## 4. Tier 1: Host Platform Architecture (`app/host/`)
 
-No peer business imports between workspaces or plugins. Workspace/plugin package
-initializers are empty/docstring-only. Imports perform no I/O, environment reads,
-handler setup, database access, registration or thread creation.
+The Host platform provides universal infrastructure to workspaces and plugins:
 
-Host discovery validates literal identity, ownership, version compatibility and
-path containment before executing contributions. Workspaces receive host-injected
-capabilities and attach plugins through typed slots. Missing/removed plugins yield
-explicit unavailable results; zero-plugin workspaces preserve unrelated operations.
-Preparation, admission, cancellation, shutdown and cleanup have explicit owners and
-logged outcomes. Exact lifecycle/state semantics must be qualified per feature.
+### 4.1 Bootstrap & Lifecycle Management (`app/host/bootstrap.py`)
+The host boot sequence executes sequentially through well-defined stages:
+1. **Config & Logging:** Loads settings, sets log levels, initializes secret redaction.
+2. **Persistence:** Starts `DatabaseManager`, verifies schema migrations, configures SQLite WAL mode.
+3. **Resource Governance:** Sets memory and CPU limits via `ResourceManager`.
+4. **Job Coordination:** Initializes `JobManager` thread pool.
+5. **Plugin Discovery & Registration:** Asynchronously scans plugin directories, validates manifests, dynamically imports adapters, and registers them into workspace managers.
+6. **Router Mounting:** Mounts workspace REST routers onto the FastAPI application.
+7. **Graceful Teardown:** Shuts down jobs, drains queues, releases plugin adapters in reverse order, and closes database connections.
 
-## Shared research documents and execution
+### 4.2 Dynamic Plugin Discovery Engine (`app/host/discovery.py`)
+* **Manifest Verification:** Inspects each plugin directory for a valid `plugin.json` declaring `id`, `name`, `version`, `slot`, `entry_point`, and `capabilities`.
+* **Dynamic Import Isolation:** Loads plugin modules dynamically using `importlib.util.spec_from_file_location` without hard-coded package dependencies.
+* **Instance Registry:** Provides `get_instance(plugin_id)` and `get_instances_for_slot(slot_id)` with lazy instantiation and thread-safe caching.
 
-| Document or operation | Semantic owner | Shared role |
-| --- | --- | --- |
-| Dataset revision | F02 market data | Instrument/time/session/units, validated rows and immutable source lineage |
-| Strategy revision | F03 authoring and blocks | Typed rules/parameters and qualified block/engine/export requirements |
-| Run specification and execution | F04 simulation | Pinned strategy/data, costs/sizing/clocks/seed and explicit execution profile |
-| Run ledger/result | F04 ledger; F05 analysis | Authoritative fills/trades/cash/equity; shared metrics and result projections |
-| Search, experiment and portfolio | F06/F07/F08 | Propose candidates/scenarios/membership; reuse qualified simulation and metrics |
-| Project and research procedure | F09; F13 tool orchestration | Bounded task/condition documents delegating to existing capabilities |
-| Job and resource record | F01 host custody; domain payload owner | Admission/attempt/status and retained checksummed artifact references |
+### 4.3 Persistence & Storage Custody (`app/host/persistence.py`)
+* **SQLite Import Isolation:** Enforces strict isolation: `sqlite3` must NEVER be imported anywhere outside `app/host/persistence.py`. Violations trigger immediate test failures.
+* **WAL Mode & Concurrency:** Configured with `journal_mode=WAL`, `synchronous=NORMAL`, and busy timeout handling for robust concurrent read/write operations.
+* **Transactions & Migrations:** Centralizes schema creation, migrations, and transactional execution.
 
-The common loop is dataset + strategy -> run -> retained result -> analysis,
-portfolio or project. Builder, Optimizer, Retester and projects call the same
-qualified simulator; they do not own separate fill/accounting engines. F05 owns
-shared metrics/correlation, while methods retain their own selection objectives,
-scenario rules and thresholds. Reuse does not merge distinct algorithm semantics.
+### 4.4 Resource Management (`app/host/resources.py`)
+* **Process & Memory Quotas:** Tracks active memory and process limits.
+* **Temporary Storage Sandboxing:** Allocates isolated scratch directories per task/job with automatic cleanup.
 
-Custom Projects use a bounded state machine, including supported branches,
-repetitions and go-to conditions. They are not limited to acyclic graphs. Maximum
-steps/cycles/runtime, evaluation points, cancellation and recovery are explicit.
-Each node requires only its selected capabilities; a missing model or remote worker
-does not block an unrelated project. F13 calls the same typed operations as humans,
-with scoped permissions, budgets and actual result/resource lineage.
+### 4.5 Transports & Uniform Response Envelope (`app/host/transport.py`, `app/host/response.py`)
+* **Uniform Envelopes:** Standard API responses follow `ApiResponse[T]`, guaranteeing consistent formatting (`data`, `error`, `timestamp`, `version`).
+* **Error Handling:** RFC 7807 compliant error schemas (`StandardError`) prevent leaked stack traces or sensitive internals.
+* **Event Bus:** In-memory asynchronous pub/sub event distribution (`EventBus`) for decoupling system events from direct callers.
 
-## Jobs, workers and lifecycle extension
+### 4.6 Background Job Coordinator (`app/host/jobs.py`)
+* **Non-blocking Execution:** Executes long-running tasks (historical data downloads, transform jobs, quality audits) via thread pools.
+* **Job States:** Lifecycle states: `QUEUED`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`.
 
-One host coordinator owns admission, queued/running/terminal outcomes, attempts,
-progress and parent-child cancellation. Domain operations supply versioned specs
-and checkpoint hooks. Trusted CPU work targets bounded local worker processes;
-I/O uses bounded asynchronous operations. This is future execution scope beyond
-the approved minimum P01 host, not an already available worker pool.
+---
 
-Specify publication fencing, operation-specific retry/idempotency and interrupted
-recovery before activation. Seeds and aggregation order follow stable identities,
-not completion timing. Windows worker imports stay inert; initialization is explicit.
-Do not persist arbitrary executable objects or promise arbitrary process-state
-resurrection or exactly-once external effects.
+## 5. Tier 2: Workspaces Architecture (`app/workspace/`)
 
-F10 extends that coordinator with compatible authenticated remote-worker placement,
-leases and result transfer. It does not introduce a second scheduler or require
-Java messaging-framework replicas. Local backtests and neural training do not
-require remote compute. SQX Java-node wire interoperability is a separate requirement.
+Workspaces encapsulate functional areas of the workstation. Each workspace acts as an authoritative domain coordinator.
 
-Custom/user code and AI Python analysis need enforceable filesystem/network,
-CPU/memory/time/output limits and isolation. A normal worker process is not a
-security sandbox. Remote access/deployment and irreversible external operations
-retain their own explicit authority and qualification.
+### 5.1 Authoritative Data Manager Workspace (`app/workspace/data_manager/`)
+Faithfully re-architected from StrategyQuant X (SQX-145) reference donors into cohesive Python modules:
 
-## Storage and resource custody
+| Module | StrategyQuant X Donor | Functional Responsibility |
+| :--- | :--- | :--- |
+| [`home.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/home.py) | `DataManagerHome` | Storage health metrics, total bar count, disk usage, symbol inventory overview. |
+| [`data.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/data.py) | `DataManagerData` | Bar and tick catalog, ingestion pipeline, historical bar storage and retrieval. |
+| [`instruments.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/instruments.py) | `DataManagerInstruments` | Instrument definitions: tick sizes, point values, pip values, contract specifications, margins. |
+| [`sessions.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/sessions.py) | `DataManagerSessions` | Trading session schedules, day-of-week windows, NinjaTrader XML session import/export. |
+| [`baskets.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/baskets.py) | `DataManagerBasket` | Synthetic/composite instruments, custom weightings, index creation. |
+| [`broker.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/broker.py) | `DataManagerBroker` | Broker profiles: spread models, commission rates, slippage models, margin requirements. |
+| [`connections.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/connections.py) | `DataManagerConnections` | `ProviderManager` coordinating data feeds, download queues, provider registration. |
+| [`custom_data.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/custom_data.py) | `DataManagerCustomData` | COT (Commitment of Traders) reports and generic macroeconomic/custom series. |
+| [`log.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/log.py) | `DataManagerLog` | Audit log of data operations, import history, and user adjustments. |
+| [`help.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/help.py) | `DataManagerHelp` | Contextual help registry, documentation topics, data guides. |
+| [`actions/review/quality.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/actions/review/quality.py) | `DataManagerActions` (Review) | `DataQualityInspector`: gap detection, bad tick filtering, price spike detection. |
+| [`actions/transform/transforms.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/actions/transform/transforms.py) | `DataManagerActions` (Transform) | `SeriesTransformer`: resampling timeframes (M1 to H1/D1), session alignment, adjustments. |
+| [`routes.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/routes.py) | Data Manager REST API | REST router exposing endpoints under `/api/v2/data/...`. |
 
-Every schema/table/partition/preset collection has one semantic feature owner.
-Transactions, migrations, retention and compatibility belong to a ratified host
-persistence capability. No plugin ad-hoc SQL or raw database handles. Shared database
-paths and schemas cannot be activated or repurposed by inference.
+### 5.2 Workspace Extensibility Pattern (Future Workspaces)
+The workspace architecture is designed to accommodate additional SQX workspaces without cross-coupling:
+* **Strategy Builder (`app/workspace/strategy_builder/`):** Genetic generation, building blocks, rule trees, and candidate evaluation.
+* **Retester / Backtester (`app/workspace/retester/`):** Multi-market backtesting, historical simulations, slippage and spread stress-testing.
+* **Optimizer (`app/workspace/optimizer/`):** Walk-Forward Matrix (WFM), parameter optimization, Monte Carlo permutation analysis.
+* **Custom Projects (`app/workspace/custom_projects/`):** Automated quantitative workflow pipelines, acyclic/cyclic step execution graphs.
 
-Published resources carry IDs, schema versions, immutable revisions, SHA-256,
-media types and producer provenance. Consumers read retained bytes without importing
-producer code. Uninstall preserves resources and unrelated user data. Tests use
-isolated temporary resources. Removal/cascade/restore verification runs in an
-isolated candidate under a separately approved exact-path plan, never on shared data.
+---
 
-Retain P01 atomic preferences independently of later operational storage. V2 proposes
-one host-owned SQLite control store for job/catalog/project/resource metadata,
-plus immutable JSON and Arrow/Parquet artifacts for large data/ledgers/series.
-DuckDB may serve analytical reads; it is not automatically a second operational
-writer. These choices are proposals: no schema, database path, migration, retention
-policy or active-store adoption is ratified by this document alignment.
+## 6. Tier 3: Dynamic Plugins (`app/plugins/`)
 
-Stage, validate and hash artifacts before publishing metadata references. A file
-rename and database commit are not one atomic transaction; the owning plan must
-qualify orphan/missing-file recovery, revision conflicts and interrupted publication.
-Start with the records needed by the selected journey; expose narrow typed methods
-rather than generic plugin SQL or an arbitrary query framework.
+Plugins are autonomous add-on packages that extend HaruQuantAI through typed extension slots.
 
-## Verification authority and current gaps
+### 6.1 Extension Slot Contract: `data.provider`
+Market data providers declare compliance with `slot: "data.provider"` in `plugin.json` and implement `BaseDataProvider` (`app/workspace/data_manager/connections.py`):
+* `provider_id`: Unique identifier matching manifest.
+* `get_available_symbols()`: Query available instruments from provider feed.
+* `fetch_bars(symbol, timeframe, start, end)`: Ingest historical OHLCV bars.
+* `fetch_ticks(symbol, start, end)`: Ingest high-resolution tick data.
+* `test_connection()`: Verify connectivity and credentials.
 
-Every concrete Python module has the five-section constitutional docstring, typed
-public signatures, descriptive FRs, emitted FR events and log assertions. Focused
-pytest uses explicit paths and --no-cov; branch coverage is evidence, not parity.
+### 6.2 Plugin Manifest Specification (`plugin.json`)
+```json
+{
+  "id": "dukascopy",
+  "name": "Dukascopy Data Provider",
+  "version": "1.0.0",
+  "author": "HaruQuantAI",
+  "slot": "data.provider",
+  "entry_point": "adapter:DukascopyDataProvider",
+  "capabilities": ["ticks", "bars", "fx", "cfd"]
+}
+```
 
-P00 qualifies reference tooling using its dedicated branch-aware coverage config.
-No Python application modules currently exist. Retained tooling/frontend checks are
-in `scripts/ci_check.py`. Historical architecture/package/removal checkers are
-absent and cannot be presented as current executable acceptance checks.
-Future application source must restore >=80% branch-aware application coverage and
-its feature-specific architecture/removal checks through approved plans.
+### 6.3 Active Dynamic Data Providers (`app/plugins/data_source/`)
+1. **`dukascopy`:** Dukascopy Forex and CFD historical tick and minute data.
+2. **`darwinex`:** Darwinex tick data with true institutional bid/ask spreads.
+3. **`metatrader`:** MetaTrader 4 / 5 CSV and binary history file parser.
+4. **`sq_equity`:** StrategyQuant proprietary stock/equity historical data provider.
+5. **`sq_futures`:** StrategyQuant proprietary futures historical data provider.
+6. **`crypto`:** Binance and cryptocurrency exchange historical feeds.
+7. **`files`:** Generic multi-format local file importer (CSV, Parquet, TSV).
+8. **`yahoo`:** Yahoo Finance free daily and intraday bar provider.
+9. **`tick_downloader`:** High-precision tick downloader provider.
 
-MainApp/AppSettings/CpuInfo remain unavailable within the audited current static
-boundary; SQLib/core packaging is unresolved. The owner-approved
-DEC-HOST-P00-UNAVAILABLE-HOST-SOURCE permits target-owned universal host contracts
-through approved feature plans. Settings precedence, CPU policy, lifecycle and
-paths must be explicit target decisions rather than inferred SQX facts. This
-exception covers no missing numerical, trading, AI or domain algorithm.
-Donor-derived translation/parity claims still require supporting body semantics
-and applicable independent observations; product activation remains unverified.
-P00 closure establishes reference readiness and dispositions only. Application
-registration and runtime qualification belong to owning feature/integration plans.
+---
+
+## 7. Quality, Verification & Constitutional Baseline
+
+All HaruQuantAI modules adhere to the strict quality baseline enforced by CI and pre-commit hooks:
+
+* **Standardized 5-Section Docstrings:** Every Python file must start with a docstring defining `Description:`, `Purpose:` (`FEAT-*`), `Key Capabilities:` (descriptive kebab-case `FR-*` tags), `Python API Usage:`, and `CLI Usage:`.
+* **Zero Silent Failures:** No bare `except:`, no unhandled errors, no silent executions. Every critical operation emits an explicit log entry with its corresponding `FR-*` capability tag.
+* **Strict Typing:** Python code passes `mypy --strict` and `pyright` without warnings or any-type leaks.
+* **Ruff Formatting & Linting:** 88-character line limit, Google-style docstrings, organized imports (I001), and PEP 604 modern typing syntax.
+* **Branch-Aware Coverage:** Focused, change-scoped pytest verification with a minimum of 80% branch coverage required for production releases.
