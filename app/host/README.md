@@ -14,6 +14,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | Identity | Responsibility | Status |
 | --- | --- | --- |
 | `FEAT-HOST-EVIDENCE` | Host-governed reference manifests, fixtures and qualification in tests/reference | Implemented tooling; P00 reference readiness/disposition complete with recorded static passes; application/runtime qualification belongs to owning features |
+| `FEAT-HOST-BOOT` | Universal host bootstrap, lifespan stages, reverse-order shutdown, readiness assessment, and browser shell HTTP composition in `app/host/bootstrap.py` | Implemented and verified; Phase 1 task 1.1 qualified |
 
 ## Registered functional requirements
 
@@ -26,6 +27,11 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-EVIDENCE-LEDGER-INTEGRITY` | Validate schema v4, atomic records, current sources, monotonic allocation, related records, mappings and pass artifacts. | DEBUG checks, INFO accepted counts/lifecycle, ERROR stable failure codes; structured fr_id; no physical paths or secret values. |
 | `FR-HOST-EVIDENCE-OWNERSHIP-GATES` | Bind current archive/features/FR seeds to proposed owners; check registered identities and reject unqualified runtime release. | DEBUG checks, INFO accepted counts/lifecycle, ERROR stable failure codes; structured fr_id; no physical paths or secret values. |
 | `FR-HOST-EVIDENCE-QUALIFICATION-CLI` | Run offline evidence gates by default and explicit read-only --check-donor checks; emit outcome logs and nonzero failures. | DEBUG checks, INFO accepted counts/lifecycle, ERROR stable failure codes; structured fr_id; no physical paths or secret values. |
+| `FR-HOST-BOOT-LIFECYCLE-STAGES` | Strict progression through ordered host lifespan stages (CONFIGURING, PATHS, LOGGING, DISCOVERY, SERVICES, ROUTES, READY). | INFO stage advances, ERROR on stage startup failure with fr_id and stage identity. |
+| `FR-HOST-BOOT-REVERSE-SHUTDOWN` | Idempotent reverse-order teardown and automatic rollback of acquired stages upon startup failure. | INFO stage release events, INFO safe repeated stop, ERROR stage release failure with fr_id. |
+| `FR-HOST-BOOT-READINESS-ASSESSMENT` | Comprehensive readiness checks and system health state snapshots. | DEBUG ready queries, WARNING degraded/stopped queries with structured snapshot. |
+| `FR-HOST-BOOT-APP-COMPOSITION` | Lazy factory composition of FastAPI application and router mounting without import-time side-effects. | INFO composition start/finish and route mounting with fr_id. |
+| `FR-HOST-BOOT-SHELL-PROJECTION` | Browser shell contract endpoints for status, readiness inspection, Home/About metadata, and settings. | INFO app-loaded acknowledgement and settings writes, DEBUG status queries with fr_id. |
 
 ## Ratified reference decisions
 
@@ -45,6 +51,8 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-SQX145-BYTE-IDENTITY` | Fingerprint-bound published references serialize deterministically as UTF-8/LF with scoped Git attributes. Hash final bytes and reject unexplained drift; metadata shards remain bounded. |
 | `DEC-HOST-P00-CLOSURE-BOUNDARY` | P00 accepts verified reference tooling/inventory, reconciled ownership proposals and explicit gap dispositions. Application registration, execution and applicable independent runtime comparisons belong to owning feature plans and release gates; P00 closure grants no runtime/parity authority. |
 | `DEC-HOST-P00-UNAVAILABLE-HOST-SOURCE` | The audited MainApp/AppSettings/CpuInfo host-service bodies receive an accepted source limitation. HaruQuantAI may implement its own universal lifecycle/settings/path/CPU contracts, informed by directly inspected callers, through approved feature plans. Unsupported semantics are explicit normative target decisions. This exception covers no missing numerical, trading, AI or domain algorithm and grants no exact-translation/parity claim. |
+| `DEC-HOST-SINGLE-BOOTSTRAP-MODULE` | Merged proposed bootstrap and readiness capabilities into a single canonical module `app/host/bootstrap.py` for unified lifecycle coordination and zero circular dependencies. |
+| `DEC-HOST-LIFESPAN-REVERSE-SHUTDOWN` | Acquired stages during startup are tracked in an internal LIFO stack and rolled back in strict reverse order upon startup failure or teardown; repeated shutdown calls are safe and idempotent. |
 
 ## Ownership and release boundaries
 

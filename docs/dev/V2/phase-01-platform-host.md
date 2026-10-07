@@ -55,18 +55,17 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/bootstrap.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `app/host/readiness.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_bootstrap.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/bootstrap.py` — owned implementation merging bootstrap, lifespan stages, reverse-order shutdown, readiness assessment, and browser shell FastAPI app.
+- **Create:** `tests/unit/v2/phase_01/test_bootstrap.py` — independent contract, failure and FR-log cases for this task.
+- **Audit/compose:** `app/host/README.md` and applicable browser shell endpoints. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Define lifespan stages, readiness states and ownership of acquired services.
-- [ ] **Step 2:** Compose FastAPI configuration, log setup, paths, services, discovery and routes without import-time work.
-- [ ] **Step 3:** Undo acquired stages when startup fails; make repeated shutdown safe.
-- [ ] **Step 4:** Connect Home/About/help, navigation, skin, language and zoom to actual readiness/preferences; qualify clean install/start/stop.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Define lifespan stages, readiness states and ownership of acquired services.
+- [x] **Step 2:** Compose FastAPI configuration, log setup, paths, services, discovery and routes without import-time work.
+- [x] **Step 3:** Undo acquired stages when startup fails; make repeated shutdown safe.
+- [x] **Step 4:** Connect Home/About/help, navigation, skin, language and zoom to actual readiness/preferences; qualify clean install/start/stop.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 

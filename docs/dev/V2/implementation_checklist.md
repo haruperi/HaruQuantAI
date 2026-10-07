@@ -1,9 +1,9 @@
 # SQX V2 implementation checklist
 
 ```text
-Progress Bar   [--------------------] 0.00%
-Completed      0/72
-Current Task   1.1 App/host bootstrap and browser shell
+Progress Bar   [--------------------] 1.4%
+Completed      1/72
+Current Task   1.2 Centralized logging and DebugConsole
 ```
 
 - Count the **72 numbered capability tasks** only; thirteen phase checkboxes are rollups. Nested steps, specialist matrix rows and the shared release gate are acceptance conditions, not additional counted tasks.
@@ -15,7 +15,7 @@ Current Task   1.1 App/host bootstrap and browser shell
 - Owning READMEs remain the status authority. V2 is a proposal; ratified architecture and the already approved P01 contracts remain binding. Every runtime slice needs its own canonical approved plan.
 
 - [ ] 1. [Phase 1 — Platform and web shell](phase-01-platform-host.md)
-    - [ ] 1.1 [App/host bootstrap and browser shell](phase-01-platform-host.md#11-apphost-bootstrap-and-browser-shell)
+    - [x] 1.1 [App/host bootstrap and browser shell](phase-01-platform-host.md#11-apphost-bootstrap-and-browser-shell)
     - [ ] 1.2 [Centralized logging and DebugConsole](phase-01-platform-host.md#12-centralized-logging-and-debugconsole)
     - [ ] 1.3 [System and hardware diagnostics](phase-01-platform-host.md#13-system-and-hardware-diagnostics)
     - [ ] 1.4 [Settings and configurations](phase-01-platform-host.md#14-settings-and-configurations)

@@ -5,7 +5,7 @@ Substitute `{FEATURE_ID}` or `{PHASE_PLAN_PATH}`. Both prompts follow [AGENTS.md
 ## Prompt 1 — One feature task
 
 ```text
-Implement {FEATURE_ID} from its numbered task in docs/dev/V1/.
+Implement {FEATURE_ID} from its numbered task in docs/dev/V2/.
 
 - Read AGENTS.md, docs/templates/PYTHON_MODULE.md, owning domain READMEs, the current roadmap, task and master checklist before work.
 - Use only SQX145 Dev 1 (C:\SQX-145) under explicitly configured SQX_145_REFERENCE_ROOT; HARUQUANTAI_ROOT is this repository. Publish logical paths only. Missing sources are blockers; never substitute another donor.
@@ -23,7 +23,7 @@ Implement {FEATURE_ID} from its numbered task in docs/dev/V1/.
 - After qualification, produce the canonical feature walkthrough with donor traceability, registered FEAT/FR/DEC mappings and proposed commit message.
 
 Mandatory completion tracking:
-- Include docs/dev/V1/implementation_checklist.md in exact ALLOWED_WRITE_PATHS. Set Current Task when approved work starts.
+- Include docs/dev/V2/implementation_checklist.md in exact ALLOWED_WRITE_PATHS. Set Current Task when approved work starts.
 - Immediately after EACH task's implementation and required verification pass, check its numbered row; reconcile detailed steps, owning README status and walkthrough evidence. Leave partial/blocked/unverified tasks unchecked.
 - Recalculate Completed as checked child tasks / total child tasks; exclude phase-heading rows. Progress = round(100 * completed / total, 1)%; 20-cell bar fills floor(20 * completed / total) cells.
 - Check a phase only when all child tasks and phase completion gates pass. Set Current Task to the next pending task, or retain a blocked task with its reason; use None — complete only when all tasks pass.
@@ -56,7 +56,7 @@ Implement every feature/task in {PHASE_PLAN_PATH} as one approved phase batch.
 - Produce one canonical phase walkthrough with per-feature outcomes, real connected acceptance and explicit remaining blockers.
 
 Mandatory completion tracking:
-- Include docs/dev/V1/implementation_checklist.md in exact ALLOWED_WRITE_PATHS. Set Current Task when approved work starts.
+- Include docs/dev/V2/implementation_checklist.md in exact ALLOWED_WRITE_PATHS. Set Current Task when approved work starts.
 - Immediately after EACH task's implementation and required verification pass, check its numbered row; reconcile detailed steps, owning README status and walkthrough evidence. Leave partial/blocked/unverified tasks unchecked.
 - Recalculate Completed as checked child tasks / total child tasks; exclude phase-heading rows. Progress = round(100 * completed / total, 1)%; 20-cell bar fills floor(20 * completed / total) cells.
 - Check a phase only when all child tasks and phase completion gates pass. Set Current Task to the next pending task, or retain a blocked task with its reason; use None — complete only when all tasks pass.
