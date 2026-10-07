@@ -21,6 +21,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-RESPONSE` | Universal immutable response envelope, structured error taxonomy, and execution metadata in `app/host/response.py` | Implemented and verified; Phase 1 task 1.6 qualified |
 | `FEAT-HOST-TRANSPORT` | Unified HTTP transport middleware, request correlation, session authentication, in-memory event bus, and Server-Sent Events streaming in `app/host/transport.py` | Implemented and verified; Phase 1 task 1.6 qualified |
 | `FEAT-HOST-JOBS` | Hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, restart reconciliation, and event broadcasting in `app/host/jobs.py` | Implemented and verified; Phase 1 task 1.7 qualified |
+| `FEAT-HOST-RESOURCES` | Immutable artifact custody, content-addressed storage, path containment, Zip-Slip/expansion bomb prevention, bounded caching, and REST management in `app/host/resources.py` | Implemented and verified; Phase 1 task 1.8 qualified |
 
 ## Registered functional requirements
 
@@ -89,6 +90,14 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-JOBS-RESTART-RECONCILIATION` | Durable SQLite storage (`host_jobs`) reconciling orphaned or active jobs to INTERRUPTED on reboot. | Emits INFO when orphaned or active jobs from previous runs are reconciled. |
 | `FR-HOST-JOBS-EVENT-BROADCAST` | Real-time broadcasting of job state updates and progress reports to the EventBus. | Emits DEBUG when job lifecycle updates and progress reports are broadcast. |
 | `FR-HOST-JOBS-REST-API` | FastAPI jobs router exposing endpoints for capacity, job submission, querying, and cancellation. | Emits DEBUG when jobs router is constructed and endpoints are invoked. |
+| `FR-HOST-RESOURCES-STAGING-PUBLICATION` | Stage raw bytes and files into transient custody and publish into immutable SHA-256 content-addressed store. | Emits INFO detailing resource ID, SHA-256 digest, byte size, and store path. |
+| `FR-HOST-RESOURCES-CONTAINMENT-SECURITY` | Sandbox containment resolver rejecting traversal (`..`), foreign drive components, and forbidden symlinks. | Emits DEBUG on verified path; WARNING/ERROR on traversal attempts and drive escapes. |
+| `FR-HOST-RESOURCES-ARCHIVE-INSPECTION` | Pre-extraction inspection of ZIP and TAR archives for entry counts, uncompressed byte limits, and compression bombs. | Emits INFO summarizing entry counts and safety; WARNING on limit violations. |
+| `FR-HOST-RESOURCES-ARCHIVE-EXTRACTION` | Transaction-safe contained extraction into sandbox directory with automatic directory rollback upon failure. | Emits INFO with destination and extracted count; ERROR on extraction failure with rollback. |
+| `FR-HOST-RESOURCES-BOUNDED-CACHE` | Thread-safe, byte-bounded LRU and TTL memory cache for resource payloads with hit/miss/eviction telemetry. | Emits DEBUG on hit/miss; INFO on LRU eviction events recording freed bytes and counts. |
+| `FR-HOST-RESOURCES-HTTPX-ACQUISITION` | Bounded remote artifact streaming download via httpx with size limits, timeouts, and orphan rollback. | Emits INFO on acquisition success; ERROR on HTTP failures or byte ceiling violations. |
+| `FR-HOST-RESOURCES-ORPHAN-CLEANUP` | Automated garbage collection of abandoned or expired staging directories to bound disk usage. | Emits INFO recording count of purged staging directories. |
+| `FR-HOST-RESOURCES-REST-PROJECTION` | FastAPI REST projection endpoints exposing staging, publishing, retrieval, inspection, extraction, and cache status. | Emits DEBUG on router composition; INFO on resource mutations and query invocations. |
 
 ## Ratified reference decisions
 

@@ -295,18 +295,17 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/resources.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `app/host/archives.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_resources.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/resources.py` — owned implementation merging resource staging, content-addressed storage, path containment, safe archive inspection and extraction, bounded LRU/TTL caching, remote HTTP acquisition, and REST endpoints.
+- **Create:** `tests/unit/v2/phase_01/test_resources.py` — independent contract, failure, and FR-log cases for resource services and safe archive access.
+- **Audit/compose:** `app/host/README.md`. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Define resource IDs, checksums, media/size metadata, scopes and staging-to-publication transitions.
-- [ ] **Step 2:** Enforce contained paths including resolved junctions; reject escaped entries and expansion limits.
-- [ ] **Step 3:** Use Python file/hash/archive primitives and bounded httpx acquisition policy; qualify each needed compression/encryption variant.
-- [ ] **Step 4:** Clean temporary work after failure/cancel; preserve retained revisions after producer removal and key caches by version with measured bounds.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Define resource IDs, checksums, media/size metadata, scopes and staging-to-publication transitions.
+- [x] **Step 2:** Enforce contained paths including resolved junctions; reject escaped entries and expansion limits.
+- [x] **Step 3:** Use Python file/hash/archive primitives and bounded httpx acquisition policy; qualify each needed compression/encryption variant.
+- [x] **Step 4:** Clean temporary work after failure/cancel; preserve retained revisions after producer removal and key caches by version with measured bounds.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
