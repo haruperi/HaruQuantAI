@@ -68,7 +68,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import inspect
-import logging
 import sys
 import time
 import uuid
@@ -84,7 +83,9 @@ from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-logger = logging.getLogger(__name__)
+from app.host.logging import configure_host_logging, get_logger
+
+logger = get_logger(__name__)
 
 DEFAULT_SHELL_PREFERENCES: dict[str, Any] = {
     "revision": 1,
@@ -512,6 +513,11 @@ def _create_shell_router(
         """Return the host readiness assessment snapshot."""
         rt: HostRuntime = request.app.state.runtime
         readiness = rt.get_readiness()
+        logger.debug(
+            "FR-HOST-BOOT-SHELL-PROJECTION: Readiness endpoint evaluated: is_ready=%s",
+            readiness.is_ready,
+            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
+        )
         http_status = (
             status.HTTP_200_OK
             if readiness.is_ready
@@ -530,6 +536,12 @@ def _create_shell_router(
         """Acknowledge the browser shell frontend completion of load."""
         rt: HostRuntime = request.app.state.runtime
         rt.acknowledge_app_loaded()
+        logger.info(
+            "FR-HOST-BOOT-SHELL-PROJECTION: Browser shell app-loaded received "
+            "for host=%s",
+            rt.host_instance_id,
+            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
+        )
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content={
@@ -638,10 +650,19 @@ def create_host_app(
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         app.state.runtime = resolved_runtime
         app.state.settings = resolved_settings
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: Entering host lifespan: starting runtime.",
+            extra={"fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES"},
+        )
         await resolved_runtime.start()
         try:
             yield
         finally:
+            logger.info(
+                "FR-HOST-BOOT-REVERSE-SHUTDOWN: Exiting host lifespan: "
+                "stopping runtime.",
+                extra={"fr_id": "FR-HOST-BOOT-REVERSE-SHUTDOWN"},
+            )
             await resolved_runtime.stop()
 
     app = FastAPI(
@@ -677,9 +698,14 @@ def main() -> None:
     parser.add_argument("--debug", action="store_true", help="Enable debug diagnostics")
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.DEBUG if args.debug else logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    configure_host_logging(level="DEBUG" if args.debug else "INFO")
+    logger.info(
+        "FR-HOST-BOOT-LIFECYCLE-STAGES: Initializing host from CLI: "
+        "host=%s port=%d debug=%s",
+        args.host,
+        args.port,
+        args.debug,
+        extra={"fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES"},
     )
 
     settings = HostSettings(host=args.host, port=args.port, debug=args.debug)

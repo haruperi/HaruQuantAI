@@ -885,6 +885,14 @@ class BenchmarkRunner:
             self._jobs[job_id] = job
             self._cancel_events[job_id] = cancel_evt
 
+        logger.info(
+            "FR-HOST-DIAG-BENCHMARK-EXECUTION: Started background benchmark job %s "
+            "(%d iterations)",
+            job_id,
+            iterations,
+            extra={"fr_id": "FR-HOST-DIAG-BENCHMARK-EXECUTION", "job_id": job_id},
+        )
+
         worker = threading.Thread(
             target=self._execute_worker,
             args=(job_id, iterations, cancel_evt),
@@ -968,6 +976,14 @@ class BenchmarkRunner:
                     error_message=None,
                     metadata=curr.metadata if curr else {},
                 )
+            logger.info(
+                "FR-HOST-DIAG-BENCHMARK-EXECUTION: Completed benchmark job %s: "
+                "throughput=%.1f ops/sec, duration=%.3fs",
+                job_id,
+                throughput,
+                elapsed,
+                extra={"fr_id": "FR-HOST-DIAG-BENCHMARK-EXECUTION", "job_id": job_id},
+            )
         except InterruptedError:
             elapsed = round(time.perf_counter() - start_perf, 4)
             with self._lock:
@@ -985,7 +1001,14 @@ class BenchmarkRunner:
                     error_message="Benchmark cancelled by user request",
                     metadata=curr.metadata if curr else {},
                 )
-        except Exception as exc:  # noqa: BLE001
+            logger.info(
+                "FR-HOST-DIAG-BENCHMARK-EXECUTION: Benchmark job %s cancelled "
+                "after %d iterations",
+                job_id,
+                completed,
+                extra={"fr_id": "FR-HOST-DIAG-BENCHMARK-EXECUTION", "job_id": job_id},
+            )
+        except Exception:
             elapsed = round(time.perf_counter() - start_perf, 4)
             with self._lock:
                 curr = self._jobs.get(job_id)
@@ -999,9 +1022,14 @@ class BenchmarkRunner:
                     iterations_completed=completed,
                     throughput_ops_per_sec=None,
                     results=None,
-                    error_message=str(exc),
+                    error_message="Benchmark execution failed unexpectedly",
                     metadata=curr.metadata if curr else {},
                 )
+            logger.exception(
+                "FR-HOST-DIAG-BENCHMARK-EXECUTION: Benchmark job %s failed",
+                job_id,
+                extra={"fr_id": "FR-HOST-DIAG-BENCHMARK-EXECUTION", "job_id": job_id},
+            )
 
     def get_job(self, job_id: str) -> BenchmarkJob | None:
         """Retrieve status of an existing benchmark job."""

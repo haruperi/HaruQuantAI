@@ -1181,6 +1181,7 @@ class BoundLogger:
                 category=chosen_category,
             )
             engine.enqueue(event)
+            _bridge_event_to_stdlib(event)
         finally:
             _LOCAL_STATE.is_logging = False
 
@@ -1245,6 +1246,31 @@ class BoundLogger:
         exc_val = sys.exception()
         err_info = safe_error_boundary(exc_val) if exc_val is not None else None
         self._log("ERROR", msg, *args, category=category, error=err_info, extra=extra)
+
+
+def _bridge_event_to_stdlib(event: LogEvent) -> None:
+    """Forward sanitized record to active standard library handlers."""
+    with contextlib.suppress(Exception):
+        stdlib_logger = logging.getLogger(event.namespace)
+        root_logger = logging.getLogger()
+        active = list(stdlib_logger.handlers) + list(root_logger.handlers)
+        if not active:
+            return
+        lvl_no = getattr(logging, event.level, logging.INFO)
+        record = stdlib_logger.makeRecord(
+            event.namespace,
+            lvl_no,
+            event.module,
+            event.line,
+            event.message,
+            args=(),
+            exc_info=None,
+            func=event.function,
+            extra=event.context,
+        )
+        for handler in active:
+            if not isinstance(handler, HostBridgeHandler):
+                handler.handle(record)
 
 
 # ============================================================================

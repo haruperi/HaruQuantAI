@@ -81,7 +81,6 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
-import logging
 import re
 import sys
 from collections.abc import Callable, Sequence
@@ -93,7 +92,7 @@ from typing import Annotated, Any, cast
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.host.logging import get_logger
+from app.host.logging import BoundLogger, get_logger
 
 logger = get_logger(__name__)
 
@@ -403,7 +402,7 @@ class PluginHostContext:
         self.package_dir: Path = package_dir
         self.data_dir: Path = data_dir
         self.settings: Any | None = settings
-        self.logger: logging.Logger = logging.getLogger(f"plugin.{plugin_id}")
+        self.logger: BoundLogger = get_logger(f"plugin.{plugin_id}")
 
         self._mounted_routers: list[APIRouter] = []
         self._event_listeners: list[tuple[str, Callable[..., Any]]] = []
@@ -1140,6 +1139,14 @@ class PluginLifecycleManager:
         if plugin_id not in self._records:
             return False
 
+        logger.info(
+            "FR-HOST-DISC-LIFECYCLE-MANAGEMENT: Enabling plugin '%s'...",
+            plugin_id,
+            extra={
+                "fr_id": "FR-HOST-DISC-LIFECYCLE-MANAGEMENT",
+                "plugin_id": plugin_id,
+            },
+        )
         rec = self._records[plugin_id]
         self._records[plugin_id] = PluginRecord(
             manifest=rec.manifest,
@@ -1155,6 +1162,14 @@ class PluginLifecycleManager:
         if plugin_id not in self._records:
             return False
 
+        logger.info(
+            "FR-HOST-DISC-LIFECYCLE-MANAGEMENT: Reloading plugin '%s'...",
+            plugin_id,
+            extra={
+                "fr_id": "FR-HOST-DISC-LIFECYCLE-MANAGEMENT",
+                "plugin_id": plugin_id,
+            },
+        )
         self.disable(plugin_id)
         rec = self._records[plugin_id]
         package_dir = Path(rec.package_dir)
