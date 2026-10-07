@@ -1,9 +1,9 @@
 # SQX V2 implementation checklist
 
 ```text
-Progress Bar   [--------------------] 1.4%
-Completed      1/72
-Current Task   1.2 Centralized logging and DebugConsole
+Progress Bar   [--------------------] 2.8%
+Completed      2/72
+Current Task   1.3 System and hardware diagnostics
 ```
 
 - Count the **72 numbered capability tasks** only; thirteen phase checkboxes are rollups. Nested steps, specialist matrix rows and the shared release gate are acceptance conditions, not additional counted tasks.
@@ -16,7 +16,7 @@ Current Task   1.2 Centralized logging and DebugConsole
 
 - [ ] 1. [Phase 1 — Platform and web shell](phase-01-platform-host.md)
     - [x] 1.1 [App/host bootstrap and browser shell](phase-01-platform-host.md#11-apphost-bootstrap-and-browser-shell)
-    - [ ] 1.2 [Centralized logging and DebugConsole](phase-01-platform-host.md#12-centralized-logging-and-debugconsole)
+    - [x] 1.2 [Centralized logging and DebugConsole](phase-01-platform-host.md#12-centralized-logging-and-debugconsole)
     - [ ] 1.3 [System and hardware diagnostics](phase-01-platform-host.md#13-system-and-hardware-diagnostics)
     - [ ] 1.4 [Settings and configurations](phase-01-platform-host.md#14-settings-and-configurations)
     - [ ] 1.5 [Workspace and plugin discovery](phase-01-platform-host.md#15-workspace-and-plugin-discovery)

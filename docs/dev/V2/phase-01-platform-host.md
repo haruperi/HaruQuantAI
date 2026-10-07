@@ -89,18 +89,17 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 3. File Changes
 
-- **Create (proposed):** `app/host/logging.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `app/host/log_projection.py` — owned implementation of the operations below; reuse an earlier qualified module when appropriate.
-- **Create (proposed):** `tests/unit/v2/phase_01/test_logging.py` — independent contract, failure and FR-log cases for this task.
-- **Audit/compose:** the owning README and applicable workspace/client listed above; choose exact existing files in the task plan. Host services remain the only job/resource/persistence authority.
+- **Create:** `app/host/logging.py` — owned implementation merging centralized logging, redaction filtering, rotating ZIP storage, bounded in-memory ring buffer, and DebugConsole projections.
+- **Create:** `tests/unit/v2/phase_01/test_logging.py` — independent contract, failure and FR-log cases for this task.
+- **Audit/compose:** `app/host/README.md` and applicable workspace/client. Host services remain the only job/resource/persistence authority.
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Specify event fields, FR identity, request/job/resource correlation and bounded sinks.
-- [ ] **Step 2:** Configure stdlib loggers once; forward worker records with context and redact before every sink.
-- [ ] **Step 3:** Implement rotating storage and bounded DebugConsole snapshots/events using existing cursor limits.
-- [ ] **Step 4:** Expose sink overflow/failure without recursive logging; close subscriptions and sinks on stop.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Specify event fields, FR identity, request/job/resource correlation and bounded sinks.
+- [x] **Step 2:** Configure stdlib loggers once; forward worker records with context and redact before every sink.
+- [x] **Step 3:** Implement rotating storage and bounded DebugConsole snapshots/events using existing cursor limits.
+- [x] **Step 4:** Expose sink overflow/failure without recursive logging; close subscriptions and sinks on stop.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
