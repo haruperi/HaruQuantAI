@@ -8,7 +8,7 @@ Substitute `{FEATURE_ID}` or `{PHASE_PLAN_PATH}`. Both prompts follow [AGENTS.md
 Implement {FEATURE_ID} from its numbered task in docs/dev/V1/.
 
 - Read AGENTS.md, docs/templates/PYTHON_MODULE.md, owning domain READMEs, the current roadmap, task and master checklist before work.
-- Use only SQX145 Dev 1 under explicitly configured SQX_145_REFERENCE_ROOT; HARUQUANTAI_ROOT is this repository. Publish logical paths only. Missing sources are blockers; never substitute another donor.
+- Use only SQX145 Dev 1 (C:\SQX-145) under explicitly configured SQX_145_REFERENCE_ROOT; HARUQUANTAI_ROOT is this repository. Publish logical paths only. Missing sources are blockers; never substitute another donor.
 - Read docs/dev/V1/sqx145-baseline-audit.md and current inventory/ownership/member metadata. Verify exact donor SHA-256 and actual classes/functions before translation.
 - Inspect readable/decompiled implementation bodies or bytecode and actual callers. Preserve confirmed formulas, operation order, defaults, state transitions, I/O and failure semantics in independently written Python. Signatures, names and manifest descriptions cannot supply missing logic.
 - Enumerate all consumed classes/functions/resources, not merely representative FR seeds. Map each accepted behavior to descriptive FRs; classify JVM-only/unconsumed internals explicitly.
@@ -31,7 +31,6 @@ Mandatory completion tracking:
 - Run focused tests with explicit paths and --no-cov during iteration, independent normal/boundary/failure vectors, FR log checks and applicable lifecycle/resource tests. Run prescribed candidate coverage and UI typecheck/test/build plus isolated real-host acceptance when UI is connected.
 - Record exact commands/results, timestamped artifacts, deviations and unresolved gaps. Never infer SQX parity from static inventory, code coverage or matching screens.
 - Do not commit, merge, push, rebase or rewrite history without separate owner authorization after walkthrough review.
-
 ```
 
 ## Prompt 2 — Whole phase batch
@@ -40,7 +39,7 @@ Mandatory completion tracking:
 Implement every feature/task in {PHASE_PLAN_PATH} as one approved phase batch.
 
 - Read AGENTS.md, docs/templates/PYTHON_MODULE.md, owning domain READMEs, the current roadmap, task and master checklist before work.
-- Use only SQX145 Dev 1 under explicitly configured SQX_145_REFERENCE_ROOT; HARUQUANTAI_ROOT is this repository. Publish logical paths only. Missing sources are blockers; never substitute another donor.
+- Use only SQX145 Dev 1 (C:\SQX-145) under explicitly configured SQX_145_REFERENCE_ROOT; HARUQUANTAI_ROOT is this repository. Publish logical paths only. Missing sources are blockers; never substitute another donor.
 - Read docs/dev/V1/sqx145-baseline-audit.md and current inventory/ownership/member metadata. Verify exact donor SHA-256 and actual classes/functions before translation.
 - Inspect readable/decompiled implementation bodies or bytecode and actual callers. Preserve confirmed formulas, operation order, defaults, state transitions, I/O and failure semantics in independently written Python. Signatures, names and manifest descriptions cannot supply missing logic.
 - Enumerate all consumed classes/functions/resources, not merely representative FR seeds. Map each accepted behavior to descriptive FRs; classify JVM-only/unconsumed internals explicitly.
@@ -65,5 +64,4 @@ Mandatory completion tracking:
 - Run focused tests with explicit paths and --no-cov during iteration, independent normal/boundary/failure vectors, FR log checks and applicable lifecycle/resource tests. Run prescribed candidate coverage and UI typecheck/test/build plus isolated real-host acceptance when UI is connected.
 - Record exact commands/results, timestamped artifacts, deviations and unresolved gaps. Never infer SQX parity from static inventory, code coverage or matching screens.
 - Do not commit, merge, push, rebase or rewrite history without separate owner authorization after walkthrough review.
-
 ```
