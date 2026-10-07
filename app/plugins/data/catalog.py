@@ -73,6 +73,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from typing import Any, override
 
 from app.host.logging import get_logger
 from app.host.persistence import DatabaseManager, PersistenceError
@@ -101,6 +102,9 @@ class DatasetRecord(BaseModel):
     date_from: str = Field(default="", description="Start date string YYYY-MM-DD")
     date_to: str = Field(default="", description="End date string YYYY-MM-DD")
     bars: int = Field(default=0, ge=0, description="Authoritative total row/bar count")
+    bar_count: int | None = Field(
+        default=None, description="Alias for bars matching frontend expectations"
+    )
     created_at: str | None = Field(default=None)
     updated_at: str | None = Field(default=None)
     path: str = Field(default="", description="Relative or absolute data file path")
@@ -112,6 +116,12 @@ class DatasetRecord(BaseModel):
     )
     lineage_json: str = Field(default="{}", description="JSON lineage metadata")
     schema_version: int = Field(default=1, description="Metadata schema version")
+
+    @override
+    def model_post_init(self, _context: Any, /) -> None:
+        """Ensure bar_count mirrors bars if omitted."""
+        if self.bar_count is None:
+            object.__setattr__(self, "bar_count", self.bars)
 
 
 class BrokerProfileRecord(BaseModel):

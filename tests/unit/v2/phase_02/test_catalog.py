@@ -45,22 +45,24 @@ def test_instrument_crud(
     caplog.set_level(logging.DEBUG)
     service = InstrumentService(test_db)
 
-    # Initial state
-    assert service.count_instruments() == 0
-    assert service.list_instruments() == []
-    assert service.get_instrument("EURUSD") is None
+    # Initial state contains baseline seeds
+    assert service.count_instruments() == 3
+    initial_symbols = [inst.symbol for inst in service.list_instruments()]
+    assert "EURUSD" in initial_symbols
+    assert "USDJPY" in initial_symbols
+    assert service.get_instrument("AUDUSD") is None
 
     # Create / Save
-    eurusd = InstrumentDefinition(
-        symbol="EURUSD",
+    audusd = InstrumentDefinition(
+        symbol="AUDUSD",
         connection="Direct",
         broker_id=1,
-        description="Euro / US Dollar spot",
-        tick_size=0.00001,
-        tick_step=0.00001,
+        description="Australian Dollar spot",
+        tick_size=0.0001,
+        tick_step=0.0001,
         tick_value_in_money=1.0,
         point_value=100000.0,
-        decimals=5,
+        decimals=4,
         default_spread=1.2,
         default_slippage=0.5,
         min_volume=0.01,
@@ -73,10 +75,10 @@ def test_instrument_crud(
         commissions="3.5",
         data_type="Forex",
         exchange="FXCM",
-        country="US",
+        country="AU",
         sector="Currencies",
     )
-    service.save_instrument(eurusd)
+    service.save_instrument(audusd)
 
     # FR log verification
     assert any(
@@ -84,31 +86,31 @@ def test_instrument_crud(
     )
 
     # Read
-    assert service.count_instruments() == 1
-    retrieved = service.get_instrument("EURUSD")
+    assert service.count_instruments() == 4
+    retrieved = service.get_instrument("AUDUSD")
     assert retrieved is not None
-    assert retrieved.symbol == "EURUSD"
-    assert retrieved.tick_size == 0.00001
-    assert retrieved.decimals == 5
+    assert retrieved.symbol == "AUDUSD"
+    assert retrieved.tick_size == 0.0001
+    assert retrieved.decimals == 4
     assert retrieved.data_type == "Forex"
 
     # List
     all_insts = service.list_instruments()
-    assert len(all_insts) == 1
-    assert all_insts[0].symbol == "EURUSD"
+    assert len(all_insts) == 4
+    assert any(i.symbol == "AUDUSD" for i in all_insts)
 
     # Update
-    updated_eurusd = retrieved.model_copy(update={"default_spread": 0.8})
-    service.save_instrument(updated_eurusd)
-    retrieved2 = service.get_instrument("EURUSD")
+    updated_audusd = retrieved.model_copy(update={"default_spread": 0.8})
+    service.save_instrument(updated_audusd)
+    retrieved2 = service.get_instrument("AUDUSD")
     assert retrieved2 is not None
     assert retrieved2.default_spread == 0.8
 
     # Delete
-    deleted = service.delete_instrument("EURUSD")
+    deleted = service.delete_instrument("AUDUSD")
     assert deleted is True
-    assert service.count_instruments() == 0
-    assert service.get_instrument("EURUSD") is None
+    assert service.count_instruments() == 3
+    assert service.get_instrument("AUDUSD") is None
 
     # Delete nonexistent returns False
     assert service.delete_instrument("NONEXISTENT") is False

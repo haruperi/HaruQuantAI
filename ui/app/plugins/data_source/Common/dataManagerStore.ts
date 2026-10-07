@@ -25,6 +25,7 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
       broker?: string;
       source?: string;
       timezone?: string;
+      bars?: number;
       bar_count?: number;
       bars_count?: number;
       date_from?: string;
@@ -44,7 +45,7 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
       category: item.category || 'Forex',
       from: item.date_from || '',
       to: item.date_to || '',
-      bars: item.bar_count ?? item.bars_count ?? 0,
+      bars: item.bars ?? item.bar_count ?? item.bars_count ?? 0,
     }));
   } catch {
     return [];

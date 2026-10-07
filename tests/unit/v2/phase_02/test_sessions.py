@@ -103,8 +103,11 @@ def test_session_persistence_crud(
     caplog.set_level(logging.DEBUG)
     service = SessionService(test_db)
 
-    # Initial state
-    assert service.list_sessions() == []
+    # Initial state contains baseline seeds
+    assert len(service.list_sessions()) >= 2
+    initial_names = [s.name for s in service.list_sessions()]
+    assert "24/7 Forex" in initial_names
+    assert "US Equities RTH" in initial_names
     assert service.get_session("US_Equities") is None
 
     session = TradingSessionDefinition(
@@ -152,8 +155,7 @@ def test_session_persistence_crud(
 
     # List
     all_sessions = service.list_sessions()
-    assert len(all_sessions) == 1
-    assert all_sessions[0].name == "US_Equities"
+    assert any(s.name == "US_Equities" for s in all_sessions)
 
     # Delete
     assert service.delete_session("US_Equities") is True

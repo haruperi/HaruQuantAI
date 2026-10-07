@@ -128,6 +128,7 @@ __all__ = [
     "TransportService",
     "ValidationIssue",
     "create_transport_router",
+    "get_event_bus",
     "get_global_event_bus",
     "get_global_token_manager",
     "register_transport_exception_handlers",
@@ -517,6 +518,9 @@ def get_global_event_bus() -> EventBus:
             if _STATE.event_bus is None:
                 _STATE.event_bus = EventBus()
     return _STATE.event_bus
+
+
+get_event_bus = get_global_event_bus
 
 
 def get_global_token_manager() -> SessionTokenManager:

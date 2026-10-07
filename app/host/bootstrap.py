@@ -109,6 +109,7 @@ from app.host.settings import settings as default_host_settings
 from app.host.transport import (
     TransportMiddleware,
     create_transport_router,
+    get_event_bus,
     register_transport_exception_handlers,
 )
 from app.plugins.data.integration import create_data_router
@@ -879,7 +880,10 @@ def _mount_host_routers(
 
     # 11. Market Data Router (/data/..., /api/v1/data/...)
     data_router = create_data_router(
-        resolved_runtime.db_manager, resolved_runtime.resource_manager
+        resolved_runtime.db_manager,
+        resolved_runtime.resource_manager,
+        job_manager=resolved_runtime.job_manager,
+        event_bus=get_event_bus(),
     )
     app.include_router(data_router)
     app.include_router(data_router, prefix=resolved_settings.api_prefix)

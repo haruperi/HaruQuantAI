@@ -1020,8 +1020,8 @@ class SchemaManager:
             # Record initial schema version if not recorded
             cur = conn.cursor()
             cur.execute("SELECT COUNT(*) FROM schema_migrations WHERE version = 1;")
+            now_str = datetime.now(UTC).isoformat()
             if cur.fetchone()[0] == 0:
-                now_str = datetime.now(UTC).isoformat()
                 conn.execute(
                     """
                     INSERT INTO schema_migrations (
@@ -1030,6 +1030,54 @@ class SchemaManager:
                     """,
                     (now_str,),
                 )
+
+            # Seed standard baseline instruments if absent
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO datamgr_instruments (
+                    symbol, description, tick_size, tick_step, point_value,
+                    decimals, default_spread, data_type, alias,
+                    created_at_utc, updated_at_utc
+                ) VALUES
+                ('EURUSD', 'Euro / US Dollar', 0.00001, 0.00001, 100000.0,
+                 5, 0.0001, 'Forex', 'EUR/USD,EURUSD_SB', ?, ?),
+                ('GBPUSD', 'British Pound / US Dollar', 0.00001, 0.00001, 100000.0,
+                 5, 0.0001, 'Forex', 'GBP/USD', ?, ?),
+                ('USDJPY', 'US Dollar / Japanese Yen', 0.001, 0.001, 100000.0,
+                 3, 0.01, 'Forex', 'USD/JPY', ?, ?);
+                """,
+                (now_str, now_str, now_str, now_str, now_str, now_str),
+            )
+
+            # Seed standard baseline trading sessions if absent
+            forex_windows = (
+                '[{"day_of_week": 0, "start_time": "00:00", "end_time": "23:59:59"},'
+                ' {"day_of_week": 1, "start_time": "00:00", "end_time": "23:59:59"},'
+                ' {"day_of_week": 2, "start_time": "00:00", "end_time": "23:59:59"},'
+                ' {"day_of_week": 3, "start_time": "00:00", "end_time": "23:59:59"},'
+                ' {"day_of_week": 4, "start_time": "00:00", "end_time": "23:59:59"},'
+                ' {"day_of_week": 5, "start_time": "00:00", "end_time": "23:59:59"},'
+                ' {"day_of_week": 6, "start_time": "00:00", "end_time": "23:59:59"}]'
+            )
+            rth_windows = (
+                '[{"day_of_week": 1, "start_time": "09:30", "end_time": "16:00"},'
+                ' {"day_of_week": 2, "start_time": "09:30", "end_time": "16:00"},'
+                ' {"day_of_week": 3, "start_time": "09:30", "end_time": "16:00"},'
+                ' {"day_of_week": 4, "start_time": "09:30", "end_time": "16:00"},'
+                ' {"day_of_week": 5, "start_time": "09:30", "end_time": "16:00"}]'
+            )
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO datamgr_sessions (
+                    name, description, timezone, windows_json, is_default
+                ) VALUES
+                ('24/7 Forex', 'Continuous round-the-clock forex trading session',
+                 'UTC', ?, 1),
+                ('US Equities RTH', 'US Equities Regular Trading Hours',
+                 'America/New_York', ?, 0);
+                """,
+                (forex_windows, rth_windows),
+            )
 
         self._initialized = True
         logger.info(

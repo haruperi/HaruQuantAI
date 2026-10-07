@@ -38,6 +38,7 @@ import pytest
 from app.host.bootstrap import HostRuntime, HostSettings, create_host_app
 from app.host.persistence import DatabaseManager
 from app.host.resources import ResourceManager
+from app.host.transport import get_event_bus
 from fastapi.testclient import TestClient
 
 SAMPLE_CSV_CONTENT = (
@@ -145,17 +146,20 @@ def test_integration_datasets_workflow(
 
 def test_integration_instruments_workflow(client: TestClient) -> None:
     """Validate instrument CRUD operations via REST endpoints."""
-    # 1. Initial listing
+    # 1. Initial listing contains baseline seeds
     resp = client.get("/api/v1/data/instruments")
     assert resp.status_code == 200
-    assert resp.json()["data"] == []
+    initial_symbols = [inst["symbol"] for inst in resp.json()["data"]]
+    assert "EURUSD" in initial_symbols
+    assert "USDJPY" in initial_symbols
+    assert "GBPUSD" in initial_symbols
 
     # 2. Create instrument
     inst_payload = {
-        "symbol": "GBPUSD",
+        "symbol": "AUDUSD",
         "connection": "Direct",
         "broker_id": 1,
-        "description": "British Pound vs US Dollar",
+        "description": "Australian Dollar vs US Dollar",
         "point_value": 100000.0,
         "tick_size": 0.0001,
         "tick_step": 0.0001,
@@ -164,31 +168,31 @@ def test_integration_instruments_workflow(client: TestClient) -> None:
     }
     create_resp = client.post("/api/v1/data/instruments", json=inst_payload)
     assert create_resp.status_code == 201
-    assert create_resp.json()["data"]["symbol"] == "GBPUSD"
+    assert create_resp.json()["data"]["symbol"] == "AUDUSD"
 
     # 3. Retrieve instrument
-    get_resp = client.get("/api/v1/data/instruments/GBPUSD")
+    get_resp = client.get("/api/v1/data/instruments/AUDUSD")
     assert get_resp.status_code == 200
-    assert get_resp.json()["data"]["description"] == "British Pound vs US Dollar"
+    assert get_resp.json()["data"]["description"] == "Australian Dollar vs US Dollar"
 
     # 4. Update instrument
     update_resp = client.put(
-        "/api/v1/data/instruments/GBPUSD",
-        json={"description": "Updated GBPUSD Description"},
+        "/api/v1/data/instruments/AUDUSD",
+        json={"description": "Updated AUDUSD Description"},
     )
     assert update_resp.status_code == 200
     assert update_resp.json()["data"]["updated"] is True
 
     # 5. Verify update persisted
-    verify_resp = client.get("/api/v1/data/instruments/GBPUSD")
-    assert verify_resp.json()["data"]["description"] == "Updated GBPUSD Description"
+    verify_resp = client.get("/api/v1/data/instruments/AUDUSD")
+    assert verify_resp.json()["data"]["description"] == "Updated AUDUSD Description"
 
     # 6. Delete instrument
-    del_resp = client.delete("/api/v1/data/instruments/GBPUSD")
+    del_resp = client.delete("/api/v1/data/instruments/AUDUSD")
     assert del_resp.status_code == 200
 
     # 7. Check 404 on deleted instrument
-    assert client.get("/api/v1/data/instruments/GBPUSD").status_code == 404
+    assert client.get("/api/v1/data/instruments/AUDUSD").status_code == 404
 
 
 def test_integration_sessions_workflow(client: TestClient) -> None:
@@ -441,3 +445,106 @@ def test_integration_error_handling(client: TestClient) -> None:
     # Also verify route reachable at root /data prefix
     root_resp = client.get("/data/datasets")
     assert root_resp.status_code == 200
+
+
+def test_integration_async_background_jobs(client: TestClient) -> None:
+    """Validate async background job ingestion for dataset and provider workflows."""
+    # 1. Submit async dataset import
+    import_payload = {
+        "symbol": "EURUSD",
+        "timeframe": "M1",
+        "broker": "Default",
+        "content": SAMPLE_CSV_CONTENT,
+        "async_job": True,
+    }
+    resp = client.post("/api/v1/data/datasets/import", json=import_payload)
+    assert resp.status_code == 202
+    data = resp.json()["data"]
+    assert "job_id" in data
+    assert data["status"] == "pending"
+    assert data["symbol"] == "EURUSD"
+
+    # 2. Submit async provider download
+    download_payload = {
+        "provider": "mock",
+        "symbol": "EURUSD",
+        "timeframe": "M1",
+        "date_from": "2026-10-01",
+        "date_to": "2026-10-02",
+        "async_job": True,
+    }
+    resp_dl = client.post("/api/v1/data/providers/download", json=download_payload)
+    assert resp_dl.status_code == 202
+    data_dl = resp_dl.json()["data"]
+    assert "job_id" in data_dl
+    assert data_dl["status"] == "pending"
+    assert data_dl["provider"] == "mock"
+
+
+def test_integration_event_bus_notifications(client: TestClient) -> None:
+    """Validate event bus publishing on dataset, instrument, and session actions."""
+    bus = get_event_bus()
+    sub_id, queue, _, _ = bus.subscribe(
+        channels=["data.dataset", "data.instrument", "data.session"]
+    )
+    try:
+        # Create an instrument
+        inst_payload = {
+            "symbol": "NZDUSD",
+            "connection": "Direct",
+            "broker_id": 1,
+            "description": "New Zealand Dollar vs US Dollar",
+            "point_value": 100000.0,
+            "tick_size": 0.0001,
+            "tick_step": 0.0001,
+            "digits": 4,
+            "data_type": "Forex",
+        }
+        client.post("/api/v1/data/instruments", json=inst_payload)
+
+        # Ingest a dataset synchronously
+        client.post(
+            "/api/v1/data/datasets/import",
+            json={
+                "symbol": "NZDUSD",
+                "timeframe": "M1",
+                "broker": "Default",
+                "content": SAMPLE_CSV_CONTENT,
+            },
+        )
+
+        # Drain queued events
+        collected_events = []
+        while not queue.empty():
+            collected_events.append(queue.get_nowait())
+
+        channels = [evt.channel for evt in collected_events]
+        assert "data.instrument" in channels
+        assert "data.dataset" in channels
+    finally:
+        bus.unsubscribe(sub_id)
+
+
+def test_integration_dataset_contract_alignment(client: TestClient) -> None:
+    """Validate bar_count and bars contract alignment on DatasetRecord."""
+    # Ingest a test dataset
+    client.post(
+        "/api/v1/data/datasets/import",
+        json={
+            "symbol": "EURUSD",
+            "timeframe": "M1",
+            "broker": "Default",
+            "content": SAMPLE_CSV_CONTENT,
+        },
+    )
+
+    resp = client.get("/api/v1/data/datasets")
+    assert resp.status_code == 200
+    datasets = resp.json()["data"]
+    assert len(datasets) > 0
+    record = datasets[0]
+    # Validate both 'bars' and 'bar_count' are populated and equivalent
+    assert "bars" in record
+    assert "bar_count" in record
+    assert record["bars"] == 5
+    assert record["bar_count"] == 5

@@ -64,14 +64,16 @@ from __future__ import annotations
 import argparse
 import sys
 import uuid
+from concurrent.futures import Future
 from pathlib import Path
 from typing import Any
 
+from app.host.jobs import JobManager
 from app.host.logging import get_logger
-from app.host.persistence import DatabaseManager
+from app.host.persistence import DatabaseManager, get_database_manager
 from app.host.resources import ResourceManager
 from app.host.response import StandardError
-from app.host.transport import ApiResponse
+from app.host.transport import ApiResponse, EventBus
 from app.plugins.data.baskets import BasketDefinition, BasketService
 from app.plugins.data.catalog import CatalogService
 from app.plugins.data.cot import CotService
@@ -91,6 +93,64 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 logger = get_logger(__name__)
+
+
+def _execute_async_import(
+    db_path_str: str,
+    storage_dir_str: str,
+    file_path_str: str,
+    *,
+    symbol: str,
+    timeframe: str,
+    broker: str,
+    config_dict: dict[str, Any],
+) -> dict[str, Any]:
+    """Execute background ingestion job in worker process."""
+    from app.host.persistence import DatabaseManager
+    from app.plugins.data.catalog import CatalogService
+    from app.plugins.data.ingestion import (
+        DataIngestionService,
+        IngestionConfig,
+    )
+
+    db = DatabaseManager(database_path=Path(db_path_str))
+    catalog = CatalogService(db)
+    service = DataIngestionService(catalog=catalog, storage_dir=Path(storage_dir_str))
+    config = IngestionConfig.model_validate(config_dict)
+    res = service.ingest_file(
+        file_path=Path(file_path_str),
+        symbol=symbol,
+        timeframe=timeframe,
+        source=broker,
+        config=config,
+    )
+    return res.model_dump(mode="json")
+
+
+def _execute_async_download(
+    provider_name: str,
+    symbol: str,
+    timeframe: str,
+    date_from: str,
+    date_to: str,
+) -> dict[str, Any]:
+    """Execute background provider download job in worker process."""
+    from app.plugins.data.providers import DownloadRequest, ProviderManager
+
+    manager = ProviderManager()
+    req = DownloadRequest(
+        provider_name=provider_name,
+        symbol=symbol,
+        timeframe=timeframe,
+        date_from=date_from,
+        date_to=date_to,
+    )
+    bars = manager.download(req)
+    return {
+        "provider": provider_name,
+        "symbol": symbol,
+        "bars_count": len(bars),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -113,6 +173,9 @@ class DatasetImportPayload(BaseModel):
     delimiter: str | None = Field(default=None, description="Delimiter override")
     has_header: bool | None = Field(
         default=None, description="Header presence override"
+    )
+    async_job: bool = Field(
+        default=False, description="Submit ingestion as background compute job"
     )
 
 
@@ -149,6 +212,9 @@ class ProviderDownloadPayload(BaseModel):
     timeframe: str = Field(default="M1", description="Target timeframe")
     date_from: str = Field(default="2020-01-01", description="Start date (YYYY-MM-DD)")
     date_to: str = Field(default="2020-01-02", description="End date (YYYY-MM-DD)")
+    async_job: bool = Field(
+        default=False, description="Submit download as background compute job"
+    )
 
 
 class CotUpdatePayload(BaseModel):
@@ -204,9 +270,19 @@ class ExportPayload(BaseModel):
 class DataRouterService:
     """Service container encapsulating market data route handlers."""
 
-    def __init__(self, db: DatabaseManager, res_dir: Path) -> None:
+    def __init__(
+        self,
+        db: DatabaseManager,
+        res_dir: Path,
+        *,
+        job_manager: JobManager | None = None,
+        event_bus: EventBus | None = None,
+    ) -> None:
         """Initialize all backing domain services."""
+        self.db = db
         self.res_dir = res_dir
+        self.job_manager = job_manager
+        self.event_bus = event_bus
         self.catalog = CatalogService(db)
         self.instruments = InstrumentService(db)
         self.sessions = SessionService(db)
@@ -219,6 +295,18 @@ class DataRouterService:
         self.providers = ProviderManager()
         self.custom_data = CustomDataService(db=db, storage_dir=res_dir / "custom_data")
         self.cot = CotService(db=db, storage_dir=res_dir / "cot")
+
+    def _emit_event(
+        self, channel: str, event_type: str, payload: dict[str, Any]
+    ) -> None:
+        """Publish real-time notification to host event bus if available."""
+        if self.event_bus is not None:
+            try:
+                self.event_bus.publish(
+                    channel=channel, event_type=event_type, payload=payload
+                )
+            except Exception:
+                logger.exception("Failed to publish event to channel '%s'", channel)
 
     def _error_response(
         self,
@@ -292,6 +380,7 @@ class DataRouterService:
                 f"Dataset '{dataset_id}' not found",
                 req_id,
             )
+        self._emit_event("data.dataset", "deleted", {"dataset_id": dataset_id})
         logger.info(
             "FR-DATA-INTEGRATION-DATASETS: Deleted dataset '%s'",
             dataset_id,
@@ -353,6 +442,57 @@ class DataRouterService:
         )
 
         try:
+            if payload.async_job and self.job_manager is not None:
+                staging_target: Path
+                if payload.content is not None:
+                    staging_dir = self.res_dir / "staging"
+                    staging_dir.mkdir(parents=True, exist_ok=True)
+                    staging_target = staging_dir / f"import_{uuid.uuid4().hex[:8]}.csv"
+                    staging_target.write_text(payload.content, encoding="utf-8")
+                else:
+                    staging_target = Path(payload.file_path or "")
+
+                storage_dir = self.res_dir / "datasets"
+                future = self.job_manager.submit(
+                    "data_manager",
+                    _execute_async_import,
+                    str(self.db.database_path),
+                    str(storage_dir),
+                    str(staging_target),
+                    symbol=payload.symbol,
+                    timeframe=payload.timeframe,
+                    broker=payload.broker,
+                    config_dict=config.model_dump(),
+                    kind="dataset_import",
+                )
+                job_id = self.job_manager.get_job_id_for_future(future) or ""
+
+                def _on_import_done(fut: Future[Any]) -> None:
+                    exc = fut.exception()
+                    if exc is not None:
+                        logger.warning(
+                            "FR-DATA-INTEGRATION-DATASETS: Async import failed: %s",
+                            exc,
+                        )
+                        return
+                    res = fut.result()
+                    self._emit_event("data.dataset", "created", res)
+
+                future.add_done_callback(_on_import_done)
+
+                resp = ApiResponse.success(
+                    data={
+                        "job_id": job_id,
+                        "status": "pending",
+                        "symbol": payload.symbol,
+                    },
+                    message=(f"Dataset import submitted as background job '{job_id}'"),
+                    request_id=req_id,
+                )
+                return JSONResponse(
+                    status_code=status.HTTP_202_ACCEPTED, content=resp.to_dict()
+                )
+
             if payload.content is not None:
                 staging_dir = self.res_dir / "staging"
                 staging_dir.mkdir(parents=True, exist_ok=True)
@@ -381,6 +521,7 @@ class DataRouterService:
                     req_id,
                 )
 
+            self._emit_event("data.dataset", "created", res.model_dump(mode="json"))
             logger.info(
                 "FR-DATA-INTEGRATION-DATASETS: Ingested %d bars for symbol '%s'",
                 res.bar_count,
@@ -472,6 +613,9 @@ class DataRouterService:
         req_id = request.headers.get("x-request-id")
         try:
             inst_id = self.instruments.create_instrument(instrument)
+            self._emit_event(
+                "data.instrument", "created", instrument.model_dump(mode="json")
+            )
             logger.info(
                 "FR-DATA-INTEGRATION-INSTRUMENTS: Created instrument '%s' (id=%d)",
                 instrument.symbol,
@@ -516,6 +660,9 @@ class DataRouterService:
                 f"Instrument '{symbol}' not found",
                 req_id,
             )
+        self._emit_event(
+            "data.instrument", "updated", {"symbol": symbol, "updates": updates}
+        )
         logger.info(
             "FR-DATA-INTEGRATION-INSTRUMENTS: Updated instrument '%s'",
             symbol,
@@ -539,6 +686,7 @@ class DataRouterService:
                 f"Instrument '{symbol}' not found",
                 req_id,
             )
+        self._emit_event("data.instrument", "deleted", {"symbol": symbol})
         logger.info(
             "FR-DATA-INTEGRATION-INSTRUMENTS: Deleted instrument '%s'",
             symbol,
@@ -600,6 +748,9 @@ class DataRouterService:
         req_id = request.headers.get("x-request-id")
         try:
             sess_id = self.sessions.save_session(session_def)
+            self._emit_event(
+                "data.session", "created", session_def.model_dump(mode="json")
+            )
             logger.info(
                 "FR-DATA-INTEGRATION-SESSIONS: Saved session '%s' (id=%d)",
                 session_def.name,
@@ -642,6 +793,7 @@ class DataRouterService:
                 f"Session '{name}' not found",
                 req_id,
             )
+        self._emit_event("data.session", "deleted", {"name": name})
         logger.info(
             "FR-DATA-INTEGRATION-SESSIONS: Deleted session '%s'",
             name,
@@ -663,6 +815,7 @@ class DataRouterService:
             imported = self.sessions.import_ninjatrader_xml(
                 payload.xml_content, policy=payload.conflict_policy
             )
+            self._emit_event("data.session", "imported", {"count": len(imported)})
             logger.info(
                 "FR-DATA-INTEGRATION-SESSIONS: Imported %d NT session(s)",
                 len(imported),
@@ -736,6 +889,7 @@ class DataRouterService:
         req_id = request.headers.get("x-request-id")
         try:
             basket_id = self.baskets.save_basket(basket)
+            self._emit_event("data.basket", "created", basket.model_dump(mode="json"))
             logger.info(
                 "FR-DATA-INTEGRATION-BASKETS: Saved basket '%s' (id=%d)",
                 basket.name,
@@ -778,6 +932,7 @@ class DataRouterService:
                 f"Basket '{name}' not found",
                 req_id,
             )
+        self._emit_event("data.basket", "deleted", {"name": name})
         logger.info(
             "FR-DATA-INTEGRATION-BASKETS: Deleted basket '%s'",
             name,
@@ -859,7 +1014,56 @@ class DataRouterService:
                 date_from=payload.date_from,
                 date_to=payload.date_to,
             )
+            if payload.async_job and self.job_manager is not None:
+                future = self.job_manager.submit(
+                    "data_manager",
+                    _execute_async_download,
+                    payload.provider,
+                    payload.symbol,
+                    payload.timeframe,
+                    payload.date_from,
+                    payload.date_to,
+                    kind="provider_download",
+                )
+                job_id = self.job_manager.get_job_id_for_future(future) or ""
+
+                def _on_download_done(fut: Future[Any]) -> None:
+                    exc = fut.exception()
+                    if exc is not None:
+                        logger.warning(
+                            "FR-DATA-INTEGRATION-PROVIDERS: Download failed: %s",
+                            exc,
+                        )
+                        return
+                    res = fut.result()
+                    self._emit_event("data.provider", "downloaded", res)
+
+                future.add_done_callback(_on_download_done)
+
+                resp = ApiResponse.success(
+                    data={
+                        "job_id": job_id,
+                        "status": "pending",
+                        "provider": payload.provider,
+                        "symbol": payload.symbol,
+                    },
+                    message=(f"Download submitted as background job '{job_id}'"),
+                    request_id=req_id,
+                )
+                return JSONResponse(
+                    status_code=status.HTTP_202_ACCEPTED, content=resp.to_dict()
+                )
+
             bars = self.providers.download(req)
+            self._emit_event(
+                "data.provider",
+                "downloaded",
+                {
+                    "provider": payload.provider,
+                    "symbol": payload.symbol,
+                    "bars_count": len(bars),
+                },
+            )
             logger.info(
                 "FR-DATA-INTEGRATION-PROVIDERS: Downloaded %d bars from %s",
                 len(bars),
@@ -871,13 +1075,14 @@ class DataRouterService:
                     "count": len(bars),
                 },
             )
+            res_data: dict[str, Any] = {
+                "provider": payload.provider,
+                "symbol": payload.symbol,
+                "bars_count": len(bars),
+                "bars": [b.model_dump(mode="json") for b in bars],
+            }
             resp = ApiResponse.success(
-                data={
-                    "provider": payload.provider,
-                    "symbol": payload.symbol,
-                    "bars_count": len(bars),
-                    "bars": [b.model_dump(mode="json") for b in bars],
-                },
+                data=res_data,
                 message=f"Downloaded {len(bars)} bar(s) from {payload.provider}",
                 request_id=req_id,
             )
@@ -1142,24 +1347,31 @@ class DataRouterService:
 def create_data_router(
     db_manager: DatabaseManager | None = None,
     resource_manager: ResourceManager | None = None,
+    *,
+    job_manager: JobManager | None = None,
+    event_bus: EventBus | None = None,
 ) -> APIRouter:
     """Create and configure FastAPI APIRouter for Market Data subsystem.
 
     Args:
         db_manager: Central host DatabaseManager instance.
         resource_manager: Central host ResourceManager instance.
+        job_manager: Optional host JobManager instance for background compute jobs.
+        event_bus: Optional host EventBus instance for real-time notification streaming.
 
     Returns:
         Configured FastAPI APIRouter.
     """
-    db = db_manager or DatabaseManager(Path("data/database/haruquantai.db"))
+    db = db_manager or get_database_manager()
     res_dir = (
         resource_manager.root_dir
         if resource_manager is not None
         else Path("data/resources")
     )
 
-    service = DataRouterService(db, res_dir)
+    service = DataRouterService(
+        db, res_dir, job_manager=job_manager, event_bus=event_bus
+    )
     router = APIRouter(prefix="/data", tags=["Market Data"])
 
     # Datasets
