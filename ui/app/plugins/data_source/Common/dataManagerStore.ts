@@ -12,6 +12,44 @@ import { create } from 'zustand';
 import { datasets } from './fixtures';
 import { catalogue, type AddDukasRequest } from '../Dukascopy/dukascopy';
 import { normalizeBrokerName, validateBroker, type BrokerProfile, type BrokerUpdateJob } from '../Catalogs/BrokerProfiles/brokerProfiles';
+import { createDomainClient } from '../../../host/transport';
+
+const dataClient = createDomainClient('/data');
+
+export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
+  try {
+    const list = await dataClient.get<Array<{
+      id: string;
+      symbol: string;
+      timeframe: string;
+      broker?: string;
+      source?: string;
+      timezone?: string;
+      bar_count?: number;
+      bars_count?: number;
+      date_from?: string;
+      date_to?: string;
+      category?: string;
+    }>>('/datasets');
+    return list.map(item => ({
+      id: item.id,
+      source: item.source || 'Server',
+      symbol: item.symbol,
+      underlying: item.symbol,
+      instrument: item.symbol,
+      timeframe: item.timeframe,
+      broker: item.broker || 'default',
+      brokerName: item.broker || 'Default',
+      timezone: item.timezone || 'UTC',
+      category: item.category || 'Forex',
+      from: item.date_from || '',
+      to: item.date_to || '',
+      bars: item.bar_count ?? item.bars_count ?? 0,
+    }));
+  } catch {
+    return [];
+  }
+}
 
 export interface MockDefinition {
   id: string; source: string; symbol: string; underlying: string; instrument: string;
@@ -22,6 +60,7 @@ const storageKey = 'sqx-data-manager-v1';
 interface DataState { definitions: MockDefinition[]; brokers: BrokerProfile[]; brokerJob:BrokerUpdateJob|null; storageError: string; addData: (request: AddDukasRequest) => void;
   saveBroker:(profile:BrokerProfile)=>void; saveBrokerStocks:(id:string,stocks:string[])=>void; removeBrokers:(ids:string[])=>void; importBrokers:(profiles:Omit<BrokerProfile,'id'>[],overwrite:string[])=>number;
   startBrokerUpdate:(ids:string[],existing:string[])=>void; advanceBrokerUpdate:()=>void; brokerAction:(action:'pause'|'resume'|'stop')=>void;
+  syncRemoteDatasets: () => Promise<void>;
 }
 function completeBroker(value:Partial<BrokerProfile>&Pick<BrokerProfile,'id'|'name'|'postfix'|'timezone'|'mtUse'>):BrokerProfile{return {desc:'',stockPickerUse:false,system:false,stocks:[],instruments:[],...value};}
 function readState(): Pick<DataState, 'definitions' | 'brokers' | 'brokerJob' | 'storageError'> {
@@ -75,6 +114,22 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     try { persistData(state,state.brokers,definitions,state.brokerJob); }
     catch { throw new Error('Unable to save mock definitions in browser storage. No symbols were added.'); }
     set({ definitions });
+  },
+  syncRemoteDatasets: async () => {
+    try {
+      const remote = await fetchRemoteDatasets();
+      if (!remote.length) return;
+      const state = get();
+      const existingIds = new Set(state.definitions.map(d => d.id));
+      const newItems = remote.filter(d => !existingIds.has(d.id));
+      if (newItems.length > 0) {
+        const merged = [...state.definitions, ...newItems];
+        try { persistData(state, state.brokers, merged, state.brokerJob); } catch { /* ignore */ }
+        set({ definitions: merged });
+      }
+    } catch {
+      // Non-blocking sync
+    }
   },
 }));
 

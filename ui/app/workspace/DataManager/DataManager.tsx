@@ -583,6 +583,10 @@ export function DataManager() {
     return () => { document.removeEventListener('mousedown', closeMenus); document.removeEventListener('keydown', closeOnEscape); };
   }, []);
 
+  useEffect(() => {
+    useDataManagerStore.getState().syncRemoteDatasets?.();
+  }, []);
+
   const startOperation = (label: string) => { if ([td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(state => state === 'running' || state === 'paused')) { setSelectionMessage('Finish or stop the active data operation first.'); return; } setSelectionMessage(''); setOpenMenu(null); setNestedOpen(false); setOperationLabel(label); setProgress(4); setOperationState('running'); notify(`${label} queued as a simulation`); };
   const runDirectAction = (action: DirectDataSourceAction) => {
     if (action === 'sq-equity-update') { runEquityUpdate(startOperation); return; }

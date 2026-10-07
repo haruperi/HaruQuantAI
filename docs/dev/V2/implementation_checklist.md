@@ -1,9 +1,9 @@
 # SQX V2 implementation checklist
 
 ```text
-Progress Bar   [###-----------------] 13.9%
-Completed      10/72
-Current Task   2.1 Dataset catalog, instruments and broker definitions
+Progress Bar   [#####---------------] 25.0%
+Completed      18/72
+Current Task   3.1 Versioned semantic strategy document
 ```
 
 - Count the **72 numbered capability tasks** only; thirteen phase checkboxes are rollups. Nested steps, specialist matrix rows and the shared release gate are acceptance conditions, not additional counted tasks.
@@ -26,18 +26,19 @@ Current Task   2.1 Dataset catalog, instruments and broker definitions
     - [x] 1.9 [Host-owned persistence and restart recovery](phase-01-platform-host.md#19-host-owned-persistence-and-restart-recovery)
     - [x] 1.10 [Security, sessions and distribution qualification](phase-01-platform-host.md#110-security-sessions-and-distribution-qualification)
 
-- [ ] 2. [Phase 2 — Market data](phase-02-market-data.md)
-    - [ ] 2.1 [Dataset catalog, instruments and broker definitions](phase-02-market-data.md#21-dataset-catalog-instruments-and-broker-definitions)
-    - [ ] 2.2 [Sessions, clocks and native session import](phase-02-market-data.md#22-sessions-clocks-and-native-session-import)
-    - [ ] 2.3 [File import and immutable dataset revisions](phase-02-market-data.md#23-file-import-and-immutable-dataset-revisions)
-    - [ ] 2.4 [Data quality, transformations and data export](phase-02-market-data.md#24-data-quality-transformations-and-data-export)
-    - [ ] 2.5 [Provider downloads and compatibility matrix](phase-02-market-data.md#25-provider-downloads-and-compatibility-matrix)
-    - [ ] 2.6 [Baskets and custom data](phase-02-market-data.md#26-baskets-and-custom-data)
-    - [ ] 2.7 [COT catalog, mapping and updates](phase-02-market-data.md#27-cot-catalog-mapping-and-updates)
-    - [ ] 2.8 [Connected Data Manager workflow](phase-02-market-data.md#28-connected-data-manager-workflow)
+- [x] 2. [Phase 2 — Market data](phase-02-market-data.md)
+    - [x] 2.1 [Dataset catalog, instruments and broker definitions](phase-02-market-data.md#21-dataset-catalog-instruments-and-broker-definitions)
+    - [x] 2.2 [Sessions, clocks and native session import](phase-02-market-data.md#22-sessions-clocks-and-native-session-import)
+    - [x] 2.3 [File import and immutable dataset revisions](phase-02-market-data.md#23-file-import-and-immutable-dataset-revisions)
+    - [x] 2.4 [Data quality, transformations and data export](phase-02-market-data.md#24-data-quality-transformations-and-data-export)
+    - [x] 2.5 [Provider downloads and compatibility matrix](phase-02-market-data.md#25-provider-downloads-and-compatibility-matrix)
+    - [x] 2.6 [Baskets and custom data](phase-02-market-data.md#26-baskets-and-custom-data)
+    - [x] 2.7 [COT catalog, mapping and updates](phase-02-market-data.md#27-cot-catalog-mapping-and-updates)
+    - [x] 2.8 [Connected Data Manager workflow](phase-02-market-data.md#28-connected-data-manager-workflow)
 
 - [ ] 3. [Phase 3 — Strategies and authoring](phase-03-strategies-authoring.md)
     - [ ] 3.1 [Versioned semantic strategy document](phase-03-strategies-authoring.md#31-versioned-semantic-strategy-document)
+
     - [ ] 3.2 [Blocks, snippets, constants and indicator catalog](phase-03-strategies-authoring.md#32-blocks-snippets-constants-and-indicator-catalog)
     - [ ] 3.3 [COT, market/profile and specialist indicators](phase-03-strategies-authoring.md#33-cot-marketprofile-and-specialist-indicators)
     - [ ] 3.4 [AlgoWizard rule authoring](phase-03-strategies-authoring.md#34-algowizard-rule-authoring)

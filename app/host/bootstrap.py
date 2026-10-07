@@ -103,6 +103,7 @@ from app.host.transport import (
     create_transport_router,
     register_transport_exception_handlers,
 )
+from app.plugins.data.integration import create_data_router
 
 logger = get_logger(__name__)
 
@@ -640,6 +641,13 @@ def _mount_host_routers(
         resolved_runtime.resource_manager = ResourceManager(root_dir=res_dir)
     resources_router = create_resources_router(resolved_runtime.resource_manager)
     app.include_router(resources_router, prefix=resolved_settings.api_prefix)
+
+    # 11. Market Data Router (/data/..., /api/v1/data/...)
+    data_router = create_data_router(
+        resolved_runtime.db_manager, resolved_runtime.resource_manager
+    )
+    app.include_router(data_router)
+    app.include_router(data_router, prefix=resolved_settings.api_prefix)
 
 
 def create_host_app(

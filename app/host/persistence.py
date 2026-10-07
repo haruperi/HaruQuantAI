@@ -123,6 +123,7 @@ import re
 import sqlite3
 import sys
 import threading
+import uuid
 from collections.abc import Callable, Generator, Mapping
 from dataclasses import asdict, is_dataclass
 from datetime import UTC, datetime
@@ -161,9 +162,11 @@ __all__ = [
     "CorruptDataError",
     "DatabaseManager",
     "DatabaseStatus",
+    "DatasetPersistence",
     "EntityRecord",
     "HostSettingsSnapshot",
     "IncompatibleSchemaError",
+    "InstrumentPersistence",
     "JobStore",
     "LeaseExpiredError",
     "LeaseManager",
@@ -178,6 +181,7 @@ __all__ = [
     "RenewLeaseRequest",
     "RevisionConflictError",
     "SchemaManager",
+    "SessionPersistence",
     "SettingRecord",
     "SettingsPage",
     "SettingsStore",
@@ -503,6 +507,9 @@ class DatabaseManager:
         self.schema = SchemaManager(self)
         self.leases = LeaseManager(self)
         self.recovery = RecoveryManager(self)
+        self.instruments = InstrumentPersistence(self)
+        self.sessions = SessionPersistence(self)
+        self.datasets = DatasetPersistence(self)
 
     @property
     def is_memory(self) -> bool:
@@ -879,6 +886,102 @@ class SchemaManager:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_host_jobs_dedup "
                 "ON host_jobs(dedup_key);"
+            )
+
+            # Datamgr market data control tables
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS datamgr_instruments (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    symbol TEXT NOT NULL UNIQUE,
+                    connection TEXT DEFAULT '',
+                    broker_id INTEGER DEFAULT 0,
+                    description TEXT DEFAULT '',
+                    tick_size REAL NOT NULL DEFAULT 0.00001,
+                    tick_step REAL NOT NULL DEFAULT 0.00001,
+                    tick_value_in_money REAL NOT NULL DEFAULT 10.0,
+                    point_value REAL NOT NULL DEFAULT 100000.0,
+                    decimals INTEGER NOT NULL DEFAULT 5,
+                    default_spread REAL NOT NULL DEFAULT 0.0001,
+                    default_slippage REAL NOT NULL DEFAULT 0.0,
+                    min_volume REAL NOT NULL DEFAULT 0.01,
+                    max_volume REAL NOT NULL DEFAULT 100.0,
+                    lot_step REAL NOT NULL DEFAULT 0.01,
+                    margin_rate REAL NOT NULL DEFAULT 0.05,
+                    swap_long REAL NOT NULL DEFAULT 0.0,
+                    swap_short REAL NOT NULL DEFAULT 0.0,
+                    swap_3day_day INTEGER NOT NULL DEFAULT 3,
+                    commissions TEXT DEFAULT '0.0',
+                    data_type TEXT DEFAULT 'Forex',
+                    alias TEXT DEFAULT '',
+                    exchange TEXT DEFAULT '',
+                    country TEXT DEFAULT '',
+                    sector TEXT DEFAULT '',
+                    created_at_utc TEXT NOT NULL,
+                    updated_at_utc TEXT NOT NULL
+                );
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS datamgr_sessions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL UNIQUE,
+                    description TEXT DEFAULT '',
+                    timezone TEXT NOT NULL DEFAULT 'UTC',
+                    windows_json TEXT NOT NULL DEFAULT '[]',
+                    holidays_json TEXT NOT NULL DEFAULT '[]',
+                    is_default INTEGER NOT NULL DEFAULT 0
+                );
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS datamgr_datasets (
+                    id TEXT PRIMARY KEY,
+                    source TEXT NOT NULL,
+                    symbol TEXT NOT NULL,
+                    underlying TEXT NOT NULL,
+                    instrument TEXT NOT NULL,
+                    timeframe TEXT NOT NULL,
+                    broker TEXT NOT NULL,
+                    broker_name TEXT NOT NULL,
+                    timezone TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    date_from TEXT NOT NULL,
+                    date_to TEXT NOT NULL,
+                    bars INTEGER NOT NULL DEFAULT 0,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    path TEXT NOT NULL DEFAULT '',
+                    data_kind TEXT NOT NULL DEFAULT 'bars',
+                    quality_score REAL NOT NULL DEFAULT 1.0,
+                    lineage_json TEXT NOT NULL DEFAULT '{}',
+                    schema_version INTEGER NOT NULL DEFAULT 1
+                );
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS datamgr_stock_group (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL UNIQUE,
+                    system INTEGER NOT NULL DEFAULT 0,
+                    description TEXT DEFAULT ''
+                );
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS datamgr_stock (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ticker TEXT NOT NULL,
+                    basket_id INTEGER NOT NULL,
+                    date_from TEXT NOT NULL,
+                    date_to TEXT,
+                    FOREIGN KEY(basket_id) REFERENCES datamgr_stock_group(id)
+                );
+                """
             )
 
             # Record initial schema version if not recorded
@@ -2420,6 +2523,454 @@ class JobStore:
             error_message=row_dict["error_message"],
             error_location=row_dict["error_location"],
         )
+
+
+# ============================================================================
+# Datamgr Entities Persistence (Instruments, Sessions, Datasets)
+# ============================================================================
+
+
+class InstrumentPersistence:
+    """Authoritative host persistence operations for datamgr_instruments."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        """Initialize with parent DatabaseManager."""
+        self._db = db
+
+    def create(self, record: dict[str, Any]) -> int:
+        """Insert a new instrument record and return its generated ID."""
+        now_ts = now_utc_iso()
+        record_copy = dict(record)
+        if not record_copy.get("created_at_utc"):
+            record_copy["created_at_utc"] = now_ts
+        if not record_copy.get("updated_at_utc"):
+            record_copy["updated_at_utc"] = now_ts
+        columns = [
+            "symbol",
+            "connection",
+            "broker_id",
+            "description",
+            "tick_size",
+            "tick_step",
+            "tick_value_in_money",
+            "point_value",
+            "decimals",
+            "default_spread",
+            "default_slippage",
+            "min_volume",
+            "max_volume",
+            "lot_step",
+            "margin_rate",
+            "swap_long",
+            "swap_short",
+            "swap_3day_day",
+            "commissions",
+            "data_type",
+            "alias",
+            "exchange",
+            "country",
+            "sector",
+            "created_at_utc",
+            "updated_at_utc",
+        ]
+        values = []
+        for col in columns:
+            val = record_copy.get(col)
+            if val is None:
+                if col in ("broker_id", "decimals", "swap_3day_day"):
+                    val = 0
+                elif col in (
+                    "tick_size",
+                    "tick_step",
+                    "tick_value_in_money",
+                    "point_value",
+                    "default_spread",
+                    "default_slippage",
+                    "min_volume",
+                    "max_volume",
+                    "lot_step",
+                    "margin_rate",
+                    "swap_long",
+                    "swap_short",
+                ):
+                    val = 0.0
+                else:
+                    val = ""
+            values.append(val)
+        sql = (
+            "INSERT INTO datamgr_instruments ("
+            "symbol, connection, broker_id, description, "
+            "tick_size, tick_step, tick_value_in_money, point_value, "
+            "decimals, default_spread, default_slippage, min_volume, "
+            "max_volume, lot_step, margin_rate, swap_long, "
+            "swap_short, swap_3day_day, commissions, data_type, "
+            "alias, exchange, country, sector, "
+            "created_at_utc, updated_at_utc"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+            "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        )
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, values)
+            last_id = cur.lastrowid or 0
+        logger.info(
+            "Created instrument in datamgr_instruments: %s (id=%d)",
+            record_copy.get("symbol"),
+            last_id,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
+        return int(last_id)
+
+    def get_by_symbol(self, symbol: str) -> dict[str, Any] | None:
+        """Retrieve instrument record by symbol name."""
+        sql = "SELECT * FROM datamgr_instruments WHERE symbol = ?;"
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (symbol,))
+            row = cur.fetchone()
+            if row is not None:
+                return dict(row)
+        return None
+
+    def list_instruments(
+        self,
+        connection: str | None = None,
+        data_type: str | None = None,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        """List instruments with optional connection or data_type filter."""
+        if connection and data_type:
+            sql = (
+                "SELECT * FROM datamgr_instruments WHERE connection = ? "
+                "AND data_type = ? ORDER BY symbol ASC LIMIT ? OFFSET ?;"
+            )
+            params = [connection, data_type, limit, offset]
+        elif connection:
+            sql = (
+                "SELECT * FROM datamgr_instruments WHERE connection = ? "
+                "ORDER BY symbol ASC LIMIT ? OFFSET ?;"
+            )
+            params = [connection, limit, offset]
+        elif data_type:
+            sql = (
+                "SELECT * FROM datamgr_instruments WHERE data_type = ? "
+                "ORDER BY symbol ASC LIMIT ? OFFSET ?;"
+            )
+            params = [data_type, limit, offset]
+        else:
+            sql = (
+                "SELECT * FROM datamgr_instruments ORDER BY symbol ASC "
+                "LIMIT ? OFFSET ?;"
+            )
+            params = [limit, offset]
+
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, params)
+            return [dict(r) for r in cur.fetchall()]
+
+    def update(self, symbol: str, updates: dict[str, Any]) -> bool:
+        """Update fields for a symbol in datamgr_instruments."""
+        if not updates:
+            return True
+        updates_copy = dict(updates)
+        updates_copy["updated_at_utc"] = now_utc_iso()
+        updates_copy.pop("id", None)
+        updates_copy.pop("symbol", None)
+        for k in updates_copy:
+            validate_identifier(k, "column")
+        set_clause = ", ".join(f"{k} = ?" for k in updates_copy)
+        sql = f"UPDATE datamgr_instruments SET {set_clause} WHERE symbol = ?;"  # noqa: S608
+        params = [*list(updates_copy.values()), symbol]
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, params)
+            success = cur.rowcount > 0
+        logger.info(
+            "Updated instrument %s (success=%s)",
+            symbol,
+            success,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
+        return success
+
+    def delete(self, symbol: str) -> bool:
+        """Delete an instrument record by symbol."""
+        sql = "DELETE FROM datamgr_instruments WHERE symbol = ?;"
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (symbol,))
+            success = cur.rowcount > 0
+        logger.info(
+            "Deleted instrument %s (success=%s)",
+            symbol,
+            success,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
+        return success
+
+    def count(self) -> int:
+        """Return total instrument count."""
+        sql = "SELECT COUNT(*) FROM datamgr_instruments;"
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql)
+            row = cur.fetchone()
+            return int(row[0]) if row else 0
+
+
+class SessionPersistence:
+    """Authoritative host persistence operations for datamgr_sessions."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        """Initialize with parent DatabaseManager."""
+        self._db = db
+
+    def create(self, record: dict[str, Any]) -> int:
+        """Insert a new session definition and return its generated ID."""
+        values = [
+            record.get("name", ""),
+            record.get("description", ""),
+            record.get("timezone", "UTC"),
+            record.get("windows_json", "[]"),
+            record.get("holidays_json", "[]"),
+            int(record.get("is_default", 0)),
+        ]
+        sql = (
+            "INSERT INTO datamgr_sessions ("
+            "name, description, timezone, windows_json, holidays_json, is_default"
+            ") VALUES (?, ?, ?, ?, ?, ?);"
+        )
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, values)
+            last_id = cur.lastrowid or 0
+        logger.info(
+            "Created session in datamgr_sessions: %s (id=%d)",
+            record.get("name"),
+            last_id,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
+        return int(last_id)
+
+    def get_by_name(self, name: str) -> dict[str, Any] | None:
+        """Retrieve session record by name."""
+        sql = "SELECT * FROM datamgr_sessions WHERE name = ?;"
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (name,))
+            row = cur.fetchone()
+            if row is not None:
+                return dict(row)
+        return None
+
+    def list_sessions(self, limit: int = 1000, offset: int = 0) -> list[dict[str, Any]]:
+        """List sessions in ascending name order."""
+        sql = "SELECT * FROM datamgr_sessions ORDER BY name ASC LIMIT ? OFFSET ?;"
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (limit, offset))
+            return [dict(r) for r in cur.fetchall()]
+
+    def update(self, name: str, updates: dict[str, Any]) -> bool:
+        """Update fields for a session by name."""
+        if not updates:
+            return True
+        updates_copy = dict(updates)
+        updates_copy.pop("id", None)
+        updates_copy.pop("name", None)
+        for k in updates_copy:
+            validate_identifier(k, "column")
+        set_clause = ", ".join(f"{k} = ?" for k in updates_copy)
+        sql = f"UPDATE datamgr_sessions SET {set_clause} WHERE name = ?;"  # noqa: S608
+        params = [*list(updates_copy.values()), name]
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, params)
+            success = cur.rowcount > 0
+        logger.info(
+            "Updated session %s (success=%s)",
+            name,
+            success,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
+        return success
+
+    def delete(self, name: str) -> bool:
+        """Delete session definition by name."""
+        sql = "DELETE FROM datamgr_sessions WHERE name = ?;"
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (name,))
+            success = cur.rowcount > 0
+        logger.info(
+            "Deleted session %s (success=%s)",
+            name,
+            success,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
+        return success
+
+    def count(self) -> int:
+        """Return total session definitions count."""
+        sql = "SELECT COUNT(*) FROM datamgr_sessions;"
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql)
+            row = cur.fetchone()
+            return int(row[0]) if row else 0
+
+
+class DatasetPersistence:
+    """Authoritative host persistence operations for datamgr_datasets."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        """Initialize with parent DatabaseManager."""
+        self._db = db
+
+    def save(self, record: dict[str, Any]) -> str:
+        """Upsert a dataset metadata record."""
+        now_ts = now_utc_iso()
+        record_copy = dict(record)
+        dataset_id = str(record_copy.get("id") or f"dataset-{uuid.uuid4().hex[:12]}")
+        record_copy["id"] = dataset_id
+        if not record_copy.get("created_at"):
+            record_copy["created_at"] = now_ts
+        record_copy["updated_at"] = now_ts
+        columns = [
+            "id",
+            "source",
+            "symbol",
+            "underlying",
+            "instrument",
+            "timeframe",
+            "broker",
+            "broker_name",
+            "timezone",
+            "category",
+            "date_from",
+            "date_to",
+            "bars",
+            "created_at",
+            "updated_at",
+            "path",
+            "data_kind",
+            "quality_score",
+            "lineage_json",
+            "schema_version",
+        ]
+        values = []
+        for col in columns:
+            val = record_copy.get(col)
+            if val is None:
+                if col == "bars":
+                    val = 0
+                elif col == "schema_version":
+                    val = 1
+                elif col == "quality_score":
+                    val = 1.0
+                else:
+                    val = ""
+            values.append(val)
+        sql = (
+            "INSERT INTO datamgr_datasets ("
+            "id, source, symbol, underlying, instrument, timeframe, "
+            "broker, broker_name, timezone, category, date_from, date_to, "
+            "bars, created_at, updated_at, path, data_kind, quality_score, "
+            "lineage_json, schema_version"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(id) DO UPDATE SET "
+            "bars = excluded.bars, "
+            "date_from = excluded.date_from, "
+            "date_to = excluded.date_to, "
+            "updated_at = excluded.updated_at, "
+            "path = excluded.path, "
+            "quality_score = excluded.quality_score, "
+            "lineage_json = excluded.lineage_json;"
+        )
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, values)
+        logger.info(
+            "Saved dataset in datamgr_datasets: %s",
+            dataset_id,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"},
+        )
+        return dataset_id
+
+    def get_by_id(self, dataset_id: str) -> dict[str, Any] | None:
+        """Retrieve dataset record by primary ID."""
+        sql = "SELECT * FROM datamgr_datasets WHERE id = ?;"
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (dataset_id,))
+            row = cur.fetchone()
+            if row is not None:
+                return dict(row)
+        return None
+
+    def list_datasets(
+        self,
+        source: str | None = None,
+        symbol: str | None = None,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        """List datasets matching optional source and symbol filters."""
+        if source and symbol:
+            sql = (
+                "SELECT * FROM datamgr_datasets WHERE source = ? "
+                "AND symbol = ? ORDER BY symbol ASC, timeframe ASC LIMIT ? OFFSET ?;"
+            )
+            params = [source, symbol, limit, offset]
+        elif source:
+            sql = (
+                "SELECT * FROM datamgr_datasets WHERE source = ? "
+                "ORDER BY symbol ASC, timeframe ASC LIMIT ? OFFSET ?;"
+            )
+            params = [source, limit, offset]
+        elif symbol:
+            sql = (
+                "SELECT * FROM datamgr_datasets WHERE symbol = ? "
+                "ORDER BY symbol ASC, timeframe ASC LIMIT ? OFFSET ?;"
+            )
+            params = [symbol, limit, offset]
+        else:
+            sql = (
+                "SELECT * FROM datamgr_datasets ORDER BY symbol ASC, "
+                "timeframe ASC LIMIT ? OFFSET ?;"
+            )
+            params = [limit, offset]
+
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, params)
+            return [dict(r) for r in cur.fetchall()]
+
+    def delete(self, dataset_id: str) -> bool:
+        """Delete dataset record by ID."""
+        sql = "DELETE FROM datamgr_datasets WHERE id = ?;"
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (dataset_id,))
+            success = cur.rowcount > 0
+        logger.info(
+            "Deleted dataset %s (success=%s)",
+            dataset_id,
+            success,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"},
+        )
+        return success
+
+    def count(self) -> int:
+        """Return total dataset records count."""
+        sql = "SELECT COUNT(*) FROM datamgr_datasets;"
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql)
+            row = cur.fetchone()
+            return int(row[0]) if row else 0
 
 
 # ============================================================================

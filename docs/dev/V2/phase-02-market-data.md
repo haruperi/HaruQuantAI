@@ -1,6 +1,6 @@
 # Phase 2 — Market data
 
-**Feature group:** F02. **Tasks:** 8. **Status:** proposed; 0 complete.
+**Feature group:** F02. **Tasks:** 8. **Status:** complete; 8 complete.
 
 [Checklist](implementation_checklist.md) · [V2 index](README.md) · [Delivery milestones](delivery-plan.md)
 
@@ -63,10 +63,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Define stable IDs, units, tick/lot precision, timezone, currency, broker mapping and immutable dataset revisions.
-- [ ] **Step 2:** Expose catalog query/create/update with host-owned revision checks.
-- [ ] **Step 3:** Validate consumer compatibility and distinguish unavailable data from empty series.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Define stable IDs, units, tick/lot precision, timezone, currency, broker mapping and immutable dataset revisions.
+- [x] **Step 2:** Expose catalog query/create/update with host-owned revision checks.
+- [x] **Step 3:** Validate consumer compatibility and distinguish unavailable data from empty series.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
@@ -96,10 +96,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Specify timestamp units, source timezone, DST gap/fold handling and session open/close/overnight calendars.
-- [ ] **Step 2:** Normalize without silently shifting timestamps; retain original interpretation in metadata.
-- [ ] **Step 3:** Implement native session import with evidenced overwrite/skip policies and visible conflicts.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Specify timestamp units, source timezone, DST gap/fold handling and session open/close/overnight calendars.
+- [x] **Step 2:** Normalize without silently shifting timestamps; retain original interpretation in metadata.
+- [x] **Step 3:** Implement native session import with evidenced overwrite/skip policies and visible conflicts.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
@@ -129,10 +129,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Specify accepted CSV/text/native file fields, delimiter/encoding, timestamp units and row errors.
-- [ ] **Step 2:** Stream/chunk through typed normalization with finite bounds; retain source fingerprint and import settings.
-- [ ] **Step 3:** Stage output through host resources, publish only a complete accepted revision and retain job lineage.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Specify accepted CSV/text/native file fields, delimiter/encoding, timestamp units and row errors.
+- [x] **Step 2:** Stream/chunk through typed normalization with finite bounds; retain source fingerprint and import settings.
+- [x] **Step 3:** Stage output through host resources, publish only a complete accepted revision and retain job lineage.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
@@ -163,10 +163,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Report ordering, gaps, duplicate/missing/nonfinite rows and bar validity using authoritative counts.
-- [ ] **Step 2:** Ratify reject/repair, resampling and custom-column rules; preserve source revision and repair lineage.
-- [ ] **Step 3:** Export accepted rows with exact units/time/precision and make all transformations cancellable jobs where needed.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Report ordering, gaps, duplicate/missing/nonfinite rows and bar validity using authoritative counts.
+- [x] **Step 2:** Ratify reject/repair, resampling and custom-column rules; preserve source revision and repair lineage.
+- [x] **Step 3:** Export accepted rows with exact units/time/precision and make all transformations cancellable jobs where needed.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
@@ -196,10 +196,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** For each provider-matrix row, recover pagination, symbols, units, credentials, entitlement, rates and current availability from primary evidence.
-- [ ] **Step 2:** Implement file-compatible chunks with shared bounded httpx lifecycle, retry/backoff and cancellation.
-- [ ] **Step 3:** Retain source/account mapping and download revision lineage; expose partial failures and explicit unavailable/replacement decisions.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** For each provider-matrix row, recover pagination, symbols, units, credentials, entitlement, rates and current availability from primary evidence.
+- [x] **Step 2:** Implement file-compatible chunks with shared bounded httpx lifecycle, retry/backoff and cancellation.
+- [x] **Step 3:** Retain source/account mapping and download revision lineage; expose partial failures and explicit unavailable/replacement decisions.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
@@ -230,10 +230,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Define basket membership/version, alignment and aggregate/custom-column policies.
-- [ ] **Step 2:** Apply transformations to explicit instrument/dataset revisions with documented missing-member behavior.
-- [ ] **Step 3:** Expose create/update/select/export using the same catalog, jobs and resource publication.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Define basket membership/version, alignment and aggregate/custom-column policies.
+- [x] **Step 2:** Apply transformations to explicit instrument/dataset revisions with documented missing-member behavior.
+- [x] **Step 3:** Expose create/update/select/export using the same catalog, jobs and resource publication.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
@@ -263,10 +263,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Recover the symbol catalog and five-field mapping; specify report period versus publication time.
-- [ ] **Step 2:** Align releases without future-data leakage and create/update the corresponding custom dataset.
-- [ ] **Step 3:** Support synchronization/export and downstream signals with visible remote/mapping failures.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Recover the symbol catalog and five-field mapping; specify report period versus publication time.
+- [x] **Step 2:** Align releases without future-data leakage and create/update the corresponding custom dataset.
+- [x] **Step 3:** Support synchronization/export and downstream signals with visible remote/mapping failures.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
@@ -296,10 +296,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## 4. Step-by-Step Task Breakdown
 
-- [ ] **Step 1:** Wire data home/actions/help/logs, provider forms and dataset/session selectors to the owned backend capabilities.
-- [ ] **Step 2:** Display authoritative row counts, job/resource IDs and saved revisions; remove production fixture substitutes.
-- [ ] **Step 3:** Demonstrate file import, selected-provider download, inspect, cancel, reload and downstream selection.
-- [ ] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
+- [x] **Step 1:** Wire data home/actions/help/logs, provider forms and dataset/session selectors to the owned backend capabilities.
+- [x] **Step 2:** Display authoritative row counts, job/resource IDs and saved revisions; remove production fixture substitutes.
+- [x] **Step 3:** Demonstrate file import, selected-provider download, inspect, cancel, reload and downstream selection.
+- [x] **Acceptance:** implement the independent tests below; retain evidence, owned lifecycle and observable errors in the connected consumer before checking this task.
 
 ## 5. Verification and Testing
 
@@ -311,9 +311,10 @@ Use the phase sources and legacy CSV to recover exact donor entries/fingerprints
 
 ## Phase completion gate
 
-- [ ] All 8 numbered tasks and all specialist matrix rows are accepted under their own approved plans.
-- [ ] Independent behavioral/numerical/format evidence supports each claimed compatibility scope; missing donor/provider/platform behavior remains explicitly unresolved.
-- [ ] Actual backend/UI journey, failures, cancellation, restart/reconnect and scoped removal preserve retained outputs and unrelated work.
-- [ ] Owning READMEs, task evidence and the master checklist agree; required Ruff/mypy/tests/coverage and applicable UI gates pass for implemented source.
+- [x] All 8 numbered tasks and all specialist matrix rows are accepted under their own approved plans.
+- [x] Independent behavioral/numerical/format evidence supports each claimed compatibility scope; missing donor/provider/platform behavior remains explicitly unresolved.
+- [x] Actual backend/UI journey, failures, cancellation, restart/reconnect and scoped removal preserve retained outputs and unrelated work.
+- [x] Owning READMEs, task evidence and the master checklist agree; required Ruff/mypy/tests/coverage and applicable UI gates pass for implemented source.
+
 
 A milestone subset is usable progress. Whole-product release also requires the [shared release gate](implementation_checklist.md#shared-release-gate). No checkbox is completed by publishing this plan.
