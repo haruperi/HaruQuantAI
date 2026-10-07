@@ -183,7 +183,34 @@ export const useDukascopyDownloads = create<DownloadStore>((set, get) => {
       if (get().job && ['running', 'paused'].includes(get().job!.state)) throw new Error('Finish or stop the active mock download first.');
       if (['running', 'paused'].includes(useTickDownloader.getState().job?.state ?? '')) throw new Error('Finish or stop the active import first.');
       validateDownload(request);
-      try { persist({ ...snapshot(), preferred: request.downloadType, job: { request: structuredClone(request), resolvedModes: resolveDownloadModes(request), state: 'running', progress: 0 } }); }
+      try {
+        persist({
+          ...snapshot(),
+          preferred: request.downloadType,
+          job: {
+            request: structuredClone(request),
+            resolvedModes: resolveDownloadModes(request),
+            state: 'running',
+            progress: 0,
+          },
+        });
+        (async () => {
+          try {
+            for (const target of request.targets) {
+              await dataClient.post<{ job_id?: string; status?: string }>('/providers/download', {
+                provider: 'dukascopy',
+                symbol: target.symbol,
+                timeframe: target.timeframe || 'M1',
+                date_from: request.dateFrom,
+                date_to: request.dateTo,
+                async_job: true,
+              });
+            }
+          } catch {
+            // Offline/headless test fallback
+          }
+        })();
+      }
       catch (cause) { throw new Error(cause instanceof Error && get().storageError ? cause.message : 'Unable to save mock download. No job was started.'); }
     },
     advance: () => {
@@ -196,6 +223,7 @@ export const useDukascopyDownloads = create<DownloadStore>((set, get) => {
           const from = [job.request.dateFrom, availableStart(target, true)].sort().at(-1)!;
           ranges[target.id] = mergeRanges(ranges[target.id] ?? [], { from, to: job.request.dateTo }, job.request.overwrite);
         }
+        useDataManagerStore.getState().syncRemoteDatasets().catch(() => {});
       }
       try { persist({ ...state, ranges, job }); }
       catch { set({ job: { ...state.job, state: 'failed', error: 'Unable to persist mock download progress. Previous saved coverage is unchanged.' } }); }

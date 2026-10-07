@@ -1,4 +1,5 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
+import { createDomainClient } from '../../../host/transport';
 import { datasets } from '../Common/fixtures';
 import { validateName } from './fileSymbols';
 import { create } from 'zustand';
@@ -53,6 +54,23 @@ export const useFileImports = create<Store>((set, get) => {
       if ([...planned.values()].reduce((n, row) => n + row.timestamps.length, 0) > limits.timestamps) throw new Error('Browser mock limit: 200,000 tracked timestamps. Import a smaller selection.');
       let name = group; let n = 2; while (name && get().groups.some(row => row.name === name)) name = `${group} ${n++}`;
       persist({ timezone, job: { tasks, state: 'running', progress: 0, completed: 0, skipped, group: name } });
+      (async () => {
+        try {
+          const client = createDomainClient('/data');
+          for (const task of tasks) {
+            if (task.error) continue;
+            await client.post('/datasets/import', {
+              symbol: task.record.symbol,
+              timeframe: task.record.timeframe || 'M1',
+              broker: task.record.broker || 'Default',
+              timezone: timezone || 'UTC',
+              async_job: true,
+            });
+          }
+        } catch {
+          // Offline / test fallback
+        }
+      })();
     },
     advance: () => {
       const { job, records, groups } = get(); if (!job || job.state !== 'running') return;
@@ -62,7 +80,12 @@ export const useFileImports = create<Store>((set, get) => {
       for (; completed < count; completed++) { const task = job.tasks[completed]; if (task.error) { error = `${task.filename}: ${task.error}`; break; } next = [...next.filter(row => row.id !== task.record.id), task.record]; }
       const updatedGroups = [...groups];
       if (job.group && completed > 0) { const symbols = job.tasks.slice(0, completed).map(task => task.record.symbol); const index = updatedGroups.findIndex(row => row.name === job.group); if (index < 0) updatedGroups.push({ name: job.group, symbols }); else updatedGroups[index] = { name: job.group, symbols }; }
-      try { persist({ records: next, groups: updatedGroups, job: { ...job, progress, completed, state: error ? 'failed' : progress === 100 ? 'completed' : 'running', error } }); } catch (cause) { fail(cause); }
+      try {
+        persist({ records: next, groups: updatedGroups, job: { ...job, progress, completed, state: error ? 'failed' : progress === 100 ? 'completed' : 'running', error } });
+        if (progress === 100 && !error) {
+          import('../Common/dataManagerStore').then(m => m.useDataManagerStore.getState().syncRemoteDatasets()).catch(() => {});
+        }
+      } catch (cause) { fail(cause); }
     },
     action: action => { const job = get().job; if (!job || !activeImport(job.state)) return; try { persist({ job: { ...job, state: action === 'pause' ? 'paused' : action === 'resume' ? 'running' : 'cancelled' } }); } catch (cause) { fail(cause); } },
   };

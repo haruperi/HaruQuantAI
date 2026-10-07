@@ -39,3 +39,34 @@ it('resolves each fast target independently and uses standard speed for unsuppor
     expect(resolveDownloadModes({ ...supported, downloadType: 'standard' })).toEqual({ supported: 'standard' });
   }
 });
+
+describe('Dukascopy download store lifecycle', () => {
+  it('starts download job and advances to completion with remote sync', async () => {
+    const { vi } = await import('vitest');
+    vi.resetModules();
+    const memory = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => memory.get(key) ?? null,
+      setItem: (key: string, value: string) => { memory.set(key, value); },
+      removeItem: (key: string) => { memory.delete(key); },
+    };
+    vi.stubGlobal('localStorage', storage);
+
+    const { useDukascopyDownloads } = await import('../../../../../app/plugins/data_source/Common/dataManagerStore');
+    const request = {
+      targets: [target],
+      dateFrom: '2020-01-01',
+      dateTo: '2020-02-01',
+      dateType: 'custom' as const,
+      overwrite: false,
+      downloadType: 'standard' as const,
+    };
+    useDukascopyDownloads.getState().start(request);
+    expect(useDukascopyDownloads.getState().job?.state).toBe('running');
+
+    while (useDukascopyDownloads.getState().job?.state === 'running') {
+      useDukascopyDownloads.getState().advance();
+    }
+    expect(useDukascopyDownloads.getState().job?.state).toBe('completed');
+  });
+});
