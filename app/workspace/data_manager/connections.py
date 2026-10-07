@@ -54,12 +54,11 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
-import math
 import sys
 import time
 from abc import ABC, abstractmethod
-from datetime import UTC, datetime, timedelta
-from typing import Any, override
+from datetime import UTC, datetime
+from typing import Any, cast, override
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -71,7 +70,6 @@ logger = get_logger(__name__)
 DEFAULT_RATE_LIMIT_RPS = 10.0
 DEFAULT_MAX_RETRIES = 3
 INITIAL_BACKOFF_SECONDS = 0.5
-MAX_SYNTHETIC_BARS = 500
 
 
 class CancellationToken:
@@ -160,52 +158,38 @@ class DownloadRequest(BaseModel):
     )
 
 
+def _parse_iso(iso_str: str | None) -> datetime | None:
+    """Safely parse ISO datetime string with UTC fallback."""
+    if not iso_str:
+        return None
+    try:
+        dt = datetime.fromisoformat(iso_str)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=UTC)
+        return dt
+    except ValueError, TypeError:
+        return None
+
+
 class SyntheticMockHelper:
-    """Helper generating deterministic mock market bars for testing."""
+    """Helper previously generating mock bars (DEPRECATED: Strict Real-Data Policy)."""
 
     @staticmethod
     def generate_bars(
         symbol: str,
-        start_iso: str,
-        end_iso: str,
+        start_iso: str = "",
+        end_iso: str = "",
         step_minutes: int = 1,
         base_price: float = 100.0,
     ) -> list[BarRecord]:
-        """Generate deterministic synthetic bars between two ISO timestamps."""
-        try:
-            start_dt = datetime.fromisoformat(start_iso)
-            end_dt = datetime.fromisoformat(end_iso)
-        except ValueError:
-            start_dt = datetime(2026, 10, 1, 0, 0, tzinfo=UTC)
-            end_dt = datetime(2026, 10, 1, 1, 0, tzinfo=UTC)
-
-        bars: list[BarRecord] = []
-        cur_dt = start_dt
-        price = base_price
-
-        # Hash symbol for deterministic variance
-        sym_hash = sum(ord(c) for c in symbol)
-
-        while cur_dt <= end_dt and len(bars) < MAX_SYNTHETIC_BARS:
-            sin_offset = math.sin((len(bars) + sym_hash) * 0.1) * 2.0
-            o = round(price + sin_offset, 4)
-            h = round(o + 0.5, 4)
-            low_p = round(o - 0.4, 4)
-            c = round(o + 0.1, 4)
-            bars.append(
-                BarRecord(
-                    timestamp_utc=cur_dt.isoformat(),
-                    open=max(0.01, o),
-                    high=max(0.01, h),
-                    low=max(0.01, low_p),
-                    close=max(0.01, c),
-                    volume=100.0,
-                )
-            )
-            price = c
-            cur_dt += timedelta(minutes=step_minutes)
-
-        return bars
+        """Strict Real-Data Policy: zero synthetic fallback data."""
+        _ = (start_iso, end_iso, step_minutes, base_price)
+        logger.warning(
+            "FR-DATA-PROVIDERS-ADAPTERS: SyntheticMockHelper.generate_bars "
+            "called for %s - returning empty list under Strict Real-Data Policy",
+            symbol,
+        )
+        return []
 
 
 class BaseDataProvider(ABC):
@@ -326,6 +310,7 @@ class BinanceProvider(BaseDataProvider):
 
     def __init__(self, variant: str = "Spot") -> None:
         """Initialize Binance adapter with specified market variant."""
+        self._variant = variant
         name = f"Binance_{variant}" if variant != "Spot" else "Binance"
         super().__init__(
             ProviderCapabilities(
@@ -344,13 +329,30 @@ class BinanceProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=30000.0,
+        from app.plugins.brokers.crypto.adapter import BinanceBroker
+
+        broker = BinanceBroker(default_market=self._variant)
+        dt_from = _parse_iso(request.date_from)
+        dt_to = _parse_iso(request.date_to)
+        resp = broker.get_bars(
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            date_from=dt_from,
+            date_to=dt_to,
         )
+        if not resp.is_success or not resp.data:
+            return []
+        return [
+            BarRecord(
+                timestamp_utc=b.time.isoformat(),
+                open=b.open,
+                high=b.high,
+                low=b.low,
+                close=b.close,
+                volume=float(b.real_volume or b.tick_volume),
+            )
+            for b in resp.data
+        ]
 
 
 class BitfinexProvider(BaseDataProvider):
@@ -374,13 +376,12 @@ class BitfinexProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=2000.0,
+        logger.warning(
+            "FR-DATA-PROVIDERS-ADAPTERS: %s has no active broker connection; "
+            "returning empty list under Strict Real-Data Policy",
+            self.capabilities.name,
         )
+        return []
 
 
 class CoinbaseProProvider(BaseDataProvider):
@@ -404,13 +405,12 @@ class CoinbaseProProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=150.0,
+        logger.warning(
+            "FR-DATA-PROVIDERS-ADAPTERS: %s has no active broker connection; "
+            "returning empty list under Strict Real-Data Policy",
+            self.capabilities.name,
         )
+        return []
 
 
 class PoloniexProvider(BaseDataProvider):
@@ -434,13 +434,12 @@ class PoloniexProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=5,
-            base_price=50.0,
+        logger.warning(
+            "FR-DATA-PROVIDERS-ADAPTERS: %s has no active broker connection; "
+            "returning empty list under Strict Real-Data Policy",
+            self.capabilities.name,
         )
+        return []
 
 
 class DarwinexProvider(BaseDataProvider):
@@ -464,13 +463,30 @@ class DarwinexProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=1.1000,
+        from app.plugins.brokers.darwinex.adapter import DarwinexBroker
+
+        broker = DarwinexBroker()
+        dt_from = _parse_iso(request.date_from)
+        dt_to = _parse_iso(request.date_to)
+        resp = broker.get_bars(
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            date_from=dt_from,
+            date_to=dt_to,
         )
+        if not resp.is_success or not resp.data:
+            return []
+        return [
+            BarRecord(
+                timestamp_utc=b.time.isoformat(),
+                open=b.open,
+                high=b.high,
+                low=b.low,
+                close=b.close,
+                volume=float(b.real_volume or b.tick_volume),
+            )
+            for b in resp.data
+        ]
 
 
 class DukascopyProvider(BaseDataProvider):
@@ -494,13 +510,30 @@ class DukascopyProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=1.0850,
+        from app.plugins.brokers.dukascopy.adapter import DukascopyBroker
+
+        broker = DukascopyBroker()
+        dt_from = _parse_iso(request.date_from)
+        dt_to = _parse_iso(request.date_to)
+        resp = broker.get_bars(
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            date_from=dt_from,
+            date_to=dt_to,
         )
+        if not resp.is_success or not resp.data:
+            return []
+        return [
+            BarRecord(
+                timestamp_utc=b.time.isoformat(),
+                open=b.open,
+                high=b.high,
+                low=b.low,
+                close=b.close,
+                volume=float(b.real_volume or b.tick_volume),
+            )
+            for b in resp.data
+        ]
 
 
 class MT5Provider(BaseDataProvider):
@@ -523,13 +556,30 @@ class MT5Provider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=100.0,
+        from app.plugins.brokers.metatrader.adapter import MetaTraderBroker
+
+        broker = MetaTraderBroker()
+        dt_from = _parse_iso(request.date_from)
+        dt_to = _parse_iso(request.date_to)
+        resp = broker.get_bars(
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            date_from=dt_from,
+            date_to=dt_to,
         )
+        if not resp.is_success or not resp.data:
+            return []
+        return [
+            BarRecord(
+                timestamp_utc=b.time.isoformat(),
+                open=b.open,
+                high=b.high,
+                low=b.low,
+                close=b.close,
+                volume=float(b.real_volume or b.tick_volume),
+            )
+            for b in resp.data
+        ]
 
 
 class SQEquityProvider(BaseDataProvider):
@@ -552,13 +602,30 @@ class SQEquityProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=180.0,
+        from app.plugins.brokers.sq_equity.adapter import SQEquityBroker
+
+        broker = SQEquityBroker()
+        dt_from = _parse_iso(request.date_from)
+        dt_to = _parse_iso(request.date_to)
+        resp = broker.get_bars(
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            date_from=dt_from,
+            date_to=dt_to,
         )
+        if not resp.is_success or not resp.data:
+            return []
+        return [
+            BarRecord(
+                timestamp_utc=b.time.isoformat(),
+                open=b.open,
+                high=b.high,
+                low=b.low,
+                close=b.close,
+                volume=float(b.real_volume or b.tick_volume),
+            )
+            for b in resp.data
+        ]
 
 
 class SQFuturesProvider(BaseDataProvider):
@@ -581,13 +648,30 @@ class SQFuturesProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=5000.0,
+        from app.plugins.brokers.sq_futures.adapter import SQFuturesBroker
+
+        broker = SQFuturesBroker()
+        dt_from = _parse_iso(request.date_from)
+        dt_to = _parse_iso(request.date_to)
+        resp = broker.get_bars(
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            date_from=dt_from,
+            date_to=dt_to,
         )
+        if not resp.is_success or not resp.data:
+            return []
+        return [
+            BarRecord(
+                timestamp_utc=b.time.isoformat(),
+                open=b.open,
+                high=b.high,
+                low=b.low,
+                close=b.close,
+                volume=float(b.real_volume or b.tick_volume),
+            )
+            for b in resp.data
+        ]
 
 
 class TDProvider(BaseDataProvider):
@@ -611,13 +695,12 @@ class TDProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=220.0,
+        logger.warning(
+            "FR-DATA-PROVIDERS-ADAPTERS: %s has no active broker connection; "
+            "returning empty list under Strict Real-Data Policy",
+            self.capabilities.name,
         )
+        return []
 
 
 class YahooProvider(BaseDataProvider):
@@ -641,13 +724,30 @@ class YahooProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        return SyntheticMockHelper.generate_bars(
-            request.symbol,
-            request.date_from,
-            request.date_to,
-            step_minutes=1,
-            base_price=450.0,
+        from app.plugins.brokers.yahoo.adapter import YahooBroker
+
+        broker = YahooBroker()
+        dt_from = _parse_iso(request.date_from)
+        dt_to = _parse_iso(request.date_to)
+        resp = broker.get_bars(
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            date_from=dt_from,
+            date_to=dt_to,
         )
+        if not resp.is_success or not resp.data:
+            return []
+        return [
+            BarRecord(
+                timestamp_utc=b.time.isoformat(),
+                open=b.open,
+                high=b.high,
+                low=b.low,
+                close=b.close,
+                volume=float(b.real_volume or b.tick_volume),
+            )
+            for b in resp.data
+        ]
 
 
 class ProviderManager:
@@ -655,7 +755,7 @@ class ProviderManager:
 
     def __init__(self) -> None:
         """Initialize provider registry with authoritative SQX supported providers."""
-        self._providers: dict[str, BaseDataProvider] = {}
+        self._providers: dict[str, Any] = {}
 
         # Register default core providers
         self.register(BinanceProvider(variant="Spot"))
@@ -672,25 +772,59 @@ class ProviderManager:
         self.register(TDProvider())
         self.register(YahooProvider())
 
-    def register(self, provider: BaseDataProvider) -> None:
-        """Register a provider adapter instance."""
-        self._providers[provider.capabilities.name.lower()] = provider
+    def register(self, provider: Any) -> None:
+        """Register a provider or broker adapter instance."""
+        name = ""
+        if hasattr(provider, "provider_capabilities") and hasattr(
+            provider.provider_capabilities, "name"
+        ):
+            name = provider.provider_capabilities.name
+        elif hasattr(provider, "capabilities"):
+            caps = provider.capabilities
+            if (
+                hasattr(caps, "name")
+                and isinstance(caps.name, str)
+                and caps.name != "ALL"
+            ):
+                name = caps.name
+        if not name and hasattr(provider, "name") and isinstance(provider.name, str):
+            name = provider.name
+        if not name:
+            name = str(provider)
+
+        key = name.lower()
+        self._providers[key] = provider
+        if key in ("metatrader", "metatrader5", "mt5"):
+            self._providers["metatrader"] = provider
+            self._providers["metatrader5"] = provider
+            self._providers["mt5"] = provider
+
         logger.info(
             "FR-DATA-PROVIDERS-ADAPTERS: Registered provider '%s'",
-            provider.capabilities.name,
+            name,
             extra={
-                "provider": provider.capabilities.name,
+                "provider": name,
                 "fr_id": "FR-DATA-PROVIDERS-ADAPTERS",
             },
         )
 
-    def get_provider(self, name: str) -> BaseDataProvider | None:
+    def get_provider(self, name: str) -> Any | None:
         """Retrieve provider adapter by case-insensitive key."""
         return self._providers.get(name.strip().lower())
 
     def list_capabilities(self) -> list[ProviderCapabilities]:
         """List capabilities for all registered data providers."""
-        return [p.capabilities for p in self._providers.values()]
+        caps: dict[str, ProviderCapabilities] = {}
+        for p in self._providers.values():
+            if hasattr(p, "provider_capabilities") and isinstance(
+                p.provider_capabilities, ProviderCapabilities
+            ):
+                caps[p.provider_capabilities.name.lower()] = p.provider_capabilities
+            elif hasattr(p, "capabilities") and isinstance(
+                p.capabilities, ProviderCapabilities
+            ):
+                caps[p.capabilities.name.lower()] = p.capabilities
+        return list(caps.values())
 
     def download(
         self,
@@ -710,7 +844,8 @@ class ProviderManager:
                 f"Unknown data provider '{request.provider_name}'. "
                 f"Available: {[p.name for p in self.list_capabilities()]}"
             )
-        return provider.download_bars(request, cancel_token=cancel_token)
+        result = provider.download_bars(request, cancel_token=cancel_token)
+        return cast("list[BarRecord]", result)
 
 
 def main() -> int:

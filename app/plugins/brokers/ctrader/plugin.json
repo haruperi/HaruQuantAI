@@ -1,0 +1,24 @@
+{
+  "manifest_version": 1,
+  "id": "broker-ctrader",
+  "name": "cTrader Open API Broker",
+  "version": "1.0.0",
+  "description": "Spotware cTrader Open API v2 Protocol Buffers execution and market data broker plugin",
+  "author": "HaruQuantAI",
+  "slot": "broker",
+  "entrypoint": "adapter:create_adapter",
+  "dependencies": [],
+  "capabilities": [
+    "trading",
+    "market_data",
+    "account_sync"
+  ],
+  "enabled": true,
+  "metadata": {
+    "provider_name": "cTrader",
+    "display_name": "cTrader Open API",
+    "asset_classes": ["Forex", "Indices", "Commodities", "Crypto"],
+    "timeframes": ["M1", "M5", "M15", "H1", "D1"],
+    "requires_auth": true
+  }
+}

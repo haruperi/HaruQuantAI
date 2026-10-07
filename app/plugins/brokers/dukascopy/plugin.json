@@ -1,0 +1,22 @@
+{
+  "manifest_version": 1,
+  "id": "broker-dukascopy",
+  "name": "Dukascopy Connector",
+  "version": "1.0.0",
+  "description": "Dukascopy Bank SA tick and historical bar data provider and broker plugin",
+  "author": "HaruQuantAI",
+  "slot": "broker",
+  "entrypoint": "adapter:create_adapter",
+  "dependencies": [],
+  "capabilities": ["bars", "ticks", "symbols"],
+  "enabled": true,
+  "metadata": {
+    "provider_name": "Dukascopy",
+    "display_name": "Dukascopy Bank SA",
+    "asset_classes": ["Forex", "Commodities", "Indices"],
+    "timeframes": ["M1", "H1", "D1"],
+    "requires_auth": false,
+    "rate_limit_rps": 10.0,
+    "base_url": "https://datafeed.dukascopy.com"
+  }
+}

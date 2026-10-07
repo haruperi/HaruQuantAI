@@ -499,8 +499,10 @@ def test_telemetry_logging_emissions() -> None:
 
     client = TestClient(app)
     tok = tokens.create_token("operator").token
+    sub_id, *_ = bus.subscribe(["chan.test"])
     bus.publish("chan.test", "ping", {})
     client.get("/auth/status", headers={"Authorization": f"Bearer {tok}"})
+    engine.flush()
 
     requirements = [e.context.get("requirement") for e in engine.ring_buffer._entries]
     assert "FR-HOST-TRANSPORT-SESSION-AUTH" in requirements

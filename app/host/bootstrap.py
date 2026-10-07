@@ -448,7 +448,7 @@ class HostRuntime:
             return
 
         plugin_dirs: list[Path] = []
-        plugins_root = Path("app/plugins/data_source")
+        plugins_root = Path("app/plugins/brokers")
         if plugins_root.is_dir():
             plugin_dirs.append(plugins_root)
 
@@ -461,7 +461,7 @@ class HostRuntime:
                     attached = plugin_mgr.attach(p_id)
                     if attached:
                         inst = plugin_mgr.get_instance(p_id)
-                        if inst is not None and hasattr(inst, "capabilities"):
+                        if inst is not None:
                             self.provider_manager.register(inst)
                 except Exception:
                     logger.exception(

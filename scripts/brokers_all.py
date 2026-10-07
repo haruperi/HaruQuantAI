@@ -1,4 +1,4 @@
-"""Test script testing all registered broker plugins in app/plugin/broker.
+"""Test script testing all registered broker plugins in app/plugins/brokers.
 
 Validates:
 - MetaTrader5 (Live trading, execution, quotes, bars, history)
@@ -19,17 +19,19 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.host.logging import get_logger
-from app.plugin.broker import (
+from app.plugins.brokers import (
     OrderAction,
     OrderType,
     TimeFrame,
     TradeRequest,
+    binance,
     check_order,
     connect,
     ctrader,
     darwinex,
     disconnect,
     dukascopy,
+    files,
     get_account_info,
     get_bars,
     get_position_info,
@@ -231,8 +233,58 @@ def run_tests() -> bool:
     disconnect(broker=ctrader)
     print("    cTrader disconnected successfully.")
 
+    # ------------------------------------------------------------------------
+    # 8. Binance Crypto Exchange (Live Public REST API: Ping, BookTicker, Klines)
+    # ------------------------------------------------------------------------
+    print("\n[8] BINANCE CRYPTO EXCHANGE:")
+    b_conn = connect(broker=binance)
+    print(
+        f"    Ping / Connection: success={b_conn.is_success}, message='{b_conn.message}'"
+    )
+    assert b_conn.is_success
+    b_tick = get_symbol_tick(broker=binance, symbol="BTCUSDT")
+    print(
+        f"    Live Book Ticker: Bid={b_tick.data.bid if b_tick.data else 'None'}, "
+        f"Ask={b_tick.data.ask if b_tick.data else 'None'}"
+    )
+    assert b_tick.is_success
+    assert b_tick.data is not None
+    assert b_tick.data.bid > 0.0
+    b_bars = get_bars(broker=binance, symbol="BTCUSDT", timeframe=TimeFrame.M1, count=5)
+    print(f"    Live Klines count: {len(b_bars.data) if b_bars.data else 0}")
+    assert b_bars.is_success
+    assert b_bars.data is not None
+    assert len(b_bars.data) == 5
+    print(f"    Sample Bar: {b_bars.data[-1]}")
+    b_trade = trade(
+        broker=binance, request=TradeRequest(symbol="BTCUSDT", volume=0.001)
+    )
+    print(
+        f"    Trade Attempt: success={b_trade.is_success}, message='{b_trade.message}'"
+    )
+    assert not b_trade.is_success
+    assert "doesn't have trading capabilities" in b_trade.message
+
+    # ------------------------------------------------------------------------
+    # 9. Filesystem Tabular Market Data (CSV / Parquet Ingestion)
+    # ------------------------------------------------------------------------
+    print("\n[9] FILES BROKER (CSV/Parquet):")
+    f_conn = connect(broker=files)
+    print(f"    Mount Status: success={f_conn.is_success}, message='{f_conn.message}'")
+    assert f_conn.is_success
+    f_syms = get_symbols(broker=files)
+    print(f"    Discovered Files Datasets: {len(f_syms.data) if f_syms.data else 0}")
+    f_bars = get_bars(broker=files, symbol="AAPL", timeframe=TimeFrame.D1, count=5)
+    print(
+        f"    Files Bars: success={f_bars.is_success}, count={len(f_bars.data) if f_bars.data else 0}"
+    )
+    assert f_bars.is_success
+    assert f_bars.data is not None
+    assert len(f_bars.data) > 0
+
     print("\n" + "=" * 80)
-    print("ALL 7 BROKERS SUCCESSFULLY VERIFIED AND COMPATIBLE WITH BASE CONTRACTS!")
+    print("ALL 9 BROKERS (MT5, YAHOO, DUKASCOPY, DARWINEX, SQ_EQUITY, SQ_FUTURES,")
+    print("CTRADER, BINANCE, FILES) VERIFIED UNDER STRICT REAL-DATA POLICY!")
     print("=" * 80)
     return True
 

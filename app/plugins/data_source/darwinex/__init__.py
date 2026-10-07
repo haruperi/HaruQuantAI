@@ -1,1 +1,0 @@
-"""Darwinex plugin package."""

@@ -213,10 +213,10 @@ class DatasetRecord(BaseModel):
 class CatalogService:
     """Central domain service managing dataset catalogs and broker profiles."""
 
-    def __init__(self, db: DatabaseManager) -> None:
+    def __init__(self, db: DatabaseManager | None = None) -> None:
         """Initialize CatalogService with parent DatabaseManager."""
-        self._db = db
-        self._broker_service = BrokerService(db)
+        self._db = db or DatabaseManager()
+        self._broker_service = BrokerService(self._db)
 
     def save_dataset(self, dataset: DatasetRecord) -> str:
         """Persist or update dataset metadata in host persistence.

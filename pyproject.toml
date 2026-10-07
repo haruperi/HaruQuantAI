@@ -166,7 +166,7 @@ ignore = [
     "PTH",
     "SLF001",
 ]
-"app/plugin/broker/**/*.py" = [
+"app/plugins/brokers/**/*.py" = [
     "C901",
     "PLR0911",
     "PLR0912",

@@ -1,1 +1,0 @@
-"""Dukascopy plugin package."""

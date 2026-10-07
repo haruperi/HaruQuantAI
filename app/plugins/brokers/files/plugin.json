@@ -1,0 +1,21 @@
+{
+  "manifest_version": 1,
+  "id": "broker-files",
+  "name": "Local Files Connector",
+  "version": "1.0.0",
+  "description": "Local filesystem tabular (CSV/TXT/Parquet) market data broker and provider plugin",
+  "author": "HaruQuantAI",
+  "slot": "broker",
+  "entrypoint": "adapter:create_adapter",
+  "dependencies": [],
+  "capabilities": ["bars", "ticks", "symbols"],
+  "enabled": true,
+  "metadata": {
+    "provider_name": "Files",
+    "display_name": "Local Filesystem Feed",
+    "asset_classes": ["Forex", "Stocks", "Futures", "Crypto"],
+    "timeframes": ["M1", "M5", "H1", "D1"],
+    "requires_auth": false,
+    "rate_limit_rps": 100.0
+  }
+}

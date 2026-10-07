@@ -1,1 +1,0 @@
-"""Crypto plugin package."""

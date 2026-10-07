@@ -1,0 +1,22 @@
+{
+  "manifest_version": 1,
+  "id": "broker-darwinex",
+  "name": "Darwinex Connector",
+  "version": "1.0.0",
+  "description": "Darwinex institutional tick and bar market data provider and broker plugin",
+  "author": "HaruQuantAI",
+  "slot": "broker",
+  "entrypoint": "adapter:create_adapter",
+  "dependencies": [],
+  "capabilities": ["bars", "ticks", "symbols"],
+  "enabled": true,
+  "metadata": {
+    "provider_name": "Darwinex",
+    "display_name": "Darwinex Tick & Bar Feeds",
+    "asset_classes": ["Forex", "CFD"],
+    "timeframes": ["M1", "H1", "D1"],
+    "requires_auth": true,
+    "rate_limit_rps": 5.0,
+    "base_url": "https://api.darwinex.com"
+  }
+}

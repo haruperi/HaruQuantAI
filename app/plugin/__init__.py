@@ -1,1 +1,0 @@
-"""Plugin root package."""

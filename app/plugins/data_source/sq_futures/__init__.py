@@ -1,1 +1,0 @@
-"""SQ Futures plugin package."""

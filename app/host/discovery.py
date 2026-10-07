@@ -330,6 +330,11 @@ class SlotRegistry:
                 multi_instance=True,
             ),
             SlotDefinition(
+                slot_id="broker",
+                description="Live execution and market data broker connector plugin",
+                multi_instance=True,
+            ),
+            SlotDefinition(
                 slot_id="engine.evaluator",
                 description="Quantitative strategy evaluator or fitness ranking",
                 multi_instance=True,

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 1,
+  "id": "broker-sq-equity",
+  "name": "StrategyQuant US Equities Connector",
+  "version": "1.0.0",
+  "description": "StrategyQuant US Equities historical parquet data and broker plugin",
+  "author": "HaruQuantAI",
+  "slot": "broker",
+  "entrypoint": "adapter:create_adapter",
+  "dependencies": [],
+  "capabilities": ["bars", "symbols"],
+  "enabled": true,
+  "metadata": {
+    "provider_name": "SQEquity",
+    "display_name": "StrategyQuant US Equities",
+    "asset_classes": ["Stocks"],
+    "timeframes": ["M1", "D1"],
+    "requires_auth": false,
+    "rate_limit_rps": 10.0
+  }
+}

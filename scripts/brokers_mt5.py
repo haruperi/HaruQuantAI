@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 from app.host.logging import get_logger
-from app.plugin.broker import (
+from app.plugins.brokers import (
     OrderAction,
     OrderType,
     TimeFrame,
