@@ -8,12 +8,17 @@ Every development task follows this sequence:
    dependencies, and working-tree state. Make no source edits.
 2. **Implementation plan:** create or append
    `.agents/logs/<timestamp>_<task>/implementation-plan.md` using the [canonical
-   template](docs/templates/implementation-plan.md) and define exact
-   `ALLOWED_WRITE_PATHS`.
-3. **Owner approval gate:** stop until the owner explicitly responds
-   `APPROVED: EXECUTE` or equivalently approves the documented plan.
-4. **Surgical implementation:** edit only approved paths and record material
-   deviations as a plan iteration before proceeding.
+   template](docs/templates/implementation-plan.md) .
+3. **Owner approval gate:** stop until the owner explicitly responds exactly
+   `APPROVED: EXECUTE` with nothing else. Any extra text means adjusting
+   the plan first or addressing that issue first. If its a follow up task of the same
+   Implementation, no need to create a new implementation plan file, append at the end
+   of the same document with Iteration: 2/3/4 etc.
+4. **Surgical implementation:** edit only approved task and paths, record material
+   deviations as a plan iteration before proceeding. Only one "APPROVED: EXECUTE"
+   for what is listed in this task only do not treat historical approval as current.
+   Any blockers during implementation will need its own "APPROVED: EXECUTE"
+   after updating the implementation plan.
 5. **Focused verification:** run change-scoped tests during development.
 6. **Walkthrough:** create `walkthrough.md` from the
    [canonical template](docs/templates/walkthrough.md),
@@ -33,8 +38,7 @@ iteration and renewed approval when they materially expand scope.
   concrete Python module must follow `docs/templates/PYTHON_MODULE.md` declaring
   `Description:` (business logic and internal/external workflows), `Purpose:`
   (`FEAT-*`), `Key Capabilities:` (descriptive kebab-case `FR-*` labels, never
-  numbered, with zero silent executions and explicit log verification), `Python API
-  Usage:`, and `CLI Usage:`.
+  numbered, with zero silent executions and explicit log verification), `Python API Usage:`, and `CLI Usage:`.
 - Mypy strict mode with all public signatures explicitly typed.
 - No bare `except`, silent failures, application `print`, hidden logging setup,
   or secret-bearing diagnostics.
@@ -45,7 +49,6 @@ iteration and renewed approval when they materially expand scope.
 - UI changes require, as applicable:
   `npm --prefix ui run typecheck`, `npm --prefix ui run test`, and
   `npm --prefix ui run build`.
-
 
 ## 3. Security, persistence, and external effects
 

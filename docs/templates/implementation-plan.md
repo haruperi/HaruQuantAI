@@ -2,7 +2,7 @@
 
 Iteration: <n></n>. Status: PROPOSED | APPROVED | SUPERSEDED.
 Date, source HEAD/fingerprint, working-tree status, owner approval reference:
-<record evidence; do not infer approval>
+<record evidence; do not infer approval. No essays, everything should be brief and straight to the point.>
 
 ## 1. Objective and acceptance boundary
 
@@ -44,13 +44,3 @@ Date, source HEAD/fingerprint, working-tree status, owner approval reference:
 
 - [Output location (if any)]
 - [Proposed commit subject, plan approval and separate commit gate]
-
-**IMPORTANT NOTES _(for agents only_):**
-
-- Stop before unapproved implementation; Wait for exactly "APPROVED: EXECUTE" with nothing else.
-Any extra text means adjusting the plan first or addressing that issue first.
-- Only one "APPROVED: EXECUTE" for what is listed in this task only do not treat historical approval as current.
-Any blockers during implementation will need their own "APPROVED: EXECUTE" after updating the implementation plan.
-- If its a follow up task of the same Implementation, no need to create a implementation plan file, append at the end
-of the same document with the 7 headings above and Iteration: 2/3/4 etc.
-- No essays, everything should be brief and straight to the point.
