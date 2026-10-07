@@ -467,23 +467,56 @@ class HostSettings(_SettingsNode):
 
     Inherits recursive dot-access and dictionary indexing from `_SettingsNode`.
     Connects to the authoritative SQLite persistence store (`SettingsStore`) to
-    load, cache, and structure configuration records across all defined scopes.
+    load, cache, structure, and provide default fallback configuration records
+    across all defined scopes.
     """
 
     def __init__(
         self,
         db_path: Path | str | None = None,
         *,
+        host: str | None = None,
+        port: int | None = None,
+        debug: bool | None = None,
+        data_dir: Path | str | None = None,
+        title: str | None = None,
+        version: str | None = None,
+        api_prefix: str | None = None,
+        reference_cohort: str | None = None,
         auto_load: bool = True,
     ) -> None:
-        """Initialize HostSettings with optional database path.
+        """Initialize HostSettings with optional database path and overrides.
 
         Args:
             db_path: Optional path to SQLite database. Defaults to repository store.
+            host: Optional host IP override.
+            port: Optional host port override.
+            debug: Optional debug mode override.
+            data_dir: Optional workspace runtime data directory override.
+            title: Optional application title override.
+            version: Optional application version override.
+            api_prefix: Optional REST API route prefix override.
+            reference_cohort: Optional reference cohort identifier override.
             auto_load: Whether to load settings immediately upon construction.
         """
         super().__init__()
-        self._store = SettingsStore(db_path=Path(db_path) if db_path else None)
+        self._override_host: str | None = host
+        self._override_port: int | None = port
+        self._override_debug: bool | None = debug
+        self._override_data_dir: Path | None = (
+            Path(data_dir) if data_dir is not None else None
+        )
+        self._override_title: str | None = title
+        self._override_version: str | None = version
+        self._override_api_prefix: str | None = api_prefix
+        self._override_reference_cohort: str | None = reference_cohort
+
+        resolved_db: Path | None = None
+        if db_path is not None:
+            resolved_db = Path(db_path)
+        elif self._override_data_dir is not None:
+            resolved_db = self._override_data_dir / "database" / "haruquantai.db"
+        self._store = SettingsStore(db_path=resolved_db)
         self._scopes: dict[str, _SettingsNode] = {}
         self._revision: int = 1
         self._loaded: bool = False
@@ -506,18 +539,98 @@ class HostSettings(_SettingsNode):
         self._ensure_loaded()
         return self._revision
 
+    @property
+    def host(self) -> str:
+        """Return configured bind IP address."""
+        if self._override_host is not None:
+            return self._override_host
+        self._ensure_loaded()
+        raw = self.get("app_general")
+        return str(raw.get("host", "127.0.0.1")) if hasattr(raw, "get") else "127.0.0.1"
+
+    @property
+    def port(self) -> int:
+        """Return configured backend bind port number."""
+        if self._override_port is not None:
+            return self._override_port
+        self._ensure_loaded()
+        raw = self.get("app_general")
+        return int(raw.get("backend_port", 8000)) if hasattr(raw, "get") else 8000
+
+    @property
+    def debug(self) -> bool:
+        """Return True if debug diagnostics are active."""
+        if self._override_debug is not None:
+            return self._override_debug
+        self._ensure_loaded()
+        raw = self.get("config_troubleshooting")
+        return (
+            bool(raw.get("debug_level_active", False)) if hasattr(raw, "get") else False
+        )
+
+    @property
+    def data_dir(self) -> Path | None:
+        """Return configured workspace data directory."""
+        if self._override_data_dir is not None:
+            return self._override_data_dir
+        self._ensure_loaded()
+        raw = self.get("workspace_paths")
+        path_str = raw.get("data_dir") if hasattr(raw, "get") else None
+        return Path(path_str) if path_str is not None else None
+
+    @property
+    def api_prefix(self) -> str:
+        """Return REST API route prefix."""
+        if self._override_api_prefix is not None:
+            return self._override_api_prefix
+        self._ensure_loaded()
+        raw = self.get("host_runtime")
+        return (
+            str(raw.get("api_prefix", "/api/v1")) if hasattr(raw, "get") else "/api/v1"
+        )
+
+    @property
+    def title(self) -> str:
+        """Return platform application title."""
+        if self._override_title is not None:
+            return self._override_title
+        self._ensure_loaded()
+        raw = self.get("host_runtime")
+        return (
+            str(raw.get("title", "HaruQuantAI Host"))
+            if hasattr(raw, "get")
+            else "HaruQuantAI Host"
+        )
+
+    @property
+    def version(self) -> str:
+        """Return platform application version."""
+        if self._override_version is not None:
+            return self._override_version
+        self._ensure_loaded()
+        raw = self.get("host_runtime")
+        return str(raw.get("version", "2.1.0")) if hasattr(raw, "get") else "2.1.0"
+
+    @property
+    def reference_cohort(self) -> str:
+        """Return platform reference cohort identifier."""
+        if self._override_reference_cohort is not None:
+            return self._override_reference_cohort
+        self._ensure_loaded()
+        raw = self.get("host_runtime")
+        return (
+            str(raw.get("reference_cohort", "SQX145 Dev 1"))
+            if hasattr(raw, "get")
+            else "SQX145 Dev 1"
+        )
+
     def _ensure_loaded(self) -> None:
         """Ensure settings are loaded from disk if not yet loaded."""
         if not self._loaded:
             self.reload()
 
-    def reload(self) -> None:
-        """Query host database and reload all scoped settings into memory."""
-        self._data.clear()
-        self._raw.clear()
-        self._scopes.clear()
-
-        # Auto-initialize store if database file absent or table not created
+    def _initialize_store(self) -> None:
+        """Ensure storage schemas are initialized before reading."""
         if not self._store.db_path.exists():
             try:
                 self._store.initialize()
@@ -531,11 +644,50 @@ class HostSettings(_SettingsNode):
             with contextlib.suppress(PersistenceError):
                 self._store.initialize()
 
+    def _apply_runtime_overrides(self, merged: dict[str, dict[str, Any]]) -> None:
+        """Apply explicit constructor overrides onto loaded configuration dictionary."""
+        if self._override_host is not None:
+            merged.setdefault("app_general", {})["host"] = self._override_host
+        if self._override_port is not None:
+            merged.setdefault("app_general", {})["backend_port"] = self._override_port
+        if self._override_debug is not None:
+            merged.setdefault("config_troubleshooting", {})["debug_level_active"] = (
+                self._override_debug
+            )
+        if self._override_data_dir is not None:
+            merged.setdefault("workspace_paths", {})["data_dir"] = str(
+                self._override_data_dir
+            )
+        if self._override_title is not None:
+            merged.setdefault("host_runtime", {})["title"] = self._override_title
+        if self._override_version is not None:
+            merged.setdefault("host_runtime", {})["version"] = self._override_version
+        if self._override_api_prefix is not None:
+            merged.setdefault("host_runtime", {})["api_prefix"] = (
+                self._override_api_prefix
+            )
+        if self._override_reference_cohort is not None:
+            merged.setdefault("host_runtime", {})["reference_cohort"] = (
+                self._override_reference_cohort
+            )
+
+    def reload(self) -> None:
+        """Query host database and reload all scoped settings into memory."""
+        self._data.clear()
+        self._raw.clear()
+        self._scopes.clear()
+
+        self._initialize_store()
         rev, scoped_vals = self._store.read_all_scoped()
         self._revision = rev
 
+        merged_scoped: dict[str, dict[str, Any]] = {
+            s: dict(kvs) for s, kvs in scoped_vals.items()
+        }
+        self._apply_runtime_overrides(merged_scoped)
+
         total_keys = 0
-        for scope, keyvals in scoped_vals.items():
+        for scope, keyvals in merged_scoped.items():
             scope_dict: dict[str, Any] = {}
             clean_scope = scope.replace(".", "_")
 
@@ -563,10 +715,10 @@ class HostSettings(_SettingsNode):
         logger.info(
             "FR-HOST-SETTINGS-LOAD: Loaded %d records in %d scopes. Revision: %d",
             total_keys,
-            len(scoped_vals),
+            len(merged_scoped),
             self._revision,
             extra={
-                "scopes": list(scoped_vals.keys()),
+                "scopes": list(merged_scoped.keys()),
                 "count": total_keys,
                 "revision": self._revision,
                 "fr_id": "FR-HOST-SETTINGS-LOAD",

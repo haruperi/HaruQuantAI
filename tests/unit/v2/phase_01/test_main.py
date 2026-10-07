@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from app.host.bootstrap import HostSettings
+from app.host.settings import HostSettings
 from app.main import _build_parser, create_app, main
 from fastapi.testclient import TestClient
 

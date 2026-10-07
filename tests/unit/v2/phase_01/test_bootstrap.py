@@ -48,13 +48,24 @@ def test_bootstrap_normal_startup_and_stop(
         assert LifespanStage.CONFIGURING in snapshot.completed_stages
         assert LifespanStage.ROUTES in snapshot.completed_stages
 
-        # Verify FR-HOST-BOOT-LIFECYCLE-STAGES log
+        # Verify FR-HOST-BOOT-LIFECYCLE-STAGES log and numbered stage progression
         stage_logs = [
             r.message
             for r in caplog.records
             if "FR-HOST-BOOT-LIFECYCLE-STAGES" in r.message
         ]
         assert len(stage_logs) > 0
+        assert any("[1/6] Stage CONFIGURING" in m for m in stage_logs)
+        assert any("[2/6] Stage PATHS" in m for m in stage_logs)
+        assert any("[3/6] Stage LOGGING" in m for m in stage_logs)
+        assert any("[4/6] Stage DISCOVERY" in m for m in stage_logs)
+        assert any("[5/6] Stage SERVICES" in m for m in stage_logs)
+        assert any("Substage 1/4" in m for m in stage_logs)
+        assert any("Substage 2/4" in m for m in stage_logs)
+        assert any("Substage 3/4" in m for m in stage_logs)
+        assert any("Substage 4/4" in m for m in stage_logs)
+        assert any("[6/6] Stage ROUTES" in m for m in stage_logs)
+        assert any("[READY]" in m for m in stage_logs)
 
         # Stop and verify reverse shutdown
         await runtime.stop()

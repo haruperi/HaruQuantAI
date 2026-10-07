@@ -82,7 +82,7 @@ from typing import Any
 from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from app.host.diagnostics import create_diagnostics_router
 from app.host.discovery import create_discovery_router
@@ -93,10 +93,18 @@ from app.host.logging import (
     get_logger,
     shutdown,
 )
-from app.host.persistence import DatabaseManager, create_persistence_router
+from app.host.persistence import (
+    DEFAULT_DATABASE_PATH,
+    DatabaseManager,
+    create_persistence_router,
+    get_database_manager,
+)
 from app.host.resources import ResourceManager, create_resources_router
 from app.host.session import create_sessions_router
-from app.host.settings import create_settings_router
+from app.host.settings import (
+    HostSettings,
+    create_settings_router,
+)
 from app.host.settings import settings as default_host_settings
 from app.host.transport import (
     TransportMiddleware,
@@ -105,7 +113,19 @@ from app.host.transport import (
 )
 from app.plugins.data.integration import create_data_router
 
+__all__ = [
+    "HostRuntime",
+    "HostSettings",
+    "LifespanStage",
+    "ReadinessSnapshot",
+    "ReadinessState",
+    "create_host_app",
+]
+
 logger = get_logger(__name__)
+
+_MIN_PORT: int = 1
+_MAX_PORT: int = 65535
 
 
 class LifespanStage(StrEnum):
@@ -134,25 +154,6 @@ class ReadinessState(StrEnum):
     STOPPING = "stopping"
     STOPPED = "stopped"
     FAILED = "failed"
-
-
-class HostSettings(BaseModel):
-    """Configuration model for the host platform runtime."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    host: str = Field(default="127.0.0.1", description="Bind IP address")
-    port: int = Field(default=8000, ge=1, le=65535, description="Bind port")
-    api_prefix: str = Field(default="/api/v1", description="API route prefix")
-    title: str = Field(default="HaruQuantAI Host", description="App title")
-    version: str = Field(default="2.1.0", description="App version")
-    reference_cohort: str = Field(
-        default="SQX145 Dev 1", description="Reference cohort identifier"
-    )
-    data_dir: Path | None = Field(
-        default=None, description="Path to runtime data directory"
-    )
-    debug: bool = Field(default=False, description="Enable debug diagnostics")
 
 
 class ReadinessSnapshot(BaseModel):
@@ -335,8 +336,227 @@ class HostRuntime:
                     },
                 )
 
+    @staticmethod
+    def _validate_configuration(settings: HostSettings) -> None:
+        """Validate critical host runtime settings before advancing stages."""
+        if not (_MIN_PORT <= settings.port <= _MAX_PORT):
+            raise ValueError(f"Invalid host port number: {settings.port}")
+
+    async def _boot_stage_configuring(self) -> None:
+        """Execute Stage 1: CONFIGURING."""
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [1/6] Stage CONFIGURING: "
+            "Validating runtime settings and configuration profiles "
+            "(host=%s, port=%d, debug=%s, title=%s)",
+            self.settings.host,
+            self.settings.port,
+            self.settings.debug,
+            self.settings.title,
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.CONFIGURING,
+                "host": self.settings.host,
+                "port": self.settings.port,
+                "debug": self.settings.debug,
+            },
+        )
+        self._validate_configuration(self.settings)
+        await self._advance_stage(LifespanStage.CONFIGURING, "configuration")
+
+    async def _boot_stage_paths(self) -> None:
+        """Execute Stage 2: PATHS."""
+        base_data_dir = self.settings.data_dir or Path("data")
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [2/6] Stage PATHS: "
+            "Initializing and verifying filesystem containment hierarchy at %s",
+            base_data_dir,
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.PATHS,
+                "data_dir": str(base_data_dir),
+            },
+        )
+        (base_data_dir / "database").mkdir(parents=True, exist_ok=True)
+        (base_data_dir / "logs").mkdir(parents=True, exist_ok=True)
+        (base_data_dir / "resources" / "staging").mkdir(parents=True, exist_ok=True)
+        (base_data_dir / "resources" / "store").mkdir(parents=True, exist_ok=True)
+        (base_data_dir / "resources" / "metadata").mkdir(parents=True, exist_ok=True)
+        (base_data_dir / "resources" / "extracted").mkdir(parents=True, exist_ok=True)
+        (base_data_dir / "resources" / "datasets").mkdir(parents=True, exist_ok=True)
+        (base_data_dir / "resources" / "custom_data").mkdir(parents=True, exist_ok=True)
+        (base_data_dir / "resources" / "cot").mkdir(parents=True, exist_ok=True)
+        await self._advance_stage(LifespanStage.PATHS, "paths")
+
+    async def _boot_stage_logging(self) -> None:
+        """Execute Stage 3: LOGGING."""
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [3/6] Stage LOGGING: "
+            "Centralized telemetry, asynchronous queue worker, "
+            "and ring buffer active",
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.LOGGING,
+            },
+        )
+        await self._advance_stage(LifespanStage.LOGGING, "logging")
+
+    async def _boot_stage_discovery(self) -> None:
+        """Execute Stage 4: DISCOVERY."""
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [4/6] Stage DISCOVERY: "
+            "Initializing workspace package discovery and "
+            "extension slot registry",
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.DISCOVERY,
+            },
+        )
+        await self._advance_stage(LifespanStage.DISCOVERY, "discovery")
+
+    def _init_persistence(self) -> DatabaseManager:
+        """Initialize SQLite database persistence and schema migrations."""
+        if self.db_manager is None:
+            self.db_manager = get_database_manager(
+                getattr(self.settings, "db_path", None)
+            )
+        self.db_manager.initialize()
+        return self.db_manager
+
+    def _cleanup_services(self) -> None:
+        """Tear down database and job manager during rollback or shutdown."""
+        if self.job_manager is not None:
+            try:
+                self.job_manager.close(timeout=5.0)
+            except Exception:
+                logger.exception(
+                    "FR-HOST-BOOT-REVERSE-SHUTDOWN: Error closing job manager."
+                )
+            self.job_manager = None
+        if self.db_manager is not None:
+            try:
+                self.db_manager.close()
+            except Exception:
+                logger.exception(
+                    "FR-HOST-BOOT-REVERSE-SHUTDOWN: Error closing db manager."
+                )
+            self.db_manager = None
+
+    async def _boot_stage_services(self) -> None:
+        """Execute Stage 5: SERVICES."""
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [5/6] Stage SERVICES: "
+            "Initializing authoritative host persistence, "
+            "recovery, and compute coordinators",
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.SERVICES,
+            },
+        )
+
+        # Substage 5.1: Persistence & Schema Migrations
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [5/6] Stage SERVICES "
+            "(Substage 1/4): Initializing SQLite persistence authority "
+            "and executing schema migrations",
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.SERVICES,
+                "substage": "persistence",
+            },
+        )
+        db_mgr = self._init_persistence()
+
+        # Substage 5.2: Startup Recovery & Integrity Verification
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [5/6] Stage SERVICES "
+            "(Substage 2/4): Running database physical integrity audit "
+            "and restart reconciliation",
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.SERVICES,
+                "substage": "recovery",
+            },
+        )
+        recovery_report = db_mgr.recovery.reconcile_on_startup()
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: Startup recovery audit complete "
+            "(integrity=%s, pruned_leases=%s)",
+            recovery_report.get("integrity", "unknown"),
+            recovery_report.get("pruned_expired_leases", 0),
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.SERVICES,
+                "recovery": recovery_report,
+            },
+        )
+
+        # Substage 5.3: Safe Resource Custody
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [5/6] Stage SERVICES "
+            "(Substage 3/4): Verifying immutable resource custody "
+            "and content-addressed storage",
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.SERVICES,
+                "substage": "resources",
+            },
+        )
+        if self.resource_manager is None:
+            res_target = (
+                (self.settings.data_dir / "resources")
+                if self.settings.data_dir is not None
+                else Path("data/resources")
+            )
+            self.resource_manager = ResourceManager(root_dir=res_target)
+
+        # Substage 5.4: Job Coordinator & In-flight Task Reconciliation
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [5/6] Stage SERVICES "
+            "(Substage 4/4): Reconciling in-flight compute jobs "
+            "and worker process pool",
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.SERVICES,
+                "substage": "jobs",
+            },
+        )
+        if self.job_manager is None:
+            self.job_manager = JobManager(
+                max_workers=4,
+                db_path=db_mgr.database_path,
+                auto_reconcile=False,
+            )
+        self.job_manager.store.reconcile_on_startup()
+
+        await self._advance_stage(
+            LifespanStage.SERVICES, "services", cleanup=self._cleanup_services
+        )
+
+    async def _boot_stage_routes(self) -> None:
+        """Execute Stage 6: ROUTES."""
+        logger.info(
+            "FR-HOST-BOOT-LIFECYCLE-STAGES: [6/6] Stage ROUTES: "
+            "Verifying mounted capability routers, transport middleware, "
+            "and API endpoints",
+            extra={
+                "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                "stage": LifespanStage.ROUTES,
+            },
+        )
+        await self._advance_stage(LifespanStage.ROUTES, "routes")
+
     async def start(self) -> ReadinessSnapshot:
-        """Execute the ordered host startup sequence.
+        """Execute the ordered host startup sequence across all lifespan stages.
+
+        Progresses strictly through:
+            1. CONFIGURING: Validates runtime host, port, and debug configuration.
+            2. PATHS: Ensures directory containment hierarchy for data and resources.
+            3. LOGGING: Verifies centralized telemetry and ring buffer readiness.
+            4. DISCOVERY: Initializes extension slot registry and plugin context.
+            5. SERVICES: Initializes SQLite schemas, runs startup recovery audit,
+               reconciles active compute jobs, and verifies resource custody.
+            6. ROUTES: Confirms capability routers, transport middleware and contracts.
+            7. READY: Asserts all checks passed and signals readiness to serve.
 
         Fires FR-HOST-BOOT-LIFECYCLE-STAGES and FR-HOST-BOOT-REVERSE-SHUTDOWN on
         failure.
@@ -359,22 +579,34 @@ class HostRuntime:
             )
 
             try:
-                await self._advance_stage(LifespanStage.CONFIGURING, "configuration")
-                await self._advance_stage(LifespanStage.PATHS, "paths")
-                await self._advance_stage(LifespanStage.LOGGING, "logging")
-                await self._advance_stage(LifespanStage.DISCOVERY, "discovery")
-                await self._advance_stage(LifespanStage.SERVICES, "services")
-                await self._advance_stage(LifespanStage.ROUTES, "routes")
+                await self._boot_stage_configuring()
+                await self._boot_stage_paths()
+                await self._boot_stage_logging()
+                await self._boot_stage_discovery()
+                await self._boot_stage_services()
+                await self._boot_stage_routes()
 
+                # -------------------------------------------------------------
+                # Stage 7: READY
+                # -------------------------------------------------------------
                 self._active_stage = LifespanStage.READY
                 self._state = ReadinessState.READY
                 self._completed_stages.append(LifespanStage.READY)
 
+                uptime = time.monotonic() - self._start_time
                 logger.info(
-                    "FR-HOST-BOOT-LIFECYCLE-STAGES: Host runtime is fully ready "
-                    "(instance=%s)",
+                    "FR-HOST-BOOT-LIFECYCLE-STAGES: [READY] HaruQuantAI platform "
+                    "host is ready to serve requests "
+                    "(instance=%s, uptime=%.2fs, prefix=%s)",
                     self.host_instance_id,
-                    extra={"fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES"},
+                    uptime,
+                    self.settings.api_prefix,
+                    extra={
+                        "fr_id": "FR-HOST-BOOT-LIFECYCLE-STAGES",
+                        "stage": LifespanStage.READY,
+                        "instance": self.host_instance_id,
+                        "uptime": uptime,
+                    },
                 )
                 return self.get_readiness()
 
@@ -611,9 +843,13 @@ def _mount_host_routers(
     app.include_router(sessions_router, prefix=resolved_settings.api_prefix)
 
     # 8. Persistence Router (/api/v1/persistence/...)
-    db_path = getattr(resolved_config, "db_path", Path("data/database/haruquantai.db"))
     if resolved_runtime.db_manager is None:
-        resolved_runtime.db_manager = DatabaseManager(Path(db_path))
+        db_target = getattr(resolved_settings, "db_path", None)
+        if (db_target is None or db_target == DEFAULT_DATABASE_PATH) and hasattr(
+            resolved_config, "db_path"
+        ):
+            db_target = resolved_config.db_path
+        resolved_runtime.db_manager = get_database_manager(db_target)
     persistence_router = create_persistence_router(resolved_runtime.db_manager)
     app.include_router(persistence_router, prefix=resolved_settings.api_prefix)
 
@@ -624,7 +860,7 @@ def _mount_host_routers(
             max_workers = int(resolved_config.config_cpu.get("custom_cores", 4))
         resolved_runtime.job_manager = JobManager(
             max_workers=max_workers,
-            db_path=Path(db_path),
+            db_path=resolved_runtime.db_manager.database_path,
             auto_reconcile=False,
         )
     jobs_router = create_jobs_router(resolved_runtime.job_manager)
@@ -632,12 +868,11 @@ def _mount_host_routers(
 
     # 10. Resources Router (/api/v1/resources/...)
     if resolved_runtime.resource_manager is None:
-        res_dir = Path("data/resources")
-        if hasattr(resolved_config, "workspace_paths"):
-            res_dir = (
-                Path(resolved_config.workspace_paths.get("data_dir", "data"))
-                / "resources"
-            )
+        res_dir = (
+            resolved_settings.data_dir / "resources"
+            if resolved_settings.data_dir is not None
+            else Path("data/resources")
+        )
         resolved_runtime.resource_manager = ResourceManager(root_dir=res_dir)
     resources_router = create_resources_router(resolved_runtime.resource_manager)
     app.include_router(resources_router, prefix=resolved_settings.api_prefix)

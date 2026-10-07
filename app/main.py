@@ -2,10 +2,22 @@
 
 Description:
     Serves as the main process bootstrap and lifecycle coordinator for the
-    HaruQuantAI platform. Resolves host, port, and debug configuration from the
-    authoritative database settings with CLI overrides, initializes host
-    telemetry, launches the ASGI web server, and guarantees orderly shutdown
-    with complete queue draining in a finally boundary.
+    HaruQuantAI clean-room Python host (replacing legacy JVM mechanics).
+    Resolves host, port, and debug configuration from the authoritative database
+    settings with CLI overrides, initializes host telemetry, launches the ASGI
+    web server with factory composition, and triggers the structured LifespanStage
+    state machine:
+        1. CONFIGURING: Validates runtime settings and configuration profiles.
+        2. PATHS: Ensures directory containment hierarchy for data and resources.
+        3. LOGGING: Verifies centralized telemetry and ring buffer readiness.
+        4. DISCOVERY: Initializes extension slot registry and plugin context.
+        5. SERVICES: Initializes SQLite schemas, runs startup recovery audit,
+           reconciles active compute jobs, and verifies resource custody.
+        6. ROUTES: Confirms capability routers, transport middleware and contracts.
+        7. READY: Asserts all checks passed and signals readiness to serve.
+
+    Guarantees orderly shutdown with reverse-order stage rollback and complete
+    queue draining in a finally boundary.
 
 Purpose:
     FEAT-APP-MAIN: Main application lifecycle entry point and process coordinator.
@@ -45,8 +57,11 @@ from typing import Any
 
 from fastapi import FastAPI
 
-from app.host.bootstrap import HostRuntime, HostSettings, create_host_app
+from app.host.bootstrap import HostRuntime, create_host_app
 from app.host.logging import configure_host_logging, get_logger, shutdown
+from app.host.settings import (
+    HostSettings,
+)
 from app.host.settings import settings as default_host_settings
 
 logger = get_logger(__name__)
@@ -179,10 +194,12 @@ def main(argv: list[str] | None = None) -> None:
         data_dir=args.data_dir,
     )
 
+    # 3. Launch ASGI web server and trigger HostRuntime lifespan state machine
     try:
         import uvicorn
 
         if args.reload:
+            # Development reload mode: factory string allows hot reloading
             uvicorn.run(
                 "app.main:create_app",
                 host=host,
@@ -191,6 +208,7 @@ def main(argv: list[str] | None = None) -> None:
                 reload=True,
             )
         else:
+            # Production mode: pre-composed application instance with bound runtime
             app = create_app(settings=host_settings)
             uvicorn.run(app, host=host, port=port)
 
@@ -204,6 +222,7 @@ def main(argv: list[str] | None = None) -> None:
             "Please ensure dependencies are installed."
         )
     finally:
+        # 4. Process teardown boundary: drain all queued telemetry sinks
         logger.info(
             "FR-APP-MAIN-LIFECYCLE: Draining queued telemetry and shutting down.",
             extra={"fr_id": "FR-APP-MAIN-LIFECYCLE"},

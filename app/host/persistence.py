@@ -190,6 +190,7 @@ __all__ = [
     "ValidationError",
     "canonical_json",
     "create_persistence_router",
+    "get_database_manager",
     "main",
     "now_utc_iso",
     "validate_identifier",
@@ -746,6 +747,36 @@ class DatabaseManager:
         self.schema.initialize()
 
 
+class _DefaultDatabaseHolder:
+    """Internal singleton holder avoiding module global mutation."""
+
+    instance: DatabaseManager | None = None
+
+
+def get_database_manager(
+    database_path: Path | str | None = None,
+    *,
+    busy_timeout: float = _BUSY_TIMEOUT_SECONDS,
+) -> DatabaseManager:
+    """Obtain authoritative DatabaseManager, using default database location if omitted.
+
+    Args:
+        database_path: Optional path to SQLite database. Defaults to
+            DEFAULT_DATABASE_PATH.
+        busy_timeout: Timeout in seconds for SQLite lock waits.
+
+    Returns:
+        Configured DatabaseManager instance.
+    """
+    if database_path is not None:
+        return DatabaseManager(database_path, busy_timeout=busy_timeout)
+    if _DefaultDatabaseHolder.instance is None:
+        _DefaultDatabaseHolder.instance = DatabaseManager(
+            DEFAULT_DATABASE_PATH, busy_timeout=busy_timeout
+        )
+    return _DefaultDatabaseHolder.instance
+
+
 # ============================================================================
 # Schema Migration Manager
 # ============================================================================
@@ -868,6 +899,8 @@ class SchemaManager:
                 "child_job_ids_json": "TEXT NOT NULL DEFAULT '[]'",
                 "budget_json": "TEXT NOT NULL DEFAULT '{}'",
                 "submitted_at_utc": "TEXT NOT NULL DEFAULT ''",
+                "started_at_utc": "TEXT",
+                "finished_at_utc": "TEXT",
                 "error_message": "TEXT",
                 "error_location": "TEXT",
             }

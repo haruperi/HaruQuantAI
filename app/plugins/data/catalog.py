@@ -72,11 +72,10 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
-import sqlite3
 import sys
 
 from app.host.logging import get_logger
-from app.host.persistence import DatabaseManager
+from app.host.persistence import DatabaseManager, PersistenceError
 from pydantic import BaseModel, ConfigDict, Field
 
 logger = get_logger(__name__)
@@ -369,7 +368,7 @@ class CatalogService:
                                 )
                             )
                         return results
-        except (sqlite3.Error, OSError, ValueError) as exc:
+        except (PersistenceError, OSError, ValueError) as exc:
             logger.debug(
                 "FR-DATA-CATALOG-BROKER-PROFILES: Query datamgr_broker failed: %s",
                 exc,
