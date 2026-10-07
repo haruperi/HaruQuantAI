@@ -85,7 +85,13 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 
 from app.host.diagnostics import create_diagnostics_router
-from app.host.discovery import create_discovery_router
+from app.host.discovery import (
+    PluginDiscoveryEngine,
+    PluginLifecycleManager,
+    PluginState,
+    SlotRegistry,
+    create_discovery_router,
+)
 from app.host.jobs import JobManager, create_jobs_router
 from app.host.logging import (
     configure_host_logging,
@@ -112,7 +118,8 @@ from app.host.transport import (
     get_event_bus,
     register_transport_exception_handlers,
 )
-from app.plugins.data.integration import create_data_router
+from app.workspace.data_manager.connections import ProviderManager
+from app.workspace.data_manager.routes import create_data_router
 
 __all__ = [
     "HostRuntime",
@@ -208,6 +215,9 @@ class HostRuntime:
         self.db_manager: DatabaseManager | None = None
         self.job_manager: JobManager | None = None
         self.resource_manager: ResourceManager | None = None
+        self.discovery_engine: PluginDiscoveryEngine | None = None
+        self.plugin_manager: PluginLifecycleManager | None = None
+        self.provider_manager: ProviderManager = ProviderManager()
 
     @property
     def state(self) -> ReadinessState:
@@ -401,6 +411,64 @@ class HostRuntime:
         )
         await self._advance_stage(LifespanStage.LOGGING, "logging")
 
+    def _cleanup_plugins(self) -> None:
+        """Tear down attached plugins during reverse rollback."""
+        if self.plugin_manager is not None:
+            for p_id in reversed(list(self.plugin_manager.records.keys())):
+                try:
+                    rec = self.plugin_manager.get_record(p_id)
+                    if rec is not None and rec.state == PluginState.ATTACHED:
+                        self.plugin_manager.disable(p_id)
+                except Exception:
+                    logger.exception(
+                        "FR-HOST-BOOT-REVERSE-SHUTDOWN: Error disabling plugin %s",
+                        p_id,
+                    )
+
+    def init_discovery(self) -> PluginLifecycleManager:
+        """Initialize plugin discovery engine and lifecycle manager."""
+        if self.discovery_engine is None:
+            registry = SlotRegistry()
+            self.discovery_engine = PluginDiscoveryEngine(slot_registry=registry)
+        if self.plugin_manager is None:
+            self.plugin_manager = PluginLifecycleManager(
+                self.discovery_engine,
+                data_base_dir=(
+                    (self.settings.data_dir / "plugins")
+                    if self.settings.data_dir is not None
+                    else Path("data/plugins")
+                ),
+                settings=self.settings,
+            )
+        return self.plugin_manager
+
+    def _scan_and_attach_plugins(self, plugin_mgr: PluginLifecycleManager) -> None:
+        """Scan configured plugin directories and attach discovered plugins."""
+        if self.discovery_engine is None:
+            return
+
+        plugin_dirs: list[Path] = []
+        plugins_root = Path("app/plugins/data_source")
+        if plugins_root.is_dir():
+            plugin_dirs.append(plugins_root)
+
+        if plugin_dirs:
+            discovered = self.discovery_engine.discover(plugin_dirs)
+            plugin_mgr.set_records(discovered)
+            order = self.discovery_engine.resolve_dependencies(discovered)
+            for p_id in order:
+                try:
+                    attached = plugin_mgr.attach(p_id)
+                    if attached:
+                        inst = plugin_mgr.get_instance(p_id)
+                        if inst is not None and hasattr(inst, "capabilities"):
+                            self.provider_manager.register(inst)
+                except Exception:
+                    logger.exception(
+                        "FR-HOST-BOOT-LIFECYCLE-STAGES: Failed to attach plugin: %s",
+                        p_id,
+                    )
+
     async def _boot_stage_discovery(self) -> None:
         """Execute Stage 4: DISCOVERY."""
         logger.info(
@@ -412,7 +480,12 @@ class HostRuntime:
                 "stage": LifespanStage.DISCOVERY,
             },
         )
-        await self._advance_stage(LifespanStage.DISCOVERY, "discovery")
+        plugin_mgr = self.init_discovery()
+        await asyncio.to_thread(self._scan_and_attach_plugins, plugin_mgr)
+
+        await self._advance_stage(
+            LifespanStage.DISCOVERY, "discovery", cleanup=self._cleanup_plugins
+        )
 
     def _init_persistence(self) -> DatabaseManager:
         """Initialize SQLite database persistence and schema migrations."""
@@ -836,7 +909,8 @@ def _mount_host_routers(
     app.include_router(diagnostics_router)
 
     # 6. Discovery Router (/api/v1/discovery/...)
-    discovery_router = create_discovery_router()
+    disc_mgr = resolved_runtime.init_discovery()
+    discovery_router = create_discovery_router(disc_mgr)
     app.include_router(discovery_router, prefix=resolved_settings.api_prefix)
 
     # 7. Sessions Router (/api/v1/sessions/...)
@@ -884,6 +958,7 @@ def _mount_host_routers(
         resolved_runtime.resource_manager,
         job_manager=resolved_runtime.job_manager,
         event_bus=get_event_bus(),
+        provider_manager=resolved_runtime.provider_manager,
     )
     app.include_router(data_router)
     app.include_router(data_router, prefix=resolved_settings.api_prefix)

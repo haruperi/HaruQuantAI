@@ -1,0 +1,22 @@
+{
+  "manifest_version": 1,
+  "id": "data-source-yahoo",
+  "name": "Yahoo Finance Feed",
+  "version": "1.0.0",
+  "description": "Yahoo Finance historical daily and intraday market data provider plugin",
+  "author": "HaruQuantAI",
+  "slot": "data.provider",
+  "entrypoint": "adapter:create_adapter",
+  "dependencies": [],
+  "capabilities": [],
+  "enabled": true,
+  "metadata": {
+    "provider_name": "Yahoo",
+    "display_name": "Yahoo Finance",
+    "asset_classes": ["Stocks", "Indices", "Commodities"],
+    "timeframes": ["M1", "M5", "D1"],
+    "requires_auth": false,
+    "rate_limit_rps": 5.0,
+    "base_url": "https://query1.finance.yahoo.com"
+  }
+}

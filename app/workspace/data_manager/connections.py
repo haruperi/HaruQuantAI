@@ -1,24 +1,33 @@
-"""Market data provider download adapters, rate limiting, and cancellation.
+"""Data provider connections, credentials, and adapter contracts.
 
 Description:
-    Download adapters for external market data sources, providing normalized
-    access to cryptocurrency exchanges (Binance Spot/Coin-M/USDT-M, Bitfinex,
-    Coinbase Pro, Poloniex), FX brokers (Dukascopy, Darwinex, MT5), and equity/futures
-    sources (SQ Equity, SQ Futures, TD Ameritrade, Yahoo Finance). Implements
-    per-provider token-bucket rate limiting, exponential backoff retries, and
-    cooperative cancellation for background jobs.
+    Connection manager and provider adapter contracts for external market data
+    sources within the Data Manager workspace, mirroring SQX DataManagerConnections.
+    Provides uniform typed contracts (`BaseDataProvider`, `ProviderCapabilities`,
+    `DownloadRequest`, `CancellationToken`, `RateLimiter`) used by dynamic
+    `data.provider` plugins. Coordinates provider lifecycle, credential resolution,
+    rate limiting, cooperative cancellation, and dispatch.
 
 Purpose:
-    FEAT-DATA-PROVIDERS: Historical market data acquisition across external providers.
+    FEAT-WORKSPACE-DATAMGR: Manage active provider connections and data source
+    adapters for the Data Manager workspace.
 
 Key Capabilities:
-    FR-DATA-PROVIDERS-ADAPTERS: Uniform typed provider adapters and capability metadata.
-    FR-DATA-PROVIDERS-RATELIMIT: Bounded token-bucket rate limiting and retry backoff.
-    FR-DATA-PROVIDERS-CANCEL: Cooperative cancellation of ongoing download requests.
+    - FR-DATA-PROVIDERS-ADAPTERS: Uniform typed provider adapters and capability
+      metadata.
+      Associated: `[BaseDataProvider]`, `[ProviderManager.download()]`
+      Logging: Emits INFO on download dispatch and completion.
+    - FR-DATA-PROVIDERS-RATELIMIT: Bounded token-bucket rate limiting and retry backoff.
+      Associated: `[RateLimiter.acquire()]`
+      Logging: Emits WARNING on rate-limit retries.
+    - FR-DATA-PROVIDERS-CANCEL: Cooperative cancellation of ongoing download requests.
+      Associated: `[CancellationToken.cancel()]`,
+      `[CancellationToken.check_cancelled()]`
+      Logging: Emits INFO when downloads are cancelled.
 
 Python API Usage:
     ```python
-    from app.plugins.data.providers import (
+    from app.workspace.data_manager.connections import (
         CancellationToken,
         DownloadRequest,
         ProviderManager,
@@ -26,8 +35,8 @@ Python API Usage:
 
     manager = ProviderManager()
     request = DownloadRequest(
-        provider_name="Binance",
-        symbol="BTCUSDT",
+        provider_name="Dukascopy",
+        symbol="EURUSD",
         timeframe="M1",
         date_from="2026-10-01T00:00:00Z",
         date_to="2026-10-02T00:00:00Z",
@@ -38,8 +47,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    python -m app.plugins.data.providers --list
-    python -m app.plugins.data.providers --download Binance --symbol BTCUSDT --tf M1
+    python -m app.workspace.data_manager.connections --list
     ```
 """
 
@@ -50,12 +58,13 @@ import math
 import sys
 import time
 from abc import ABC, abstractmethod
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any, override
 
-from app.host.logging import get_logger
-from app.plugins.data.ingestion import BarRecord
 from pydantic import BaseModel, ConfigDict, Field
+
+from app.host.logging import get_logger
+from app.workspace.data_manager.data import BarRecord
 
 logger = get_logger(__name__)
 
@@ -149,6 +158,54 @@ class DownloadRequest(BaseModel):
     extra_params: dict[str, Any] = Field(
         default_factory=dict, description="Provider specific options"
     )
+
+
+class SyntheticMockHelper:
+    """Helper generating deterministic mock market bars for testing."""
+
+    @staticmethod
+    def generate_bars(
+        symbol: str,
+        start_iso: str,
+        end_iso: str,
+        step_minutes: int = 1,
+        base_price: float = 100.0,
+    ) -> list[BarRecord]:
+        """Generate deterministic synthetic bars between two ISO timestamps."""
+        try:
+            start_dt = datetime.fromisoformat(start_iso)
+            end_dt = datetime.fromisoformat(end_iso)
+        except ValueError:
+            start_dt = datetime(2026, 10, 1, 0, 0, tzinfo=UTC)
+            end_dt = datetime(2026, 10, 1, 1, 0, tzinfo=UTC)
+
+        bars: list[BarRecord] = []
+        cur_dt = start_dt
+        price = base_price
+
+        # Hash symbol for deterministic variance
+        sym_hash = sum(ord(c) for c in symbol)
+
+        while cur_dt <= end_dt and len(bars) < MAX_SYNTHETIC_BARS:
+            sin_offset = math.sin((len(bars) + sym_hash) * 0.1) * 2.0
+            o = round(price + sin_offset, 4)
+            h = round(o + 0.5, 4)
+            low_p = round(o - 0.4, 4)
+            c = round(o + 0.1, 4)
+            bars.append(
+                BarRecord(
+                    timestamp_utc=cur_dt.isoformat(),
+                    open=max(0.01, o),
+                    high=max(0.01, h),
+                    low=max(0.01, low_p),
+                    close=max(0.01, c),
+                    volume=100.0,
+                )
+            )
+            price = c
+            cur_dt += timedelta(minutes=step_minutes)
+
+        return bars
 
 
 class BaseDataProvider(ABC):
@@ -261,51 +318,7 @@ class BaseDataProvider(ABC):
         request: DownloadRequest,
         token: CancellationToken,
     ) -> list[BarRecord]:
-        """Fetch raw data and parse into BarRecord sequence."""
-        ...
-
-
-class SyntheticMockHelper:
-    """Helper generating deterministic synthetic bars for test and offline use."""
-
-    @staticmethod
-    def generate_bars(
-        symbol: str,
-        start_iso: str,
-        end_iso: str,
-        step_minutes: int = 1,
-        base_price: float = 100.0,
-    ) -> list[BarRecord]:
-        """Generate contiguous sequence of synthetic bars for testing."""
-        dt_start = datetime.fromisoformat(start_iso)
-        dt_end = datetime.fromisoformat(end_iso)
-        bars: list[BarRecord] = []
-        cur_dt = dt_start
-        price = base_price
-
-        # Hash symbol for deterministic variance
-        sym_hash = sum(ord(c) for c in symbol)
-
-        while cur_dt <= dt_end and len(bars) < MAX_SYNTHETIC_BARS:
-            sin_offset = math.sin((len(bars) + sym_hash) * 0.1) * 2.0
-            o = round(price + sin_offset, 4)
-            h = round(o + 0.5, 4)
-            low_p = round(o - 0.4, 4)
-            c = round(o + 0.1, 4)
-            bars.append(
-                BarRecord(
-                    timestamp_utc=cur_dt.isoformat(),
-                    open=max(0.01, o),
-                    high=max(0.01, h),
-                    low=max(0.01, low_p),
-                    close=max(0.01, c),
-                    volume=100.0,
-                )
-            )
-            price = c
-            cur_dt += timedelta(minutes=step_minutes)
-
-        return bars
+        """Execute vendor-specific bar retrieval."""
 
 
 class BinanceProvider(BaseDataProvider):
@@ -491,7 +504,7 @@ class DukascopyProvider(BaseDataProvider):
 
 
 class MT5Provider(BaseDataProvider):
-    """MetaTrader 5 terminal terminal connector downloader."""
+    """MetaTrader 5 terminal connector downloader."""
 
     def __init__(self) -> None:
         super().__init__(
@@ -641,10 +654,10 @@ class ProviderManager:
     """Registry and coordinator for external market data provider adapters."""
 
     def __init__(self) -> None:
-        """Register all authoritative SQX145 supported providers."""
+        """Initialize provider registry with authoritative SQX supported providers."""
         self._providers: dict[str, BaseDataProvider] = {}
 
-        # Register providers
+        # Register default core providers
         self.register(BinanceProvider(variant="Spot"))
         self.register(BinanceProvider(variant="Coin-M"))
         self.register(BinanceProvider(variant="USDT-M"))
@@ -662,6 +675,14 @@ class ProviderManager:
     def register(self, provider: BaseDataProvider) -> None:
         """Register a provider adapter instance."""
         self._providers[provider.capabilities.name.lower()] = provider
+        logger.info(
+            "FR-DATA-PROVIDERS-ADAPTERS: Registered provider '%s'",
+            provider.capabilities.name,
+            extra={
+                "provider": provider.capabilities.name,
+                "fr_id": "FR-DATA-PROVIDERS-ADAPTERS",
+            },
+        )
 
     def get_provider(self, name: str) -> BaseDataProvider | None:
         """Retrieve provider adapter by case-insensitive key."""
@@ -696,15 +717,6 @@ def main() -> int:
     """CLI tool for querying providers and running test downloads."""
     parser = argparse.ArgumentParser(description="Query and test data providers")
     parser.add_argument("--list", action="store_true", help="List all providers")
-    parser.add_argument("--download", type=str, help="Provider name to download from")
-    parser.add_argument("--symbol", type=str, default="EURUSD", help="Symbol")
-    parser.add_argument("--tf", type=str, default="M1", help="Timeframe")
-    parser.add_argument(
-        "--from-date", type=str, default="2026-10-01T00:00:00Z", help="Start date"
-    )
-    parser.add_argument(
-        "--to-date", type=str, default="2026-10-01T01:00:00Z", help="End date"
-    )
     args = parser.parse_args()
 
     manager = ProviderManager()
@@ -715,23 +727,6 @@ def main() -> int:
             print(
                 f"  {c.name:18} {c.display_name:30} "
                 f"Auth: {c.requires_auth!s:5} Rate: {c.rate_limit_rps:4.0f} rps"
-            )
-        return 0
-
-    if args.download:
-        req = DownloadRequest(
-            provider_name=args.download,
-            symbol=args.symbol,
-            timeframe=args.tf,
-            date_from=args.from_date,
-            date_to=args.to_date,
-        )
-        bars = manager.download(req)
-        print(f"Acquired {len(bars)} bars from {args.download} for {args.symbol}:")
-        for b in bars[:5]:
-            print(
-                f"  {b.timestamp_utc} O:{b.open:.4f} H:{b.high:.4f} "
-                f"L:{b.low:.4f} C:{b.close:.4f}"
             )
         return 0
 

@@ -1,0 +1,1 @@
+"""SQ Equity plugin package."""

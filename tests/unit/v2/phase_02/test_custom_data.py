@@ -25,9 +25,13 @@ from pathlib import Path
 
 import pytest
 from app.host.persistence import DatabaseManager
-from app.plugins.data.baskets import BasketDefinition, BasketItem, BasketService
-from app.plugins.data.custom_data import CustomDataPoint, CustomDataService
-from app.plugins.data.ingestion import BarRecord
+from app.workspace.data_manager.baskets import (
+    BasketDefinition,
+    BasketItem,
+    BasketService,
+)
+from app.workspace.data_manager.custom_data import CustomDataPoint, CustomDataService
+from app.workspace.data_manager.data import BarRecord
 
 
 @pytest.fixture

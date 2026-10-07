@@ -1,8 +1,8 @@
 """Unit and integration tests for connected market data REST router workflows.
 
 Description:
-    Tests the complete FastAPI REST router for the market data subsystem
-    (`app.plugins.data.integration`). Validates dataset imports and availability,
+    Tests the complete FastAPI REST router for the market data workspace
+    (`app.workspace.data_manager.routes`). Validates dataset imports and availability,
     instrument lifecycle CRUD, trading session management and NinjaTrader XML
     imports, stock group / basket definitions and synthetic calculation, provider
     matrix queries and downloads, COT mappings and observations, data quality

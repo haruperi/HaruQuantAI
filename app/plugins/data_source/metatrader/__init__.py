@@ -1,0 +1,1 @@
+"""MetaTrader plugin package."""

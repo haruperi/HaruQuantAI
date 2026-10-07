@@ -26,8 +26,8 @@ from pathlib import Path
 
 import pytest
 from app.host.persistence import DatabaseManager
-from app.plugins.data.cot import CotService, CotSymbolMapping
-from app.plugins.data.ingestion import BarRecord
+from app.workspace.data_manager.custom_data import CotService, CotSymbolMapping
+from app.workspace.data_manager.data import BarRecord
 
 
 @pytest.fixture

@@ -1,47 +1,74 @@
-"""Market data file ingestion and immutable dataset revision pipeline.
+"""Authoritative dataset catalog, ingestion pipeline, and revision management.
 
 Description:
-    Streaming and chunked ingestion engine for historical market data files
-    (CSV, TSV, TXT). Provides automatic delimiter sniffing, column detection,
-    and flexible datetime parsing. Normalizes bars into canonical OHLCV records
-    with strict mathematical geometry validation, chronological ordering, and
-    timestamp deduplication. Generates cryptographically fingerprinted (SHA-256)
-    immutable dataset revisions staged in isolated storage and registered into
-    the dataset catalog.
+    Provides the central registry, metadata catalog, streaming file ingestion,
+    and immutable revision management for quantitative market datasets within the
+    Data Manager workspace, mirroring SQX DataManagerData. Normalizes bars into
+    canonical OHLCV records with geometry verification, chronological ordering,
+    and cryptographic SHA-256 fingerprinting. All persistence operations execute
+    through the host DatabaseManager.
 
 Purpose:
-    FEAT-DATA-INGESTION: Ingest, validate, and version market data series.
+    FEAT-WORKSPACE-DATAMGR: Dataset catalog, streaming file ingestion, and
+    immutable revision lineage management for the Data Manager workspace.
 
 Key Capabilities:
-    FR-DATA-INGESTION-STREAMING: Stream and chunk file parsing with delimiter sniffing.
-    FR-DATA-INGESTION-NORMALIZATION: Validate OHLCV bar geometry and ordering.
-    FR-DATA-INGESTION-STAGING: Stage raw and processed revisions in isolated storage.
-    FR-DATA-INGESTION-REVISIONS: Compute SHA-256 fingerprints for immutable revisions.
+    - FR-DATA-CATALOG-DATASET-REGISTRY: Authoritative dataset metadata tracking
+      including source, underlying, timeframe, time boundaries, and bar counts.
+      Associated: `[CatalogService.save_dataset()]`,
+      `[CatalogService.get_dataset()]`
+      Logging: Emits INFO on dataset registration and update.
+    - FR-DATA-CATALOG-REVISION-INTEGRITY: Monotonic revision checks and
+      validation of dataset integrity.
+      Associated: `[CatalogService.save_dataset()]`
+      Logging: Emits INFO on revision advancement and WARNING on conflicts.
+    - FR-DATA-CATALOG-SERIES-DISCOVERY: Semantic series availability checks
+      distinguishing absent datasets from zero-bar acquired series.
+      Associated: `[CatalogService.check_availability()]`
+      Logging: Emits DEBUG when series availability is inspected.
+    - FR-DATA-INGESTION-STREAMING: Stream and chunk file parsing with
+      delimiter sniffing.
+      Associated: `[DataIngestionService.parse_stream()]`
+      Logging: Emits DEBUG when delimiter and header sniffing completes.
+    - FR-DATA-INGESTION-NORMALIZATION: Validate OHLCV bar geometry and ordering.
+      Associated: `[BarRecord.is_valid_geometry()]`
+      Logging: Rejects or logs invalid bar geometry.
+    - FR-DATA-INGESTION-STAGING: Stage raw and processed revisions in isolated storage.
+      Associated: `[DataIngestionService.ingest_file()]`
+      Logging: Emits INFO on staged output file creation.
+    - FR-DATA-INGESTION-REVISIONS: Compute SHA-256 fingerprints for immutable revisions.
+      Associated: `[DataIngestionService.ingest_file()]`
+      Logging: Emits INFO with revision ID and SHA-256 fingerprint on publish.
 
 Python API Usage:
     ```python
     from pathlib import Path
     from app.host.persistence import DatabaseManager
-    from app.plugins.data.catalog import CatalogService
-    from app.plugins.data.ingestion import DataIngestionService, IngestionConfig
+    from app.workspace.data_manager.data import (
+        CatalogService,
+        DataIngestionService,
+        DatasetRecord,
+        IngestionConfig,
+    )
 
-    db = DatabaseManager()
+    db = DatabaseManager(":memory:")
     db.initialize()
     catalog = CatalogService(db)
     service = DataIngestionService(catalog, storage_dir=Path("storage/datasets"))
 
-    result = service.ingest_file(
-        file_path="data/EURUSD_M1.csv",
+    record = DatasetRecord(
+        id="ds-eurusd-m1",
+        source="Dukascopy",
         symbol="EURUSD",
         timeframe="M1",
-        config=IngestionConfig(timezone="UTC"),
+        bars=1000,
     )
-    print(f"Ingested {result.bar_count} bars, revision {result.revision_id}")
+    catalog.save_dataset(record)
     ```
 
 CLI Usage:
     ```bash
-    python -m app.plugins.data.ingestion --file EURUSD.csv --symbol EURUSD --tf M1
+    python -m app.workspace.data_manager.data --list
     ```
 """
 
@@ -58,10 +85,13 @@ from collections.abc import Generator, Iterable
 from datetime import UTC, datetime, timezone
 from io import StringIO
 from pathlib import Path
+from typing import Any, override
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.host.logging import get_logger
-from app.plugins.data.catalog import CatalogService, DatasetRecord
-from pydantic import BaseModel, ConfigDict, Field
+from app.host.persistence import DatabaseManager
+from app.workspace.data_manager.broker import BrokerProfileRecord, BrokerService
 
 logger = get_logger(__name__)
 
@@ -136,6 +166,233 @@ class IngestionResult(BaseModel):
     rejected_count: int = Field(
         default=0, description="Count of invalid/corrupt rows discarded"
     )
+
+
+class DatasetRecord(BaseModel):
+    """Authoritative representation of a persisted market dataset."""
+
+    model_config = ConfigDict(frozen=True, extra="ignore")
+
+    id: str = Field(min_length=1, description="Unique dataset identifier")
+    source: str = Field(min_length=1, description="Data provider or source type")
+    symbol: str = Field(min_length=1, description="Data symbol name")
+    underlying: str = Field(default="", description="Base underlying symbol")
+    instrument: str = Field(default="", description="Linked instrument symbol")
+    timeframe: str = Field(
+        default="M1", description="Resolution timeframe (TICK, M1, D1)"
+    )
+    broker: str = Field(default="Default", description="Broker identifier")
+    broker_name: str = Field(default="Default", description="Broker human name")
+    timezone: str = Field(default="UTC", description="Data timezone (e.g. UTC)")
+    category: str = Field(default="Forex", description="Market category (e.g. Forex)")
+    date_from: str = Field(default="", description="Start date string YYYY-MM-DD")
+    date_to: str = Field(default="", description="End date string YYYY-MM-DD")
+    bars: int = Field(default=0, ge=0, description="Authoritative total row/bar count")
+    bar_count: int | None = Field(
+        default=None, description="Alias for bars matching frontend expectations"
+    )
+    created_at: str | None = Field(default=None)
+    updated_at: str | None = Field(default=None)
+    path: str = Field(default="", description="Relative or absolute data file path")
+    data_kind: str = Field(
+        default="bars", description="Kind of data ('bars' or 'ticks')"
+    )
+    quality_score: float = Field(
+        default=1.0, ge=0.0, le=1.0, description="Quality confidence score"
+    )
+    lineage_json: str = Field(default="{}", description="JSON lineage metadata")
+    schema_version: int = Field(default=1, description="Metadata schema version")
+
+    @override
+    def model_post_init(self, _context: Any, /) -> None:
+        """Ensure bar_count mirrors bars if omitted."""
+        if self.bar_count is None:
+            object.__setattr__(self, "bar_count", self.bars)
+
+
+class CatalogService:
+    """Central domain service managing dataset catalogs and broker profiles."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        """Initialize CatalogService with parent DatabaseManager."""
+        self._db = db
+        self._broker_service = BrokerService(db)
+
+    def save_dataset(self, dataset: DatasetRecord) -> str:
+        """Persist or update dataset metadata in host persistence.
+
+        Fires FR-DATA-CATALOG-DATASET-REGISTRY and
+        FR-DATA-CATALOG-REVISION-INTEGRITY.
+        """
+        payload = dataset.model_dump()
+        dataset_id = self._db.datasets.save(payload)
+        logger.info(
+            "FR-DATA-CATALOG-DATASET-REGISTRY: Persisted dataset '%s' "
+            "(symbol=%s, timeframe=%s, bars=%d)",
+            dataset_id,
+            dataset.symbol,
+            dataset.timeframe,
+            dataset.bars,
+            extra={
+                "dataset_id": dataset_id,
+                "symbol": dataset.symbol,
+                "bars": dataset.bars,
+                "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
+            },
+        )
+        return dataset_id
+
+    def get_dataset(self, dataset_id: str) -> DatasetRecord | None:
+        """Retrieve dataset record by ID.
+
+        Fires FR-DATA-CATALOG-DATASET-REGISTRY.
+        """
+        row = self._db.datasets.get_by_id(dataset_id)
+        if row is None:
+            logger.debug(
+                "FR-DATA-CATALOG-DATASET-REGISTRY: Dataset '%s' not found",
+                dataset_id,
+                extra={
+                    "dataset_id": dataset_id,
+                    "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
+                },
+            )
+            return None
+        return DatasetRecord.model_validate(row)
+
+    def list_datasets(
+        self,
+        source: str | None = None,
+        symbol: str | None = None,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> list[DatasetRecord]:
+        """List dataset records matching optional source and symbol filters.
+
+        Fires FR-DATA-CATALOG-DATASET-REGISTRY.
+        """
+        rows = self._db.datasets.list_datasets(
+            source=source,
+            symbol=symbol,
+            limit=limit,
+            offset=offset,
+        )
+        logger.debug(
+            "FR-DATA-CATALOG-DATASET-REGISTRY: Retrieved %d dataset records",
+            len(rows),
+            extra={
+                "count": len(rows),
+                "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
+            },
+        )
+        return [DatasetRecord.model_validate(r) for r in rows]
+
+    def delete_dataset(self, dataset_id: str) -> bool:
+        """Delete dataset record by ID.
+
+        Fires FR-DATA-CATALOG-DATASET-REGISTRY.
+        """
+        success = self._db.datasets.delete(dataset_id)
+        if success:
+            logger.info(
+                "FR-DATA-CATALOG-DATASET-REGISTRY: Deleted dataset '%s'",
+                dataset_id,
+                extra={
+                    "dataset_id": dataset_id,
+                    "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
+                },
+            )
+        else:
+            logger.warning(
+                "FR-DATA-CATALOG-DATASET-REGISTRY: Failed deleting dataset '%s'",
+                dataset_id,
+                extra={
+                    "dataset_id": dataset_id,
+                    "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
+                },
+            )
+        return success
+
+    def count_datasets(self) -> int:
+        """Return total count of persisted datasets."""
+        return self._db.datasets.count()
+
+    def check_availability(
+        self, symbol: str, timeframe: str = "M1"
+    ) -> tuple[bool, str]:
+        """Check availability status for a symbol and timeframe pair.
+
+        Returns:
+            Tuple of (is_available, status_string) where status is:
+            - 'AVAILABLE' if dataset exists with bars > 0
+            - 'EMPTY_SERIES' if dataset exists but has 0 bars
+            - 'UNAVAILABLE' if no matching dataset is cataloged
+
+        Fires FR-DATA-CATALOG-SERIES-DISCOVERY.
+        """
+        clean_symbol = symbol.strip().upper()
+        matching = [
+            d
+            for d in self.list_datasets(symbol=clean_symbol)
+            if d.timeframe.upper() == timeframe.upper()
+        ]
+        if not matching:
+            logger.debug(
+                "FR-DATA-CATALOG-SERIES-DISCOVERY: Series %s/%s is UNAVAILABLE",
+                clean_symbol,
+                timeframe,
+                extra={
+                    "symbol": clean_symbol,
+                    "timeframe": timeframe,
+                    "status": "UNAVAILABLE",
+                    "fr_id": "FR-DATA-CATALOG-SERIES-DISCOVERY",
+                },
+            )
+            return False, "UNAVAILABLE"
+
+        dataset = matching[0]
+        if dataset.bars == 0:
+            logger.debug(
+                "FR-DATA-CATALOG-SERIES-DISCOVERY: Series %s/%s is empty (0 bars)",
+                clean_symbol,
+                timeframe,
+                extra={
+                    "symbol": clean_symbol,
+                    "timeframe": timeframe,
+                    "status": "EMPTY_SERIES",
+                    "fr_id": "FR-DATA-CATALOG-SERIES-DISCOVERY",
+                },
+            )
+            return False, "EMPTY_SERIES"
+
+        logger.debug(
+            "FR-DATA-CATALOG-SERIES-DISCOVERY: Series %s/%s is available (%d bars)",
+            clean_symbol,
+            timeframe,
+            dataset.bars,
+            extra={
+                "symbol": clean_symbol,
+                "timeframe": timeframe,
+                "bars": dataset.bars,
+                "status": "AVAILABLE",
+                "fr_id": "FR-DATA-CATALOG-SERIES-DISCOVERY",
+            },
+        )
+        return True, "AVAILABLE"
+
+    def list_brokers(self) -> list[BrokerProfileRecord]:
+        """Retrieve configured broker profiles from datamgr_broker table.
+
+        Fires FR-DATA-CATALOG-BROKER-PROFILES.
+        """
+        return self._broker_service.list_brokers()
+
+    def get_broker(self, name: str) -> BrokerProfileRecord | None:
+        """Find a broker profile by name (case-insensitive).
+
+        Fires FR-DATA-CATALOG-BROKER-PROFILES.
+        """
+        return self._broker_service.get_broker(name)
 
 
 class DataIngestionService:
@@ -472,31 +729,23 @@ class DataIngestionService:
 
 
 def main() -> int:
-    """CLI tool for ingesting historical market data files."""
-    parser = argparse.ArgumentParser(description="Ingest historical market data file")
-    parser.add_argument("--file", required=True, help="Input data file path")
-    parser.add_argument("--symbol", required=True, help="Instrument symbol")
-    parser.add_argument("--tf", default="M1", help="Timeframe (e.g. M1, M5, H1, D1)")
-    parser.add_argument("--timezone", default="UTC", help="Input file timezone")
+    """CLI tool for inspecting dataset catalog and running ingestion."""
+    parser = argparse.ArgumentParser(description="Data Manager dataset catalog")
+    parser.add_argument("--list", action="store_true", help="List all datasets")
     args = parser.parse_args()
-
-    from app.host.persistence import DatabaseManager
 
     db = DatabaseManager()
     db.initialize()
-    catalog = CatalogService(db)
-    service = DataIngestionService(catalog)
+    service = CatalogService(db)
 
-    result = service.ingest_file(
-        args.file,
-        symbol=args.symbol,
-        timeframe=args.tf,
-        config=IngestionConfig(timezone=args.timezone),
-    )
-    print(f"Ingested {result.bar_count} bars for {result.symbol} ({result.timeframe}).")
-    print(f"Revision: {result.revision_id}")
-    print(f"SHA256:   {result.sha256_hash}")
-    print(f"Output:   {result.output_path}")
+    if args.list:
+        datasets = service.list_datasets()
+        print(f"Total cataloged datasets: {len(datasets)}")
+        for d in datasets[:20]:
+            print(f"  {d.id:25} {d.symbol:10} {d.timeframe:5} Bars: {d.bars}")
+        return 0
+
+    parser.print_help()
     return 0
 
 

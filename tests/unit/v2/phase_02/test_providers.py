@@ -26,8 +26,7 @@ import time
 from typing import override
 
 import pytest
-from app.plugins.data.ingestion import BarRecord
-from app.plugins.data.providers import (
+from app.workspace.data_manager.connections import (
     BaseDataProvider,
     CancellationToken,
     DownloadRequest,
@@ -35,6 +34,7 @@ from app.plugins.data.providers import (
     ProviderManager,
     RateLimiter,
 )
+from app.workspace.data_manager.data import BarRecord
 
 
 def test_provider_registry_enumeration() -> None:

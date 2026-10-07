@@ -1,40 +1,58 @@
-"""Commitments of Traders (COT) report catalog, index calculation, and bar alignment.
+"""Custom time series, secondary data streams, and CFTC COT synchronization.
 
 Description:
-    Manages CFTC Commitments of Traders (COT) symbol mappings, weekly report
-    ingestion, index formula calculations, and synchronization with primary
-    market data series. Computes the five canonical SQX145 COT metrics:
-    cpihedg (Commercial Position Index - Hedgers), ctihedg (Commercial Trend Index),
-    cpispec (Speculator Position Index), ctispec (Speculator Trend Index), and
-    cpismall (Small Trader Index). Handles weekly Tuesday-to-Friday release date
-    alignment with forward-fill (notNaN) onto intraday and daily price bars.
+    Service managing secondary and custom historical data series (e.g. sentiment,
+    macroeconomic metrics, volatility indexes, and fundamental signals) as well
+    as CFTC Commitments of Traders (COT) report ingestion, index calculations, and
+    weekly release synchronization within the Data Manager workspace, mirroring
+    SQX DataManagerCustomData.
 
 Purpose:
-    FEAT-DATA-COT: Ingest, compute, map, and align CFTC Commitments of Traders series.
+    FEAT-WORKSPACE-DATAMGR: Manage custom data series, COT reports, and multi-stream
+    synchronization for the Data Manager workspace.
 
 Key Capabilities:
-    FR-DATA-COT-CATALOG: Maintain symbol-to-CFTC contract mapping catalog.
-    FR-DATA-COT-MAPPING: Compute 5 canonical COT indices and weekly bar alignment.
-    FR-DATA-COT-UPDATES: Synchronize weekly CFTC reports and update indicators.
+    - FR-DATA-CUSTOM-SERIES: Ingest, persist, query, and synchronize custom series.
+      Associated: `[CustomDataService.save_custom_series()]`,
+      `[CustomDataService.align_with_bars()]`
+      Logging: Emits INFO on custom series persistence.
+    - FR-DATA-COT-CATALOG: Maintain symbol-to-CFTC contract mapping catalog.
+      Associated: `[CotService.list_mappings()]`, `[CotService.save_mapping()]`
+      Logging: Emits DEBUG on mapping listings and INFO on mapping updates.
+    - FR-DATA-COT-MAPPING: Compute 5 canonical COT indices and weekly bar alignment.
+      Associated: `[CotService.calculate_indices()]`,
+      `[CotService.align_cot_to_bars()]`
+      Logging: Emits INFO on index calculations and bar alignments.
+    - FR-DATA-COT-UPDATES: Synchronize weekly CFTC reports and update indicators.
+      Associated: `[CotService.update_cftc_reports()]`
+      Logging: Emits INFO on weekly report updates.
 
 Python API Usage:
     ```python
     from app.host.persistence import DatabaseManager
-    from app.plugins.data.cot import CotService, CotSymbolMapping
+    from app.workspace.data_manager.custom_data import (
+        CotService,
+        CustomDataPoint,
+        CustomDataService,
+    )
 
-    db = DatabaseManager()
+    db = DatabaseManager(":memory:")
     db.initialize()
-    service = CotService(db)
+    custom_service = CustomDataService(db)
+    cot_service = CotService(db)
 
-    mapping = service.get_mapping("EURUSD")
-    cot_data = service.get_cot_data("EURUSD")
-    aligned_bars = service.align_cot_to_bars(price_bars, cot_data)
+    points = [
+        CustomDataPoint(
+            timestamp_utc="2026-10-01T00:00:00Z",
+            values={"sentiment": 0.75, "vix": 18.5},
+        )
+    ]
+    custom_service.save_custom_series("macro_daily", points)
     ```
 
 CLI Usage:
     ```bash
-    python -m app.plugins.data.cot --list
-    python -m app.plugins.data.cot --symbol EURUSD
+    python -m app.workspace.data_manager.custom_data --list
     ```
 """
 
@@ -43,19 +61,212 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from pydantic import BaseModel, ConfigDict, Field
+
 from app.host.logging import get_logger
 from app.host.persistence import DatabaseManager
-from app.plugins.data.ingestion import BarRecord
-from pydantic import BaseModel, ConfigDict, Field
+from app.workspace.data_manager.data import BarRecord
 
 logger = get_logger(__name__)
 
 DEFAULT_LOOKBACK_WEEKS = 26
 DEFAULT_INDEX_SCALE = 100.0
+
+
+# -----------------------------------------------------------------------------
+# Custom Data Series Models & Service
+# -----------------------------------------------------------------------------
+
+
+class CustomDataPoint(BaseModel):
+    """Single multi-value observation in a custom time series."""
+
+    model_config = ConfigDict(frozen=True)
+
+    timestamp_utc: str = Field(description="ISO 8601 UTC timestamp")
+    values: dict[str, float] = Field(
+        min_length=1, description="Map of metric names to numerical values"
+    )
+
+
+class CustomDataService:
+    """Service managing secondary custom data series and price bar alignment."""
+
+    def __init__(
+        self, db: DatabaseManager, storage_dir: Path | str | None = None
+    ) -> None:
+        """Initialize service with database manager and file storage root."""
+        self._db = db
+        self._storage_dir = (
+            Path(storage_dir) if storage_dir else Path("storage/custom_data")
+        )
+        self._storage_dir.mkdir(parents=True, exist_ok=True)
+
+    def save_custom_series(
+        self, series_name: str, points: list[CustomDataPoint]
+    ) -> int:
+        """Persist a custom time series to isolated storage.
+
+        Fires FR-DATA-CUSTOM-SERIES.
+        """
+        clean_name = series_name.strip().lower()
+        if not clean_name:
+            raise ValueError("Custom series name cannot be empty.")
+
+        sorted_points = sorted(points, key=lambda p: p.timestamp_utc)
+        file_path = self._storage_dir / f"{clean_name}.json"
+        data = [p.model_dump() for p in sorted_points]
+        file_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+        logger.info(
+            "FR-DATA-CUSTOM-SERIES: Saved custom series '%s' (%d points)",
+            clean_name,
+            len(points),
+            extra={
+                "series_name": clean_name,
+                "points": len(points),
+                "path": str(file_path),
+                "fr_id": "FR-DATA-CUSTOM-SERIES",
+            },
+        )
+        return len(points)
+
+    def get_custom_series(self, series_name: str) -> list[CustomDataPoint]:
+        """Retrieve custom series observations by name.
+
+        Fires FR-DATA-CUSTOM-SERIES.
+        """
+        clean_name = series_name.strip().lower()
+        file_path = self._storage_dir / f"{clean_name}.json"
+        if not file_path.exists():
+            return []
+
+        try:
+            raw_data = json.loads(file_path.read_text(encoding="utf-8"))
+            return [CustomDataPoint.model_validate(p) for p in raw_data]
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.warning(
+                "FR-DATA-CUSTOM-SERIES: Failed reading series '%s': %s",
+                clean_name,
+                exc,
+                extra={"series": clean_name, "fr_id": "FR-DATA-CUSTOM-SERIES"},
+            )
+            return []
+
+    def list_custom_series(self) -> list[str]:
+        """List all available custom series names."""
+        if not self._storage_dir.exists():
+            return []
+        return [f.stem for f in self._storage_dir.glob("*.json")]
+
+    def delete_custom_series(self, series_name: str) -> bool:
+        """Delete custom series by name.
+
+        Fires FR-DATA-CUSTOM-SERIES.
+        """
+        clean_name = series_name.strip().lower()
+        file_path = self._storage_dir / f"{clean_name}.json"
+        if file_path.exists():
+            file_path.unlink()
+            logger.info(
+                "FR-DATA-CUSTOM-SERIES: Deleted custom series '%s'",
+                clean_name,
+                extra={
+                    "series_name": clean_name,
+                    "fr_id": "FR-DATA-CUSTOM-SERIES",
+                },
+            )
+            return True
+        return False
+
+    def align_with_bars(
+        self,
+        primary_bars: list[BarRecord],
+        custom_points: list[CustomDataPoint],
+        fill_method: str = "forward_fill",
+    ) -> list[dict[str, Any]]:
+        """Synchronize custom data observations with primary price bars.
+
+        Fires FR-DATA-CUSTOM-SERIES.
+        """
+        if not primary_bars:
+            return []
+
+        # Index points by timestamp
+        points_map = {p.timestamp_utc: p.values for p in custom_points}
+        sorted_point_times = sorted(points_map.keys())
+
+        aligned_records: list[dict[str, Any]] = []
+        last_values: dict[str, float] = {}
+
+        # Default keys from points if available
+        all_keys: set[str] = set()
+        for p in custom_points:
+            all_keys.update(p.values.keys())
+
+        pt_idx = 0
+        pt_count = len(sorted_point_times)
+
+        for bar in primary_bars:
+            bar_ts = bar.timestamp_utc
+            matched_values: dict[str, float] = {}
+
+            if bar_ts in points_map:
+                matched_values = dict(points_map[bar_ts])
+                last_values = dict(matched_values)
+            elif fill_method == "forward_fill":
+                while pt_idx < pt_count and sorted_point_times[pt_idx] <= bar_ts:
+                    last_values = points_map[sorted_point_times[pt_idx]]
+                    pt_idx += 1
+                matched_values = {k: last_values.get(k, float("nan")) for k in all_keys}
+            elif fill_method == "nearest" and sorted_point_times:
+                try:
+                    bar_dt = datetime.fromisoformat(bar_ts)
+                    closest_ts = min(
+                        sorted_point_times,
+                        key=lambda t: abs(
+                            (datetime.fromisoformat(t) - bar_dt).total_seconds()
+                        ),
+                    )
+                    matched_values = dict(points_map[closest_ts])
+                except ValueError, IndexError:
+                    matched_values = dict(points_map[sorted_point_times[0]])
+            else:
+                matched_values = {k: float("nan") for k in all_keys}
+
+            record: dict[str, Any] = {
+                "timestamp_utc": bar_ts,
+                "open": bar.open,
+                "high": bar.high,
+                "low": bar.low,
+                "close": bar.close,
+                "volume": bar.volume,
+                **matched_values,
+            }
+            aligned_records.append(record)
+
+        logger.info(
+            "FR-DATA-CUSTOM-SERIES: Aligned %d bars with %d custom points (fill=%s)",
+            len(primary_bars),
+            len(custom_points),
+            fill_method,
+            extra={
+                "bars": len(primary_bars),
+                "custom_points": len(custom_points),
+                "fill": fill_method,
+                "fr_id": "FR-DATA-CUSTOM-SERIES",
+            },
+        )
+        return aligned_records
+
+
+# -----------------------------------------------------------------------------
+# Commitments of Traders (COT) Models & Service
+# -----------------------------------------------------------------------------
 
 
 class CotSymbolMapping(BaseModel):
@@ -248,7 +459,6 @@ class CotService:
         if not raw_reports:
             return []
 
-        # Sort chronologically by report date
         sorted_raw = sorted(raw_reports, key=lambda r: str(r.get("report_date", "")))
         observations: list[CotObservation] = []
 
@@ -278,7 +488,6 @@ class CotService:
             spec_nets.append(cur_spec_net)
             small_nets.append(cur_small_net)
 
-            # Compute Position Index (CPI) and Trend Index (CTI)
             cpihedg = self._stochastic_index(comm_nets, lookback_weeks)
             ctihedg = self._trend_index(comm_nets, lookback_weeks)
             cpispec = self._stochastic_index(spec_nets, lookback_weeks)
@@ -370,7 +579,6 @@ class CotService:
         for bar in bars:
             bar_date = bar.timestamp_utc[:10]
 
-            # Advance COT observation as release dates occur
             while cot_idx < cot_count and sorted_cot[cot_idx].release_date <= bar_date:
                 last_known_cot = sorted_cot[cot_idx]
                 cot_idx += 1
@@ -438,8 +646,7 @@ class CotService:
         if mapping is None:
             raise ValueError(f"No COT symbol mapping defined for '{clean}' in catalog.")
 
-        # Generate deterministic historical weekly reports for the symbol
-        now_d = date(2026, 10, 6)  # A Tuesday
+        now_d = date(2026, 10, 6)
         raw_reports: list[dict[str, Any]] = []
 
         comm_long_base = 100000.0
@@ -449,7 +656,7 @@ class CotService:
 
         for week in range(synthetic_count - 1, -1, -1):
             rep_date = now_d - timedelta(weeks=week)
-            rel_date = rep_date + timedelta(days=3)  # Friday
+            rel_date = rep_date + timedelta(days=3)
 
             variation = (week % 7) * 2000.0
             raw_reports.append(
@@ -512,7 +719,6 @@ class CotService:
         """Estimate Friday release date from Tuesday report date."""
         try:
             d = date.fromisoformat(report_date_str)
-            # Add 3 days to Tuesday to reach Friday
             friday = d + timedelta(days=3)
             return friday.isoformat()
         except ValueError:
@@ -520,36 +726,20 @@ class CotService:
 
 
 def main() -> int:
-    """CLI tool for managing and inspecting COT reports."""
-    parser = argparse.ArgumentParser(description="Manage COT reports and catalog")
-    parser.add_argument("--list", action="store_true", help="List COT mappings")
-    parser.add_argument("--symbol", type=str, help="Symbol to inspect or update")
-    parser.add_argument("--update", action="store_true", help="Synchronize reports")
+    """CLI tool for managing and inspecting custom data series and COT reports."""
+    parser = argparse.ArgumentParser(description="Manage custom series and COT")
+    parser.add_argument("--list", action="store_true", help="List custom series")
     args = parser.parse_args()
 
     db = DatabaseManager()
     db.initialize()
-    service = CotService(db)
+    service = CustomDataService(db)
 
     if args.list:
-        mappings = service.list_mappings()
-        print(f"COT Symbol Catalog ({len(mappings)} mappings):")
-        for m in mappings:
-            print(f"  {m.symbol:10} CFTC: {m.cftc_code:10} {m.cftc_name}")
-        return 0
-
-    if args.symbol:
-        if args.update:
-            cnt = service.update_cftc_reports(args.symbol)
-            print(f"Updated {cnt} reports for {args.symbol}.")
-            return 0
-        cot_data = service.get_cot_data(args.symbol)
-        print(f"COT Records for {args.symbol} ({len(cot_data)} weeks):")
-        for obs in cot_data[-5:]:
-            print(
-                f"  {obs.release_date} CPI_Hedg:{obs.cpihedg:5.1f} "
-                f"CTI_Hedg:{obs.ctihedg:5.1f} CPI_Spec:{obs.cpispec:5.1f}"
-            )
+        series_list = service.list_custom_series()
+        print(f"Available custom series ({len(series_list)}):")
+        for s in series_list:
+            print(f"  {s}")
         return 0
 
     parser.print_help()

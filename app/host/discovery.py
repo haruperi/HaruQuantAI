@@ -947,6 +947,20 @@ class PluginLifecycleManager:
         """Retrieve active host context for an attached plugin."""
         return self._contexts.get(plugin_id)
 
+    def get_instance(self, plugin_id: str) -> Any | None:
+        """Retrieve attached instance of a plugin."""
+        return self._instances.get(plugin_id)
+
+    def get_instances_for_slot(self, slot_id: str) -> list[Any]:
+        """Retrieve all attached plugin instances matching a slot."""
+        instances: list[Any] = []
+        for p_id, rec in self._records.items():
+            if rec.state == PluginState.ATTACHED and rec.manifest.slot == slot_id:
+                inst = self._instances.get(p_id)
+                if inst is not None:
+                    instances.append(inst)
+        return instances
+
     def attach(self, plugin_id: str) -> bool:
         """Load and attach a plugin into the host platform.
 

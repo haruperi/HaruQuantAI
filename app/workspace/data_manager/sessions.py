@@ -2,24 +2,26 @@
 
 Description:
     Market sessions, exchange clocks, DST transitions, and native session import
-    service for the Data Manager subsystem. Manages canonical trading sessions,
+    service for the Data Manager workspace. Manages canonical trading sessions,
     day-of-week active windows, holiday schedules, and time zone transformations
     with IANA zoneinfo support. Imports NinjaTrader 8 TradingHours XML templates
     with configurable overwrite and skip conflict policies.
 
 Purpose:
-    FEAT-DATA-SESSIONS: Manage exchange trading hours, clocks, and holiday calendars.
+    FEAT-WORKSPACE-DATAMGR: Manage exchange trading hours, clocks, and holiday
+    calendars in the Data Manager workspace.
 
 Key Capabilities:
-    FR-DATA-SESSIONS-TIMEZONES: Validate and resolve standard IANA timezones and DST.
-    FR-DATA-SESSIONS-WINDOWS: Represent and evaluate multi-window daily sessions.
-    FR-DATA-SESSIONS-IMPORT: Parse and import NinjaTrader 8 XML trading hours templates.
-    FR-DATA-SESSIONS-PERSISTENCE-CRUD: CRUD operations against datamgr_sessions table.
+    - FR-DATA-SESSIONS-TIMEZONES: Validate and resolve standard IANA timezones and DST.
+    - FR-DATA-SESSIONS-WINDOWS: Represent and evaluate multi-window daily sessions.
+    - FR-DATA-SESSIONS-IMPORT: Parse and import NinjaTrader 8 XML trading
+      hours templates.
+    - FR-DATA-SESSIONS-PERSISTENCE-CRUD: CRUD operations against datamgr_sessions table.
 
 Python API Usage:
     ```python
     from app.host.persistence import DatabaseManager
-    from app.plugins.data.sessions import (
+    from app.workspace.data_manager.sessions import (
         SessionService,
         SessionWindow,
         TradingSessionDefinition,
@@ -43,9 +45,11 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    python -m app.plugins.data.sessions --list
-    python -m app.plugins.data.sessions --check US_Equities_RTH --time 2026-10-07T14:30Z
-    python -m app.plugins.data.sessions --import-nt TradingHours.xml --policy overwrite
+    python -m app.workspace.data_manager.sessions --list
+    python -m app.workspace.data_manager.sessions --check US_Equities_RTH \
+        --time 2026-10-07T14:30Z
+    python -m app.workspace.data_manager.sessions \
+        --import-nt TradingHours.xml --policy overwrite
     ```
 """
 
@@ -59,9 +63,10 @@ import zoneinfo
 from datetime import date, datetime, time
 from pathlib import Path
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from app.host.logging import get_logger
 from app.host.persistence import DatabaseManager
-from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 logger = get_logger(__name__)
 

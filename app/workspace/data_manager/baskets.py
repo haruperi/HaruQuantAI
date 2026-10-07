@@ -2,23 +2,34 @@
 
 Description:
     Service managing multi-asset baskets, stock groups, and cross-instrument
-    series alignment for portfolio analysis and synthetic instrument generation.
+    series alignment for portfolio analysis and synthetic instrument generation
+    within the Data Manager workspace, mirroring SQX DataManagerBasket.
     Supports stock group persistence in datamgr_stock_group and datamgr_stock
     tables, configurable weighting schemes (equal or custom), and chronological
     timestamp alignment across heterogeneous series using intersection (inner join)
     or union (outer join with forward-fill / notNaN) policies.
 
 Purpose:
-    FEAT-DATA-BASKETS: Manage stock groups, baskets, and multi-series alignment.
+    FEAT-WORKSPACE-DATAMGR: Manage stock groups, baskets, and multi-series
+    alignment for the Data Manager workspace.
 
 Key Capabilities:
-    FR-DATA-BASKETS-GROUPS: Manage stock groups and basket compositions.
-    FR-DATA-BASKETS-ALIGNMENT: Multi-symbol alignment and synthetic bar math.
+    - FR-DATA-BASKETS-GROUPS: Manage stock groups and basket compositions.
+      Associated: `[BasketService.save_basket()]`, `[BasketService.get_basket()]`
+      Logging: Emits INFO on basket mutations.
+    - FR-DATA-BASKETS-ALIGNMENT: Multi-symbol alignment and synthetic bar math.
+      Associated: `[BasketService.align_series()]`,
+      `[BasketService.compute_basket_series()]`
+      Logging: Emits INFO on synthetic bar computation.
 
 Python API Usage:
     ```python
     from app.host.persistence import DatabaseManager
-    from app.plugins.data.baskets import BasketDefinition, BasketItem, BasketService
+    from app.workspace.data_manager.baskets import (
+        BasketDefinition,
+        BasketItem,
+        BasketService,
+    )
 
     db = DatabaseManager()
     db.initialize()
@@ -39,7 +50,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    python -m app.plugins.data.baskets --list
+    python -m app.workspace.data_manager.baskets --list
     ```
 """
 
@@ -48,10 +59,11 @@ from __future__ import annotations
 import argparse
 import sys
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from app.host.logging import get_logger
 from app.host.persistence import DatabaseManager
-from app.plugins.data.ingestion import BarRecord
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from app.workspace.data_manager.data import BarRecord
 
 logger = get_logger(__name__)
 
@@ -274,7 +286,7 @@ class BasketService:
                     # Forward-fill previous bar with updated timestamp
                     prev = last_known[sym]
                     row[sym] = prev.model_copy(update={"timestamp_utc": ts})
-            # Only include row if at least one symbol is present
+            # Only include row if all symbols are present
             if len(row) == len(symbols):
                 aligned_union.append(row)
 

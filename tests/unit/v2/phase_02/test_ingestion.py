@@ -26,9 +26,9 @@ from pathlib import Path
 
 import pytest
 from app.host.persistence import DatabaseManager
-from app.plugins.data.catalog import CatalogService
-from app.plugins.data.ingestion import (
+from app.workspace.data_manager.data import (
     BarRecord,
+    CatalogService,
     DataIngestionService,
     IngestionConfig,
 )

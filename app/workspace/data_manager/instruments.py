@@ -3,16 +3,15 @@
 Description:
     Provides canonical quantitative instrument definitions, precision models,
     margin rates, financing swaps, broker aliases, and host SQLite persistence
-    operations for the HaruQuantAI platform. Instruments represent tradable
+    operations for the Data Manager workspace. Instruments represent tradable
     assets across heterogeneous asset classes (Forex, Equities, Futures, Crypto,
     Commodities) with distinct tick values, contract point sizes, and price
     decimals. All mutations and lookups execute through the host persistence
-    layer via `DatabaseManager.instruments`, ensuring zero ad-hoc SQL execution
-    in plugin space.
+    layer via `DatabaseManager.instruments`, ensuring zero ad-hoc SQL execution.
 
 Purpose:
-    FEAT-DATA-INSTRUMENTS: Instrument definitions, parameter validation,
-    and host persistence for datamgr_instruments.
+    FEAT-WORKSPACE-DATAMGR: Manage instrument definitions, parameter validation,
+    and host persistence for the Data Manager workspace.
 
 Key Capabilities:
     - FR-DATA-INSTRUMENTS-SPECIFICATION: Strongly typed instrument parameters
@@ -37,7 +36,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.host.persistence import DatabaseManager
-    from app.plugins.data.instruments import (
+    from app.workspace.data_manager.instruments import (
         InstrumentDefinition,
         InstrumentService,
     )
@@ -61,7 +60,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.plugins.data.instruments --symbol EURUSD
+    uv run python -m app.workspace.data_manager.instruments --symbol EURUSD
     ```
 """
 
@@ -71,9 +70,10 @@ import argparse
 import sys
 from typing import Any
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from app.host.logging import get_logger
 from app.host.persistence import DatabaseManager
-from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 logger = get_logger(__name__)
 

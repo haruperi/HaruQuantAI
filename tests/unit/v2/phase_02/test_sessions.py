@@ -27,7 +27,7 @@ from pathlib import Path
 
 import pytest
 from app.host.persistence import DatabaseManager
-from app.plugins.data.sessions import (
+from app.workspace.data_manager.sessions import (
     SessionService,
     SessionWindow,
     TradingHoliday,

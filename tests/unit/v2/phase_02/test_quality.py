@@ -24,14 +24,14 @@ import logging
 from pathlib import Path
 
 import pytest
-from app.plugins.data.ingestion import BarRecord
-from app.plugins.data.quality import DataQualityInspector
-from app.plugins.data.sessions import (
+from app.workspace.data_manager.actions.review.quality import DataQualityInspector
+from app.workspace.data_manager.actions.transform.transforms import SeriesTransformer
+from app.workspace.data_manager.data import BarRecord
+from app.workspace.data_manager.sessions import (
     SessionWindow,
     TradingHoliday,
     TradingSessionDefinition,
 )
-from app.plugins.data.transforms import SeriesTransformer
 
 
 @pytest.fixture

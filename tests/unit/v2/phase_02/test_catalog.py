@@ -25,8 +25,11 @@ from pathlib import Path
 
 import pytest
 from app.host.persistence import DatabaseManager
-from app.plugins.data.catalog import CatalogService, DatasetRecord
-from app.plugins.data.instruments import InstrumentDefinition, InstrumentService
+from app.workspace.data_manager.data import CatalogService, DatasetRecord
+from app.workspace.data_manager.instruments import (
+    InstrumentDefinition,
+    InstrumentService,
+)
 
 
 @pytest.fixture

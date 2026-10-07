@@ -1,23 +1,36 @@
 """Market data series resampling, timezone transformation, and multi-format export.
 
 Description:
-    Transformation and export engine for market data series. Provides timeframe
-    resampling (M1 to M5, M15, M30, H1, H4, D1) with accurate OHLCV aggregation
-    and bucket boundary alignment. Supports timezone shifting to broker server
-    timezones, trading session filtering (excluding weekends and holidays), and
-    multi-format export to standard CSV, MetaTrader 4 (MT4), and MetaTrader 5 (MT5).
+    Transformation and export engine for market data series within the Data
+    Manager workspace, mirroring SQX DataManagerActions transform operations.
+    Provides timeframe resampling (M1 to M5, M15, M30, H1, H4, D1) with accurate
+    OHLCV aggregation and bucket boundary alignment. Supports timezone shifting
+    to broker server timezones, trading session filtering (excluding weekends and
+    holidays), and multi-format export to standard CSV, MetaTrader 4 (MT4), and
+    MetaTrader 5 (MT5).
 
 Purpose:
-    FEAT-DATA-QUALITY: Resample, transform, filter, and export market data series.
+    FEAT-WORKSPACE-DATAMGR: Resample, transform, filter, and export market data
+    series in the Data Manager workspace.
 
 Key Capabilities:
-    FR-DATA-QUALITY-TRANSFORMS: Timeframe resampling and timezone shifting.
-    FR-DATA-QUALITY-EXPORT: Export datasets to CSV, MT4, and MT5 formats.
+    - FR-DATA-QUALITY-TRANSFORMS: Timeframe resampling and timezone shifting.
+      Associated: `[SeriesTransformer.resample()]`,
+      `[SeriesTransformer.shift_timezone()]`,
+      `[SeriesTransformer.filter_by_session()]`
+      Logging: Emits INFO on transform executions.
+    - FR-DATA-QUALITY-EXPORT: Export datasets to CSV, MT4, and MT5 formats.
+      Associated: `[SeriesTransformer.export_csv()]`,
+      `[SeriesTransformer.export_mt4()]`,
+      `[SeriesTransformer.export_mt5()]`
+      Logging: Emits INFO on file exports.
 
 Python API Usage:
     ```python
-    from app.plugins.data.ingestion import BarRecord
-    from app.plugins.data.transforms import SeriesTransformer
+    from app.workspace.data_manager.actions.transform.transforms import (
+        SeriesTransformer,
+    )
+    from app.workspace.data_manager.data import BarRecord
 
     transformer = SeriesTransformer()
     m5_bars = transformer.resample(m1_bars, target_timeframe="M5")
@@ -27,7 +40,8 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    python -m app.plugins.data.transforms --file m1.csv --resample M5
+    python -m app.workspace.data_manager.actions.transform.transforms \
+        --file m1.csv --resample M5
     ```
 """
 
@@ -42,8 +56,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from app.host.logging import get_logger
-from app.plugins.data.ingestion import BarRecord
-from app.plugins.data.sessions import TradingSessionDefinition
+from app.workspace.data_manager.data import BarRecord
+from app.workspace.data_manager.sessions import TradingSessionDefinition
 
 logger = get_logger(__name__)
 
@@ -357,7 +371,6 @@ class SeriesTransformer:
             hours_step = step_minutes // MINUTES_IN_HOUR
             hour_bucket = (dt.hour // hours_step) * hours_step
             return dt.replace(hour=hour_bucket, minute=0, second=0, microsecond=0)
-        # Daily
         return dt.replace(hour=0, minute=0, second=0, microsecond=0)
 
 

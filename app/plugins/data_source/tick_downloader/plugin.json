@@ -1,0 +1,21 @@
+{
+  "manifest_version": 1,
+  "id": "data-source-tick-downloader",
+  "name": "Tick Data Downloader",
+  "version": "1.0.0",
+  "description": "High-precision tick and trade volume historical data downloader plugin",
+  "author": "HaruQuantAI",
+  "slot": "data.provider",
+  "entrypoint": "adapter:create_adapter",
+  "dependencies": [],
+  "capabilities": [],
+  "enabled": true,
+  "metadata": {
+    "provider_name": "TickDownloader",
+    "display_name": "Tick Data Downloader",
+    "asset_classes": ["Forex", "Futures", "Crypto"],
+    "timeframes": ["TICK", "M1"],
+    "requires_auth": false,
+    "rate_limit_rps": 20.0
+  }
+}

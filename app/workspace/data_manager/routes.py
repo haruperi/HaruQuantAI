@@ -1,23 +1,22 @@
-"""Market data REST router, API contracts, and unified host integration.
+"""Data Manager workspace REST router, API contracts, and host integration.
 
 Description:
-    This module provides the central FastAPI REST router for the market data
-    subsystem (`app.plugins.data`). It exposes clean, strongly-typed endpoints
-    for dataset cataloging, instrument lifecycle, trading session definitions,
-    data ingestion, quality auditing, timeframe transformations, provider
-    downloads, synthetic baskets, and CFTC Commitments of Traders (COT) series.
-    It links the frontend DataManager workspace with authoritative host persistence.
+    Provides the central FastAPI REST router for the Data Manager workspace
+    (`app.workspace.data_manager`). Exposes strongly-typed endpoints for
+    datasets, instruments, sessions, baskets, broker profiles, provider downloads,
+    CFTC COT series, custom time series, quality review, timeframe transforms,
+    workspace overview metrics, operational audit logs, and user help guides.
 
 Purpose:
-    FEAT-DATA-INTEGRATION: Expose unified market data via REST endpoints.
+    FEAT-WORKSPACE-DATAMGR: Expose unified Data Manager workspace capabilities via
+    FastAPI HTTP endpoints.
 
 Key Capabilities:
     - FR-DATA-INTEGRATION-DATASETS: REST endpoints for dataset listing, querying,
       deletion, availability checks, and ingestion.
       Associated: `get_datasets`, `get_dataset`, `delete_dataset`,
         `check_dataset_availability`, `import_dataset`
-      Logging: Emits INFO on dataset mutations and ingestion completion;
-        emits DEBUG on listings.
+      Logging: Emits INFO on dataset mutations and ingestion completion.
     - FR-DATA-INTEGRATION-INSTRUMENTS: REST endpoints for instrument CRUD.
       Associated: `list_instruments`, `get_instrument`, `create_instrument`,
         `update_instrument`, `delete_instrument`
@@ -46,7 +45,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.host.persistence import DatabaseManager
-    from app.plugins.data.integration import create_data_router
+    from app.workspace.data_manager.routes import create_data_router
 
     db = DatabaseManager()
     db.initialize()
@@ -55,7 +54,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.plugins.data.integration --help
+    uv run python -m app.workspace.data_manager.routes --list-routes
     ```
 """
 
@@ -68,29 +67,39 @@ from concurrent.futures import Future
 from pathlib import Path
 from typing import Any
 
+from fastapi import APIRouter, Request, Response, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field
+
 from app.host.jobs import JobManager
 from app.host.logging import get_logger
 from app.host.persistence import DatabaseManager, get_database_manager
 from app.host.resources import ResourceManager
 from app.host.response import StandardError
 from app.host.transport import ApiResponse, EventBus
-from app.plugins.data.baskets import BasketDefinition, BasketService
-from app.plugins.data.catalog import CatalogService
-from app.plugins.data.cot import CotService
-from app.plugins.data.custom_data import CustomDataService
-from app.plugins.data.ingestion import (
+from app.workspace.data_manager.actions.review.quality import DataQualityInspector
+from app.workspace.data_manager.actions.transform.transforms import SeriesTransformer
+from app.workspace.data_manager.baskets import BasketDefinition, BasketService
+from app.workspace.data_manager.broker import BrokerService
+from app.workspace.data_manager.connections import DownloadRequest, ProviderManager
+from app.workspace.data_manager.custom_data import CotService, CustomDataService
+from app.workspace.data_manager.data import (
     BarRecord,
+    CatalogService,
     DataIngestionService,
     IngestionConfig,
 )
-from app.plugins.data.instruments import InstrumentDefinition, InstrumentService
-from app.plugins.data.providers import DownloadRequest, ProviderManager
-from app.plugins.data.quality import DataQualityInspector
-from app.plugins.data.sessions import SessionService, TradingSessionDefinition
-from app.plugins.data.transforms import SeriesTransformer
-from fastapi import APIRouter, Request, Response, status
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, Field
+from app.workspace.data_manager.help import DataManagerHelpService
+from app.workspace.data_manager.home import DataManagerHomeService
+from app.workspace.data_manager.instruments import (
+    InstrumentDefinition,
+    InstrumentService,
+)
+from app.workspace.data_manager.log import DataManagerLogService
+from app.workspace.data_manager.sessions import (
+    SessionService,
+    TradingSessionDefinition,
+)
 
 logger = get_logger(__name__)
 
@@ -106,13 +115,6 @@ def _execute_async_import(
     config_dict: dict[str, Any],
 ) -> dict[str, Any]:
     """Execute background ingestion job in worker process."""
-    from app.host.persistence import DatabaseManager
-    from app.plugins.data.catalog import CatalogService
-    from app.plugins.data.ingestion import (
-        DataIngestionService,
-        IngestionConfig,
-    )
-
     db = DatabaseManager(database_path=Path(db_path_str))
     catalog = CatalogService(db)
     service = DataIngestionService(catalog=catalog, storage_dir=Path(storage_dir_str))
@@ -135,8 +137,6 @@ def _execute_async_download(
     date_to: str,
 ) -> dict[str, Any]:
     """Execute background provider download job in worker process."""
-    from app.plugins.data.providers import DownloadRequest, ProviderManager
-
     manager = ProviderManager()
     req = DownloadRequest(
         provider_name=provider_name,
@@ -268,7 +268,7 @@ class ExportPayload(BaseModel):
 
 
 class DataRouterService:
-    """Service container encapsulating market data route handlers."""
+    """Service container encapsulating Data Manager workspace route handlers."""
 
     def __init__(
         self,
@@ -277,6 +277,7 @@ class DataRouterService:
         *,
         job_manager: JobManager | None = None,
         event_bus: EventBus | None = None,
+        provider_manager: ProviderManager | None = None,
     ) -> None:
         """Initialize all backing domain services."""
         self.db = db
@@ -287,12 +288,18 @@ class DataRouterService:
         self.instruments = InstrumentService(db)
         self.sessions = SessionService(db)
         self.baskets = BasketService(db)
+        self.broker = BrokerService(db)
+        self.home = DataManagerHomeService(db)
+        self.log = DataManagerLogService(db)
+        self.help = DataManagerHelpService()
         self.ingestion = DataIngestionService(
             catalog=self.catalog, storage_dir=res_dir / "datasets"
         )
         self.quality = DataQualityInspector()
         self.transformer = SeriesTransformer()
-        self.providers = ProviderManager()
+        self.providers = (
+            provider_manager if provider_manager is not None else ProviderManager()
+        )
         self.custom_data = CustomDataService(db=db, storage_dir=res_dir / "custom_data")
         self.cot = CotService(db=db, storage_dir=res_dir / "cot")
 
@@ -1338,6 +1345,61 @@ class DataRouterService:
                 req_id,
             )
 
+    # Home overview
+    def get_home_overview(self, request: Request) -> Response:
+        """Get Data Manager workspace overview summary."""
+        req_id = request.headers.get("x-request-id")
+        active_providers = len(self.providers.list_capabilities())
+        overview = self.home.get_overview(active_providers_count=active_providers)
+        resp = ApiResponse.success(
+            data=overview.model_dump(mode="json"),
+            message="Workspace overview retrieved",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    # Broker profiles
+    def list_brokers(self, request: Request) -> Response:
+        """List configured broker profiles."""
+        req_id = request.headers.get("x-request-id")
+        brokers = self.broker.list_brokers()
+        resp = ApiResponse.success(
+            data=[b.model_dump(mode="json") for b in brokers],
+            message=f"Retrieved {len(brokers)} broker profile(s)",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    # Logs
+    def list_logs(
+        self,
+        request: Request,
+        symbol: str | None = None,
+        action: str | None = None,
+        limit: int = 100,
+    ) -> Response:
+        """List activity logs."""
+        req_id = request.headers.get("x-request-id")
+        logs = self.log.list_logs(symbol=symbol, action=action, limit=limit)
+        resp = ApiResponse.success(
+            data=[entry.model_dump(mode="json") for entry in logs],
+            message=f"Retrieved {len(logs)} log entry/entries",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    # Help topics
+    def list_help_topics(self, request: Request) -> Response:
+        """List help guide topics."""
+        req_id = request.headers.get("x-request-id")
+        topics = self.help.list_topics()
+        resp = ApiResponse.success(
+            data=[t.model_dump(mode="json") for t in topics],
+            message=f"Retrieved {len(topics)} help topic(s)",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
 
 # ---------------------------------------------------------------------------
 # Router Factory
@@ -1350,14 +1412,16 @@ def create_data_router(
     *,
     job_manager: JobManager | None = None,
     event_bus: EventBus | None = None,
+    provider_manager: ProviderManager | None = None,
 ) -> APIRouter:
-    """Create and configure FastAPI APIRouter for Market Data subsystem.
+    """Create and configure FastAPI APIRouter for Market Data workspace.
 
     Args:
         db_manager: Central host DatabaseManager instance.
         resource_manager: Central host ResourceManager instance.
         job_manager: Optional host JobManager instance for background compute jobs.
         event_bus: Optional host EventBus instance for real-time notification streaming.
+        provider_manager: Optional host-discovered ProviderManager instance.
 
     Returns:
         Configured FastAPI APIRouter.
@@ -1370,7 +1434,11 @@ def create_data_router(
     )
 
     service = DataRouterService(
-        db, res_dir, job_manager=job_manager, event_bus=event_bus
+        db,
+        res_dir,
+        job_manager=job_manager,
+        event_bus=event_bus,
+        provider_manager=provider_manager,
     )
     router = APIRouter(prefix="/data", tags=["Market Data"])
 
@@ -1555,7 +1623,43 @@ def create_data_router(
         summary="Export bar series",
     )
 
+    # Workspace Home Overview
+    router.add_api_route(
+        "/home/overview",
+        service.get_home_overview,
+        methods=["GET"],
+        summary="Get workspace overview",
+    )
+
+    # Brokers
+    router.add_api_route(
+        "/brokers",
+        service.list_brokers,
+        methods=["GET"],
+        summary="List broker profiles",
+    )
+
+    # Audit Logs
+    router.add_api_route(
+        "/logs",
+        service.list_logs,
+        methods=["GET"],
+        summary="List activity logs",
+    )
+
+    # Help
+    router.add_api_route(
+        "/help/topics",
+        service.list_help_topics,
+        methods=["GET"],
+        summary="List help topics",
+    )
+
     return router
+
+
+# Alias for SQX naming conventions
+create_data_manager_router = create_data_router
 
 
 def main(argv: list[str] | None = None) -> int:

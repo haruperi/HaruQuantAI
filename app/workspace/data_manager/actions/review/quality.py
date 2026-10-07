@@ -1,22 +1,27 @@
 """Data quality evaluation, gap detection, and health metric auditing.
 
 Description:
-    Diagnostic auditing service for historical market data series. Analyzes
-    OHLCV bar sequences for price envelope geometry anomalies, zero or negative
-    prices, duplicate timestamps, and unexpected chronological gap intervals.
-    Calculates a normalized health quality score [0.0, 1.0] and produces
+    Diagnostic auditing service for historical market data series within the
+    Data Manager workspace, mirroring SQX DataManagerActions review quality.
+    Analyzes OHLCV bar sequences for price envelope geometry anomalies, zero or
+    negative prices, duplicate timestamps, and unexpected chronological gap
+    intervals. Calculates a normalized health quality score [0.0, 1.0] and produces
     structured data quality reports for dataset cataloging.
 
 Purpose:
-    FEAT-DATA-QUALITY: Audit, diagnose, and score historical market data quality.
+    FEAT-WORKSPACE-DATAMGR: Audit, diagnose, and score historical market data
+    quality in the Data Manager workspace.
 
 Key Capabilities:
-    FR-DATA-QUALITY-METRICS: Calculate bar health, gaps, duplicates, and quality score.
+    - FR-DATA-QUALITY-METRICS: Calculate bar health, gaps, duplicates, and
+      quality score.
+      Associated: `[DataQualityInspector.inspect_series()]`
+      Logging: Emits INFO on quality analysis completion.
 
 Python API Usage:
     ```python
-    from app.plugins.data.ingestion import BarRecord
-    from app.plugins.data.quality import DataQualityInspector
+    from app.workspace.data_manager.actions.review.quality import DataQualityInspector
+    from app.workspace.data_manager.data import BarRecord
 
     inspector = DataQualityInspector()
     report = inspector.inspect_series(bars, expected_interval_seconds=60)
@@ -25,7 +30,8 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    python -m app.plugins.data.quality --file dataset.csv --step 60
+    python -m app.workspace.data_manager.actions.review.quality \
+        --file dataset.csv --step 60
     ```
 """
 
@@ -37,9 +43,10 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from app.host.logging import get_logger
-from app.plugins.data.ingestion import BarRecord
 from pydantic import BaseModel, ConfigDict, Field
+
+from app.host.logging import get_logger
+from app.workspace.data_manager.data import BarRecord
 
 logger = get_logger(__name__)
 
