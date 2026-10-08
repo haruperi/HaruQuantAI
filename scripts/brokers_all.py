@@ -212,9 +212,30 @@ def run_tests() -> bool:
     assert "doesn't have trading capabilities" in dw_trade.message
 
     # ------------------------------------------------------------------------
-    # 5. SQ Equity (Market Data Provider: Local Parquet Datasets: AAPL, MSFT)
+    # 5. SQ Equity (Market Data Provider: Parquet Datasets & US Equity Catalog)
     # ------------------------------------------------------------------------
     print("\n[5] SQ EQUITY:")
+    eq_info = get_symbol_info(broker=sq_equity, symbol="AAPL")
+    print(
+        f"    Symbol Info: {eq_info.data.description if eq_info.data else 'None'}, "
+        f"digits={eq_info.data.digits if eq_info.data else 'None'}"
+    )
+    assert eq_info.is_success
+    assert eq_info.data is not None
+    assert eq_info.data.name == "AAPL"
+
+    eq_num = sq_equity.get_num_of_symbols()
+    print(f"    Catalog Symbols: {eq_num.data}")
+    assert eq_num.is_success
+    assert eq_num.data is not None
+    assert eq_num.data >= 10
+
+    eq_etfs = sq_equity.get_symbols(group="ETFs")
+    print(f"    ETFs count: {len(eq_etfs.data) if eq_etfs.data else 0}")
+    assert eq_etfs.is_success
+    assert eq_etfs.data is not None
+    assert len(eq_etfs.data) > 0
+
     eq_bars = get_bars(broker=sq_equity, symbol="AAPL", count=5)
     print(f"    Parquet Bars count: {len(eq_bars.data) if eq_bars.data else 0}")
     assert eq_bars.is_success
