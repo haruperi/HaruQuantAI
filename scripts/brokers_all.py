@@ -178,12 +178,31 @@ def run_tests() -> bool:
     assert "doesn't have trading capabilities" in d_trade.message
 
     # ------------------------------------------------------------------------
-    # 4. Darwinex (Market Data Provider: Parquet store)
+    # 4. Darwinex (In-Memory CDN Bars & Authoritative CSV Symbol Catalog)
     # ------------------------------------------------------------------------
     print("\n[4] DARWINEX:")
+    dw_info = get_symbol_info(broker=darwinex, symbol="EURUSD")
+    print(
+        f"    Symbol Info: {dw_info.data.description if dw_info.data else 'None'}, "
+        f"digits={dw_info.data.digits if dw_info.data else 'None'}"
+    )
+    assert dw_info.is_success
+    assert dw_info.data is not None
+    assert dw_info.data.digits == 5
+
+    dw_num = darwinex.get_num_of_symbols()
+    print(f"    Catalog Symbols: {dw_num.data}")
+    assert dw_num.is_success
+    assert dw_num.data == 328
+
     dw_bars = get_bars(broker=darwinex, symbol="EURUSD", count=5)
-    print(f"    Parquet Bars: success={dw_bars.is_success}")
+    print(
+        f"    CDN Bars: count={len(dw_bars.data) if dw_bars.data else 0} "
+        f"(success={dw_bars.is_success})"
+    )
     assert dw_bars.is_success
+    assert dw_bars.data is not None
+    assert len(dw_bars.data) == 5
 
     dw_trade = trade(broker=darwinex, request=TradeRequest(symbol="EURUSD", volume=1))
     print(
