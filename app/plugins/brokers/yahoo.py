@@ -39,7 +39,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python scripts/brokers_all.py
+    uv run python -m app.plugins.brokers.yahoo
     ```
 """
 

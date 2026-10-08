@@ -50,7 +50,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python scripts/brokers_all.py
+    uv run python -c "from app.plugins.brokers.ctrader import create_adapter; create_adapter()"
     ```
 """
 
