@@ -71,7 +71,29 @@ from app.workspace.data_manager.data import BarRecord
 
 logger = get_logger(__name__)
 
-DEFAULT_DATA_DIR = Path(__file__).resolve().parents[4] / "data" / "market"
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "broker-files",
+    "name": "Local Files Connector",
+    "version": "1.0.0",
+    "description": "Local filesystem tabular (CSV/TXT/Parquet) market data broker and provider plugin",
+    "author": "HaruQuantAI",
+    "slot": "broker",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": ["bars", "ticks", "symbols"],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "Files",
+        "display_name": "Local Filesystem Feed",
+        "asset_classes": ["Forex", "Stocks", "Futures", "Crypto"],
+        "timeframes": ["M1", "M5", "H1", "D1"],
+        "requires_auth": False,
+        "rate_limit_rps": 100.0,
+    },
+}
+
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
 
 
 def _parse_timestamp(val: str) -> datetime:
@@ -96,6 +118,9 @@ def _parse_timestamp(val: str) -> datetime:
         except ValueError:
             continue
     return datetime.now(UTC)
+
+
+__all__ = ["FilesBroker", "FilesProvider", "create_adapter"]
 
 
 class FilesBroker(BaseBroker):

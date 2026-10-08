@@ -77,6 +77,29 @@ from app.workspace.data_manager.data import BarRecord
 
 logger = get_logger(__name__)
 
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "data-source-yahoo",
+    "name": "Yahoo Finance Feed",
+    "version": "1.0.0",
+    "description": "Yahoo Finance historical daily and intraday market data provider plugin",
+    "author": "HaruQuantAI",
+    "slot": "data.provider",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": [],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "Yahoo",
+        "display_name": "Yahoo Finance",
+        "asset_classes": ["Stocks", "Indices", "Commodities"],
+        "timeframes": ["M1", "M5", "D1"],
+        "requires_auth": False,
+        "rate_limit_rps": 5.0,
+        "base_url": "https://query1.finance.yahoo.com",
+    },
+}
+
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -94,6 +117,9 @@ TIMEFRAME_TO_YAHOO_INTERVAL = {
     TimeFrame.W1: "1wk",
     TimeFrame.MN1: "1mo",
 }
+
+
+__all__ = ["YahooBroker", "create_adapter"]
 
 
 class YahooBroker(BaseBroker):

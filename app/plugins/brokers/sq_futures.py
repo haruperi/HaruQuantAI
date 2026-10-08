@@ -1,44 +1,44 @@
-"""StrategyQuant Equity local Parquet market data broker and provider plugin.
+"""StrategyQuant Futures local Parquet market data broker and provider plugin.
 
 Description:
     Implements a specialized market data broker plugin accessing StrategyQuant
-    US Equity historical tick and candlestick archives stored as local Parquet
-    files under `data/market/sq_equity`.
-    Within HaruQuantAI, this module provides fast local access to normalized US
-    equity datasets (e.g. AAPL, MSFT, TSLA, NVDA, SPY, QQQ) without requiring
-    remote API credentials or network connections.
-    Because SQ Equity is an offline historical archive provider, trading operations
+    Commodity, Index, and Currency Futures historical tick and candlestick archives
+    stored as local Parquet files under `data/market/sq_futures`.
+    Within HaruQuantAI, this module provides contract specifications (including
+    point sizes, tick values, and trading contract sizes) for active and continuous
+    futures instruments (e.g. @ES, @NQ, @YM, @CL, @GC, @SI).
+    Because SQ Futures is an offline historical archive provider, trading operations
     and live session controls are rejected with canonical capability unsupported
     errors (`BaseBroker._unsupported()`).
 
 Purpose:
-    FEAT-BROKER-SQ-EQUITY: StrategyQuant US Equity Local Parquet Datafeed.
-    Provides fast, offline historical equity bar and tick extraction from
-    filesystem Parquet archives.
+    FEAT-BROKER-SQ-FUTURES: StrategyQuant Futures Local Parquet Datafeed.
+    Provides contract specifications and offline historical futures bar/tick
+    extraction from local Parquet archives.
 
 Key Capabilities:
-    - FR-BROKER-SQ-EQUITY-CATALOG: US Equity Ticker Specifications
-      Associated: `[SQEquityBroker.get_symbol_info()]`,
-      `[SQEquityBroker.get_symbols()]`
-      Logging: Emits DEBUG log when returning equity metadata.
-    - FR-BROKER-SQ-EQUITY-PARQUET-DATA: Parquet Historical Bar Ingestion
-      Associated: `[SQEquityBroker.get_bars()]`,
-      `[SQEquityBroker._read_local_parquet()]`
+    - FR-BROKER-SQ-FUTURES-CATALOG: Continuous Futures Specifications
+      Associated: `[SQFuturesBroker.get_symbol_info()]`,
+      `[SQFuturesBroker.get_symbols()]`
+      Logging: Emits DEBUG log when returning contract specifications.
+    - FR-BROKER-SQ-FUTURES-PARQUET-DATA: Parquet Historical Bar Ingestion
+      Associated: `[SQFuturesBroker.get_bars()]`,
+      `[SQFuturesBroker._read_local_parquet()]`
       Logging: Emits INFO log upon successfully parsing Parquet partitions,
       and WARNING log if files are missing or empty.
-    - FR-BROKER-SQ-EQUITY-TRADE-REJECTION: Unsupported Trade Capability Rejection
-      Associated: `[SQEquityBroker.trade()]`, `[SQEquityBroker.check_order()]`
+    - FR-BROKER-SQ-FUTURES-TRADE-REJECTION: Unsupported Trade Capability Rejection
+      Associated: `[SQFuturesBroker.trade()]`, `[SQFuturesBroker.check_order()]`
       Logging: Emits WARNING log declaring trading capabilities unsupported.
 
 Python API Usage:
     ```python
-    from app.plugins.brokers import TimeFrame, sq_equity
+    from app.plugins.brokers import TimeFrame, sq_futures
 
-    # Read historical AAPL daily bars from local Parquet archive
-    bars_resp = sq_equity.get_bars("AAPL", timeframe=TimeFrame.D1, count=5)
-    if bars_resp.is_success:
-        assert len(bars_resp.data) == 5
-        print(f"Latest AAPL close: {bars_resp.data[-1].close}")
+    # Retrieve continuous E-mini S&P 500 contract specifications
+    sym_resp = sq_futures.get_symbol_info("@ES")
+    if sym_resp.is_success:
+        assert sym_resp.data.trade_contract_size == 50.0
+        print(f"Point value: {sym_resp.data.point}")
     ```
 
 CLI Usage:
@@ -76,38 +76,98 @@ from app.workspace.data_manager.instruments import InstrumentService
 
 logger = get_logger(__name__)
 
-DEFAULT_DATA_DIR = Path(__file__).resolve().parents[4] / "data" / "market"
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "broker-sq-futures",
+    "name": "StrategyQuant Continuous Futures Connector",
+    "version": "1.0.0",
+    "description": "StrategyQuant Continuous Futures historical parquet data and broker plugin",
+    "author": "HaruQuantAI",
+    "slot": "broker",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": ["bars", "symbols"],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "SQFutures",
+        "display_name": "StrategyQuant Continuous Futures",
+        "asset_classes": ["Futures"],
+        "timeframes": ["M1", "D1"],
+        "requires_auth": False,
+        "rate_limit_rps": 10.0,
+    },
+}
 
-# Embedded benchmark equities from SQEquityCatalog
-EQUITY_TICKERS: dict[str, dict[str, Any]] = {
-    "SPY": {"name": "SPDR S&P 500 ETF Trust", "exchange": "ARCA", "decimals": 2},
-    "QQQ": {"name": "Invesco QQQ Trust", "exchange": "NASDAQ", "decimals": 2},
-    "DIA": {
-        "name": "SPDR Dow Jones Industrial Average ETF",
-        "exchange": "ARCA",
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
+
+# Embedded specifications for continuous futures
+SQ_FUTURES_INSTRUMENTS: dict[str, dict[str, Any]] = {
+    "@ES": {
+        "name": "E-mini S&P 500",
+        "tick_size": 0.25,
+        "point_value": 50.0,
+        "exchange": "CME",
         "decimals": 2,
     },
-    "IWM": {"name": "iShares Russell 2000 ETF", "exchange": "ARCA", "decimals": 2},
-    "AAPL": {"name": "Apple Inc.", "exchange": "NASDAQ", "decimals": 2},
-    "MSFT": {"name": "Microsoft Corporation", "exchange": "NASDAQ", "decimals": 2},
-    "AMZN": {"name": "Amazon.com Inc.", "exchange": "NASDAQ", "decimals": 2},
-    "GOOGL": {"name": "Alphabet Inc.", "exchange": "NASDAQ", "decimals": 2},
-    "NVDA": {"name": "NVIDIA Corporation", "exchange": "NASDAQ", "decimals": 2},
-    "TSLA": {"name": "Tesla Inc.", "exchange": "NASDAQ", "decimals": 2},
-    "META": {"name": "Meta Platforms Inc.", "exchange": "NASDAQ", "decimals": 2},
+    "@NQ": {
+        "name": "E-mini NASDAQ 100",
+        "tick_size": 0.25,
+        "point_value": 20.0,
+        "exchange": "CME",
+        "decimals": 2,
+    },
+    "@YM": {
+        "name": "E-mini Dow Jones",
+        "tick_size": 1.0,
+        "point_value": 5.0,
+        "exchange": "CBOT",
+        "decimals": 0,
+    },
+    "@CL": {
+        "name": "Crude Oil",
+        "tick_size": 0.01,
+        "point_value": 1000.0,
+        "exchange": "NYMEX",
+        "decimals": 2,
+    },
+    "@GC": {
+        "name": "Gold",
+        "tick_size": 0.1,
+        "point_value": 100.0,
+        "exchange": "COMEX",
+        "decimals": 1,
+    },
+    "@SI": {
+        "name": "Silver",
+        "tick_size": 0.005,
+        "point_value": 5000.0,
+        "exchange": "COMEX",
+        "decimals": 3,
+    },
 }
 
 
-class SQEquityBroker(BaseBroker):
-    """StrategyQuant Equity market data plugin."""
+def _calc_digits(tick_size: float) -> int:
+    """Calculate quotation digits precision from tick size."""
+    if tick_size >= 1.0 or tick_size <= 0:
+        return 0
+    s = f"{tick_size:.8f}".rstrip("0")
+    return len(s.split(".")[1]) if "." in s else 0
+
+
+__all__ = ["SQFuturesBroker", "SQFuturesProvider", "create_adapter"]
+
+
+class SQFuturesBroker(BaseBroker):
+    """StrategyQuant Futures market data plugin."""
 
     def __init__(
         self,
-        name: str = "SQ_Equity",
+        name: str = "SQ_Futures",
         store_dir: str | Path | None = None,
         db: DatabaseManager | None = None,
     ) -> None:
-        """Initialize SQ Equity broker plugin."""
+        """Initialize SQ Futures broker plugin."""
         super().__init__(
             name=name,
             capabilities=(
@@ -117,7 +177,7 @@ class SQEquityBroker(BaseBroker):
             ),
         )
         self.store_dir = (
-            Path(store_dir) if store_dir else DEFAULT_DATA_DIR / "sq_equity"
+            Path(store_dir) if store_dir else DEFAULT_DATA_DIR / "sq_futures"
         )
         self._db = db
         self._instruments_service = InstrumentService(db) if db else None
@@ -127,9 +187,9 @@ class SQEquityBroker(BaseBroker):
     def provider_capabilities(self) -> ProviderCapabilities:
         """Data provider capabilities metadata."""
         return ProviderCapabilities(
-            name="SQEquity",
-            display_name="StrategyQuant US Equities",
-            asset_classes=["Stocks"],
+            name="SQFutures",
+            display_name="StrategyQuant Continuous Futures",
+            asset_classes=["Futures"],
             timeframes=["M1", "D1"],
             requires_auth=False,
             rate_limit_rps=10.0,
@@ -170,13 +230,13 @@ class SQEquityBroker(BaseBroker):
         """Verify presence of local market data store or connection."""
         self._connected = self.store_dir.exists()
         self.logger.info(
-            "FR-BROKER-SQ-EQUITY-CATALOG: Connected to SQ Equity datafeed. Directory exists: %s",
+            "FR-BROKER-SQ-FUTURES-CATALOG: Connected to SQ Futures datafeed. Store exists: %s",
             self._connected,
-            extra={"fr_id": "FR-BROKER-SQ-EQUITY-CATALOG"},
+            extra={"fr_id": "FR-BROKER-SQ-FUTURES-CATALOG"},
         )
         return StandardResponse.success(
             data=True,
-            message="SQ Equity store ready",
+            message="SQ Futures store ready",
             extensions={"broker": self.name},
         )
 
@@ -195,71 +255,89 @@ class SQEquityBroker(BaseBroker):
 
     @override
     def get_symbol_info(self, symbol: str) -> StandardResponse[SymbolInfo]:
-        """Retrieve stock metadata from host catalog or fallback."""
+        """Retrieve contract specifications from host catalog or embedded specifications."""
         sym_clean = symbol.upper().strip()
         if self._instruments_service is not None:
             inst = self._instruments_service.get_instrument(sym_clean)
             if inst is not None:
+                digits = _calc_digits(inst.tick_size)
                 info = SymbolInfo(
                     name=sym_clean,
                     visible=True,
                     select=True,
-                    digits=inst.decimals,
                     point=inst.tick_size,
+                    digits=digits,
+                    trade_contract_size=inst.point_value,
                     currency_base="USD",
                     currency_profit="USD",
                     currency_margin="USD",
                     description=inst.description,
-                    exchange="US",
+                    exchange="Futures",
                     raw=inst,
                 )
                 self.logger.debug(
-                    "FR-BROKER-SQ-EQUITY-CATALOG: Retrieved symbol info from database for %s",
+                    "FR-BROKER-SQ-FUTURES-CATALOG: Retrieved symbol info from database for %s",
                     sym_clean,
-                    extra={"fr_id": "FR-BROKER-SQ-EQUITY-CATALOG", "symbol": sym_clean},
+                    extra={
+                        "fr_id": "FR-BROKER-SQ-FUTURES-CATALOG",
+                        "symbol": sym_clean,
+                    },
                 )
                 return StandardResponse.success(
                     data=info,
                     extensions={"broker": self.name, "source": "database"},
                 )
 
-        spec = EQUITY_TICKERS.get(
-            sym_clean, {"name": sym_clean, "exchange": "US", "decimals": 2}
-        )
-        dec = int(spec.get("decimals", 2))
-        info = SymbolInfo(
-            name=sym_clean,
-            visible=True,
-            select=True,
-            digits=dec,
-            point=1.0 / (10**dec),
-            currency_base="USD",
-            currency_profit="USD",
-            currency_margin="USD",
-            raw=spec,
-        )
-        self.logger.debug(
-            "FR-BROKER-SQ-EQUITY-CATALOG: Retrieved symbol info from fallback for %s",
-            sym_clean,
-            extra={"fr_id": "FR-BROKER-SQ-EQUITY-CATALOG", "symbol": sym_clean},
-        )
-        return StandardResponse.success(
-            data=info,
-            extensions={"broker": self.name, "raw": spec, "source": "fallback"},
+        # Lookup in static futures catalog
+        lookup_key = sym_clean if sym_clean.startswith("@") else f"@{sym_clean}"
+        spec = SQ_FUTURES_INSTRUMENTS.get(lookup_key)
+        if spec is not None:
+            digits = int(spec["decimals"])
+            info = SymbolInfo(
+                name=sym_clean,
+                visible=True,
+                select=True,
+                point=float(spec["tick_size"]),
+                digits=digits,
+                trade_contract_size=float(spec["point_value"]),
+                currency_base="USD",
+                currency_profit="USD",
+                currency_margin="USD",
+                description=str(spec["name"]),
+                exchange=str(spec["exchange"]),
+                raw=spec,
+            )
+            self.logger.debug(
+                "FR-BROKER-SQ-FUTURES-CATALOG: Retrieved symbol info from catalog for %s",
+                sym_clean,
+                extra={"fr_id": "FR-BROKER-SQ-FUTURES-CATALOG", "symbol": sym_clean},
+            )
+            return StandardResponse.success(
+                data=info,
+                extensions={"broker": self.name, "source": "catalog"},
+            )
+
+        msg = f"Commodity symbol '{symbol}' not found in host catalog"
+        return StandardResponse.failure(
+            message=msg,
+            error=StandardError(code="SYMBOL_NOT_FOUND", message=msg),
+            extensions={"broker": self.name},
         )
 
     @override
     def get_symbols(
         self, group: str | None = None
     ) -> StandardResponse[list[SymbolInfo]]:
-        """Retrieve list of supported equity tickers."""
+        """Retrieve list of supported futures contracts."""
         res: list[SymbolInfo] = []
-        for sym in EQUITY_TICKERS:
+        for sym in SQ_FUTURES_INSTRUMENTS:
             if not group or group.upper() in sym:
                 info_res = self.get_symbol_info(sym)
                 if info_res.data:
                     res.append(info_res.data)
-        return StandardResponse.success(data=res, extensions={"broker": self.name})
+        return StandardResponse.success(
+            data=res, extensions={"broker": self.name, "source": "catalog"}
+        )
 
     @override
     def get_symbol_tick(self, symbol: str) -> StandardResponse[Tick]:
@@ -278,10 +356,10 @@ class SQEquityBroker(BaseBroker):
                 extensions={"broker": self.name},
             )
         return StandardResponse.failure(
-            message=f"No local Parquet quotes available from SQ Equity for symbol '{symbol}'",
+            message=f"No local Parquet quotes available from SQ Futures for symbol '{symbol}'",
             error=StandardError(
                 code="NO_DATA",
-                message=f"No local Parquet quotes available from SQ Equity for symbol '{symbol}'",
+                message=f"No local Parquet quotes available from SQ Futures for symbol '{symbol}'",
             ),
             extensions={"broker": self.name},
         )
@@ -303,12 +381,20 @@ class SQEquityBroker(BaseBroker):
 
         target_dir = self.store_dir / res_dir / sym_clean
         if not target_dir.exists():
-            msg = f"No local data found for symbol '{symbol}' in {target_dir}"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code="NOT_FOUND", message=msg),
-                extensions={"broker": self.name},
+            # Try without '@' or with '@'
+            alt = (
+                sym_clean.lstrip("@") if sym_clean.startswith("@") else f"@{sym_clean}"
             )
+            alt_dir = self.store_dir / res_dir / alt
+            if alt_dir.exists():
+                target_dir = alt_dir
+            else:
+                msg = f"No local data found for symbol '{symbol}' in {target_dir}"
+                return StandardResponse.failure(
+                    message=msg,
+                    error=StandardError(code="NOT_FOUND", message=msg),
+                    extensions={"broker": self.name},
+                )
 
         try:
             import pyarrow.parquet as pq
@@ -347,11 +433,11 @@ class SQEquityBroker(BaseBroker):
                 bars = bars[-count:]
 
             self.logger.info(
-                "FR-BROKER-SQ-EQUITY-PARQUET-DATA: Loaded %d bars for %s",
+                "FR-BROKER-SQ-FUTURES-PARQUET-DATA: Loaded %d bars for %s",
                 len(bars),
                 symbol,
                 extra={
-                    "fr_id": "FR-BROKER-SQ-EQUITY-PARQUET-DATA",
+                    "fr_id": "FR-BROKER-SQ-FUTURES-PARQUET-DATA",
                     "symbol": symbol,
                     "count": len(bars),
                 },
@@ -371,10 +457,10 @@ class SQEquityBroker(BaseBroker):
 
 
 # Compatibility aliases
-SQEquityProvider = SQEquityBroker
+SQFuturesProvider = SQFuturesBroker
 
 
-def create_adapter(_context: PluginHostContext | None = None) -> SQEquityBroker:
-    """Plugin entrypoint factory constructing SQEquityBroker adapter."""
-    logger.info("Initializing SQ Equity broker plugin adapter.")
-    return SQEquityBroker()
+def create_adapter(_context: PluginHostContext | None = None) -> SQFuturesBroker:
+    """Plugin entrypoint factory constructing SQFuturesBroker adapter."""
+    logger.info("Initializing SQ Futures broker plugin adapter.")
+    return SQFuturesBroker()

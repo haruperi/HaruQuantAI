@@ -1004,3 +1004,117 @@ def test_cli_scan_with_discovered_plugins(
     captured = capsys.readouterr()
     assert "Discovered 1 plugin packages" in captured.out
     assert "CLI Sample Plugin" in captured.out
+
+
+def test_flat_file_manifest_discovery_and_attach(
+    tmp_path: Path,
+    discovery_engine: PluginDiscoveryEngine,
+    lifecycle_manager: PluginLifecycleManager,
+) -> None:
+    """Verify discovery, AST parsing, and attachment of single-file flat plugins."""
+    flat_code = """
+PLUGIN_MANIFEST = {
+    "id": "broker-flat-demo",
+    "name": "Flat Broker Demo",
+    "version": "1.0.0",
+    "slot": "broker",
+    "entrypoint": "create_demo",
+    "capabilities": ["bars", "ticks"],
+    "metadata": {"custom_key": "custom_val"},
+}
+
+class DemoBroker:
+    def __init__(self) -> None:
+        self.name = "DemoBroker"
+
+def create_demo(ctx=None):
+    return DemoBroker()
+"""
+    plugin_file = tmp_path / "flat_demo.py"
+    plugin_file.write_text(flat_code, encoding="utf-8")
+
+    # Discover from parent directory
+    records = discovery_engine.discover([tmp_path])
+    assert "broker-flat-demo" in records
+    rec = records["broker-flat-demo"]
+    assert rec.manifest.name == "Flat Broker Demo"
+    assert rec.manifest.slot == "broker"
+    assert rec.manifest.entrypoint == "flat_demo.py:create_demo"
+    assert rec.state == PluginState.DISCOVERED
+
+    # Attach and verify instance
+    lifecycle_manager.set_records(records)
+    attached = lifecycle_manager.attach("broker-flat-demo")
+    assert attached is True
+    instance = lifecycle_manager.get_instance("broker-flat-demo")
+    assert instance is not None
+    assert getattr(instance, "name", None) == "DemoBroker"
+
+
+def test_flat_file_manifest_non_literal_error(
+    tmp_path: Path, discovery_engine: PluginDiscoveryEngine
+) -> None:
+    """Verify non-literal or malformed AST assignment in flat plugin is rejected."""
+    bad_code = """
+import os
+PLUGIN_MANIFEST = {"id": os.getenv("UNDEFINED_VAR", "bad")}
+"""
+    plugin_file = tmp_path / "bad_flat.py"
+    plugin_file.write_text(bad_code, encoding="utf-8")
+
+    with pytest.raises(ManifestValidationError, match="non-literal"):
+        discovery_engine.parse_manifest_from_python_file(plugin_file, tmp_path)
+
+
+def test_flat_file_reload(
+    tmp_path: Path,
+    discovery_engine: PluginDiscoveryEngine,
+    lifecycle_manager: PluginLifecycleManager,
+) -> None:
+    """Verify reloading a flat-file plugin re-reads updated manifest."""
+    v1_code = """
+PLUGIN_MANIFEST = {
+    "id": "reloadable-flat-plugin",
+    "name": "Reloadable Flat Plugin",
+    "version": "1.0.0",
+    "slot": "broker",
+    "entrypoint": "make_instance",
+}
+
+def make_instance(ctx=None):
+    return {"version": 1}
+"""
+    py_path = tmp_path / "reloadable.py"
+    py_path.write_text(v1_code, encoding="utf-8")
+
+    records = discovery_engine.discover([tmp_path])
+    lifecycle_manager.set_records(records)
+    lifecycle_manager.attach("reloadable-flat-plugin")
+    inst1 = lifecycle_manager.get_instance("reloadable-flat-plugin")
+    assert inst1 == {"version": 1}
+
+    # Update version in file
+    v2_code = v1_code.replace('"1.0.0"', '"2.0.0"').replace(
+        '{"version": 1}', '{"version": 2}'
+    )
+    py_path.write_text(v2_code, encoding="utf-8")
+
+    reloaded = lifecycle_manager.reload("reloadable-flat-plugin")
+    assert reloaded is True
+    rec = lifecycle_manager.get_record("reloadable-flat-plugin")
+    assert rec is not None
+    assert rec.manifest.version == "2.0.0"
+    inst2 = lifecycle_manager.get_instance("reloadable-flat-plugin")
+    assert inst2 == {"version": 2}
+
+
+def test_flat_file_skips_support_and_private_files(
+    tmp_path: Path, discovery_engine: PluginDiscoveryEngine
+) -> None:
+    """Verify files without manifests or internal support modules are skipped."""
+    (tmp_path / "__init__.py").write_text("# init", encoding="utf-8")
+    (tmp_path / "contracts.py").write_text("# contracts", encoding="utf-8")
+    (tmp_path / "helper.py").write_text("def helper(): pass", encoding="utf-8")
+
+    records = discovery_engine.discover([tmp_path])
+    assert len(records) == 0

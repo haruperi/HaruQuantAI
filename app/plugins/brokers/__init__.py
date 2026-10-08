@@ -78,15 +78,15 @@ from app.plugins.brokers.contracts import (
     TradeRequest,
     TradeResult,
 )
-from app.plugins.brokers.crypto.adapter import BinanceBroker
-from app.plugins.brokers.ctrader.adapter import CTraderBroker
-from app.plugins.brokers.darwinex.adapter import DarwinexBroker
-from app.plugins.brokers.dukascopy.adapter import DukascopyBroker
-from app.plugins.brokers.files.adapter import FilesBroker
-from app.plugins.brokers.metatrader.adapter import MetaTraderBroker
-from app.plugins.brokers.sq_equity.adapter import SQEquityBroker
-from app.plugins.brokers.sq_futures.adapter import SQFuturesBroker
-from app.plugins.brokers.yahoo.adapter import YahooBroker
+from app.plugins.brokers.crypto import BinanceBroker
+from app.plugins.brokers.ctrader import CTraderBroker
+from app.plugins.brokers.darwinex import DarwinexBroker
+from app.plugins.brokers.dukascopy import DukascopyBroker
+from app.plugins.brokers.files import FilesBroker
+from app.plugins.brokers.metatrader import MetaTraderBroker
+from app.plugins.brokers.sq_equity import SQEquityBroker
+from app.plugins.brokers.sq_futures import SQFuturesBroker
+from app.plugins.brokers.yahoo import YahooBroker
 
 logger = get_logger(__name__)
 

@@ -83,6 +83,29 @@ from app.workspace.data_manager.data import BarRecord
 
 logger = get_logger(__name__)
 
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "broker-binance",
+    "name": "Binance Crypto Connector",
+    "version": "1.0.0",
+    "description": "Binance cryptocurrency REST market data and execution broker plugin",
+    "author": "HaruQuantAI",
+    "slot": "broker",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": ["bars", "ticks", "symbols", "depth"],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "Binance",
+        "display_name": "Binance Crypto Exchange",
+        "asset_classes": ["Crypto"],
+        "timeframes": ["1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "1d", "1w"],
+        "requires_auth": False,
+        "rate_limit_rps": 20.0,
+        "base_url": "https://api.binance.com",
+    },
+}
+
 BINANCE_SPOT_BASE_URL = "https://api.binance.com"
 BINANCE_FUTURES_USDT_BASE_URL = "https://fapi.binance.com"
 BINANCE_FUTURES_COIN_BASE_URL = "https://dapi.binance.com"
@@ -140,6 +163,9 @@ def _map_timeframe(tf: TimeFrame | str | int) -> str:
     return TIMEFRAME_MAP.get(s, "1m")
 
 
+__all__ = ["BinanceBroker", "CryptoBroker", "CryptoMultiProvider", "create_adapter"]
+
+
 class BinanceBroker(BaseBroker):
     """Binance cryptocurrency market data and execution broker plugin."""
 
@@ -183,7 +209,7 @@ class BinanceBroker(BaseBroker):
         if self.api_key:
             self.session.headers["X-MBX-APIKEY"] = self.api_key
 
-        retry_strategy = Retry(
+        retry_strategy: Any = Retry(
             total=3,
             backoff_factor=0.3,
             status_forcelist=[429, 500, 502, 503, 504],

@@ -79,6 +79,8 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
+import ast
+import contextlib
 import importlib.util
 import json
 import re
@@ -104,6 +106,48 @@ ID_PATTERN: re.Pattern[str] = re.compile(r"^[a-zA-Z0-9_\-\.]{1,100}$")
 
 # Expected number of integer parts in a normalized semantic version
 SEMVER_PARTS_COUNT: int = 3
+
+# Recognized top-level manifest dictionary variable names in flat-file plugins
+MANIFEST_VARIABLE_NAMES: frozenset[str] = frozenset(
+    {"PLUGIN_MANIFEST", "MANIFEST", "__manifest__", "__plugin__"}
+)
+
+
+def _extract_manifest_dict_from_ast(
+    tree: ast.Module, py_path: Path
+) -> dict[str, Any] | None:
+    """Extract literal manifest dictionary from parsed Python AST module."""
+    for stmt in tree.body:
+        target_name: str | None = None
+        val_node: ast.expr | None = None
+
+        if isinstance(stmt, ast.Assign):
+            for target in stmt.targets:
+                if (
+                    isinstance(target, ast.Name)
+                    and target.id in MANIFEST_VARIABLE_NAMES
+                ):
+                    target_name = target.id
+                    val_node = stmt.value
+                    break
+        elif (
+            isinstance(stmt, ast.AnnAssign)
+            and isinstance(stmt.target, ast.Name)
+            and stmt.target.id in MANIFEST_VARIABLE_NAMES
+        ):
+            target_name = stmt.target.id
+            val_node = stmt.value
+
+        if target_name is not None and val_node is not None:
+            try:
+                evaluated = ast.literal_eval(val_node)
+                if isinstance(evaluated, dict):
+                    return evaluated
+            except (ValueError, SyntaxError) as exc:
+                raise ManifestValidationError(
+                    f"Plugin file '{py_path}' has non-literal {target_name}: {exc}"
+                ) from exc
+    return None
 
 
 # -----------------------------------------------------------------------------
@@ -739,6 +783,157 @@ class PluginDiscoveryEngine:
             discovered_at=now,
         )
 
+    def parse_manifest_from_python_file(
+        self, py_path: Path, search_root: Path
+    ) -> PluginManifest | None:
+        """Parse in-file manifest dictionary from a Python module using AST.
+
+        Fires FR-HOST-DISC-MANIFEST-SCHEMA and FR-HOST-DISC-CONTAINMENT-SECURITY.
+        """
+        # 1. Size bounds check
+        try:
+            stat_res = py_path.stat()
+        except OSError as exc:
+            raise ManifestValidationError(
+                f"Cannot access plugin file '{py_path}': {exc}"
+            ) from exc
+
+        if stat_res.st_size > MAX_MANIFEST_BYTES:
+            raise ManifestValidationError(
+                f"Plugin file '{py_path}' exceeds size limit "
+                f"({stat_res.st_size} > {MAX_MANIFEST_BYTES} bytes)"
+            )
+
+        # 2. Containment check
+        self.verify_containment(py_path.parent, search_root)
+
+        # 3. Read and parse AST
+        try:
+            content_str = py_path.read_text(encoding="utf-8")
+            tree = ast.parse(content_str, filename=str(py_path))
+        except UnicodeDecodeError as exc:
+            raise ManifestValidationError(
+                f"Plugin file '{py_path}' is not valid UTF-8: {exc}"
+            ) from exc
+        except SyntaxError as exc:
+            raise ManifestValidationError(
+                f"Plugin file '{py_path}' contains syntax errors: {exc}"
+            ) from exc
+
+        raw_dict = _extract_manifest_dict_from_ast(tree, py_path)
+        if raw_dict is None:
+            return None
+
+        # Normalize entrypoint if not explicitly namespaced with colon
+        if "entrypoint" not in raw_dict:
+            raw_dict["entrypoint"] = f"{py_path.name}:create_adapter"
+        elif ":" not in str(raw_dict["entrypoint"]):
+            raw_dict["entrypoint"] = f"{py_path.name}:{raw_dict['entrypoint']}"
+
+        # 4. Pydantic schema validation
+        try:
+            manifest = PluginManifest.model_validate(raw_dict)
+        except Exception as exc:
+            raise ManifestValidationError(
+                f"Plugin file '{py_path}' schema validation failed: {exc}"
+            ) from exc
+
+        logger.info(
+            "FR-HOST-DISC-MANIFEST-SCHEMA: Validated in-file manifest for plugin '%s' "
+            "(version=%s, slot=%s)",
+            manifest.id,
+            manifest.version,
+            manifest.slot,
+            extra={
+                "fr_id": "FR-HOST-DISC-MANIFEST-SCHEMA",
+                "plugin_id": manifest.id,
+                "version": manifest.version,
+                "slot": manifest.slot,
+            },
+        )
+        return manifest
+
+    def _process_file_candidate(
+        self,
+        candidate_file: Path,
+        search_root: Path,
+        discovered: dict[str, PluginRecord],
+        now: str,
+    ) -> None:
+        """Process a single Python file candidate for plugin manifest discovery."""
+        if candidate_file.name.startswith(("_", ".")) or candidate_file.name in (
+            "contracts.py",
+            "conftest.py",
+        ):
+            return
+
+        try:
+            manifest = self.parse_manifest_from_python_file(candidate_file, search_root)
+        except (ManifestValidationError, SecurityViolationError) as exc:
+            logger.exception(
+                "FR-HOST-DISC-MANIFEST-SCHEMA: Rejected invalid plugin in '%s'",
+                candidate_file.name,
+                extra={
+                    "fr_id": "FR-HOST-DISC-MANIFEST-SCHEMA",
+                    "candidate_file": candidate_file.name,
+                    "error": str(exc),
+                },
+            )
+            return
+
+        if manifest is None:
+            return
+
+        # Check for duplicate ID
+        if manifest.id in discovered:
+            existing = discovered[manifest.id]
+            dup_err = (
+                f"Duplicate plugin ID '{manifest.id}' in '{candidate_file}' "
+                f"conflicting with '{existing.package_dir}'"
+            )
+            logger.error(
+                "FR-HOST-DISC-MANIFEST-SCHEMA: %s",
+                dup_err,
+                extra={
+                    "fr_id": "FR-HOST-DISC-MANIFEST-SCHEMA",
+                    "plugin_id": manifest.id,
+                },
+            )
+            discovered[manifest.id] = PluginRecord(
+                manifest=existing.manifest,
+                state=PluginState.INCOMPATIBLE,
+                package_dir=existing.package_dir,
+                error_message=dup_err,
+                discovered_at=existing.discovered_at,
+            )
+            return
+
+        # Check slot compatibility
+        state = PluginState.DISCOVERED
+        err_message: str | None = None
+        if not self.slot_registry.has_slot(manifest.slot):
+            state = PluginState.INCOMPATIBLE
+            err_message = f"Target slot '{manifest.slot}' is not registered in host"
+            logger.warning(
+                "FR-HOST-DISC-SLOT-REGISTRATION: Plugin '%s' declared "
+                "unregistered slot '%s'",
+                manifest.id,
+                manifest.slot,
+                extra={
+                    "fr_id": "FR-HOST-DISC-SLOT-REGISTRATION",
+                    "plugin_id": manifest.id,
+                    "slot": manifest.slot,
+                },
+            )
+
+        discovered[manifest.id] = PluginRecord(
+            manifest=manifest,
+            state=state,
+            package_dir=str(candidate_file.parent.resolve()),
+            error_message=err_message,
+            discovered_at=now,
+        )
+
     def discover(self, search_paths: Sequence[Path | str]) -> dict[str, PluginRecord]:
         """Scan candidate search paths and discover all valid plugin manifests.
 
@@ -753,9 +948,13 @@ class PluginDiscoveryEngine:
                 continue
 
             search_root = path.resolve()
-            for candidate_dir in search_root.iterdir():
-                if candidate_dir.is_dir():
-                    self._process_candidate(candidate_dir, search_root, discovered, now)
+            for candidate in search_root.iterdir():
+                if candidate.is_dir():
+                    self._process_candidate(candidate, search_root, discovered, now)
+                elif candidate.is_file() and candidate.suffix == ".py":
+                    self._process_file_candidate(
+                        candidate, search_root, discovered, now
+                    )
 
         return discovered
 
@@ -1196,7 +1395,19 @@ class PluginLifecycleManager:
         if not manifest_file.exists():
             manifest_file = package_dir / "manifest.json"
 
+        # Check for single-file flat plugin
+        py_file: Path | None = None
         if not manifest_file.exists():
+            target = rec.manifest.entrypoint.split(":", 1)[0]
+            cand_py = (
+                package_dir / target
+                if target.endswith(".py")
+                else package_dir / f"{target}.py"
+            )
+            if cand_py.is_file():
+                py_file = cand_py
+
+        if not manifest_file.exists() and py_file is None:
             logger.error(
                 "FR-HOST-DISC-LIFECYCLE-MANAGEMENT: Manifest missing on reload of '%s'",
                 plugin_id,
@@ -1208,9 +1419,18 @@ class PluginLifecycleManager:
             return False
 
         try:
-            new_manifest = self.engine.parse_manifest_file(
-                manifest_file, package_dir.parent
-            )
+            if py_file is not None:
+                new_manifest = self.engine.parse_manifest_from_python_file(
+                    py_file, package_dir
+                )
+                if new_manifest is None:
+                    raise ManifestValidationError(
+                        f"No manifest found in '{py_file}' on reload"
+                    )
+            else:
+                new_manifest = self.engine.parse_manifest_file(
+                    manifest_file, package_dir.parent
+                )
             self._records[plugin_id] = PluginRecord(
                 manifest=new_manifest,
                 state=PluginState.VALIDATED,
@@ -1247,43 +1467,43 @@ class PluginLifecycleManager:
         )
         return True
 
-    def _load_entrypoint(
-        self, package_dir: Path, entrypoint_spec: str
+    def _load_file_entrypoint(
+        self, package_dir: Path, py_file: Path, attr: str
     ) -> Callable[..., Any]:
-        """Safely load entrypoint callable from package directory."""
-        target, attr = entrypoint_spec.split(":", 1)
+        """Load callable entrypoint from an on-disk Python file."""
+        if not py_file.is_file():
+            raise FileNotFoundError(f"Entrypoint file '{py_file}' not found")
 
-        is_file_target = (
-            target.endswith(".py")
-            or (package_dir / f"{target}.py").exists()
-            or (package_dir / target).is_file()
-        )
-        if is_file_target:
-            py_file = (
-                package_dir / target
-                if target.endswith(".py")
-                else package_dir / f"{target}.py"
+        self.engine.verify_containment(py_file.parent, package_dir)
+
+        # Remove stale pyc to ensure immediate reload reflects latest code
+        pycache_dir = py_file.parent / "__pycache__"
+        if pycache_dir.is_dir():
+            for pyc in pycache_dir.glob(f"{py_file.stem}*.pyc"):
+                with contextlib.suppress(OSError):
+                    pyc.unlink(missing_ok=True)
+
+        mod_name = f"haru_plugin_{package_dir.name}_{py_file.stem}"
+        importlib.invalidate_caches()
+        sys.modules.pop(mod_name, None)
+        spec = importlib.util.spec_from_file_location(mod_name, py_file)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Cannot create module spec for '{py_file}'")
+
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[mod_name] = module
+        spec.loader.exec_module(module)
+        factory = getattr(module, attr, None)
+        if factory is None or not callable(factory):
+            raise AttributeError(
+                f"Module '{py_file}' has no callable attribute '{attr}'"
             )
-            if not py_file.is_file():
-                raise FileNotFoundError(f"Entrypoint file '{py_file}' not found")
+        return cast("Callable[..., Any]", factory)
 
-            self.engine.verify_containment(py_file.parent, package_dir)
-
-            mod_name = f"haru_plugin_{package_dir.name}_{py_file.stem}"
-            spec = importlib.util.spec_from_file_location(mod_name, py_file)
-            if spec is None or spec.loader is None:
-                raise ImportError(f"Cannot create module spec for '{py_file}'")
-
-            module = importlib.util.module_from_spec(spec)
-            sys.modules[mod_name] = module
-            spec.loader.exec_module(module)
-            factory = getattr(module, attr, None)
-            if factory is None or not callable(factory):
-                raise AttributeError(
-                    f"Module '{py_file}' has no callable attribute '{attr}'"
-                )
-            return cast("Callable[..., Any]", factory)
-
+    def _load_module_entrypoint(
+        self, package_dir: Path, target: str, attr: str
+    ) -> Callable[..., Any]:
+        """Load callable entrypoint by importing module from package parent."""
         pkg_parent_str = str(package_dir.parent.resolve())
         sys_path_added = False
         if pkg_parent_str not in sys.path:
@@ -1301,6 +1521,27 @@ class PluginLifecycleManager:
         finally:
             if sys_path_added and pkg_parent_str in sys.path:
                 sys.path.remove(pkg_parent_str)
+
+    def _load_entrypoint(
+        self, package_dir: Path, entrypoint_spec: str
+    ) -> Callable[..., Any]:
+        """Safely load entrypoint callable from package directory."""
+        target, attr = entrypoint_spec.split(":", 1)
+
+        is_file_target = (
+            target.endswith(".py")
+            or (package_dir / f"{target}.py").exists()
+            or (package_dir / target).is_file()
+        )
+        if is_file_target:
+            py_file = (
+                package_dir / target
+                if target.endswith(".py")
+                else package_dir / f"{target}.py"
+            )
+            return self._load_file_entrypoint(package_dir, py_file, attr)
+
+        return self._load_module_entrypoint(package_dir, target, attr)
 
 
 # -----------------------------------------------------------------------------

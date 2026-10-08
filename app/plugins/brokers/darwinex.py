@@ -78,13 +78,36 @@ from app.workspace.data_manager.instruments import InstrumentService
 
 logger = get_logger(__name__)
 
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "broker-darwinex",
+    "name": "Darwinex Connector",
+    "version": "1.0.0",
+    "description": "Darwinex institutional tick and bar market data provider and broker plugin",
+    "author": "HaruQuantAI",
+    "slot": "broker",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": ["bars", "ticks", "symbols"],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "Darwinex",
+        "display_name": "Darwinex Tick & Bar Feeds",
+        "asset_classes": ["Forex", "CFD"],
+        "timeframes": ["M1", "H1", "D1"],
+        "requires_auth": True,
+        "rate_limit_rps": 5.0,
+        "base_url": "https://api.darwinex.com",
+    },
+}
+
 SQX_DARWINEX_CDN = "https://cdn.strategyquantcdn.com/data/darwinex"
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
 
-DEFAULT_DATA_DIR = Path(__file__).resolve().parents[4] / "data" / "market"
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
 
 # Core embedded instruments from DarwinexCatalog
 DARWINEX_INSTRUMENTS: dict[str, dict[str, Any]] = {
@@ -134,6 +157,9 @@ DARWINEX_INSTRUMENTS: dict[str, dict[str, Any]] = {
     "NAS100": {"decimals": 2, "tick_value": 1.0, "tick_size": 0.01, "tick_step": 0.01},
     "AAPL": {"decimals": 2, "tick_value": 1.0, "tick_size": 0.01, "tick_step": 0.01},
 }
+
+
+__all__ = ["DarwinexBroker", "DarwinexProvider", "create_adapter"]
 
 
 class DarwinexBroker(BaseBroker):
@@ -305,9 +331,9 @@ class DarwinexBroker(BaseBroker):
             name=sym_clean,
             visible=True,
             select=True,
-            point=spec["tick_step"],
-            digits=spec["decimals"],
-            trade_contract_size=spec["tick_value"],
+            point=float(spec["tick_step"]),
+            digits=int(spec["decimals"]),
+            trade_contract_size=float(spec["tick_value"]),
             currency_base=sym_clean[:3] if len(sym_clean) >= 6 else "USD",
             currency_profit=sym_clean[3:6] if len(sym_clean) >= 6 else "USD",
             raw=spec,

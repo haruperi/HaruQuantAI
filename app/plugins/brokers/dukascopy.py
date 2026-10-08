@@ -88,6 +88,29 @@ from app.workspace.data_manager.instruments import InstrumentService
 
 logger = get_logger(__name__)
 
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "broker-dukascopy",
+    "name": "Dukascopy Connector",
+    "version": "1.0.0",
+    "description": "Dukascopy Bank SA tick and historical bar data provider and broker plugin",
+    "author": "HaruQuantAI",
+    "slot": "broker",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": ["bars", "ticks", "symbols"],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "Dukascopy",
+        "display_name": "Dukascopy Bank SA",
+        "asset_classes": ["Forex", "Commodities", "Indices"],
+        "timeframes": ["M1", "H1", "D1"],
+        "requires_auth": False,
+        "rate_limit_rps": 10.0,
+        "base_url": "https://datafeed.dukascopy.com",
+    },
+}
+
 SQX_CDN_BASE_URL = "https://cdn.strategyquantcdn.com/data/dukascopy"
 DUKASCOPY_FEED_HTTPS = "https://datafeed.dukascopy.com/datafeed"
 USER_AGENT = (
@@ -95,7 +118,7 @@ USER_AGENT = (
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
 
-DEFAULT_DATA_DIR = Path(__file__).resolve().parents[4] / "data" / "market"
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
 
 KNOWN_SYMBOLS: dict[str, dict[str, Any]] = {
     "EURUSD": {
@@ -178,6 +201,9 @@ def _decompress_bi5(data: bytes) -> bytes:
         return b""
 
 
+__all__ = ["DukascopyBroker", "DukascopyProvider", "create_adapter"]
+
+
 class DukascopyBroker(BaseBroker):
     """Dukascopy datafeed broker plugin."""
 
@@ -198,7 +224,7 @@ class DukascopyBroker(BaseBroker):
         )
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": USER_AGENT})
-        retry_strategy = Retry(
+        retry_strategy: Any = Retry(
             total=3,
             backoff_factor=0.3,
             status_forcelist=[429, 500, 502, 503, 504],
@@ -356,11 +382,13 @@ class DukascopyBroker(BaseBroker):
             name=sym_clean,
             visible=True,
             select=True,
-            point=spec["pip_size"] / 10.0
-            if spec["decimals"] in (3, 5)
-            else spec["pip_size"],
-            digits=spec["decimals"],
-            trade_contract_size=spec["point_size"],
+            point=(
+                float(spec["pip_size"]) / 10.0
+                if int(spec["decimals"]) in (3, 5)
+                else float(spec["pip_size"])
+            ),
+            digits=int(spec["decimals"]),
+            trade_contract_size=float(spec["point_size"]),
             currency_base=sym_clean[:3] if len(sym_clean) >= 6 else "USD",
             currency_profit=sym_clean[3:6] if len(sym_clean) >= 6 else "USD",
             raw=spec,

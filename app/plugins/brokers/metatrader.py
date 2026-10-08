@@ -96,15 +96,59 @@ from app.workspace.data_manager.connections import (
 )
 from app.workspace.data_manager.data import BarRecord
 
-mt5: Any = None
+
+class _MissingMetaTrader5:
+    """Sentinel placeholder when MetaTrader 5 binary package is not installed."""
+
+    def __bool__(self) -> bool:
+        return False
+
+    def __getattr__(self, name: str) -> Any:
+        return None
+
+
+mt5: Any = _MissingMetaTrader5()
 try:
     import MetaTrader5 as _mt5_mod  # pyright: ignore[reportMissingImports] # type: ignore[import-untyped,import-not-found]
 
     mt5 = _mt5_mod
 except ImportError:
-    mt5 = None
+    pass
 
 logger = get_logger(__name__)
+
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "data-source-metatrader",
+    "name": "MetaTrader Connector",
+    "version": "1.0.0",
+    "description": "MetaTrader 5 terminal connector and data provider plugin",
+    "author": "HaruQuantAI",
+    "slot": "broker",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": [
+        "trading",
+        "bars",
+        "ticks",
+        "depth",
+        "account",
+        "orders",
+        "positions",
+    ],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "MetaTrader5",
+        "display_name": "MetaTrader 5 Connector",
+        "asset_classes": ["Forex", "Futures", "Indices", "Stocks"],
+        "timeframes": ["M1", "M5", "M15", "H1", "D1"],
+        "requires_auth": False,
+        "rate_limit_rps": 50.0,
+    },
+}
+
+
+__all__ = ["MetaTraderBroker", "create_adapter"]
 
 
 class MetaTraderBroker(BaseBroker):
@@ -205,7 +249,7 @@ class MetaTraderBroker(BaseBroker):
 
     def _ensure_module(self) -> StandardResponse[Any] | None:
         """Validate that MetaTrader5 package is available."""
-        if mt5 is None:
+        if not mt5 or isinstance(mt5, _MissingMetaTrader5):
             msg = "MetaTrader5 Python module is not installed."
             self.logger.error("FR-BROKER-MT5-SESSION-LIFECYCLE: %s", msg)
             return StandardResponse.failure(
@@ -278,7 +322,7 @@ class MetaTraderBroker(BaseBroker):
 
     def _detect_symbol_filling(self, symbol: str) -> int:
         """Determine appropriate filling mode based on symbol capabilities."""
-        if mt5 is None:
+        if not mt5 or isinstance(mt5, _MissingMetaTrader5):
             return 1
         info = mt5.symbol_info(symbol)
         if not info:
@@ -1235,7 +1279,12 @@ class MetaTraderBroker(BaseBroker):
         type_int = self._map_order_type(request.type)
 
         price = request.price
-        if (price is None or price <= 0) and request.symbol and mt5 is not None:
+        if (
+            (price is None or price <= 0)
+            and request.symbol
+            and mt5
+            and not isinstance(mt5, _MissingMetaTrader5)
+        ):
             tick = mt5.symbol_info_tick(request.symbol)
             if tick:
                 price = tick.ask if type_int == 0 else tick.bid

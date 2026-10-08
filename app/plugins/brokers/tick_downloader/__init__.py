@@ -1,1 +1,0 @@
-"""Tick Downloader plugin package."""

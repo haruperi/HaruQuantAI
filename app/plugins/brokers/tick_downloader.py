@@ -33,7 +33,7 @@ CLI Usage:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import override
+from typing import Any, override
 
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
@@ -47,7 +47,32 @@ from app.workspace.data_manager.data import BarRecord
 
 logger = get_logger(__name__)
 
-DEFAULT_DATA_DIR = Path(__file__).resolve().parents[4] / "data" / "market"
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "data-source-tick-downloader",
+    "name": "Tick Data Downloader",
+    "version": "1.0.0",
+    "description": "High-precision tick and trade volume historical data downloader plugin",
+    "author": "HaruQuantAI",
+    "slot": "data.provider",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": [],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "TickDownloader",
+        "display_name": "Tick Data Downloader",
+        "asset_classes": ["Forex", "Futures", "Crypto"],
+        "timeframes": ["TICK", "M1"],
+        "requires_auth": False,
+        "rate_limit_rps": 20.0,
+    },
+}
+
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
+
+
+__all__ = ["TickDownloaderProvider", "create_adapter"]
 
 
 class TickDownloaderProvider(BaseDataProvider):

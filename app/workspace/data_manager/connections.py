@@ -329,7 +329,7 @@ class BinanceProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.crypto.adapter import BinanceBroker
+        from app.plugins.brokers.crypto import BinanceBroker
 
         broker = BinanceBroker(default_market=self._variant)
         dt_from = _parse_iso(request.date_from)
@@ -463,7 +463,7 @@ class DarwinexProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.darwinex.adapter import DarwinexBroker
+        from app.plugins.brokers.darwinex import DarwinexBroker
 
         broker = DarwinexBroker()
         dt_from = _parse_iso(request.date_from)
@@ -510,7 +510,7 @@ class DukascopyProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.dukascopy.adapter import DukascopyBroker
+        from app.plugins.brokers.dukascopy import DukascopyBroker
 
         broker = DukascopyBroker()
         dt_from = _parse_iso(request.date_from)
@@ -556,7 +556,7 @@ class MT5Provider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.metatrader.adapter import MetaTraderBroker
+        from app.plugins.brokers.metatrader import MetaTraderBroker
 
         broker = MetaTraderBroker()
         dt_from = _parse_iso(request.date_from)
@@ -602,7 +602,7 @@ class SQEquityProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.sq_equity.adapter import SQEquityBroker
+        from app.plugins.brokers.sq_equity import SQEquityBroker
 
         broker = SQEquityBroker()
         dt_from = _parse_iso(request.date_from)
@@ -648,7 +648,7 @@ class SQFuturesProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.sq_futures.adapter import SQFuturesBroker
+        from app.plugins.brokers.sq_futures import SQFuturesBroker
 
         broker = SQFuturesBroker()
         dt_from = _parse_iso(request.date_from)
@@ -724,7 +724,7 @@ class YahooProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.yahoo.adapter import YahooBroker
+        from app.plugins.brokers.yahoo import YahooBroker
 
         broker = YahooBroker()
         dt_from = _parse_iso(request.date_from)

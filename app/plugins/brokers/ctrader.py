@@ -90,9 +90,20 @@ from app.workspace.data_manager.connections import (
 )
 from app.workspace.data_manager.data import BarRecord
 
-commonmsg: Any = None
-modelmsg: Any = None
-oamsg: Any = None
+
+class _MissingCTraderOpenAPI:
+    """Sentinel placeholder when ctrader_open_api package is not installed."""
+
+    def __bool__(self) -> bool:
+        return False
+
+    def __getattr__(self, name: str) -> Any:
+        return None
+
+
+commonmsg: Any = _MissingCTraderOpenAPI()
+modelmsg: Any = _MissingCTraderOpenAPI()
+oamsg: Any = _MissingCTraderOpenAPI()
 try:
     from ctrader_open_api.messages import (  # pyright: ignore[reportMissingImports] # type: ignore[import-untyped,import-not-found]
         OpenApiCommonMessages_pb2 as _cmsg,
@@ -108,11 +119,33 @@ try:
     oamsg = _omsg
     modelmsg = _mmsg
 except ImportError:
-    commonmsg = None
-    modelmsg = None
-    oamsg = None
+    pass
 
 logger = get_logger(__name__)
+
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "manifest_version": 1,
+    "id": "broker-ctrader",
+    "name": "cTrader Open API Broker",
+    "version": "1.0.0",
+    "description": "Spotware cTrader Open API v2 Protocol Buffers execution and market data broker plugin",
+    "author": "HaruQuantAI",
+    "slot": "broker",
+    "entrypoint": "create_adapter",
+    "dependencies": [],
+    "capabilities": ["trading", "market_data", "account_sync"],
+    "enabled": True,
+    "metadata": {
+        "provider_name": "cTrader",
+        "display_name": "cTrader Open API",
+        "asset_classes": ["Forex", "Indices", "Commodities", "Crypto"],
+        "timeframes": ["M1", "M5", "M15", "H1", "D1"],
+        "requires_auth": True,
+    },
+}
+
+
+__all__ = ["CTraderBroker", "create_adapter"]
 
 
 class CTraderBroker(BaseBroker):
@@ -234,7 +267,12 @@ class CTraderBroker(BaseBroker):
 
     def _ensure_module(self) -> StandardResponse[Any] | None:
         """Verify protobuf modules are available."""
-        if oamsg is None or modelmsg is None or commonmsg is None:
+        if (
+            not oamsg
+            or not modelmsg
+            or not commonmsg
+            or isinstance(commonmsg, _MissingCTraderOpenAPI)
+        ):
             msg = "cTrader Open API protobuf modules not available."
             self.logger.error("FR-BROKER-CTRADER-TLS-AUTH: %s", msg)
             return StandardResponse.failure(
