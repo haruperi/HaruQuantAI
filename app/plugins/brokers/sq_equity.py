@@ -2,43 +2,36 @@
 
 Description:
     Implements a specialized market data broker plugin accessing StrategyQuant
-    US Equity historical tick and candlestick archives stored as local Parquet
-    files under `data/market/sq_equity`.
+    US Equity historical candlestick archives stored as local Parquet files
+    under `data/market/sq_equity`.
     Within HaruQuantAI, this module provides fast local access to normalized US
-    equity datasets (e.g. AAPL, MSFT, TSLA, NVDA, SPY, QQQ) without requiring
-    remote API credentials or network connections.
-    Because SQ Equity is an offline historical archive provider, trading operations
-    and live session controls are rejected with canonical capability unsupported
-    errors (`BaseBroker._unsupported()`).
+    equity datasets (e.g. AAPL, MSFT, TSLA, NVDA, SPY, QQQ) and fulfills Data
+    Manager workspace download requests (`download_bars()`) alongside `get_bars()`.
+    All non-download and trading methods cleanly fallback to BaseBroker default
+    unsupported capability handling.
 
 Purpose:
     FEAT-BROKER-SQ-EQUITY: StrategyQuant US Equity Local Parquet Datafeed.
-    Provides fast, offline historical equity bar and tick extraction from
-    filesystem Parquet archives.
+    Provides fast, offline historical equity bar extraction and Data Manager
+    downloads from filesystem Parquet archives.
 
 Key Capabilities:
-    - FR-BROKER-SQ-EQUITY-CATALOG: US Equity Ticker Specifications
-      Associated: `[SQEquityBroker.get_symbol_info()]`,
-      `[SQEquityBroker.get_symbols()]`
-      Logging: Emits DEBUG log when returning equity metadata.
     - FR-BROKER-SQ-EQUITY-PARQUET-DATA: Parquet Historical Bar Ingestion
-      Associated: `[SQEquityBroker.get_bars()]`,
-      `[SQEquityBroker._read_local_parquet()]`
+      Associated: `[SQEquityBroker.get_bars()]`
       Logging: Emits INFO log upon successfully parsing Parquet partitions,
       and WARNING log if files are missing or empty.
-    - FR-BROKER-SQ-EQUITY-TRADE-REJECTION: Unsupported Trade Capability Rejection
-      Associated: `[SQEquityBroker.trade()]`, `[SQEquityBroker.check_order()]`
-      Logging: Emits WARNING log declaring trading capabilities unsupported.
+    - FR-BROKER-SQ-EQUITY-DOWNLOAD: Data Manager Bar Download Pipeline
+      Associated: `[SQEquityBroker.download_bars()]`, `[create_adapter()]`
+      Logging: Emits delegated telemetry through get_bars and cancellation checks.
 
 Python API Usage:
     ```python
-    from app.plugins.brokers import TimeFrame, sq_equity
+    from app.plugins.brokers.sq_equity import SQEquityBroker, create_adapter
 
-    # Read historical AAPL daily bars from local Parquet archive
-    bars_resp = sq_equity.get_bars("AAPL", timeframe=TimeFrame.D1, count=5)
+    broker = create_adapter()
+    bars_resp = broker.get_bars("AAPL", count=5)
     if bars_resp.is_success:
-        assert len(bars_resp.data) == 5
-        print(f"Latest AAPL close: {bars_resp.data[-1].close}")
+        assert len(bars_resp.data) > 0
     ```
 
 CLI Usage:
@@ -49,7 +42,7 @@ CLI Usage:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any, override
 
@@ -62,8 +55,6 @@ from app.plugins.brokers.contracts import (
     BrokerCapability,
     StandardError,
     StandardResponse,
-    SymbolInfo,
-    Tick,
     TimeFrame,
 )
 from app.workspace.data_manager.connections import (
@@ -72,7 +63,6 @@ from app.workspace.data_manager.connections import (
     ProviderCapabilities,
 )
 from app.workspace.data_manager.data import BarRecord
-from app.workspace.data_manager.instruments import InstrumentService
 
 logger = get_logger(__name__)
 
@@ -81,12 +71,12 @@ PLUGIN_MANIFEST: dict[str, Any] = {
     "id": "broker-sq-equity",
     "name": "StrategyQuant US Equities Connector",
     "version": "1.0.0",
-    "description": "StrategyQuant US Equities historical parquet data and broker plugin",
+    "description": "StrategyQuant US Equities historical parquet data and provider plugin",
     "author": "HaruQuantAI",
     "slot": "broker",
     "entrypoint": "create_adapter",
     "dependencies": [],
-    "capabilities": ["bars", "symbols"],
+    "capabilities": ["bars"],
     "enabled": True,
     "metadata": {
         "provider_name": "SQEquity",
@@ -135,18 +125,12 @@ class SQEquityBroker(BaseBroker):
         """Initialize SQ Equity broker plugin."""
         super().__init__(
             name=name,
-            capabilities=(
-                BrokerCapability.CONNECT
-                | BrokerCapability.MARKET_DATA
-                | BrokerCapability.SYMBOLS
-            ),
+            capabilities=BrokerCapability.MARKET_DATA,
         )
         self.store_dir = (
             Path(store_dir) if store_dir else DEFAULT_DATA_DIR / "sq_equity"
         )
         self._db = db
-        self._instruments_service = InstrumentService(db) if db else None
-        self._connected = True
 
     @property
     def provider_capabilities(self) -> ProviderCapabilities:
@@ -189,127 +173,6 @@ class SQEquityBroker(BaseBroker):
                 for b in bars_resp.data
             ]
         return []
-
-    @override
-    def connect(self, **kwargs: Any) -> StandardResponse[bool]:
-        """Verify presence of local market data store or connection."""
-        self._connected = self.store_dir.exists()
-        self.logger.info(
-            "FR-BROKER-SQ-EQUITY-CATALOG: Connected to SQ Equity datafeed. Directory exists: %s",
-            self._connected,
-            extra={"fr_id": "FR-BROKER-SQ-EQUITY-CATALOG"},
-        )
-        return StandardResponse.success(
-            data=True,
-            message="SQ Equity store ready",
-            extensions={"broker": self.name},
-        )
-
-    @override
-    def is_connected(self) -> StandardResponse[bool]:
-        """Check active state."""
-        return StandardResponse.success(
-            data=self._connected, extensions={"broker": self.name}
-        )
-
-    @override
-    def disconnect(self) -> StandardResponse[bool]:
-        """Disconnect session."""
-        self._connected = False
-        return StandardResponse.success(data=True, extensions={"broker": self.name})
-
-    @override
-    def get_symbol_info(self, symbol: str) -> StandardResponse[SymbolInfo]:
-        """Retrieve stock metadata from host catalog or fallback."""
-        sym_clean = symbol.upper().strip()
-        if self._instruments_service is not None:
-            inst = self._instruments_service.get_instrument(sym_clean)
-            if inst is not None:
-                info = SymbolInfo(
-                    name=sym_clean,
-                    visible=True,
-                    select=True,
-                    digits=inst.decimals,
-                    point=inst.tick_size,
-                    currency_base="USD",
-                    currency_profit="USD",
-                    currency_margin="USD",
-                    description=inst.description,
-                    exchange="US",
-                    raw=inst,
-                )
-                self.logger.debug(
-                    "FR-BROKER-SQ-EQUITY-CATALOG: Retrieved symbol info from database for %s",
-                    sym_clean,
-                    extra={"fr_id": "FR-BROKER-SQ-EQUITY-CATALOG", "symbol": sym_clean},
-                )
-                return StandardResponse.success(
-                    data=info,
-                    extensions={"broker": self.name, "source": "database"},
-                )
-
-        spec = EQUITY_TICKERS.get(
-            sym_clean, {"name": sym_clean, "exchange": "US", "decimals": 2}
-        )
-        dec = int(spec.get("decimals", 2))
-        info = SymbolInfo(
-            name=sym_clean,
-            visible=True,
-            select=True,
-            digits=dec,
-            point=1.0 / (10**dec),
-            currency_base="USD",
-            currency_profit="USD",
-            currency_margin="USD",
-            raw=spec,
-        )
-        self.logger.debug(
-            "FR-BROKER-SQ-EQUITY-CATALOG: Retrieved symbol info from fallback for %s",
-            sym_clean,
-            extra={"fr_id": "FR-BROKER-SQ-EQUITY-CATALOG", "symbol": sym_clean},
-        )
-        return StandardResponse.success(
-            data=info,
-            extensions={"broker": self.name, "raw": spec, "source": "fallback"},
-        )
-
-    @override
-    def get_symbols(
-        self, group: str | None = None
-    ) -> StandardResponse[list[SymbolInfo]]:
-        """Retrieve list of supported equity tickers."""
-        res: list[SymbolInfo] = []
-        for sym in EQUITY_TICKERS:
-            if not group or group.upper() in sym:
-                info_res = self.get_symbol_info(sym)
-                if info_res.data:
-                    res.append(info_res.data)
-        return StandardResponse.success(data=res, extensions={"broker": self.name})
-
-    @override
-    def get_symbol_tick(self, symbol: str) -> StandardResponse[Tick]:
-        """Retrieve latest known quote tick for symbol."""
-        bars_res = self.get_bars(symbol=symbol, count=1)
-        now = datetime.now(UTC)
-        if bars_res.is_success and bars_res.data:
-            last_bar = bars_res.data[-1]
-            return StandardResponse.success(
-                data=Tick(
-                    time=last_bar.time,
-                    bid=last_bar.close,
-                    ask=last_bar.close,
-                    last=last_bar.close,
-                ),
-                extensions={"broker": self.name},
-            )
-        return StandardResponse.failure(
-            message=f"No local Parquet quotes available from SQ Equity for symbol '{symbol}'",
-            error=StandardError(
-                code="NO_DATA",
-                message=f"No local Parquet quotes available from SQ Equity for symbol '{symbol}'",
-            ),
-            extensions={"broker": self.name},
-        )
 
     @override
     def get_bars(

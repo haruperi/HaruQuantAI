@@ -4,13 +4,12 @@ Description:
     Implements a specialized market data broker plugin for Dukascopy Swiss FX
     marketplace historical data and tick archives.
     Within HaruQuantAI, Dukascopy serves as a primary source for high-precision
-    historical backtesting data. The plugin supports downloading and decompressing
-    raw `.bi5` binary files (LZMA compressed struct arrays) from Dukascopy web
-    servers, fetching consolidated candles from StrategyQuant CDN servers, and
-    reading cached Parquet archives from `data/market/dukascopy`.
-    Because Dukascopy is utilized exclusively for market data extraction in this
-    subsystem, all order routing, trading, and execution methods return canonical
-    unsupported capability responses (`BaseBroker._unsupported()`).
+    historical backtesting data and Data Manager workspace downloads. The plugin
+    supports downloading and decompressing raw `.bi5` binary files (LZMA compressed
+    struct arrays) from StrategyQuant CDN servers, reading cached Parquet archives
+    from `data/market/dukascopy`, and fulfilling uniform `download_bars()` requests.
+    All non-download and trading methods cleanly fallback to BaseBroker default
+    unsupported capability handling.
 
 Purpose:
     FEAT-BROKER-DUKASCOPY: High-Precision Historical FX Tick and Bar Extraction.
@@ -18,32 +17,26 @@ Purpose:
     Parquet reading for Dukascopy market data feeds.
 
 Key Capabilities:
-    - FR-BROKER-DUKASCOPY-CATALOG: Swiss FX/CFD Contract Specifications
-      Associated: `[DukascopyBroker.get_symbol_info()]`,
-      `[DukascopyBroker.get_symbols()]`
-      Logging: Emits DEBUG log when returning symbol specifications.
     - FR-BROKER-DUKASCOPY-TICK-DECOMPRESS: Bi5 Binary LZMA Tick Parsing
-      Associated: `[DukascopyBroker._download_bi5_ticks()]`,
-      `[DukascopyBroker._parse_bi5_ticks()]`
-      Logging: Emits DEBUG log with decompressed tick counts and WARNING log
-      on HTTP 404 or corrupted archives.
+      Associated: `[DukascopyBroker.get_bars()]`, `[_decompress_bi5()]`
+      Logging: Emits INFO log upon successfully downloading and parsing CDN bars,
+      and DEBUG log on decompression or network failures.
     - FR-BROKER-DUKASCOPY-LOCAL-STORE: Parquet Archive Ingestion
-      Associated: `[DukascopyBroker.get_bars()]`,
-      `[DukascopyBroker._read_local_parquet()]`
-      Logging: Emits INFO log upon reading local Parquet partitions.
-    - FR-BROKER-DUKASCOPY-TRADE-REJECTION: Unsupported Trade Capability Rejection
-      Associated: `[DukascopyBroker.trade()]`, `[DukascopyBroker.check_order()]`
-      Logging: Emits WARNING log declaring trading capabilities unsupported.
+      Associated: `[DukascopyBroker.get_bars()]`, `[DukascopyBroker.get_ticks()]`
+      Logging: Emits INFO log upon reading local Parquet partitions, and DEBUG
+      log on partition read errors.
+    - FR-BROKER-DUKASCOPY-DOWNLOAD: Data Manager Bar Download Pipeline
+      Associated: `[DukascopyBroker.download_bars()]`, `[create_adapter()]`
+      Logging: Emits delegated telemetry through get_bars and cancellation checks.
 
 Python API Usage:
     ```python
-    from app.plugins.brokers import dukascopy
+    from app.plugins.brokers.dukascopy import DukascopyBroker, create_adapter
 
-    # Verify Dukascopy instrument specification
-    sym_resp = dukascopy.get_symbol_info("EURUSD")
-    if sym_resp.is_success:
-        assert sym_resp.data.point == 0.00001
-        print(f"Contract Size: {sym_resp.data.trade_contract_size}")
+    broker = create_adapter()
+    bars_resp = broker.get_bars("EURUSD", count=10)
+    if bars_resp.is_success:
+        assert len(bars_resp.data) > 0
     ```
 
 CLI Usage:
@@ -72,9 +65,7 @@ from app.plugins.brokers.contracts import (
     Bar,
     BaseBroker,
     BrokerCapability,
-    StandardError,
     StandardResponse,
-    SymbolInfo,
     Tick,
     TimeFrame,
 )
@@ -84,7 +75,6 @@ from app.workspace.data_manager.connections import (
     ProviderCapabilities,
 )
 from app.workspace.data_manager.data import BarRecord
-from app.workspace.data_manager.instruments import InstrumentService
 
 logger = get_logger(__name__)
 
@@ -98,7 +88,7 @@ PLUGIN_MANIFEST: dict[str, Any] = {
     "slot": "broker",
     "entrypoint": "create_adapter",
     "dependencies": [],
-    "capabilities": ["bars", "ticks", "symbols"],
+    "capabilities": ["bars", "ticks"],
     "enabled": True,
     "metadata": {
         "provider_name": "Dukascopy",
@@ -216,11 +206,7 @@ class DukascopyBroker(BaseBroker):
         """Initialize Dukascopy broker plugin."""
         super().__init__(
             name=name,
-            capabilities=(
-                BrokerCapability.CONNECT
-                | BrokerCapability.MARKET_DATA
-                | BrokerCapability.SYMBOLS
-            ),
+            capabilities=BrokerCapability.MARKET_DATA,
         )
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": USER_AGENT})
@@ -239,8 +225,6 @@ class DukascopyBroker(BaseBroker):
             Path(store_dir) if store_dir else DEFAULT_DATA_DIR / "dukascopy"
         )
         self._db = db
-        self._instruments_service = InstrumentService(db) if db else None
-        self._connected = True
 
     @property
     def provider_capabilities(self) -> ProviderCapabilities:
@@ -284,162 +268,6 @@ class DukascopyBroker(BaseBroker):
                 for b in bars_resp.data
             ]
         return []
-
-    @override
-    def connect(self, **kwargs: Any) -> StandardResponse[bool]:
-        """Verify connectivity to StrategyQuant Cloudflare CDN."""
-        self.logger.info(
-            "FR-BROKER-DUKASCOPY-CATALOG: Connecting to Dukascopy CDN datafeed...",
-            extra={"fr_id": "FR-BROKER-DUKASCOPY-CATALOG"},
-        )
-        try:
-            r = self.session.head(
-                f"{SQX_CDN_BASE_URL}/m1/EURUSD/2023.zip", timeout=(3.0, 5.0)
-            )
-            self._connected = r.status_code == 200
-            if self._connected:
-                return StandardResponse.success(
-                    data=True,
-                    message="Connected to Dukascopy CDN",
-                    extensions={"broker": self.name},
-                )
-            msg = f"Dukascopy CDN returned status {r.status_code}"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code=str(r.status_code), message=msg),
-                extensions={"broker": self.name},
-            )
-        except Exception as e:
-            self._connected = False
-            msg = f"Failed to connect to Dukascopy CDN: {e}"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code="CONNECTION_ERROR", message=msg),
-                extensions={"broker": self.name},
-            )
-
-    @override
-    def is_connected(self) -> StandardResponse[bool]:
-        """Check active connection state."""
-        return StandardResponse.success(
-            data=self._connected,
-            message="Connected" if self._connected else "Disconnected",
-            extensions={"broker": self.name},
-        )
-
-    @override
-    def disconnect(self) -> StandardResponse[bool]:
-        """Disconnect session."""
-        self._connected = False
-        return StandardResponse.success(
-            data=True, message="Disconnected", extensions={"broker": self.name}
-        )
-
-    @override
-    def get_symbol_info(self, symbol: str) -> StandardResponse[SymbolInfo]:
-        """Retrieve instrument specifications from host catalog or fallback."""
-        sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
-        if self._instruments_service is not None:
-            inst = self._instruments_service.get_instrument(sym_clean)
-            if inst is not None:
-                info = SymbolInfo(
-                    name=sym_clean,
-                    visible=True,
-                    select=True,
-                    point=inst.tick_size,
-                    digits=inst.decimals,
-                    spread=int(inst.default_spread / inst.tick_size)
-                    if inst.tick_size
-                    else 0,
-                    trade_contract_size=inst.point_value,
-                    currency_base=sym_clean[:3] if len(sym_clean) >= 6 else "USD",
-                    currency_profit=sym_clean[3:6] if len(sym_clean) >= 6 else "USD",
-                    currency_margin=sym_clean[:3] if len(sym_clean) >= 6 else "USD",
-                    description=inst.description,
-                    raw=inst,
-                )
-                self.logger.debug(
-                    "FR-BROKER-DUKASCOPY-CATALOG: Retrieved symbol info from database for %s",
-                    sym_clean,
-                    extra={"fr_id": "FR-BROKER-DUKASCOPY-CATALOG", "symbol": sym_clean},
-                )
-                return StandardResponse.success(
-                    data=info,
-                    extensions={"broker": self.name, "source": "database"},
-                )
-
-        spec = KNOWN_SYMBOLS.get(sym_clean)
-        if not spec:
-            dec = 3 if sym_clean.endswith("JPY") else 5
-            spec = {
-                "decimals": dec,
-                "point_size": 100000.0,
-                "category": "Forex",
-                "pip_size": 0.01 if dec == 3 else 0.0001,
-            }
-
-        info = SymbolInfo(
-            name=sym_clean,
-            visible=True,
-            select=True,
-            point=(
-                float(spec["pip_size"]) / 10.0
-                if int(spec["decimals"]) in (3, 5)
-                else float(spec["pip_size"])
-            ),
-            digits=int(spec["decimals"]),
-            trade_contract_size=float(spec["point_size"]),
-            currency_base=sym_clean[:3] if len(sym_clean) >= 6 else "USD",
-            currency_profit=sym_clean[3:6] if len(sym_clean) >= 6 else "USD",
-            raw=spec,
-        )
-        self.logger.debug(
-            "FR-BROKER-DUKASCOPY-CATALOG: Retrieved symbol info from fallback catalog for %s",
-            sym_clean,
-            extra={"fr_id": "FR-BROKER-DUKASCOPY-CATALOG", "symbol": sym_clean},
-        )
-        return StandardResponse.success(
-            data=info,
-            extensions={"broker": self.name, "raw": spec, "source": "fallback"},
-        )
-
-    @override
-    def get_symbols(
-        self, group: str | None = None
-    ) -> StandardResponse[list[SymbolInfo]]:
-        """Retrieve list of available Dukascopy instruments."""
-        symbols: list[SymbolInfo] = []
-        for sym in KNOWN_SYMBOLS:
-            if not group or group.upper() in sym:
-                res = self.get_symbol_info(sym)
-                if res.data:
-                    symbols.append(res.data)
-        return StandardResponse.success(data=symbols, extensions={"broker": self.name})
-
-    @override
-    def get_symbol_tick(self, symbol: str) -> StandardResponse[Tick]:
-        """Get latest known quote tick for symbol."""
-        bars_res = self.get_bars(symbol=symbol, timeframe=TimeFrame.M1, count=1)
-        now = datetime.now(UTC)
-        if bars_res.is_success and bars_res.data:
-            last_bar = bars_res.data[-1]
-            return StandardResponse.success(
-                data=Tick(
-                    time=last_bar.time,
-                    bid=last_bar.close,
-                    ask=last_bar.close,
-                    last=last_bar.close,
-                ),
-                extensions={"broker": self.name},
-            )
-        return StandardResponse.failure(
-            message=f"No recent quotes available from Dukascopy for symbol '{symbol}'",
-            error=StandardError(
-                code="NO_DATA",
-                message=f"No recent quotes available from Dukascopy for symbol '{symbol}'",
-            ),
-            extensions={"broker": self.name},
-        )
 
     @override
     def get_bars(

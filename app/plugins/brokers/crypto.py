@@ -1,49 +1,40 @@
 """Binance cryptocurrency market data broker and provider plugin.
 
 Description:
-    Implements a cryptocurrency market data and execution broker plugin connecting
+    Implements a cryptocurrency market data broker and provider plugin connecting
     directly to Binance public and authenticated REST APIs (Spot, USDT-M, and
     Coin-M). Modeled after the StrategyQuant CryptoExchangeBinance architecture,
-    this plugin retrieves real-time order books, live ticker quotes, comprehensive
-    exchange metadata, and high-resolution historical klines (candlestick bars)
-    across arbitrary timeframes (1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d).
+    this plugin retrieves high-resolution historical klines (candlestick bars)
+    and trade ticks across arbitrary timeframes (1m, 3m, 5m, 15m, 30m, 1h, 2h,
+    4h, 6h, 8h, 12h, 1d) and fulfills Data Manager downloads (`download_bars()`).
     In accordance with the workspace Strict Real-Data Policy, all operations
     interact exclusively with real remote endpoints and fail closed without
     synthetic or mock fallbacks.
+    All non-download and trading methods cleanly fallback to BaseBroker default
+    unsupported capability handling.
 
 Purpose:
     FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE: Binance Exchange Integration.
-    Provides live cryptocurrency market data, instrument metadata, historical
-    klines, and trading contracts across Binance Spot and Futures venues.
+    Provides live cryptocurrency market data, historical klines, and trade ticks
+    across Binance Spot and Futures venues.
 
 Key Capabilities:
-    - FR-BROKER-BINANCE-CONNECTIVITY: Live Gateway Connectivity and Server Ping
-      Associated: `[BinanceBroker.connect()]`, `[BinanceBroker.is_connected()]`
-      Logging: Emits INFO log upon pinging Binance API endpoints.
-    - FR-BROKER-BINANCE-EXCHANGE-INFO: Exchange Symbol Catalog and Precision Models
-      Associated: `[BinanceBroker.get_symbol_info()]`,
-      `[BinanceBroker.get_symbols()]`
-      Logging: Emits DEBUG log when caching and returning symbol filter rules.
-    - FR-BROKER-BINANCE-MARKET-DATA: Historical Kline Extraction and Real Ticker Quotes
-      Associated: `[BinanceBroker.get_bars()]`,
-      `[BinanceBroker.get_symbol_tick()]`, `[BinanceBroker.get_ticks()]`
-      Logging: Emits INFO log with bar counts retrieved from Binance API.
-    - FR-DATA-PROVIDERS-ADAPTERS: Uniform Typed Provider Compatibility
+    - FR-BROKER-BINANCE-MARKET-DATA: Historical Kline Extraction and Real Trades
+      Associated: `[BinanceBroker.get_bars()]`, `[BinanceBroker.get_ticks()]`
+      Logging: Emits INFO log with bar counts retrieved from Binance API, and
+      ERROR log on network or parsing failure.
+    - FR-BROKER-BINANCE-DOWNLOAD: Data Manager Bar Download Pipeline
       Associated: `[BinanceBroker.download_bars()]`, `[create_adapter()]`
-      Logging: Emits INFO log on download dispatch.
+      Logging: Emits delegated telemetry through get_bars and cancellation checks.
 
 Python API Usage:
     ```python
-    from app.plugins.brokers.crypto.adapter import BinanceBroker
+    from app.plugins.brokers.crypto import BinanceBroker, create_adapter
 
-    broker = BinanceBroker()
-    resp = broker.connect()
-    assert resp.is_success
-
-    # Retrieve live BTCUSDT klines
+    broker = create_adapter()
     bars_resp = broker.get_bars(symbol="BTCUSDT", count=10)
     if bars_resp.is_success and bars_resp.data:
-        print(f"Latest BTCUSDT close: {bars_resp.data[-1].close}")
+        assert len(bars_resp.data) > 0
     ```
 
 CLI Usage:
@@ -70,7 +61,6 @@ from app.plugins.brokers.contracts import (
     BrokerCapability,
     StandardError,
     StandardResponse,
-    SymbolInfo,
     Tick,
     TimeFrame,
 )
@@ -88,12 +78,12 @@ PLUGIN_MANIFEST: dict[str, Any] = {
     "id": "broker-binance",
     "name": "Binance Crypto Connector",
     "version": "1.0.0",
-    "description": "Binance cryptocurrency REST market data and execution broker plugin",
+    "description": "Binance cryptocurrency REST market data and provider plugin",
     "author": "HaruQuantAI",
     "slot": "broker",
     "entrypoint": "create_adapter",
     "dependencies": [],
-    "capabilities": ["bars", "ticks", "symbols", "depth"],
+    "capabilities": ["bars", "ticks"],
     "enabled": True,
     "metadata": {
         "provider_name": "Binance",
@@ -180,12 +170,7 @@ class BinanceBroker(BaseBroker):
         """Initialize Binance broker plugin with resilient HTTP session."""
         super().__init__(
             name=name,
-            capabilities=(
-                BrokerCapability.CONNECT
-                | BrokerCapability.MARKET_DATA
-                | BrokerCapability.SYMBOLS
-                | BrokerCapability.MARKET_DEPTH
-            ),
+            capabilities=BrokerCapability.MARKET_DATA,
         )
         target_venue = default_market or venue
         self.venue = target_venue.lower().strip()
@@ -220,9 +205,6 @@ class BinanceBroker(BaseBroker):
         )
         self.session.mount("https://", adapter)
         self.session.mount("http://", adapter)
-
-        self._connected = False
-        self._symbols_cache: dict[str, SymbolInfo] = {}
 
     @property
     def provider_capabilities(self) -> ProviderCapabilities:
@@ -268,60 +250,6 @@ class BinanceBroker(BaseBroker):
         # Strict Real-Data Policy: fail closed without synthetic mock fallback
         return []
 
-    @override
-    def connect(self, **kwargs: Any) -> StandardResponse[bool]:
-        """Verify active network connectivity to Binance REST API."""
-        self.logger.info(
-            "FR-BROKER-BINANCE-CONNECTIVITY: Connecting to Binance REST endpoint (%s)...",
-            self.base_url,
-            extra={
-                "fr_id": "FR-BROKER-BINANCE-CONNECTIVITY",
-                "base_url": self.base_url,
-            },
-        )
-        try:
-            url = f"{self.base_url}/api/v3/ping"
-            r = self.session.get(url, timeout=(3.0, 5.0))
-            self._connected = r.status_code == 200
-            if self._connected:
-                return StandardResponse.success(
-                    data=True,
-                    message=f"Connected to Binance {self.venue.title()} API",
-                    extensions={"broker": self.name, "venue": self.venue},
-                )
-            msg = f"Binance ping returned HTTP {r.status_code}"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code=str(r.status_code), message=msg),
-                extensions={"broker": self.name},
-            )
-        except Exception as e:
-            self._connected = False
-            msg = f"Failed to connect to Binance API: {e}"
-            self.logger.error("FR-BROKER-BINANCE-CONNECTIVITY: %s", msg)
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code="CONNECTION_ERROR", message=msg),
-                extensions={"broker": self.name},
-            )
-
-    @override
-    def is_connected(self) -> StandardResponse[bool]:
-        """Check active connection state."""
-        return StandardResponse.success(
-            data=self._connected,
-            message="Connected" if self._connected else "Disconnected",
-            extensions={"broker": self.name},
-        )
-
-    @override
-    def disconnect(self) -> StandardResponse[bool]:
-        """Disconnect session."""
-        self._connected = False
-        return StandardResponse.success(
-            data=True, message="Disconnected", extensions={"broker": self.name}
-        )
-
     def _normalize_symbol(self, symbol: str) -> str:
         """Normalize symbol string for Binance REST endpoints."""
         sym = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
@@ -329,174 +257,6 @@ class BinanceBroker(BaseBroker):
             if self.venue not in ("coin-m", "delivery", "dapi"):
                 sym = f"{sym}T"
         return sym
-
-    @override
-    def get_symbol_info(self, symbol: str) -> StandardResponse[SymbolInfo]:
-        """Retrieve instrument specifications from Binance exchangeInfo."""
-        sym_clean = self._normalize_symbol(symbol)
-        if sym_clean in self._symbols_cache:
-            return StandardResponse.success(
-                data=self._symbols_cache[sym_clean],
-                extensions={"broker": self.name, "source": "cache"},
-            )
-
-        url = f"{self.base_url}/api/v3/exchangeInfo?symbol={urllib.parse.quote(sym_clean)}"
-        try:
-            r = self.session.get(url, timeout=(3.0, 10.0))
-            if r.status_code == 200:
-                data = r.json()
-                symbols_list = data.get("symbols", [])
-                if symbols_list:
-                    item = symbols_list[0]
-                    # Parse precision filters
-                    digits = 8
-                    tick_size = 0.00000001
-                    step_size = 0.00000001
-                    for f in item.get("filters", []):
-                        if f.get("filterType") == "PRICE_FILTER":
-                            tick_size = float(f.get("tickSize", 0.00000001))
-                            tick_str = f"{tick_size:.10f}".rstrip("0")
-                            digits = (
-                                len(tick_str.split(".")[1]) if "." in tick_str else 0
-                            )
-                        elif f.get("filterType") == "LOT_SIZE":
-                            step_size = float(f.get("stepSize", 0.00000001))
-
-                    info = SymbolInfo(
-                        name=sym_clean,
-                        visible=True,
-                        select=True,
-                        point=tick_size,
-                        digits=digits,
-                        trade_contract_size=1.0,
-                        currency_base=item.get("baseAsset", "BTC"),
-                        currency_profit=item.get("quoteAsset", "USDT"),
-                        currency_margin=item.get("quoteAsset", "USDT"),
-                        description=f"Binance {item.get('baseAsset')}/{item.get('quoteAsset')}",
-                        exchange="Binance",
-                        raw=item,
-                    )
-                    self._symbols_cache[sym_clean] = info
-                    self.logger.debug(
-                        "FR-BROKER-BINANCE-EXCHANGE-INFO: Loaded symbol info for %s",
-                        sym_clean,
-                        extra={
-                            "fr_id": "FR-BROKER-BINANCE-EXCHANGE-INFO",
-                            "symbol": sym_clean,
-                        },
-                    )
-                    return StandardResponse.success(
-                        data=info,
-                        extensions={"broker": self.name, "source": "api"},
-                    )
-            msg = f"Symbol '{sym_clean}' not found on Binance (status {r.status_code})"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code="SYMBOL_NOT_FOUND", message=msg),
-                extensions={"broker": self.name},
-            )
-        except Exception as e:
-            msg = f"Failed to retrieve symbol info from Binance for '{sym_clean}': {e}"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code="QUERY_ERROR", message=msg),
-                extensions={"broker": self.name},
-            )
-
-    @override
-    def get_symbols(
-        self, group: str | None = None
-    ) -> StandardResponse[list[SymbolInfo]]:
-        """Retrieve list of active symbols from Binance exchangeInfo."""
-        url = f"{self.base_url}/api/v3/exchangeInfo"
-        try:
-            r = self.session.get(url, timeout=(5.0, 15.0))
-            if r.status_code == 200:
-                data = r.json()
-                symbols: list[SymbolInfo] = []
-                for item in data.get("symbols", []):
-                    if item.get("status") == "TRADING":
-                        sym_name = item.get("symbol", "")
-                        if not group or group.upper() in sym_name:
-                            tick_size = 0.00000001
-                            digits = 8
-                            for f in item.get("filters", []):
-                                if f.get("filterType") == "PRICE_FILTER":
-                                    tick_size = float(f.get("tickSize", 0.00000001))
-                                    tick_str = f"{tick_size:.10f}".rstrip("0")
-                                    digits = (
-                                        len(tick_str.split(".")[1])
-                                        if "." in tick_str
-                                        else 0
-                                    )
-                            info = SymbolInfo(
-                                name=sym_name,
-                                visible=True,
-                                select=True,
-                                point=tick_size,
-                                digits=digits,
-                                trade_contract_size=1.0,
-                                currency_base=item.get("baseAsset", ""),
-                                currency_profit=item.get("quoteAsset", ""),
-                                currency_margin=item.get("quoteAsset", ""),
-                                description=f"Binance {item.get('baseAsset')}/{item.get('quoteAsset')}",
-                                exchange="Binance",
-                                raw=item,
-                            )
-                            symbols.append(info)
-                            self._symbols_cache[sym_name] = info
-                return StandardResponse.success(
-                    data=symbols, extensions={"broker": self.name}
-                )
-            msg = f"Failed to list Binance symbols (status {r.status_code})"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code=str(r.status_code), message=msg),
-                extensions={"broker": self.name},
-            )
-        except Exception as e:
-            msg = f"Failed to list Binance symbols: {e}"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code="QUERY_ERROR", message=msg),
-                extensions={"broker": self.name},
-            )
-
-    @override
-    def get_symbol_tick(self, symbol: str) -> StandardResponse[Tick]:
-        """Retrieve real live book ticker quote for symbol from Binance."""
-        sym_clean = self._normalize_symbol(symbol)
-        url = f"{self.base_url}/api/v3/ticker/bookTicker?symbol={urllib.parse.quote(sym_clean)}"
-        try:
-            r = self.session.get(url, timeout=(2.0, 5.0))
-            if r.status_code == 200:
-                data = r.json()
-                bid = float(data.get("bidPrice", 0.0))
-                ask = float(data.get("askPrice", 0.0))
-                tick = Tick(
-                    time=datetime.now(UTC),
-                    bid=bid,
-                    ask=ask,
-                    last=bid,
-                    volume=float(data.get("bidQty", 0.0)),
-                    raw=data,
-                )
-                return StandardResponse.success(
-                    data=tick, extensions={"broker": self.name}
-                )
-            msg = f"Failed to retrieve Binance tick for '{sym_clean}' (status {r.status_code})"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code="NO_DATA", message=msg),
-                extensions={"broker": self.name},
-            )
-        except Exception as e:
-            msg = f"Failed to retrieve Binance tick for '{sym_clean}': {e}"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code="FETCH_ERROR", message=msg),
-                extensions={"broker": self.name},
-            )
 
     @override
     def get_bars(

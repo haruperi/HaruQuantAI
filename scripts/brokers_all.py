@@ -2,12 +2,14 @@
 
 Validates:
 - MetaTrader5 (Live trading, execution, quotes, bars, history)
-- Yahoo (Live v8 chart API quotes & bars, capability check)
-- Dukascopy (Live StrategyQuant CDN fast quotes & bars, capability check)
-- Darwinex (Catalog & specs, capability check)
-- SQ_Equity (Local partitioned Parquet datasets, AAPL/MSFT, capability check)
-- SQ_Futures (Local partitioned Parquet datasets, @ES/CL, capability check)
 - cTrader (Spotware Open API SSL TLS connection, App Auth & Account Auth)
+- Yahoo (Market data provider: live v8 chart API bars, data download)
+- Dukascopy (Market data provider: StrategyQuant CDN fast bars, Parquet)
+- Darwinex (Market data provider: Parquet data ingestion)
+- SQ_Equity (Market data provider: Local partitioned Parquet datasets, AAPL/MSFT)
+- SQ_Futures (Market data provider: Local partitioned Parquet datasets, @ES/CL)
+- Binance (Market data provider: REST API live klines, trades)
+- Files (Market data provider: Local CSV/Parquet historical bar parsing)
 """
 
 from __future__ import annotations
@@ -45,6 +47,7 @@ from app.plugins.brokers import (
     trade,
     yahoo,
 )
+from app.workspace.data_manager.connections import DownloadRequest
 
 logger = get_logger("TestAllBrokers")
 
@@ -64,15 +67,18 @@ def run_tests() -> bool:
 
     term = get_terminal_info(broker=mt5)
     print(
-        f"    Terminal: {term.data.name if term.data else 'None'}, Connected: {term.data.connected if term.data else 'None'}"
+        f"    Terminal: {term.data.name if term.data else 'None'}, "
+        f"Connected: {term.data.connected if term.data else 'None'}"
     )
     acc = get_account_info(broker=mt5)
     print(
-        f"    Account: Balance={acc.data.balance if acc.data else 'None'} {acc.data.currency if acc.data else ''}"
+        f"    Account: Balance={acc.data.balance if acc.data else 'None'} "
+        f"{acc.data.currency if acc.data else ''}"
     )
     tick = get_symbol_tick(broker=mt5, symbol="EURUSD")
     print(
-        f"    Tick: Bid={tick.data.bid if tick.data else 'None'}, Ask={tick.data.ask if tick.data else 'None'}"
+        f"    Tick: Bid={tick.data.bid if tick.data else 'None'}, "
+        f"Ask={tick.data.ask if tick.data else 'None'}"
     )
     bars = get_bars(broker=mt5, symbol="EURUSD", timeframe=TimeFrame.H1, count=3)
     print(f"    Bars count: {len(bars.data) if bars.data else 0}")
@@ -89,7 +95,8 @@ def run_tests() -> bool:
         ),
     )
     print(
-        f"    Trade Buy: success={buy_res.is_success}, order={buy_res.data.order if buy_res.data else 'None'}"
+        f"    Trade Buy: success={buy_res.is_success}, "
+        f"order={buy_res.data.order if buy_res.data else 'None'}"
     )
     assert buy_res.is_success
     pos = get_position_info(broker=mt5, symbol="EURUSD")
@@ -113,116 +120,124 @@ def run_tests() -> bool:
     print("    MT5 disconnected successfully.")
 
     # ------------------------------------------------------------------------
-    # 2. Yahoo Finance (Live v8 API)
+    # 2. Yahoo Finance (Market Data Provider: Live v8 API)
     # ------------------------------------------------------------------------
     print("\n[2] YAHOO FINANCE:")
-    y_info = get_symbol_info(broker=yahoo, symbol="AAPL")
-    print(
-        f"    Symbol Info: {y_info.data.name if y_info.data else 'None'}, Price={y_info.data.bid if y_info.data else 'None'}"
-    )
     y_bars = get_bars(broker=yahoo, symbol="AAPL", timeframe=TimeFrame.D1, count=5)
     print(f"    Bars count: {len(y_bars.data) if y_bars.data else 0}")
     assert y_bars.is_success
     assert y_bars.data is not None
     assert len(y_bars.data) == 5
+
+    y_dl = yahoo.download_bars(
+        DownloadRequest(
+            provider_name="Yahoo",
+            symbol="AAPL",
+            timeframe="D1",
+            date_from="2026-09-01T00:00:00Z",
+            date_to="2026-10-01T00:00:00Z",
+        )
+    )
+    print(f"    Download bars count: {len(y_dl)}")
+    assert len(y_dl) > 0
+
     y_trade = trade(broker=yahoo, request=TradeRequest(symbol="AAPL", volume=1))
     print(
-        f"    Trade Attempt: success={y_trade.is_success}, message='{y_trade.message}'"
+        f"    Trade Rejection: success={y_trade.is_success}, message='{y_trade.message}'"
     )
     assert not y_trade.is_success
     assert "doesn't have trading capabilities" in y_trade.message
 
     # ------------------------------------------------------------------------
-    # 3. Dukascopy (StrategyQuant CDN datafeed)
+    # 3. Dukascopy (Market Data Provider: StrategyQuant CDN datafeed)
     # ------------------------------------------------------------------------
     print("\n[3] DUKASCOPY:")
-    d_info = get_symbol_info(broker=dukascopy, symbol="EURUSD")
-    print(
-        f"    Symbol Info: {d_info.data.name if d_info.data else 'None'}, Digits={d_info.data.digits if d_info.data else 'None'}"
-    )
     d_bars = get_bars(broker=dukascopy, symbol="EURUSD", count=5)
     print(f"    CDN Bars count: {len(d_bars.data) if d_bars.data else 0}")
     assert d_bars.is_success
     assert d_bars.data is not None
     assert len(d_bars.data) > 0
+
+    d_dl = dukascopy.download_bars(
+        DownloadRequest(
+            provider_name="Dukascopy",
+            symbol="EURUSD",
+            timeframe="M1",
+            date_from="2026-10-01T00:00:00Z",
+            date_to="2026-10-01T00:05:00Z",
+        )
+    )
+    print(f"    Download bars count: {len(d_dl)}")
+
     d_trade = trade(broker=dukascopy, request=TradeRequest(symbol="EURUSD", volume=1))
     print(
-        f"    Trade Attempt: success={d_trade.is_success}, message='{d_trade.message}'"
+        f"    Trade Rejection: success={d_trade.is_success}, message='{d_trade.message}'"
     )
     assert not d_trade.is_success
     assert "doesn't have trading capabilities" in d_trade.message
 
     # ------------------------------------------------------------------------
-    # 4. Darwinex (Catalog & Specs)
+    # 4. Darwinex (Market Data Provider: Parquet store)
     # ------------------------------------------------------------------------
     print("\n[4] DARWINEX:")
-    dw_info = get_symbol_info(broker=darwinex, symbol="EURUSD")
-    print(
-        f"    Symbol Info: {dw_info.data.name if dw_info.data else 'None'}, Digits={dw_info.data.digits if dw_info.data else 'None'}"
-    )
-    dw_syms = get_symbols(broker=darwinex)
-    print(f"    Symbols count: {len(dw_syms.data) if dw_syms.data else 0}")
-    assert dw_syms.is_success
-    assert dw_syms.data is not None
-    assert len(dw_syms.data) > 0
+    dw_bars = get_bars(broker=darwinex, symbol="EURUSD", count=5)
+    print(f"    Parquet Bars: success={dw_bars.is_success}")
+    assert dw_bars.is_success
+
     dw_trade = trade(broker=darwinex, request=TradeRequest(symbol="EURUSD", volume=1))
     print(
-        f"    Trade Attempt: success={dw_trade.is_success}, message='{dw_trade.message}'"
+        f"    Trade Rejection: success={dw_trade.is_success}, message='{dw_trade.message}'"
     )
     assert not dw_trade.is_success
     assert "doesn't have trading capabilities" in dw_trade.message
 
     # ------------------------------------------------------------------------
-    # 5. SQ Equity (Local Parquet Datasets: AAPL, MSFT, QQQ, SPY)
+    # 5. SQ Equity (Market Data Provider: Local Parquet Datasets: AAPL, MSFT)
     # ------------------------------------------------------------------------
     print("\n[5] SQ EQUITY:")
-    eq_info = get_symbol_info(broker=sq_equity, symbol="AAPL")
-    print(f"    Symbol Info: {eq_info.data.name if eq_info.data else 'None'}")
     eq_bars = get_bars(broker=sq_equity, symbol="AAPL", count=5)
     print(f"    Parquet Bars count: {len(eq_bars.data) if eq_bars.data else 0}")
     assert eq_bars.is_success
     assert eq_bars.data is not None
     assert len(eq_bars.data) == 5
-    print(f"    Sample Bar: {eq_bars.data[-1]}")
+
     eq_trade = trade(broker=sq_equity, request=TradeRequest(symbol="AAPL", volume=1))
     print(
-        f"    Trade Attempt: success={eq_trade.is_success}, message='{eq_trade.message}'"
+        f"    Trade Rejection: success={eq_trade.is_success}, message='{eq_trade.message}'"
     )
     assert not eq_trade.is_success
     assert "doesn't have trading capabilities" in eq_trade.message
 
     # ------------------------------------------------------------------------
-    # 6. SQ Futures (Local Parquet Datasets: @ES, CL)
+    # 6. SQ Futures (Market Data Provider: Local Parquet Datasets: @ES, CL)
     # ------------------------------------------------------------------------
     print("\n[6] SQ FUTURES:")
-    fut_info = get_symbol_info(broker=sq_futures, symbol="@ES")
-    print(
-        f"    Symbol Info: {fut_info.data.name if fut_info.data else 'None'}, TickSize={fut_info.data.point if fut_info.data else 'None'}"
-    )
     fut_bars = get_bars(broker=sq_futures, symbol="@ES", count=5)
     print(f"    Parquet Bars count: {len(fut_bars.data) if fut_bars.data else 0}")
     assert fut_bars.is_success
     assert fut_bars.data is not None
     assert len(fut_bars.data) == 5
-    print(f"    Sample Bar: {fut_bars.data[-1]}")
+
     fut_trade = trade(broker=sq_futures, request=TradeRequest(symbol="@ES", volume=1))
     print(
-        f"    Trade Attempt: success={fut_trade.is_success}, message='{fut_trade.message}'"
+        f"    Trade Rejection: success={fut_trade.is_success}, message='{fut_trade.message}'"
     )
     assert not fut_trade.is_success
     assert "doesn't have trading capabilities" in fut_trade.message
 
     # ------------------------------------------------------------------------
-    # 7. cTrader Open API (Gateway & Auth Protocol via settings.config_ctrader)
+    # 7. cTrader Open API (Live Execution Broker: Gateway & Auth Protocol)
     # ------------------------------------------------------------------------
     print("\n[7] CTRADER OPEN API:")
     c_conn = connect(broker=ctrader)
     print(
-        f"    Gateway Connection & Auth: success={c_conn.is_success}, message='{c_conn.message}'"
+        f"    Gateway Connection & Auth: success={c_conn.is_success}, "
+        f"message='{c_conn.message}'"
     )
     c_info = get_symbol_info(broker=ctrader, symbol="EURUSD")
     print(
-        f"    Symbol Info: {c_info.data.name if c_info.data else 'None'}, Digits={c_info.data.digits if c_info.data else 'None'}"
+        f"    Symbol Info: {c_info.data.name if c_info.data else 'None'}, "
+        f"Digits={c_info.data.digits if c_info.data else 'None'}"
     )
     c_syms = get_symbols(broker=ctrader)
     print(f"    Symbols count: {len(c_syms.data) if c_syms.data else 0}")
@@ -234,57 +249,59 @@ def run_tests() -> bool:
     print("    cTrader disconnected successfully.")
 
     # ------------------------------------------------------------------------
-    # 8. Binance Crypto Exchange (Live Public REST API: Ping, BookTicker, Klines)
+    # 8. Binance Crypto Exchange (Market Data Provider: Live Public REST API)
     # ------------------------------------------------------------------------
     print("\n[8] BINANCE CRYPTO EXCHANGE:")
-    b_conn = connect(broker=binance)
-    print(
-        f"    Ping / Connection: success={b_conn.is_success}, message='{b_conn.message}'"
-    )
-    assert b_conn.is_success
-    b_tick = get_symbol_tick(broker=binance, symbol="BTCUSDT")
-    print(
-        f"    Live Book Ticker: Bid={b_tick.data.bid if b_tick.data else 'None'}, "
-        f"Ask={b_tick.data.ask if b_tick.data else 'None'}"
-    )
-    assert b_tick.is_success
-    assert b_tick.data is not None
-    assert b_tick.data.bid > 0.0
     b_bars = get_bars(broker=binance, symbol="BTCUSDT", timeframe=TimeFrame.M1, count=5)
     print(f"    Live Klines count: {len(b_bars.data) if b_bars.data else 0}")
     assert b_bars.is_success
     assert b_bars.data is not None
     assert len(b_bars.data) == 5
-    print(f"    Sample Bar: {b_bars.data[-1]}")
+
+    b_dl = binance.download_bars(
+        DownloadRequest(
+            provider_name="Binance",
+            symbol="BTCUSDT",
+            timeframe="M1",
+            date_from="2026-10-01T00:00:00Z",
+            date_to="2026-10-01T00:05:00Z",
+        )
+    )
+    print(f"    Download klines count: {len(b_dl)}")
+    assert len(b_dl) > 0
+
     b_trade = trade(
         broker=binance, request=TradeRequest(symbol="BTCUSDT", volume=0.001)
     )
     print(
-        f"    Trade Attempt: success={b_trade.is_success}, message='{b_trade.message}'"
+        f"    Trade Rejection: success={b_trade.is_success}, message='{b_trade.message}'"
     )
     assert not b_trade.is_success
     assert "doesn't have trading capabilities" in b_trade.message
 
     # ------------------------------------------------------------------------
-    # 9. Filesystem Tabular Market Data (CSV / Parquet Ingestion)
+    # 9. Filesystem Tabular Market Data (Market Data Provider: CSV/Parquet)
     # ------------------------------------------------------------------------
     print("\n[9] FILES BROKER (CSV/Parquet):")
-    f_conn = connect(broker=files)
-    print(f"    Mount Status: success={f_conn.is_success}, message='{f_conn.message}'")
-    assert f_conn.is_success
-    f_syms = get_symbols(broker=files)
-    print(f"    Discovered Files Datasets: {len(f_syms.data) if f_syms.data else 0}")
     f_bars = get_bars(broker=files, symbol="AAPL", timeframe=TimeFrame.D1, count=5)
     print(
-        f"    Files Bars: success={f_bars.is_success}, count={len(f_bars.data) if f_bars.data else 0}"
+        f"    Files Bars: success={f_bars.is_success}, "
+        f"count={len(f_bars.data) if f_bars.data else 0}"
     )
     assert f_bars.is_success
     assert f_bars.data is not None
     assert len(f_bars.data) > 0
 
+    f_trade = trade(broker=files, request=TradeRequest(symbol="AAPL", volume=1))
+    print(
+        f"    Trade Rejection: success={f_trade.is_success}, message='{f_trade.message}'"
+    )
+    assert not f_trade.is_success
+    assert "doesn't have trading capabilities" in f_trade.message
+
     print("\n" + "=" * 80)
-    print("ALL 9 BROKERS (MT5, YAHOO, DUKASCOPY, DARWINEX, SQ_EQUITY, SQ_FUTURES,")
-    print("CTRADER, BINANCE, FILES) VERIFIED UNDER STRICT REAL-DATA POLICY!")
+    print("ALL 9 BROKERS (MT5, CTRADER EXECUTION + YAHOO, DUKASCOPY, DARWINEX,")
+    print("SQ_EQUITY, SQ_FUTURES, BINANCE, FILES DATA PROVIDERS) VERIFIED!")
     print("=" * 80)
     return True
 

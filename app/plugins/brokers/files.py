@@ -4,37 +4,33 @@ Description:
     Implements a local filesystem market data broker plugin accessing historical
     bars, ticks, and instrument records stored as CSV, TXT, or Parquet files on
     disk. Modeled after the StrategyQuant DataSourceFiles architecture, this
-    plugin performs automated directory discovery across `data/market/` or custom
-    workspace paths, automatically parses diverse tabular schemas (date/time,
-    open, high, low, close, volume), and synthesizes standard `Bar` and `Tick`
-    dataclasses. Under the workspace Strict Real-Data Policy, if a requested
+    plugin automatically discovers and parses diverse tabular schemas
+    (date/time, open, high, low, close, volume) and fulfills Data Manager
+    workspace requests (`download_bars()`) alongside `get_bars()` and
+    `get_ticks()`. Under the workspace Strict Real-Data Policy, if a requested
     symbol file does not exist, the adapter fails closed with a typed
     `FILE_NOT_FOUND` error, never synthesizing mock or random-walk data.
+    All non-download and trading methods cleanly fallback to BaseBroker default
+    unsupported capability handling.
 
 Purpose:
     FEAT-DATA-SOURCE-FILES: Local Filesystem Historical Market Data Ingestion.
     Provides flexible tabular and Parquet file parsing for user-provided datasets.
 
 Key Capabilities:
-    - FR-BROKER-FILES-DISCOVERY: Filesystem Directory and Partition Scanning
-      Associated: `[FilesBroker.connect()]`, `[FilesBroker.get_symbols()]`
-      Logging: Emits INFO log upon scanning data directory and discovering files.
-    - FR-BROKER-FILES-PARSING: CSV/Parquet Historical Bar Ingestion
+    - FR-BROKER-FILES-PARSING: CSV/Parquet Historical Bar and Tick Ingestion
       Associated: `[FilesBroker.get_bars()]`, `[FilesBroker.get_ticks()]`
       Logging: Emits INFO log with parsed record counts, or WARNING on absent paths.
-    - FR-DATA-PROVIDERS-ADAPTERS: Uniform Typed Provider Compatibility
+    - FR-BROKER-FILES-DOWNLOAD: Data Manager Bar Download Pipeline
       Associated: `[FilesBroker.download_bars()]`, `[create_adapter()]`
-      Logging: Emits INFO log on download dispatch.
+      Logging: Emits delegated telemetry through get_bars and cancellation checks.
 
 Python API Usage:
     ```python
-    from app.plugins.brokers.files.adapter import FilesBroker
+    from app.plugins.brokers.files import FilesBroker, create_adapter
 
-    broker = FilesBroker()
-    resp = broker.connect()
-    assert resp.is_success
-
-    bars_resp = broker.get_bars("EURUSD", count=100)
+    broker = create_adapter()
+    bars_resp = broker.get_bars("EURUSD", count=10)
     ```
 
 CLI Usage:
@@ -58,7 +54,6 @@ from app.plugins.brokers.contracts import (
     BrokerCapability,
     StandardError,
     StandardResponse,
-    SymbolInfo,
     Tick,
     TimeFrame,
 )
@@ -76,12 +71,12 @@ PLUGIN_MANIFEST: dict[str, Any] = {
     "id": "broker-files",
     "name": "Local Files Connector",
     "version": "1.0.0",
-    "description": "Local filesystem tabular (CSV/TXT/Parquet) market data broker and provider plugin",
+    "description": "Local filesystem tabular (CSV/TXT/Parquet) market data provider plugin",
     "author": "HaruQuantAI",
     "slot": "broker",
     "entrypoint": "create_adapter",
     "dependencies": [],
-    "capabilities": ["bars", "ticks", "symbols"],
+    "capabilities": ["bars", "ticks"],
     "enabled": True,
     "metadata": {
         "provider_name": "Files",
@@ -134,14 +129,9 @@ class FilesBroker(BaseBroker):
         """Initialize Files broker with local storage directory."""
         super().__init__(
             name=name,
-            capabilities=(
-                BrokerCapability.CONNECT
-                | BrokerCapability.MARKET_DATA
-                | BrokerCapability.SYMBOLS
-            ),
+            capabilities=BrokerCapability.MARKET_DATA,
         )
         self.data_dir = Path(data_dir) if data_dir else DEFAULT_DATA_DIR
-        self._connected = True
 
     @property
     def provider_capabilities(self) -> ProviderCapabilities:
@@ -187,38 +177,6 @@ class FilesBroker(BaseBroker):
         # Strict Real-Data Policy: return empty on file not found
         return []
 
-    @override
-    def connect(self, **kwargs: Any) -> StandardResponse[bool]:
-        """Verify presence of local market data directory."""
-        exists = self.data_dir.exists()
-        self.logger.info(
-            "FR-BROKER-FILES-DISCOVERY: Connected to Files datafeed. Store path: %s (exists=%s)",
-            self.data_dir,
-            exists,
-            extra={"fr_id": "FR-BROKER-FILES-DISCOVERY", "path": str(self.data_dir)},
-        )
-        return StandardResponse.success(
-            data=exists,
-            message="Files directory available"
-            if exists
-            else "Data directory not found",
-            extensions={"broker": self.name, "path": str(self.data_dir)},
-        )
-
-    @override
-    def is_connected(self) -> StandardResponse[bool]:
-        """Check active state."""
-        return StandardResponse.success(
-            data=self._connected and self.data_dir.exists(),
-            extensions={"broker": self.name},
-        )
-
-    @override
-    def disconnect(self) -> StandardResponse[bool]:
-        """Disconnect session."""
-        self._connected = False
-        return StandardResponse.success(data=True, extensions={"broker": self.name})
-
     def _find_symbol_files(self, symbol: str) -> list[Path]:
         """Find CSV or Parquet files associated with symbol."""
         sym_clean = symbol.lower().replace("/", "").replace("_", "").replace("-", "")
@@ -240,88 +198,6 @@ class FilesBroker(BaseBroker):
                 if sym_clean in name_clean or sym_clean == parent_clean:
                     matches.append(p)
         return sorted(matches)
-
-    @override
-    def get_symbol_info(self, symbol: str) -> StandardResponse[SymbolInfo]:
-        """Retrieve instrument specifications from local file discovery."""
-        sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
-        files = self._find_symbol_files(symbol)
-        if files:
-            dec = 3 if sym_clean.endswith("JPY") else (2 if len(sym_clean) <= 4 else 5)
-            info = SymbolInfo(
-                name=sym_clean,
-                visible=True,
-                select=True,
-                point=1.0 / (10**dec),
-                digits=dec,
-                trade_contract_size=100000.0 if dec == 5 else 1.0,
-                currency_base=sym_clean[:3] if len(sym_clean) >= 6 else "USD",
-                currency_profit=sym_clean[3:6] if len(sym_clean) >= 6 else "USD",
-                description=f"Local file feed: {files[0].name}",
-                exchange="LocalFiles",
-                raw={"file": str(files[0])},
-            )
-            return StandardResponse.success(data=info, extensions={"broker": self.name})
-
-        msg = f"No local market data files found for symbol '{symbol}'"
-        return StandardResponse.failure(
-            message=msg,
-            error=StandardError(code="FILE_NOT_FOUND", message=msg),
-            extensions={"broker": self.name},
-        )
-
-    @override
-    def get_symbols(
-        self, group: str | None = None
-    ) -> StandardResponse[list[SymbolInfo]]:
-        """List distinct symbols discovered in local filesystem."""
-        if not self.data_dir.exists():
-            return StandardResponse.success(data=[], extensions={"broker": self.name})
-
-        found_symbols: set[str] = set()
-        for ext in ("*.parquet", "*.csv"):
-            for p in self.data_dir.rglob(ext):
-                # Check parent folder or stem
-                cand = p.parent.name.upper()
-                if (
-                    len(cand) >= 3
-                    and not cand.isdigit()
-                    and cand not in ("M1", "D1", "TICKS")
-                ):
-                    found_symbols.add(cand)
-                else:
-                    found_symbols.add(p.stem.upper())
-
-        symbols: list[SymbolInfo] = []
-        for sym in sorted(found_symbols):
-            if not group or group.upper() in sym:
-                res = self.get_symbol_info(sym)
-                if res.is_success and res.data:
-                    symbols.append(res.data)
-        return StandardResponse.success(data=symbols, extensions={"broker": self.name})
-
-    @override
-    def get_symbol_tick(self, symbol: str) -> StandardResponse[Tick]:
-        """Retrieve latest known quote tick from local files."""
-        bars_res = self.get_bars(symbol=symbol, count=1)
-        if bars_res.is_success and bars_res.data:
-            last_bar = bars_res.data[-1]
-            return StandardResponse.success(
-                data=Tick(
-                    time=last_bar.time,
-                    bid=last_bar.close,
-                    ask=last_bar.close,
-                    last=last_bar.close,
-                    volume=float(last_bar.tick_volume),
-                ),
-                extensions={"broker": self.name},
-            )
-        msg = f"No local file quotes available for symbol '{symbol}'"
-        return StandardResponse.failure(
-            message=msg,
-            error=StandardError(code="NO_DATA", message=msg),
-            extensions={"broker": self.name},
-        )
 
     @override
     def get_bars(

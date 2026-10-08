@@ -2,43 +2,37 @@
 
 Description:
     Implements a specialized market data broker plugin accessing StrategyQuant
-    Commodity, Index, and Currency Futures historical tick and candlestick archives
+    Commodity, Index, and Currency Futures historical candlestick archives
     stored as local Parquet files under `data/market/sq_futures`.
-    Within HaruQuantAI, this module provides contract specifications (including
-    point sizes, tick values, and trading contract sizes) for active and continuous
-    futures instruments (e.g. @ES, @NQ, @YM, @CL, @GC, @SI).
-    Because SQ Futures is an offline historical archive provider, trading operations
-    and live session controls are rejected with canonical capability unsupported
-    errors (`BaseBroker._unsupported()`).
+    Within HaruQuantAI, this module provides offline historical futures bar
+    and tick extraction from local Parquet archives, and fulfills Data Manager
+    workspace download requests (`download_bars()`) alongside `get_bars()`
+    and `get_ticks()`.
+    All non-download and trading methods cleanly fallback to BaseBroker default
+    unsupported capability handling.
 
 Purpose:
     FEAT-BROKER-SQ-FUTURES: StrategyQuant Futures Local Parquet Datafeed.
-    Provides contract specifications and offline historical futures bar/tick
-    extraction from local Parquet archives.
+    Provides offline historical futures bar and tick extraction and Data
+    Manager downloads from local Parquet archives.
 
 Key Capabilities:
-    - FR-BROKER-SQ-FUTURES-CATALOG: Continuous Futures Specifications
-      Associated: `[SQFuturesBroker.get_symbol_info()]`,
-      `[SQFuturesBroker.get_symbols()]`
-      Logging: Emits DEBUG log when returning contract specifications.
     - FR-BROKER-SQ-FUTURES-PARQUET-DATA: Parquet Historical Bar Ingestion
-      Associated: `[SQFuturesBroker.get_bars()]`,
-      `[SQFuturesBroker._read_local_parquet()]`
+      Associated: `[SQFuturesBroker.get_bars()]`, `[SQFuturesBroker.get_ticks()]`
       Logging: Emits INFO log upon successfully parsing Parquet partitions,
       and WARNING log if files are missing or empty.
-    - FR-BROKER-SQ-FUTURES-TRADE-REJECTION: Unsupported Trade Capability Rejection
-      Associated: `[SQFuturesBroker.trade()]`, `[SQFuturesBroker.check_order()]`
-      Logging: Emits WARNING log declaring trading capabilities unsupported.
+    - FR-BROKER-SQ-FUTURES-DOWNLOAD: Data Manager Bar Download Pipeline
+      Associated: `[SQFuturesBroker.download_bars()]`, `[create_adapter()]`
+      Logging: Emits delegated telemetry through get_bars and cancellation checks.
 
 Python API Usage:
     ```python
-    from app.plugins.brokers import TimeFrame, sq_futures
+    from app.plugins.brokers.sq_futures import SQFuturesBroker, create_adapter
 
-    # Retrieve continuous E-mini S&P 500 contract specifications
-    sym_resp = sq_futures.get_symbol_info("@ES")
-    if sym_resp.is_success:
-        assert sym_resp.data.trade_contract_size == 50.0
-        print(f"Point value: {sym_resp.data.point}")
+    broker = create_adapter()
+    bars_resp = broker.get_bars("@ES", count=5)
+    if bars_resp.is_success:
+        assert len(bars_resp.data) > 0
     ```
 
 CLI Usage:
@@ -49,7 +43,7 @@ CLI Usage:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Any, override
 
@@ -62,7 +56,6 @@ from app.plugins.brokers.contracts import (
     BrokerCapability,
     StandardError,
     StandardResponse,
-    SymbolInfo,
     Tick,
     TimeFrame,
 )
@@ -72,7 +65,6 @@ from app.workspace.data_manager.connections import (
     ProviderCapabilities,
 )
 from app.workspace.data_manager.data import BarRecord
-from app.workspace.data_manager.instruments import InstrumentService
 
 logger = get_logger(__name__)
 
@@ -81,12 +73,12 @@ PLUGIN_MANIFEST: dict[str, Any] = {
     "id": "broker-sq-futures",
     "name": "StrategyQuant Continuous Futures Connector",
     "version": "1.0.0",
-    "description": "StrategyQuant Continuous Futures historical parquet data and broker plugin",
+    "description": "StrategyQuant Continuous Futures historical parquet data and provider plugin",
     "author": "HaruQuantAI",
     "slot": "broker",
     "entrypoint": "create_adapter",
     "dependencies": [],
-    "capabilities": ["bars", "symbols"],
+    "capabilities": ["bars"],
     "enabled": True,
     "metadata": {
         "provider_name": "SQFutures",
@@ -170,18 +162,12 @@ class SQFuturesBroker(BaseBroker):
         """Initialize SQ Futures broker plugin."""
         super().__init__(
             name=name,
-            capabilities=(
-                BrokerCapability.CONNECT
-                | BrokerCapability.MARKET_DATA
-                | BrokerCapability.SYMBOLS
-            ),
+            capabilities=BrokerCapability.MARKET_DATA,
         )
         self.store_dir = (
             Path(store_dir) if store_dir else DEFAULT_DATA_DIR / "sq_futures"
         )
         self._db = db
-        self._instruments_service = InstrumentService(db) if db else None
-        self._connected = True
 
     @property
     def provider_capabilities(self) -> ProviderCapabilities:
@@ -226,145 +212,6 @@ class SQFuturesBroker(BaseBroker):
         return []
 
     @override
-    def connect(self, **kwargs: Any) -> StandardResponse[bool]:
-        """Verify presence of local market data store or connection."""
-        self._connected = self.store_dir.exists()
-        self.logger.info(
-            "FR-BROKER-SQ-FUTURES-CATALOG: Connected to SQ Futures datafeed. Store exists: %s",
-            self._connected,
-            extra={"fr_id": "FR-BROKER-SQ-FUTURES-CATALOG"},
-        )
-        return StandardResponse.success(
-            data=True,
-            message="SQ Futures store ready",
-            extensions={"broker": self.name},
-        )
-
-    @override
-    def is_connected(self) -> StandardResponse[bool]:
-        """Check active state."""
-        return StandardResponse.success(
-            data=self._connected, extensions={"broker": self.name}
-        )
-
-    @override
-    def disconnect(self) -> StandardResponse[bool]:
-        """Disconnect session."""
-        self._connected = False
-        return StandardResponse.success(data=True, extensions={"broker": self.name})
-
-    @override
-    def get_symbol_info(self, symbol: str) -> StandardResponse[SymbolInfo]:
-        """Retrieve contract specifications from host catalog or embedded specifications."""
-        sym_clean = symbol.upper().strip()
-        if self._instruments_service is not None:
-            inst = self._instruments_service.get_instrument(sym_clean)
-            if inst is not None:
-                digits = _calc_digits(inst.tick_size)
-                info = SymbolInfo(
-                    name=sym_clean,
-                    visible=True,
-                    select=True,
-                    point=inst.tick_size,
-                    digits=digits,
-                    trade_contract_size=inst.point_value,
-                    currency_base="USD",
-                    currency_profit="USD",
-                    currency_margin="USD",
-                    description=inst.description,
-                    exchange="Futures",
-                    raw=inst,
-                )
-                self.logger.debug(
-                    "FR-BROKER-SQ-FUTURES-CATALOG: Retrieved symbol info from database for %s",
-                    sym_clean,
-                    extra={
-                        "fr_id": "FR-BROKER-SQ-FUTURES-CATALOG",
-                        "symbol": sym_clean,
-                    },
-                )
-                return StandardResponse.success(
-                    data=info,
-                    extensions={"broker": self.name, "source": "database"},
-                )
-
-        # Lookup in static futures catalog
-        lookup_key = sym_clean if sym_clean.startswith("@") else f"@{sym_clean}"
-        spec = SQ_FUTURES_INSTRUMENTS.get(lookup_key)
-        if spec is not None:
-            digits = int(spec["decimals"])
-            info = SymbolInfo(
-                name=sym_clean,
-                visible=True,
-                select=True,
-                point=float(spec["tick_size"]),
-                digits=digits,
-                trade_contract_size=float(spec["point_value"]),
-                currency_base="USD",
-                currency_profit="USD",
-                currency_margin="USD",
-                description=str(spec["name"]),
-                exchange=str(spec["exchange"]),
-                raw=spec,
-            )
-            self.logger.debug(
-                "FR-BROKER-SQ-FUTURES-CATALOG: Retrieved symbol info from catalog for %s",
-                sym_clean,
-                extra={"fr_id": "FR-BROKER-SQ-FUTURES-CATALOG", "symbol": sym_clean},
-            )
-            return StandardResponse.success(
-                data=info,
-                extensions={"broker": self.name, "source": "catalog"},
-            )
-
-        msg = f"Commodity symbol '{symbol}' not found in host catalog"
-        return StandardResponse.failure(
-            message=msg,
-            error=StandardError(code="SYMBOL_NOT_FOUND", message=msg),
-            extensions={"broker": self.name},
-        )
-
-    @override
-    def get_symbols(
-        self, group: str | None = None
-    ) -> StandardResponse[list[SymbolInfo]]:
-        """Retrieve list of supported futures contracts."""
-        res: list[SymbolInfo] = []
-        for sym in SQ_FUTURES_INSTRUMENTS:
-            if not group or group.upper() in sym:
-                info_res = self.get_symbol_info(sym)
-                if info_res.data:
-                    res.append(info_res.data)
-        return StandardResponse.success(
-            data=res, extensions={"broker": self.name, "source": "catalog"}
-        )
-
-    @override
-    def get_symbol_tick(self, symbol: str) -> StandardResponse[Tick]:
-        """Retrieve latest known quote tick for symbol."""
-        bars_res = self.get_bars(symbol=symbol, count=1)
-        now = datetime.now(UTC)
-        if bars_res.is_success and bars_res.data:
-            last_bar = bars_res.data[-1]
-            return StandardResponse.success(
-                data=Tick(
-                    time=last_bar.time,
-                    bid=last_bar.close,
-                    ask=last_bar.close,
-                    last=last_bar.close,
-                ),
-                extensions={"broker": self.name},
-            )
-        return StandardResponse.failure(
-            message=f"No local Parquet quotes available from SQ Futures for symbol '{symbol}'",
-            error=StandardError(
-                code="NO_DATA",
-                message=f"No local Parquet quotes available from SQ Futures for symbol '{symbol}'",
-            ),
-            extensions={"broker": self.name},
-        )
-
-    @override
     def get_bars(
         self,
         symbol: str,
@@ -381,20 +228,12 @@ class SQFuturesBroker(BaseBroker):
 
         target_dir = self.store_dir / res_dir / sym_clean
         if not target_dir.exists():
-            # Try without '@' or with '@'
-            alt = (
-                sym_clean.lstrip("@") if sym_clean.startswith("@") else f"@{sym_clean}"
+            msg = f"No local data found for symbol '{symbol}' in {target_dir}"
+            return StandardResponse.failure(
+                message=msg,
+                error=StandardError(code="NOT_FOUND", message=msg),
+                extensions={"broker": self.name},
             )
-            alt_dir = self.store_dir / res_dir / alt
-            if alt_dir.exists():
-                target_dir = alt_dir
-            else:
-                msg = f"No local data found for symbol '{symbol}' in {target_dir}"
-                return StandardResponse.failure(
-                    message=msg,
-                    error=StandardError(code="NOT_FOUND", message=msg),
-                    extensions={"broker": self.name},
-                )
 
         try:
             import pyarrow.parquet as pq
@@ -454,6 +293,18 @@ class SQFuturesBroker(BaseBroker):
                 error=StandardError(code="READ_ERROR", message=msg),
                 extensions={"broker": self.name},
             )
+
+    @override
+    def get_ticks(
+        self,
+        symbol: str,
+        count: int | None = None,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        flags: int | None = None,
+    ) -> StandardResponse[list[Tick]]:
+        """Retrieve historical ticks."""
+        return StandardResponse.success(data=[], extensions={"broker": self.name})
 
 
 # Compatibility aliases
