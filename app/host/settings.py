@@ -1,6 +1,10 @@
 """Host configuration settings manager and dot-accessible configuration interface.
 
 Description:
+    Configuration validation and HostSettingsSnapshot assembly live here.
+    SettingsStore composes persistence.SettingsStore; storage receives validated
+    values and returns records/revisions. No database handles or SQL are permitted.
+
     Provides the central configuration settings container, dot-accessible access
     interface, validation engine, and settings management for HaruQuantAI host
     operations. All persistent database operations, schemas, and transactions are
@@ -80,7 +84,7 @@ from app.host.logging import get_logger
 from app.host.persistence import (
     DEFAULT_DATABASE_PATH,
     CorruptDataError,
-    HostSettingsSnapshot,
+    DatabaseManager,
     IncompatibleSchemaError,
     PersistenceError,
     RevisionConflictError,
@@ -90,6 +94,9 @@ from app.host.persistence import (
     ValidationError,
     canonical_json,
     validate_identifier,
+)
+from app.host.persistence import (
+    DEFAULT_READ_LIMIT as STORAGE_READ_LIMIT,
 )
 from app.host.persistence import (
     SettingsStore as _PersistenceSettingsStore,
@@ -319,13 +326,15 @@ def validate_configuration_values(scope: str, key: str, value: Any) -> None:
     _validate_string_limits(scope, key, value)
 
 
-class SettingsStore(_PersistenceSettingsStore):
-    """Authoritative host settings persistence store delegating to app.host.persistence.
+class HostSettingsSnapshot(BaseModel):
+    """Point-in-time snapshot of the entire host settings dictionary."""
 
-    Maintains 100% backward compatibility for existing callers and test suites while
-    ensuring that all SQLite connections and transactions are exclusively managed by
-    the host persistence engine.
-    """
+    revision: int
+    values: dict[str, dict[str, Any]]
+
+
+class SettingsStore:
+    """Validate host configuration and assemble snapshots through CRUD storage."""
 
     def __init__(
         self,
@@ -334,18 +343,79 @@ class SettingsStore(_PersistenceSettingsStore):
         busy_timeout: float = BUSY_TIMEOUT_SECONDS,
         validator: Callable[[str, str, Any], None] | None = None,
     ) -> None:
-        """Initialize SettingsStore delegating to app.host.persistence.
+        self._storage = _PersistenceSettingsStore(db_path, busy_timeout=busy_timeout)
+        self._validator = validator or validate_configuration_values
 
-        Args:
-            db_path: Optional path to the SQLite database file or ':memory:'.
-            busy_timeout: Timeout in seconds for SQLite lock waits.
-            validator: Optional callback validating setting value constraints.
-        """
-        super().__init__(
-            db_path=db_path,
-            busy_timeout=busy_timeout,
-            validator=validator or validate_configuration_values,
+    @property
+    def db_path(self) -> Path:
+        """Return the database location."""
+        return self._storage.db_path
+
+    @property
+    def db(self) -> DatabaseManager:
+        """Return the underlying storage manager without borrowing handles."""
+        return self._storage.db
+
+    def initialize(self) -> None:
+        """Initialize configuration storage."""
+        self._storage.initialize()
+
+    def get_revision(self) -> int:
+        """Return the configuration revision."""
+        return self._storage.get_revision()
+
+    def read_settings(
+        self,
+        scope: str,
+        *,
+        key: str | None = None,
+        after_key: str | None = None,
+        limit: int = STORAGE_READ_LIMIT,
+    ) -> SettingsPage:
+        """Read validated configuration storage records."""
+        return self._storage.read_settings(
+            scope, key=key, after_key=after_key, limit=limit
         )
+
+    def read_all_scoped(self) -> tuple[int, dict[str, dict[str, Any]]]:
+        """Group stored configuration values by namespace."""
+        revision, records = self._storage.read_all()
+        values: dict[str, dict[str, Any]] = {}
+        for record in records:
+            values.setdefault(record.scope, {})[record.key] = record.value
+        return revision, values
+
+    def get_snapshot(self) -> HostSettingsSnapshot:
+        """Assemble the host configuration snapshot."""
+        revision, values = self.read_all_scoped()
+        return HostSettingsSnapshot(revision=revision, values=values)
+
+    def update_settings(
+        self,
+        scope: str,
+        values: dict[str, Any],
+        *,
+        expected_revision: int | None = None,
+    ) -> HostSettingsSnapshot:
+        """Validate and update one configuration namespace."""
+        return self.update_batch({scope: values}, expected_revision=expected_revision)
+
+    def update_batch(
+        self,
+        changes: dict[str, dict[str, Any]],
+        *,
+        expected_revision: int | None = None,
+    ) -> HostSettingsSnapshot:
+        """Validate configuration before its atomic persistence update."""
+        for scope, values in changes.items():
+            if not isinstance(values, dict):
+                raise ValidationError(
+                    f"Scope changes for '{scope}' must be a dictionary"
+                )
+            for key, value in values.items():
+                self._validator(scope, key, value)
+        self._storage.update_batch(changes, expected_revision=expected_revision)
+        return self.get_snapshot()
 
 
 class _SettingsNode:

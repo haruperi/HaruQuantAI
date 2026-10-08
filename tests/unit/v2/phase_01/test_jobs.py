@@ -290,6 +290,12 @@ def test_deduplication(job_manager: JobManager) -> None:
     fut1.result(timeout=2.0)
 
     # Once fut1 completes, dedup_key is released and submission succeeds
+    job_id = job_manager.get_job_id_for_future(fut1)
+    assert job_id is not None
+    deadline = time.monotonic() + 2.0
+    while job_manager.get_job(job_id).status != JobStatus.COMPLETED:
+        assert time.monotonic() < deadline
+        time.sleep(0.01)
     fut2 = job_manager.submit(
         "owner-dedup-3",
         _simple_add,

@@ -1,6 +1,11 @@
 """Host-owned sessions, security boundaries, and distribution qualification.
 
 Description:
+    PersistenceAccess binds entity namespaces and worker owners, delegating CRUD
+    to persistence and reservation policy to jobs.LeaseManager. Namespace binding
+    is not authorization; existing session authorization remains authoritative.
+    No database connections, cursors or SQL are exposed to this module.
+
     Provides the central security authority, loopback origin validation, ephemeral
     session management with guaranteed host-restart invalidation, fine-grained
     scope authorization, distinct authority elevation for high-risk operations
@@ -129,7 +134,9 @@ from pydantic import BaseModel, ConfigDict, Field
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import JSONResponse
 
+from app.host.jobs import LeaseManager, LeaseRecord
 from app.host.logging import get_logger
+from app.host.persistence import DatabaseManager, TypedRepository, validate_identifier
 from app.host.response import StandardError, StandardResponse
 
 __all__ = [
@@ -150,6 +157,7 @@ __all__ = [
     "LoopbackValidator",
     "MaskedSecret",
     "PermissionDeniedError",
+    "PersistenceAccess",
     "RoleType",
     "ScopeAuthorizer",
     "ScopeCheckRequest",
@@ -1734,6 +1742,71 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     parser.print_help()
     return 0
+
+
+class PersistenceAccess:
+    """Scoped capability facade restricting domain callers to an authorized scope."""
+
+    def __init__(
+        self,
+        db: DatabaseManager,
+        *,
+        scope: str,
+        owner_id: str,
+    ) -> None:
+        """Initialize PersistenceAccess facade with database and scope.
+
+        Args:
+            db: Central host DatabaseManager.
+            scope: Bound tenant or namespace scope.
+            owner_id: Unique identifier of domain owner.
+        """
+        validate_identifier(scope, "scope")
+        validate_identifier(owner_id, "owner_id")
+        self._db = db
+        self._leases = LeaseManager(db)
+        self.scope = scope
+        self.owner_id = owner_id
+
+    def get_repository[T: BaseModel](
+        self,
+        entity_type: str,
+        model_cls: type[T],
+    ) -> TypedRepository[T]:
+        """Create a TypedRepository bound strictly to caller scope."""
+        return TypedRepository(
+            self._db,
+            entity_type=entity_type,
+            model_cls=model_cls,
+            scope=self.scope,
+        )
+
+    def acquire_lease(
+        self,
+        lease_key: str,
+        *,
+        ttl_seconds: float = 30.0,
+        metadata: dict[str, Any] | None = None,
+    ) -> LeaseRecord:
+        """Acquire a lease bound to owner and scope."""
+        scoped_key = f"{self.scope}:{lease_key}"
+        return self._leases.acquire(
+            scoped_key,
+            self.owner_id,
+            ttl_seconds=ttl_seconds,
+            scope=self.scope,
+            metadata=metadata,
+        )
+
+    def renew_lease(self, lease_key: str, *, ttl_seconds: float = 30.0) -> LeaseRecord:
+        """Renew a held lease."""
+        scoped_key = f"{self.scope}:{lease_key}"
+        return self._leases.renew(scoped_key, self.owner_id, ttl_seconds=ttl_seconds)
+
+    def release_lease(self, lease_key: str) -> bool:
+        """Release a held lease."""
+        scoped_key = f"{self.scope}:{lease_key}"
+        return self._leases.release(scoped_key, self.owner_id)
 
 
 if __name__ == "__main__":

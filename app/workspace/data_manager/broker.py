@@ -1,6 +1,10 @@
 """Authoritative broker profile definitions and configuration management.
 
 Description:
+    BrokerStore reads optional legacy rows through app.host.persistence. Business
+    fallback profiles and domain conversion remain here; this module executes no
+    SQL and does not create the optional legacy table.
+
     Provides broker profile configurations, server timezones, symbol postfixes,
     and platform execution/spread/commission profiles within the Data Manager
     workspace, mirroring SQX DataManagerBroker.
@@ -108,37 +112,25 @@ class BrokerService:
             ),
         ]
         try:
-            with self._db.connection(query_only=True) as conn:
-                cur = conn.cursor()
-                cur.execute(
-                    "SELECT 1 FROM sqlite_master WHERE type='table' "
-                    "AND name='datamgr_broker';"
-                )
-                if cur.fetchone() is not None:
-                    cur.execute("SELECT * FROM datamgr_broker ORDER BY id ASC;")
-                    rows = cur.fetchall()
-                    if rows:
-                        results: list[BrokerProfileRecord] = []
-                        for r in rows:
-                            r_dict = dict(r)
-                            results.append(
-                                BrokerProfileRecord(
-                                    id=r_dict.get("id", 0),
-                                    name=r_dict.get("name", ""),
-                                    is_system=bool(r_dict.get("is_system", 0)),
-                                    description=r_dict.get("description", ""),
-                                    server_timezone=r_dict.get(
-                                        "server_timezone", "UTC"
-                                    ),
-                                    postfix=r_dict.get("postfix", ""),
-                                    enabled=bool(r_dict.get("enabled", 1)),
-                                    mt_use=bool(r_dict.get("mt_use", 0)),
-                                    stockpicker_use=bool(
-                                        r_dict.get("stockpicker_use", 0)
-                                    ),
-                                )
-                            )
-                        return results
+            rows = self._db.brokers.list_profiles()
+            if rows:
+                results: list[BrokerProfileRecord] = []
+                for r in rows:
+                    r_dict = r
+                    results.append(
+                        BrokerProfileRecord(
+                            id=r_dict.get("id", 0),
+                            name=r_dict.get("name", ""),
+                            is_system=bool(r_dict.get("is_system", 0)),
+                            description=r_dict.get("description", ""),
+                            server_timezone=r_dict.get("server_timezone", "UTC"),
+                            postfix=r_dict.get("postfix", ""),
+                            enabled=bool(r_dict.get("enabled", 1)),
+                            mt_use=bool(r_dict.get("mt_use", 0)),
+                            stockpicker_use=bool(r_dict.get("stockpicker_use", 0)),
+                        )
+                    )
+                return results
         except (PersistenceError, OSError, ValueError, KeyError) as exc:
             logger.warning(
                 "FR-DATA-CATALOG-BROKER-PROFILES: Error reading datamgr_broker: %s",

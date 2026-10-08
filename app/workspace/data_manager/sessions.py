@@ -1,6 +1,10 @@
 """Market sessions, exchange clocks, and native session import service.
 
 Description:
+    ensure_defaults() owns baseline trading windows. Save/delete operations use
+    atomic SessionStore CRUD in app.host.persistence; calendar, timezone and window
+    interpretation remain here. No direct database handles or SQL are permitted.
+
     Market sessions, exchange clocks, DST transitions, and native session import
     service for the Data Manager workspace. Manages canonical trading sessions,
     day-of-week active windows, holiday schedules, and time zone transformations
@@ -12,6 +16,9 @@ Purpose:
     calendars in the Data Manager workspace.
 
 Key Capabilities:
+    - FR-DATA-SESSIONS-DEFAULTS: Initialize baseline trading windows idempotently.
+      Associated: `SessionService.ensure_defaults()`
+      Logging: INFO initialization; storage logs each upsert result.
     - FR-DATA-SESSIONS-TIMEZONES: Validate and resolve standard IANA timezones and DST.
     - FR-DATA-SESSIONS-WINDOWS: Represent and evaluate multi-window daily sessions.
     - FR-DATA-SESSIONS-IMPORT: Parse and import NinjaTrader 8 XML trading
@@ -30,6 +37,7 @@ Python API Usage:
     db = DatabaseManager()
     db.initialize()
     service = SessionService(db)
+    service.ensure_defaults()
 
     session = TradingSessionDefinition(
         name="US_Equities_RTH",
@@ -204,66 +212,67 @@ class SessionService:
         """Initialize session service with host database manager."""
         self._db = db
 
-    def save_session(self, session: TradingSessionDefinition) -> int:
-        """Upsert a trading session definition into datamgr_sessions.
-
-        Fires FR-DATA-SESSIONS-PERSISTENCE-CRUD.
-        """
-        windows_json = json.dumps([w.model_dump() for w in session.windows])
-        holidays_json = json.dumps([h.model_dump() for h in session.holidays])
-
-        existing = self._db.sessions.get_by_name(session.name)
-        if existing is not None:
-            sql = (
-                "UPDATE datamgr_sessions SET description = ?, timezone = ?, "
-                "windows_json = ?, holidays_json = ?, is_default = ? "
-                "WHERE name = ?;"
-            )
-            with self._db.transaction() as conn:
-                cur = conn.cursor()
-                cur.execute(
-                    sql,
-                    (
-                        session.description,
-                        session.timezone,
-                        windows_json,
-                        holidays_json,
-                        int(session.is_default),
-                        session.name,
-                    ),
-                )
-            logger.info(
-                "FR-DATA-SESSIONS-PERSISTENCE-CRUD: Updated session '%s'",
-                session.name,
-                extra={
-                    "session_name": session.name,
-                    "timezone": session.timezone,
-                    "fr_id": "FR-DATA-SESSIONS-PERSISTENCE-CRUD",
+    def ensure_defaults(self) -> None:
+        """Initialize baseline trading windows without replacing user definitions."""
+        for name, description, timezone, days, start, end, is_default in (
+            (
+                "24/7 Forex",
+                "Continuous round-the-clock forex trading session",
+                "UTC",
+                range(7),
+                "00:00",
+                "23:59:59",
+                1,
+            ),
+            (
+                "US Equities RTH",
+                "US Equities Regular Trading Hours",
+                "America/New_York",
+                range(1, 6),
+                "09:30",
+                "16:00",
+                0,
+            ),
+        ):
+            windows = [
+                {"day_of_week": day, "start_time": start, "end_time": end}
+                for day in days
+            ]
+            self._db.sessions.upsert(
+                {
+                    "name": name,
+                    "description": description,
+                    "timezone": timezone,
+                    "windows_json": json.dumps(windows),
+                    "holidays_json": "[]",
+                    "is_default": is_default,
                 },
+                only_if_absent=True,
             )
-            return int(existing.get("id", 0))
+        logger.info(
+            "Baseline trading sessions initialized",
+            extra={"fr_id": "FR-DATA-SESSIONS-DEFAULTS"},
+        )
 
+    def save_session(self, session: TradingSessionDefinition) -> int:
+        """Persist a supplied trading definition through one atomic upsert."""
         record = {
             "name": session.name,
             "description": session.description,
             "timezone": session.timezone,
-            "windows_json": windows_json,
-            "holidays_json": holidays_json,
+            "windows_json": json.dumps([w.model_dump() for w in session.windows]),
+            "holidays_json": json.dumps([h.model_dump() for h in session.holidays]),
             "is_default": int(session.is_default),
         }
-        new_id = self._db.sessions.create(record)
+        session_id = self._db.sessions.upsert(record)
         logger.info(
-            "FR-DATA-SESSIONS-PERSISTENCE-CRUD: Created session '%s' (id=%d)",
-            session.name,
-            new_id,
+            "Trading session saved",
             extra={
                 "session_name": session.name,
-                "session_id": new_id,
-                "timezone": session.timezone,
                 "fr_id": "FR-DATA-SESSIONS-PERSISTENCE-CRUD",
             },
         )
-        return new_id
+        return session_id
 
     def get_session(self, name: str) -> TradingSessionDefinition | None:
         """Retrieve a trading session definition by unique name.
@@ -324,25 +333,12 @@ class SessionService:
         return result
 
     def delete_session(self, name: str) -> bool:
-        """Delete trading session by name.
-
-        Fires FR-DATA-SESSIONS-PERSISTENCE-CRUD.
-        """
-        clean_name = name.strip()
-        sql = "DELETE FROM datamgr_sessions WHERE name = ?;"
-        with self._db.transaction() as conn:
-            cur = conn.cursor()
-            cur.execute(sql, (clean_name,))
-            deleted = cur.rowcount > 0
-        if deleted:
-            logger.info(
-                "FR-DATA-SESSIONS-PERSISTENCE-CRUD: Deleted session '%s'",
-                clean_name,
-                extra={
-                    "session_name": clean_name,
-                    "fr_id": "FR-DATA-SESSIONS-PERSISTENCE-CRUD",
-                },
-            )
+        """Delete a trading definition through storage CRUD."""
+        deleted = self._db.sessions.delete(name.strip())
+        logger.info(
+            "Trading session delete completed",
+            extra={"deleted": deleted, "fr_id": "FR-DATA-SESSIONS-PERSISTENCE-CRUD"},
+        )
         return deleted
 
     def is_market_open(self, session_name: str, dt_utc: datetime) -> bool:
@@ -583,6 +579,7 @@ def main() -> int:
     db = DatabaseManager()
     db.initialize()
     service = SessionService(db)
+    service.ensure_defaults()
 
     if args.import_nt:
         sessions = service.import_ninjatrader_xml(args.import_nt, policy=args.policy)

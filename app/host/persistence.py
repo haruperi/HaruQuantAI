@@ -1,150 +1,107 @@
-"""Authoritative host SQLite persistence, typed repositories, and restart recovery.
+"""Exclusive database access and storage CRUD for the application.
 
 Description:
-    Provides the central transactional SQLite persistence authority, schema migration
-    manager, narrow typed entity repositories, authoritative scoped settings store,
-    durable compute job store, distributed cooperative leases, and restart
-    reconciliation services for the HaruQuantAI platform host. All SQLite database
-    connections, transactions, migrations, and queries across the entire platform are
-    strictly centralized within this module. Domain plugins, host configuration
-    managers (app.host.settings), compute coordinators (app.host.jobs), and security
-    boundaries (app.host.session) never open SQLite handles or execute raw SQL
-    directly. This module acts as the sole persistence gateway, enforcing
-    connection-per-operation safety, `BEGIN IMMEDIATE` write serialization,
-    WAL journaling, foreign keys, and busy timeout management.
+    This is the only application module permitted to import database drivers,
+    open connections, execute SQL, or manage schemas and database transactions.
+    Small stores group related CRUD, queries, aggregates, storage serialization,
+    and atomic conditional writes. DatabaseManager owns handles; stores return
+    records and results. Connection/transaction methods are internal infrastructure:
+    other application modules must never borrow handles or supply connections.
 
-    Externally, it participates in four critical host lifecycles: (1) host bootstrap
-    calls `DatabaseManager.initialize()` and `RecoveryManager.reconcile_on_startup()`
-    during early startup to verify schema integrity, recover interrupted transactions,
-    and prune expired leases; (2) domain workspaces and host modules interact via
-    `SettingsStore`, `JobStore`, and scoped `PersistenceAccess` capability facades
-    without SQL exposure; (3) background worker pools and job admission controllers
-    coordinate multi-worker tasks through `LeaseManager` without split-brain lockouts;
-    and (4) the browser shell and DevOps tooling inspect storage metrics and run
-    physical database integrity checks via `create_persistence_router()`.
+    Business logic MUST NOT be added here. Configuration validation and snapshots
+    belong to app.host.settings; job lifecycle and worker lease policy belong to
+    app.host.jobs; scope binding belongs to app.host.session; startup recovery
+    sequencing belongs to app.host.bootstrap. Trading defaults and interpretation
+    belong to workspace services. HTTP handlers and CLI presentation belong to
+    app.host.diagnostics. No service callbacks, domain-model imports, business
+    seeds, job-state decisions, authorization decisions, or transport dependencies
+    are allowed in this module. Future features add narrow CRUD operations here
+    and call them from their owning service.
 
-    Internally, `DatabaseManager` manages SQLite connections, transaction blocks, and
-    WAL settings; `SchemaManager` enforces immutable migration history and runs
-    `PRAGMA integrity_check`; `SettingsStore` provides transactional settings CRUD;
-    `JobStore` manages compute job state transitions and startup reconciliation;
-    `TypedRepository[T]` maps Pydantic models to versioned JSON payload records with
-    monotonic revision checks (`expected_revision`); `LeaseManager` provides atomic
-    lease acquisition and heartbeats; and `RecoveryManager` audits control tables after
-    reboot to reconcile transient states without fabricating false data.
+    Domain services supply complete creation records, business defaults, domain
+    timestamps and conflict-update field choices. CRUD must not invent missing
+    trading values, session definitions, dataset IDs or quality scores. Existing
+    schema DEFAULT declarations remain compatibility infrastructure; storage
+    audit timestamps, revisions and serialization constraints belong here.
 
 Purpose:
-    FEAT-HOST-PERSISTENCE: Authoritative Host Persistence, Repositories, and Recovery.
-    Provides transactional SQLite database management, schema migration integrity,
-    narrow typed repositories, optimistic revision controls, and restart recovery.
+    FEAT-HOST-PERSISTENCE: Exclusive transactional database access and storage CRUD.
+    Preserve storage consistency without deciding application behavior.
 
 Key Capabilities:
-    - FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION: Schema Migrations & Integrity Checking
-      Associated: `[SchemaManager.initialize()]`, `[SchemaManager.check_integrity()]`
-      Logging: Emits INFO log on schema initialization and migration commits; ERROR
-      log on schema drift, checksum mismatch, or integrity corruption.
-    - FR-HOST-PERSISTENCE-TRANSACTIONS: Serialized ACID Write Transactions
-      Associated: `[DatabaseManager.transaction()]`
-      Logging: Emits DEBUG log on transaction begin/commit; WARNING log on rollback;
-      ERROR log on busy contention or lock timeouts.
-    - FR-HOST-PERSISTENCE-TYPED-REPOSITORY: Narrow Domain Entity Repositories
-      Associated: `[TypedRepository.get()]`, `[TypedRepository.save()]`,
-      `[TypedRepository.delete()]`, `[TypedRepository.list()]`
-      Logging: Emits DEBUG log on entity reads/queries; INFO log on entity mutations
-      recording entity ID, type, and updated revision.
-    - FR-HOST-PERSISTENCE-REVISION-CONCURRENCY: Optimistic Monotonic Revision Controls
-      Associated: `[TypedRepository.save()]`, `[TypedRepository.delete()]`
-      Logging: Emits WARNING log with conflict details when an update's expected
-      revision diverges from the persisted record.
-    - FR-HOST-PERSISTENCE-LEASE-COORDINATION: Cooperative Worker Leases & TTL Heartbeats
-      Associated: `[LeaseManager.acquire()]`, `[LeaseManager.renew()]`,
-      `[LeaseManager.release()]`
-      Logging: Emits INFO log on lease acquisition, renewal, and release; WARNING log
-      when lease acquisition is denied due to active holder.
-    - FR-HOST-PERSISTENCE-RESTART-RECOVERY: Startup Reconciliation of Orphaned Leases
-      Associated: `[RecoveryManager.reconcile_on_startup()]`
-      Logging: Emits INFO log detailing purged expired leases, reconciled entities,
-      and verified database physical integrity.
-    - FR-HOST-PERSISTENCE-INTEGRITY-CHECK: Physical SQLite Verification
-      Associated: `[DatabaseManager.check_integrity()]`
-      Logging: Emits INFO log on clean PRAGMA integrity check; ERROR log on detected
-      database page corruption.
-    - FR-HOST-PERSISTENCE-REST-PROJECTION: FastAPI REST Persistence Endpoints
-      Associated: `[create_persistence_router()]`
-      Logging: Emits DEBUG log on router initialization; INFO log on status,
-      lease, schema, and recovery API invocations.
+    - FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION: Create and inspect storage schemas.
+      Associated: `SchemaManager.initialize()`, `SchemaManager.verify_schema()`
+      Logging: INFO initialization; ERROR incompatible required tables/version.
+    - FR-HOST-PERSISTENCE-TRANSACTIONS: Atomic writes and connection ownership.
+      Associated: `DatabaseManager.connection()`, `DatabaseManager.transaction()`
+      Logging: DEBUG access/commit; WARNING rollback; ERROR contention.
+    - FR-HOST-PERSISTENCE-TYPED-REPOSITORY: Scoped JSON entity CRUD and revisions.
+      Associated: `TypedRepository.get()`, `save()`, `delete()`, `list()`
+      Logging: DEBUG reads; INFO writes; WARNING revision conflicts.
+    - FR-HOST-PERSISTENCE-SETTINGS: Setting reads and atomic batch writes.
+      Associated: `SettingsStore.read_all()`, `SettingsStore.update_batch()`
+      Logging: DEBUG reads; INFO changes; WARNING unavailable/corrupt data.
+    - FR-HOST-PERSISTENCE-JOBS: Job row reads/writes and conditional field updates.
+      Associated: `JobStore.get_job()`, `upsert_job()`, `update_statuses()`
+      Logging: DEBUG reads; INFO writes and affected-row count.
+    - FR-HOST-PERSISTENCE-LEASES: Atomic reservation row predicates and CRUD.
+      Associated: `LeaseStore.acquire()`, `renew()`, `release()`, `prune_expired()`
+      Logging: DEBUG conditional results/reads; INFO deleted-row count.
+    - FR-HOST-PERSISTENCE-INSTRUMENTS: Instrument row CRUD.
+      Associated: `InstrumentStore.create()`, `get_by_symbol()`, `update()`, `delete()`
+      Logging: DEBUG reads; INFO writes without payload values.
+    - FR-HOST-PERSISTENCE-SESSIONS: Trading-session row CRUD.
+      Associated: `SessionStore.upsert()`, `get_by_name()`, `delete()`
+      Logging: DEBUG reads; INFO write results.
+    - FR-HOST-PERSISTENCE-DATASETS: Metadata CRUD and bar aggregates.
+      Associated: `DatasetStore.save()`, `get_by_id()`, `sum_bars()`
+      Logging: DEBUG reads; INFO writes.
+    - FR-HOST-PERSISTENCE-BASKETS: Transactional group and membership CRUD.
+      Associated: `BasketStore.save()`, `get()`, `delete()`, `count()`
+      Logging: DEBUG reads; INFO write/delete results.
+    - FR-HOST-PERSISTENCE-BROKERS: Optional legacy broker row queries.
+      Associated: `BrokerStore.list_profiles()`
+      Logging: DEBUG read and table availability; no business fallback profiles.
+    - FR-HOST-PERSISTENCE-INTEGRITY-CHECK: Query physical SQLite integrity.
+      Associated: `DatabaseManager.check_integrity()`
+      Logging: INFO clean result; ERROR detected corruption.
 
 Python API Usage:
     ```python
-    from pathlib import Path
-    from pydantic import BaseModel
-    from app.host.persistence import DatabaseManager, TypedRepository
+    from app.host.persistence import DatabaseManager
 
-
-    class StrategyConfig(BaseModel):
-        symbol: str
-        timeframe: str
-
-
-    db = DatabaseManager(Path("data/database/haruquantai.db"))
-    db.initialize()
-
-    repo = TypedRepository(db, entity_type="strategy", model_cls=StrategyConfig)
-
-    # Save entity with initial revision
-    record = repo.save("strat-01", StrategyConfig(symbol="EURUSD", timeframe="1h"))
-
-    # Update with optimistic concurrency check
-    updated = repo.save(
-        "strat-01",
-        StrategyConfig(symbol="EURUSD", timeframe="4h"),
-        expected_revision=record.revision,
-    )
+    db = DatabaseManager(":memory:")
+    db.initialize()  # Storage only; domain services initialize business defaults.
+    rows = db.datasets.list_datasets(limit=50)
+    db.close()
     ```
 
 CLI Usage:
+    No persistence CLI or business orchestration lives here. Diagnostics owns it:
     ```bash
-    # Check database status and schema migration level
-    uv run python -m app.host.persistence --status
-
-    # Run physical database integrity verification
-    uv run python -m app.host.persistence --integrity-check
-
-    # Execute startup reconciliation of interrupted states
-    uv run python -m app.host.persistence --reconcile
+    uv run python -m app.host.diagnostics --status --db path/to/database.db
+    uv run python -m app.host.diagnostics --integrity-check --db path/to/database.db
     ```
 """
 
 from __future__ import annotations
 
-import argparse
 import contextlib
 import json
 import re
 import sqlite3
-import sys
 import threading
-import uuid
-from collections.abc import Callable, Generator, Mapping
-from dataclasses import asdict, is_dataclass
+from collections.abc import Generator, Mapping
 from datetime import UTC, datetime
-from enum import StrEnum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any
 
-if TYPE_CHECKING:
-    from app.host.jobs import JobRecord
-
-from fastapi import APIRouter, HTTPException, Request, Response, status
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.host.logging import get_logger
-from app.host.response import StandardResponse
 
 logger = get_logger(__name__)
 
-# Canonical envelope alias matching transport conventions
-ApiResponse = StandardResponse
 
 DEFAULT_DATABASE_PATH: Path = (
     Path(__file__).resolve().parents[2] / "data" / "database" / "haruquantai.db"
@@ -160,31 +117,24 @@ __all__ = [
     "MAX_BATCH_SIZE",
     "MAX_READ_LIMIT",
     "SCHEMA_VERSION",
-    "AcquireLeaseRequest",
-    "ApiResponse",
+    "BasketStore",
+    "BrokerStore",
     "CorruptDataError",
     "DatabaseManager",
     "DatabaseStatus",
-    "DatasetPersistence",
+    "DatasetStore",
     "EntityRecord",
-    "HostSettingsSnapshot",
     "IncompatibleSchemaError",
-    "InstrumentPersistence",
+    "InstrumentStore",
     "JobStore",
     "LeaseExpiredError",
-    "LeaseManager",
-    "LeaseRecord",
-    "LeaseStatus",
+    "LeaseStore",
     "MigrationRecord",
     "Page",
-    "PersistenceAccess",
     "PersistenceError",
-    "RecoveryManager",
-    "ReleaseLeaseRequest",
-    "RenewLeaseRequest",
     "RevisionConflictError",
     "SchemaManager",
-    "SessionPersistence",
+    "SessionStore",
     "SettingRecord",
     "SettingsPage",
     "SettingsStore",
@@ -192,9 +142,7 @@ __all__ = [
     "TypedRepository",
     "ValidationError",
     "canonical_json",
-    "create_persistence_router",
     "get_database_manager",
-    "main",
     "now_utc_iso",
     "validate_identifier",
     "validate_json_depth",
@@ -215,14 +163,6 @@ _CURRENT_SCHEMA_VERSION: int = 1
 # ============================================================================
 
 
-class LeaseStatus(StrEnum):
-    """Lifecycle state of a cooperative worker lease."""
-
-    ACTIVE = "active"
-    EXPIRED = "expired"
-    RELEASED = "released"
-
-
 class MigrationRecord(BaseModel):
     """Schema migration ledger entry."""
 
@@ -230,26 +170,6 @@ class MigrationRecord(BaseModel):
     name: str = Field(description="Descriptive identifier of migration.")
     applied_at_utc: datetime = Field(description="UTC timestamp of migration commit.")
     checksum: str = Field(description="SHA-256 digest of migration SQL script.")
-
-
-class LeaseRecord(BaseModel):
-    """Cooperative worker lease representation."""
-
-    lease_key: str = Field(description="Unique lease resource identifier.")
-    holder_id: str = Field(description="Identity of the active lease holder.")
-    scope: str = Field(description="Authorization or tenant scope.")
-    acquired_at_utc: datetime = Field(
-        description="UTC timestamp when lease was acquired."
-    )
-    expires_at_utc: datetime = Field(description="UTC timestamp when lease expires.")
-    metadata: dict[str, Any] = Field(
-        default_factory=dict, description="Arbitrary lease metadata attributes."
-    )
-
-    @property
-    def is_expired(self) -> bool:
-        """Return True if lease expiration is in the past."""
-        return datetime.now(UTC) > self.expires_at_utc
 
 
 class EntityRecord(BaseModel):
@@ -287,31 +207,6 @@ class Page[T](BaseModel):
     )
 
 
-class AcquireLeaseRequest(BaseModel):
-    """Request payload for acquiring a cooperative worker lease."""
-
-    lease_key: str = Field(min_length=1)
-    holder_id: str = Field(min_length=1)
-    ttl_seconds: float = Field(default=30.0, gt=0.0)
-    scope: str = Field(default="default")
-    metadata: dict[str, Any] = Field(default_factory=dict)
-
-
-class RenewLeaseRequest(BaseModel):
-    """Request payload for renewing an active lease."""
-
-    lease_key: str = Field(min_length=1)
-    holder_id: str = Field(min_length=1)
-    ttl_seconds: float = Field(default=30.0, gt=0.0)
-
-
-class ReleaseLeaseRequest(BaseModel):
-    """Request payload for releasing a held lease."""
-
-    lease_key: str = Field(min_length=1)
-    holder_id: str = Field(min_length=1)
-
-
 class SettingRecord(BaseModel):
     """Auditable record for a scoped configuration setting."""
 
@@ -327,13 +222,6 @@ class SettingsPage(BaseModel):
 
     items: list[SettingRecord]
     next_key: str | None = None
-
-
-class HostSettingsSnapshot(BaseModel):
-    """Point-in-time snapshot of the entire host settings dictionary."""
-
-    revision: int
-    values: dict[str, dict[str, Any]]
 
 
 # ============================================================================
@@ -463,6 +351,18 @@ def now_utc_iso() -> str:
     return datetime.now(UTC).isoformat()
 
 
+def _validate_columns(record: Mapping[str, Any], allowed: frozenset[str]) -> None:
+    """Reject update/insert fields outside a fixed storage-column allowlist."""
+    if set(record) - allowed:
+        raise ValidationError("Unsupported storage column")
+
+
+def _require_columns(record: Mapping[str, Any], columns: tuple[str, ...]) -> None:
+    """Reject incomplete inserts before opening a write transaction."""
+    if set(columns) - set(record):
+        raise ValidationError("Incomplete storage record")
+
+
 # ============================================================================
 # Database Connection & Transaction Manager
 # ============================================================================
@@ -509,11 +409,12 @@ class DatabaseManager:
             self.database_path.parent.mkdir(parents=True, exist_ok=True)
 
         self.schema = SchemaManager(self)
-        self.leases = LeaseManager(self)
-        self.recovery = RecoveryManager(self)
-        self.instruments = InstrumentPersistence(self)
-        self.sessions = SessionPersistence(self)
-        self.datasets = DatasetPersistence(self)
+        self.leases = LeaseStore(self)
+        self.instruments = InstrumentStore(self)
+        self.sessions = SessionStore(self)
+        self.datasets = DatasetStore(self)
+        self.baskets = BasketStore(self)
+        self.brokers = BrokerStore(self)
 
     @property
     def is_memory(self) -> bool:
@@ -550,6 +451,10 @@ class DatabaseManager:
         Yields:
             Configured sqlite3.Connection instance.
         """
+        logger.debug(
+            "Database connection access",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-TRANSACTIONS"},
+        )
         if self._is_memory and self._mem_conn is not None:
             with self._lock:
                 yield self._mem_conn
@@ -1034,54 +939,6 @@ class SchemaManager:
                     (now_str,),
                 )
 
-            # Seed standard baseline instruments if absent
-            conn.execute(
-                """
-                INSERT OR IGNORE INTO datamgr_instruments (
-                    symbol, description, tick_size, tick_step, point_value,
-                    decimals, default_spread, data_type, alias,
-                    created_at_utc, updated_at_utc
-                ) VALUES
-                ('EURUSD', 'Euro / US Dollar', 0.00001, 0.00001, 100000.0,
-                 5, 0.0001, 'Forex', 'EUR/USD,EURUSD_SB', ?, ?),
-                ('GBPUSD', 'British Pound / US Dollar', 0.00001, 0.00001, 100000.0,
-                 5, 0.0001, 'Forex', 'GBP/USD', ?, ?),
-                ('USDJPY', 'US Dollar / Japanese Yen', 0.001, 0.001, 100000.0,
-                 3, 0.01, 'Forex', 'USD/JPY', ?, ?);
-                """,
-                (now_str, now_str, now_str, now_str, now_str, now_str),
-            )
-
-            # Seed standard baseline trading sessions if absent
-            forex_windows = (
-                '[{"day_of_week": 0, "start_time": "00:00", "end_time": "23:59:59"},'
-                ' {"day_of_week": 1, "start_time": "00:00", "end_time": "23:59:59"},'
-                ' {"day_of_week": 2, "start_time": "00:00", "end_time": "23:59:59"},'
-                ' {"day_of_week": 3, "start_time": "00:00", "end_time": "23:59:59"},'
-                ' {"day_of_week": 4, "start_time": "00:00", "end_time": "23:59:59"},'
-                ' {"day_of_week": 5, "start_time": "00:00", "end_time": "23:59:59"},'
-                ' {"day_of_week": 6, "start_time": "00:00", "end_time": "23:59:59"}]'
-            )
-            rth_windows = (
-                '[{"day_of_week": 1, "start_time": "09:30", "end_time": "16:00"},'
-                ' {"day_of_week": 2, "start_time": "09:30", "end_time": "16:00"},'
-                ' {"day_of_week": 3, "start_time": "09:30", "end_time": "16:00"},'
-                ' {"day_of_week": 4, "start_time": "09:30", "end_time": "16:00"},'
-                ' {"day_of_week": 5, "start_time": "09:30", "end_time": "16:00"}]'
-            )
-            conn.execute(
-                """
-                INSERT OR IGNORE INTO datamgr_sessions (
-                    name, description, timezone, windows_json, is_default
-                ) VALUES
-                ('24/7 Forex', 'Continuous round-the-clock forex trading session',
-                 'UTC', ?, 1),
-                ('US Equities RTH', 'US Equities Regular Trading Hours',
-                 'America/New_York', ?, 0);
-                """,
-                (forex_windows, rth_windows),
-            )
-
         self._initialized = True
         logger.info(
             "Host database schema initialized",
@@ -1187,18 +1044,19 @@ class TypedRepository[T: BaseModel]:
     def get(
         self,
         entity_id: str,
-        *,
-        connection: sqlite3.Connection | None = None,
     ) -> T | None:
         """Retrieve and deserialize an entity by ID if present.
 
         Args:
             entity_id: Unique entity identifier.
-            connection: Optional external transaction connection.
 
         Returns:
             Deserialized Pydantic model instance, or None if absent.
         """
+        logger.debug(
+            "TypedRepository.get storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-TYPED-REPOSITORY"},
+        )
         validate_identifier(entity_id, "entity_id")
         sql = (
             "SELECT payload FROM host_entities "
@@ -1206,15 +1064,10 @@ class TypedRepository[T: BaseModel]:
         )
         params = (entity_id, self.entity_type, self.scope)
 
-        if connection is not None:
-            cur = connection.cursor()
+        with self._db.connection() as conn:
+            cur = conn.cursor()
             cur.execute(sql, params)
             row = cur.fetchone()
-        else:
-            with self._db.connection() as conn:
-                cur = conn.cursor()
-                cur.execute(sql, params)
-                row = cur.fetchone()
 
         if row is None:
             return None
@@ -1232,18 +1085,19 @@ class TypedRepository[T: BaseModel]:
     def get_record(
         self,
         entity_id: str,
-        *,
-        connection: sqlite3.Connection | None = None,
     ) -> EntityRecord | None:
         """Retrieve full EntityRecord envelope including revision metadata.
 
         Args:
             entity_id: Unique entity identifier.
-            connection: Optional external transaction connection.
 
         Returns:
             EntityRecord record, or None if absent.
         """
+        logger.debug(
+            "TypedRepository.get_record storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-TYPED-REPOSITORY"},
+        )
         validate_identifier(entity_id, "entity_id")
         sql = (
             "SELECT entity_id, entity_type, scope, payload, revision, "
@@ -1252,15 +1106,10 @@ class TypedRepository[T: BaseModel]:
         )
         params = (entity_id, self.entity_type, self.scope)
 
-        if connection is not None:
-            cur = connection.cursor()
+        with self._db.connection() as conn:
+            cur = conn.cursor()
             cur.execute(sql, params)
             row = cur.fetchone()
-        else:
-            with self._db.connection() as conn:
-                cur = conn.cursor()
-                cur.execute(sql, params)
-                row = cur.fetchone()
 
         if row is None:
             return None
@@ -1285,7 +1134,6 @@ class TypedRepository[T: BaseModel]:
         model: T,
         *,
         expected_revision: int | None = None,
-        connection: sqlite3.Connection | None = None,
     ) -> EntityRecord:
         """Save or update entity, verifying optimistic concurrency revision.
 
@@ -1294,7 +1142,6 @@ class TypedRepository[T: BaseModel]:
             model: Pydantic model payload to persist.
             expected_revision: Expected current revision for optimistic
                 concurrency check.
-            connection: Optional external transaction connection.
 
         Returns:
             Updated EntityRecord envelope.
@@ -1302,6 +1149,10 @@ class TypedRepository[T: BaseModel]:
         Raises:
             RevisionConflictError: If expected_revision does not match persisted record.
         """
+        logger.debug(
+            "TypedRepository.save storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-TYPED-REPOSITORY"},
+        )
         validate_identifier(entity_id, "entity_id")
         payload_dict = model.model_dump(mode="json")
         payload_json = canonical_json(payload_dict)
@@ -1411,8 +1262,6 @@ class TypedRepository[T: BaseModel]:
                 updated_at_utc=now_dt,
             )
 
-        if connection is not None:
-            return _execute(connection)
         with self._db.transaction() as conn:
             return _execute(conn)
 
@@ -1421,18 +1270,20 @@ class TypedRepository[T: BaseModel]:
         entity_id: str,
         *,
         expected_revision: int | None = None,
-        connection: sqlite3.Connection | None = None,
     ) -> bool:
         """Delete an entity by ID with optional expected revision check.
 
         Args:
             entity_id: Unique entity identifier.
             expected_revision: Optional revision concurrency assertion.
-            connection: Optional external transaction connection.
 
         Returns:
             True if entity was deleted; False if not found.
         """
+        logger.debug(
+            "TypedRepository.delete storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-TYPED-REPOSITORY"},
+        )
         validate_identifier(entity_id, "entity_id")
 
         def _execute(conn: sqlite3.Connection) -> bool:
@@ -1462,8 +1313,6 @@ class TypedRepository[T: BaseModel]:
             )
             return cur.rowcount > 0
 
-        if connection is not None:
-            return _execute(connection)
         with self._db.transaction() as conn:
             return _execute(conn)
 
@@ -1482,6 +1331,10 @@ class TypedRepository[T: BaseModel]:
         Returns:
             Page containing deserialized models and next cursor.
         """
+        logger.debug(
+            "TypedRepository.list storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-TYPED-REPOSITORY"},
+        )
         clamped_limit = max(1, min(limit, 500))
         with self._db.connection() as conn:
             cur = conn.cursor()
@@ -1522,382 +1375,6 @@ class TypedRepository[T: BaseModel]:
 
 
 # ============================================================================
-# Cooperative Lease Manager
-# ============================================================================
-
-
-class LeaseManager:
-    """Manages cooperative worker locks, heartbeats, and TTL expiration."""
-
-    def __init__(self, db: DatabaseManager) -> None:
-        self._db = db
-
-    def acquire(
-        self,
-        lease_key: str,
-        holder_id: str,
-        *,
-        ttl_seconds: float = 30.0,
-        scope: str = "default",
-        metadata: dict[str, Any] | None = None,
-    ) -> LeaseRecord:
-        """Atomically acquire or reclaim an expired cooperative lease.
-
-        Args:
-            lease_key: Unique lease resource key.
-            holder_id: Unique worker or process identifier.
-            ttl_seconds: Lease duration in seconds.
-            scope: Ownership or tenant scope.
-            metadata: Optional arbitrary structured lease attributes.
-
-        Returns:
-            LeaseRecord representing acquired lease.
-
-        Raises:
-            StorageBusyError: If lease is held by another worker and unexpired.
-        """
-        validate_identifier(lease_key, "lease_key")
-        validate_identifier(holder_id, "holder_id")
-        validate_identifier(scope, "scope")
-
-        meta_json = canonical_json(metadata or {})
-        now_dt = datetime.now(UTC)
-        expires_dt = datetime.fromtimestamp(now_dt.timestamp() + ttl_seconds, tz=UTC)
-        now_str = now_dt.isoformat()
-        expires_str = expires_dt.isoformat()
-
-        with self._db.transaction() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT holder_id, expires_at_utc FROM host_leases "
-                "WHERE lease_key = ?;",
-                (lease_key,),
-            )
-            existing = cur.fetchone()
-
-            if existing is not None:
-                current_holder = existing["holder_id"]
-                current_exp = datetime.fromisoformat(existing["expires_at_utc"])
-                if now_dt <= current_exp and current_holder != holder_id:
-                    msg = (
-                        f"Lease '{lease_key}' is actively held by "
-                        f"worker '{current_holder}' until {current_exp.isoformat()}"
-                    )
-                    logger.warning(
-                        msg,
-                        extra={"fr_id": "FR-HOST-PERSISTENCE-LEASE-COORDINATION"},
-                    )
-                    raise StorageBusyError(msg)
-
-                cur.execute(
-                    """
-                    UPDATE host_leases
-                    SET holder_id = ?, scope = ?, acquired_at_utc = ?,
-                        expires_at_utc = ?, metadata = ?
-                    WHERE lease_key = ?;
-                    """,
-                    (holder_id, scope, now_str, expires_str, meta_json, lease_key),
-                )
-            else:
-                cur.execute(
-                    """
-                    INSERT INTO host_leases (
-                        lease_key, holder_id, scope, acquired_at_utc,
-                        expires_at_utc, metadata
-                    ) VALUES (?, ?, ?, ?, ?, ?);
-                    """,
-                    (lease_key, holder_id, scope, now_str, expires_str, meta_json),
-                )
-
-        logger.info(
-            "Lease acquired",
-            extra={
-                "lease_key": lease_key,
-                "holder_id": holder_id,
-                "expires_at": expires_str,
-                "fr_id": "FR-HOST-PERSISTENCE-LEASE-COORDINATION",
-            },
-        )
-        return LeaseRecord(
-            lease_key=lease_key,
-            holder_id=holder_id,
-            scope=scope,
-            acquired_at_utc=now_dt,
-            expires_at_utc=expires_dt,
-            metadata=metadata or {},
-        )
-
-    def renew(
-        self,
-        lease_key: str,
-        holder_id: str,
-        *,
-        ttl_seconds: float = 30.0,
-    ) -> LeaseRecord:
-        """Renew an actively held lease, extending expiration time.
-
-        Args:
-            lease_key: Unique lease resource key.
-            holder_id: Holder identifier attempting renewal.
-            ttl_seconds: Extended duration in seconds.
-
-        Returns:
-            Updated LeaseRecord.
-
-        Raises:
-            LeaseExpiredError: If lease does not exist, has expired, or is held
-                by other.
-        """
-        validate_identifier(lease_key, "lease_key")
-        now_dt = datetime.now(UTC)
-        expires_dt = datetime.fromtimestamp(now_dt.timestamp() + ttl_seconds, tz=UTC)
-        expires_str = expires_dt.isoformat()
-
-        with self._db.transaction() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT holder_id, scope, acquired_at_utc, expires_at_utc, metadata "
-                "FROM host_leases WHERE lease_key = ?;",
-                (lease_key,),
-            )
-            existing = cur.fetchone()
-
-            if existing is None:
-                msg = f"Lease '{lease_key}' does not exist, cannot renew"
-                raise LeaseExpiredError(msg)
-
-            if existing["holder_id"] != holder_id:
-                msg = (
-                    f"Lease '{lease_key}' is held by '{existing['holder_id']}', "
-                    f"not '{holder_id}'"
-                )
-                raise LeaseExpiredError(msg)
-
-            cur_exp = datetime.fromisoformat(existing["expires_at_utc"])
-            if now_dt > cur_exp:
-                msg = f"Lease '{lease_key}' has already expired"
-                raise LeaseExpiredError(msg)
-
-            cur.execute(
-                "UPDATE host_leases SET expires_at_utc = ? WHERE lease_key = ?;",
-                (expires_str, lease_key),
-            )
-            scope = existing["scope"]
-            acq_dt = datetime.fromisoformat(existing["acquired_at_utc"])
-            meta_dict = json.loads(existing["metadata"])
-
-        logger.info(
-            "Lease renewed",
-            extra={
-                "lease_key": lease_key,
-                "holder_id": holder_id,
-                "new_expires_at": expires_str,
-                "fr_id": "FR-HOST-PERSISTENCE-LEASE-COORDINATION",
-            },
-        )
-        return LeaseRecord(
-            lease_key=lease_key,
-            holder_id=holder_id,
-            scope=scope,
-            acquired_at_utc=acq_dt,
-            expires_at_utc=expires_dt,
-            metadata=meta_dict,
-        )
-
-    def release(self, lease_key: str, holder_id: str) -> bool:
-        """Release a held lease if the caller is the registered holder.
-
-        Args:
-            lease_key: Unique lease resource key.
-            holder_id: Holder identifier attempting release.
-
-        Returns:
-            True if released; False if lease absent or held by another worker.
-        """
-        validate_identifier(lease_key, "lease_key")
-        with self._db.transaction() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "DELETE FROM host_leases WHERE lease_key = ? AND holder_id = ?;",
-                (lease_key, holder_id),
-            )
-            released = cur.rowcount > 0
-
-        if released:
-            logger.info(
-                "Lease released",
-                extra={
-                    "lease_key": lease_key,
-                    "holder_id": holder_id,
-                    "fr_id": "FR-HOST-PERSISTENCE-LEASE-COORDINATION",
-                },
-            )
-        return released
-
-    def list_active(self) -> list[LeaseRecord]:
-        """List all active unexpired leases."""
-        now_str = datetime.now(UTC).isoformat()
-        with self._db.connection() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT lease_key, holder_id, scope, acquired_at_utc, "
-                "expires_at_utc, metadata FROM host_leases "
-                "WHERE expires_at_utc > ? ORDER BY expires_at_utc ASC;",
-                (now_str,),
-            )
-            rows = cur.fetchall()
-
-        return [
-            LeaseRecord(
-                lease_key=r["lease_key"],
-                holder_id=r["holder_id"],
-                scope=r["scope"],
-                acquired_at_utc=datetime.fromisoformat(r["acquired_at_utc"]),
-                expires_at_utc=datetime.fromisoformat(r["expires_at_utc"]),
-                metadata=json.loads(r["metadata"]),
-            )
-            for r in rows
-        ]
-
-    def prune_expired(self) -> int:
-        """Prune all expired leases from storage.
-
-        Returns:
-            Number of deleted expired lease records.
-        """
-        now_str = datetime.now(UTC).isoformat()
-        with self._db.transaction() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "DELETE FROM host_leases WHERE expires_at_utc <= ?;",
-                (now_str,),
-            )
-            return cur.rowcount
-
-
-# ============================================================================
-# Restart Recovery Manager
-# ============================================================================
-
-
-class RecoveryManager:
-    """Reconciles interrupted writes, dead leases, and asserts integrity on boot."""
-
-    def __init__(self, db: DatabaseManager) -> None:
-        self._db = db
-
-    def reconcile_on_startup(self) -> dict[str, Any]:
-        """Perform comprehensive startup recovery and integrity verification.
-
-        Returns:
-            Dictionary report summarizing recovery outcome.
-        """
-        logger.info(
-            "Starting host persistence recovery audit",
-            extra={"fr_id": "FR-HOST-PERSISTENCE-RESTART-RECOVERY"},
-        )
-        # 1. Verify physical integrity
-        integrity = self._db.check_integrity()
-        if integrity.lower() != "ok":
-            msg = (
-                f"Database integrity check failed during startup recovery: {integrity}"
-            )
-            raise IncompatibleSchemaError(msg)
-
-        # 2. Verify schema readiness
-        self._db.schema.initialize()
-        self._db.schema.verify_schema()
-
-        # 3. Prune expired or stale leases
-        pruned_leases = self._db.leases.prune_expired()
-
-        report = {
-            "status": "reconciled",
-            "integrity": integrity,
-            "pruned_expired_leases": pruned_leases,
-            "reconciled_at_utc": datetime.now(UTC).isoformat(),
-        }
-
-        logger.info(
-            "Host persistence recovery complete",
-            extra={
-                "report": report,
-                "fr_id": "FR-HOST-PERSISTENCE-RESTART-RECOVERY",
-            },
-        )
-        return report
-
-
-# ============================================================================
-# Scoped Capability Facade
-# ============================================================================
-
-
-class PersistenceAccess:
-    """Scoped capability facade restricting domain callers to an authorized scope."""
-
-    def __init__(
-        self,
-        db: DatabaseManager,
-        *,
-        scope: str,
-        owner_id: str,
-    ) -> None:
-        """Initialize PersistenceAccess facade with database and scope.
-
-        Args:
-            db: Central host DatabaseManager.
-            scope: Bound tenant or namespace scope.
-            owner_id: Unique identifier of domain owner.
-        """
-        validate_identifier(scope, "scope")
-        validate_identifier(owner_id, "owner_id")
-        self._db = db
-        self.scope = scope
-        self.owner_id = owner_id
-
-    def get_repository[T: BaseModel](
-        self,
-        entity_type: str,
-        model_cls: type[T],
-    ) -> TypedRepository[T]:
-        """Create a TypedRepository bound strictly to caller scope."""
-        return TypedRepository(
-            self._db,
-            entity_type=entity_type,
-            model_cls=model_cls,
-            scope=self.scope,
-        )
-
-    def acquire_lease(
-        self,
-        lease_key: str,
-        *,
-        ttl_seconds: float = 30.0,
-        metadata: dict[str, Any] | None = None,
-    ) -> LeaseRecord:
-        """Acquire a lease bound to owner and scope."""
-        scoped_key = f"{self.scope}:{lease_key}"
-        return self._db.leases.acquire(
-            scoped_key,
-            self.owner_id,
-            ttl_seconds=ttl_seconds,
-            scope=self.scope,
-            metadata=metadata,
-        )
-
-    def renew_lease(self, lease_key: str, *, ttl_seconds: float = 30.0) -> LeaseRecord:
-        """Renew a held lease."""
-        scoped_key = f"{self.scope}:{lease_key}"
-        return self._db.leases.renew(scoped_key, self.owner_id, ttl_seconds=ttl_seconds)
-
-    def release_lease(self, lease_key: str) -> bool:
-        """Release a held lease."""
-        scoped_key = f"{self.scope}:{lease_key}"
-        return self._db.leases.release(scoped_key, self.owner_id)
-
-
-# ============================================================================
 # Authoritative Settings Store
 # ============================================================================
 
@@ -1916,7 +1393,6 @@ class SettingsStore:
         *,
         busy_timeout: float = _BUSY_TIMEOUT_SECONDS,
         db: DatabaseManager | None = None,
-        validator: Callable[[str, str, Any], None] | None = None,
     ) -> None:
         """Initialize SettingsStore with an authoritative database file path or manager.
 
@@ -1924,13 +1400,11 @@ class SettingsStore:
             db_path: Optional path to the SQLite database file or ':memory:'.
             busy_timeout: Timeout in seconds for SQLite lock waits.
             db: Optional preexisting DatabaseManager instance.
-            validator: Optional callback validating setting value constraints.
         """
         self._db: DatabaseManager = db or DatabaseManager(
             db_path, busy_timeout=busy_timeout
         )
         self._busy_timeout: float = busy_timeout
-        self._validator: Callable[[str, str, Any], None] | None = validator
 
     @property
     def db_path(self) -> Path:
@@ -1949,6 +1423,10 @@ class SettingsStore:
             IncompatibleSchemaError: If the existing table schema is incompatible.
             PersistenceError: If table creation or schema verification fails.
         """
+        logger.debug(
+            "SettingsStore.initialize storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+        )
         self._db.schema.initialize()
         with self._db.connection(query_only=False) as conn:
             try:
@@ -2052,6 +1530,10 @@ class SettingsStore:
 
     def get_revision(self) -> int:
         """Query current monotonic revision counter."""
+        logger.debug(
+            "SettingsStore.get_revision storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+        )
         if not self._db.is_memory and not self._db.database_path.exists():
             return 1
         with self._db.connection(query_only=True) as conn:
@@ -2079,6 +1561,10 @@ class SettingsStore:
         limit: int = DEFAULT_READ_LIMIT,
     ) -> SettingsPage:
         """Query scoped host settings with pagination and optional single key lookup."""
+        logger.debug(
+            "SettingsStore.read_settings storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+        )
         validate_identifier(scope, "scope")
         if key is not None:
             validate_identifier(key, "key")
@@ -2160,63 +1646,49 @@ class SettingsStore:
         records = [self._row_to_record(r) for r in display_rows]
         return SettingsPage(items=records, next_key=next_cursor)
 
-    def read_all_scoped(self) -> tuple[int, dict[str, dict[str, Any]]]:
-        """Read all scoped settings records grouped by scope, plus revision number."""
+    def read_all(self) -> tuple[int, list[SettingRecord]]:
+        """Read configuration records and their global storage revision."""
+        logger.debug(
+            "SettingsStore.read_all storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+        )
         if not self._db.is_memory and not self._db.database_path.exists():
-            return 1, {}
-
+            return 1, []
         with self._db.connection(query_only=True) as conn:
             try:
                 rows = conn.execute(
-                    """
-                    SELECT scope, key, value_json, schema_version, updated_at_utc
-                    FROM host_settings
-                    ORDER BY scope ASC, key ASC
-                    """
+                    "SELECT * FROM host_settings ORDER BY scope, key"
                 ).fetchall()
-            except sqlite3.OperationalError:
-                return 1, {}
-
-        revision = 1
-        values: dict[str, dict[str, Any]] = {}
-        for row in rows:
-            scope = str(row["scope"])
-            key = str(row["key"])
-            try:
-                val = json.loads(row["value_json"])
-            except (ValueError, TypeError) as exc:
-                logger.debug(
-                    "FR-HOST-SETTINGS-LOAD: Skipping corrupt row (%s)",
-                    exc,
-                    extra={"fr_id": "FR-HOST-SETTINGS-LOAD"},
+            except sqlite3.OperationalError as exc:
+                logger.warning(
+                    "Settings storage read unavailable",
+                    extra={
+                        "error_type": type(exc).__name__,
+                        "fr_id": "FR-HOST-PERSISTENCE-SETTINGS",
+                    },
                 )
+                return 1, []
+        revision = 1
+        records: list[SettingRecord] = []
+        for row in rows:
+            if row["scope"] == "_system" and row["key"] == "revision":
+                try:
+                    revision = int(json.loads(row["value_json"]))
+                except (ValueError, TypeError) as exc:
+                    raise CorruptDataError("Corrupt settings revision") from exc
                 continue
-
-            if scope == "_system" and key == "revision":
-                if isinstance(val, int):
-                    revision = val
-                continue
-
-            if scope not in values:
-                values[scope] = {}
-            values[scope][key] = val
-
-        return revision, values
-
-    def get_snapshot(self) -> HostSettingsSnapshot:
-        """Return full host settings snapshot including revision and values."""
-        rev, vals = self.read_all_scoped()
-        return HostSettingsSnapshot(revision=rev, values=vals)
-
-    def update_settings(
-        self,
-        scope: str,
-        values: dict[str, Any],
-        *,
-        expected_revision: int | None = None,
-    ) -> HostSettingsSnapshot:
-        """Convenience method to update settings within a single scope."""
-        return self.update_batch({scope: values}, expected_revision=expected_revision)
+            try:
+                records.append(self._row_to_record(row))
+            except CorruptDataError:
+                logger.warning(
+                    "Skipping corrupt settings row",
+                    extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+                )
+        logger.debug(
+            "Read settings records",
+            extra={"count": len(records), "fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+        )
+        return revision, records
 
     def _validate_batch_changes(
         self, changes: dict[str, dict[str, Any]]
@@ -2237,8 +1709,6 @@ class SettingsStore:
                 )
             for key, val in scope_changes.items():
                 validate_identifier(key, "key")
-                if self._validator is not None:
-                    self._validator(scope, key, val)
                 encoded = canonical_json(val)
                 validated_items.append((scope, key, val, encoded))
 
@@ -2265,10 +1735,14 @@ class SettingsStore:
         changes: dict[str, dict[str, Any]],
         *,
         expected_revision: int | None = None,
-    ) -> HostSettingsSnapshot:
+    ) -> tuple[int, list[SettingRecord]]:
         """Atomically update multiple scoped settings with optimistic locking."""
+        logger.debug(
+            "SettingsStore.update_batch storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+        )
         if not changes:
-            return self.get_snapshot()
+            return self.read_all()
 
         validated_items = self._validate_batch_changes(changes)
 
@@ -2338,7 +1812,7 @@ class SettingsStore:
                 "fr_id": "FR-HOST-SETTINGS-UPDATE",
             },
         )
-        return self.get_snapshot()
+        return self.read_all()
 
     def _check_table_exists(self, conn: sqlite3.Connection) -> None:
         """Verify that the host_settings table exists."""
@@ -2376,249 +1850,42 @@ class SettingsStore:
 
 
 # ============================================================================
-# Authoritative Job Store
-# ============================================================================
-
-
-class JobStore:
-    """Authoritative SQLite persistence manager for compute job records.
-
-    Provides transactional, parameterized CRUD operations against the `host_jobs`
-    table and startup reconciliation for interrupted jobs.
-    """
-
-    def __init__(
-        self,
-        db_path: Path | str | None = None,
-        *,
-        busy_timeout: float = _BUSY_TIMEOUT_SECONDS,
-        db: DatabaseManager | None = None,
-        record_factory: Callable[[Mapping[str, Any]], Any] | None = None,
-    ) -> None:
-        """Initialize JobStore with a database path or manager.
-
-        Args:
-            db_path: Optional path to SQLite file or ':memory:'.
-            busy_timeout: Lock timeout in seconds.
-            db: Optional preexisting DatabaseManager instance.
-            record_factory: Optional deserialization factory from mapping to
-                domain record.
-        """
-        self._db: DatabaseManager = db or DatabaseManager(
-            db_path, busy_timeout=busy_timeout
-        )
-        self._busy_timeout: float = busy_timeout
-        self._record_factory: Callable[[Mapping[str, Any]], Any] | None = record_factory
-
-    @property
-    def db_path(self) -> Path | str:
-        """Return the resolved database path or ':memory:'."""
-        return ":memory:" if self._db.is_memory else self._db.database_path
-
-    @property
-    def db(self) -> DatabaseManager:
-        """Return the underlying DatabaseManager instance."""
-        return self._db
-
-    def initialize(self) -> None:
-        """Ensure host_jobs schema and indexes exist."""
-        self._db.schema.initialize()
-
-    def upsert_job(self, record: Any) -> None:
-        """Insert or replace a job record.
-
-        Args:
-            record: Job record model instance to persist.
-        """
-        self.initialize()
-        budget_attr = getattr(record, "budget", {})
-        if is_dataclass(budget_attr) and not isinstance(budget_attr, type):
-            budget_dict = asdict(budget_attr)
-        elif isinstance(budget_attr, BaseModel):
-            budget_dict = budget_attr.model_dump(mode="json")
-        elif isinstance(budget_attr, dict):
-            budget_dict = budget_attr
-        else:
-            budget_dict = getattr(budget_attr, "__dict__", {})
-        budget_json = json.dumps(budget_dict)
-        child_ids = getattr(record, "child_job_ids", [])
-        child_json = json.dumps(child_ids)
-
-        with self._db.transaction() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO host_jobs (
-                    job_id, owner, kind, status, progress, accepted, rejected,
-                    message, attempt_id, max_retries, retry_count, dedup_key,
-                    parent_job_id, child_job_ids_json, budget_json, submitted_at_utc,
-                    started_at_utc, finished_at_utc, error_message, error_location
-                ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-                );
-                """,
-                (
-                    str(record.job_id),
-                    str(record.owner),
-                    str(record.kind),
-                    str(record.status),
-                    float(record.progress),
-                    int(record.accepted),
-                    int(record.rejected),
-                    str(record.message),
-                    int(record.attempt_id),
-                    int(record.max_retries),
-                    int(record.retry_count),
-                    record.dedup_key,
-                    record.parent_job_id,
-                    child_json,
-                    budget_json,
-                    str(record.submitted_at_utc),
-                    record.started_at_utc,
-                    record.finished_at_utc,
-                    record.error_message,
-                    record.error_location,
-                ),
-            )
-
-    def get_job(self, job_id: str) -> JobRecord | None:
-        """Query job record by job_id.
-
-        Args:
-            job_id: Task identifier string.
-
-        Returns:
-            Job record instance if found, None otherwise.
-        """
-        self.initialize()
-        with self._db.connection() as conn:
-            row = conn.execute(
-                "SELECT * FROM host_jobs WHERE job_id = ?;", (job_id,)
-            ).fetchone()
-            if row is None:
-                return None
-            return self._row_to_record(row)
-
-    def list_jobs(
-        self,
-        owner: str | None = None,
-        status: Any | None = None,
-        limit: int = 100,
-    ) -> list[JobRecord]:
-        """List job records matching optional filters."""
-        self.initialize()
-        params: list[Any] = []
-        if owner is not None and status is not None:
-            query = (
-                "SELECT * FROM host_jobs WHERE owner = ? AND status = ? "
-                "ORDER BY submitted_at_utc DESC LIMIT ?;"
-            )
-            params = [owner, str(status), limit]
-        elif owner is not None:
-            query = (
-                "SELECT * FROM host_jobs WHERE owner = ? "
-                "ORDER BY submitted_at_utc DESC LIMIT ?;"
-            )
-            params = [owner, limit]
-        elif status is not None:
-            query = (
-                "SELECT * FROM host_jobs WHERE status = ? "
-                "ORDER BY submitted_at_utc DESC LIMIT ?;"
-            )
-            params = [str(status), limit]
-        else:
-            query = "SELECT * FROM host_jobs ORDER BY submitted_at_utc DESC LIMIT ?;"
-            params = [limit]
-
-        with self._db.connection() as conn:
-            rows = conn.execute(query, params).fetchall()
-            return [self._row_to_record(r) for r in rows]
-
-    def reconcile_on_startup(self) -> int:
-        """Reconcile uncompleted jobs from previous runs to INTERRUPTED state."""
-        self.initialize()
-        now_utc = datetime.now(UTC).isoformat()
-        with self._db.transaction() as conn:
-            cols = {
-                r["name"]
-                for r in conn.execute("PRAGMA table_info(host_jobs)").fetchall()
-            }
-            if "status" not in cols:
-                return 0
-            cursor = conn.execute(
-                """
-                UPDATE host_jobs
-                SET status = 'interrupted',
-                    finished_at_utc = ?,
-                    error_message = ?
-                WHERE status IN ('queued', 'running', 'cancellation_requested');
-                """,
-                (now_utc, "Host restarted while job was in-flight."),
-            )
-            count = cursor.rowcount
-
-        if count > 0:
-            logger.info(
-                "Startup reconciliation: marked %d orphaned jobs as INTERRUPTED",
-                count,
-                extra={
-                    "reconciled_count": count,
-                    "requirement": "FR-HOST-JOBS-RESTART-RECONCILIATION",
-                },
-            )
-        return count
-
-    def _row_to_record(self, row: Mapping[str, Any]) -> JobRecord:
-        """Convert SQLite row to typed JobRecord model."""
-        if self._record_factory is not None:
-            return cast("JobRecord", self._record_factory(row))
-
-        from app.host.jobs import Budget, JobRecord, JobStatus
-
-        row_dict = dict(row)
-        raw_budget = row_dict.get("budget_json", "{}")
-        budget_data: dict[str, Any] = {}
-        if raw_budget:
-            parsed_budget = json.loads(raw_budget)
-            if isinstance(parsed_budget, dict):
-                budget_data = parsed_budget
-
-        raw_children = row_dict.get("child_job_ids_json", "[]")
-        child_ids: list[str] = []
-        if raw_children:
-            parsed_children = json.loads(raw_children)
-            if isinstance(parsed_children, list):
-                child_ids = [str(item) for item in parsed_children]
-        return JobRecord(
-            job_id=str(row_dict["job_id"]),
-            owner=str(row_dict["owner"]),
-            kind=str(row_dict["kind"]),
-            status=JobStatus(row_dict["status"]),
-            progress=float(row_dict["progress"]),
-            accepted=int(row_dict["accepted"]),
-            rejected=int(row_dict["rejected"]),
-            message=str(row_dict["message"]),
-            attempt_id=int(row_dict["attempt_id"]),
-            max_retries=int(row_dict["max_retries"]),
-            retry_count=int(row_dict["retry_count"]),
-            dedup_key=row_dict["dedup_key"],
-            parent_job_id=row_dict["parent_job_id"],
-            child_job_ids=child_ids,
-            budget=Budget(**budget_data),
-            submitted_at_utc=str(row_dict["submitted_at_utc"]),
-            started_at_utc=row_dict["started_at_utc"],
-            finished_at_utc=row_dict["finished_at_utc"],
-            error_message=row_dict["error_message"],
-            error_location=row_dict["error_location"],
-        )
-
-
-# ============================================================================
 # Datamgr Entities Persistence (Instruments, Sessions, Datasets)
 # ============================================================================
 
 
-class InstrumentPersistence:
+class InstrumentStore:
     """Authoritative host persistence operations for datamgr_instruments."""
+
+    _columns = frozenset(
+        {
+            "connection",
+            "broker_id",
+            "description",
+            "tick_size",
+            "tick_step",
+            "tick_value_in_money",
+            "point_value",
+            "decimals",
+            "default_spread",
+            "default_slippage",
+            "min_volume",
+            "max_volume",
+            "lot_step",
+            "margin_rate",
+            "swap_long",
+            "swap_short",
+            "swap_3day_day",
+            "commissions",
+            "data_type",
+            "alias",
+            "exchange",
+            "country",
+            "sector",
+            "created_at_utc",
+            "updated_at_utc",
+        }
+    )
 
     def __init__(self, db: DatabaseManager) -> None:
         """Initialize with parent DatabaseManager."""
@@ -2626,12 +1893,10 @@ class InstrumentPersistence:
 
     def create(self, record: dict[str, Any]) -> int:
         """Insert a new instrument record and return its generated ID."""
-        now_ts = now_utc_iso()
-        record_copy = dict(record)
-        if not record_copy.get("created_at_utc"):
-            record_copy["created_at_utc"] = now_ts
-        if not record_copy.get("updated_at_utc"):
-            record_copy["updated_at_utc"] = now_ts
+        logger.debug(
+            "InstrumentStore.create storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
         columns = [
             "symbol",
             "connection",
@@ -2660,30 +1925,9 @@ class InstrumentPersistence:
             "created_at_utc",
             "updated_at_utc",
         ]
-        values = []
-        for col in columns:
-            val = record_copy.get(col)
-            if val is None:
-                if col in ("broker_id", "decimals", "swap_3day_day"):
-                    val = 0
-                elif col in (
-                    "tick_size",
-                    "tick_step",
-                    "tick_value_in_money",
-                    "point_value",
-                    "default_spread",
-                    "default_slippage",
-                    "min_volume",
-                    "max_volume",
-                    "lot_step",
-                    "margin_rate",
-                    "swap_long",
-                    "swap_short",
-                ):
-                    val = 0.0
-                else:
-                    val = ""
-            values.append(val)
+        _validate_columns(record, self._columns | {"symbol"})
+        _require_columns(record, tuple(columns))
+        values = [record[col] for col in columns]
         sql = (
             "INSERT INTO datamgr_instruments ("
             "symbol, connection, broker_id, description, "
@@ -2702,7 +1946,7 @@ class InstrumentPersistence:
             last_id = cur.lastrowid or 0
         logger.info(
             "Created instrument in datamgr_instruments: %s (id=%d)",
-            record_copy.get("symbol"),
+            record["symbol"],
             last_id,
             extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
         )
@@ -2710,6 +1954,10 @@ class InstrumentPersistence:
 
     def get_by_symbol(self, symbol: str) -> dict[str, Any] | None:
         """Retrieve instrument record by symbol name."""
+        logger.debug(
+            "InstrumentStore.get_by_symbol storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
         sql = "SELECT * FROM datamgr_instruments WHERE symbol = ?;"
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
@@ -2719,6 +1967,27 @@ class InstrumentPersistence:
                 return dict(row)
         return None
 
+    def insert_if_absent(self, record: Mapping[str, Any]) -> bool:
+        """Insert supplied instrument fields without replacing an existing symbol."""
+        logger.debug(
+            "InstrumentStore.insert_if_absent storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
+        columns = tuple(record)
+        _validate_columns(record, self._columns | {"symbol"})
+        placeholders = ", ".join("?" for _ in columns)
+        sql = (
+            f"INSERT OR IGNORE INTO datamgr_instruments ({', '.join(columns)}) "  # noqa: S608 - fixed columns/placeholders only
+            f"VALUES ({placeholders})"
+        )
+        with self._db.transaction() as conn:
+            inserted = conn.execute(sql, tuple(record.values())).rowcount > 0
+        logger.info(
+            "Instrument insert-if-absent completed",
+            extra={"inserted": inserted, "fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
+        return inserted
+
     def list_instruments(
         self,
         connection: str | None = None,
@@ -2727,6 +1996,10 @@ class InstrumentPersistence:
         offset: int = 0,
     ) -> list[dict[str, Any]]:
         """List instruments with optional connection or data_type filter."""
+        logger.debug(
+            "InstrumentStore.list_instruments storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
         if connection and data_type:
             sql = (
                 "SELECT * FROM datamgr_instruments WHERE connection = ? "
@@ -2759,14 +2032,18 @@ class InstrumentPersistence:
 
     def update(self, symbol: str, updates: dict[str, Any]) -> bool:
         """Update fields for a symbol in datamgr_instruments."""
+        logger.debug(
+            "InstrumentStore.update storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
         if not updates:
             return True
         updates_copy = dict(updates)
-        updates_copy["updated_at_utc"] = now_utc_iso()
         updates_copy.pop("id", None)
         updates_copy.pop("symbol", None)
-        for k in updates_copy:
-            validate_identifier(k, "column")
+        _validate_columns(updates_copy, self._columns)
+        if not updates_copy:
+            return True
         set_clause = ", ".join(f"{k} = ?" for k in updates_copy)
         sql = f"UPDATE datamgr_instruments SET {set_clause} WHERE symbol = ?;"  # noqa: S608
         params = [*list(updates_copy.values()), symbol]
@@ -2784,6 +2061,10 @@ class InstrumentPersistence:
 
     def delete(self, symbol: str) -> bool:
         """Delete an instrument record by symbol."""
+        logger.debug(
+            "InstrumentStore.delete storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
         sql = "DELETE FROM datamgr_instruments WHERE symbol = ?;"
         with self._db.transaction() as conn:
             cur = conn.cursor()
@@ -2799,6 +2080,10 @@ class InstrumentPersistence:
 
     def count(self) -> int:
         """Return total instrument count."""
+        logger.debug(
+            "InstrumentStore.count storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
         sql = "SELECT COUNT(*) FROM datamgr_instruments;"
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
@@ -2807,8 +2092,18 @@ class InstrumentPersistence:
             return int(row[0]) if row else 0
 
 
-class SessionPersistence:
+class SessionStore:
     """Authoritative host persistence operations for datamgr_sessions."""
+
+    _columns = frozenset(
+        {
+            "description",
+            "timezone",
+            "windows_json",
+            "holidays_json",
+            "is_default",
+        }
+    )
 
     def __init__(self, db: DatabaseManager) -> None:
         """Initialize with parent DatabaseManager."""
@@ -2816,14 +2111,21 @@ class SessionPersistence:
 
     def create(self, record: dict[str, Any]) -> int:
         """Insert a new session definition and return its generated ID."""
-        values = [
-            record.get("name", ""),
-            record.get("description", ""),
-            record.get("timezone", "UTC"),
-            record.get("windows_json", "[]"),
-            record.get("holidays_json", "[]"),
-            int(record.get("is_default", 0)),
-        ]
+        logger.debug(
+            "SessionStore.create storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
+        columns = (
+            "name",
+            "description",
+            "timezone",
+            "windows_json",
+            "holidays_json",
+            "is_default",
+        )
+        _validate_columns(record, self._columns | {"name"})
+        _require_columns(record, columns)
+        values = [record[col] for col in columns]
         sql = (
             "INSERT INTO datamgr_sessions ("
             "name, description, timezone, windows_json, holidays_json, is_default"
@@ -2843,6 +2145,10 @@ class SessionPersistence:
 
     def get_by_name(self, name: str) -> dict[str, Any] | None:
         """Retrieve session record by name."""
+        logger.debug(
+            "SessionStore.get_by_name storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
         sql = "SELECT * FROM datamgr_sessions WHERE name = ?;"
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
@@ -2852,8 +2158,45 @@ class SessionPersistence:
                 return dict(row)
         return None
 
+    def upsert(self, record: Mapping[str, Any], *, only_if_absent: bool = False) -> int:
+        """Atomically insert or update a session and return its existing/new ID."""
+        logger.debug(
+            "SessionStore.upsert storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
+        columns = tuple(record)
+        _validate_columns(record, self._columns | {"name"})
+        placeholders = ", ".join("?" for _ in columns)
+        updates = ", ".join(
+            f"{col} = excluded.{col}" for col in columns if col != "name"
+        )
+        action = (
+            "DO NOTHING"
+            if only_if_absent or not updates
+            else f"DO UPDATE SET {updates}"
+        )
+        sql = (
+            f"INSERT INTO datamgr_sessions ({', '.join(columns)}) "  # noqa: S608 - fixed columns/placeholders only
+            f"VALUES ({placeholders}) ON CONFLICT(name) {action}"
+        )
+        with self._db.transaction() as conn:
+            conn.execute(sql, tuple(record.values()))
+            row = conn.execute(
+                "SELECT id FROM datamgr_sessions WHERE name = ?", (record["name"],)
+            ).fetchone()
+            session_id = int(row["id"])
+        logger.info(
+            "Session upsert completed",
+            extra={"session_id": session_id, "fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
+        return session_id
+
     def list_sessions(self, limit: int = 1000, offset: int = 0) -> list[dict[str, Any]]:
         """List sessions in ascending name order."""
+        logger.debug(
+            "SessionStore.list_sessions storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
         sql = "SELECT * FROM datamgr_sessions ORDER BY name ASC LIMIT ? OFFSET ?;"
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
@@ -2862,13 +2205,16 @@ class SessionPersistence:
 
     def update(self, name: str, updates: dict[str, Any]) -> bool:
         """Update fields for a session by name."""
+        logger.debug(
+            "SessionStore.update storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
         if not updates:
             return True
         updates_copy = dict(updates)
         updates_copy.pop("id", None)
         updates_copy.pop("name", None)
-        for k in updates_copy:
-            validate_identifier(k, "column")
+        _validate_columns(updates_copy, self._columns)
         set_clause = ", ".join(f"{k} = ?" for k in updates_copy)
         sql = f"UPDATE datamgr_sessions SET {set_clause} WHERE name = ?;"  # noqa: S608
         params = [*list(updates_copy.values()), name]
@@ -2886,6 +2232,10 @@ class SessionPersistence:
 
     def delete(self, name: str) -> bool:
         """Delete session definition by name."""
+        logger.debug(
+            "SessionStore.delete storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
         sql = "DELETE FROM datamgr_sessions WHERE name = ?;"
         with self._db.transaction() as conn:
             cur = conn.cursor()
@@ -2901,6 +2251,10 @@ class SessionPersistence:
 
     def count(self) -> int:
         """Return total session definitions count."""
+        logger.debug(
+            "SessionStore.count storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
         sql = "SELECT COUNT(*) FROM datamgr_sessions;"
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
@@ -2909,22 +2263,34 @@ class SessionPersistence:
             return int(row[0]) if row else 0
 
 
-class DatasetPersistence:
+class DatasetStore:
     """Authoritative host persistence operations for datamgr_datasets."""
 
     def __init__(self, db: DatabaseManager) -> None:
         """Initialize with parent DatabaseManager."""
         self._db = db
 
-    def save(self, record: dict[str, Any]) -> str:
-        """Upsert a dataset metadata record."""
-        now_ts = now_utc_iso()
-        record_copy = dict(record)
-        dataset_id = str(record_copy.get("id") or f"dataset-{uuid.uuid4().hex[:12]}")
-        record_copy["id"] = dataset_id
-        if not record_copy.get("created_at"):
-            record_copy["created_at"] = now_ts
-        record_copy["updated_at"] = now_ts
+    def sum_bars(self) -> int:
+        """Return the sum of stored dataset bar counts."""
+        logger.debug(
+            "DatasetStore.sum_bars storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"},
+        )
+        with self._db.connection(query_only=True) as conn:
+            row = conn.execute(
+                "SELECT COALESCE(SUM(bars), 0) FROM datamgr_datasets"
+            ).fetchone()
+        logger.debug(
+            "Dataset bar sum read", extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"}
+        )
+        return int(row[0])
+
+    def save(self, record: dict[str, Any], *, update_columns: tuple[str, ...]) -> str:
+        """Insert a complete row or update caller-selected columns on conflict."""
+        logger.debug(
+            "DatasetStore.save storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"},
+        )
         columns = [
             "id",
             "source",
@@ -2947,34 +2313,17 @@ class DatasetPersistence:
             "lineage_json",
             "schema_version",
         ]
-        values = []
-        for col in columns:
-            val = record_copy.get(col)
-            if val is None:
-                if col == "bars":
-                    val = 0
-                elif col == "schema_version":
-                    val = 1
-                elif col == "quality_score":
-                    val = 1.0
-                else:
-                    val = ""
-            values.append(val)
+        _validate_columns(record, frozenset(columns))
+        _require_columns(record, tuple(columns))
+        _validate_columns(dict.fromkeys(update_columns), frozenset(columns) - {"id"})
+        values = [record[col] for col in columns]
+        dataset_id = str(record["id"])
+        updates = ", ".join(f"{col} = excluded.{col}" for col in update_columns)
+        action = f"DO UPDATE SET {updates}" if updates else "DO NOTHING"
+        placeholders = ", ".join("?" for _ in columns)
         sql = (
-            "INSERT INTO datamgr_datasets ("
-            "id, source, symbol, underlying, instrument, timeframe, "
-            "broker, broker_name, timezone, category, date_from, date_to, "
-            "bars, created_at, updated_at, path, data_kind, quality_score, "
-            "lineage_json, schema_version"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
-            "ON CONFLICT(id) DO UPDATE SET "
-            "bars = excluded.bars, "
-            "date_from = excluded.date_from, "
-            "date_to = excluded.date_to, "
-            "updated_at = excluded.updated_at, "
-            "path = excluded.path, "
-            "quality_score = excluded.quality_score, "
-            "lineage_json = excluded.lineage_json;"
+            f"INSERT INTO datamgr_datasets ({', '.join(columns)}) "  # noqa: S608 - fixed column allowlist and placeholders
+            f"VALUES ({placeholders}) ON CONFLICT(id) {action}"
         )
         with self._db.transaction() as conn:
             cur = conn.cursor()
@@ -2988,6 +2337,10 @@ class DatasetPersistence:
 
     def get_by_id(self, dataset_id: str) -> dict[str, Any] | None:
         """Retrieve dataset record by primary ID."""
+        logger.debug(
+            "DatasetStore.get_by_id storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"},
+        )
         sql = "SELECT * FROM datamgr_datasets WHERE id = ?;"
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
@@ -3005,6 +2358,10 @@ class DatasetPersistence:
         offset: int = 0,
     ) -> list[dict[str, Any]]:
         """List datasets matching optional source and symbol filters."""
+        logger.debug(
+            "DatasetStore.list_datasets storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"},
+        )
         if source and symbol:
             sql = (
                 "SELECT * FROM datamgr_datasets WHERE source = ? "
@@ -3037,6 +2394,10 @@ class DatasetPersistence:
 
     def delete(self, dataset_id: str) -> bool:
         """Delete dataset record by ID."""
+        logger.debug(
+            "DatasetStore.delete storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"},
+        )
         sql = "DELETE FROM datamgr_datasets WHERE id = ?;"
         with self._db.transaction() as conn:
             cur = conn.cursor()
@@ -3052,6 +2413,10 @@ class DatasetPersistence:
 
     def count(self) -> int:
         """Return total dataset records count."""
+        logger.debug(
+            "DatasetStore.count storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-DATASETS"},
+        )
         sql = "SELECT COUNT(*) FROM datamgr_datasets;"
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
@@ -3060,302 +2425,367 @@ class DatasetPersistence:
             return int(row[0]) if row else 0
 
 
-# ============================================================================
-# REST Transport Projection
-# ============================================================================
-
-
-class PersistenceRouterService:
-    """Internal service adapter translating HTTP requests to persistence actions."""
+class LeaseStore:
+    """Store reservations with atomic holder/expiry predicates supplied by callers."""
 
     def __init__(self, db: DatabaseManager) -> None:
         self._db = db
 
-    def get_status(self, request: Request) -> Response:
-        """Get database operational metrics snapshot."""
-        req_id = request.headers.get("x-request-id")
-        status_rec = self._db.get_status()
-        resp = ApiResponse.success(
-            data=status_rec.model_dump(mode="json"),
-            message="Database status retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+    def get(self, lease_key: str) -> dict[str, Any] | None:
+        """Read one reservation row without interpreting its lifecycle."""
+        with self._db.connection(query_only=True) as conn:
+            row = conn.execute(
+                "SELECT * FROM host_leases WHERE lease_key = ?", (lease_key,)
+            ).fetchone()
+        logger.debug("Lease row read", extra={"fr_id": "FR-HOST-PERSISTENCE-LEASES"})
+        return self._row_to_record(row) if row is not None else None
 
-    def get_schema(self, request: Request) -> Response:
-        """Get schema migration ledger records."""
-        req_id = request.headers.get("x-request-id")
-        migrations = self._db.schema.list_migrations()
-        resp = ApiResponse.success(
-            data=[m.model_dump(mode="json") for m in migrations],
-            message="Schema migrations retrieved successfully.",
-            request_id=req_id,
+    def acquire(self, record: Mapping[str, Any], observed_at_utc: str) -> bool:
+        """Conditionally insert/replace a row by its holder and expiration."""
+        metadata = canonical_json(record["metadata"])
+        with self._db.transaction() as conn:
+            cursor = conn.execute(
+                """INSERT INTO host_leases
+                (lease_key, holder_id, scope, acquired_at_utc, expires_at_utc, metadata)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(lease_key) DO UPDATE SET
+                    holder_id = excluded.holder_id, scope = excluded.scope,
+                    acquired_at_utc = excluded.acquired_at_utc,
+                    expires_at_utc = excluded.expires_at_utc,
+                    metadata = excluded.metadata
+                WHERE host_leases.holder_id = excluded.holder_id
+                   OR host_leases.expires_at_utc < ?""",
+                (
+                    record["lease_key"],
+                    record["holder_id"],
+                    record["scope"],
+                    record["acquired_at_utc"],
+                    record["expires_at_utc"],
+                    metadata,
+                    observed_at_utc,
+                ),
+            )
+            changed = cursor.rowcount > 0
+        logger.debug(
+            "Conditional lease write completed",
+            extra={"changed": changed, "fr_id": "FR-HOST-PERSISTENCE-LEASES"},
         )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        return changed
 
-    def check_integrity_endpoint(self, request: Request) -> Response:
-        """Run physical SQLite database integrity verification."""
-        req_id = request.headers.get("x-request-id")
-        res = self._db.check_integrity()
-        resp = ApiResponse.success(
-            data={"integrity": res, "integrity_check": res},
-            message=f"Database integrity verified: {res}",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def list_leases(self, request: Request) -> Response:
-        """List currently active cooperative leases."""
-        req_id = request.headers.get("x-request-id")
-        leases = self._db.leases.list_active()
-        resp = ApiResponse.success(
-            data=[lease.model_dump(mode="json") for lease in leases],
-            message="Active leases retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def acquire_lease_endpoint(
+    def renew(
         self,
-        request: Request,
-        req: AcquireLeaseRequest,
-    ) -> Response:
-        """Acquire a cooperative worker lease."""
-        req_id = request.headers.get("x-request-id")
-        try:
-            lease = self._db.leases.acquire(
-                req.lease_key,
-                req.holder_id,
-                ttl_seconds=req.ttl_seconds,
-                scope=req.scope,
-                metadata=req.metadata,
+        lease_key: str,
+        holder_id: str,
+        observed_at_utc: str,
+        expires_at_utc: str,
+    ) -> dict[str, Any] | None:
+        """Update expiry and read the resulting row within one transaction."""
+        with self._db.transaction() as conn:
+            cursor = conn.execute(
+                "UPDATE host_leases SET expires_at_utc = ? "
+                "WHERE lease_key = ? AND holder_id = ? AND expires_at_utc >= ?",
+                (expires_at_utc, lease_key, holder_id, observed_at_utc),
             )
-            resp = ApiResponse.success(
-                data=lease.model_dump(mode="json"),
-                message=f"Lease {req.lease_key} acquired successfully.",
-                request_id=req_id,
+            row = (
+                conn.execute(
+                    "SELECT * FROM host_leases WHERE lease_key = ?", (lease_key,)
+                ).fetchone()
+                if cursor.rowcount
+                else None
             )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except StorageBusyError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=str(exc),
-            ) from exc
-
-    def renew_lease_endpoint(
-        self,
-        request: Request,
-        req: RenewLeaseRequest,
-    ) -> Response:
-        """Renew a held cooperative lease."""
-        req_id = request.headers.get("x-request-id")
-        try:
-            lease = self._db.leases.renew(
-                req.lease_key,
-                req.holder_id,
-                ttl_seconds=req.ttl_seconds,
-            )
-            resp = ApiResponse.success(
-                data=lease.model_dump(mode="json"),
-                message=f"Lease {req.lease_key} renewed successfully.",
-                request_id=req_id,
-            )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except LeaseExpiredError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=str(exc),
-            ) from exc
-
-    def release_lease_endpoint(
-        self,
-        request: Request,
-        req: ReleaseLeaseRequest,
-    ) -> Response:
-        """Release a held cooperative lease."""
-        req_id = request.headers.get("x-request-id")
-        released = self._db.leases.release(req.lease_key, req.holder_id)
-        resp = ApiResponse.success(
-            data={"released": released},
-            message=f"Lease {req.lease_key} released: {released}",
-            request_id=req_id,
+            record = self._row_to_record(row) if row is not None else None
+        logger.debug(
+            "Conditional lease renewal completed",
+            extra={"changed": row is not None, "fr_id": "FR-HOST-PERSISTENCE-LEASES"},
         )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        return record
 
-    def reconcile_endpoint(self, request: Request) -> Response:
-        """Trigger restart recovery reconciliation."""
-        req_id = request.headers.get("x-request-id")
-        report = self._db.recovery.reconcile_on_startup()
-        resp = ApiResponse.success(
-            data=report,
-            message="Recovery reconciliation completed.",
-            request_id=req_id,
+    def release(self, lease_key: str, holder_id: str) -> bool:
+        """Delete a row only when its key and holder match."""
+        with self._db.transaction() as conn:
+            changed = (
+                conn.execute(
+                    "DELETE FROM host_leases WHERE lease_key = ? AND holder_id = ?",
+                    (lease_key, holder_id),
+                ).rowcount
+                > 0
+            )
+        logger.debug(
+            "Conditional lease delete completed",
+            extra={"changed": changed, "fr_id": "FR-HOST-PERSISTENCE-LEASES"},
         )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        return changed
+
+    def list_active(self, observed_at_utc: str) -> list[dict[str, Any]]:
+        """Read rows after a caller-supplied expiration cutoff."""
+        with self._db.connection(query_only=True) as conn:
+            rows = conn.execute(
+                "SELECT * FROM host_leases WHERE expires_at_utc > ? "
+                "ORDER BY expires_at_utc",
+                (observed_at_utc,),
+            ).fetchall()
+        logger.debug("Lease rows read", extra={"fr_id": "FR-HOST-PERSISTENCE-LEASES"})
+        return [self._row_to_record(row) for row in rows]
+
+    def prune_expired(self, observed_at_utc: str) -> int:
+        """Delete rows at or before a caller-supplied expiration cutoff."""
+        with self._db.transaction() as conn:
+            count = conn.execute(
+                "DELETE FROM host_leases WHERE expires_at_utc <= ?", (observed_at_utc,)
+            ).rowcount
+        logger.info(
+            "Lease rows deleted",
+            extra={"count": count, "fr_id": "FR-HOST-PERSISTENCE-LEASES"},
+        )
+        return count
+
+    @staticmethod
+    def _row_to_record(row: sqlite3.Row) -> dict[str, Any]:
+        """Decode stored JSON without interpreting worker policy."""
+        record = dict(row)
+        record["metadata"] = json.loads(record["metadata"])
+        return record
 
 
-def create_persistence_router(db: DatabaseManager) -> APIRouter:
-    """Create and configure FastAPI APIRouter exposing persistence endpoints.
+class JobStore:
+    """Persist explicit job fields without interpreting job lifecycle or budgets."""
 
-    Args:
-        db: Central host DatabaseManager instance.
-
-    Returns:
-        Configured FastAPI APIRouter.
-    """
-    service = PersistenceRouterService(db)
-    router = APIRouter(prefix="/persistence", tags=["persistence"])
-
-    router.add_api_route(
-        "/status",
-        service.get_status,
-        methods=["GET"],
-        summary="Query database status and health",
-    )
-    router.add_api_route(
-        "/schema",
-        service.get_schema,
-        methods=["GET"],
-        summary="List applied schema migrations",
-    )
-    router.add_api_route(
-        "/schema/migrations",
-        service.get_schema,
-        methods=["GET"],
-        summary="List applied schema migrations alias",
-    )
-    router.add_api_route(
-        "/integrity-check",
-        service.check_integrity_endpoint,
-        methods=["POST"],
-        summary="Execute PRAGMA integrity_check",
-    )
-    router.add_api_route(
-        "/leases",
-        service.list_leases,
-        methods=["GET"],
-        summary="List active cooperative leases",
-    )
-    router.add_api_route(
-        "/leases/acquire",
-        service.acquire_lease_endpoint,
-        methods=["POST"],
-        summary="Acquire a cooperative lease",
-    )
-    router.add_api_route(
-        "/leases/renew",
-        service.renew_lease_endpoint,
-        methods=["POST"],
-        summary="Renew an active lease",
-    )
-    router.add_api_route(
-        "/leases/release",
-        service.release_lease_endpoint,
-        methods=["POST"],
-        summary="Release an active lease",
-    )
-    router.add_api_route(
-        "/recovery/reconcile",
-        service.reconcile_endpoint,
-        methods=["POST"],
-        summary="Trigger restart recovery reconciliation",
+    _columns = (
+        "job_id",
+        "owner",
+        "kind",
+        "status",
+        "progress",
+        "accepted",
+        "rejected",
+        "message",
+        "attempt_id",
+        "max_retries",
+        "retry_count",
+        "dedup_key",
+        "parent_job_id",
+        "child_job_ids_json",
+        "budget_json",
+        "submitted_at_utc",
+        "started_at_utc",
+        "finished_at_utc",
+        "error_message",
+        "error_location",
     )
 
-    logger.debug(
-        "Persistence REST router initialized",
-        extra={"fr_id": "FR-HOST-PERSISTENCE-REST-PROJECTION"},
-    )
-    return router
+    def __init__(
+        self,
+        db_path: Path | str | None = None,
+        *,
+        busy_timeout: float = _BUSY_TIMEOUT_SECONDS,
+        db: DatabaseManager | None = None,
+    ) -> None:
+        self._db = db or DatabaseManager(db_path, busy_timeout=busy_timeout)
+
+    @property
+    def db_path(self) -> Path | str:
+        """Return the configured database location."""
+        return ":memory:" if self._db.is_memory else self._db.database_path
+
+    @property
+    def db(self) -> DatabaseManager:
+        """Return the manager used by this store."""
+        return self._db
+
+    def initialize(self) -> None:
+        """Ensure the storage schema exists."""
+        self._db.initialize()
+
+    def upsert_job(self, record: Mapping[str, Any]) -> None:
+        """Write one complete job storage record."""
+        self.initialize()
+        placeholders = ", ".join("?" for _ in self._columns)
+        sql = (
+            f"INSERT OR REPLACE INTO host_jobs ({', '.join(self._columns)}) "  # noqa: S608 - fixed columns/placeholders only
+            f"VALUES ({placeholders})"
+        )
+        with self._db.transaction() as conn:
+            conn.execute(sql, tuple(record[column] for column in self._columns))
+        logger.info("Job row saved", extra={"fr_id": "FR-HOST-PERSISTENCE-JOBS"})
+
+    def get_job(self, job_id: str) -> dict[str, Any] | None:
+        """Read one job storage record by ID."""
+        self.initialize()
+        with self._db.connection(query_only=True) as conn:
+            row = conn.execute(
+                "SELECT * FROM host_jobs WHERE job_id = ?", (job_id,)
+            ).fetchone()
+        logger.debug("Job row read", extra={"fr_id": "FR-HOST-PERSISTENCE-JOBS"})
+        return dict(row) if row is not None else None
+
+    def list_jobs(
+        self,
+        owner: str | None = None,
+        status: str | None = None,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        """Read recent job rows with optional field filters."""
+        self.initialize()
+        filters = []
+        parameters: list[Any] = []
+        for column, value in (("owner", owner), ("status", status)):
+            if value is not None:
+                filters.append(f"{column} = ?")
+                parameters.append(value)
+        where = " WHERE " + " AND ".join(filters) if filters else ""
+        sql = f"SELECT * FROM host_jobs{where} ORDER BY submitted_at_utc DESC LIMIT ?"  # noqa: S608
+        with self._db.connection(query_only=True) as conn:
+            rows = conn.execute(sql, (*parameters, limit)).fetchall()
+        logger.debug("Job rows read", extra={"fr_id": "FR-HOST-PERSISTENCE-JOBS"})
+        return [dict(row) for row in rows]
+
+    def update_statuses(
+        self,
+        matching_statuses: tuple[str, ...],
+        *,
+        status: str,
+        finished_at_utc: str,
+        error_message: str,
+    ) -> int:
+        """Atomically update fields on rows matching caller-supplied statuses."""
+        self.initialize()
+        if not matching_statuses:
+            return 0
+        placeholders = ", ".join("?" for _ in matching_statuses)
+        sql = (
+            "UPDATE host_jobs SET status = ?, finished_at_utc = ?, error_message = ? "  # noqa: S608 - fixed columns/placeholders only
+            f"WHERE status IN ({placeholders})"
+        )
+        with self._db.transaction() as conn:
+            count = conn.execute(
+                sql, (status, finished_at_utc, error_message, *matching_statuses)
+            ).rowcount
+        logger.info(
+            "Job rows updated",
+            extra={"count": count, "fr_id": "FR-HOST-PERSISTENCE-JOBS"},
+        )
+        return count
 
 
-# ============================================================================
-# CLI Diagnostics Entrypoint
-# ============================================================================
+class BasketStore:
+    """Own group/member CRUD and their shared transaction boundary."""
 
+    def __init__(self, db: DatabaseManager) -> None:
+        self._db = db
 
-def main() -> int:
-    """CLI diagnostics entrypoint for database inspection and integrity validation.
-
-    Returns:
-        Process exit code (0 for success, non-zero for failure).
-    """
-    parser = argparse.ArgumentParser(
-        description="HaruQuantAI Host Persistence Authority Tool"
-    )
-    parser.add_argument(
-        "--status",
-        action="store_true",
-        help="Inspect database operational status and schema version",
-    )
-    parser.add_argument(
-        "--integrity-check",
-        action="store_true",
-        help="Run physical database integrity verification",
-    )
-    parser.add_argument(
-        "--reconcile",
-        action="store_true",
-        help="Execute startup recovery reconciliation",
-    )
-    parser.add_argument(
-        "--db",
-        type=Path,
-        default=Path("data/database/haruquantai.db"),
-        help="Target SQLite database path (default: data/database/haruquantai.db)",
-    )
-
-    args = parser.parse_args()
-    db = DatabaseManager(args.db)
-    exit_code = 0
-
-    if args.status:
-        try:
-            stat = db.get_status()
-            logger.info(
-                "Database status output",
-                extra={"status": stat.model_dump(mode="json")},
+    def save(
+        self, name: str, description: str, members: list[dict[str, str]], *, system: int
+    ) -> int:
+        """Replace a group's membership atomically without domain defaults."""
+        with self._db.transaction() as conn:
+            conn.execute(
+                "INSERT INTO datamgr_stock_group (name, description, system) "
+                "VALUES (?, ?, ?) ON CONFLICT(name) DO UPDATE SET "
+                "description = excluded.description",
+                (name, description, system),
             )
-            print(f"Database: {stat.database_path}")
-            print(f"Connected: {stat.is_connected}")
-            print(f"Journal: {stat.journal_mode}")
-            print(f"Schema Version: {stat.schema_version}")
-            print(f"Tables: {stat.table_count}")
-            print(f"Integrity: {stat.integrity_status}")
-            exit_code = 0 if stat.is_connected and stat.integrity_status == "ok" else 1
-        except Exception as exc:
-            logger.exception(
-                "Error checking database status",
-                extra={"error": str(exc)},
+            row = conn.execute(
+                "SELECT id FROM datamgr_stock_group WHERE name = ?", (name,)
+            ).fetchone()
+            group_id = int(row["id"])
+            conn.execute("DELETE FROM datamgr_stock WHERE basket_id = ?", (group_id,))
+            conn.executemany(
+                "INSERT INTO datamgr_stock (ticker, basket_id, date_from) "
+                "VALUES (?, ?, ?)",
+                [(m["ticker"], group_id, m["date_from"]) for m in members],
             )
-            exit_code = 2
-    elif args.integrity_check:
-        try:
-            result = db.check_integrity()
-            print(f"Integrity check: {result}")
-            exit_code = 0 if result == "ok" else 1
-        except Exception as exc:
-            logger.exception(
-                "Error verifying integrity",
-                extra={"error": str(exc)},
+        logger.info("Basket rows saved", extra={"fr_id": "FR-HOST-PERSISTENCE-BASKETS"})
+        return group_id
+
+    def get(self, name: str) -> dict[str, Any] | None:
+        """Read a group and its ordered members in one read transaction."""
+        with self._db.connection(query_only=True) as conn:
+            conn.execute("BEGIN")
+            try:
+                row = conn.execute(
+                    "SELECT * FROM datamgr_stock_group WHERE name = ?", (name,)
+                ).fetchone()
+                if row is None:
+                    record = None
+                else:
+                    record = dict(row)
+                    record["members"] = [
+                        dict(member)
+                        for member in conn.execute(
+                            "SELECT * FROM datamgr_stock WHERE basket_id = ? "
+                            "ORDER BY id",
+                            (row["id"],),
+                        ).fetchall()
+                    ]
+            finally:
+                conn.execute("ROLLBACK")
+        logger.debug("Basket rows read", extra={"fr_id": "FR-HOST-PERSISTENCE-BASKETS"})
+        return record
+
+    def list_names(self) -> list[str]:
+        """Read group names in alphabetical order."""
+        with self._db.connection(query_only=True) as conn:
+            rows = conn.execute(
+                "SELECT name FROM datamgr_stock_group ORDER BY name"
+            ).fetchall()
+        logger.debug(
+            "Basket names read", extra={"fr_id": "FR-HOST-PERSISTENCE-BASKETS"}
+        )
+        return [str(row["name"]) for row in rows]
+
+    def delete(self, name: str) -> bool:
+        """Delete a group and its members in one transaction."""
+        with self._db.transaction() as conn:
+            row: sqlite3.Row | None = conn.execute(
+                "SELECT id FROM datamgr_stock_group WHERE name = ?", (name,)
+            ).fetchone()
+            if row is not None:
+                conn.execute(
+                    "DELETE FROM datamgr_stock WHERE basket_id = ?", (row["id"],)
+                )
+                conn.execute(
+                    "DELETE FROM datamgr_stock_group WHERE id = ?", (row["id"],)
+                )
+        deleted: bool = row is not None
+        logger.info(
+            "Basket delete completed",
+            extra={"deleted": deleted, "fr_id": "FR-HOST-PERSISTENCE-BASKETS"},
+        )
+        return deleted
+
+    def count(self) -> int:
+        """Return the number of stored groups."""
+        with self._db.connection(query_only=True) as conn:
+            row = conn.execute("SELECT COUNT(*) FROM datamgr_stock_group").fetchone()
+        logger.debug(
+            "Basket count read", extra={"fr_id": "FR-HOST-PERSISTENCE-BASKETS"}
+        )
+        return int(row[0])
+
+
+class BrokerStore:
+    """Read optional legacy broker storage without defining broker defaults."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        self._db = db
+
+    def list_profiles(self) -> list[dict[str, Any]]:
+        """Return existing legacy rows, or an empty list if the table is absent."""
+        with self._db.connection(query_only=True) as conn:
+            exists: sqlite3.Row | None = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' "
+                "AND name='datamgr_broker'"
+            ).fetchone()
+            rows: list[sqlite3.Row] = (
+                conn.execute("SELECT * FROM datamgr_broker ORDER BY id").fetchall()
+                if exists
+                else []
             )
-            exit_code = 2
-    elif args.reconcile:
-        try:
-            report = db.recovery.reconcile_on_startup()
-            print(f"Reconciliation: {report['status']}")
-            print(f"Pruned Leases: {report['pruned_expired_leases']}")
-            exit_code = 0
-        except Exception as exc:
-            logger.exception(
-                "Error running reconciliation",
-                extra={"error": str(exc)},
-            )
-            exit_code = 2
-    else:
-        parser.print_help()
-
-    return exit_code
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+        logger.debug(
+            "Broker rows read",
+            extra={
+                "table_exists": exists is not None,
+                "fr_id": "FR-HOST-PERSISTENCE-BROKERS",
+            },
+        )
+        return [dict(row) for row in rows]

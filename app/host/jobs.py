@@ -1,6 +1,12 @@
 """Hardware diagnostics, process pool allocation, and job admission coordinator.
 
 Description:
+    JobStore composes the storage CRUD class and owns JobRecord/Budget conversion
+    and interrupted-job recovery policy. LeaseManager owns worker reservation
+    acquisition, renewal durations, holder decisions and expiration cleanup, using
+    atomic conditional LeaseStore writes. This module never receives database
+    handles or executes SQL.
+
     Provides point-in-time hardware resource diagnostics, background worker pool
     allocation, resource-bounded compute job admission, deduplicated scheduling,
     hierarchical parent-child tracking, checkpointed cooperative task cancellation,
@@ -24,7 +30,7 @@ Description:
     success or hanging indefinitely.
 
     Internally, `diagnostics()` queries `psutil`; `create_pool()` constructs worker
-    pools bounded for platform safety; `JobStore` delegates persistence of job
+    pools bounded for platform safety; `JobStore` delegates storage of job
     states and budgets to `app.host.persistence.DatabaseManager` (`host_jobs` table);
     `JobContext` coordinates cooperative cancellation and incremental progress
     reporting; and `JobManager` validates `Budget` constraints, tracks
@@ -37,6 +43,10 @@ Purpose:
     task admission, deduplication, restart reconciliation, and cooperative cancellation.
 
 Key Capabilities:
+    - FR-HOST-JOBS-LEASE-COORDINATION: Worker reservation ownership and durations.
+      Associated: `LeaseManager.acquire()`, `renew()`, `release()`, `prune_expired()`
+      Logging: INFO acquisition/renewal/release; WARNING denied ownership/expiry;
+        storage emits DEBUG conditional outcomes and INFO pruning counts.
     - FR-HOST-JOBS-HARDWARE-DIAGNOSTICS: System Metrics Sampling
       Associated: `[diagnostics()]`
       Logging: Emits INFO log when hardware diagnostics (CPU, RAM, OS, Python)
@@ -115,7 +125,7 @@ import sys
 import threading
 from collections.abc import Callable, Mapping
 from concurrent.futures import Executor, Future, ProcessPoolExecutor
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
@@ -127,6 +137,12 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app.host.logging import get_logger
+from app.host.persistence import (
+    DatabaseManager,
+    LeaseExpiredError,
+    StorageBusyError,
+    validate_identifier,
+)
 from app.host.persistence import (
     JobStore as _PersistenceJobStore,
 )
@@ -160,6 +176,9 @@ __all__ = [
     "JobStatus",
     "JobStore",
     "JobTimeoutError",
+    "LeaseManager",
+    "LeaseRecord",
+    "LeaseStatus",
     "SubmitJobRequest",
     "create_jobs_router",
     "create_pool",
@@ -541,32 +560,76 @@ class JobContext:
 # ==============================================================================
 
 
-class JobStore(_PersistenceJobStore):
-    """Host compute job persistence facade delegating to central DatabaseManager."""
+class JobStore:
+    """Adapt job models and lifecycle decisions to the host CRUD store."""
 
     def __init__(
         self,
         db_path: Path | str | None = None,
         *,
         busy_timeout: float = 5.0,
-        db: Any = None,
+        db: DatabaseManager | None = None,
     ) -> None:
-        """Initialize JobStore with a database path or DatabaseManager.
+        self._storage = _PersistenceJobStore(db_path, busy_timeout=busy_timeout, db=db)
 
-        Args:
-            db_path: Optional path to SQLite file or ':memory:'. Defaults to
-                'data/database/haruquantai.db'.
-            busy_timeout: Lock timeout in seconds.
-            db: Optional preexisting DatabaseManager instance.
-        """
-        super().__init__(
-            db_path=db_path,
-            busy_timeout=busy_timeout,
-            db=db,
-            record_factory=self._row_to_record,
+    @property
+    def db_path(self) -> Path | str:
+        """Return the underlying database location."""
+        return self._storage.db_path
+
+    @property
+    def db(self) -> DatabaseManager:
+        """Return the storage manager, without exposing database handles."""
+        return self._storage.db
+
+    def initialize(self) -> None:
+        """Ensure storage is ready."""
+        self._storage.initialize()
+
+    def upsert_job(self, record: JobRecord) -> None:
+        """Convert the job and its budget to explicit storage fields."""
+        data = record.model_dump(mode="json")
+        data["budget_json"] = json.dumps(asdict(record.budget))
+        data["child_job_ids_json"] = json.dumps(record.child_job_ids)
+        self._storage.upsert_job(data)
+
+    def get_job(self, job_id: str) -> JobRecord | None:
+        """Read and reconstruct a job model."""
+        row = self._storage.get_job(job_id)
+        return self._row_to_record(row) if row is not None else None
+
+    def list_jobs(
+        self,
+        owner: str | None = None,
+        status: JobStatus | str | None = None,
+        limit: int = 100,
+    ) -> list[JobRecord]:
+        """Read jobs with optional owner and lifecycle-state filters."""
+        return [
+            self._row_to_record(row)
+            for row in self._storage.list_jobs(
+                owner, str(status) if status is not None else None, limit
+            )
+        ]
+
+    def reconcile_on_startup(self) -> int:
+        """Mark jobs left in flight by the previous host as interrupted."""
+        count = self._storage.update_statuses(
+            (str(JobStatus.QUEUED), str(JobStatus.RUNNING), "cancellation_requested"),
+            status=str(JobStatus.INTERRUPTED),
+            finished_at_utc=datetime.now(UTC).isoformat(),
+            error_message="Host restarted while job was in-flight.",
         )
+        logger.info(
+            "Startup reconciliation marked %d jobs interrupted",
+            count,
+            extra={
+                "fr_id": "FR-HOST-JOBS-RESTART-RECONCILIATION",
+                "requirement": "FR-HOST-JOBS-RESTART-RECONCILIATION",
+            },
+        )
+        return count
 
-    @override
     def _row_to_record(self, row: Mapping[str, Any]) -> JobRecord:
         """Convert row mapping to typed JobRecord model."""
         budget_data = json.loads(row["budget_json"])
@@ -593,41 +656,6 @@ class JobStore(_PersistenceJobStore):
             error_message=row["error_message"],
             error_location=row["error_location"],
         )
-
-    @override
-    def get_job(self, job_id: str) -> JobRecord | None:
-        """Query job record by job_id.
-
-        Args:
-            job_id: Task identifier string.
-
-        Returns:
-            JobRecord instance if found, None otherwise.
-        """
-        record = super().get_job(job_id)
-        if isinstance(record, JobRecord):
-            return record
-        return None
-
-    @override
-    def list_jobs(
-        self,
-        owner: str | None = None,
-        status: Any | None = None,
-        limit: int = 100,
-    ) -> list[JobRecord]:
-        """List job records matching optional filters.
-
-        Args:
-            owner: Filter by owner identifier.
-            status: Filter by status value.
-            limit: Maximum count.
-
-        Returns:
-            List of matching JobRecord instances.
-        """
-        records = super().list_jobs(owner=owner, status=status, limit=limit)
-        return [r for r in records if isinstance(r, JobRecord)]
 
 
 # ==============================================================================
@@ -1813,6 +1841,153 @@ def main(argv: list[str] | None = None) -> int:
 
     parser.print_help()
     return 0
+
+
+class LeaseStatus(StrEnum):
+    """Lifecycle state of a cooperative worker lease."""
+
+    ACTIVE = "active"
+    EXPIRED = "expired"
+    RELEASED = "released"
+
+
+class LeaseRecord(BaseModel):
+    """Cooperative worker lease representation."""
+
+    lease_key: str = Field(description="Unique lease resource identifier.")
+    holder_id: str = Field(description="Identity of the active lease holder.")
+    scope: str = Field(description="Authorization or tenant scope.")
+    acquired_at_utc: datetime = Field(
+        description="UTC timestamp when lease was acquired."
+    )
+    expires_at_utc: datetime = Field(description="UTC timestamp when lease expires.")
+    metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Arbitrary lease metadata attributes."
+    )
+
+    @property
+    def is_expired(self) -> bool:
+        """Return True if lease expiration is in the past."""
+        return datetime.now(UTC) > self.expires_at_utc
+
+
+class LeaseManager:
+    """Coordinate worker reservations through atomic lease storage operations."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        self._store = db.leases
+
+    def acquire(
+        self,
+        lease_key: str,
+        holder_id: str,
+        *,
+        ttl_seconds: float = 30.0,
+        scope: str = "default",
+        metadata: dict[str, Any] | None = None,
+    ) -> LeaseRecord:
+        """Acquire, reacquire, or reclaim a reservation for the specified worker."""
+        validate_identifier(lease_key, "lease_key")
+        validate_identifier(holder_id, "holder_id")
+        validate_identifier(scope, "scope")
+        now = datetime.now(UTC)
+        record = LeaseRecord(
+            lease_key=lease_key,
+            holder_id=holder_id,
+            scope=scope,
+            acquired_at_utc=now,
+            expires_at_utc=datetime.fromtimestamp(now.timestamp() + ttl_seconds, UTC),
+            metadata=metadata or {},
+        )
+        data = record.model_dump(mode="json")
+        data["acquired_at_utc"] = record.acquired_at_utc.isoformat()
+        data["expires_at_utc"] = record.expires_at_utc.isoformat()
+        if not self._store.acquire(data, now.isoformat()):
+            logger.warning(
+                "Lease acquisition denied",
+                extra={
+                    "lease_key": lease_key,
+                    "fr_id": "FR-HOST-JOBS-LEASE-COORDINATION",
+                },
+            )
+            current = self._store.get(lease_key)
+            holder = current["holder_id"] if current is not None else "another worker"
+            raise StorageBusyError(
+                f"Lease '{lease_key}' is actively held by worker '{holder}'"
+            )
+        logger.info(
+            "Lease acquired",
+            extra={
+                "lease_key": lease_key,
+                "holder_id": holder_id,
+                "fr_id": "FR-HOST-JOBS-LEASE-COORDINATION",
+            },
+        )
+        return record
+
+    def renew(
+        self,
+        lease_key: str,
+        holder_id: str,
+        *,
+        ttl_seconds: float = 30.0,
+    ) -> LeaseRecord:
+        """Extend an unexpired reservation held by this worker."""
+        validate_identifier(lease_key, "lease_key")
+        now = datetime.now(UTC)
+        expires = datetime.fromtimestamp(now.timestamp() + ttl_seconds, UTC)
+        row = self._store.renew(
+            lease_key, holder_id, now.isoformat(), expires.isoformat()
+        )
+        if row is None:
+            current = self._store.get(lease_key)
+            if current is None:
+                message = f"Lease '{lease_key}' does not exist, cannot renew"
+            elif current["holder_id"] != holder_id:
+                message = (
+                    f"Lease '{lease_key}' is held by '{current['holder_id']}', "
+                    f"not '{holder_id}'"
+                )
+            else:
+                message = f"Lease '{lease_key}' has already expired"
+            logger.warning(
+                "Lease renewal denied",
+                extra={
+                    "lease_key": lease_key,
+                    "fr_id": "FR-HOST-JOBS-LEASE-COORDINATION",
+                },
+            )
+            raise LeaseExpiredError(message)
+        logger.info(
+            "Lease renewed",
+            extra={"lease_key": lease_key, "fr_id": "FR-HOST-JOBS-LEASE-COORDINATION"},
+        )
+        return LeaseRecord.model_validate(row)
+
+    def release(self, lease_key: str, holder_id: str) -> bool:
+        """Release only this worker's reservation."""
+        validate_identifier(lease_key, "lease_key")
+        released = self._store.release(lease_key, holder_id)
+        logger.info(
+            "Lease release completed",
+            extra={
+                "lease_key": lease_key,
+                "released": released,
+                "fr_id": "FR-HOST-JOBS-LEASE-COORDINATION",
+            },
+        )
+        return released
+
+    def list_active(self) -> list[LeaseRecord]:
+        """List currently unexpired reservations."""
+        return [
+            LeaseRecord.model_validate(row)
+            for row in self._store.list_active(datetime.now(UTC).isoformat())
+        ]
+
+    def prune_expired(self) -> int:
+        """Remove reservations whose duration has elapsed."""
+        return self._store.prune_expired(datetime.now(UTC).isoformat())
 
 
 if __name__ == "__main__":

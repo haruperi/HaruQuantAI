@@ -1,6 +1,10 @@
 """Market data baskets, stock groups, and multi-symbol series alignment.
 
 Description:
+    BasketStore in app.host.persistence owns atomic group/membership SQL. This
+    service owns dates, default weights, basket models and synthetic calculations.
+    No database connections, cursors or SQL are permitted here.
+
     Service managing multi-asset baskets, stock groups, and cross-instrument
     series alignment for portfolio analysis and synthetic instrument generation
     within the Data Manager workspace, mirroring SQX DataManagerBasket.
@@ -115,126 +119,50 @@ class BasketService:
         self._db = db
 
     def save_basket(self, basket: BasketDefinition) -> int:
-        """Upsert basket and its constituent items in datamgr_stock_group.
-
-        Fires FR-DATA-BASKETS-GROUPS.
-        """
-        with self._db.transaction() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT id FROM datamgr_stock_group WHERE name = ?;",
-                (basket.name,),
-            )
-            row = cur.fetchone()
-            if row is not None:
-                group_id = int(row[0])
-                cur.execute(
-                    "UPDATE datamgr_stock_group SET description = ? WHERE id = ?;",
-                    (basket.description, group_id),
-                )
-                cur.execute(
-                    "DELETE FROM datamgr_stock WHERE basket_id = ?;", (group_id,)
-                )
-            else:
-                cur.execute(
-                    "INSERT INTO datamgr_stock_group (name, description, system) "
-                    "VALUES (?, ?, ?);",
-                    (basket.name, basket.description, 0),
-                )
-                group_id = cur.lastrowid or 0
-
-            for item in basket.items:
-                cur.execute(
-                    "INSERT INTO datamgr_stock (ticker, basket_id, date_from) "
-                    "VALUES (?, ?, ?);",
-                    (item.symbol, group_id, "1900-01-01"),
-                )
-
+        """Persist basket members with this service's historical date convention."""
+        members = [
+            {"ticker": item.symbol, "date_from": "1900-01-01"} for item in basket.items
+        ]
+        group_id = self._db.baskets.save(
+            basket.name, basket.description, members, system=0
+        )
         logger.info(
-            "FR-DATA-BASKETS-GROUPS: Saved basket '%s' (id=%d, items=%d)",
-            basket.name,
-            group_id,
-            len(basket.items),
-            extra={
-                "basket_name": basket.name,
-                "group_id": group_id,
-                "item_count": len(basket.items),
-                "fr_id": "FR-DATA-BASKETS-GROUPS",
-            },
+            "FR-DATA-BASKETS-GROUPS: Basket saved",
+            extra={"basket_name": basket.name, "fr_id": "FR-DATA-BASKETS-GROUPS"},
         )
         return group_id
 
     def get_basket(self, name: str) -> BasketDefinition | None:
-        """Retrieve basket definition and constituents by name.
-
-        Fires FR-DATA-BASKETS-GROUPS.
-        """
-        clean_name = name.strip()
-        with self._db.connection(query_only=True) as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT id, name, description FROM datamgr_stock_group WHERE name = ?;",
-                (clean_name,),
-            )
-            group_row = cur.fetchone()
-            if group_row is None:
-                return None
-            group_id = int(group_row[0])
-            desc = str(group_row[2] or "")
-
-            cur.execute(
-                "SELECT ticker FROM datamgr_stock WHERE basket_id = ? ORDER BY id ASC;",
-                (group_id,),
-            )
-            stock_rows = cur.fetchall()
-            items = [BasketItem(symbol=str(r[0]), weight=1.0) for r in stock_rows]
-
-        return BasketDefinition(name=clean_name, description=desc, items=items)
+        """Convert stored members into the service's basket model."""
+        record = self._db.baskets.get(name.strip())
+        if record is None:
+            return None
+        return BasketDefinition(
+            name=record["name"],
+            description=record["description"] or "",
+            items=[
+                BasketItem(symbol=member["ticker"], weight=1.0)
+                for member in record["members"]
+            ],
+        )
 
     def list_baskets(self) -> list[BasketDefinition]:
-        """List all defined baskets in the database."""
-        with self._db.connection(query_only=True) as conn:
-            cur = conn.cursor()
-            cur.execute("SELECT name FROM datamgr_stock_group ORDER BY name ASC;")
-            names = [str(r[0]) for r in cur.fetchall()]
-
-        baskets: list[BasketDefinition] = []
-        for n in names:
-            b = self.get_basket(n)
-            if b is not None:
-                baskets.append(b)
-        return baskets
+        """List domain baskets in name order."""
+        result = []
+        for name in self._db.baskets.list_names():
+            basket = self.get_basket(name)
+            if basket is not None:
+                result.append(basket)
+        return result
 
     def delete_basket(self, name: str) -> bool:
-        """Delete basket and its constituents by name.
-
-        Fires FR-DATA-BASKETS-GROUPS.
-        """
-        clean_name = name.strip()
-        with self._db.transaction() as conn:
-            cur = conn.cursor()
-            cur.execute(
-                "SELECT id FROM datamgr_stock_group WHERE name = ?;",
-                (clean_name,),
-            )
-            row = cur.fetchone()
-            if row is None:
-                return False
-            group_id = int(row[0])
-            cur.execute("DELETE FROM datamgr_stock WHERE basket_id = ?;", (group_id,))
-            cur.execute("DELETE FROM datamgr_stock_group WHERE id = ?;", (group_id,))
-
+        """Request atomic deletion of a basket and its members."""
+        deleted = self._db.baskets.delete(name.strip())
         logger.info(
-            "FR-DATA-BASKETS-GROUPS: Deleted basket '%s' (id=%d)",
-            clean_name,
-            group_id,
-            extra={
-                "basket_name": clean_name,
-                "group_id": group_id,
-                "fr_id": "FR-DATA-BASKETS-GROUPS",
-            },
+            "Basket delete completed",
+            extra={"deleted": deleted, "fr_id": "FR-DATA-BASKETS-GROUPS"},
         )
-        return True
+        return deleted
 
     def align_series(
         self,

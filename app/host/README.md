@@ -22,7 +22,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-TRANSPORT` | Unified HTTP transport middleware, request correlation, session authentication, in-memory event bus, and Server-Sent Events streaming in `app/host/transport.py` | Implemented and verified; Phase 1 task 1.6 qualified |
 | `FEAT-HOST-JOBS` | Hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, restart reconciliation, and event broadcasting in `app/host/jobs.py` | Implemented and verified; Phase 1 task 1.7 qualified |
 | `FEAT-HOST-RESOURCES` | Immutable artifact custody, content-addressed storage, path containment, Zip-Slip/expansion bomb prevention, bounded caching, and REST management in `app/host/resources.py` | Implemented and verified; Phase 1 task 1.8 qualified |
-| `FEAT-HOST-PERSISTENCE` | Central SQLite persistence authority, schema migrations, narrow typed repositories, optimistic revision concurrency, cooperative leases, and restart reconciliation in `app/host/persistence.py` | Implemented and verified; Phase 1 task 1.9 qualified |
+| `FEAT-HOST-PERSISTENCE` | Exclusive SQLite access, schema operations, grouped CRUD stores and atomic revisions in `app/host/persistence.py`; job/lease policy in jobs, recovery sequencing in bootstrap, HTTP/CLI in diagnostics | Implemented and verified; Phase 1 task 1.9 qualified |
 | `FEAT-HOST-SESSION` | Central security authority, loopback origin validation, ephemeral session lifecycle, fine-grained scope authorization, distinct authority elevation, and distribution qualification in `app/host/session.py` | Implemented and verified; Phase 1 task 1.10 qualified |
 
 ## Registered functional requirements
@@ -100,13 +100,13 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-RESOURCES-HTTPX-ACQUISITION` | Bounded remote artifact streaming download via httpx with size limits, timeouts, and orphan rollback. | Emits INFO on acquisition success; ERROR on HTTP failures or byte ceiling violations. |
 | `FR-HOST-RESOURCES-ORPHAN-CLEANUP` | Automated garbage collection of abandoned or expired staging directories to bound disk usage. | Emits INFO recording count of purged staging directories. |
 | `FR-HOST-RESOURCES-REST-PROJECTION` | FastAPI REST projection endpoints exposing staging, publishing, retrieval, inspection, extraction, and cache status. | Emits DEBUG on router composition; INFO on resource mutations and query invocations. |
-| `FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION` | Versioned schema migration ledger, checksum verification, and physical `PRAGMA integrity_check`. | Emits INFO on initialization and migrations; ERROR on schema drift or corruption. |
+| `FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION` | Schema creation, migration ledger reads, required-table/minimum-version checks. The existing checksum is a fixed marker, not verified migration history. | Emits INFO initialization; ERROR missing tables or unsupported minimum version. |
 | `FR-HOST-PERSISTENCE-TRANSACTIONS` | Serialized ACID write transactions using `BEGIN IMMEDIATE` and `COMMIT;` with operational busy timeout handling. | Emits DEBUG on begin/commit; WARNING on rollback; ERROR on contention timeout. |
 | `FR-HOST-PERSISTENCE-TYPED-REPOSITORY` | Narrow typed CRUD repository mapping Pydantic models to JSON payload envelopes with keyset pagination. | Emits DEBUG on queries/reads; INFO on entity creation and mutations. |
 | `FR-HOST-PERSISTENCE-REVISION-CONCURRENCY` | Optimistic monotonic revision checks asserting persisted revision matches `expected_revision`. | Emits WARNING on revision conflict without silent data overwrites. |
-| `FR-HOST-PERSISTENCE-LEASE-COORDINATION` | Cooperative distributed worker leases with atomic acquisition, heartbeats/renewal, and TTL expiration. | Emits INFO on acquire/renew/release; WARNING on conflict contention. |
-| `FR-HOST-PERSISTENCE-RESTART-RECOVERY` | Startup reconciliation auditing physical integrity, schema readiness, and pruning dead/expired worker leases. | Emits INFO on audit start and completion; ERROR on failed integrity checks. |
-| `FR-HOST-PERSISTENCE-REST-PROJECTION` | FastAPI REST projection endpoints exposing database status, schema migrations, integrity checks, and leases. | Emits DEBUG on router composition; INFO on lease and recovery actions. |
+| `FR-HOST-JOBS-LEASE-COORDINATION` | jobs.LeaseManager owns reservation policy; persistence.LeaseStore owns atomic SQL predicates. | Emits INFO acquire/renew/release; WARNING conflicts; DEBUG storage outcomes. |
+| `FR-HOST-BOOT-PERSISTENCE-RECOVERY` | bootstrap sequences integrity/schema checks and jobs-owned expired-lease cleanup. | Emits INFO recovery report; fails startup on integrity/schema failure. |
+| `FR-HOST-PERSISTENCE-REST-PROJECTION` | diagnostics owns persistence HTTP endpoints and CLI, with bootstrap recovery injected. | Emits DEBUG router composition; delegated storage/services log operations. |
 | `FR-HOST-SESS-LOOPBACK-ORIGIN` | Loopback origin validation and DNS rebinding prevention for local workstation HTTP endpoints. | Emits DEBUG on verified loopback request; WARNING on rejected foreign origins or DNS rebinding attempts. |
 | `FR-HOST-SESS-LIFECYCLE` | Ephemeral session token generation, sliding TTL, explicit revocation, and host-restart invalidation. | Emits INFO on session creation and revocation; WARNING on expired or unknown tokens; INFO on restart invalidation. |
 | `FR-HOST-SESS-SCOPE-AUTHORIZATION` | Granular scope checking (`<resource>:<action>` and wildcards) across domains, resources, and tools. | Emits DEBUG on authorized actions; WARNING on permission denial with structured fr_id and requested scope. |
@@ -151,9 +151,9 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-SINGLE-JOBS-MODULE` | Merged hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, SQLite durability, restart reconciliation, and REST endpoints into a single canonical module `app/host/jobs.py`. |
 | `DEC-HOST-RESOURCE-BUDGET-ADMISSION` | Background compute jobs declare worker and memory budgets guarded by hard capacity ceilings (`CapacityExceededError`, `BudgetExceededError`) to prevent host resource starvation. |
 | `DEC-HOST-RESTART-RECONCILIATION` | On coordinator initialization, active in-flight jobs (`queued`, `running`, `cancellation_requested`) stored in SQLite are reconciled to `interrupted` without fabricating false success or hanging indefinitely. |
-| `DEC-HOST-SINGLE-PERSISTENCE-MODULE` | Merged database engine, connection pragmas, schema migrations, typed repositories, cooperative leases, restart recovery, settings store, job store, and REST routes into a single canonical module `app/host/persistence.py`. |
+| `DEC-HOST-SINGLE-PERSISTENCE-MODULE` | Database connections, SQL, schema operations, transactions and grouped CRUD stores live exclusively in `app/host/persistence.py`. Business logic, lease/job policy, recovery sequencing, HTTP and CLI belong to their existing owner modules. |
 | `DEC-HOST-CENTRALIZED-PERSISTENCE-AUTHORITY` | `app/host/persistence.py` is the sole module authorized to create SQLite connections, execute queries, manage schemas, and control transactions. All other modules (`settings.py`, `jobs.py`, etc.) delegate persistence through `persistence.py`; direct `sqlite3` imports or database interactions anywhere else in the application are strictly prohibited. |
-| `DEC-HOST-ZERO-RAW-SQL-EXPOSURE` | Domain plugins and workspaces access storage exclusively through typed `PersistenceAccess` facades and `TypedRepository[T]`; raw SQL execution and direct SQLite handles are strictly forbidden. |
+| `DEC-HOST-ZERO-RAW-SQL-EXPOSURE` | Services call small CRUD stores and receive records/results. Scope binding is owned by session.PersistenceAccess; generic typed entity CRUD remains in persistence.TypedRepository. Application SQL and borrowed database handles outside persistence.py are forbidden and checked by architecture tests. |
 | `DEC-HOST-SERIALIZED-WRITE-TRANSACTIONS` | Write transactions enforce `BEGIN IMMEDIATE;` to serialize concurrent writers at transaction start, eliminating SQLite deadlock upgrades under WAL mode. |
 | `DEC-HOST-OPTIMISTIC-REVISION-CONCURRENCY` | Entity updates and deletions require monotonic revision validation (`expected_revision`), raising `RevisionConflictError` on divergence to prevent split-brain overwrites. |
 | `DEC-HOST-SINGLE-SESSION-MODULE` | Merged loopback origin security, ephemeral session management, scope authorization, distinct authority, secret sanitization, and distribution qualification into a single canonical module `app/host/session.py`. |
@@ -172,3 +172,36 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 - Missing domain bodies/independent observations cannot be replaced by guessed SQX behavior. Application tests do not establish donor parity; installed-product activation remains unverified.
 - Persistence schemas/migrations/transactions/retention require a ratified host capability; plugins receive focused typed interfaces and never ad-hoc SQL authority.
 - Reference tooling opens no operational database and never launches the donor. Live/irreversible effects retain distinct authorization.
+
+
+## Persistence ownership boundary
+
+- `persistence.py`: DatabaseManager, SchemaManager, SettingsStore, JobStore,
+  LeaseStore, InstrumentStore, SessionStore, DatasetStore, BasketStore, BrokerStore,
+  and generic TypedRepository. Schema initialization creates storage only.
+- `settings.py`: configuration validation, grouping, snapshots and setting APIs.
+- `jobs.py`: job models/budgets, restart interruption and LeaseManager policy.
+- `session.py`: PersistenceAccess namespace/owner binding and existing authorization.
+- `bootstrap.py`: recovery sequencing and dependency wiring.
+- `diagnostics.py`: persistence HTTP adapter and CLI; HTTP contracts are retained.
+- Workspace instruments/sessions: explicit idempotent `ensure_defaults()`;
+  existing definitions are never overwritten by baseline seeding.
+
+Database callers receive records and results, never connections or cursors. Atomic
+revision, lease and multi-table writes stay inside CRUD transactions. Do not add
+business seeds, job-state decisions, service callbacks, domain-model imports,
+authorization or transport handling to persistence.py.
+
+Instrument, trading-session and dataset defaults belong to their workspace models
+and services. Services supply complete creation records, domain timestamps and
+dataset conflict-update columns. CRUD never fills missing trading values or
+generates dataset IDs. Existing schema defaults, storage audit timestamps,
+serialization limits and revision checks remain database infrastructure.
+
+The old `python -m app.host.persistence` CLI is replaced by:
+
+```bash
+uv run python -m app.host.diagnostics --status --db path/to/database.db
+uv run python -m app.host.diagnostics --integrity-check --db path/to/database.db
+uv run python -m app.host.diagnostics --reconcile --db path/to/database.db
+```

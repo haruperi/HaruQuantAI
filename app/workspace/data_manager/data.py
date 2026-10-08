@@ -6,7 +6,8 @@ Description:
     Data Manager workspace, mirroring SQX DataManagerData. Normalizes bars into
     canonical OHLCV records with geometry verification, chronological ordering,
     and cryptographic SHA-256 fingerprinting. All persistence operations execute
-    through the host DatabaseManager.
+    through the host DatabaseManager. DatasetRecord owns metadata defaults;
+    CatalogService supplies domain timestamps and conflict-update field policy.
 
 Purpose:
     FEAT-WORKSPACE-DATAMGR: Dataset catalog, streaming file ingestion, and
@@ -224,8 +225,22 @@ class CatalogService:
         Fires FR-DATA-CATALOG-DATASET-REGISTRY and
         FR-DATA-CATALOG-REVISION-INTEGRITY.
         """
-        payload = dataset.model_dump()
-        dataset_id = self._db.datasets.save(payload)
+        payload = dataset.model_dump(exclude={"bar_count"})
+        now = datetime.now(UTC).isoformat()
+        payload["created_at"] = payload["created_at"] or now
+        payload["updated_at"] = now
+        dataset_id = self._db.datasets.save(
+            payload,
+            update_columns=(
+                "bars",
+                "date_from",
+                "date_to",
+                "updated_at",
+                "path",
+                "quality_score",
+                "lineage_json",
+            ),
+        )
         logger.info(
             "FR-DATA-CATALOG-DATASET-REGISTRY: Persisted dataset '%s' "
             "(symbol=%s, timeframe=%s, bars=%d)",

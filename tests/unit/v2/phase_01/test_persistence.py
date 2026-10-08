@@ -9,22 +9,24 @@ FastAPI REST routes, and CLI diagnostics.
 from __future__ import annotations
 
 import ast
+import re
 import sqlite3
 import sys
 from collections.abc import Generator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
+from app.host.bootstrap import HostRuntime
+from app.host.diagnostics import create_persistence_router, main
+from app.host.jobs import LeaseManager
 from app.host.persistence import (
     CorruptDataError,
     DatabaseManager,
     IncompatibleSchemaError,
     JobStore,
     LeaseExpiredError,
-    PersistenceAccess,
     PersistenceError,
     RevisionConflictError,
     SettingsStore,
@@ -32,11 +34,10 @@ from app.host.persistence import (
     TypedRepository,
     ValidationError,
     canonical_json,
-    create_persistence_router,
-    main,
     validate_identifier,
     validate_json_depth,
 )
+from app.host.session import PersistenceAccess
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
@@ -79,7 +80,9 @@ def sample_repo(db_manager: DatabaseManager) -> TypedRepository[SampleConfig]:
 def client(db_manager: DatabaseManager) -> Generator[TestClient]:
     """Fixture providing a FastAPI TestClient mounted with persistence router."""
     app = FastAPI()
-    router = create_persistence_router(db_manager)
+    router = create_persistence_router(
+        db_manager, reconcile=lambda: HostRuntime.reconcile_persistence(db_manager)
+    )
     app.include_router(router, prefix="/api/v2")
     with TestClient(app) as test_client:
         yield test_client
@@ -456,19 +459,21 @@ def test_typed_repository_corrupt_envelope(
         sample_repo.get_record("corrupt_env")
 
 
-def test_typed_repository_with_external_connection(
+def test_typed_repository_owns_transaction(
     sample_repo: TypedRepository[SampleConfig],
     db_manager: DatabaseManager,
 ) -> None:
-    """Verify repository operations participate in external transaction context."""
-    with db_manager.transaction() as conn:
-        cfg = SampleConfig(symbol="AVAX/USD", timeframe="1h")
-        sample_repo.save("avax_strat", cfg, connection=conn)
-        record = sample_repo.get_record("avax_strat", connection=conn)
-        assert record is not None
-        assert record.revision == 1
+    """Entity operations own their transaction and do not accept external handles."""
+    import inspect
 
-    # Confirmed after commit
+    for method in (
+        sample_repo.get,
+        sample_repo.get_record,
+        sample_repo.save,
+        sample_repo.delete,
+    ):
+        assert "connection" not in inspect.signature(method).parameters
+    sample_repo.save("avax_strat", SampleConfig(symbol="AVAX/USD", timeframe="1h"))
     assert sample_repo.get("avax_strat") is not None
 
 
@@ -479,7 +484,7 @@ def test_typed_repository_with_external_connection(
 
 def test_lease_manager_acquire_and_release(db_manager: DatabaseManager) -> None:
     """Verify normal lease acquisition, list, and release."""
-    leases = db_manager.leases
+    leases = LeaseManager(db_manager)
 
     # Acquire
     rec = leases.acquire("worker_lock_1", "worker_node_a", ttl_seconds=30.0)
@@ -502,7 +507,7 @@ def test_lease_manager_acquire_and_release(db_manager: DatabaseManager) -> None:
 
 def test_lease_manager_acquire_busy_conflict(db_manager: DatabaseManager) -> None:
     """Verify StorageBusyError raised when lease is held by another active worker."""
-    leases = db_manager.leases
+    leases = LeaseManager(db_manager)
     leases.acquire("exclusive_job", "worker_1", ttl_seconds=60.0)
 
     # Worker 2 attempts acquisition while active
@@ -514,7 +519,7 @@ def test_lease_manager_acquire_overwrites_same_holder(
     db_manager: DatabaseManager,
 ) -> None:
     """Verify same worker can re-acquire an existing lease."""
-    leases = db_manager.leases
+    leases = LeaseManager(db_manager)
     rec1 = leases.acquire("re_acquire_job", "worker_1", ttl_seconds=10.0)
     rec2 = leases.acquire("re_acquire_job", "worker_1", ttl_seconds=60.0)
     assert rec2.expires_at_utc > rec1.expires_at_utc
@@ -524,7 +529,7 @@ def test_lease_manager_acquire_expired_lease_stealing(
     db_manager: DatabaseManager,
 ) -> None:
     """Verify worker can acquire a lease if previous holder's lease is expired."""
-    leases = db_manager.leases
+    leases = LeaseManager(db_manager)
     expired_time = (datetime.now(UTC) - timedelta(seconds=10)).isoformat()
     now_str = datetime.now(UTC).isoformat()
 
@@ -546,7 +551,7 @@ def test_lease_manager_acquire_expired_lease_stealing(
 
 def test_lease_manager_renew_success(db_manager: DatabaseManager) -> None:
     """Verify renewal extends expiration time."""
-    leases = db_manager.leases
+    leases = LeaseManager(db_manager)
     rec1 = leases.acquire("heartbeat_lease", "worker_alpha", ttl_seconds=10.0)
 
     rec2 = leases.renew("heartbeat_lease", "worker_alpha", ttl_seconds=60.0)
@@ -555,7 +560,7 @@ def test_lease_manager_renew_success(db_manager: DatabaseManager) -> None:
 
 def test_lease_manager_renew_errors(db_manager: DatabaseManager) -> None:
     """Verify renewal errors on nonexistent, stolen, or expired leases."""
-    leases = db_manager.leases
+    leases = LeaseManager(db_manager)
 
     # Nonexistent
     with pytest.raises(LeaseExpiredError, match="does not exist"):
@@ -579,7 +584,7 @@ def test_lease_manager_renew_errors(db_manager: DatabaseManager) -> None:
 
 def test_lease_manager_release_failures(db_manager: DatabaseManager) -> None:
     """Verify release returns False on nonexistent or mismatched holder."""
-    leases = db_manager.leases
+    leases = LeaseManager(db_manager)
     leases.acquire("lock_a", "worker_1", ttl_seconds=60.0)
 
     # Mismatched holder
@@ -591,7 +596,7 @@ def test_lease_manager_release_failures(db_manager: DatabaseManager) -> None:
 
 def test_lease_manager_prune_expired(db_manager: DatabaseManager) -> None:
     """Verify prune_expired removes expired leases and keeps active ones."""
-    leases = db_manager.leases
+    leases = LeaseManager(db_manager)
     # Active lease
     leases.acquire("active_lock", "live_node", ttl_seconds=60.0)
 
@@ -633,7 +638,7 @@ def test_recovery_manager_reconcile_on_startup(db_manager: DatabaseManager) -> N
             (past_time, past_time),
         )
 
-    report = db_manager.recovery.reconcile_on_startup()
+    report = HostRuntime.reconcile_persistence(db_manager)
     assert report["status"] == "reconciled"
     assert report["integrity"].lower() == "ok"
     assert report["pruned_expired_leases"] >= 1
@@ -648,7 +653,7 @@ def test_recovery_manager_integrity_failure(temp_db_path: Path) -> None:
         with pytest.raises(
             IncompatibleSchemaError, match="Database integrity check failed"
         ):
-            mgr.recovery.reconcile_on_startup()
+            HostRuntime.reconcile_persistence(mgr)
 
 
 def test_persistence_access_isolation(db_manager: DatabaseManager) -> None:
@@ -894,88 +899,370 @@ def test_sqlite3_import_isolation() -> None:
 
 
 def test_persistence_settings_store_crud(temp_db_path: Path) -> None:
-    """Validate SettingsStore operations directly in app.host.persistence."""
+    """Settings storage returns records and revisions without host snapshots."""
     store = SettingsStore(db_path=temp_db_path)
     store.initialize()
-
-    # Initial snapshot revision
-    snapshot = store.get_snapshot()
-    assert snapshot.revision == 1
-
-    # Insert setting via update_settings
-    snap_after_write = store.update_settings(
-        "workspace_paths",
-        {"data_dir": "data"},
-        expected_revision=1,
+    assert store.read_all() == (1, [])
+    revision, rows = store.update_batch(
+        {"workspace_paths": {"data_dir": "data"}}, expected_revision=1
     )
-    assert snap_after_write.revision == 2
-
-    # Query key via read_settings
-    page = store.read_settings("workspace_paths", key="data_dir")
-    assert len(page.items) == 1
-    assert page.items[0].value == "data"
-
-    # Batch updates via update_settings
-    updated_snap = store.update_settings(
-        "workspace_paths",
-        {"data_dir": "custom_data"},
-        expected_revision=2,
+    assert revision == 2
+    assert rows[0].value == "data"
+    assert (
+        store.read_settings("workspace_paths", key="data_dir").items[0].value == "data"
     )
-    assert updated_snap.revision == 3
-    assert updated_snap.values["workspace_paths"]["data_dir"] == "custom_data"
-
-    # Verify updated values via read_settings
-    page_updated = store.read_settings("workspace_paths", key="data_dir")
-    assert len(page_updated.items) == 1
-    assert page_updated.items[0].value == "custom_data"
+    revision, rows = store.update_batch(
+        {"workspace_paths": {"data_dir": "custom_data"}}, expected_revision=2
+    )
+    assert revision == 3
+    assert rows[0].value == "custom_data"
+    assert (
+        store.update_batch(
+            {"workspace_paths": {"data_dir": "custom_data"}}, expected_revision=3
+        )[0]
+        == 3
+    )
 
 
 def test_persistence_job_store_crud(temp_db_path: Path) -> None:
-    """Validate JobStore operations directly in app.host.persistence."""
+    """Job storage persists explicit fields without job lifecycle interpretation."""
     store = JobStore(db_path=temp_db_path)
+    record = {
+        "job_id": "job-test-001",
+        "owner": "worker-1",
+        "kind": "compute",
+        "status": "running",
+        "progress": 25.0,
+        "accepted": 10,
+        "rejected": 0,
+        "message": "Processing batch 1",
+        "attempt_id": 1,
+        "max_retries": 3,
+        "retry_count": 0,
+        "dedup_key": "dedup-batch-1",
+        "parent_job_id": None,
+        "child_job_ids_json": "[]",
+        "budget_json": "{}",
+        "submitted_at_utc": "2026-10-07T12:00:00Z",
+        "started_at_utc": None,
+        "finished_at_utc": None,
+        "error_message": None,
+        "error_location": None,
+    }
+    store.upsert_job(record)
+    assert store.get_job("job-test-001") == record
+    assert store.list_jobs(owner="worker-1")[0]["status"] == "running"
+    assert (
+        store.update_statuses(
+            ("running",),
+            status="caller-selected-state",
+            finished_at_utc="2026-10-08T12:00:00Z",
+            error_message="caller-selected-message",
+        )
+        == 1
+    )
+    assert store.get_job("job-test-001")["status"] == "caller-selected-state"
+
+
+def _database_boundary_violations(source: str) -> list[str]:  # noqa: C901 - bounded AST cases
+    """Detect application database imports, SQL and handle access without execution."""
+    violations = []
+    drivers = {"sqlite3", "aiosqlite", "duckdb", "sqlalchemy", "psycopg", "pymysql"}
+    sql = re.compile(
+        r"^\s*(?:SELECT\b[\s\S]*\bFROM\b|INSERT\s+(?:OR\s+\w+\s+)?INTO\b|"
+        r"UPDATE\s+\w+\s+SET\b|DELETE\s+FROM\b|CREATE\s+(?:TABLE|INDEX)\b|PRAGMA\b)",
+        re.IGNORECASE,
+    )
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            if any(alias.name.split(".")[0] in drivers for alias in node.names):
+                violations.append("database driver import")
+        elif isinstance(node, ast.ImportFrom):
+            if (node.module or "").split(".")[0] in drivers:
+                violations.append("database driver import")
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str):
+            if sql.search(node.value):
+                violations.append("SQL statement")
+        elif isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Attribute) and node.func.attr in {
+                "connection",
+                "transaction",
+                "cursor",
+                "executescript",
+                "executemany",
+            }:
+                violations.append("database handle operation")
+            if isinstance(node.func, ast.Attribute) and node.func.attr in {
+                "connect",
+                "execute",
+                "fetchone",
+                "fetchall",
+            }:
+                receiver = node.func.value
+                receiver_names = {
+                    child.id
+                    for child in ast.walk(receiver)
+                    if isinstance(child, ast.Name)
+                } | {
+                    child.attr
+                    for child in ast.walk(receiver)
+                    if isinstance(child, ast.Attribute)
+                }
+                if receiver_names & {"db", "_db", "db_manager", "conn", "cursor"}:
+                    violations.append("database handle operation")
+            if node.args and isinstance(node.args[0], ast.Constant):
+                value = node.args[0].value
+                if isinstance(value, str) and value.split(".")[0] in drivers:
+                    if (
+                        isinstance(node.func, ast.Name) and node.func.id == "__import__"
+                    ) or (
+                        isinstance(node.func, ast.Attribute)
+                        and node.func.attr == "import_module"
+                    ):
+                        violations.append("dynamic database driver import")
+    return violations
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "import sqlite3 as driver\ndriver.connect(':memory:')",
+        "from sqlite3 import connect as open_db",
+        "with manager.connection() as borrowed:\n    borrowed.execute(query)",
+        "with manager.transaction() as borrowed:\n    pass",
+        "cursor = borrowed.cursor()",
+        "db.connect()",
+        "conn.execute(query)",
+        "query = 'SELECT name FROM records'\nrunner.execute(query)",
+        "__import__('sqlite3')",
+        "importlib.import_module('duckdb')",
+    ],
+)
+def test_database_boundary_rejects_bypasses(source: str) -> None:
+    """Guard catches imports, dynamic imports, borrowed handles and SQL constants."""
+    assert _database_boundary_violations(source)
+
+
+def test_database_boundary_allows_service_calls() -> None:
+    """Unrelated execution methods and storage result APIs are permitted."""
+    assert not _database_boundary_violations(
+        "from app.host.persistence import DatabaseManager\n"
+        "rows = db.datasets.list_datasets()\nresult = worker.execute(task)"
+    )
+
+
+def test_application_database_boundary() -> None:
+    """Every application SQL/driver/handle operation belongs to persistence."""
+    root = Path(__file__).resolve().parents[4]
+    violations = {}
+    for path in (root / "app").rglob("*.py"):
+        if path == root / "app/host/persistence.py":
+            continue
+        found = _database_boundary_violations(path.read_text(encoding="utf-8"))
+        if found:
+            violations[str(path.relative_to(root))] = found
+    assert not violations
+    source = (root / "app/host/persistence.py").read_text(encoding="utf-8")
+    forbidden = {
+        "fastapi",
+        "argparse",
+        "app.host.jobs",
+        "app.host.settings",
+        "app.host.bootstrap",
+        "app.host.session",
+        "app.host.diagnostics",
+    }
+    for node in ast.walk(ast.parse(source)):
+        modules = []
+        if isinstance(node, ast.Import):
+            modules = [alias.name for alias in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            modules = [node.module or ""]
+        assert not any(
+            module == prefix or module.startswith(prefix + ".")
+            for module in modules
+            for prefix in forbidden | {"app.workspace"}
+        )
+
+
+def test_storage_initialization_has_no_domain_seeds(
+    db_manager: DatabaseManager,
+) -> None:
+    """Creating tables must never decide which instruments or sessions exist."""
+    assert db_manager.instruments.count() == 0
+    assert db_manager.sessions.count() == 0
+
+
+def test_basket_replacement_rolls_back(db_manager: DatabaseManager) -> None:
+    """A membership write failure cannot destroy the previous group or members."""
+    store = db_manager.baskets
+    store.save(
+        "group", "original", [{"ticker": "AAPL", "date_from": "1900-01-01"}], system=0
+    )
+    before = store.get("group")
+    with pytest.raises(KeyError):
+        store.save("group", "replacement", [{"ticker": "MSFT"}], system=0)
+    assert store.get("group") == before
+
+
+def test_lease_acquisition_is_atomic(temp_db_path: Path) -> None:
+    """Independent managers racing for a lease produce exactly one winner."""
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    first = DatabaseManager(temp_db_path)
+    first.initialize()
+    second = DatabaseManager(temp_db_path)
+    barrier = Barrier(2)
+
+    def acquire(db: DatabaseManager, holder: str) -> bool:
+        barrier.wait(timeout=5)
+        try:
+            LeaseManager(db).acquire("race", holder, ttl_seconds=60)
+        except StorageBusyError:
+            return False
+        return True
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = [
+            pool.submit(acquire, first, "one"),
+            pool.submit(acquire, second, "two"),
+        ]
+        assert sum(future.result(timeout=10) for future in futures) == 1
+
+
+def test_session_upsert_reuses_id(db_manager: DatabaseManager) -> None:
+    """Session upsert updates supplied fields while preserving its identity."""
+    first = db_manager.sessions.upsert({"name": "session", "description": "first"})
+    second = db_manager.sessions.upsert({"name": "session", "description": "second"})
+    assert first == second
+    assert db_manager.sessions.get_by_name("session")["description"] == "second"
+
+
+def test_corrupt_lease_renewal_rolls_back(db_manager: DatabaseManager) -> None:
+    """Corrupt metadata must abort the expiry update rather than commit it."""
+    import json
+
+    leases = LeaseManager(db_manager)
+    before = leases.acquire("corrupt", "holder", ttl_seconds=60)
+    with db_manager.transaction() as conn:
+        conn.execute(
+            "UPDATE host_leases SET metadata = 'invalid-json' WHERE lease_key = 'corrupt'"
+        )
+    with pytest.raises(json.JSONDecodeError):
+        leases.renew("corrupt", "holder", ttl_seconds=120)
+    with db_manager.connection(query_only=True) as conn:
+        row = conn.execute(
+            "SELECT expires_at_utc FROM host_leases WHERE lease_key = 'corrupt'"
+        ).fetchone()
+    assert datetime.fromisoformat(row[0]) == before.expires_at_utc
+
+
+def test_storage_column_allowlists(db_manager: DatabaseManager) -> None:
+    """Unknown column expressions are rejected before SQL construction."""
+    with pytest.raises(ValidationError):
+        db_manager.sessions.upsert({"name": "session", "unknown": "value"})
+    with pytest.raises(ValidationError):
+        db_manager.instruments.update("symbol", {"unknown": "value"})
+
+
+def test_storage_logs_do_not_include_setting_values(
+    db_manager: DatabaseManager,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Storage records its operations without logging arbitrary stored payloads."""
+    import logging
+
+    caplog.set_level(logging.DEBUG)
+    store = SettingsStore(db=db_manager)
     store.initialize()
+    store.update_batch({"scope": {"token": "sensitive-test-value"}})
+    store.read_all()
+    assert any(
+        getattr(record, "fr_id", "") == "FR-HOST-PERSISTENCE-SETTINGS"
+        for record in caplog.records
+    )
+    assert "sensitive-test-value" not in caplog.text
 
-    from dataclasses import dataclass, field
 
-    @dataclass
-    class MockJobRecord:
-        job_id: str
-        owner: str = "worker-1"
-        kind: str = "compute"
-        status: str = "running"
-        progress: float = 25.0
-        accepted: int = 10
-        rejected: int = 0
-        message: str = "Processing batch 1"
-        attempt_id: int = 1
-        max_retries: int = 3
-        retry_count: int = 0
-        dedup_key: str | None = "dedup-batch-1"
-        parent_job_id: str | None = None
-        child_job_ids: list[str] = field(default_factory=list)
-        budget: dict[str, Any] = field(default_factory=dict)
-        submitted_at_utc: str = "2026-10-07T12:00:00Z"
-        started_at_utc: str | None = "2026-10-07T12:00:01Z"
-        finished_at_utc: str | None = None
-        error_message: str | None = None
-        error_location: str | None = None
+@pytest.fixture
+def explicit_dataset_row() -> dict[str, object]:
+    """A complete storage row with intentionally non-default metadata."""
+    return {
+        "id": "explicit-id",
+        "source": "source",
+        "symbol": "SYMBOL",
+        "underlying": "",
+        "instrument": "",
+        "timeframe": "D1",
+        "broker": "broker",
+        "broker_name": "Broker",
+        "timezone": "UTC",
+        "category": "Custom",
+        "date_from": "first",
+        "date_to": "last",
+        "bars": 7,
+        "created_at": "caller-created",
+        "updated_at": "caller-updated",
+        "path": "path",
+        "data_kind": "ticks",
+        "quality_score": 0.25,
+        "lineage_json": "{}",
+        "schema_version": 9,
+    }
 
-    rec = MockJobRecord(job_id="job-test-001")
-    store.upsert_job(rec)
 
-    fetched = store.get_job("job-test-001")
-    assert fetched is not None
-    assert fetched.job_id == "job-test-001"
-    assert fetched.owner == "worker-1"
+def test_dataset_crud_uses_explicit_fields_and_update_selection(
+    db_manager: DatabaseManager, explicit_dataset_row: dict[str, object]
+) -> None:
+    """CRUD preserves supplied metadata and only updates selected columns."""
+    store = db_manager.datasets
+    store.save(explicit_dataset_row, update_columns=("source",))
+    assert store.get_by_id("explicit-id") == explicit_dataset_row
+    revised = dict(explicit_dataset_row, source="changed", bars=99, updated_at="new")
+    store.save(revised, update_columns=("source",))
+    assert store.get_by_id("explicit-id") == dict(
+        explicit_dataset_row, source="changed"
+    )
+    store.save(revised, update_columns=())
+    assert store.get_by_id("explicit-id") == dict(
+        explicit_dataset_row, source="changed"
+    )
+    with pytest.raises(ValidationError, match="Unsupported storage column"):
+        store.save(revised, update_columns=("source = 'unsafe'",))
+    assert store.get_by_id("explicit-id") == dict(
+        explicit_dataset_row, source="changed"
+    )
 
-    listed = store.list_jobs(owner="worker-1")
-    assert len(listed) == 1
-    assert listed[0].job_id == "job-test-001"
 
-    # Startup reconciliation marks running jobs interrupted
-    reconciled = store.reconcile_on_startup()
-    assert reconciled == 1
+@pytest.mark.parametrize("store_name", ["instruments", "sessions", "datasets"])
+def test_incomplete_creation_does_not_invent_domain_defaults(
+    db_manager: DatabaseManager, store_name: str
+) -> None:
+    """Incomplete raw creation fails before writing any business rows."""
+    with pytest.raises(ValidationError, match="Incomplete storage record"):
+        if store_name == "instruments":
+            db_manager.instruments.create({"symbol": "incomplete"})
+        elif store_name == "sessions":
+            db_manager.sessions.create({"name": "incomplete"})
+        else:
+            db_manager.datasets.save({"id": "incomplete"}, update_columns=())
+    assert db_manager.instruments.count() == 0
+    assert db_manager.sessions.count() == 0
+    assert db_manager.datasets.count() == 0
 
-    post_rec = store.get_job("job-test-001")
-    assert post_rec is not None
-    assert post_rec.status == "interrupted"
+
+def test_raw_session_create_preserves_supplied_fields(
+    db_manager: DatabaseManager,
+) -> None:
+    """The store persists explicit session values without choosing defaults."""
+    row = {
+        "name": "explicit",
+        "description": "",
+        "timezone": "caller-zone",
+        "windows_json": "caller-windows",
+        "holidays_json": "caller-holidays",
+        "is_default": 1,
+    }
+    session_id = db_manager.sessions.create(row)
+    assert db_manager.sessions.get_by_name("explicit") == dict(row, id=session_id)

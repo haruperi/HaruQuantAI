@@ -1,6 +1,10 @@
 """Data Manager workspace REST router, API contracts, and host integration.
 
 Description:
+    Workspace composition explicitly invokes idempotent instrument and trading
+    session default initialization. Services call narrow stores; connections,
+    cursors, SQL and database transactions remain in app.host.persistence.
+
     Provides the central FastAPI REST router for the Data Manager workspace
     (`app.workspace.data_manager`). Exposes strongly-typed endpoints for
     datasets, instruments, sessions, baskets, broker profiles, provider downloads,
@@ -287,6 +291,8 @@ class DataRouterService:
         self.catalog = CatalogService(db)
         self.instruments = InstrumentService(db)
         self.sessions = SessionService(db)
+        self.instruments.ensure_defaults()
+        self.sessions.ensure_defaults()
         self.baskets = BasketService(db)
         self.broker = BrokerService(db)
         self.home = DataManagerHomeService(db)

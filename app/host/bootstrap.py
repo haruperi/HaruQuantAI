@@ -1,6 +1,11 @@
 """Platform host bootstrap, lifecycle stages, and browser shell runtime.
 
 Description:
+    reconcile_persistence() sequences storage integrity/schema checks and jobs
+    lease cleanup; job interruption remains a separate lifecycle stage. Domain
+    services explicitly initialize baseline instruments/trading sessions during
+    workspace setup. Bootstrap never executes SQL or borrows database handles.
+
     This module provides the central host runtime and application composition
     for HaruQuantAI. It defines the structured lifespan stages, manages
     acquired services with strict reverse-order rollback on failure or
@@ -14,6 +19,9 @@ Purpose:
     and browser shell projection replacing legacy Java bootstrap mechanics.
 
 Key Capabilities:
+    - FR-HOST-BOOT-PERSISTENCE-RECOVERY: Sequence startup storage audit and cleanup.
+      Associated: `HostRuntime.reconcile_persistence()`
+      Logging: INFO recovery report; failed integrity/schema checks stop startup.
     - FR-HOST-BOOT-LIFECYCLE-STAGES: Strict progression through ordered host
       lifespan stages (CONFIGURING, PATHS, LOGGING, DISCOVERY, SERVICES, ROUTES,
       READY).
@@ -84,7 +92,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 
-from app.host.diagnostics import create_diagnostics_router
+from app.host.diagnostics import create_diagnostics_router, create_persistence_router
 from app.host.discovery import (
     PluginDiscoveryEngine,
     PluginLifecycleManager,
@@ -92,7 +100,7 @@ from app.host.discovery import (
     SlotRegistry,
     create_discovery_router,
 )
-from app.host.jobs import JobManager, create_jobs_router
+from app.host.jobs import JobManager, LeaseManager, create_jobs_router
 from app.host.logging import (
     configure_host_logging,
     create_debug_console_router,
@@ -102,7 +110,7 @@ from app.host.logging import (
 from app.host.persistence import (
     DEFAULT_DATABASE_PATH,
     DatabaseManager,
-    create_persistence_router,
+    IncompatibleSchemaError,
     get_database_manager,
 )
 from app.host.resources import ResourceManager, create_resources_router
@@ -487,6 +495,28 @@ class HostRuntime:
             LifespanStage.DISCOVERY, "discovery", cleanup=self._cleanup_plugins
         )
 
+    @staticmethod
+    def reconcile_persistence(db: DatabaseManager) -> dict[str, Any]:
+        """Sequence startup integrity/schema checks and worker-lease cleanup."""
+        integrity = db.check_integrity()
+        if integrity.lower() != "ok":
+            raise IncompatibleSchemaError(
+                f"Database integrity check failed during startup recovery: {integrity}"
+            )
+        db.initialize()
+        db.schema.verify_schema()
+        report = {
+            "status": "reconciled",
+            "integrity": integrity,
+            "pruned_expired_leases": LeaseManager(db).prune_expired(),
+            "reconciled_at_utc": datetime.now(UTC).isoformat(),
+        }
+        logger.info(
+            "Host persistence recovery complete",
+            extra={"report": report, "fr_id": "FR-HOST-BOOT-PERSISTENCE-RECOVERY"},
+        )
+        return report
+
     def _init_persistence(self) -> DatabaseManager:
         """Initialize SQLite database persistence and schema migrations."""
         if self.db_manager is None:
@@ -551,7 +581,7 @@ class HostRuntime:
                 "substage": "recovery",
             },
         )
-        recovery_report = db_mgr.recovery.reconcile_on_startup()
+        recovery_report = self.reconcile_persistence(db_mgr)
         logger.info(
             "FR-HOST-BOOT-LIFECYCLE-STAGES: Startup recovery audit complete "
             "(integrity=%s, pruned_leases=%s)",
@@ -925,7 +955,11 @@ def _mount_host_routers(
         ):
             db_target = resolved_config.db_path
         resolved_runtime.db_manager = get_database_manager(db_target)
-    persistence_router = create_persistence_router(resolved_runtime.db_manager)
+    persistence_db = resolved_runtime.db_manager
+    persistence_router = create_persistence_router(
+        resolved_runtime.db_manager,
+        reconcile=lambda: resolved_runtime.reconcile_persistence(persistence_db),
+    )
     app.include_router(persistence_router, prefix=resolved_settings.api_prefix)
 
     # 9. Jobs Router (/api/v1/jobs/...)

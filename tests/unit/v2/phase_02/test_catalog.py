@@ -30,6 +30,7 @@ from app.workspace.data_manager.instruments import (
     InstrumentDefinition,
     InstrumentService,
 )
+from app.workspace.data_manager.sessions import SessionService
 
 
 @pytest.fixture
@@ -38,6 +39,8 @@ def test_db(tmp_path: Path) -> DatabaseManager:
     db_file = tmp_path / "test_data.db"
     db = DatabaseManager(database_path=db_file)
     db.initialize()
+    InstrumentService(db).ensure_defaults()
+    SessionService(db).ensure_defaults()
     return db
 
 
@@ -117,6 +120,27 @@ def test_instrument_crud(
 
     # Delete nonexistent returns False
     assert service.delete_instrument("NONEXISTENT") is False
+
+
+def test_domain_defaults_preserve_existing_definitions(
+    test_db: DatabaseManager,
+) -> None:
+    """Repeated domain initialization leaves customized definitions intact."""
+    instruments = InstrumentService(test_db)
+    sessions = SessionService(test_db)
+    test_db.instruments.update("EURUSD", {"description": "User customization"})
+    test_db.sessions.update("24/7 Forex", {"description": "User calendar"})
+    instruments.ensure_defaults()
+    sessions.ensure_defaults()
+    instruments.ensure_defaults()
+    sessions.ensure_defaults()
+    assert test_db.instruments.count() == 3
+    assert test_db.sessions.count() == 2
+    assert (
+        test_db.instruments.get_by_symbol("EURUSD")["description"]
+        == "User customization"
+    )
+    assert test_db.sessions.get_by_name("24/7 Forex")["description"] == "User calendar"
 
 
 def test_instrument_validation(test_db: DatabaseManager) -> None:
@@ -315,3 +339,85 @@ def test_catalog_broker_profiles_from_db(test_db: DatabaseManager) -> None:
     assert len(brokers) == 1
     assert brokers[0].name == "InteractiveBrokers"
     assert brokers[0].server_timezone == "US/Eastern"
+
+
+def test_domain_creation_supplies_defaults_and_timestamps(
+    test_db: DatabaseManager,
+) -> None:
+    """Creation owns defaults and preserves caller-supplied creation metadata."""
+    instruments = InstrumentService(test_db)
+    instruments.create_instrument(InstrumentDefinition(symbol="NEW"))
+    row = test_db.instruments.get_by_symbol("NEW")
+    assert row is not None
+    assert row["tick_size"] == 0.00001
+    assert row["tick_value_in_money"] == 10.0
+    assert row["decimals"] == 5
+    assert row["swap_3day_day"] == 3
+    assert row["created_at_utc"]
+    assert row["updated_at_utc"]
+    instruments.create_instrument(
+        InstrumentDefinition(
+            symbol="DATED", created_at_utc="original", updated_at_utc="previous"
+        )
+    )
+    test_db.instruments.update("DATED", {"description": "raw update"})
+    row = test_db.instruments.get_by_symbol("DATED")
+    assert row is not None
+    assert row["created_at_utc"] == "original"
+    assert row["updated_at_utc"] == "previous"
+    assert test_db.instruments.update("DATED", {"symbol": "ignored", "id": -1})
+    assert test_db.instruments.get_by_symbol("DATED") == row
+    instruments.update_instrument("DATED", {"description": "service update"})
+    row = test_db.instruments.get_by_symbol("DATED")
+    assert row is not None
+    assert row["created_at_utc"] == "original"
+    assert row["updated_at_utc"] != "previous"
+
+    catalog = CatalogService(test_db)
+    catalog.save_dataset(
+        DatasetRecord(
+            id="domain", source="original", symbol="NEW", created_at="creation"
+        )
+    )
+    first = test_db.datasets.get_by_id("domain")
+    assert first is not None
+    assert first["quality_score"] == 1.0
+    assert first["schema_version"] == 1
+    assert first["bars"] == 0
+    assert first["created_at"] == "creation"
+    assert first["updated_at"]
+    catalog.save_dataset(
+        DatasetRecord(
+            id="domain",
+            source="replacement",
+            symbol="DIFFERENT",
+            bars=20,
+            created_at="replacement-creation",
+            quality_score=0.5,
+            path="new-path",
+        )
+    )
+    second = test_db.datasets.get_by_id("domain")
+    assert second is not None
+    assert second["source"] == "original"
+    assert second["symbol"] == "NEW"
+    assert second["created_at"] == "creation"
+    assert second["bars"] == 20
+    assert second["quality_score"] == 0.5
+    assert second["path"] == "new-path"
+
+
+def test_baseline_instruments_preserve_historical_values(
+    test_db: DatabaseManager,
+) -> None:
+    """Complete seed rows retain the original schema-supplied baseline values."""
+    for symbol in ("EURUSD", "GBPUSD", "USDJPY"):
+        row = test_db.instruments.get_by_symbol(symbol)
+        assert row is not None
+        assert row["tick_value_in_money"] == 10.0
+        assert row["min_volume"] == 0.01
+        assert row["max_volume"] == 100.0
+        assert row["lot_step"] == 0.01
+        assert row["margin_rate"] == 0.05
+        assert row["swap_3day_day"] == 3
+        assert row["commissions"] == "0.0"

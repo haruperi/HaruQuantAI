@@ -1,6 +1,11 @@
 """Authoritative instrument specifications, validation, and host persistence.
 
 Description:
+    ensure_defaults() owns the baseline instrument definitions and initializes
+    them idempotently through InstrumentStore. All database operations belong to
+    app.host.persistence; this service owns domain validation, defaults, domain
+    timestamps and interpretation.
+
     Provides canonical quantitative instrument definitions, precision models,
     margin rates, financing swaps, broker aliases, and host SQLite persistence
     operations for the Data Manager workspace. Instruments represent tradable
@@ -14,6 +19,9 @@ Purpose:
     and host persistence for the Data Manager workspace.
 
 Key Capabilities:
+    - FR-DATA-INSTRUMENTS-DEFAULTS: Initialize baseline instruments idempotently.
+      Associated: `InstrumentService.ensure_defaults()`
+      Logging: INFO initialization; storage logs each insert-if-absent result.
     - FR-DATA-INSTRUMENTS-SPECIFICATION: Strongly typed instrument parameters
       governing ticks, points, spreads, lots, margins, and overnight swaps.
       Associated: `[InstrumentDefinition]`, `[InstrumentService.get_instrument()]`
@@ -44,6 +52,7 @@ Python API Usage:
     db = DatabaseManager(":memory:")
     db.initialize()
     service = InstrumentService(db)
+    service.ensure_defaults()
 
     instr = InstrumentDefinition(
         symbol="EURUSD",
@@ -68,6 +77,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -153,12 +163,58 @@ class InstrumentService:
         """Initialize service with host database manager."""
         self._db = db
 
+    def ensure_defaults(self) -> None:
+        """Initialize baseline instrument definitions without replacing user data."""
+        now = datetime.now(UTC).isoformat()
+        for symbol, description, tick, decimals, spread, alias in (
+            ("EURUSD", "Euro / US Dollar", 0.00001, 5, 0.0001, "EUR/USD,EURUSD_SB"),
+            ("GBPUSD", "British Pound / US Dollar", 0.00001, 5, 0.0001, "GBP/USD"),
+            ("USDJPY", "US Dollar / Japanese Yen", 0.001, 3, 0.01, "USD/JPY"),
+        ):
+            self._db.instruments.insert_if_absent(
+                {
+                    "symbol": symbol,
+                    "connection": "",
+                    "broker_id": 0,
+                    "description": description,
+                    "tick_size": tick,
+                    "tick_step": tick,
+                    "tick_value_in_money": 10.0,
+                    "point_value": 100000.0,
+                    "decimals": decimals,
+                    "default_spread": spread,
+                    "default_slippage": 0.0,
+                    "min_volume": 0.01,
+                    "max_volume": 100.0,
+                    "lot_step": 0.01,
+                    "margin_rate": 0.05,
+                    "swap_long": 0.0,
+                    "swap_short": 0.0,
+                    "swap_3day_day": 3,
+                    "commissions": "0.0",
+                    "data_type": "Forex",
+                    "alias": alias,
+                    "exchange": "",
+                    "country": "",
+                    "sector": "",
+                    "created_at_utc": now,
+                    "updated_at_utc": now,
+                }
+            )
+        logger.info(
+            "Baseline instruments initialized",
+            extra={"fr_id": "FR-DATA-INSTRUMENTS-DEFAULTS"},
+        )
+
     def create_instrument(self, instrument: InstrumentDefinition) -> int:
         """Persist a new instrument definition into datamgr_instruments.
 
         Fires FR-DATA-INSTRUMENTS-PERSISTENCE-CRUD.
         """
         payload = instrument.model_dump(exclude={"id"})
+        now = datetime.now(UTC).isoformat()
+        payload["created_at_utc"] = payload["created_at_utc"] or now
+        payload["updated_at_utc"] = payload["updated_at_utc"] or now
         try:
             new_id = self._db.instruments.create(payload)
             logger.info(
@@ -252,7 +308,10 @@ class InstrumentService:
         Fires FR-DATA-INSTRUMENTS-PERSISTENCE-CRUD.
         """
         clean_symbol = symbol.strip().upper()
-        success = self._db.instruments.update(clean_symbol, updates)
+        payload = dict(updates)
+        if payload:
+            payload["updated_at_utc"] = datetime.now(UTC).isoformat()
+        success = self._db.instruments.update(clean_symbol, payload)
         if success:
             logger.info(
                 "FR-DATA-INSTRUMENTS-PERSISTENCE-CRUD: Updated instrument '%s'",
@@ -353,6 +412,7 @@ def main() -> int:
     db = DatabaseManager()
     db.initialize()
     service = InstrumentService(db)
+    service.ensure_defaults()
 
     if args.symbol:
         inst = service.get_instrument(args.symbol)

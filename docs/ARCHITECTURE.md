@@ -111,7 +111,11 @@ The host boot sequence executes sequentially through well-defined stages:
 ### 4.3 Persistence & Storage Custody (`app/host/persistence.py`)
 * **SQLite Import Isolation:** Enforces strict isolation: `sqlite3` must NEVER be imported anywhere outside `app/host/persistence.py`. Violations trigger immediate test failures.
 * **WAL Mode & Concurrency:** Configured with `journal_mode=WAL`, `synchronous=NORMAL`, and busy timeout handling for robust concurrent read/write operations.
-* **Transactions & Migrations:** Centralizes schema creation, migrations, and transactional execution.
+* **Transactions & Migrations:** Centralizes schema creation, migrations, and transactional execution. Schema initialization does not seed business data.
+* **CRUD-only Boundary:** Small stores group related row operations. No application module outside persistence.py may execute SQL or borrow connections/cursors. Stores return records/results; atomic revision, lease and group/member predicates stay inside transactions.
+* **Business Owners:** settings owns validation/snapshots; jobs owns job lifecycle and worker leases; session owns scope binding/authorization; bootstrap sequences recovery; diagnostics owns persistence HTTP/CLI. Workspace instrument/session services explicitly initialize business defaults. No new coordination module is needed.
+* **Regression Guard:** AST architecture tests enforce database-driver/SQL/handle isolation and prohibit service/transport dependencies in persistence.py.
+* **Default Ownership:** Workspace models/services supply business defaults, complete creation records, domain timestamps and dataset conflict-update columns. Persistence does not invent trading values, session definitions, dataset IDs or quality scores. Existing schema defaults, storage audit timestamps, serialization limits and revision checks remain database infrastructure.
 
 ### 4.4 Resource Management (`app/host/resources.py`)
 * **Process & Memory Quotas:** Tracks active memory and process limits.

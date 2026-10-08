@@ -1,6 +1,10 @@
 """Data Manager workspace home, overview metrics, and quick actions.
 
 Description:
+    Overview assembly uses DatasetStore.sum_bars() and BasketStore.count(); all
+    SQL and database handles remain in app.host.persistence. Unavailable-query
+    presentation policy remains in this service and emits warning logs.
+
     Provides workspace overview metrics, aggregate catalog statistics, storage
     utilization summaries, and quick action projections for the Data Manager
     workspace home screen, mirroring SQX DataManagerHome.
@@ -75,27 +79,20 @@ class DataManagerHomeService:
 
         total_bars = 0
         try:
-            with self._db.connection(query_only=True) as conn:
-                cur = conn.cursor()
-                cur.execute("SELECT SUM(bars) FROM datamgr_datasets;")
-                val = cur.fetchone()
-                if val and val[0] is not None:
-                    total_bars = int(val[0])
+            total_bars = self._db.datasets.sum_bars()
         except PersistenceError, OSError, ValueError:
-            total_bars = 0
-
-        sessions_count = len(self._db.sessions.list_sessions(limit=5000))
-
+            logger.warning(
+                "Dataset total unavailable",
+                extra={"fr_id": "FR-WORKSPACE-DATAMGR-HOME"},
+            )
+        sessions_count = self._db.sessions.count()
         baskets_count = 0
         try:
-            with self._db.connection(query_only=True) as conn:
-                cur = conn.cursor()
-                cur.execute("SELECT COUNT(*) FROM datamgr_stock_group;")
-                b_val = cur.fetchone()
-                if b_val and b_val[0] is not None:
-                    baskets_count = int(b_val[0])
+            baskets_count = self._db.baskets.count()
         except PersistenceError, OSError, ValueError:
-            baskets_count = 0
+            logger.warning(
+                "Basket count unavailable", extra={"fr_id": "FR-WORKSPACE-DATAMGR-HOME"}
+            )
 
         logger.debug(
             "FR-WORKSPACE-DATAMGR-HOME: Computed workspace overview "

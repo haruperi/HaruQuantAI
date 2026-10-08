@@ -1,6 +1,11 @@
 """System capacity, process health, and hardware diagnostics.
 
 Description:
+    Also owns PersistenceRouterService, lease request models and the separate
+    persistence router, preserving its existing HTTP paths and response envelopes.
+    Startup recovery is supplied as a callback by bootstrap. Database diagnostic
+    CLI presentation lives here; all queries remain in app.host.persistence.
+
     This module provides the central system capacity diagnostics, process health
     monitoring, worker concurrency calculation, hardware capability inspection,
     and computational benchmarking for HaruQuantAI. It measures active machine
@@ -19,6 +24,10 @@ Purpose:
     computational benchmarking.
 
 Key Capabilities:
+    - FR-HOST-PERSISTENCE-REST-PROJECTION: Project storage diagnostics over HTTP.
+      Associated: `PersistenceRouterService`, `create_persistence_router()`
+      Logging: DEBUG router composition; delegated stores/services log every
+        query, conditional write and recovery action without payload values.
     - FR-HOST-DIAG-SYSTEM-PROBE: Probe CPU, memory, disk, and process metrics with
       bounded execution and explicit zero-vs-unavailable discrimination.
       Associated: `probe_cpu()`, `probe_memory()`, `probe_disk()`, `probe_process()`
@@ -73,6 +82,13 @@ Python API Usage:
     ```
 
 CLI Usage:
+    Inspect storage through this module, with an explicit database target:
+    ```bash
+    uv run python -m app.host.diagnostics --status --db path/to/database.db
+    uv run python -m app.host.diagnostics --integrity-check --db path/to/database.db
+    uv run python -m app.host.diagnostics --reconcile --db path/to/database.db
+    ```
+
     Run the application and query diagnostic endpoints via curl or CLI:
     ```bash
     # Query system hardware capacity snapshot
@@ -85,40 +101,53 @@ CLI Usage:
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import math
 import os
 import platform
+import sys
 import threading
 import time
 import uuid
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Final
 
 import psutil
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, Request, Response, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.host.jobs import LeaseManager
 from app.host.logging import get_logger, redact_paths
+from app.host.persistence import DatabaseManager, LeaseExpiredError, StorageBusyError
+from app.host.response import StandardResponse as ApiResponse
 
 __all__ = [
+    "AcquireLeaseRequest",
     "BenchmarkJob",
     "BenchmarkResults",
     "BenchmarkRunner",
     "CpuObservation",
     "DiskObservation",
     "MemoryObservation",
+    "PersistenceRouterService",
     "PlatformObservation",
     "ProcessObservation",
+    "ReleaseLeaseRequest",
+    "RenewLeaseRequest",
     "SystemDiagnosticsSnapshot",
     "WorkerCapacity",
     "apply_thread_affinity",
     "calculate_worker_allocation",
     "create_diagnostics_router",
+    "create_persistence_router",
     "get_worker_capacity",
     "inspect_gpu_qualification",
     "inspect_thread_affinity",
+    "main",
     "probe_cpu",
     "probe_disk",
     "probe_memory",
@@ -1182,3 +1211,328 @@ def create_diagnostics_router(
     _mount_system_routes(router)
     _mount_benchmark_routes(router, bench_runner)
     return router
+
+
+class AcquireLeaseRequest(BaseModel):
+    """Request payload for acquiring a cooperative worker lease."""
+
+    lease_key: str = Field(min_length=1)
+    holder_id: str = Field(min_length=1)
+    ttl_seconds: float = Field(default=30.0, gt=0.0)
+    scope: str = Field(default="default")
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RenewLeaseRequest(BaseModel):
+    """Request payload for renewing an active lease."""
+
+    lease_key: str = Field(min_length=1)
+    holder_id: str = Field(min_length=1)
+    ttl_seconds: float = Field(default=30.0, gt=0.0)
+
+
+class ReleaseLeaseRequest(BaseModel):
+    """Request payload for releasing a held lease."""
+
+    lease_key: str = Field(min_length=1)
+    holder_id: str = Field(min_length=1)
+
+
+class PersistenceRouterService:
+    """Internal service adapter translating HTTP requests to persistence actions."""
+
+    def __init__(
+        self, db: DatabaseManager, reconcile: Callable[[], dict[str, Any]]
+    ) -> None:
+        self._db = db
+        self._leases = LeaseManager(db)
+        self._reconcile = reconcile
+
+    def get_status(self, request: Request) -> Response:
+        """Get database operational metrics snapshot."""
+        req_id = request.headers.get("x-request-id")
+        status_rec = self._db.get_status()
+        resp = ApiResponse.success(
+            data=status_rec.model_dump(mode="json"),
+            message="Database status retrieved successfully.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def get_schema(self, request: Request) -> Response:
+        """Get schema migration ledger records."""
+        req_id = request.headers.get("x-request-id")
+        migrations = self._db.schema.list_migrations()
+        resp = ApiResponse.success(
+            data=[m.model_dump(mode="json") for m in migrations],
+            message="Schema migrations retrieved successfully.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def check_integrity_endpoint(self, request: Request) -> Response:
+        """Run physical SQLite database integrity verification."""
+        req_id = request.headers.get("x-request-id")
+        res = self._db.check_integrity()
+        resp = ApiResponse.success(
+            data={"integrity": res, "integrity_check": res},
+            message=f"Database integrity verified: {res}",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def list_leases(self, request: Request) -> Response:
+        """List currently active cooperative leases."""
+        req_id = request.headers.get("x-request-id")
+        leases = self._leases.list_active()
+        resp = ApiResponse.success(
+            data=[lease.model_dump(mode="json") for lease in leases],
+            message="Active leases retrieved successfully.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def acquire_lease_endpoint(
+        self,
+        request: Request,
+        req: AcquireLeaseRequest,
+    ) -> Response:
+        """Acquire a cooperative worker lease."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            lease = self._leases.acquire(
+                req.lease_key,
+                req.holder_id,
+                ttl_seconds=req.ttl_seconds,
+                scope=req.scope,
+                metadata=req.metadata,
+            )
+            resp = ApiResponse.success(
+                data=lease.model_dump(mode="json"),
+                message=f"Lease {req.lease_key} acquired successfully.",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except StorageBusyError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=str(exc),
+            ) from exc
+
+    def renew_lease_endpoint(
+        self,
+        request: Request,
+        req: RenewLeaseRequest,
+    ) -> Response:
+        """Renew a held cooperative lease."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            lease = self._leases.renew(
+                req.lease_key,
+                req.holder_id,
+                ttl_seconds=req.ttl_seconds,
+            )
+            resp = ApiResponse.success(
+                data=lease.model_dump(mode="json"),
+                message=f"Lease {req.lease_key} renewed successfully.",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except LeaseExpiredError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=str(exc),
+            ) from exc
+
+    def release_lease_endpoint(
+        self,
+        request: Request,
+        req: ReleaseLeaseRequest,
+    ) -> Response:
+        """Release a held cooperative lease."""
+        req_id = request.headers.get("x-request-id")
+        released = self._leases.release(req.lease_key, req.holder_id)
+        resp = ApiResponse.success(
+            data={"released": released},
+            message=f"Lease {req.lease_key} released: {released}",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def reconcile_endpoint(self, request: Request) -> Response:
+        """Trigger restart recovery reconciliation."""
+        req_id = request.headers.get("x-request-id")
+        report = self._reconcile()
+        resp = ApiResponse.success(
+            data=report,
+            message="Recovery reconciliation completed.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+
+def create_persistence_router(
+    db: DatabaseManager, *, reconcile: Callable[[], dict[str, Any]]
+) -> APIRouter:
+    """Create and configure FastAPI APIRouter exposing persistence endpoints.
+
+    Args:
+        db: Central host DatabaseManager instance.
+        reconcile: Injected startup recovery workflow owned by bootstrap.
+
+    Returns:
+        Configured FastAPI APIRouter.
+    """
+    service = PersistenceRouterService(db, reconcile)
+    router = APIRouter(prefix="/persistence", tags=["persistence"])
+
+    router.add_api_route(
+        "/status",
+        service.get_status,
+        methods=["GET"],
+        summary="Query database status and health",
+    )
+    router.add_api_route(
+        "/schema",
+        service.get_schema,
+        methods=["GET"],
+        summary="List applied schema migrations",
+    )
+    router.add_api_route(
+        "/schema/migrations",
+        service.get_schema,
+        methods=["GET"],
+        summary="List applied schema migrations alias",
+    )
+    router.add_api_route(
+        "/integrity-check",
+        service.check_integrity_endpoint,
+        methods=["POST"],
+        summary="Execute PRAGMA integrity_check",
+    )
+    router.add_api_route(
+        "/leases",
+        service.list_leases,
+        methods=["GET"],
+        summary="List active cooperative leases",
+    )
+    router.add_api_route(
+        "/leases/acquire",
+        service.acquire_lease_endpoint,
+        methods=["POST"],
+        summary="Acquire a cooperative lease",
+    )
+    router.add_api_route(
+        "/leases/renew",
+        service.renew_lease_endpoint,
+        methods=["POST"],
+        summary="Renew an active lease",
+    )
+    router.add_api_route(
+        "/leases/release",
+        service.release_lease_endpoint,
+        methods=["POST"],
+        summary="Release an active lease",
+    )
+    router.add_api_route(
+        "/recovery/reconcile",
+        service.reconcile_endpoint,
+        methods=["POST"],
+        summary="Trigger restart recovery reconciliation",
+    )
+
+    logger.debug(
+        "Persistence REST router initialized",
+        extra={"fr_id": "FR-HOST-PERSISTENCE-REST-PROJECTION"},
+    )
+    return router
+
+
+def main() -> int:
+    """CLI diagnostics entrypoint for database inspection and integrity validation.
+
+    Returns:
+        Process exit code (0 for success, non-zero for failure).
+    """
+    from app.host.bootstrap import HostRuntime
+
+    parser = argparse.ArgumentParser(
+        description="HaruQuantAI Host Persistence Authority Tool"
+    )
+    parser.add_argument(
+        "--status",
+        action="store_true",
+        help="Inspect database operational status and schema version",
+    )
+    parser.add_argument(
+        "--integrity-check",
+        action="store_true",
+        help="Run physical database integrity verification",
+    )
+    parser.add_argument(
+        "--reconcile",
+        action="store_true",
+        help="Execute startup recovery reconciliation",
+    )
+    parser.add_argument(
+        "--db",
+        type=Path,
+        default=Path("data/database/haruquantai.db"),
+        help="Target SQLite database path (default: data/database/haruquantai.db)",
+    )
+
+    args = parser.parse_args()
+    db = DatabaseManager(args.db)
+    exit_code = 0
+
+    if args.status:
+        try:
+            stat = db.get_status()
+            logger.info(
+                "Database status output",
+                extra={"status": stat.model_dump(mode="json")},
+            )
+            sys.stdout.write(f"Database: {stat.database_path}" + "\n")
+            sys.stdout.write(f"Connected: {stat.is_connected}" + "\n")
+            sys.stdout.write(f"Journal: {stat.journal_mode}" + "\n")
+            sys.stdout.write(f"Schema Version: {stat.schema_version}" + "\n")
+            sys.stdout.write(f"Tables: {stat.table_count}" + "\n")
+            sys.stdout.write(f"Integrity: {stat.integrity_status}" + "\n")
+            exit_code = 0 if stat.is_connected and stat.integrity_status == "ok" else 1
+        except Exception as exc:
+            logger.exception(
+                "Error checking database status",
+                extra={"error": str(exc)},
+            )
+            exit_code = 2
+    elif args.integrity_check:
+        try:
+            result = db.check_integrity()
+            sys.stdout.write(f"Integrity check: {result}" + "\n")
+            exit_code = 0 if result == "ok" else 1
+        except Exception as exc:
+            logger.exception(
+                "Error verifying integrity",
+                extra={"error": str(exc)},
+            )
+            exit_code = 2
+    elif args.reconcile:
+        try:
+            report = HostRuntime.reconcile_persistence(db)
+            sys.stdout.write(f"Reconciliation: {report['status']}" + "\n")
+            sys.stdout.write(f"Pruned Leases: {report['pruned_expired_leases']}" + "\n")
+            exit_code = 0
+        except Exception as exc:
+            logger.exception(
+                "Error running reconciliation",
+                extra={"error": str(exc)},
+            )
+            exit_code = 2
+    else:
+        parser.print_help()
+
+    return exit_code
+
+
+if __name__ == "__main__":
+    sys.exit(main())

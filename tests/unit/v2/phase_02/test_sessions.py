@@ -27,6 +27,7 @@ from pathlib import Path
 
 import pytest
 from app.host.persistence import DatabaseManager
+from app.workspace.data_manager.instruments import InstrumentService
 from app.workspace.data_manager.sessions import (
     SessionService,
     SessionWindow,
@@ -93,6 +94,8 @@ def test_db(tmp_path: Path) -> DatabaseManager:
     db_file = tmp_path / "test_sessions.db"
     db = DatabaseManager(database_path=db_file)
     db.initialize()
+    InstrumentService(db).ensure_defaults()
+    SessionService(db).ensure_defaults()
     return db
 
 

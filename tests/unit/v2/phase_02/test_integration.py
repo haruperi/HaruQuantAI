@@ -39,6 +39,8 @@ from app.host.bootstrap import HostRuntime, HostSettings, create_host_app
 from app.host.persistence import DatabaseManager
 from app.host.resources import ResourceManager
 from app.host.transport import get_event_bus
+from app.workspace.data_manager.instruments import InstrumentService
+from app.workspace.data_manager.sessions import SessionService
 from fastapi.testclient import TestClient
 
 SAMPLE_CSV_CONTENT = (
@@ -73,6 +75,8 @@ def client(tmp_path: Path) -> TestClient:
     db_file = tmp_path / "test_integration.db"
     db = DatabaseManager(database_path=db_file)
     db.initialize()
+    InstrumentService(db).ensure_defaults()
+    SessionService(db).ensure_defaults()
 
     res_dir = tmp_path / "resources"
     res_dir.mkdir(parents=True, exist_ok=True)
