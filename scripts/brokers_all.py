@@ -47,7 +47,6 @@ from app.plugins.brokers import (
     trade,
     yahoo,
 )
-from app.workspace.data_manager.connections import DownloadRequest
 
 logger = get_logger("TestAllBrokers")
 
@@ -314,23 +313,26 @@ def run_tests() -> bool:
     # 8. Binance Crypto Exchange (Market Data Provider: Live Public REST API)
     # ------------------------------------------------------------------------
     print("\n[8] BINANCE CRYPTO EXCHANGE:")
+    b_info = get_symbol_info(broker=binance, symbol="BTCUSDT")
+    print(
+        f"    Symbol Info: {b_info.data.description if b_info.data else 'None'}, "
+        f"digits={b_info.data.digits if b_info.data else 'None'}"
+    )
+    assert b_info.is_success
+    assert b_info.data is not None
+    assert b_info.data.name == "BTCUSDT"
+
     b_bars = get_bars(broker=binance, symbol="BTCUSDT", timeframe=TimeFrame.M1, count=5)
     print(f"    Live Klines count: {len(b_bars.data) if b_bars.data else 0}")
     assert b_bars.is_success
     assert b_bars.data is not None
     assert len(b_bars.data) == 5
 
-    b_dl = binance.download_bars(
-        DownloadRequest(
-            provider_name="Binance",
-            symbol="BTCUSDT",
-            timeframe="M1",
-            date_from="2026-10-01T00:00:00Z",
-            date_to="2026-10-01T00:05:00Z",
-        )
-    )
-    print(f"    Download klines count: {len(b_dl)}")
-    assert len(b_dl) > 0
+    b_ticks = binance.get_ticks(symbol="BTCUSDT", count=5)
+    print(f"    Live Trades count: {len(b_ticks.data) if b_ticks.data else 0}")
+    assert b_ticks.is_success
+    assert b_ticks.data is not None
+    assert len(b_ticks.data) == 5
 
     b_trade = trade(
         broker=binance, request=TradeRequest(symbol="BTCUSDT", volume=0.001)
