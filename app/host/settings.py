@@ -7,14 +7,18 @@ Description:
     lazy; reads use a local cache, updates refresh it, and reload() observes other
     writers. Constructor overrides affect the in-memory view only; snapshots
     describe persisted values. Database handles, SQL, schemas and storage checks
-    belong to persistence. HTTP and filesystem diagnostics belong to diagnostics.
-    Do not add another store wrapper, transport handlers or filesystem probes here.
+    belong to persistence. Settings HTTP access belongs here because it serves
+    the same retrieval/update capability; filesystem inspection belongs to
+    diagnostics. Do not add another store wrapper or filesystem probes here.
 
 Purpose:
     FEAT-HOST-SETTINGS: Retrieve configuration and validate/update it through the
     single database authority, with convenient scoped access.
 
 Key Capabilities:
+    - FR-HOST-SETTINGS-PROJECTION: Expose settings reads and updates over HTTP.
+      Associated: `create_settings_router()`
+      Logging: DEBUG reads; INFO updates; delegated validation logs failures.
     - FR-HOST-SETTINGS-LOAD: Load settings and rebuild the local access cache.
       Associated: `HostSettings.reload()`, `_cache_snapshot()`
       Logging: INFO counts/revision; WARNING unavailable initialization; ERROR
@@ -50,11 +54,14 @@ CLI Usage:
 
 from __future__ import annotations
 
+import json
 import math
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, override
 
+from fastapi import APIRouter, Request, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.host.logging import get_logger
@@ -62,6 +69,7 @@ from app.host.persistence import (
     CorruptDataError,
     IncompatibleSchemaError,
     PersistenceError,
+    RevisionConflictError,
     SettingRecord,
     ValidationError,
 )
@@ -70,6 +78,7 @@ from app.host.persistence import SettingsStore as _SettingsStore
 __all__ = [
     "HostSettings",
     "HostSettingsSnapshot",
+    "create_settings_router",
     "settings",
     "validate_configuration_values",
 ]
@@ -717,3 +726,103 @@ class HostSettings(_SettingsNode):
 
 # Convenient global singleton; construction performs no database I/O.
 settings = HostSettings()
+
+
+def _extract_put_payload(body: Any) -> tuple[int, dict[str, dict[str, Any]]]:
+    """Validate and extract expected revision and changes from PUT body."""
+    if not isinstance(body, dict):
+        raise ValidationError("Request body must be a JSON object")
+    expected_rev = body.get("expected_revision")
+    if not isinstance(expected_rev, int) or expected_rev < 0:
+        raise ValidationError("expected_revision must be a non-negative integer")
+    changes = body.get("changes")
+    if not isinstance(changes, dict):
+        raise ValidationError("changes must be a dictionary of scoped settings")
+    return expected_rev, changes
+
+
+def create_settings_router(
+    settings_instance: HostSettings | None = None,
+) -> APIRouter:
+    """Create FastAPI APIRouter exposing host settings REST projections.
+
+    Args:
+        settings_instance: HostSettings instance to expose. Defaults to
+            global singleton.
+
+    Returns:
+        Configured FastAPI APIRouter.
+    """
+    router = APIRouter()
+    target_settings = settings_instance if settings_instance is not None else settings
+
+    @router.get("/settings")
+    async def get_settings_endpoint() -> JSONResponse:
+        """Retrieve current shell settings and preferences snapshot."""
+        logger.debug(
+            "FR-HOST-SETTINGS-PROJECTION: Handling GET /settings query.",
+            extra={"fr_id": "FR-HOST-SETTINGS-PROJECTION"},
+        )
+        snapshot = target_settings.get_snapshot()
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"status": "success", "data": snapshot.model_dump()},
+        )
+
+    @router.put("/settings")
+    async def put_settings_endpoint(request: Request) -> JSONResponse:
+        """Atomically update host settings with revision check."""
+        try:
+            body = await request.json()
+        except ValueError, TypeError, json.JSONDecodeError:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "status": "error",
+                    "error": {
+                        "code": "INVALID_JSON",
+                        "message": "Malformed JSON payload in request body",
+                    },
+                },
+            )
+
+        try:
+            expected_rev, changes = _extract_put_payload(body)
+            snapshot = target_settings.update(changes, expected_revision=expected_rev)
+            logger.info(
+                "FR-HOST-SETTINGS-PROJECTION: Updated settings to revision %d.",
+                snapshot.revision,
+                extra={
+                    "fr_id": "FR-HOST-SETTINGS-PROJECTION",
+                    "revision": snapshot.revision,
+                },
+            )
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"status": "success", "data": snapshot.model_dump()},
+            )
+        except RevisionConflictError as exc:
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={
+                    "status": "error",
+                    "error": {
+                        "code": "REVISION_CONFLICT",
+                        "message": str(exc),
+                        "current_revision": target_settings.revision,
+                    },
+                },
+            )
+        except ValidationError as exc:
+            return JSONResponse(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                content={
+                    "status": "error",
+                    "error": {
+                        "code": "VALIDATION_ERROR",
+                        "message": str(exc),
+                    },
+                },
+            )
+
+    return router

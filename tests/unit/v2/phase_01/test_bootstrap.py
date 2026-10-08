@@ -20,9 +20,15 @@ from app.host.bootstrap import (
     LifespanStage,
     ReadinessState,
     create_host_app,
+    create_recovery_router,
+    reconcile_database,
 )
-from app.host.persistence import SettingsStore
+from app.host.bootstrap import (
+    main as bootstrap_main,
+)
+from app.host.persistence import DatabaseManager, IncompatibleSchemaError, SettingsStore
 from app.host.settings import HostSettings as AppSettings
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 
@@ -453,3 +459,61 @@ def test_bootstrap_cli_main() -> None:
         assert call_kwargs["host"] == "127.0.0.1"
         assert call_kwargs["port"] == 7777
         assert mock_shutdown.called
+
+
+def test_recovery_router_uses_injected_workflow() -> None:
+    """Recovery HTTP calls its bootstrap workflow and preserves the envelope."""
+    calls: list[bool] = []
+
+    def recover() -> dict[str, Any]:
+        calls.append(True)
+        return {"status": "reconciled", "pruned_expired_leases": 2}
+
+    app = FastAPI()
+    app.include_router(create_recovery_router(recover))
+    with TestClient(app) as client:
+        response = client.post(
+            "/persistence/recovery/reconcile", headers={"x-request-id": "recovery-test"}
+        )
+    assert response.status_code == 200
+    assert response.json()["data"] == {
+        "status": "reconciled",
+        "pruned_expired_leases": 2,
+    }
+    assert calls == [True]
+
+
+def test_recovery_cli_bypasses_server_and_closes_database(tmp_path: Path) -> None:
+    """Recovery uses only the requested store and releases it on success."""
+    path = tmp_path / "recovery-cli.db"
+    with (
+        patch(
+            "app.host.bootstrap.DatabaseManager", wraps=DatabaseManager
+        ) as constructor,
+        patch.object(DatabaseManager, "close", autospec=True) as close,
+        patch("app.host.bootstrap.create_host_app") as create_app,
+        patch("app.host.bootstrap.default_host_settings") as global_settings,
+    ):
+        assert bootstrap_main(["--reconcile", "--db", str(path)]) == 0
+        constructor.assert_called_once_with(path)
+        close.assert_called_once()
+        create_app.assert_not_called()
+        assert not global_settings.mock_calls
+    assert path.exists()
+
+
+@pytest.mark.parametrize("outcome, expected", [("incomplete", 1), ("exception", 2)])
+def test_recovery_cli_failure_closes_database(
+    tmp_path: Path, outcome: str, expected: int
+) -> None:
+    """Recovery failures return a process code and always release ownership."""
+    with (
+        patch.object(DatabaseManager, "close", autospec=True) as close,
+        patch.object(HostRuntime, "reconcile_persistence") as recover,
+    ):
+        if outcome == "exception":
+            recover.side_effect = IncompatibleSchemaError("invalid schema")
+        else:
+            recover.return_value = {"status": outcome, "pruned_expired_leases": 0}
+        assert reconcile_database(tmp_path / "failed-recovery.db") == expected
+        close.assert_called_once()

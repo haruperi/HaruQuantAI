@@ -1,13 +1,11 @@
 """System capacity, process health, and hardware diagnostics.
 
 Description:
-    Also owns PersistenceRouterService, lease request models and the separate
-    persistence router, preserving its existing HTTP paths and response envelopes.
-    Startup recovery is supplied as a callback by bootstrap. Database diagnostic
-    CLI presentation lives here; all queries remain in app.host.persistence.
-
-    Settings HTTP projections and workspace directory existence diagnostics also
-    live here; configuration retrieval and updates belong to HostSettings.
+    DatabaseDiagnosticsService exposes database status, schema and integrity
+    inspection using persistence's public API. Configured workspace path checks
+    also belong here. This module owns Python, HTTP and CLI access to diagnostics;
+    settings updates belong to settings, worker leases to jobs, and recovery to
+    bootstrap. All SQL and database handles remain in persistence.
 
     This module provides the central system capacity diagnostics, process health
     monitoring, worker concurrency calculation, hardware capability inspection,
@@ -27,16 +25,13 @@ Purpose:
     computational benchmarking.
 
 Key Capabilities:
-    - FR-HOST-SETTINGS-PROJECTION: Project settings snapshots and updates over HTTP.
-      Associated: `create_settings_router()`
-      Logging: DEBUG reads; INFO updates; delegated validation/storage log failures.
     - FR-HOST-SETTINGS-PATH-VALIDATION: Inspect configured directory existence.
       Associated: `validate_settings_paths()`
       Logging: INFO available directories; WARNING absent directories.
     - FR-HOST-PERSISTENCE-REST-PROJECTION: Project storage diagnostics over HTTP.
-      Associated: `PersistenceRouterService`, `create_persistence_router()`
+      Associated: `DatabaseDiagnosticsService`, `create_database_diagnostics_router()`
       Logging: DEBUG router composition; delegated stores/services log every
-        query, conditional write and recovery action without payload values.
+        inspection without payload values.
     - FR-HOST-DIAG-SYSTEM-PROBE: Probe CPU, memory, disk, and process metrics with
       bounded execution and explicit zero-vs-unavailable discrimination.
       Associated: `probe_cpu()`, `probe_memory()`, `probe_disk()`, `probe_process()`
@@ -95,7 +90,6 @@ CLI Usage:
     ```bash
     uv run python -m app.host.diagnostics --status --db path/to/database.db
     uv run python -m app.host.diagnostics --integrity-check --db path/to/database.db
-    uv run python -m app.host.diagnostics --reconcile --db path/to/database.db
     ```
 
     Run the application and query diagnostic endpoints via curl or CLI:
@@ -112,7 +106,6 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import math
 import os
 import platform
@@ -120,48 +113,39 @@ import sys
 import threading
 import time
 import uuid
-from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
 import psutil
 from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.host.jobs import LeaseManager
 from app.host.logging import get_logger, redact_paths
-from app.host.persistence import (
-    DatabaseManager,
-    LeaseExpiredError,
-    RevisionConflictError,
-    StorageBusyError,
-    ValidationError,
-)
+from app.host.persistence import DatabaseManager
 from app.host.response import StandardResponse as ApiResponse
-from app.host.settings import HostSettings, settings
+
+if TYPE_CHECKING:
+    from app.host.settings import HostSettings
 
 __all__ = [
-    "AcquireLeaseRequest",
     "BenchmarkJob",
     "BenchmarkResults",
     "BenchmarkRunner",
     "CpuObservation",
+    "DatabaseDiagnosticsService",
     "DiskObservation",
     "MemoryObservation",
-    "PersistenceRouterService",
     "PlatformObservation",
     "ProcessObservation",
-    "ReleaseLeaseRequest",
-    "RenewLeaseRequest",
     "SystemDiagnosticsSnapshot",
     "WorkerCapacity",
     "apply_thread_affinity",
     "calculate_worker_allocation",
+    "create_database_diagnostics_router",
     "create_diagnostics_router",
-    "create_persistence_router",
-    "create_settings_router",
+    "create_settings_paths_router",
     "get_worker_capacity",
     "inspect_gpu_qualification",
     "inspect_thread_affinity",
@@ -1232,40 +1216,11 @@ def create_diagnostics_router(
     return router
 
 
-class AcquireLeaseRequest(BaseModel):
-    """Request payload for acquiring a cooperative worker lease."""
+class DatabaseDiagnosticsService:
+    """HTTP access to database operational inspection."""
 
-    lease_key: str = Field(min_length=1)
-    holder_id: str = Field(min_length=1)
-    ttl_seconds: float = Field(default=30.0, gt=0.0)
-    scope: str = Field(default="default")
-    metadata: dict[str, Any] = Field(default_factory=dict)
-
-
-class RenewLeaseRequest(BaseModel):
-    """Request payload for renewing an active lease."""
-
-    lease_key: str = Field(min_length=1)
-    holder_id: str = Field(min_length=1)
-    ttl_seconds: float = Field(default=30.0, gt=0.0)
-
-
-class ReleaseLeaseRequest(BaseModel):
-    """Request payload for releasing a held lease."""
-
-    lease_key: str = Field(min_length=1)
-    holder_id: str = Field(min_length=1)
-
-
-class PersistenceRouterService:
-    """Internal service adapter translating HTTP requests to persistence actions."""
-
-    def __init__(
-        self, db: DatabaseManager, reconcile: Callable[[], dict[str, Any]]
-    ) -> None:
+    def __init__(self, db: DatabaseManager) -> None:
         self._db = db
-        self._leases = LeaseManager(db)
-        self._reconcile = reconcile
 
     def get_status(self, request: Request) -> Response:
         """Get database operational metrics snapshot."""
@@ -1300,109 +1255,10 @@ class PersistenceRouterService:
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
-    def list_leases(self, request: Request) -> Response:
-        """List currently active cooperative leases."""
-        req_id = request.headers.get("x-request-id")
-        leases = self._leases.list_active()
-        resp = ApiResponse.success(
-            data=[lease.model_dump(mode="json") for lease in leases],
-            message="Active leases retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
-    def acquire_lease_endpoint(
-        self,
-        request: Request,
-        req: AcquireLeaseRequest,
-    ) -> Response:
-        """Acquire a cooperative worker lease."""
-        req_id = request.headers.get("x-request-id")
-        try:
-            lease = self._leases.acquire(
-                req.lease_key,
-                req.holder_id,
-                ttl_seconds=req.ttl_seconds,
-                scope=req.scope,
-                metadata=req.metadata,
-            )
-            resp = ApiResponse.success(
-                data=lease.model_dump(mode="json"),
-                message=f"Lease {req.lease_key} acquired successfully.",
-                request_id=req_id,
-            )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except StorageBusyError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=str(exc),
-            ) from exc
-
-    def renew_lease_endpoint(
-        self,
-        request: Request,
-        req: RenewLeaseRequest,
-    ) -> Response:
-        """Renew a held cooperative lease."""
-        req_id = request.headers.get("x-request-id")
-        try:
-            lease = self._leases.renew(
-                req.lease_key,
-                req.holder_id,
-                ttl_seconds=req.ttl_seconds,
-            )
-            resp = ApiResponse.success(
-                data=lease.model_dump(mode="json"),
-                message=f"Lease {req.lease_key} renewed successfully.",
-                request_id=req_id,
-            )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except LeaseExpiredError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=str(exc),
-            ) from exc
-
-    def release_lease_endpoint(
-        self,
-        request: Request,
-        req: ReleaseLeaseRequest,
-    ) -> Response:
-        """Release a held cooperative lease."""
-        req_id = request.headers.get("x-request-id")
-        released = self._leases.release(req.lease_key, req.holder_id)
-        resp = ApiResponse.success(
-            data={"released": released},
-            message=f"Lease {req.lease_key} released: {released}",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def reconcile_endpoint(self, request: Request) -> Response:
-        """Trigger restart recovery reconciliation."""
-        req_id = request.headers.get("x-request-id")
-        report = self._reconcile()
-        resp = ApiResponse.success(
-            data=report,
-            message="Recovery reconciliation completed.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-
-def create_persistence_router(
-    db: DatabaseManager, *, reconcile: Callable[[], dict[str, Any]]
-) -> APIRouter:
-    """Create and configure FastAPI APIRouter exposing persistence endpoints.
-
-    Args:
-        db: Central host DatabaseManager instance.
-        reconcile: Injected startup recovery workflow owned by bootstrap.
-
-    Returns:
-        Configured FastAPI APIRouter.
-    """
-    service = PersistenceRouterService(db, reconcile)
+def create_database_diagnostics_router(db: DatabaseManager) -> APIRouter:
+    """Expose database status, schema and integrity inspection over HTTP."""
+    service = DatabaseDiagnosticsService(db)
     router = APIRouter(prefix="/persistence", tags=["persistence"])
 
     router.add_api_route(
@@ -1429,37 +1285,6 @@ def create_persistence_router(
         methods=["POST"],
         summary="Execute PRAGMA integrity_check",
     )
-    router.add_api_route(
-        "/leases",
-        service.list_leases,
-        methods=["GET"],
-        summary="List active cooperative leases",
-    )
-    router.add_api_route(
-        "/leases/acquire",
-        service.acquire_lease_endpoint,
-        methods=["POST"],
-        summary="Acquire a cooperative lease",
-    )
-    router.add_api_route(
-        "/leases/renew",
-        service.renew_lease_endpoint,
-        methods=["POST"],
-        summary="Renew an active lease",
-    )
-    router.add_api_route(
-        "/leases/release",
-        service.release_lease_endpoint,
-        methods=["POST"],
-        summary="Release an active lease",
-    )
-    router.add_api_route(
-        "/recovery/reconcile",
-        service.reconcile_endpoint,
-        methods=["POST"],
-        summary="Trigger restart recovery reconciliation",
-    )
-
     logger.debug(
         "Persistence REST router initialized",
         extra={"fr_id": "FR-HOST-PERSISTENCE-REST-PROJECTION"},
@@ -1519,102 +1344,10 @@ def validate_settings_paths(settings_instance: HostSettings) -> dict[str, bool]:
     return results
 
 
-def _extract_put_payload(body: Any) -> tuple[int, dict[str, dict[str, Any]]]:
-    """Validate and extract expected revision and changes from PUT body."""
-    if not isinstance(body, dict):
-        raise ValidationError("Request body must be a JSON object")
-    expected_rev = body.get("expected_revision")
-    if not isinstance(expected_rev, int) or expected_rev < 0:
-        raise ValidationError("expected_revision must be a non-negative integer")
-    changes = body.get("changes")
-    if not isinstance(changes, dict):
-        raise ValidationError("changes must be a dictionary of scoped settings")
-    return expected_rev, changes
-
-
-def create_settings_router(
-    settings_instance: HostSettings | None = None,
-) -> APIRouter:
-    """Create FastAPI APIRouter exposing host settings REST projections.
-
-    Args:
-        settings_instance: HostSettings instance to expose. Defaults to
-            global singleton.
-
-    Returns:
-        Configured FastAPI APIRouter.
-    """
+def create_settings_paths_router(settings_instance: HostSettings) -> APIRouter:
+    """Expose configured directory inspection at its existing HTTP URL."""
     router = APIRouter()
-    target_settings = settings_instance if settings_instance is not None else settings
-
-    @router.get("/settings")
-    async def get_settings_endpoint() -> JSONResponse:
-        """Retrieve current shell settings and preferences snapshot."""
-        logger.debug(
-            "FR-HOST-SETTINGS-PROJECTION: Handling GET /settings query.",
-            extra={"fr_id": "FR-HOST-SETTINGS-PROJECTION"},
-        )
-        snapshot = target_settings.get_snapshot()
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"status": "success", "data": snapshot.model_dump()},
-        )
-
-    @router.put("/settings")
-    async def put_settings_endpoint(request: Request) -> JSONResponse:
-        """Atomically update host settings with revision check."""
-        try:
-            body = await request.json()
-        except ValueError, TypeError, json.JSONDecodeError:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "INVALID_JSON",
-                        "message": "Malformed JSON payload in request body",
-                    },
-                },
-            )
-
-        try:
-            expected_rev, changes = _extract_put_payload(body)
-            snapshot = target_settings.update(changes, expected_revision=expected_rev)
-            logger.info(
-                "FR-HOST-SETTINGS-PROJECTION: Updated settings to revision %d.",
-                snapshot.revision,
-                extra={
-                    "fr_id": "FR-HOST-SETTINGS-PROJECTION",
-                    "revision": snapshot.revision,
-                },
-            )
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"status": "success", "data": snapshot.model_dump()},
-            )
-        except RevisionConflictError as exc:
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "REVISION_CONFLICT",
-                        "message": str(exc),
-                        "current_revision": target_settings.revision,
-                    },
-                },
-            )
-        except ValidationError as exc:
-            return JSONResponse(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "VALIDATION_ERROR",
-                        "message": str(exc),
-                    },
-                },
-            )
+    target_settings = settings_instance
 
     @router.get("/settings/paths/validate")
     async def validate_paths_endpoint() -> JSONResponse:
@@ -1641,10 +1374,8 @@ def main() -> int:
     Returns:
         Process exit code (0 for success, non-zero for failure).
     """
-    from app.host.bootstrap import HostRuntime
-
     parser = argparse.ArgumentParser(
-        description="HaruQuantAI Host Persistence Authority Tool"
+        description="HaruQuantAI Host Database Diagnostics"
     )
     parser.add_argument(
         "--status",
@@ -1655,11 +1386,6 @@ def main() -> int:
         "--integrity-check",
         action="store_true",
         help="Run physical database integrity verification",
-    )
-    parser.add_argument(
-        "--reconcile",
-        action="store_true",
-        help="Execute startup recovery reconciliation",
     )
     parser.add_argument(
         "--db",
@@ -1703,21 +1429,10 @@ def main() -> int:
                 extra={"error": str(exc)},
             )
             exit_code = 2
-    elif args.reconcile:
-        try:
-            report = HostRuntime.reconcile_persistence(db)
-            sys.stdout.write(f"Reconciliation: {report['status']}" + "\n")
-            sys.stdout.write(f"Pruned Leases: {report['pruned_expired_leases']}" + "\n")
-            exit_code = 0
-        except Exception as exc:
-            logger.exception(
-                "Error running reconciliation",
-                extra={"error": str(exc)},
-            )
-            exit_code = 2
     else:
         parser.print_help()
 
+    db.close()
     return exit_code
 
 

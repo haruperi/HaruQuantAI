@@ -22,7 +22,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FEAT-HOST-TRANSPORT` | Unified HTTP transport middleware, request correlation, session authentication, in-memory event bus, and Server-Sent Events streaming in `app/host/transport.py` | Implemented and verified; Phase 1 task 1.6 qualified |
 | `FEAT-HOST-JOBS` | Hardware diagnostics, process pool allocation, budget admission, cooperative cancellation, restart reconciliation, and event broadcasting in `app/host/jobs.py` | Implemented and verified; Phase 1 task 1.7 qualified |
 | `FEAT-HOST-RESOURCES` | Immutable artifact custody, content-addressed storage, path containment, Zip-Slip/expansion bomb prevention, bounded caching, and REST management in `app/host/resources.py` | Implemented and verified; Phase 1 task 1.8 qualified |
-| `FEAT-HOST-PERSISTENCE` | Exclusive SQLite access, schema operations, grouped CRUD stores and atomic revisions in `app/host/persistence.py`; job/lease policy in jobs, recovery sequencing in bootstrap, HTTP/CLI in diagnostics | Implemented and verified; Phase 1 task 1.9 qualified |
+| `FEAT-HOST-PERSISTENCE` | Exclusive SQLite access, schema operations, grouped CRUD stores and atomic revisions in `app/host/persistence.py`; job/lease policy in jobs, recovery sequencing in bootstrap, capability HTTP/CLI access with its business owner | Implemented and verified; Phase 1 task 1.9 qualified |
 | `FEAT-HOST-SESSION` | Central security authority, loopback origin validation, ephemeral session lifecycle, fine-grained scope authorization, distinct authority elevation, and distribution qualification in `app/host/session.py` | Implemented and verified; Phase 1 task 1.10 qualified |
 
 ## Registered functional requirements
@@ -67,7 +67,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-SETTINGS-VALIDATION` | Validate type, range, finite values, and credentials according to ratified rules. | Emits WARNING with reason when validation rejects a payload. |
 | `FR-HOST-SETTINGS-UPDATE` | Atomic batch upsert with monotonic revision and conflict detection. | Emits INFO on committed batch with changed count and updated revision. |
 | `FR-HOST-SETTINGS-PATH-VALIDATION` | diagnostics.validate_settings_paths inspects configured workspace filesystem paths on disk. | Emits INFO when path exists; WARNING when path is absent. |
-| `FR-HOST-SETTINGS-PROJECTION` | diagnostics.create_settings_router exposes settings snapshots, updates and path checks over HTTP. | Emits DEBUG on query; INFO on settings updates. |
+| `FR-HOST-SETTINGS-PROJECTION` | settings.create_settings_router exposes settings snapshots and updates over HTTP. | Emits DEBUG on query; INFO on settings updates. |
 | `FR-HOST-DISC-MANIFEST-SCHEMA` | Package identity, semver, contained entrypoints, slot declarations, and dependency metadata schema validation. | INFO on valid manifest discovery; ERROR on validation failure. |
 | `FR-HOST-DISC-CONTAINMENT-SECURITY` | Strict directory containment, forbidding path traversal (`..`), symbolic link escapes, and uncontained entrypoints. | WARNING/ERROR with security violation details. |
 | `FR-HOST-DISC-SLOT-REGISTRATION` | Typed host extension slots registry and attachment cardinality validation. | INFO on slot registration; WARNING on incompatible slot request. |
@@ -106,7 +106,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-PERSISTENCE-REVISION-CONCURRENCY` | Optimistic monotonic revision checks asserting persisted revision matches `expected_revision`. | Emits WARNING on revision conflict without silent data overwrites. |
 | `FR-HOST-JOBS-LEASE-COORDINATION` | jobs.LeaseManager owns reservation policy; persistence.LeaseStore owns atomic SQL predicates. | Emits INFO acquire/renew/release; WARNING conflicts; DEBUG storage outcomes. |
 | `FR-HOST-BOOT-PERSISTENCE-RECOVERY` | bootstrap sequences integrity/schema checks and jobs-owned expired-lease cleanup. | Emits INFO recovery report; fails startup on integrity/schema failure. |
-| `FR-HOST-PERSISTENCE-REST-PROJECTION` | diagnostics owns persistence HTTP endpoints and CLI, with bootstrap recovery injected. | Emits DEBUG router composition; delegated storage/services log operations. |
+| `FR-HOST-PERSISTENCE-REST-PROJECTION` | diagnostics owns database inspection HTTP/CLI; bootstrap composes it with jobs lease access and bootstrap recovery. | Emits DEBUG router composition; delegated storage/services log operations. |
 | `FR-HOST-SESS-LOOPBACK-ORIGIN` | Loopback origin validation and DNS rebinding prevention for local workstation HTTP endpoints. | Emits DEBUG on verified loopback request; WARNING on rejected foreign origins or DNS rebinding attempts. |
 | `FR-HOST-SESS-LIFECYCLE` | Ephemeral session token generation, sliding TTL, explicit revocation, and host-restart invalidation. | Emits INFO on session creation and revocation; WARNING on expired or unknown tokens; INFO on restart invalidation. |
 | `FR-HOST-SESS-SCOPE-AUTHORIZATION` | Granular scope checking (`<resource>:<action>` and wildcards) across domains, resources, and tools. | Emits DEBUG on authorized actions; WARNING on permission denial with structured fr_id and requested scope. |
@@ -140,7 +140,7 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 | `DEC-HOST-ZIP-ROTATION-WINDOWS` | Rotating file sinks close open file handles prior to renaming to guarantee compatibility with Windows file-locking semantics, compressing rotated logs to deflated `.zip` archives. |
 | `DEC-HOST-SINGLE-DIAGNOSTICS-MODULE` | Merged system probes, CPU/memory/disk/process diagnostics, worker capacity derivation, thread affinity, GPU qualification, and computational benchmarks into a single canonical module `app/host/diagnostics.py`. |
 | `DEC-HOST-REAL-BENCHMARK-MEASUREMENT` | Hardware diagnostic benchmarks perform actual bounded CPU-bound workload execution with duration and throughput measurement; synthetic or fabricated benchmark scores are prohibited. |
-| `DEC-HOST-SINGLE-SETTINGS-MODULE` | Merged settings persistence store, dot-access node, validation, workspace path checks, and FastAPI router into a single canonical module `app/host/settings.py`. |
+| `DEC-HOST-SINGLE-SETTINGS-MODULE` | HostSettings, scoped access, validation, cached snapshots and settings HTTP access live in `app/host/settings.py`; storage CRUD belongs to persistence and filesystem inspection to diagnostics. |
 | `DEC-HOST-SQLITE-SETTINGS-STORE` | Authoritative persistence for host settings is backed by the `host_settings` table in `data/database/haruquantai.db` with atomic `BEGIN IMMEDIATE` transactions and monotonic revision tracking. |
 | `DEC-HOST-SINGLE-DISCOVERY-MODULE` | Merged plugin discovery, manifest verification, slot registry, dependency resolution, capability injection, lifecycle management, and REST API projections into a single canonical module `app/host/discovery.py`. |
 | `DEC-HOST-CONTAINED-PLUGIN-EXECUTION` | Plugin manifests and entrypoints are strictly bounded within declared package directories; path traversal, symlink escapes, and unverified global module paths are rejected to guarantee host security and tenant isolation. |
@@ -179,13 +179,17 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 - `persistence.py`: DatabaseManager, SchemaManager, SettingsStore, JobStore,
   LeaseStore, InstrumentStore, SessionStore, DatasetStore, BasketStore, BrokerStore,
   and generic TypedRepository. Schema initialization creates storage only.
-- `settings.py`: HostSettings directly retrieves/updates through persistence.SettingsStore; lazy scoped access, cache refresh, validation and persisted snapshots.
-- `jobs.py`: job models/budgets, restart interruption and LeaseManager policy.
+- `settings.py`: HostSettings directly retrieves/updates through persistence.SettingsStore; lazy scoped access, cache refresh, validation, persisted snapshots and settings HTTP access.
+- `jobs.py`: job models/budgets, restart interruption, LeaseManager policy and lease HTTP access.
 - `session.py`: PersistenceAccess namespace/owner binding and existing authorization.
-- `bootstrap.py`: recovery sequencing and dependency wiring.
-- `diagnostics.py`: persistence/settings HTTP adapters, workspace path checks and persistence CLI; HTTP contracts are retained.
+- `bootstrap.py`: recovery sequencing, recovery HTTP/CLI access and dependency/router composition.
+- `diagnostics.py`: database and workspace path inspection, with diagnostic HTTP/CLI access; existing HTTP URLs are retained.
 - Workspace instruments/sessions: explicit idempotent `ensure_defaults()`;
   existing definitions are never overwritten by baseline seeding.
+
+Each module stays focused on its business capability. Python, HTTP, UI and CLI
+access may live together when they serve that same capability. Persistence is
+the explicit exception: CRUD and required database infrastructure only.
 
 Database callers receive records and results, never connections or cursors. Atomic
 revision, lease and multi-table writes stay inside CRUD transactions. Do not add
@@ -203,7 +207,7 @@ The old `python -m app.host.persistence` CLI is replaced by:
 ```bash
 uv run python -m app.host.diagnostics --status --db path/to/database.db
 uv run python -m app.host.diagnostics --integrity-check --db path/to/database.db
-uv run python -m app.host.diagnostics --reconcile --db path/to/database.db
+uv run python -m app.host.bootstrap --reconcile --db path/to/database.db
 ```
 
 Settings callers use `settings = HostSettings()` (lazy construction), with scoped

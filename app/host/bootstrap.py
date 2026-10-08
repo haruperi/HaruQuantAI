@@ -20,7 +20,8 @@ Purpose:
 
 Key Capabilities:
     - FR-HOST-BOOT-PERSISTENCE-RECOVERY: Sequence startup storage audit and cleanup.
-      Associated: `HostRuntime.reconcile_persistence()`
+      Associated: `HostRuntime.reconcile_persistence()`, `create_recovery_router()`,
+        `reconcile_database()`
       Logging: INFO recovery report; failed integrity/schema checks stop startup.
     - FR-HOST-BOOT-LIFECYCLE-STAGES: Strict progression through ordered host
       lifespan stages (CONFIGURING, PATHS, LOGGING, DISCOVERY, SERVICES, ROUTES,
@@ -68,6 +69,7 @@ Python API Usage:
 CLI Usage:
     ```bash
     uv run python -m app.host.bootstrap --host 127.0.0.1 --port 8000
+    uv run python -m app.host.bootstrap --reconcile --db path/to/database.db
     ```
 """
 
@@ -79,7 +81,7 @@ import inspect
 import sys
 import time
 import uuid
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -93,9 +95,9 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 
 from app.host.diagnostics import (
+    create_database_diagnostics_router,
     create_diagnostics_router,
-    create_persistence_router,
-    create_settings_router,
+    create_settings_paths_router,
 )
 from app.host.discovery import (
     PluginDiscoveryEngine,
@@ -104,7 +106,12 @@ from app.host.discovery import (
     SlotRegistry,
     create_discovery_router,
 )
-from app.host.jobs import JobManager, LeaseManager, create_jobs_router
+from app.host.jobs import (
+    JobManager,
+    LeaseManager,
+    create_jobs_router,
+    create_leases_router,
+)
 from app.host.logging import (
     configure_host_logging,
     create_debug_console_router,
@@ -115,12 +122,15 @@ from app.host.persistence import (
     DEFAULT_DATABASE_PATH,
     DatabaseManager,
     IncompatibleSchemaError,
+    PersistenceError,
     get_database_manager,
 )
 from app.host.resources import ResourceManager, create_resources_router
+from app.host.response import StandardResponse
 from app.host.session import create_sessions_router
 from app.host.settings import (
     HostSettings,
+    create_settings_router,
 )
 from app.host.settings import settings as default_host_settings
 from app.host.transport import (
@@ -139,6 +149,9 @@ __all__ = [
     "ReadinessSnapshot",
     "ReadinessState",
     "create_host_app",
+    "create_persistence_router",
+    "create_recovery_router",
+    "reconcile_database",
 ]
 
 logger = get_logger(__name__)
@@ -925,6 +938,10 @@ def _mount_host_routers(
     app.include_router(shell_router)
 
     # 2. Settings Router (/api/v1/settings, /api/v1/settings/paths/validate)
+    app.include_router(
+        create_settings_paths_router(resolved_config),
+        prefix=resolved_settings.api_prefix,
+    )
     settings_router = create_settings_router(resolved_config)
     app.include_router(settings_router, prefix=resolved_settings.api_prefix)
 
@@ -1073,7 +1090,64 @@ def create_host_app(
     return app
 
 
-def main(argv: list[str] | None = None) -> None:
+def create_recovery_router(reconcile: Callable[[], dict[str, Any]]) -> APIRouter:
+    """Expose bootstrap recovery using the supplied lifecycle workflow."""
+    router = APIRouter(prefix="/persistence/recovery", tags=["persistence"])
+
+    @router.post("/reconcile", summary="Trigger restart recovery reconciliation")
+    def reconcile_endpoint(request: Request) -> JSONResponse:
+        """Run the bootstrap-owned recovery sequence."""
+        response = StandardResponse.success(
+            data=reconcile(),
+            message="Recovery reconciliation completed.",
+            request_id=request.headers.get("x-request-id"),
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=response.to_dict())
+
+    logger.debug(
+        "Recovery REST router initialized",
+        extra={"fr_id": "FR-HOST-BOOT-PERSISTENCE-RECOVERY"},
+    )
+    return router
+
+
+def create_persistence_router(
+    db: DatabaseManager, *, reconcile: Callable[[], dict[str, Any]]
+) -> APIRouter:
+    """Compose separately owned capabilities at the legacy persistence URLs."""
+    router = APIRouter()
+    router.include_router(create_database_diagnostics_router(db))
+    router.include_router(create_leases_router(db))
+    router.include_router(create_recovery_router(reconcile))
+    logger.debug(
+        "Persistence REST capabilities composed",
+        extra={"fr_id": "FR-HOST-BOOT-APP-COMPOSITION"},
+    )
+    return router
+
+
+def reconcile_database(database_path: Path) -> int:
+    """Run recovery against an explicit target and release database ownership."""
+    db = DatabaseManager(database_path)
+    try:
+        report = HostRuntime.reconcile_persistence(db)
+        sys.stdout.write(f"Reconciliation: {report['status']}\n")
+        sys.stdout.write(f"Pruned Leases: {report['pruned_expired_leases']}\n")
+        return 0 if report["status"] == "reconciled" else 1
+    except (PersistenceError, OSError, ValueError) as exc:
+        logger.exception(
+            "Recovery CLI failed",
+            extra={
+                "error_type": type(exc).__name__,
+                "fr_id": "FR-HOST-BOOT-PERSISTENCE-RECOVERY",
+            },
+        )
+        return 2
+    finally:
+        db.close()
+
+
+def main(argv: list[str] | None = None) -> int:
     """CLI entrypoint for host bootstrap."""
     parser = argparse.ArgumentParser(description="HaruQuantAI Platform Host Bootstrap")
     parser.add_argument("--host", default=None, help="Bind IP address")
@@ -1084,7 +1158,20 @@ def main(argv: list[str] | None = None) -> None:
         default=None,
         help="Enable debug diagnostics",
     )
+    parser.add_argument(
+        "--reconcile",
+        action="store_true",
+        help="Execute startup recovery reconciliation",
+    )
+    parser.add_argument(
+        "--db",
+        type=Path,
+        default=DEFAULT_DATABASE_PATH,
+        help="Recovery SQLite database target",
+    )
     args = parser.parse_args(argv)
+    if args.reconcile:
+        return reconcile_database(args.db)
 
     db_host = str(default_host_settings.app_general.get("host", "127.0.0.1"))
     db_port = int(default_host_settings.app_general.get("backend_port", 8000))
@@ -1121,7 +1208,8 @@ def main(argv: list[str] | None = None) -> None:
         )
     finally:
         shutdown(timeout=5.0)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

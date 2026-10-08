@@ -26,7 +26,13 @@ from app.host.persistence import (
     canonical_json,
     validate_identifier,
 )
-from app.host.settings import HostSettings, validate_configuration_values
+from app.host.settings import (
+    HostSettings,
+    create_settings_router,
+    validate_configuration_values,
+)
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
@@ -533,3 +539,84 @@ def test_initialization_failure_logging_excludes_values(
         if hasattr(record, "fr_id")
     )
     assert "secret-test-value" not in caplog.text
+
+
+def test_fastapi_settings_router(host_settings: HostSettings) -> None:
+    """Test FastAPI settings REST projection endpoints."""
+    app = FastAPI()
+    router = create_settings_router(host_settings)
+    app.include_router(router)
+    client = TestClient(app)
+
+    # 1. GET /settings
+    resp = client.get("/settings")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "success"
+    assert data["data"]["revision"] == 1
+    assert "app.general" in data["data"]["values"]
+    assert data["data"]["values"]["app.general"]["theme"] == "dark"
+
+    # 2. PUT /settings success
+    put_resp = client.put(
+        "/settings",
+        json={
+            "expected_revision": 1,
+            "changes": {"app.general": {"theme": "light", "zoom": 1.2}},
+        },
+    )
+    assert put_resp.status_code == 200
+    put_data = put_resp.json()
+    assert put_data["status"] == "success"
+    assert put_data["data"]["revision"] == 2
+    assert put_data["data"]["values"]["app.general"]["theme"] == "light"
+    assert put_data["data"]["values"]["app.general"]["zoom"] == 1.2
+
+    # 3. PUT /settings revision conflict (409)
+    conflict_resp = client.put(
+        "/settings",
+        json={
+            "expected_revision": 1,  # Current is 2
+            "changes": {"app.general": {"theme": "dark"}},
+        },
+    )
+    assert conflict_resp.status_code == 409
+    conflict_data = conflict_resp.json()
+    assert conflict_data["status"] == "error"
+    assert conflict_data["error"]["code"] == "REVISION_CONFLICT"
+
+    # 4. PUT /settings validation error (422)
+    val_resp = client.put(
+        "/settings",
+        json={
+            "expected_revision": 2,
+            "changes": {"app.general": {"zoom": 3.5}},  # Out of range
+        },
+    )
+    assert val_resp.status_code == 422
+    val_data = val_resp.json()
+    assert val_data["status"] == "error"
+    assert val_data["error"]["code"] == "VALIDATION_ERROR"
+
+    # 5. PUT /settings invalid payload types
+    bad_type_resp = client.put("/settings", json="invalid string payload")
+    assert bad_type_resp.status_code == 422
+
+    bad_rev_resp = client.put(
+        "/settings", json={"expected_revision": -1, "changes": {}}
+    )
+    assert bad_rev_resp.status_code == 422
+
+    bad_changes_resp = client.put(
+        "/settings", json={"expected_revision": 2, "changes": "not a dict"}
+    )
+    assert bad_changes_resp.status_code == 422
+
+    # 6. PUT /settings malformed raw body (400)
+    malformed_resp = client.put(
+        "/settings",
+        content=b"not valid json at all",
+        headers={"content-type": "application/json"},
+    )
+    assert malformed_resp.status_code == 400
+    assert malformed_resp.json()["error"]["code"] == "INVALID_JSON"

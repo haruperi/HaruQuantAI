@@ -18,8 +18,9 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from app.host.bootstrap import HostRuntime
-from app.host.diagnostics import create_persistence_router, main
+from app.host.bootstrap import HostRuntime, create_persistence_router
+from app.host.bootstrap import main as bootstrap_main
+from app.host.diagnostics import main
 from app.host.jobs import LeaseManager
 from app.host.persistence import (
     CorruptDataError,
@@ -826,7 +827,7 @@ def test_cli_main_reconcile(
         "argv",
         ["persistence.py", "--reconcile", "--db", str(temp_db_path)],
     )
-    code = main()
+    code = bootstrap_main()
     assert code == 0
 
 
@@ -1269,7 +1270,7 @@ def test_raw_session_create_preserves_supplied_fields(
 
 
 def test_settings_access_and_update_boundary() -> None:
-    """Settings composes storage directly and excludes transport/path diagnostics."""
+    """Settings composes storage directly and excludes filesystem diagnostics."""
     root = Path(__file__).resolve().parents[4]
     tree = ast.parse((root / "app/host/settings.py").read_text(encoding="utf-8"))
     assert not any(
@@ -1291,10 +1292,6 @@ def test_settings_access_and_update_boundary() -> None:
         for node in ast.walk(tree)
     )
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom):
-            assert not (node.module or "").startswith("fastapi")
-        if isinstance(node, ast.Import):
-            assert not any(alias.name.startswith("fastapi") for alias in node.names)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
             assert node.func.attr not in {"exists", "is_dir", "is_file", "stat"}
     singleton = next(
@@ -1310,3 +1307,17 @@ def test_settings_access_and_update_boundary() -> None:
     assert isinstance(singleton.value.func, ast.Name)
     assert singleton.value.func.id == "HostSettings"
     assert not singleton.value.args and not singleton.value.keywords
+
+
+def test_capability_adapter_ownership() -> None:
+    """HTTP access stays with its business owner; diagnostics only observes."""
+    from app.host import bootstrap, diagnostics, jobs
+    from app.host import settings as settings_module
+
+    assert settings_module.create_settings_router.__module__ == "app.host.settings"
+    assert jobs.create_leases_router.__module__ == "app.host.jobs"
+    assert bootstrap.create_recovery_router.__module__ == "app.host.bootstrap"
+    assert bootstrap.create_persistence_router.__module__ == "app.host.bootstrap"
+    assert not hasattr(diagnostics, "create_settings_router")
+    assert not hasattr(diagnostics, "AcquireLeaseRequest")
+    assert not hasattr(diagnostics, "create_persistence_router")

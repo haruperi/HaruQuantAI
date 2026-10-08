@@ -29,11 +29,13 @@ from app.host.jobs import (
     JobStatus,
     JobStore,
     create_jobs_router,
+    create_leases_router,
     create_pool,
     diagnostics,
     main,
 )
 from app.host.logging import TelemetryEngine, flush
+from app.host.persistence import DatabaseManager
 from app.host.transport import EventBus
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -666,3 +668,44 @@ def test_cli_main(temp_db: Path, capsys: pytest.CaptureFixture[str]) -> None:
     assert "Reconciled" in captured.out
 
     assert main([]) == 0
+
+
+def test_lease_router_coordination(tmp_path: Path) -> None:
+    """Jobs owns lease HTTP access and preserves ownership/error contracts."""
+    db = DatabaseManager(tmp_path / "lease-http.db")
+    db.initialize()
+    try:
+        app = FastAPI()
+        app.include_router(create_leases_router(db))
+        with TestClient(app) as client:
+            base = "/persistence/leases"
+            payload = {
+                "lease_key": "worker-1",
+                "holder_id": "owner-1",
+                "ttl_seconds": 30,
+            }
+            assert client.get(base).json()["data"] == []
+            acquired = client.post(base + "/acquire", json=payload)
+            assert acquired.status_code == 200
+            assert acquired.json()["data"]["holder_id"] == "owner-1"
+            assert len(client.get(base).json()["data"]) == 1
+            rival = {**payload, "holder_id": "owner-2"}
+            assert client.post(base + "/acquire", json=rival).status_code == 409
+            assert client.post(base + "/renew", json=rival).status_code == 404
+            assert client.post(base + "/renew", json=payload).status_code == 200
+            assert client.post(base + "/release", json=rival).json()["data"] == {
+                "released": False
+            }
+            assert client.post(base + "/release", json=payload).json()["data"] == {
+                "released": True
+            }
+            assert client.get(base).json()["data"] == []
+            assert client.post(base + "/renew", json=payload).status_code == 404
+            assert (
+                client.post(
+                    base + "/acquire", json={**payload, "ttl_seconds": 0}
+                ).status_code
+                == 422
+            )
+    finally:
+        db.close()

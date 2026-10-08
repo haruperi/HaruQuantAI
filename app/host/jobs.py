@@ -4,7 +4,9 @@ Description:
     JobStore composes the storage CRUD class and owns JobRecord/Budget conversion
     and interrupted-job recovery policy. LeaseManager owns worker reservation
     acquisition, renewal durations, holder decisions and expiration cleanup, using
-    atomic conditional LeaseStore writes. This module never receives database
+    atomic conditional LeaseStore writes. LeaseRouterService and
+    create_leases_router provide HTTP access to this same coordination capability.
+    This module never receives database
     handles or executes SQL.
 
     Provides point-in-time hardware resource diagnostics, background worker pool
@@ -44,7 +46,8 @@ Purpose:
 
 Key Capabilities:
     - FR-HOST-JOBS-LEASE-COORDINATION: Worker reservation ownership and durations.
-      Associated: `LeaseManager.acquire()`, `renew()`, `release()`, `prune_expired()`
+      Associated: `LeaseManager.acquire()`, `renew()`, `release()`, `prune_expired()`,
+        `create_leases_router()`
       Logging: INFO acquisition/renewal/release; WARNING denied ownership/expiry;
         storage emits DEBUG conditional outcomes and INFO pruning counts.
     - FR-HOST-JOBS-HARDWARE-DIAGNOSTICS: System Metrics Sampling
@@ -132,7 +135,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, TypeVar, override
 
 import psutil
-from fastapi import APIRouter, Query, Request, Response, status
+from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -157,6 +160,7 @@ __all__ = [
     "BYTES_PER_GIB",
     "DEFAULT_CLOSE_TIMEOUT_SECONDS",
     "DEFAULT_DATABASE_PATH",
+    "AcquireLeaseRequest",
     "Budget",
     "BudgetExceededError",
     "CapacityExceededError",
@@ -178,9 +182,13 @@ __all__ = [
     "JobTimeoutError",
     "LeaseManager",
     "LeaseRecord",
+    "LeaseRouterService",
     "LeaseStatus",
+    "ReleaseLeaseRequest",
+    "RenewLeaseRequest",
     "SubmitJobRequest",
     "create_jobs_router",
+    "create_leases_router",
     "create_pool",
     "diagnostics",
     "main",
@@ -1988,6 +1996,151 @@ class LeaseManager:
     def prune_expired(self) -> int:
         """Remove reservations whose duration has elapsed."""
         return self._store.prune_expired(datetime.now(UTC).isoformat())
+
+
+class AcquireLeaseRequest(BaseModel):
+    """Request payload for acquiring a cooperative worker lease."""
+
+    lease_key: str = Field(min_length=1)
+    holder_id: str = Field(min_length=1)
+    ttl_seconds: float = Field(default=30.0, gt=0.0)
+    scope: str = Field(default="default")
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class RenewLeaseRequest(BaseModel):
+    """Request payload for renewing an active lease."""
+
+    lease_key: str = Field(min_length=1)
+    holder_id: str = Field(min_length=1)
+    ttl_seconds: float = Field(default=30.0, gt=0.0)
+
+
+class ReleaseLeaseRequest(BaseModel):
+    """Request payload for releasing a held lease."""
+
+    lease_key: str = Field(min_length=1)
+    holder_id: str = Field(min_length=1)
+
+
+class LeaseRouterService:
+    """HTTP access to worker lease coordination owned by jobs."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        self._leases = LeaseManager(db)
+
+    def list_leases(self, request: Request) -> Response:
+        """List currently active cooperative leases."""
+        req_id = request.headers.get("x-request-id")
+        leases = self._leases.list_active()
+        resp = StandardResponse.success(
+            data=[lease.model_dump(mode="json") for lease in leases],
+            message="Active leases retrieved successfully.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def acquire_lease_endpoint(
+        self,
+        request: Request,
+        req: AcquireLeaseRequest,
+    ) -> Response:
+        """Acquire a cooperative worker lease."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            lease = self._leases.acquire(
+                req.lease_key,
+                req.holder_id,
+                ttl_seconds=req.ttl_seconds,
+                scope=req.scope,
+                metadata=req.metadata,
+            )
+            resp = StandardResponse.success(
+                data=lease.model_dump(mode="json"),
+                message=f"Lease {req.lease_key} acquired successfully.",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except StorageBusyError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=str(exc),
+            ) from exc
+
+    def renew_lease_endpoint(
+        self,
+        request: Request,
+        req: RenewLeaseRequest,
+    ) -> Response:
+        """Renew a held cooperative lease."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            lease = self._leases.renew(
+                req.lease_key,
+                req.holder_id,
+                ttl_seconds=req.ttl_seconds,
+            )
+            resp = StandardResponse.success(
+                data=lease.model_dump(mode="json"),
+                message=f"Lease {req.lease_key} renewed successfully.",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except LeaseExpiredError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=str(exc),
+            ) from exc
+
+    def release_lease_endpoint(
+        self,
+        request: Request,
+        req: ReleaseLeaseRequest,
+    ) -> Response:
+        """Release a held cooperative lease."""
+        req_id = request.headers.get("x-request-id")
+        released = self._leases.release(req.lease_key, req.holder_id)
+        resp = StandardResponse.success(
+            data={"released": released},
+            message=f"Lease {req.lease_key} released: {released}",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+
+def create_leases_router(db: DatabaseManager) -> APIRouter:
+    """Expose worker lease coordination at its existing HTTP URLs."""
+    service = LeaseRouterService(db)
+    router = APIRouter(prefix="/persistence/leases", tags=["persistence"])
+    router.add_api_route(
+        "",
+        service.list_leases,
+        methods=["GET"],
+        summary="List active cooperative leases",
+    )
+    router.add_api_route(
+        "/acquire",
+        service.acquire_lease_endpoint,
+        methods=["POST"],
+        summary="Acquire a cooperative lease",
+    )
+    router.add_api_route(
+        "/renew",
+        service.renew_lease_endpoint,
+        methods=["POST"],
+        summary="Renew an active lease",
+    )
+    router.add_api_route(
+        "/release",
+        service.release_lease_endpoint,
+        methods=["POST"],
+        summary="Release an active lease",
+    )
+    logger.debug(
+        "Lease REST router initialized",
+        extra={"fr_id": "FR-HOST-JOBS-LEASE-COORDINATION"},
+    )
+    return router
 
 
 if __name__ == "__main__":

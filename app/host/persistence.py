@@ -12,9 +12,11 @@ Description:
     belong to app.host.settings; job lifecycle and worker lease policy belong to
     app.host.jobs; scope binding belongs to app.host.session; startup recovery
     sequencing belongs to app.host.bootstrap. Trading defaults and interpretation
-    belong to workspace services. HTTP handlers and CLI presentation belong to
-    app.host.diagnostics. No service callbacks, domain-model imports, business
-    seeds, job-state decisions, authorization decisions, or transport dependencies
+    belong to workspace services. Python, HTTP and CLI access belongs to each
+    business owner: settings access in settings, lease access in jobs, recovery
+    access in bootstrap, and database inspection in diagnostics.
+    No service callbacks, domain-model imports, business seeds, job-state
+    decisions, authorization decisions, or transport dependencies
     are allowed in this module. Future features add narrow CRUD operations here
     and call them from their owning service.
 
