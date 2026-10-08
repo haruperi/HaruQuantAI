@@ -36,6 +36,7 @@ from app.plugins.brokers import (
     files,
     get_account_info,
     get_bars,
+    get_num_of_symbols,
     get_position_info,
     get_symbol_info,
     get_symbol_tick,
@@ -347,6 +348,21 @@ def run_tests() -> bool:
     # 9. Filesystem Tabular Market Data (Market Data Provider: CSV/Parquet)
     # ------------------------------------------------------------------------
     print("\n[9] FILES BROKER (CSV/Parquet):")
+    f_info = get_symbol_info(broker=files, symbol="AAPL")
+    print(
+        f"    Symbol Info: {f_info.data.description if f_info.data else 'None'}, "
+        f"category={f_info.data.category if f_info.data else 'None'}"
+    )
+    assert f_info.is_success
+    assert f_info.data is not None
+    assert f_info.data.name == "AAPL"
+
+    f_count = get_num_of_symbols(broker=files)
+    print(f"    Catalog Symbols: {f_count.data}")
+    assert f_count.is_success
+    assert f_count.data is not None
+    assert f_count.data > 0
+
     f_bars = get_bars(broker=files, symbol="AAPL", timeframe=TimeFrame.D1, count=5)
     print(
         f"    Files Bars: success={f_bars.is_success}, "
@@ -355,6 +371,15 @@ def run_tests() -> bool:
     assert f_bars.is_success
     assert f_bars.data is not None
     assert len(f_bars.data) > 0
+
+    f_ticks = files.get_ticks(symbol="AAPL", count=5)
+    print(
+        f"    Files Ticks: success={f_ticks.is_success}, "
+        f"count={len(f_ticks.data) if f_ticks.data else 0}"
+    )
+    assert f_ticks.is_success
+    assert f_ticks.data is not None
+    assert len(f_ticks.data) > 0
 
     f_trade = trade(broker=files, request=TradeRequest(symbol="AAPL", volume=1))
     print(
