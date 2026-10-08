@@ -21,8 +21,8 @@ from app.host.bootstrap import (
     ReadinessState,
     create_host_app,
 )
+from app.host.persistence import SettingsStore
 from app.host.settings import HostSettings as AppSettings
-from app.host.settings import SettingsStore
 from fastapi.testclient import TestClient
 
 

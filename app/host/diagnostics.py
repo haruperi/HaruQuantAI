@@ -6,6 +6,9 @@ Description:
     Startup recovery is supplied as a callback by bootstrap. Database diagnostic
     CLI presentation lives here; all queries remain in app.host.persistence.
 
+    Settings HTTP projections and workspace directory existence diagnostics also
+    live here; configuration retrieval and updates belong to HostSettings.
+
     This module provides the central system capacity diagnostics, process health
     monitoring, worker concurrency calculation, hardware capability inspection,
     and computational benchmarking for HaruQuantAI. It measures active machine
@@ -24,6 +27,12 @@ Purpose:
     computational benchmarking.
 
 Key Capabilities:
+    - FR-HOST-SETTINGS-PROJECTION: Project settings snapshots and updates over HTTP.
+      Associated: `create_settings_router()`
+      Logging: DEBUG reads; INFO updates; delegated validation/storage log failures.
+    - FR-HOST-SETTINGS-PATH-VALIDATION: Inspect configured directory existence.
+      Associated: `validate_settings_paths()`
+      Logging: INFO available directories; WARNING absent directories.
     - FR-HOST-PERSISTENCE-REST-PROJECTION: Project storage diagnostics over HTTP.
       Associated: `PersistenceRouterService`, `create_persistence_router()`
       Logging: DEBUG router composition; delegated stores/services log every
@@ -103,6 +112,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import math
 import os
 import platform
@@ -122,8 +132,15 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.host.jobs import LeaseManager
 from app.host.logging import get_logger, redact_paths
-from app.host.persistence import DatabaseManager, LeaseExpiredError, StorageBusyError
+from app.host.persistence import (
+    DatabaseManager,
+    LeaseExpiredError,
+    RevisionConflictError,
+    StorageBusyError,
+    ValidationError,
+)
 from app.host.response import StandardResponse as ApiResponse
+from app.host.settings import HostSettings, settings
 
 __all__ = [
     "AcquireLeaseRequest",
@@ -144,6 +161,7 @@ __all__ = [
     "calculate_worker_allocation",
     "create_diagnostics_router",
     "create_persistence_router",
+    "create_settings_router",
     "get_worker_capacity",
     "inspect_gpu_qualification",
     "inspect_thread_affinity",
@@ -155,6 +173,7 @@ __all__ = [
     "probe_process",
     "probe_system_diagnostics",
     "run_cpu_benchmark",
+    "validate_settings_paths",
 ]
 
 logger = get_logger(__name__)
@@ -1445,6 +1464,174 @@ def create_persistence_router(
         "Persistence REST router initialized",
         extra={"fr_id": "FR-HOST-PERSISTENCE-REST-PROJECTION"},
     )
+    return router
+
+
+def validate_settings_paths(settings_instance: HostSettings) -> dict[str, bool]:
+    """Validate configured workspace directories on disk.
+
+    Returns:
+        Mapping of directory name to existence boolean.
+    """
+    workspace_paths = settings_instance.as_dict().get("workspace_paths")
+    paths_to_validate: dict[str, Path] = {}
+
+    if isinstance(workspace_paths, dict):
+        paths_to_validate = {
+            "Configs": Path(str(workspace_paths.get("configs_dir", "data/configs"))),
+            "Data": Path(str(workspace_paths.get("data_dir", "data"))),
+            "Projects": Path(str(workspace_paths.get("projects_dir", "data/projects"))),
+            "Strategies": Path(
+                str(workspace_paths.get("strategies_dir", "data/strategies"))
+            ),
+        }
+    else:
+        paths_to_validate = {
+            "Configs": Path("data/configs"),
+            "Data": Path("data"),
+            "Projects": Path("data/projects"),
+            "Strategies": Path("data/strategies"),
+        }
+
+    results: dict[str, bool] = {}
+    for dir_name, path in paths_to_validate.items():
+        exists = path.exists()
+        results[dir_name] = exists
+        if exists:
+            logger.info(
+                "FR-HOST-SETTINGS-PATH-VALIDATION: Directory '%s' exists.",
+                dir_name,
+                extra={
+                    "directory_name": dir_name,
+                    "fr_id": "FR-HOST-SETTINGS-PATH-VALIDATION",
+                },
+            )
+        else:
+            logger.warning(
+                "FR-HOST-SETTINGS-PATH-VALIDATION: Directory '%s' absent.",
+                dir_name,
+                extra={
+                    "directory_name": dir_name,
+                    "fr_id": "FR-HOST-SETTINGS-PATH-VALIDATION",
+                },
+            )
+
+    return results
+
+
+def _extract_put_payload(body: Any) -> tuple[int, dict[str, dict[str, Any]]]:
+    """Validate and extract expected revision and changes from PUT body."""
+    if not isinstance(body, dict):
+        raise ValidationError("Request body must be a JSON object")
+    expected_rev = body.get("expected_revision")
+    if not isinstance(expected_rev, int) or expected_rev < 0:
+        raise ValidationError("expected_revision must be a non-negative integer")
+    changes = body.get("changes")
+    if not isinstance(changes, dict):
+        raise ValidationError("changes must be a dictionary of scoped settings")
+    return expected_rev, changes
+
+
+def create_settings_router(
+    settings_instance: HostSettings | None = None,
+) -> APIRouter:
+    """Create FastAPI APIRouter exposing host settings REST projections.
+
+    Args:
+        settings_instance: HostSettings instance to expose. Defaults to
+            global singleton.
+
+    Returns:
+        Configured FastAPI APIRouter.
+    """
+    router = APIRouter()
+    target_settings = settings_instance if settings_instance is not None else settings
+
+    @router.get("/settings")
+    async def get_settings_endpoint() -> JSONResponse:
+        """Retrieve current shell settings and preferences snapshot."""
+        logger.debug(
+            "FR-HOST-SETTINGS-PROJECTION: Handling GET /settings query.",
+            extra={"fr_id": "FR-HOST-SETTINGS-PROJECTION"},
+        )
+        snapshot = target_settings.get_snapshot()
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={"status": "success", "data": snapshot.model_dump()},
+        )
+
+    @router.put("/settings")
+    async def put_settings_endpoint(request: Request) -> JSONResponse:
+        """Atomically update host settings with revision check."""
+        try:
+            body = await request.json()
+        except ValueError, TypeError, json.JSONDecodeError:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "status": "error",
+                    "error": {
+                        "code": "INVALID_JSON",
+                        "message": "Malformed JSON payload in request body",
+                    },
+                },
+            )
+
+        try:
+            expected_rev, changes = _extract_put_payload(body)
+            snapshot = target_settings.update(changes, expected_revision=expected_rev)
+            logger.info(
+                "FR-HOST-SETTINGS-PROJECTION: Updated settings to revision %d.",
+                snapshot.revision,
+                extra={
+                    "fr_id": "FR-HOST-SETTINGS-PROJECTION",
+                    "revision": snapshot.revision,
+                },
+            )
+            return JSONResponse(
+                status_code=status.HTTP_200_OK,
+                content={"status": "success", "data": snapshot.model_dump()},
+            )
+        except RevisionConflictError as exc:
+            return JSONResponse(
+                status_code=status.HTTP_409_CONFLICT,
+                content={
+                    "status": "error",
+                    "error": {
+                        "code": "REVISION_CONFLICT",
+                        "message": str(exc),
+                        "current_revision": target_settings.revision,
+                    },
+                },
+            )
+        except ValidationError as exc:
+            return JSONResponse(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                content={
+                    "status": "error",
+                    "error": {
+                        "code": "VALIDATION_ERROR",
+                        "message": str(exc),
+                    },
+                },
+            )
+
+    @router.get("/settings/paths/validate")
+    async def validate_paths_endpoint() -> JSONResponse:
+        """Validate configured workspace directories on disk."""
+        statuses = validate_settings_paths(target_settings)
+        all_valid = all(statuses.values())
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "status": "success",
+                "data": {
+                    "paths": statuses,
+                    "all_valid": all_valid,
+                },
+            },
+        )
+
     return router
 
 

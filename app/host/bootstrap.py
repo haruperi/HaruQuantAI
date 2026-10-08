@@ -92,7 +92,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 
-from app.host.diagnostics import create_diagnostics_router, create_persistence_router
+from app.host.diagnostics import (
+    create_diagnostics_router,
+    create_persistence_router,
+    create_settings_router,
+)
 from app.host.discovery import (
     PluginDiscoveryEngine,
     PluginLifecycleManager,
@@ -117,7 +121,6 @@ from app.host.resources import ResourceManager, create_resources_router
 from app.host.session import create_sessions_router
 from app.host.settings import (
     HostSettings,
-    create_settings_router,
 )
 from app.host.settings import settings as default_host_settings
 from app.host.transport import (

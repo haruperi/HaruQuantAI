@@ -1266,3 +1266,47 @@ def test_raw_session_create_preserves_supplied_fields(
     }
     session_id = db_manager.sessions.create(row)
     assert db_manager.sessions.get_by_name("explicit") == dict(row, id=session_id)
+
+
+def test_settings_access_and_update_boundary() -> None:
+    """Settings composes storage directly and excludes transport/path diagnostics."""
+    root = Path(__file__).resolve().parents[4]
+    tree = ast.parse((root / "app/host/settings.py").read_text(encoding="utf-8"))
+    assert not any(
+        isinstance(node, ast.ClassDef) and node.name == "SettingsStore"
+        for node in ast.walk(tree)
+    )
+    imported_stores = {
+        alias.asname or alias.name
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom) and node.module == "app.host.persistence"
+        for alias in node.names
+        if alias.name == "SettingsStore"
+    }
+    assert imported_stores
+    assert any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in imported_stores
+        for node in ast.walk(tree)
+    )
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            assert not (node.module or "").startswith("fastapi")
+        if isinstance(node, ast.Import):
+            assert not any(alias.name.startswith("fastapi") for alias in node.names)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            assert node.func.attr not in {"exists", "is_dir", "is_file", "stat"}
+    singleton = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == "settings"
+            for target in node.targets
+        )
+    )
+    assert isinstance(singleton.value, ast.Call)
+    assert isinstance(singleton.value.func, ast.Name)
+    assert singleton.value.func.id == "HostSettings"
+    assert not singleton.value.args and not singleton.value.keywords

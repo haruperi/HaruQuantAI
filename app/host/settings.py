@@ -1,159 +1,80 @@
-"""Host configuration settings manager and dot-accessible configuration interface.
+"""Host settings retrieval, cached access and validated updates.
 
 Description:
-    Configuration validation and HostSettingsSnapshot assembly live here.
-    SettingsStore composes persistence.SettingsStore; storage receives validated
-    values and returns records/revisions. No database handles or SQL are permitted.
-
-    Provides the central configuration settings container, dot-accessible access
-    interface, validation engine, and settings management for HaruQuantAI host
-    operations. All persistent database operations, schemas, and transactions are
-    delegated exclusively to the central host persistence authority
-    (app.host.persistence.SettingsStore). This module maintains zero direct SQLite
-    connections, ensuring single-source-of-truth database management across the
-    platform. Exposes a module-level `settings` singleton with lazy-loading
-    semantics (zero disk I/O at import time) and a FastAPI REST projection router
-    providing `/settings` inspection and atomic modification.
+    HostSettings calls persistence.SettingsStore directly to retrieve and update
+    host_settings records. A small internal wrapper provides scoped dot access
+    such as settings.user_access.username and dictionary access. Construction is
+    lazy; reads use a local cache, updates refresh it, and reload() observes other
+    writers. Constructor overrides affect the in-memory view only; snapshots
+    describe persisted values. Database handles, SQL, schemas and storage checks
+    belong to persistence. HTTP and filesystem diagnostics belong to diagnostics.
+    Do not add another store wrapper, transport handlers or filesystem probes here.
 
 Purpose:
-    FEAT-HOST-SETTINGS: Host configuration settings management, schema validation,
-    authoritative persistence delegation, and dot-accessible navigation.
+    FEAT-HOST-SETTINGS: Retrieve configuration and validate/update it through the
+    single database authority, with convenient scoped access.
 
 Key Capabilities:
-    - FR-HOST-SETTINGS-SCHEMA: Host settings table schema constraint verification
-      delegated to host persistence authority.
-      Logging: Emits INFO on table creation; DEBUG on verification.
-    - FR-HOST-SETTINGS-LOAD: Query and parse scoped configuration records into
-      memory.
-      Logging: Emits INFO on loading records with item count and discovered
-      scopes.
-    - FR-HOST-SETTINGS-DOT-ACCESS: Recursive dot-notation and dictionary-style
-      attribute navigation.
-      Logging: Emits DEBUG when accessing setting attributes or namespaces.
-    - FR-HOST-SETTINGS-VALIDATION: Validate type, range, finite values, and
-      credentials.
-      Logging: Emits WARNING with reason when validation rejects a payload.
-    - FR-HOST-SETTINGS-UPDATE: Atomic batch upsert with monotonic revision and
-      conflict detection.
-      Logging: Emits INFO on committed batch with changed count and updated
-      revision.
-    - FR-HOST-SETTINGS-PATH-VALIDATION: Validate configured workspace filesystem
-      paths.
-      Logging: Emits INFO when path exists; WARNING when path is absent.
-    - FR-HOST-SETTINGS-PROJECTION: FastAPI REST endpoints for settings snapshot
-      and updates.
-      Logging: Emits DEBUG on query; INFO on settings updates.
+    - FR-HOST-SETTINGS-LOAD: Load settings and rebuild the local access cache.
+      Associated: `HostSettings.reload()`, `_cache_snapshot()`
+      Logging: INFO counts/revision; WARNING unavailable initialization; ERROR
+        incompatible/corrupt storage without payload values.
+    - FR-HOST-SETTINGS-DOT-ACCESS: Retrieve scoped settings and nested values.
+      Associated: `HostSettings._resolve()`, `_SettingsNode`
+      Logging: DEBUG key access without setting values.
+    - FR-HOST-SETTINGS-VALIDATION: Validate configuration before database writes.
+      Associated: `validate_configuration_values()`, `HostSettings.update()`
+      Logging: WARNING rejected configuration constraints.
+    - FR-HOST-SETTINGS-UPDATE: Delegate atomic changes and refresh cached values.
+      Associated: `HostSettings.update()`
+      Logging: INFO revision on completion; persistence logs writes/conflicts.
 
 Python API Usage:
     ```python
     from app.host.settings import settings
 
-    # Access scoped setting via normalized dot-notation
-    theme = settings.app_general.theme
-    cores = settings.config_cpu.custom_cores
-
-    # Dict-style access and fallback default
-    port = settings.get("bound_port", 8080)
-
-    # Validate workspace directories
-    path_statuses = settings.validate_workspace_paths()
+    username = settings.user_access.username
+    snapshot = settings.update(
+        {"user_access": {"username": "user"}},
+        expected_revision=settings.revision,
+    )
+    settings.reload()  # Observe updates made by another writer.
     ```
 
 CLI Usage:
-    Inspect and verify settings via the diagnostic CLI:
+    Settings HTTP inspection is composed by bootstrap; this module has no CLI:
     ```bash
-    uv run python -m app.cli
+    uv run python -m app.main
     ```
 """
 
 from __future__ import annotations
 
-import contextlib
-import json
 import math
-import re
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, override
 
-from fastapi import APIRouter, Request, status
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 
 from app.host.logging import get_logger
 from app.host.persistence import (
-    DEFAULT_DATABASE_PATH,
     CorruptDataError,
-    DatabaseManager,
     IncompatibleSchemaError,
     PersistenceError,
-    RevisionConflictError,
     SettingRecord,
-    SettingsPage,
-    StorageBusyError,
     ValidationError,
-    canonical_json,
-    validate_identifier,
 )
-from app.host.persistence import (
-    DEFAULT_READ_LIMIT as STORAGE_READ_LIMIT,
-)
-from app.host.persistence import (
-    SettingsStore as _PersistenceSettingsStore,
-)
+from app.host.persistence import SettingsStore as _SettingsStore
 
 __all__ = [
-    "DEFAULT_DATABASE_PATH",
-    "MAX_BATCH_SIZE",
-    "MAX_IDENTIFIER_LENGTH",
-    "MAX_JSON_DEPTH",
-    "MAX_MEMORY_GB",
-    "MAX_PAYLOAD_BYTES",
-    "MAX_PORT",
-    "MAX_READ_LIMIT",
-    "MAX_TEXT_LENGTH",
-    "MAX_VALUE_BYTES",
-    "MAX_ZOOM",
-    "MIN_CUSTOM_CORES",
-    "MIN_MEMORY_GB",
-    "MIN_PORT",
-    "MIN_ZOOM",
-    "SCHEMA_VERSION",
-    "VALID_CORE_MODES",
-    "VALID_THEMES",
-    "AppSettings",
-    "CorruptDataError",
     "HostSettings",
     "HostSettingsSnapshot",
-    "IncompatibleSchemaError",
-    "PersistenceError",
-    "RevisionConflictError",
-    "SettingRecord",
-    "SettingsManager",
-    "SettingsPage",
-    "SettingsStore",
-    "SettingsUpdateRequest",
-    "StorageBusyError",
-    "ValidationError",
-    "canonical_json",
-    "create_settings_router",
     "settings",
     "validate_configuration_values",
-    "validate_identifier",
 ]
 
 logger = get_logger(__name__)
-
-MAX_IDENTIFIER_LENGTH: int = 128
-IDENTIFIER_PATTERN: re.Pattern[str] = re.compile(r"^[A-Za-z0-9_.:-]+$")
-MAX_BATCH_SIZE: int = 100
-MAX_PAYLOAD_BYTES: int = 1024 * 1024  # 1 MiB
-MAX_VALUE_BYTES: int = 64 * 1024  # 64 KiB
-MAX_JSON_DEPTH: int = 16
-MAX_READ_LIMIT: int = 1000
-DEFAULT_READ_LIMIT: int = 100
-BUSY_TIMEOUT_SECONDS: float = 5.0
-SCHEMA_VERSION: int = 1
 
 MIN_ZOOM: float = 0.7
 MAX_ZOOM: float = 1.8
@@ -174,19 +95,6 @@ VALID_CORE_MODES: tuple[str, ...] = (
 )
 
 _MISSING = object()
-
-
-class SettingsUpdateRequest(BaseModel):
-    """Request envelope for updating host settings with optimistic locking."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    expected_revision: int = Field(
-        ..., ge=0, description="Expected settings revision before write"
-    )
-    changes: dict[str, dict[str, Any]] = Field(
-        ..., description="Scoped changes mapping: scope -> {key: value}"
-    )
 
 
 def _validate_finite_number(scope: str, key: str, value: Any) -> None:
@@ -333,91 +241,6 @@ class HostSettingsSnapshot(BaseModel):
     values: dict[str, dict[str, Any]]
 
 
-class SettingsStore:
-    """Validate host configuration and assemble snapshots through CRUD storage."""
-
-    def __init__(
-        self,
-        db_path: Path | str | None = None,
-        *,
-        busy_timeout: float = BUSY_TIMEOUT_SECONDS,
-        validator: Callable[[str, str, Any], None] | None = None,
-    ) -> None:
-        self._storage = _PersistenceSettingsStore(db_path, busy_timeout=busy_timeout)
-        self._validator = validator or validate_configuration_values
-
-    @property
-    def db_path(self) -> Path:
-        """Return the database location."""
-        return self._storage.db_path
-
-    @property
-    def db(self) -> DatabaseManager:
-        """Return the underlying storage manager without borrowing handles."""
-        return self._storage.db
-
-    def initialize(self) -> None:
-        """Initialize configuration storage."""
-        self._storage.initialize()
-
-    def get_revision(self) -> int:
-        """Return the configuration revision."""
-        return self._storage.get_revision()
-
-    def read_settings(
-        self,
-        scope: str,
-        *,
-        key: str | None = None,
-        after_key: str | None = None,
-        limit: int = STORAGE_READ_LIMIT,
-    ) -> SettingsPage:
-        """Read validated configuration storage records."""
-        return self._storage.read_settings(
-            scope, key=key, after_key=after_key, limit=limit
-        )
-
-    def read_all_scoped(self) -> tuple[int, dict[str, dict[str, Any]]]:
-        """Group stored configuration values by namespace."""
-        revision, records = self._storage.read_all()
-        values: dict[str, dict[str, Any]] = {}
-        for record in records:
-            values.setdefault(record.scope, {})[record.key] = record.value
-        return revision, values
-
-    def get_snapshot(self) -> HostSettingsSnapshot:
-        """Assemble the host configuration snapshot."""
-        revision, values = self.read_all_scoped()
-        return HostSettingsSnapshot(revision=revision, values=values)
-
-    def update_settings(
-        self,
-        scope: str,
-        values: dict[str, Any],
-        *,
-        expected_revision: int | None = None,
-    ) -> HostSettingsSnapshot:
-        """Validate and update one configuration namespace."""
-        return self.update_batch({scope: values}, expected_revision=expected_revision)
-
-    def update_batch(
-        self,
-        changes: dict[str, dict[str, Any]],
-        *,
-        expected_revision: int | None = None,
-    ) -> HostSettingsSnapshot:
-        """Validate configuration before its atomic persistence update."""
-        for scope, values in changes.items():
-            if not isinstance(values, dict):
-                raise ValidationError(
-                    f"Scope changes for '{scope}' must be a dictionary"
-                )
-            for key, value in values.items():
-                self._validator(scope, key, value)
-        self._storage.update_batch(changes, expected_revision=expected_revision)
-        return self.get_snapshot()
-
-
 class _SettingsNode:
     """Recursive wrapper providing dot-attribute and dictionary-style access.
 
@@ -553,7 +376,7 @@ class HostSettings(_SettingsNode):
         version: str | None = None,
         api_prefix: str | None = None,
         reference_cohort: str | None = None,
-        auto_load: bool = True,
+        auto_load: bool = False,
     ) -> None:
         """Initialize HostSettings with optional database path and overrides.
 
@@ -586,8 +409,7 @@ class HostSettings(_SettingsNode):
             resolved_db = Path(db_path)
         elif self._override_data_dir is not None:
             resolved_db = self._override_data_dir / "database" / "haruquantai.db"
-        self._store = SettingsStore(db_path=resolved_db)
-        self._scopes: dict[str, _SettingsNode] = {}
+        self._store = _SettingsStore(db_path=resolved_db)
         self._revision: int = 1
         self._loaded: bool = False
         if auto_load:
@@ -597,11 +419,6 @@ class HostSettings(_SettingsNode):
     def db_path(self) -> Path:
         """Return filesystem path to underlying SQLite database."""
         return self._store.db_path
-
-    @property
-    def store(self) -> SettingsStore:
-        """Return underlying SettingsStore instance."""
-        return self._store
 
     @property
     def revision(self) -> int:
@@ -700,19 +517,23 @@ class HostSettings(_SettingsNode):
             self.reload()
 
     def _initialize_store(self) -> None:
-        """Ensure storage schemas are initialized before reading."""
-        if not self._store.db_path.exists():
-            try:
-                self._store.initialize()
-            except PersistenceError as exc:
-                logger.warning(
-                    "FR-HOST-SETTINGS-LOAD: Database initialization skipped (%s)",
-                    exc,
-                    extra={"fr_id": "FR-HOST-SETTINGS-LOAD"},
-                )
-        else:
-            with contextlib.suppress(PersistenceError):
-                self._store.initialize()
+        """Initialize storage, logging tolerated failures and surfacing corruption."""
+        try:
+            self._store.initialize()
+        except IncompatibleSchemaError, CorruptDataError:
+            logger.error(  # noqa: TRY400 - Do not log potentially secret exception text.
+                "Settings storage is incompatible or corrupt",
+                extra={"fr_id": "FR-HOST-SETTINGS-LOAD"},
+            )
+            raise
+        except PersistenceError as exc:
+            logger.warning(
+                "Settings storage initialization unavailable",
+                extra={
+                    "error_type": type(exc).__name__,
+                    "fr_id": "FR-HOST-SETTINGS-LOAD",
+                },
+            )
 
     def _apply_runtime_overrides(self, merged: dict[str, dict[str, Any]]) -> None:
         """Apply explicit constructor overrides onto loaded configuration dictionary."""
@@ -741,59 +562,50 @@ class HostSettings(_SettingsNode):
                 self._override_reference_cohort
             )
 
-    def reload(self) -> None:
-        """Query host database and reload all scoped settings into memory."""
-        self._data.clear()
-        self._raw.clear()
-        self._scopes.clear()
+    @staticmethod
+    def _snapshot(revision: int, records: list[SettingRecord]) -> HostSettingsSnapshot:
+        """Group persisted records without including runtime overrides."""
+        values: dict[str, dict[str, Any]] = {}
+        for record in records:
+            values.setdefault(record.scope, {})[record.key] = record.value
+        return HostSettingsSnapshot(revision=revision, values=values)
 
-        self._initialize_store()
-        rev, scoped_vals = self._store.read_all_scoped()
-        self._revision = rev
-
-        merged_scoped: dict[str, dict[str, Any]] = {
-            s: dict(kvs) for s, kvs in scoped_vals.items()
-        }
-        self._apply_runtime_overrides(merged_scoped)
-
+    def _cache_snapshot(self, snapshot: HostSettingsSnapshot) -> None:
+        """Build the access cache and apply in-memory constructor overrides."""
+        merged = {scope: dict(values) for scope, values in snapshot.values.items()}
+        self._apply_runtime_overrides(merged)
+        data: dict[str, Any] = {}
         total_keys = 0
-        for scope, keyvals in merged_scoped.items():
-            scope_dict: dict[str, Any] = {}
-            clean_scope = scope.replace(".", "_")
-
-            for key, val in keyvals.items():
-                wrapped = self.wrap(val)
-                clean_key = key.replace(".", "_")
-
-                self._data[clean_key] = wrapped
-                if clean_key != key:
-                    self._data[key] = wrapped
-
-                scope_dict[clean_key] = wrapped
-                if clean_key != key:
-                    scope_dict[key] = wrapped
+        for scope, values in merged.items():
+            scope_node = _SettingsNode(values)
+            for key in values:
+                value = scope_node[key]
+                data[key.replace(".", "_")] = value
+                data[key] = value
                 total_keys += 1
-
-            scope_node = _SettingsNode(scope_dict)
-            self._scopes[clean_scope] = scope_node
-            self._data[clean_scope] = scope_node
-            if clean_scope != scope:
-                self._scopes[scope] = scope_node
-                self._data[scope] = scope_node
-
+            data[scope.replace(".", "_")] = scope_node
+            data[scope] = scope_node
+        self._raw = {}
+        self._data = data
+        self._revision = snapshot.revision
         self._loaded = True
         logger.info(
             "FR-HOST-SETTINGS-LOAD: Loaded %d records in %d scopes. Revision: %d",
             total_keys,
-            len(merged_scoped),
+            len(merged),
             self._revision,
             extra={
-                "scopes": list(merged_scoped.keys()),
                 "count": total_keys,
                 "revision": self._revision,
                 "fr_id": "FR-HOST-SETTINGS-LOAD",
             },
         )
+
+    def reload(self) -> None:
+        """Reload persisted settings and rebuild the local access cache."""
+        self._initialize_store()
+        revision, records = self._store.read_all()
+        self._cache_snapshot(self._snapshot(revision, records))
 
     @override
     def _resolve(self, name: str) -> Any:
@@ -814,23 +626,6 @@ class HostSettings(_SettingsNode):
                 extra={"key": name, "fr_id": "FR-HOST-SETTINGS-DOT-ACCESS"},
             )
             return val
-
-        if name in self._scopes:
-            logger.debug(
-                "FR-HOST-SETTINGS-DOT-ACCESS: Accessed scope namespace '%s'",
-                name,
-                extra={"scope": name, "fr_id": "FR-HOST-SETTINGS-DOT-ACCESS"},
-            )
-            return self._scopes[name]
-
-        clean_name = name.replace(".", "_")
-        if clean_name in self._scopes:
-            logger.debug(
-                "FR-HOST-SETTINGS-DOT-ACCESS: Accessed scope namespace '%s'",
-                clean_name,
-                extra={"scope": clean_name, "fr_id": "FR-HOST-SETTINGS-DOT-ACCESS"},
-            )
-            return self._scopes[clean_name]
 
         return _MISSING
 
@@ -864,72 +659,52 @@ class HostSettings(_SettingsNode):
         Returns:
             Updated HostSettingsSnapshot.
         """
-        snapshot = self._store.update_batch(
+        for scope, values in changes.items():
+            if not isinstance(values, dict):
+                raise ValidationError(
+                    f"Scope changes for '{scope}' must be a dictionary"
+                )
+            for key, value in values.items():
+                validate_configuration_values(scope, key, value)
+        self._ensure_loaded()
+        revision, records = self._store.update_batch(
             changes, expected_revision=expected_revision
         )
-        self.reload()
+        snapshot = self._snapshot(revision, records)
+        self._cache_snapshot(snapshot)
+        logger.info(
+            "Host settings update completed",
+            extra={"revision": revision, "fr_id": "FR-HOST-SETTINGS-UPDATE"},
+        )
         return snapshot
 
     def get_snapshot(self) -> HostSettingsSnapshot:
-        """Return current snapshot with revision and values."""
+        """Read a persisted snapshot without in-memory runtime overrides."""
         self._ensure_loaded()
-        return self._store.get_snapshot()
+        revision, records = self._store.read_all()
+        return self._snapshot(revision, records)
 
-    def validate_workspace_paths(self) -> dict[str, bool]:
-        """Validate configured workspace directories on disk.
-
-        Returns:
-            Mapping of directory name to existence boolean.
-        """
+    @override
+    def __iter__(self) -> Iterator[str]:
+        """Load settings before iterating cached keys."""
         self._ensure_loaded()
-        workspace_paths = self.get("workspace_paths")
-        paths_to_validate: dict[str, Path] = {}
+        return super().__iter__()
 
-        if isinstance(workspace_paths, (_SettingsNode, dict)):
-            paths_to_validate = {
-                "Configs": Path(
-                    str(workspace_paths.get("configs_dir", "data/configs"))
-                ),
-                "Data": Path(str(workspace_paths.get("data_dir", "data"))),
-                "Projects": Path(
-                    str(workspace_paths.get("projects_dir", "data/projects"))
-                ),
-                "Strategies": Path(
-                    str(workspace_paths.get("strategies_dir", "data/strategies"))
-                ),
-            }
-        else:
-            paths_to_validate = {
-                "Configs": Path("data/configs"),
-                "Data": Path("data"),
-                "Projects": Path("data/projects"),
-                "Strategies": Path("data/strategies"),
-            }
+    @override
+    def __len__(self) -> int:
+        """Load settings before counting cached keys."""
+        self._ensure_loaded()
+        return super().__len__()
 
-        results: dict[str, bool] = {}
-        for dir_name, path in paths_to_validate.items():
-            exists = path.exists()
-            results[dir_name] = exists
-            if exists:
-                logger.info(
-                    "FR-HOST-SETTINGS-PATH-VALIDATION: Directory '%s' exists.",
-                    dir_name,
-                    extra={
-                        "directory_name": dir_name,
-                        "fr_id": "FR-HOST-SETTINGS-PATH-VALIDATION",
-                    },
-                )
-            else:
-                logger.warning(
-                    "FR-HOST-SETTINGS-PATH-VALIDATION: Directory '%s' absent.",
-                    dir_name,
-                    extra={
-                        "directory_name": dir_name,
-                        "fr_id": "FR-HOST-SETTINGS-PATH-VALIDATION",
-                    },
-                )
+    def __bool__(self) -> bool:
+        """Keep an explicit settings instance selectable without loading storage."""
+        return True
 
-        return results
+    @override
+    def as_dict(self) -> dict[str, Any]:
+        """Load settings before returning their dictionary representation."""
+        self._ensure_loaded()
+        return super().as_dict()
 
     @override
     def __repr__(self) -> str:
@@ -940,126 +715,5 @@ class HostSettings(_SettingsNode):
         )
 
 
-# Aliases for domain conventions
-AppSettings = HostSettings
-SettingsManager = HostSettings
-
-
-def _extract_put_payload(body: Any) -> tuple[int, dict[str, dict[str, Any]]]:
-    """Validate and extract expected revision and changes from PUT body."""
-    if not isinstance(body, dict):
-        raise ValidationError("Request body must be a JSON object")
-    expected_rev = body.get("expected_revision")
-    if not isinstance(expected_rev, int) or expected_rev < 0:
-        raise ValidationError("expected_revision must be a non-negative integer")
-    changes = body.get("changes")
-    if not isinstance(changes, dict):
-        raise ValidationError("changes must be a dictionary of scoped settings")
-    return expected_rev, changes
-
-
-def create_settings_router(
-    settings_instance: HostSettings | None = None,
-) -> APIRouter:
-    """Create FastAPI APIRouter exposing host settings REST projections.
-
-    Args:
-        settings_instance: HostSettings instance to expose. Defaults to
-            global singleton.
-
-    Returns:
-        Configured FastAPI APIRouter.
-    """
-    router = APIRouter()
-    target_settings = settings_instance or settings
-
-    @router.get("/settings")
-    async def get_settings_endpoint() -> JSONResponse:
-        """Retrieve current shell settings and preferences snapshot."""
-        logger.debug(
-            "FR-HOST-SETTINGS-PROJECTION: Handling GET /settings query.",
-            extra={"fr_id": "FR-HOST-SETTINGS-PROJECTION"},
-        )
-        snapshot = target_settings.get_snapshot()
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"status": "success", "data": snapshot.model_dump()},
-        )
-
-    @router.put("/settings")
-    async def put_settings_endpoint(request: Request) -> JSONResponse:
-        """Atomically update host settings with revision check."""
-        try:
-            body = await request.json()
-        except ValueError, TypeError, json.JSONDecodeError:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "INVALID_JSON",
-                        "message": "Malformed JSON payload in request body",
-                    },
-                },
-            )
-
-        try:
-            expected_rev, changes = _extract_put_payload(body)
-            snapshot = target_settings.update(changes, expected_revision=expected_rev)
-            logger.info(
-                "FR-HOST-SETTINGS-PROJECTION: Updated settings to revision %d.",
-                snapshot.revision,
-                extra={
-                    "fr_id": "FR-HOST-SETTINGS-PROJECTION",
-                    "revision": snapshot.revision,
-                },
-            )
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={"status": "success", "data": snapshot.model_dump()},
-            )
-        except RevisionConflictError as exc:
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "REVISION_CONFLICT",
-                        "message": str(exc),
-                        "current_revision": target_settings.revision,
-                    },
-                },
-            )
-        except ValidationError as exc:
-            return JSONResponse(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "VALIDATION_ERROR",
-                        "message": str(exc),
-                    },
-                },
-            )
-
-    @router.get("/settings/paths/validate")
-    async def validate_paths_endpoint() -> JSONResponse:
-        """Validate configured workspace directories on disk."""
-        statuses = target_settings.validate_workspace_paths()
-        all_valid = all(statuses.values())
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "status": "success",
-                "data": {
-                    "paths": statuses,
-                    "all_valid": all_valid,
-                },
-            },
-        )
-
-    return router
-
-
-# Export convenient global singleton with lazy loading (no I/O on import)
-settings = HostSettings(auto_load=False)
+# Convenient global singleton; construction performs no database I/O.
+settings = HostSettings()

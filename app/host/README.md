@@ -66,8 +66,8 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-SETTINGS-DOT-ACCESS` | Recursive dot-notation and dictionary-style attribute navigation. | Emits DEBUG when accessing setting attributes or namespaces. |
 | `FR-HOST-SETTINGS-VALIDATION` | Validate type, range, finite values, and credentials according to ratified rules. | Emits WARNING with reason when validation rejects a payload. |
 | `FR-HOST-SETTINGS-UPDATE` | Atomic batch upsert with monotonic revision and conflict detection. | Emits INFO on committed batch with changed count and updated revision. |
-| `FR-HOST-SETTINGS-PATH-VALIDATION` | Validate configured workspace filesystem paths on disk. | Emits INFO when path exists; WARNING when path is absent. |
-| `FR-HOST-SETTINGS-PROJECTION` | FastAPI REST endpoints for settings snapshot and updates. | Emits DEBUG on query; INFO on settings updates. |
+| `FR-HOST-SETTINGS-PATH-VALIDATION` | diagnostics.validate_settings_paths inspects configured workspace filesystem paths on disk. | Emits INFO when path exists; WARNING when path is absent. |
+| `FR-HOST-SETTINGS-PROJECTION` | diagnostics.create_settings_router exposes settings snapshots, updates and path checks over HTTP. | Emits DEBUG on query; INFO on settings updates. |
 | `FR-HOST-DISC-MANIFEST-SCHEMA` | Package identity, semver, contained entrypoints, slot declarations, and dependency metadata schema validation. | INFO on valid manifest discovery; ERROR on validation failure. |
 | `FR-HOST-DISC-CONTAINMENT-SECURITY` | Strict directory containment, forbidding path traversal (`..`), symbolic link escapes, and uncontained entrypoints. | WARNING/ERROR with security violation details. |
 | `FR-HOST-DISC-SLOT-REGISTRATION` | Typed host extension slots registry and attachment cardinality validation. | INFO on slot registration; WARNING on incompatible slot request. |
@@ -179,11 +179,11 @@ Owner approved the current-only migration plan version 1 and P00 closure plan ve
 - `persistence.py`: DatabaseManager, SchemaManager, SettingsStore, JobStore,
   LeaseStore, InstrumentStore, SessionStore, DatasetStore, BasketStore, BrokerStore,
   and generic TypedRepository. Schema initialization creates storage only.
-- `settings.py`: configuration validation, grouping, snapshots and setting APIs.
+- `settings.py`: HostSettings directly retrieves/updates through persistence.SettingsStore; lazy scoped access, cache refresh, validation and persisted snapshots.
 - `jobs.py`: job models/budgets, restart interruption and LeaseManager policy.
 - `session.py`: PersistenceAccess namespace/owner binding and existing authorization.
 - `bootstrap.py`: recovery sequencing and dependency wiring.
-- `diagnostics.py`: persistence HTTP adapter and CLI; HTTP contracts are retained.
+- `diagnostics.py`: persistence/settings HTTP adapters, workspace path checks and persistence CLI; HTTP contracts are retained.
 - Workspace instruments/sessions: explicit idempotent `ensure_defaults()`;
   existing definitions are never overwritten by baseline seeding.
 
@@ -205,3 +205,10 @@ uv run python -m app.host.diagnostics --status --db path/to/database.db
 uv run python -m app.host.diagnostics --integrity-check --db path/to/database.db
 uv run python -m app.host.diagnostics --reconcile --db path/to/database.db
 ```
+
+Settings callers use `settings = HostSettings()` (lazy construction), with scoped
+access such as `settings.user_access.username`. HostSettings.update validates
+values, delegates atomic writes to persistence.SettingsStore and refreshes its
+cache. reload observes other writers. Snapshots contain persisted values;
+constructor overrides remain in memory. HTTP handlers and directory probes must
+not be added to settings.py; there is no second settings store or store shim.

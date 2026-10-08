@@ -9,16 +9,20 @@ diagnostics REST endpoints.
 from __future__ import annotations
 
 import os
+import sqlite3
 import threading
 import time
+from contextlib import closing
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from app.host.diagnostics import (
     BenchmarkRunner,
     apply_thread_affinity,
     calculate_worker_allocation,
     create_diagnostics_router,
+    create_settings_router,
     get_worker_capacity,
     inspect_gpu_qualification,
     inspect_thread_affinity,
@@ -29,7 +33,10 @@ from app.host.diagnostics import (
     probe_process,
     probe_system_diagnostics,
     run_cpu_benchmark,
+    validate_settings_paths,
 )
+from app.host.persistence import SettingsStore
+from app.host.settings import HostSettings
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
@@ -281,3 +288,144 @@ def test_diagnostics_fastapi_router() -> None:
     # Non-existent job
     res_404 = client.get("/api/v1/diagnostics/benchmark/nonexistent_id")
     assert res_404.status_code == 404
+
+
+@pytest.fixture
+def host_settings(tmp_path: Path) -> HostSettings:
+    """Configure a settings projection over an isolated temporary store."""
+    path = tmp_path / "settings-diagnostics.db"
+    store = SettingsStore(path)
+    store.initialize()
+    with closing(sqlite3.connect(path)) as connection, connection:
+        connection.executemany(
+            "INSERT INTO host_settings "
+            "(scope, key, value_json, schema_version, updated_at_utc) "
+            "VALUES (?, ?, ?, 1, '2026-10-08T00:00:00Z')",
+            [("app.general", "theme", '"dark"'), ("app.general", "zoom", "1.0")],
+        )
+    return HostSettings(path)
+
+
+def test_host_settings_validate_workspace_paths(
+    host_settings: HostSettings, tmp_path: Path
+) -> None:
+    """Test workspace path validation on existing and absent directories."""
+    configs_dir = tmp_path / "configs"
+    configs_dir.mkdir()
+
+    # Update workspace paths
+    host_settings.update(
+        {
+            "workspace_paths": {
+                "configs_dir": str(configs_dir),
+                "data_dir": str(tmp_path / "absent_data"),
+                "projects_dir": str(tmp_path / "absent_projects"),
+                "strategies_dir": str(tmp_path / "absent_strategies"),
+            }
+        },
+        expected_revision=host_settings.revision,
+    )
+
+    results = validate_settings_paths(host_settings)
+    assert results["Configs"] is True
+    assert results["Data"] is False
+    assert results["Projects"] is False
+    assert results["Strategies"] is False
+
+
+def test_fastapi_settings_router(host_settings: HostSettings) -> None:
+    """Test FastAPI settings REST projection endpoints."""
+    app = FastAPI()
+    router = create_settings_router(host_settings)
+    app.include_router(router)
+    client = TestClient(app)
+
+    # 1. GET /settings
+    resp = client.get("/settings")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "success"
+    assert data["data"]["revision"] == 1
+    assert "app.general" in data["data"]["values"]
+    assert data["data"]["values"]["app.general"]["theme"] == "dark"
+
+    # 2. PUT /settings success
+    put_resp = client.put(
+        "/settings",
+        json={
+            "expected_revision": 1,
+            "changes": {"app.general": {"theme": "light", "zoom": 1.2}},
+        },
+    )
+    assert put_resp.status_code == 200
+    put_data = put_resp.json()
+    assert put_data["status"] == "success"
+    assert put_data["data"]["revision"] == 2
+    assert put_data["data"]["values"]["app.general"]["theme"] == "light"
+    assert put_data["data"]["values"]["app.general"]["zoom"] == 1.2
+
+    # 3. PUT /settings revision conflict (409)
+    conflict_resp = client.put(
+        "/settings",
+        json={
+            "expected_revision": 1,  # Current is 2
+            "changes": {"app.general": {"theme": "dark"}},
+        },
+    )
+    assert conflict_resp.status_code == 409
+    conflict_data = conflict_resp.json()
+    assert conflict_data["status"] == "error"
+    assert conflict_data["error"]["code"] == "REVISION_CONFLICT"
+
+    # 4. PUT /settings validation error (422)
+    val_resp = client.put(
+        "/settings",
+        json={
+            "expected_revision": 2,
+            "changes": {"app.general": {"zoom": 3.5}},  # Out of range
+        },
+    )
+    assert val_resp.status_code == 422
+    val_data = val_resp.json()
+    assert val_data["status"] == "error"
+    assert val_data["error"]["code"] == "VALIDATION_ERROR"
+
+    # 5. PUT /settings invalid payload types
+    bad_type_resp = client.put("/settings", json="invalid string payload")
+    assert bad_type_resp.status_code == 422
+
+    bad_rev_resp = client.put(
+        "/settings", json={"expected_revision": -1, "changes": {}}
+    )
+    assert bad_rev_resp.status_code == 422
+
+    bad_changes_resp = client.put(
+        "/settings", json={"expected_revision": 2, "changes": "not a dict"}
+    )
+    assert bad_changes_resp.status_code == 422
+
+    # 6. PUT /settings malformed raw body (400)
+    malformed_resp = client.put(
+        "/settings",
+        content=b"not valid json at all",
+        headers={"content-type": "application/json"},
+    )
+    assert malformed_resp.status_code == 400
+    assert malformed_resp.json()["error"]["code"] == "INVALID_JSON"
+
+    # 7. GET /settings/paths/validate
+    paths_resp = client.get("/settings/paths/validate")
+    assert paths_resp.status_code == 200
+    paths_data = paths_resp.json()
+    assert paths_data["status"] == "success"
+    assert "paths" in paths_data["data"]
+    assert "all_valid" in paths_data["data"]
+
+
+def test_host_settings_default_workspace_paths(tmp_path: Path) -> None:
+    """Test validate_workspace_paths when workspace_paths is None/unconfigured."""
+    db_file = tmp_path / "paths_default.db"
+    hs = HostSettings(db_file)
+    statuses = validate_settings_paths(hs)
+    assert isinstance(statuses, dict)
+    assert "Configs" in statuses
