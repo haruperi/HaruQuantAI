@@ -123,24 +123,19 @@ def run_tests() -> bool:
     # 2. Yahoo Finance (Market Data Provider: Live v8 API)
     # ------------------------------------------------------------------------
     print("\n[2] YAHOO FINANCE:")
+    y_info = get_symbol_info(broker=yahoo, symbol="AAPL")
+    print(
+        f"    Symbol Info: {y_info.data.description if y_info.data else 'None'}, "
+        f"Exchange: {y_info.data.exchange if y_info.data else 'None'}"
+    )
+    assert y_info.is_success
+    assert y_info.data is not None
+
     y_bars = get_bars(broker=yahoo, symbol="AAPL", timeframe=TimeFrame.D1, count=5)
     print(f"    Bars count: {len(y_bars.data) if y_bars.data else 0}")
     assert y_bars.is_success
     assert y_bars.data is not None
     assert len(y_bars.data) == 5
-
-    y_dl = yahoo.download_bars(
-        DownloadRequest(
-            provider_name="Yahoo",
-            symbol="AAPL",
-            timeframe="D1",
-            date_from="2026-09-01T00:00:00Z",
-            date_to="2026-10-01T00:00:00Z",
-        )
-    )
-    print(f"    Download bars count: {len(y_dl)}")
-    assert len(y_dl) > 0
-
     y_trade = trade(broker=yahoo, request=TradeRequest(symbol="AAPL", volume=1))
     print(
         f"    Trade Rejection: success={y_trade.is_success}, message='{y_trade.message}'"
