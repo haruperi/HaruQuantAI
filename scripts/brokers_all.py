@@ -144,25 +144,31 @@ def run_tests() -> bool:
     assert "doesn't have trading capabilities" in y_trade.message
 
     # ------------------------------------------------------------------------
-    # 3. Dukascopy (Market Data Provider: StrategyQuant CDN datafeed)
+    # 3. Dukascopy (In-Memory CDN Bars & Authoritative CSV Symbol Catalog)
     # ------------------------------------------------------------------------
     print("\n[3] DUKASCOPY:")
+    d_info = get_symbol_info(broker=dukascopy, symbol="EURUSD")
+    print(
+        f"    Symbol Info: {d_info.data.description if d_info.data else 'None'}, "
+        f"digits={d_info.data.digits if d_info.data else 'None'}"
+    )
+    assert d_info.is_success
+    assert d_info.data is not None
+    assert d_info.data.digits == 5
+
+    d_num = dukascopy.get_num_of_symbols()
+    print(f"    Catalog Symbols: {d_num.data}")
+    assert d_num.is_success
+    assert d_num.data == 725
+
     d_bars = get_bars(broker=dukascopy, symbol="EURUSD", count=5)
-    print(f"    CDN Bars count: {len(d_bars.data) if d_bars.data else 0}")
+    print(
+        f"    CDN Bars: count={len(d_bars.data) if d_bars.data else 0} "
+        f"(success={d_bars.is_success})"
+    )
     assert d_bars.is_success
     assert d_bars.data is not None
-    assert len(d_bars.data) > 0
-
-    d_dl = dukascopy.download_bars(
-        DownloadRequest(
-            provider_name="Dukascopy",
-            symbol="EURUSD",
-            timeframe="M1",
-            date_from="2026-10-01T00:00:00Z",
-            date_to="2026-10-01T00:05:00Z",
-        )
-    )
-    print(f"    Download bars count: {len(d_dl)}")
+    assert len(d_bars.data) == 5
 
     d_trade = trade(broker=dukascopy, request=TradeRequest(symbol="EURUSD", volume=1))
     print(
