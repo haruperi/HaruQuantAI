@@ -250,9 +250,30 @@ def run_tests() -> bool:
     assert "doesn't have trading capabilities" in eq_trade.message
 
     # ------------------------------------------------------------------------
-    # 6. SQ Futures (Market Data Provider: Local Parquet Datasets: @ES, CL)
+    # 6. SQ Futures (Market Data Provider: Continuous Futures Catalog & Parquet)
     # ------------------------------------------------------------------------
     print("\n[6] SQ FUTURES:")
+    fut_info = get_symbol_info(broker=sq_futures, symbol="@ES")
+    print(
+        f"    Symbol Info: {fut_info.data.description if fut_info.data else 'None'}, "
+        f"digits={fut_info.data.digits if fut_info.data else 'None'}"
+    )
+    assert fut_info.is_success
+    assert fut_info.data is not None
+    assert fut_info.data.name == "@ES"
+
+    fut_num = sq_futures.get_num_of_symbols()
+    print(f"    Catalog Symbols: {fut_num.data}")
+    assert fut_num.is_success
+    assert fut_num.data is not None
+    assert fut_num.data >= 50
+
+    fut_energies = sq_futures.get_symbols(group="Energies")
+    print(f"    Energies count: {len(fut_energies.data) if fut_energies.data else 0}")
+    assert fut_energies.is_success
+    assert fut_energies.data is not None
+    assert len(fut_energies.data) > 0
+
     fut_bars = get_bars(broker=sq_futures, symbol="@ES", count=5)
     print(f"    Parquet Bars count: {len(fut_bars.data) if fut_bars.data else 0}")
     assert fut_bars.is_success
