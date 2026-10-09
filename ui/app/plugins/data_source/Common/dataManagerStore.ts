@@ -11,6 +11,13 @@ import { emptyDownload, resolveDownloadModes, downloadStep, validateDownload, av
 import { create } from 'zustand';
 import { catalogue, type AddDukasRequest } from '../Dukascopy/dukascopy';
 import { normalizeBrokerName, validateBroker, type BrokerProfile, type BrokerUpdateJob } from '../Catalogs/BrokerProfiles/brokerProfiles';
+import {
+  fetchBrokers,
+  saveBroker as saveBrokerApi,
+  deleteBrokers as deleteBrokersApi,
+  saveBrokerStocks as saveBrokerStocksApi,
+  triggerBrokerDataUpdate,
+} from '../Catalogs/BrokerProfiles/brokerApiClient';
 import { createDomainClient, type DomainClient } from '../../../host/transport';
 
 let dataClient = createDomainClient('/data');
@@ -62,9 +69,10 @@ export interface MockDefinition {
 }
 const storageKey = 'sqx-data-manager-v1';
 interface DataState { definitions: MockDefinition[]; brokers: BrokerProfile[]; brokerJob:BrokerUpdateJob|null; storageError: string; addData: (request: AddDukasRequest) => void;
-  saveBroker:(profile:BrokerProfile)=>void; saveBrokerStocks:(id:string,stocks:string[])=>void; removeBrokers:(ids:string[])=>void; importBrokers:(profiles:Omit<BrokerProfile,'id'>[],overwrite:string[])=>number;
+  saveBroker:(profile:BrokerProfile)=>Promise<void>; saveBrokerStocks:(id:string,stocks:string[])=>Promise<void>; removeBrokers:(ids:string[])=>Promise<void>; importBrokers:(profiles:Omit<BrokerProfile,'id'>[],overwrite:string[])=>Promise<number>;
   startBrokerUpdate:(ids:string[],existing:string[])=>void; advanceBrokerUpdate:()=>void; brokerAction:(action:'pause'|'resume'|'stop')=>void;
   syncRemoteDatasets: () => Promise<void>;
+  syncBrokers: () => Promise<void>;
   editDataset: (id: string, updates: Partial<MockDefinition>) => Promise<void>;
   clearDataset: (id: string) => Promise<void>;
   removeDataset: (id: string) => Promise<void>;
@@ -87,11 +95,136 @@ function readState(): Pick<DataState, 'definitions' | 'brokers' | 'brokerJob' | 
 }
 export const useDataManagerStore = create<DataState>((set, get) => ({
   ...readState(),
-  saveBroker: profile => {const state=get();if(state.storageError)throw new Error(state.storageError);const clean=validateBroker(profile,state.brokers,profile.id||undefined);const found=state.brokers.findIndex(row=>row.id===profile.id);const brokers=[...state.brokers];if(found>=0)brokers[found]=structuredClone(clean);else brokers.push({...structuredClone(clean),id:`broker-${crypto.randomUUID()}`});persistData(state,brokers,state.definitions,state.brokerJob);set({brokers});},
-  saveBrokerStocks:(id,stocks)=>{const state=get();const index=state.brokers.findIndex(row=>row.id===id);if(index<0)throw new Error("Broker doesn't exist.");if(state.brokers[index].system)throw new Error("This broker can't be edited.");const brokers=[...state.brokers];brokers[index]={...brokers[index],stocks:[...stocks]};persistData(state,brokers,state.definitions,state.brokerJob);set({brokers});},
-  removeBrokers:ids=>{const state=get();const selected=new Set(ids);const brokers=state.brokers.filter(row=>!selected.has(row.id));persistData(state,brokers,state.definitions,state.brokerJob);set({brokers});},
-  importBrokers:(profiles,overwrite)=>{const state=get();const replace=new Set(overwrite.map(name=>normalizeBrokerName(name).toLowerCase()));const brokers=[...state.brokers];let count=0;for(const raw of profiles){const name=normalizeBrokerName(raw.name);const index=brokers.findIndex(row=>row.name.toLowerCase()===name.toLowerCase());if(index>=0){if(!replace.has(name.toLowerCase())||brokers[index].system)continue;brokers[index]=validateBroker({...raw,id:brokers[index].id},brokers,brokers[index].id);count++;}else{brokers.push(validateBroker({...raw,id:`broker-${crypto.randomUUID()}`},brokers));count++;}}persistData(state,brokers,state.definitions,state.brokerJob);set({brokers});return count;},
-  startBrokerUpdate:(ids,existing)=>{const state=get();if(state.brokerJob&&['running','paused'].includes(state.brokerJob.state))throw new Error('Please wait couple of seconds and try again.');const rows=ids.map(id=>state.brokers.find(row=>row.id===id)).filter((row):row is BrokerProfile=>Boolean(row));if(!rows.length)throw new Error('You have to select some broker.');const seen=new Set(existing);const targets=rows.flatMap(row=>row.stocks.map(ticker=>({brokerId:row.id,ticker,symbol:ticker+row.postfix}))).filter(target=>{if(seen.has(target.symbol))return false;seen.add(target.symbol);return true;});if(!rows.some(row=>row.stocks.length))throw new Error('Nothing to update. Broker is without any stocks.');const brokerJob:BrokerUpdateJob={brokerIds:ids,state:'running',progress:0,targets};persistData(state,state.brokers,state.definitions,brokerJob);set({brokerJob});},
+  saveBroker: async profile => {
+    const state = get();
+    if (state.storageError) throw new Error(state.storageError);
+    const clean = validateBroker(profile, state.brokers, profile.id || undefined);
+    const saved = await saveBrokerApi(clean);
+    const targetId = saved.id;
+    const finalProfile = { ...structuredClone(clean), id: targetId };
+    const stateAfter = get();
+    const found = stateAfter.brokers.findIndex(
+      row => row.id === profile.id || (profile.id && row.id === targetId)
+    );
+    const brokers = [...stateAfter.brokers];
+    if (found >= 0) brokers[found] = finalProfile;
+    else brokers.push(finalProfile);
+    persistData(stateAfter, brokers, stateAfter.definitions, stateAfter.brokerJob);
+    set({ brokers });
+  },
+  saveBrokerStocks: async (id, stocks) => {
+    const state = get();
+    const index = state.brokers.findIndex(row => row.id === id);
+    if (index < 0) throw new Error("Broker doesn't exist.");
+    if (state.brokers[index].system) throw new Error("This broker can't be edited.");
+    if (/^\d+$/.test(id)) {
+      await saveBrokerStocksApi(id, stocks);
+    }
+    const stateAfter = get();
+    const brokers = [...stateAfter.brokers];
+    const idx = brokers.findIndex(row => row.id === id);
+    if (idx >= 0) {
+      brokers[idx] = { ...brokers[idx], stocks: [...stocks] };
+      persistData(stateAfter, brokers, stateAfter.definitions, stateAfter.brokerJob);
+      set({ brokers });
+    }
+  },
+  removeBrokers: async ids => {
+    const numericIds = ids.filter(id => /^\d+$/.test(id));
+    if (numericIds.length > 0) {
+      await deleteBrokersApi(numericIds);
+    }
+    const stateAfter = get();
+    const selected = new Set(ids);
+    const brokers = stateAfter.brokers.filter(row => !selected.has(row.id));
+    persistData(stateAfter, brokers, stateAfter.definitions, stateAfter.brokerJob);
+    set({ brokers });
+  },
+  importBrokers: async (profiles, overwrite) => {
+    const state = get();
+    const replace = new Set(overwrite.map(name => normalizeBrokerName(name).toLowerCase()));
+    let count = 0;
+    for (const raw of profiles) {
+      const name = normalizeBrokerName(raw.name);
+      const existing = state.brokers.find(row => row.name.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        if (!replace.has(name.toLowerCase()) || existing.system) continue;
+        const updated = await saveBrokerApi({
+          id: existing.id,
+          name,
+          desc: raw.desc,
+          postfix: raw.postfix,
+          timezone: raw.timezone,
+          mtUse: raw.mtUse,
+          stockPickerUse: raw.stockPickerUse,
+          system: false,
+          stocks: raw.stocks,
+          instruments: [],
+        });
+        if (raw.stockPickerUse && raw.stocks.length) {
+          await saveBrokerStocksApi(updated.id, raw.stocks);
+        }
+        count++;
+      } else {
+        const created = await saveBrokerApi({
+          id: '',
+          name,
+          desc: raw.desc,
+          postfix: raw.postfix,
+          timezone: raw.timezone,
+          mtUse: raw.mtUse,
+          stockPickerUse: raw.stockPickerUse,
+          system: false,
+          stocks: raw.stocks,
+          instruments: [],
+        });
+        if (raw.stockPickerUse && raw.stocks.length) {
+          await saveBrokerStocksApi(created.id, raw.stocks);
+        }
+        count++;
+      }
+    }
+    await get().syncBrokers();
+    return count;
+  },
+  startBrokerUpdate: (ids, existing) => {
+    const state = get();
+    if (state.brokerJob && ['running', 'paused'].includes(state.brokerJob.state))
+      throw new Error('Please wait couple of seconds and try again.');
+    const rows = ids
+      .map(id => state.brokers.find(row => row.id === id))
+      .filter((row): row is BrokerProfile => Boolean(row));
+    if (!rows.length) throw new Error('You have to select some broker.');
+    const seen = new Set(existing);
+    const targets = rows
+      .flatMap(row =>
+        row.stocks.map(ticker => ({
+          brokerId: row.id,
+          ticker,
+          symbol: ticker + row.postfix,
+        }))
+      )
+      .filter(target => {
+        if (seen.has(target.symbol)) return false;
+        seen.add(target.symbol);
+        return true;
+      });
+    if (!rows.some(row => row.stocks.length))
+      throw new Error('Nothing to update. Broker is without any stocks.');
+    const brokerJob: BrokerUpdateJob = {
+      brokerIds: ids,
+      state: 'running',
+      progress: 0,
+      targets,
+    };
+    persistData(state, state.brokers, state.definitions, brokerJob);
+    set({ brokerJob });
+    ids.forEach(id => {
+      if (/^\d+$/.test(id)) {
+        triggerBrokerDataUpdate(id).catch(() => {});
+      }
+    });
+  },
   advanceBrokerUpdate:()=>{const state=get();if(state.brokerJob?.state!=='running')return;const progress=Math.min(100,state.brokerJob.progress+10);let definitions=state.definitions;let brokerJob={...state.brokerJob,progress,state:progress===100?'completed' as const:'running' as const};if(progress===100){const today=new Date().toISOString().slice(0,10);const additions=state.brokerJob.targets.map(target=>{const broker=state.brokers.find(row=>row.id===target.brokerId)!;return {id:`broker-data:${target.brokerId}:${target.symbol}`,source:'Equity',symbol:target.symbol,underlying:target.ticker,instrument:target.symbol,timeframe:'D1',broker:broker.id,brokerName:broker.name,timezone:broker.timezone,category:'Stock',from:today,to:today,bars:1};});definitions=[...definitions,...additions];}try{persistData(state,state.brokers,definitions,brokerJob);set({definitions,brokerJob});}catch{set({brokerJob:{...state.brokerJob,state:'failed',error:'Unable to persist broker update progress.'}});}},
   brokerAction:action=>{const state=get();if(!state.brokerJob||!['running','paused'].includes(state.brokerJob.state))return;const brokerJob={...state.brokerJob,state:action==='pause'?'paused' as const:action==='resume'?'running' as const:'cancelled' as const};persistData(state,state.brokers,state.definitions,brokerJob);set({brokerJob});},
   addData: request => {
@@ -124,6 +257,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     set({ definitions });
   },
   syncRemoteDatasets: async () => {
+    get().syncBrokers().catch(() => {});
     try {
       const remote = await fetchRemoteDatasets();
       if (!remote) return;
@@ -138,6 +272,26 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
       const merged = [...updated, ...newItems];
       try { persistData(state, state.brokers, merged, state.brokerJob); } catch { /* ignore */ }
       set({ definitions: merged });
+    } catch {
+      // Non-blocking sync
+    }
+  },
+  syncBrokers: async () => {
+    try {
+      const remote = await fetchBrokers();
+      if (!remote || !remote.length) return;
+      const state = get();
+      const localMap = new Map(state.brokers.map(b => [b.name.toLowerCase(), b]));
+      const merged = remote.map(rem => {
+        const local = localMap.get(rem.name.toLowerCase());
+        return {
+          ...rem,
+          stocks: rem.stocks?.length ? rem.stocks : (local?.stocks?.length ? local.stocks : []),
+          instruments: local?.instruments?.length ? local.instruments : rem.instruments,
+        };
+      });
+      try { persistData(state, merged, state.definitions, state.brokerJob); } catch { /* ignore */ }
+      set({ brokers: merged });
     } catch {
       // Non-blocking sync
     }

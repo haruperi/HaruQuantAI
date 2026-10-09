@@ -93,7 +93,11 @@ from app.workspace.data_manager.baskets import (
     export_groups_xml,
     import_groups_xml,
 )
-from app.workspace.data_manager.broker import BrokerService
+from app.workspace.data_manager.broker import (
+    BrokerSavePayload,
+    BrokerService,
+    BrokerStocksPayload,
+)
 from app.workspace.data_manager.connections import DownloadRequest, ProviderManager
 from app.workspace.data_manager.custom_data import CotService, CustomDataService
 from app.workspace.data_manager.data import (
@@ -434,6 +438,65 @@ class DatasetXmlImportPayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     xml_content: str = Field(..., min_length=1, description="Raw SQX <Data> XML string")
+
+
+class BrokerDeleteRequest(BaseModel):
+    """Payload for deleting multiple broker profiles."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    broker_ids: list[int] = Field(
+        ..., min_length=1, description="List of broker IDs to delete"
+    )
+
+
+class BrokerImportStocksRequest(BaseModel):
+    """Payload for importing stocks to a broker profile from CSV/text."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    content: str = Field(..., min_length=1, description="Raw multi-line stock text")
+
+
+class BrokerXmlExportRequest(BaseModel):
+    """Payload for exporting broker profiles to XML."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    broker_ids: list[int] | None = Field(
+        default=None, description="Optional broker IDs filter"
+    )
+
+
+class BrokerXmlImportRequest(BaseModel):
+    """Payload for importing broker profiles from XML text."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    xml_content: str = Field(..., min_length=1, description="Raw <Brokers> XML string")
+
+
+class BrokerXmlOverviewRequest(BaseModel):
+    """Payload for inspecting MT XML overview."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    xml_content: str = Field(..., min_length=1, description="Raw MetaTrader XML string")
+    kind: str = Field(default="instrument", pattern="^(instrument|session)$")
+
+
+class BrokerXmlImportRecordsRequest(BaseModel):
+    """Payload for importing selected MT XML instruments or sessions."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    xml_content: str = Field(..., min_length=1, description="Raw MetaTrader XML string")
+    kind: str = Field(default="instrument", pattern="^(instrument|session)$")
+    broker_id: int = Field(..., description="Target broker ID")
+    postfix: str = Field(default="", description="Symbol postfix")
+    selected_names: list[str] = Field(
+        ..., min_length=1, description="Selected names to import"
+    )
 
 
 class UpdateSelectedPayload(BaseModel):
@@ -2449,6 +2512,317 @@ class DataRouterService:
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
+    def save_broker(self, request: Request, payload: BrokerSavePayload) -> Response:
+        """Create or update a broker profile."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            if payload.id is not None:
+                record = self.broker.update_broker(payload.id, payload)
+                msg = f"Broker profile '{record.name}' updated"
+            else:
+                record = self.broker.create_broker(payload)
+                msg = f"Broker profile '{record.name}' created"
+            self._emit_event(
+                channel="data_manager",
+                event_type="BROKERS_CHANGED",
+                payload={"broker_id": record.id, "action": "save"},
+            )
+            resp = ApiResponse.success(
+                data=record.model_dump(mode="json"),
+                message=msg,
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="BROKER_SAVE_FAILED",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def get_broker_by_id(self, request: Request, broker_id: int) -> Response:
+        """Get a single broker profile by ID."""
+        req_id = request.headers.get("x-request-id")
+        rec = self.broker.get_broker(broker_id)
+        if rec is None:
+            return self._error_response(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code="BROKER_NOT_FOUND",
+                message=f"Broker profile '{broker_id}' not found",
+                request_id=req_id,
+            )
+        resp = ApiResponse.success(
+            data=rec.model_dump(mode="json"),
+            message=f"Retrieved broker profile '{rec.name}'",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def update_broker_by_id(
+        self, request: Request, broker_id: int, payload: BrokerSavePayload
+    ) -> Response:
+        """Update a broker profile by URL id."""
+        payload.id = broker_id
+        return self.save_broker(request, payload)
+
+    def delete_brokers(
+        self, request: Request, payload: BrokerDeleteRequest
+    ) -> Response:
+        """Delete multiple broker profiles."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            count = self.broker.delete_brokers(payload.broker_ids)
+            self._emit_event(
+                channel="data_manager",
+                event_type="BROKERS_CHANGED",
+                payload={"deleted_ids": payload.broker_ids, "count": count},
+            )
+            resp = ApiResponse.success(
+                data={"deleted_count": count},
+                message=f"Deleted {count} broker profile(s)",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="BROKER_DELETE_FAILED",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def list_broker_stocks(self, request: Request, broker_id: int) -> Response:
+        """List configured stocks for a broker profile."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            stocks = self.broker.list_stocks(broker_id)
+            resp = ApiResponse.success(
+                data={"broker_id": broker_id, "stocks": stocks},
+                message=f"Retrieved {len(stocks)} stock(s) for broker ID {broker_id}",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code="BROKER_NOT_FOUND",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def edit_broker_stocks(
+        self, request: Request, broker_id: int, payload: BrokerStocksPayload
+    ) -> Response:
+        """Replace configured stocks for a broker profile."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            self.broker.edit_stocks(broker_id, payload.stocks)
+            self._emit_event(
+                channel="data_manager",
+                event_type="BROKERS_CHANGED",
+                payload={"broker_id": broker_id, "action": "edit_stocks"},
+            )
+            resp = ApiResponse.success(
+                data={"broker_id": broker_id, "count": len(payload.stocks)},
+                message=f"Updated stocks for broker ID {broker_id}",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="BROKER_STOCKS_FAILED",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def import_broker_stocks(
+        self, request: Request, broker_id: int, payload: BrokerImportStocksRequest
+    ) -> Response:
+        """Import stocks from plain multi-line CSV/text."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            count = self.broker.import_stocks_csv(broker_id, payload.content)
+            self._emit_event(
+                channel="data_manager",
+                event_type="BROKERS_CHANGED",
+                payload={"broker_id": broker_id, "action": "import_stocks"},
+            )
+            resp = ApiResponse.success(
+                data={"broker_id": broker_id, "count": count},
+                message=f"Imported {count} stock(s) for broker ID {broker_id}",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="BROKER_STOCK_IMPORT_FAILED",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def export_broker_stocks(self, request: Request, broker_id: int) -> Response:
+        """Export configured stocks for a broker profile as plain text."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            content = self.broker.export_stocks_csv(broker_id)
+            if "application/json" in request.headers.get("accept", ""):
+                resp = ApiResponse.success(
+                    data={"broker_id": broker_id, "content": content},
+                    message="Exported broker stocks",
+                    request_id=req_id,
+                )
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK, content=resp.to_dict()
+                )
+            return PlainTextResponse(
+                content=content,
+                media_type="text/plain",
+                headers={
+                    "Content-Disposition": (
+                        f'attachment; filename="broker_{broker_id}_stocks.csv"'
+                    ),
+                    "x-request-id": req_id or "",
+                },
+            )
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_404_NOT_FOUND,
+                code="BROKER_NOT_FOUND",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def export_brokers_xml(
+        self, request: Request, payload: BrokerXmlExportRequest
+    ) -> Response:
+        """Export broker profiles to StrategyQuant X XML format."""
+        req_id = request.headers.get("x-request-id")
+        xml_content = self.broker.export_brokers_xml(payload.broker_ids)
+        if "application/json" in request.headers.get("accept", ""):
+            resp = ApiResponse.success(
+                data={"xml_content": xml_content},
+                message="Exported broker profiles to XML",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        return Response(
+            content=xml_content,
+            media_type="application/xml",
+            headers={
+                "Content-Disposition": 'attachment; filename="Brokers.xml"',
+                "x-request-id": req_id or "",
+            },
+        )
+
+    def import_brokers_xml(
+        self, request: Request, payload: BrokerXmlImportRequest
+    ) -> Response:
+        """Import broker profiles from StrategyQuant X XML format."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            imported = self.broker.import_brokers_xml(payload.xml_content)
+            self._emit_event(
+                channel="data_manager",
+                event_type="BROKERS_CHANGED",
+                payload={"action": "import_xml", "count": len(imported)},
+            )
+            resp = ApiResponse.success(
+                data=[b.model_dump(mode="json") for b in imported],
+                message=f"Imported {len(imported)} broker profile(s) from XML",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="BROKER_XML_IMPORT_FAILED",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def inspect_xml_overview(
+        self, request: Request, payload: BrokerXmlOverviewRequest
+    ) -> Response:
+        """Inspect MetaTrader XML export overview."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            items = self.broker.inspect_xml_overview(payload.xml_content, payload.kind)
+            resp = ApiResponse.success(
+                data=[item.model_dump(mode="json") for item in items],
+                message=f"Parsed {len(items)} {payload.kind}(s) from XML",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="XML_INSPECTION_FAILED",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def import_xml_records(
+        self, request: Request, payload: BrokerXmlImportRecordsRequest
+    ) -> Response:
+        """Import selected instruments or sessions from MetaTrader XML."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            count = self.broker.import_xml_records(
+                payload.xml_content,
+                payload.kind,
+                payload.broker_id,
+                payload.postfix,
+                payload.selected_names,
+            )
+            event_type = (
+                "INSTRUMENTS_CHANGED"
+                if payload.kind == "instrument"
+                else "SESSIONS_CHANGED"
+            )
+            self._emit_event(
+                channel="data_manager",
+                event_type=event_type,
+                payload={"broker_id": payload.broker_id, "count": count},
+            )
+            resp = ApiResponse.success(
+                data={"imported_count": count},
+                message=(
+                    f"Imported {count} {payload.kind}(s) for broker ID "
+                    f"{payload.broker_id}"
+                ),
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="XML_IMPORT_FAILED",
+                message=str(exc),
+                request_id=req_id,
+            )
+
+    def update_broker_data(self, request: Request, broker_id: int) -> Response:
+        """Trigger historical data update for a broker profile."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            res = self.broker.update_data_for_broker(broker_id)
+            resp = ApiResponse.success(
+                data=res,
+                message=res.get("message", "Data update initiated"),
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                code="BROKER_UPDATE_DATA_FAILED",
+                message=str(exc),
+                request_id=req_id,
+            )
+
     # Logs
     def list_logs(
         self,
@@ -2932,6 +3306,90 @@ def _register_export_home_routes(router: APIRouter, service: DataRouterService) 
         service.list_brokers,
         methods=["GET"],
         summary="List broker profiles",
+    )
+    router.add_api_route(
+        "/brokers",
+        service.save_broker,
+        methods=["POST"],
+        summary="Create or update a broker profile",
+    )
+    router.add_api_route(
+        "/brokers/{broker_id}",
+        service.get_broker_by_id,
+        methods=["GET"],
+        summary="Get broker profile by ID",
+    )
+    router.add_api_route(
+        "/brokers/{broker_id}",
+        service.update_broker_by_id,
+        methods=["PUT"],
+        summary="Update broker profile by ID",
+    )
+    router.add_api_route(
+        "/brokers",
+        service.delete_brokers,
+        methods=["DELETE"],
+        summary="Delete broker profiles",
+    )
+    router.add_api_route(
+        "/brokers/delete",
+        service.delete_brokers,
+        methods=["POST"],
+        summary="Delete broker profiles (POST alias)",
+    )
+    router.add_api_route(
+        "/brokers/{broker_id}/stocks",
+        service.list_broker_stocks,
+        methods=["GET"],
+        summary="List broker stocks",
+    )
+    router.add_api_route(
+        "/brokers/{broker_id}/stocks",
+        service.edit_broker_stocks,
+        methods=["PUT"],
+        summary="Edit broker stocks",
+    )
+    router.add_api_route(
+        "/brokers/{broker_id}/stocks/import",
+        service.import_broker_stocks,
+        methods=["POST"],
+        summary="Import broker stocks from CSV text",
+    )
+    router.add_api_route(
+        "/brokers/{broker_id}/stocks/export",
+        service.export_broker_stocks,
+        methods=["GET"],
+        summary="Export broker stocks to CSV",
+    )
+    router.add_api_route(
+        "/brokers/save-xml",
+        service.export_brokers_xml,
+        methods=["POST"],
+        summary="Export broker profiles to XML",
+    )
+    router.add_api_route(
+        "/brokers/load-xml",
+        service.import_brokers_xml,
+        methods=["POST"],
+        summary="Import broker profiles from XML",
+    )
+    router.add_api_route(
+        "/brokers/import-get-overview",
+        service.inspect_xml_overview,
+        methods=["POST"],
+        summary="Inspect MetaTrader XML overview",
+    )
+    router.add_api_route(
+        "/brokers/import-session-instrument",
+        service.import_xml_records,
+        methods=["POST"],
+        summary="Import instruments or sessions from MetaTrader XML",
+    )
+    router.add_api_route(
+        "/brokers/{broker_id}/update-data",
+        service.update_broker_data,
+        methods=["POST"],
+        summary="Trigger historical data update for a broker profile",
     )
     router.add_api_route(
         "/logs",

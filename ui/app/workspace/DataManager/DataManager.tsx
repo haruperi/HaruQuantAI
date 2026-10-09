@@ -51,6 +51,7 @@ import { BrokerStocksDialog } from '../../plugins/data_source/Catalogs/BrokerPro
 import { BrokerRecordImportDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerRecordImportDialog';
 import { BrokerTransferDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerTransferDialog';
 import { brokerCounts, serializeBrokersJson, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
+import { fetchBrokerStocks } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerApiClient';
 import { TickDownloaderImportDialog } from '../../plugins/data_source/TickDownloader/module';
 import { useTickDownloader } from '../../plugins/data_source/Common/dataManagerStore';
 import { ImportPopup } from '../../plugins/data_source/Dukascopy/import/module';
@@ -767,11 +768,29 @@ export function DataManager() {
     {tab === 'Broker profiles' && <div className="management-actions broker-actions" aria-label="Broker profile operations">
       <Button className="action-add" onClick={()=>setBrokerDialog({kind:'editor',mode:'add'})}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>
       <Button className="action-clone" onClick={()=>{const rows=requireBrokers();if(rows)updateBrokers(rows);}}><RefreshCw size={26} aria-hidden="true"/>Update data for broker (automatic)</Button>
-      <Button className="action-edit" onClick={()=>setBrokerDialog({kind:'import',recordType:'instrument'})}><FileInput size={26} aria-hidden="true"/>Import broker instruments from JSON</Button>
-      <Button className="action-load" onClick={()=>setBrokerDialog({kind:'import',recordType:'session'})}><CalendarPlus size={26} aria-hidden="true"/>Import broker sessions from JSON</Button>
-      <Button className="action-edit" onClick={()=>{const rows=requireBrokers();if(!rows)return;const row=rows[0];if(!row.stockPickerUse){setSelectionMessage("This broker profile can't hold any stocks.");return;}if(row.system){setSelectionMessage("This broker can't be edited.");return;}setBrokerDialog({kind:'stocks',source:row});}}><ListPlus size={26} aria-hidden="true"/>Edit stocks</Button>
+      <Button className="action-edit" onClick={()=>setBrokerDialog({kind:'import',recordType:'instrument'})}><FileInput size={26} aria-hidden="true"/>Import broker instruments from MT4/MT5</Button>
+      <Button className="action-load" onClick={()=>setBrokerDialog({kind:'import',recordType:'session'})}><CalendarPlus size={26} aria-hidden="true"/>Import broker sessions from MT4/MT5</Button>
+      <Button className="action-edit" onClick={()=>{const rows=requireBrokers();if(!rows)return;const row=rows[0];if(!row.stockPickerUse){setSelectionMessage("This broker profile can't hold any stocks.");return;}setBrokerDialog({kind:'stocks',source:row});}}><ListPlus size={26} aria-hidden="true"/>Edit stocks</Button>
       <Button className="action-delete" onClick={()=>{const rows=requireBrokers();if(!rows)return;if(rows.some(row=>instrumentRows.some(item=>item.broker===row.id)||sessionRows.some(item=>item.broker===row.id))){setSelectionMessage('You have to select broker which is not used by any instrument or session.');return;}const deletable=rows.filter(row=>!row.system);if(!deletable.length){setSelectionMessage('You have to select some non default broker.');return;}setBrokerDialog({kind:'delete',selected:deletable});}}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
-      <Button className="action-save" onClick={()=>{const rows=requireBrokers();if(rows){downloadTextFile('Brokers.json',serializeBrokersJson(rows));notify('Brokers saved.');}}}><Save size={26} aria-hidden="true"/>Save</Button>
+      <Button className="action-save" onClick={async ()=>{
+        const rows=requireBrokers();
+        if(!rows)return;
+        const rowsWithStocks = await Promise.all(
+          rows.map(async (row) => {
+            if (row.stockPickerUse && (!row.stocks || row.stocks.length === 0)) {
+              try {
+                const fetched = await fetchBrokerStocks(row.id);
+                return { ...row, stocks: fetched };
+              } catch {
+                return row;
+              }
+            }
+            return row;
+          })
+        );
+        downloadTextFile('Brokers.json',serializeBrokersJson(rowsWithStocks));
+        notify('Brokers saved.');
+      }}><Save size={26} aria-hidden="true"/>Save</Button>
       <Button className="action-load" onClick={()=>setBrokerDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
   </div><div className="dm-progress" role="status" aria-label="Data Manager progress"><strong>Progress</strong><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (['running', 'paused'].includes(providerJob?.state ?? '')) providerAction(providerJob?.state === 'paused' ? 'resume' : 'pause'); else setOperationState(current => current === 'paused' ? 'running' : 'paused'); }}>{operationState === 'paused' || providerJob?.state === 'paused' ? 'Resume all' : 'Pause all'}</Button><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (providerJob && ['running', 'paused'].includes(providerJob.state)) { providerAction('stop'); return; } setOperationState('cancelled'); notify(`${operationLabel} cancelled`); }}>Stop all</Button></div>
@@ -840,6 +859,6 @@ export function DataManager() {
   {brokerDialog?.kind==='stocks'&&<BrokerStocksDialog profile={brokerDialog.source} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='import'&&<BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='load'&&<BrokerTransferDialog onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
-  {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{setBrokerDialog(null);setBrokerError('');}} footer={<><Button onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" onClick={()=>{try{const ids=brokerDialog.selected.map(row=>row.id);useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})?</p></Modal></div>}
+  {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{setBrokerDialog(null);setBrokerError('');}} footer={<><Button onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" onClick={async ()=>{try{const ids=brokerDialog.selected.map(row=>row.id);await useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);setBrokerError('');}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})?</p></Modal></div>}
   {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'tickdownloader-import' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={selectedDatasetIds.length} selectedIds={selectedDatasetIds} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
 }

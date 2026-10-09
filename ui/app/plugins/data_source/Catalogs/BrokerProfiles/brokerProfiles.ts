@@ -8,9 +8,9 @@ export interface BrokerProfile {
 export interface BrokerUpdateJob { brokerIds:string[]; state:'running'|'paused'|'cancelled'|'completed'|'failed'; progress:number; targets:{brokerId:string;ticker:string;symbol:string}[]; error?:string }
 
 export function normalizeBrokerName(value:string):string {
-  let name=value.trim(); if(!name)throw new Error("Broker's name must be set");
+  const name=value.trim(); if(!name)throw new Error("Broker's name must be set");
   if(name.length>50)throw new Error('Broker profile name must be 50 characters or fewer.');
-  if(!name.startsWith('['))name=`[${name}`; if(!name.endsWith(']'))name=`${name}]`; return name;
+  return name;
 }
 export function validateBroker(value:BrokerProfile, existing:BrokerProfile[], originalId?:string):BrokerProfile {
   const name=normalizeBrokerName(value.name); if((value.desc??'').length>250)throw new Error('Description must be 250 characters or fewer.');
@@ -28,7 +28,7 @@ export function parseBrokersJson(json:string):Omit<BrokerProfile,'id'>[]{
   if(!json||new Blob([json]).size>2_000_000)throw new Error('Cannot load brokers JSON.');let raw:unknown;try{raw=JSON.parse(json);}catch{throw new Error('Select a valid Brokers JSON file.');}
   if(!jsonObject(raw)||raw.version!==1||raw.kind!=='brokers'||!Array.isArray(raw.brokers)||!raw.brokers.length||raw.brokers.length>100)throw new Error('No Brokers found to import.');const names:string[]=[];
   return raw.brokers.map(source=>{if(!jsonObject(source)||typeof source.name!=='string'||typeof source.desc!=='string'||typeof source.postfix!=='string'||typeof source.timezone!=='string'||typeof source.mtUse!=='boolean'||typeof source.stockPickerUse!=='boolean'||!Array.isArray(source.stocks)||source.stocks.some(stock=>typeof stock!=='string'||!stock.trim()))throw new Error('Invalid broker in Brokers JSON.');
-    const stripped=source.name.startsWith('[[')&&source.name.endsWith(']]')?source.name.slice(1,-1):source.name;const name=normalizeBrokerName(stripped);if(names.some(item=>item.toLowerCase()===name.toLowerCase()))throw new Error('Name must be unique');names.push(name);return {name,desc:source.desc,postfix:source.mtUse?source.postfix:'',timezone:source.mtUse?source.timezone:'',mtUse:source.mtUse,stockPickerUse:source.stockPickerUse||source.stocks.length>0,system:false,stocks:[...source.stocks] as string[],instruments:[]};});
+    const name=normalizeBrokerName(source.name);if(names.some(item=>item.toLowerCase()===name.toLowerCase()))throw new Error('Name must be unique');names.push(name);return {name,desc:source.desc,postfix:source.mtUse?source.postfix:'',timezone:source.mtUse?source.timezone:'',mtUse:source.mtUse,stockPickerUse:source.stockPickerUse||source.stocks.length>0,system:false,stocks:[...source.stocks] as string[],instruments:[]};});
 }
 export function serializeBrokerStocksJson(stocks:string[]):string{return JSON.stringify({version:1,kind:'broker-stocks',stocks:[...stocks]},null,2);}
 export function projectBrokerInstruments(items:FileInstrument[],selected:string[],broker:BrokerProfile|undefined,postfix:string):FileInstrument[]{return items.filter(row=>selected.includes(row.symbol)).map(row=>({...structuredClone(row),symbol:row.symbol+postfix,broker:broker?.id??'-1',brokerName:broker?.name??'Default',timezone:broker?.timezone||row.timezone}));}
