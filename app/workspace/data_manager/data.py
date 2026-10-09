@@ -128,6 +128,7 @@ DEFAULT_CHUNK_SIZE = 10000
 COMMON_DELIMITERS = [",", ";", "\t", " ", "|"]
 MIN_FIELD_COUNT = 5
 SEPARATE_DT_MIN_FIELDS = 6
+ALIAS_COLON_PART_COUNT = 3
 MS_EPOCH_THRESHOLD = 1e11
 
 
@@ -294,6 +295,19 @@ class CatalogService:
         Fires FR-DATA-CATALOG-DATASET-REGISTRY.
         """
         row = self._db.datasets.get_by_id(dataset_id)
+        if row is None and ":" in dataset_id:
+            parts = dataset_id.split(":")
+            if len(parts) == ALIAS_COLON_PART_COUNT:
+                p0, p1, p2 = (
+                    parts[0].strip().lower(),
+                    parts[1].strip().lower(),
+                    parts[2].strip().lower(),
+                )
+                cand1 = f"ds_{p0}_{p2}_{p1}"
+                cand2 = f"ds_{p0}_{p1}_{p2}"
+                row = self._db.datasets.get_by_id(cand1) or self._db.datasets.get_by_id(
+                    cand2
+                )
         if row is None:
             logger.debug(
                 "FR-DATA-CATALOG-DATASET-REGISTRY: Dataset '%s' not found",
@@ -636,10 +650,11 @@ class CatalogService:
             )
             self._storage.delete_partitions(existing.source, kind, existing.symbol)
 
-        success = self._db.datasets.delete(dataset_id)
+        target_id = existing.id if existing is not None else dataset_id
+        success = self._db.datasets.delete(target_id)
         logger.info(
             "FR-DATA-CATALOG-SQX-OPERATIONS: Removed dataset '%s' (success=%s)",
-            dataset_id,
+            target_id,
             success,
             extra={"fr_id": "FR-DATA-CATALOG-SQX-OPERATIONS"},
         )

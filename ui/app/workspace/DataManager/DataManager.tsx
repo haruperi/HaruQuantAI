@@ -79,7 +79,7 @@ import {
 
 import { useAppStore } from '../../host/store';
 import { Button, Checkbox, Field, Modal, ProgressBar, Section, Select, TextInput } from '../../components/ui';
-import { datasets, instruments } from '../../plugins/data_source/Common/fixtures';
+import { DataManagerHome } from './DataManagerHome';
 import {
   dataSourceContextActions, dataSourceProviders, type DataSourceCommand,
   type DataSourceCommandIcon, type DataSourceDialogId, type DataSourceProvider,
@@ -88,7 +88,7 @@ import {
 import yahooIconUrl from '../../assets/dm-yahoo.png';
 import mt5IconUrl from '../../assets/metatrader5.png';
 
-const tabs = ['Data sources', 'Export', 'Tools', 'Instruments', 'Sessions', 'External indicators', 'Stock groups', 'Broker profiles', 'Log'];
+const tabs = ['Home', 'Data sources', 'Export', 'Tools', 'Instruments', 'Sessions', 'External indicators', 'Stock groups', 'Broker profiles', 'Log'];
 type OperationState = 'idle' | 'running' | 'paused' | 'completed' | 'cancelled';
 interface DialogState { id: DataSourceDialogId; exchange?: string }
 type InstrumentDialogState =
@@ -179,15 +179,16 @@ function ExistingDataPolicy() {
   return <Field label="When existing data overlap"><Select value="replace" onChange={() => {}}><option value="replace">Replace overlapping data</option><option value="append">Keep existing data and append new history</option></Select></Field>;
 }
 function MockBoundaryNote() {
-  return <p className="dialog-note">This research-workstation control is simulated. It does not contact a provider, transmit credentials, or modify native application data.</p>;
+  return <p className="dialog-note">Data operations directly update the backend partitioned Parquet storage and catalog database.</p>;
 }
 function downloadTextFile(filename: string, text: string, type = 'application/json;charset=utf-8') { const url = URL.createObjectURL(new Blob([text], { type })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url); }
 
-function DataSourceDialog({ state, selectedCount, onClose, onSecondary, onComplete }: {
-  state: DialogState; selectedCount: number; onClose: () => void;
+function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecondary, onComplete }: {
+  state: DialogState; selectedCount: number; selectedIds?: string[]; onClose: () => void;
   onSecondary: (id: DataSourceDialogId) => void; onComplete: (message: string) => void;
 }) {
   const [agreed, setAgreed] = useState(false);
+  const [deleteOperation, setDeleteOperation] = useState<'remove' | 'clear'>('remove');
   const titles: Record<DataSourceDialogId, string> = {
     'new-instrument': 'Add instrument',
     'dukascopy-add': 'Add Dukascopy data', 'dukascopy-download': 'Download Dukascopy data',
@@ -220,13 +221,13 @@ function DataSourceDialog({ state, selectedCount, onClose, onSecondary, onComple
       content = <><Field label="Yahoo symbols"><textarea className="text-area" placeholder={'AAPL\nMSFT\nEURUSD=X'}/></Field><Field label="Data-name postfix"><TextInput placeholder="Optional"/></Field><MockBoundaryNote/></>;
       break;
     case 'mass-delete':
-      content = <><p><strong>{selectedCount}</strong> selected dataset{selectedCount === 1 ? '' : 's'} will be affected.</p><Field label="Requested operation"><Select value="remove" onChange={() => {}}><option value="remove">Remove dataset definitions and their mock data</option><option value="clear">Keep definitions and clear their mock data</option></Select></Field><p className="callout">A dependency check is required before this destructive operation can continue.</p></>;
+      content = <><p><strong>{selectedCount}</strong> selected dataset{selectedCount === 1 ? '' : 's'} will be affected.</p><Field label="Requested operation"><Select value={deleteOperation} onChange={val => setDeleteOperation(val as 'remove' | 'clear')}><option value="remove">Remove dataset definitions and their data</option><option value="clear">Keep definitions and clear their stored data</option></Select></Field><p className="callout">A dependency check is required before this destructive operation can continue.</p></>;
       break;
     case 'save-definitions':
       content = <><p>Export definitions for <strong>{selectedCount}</strong> selected dataset{selectedCount === 1 ? '' : 's'}.</p><Field label="Suggested file name"><TextInput defaultValue="Data.json"/></Field><MockBoundaryNote/></>;
       break;
     case 'load-definitions':
-      content = <><Field label="Dataset definition file"><input className="file-input compact" type="file" accept=".json,application/json"/></Field><p className="callout">The JSON file will be validated for supported schema, contained values, and conflicting identities before any mock definitions are applied.</p><MockBoundaryNote/></>;
+      content = <><Field label="Dataset definition file"><input className="file-input compact" type="file" accept=".json,application/json"/></Field><p className="callout">The JSON file will be validated for supported schema, contained values, and conflicting identities before definitions are applied.</p><MockBoundaryNote/></>;
       break;
     case 'instrument-identification':
       content = <><p>Map each provider symbol to an existing instrument or skip it. Automatic guessing is never silently accepted.</p><div className="form-grid two"><Field label="Provider symbol"><TextInput value="EURUSD" readOnly/></Field><Field label="Target instrument"><Select value="EURUSD" onChange={() => {}}><option>EURUSD</option><option>Default instrument</option><option>Skip this symbol</option></Select></Field></div></>;
@@ -244,8 +245,30 @@ function DataSourceDialog({ state, selectedCount, onClose, onSecondary, onComple
 
   const informationOnly = ['dukascopy-information', 'data-usage-conditions'].includes(state.id);
   const agreementRequired = ['sq-equity-find', 'sq-futures-find'].includes(state.id);
-  const primaryLabel = state.id === 'mass-delete' ? 'Review dependency warning' : state.id === 'save-definitions' ? 'Download JSON' : state.id === 'load-definitions' ? 'Validate and load' : state.id === 'dependency-warning' ? 'Confirm simulated deletion' : state.id === 'data-format-name' ? 'Save format' : state.id.includes('download') ? 'Start simulated download' : state.id.includes('import') || state.id === 'mt5-import' ? 'Start simulated import' : 'Save simulated configuration';
-  const primaryAction = () => state.id === 'mass-delete' ? onSecondary('dependency-warning') : onComplete(`${titles[state.id]} completed as a simulation`);
+  const primaryLabel = state.id === 'mass-delete' ? 'Review dependency warning' : state.id === 'save-definitions' ? 'Download JSON' : state.id === 'load-definitions' ? 'Validate and load' : state.id === 'dependency-warning' ? 'Confirm deletion' : state.id === 'data-format-name' ? 'Save format' : state.id.includes('download') ? 'Start download' : state.id.includes('import') || state.id === 'mt5-import' ? 'Start import' : 'Save configuration';
+  const primaryAction = async () => {
+    if (state.id === 'mass-delete') {
+      onSecondary('dependency-warning');
+      return;
+    }
+    if (state.id === 'dependency-warning') {
+      const store = useDataManagerStore.getState();
+      const ids = selectedIds || [];
+      if (deleteOperation === 'clear') {
+        for (const id of ids) {
+          try { await store.clearDataset(id); } catch { /* ignore */ }
+        }
+        onComplete(`Cleared stored data for ${ids.length} dataset(s)`);
+      } else {
+        for (const id of ids) {
+          try { await store.removeDataset(id); } catch { /* ignore */ }
+        }
+        onComplete(`Removed ${ids.length} dataset(s)`);
+      }
+      return;
+    }
+    onComplete(`${titles[state.id]} completed`);
+  };
   const wide = ['file-import', 'sq-equity-find', 'sq-futures-find', 'mt5-import'].includes(state.id);
 
   return <Modal title={titles[state.id]} onClose={onClose} width={wide ? 820 : 650} footer={<><Button onClick={onClose}>{informationOnly ? 'Close' : 'Cancel'}</Button>{!informationOnly && <Button className={state.id === 'dependency-warning' ? 'danger' : 'primary'} disabled={agreementRequired && !agreed} onClick={primaryAction}>{primaryLabel}</Button>}</>}>{content}</Modal>;
@@ -380,7 +403,7 @@ function DatasetTable({ selectedIds, onToggle, onSelect }: {
   const tools = useDataTools();
   const stockGroups = useStockGroups();
   const [stockGroup, setStockGroup] = useState('');
-  const baseDatasets = [...datasets.map(row => ({ ...row, underlying: row.symbol, instrument: row.symbol, brokerName: '—', timezone: '—', category: instruments.find(item => item.symbol === row.symbol)?.type ?? '—' })), ...definitions, ...td.definitions, ...fileDefinitions].map(row => ({ ...row, ...simulationSummary(row, downloadRanges[row.id] ?? []) }));
+  const baseDatasets = [...definitions, ...td.definitions, ...fileDefinitions].map(row => ({ ...row, ...simulationSummary(row, downloadRanges[row.id] ?? []) }));
   const darwinexRows = [...darwinex.definitions, ...(darwinexActive(darwinex.job?.state) && darwinex.job?.kind !== 'download' ? darwinex.job!.definitions.filter(item => !darwinex.definitions.some(row => row.id === item.id)) : [])].map(row => ({ ...row, ...simulationSummary(row, darwinex.ranges[row.id] ?? []) }));
   const cryptoRows = [...crypto.definitions, ...(cryptoActive(crypto.job?.state) && crypto.job?.kind === 'add' ? crypto.job.definitions.filter(item => !crypto.definitions.some(row => row.id === item.id)) : [])].map(row => ({ ...row, ...simulationSummary(row, crypto.ranges[row.id] ?? []) }));
   const yahooRows = [...yahoo.definitions, ...(yahooActive(yahoo.job?.state) && yahoo.job?.kind === 'add' ? yahoo.job.definitions.filter(item => !yahoo.definitions.some(row => row.id === item.id)) : [])].map(row => ({ ...row, ...simulationSummary(row, yahoo.ranges[row.id] ?? []) }));
@@ -615,7 +638,7 @@ export function DataManager() {
     }
     if (command.dialog === 'file-import') {
       setOpenMenu(null); setNestedOpen(false);
-      const rows = [...datasets, ...useFileSymbols.getState().definitions, ...imports.records].filter(row => selectedDatasetIds.includes(row.id) && row.source === 'File import');
+      const rows = [...definitions, ...useFileSymbols.getState().definitions, ...imports.records].filter(row => selectedDatasetIds.includes(row.id) && row.source === 'File import');
       const row = rows[0];
       if (!row) { setSelectionMessage('You must select at least one File record.'); return; }
       if ('cloned' in row && row.cloned) { setSelectionMessage('Cannot import into cloned data.'); return; }
@@ -625,7 +648,7 @@ export function DataManager() {
     if (command.dialog === 'dukascopy-download') {
       setOpenMenu(null); setNestedOpen(false);
       try {
-        const selected = [...datasets, ...definitions].filter(row => selectedDatasetIds.includes(row.id));
+        const selected = definitions.filter(row => selectedDatasetIds.includes(row.id));
         const eligible = eligibleTargets(selected, download.job).map(row => ({ ...row, ...simulationSummary(row, download.ranges[row.id] ?? []) }));
         setDownloadTargets(eligible); setSelectionMessage(''); setDialog({ id: 'dukascopy-download' });
       } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to select data'); }
@@ -641,7 +664,6 @@ export function DataManager() {
   const toggleDataset = (id: string) => setSelectedDatasetIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
   const toolRows: ToolTarget[] = [
     ...stockGroups.generated,
-    ...datasets.map(row => ({ ...row, instrument: row.symbol, timezone: '—', category: instruments.find(item => item.symbol === row.symbol)?.type ?? '—' })),
     ...definitions.map(row => ({ ...row, ...simulationSummary(row, download.ranges[row.id] ?? []) })), ...td.definitions, ...fileDefinitions, ...imports.records,
     ...sq.definitions, ...darwinex.definitions.map(row => ({ ...row, ...simulationSummary(row, darwinex.ranges[row.id] ?? []) })),
     ...crypto.definitions.map(row => ({ ...row, ...simulationSummary(row, crypto.ranges[row.id] ?? []) })), ...yahoo.definitions.map(row => ({ ...row, ...simulationSummary(row, yahoo.ranges[row.id] ?? []) })),
@@ -664,7 +686,7 @@ export function DataManager() {
   const requireSessions=():SessionDefinition[]|null=>{if(selectedSessions.length){setSelectionMessage('');return selectedSessions;}setSelectionMessage('You have to select some session.');return null;};
   const openSessionEdit=(item:SessionDefinition)=>{setSelectedSessionIds([item.name]);setSessionError('');setSessionDialog({kind:'editor',mode:'edit',source:item});};
   const openSessionDelete=(items:SessionDefinition[])=>{setSelectedSessionIds(items.map(item=>item.name));setSessionError('');setSessionDialog({kind:'delete',selected:items});};
-  const removeSelectedSessions=()=>{if(sessionDialog?.kind!=='delete')return;try{const names=sessionDialog.selected.map(item=>item.name);useSessions.getState().remove(names,instruments.map(item=>item.session));setSelectedSessionIds(current=>current.filter(name=>!names.includes(name)));notify(`${names.length} session${names.length===1?'':'s'} removed.`);setSessionDialog(null);setSessionError('');}catch(cause){setSessionError(cause instanceof Error?cause.message:'Unable to remove sessions.');}};
+  const removeSelectedSessions=()=>{if(sessionDialog?.kind!=='delete')return;try{const names=sessionDialog.selected.map(item=>item.name);useSessions.getState().remove(names,instrumentRows.map(item=>(item as {session?:string}).session??''));setSelectedSessionIds(current=>current.filter(name=>!names.includes(name)));notify(`${names.length} session${names.length===1?'':'s'} removed.`);setSessionDialog(null);setSessionError('');}catch(cause){setSessionError(cause instanceof Error?cause.message:'Unable to remove sessions.');}};
   const selectedExternal = externalIndicators.definitions.filter(item => selectedExternalNames.includes(item.name));
   const requireExternal = (): ExternalIndicatorDefinition[] | null => { if (selectedExternal.length) { setSelectionMessage(''); return selectedExternal; } setSelectionMessage('You have to select at least one indicator.'); return null; };
   const openExternalEdit = (item: ExternalIndicatorDefinition) => { setSelectedExternalNames([item.name]); setSelectionMessage(''); setExternalDialog({ kind: 'editor', mode: 'edit', source: item }); };
@@ -706,7 +728,7 @@ export function DataManager() {
   const openReview = () => { try { if (anyDataActive) throw new Error('Cannot view data while an operation is in progress.'); const target = selectReviewTarget(toolRows, selectedDatasetIds); setReviewTarget(target); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to view data.'); } };
   const progressText = selectionMessage || (operationState === 'idle' ? (providerJob ? `${progressOwner === 'broker'?'Broker data update':progressOwner === 'stock-groups' ? 'Stock group data update' : progressOwner === 'external' ? `Custom data import for '${externalIndicators.job?.indicator}'` : progressOwner === 'tools' ? 'Clone to timezone' : progressOwner === 'export' ? exports.job?.label : progressOwner === 'mt5' ? 'MT5 mock import' : progressOwner === 'yahoo' ? `Yahoo mock ${yahoo.job?.kind}` : progressOwner === 'crypto' ? `Crypto mock ${crypto.job?.kind}` : progressOwner === 'darwinex' ? `Darwinex mock ${darwinex.job?.kind}` : progressOwner === 'sq' && sq.job ? providerLabel(sq.job.provider) : progressOwner === 'file' ? 'File import' : progressOwner === 'td' ? 'TickDownloader mock import' : 'Dukascopy mock download'} ${providerJob.state} ${providerJob.progress}%${providerJob.error ? `: ${providerJob.error}` : progressOwner === 'external' && externalIndicators.job?.state === 'completed' && externalIndicators.job.ignored ? ` — ${externalIndicators.job.ignored} invalid rows ignored` : progressOwner === 'file' && imports.job?.state === 'completed' ? ` — ${imports.job.completed} imported, ${imports.job.skipped} skipped, ${imports.job.tasks.reduce((n, task) => n + task.ignored, 0)} invalid rows ignored` : ''}` : 'No active operations') : operationState === 'paused' ? `${operationLabel} paused at ${progress}%` : operationState === 'cancelled' ? `${operationLabel} cancelled` : operationState === 'completed' ? `${operationLabel} complete` : `${operationLabel}… ${progress}%`);
 
-  return <div className={`data-manager ${tab === 'Log' ? 'show-log' : ''}`}><div className="dm-title">Data Manager</div><div className="ribbon-tabs">{tabs.map(item => <button key={item} className={tab === item ? 'active' : ''} onClick={() => setTab(item)}>{item}</button>)}</div><div className="ribbon" ref={ribbonRef}>
+  return <div className={`data-manager ${tab === 'Log' ? 'show-log' : ''} ${tab === 'Home' ? 'show-home' : ''}`}><div className="dm-title">Data Manager</div><div className="ribbon-tabs">{tabs.map(item => <button key={item} className={tab === item ? 'active' : ''} onClick={() => setTab(item)}>{item}</button>)}</div><div className="ribbon" ref={ribbonRef}>
     {tab === 'Data sources' && <div className="data-source-ribbon" aria-label="Data source operations"><div className="provider-actions">{dataSourceProviders.map(provider => <ProviderMenu key={provider.id} provider={provider} isOpen={openMenu === provider.id} nestedOpen={nestedOpen && openMenu === provider.id} onToggle={() => { setOpenMenu(current => current === provider.id ? null : provider.id); setNestedOpen(false); }} onToggleNested={() => setNestedOpen(current => !current)} onSelect={command => { setLastControlId(provider.id); selectCommand(command); }}/>)}</div><div className="context-actions">{dataSourceContextActions.map(action => { const Icon = contextIcons[action.id] ?? Database; return <button className={`data-source-button ${action.id === 'mass-delete' ? 'destructive' : ''}`} data-control-id={action.id} key={action.id} title={action.label} onClick={() => { setLastControlId(action.id); if (action.requiresSelection && selectedDatasetIds.length === 0) { setSelectionMessage('Select at least one dataset first'); return; } if (action.action) runDirectAction(action.action); if (action.dialog) setDialog({ id: action.dialog }); }}><Icon size={27}/><span>{action.label}</span></button>; })}</div></div>}
     {tab === 'Export' && <div className="export-actions" aria-label="Data export operations"><Button data-control-id="export-csv" className="export-csv" onClick={() => { setLastControlId('export-csv'); openExport('csv'); }}><FileSpreadsheet size={24} aria-hidden="true"/>Export to CSV</Button><Button data-control-id="export-mt4" className="export-mt4" title="Export to MetaTrader 4 (FXT & HST)" onClick={() => { setLastControlId('export-mt4'); openExport('mt4'); }}><MonitorDown size={24} aria-hidden="true"/>Export MT4 (FXT &amp; HST)</Button><Button data-control-id="export-mt5" className="export-mt5" title="Export to MetaTrader 5 data (99% test)" onClick={() => { setLastControlId('export-mt5'); openExport('mt5'); }}><ChartCandlestick size={24} aria-hidden="true"/>Export to MT5 data (99% test)</Button></div>}
     {tab === 'Tools' && <div className="data-tool-actions" aria-label="Data tools"><Button data-control-id="tool-timezone" className="tool-timezone" onClick={() => { setLastControlId('tool-timezone'); openClone(); }}><span className="timezone-tool-icon" aria-hidden="true"><Globe2 size={26}/><Clock size={13}/></span>Clone to timezone</Button><Button data-control-id="tool-analyze" className="tool-analyze" onClick={() => { setLastControlId('tool-analyze'); openReview(); }}><ChartCandlestick size={26} aria-hidden="true"/>View &amp; Analyze</Button></div>}
@@ -753,7 +775,7 @@ export function DataManager() {
       <Button className="action-load" onClick={()=>setBrokerDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
   </div><div className="dm-progress" role="status" aria-label="Data Manager progress"><strong>Progress</strong><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (['running', 'paused'].includes(providerJob?.state ?? '')) providerAction(providerJob?.state === 'paused' ? 'resume' : 'pause'); else setOperationState(current => current === 'paused' ? 'running' : 'paused'); }}>{operationState === 'paused' || providerJob?.state === 'paused' ? 'Resume all' : 'Pause all'}</Button><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (providerJob && ['running', 'paused'].includes(providerJob.state)) { providerAction('stop'); return; } setOperationState('cancelled'); notify(`${operationLabel} cancelled`); }}>Stop all</Button></div>
-  <div className="dm-body">{tab === 'Log' ? <main className="dm-log"><header><strong>Log</strong><button className="clear-log" onClick={() => setLogEntries([])}>Clear log</button></header><div className="dm-log-output" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/> : <div className="dm-config"><Section title={tab}><div className="cards-list">{Array.from({ length: 6 }, (_, index) => <button key={index}><Database size={22}/><strong>{tab.replace(/s$/, '')} {index + 1}</strong><span>{index % 2 ? 'Configured · mock adapter' : 'Ready for configuration'}</span></button>)}</div></Section></div>}</div>
+  <div className="dm-body">{tab === 'Home' ? <DataManagerHome onNavigateTab={setTab} onOpenImport={() => { setTab('Data sources'); setDialog({ id: 'file-import' }); }} onOpenDownload={() => { setTab('Data sources'); setDialog({ id: 'dukascopy-download' }); }} /> : tab === 'Log' ? <main className="dm-log"><header><strong>Log</strong><button className="clear-log" onClick={() => setLogEntries([])}>Clear log</button></header><div className="dm-log-output" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/> : <div className="dm-config"><Section title={tab}><div className="cards-list">{Array.from({ length: 6 }, (_, index) => <button key={index}><Database size={22}/><strong>{tab.replace(/s$/, '')} {index + 1}</strong><span>{index % 2 ? 'Configured · mock adapter' : 'Ready for configuration'}</span></button>)}</div></Section></div>}</div>
   {dialog?.id === 'dukascopy-information' && <DisclaimerPopup onClose={closeDialog}/>}
   <AddPopup open={dialog?.id === 'dukascopy-add'} onClose={closeDialog} onComplete={message => { notify(message); closeDialog(); }}/>{dialog?.id === 'dukascopy-download' && <ImportPopup targets={downloadTargets} onClose={closeDialog} onStarted={() => { setProgressOwner('download'); setOperationState('idle'); notify('Dukascopy download started (simulation)'); }}/>}
   {dialog?.id === 'darwinex-add' && <DarwinexAddDialog onClose={closeDialog} onStarted={() => { setProgressOwner('darwinex'); setOperationState('idle'); setSelectionMessage(''); }}/> }
@@ -819,5 +841,5 @@ export function DataManager() {
   {brokerDialog?.kind==='import'&&<BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='load'&&<BrokerTransferDialog onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{setBrokerDialog(null);setBrokerError('');}} footer={<><Button onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" onClick={()=>{try{const ids=brokerDialog.selected.map(row=>row.id);useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})?</p></Modal></div>}
-  {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'tickdownloader-import' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={selectedDatasetIds.length} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
+  {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'tickdownloader-import' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={selectedDatasetIds.length} selectedIds={selectedDatasetIds} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
 }

@@ -19,7 +19,8 @@ Key Capabilities:
     - FR-DATA-INTEGRATION-DATASETS: REST endpoints for dataset listing, querying,
       deletion, availability checks, and ingestion.
       Associated: `get_datasets`, `get_dataset`, `delete_dataset`,
-        `check_dataset_availability`, `import_dataset`
+        `check_dataset_availability`, `import_dataset`, `edit_dataset`,
+        `clear_dataset_data`, `review_chart`, `clone_to_timezone`
       Logging: Emits INFO on dataset mutations and ingestion completion.
     - FR-DATA-INTEGRATION-INSTRUMENTS: REST endpoints for instrument CRUD.
       Associated: `list_instruments`, `get_instrument`, `create_instrument`,
@@ -150,6 +151,15 @@ def _execute_async_download(
         date_to=date_to,
     )
     bars = manager.download(req)
+    if bars:
+        db = get_database_manager()
+        catalog = CatalogService(db)
+        catalog.save_bars(
+            source=provider_name,
+            symbol=symbol,
+            timeframe=timeframe,
+            bars=bars,
+        )
     return {
         "provider": provider_name,
         "symbol": symbol,
@@ -264,6 +274,45 @@ class ExportPayload(BaseModel):
     timeframe: str = Field(default="M1", description="Timeframe identifier")
     digits: int = Field(default=5, ge=0, le=8, description="Price decimals")
     output_path: str | None = Field(default=None, description="Optional output path")
+
+
+class DatasetEditPayload(BaseModel):
+    """Payload for editing dataset configuration metadata."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    symbol_new: str | None = Field(default=None, description="Updated symbol name")
+    instrument: str | None = Field(
+        default=None, description="Updated instrument symbol"
+    )
+    timezone: str | None = Field(default=None, description="Updated timezone")
+    category: str | None = Field(default=None, description="Updated asset category")
+
+
+class ReviewChartPayload(BaseModel):
+    """Payload for chart review bar slice extraction."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    dataset_id: str = Field(..., description="Target dataset ID")
+    date_from: str | None = Field(default=None, description="Start date ISO string")
+    date_to: str | None = Field(default=None, description="End date ISO string")
+    limit: int = Field(default=1000, ge=1, le=50000, description="Max bars to return")
+    offset: int = Field(default=0, ge=0, description="Offset in bars")
+
+
+class CloneTimezonePayload(BaseModel):
+    """Payload for cloning a dataset into another timezone."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    dataset_id: str = Field(..., description="Target dataset ID")
+    target_timezone: str = Field(
+        ..., description="Target timezone name (e.g. Europe/Prague)"
+    )
+    new_dataset_id: str | None = Field(
+        default=None, description="Optional new dataset ID"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -402,6 +451,66 @@ class DataRouterService:
         resp = ApiResponse.success(
             data={"deleted": True, "dataset_id": dataset_id},
             message=f"Dataset '{dataset_id}' deleted successfully",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def edit_dataset(
+        self, request: Request, dataset_id: str, payload: DatasetEditPayload
+    ) -> Response:
+        """Edit dataset metadata in catalog."""
+        req_id = request.headers.get("x-request-id")
+        success = self.catalog.edit_dataset(
+            dataset_id,
+            symbol_new=payload.symbol_new,
+            instrument=payload.instrument,
+            timezone=payload.timezone,
+            category=payload.category,
+        )
+        if not success:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND,
+                "DATASET_NOT_FOUND",
+                f"Dataset '{dataset_id}' not found",
+                req_id,
+            )
+        self._emit_event(
+            "data.dataset",
+            "updated",
+            {"dataset_id": dataset_id, **payload.model_dump(exclude_none=True)},
+        )
+        logger.info(
+            "FR-DATA-INTEGRATION-DATASETS: Edited dataset '%s'",
+            dataset_id,
+            extra={"fr_id": "FR-DATA-INTEGRATION-DATASETS", "dataset_id": dataset_id},
+        )
+        resp = ApiResponse.success(
+            data={"dataset_id": dataset_id, "updated": True},
+            message=f"Dataset '{dataset_id}' updated successfully",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def clear_dataset_data(self, request: Request, dataset_id: str) -> Response:
+        """Clear on-disk Parquet data while preserving catalog definition."""
+        req_id = request.headers.get("x-request-id")
+        success = self.catalog.clear_data(dataset_id)
+        if not success:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND,
+                "DATASET_NOT_FOUND",
+                f"Dataset '{dataset_id}' not found",
+                req_id,
+            )
+        self._emit_event("data.dataset", "cleared", {"dataset_id": dataset_id})
+        logger.info(
+            "FR-DATA-INTEGRATION-DATASETS: Cleared partition data for dataset '%s'",
+            dataset_id,
+            extra={"fr_id": "FR-DATA-INTEGRATION-DATASETS", "dataset_id": dataset_id},
+        )
+        resp = ApiResponse.success(
+            data={"dataset_id": dataset_id, "cleared": True},
+            message=f"Data for dataset '{dataset_id}' cleared successfully",
             request_id=req_id,
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
@@ -564,6 +673,81 @@ class DataRouterService:
                 status.HTTP_400_BAD_REQUEST,
                 "INGESTION_ERROR",
                 f"Data ingestion failed: {exc}",
+                req_id,
+            )
+
+    def review_chart(self, request: Request, payload: ReviewChartPayload) -> Response:
+        """Review chart bars slice from canonical Parquet partitions."""
+        req_id = request.headers.get("x-request-id")
+        bars = self.catalog.review_chart(
+            payload.dataset_id,
+            date_from=payload.date_from,
+            date_to=payload.date_to,
+            limit=payload.limit,
+            offset=payload.offset,
+        )
+        logger.debug(
+            "FR-DATA-INTEGRATION-DATASETS: Extracted %d chart review bars for %s",
+            len(bars),
+            payload.dataset_id,
+            extra={
+                "fr_id": "FR-DATA-INTEGRATION-DATASETS",
+                "dataset_id": payload.dataset_id,
+                "count": len(bars),
+            },
+        )
+        resp = ApiResponse.success(
+            data={
+                "dataset_id": payload.dataset_id,
+                "count": len(bars),
+                "bars": bars,
+            },
+            message=f"Extracted {len(bars)} bar(s) for chart review",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def clone_to_timezone(
+        self, request: Request, payload: CloneTimezonePayload
+    ) -> Response:
+        """Clone existing dataset into another timezone partition."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            new_id = self.catalog.clone_to_timezone(
+                payload.dataset_id,
+                target_timezone=payload.target_timezone,
+                new_dataset_id=payload.new_dataset_id,
+            )
+            self._emit_event(
+                "data.dataset",
+                "cloned",
+                {"source_id": payload.dataset_id, "cloned_id": new_id},
+            )
+            logger.info(
+                "FR-DATA-INTEGRATION-DATASETS: Cloned dataset '%s' to '%s' "
+                "(timezone=%s)",
+                payload.dataset_id,
+                new_id,
+                payload.target_timezone,
+                extra={"fr_id": "FR-DATA-INTEGRATION-DATASETS", "new_id": new_id},
+            )
+            resp = ApiResponse.success(
+                data={"source_id": payload.dataset_id, "cloned_id": new_id},
+                message=f"Cloned dataset to timezone '{payload.target_timezone}'",
+                request_id=req_id,
+            )
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED, content=resp.to_dict()
+            )
+        except Exception as exc:
+            logger.exception(
+                "FR-DATA-INTEGRATION-DATASETS: Timezone clone failed",
+                extra={"fr_id": "FR-DATA-INTEGRATION-DATASETS", "error": str(exc)},
+            )
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "CLONE_TIMEZONE_ERROR",
+                f"Failed to clone dataset to timezone: {exc}",
                 req_id,
             )
 
@@ -1068,6 +1252,13 @@ class DataRouterService:
                 )
 
             bars = self.providers.download(req)
+            if bars:
+                self.catalog.save_bars(
+                    source=payload.provider,
+                    symbol=payload.symbol,
+                    timeframe=payload.timeframe or "M1",
+                    bars=bars,
+                )
             self._emit_event(
                 "data.provider",
                 "downloaded",
@@ -1364,6 +1555,60 @@ class DataRouterService:
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
+    def get_home_doc_links(self, request: Request) -> Response:
+        """Get documentation and tutorial links mirroring SQX DataManagerHome."""
+        req_id = request.headers.get("x-request-id")
+        links = [
+            {
+                "id": "import-mt4",
+                "title": "Import History Data MT4",
+                "description": "Learn how to import historical data to MetaTrader 4",
+                "icon": "download",
+                "url": "https://strategyquant.com/doc/quantdatamanager/import-history-data-metatrader-4/",
+            },
+            {
+                "id": "test-mt4",
+                "title": "Test Strategy MT4",
+                "description": "Test your strategy in MT4 with tick precision",
+                "icon": "speed",
+                "url": "https://strategyquant.com/doc/quantdatamanager/test-strategy-metatrader-4-tick-precision/",
+            },
+            {
+                "id": "import-mt5",
+                "title": "Import Data to MT5",
+                "description": "How to import data to MetaTrader 5",
+                "icon": "input",
+                "url": "https://strategyquant.com/doc/quantdatamanager/how-to-import-data-to-metatrader-5/",
+            },
+            {
+                "id": "export-mt5",
+                "title": "Export Data from MT5",
+                "description": "How to export data from MetaTrader 5",
+                "icon": "output",
+                "url": "https://strategyquant.com/doc/quantdatamanager/how-to-export-data-from-metatrader-5/",
+            },
+            {
+                "id": "intro-cli",
+                "title": "Introduction to CLI",
+                "description": "What is CLI and how to use it",
+                "icon": "terminal",
+                "url": "https://strategyquant.com/doc/cli-command-line/introduction-to-cli/",
+            },
+            {
+                "id": "full-doc",
+                "title": "Full Documentation",
+                "description": "Browse complete QDM documentation",
+                "icon": "menu_book",
+                "url": "https://strategyquant.com/doc/quantdatamanager/",
+            },
+        ]
+        resp = ApiResponse.success(
+            data=links,
+            message="Documentation links retrieved",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
     # Broker profiles
     def list_brokers(self, request: Request) -> Response:
         """List configured broker profiles."""
@@ -1463,6 +1708,36 @@ def create_data_router(
         service.delete_dataset,
         methods=["DELETE"],
         summary="Delete dataset",
+    )
+    router.add_api_route(
+        "/datasets/{dataset_id}/delete",
+        service.delete_dataset,
+        methods=["POST"],
+        summary="Delete dataset (POST alias)",
+    )
+    router.add_api_route(
+        "/datasets/{dataset_id}",
+        service.edit_dataset,
+        methods=["PUT"],
+        summary="Edit dataset",
+    )
+    router.add_api_route(
+        "/datasets/{dataset_id}/clear",
+        service.clear_dataset_data,
+        methods=["POST"],
+        summary="Clear dataset data",
+    )
+    router.add_api_route(
+        "/datasets/review-chart",
+        service.review_chart,
+        methods=["POST"],
+        summary="Review chart bars slice",
+    )
+    router.add_api_route(
+        "/datasets/clone-timezone",
+        service.clone_to_timezone,
+        methods=["POST"],
+        summary="Clone dataset to timezone",
     )
     router.add_api_route(
         "/datasets/{symbol}/{timeframe}/availability",
@@ -1635,6 +1910,12 @@ def create_data_router(
         service.get_home_overview,
         methods=["GET"],
         summary="Get workspace overview",
+    )
+    router.add_api_route(
+        "/home/doc-links",
+        service.get_home_doc_links,
+        methods=["GET"],
+        summary="Get home documentation links",
     )
 
     # Brokers

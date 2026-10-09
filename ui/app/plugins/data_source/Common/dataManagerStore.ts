@@ -9,12 +9,15 @@ import { useFileSymbols } from '../FileImport/fileSymbolsStore';
 import { validateTD, type TDJob, type TDRequest } from '../TickDownloader/tickDownloader';
 import { emptyDownload, resolveDownloadModes, downloadStep, validateDownload, availableStart, mergeRanges, validDate, type DownloadState, type DownloadRequest, type Interval } from '../Dukascopy/dukascopyDownload';
 import { create } from 'zustand';
-import { datasets } from './fixtures';
 import { catalogue, type AddDukasRequest } from '../Dukascopy/dukascopy';
 import { normalizeBrokerName, validateBroker, type BrokerProfile, type BrokerUpdateJob } from '../Catalogs/BrokerProfiles/brokerProfiles';
-import { createDomainClient } from '../../../host/transport';
+import { createDomainClient, type DomainClient } from '../../../host/transport';
 
-const dataClient = createDomainClient('/data');
+let dataClient = createDomainClient('/data');
+
+export function setDataClient(client: DomainClient): void {
+  dataClient = client;
+}
 
 export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
   try {
@@ -62,6 +65,10 @@ interface DataState { definitions: MockDefinition[]; brokers: BrokerProfile[]; b
   saveBroker:(profile:BrokerProfile)=>void; saveBrokerStocks:(id:string,stocks:string[])=>void; removeBrokers:(ids:string[])=>void; importBrokers:(profiles:Omit<BrokerProfile,'id'>[],overwrite:string[])=>number;
   startBrokerUpdate:(ids:string[],existing:string[])=>void; advanceBrokerUpdate:()=>void; brokerAction:(action:'pause'|'resume'|'stop')=>void;
   syncRemoteDatasets: () => Promise<void>;
+  editDataset: (id: string, updates: Partial<MockDefinition>) => Promise<void>;
+  clearDataset: (id: string) => Promise<void>;
+  removeDataset: (id: string) => Promise<void>;
+  fetchChartBars: (datasetId: string, limit?: number, offset?: number) => Promise<Array<{ datetime: string; open: number; high: number; low: number; close: number; volume: number }>>;
 }
 function completeBroker(value:Partial<BrokerProfile>&Pick<BrokerProfile,'id'|'name'|'postfix'|'timezone'|'mtUse'>):BrokerProfile{return {desc:'',stockPickerUse:false,system:false,stocks:[],instruments:[],...value};}
 function readState(): Pick<DataState, 'definitions' | 'brokers' | 'brokerJob' | 'storageError'> {
@@ -71,7 +78,7 @@ function readState(): Pick<DataState, 'definitions' | 'brokers' | 'brokerJob' | 
     const value = normalizeLegacyBranding(JSON.parse(raw));
     if (![1,2].includes(value.version) || !Array.isArray(value.definitions) || value.definitions.length > 10000
       || !Array.isArray(value.brokers) || value.brokers.length > 100
-      || value.definitions.some((row: MockDefinition) => !row || ['id', 'source', 'symbol', 'underlying', 'instrument', 'timeframe', 'broker', 'brokerName', 'timezone', 'category', 'from', 'to'].some(key => typeof (row as unknown as Record<string, unknown>)[key] !== 'string') || row.bars !== 0)
+      || value.definitions.some((row: MockDefinition) => !row || ['id', 'source', 'symbol', 'underlying', 'instrument', 'timeframe', 'broker', 'brokerName', 'timezone', 'category', 'from', 'to'].some(key => typeof (row as unknown as Record<string, unknown>)[key] !== 'string') || typeof row.bars !== 'number')
       || value.brokers.some((broker: BrokerProfile) => !broker || ['id', 'name', 'postfix', 'timezone'].some(key => typeof (broker as unknown as Record<string, unknown>)[key] !== 'string') || typeof broker.mtUse !== 'boolean' || !Array.isArray(broker.instruments) || broker.instruments.some(item => typeof item !== 'string')))
       throw new Error('Invalid saved definitions');
     const brokers=(value.brokers as BrokerProfile[]).map(completeBroker);const brokerJob=value.version===2&&value.brokerJob?value.brokerJob as BrokerUpdateJob:null;if(brokerJob){if(!['running','paused','cancelled','completed','failed'].includes(brokerJob.state)||!Number.isFinite(brokerJob.progress)||!Array.isArray(brokerJob.targets))throw new Error('Invalid broker job');if(brokerJob.state==='running')brokerJob.state='paused';}
@@ -96,7 +103,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     if (!['TICK', 'M1'].includes(request.dataType)) throw new Error('Invalid data type');
     const broker = state.brokers.find(item => item.id === request.broker && item.mtUse);
     if (request.broker !== '-1' && !broker) throw new Error('Choose a valid broker profile');
-    const existingNames = new Set([...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedSQDefinitions(), ...reservedMt5(), ...datasets, ...state.definitions, ...useTickDownloader.getState().definitions, ...useFileSymbols.getState().definitions, ...useFileImports.getState().records, ...(activeImport(useFileImports.getState().job?.state) ? useFileImports.getState().job?.tasks.map(task => task.record) ?? [] : [])].map(row => row.symbol));
+    const existingNames = new Set([...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedSQDefinitions(), ...reservedMt5(), ...state.definitions, ...useTickDownloader.getState().definitions, ...useFileSymbols.getState().definitions, ...useFileImports.getState().records, ...(activeImport(useFileImports.getState().job?.state) ? useFileImports.getState().job?.tasks.map(task => task.record) ?? [] : [])].map(row => row.symbol));
     const additions = request.symbols.map((symbol, index): MockDefinition => {
       const item = catalogue.find(row => row.symbol === symbol);
       if (!item) throw new Error('Unknown catalogue symbol');
@@ -119,18 +126,56 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
   syncRemoteDatasets: async () => {
     try {
       const remote = await fetchRemoteDatasets();
-      if (!remote.length) return;
+      if (!remote) return;
       const state = get();
+      const remoteMap = new Map(remote.map(d => [d.id, d]));
+      const updated = state.definitions.map(d => {
+        const rem = remoteMap.get(d.id);
+        return rem ? { ...d, ...rem } : d;
+      });
       const existingIds = new Set(state.definitions.map(d => d.id));
       const newItems = remote.filter(d => !existingIds.has(d.id));
-      if (newItems.length > 0) {
-        const merged = [...state.definitions, ...newItems];
-        try { persistData(state, state.brokers, merged, state.brokerJob); } catch { /* ignore */ }
-        set({ definitions: merged });
-      }
+      const merged = [...updated, ...newItems];
+      try { persistData(state, state.brokers, merged, state.brokerJob); } catch { /* ignore */ }
+      set({ definitions: merged });
     } catch {
       // Non-blocking sync
     }
+  },
+  editDataset: async (id: string, updates: Partial<MockDefinition>) => {
+    const state = get();
+    await dataClient.put(`/datasets/${encodeURIComponent(id)}`, {
+      symbol: updates.symbol,
+      broker: updates.broker,
+      timezone: updates.timezone,
+      category: updates.category,
+      instrument: updates.instrument,
+    });
+    const definitions = state.definitions.map(d => (d.id === id ? { ...d, ...updates } : d));
+    try { persistData(state, state.brokers, definitions, state.brokerJob); } catch { /* ignore */ }
+    set({ definitions });
+  },
+  clearDataset: async (id: string) => {
+    const state = get();
+    await dataClient.post(`/datasets/${encodeURIComponent(id)}/clear`, {});
+    const definitions = state.definitions.map(d => (d.id === id ? { ...d, bars: 0, from: '', to: '' } : d));
+    try { persistData(state, state.brokers, definitions, state.brokerJob); } catch { /* ignore */ }
+    set({ definitions });
+  },
+  removeDataset: async (id: string) => {
+    const state = get();
+    await dataClient.post(`/datasets/${encodeURIComponent(id)}/delete`, {});
+    const definitions = state.definitions.filter(d => d.id !== id);
+    try { persistData(state, state.brokers, definitions, state.brokerJob); } catch { /* ignore */ }
+    set({ definitions });
+  },
+  fetchChartBars: async (datasetId: string, limit = 500, offset = 0) => {
+    const resp = await dataClient.post<{ bars: Array<{ datetime: string; open: number; high: number; low: number; close: number; volume: number }> }>('/datasets/review-chart', {
+      dataset_id: datasetId,
+      limit,
+      offset,
+    });
+    return resp?.bars ?? [];
   },
 }));
 
@@ -277,7 +322,7 @@ export const useTickDownloader = create<TDState>((set, get) => {
       if ([get().job?.state, useDukascopyDownloads.getState().job?.state].some(state => state === 'running' || state === 'paused')) throw new Error('Finish or stop the active data operation first.');
       if (useFileSymbols.getState().storageError) throw new Error(useFileSymbols.getState().storageError);
       if (useFileImports.getState().storageError) throw new Error(useFileImports.getState().storageError);
-      validateTD(request, available, [...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedSQDefinitions(), ...reservedMt5(), ...datasets, ...useDataManagerStore.getState().definitions, ...get().definitions, ...useFileSymbols.getState().definitions, ...useFileImports.getState().records, ...(activeImport(useFileImports.getState().job?.state) ? useFileImports.getState().job?.tasks.map(task => task.record) ?? [] : [])].map(row => row.symbol));
+      validateTD(request, available, [...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedSQDefinitions(), ...reservedMt5(), ...useDataManagerStore.getState().definitions, ...get().definitions, ...useFileSymbols.getState().definitions, ...useFileImports.getState().records, ...(activeImport(useFileImports.getState().job?.state) ? useFileImports.getState().job?.tasks.map(task => task.record) ?? [] : [])].map(row => row.symbol));
       if (get().definitions.length + request.symbols.length > 10000) throw new Error('Mock dataset limit reached.');
       const additions: MockDefinition[] = request.symbols.map(symbol => ({ id: `td:${symbol + request.postfix}`, symbol: symbol + request.postfix, underlying: symbol, instrument: symbol, source: 'TickDownloader', timeframe: 'TICK', broker: '-1', brokerName: 'Default', timezone: 'UTC', category: catalogue.find(row => row.symbol === symbol)?.category ?? '—', from: '', to: '', bars: 0 }));
       try { persist({ folder: request.folder, postfix: request.postfix, definitions: [...get().definitions, ...additions], job: { request: structuredClone(request), state: 'running', progress: 0 } }); }
