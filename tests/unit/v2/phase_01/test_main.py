@@ -15,6 +15,26 @@ from app.main import _build_parser, create_app, main
 from fastapi.testclient import TestClient
 
 
+@pytest.fixture(autouse=True)
+def isolated_default_store(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Resolve pre-existing default-path fixtures to a temporary host store."""
+    from app.host import persistence
+    from app.host.settings import HostSettings
+
+    path = tmp_path / "default-host.db"
+    monkeypatch.setattr(persistence, "DEFAULT_DATABASE_PATH", path)
+    settings = HostSettings(path)
+    settings.update(
+        {
+            "app.general": {"host": "127.0.0.1", "backend_port": 8000},
+            "config.troubleshooting": {"debug_level_active": False},
+            "workspace_paths": {"data_dir": str(tmp_path / "data")},
+        }
+    )
+    monkeypatch.setattr("app.host.bootstrap.default_host_settings", settings)
+    monkeypatch.setattr("app.main.default_host_settings", settings)
+
+
 def test_create_app_defaults() -> None:
     """Verify create_app resolves default configuration and creates FastAPI app."""
     app = create_app()

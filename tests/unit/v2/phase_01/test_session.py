@@ -13,6 +13,7 @@ Tests FR-HOST-SESS-* requirements:
 from __future__ import annotations
 
 import time
+from collections.abc import Generator
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,9 @@ from app.host.session import (
     DistinctAuthorityType,
     ElevationExpiredError,
     ElevationRequest,
+    HostAuthentication,
+    LoginCooldownError,
+    LoginRequest,
     LoopbackOriginError,
     LoopbackSecurityMiddleware,
     LoopbackValidator,
@@ -36,24 +40,34 @@ from app.host.session import (
     SessionExpiredError,
     SessionManager,
     StandardScope,
+    create_auth_router,
     create_sessions_router,
     extract_bearer_token,
     get_current_session,
     get_tls_remote_deployment_proposal,
+    hash_password,
     main,
     reset_global_security_state,
     sanitize_operational_inputs,
     validate_user_code_ast,
     verify_clean_installation,
     verify_domain_removal,
+    verify_password,
 )
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
 
 @pytest.fixture(autouse=True)
-def clean_security_state() -> None:
+def clean_security_state(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> Generator[None]:
     """Reset global security singletons before and after each test."""
+    from app.host import persistence
+
+    monkeypatch.setattr(persistence, "DEFAULT_DATABASE_PATH", tmp_path / "sessions.db")
+    reset_global_security_state()
+    yield
     reset_global_security_state()
 
 
@@ -615,19 +629,30 @@ def test_tls_remote_deployment_proposal() -> None:
 # -----------------------------------------------------------------------------
 
 
-def test_sessions_router_endpoints() -> None:
+def test_sessions_router_endpoints(tmp_path: Path) -> None:
     """Verify REST endpoints for sessions, elevation, scope checks, and distribution."""
     mgr = SessionManager(host_instance_id="host-test")
     auth = ScopeAuthorizer()
     coord = DistinctAuthorityCoordinator()
 
     app = FastAPI()
-    router = create_sessions_router(mgr, auth, coord)
+    from app.host.settings import HostSettings
+
+    settings = HostSettings(tmp_path / "session-login.db")
+    settings.update(
+        {
+            "user_access": {
+                "username": "trader_1",
+                "password_hash": hash_password("test-password"),
+            }
+        }
+    )
+    router = create_sessions_router(mgr, auth, coord, HostAuthentication(settings, mgr))
     app.include_router(router)
     client = TestClient(app)
 
     # 1. Login
-    resp_login = client.post("/sessions/login", json={"username": "trader_1"})
+    resp_login = client.post("/sessions/login", json={"password": "test-password"})
     assert resp_login.status_code == 200
     login_data = resp_login.json()["data"]
     token = login_data["token"]
@@ -732,3 +757,353 @@ def test_cli_entrypoint() -> None:
     # Clean install on repository root
     rc = main(["--check-install"])
     assert rc in (0, 1)
+
+
+@pytest.fixture
+def configured_auth(tmp_path: Path) -> HostAuthentication:
+    """One isolated configured host user, with no plaintext storage."""
+    from app.host.settings import HostSettings
+
+    settings = HostSettings(tmp_path / "auth.db")
+    settings.update(
+        {
+            "user_access": {
+                "username": "configured-user",
+                "password_hash": hash_password("test-password"),
+            }
+        }
+    )
+    return HostAuthentication(settings, SessionManager(host_instance_id="test-host"))
+
+
+def test_password_verifier_and_secret_representation() -> None:
+    """Verifier is salted, bounded and rejects wrong/malformed credentials."""
+    encoded = hash_password("test-password")
+    assert encoded != hash_password("test-password")
+    assert "test-password" not in encoded
+    assert verify_password("test-password", encoded)
+    assert not verify_password("wrong", encoded)
+    assert not verify_password("", encoded)
+    assert not verify_password("x" * 1025, encoded)
+    for malformed in [
+        "plaintext",
+        encoded.replace("600000", "999999999"),
+        "pbkdf2-sha256$600000$" + "z" * 32 + "$" + "z" * 64,
+    ]:
+        assert not verify_password("test-password", malformed)
+    assert "test-password" not in repr(LoginRequest(password="test-password"))
+    with pytest.raises(ValueError):
+        hash_password("")
+
+
+def test_authentication_identity_changes_and_cooldown(
+    configured_auth: HostAuthentication, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Only configured operator credentials mint tokens; changes revoke authority."""
+    auth = configured_auth
+    issued = auth.authenticate(LoginRequest(password="test-password"))
+    assert issued.username == "configured-user"
+    assert issued.host_instance_id == "test-host"
+    assert auth.verify_session(issued.token).role == RoleType.OPERATOR
+    for request in [
+        LoginRequest(password="wrong"),
+        LoginRequest(password="test-password", username="other-user"),
+        LoginRequest(password="test-password", role=RoleType.SYSTEM),
+    ]:
+        with pytest.raises(AuthenticationError):
+            auth.authenticate(request)
+    auth.settings.update(
+        {"user_access": {"password_hash": hash_password("replacement-password")}}
+    )
+    with pytest.raises(AuthenticationError):
+        auth.verify_session(issued.token)
+    for _ in range(2):
+        with pytest.raises(AuthenticationError):
+            auth.authenticate(LoginRequest(password="wrong"))
+    with pytest.raises(LoginCooldownError):
+        auth.authenticate(LoginRequest(password="replacement-password"))
+    monkeypatch.setattr(
+        "app.host.session.time.monotonic", lambda: auth._window_start + 61
+    )
+    new_session = auth.authenticate(LoginRequest(password="replacement-password"))
+    assert auth.verify_session(new_session.token).username == "configured-user"
+
+
+def test_missing_account_fails_closed(tmp_path: Path) -> None:
+    """Missing credential setup issues no HTTP-capable session."""
+    from app.host.settings import HostSettings
+
+    auth = HostAuthentication(HostSettings(tmp_path / "missing.db"), SessionManager())
+    with pytest.raises(AuthenticationError):
+        auth.authenticate(LoginRequest(password="any-password"))
+    assert not auth.manager._sessions
+
+
+def test_local_account_setup_confirmation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Local setup stores hashes only and requires confirmation for replacement."""
+    from app.host.settings import HostSettings
+
+    path = tmp_path / "account.db"
+    answers = iter(["test-password", "test-password"])
+    monkeypatch.setattr("app.host.session.getpass.getpass", lambda _: next(answers))
+    assert (
+        main(["--configure-user", "--username", "configured-user", "--db", str(path)])
+        == 0
+    )
+    account = HostSettings(path).get_snapshot().values["application"]["user_access"]
+    assert account["username"] == "configured-user"
+    assert "password" not in account
+    assert verify_password("test-password", account["password_hash"])
+    monkeypatch.setattr("builtins.input", lambda _: "CANCEL")
+    assert (
+        main(["--configure-user", "--username", "replacement", "--db", str(path)]) == 1
+    )
+    assert (
+        HostSettings(path).get_snapshot().values["application"]["user_access"]
+        == account
+    )
+    monkeypatch.setattr("builtins.input", lambda _: "REPLACE")
+    answers = iter(["replacement-password", "does-not-match"])
+    assert (
+        main(["--configure-user", "--username", "replacement", "--db", str(path)]) == 2
+    )
+    assert (
+        HostSettings(path).get_snapshot().values["application"]["user_access"]
+        == account
+    )
+
+
+def test_credential_logging_has_no_payload(
+    configured_auth: HostAuthentication, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Credential capability logs outcomes without passwords, hashes or tokens."""
+    import logging
+
+    caplog.set_level(logging.DEBUG)
+    issued = configured_auth.authenticate(LoginRequest(password="test-password"))
+    with pytest.raises(AuthenticationError):
+        configured_auth.authenticate(LoginRequest(password="wrong-password"))
+    text = caplog.text
+    assert "Login authenticated" in text and "Login rejected" in text
+    assert "test-password" not in text and "wrong-password" not in text
+    assert issued.token not in text
+    assert (
+        configured_auth.settings.get_snapshot().values["application"]["user_access"][
+            "password_hash"
+        ]
+        not in text
+    )
+
+
+def test_default_session_remains_valid_for_24_hours_without_extending_expiry() -> None:
+    """Verification retains the issued expiry and rejects the token after 24 hours."""
+    from datetime import UTC, datetime, timedelta
+    from unittest.mock import patch
+
+    start = datetime(2026, 10, 9, tzinfo=UTC)
+    with patch("app.host.session.datetime", wraps=datetime) as clock:
+        clock.now.return_value = start
+        manager = SessionManager()
+        session = manager.create_session(username="ttl-test")
+        expiry = session.expires_at
+        assert datetime.fromisoformat(expiry) - start == timedelta(hours=24)
+        clock.now.return_value = start + timedelta(hours=23, minutes=59, seconds=59)
+        assert manager.verify_session(session.token).expires_at == expiry
+        clock.now.return_value = start + timedelta(hours=24, seconds=1)
+        with pytest.raises(SessionExpiredError):
+            manager.verify_session(session.token)
+
+
+def test_account_change_verifies_password_and_revokes_sessions(tmp_path: Path) -> None:
+    """Account UI changes preserve verifier privacy and require a fresh login."""
+    from app.host.settings import HostSettings
+
+    target = HostSettings(tmp_path / "account.db")
+    target.update(
+        {
+            "user_access": {
+                "username": "original",
+                "password_hash": hash_password("old-synthetic-password"),
+            }
+        }
+    )
+    manager = SessionManager()
+    authentication = HostAuthentication(target, manager)
+    session = authentication.authenticate(
+        LoginRequest(password="old-synthetic-password")
+    )
+    app = FastAPI()
+    app.include_router(create_auth_router(authentication))
+    headers = {"authorization": f"Bearer {session.token}"}
+    with TestClient(app) as client:
+        assert client.get("/auth/account").status_code == 401
+        account = client.get("/auth/account", headers=headers).json()["data"]
+        assert account["username"] == "original"
+        assert account["session_timeout_mins"] == 1440
+        request = {
+            "expected_revision": account["revision"],
+            "username": "replacement",
+            "session_timeout_mins": 2880,
+            "current_password": "wrong-synthetic-password",
+            "new_password": "new-synthetic-password",
+        }
+        before = target.get_snapshot()
+        assert (
+            client.put("/auth/account", headers=headers, json=request).status_code
+            == 403
+        )
+        assert target.get_snapshot() == before
+        authentication.verify_session(session.token)
+        request["current_password"] = "old-synthetic-password"
+        saved = client.put("/auth/account", headers=headers, json=request)
+        assert saved.status_code == 200
+        assert "synthetic-password" not in saved.text
+        assert saved.json()["data"]["reauthenticate"] is True
+        assert client.get("/auth/account", headers=headers).status_code == 401
+        new_session = authentication.authenticate(
+            LoginRequest(password="new-synthetic-password")
+        )
+        assert new_session.username == "replacement"
+        from datetime import datetime
+
+        assert (
+            datetime.fromisoformat(new_session.expires_at)
+            - datetime.fromisoformat(new_session.created_at)
+        ).total_seconds() >= 172800
+        with pytest.raises(AuthenticationError):
+            authentication.authenticate(LoginRequest(password="old-synthetic-password"))
+
+
+@pytest.mark.parametrize("channel", ["ui", "cli"])
+def test_session_channels_record_hashed_tokens(tmp_path: Path, channel: str) -> None:
+    """HTTP login and trusted CLI/Python issuance use the same singular store."""
+    import hashlib
+
+    from app.host.persistence import DatabaseManager, HostSessionStore
+    from app.host.session import SessionTokenManager
+    from app.host.settings import HostSettings
+
+    path = tmp_path / "recorded.db"
+    settings = HostSettings(path)
+    settings.update(
+        {
+            "user_access": {
+                "username": "test",
+                "password_hash": hash_password("synthetic-password"),
+            }
+        }
+    )
+    store = HostSessionStore(DatabaseManager(path))
+    mgr = SessionManager(host_instance_id="issuer", store=store)
+    if channel == "ui":
+        authentication = HostAuthentication(settings, mgr)
+        app = FastAPI()
+        app.include_router(create_auth_router(authentication))
+        with TestClient(app) as client:
+            assert (
+                client.post("/auth/login", json={"password": "invalid"}).status_code
+                == 401
+            )
+            assert store.list_records(peer_id="issuer") == []
+            response = client.post(
+                "/auth/login", json={"password": "synthetic-password"}
+            )
+            assert response.status_code == 200
+            token = response.json()["data"]["token"]
+            assert (
+                client.get(
+                    "/auth/status", headers={"Authorization": "Bearer " + token}
+                ).status_code
+                == 200
+            )
+            assert (
+                client.get(
+                    "/auth/status", headers={"Authorization": "Bearer " + token}
+                ).status_code
+                == 200
+            )
+    else:
+        token = SessionTokenManager(manager=mgr).create_token("test").token
+    rows = store.list_records(peer_id="issuer")
+    assert len(rows) == 1
+    assert rows[0].token_hash == hashlib.sha256(token.encode()).hexdigest()
+    assert token not in str(rows[0].model_dump())
+    assert rows[0].status == "ACTIVE"
+    assert rows[0].revoked_at_utc is None
+    assert rows[0].username == "test"
+    assert rows[0].expires_at_utc == mgr.verify_session(token).expires_at
+    mgr.revoke_session(token)
+    revoked = store.list_records(peer_id="issuer")[0]
+    assert revoked.status == "REVOKED" and revoked.revoked_at_utc is not None
+
+
+def test_session_records_expiry_and_issuer_isolation(tmp_path: Path) -> None:
+    from app.host.persistence import DatabaseManager, HostSessionStore
+
+    store = HostSessionStore(DatabaseManager(tmp_path / "lifecycle.db"))
+    first = SessionManager(host_instance_id="one", store=store)
+    second = SessionManager(host_instance_id="two", store=store)
+    expired = first.create_session("test", ttl_sec=-1)
+    with pytest.raises(SessionExpiredError):
+        first.verify_session(expired.token)
+    assert store.list_records(peer_id="one")[0].status == "EXPIRED"
+    first.create_session("test")
+    active = second.create_session("test")
+    assert first.revoke_user("test") == 1
+    assert second.verify_session(active.token)
+    assert store.list_records(peer_id="two")[0].status == "ACTIVE"
+    second.reset(new_host_instance_id="three")
+    assert store.list_records(peer_id="two")[0].status == "REVOKED"
+    assert len(store.list_records(peer_id="one")) == 2
+    fresh = SessionManager(host_instance_id="two", store=store)
+    with pytest.raises(AuthenticationError):
+        fresh.verify_session(active.token)
+
+
+def test_session_persistence_failure_does_not_issue_or_retain_access(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.host.persistence import DatabaseManager, HostSessionStore, PersistenceError
+
+    store = HostSessionStore(DatabaseManager(tmp_path / "failure.db"))
+    mgr = SessionManager(host_instance_id="failure", store=store)
+
+    def fail(*args: Any, **kwargs: Any) -> None:
+        raise PersistenceError("synthetic storage failure")
+
+    with monkeypatch.context() as patcher:
+        patcher.setattr(store, "create", fail)
+        with pytest.raises(PersistenceError):
+            mgr.create_session("test")
+    assert mgr.active_session_count() == 0
+    assert store.list_records(peer_id="failure") == []
+    active = mgr.create_session("test")
+    with monkeypatch.context() as patcher:
+        patcher.setattr(store, "update_status", fail)
+        with pytest.raises(PersistenceError):
+            mgr.revoke_session(active.token)
+    with pytest.raises(AuthenticationError):
+        mgr.verify_session(active.token)
+    mgr.reset()
+    assert store.list_records(peer_id="failure")[0].status == "REVOKED"
+
+
+def test_login_storage_failure_returns_safe_unavailable(
+    configured_auth: HostAuthentication, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from app.host.persistence import PersistenceError
+
+    app = FastAPI()
+    app.include_router(create_auth_router(configured_auth))
+
+    def fail(*args: Any, **kwargs: Any) -> None:
+        raise PersistenceError("private database details")
+
+    monkeypatch.setattr(configured_auth.manager, "create_session", fail)
+    with TestClient(app) as client:
+        response = client.post("/auth/login", json={"password": "test-password"})
+        assert response.status_code == 503
+        assert "private database details" not in response.text
+        assert "token" not in (response.json().get("data") or {})

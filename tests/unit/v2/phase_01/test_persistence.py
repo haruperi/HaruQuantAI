@@ -52,6 +52,82 @@ class SampleConfig(BaseModel):
     allocation: float = 1.0
 
 
+def _seed_obsolete_sessions(db: DatabaseManager) -> None:
+    with db.transaction() as conn:
+        conn.execute(
+            "CREATE TABLE host_sessions (token_hash TEXT PRIMARY KEY, "
+            "username TEXT NOT NULL, issued_at REAL NOT NULL, "
+            "expires_at REAL NOT NULL, revoked INTEGER NOT NULL DEFAULT 0)"
+        )
+        conn.execute("INSERT INTO host_sessions VALUES ('synthetic', 'test', 1, 2, 0)")
+        conn.execute("CREATE TABLE host_session (session_id TEXT PRIMARY KEY)")
+        conn.execute("INSERT INTO host_session VALUES ('preserve')")
+
+
+def test_obsolete_session_cleanup_preserves_singular_table(
+    db_manager: DatabaseManager, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Explicit guarded drop preserves singular records and is idempotent."""
+    _seed_obsolete_sessions(db_manager)
+    with caplog.at_level("INFO"):
+        assert (
+            db_manager.schema.drop_obsolete_sessions(expected_count=1, expires_before=3)
+            == 1
+        )
+        assert (
+            db_manager.schema.drop_obsolete_sessions(expected_count=1, expires_before=3)
+            == 0
+        )
+    assert "Obsolete session table removed" in caplog.text
+    assert "Obsolete session table already absent" in caplog.text
+    with db_manager.connection(query_only=True) as conn:
+        assert (
+            conn.execute("SELECT session_id FROM host_session").fetchone()[0]
+            == "preserve"
+        )
+        assert (
+            conn.execute(
+                "SELECT COUNT(*) FROM sqlite_master WHERE name='host_sessions'"
+            ).fetchone()[0]
+            == 0
+        )
+
+
+@pytest.mark.parametrize("change", ["count", "expiry", "schema", "view", "foreign_key"])
+def test_obsolete_session_cleanup_rejects_changed_targets(
+    db_manager: DatabaseManager, change: str
+) -> None:
+    """Changed data, schema or dependencies abort without dropping records."""
+    _seed_obsolete_sessions(db_manager)
+    with db_manager.transaction() as conn:
+        if change == "schema":
+            conn.execute("ALTER TABLE host_sessions ADD COLUMN unexpected TEXT")
+        elif change == "view":
+            conn.execute("CREATE VIEW session_view AS SELECT * FROM host_sessions")
+        elif change == "foreign_key":
+            conn.execute(
+                "CREATE TABLE dependent (token TEXT REFERENCES host_sessions(token_hash))"
+            )
+    with pytest.raises((RevisionConflictError, IncompatibleSchemaError)):
+        db_manager.schema.drop_obsolete_sessions(
+            expected_count=2 if change == "count" else 1,
+            expires_before=1 if change == "expiry" else 3,
+        )
+    with db_manager.connection(query_only=True) as conn:
+        assert conn.execute("SELECT COUNT(*) FROM host_sessions").fetchone()[0] == 1
+        assert conn.execute("SELECT COUNT(*) FROM host_session").fetchone()[0] == 1
+
+
+@pytest.mark.parametrize("count,cutoff", [(-1, 3), (1, float("nan")), (1, 0)])
+def test_obsolete_session_cleanup_rejects_invalid_predicates(
+    db_manager: DatabaseManager, count: int, cutoff: float
+) -> None:
+    with pytest.raises(ValidationError):
+        db_manager.schema.drop_obsolete_sessions(
+            expected_count=count, expires_before=cutoff
+        )
+
+
 @pytest.fixture
 def temp_db_path(tmp_path: Path) -> Path:
     """Fixture providing an isolated temporary database path."""
@@ -1321,3 +1397,122 @@ def test_capability_adapter_ownership() -> None:
     assert not hasattr(diagnostics, "create_settings_router")
     assert not hasattr(diagnostics, "AcquireLeaseRequest")
     assert not hasattr(diagnostics, "create_persistence_router")
+
+
+def test_settings_atomic_delete_conflict_and_backup(tmp_path: Path) -> None:
+    """Update/delete share one revision; backup preserves data without overwrite."""
+    store = SettingsStore(tmp_path / "source.db")
+    store.initialize()
+    revision, _ = store.update_batch(
+        {
+            "application": {"config_global": {"unknown": "keep"}},
+            "config.global": {"sounds_off": True},
+        }
+    )
+    before = store.read_all()
+    with pytest.raises(RevisionConflictError):
+        store.update_batch(
+            {"application": {"config_global": {"sounds_off": True}}},
+            deletions=(("config.global", "sounds_off"),),
+            expected_revision=revision - 1,
+        )
+    assert store.read_all() == before
+    backup = tmp_path / "backups" / "backup.db"
+    store.backup_to(backup)
+    assert SettingsStore(backup).read_all() == before
+    with pytest.raises(ValidationError):
+        store.backup_to(backup)
+    with pytest.raises(ValidationError):
+        store.backup_to(store.db_path)
+    for deletions in (
+        (("_system", "revision"),),
+        (("config.global", "sounds_off"), ("config.global", "sounds_off")),
+    ):
+        with pytest.raises(ValidationError):
+            store.update_batch({}, deletions=deletions)
+    final, rows = store.update_batch(
+        {"application": {"config_global": {"sounds_off": True, "unknown": "keep"}}},
+        deletions=(("config.global", "sounds_off"),),
+        expected_revision=revision,
+    )
+    assert final == revision + 1
+    assert [(r.scope, r.key) for r in rows] == [("application", "config_global")]
+    assert SettingsStore(backup).read_all() == before
+
+
+def test_host_session_crud_preserves_history_and_filters_issuer(
+    db_manager: DatabaseManager, caplog: pytest.LogCaptureFixture
+) -> None:
+    from app.host.persistence import HostSessionRecord, HostSessionStore
+
+    store = HostSessionStore(db_manager)
+
+    def row(name: str, peer: str) -> HostSessionRecord:
+        return HostSessionRecord(
+            session_id=name,
+            token_hash="hash-" + name,
+            username="test",
+            peer_id=peer,
+            created_at_utc="2026-10-09T00:00:00+00:00",
+            expires_at_utc="2026-10-10T00:00:00+00:00",
+            status="ACTIVE",
+        )
+
+    with caplog.at_level("INFO"):
+        store.create(row("one", "peer-one"))
+        store.create(row("two", "peer-two"))
+        assert (
+            store.update_status(
+                peer_id="peer-one",
+                expected_status="ACTIVE",
+                status="REVOKED",
+                revoked_at_utc="2026-10-09T01:00:00+00:00",
+                token_hash="hash-one",
+                username="test",
+            )
+            == 1
+        )
+        assert (
+            store.update_status(
+                peer_id="peer-one",
+                expected_status="ACTIVE",
+                status="EXPIRED",
+                revoked_at_utc=None,
+            )
+            == 0
+        )
+    assert "hash-one" not in caplog.text
+    assert "Host session record inserted" in caplog.text
+    assert "Host session records updated" in caplog.text
+    assert store.list_records(peer_id="peer-one")[0].status == "REVOKED"
+    assert store.list_records(peer_id="peer-two")[0].status == "ACTIVE"
+    store.initialize()
+    assert len(store.list_records(peer_id="peer-one")) == 1
+    with pytest.raises(sqlite3.IntegrityError):
+        store.create(row("one", "peer-one"))
+    assert len(store.list_records(peer_id="peer-one")) == 1
+    with db_manager.connection(query_only=True) as conn:
+        assert (
+            conn.execute(
+                "SELECT name FROM sqlite_master WHERE name='host_sessions'"
+            ).fetchone()
+            is None
+        )
+    with pytest.raises(ValidationError):
+        store.list_records(peer_id="peer-one", limit=0)
+
+
+def test_host_session_store_rejects_incompatible_schema(
+    db_manager: DatabaseManager,
+) -> None:
+    from app.host.persistence import HostSessionStore
+
+    with db_manager.transaction() as conn:
+        conn.execute("CREATE TABLE host_session (unexpected TEXT)")
+    with pytest.raises(IncompatibleSchemaError):
+        HostSessionStore(db_manager).initialize()
+    with db_manager.connection(query_only=True) as conn:
+        assert (
+            conn.execute("PRAGMA table_info(host_session)").fetchone()["name"]
+            == "unexpected"
+        )

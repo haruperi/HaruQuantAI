@@ -113,7 +113,7 @@ The host boot sequence executes sequentially through well-defined stages:
 * **WAL Mode & Concurrency:** Configured with `journal_mode=WAL`, `synchronous=NORMAL`, and busy timeout handling for robust concurrent read/write operations.
 * **Transactions & Migrations:** Centralizes schema creation, migrations, and transactional execution. Schema initialization does not seed business data.
 * **CRUD-only Boundary:** Small stores group related row operations. No application module outside persistence.py may execute SQL or borrow connections/cursors. Stores return records/results; atomic revision, lease and group/member predicates stay inside transactions.
-* **Business Owners:** settings owns validation/snapshots; jobs owns job lifecycle and worker leases; session owns scope binding/authorization; bootstrap sequences recovery; diagnostics owns database/workspace path inspection and its HTTP/CLI access. Each business owner may provide Python, UI, HTTP and CLI access to that same capability: settings access in settings, worker lease access in jobs, recovery access/composition in bootstrap. Persistence remains CRUD and its required database infrastructure only. Workspace instrument/session services explicitly initialize business defaults. No new coordination module is needed.
+* **Business Owners:** settings owns validation/snapshots; jobs owns job lifecycle and worker leases; session owns scope binding/authorization, password authentication, local credential provisioning and the single ephemeral session store; bootstrap sequences recovery; diagnostics owns database/workspace path inspection and its HTTP/CLI access. Each business owner may provide Python, UI, HTTP and CLI access to that same capability: settings access in settings, worker lease access in jobs, recovery access/composition in bootstrap. Persistence remains CRUD and its required database infrastructure only. Workspace instrument/session services explicitly initialize business defaults. No new coordination module is needed.
 * **Regression Guard:** AST architecture tests enforce database-driver/SQL/handle isolation and prohibit service/transport dependencies in persistence.py.
 * **Default Ownership:** Workspace models/services supply business defaults, complete creation records, domain timestamps and dataset conflict-update columns. Persistence does not invent trading values, session definitions, dataset IDs or quality scores. Existing schema defaults, storage audit timestamps, serialization limits and revision checks remain database infrastructure.
 
@@ -215,5 +215,59 @@ All HaruQuantAI modules adhere to the strict quality baseline enforced by CI and
 HostSettings directly composes persistence.SettingsStore for retrieval and
 validated updates. The global `settings = HostSettings()` is lazy; scoped dot
 access uses cached values, updates refresh that cache, and reload observes other
-writers. No settings service/store wrapper, HTTP handlers or filesystem probes
-belong in settings.py. Persisted snapshots exclude constructor runtime overrides.
+writers. Settings HTTP handlers belong in settings.py; filesystem probes belong
+in diagnostics.py. There is no second settings service/store wrapper. Persisted
+snapshots exclude constructor runtime overrides. Authenticated UI reads and writes
+use this same HostSettings -> SettingsStore -> host_settings path. Bootstrap wires
+revision-only settings.changed notifications to the existing event bus after
+committed HTTP writes. Open dialogs submit against their opening revision; stale
+drafts are rejected, and failed saves retain drafts. Host settings are not stored
+in browser local storage. Remote/SMTP preferences do not activate their services
+or persist passwords.
+
+
+Browser host sessions retain their opaque token and server-issued 24-hour expiry
+in host-scoped versioned local storage. HostConnection validates /sessions/me on
+reload before loading settings and resuming SSE; it does not mint a new session.
+Passwords are not stored, and expiry/revocation/credential changes remove the
+saved session when rejected. Network outages and component cleanup preserve it.
+Server sessions still reside in the shared runtime SessionManager; backend
+restart invalidates them. Browser storage failures are surfaced explicitly.
+
+The seven-tab Configuration UI follows SQX reference presentation while retaining
+HaruQuantAI settings storage contracts. HostSettings validates preference types
+and modes; persistence.SettingsStore owns all SQL and atomic row writes. The
+data-frame guard is a warn/stop/off preference; memory cleanup uses 0 minutes for
+never. Default databank sync uses null for never and 0 for immediately. CPU count
+is runtime status, not a database preference. Java/engine/browser execution
+effects belong to their capability owners. Applying defaults to all existing
+databanks requires a future backend databank capability; settings must not invent
+that operation or claim it succeeded after saving a global default.
+### Host settings UI catalogue and account boundary
+
+Host settings forms use a settings-owned field catalogue with an HTTP allowlist,
+primitive/list validation and recursive secret redaction. Nested application
+records are the sole persisted preferences/account source; dotted HTTP names are
+in-memory aliases. Explicit revision-checked saves merge JSON leaves atomically through
+`HostSettings -> persistence.SettingsStore`. No startup migration or ad-hoc SQL
+is introduced. Unknown metadata and system-owned revision/bound port are read-only.
+
+Notification, broker and AI credentials use write-only replacement/clear controls;
+secret values are never returned to the browser or persisted in its UI store.
+Account password verification/hashing and all-session revocation belong to
+`session.py`; settings.py owns configuration retrieval/validation/update. The
+User access form cannot disable authentication or reduce sessions below 24 hours.
+Saving preferences does not implement or activate their owning runtime capability.
+
+The stored backend port is the `backend_port` JSON leaf in the existing
+`application/app_general` settings record. Runtime catalogue metadata must not
+duplicate it. The obsolete `host_sessions` table is removed only through explicit
+backed-up maintenance. The retained `host_session` table is not used to resurrect
+tokens; `SessionManager` remains the in-memory login authority.
+
+Host session issuance from UI or CLI/Python persists lifecycle metadata through
+`persistence.HostSessionStore` into the existing `host_session` table. Token hashing,
+IDs, timestamps and lifecycle policy belong to `session.py`; SQL and transactions
+remain exclusive to `persistence.py`. Database records contain no bearer tokens,
+roles or elevated grants and cannot restore authority after restart. Revocation
+updates are issuer-scoped, and failed persistence cannot issue a usable token.

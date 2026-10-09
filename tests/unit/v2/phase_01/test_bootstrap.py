@@ -27,9 +27,30 @@ from app.host.bootstrap import (
     main as bootstrap_main,
 )
 from app.host.persistence import DatabaseManager, IncompatibleSchemaError, SettingsStore
+from app.host.session import hash_password
 from app.host.settings import HostSettings as AppSettings
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
+
+@pytest.fixture(autouse=True)
+def isolated_default_store(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Resolve pre-existing default-path fixtures to a temporary host store."""
+    from app.host import persistence
+    from app.host.settings import HostSettings
+
+    path = tmp_path / "default-host.db"
+    monkeypatch.setattr(persistence, "DEFAULT_DATABASE_PATH", path)
+    settings = HostSettings(path)
+    settings.update(
+        {
+            "app.general": {"host": "127.0.0.1", "backend_port": 8000},
+            "config.troubleshooting": {"debug_level_active": False},
+            "workspace_paths": {"data_dir": str(tmp_path / "data")},
+        }
+    )
+    monkeypatch.setattr("app.host.bootstrap.default_host_settings", settings)
+    monkeypatch.setattr("app.main.default_host_settings", settings)
 
 
 def test_bootstrap_normal_startup_and_stop(
@@ -228,8 +249,7 @@ def test_fastapi_shell_endpoints_and_lifespan(
         """
         INSERT INTO host_settings (scope, key, value_json, schema_version, updated_at_utc)
         VALUES
-            ('app.general', 'theme', '"dark"', 1, '2026-10-07T00:00:00Z'),
-            ('app.general', 'zoom', '1.0', 1, '2026-10-07T00:00:00Z')
+            ('application', 'app_general', '{"theme":"dark","zoom":1.0}', 1, '2026-10-07T00:00:00Z')
         """
     )
     conn.commit()
@@ -238,6 +258,14 @@ def test_fastapi_shell_endpoints_and_lifespan(
 
     settings = HostSettings(
         title="Test Shell", version="2.1.0", reference_cohort="SQX145 Dev 1"
+    )
+    app_config.update(
+        {
+            "user_access": {
+                "username": "operator",
+                "password_hash": hash_password("test-password"),
+            }
+        }
     )
     runtime = HostRuntime(settings)
     app = create_host_app(settings, runtime=runtime, configuration=app_config)
@@ -248,6 +276,9 @@ def test_fastapi_shell_endpoints_and_lifespan(
     assert len(comp_logs) >= 1
 
     with TestClient(app) as client:
+        login = client.post("/api/v1/auth/login", json={"password": "test-password"})
+        assert login.status_code == 200
+        client.headers["Authorization"] = "Bearer " + login.json()["data"]["token"]
         # App is in lifespan: runtime should be ready
         assert runtime.is_ready()
 
@@ -259,6 +290,11 @@ def test_fastapi_shell_endpoints_and_lifespan(
         assert data["data"]["is_ready"] is True
         assert data["data"]["version"] == "2.1.0"
         assert data["data"]["reference_cohort"] == "SQX145 Dev 1"
+        for detected, expected in ((12, 12), (None, 1), (0, 1)):
+            with patch("app.host.bootstrap.os.cpu_count", return_value=detected):
+                assert (
+                    client.get("/api/v1/status").json()["data"]["cpu_count"] == expected
+                )
 
         # 2. /readiness
         resp_ready = client.get("/api/v1/readiness")
@@ -285,13 +321,13 @@ def test_fastapi_shell_endpoints_and_lifespan(
         resp_settings = client.get("/api/v1/settings")
         assert resp_settings.status_code == 200
         settings_data = resp_settings.json()["data"]
-        assert settings_data["revision"] == 1
+        assert settings_data["revision"] == 2
         assert settings_data["values"]["app.general"]["theme"] == "dark"
 
         update_resp = client.put(
             "/api/v1/settings",
             json={
-                "expected_revision": 1,
+                "expected_revision": 2,
                 "changes": {
                     "app.general": {"theme": "light", "zoom": 1.1},
                 },
@@ -299,12 +335,14 @@ def test_fastapi_shell_endpoints_and_lifespan(
         )
         assert update_resp.status_code == 200
         updated_data = update_resp.json()["data"]
-        assert updated_data["revision"] == 2
+        assert updated_data["revision"] == 3
         assert updated_data["values"]["app.general"]["theme"] == "light"
         assert updated_data["values"]["app.general"]["zoom"] == 1.1
 
         # 6. /auth/login
-        resp_login = client.post("/api/v1/auth/login")
+        resp_login = client.post(
+            "/api/v1/auth/login", json={"password": "test-password"}
+        )
         assert resp_login.status_code == 200
         assert "token" in resp_login.json()["data"]
 
@@ -517,3 +555,121 @@ def test_recovery_cli_failure_closes_database(
             recover.return_value = {"status": outcome, "pruned_expired_leases": 0}
         assert reconcile_database(tmp_path / "failed-recovery.db") == expected
         close.assert_called_once()
+
+
+def test_password_login_shared_session_integration(tmp_path: Path) -> None:
+    """Real host login shares authority across settings, SSE, me and revocation."""
+    from app.host.session import AuthenticationError
+    from app.host.transport import get_event_bus
+
+    settings = HostSettings(
+        tmp_path / "integrated-login.db", data_dir=tmp_path / "data"
+    )
+    settings.update(
+        {
+            "application": {"app_general": {"theme": "dark"}},
+            "user_access": {
+                "username": "configured-user",
+                "password_hash": hash_password("test-password"),
+            },
+        }
+    )
+    runtime = HostRuntime(settings)
+    app = create_host_app(settings, runtime=runtime, configuration=settings)
+    with TestClient(app) as client:
+        assert client.post("/api/v1/auth/login", json={}).status_code == 401
+        assert (
+            client.post("/api/v1/auth/login", json={"password": "wrong"}).status_code
+            == 401
+        )
+        assert client.post("/api/v1/app-loaded").status_code == 401
+        assert not runtime.is_app_loaded()
+        assert client.get("/api/v1/settings").status_code == 401
+        login = client.post("/api/v1/auth/login", json={"password": "test-password"})
+        assert login.status_code == 200
+        token = login.json()["data"]["token"]
+        headers = {"Authorization": f"Bearer {token}"}
+        assert login.json()["data"]["username"] == "configured-user"
+        assert login.json()["data"]["host_instance_id"] == runtime.host_instance_id
+        assert client.get("/api/v1/sessions/me", headers=headers).status_code == 200
+        snapshot = client.get("/api/v1/settings", headers=headers)
+        assert snapshot.status_code == 200
+        assert "user_access" not in snapshot.json()["data"]["values"]
+        assert "password_hash" not in snapshot.text
+        assert (
+            client.put(
+                "/api/v1/settings",
+                headers=headers,
+                json={
+                    "expected_revision": 1,
+                    "changes": {"user_access": {"username": "other"}},
+                },
+            ).status_code
+            == 422
+        )
+        cursor = get_event_bus().current_cursor
+        saved = client.put(
+            "/api/v1/settings",
+            headers=headers,
+            json={
+                "expected_revision": snapshot.json()["data"]["revision"],
+                "changes": {"app.general": {"theme": "light"}},
+            },
+        )
+        assert saved.status_code == 200
+        notification = client.get(
+            f"/api/v1/events?channels=settings.changed&since_cursor={cursor}&limit=1",
+            headers=headers,
+        )
+        assert notification.status_code == 200
+        frame = next(
+            line[6:]
+            for line in notification.text.splitlines()
+            if line.startswith("data: ")
+        )
+        import json
+
+        assert json.loads(frame)["payload"] == {
+            "revision": saved.json()["data"]["revision"]
+        }
+        assert "password_hash" not in notification.text
+        assert client.post("/api/v1/app-loaded", headers=headers).status_code == 200
+        get_event_bus().publish("login.probe", "ping", {"ready": True})
+        stream = client.get(
+            "/api/v1/events?channels=login.probe&since_cursor=0&limit=1",
+            headers=headers,
+        )
+        assert stream.status_code == 200 and "login.probe" in stream.text
+        assert (
+            client.get(
+                "/api/v1/events?limit=1",
+                headers={"Authorization": "Bearer bootstrap-token-fake"},
+            ).status_code
+            == 401
+        )
+        assert (
+            client.post("/api/v1/sessions/revoke", headers=headers).status_code == 200
+        )
+        assert client.get("/api/v1/settings", headers=headers).status_code == 401
+        assert client.get("/api/v1/sessions/me", headers=headers).status_code == 401
+        assert (
+            client.post(
+                "/api/v1/sessions/login",
+                json={"password": "test-password", "role": "system"},
+            ).status_code
+            == 401
+        )
+        fresh = client.post("/api/v1/login", json={"password": "test-password"}).json()[
+            "data"
+        ]["token"]
+    with pytest.raises(AuthenticationError):
+        runtime.session_manager.verify_session(fresh)
+    import warnings
+
+    with warnings.catch_warnings(record=True) as captured:
+        warnings.simplefilter("always")
+        schema = app.openapi()
+    assert "post" in schema["paths"]["/api/v1/auth/login"]
+    assert not any(
+        "Duplicate Operation ID" in str(warning.message) for warning in captured
+    )

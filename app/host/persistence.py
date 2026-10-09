@@ -32,7 +32,8 @@ Purpose:
 
 Key Capabilities:
     - FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION: Create and inspect storage schemas.
-      Associated: `SchemaManager.initialize()`, `SchemaManager.verify_schema()`
+      Associated: `SchemaManager.initialize()`, `SchemaManager.verify_schema()`,
+        `SchemaManager.drop_obsolete_sessions()`
       Logging: INFO initialization; ERROR incompatible required tables/version.
     - FR-HOST-PERSISTENCE-TRANSACTIONS: Atomic writes and connection ownership.
       Associated: `DatabaseManager.connection()`, `DatabaseManager.transaction()`
@@ -40,8 +41,9 @@ Key Capabilities:
     - FR-HOST-PERSISTENCE-TYPED-REPOSITORY: Scoped JSON entity CRUD and revisions.
       Associated: `TypedRepository.get()`, `save()`, `delete()`, `list()`
       Logging: DEBUG reads; INFO writes; WARNING revision conflicts.
-    - FR-HOST-PERSISTENCE-SETTINGS: Setting reads and atomic batch writes.
-      Associated: `SettingsStore.read_all()`, `SettingsStore.update_batch()`
+    - FR-HOST-PERSISTENCE-SETTINGS: Setting reads, batch writes/deletes and backups.
+      Associated: `SettingsStore.read_all()`, `SettingsStore.update_batch()`,
+        `SettingsStore.backup_to()`
       Logging: DEBUG reads; INFO changes; WARNING unavailable/corrupt data.
     - FR-HOST-PERSISTENCE-JOBS: Job row reads/writes and conditional field updates.
       Associated: `JobStore.get_job()`, `upsert_job()`, `update_statuses()`
@@ -55,6 +57,10 @@ Key Capabilities:
     - FR-HOST-PERSISTENCE-SESSIONS: Trading-session row CRUD.
       Associated: `SessionStore.upsert()`, `get_by_name()`, `delete()`
       Logging: DEBUG reads; INFO write results.
+    - FR-HOST-PERSISTENCE-HOST-SESSIONS: Login lifecycle record CRUD.
+      Associated: `HostSessionStore.initialize()`, `create()`, `list_records()`,
+        `update_status()`
+      Logging: INFO storage verification/writes and counts; DEBUG reads.
     - FR-HOST-PERSISTENCE-DATASETS: Metadata CRUD and bar aggregates.
       Associated: `DatasetStore.save()`, `get_by_id()`, `sum_bars()`
       Logging: DEBUG reads; INFO writes.
@@ -126,6 +132,8 @@ __all__ = [
     "DatabaseStatus",
     "DatasetStore",
     "EntityRecord",
+    "HostSessionRecord",
+    "HostSessionStore",
     "IncompatibleSchemaError",
     "InstrumentStore",
     "JobStore",
@@ -1011,6 +1019,74 @@ class SchemaManager:
 
         return True
 
+    def drop_obsolete_sessions(
+        self, *, expected_count: int, expires_before: float
+    ) -> int:
+        """Drop the obsolete table only when its schema and row predicates match.
+
+        The caller owns backup, approval and cutoff policy. This operation never
+        runs during initialization and never changes the singular host_session.
+        """
+        if expected_count < 0 or not (0 < expires_before < float("inf")):
+            raise ValidationError("Invalid obsolete-table cleanup predicates")
+        logger.debug(
+            "Inspecting obsolete session storage",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION"},
+        )
+        with self._db.transaction() as conn:
+            objects = conn.execute(
+                "SELECT type, name, tbl_name, sql FROM sqlite_master"
+            ).fetchall()
+            if not any(row["name"] == "host_sessions" for row in objects):
+                logger.info(
+                    "Obsolete session table already absent",
+                    extra={"fr_id": "FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION"},
+                )
+                return 0
+            columns = conn.execute("PRAGMA table_info(host_sessions)").fetchall()
+            shape = [
+                (r["name"], r["type"], r["notnull"], r["dflt_value"], r["pk"])
+                for r in columns
+            ]
+            if shape != [
+                ("token_hash", "TEXT", 0, None, 1),
+                ("username", "TEXT", 1, None, 0),
+                ("issued_at", "REAL", 1, None, 0),
+                ("expires_at", "REAL", 1, None, 0),
+                ("revoked", "INTEGER", 1, "0", 0),
+            ]:
+                raise IncompatibleSchemaError("Obsolete session schema differs")
+            for row in objects:
+                if row["type"] == "table" and row["name"] == "host_sessions":
+                    continue
+                if row["sql"] and re.search(
+                    r"\bhost_sessions\b", str(row["sql"]), re.IGNORECASE
+                ):
+                    raise IncompatibleSchemaError("Obsolete table has dependencies")
+            row = conn.execute(
+                "SELECT COUNT(*) AS total, COUNT(CASE WHEN "
+                "typeof(issued_at) IN ('real', 'integer') AND "
+                "typeof(expires_at) IN ('real', 'integer') AND "
+                "issued_at <= expires_at AND expires_at <= ? "
+                "THEN 1 END) AS matched FROM host_sessions",
+                (expires_before,),
+            ).fetchone()
+            if row is None:
+                raise CorruptDataError("Obsolete table count unavailable")
+            if row["total"] != expected_count or row["matched"] != expected_count:
+                raise RevisionConflictError(
+                    "Obsolete session rows differ from approval"
+                )
+            conn.execute("DROP TABLE host_sessions")
+        logger.info(
+            "Obsolete session table removed",
+            extra={
+                "row_count": expected_count,
+                "fr_id": "FR-HOST-PERSISTENCE-SCHEMA-VERIFICATION",
+            },
+        )
+        return expected_count
+
 
 # ============================================================================
 # Narrow Typed Repository
@@ -1737,16 +1813,25 @@ class SettingsStore:
         changes: dict[str, dict[str, Any]],
         *,
         expected_revision: int | None = None,
+        deletions: tuple[tuple[str, str], ...] = (),
     ) -> tuple[int, list[SettingRecord]]:
         """Atomically update multiple scoped settings with optimistic locking."""
         logger.debug(
             "SettingsStore.update_batch storage operation",
             extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
         )
-        if not changes:
+        if not changes and not deletions:
             return self.read_all()
 
         validated_items = self._validate_batch_changes(changes)
+        updates = {(scope, key) for scope, key, _, _ in validated_items}
+        if len(deletions) > MAX_BATCH_SIZE or len(set(deletions)) != len(deletions):
+            raise ValidationError("Invalid settings deletion batch.")
+        for scope, key in deletions:
+            validate_identifier(scope, "scope")
+            validate_identifier(key, "key")
+            if scope == "_system" or (scope, key) in updates:
+                raise ValidationError("Protected or ambiguous settings deletion.")
 
         with self._db.transaction() as conn:
             self._check_table_exists(conn)
@@ -1786,6 +1871,13 @@ class SettingsStore:
                 )
                 changed_count += 1
 
+            for scope, key in deletions:
+                cursor = conn.execute(
+                    "DELETE FROM host_settings WHERE scope = ? AND key = ?",
+                    (scope, key),
+                )
+                changed_count += cursor.rowcount
+
             new_revision = (
                 current_revision + 1 if changed_count > 0 else current_revision
             )
@@ -1815,6 +1907,37 @@ class SettingsStore:
             },
         )
         return self.read_all()
+
+    def backup_to(self, destination: Path) -> None:
+        """Create a consistent SQLite backup without overwriting an existing file."""
+        target = destination.resolve()
+        if self._db.is_memory or not self.db_path.exists():
+            raise ValidationError("Backup requires an existing file database.")
+        if target == self.db_path.resolve() or target.exists():
+            raise ValidationError("Backup destination must be a new file.")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        # Exclusive creation closes the existence-check race before SQLite opens it.
+        with target.open("xb"):
+            pass
+        try:
+            with self._db.connection(query_only=True) as source:
+                backup = sqlite3.connect(str(target), timeout=self._busy_timeout)
+                try:
+                    source.backup(backup)
+                    if backup.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                        raise PersistenceError("Backup integrity verification failed.")
+                finally:
+                    backup.close()
+        except sqlite3.Error as exc:
+            logger.error(  # noqa: TRY400 - Never expose database exception payloads.
+                "Settings database backup failed",
+                extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+            )
+            raise PersistenceError("Settings database backup failed.") from exc
+        logger.info(
+            "Settings database backup completed",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
+        )
 
     def _check_table_exists(self, conn: sqlite3.Connection) -> None:
         """Verify that the host_settings table exists."""
@@ -2092,6 +2215,140 @@ class InstrumentStore:
             cur.execute(sql)
             row = cur.fetchone()
             return int(row[0]) if row else 0
+
+
+class HostSessionRecord(BaseModel):
+    """Stored login lifecycle metadata without a usable bearer token."""
+
+    session_id: str
+    token_hash: str = Field(repr=False)
+    username: str
+    peer_id: str
+    created_at_utc: str
+    expires_at_utc: str
+    revoked_at_utc: str | None = None
+    status: str
+
+
+class HostSessionStore:
+    """CRUD for the existing singular host_session login lifecycle table."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        self._db = db
+        self._initialized = False
+
+    @property
+    def db_path(self) -> Path:
+        """Return the storage target for service binding checks."""
+        return self._db.database_path
+
+    def initialize(self) -> None:
+        """Create the identical singular schema if absent, then verify columns."""
+        if self._initialized:
+            return
+        with self._db.transaction() as conn:
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS host_session ("
+                "session_id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE, "
+                "username TEXT NOT NULL, peer_id TEXT NOT NULL, "
+                "created_at_utc TEXT NOT NULL, expires_at_utc TEXT NOT NULL, "
+                "revoked_at_utc TEXT, status TEXT NOT NULL)"
+            )
+            columns = conn.execute("PRAGMA table_info(host_session)").fetchall()
+            shape = [(r["name"], r["type"], r["notnull"], r["pk"]) for r in columns]
+            if shape != [
+                ("session_id", "TEXT", 0, 1),
+                ("token_hash", "TEXT", 1, 0),
+                ("username", "TEXT", 1, 0),
+                ("peer_id", "TEXT", 1, 0),
+                ("created_at_utc", "TEXT", 1, 0),
+                ("expires_at_utc", "TEXT", 1, 0),
+                ("revoked_at_utc", "TEXT", 0, 0),
+                ("status", "TEXT", 1, 0),
+            ]:
+                raise IncompatibleSchemaError("Host session schema differs")
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_host_session_status "
+                "ON host_session(status)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_host_session_peer_id "
+                "ON host_session(peer_id)"
+            )
+            conn.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_host_session_token_hash "
+                "ON host_session(token_hash)"
+            )
+        self._initialized = True
+        logger.info(
+            "Host session storage verified",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-HOST-SESSIONS"},
+        )
+
+    def create(self, record: HostSessionRecord) -> None:
+        """Insert caller-provided metadata atomically."""
+        self.initialize()
+        with self._db.transaction() as conn:
+            conn.execute(
+                "INSERT INTO host_session (session_id,token_hash,username,peer_id,"
+                "created_at_utc,expires_at_utc,revoked_at_utc,status) "
+                "VALUES (?,?,?,?,?,?,?,?)",
+                tuple(record.model_dump().values()),
+            )
+        logger.info(
+            "Host session record inserted",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-HOST-SESSIONS"},
+        )
+
+    def list_records(
+        self, *, peer_id: str, limit: int = 1000
+    ) -> list[HostSessionRecord]:
+        """Read a bounded set of records belonging to the requested issuer."""
+        if not 1 <= limit <= MAX_READ_LIMIT:
+            raise ValidationError("Invalid host session read limit")
+        self.initialize()
+        with self._db.connection(query_only=True) as conn:
+            rows = conn.execute(
+                "SELECT * FROM host_session WHERE peer_id=? "
+                "ORDER BY created_at_utc,session_id LIMIT ?",
+                (peer_id, limit),
+            ).fetchall()
+        logger.debug(
+            "Host session records read",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-HOST-SESSIONS", "count": len(rows)},
+        )
+        return [HostSessionRecord.model_validate(dict(row)) for row in rows]
+
+    def update_status(
+        self,
+        *,
+        peer_id: str,
+        expected_status: str,
+        status: str,
+        revoked_at_utc: str | None,
+        token_hash: str | None = None,
+        username: str | None = None,
+    ) -> int:
+        """Conditionally update only the requested issuer and optional row filters."""
+        self.initialize()
+        sql = (
+            "UPDATE host_session SET status=?,revoked_at_utc=? "
+            "WHERE peer_id=? AND status=?"
+        )
+        values: list[str | None] = [status, revoked_at_utc, peer_id, expected_status]
+        if token_hash is not None:
+            sql += " AND token_hash=?"
+            values.append(token_hash)
+        if username is not None:
+            sql += " AND username=?"
+            values.append(username)
+        with self._db.transaction() as conn:
+            count = conn.execute(sql, values).rowcount
+        logger.info(
+            "Host session records updated",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-HOST-SESSIONS", "count": count},
+        )
+        return count
 
 
 class SessionStore:

@@ -8,17 +8,19 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) { return
 export function Checkbox({ label, checked, onChange, disabled }: { label: string; checked: boolean; onChange: (value: boolean) => void; disabled?: boolean }) { return <label className={`check ${disabled ? 'disabled' : ''}`}><input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} disabled={disabled}/><span>{label}</span></label>; }
 export function Select({ value, onChange, children, disabled }: { value: string; onChange: (value: string) => void; children: ReactNode; disabled?: boolean }) { return <select className="text-input" value={value} onChange={e => onChange(e.target.value)} disabled={disabled}>{children}</select>; }
 export function Section({ title, description, children, actions }: { title: string; description?: string; children: ReactNode; actions?: ReactNode }) { return <section className="section"><header><div><h3>{title}</h3>{description && <p>{description}</p>}</div>{actions}</header><div className="section-body">{children}</div></section>; }
-export function Modal({ title, onClose, children, footer, width = 620 }: { title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; width?: number }) {
+export function Modal({ title, onClose, children, footer, width = 620, className = '', showHeaderClose = true }: { title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; width?: number; className?: string; showHeaderClose?: boolean }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const titleId = `modal-title-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const close = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', close);
-    closeButtonRef.current?.focus();
+    if (showHeaderClose) closeButtonRef.current?.focus();
+    else dialogRef.current?.querySelector<HTMLElement>('button, input, select')?.focus();
     return () => { document.removeEventListener('keydown', close); previousFocus?.focus(); };
   }, [onClose]);
-  return <div className="modal-backdrop" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}><div className="modal" role="dialog" aria-modal="true" aria-labelledby={titleId} style={{ width }}><header><h2 id={titleId}>{title}</h2><IconButton ref={closeButtonRef} title="Close" onClick={onClose}><X size={16}/></IconButton></header><div className="modal-content">{children}</div>{footer && <footer>{footer}</footer>}</div></div>;
+  return <div className="modal-backdrop" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}><div ref={dialogRef} className={`modal ${className}`} role="dialog" aria-modal="true" aria-labelledby={titleId} style={{ width }}><header><h2 id={titleId}>{title}</h2>{showHeaderClose && <IconButton ref={closeButtonRef} title="Close" onClick={onClose}><X size={16}/></IconButton>}</header><div className="modal-content">{children}</div>{footer && <footer>{footer}</footer>}</div></div>;
 }
 export function ProgressBar({ value, label }: { value: number; label?: string }) { return <div className="progress-track"><div style={{ width: `${Math.max(0, Math.min(100, value))}%` }}><span>{label ?? `${Math.round(value)}%`}</span></div></div>; }
 export function Stat({ label, value, tone }: { label: string; value: ReactNode; tone?: 'good' | 'bad' }) { return <div className="stat"><span>{label}</span><strong className={tone}>{value}</strong></div>; }

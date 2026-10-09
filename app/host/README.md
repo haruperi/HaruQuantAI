@@ -108,6 +108,7 @@ their owning workspace/plugin. This documentation activates no service or schema
 | `FR-HOST-BOOT-PERSISTENCE-RECOVERY` | bootstrap sequences integrity/schema checks and jobs-owned expired-lease cleanup. | Emits INFO recovery report; fails startup on integrity/schema failure. |
 | `FR-HOST-PERSISTENCE-REST-PROJECTION` | diagnostics owns database inspection HTTP/CLI; bootstrap composes it with jobs lease access and bootstrap recovery. | Emits DEBUG router composition; delegated storage/services log operations. |
 | `FR-HOST-SESS-LOOPBACK-ORIGIN` | Loopback origin validation and DNS rebinding prevention for local workstation HTTP endpoints. | Emits DEBUG on verified loopback request; WARNING on rejected foreign origins or DNS rebinding attempts. |
+| `FR-HOST-SESS-CREDENTIALS` | Verify the configured host password and provision locally through settings/persistence. | INFO setup/authentication; WARNING rejection/cooldown; ERROR sanitized setup failure. |
 | `FR-HOST-SESS-LIFECYCLE` | Ephemeral session token generation, sliding TTL, explicit revocation, and host-restart invalidation. | Emits INFO on session creation and revocation; WARNING on expired or unknown tokens; INFO on restart invalidation. |
 | `FR-HOST-SESS-SCOPE-AUTHORIZATION` | Granular scope checking (`<resource>:<action>` and wildcards) across domains, resources, and tools. | Emits DEBUG on authorized actions; WARNING on permission denial with structured fr_id and requested scope. |
 | `FR-HOST-SESS-DISTINCT-AUTHORITY` | Explicit time-bounded elevation grants for dangerous tasks (live orders, destructive tasks, scripts, mail, paid tools). | Emits WARNING on elevation grant issuance and expiration; ERROR on unauthorized dangerous task attempts. |
@@ -214,5 +215,131 @@ Settings callers use `settings = HostSettings()` (lazy construction), with scope
 access such as `settings.user_access.username`. HostSettings.update validates
 values, delegates atomic writes to persistence.SettingsStore and refreshes its
 cache. reload observes other writers. Snapshots contain persisted values;
-constructor overrides remain in memory. HTTP handlers and directory probes must
-not be added to settings.py; there is no second settings store or store shim.
+constructor overrides remain in memory. Settings HTTP handlers belong in
+settings.py; directory probes belong in diagnostics.py. There is no second
+settings store or store shim.
+
+
+## Host login and account setup
+
+The UI keeps one password field. session.HostAuthentication resolves the configured
+username, checks a versioned salted PBKDF2-SHA256 verifier (600,000 iterations),
+and issues an operator session through the runtime's shared SessionManager.
+Settings and authenticated event streams accept that same session. Wrong/missing
+credentials fail closed; five failures trigger a 60-second retry window.
+
+Credential configuration flows through HostSettings -> persistence.SettingsStore
+-> host_settings (scope `application`, key `user_access`, JSON username/password_hash). No SQL or
+hashing policy is added to persistence. The user_access scope is omitted from
+settings HTTP responses and cannot be changed through the general settings API.
+
+Configure the first account locally, targeting the intended store explicitly:
+
+```bash
+uv run python -m app.host.session --configure-user --username operator --db path/to/database.db
+```
+
+The CLI prompts for password and confirmation without command-line secrets.
+Replacing an existing account requires typing REPLACE. No automatic/default
+account is provisioned. Credential changes invalidate existing sessions when
+verified, including live event stream checks. Tokens remain in server/browser
+memory on the server; the browser retains the token and server expiry for its
+24-hour lifetime. Refresh/reopen validates and resumes the existing session.
+Expiry, revocation and host shutdown/restart require password re-entry.
+Full app-wide authorization and remote exposure remain separate capabilities.
+
+
+## Database-backed UI settings
+
+After password login, the shell reads GET /api/v1/settings. Configuration,
+language, skin, zoom, remote-access preferences and non-secret SMTP preferences
+save through PUT /api/v1/settings -> HostSettings.update -> SettingsStore ->
+host_settings. The server validates writes and checks expected_revision atomically.
+The UI applies the confirmed snapshot and keeps host settings out of browser
+local storage. Reload/re-login reads persisted settings from the host again.
+
+Bootstrap supplies a revision-only settings.changed event callback to the
+settings HTTP router. Successful non-empty writes refresh other authenticated
+windows; rejected writes emit no notification. A callback failure is logged while
+the committed save remains successful. Reconnect also reloads settings. Local CLI
+or separate-process updates are observed on reload/reconnect, without a database
+watcher. Dialogs retain their opening revision and reject stale submissions so an
+old draft cannot undo newer changes; close/reopen the dialog to review and retry.
+
+Remote access and SMTP controls currently persist preferences only. They do not
+start a remote server, store SMTP/remote passwords, or send email. Account
+credentials remain session-owned local configuration, excluded from this API.
+
+
+Browser session retention uses a versioned local-storage record scoped to the
+host URL, containing only the opaque token and server-issued expires_at. Startup
+checks /sessions/me before reloading settings and opening the event stream.
+Ordinary refreshes/remounts and transient network errors preserve the record;
+invalid/expired/revoked sessions remove it and show the password dialog. The
+password is never stored. If browser storage is blocked, an explicit message
+explains that the current in-memory login will not survive refresh. Browser
+retention does not make the in-memory backend session survive a backend restart.
+
+Configuration mirrors the seven SQX reference tabs. Every editable preference
+round-trips through authenticated revision-checked settings requests and
+HostSettings → persistence.SettingsStore → host_settings. The new
+config.global.data_frame_guard accepts warn/stop/off (missing value defaults to
+warn in the UI); config.memory.cleanup_interval_mins accepts 0 for never plus
+5/15/30/60 minutes. Databank intervals retain null for never and 0 for immediate.
+Status reports detected logical CPU count rather than a fixed demonstration value.
+Hidden thread-affinity values remain stored and are not rewritten by unrelated
+UI edits. Reference examples do not override existing saved configuration.
+
+These are preference and UI contracts. Java GC, engine metrics/project guards,
+resource scheduling, .sq4 synchronization and browser GPU changes require their
+runtime capability owners; storing a preference does not establish execution
+parity. Apply-to-all existing databanks stays unavailable because no backend
+databank entity/service exists. It is a command, not a host_settings row.
+### Complete host settings UI coverage
+
+Application settings now includes Notifications (Desktop, Email, Telegram),
+User access, Credentials (MT5, cTrader, AI agents), and Advanced settings
+(General, Workspace, Backtest, Calibration, Runtime). SMTP opens the same Email
+form; MCP exposes its saved configuration. Configuration includes thread affinity.
+
+`GET /settings/catalogue` exposes a typed field inventory. Every supported leaf
+has a control or a read-only disposition; unsupported metadata is listed without
+values. Known secret leaves expose only configured/unconfigured state. Blank
+secret input preserves the value; entered replacement or explicit Clear sends a
+write-only `PUT /settings/secrets` request. Mixed secret/preference changes commit
+atomically at the opening revision. Neither secret drafts nor catalogues enter
+the persisted browser store. Stored secret encryption is not added by these forms.
+
+Existing `application.<group>` JSON records are the canonical consumer records.
+Dotted HTTP scopes and Python dot access are in-memory aliases only. Explicit
+updates merge changed leaves only into the existing group value_json in one
+revision-checked SettingsStore transaction; no scalar/mirror rows are created.
+Header custom text belongs to app_general; remote access is its remote_access
+object. One-time consolidation preserves current effective values and working
+credentials, backs up the database and deletes only explicitly approved duplicate
+rows. Reads/startup never migrate or delete rows.
+Separate SSL/TLS flags are retained. Saved settings do not start senders, OAuth,
+MCP, agents or broker connections, move workspace files, or authorize trading.
+
+Session-owned `GET/PUT /auth/account` retrieves username/effective session duration
+and changes the account after current-password verification. New passwords are
+hashed server-side; hashes/salts never reach the browser. Saving revokes all
+sessions and requires signing in again. Duration is 1440–43200 minutes, with a
+24-hour minimum. Credentials and duration belong to the same application/user_access
+JSON record. The current versioned password hash is preserved during consolidation;
+the existing password_salt compatibility field matches its embedded salt.
+Authentication and browser retention remain required; their compatibility switches
+and language are read-only data.
+
+Backend port preferences use only `application / app_general / backend_port`.
+The configuration catalogue does not retain `host / bound_port` metadata.
+An explicit, backed-up cleanup removed the unused plural `host_sessions` table;
+`host_session` preserves its historical rows. Neither table is authentication authority:
+login tokens remain in memory and backend restart invalidates them.
+
+SessionManager now records UI and CLI/Python issuance in the existing singular
+`host_session` table via `persistence.HostSessionStore`. It stores a UUID, SHA-256
+token hash, username, issuing runtime as peer_id, UTC creation/expiry timestamps,
+revocation timestamp and status. Expiry/revocation/reset update only issuer-owned
+records. Tokens remain in memory and are never restored from these records.
+Issuance must commit before returning access; storage failures fail closed.

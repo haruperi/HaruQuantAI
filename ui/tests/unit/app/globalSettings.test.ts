@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+it('validates the new data-frame and cleanup preference contracts', () => {
+  const value = createDefaultConfiguration();
+  expect(validateConfiguration({ ...value, dataFrameGuard: 'off', cleanupInterval: 'never' })).toBeNull();
+  expect(validateConfiguration({ ...value, dataFrameGuard: 'unknown' as never })).toContain('Data frame');
+  expect(validateConfiguration({ ...value, cleanupInterval: 'unknown' as never })).toContain('cleanup interval');
+});
+
 import {
   applicationLanguages,
   applicationSkins,
@@ -19,13 +26,12 @@ describe('global settings contracts', () => {
   it('matches the audited HaruQuantAI menu groups and configuration tabs', () => {
     expect(globalMenuGroups.flat().map(id => globalMenuLabels[id])).toEqual([
       'Configuration...', 'Benchmark...', 'Remote access...', 'MCP Server...', 'SMTP server...',
-      'Language', 'Skin', 'Zoom', 'HaruQuantAI Website', 'Help center', 'Support',
-      'Update license', 'About', 'Reload UI', 'Exit',
+      'Notifications...', 'User access...', 'Credentials...', 'Advanced settings...', 'Skin', 'Zoom', 'Reload UI', 'Exit',
     ]);
     expect(configurationTabs).toEqual(['Global', 'CPU', 'Performance', 'Memory', 'Databanks', 'Optimizations', 'Troubleshooting']);
   });
 
-  it('keeps the active languages and skins explicit', () => {
+  it('retains stored-language compatibility and available skins', () => {
     expect(applicationLanguages).toHaveLength(12);
     expect(applicationLanguages[0]).toBe('English');
     expect(applicationSkins).toEqual(['Dark skin', 'Light skin']);

@@ -1,6 +1,11 @@
 """Unified HTTP and event transport subsystem for the HaruQuantAI platform host.
 
 Description:
+    Authentication and ephemeral session policy belong to session.py. This module
+    composes session-owned auth routes and validates event access through the
+    injected shared capability; its SessionTokenManager export is a compatibility
+    re-export with no separate token store. Live streams recheck authority.
+
     Provides the central HTTP transport middleware, versioned request/response
     correlation, session authentication, in-memory multi-channel event bus, and
     authenticated Server-Sent Events (SSE) streaming engine for the HaruQuantAI
@@ -35,9 +40,9 @@ Key Capabilities:
     - FR-HOST-TRANSPORT-SESSION-AUTH: Token-based session authentication and bearer
       validation.
       Associated: `[SessionTokenManager.create_token()]`,
-      `[SessionTokenManager.verify_token()]`, `[TransportService.handle_login()]`
-      Logging: Emits INFO on token creation; WARNING on missing, invalid, or expired
-      session credentials.
+      `[SessionTokenManager.verify_token()]`, session-owned HTTP handlers
+      Logging: Delegated session lifecycle emits INFO creation and WARNING invalid
+      or expired sessions; transport logs connection/disconnection.
     - FR-HOST-TRANSPORT-EVENT-BUS: In-memory multi-channel event broker with
       monotonic cursors and ring buffer.
       Associated: `[EventBus.publish()]`, `[EventBus.subscribe()]`
@@ -95,9 +100,9 @@ import sys
 import threading
 import time
 from collections import deque
-from collections.abc import AsyncGenerator, Sequence
+from collections.abc import AsyncGenerator, Callable, Sequence
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any, Final
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query, Request, Response, status
@@ -109,6 +114,17 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.host.logging import get_logger
 from app.host.response import StandardError, StandardResponse
+from app.host.session import (
+    AuthenticationError,
+    HostAuthentication,
+    LoginRequest,
+    SessionExpiredError,
+    SessionTokenManager,
+    create_auth_router,
+    get_global_session_manager,
+)
+from app.host.session import SessionToken as LoginResponse
+from app.host.settings import HostSettings
 
 __all__ = [
     "ApiResponse",
@@ -141,7 +157,6 @@ ApiResponse = StandardResponse
 
 DEFAULT_RING_CAPACITY: Final[int] = 1024
 DEFAULT_MAX_QUEUE_SIZE: Final[int] = 256
-DEFAULT_TOKEN_TTL_SEC: Final[int] = 86400  # 24 hours
 DEFAULT_HEARTBEAT_SEC: Final[float] = 15.0
 
 
@@ -157,14 +172,6 @@ def _now_utc_iso() -> str:
 
 class TransportError(Exception):
     """Base exception for all transport-layer failures."""
-
-
-class AuthenticationError(TransportError):
-    """Raised when authentication credentials or tokens are invalid."""
-
-
-class SessionExpiredError(AuthenticationError):
-    """Raised when an active session token has expired."""
 
 
 class EventStreamError(TransportError):
@@ -188,25 +195,6 @@ class ValidationIssue(BaseModel):
     path: str = Field(description="Field path that failed validation")
     code: str = Field(description="Issue code identifier")
     message: str = Field(description="Human-readable description of the problem")
-
-
-class LoginRequest(BaseModel):
-    """Credentials submitted for session authentication."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    username: str = Field(default="operator", description="Operator username")
-    password: str = Field(default="", description="Operator password")
-
-
-class LoginResponse(BaseModel):
-    """Session credentials issued upon successful authentication."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    token: str = Field(description="Opaque bearer session token")
-    username: str = Field(description="Authenticated username")
-    expires_at: str = Field(description="ISO 8601 UTC expiration timestamp")
 
 
 class HostEvent(BaseModel):
@@ -254,78 +242,6 @@ class PublishEventRequest(BaseModel):
 # -----------------------------------------------------------------------------
 # Session Token Manager
 # -----------------------------------------------------------------------------
-
-
-class SessionTokenManager:
-    """Thread-safe in-memory session token store with TTL expiration."""
-
-    def __init__(self, default_ttl_sec: int = DEFAULT_TOKEN_TTL_SEC) -> None:
-        self.default_ttl_sec = default_ttl_sec
-        self._tokens: dict[str, tuple[str, datetime]] = {}
-        self._lock = threading.Lock()
-
-    def create_token(self, username: str, ttl_sec: int | None = None) -> LoginResponse:
-        """Create and store a new opaque session token for the user."""
-        ttl = ttl_sec if ttl_sec is not None else self.default_ttl_sec
-        token = secrets.token_hex(32)
-        expires_at = datetime.now(UTC) + timedelta(seconds=ttl)
-        with self._lock:
-            self._tokens[token] = (username, expires_at)
-        logger.info(
-            "SessionTokenManager created token: username=%s expires_at=%s",
-            username,
-            expires_at.isoformat(),
-            extra={"requirement": "FR-HOST-TRANSPORT-SESSION-AUTH"},
-        )
-        return LoginResponse(
-            token=token,
-            username=username,
-            expires_at=expires_at.isoformat(),
-        )
-
-    def verify_token(self, token: str) -> str:
-        """Validate token and return username.
-
-        Raises:
-            AuthenticationError: If token does not exist.
-            SessionExpiredError: If token has passed expiration.
-        """
-        with self._lock:
-            record = self._tokens.get(token)
-            if not record:
-                logger.warning(
-                    "SessionTokenManager rejected token: token not found",
-                    extra={"requirement": "FR-HOST-TRANSPORT-SESSION-AUTH"},
-                )
-                raise AuthenticationError("Invalid or missing session token.")
-            username, expires_at = record
-            if datetime.now(UTC) > expires_at:
-                self._tokens.pop(token, None)
-                logger.warning(
-                    "SessionTokenManager rejected token: expired for username=%s",
-                    username,
-                    extra={"requirement": "FR-HOST-TRANSPORT-SESSION-AUTH"},
-                )
-                raise SessionExpiredError("Session token has expired.")
-            return username
-
-    def is_valid(self, token: str) -> bool:
-        """Return True if token exists and is not expired."""
-        try:
-            self.verify_token(token)
-            return True
-        except AuthenticationError, SessionExpiredError:
-            return False
-
-    def revoke_token(self, token: str) -> bool:
-        """Revoke a token, returning True if it was present."""
-        with self._lock:
-            return self._tokens.pop(token, None) is not None
-
-    def clear(self) -> None:
-        """Clear all active tokens."""
-        with self._lock:
-            self._tokens.clear()
 
 
 # -----------------------------------------------------------------------------
@@ -528,7 +444,9 @@ def get_global_token_manager() -> SessionTokenManager:
     if _STATE.token_manager is None:
         with _SINGLETON_LOCK:
             if _STATE.token_manager is None:
-                _STATE.token_manager = SessionTokenManager()
+                _STATE.token_manager = SessionTokenManager(
+                    manager=get_global_session_manager()
+                )
     return _STATE.token_manager
 
 
@@ -537,7 +455,7 @@ def get_global_token_manager() -> SessionTokenManager:
 # -----------------------------------------------------------------------------
 
 
-async def sse_event_generator(
+async def sse_event_generator(  # noqa: C901 - Check authority before replay, live frames and heartbeats.
     event_bus: EventBus,
     channels: Sequence[str],
     since_cursor: int | None,
@@ -545,6 +463,7 @@ async def sse_event_generator(
     *,
     heartbeat_interval_sec: float = DEFAULT_HEARTBEAT_SEC,
     limit: int | None = None,
+    session_valid: Callable[[], bool] | None = None,
 ) -> AsyncGenerator[str]:
     """Generate Server-Sent Events stream frames for client subscription."""
     sub_id, queue, replay_events, has_gap = event_bus.subscribe(
@@ -572,6 +491,8 @@ async def sse_event_generator(
             yield f"event: system.gap\ndata: {json.dumps(gap_payload)}\n\n"
 
         for ev in replay_events:
+            if session_valid is not None and not session_valid():
+                return
             yield (
                 f"id: {ev.cursor}\n"
                 f"event: {ev.channel}\n"
@@ -582,6 +503,8 @@ async def sse_event_generator(
                 return
 
         while True:
+            if session_valid is not None and not session_valid():
+                break
             if await request.is_disconnected():
                 break
 
@@ -589,6 +512,8 @@ async def sse_event_generator(
                 event = await asyncio.wait_for(
                     queue.get(), timeout=heartbeat_interval_sec
                 )
+                if session_valid is not None and not session_valid():
+                    break
                 yield (
                     f"id: {event.cursor}\n"
                     f"event: {event.channel}\n"
@@ -751,60 +676,6 @@ class TransportService:
             return token_query.strip()
         return None
 
-    async def handle_login(
-        self, credentials: LoginRequest, request: Request
-    ) -> JSONResponse:
-        """Handle session authentication request."""
-        req_id = request.headers.get("x-request-id")
-        if not credentials.username or not credentials.username.strip():
-            err = StandardError(
-                code="INVALID_CREDENTIALS",
-                message="Username cannot be empty.",
-            )
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content=StandardResponse.failure(
-                    message="Invalid credentials.",
-                    error=err,
-                    request_id=req_id,
-                ).to_dict(),
-            )
-
-        login_resp = self.tokens.create_token(username=credentials.username.strip())
-        resp = StandardResponse.success(
-            data=login_resp.model_dump(),
-            message="Authentication successful.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_auth_status(
-        self, request: Request, token: str | None = None
-    ) -> JSONResponse:
-        """Query status of active session token."""
-        req_id = request.headers.get("x-request-id")
-        resolved = self.resolve_token(request, token)
-        if not resolved or not self.tokens.is_valid(resolved):
-            err = StandardError(
-                code="UNAUTHORIZED",
-                message="No active session token.",
-            )
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content=StandardResponse.failure(
-                    message="Unauthorized.",
-                    error=err,
-                    request_id=req_id,
-                ).to_dict(),
-            )
-        username = self.tokens.verify_token(resolved)
-        resp = StandardResponse.success(
-            data={"authenticated": True, "username": username},
-            message="Session active.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
     async def handle_events_stream(
         self,
         request: Request,
@@ -854,6 +725,7 @@ class TransportService:
                 since_cursor=effective_cursor,
                 request=request,
                 limit=limit,
+                session_valid=lambda: self.tokens.is_valid(resolved),
             ),
             media_type="text/event-stream",
             headers={
@@ -917,9 +789,10 @@ def create_transport_router(
     service = TransportService(bus, tokens)
     router = APIRouter(tags=["transport"])
 
-    router.add_api_route("/auth/login", service.handle_login, methods=["POST"])
-    router.add_api_route("/login", service.handle_login, methods=["POST"])
-    router.add_api_route("/auth/status", service.handle_auth_status, methods=["GET"])
+    authentication = tokens.authentication or HostAuthentication(
+        HostSettings(), tokens.manager
+    )
+    router.include_router(create_auth_router(authentication))
     router.add_api_route("/events", service.handle_events_stream, methods=["GET"])
     router.add_api_route("/events/publish", service.handle_publish, methods=["POST"])
     router.add_api_route("/events/snapshot", service.handle_snapshot, methods=["GET"])

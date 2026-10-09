@@ -10,10 +10,12 @@ Covers:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import pytest
 from app.host.logging import TelemetryEngine
+from app.host.session import hash_password
+from app.host.settings import HostSettings
 from app.host.transport import (
     AuthenticationError,
     EventBus,
@@ -31,6 +33,27 @@ from app.host.transport import (
 )
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
+
+
+@pytest.fixture(autouse=True)
+def isolated_default_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Standalone transport authentication never accesses the active store."""
+    from app.host import persistence
+
+    monkeypatch.setattr(
+        persistence, "DEFAULT_DATABASE_PATH", tmp_path / "transport-default.db"
+    )
+    settings = HostSettings(tmp_path / "transport-default.db")
+    settings.update(
+        {
+            "user_access": {
+                "username": "operator",
+                "password_hash": hash_password("test-password"),
+            }
+        }
+    )
+    monkeypatch.setattr("app.host.transport.HostSettings", lambda: settings)
+
 
 # -----------------------------------------------------------------------------
 # Session Token Manager Tests
@@ -63,12 +86,8 @@ def test_session_token_manager_lifecycle() -> None:
 def test_session_token_manager_expiration() -> None:
     """Verify expired token raises SessionExpiredError."""
     mgr = SessionTokenManager()
-    token_str = "expired-token-123"
-    # Inject directly an expired token
-    past = datetime.now(UTC) - timedelta(seconds=10)
-    mgr._tokens[token_str] = ("operator", past)
-
-    with pytest.raises(SessionExpiredError, match="Session token has expired"):
+    token_str = mgr.create_token("operator", ttl_sec=-10).token
+    with pytest.raises(SessionExpiredError):
         mgr.verify_token(token_str)
     assert mgr.is_valid(token_str) is False
 
@@ -76,7 +95,7 @@ def test_session_token_manager_expiration() -> None:
 def test_session_token_manager_invalid_token() -> None:
     """Verify non-existent token raises AuthenticationError."""
     mgr = SessionTokenManager()
-    with pytest.raises(AuthenticationError, match="Invalid or missing session token"):
+    with pytest.raises(AuthenticationError, match="Invalid or unknown session token"):
         mgr.verify_token("unknown-token")
 
 
@@ -273,17 +292,33 @@ def test_register_transport_exception_handlers() -> None:
 # -----------------------------------------------------------------------------
 
 
-def test_auth_login_endpoints() -> None:
+def test_auth_login_endpoints(tmp_path: Path) -> None:
     """Verify /auth/login and /login with valid and invalid credentials."""
     app = FastAPI()
     bus = EventBus()
-    tokens = SessionTokenManager()
+    from app.host.session import HostAuthentication, SessionManager, hash_password
+    from app.host.settings import HostSettings
+
+    settings = HostSettings(tmp_path / "login.db")
+    settings.update(
+        {
+            "user_access": {
+                "username": "operator",
+                "password_hash": hash_password("test-password"),
+            }
+        }
+    )
+    manager = SessionManager()
+    authentication = HostAuthentication(settings, manager)
+    tokens = SessionTokenManager(manager=manager, authentication=authentication)
     router = create_transport_router(event_bus=bus, token_manager=tokens)
     app.include_router(router)
     client = TestClient(app)
 
     # Valid login
-    res = client.post("/auth/login", json={"username": "operator", "password": ""})
+    res = client.post(
+        "/auth/login", json={"username": "operator", "password": "test-password"}
+    )
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "success"
@@ -291,13 +326,17 @@ def test_auth_login_endpoints() -> None:
     assert data["data"]["username"] == "operator"
 
     # Also test /login alias
-    res_alias = client.post("/login", json={"username": "operator", "password": ""})
+    res_alias = client.post(
+        "/login", json={"username": "operator", "password": "test-password"}
+    )
     assert res_alias.status_code == 200
     assert "token" in res_alias.json()["data"]
 
     # Invalid login (empty username)
-    res_err = client.post("/auth/login", json={"username": "  ", "password": ""})
-    assert res_err.status_code == 400
+    res_err = client.post(
+        "/auth/login", json={"username": "  ", "password": "test-password"}
+    )
+    assert res_err.status_code == 401
     assert res_err.json()["error"]["code"] == "INVALID_CREDENTIALS"
 
 
@@ -315,7 +354,9 @@ def test_auth_status_endpoint() -> None:
     assert r_unauth.status_code == 401
 
     # Valid token in Bearer header
-    login_tok = tokens.create_token("operator").token
+    login_tok = client.post("/auth/login", json={"password": "test-password"}).json()[
+        "data"
+    ]["token"]
     r_auth = client.get(
         "/auth/status", headers={"Authorization": f"Bearer {login_tok}"}
     )
@@ -498,14 +539,19 @@ def test_telemetry_logging_emissions() -> None:
     app.include_router(router)
 
     client = TestClient(app)
-    tok = tokens.create_token("operator").token
+    tok = client.post("/auth/login", json={"password": "test-password"}).json()["data"][
+        "token"
+    ]
     sub_id, *_ = bus.subscribe(["chan.test"])
     bus.publish("chan.test", "ping", {})
     client.get("/auth/status", headers={"Authorization": f"Bearer {tok}"})
     engine.flush()
 
-    requirements = [e.context.get("requirement") for e in engine.ring_buffer._entries]
-    assert "FR-HOST-TRANSPORT-SESSION-AUTH" in requirements
+    requirements = [
+        e.context.get("requirement") or e.context.get("fr_id")
+        for e in engine.ring_buffer._entries
+    ]
+    assert "FR-HOST-SESS-LIFECYCLE" in requirements
     assert "FR-HOST-TRANSPORT-EVENT-BUS" in requirements
     assert "FR-HOST-TRANSPORT-MIDDLEWARE" in requirements
     assert "FR-HOST-TRANSPORT-REST-PROJECTION" in requirements

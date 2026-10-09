@@ -4,18 +4,17 @@ export const configurationTabs = ['Global', 'CPU', 'Performance', 'Memory', 'Dat
 
 export const globalMenuGroups = [
   ['configuration', 'benchmark', 'remote-access', 'mcp-server', 'smtp-server'],
-  ['language'],
+  ['notifications', 'user-access', 'credentials', 'advanced-settings'],
   ['skin'],
   ['zoom'],
-  ['website', 'help-center', 'support', 'update-license', 'about'],
   ['reload-ui', 'exit'],
 ] as const;
 
 export const globalMenuLabels: Record<string, string> = {
   configuration: 'Configuration...', benchmark: 'Benchmark...', 'remote-access': 'Remote access...',
-  'mcp-server': 'MCP Server...', 'smtp-server': 'SMTP server...', language: 'Language', skin: 'Skin', zoom: 'Zoom',
-  website: 'HaruQuantAI Website', 'help-center': 'Help center', support: 'Support', 'update-license': 'Update license',
-  about: 'About', 'reload-ui': 'Reload UI', exit: 'Exit',
+  'mcp-server': 'MCP Server...', 'smtp-server': 'SMTP server...', skin: 'Skin', zoom: 'Zoom',
+  notifications: 'Notifications...', 'user-access': 'User access...', credentials: 'Credentials...', 'advanced-settings': 'Advanced settings...',
+  'reload-ui': 'Reload UI', exit: 'Exit',
 };
 
 export const applicationLanguages = [
@@ -28,7 +27,7 @@ export const applicationSkins = ['Dark skin', 'Light skin'] as const;
 export function createDefaultConfiguration(): ConfigurationSettings {
   return {
     soundsOff: false, rememberFileChooser: true, showControlOrders: false,
-    headerCustomText: '', footerCustomText: '', defaultResult: 'portfolio', totalCores: 8,
+    headerCustomText: '', footerCustomText: '', defaultResult: 'portfolio', dataFrameGuard: 'warn', totalCores: 8,
     coreUsage: 'reserve-one', customCores: 7, highPriority: false, threadAffinity: false,
     computePipsMetrics: false, computePercentMetrics: false, computeSeparateMetrics: true,
     garbageCollector: 'parallel', automaticMemory: false, memoryGb: 10,
@@ -61,6 +60,8 @@ export function mergeAppSettings(saved?: Partial<AppSettings> & { navigationColl
 }
 
 export function validateConfiguration(value: ConfigurationSettings): string | null {
+  if (!['warn', 'stop', 'off'].includes(value.dataFrameGuard)) return 'Data frame check must be warn, stop or off.';
+  if (!['never', '5 minutes', '15 minutes', '30 minutes', '1 hour'].includes(value.cleanupInterval)) return 'Unsupported cleanup interval.';
   if (!Number.isInteger(value.customCores) || value.customCores < 1 || value.customCores > Math.max(1, value.totalCores)) return 'Custom cores must be a whole number between 1 and the available core count.';
   if (!Number.isFinite(value.memoryGb) || value.memoryGb < 2 || value.memoryGb > 1024) return 'Maximum memory must be between 2 and 1024 GB.';
   if (value.headerCustomText.length > 30 || value.footerCustomText.length > 30) return 'Window header and footer text must contain at most 30 characters.';

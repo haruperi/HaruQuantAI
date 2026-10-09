@@ -720,3 +720,80 @@
 @media(max-width:1100px){.pf-composer-columns{flex-direction:column;overflow:auto}.pf-composer-settings{flex:0 0 600px;width:100%;box-sizing:border-box}.pf-composer-results{flex:0 0 620px;min-height:620px;border-left:0;border-top:1px solid var(--sqx-tab-border)}.pf-row>span:first-child,.pf-master-form .pf-row>span:first-child{min-width:150px}.pf-master-form .pf-indent{margin-left:0}}
 
 .pf-composer{--sqx-panel:var(--sqd-dashboard-bg);--sqx-card:var(--sqd-header-bg);--sqx-tab-bg:var(--sqd-header-bg)}
+
+/* Configuration follows the owner's SQX reference; other dialogs retain defaults. */
+.sqx-configuration-modal { background: #202020; color: #ccc; border-color: #777; font-size: 12px; }
+.sqx-configuration-modal > header { height: 30px; min-height: 30px; background: #356489; border: 0; padding: 0 18px; }
+.sqx-configuration-modal > header h2 { color: #fff; font-size: 13px; font-weight: 400; }
+.sqx-configuration-modal .modal-content { padding: 16px 14px 0; gap: 0; }
+.sqx-configuration { min-height: 0; }
+.sqx-configuration > nav { background: transparent; padding: 0 2px; border: 0; flex-wrap: wrap; }
+.sqx-configuration > nav button { height: 28px; padding: 0 11px; background: #3c3c3c; border: 1px solid #777; border-right: 0; color: #ccc; font-size: 12px; border-radius: 0; }
+.sqx-configuration > nav button:first-child { border-radius: 3px 0 0 0; }
+.sqx-configuration > nav button:last-child { border-right: 1px solid #777; border-radius: 0 3px 0 0; }
+.sqx-configuration > nav button.active { background: #282828; border-bottom-color: #282828; font-weight: 700; position: relative; z-index: 1; }
+.sqx-configuration .configuration-page { background: #282828; border: 1px solid #777; border-radius: 3px; padding: 14px 24px; min-height: 334px; margin-top: -1px; overflow: visible; }
+.sqx-configuration .sqx-config-global { min-height: 444px; }
+.sqx-configuration .sqx-config-databanks { min-height: 374px; }
+.sqx-configuration .check { min-height: 25px; gap: 12px; }
+.sqx-configuration .check input { appearance: none; width: 29px; height: 13px; border: 0; border-radius: 10px; background: #bcbebf; position: relative; flex-shrink: 0; margin: 0; cursor: pointer; }
+.sqx-configuration .check input::after { content: ''; position: absolute; width: 15px; height: 15px; border-radius: 50%; background: #eee; left: 0; top: -1px; }
+.sqx-configuration .check input:checked { background: #8dcefa; }
+.sqx-configuration .check input:checked::after { left: 14px; background: #168fe4; }
+.sqx-configuration input:focus-visible,.sqx-configuration button:focus-visible,.sqx-configuration select:focus-visible { outline: 2px solid #168fe4; outline-offset: 2px; }
+.sqx-configuration .settings-radio { display: flex; align-items: center; gap: 7px; min-height: 21px; margin: 0; }
+.sqx-configuration .settings-radio input { appearance: none; width: 14px; height: 14px; border: 1.5px solid #888; border-radius: 50%; margin: 0; position: relative; flex-shrink: 0; cursor: pointer; }
+.sqx-configuration .settings-radio input:checked { border-color: #168fe4; }
+.sqx-configuration .settings-radio input:checked::after { content: ''; position: absolute; inset: 2px; background: #168fe4; border-radius: 50%; }
+.sqx-configuration .text-input,.sqx-config-spinner { background: #282828; border: 1px solid #777; border-radius: 0; color: #ccc; height: 22px; font-size: 12px; }
+.sqx-config-texts { margin: 22px 0; display: grid; gap: 17px; }
+.sqx-config-texts .field { display: grid; grid-template-columns: 212px 150px; align-items: center; gap: 0; color: inherit; font-size: 12px; }
+.sqx-config-columns { display: grid; grid-template-columns: 212px minmax(0,1fr); margin: 23px 0 0; }
+.sqx-config-columns > span { white-space: normal; padding-right: 8px; }
+.sqx-config-result { display: flex; justify-content: space-between; gap: 8px; }
+.sqx-config-hint { margin: 5px 0 18px 44px; font-size: 12px; color: #aaa; font-style: italic; line-height: 1.45; }
+.sqx-config-columns .sqx-config-hint { margin: 16px 0 0; }
+.sqx-config-block { margin-top: 23px; }
+.sqx-config-optimizations .sqx-config-hint { max-width: 470px; }
+.sqx-config-inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.sqx-config-cores { margin: 6px 0 14px 16px; }
+.sqx-config-single-help { margin: 0 0 7px 18px; }
+.sqx-config-spinner { display: inline-flex; width: 80px; }
+.sqx-config-spinner input { appearance: textfield; width: 40px; flex: 1; min-width: 0; background: transparent; border: 0; padding: 0 6px; color: inherit; }
+.sqx-config-spinner input::-webkit-inner-spin-button { appearance: none; }
+.sqx-config-spinner button { background: transparent; color: inherit; border: 0; padding: 0 3px; cursor: pointer; }
+.sqx-config-spinner button:disabled { opacity: .5; cursor: default; }
+.sqx-config-gc { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; margin: 0 0 23px; }
+.sqx-config-memory-mode { margin-left: 0; }
+.sqx-config-memory-mode .settings-radio { min-height: 25px; }
+.sqx-config-select select { width: 150px; }
+.sqx-config-sync { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin: 7px 0; flex-wrap: wrap; }
+.sqx-config-sync .sq-button { height: 22px; font-size: 11px; }
+.sqx-config-limit { font-size: 11px; color: #aaa; margin: 0 0 0 44px; }
+.sqx-configuration-modal > footer { height: auto; min-height: 50px; border: 0; background: #202020; padding: 12px 14px; gap: 16px; }
+.sqx-configuration-modal > footer .primary { background: #356489; border-color: #4b7fa5; }
+.sqx-config-close { background: transparent; border: 0; padding: 0 4px; color: #87c9fc; text-decoration: underline; }
+.sqx-config-capability { margin-right: auto; font-size: 11px; max-width: 460px; }
+.sqx-configuration .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+html[data-theme=light] .sqx-configuration-modal { color: #333; background: #eee; }
+html[data-theme=light] .sqx-configuration .configuration-page,html[data-theme=light] .sqx-configuration > nav button.active,html[data-theme=light] .sqx-configuration .text-input,html[data-theme=light] .sqx-config-spinner { background: #f5f5f5; color: #333; }
+html[data-theme=light] .sqx-configuration > nav button { background: #ddd; color: #333; }
+html[data-theme=light] .sqx-configuration .sqx-config-hint,html[data-theme=light] .sqx-config-limit { color: #555; }
+html[data-theme=light] .sqx-configuration-modal > footer { background: #eee; }
+html[data-theme=light] .sqx-config-close { color: #205c87; }
+html[data-theme=light] .sqx-configuration > nav button.active { border-bottom-color: #f5f5f5; }
+@media(max-width:700px) { .sqx-config-columns { grid-template-columns: 1fr; gap: 10px; }.sqx-config-columns > span { white-space: normal; }.sqx-config-texts .field { grid-template-columns: 1fr; gap: 6px; }.sqx-config-result { flex-wrap: wrap; }.sqx-configuration .configuration-page { padding: 14px; }.sqx-config-hint { margin-left: 0; }.sqx-configuration-modal > footer { flex-wrap: wrap; }.sqx-config-capability { flex-basis: 100%; } }
+.host-settings-tabs { display: flex; flex-wrap: wrap; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.host-settings-tabs button { color: inherit; background: var(--panel); border: 1px solid var(--line); padding: 8px 14px; cursor: pointer; }
+.host-settings-tabs button[aria-selected="true"] { border-bottom: 2px solid #168bd2; font-weight: 600; }
+.host-settings-panel { display: grid; gap: 12px; max-height: 55vh; overflow: auto; padding: 4px; }
+.host-setting-field { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(160px, 1.4fr); gap: 5px 14px; align-items: center; }
+.host-setting-field small { grid-column: 1 / -1; opacity: .65; font-size: 11px; overflow-wrap: anywhere; }
+.host-settings-panel input:not([type="checkbox"]), .host-settings-panel select, .host-settings-panel textarea { color: inherit; background: var(--input-bg, #17202a); border: 1px solid var(--line); padding: 7px; min-width: 0; width: 100%; }
+.host-settings-panel > label { display: grid; gap: 5px; }
+.host-settings-panel label:has(input[type="checkbox"]) { display: flex; gap: 8px; align-items: center; }
+.host-setting-field textarea { min-height: 64px; resize: vertical; }
+.host-secret-state, .host-secret-clear { font-size: 12px; }
+.host-settings-panel [readonly], .host-settings-panel :disabled { opacity: .65; }
+html[data-theme="light"] .host-settings-panel input:not([type="checkbox"]), html[data-theme="light"] .host-settings-panel select, html[data-theme="light"] .host-settings-panel textarea { background: #fff; }
+@media (max-width: 600px) { .host-setting-field { grid-template-columns: 1fr; } }

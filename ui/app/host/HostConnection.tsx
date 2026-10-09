@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useRef, useState, type FormEvent,
 import { Button, Field, Modal, TextInput } from '../components/ui';
 import { useAppStore } from './store';
 import { readHostPreferences, shellPreferences, watchSettingsChanges, writeHostPreferences, type HostSettingsSnapshot, type ShellPreferences } from './hostSettings';
-import { ApiClientError, createDomainClient, login, setAuthToken, subscribeAuthExpired } from './transport';
+import { ApiClientError, createDomainClient, getAuthToken, getSessionPersistenceWarning, login, restoreSavedSession, setAuthToken, subscribeAuthExpired } from './transport';
 
 export type HostStatus = 'connecting' | 'online' | 'locked' | 'offline';
 export type SaveSettingsResult = { ok: true } | { ok: false; message: string };
@@ -28,8 +28,22 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
   };
 
   try {
-    await login({ username: 'operator', ...(options.password ? { password: options.password } : {}) }, config);
+    try {
+      if (options.password !== undefined) {
+        await login({ password: options.password }, config);
+      } else if (getAuthToken() || restoreSavedSession()) {
+        await createDomainClient('', config).get('/sessions/me');
+      } else {
+        onStatus('locked');
+        onError('Enter the host password to connect.');
+        return;
+      }
+    } finally {
+      options.password = undefined;
+    }
     if (signal.aborted) return;
+    const persistenceIssue = getSessionPersistenceWarning();
+    if (persistenceIssue) onError(persistenceIssue);
     await refresh();
     if (options.onCoreCount) {
       const status = await createDomainClient('', config).get<{ cpu_count?: number }>('/status');
@@ -46,10 +60,10 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
     });
   } catch (error) {
     if (signal.aborted) return;
-    setAuthToken(null);
-    if (error instanceof ApiClientError && error.status === 401) {
+    if (error instanceof ApiClientError && (error.status === 401 || error.status === 429)) {
+      setAuthToken(null);
       onStatus('locked');
-      onError('The host requires a valid password or a new session.');
+      onError(error.status === 429 ? 'Too many login attempts. Wait a minute, then try again.' : 'The host requires a valid password or a new session.');
     } else {
       onStatus('offline');
       onError(error instanceof Error ? error.message : 'Host connection failed');
@@ -59,7 +73,8 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
 
 interface HostConnectionValue {
   status: HostStatus;
-  saveSettings: (change: Partial<ShellPreferences>) => Promise<SaveSettingsResult>;
+  settingsRevision: number | null;
+  saveSettings: (change: Partial<ShellPreferences>, openingRevision?: number | null) => Promise<SaveSettingsResult>;
 }
 
 const HostConnectionContext = createContext<HostConnectionValue | null>(null);
@@ -75,16 +90,20 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
   const statusRef = useRef<HostStatus>('connecting');
   const [message, setMessage] = useState('');
   const [password, setPassword] = useState('');
+  const [loginVisible, setLoginVisible] = useState(false);
   const credentialRef = useRef<string | undefined>(undefined);
+  const connectionRef = useRef<AbortController | null>(null);
   const [attempt, setAttempt] = useState(0);
   const writeQueue = useRef<Promise<void>>(Promise.resolve());
   const revisionRef = useRef<number | null>(null);
+  const [settingsRevision, setSettingsRevision] = useState<number | null>(null);
   const preferencesRef = useRef<ShellPreferences | null>(null);
   const coreCountRef = useRef<number | null>(null);
 
   const applySettings = (snapshot: HostSettingsSnapshot) => {
     if (revisionRef.current !== null && snapshot.revision < revisionRef.current) return;
     revisionRef.current = snapshot.revision;
+    setSettingsRevision(snapshot.revision);
     preferencesRef.current = snapshot.preferences;
     const configuration = { ...snapshot.preferences.configuration };
     if (coreCountRef.current !== null) {
@@ -97,7 +116,7 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
     useAppStore.getState().updateSettings({ ...snapshot.preferences, configuration, workers, memoryGb: configuration.memoryGb });
   };
 
-  const updateStatus = (next: HostStatus) => { statusRef.current = next; setStatus(next); };
+  const updateStatus = (next: HostStatus) => { statusRef.current = next; setStatus(next); if (next === 'locked') setLoginVisible(true); if (next === 'online') setLoginVisible(false); };
 
   useEffect(() => subscribeAuthExpired(() => {
     updateStatus('locked');
@@ -106,6 +125,7 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const controller = new AbortController();
+    connectionRef.current = controller;
     const credential = credentialRef.current;
     credentialRef.current = undefined;
     updateStatus('connecting');
@@ -125,27 +145,20 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
       },
       onError: error => setMessage(error),
     });
-    return () => { controller.abort(); setAuthToken(null); };
+    return () => { controller.abort(); };
   }, [attempt]);
 
   const recoverSession = async (): Promise<boolean> => {
     revisionRef.current = null;
+    setSettingsRevision(null);
     preferencesRef.current = null;
-    try {
-      await login({ username: 'operator' });
-      applySettings(await readHostPreferences());
-      updateStatus('online');
-      setMessage('');
-      return true;
-    } catch (error) {
-      const locked = error instanceof ApiClientError && error.status === 401;
-      updateStatus(locked ? 'locked' : 'offline');
-      setMessage(error instanceof Error ? error.message : 'Host reconnection failed');
-      return false;
-    }
+    setAuthToken(null);
+    updateStatus('locked');
+    setMessage('Enter the host password to reconnect, then retry saving.');
+    return false;
   };
 
-  const saveSettings = (change: Partial<ShellPreferences>): Promise<SaveSettingsResult> => {
+  const saveSettings = (change: Partial<ShellPreferences>, openingRevision?: number | null): Promise<SaveSettingsResult> => {
     const task = writeQueue.current.then(async (): Promise<SaveSettingsResult> => {
       const failure = (reason: string): SaveSettingsResult => {
         const message = `Settings were not saved: ${reason}`;
@@ -154,6 +167,9 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
       };
       if (statusRef.current !== 'online' || revisionRef.current === null || preferencesRef.current === null) {
         if (!await recoverSession()) return failure('host session unavailable. Reconnect and retry.');
+      }
+      if (openingRevision !== undefined && openingRevision !== revisionRef.current) {
+        return failure('settings changed since this dialog opened. Close and reopen it to review the latest settings.');
       }
       for (let attempt = 0; attempt < 2; attempt += 1) {
         try {
@@ -203,15 +219,17 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
   };
   const submitPassword = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (statusRef.current === 'connecting') return;
     retry(password);
   };
 
-  return <HostConnectionContext.Provider value={{ status, saveSettings }}>
+  return <HostConnectionContext.Provider value={{ status, settingsRevision, saveSettings }}>
     {children}
-    {status === 'locked' && <Modal title="Connect to HaruQuantAI host" onClose={() => updateStatus('offline')} footer={<Button form="host-login" type="submit" className="primary">Connect</Button>}>
+    {status === 'online' && message && <div role="status">{message}</div>}
+    {loginVisible && status !== 'offline' && <Modal title="Connect to HaruQuantAI host" onClose={() => { connectionRef.current?.abort(); setAuthToken(null); updateStatus('offline'); setLoginVisible(false); }} footer={<Button form="host-login" type="submit" className="primary" disabled={status === 'connecting'}>{status === 'connecting' ? 'Connecting...' : 'Connect'}</Button>}>
       <form id="host-login" onSubmit={submitPassword}>
         <p role="alert">{message || 'Enter the host password to connect.'}</p>
-        <Field label="Host password"><TextInput type="password" autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></Field>
+        <Field label="Host password"><TextInput type="password" required maxLength={1024} disabled={status === 'connecting'} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></Field>
       </form>
     </Modal>}
     {status === 'offline' && <div role="status">Host offline. Settings cannot be saved. {message} <Button onClick={() => retry()}>Retry connection</Button></div>}

@@ -1,6 +1,10 @@
 """Platform host bootstrap, lifecycle stages, and browser shell runtime.
 
 Description:
+    Composes one runtime-owned SessionManager with session-owned password login,
+    settings access and event transport. No bootstrap token generation or password
+    policy lives here. Shutdown and rollback clear runtime sessions.
+
     reconcile_persistence() sequences storage integrity/schema checks and jobs
     lease cleanup; job interruption remains a separate lifecycle stage. Domain
     services explicitly initialize baseline instruments/trading sessions during
@@ -78,6 +82,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import inspect
+import os
 import sys
 import time
 import uuid
@@ -121,13 +126,19 @@ from app.host.logging import (
 from app.host.persistence import (
     DEFAULT_DATABASE_PATH,
     DatabaseManager,
+    HostSessionStore,
     IncompatibleSchemaError,
     PersistenceError,
     get_database_manager,
 )
 from app.host.resources import ResourceManager, create_resources_router
 from app.host.response import StandardResponse
-from app.host.session import create_sessions_router
+from app.host.session import (
+    HostAuthentication,
+    SessionManager,
+    SessionTokenManager,
+    create_sessions_router,
+)
 from app.host.settings import (
     HostSettings,
     create_settings_router,
@@ -219,6 +230,10 @@ class HostRuntime:
         """Initialize the host runtime without performing import-time work."""
         self.settings: HostSettings = settings or HostSettings()
         self.host_instance_id: str = f"host-{uuid.uuid4().hex[:12]}"
+        self.session_manager = SessionManager(
+            host_instance_id=self.host_instance_id,
+            store=HostSessionStore(DatabaseManager(self.settings.db_path)),
+        )
         self._state: ReadinessState = ReadinessState.NOT_STARTED
         self._active_stage: LifespanStage = LifespanStage.UNINITIALIZED
         self._completed_stages: list[LifespanStage] = []
@@ -544,6 +559,7 @@ class HostRuntime:
 
     def _cleanup_services(self) -> None:
         """Tear down database and job manager during rollback or shutdown."""
+        self.session_manager.reset(new_host_instance_id=self.host_instance_id)
         if self.job_manager is not None:
             try:
                 self.job_manager.close(timeout=5.0)
@@ -758,6 +774,7 @@ class HostRuntime:
                 return
 
             self._state = ReadinessState.STOPPING
+            self.session_manager.reset(new_host_instance_id=self.host_instance_id)
             self._active_stage = LifespanStage.STOPPING
             logger.info(
                 "FR-HOST-BOOT-REVERSE-SHUTDOWN: Stopping host runtime (instance=%s)",
@@ -828,7 +845,7 @@ def _create_shell_router(settings: HostSettings) -> APIRouter:
                     "state": readiness.state.value,
                     "host_instance_id": rt.host_instance_id,
                     "is_ready": readiness.is_ready,
-                    "cpu_count": 4,
+                    "cpu_count": max(1, os.cpu_count() or 1),
                     "uptime_seconds": readiness.uptime_seconds,
                     "version": settings.version,
                     "reference_cohort": settings.reference_cohort,
@@ -863,6 +880,7 @@ def _create_shell_router(settings: HostSettings) -> APIRouter:
     async def post_app_loaded(request: Request) -> JSONResponse:
         """Acknowledge the browser shell frontend completion of load."""
         rt: HostRuntime = request.app.state.runtime
+        request.app.state.authentication.require_session(request)
         rt.acknowledge_app_loaded()
         logger.info(
             "FR-HOST-BOOT-SHELL-PROJECTION: Browser shell app-loaded received "
@@ -905,24 +923,6 @@ def _create_shell_router(settings: HostSettings) -> APIRouter:
             },
         )
 
-    @router.post("/auth/login")
-    async def post_login() -> JSONResponse:
-        """Issue initial loopback session token for browser shell handshake."""
-        logger.info(
-            "FR-HOST-BOOT-SHELL-PROJECTION: Issued bootstrap loopback session.",
-            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "status": "success",
-                "data": {
-                    "token": f"bootstrap-token-{uuid.uuid4().hex}",
-                    "username": "operator",
-                },
-            },
-        )
-
     return router
 
 
@@ -933,6 +933,10 @@ def _mount_host_routers(
     resolved_config: Any,
 ) -> None:
     """Mount all host capability routers and initialize service custody."""
+    authentication = HostAuthentication(
+        resolved_config, resolved_runtime.session_manager
+    )
+    app.state.authentication = authentication
     # 1. Shell Router (/api/v1/status, /api/v1/readiness, /api/v1/about, etc.)
     shell_router = _create_shell_router(resolved_settings)
     app.include_router(shell_router)
@@ -942,11 +946,28 @@ def _mount_host_routers(
         create_settings_paths_router(resolved_config),
         prefix=resolved_settings.api_prefix,
     )
-    settings_router = create_settings_router(resolved_config)
+
+    def publish_settings_revision(revision: int) -> None:
+        """Notify connected settings readers after a committed HTTP update."""
+        if default_host_settings is not resolved_config and (
+            default_host_settings.db_path == resolved_config.db_path
+        ):
+            default_host_settings.reload()
+        get_event_bus().publish("settings.changed", "updated", {"revision": revision})
+
+    settings_router = create_settings_router(
+        resolved_config,
+        require_session=authentication.require_session,
+        on_updated=publish_settings_revision,
+    )
     app.include_router(settings_router, prefix=resolved_settings.api_prefix)
 
     # 3. Transport Router (/events, /auth/status, /events/publish, /events/snapshot)
-    transport_router = create_transport_router()
+    transport_router = create_transport_router(
+        token_manager=SessionTokenManager(
+            manager=resolved_runtime.session_manager, authentication=authentication
+        )
+    )
     app.include_router(transport_router)
     app.include_router(transport_router, prefix=resolved_settings.api_prefix)
 
@@ -964,7 +985,9 @@ def _mount_host_routers(
     app.include_router(discovery_router, prefix=resolved_settings.api_prefix)
 
     # 7. Sessions Router (/api/v1/sessions/...)
-    sessions_router = create_sessions_router()
+    sessions_router = create_sessions_router(
+        resolved_runtime.session_manager, authentication=authentication
+    )
     app.include_router(sessions_router, prefix=resolved_settings.api_prefix)
 
     # 8. Persistence Router (/api/v1/persistence/...)

@@ -1,6 +1,17 @@
 """Host-owned sessions, security boundaries, and distribution qualification.
 
 Description:
+    HostAuthentication verifies the single configured host account through
+    HostSettings and owns password hashing, bounded login attempts, HTTP login
+    aliases and local CLI provisioning. SessionManager is the sole ephemeral
+    session authority; lifecycle records use persistence.HostSessionStore in the
+    existing host_session table. UI and CLI/Python issuance share this path; only
+    hashes are stored. Transport compatibility delegates here. Changed credentials
+    revoke sessions on verification. HTTP clients cannot request privileged roles.
+    Account credentials and duration use application/user_access JSON exclusively.
+    Account HTTP access verifies the current password before changing username,
+    password or session duration; successful changes revoke existing sessions.
+
     PersistenceAccess binds entity namespaces and worker owners, delegating CRUD
     to persistence and reservation policy to jobs.LeaseManager. Namespace binding
     is not authorization; existing session authorization remains authoritative.
@@ -22,7 +33,8 @@ Description:
     are denied by default and require time-bounded distinct authority grants.
 
     In accordance with platform persistence isolation principles, session data is
-    strictly ephemeral and held in-memory; any durable host state must route
+    strictly ephemeral and held in-memory; lifecycle metadata is durably recorded
+    without restoring tokens. Any durable host state must route
     exclusively through `app.host.persistence.DatabaseManager`.
 
 Purpose:
@@ -32,6 +44,11 @@ Purpose:
     distribution qualification.
 
 Key Capabilities:
+    - FR-HOST-SESS-CREDENTIALS: Verify/provision the configured host account.
+      Associated: `HostAuthentication`, `hash_password()`, `configure_host_user()`,
+        `HostAuthentication.change_account()`, `_create_account_router()`
+      Logging: INFO verifier/setup/auth success; WARNING rejection/cooldown; ERROR
+        setup failure. Tests verify omission of password/hash/token payloads.
     - FR-HOST-SESS-LOOPBACK-ORIGIN: Loopback origin validation and DNS rebinding
       prevention for local workstation HTTP endpoints.
       Associated: `[LoopbackValidator]`, `[LoopbackSecurityMiddleware]`
@@ -104,6 +121,10 @@ Python API Usage:
     ```
 
 CLI Usage:
+    Configure the account locally; passwords are entered through hidden prompts:
+    `uv run python -m app.host.session --configure-user --username operator
+    --db path/to/database.db`. Existing account replacement requires confirmation.
+    No plaintext passwords, default credentials or persistent tokens are created.
     ```bash
     uv run python -m app.host.session --check-install
     uv run python -m app.host.session --audit-scopes
@@ -115,12 +136,16 @@ from __future__ import annotations
 
 import argparse
 import ast
+import asyncio
+import getpass
 import hashlib
+import hmac
 import ipaddress
 import re
 import secrets
 import sys
 import threading
+import time
 import uuid
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
@@ -136,8 +161,17 @@ from starlette.responses import JSONResponse
 
 from app.host.jobs import LeaseManager, LeaseRecord
 from app.host.logging import get_logger
-from app.host.persistence import DatabaseManager, TypedRepository, validate_identifier
+from app.host.persistence import (
+    DatabaseManager,
+    HostSessionRecord,
+    HostSessionStore,
+    PersistenceError,
+    RevisionConflictError,
+    TypedRepository,
+    validate_identifier,
+)
 from app.host.response import StandardError, StandardResponse
+from app.host.settings import HostSettings
 
 __all__ = [
     "AuthenticationError",
@@ -151,6 +185,7 @@ __all__ = [
     "ElevationExpiredError",
     "ElevationRequest",
     "ElevationResponse",
+    "HostAuthentication",
     "LoginRequest",
     "LoopbackOriginError",
     "LoopbackSecurityMiddleware",
@@ -167,10 +202,13 @@ __all__ = [
     "SessionExpiredError",
     "SessionManager",
     "SessionToken",
+    "SessionTokenManager",
     "SessionsRouter",
     "StandardScope",
     "TlsRemoteDeploymentProposal",
     "UserCodeBounds",
+    "configure_host_user",
+    "create_auth_router",
     "create_sessions_router",
     "extract_bearer_token",
     "get_current_session",
@@ -178,17 +216,28 @@ __all__ = [
     "get_global_authorizer",
     "get_global_session_manager",
     "get_tls_remote_deployment_proposal",
+    "hash_password",
     "main",
     "reset_global_security_state",
     "sanitize_operational_inputs",
     "validate_user_code_ast",
     "verify_clean_installation",
     "verify_domain_removal",
+    "verify_password",
 ]
 
 logger = get_logger(__name__)
 
 # Constants
+MAX_PASSWORD_LENGTH: Final[int] = 1024
+MAX_USERNAME_LENGTH: Final[int] = 64
+PASSWORD_ITERATIONS: Final[int] = 600_000
+PASSWORD_SALT_HEX_LENGTH: Final[int] = 32
+PASSWORD_DIGEST_HEX_LENGTH: Final[int] = 64
+LOGIN_WINDOW_SECONDS: Final[int] = 60
+MAX_LOGIN_FAILURES: Final[int] = 5
+MIN_SESSION_MINUTES: Final[int] = 1440
+MAX_SESSION_MINUTES: Final[int] = 43200
 DEFAULT_SESSION_TTL_SEC: Final[int] = 86400  # 24 hours
 DEFAULT_ELEVATION_TTL_SEC: Final[int] = 600  # 10 minutes
 MAX_ELEVATION_TTL_SEC: Final[int] = 1800  # 30 minutes
@@ -411,8 +460,12 @@ class LoginRequest(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    username: str = Field(default="operator", description="Principal username")
-    password: str = Field(default="", description="Principal password")
+    username: str = Field(
+        default="", max_length=64, description="Optional configured username"
+    )
+    password: str = Field(
+        default="", max_length=1024, repr=False, description="Principal password"
+    )
     role: RoleType = Field(
         default=RoleType.OPERATOR, description="Requested principal role"
     )
@@ -736,7 +789,7 @@ class LoopbackSecurityMiddleware(BaseHTTPMiddleware):
 
 
 class SessionManager:
-    """Thread-safe in-memory session manager with guaranteed host-restart invalidation.
+    """In-memory authority with durable records and host-restart invalidation.
 
     Fires FR-HOST-SESS-LIFECYCLE.
     """
@@ -745,11 +798,53 @@ class SessionManager:
         self,
         host_instance_id: str | None = None,
         default_ttl_sec: int = DEFAULT_SESSION_TTL_SEC,
+        *,
+        store: HostSessionStore | None = None,
     ) -> None:
         self.host_instance_id = host_instance_id or f"host-{uuid.uuid4().hex[:12]}"
         self.default_ttl_sec = default_ttl_sec
         self._sessions: dict[str, SessionContext] = {}
         self._lock = threading.RLock()
+        self._store = store
+
+    def bind_store(self, store: HostSessionStore) -> None:
+        """Bind configured storage before issuance without relocating active tokens."""
+        with self._lock:
+            if self._sessions and (
+                self._store is None or self._store.db_path != store.db_path
+            ):
+                raise AuthenticationError("Cannot relocate active session storage.")
+            self._store = store
+            logger.debug(
+                "Session lifecycle storage bound",
+                extra={"fr_id": "FR-HOST-SESS-LIFECYCLE"},
+            )
+
+    def _session_store(self) -> HostSessionStore:
+        """Resolve standalone CLI/Python storage lazily, without import-time work."""
+        if self._store is None:
+            self._store = HostSessionStore(DatabaseManager())
+        return self._store
+
+    def _record_status(
+        self,
+        status: str,
+        *,
+        token: str | None = None,
+        username: str | None = None,
+        peer_id: str | None = None,
+    ) -> None:
+        """Persist issuer-scoped lifecycle decisions without storing bearer tokens."""
+        if self._store is None:
+            return
+        self._store.update_status(
+            peer_id=peer_id or self.host_instance_id,
+            expected_status="ACTIVE",
+            status=status,
+            revoked_at_utc=_now_utc_iso() if status == "REVOKED" else None,
+            token_hash=hashlib.sha256(token.encode()).hexdigest() if token else None,
+            username=username,
+        )
 
     def create_session(
         self,
@@ -760,6 +855,8 @@ class SessionManager:
     ) -> SessionContext:
         """Create and register a new ephemeral session bound to this host instance."""
         ttl = ttl_sec if ttl_sec is not None else self.default_ttl_sec
+        with self._lock:
+            self._session_store().initialize()
         now = datetime.now(UTC)
         created_at_iso = now.isoformat()
         expires_at_iso = (now + timedelta(seconds=ttl)).isoformat()
@@ -781,6 +878,17 @@ class SessionManager:
         )
 
         with self._lock:
+            self._session_store().create(
+                HostSessionRecord(
+                    session_id=uuid.uuid4().hex,
+                    token_hash=hashlib.sha256(token.encode()).hexdigest(),
+                    username=username,
+                    peer_id=self.host_instance_id,
+                    created_at_utc=created_at_iso,
+                    expires_at_utc=expires_at_iso,
+                    status="ACTIVE",
+                )
+            )
             self._sessions[token] = session
 
         logger.info(
@@ -821,6 +929,9 @@ class SessionManager:
             # Host restart boundary check
             if session.host_instance_id != self.host_instance_id:
                 self._sessions.pop(token, None)
+                self._record_status(
+                    "REVOKED", token=token, peer_id=session.host_instance_id
+                )
                 logger.warning(
                     "FR-HOST-SESS-LIFECYCLE: Rejected session from prior instance: %s",
                     session.host_instance_id,
@@ -833,6 +944,7 @@ class SessionManager:
             # Check expiration
             if session.is_expired():
                 self._sessions.pop(token, None)
+                self._record_status("EXPIRED", token=token)
                 logger.warning(
                     "FR-HOST-SESS-LIFECYCLE: Rejected expired session for user=%s",
                     session.username,
@@ -848,6 +960,8 @@ class SessionManager:
         """Revoke a specific session token."""
         with self._lock:
             removed = self._sessions.pop(token, None) is not None
+            if removed:
+                self._record_status("REVOKED", token=token)
         if removed:
             logger.info(
                 "FR-HOST-SESS-LIFECYCLE: Explicitly revoked session token.",
@@ -865,6 +979,8 @@ class SessionManager:
             for tok in tokens_to_revoke:
                 self._sessions.pop(tok, None)
                 revoked_count += 1
+            if tokens_to_revoke:
+                self._record_status("REVOKED", username=username)
         logger.info(
             "FR-HOST-SESS-LIFECYCLE: Revoked %d active sessions for user=%s",
             revoked_count,
@@ -881,6 +997,7 @@ class SessionManager:
         with self._lock:
             count = len(self._sessions)
             self._sessions.clear()
+            self._record_status("REVOKED")
             self.host_instance_id = (
                 new_host_instance_id or f"host-{uuid.uuid4().hex[:12]}"
             )
@@ -900,11 +1017,15 @@ class SessionManager:
         """Return the current count of registered unexpired sessions."""
         with self._lock:
             now = datetime.now(UTC)
-            return sum(
-                1
-                for s in self._sessions.values()
-                if datetime.fromisoformat(s.expires_at) > now
-            )
+            expired = [
+                token
+                for token, s in self._sessions.items()
+                if datetime.fromisoformat(s.expires_at) <= now
+            ]
+            for token in expired:
+                self._sessions.pop(token, None)
+                self._record_status("EXPIRED", token=token)
+            return len(self._sessions)
 
 
 # -----------------------------------------------------------------------------
@@ -1449,6 +1570,417 @@ def get_current_session(
         ) from exc
 
 
+class LoginCooldownError(AuthenticationError):
+    """Login attempts exceeded the bounded host-user retry window."""
+
+
+def hash_password(password: str) -> str:
+    """Encode a salted, versioned password verifier without retaining plaintext."""
+    if not password or len(password) > MAX_PASSWORD_LENGTH:
+        raise ValueError("Password must contain 1 to 1024 characters.")
+    salt = secrets.token_bytes(16)
+    derived = hashlib.pbkdf2_hmac(
+        "sha256", password.encode(), salt, PASSWORD_ITERATIONS
+    )
+    logger.info(
+        "Password verifier prepared", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+    )
+    return f"pbkdf2-sha256$600000${salt.hex()}${derived.hex()}"
+
+
+def password_verifier_salt(encoded: str) -> str:
+    """Validate the supported credential format and return its embedded salt."""
+    algorithm, iterations, salt, digest = encoded.split("$")
+    if (
+        algorithm != "pbkdf2-sha256"
+        or iterations != "600000"
+        or len(salt) != PASSWORD_SALT_HEX_LENGTH
+        or len(digest) != PASSWORD_DIGEST_HEX_LENGTH
+        or len(bytes.fromhex(salt)) != PASSWORD_SALT_HEX_LENGTH // 2
+        or len(bytes.fromhex(digest)) != PASSWORD_DIGEST_HEX_LENGTH // 2
+    ):
+        raise ValueError("Unsupported password verifier format.")
+    logger.debug(
+        "Password verifier format checked", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+    )
+    return salt
+
+
+def verify_password(password: str, encoded: str) -> bool:
+    """Verify only the bounded supported hash format using constant-time comparison."""
+    try:
+        algorithm, iterations, salt, expected = encoded.split("$")
+        if (
+            algorithm != "pbkdf2-sha256"
+            or iterations != "600000"
+            or len(salt) != PASSWORD_SALT_HEX_LENGTH
+            or len(expected) != PASSWORD_DIGEST_HEX_LENGTH
+            or not password
+            or len(password) > MAX_PASSWORD_LENGTH
+        ):
+            return False
+        salt_bytes = bytes.fromhex(salt)
+        expected_bytes = bytes.fromhex(expected)
+        if (
+            len(salt_bytes) != PASSWORD_SALT_HEX_LENGTH // 2
+            or len(expected_bytes) != PASSWORD_DIGEST_HEX_LENGTH // 2
+        ):
+            return False
+    except ValueError:
+        return False
+    derived = hashlib.pbkdf2_hmac(
+        "sha256", password.encode(), salt_bytes, PASSWORD_ITERATIONS
+    )
+    return hmac.compare_digest(derived, expected_bytes)
+
+
+class HostAuthentication:
+    """Verify configured credentials and guard one shared ephemeral session manager."""
+
+    def __init__(self, settings: HostSettings, manager: SessionManager) -> None:
+        self.settings = settings
+        self.manager = manager
+        self.manager.bind_store(HostSessionStore(DatabaseManager(settings.db_path)))
+        self._lock = threading.RLock()
+        self._window_start = time.monotonic()
+        self._failures = 0
+        self._credentials: tuple[str, str] | None = None
+
+    def _read_credentials(self) -> tuple[str, str]:
+        values = (
+            self.settings.get_snapshot()
+            .values.get("application", {})
+            .get("user_access", {})
+        )
+        username = values.get("username")
+        encoded = values.get("password_hash")
+        if (
+            not isinstance(username, str)
+            or not username.strip()
+            or len(username) > MAX_USERNAME_LENGTH
+            or not isinstance(encoded, str)
+        ):
+            self.manager.reset(new_host_instance_id=self.manager.host_instance_id)
+            self._credentials = None
+            raise AuthenticationError("Host credentials are unavailable.")
+        credentials = (username, encoded)
+        if self._credentials != credentials:
+            self.manager.reset(new_host_instance_id=self.manager.host_instance_id)
+            self._credentials = credentials
+        return credentials
+
+    def authenticate(self, request: LoginRequest) -> SessionContext:
+        """Authenticate the configured user; never honor client privilege requests."""
+        with self._lock:
+            if time.monotonic() - self._window_start >= LOGIN_WINDOW_SECONDS:
+                self._window_start = time.monotonic()
+                self._failures = 0
+            if self._failures >= MAX_LOGIN_FAILURES:
+                logger.warning(
+                    "Login cooldown active", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+                )
+                raise LoginCooldownError("Retry login after the cooldown.")
+            self._failures += 1
+            try:
+                username, encoded = self._read_credentials()
+                valid = verify_password(request.password, encoded)
+                if (
+                    not valid
+                    or (request.username and request.username != username)
+                    or request.role != RoleType.OPERATOR
+                ):
+                    raise AuthenticationError("Invalid credentials.")  # noqa: TRY301 - Translate failures without exposing credential state.
+            except AuthenticationError, PersistenceError:
+                logger.warning(
+                    "Login rejected", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+                )
+                raise AuthenticationError(
+                    "Invalid credentials or host setup unavailable."
+                ) from None
+            self._failures = 0
+            logger.info(
+                "Login authenticated", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+            )
+            legacy = (
+                self.settings.get_snapshot()
+                .values.get("application", {})
+                .get("user_access", {})
+            )
+            duration = legacy.get("session_timeout_mins", 1440)
+            ttl = (
+                max(MIN_SESSION_MINUTES, duration) * 60
+                if type(duration) is int
+                else 86400
+            )
+            return self.manager.create_session(
+                username=username, role=RoleType.OPERATOR, ttl_sec=ttl
+            )
+
+    def change_account(
+        self,
+        token: str,
+        *,
+        current_password: str,
+        username: str,
+        new_password: str,
+        duration_minutes: int,
+        expected_revision: int,
+    ) -> int:
+        """Verify current credentials, commit the account, and revoke all sessions."""
+        with self._lock:
+            self.verify_session(token)
+            _, encoded = self._read_credentials()
+            # Reuse bounded verification/cooldown policy before any account mutation.
+            confirmation = self.authenticate(LoginRequest(password=current_password))
+            self.manager.revoke_session(confirmation.token)
+            if not username.strip() or len(username) > MAX_USERNAME_LENGTH:
+                raise ValueError("Invalid account username.")
+            if (
+                type(duration_minutes) is not int
+                or not MIN_SESSION_MINUTES <= duration_minutes <= MAX_SESSION_MINUTES
+            ):
+                raise ValueError("Session duration must be 1440 to 43200 minutes.")
+            replacement = hash_password(new_password) if new_password else encoded
+            snapshot = self.settings.get_snapshot()
+            legacy = dict(snapshot.values.get("application", {}).get("user_access", {}))
+            legacy["session_timeout_mins"] = duration_minutes
+            saved = self.settings.update(
+                {
+                    "application": {
+                        "user_access": {
+                            **legacy,
+                            "username": username.strip(),
+                            "password_hash": replacement,
+                            "password_salt": password_verifier_salt(replacement),
+                        }
+                    },
+                },
+                expected_revision=expected_revision,
+            )
+            self.manager.reset(new_host_instance_id=self.manager.host_instance_id)
+            self._credentials = (username.strip(), replacement)
+            logger.info(
+                "Host account changed; sessions revoked",
+                extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"},
+            )
+            return saved.revision
+
+    def verify_session(self, token: str) -> SessionContext:
+        """Reject sessions after credential changes, expiry, revocation or restart."""
+        with self._lock:
+            try:
+                self._read_credentials()
+            except PersistenceError:
+                self.manager.reset(new_host_instance_id=self.manager.host_instance_id)
+                raise AuthenticationError("Host credentials are unavailable.") from None
+            return self.manager.verify_session(token)
+
+    def require_session(self, request: Request) -> None:
+        """Authenticate a protected host route without exposing credential material."""
+        token = extract_bearer_token(request.headers.get("authorization"))
+        try:
+            self.verify_session(token)
+        except SecurityError:
+            raise HTTPException(
+                status_code=401, detail="Host session required or expired."
+            ) from None
+
+
+class SessionTokenManager:
+    """Compatibility facade; all storage and TTL policy belongs to SessionManager."""
+
+    def __init__(
+        self,
+        default_ttl_sec: int = DEFAULT_SESSION_TTL_SEC,
+        *,
+        manager: SessionManager | None = None,
+        authentication: HostAuthentication | None = None,
+    ) -> None:
+        self.manager = (
+            manager
+            if manager is not None
+            else SessionManager(default_ttl_sec=default_ttl_sec)
+        )
+        self.authentication = authentication
+
+    def create_token(self, username: str, ttl_sec: int | None = None) -> SessionToken:
+        """Create a session for trusted internal callers, never HTTP login."""
+        session = self.manager.create_session(username=username, ttl_sec=ttl_sec)
+        return SessionToken(
+            token=session.token,
+            username=session.username,
+            role=session.role,
+            scopes=sorted(session.scopes),
+            expires_at=session.expires_at,
+            host_instance_id=session.host_instance_id,
+        )
+
+    def verify_token(self, token: str) -> str:
+        """Resolve a token through the shared session authority."""
+        verifier = self.authentication or self.manager
+        return verifier.verify_session(token).username
+
+    def is_valid(self, token: str) -> bool:
+        """Test session validity without creating or renewing its authority."""
+        try:
+            self.verify_token(token)
+            return True
+        except SecurityError:
+            return False
+
+    def revoke_token(self, token: str) -> bool:
+        """Revoke from the shared session store."""
+        return self.manager.revoke_session(token)
+
+    def clear(self) -> None:
+        """Invalidate all tokens owned by the shared manager."""
+        self.manager.reset(new_host_instance_id=self.manager.host_instance_id)
+
+
+def _account_change_payload(body: Any) -> tuple[str, str, str, int, int]:
+    """Validate account input without including passwords in error details."""
+    names = {
+        "username",
+        "current_password",
+        "new_password",
+        "session_timeout_mins",
+        "expected_revision",
+    }
+    if not isinstance(body, dict) or set(body) != names:
+        raise ValueError("Invalid account request.")
+    if any(
+        not isinstance(body[key], str)
+        for key in ("username", "current_password", "new_password")
+    ):
+        raise ValueError("Invalid account request.")
+    if (
+        type(body["expected_revision"]) is not int
+        or type(body["session_timeout_mins"]) is not int
+    ):
+        raise ValueError("Invalid account request.")
+    return (
+        body["current_password"],
+        body["username"],
+        body["new_password"],
+        body["session_timeout_mins"],
+        body["expected_revision"],
+    )
+
+
+def _create_account_router(authentication: HostAuthentication) -> APIRouter:
+    """Compose current-password-verified account settings access."""
+    router = APIRouter()
+
+    @router.get("/auth/account")
+    def read_account(request: Request) -> JSONResponse:
+        """Project username and effective duration without account verifier material."""
+        authentication.require_session(request)
+        session = authentication.verify_session(
+            extract_bearer_token(request.headers.get("authorization"))
+        )
+        username = session.username
+        snapshot = authentication.settings.get_snapshot()
+        legacy = snapshot.values.get("application", {}).get("user_access", {})
+        duration = legacy.get("session_timeout_mins", 1440)
+        logger.debug(
+            "Account settings projected", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+        )
+        return JSONResponse(
+            content=StandardResponse.success(
+                data={
+                    "username": username,
+                    "revision": snapshot.revision,
+                    "session_timeout_mins": max(MIN_SESSION_MINUTES, duration)
+                    if type(duration) is int
+                    else 1440,
+                }
+            ).to_dict()
+        )
+
+    @router.put("/auth/account")
+    async def change_account_endpoint(request: Request) -> JSONResponse:
+        """Change the configured account after current-password verification."""
+        authentication.require_session(request)
+        try:
+            body = await request.json()
+            payload = _account_change_payload(body)
+            revision = await asyncio.to_thread(
+                authentication.change_account,
+                extract_bearer_token(request.headers.get("authorization")),
+                current_password=payload[0],
+                username=payload[1],
+                new_password=payload[2],
+                duration_minutes=payload[3],
+                expected_revision=payload[4],
+            )
+            return JSONResponse(
+                content=StandardResponse.success(
+                    data={"revision": revision, "reauthenticate": True}
+                ).to_dict()
+            )
+        except RevisionConflictError:
+            code, message = 409, "Settings changed. Reopen and retry."
+        except AuthenticationError:
+            code, message = 403, "Current password verification failed."
+        except ValueError, TypeError:
+            code, message = 422, "Invalid account settings."
+        except PersistenceError:
+            code, message = 503, "Account store unavailable."
+        logger.warning(
+            "Account update rejected", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+        )
+        return JSONResponse(
+            status_code=code,
+            content=StandardResponse.failure(
+                error=StandardError(code="ACCOUNT_UPDATE_FAILED", message=message),
+                message=message,
+            ).to_dict(),
+        )
+
+    return router
+
+
+def create_auth_router(authentication: HostAuthentication) -> APIRouter:
+    """Expose legacy login/status aliases using the session-owned authentication."""
+    handlers = SessionsRouter(
+        authentication.manager,
+        get_global_authorizer(),
+        get_global_authority_coordinator(),
+        authentication,
+    )
+    router = APIRouter(tags=["sessions"])
+    router.add_api_route("/auth/login", handlers.login_endpoint, methods=["POST"])
+    router.add_api_route("/login", handlers.login_endpoint, methods=["POST"])
+
+    router.include_router(_create_account_router(authentication))
+
+    @router.get("/auth/status")
+    def auth_status(request: Request, token: str | None = None) -> JSONResponse:
+        """Inspect whether the supplied shared session is active."""
+        resolved = (
+            extract_bearer_token(request.headers.get("authorization"))
+            if request.headers.get("authorization")
+            else token
+        )
+        try:
+            session = authentication.verify_session(resolved or "")
+        except SecurityError:
+            raise HTTPException(
+                status_code=401, detail="Host session required or expired."
+            ) from None
+        return JSONResponse(
+            content=StandardResponse.success(
+                data={"authenticated": True, "username": session.username}
+            ).to_dict()
+        )
+
+    logger.debug(
+        "Authentication router composed",
+        extra={"fr_id": "FR-HOST-SESS-REST-PROJECTION"},
+    )
+    return router
+
+
 class SessionsRouter:
     """Encapsulates FastAPI endpoint methods for host sessions and security."""
 
@@ -1457,14 +1989,54 @@ class SessionsRouter:
         session_manager: SessionManager,
         authorizer: ScopeAuthorizer,
         authority_coordinator: DistinctAuthorityCoordinator,
+        authentication: HostAuthentication | None = None,
     ) -> None:
         self.mgr = session_manager
         self.auth = authorizer
         self.coord = authority_coordinator
+        self.authentication = (
+            authentication
+            if authentication is not None
+            else HostAuthentication(HostSettings(), session_manager)
+        )
 
     async def login_endpoint(self, req: LoginRequest) -> Response:
         """Authenticate and issue a new ephemeral session token."""
-        session = self.mgr.create_session(username=req.username, role=req.role)
+        try:
+            session = await asyncio.to_thread(self.authentication.authenticate, req)
+        except PersistenceError:
+            logger.error(  # noqa: TRY400 - Storage errors must not expose details.
+                "Login session storage unavailable",
+                extra={"fr_id": "FR-HOST-SESS-LIFECYCLE"},
+            )
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content=StandardResponse.failure(
+                    error=StandardError(
+                        code="SESSION_STORAGE_UNAVAILABLE",
+                        message="Session storage is unavailable. Retry later.",
+                    ),
+                    message="Login failed.",
+                ).to_dict(),
+            )
+        except AuthenticationError as exc:
+            code = (
+                status.HTTP_429_TOO_MANY_REQUESTS
+                if isinstance(exc, LoginCooldownError)
+                else status.HTTP_401_UNAUTHORIZED
+            )
+            return JSONResponse(
+                status_code=code,
+                content=StandardResponse.failure(
+                    error=StandardError(
+                        code="LOGIN_COOLDOWN"
+                        if code == status.HTTP_429_TOO_MANY_REQUESTS
+                        else "INVALID_CREDENTIALS",
+                        message="Invalid credentials or host setup unavailable.",
+                    ),
+                    message="Login failed.",
+                ).to_dict(),
+            )
         token_data = SessionToken(
             token=session.token,
             username=session.username,
@@ -1486,7 +2058,7 @@ class SessionsRouter:
         """Inspect active session details and scopes."""
         token = extract_bearer_token(authorization)
         try:
-            session = self.mgr.verify_session(token)
+            session = self.authentication.verify_session(token)
         except SecurityError as exc:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)
@@ -1527,7 +2099,7 @@ class SessionsRouter:
         """Request time-bounded distinct authority elevation for a dangerous action."""
         token = extract_bearer_token(authorization)
         try:
-            session = self.mgr.verify_session(token)
+            session = self.authentication.verify_session(token)
         except SecurityError as exc:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)
@@ -1562,7 +2134,7 @@ class SessionsRouter:
         """Evaluate whether active session possesses required scope."""
         token = extract_bearer_token(authorization)
         try:
-            session = self.mgr.verify_session(token)
+            session = self.authentication.verify_session(token)
         except SecurityError as exc:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail=str(exc)
@@ -1618,6 +2190,7 @@ def create_sessions_router(
     session_manager: SessionManager | None = None,
     authorizer: ScopeAuthorizer | None = None,
     authority_coordinator: DistinctAuthorityCoordinator | None = None,
+    authentication: HostAuthentication | None = None,
 ) -> APIRouter:
     """Create FastAPI router exposing session lifecycle and security endpoints.
 
@@ -1627,7 +2200,7 @@ def create_sessions_router(
     auth = authorizer or get_global_authorizer()
     coord = authority_coordinator or get_global_authority_coordinator()
 
-    handlers = SessionsRouter(mgr, auth, coord)
+    handlers = SessionsRouter(mgr, auth, coord, authentication)
     router = APIRouter(prefix="/sessions", tags=["sessions"])
 
     router.add_api_route(
@@ -1687,6 +2260,49 @@ def create_sessions_router(
 # -----------------------------------------------------------------------------
 
 
+def configure_host_user(database_path: Path, username: str) -> int:
+    """Configure the single account through local hidden password prompts."""
+    settings = HostSettings(database_path)
+    try:
+        snapshot = settings.get_snapshot()
+        if snapshot.values.get("application", {}).get("user_access") and (
+            input("Replace the configured host account? Type REPLACE: ") != "REPLACE"
+        ):
+            logger.info(
+                "Account replacement canceled",
+                extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"},
+            )
+            return 1
+        password = getpass.getpass("Host password: ")
+        confirmation = getpass.getpass("Confirm host password: ")
+        if password != confirmation:
+            raise ValueError("Password confirmation does not match.")  # noqa: TRY301 - CLI translates a failed confirmation into an exit code.
+        encoded = hash_password(password)
+        del password, confirmation
+        settings.update(
+            {
+                "application": {
+                    "user_access": {
+                        "username": username,
+                        "password_hash": encoded,
+                        "password_salt": password_verifier_salt(encoded),
+                    }
+                }
+            },
+            expected_revision=snapshot.revision,
+        )
+        get_global_session_manager().reset()
+        logger.info(
+            "Host account configured", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+        )
+        return 0
+    except PersistenceError, ValueError, EOFError:
+        logger.error(  # noqa: TRY400 - Credential errors must not leak values.
+            "Host account setup failed", extra={"fr_id": "FR-HOST-SESS-CREDENTIALS"}
+        )
+        return 2
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint for host session and security inspection."""
     parser = argparse.ArgumentParser(
@@ -1709,7 +2325,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Print remote TLS deployment architecture specification.",
     )
 
+    parser.add_argument(
+        "--configure-user",
+        action="store_true",
+        help="Configure the single host account locally",
+    )
+    parser.add_argument("--username", help="Canonical host username")
+    parser.add_argument("--db", type=Path, help="Explicit credential database target")
     args = parser.parse_args(argv)
+    if args.configure_user:
+        if (
+            args.db is None
+            or not args.username
+            or not args.username.strip()
+            or len(args.username) > MAX_USERNAME_LENGTH
+        ):
+            parser.error(
+                "--configure-user requires --db and a nonempty --username "
+                "(up to 64 characters)"
+            )
+        return configure_host_user(args.db, args.username.strip())
 
     if args.check_install:
         result = verify_clean_installation(Path())

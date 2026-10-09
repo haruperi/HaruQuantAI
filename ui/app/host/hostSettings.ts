@@ -7,6 +7,71 @@ import type { AppSettings, ConfigurationSettings } from './types';
 export type ShellPreferences = Pick<AppSettings, 'theme' | 'language' | 'zoom' | 'configuration' | 'remoteAccess' | 'smtp'>;
 export interface HostSettingsSnapshot { revision: number; preferences: ShellPreferences }
 
+export interface SettingsField {
+  scope: string; group: string; key: string; label: string;
+  kind: 'str' | 'bool' | 'int' | 'float' | 'list';
+  readonly: boolean; secret: boolean; configured?: boolean;
+  value?: string | number | boolean | unknown[] | null; options?: string[]; effect?: string;
+}
+export interface SettingsCatalogue {
+  revision: number; fields: SettingsField[];
+  unknown: { scope: string; key: string; reason: string }[];
+}
+
+export function parseSettingsCatalogue(value: unknown): SettingsCatalogue {
+  const catalogue = object(value, 'Settings catalogue');
+  if (!Number.isInteger(catalogue.revision) || Number(catalogue.revision) < 0 || !Array.isArray(catalogue.fields) || !Array.isArray(catalogue.unknown)) throw new Error('Invalid settings catalogue.');
+  const fields = catalogue.fields.map(item => {
+    const field = object(item, 'Settings field');
+    if (['scope', 'group', 'key', 'label', 'kind'].some(key => typeof field[key] !== 'string') || typeof field.secret !== 'boolean' || typeof field.readonly !== 'boolean' || !['str', 'bool', 'int', 'float', 'list'].includes(String(field.kind))) throw new Error('Invalid settings field.');
+    const leaf = String(field.key).split('.').at(-1);
+    if (['password', 'password_hash', 'password_salt', 'api_key', 'client_secret', 'access_token', 'refresh_token', 'auth_token', 'bot_token'].includes(leaf ?? '') && !field.secret) throw new Error('Unsafe settings secret projection.');
+    if (field.secret) {
+      if ('value' in field || typeof field.configured !== 'boolean') throw new Error('Unsafe settings secret projection.');
+    } else {
+      const item = field.value;
+      const valid = field.kind === 'str' ? typeof item === 'string' : field.kind === 'bool' ? typeof item === 'boolean' : field.kind === 'list' ? Array.isArray(item) : (item === null && field.key === 'databank_sync_interval_mins') || (typeof item === 'number' && Number.isFinite(item) && (field.kind !== 'int' || Number.isInteger(item)));
+      if (!valid) throw new Error('Invalid settings field value.');
+    }
+    if (field.options !== undefined && (!Array.isArray(field.options) || field.options.some(option => typeof option !== 'string'))) throw new Error('Invalid settings options.');
+    return field as unknown as SettingsField;
+  });
+  const unknown = catalogue.unknown.map(item => {
+    const row = object(item, 'Unsupported settings metadata');
+    if (typeof row.scope !== 'string' || typeof row.key !== 'string' || typeof row.reason !== 'string') throw new Error('Invalid unsupported settings metadata.');
+    return { scope: row.scope, key: row.key, reason: row.reason };
+  });
+  return { revision: Number(catalogue.revision), fields, unknown };
+}
+
+export async function readSettingsCatalogue(): Promise<SettingsCatalogue> {
+  return parseSettingsCatalogue(await createDomainClient('').get<unknown>('/settings/catalogue'));
+}
+
+export async function saveCatalogueFields(
+  catalogue: SettingsCatalogue, changes: Record<string, Record<string, unknown>>,
+  includesSecrets: boolean,
+): Promise<SettingsCatalogue> {
+  await createDomainClient('').put(includesSecrets ? '/settings/secrets' : '/settings', {
+    expected_revision: catalogue.revision, changes,
+  });
+  return readSettingsCatalogue();
+}
+
+export interface HostAccount { username: string; revision: number; session_timeout_mins: number }
+export function readHostAccount(): Promise<HostAccount> {
+  return createDomainClient('').get('/auth/account');
+}
+export async function changeHostAccount(
+  account: HostAccount, currentPassword: string, newPassword: string,
+): Promise<void> {
+  await createDomainClient('').put('/auth/account', {
+    username: account.username, expected_revision: account.revision,
+    session_timeout_mins: account.session_timeout_mins,
+    current_password: currentPassword, new_password: newPassword,
+  });
+}
+
 export function shellPreferences(settings: AppSettings): ShellPreferences {
   const { theme, language, zoom, configuration, remoteAccess, smtp } = settings;
   return { theme, language, zoom, configuration, remoteAccess, smtp };
@@ -31,7 +96,7 @@ const gcModes: Record<ConfigurationSettings['garbageCollector'], string> = {
   parallel: 'ParallelGC', g1: 'G1GC', automatic: 'Automatic',
 };
 const cleanupMinutes: Record<ConfigurationSettings['cleanupInterval'], number> = {
-  '5 minutes': 5, '15 minutes': 15, '30 minutes': 30, '1 hour': 60,
+  never: 0, '5 minutes': 5, '15 minutes': 15, '30 minutes': 30, '1 hour': 60,
 };
 const syncMinutes: Record<ConfigurationSettings['databankSyncInterval'], number | null> = {
   Never: null, Immediately: 0, 'Every 5 minutes': 5,
@@ -96,9 +161,10 @@ function parsePreferences(values: Record<string, unknown>): ShellPreferences {
     soundsOff: boolField(global, 'sounds_off', defaults.configuration.soundsOff),
     rememberFileChooser: boolField(global, 'advanced_file_chooser', defaults.configuration.rememberFileChooser),
     showControlOrders: boolField(global, 'show_control_orders', defaults.configuration.showControlOrders),
-    headerCustomText: stringField(global, 'header_custom_text', ''),
+    headerCustomText: stringField(app, 'header_custom_text', ''),
     footerCustomText: stringField(global, 'footer_custom_text', ''),
     defaultResult,
+    dataFrameGuard: mappedField(stringField(global, 'data_frame_guard', 'warn'), { warn: 'warn', stop: 'stop', off: 'off' }, 'data frame guard'),
     coreUsage: mappedField(stringField(cpu, 'core_usage', 'all_except_one'), cpuModes, 'CPU mode'),
     customCores: numberField(cpu, 'custom_cores', defaults.configuration.customCores),
     highPriority: boolField(cpu, 'high_priority', false),
@@ -162,9 +228,7 @@ export async function writeHostPreferences(
     if (!Object.is(value, before)) put(key, field, value);
   };
   changed('app.general', 'theme', preferences.theme, previous.theme);
-  changed('config.global', 'theme', preferences.theme, previous.theme);
   changed('app.general', 'language', languageCodes[preferences.language], languageCodes[previous.language]);
-  changed('config.global', 'language', languageCodes[preferences.language], languageCodes[previous.language]);
   changed('app.general', 'zoom', preferences.zoom, previous.zoom);
   const next = preferences.configuration;
   const old = previous.configuration;
@@ -172,9 +236,10 @@ export async function writeHostPreferences(
   field('config.global', 'sounds_off', 'soundsOff');
   field('config.global', 'advanced_file_chooser', 'rememberFileChooser');
   field('config.global', 'show_control_orders', 'showControlOrders');
-  field('config.global', 'header_custom_text', 'headerCustomText');
+  field('app.general', 'header_custom_text', 'headerCustomText');
   field('config.global', 'footer_custom_text', 'footerCustomText');
   field('config.global', 'default_result_to_display', 'defaultResult', next.defaultResult === 'main' ? 'Main' : 'Portfolio', old.defaultResult === 'main' ? 'Main' : 'Portfolio');
+  field('config.global', 'data_frame_guard', 'dataFrameGuard');
   field('config.cpu', 'core_usage', 'coreUsage', cpuModes[next.coreUsage], cpuModes[old.coreUsage]);
   field('config.cpu', 'custom_cores', 'customCores');
   field('config.cpu', 'high_priority', 'highPriority');
