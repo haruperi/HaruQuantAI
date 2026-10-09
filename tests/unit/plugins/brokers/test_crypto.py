@@ -345,6 +345,212 @@ def test_get_bars_errors() -> None:
         assert resp_exc.error.code == "KLINE_ERROR"
 
 
+def _make_mock_kline_batch(
+    start_time_ms: int, count: int, interval_ms: int = 60000
+) -> list[list[Any]]:
+    """Generate synthetic kline records with sequential timestamps for pagination tests."""
+    batch: list[list[Any]] = []
+    for i in range(count):
+        t = start_time_ms + i * interval_ms
+        batch.append(
+            [
+                t,
+                "27000.00",
+                "27100.00",
+                "26900.00",
+                "27050.00",
+                "10.0",
+                t + interval_ms - 1,
+                "270000.0",
+                100,
+                "5.0",
+                "135000.0",
+                "0",
+            ]
+        )
+    return batch
+
+
+def test_get_bars_forward_pagination() -> None:
+    """Verify forward chronological pagination across multiple 1,000-bar pages."""
+    broker = BinanceBroker(venue="spot")
+
+    t0 = 1700000000000
+    batch1 = _make_mock_kline_batch(t0, 1000)
+    t1 = t0 + 1000 * 60000
+    batch2 = _make_mock_kline_batch(t1, 500)
+
+    resp1 = MagicMock()
+    resp1.status_code = 200
+    resp1.json.return_value = batch1
+
+    resp2 = MagicMock()
+    resp2.status_code = 200
+    resp2.json.return_value = batch2
+
+    d_from = datetime.fromtimestamp(t0 / 1000.0, tz=UTC)
+    d_to = datetime.fromtimestamp((t1 + 500 * 60000) / 1000.0, tz=UTC)
+
+    with patch.object(broker.session, "get", side_effect=[resp1, resp2]) as mock_get:
+        resp = broker.get_bars(
+            symbol="BTCUSDT",
+            timeframe=TimeFrame.M1,
+            date_from=d_from,
+            date_to=d_to,
+        )
+        assert resp.is_success
+        assert resp.data is not None
+        assert len(resp.data) == 1500
+        assert mock_get.call_count == 2
+
+        # Verify page 2 startTime advanced
+        call2_kwargs = mock_get.call_args_list[1][1]
+        last_t_page1 = batch1[-1][0]
+        assert call2_kwargs["params"]["startTime"] == last_t_page1 + 1
+
+
+def test_get_bars_forward_pagination_with_count_limit() -> None:
+    """Verify forward pagination halts once count limit is satisfied."""
+    broker = BinanceBroker(venue="spot")
+
+    t0 = 1700000000000
+    batch1 = _make_mock_kline_batch(t0, 1000)
+    t1 = t0 + 1000 * 60000
+    batch2 = _make_mock_kline_batch(t1, 200)
+
+    resp1 = MagicMock()
+    resp1.status_code = 200
+    resp1.json.return_value = batch1
+
+    resp2 = MagicMock()
+    resp2.status_code = 200
+    resp2.json.return_value = batch2
+
+    d_from = datetime.fromtimestamp(t0 / 1000.0, tz=UTC)
+
+    with patch.object(broker.session, "get", side_effect=[resp1, resp2]) as mock_get:
+        resp = broker.get_bars(
+            symbol="BTCUSDT",
+            timeframe=TimeFrame.M1,
+            count=1200,
+            date_from=d_from,
+            start_pos=10,
+        )
+        assert resp.is_success
+        assert resp.data is not None
+        assert len(resp.data) == 1190  # 1200 - 10 start_pos
+        assert mock_get.call_count == 2
+        # Check second call requested remaining 200
+        call2_kwargs = mock_get.call_args_list[1][1]
+        assert call2_kwargs["params"]["limit"] == 200
+
+
+def test_get_bars_backward_pagination() -> None:
+    """Verify backward pagination when count > 1000 with no date_from."""
+    broker = BinanceBroker(venue="spot")
+
+    t_recent = 1700100000000
+    batch_recent = _make_mock_kline_batch(t_recent, 1000)
+    t_older = t_recent - 500 * 60000
+    batch_older = _make_mock_kline_batch(t_older, 500)
+
+    resp1 = MagicMock()
+    resp1.status_code = 200
+    resp1.json.return_value = batch_recent
+
+    resp2 = MagicMock()
+    resp2.status_code = 200
+    resp2.json.return_value = batch_older
+
+    with patch.object(broker.session, "get", side_effect=[resp1, resp2]) as mock_get:
+        resp = broker.get_bars(
+            symbol="BTCUSDT",
+            timeframe=TimeFrame.M1,
+            count=1500,
+            start_pos=5,
+        )
+        assert resp.is_success
+        assert resp.data is not None
+        assert len(resp.data) == 1495  # 1500 - 5 start_pos
+        assert mock_get.call_count == 2
+
+        # Verify call 2 passed endTime = earliest_open_ms - 1
+        call2_kwargs = mock_get.call_args_list[1][1]
+        earliest_ms = batch_recent[0][0]
+        assert call2_kwargs["params"]["endTime"] == earliest_ms - 1
+        assert call2_kwargs["params"]["limit"] == 500
+
+        # Verify strict ascending chronological ordering after combining
+        for i in range(1, len(resp.data)):
+            assert resp.data[i].time > resp.data[i - 1].time
+
+
+def test_get_bars_pagination_partial_failure_and_edge_cases() -> None:
+    """Verify pagination failure branches, empty responses, and non-advancing breaks."""
+    broker = BinanceBroker(venue="spot")
+
+    # 1. Forward pagination initial request failure (status 500)
+    err_resp = MagicMock()
+    err_resp.status_code = 500
+    err_resp.text = "Server Error"
+    d_from = datetime(2023, 11, 1, 0, 0, tzinfo=UTC)
+
+    with patch.object(broker.session, "get", return_value=err_resp):
+        fail_resp = broker.get_bars("BTCUSDT", date_from=d_from)
+        assert not fail_resp.is_success
+        assert fail_resp.error is not None
+        assert fail_resp.error.code == "500"
+
+    # 2. Forward pagination interrupted on page 2 (gracefully returns page 1)
+    batch1 = _make_mock_kline_batch(1700000000000, 1000)
+    succ_resp = MagicMock()
+    succ_resp.status_code = 200
+    succ_resp.json.return_value = batch1
+
+    with patch.object(broker.session, "get", side_effect=[succ_resp, err_resp]):
+        partial_resp = broker.get_bars("BTCUSDT", date_from=d_from)
+        assert partial_resp.is_success
+        assert partial_resp.data is not None
+        assert len(partial_resp.data) == 1000
+
+    # 3. Forward pagination returns empty rows on page 2
+    empty_resp = MagicMock()
+    empty_resp.status_code = 200
+    empty_resp.json.return_value = []
+    with patch.object(broker.session, "get", side_effect=[succ_resp, empty_resp]):
+        empty_end_resp = broker.get_bars("BTCUSDT", date_from=d_from)
+        assert empty_end_resp.is_success
+        assert len(empty_end_resp.data or []) == 1000
+
+    # 4. Backward pagination initial request failure
+    with patch.object(broker.session, "get", return_value=err_resp):
+        back_fail = broker.get_bars("BTCUSDT", count=1500)
+        assert not back_fail.is_success
+        assert back_fail.error is not None
+        assert back_fail.error.code == "500"
+
+    # 5. Backward pagination interrupted on page 2 (gracefully returns batch 1)
+    with patch.object(broker.session, "get", side_effect=[succ_resp, err_resp]):
+        back_partial = broker.get_bars("BTCUSDT", count=1500)
+        assert back_partial.is_success
+        assert len(back_partial.data or []) == 1000
+
+    # 6. Backward pagination returns empty on page 2
+    with patch.object(broker.session, "get", side_effect=[succ_resp, empty_resp]):
+        back_empty = broker.get_bars("BTCUSDT", count=1500)
+        assert back_empty.is_success
+        assert len(back_empty.data or []) == 1000
+
+    # 7. Exception raised during pagination
+    with patch.object(
+        broker.session, "get", side_effect=requests.RequestException("DNS failure")
+    ):
+        exc_resp = broker.get_bars("BTCUSDT", date_from=d_from)
+        assert not exc_resp.is_success
+        assert exc_resp.error is not None
+        assert exc_resp.error.code == "KLINE_ERROR"
+
+
 MOCK_RAW_TRADES: list[dict[str, Any]] = [
     {
         "id": 1001,

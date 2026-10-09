@@ -163,6 +163,20 @@ def _calc_digits(tick_size: float) -> int:
     return len(s.split(".")[1]) if "." in s else 0
 
 
+def _raw_kline_to_bar(row: list[Any]) -> Bar:
+    """Convert raw Binance kline array to canonical Bar record."""
+    open_time = datetime.fromtimestamp(float(row[0]) / 1000.0, tz=UTC)
+    return Bar(
+        time=open_time,
+        open=float(row[1]),
+        high=float(row[2]),
+        low=float(row[3]),
+        close=float(row[4]),
+        tick_volume=int(float(row[5])),
+        real_volume=int(float(row[5])),
+    )
+
+
 __all__ = ["BinanceBroker", "create_adapter"]
 
 
@@ -436,62 +450,222 @@ class BinanceBroker(BaseBroker):
         date_to: datetime | None = None,
         start_pos: int | None = 0,
     ) -> StandardResponse[list[Bar]]:
-        """Retrieve real historical candlestick bars from Binance REST klines API."""
+        """Retrieve real historical candlestick bars from Binance REST klines API with pagination."""
         sym_clean = self._normalize_symbol(symbol)
         interval = _map_timeframe(timeframe)
-        limit = min(count or 500, 1000)
-
-        params: dict[str, Any] = {
-            "symbol": sym_clean,
-            "interval": interval,
-            "limit": limit,
-        }
-        if date_from:
-            params["startTime"] = int(date_from.timestamp() * 1000)
-        if date_to:
-            params["endTime"] = int(date_to.timestamp() * 1000)
-
         url = f"{self.base_url}{self.api_prefix}/klines"
-        try:
-            r = self.session.get(url, params=params, timeout=(5.0, 20.0))
-            if r.status_code == 200:
-                raw_klines = r.json()
-                bars: list[Bar] = []
-                for row in raw_klines:
-                    # [ openTime, open, high, low, close, volume, closeTime, ... ]
-                    open_time = datetime.fromtimestamp(row[0] / 1000.0, tz=UTC)
-                    bars.append(
-                        Bar(
-                            time=open_time,
-                            open=float(row[1]),
-                            high=float(row[2]),
-                            low=float(row[3]),
-                            close=float(row[4]),
-                            tick_volume=int(float(row[5])),
-                            real_volume=int(float(row[5])),
-                        )
+
+        # Fast path: single-page request when date_from is None and count <= 1000
+        if date_from is None and (count is None or count <= 1000):
+            limit = min(count or 500, 1000)
+            params: dict[str, Any] = {
+                "symbol": sym_clean,
+                "interval": interval,
+                "limit": limit,
+            }
+            if date_to:
+                params["endTime"] = int(date_to.timestamp() * 1000)
+
+            try:
+                r = self.session.get(url, params=params, timeout=(5.0, 20.0))
+                if r.status_code == 200:
+                    raw_klines: list[list[Any]] = r.json()
+                    bars: list[Bar] = [_raw_kline_to_bar(row) for row in raw_klines]
+                    if start_pos and start_pos > 0:
+                        bars = bars[start_pos:]
+                    self.logger.info(
+                        "FR-BROKER-BINANCE-MARKET-DATA: Retrieved %d klines for %s from Binance",
+                        len(bars),
+                        sym_clean,
+                        extra={
+                            "fr_id": "FR-BROKER-BINANCE-MARKET-DATA",
+                            "symbol": sym_clean,
+                            "count": len(bars),
+                        },
                     )
+                    return StandardResponse.success(
+                        data=bars,
+                        message=f"Retrieved {len(bars)} bars from Binance for '{sym_clean}'",
+                        extensions={"broker": self.name},
+                    )
+                msg = f"Binance klines request failed with status {r.status_code}: {r.text}"
+                return StandardResponse.failure(
+                    message=msg,
+                    error=StandardError(code=str(r.status_code), message=msg),
+                    extensions={"broker": self.name},
+                )
+            except Exception as e:
+                msg = f"Failed to retrieve klines from Binance for '{sym_clean}': {e}"
+                self.logger.error("FR-BROKER-BINANCE-MARKET-DATA: %s", msg)
+                return StandardResponse.failure(
+                    message=msg,
+                    error=StandardError(code="KLINE_ERROR", message=msg),
+                    extensions={"broker": self.name},
+                )
+
+        # Multi-page pagination path
+        max_pages = 50
+        pages = 0
+
+        try:
+            if date_from is not None:
+                # Forward pagination starting from date_from up to date_to or count
+                all_bars: list[Bar] = []
+                cur_start_ms = int(date_from.timestamp() * 1000)
+                end_ms = int(date_to.timestamp() * 1000) if date_to else None
+
+                while pages < max_pages:
+                    pages += 1
+                    batch_limit = 1000
+                    if count is not None:
+                        remaining = count - len(all_bars)
+                        if remaining <= 0:
+                            break
+                        batch_limit = min(remaining, 1000)
+
+                    p: dict[str, Any] = {
+                        "symbol": sym_clean,
+                        "interval": interval,
+                        "limit": batch_limit,
+                        "startTime": cur_start_ms,
+                    }
+                    if end_ms is not None:
+                        p["endTime"] = end_ms
+
+                    r = self.session.get(url, params=p, timeout=(5.0, 20.0))
+                    if r.status_code != 200:
+                        if not all_bars:
+                            msg = f"Binance klines request failed with status {r.status_code}: {r.text}"
+                            return StandardResponse.failure(
+                                message=msg,
+                                error=StandardError(
+                                    code=str(r.status_code), message=msg
+                                ),
+                                extensions={"broker": self.name},
+                            )
+                        self.logger.warning(
+                            "FR-BROKER-BINANCE-MARKET-DATA: Kline pagination interrupted at page %d (status %d)",
+                            pages,
+                            r.status_code,
+                        )
+                        break
+
+                    raw_rows: list[list[Any]] = r.json()
+                    if not raw_rows:
+                        break
+
+                    batch_bars = [_raw_kline_to_bar(row) for row in raw_rows]
+                    all_bars.extend(batch_bars)
+
+                    last_open_ms: int = int(raw_rows[-1][0])
+                    next_start_ms = last_open_ms + 1
+                    if next_start_ms <= cur_start_ms:
+                        break
+                    cur_start_ms = next_start_ms
+
+                    if end_ms is not None and cur_start_ms > end_ms:
+                        break
+                    if len(raw_rows) < batch_limit:
+                        break
+
+                if start_pos and start_pos > 0:
+                    all_bars = all_bars[start_pos:]
+
                 self.logger.info(
-                    "FR-BROKER-BINANCE-MARKET-DATA: Retrieved %d klines for %s from Binance",
-                    len(bars),
+                    "FR-BROKER-BINANCE-MARKET-DATA: Retrieved %d klines for %s across %d page(s)",
+                    len(all_bars),
                     sym_clean,
+                    pages,
                     extra={
                         "fr_id": "FR-BROKER-BINANCE-MARKET-DATA",
                         "symbol": sym_clean,
-                        "count": len(bars),
+                        "count": len(all_bars),
+                        "pages": pages,
                     },
                 )
                 return StandardResponse.success(
-                    data=bars,
-                    message=f"Retrieved {len(bars)} bars from Binance for '{sym_clean}'",
+                    data=all_bars,
+                    message=f"Retrieved {len(all_bars)} bars from Binance for '{sym_clean}' ({pages} pages)",
                     extensions={"broker": self.name},
                 )
-            msg = f"Binance klines request failed with status {r.status_code}: {r.text}"
-            return StandardResponse.failure(
-                message=msg,
-                error=StandardError(code=str(r.status_code), message=msg),
+
+            # Backward pagination: date_from is None, count > 1000
+            batches: list[list[Bar]] = []
+            total_collected = 0
+            target_count = count if count is not None else 1000
+            cur_end_ms = int(date_to.timestamp() * 1000) if date_to else None
+
+            while pages < max_pages and total_collected < target_count:
+                pages += 1
+                remaining = target_count - total_collected
+                batch_limit = min(remaining, 1000)
+
+                p = {
+                    "symbol": sym_clean,
+                    "interval": interval,
+                    "limit": batch_limit,
+                }
+                if cur_end_ms is not None:
+                    p["endTime"] = cur_end_ms
+
+                r = self.session.get(url, params=p, timeout=(5.0, 20.0))
+                if r.status_code != 200:
+                    if not batches:
+                        msg = f"Binance klines request failed with status {r.status_code}: {r.text}"
+                        return StandardResponse.failure(
+                            message=msg,
+                            error=StandardError(code=str(r.status_code), message=msg),
+                            extensions={"broker": self.name},
+                        )
+                    self.logger.warning(
+                        "FR-BROKER-BINANCE-MARKET-DATA: Backward pagination interrupted at page %d (status %d)",
+                        pages,
+                        r.status_code,
+                    )
+                    break
+
+                raw_rows = r.json()
+                if not raw_rows:
+                    break
+
+                batch_bars = [_raw_kline_to_bar(row) for row in raw_rows]
+                batches.append(batch_bars)
+                total_collected += len(batch_bars)
+
+                earliest_open_ms: int = int(raw_rows[0][0])
+                next_end_ms = earliest_open_ms - 1
+                if cur_end_ms is not None and next_end_ms >= cur_end_ms:
+                    break
+                cur_end_ms = next_end_ms
+
+                if len(raw_rows) < batch_limit:
+                    break
+
+            ordered_bars: list[Bar] = []
+            for b in reversed(batches):
+                ordered_bars.extend(b)
+
+            if start_pos and start_pos > 0:
+                ordered_bars = ordered_bars[start_pos:]
+
+            self.logger.info(
+                "FR-BROKER-BINANCE-MARKET-DATA: Retrieved %d klines for %s across %d page(s)",
+                len(ordered_bars),
+                sym_clean,
+                pages,
+                extra={
+                    "fr_id": "FR-BROKER-BINANCE-MARKET-DATA",
+                    "symbol": sym_clean,
+                    "count": len(ordered_bars),
+                    "pages": pages,
+                },
+            )
+            return StandardResponse.success(
+                data=ordered_bars,
+                message=f"Retrieved {len(ordered_bars)} bars from Binance for '{sym_clean}' ({pages} pages)",
                 extensions={"broker": self.name},
             )
+
         except Exception as e:
             msg = f"Failed to retrieve klines from Binance for '{sym_clean}': {e}"
             self.logger.error("FR-BROKER-BINANCE-MARKET-DATA: %s", msg)
@@ -592,32 +766,46 @@ if __name__ == "__main__":
     assert syms_resp.data is not None
     assert len(syms_resp.data) > 0
 
-    # 4. Test historical klines
+    # 4. Test historical klines (single-page fast path)
     bars_resp = broker.get_bars("BTCUSDT", count=5)
     print(
-        f"[4] Live Klines BTCUSDT: success={bars_resp.is_success}, "
+        f"[4] Live Klines BTCUSDT (fast path): success={bars_resp.is_success}, "
         f"count={len(bars_resp.data) if bars_resp.data else 0}"
     )
     assert bars_resp.is_success, f"Bars retrieval failed: {bars_resp.message}"
     assert bars_resp.data is not None
     assert len(bars_resp.data) == 5
 
-    # 5. Test real ticks
+    # 5. Test multi-page historical klines pagination (> 1000 bars)
+    multi_bars_resp = broker.get_bars("BTCUSDT", count=1050)
+    print(
+        f"[5] Multi-page Klines BTCUSDT: success={multi_bars_resp.is_success}, "
+        f"count={len(multi_bars_resp.data) if multi_bars_resp.data else 0}"
+    )
+    assert multi_bars_resp.is_success, (
+        f"Multi-page bars failed: {multi_bars_resp.message}"
+    )
+    assert multi_bars_resp.data is not None
+    assert len(multi_bars_resp.data) == 1050
+    for idx in range(1, len(multi_bars_resp.data)):
+        assert multi_bars_resp.data[idx].time > multi_bars_resp.data[idx - 1].time
+
+    # 6. Test real ticks
     ticks_resp = broker.get_ticks("BTCUSDT", count=5)
     print(
-        f"[5] Live Ticks BTCUSDT: success={ticks_resp.is_success}, "
+        f"[6] Live Ticks BTCUSDT: success={ticks_resp.is_success}, "
         f"count={len(ticks_resp.data) if ticks_resp.data else 0}"
     )
     assert ticks_resp.is_success, f"Ticks retrieval failed: {ticks_resp.message}"
     assert ticks_resp.data is not None
     assert len(ticks_resp.data) == 5
 
-    # 6. Test trading rejection
+    # 7. Test trading rejection
     from app.plugins.brokers.contracts import TradeRequest
 
     trade_resp = broker.trade(TradeRequest(symbol="BTCUSDT", volume=0.001))
     print(
-        f"[6] Trade Rejection: success={trade_resp.is_success}, "
+        f"[7] Trade Rejection: success={trade_resp.is_success}, "
         f"message='{trade_resp.message}'"
     )
     assert not trade_resp.is_success
