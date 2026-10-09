@@ -73,7 +73,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Request, Response, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.host.jobs import JobManager
@@ -84,7 +84,12 @@ from app.host.response import StandardError
 from app.host.transport import ApiResponse, EventBus
 from app.workspace.data_manager.actions.review.quality import DataQualityInspector
 from app.workspace.data_manager.actions.transform.transforms import SeriesTransformer
-from app.workspace.data_manager.baskets import BasketDefinition, BasketService
+from app.workspace.data_manager.baskets import (
+    BasketDefinition,
+    BasketService,
+    export_groups_xml,
+    import_groups_xml,
+)
 from app.workspace.data_manager.broker import BrokerService
 from app.workspace.data_manager.connections import DownloadRequest, ProviderManager
 from app.workspace.data_manager.custom_data import CotService, CustomDataService
@@ -213,6 +218,36 @@ class BasketComputePayload(BaseModel):
     series: dict[str, list[BarRecord]]
     alignment_mode: str = Field(
         default="intersection", description="'intersection' or 'union'"
+    )
+
+
+class BasketCsvImportPayload(BaseModel):
+    """Payload for importing stock constituents from CSV text."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    basket_name: str = Field(..., description="Target basket name")
+    csv_text: str = Field(..., description="Multi-line CSV text (Ticker;From;To)")
+
+
+class BasketXmlImportPayload(BaseModel):
+    """Payload for importing stock groups from SQX XML."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    xml_content: str = Field(..., description="Canonical SQX XML string")
+    overwrite: bool = Field(
+        default=False, description="Whether to overwrite existing groups"
+    )
+
+
+class BasketXmlExportPayload(BaseModel):
+    """Payload for exporting stock groups to SQX XML."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    basket_names: list[str] = Field(
+        default_factory=list, description="Optional subset of basket names"
     )
 
 
@@ -1181,6 +1216,167 @@ class DataRouterService:
                 req_id,
             )
 
+    def import_basket_csv(
+        self, request: Request, payload: BasketCsvImportPayload
+    ) -> Response:
+        """Import constituents from CSV into an existing stock group."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            updated = self.baskets.import_stocks_from_csv(
+                payload.basket_name, payload.csv_text
+            )
+            self._emit_event("data.basket", "updated", updated.model_dump(mode="json"))
+            logger.info(
+                "FR-DATA-INTEGRATION-BASKETS: Imported CSV into basket '%s'",
+                payload.basket_name,
+                extra={
+                    "fr_id": "FR-DATA-INTEGRATION-BASKETS",
+                    "basket_name": payload.basket_name,
+                    "items": len(updated.items),
+                },
+            )
+            resp = ApiResponse.success(
+                data=updated.model_dump(mode="json"),
+                message=(
+                    f"Imported {len(updated.items)} stocks into basket "
+                    f"'{payload.basket_name}'"
+                ),
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except Exception as exc:
+            logger.exception(
+                "FR-DATA-INTEGRATION-BASKETS: Failed to import CSV into basket %s",
+                payload.basket_name,
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "error": str(exc)},
+            )
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "BASKET_CSV_IMPORT_ERROR",
+                f"Failed to import CSV: {exc}",
+                req_id,
+            )
+
+    def export_basket_csv(self, request: Request, name: str) -> Response:
+        """Export constituent list of a basket to CSV text."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            csv_text = self.baskets.export_stocks_to_csv(name)
+            logger.info(
+                "FR-DATA-INTEGRATION-BASKETS: Exported basket '%s' to CSV",
+                name,
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "basket_name": name},
+            )
+            return PlainTextResponse(content=csv_text, media_type="text/csv")
+        except Exception as exc:
+            logger.exception(
+                "FR-DATA-INTEGRATION-BASKETS: Failed to export basket %s to CSV",
+                name,
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "error": str(exc)},
+            )
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND,
+                "BASKET_NOT_FOUND",
+                f"Failed to export basket: {exc}",
+                req_id,
+            )
+
+    def import_basket_xml(
+        self, request: Request, payload: BasketXmlImportPayload
+    ) -> Response:
+        """Import baskets from canonical SQX XML format."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            imported = import_groups_xml(payload.xml_content)
+            saved: list[dict[str, Any]] = []
+            for b in imported:
+                b_id = self.baskets.save_basket(b, override_system=payload.overwrite)
+                saved.append({"id": b_id, "name": b.name, "items": len(b.items)})
+            logger.info(
+                "FR-DATA-INTEGRATION-BASKETS: Imported %d baskets from XML",
+                len(saved),
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "count": len(saved)},
+            )
+            resp = ApiResponse.success(
+                data=saved,
+                message=f"Imported {len(saved)} basket(s) from XML",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except Exception as exc:
+            logger.exception(
+                "FR-DATA-INTEGRATION-BASKETS: Failed to import baskets from XML",
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "error": str(exc)},
+            )
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "BASKET_XML_IMPORT_ERROR",
+                f"Failed to import XML: {exc}",
+                req_id,
+            )
+
+    def export_basket_xml(
+        self, request: Request, payload: BasketXmlExportPayload
+    ) -> Response:
+        """Export specified or all baskets to SQX XML format."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            if payload.basket_names:
+                baskets = [
+                    b
+                    for name in payload.basket_names
+                    if (b := self.baskets.get_basket(name)) is not None
+                ]
+            else:
+                baskets = self.baskets.list_baskets()
+            xml_text = export_groups_xml(baskets)
+            logger.info(
+                "FR-DATA-INTEGRATION-BASKETS: Exported %d baskets to XML",
+                len(baskets),
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "count": len(baskets)},
+            )
+            return PlainTextResponse(content=xml_text, media_type="application/xml")
+        except Exception as exc:
+            logger.exception(
+                "FR-DATA-INTEGRATION-BASKETS: Failed to export baskets to XML",
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "error": str(exc)},
+            )
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "BASKET_XML_EXPORT_ERROR",
+                f"Failed to export XML: {exc}",
+                req_id,
+            )
+
+    def check_basket_readiness(self, request: Request, name: str) -> Response:
+        """Evaluate data readiness diagnostics for a stock group."""
+        req_id = request.headers.get("x-request-id")
+        basket = self.baskets.get_basket(name)
+        if basket is None:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND,
+                "BASKET_NOT_FOUND",
+                f"Basket '{name}' not found",
+                req_id,
+            )
+        available_symbols = {d.symbol for d in self.catalog.list_datasets()}
+        readiness = self.baskets.check_readiness(basket, available_symbols)
+        logger.info(
+            "FR-DATA-INTEGRATION-BASKETS: Evaluated readiness for basket '%s'",
+            name,
+            extra={
+                "fr_id": "FR-DATA-INTEGRATION-BASKETS",
+                "basket_name": name,
+                "is_ready": readiness.is_ready,
+            },
+        )
+        resp = ApiResponse.success(
+            data=readiness.model_dump(mode="json"),
+            message="Basket readiness evaluated successfully",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
     # Providers
     def list_providers(self, request: Request) -> Response:
         """List provider capabilities."""
@@ -1846,6 +2042,36 @@ def create_data_router(
         service.compute_basket,
         methods=["POST"],
         summary="Compute synthetic basket",
+    )
+    router.add_api_route(
+        "/baskets/import-csv",
+        service.import_basket_csv,
+        methods=["POST"],
+        summary="Import basket constituents from CSV",
+    )
+    router.add_api_route(
+        "/baskets/{name}/export-csv",
+        service.export_basket_csv,
+        methods=["GET"],
+        summary="Export basket constituents to CSV",
+    )
+    router.add_api_route(
+        "/baskets/import-xml",
+        service.import_basket_xml,
+        methods=["POST"],
+        summary="Import baskets from SQX XML",
+    )
+    router.add_api_route(
+        "/baskets/export-xml",
+        service.export_basket_xml,
+        methods=["POST"],
+        summary="Export baskets to SQX XML",
+    )
+    router.add_api_route(
+        "/baskets/{name}/readiness",
+        service.check_basket_readiness,
+        methods=["GET"],
+        summary="Check basket data download readiness",
     )
 
     # Providers

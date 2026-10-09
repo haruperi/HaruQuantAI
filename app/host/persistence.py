@@ -2961,14 +2961,19 @@ class BasketStore:
         self._db = db
 
     def save(
-        self, name: str, description: str, members: list[dict[str, str]], *, system: int
+        self,
+        name: str,
+        description: str,
+        members: list[dict[str, Any]],
+        *,
+        system: int = 0,
     ) -> int:
         """Replace a group's membership atomically without domain defaults."""
         with self._db.transaction() as conn:
             conn.execute(
                 "INSERT INTO datamgr_stock_group (name, description, system) "
                 "VALUES (?, ?, ?) ON CONFLICT(name) DO UPDATE SET "
-                "description = excluded.description",
+                "description = excluded.description, system = excluded.system",
                 (name, description, system),
             )
             row = conn.execute(
@@ -2977,9 +2982,17 @@ class BasketStore:
             group_id = int(row["id"])
             conn.execute("DELETE FROM datamgr_stock WHERE basket_id = ?", (group_id,))
             conn.executemany(
-                "INSERT INTO datamgr_stock (ticker, basket_id, date_from) "
-                "VALUES (?, ?, ?)",
-                [(m["ticker"], group_id, m["date_from"]) for m in members],
+                "INSERT INTO datamgr_stock (ticker, basket_id, date_from, date_to) "
+                "VALUES (?, ?, ?, ?)",
+                [
+                    (
+                        m["ticker"],
+                        group_id,
+                        m.get("date_from") or "",
+                        m.get("date_to"),
+                    )
+                    for m in members
+                ],
             )
         logger.info("Basket rows saved", extra={"fr_id": "FR-HOST-PERSISTENCE-BASKETS"})
         return group_id
@@ -3009,6 +3022,33 @@ class BasketStore:
         logger.debug("Basket rows read", extra={"fr_id": "FR-HOST-PERSISTENCE-BASKETS"})
         return record
 
+    def get_by_id(self, basket_id: int) -> dict[str, Any] | None:
+        """Read a group and its ordered members by ID in one read transaction."""
+        with self._db.connection(query_only=True) as conn:
+            conn.execute("BEGIN")
+            try:
+                row = conn.execute(
+                    "SELECT * FROM datamgr_stock_group WHERE id = ?", (basket_id,)
+                ).fetchone()
+                if row is None:
+                    record = None
+                else:
+                    record = dict(row)
+                    record["members"] = [
+                        dict(member)
+                        for member in conn.execute(
+                            "SELECT * FROM datamgr_stock WHERE basket_id = ? "
+                            "ORDER BY id",
+                            (row["id"],),
+                        ).fetchall()
+                    ]
+            finally:
+                conn.execute("ROLLBACK")
+        logger.debug(
+            "Basket rows read by id", extra={"fr_id": "FR-HOST-PERSISTENCE-BASKETS"}
+        )
+        return record
+
     def list_names(self) -> list[str]:
         """Read group names in alphabetical order."""
         with self._db.connection(query_only=True) as conn:
@@ -3020,13 +3060,38 @@ class BasketStore:
         )
         return [str(row["name"]) for row in rows]
 
+    def list_groups(self) -> list[dict[str, Any]]:
+        """Read all stock groups with constituent counts in alphabetical order."""
+        with self._db.connection(query_only=True) as conn:
+            rows = conn.execute(
+                "SELECT g.id, g.name, g.description, g.system, "
+                "COUNT(s.id) AS member_count "
+                "FROM datamgr_stock_group g "
+                "LEFT JOIN datamgr_stock s ON g.id = s.basket_id "
+                "GROUP BY g.id "
+                "ORDER BY g.name"
+            ).fetchall()
+        logger.debug(
+            "Basket groups list read", extra={"fr_id": "FR-HOST-PERSISTENCE-BASKETS"}
+        )
+        return [dict(row) for row in rows]
+
     def delete(self, name: str) -> bool:
-        """Delete a group and its members in one transaction."""
+        """Delete a non-system group and its members in one transaction."""
         with self._db.transaction() as conn:
             row: sqlite3.Row | None = conn.execute(
-                "SELECT id FROM datamgr_stock_group WHERE name = ?", (name,)
+                "SELECT id, system FROM datamgr_stock_group WHERE name = ?", (name,)
             ).fetchone()
             if row is not None:
+                if int(row["system"]) == 1:
+                    logger.warning(
+                        "Cannot delete system stock group",
+                        extra={
+                            "basket_name": name,
+                            "fr_id": "FR-HOST-PERSISTENCE-BASKETS",
+                        },
+                    )
+                    return False
                 conn.execute(
                     "DELETE FROM datamgr_stock WHERE basket_id = ?", (row["id"],)
                 )
