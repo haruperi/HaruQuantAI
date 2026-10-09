@@ -721,7 +721,7 @@ class SQEquityBroker(BaseBroker):
 
         if dat_file:
             try:
-                bars = _decode_sq_dat_bars(
+                dat_bars = _decode_sq_dat_bars(
                     dat_file,
                     count=count,
                     date_from=date_from,
@@ -731,18 +731,18 @@ class SQEquityBroker(BaseBroker):
                 self.logger.info(
                     "FR-BROKER-SQ-EQUITY-MARKET-DATA: Loaded %d bars from SQ dat for"
                     " %s",
-                    len(bars),
+                    len(dat_bars),
                     symbol,
                     extra={
                         "fr_id": "FR-BROKER-SQ-EQUITY-MARKET-DATA",
                         "symbol": symbol,
-                        "count": len(bars),
+                        "count": len(dat_bars),
                         "file": str(dat_file),
                     },
                 )
                 return StandardResponse.success(
-                    data=bars,
-                    message=f"Loaded {len(bars)} bars for '{symbol}' from SQ dat",
+                    data=dat_bars,
+                    message=f"Loaded {len(dat_bars)} bars for '{symbol}' from SQ dat",
                     extensions={"broker": self.name, "source": "sq_dat"},
                 )
             except Exception as e:
@@ -779,7 +779,7 @@ class SQEquityBroker(BaseBroker):
 
                 norm_from = _normalize_dt(date_from)
                 norm_to = _normalize_dt(date_to)
-                bars = []
+                bars: list[Bar] = []
 
                 for pf_path in parquet_files:
                     pf = pq.ParquetFile(str(pf_path))

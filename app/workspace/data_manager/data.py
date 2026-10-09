@@ -1,17 +1,17 @@
-"""Authoritative dataset catalog, ingestion pipeline, and revision management.
+"""Authoritative dataset catalog, historical storage integration, and SQX operations.
 
 Description:
     Provides the central registry, metadata catalog, streaming file ingestion,
-    and immutable revision management for quantitative market datasets within the
-    Data Manager workspace, mirroring SQX DataManagerData. Normalizes bars into
-    canonical OHLCV records with geometry verification, chronological ordering,
-    and cryptographic SHA-256 fingerprinting. All persistence operations execute
-    through the host DatabaseManager. DatasetRecord owns metadata defaults;
-    CatalogService supplies domain timestamps and conflict-update field policy.
+    and StrategyQuant X (DataManagerData) operations for quantitative market
+    datasets within the Data Manager workspace. Normalizes bars and ticks into
+    canonical records with geometry verification, chronological ordering, and
+    integer tick unit encoding in partitioned Parquet files (ZSTD level 6). All
+    persistence operations synchronize authoritatively through the host
+    DatabaseManager (datamgr_datasets and datamgr_instruments).
 
 Purpose:
-    FEAT-WORKSPACE-DATAMGR: Dataset catalog, streaming file ingestion, and
-    immutable revision lineage management for the Data Manager workspace.
+    FEAT-WORKSPACE-DATAMGR: Dataset catalog, historical storage integration, and
+    StrategyQuant X DataManagerData domain operations.
 
 Key Capabilities:
     - FR-DATA-CATALOG-DATASET-REGISTRY: Authoritative dataset metadata tracking
@@ -27,6 +27,13 @@ Key Capabilities:
       distinguishing absent datasets from zero-bar acquired series.
       Associated: `[CatalogService.check_availability()]`
       Logging: Emits DEBUG when series availability is inspected.
+    - FR-DATA-CATALOG-SQX-OPERATIONS: StrategyQuant X DataManagerData operations:
+      add/create, read/view, update/edit, clear data, and remove data.
+      Associated: `[CatalogService.edit_dataset()]`,
+      `[CatalogService.clear_data()]`,
+      `[CatalogService.remove_data()]`,
+      `[CatalogService.review_chart()]`
+      Logging: Emits INFO on SQX data mutations and state transitions.
     - FR-DATA-INGESTION-STREAMING: Stream and chunk file parsing with
       delimiter sniffing.
       Associated: `[DataIngestionService.parse_stream()]`
@@ -55,7 +62,7 @@ Python API Usage:
     db = DatabaseManager(":memory:")
     db.initialize()
     catalog = CatalogService(db)
-    service = DataIngestionService(catalog, storage_dir=Path("storage/datasets"))
+    service = DataIngestionService(catalog, storage_dir=Path("data/market"))
 
     record = DatasetRecord(
         id="ds-eurusd-m1",
@@ -78,49 +85,50 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import json
 import re
 import sys
 import uuid
 import zoneinfo
-from collections.abc import Generator, Iterable
+from collections.abc import Generator, Iterable, Sequence
 from datetime import UTC, datetime, timezone
 from io import StringIO
 from pathlib import Path
 from typing import Any, override
 
+import polars as pl
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.host.logging import get_logger
 from app.host.persistence import DatabaseManager
 from app.workspace.data_manager.broker import BrokerProfileRecord, BrokerService
+from app.workspace.data_manager.instruments import InstrumentService
+from app.workspace.data_manager.storage import (
+    DEFAULT_TICK_SIZE,
+    BarRecord,
+    MarketDataStorage,
+    TickRecord,
+    parse_iso_to_utc_datetime,
+)
 
 logger = get_logger(__name__)
+
+__all__ = [
+    "BarRecord",
+    "CatalogService",
+    "DataIngestionService",
+    "DatasetRecord",
+    "IngestionConfig",
+    "IngestionResult",
+    "MarketDataStorage",
+    "TickRecord",
+]
 
 DEFAULT_CHUNK_SIZE = 10000
 COMMON_DELIMITERS = [",", ";", "\t", " ", "|"]
 MIN_FIELD_COUNT = 5
 SEPARATE_DT_MIN_FIELDS = 6
 MS_EPOCH_THRESHOLD = 1e11
-
-
-class BarRecord(BaseModel):
-    """Normalized OHLCV market data bar."""
-
-    model_config = ConfigDict(frozen=True)
-
-    timestamp_utc: str = Field(description="ISO 8601 UTC timestamp")
-    open: float = Field(gt=0.0, description="Opening price")
-    high: float = Field(gt=0.0, description="Highest price")
-    low: float = Field(gt=0.0, description="Lowest price")
-    close: float = Field(gt=0.0, description="Closing price")
-    volume: float = Field(default=0.0, ge=0.0, description="Bar traded volume")
-    open_interest: float = Field(default=0.0, ge=0.0, description="Open interest")
-
-    def is_valid_geometry(self) -> bool:
-        """Validate bar price envelope consistency."""
-        max_oc = max(self.open, self.close)
-        min_oc = min(self.open, self.close)
-        return self.high >= max_oc and self.low <= min_oc and self.high >= self.low
 
 
 class IngestionConfig(BaseModel):
@@ -212,12 +220,35 @@ class DatasetRecord(BaseModel):
 
 
 class CatalogService:
-    """Central domain service managing dataset catalogs and broker profiles."""
+    """Central domain service managing dataset catalogs and SQX data operations."""
 
-    def __init__(self, db: DatabaseManager | None = None) -> None:
-        """Initialize CatalogService with parent DatabaseManager."""
+    def __init__(
+        self,
+        db: DatabaseManager | None = None,
+        storage: MarketDataStorage | None = None,
+    ) -> None:
+        """Initialize CatalogService with parent DatabaseManager and storage."""
         self._db = db or DatabaseManager()
         self._broker_service = BrokerService(self._db)
+        self._instrument_service = InstrumentService(self._db)
+        self._storage = storage or MarketDataStorage()
+
+    @property
+    def storage(self) -> MarketDataStorage:
+        """Return attached canonical MarketDataStorage engine."""
+        return self._storage
+
+    @storage.setter
+    def storage(self, value: MarketDataStorage) -> None:
+        """Update attached canonical MarketDataStorage engine."""
+        self._storage = value
+
+    def _get_instrument_tick_size(self, symbol: str) -> float:
+        """Retrieve instrument tick size or default scale."""
+        instr = self._instrument_service.get_instrument(symbol)
+        if instr is not None and instr.tick_size > 0.0:
+            return instr.tick_size
+        return DEFAULT_TICK_SIZE
 
     def save_dataset(self, dataset: DatasetRecord) -> str:
         """Persist or update dataset metadata in host persistence.
@@ -303,30 +334,12 @@ class CatalogService:
         return [DatasetRecord.model_validate(r) for r in rows]
 
     def delete_dataset(self, dataset_id: str) -> bool:
-        """Delete dataset record by ID.
+        """Delete dataset record and all on-disk partitions.
 
+        Delegates to remove_data() to ensure full cleanup.
         Fires FR-DATA-CATALOG-DATASET-REGISTRY.
         """
-        success = self._db.datasets.delete(dataset_id)
-        if success:
-            logger.info(
-                "FR-DATA-CATALOG-DATASET-REGISTRY: Deleted dataset '%s'",
-                dataset_id,
-                extra={
-                    "dataset_id": dataset_id,
-                    "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
-                },
-            )
-        else:
-            logger.warning(
-                "FR-DATA-CATALOG-DATASET-REGISTRY: Failed deleting dataset '%s'",
-                dataset_id,
-                extra={
-                    "dataset_id": dataset_id,
-                    "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
-                },
-            )
-        return success
+        return self.remove_data(dataset_id)
 
     def count_datasets(self) -> int:
         """Return total count of persisted datasets."""
@@ -336,12 +349,6 @@ class CatalogService:
         self, symbol: str, timeframe: str = "M1"
     ) -> tuple[bool, str]:
         """Check availability status for a symbol and timeframe pair.
-
-        Returns:
-            Tuple of (is_available, status_string) where status is:
-            - 'AVAILABLE' if dataset exists with bars > 0
-            - 'EMPTY_SERIES' if dataset exists but has 0 bars
-            - 'UNAVAILABLE' if no matching dataset is cataloged
 
         Fires FR-DATA-CATALOG-SERIES-DISCOVERY.
         """
@@ -395,6 +402,404 @@ class CatalogService:
         )
         return True, "AVAILABLE"
 
+    # =========================================================================
+    # StrategyQuant X DataManagerData Domain Operations
+    # =========================================================================
+
+    def save_bars(
+        self,
+        source: str,
+        symbol: str,
+        timeframe: str,
+        bars: Sequence[BarRecord],
+        instrument: str | None = None,
+    ) -> DatasetRecord:
+        """Write bars into canonical Parquet partitions and update catalog.
+
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        clean_symbol = symbol.strip().upper()
+        clean_tf = timeframe.strip().upper()
+        clean_source = source.strip()
+
+        tick_size = self._get_instrument_tick_size(clean_symbol)
+        write_res = self._storage.write_bars(
+            source=clean_source,
+            symbol=clean_symbol,
+            timeframe=clean_tf,
+            bars=bars,
+            tick_size=tick_size,
+        )
+
+        dataset_id = (
+            f"ds_{clean_source.lower()}_{clean_symbol.lower()}_{clean_tf.lower()}"
+        )
+        existing = self.get_dataset(dataset_id)
+
+        partition_dir = str(
+            self._storage.base_dir
+            / clean_source.lower()
+            / clean_tf.lower()
+            / clean_symbol.lower()
+        )
+        lineage = {
+            "tick_size": tick_size,
+            "partitions": write_res.partition_files,
+            "data_kind": "bars",
+        }
+
+        instr_val = instrument or (existing.instrument if existing else clean_symbol)
+        record = DatasetRecord(
+            id=dataset_id,
+            source=clean_source,
+            symbol=clean_symbol,
+            underlying=clean_symbol,
+            instrument=instr_val,
+            timeframe=clean_tf,
+            broker=clean_source,
+            broker_name=clean_source,
+            timezone="UTC",
+            category=existing.category if existing else "Forex",
+            date_from=write_res.date_from or (existing.date_from if existing else ""),
+            date_to=write_res.date_to or (existing.date_to if existing else ""),
+            bars=write_res.total_bars,
+            path=partition_dir,
+            data_kind="bars",
+            quality_score=1.0,
+            lineage_json=json.dumps(lineage),
+            schema_version=1,
+        )
+        self.save_dataset(record)
+        logger.info(
+            "FR-DATA-CATALOG-SQX-OPERATIONS: Saved %d bars for dataset '%s'",
+            write_res.total_bars,
+            dataset_id,
+            extra={"fr_id": "FR-DATA-CATALOG-SQX-OPERATIONS"},
+        )
+        return record
+
+    def save_ticks(
+        self,
+        source: str,
+        symbol: str,
+        ticks: Sequence[TickRecord],
+        instrument: str | None = None,
+    ) -> DatasetRecord:
+        """Write ticks into canonical Parquet partitions and update catalog.
+
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        clean_symbol = symbol.strip().upper()
+        clean_source = source.strip()
+
+        tick_size = self._get_instrument_tick_size(clean_symbol)
+        write_res = self._storage.write_ticks(
+            source=clean_source,
+            symbol=clean_symbol,
+            ticks=ticks,
+            tick_size=tick_size,
+        )
+
+        dataset_id = f"ds_{clean_source.lower()}_{clean_symbol.lower()}_ticks"
+        existing = self.get_dataset(dataset_id)
+
+        partition_dir = str(
+            self._storage.base_dir
+            / clean_source.lower()
+            / "ticks"
+            / clean_symbol.lower()
+        )
+        lineage = {
+            "tick_size": tick_size,
+            "partitions": write_res.partition_files,
+            "data_kind": "ticks",
+        }
+
+        instr_val = instrument or (existing.instrument if existing else clean_symbol)
+        record = DatasetRecord(
+            id=dataset_id,
+            source=clean_source,
+            symbol=clean_symbol,
+            underlying=clean_symbol,
+            instrument=instr_val,
+            timeframe="TICK",
+            broker=clean_source,
+            broker_name=clean_source,
+            timezone="UTC",
+            category=existing.category if existing else "Forex",
+            date_from=write_res.date_from or (existing.date_from if existing else ""),
+            date_to=write_res.date_to or (existing.date_to if existing else ""),
+            bars=write_res.total_bars,
+            path=partition_dir,
+            data_kind="ticks",
+            quality_score=1.0,
+            lineage_json=json.dumps(lineage),
+            schema_version=1,
+        )
+        self.save_dataset(record)
+        logger.info(
+            "FR-DATA-CATALOG-SQX-OPERATIONS: Saved %d ticks for dataset '%s'",
+            write_res.total_bars,
+            dataset_id,
+            extra={"fr_id": "FR-DATA-CATALOG-SQX-OPERATIONS"},
+        )
+        return record
+
+    def edit_dataset(
+        self,
+        dataset_id: str,
+        *,
+        symbol_new: str | None = None,
+        instrument: str | None = None,
+        timezone: str | None = None,
+        category: str | None = None,
+    ) -> bool:
+        """Edit dataset configuration metadata in datamgr_datasets.
+
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            return False
+
+        payload = existing.model_dump(exclude={"bar_count"})
+        update_cols: list[str] = ["updated_at"]
+
+        if symbol_new and symbol_new != existing.symbol:
+            payload["symbol"] = symbol_new.strip().upper()
+            update_cols.append("symbol")
+        if instrument and instrument != existing.instrument:
+            payload["instrument"] = instrument.strip().upper()
+            update_cols.append("instrument")
+        if timezone and timezone != existing.timezone:
+            payload["timezone"] = timezone.strip()
+            update_cols.append("timezone")
+        if category and category != existing.category:
+            payload["category"] = category.strip()
+            update_cols.append("category")
+
+        payload["updated_at"] = datetime.now(UTC).isoformat()
+        self._db.datasets.save(payload, update_columns=tuple(update_cols))
+
+        logger.info(
+            "FR-DATA-CATALOG-SQX-OPERATIONS: Edited dataset '%s' (updates=%s)",
+            dataset_id,
+            update_cols,
+            extra={"fr_id": "FR-DATA-CATALOG-SQX-OPERATIONS"},
+        )
+        return True
+
+    def clear_data(self, dataset_id: str) -> bool:
+        """Clear on-disk Parquet partition files while preserving dataset entry.
+
+        Matches SQX 'Clear data' operation in dataDeleteConfirmPopup.html.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            return False
+
+        kind = (
+            existing.data_kind if existing.data_kind == "ticks" else existing.timeframe
+        )
+        self._storage.clear_partitions(existing.source, kind, existing.symbol)
+
+        payload = existing.model_dump(exclude={"bar_count"})
+        payload["bars"] = 0
+        payload["date_from"] = ""
+        payload["date_to"] = ""
+        payload["updated_at"] = datetime.now(UTC).isoformat()
+        self._db.datasets.save(
+            payload,
+            update_columns=("bars", "date_from", "date_to", "updated_at"),
+        )
+
+        logger.info(
+            "FR-DATA-CATALOG-SQX-OPERATIONS: Cleared data for '%s'",
+            dataset_id,
+            extra={"fr_id": "FR-DATA-CATALOG-SQX-OPERATIONS"},
+        )
+        return True
+
+    def remove_data(self, dataset_id: str) -> bool:
+        """Remove on-disk Parquet partitions AND delete row from datamgr_datasets.
+
+        Matches SQX 'Delete' (deleteconfirm) operation.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is not None:
+            kind = (
+                existing.data_kind
+                if existing.data_kind == "ticks"
+                else existing.timeframe
+            )
+            self._storage.delete_partitions(existing.source, kind, existing.symbol)
+
+        success = self._db.datasets.delete(dataset_id)
+        logger.info(
+            "FR-DATA-CATALOG-SQX-OPERATIONS: Removed dataset '%s' (success=%s)",
+            dataset_id,
+            success,
+            extra={"fr_id": "FR-DATA-CATALOG-SQX-OPERATIONS"},
+        )
+        return success
+
+    def review_chart(
+        self,
+        dataset_id: str,
+        *,
+        date_from: str | None = None,
+        date_to: str | None = None,
+        limit: int = 1000,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        """Read bar slice for chart review with prices converted to float.
+
+        Matches SQX /data/reviewChart endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            return []
+
+        tick_size = self._get_instrument_tick_size(existing.symbol)
+        try:
+            lineage = json.loads(existing.lineage_json)
+            if "tick_size" in lineage and float(lineage["tick_size"]) > 0.0:
+                tick_size = float(lineage["tick_size"])
+        except ValueError, TypeError:
+            pass
+
+        if existing.data_kind == "ticks":
+            ticks = self._storage.read_ticks_slice(
+                source=existing.source,
+                symbol=existing.symbol,
+                date_from=date_from,
+                date_to=date_to,
+                limit=limit,
+                offset=offset,
+                tick_size=tick_size,
+            )
+            return [t.model_dump(mode="json") for t in ticks]
+
+        bars = self._storage.read_bars_slice(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+            date_from=date_from,
+            date_to=date_to,
+            limit=limit,
+            offset=offset,
+            tick_size=tick_size,
+        )
+        return [b.model_dump(mode="json") for b in bars]
+
+    def get_index_for_date(self, dataset_id: str, date: str) -> int:
+        """Find the 0-indexed position of bar at or closest to given date.
+
+        Matches SQX /data/getIndexForDate endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is None or existing.bars == 0:
+            return -1
+
+        dt_target = parse_iso_to_utc_datetime(date)
+        lf = self._storage.scan_bars(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+        )
+        df_filtered = (
+            lf.filter(pl.col("DateTime") <= dt_target)
+            .select(pl.len().alias("count"))
+            .collect()
+        )
+        count = int(df_filtered["count"][0])
+        return max(0, count - 1) if count > 0 else 0
+
+    def check_quality_summary(self, dataset_id: str) -> dict[str, Any]:
+        """Audit data quality (anomalies, missing bars, date spans).
+
+        Matches SQX /data/checkQualitySummary endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            return {"status": "NOT_FOUND", "quality_score": 0.0, "anomalies": []}
+
+        anomalies: list[str] = []
+        if existing.bars == 0:
+            anomalies.append("Series contains 0 bars")
+
+        return {
+            "dataset_id": dataset_id,
+            "symbol": existing.symbol,
+            "timeframe": existing.timeframe,
+            "bars": existing.bars,
+            "date_from": existing.date_from,
+            "date_to": existing.date_to,
+            "quality_score": existing.quality_score,
+            "anomalies": anomalies,
+            "status": "VALID" if not anomalies else "WARNING",
+        }
+
+    def clone_to_timezone(
+        self,
+        dataset_id: str,
+        target_timezone: str,
+        new_dataset_id: str | None = None,
+    ) -> str:
+        """Clone existing dataset into target timezone partition.
+
+        Matches SQX /data/cloneToTimezone endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            raise ValueError(f"Dataset not found: {dataset_id}")
+
+        clean_tz = target_timezone.strip()
+        tz_obj = zoneinfo.ZoneInfo(clean_tz)
+
+        tick_size = self._get_instrument_tick_size(existing.symbol)
+        bars = self._storage.read_bars_slice(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+            limit=existing.bars or 1000000,
+            tick_size=tick_size,
+        )
+
+        cloned_bars: list[BarRecord] = []
+        for b in bars:
+            dt_utc = parse_iso_to_utc_datetime(b.timestamp_utc)
+            dt_local = dt_utc.astimezone(tz_obj)
+            cloned_bars.append(
+                BarRecord(
+                    timestamp_utc=dt_local.isoformat(),
+                    open=b.open,
+                    high=b.high,
+                    low=b.low,
+                    close=b.close,
+                    volume=b.volume,
+                    open_interest=b.open_interest,
+                )
+            )
+
+        tz_slug = clean_tz.replace("/", "_").replace(" ", "_").lower()
+        target_symbol = f"{existing.symbol}_{tz_slug.upper()}"
+
+        cloned_record = self.save_bars(
+            source=existing.source,
+            symbol=target_symbol,
+            timeframe=existing.timeframe,
+            bars=cloned_bars,
+            instrument=existing.instrument,
+        )
+        return new_dataset_id or cloned_record.id
+
     def list_brokers(self) -> list[BrokerProfileRecord]:
         """Retrieve configured broker profiles from datamgr_broker table.
 
@@ -414,13 +819,21 @@ class DataIngestionService:
     """Service managing historical data file ingestion and revision publication."""
 
     def __init__(
-        self, catalog: CatalogService, storage_dir: Path | str | None = None
+        self,
+        catalog: CatalogService,
+        storage_dir: Path | str | None = None,
+        storage: MarketDataStorage | None = None,
     ) -> None:
         """Initialize service with catalog service and target storage root."""
         self._catalog = catalog
-        self._storage_dir = (
-            Path(storage_dir) if storage_dir else Path("storage/datasets")
-        )
+        if storage is not None:
+            self._storage = storage
+        elif storage_dir is not None:
+            self._storage = MarketDataStorage(base_dir=storage_dir)
+            self._catalog.storage = self._storage
+        else:
+            self._storage = catalog.storage
+        self._storage_dir = self._storage.base_dir
         self._storage_dir.mkdir(parents=True, exist_ok=True)
 
     def detect_format(self, sample_text: str) -> tuple[str, bool]:
@@ -511,6 +924,52 @@ class DataIngestionService:
 
             yield bar
 
+    def _sniff_config_if_needed(
+        self, path: Path, config: IngestionConfig
+    ) -> IngestionConfig:
+        """Helper to sniff delimiter and header if not provided in config."""
+        if config.delimiter is not None and config.has_header is not None:
+            return config
+
+        sample_buffer: list[str] = []
+        with path.open("r", encoding="utf-8", errors="replace") as f:
+            for _ in range(20):
+                line = f.readline()
+                if not line:
+                    break
+                sample_buffer.append(line)
+        detected_delim, detected_header = self.detect_format("".join(sample_buffer))
+        return config.model_copy(
+            update={
+                "delimiter": config.delimiter or detected_delim,
+                "has_header": (
+                    config.has_header
+                    if config.has_header is not None
+                    else detected_header
+                ),
+            }
+        )
+
+    def _compute_revision_hash(
+        self, record: DatasetRecord, revision_id: str
+    ) -> tuple[str, str]:
+        """Helper to compute SHA-256 fingerprint from partition files."""
+        hasher = hashlib.sha256()
+        output_path = record.path
+        try:
+            lineage = json.loads(record.lineage_json)
+            partition_paths = lineage.get("partitions", [])
+            for p_str in partition_paths:
+                p_file = Path(p_str)
+                if p_file.exists():
+                    hasher.update(p_file.read_bytes())
+            if partition_paths:
+                output_path = partition_paths[0]
+        except ValueError, TypeError, OSError:
+            hasher.update(revision_id.encode("utf-8"))
+
+        return hasher.hexdigest(), output_path
+
     def ingest_file(
         self,
         file_path: Path | str,
@@ -519,7 +978,7 @@ class DataIngestionService:
         source: str = "FileImport",
         config: IngestionConfig | None = None,
     ) -> IngestionResult:
-        """Execute full streaming ingestion pipeline for historical file.
+        """Execute streaming ingestion pipeline writing partitioned Parquet files.
 
         Fires:
             FR-DATA-INGESTION-STREAMING
@@ -527,42 +986,20 @@ class DataIngestionService:
             FR-DATA-INGESTION-STAGING
             FR-DATA-INGESTION-REVISIONS
         """
-        cfg = config or IngestionConfig()
+        cfg = self._sniff_config_if_needed(Path(file_path), config or IngestionConfig())
         path = Path(file_path)
         if not path.exists():
             raise FileNotFoundError(f"Input data file does not exist: {path}")
-
-        if cfg.delimiter is None or cfg.has_header is None:
-            sample_buffer: list[str] = []
-            with path.open("r", encoding="utf-8", errors="replace") as f:
-                for _ in range(20):
-                    line = f.readline()
-                    if not line:
-                        break
-                    sample_buffer.append(line)
-            detected_delim, detected_header = self.detect_format("".join(sample_buffer))
-            cfg = cfg.model_copy(
-                update={
-                    "delimiter": cfg.delimiter or detected_delim,
-                    "has_header": cfg.has_header
-                    if cfg.has_header is not None
-                    else detected_header,
-                }
-            )
 
         clean_symbol = symbol.strip().upper()
         clean_tf = timeframe.strip().upper()
         revision_id = f"rev_{uuid.uuid4().hex[:12]}"
 
-        symbol_dir = self._storage_dir / clean_symbol / clean_tf
-        symbol_dir.mkdir(parents=True, exist_ok=True)
-        out_file = symbol_dir / f"{revision_id}.csv"
-
         logger.info(
-            "FR-DATA-INGESTION-STAGING: Staging ingestion for %s/%s to %s",
+            "FR-DATA-INGESTION-STAGING: Staging ingestion for %s/%s from %s",
             clean_symbol,
             clean_tf,
-            out_file,
+            path,
             extra={
                 "symbol": clean_symbol,
                 "timeframe": clean_tf,
@@ -577,90 +1014,41 @@ class DataIngestionService:
         if not all_bars:
             raise ValueError(f"No valid bars extracted from {path} for {clean_symbol}")
 
-        all_bars.sort(key=lambda b: b.timestamp_utc)
-        deduped: dict[str, BarRecord] = {}
-        for b in all_bars:
-            deduped[b.timestamp_utc] = b
-        sorted_bars = list(deduped.values())
-        sorted_bars.sort(key=lambda b: b.timestamp_utc)
-
-        hasher = hashlib.sha256()
-        with out_file.open("w", encoding="utf-8", newline="") as out_csv:
-            writer = csv.writer(out_csv)
-            writer.writerow(
-                [
-                    "timestamp",
-                    "open",
-                    "high",
-                    "low",
-                    "close",
-                    "volume",
-                    "open_interest",
-                ]
-            )
-            for bar in sorted_bars:
-                row_str = (
-                    f"{bar.timestamp_utc},{bar.open:.6f},{bar.high:.6f},"
-                    f"{bar.low:.6f},{bar.close:.6f},{bar.volume:.2f},"
-                    f"{bar.open_interest:.2f}\n"
-                )
-                hasher.update(row_str.encode("utf-8"))
-                writer.writerow(
-                    [
-                        bar.timestamp_utc,
-                        bar.open,
-                        bar.high,
-                        bar.low,
-                        bar.close,
-                        bar.volume,
-                        bar.open_interest,
-                    ]
-                )
-
-        sha256_hash = hasher.hexdigest()
-        date_from = sorted_bars[0].timestamp_utc
-        date_to = sorted_bars[-1].timestamp_utc
-        bar_count = len(sorted_bars)
-        dataset_id = f"ds_{clean_symbol.lower()}_{clean_tf.lower()}"
-
-        dataset_record = DatasetRecord(
-            id=dataset_id,
+        dataset_record = self._catalog.save_bars(
             source=source,
             symbol=clean_symbol,
             timeframe=clean_tf,
-            bars=bar_count,
-            date_from=date_from,
-            date_to=date_to,
-            path=str(out_file),
-            quality_score=1.0,
-            schema_version=1,
+            bars=all_bars,
         )
-        self._catalog.save_dataset(dataset_record)
+
+        sha256_hash, output_path = self._compute_revision_hash(
+            dataset_record, revision_id
+        )
 
         logger.info(
             "FR-DATA-INGESTION-REVISIONS: Published revision %s for %s (%d bars)",
             revision_id,
             clean_symbol,
-            bar_count,
+            dataset_record.bars,
             extra={
                 "symbol": clean_symbol,
                 "revision_id": revision_id,
-                "bars": bar_count,
+                "bars": dataset_record.bars,
                 "sha256": sha256_hash,
                 "fr_id": "FR-DATA-INGESTION-REVISIONS",
             },
         )
 
         return IngestionResult(
-            dataset_id=dataset_id,
+            dataset_id=dataset_record.id,
             revision_id=revision_id,
             symbol=clean_symbol,
             timeframe=clean_tf,
-            bar_count=bar_count,
-            date_from=date_from,
-            date_to=date_to,
+            bar_count=dataset_record.bars,
+            date_from=dataset_record.date_from,
+            date_to=dataset_record.date_to,
             sha256_hash=sha256_hash,
-            output_path=str(out_file),
+            output_path=output_path,
             rejected_count=0,
         )
 

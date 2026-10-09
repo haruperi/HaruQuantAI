@@ -70,6 +70,9 @@ Key Capabilities:
     - FR-HOST-PERSISTENCE-BROKERS: Optional legacy broker row queries.
       Associated: `BrokerStore.list_profiles()`
       Logging: DEBUG read and table availability; no business fallback profiles.
+    - FR-HOST-PERSISTENCE-ANALYTICAL-QUERY: Direct DuckDB analytical query execution.
+      Associated: `query_duckdb()`, `DatabaseManager.query_duckdb()`
+      Logging: DEBUG execution with query text.
     - FR-HOST-PERSISTENCE-INTEGRITY-CHECK: Query physical SQLite integrity.
       Associated: `DatabaseManager.check_integrity()`
       Logging: INFO clean result; ERROR detected corruption.
@@ -154,6 +157,7 @@ __all__ = [
     "canonical_json",
     "get_database_manager",
     "now_utc_iso",
+    "query_duckdb",
     "validate_identifier",
     "validate_json_depth",
 ]
@@ -664,11 +668,35 @@ class DatabaseManager:
         """Initialize core schemas and verify database readiness."""
         self.schema.initialize()
 
+    def query_duckdb(self, query: str, *args: Any, **kwargs: Any) -> Any:
+        """Execute analytical DuckDB SQL query directly over Parquet files or memory.
+
+        Fires FR-HOST-PERSISTENCE-ANALYTICAL-QUERY.
+        """
+        return query_duckdb(query, *args, **kwargs)
+
 
 class _DefaultDatabaseHolder:
     """Internal singleton holder avoiding module global mutation."""
 
     instance: DatabaseManager | None = None
+
+
+def query_duckdb(query: str, *args: Any, **kwargs: Any) -> Any:
+    """Execute analytical DuckDB SQL query directly over Parquet files or memory.
+
+    Centralizes DuckDB database driver imports within app.host.persistence to
+    satisfy architectural driver isolation requirements.
+
+    Fires FR-HOST-PERSISTENCE-ANALYTICAL-QUERY.
+    """
+    import duckdb
+
+    logger.debug(
+        "FR-HOST-PERSISTENCE-ANALYTICAL-QUERY: Executing DuckDB query",
+        extra={"fr_id": "FR-HOST-PERSISTENCE-ANALYTICAL-QUERY", "query": query},
+    )
+    return duckdb.query(query, *args, **kwargs)
 
 
 def get_database_manager(
