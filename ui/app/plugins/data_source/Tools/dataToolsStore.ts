@@ -1,6 +1,13 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
+import { createDomainClient, type DomainClient } from '../../../host/transport';
 import { createCloneDefinitions, validateCloneSettings, validateReviewChange, type CloneDefinition, type CloneSettings, type ReviewMutation, type ReviewRow, type ToolJobState, type ToolTarget } from './dataTools';
+
+let dataClient = createDomainClient('/data');
+
+export function setDataClient(client: DomainClient): void {
+  dataClient = client;
+}
 
 export interface CloneTask { source: ToolTarget; definition: CloneDefinition }
 export interface CloneJob { id: string; tasks: CloneTask[]; completed: number; state: ToolJobState; progress: number; error?: string }
@@ -11,6 +18,13 @@ interface Store extends Saved {
   advance: () => void;
   action: (action: 'pause' | 'resume' | 'stop') => void;
   saveReview: (key: string, rows: ReviewRow[], changed: Record<string, Partial<ReviewRow>>, deleted: string[], tick: boolean) => void;
+  cloneRemote: (payload: { dataset_id: string; timezone_type?: string; shift_hours?: number; timezone?: string; remove_weekends?: boolean; postfix?: string }) => Promise<unknown>;
+  fetchReviewRows: (datasetId: string, limit?: number, offset?: number) => Promise<ReviewRow[]>;
+  saveRemoteReviewChanges: (datasetId: string, changedBars: Array<Record<string, unknown>>, deletedTimestamps: string[]) => Promise<unknown>;
+  fetchQualitySummary: (datasetId: string) => Promise<unknown>;
+  fetchQualityDetails: (datasetId: string, limit?: number, offset?: number) => Promise<unknown>;
+  getIndexForDate: (datasetId: string, targetDate: string) => Promise<number>;
+  massDeleteRemote: (datasetIds: string[], action?: 'remove' | 'clear', force?: boolean) => Promise<unknown>;
 }
 
 const storageKey = 'haru-data-tools-v1';
@@ -53,6 +67,37 @@ export const useDataTools = create<Store>((set, get) => {
       for (const row of rows) validateReviewChange({ ...row, ...(changed[row.id] ?? {}) }, tick);
       const previous = get().reviews[key];
       persist({ reviews: { ...get().reviews, [key]: { changed: { ...(previous?.changed ?? {}), ...changed }, deleted: [...new Set([...(previous?.deleted ?? []), ...deleted])] } } });
+    },
+    cloneRemote: async (payload) => {
+      return dataClient.post('/datasets/clone-timezone', payload);
+    },
+    fetchReviewRows: async (datasetId, limit = 500, offset = 0) => {
+      const res = await dataClient.get<{ rows: ReviewRow[] }>(`/datasets/${encodeURIComponent(datasetId)}/review-data?limit=${limit}&offset=${offset}`);
+      return res?.rows ?? [];
+    },
+    saveRemoteReviewChanges: async (datasetId, changedBars, deletedTimestamps) => {
+      return dataClient.post(`/datasets/${encodeURIComponent(datasetId)}/save-changes`, {
+        dataset_id: datasetId,
+        changed_bars: changedBars,
+        deleted_timestamps: deletedTimestamps,
+      });
+    },
+    fetchQualitySummary: async (datasetId) => {
+      return dataClient.get(`/datasets/${encodeURIComponent(datasetId)}/quality-summary`);
+    },
+    fetchQualityDetails: async (datasetId, limit = 100, offset = 0) => {
+      return dataClient.get(`/datasets/${encodeURIComponent(datasetId)}/quality-details?limit=${limit}&offset=${offset}`);
+    },
+    getIndexForDate: async (datasetId, targetDate) => {
+      const res = await dataClient.get<{ index: number }>(`/datasets/${encodeURIComponent(datasetId)}/index-for-date?target_date=${encodeURIComponent(targetDate)}`);
+      return res?.index ?? 0;
+    },
+    massDeleteRemote: async (datasetIds, action = 'remove', force = false) => {
+      return dataClient.post('/datasets/mass-delete', {
+        dataset_ids: datasetIds,
+        action,
+        force,
+      });
     },
   };
 });

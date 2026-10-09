@@ -42,6 +42,7 @@ import csv
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -54,6 +55,7 @@ DEFAULT_INTERVAL_SECONDS = 60
 MAX_REPORTED_ISSUES = 5
 MAX_GAP_INFLATION = 100
 GAP_TOLERANCE_MULTIPLIER = 1.5
+PRICE_SPIKE_THRESHOLD = 0.10
 
 
 class DataQualityReport(BaseModel):
@@ -198,6 +200,190 @@ class DataQualityInspector:
             return 1.0
         penalty = (bad_bars * 2.0 + duplicate_bars + gap_bars * 0.1) / denominator
         return max(0.0, min(1.0, 1.0 - penalty))
+
+    def check_quality_summary(
+        self,
+        bars: list[BarRecord],
+        expected_interval_seconds: int = DEFAULT_INTERVAL_SECONDS,
+    ) -> dict[str, Any]:
+        """Compute SQX-compatible quality summary with 24h distribution.
+
+        Fires FR-DATA-QUALITY-METRICS.
+        """
+        hourly_gaps = [0] * 24
+        hourly_spikes = [0] * 24
+        hourly_ohlc = [0] * 24
+
+        gaps = 0
+        spikes = 0
+        bad_ohlc = 0
+        prev_dt: datetime | None = None
+        prev_close: float | None = None
+
+        for b in bars:
+            try:
+                dt = datetime.fromisoformat(b.timestamp_utc)
+            except ValueError:
+                bad_ohlc += 1
+                continue
+
+            hour = dt.hour
+            if not b.is_valid_geometry() or any(
+                p <= 0.0 for p in (b.open, b.high, b.low, b.close)
+            ):
+                bad_ohlc += 1
+                hourly_ohlc[hour] += 1
+
+            if prev_close is not None and prev_close > 0:
+                pct_change = abs(b.close - prev_close) / prev_close
+                if pct_change > PRICE_SPIKE_THRESHOLD:
+                    spikes += 1
+                    hourly_spikes[hour] += 1
+            prev_close = b.close
+
+            if prev_dt is not None:
+                delta_sec = (dt - prev_dt).total_seconds()
+                if delta_sec > expected_interval_seconds * GAP_TOLERANCE_MULTIPLIER:
+                    gaps += 1
+                    hourly_gaps[hour] += 1
+            prev_dt = dt
+
+        total_issues = gaps + spikes + bad_ohlc
+        total_bars = len(bars)
+        pct_gap = round((gaps / total_bars * 100), 2) if total_bars else 0.0
+        pct_spike = round((spikes / total_bars * 100), 2) if total_bars else 0.0
+        pct_ohlc = round((bad_ohlc / total_bars * 100), 2) if total_bars else 0.0
+
+        distribution = [
+            {
+                "hour": h,
+                "bucket": f"{h:02d}:00",
+                "gaps": hourly_gaps[h],
+                "spikes": hourly_spikes[h],
+                "ohlc": hourly_ohlc[h],
+                "total": hourly_gaps[h] + hourly_spikes[h] + hourly_ohlc[h],
+            }
+            for h in range(24)
+        ]
+
+        logger.info(
+            "FR-DATA-QUALITY-METRICS: Quality summary: %d total issues "
+            "(gaps=%d, spikes=%d, ohlc=%d)",
+            total_issues,
+            gaps,
+            spikes,
+            bad_ohlc,
+            extra={
+                "total_issues": total_issues,
+                "gaps": gaps,
+                "spikes": spikes,
+                "bad_ohlc": bad_ohlc,
+                "fr_id": "FR-DATA-QUALITY-METRICS",
+            },
+        )
+
+        return {
+            "totalErrors": total_issues,
+            "counts": {"gap": gaps, "spike": spikes, "ohlc": bad_ohlc},
+            "percents": {"gap": pct_gap, "spike": pct_spike, "ohlc": pct_ohlc},
+            "distribution": distribution,
+            "pointOpacity": 0.8,
+            "minHour": 0,
+            "maxHour": 23,
+        }
+
+    def check_quality_details(
+        self,
+        bars: list[BarRecord],
+        expected_interval_seconds: int = DEFAULT_INTERVAL_SECONDS,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        """Identify individual defect bars for grid display.
+
+        Fires FR-DATA-QUALITY-METRICS.
+        """
+        defects: list[dict[str, Any]] = []
+        prev_dt: datetime | None = None
+        prev_close: float | None = None
+
+        for idx, b in enumerate(bars):
+            try:
+                dt = datetime.fromisoformat(b.timestamp_utc)
+            except ValueError:
+                defects.append(
+                    {
+                        "id": f"err-{idx}",
+                        "date": b.timestamp_utc,
+                        "open": b.open,
+                        "high": b.high,
+                        "low": b.low,
+                        "close": b.close,
+                        "volume": b.volume,
+                        "kind": "Bad OHLC",
+                        "reason": "Bad OHLC",
+                        "problem": "Bad OHLC",
+                    }
+                )
+                continue
+
+            if not b.is_valid_geometry() or any(
+                p <= 0.0 for p in (b.open, b.high, b.low, b.close)
+            ):
+                defects.append(
+                    {
+                        "id": f"err-{idx}",
+                        "date": b.timestamp_utc,
+                        "open": b.open,
+                        "high": b.high,
+                        "low": b.low,
+                        "close": b.close,
+                        "volume": b.volume,
+                        "kind": "Bad OHLC",
+                        "reason": "Bad OHLC",
+                        "problem": "Bad OHLC",
+                    }
+                )
+            elif prev_close is not None and prev_close > 0:
+                pct = abs(b.close - prev_close) / prev_close
+                if pct > PRICE_SPIKE_THRESHOLD:
+                    defects.append(
+                        {
+                            "id": f"err-{idx}",
+                            "date": b.timestamp_utc,
+                            "open": b.open,
+                            "high": b.high,
+                            "low": b.low,
+                            "close": b.close,
+                            "volume": b.volume,
+                            "kind": "Spike",
+                            "reason": "Price spike",
+                            "problem": "Price spike",
+                        }
+                    )
+
+            if prev_dt is not None:
+                delta_sec = (dt - prev_dt).total_seconds()
+                if delta_sec > expected_interval_seconds * GAP_TOLERANCE_MULTIPLIER:
+                    defects.append(
+                        {
+                            "id": f"err-gap-{idx}",
+                            "date": b.timestamp_utc,
+                            "open": b.open,
+                            "high": b.high,
+                            "low": b.low,
+                            "close": b.close,
+                            "volume": b.volume,
+                            "kind": "Gap",
+                            "reason": "Time gap",
+                            "problem": "Time gap",
+                        }
+                    )
+
+            prev_dt = dt
+            prev_close = b.close
+
+        return defects[offset : offset + limit]
 
 
 def main() -> int:

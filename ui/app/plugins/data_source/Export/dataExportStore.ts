@@ -1,6 +1,13 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
+import { createDomainClient, type DomainClient } from '../../../host/transport';
 import { builtInCsvFormats, validateCsvFormat, type CsvFormat, type ExportArtifact, type ExportJobState, type ExportKind } from './dataExport';
+
+let dataClient = createDomainClient('/data');
+
+export function setDataClient(client: DomainClient): void {
+  dataClient = client;
+}
 
 export interface ExportHistory { id: string; kind: ExportKind; names: string[]; targetIds: string[]; completedAt: string }
 export interface ExportJob { id: string; kind: ExportKind; label: string; targetIds: string[]; artifacts: ExportArtifact[]; state: ExportJobState; progress: number; error?: string }
@@ -12,6 +19,29 @@ interface Store extends Saved {
   start: (kind: ExportKind, label: string, targetIds: string[], artifacts: ExportArtifact[], settings: Record<string, string | number | boolean>, externalActive: boolean) => void;
   advance: () => void;
   action: (action: 'pause' | 'resume' | 'stop') => void;
+  fetchRemoteFormats: () => Promise<CsvFormat[]>;
+  saveRemoteFormat: (format: CsvFormat) => Promise<unknown>;
+  deleteRemoteFormat: (name: string) => Promise<unknown>;
+  exportRemote: (payload: {
+    format: string;
+    series: Array<{
+      source: string;
+      kind: string;
+      symbol: string;
+      timeframe?: string;
+      start?: string;
+      end?: string;
+      session?: string;
+      tz?: string;
+    }>;
+    delimiter?: string;
+    include_header?: boolean;
+    custom_format?: string;
+    properties?: Record<string, string>;
+    mt4_name?: string;
+    spread_mode?: string;
+    fixed_spread?: number;
+  }) => Promise<unknown>;
 }
 
 const key = 'haru-data-export-v1';
@@ -64,5 +94,22 @@ export const useDataExports = create<Store>((set, get) => {
       try { persist({ history, job: { ...job, progress, state } }); } catch (cause) { fail(cause); }
     },
     action: action => { const job = get().job; if (!job || !exportActive(job.state)) return; try { persist({ job: { ...job, state: action === 'pause' ? 'paused' : action === 'resume' ? 'running' : 'cancelled' } }); } catch (cause) { fail(cause); } },
+    fetchRemoteFormats: async () => {
+      try {
+        const res = await dataClient.get<{ formats: CsvFormat[] }>('/export/csv/formats');
+        return res?.formats ?? [];
+      } catch {
+        return [];
+      }
+    },
+    saveRemoteFormat: async (format) => {
+      return dataClient.post('/export/csv/formats', format);
+    },
+    deleteRemoteFormat: async (name) => {
+      return dataClient.post('/export/csv/formats/delete', { name });
+    },
+    exportRemote: async (payload) => {
+      return dataClient.post('/export', payload);
+    },
   };
 });

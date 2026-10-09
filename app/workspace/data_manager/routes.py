@@ -78,12 +78,15 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.host.jobs import JobManager
 from app.host.logging import get_logger
-from app.host.persistence import DatabaseManager, get_database_manager
+from app.host.persistence import DatabaseManager, TypedRepository, get_database_manager
 from app.host.resources import ResourceManager
 from app.host.response import StandardError
 from app.host.transport import ApiResponse, EventBus
 from app.workspace.data_manager.actions.review.quality import DataQualityInspector
-from app.workspace.data_manager.actions.transform.transforms import SeriesTransformer
+from app.workspace.data_manager.actions.transform.transforms import (
+    TIMEFRAME_MINUTES,
+    SeriesTransformer,
+)
 from app.workspace.data_manager.baskets import (
     BasketDefinition,
     BasketService,
@@ -110,8 +113,11 @@ from app.workspace.data_manager.sessions import (
     SessionService,
     TradingSessionDefinition,
 )
+from app.workspace.data_manager.storage import MarketDataStorage
 
 logger = get_logger(__name__)
+
+DEFAULT_EXPORT_SPREAD = 2.0
 
 
 def _execute_async_import(
@@ -303,12 +309,34 @@ class ExportPayload(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    bars: list[BarRecord] = Field(..., description="Source bars to export")
-    format: str = Field(default="csv", description="'csv', 'mt4', or 'mt5'")
+    bars: list[BarRecord] = Field(
+        default_factory=list, description="Source bars to export"
+    )
+    dataset_id: str | None = Field(
+        default=None, description="Optional source dataset ID to export"
+    )
+    format: str = Field(
+        default="csv",
+        description="'csv', 'mt4', 'mt4_hst', 'mt4_fxt', 'mt5', or 'custom'",
+    )
+    format_name: str | None = Field(
+        default=None, description="Saved CSV format profile name"
+    )
+    items: list[str] | None = Field(
+        default=None, description="Custom token list for CSV export"
+    )
+    delimiter: str = Field(default=",", description="Delimiter for CSV export")
+    include_header: bool = Field(
+        default=False, description="Whether to include CSV header"
+    )
     symbol: str = Field(default="EURUSD", description="Symbol identifier")
     timeframe: str = Field(default="M1", description="Timeframe identifier")
     digits: int = Field(default=5, ge=0, le=8, description="Price decimals")
     output_path: str | None = Field(default=None, description="Optional output path")
+    spread: float = Field(default=2.0, ge=0.0, description="Spread in pips/points")
+    real_spread: bool = Field(
+        default=False, description="Use real ask-bid spread for MT5"
+    )
 
 
 class DatasetEditPayload(BaseModel):
@@ -342,12 +370,175 @@ class CloneTimezonePayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     dataset_id: str = Field(..., description="Target dataset ID")
-    target_timezone: str = Field(
-        ..., description="Target timezone name (e.g. Europe/Prague)"
+    target_timezone: str | None = Field(
+        default=None, description="Target timezone name (e.g. Europe/Prague)"
+    )
+    timezone_type: str = Field(default="zone", description="'zone' or 'hours'")
+    shift_hours: int | None = Field(
+        default=None, ge=-23, le=23, description="Fixed hour offset (-23 to 23)"
+    )
+    remove_weekends: bool = Field(
+        default=False, description="Whether to drop Saturday and Sunday bars"
+    )
+    postfix: str | None = Field(
+        default=None, description="Template postfix, e.g. '_{timeframe}_{cloneTime}'"
     )
     new_dataset_id: str | None = Field(
         default=None, description="Optional new dataset ID"
     )
+
+
+class SaveDataChangesPayload(BaseModel):
+    """Payload for updating modified cells or deleted rows in dataset storage."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    dataset_id: str | None = Field(default=None, description="Dataset identifier")
+    symbol: str | None = Field(default=None, description="Symbol")
+    timeframe: str | None = Field(default=None, description="Timeframe")
+    changed_bars: list[BarRecord] = Field(
+        default_factory=list, description="List of modified or new bars"
+    )
+    deleted_timestamps: list[str] = Field(
+        default_factory=list, description="List of ISO timestamps to delete"
+    )
+
+
+class MassDeletePayload(BaseModel):
+    """Payload for batch delete or clear operations on datasets."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    dataset_ids: list[str] = Field(
+        ..., min_length=1, description="List of dataset IDs to delete/clear"
+    )
+    action: str = Field(
+        default="remove", description="'remove' (full deletion) or 'clear' (wipe data)"
+    )
+    force: bool = Field(default=False, description="Override clone dependency guard")
+
+
+class DatasetXmlExportPayload(BaseModel):
+    """Payload for exporting datasets to SQX <Data> XML."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    dataset_ids: list[str] | None = Field(
+        default=None, description="Optional list of dataset IDs (all if omitted)"
+    )
+
+
+class DatasetXmlImportPayload(BaseModel):
+    """Payload for importing datasets and brokers from SQX <Data> XML."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    xml_content: str = Field(..., min_length=1, description="Raw SQX <Data> XML string")
+
+
+class UpdateSelectedPayload(BaseModel):
+    """Payload for batch updating selected datasets."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    dataset_ids: list[str] = Field(
+        ..., min_length=1, description="List of dataset IDs to update"
+    )
+
+
+class CsvFormatProfile(BaseModel):
+    """Saved CSV export token format profile."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    name: str = Field(..., min_length=1, description="Format profile name")
+    items: list[str] = Field(
+        default_factory=list,
+        description="Ordered token list, e.g. ['[date:yyyyMMdd]', ...]",
+    )
+    delimiter: str = Field(default=",", description="CSV column delimiter")
+    header: bool | str = Field(
+        default=False, description="Include column header row or custom header line"
+    )
+    date_format: str = Field(default="yyyyMMdd", description="Default date format")
+    time_format: str = Field(default="HHmmss", description="Default time format")
+
+
+CANONICAL_CSV_FORMATS: list[dict[str, Any]] = [
+    {
+        "name": "Generic bar format (comma delimited)",
+        "items": [
+            "[date:yyyyMMdd]",
+            "[time:HHmmss]",
+            "[open]",
+            "[high]",
+            "[low]",
+            "[close]",
+            "[volume]",
+        ],
+        "delimiter": ",",
+        "header": False,
+        "date_format": "yyyyMMdd",
+        "time_format": "HHmmss",
+    },
+    {
+        "name": "Generic bar format (semicolon delimited)",
+        "items": [
+            "[date:yyyyMMdd]",
+            "[time:HHmmss]",
+            "[open]",
+            "[high]",
+            "[low]",
+            "[close]",
+            "[volume]",
+        ],
+        "delimiter": ";",
+        "header": False,
+        "date_format": "yyyyMMdd",
+        "time_format": "HHmmss",
+    },
+    {
+        "name": "Generic tick format (comma delimited)",
+        "items": ["[datetime:yyyyMMdd HH:mm:ss.SSS]", "[bid]", "[ask]", "[volume]"],
+        "delimiter": ",",
+        "header": False,
+        "date_format": "yyyyMMdd HH:mm:ss.SSS",
+        "time_format": "",
+    },
+    {
+        "name": "MetaTrader 4 bar format",
+        "items": [
+            "[date:yyyy.MM.dd]",
+            "[time:HH:mm]",
+            "[open]",
+            "[high]",
+            "[low]",
+            "[close]",
+            "[volume]",
+        ],
+        "delimiter": ",",
+        "header": False,
+        "date_format": "yyyy.MM.dd",
+        "time_format": "HH:mm",
+    },
+    {
+        "name": "MetaTrader 5 bar format",
+        "items": [
+            "[date:yyyy.MM.dd]",
+            "[time:HH:mm]",
+            "[open]",
+            "[high]",
+            "[low]",
+            "[close]",
+            "[volume]",
+            "[spread]",
+        ],
+        "delimiter": "\t",
+        "header": False,
+        "date_format": "yyyy.MM.dd",
+        "time_format": "HH:mm",
+    },
+]
 
 
 # ---------------------------------------------------------------------------
@@ -372,7 +563,8 @@ class DataRouterService:
         self.res_dir = res_dir
         self.job_manager = job_manager
         self.event_bus = event_bus
-        self.catalog = CatalogService(db)
+        self.storage = MarketDataStorage(base_dir=res_dir / "datasets")
+        self.catalog = CatalogService(db, storage=self.storage)
         self.instruments = InstrumentService(db)
         self.sessions = SessionService(db)
         self.instruments.ensure_defaults()
@@ -392,6 +584,12 @@ class DataRouterService:
         )
         self.custom_data = CustomDataService(db=db, storage_dir=res_dir / "custom_data")
         self.cot = CotService(db=db, storage_dir=res_dir / "cot")
+        self.csv_formats_repo = TypedRepository(
+            db,
+            entity_type="csv_format",
+            model_cls=CsvFormatProfile,
+            scope="global",
+        )
 
     def _emit_event(
         self, channel: str, event_type: str, payload: dict[str, Any]
@@ -751,6 +949,10 @@ class DataRouterService:
             new_id = self.catalog.clone_to_timezone(
                 payload.dataset_id,
                 target_timezone=payload.target_timezone,
+                timezone_type=payload.timezone_type,
+                shift_hours=payload.shift_hours,
+                remove_weekends=payload.remove_weekends,
+                postfix=payload.postfix,
                 new_dataset_id=payload.new_dataset_id,
             )
             self._emit_event(
@@ -785,6 +987,339 @@ class DataRouterService:
                 f"Failed to clone dataset to timezone: {exc}",
                 req_id,
             )
+
+    def _resolve_dataset_id(
+        self,
+        dataset_id: str | None = None,
+        symbol: str | None = None,
+        timeframe: str | None = None,
+        source: str | None = None,
+    ) -> str:
+        """Resolve dataset ID from explicit ID or symbol/timeframe lookup."""
+        if dataset_id:
+            return dataset_id
+        if symbol:
+            all_ds = self.catalog.list_datasets()
+            for ds in all_ds:
+                if ds.symbol.upper() == symbol.upper():
+                    if timeframe and ds.timeframe.upper() != timeframe.upper():
+                        continue
+                    if source and ds.source.upper() != source.upper():
+                        continue
+                    return ds.id
+        raise ValueError(
+            f"Could not resolve dataset for dataset_id={dataset_id}, "
+            f"symbol={symbol}, timeframe={timeframe}"
+        )
+
+    def review_data(
+        self,
+        request: Request,
+        dataset_id: str | None = None,
+        *,
+        symbol: str | None = None,
+        timeframe: str | None = None,
+        source: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+        session_name: str | None = None,
+    ) -> Response:
+        """Fetch paginated bar records for review/inspection."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            target_id = self._resolve_dataset_id(dataset_id, symbol, timeframe, source)
+            res = self.catalog.get_review_rows(
+                target_id, limit=limit, offset=offset, session_name=session_name
+            )
+            resp = ApiResponse.success(data=res, request_id=req_id)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND, "DATASET_NOT_FOUND", str(exc), req_id
+            )
+
+    def get_index_for_date(
+        self,
+        request: Request,
+        dataset_id: str | None = None,
+        *,
+        symbol: str | None = None,
+        timeframe: str | None = None,
+        source: str | None = None,
+        date: str | None = None,
+        target_date: str | None = None,
+    ) -> Response:
+        """Find bar index matching or immediately after target date."""
+        req_id = request.headers.get("x-request-id")
+        target_dt = date or target_date
+        if not target_dt:
+            return self._error_response(
+                status.HTTP_422_UNPROCESSABLE_ENTITY,
+                "VALIDATION_ERROR",
+                "Missing 'date' or 'target_date' parameter.",
+                req_id,
+            )
+        try:
+            target_id = self._resolve_dataset_id(dataset_id, symbol, timeframe, source)
+            idx = self.catalog.get_index_for_date(target_id, target_dt)
+            resp = ApiResponse.success(
+                data={"dataset_id": target_id, "date": target_dt, "index": idx},
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND, "NOT_FOUND", str(exc), req_id
+            )
+
+    def save_data_changes(
+        self,
+        request: Request,
+        payload: SaveDataChangesPayload,
+        dataset_id: str | None = None,
+    ) -> Response:
+        """Save edited or deleted bars directly into partitioned Parquet files."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            target_id = self._resolve_dataset_id(
+                dataset_id=dataset_id or payload.dataset_id,
+                symbol=payload.symbol,
+                timeframe=payload.timeframe,
+            )
+            updated = self.catalog.save_data_changes(
+                target_id,
+                changed_bars=payload.changed_bars,
+                deleted_timestamps=set(payload.deleted_timestamps),
+            )
+            self._emit_event(
+                "data.dataset",
+                "modified",
+                {"dataset_id": target_id, "bars": updated.bars},
+            )
+            resp = ApiResponse.success(
+                data=updated.model_dump(mode="json"),
+                message="Data changes saved successfully.",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError, OSError) as exc:
+            logger.exception("Failed to save data changes")
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST, "SAVE_CHANGES_FAILED", str(exc), req_id
+            )
+
+    def quality_summary(
+        self,
+        request: Request,
+        dataset_id: str | None = None,
+        *,
+        symbol: str | None = None,
+        timeframe: str | None = None,
+        source: str | None = None,
+    ) -> Response:
+        """Retrieve quality defect summary and 24-hour error distribution."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            target_id = self._resolve_dataset_id(dataset_id, symbol, timeframe, source)
+            summary = self.catalog.check_quality_summary(target_id)
+            data_out = {
+                **summary,
+                "errorDistribution": summary.get("distribution", []),
+                "problems": summary,
+            }
+            resp = ApiResponse.success(data=data_out, request_id=req_id)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND, "NOT_FOUND", str(exc), req_id
+            )
+
+    def quality_details(
+        self,
+        request: Request,
+        dataset_id: str | None = None,
+        *,
+        symbol: str | None = None,
+        timeframe: str | None = None,
+        source: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> Response:
+        """Retrieve paginated defect bars for quality review."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            target_id = self._resolve_dataset_id(dataset_id, symbol, timeframe, source)
+            details = self.catalog.check_quality_details(
+                target_id, limit=limit, offset=offset
+            )
+            resp = ApiResponse.success(data=details, request_id=req_id)
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError) as exc:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND, "NOT_FOUND", str(exc), req_id
+            )
+
+    def mass_delete(self, request: Request, payload: MassDeletePayload) -> Response:
+        """Execute batch delete or clear with clone dependency guard."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            res = self.catalog.mass_delete(
+                dataset_ids=payload.dataset_ids,
+                action=payload.action,
+                force=payload.force,
+            )
+            self._emit_event(
+                "data.dataset",
+                "mass_delete",
+                {"count": res["deleted_count"], "action": payload.action},
+            )
+            resp = ApiResponse.success(
+                data=res,
+                message=(
+                    f"Batch {payload.action} completed for "
+                    f"{res['deleted_count']} datasets."
+                ),
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except ValueError as exc:
+            is_dep = "CLONE_DEPENDENCY" in str(exc)
+            code = "CLONE_DEPENDENCY" if is_dep else "INVALID_PARAM"
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST, code, str(exc), req_id
+            )
+        except (KeyError, RuntimeError, OSError) as exc:
+            logger.exception("Mass delete failed")
+            return self._error_response(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "MASS_DELETE_FAILED",
+                str(exc),
+                req_id,
+            )
+
+    def export_catalog_xml(
+        self, request: Request, payload: DatasetXmlExportPayload
+    ) -> Response:
+        """Export datasets and brokers in SQX <Data> XML format."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            xml_str = self.catalog.export_catalog_xml(payload.dataset_ids)
+            resp = ApiResponse.success(
+                data={"xml_content": xml_str},
+                message="Catalog XML exported successfully.",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError, OSError) as exc:
+            logger.exception("Catalog XML export failed")
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST, "EXPORT_XML_FAILED", str(exc), req_id
+            )
+
+    def import_catalog_xml(
+        self, request: Request, payload: DatasetXmlImportPayload
+    ) -> Response:
+        """Import datasets and brokers from SQX <Data> XML."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            counts = self.catalog.import_catalog_xml(payload.xml_content)
+            self._emit_event("data.catalog", "imported_xml", counts)
+            msg = (
+                f"Imported {counts['datasets_imported']} datasets, "
+                f"{counts['brokers_imported']} brokers."
+            )
+            resp = ApiResponse.success(
+                data=counts,
+                message=msg,
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError, OSError) as exc:
+            logger.exception("Catalog XML import failed")
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST, "IMPORT_XML_FAILED", str(exc), req_id
+            )
+
+    def update_all_datasets(self, request: Request) -> Response:
+        """Trigger update on all datasets."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            res = self.catalog.update_all_datasets()
+            resp = ApiResponse.success(
+                data=res, message="Updates started.", request_id=req_id
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError, OSError) as exc:
+            return self._error_response(
+                status.HTTP_500_INTERNAL_SERVER_ERROR, "UPDATE_FAILED", str(exc), req_id
+            )
+
+    def update_selected_datasets(
+        self, request: Request, payload: UpdateSelectedPayload
+    ) -> Response:
+        """Trigger update on selected datasets."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            res = self.catalog.update_selected_datasets(payload.dataset_ids)
+            resp = ApiResponse.success(
+                data=res, message="Updates started.", request_id=req_id
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (ValueError, KeyError, RuntimeError, OSError) as exc:
+            return self._error_response(
+                status.HTTP_500_INTERNAL_SERVER_ERROR, "UPDATE_FAILED", str(exc), req_id
+            )
+
+    def list_csv_formats(self, request: Request) -> Response:
+        """List all canonical and custom CSV export format profiles."""
+        req_id = request.headers.get("x-request-id")
+        page = self.csv_formats_repo.list(limit=100)
+        custom_formats = [f.model_dump(mode="json") for f in page.items]
+        combined = list(CANONICAL_CSV_FORMATS) + custom_formats
+        resp = ApiResponse.success(
+            data={"formats": combined, "canonical": CANONICAL_CSV_FORMATS},
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def save_csv_format(self, request: Request, payload: CsvFormatProfile) -> Response:
+        """Save or update custom CSV export format profile."""
+        req_id = request.headers.get("x-request-id")
+        self.csv_formats_repo.save(payload.name, payload)
+        resp = ApiResponse.success(
+            data=payload.model_dump(mode="json"),
+            message=f"Format '{payload.name}' saved.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    async def delete_csv_format(self, request: Request, name: str = "") -> Response:
+        """Delete custom CSV format profile."""
+        req_id = request.headers.get("x-request-id")
+        target_name = name
+        if not target_name:
+            try:
+                body = await request.json()
+                if isinstance(body, dict):
+                    target_name = str(body.get("name", ""))
+            except ValueError, TypeError, UnicodeDecodeError:
+                target_name = ""
+        if not target_name:
+            target_name = request.query_params.get("name", "")
+        deleted = self.csv_formats_repo.delete(target_name)
+        if not deleted:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND,
+                "FORMAT_NOT_FOUND",
+                f"Format '{target_name}' not found.",
+                req_id,
+            )
+        resp = ApiResponse.success(
+            data={"name": target_name, "deleted": True},
+            message=f"Format '{target_name}' deleted.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
     # Instruments
     def list_instruments(
@@ -1672,45 +2207,142 @@ class DataRouterService:
                 req_id,
             )
 
+    def _resolve_csv_tokens(
+        self, payload: ExportPayload
+    ) -> tuple[list[str], str, bool]:
+        """Resolve items, delimiter, and header from format profile or custom fields."""
+        if payload.items:
+            return payload.items, payload.delimiter, payload.include_header
+        if payload.format_name:
+            for c in CANONICAL_CSV_FORMATS:
+                if c["name"] == payload.format_name:
+                    return list(c["items"]), str(c["delimiter"]), bool(c["header"])
+            saved = self.csv_formats_repo.get(payload.format_name)
+            if saved:
+                hdr_bool = (
+                    saved.header
+                    if isinstance(saved.header, bool)
+                    else bool(saved.header)
+                )
+                return saved.items, saved.delimiter, hdr_bool
+        return (
+            [
+                "[date:yyyyMMdd]",
+                "[time:HHmmss]",
+                "[open]",
+                "[high]",
+                "[low]",
+                "[close]",
+                "[volume]",
+            ],
+            payload.delimiter,
+            payload.include_header,
+        )
+
+    def _execute_export(
+        self,
+        fmt: str,
+        bars: list[BarRecord],
+        payload: ExportPayload,
+        out_file: Path,
+    ) -> Path:
+        """Route to appropriate SeriesTransformer export function."""
+        if fmt in ("mt4_hst", "mt4_binary"):
+            period = TIMEFRAME_MINUTES.get(payload.timeframe.upper(), 1)
+            out_path = self.transformer.export_mt4_binary(
+                bars=bars,
+                output_path=out_file,
+                symbol=payload.symbol,
+                period=period,
+                digits=payload.digits,
+            )
+        elif fmt in ("mt4_fxt", "fxt"):
+            out_path = self.transformer.export_mt4_fxt_binary(
+                bars=bars,
+                symbol=payload.symbol,
+                timeframe=payload.timeframe,
+                digits=payload.digits,
+                spread=payload.spread,
+                output_path=out_file,
+            )
+        elif fmt == "mt5" and (
+            payload.real_spread or payload.spread != DEFAULT_EXPORT_SPREAD
+        ):
+            out_path = self.transformer.export_mt5_advanced(
+                bars=bars,
+                symbol=payload.symbol,
+                real_spread=payload.real_spread,
+                fixed_spread=payload.spread,
+                output_path=out_file,
+            )
+        elif fmt in ("custom", "csv") and (payload.items or payload.format_name):
+            items, delimiter, header = self._resolve_csv_tokens(payload)
+            out_path = self.transformer.export_csv_custom(
+                bars=bars,
+                symbol=payload.symbol,
+                items=items,
+                delimiter=delimiter,
+                include_header=header,
+                output_path=out_file,
+            )
+        elif fmt == "mt4":
+            out_path = self.transformer.export_mt4(bars=bars, output_path=out_file)
+        elif fmt == "mt5":
+            out_path = self.transformer.export_mt5(bars=bars, output_path=out_file)
+        else:
+            out_path = self.transformer.export_csv(bars=bars, output_path=out_file)
+        return out_path
+
     def export_series(self, request: Request, payload: ExportPayload) -> Response:
-        """Export series."""
+        """Export series with support for tokens, MT4 binary, and MT5 advanced."""
         req_id = request.headers.get("x-request-id")
         try:
+            bars = list(payload.bars)
+            if not bars and payload.dataset_id:
+                ds = self.catalog.get_dataset(payload.dataset_id)
+                if ds:
+                    bars = self.catalog.storage.read_bars_slice(
+                        source=ds.source,
+                        symbol=ds.symbol,
+                        timeframe=ds.timeframe,
+                        limit=ds.bars or 1000000,
+                    )
             fmt = payload.format.lower()
+            ext = (
+                "fxt"
+                if fmt in ("mt4_fxt", "fxt")
+                else ("hst" if fmt in ("mt4_hst", "mt4_binary") else fmt)
+            )
             out_file = (
                 Path(payload.output_path)
                 if payload.output_path
                 else self.res_dir
                 / "exports"
-                / f"{payload.symbol}_{payload.timeframe}.{fmt}"
+                / f"{payload.symbol}_{payload.timeframe}.{ext}"
             )
-            if fmt == "mt4":
-                out_path = self.transformer.export_mt4(
-                    bars=payload.bars,
-                    output_path=out_file,
-                )
-            elif fmt == "mt5":
-                out_path = self.transformer.export_mt5(
-                    bars=payload.bars,
-                    output_path=out_file,
-                )
-            else:
-                out_path = self.transformer.export_csv(
-                    bars=payload.bars,
-                    output_path=out_file,
-                )
+            out_path = self._execute_export(
+                fmt=fmt,
+                bars=bars,
+                payload=payload,
+                out_file=out_file,
+            )
 
-            file_content = out_path.read_text(encoding="utf-8")
-            line_count = len(file_content.splitlines())
+            if fmt in ("mt4_hst", "mt4_binary", "mt4_fxt", "fxt"):
+                file_bytes = out_path.read_bytes()
+                file_content = f"<binary {len(file_bytes)} bytes>"
+                line_count = len(bars)
+            else:
+                file_content = out_path.read_text(encoding="utf-8")
+                line_count = len(file_content.splitlines())
 
             logger.info(
                 "FR-DATA-INTEGRATION-TRANSFORMS: Exported %d bars as %s",
-                len(payload.bars),
+                len(bars),
                 fmt,
                 extra={
                     "fr_id": "FR-DATA-INTEGRATION-TRANSFORMS",
                     "format": fmt,
-                    "bars_count": len(payload.bars),
+                    "bars_count": len(bars),
                 },
             )
             resp = ApiResponse.success(
@@ -1722,7 +2354,7 @@ class DataRouterService:
                     "content": file_content,
                     "line_count": line_count,
                 },
-                message=f"Exported {len(payload.bars)} bars as {fmt.upper()}",
+                message=f"Exported {len(bars)} bars as {fmt.upper()}",
                 request_id=req_id,
             )
             return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
@@ -1849,47 +2481,12 @@ class DataRouterService:
 
 
 # ---------------------------------------------------------------------------
-# Router Factory
+# Route Registration Helpers
 # ---------------------------------------------------------------------------
 
 
-def create_data_router(
-    db_manager: DatabaseManager | None = None,
-    resource_manager: ResourceManager | None = None,
-    *,
-    job_manager: JobManager | None = None,
-    event_bus: EventBus | None = None,
-    provider_manager: ProviderManager | None = None,
-) -> APIRouter:
-    """Create and configure FastAPI APIRouter for Market Data workspace.
-
-    Args:
-        db_manager: Central host DatabaseManager instance.
-        resource_manager: Central host ResourceManager instance.
-        job_manager: Optional host JobManager instance for background compute jobs.
-        event_bus: Optional host EventBus instance for real-time notification streaming.
-        provider_manager: Optional host-discovered ProviderManager instance.
-
-    Returns:
-        Configured FastAPI APIRouter.
-    """
-    db = db_manager or get_database_manager()
-    res_dir = (
-        resource_manager.root_dir
-        if resource_manager is not None
-        else Path("data/resources")
-    )
-
-    service = DataRouterService(
-        db,
-        res_dir,
-        job_manager=job_manager,
-        event_bus=event_bus,
-        provider_manager=provider_manager,
-    )
-    router = APIRouter(prefix="/data", tags=["Market Data"])
-
-    # Datasets
+def _register_dataset_routes(router: APIRouter, service: DataRouterService) -> None:
+    """Register all dataset manipulation and inspection routes."""
     router.add_api_route(
         "/datasets", service.list_datasets, methods=["GET"], summary="List datasets"
     )
@@ -1936,6 +2533,127 @@ def create_data_router(
         summary="Clone dataset to timezone",
     )
     router.add_api_route(
+        "/datasets/{dataset_id}/review-data",
+        service.review_data,
+        methods=["GET"],
+        summary="Review paginated bar records",
+    )
+    router.add_api_route(
+        "/datasets/{dataset_id}/index-for-date",
+        service.get_index_for_date,
+        methods=["GET"],
+        summary="Get bar index for date",
+    )
+    router.add_api_route(
+        "/datasets/{dataset_id}/save-changes",
+        service.save_data_changes,
+        methods=["POST"],
+        summary="Save bar cell changes or row deletions",
+    )
+    router.add_api_route(
+        "/datasets/{dataset_id}/quality-summary",
+        service.quality_summary,
+        methods=["GET"],
+        summary="Data quality defect summary",
+    )
+    router.add_api_route(
+        "/datasets/{dataset_id}/quality-details",
+        service.quality_details,
+        methods=["GET"],
+        summary="Data quality defect details",
+    )
+    router.add_api_route(
+        "/datasets/mass-delete",
+        service.mass_delete,
+        methods=["POST"],
+        summary="Mass delete or clear datasets",
+    )
+    router.add_api_route(
+        "/datasets/export-xml",
+        service.export_catalog_xml,
+        methods=["POST"],
+        summary="Export datasets and brokers to SQX <Data> XML",
+    )
+    router.add_api_route(
+        "/datasets/import-xml",
+        service.import_catalog_xml,
+        methods=["POST"],
+        summary="Import datasets and brokers from SQX <Data> XML",
+    )
+    router.add_api_route(
+        "/datasets/update-all",
+        service.update_all_datasets,
+        methods=["POST"],
+        summary="Update all online datasets",
+    )
+    router.add_api_route(
+        "/datasets/update-selected",
+        service.update_selected_datasets,
+        methods=["POST"],
+        summary="Update selected online datasets",
+    )
+    # Direct SQX RPC path aliases
+    router.add_api_route(
+        "/reviewData",
+        service.review_data,
+        methods=["GET"],
+        summary="Review paginated bar records (SQX alias)",
+    )
+    router.add_api_route(
+        "/getIndexForDate",
+        service.get_index_for_date,
+        methods=["GET"],
+        summary="Get bar index for date (SQX alias)",
+    )
+    router.add_api_route(
+        "/saveDataChanges",
+        service.save_data_changes,
+        methods=["POST"],
+        summary="Save bar cell changes (SQX alias)",
+    )
+    router.add_api_route(
+        "/checkQualitySummary",
+        service.quality_summary,
+        methods=["GET"],
+        summary="Quality summary (SQX alias)",
+    )
+    router.add_api_route(
+        "/checkQualityDetails",
+        service.quality_details,
+        methods=["GET"],
+        summary="Quality details (SQX alias)",
+    )
+    router.add_api_route(
+        "/cloneToTimezone",
+        service.clone_to_timezone,
+        methods=["POST"],
+        summary="Clone dataset to timezone (SQX alias)",
+    )
+    router.add_api_route(
+        "/updateAll",
+        service.update_all_datasets,
+        methods=["POST"],
+        summary="Update all datasets (SQX alias)",
+    )
+    router.add_api_route(
+        "/updateSelected",
+        service.update_selected_datasets,
+        methods=["POST"],
+        summary="Update selected datasets (SQX alias)",
+    )
+    router.add_api_route(
+        "/save",
+        service.export_catalog_xml,
+        methods=["POST"],
+        summary="Export catalog XML (SQX alias)",
+    )
+    router.add_api_route(
+        "/load",
+        service.import_catalog_xml,
+        methods=["POST"],
+        summary="Import catalog XML (SQX alias)",
+    )
+    router.add_api_route(
         "/datasets/{symbol}/{timeframe}/availability",
         service.check_availability,
         methods=["GET"],
@@ -1948,7 +2666,11 @@ def create_data_router(
         summary="Import dataset",
     )
 
-    # Instruments
+
+def _register_instrument_session_routes(
+    router: APIRouter, service: DataRouterService
+) -> None:
+    """Register instrument and trading session template routes."""
     router.add_api_route(
         "/instruments",
         service.list_instruments,
@@ -1979,8 +2701,6 @@ def create_data_router(
         methods=["DELETE"],
         summary="Delete instrument",
     )
-
-    # Sessions
     router.add_api_route(
         "/sessions",
         service.list_sessions,
@@ -2012,7 +2732,11 @@ def create_data_router(
         summary="Import NinjaTrader sessions",
     )
 
-    # Baskets
+
+def _register_basket_provider_routes(
+    router: APIRouter, service: DataRouterService
+) -> None:
+    """Register basket, provider, and COT routes."""
     router.add_api_route(
         "/baskets",
         service.list_baskets,
@@ -2073,8 +2797,6 @@ def create_data_router(
         methods=["GET"],
         summary="Check basket data download readiness",
     )
-
-    # Providers
     router.add_api_route(
         "/providers",
         service.list_providers,
@@ -2087,8 +2809,6 @@ def create_data_router(
         methods=["POST"],
         summary="Download provider data",
     )
-
-    # COT
     router.add_api_route(
         "/cot/mappings",
         service.list_cot_mappings,
@@ -2108,15 +2828,15 @@ def create_data_router(
         summary="Update COT observations",
     )
 
-    # Quality
+
+def _register_export_home_routes(router: APIRouter, service: DataRouterService) -> None:
+    """Register export, quality, home, broker, and log routes."""
     router.add_api_route(
         "/quality/audit",
         service.audit_data_quality,
         methods=["POST"],
         summary="Audit data quality",
     )
-
-    # Transforms & Export
     router.add_api_route(
         "/transforms/resample",
         service.resample_timeframe,
@@ -2129,8 +2849,72 @@ def create_data_router(
         methods=["POST"],
         summary="Export bar series",
     )
-
-    # Workspace Home Overview
+    router.add_api_route(
+        "/export/csv/formats",
+        service.list_csv_formats,
+        methods=["GET"],
+        summary="List CSV export format profiles",
+    )
+    router.add_api_route(
+        "/export/csv/formats",
+        service.save_csv_format,
+        methods=["POST"],
+        summary="Save CSV export format profile",
+    )
+    router.add_api_route(
+        "/export/csv/formats/{name}",
+        service.delete_csv_format,
+        methods=["DELETE"],
+        summary="Delete CSV export format profile",
+    )
+    router.add_api_route(
+        "/exportToCsvLoadSettings",
+        service.list_csv_formats,
+        methods=["GET", "POST"],
+        summary="Export to CSV load settings (SQX alias)",
+    )
+    router.add_api_route(
+        "/exportToCsvSaveFileFormat",
+        service.save_csv_format,
+        methods=["POST"],
+        summary="Save CSV format (SQX alias)",
+    )
+    router.add_api_route(
+        "/exportToCsvSaveAsFileFormat",
+        service.save_csv_format,
+        methods=["POST"],
+        summary="Save As CSV format (SQX alias)",
+    )
+    router.add_api_route(
+        "/exportToCsvDeleteFileFormat",
+        service.delete_csv_format,
+        methods=["POST"],
+        summary="Delete CSV format (SQX alias)",
+    )
+    router.add_api_route(
+        "/export/csv/formats/delete",
+        service.delete_csv_format,
+        methods=["POST"],
+        summary="Delete CSV format (POST)",
+    )
+    router.add_api_route(
+        "/exportToCsvAction",
+        service.export_series,
+        methods=["POST"],
+        summary="Export to CSV action (SQX alias)",
+    )
+    router.add_api_route(
+        "/exportToMT4Action",
+        service.export_series,
+        methods=["POST"],
+        summary="Export to MT4 action (SQX alias)",
+    )
+    router.add_api_route(
+        "/exportToMT5Action",
+        service.export_series,
+        methods=["POST"],
+        summary="Export to MT5 action (SQX alias)",
+    )
     router.add_api_route(
         "/home/overview",
         service.get_home_overview,
@@ -2143,24 +2927,18 @@ def create_data_router(
         methods=["GET"],
         summary="Get home documentation links",
     )
-
-    # Brokers
     router.add_api_route(
         "/brokers",
         service.list_brokers,
         methods=["GET"],
         summary="List broker profiles",
     )
-
-    # Audit Logs
     router.add_api_route(
         "/logs",
         service.list_logs,
         methods=["GET"],
         summary="List activity logs",
     )
-
-    # Help
     router.add_api_route(
         "/help/topics",
         service.list_help_topics,
@@ -2168,6 +2946,46 @@ def create_data_router(
         summary="List help topics",
     )
 
+
+def create_data_router(
+    db_manager: DatabaseManager | None = None,
+    resource_manager: ResourceManager | None = None,
+    *,
+    job_manager: JobManager | None = None,
+    event_bus: EventBus | None = None,
+    provider_manager: ProviderManager | None = None,
+) -> APIRouter:
+    """Create and configure FastAPI APIRouter for Market Data workspace.
+
+    Args:
+        db_manager: Central host DatabaseManager instance.
+        resource_manager: Central host ResourceManager instance.
+        job_manager: Optional host JobManager instance for background compute jobs.
+        event_bus: Optional host EventBus instance for real-time notification streaming.
+        provider_manager: Optional host-discovered ProviderManager instance.
+
+    Returns:
+        Configured FastAPI APIRouter.
+    """
+    db = db_manager or get_database_manager()
+    res_dir = (
+        resource_manager.root_dir
+        if resource_manager is not None
+        else Path("data/resources")
+    )
+
+    service = DataRouterService(
+        db,
+        res_dir,
+        job_manager=job_manager,
+        event_bus=event_bus,
+        provider_manager=provider_manager,
+    )
+    router = APIRouter(prefix="/data", tags=["Market Data"])
+    _register_dataset_routes(router, service)
+    _register_instrument_session_routes(router, service)
+    _register_basket_provider_routes(router, service)
+    _register_export_home_routes(router, service)
     return router
 
 

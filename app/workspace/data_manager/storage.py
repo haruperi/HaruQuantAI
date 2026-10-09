@@ -84,6 +84,7 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import gzip
 import io
 import lzma
@@ -869,6 +870,175 @@ class MarketDataStorage:
                 exc,
             )
             return False
+
+    def patch_bars(
+        self,
+        source: str,
+        timeframe: str,
+        symbol: str,
+        changed_bars: Sequence[BarRecord],
+        deleted_timestamps: set[str],
+        *,
+        tick_size: float = DEFAULT_TICK_SIZE,
+    ) -> int:
+        """Patch bar partitions by replacing changed bars and deleting timestamps.
+
+        Fires FR-DATA-STORAGE-WRITER.
+        Returns total remaining bar count across all partitions.
+        """
+        clean_sym = symbol.strip().upper()
+        clean_source = source.strip().lower()
+        clean_tf = timeframe.strip().upper()
+
+        affected_years = self._collect_affected_years(changed_bars, deleted_timestamps)
+        schema_metadata = {
+            "tick_size": str(tick_size),
+            "source": clean_source,
+            "symbol": clean_sym,
+            "timeframe": clean_tf,
+            "data_kind": "bars",
+        }
+        schema = M1_SCHEMA.with_metadata(schema_metadata)
+
+        for year in affected_years:
+            path = get_bar_partition_path(
+                self._base_dir, clean_source, clean_tf, clean_sym, year
+            )
+            if path.exists():
+                self._patch_year_partition(
+                    path,
+                    year,
+                    changed_bars,
+                    deleted_timestamps,
+                    schema=schema,
+                    tick_size=tick_size,
+                )
+
+        base_dir = self._base_dir / clean_source / clean_tf.lower() / clean_sym.lower()
+        total_bars = self._recount_total_bars(base_dir)
+
+        logger.info(
+            "FR-DATA-STORAGE-WRITER: Patched %s/%s/%s: %d changed, %d deleted, "
+            "%d total remaining",
+            clean_source,
+            clean_sym,
+            clean_tf,
+            len(changed_bars),
+            len(deleted_timestamps),
+            total_bars,
+            extra={
+                "changed": len(changed_bars),
+                "deleted": len(deleted_timestamps),
+                "remaining_bars": total_bars,
+                "fr_id": "FR-DATA-STORAGE-WRITER",
+            },
+        )
+        return total_bars
+
+    @staticmethod
+    def _collect_affected_years(
+        changed_bars: Sequence[BarRecord], deleted_timestamps: set[str]
+    ) -> set[int]:
+        years: set[int] = set()
+        for b in changed_bars:
+            years.add(parse_iso_to_utc_datetime(b.timestamp_utc).year)
+        for ts in deleted_timestamps:
+            with contextlib.suppress(ValueError):
+                years.add(parse_iso_to_utc_datetime(ts).year)
+        return years
+
+    def _patch_year_partition(
+        self,
+        path: Path,
+        year: int,
+        changed_bars: Sequence[BarRecord],
+        deleted_timestamps: set[str],
+        *,
+        schema: pa.Schema,
+        tick_size: float,
+    ) -> None:
+        try:
+            existing_table = pq.read_table(path)
+            df = pl.DataFrame(existing_table)
+        except (pa.ArrowInvalid, OSError, ValueError) as exc:
+            logger.warning(
+                "FR-DATA-STORAGE-WRITER: Reading partition %s failed: %s",
+                path,
+                exc,
+                extra={"fr_id": "FR-DATA-STORAGE-WRITER"},
+            )
+            return
+
+        del_dts: list[datetime] = []
+        for ts_str in deleted_timestamps:
+            with contextlib.suppress(ValueError):
+                d = parse_iso_to_utc_datetime(ts_str)
+                if d.year == year:
+                    del_dts.append(d)
+        if del_dts:
+            df = df.filter(~pl.col("DateTime").is_in(del_dts))
+
+        year_changed = [
+            b
+            for b in changed_bars
+            if parse_iso_to_utc_datetime(b.timestamp_utc).year == year
+        ]
+        if year_changed:
+            records = [
+                (
+                    parse_iso_to_utc_datetime(b.timestamp_utc),
+                    to_tick_units(b.open, tick_size),
+                    to_tick_units(b.high, tick_size),
+                    to_tick_units(b.low, tick_size),
+                    to_tick_units(b.close, tick_size),
+                    max(0, round(b.volume)),
+                )
+                for b in year_changed
+            ]
+            records.sort(key=lambda r: r[0])
+            new_table = pa.Table.from_arrays(
+                [
+                    pa.array(
+                        [r[0] for r in records],
+                        type=pa.timestamp("us", tz="UTC"),
+                    ),
+                    pa.array([r[1] for r in records], type=pa.int64()),
+                    pa.array([r[2] for r in records], type=pa.int64()),
+                    pa.array([r[3] for r in records], type=pa.int64()),
+                    pa.array([r[4] for r in records], type=pa.int64()),
+                    pa.array([r[5] for r in records], type=pa.uint64()),
+                ],
+                schema=schema,
+            )
+            new_df = pl.DataFrame(new_table)
+            df = (
+                pl.concat([df, new_df])
+                .unique(subset=["DateTime"], keep="last")
+                .sort("DateTime")
+            )
+
+        if df.height > 0:
+            final_table = df.to_arrow().cast(schema)
+            pq.write_table(
+                final_table,
+                path,
+                compression="zstd",
+                compression_level=ZSTD_COMPRESSION_LEVEL,
+            )
+        else:
+            with contextlib.suppress(OSError):
+                path.unlink()
+
+    @staticmethod
+    def _recount_total_bars(base_dir: Path) -> int:
+        if not base_dir.exists():
+            return 0
+        total = 0
+        for f in sorted(base_dir.rglob("*.parquet")):
+            with contextlib.suppress(OSError, pa.ArrowInvalid):
+                meta = pq.read_metadata(f)
+                total += meta.num_rows
+        return total
 
 
 def main() -> int:

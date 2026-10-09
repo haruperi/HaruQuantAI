@@ -49,6 +49,8 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
+import struct
 import sys
 import zoneinfo
 from collections import defaultdict
@@ -73,6 +75,63 @@ TIMEFRAME_MINUTES: dict[str, int] = {
     "H4": 240,
     "D1": 1440,
 }
+
+MT4_HST_VERSION = 401
+MT4_FXT_VERSION = 405
+MT4_COPYRIGHT = b"(C) Copyright 2026, HaruQuantAI"
+MT4_HEADER_FORMAT = "<i64s12siiii52s"
+MT4_RATE_FORMAT = "<qddddqiq"
+DEFAULT_DIGITS = 5
+MT4_FXT_HEADER_LEN = 728
+MT4_FXT_RECORD_FORMAT = "<qddddqq"
+
+
+def translate_java_date_format(java_fmt: str) -> str:
+    """Translate Java date format tokens into Python strftime format."""
+    res = (
+        java_fmt.replace("yyyy", "%Y")
+        .replace("YYYY", "%Y")
+        .replace("yy", "%y")
+        .replace("YY", "%y")
+    )
+    res = res.replace("MM", "%m").replace("DD", "%d").replace("dd", "%d")
+    res = res.replace("HH", "%H").replace("hh", "%I")
+    return res.replace("mm", "%M").replace("ss", "%S")
+
+
+def _resolve_single_token(tok: str, bar: BarRecord, symbol: str, dt: datetime) -> str:
+    """Resolve a single format token into its replacement string."""
+    lower_tok = tok.lower()
+    if lower_tok == "symbol":
+        return symbol
+    if lower_tok.startswith(("date:", "time:")):
+        fmt = translate_java_date_format(tok[5:])
+        return dt.strftime(fmt)
+    if lower_tok == "datetime":
+        return dt.strftime("%Y.%m.%d %H:%M:%S")
+    lookup: dict[str, str] = {
+        "open": f"{bar.open:.5f}",
+        "high": f"{bar.high:.5f}",
+        "low": f"{bar.low:.5f}",
+        "close": f"{bar.close:.5f}",
+        "volume": f"{int(bar.volume)}",
+        "ask": f"{bar.close:.5f}",
+        "bid": f"{bar.close:.5f}",
+        "spread": "0",
+    }
+    return lookup.get(lower_tok, f"[{tok}]")
+
+
+def format_custom_csv_row(bar: BarRecord, format_template: str, symbol: str) -> str:
+    """Format single BarRecord according to SQX tokenized format string."""
+    dt = datetime.fromisoformat(bar.timestamp_utc)
+    tokens = re.findall(r"\[([^\]]+)\]", format_template)
+    row_str = format_template
+    for tok in tokens:
+        full_tok = f"[{tok}]"
+        val = _resolve_single_token(tok, bar, symbol, dt)
+        row_str = row_str.replace(full_tok, val)
+    return row_str
 
 
 class SeriesTransformer:
@@ -355,6 +414,234 @@ class SeriesTransformer:
             extra={
                 "bar_count": len(bars),
                 "format": "MT5",
+                "path": str(out),
+                "fr_id": "FR-DATA-QUALITY-EXPORT",
+            },
+        )
+        return out
+
+    def export_csv_custom(
+        self,
+        bars: list[BarRecord],
+        output_path: Path | str,
+        *,
+        format_template: str = "",
+        header_template: str | None = None,
+        include_header: bool = True,
+        symbol: str = "",
+        items: list[str] | None = None,
+        delimiter: str = ",",
+    ) -> Path:
+        """Export bars using custom SQX tokenized CSV format.
+
+        Fires FR-DATA-QUALITY-EXPORT.
+        """
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        active_format = format_template
+        if not active_format and items:
+            active_format = delimiter.join(items)
+
+        with out.open("w", encoding="utf-8", newline="") as f:
+            if include_header and header_template:
+                f.write(header_template.strip() + "\n")
+            elif include_header:
+                f.write("Date,Time,Open,High,Low,Close,Volume\n")
+            for b in bars:
+                row_str = format_custom_csv_row(b, active_format, symbol)
+                f.write(row_str + "\n")
+
+        logger.info(
+            "FR-DATA-QUALITY-EXPORT: Exported %d bars to custom CSV: %s",
+            len(bars),
+            out,
+            extra={
+                "bar_count": len(bars),
+                "format": "CSV_CUSTOM",
+                "path": str(out),
+                "fr_id": "FR-DATA-QUALITY-EXPORT",
+            },
+        )
+        return out
+
+    def export_mt4_binary(
+        self,
+        bars: list[BarRecord],
+        output_path: Path | str,
+        symbol: str = "EURUSD",
+        period: int = 1,
+        digits: int = DEFAULT_DIGITS,
+    ) -> Path:
+        """Export bars to binary MT4 HST format (version 401).
+
+        Fires FR-DATA-QUALITY-EXPORT.
+        """
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+
+        sym_bytes = symbol.encode("ascii")[:11]
+        now_ts = int(datetime.now(UTC).timestamp())
+        header = struct.pack(
+            MT4_HEADER_FORMAT,
+            MT4_HST_VERSION,
+            MT4_COPYRIGHT,
+            sym_bytes,
+            period,
+            digits,
+            now_ts,
+            0,
+            b"\x00" * 52,
+        )
+
+        with out.open("wb") as f:
+            f.write(header)
+            for b in bars:
+                dt = datetime.fromisoformat(b.timestamp_utc)
+                ctm = int(dt.timestamp())
+                rec = struct.pack(
+                    MT4_RATE_FORMAT,
+                    ctm,
+                    b.open,
+                    b.high,
+                    b.low,
+                    b.close,
+                    int(b.volume),
+                    0,
+                    int(b.open_interest),
+                )
+                f.write(rec)
+
+        logger.info(
+            "FR-DATA-QUALITY-EXPORT: Exported %d bars to binary MT4 HST: %s",
+            len(bars),
+            out,
+            extra={
+                "bar_count": len(bars),
+                "format": "MT4_HST",
+                "path": str(out),
+                "fr_id": "FR-DATA-QUALITY-EXPORT",
+            },
+        )
+        return out
+
+    def export_mt4_fxt_binary(
+        self,
+        bars: list[BarRecord],
+        output_path: Path | str,
+        *,
+        symbol: str = "EURUSD",
+        timeframe: str = "M1",
+        digits: int = 5,
+        spread: float = 2.0,
+    ) -> Path:
+        """Export bars to binary MT4 FXT format (version 405).
+
+        Fires FR-DATA-QUALITY-EXPORT.
+        """
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+
+        header = struct.pack("<i", MT4_FXT_VERSION) + (
+            b"\x00" * (MT4_FXT_HEADER_LEN - 4)
+        )
+        with out.open("wb") as f:
+            f.write(header)
+            for b in bars:
+                dt = datetime.fromisoformat(b.timestamp_utc)
+                ctm = int(dt.timestamp())
+                rec = struct.pack(
+                    MT4_FXT_RECORD_FORMAT,
+                    ctm,
+                    b.open,
+                    b.high,
+                    b.low,
+                    b.close,
+                    int(b.volume),
+                    int(b.open_interest),
+                )
+                f.write(rec)
+
+        logger.info(
+            "FR-DATA-QUALITY-EXPORT: Exported %d ticks to binary MT4 FXT: %s",
+            len(bars),
+            out,
+            extra={
+                "bar_count": len(bars),
+                "symbol": symbol,
+                "timeframe": timeframe,
+                "digits": digits,
+                "spread": spread,
+                "format": "MT4_FXT",
+                "path": str(out),
+                "fr_id": "FR-DATA-QUALITY-EXPORT",
+            },
+        )
+        return out
+
+    def export_mt5_advanced(
+        self,
+        bars: list[BarRecord],
+        output_path: Path | str,
+        *,
+        symbol: str = "EURUSD",
+        is_tick: bool = False,
+        real_spread: bool = False,
+        spread_mode: str = "real",
+        fixed_spread: float = 10,
+        target_timezone: str | None = None,
+    ) -> Path:
+        """Export bars/ticks to MT5 format with spread modeling and timezone shifting.
+
+        Fires FR-DATA-QUALITY-EXPORT.
+        """
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+
+        effective_spread_mode = "real" if real_spread else spread_mode
+        work_bars = bars
+        if target_timezone:
+            work_bars = self.shift_timezone(bars, target_timezone)
+
+        with out.open("w", encoding="utf-8", newline="") as f:
+            if is_tick:
+                f.write("<DATE>\t<TIME>\t<BID>\t<ASK>\t<LAST>\t<VOLUME>\t<FLAGS>\n")
+                for b in work_bars:
+                    dt = datetime.fromisoformat(b.timestamp_utc)
+                    d_part = dt.strftime("%Y.%m.%d")
+                    t_part = dt.strftime("%H:%M:%S.%f")[:12]
+                    vol = int(b.volume)
+                    f.write(
+                        f"{d_part}\t{t_part}\t{b.low:.5f}\t{b.high:.5f}\t"
+                        f"{b.close:.5f}\t{vol}\t0\n"
+                    )
+            else:
+                f.write(
+                    "<DATE>\t<TIME>\t<OPEN>\t<HIGH>\t<LOW>\t<CLOSE>\t"
+                    "<TICKVOL>\t<VOL>\t<SPREAD>\n"
+                )
+                for b in work_bars:
+                    dt = datetime.fromisoformat(b.timestamp_utc)
+                    d_part = dt.strftime("%Y.%m.%d")
+                    t_part = dt.strftime("%H:%M:%S")
+                    spread_val = (
+                        round((b.high - b.low) * 10000)
+                        if effective_spread_mode == "real"
+                        else int(fixed_spread)
+                    )
+                    vol = int(b.volume)
+                    f.write(
+                        f"{d_part}\t{t_part}\t{b.open:.5f}\t{b.high:.5f}\t"
+                        f"{b.low:.5f}\t{b.close:.5f}\t{vol}\t0\t{spread_val}\n"
+                    )
+
+        logger.info(
+            "FR-DATA-QUALITY-EXPORT: Exported %d bars to advanced MT5 format: %s",
+            len(bars),
+            out,
+            extra={
+                "bar_count": len(bars),
+                "symbol": symbol,
+                "format": "MT5_ADVANCED",
                 "path": str(out),
                 "fr_id": "FR-DATA-QUALITY-EXPORT",
             },

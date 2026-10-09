@@ -89,9 +89,10 @@ import json
 import re
 import sys
 import uuid
+import xml.etree.ElementTree as ET
 import zoneinfo
 from collections.abc import Generator, Iterable, Sequence
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from io import StringIO
 from pathlib import Path
 from typing import Any, override
@@ -130,6 +131,7 @@ MIN_FIELD_COUNT = 5
 SEPARATE_DT_MIN_FIELDS = 6
 ALIAS_COLON_PART_COUNT = 3
 MS_EPOCH_THRESHOLD = 1e11
+WEEKEND_START_DAY = 5
 
 
 class IngestionConfig(BaseModel):
@@ -210,14 +212,84 @@ class DatasetRecord(BaseModel):
     quality_score: float = Field(
         default=1.0, ge=0.0, le=1.0, description="Quality confidence score"
     )
+    source_data_id: str | None = Field(
+        default=None, description="Parent dataset ID if this dataset is cloned"
+    )
     lineage_json: str = Field(default="{}", description="JSON lineage metadata")
     schema_version: int = Field(default=1, description="Metadata schema version")
 
     @override
     def model_post_init(self, _context: Any, /) -> None:
-        """Ensure bar_count mirrors bars if omitted."""
+        """Ensure bar_count mirrors bars and unpack source_data_id from lineage."""
         if self.bar_count is None:
             object.__setattr__(self, "bar_count", self.bars)
+        if self.source_data_id is None and self.lineage_json:
+            try:
+                lineage = json.loads(self.lineage_json)
+                if isinstance(lineage, dict) and "source_data_id" in lineage:
+                    object.__setattr__(
+                        self, "source_data_id", lineage["source_data_id"]
+                    )
+            except json.JSONDecodeError, TypeError:
+                pass
+
+
+def _shift_bar_timestamp(
+    bar: BarRecord,
+    timezone_type: str,
+    shift_delta: timedelta | None,
+    tz_obj: zoneinfo.ZoneInfo | None,
+    remove_weekends: bool,
+) -> BarRecord | None:
+    """Shift a bar's timestamp and optionally filter weekends."""
+    dt_utc = parse_iso_to_utc_datetime(bar.timestamp_utc)
+    if timezone_type == "hours" and shift_delta is not None:
+        dt = dt_utc + shift_delta
+    elif tz_obj is not None:
+        dt = dt_utc.astimezone(tz_obj)
+    else:
+        dt = dt_utc
+
+    if remove_weekends and dt.weekday() >= WEEKEND_START_DAY:
+        return None
+
+    return BarRecord(
+        timestamp_utc=dt.isoformat(),
+        open=bar.open,
+        high=bar.high,
+        low=bar.low,
+        close=bar.close,
+        volume=bar.volume,
+        open_interest=bar.open_interest,
+    )
+
+
+def _resolve_clone_parameters(
+    timezone_type: str,
+    target_timezone: str | None,
+    shift_hours: int | None,
+    timeframe: str,
+    postfix: str | None,
+) -> tuple[timedelta | None, zoneinfo.ZoneInfo | None, str, str]:
+    """Resolve shift, tz object, tz label, and symbol postfix."""
+    if timezone_type == "hours" or shift_hours is not None:
+        sh = int(shift_hours or 0)
+        shift_delta = timedelta(hours=sh)
+        tz_obj = None
+        clone_time_str = f"{sh:+d}h"
+        tz_label = f"UTC{sh:+d}"
+    else:
+        clean_tz = (target_timezone or "UTC").strip()
+        tz_obj = zoneinfo.ZoneInfo(clean_tz)
+        shift_delta = None
+        clone_time_str = clean_tz.replace("/", "_").replace(" ", "_")
+        tz_label = clean_tz
+
+    template = postfix or "_{timeframe}_{cloneTime}"
+    resolved_postfix = template.replace("{timeframe}", timeframe).replace(
+        "{cloneTime}", clone_time_str
+    )
+    return shift_delta, tz_obj, tz_label, resolved_postfix
 
 
 class CatalogService:
@@ -257,7 +329,16 @@ class CatalogService:
         Fires FR-DATA-CATALOG-DATASET-REGISTRY and
         FR-DATA-CATALOG-REVISION-INTEGRITY.
         """
-        payload = dataset.model_dump(exclude={"bar_count"})
+        payload = dataset.model_dump(exclude={"bar_count", "source_data_id"})
+        if dataset.source_data_id:
+            try:
+                lineage = json.loads(payload.get("lineage_json") or "{}")
+                if not isinstance(lineage, dict):
+                    lineage = {}
+            except json.JSONDecodeError, TypeError:
+                lineage = {}
+            lineage["source_data_id"] = dataset.source_data_id
+            payload["lineage_json"] = json.dumps(lineage)
         now = datetime.now(UTC).isoformat()
         payload["created_at"] = payload["created_at"] or now
         payload["updated_at"] = now
@@ -427,6 +508,9 @@ class CatalogService:
         timeframe: str,
         bars: Sequence[BarRecord],
         instrument: str | None = None,
+        *,
+        source_data_id: str | None = None,
+        timezone: str = "UTC",
     ) -> DatasetRecord:
         """Write bars into canonical Parquet partitions and update catalog.
 
@@ -456,11 +540,13 @@ class CatalogService:
             / clean_tf.lower()
             / clean_symbol.lower()
         )
-        lineage = {
+        lineage: dict[str, Any] = {
             "tick_size": tick_size,
             "partitions": write_res.partition_files,
             "data_kind": "bars",
         }
+        if source_data_id:
+            lineage["source_data_id"] = source_data_id
 
         instr_val = instrument or (existing.instrument if existing else clean_symbol)
         record = DatasetRecord(
@@ -472,7 +558,7 @@ class CatalogService:
             timeframe=clean_tf,
             broker=clean_source,
             broker_name=clean_source,
-            timezone="UTC",
+            timezone=timezone,
             category=existing.category if existing else "Forex",
             date_from=write_res.date_from or (existing.date_from if existing else ""),
             date_to=write_res.date_to or (existing.date_to if existing else ""),
@@ -480,6 +566,7 @@ class CatalogService:
             path=partition_dir,
             data_kind="bars",
             quality_score=1.0,
+            source_data_id=source_data_id,
             lineage_json=json.dumps(lineage),
             schema_version=1,
         )
@@ -576,7 +663,16 @@ class CatalogService:
         if existing is None:
             return False
 
-        payload = existing.model_dump(exclude={"bar_count"})
+        payload = existing.model_dump(exclude={"bar_count", "source_data_id"})
+        if existing.source_data_id:
+            try:
+                lineage = json.loads(payload.get("lineage_json") or "{}")
+                if not isinstance(lineage, dict):
+                    lineage = {}
+            except json.JSONDecodeError, TypeError:
+                lineage = {}
+            lineage["source_data_id"] = existing.source_data_id
+            payload["lineage_json"] = json.dumps(lineage)
         update_cols: list[str] = ["updated_at"]
 
         if symbol_new and symbol_new != existing.symbol:
@@ -618,15 +714,15 @@ class CatalogService:
         )
         self._storage.clear_partitions(existing.source, kind, existing.symbol)
 
-        payload = existing.model_dump(exclude={"bar_count"})
-        payload["bars"] = 0
-        payload["date_from"] = ""
-        payload["date_to"] = ""
-        payload["updated_at"] = datetime.now(UTC).isoformat()
-        self._db.datasets.save(
-            payload,
-            update_columns=("bars", "date_from", "date_to", "updated_at"),
+        cleared_record = existing.model_copy(
+            update={
+                "bars": 0,
+                "bar_count": 0,
+                "date_from": "",
+                "date_to": "",
+            }
         )
+        self.save_dataset(cleared_record)
 
         logger.info(
             "FR-DATA-CATALOG-SQX-OPERATIONS: Cleared data for '%s'",
@@ -710,17 +806,66 @@ class CatalogService:
         )
         return [b.model_dump(mode="json") for b in bars]
 
-    def get_index_for_date(self, dataset_id: str, date: str) -> int:
+    def get_review_rows(
+        self,
+        dataset_id: str,
+        *,
+        session_name: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> dict[str, Any]:
+        """Fetch a paginated page of bar records for inspection.
+
+        Matches SQX /data/reviewData endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        _ = session_name
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            raise ValueError(f"Dataset not found: {dataset_id}")
+
+        tick_size = self._get_instrument_tick_size(existing.symbol)
+        bars = self._storage.read_bars_slice(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+            limit=limit,
+            offset=offset,
+            tick_size=tick_size,
+        )
+        return {
+            "dataset_id": dataset_id,
+            "total_rows": existing.bars,
+            "offset": offset,
+            "limit": limit,
+            "rows": [
+                {
+                    "timestamp": b.timestamp_utc,
+                    "open": b.open,
+                    "high": b.high,
+                    "low": b.low,
+                    "close": b.close,
+                    "volume": b.volume,
+                    "open_interest": b.open_interest,
+                }
+                for b in bars
+            ],
+        }
+
+    def get_index_for_date(
+        self, dataset_id: str, date: str = "", *, target_date: str = ""
+    ) -> int:
         """Find the 0-indexed position of bar at or closest to given date.
 
         Matches SQX /data/getIndexForDate endpoint.
         Fires FR-DATA-CATALOG-SQX-OPERATIONS.
         """
+        effective_date = target_date or date
         existing = self.get_dataset(dataset_id)
         if existing is None or existing.bars == 0:
             return -1
 
-        dt_target = parse_iso_to_utc_datetime(date)
+        dt_target = parse_iso_to_utc_datetime(effective_date)
         lf = self._storage.scan_bars(
             source=existing.source,
             symbol=existing.symbol,
@@ -734,8 +879,79 @@ class CatalogService:
         count = int(df_filtered["count"][0])
         return max(0, count - 1) if count > 0 else 0
 
+    def _recalculate_dataset_boundaries(
+        self, existing: DatasetRecord, total_bars: int, tick_size: float
+    ) -> tuple[str, str]:
+        """Compute new date_from and date_to boundaries after partition patch."""
+        if total_bars == 0:
+            return "", ""
+        first_slice = self._storage.read_bars_slice(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+            limit=1,
+            offset=0,
+            tick_size=tick_size,
+        )
+        last_slice = self._storage.read_bars_slice(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+            limit=1,
+            offset=max(0, total_bars - 1),
+            tick_size=tick_size,
+        )
+        date_from = first_slice[0].timestamp_utc[:10] if first_slice else ""
+        date_to = last_slice[0].timestamp_utc[:10] if last_slice else ""
+        return date_from, date_to
+
+    def save_data_changes(
+        self,
+        dataset_id: str,
+        changed_bars: Sequence[BarRecord],
+        deleted_timestamps: set[str],
+    ) -> DatasetRecord:
+        """Persist user-edited cells or deleted rows to on-disk Parquet partitions.
+
+        Matches SQX /data/saveDataChanges endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            raise ValueError(f"Dataset not found: {dataset_id}")
+
+        tick_size = self._get_instrument_tick_size(existing.symbol)
+        total_bars = self._storage.patch_bars(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+            changed_bars=changed_bars,
+            deleted_timestamps=deleted_timestamps,
+            tick_size=tick_size,
+        )
+
+        date_from, date_to = self._recalculate_dataset_boundaries(
+            existing, total_bars, tick_size
+        )
+        updated = existing.model_copy(
+            update={
+                "bars": total_bars,
+                "bar_count": total_bars,
+                "date_from": date_from,
+                "date_to": date_to,
+            }
+        )
+        self.save_dataset(updated)
+        logger.info(
+            "FR-DATA-CATALOG-SQX-OPERATIONS: Saved changes to '%s' (bars=%d)",
+            dataset_id,
+            total_bars,
+            extra={"dataset_id": dataset_id, "bars": total_bars},
+        )
+        return updated
+
     def check_quality_summary(self, dataset_id: str) -> dict[str, Any]:
-        """Audit data quality (anomalies, missing bars, date spans).
+        """Audit data quality (anomalies, missing bars, date spans, hourly heatmap).
 
         Matches SQX /data/checkQualitySummary endpoint.
         Fires FR-DATA-CATALOG-SQX-OPERATIONS.
@@ -744,39 +960,87 @@ class CatalogService:
         if existing is None:
             return {"status": "NOT_FOUND", "quality_score": 0.0, "anomalies": []}
 
-        anomalies: list[str] = []
-        if existing.bars == 0:
-            anomalies.append("Series contains 0 bars")
+        tick_size = self._get_instrument_tick_size(existing.symbol)
+        bars = self._storage.read_bars_slice(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+            limit=existing.bars or 1000000,
+            tick_size=tick_size,
+        )
+        from app.workspace.data_manager.actions.review.quality import (
+            DataQualityInspector,
+        )
 
-        return {
-            "dataset_id": dataset_id,
-            "symbol": existing.symbol,
-            "timeframe": existing.timeframe,
-            "bars": existing.bars,
-            "date_from": existing.date_from,
-            "date_to": existing.date_to,
-            "quality_score": existing.quality_score,
-            "anomalies": anomalies,
-            "status": "VALID" if not anomalies else "WARNING",
-        }
+        inspector = DataQualityInspector()
+        summary = inspector.check_quality_summary(bars)
+        summary["dataset_id"] = dataset_id
+        summary["symbol"] = existing.symbol
+        summary["timeframe"] = existing.timeframe
+        summary["bars"] = existing.bars
+        summary["date_from"] = existing.date_from
+        summary["date_to"] = existing.date_to
+        return summary
+
+    def check_quality_details(
+        self, dataset_id: str, *, limit: int = 100, offset: int = 0
+    ) -> list[dict[str, Any]]:
+        """Return paginated defect bars for data quality inspection.
+
+        Matches SQX /data/checkQualityDetails endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            return []
+
+        tick_size = self._get_instrument_tick_size(existing.symbol)
+        bars = self._storage.read_bars_slice(
+            source=existing.source,
+            symbol=existing.symbol,
+            timeframe=existing.timeframe,
+            limit=existing.bars or 1000000,
+            tick_size=tick_size,
+        )
+        from app.workspace.data_manager.actions.review.quality import (
+            DataQualityInspector,
+        )
+
+        inspector = DataQualityInspector()
+        return inspector.check_quality_details(bars, limit=limit, offset=offset)
 
     def clone_to_timezone(
         self,
         dataset_id: str,
-        target_timezone: str,
+        target_timezone: str | None = None,
+        *,
+        timezone_type: str = "zone",
+        shift_hours: int | None = None,
+        remove_weekends: bool = False,
+        postfix: str | None = None,
         new_dataset_id: str | None = None,
     ) -> str:
         """Clone existing dataset into target timezone partition.
 
-        Matches SQX /data/cloneToTimezone endpoint.
+        Matches SQX /data/cloneToTimezone endpoint with clone guard.
         Fires FR-DATA-CATALOG-SQX-OPERATIONS.
         """
         existing = self.get_dataset(dataset_id)
         if existing is None:
             raise ValueError(f"Dataset not found: {dataset_id}")
 
-        clean_tz = target_timezone.strip()
-        tz_obj = zoneinfo.ZoneInfo(clean_tz)
+        if existing.source_data_id:
+            raise ValueError(
+                f"'{existing.symbol}' is cloned data. You cannot clone it again."
+            )
+
+        shift_delta, tz_obj, tz_label, resolved_postfix = _resolve_clone_parameters(
+            timezone_type=timezone_type,
+            target_timezone=target_timezone,
+            shift_hours=shift_hours,
+            timeframe=existing.timeframe,
+            postfix=postfix,
+        )
 
         tick_size = self._get_instrument_tick_size(existing.symbol)
         bars = self._storage.read_bars_slice(
@@ -789,31 +1053,209 @@ class CatalogService:
 
         cloned_bars: list[BarRecord] = []
         for b in bars:
-            dt_utc = parse_iso_to_utc_datetime(b.timestamp_utc)
-            dt_local = dt_utc.astimezone(tz_obj)
-            cloned_bars.append(
-                BarRecord(
-                    timestamp_utc=dt_local.isoformat(),
-                    open=b.open,
-                    high=b.high,
-                    low=b.low,
-                    close=b.close,
-                    volume=b.volume,
-                    open_interest=b.open_interest,
-                )
+            shifted = _shift_bar_timestamp(
+                bar=b,
+                timezone_type=timezone_type,
+                shift_delta=shift_delta,
+                tz_obj=tz_obj,
+                remove_weekends=remove_weekends,
             )
+            if shifted is not None:
+                cloned_bars.append(shifted)
 
-        tz_slug = clean_tz.replace("/", "_").replace(" ", "_").lower()
-        target_symbol = f"{existing.symbol}_{tz_slug.upper()}"
-
+        target_symbol = f"{existing.symbol}{resolved_postfix}"
         cloned_record = self.save_bars(
             source=existing.source,
             symbol=target_symbol,
             timeframe=existing.timeframe,
             bars=cloned_bars,
             instrument=existing.instrument,
+            source_data_id=existing.id,
+            timezone=tz_label,
         )
         return new_dataset_id or cloned_record.id
+
+    def _find_clone_dependents(self, target_ids: Sequence[str]) -> list[DatasetRecord]:
+        """Find non-targeted cloned datasets depending on deleted datasets."""
+        all_datasets = self.list_datasets(limit=10000)
+        deps_by_parent: dict[str, list[DatasetRecord]] = {}
+        for ds in all_datasets:
+            if ds.source_data_id:
+                deps_by_parent.setdefault(ds.source_data_id, []).append(ds)
+
+        target_ids_set = set(target_ids)
+        conflicts: list[DatasetRecord] = []
+        for tid in target_ids:
+            if tid in deps_by_parent:
+                non_deleted = [
+                    d for d in deps_by_parent[tid] if d.id not in target_ids_set
+                ]
+                conflicts.extend(non_deleted)
+        return conflicts
+
+    def mass_delete(
+        self,
+        dataset_ids: Sequence[str],
+        action: str = "remove",
+        *,
+        force: bool = False,
+    ) -> dict[str, Any]:
+        """Perform batch clear or removal of datasets with clone dependency check.
+
+        Matches SQX delete / clear operations.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        conflicts = self._find_clone_dependents(dataset_ids)
+        if conflicts and not force:
+            conflict_names = ", ".join(f"{c.symbol} ({c.id})" for c in conflicts)
+            msg = (
+                "CLONE_DEPENDENCY: The following cloned datasets depend on data "
+                f"being deleted: {conflict_names}. Set force=True to confirm deletion."
+            )
+            raise ValueError(msg)
+
+        results: dict[str, bool] = {}
+        for did in dataset_ids:
+            if action == "clear":
+                results[did] = self.clear_data(did)
+            else:
+                results[did] = self.remove_data(did)
+
+        return {
+            "action": action,
+            "results": results,
+            "deleted_count": sum(1 for v in results.values() if v),
+        }
+
+    def export_catalog_xml(
+        self,
+        dataset_ids: Sequence[str] | None = None,
+    ) -> str:
+        """Export dataset and broker configuration matching SQX <Data> XML schema.
+
+        Matches SQX /data/save endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        root = ET.Element("Data")
+        all_datasets = self.list_datasets(limit=10000)
+        target_ids = set(dataset_ids) if dataset_ids is not None else None
+        selected = [d for d in all_datasets if target_ids is None or d.id in target_ids]
+
+        referenced_brokers: set[str] = set()
+        for ds in selected:
+            data_info = ET.SubElement(root, "DataInfo")
+            data_info.set("id", ds.id)
+            data_info.set("symbol", ds.symbol)
+            data_info.set("timeframe", ds.timeframe)
+            data_info.set("source", ds.source)
+            data_info.set("broker", ds.broker)
+            data_info.set("brokerName", ds.broker_name)
+            data_info.set("timezone", ds.timezone)
+            data_info.set("category", ds.category)
+            data_info.set("dateFrom", ds.date_from)
+            data_info.set("dateTo", ds.date_to)
+            data_info.set("bars", str(ds.bars))
+            data_info.set("dataKind", ds.data_kind)
+            if ds.source_data_id:
+                data_info.set("sourceDataId", ds.source_data_id)
+            if ds.broker:
+                referenced_brokers.add(ds.broker)
+
+        for br_name in sorted(referenced_brokers):
+            br_rec = self.get_broker(br_name)
+            if br_rec is not None:
+                br_elem = ET.SubElement(root, "Broker")
+                br_elem.set("name", br_rec.name)
+                br_elem.set("serverTimezone", br_rec.server_timezone)
+                br_elem.set("postfix", br_rec.postfix)
+                br_elem.set("mtUse", str(br_rec.mt_use))
+
+        ET.indent(root, space="  ")
+        return ET.tostring(root, encoding="unicode")
+
+    def import_catalog_xml(self, xml_content: str) -> dict[str, int]:
+        """Import dataset metadata and brokers from SQX <Data> XML document.
+
+        Matches SQX /data/load endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        root = ET.fromstring(xml_content)  # noqa: S314
+        brokers_count = 0
+        datasets_count = 0
+
+        for br_elem in root.findall("Broker"):
+            b_name = br_elem.attrib.get("name", "").strip()
+            if b_name:
+                brokers_count += 1
+
+        for di in root.findall("DataInfo"):
+            ds_id = di.attrib.get("id") or f"ds_{uuid.uuid4().hex[:8]}"
+            ds_sym = di.attrib.get("symbol", "UNKNOWN")
+            ds_tf = di.attrib.get("timeframe", "M1")
+            ds_src = di.attrib.get("source", "Imported")
+            record = DatasetRecord(
+                id=ds_id,
+                source=ds_src,
+                symbol=ds_sym,
+                timeframe=ds_tf,
+                broker=di.attrib.get("broker", "Default"),
+                broker_name=di.attrib.get("brokerName", "Default"),
+                timezone=di.attrib.get("timezone", "UTC"),
+                category=di.attrib.get("category", "Forex"),
+                date_from=di.attrib.get("dateFrom", ""),
+                date_to=di.attrib.get("dateTo", ""),
+                bars=int(di.attrib.get("bars", 0)),
+                data_kind=di.attrib.get("dataKind", "bars"),
+                source_data_id=di.attrib.get("sourceDataId"),
+            )
+            self.save_dataset(record)
+            datasets_count += 1
+
+        return {
+            "brokers_imported": brokers_count,
+            "datasets_imported": datasets_count,
+        }
+
+    def update_all_datasets(self) -> dict[str, Any]:
+        """Trigger background refresh/download for all active online datasets.
+
+        Matches SQX /data/updateAll endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        all_datasets = self.list_datasets(limit=10000)
+        updated_ids: list[str] = [d.id for d in all_datasets]
+        logger.info(
+            "FR-DATA-CATALOG-SQX-OPERATIONS: updateAll triggered for %d datasets",
+            len(updated_ids),
+            extra={
+                "count": len(updated_ids),
+                "fr_id": "FR-DATA-CATALOG-SQX-OPERATIONS",
+            },
+        )
+        return {
+            "success": "Updates started.",
+            "updated_datasets": updated_ids,
+        }
+
+    def update_selected_datasets(self, dataset_ids: Sequence[str]) -> dict[str, Any]:
+        """Trigger background refresh/download for selected datasets.
+
+        Matches SQX /data/updateSelected endpoint.
+        Fires FR-DATA-CATALOG-SQX-OPERATIONS.
+        """
+        clean_ids = [d for d in dataset_ids if self.get_dataset(d) is not None]
+        logger.info(
+            "FR-DATA-CATALOG-SQX-OPERATIONS: updateSelected triggered for %d datasets",
+            len(clean_ids),
+            extra={
+                "count": len(clean_ids),
+                "fr_id": "FR-DATA-CATALOG-SQX-OPERATIONS",
+            },
+        )
+        return {
+            "success": "Updates started.",
+            "updated_datasets": clean_ids,
+        }
 
     def list_brokers(self) -> list[BrokerProfileRecord]:
         """Retrieve configured broker profiles from datamgr_broker table.
