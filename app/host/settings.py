@@ -1285,7 +1285,15 @@ def _default_field(field: str, kind: str) -> Any:
         return _FIELD_DEFAULTS[field]
     if leaf in _FIELD_DEFAULTS:
         return _FIELD_DEFAULTS[leaf]
-    return {"bool": False, "int": 0, "float": 0.0, "str": "", "list": []}[kind]
+    empty_list: list[Any] = []
+    defaults: dict[str, Any] = {
+        "bool": False,
+        "int": 0,
+        "float": 0.0,
+        "str": "",
+        "list": empty_list,
+    }
+    return defaults[kind]
 
 
 MAX_SETTING_STRING = 4096
@@ -1387,7 +1395,9 @@ def _unknown_settings_metadata(
         if scope == "application":
             for name, value in row.items():
                 schema = SETTINGS_FIELDS.get(name)
-                keys = list(_leaf_field_names(value)) if isinstance(value, dict) else []
+                keys: list[str] = []
+                if isinstance(value, dict):
+                    keys = list(_leaf_field_names(value))
                 extras = [
                     key
                     for key in keys

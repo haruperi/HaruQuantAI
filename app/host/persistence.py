@@ -3252,7 +3252,7 @@ class BrokerStore:
                     str(data.get("updated_at_utc") or now_str),
                 ),
             )
-            broker_id = int(cursor.lastrowid or 0)
+            broker_id = cursor.lastrowid or 0
         logger.info(
             "Broker profile created",
             extra={
