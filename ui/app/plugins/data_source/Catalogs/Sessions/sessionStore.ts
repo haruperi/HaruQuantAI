@@ -45,39 +45,15 @@ export const useSessions = create<SessionState>((set, get) => {
     const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
     if (raw) {
       const value = normalizeLegacyBranding(JSON.parse(raw));
-      if (
-        value.version !== 1 ||
-        !Array.isArray(value.sessions) ||
-        !value.overrides ||
-        typeof value.overrides !== 'object' ||
-        !Array.isArray(value.removed) ||
-        value.sessions.length > 10000 ||
-        Object.keys(value.overrides).length > 10000 ||
-        value.removed.length > 10000
-      ) {
-        throw new Error('invalid');
+      if (Array.isArray(value.sessions) && value.sessions.length <= 10000) {
+        initial = {
+          sessions: value.sessions as SessionDefinition[],
+          overrides: (value.overrides && typeof value.overrides === 'object' ? value.overrides : {}) as Record<string, SessionDefinition>,
+          removed: Array.isArray(value.removed) ? (value.removed as string[]) : [],
+          storageError: '',
+          isSyncing: false,
+        };
       }
-      const names = seedSessions.map((row) => row.name);
-      for (const item of value.sessions as SessionDefinition[]) {
-        validateSession(item, names, [item.broker], false);
-        names.push(item.name);
-      }
-      for (const [name, item] of Object.entries(value.overrides) as [string, SessionDefinition][]) {
-        if (name !== item.name || !seedSessions.some((row) => row.name === name)) {
-          throw new Error('invalid');
-        }
-        validateSession(item, [], [item.broker], false);
-      }
-      if (value.removed.some((name: unknown) => typeof name !== 'string')) {
-        throw new Error('invalid');
-      }
-      initial = {
-        sessions: value.sessions,
-        overrides: value.overrides,
-        removed: value.removed,
-        storageError: '',
-        isSyncing: false,
-      };
     }
   } catch {
     initial.storageError =
@@ -85,8 +61,10 @@ export const useSessions = create<SessionState>((set, get) => {
   }
 
   function persist(patch: Partial<SessionState>): void {
-    if (get().storageError) throw new Error(get().storageError);
-    const next = { ...get(), ...patch };
+    if (get().storageError && patch.storageError === undefined) {
+      throw new Error(get().storageError);
+    }
+    const next = { ...get(), ...patch, storageError: patch.storageError ?? '' };
     try {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(
@@ -104,13 +82,13 @@ export const useSessions = create<SessionState>((set, get) => {
         'Unable to save sessions in browser storage. No changes were applied.',
       );
     }
-    set(patch);
+    set({ ...patch, storageError: patch.storageError ?? '' });
   }
 
   const store: SessionState = {
     ...initial,
     refreshFromServer: async () => {
-      set({ isSyncing: true });
+      set({ isSyncing: true, storageError: '' });
       try {
         const remote = await fetchRemoteSessions();
         if (remote && remote.length > 0) {
@@ -118,7 +96,14 @@ export const useSessions = create<SessionState>((set, get) => {
           const preservedCustom = get().sessions.filter(
             (s) => !remoteNames.has(s.name.toLowerCase()),
           );
-          persist({ sessions: [...remote, ...preservedCustom] });
+          const activeRemoved = get().removed.filter(
+            (name) => !remoteNames.has(name.toLowerCase()),
+          );
+          persist({
+            sessions: [...remote, ...preservedCustom],
+            removed: activeRemoved,
+            storageError: '',
+          });
         }
       } catch {
         // Fallback silently to cached / seed sessions if offline

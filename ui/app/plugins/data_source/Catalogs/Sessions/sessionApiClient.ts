@@ -78,7 +78,10 @@ export function toSessionDefinition(record: RemoteSessionDefinition): SessionDef
   return {
     name: record.name,
     broker: String(record.broker_id ?? -1),
-    brokerName: record.broker_name || (record.broker_id === -1 ? 'Default' : `Broker ${record.broker_id}`),
+    brokerName:
+      record.broker_id === -1 || record.broker_name === 'SQ default'
+        ? 'Default'
+        : (record.broker_name || 'Default'),
     elements,
   };
 }
