@@ -50,8 +50,10 @@ export function generateMondayFriday(elements: SessionElement[]): SessionElement
   const generated = days.map((day,index): SessionElement => ({ ...monday, dayFrom:day, dayTo:monday.dayTo === 'Tue' ? sessionDays[index + 1] : day }));
   return [...generated, ...elements.filter(row => row.dayFrom === 'Sat' || row.dayFrom === 'Sun')];
 }
-export function effectiveSessions(custom: SessionDefinition[], overrides: Record<string,SessionDefinition>, removed: string[]): SessionDefinition[] {
-  const removedSet = new Set(removed); return [...seedSessions.filter(row => !removedSet.has(row.name)).map(row => overrides[row.name] ?? row), ...custom].map(row => structuredClone(row));
+export function effectiveSessions(custom: SessionDefinition[], overrides: Record<string,SessionDefinition> = {}, removed: string[] = []): SessionDefinition[] {
+  const removedSet = new Set(removed);
+  const base = custom.length > 0 ? custom : seedSessions;
+  return base.filter(row => !removedSet.has(row.name)).map(row => structuredClone(overrides[row.name] ?? row));
 }
 interface SessionsJson { version:1;kind:'sessions';sessions:SessionDefinition[] }
 function jsonObject(value:unknown):value is Record<string,unknown>{return Boolean(value)&&typeof value==='object'&&!Array.isArray(value);}

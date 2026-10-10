@@ -727,6 +727,31 @@ def get_database_manager(
     return _DefaultDatabaseHolder.instance
 
 
+def _migrate_datamgr_tables(conn: sqlite3.Connection) -> None:
+    """Ensure column compatibility and safe migrations for workspace tables."""
+    inst_table_info = conn.execute("PRAGMA table_info(datamgr_instruments);").fetchall()
+    inst_cols = {r["name"] for r in inst_table_info}
+    if inst_cols:
+        for col, col_def in (
+            ("min_distance", "REAL NOT NULL DEFAULT 0.0"),
+            ("order_size_multiplier", "REAL NOT NULL DEFAULT 1.0"),
+            ("order_size_step", "REAL NOT NULL DEFAULT 0.0"),
+            ("cot", "TEXT DEFAULT NULL"),
+        ):
+            if col not in inst_cols:
+                conn.execute(
+                    f"ALTER TABLE datamgr_instruments ADD COLUMN {col} {col_def};"
+                )
+
+    sess_table_info = conn.execute("PRAGMA table_info(datamgr_sessions);").fetchall()
+    sess_cols = {r["name"] for r in sess_table_info}
+    if sess_cols and "broker_id" not in sess_cols:
+        conn.execute(
+            "ALTER TABLE datamgr_sessions ADD COLUMN "
+            "broker_id INTEGER NOT NULL DEFAULT -1;"
+        )
+
+
 # ============================================================================
 # Schema Migration Manager
 # ============================================================================
@@ -878,7 +903,7 @@ class SchemaManager:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     symbol TEXT NOT NULL UNIQUE,
                     connection TEXT DEFAULT '',
-                    broker_id INTEGER DEFAULT 0,
+                    broker_id INTEGER DEFAULT -1,
                     description TEXT DEFAULT '',
                     tick_size REAL NOT NULL DEFAULT 0.00001,
                     tick_step REAL NOT NULL DEFAULT 0.00001,
@@ -900,11 +925,16 @@ class SchemaManager:
                     exchange TEXT DEFAULT '',
                     country TEXT DEFAULT '',
                     sector TEXT DEFAULT '',
+                    min_distance REAL NOT NULL DEFAULT 0.0,
+                    order_size_multiplier REAL NOT NULL DEFAULT 1.0,
+                    order_size_step REAL NOT NULL DEFAULT 0.0,
+                    cot TEXT DEFAULT NULL,
                     created_at_utc TEXT NOT NULL,
                     updated_at_utc TEXT NOT NULL
                 );
                 """
             )
+            _migrate_datamgr_tables(conn)
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS datamgr_sessions (
@@ -919,16 +949,6 @@ class SchemaManager:
                 );
                 """
             )
-            # Ensure columns and backward-compatibility for datamgr_sessions
-            sess_table_info = conn.execute(
-                "PRAGMA table_info(datamgr_sessions);"
-            ).fetchall()
-            sess_cols = {r["name"] for r in sess_table_info}
-            if sess_cols and "broker_id" not in sess_cols:
-                conn.execute(
-                    "ALTER TABLE datamgr_sessions ADD COLUMN "
-                    "broker_id INTEGER NOT NULL DEFAULT -1;"
-                )
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS datamgr_datasets (
@@ -2107,6 +2127,10 @@ class InstrumentStore:
             "exchange",
             "country",
             "sector",
+            "min_distance",
+            "order_size_multiplier",
+            "order_size_step",
+            "cot",
             "created_at_utc",
             "updated_at_utc",
         }
@@ -2122,6 +2146,12 @@ class InstrumentStore:
             "InstrumentStore.create storage operation",
             extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
         )
+        record_copy = dict(record)
+        record_copy.setdefault("min_distance", 0.0)
+        record_copy.setdefault("order_size_multiplier", 1.0)
+        record_copy.setdefault("order_size_step", 0.0)
+        record_copy.setdefault("cot", None)
+
         columns = [
             "symbol",
             "connection",
@@ -2147,24 +2177,19 @@ class InstrumentStore:
             "exchange",
             "country",
             "sector",
+            "min_distance",
+            "order_size_multiplier",
+            "order_size_step",
+            "cot",
             "created_at_utc",
             "updated_at_utc",
         ]
-        _validate_columns(record, self._columns | {"symbol"})
-        _require_columns(record, tuple(columns))
-        values = [record[col] for col in columns]
-        sql = (
-            "INSERT INTO datamgr_instruments ("
-            "symbol, connection, broker_id, description, "
-            "tick_size, tick_step, tick_value_in_money, point_value, "
-            "decimals, default_spread, default_slippage, min_volume, "
-            "max_volume, lot_step, margin_rate, swap_long, "
-            "swap_short, swap_3day_day, commissions, data_type, "
-            "alias, exchange, country, sector, "
-            "created_at_utc, updated_at_utc"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-            "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
-        )
+        _validate_columns(record_copy, self._columns | {"symbol"})
+        _require_columns(record_copy, tuple(columns))
+        values = [record_copy[col] for col in columns]
+        placeholders = ", ".join("?" for _ in columns)
+        cols_str = ", ".join(columns)
+        sql = f"INSERT INTO datamgr_instruments ({cols_str}) VALUES ({placeholders});"  # noqa: S608
         with self._db.transaction() as conn:
             cur = conn.cursor()
             cur.execute(sql, values)
@@ -2217,38 +2242,39 @@ class InstrumentStore:
         self,
         connection: str | None = None,
         data_type: str | None = None,
+        *,
+        broker_id: int | None = None,
+        search: str | None = None,
         limit: int = 1000,
         offset: int = 0,
     ) -> list[dict[str, Any]]:
-        """List instruments with optional connection or data_type filter."""
+        """List instruments with optional connection, type, broker, or search."""
         logger.debug(
             "InstrumentStore.list_instruments storage operation",
             extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
         )
-        if connection and data_type:
-            sql = (
-                "SELECT * FROM datamgr_instruments WHERE connection = ? "
-                "AND data_type = ? ORDER BY symbol ASC LIMIT ? OFFSET ?;"
-            )
-            params = [connection, data_type, limit, offset]
-        elif connection:
-            sql = (
-                "SELECT * FROM datamgr_instruments WHERE connection = ? "
-                "ORDER BY symbol ASC LIMIT ? OFFSET ?;"
-            )
-            params = [connection, limit, offset]
-        elif data_type:
-            sql = (
-                "SELECT * FROM datamgr_instruments WHERE data_type = ? "
-                "ORDER BY symbol ASC LIMIT ? OFFSET ?;"
-            )
-            params = [data_type, limit, offset]
-        else:
-            sql = (
-                "SELECT * FROM datamgr_instruments ORDER BY symbol ASC "
-                "LIMIT ? OFFSET ?;"
-            )
-            params = [limit, offset]
+        where_clauses: list[str] = []
+        params: list[Any] = []
+        if connection:
+            where_clauses.append("connection = ?")
+            params.append(connection)
+        if data_type:
+            where_clauses.append("data_type = ?")
+            params.append(data_type)
+        if broker_id is not None:
+            where_clauses.append("broker_id = ?")
+            params.append(broker_id)
+        if search:
+            where_clauses.append("(symbol LIKE ? OR description LIKE ?)")
+            pattern = f"%{search}%"
+            params.extend([pattern, pattern])
+
+        where_sql = f"WHERE {' AND '.join(where_clauses)} " if where_clauses else ""
+        sql = (
+            f"SELECT * FROM datamgr_instruments {where_sql}"  # noqa: S608
+            "ORDER BY symbol ASC LIMIT ? OFFSET ?;"
+        )
+        params.extend([limit, offset])
 
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
@@ -2302,6 +2328,27 @@ class InstrumentStore:
             extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
         )
         return success
+
+    def delete_many(self, symbols: list[str]) -> int:
+        """Delete multiple instruments by symbol."""
+        if not symbols:
+            return 0
+        logger.debug(
+            "InstrumentStore.delete_many storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS", "count": len(symbols)},
+        )
+        placeholders = ", ".join("?" for _ in symbols)
+        sql = f"DELETE FROM datamgr_instruments WHERE symbol IN ({placeholders});"  # noqa: S608
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, tuple(symbols))
+            deleted_count = cur.rowcount
+        logger.info(
+            "Deleted %d instruments",
+            deleted_count,
+            extra={"fr_id": "FR-HOST-PERSISTENCE-INSTRUMENTS"},
+        )
+        return deleted_count
 
     def count(self) -> int:
         """Return total instrument count."""

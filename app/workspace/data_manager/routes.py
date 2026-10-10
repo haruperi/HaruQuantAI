@@ -266,6 +266,84 @@ class SessionExportXmlPayload(BaseModel):
     )
 
 
+class InstrumentClonePayload(BaseModel):
+    """Payload for cloning an existing instrument."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    symbol: str = Field(default="", description="Source instrument symbol")
+    instrument: str = Field(default="", description="SQX alias for symbol")
+    clone_name: str = Field(default="", description="New instrument symbol")
+    clone: str = Field(default="", description="SQX alias for clone_name")
+    broker_id: int = Field(default=-1, description="Broker profile ID (-1 for default)")
+    broker: int = Field(default=-1, description="SQX alias for broker_id")
+    broker_postfix: str = Field(default="", description="Optional postfix for symbol")
+    brokerPostfix: str = Field(  # noqa: N815
+        default="", description="SQX alias for broker_postfix"
+    )
+
+
+class InstrumentMassEditPayload(BaseModel):
+    """Payload for mass editing instruments."""
+
+    model_config = ConfigDict(extra="allow")
+
+    symbols: list[str] = Field(default_factory=list, description="Target symbols")
+    instruments: list[str] = Field(
+        default_factory=list, description="SQX alias for symbols"
+    )
+    updates: dict[str, Any] = Field(
+        default_factory=dict, description="Fields to update"
+    )
+    change_flags: dict[str, bool] | None = Field(
+        default=None, description="SQX change flags"
+    )
+
+
+class InstrumentMassDeletePayload(BaseModel):
+    """Payload for deleting multiple instruments."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    symbols: list[str] = Field(default_factory=list, description="Symbols to delete")
+    instruments: list[str] = Field(
+        default_factory=list, description="SQX alias for symbols"
+    )
+
+
+class InstrumentExportXmlPayload(BaseModel):
+    """Payload for exporting instruments to SQX XML format."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    symbols: list[str] = Field(default_factory=list, description="Symbols to export")
+    instruments: list[str] = Field(
+        default_factory=list, description="SQX alias for symbols"
+    )
+
+
+class InstrumentImportXmlPayload(BaseModel):
+    """Payload for importing instruments from SQX XML format."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    xml_content: str = Field(default="", description="XML string content")
+    xml: str = Field(default="", description="SQX alias for xml_content")
+    conflict_policy: str = Field(
+        default="overwrite_all", description="'overwrite_all', 'skip', or 'cancel'"
+    )
+
+
+class InstrumentAliasPayload(BaseModel):
+    """Payload for creating or updating an instrument alias."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    alias: str = Field(..., min_length=1, description="Broker-specific alias")
+    instrument: str = Field(..., min_length=1, description="Target instrument symbol")
+    description: str = Field(default="", description="Optional description")
+
+
 class BasketComputePayload(BaseModel):
     """Payload for calculating synthetic composite basket series."""
 
@@ -1447,15 +1525,27 @@ class DataRouterService:
     def list_instruments(
         self,
         request: Request,
+        *,
         connection: str | None = None,
         data_type: str | None = None,
+        broker_id: int | None = None,
+        broker: int | None = None,
+        search: str | None = None,
         limit: int = 1000,
         offset: int = 0,
     ) -> Response:
-        """List instruments."""
+        """List instruments with optional filters."""
         req_id = request.headers.get("x-request-id")
+        raw_type = request.query_params.get("type")
+        effective_type = data_type or raw_type
+        effective_broker = broker_id if broker_id is not None else broker
         instruments = self.instruments.list_instruments(
-            connection=connection, data_type=data_type, limit=limit, offset=offset
+            connection=connection,
+            data_type=effective_type,
+            broker_id=effective_broker,
+            search=search,
+            limit=limit,
+            offset=offset,
         )
         logger.debug(
             "FR-DATA-INTEGRATION-INSTRUMENTS: Listed %d instruments",
@@ -1564,6 +1654,13 @@ class DataRouterService:
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
+    def update_instrument_from_body(
+        self, request: Request, payload: dict[str, Any]
+    ) -> Response:
+        """Update instrument definition from POST body (SQX alias)."""
+        symbol = str(payload.get("symbol") or payload.get("instrument") or "")
+        return self.update_instrument(request, symbol, payload)
+
     def delete_instrument(self, request: Request, symbol: str) -> Response:
         """Delete instrument definition."""
         req_id = request.headers.get("x-request-id")
@@ -1584,6 +1681,219 @@ class DataRouterService:
         resp = ApiResponse.success(
             data={"deleted": True, "symbol": symbol},
             message=f"Instrument '{symbol}' deleted successfully",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def clone_instrument(
+        self, request: Request, payload: InstrumentClonePayload
+    ) -> Response:
+        """Clone an existing instrument with broker postfix handling."""
+        req_id = request.headers.get("x-request-id")
+        source_symbol = payload.symbol or payload.instrument
+        target_name = payload.clone_name or payload.clone
+        effective_broker = (
+            payload.broker_id if payload.broker_id != -1 else payload.broker
+        )
+        postfix = payload.broker_postfix or payload.brokerPostfix
+        try:
+            cloned = self.instruments.clone_instrument(
+                symbol=source_symbol,
+                clone_name=target_name,
+                broker_id=effective_broker,
+                broker_postfix=postfix,
+            )
+            self._emit_event(
+                "data.instrument", "cloned", cloned.model_dump(mode="json")
+            )
+            resp = ApiResponse.success(
+                data=cloned.model_dump(mode="json"),
+                message=f"Instrument '{cloned.symbol}' cloned successfully",
+                request_id=req_id,
+            )
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED, content=resp.to_dict()
+            )
+        except ValueError as exc:
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "CLONE_ERROR",
+                str(exc),
+                req_id,
+            )
+
+    def mass_edit_instruments(
+        self, request: Request, payload: InstrumentMassEditPayload
+    ) -> Response:
+        """Mass update fields across multiple instruments."""
+        req_id = request.headers.get("x-request-id")
+        symbols = payload.symbols or payload.instruments
+        updates = payload.updates
+        if not updates:
+            raw_dict = payload.model_dump(
+                exclude={"symbols", "instruments", "change_flags"}
+            )
+            updates = {k: v for k, v in raw_dict.items() if v is not None}
+        updated_count = self.instruments.mass_edit_instruments(
+            symbols=symbols,
+            updates=updates,
+            change_flags=payload.change_flags,
+        )
+        self._emit_event(
+            "data.instrument",
+            "mass_edited",
+            {"count": updated_count, "symbols": symbols},
+        )
+        resp = ApiResponse.success(
+            data={"updated_count": updated_count, "symbols": symbols},
+            message=f"Updated {updated_count} instrument(s)",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def mass_delete_instruments(
+        self, request: Request, payload: InstrumentMassDeletePayload
+    ) -> Response:
+        """Batch delete multiple instruments."""
+        req_id = request.headers.get("x-request-id")
+        symbols = payload.symbols or payload.instruments
+        deleted_count, is_async = self.instruments.delete_instruments(symbols)
+        self._emit_event(
+            "data.instrument",
+            "deleted",
+            {"count": deleted_count, "symbols": symbols, "is_async": is_async},
+        )
+        resp = ApiResponse.success(
+            data={"deleted_count": deleted_count, "is_async": is_async},
+            message=f"Deleted {deleted_count} instrument(s)",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def export_instruments_xml(
+        self, request: Request, payload: InstrumentExportXmlPayload
+    ) -> Response:
+        """Export instruments as StrategyQuant X XML string."""
+        req_id = request.headers.get("x-request-id")
+        symbols = payload.symbols or payload.instruments
+        if not symbols:
+            symbols = [i.symbol for i in self.instruments.list_instruments(limit=5000)]
+        xml_content = self.instruments.export_sqx_xml(symbols)
+        resp = ApiResponse.success(
+            data={"xml": xml_content, "count": len(symbols)},
+            message=f"Exported {len(symbols)} instrument(s) to XML",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def import_instruments_xml(
+        self, request: Request, payload: InstrumentImportXmlPayload
+    ) -> Response:
+        """Import instruments from StrategyQuant X XML string."""
+        req_id = request.headers.get("x-request-id")
+        xml_text = payload.xml_content or payload.xml
+        if not xml_text:
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "XML_EMPTY",
+                "No XML content provided for instrument import.",
+                req_id,
+            )
+        try:
+            result = self.instruments.import_sqx_xml(
+                xml_content=xml_text,
+                conflict_policy=payload.conflict_policy,
+            )
+            self._emit_event("data.instrument", "imported", result)
+            resp = ApiResponse.success(
+                data=result,
+                message=(
+                    f"Imported {result['imported']} instrument(s), "
+                    f"overwrote {result['overwritten']}, "
+                    f"skipped {result['skipped']}"
+                ),
+                request_id=req_id,
+            )
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED, content=resp.to_dict()
+            )
+        except ValueError as exc:
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "IMPORT_ERROR",
+                str(exc),
+                req_id,
+            )
+
+    def list_aliases(self, request: Request) -> Response:
+        """List all broker aliases."""
+        req_id = request.headers.get("x-request-id")
+        aliases = self.instruments.list_aliases()
+        resp = ApiResponse.success(
+            data=aliases,
+            message=f"Retrieved {len(aliases)} alias(es)",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def add_alias(self, request: Request, payload: InstrumentAliasPayload) -> Response:
+        """Register a new broker alias."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            self.instruments.add_alias(
+                alias=payload.alias,
+                instrument=payload.instrument,
+                description=payload.description,
+            )
+            resp = ApiResponse.success(
+                data=payload.model_dump(mode="json"),
+                message=f"Alias '{payload.alias}' registered",
+                request_id=req_id,
+            )
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED, content=resp.to_dict()
+            )
+        except ValueError as exc:
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST, "ALIAS_ERROR", str(exc), req_id
+            )
+
+    def edit_alias(
+        self, request: Request, alias: str, payload: InstrumentAliasPayload
+    ) -> Response:
+        """Update an existing broker alias."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            self.instruments.edit_alias(
+                alias=alias,
+                instrument=payload.instrument,
+                description=payload.description,
+            )
+            resp = ApiResponse.success(
+                data=payload.model_dump(mode="json"),
+                message=f"Alias '{alias}' updated",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except ValueError as exc:
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST, "ALIAS_ERROR", str(exc), req_id
+            )
+
+    def delete_alias(self, request: Request, alias: str) -> Response:
+        """Remove a broker alias."""
+        req_id = request.headers.get("x-request-id")
+        removed = self.instruments.remove_alias(alias)
+        if not removed:
+            return self._error_response(
+                status.HTTP_404_NOT_FOUND,
+                "ALIAS_NOT_FOUND",
+                f"Alias '{alias}' not found",
+                req_id,
+            )
+        resp = ApiResponse.success(
+            data={"alias": alias, "removed": True},
+            message=f"Alias '{alias}' removed",
             request_id=req_id,
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
@@ -3327,6 +3637,78 @@ def _register_instrument_session_routes(
         summary="List instruments",
     )
     router.add_api_route(
+        "/instruments/list",
+        service.list_instruments,
+        methods=["GET"],
+        summary="List instruments (SQX alias)",
+    )
+    router.add_api_route(
+        "/instruments/clone",
+        service.clone_instrument,
+        methods=["POST"],
+        summary="Clone instrument",
+    )
+    router.add_api_route(
+        "/instruments/mass-edit",
+        service.mass_edit_instruments,
+        methods=["POST"],
+        summary="Mass edit instruments",
+    )
+    router.add_api_route(
+        "/instruments/massEditInstrument",
+        service.mass_edit_instruments,
+        methods=["POST"],
+        summary="Mass edit instruments (SQX alias)",
+    )
+    router.add_api_route(
+        "/instruments/mass-delete",
+        service.mass_delete_instruments,
+        methods=["POST"],
+        summary="Mass delete instruments",
+    )
+    router.add_api_route(
+        "/instruments/removeInstrument",
+        service.mass_delete_instruments,
+        methods=["POST"],
+        summary="Mass delete instruments (SQX alias)",
+    )
+    router.add_api_route(
+        "/instruments/save",
+        service.export_instruments_xml,
+        methods=["POST"],
+        summary="Export instruments XML",
+    )
+    router.add_api_route(
+        "/instruments/load",
+        service.import_instruments_xml,
+        methods=["POST"],
+        summary="Import instruments XML",
+    )
+    router.add_api_route(
+        "/instruments/aliases",
+        service.list_aliases,
+        methods=["GET"],
+        summary="List instrument aliases",
+    )
+    router.add_api_route(
+        "/instruments/aliases",
+        service.add_alias,
+        methods=["POST"],
+        summary="Add instrument alias",
+    )
+    router.add_api_route(
+        "/instruments/aliases/{alias}",
+        service.edit_alias,
+        methods=["PUT"],
+        summary="Edit instrument alias",
+    )
+    router.add_api_route(
+        "/instruments/aliases/{alias}",
+        service.delete_alias,
+        methods=["DELETE"],
+        summary="Delete instrument alias",
+    )
+    router.add_api_route(
         "/instruments/{symbol}",
         service.get_instrument,
         methods=["GET"],
@@ -3339,10 +3721,22 @@ def _register_instrument_session_routes(
         summary="Create instrument",
     )
     router.add_api_route(
+        "/instruments/addInstrument",
+        service.create_instrument,
+        methods=["POST"],
+        summary="Create instrument (SQX alias)",
+    )
+    router.add_api_route(
         "/instruments/{symbol}",
         service.update_instrument,
         methods=["PUT"],
         summary="Update instrument",
+    )
+    router.add_api_route(
+        "/instruments/editInstrument",
+        service.update_instrument_from_body,
+        methods=["POST"],
+        summary="Update instrument (SQX alias)",
     )
     router.add_api_route(
         "/instruments/{symbol}",

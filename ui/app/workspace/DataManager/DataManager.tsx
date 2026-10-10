@@ -25,6 +25,7 @@ import { emptyFileRecord } from '../../plugins/data_source/FileImport/fileImport
 import { effectiveInstruments, seedInstruments, type FileDefinition, type FileInstrument, type InstrumentBroker } from '../../plugins/data_source/FileImport/fileSymbols';
 import { AddPopup as FileSymbolDialog } from '../../plugins/data_source/FileImport/add/module';
 import { useFileSymbols } from '../../plugins/data_source/FileImport/fileSymbolsStore';
+import { useInstruments } from '../../plugins/data_source/Catalogs/Instruments/instrumentsStore';
 import { InstrumentEditorDialog } from '../../plugins/data_source/Catalogs/Instruments/InstrumentEditorDialog';
 import { CloneInstrumentDialog } from '../../plugins/data_source/Catalogs/Instruments/CloneInstrumentDialog';
 import { InstrumentTransferDialog } from '../../plugins/data_source/Catalogs/Instruments/InstrumentTransferDialog';
@@ -353,8 +354,11 @@ function InstrumentTable({ selected, onSelect, onEdit, onDelete }: {
   selected: string[]; onSelect: (symbols: string[]) => void;
   onEdit: (item: FileInstrument) => void; onDelete: (item: FileInstrument) => void;
 }) {
+  const instState = useInstruments();
   const fileState = useFileSymbols();
-  const instruments = effectiveInstruments(fileState.instruments, fileState.overrides, fileState.removed);
+  const instruments = instState.instruments.length > 0
+    ? instState.instruments
+    : effectiveInstruments(fileState.instruments, fileState.overrides, fileState.removed);
   const [query, setQuery] = useState('');
   const [dataType, setDataType] = useState('');
   const [broker, setBroker] = useState('');
@@ -493,6 +497,7 @@ export function DataManager() {
   const crypto = useCrypto();
   const yahoo = useYahoo();
   const mt5 = useMt5Import();
+  const liveInstruments = useInstruments(state => state.instruments);
   const fileDefinitions = useFileSymbols(state => state.definitions);
   const fileInstruments = useFileSymbols(state => state.instruments);
   const instrumentOverrides = useFileSymbols(state => state.overrides);
@@ -504,6 +509,10 @@ export function DataManager() {
   const tools = useDataTools();
   const externalIndicators = useExternalIndicators();
   const stockGroups = useStockGroups();
+  useEffect(() => {
+    void useInstruments.getState().refreshFromServer();
+    void useSessions.getState().refreshFromServer();
+  }, []);
   useEffect(() => { void useStockGroups.getState().syncRemote(); }, []);
   useEffect(() => { try { useStockGroups.getState().syncImports(imports.groups); } catch { /* surfaced by the store and later actions */ } }, [imports.groups]);
   useEffect(() => { if (stockGroups.job?.state !== 'running') return; const timer = window.setInterval(() => useStockGroups.getState().advance(), 220); return () => window.clearInterval(timer); }, [stockGroups.job?.state]);
@@ -678,7 +687,9 @@ export function DataManager() {
     ...tools.definitions,
   ].map(row => ({ id: row.id, symbol: row.symbol, instrument: row.instrument || row.symbol, source: row.source, timeframe: row.timeframe, timezone: row.timezone || '—', from: row.from, to: row.to, bars: row.bars, category: row.category || '—', sourceDataId: 'sourceDataId' in row && typeof row.sourceDataId === 'string' ? row.sourceDataId : undefined }));
   const exportRows: ExportTarget[] = toolRows;
-  const instrumentRows = effectiveInstruments(fileInstruments, instrumentOverrides, removedInstruments);
+  const instrumentRows = liveInstruments.length > 0
+    ? liveInstruments
+    : effectiveInstruments(fileInstruments, instrumentOverrides, removedInstruments);
   const instrumentBrokers: InstrumentBroker[] = [
     { id: '-1', name: 'Default', postfix: '', timezone: 'UTC' },
     ...brokerProfiles.filter(profile => profile.mtUse).map(profile => ({ id: profile.id, name: profile.name, postfix: profile.postfix, timezone: profile.timezone })),
@@ -720,6 +731,7 @@ export function DataManager() {
     if (instrumentDialog?.kind !== 'delete') return;
     try {
       const names = instrumentDialog.selected.map(item => item.symbol);
+      void useInstruments.getState().removeInstruments(names);
       useFileSymbols.getState().removeInstruments(names, toolRows.map(row => row.instrument));
       setSelectedInstrumentIds(current => current.filter(name => !names.includes(name)));
       notify(`${names.length} instrument${names.length === 1 ? '' : 's'} removed.`);
@@ -740,12 +752,12 @@ export function DataManager() {
     {tab === 'Export' && <div className="export-actions" aria-label="Data export operations"><Button data-control-id="export-csv" className="export-csv" onClick={() => { setLastControlId('export-csv'); openExport('csv'); }}><FileSpreadsheet size={24} aria-hidden="true"/>Export to CSV</Button><Button data-control-id="export-mt4" className="export-mt4" title="Export to MetaTrader 4 (FXT & HST)" onClick={() => { setLastControlId('export-mt4'); openExport('mt4'); }}><MonitorDown size={24} aria-hidden="true"/>Export MT4 (FXT &amp; HST)</Button><Button data-control-id="export-mt5" className="export-mt5" title="Export to MetaTrader 5 data (99% test)" onClick={() => { setLastControlId('export-mt5'); openExport('mt5'); }}><ChartCandlestick size={24} aria-hidden="true"/>Export to MT5 data (99% test)</Button></div>}
     {tab === 'Tools' && <div className="data-tool-actions" aria-label="Data tools"><Button data-control-id="tool-timezone" className="tool-timezone" onClick={() => { setLastControlId('tool-timezone'); openClone(); }}><span className="timezone-tool-icon" aria-hidden="true"><Globe2 size={26}/><Clock size={13}/></span>Clone to timezone</Button><Button data-control-id="tool-analyze" className="tool-analyze" onClick={() => { setLastControlId('tool-analyze'); openReview(); }}><ChartCandlestick size={26} aria-hidden="true"/>View &amp; Analyze</Button></div>}
     {tab === 'Instruments' && <div className="management-actions" aria-label="Instrument operations">
-      <Button className="action-add" onClick={() => { setInstrumentError(''); setInstrumentDialog({ kind: 'editor', mode: 'add', selected: [] }); }}><CirclePlus size={26} aria-hidden="true"/>Add Instrument</Button>
-      <Button className="action-clone" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'clone', source: rows[0] }); }}><CopyPlus size={26} aria-hidden="true"/>Clone Instrument</Button>
-      <Button className="action-edit" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'editor', mode: rows.length === 1 ? 'edit' : 'mass', selected: rows }); }}><Settings2 size={26} aria-hidden="true"/>Mass Edit Instrument</Button>
-      <Button className="action-delete" onClick={() => { const rows = requireInstruments(); if (rows) openInstrumentDelete(rows); }}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
-      <Button className="action-save" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'transfer', mode: 'save', selected: rows }); }}><Save size={26} aria-hidden="true"/>Save</Button>
-      <Button className="action-load" onClick={() => setInstrumentDialog({ kind: 'transfer', mode: 'load', selected: [] })}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
+      <Button id="datamanager-instruments-add" className="action-add" onClick={() => { setInstrumentError(''); setInstrumentDialog({ kind: 'editor', mode: 'add', selected: [] }); }}><CirclePlus size={26} aria-hidden="true"/>Add Instrument</Button>
+      <Button id="datamanager-instruments-clone" className="action-clone" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'clone', source: rows[0] }); }}><CopyPlus size={26} aria-hidden="true"/>Clone Instrument</Button>
+      <Button id="datamanager-instruments-edit" className="action-edit" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'editor', mode: rows.length === 1 ? 'edit' : 'mass', selected: rows }); }}><Settings2 size={26} aria-hidden="true"/>Mass Edit Instrument</Button>
+      <Button id="datamanager-instruments-delete" className="action-delete" onClick={() => { const rows = requireInstruments(); if (rows) openInstrumentDelete(rows); }}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
+      <Button id="datamanager-instruments-save" className="action-save" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'transfer', mode: 'save', selected: rows }); }}><Save size={26} aria-hidden="true"/>Save</Button>
+      <Button id="datamanager-instruments-load" className="action-load" onClick={() => setInstrumentDialog({ kind: 'transfer', mode: 'load', selected: [] })}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
     {tab === 'Sessions' && <div className="management-actions" aria-label="Session operations">
       <Button className="action-add" onClick={()=>{setSessionError('');setSessionDialog({kind:'editor',mode:'add'});}}><CalendarPlus size={26} aria-hidden="true"/>Add Session</Button>

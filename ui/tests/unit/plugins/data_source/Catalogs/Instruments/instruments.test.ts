@@ -54,4 +54,18 @@ describe('instrument management rules', () => {
     const duplicateJson = serializeInstrumentsJson([first, { ...first, symbol: 'dup' }], brokers);
     expect(() => parseInstrumentsJson(duplicateJson, brokers)).toThrow('already exists');
   });
+
+  it('manages instruments in useInstruments store', async () => {
+    const { useInstruments } = await import('../../../../../../app/plugins/data_source/Catalogs/Instruments/instrumentsStore');
+    const store = useInstruments.getState();
+    const item = { ...newInstrument('Forex'), symbol: 'TEST_SYMBOL', name: 'Test Symbol' };
+    await store.addInstrument(item, ['-1']);
+    expect(useInstruments.getState().instruments.some(row => row.symbol === 'TEST_SYMBOL')).toBe(true);
+
+    await store.editInstrument('TEST_SYMBOL', { ...item, spread: 3.5 }, ['-1']);
+    expect(useInstruments.getState().instruments.find(row => row.symbol === 'TEST_SYMBOL')?.spread).toBe(3.5);
+
+    await store.removeInstruments(['TEST_SYMBOL']);
+    expect(useInstruments.getState().instruments.some(row => row.symbol === 'TEST_SYMBOL')).toBe(false);
+  });
 });
