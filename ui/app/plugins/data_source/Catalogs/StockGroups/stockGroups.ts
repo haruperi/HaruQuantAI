@@ -1,4 +1,4 @@
-export const stockGroupLimits = { groups: 1_000, members: 10_000, csv: 2 * 1024 * 1024, json: 5 * 1024 * 1024 };
+export const stockGroupLimits = { groups: 1_000, members: 50_000, csv: 20 * 1024 * 1024, json: 20 * 1024 * 1024 };
 
 export interface StockMembership { ticker: string; from?: string; to?: string }
 export interface StockGroupDefinition {
@@ -41,7 +41,7 @@ export function validateGroup(group: StockGroupDefinition, existing: StockGroupD
   if (normalizeGroupName(group.name, group.system) !== group.name) throw new Error('Invalid stock group name.');
   if (group.description.length > 250) throw new Error('Description must be 250 characters or fewer.');
   if (existing.some(item => item.id !== group.id && item.name.toLowerCase() === group.name.toLowerCase())) throw new Error('Name must be unique');
-  if (group.members.length > stockGroupLimits.members) throw new Error('Stock group exceeds the 10,000-member limit.');
+  if (group.members.length > stockGroupLimits.members) throw new Error('Stock group exceeds the 50,000-member limit.');
   group.members.forEach(member => validateMember(member));
 }
 
@@ -74,7 +74,7 @@ function parseStockDate(value: string | undefined): string | undefined {
 }
 
 export function parseStockLines(text: string): StockMembership[] {
-  if (new Blob([text]).size > stockGroupLimits.csv) throw new Error('Stock list exceeds the 2 MiB limit.');
+  if (new Blob([text]).size > stockGroupLimits.csv) throw new Error('Stock list exceeds the 20 MiB limit.');
   const members = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
     const cells = line.split(';');
     const member: StockMembership = { ticker: cells[0].trim() };
@@ -85,7 +85,7 @@ export function parseStockLines(text: string): StockMembership[] {
     return member;
   });
   if (!members.length) throw new Error('No stocks recognized.');
-  if (members.length > stockGroupLimits.members) throw new Error('Stock group exceeds the 10,000-member limit.');
+  if (members.length > stockGroupLimits.members) throw new Error('Stock group exceeds the 50,000-member limit.');
   return members;
 }
 
@@ -114,7 +114,110 @@ export function summarizeGroup(group: StockGroupDefinition, datasets: DatasetSum
   const ranges = matching.filter((row): row is DatasetSummaryInput => Boolean(row?.from && row?.to));
   const from = ranges.map(row => row.from!).sort()[0] ?? '';
   const to = ranges.map(row => row.to!).sort().at(-1) ?? '';
-  return { active: activeMemberships(group).length, total: group.members.length, numberOfSymbols, downloaded, ready: group.members.length > 0 && downloaded >= group.members.length - 3, from, to };
+  return { active: activeMemberships(group).length, total: group.members.length, numberOfSymbols, downloaded, ready: group.members.length > 0 && downloaded >= group.members.length, from, to };
+}
+
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+export function serializeStockGroupsXml(groups: StockGroupDefinition[]): string {
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<Groups>\n';
+  for (const group of groups) {
+    xml += `  <Group name="${escapeXml(group.name)}">\n`;
+    xml += `    <Desc>${escapeXml(group.description || '')}</Desc>\n`;
+    xml += '    <Stocks>\n';
+    for (const member of group.members) {
+      let stockTag = `      <Stock name="${escapeXml(member.ticker)}"`;
+      if (member.from) stockTag += ` from="${member.from}"`;
+      if (member.to) stockTag += ` to="${member.to}"`;
+      stockTag += '/>\n';
+      xml += stockTag;
+    }
+    xml += '    </Stocks>\n';
+    xml += '  </Group>\n';
+  }
+  xml += '</Groups>\n';
+  return xml;
+}
+
+function unescapeXml(str: string): string {
+  return str
+    .replace(/&apos;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&gt;/g, '>')
+    .replace(/&lt;/g, '<')
+    .replace(/&amp;/g, '&');
+}
+
+export function parseStockGroupsXml(xmlText: string): StockGroupDefinition[] {
+  if (!xmlText || new Blob([xmlText]).size > stockGroupLimits.json) {
+    throw new Error('Groups XML file is invalid or too large.');
+  }
+  if (!/<Groups\b[^>]*>/i.test(xmlText) || !/<\/Groups>/i.test(xmlText)) {
+    throw new Error('Choose a valid Groups XML file.');
+  }
+
+  const groupRegex = /<Group\b([^>]*)>([\s\S]*?)<\/Group>/gi;
+  const groups: StockGroupDefinition[] = [];
+  const names: string[] = [];
+  let groupMatch: RegExpExecArray | null;
+
+  while ((groupMatch = groupRegex.exec(xmlText)) !== null) {
+    if (groups.length >= stockGroupLimits.groups) {
+      throw new Error('Choose a valid Groups XML file.');
+    }
+    const attrs = groupMatch[1];
+    const inner = groupMatch[2];
+    const nameMatch = /name=(["'])(.*?)\1/i.exec(attrs);
+    if (!nameMatch) {
+      throw new Error('Choose a valid Groups XML file.');
+    }
+    const name = normalizeGroupName(unescapeXml(nameMatch[2]));
+    if (names.some(item => item.toLowerCase() === name.toLowerCase())) {
+      throw new Error('Duplicate group in Groups XML.');
+    }
+    const descMatch = /<Desc\b[^>]*>([\s\S]*?)<\/Desc>/i.exec(inner);
+    const description = descMatch ? unescapeXml(descMatch[1].trim()) : '';
+
+    const members: StockMembership[] = [];
+    const stockRegex = /<Stock\b([^>]*)\/?>/gi;
+    let stockMatch: RegExpExecArray | null;
+    while ((stockMatch = stockRegex.exec(inner)) !== null) {
+      const stockAttrs = stockMatch[1];
+      const stockNameMatch = /name=(["'])(.*?)\1/i.exec(stockAttrs);
+      if (!stockNameMatch) continue;
+      const ticker = unescapeXml(stockNameMatch[2].trim());
+      const fromMatch = /from=(["'])(.*?)\1/i.exec(stockAttrs);
+      const toMatch = /to=(["'])(.*?)\1/i.exec(stockAttrs);
+      const from = parseStockDate(fromMatch ? fromMatch[2] : undefined);
+      const to = parseStockDate(toMatch ? toMatch[2] : undefined);
+      const member: StockMembership = { ticker, ...(from ? { from } : {}), ...(to ? { to } : {}) };
+      validateMember(member);
+      members.push(member);
+    }
+    const group: StockGroupDefinition = {
+      id: `import:${groups.length}:${name}`,
+      name,
+      description,
+      system: false,
+      members,
+    };
+    validateGroup(group);
+    names.push(name);
+    groups.push(group);
+  }
+
+  if (groups.length === 0) {
+    throw new Error('Choose a valid Groups XML file.');
+  }
+
+  return groups;
 }
 
 interface StockGroupsJson{version:1;kind:'stock-groups';groups:Array<{name:string;description:string;members:StockMembership[]}>}

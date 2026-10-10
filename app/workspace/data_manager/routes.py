@@ -261,6 +261,17 @@ class BasketXmlExportPayload(BaseModel):
     )
 
 
+class BasketUpdateDataPayload(BaseModel):
+    """Payload for triggering automatic data update for stock group(s)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    basket_ids: list[str] | list[int] | str | int = Field(
+        ...,
+        description="Single basket ID, list of IDs, or comma-separated string",
+    )
+
+
 class ProviderDownloadPayload(BaseModel):
     """Payload for triggering provider downloads."""
 
@@ -633,6 +644,7 @@ class DataRouterService:
         self.instruments.ensure_defaults()
         self.sessions.ensure_defaults()
         self.baskets = BasketService(db)
+        self.baskets.ensure_defaults()
         self.broker = BrokerService(db)
         self.home = DataManagerHomeService(db)
         self.log = DataManagerLogService(db)
@@ -1865,6 +1877,15 @@ class DataRouterService:
                 name,
                 extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "basket_name": name},
             )
+            if "application/json" in request.headers.get("accept", ""):
+                resp = ApiResponse.success(
+                    data={"basket_name": name, "content": csv_text},
+                    message=f"Exported stocks for basket '{name}'",
+                    request_id=req_id,
+                )
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK, content=resp.to_dict()
+                )
             return PlainTextResponse(content=csv_text, media_type="text/csv")
         except Exception as exc:
             logger.exception(
@@ -1914,12 +1935,12 @@ class DataRouterService:
             )
 
     def export_basket_xml(
-        self, request: Request, payload: BasketXmlExportPayload
+        self, request: Request, payload: BasketXmlExportPayload | None = None
     ) -> Response:
         """Export specified or all baskets to SQX XML format."""
         req_id = request.headers.get("x-request-id")
         try:
-            if payload.basket_names:
+            if payload is not None and payload.basket_names:
                 baskets = [
                     b
                     for name in payload.basket_names
@@ -1933,7 +1954,23 @@ class DataRouterService:
                 len(baskets),
                 extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "count": len(baskets)},
             )
-            return PlainTextResponse(content=xml_text, media_type="application/xml")
+            if "application/json" in request.headers.get("accept", ""):
+                resp = ApiResponse.success(
+                    data={"xml_content": xml_text},
+                    message=f"Exported {len(baskets)} basket(s) to XML",
+                    request_id=req_id,
+                )
+                return JSONResponse(
+                    status_code=status.HTTP_200_OK, content=resp.to_dict()
+                )
+            return Response(
+                content=xml_text,
+                media_type="application/xml",
+                headers={
+                    "Content-Disposition": 'attachment; filename="Groups.xml"',
+                    "x-request-id": req_id or "",
+                },
+            )
         except Exception as exc:
             logger.exception(
                 "FR-DATA-INTEGRATION-BASKETS: Failed to export baskets to XML",
@@ -1974,6 +2011,67 @@ class DataRouterService:
             request_id=req_id,
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def list_baskets_overview(self, request: Request) -> Response:
+        """List enriched overview rows matching the 8-column SQX table grid."""
+        req_id = request.headers.get("x-request-id")
+        overview = self.baskets.list_baskets_overview()
+        logger.info(
+            "FR-DATA-INTEGRATION-BASKETS: Listed %d basket overview rows",
+            len(overview),
+            extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "count": len(overview)},
+        )
+        resp = ApiResponse.success(
+            data=[row.model_dump(mode="json") for row in overview],
+            message=f"Retrieved {len(overview)} basket overview row(s)",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def update_basket_data(
+        self, request: Request, payload: BasketUpdateDataPayload
+    ) -> Response:
+        """Trigger automatic background data update for symbols in group(s)."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            ids_input = payload.basket_ids
+            id_list: list[str | int]
+            if isinstance(ids_input, list):
+                id_list = list(ids_input)
+            elif isinstance(ids_input, str):
+                id_list = [i.strip() for i in ids_input.split(",") if i.strip()]
+            else:
+                id_list = [ids_input]
+
+            results: list[dict[str, Any]] = []
+            for bid in id_list:
+                res = self.baskets.update_group_data(bid)
+                results.append(res)
+
+            logger.info(
+                "FR-DATA-INTEGRATION-BASKETS: Initiated data update for %d basket(s)",
+                len(results),
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "count": len(results)},
+            )
+            resp = ApiResponse.success(
+                data=results,
+                message=(
+                    "Data update started, please check Log tab for more information."
+                ),
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except Exception as exc:
+            logger.exception(
+                "FR-DATA-INTEGRATION-BASKETS: Failed to initiate basket data update",
+                extra={"fr_id": "FR-DATA-INTEGRATION-BASKETS", "error": str(exc)},
+            )
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "BASKET_UPDATE_ERROR",
+                str(exc),
+                req_id,
+            )
 
     # Providers
     def list_providers(self, request: Request) -> Response:
@@ -3118,22 +3216,22 @@ def _register_basket_provider_routes(
         summary="List baskets",
     )
     router.add_api_route(
-        "/baskets/{name}",
-        service.get_basket,
-        methods=["GET"],
-        summary="Get basket",
-    )
-    router.add_api_route(
         "/baskets",
         service.create_basket,
         methods=["POST"],
         summary="Create basket",
     )
     router.add_api_route(
-        "/baskets/{name}",
-        service.delete_basket,
-        methods=["DELETE"],
-        summary="Delete basket",
+        "/baskets/overview",
+        service.list_baskets_overview,
+        methods=["GET"],
+        summary="List stock groups overview with SQX readiness and metrics",
+    )
+    router.add_api_route(
+        "/baskets/update-data",
+        service.update_basket_data,
+        methods=["POST"],
+        summary="Trigger automatic historical data update for basket group(s)",
     )
     router.add_api_route(
         "/baskets/compute",
@@ -3148,12 +3246,6 @@ def _register_basket_provider_routes(
         summary="Import basket constituents from CSV",
     )
     router.add_api_route(
-        "/baskets/{name}/export-csv",
-        service.export_basket_csv,
-        methods=["GET"],
-        summary="Export basket constituents to CSV",
-    )
-    router.add_api_route(
         "/baskets/import-xml",
         service.import_basket_xml,
         methods=["POST"],
@@ -3162,8 +3254,76 @@ def _register_basket_provider_routes(
     router.add_api_route(
         "/baskets/export-xml",
         service.export_basket_xml,
+        methods=["GET"],
+        summary="Export baskets to SQX XML",
+        name="export_basket_xml_get",
+    )
+    router.add_api_route(
+        "/baskets/export-xml",
+        service.export_basket_xml,
         methods=["POST"],
         summary="Export baskets to SQX XML",
+        name="export_basket_xml_post",
+    )
+    router.add_api_route(
+        "/basketOfStocks/list",
+        service.list_baskets_overview,
+        methods=["GET"],
+        summary="List stock groups overview (SQX alias)",
+        name="basket_of_stocks_list_get",
+    )
+    router.add_api_route(
+        "/basketOfStocks/list",
+        service.list_baskets_overview,
+        methods=["POST"],
+        summary="List stock groups overview (SQX alias)",
+        name="basket_of_stocks_list_post",
+    )
+    router.add_api_route(
+        "/basketOfStocks/updateData",
+        service.update_basket_data,
+        methods=["POST"],
+        summary="Update stock group data (SQX alias)",
+        name="basket_of_stocks_update_data_post",
+    )
+    router.add_api_route(
+        "/basketOfStocks/saveXml",
+        service.export_basket_xml,
+        methods=["GET"],
+        summary="Save stock groups XML (SQX alias)",
+        name="basket_of_stocks_save_xml_get",
+    )
+    router.add_api_route(
+        "/basketOfStocks/saveXml",
+        service.export_basket_xml,
+        methods=["POST"],
+        summary="Save stock groups XML (SQX alias)",
+        name="basket_of_stocks_save_xml_post",
+    )
+    router.add_api_route(
+        "/basketOfStocks/loadXml",
+        service.import_basket_xml,
+        methods=["POST"],
+        summary="Load stock groups XML (SQX alias)",
+        name="basket_of_stocks_load_xml_post",
+    )
+    router.add_api_route(
+        "/baskets/{name}",
+        service.get_basket,
+        methods=["GET"],
+        summary="Get basket",
+    )
+    router.add_api_route(
+        "/baskets/{name}",
+        service.delete_basket,
+        methods=["DELETE"],
+        summary="Delete basket",
+    )
+    router.add_api_route(
+        "/baskets/{name}/export-csv",
+        service.export_basket_csv,
+        methods=["GET"],
+        summary="Export basket constituents to CSV",
     )
     router.add_api_route(
         "/baskets/{name}/readiness",
@@ -3244,32 +3404,44 @@ def _register_export_home_routes(router: APIRouter, service: DataRouterService) 
     router.add_api_route(
         "/exportToCsvLoadSettings",
         service.list_csv_formats,
-        methods=["GET", "POST"],
+        methods=["GET"],
         summary="Export to CSV load settings (SQX alias)",
+        name="export_to_csv_load_settings_get",
+    )
+    router.add_api_route(
+        "/exportToCsvLoadSettings",
+        service.list_csv_formats,
+        methods=["POST"],
+        summary="Export to CSV load settings (SQX alias)",
+        name="export_to_csv_load_settings_post",
     )
     router.add_api_route(
         "/exportToCsvSaveFileFormat",
         service.save_csv_format,
         methods=["POST"],
         summary="Save CSV format (SQX alias)",
+        name="export_to_csv_save_file_format_post",
     )
     router.add_api_route(
         "/exportToCsvSaveAsFileFormat",
         service.save_csv_format,
         methods=["POST"],
         summary="Save As CSV format (SQX alias)",
+        name="export_to_csv_save_as_file_format_post",
     )
     router.add_api_route(
         "/exportToCsvDeleteFileFormat",
         service.delete_csv_format,
         methods=["POST"],
         summary="Delete CSV format (SQX alias)",
+        name="export_to_csv_delete_file_format_post",
     )
     router.add_api_route(
         "/export/csv/formats/delete",
         service.delete_csv_format,
         methods=["POST"],
         summary="Delete CSV format (POST)",
+        name="export_csv_formats_delete_post",
     )
     router.add_api_route(
         "/exportToCsvAction",

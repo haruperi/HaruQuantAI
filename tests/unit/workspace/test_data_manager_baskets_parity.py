@@ -11,10 +11,11 @@ Key Capabilities Verified:
 from __future__ import annotations
 
 import logging
+import re
 from pathlib import Path
 
 import pytest
-from app.host.persistence import DatabaseManager
+from app.host.persistence import DatabaseManager, normalize_sqx_date
 from app.host.resources import ResourceManager
 from app.workspace.data_manager.baskets import (
     BasketDefinition,
@@ -322,3 +323,316 @@ def test_basket_routes_api(test_db: DatabaseManager, tmp_path: Path) -> None:
     resp = client.delete("/data/baskets/RouteGroup")
     assert resp.status_code == 200
     assert resp.json()["data"]["deleted"] is True
+
+
+def test_default_groups_seeding(test_db: DatabaseManager) -> None:
+    """Validate that ensure_defaults populates the 10 authoritative SQX default groups."""
+    service = BasketService(test_db)
+    service.ensure_defaults()
+
+    baskets = service.list_baskets()
+    names = {b.name for b in baskets}
+
+    expected_groups = {
+        "[[Dow Jones Industrial Average]]",
+        "[[Nasdaq 100]]",
+        "[[Nasdaq Biotechnology]]",
+        "[[Russell 1000]]",
+        "[[Russell 2000]]",
+        "[[Russell 3000]]",
+        "[[S&P 100 limited]]",
+        "[[S&P 100]]",
+        "[[S&P 500]]",
+        "[[S&P MidCap 400]]",
+    }
+    assert expected_groups.issubset(names)
+
+    djia = service.get_basket("[[Dow Jones Industrial Average]]")
+    assert djia is not None
+    assert djia.system is True
+    assert len(djia.items) == 30
+
+    nasdaq = service.get_basket("[[Nasdaq 100]]")
+    assert nasdaq is not None
+    assert nasdaq.system is True
+    assert len(nasdaq.items) > 0
+
+
+def test_baskets_overview_metrics(test_db: DatabaseManager) -> None:
+    """Validate list_baskets_overview returns the 8 SQX table grid columns."""
+    service = BasketService(test_db)
+    service.ensure_defaults()
+
+    # Add historical data record for AAPL in catalog
+    with test_db.transaction() as conn:
+        conn.execute(
+            """INSERT INTO datamgr_datasets
+            (id, symbol, underlying, instrument, source, timeframe, broker, broker_name, timezone, category, date_from, date_to, bars, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                "AAPL_D1",
+                "AAPL",
+                "AAPL",
+                "AAPL",
+                "Equity",
+                "D1",
+                "Default",
+                "Default",
+                "UTC",
+                "Stocks",
+                "2020-01-01",
+                "2024-01-01",
+                1000,
+                "2024-01-01T00:00:00Z",
+                "2024-01-01T00:00:00Z",
+            ),
+        )
+
+    overview = service.list_baskets_overview()
+    assert len(overview) >= 10
+
+    by_name = {item.name: item for item in overview}
+    assert "[[Dow Jones Industrial Average]]" in by_name
+    djia_overview = by_name["[[Dow Jones Industrial Average]]"]
+    assert djia_overview.total_count == 30
+    assert djia_overview.active_count == 30
+    assert djia_overview.symbols_count == 30
+    # AAPL is in DJIA so downloaded_count must be at least 1
+    assert djia_overview.downloaded_count >= 1
+    # Not all 30 symbols downloaded, so not ready
+    assert djia_overview.is_ready is False
+    assert "AAPL" not in djia_overview.missing_symbols
+    assert len(djia_overview.missing_symbols) > 0
+
+
+def test_update_group_data_rules(test_db: DatabaseManager) -> None:
+    """Validate SQX rules and exceptions for group data updates."""
+    service = BasketService(test_db)
+    service.ensure_defaults()
+
+    # Rule 1: S&P 100 limited cannot be updated
+    with pytest.raises(
+        ValueError,
+        match=re.escape(
+            "Group S&P 100 limited cannot be updated, it is only in clean installation."
+        ),
+    ):
+        service.update_group_data("[[S&P 100 limited]]")
+
+    # Rule 2: Empty group cannot be updated
+    empty_basket = BasketDefinition(
+        name="EmptyGroup",
+        description="Group without stocks",
+        items=[],
+    )
+    service.save_basket(empty_basket)
+    with pytest.raises(
+        ValueError,
+        match=re.escape("Nothing to update. Group is without any stocks."),
+    ):
+        service.update_group_data("EmptyGroup")
+
+    # Rule 3: Valid group triggers background update job
+    res = service.update_group_data("[[Nasdaq 100]]")
+    assert res["status"] == "started"
+    assert res["basket_name"] == "[[Nasdaq 100]]"
+    assert res["total_symbols"] > 0
+    assert "missing_symbols" in res
+
+
+def test_basket_routes_overview_and_update(
+    test_db: DatabaseManager, tmp_path: Path
+) -> None:
+    """Validate FastAPI routes for overview and background data updates including SQX aliases."""
+    app = FastAPI()
+    res_mgr = ResourceManager(root_dir=tmp_path / "resources")
+    router = create_data_router(db_manager=test_db, resource_manager=res_mgr)
+    app.include_router(router)
+    client = TestClient(app)
+
+    # 1. GET /data/baskets/overview
+    resp = client.get("/data/baskets/overview")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert isinstance(data, list)
+    assert len(data) >= 10
+
+    # 2. SQX alias: GET /data/basketOfStocks/list
+    resp_alias = client.get("/data/basketOfStocks/list")
+    assert resp_alias.status_code == 200
+    assert len(resp_alias.json()["data"]) >= 10
+
+    # 3. POST /data/baskets/update-data with S&P 100 limited returns error
+    resp_err = client.post(
+        "/data/baskets/update-data", json={"basket_ids": ["[[S&P 100 limited]]"]}
+    )
+    assert resp_err.status_code == 400
+    assert "Group S&P 100 limited cannot be updated" in resp_err.json()["message"]
+
+    # 4. POST /data/baskets/update-data with valid group returns success
+    resp_ok = client.post(
+        "/data/baskets/update-data",
+        json={"basket_ids": ["[[Dow Jones Industrial Average]]"]},
+    )
+    assert resp_ok.status_code == 200
+    assert (
+        resp_ok.json()["message"]
+        == "Data update started, please check Log tab for more information."
+    )
+
+    # 5. SQX alias: POST /data/basketOfStocks/updateData
+    resp_alias_update = client.post(
+        "/data/basketOfStocks/updateData",
+        json={"basket_ids": ["[[Dow Jones Industrial Average]]"]},
+    )
+    assert resp_alias_update.status_code == 200
+    assert (
+        resp_alias_update.json()["message"]
+        == "Data update started, please check Log tab for more information."
+    )
+
+
+def test_normalize_sqx_date_helper() -> None:
+    """Test date normalization across SQX epoch ms, -1, ISO, and pre-1970 dates."""
+    assert normalize_sqx_date(None) is None
+    assert normalize_sqx_date(-1) is None
+    assert normalize_sqx_date("-1") is None
+    assert normalize_sqx_date("") is None
+    assert normalize_sqx_date("null") is None
+    # 960163200000 ms is 2000-06-05
+    assert normalize_sqx_date(960163200000) == "2000-06-05"
+    assert normalize_sqx_date("960163200000") == "2000-06-05"
+    # Negative epoch millisecond (-630892800000 ms is 1950-01-04)
+    assert normalize_sqx_date(-630892800000) == "1950-01-04"
+    # ISO strings
+    assert normalize_sqx_date("1900-01-01") == "1900-01-01"
+    assert normalize_sqx_date("2024-05-15T12:00:00") == "2024-05-15"
+    # European format DD.MM.YYYY
+    assert normalize_sqx_date("05.06.2000") == "2000-06-05"
+
+
+def test_sqx_legacy_schema_and_date_formats(tmp_path: Path) -> None:
+    """Validate compatibility with legacy SQX uppercase SQLite schema and integer dates."""
+    import sqlite3
+
+    db_path = tmp_path / "legacy_sqx.db"
+    conn = sqlite3.connect(db_path)
+    # Replicate exact SQX table DDL (uppercase columns, no unique constraint on NAME)
+    conn.execute(
+        """
+        CREATE TABLE datamgr_stock_group (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            NAME VARCHAR(50) NOT NULL,
+            SYSTEM BOOLEAN NOT NULL,
+            DESC VARCHAR(250)
+        );
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE datamgr_stock (
+            ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            TICKER VARCHAR(20) NOT NULL,
+            BASKET_ID INTEGER NOT NULL,
+            DATE_FROM INTEGER NOT NULL,
+            DATE_TO INTEGER NOT NULL
+        );
+        """
+    )
+    # Insert legacy rows with epoch ms and -1
+    conn.execute(
+        "INSERT INTO datamgr_stock_group (ID, NAME, SYSTEM, DESC) "
+        "VALUES (1, '[[S&P 500]]', 1, 'Standard & Poor 500')"
+    )
+    conn.execute(
+        "INSERT INTO datamgr_stock (ID, TICKER, BASKET_ID, DATE_FROM, DATE_TO) "
+        "VALUES (10, 'AAPL', 1, 960163200000, -1)"
+    )
+    conn.execute(
+        "INSERT INTO datamgr_stock (ID, TICKER, BASKET_ID, DATE_FROM, DATE_TO) "
+        "VALUES (11, 'OLD', 1, -630892800000, 1497571200000)"
+    )
+    conn.commit()
+    conn.close()
+
+    db = DatabaseManager(database_path=db_path)
+    service = BasketService(db)
+
+    # 1. Test get_basket with uppercase columns
+    basket = service.get_basket("[[S&P 500]]")
+    assert basket is not None
+    assert basket.id == 1
+    assert basket.name == "[[S&P 500]]"
+    assert basket.description == "Standard & Poor 500"
+    assert basket.system is True
+    assert len(basket.items) == 2
+
+    aapl = next(i for i in basket.items if i.symbol == "AAPL")
+    assert aapl.date_from == "2000-06-05"
+    assert aapl.date_to is None
+
+    old = next(i for i in basket.items if i.symbol == "OLD")
+    assert old.date_from == "1950-01-04"
+    assert old.date_to == "2017-06-16"
+
+    # 2. Test list_baskets_overview with uppercase columns and integer timestamps
+    overview = service.list_baskets_overview()
+    assert len(overview) == 1
+    ov = overview[0]
+    assert ov.id == 1
+    assert ov.name == "[[S&P 500]]"
+    assert ov.total_count == 2
+    # AAPL is active, OLD expired in 2017
+    assert ov.active_count == 1
+    assert ov.symbols_count == 2
+    assert "AAPL" in ov.missing_symbols
+    assert "OLD" in ov.missing_symbols
+
+    # 3. Test saving a new basket on legacy table without UNIQUE constraint
+    new_basket = BasketDefinition(
+        name="Custom Tech",
+        description="Custom tech stock group",
+        system=False,
+        items=[BasketItem(symbol="MSFT", date_from="2010-01-01", date_to=None)],
+    )
+    new_id = service.save_basket(new_basket)
+    assert new_id > 1
+
+    retrieved = service.get_basket("Custom Tech")
+    assert retrieved is not None
+    assert retrieved.name == "Custom Tech"
+    assert len(retrieved.items) == 1
+    assert retrieved.items[0].symbol == "MSFT"
+
+
+def test_ensure_defaults_canonical_sqx_groups(test_db: DatabaseManager) -> None:
+    """Verify that ensure_defaults seeds exactly the 10 canonical SQX double-bracketed groups."""
+    from app.host.persistence import BasketStore
+
+    store = BasketStore(test_db)
+    store.ensure_defaults()
+
+    groups = store.list_groups()
+    assert len(groups) == 10
+
+    names = {g["name"] for g in groups}
+    expected = {
+        "[[Dow Jones Industrial Average]]",
+        "[[Nasdaq 100]]",
+        "[[Nasdaq Biotechnology]]",
+        "[[Russell 1000]]",
+        "[[Russell 2000]]",
+        "[[Russell 3000]]",
+        "[[S&P 100 limited]]",
+        "[[S&P 100]]",
+        "[[S&P 500]]",
+        "[[S&P MidCap 400]]",
+    }
+    assert names == expected
+    for g in groups:
+        assert g["system"] == 1
+        assert g["name"].startswith("[[") and g["name"].endswith("]]")
+
+    # Idempotent re-run
+    store.ensure_defaults()
+    assert store.count() == 10

@@ -44,7 +44,7 @@ import { externalJobActive, useExternalIndicators } from '../../plugins/data_sou
 import { StockGroupEditorDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupEditorDialog';
 import { StockGroupStocksDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupStocksDialog';
 import { StockGroupTransferDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupTransferDialog';
-import { serializeStockGroupsJson, summarizeGroup, type StockGroupDefinition } from '../../plugins/data_source/Catalogs/StockGroups/stockGroups';
+import { serializeStockGroupsJson, serializeStockGroupsXml, summarizeGroup, type StockGroupDefinition } from '../../plugins/data_source/Catalogs/StockGroups/stockGroups';
 import { stockGroupJobActive, useStockGroups } from '../../plugins/data_source/Catalogs/StockGroups/stockGroupsStore';
 import { BrokerProfileEditorDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerProfileEditorDialog';
 import { BrokerStocksDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerStocksDialog';
@@ -290,6 +290,9 @@ function BrokerProfilesTable({profiles,selected,instruments,sessions,onSelect,on
 function StockGroupsTable({ groups, selected, datasets: available, onSelect, onEdit, onUpdate }: { groups: StockGroupDefinition[]; selected: string[]; datasets: { symbol:string; from?:string; to?:string; bars?:number }[]; onSelect:(ids:string[])=>void; onEdit:(group:StockGroupDefinition)=>void; onUpdate:(group:StockGroupDefinition)=>void }) {
   const allSelected = groups.length > 0 && groups.every(group => selected.includes(group.id));
   return <main className="full dataset-workspace" aria-label="Stock groups">
+    <div className="stock-groups-banner">
+      Stock groups are - as name suggests - groups of stocks. It can be indexes like S&P500, which consists of 500 stocks, or you can define your own custom group of symbols. They support also complete history of index composition changes, which prevents survivorship bias. Default unmodifiable stock groups are enclosed in double braces [[ ]]. Stock groups must be fully downloaded and updated before they will be available to use.
+    </div>
     <div className="dataset-grid stock-groups-grid"><table className="plain-table stock-group-table" aria-label="Stock groups">
       <colgroup><col style={{ width:26 }}/><col style={{ width:250 }}/><col style={{ width:100 }}/><col/><col style={{ width:130 }}/><col style={{ width:130 }}/><col style={{ width:110 }}/><col style={{ width:100 }}/><col style={{ width:100 }}/></colgroup>
       <thead><tr><th><input type="checkbox" aria-label="Select all stock groups" checked={allSelected} disabled={!groups.length} onChange={() => onSelect(allSelected ? [] : groups.map(group => group.id))}/></th>
@@ -499,6 +502,7 @@ export function DataManager() {
   const tools = useDataTools();
   const externalIndicators = useExternalIndicators();
   const stockGroups = useStockGroups();
+  useEffect(() => { void useStockGroups.getState().syncRemote(); }, []);
   useEffect(() => { try { useStockGroups.getState().syncImports(imports.groups); } catch { /* surfaced by the store and later actions */ } }, [imports.groups]);
   useEffect(() => { if (stockGroups.job?.state !== 'running') return; const timer = window.setInterval(() => useStockGroups.getState().advance(), 220); return () => window.clearInterval(timer); }, [stockGroups.job?.state]);
   useEffect(() => { if (brokerJob?.state !== 'running') return; const timer = window.setInterval(() => useDataManagerStore.getState().advanceBrokerUpdate(), 220); return () => window.clearInterval(timer); }, [brokerJob?.state]);
@@ -762,7 +766,7 @@ export function DataManager() {
       <Button className="action-clone" onClick={() => { const rows=requireStockGroups(); if(rows) updateStockGroups(rows); }}><RefreshCw size={26} aria-hidden="true"/>Update data in group (automatic)</Button>
       <Button className="action-edit" onClick={() => { const rows=requireStockGroups(); if(!rows)return; if(rows[0].system){setSelectionMessage("This group can't be edited.");return;} setStockGroupDialog({kind:'stocks',source:rows[0]}); }}><ListPlus size={26} aria-hidden="true"/>Edit stocks</Button>
       <Button className="action-delete" onClick={() => { const rows=requireStockGroups(); if(rows){const deletable=rows.filter(row=>!row.system);if(!deletable.length){setSelectionMessage('You have to select some non default group.');return;}setStockGroupDialog({kind:'delete',selected:deletable});} }}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
-      <Button className="action-save" onClick={() => { const rows=requireStockGroups(); if(rows){downloadTextFile('Groups.json',serializeStockGroupsJson(rows));notify('Groups saved.');} }}><Save size={26} aria-hidden="true"/>Save</Button>
+      <Button className="action-save" onClick={() => { const rows=requireStockGroups(); if(rows){downloadTextFile('Groups.xml',serializeStockGroupsXml(rows));notify('Groups saved.');} }}><Save size={26} aria-hidden="true"/>Save</Button>
       <Button className="action-load" onClick={() => setStockGroupDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
     {tab === 'Broker profiles' && <div className="management-actions broker-actions" aria-label="Broker profile operations">

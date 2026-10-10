@@ -1223,7 +1223,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         import uvicorn
 
-        uvicorn.run(app, host=settings.host, port=settings.port)
+        uvicorn.run(
+            app,
+            host=settings.host,
+            port=settings.port,
+            timeout_graceful_shutdown=settings.timeout_graceful_shutdown,
+        )
     except ImportError:
         sys.exit(
             "uvicorn is required to run the host CLI. "

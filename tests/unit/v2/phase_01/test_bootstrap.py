@@ -496,6 +496,7 @@ def test_bootstrap_cli_main() -> None:
         call_args, call_kwargs = mock_uvicorn.call_args
         assert call_kwargs["host"] == "127.0.0.1"
         assert call_kwargs["port"] == 7777
+        assert call_kwargs["timeout_graceful_shutdown"] == 2
         assert mock_shutdown.called
 
 

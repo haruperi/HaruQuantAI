@@ -90,6 +90,7 @@ def test_main_cli_execution_standard() -> None:
         call_args, call_kwargs = mock_uvicorn.call_args
         assert call_kwargs["host"] == "127.0.0.1"
         assert call_kwargs["port"] == 8888
+        assert call_kwargs["timeout_graceful_shutdown"] == 2
         assert mock_shutdown.called
 
 
@@ -105,6 +106,7 @@ def test_main_cli_execution_reload_mode() -> None:
         assert call_args[0] == "app.main:create_app"
         assert call_kwargs["factory"] is True
         assert call_kwargs["reload"] is True
+        assert call_kwargs["timeout_graceful_shutdown"] == 2
         assert mock_shutdown.called
 
 

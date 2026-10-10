@@ -206,11 +206,17 @@ def main(argv: list[str] | None = None) -> None:
                 port=port,
                 factory=True,
                 reload=True,
+                timeout_graceful_shutdown=host_settings.timeout_graceful_shutdown,
             )
         else:
             # Production mode: pre-composed application instance with bound runtime
             app = create_app(settings=host_settings)
-            uvicorn.run(app, host=host, port=port)
+            uvicorn.run(
+                app,
+                host=host,
+                port=port,
+                timeout_graceful_shutdown=host_settings.timeout_graceful_shutdown,
+            )
 
         logger.info(
             "FR-APP-MAIN-LIFECYCLE: HaruQuantAI application server stopped cleanly.",

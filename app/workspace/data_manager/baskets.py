@@ -84,6 +84,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from datetime import UTC, datetime
+from typing import Any
 from xml.dom import minidom
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -195,7 +196,7 @@ class BasketDefinition(BaseModel):
         default=False, description="Whether group is a built-in system group"
     )
     items: list[BasketItem] = Field(
-        min_length=1, description="List of basket constituents"
+        default_factory=list, description="List of basket constituents"
     )
 
     @field_validator("name")
@@ -231,6 +232,32 @@ class BasketSummary(BaseModel):
     description: str
     system: bool
     member_count: int
+
+
+class BasketOverviewItem(BaseModel):
+    """Enriched stock group overview row conforming to SQX table grid columns."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: int = Field(description="Unique group integer ID")
+    name: str = Field(description="Stock group name")
+    description: str = Field(default="", description="Group description")
+    system: bool = Field(
+        default=False,
+        description="Whether group is a built-in unmodifiable system group",
+    )
+    active_count: int = Field(description="Count of currently active constituents")
+    total_count: int = Field(description="Total count of constituent stocks")
+    symbols_count: int = Field(description="Unique symbols count in group")
+    downloaded_count: int = Field(description="Constituents with downloaded data")
+    is_ready: bool = Field(description="Whether all symbols in group are downloaded")
+    missing_symbols: list[str] = Field(
+        default_factory=list, description="Constituent symbols missing data"
+    )
+    data_from: str = Field(default="", description="Earliest ISO date (YYYY-MM-DD)")
+    data_to: str = Field(default="", description="Latest ISO date (YYYY-MM-DD)")
+    data_from_sqx: str = Field(default="-", description="Earliest date (DD.MM.YYYY)")
+    data_to_sqx: str = Field(default="-", description="Latest date (DD.MM.YYYY)")
 
 
 def parse_stock_lines(text: str) -> list[BasketItem]:
@@ -404,19 +431,21 @@ class BasketService:
         record = self._db.baskets.get(name.strip())
         if record is None:
             return None
+        rec = {k.lower(): v for k, v in record.items()}
         return BasketDefinition(
-            id=record.get("id"),
-            name=record["name"],
-            description=record["description"] or "",
-            system=bool(record.get("system", 0)),
+            id=rec.get("id"),
+            name=str(rec.get("name", "")),
+            description=str(rec.get("description") or rec.get("desc") or ""),
+            system=bool(rec.get("system", 0)),
             items=[
                 BasketItem(
-                    symbol=member["ticker"],
+                    symbol=str(m.get("ticker") or m.get("symbol") or "").strip(),
                     weight=1.0,
-                    date_from=member.get("date_from"),
-                    date_to=member.get("date_to"),
+                    date_from=m.get("date_from"),
+                    date_to=m.get("date_to"),
                 )
-                for member in record["members"]
+                for member in rec.get("members", [])
+                for m in [{k.lower(): v for k, v in member.items()}]
             ],
         )
 
@@ -425,19 +454,21 @@ class BasketService:
         record = self._db.baskets.get_by_id(basket_id)
         if record is None:
             return None
+        rec = {k.lower(): v for k, v in record.items()}
         return BasketDefinition(
-            id=record.get("id"),
-            name=record["name"],
-            description=record["description"] or "",
-            system=bool(record.get("system", 0)),
+            id=rec.get("id"),
+            name=str(rec.get("name", "")),
+            description=str(rec.get("description") or rec.get("desc") or ""),
+            system=bool(rec.get("system", 0)),
             items=[
                 BasketItem(
-                    symbol=member["ticker"],
+                    symbol=str(m.get("ticker") or m.get("symbol") or "").strip(),
                     weight=1.0,
-                    date_from=member.get("date_from"),
-                    date_to=member.get("date_to"),
+                    date_from=m.get("date_from"),
+                    date_to=m.get("date_to"),
                 )
-                for member in record["members"]
+                for member in rec.get("members", [])
+                for m in [{k.lower(): v for k, v in member.items()}]
             ],
         )
 
@@ -463,6 +494,101 @@ class BasketService:
             )
             for g in groups
         ]
+
+    def ensure_defaults(self) -> None:
+        """Seed default StrategyQuant X stock groups if uninitialized."""
+        self._db.baskets.ensure_defaults()
+        logger.info(
+            "FR-DATA-BASKETS-GROUPS: Verified and seeded default stock groups",
+            extra={"fr_id": "FR-DATA-BASKETS-GROUPS"},
+        )
+
+    def list_baskets_overview(self) -> list[BasketOverviewItem]:
+        """List enriched overview rows matching the 8-column SQX table grid."""
+        rows = self._db.baskets.list_groups_overview()
+        overview_items: list[BasketOverviewItem] = []
+        for r in rows:
+            df = r["data_from"]
+            dt = r["data_to"]
+            df_sqx = format_iso_to_sqx_date(df) if df else "-"
+            dt_sqx = format_iso_to_sqx_date(dt) if dt else "-"
+            overview_items.append(
+                BasketOverviewItem(
+                    id=r["id"],
+                    name=r["name"],
+                    description=r["description"],
+                    system=r["system"],
+                    active_count=r["active_count"],
+                    total_count=r["total_count"],
+                    symbols_count=r["symbols_count"],
+                    downloaded_count=r["downloaded_count"],
+                    is_ready=r["is_ready"],
+                    missing_symbols=r["missing_symbols"],
+                    data_from=df,
+                    data_to=dt,
+                    data_from_sqx=df_sqx,
+                    data_to_sqx=dt_sqx,
+                )
+            )
+        logger.info(
+            "FR-DATA-BASKETS-GROUPS: Listed overview for %d baskets",
+            len(overview_items),
+            extra={
+                "count": len(overview_items),
+                "fr_id": "FR-DATA-BASKETS-GROUPS",
+            },
+        )
+        return overview_items
+
+    def update_group_data(self, basket_id_or_name: int | str) -> dict[str, Any]:
+        """Dispatch automatic historical data update for stocks in a group."""
+        basket: BasketDefinition | None
+        if isinstance(basket_id_or_name, int) or (
+            isinstance(basket_id_or_name, str) and basket_id_or_name.isdigit()
+        ):
+            basket = self.get_basket_by_id(int(basket_id_or_name))
+        else:
+            basket = self.get_basket(str(basket_id_or_name))
+
+        if basket is None:
+            raise ValueError("Group doesn't exist.")
+
+        if basket.name == "[[S&P 100 limited]]":
+            raise ValueError(
+                "Group S&P 100 limited cannot be updated, "
+                "it is only in clean installation."
+            )
+
+        if not basket.items:
+            raise ValueError("Nothing to update. Group is without any stocks.")
+
+        available_symbols = {
+            str(d["symbol"]).upper()
+            for d in self._db.datasets.list_datasets(limit=10000)
+        }
+        readiness = self.check_readiness(basket, available_symbols)
+
+        logger.info(
+            "FR-DATA-BASKETS-GROUPS: Dispatched data update for basket '%s'",
+            basket.name,
+            extra={
+                "basket_name": basket.name,
+                "symbols_count": len(basket.items),
+                "missing_count": len(readiness.missing_symbols),
+                "fr_id": "FR-DATA-BASKETS-GROUPS",
+            },
+        )
+
+        return {
+            "status": "started",
+            "basket_id": basket.id,
+            "basket_name": basket.name,
+            "total_symbols": len(basket.items),
+            "missing_symbols": readiness.missing_symbols,
+            "message": (
+                "Data update started, please check Log tab for more information."
+            ),
+        }
 
     def delete_basket(self, name: str) -> bool:
         """Request atomic deletion of a non-system basket and its members."""

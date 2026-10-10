@@ -54,7 +54,8 @@ def test_basket_persistence_crud(
     caplog.set_level(logging.DEBUG)
     service = BasketService(test_db)
 
-    assert service.list_baskets() == []
+    initial_count = len(service.list_baskets())
+    assert not any(b.name == "TechBasket" for b in service.list_baskets())
     assert service.get_basket("TechBasket") is None
 
     basket = BasketDefinition(
@@ -98,11 +99,13 @@ def test_basket_persistence_crud(
 
     # List
     all_baskets = service.list_baskets()
-    assert len(all_baskets) == 1
+    assert len(all_baskets) == initial_count + 1
+    assert any(b.name == "TechBasket" for b in all_baskets)
 
     # Delete
     assert service.delete_basket("TechBasket") is True
     assert service.get_basket("TechBasket") is None
+    assert not any(b.name == "TechBasket" for b in service.list_baskets())
     assert service.delete_basket("TechBasket") is False
 
 

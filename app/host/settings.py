@@ -445,6 +445,7 @@ class HostSettings(_SettingsNode):
         version: str | None = None,
         api_prefix: str | None = None,
         reference_cohort: str | None = None,
+        timeout_graceful_shutdown: int | None = None,
         auto_load: bool = False,
     ) -> None:
         """Initialize HostSettings with optional database path and overrides.
@@ -459,6 +460,8 @@ class HostSettings(_SettingsNode):
             version: Optional application version override.
             api_prefix: Optional REST API route prefix override.
             reference_cohort: Optional reference cohort identifier override.
+            timeout_graceful_shutdown: Optional graceful shutdown timeout
+                override in seconds.
             auto_load: Whether to load settings immediately upon construction.
         """
         super().__init__()
@@ -472,6 +475,11 @@ class HostSettings(_SettingsNode):
         self._override_version: str | None = version
         self._override_api_prefix: str | None = api_prefix
         self._override_reference_cohort: str | None = reference_cohort
+        self._override_timeout_graceful_shutdown: int | None = (
+            int(timeout_graceful_shutdown)
+            if timeout_graceful_shutdown is not None
+            else None
+        )
 
         resolved_db: Path | None = None
         if db_path is not None:
@@ -579,6 +587,23 @@ class HostSettings(_SettingsNode):
             if hasattr(raw, "get")
             else "SQX145 Dev 1"
         )
+
+    @property
+    def timeout_graceful_shutdown(self) -> int:
+        """Return configured timeout in seconds for server graceful shutdown."""
+        if self._override_timeout_graceful_shutdown is not None:
+            return self._override_timeout_graceful_shutdown
+        self._ensure_loaded()
+        raw = self.get("app_general")
+        try:
+            val = (
+                int(raw.get("timeout_graceful_shutdown", 2))
+                if hasattr(raw, "get")
+                else 2
+            )
+            return max(1, val)
+        except ValueError, TypeError:
+            return 2
 
     def _ensure_loaded(self) -> None:
         """Ensure settings are loaded from disk if not yet loaded."""

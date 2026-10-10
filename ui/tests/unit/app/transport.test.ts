@@ -43,6 +43,18 @@ describe('UI host transport', () => {
     expect(headers.get('Content-Type')).toBe('application/json');
   });
 
+  it('sends a request id and executes delete', async () => {
+    const mockFetch = okFetch({ deleted: true });
+    const client = createDomainClient('/baskets', { baseUrl: '', fetchFn: asFetch(mockFetch) });
+
+    const result = await client.delete('/my-group');
+
+    const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('/baskets/my-group');
+    expect(init.method).toBe('DELETE');
+    expect(result).toEqual({ deleted: true });
+  });
+
   it('attaches Bearer token from global auth token store', async () => {
     setAuthToken('test-token-123');
     expect(getAuthToken()).toBe('test-token-123');

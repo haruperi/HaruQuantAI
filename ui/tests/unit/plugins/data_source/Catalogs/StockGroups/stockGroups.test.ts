@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { activeMemberships, formatStockLines, normalizeGroupName, parseStockGroupsJson, parseStockLines, serializeStockGroupsJson, serializeStockMembersJson, summarizeGroup, type StockGroupDefinition } from '../../../../../../app/plugins/data_source/Catalogs/StockGroups/stockGroups';
+import { activeMemberships, formatStockLines, normalizeGroupName, parseStockGroupsJson, parseStockGroupsXml, parseStockLines, serializeStockGroupsJson, serializeStockGroupsXml, serializeStockMembersJson, summarizeGroup, type StockGroupDefinition } from '../../../../../../app/plugins/data_source/Catalogs/StockGroups/stockGroups';
 
 const group: StockGroupDefinition = { id:'g1',name:'[Index]',description:'History-aware index',system:false,members:[{ticker:'AAPL'},{ticker:'MSFT',from:'2020-12-01'},{ticker:'OLD',from:'2007-04-15',to:'2015-05-30'}] };
 
@@ -19,10 +19,32 @@ describe('stock groups', () => {
     expect(activeMemberships(group, '2026-01-01').map(row => row.ticker)).toEqual(['AAPL','MSFT']);
   });
 
-  it('calculates downloaded counts and the within-three readiness threshold', () => {
-    const summary = summarizeGroup(group, [{symbol:'AAPL',from:'2010-01-01',to:'2026-01-01',bars:4000}]);
-    expect(summary).toMatchObject({active:2,total:3,numberOfSymbols:1,downloaded:1,ready:true,from:'2010-01-01',to:'2026-01-01'});
+  it('calculates downloaded counts and enforces 100% SQX readiness', () => {
+    const partialDatasets = [{symbol:'AAPL',from:'2010-01-01',to:'2026-01-01',bars:4000}];
+    const summary = summarizeGroup(group, partialDatasets);
+    expect(summary).toMatchObject({active:2,total:3,numberOfSymbols:1,downloaded:1,ready:false,from:'2010-01-01',to:'2026-01-01'});
     expect(summarizeGroup({...group,members:[]},[]).ready).toBe(false);
+
+    const fullDatasets = [
+      {symbol:'AAPL',from:'2010-01-01',to:'2026-01-01',bars:4000},
+      {symbol:'MSFT',from:'2015-01-01',to:'2026-01-01',bars:3000},
+      {symbol:'OLD',from:'2007-04-15',to:'2015-05-30',bars:2000},
+    ];
+    const fullSummary = summarizeGroup(group, fullDatasets);
+    expect(fullSummary.ready).toBe(true);
+    expect(fullSummary.downloaded).toBe(3);
+  });
+
+  it('round trips the canonical SQX Groups XML shape with members', () => {
+    const xml = serializeStockGroupsXml([group]);
+    expect(xml).toContain('<Groups>');
+    expect(xml).toContain('<Group name="[Index]">');
+    expect(xml).toContain('<Stock name="AAPL"');
+    expect(xml).toContain('<Stock name="MSFT" from="2020-12-01"');
+    const parsed = parseStockGroupsXml(xml);
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0].name).toBe('[Index]');
+    expect(parsed[0].members).toHaveLength(3);
   });
 
   it('round trips the versioned Groups JSON shape with ISO dates', () => {
