@@ -33,6 +33,7 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
       symbol: string;
       timeframe: string;
       broker?: string;
+      broker_name?: string;
       source?: string;
       timezone?: string;
       bars?: number;
@@ -41,16 +42,18 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
       date_from?: string;
       date_to?: string;
       category?: string;
+      underlying?: string;
+      instrument?: string;
     }>>('/datasets');
     return list.map(item => ({
       id: item.id,
       source: item.source || 'Server',
       symbol: item.symbol,
-      underlying: item.symbol,
-      instrument: item.symbol,
+      underlying: item.underlying || item.symbol,
+      instrument: item.instrument || item.symbol,
       timeframe: item.timeframe,
       broker: item.broker || 'default',
-      brokerName: item.broker || 'Default',
+      brokerName: item.broker_name || item.broker || 'Default',
       timezone: item.timezone || 'UTC',
       category: item.category || 'Forex',
       from: item.date_from || '',
@@ -90,7 +93,10 @@ function readState(): Pick<DataState, 'definitions' | 'brokers' | 'brokerJob' | 
       || value.brokers.some((broker: BrokerProfile) => !broker || ['id', 'name', 'postfix', 'timezone'].some(key => typeof (broker as unknown as Record<string, unknown>)[key] !== 'string') || typeof broker.mtUse !== 'boolean' || !Array.isArray(broker.instruments) || broker.instruments.some(item => typeof item !== 'string')))
       throw new Error('Invalid saved definitions');
     const brokers=(value.brokers as BrokerProfile[]).map(completeBroker);const brokerJob=value.version===2&&value.brokerJob?value.brokerJob as BrokerUpdateJob:null;if(brokerJob){if(!['running','paused','cancelled','completed','failed'].includes(brokerJob.state)||!Number.isFinite(brokerJob.progress)||!Array.isArray(brokerJob.targets))throw new Error('Invalid broker job');if(brokerJob.state==='running')brokerJob.state='paused';}
-    return { definitions: value.definitions, brokers, brokerJob, storageError: '' };
+    const cleanDefinitions = (value.definitions as MockDefinition[]).filter(
+      row => !row.id.startsWith('broker-data:')
+    );
+    return { definitions: cleanDefinitions, brokers, brokerJob, storageError: '' };
   } catch { return { definitions: [], brokers: [], brokerJob:null, storageError: 'Saved mock data could not be read. Existing browser storage has been preserved.' }; }
 }
 export const useDataManagerStore = create<DataState>((set, get) => ({
@@ -225,7 +231,31 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
       }
     });
   },
-  advanceBrokerUpdate:()=>{const state=get();if(state.brokerJob?.state!=='running')return;const progress=Math.min(100,state.brokerJob.progress+10);let definitions=state.definitions;let brokerJob={...state.brokerJob,progress,state:progress===100?'completed' as const:'running' as const};if(progress===100){const today=new Date().toISOString().slice(0,10);const additions=state.brokerJob.targets.map(target=>{const broker=state.brokers.find(row=>row.id===target.brokerId)!;return {id:`broker-data:${target.brokerId}:${target.symbol}`,source:'Equity',symbol:target.symbol,underlying:target.ticker,instrument:target.symbol,timeframe:'D1',broker:broker.id,brokerName:broker.name,timezone:broker.timezone,category:'Stock',from:today,to:today,bars:1};});definitions=[...definitions,...additions];}try{persistData(state,state.brokers,definitions,brokerJob);set({definitions,brokerJob});}catch{set({brokerJob:{...state.brokerJob,state:'failed',error:'Unable to persist broker update progress.'}});}},
+  advanceBrokerUpdate: () => {
+    const state = get();
+    if (state.brokerJob?.state !== 'running') return;
+    const progress = Math.min(100, state.brokerJob.progress + 10);
+    const brokerJob: BrokerUpdateJob = {
+      ...state.brokerJob,
+      progress,
+      state: progress === 100 ? ('completed' as const) : ('running' as const),
+    };
+    try {
+      persistData(state, state.brokers, state.definitions, brokerJob);
+      set({ brokerJob });
+      if (progress === 100) {
+        get().syncRemoteDatasets().catch(() => {});
+      }
+    } catch {
+      set({
+        brokerJob: {
+          ...state.brokerJob,
+          state: 'failed',
+          error: 'Unable to persist broker update progress.',
+        },
+      });
+    }
+  },
   brokerAction:action=>{const state=get();if(!state.brokerJob||!['running','paused'].includes(state.brokerJob.state))return;const brokerJob={...state.brokerJob,state:action==='pause'?'paused' as const:action==='resume'?'running' as const:'cancelled' as const};persistData(state,state.brokers,state.definitions,brokerJob);set({brokerJob});},
   addData: request => {
     const state = get();
@@ -262,16 +292,8 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
       const remote = await fetchRemoteDatasets();
       if (!remote) return;
       const state = get();
-      const remoteMap = new Map(remote.map(d => [d.id, d]));
-      const updated = state.definitions.map(d => {
-        const rem = remoteMap.get(d.id);
-        return rem ? { ...d, ...rem } : d;
-      });
-      const existingIds = new Set(state.definitions.map(d => d.id));
-      const newItems = remote.filter(d => !existingIds.has(d.id));
-      const merged = [...updated, ...newItems];
-      try { persistData(state, state.brokers, merged, state.brokerJob); } catch { /* ignore */ }
-      set({ definitions: merged });
+      try { persistData(state, state.brokers, remote, state.brokerJob); } catch { /* ignore */ }
+      set({ definitions: remote });
     } catch {
       // Non-blocking sync
     }

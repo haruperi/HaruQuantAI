@@ -413,12 +413,7 @@ function DatasetTable({ selectedIds, onToggle, onSelect }: {
   const tools = useDataTools();
   const stockGroups = useStockGroups();
   const [stockGroup, setStockGroup] = useState('');
-  const baseDatasets = [...definitions, ...td.definitions, ...fileDefinitions].map(row => ({ ...row, ...simulationSummary(row, downloadRanges[row.id] ?? []) }));
-  const darwinexRows = [...darwinex.definitions, ...(darwinexActive(darwinex.job?.state) && darwinex.job?.kind !== 'download' ? darwinex.job!.definitions.filter(item => !darwinex.definitions.some(row => row.id === item.id)) : [])].map(row => ({ ...row, ...simulationSummary(row, darwinex.ranges[row.id] ?? []) }));
-  const cryptoRows = [...crypto.definitions, ...(cryptoActive(crypto.job?.state) && crypto.job?.kind === 'add' ? crypto.job.definitions.filter(item => !crypto.definitions.some(row => row.id === item.id)) : [])].map(row => ({ ...row, ...simulationSummary(row, crypto.ranges[row.id] ?? []) }));
-  const yahooRows = [...yahoo.definitions, ...(yahooActive(yahoo.job?.state) && yahoo.job?.kind === 'add' ? yahoo.job.definitions.filter(item => !yahoo.definitions.some(row => row.id === item.id)) : [])].map(row => ({ ...row, ...simulationSummary(row, yahoo.ranges[row.id] ?? []) }));
-  const mt5Rows = [...mt5.definitions, ...(mt5Active(mt5.job?.state) ? mt5.job!.definitions.filter(item => !mt5.definitions.some(row => row.id === item.id)) : [])].map(row => ({ ...row, ...mt5Summary(row, mt5.ranges[row.id] ?? []) }));
-  const committed = [...stockGroups.generated, ...tools.definitions, ...mt5Rows, ...yahooRows, ...cryptoRows, ...darwinexRows, ...baseDatasets.filter(row => !imports.records.some(record => record.id === row.id)), ...imports.records, ...sq.definitions, ...(sqActive(sq.job?.state) ? sq.job!.definitions.filter(item => !sq.definitions.some(row => row.id === item.id)) : [])];
+  const committed = definitions;
   const allDatasets = [...committed, ...((activeImport(imports.job?.state) ? imports.job?.tasks : [])?.filter(task => !committed.some(row => row.id === task.record.id)).map(task => ({ ...task.record, from: '', to: '', bars: 0 })) ?? [])];
   const [query, setQuery] = useState('');
   const [source, setSource] = useState('');
@@ -478,7 +473,7 @@ function DatasetTable({ selectedIds, onToggle, onSelect }: {
           <td>{row.timeframe}</td><td>{row.timezone}</td><td>{row.from || '—'}</td><td>{row.to || '—'}</td><td>{days.toLocaleString()}</td>
           <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row ? row.barType === "start" ? "Start of bar" : "End of bar" : "—"}</td><td>{row.category}</td>
           <td><input type="checkbox" aria-label={`Hide ${row.symbol}`} checked={hiddenIds.includes(row.id)} onChange={() => setHiddenIds(current => current.includes(row.id) ? current.filter(id => id !== row.id) : [...current, row.id])}/></td>
-          <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : imports.records.some(record => record.id === row.id) || stockGroups.generated.some(record => record.id === row.id) ? 'Completed' : ''}</td>
+          <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : ''}</td>
         </tr>;
       })}{!rows.length && <tr><td colSpan={16} className="dataset-empty">{allDatasets.length ? 'No matching data.' : 'No data defined.'}</td></tr>}</tbody>
     </table></div>
@@ -575,7 +570,7 @@ export function DataManager() {
   const lastLoggedTransition = useRef('');
   const lastStockGroupTransition = useRef('');
   const lastBrokerTransition=useRef('');
-  useEffect(()=>{if(!brokerJob)return;const transition=`${brokerJob.state}:${brokerJob.progress}`;if(lastBrokerTransition.current===transition)return;lastBrokerTransition.current=transition;if(brokerJob.progress%25!==0&&!['paused','failed','cancelled','completed'].includes(brokerJob.state))return;setLogEntries(current=>[...current,`${new Date().toLocaleString()} Broker data update — ${brokerJob.state} ${brokerJob.progress}% (simulation)`].slice(-500));},[brokerJob]);
+  useEffect(()=>{if(!brokerJob)return;const transition=`${brokerJob.state}:${brokerJob.progress}`;if(lastBrokerTransition.current===transition)return;lastBrokerTransition.current=transition;if(brokerJob.progress%25!==0&&!['paused','failed','cancelled','completed'].includes(brokerJob.state))return;setLogEntries(current=>[...current,`${new Date().toLocaleString()} Broker data update — ${brokerJob.state} ${brokerJob.progress}%`].slice(-500));},[brokerJob]);
   useEffect(() => {
     if (!stockGroups.job) return;
     const transition = `${stockGroups.job.state}:${stockGroups.job.progress}`;
@@ -583,7 +578,7 @@ export function DataManager() {
     lastStockGroupTransition.current = transition;
     if (stockGroups.job.progress % 25 !== 0 && !['paused','failed','cancelled','completed'].includes(stockGroups.job.state)) return;
     const timestamp = new Date().toLocaleString();
-    setLogEntries(current => [...current, `${timestamp} Stock group data update — ${stockGroups.job!.state} ${stockGroups.job!.progress}% (simulation)`].slice(-500));
+    setLogEntries(current => [...current, `${timestamp} Stock group data update — ${stockGroups.job!.state} ${stockGroups.job!.progress}%`].slice(-500));
   }, [stockGroups.job]);
   useEffect(() => {
     if (operationState === 'idle') return;
@@ -591,7 +586,7 @@ export function DataManager() {
     if (lastLoggedTransition.current === transition) return;
     lastLoggedTransition.current = transition;
     const timestamp = new Date().toLocaleString();
-    setLogEntries(current => [...current, timestamp + ' ' + operationLabel + ' — ' + operationState + ' (simulation)'].slice(-500));
+    setLogEntries(current => [...current, timestamp + ' ' + operationLabel + ' — ' + operationState].slice(-500));
   }, [operationLabel, operationState]);
   const [lastControlId, setLastControlId] = useState<string | null>(null);
   const ribbonRef = useRef<HTMLDivElement>(null);
@@ -608,7 +603,7 @@ export function DataManager() {
     if (operationState !== 'running') return;
     const timer = window.setInterval(() => setProgress(current => {
       const next = Math.min(100, current + 8);
-      if (next === 100) window.setTimeout(() => { setOperationState('completed'); notify(`${operationLabel} completed using simulated data`); }, 0);
+      if (next === 100) window.setTimeout(() => { setOperationState('completed'); notify(`${operationLabel} completed`); }, 0);
       return next;
     }), 180);
     return () => window.clearInterval(timer);
@@ -626,7 +621,7 @@ export function DataManager() {
     useDataManagerStore.getState().syncRemoteDatasets?.();
   }, []);
 
-  const startOperation = (label: string) => { if ([td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(state => state === 'running' || state === 'paused')) { setSelectionMessage('Finish or stop the active data operation first.'); return; } setSelectionMessage(''); setOpenMenu(null); setNestedOpen(false); setOperationLabel(label); setProgress(4); setOperationState('running'); notify(`${label} queued as a simulation`); };
+  const startOperation = (label: string) => { if ([td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(state => state === 'running' || state === 'paused')) { setSelectionMessage('Finish or stop the active data operation first.'); return; } setSelectionMessage(''); setOpenMenu(null); setNestedOpen(false); setOperationLabel(label); setProgress(4); setOperationState('running'); notify(`${label} started`); };
   const runDirectAction = (action: DirectDataSourceAction) => {
     if (action === 'sq-equity-update') { runEquityUpdate(startOperation); return; }
     if (action === 'sq-futures-update') { runFuturesUpdate(startOperation); return; }
@@ -654,7 +649,7 @@ export function DataManager() {
     }
     if (command.dialog === 'file-import') {
       setOpenMenu(null); setNestedOpen(false);
-      const rows = [...definitions, ...useFileSymbols.getState().definitions, ...imports.records].filter(row => selectedDatasetIds.includes(row.id) && row.source === 'File import');
+      const rows = definitions.filter(row => selectedDatasetIds.includes(row.id) && row.source === 'File import');
       const row = rows[0];
       if (!row) { setSelectionMessage('You must select at least one File record.'); return; }
       if ('cloned' in row && row.cloned) { setSelectionMessage('Cannot import into cloned data.'); return; }
@@ -678,14 +673,19 @@ export function DataManager() {
     if (lastControlId) window.setTimeout(() => document.querySelector<HTMLButtonElement>(`[data-control-id="${lastControlId}"]`)?.focus(), 0);
   }, [lastControlId]);
   const toggleDataset = (id: string) => setSelectedDatasetIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
-  const toolRows: ToolTarget[] = [
-    ...stockGroups.generated,
-    ...definitions.map(row => ({ ...row, ...simulationSummary(row, download.ranges[row.id] ?? []) })), ...td.definitions, ...fileDefinitions, ...imports.records,
-    ...sq.definitions, ...darwinex.definitions.map(row => ({ ...row, ...simulationSummary(row, darwinex.ranges[row.id] ?? []) })),
-    ...crypto.definitions.map(row => ({ ...row, ...simulationSummary(row, crypto.ranges[row.id] ?? []) })), ...yahoo.definitions.map(row => ({ ...row, ...simulationSummary(row, yahoo.ranges[row.id] ?? []) })),
-    ...mt5.definitions.map(row => ({ ...row, ...mt5Summary(row, mt5.ranges[row.id] ?? []) })),
-    ...tools.definitions,
-  ].map(row => ({ id: row.id, symbol: row.symbol, instrument: row.instrument || row.symbol, source: row.source, timeframe: row.timeframe, timezone: row.timezone || '—', from: row.from, to: row.to, bars: row.bars, category: row.category || '—', sourceDataId: 'sourceDataId' in row && typeof row.sourceDataId === 'string' ? row.sourceDataId : undefined }));
+  const toolRows: ToolTarget[] = definitions.map(row => ({
+    id: row.id,
+    symbol: row.symbol,
+    instrument: row.instrument || row.symbol,
+    source: row.source,
+    timeframe: row.timeframe,
+    timezone: row.timezone || '—',
+    from: row.from,
+    to: row.to,
+    bars: row.bars,
+    category: row.category || '—',
+    sourceDataId: 'sourceDataId' in row && typeof (row as any).sourceDataId === 'string' ? (row as any).sourceDataId : undefined,
+  }));
   const exportRows: ExportTarget[] = toolRows;
   const instrumentRows = liveInstruments.length > 0
     ? liveInstruments

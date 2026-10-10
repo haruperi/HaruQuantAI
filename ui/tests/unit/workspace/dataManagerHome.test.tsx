@@ -261,4 +261,102 @@ describe('DataManagerHome component and store wiring', () => {
     );
     expect(useDataManagerStore.getState().definitions).toHaveLength(0);
   });
+
+  it('replaces stale or synthetic local datasets with authoritative backend datasets', async () => {
+    const staleSyntheticDef: MockDefinition = {
+      id: 'broker-data:1:AAPL',
+      source: 'Equity',
+      symbol: 'AAPL',
+      underlying: 'AAPL',
+      instrument: 'AAPL',
+      timeframe: 'D1',
+      broker: '1',
+      brokerName: 'XTB',
+      timezone: 'UTC',
+      category: 'Stock',
+      from: '2026-10-10',
+      to: '2026-10-10',
+      bars: 1,
+    };
+
+    useDataManagerStore.setState({
+      definitions: [staleSyntheticDef],
+      brokers: [],
+      brokerJob: null,
+      storageError: '',
+    });
+
+    const realBackendDataset = {
+      id: 'real_dataset_123',
+      symbol: 'EURUSD',
+      timeframe: 'M1',
+      broker: 'Dukascopy',
+      source: 'Dukascopy',
+      timezone: 'UTC',
+      bars: 500000,
+      date_from: '2020-01-01',
+      date_to: '2024-01-01',
+      category: 'Forex',
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        status: 'success',
+        data: [realBackendDataset],
+      }),
+    } as Response);
+
+    setDataClient(createDomainClient('/data', {
+      baseUrl: 'http://localhost/api/v1',
+      fetchFn: mockFetch as any,
+    }));
+
+    await useDataManagerStore.getState().syncRemoteDatasets();
+
+    const state = useDataManagerStore.getState();
+    expect(state.definitions).toHaveLength(1);
+    expect(state.definitions[0].id).toBe('real_dataset_123');
+    expect(state.definitions[0].symbol).toBe('EURUSD');
+    expect(state.definitions[0].bars).toBe(500000);
+    // Verified that synthetic item was eliminated
+    expect(state.definitions.some(d => d.id.startsWith('broker-data:'))).toBe(false);
+  });
+
+  it('advances broker update without generating synthetic datasets', () => {
+    useDataManagerStore.setState({
+      definitions: [],
+      brokers: [{
+        id: '1',
+        name: 'XTB',
+        desc: '',
+        postfix: '',
+        timezone: 'UTC',
+        mtUse: false,
+        stockPickerUse: true,
+        system: false,
+        stocks: ['AAPL', 'MSFT'],
+        instruments: [],
+      }],
+      brokerJob: {
+        brokerIds: ['1'],
+        state: 'running',
+        progress: 90,
+        targets: [
+          { brokerId: '1', ticker: 'AAPL', symbol: 'AAPL' },
+          { brokerId: '1', ticker: 'MSFT', symbol: 'MSFT' },
+        ],
+      },
+      storageError: '',
+    });
+
+    useDataManagerStore.getState().advanceBrokerUpdate();
+
+    const state = useDataManagerStore.getState();
+    expect(state.brokerJob?.state).toBe('completed');
+    expect(state.brokerJob?.progress).toBe(100);
+    // Definitions must remain untouched, zero synthetic datasets generated
+    expect(state.definitions).toHaveLength(0);
+  });
 });
