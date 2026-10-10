@@ -910,6 +910,7 @@ class SchemaManager:
                 CREATE TABLE IF NOT EXISTS datamgr_sessions (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL UNIQUE,
+                    broker_id INTEGER NOT NULL DEFAULT -1,
                     description TEXT DEFAULT '',
                     timezone TEXT NOT NULL DEFAULT 'UTC',
                     windows_json TEXT NOT NULL DEFAULT '[]',
@@ -918,6 +919,16 @@ class SchemaManager:
                 );
                 """
             )
+            # Ensure columns and backward-compatibility for datamgr_sessions
+            sess_table_info = conn.execute(
+                "PRAGMA table_info(datamgr_sessions);"
+            ).fetchall()
+            sess_cols = {r["name"] for r in sess_table_info}
+            if sess_cols and "broker_id" not in sess_cols:
+                conn.execute(
+                    "ALTER TABLE datamgr_sessions ADD COLUMN "
+                    "broker_id INTEGER NOT NULL DEFAULT -1;"
+                )
             conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS datamgr_datasets (
@@ -2445,6 +2456,7 @@ class SessionStore:
 
     _columns = frozenset(
         {
+            "broker_id",
             "description",
             "timezone",
             "windows_json",
@@ -2463,21 +2475,25 @@ class SessionStore:
             "SessionStore.create storage operation",
             extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
         )
+        record_copy = dict(record)
+        record_copy.setdefault("broker_id", -1)
         columns = (
             "name",
+            "broker_id",
             "description",
             "timezone",
             "windows_json",
             "holidays_json",
             "is_default",
         )
-        _validate_columns(record, self._columns | {"name"})
-        _require_columns(record, columns)
-        values = [record[col] for col in columns]
+        _validate_columns(record_copy, self._columns | {"name"})
+        _require_columns(record_copy, columns)
+        values = [record_copy[col] for col in columns]
         sql = (
             "INSERT INTO datamgr_sessions ("
-            "name, description, timezone, windows_json, holidays_json, is_default"
-            ") VALUES (?, ?, ?, ?, ?, ?);"
+            "name, broker_id, description, timezone, "
+            "windows_json, holidays_json, is_default"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?);"
         )
         with self._db.transaction() as conn:
             cur = conn.cursor()
@@ -2485,7 +2501,7 @@ class SessionStore:
             last_id = cur.lastrowid or 0
         logger.info(
             "Created session in datamgr_sessions: %s (id=%d)",
-            record.get("name"),
+            record_copy.get("name"),
             last_id,
             extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
         )
@@ -2512,8 +2528,10 @@ class SessionStore:
             "SessionStore.upsert storage operation",
             extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
         )
-        columns = tuple(record)
-        _validate_columns(record, self._columns | {"name"})
+        record_copy = dict(record)
+        record_copy.setdefault("broker_id", -1)
+        columns = tuple(record_copy)
+        _validate_columns(record_copy, self._columns | {"name"})
         placeholders = ", ".join("?" for _ in columns)
         updates = ", ".join(
             f"{col} = excluded.{col}" for col in columns if col != "name"
@@ -2528,9 +2546,9 @@ class SessionStore:
             f"VALUES ({placeholders}) ON CONFLICT(name) {action}"
         )
         with self._db.transaction() as conn:
-            conn.execute(sql, tuple(record.values()))
+            conn.execute(sql, tuple(record_copy.values()))
             row = conn.execute(
-                "SELECT id FROM datamgr_sessions WHERE name = ?", (record["name"],)
+                "SELECT id FROM datamgr_sessions WHERE name = ?", (record_copy["name"],)
             ).fetchone()
             session_id = int(row["id"])
         logger.info(
@@ -2549,6 +2567,23 @@ class SessionStore:
         with self._db.connection(query_only=True) as conn:
             cur = conn.cursor()
             cur.execute(sql, (limit, offset))
+            return [dict(r) for r in cur.fetchall()]
+
+    def list_by_broker(
+        self, broker_id: int, limit: int = 1000, offset: int = 0
+    ) -> list[dict[str, Any]]:
+        """List sessions filtered by broker profile ID."""
+        logger.debug(
+            "SessionStore.list_by_broker storage operation",
+            extra={"broker_id": broker_id, "fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
+        sql = (
+            "SELECT * FROM datamgr_sessions WHERE broker_id = ? "
+            "ORDER BY name ASC LIMIT ? OFFSET ?;"
+        )
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (broker_id, limit, offset))
             return [dict(r) for r in cur.fetchall()]
 
     def update(self, name: str, updates: dict[str, Any]) -> bool:
@@ -2596,6 +2631,30 @@ class SessionStore:
             extra={"fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
         )
         return success
+
+    def delete_many(self, names: list[str]) -> int:
+        """Batch delete session definitions by names."""
+        logger.debug(
+            "SessionStore.delete_many storage operation",
+            extra={"names_count": len(names), "fr_id": "FR-HOST-PERSISTENCE-SESSIONS"},
+        )
+        if not names:
+            return 0
+        placeholders = ", ".join("?" for _ in names)
+        sql = f"DELETE FROM datamgr_sessions WHERE name IN ({placeholders});"  # noqa: S608
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(sql, tuple(names))
+            deleted_count = cur.rowcount or 0
+        logger.info(
+            "Batch deleted %d session(s)",
+            deleted_count,
+            extra={
+                "deleted_count": deleted_count,
+                "fr_id": "FR-HOST-PERSISTENCE-SESSIONS",
+            },
+        )
+        return deleted_count
 
     def count(self) -> int:
         """Return total session definitions count."""

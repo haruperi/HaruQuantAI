@@ -213,9 +213,56 @@ class SessionImportNTPayload(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    xml_content: str = Field(..., min_length=1, description="Raw NT XML content")
+    xml_content: str | None = Field(default=None, description="Raw NT XML content")
+    folder_path: str | None = Field(
+        default=None, description="Path to NT templates directory"
+    )
     conflict_policy: str = Field(
         default="overwrite", description="'overwrite' or 'skip'"
+    )
+
+
+class SessionClonePayload(BaseModel):
+    """Payload for cloning an existing trading session."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    source_name: str = Field(..., min_length=1, description="Source session name")
+    new_name: str = Field(..., min_length=1, description="New session name")
+    broker_id: int = Field(
+        default=-1, description="Broker profile ID (-1 for SQ default)"
+    )
+    broker_postfix: str = Field(
+        default="", description="Optional postfix for broker session"
+    )
+
+
+class SessionMassDeletePayload(BaseModel):
+    """Payload for batch deleting multiple trading sessions."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    names: list[str] = Field(
+        ..., min_length=1, description="List of session names to delete"
+    )
+
+
+class SessionImportXmlPayload(BaseModel):
+    """Payload for importing StrategyQuant X Sessions.xml."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    xml_content: str = Field(..., min_length=1, description="Raw SQX XML content")
+    policy: str = Field(default="overwrite", description="'overwrite' or 'skip'")
+
+
+class SessionExportXmlPayload(BaseModel):
+    """Payload for exporting StrategyQuant X Sessions.xml."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    names: list[str] = Field(
+        default_factory=list, description="List of session names to export"
     )
 
 
@@ -1543,11 +1590,18 @@ class DataRouterService:
 
     # Sessions
     def list_sessions(
-        self, request: Request, limit: int = 1000, offset: int = 0
+        self,
+        request: Request,
+        limit: int = 1000,
+        offset: int = 0,
+        broker_id: int | None = None,
+        search: str | None = None,
     ) -> Response:
-        """List sessions."""
+        """List sessions with optional broker and search filters."""
         req_id = request.headers.get("x-request-id")
-        sessions = self.sessions.list_sessions(limit=limit, offset=offset)
+        sessions = self.sessions.list_sessions(
+            limit=limit, offset=offset, broker_id=broker_id, search=search
+        )
         logger.debug(
             "FR-DATA-INTEGRATION-SESSIONS: Listed %d sessions",
             len(sessions),
@@ -1611,7 +1665,7 @@ class DataRouterService:
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED, content=resp.to_dict()
             )
-        except Exception as exc:
+        except ValueError as exc:
             logger.exception(
                 "FR-DATA-INTEGRATION-SESSIONS: Error creating session %s",
                 session_def.name,
@@ -1648,33 +1702,93 @@ class DataRouterService:
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
-    def import_nt_sessions(
-        self, request: Request, payload: SessionImportNTPayload
-    ) -> Response:
-        """Import NinjaTrader XML sessions."""
+    def clone_session(self, request: Request, payload: SessionClonePayload) -> Response:
+        """Clone an existing session definition."""
         req_id = request.headers.get("x-request-id")
         try:
-            imported = self.sessions.import_ninjatrader_xml(
-                payload.xml_content, policy=payload.conflict_policy
+            cloned = self.sessions.clone_session(
+                source_name=payload.source_name,
+                new_name=payload.new_name,
+                broker_id=payload.broker_id,
+                broker_postfix=payload.broker_postfix,
             )
-            self._emit_event("data.session", "imported", {"count": len(imported)})
-            logger.info(
-                "FR-DATA-INTEGRATION-SESSIONS: Imported %d NT session(s)",
-                len(imported),
-                extra={
-                    "fr_id": "FR-DATA-INTEGRATION-SESSIONS",
-                    "count": len(imported),
-                },
-            )
+            self._emit_event("data.session", "cloned", cloned.model_dump(mode="json"))
             resp = ApiResponse.success(
-                data=[s.model_dump(mode="json") for s in imported],
-                message=f"Imported {len(imported)} session(s)",
+                data=cloned.model_dump(mode="json"),
+                message=f"Session '{cloned.name}' cloned successfully",
                 request_id=req_id,
             )
             return JSONResponse(
                 status_code=status.HTTP_201_CREATED, content=resp.to_dict()
             )
-        except Exception as exc:
+        except ValueError as exc:
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "SESSION_CLONE_ERROR",
+                str(exc),
+                req_id,
+            )
+
+    def mass_delete_sessions(
+        self, request: Request, payload: SessionMassDeletePayload
+    ) -> Response:
+        """Delete multiple sessions in one batch."""
+        req_id = request.headers.get("x-request-id")
+        deleted_count = self.sessions.delete_sessions(payload.names)
+        self._emit_event(
+            "data.session",
+            "mass_deleted",
+            {"count": deleted_count, "names": payload.names},
+        )
+        resp = ApiResponse.success(
+            data={"deleted_count": deleted_count},
+            message=f"Deleted {deleted_count} session(s)",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def list_nt_templates(
+        self, request: Request, folder_path: str | None = None
+    ) -> Response:
+        """List NinjaTrader 8 TradingHours templates on disk."""
+        req_id = request.headers.get("x-request-id")
+        info = self.sessions.list_ninjatrader_templates(folder_path=folder_path)
+        resp = ApiResponse.success(
+            data=info,
+            message="NinjaTrader templates listed",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    def import_nt_sessions(
+        self, request: Request, payload: SessionImportNTPayload
+    ) -> Response:
+        """Import NinjaTrader XML sessions."""
+        req_id = request.headers.get("x-request-id")
+        source = payload.folder_path or (payload.xml_content or "")
+        if not source.strip():
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "SESSION_IMPORT_ERROR",
+                "Either xml_content or folder_path must be provided",
+                req_id,
+            )
+        try:
+            result = self.sessions.import_ninjatrader_full(
+                source, policy=payload.conflict_policy
+            )
+            self._emit_event(
+                "data.session", "imported", {"count": len(result["imported"])}
+            )
+            resp = ApiResponse.success(
+                data=result,
+                message=result["success"],
+                request_id=req_id,
+            )
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED, content=resp.to_dict()
+            )
+        except (ValueError, OSError) as exc:
             logger.exception(
                 "FR-DATA-INTEGRATION-SESSIONS: NT XML import failed",
                 extra={"fr_id": "FR-DATA-INTEGRATION-SESSIONS", "error": str(exc)},
@@ -1683,6 +1797,69 @@ class DataRouterService:
                 status.HTTP_400_BAD_REQUEST,
                 "SESSION_IMPORT_ERROR",
                 f"Failed to import NinjaTrader sessions: {exc}",
+                req_id,
+            )
+
+    def export_sqx_xml(self, _request: Request, names: str | None = None) -> Response:
+        """Export session definitions as StrategyQuant X Sessions.xml."""
+        name_list: list[str] = []
+        if names:
+            name_list = [n.strip() for n in names.split(",") if n.strip()]
+        else:
+            name_list = [s.name for s in self.sessions.list_sessions()]
+        xml_content = self.sessions.export_sqx_xml(name_list)
+        return Response(
+            content=xml_content,
+            media_type="application/xml",
+            headers={"Content-Disposition": 'attachment; filename="Sessions.xml"'},
+        )
+
+    def export_sqx_xml_post(
+        self, _request: Request, payload: SessionExportXmlPayload
+    ) -> Response:
+        """Export session definitions as StrategyQuant X Sessions.xml via POST."""
+        name_list = payload.names or [s.name for s in self.sessions.list_sessions()]
+        xml_content = self.sessions.export_sqx_xml(name_list)
+        return Response(
+            content=xml_content,
+            media_type="application/xml",
+            headers={"Content-Disposition": 'attachment; filename="Sessions.xml"'},
+        )
+
+    def import_sqx_xml(
+        self, request: Request, payload: SessionImportXmlPayload
+    ) -> Response:
+        """Import session definitions from StrategyQuant X Sessions.xml."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            imported, skipped = self.sessions.import_sqx_xml(
+                payload.xml_content, policy=payload.policy
+            )
+            self._emit_event(
+                "data.session",
+                "xml_imported",
+                {"imported": len(imported), "skipped": len(skipped)},
+            )
+            resp = ApiResponse.success(
+                data={
+                    "imported": [s.model_dump(mode="json") for s in imported],
+                    "skipped": skipped,
+                },
+                message=f"Imported {len(imported)} session(s), skipped {len(skipped)}",
+                request_id=req_id,
+            )
+            return JSONResponse(
+                status_code=status.HTTP_201_CREATED, content=resp.to_dict()
+            )
+        except (ValueError, OSError) as exc:
+            logger.exception(
+                "FR-DATA-INTEGRATION-SESSIONS: SQX XML import failed",
+                extra={"fr_id": "FR-DATA-INTEGRATION-SESSIONS", "error": str(exc)},
+            )
+            return self._error_response(
+                status.HTTP_400_BAD_REQUEST,
+                "SESSION_XML_IMPORT_ERROR",
+                f"Failed to import SQX sessions XML: {exc}",
                 req_id,
             )
 
@@ -3180,28 +3357,66 @@ def _register_instrument_session_routes(
         summary="List sessions",
     )
     router.add_api_route(
-        "/sessions/{name}",
-        service.get_session,
-        methods=["GET"],
-        summary="Get session",
-    )
-    router.add_api_route(
         "/sessions",
         service.create_session,
         methods=["POST"],
         summary="Create session",
     )
     router.add_api_route(
-        "/sessions/{name}",
-        service.delete_session,
-        methods=["DELETE"],
-        summary="Delete session",
+        "/sessions/clone",
+        service.clone_session,
+        methods=["POST"],
+        summary="Clone session",
+    )
+    router.add_api_route(
+        "/sessions/mass-delete",
+        service.mass_delete_sessions,
+        methods=["POST"],
+        summary="Mass delete sessions",
+    )
+    router.add_api_route(
+        "/sessions/nt-templates",
+        service.list_nt_templates,
+        methods=["GET"],
+        summary="List NinjaTrader templates",
     )
     router.add_api_route(
         "/sessions/import-nt",
         service.import_nt_sessions,
         methods=["POST"],
         summary="Import NinjaTrader sessions",
+    )
+    router.add_api_route(
+        "/sessions/export-xml",
+        service.export_sqx_xml,
+        methods=["GET"],
+        summary="Export SQX sessions XML (GET)",
+        name="sessions_export_xml_get",
+    )
+    router.add_api_route(
+        "/sessions/export-xml",
+        service.export_sqx_xml_post,
+        methods=["POST"],
+        summary="Export SQX sessions XML (POST)",
+        name="sessions_export_xml_post",
+    )
+    router.add_api_route(
+        "/sessions/import-xml",
+        service.import_sqx_xml,
+        methods=["POST"],
+        summary="Import SQX sessions XML",
+    )
+    router.add_api_route(
+        "/sessions/{name}",
+        service.get_session,
+        methods=["GET"],
+        summary="Get session",
+    )
+    router.add_api_route(
+        "/sessions/{name}",
+        service.delete_session,
+        methods=["DELETE"],
+        summary="Delete session",
     )
 
 

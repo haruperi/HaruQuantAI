@@ -64,3 +64,60 @@ export function parseSessionsJson(json:string):SessionDefinition[]{
     const elements:SessionElement[]=source.elements.map(element=>{if(!jsonObject(element)||typeof element.dayFrom!=='string'||typeof element.dayTo!=='string'||typeof element.timeFrom!=='string'||typeof element.timeTo!=='string'||typeof element.eod!=='boolean')throw new Error('Invalid session element in Sessions JSON.');const value:SessionElement={dayFrom:element.dayFrom as SessionDay,dayTo:element.dayTo as SessionDay,timeFrom:element.timeFrom,timeTo:element.timeTo,eod:element.eod};validateElement(value);return value;});
     const value:SessionDefinition={name:source.name,broker:typeof source.broker==='string'?source.broker:'-1',brokerName:typeof source.brokerName==='string'?source.brokerName:'Default',elements};validateSession(value,names,[value.broker],false);names.push(value.name);return value;});
 }
+
+export function serializeSessionsXml(items: SessionDefinition[]): string {
+  const lines: string[] = ['<?xml version="1.0" encoding="UTF-8"?>', '<Sessions>'];
+  for (const item of items) {
+    lines.push(`  <Session name="${item.name}" broker="${item.broker}" timezone="UTC">`);
+    for (const el of item.elements) {
+      lines.push(
+        `    <SessionElement startDay="${el.dayFrom}" startTime="${el.timeFrom}" endDay="${el.dayTo}" endTime="${el.timeTo}" seoc="${el.eod ? 'Yes' : 'No'}" type="Regular" />`
+      );
+    }
+    lines.push('  </Session>');
+  }
+  lines.push('</Sessions>');
+  return lines.join('\n');
+}
+
+export function parseSessionsXml(xml: string): SessionDefinition[] {
+  if (!xml || new Blob([xml]).size > 2_000_000) throw new Error('Session XML file is invalid or too large.');
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xml, 'application/xml');
+  const parseError = doc.querySelector('parsererror');
+  if (parseError) throw new Error('Select a valid Sessions XML file.');
+  const sessionNodes = doc.querySelectorAll('Session');
+  if (!sessionNodes.length) throw new Error('No sessions found in Sessions XML.');
+  const names: string[] = [];
+  const items: SessionDefinition[] = [];
+  sessionNodes.forEach((node) => {
+    if (node.parentElement?.tagName.toLowerCase() === 'session') return;
+    const name = node.getAttribute('name') || node.querySelector('Name')?.textContent || '';
+    if (!name.trim()) return;
+    const broker = node.getAttribute('broker') || node.querySelector('Broker')?.textContent || '-1';
+    const brokerName = broker === '-1' ? 'Default' : `Broker ${broker}`;
+    const elemNodes = node.querySelectorAll('SessionElement, Session');
+    const elements: SessionElement[] = [];
+    elemNodes.forEach((elem) => {
+      if (elem === node) return;
+      const dFrom = (elem.getAttribute('startDay') || elem.getAttribute('dayFrom') || elem.querySelector('DayOfWeek')?.textContent || 'Mon').slice(0, 3) as SessionDay;
+      const tFrom = (elem.getAttribute('startTime') || elem.getAttribute('timeFrom') || elem.querySelector('StartTime')?.textContent || '00:00').slice(0, 5);
+      const dTo = (elem.getAttribute('endDay') || elem.getAttribute('dayTo') || dFrom).slice(0, 3) as SessionDay;
+      const tTo = (elem.getAttribute('endTime') || elem.getAttribute('timeTo') || elem.querySelector('EndTime')?.textContent || '23:59').slice(0, 5);
+      const seocRaw = elem.getAttribute('seoc') || elem.getAttribute('eod') || 'Yes';
+      const isEod = ['yes', 'true', '1'].includes(String(seocRaw).toLowerCase());
+      elements.push({
+        dayFrom: dFrom,
+        timeFrom: tFrom,
+        dayTo: dTo,
+        timeTo: tTo,
+        eod: isEod,
+      });
+    });
+    const value: SessionDefinition = { name, broker, brokerName, elements };
+    validateSession(value, names, [broker], false);
+    names.push(name);
+    items.push(value);
+  });
+  return items;
+}

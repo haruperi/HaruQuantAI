@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { generateMondayFriday, parseSessionsJson, serializeSessionsJson, validateElement, validateSession, type SessionDefinition } from '../../../../../../app/plugins/data_source/Catalogs/Sessions/sessions';
+import {
+  generateMondayFriday,
+  parseSessionsJson,
+  serializeSessionsJson,
+  serializeSessionsXml,
+  validateElement,
+  validateSession,
+  type SessionDefinition,
+} from '../../../../../../app/plugins/data_source/Catalogs/Sessions/sessions';
 
 const monday = { dayFrom:'Mon',timeFrom:'09:30',dayTo:'Tue',timeTo:'16:00',eod:true } as const;
 describe('session rules',()=>{
@@ -24,5 +32,17 @@ describe('session rules',()=>{
     const value={name:'US_Index',broker:'-1',brokerName:'Default',elements:[monday]};const json=serializeSessionsJson([value]);
     expect(JSON.parse(json)).toMatchObject({version:1,kind:'sessions',sessions:[{name:'US_Index'}]});expect(parseSessionsJson(json)).toEqual([value]);
     expect(()=>parseSessionsJson('{"version":1,"kind":"instruments","sessions":[]}')).toThrow('valid Sessions JSON');
+  });
+  it('serializes native SQX Sessions.xml template', () => {
+    const value: SessionDefinition = {
+      name: 'US_Index',
+      broker: '-1',
+      brokerName: 'Default',
+      elements: [monday],
+    };
+    const xml = serializeSessionsXml([value]);
+    expect(xml).toContain('<Sessions>');
+    expect(xml).toContain('<Session name="US_Index" broker="-1" timezone="UTC">');
+    expect(xml).toContain('<SessionElement startDay="Mon" startTime="09:30" endDay="Tue" endTime="16:00" seoc="Yes" type="Regular" />');
   });
 });

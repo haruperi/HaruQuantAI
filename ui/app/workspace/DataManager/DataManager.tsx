@@ -31,6 +31,7 @@ import { InstrumentTransferDialog } from '../../plugins/data_source/Catalogs/Ins
 import { SessionTemplateDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionTemplateDialog';
 import { CloneSessionDialog } from '../../plugins/data_source/Catalogs/Sessions/CloneSessionDialog';
 import { SessionTransferDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionTransferDialog';
+import { SessionNtImportDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionNtImportDialog';
 import { effectiveSessions, type SessionBroker, type SessionDefinition } from '../../plugins/data_source/Catalogs/Sessions/sessions';
 import { useSessions } from '../../plugins/data_source/Catalogs/Sessions/sessionStore';
 import { ExternalIndicatorEditorDialog } from '../../plugins/data_source/Indicators/ExternalIndicatorEditorDialog';
@@ -101,7 +102,8 @@ type SessionDialogState =
   | { kind:'editor'; mode:'add'|'edit'; source?:SessionDefinition }
   | { kind:'clone'; source:SessionDefinition }
   | { kind:'delete'; selected:SessionDefinition[] }
-  | { kind:'transfer'; mode:'save'|'load'; selected:SessionDefinition[] };
+  | { kind:'transfer'; mode:'save'|'load'; selected:SessionDefinition[] }
+  | { kind:'import-nt' };
 type ExternalIndicatorDialogState =
   | { kind: 'editor'; mode: 'add' | 'edit'; source?: ExternalIndicatorDefinition }
   | { kind: 'import'; source: ExternalIndicatorDefinition }
@@ -751,6 +753,7 @@ export function DataManager() {
       <Button className="action-delete" onClick={()=>{const rows=requireSessions();if(rows)openSessionDelete(rows);}}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
       <Button className="action-save" onClick={()=>{const rows=requireSessions();if(rows)setSessionDialog({kind:'transfer',mode:'save',selected:rows});}}><Save size={26} aria-hidden="true"/>Save</Button>
       <Button className="action-load" onClick={()=>setSessionDialog({kind:'transfer',mode:'load',selected:[]})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
+      <Button id="datamanager-session-import-ninja-trader" className="action-import-nt" onClick={()=>setSessionDialog({kind:'import-nt'})}><Download size={26} aria-hidden="true"/>Import NinjaTrader sessions</Button>
     </div>}
     {tab === 'External indicators' && <div className="management-actions" aria-label="External indicator operations">
       <Button className="action-add" onClick={() => setExternalDialog({ kind: 'editor', mode: 'add' })}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>
@@ -849,6 +852,7 @@ export function DataManager() {
   {sessionDialog?.kind==='clone'&&<CloneSessionDialog source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
   {sessionDialog?.kind==='transfer'&&<SessionTransferDialog mode={sessionDialog.mode} selected={sessionDialog.selected} all={sessionRows} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
   {sessionDialog?.kind==='delete'&&<div className="sessions-flow"><Modal title="Removing sessions" width={520} onClose={()=>{setSessionDialog(null);setSessionError('');}} footer={<><Button onClick={()=>{setSessionDialog(null);setSessionError('');}}>No</Button><Button className="primary" onClick={removeSelectedSessions}>Yes</Button></>}>{sessionError&&<p role="alert" className="session-error">{sessionError}</p>}<p>Are you sure you want to remove selected sessions ({sessionDialog.selected.length})?</p></Modal></div>}
+  {sessionDialog?.kind==='import-nt'&&<SessionNtImportDialog onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
   {externalDialog?.kind === 'editor' && <ExternalIndicatorEditorDialog mode={externalDialog.mode} source={externalDialog.source} onClose={() => setExternalDialog(null)} onSaved={message => notify(message)}/>}
   {externalDialog?.kind === 'import' && <ExternalIndicatorImportDialog item={externalDialog.source} externalActive={otherProviderActive} onClose={() => setExternalDialog(null)} onStarted={() => { setProgressOwner('external'); setOperationState('idle'); setSelectionMessage(''); notify('Importing indicator data.'); }}/>}
   {externalDialog?.kind === 'recognize' && <ExternalIndicatorRecognizeDialog onClose={() => setExternalDialog(null)} onSaved={message => notify(message)}/>}
