@@ -309,7 +309,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
         from: '',
         to: '',
         bars: 0,
-        path: `data\\market\\dukascopy\\${folderKind}\\${name.toLowerCase()}`,
+        path: `data\\market\\dukascopy\\${folderKind}\\${symbol.toLowerCase()}`,
         barType: 'Start of bar',
       };
     });

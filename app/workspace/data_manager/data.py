@@ -352,6 +352,38 @@ class CatalogService:
             return instr.tick_size
         return DEFAULT_TICK_SIZE
 
+    def _resolve_storage_symbol(
+        self,
+        dataset_or_symbol: DatasetRecord | str,
+        underlying: str | None = None,
+        source: str | None = None,
+    ) -> str:
+        """Resolve clean canonical storage symbol (stripping broker postfixes).
+
+        Parquet market partitions are scoped by broker folder (e.g.
+        data/market/dukascopy/), so files on disk use the clean canonical underlying
+        (e.g. 'GBPUSD'), while the UI retains postfixed symbol names (e.g.
+        'GBPUSD_DUKASCOPY') for differentiation.
+        """
+        if isinstance(dataset_or_symbol, DatasetRecord):
+            if dataset_or_symbol.underlying:
+                return dataset_or_symbol.underlying.strip().upper()
+            sym = dataset_or_symbol.symbol.strip().upper()
+            src = dataset_or_symbol.source.strip().upper()
+        else:
+            if underlying and underlying.strip():
+                return underlying.strip().upper()
+            sym = str(dataset_or_symbol).strip().upper()
+            src = source.strip().upper() if source else ""
+
+        if "_" in sym:
+            return sym.split("_")[0]
+        if "." in sym:
+            return sym.split(".")[0]
+        if src and sym.endswith(src):
+            return sym[: -len(src)]
+        return sym
+
     def _clean_broker_name(self, name: str) -> str:
         """Strip SQX brackets [[...]] from broker display name."""
         clean = name.strip()
@@ -847,6 +879,7 @@ class CatalogService:
         bars: Sequence[BarRecord],
         instrument: str | None = None,
         *,
+        underlying: str | None = None,
         source_data_id: str | None = None,
         timezone: str = "UTC",
     ) -> DatasetRecord:
@@ -858,25 +891,30 @@ class CatalogService:
         clean_tf = timeframe.strip().upper()
         clean_source = source.strip()
 
-        tick_size = self._get_instrument_tick_size(clean_symbol)
-        write_res = self._storage.write_bars(
-            source=clean_source,
-            symbol=clean_symbol,
-            timeframe=clean_tf,
-            bars=bars,
-            tick_size=tick_size,
-        )
-
         dataset_id = (
             f"ds_{clean_source.lower()}_{clean_symbol.lower()}_{clean_tf.lower()}"
         )
         existing = self.get_dataset(dataset_id)
 
+        und_candidate = underlying or (existing.underlying if existing else None)
+        storage_symbol = self._resolve_storage_symbol(
+            clean_symbol, underlying=und_candidate, source=clean_source
+        )
+
+        tick_size = self._get_instrument_tick_size(storage_symbol)
+        write_res = self._storage.write_bars(
+            source=clean_source,
+            symbol=storage_symbol,
+            timeframe=clean_tf,
+            bars=bars,
+            tick_size=tick_size,
+        )
+
         partition_dir = str(
             self._storage.base_dir
             / clean_source.lower()
             / clean_tf.lower()
-            / clean_symbol.lower()
+            / storage_symbol.lower()
         )
         lineage: dict[str, Any] = {
             "tick_size": tick_size,
@@ -886,12 +924,15 @@ class CatalogService:
         if source_data_id:
             lineage["source_data_id"] = source_data_id
 
-        instr_val = instrument or (existing.instrument if existing else clean_symbol)
+        resolved_underlying = und_candidate or storage_symbol
+        instr_val = instrument or (
+            existing.instrument if existing else resolved_underlying
+        )
         record = DatasetRecord(
             id=dataset_id,
             source=clean_source,
             symbol=clean_symbol,
-            underlying=clean_symbol,
+            underlying=resolved_underlying,
             instrument=instr_val,
             timeframe=clean_tf,
             broker=clean_source,
@@ -923,6 +964,8 @@ class CatalogService:
         symbol: str,
         ticks: Sequence[TickRecord],
         instrument: str | None = None,
+        *,
+        underlying: str | None = None,
     ) -> DatasetRecord:
         """Write ticks into canonical Parquet partitions and update catalog.
 
@@ -931,22 +974,27 @@ class CatalogService:
         clean_symbol = symbol.strip().upper()
         clean_source = source.strip()
 
-        tick_size = self._get_instrument_tick_size(clean_symbol)
+        dataset_id = f"ds_{clean_source.lower()}_{clean_symbol.lower()}_ticks"
+        existing = self.get_dataset(dataset_id)
+
+        und_candidate = underlying or (existing.underlying if existing else None)
+        storage_symbol = self._resolve_storage_symbol(
+            clean_symbol, underlying=und_candidate, source=clean_source
+        )
+
+        tick_size = self._get_instrument_tick_size(storage_symbol)
         write_res = self._storage.write_ticks(
             source=clean_source,
-            symbol=clean_symbol,
+            symbol=storage_symbol,
             ticks=ticks,
             tick_size=tick_size,
         )
-
-        dataset_id = f"ds_{clean_source.lower()}_{clean_symbol.lower()}_ticks"
-        existing = self.get_dataset(dataset_id)
 
         partition_dir = str(
             self._storage.base_dir
             / clean_source.lower()
             / "ticks"
-            / clean_symbol.lower()
+            / storage_symbol.lower()
         )
         lineage = {
             "tick_size": tick_size,
@@ -954,12 +1002,15 @@ class CatalogService:
             "data_kind": "ticks",
         }
 
-        instr_val = instrument or (existing.instrument if existing else clean_symbol)
+        resolved_underlying = und_candidate or storage_symbol
+        instr_val = instrument or (
+            existing.instrument if existing else resolved_underlying
+        )
         record = DatasetRecord(
             id=dataset_id,
             source=clean_source,
             symbol=clean_symbol,
-            underlying=clean_symbol,
+            underlying=resolved_underlying,
             instrument=instr_val,
             timeframe="TICK",
             broker=clean_source,
@@ -1053,7 +1104,8 @@ class CatalogService:
         kind = (
             existing.data_kind if existing.data_kind == "ticks" else existing.timeframe
         )
-        self._storage.clear_partitions(existing.source, kind, existing.symbol)
+        storage_sym = self._resolve_storage_symbol(existing)
+        self._storage.clear_partitions(existing.source, kind, storage_sym)
 
         cleared_lineage: dict[str, Any] = {}
         if existing.lineage_json:
@@ -1095,7 +1147,8 @@ class CatalogService:
                 if existing.data_kind == "ticks"
                 else existing.timeframe
             )
-            self._storage.delete_partitions(existing.source, kind, existing.symbol)
+            storage_sym = self._resolve_storage_symbol(existing)
+            self._storage.delete_partitions(existing.source, kind, storage_sym)
 
         target_id = existing.id if existing is not None else dataset_id
         success = self._db.datasets.delete(target_id)
@@ -1133,10 +1186,12 @@ class CatalogService:
         except ValueError, TypeError:
             pass
 
+        storage_sym = self._resolve_storage_symbol(existing)
+        tick_size = self._get_instrument_tick_size(storage_sym)
         if existing.data_kind == "ticks":
             ticks = self._storage.read_ticks_slice(
                 source=existing.source,
-                symbol=existing.symbol,
+                symbol=storage_sym,
                 date_from=date_from,
                 date_to=date_to,
                 limit=limit,
@@ -1147,7 +1202,7 @@ class CatalogService:
 
         bars = self._storage.read_bars_slice(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
             date_from=date_from,
             date_to=date_to,
@@ -1175,10 +1230,11 @@ class CatalogService:
         if existing is None:
             raise ValueError(f"Dataset not found: {dataset_id}")
 
-        tick_size = self._get_instrument_tick_size(existing.symbol)
+        storage_sym = self._resolve_storage_symbol(existing)
+        tick_size = self._get_instrument_tick_size(storage_sym)
         bars = self._storage.read_bars_slice(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
             limit=limit,
             offset=offset,
@@ -1217,9 +1273,10 @@ class CatalogService:
             return -1
 
         dt_target = parse_iso_to_utc_datetime(effective_date)
+        storage_sym = self._resolve_storage_symbol(existing)
         lf = self._storage.scan_bars(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
         )
         df_filtered = (
@@ -1236,9 +1293,10 @@ class CatalogService:
         """Compute new date_from and date_to boundaries after partition patch."""
         if total_bars == 0:
             return "", ""
+        storage_sym = self._resolve_storage_symbol(existing)
         first_slice = self._storage.read_bars_slice(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
             limit=1,
             offset=0,
@@ -1246,7 +1304,7 @@ class CatalogService:
         )
         last_slice = self._storage.read_bars_slice(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
             limit=1,
             offset=max(0, total_bars - 1),
@@ -1271,10 +1329,11 @@ class CatalogService:
         if existing is None:
             raise ValueError(f"Dataset not found: {dataset_id}")
 
-        tick_size = self._get_instrument_tick_size(existing.symbol)
+        storage_sym = self._resolve_storage_symbol(existing)
+        tick_size = self._get_instrument_tick_size(storage_sym)
         total_bars = self._storage.patch_bars(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
             changed_bars=changed_bars,
             deleted_timestamps=deleted_timestamps,
@@ -1311,10 +1370,11 @@ class CatalogService:
         if existing is None:
             return {"status": "NOT_FOUND", "quality_score": 0.0, "anomalies": []}
 
-        tick_size = self._get_instrument_tick_size(existing.symbol)
+        storage_sym = self._resolve_storage_symbol(existing)
+        tick_size = self._get_instrument_tick_size(storage_sym)
         bars = self._storage.read_bars_slice(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
             limit=existing.bars or 1000000,
             tick_size=tick_size,
@@ -1357,10 +1417,11 @@ class CatalogService:
         if existing is None:
             return []
 
-        tick_size = self._get_instrument_tick_size(existing.symbol)
+        storage_sym = self._resolve_storage_symbol(existing)
+        tick_size = self._get_instrument_tick_size(storage_sym)
         bars = self._storage.read_bars_slice(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
             limit=existing.bars or 1000000,
             tick_size=tick_size,
@@ -1405,10 +1466,11 @@ class CatalogService:
             postfix=postfix,
         )
 
-        tick_size = self._get_instrument_tick_size(existing.symbol)
+        storage_sym = self._resolve_storage_symbol(existing)
+        tick_size = self._get_instrument_tick_size(storage_sym)
         bars = self._storage.read_bars_slice(
             source=existing.source,
-            symbol=existing.symbol,
+            symbol=storage_sym,
             timeframe=existing.timeframe,
             limit=existing.bars or 1000000,
             tick_size=tick_size,
@@ -1433,6 +1495,7 @@ class CatalogService:
             timeframe=existing.timeframe,
             bars=cloned_bars,
             instrument=existing.instrument,
+            underlying=target_symbol,
             source_data_id=existing.id,
             timezone=tz_label,
         )

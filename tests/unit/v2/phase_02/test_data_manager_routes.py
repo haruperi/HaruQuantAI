@@ -27,6 +27,7 @@ CLI Usage:
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -458,3 +459,18 @@ def test_provider_download_resolves_postfixed_underlying_symbol(
     assert ds is not None
     assert ds.bars == 1
     assert ds.symbol == "GBPUSD_DUKASCOPY"
+    assert ds.underlying == "GBPUSD"
+    # Ensure on-disk storage path uses canonical underlying symbol (gbpusd) without postfix
+    norm_path = ds.path.replace("\\", "/")
+    assert norm_path.endswith("m1/gbpusd")
+    lineage = json.loads(ds.lineage_json)
+    partitions = [p.replace("\\", "/") for p in lineage.get("partitions", [])]
+    assert any(p.endswith("gbpusd/2025.parquet") for p in partitions)
+    assert not any("gbpusd_dukascopy" in p for p in partitions)
+
+    # Verify reviewData successfully reads bars from the canonical underlying storage directory
+    review_resp = client.get(f"/data/reviewData?dataset_id={ds.id}")
+    assert review_resp.status_code == 200
+    rows = review_resp.json()["data"]["rows"]
+    assert len(rows) == 1
+    assert rows[0]["open"] == 1.2500

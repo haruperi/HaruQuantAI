@@ -202,6 +202,7 @@ def _execute_async_download(
             symbol=symbol,
             timeframe=timeframe,
             bars=bars,
+            underlying=provider_sym,
         )
         DataManagerLogService(db).log_activity(
             "DOWNLOAD",
@@ -888,18 +889,29 @@ class DataRouterService:
         tf_clean = payload.timeframe.strip().upper()
         data_kind = "ticks" if tf_clean in ("TICK", "TICKS") else "bars"
 
+        und_clean = (payload.underlying or "").strip().upper()
+        if not und_clean:
+            if "_" in sym_clean:
+                und_clean = sym_clean.split("_")[0]
+            elif "." in sym_clean:
+                und_clean = sym_clean.split(".")[0]
+            elif sym_clean.endswith(src_clean.upper()):
+                und_clean = sym_clean[: -len(src_clean)]
+            else:
+                und_clean = sym_clean
+
         ds_id = payload.id or f"ds_{src_clean}_{sym_clean.lower()}_{tf_clean.lower()}"
         path = payload.path
         if not path:
             folder_kind = "ticks" if data_kind == "ticks" else tf_clean.lower()
-            path = f"data\\market\\{src_clean}\\{folder_kind}\\{sym_clean.lower()}"
+            path = f"data\\market\\{src_clean}\\{folder_kind}\\{und_clean.lower()}"
 
         record = DatasetRecord(
             id=ds_id,
             source=payload.source,
             symbol=sym_clean,
-            underlying=payload.underlying or sym_clean,
-            instrument=payload.instrument or sym_clean,
+            underlying=und_clean,
+            instrument=payload.instrument or und_clean,
             timeframe=tf_clean,
             broker=payload.broker,
             broker_name=payload.broker_name,
@@ -2809,6 +2821,7 @@ class DataRouterService:
                     symbol=payload.symbol,
                     timeframe=payload.timeframe or "M1",
                     bars=bars,
+                    underlying=provider_sym,
                 )
             self._emit_event(
                 "data.provider",
