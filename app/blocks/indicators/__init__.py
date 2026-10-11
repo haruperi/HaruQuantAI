@@ -9,6 +9,7 @@ Re-exports all 73 quantitative indicators across domain subpackages:
 - regime: Market regime classification, persistence, and choppiness (3).
 """
 
+from app.blocks.indicators.base import BaseIndicator, IndicatorSeries
 from app.blocks.indicators.momentum import (
     CCI,
     MACD,
@@ -122,6 +123,7 @@ __all__ = [
     "AvgVolume",
     "AwesomeOscillator",
     "BarRange",
+    "BaseIndicator",
     "BearsPower",
     "BollingerBands",
     "BullsPower",
@@ -141,6 +143,7 @@ __all__ = [
     "HullMovingAverage",
     "HurstExponent",
     "Ichimoku",
+    "IndicatorSeries",
     "KaufmanEfficiencyRatio",
     "KeltnerChannel",
     "LaguerreRSI",

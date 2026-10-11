@@ -50,7 +50,7 @@ from typing import Any, override
 
 import numpy as np
 
-from app.blocks.base import BaseIndicator, IndicatorSeries
+from app.blocks.indicators.base import BaseIndicator, IndicatorSeries
 from app.host.logging import get_logger
 
 logger = get_logger(__name__)

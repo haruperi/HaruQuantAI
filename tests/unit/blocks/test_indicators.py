@@ -252,7 +252,6 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from app.blocks.base import IndicatorSeries
 from app.blocks.indicators import (
     ADX,
     ATR,
@@ -328,6 +327,7 @@ from app.blocks.indicators import (
     WilliamsPR,
     ZigZag,
 )
+from app.blocks.indicators.base import IndicatorSeries
 
 SuperTrend = Supertrend
 

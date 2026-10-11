@@ -20,7 +20,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.blocks.base import IndicatorSeries
+    from app.blocks.indicators.base import IndicatorSeries
 
     series = IndicatorSeries(np.array([10.0, 12.0, 11.5, 13.0]))
     current_val = series.get(0)  # 13.0
@@ -302,3 +302,6 @@ class BaseIndicator(ABC):
     @abstractmethod
     def calculate(cls, *args: Any, **kwargs: Any) -> Any:
         """Compute the indicator series."""
+
+
+__all__ = ["BaseIndicator", "IndicatorSeries"]

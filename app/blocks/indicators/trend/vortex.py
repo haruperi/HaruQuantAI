@@ -48,7 +48,7 @@ from typing import override
 
 import numpy as np
 
-from app.blocks.base import BaseIndicator, IndicatorSeries
+from app.blocks.indicators.base import BaseIndicator, IndicatorSeries
 from app.blocks.indicators.volatility.atr import ATR
 from app.host.logging import get_logger
 
