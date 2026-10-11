@@ -2799,23 +2799,82 @@ def test_price_velocity() -> None:
 
 def test_candlestick_patterns() -> None:
     """Verify CandlestickPatterns recognition of standard formations."""
-    o = np.array([100.0, 100.0, 100.0, 102.0, 97.5, 100.0, 96.0])
-    h = np.array([105.0, 105.0, 101.0, 103.0, 104.0, 102.0, 105.0])
-    low_arr = np.array([95.0, 95.0, 85.0, 97.0, 97.0, 98.0, 95.0])
-    c = np.array([102.0, 100.05, 100.5, 98.0, 103.0, 101.0, 104.0])
+    o = np.array(
+        [
+            100.0,
+            100.0,
+            100.0,
+            102.0,
+            97.5,
+            100.0,
+            96.0,
+            105.0,
+            93.0,
+            100.0,
+            112.0,
+        ]
+    )
+    h = np.array(
+        [
+            105.0,
+            105.0,
+            101.0,
+            103.0,
+            104.0,
+            102.0,
+            105.0,
+            106.0,
+            102.0,
+            111.0,
+            113.0,
+        ]
+    )
+    low_arr = np.array(
+        [
+            95.0,
+            95.0,
+            85.0,
+            97.0,
+            97.0,
+            98.0,
+            95.0,
+            94.0,
+            92.0,
+            99.0,
+            102.0,
+        ]
+    )
+    c = np.array(
+        [
+            102.0,
+            100.05,
+            100.5,
+            98.0,
+            103.0,
+            101.0,
+            104.0,
+            95.0,
+            101.0,
+            110.0,
+            103.0,
+        ]
+    )
 
     patterns = CandlestickPatterns.calculate(o, h, low_arr, c, doji_ratio=0.10)
     assert "doji" in patterns and "engulfing" in patterns
     assert "pinbar" in patterns and "inside_bar" in patterns
-    assert "three_bar" in patterns
+    assert "three_bar" in patterns and "dark_cloud" in patterns
+    assert "piercing_line" in patterns
 
     doji = patterns["doji"]
     engulfing = patterns["engulfing"]
     pinbar = patterns["pinbar"]
     inside = patterns["inside_bar"]
     three_bar = patterns["three_bar"]
+    dark_cloud = patterns["dark_cloud"]
+    piercing_line = patterns["piercing_line"]
 
-    assert len(doji) == 7
+    assert len(doji) == 11
     # Bar 1 is Doji (body 0.05 / range 10.0 = 0.005 <= 0.10)
     assert doji.values[1] == 1.0
     # Bar 2 is Hammer/Pinbar (lower wick 15.0, body 0.5)
@@ -2824,24 +2883,32 @@ def test_candlestick_patterns() -> None:
     assert engulfing.values[4] == 1.0
     # Bar 5 is Inside Bar of Bar 4
     assert inside.values[5] == 1.0
+    # Bar 8 is Piercing Line after Bar 7
+    assert piercing_line.values[8] == 1.0
+    # Bar 10 is Dark Cloud Cover after Bar 9
+    assert dark_cloud.values[10] == 1.0
 
     # Condition helpers
-    assert isinstance(CandlestickPatterns.is_doji(doji, shift=5), bool)
+    assert isinstance(CandlestickPatterns.is_doji(doji, shift=9), bool)
     assert isinstance(
-        CandlestickPatterns.is_bullish_engulfing(engulfing, shift=2), bool
+        CandlestickPatterns.is_bullish_engulfing(engulfing, shift=6), bool
     )
     assert isinstance(
         CandlestickPatterns.is_bearish_engulfing(engulfing, shift=0), bool
     )
-    assert isinstance(CandlestickPatterns.is_bullish_pinbar(pinbar, shift=4), bool)
+    assert isinstance(CandlestickPatterns.is_bullish_pinbar(pinbar, shift=8), bool)
+    assert isinstance(CandlestickPatterns.is_hammer(pinbar, shift=8), bool)
     assert isinstance(CandlestickPatterns.is_bearish_pinbar(pinbar, shift=0), bool)
-    assert isinstance(CandlestickPatterns.is_inside_bar(inside, shift=1), bool)
+    assert isinstance(CandlestickPatterns.is_shooting_star(pinbar, shift=0), bool)
+    assert isinstance(CandlestickPatterns.is_inside_bar(inside, shift=5), bool)
     assert isinstance(
         CandlestickPatterns.is_bullish_three_bar(three_bar, shift=0), bool
     )
     assert isinstance(
         CandlestickPatterns.is_bearish_three_bar(three_bar, shift=0), bool
     )
+    assert CandlestickPatterns.is_piercing_line(piercing_line, shift=2) is True
+    assert CandlestickPatterns.is_dark_cloud(dark_cloud, shift=0) is True
 
     # Edge cases
     with pytest.raises(ValueError, match="strictly between 0 and 1"):
