@@ -83,6 +83,7 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
 import hashlib
 import json
@@ -98,6 +99,7 @@ from pathlib import Path
 from typing import Any, override
 
 import polars as pl
+import pyarrow.parquet as pq
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.host.logging import get_logger
@@ -132,6 +134,14 @@ SEPARATE_DT_MIN_FIELDS = 6
 ALIAS_COLON_PART_COUNT = 3
 MS_EPOCH_THRESHOLD = 1e11
 WEEKEND_START_DAY = 5
+BAR_PARTITION_PARTS = 4
+TICK_PARTITION_PARTS = 5
+FOREX_RAW_TICK_THRESHOLD = 500_000
+SIX_DIGIT_TICK_SCALE = 0.000001
+IGNORED_PARTITION_DIRS = frozenset(
+    {"database", "logs", "plugins", "resources", "staging"}
+)
+SIX_DIGIT_FOREX_SYMBOLS = frozenset({"EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCHF"})
 
 
 class IngestionConfig(BaseModel):
@@ -209,6 +219,9 @@ class DatasetRecord(BaseModel):
     data_kind: str = Field(
         default="bars", description="Kind of data ('bars' or 'ticks')"
     )
+    bar_type: str = Field(
+        default="Start of bar", description="Bar timestamp convention"
+    )
     quality_score: float = Field(
         default=1.0, ge=0.0, le=1.0, description="Quality confidence score"
     )
@@ -220,9 +233,25 @@ class DatasetRecord(BaseModel):
 
     @override
     def model_post_init(self, _context: Any, /) -> None:
-        """Ensure bar_count mirrors bars and unpack source_data_id from lineage."""
+        """Ensure bar_count mirrors bars, dates are date-only, and unpack lineage."""
         if self.bar_count is None:
             object.__setattr__(self, "bar_count", self.bars)
+        if self.date_from and ("T" in self.date_from or " " in self.date_from):
+            object.__setattr__(
+                self,
+                "date_from",
+                self.date_from.split("T", maxsplit=1)[0]
+                .split(" ", maxsplit=1)[0]
+                .strip(),
+            )
+        if self.date_to and ("T" in self.date_to or " " in self.date_to):
+            object.__setattr__(
+                self,
+                "date_to",
+                self.date_to.split("T", maxsplit=1)[0]
+                .split(" ", maxsplit=1)[0]
+                .strip(),
+            )
         if self.source_data_id is None and self.lineage_json:
             try:
                 lineage = json.loads(self.lineage_json)
@@ -273,7 +302,7 @@ def _resolve_clone_parameters(
 ) -> tuple[timedelta | None, zoneinfo.ZoneInfo | None, str, str]:
     """Resolve shift, tz object, tz label, and symbol postfix."""
     if timezone_type == "hours" or shift_hours is not None:
-        sh = int(shift_hours or 0)
+        sh = shift_hours or 0
         shift_delta = timedelta(hours=sh)
         tz_obj = None
         clone_time_str = f"{sh:+d}h"
@@ -323,20 +352,91 @@ class CatalogService:
             return instr.tick_size
         return DEFAULT_TICK_SIZE
 
+    def _clean_broker_name(self, name: str) -> str:
+        """Strip SQX brackets [[...]] from broker display name."""
+        clean = name.strip()
+        if clean.startswith("[[") and clean.endswith("]]"):
+            clean = clean[2:-2].strip()
+        return clean
+
+    def _resolve_broker_display_name(self, broker: str, broker_name: str) -> str:
+        """Resolve human-readable broker profile name instead of numeric ID."""
+        clean_name = self._clean_broker_name(broker_name)
+        if clean_name in ("-1", "", "Default"):
+            return "Default"
+        if clean_name.isdigit():
+            b = self._broker_service.get_broker(int(clean_name))
+            if b is not None:
+                return self._clean_broker_name(b.name)
+            return f"Broker {clean_name}"
+        if broker.isdigit() and broker != "-1":
+            b = self._broker_service.get_broker(int(broker))
+            if b is not None:
+                return self._clean_broker_name(b.name)
+        return clean_name
+
+    def _make_relative_path(self, path_str: str) -> str:
+        """Convert absolute storage path to application-relative path."""
+        if not path_str:
+            return ""
+        clean = path_str.strip()
+        p = Path(clean)
+        try:
+            cwd = Path.cwd().resolve()
+            resolved = p.resolve()
+            if resolved.is_relative_to(cwd):
+                return str(resolved.relative_to(cwd))
+        except ValueError, OSError, RuntimeError:
+            pass
+        lower = clean.lower()
+        idx = lower.find("data\\")
+        if idx == -1:
+            idx = lower.find("data/")
+        if idx >= 0:
+            return clean[idx:]
+        return clean
+
+    @staticmethod
+    def _extract_date_alone(dt_str: str) -> str:
+        """Normalize timestamp or ISO string to date alone (YYYY-MM-DD)."""
+        if not dt_str:
+            return ""
+        return dt_str.split("T", maxsplit=1)[0].split(" ", maxsplit=1)[0].strip()
+
     def save_dataset(self, dataset: DatasetRecord) -> str:
         """Persist or update dataset metadata in host persistence.
 
         Fires FR-DATA-CATALOG-DATASET-REGISTRY and
         FR-DATA-CATALOG-REVISION-INTEGRITY.
         """
-        payload = dataset.model_dump(exclude={"bar_count", "source_data_id"})
+        resolved_name = self._resolve_broker_display_name(
+            dataset.broker, dataset.broker_name
+        )
+        rel_path = self._make_relative_path(dataset.path)
+        d_from = self._extract_date_alone(dataset.date_from)
+        d_to = self._extract_date_alone(dataset.date_to)
+        updates: dict[str, Any] = {}
+        if resolved_name != dataset.broker_name:
+            updates["broker_name"] = resolved_name
+        if rel_path != dataset.path:
+            updates["path"] = rel_path
+        if d_from != dataset.date_from:
+            updates["date_from"] = d_from
+        if d_to != dataset.date_to:
+            updates["date_to"] = d_to
+        if updates:
+            dataset = dataset.model_copy(update=updates)
+        payload = dataset.model_dump(
+            exclude={"bar_count", "source_data_id", "bar_type"}
+        )
         if dataset.source_data_id:
+            lineage: dict[str, Any] = {}
             try:
-                lineage = json.loads(payload.get("lineage_json") or "{}")
-                if not isinstance(lineage, dict):
-                    lineage = {}
+                parsed = json.loads(payload.get("lineage_json") or "{}")
+                if isinstance(parsed, dict):
+                    lineage = parsed
             except json.JSONDecodeError, TypeError:
-                lineage = {}
+                pass
             lineage["source_data_id"] = dataset.source_data_id
             payload["lineage_json"] = json.dumps(lineage)
         now = datetime.now(UTC).isoformat()
@@ -399,7 +499,23 @@ class CatalogService:
                 },
             )
             return None
-        return DatasetRecord.model_validate(row)
+        rec = DatasetRecord.model_validate(row)
+        resolved_name = self._resolve_broker_display_name(rec.broker, rec.broker_name)
+        rel_path = self._make_relative_path(rec.path)
+        d_from = self._extract_date_alone(rec.date_from)
+        d_to = self._extract_date_alone(rec.date_to)
+        updates: dict[str, Any] = {}
+        if resolved_name != rec.broker_name:
+            updates["broker_name"] = resolved_name
+        if rel_path != rec.path:
+            updates["path"] = rel_path
+        if d_from != rec.date_from:
+            updates["date_from"] = d_from
+        if d_to != rec.date_to:
+            updates["date_to"] = d_to
+        if updates:
+            rec = rec.model_copy(update=updates)
+        return rec
 
     def list_datasets(
         self,
@@ -426,7 +542,28 @@ class CatalogService:
                 "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
             },
         )
-        return [DatasetRecord.model_validate(r) for r in rows]
+        results: list[DatasetRecord] = []
+        for r in rows:
+            rec = DatasetRecord.model_validate(r)
+            resolved_name = self._resolve_broker_display_name(
+                rec.broker, rec.broker_name
+            )
+            rel_path = self._make_relative_path(rec.path)
+            d_from = self._extract_date_alone(rec.date_from)
+            d_to = self._extract_date_alone(rec.date_to)
+            updates: dict[str, Any] = {}
+            if resolved_name != rec.broker_name:
+                updates["broker_name"] = resolved_name
+            if rel_path != rec.path:
+                updates["path"] = rel_path
+            if d_from != rec.date_from:
+                updates["date_from"] = d_from
+            if d_to != rec.date_to:
+                updates["date_to"] = d_to
+            if updates:
+                rec = rec.model_copy(update=updates)
+            results.append(rec)
+        return results
 
     def delete_dataset(self, dataset_id: str) -> bool:
         """Delete dataset record and all on-disk partitions.
@@ -439,6 +576,207 @@ class CatalogService:
     def count_datasets(self) -> int:
         """Return total count of persisted datasets."""
         return self._db.datasets.count()
+
+    @staticmethod
+    def _scan_disk_partition_series(
+        base_dir: Path,
+    ) -> dict[tuple[str, str, str, str], list[Path]]:
+        """Collect and index valid partitioned parquet files by series key."""
+        series_map: dict[tuple[str, str, str, str], list[Path]] = {}
+        for pf in sorted(base_dir.rglob("*.parquet")):
+            try:
+                rel = pf.relative_to(base_dir)
+            except ValueError:
+                continue
+            parts = rel.parts
+            if not parts or parts[0] in IGNORED_PARTITION_DIRS:
+                continue
+
+            if len(parts) == BAR_PARTITION_PARTS and parts[1].lower() != "ticks":
+                src, tf, sym = (
+                    parts[0].strip().lower(),
+                    parts[1].strip().upper(),
+                    parts[2].strip().upper(),
+                )
+                kind = "bars"
+            elif len(parts) == TICK_PARTITION_PARTS and parts[1].lower() == "ticks":
+                src = parts[0].strip().lower()
+                tf = "TICK"
+                sym = parts[2].strip().upper()
+                kind = "ticks"
+            else:
+                continue
+            series_map.setdefault((src, sym, tf, kind), []).append(pf)
+        return series_map
+
+    @staticmethod
+    def _read_partition_bounds(files: Sequence[Path]) -> tuple[int, str, str]:
+        """Read total rows and min/max date strings from parquet partition files."""
+        total_rows = 0
+        for f in files:
+            try:
+                total_rows += pq.read_metadata(f).num_rows
+            except (OSError, ValueError, TypeError) as exc:
+                logger.warning(
+                    "FR-DATA-CATALOG-DATASET-REGISTRY: Metadata error in %s: %s",
+                    f,
+                    exc,
+                    extra={"fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY"},
+                )
+
+        date_from = ""
+        date_to = ""
+        if files:
+            try:
+                t_first = pq.read_table(files[0], columns=["DateTime"])
+                if t_first.num_rows > 0:
+                    val_first = t_first.column("DateTime")[0].as_py()
+                    date_from = (
+                        val_first.strftime("%Y-%m-%d")
+                        if hasattr(val_first, "strftime")
+                        else CatalogService._extract_date_alone(str(val_first))
+                    )
+                t_last = pq.read_table(files[-1], columns=["DateTime"])
+                if t_last.num_rows > 0:
+                    val_last = t_last.column("DateTime")[-1].as_py()
+                    date_to = (
+                        val_last.strftime("%Y-%m-%d")
+                        if hasattr(val_last, "strftime")
+                        else CatalogService._extract_date_alone(str(val_last))
+                    )
+            except (OSError, ValueError, TypeError) as exc:
+                logger.warning(
+                    "FR-DATA-CATALOG-DATASET-REGISTRY: Bounds error in %s: %s",
+                    files[0],
+                    exc,
+                    extra={"fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY"},
+                )
+        return total_rows, date_from, date_to
+
+    def _resolve_partition_tick_size(
+        self, files: Sequence[Path], sym: str, kind: str
+    ) -> float:
+        """Resolve tick size from schema metadata, sample values, or instrument defs."""
+        tick_size = self._get_instrument_tick_size(sym)
+        if not files:
+            return tick_size
+        try:
+            meta = pq.read_metadata(files[0]).schema.to_arrow_schema().metadata or {}
+            raw_ts = meta.get(b"tick_size") or meta.get("tick_size")
+            if raw_ts:
+                return float(raw_ts)
+            if kind == "ticks":
+                t_sample = pq.read_table(files[0], columns=["Bid"])
+                if t_sample.num_rows > 0:
+                    first_bid = t_sample.column("Bid")[0].as_py()
+                    if (
+                        isinstance(first_bid, int)
+                        and first_bid > FOREX_RAW_TICK_THRESHOLD
+                        and sym in SIX_DIGIT_FOREX_SYMBOLS
+                    ):
+                        return SIX_DIGIT_TICK_SCALE
+        except OSError, ValueError, TypeError:
+            pass
+        return tick_size
+
+    def _resolve_dataset_record(
+        self,
+        src: str,
+        sym: str,
+        tf: str,
+        kind: str,
+        files: Sequence[Path],
+    ) -> DatasetRecord:
+        """Build or synchronize DatasetRecord for a partition file series."""
+        total_rows, date_from, date_to = self._read_partition_bounds(files)
+        tick_size = self._resolve_partition_tick_size(files, sym, kind)
+
+        category = "Forex"
+        if src in ("dukascopy", "darwinex"):
+            category = "Forex"
+        elif src in ("sq_equity", "yahoo"):
+            category = "Stocks"
+        elif src == "sq_futures":
+            category = "Futures"
+
+        dataset_id = f"ds_{src}_{sym.lower()}_{tf.lower()}"
+        existing = self.get_dataset(dataset_id)
+        if existing is None:
+            matches = [
+                d
+                for d in self.list_datasets(symbol=sym)
+                if d.timeframe.upper() == tf and d.source.lower() == src
+            ]
+            if matches:
+                existing = matches[0]
+                dataset_id = existing.id
+
+        p_dir = files[0].parent.parent if kind == "ticks" else files[0].parent
+        partition_dir = self._make_relative_path(str(p_dir))
+        lineage: dict[str, Any] = {
+            "tick_size": tick_size,
+            "partitions": [self._make_relative_path(str(f)) for f in files],
+            "data_kind": kind,
+        }
+        if existing and existing.source_data_id:
+            lineage["source_data_id"] = existing.source_data_id
+
+        return DatasetRecord(
+            id=dataset_id,
+            source=src,
+            symbol=sym,
+            underlying=sym,
+            instrument=existing.instrument if existing else sym,
+            timeframe=tf,
+            broker=src,
+            broker_name=src,
+            timezone=existing.timezone if existing else "UTC",
+            category=existing.category if existing else category,
+            date_from=date_from,
+            date_to=date_to,
+            bars=total_rows,
+            path=partition_dir,
+            data_kind=kind,
+            quality_score=1.0,
+            source_data_id=existing.source_data_id if existing else None,
+            lineage_json=json.dumps(lineage),
+            schema_version=1,
+        )
+
+    def sync_disk_partitions(self) -> list[DatasetRecord]:
+        """Scan on-disk market data partitions and synchronize with datamgr_datasets.
+
+        Discovers all bar and tick series under self._storage.base_dir, computes
+        actual row counts, chronological boundaries, and registers or updates
+        them in persistence.
+        Fires FR-DATA-CATALOG-DATASET-REGISTRY.
+        """
+        base_dir = self._storage.base_dir
+        if not base_dir.exists():
+            return []
+
+        series_map = self._scan_disk_partition_series(base_dir)
+        synced_records: list[DatasetRecord] = []
+        for (src, sym, tf, kind), files in sorted(series_map.items()):
+            record = self._resolve_dataset_record(src, sym, tf, kind, sorted(files))
+            self.save_dataset(record)
+            synced_records.append(record)
+            logger.info(
+                "FR-DATA-CATALOG-DATASET-REGISTRY: Synchronized on-disk dataset "
+                "'%s' (%s/%s/%s, %d rows)",
+                record.id,
+                src,
+                sym,
+                tf,
+                record.bars,
+                extra={
+                    "fr_id": "FR-DATA-CATALOG-DATASET-REGISTRY",
+                    "dataset_id": record.id,
+                    "bars": record.bars,
+                },
+            )
+
+        return synced_records
 
     def check_availability(
         self, symbol: str, timeframe: str = "M1"
@@ -663,14 +1001,17 @@ class CatalogService:
         if existing is None:
             return False
 
-        payload = existing.model_dump(exclude={"bar_count", "source_data_id"})
+        payload = existing.model_dump(
+            exclude={"bar_count", "source_data_id", "bar_type"}
+        )
         if existing.source_data_id:
+            lineage: dict[str, Any] = {}
             try:
-                lineage = json.loads(payload.get("lineage_json") or "{}")
-                if not isinstance(lineage, dict):
-                    lineage = {}
+                parsed = json.loads(payload.get("lineage_json") or "{}")
+                if isinstance(parsed, dict):
+                    lineage = parsed
             except json.JSONDecodeError, TypeError:
-                lineage = {}
+                pass
             lineage["source_data_id"] = existing.source_data_id
             payload["lineage_json"] = json.dumps(lineage)
         update_cols: list[str] = ["updated_at"]
@@ -714,12 +1055,22 @@ class CatalogService:
         )
         self._storage.clear_partitions(existing.source, kind, existing.symbol)
 
+        cleared_lineage: dict[str, Any] = {}
+        if existing.lineage_json:
+            with contextlib.suppress(Exception):
+                parsed = json.loads(existing.lineage_json)
+                if isinstance(parsed, dict):
+                    cleared_lineage = parsed
+        cleared_partitions: list[dict[str, Any]] = []
+        cleared_lineage["partitions"] = cleared_partitions
+
         cleared_record = existing.model_copy(
             update={
                 "bars": 0,
                 "bar_count": 0,
                 "date_from": "",
                 "date_to": "",
+                "lineage_json": json.dumps(cleared_lineage),
             }
         )
         self.save_dataset(cleared_record)
@@ -974,12 +1325,24 @@ class CatalogService:
 
         inspector = DataQualityInspector()
         summary = inspector.check_quality_summary(bars)
+        total_errors = int(summary.get("totalErrors", 0))
         summary["dataset_id"] = dataset_id
         summary["symbol"] = existing.symbol
         summary["timeframe"] = existing.timeframe
         summary["bars"] = existing.bars
         summary["date_from"] = existing.date_from
         summary["date_to"] = existing.date_to
+        summary["status"] = "VALID" if total_errors == 0 else "WARNING"
+        counts = summary.get("counts", {})
+        summary["quality_score"] = round(
+            inspector.compute_score(
+                total_bars=existing.bars or len(bars),
+                bad_bars=int(counts.get("ohlc", 0)),
+                duplicate_bars=int(counts.get("spike", 0)),
+                gap_bars=int(counts.get("gap", 0)),
+            ),
+            4,
+        )
         return summary
 
     def check_quality_details(

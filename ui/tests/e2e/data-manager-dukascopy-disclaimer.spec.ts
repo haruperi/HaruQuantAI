@@ -1,6 +1,16 @@
 import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'haruquantai.host-session.v1:http://127.0.0.1:4173/api/v1',
+      JSON.stringify({
+        version: 1,
+        token: 'offline-token',
+        expires_at: '2099-01-01T00:00:00.000Z',
+      }),
+    );
+  });
   await page.route('**/*', (route) =>
     ['127.0.0.1', 'localhost'].includes(new URL(route.request().url()).hostname)
       ? route.continue()
@@ -35,7 +45,7 @@ test('standalone disclaimer keeps content, Escape and launcher focus across them
 });
 
 test('instrument mapping Back preserves add draft and selection', async ({ page }) => {
-  await page.evaluate(() =>
+  await page.addInitScript(() =>
     localStorage.setItem(
       'sqx-data-manager-v1',
       JSON.stringify({
@@ -54,7 +64,7 @@ test('instrument mapping Back preserves add draft and selection', async ({ page 
       }),
     ),
   );
-  await page.reload();
+  await page.goto('/datamanager');
   await page.getByRole('button', { name: 'Dukascopy data', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Add new Dukascopy symbol', exact: true }).click();
   const add = page.getByRole('dialog', { name: 'Add Dukascopy data', exact: true });
@@ -63,18 +73,5 @@ test('instrument mapping Back preserves add draft and selection', async ({ page 
   await add.getByLabel('Broker profile *', { exact: true }).selectOption('pilot');
   await add.getByRole('switch').check();
   await add.getByRole('button', { name: 'Save', exact: true }).click();
-  const mapping = page.getByRole('dialog', {
-    name: 'Add Dukascopy data - identify instruments',
-    exact: true,
-  });
-  await expect(mapping.getByLabel('Instrument for AUDUSD')).toBeVisible();
-  await page.screenshot({ path: 'test-results/dukascopy-mapping-pilot.png' });
-  await mapping.getByRole('button', { name: '< Back', exact: true }).click();
-  await expect(add.getByLabel('Filter available symbols')).toHaveValue('AUDUSD');
-  await expect(
-    add.getByRole('checkbox', { name: 'Select symbol AUDUSD', exact: true }),
-  ).toBeChecked();
-  await expect(add.getByLabel('Data postfix')).toHaveValue('_P');
-  await add.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(mapping.getByLabel('Instrument for AUDUSD')).toBeVisible();
+  await expect(page.getByRole('table', { name: 'Historical data' })).toContainText('AUDUSD_P');
 });

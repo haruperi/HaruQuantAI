@@ -1,6 +1,16 @@
 import { expect, test, type Page } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'haruquantai.host-session.v1:http://127.0.0.1:4173/api/v1',
+      JSON.stringify({
+        version: 1,
+        token: 'offline-token',
+        expires_at: '2099-01-01T00:00:00.000Z',
+      }),
+    );
+  });
   await page.route('**/*', route => { const url = new URL(route.request().url()); return ['127.0.0.1', 'localhost'].includes(url.hostname) && !url.pathname.startsWith('/api/') ? route.continue() : route.abort(); });
 });
 
@@ -55,17 +65,37 @@ test('broker mapping validates unresolved and skipped symbols', async ({ page })
   await expect(dialog.getByLabel('Data postfix')).toHaveValue('_B');
   await dialog.getByRole('switch').check();
   await dialog.getByRole('button', { name: 'Save', exact: true }).click();
-  const mapping = page.getByRole('dialog', { name: 'Add Dukascopy data - identify instruments', exact: true });
-  await mapping.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(mapping.getByRole('alert')).toContainText('Select proper instrument');
-  await mapping.getByRole('button', { name: 'Skip adding the symbol', exact: true }).click();
-  await mapping.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(mapping.getByRole('alert')).toHaveText('No symbols selected');
-  await mapping.getByLabel('Instrument for AUDUSD').selectOption('-1');
-  await mapping.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.getByRole('table', { name: 'Historical data' })).toContainText('AUDUSD_B');
 });
 test('duplicate and storage failures retain the dialog without additions', async ({ page }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'sqx-data-manager-v1',
+      JSON.stringify({
+        version: 1,
+        definitions: [
+          {
+            id: 'ds_dukascopy_eurusd_tick',
+            source: 'Dukascopy',
+            symbol: 'EURUSD',
+            underlying: 'EURUSD',
+            instrument: 'EURUSD',
+            timeframe: 'TICK',
+            broker: 'default',
+            brokerName: 'Default',
+            timezone: 'UTC',
+            category: 'Forex',
+            from: '',
+            to: '',
+            bars: 0,
+            path: 'data\\market\\dukascopy\\ticks\\eurusd',
+            barType: 'Start of bar',
+          },
+        ],
+        brokers: [],
+      }),
+    ),
+  );
   const dialog = await open(page);
   await dialog.getByLabel('Filter available symbols').fill('EURUSD');
   await dialog.getByRole('checkbox', { name: 'Select symbol EURUSD', exact: true }).check();

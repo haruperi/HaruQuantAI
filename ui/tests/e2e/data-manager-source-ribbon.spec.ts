@@ -89,7 +89,7 @@ test('Data sources exposes every provider workflow and remains mock-only', async
   await expect(page.locator('.source-tree')).toHaveCount(0);
   await expect(page.getByRole('table', { name: 'Historical data' }).getByRole('columnheader')).toHaveText([
     '', 'Symbol Name ▴', 'Instrument', 'Broker profile', 'Underlying Symbol', 'Timeframe',
-    'Timezone', 'Date from', 'Date to', 'Total Days', 'Total Records', 'Source', 'Bar type', 'Data type', 'Hide', '',
+    'Timezone', 'Date from', 'Date to', 'Total Days', 'Total Records', 'Source', 'Bar type', 'Data type', 'Path', '', '',
   ]);
   await page.getByRole('textbox', { name: 'Filter items' }).fill('EURUSD');
   await expect(page.getByText('Records: 1', { exact: true })).toBeVisible();
@@ -188,10 +188,9 @@ test('Data sources exposes every provider workflow and remains mock-only', async
   await expect(page.getByRole('button', { name: 'Update selected', exact: true })).toBeEnabled();
 
   await page.getByRole('button', { name: 'Mass delete', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Remove or clear selected datasets' })).toBeVisible();
-  await page.getByRole('button', { name: 'Review dependency warning' }).click();
-  await expect(page.getByRole('dialog', { name: 'Dependent dataset warning' })).toBeVisible();
-  await page.getByRole('dialog', { name: 'Dependent dataset warning' }).getByRole('button', { name: 'Close' }).click();
+  await expect(page.getByRole('dialog', { name: 'Delete data' })).toBeVisible();
+  await expect(page.getByText(/Do you want to remove selected symbols/)).toBeVisible();
+  await page.getByRole('dialog', { name: 'Delete data' }).getByRole('button', { name: 'Close' }).click();
 
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.getByRole('dialog', { name: 'Save selected dataset definitions' })).toContainText('1 selected dataset');

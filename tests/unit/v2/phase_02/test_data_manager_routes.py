@@ -297,3 +297,164 @@ def test_provider_download_persistence(tmp_path: Path) -> None:
     assert len(datasets) == 1
     assert datasets[0].symbol == "EURUSD"
     assert datasets[0].bars == 2
+
+
+def test_create_dataset_persists_to_database(
+    test_setup: tuple[TestClient, CatalogService, DatabaseManager],
+) -> None:
+    """Validate POST /data/datasets inserts record directly into datamgr_datasets."""
+    client, catalog, db = test_setup
+
+    create_payload = {
+        "symbol": "GBPUSD",
+        "source": "Dukascopy",
+        "timeframe": "M1",
+        "broker": "-1",
+        "broker_name": "Default",
+        "timezone": "UTC",
+        "category": "Forex",
+        "underlying": "GBPUSD",
+        "instrument": "GBPUSD",
+    }
+    resp = client.post("/data/datasets", json=create_payload)
+    assert resp.status_code == 201
+    body = resp.json()["data"]
+    assert body["symbol"] == "GBPUSD"
+    assert body["timeframe"] == "M1"
+    assert body["path"] == "data\\market\\dukascopy\\m1\\gbpusd"
+    assert body["bar_type"] == "Start of bar"
+    assert body["bars"] == 0
+
+    # Query directly from database
+    row = db.datasets.get_by_id(body["id"])
+    assert row is not None
+    assert row["symbol"] == "GBPUSD"
+    assert row["source"] == "Dukascopy"
+    assert row["timeframe"] == "M1"
+    assert row["path"] == "data\\market\\dukascopy\\m1\\gbpusd"
+
+    # Query via catalog service
+    catalog_record = catalog.get_dataset(body["id"])
+    assert catalog_record is not None
+    assert catalog_record.symbol == "GBPUSD"
+    assert catalog_record.bar_type == "Start of bar"
+
+
+def test_provider_download_async_job_submits_to_job_manager(
+    tmp_path: Path,
+) -> None:
+    """Validate POST /data/providers/download with async_job=True submits to JobManager."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from app.host.jobs import JobManager
+
+    db_file = tmp_path / "async_download.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    res_dir = tmp_path / "resources"
+    res_dir.mkdir(parents=True, exist_ok=True)
+    res_mgr = ResourceManager(root_dir=res_dir)
+
+    pool = ThreadPoolExecutor(max_workers=2)
+    jm = JobManager(db_path=db_file, pool=pool)
+
+    app = FastAPI()
+    router = create_data_router(db_manager=db, resource_manager=res_mgr, job_manager=jm)
+    app.include_router(router)
+
+    client = TestClient(app)
+    download_payload = {
+        "provider": "dukascopy",
+        "symbol": "EURUSD",
+        "timeframe": "M1",
+        "date_from": "2025-01-01",
+        "date_to": "2025-01-02",
+        "async_job": True,
+    }
+    resp = client.post("/data/providers/download", json=download_payload)
+    assert resp.status_code == 202
+    data = resp.json()["data"]
+    assert data["provider"] == "dukascopy"
+    assert data["symbol"] == "EURUSD"
+    assert data["status"] == "pending"
+    assert "job_id" in data
+
+    # Verify job record in database
+    from app.host.persistence import JobStore
+
+    job_row = JobStore(db=db).get_job(data["job_id"])
+    assert job_row is not None
+    assert job_row["owner"] == "data_manager"
+    assert job_row["kind"] == "provider_download"
+
+    jm.close()
+
+
+def test_dukascopy_symbol_resolution() -> None:
+    """Verify DukascopyBroker._clean_symbol maps custom postfixed symbols to canonical instruments."""
+    from app.plugins.brokers.dukascopy import DukascopyBroker
+
+    broker = DukascopyBroker()
+    assert broker._clean_symbol("GBPUSD") == "GBPUSD"
+    assert broker._clean_symbol("GBPUSD_DUKASCOPY") == "GBPUSD"
+    assert broker._clean_symbol("GBPUSDDUKASCOPY") == "GBPUSD"
+    assert broker._clean_symbol("EURUSD.m") == "EURUSD"
+    assert broker._clean_symbol("EUR/USD") == "EURUSD"
+    assert broker._clean_symbol("BTC/USD_DUKAS") == "BTCUSD"
+
+
+def test_provider_download_resolves_postfixed_underlying_symbol(
+    test_setup: tuple[TestClient, CatalogService, DatabaseManager],
+) -> None:
+    """POST /data/providers/download uses underlying instrument and saves bars to postfixed dataset."""
+    client, catalog, _ = test_setup
+
+    # Create dataset with custom postfix and underlying mapped to GBPUSD
+    dataset_payload = {
+        "id": "ds_dukascopy_gbpusd_dukascopy_m1",
+        "symbol": "GBPUSD_DUKASCOPY",
+        "source": "dukascopy",
+        "timeframe": "M1",
+        "underlying": "GBPUSD",
+        "instrument": "GBPUSD",
+        "broker": "-1",
+        "broker_name": "Default",
+        "timezone": "UTC",
+        "category": "Forex",
+        "bar_type": "Start of bar",
+    }
+    client.post("/data/datasets", json=dataset_payload)
+
+    # Download with underlying specified
+    bars_downloaded = [
+        BarRecord(
+            timestamp_utc="2025-01-01T00:00:00Z",
+            open=1.2500,
+            high=1.2510,
+            low=1.2490,
+            close=1.2505,
+            volume=100.0,
+        )
+    ]
+    with pytest.MonkeyPatch().context() as mp:
+        mp.setattr(
+            "app.workspace.data_manager.connections.ProviderManager.download",
+            lambda self, req: bars_downloaded,
+        )
+        download_payload = {
+            "provider": "dukascopy",
+            "symbol": "GBPUSD_DUKASCOPY",
+            "timeframe": "M1",
+            "underlying": "GBPUSD",
+            "date_from": "2025-01-01",
+            "date_to": "2025-01-02",
+        }
+        resp = client.post("/data/providers/download", json=download_payload)
+        assert resp.status_code == 200
+
+    # Verify that the postfixed dataset in catalog received the bars
+    ds = catalog.get_dataset("ds_dukascopy_gbpusd_dukascopy_m1")
+    assert ds is not None
+    assert ds.bars == 1
+    assert ds.symbol == "GBPUSD_DUKASCOPY"

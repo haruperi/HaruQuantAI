@@ -8013,8 +8013,122 @@
         "static",
         "same_cohort"
       ]
+    },
+    "SQX145-EV-000197": {
+      "topic": "data_manager.plugins.data_manager_log",
+      "title": "DataManagerLog client plugin architecture",
+      "question": "How does StrategyQuant X implement the DataManagerLog plugin and data progress logging?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "data_manager"
+        ],
+        "conditions": [
+          "Static inspection of internal/plugins/DataManagerLog artifacts and layout."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "DataManagerLog in SQX-145 is a client-side AngularJS plugin without a dedicated backend JAR. It subscribes to WebSocket progress events (args.DMDataProgresses), formats log entries as YYYY.M.D HH:mm <key> <logStr>, prepends them into a 10,000-character in-memory buffer, and provides a clear log action.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Static donor inspection does not execute donor runtime; progress event emission occurs during download/ingestion jobs."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataManagerLog/module.js",
+          "location": {
+            "section": "plugin_registration",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "MainTab registration with dataItem log, dataTestid dm-tab-log, title Log, and help description."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "533bd12379f9e6eb1e68ef4d4cbc7fa63522b53d2dd3bf0449a9883c451e09d5"
+          },
+          "accessed_at": "2026-10-11"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/plugins/DataManagerLog/DMDataLogCtrl.js",
+          "location": {
+            "section": "controller",
+            "symbol": "onWebSocketData",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Controller subscribes to WebSocket DMDataProgresses, formats log lines, and handles clearLog."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "32aea04501cfb478fd6d5ea1cdf6c78aa4c86a3c6ef3166588fec8a920205999"
+          },
+          "accessed_at": "2026-10-11"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DATA-APP-DATA-MANAGER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/p00-ownership.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature is proposed; DataManagerLog client plugin operates under DataManager workspace without independent registered FR.",
+        "proposed_owner_readme": "app/workspace/DataManager/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Inspect all 4 files in SQX_REFERENCE_ROOT/internal/plugins/DataManagerLog and match with resources-145.json hashes.",
+        "expected_observation": "All 4 files exist with exact SHA-256 fingerprints, defining AngularJS module, controller, template, and stylesheet.",
+        "actual_observation": "Verified module.js, DMDataLogCtrl.js, dataLog.html, and DataManagerLog.css match resources-145.json exact hashes; confirmed WebSocket subscription and buffer handling.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/resources-145.json"
+        ],
+        "executed_at": "2026-10-11T09:04:00.000Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a10f01e8172f7cae86006df0e6fc73735f86307b",
+        "created_at": "2026-10-11T09:04:00.000Z",
+        "updated_at": "2026-10-11T09:04:00.000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased behavioral and architectural observations only; no proprietary code copied."
+      },
+      "tags": [
+        "data_manager",
+        "plugins",
+        "logging",
+        "static",
+        "angularjs"
+      ]
     }
   },
   "minimum_record_number": 132,
-  "allocation_high_water_mark": 196
+  "allocation_high_water_mark": 197
 }

@@ -60,7 +60,7 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
         ? current.filter((symbol) => !symbols.includes(symbol))
         : [...new Set([...current, ...symbols])],
     );
-  const save = () => {
+  const save = async () => {
     setError('');
     if (!selected.length) {
       setError('No symbols selected');
@@ -70,34 +70,25 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
       setError(disclaimer);
       return;
     }
-    if (broker !== '-1' && !mapping) {
-      setMapping(
-        Object.fromEntries(
-          selected.map((symbol) => [
-            symbol,
-            activeBroker?.instruments.find(
-              (item) => !item.startsWith('[') && item.startsWith(symbol),
-            ) ?? '-1001',
-          ]),
-        ),
-      );
-      return;
-    }
-    if (mapping && Object.values(mapping).includes('-1001')) {
-      setError('Select proper instrument or skip the symbol');
-      return;
-    }
-    const symbols = selected.filter((symbol) => mapping?.[symbol] !== '-1000');
+    const resolvedInstruments = selected.map((symbol) => {
+      if (activeBroker) {
+        const found = activeBroker.instruments.find(
+          (item) => item === symbol || (!item.startsWith('[') && item.startsWith(symbol)),
+        );
+        if (found) return found;
+      }
+      return '-1';
+    });
     try {
-      addData({
-        symbols,
+      await addData({
+        symbols: selected,
         dataType,
         broker,
         postfix,
-        instruments: mapping ? symbols.map((symbol) => mapping[symbol]) : [],
+        instruments: resolvedInstruments,
       });
       onComplete(
-        `${symbols.length} Dukascopy mock dataset definition${symbols.length === 1 ? '' : 's'} added`,
+        `${selected.length} Dukascopy mock dataset definition${selected.length === 1 ? '' : 's'} added`,
       );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to add symbols');

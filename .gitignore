@@ -187,6 +187,7 @@ log_*.txt
 # Data Files & Storage
 # ============================================================================
 data/market/*
+data/resources/*
 /results/
 exports/
 temp_data/

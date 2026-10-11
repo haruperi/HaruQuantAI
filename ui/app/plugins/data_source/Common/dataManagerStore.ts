@@ -26,26 +26,41 @@ export function setDataClient(client: DomainClient): void {
   dataClient = client;
 }
 
+export function normalizeRelativePath(path?: string): string {
+  if (!path) return '';
+  const trimmed = path.trim();
+  const dataIdx = trimmed.search(/data[\\/]/i);
+  if (dataIdx >= 0) {
+    return trimmed.slice(dataIdx);
+  }
+  return trimmed;
+}
+
 export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
-  try {
-    const list = await dataClient.get<Array<{
-      id: string;
-      symbol: string;
-      timeframe: string;
-      broker?: string;
-      broker_name?: string;
-      source?: string;
-      timezone?: string;
-      bars?: number;
-      bar_count?: number;
-      bars_count?: number;
-      date_from?: string;
-      date_to?: string;
-      category?: string;
-      underlying?: string;
-      instrument?: string;
-    }>>('/datasets');
-    return list.map(item => ({
+  const list = await dataClient.get<Array<{
+    id: string;
+    symbol: string;
+    timeframe: string;
+    broker?: string;
+    broker_name?: string;
+    source?: string;
+    timezone?: string;
+    bars?: number;
+    bar_count?: number;
+    bars_count?: number;
+    date_from?: string;
+    date_to?: string;
+    category?: string;
+    underlying?: string;
+    instrument?: string;
+    path?: string;
+    bar_type?: string;
+  }>>('/datasets');
+  return list.map(item => {
+    let bName = (item.broker_name || item.broker || 'Default').trim();
+    if (bName === '-1') bName = 'Default';
+    if (bName.startsWith('[[') && bName.endsWith(']]')) bName = bName.slice(2, -2).trim();
+    return {
       id: item.id,
       source: item.source || 'Server',
       symbol: item.symbol,
@@ -53,25 +68,27 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
       instrument: item.instrument || item.symbol,
       timeframe: item.timeframe,
       broker: item.broker || 'default',
-      brokerName: item.broker_name || item.broker || 'Default',
+      brokerName: bName,
       timezone: item.timezone || 'UTC',
       category: item.category || 'Forex',
-      from: item.date_from || '',
-      to: item.date_to || '',
+      from: (item.date_from || '').split(/[T ]/)[0],
+      to: (item.date_to || '').split(/[T ]/)[0],
       bars: item.bars ?? item.bar_count ?? item.bars_count ?? 0,
-    }));
-  } catch {
-    return [];
-  }
+      path: normalizeRelativePath(item.path),
+      barType: item.bar_type || 'Start of bar',
+    };
+  });
 }
 
 export interface MockDefinition {
   id: string; source: string; symbol: string; underlying: string; instrument: string;
   timeframe: string; broker: string; brokerName: string; timezone: string;
   category: string; from: string; to: string; bars: number;
+  path?: string;
+  barType?: string;
 }
 const storageKey = 'sqx-data-manager-v1';
-interface DataState { definitions: MockDefinition[]; brokers: BrokerProfile[]; brokerJob:BrokerUpdateJob|null; storageError: string; addData: (request: AddDukasRequest) => void;
+interface DataState { definitions: MockDefinition[]; brokers: BrokerProfile[]; brokerJob:BrokerUpdateJob|null; storageError: string; addData: (request: AddDukasRequest) => Promise<void>;
   saveBroker:(profile:BrokerProfile)=>Promise<void>; saveBrokerStocks:(id:string,stocks:string[])=>Promise<void>; removeBrokers:(ids:string[])=>Promise<void>; importBrokers:(profiles:Omit<BrokerProfile,'id'>[],overwrite:string[])=>Promise<number>;
   startBrokerUpdate:(ids:string[],existing:string[])=>void; advanceBrokerUpdate:()=>void; brokerAction:(action:'pause'|'resume'|'stop')=>void;
   syncRemoteDatasets: () => Promise<void>;
@@ -257,7 +274,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     }
   },
   brokerAction:action=>{const state=get();if(!state.brokerJob||!['running','paused'].includes(state.brokerJob.state))return;const brokerJob={...state.brokerJob,state:action==='pause'?'paused' as const:action==='resume'?'running' as const:'cancelled' as const};persistData(state,state.brokers,state.definitions,brokerJob);set({brokerJob});},
-  addData: request => {
+  addData: async request => {
     const state = get();
     if (useFileSymbols.getState().storageError) throw new Error(useFileSymbols.getState().storageError);
       if (useFileImports.getState().storageError) throw new Error(useFileImports.getState().storageError);
@@ -274,23 +291,59 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
       if (existingNames.has(name)) throw new Error(`Data symbol ${name} already exists. Choose a different postfix.`);
       existingNames.add(name);
       const mapping = request.instruments[index] ?? '-1';
-      if (broker && mapping !== '-1' && !broker.instruments.includes(mapping)) throw new Error('Select proper instrument or skip the symbol');
-      return { id: `dukas:${name}`, source: 'Dukascopy', symbol: name, underlying: symbol,
-        instrument: mapping === '-1' ? symbol : mapping, timeframe: request.dataType,
-        broker: request.broker, brokerName: broker?.name ?? 'Default', timezone: broker?.timezone ?? 'UTC',
-        category: item.category, from: '', to: '', bars: 0 };
+      const resolvedInstrument = (broker && mapping !== '-1' && broker.instruments.includes(mapping))
+        ? mapping
+        : symbol;
+      const folderKind = request.dataType === 'TICK' ? 'ticks' : 'm1';
+      return {
+        id: `ds_dukascopy_${name.toLowerCase()}_${request.dataType.toLowerCase()}`,
+        source: 'Dukascopy',
+        symbol: name,
+        underlying: symbol,
+        instrument: resolvedInstrument,
+        timeframe: request.dataType,
+        broker: request.broker,
+        brokerName: broker?.name ?? 'Default',
+        timezone: broker?.timezone ?? 'UTC',
+        category: item.category,
+        from: '',
+        to: '',
+        bars: 0,
+        path: `data\\market\\dukascopy\\${folderKind}\\${name.toLowerCase()}`,
+        barType: 'Start of bar',
+      };
     });
     const definitions = [...state.definitions, ...additions];
     if (definitions.length > 10000) throw new Error('Mock dataset limit reached');
     try { persistData(state,state.brokers,definitions,state.brokerJob); }
     catch { throw new Error('Unable to save mock definitions in browser storage. No symbols were added.'); }
     set({ definitions });
+    try {
+      for (const def of additions) {
+        await dataClient.post('/datasets', {
+          id: def.id,
+          symbol: def.symbol,
+          source: def.source,
+          timeframe: def.timeframe,
+          underlying: def.underlying,
+          instrument: def.instrument,
+          broker: def.broker,
+          broker_name: def.brokerName,
+          timezone: def.timezone,
+          category: def.category,
+          path: def.path,
+          bar_type: def.barType,
+        });
+      }
+    } catch {
+      // Offline / headless mock test fallback
+    }
   },
   syncRemoteDatasets: async () => {
     get().syncBrokers().catch(() => {});
     try {
       const remote = await fetchRemoteDatasets();
-      if (!remote) return;
+      if (!remote || !remote.length) return;
       const state = get();
       try { persistData(state, state.brokers, remote, state.brokerJob); } catch { /* ignore */ }
       set({ definitions: remote });
@@ -421,6 +474,7 @@ export const useDukascopyDownloads = create<DownloadStore>((set, get) => {
               await dataClient.post<{ job_id?: string; status?: string }>('/providers/download', {
                 provider: 'dukascopy',
                 symbol: target.symbol,
+                underlying: target.underlying || target.instrument,
                 timeframe: target.timeframe || 'M1',
                 date_from: request.dateFrom,
                 date_to: request.dateTo,

@@ -74,6 +74,10 @@ Key Capabilities:
         `BrokerStore.list_stocks()`, `BrokerStore.replace_stocks()`,
         `BrokerStore.get_counts()`, `BrokerStore.ensure_defaults()`
       Logging: DEBUG reads; INFO writes and lifecycle events.
+    - FR-HOST-PERSISTENCE-LOGS: Data Manager operational audit log CRUD.
+      Associated: `LogStore.create()`, `LogStore.list_logs()`, `LogStore.clear()`,
+        `LogStore.count()`
+      Logging: DEBUG reads; INFO writes and clears.
     - FR-HOST-PERSISTENCE-ANALYTICAL-QUERY: Direct DuckDB analytical query execution.
       Associated: `query_duckdb()`, `DatabaseManager.query_duckdb()`
       Logging: DEBUG execution with query text.
@@ -146,6 +150,7 @@ __all__ = [
     "JobStore",
     "LeaseExpiredError",
     "LeaseStore",
+    "LogStore",
     "MigrationRecord",
     "Page",
     "PersistenceError",
@@ -433,6 +438,7 @@ class DatabaseManager:
         self.datasets = DatasetStore(self)
         self.baskets = BasketStore(self)
         self.brokers = BrokerStore(self)
+        self.logs = LogStore(self)
 
     @property
     def is_memory(self) -> bool:
@@ -751,6 +757,118 @@ def _migrate_datamgr_tables(conn: sqlite3.Connection) -> None:
             "broker_id INTEGER NOT NULL DEFAULT -1;"
         )
 
+    # Clean up obsolete legacy market data tables that carry incompatible foreign keys
+    for table_name in (
+        "source_partitions",
+        "source_datasets",
+        "market_files",
+        "market_ingestions",
+    ):
+        conn.execute(f"DROP TABLE IF EXISTS {table_name};")
+
+
+def _migrate_host_jobs(conn: sqlite3.Connection) -> None:
+    """Ensure host_jobs table exists, migrates schemas, and creates indexes."""
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS host_jobs (
+            job_id TEXT PRIMARY KEY,
+            owner TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            status TEXT NOT NULL,
+            progress REAL NOT NULL DEFAULT 0.0,
+            accepted INTEGER NOT NULL DEFAULT 0,
+            rejected INTEGER NOT NULL DEFAULT 0,
+            message TEXT NOT NULL DEFAULT '',
+            attempt_id INTEGER NOT NULL DEFAULT 1,
+            max_retries INTEGER NOT NULL DEFAULT 0,
+            retry_count INTEGER NOT NULL DEFAULT 0,
+            dedup_key TEXT,
+            parent_job_id TEXT,
+            child_job_ids_json TEXT NOT NULL DEFAULT '[]',
+            budget_json TEXT NOT NULL DEFAULT '{}',
+            submitted_at_utc TEXT NOT NULL DEFAULT '',
+            started_at_utc TEXT,
+            finished_at_utc TEXT,
+            error_message TEXT,
+            error_location TEXT
+        );
+        """
+    )
+    table_info = conn.execute("PRAGMA table_info(host_jobs);").fetchall()
+    cols = {r["name"] for r in table_info}
+    required_cols = {
+        "owner": "TEXT NOT NULL DEFAULT 'default'",
+        "kind": "TEXT NOT NULL DEFAULT 'compute'",
+        "status": "TEXT NOT NULL DEFAULT 'completed'",
+        "progress": "REAL NOT NULL DEFAULT 0.0",
+        "accepted": "INTEGER NOT NULL DEFAULT 0",
+        "rejected": "INTEGER NOT NULL DEFAULT 0",
+        "message": "TEXT NOT NULL DEFAULT ''",
+        "attempt_id": "INTEGER NOT NULL DEFAULT 1",
+        "max_retries": "INTEGER NOT NULL DEFAULT 0",
+        "retry_count": "INTEGER NOT NULL DEFAULT 0",
+        "dedup_key": "TEXT",
+        "parent_job_id": "TEXT",
+        "child_job_ids_json": "TEXT NOT NULL DEFAULT '[]'",
+        "budget_json": "TEXT NOT NULL DEFAULT '{}'",
+        "submitted_at_utc": "TEXT NOT NULL DEFAULT ''",
+        "started_at_utc": "TEXT",
+        "finished_at_utc": "TEXT",
+        "error_message": "TEXT",
+        "error_location": "TEXT",
+    }
+    if "group_id" in cols:
+        conn.execute(
+            """
+            CREATE TABLE host_jobs_v2 (
+                job_id TEXT PRIMARY KEY,
+                owner TEXT NOT NULL DEFAULT 'default',
+                kind TEXT NOT NULL DEFAULT 'compute',
+                status TEXT NOT NULL DEFAULT 'completed',
+                progress REAL NOT NULL DEFAULT 0.0,
+                accepted INTEGER NOT NULL DEFAULT 0,
+                rejected INTEGER NOT NULL DEFAULT 0,
+                message TEXT NOT NULL DEFAULT '',
+                attempt_id INTEGER NOT NULL DEFAULT 1,
+                max_retries INTEGER NOT NULL DEFAULT 0,
+                retry_count INTEGER NOT NULL DEFAULT 0,
+                dedup_key TEXT,
+                parent_job_id TEXT,
+                child_job_ids_json TEXT NOT NULL DEFAULT '[]',
+                budget_json TEXT NOT NULL DEFAULT '{}',
+                submitted_at_utc TEXT NOT NULL DEFAULT '',
+                started_at_utc TEXT,
+                finished_at_utc TEXT,
+                error_message TEXT,
+                error_location TEXT
+            );
+            """
+        )
+        common_cols = [c for c in required_cols if c in cols]
+        cols_to_copy = ["job_id", *common_cols]
+        cols_str = ", ".join(cols_to_copy)
+        conn.execute(
+            f"INSERT OR IGNORE INTO host_jobs_v2 ({cols_str}) "  # noqa: S608
+            f"SELECT {cols_str} FROM host_jobs;"
+        )
+        conn.execute("DROP TABLE host_jobs;")
+        conn.execute("ALTER TABLE host_jobs_v2 RENAME TO host_jobs;")
+        table_info = conn.execute("PRAGMA table_info(host_jobs);").fetchall()
+        cols = {r["name"] for r in table_info}
+
+    for col_name, col_def in required_cols.items():
+        if col_name not in cols:
+            conn.execute(f"ALTER TABLE host_jobs ADD COLUMN {col_name} {col_def};")
+
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_host_jobs_owner ON host_jobs(owner);")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_host_jobs_status ON host_jobs(status);"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_host_jobs_dedup ON host_jobs(dedup_key);"
+    )
+
 
 # ============================================================================
 # Schema Migration Manager
@@ -829,72 +947,7 @@ class SchemaManager:
                 );
                 """
             )
-            conn.execute(
-                """
-                CREATE TABLE IF NOT EXISTS host_jobs (
-                    job_id TEXT PRIMARY KEY,
-                    owner TEXT NOT NULL,
-                    kind TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    progress REAL NOT NULL DEFAULT 0.0,
-                    accepted INTEGER NOT NULL DEFAULT 0,
-                    rejected INTEGER NOT NULL DEFAULT 0,
-                    message TEXT NOT NULL DEFAULT '',
-                    attempt_id INTEGER NOT NULL DEFAULT 1,
-                    max_retries INTEGER NOT NULL DEFAULT 0,
-                    retry_count INTEGER NOT NULL DEFAULT 0,
-                    dedup_key TEXT,
-                    parent_job_id TEXT,
-                    child_job_ids_json TEXT NOT NULL DEFAULT '[]',
-                    budget_json TEXT NOT NULL DEFAULT '{}',
-                    submitted_at_utc TEXT NOT NULL DEFAULT '',
-                    started_at_utc TEXT,
-                    finished_at_utc TEXT,
-                    error_message TEXT,
-                    error_location TEXT
-                );
-                """
-            )
-            # Ensure columns and backward-compatibility for host_jobs
-            table_info = conn.execute("PRAGMA table_info(host_jobs);").fetchall()
-            cols = {r["name"] for r in table_info}
-            required_cols = {
-                "owner": "TEXT NOT NULL DEFAULT 'default'",
-                "kind": "TEXT NOT NULL DEFAULT 'compute'",
-                "status": "TEXT NOT NULL DEFAULT 'completed'",
-                "progress": "REAL NOT NULL DEFAULT 0.0",
-                "accepted": "INTEGER NOT NULL DEFAULT 0",
-                "rejected": "INTEGER NOT NULL DEFAULT 0",
-                "message": "TEXT NOT NULL DEFAULT ''",
-                "attempt_id": "INTEGER NOT NULL DEFAULT 1",
-                "max_retries": "INTEGER NOT NULL DEFAULT 0",
-                "retry_count": "INTEGER NOT NULL DEFAULT 0",
-                "dedup_key": "TEXT",
-                "parent_job_id": "TEXT",
-                "child_job_ids_json": "TEXT NOT NULL DEFAULT '[]'",
-                "budget_json": "TEXT NOT NULL DEFAULT '{}'",
-                "submitted_at_utc": "TEXT NOT NULL DEFAULT ''",
-                "started_at_utc": "TEXT",
-                "finished_at_utc": "TEXT",
-                "error_message": "TEXT",
-                "error_location": "TEXT",
-            }
-            for col_name, col_def in required_cols.items():
-                if col_name not in cols:
-                    conn.execute(
-                        f"ALTER TABLE host_jobs ADD COLUMN {col_name} {col_def};"
-                    )
-
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_host_jobs_owner ON host_jobs(owner);"
-            )
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_host_jobs_status ON host_jobs(status);"
-            )
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_host_jobs_dedup "
-                "ON host_jobs(dedup_key);"
-            )
+            _migrate_host_jobs(conn)
 
             # Datamgr market data control tables
             conn.execute(
@@ -1049,6 +1102,20 @@ class SchemaManager:
                     broker_id INTEGER NOT NULL,
                     FOREIGN KEY(broker_id) REFERENCES datamgr_broker(id)
                         ON DELETE CASCADE
+                );
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS datamgr_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp_utc TEXT NOT NULL,
+                    action TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    symbol TEXT,
+                    details TEXT NOT NULL DEFAULT '{}',
+                    created_at TEXT NOT NULL DEFAULT
+                        (strftime('%Y-%m-%d %H:%M:%f', 'now'))
                 );
                 """
             )
@@ -2855,6 +2922,19 @@ class DatasetStore:
         sql = "DELETE FROM datamgr_datasets WHERE id = ?;"
         with self._db.transaction() as conn:
             cur = conn.cursor()
+            cur.execute(
+                "SELECT name FROM sqlite_master "
+                "WHERE type='table' AND name='source_datasets';"
+            )
+            if cur.fetchone():
+                cur.execute(
+                    "DELETE FROM source_partitions WHERE dataset_id = ?;",
+                    (dataset_id,),
+                )
+                cur.execute(
+                    "DELETE FROM source_datasets WHERE id = ?;",
+                    (dataset_id,),
+                )
             cur.execute(sql, (dataset_id,))
             success = cur.rowcount > 0
         logger.info(
@@ -3224,7 +3304,7 @@ class BasketStore:
 
             rows_to_insert = []
             for m in members:
-                df = m.get("date_from")
+                df = m["date_from"]
                 if df is None and date_from_not_null:
                     df = "1900-01-01"
                 dt = m.get("date_to")
@@ -4362,3 +4442,121 @@ class BrokerStore:
             "System broker profile defaults ensured",
             extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
         )
+
+
+# ============================================================================
+# Datamgr Operational Logs Persistence
+# ============================================================================
+
+
+class LogStore:
+    """Authoritative host persistence operations for datamgr_logs."""
+
+    def __init__(self, db: DatabaseManager) -> None:
+        """Initialize with parent DatabaseManager."""
+        self._db = db
+
+    def create(self, record: dict[str, Any]) -> int:
+        """Insert a new log record and return its generated ID."""
+        logger.debug(
+            "LogStore.create storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-LOGS"},
+        )
+        record_copy = dict(record)
+        details = record_copy.get("details", {})
+        if isinstance(details, (dict, list)):
+            details_str = json.dumps(details)
+        elif isinstance(details, str):
+            details_str = details
+        else:
+            details_str = "{}"
+
+        columns = ["timestamp_utc", "action", "message", "symbol", "details"]
+        values = [
+            record_copy.get("timestamp_utc", datetime.now(UTC).isoformat()),
+            str(record_copy.get("action", "")).upper(),
+            str(record_copy.get("message", "")),
+            str(record_copy["symbol"]).upper() if record_copy.get("symbol") else None,
+            details_str,
+        ]
+        placeholders = ", ".join(["?"] * len(columns))
+        sql = (
+            f"INSERT INTO datamgr_logs ({', '.join(columns)}) "  # noqa: S608
+            f"VALUES ({placeholders});"
+        )
+        with self._db.transaction() as conn:
+            cursor = conn.execute(sql, values)
+            return cursor.lastrowid or 0
+
+    def list_logs(
+        self,
+        symbol: str | None = None,
+        action: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[dict[str, Any]]:
+        """List log records ordered newest first with optional filters."""
+        logger.debug(
+            "LogStore.list_logs storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-LOGS"},
+        )
+        query = "SELECT * FROM datamgr_logs WHERE 1=1"
+        params: list[Any] = []
+        if symbol:
+            query += " AND UPPER(symbol) = UPPER(?)"
+            params.append(symbol.strip())
+        if action:
+            query += " AND UPPER(action) = UPPER(?)"
+            params.append(action.strip())
+        query += " ORDER BY id DESC LIMIT ? OFFSET ?;"
+        params.extend([limit, offset])
+
+        with self._db.connection(query_only=True) as conn:
+            rows = conn.execute(query, params).fetchall()
+            results: list[dict[str, Any]] = []
+            for r in rows:
+                item: dict[str, Any] = dict(r)
+                details_raw = item.get("details")
+                if isinstance(details_raw, str):
+                    fallback_details: dict[str, Any] = {}
+                    try:
+                        loaded = json.loads(details_raw)
+                        item["details"] = (
+                            loaded if isinstance(loaded, dict) else fallback_details
+                        )
+                    except json.JSONDecodeError, ValueError:
+                        item["details"] = fallback_details
+                results.append(item)
+            return results
+
+    def clear(self, symbol: str | None = None) -> int:
+        """Delete log records, optionally filtered by symbol. Return deleted count."""
+        logger.info(
+            "LogStore.clear storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-LOGS"},
+        )
+        query = "DELETE FROM datamgr_logs"
+        params: list[Any] = []
+        if symbol:
+            query += " WHERE UPPER(symbol) = UPPER(?)"
+            params.append(symbol.strip())
+        query += ";"
+        with self._db.transaction() as conn:
+            cursor = conn.execute(query, params)
+            return cursor.rowcount or 0
+
+    def count(self, symbol: str | None = None) -> int:
+        """Return count of log records."""
+        logger.debug(
+            "LogStore.count storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-LOGS"},
+        )
+        query = "SELECT COUNT(*) FROM datamgr_logs"
+        params: list[Any] = []
+        if symbol:
+            query += " WHERE UPPER(symbol) = UPPER(?)"
+            params.append(symbol.strip())
+        query += ";"
+        with self._db.connection(query_only=True) as conn:
+            row = conn.execute(query, params).fetchone()
+            return int(row[0]) if row else 0

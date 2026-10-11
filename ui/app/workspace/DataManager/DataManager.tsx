@@ -55,13 +55,16 @@ import { BrokerTransferDialog } from '../../plugins/data_source/Catalogs/BrokerP
 import { brokerCounts, serializeBrokersJson, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
 import { fetchBrokerStocks } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerApiClient';
 import { TickDownloaderImportDialog } from '../../plugins/data_source/TickDownloader/module';
-import { useTickDownloader } from '../../plugins/data_source/Common/dataManagerStore';
 import { ImportPopup } from '../../plugins/data_source/Dukascopy/import/module';
 import { DisclaimerPopup } from '../../plugins/data_source/Dukascopy/disclaimer/module';
 import { eligibleTargets, simulationSummary, type DownloadTarget } from '../../plugins/data_source/Dukascopy/dukascopyDownload';
-import { useDukascopyDownloads } from '../../plugins/data_source/Common/dataManagerStore';
 import { AddPopup } from '../../plugins/data_source/Dukascopy/add/module';
-import { useDataManagerStore } from '../../plugins/data_source/Common/dataManagerStore';
+import {
+  normalizeRelativePath,
+  useDataManagerStore,
+  useDukascopyDownloads,
+  useTickDownloader,
+} from '../../plugins/data_source/Common/dataManagerStore';
 import { CsvExportDialog } from '../../plugins/data_source/Export/CsvExportDialog';
 import { Mt4ExportDialog } from '../../plugins/data_source/Export/Mt4ExportDialog';
 import { Mt5ExportDialog } from '../../plugins/data_source/Export/Mt5ExportDialog';
@@ -71,6 +74,7 @@ import { CloneTimezoneDialog } from '../../plugins/data_source/Tools/CloneTimezo
 import { ViewAnalyzeDialog } from '../../plugins/data_source/Tools/ViewAnalyzeDialog';
 import { selectCloneTargets, selectReviewTarget, type ToolTarget } from '../../plugins/data_source/Tools/dataTools';
 import { toolsActive, useDataTools } from '../../plugins/data_source/Tools/dataToolsStore';
+import { clearLogs, fetchLogs, formatSqxLogLine } from './dataManagerLogClient';
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import {
   Bitcoin, ChartCandlestick, ChevronDown, ChevronRight, CircleDollarSign,
@@ -93,7 +97,7 @@ import mt5IconUrl from '../../assets/metatrader5.png';
 
 const tabs = ['Home', 'Data sources', 'Export', 'Tools', 'Instruments', 'Sessions', 'External indicators', 'Stock groups', 'Broker profiles', 'Log'];
 type OperationState = 'idle' | 'running' | 'paused' | 'completed' | 'cancelled';
-interface DialogState { id: DataSourceDialogId; exchange?: string }
+interface DialogState { id: DataSourceDialogId; exchange?: string; targetIds?: string[] }
 type InstrumentDialogState =
   | { kind: 'editor'; mode: 'add' | 'edit' | 'mass'; selected: FileInstrument[] }
   | { kind: 'clone'; source: FileInstrument }
@@ -192,7 +196,6 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
   onSecondary: (id: DataSourceDialogId) => void; onComplete: (message: string) => void;
 }) {
   const [agreed, setAgreed] = useState(false);
-  const [deleteOperation, setDeleteOperation] = useState<'remove' | 'clear'>('remove');
   const titles: Record<DataSourceDialogId, string> = {
     'new-instrument': 'Add instrument',
     'dukascopy-add': 'Add Dukascopy data', 'dukascopy-download': 'Download Dukascopy data',
@@ -203,11 +206,49 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
     'darwinex-import': 'Import data from a Darwinex folder', 'darwinex-download': 'Download Darwinex data',
     'crypto-add': `Add ${state.exchange ?? 'crypto'} symbols`, 'crypto-download': 'Download Crypto data',
     'yahoo-add': 'Add Yahoo data', 'yahoo-download': 'Download Yahoo data', 'mt5-import': 'Import data from MT5',
-    'mass-delete': 'Remove or clear selected datasets', 'save-definitions': 'Save selected dataset definitions',
+    'mass-delete': 'Delete data', 'save-definitions': 'Save selected dataset definitions',
     'load-definitions': 'Load dataset definitions', 'instrument-identification': 'Identify instruments for imported symbols',
     'data-format-name': 'Save data format', 'data-usage-conditions': 'Data usage conditions',
     'dependency-warning': 'Dependent dataset warning',
   };
+
+  if (state.id === 'mass-delete') {
+    const ids = state.targetIds ?? selectedIds ?? [];
+    const count = state.targetIds ? state.targetIds.length : selectedCount;
+    const handleClearData = async () => {
+      const store = useDataManagerStore.getState();
+      for (const id of ids) {
+        try { await store.clearDataset(id); } catch { /* ignore */ }
+      }
+      onComplete(`Cleared stored data for ${ids.length} dataset(s)`);
+    };
+    const handleDelete = async () => {
+      const store = useDataManagerStore.getState();
+      for (const id of ids) {
+        try { await store.removeDataset(id); } catch { /* ignore */ }
+      }
+      onComplete(`Removed ${ids.length} dataset(s)`);
+    };
+    return (
+      <Modal
+        title="Delete data"
+        onClose={onClose}
+        width={520}
+        className="sqx-delete-data-modal"
+        footer={
+          <>
+            <button className="sqx-delete-close-btn" onClick={onClose}>Close</button>
+            <button className="sqx-delete-action-btn" onClick={handleClearData}>Clear data</button>
+            <button className="sqx-delete-action-btn" onClick={handleDelete}>Delete</button>
+          </>
+        }
+      >
+        <p className="sqx-delete-prompt">
+          Do you want to remove selected symbols ({count}) or only clear their data ?
+        </p>
+      </Modal>
+    );
+  }
 
   let content;
   switch (state.id) {
@@ -223,9 +264,6 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
       break;
     case 'yahoo-add':
       content = <><Field label="Yahoo symbols"><textarea className="text-area" placeholder={'AAPL\nMSFT\nEURUSD=X'}/></Field><Field label="Data-name postfix"><TextInput placeholder="Optional"/></Field><MockBoundaryNote/></>;
-      break;
-    case 'mass-delete':
-      content = <><p><strong>{selectedCount}</strong> selected dataset{selectedCount === 1 ? '' : 's'} will be affected.</p><Field label="Requested operation"><Select value={deleteOperation} onChange={val => setDeleteOperation(val as 'remove' | 'clear')}><option value="remove">Remove dataset definitions and their data</option><option value="clear">Keep definitions and clear their stored data</option></Select></Field><p className="callout">A dependency check is required before this destructive operation can continue.</p></>;
       break;
     case 'save-definitions':
       content = <><p>Export definitions for <strong>{selectedCount}</strong> selected dataset{selectedCount === 1 ? '' : 's'}.</p><Field label="Suggested file name"><TextInput defaultValue="Data.json"/></Field><MockBoundaryNote/></>;
@@ -249,26 +287,15 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
 
   const informationOnly = ['dukascopy-information', 'data-usage-conditions'].includes(state.id);
   const agreementRequired = ['sq-equity-find', 'sq-futures-find'].includes(state.id);
-  const primaryLabel = state.id === 'mass-delete' ? 'Review dependency warning' : state.id === 'save-definitions' ? 'Download JSON' : state.id === 'load-definitions' ? 'Validate and load' : state.id === 'dependency-warning' ? 'Confirm deletion' : state.id === 'data-format-name' ? 'Save format' : state.id.includes('download') ? 'Start download' : state.id.includes('import') || state.id === 'mt5-import' ? 'Start import' : 'Save configuration';
+  const primaryLabel = state.id === 'save-definitions' ? 'Download JSON' : state.id === 'load-definitions' ? 'Validate and load' : state.id === 'dependency-warning' ? 'Confirm deletion' : state.id === 'data-format-name' ? 'Save format' : state.id.includes('download') ? 'Start download' : state.id.includes('import') || state.id === 'mt5-import' ? 'Start import' : 'Save configuration';
   const primaryAction = async () => {
-    if (state.id === 'mass-delete') {
-      onSecondary('dependency-warning');
-      return;
-    }
     if (state.id === 'dependency-warning') {
       const store = useDataManagerStore.getState();
       const ids = selectedIds || [];
-      if (deleteOperation === 'clear') {
-        for (const id of ids) {
-          try { await store.clearDataset(id); } catch { /* ignore */ }
-        }
-        onComplete(`Cleared stored data for ${ids.length} dataset(s)`);
-      } else {
-        for (const id of ids) {
-          try { await store.removeDataset(id); } catch { /* ignore */ }
-        }
-        onComplete(`Removed ${ids.length} dataset(s)`);
+      for (const id of ids) {
+        try { await store.removeDataset(id); } catch { /* ignore */ }
       }
+      onComplete(`Removed ${ids.length} dataset(s)`);
       return;
     }
     onComplete(`${titles[state.id]} completed`);
@@ -395,11 +422,28 @@ function InstrumentTable({ selected, onSelect, onEdit, onDelete }: {
   </main>;
 }
 
-function DatasetTable({ selectedIds, onToggle, onSelect }: {
+function getBrokerDisplayName(brokerName: string | undefined, brokerId: string | undefined, brokers: BrokerProfile[]): string {
+  const raw = (brokerName || '').trim();
+  if (!raw || raw === '-1' || brokerId === '-1') return 'Default';
+  if (raw.startsWith('[[') && raw.endsWith(']]')) return raw.slice(2, -2).trim();
+  const match = brokers.find(b => b.id === raw || b.id === brokerId);
+  if (match) return match.name.replace(/^\[\[/, '').replace(/\]\]$/, '').trim();
+  return raw;
+}
+
+function formatDateOnly(value: string | undefined): string {
+  if (!value) return '—';
+  const match = value.match(/^\d{4}-\d{2}-\d{2}/);
+  return match ? match[0] : value.split(/[T ]/)[0] || '—';
+}
+
+function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
   selectedIds: string[]; onToggle: (id: string) => void; onSelect: (ids: string[]) => void;
+  onDeleteRow?: (id: string) => void;
 }) {
   const td = useTickDownloader();
   const definitions = useDataManagerStore(state => state.definitions);
+  const brokerProfiles = useDataManagerStore(state => state.brokers);
   const downloadRanges = useDukascopyDownloads(state => state.ranges);
   const downloadJob = useDukascopyDownloads(state => state.job);
   const fileDefinitions = useFileSymbols(state => state.definitions);
@@ -413,13 +457,15 @@ function DatasetTable({ selectedIds, onToggle, onSelect }: {
   const tools = useDataTools();
   const stockGroups = useStockGroups();
   const [stockGroup, setStockGroup] = useState('');
-  const committed = definitions;
-  const allDatasets = [...committed, ...((activeImport(imports.job?.state) ? imports.job?.tasks : [])?.filter(task => !committed.some(row => row.id === task.record.id)).map(task => ({ ...task.record, from: '', to: '', bars: 0 })) ?? [])];
+  const committed = definitions.map(row => ({
+    ...row,
+    brokerName: getBrokerDisplayName(row.brokerName, row.broker, brokerProfiles),
+  }));
+  const allDatasets = [...committed, ...((activeImport(imports.job?.state) ? imports.job?.tasks : [])?.filter(task => !committed.some(row => row.id === task.record.id)).map(task => ({ ...task.record, brokerName: getBrokerDisplayName(task.record.brokerName, task.record.broker, brokerProfiles), from: '', to: '', bars: 0, path: '' })) ?? [])];
   const [query, setQuery] = useState('');
   const [source, setSource] = useState('');
   const [dataType, setDataType] = useState('');
   const [brokerFilter,setBrokerFilter]=useState('');
-  const [hiddenIds, setHiddenIds] = useState<string[]>([]);
   const [descending, setDescending] = useState(false);
   const rows = allDatasets.filter(row => (!source || row.source === source)
     && (!stockGroup || stockGroups.groups.find(group => group.id === stockGroup)?.members.some(member => member.ticker === row.symbol))
@@ -429,7 +475,7 @@ function DatasetTable({ selectedIds, onToggle, onSelect }: {
     .sort((a, b) => a.symbol.localeCompare(b.symbol) * (descending ? -1 : 1));
   const allSelected = rows.length > 0 && rows.every(row => selectedIds.includes(row.id));
   const columns = ['Instrument', 'Broker profile', 'Underlying Symbol', 'Timeframe', 'Timezone',
-    'Date from', 'Date to', 'Total Days', 'Total Records', 'Source', 'Bar type', 'Data type', 'Hide'];
+    'Date from', 'Date to', 'Total Days', 'Total Records', 'Source', 'Bar type', 'Data type', 'Path'];
   return <main className="full dataset-workspace" aria-label="Historical data">
     <div className="dataset-filters">
       <input className="text-input" aria-label="Filter items" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
@@ -447,7 +493,7 @@ function DatasetTable({ selectedIds, onToggle, onSelect }: {
       <thead><tr>
         <th><input type="checkbox" aria-label="Select all visible datasets" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selectedIds.filter(id => !rows.some(row => row.id === id)) : [...new Set([...selectedIds, ...rows.map(row => row.id)])])}/></th>
         <th aria-sort={descending ? 'descending' : 'ascending'}><button className="dataset-sort" onClick={() => setDescending(value => !value)}>Symbol Name <span aria-hidden="true">{descending ? '▾' : '▴'}</span></button></th>
-        {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Status" style={{ minWidth: 120 }}/>
+        {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Status" style={{ minWidth: 120 }}/><th aria-label="Row actions" style={{ width: 36 }}/>
       </tr></thead>
       <tbody>{rows.map(row => {
         const days = row.from && row.to ? Math.floor((Date.parse(row.to) - Date.parse(row.from)) / 86400000) + 1 : 0;
@@ -467,15 +513,17 @@ function DatasetTable({ selectedIds, onToggle, onSelect }: {
         const cloneIndex = tools.job?.tasks.findIndex(task => task.source.id === row.id || task.definition.id === row.id) ?? -1;
         const cloneStatus = cloneIndex >= 0 && tools.job ? cloneIndex < tools.job.completed || tools.job.state === 'completed' ? 'Completed' : `${tools.job.state.charAt(0).toUpperCase()}${tools.job.state.slice(1)} ${tools.job.progress}%` : tools.definitions.some(item => item.id === row.id) ? 'Completed' : '';
         const rowJob = row.id.startsWith('td:') && td.job?.request.symbols.some(symbol => `td:${symbol + td.job!.request.postfix}` === row.id) ? td.job : downloadJob?.request.targets.some(target => target.id === row.id) ? downloadJob : null;
+        const rowPath = 'path' in row && typeof row.path === 'string' ? normalizeRelativePath(row.path) : '';
         return <tr key={row.id} className={selectedIds.includes(row.id) ? 'selected' : ''}>
           <td><input type="checkbox" aria-label={`Select ${row.symbol}`} checked={selectedIds.includes(row.id)} onChange={() => onToggle(row.id)}/></td>
           <td><strong>{row.symbol}</strong></td><td>{row.instrument}</td><td>{row.brokerName}</td><td>{row.underlying}</td>
-          <td>{row.timeframe}</td><td>{row.timezone}</td><td>{row.from || '—'}</td><td>{row.to || '—'}</td><td>{days.toLocaleString()}</td>
-          <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row ? row.barType === "start" ? "Start of bar" : "End of bar" : "—"}</td><td>{row.category}</td>
-          <td><input type="checkbox" aria-label={`Hide ${row.symbol}`} checked={hiddenIds.includes(row.id)} onChange={() => setHiddenIds(current => current.includes(row.id) ? current.filter(id => id !== row.id) : [...current, row.id])}/></td>
+          <td>{row.timeframe}</td><td>{row.timezone}</td><td>{formatDateOnly(row.from)}</td><td>{formatDateOnly(row.to)}</td><td>{days.toLocaleString()}</td>
+          <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row && (row.barType === "end" || row.barType === "End of bar") ? "End of bar" : "Start of bar"}</td><td>{row.category}</td>
+          <td title={rowPath || '—'}>{rowPath || '—'}</td>
           <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : ''}</td>
+          <td style={{ textAlign: 'center' }}><button className="instrument-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
         </tr>;
-      })}{!rows.length && <tr><td colSpan={16} className="dataset-empty">{allDatasets.length ? 'No matching data.' : 'No data defined.'}</td></tr>}</tbody>
+      })}{!rows.length && <tr><td colSpan={17} className="dataset-empty">{allDatasets.length ? 'No matching data.' : 'No data defined.'}</td></tr>}</tbody>
     </table></div>
   </main>;
 }
@@ -588,6 +636,32 @@ export function DataManager() {
     const timestamp = new Date().toLocaleString();
     setLogEntries(current => [...current, timestamp + ' ' + operationLabel + ' — ' + operationState].slice(-500));
   }, [operationLabel, operationState]);
+
+  useEffect(() => {
+    if (tab === 'Log') {
+      fetchLogs()
+        .then(records => {
+          if (records && records.length > 0) {
+            const formatted = records.map(formatSqxLogLine);
+            setLogEntries(formatted);
+          }
+        })
+        .catch(() => {
+          // preserve existing local entries if fetch fails
+        });
+    }
+  }, [tab]);
+
+  const handleClearLog = async () => {
+    try {
+      await clearLogs();
+      setLogEntries([]);
+      notify('Logs cleared.');
+    } catch {
+      setLogEntries([]);
+      notify('Logs cleared.');
+    }
+  };
   const [lastControlId, setLastControlId] = useState<string | null>(null);
   const ribbonRef = useRef<HTMLDivElement>(null);
   const notify = useAppStore(state => state.notify);
@@ -654,7 +728,8 @@ export function DataManager() {
       if (!row) { setSelectionMessage('You must select at least one File record.'); return; }
       if ('cloned' in row && row.cloned) { setSelectionMessage('Cannot import into cloned data.'); return; }
       const instrument = seedInstruments.find(item => item.symbol === row.symbol) ?? seedInstruments[0];
-      setFileTarget({ ...emptyFileRecord(row.symbol, instrument, 'start'), ...row }); setSelectionMessage(''); setDialog({ id: 'file-import' }); return;
+      const targetBarType: 'start' | 'end' = row.barType === 'end' ? 'end' : 'start';
+      setFileTarget({ ...emptyFileRecord(row.symbol, instrument, targetBarType), ...row, barType: targetBarType }); setSelectionMessage(''); setDialog({ id: 'file-import' }); return;
     }
     if (command.dialog === 'dukascopy-download') {
       setOpenMenu(null); setNestedOpen(false);
@@ -747,6 +822,11 @@ export function DataManager() {
   const openReview = () => { try { if (anyDataActive) throw new Error('Cannot view data while an operation is in progress.'); const target = selectReviewTarget(toolRows, selectedDatasetIds); setReviewTarget(target); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to view data.'); } };
   const progressText = selectionMessage || (operationState === 'idle' ? (providerJob ? `${progressOwner === 'broker'?'Broker data update':progressOwner === 'stock-groups' ? 'Stock group data update' : progressOwner === 'external' ? `Custom data import for '${externalIndicators.job?.indicator}'` : progressOwner === 'tools' ? 'Clone to timezone' : progressOwner === 'export' ? exports.job?.label : progressOwner === 'mt5' ? 'MT5 mock import' : progressOwner === 'yahoo' ? `Yahoo mock ${yahoo.job?.kind}` : progressOwner === 'crypto' ? `Crypto mock ${crypto.job?.kind}` : progressOwner === 'darwinex' ? `Darwinex mock ${darwinex.job?.kind}` : progressOwner === 'sq' && sq.job ? providerLabel(sq.job.provider) : progressOwner === 'file' ? 'File import' : progressOwner === 'td' ? 'TickDownloader mock import' : 'Dukascopy mock download'} ${providerJob.state} ${providerJob.progress}%${providerJob.error ? `: ${providerJob.error}` : progressOwner === 'external' && externalIndicators.job?.state === 'completed' && externalIndicators.job.ignored ? ` — ${externalIndicators.job.ignored} invalid rows ignored` : progressOwner === 'file' && imports.job?.state === 'completed' ? ` — ${imports.job.completed} imported, ${imports.job.skipped} skipped, ${imports.job.tasks.reduce((n, task) => n + task.ignored, 0)} invalid rows ignored` : ''}` : 'No active operations') : operationState === 'paused' ? `${operationLabel} paused at ${progress}%` : operationState === 'cancelled' ? `${operationLabel} cancelled` : operationState === 'completed' ? `${operationLabel} complete` : `${operationLabel}… ${progress}%`);
 
+  const handleDeleteDatasetRow = (id: string) => {
+    setSelectedDatasetIds([id]);
+    setDialog({ id: 'mass-delete', targetIds: [id] });
+  };
+
   return <div className={`data-manager ${tab === 'Log' ? 'show-log' : ''} ${tab === 'Home' ? 'show-home' : ''}`}><div className="dm-title">Data Manager</div><div className="ribbon-tabs">{tabs.map(item => <button key={item} className={tab === item ? 'active' : ''} onClick={() => setTab(item)}>{item}</button>)}</div><div className="ribbon" ref={ribbonRef}>
     {tab === 'Data sources' && <div className="data-source-ribbon" aria-label="Data source operations"><div className="provider-actions">{dataSourceProviders.map(provider => <ProviderMenu key={provider.id} provider={provider} isOpen={openMenu === provider.id} nestedOpen={nestedOpen && openMenu === provider.id} onToggle={() => { setOpenMenu(current => current === provider.id ? null : provider.id); setNestedOpen(false); }} onToggleNested={() => setNestedOpen(current => !current)} onSelect={command => { setLastControlId(provider.id); selectCommand(command); }}/>)}</div><div className="context-actions">{dataSourceContextActions.map(action => { const Icon = contextIcons[action.id] ?? Database; return <button className={`data-source-button ${action.id === 'mass-delete' ? 'destructive' : ''}`} data-control-id={action.id} key={action.id} title={action.label} onClick={() => { setLastControlId(action.id); if (action.requiresSelection && selectedDatasetIds.length === 0) { setSelectionMessage('Select at least one dataset first'); return; } if (action.action) runDirectAction(action.action); if (action.dialog) setDialog({ id: action.dialog }); }}><Icon size={27}/><span>{action.label}</span></button>; })}</div></div>}
     {tab === 'Export' && <div className="export-actions" aria-label="Data export operations"><Button data-control-id="export-csv" className="export-csv" onClick={() => { setLastControlId('export-csv'); openExport('csv'); }}><FileSpreadsheet size={24} aria-hidden="true"/>Export to CSV</Button><Button data-control-id="export-mt4" className="export-mt4" title="Export to MetaTrader 4 (FXT & HST)" onClick={() => { setLastControlId('export-mt4'); openExport('mt4'); }}><MonitorDown size={24} aria-hidden="true"/>Export MT4 (FXT &amp; HST)</Button><Button data-control-id="export-mt5" className="export-mt5" title="Export to MetaTrader 5 data (99% test)" onClick={() => { setLastControlId('export-mt5'); openExport('mt5'); }}><ChartCandlestick size={24} aria-hidden="true"/>Export to MT5 data (99% test)</Button></div>}
@@ -813,7 +893,7 @@ export function DataManager() {
       <Button className="action-load" onClick={()=>setBrokerDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
   </div><div className="dm-progress" role="status" aria-label="Data Manager progress"><strong>Progress</strong><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (['running', 'paused'].includes(providerJob?.state ?? '')) providerAction(providerJob?.state === 'paused' ? 'resume' : 'pause'); else setOperationState(current => current === 'paused' ? 'running' : 'paused'); }}>{operationState === 'paused' || providerJob?.state === 'paused' ? 'Resume all' : 'Pause all'}</Button><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (providerJob && ['running', 'paused'].includes(providerJob.state)) { providerAction('stop'); return; } setOperationState('cancelled'); notify(`${operationLabel} cancelled`); }}>Stop all</Button></div>
-  <div className="dm-body">{tab === 'Home' ? <DataManagerHome onNavigateTab={setTab} onOpenImport={() => { setTab('Data sources'); setDialog({ id: 'file-import' }); }} onOpenDownload={() => { setTab('Data sources'); setDialog({ id: 'dukascopy-download' }); }} /> : tab === 'Log' ? <main className="dm-log"><header><strong>Log</strong><button className="clear-log" onClick={() => setLogEntries([])}>Clear log</button></header><div className="dm-log-output" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/> : <div className="dm-config"><Section title={tab}><div className="cards-list">{Array.from({ length: 6 }, (_, index) => <button key={index}><Database size={22}/><strong>{tab.replace(/s$/, '')} {index + 1}</strong><span>{index % 2 ? 'Configured · mock adapter' : 'Ready for configuration'}</span></button>)}</div></Section></div>}</div>
+  <div className="dm-body">{tab === 'Home' ? <DataManagerHome onNavigateTab={setTab} onOpenImport={() => { setTab('Data sources'); setDialog({ id: 'file-import' }); }} onOpenDownload={() => { setTab('Data sources'); setDialog({ id: 'dukascopy-download' }); }} /> : tab === 'Log' ? <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} onDeleteRow={handleDeleteDatasetRow}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/> : <div className="dm-config"><Section title={tab}><div className="cards-list">{Array.from({ length: 6 }, (_, index) => <button key={index}><Database size={22}/><strong>{tab.replace(/s$/, '')} {index + 1}</strong><span>{index % 2 ? 'Configured · mock adapter' : 'Ready for configuration'}</span></button>)}</div></Section></div>}</div>
   {dialog?.id === 'dukascopy-information' && <DisclaimerPopup onClose={closeDialog}/>}
   <AddPopup open={dialog?.id === 'dukascopy-add'} onClose={closeDialog} onComplete={message => { notify(message); closeDialog(); }}/>{dialog?.id === 'dukascopy-download' && <ImportPopup targets={downloadTargets} onClose={closeDialog} onStarted={() => { setProgressOwner('download'); setOperationState('idle'); notify('Dukascopy download started (simulation)'); }}/>}
   {dialog?.id === 'darwinex-add' && <DarwinexAddDialog onClose={closeDialog} onStarted={() => { setProgressOwner('darwinex'); setOperationState('idle'); setSelectionMessage(''); }}/> }
@@ -880,5 +960,5 @@ export function DataManager() {
   {brokerDialog?.kind==='import'&&<BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='load'&&<BrokerTransferDialog onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{setBrokerDialog(null);setBrokerError('');}} footer={<><Button onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" onClick={async ()=>{try{const ids=brokerDialog.selected.map(row=>row.id);await useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);setBrokerError('');}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})?</p></Modal></div>}
-  {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'tickdownloader-import' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={selectedDatasetIds.length} selectedIds={selectedDatasetIds} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
+  {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'tickdownloader-import' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={dialog.targetIds ? dialog.targetIds.length : selectedDatasetIds.length} selectedIds={dialog.targetIds ?? selectedDatasetIds} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
 }

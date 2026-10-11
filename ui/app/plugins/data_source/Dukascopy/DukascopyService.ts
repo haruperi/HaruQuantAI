@@ -7,7 +7,7 @@ export function useDukascopyAddService() {
   const brokers = useDataManagerStore((state) => state.brokers);
   const storageError = useDataManagerStore((state) => state.storageError);
   const add = useDataManagerStore((state) => state.addData);
-  return { brokers, storageError, addData: (request: AddDukasRequest): void => add(request) };
+  return { brokers, storageError, addData: (request: AddDukasRequest): Promise<void> => add(request) };
 }
 
 export function useDukascopyDownloadService() {

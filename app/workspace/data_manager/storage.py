@@ -542,7 +542,7 @@ class MarketDataStorage:
             key = (dt.year, dt.month)
             bid_u = to_tick_units(t.bid, tick_size)
             ask_u = to_tick_units(t.ask, tick_size)
-            flags_u = max(0, min(MAX_UINT16, int(t.flags)))
+            flags_u = max(0, min(MAX_UINT16, t.flags))
             by_year_month.setdefault(key, []).append((dt, bid_u, ask_u, flags_u))
 
         written_files: list[str] = []
@@ -631,9 +631,9 @@ class MarketDataStorage:
         clean_sym = symbol.strip().lower()
 
         pattern = self._base_dir / clean_source / clean_tf / clean_sym / "*.parquet"
-        matched_files = sorted(
-            pattern.parent.glob("*.parquet") if pattern.parent.exists() else []
-        )
+        matched_files: list[Path] = []
+        if pattern.parent.exists():
+            matched_files = sorted(pattern.parent.glob("*.parquet"))
 
         logger.debug(
             "FR-DATA-STORAGE-POLARS-SCAN: Scanning %d partition files for %s/%s/%s",
@@ -684,7 +684,9 @@ class MarketDataStorage:
         clean_sym = symbol.strip().lower()
 
         base_dir = self._base_dir / clean_source / "ticks" / clean_sym
-        matched_files = sorted(base_dir.rglob("*.parquet")) if base_dir.exists() else []
+        matched_files: list[Path] = []
+        if base_dir.exists():
+            matched_files = sorted(base_dir.rglob("*.parquet"))
 
         logger.debug(
             "FR-DATA-STORAGE-POLARS-SCAN: Scanning %d tick partition files for %s/%s",
@@ -762,15 +764,27 @@ class MarketDataStorage:
         lows = df["Low"].to_list()
         closes = df["Close"].to_list()
         volumes = df["Volume"].to_list()
+        is_float_price = df["Open"].dtype.is_float()
 
         for idx, dt_val in enumerate(dts):
+            if is_float_price:
+                o_val = float(opens[idx])
+                h_val = float(highs[idx])
+                l_val = float(lows[idx])
+                c_val = float(closes[idx])
+            else:
+                o_val = from_tick_units(opens[idx], tick_size)
+                h_val = from_tick_units(highs[idx], tick_size)
+                l_val = from_tick_units(lows[idx], tick_size)
+                c_val = from_tick_units(closes[idx], tick_size)
+
             bars.append(
                 BarRecord(
                     timestamp_utc=dt_val.isoformat(),
-                    open=from_tick_units(opens[idx], tick_size),
-                    high=from_tick_units(highs[idx], tick_size),
-                    low=from_tick_units(lows[idx], tick_size),
-                    close=from_tick_units(closes[idx], tick_size),
+                    open=o_val,
+                    high=h_val,
+                    low=l_val,
+                    close=c_val,
                     volume=float(volumes[idx]),
                     open_interest=0.0,
                 )
@@ -804,14 +818,22 @@ class MarketDataStorage:
         dts = df["DateTime"].to_list()
         bids = df["Bid"].to_list()
         asks = df["Ask"].to_list()
-        flags = df["Flags"].to_list()
+        flags = df["Flags"].to_list() if "Flags" in df.columns else [0] * len(dts)
+        is_float_price = df["Bid"].dtype.is_float()
 
         for idx, dt_val in enumerate(dts):
+            if is_float_price:
+                b_val = float(bids[idx])
+                a_val = float(asks[idx])
+            else:
+                b_val = from_tick_units(bids[idx], tick_size)
+                a_val = from_tick_units(asks[idx], tick_size)
+
             ticks.append(
                 TickRecord(
                     timestamp_utc=dt_val.isoformat(),
-                    bid=from_tick_units(bids[idx], tick_size),
-                    ask=from_tick_units(asks[idx], tick_size),
+                    bid=b_val,
+                    ask=a_val,
                     flags=int(flags[idx]),
                 )
             )

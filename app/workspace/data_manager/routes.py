@@ -104,6 +104,7 @@ from app.workspace.data_manager.data import (
     BarRecord,
     CatalogService,
     DataIngestionService,
+    DatasetRecord,
     IngestionConfig,
 )
 from app.workspace.data_manager.help import DataManagerHelpService
@@ -146,6 +147,14 @@ def _execute_async_import(
         source=broker,
         config=config,
     )
+    DataManagerLogService(db).log_activity(
+        "INGEST",
+        f"Ingested {res.bar_count} bars for {symbol}",
+        symbol=symbol,
+        key=symbol,
+        log_str=f"Ingested {res.bar_count} bars ({broker})",
+        details={"broker": broker, "bars": res.bar_count},
+    )
     return res.model_dump(mode="json")
 
 
@@ -155,15 +164,34 @@ def _execute_async_download(
     timeframe: str,
     date_from: str,
     date_to: str,
+    *,
+    underlying: str | None = None,
 ) -> dict[str, Any]:
     """Execute background provider download job in worker process."""
     manager = ProviderManager()
+    db = get_database_manager()
+    catalog = CatalogService(db)
+
+    # Resolve underlying instrument if not supplied
+    provider_sym = underlying
+    if not provider_sym:
+        clean_sym = symbol.strip().upper()
+        clean_src = provider_name.strip()
+        clean_tf = (timeframe or "M1").strip().upper()
+        dataset = catalog.get_dataset(
+            f"ds_{clean_src.lower()}_{clean_sym.lower()}_{clean_tf.lower()}"
+        )
+        if dataset and (dataset.underlying or dataset.instrument):
+            provider_sym = dataset.underlying or dataset.instrument
+
+    extra_params = {"underlying": provider_sym} if provider_sym else {}
     req = DownloadRequest(
         provider_name=provider_name,
         symbol=symbol,
         timeframe=timeframe,
         date_from=date_from,
         date_to=date_to,
+        extra_params=extra_params,
     )
     bars = manager.download(req)
     if bars:
@@ -174,6 +202,14 @@ def _execute_async_download(
             symbol=symbol,
             timeframe=timeframe,
             bars=bars,
+        )
+        DataManagerLogService(db).log_activity(
+            "DOWNLOAD",
+            f"Downloaded {len(bars)} bars from {provider_name} for {symbol}",
+            symbol=symbol,
+            key=symbol,
+            log_str=f"Downloaded {len(bars)} bars ({provider_name})",
+            details={"provider": provider_name, "bars": len(bars)},
         )
     return {
         "provider": provider_name,
@@ -407,6 +443,9 @@ class ProviderDownloadPayload(BaseModel):
     timeframe: str = Field(default="M1", description="Target timeframe")
     date_from: str = Field(default="2020-01-01", description="Start date (YYYY-MM-DD)")
     date_to: str = Field(default="2020-01-02", description="End date (YYYY-MM-DD)")
+    underlying: str | None = Field(
+        default=None, description="Optional underlying ticker without broker postfix"
+    )
     async_job: bool = Field(
         default=False, description="Submit download as background compute job"
     )
@@ -476,6 +515,29 @@ class ExportPayload(BaseModel):
     spread: float = Field(default=2.0, ge=0.0, description="Spread in pips/points")
     real_spread: bool = Field(
         default=False, description="Use real ask-bid spread for MT5"
+    )
+
+
+class DatasetCreatePayload(BaseModel):
+    """Payload for registering/creating a new dataset in the catalog."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    id: str | None = Field(default=None, description="Optional custom dataset ID")
+    symbol: str = Field(..., min_length=1, description="Symbol name")
+    source: str = Field(default="Dukascopy", description="Data provider or source")
+    timeframe: str = Field(
+        default="M1", description="Resolution timeframe (TICK, M1, D1, etc.)"
+    )
+    underlying: str | None = Field(default=None, description="Base underlying symbol")
+    instrument: str | None = Field(default=None, description="Linked broker instrument")
+    broker: str = Field(default="-1", description="Broker identifier")
+    broker_name: str = Field(default="Default", description="Broker display name")
+    timezone: str = Field(default="UTC", description="Data timezone")
+    category: str = Field(default="Forex", description="Market asset category")
+    path: str | None = Field(default=None, description="Optional storage path")
+    bar_type: str = Field(
+        default="Start of bar", description="Bar timestamp convention"
     )
 
 
@@ -816,6 +878,62 @@ class DataRouterService:
         return JSONResponse(status_code=status_code, content=resp.to_dict())
 
     # Datasets
+    def create_dataset(
+        self, request: Request, payload: DatasetCreatePayload
+    ) -> Response:
+        """Create and persist a new dataset in catalog."""
+        req_id = request.headers.get("x-request-id")
+        src_clean = payload.source.strip().lower()
+        sym_clean = payload.symbol.strip().upper()
+        tf_clean = payload.timeframe.strip().upper()
+        data_kind = "ticks" if tf_clean in ("TICK", "TICKS") else "bars"
+
+        ds_id = payload.id or f"ds_{src_clean}_{sym_clean.lower()}_{tf_clean.lower()}"
+        path = payload.path
+        if not path:
+            folder_kind = "ticks" if data_kind == "ticks" else tf_clean.lower()
+            path = f"data\\market\\{src_clean}\\{folder_kind}\\{sym_clean.lower()}"
+
+        record = DatasetRecord(
+            id=ds_id,
+            source=payload.source,
+            symbol=sym_clean,
+            underlying=payload.underlying or sym_clean,
+            instrument=payload.instrument or sym_clean,
+            timeframe=tf_clean,
+            broker=payload.broker,
+            broker_name=payload.broker_name,
+            timezone=payload.timezone,
+            category=payload.category,
+            path=path,
+            data_kind=data_kind,
+            bar_type=payload.bar_type,
+            bars=0,
+            date_from="",
+            date_to="",
+            quality_score=1.0,
+        )
+        self.catalog.save_dataset(record)
+        self._emit_event(
+            "data.dataset",
+            "created",
+            {"dataset_id": ds_id, "symbol": sym_clean, "timeframe": tf_clean},
+        )
+        logger.info(
+            "FR-DATA-INTEGRATION-DATASETS: Created dataset '%s' "
+            "(symbol=%s, timeframe=%s)",
+            ds_id,
+            sym_clean,
+            tf_clean,
+            extra={"fr_id": "FR-DATA-INTEGRATION-DATASETS", "dataset_id": ds_id},
+        )
+        resp = ApiResponse.success(
+            data=record.model_dump(mode="json"),
+            message=f"Dataset '{ds_id}' created successfully",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=resp.to_dict())
+
     def list_datasets(
         self,
         request: Request,
@@ -1077,6 +1195,23 @@ class DataRouterService:
                 )
 
             self._emit_event("data.dataset", "created", res.model_dump(mode="json"))
+            self.log.log_activity(
+                "INGEST",
+                f"Ingested {res.bar_count} bars for {payload.symbol}",
+                symbol=payload.symbol,
+                key=payload.symbol,
+                log_str=f"Ingested {res.bar_count} bars",
+                details={"dataset_id": res.dataset_id, "bars": res.bar_count},
+            )
+            self._emit_event(
+                channel="data_manager.log",
+                event_type="log.created",
+                payload={
+                    "action": "INGEST",
+                    "symbol": payload.symbol,
+                    "message": f"Ingested {res.bar_count} bars",
+                },
+            )
             logger.info(
                 "FR-DATA-INTEGRATION-DATASETS: Ingested %d bars for symbol '%s'",
                 res.bar_count,
@@ -1468,6 +1603,28 @@ class DataRouterService:
         except (ValueError, KeyError, RuntimeError, OSError) as exc:
             return self._error_response(
                 status.HTTP_500_INTERNAL_SERVER_ERROR, "UPDATE_FAILED", str(exc), req_id
+            )
+
+    def sync_disk_datasets(self, request: Request) -> Response:
+        """Scan on-disk market data partitions and synchronize datamgr_datasets."""
+        req_id = request.headers.get("x-request-id")
+        try:
+            synced = self.catalog.sync_disk_partitions()
+            resp = ApiResponse.success(
+                data={
+                    "count": len(synced),
+                    "datasets": [d.model_dump(mode="json") for d in synced],
+                },
+                message=f"Synchronized {len(synced)} datasets from on-disk partitions",
+                request_id=req_id,
+            )
+            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        except (OSError, ValueError, TypeError) as exc:
+            return self._error_response(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "SYNC_FAILED",
+                f"Failed synchronizing disk partitions: {exc}",
+                req_id,
             )
 
     def list_csv_formats(self, request: Request) -> Response:
@@ -2583,12 +2740,26 @@ class DataRouterService:
         """Download provider data."""
         req_id = request.headers.get("x-request-id")
         try:
+            # Resolve underlying instrument if not supplied
+            provider_sym = payload.underlying
+            if not provider_sym:
+                clean_sym = payload.symbol.strip().upper()
+                clean_src = payload.provider.strip()
+                clean_tf = (payload.timeframe or "M1").strip().upper()
+                dataset = self.catalog.get_dataset(
+                    f"ds_{clean_src.lower()}_{clean_sym.lower()}_{clean_tf.lower()}"
+                )
+                if dataset and (dataset.underlying or dataset.instrument):
+                    provider_sym = dataset.underlying or dataset.instrument
+
+            extra_params = {"underlying": provider_sym} if provider_sym else {}
             req = DownloadRequest(
                 provider_name=payload.provider,
                 symbol=payload.symbol,
                 timeframe=payload.timeframe,
                 date_from=payload.date_from,
                 date_to=payload.date_to,
+                extra_params=extra_params,
             )
             if payload.async_job and self.job_manager is not None:
                 future = self.job_manager.submit(
@@ -2599,6 +2770,7 @@ class DataRouterService:
                     payload.timeframe,
                     payload.date_from,
                     payload.date_to,
+                    underlying=provider_sym,
                     kind="provider_download",
                 )
                 job_id = self.job_manager.get_job_id_for_future(future) or ""
@@ -3004,6 +3176,14 @@ class DataRouterService:
                 },
                 message=f"Exported {len(bars)} bars as {fmt.upper()}",
                 request_id=req_id,
+            )
+            self.log.log_activity(
+                "EXPORT",
+                f"Exported {len(bars)} bars as {fmt.upper()}",
+                symbol=payload.symbol,
+                key=payload.symbol,
+                log_str=f"Exported {len(bars)} bars as {fmt.upper()}",
+                details={"format": fmt, "bars": len(bars)},
             )
             return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
         except Exception as exc:
@@ -3426,6 +3606,62 @@ class DataRouterService:
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
+    def create_log(
+        self,
+        request: Request,
+        payload: dict[str, Any],
+    ) -> Response:
+        """Create an activity log entry."""
+        req_id = request.headers.get("x-request-id")
+        action = str(payload.get("action", "INFO")).upper()
+        message = str(payload.get("message", ""))
+        symbol = payload.get("symbol")
+        details = payload.get("details", {})
+        key = payload.get("key")
+        pct = payload.get("pct")
+        log_str = payload.get("log_str")
+
+        entry = self.log.log_activity(
+            action=action,
+            message=message,
+            symbol=symbol,
+            details=details,
+            key=key,
+            pct=pct,
+            log_str=log_str,
+        )
+        self._emit_event(
+            channel="data_manager.log",
+            event_type="log.created",
+            payload=entry.model_dump(mode="json"),
+        )
+        resp = ApiResponse.success(
+            data=entry.model_dump(mode="json"),
+            message="Log entry recorded",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_201_CREATED, content=resp.to_dict())
+
+    def clear_logs(
+        self,
+        request: Request,
+        symbol: str | None = None,
+    ) -> Response:
+        """Clear activity logs."""
+        req_id = request.headers.get("x-request-id")
+        cleared = self.log.clear_logs(symbol=symbol)
+        self._emit_event(
+            channel="data_manager.log",
+            event_type="logs.cleared",
+            payload={"cleared_count": cleared, "symbol": symbol},
+        )
+        resp = ApiResponse.success(
+            data={"cleared_count": cleared, "symbol": symbol},
+            message=f"Cleared {cleared} log(s)",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
     # Help topics
     def list_help_topics(self, request: Request) -> Response:
         """List help guide topics."""
@@ -3448,6 +3684,12 @@ def _register_dataset_routes(router: APIRouter, service: DataRouterService) -> N
     """Register all dataset manipulation and inspection routes."""
     router.add_api_route(
         "/datasets", service.list_datasets, methods=["GET"], summary="List datasets"
+    )
+    router.add_api_route(
+        "/datasets",
+        service.create_dataset,
+        methods=["POST"],
+        summary="Create dataset",
     )
     router.add_api_route(
         "/datasets/{dataset_id}",
@@ -3550,6 +3792,12 @@ def _register_dataset_routes(router: APIRouter, service: DataRouterService) -> N
         service.update_selected_datasets,
         methods=["POST"],
         summary="Update selected online datasets",
+    )
+    router.add_api_route(
+        "/datasets/sync-disk",
+        service.sync_disk_datasets,
+        methods=["POST"],
+        summary="Scan on-disk market partitions and sync datasets",
     )
     # Direct SQX RPC path aliases
     router.add_api_route(
@@ -4177,6 +4425,24 @@ def _register_export_home_routes(router: APIRouter, service: DataRouterService) 
         service.list_logs,
         methods=["GET"],
         summary="List activity logs",
+    )
+    router.add_api_route(
+        "/logs",
+        service.create_log,
+        methods=["POST"],
+        summary="Create activity log entry",
+    )
+    router.add_api_route(
+        "/logs/clear",
+        service.clear_logs,
+        methods=["POST"],
+        summary="Clear activity logs",
+    )
+    router.add_api_route(
+        "/logs",
+        service.clear_logs,
+        methods=["DELETE"],
+        summary="Clear activity logs",
     )
     router.add_api_route(
         "/help/topics",

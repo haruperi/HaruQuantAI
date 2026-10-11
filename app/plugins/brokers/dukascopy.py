@@ -58,6 +58,7 @@ from __future__ import annotations
 import io
 import lzma
 import struct
+import sys
 import zipfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -67,9 +68,13 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from app.host.discovery import PluginHostContext
-from app.host.logging import get_logger
-from app.plugins.brokers.contracts import (
+_project_root = str(Path(__file__).resolve().parent.parent.parent.parent)
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+from app.host.discovery import PluginHostContext  # noqa: E402
+from app.host.logging import get_logger  # noqa: E402
+from app.plugins.brokers.contracts import (  # noqa: E402
     Bar,
     BaseBroker,
     BrokerCapability,
@@ -284,6 +289,35 @@ class DukascopyBroker(BaseBroker):
         self._catalog = catalog
         return self._catalog
 
+    def _clean_symbol(self, symbol: str) -> str:
+        """Resolve raw or postfixed symbol to canonical Dukascopy catalog symbol.
+
+        Handles delimiter prefixes (e.g. 'GBPUSD_DUKASCOPY' -> 'GBPUSD'),
+        suffix stripping (e.g. 'GBPUSDDUKASCOPY' -> 'GBPUSD', 'EURUSD.m' -> 'EURUSD'),
+        and catalog longest-prefix matching.
+        """
+        s = symbol.strip().upper()
+        catalog = self._ensure_catalog()
+        if s in catalog:
+            return s
+        cleaned = s.replace("/", "").replace("_", "").replace("-", "").replace(".", "")
+        if cleaned in catalog:
+            return cleaned
+        for delim in ("_", ".", "-"):
+            if delim in s:
+                prefix = s.split(delim)[0]
+                if prefix in catalog:
+                    return prefix
+        if cleaned.endswith("DUKASCOPY"):
+            prefix = cleaned[:-9]
+            if prefix in catalog:
+                return prefix
+        matched = ""
+        for cat_sym in catalog:
+            if cleaned.startswith(cat_sym) and len(cat_sym) > len(matched):
+                matched = cat_sym
+        return matched or cleaned
+
     def _fetch_datafeed_bars(
         self,
         sym_clean: str,
@@ -400,7 +434,7 @@ class DukascopyBroker(BaseBroker):
     @override
     def get_symbol_info(self, symbol: str) -> StandardResponse[SymbolInfo]:
         """Retrieve instrument specifications and metadata from the CSV catalog."""
-        sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
+        sym_clean = self._clean_symbol(symbol)
         catalog = self._ensure_catalog()
         info = catalog.get(sym_clean)
         if not info:
@@ -501,7 +535,7 @@ class DukascopyBroker(BaseBroker):
         Returns:
             StandardResponse containing list of Bar entities.
         """
-        sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
+        sym_clean = self._clean_symbol(symbol)
         catalog = self._ensure_catalog()
         sym_info = catalog.get(sym_clean)
         decimals = sym_info.digits if sym_info else 5
@@ -656,7 +690,7 @@ class DukascopyBroker(BaseBroker):
         flags: int | None = None,
     ) -> StandardResponse[list[Tick]]:
         """Retrieve historical tick data with direct datafeed fallback."""
-        sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
+        sym_clean = self._clean_symbol(symbol)
         catalog = self._ensure_catalog()
         sym_info = catalog.get(sym_clean)
         decimals = sym_info.digits if sym_info else 5
@@ -734,6 +768,13 @@ def create_adapter(_context: PluginHostContext | None = None) -> DukascopyBroker
 
 
 if __name__ == "__main__":
+    import sys
+    from pathlib import Path
+
+    _project_root = str(Path(__file__).resolve().parent.parent.parent.parent)
+    if _project_root not in sys.path:
+        sys.path.insert(0, _project_root)
+
     from app.plugins.brokers import get_bars, get_symbol_info
 
     dukascopy = create_adapter()

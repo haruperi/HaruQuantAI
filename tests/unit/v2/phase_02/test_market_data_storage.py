@@ -25,6 +25,7 @@ Python API Usage:
 from __future__ import annotations
 
 import gzip
+import json
 import logging
 import lzma
 import zipfile
@@ -35,7 +36,7 @@ from pathlib import Path
 import pyarrow.parquet as pq
 import pytest
 from app.host.persistence import DatabaseManager
-from app.workspace.data_manager.data import CatalogService
+from app.workspace.data_manager.data import CatalogService, DatasetRecord
 from app.workspace.data_manager.instruments import (
     InstrumentDefinition,
     InstrumentService,
@@ -327,8 +328,162 @@ def test_sqx_catalog_operations(
     cleared_ds = catalog.get_dataset(ds.id)
     assert cleared_ds is not None
     assert cleared_ds.bars == 0
+    cleared_lineage = json.loads(cleared_ds.lineage_json)
+    assert cleared_lineage.get("partitions") == []
 
     # 7. Remove Data (deletes parquet and deletes DB row)
     remove_ok = catalog.remove_data(ds.id)
     assert remove_ok is True
     assert catalog.get_dataset(ds.id) is None
+
+
+def test_catalog_sync_disk_partitions(
+    storage_setup: tuple[DatabaseManager, CatalogService, MarketDataStorage, Path],
+) -> None:
+    """Validate auto-discovery and synchronization of on-disk Parquet partitions."""
+    _, catalog, storage, _ = storage_setup
+
+    bars = [
+        BarRecord(
+            timestamp_utc="2025-04-15T09:30:00Z",
+            open=1.10000,
+            high=1.10500,
+            low=1.09800,
+            close=1.10200,
+            volume=150.0,
+        ),
+    ]
+    storage.write_bars("dukascopy", "GBPUSD", "M1", bars)
+
+    synced = catalog.sync_disk_partitions()
+    assert any(d.symbol == "GBPUSD" and d.bars == 1 for d in synced)
+
+    gbp = catalog.get_dataset("ds_dukascopy_gbpusd_m1")
+    assert gbp is not None
+    assert gbp.bars == 1
+    assert "2025.parquet" in gbp.lineage_json
+
+
+def test_catalog_broker_profile_name_resolution(
+    storage_setup: tuple[DatabaseManager, CatalogService, MarketDataStorage, Path],
+) -> None:
+    """Validate broker profile display name resolution from numeric IDs and brackets."""
+    db, catalog, _, _ = storage_setup
+
+    from app.workspace.data_manager.broker import BrokerSavePayload, BrokerService
+
+    broker_svc = BrokerService(db)
+    created = broker_svc.create_broker(
+        BrokerSavePayload(
+            name="[[TitanFX]]",
+            postfix="_titan",
+        )
+    )
+    b_id = str(created.id)
+
+    # Clean brackets helper
+    assert catalog._clean_broker_name("[[Pepperstone]]") == "Pepperstone"
+    assert catalog._clean_broker_name("Default") == "Default"
+
+    # Resolve display name
+    assert catalog._resolve_broker_display_name("-1", "-1") == "Default"
+    assert catalog._resolve_broker_display_name("-1", "") == "Default"
+    assert catalog._resolve_broker_display_name(b_id, b_id) == "TitanFX"
+    assert catalog._resolve_broker_display_name(b_id, "[[TitanFX]]") == "TitanFX"
+
+    # Save dataset with -1 and verify resolved broker_name
+    ds = DatasetRecord(
+        id="ds_test_broker_res",
+        source="TestBroker",
+        symbol="TESTSYM",
+        timeframe="M1",
+        broker="-1",
+        broker_name="-1",
+        bars=10,
+    )
+    catalog.save_dataset(ds)
+
+    loaded = catalog.get_dataset("ds_test_broker_res")
+    assert loaded is not None
+    assert loaded.broker_name == "Default"
+
+    # Save dataset with created broker id
+    ds42 = DatasetRecord(
+        id="ds_test_broker_titan",
+        source="TestBroker",
+        symbol="TESTSYM42",
+        timeframe="M1",
+        broker=b_id,
+        broker_name=b_id,
+        bars=20,
+    )
+    catalog.save_dataset(ds42)
+
+    loaded42 = catalog.get_dataset("ds_test_broker_titan")
+    assert loaded42 is not None
+    assert loaded42.broker_name == "TitanFX"
+
+
+def test_catalog_relative_path_normalization(
+    storage_setup: tuple[DatabaseManager, CatalogService, MarketDataStorage, Path],
+) -> None:
+    """Validate conversion of absolute storage paths to relative paths."""
+    _, catalog, _, _ = storage_setup
+
+    cwd = Path.cwd().resolve()
+    abs_sample = str(cwd / "data" / "market" / "dukascopy" / "m1" / "eurusd")
+    rel_sample = catalog._make_relative_path(abs_sample)
+    assert not Path(rel_sample).is_absolute()
+    assert "data" in rel_sample and "eurusd" in rel_sample
+
+    ds = DatasetRecord(
+        id="ds_test_rel_path",
+        source="Dukascopy",
+        symbol="EURUSD_REL",
+        timeframe="M1",
+        bars=50,
+        path=abs_sample,
+    )
+    catalog.save_dataset(ds)
+
+    loaded = catalog.get_dataset("ds_test_rel_path")
+    assert loaded is not None
+    assert not Path(loaded.path).is_absolute()
+    assert "data" in loaded.path and "eurusd" in loaded.path
+
+
+def test_catalog_bar_type_and_date_alone_normalization(
+    storage_setup: tuple[DatabaseManager, CatalogService, MarketDataStorage, Path],
+) -> None:
+    """Validate default bar_type 'Start of bar' and date-alone normalization."""
+    _, catalog, _, _ = storage_setup
+
+    # 1. DatasetRecord default bar_type and post_init date normalization
+    ds = DatasetRecord(
+        id="ds_test_dates_bar_type",
+        source="Dukascopy",
+        symbol="EURUSD_DT",
+        timeframe="M1",
+        date_from="2024-01-02T14:30:00+00:00",
+        date_to="2024-12-31 23:59:59",
+        bars=100,
+    )
+    assert ds.bar_type == "Start of bar"
+    assert ds.date_from == "2024-01-02"
+    assert ds.date_to == "2024-12-31"
+
+    # 2. Static helper _extract_date_alone
+    assert (
+        catalog._extract_date_alone("2023-01-03T03:58:42.496000+00:00") == "2023-01-03"
+    )
+    assert catalog._extract_date_alone("2023-12-29 05:52:57") == "2023-12-29"
+    assert catalog._extract_date_alone("2025-05-01") == "2025-05-01"
+    assert catalog._extract_date_alone("") == ""
+
+    # 3. Persistence round-trip retains date-alone and Start of bar
+    catalog.save_dataset(ds)
+    loaded = catalog.get_dataset("ds_test_dates_bar_type")
+    assert loaded is not None
+    assert loaded.bar_type == "Start of bar"
+    assert loaded.date_from == "2024-01-02"
+    assert loaded.date_to == "2024-12-31"

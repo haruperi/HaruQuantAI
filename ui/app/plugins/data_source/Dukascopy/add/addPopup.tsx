@@ -48,10 +48,7 @@ export function AddPopup(props: AddPopupProps) {
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.stopPropagation();
-            if (mapping) {
-              setMapping(null);
-              setError('');
-            } else onClose();
+            onClose();
           }
           if (event.key === 'Tab') {
             const controls = Array.from(
@@ -73,16 +70,13 @@ export function AddPopup(props: AddPopupProps) {
         }}
       >
         <header>
-          <h2 id="dukas-title">Add Dukascopy data{mapping ? ' - identify instruments' : ''}</h2>
+          <h2 id="dukas-title">Add Dukascopy data</h2>
           <button aria-label="Close" onClick={onClose}>
             ×
           </button>
         </header>
         <div className="dukas-body">
-          {mapping ? (
-            <SelectInstrumentsPopup controller={controller} />
-          ) : (
-            <section className="dukas-panel">
+          <section className="dukas-panel">
               <strong>Choose from available data</strong>
               <div className="dukas-filters">
                 <input
@@ -203,36 +197,25 @@ export function AddPopup(props: AddPopupProps) {
                 </p>
               )}
             </section>
-          )}
         </div>
         <footer>
-          {!mapping && (
-            <label className="dukas-consent">
-              <input
-                role="switch"
-                type="checkbox"
-                checked={confirmed}
-                onChange={(event) => setConfirmed(event.target.checked)}
-              />
-              <span>{disclaimer}</span>
-            </label>
-          )}
+          <label className="dukas-consent">
+            <input
+              role="switch"
+              type="checkbox"
+              checked={confirmed}
+              onChange={(event) => setConfirmed(event.target.checked)}
+            />
+            <span>{disclaimer}</span>
+          </label>
           {(error || storageError) && (
             <p className="dukas-error" role="alert">
               {error || storageError}
             </p>
           )}
           <div className="dukas-actions">
-            <button
-              className="dukas-link sq-button"
-              onClick={() => {
-                if (mapping) {
-                  setMapping(null);
-                  setError('');
-                } else onClose();
-              }}
-            >
-              {mapping ? '< Back' : 'Close'}
+            <button className="dukas-link sq-button" onClick={onClose}>
+              Close
             </button>
             <button className="dukas-save sq-button primary" onClick={save}>
               Save

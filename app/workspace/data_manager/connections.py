@@ -515,8 +515,9 @@ class DukascopyProvider(BaseDataProvider):
         broker = DukascopyBroker()
         dt_from = _parse_iso(request.date_from)
         dt_to = _parse_iso(request.date_to)
+        provider_sym = request.extra_params.get("underlying") or request.symbol
         resp = broker.get_bars(
-            symbol=request.symbol,
+            symbol=provider_sym,
             timeframe=request.timeframe,
             date_from=dt_from,
             date_to=dt_to,

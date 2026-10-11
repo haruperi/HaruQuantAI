@@ -191,7 +191,7 @@ class DataQualityInspector:
         return 0
 
     @staticmethod
-    def _compute_score(
+    def compute_score(
         total_bars: int, bad_bars: int, duplicate_bars: int, gap_bars: int
     ) -> float:
         """Calculate bounded quality metric in range [0.0, 1.0]."""
@@ -200,6 +200,8 @@ class DataQualityInspector:
             return 1.0
         penalty = (bad_bars * 2.0 + duplicate_bars + gap_bars * 0.1) / denominator
         return max(0.0, min(1.0, 1.0 - penalty))
+
+    _compute_score = compute_score
 
     def check_quality_summary(
         self,

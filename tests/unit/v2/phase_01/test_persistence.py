@@ -128,6 +128,83 @@ def test_obsolete_session_cleanup_rejects_invalid_predicates(
         )
 
 
+def test_legacy_host_jobs_table_migrates_cleanly(tmp_path: Path) -> None:
+    """Verify that a legacy host_jobs table with obsolete group_id NOT NULL constraint
+    is automatically migrated to the canonical schema upon initialize()."""
+    db_file = tmp_path / "legacy_jobs.db"
+    conn = sqlite3.connect(db_file)
+    conn.execute(
+        """
+        CREATE TABLE host_jobs (
+            job_id TEXT PRIMARY KEY,
+            group_id TEXT NOT NULL,
+            operation TEXT NOT NULL,
+            state TEXT NOT NULL,
+            resource_class TEXT NOT NULL,
+            config_hash TEXT NOT NULL,
+            payload_json TEXT NOT NULL,
+            created_at_utc TEXT NOT NULL
+        );
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO host_jobs (
+            job_id, group_id, operation, state, resource_class,
+            config_hash, payload_json, created_at_utc
+        ) VALUES (
+            'legacy-job-1', 'grp1', 'op1', 'COMPLETED', 'res1',
+            'hash1', '{}', '2025-01-01T00:00:00Z'
+        );
+        """
+    )
+    conn.commit()
+    conn.close()
+
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    # Verify table schema has canonical columns and no group_id
+    with db.connection(query_only=True) as conn:
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(host_jobs)").fetchall()]
+        assert "group_id" not in cols
+        assert "job_id" in cols
+        assert "owner" in cols
+        assert "kind" in cols
+        assert "status" in cols
+
+    # Verify upserting a modern job record succeeds without IntegrityError
+    store = JobStore(db=db)
+    store.upsert_job(
+        {
+            "job_id": "modern-job-1",
+            "owner": "test_owner",
+            "kind": "provider_download",
+            "status": "QUEUED",
+            "progress": 0.0,
+            "accepted": 0,
+            "rejected": 0,
+            "message": "Starting download",
+            "attempt_id": 1,
+            "max_retries": 0,
+            "retry_count": 0,
+            "dedup_key": None,
+            "parent_job_id": None,
+            "child_job_ids_json": "[]",
+            "budget_json": "{}",
+            "submitted_at_utc": "2026-10-11T12:00:00Z",
+            "started_at_utc": None,
+            "finished_at_utc": None,
+            "error_message": None,
+            "error_location": None,
+        }
+    )
+    job = store.get_job("modern-job-1")
+    assert job is not None
+    assert job["owner"] == "test_owner"
+    assert job["status"] == "QUEUED"
+
+
 @pytest.fixture
 def temp_db_path(tmp_path: Path) -> Path:
     """Fixture providing an isolated temporary database path."""
@@ -1335,6 +1412,7 @@ def test_raw_session_create_preserves_supplied_fields(
     """The store persists explicit session values without choosing defaults."""
     row = {
         "name": "explicit",
+        "broker_id": 42,
         "description": "",
         "timezone": "caller-zone",
         "windows_json": "caller-windows",
@@ -1516,3 +1594,85 @@ def test_host_session_store_rejects_incompatible_schema(
             conn.execute("PRAGMA table_info(host_session)").fetchone()["name"]
             == "unexpected"
         )
+
+
+def test_dataset_delete_legacy_foreign_key_tolerance(
+    db_manager: DatabaseManager,
+) -> None:
+    """Deleting a dataset cleans up legacy referencing tables without FK errors."""
+    from app.host.persistence import _migrate_datamgr_tables
+
+    dataset_record = {
+        "id": "ds_legacy_fk_test",
+        "source": "MT5",
+        "symbol": "NZDJPY_test",
+        "underlying": "NZDJPY",
+        "instrument": "NZDJPY",
+        "timeframe": "M1",
+        "broker": "6",
+        "broker_name": "Pepperstone",
+        "timezone": "UTC",
+        "category": "Forex",
+        "date_from": "2024-01-01",
+        "date_to": "2024-01-02",
+        "bars": 100,
+        "created_at": datetime.now(UTC).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
+        "path": "",
+        "data_kind": "bars",
+        "quality_score": 1.0,
+        "lineage_json": "{}",
+        "schema_version": 1,
+    }
+    db_manager.datasets.save(dataset_record, update_columns=())
+    assert db_manager.datasets.get_by_id("ds_legacy_fk_test") is not None
+
+    # Simulate legacy tables referencing datamgr_datasets
+    with db_manager.transaction() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS source_datasets (
+                id TEXT PRIMARY KEY REFERENCES datamgr_datasets(id),
+                owner TEXT NOT NULL,
+                identity_json TEXT NOT NULL,
+                options_json TEXT NOT NULL
+            );
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS source_partitions (
+                dataset_id TEXT NOT NULL REFERENCES source_datasets(id),
+                period TEXT NOT NULL,
+                revision INTEGER NOT NULL,
+                relative_path TEXT NOT NULL,
+                sha256 TEXT NOT NULL,
+                row_count INTEGER NOT NULL,
+                first_ms INTEGER NOT NULL,
+                last_ms INTEGER NOT NULL,
+                schema_json TEXT NOT NULL,
+                committed_at TEXT NOT NULL,
+                PRIMARY KEY (dataset_id, period, revision)
+            );
+            """
+        )
+        conn.execute(
+            "INSERT INTO source_datasets VALUES (?, 'plugin.data_manager.meta_trader', '[]', '{}')",
+            ("ds_legacy_fk_test",),
+        )
+        conn.execute(
+            "INSERT INTO source_partitions VALUES (?, '2024', 1, 'rel.parquet', 'sha', 10, 0, 100, '{}', 'now')",
+            ("ds_legacy_fk_test",),
+        )
+
+    # Deletion must succeed despite existing foreign key referencing rows
+    assert db_manager.datasets.delete("ds_legacy_fk_test") is True
+    assert db_manager.datasets.get_by_id("ds_legacy_fk_test") is None
+
+    # Verify _migrate_datamgr_tables purges obsolete legacy tables
+    with db_manager.transaction() as conn:
+        _migrate_datamgr_tables(conn)
+        remaining = conn.execute(
+            "SELECT name FROM sqlite_master WHERE name IN ('source_datasets', 'source_partitions')"
+        ).fetchall()
+        assert remaining == []

@@ -103,7 +103,8 @@
 .dataset-sort span { float:right; margin-left:10px; color:var(--muted); }
 .dataset-grid .dataset-empty { text-align:center; color:var(--muted); }
 .instrument-table td:nth-child(3) { max-width:180px; overflow:hidden; text-overflow:ellipsis; }
-.instrument-remove { border:0; background:transparent; color:var(--muted); font-size:16px; }
+.instrument-remove { border:0; background:transparent; color:var(--muted); font-size:16px; cursor:pointer; }
+.instrument-remove:hover { color:var(--foreground); }
 .session-grid .session-table { min-width:760px; table-layout:fixed; }
 .external-indicators-grid table { min-width:1120px; table-layout:fixed; }
 .stock-groups-grid table { min-width:1250px; table-layout:fixed; }
@@ -1066,3 +1067,82 @@ html[data-theme="light"] .host-settings-panel input:not([type="checkbox"]), html
 
 .data-manager.show-home { grid-template-rows:34px 29px minmax(0,1fr); }
 .show-home > .ribbon, .show-home > .dm-progress { display:none; }
+
+/* SQX Delete Data Dialog Parity */
+.sqx-delete-data-modal {
+  width: 520px;
+  background: #1e2024;
+  border: 1px solid #4a515d;
+  border-radius: 4px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+.sqx-delete-data-modal > header {
+  background: #a92424;
+  height: 38px;
+  border-bottom: none;
+  padding: 0 12px 0 16px;
+}
+.sqx-delete-data-modal > header h2 {
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+.sqx-delete-data-modal > header button {
+  color: #ffffff;
+}
+.sqx-delete-data-modal > header button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+.sqx-delete-data-modal .modal-content {
+  padding: 24px 20px 20px 20px;
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sqx-delete-data-modal .sqx-delete-prompt {
+  margin: 0;
+  font-size: 13px;
+  color: #ffffff;
+}
+.sqx-delete-data-modal > footer {
+  background: #1e2024;
+  border-top: none;
+  padding: 0 20px 20px 20px;
+  height: auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+}
+.sqx-delete-data-modal .sqx-delete-close-btn {
+  background: transparent;
+  border: none;
+  color: #3882f6;
+  text-decoration: underline;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-family: inherit;
+}
+.sqx-delete-data-modal .sqx-delete-close-btn:hover {
+  color: #60a5fa;
+}
+.sqx-delete-data-modal .sqx-delete-action-btn {
+  background: #2b5c8f;
+  color: #ffffff;
+  border: 1px solid #3b74ad;
+  border-radius: 3px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.sqx-delete-data-modal .sqx-delete-action-btn:hover {
+  background: #346ea8;
+  border-color: #4b8cd4;
+}
