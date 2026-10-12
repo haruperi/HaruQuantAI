@@ -14,6 +14,9 @@ Key Capabilities:
         `SchemaManager.drop_obsolete_sessions()`, `ensure_settings_schema()`,
         `ensure_host_session_schema()`, `validate_settings_schema()`
       Logging: INFO initialization; ERROR incompatible required tables/version.
+    - FR-HOST-PERSISTENCE-MT5-JOURNAL-SCHEMA: MT5 command/event table custody.
+      Associated: `ensure_mt5bridge_journal_schema()`
+      Logging: DEBUG compatibility check; INFO schema ready, without paths/values.
 
 Python API Usage:
     ```python
@@ -53,6 +56,120 @@ if TYPE_CHECKING:
     from app.host.persistence.engine import DatabaseManager
 
 logger = get_logger(__name__)
+
+
+MT5BRIDGE_JOURNAL_DDL: str = """
+            CREATE TABLE IF NOT EXISTS mt5_commands (
+                command_id TEXT PRIMARY KEY,
+                session_id TEXT,
+                object_id TEXT NOT NULL,
+                class_name TEXT NOT NULL,
+                method_name TEXT NOT NULL,
+                args_json TEXT NOT NULL,
+                requires_arm INTEGER NOT NULL,
+                created_at REAL NOT NULL,
+                sent_at REAL,
+                acknowledged_at REAL,
+                resolved_at REAL,
+                status TEXT NOT NULL,
+                native_request_id TEXT,
+                value_json TEXT,
+                meta_json TEXT,
+                error_json TEXT
+            );
+            CREATE TABLE IF NOT EXISTS mt5_events (
+                event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT,
+                command_id TEXT,
+                native_request_id TEXT,
+                event_type TEXT NOT NULL,
+                payload_json TEXT NOT NULL,
+                received_at REAL NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_mt5_events_request
+                ON mt5_events(native_request_id);
+            CREATE INDEX IF NOT EXISTS idx_mt5_events_command
+                ON mt5_events(command_id);
+            """
+
+_MT5BRIDGE_JOURNAL_SHAPES = {
+    "mt5_commands": (
+        ("command_id", "TEXT", 0, None, 1),
+        ("session_id", "TEXT", 0, None, 0),
+        ("object_id", "TEXT", 1, None, 0),
+        ("class_name", "TEXT", 1, None, 0),
+        ("method_name", "TEXT", 1, None, 0),
+        ("args_json", "TEXT", 1, None, 0),
+        ("requires_arm", "INTEGER", 1, None, 0),
+        ("created_at", "REAL", 1, None, 0),
+        ("sent_at", "REAL", 0, None, 0),
+        ("acknowledged_at", "REAL", 0, None, 0),
+        ("resolved_at", "REAL", 0, None, 0),
+        ("status", "TEXT", 1, None, 0),
+        ("native_request_id", "TEXT", 0, None, 0),
+        ("value_json", "TEXT", 0, None, 0),
+        ("meta_json", "TEXT", 0, None, 0),
+        ("error_json", "TEXT", 0, None, 0),
+    ),
+    "mt5_events": (
+        ("event_id", "INTEGER", 0, None, 1),
+        ("session_id", "TEXT", 0, None, 0),
+        ("command_id", "TEXT", 0, None, 0),
+        ("native_request_id", "TEXT", 0, None, 0),
+        ("event_type", "TEXT", 1, None, 0),
+        ("payload_json", "TEXT", 1, None, 0),
+        ("received_at", "REAL", 1, None, 0),
+    ),
+}
+
+
+def ensure_mt5bridge_journal_schema(conn: sqlite3.Connection) -> None:
+    """Ensure MT5 bridge tables exist; reject incompatible existing shapes."""
+    logger.debug(
+        "Checking MT5 bridge journal schema",
+        extra={"fr_id": "FR-HOST-PERSISTENCE-MT5-JOURNAL-SCHEMA"},
+    )
+    for table, expected in _MT5BRIDGE_JOURNAL_SHAPES.items():
+        # Identifiers come only from the fixed local schema declaration.
+        actual = tuple(
+            tuple(row[1:]) for row in conn.execute(f"PRAGMA table_info({table})")
+        )
+        if actual and actual != expected:
+            raise IncompatibleSchemaError("MT5 bridge journal table shape differs")
+    for index, column in (
+        ("idx_mt5_events_request", "native_request_id"),
+        ("idx_mt5_events_command", "command_id"),
+    ):
+        existing = conn.execute(
+            "SELECT tbl_name FROM sqlite_master WHERE type='index' AND name=?",
+            (index,),
+        ).fetchone()
+        if existing is not None:
+            columns = tuple(
+                row[2] for row in conn.execute(f"PRAGMA index_info({index})")
+            )
+            flags = next(
+                (
+                    row
+                    for row in conn.execute("PRAGMA index_list(mt5_events)")
+                    if row[1] == index
+                ),
+                None,
+            )
+            if (
+                existing[0] != "mt5_events"
+                or columns != (column,)
+                or flags is None
+                or flags[2]
+                or flags[4]
+            ):
+                raise IncompatibleSchemaError("MT5 bridge journal index shape differs")
+    conn.executescript(MT5BRIDGE_JOURNAL_DDL)
+    logger.info(
+        "MT5 bridge journal schema ready",
+        extra={"fr_id": "FR-HOST-PERSISTENCE-MT5-JOURNAL-SCHEMA"},
+    )
+
 
 CURRENT_SCHEMA_VERSION: int = 1
 INITIAL_MIGRATION_NAME: str = "initial_host_control_tables"

@@ -5,7 +5,11 @@ Description:
     open connections, execute SQL, or manage schemas and database transactions.
     Small stores group related CRUD, queries, aggregates, storage serialization,
     and atomic conditional writes. DatabaseManager owns handles; stores return
-    records and results. Connection/transaction methods are internal infrastructure:
+    records and results. mt5bridge_journal.Journal owns a scoped bridge connection
+    and CRUD in the shared application database; schema.py owns its MT5 DDL.
+    Broker code owns journal lifecycle and trade interpretation. Journal startup
+    creates only missing MT5 tables/indexes, without initializing core tables.
+    Connection/transaction methods are internal infrastructure:
     other application modules must never borrow handles or supply connections.
 
     Business logic MUST NOT be added here. Configuration validation and snapshots
