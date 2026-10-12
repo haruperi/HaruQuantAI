@@ -8127,8 +8127,227 @@
         "static",
         "angularjs"
       ]
+    },
+    "SQX145-EV-000198": {
+      "topic": "strategy.blocks.comparisons",
+      "title": "StrategyQuant X Comparison building blocks semantics, precision, and moving average evaluation",
+      "question": "How does StrategyQuant X implement comparison, crossover, trend persistence, percentile rank, and indicator-MA building blocks in internal/extend/Snippets/SQ/Blocks/Comparisons?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "strategy",
+          "services"
+        ],
+        "conditions": [
+          "Static inspection of 27 Java snippet sources in internal/extend/Snippets/SQ/Blocks/Comparisons."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX Comparison building blocks provide 6 direct arithmetic comparisons with 6-decimal rounding, 2 consecutive-bar crossovers (shift 1 vs 0), multi-bar directional trend persistence (IsRising/IsFalling) with chronological traversal and strictness controls, multi-bar persistent comparisons (IsGreaterCount/IsLowerCount) with 5-decimal rounding, historical percentile ranking (IsGreaterPercentil/IsLowerPercentil) with 5-decimal precision, indicator-to-MA comparisons supporting MA types 1 to 4 (SMA, EMA, WMA, HULL), and short-circuiting logical combinators (AND, OR, Not).",
+        "confidence": "confirmed",
+        "limitations": [
+          "Static inspection of snippet source code; runtime engine integration is tested independently in HaruQuantAI."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Comparisons/IsGreater.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnEvaluateComparison",
+            "line_range": "38-43",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates Left and Right rounded to 6 decimal places."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0ade6463d7846d8c6caf00117bc1cd8acc70128ba05a160e40e0d984b126b2ee"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Comparisons/CrossesAbove.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnEvaluateComparison",
+            "line_range": "38-50",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates crossover across shift 1 and shift 0 with 6-decimal rounding."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "78724d76b2661b149145ba847d1c6a1ba7657ecf2eb11ee98fd0a2ed1ff94d26"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Comparisons/IsRising.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnEvaluateComparison",
+            "line_range": "46-70",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates multi-bar chronological trend progression and NotStrict flag."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "380e620c7582a8d6dbb5ca909b7dd6b637dc93696241b4ca325ab77c20968735"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Comparisons/IsGreaterCount.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnEvaluateComparison",
+            "line_range": "39-63",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates multi-bar condition count with 5-decimal precision."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9cd5486728042a2769fbcbad46ebbaa4e7f0e65191c93fec772b4601efd999ed"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Comparisons/IsGreaterPercentil.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnEvaluateComparison",
+            "line_range": "40-59",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates historical percentile rank using count initialized to 1 and 5-decimal precision."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0fd3667e5da5481d98a905ca1bbc1d55fb320a1831cab4f8f6b650b3900abdc9"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Comparisons/IndicatorMAComparisonBlockAbstract.java",
+          "location": {
+            "section": "calculation",
+            "symbol": "calculateMA",
+            "line_range": "25-78",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines MA calculations for SMA (1), EMA (2), WMA (3), and Hull MA (4)."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "dcc95f62e4b0f1c2e0e786b1284b7c6d76ce9d55a6b84859eaf37d5b503c1741"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Comparisons/AND.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnEvaluateComparison",
+            "line_range": "40-55",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates short-circuit logical AND across child blocks."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "254a59a9df30807a59311698d54f095c388a785101c729d98ee4ad3d6cba57b1"
+          },
+          "accessed_at": "2026-10-12"
+        }
+      ],
+      "target_mapping": {
+        "domain": "strategy",
+        "feature_ids": [
+          "FEAT-SERVICES-COMPARISONS"
+        ],
+        "requirement_ids": [
+          "FR-SERVICES-COMPARISON-BASIC",
+          "FR-SERVICES-COMPARISON-CROSSOVER",
+          "FR-SERVICES-COMPARISON-TREND",
+          "FR-SERVICES-COMPARISON-COUNT",
+          "FR-SERVICES-COMPARISON-PERCENTILE",
+          "FR-SERVICES-COMPARISON-MA",
+          "FR-SERVICES-COMPARISON-LOGIC",
+          "FR-SERVICES-COMPARISONS-FACADE"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/reimplementation.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature FEAT-SERVICES-COMPARISONS proposed for comparison building blocks matching SQX Snippets/SQ/Blocks/Comparisons suite.",
+        "proposed_owner_readme": "app/services/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Statically inspect and verify all 27 comparison block java snippets under SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Blocks/Comparisons.",
+        "expected_observation": "Comparison blocks implement 6-decimal rounding for basic comparisons, crossovers, trends, and MAs, 5-decimal rounding for multi-bar counts and percentiles, and boolean combinators.",
+        "actual_observation": "Inspected all 27 files in SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Blocks/Comparisons; verified arithmetic comparisons, crossover logic across shift 1 and 0, chronological trend evaluation in IsRising/IsFalling, 5-decimal precision in IsGreaterCount/IsLowerCount, count-based percentile ranking, and MA types 1 to 4.",
+        "artifact_paths": [
+          "internal/extend/Snippets/SQ/Blocks/Comparisons"
+        ],
+        "executed_at": "2026-10-12T20:44:00.000Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "7eabf6494efd45f5af5245833bc0520da700d6bb",
+        "created_at": "2026-10-12T20:44:00.000Z",
+        "updated_at": "2026-10-12T20:44:00.000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased behavioral and mathematical evaluation rules only; no proprietary code copied."
+      },
+      "tags": [
+        "services",
+        "blocks",
+        "comparisons",
+        "static",
+        "snippets"
+      ]
     }
   },
   "minimum_record_number": 132,
-  "allocation_high_water_mark": 197
+  "allocation_high_water_mark": 198
 }
