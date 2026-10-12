@@ -1013,7 +1013,7 @@ def test_cli_main_exception(
 
 
 def test_sqlite3_import_isolation() -> None:
-    """Assert that sqlite3 is imported ONLY within app/host/persistence.py across app/."""
+    """Assert that sqlite3 is imported ONLY within app/host/persistence across app/."""
     app_root = Path(__file__).resolve().parents[4] / "app"
     assert app_root.is_dir(), f"Expected app directory at {app_root}"
 
@@ -1021,8 +1021,10 @@ def test_sqlite3_import_isolation() -> None:
 
     for py_file in app_root.rglob("*.py"):
         rel_path = py_file.relative_to(app_root.parent).as_posix()
-        # app/host/persistence.py is the sole authorized SQLite module
-        if rel_path == "app/host/persistence.py":
+        # app/host/persistence is the sole authorized SQLite package/module
+        if rel_path == "app/host/persistence.py" or rel_path.startswith(
+            "app/host/persistence/"
+        ):
             continue
 
         try:
@@ -1047,7 +1049,7 @@ def test_sqlite3_import_isolation() -> None:
 
     assert not violating_imports, (
         "Architectural violation: sqlite3 must ONLY be imported within "
-        "app/host/persistence.py. Found unauthorized imports in: "
+        "app/host/persistence. Found unauthorized imports in: "
         f"{violating_imports}"
     )
 
@@ -1210,13 +1212,20 @@ def test_application_database_boundary() -> None:
     root = Path(__file__).resolve().parents[4]
     violations = {}
     for path in (root / "app").rglob("*.py"):
-        if path == root / "app/host/persistence.py":
+        if path == root / "app/host/persistence.py" or (
+            path.is_relative_to(root / "app/host/persistence")
+        ):
             continue
         found = _database_boundary_violations(path.read_text(encoding="utf-8"))
         if found:
             violations[str(path.relative_to(root))] = found
     assert not violations
-    source = (root / "app/host/persistence.py").read_text(encoding="utf-8")
+    persistence_dir = root / "app/host/persistence"
+    persistence_files = (
+        list(persistence_dir.rglob("*.py"))
+        if persistence_dir.is_dir()
+        else [root / "app/host/persistence.py"]
+    )
     forbidden = {
         "fastapi",
         "argparse",
@@ -1226,17 +1235,19 @@ def test_application_database_boundary() -> None:
         "app.host.session",
         "app.host.diagnostics",
     }
-    for node in ast.walk(ast.parse(source)):
-        modules = []
-        if isinstance(node, ast.Import):
-            modules = [alias.name for alias in node.names]
-        elif isinstance(node, ast.ImportFrom):
-            modules = [node.module or ""]
-        assert not any(
-            module == prefix or module.startswith(prefix + ".")
-            for module in modules
-            for prefix in forbidden | {"app.workspace"}
-        )
+    for p_file in persistence_files:
+        source = p_file.read_text(encoding="utf-8")
+        for node in ast.walk(ast.parse(source)):
+            modules = []
+            if isinstance(node, ast.Import):
+                modules = [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                modules = [node.module or ""]
+            assert not any(
+                module == prefix or module.startswith(prefix + ".")
+                for module in modules
+                for prefix in forbidden | {"app.workspace"}
+            )
 
 
 def test_storage_initialization_has_no_domain_seeds(
