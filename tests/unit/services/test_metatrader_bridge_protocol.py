@@ -308,7 +308,7 @@ def test_connection_example_displays_observed_receipt(
             assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
             assert receipt.value is True
         finally:
-            await brokers.example_17_shutdown(ctx)
+            await brokers.example_19_shutdown(ctx)
 
     asyncio.run(scenario())
     output = capsys.readouterr().out
@@ -376,7 +376,7 @@ def test_connection_example_rejects_invalid_receipt(
                 await brokers.example_01_connect(ctx)
             assert ctx.results == []
         finally:
-            await brokers.example_17_shutdown(ctx)
+            await brokers.example_19_shutdown(ctx)
 
     asyncio.run(scenario())
 
@@ -408,7 +408,7 @@ def test_connection_example_rejects_false_or_nonboolean_probe(
                 await brokers.example_01_connect(ctx)
             assert ctx.results == []
         finally:
-            await brokers.example_17_shutdown(ctx)
+            await brokers.example_19_shutdown(ctx)
 
     asyncio.run(scenario())
 
@@ -519,20 +519,20 @@ def test_connection_evidence_preserves_complete_simulation_walkthrough(
             "example_02_terminal",
             "example_03_account",
             "example_04_symbol",
-            "example_05_position",
-            "example_06_order",
-            "example_07_history_order",
-            "example_08_history_deal",
-            "example_09_open_position",
-            "example_10_calc_profit_margin",
-            "example_11_modify_position",
-            "example_12_close_partial_position",
-            "example_13_close_position",
-            "example_14_pending_orders",
-            "example_15_modify_pending_orders",
-            "example_16_delete_pending_orders",
-            "example_18_historical_bars",
-            "example_19_tick_data",
+            "example_05_historical_bars",
+            "example_06_tick_data",
+            "example_07_position",
+            "example_08_order",
+            "example_09_history_order",
+            "example_10_history_deal",
+            "example_11_open_position",
+            "example_12_calc_profit_margin",
+            "example_13_modify_position",
+            "example_14_close_partial_position",
+            "example_15_close_position",
+            "example_16_pending_orders",
+            "example_17_modify_pending_orders",
+            "example_18_delete_pending_orders",
         )
     )
     monkeypatch.setattr(brokers, "EXAMPLES", examples)

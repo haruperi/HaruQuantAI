@@ -110,30 +110,29 @@ Only the setup factory imports providers; all example functions use `Trading`.
 The current owner-selected flags are preserved. Keep `ALLOW_LIVE_TRADING = False`
 for read-only MT5. Simulation runs all functions with explicitly seeded history.
 
-The legacy seventeen-function sequence is implemented as async functions:
+The nineteen-function sequence is implemented as async functions:
 
 1. `example_01_connect`
 2. `example_02_terminal`
 3. `example_03_account`
 4. `example_04_symbol`
-5. `example_05_position`
-6. `example_06_order`
-7. `example_07_history_order`
-8. `example_08_history_deal`
-9. `example_09_open_position`
-10. `example_10_calc_profit_margin`
-11. `example_11_modify_position`
-12. `example_12_close_partial_position`
-13. `example_13_close_position`
-14. `example_14_pending_orders`
-15. `example_15_modify_pending_orders`
-16. `example_16_delete_pending_orders`
-17. `example_17_shutdown`
-18. `example_18_historical_bars`
-19. `example_19_tick_data`
+5. `example_05_historical_bars`
+6. `example_06_tick_data`
+7. `example_07_position`
+8. `example_08_order`
+9. `example_09_history_order`
+10. `example_10_history_deal`
+11. `example_11_open_position`
+12. `example_12_calc_profit_margin`
+13. `example_13_modify_position`
+14. `example_14_close_partial_position`
+15. `example_15_close_position`
+16. `example_16_pending_orders`
+17. `example_17_modify_pending_orders`
+18. `example_18_delete_pending_orders`
+19. `example_19_shutdown`
 
-Functions 18/19 run before function 17 so shutdown remains last. Shutdown also
-runs once on failure. Each function accepts an explicit `ExampleContext` from the
+Shutdown runs last and also once on failure. Each function accepts an explicit `ExampleContext` from the
 script, so callers may run selected functions after connection/symbol setup.
 `EXAMPLES` contains the eighteen non-shutdown functions; `run_examples` owns the
 final shutdown and reports one result per function.

@@ -12,7 +12,7 @@ Purpose:
 
 Key Capabilities:
     - FR-TRADING-USAGE-EXAMPLES: Execute nineteen named functions and field previews.
-      Associated: `example_01_connect()` through `example_19_tick_data()`
+      Associated: `example_01_connect()` through `example_19_shutdown()`
       Logging: INFO number/title/status and labelled values, no credentials,
         identity/path/comment/request dumps or arbitrary exception messages.
     - FR-TRADING-USAGE-LIFECYCLE: Select providers and close exactly once.
@@ -61,7 +61,11 @@ from app.services.brokers.contracts import (
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
 from app.services.trading import Trading
-from app.services.utils import format_timestamp
+from app.services.utils import (
+    bars_to_dataframe,
+    format_timestamp,
+    ticks_to_dataframe,
+)
 
 BROKER: Literal["simulator", "mt5"] = "mt5"
 ALLOW_LIVE_TRADING = True
@@ -311,7 +315,33 @@ async def example_04_symbol(ctx: ExampleContext) -> None:
     print(f"Swap short: {await symbol.SwapShort()}")
 
 
-async def example_05_position(ctx: ExampleContext) -> None:
+async def example_05_historical_bars(ctx: ExampleContext) -> None:
+    """Demonstrate bars by date range converted to a DataFrame."""
+    _header("Historical Bars")
+    trading = ctx.trading
+    bars = await trading.get_historical_bars(
+        SYMBOL, TIMEFRAME, DATE_FROM, DATE_TO, limit=DATA_LIMIT
+    )
+    print(f"Range count: {len(bars)}")
+    print(f"Range sample: {bars[:PREVIEW_LIMIT]}")
+    bars_df = bars_to_dataframe(bars)
+    print("Historical Bars DataFrame:")
+    print(bars_df.head())
+
+
+async def example_06_tick_data(ctx: ExampleContext) -> None:
+    """Demonstrate ticks by date range converted to a DataFrame."""
+    _header("Historical Ticks")
+    trading = ctx.trading
+    ticks = await trading.get_ticks(SYMBOL, TICK_DATE_FROM, DATE_TO, limit=DATA_LIMIT)
+    print(f"Range count: {len(ticks)}")
+    print(f"Range sample: {ticks[:PREVIEW_LIMIT]}")
+    ticks_df = ticks_to_dataframe(ticks)
+    print("Historical Ticks DataFrame:")
+    print(ticks_df.head())
+
+
+async def example_07_position(ctx: ExampleContext) -> None:
     """Demonstrate printing an open-position preview using PositionInfo."""
     _header("Position Information")
     position = ctx.trading.position
@@ -334,7 +364,7 @@ async def example_05_position(ctx: ExampleContext) -> None:
         print("No open positions")
 
 
-async def example_06_order(ctx: ExampleContext) -> None:
+async def example_08_order(ctx: ExampleContext) -> None:
     """Demonstrate printing a pending-order preview using OrderInfo."""
     _header("Order Information")
     order = ctx.trading.order
@@ -354,7 +384,7 @@ async def example_06_order(ctx: ExampleContext) -> None:
         print("No pending orders")
 
 
-async def example_07_history_order(ctx: ExampleContext) -> None:
+async def example_09_history_order(ctx: ExampleContext) -> None:
     """Demonstrate printing historical orders using HistoryOrderInfo."""
     _header("History Order Information")
     order = ctx.trading.history_order
@@ -374,7 +404,7 @@ async def example_07_history_order(ctx: ExampleContext) -> None:
         print("No history orders")
 
 
-async def example_08_history_deal(ctx: ExampleContext) -> None:
+async def example_10_history_deal(ctx: ExampleContext) -> None:
     """Demonstrate printing historical deals using DealInfo."""
     _header("Deal Information")
     deal = ctx.trading.deal
@@ -396,7 +426,7 @@ async def example_08_history_deal(ctx: ExampleContext) -> None:
         print("No history deals")
 
 
-async def example_09_open_position(ctx: ExampleContext) -> None:
+async def example_11_open_position(ctx: ExampleContext) -> None:
     """Demonstrate opening a buy position using Trade."""
     _header("Open Position")
     if not ctx.allow_writes:
@@ -458,7 +488,7 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
     print(f"Opened owned position with volume: {2 * VOLUME}; retcode={retcode}")
 
 
-async def example_10_calc_profit_margin(ctx: ExampleContext) -> None:
+async def example_12_calc_profit_margin(ctx: ExampleContext) -> None:
     """Demonstrate calculating expected profit and required margin using AccountInfo."""
     _header("Calculate Profit and Margin")
     ask = float(await ctx.trading.symbol.Ask())
@@ -476,7 +506,7 @@ async def example_10_calc_profit_margin(ctx: ExampleContext) -> None:
     )
 
 
-async def example_11_modify_position(ctx: ExampleContext) -> None:
+async def example_13_modify_position(ctx: ExampleContext) -> None:
     """Demonstrate modifying the owned position's SL/TP using Trade."""
     _header("Modify Position")
     if not ctx.allow_writes:
@@ -513,7 +543,7 @@ async def example_11_modify_position(ctx: ExampleContext) -> None:
     print(f"Modified owned position SL={sl}, TP={tp}")
 
 
-async def example_12_close_partial_position(ctx: ExampleContext) -> None:
+async def example_14_close_partial_position(ctx: ExampleContext) -> None:
     """Demonstrate partially closing the owned position using Trade."""
     _header("Close Partial Position")
     if not ctx.allow_writes:
@@ -547,7 +577,7 @@ async def example_12_close_partial_position(ctx: ExampleContext) -> None:
     print(f"Partial close successful; remaining volume: {remaining}")
 
 
-async def example_13_close_position(ctx: ExampleContext) -> None:
+async def example_15_close_position(ctx: ExampleContext) -> None:
     """Demonstrate fully closing the remaining owned position using Trade."""
     _header("Close Position")
     if not ctx.allow_writes:
@@ -573,7 +603,7 @@ async def example_13_close_position(ctx: ExampleContext) -> None:
     print("Closed remaining owned position")
 
 
-async def example_14_pending_orders(ctx: ExampleContext) -> None:
+async def example_16_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate placing a BuyLimit pending order using Trade."""
     _header("Place Pending Order")
     if not ctx.allow_writes:
@@ -608,7 +638,7 @@ async def example_14_pending_orders(ctx: ExampleContext) -> None:
     print(f"Placed owned pending order at price: {ctx.pending_price}; volume: {VOLUME}")
 
 
-async def example_15_modify_pending_orders(ctx: ExampleContext) -> None:
+async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate modifying the owned pending order using Trade."""
     _header("Modify Pending Order")
     if not ctx.allow_writes:
@@ -645,7 +675,7 @@ async def example_15_modify_pending_orders(ctx: ExampleContext) -> None:
     print(f"Modified owned pending order price: {price}")
 
 
-async def example_16_delete_pending_orders(ctx: ExampleContext) -> None:
+async def example_18_delete_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate cancelling the owned pending order using Trade."""
     _header("Cancel Pending Order")
     if not ctx.allow_writes:
@@ -670,7 +700,7 @@ async def example_16_delete_pending_orders(ctx: ExampleContext) -> None:
     print("Deleted owned pending order")
 
 
-async def example_17_shutdown(ctx: ExampleContext) -> None:
+async def example_19_shutdown(ctx: ExampleContext) -> None:
     """Demonstrate shutting down the broker connection."""
     _header("Shutdown")
     if not ctx.closed:
@@ -680,46 +710,7 @@ async def example_17_shutdown(ctx: ExampleContext) -> None:
         print("Broker connection closed successfully")
 
 
-async def example_18_historical_bars(ctx: ExampleContext) -> None:
-    """Demonstrate bars by date range, forward date/count, index/count and defaults."""
-    _header("Historical Bars")
-    trading = ctx.trading
-    bars = await trading.get_historical_bars(
-        SYMBOL, TIMEFRAME, DATE_FROM, DATE_TO, limit=DATA_LIMIT
-    )
-    from_date = await trading.get_historical_bars(
-        SYMBOL, TIMEFRAME, date_from=DATE_FROM, count=3
-    )
-    from_index = await trading.get_historical_bars(
-        SYMBOL, TIMEFRAME, start_pos=1, count=2
-    )
-    latest = await trading.get_historical_bars(SYMBOL, TIMEFRAME, count=3)
-    until_now = await trading.get_historical_bars(
-        SYMBOL, TIMEFRAME, date_from=DATE_FROM
-    )
-    through_current = await trading.get_historical_bars(SYMBOL, TIMEFRAME, start_pos=2)
-    print(f"Range count: {len(bars)}")
-    print(f"Range sample: {bars[:PREVIEW_LIMIT]}")
-    print(f"Date/count: {from_date[:PREVIEW_LIMIT]}")
-    print(f"Index/count: {from_index[:PREVIEW_LIMIT]}")
-    print(f"Latest: {latest[:PREVIEW_LIMIT]}")
-    print(f"Date until now count: {len(until_now)}")
-    print(f"Index through current: {through_current[:PREVIEW_LIMIT]}")
-
-
-async def example_19_tick_data(ctx: ExampleContext) -> None:
-    """Demonstrate ticks by date range, forward date/count and latest count."""
-    _header("Historical Ticks")
-    trading = ctx.trading
-    ticks = await trading.get_ticks(SYMBOL, TICK_DATE_FROM, DATE_TO, limit=DATA_LIMIT)
-    from_date = await trading.get_ticks(SYMBOL, date_from=TICK_DATE_FROM, count=3)
-    latest = await trading.get_ticks(SYMBOL, count=3)
-    until_now = await trading.get_ticks(SYMBOL, date_from=TICK_DATE_FROM)
-    print(f"Range count: {len(ticks)}")
-    print(f"Range sample: {ticks[:PREVIEW_LIMIT]}")
-    print(f"Date/count: {from_date[:PREVIEW_LIMIT]}")
-    print(f"Latest: {latest[:PREVIEW_LIMIT]}")
-    print(f"Date until now count: {len(until_now)}")
+example_17_shutdown = example_19_shutdown
 
 
 EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
@@ -727,20 +718,20 @@ EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_02_terminal,
     example_03_account,
     example_04_symbol,
-    # example_05_position,
-    # example_06_order,
-    # example_07_history_order,
-    # example_08_history_deal,
-    # example_09_open_position,
-    # example_10_calc_profit_margin,
-    # example_11_modify_position,
-    # example_12_close_partial_position,
-    # example_13_close_position,
-    # example_14_pending_orders,
-    # example_15_modify_pending_orders,
-    # example_16_delete_pending_orders,
-    # example_18_historical_bars,
-    # example_19_tick_data,
+    example_05_historical_bars,
+    example_06_tick_data,
+    # example_07_position,
+    # example_08_order,
+    # example_09_history_order,
+    # example_10_history_deal,
+    # example_11_open_position,
+    # example_12_calc_profit_margin,
+    # example_13_modify_position,
+    # example_14_close_partial_position,
+    # example_15_close_position,
+    # example_16_pending_orders,
+    # example_17_modify_pending_orders,
+    # example_18_delete_pending_orders,
 )
 
 
@@ -753,7 +744,7 @@ async def run_examples(
         for example in EXAMPLES:
             await example(ctx)
     finally:
-        await example_17_shutdown(ctx)
+        await example_19_shutdown(ctx)
     print("\nExamples completed successfully.")
     return ctx.results
 

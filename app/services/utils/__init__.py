@@ -20,10 +20,12 @@ Description:
     - Action primitives: Actions facade, ActionRecord, variable assignments,
       chart annotations (arrows, vertical line), logging (journal, file), and
       email notifications.
+    - Data primitives: bars_to_dataframe, bars_to_df, ticks_to_dataframe,
+      and ticks_to_df converting market data collections to pandas DataFrames.
 
 Purpose:
     FEAT-SERVICES-UTILS: Re-export temporal, price, comparison, function, type,
-    and action utility building blocks.
+    action, and data utility building blocks.
 
 Key Capabilities:
     - FR-SERVICES-UTILS-EXPORTS: Provide centralized public access to utilities.
@@ -112,6 +114,12 @@ from app.services.utils.comparisons import (
     resolve_shift_value,
     round_value,
 )
+from app.services.utils.data import (
+    bars_to_dataframe,
+    bars_to_df,
+    ticks_to_dataframe,
+    ticks_to_df,
+)
 from app.services.utils.functions import (
     Functions,
     abs_val,
@@ -189,6 +197,8 @@ __all__ = [
     "Variable",
     "abs_val",
     "assign_variable",
+    "bars_to_dataframe",
+    "bars_to_df",
     "boolean_constant",
     "boolean_variable",
     "calculate_ma",
@@ -248,4 +258,6 @@ __all__ = [
     "round_value",
     "send_email",
     "square_root",
+    "ticks_to_dataframe",
+    "ticks_to_df",
 ]
