@@ -1300,6 +1300,43 @@ def _symbolinfo_symbolsget(self: _ObjectState, group: str | None = None) -> list
     return [name for name in names if _match_symbol_pattern(name, group)]
 
 
+def _symbolinfo_symbolinfotick(
+    self: _ObjectState, symbol: str | None = None
+) -> dict[str, Any] | None:
+    sym = symbol or self.symbol_name
+    if not sym:
+        return None
+    tick = self._backend.tick(sym)
+    if tick is None:
+        return None
+    time_sec = epoch_seconds(tick.time)
+    time_msc = epoch_millis(tick.time)
+    return {
+        "time": time_sec,
+        "bid": float(tick.bid),
+        "ask": float(tick.ask),
+        "last": float(tick.last),
+        "volume": int(tick.volume),
+        "time_msc": time_msc,
+        "flags": 6,
+        "volume_real": float(tick.volume),
+    }
+
+
+def _symbolinfo_symbolselect(
+    self: _ObjectState, name: str | bool | None = None, enable: bool = True
+) -> bool:
+    if isinstance(name, bool):
+        sym = self.symbol_name
+        is_enabled = name
+    else:
+        sym = name or self.symbol_name
+        is_enabled = enable
+    if not sym:
+        return False
+    return bool(self._backend.select_symbol(sym, is_enabled))
+
+
 def _symbolinfo_custom(self: _ObjectState) -> bool:
     return bool(_symbolinfo__s(self).custom)
 
@@ -2583,6 +2620,8 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "NormalizePrice": _symbolinfo_normalizeprice,
         "SymbolsTotal": _symbolinfo_symbolstotal,
         "SymbolsGet": _symbolinfo_symbolsget,
+        "SymbolInfoTick": _symbolinfo_symbolinfotick,
+        "SymbolSelect": _symbolinfo_symbolselect,
         "Custom": _symbolinfo_custom,
         "ChartMode": _symbolinfo_chartmode,
         "Visible": _symbolinfo_visible,

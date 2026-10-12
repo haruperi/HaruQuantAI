@@ -1145,6 +1145,46 @@ void DispatchSymbol(const string command_id,const string object_id,const string 
       RespondRaw(command_id, true, json);
       return;
      }
+   if(method=="SymbolInfoTick")
+     {
+      string sym = (ArraySize(args) > 0 && args[0] != "") ? ArgString(args, 0) : obj.Name();
+      MqlTick tick;
+      if(!SymbolInfoTick(sym, tick))
+        {
+         RespondRaw(command_id, true, "null");
+         return;
+        }
+      string j = "{";
+      j += "\"time\":" + JsonLong((long)tick.time) + ",";
+      j += "\"bid\":" + JsonDouble(tick.bid) + ",";
+      j += "\"ask\":" + JsonDouble(tick.ask) + ",";
+      j += "\"last\":" + JsonDouble(tick.last) + ",";
+      j += "\"volume\":" + JsonLong((long)tick.volume) + ",";
+      j += "\"time_msc\":" + JsonLong(tick.time_msc) + ",";
+      j += "\"flags\":" + JsonLong((long)tick.flags) + ",";
+      j += "\"volume_real\":" + JsonDouble(tick.volume_real) + "}";
+      RespondRaw(command_id, true, j);
+      return;
+     }
+   if(method=="SymbolSelect")
+     {
+      string sym = obj.Name();
+      bool enable = true;
+      if(ArraySize(args) == 1)
+        {
+         if(args[0] == "true" || args[0] == "false" || args[0] == "1" || args[0] == "0")
+           enable = ArgBool(args, 0);
+         else
+           sym = ArgString(args, 0);
+        }
+      else if(ArraySize(args) >= 2)
+        {
+         if(args[0] != "") sym = ArgString(args, 0);
+         enable = ArgBool(args, 1);
+        }
+      RespondBool(command_id, true, SymbolSelect(sym, enable));
+      return;
+     }
    if(method=="Custom") { RespondBool(command_id, true, (bool)SymbolInfoInteger(obj.Name(), SYMBOL_CUSTOM)); return; }
    if(method=="ChartMode") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_CHART_MODE)); return; }
    if(method=="Visible") { RespondBool(command_id, true, (bool)SymbolInfoInteger(obj.Name(), SYMBOL_VISIBLE)); return; }

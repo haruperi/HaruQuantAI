@@ -358,6 +358,14 @@ class SymbolInfo(TradingClass):
         """Await the backend SymbolInfo.SymbolsGet operation."""
         return await self._call("SymbolsGet", *args)
 
+    async def SymbolInfoTick(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.SymbolInfoTick operation."""
+        return await self._call("SymbolInfoTick", *args)
+
+    async def SymbolSelect(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.SymbolSelect operation."""
+        return await self._call("SymbolSelect", *args)
+
     async def Custom(self, *args: Any) -> Any:
         """Await the backend SymbolInfo.Custom operation."""
         return await self._call("Custom", *args)

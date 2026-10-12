@@ -26,6 +26,7 @@ CLI Usage:
 import asyncio
 import json
 from dataclasses import replace
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
 from unittest.mock import AsyncMock, Mock
@@ -617,5 +618,27 @@ def test_symbol_info_extended_properties_and_search_parity() -> None:
         assert d["digits"] == 5
         assert d["select"] is True
         assert d["custom"] is False
+
+        # 5. SymbolSelect
+        assert await symbol.SymbolSelect("USDRUB", True) is True
+        assert await symbol.SymbolsTotal(True) == 3
+        assert await symbol.SymbolSelect("USDRUB", False) is True
+        assert await symbol.SymbolsTotal(True) == 2
+
+        # 6. SymbolInfoTick
+        sim.feed_tick(
+            "EURUSD",
+            bid=1.0950,
+            ask=1.0952,
+            time=datetime(2026, 10, 12, 12, 0, 0, tzinfo=UTC),
+        )
+        tick = await symbol.SymbolInfoTick("EURUSD")
+        assert tick is not None
+        assert tick["bid"] == 1.0950
+        assert tick["ask"] == 1.0952
+        assert tick["flags"] == 6
+
+        # Unseeded tick returns None
+        assert await symbol.SymbolInfoTick("BTCUSD") is None
 
     asyncio.run(scenario())

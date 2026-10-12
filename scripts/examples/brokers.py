@@ -278,7 +278,13 @@ async def example_04_symbol(ctx: ExampleContext) -> None:
     no_majors = await symbol.SymbolsGet("*,!*USD*,!*EUR*,!*JPY*,!*GBP*")
     print(f"Symbols get (all count): {len(all_symbols)}")
     print(f"Symbols get (*RU*): {ru_symbols}")
-    print(f"Symbols get (no USD/EUR/JPY/GBP): {no_majors}")
+    print(f"Symbols get (no USD/EUR/JPY/GBP): {no_majors[:10]}")
+
+    selected_ok = await symbol.SymbolSelect(SYMBOL, True)
+    print(f"Symbol select ({SYMBOL}, True): {selected_ok}")
+
+    last_tick = await symbol.SymbolInfoTick(SYMBOL)
+    print(f"Symbol info tick: {last_tick}")
 
     if (
         not await symbol.Name(SYMBOL)
