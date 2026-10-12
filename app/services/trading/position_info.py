@@ -145,3 +145,13 @@ class PositionInfo(TradingClass):
     async def CheckState(self, *args: Any) -> Any:
         """Await the backend PositionInfo.CheckState operation."""
         return await self._call("CheckState", *args)
+
+    async def PositionsTotal(self, *args: Any) -> Any:
+        """Await the backend PositionInfo.PositionsTotal operation."""
+        return await self._call("PositionsTotal", *args)
+
+    async def PositionsGet(self, *args: Any, **kwargs: Any) -> Any:
+        """Await the backend PositionInfo.PositionsGet operation."""
+        if kwargs:
+            return await self._call("PositionsGet", kwargs)
+        return await self._call("PositionsGet", *args)

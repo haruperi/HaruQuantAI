@@ -102,7 +102,7 @@ Tests exercise actual local models and bounded native transport fixtures. They d
 not connect to a live terminal or certify real broker fills.
 
 
-## Twenty named usage functions
+## Twenty-one named usage functions
 
 Run `uv run python -m scripts.examples.brokers` from the repository root.
 Select `BROKER = "mt5"` or `"simulator"` in `scripts/examples/brokers.py`.
@@ -110,7 +110,7 @@ Only the setup factory imports providers; all example functions use `Trading`.
 The current owner-selected flags are preserved. Keep `ALLOW_LIVE_TRADING = False`
 for read-only MT5. Simulation runs all functions with explicitly seeded history.
 
-The twenty-function sequence is implemented as async functions:
+The twenty-one-function sequence is implemented as async functions:
 
 1. `example_01_connect`
 2. `example_02_terminal`
@@ -119,23 +119,24 @@ The twenty-function sequence is implemented as async functions:
 5. `example_05_historical_bars`
 6. `example_06_tick_data`
 7. `example_07_order_book`
-8. `example_08_position`
-9. `example_09_order`
-10. `example_10_history_order`
-11. `example_11_history_deal`
-12. `example_12_open_position`
-13. `example_13_calc_profit_margin`
-14. `example_14_modify_position`
-15. `example_15_close_partial_position`
-16. `example_16_close_position`
-17. `example_17_pending_orders`
-18. `example_18_modify_pending_orders`
-19. `example_19_delete_pending_orders`
-20. `example_20_shutdown`
+8. `example_08_order_check`
+9. `example_09_open_position`
+10. `example_10_calc_profit_margin`
+11. `example_11_position`
+12. `example_12_modify_position`
+13. `example_13_close_partial_position`
+14. `example_14_close_position`
+15. `example_15_pending_orders`
+16. `example_16_order`
+17. `example_17_modify_pending_orders`
+18. `example_18_delete_pending_orders`
+19. `example_19_history_order`
+20. `example_20_history_deal`
+21. `example_21_shutdown`
 
 Shutdown runs last and also once on failure. Each function accepts an explicit `ExampleContext` from the
 script, so callers may run selected functions after connection/symbol setup.
-`EXAMPLES` contains the nineteen non-shutdown functions; `run_examples` owns the
+`EXAMPLES` contains the twenty non-shutdown functions; `run_examples` owns the
 final shutdown and reports one result per function.
 
 Each function directly calls the relevant trading class and reports its fields.
@@ -223,7 +224,9 @@ bars = await trading.get_historical_bars(symbol, timeframe, date_from=start, cou
 # Bars by native index: zero is the current, potentially unfinished bar.
 bars = await trading.get_historical_bars(symbol, timeframe, start_pos=10, count=100)
 # Inclusive date range (existing positional dates also work).
-bars = await trading.get_historical_bars(symbol, timeframe, date_from=start, date_to=end)
+bars = await trading.get_historical_bars(
+    symbol, timeframe, date_from=start, date_to=end
+)
 # Latest bars; a date alone runs through the current UTC instant.
 bars = await trading.get_historical_bars(symbol, timeframe, count=100)
 bars = await trading.get_historical_bars(symbol, timeframe, date_from=start)

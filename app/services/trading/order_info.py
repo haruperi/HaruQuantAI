@@ -165,3 +165,13 @@ class OrderInfo(TradingClass):
     async def SelectByIndex(self, *args: Any) -> Any:
         """Await the backend OrderInfo.SelectByIndex operation."""
         return await self._call("SelectByIndex", *args)
+
+    async def OrdersTotal(self, *args: Any) -> Any:
+        """Await the backend OrderInfo.OrdersTotal operation."""
+        return await self._call("OrdersTotal", *args)
+
+    async def OrdersGet(self, *args: Any, **kwargs: Any) -> Any:
+        """Await the backend OrderInfo.OrdersGet operation."""
+        if kwargs:
+            return await self._call("OrdersGet", kwargs)
+        return await self._call("OrdersGet", *args)

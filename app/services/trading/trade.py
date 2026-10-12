@@ -120,6 +120,12 @@ class Trade(TradingClass):
         """Await the backend Trade.SetMarginMode operation."""
         return await self._call("SetMarginMode", *args)
 
+    async def OrderCheck(self, *args: Any, **kwargs: Any) -> Any:
+        """Await the backend Trade.OrderCheck operation."""
+        if kwargs:
+            return await self._call("OrderCheck", kwargs)
+        return await self._call("OrderCheck", *args)
+
     async def OrderOpen(self, *args: Any) -> Any:
         """Await the backend Trade.OrderOpen operation."""
         return await self._call("OrderOpen", *args)

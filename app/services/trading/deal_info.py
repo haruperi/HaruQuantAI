@@ -125,3 +125,15 @@ class DealInfo(TradingClass):
     async def Commission(self, *args: Any) -> Any:
         """Compatibility alias for the correctly-spelled method page."""
         return await self._call("Commision", *args)
+
+    async def HistoryDealsTotal(self, *args: Any, **kwargs: Any) -> Any:
+        """Await the backend DealInfo.HistoryDealsTotal operation."""
+        if kwargs:
+            return await self._call("HistoryDealsTotal", kwargs)
+        return await self._call("HistoryDealsTotal", *args)
+
+    async def HistoryDealsGet(self, *args: Any, **kwargs: Any) -> Any:
+        """Await the backend DealInfo.HistoryDealsGet operation."""
+        if kwargs:
+            return await self._call("HistoryDealsGet", kwargs)
+        return await self._call("HistoryDealsGet", *args)

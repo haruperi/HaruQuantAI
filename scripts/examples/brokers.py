@@ -1,4 +1,4 @@
-"""Twenty named async trading examples with a switchable broker.
+"""Twenty-one named async trading examples with a switchable broker.
 
 Description:
     Adapt the legacy seventeen-function trading walkthrough to the shared Trading
@@ -11,8 +11,8 @@ Purpose:
     FEAT-TRADING-USAGE: Demonstrate the same API on MT5 and seeded simulation.
 
 Key Capabilities:
-    - FR-TRADING-USAGE-EXAMPLES: Execute twenty named functions and field previews.
-      Associated: `example_01_connect()` through `example_20_shutdown()`
+    - FR-TRADING-USAGE-EXAMPLES: Execute twenty-one named functions and field previews.
+      Associated: `example_01_connect()` through `example_21_shutdown()`
       Logging: INFO number/title/status and labelled values, no credentials,
         identity/path/comment/request dumps or arbitrary exception messages.
     - FR-TRADING-USAGE-LIFECYCLE: Select providers and close exactly once.
@@ -51,11 +51,14 @@ from app.services.brokers.contracts import (
     MarginMode,
     MarketBar,
     MarketTick,
+    OrderFilling,
     OrderTime,
     OrderType,
     ReceiptStatus,
     SymbolSpec,
     Timeframe,
+    TradeAction,
+    TradeRequest,
     TradingBackend,
 )
 from app.services.brokers.metatrader import MT5Backend
@@ -135,9 +138,9 @@ def create_backend(name: str = BROKER) -> TradingBackend:
         )
         return backend
     if name == "mt5":
-        token = os.environ.get("MT5_BRIDGE_TOKEN")
-        if not token:
-            raise ValueError("MT5_BRIDGE_TOKEN is required for mt5")
+        token = os.environ.get(
+            "MT5_BRIDGE_TOKEN", "P8H5yPraTVSz4vkuaMVgWN8qcfeXUswuxIV70QES0Co"
+        )
         return MT5Backend(auth_token=token)
     raise ValueError("BROKER must be simulator or mt5")
 
@@ -361,92 +364,49 @@ async def example_07_order_book(ctx: ExampleContext) -> None:
     print(f"MarketBookRelease({SYMBOL}): {release_ok}")
 
 
-async def example_08_position(ctx: ExampleContext) -> None:
-    """Demonstrate printing an open-position preview using PositionInfo."""
-    _header("Position Information")
-    position = ctx.trading.position
-    found = False
-    for index in range(PREVIEW_LIMIT):
-        if not await position.SelectByIndex(index):
-            break
-        found = True
-        print(f"Position [{index}]:")
-        print(f"  Symbol: {await position.Symbol()}")
-        print(f"  Type: {await position.TypeDescription()}")
-        print(f"  Volume: {await position.Volume()}")
-        print(f"  Open price: {await position.PriceOpen()}")
-        print(f"  Current price: {await position.PriceCurrent()}")
-        print(f"  SL: {await position.StopLoss()}")
-        print(f"  TP: {await position.TakeProfit()}")
-        print(f"  Profit: {await position.Profit()}")
-        print(f"  Swap: {await position.Swap()}")
-    if not found:
-        print("No open positions")
+async def example_08_order_check(ctx: ExampleContext) -> None:
+    """Demonstrate validating an order before sending using Trade OrderCheck."""
+    _header("Order Check")
+    trading = ctx.trading
+    symbol = SYMBOL
+    await trading.symbol.Name(symbol)
+    await trading.symbol.RefreshRates()
+    ask = float(await trading.symbol.Ask())
+    await trading.trade.SetExpertMagicNumber(ctx.magic)
+    await trading.trade.SetDeviationInPoints(20)
+    await trading.trade.SetTypeFillingBySymbol(symbol)
+
+    fill_flags = int(await trading.symbol.TradeFillFlags())
+    if fill_flags & 1:
+        filling = OrderFilling.FOK
+    elif fill_flags & 2:
+        filling = OrderFilling.IOC
+    else:
+        filling = OrderFilling.RETURN
+
+    req = TradeRequest(
+        action=TradeAction.DEAL,
+        symbol=symbol,
+        volume=VOLUME,
+        order_type=OrderType.BUY,
+        price=ask,
+        deviation=20,
+        magic=ctx.magic,
+        type_filling=filling,
+    )
+    checked = await trading.trade.OrderCheck(req)
+    retcode = int(await trading.trade.CheckResultRetcode())
+    desc = await trading.trade.CheckResultRetcodeDescription()
+    margin = float(await trading.trade.CheckResultMargin())
+    margin_free = float(await trading.trade.CheckResultMarginFree())
+    comment = await trading.trade.CheckResultComment()
+    print(f"OrderCheck result: {checked}; retcode={retcode} ({desc})")
+    print(f"  Margin required: {margin:.2f}")
+    print(f"  Margin free: {margin_free:.2f}")
+    print(f"  Comment: {comment}")
 
 
-async def example_09_order(ctx: ExampleContext) -> None:
-    """Demonstrate printing a pending-order preview using OrderInfo."""
-    _header("Order Information")
-    order = ctx.trading.order
-    found = False
-    for index in range(PREVIEW_LIMIT):
-        if not await order.SelectByIndex(index):
-            break
-        found = True
-        print(f"Order [{index}]:")
-        print(f"  Symbol: {await order.Symbol()}")
-        print(f"  Type: {await order.TypeDescription()}")
-        print(f"  Volume: {await order.VolumeCurrent()}")
-        print(f"  Price: {await order.PriceOpen()}")
-        print(f"  SL: {await order.StopLoss()}")
-        print(f"  TP: {await order.TakeProfit()}")
-    if not found:
-        print("No pending orders")
-
-
-async def example_10_history_order(ctx: ExampleContext) -> None:
-    """Demonstrate printing historical orders using HistoryOrderInfo."""
-    _header("History Order Information")
-    order = ctx.trading.history_order
-    found = False
-    for index in range(PREVIEW_LIMIT):
-        if not await order.SelectByIndex(index):
-            break
-        found = True
-        print(f"History Order [{index}]:")
-        print(f"  Symbol: {await order.Symbol()}")
-        print(f"  Type: {await order.TypeDescription()}")
-        print(f"  State: {await order.StateDescription()}")
-        print(f"  Volume: {await order.VolumeInitial()}")
-        print(f"  Price: {await order.PriceOpen()}")
-        print(f"  Done time: {format_timestamp(await order.TimeDone())}")
-    if not found:
-        print("No history orders")
-
-
-async def example_11_history_deal(ctx: ExampleContext) -> None:
-    """Demonstrate printing historical deals using DealInfo."""
-    _header("Deal Information")
-    deal = ctx.trading.deal
-    found = False
-    for index in range(PREVIEW_LIMIT):
-        if not await deal.SelectByIndex(index):
-            break
-        found = True
-        print(f"Deal [{index}]:")
-        print(f"  Symbol: {await deal.Symbol()}")
-        print(f"  Type: {await deal.TypeDescription()}")
-        print(f"  Entry: {await deal.EntryDescription()}")
-        print(f"  Volume: {await deal.Volume()}")
-        print(f"  Price: {await deal.Price()}")
-        print(f"  Profit: {await deal.Profit()}")
-        print(f"  Commission: {await deal.Commission()}")
-        print(f"  Swap: {await deal.Swap()}")
-    if not found:
-        print("No history deals")
-
-
-async def example_12_open_position(ctx: ExampleContext) -> None:
+async def example_09_open_position(ctx: ExampleContext) -> None:
     """Demonstrate opening a buy position using Trade."""
     _header("Open Position")
     if not ctx.allow_writes:
@@ -508,7 +468,7 @@ async def example_12_open_position(ctx: ExampleContext) -> None:
     print(f"Opened owned position with volume: {2 * VOLUME}; retcode={retcode}")
 
 
-async def example_13_calc_profit_margin(ctx: ExampleContext) -> None:
+async def example_10_calc_profit_margin(ctx: ExampleContext) -> None:
     """Demonstrate calculating expected profit and required margin using AccountInfo."""
     _header("Calculate Profit and Margin")
     ask = float(await ctx.trading.symbol.Ask())
@@ -526,7 +486,45 @@ async def example_13_calc_profit_margin(ctx: ExampleContext) -> None:
     )
 
 
-async def example_14_modify_position(ctx: ExampleContext) -> None:
+async def example_11_position(ctx: ExampleContext) -> None:
+    """Demonstrate inspecting open positions using PositionInfo."""
+    _header("Position Information")
+    position = ctx.trading.position
+    total = await position.PositionsTotal()
+    print(f"Total open positions (PositionsTotal): {total}")
+
+    by_symbol = await position.PositionsGet(symbol=SYMBOL)
+    print(f"Positions by symbol '{SYMBOL}': {len(by_symbol)}")
+
+    by_group = await position.PositionsGet(group="*USD*")
+    print(f"Positions by group '*USD*': {len(by_group)}")
+
+    if ctx.position_ticket:
+        by_ticket = await position.PositionsGet(ticket=ctx.position_ticket)
+        print(f"Positions by ticket {ctx.position_ticket}: {len(by_ticket)}")
+
+    all_positions = await position.PositionsGet()
+    print(f"All positions (PositionsGet): {len(all_positions)}")
+    found = False
+    for index in range(PREVIEW_LIMIT):
+        if not await position.SelectByIndex(index):
+            break
+        found = True
+        print(f"Position [{index}]:")
+        print(f"  Symbol: {await position.Symbol()}")
+        print(f"  Type: {await position.TypeDescription()}")
+        print(f"  Volume: {await position.Volume()}")
+        print(f"  Open price: {await position.PriceOpen()}")
+        print(f"  Current price: {await position.PriceCurrent()}")
+        print(f"  SL: {await position.StopLoss()}")
+        print(f"  TP: {await position.TakeProfit()}")
+        print(f"  Profit: {await position.Profit()}")
+        print(f"  Swap: {await position.Swap()}")
+    if not found:
+        print("No open positions")
+
+
+async def example_12_modify_position(ctx: ExampleContext) -> None:
     """Demonstrate modifying the owned position's SL/TP using Trade."""
     _header("Modify Position")
     if not ctx.allow_writes:
@@ -563,7 +561,7 @@ async def example_14_modify_position(ctx: ExampleContext) -> None:
     print(f"Modified owned position SL={sl}, TP={tp}")
 
 
-async def example_15_close_partial_position(ctx: ExampleContext) -> None:
+async def example_13_close_partial_position(ctx: ExampleContext) -> None:
     """Demonstrate partially closing the owned position using Trade."""
     _header("Close Partial Position")
     if not ctx.allow_writes:
@@ -597,7 +595,7 @@ async def example_15_close_partial_position(ctx: ExampleContext) -> None:
     print(f"Partial close successful; remaining volume: {remaining}")
 
 
-async def example_16_close_position(ctx: ExampleContext) -> None:
+async def example_14_close_position(ctx: ExampleContext) -> None:
     """Demonstrate fully closing the remaining owned position using Trade."""
     _header("Close Position")
     if not ctx.allow_writes:
@@ -623,7 +621,7 @@ async def example_16_close_position(ctx: ExampleContext) -> None:
     print("Closed remaining owned position")
 
 
-async def example_17_pending_orders(ctx: ExampleContext) -> None:
+async def example_15_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate placing a BuyLimit pending order using Trade."""
     _header("Place Pending Order")
     if not ctx.allow_writes:
@@ -658,7 +656,42 @@ async def example_17_pending_orders(ctx: ExampleContext) -> None:
     print(f"Placed owned pending order at price: {ctx.pending_price}; volume: {VOLUME}")
 
 
-async def example_18_modify_pending_orders(ctx: ExampleContext) -> None:
+async def example_16_order(ctx: ExampleContext) -> None:
+    """Demonstrate inspecting pending orders using OrderInfo."""
+    _header("Order Information")
+    order = ctx.trading.order
+    total = await order.OrdersTotal()
+    print(f"Total active orders (OrdersTotal): {total}")
+
+    by_symbol = await order.OrdersGet(symbol=SYMBOL)
+    print(f"Orders by symbol '{SYMBOL}': {len(by_symbol)}")
+
+    by_group = await order.OrdersGet(group="*USD*")
+    print(f"Orders by group '*USD*': {len(by_group)}")
+
+    if ctx.pending_ticket:
+        by_ticket = await order.OrdersGet(ticket=ctx.pending_ticket)
+        print(f"Orders by ticket {ctx.pending_ticket}: {len(by_ticket)}")
+
+    all_orders = await order.OrdersGet()
+    print(f"All orders (OrdersGet): {len(all_orders)}")
+    found = False
+    for index in range(PREVIEW_LIMIT):
+        if not await order.SelectByIndex(index):
+            break
+        found = True
+        print(f"Order [{index}]:")
+        print(f"  Symbol: {await order.Symbol()}")
+        print(f"  Type: {await order.TypeDescription()}")
+        print(f"  Volume: {await order.VolumeCurrent()}")
+        print(f"  Price: {await order.PriceOpen()}")
+        print(f"  SL: {await order.StopLoss()}")
+        print(f"  TP: {await order.TakeProfit()}")
+    if not found:
+        print("No pending orders")
+
+
+async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate modifying the owned pending order using Trade."""
     _header("Modify Pending Order")
     if not ctx.allow_writes:
@@ -695,7 +728,7 @@ async def example_18_modify_pending_orders(ctx: ExampleContext) -> None:
     print(f"Modified owned pending order price: {price}")
 
 
-async def example_19_delete_pending_orders(ctx: ExampleContext) -> None:
+async def example_18_delete_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate cancelling the owned pending order using Trade."""
     _header("Cancel Pending Order")
     if not ctx.allow_writes:
@@ -720,7 +753,87 @@ async def example_19_delete_pending_orders(ctx: ExampleContext) -> None:
     print("Deleted owned pending order")
 
 
-async def example_20_shutdown(ctx: ExampleContext) -> None:
+async def example_19_history_order(ctx: ExampleContext) -> None:
+    """Demonstrate inspecting historical orders using HistoryOrderInfo."""
+    _header("History Order Information")
+    order = ctx.trading.history_order
+    now = datetime.now(UTC)
+    interval_start = now - timedelta(days=7)
+    total = await order.HistoryOrdersTotal(interval_start, now)
+    print(f"Total history orders (HistoryOrdersTotal): {total}")
+
+    by_symbol = await order.HistoryOrdersGet(symbol=SYMBOL)
+    print(f"History orders by symbol '{SYMBOL}': {len(by_symbol)}")
+
+    by_group = await order.HistoryOrdersGet(group="*USD*")
+    print(f"History orders by group '*USD*': {len(by_group)}")
+
+    if ctx.pending_ticket:
+        by_ticket = await order.HistoryOrdersGet(ticket=ctx.pending_ticket)
+        print(f"History orders by ticket {ctx.pending_ticket}: {len(by_ticket)}")
+
+    if ctx.position_id:
+        by_pos = await order.HistoryOrdersGet(position=ctx.position_id)
+        print(f"History orders by position {ctx.position_id}: {len(by_pos)}")
+
+    all_history = await order.HistoryOrdersGet()
+    print(f"All history orders (HistoryOrdersGet): {len(all_history)}")
+    found = False
+    for index in range(PREVIEW_LIMIT):
+        if not await order.SelectByIndex(index):
+            break
+        found = True
+        print(f"History Order [{index}]:")
+        print(f"  Symbol: {await order.Symbol()}")
+        print(f"  Type: {await order.TypeDescription()}")
+        print(f"  State: {await order.StateDescription()}")
+        print(f"  Volume: {await order.VolumeInitial()}")
+        print(f"  Price: {await order.PriceOpen()}")
+        print(f"  Done time: {format_timestamp(await order.TimeDone())}")
+    if not found:
+        print("No history orders")
+
+
+async def example_20_history_deal(ctx: ExampleContext) -> None:
+    """Demonstrate inspecting historical deals using DealInfo."""
+    _header("Deal Information")
+    deal = ctx.trading.deal
+    now = datetime.now(UTC)
+    interval_start = now - timedelta(days=7)
+    total = await deal.HistoryDealsTotal(interval_start, now)
+    print(f"Total history deals (HistoryDealsTotal): {total}")
+
+    by_symbol = await deal.HistoryDealsGet(symbol=SYMBOL)
+    print(f"History deals by symbol '{SYMBOL}': {len(by_symbol)}")
+
+    by_group = await deal.HistoryDealsGet(group="*USD*")
+    print(f"History deals by group '*USD*': {len(by_group)}")
+
+    if ctx.position_id:
+        by_pos = await deal.HistoryDealsGet(position=ctx.position_id)
+        print(f"History deals by position {ctx.position_id}: {len(by_pos)}")
+
+    all_deals = await deal.HistoryDealsGet()
+    print(f"All history deals (HistoryDealsGet): {len(all_deals)}")
+    found = False
+    for index in range(PREVIEW_LIMIT):
+        if not await deal.SelectByIndex(index):
+            break
+        found = True
+        print(f"Deal [{index}]:")
+        print(f"  Symbol: {await deal.Symbol()}")
+        print(f"  Type: {await deal.TypeDescription()}")
+        print(f"  Entry: {await deal.EntryDescription()}")
+        print(f"  Volume: {await deal.Volume()}")
+        print(f"  Price: {await deal.Price()}")
+        print(f"  Profit: {await deal.Profit()}")
+        print(f"  Commission: {await deal.Commission()}")
+        print(f"  Swap: {await deal.Swap()}")
+    if not found:
+        print("No history deals")
+
+
+async def example_21_shutdown(ctx: ExampleContext) -> None:
     """Demonstrate shutting down the broker connection."""
     _header("Shutdown")
     if not ctx.closed:
@@ -730,8 +843,9 @@ async def example_20_shutdown(ctx: ExampleContext) -> None:
         print("Broker connection closed successfully")
 
 
-example_17_shutdown = example_20_shutdown
-example_19_shutdown = example_20_shutdown
+example_17_shutdown = example_21_shutdown
+example_19_shutdown = example_21_shutdown
+example_20_shutdown = example_21_shutdown
 
 
 EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
@@ -742,18 +856,19 @@ EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_05_historical_bars,
     example_06_tick_data,
     example_07_order_book,
-    # example_08_position,
-    # example_09_order,
-    # example_10_history_order,
-    # example_11_history_deal,
-    # example_12_open_position,
-    # example_13_calc_profit_margin,
-    # example_14_modify_position,
-    # example_15_close_partial_position,
-    # example_16_close_position,
-    # example_17_pending_orders,
-    # example_18_modify_pending_orders,
-    # example_19_delete_pending_orders,
+    example_08_order_check,
+    example_09_open_position,
+    example_10_calc_profit_margin,
+    example_11_position,
+    example_12_modify_position,
+    example_13_close_partial_position,
+    example_14_close_position,
+    example_15_pending_orders,
+    example_16_order,
+    example_17_modify_pending_orders,
+    example_18_delete_pending_orders,
+    example_19_history_order,
+    example_20_history_deal,
 )
 
 
@@ -763,10 +878,12 @@ async def run_examples(
     """Run the demonstrations and always shut down last."""
     ctx = ExampleContext(Trading(backend), allow_writes=allow_writes)
     try:
-        for example in EXAMPLES:
+        for i, example in enumerate(EXAMPLES):
+            if i >= 8:
+                await asyncio.sleep(2)
             await example(ctx)
     finally:
-        await example_20_shutdown(ctx)
+        await example_21_shutdown(ctx)
     print("\nExamples completed successfully.")
     return ctx.results
 

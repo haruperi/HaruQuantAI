@@ -93,6 +93,15 @@ class _ObjectState:
     scope: Any = None
 
 
+def _to_epoch(value: Any) -> float:
+    """Extract unix timestamp from datetime or numeric value."""
+    if isinstance(value, datetime):
+        return value.timestamp()
+    if isinstance(value, (int, float)):
+        return float(value)
+    return 0.0
+
+
 def record_dict(value: Any) -> dict[str, Any]:
     """Read a local record as an independent field mapping."""
     if value is None:
@@ -111,6 +120,58 @@ def record_dict(value: Any) -> dict[str, Any]:
         for name in dir(value)
         if not name.startswith("_") and (not callable(getattr(value, name, None)))
     }
+
+
+def _extract_active_query(
+    args: tuple[Any, ...], kwargs: dict[str, Any]
+) -> tuple[str | None, str | None, int | None]:
+    """Extract symbol, group, and ticket filters from active query parameters."""
+    if args and isinstance(args[0], dict):
+        d = args[0]
+        return d.get("symbol"), d.get("group"), d.get("ticket")
+    symbol = (
+        str(args[0]) if len(args) > 0 and args[0] is not None else kwargs.get("symbol")
+    )
+    group = (
+        str(args[1]) if len(args) > 1 and args[1] is not None else kwargs.get("group")
+    )
+    ticket = (
+        int(args[2])
+        if len(args) > 2 and args[2] is not None  # noqa: PLR2004
+        else kwargs.get("ticket")
+    )
+    return symbol, group, ticket
+
+
+def _extract_history_query(
+    args: tuple[Any, ...], kwargs: dict[str, Any]
+) -> tuple[Any, Any, str | None, str | None, int | None, int | None]:
+    """Extract interval, symbol, group, ticket, position from history query."""
+    if args and isinstance(args[0], dict):
+        d = args[0]
+        return (
+            d.get("date_from"),
+            d.get("date_to"),
+            d.get("symbol"),
+            d.get("group"),
+            d.get("ticket"),
+            d.get("position"),
+        )
+    date_from, date_to, symbol, group = None, None, None, None
+    if len(args) == 1 and isinstance(args[0], str):
+        symbol = args[0]
+    elif len(args) >= 2:  # noqa: PLR2004
+        date_from, date_to = args[0], args[1]
+        if len(args) > 2:  # noqa: PLR2004
+            group = str(args[2])
+    return (
+        kwargs.get("date_from", date_from),
+        kwargs.get("date_to", date_to),
+        kwargs.get("symbol", symbol),
+        kwargs.get("group", group),
+        kwargs.get("ticket"),
+        kwargs.get("position"),
+    )
 
 
 def _retcode_description(code: int) -> str:
@@ -494,6 +555,38 @@ def _dealinfo_selectbyindex(self: _ObjectState, index: int) -> bool:
     )
 
 
+def _dealinfo_historydealstotal(self: _ObjectState, *args: Any, **kwargs: Any) -> int:
+    date_from = args[0] if len(args) > 0 else kwargs.get("date_from")
+    date_to = args[1] if len(args) > 1 else kwargs.get("date_to")
+    deals = self._backend.deals()
+    if date_from is not None and date_to is not None:
+        t_from = _to_epoch(date_from)
+        t_to = _to_epoch(date_to)
+        deals = [d for d in deals if t_from <= _to_epoch(d.time) <= t_to]
+    return len(deals)
+
+
+def _dealinfo_historydealsget(
+    self: _ObjectState, *args: Any, **kwargs: Any
+) -> list[dict[str, Any]]:
+    date_from, date_to, symbol, group, ticket, position = _extract_history_query(
+        args, kwargs
+    )
+    deals = list(self._backend.deals())
+    if date_from is not None and date_to is not None:
+        t_from, t_to = _to_epoch(date_from), _to_epoch(date_to)
+        deals = [d for d in deals if t_from <= _to_epoch(d.time) <= t_to]
+    if ticket is not None:
+        deals = [d for d in deals if d.ticket == ticket]
+    if position is not None:
+        deals = [d for d in deals if d.position_id == position]
+    if symbol is not None:
+        deals = [d for d in deals if d.symbol == symbol]
+    if group is not None:
+        deals = [d for d in deals if fnmatch.fnmatch(d.symbol, group)]
+    return [record_dict(d) for d in deals]
+
+
 def _historyorderinfo_timesetup(self: _ObjectState) -> int:
     return epoch_seconds(_selectionbase__value(self, "time_setup", None))
 
@@ -626,6 +719,48 @@ def _historyorderinfo_selectbyindex(self: _ObjectState, index: int) -> bool:
     return _selectionbase__select(
         self, values[index] if 0 <= index < len(values) else None
     )
+
+
+def _historyorderinfo_historyorderstotal(
+    self: _ObjectState, *args: Any, **kwargs: Any
+) -> int:
+    date_from = args[0] if len(args) > 0 else kwargs.get("date_from")
+    date_to = args[1] if len(args) > 1 else kwargs.get("date_to")
+    orders = self._backend.history_orders()
+    if date_from is not None and date_to is not None:
+        t_from = _to_epoch(date_from)
+        t_to = _to_epoch(date_to)
+        orders = [
+            o
+            for o in orders
+            if t_from <= _to_epoch(o.time_done or o.time_setup) <= t_to
+        ]
+    return len(orders)
+
+
+def _historyorderinfo_historyordersget(
+    self: _ObjectState, *args: Any, **kwargs: Any
+) -> list[dict[str, Any]]:
+    date_from, date_to, symbol, group, ticket, position = _extract_history_query(
+        args, kwargs
+    )
+    orders = list(self._backend.history_orders())
+    if date_from is not None and date_to is not None:
+        t_from, t_to = _to_epoch(date_from), _to_epoch(date_to)
+        orders = [
+            o
+            for o in orders
+            if t_from <= _to_epoch(o.time_done or o.time_setup) <= t_to
+        ]
+    if ticket is not None:
+        orders = [o for o in orders if o.ticket == ticket]
+    if position is not None:
+        orders = [o for o in orders if o.position_id == position]
+    if symbol is not None:
+        orders = [o for o in orders if o.symbol == symbol]
+    if group is not None:
+        orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
+    return [record_dict(o) for o in orders]
 
 
 def _orderinfo_ticket(self: _ObjectState) -> int:
@@ -774,6 +909,25 @@ def _orderinfo_selectbyindex(self: _ObjectState, index: int) -> bool:
     )
 
 
+def _orderinfo_orderstotal(self: _ObjectState, *args: Any) -> int:
+    del args
+    return len(self._backend.orders())
+
+
+def _orderinfo_ordersget(
+    self: _ObjectState, *args: Any, **kwargs: Any
+) -> list[dict[str, Any]]:
+    symbol, group, ticket = _extract_active_query(args, kwargs)
+    orders = list(self._backend.orders())
+    if ticket is not None:
+        orders = [o for o in orders if o.ticket == ticket]
+    if symbol is not None:
+        orders = [o for o in orders if o.symbol == symbol]
+    if group is not None:
+        orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
+    return [record_dict(o) for o in orders]
+
+
 def _positioninfo_time(self: _ObjectState) -> int:
     return epoch_seconds(_selectionbase__value(self, "time", None))
 
@@ -901,6 +1055,25 @@ def _positioninfo_checkstate(self: _ObjectState) -> bool:
     ticket = int(_selectionbase__value(self, "ticket"))
     _positioninfo_selectbyticket(self, ticket)
     return _selectionbase__check(self)
+
+
+def _positioninfo_positionstotal(self: _ObjectState, *args: Any) -> int:
+    del args
+    return len(self._backend.positions())
+
+
+def _positioninfo_positionsget(
+    self: _ObjectState, *args: Any, **kwargs: Any
+) -> list[dict[str, Any]]:
+    symbol, group, ticket = _extract_active_query(args, kwargs)
+    positions = list(self._backend.positions())
+    if ticket is not None:
+        positions = [p for p in positions if p.ticket == ticket]
+    if symbol is not None:
+        positions = [p for p in positions if p.symbol == symbol]
+    if group is not None:
+        positions = [p for p in positions if fnmatch.fnmatch(p.symbol, group)]
+    return [record_dict(p) for p in positions]
 
 
 def _symbolinfo___init__(
@@ -1349,7 +1522,7 @@ def _symbolinfo_marketbookadd(self: _ObjectState, symbol: str | None = None) -> 
     )
     if subscriptions is None:
         subscriptions = set()
-        setattr(self._backend, "_market_book_subscriptions", subscriptions)
+        self._backend._market_book_subscriptions = subscriptions  # noqa: SLF001
     subscriptions.add(sym)
     return True
 
@@ -1844,6 +2017,73 @@ def _trade__send(self: _ObjectState, request: TradeRequest) -> bool:
         int(TradeRetcode.PLACED),
         int(TradeRetcode.DONE_PARTIAL),
         int(TradeRetcode.NO_CHANGES),
+    }
+
+
+def _parse_trade_request(self: _ObjectState, data: dict[str, Any]) -> TradeRequest:
+    action_val = data.get("action", TradeAction.DEAL)
+    action = (
+        TradeAction[action_val.removeprefix("TRADE_ACTION_")]
+        if isinstance(action_val, str)
+        else TradeAction(action_val)
+    )
+    type_val = data.get("order_type", data.get("type", OrderType.BUY))
+    order_type = (
+        OrderType[type_val.removeprefix("ORDER_TYPE_")]
+        if isinstance(type_val, str)
+        else OrderType(type_val)
+    )
+    fill_val = data.get(
+        "type_filling", data.get("filling", self._filling or OrderFilling.FOK)
+    )
+    filling = (
+        OrderFilling[fill_val.removeprefix("ORDER_FILLING_")]
+        if isinstance(fill_val, str)
+        else OrderFilling(fill_val)
+    )
+    time_val = data.get("type_time", data.get("time_type", OrderTime.GTC))
+    time_type = (
+        OrderTime[time_val.removeprefix("ORDER_TIME_")]
+        if isinstance(time_val, str)
+        else OrderTime(time_val)
+    )
+    return TradeRequest(
+        action=action,
+        symbol=str(data.get("symbol", self.symbol_name or "")),
+        volume=float(data.get("volume", 0.0)),
+        order_type=order_type,
+        price=float(data.get("price", 0.0)),
+        stoplimit=float(data.get("stoplimit", 0.0)),
+        sl=float(data.get("sl", 0.0)),
+        tp=float(data.get("tp", 0.0)),
+        deviation=int(data.get("deviation", self._deviation or 10)),
+        magic=int(data.get("magic", self._magic or 0)),
+        order=int(data.get("order", 0)),
+        position=int(data.get("position", 0)),
+        position_by=int(data.get("position_by", 0)),
+        type_filling=filling,
+        type_time=time_type,
+        expiration=data.get("expiration"),
+        comment=str(data.get("comment", "")),
+    )
+
+
+def _trade_ordercheck(self: _ObjectState, *args: Any, **kwargs: Any) -> bool:
+    if args and isinstance(args[0], TradeRequest):
+        req = args[0]
+    elif args and isinstance(args[0], dict):
+        req = _parse_trade_request(self, args[0])
+    elif kwargs:
+        req = _parse_trade_request(self, kwargs)
+    else:
+        req = replace(self._last_request)
+    self._last_request = replace(req)
+    self._last_check = self._backend.order_check(req)
+    return self._last_check.retcode in {
+        0,
+        int(TradeRetcode.DONE),
+        int(TradeRetcode.PLACED),
+        int(TradeRetcode.DONE_PARTIAL),
     }
 
 
@@ -2521,6 +2761,8 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "InfoString": _dealinfo_infostring,
         "Ticket": _dealinfo_ticket,
         "SelectByIndex": _dealinfo_selectbyindex,
+        "HistoryDealsTotal": _dealinfo_historydealstotal,
+        "HistoryDealsGet": _dealinfo_historydealsget,
     },
     "HistoryOrderInfo": {
         "TimeSetup": _historyorderinfo_timesetup,
@@ -2552,6 +2794,8 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "InfoString": _historyorderinfo_infostring,
         "Ticket": _historyorderinfo_ticket,
         "SelectByIndex": _historyorderinfo_selectbyindex,
+        "HistoryOrdersTotal": _historyorderinfo_historyorderstotal,
+        "HistoryOrdersGet": _historyorderinfo_historyordersget,
     },
     "OrderInfo": {
         "Ticket": _orderinfo_ticket,
@@ -2586,6 +2830,8 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "CheckState": _orderinfo_checkstate,
         "Select": _orderinfo_select,
         "SelectByIndex": _orderinfo_selectbyindex,
+        "OrdersTotal": _orderinfo_orderstotal,
+        "OrdersGet": _orderinfo_ordersget,
     },
     "PositionInfo": {
         "Time": _positioninfo_time,
@@ -2615,6 +2861,8 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "SelectByTicket": _positioninfo_selectbyticket,
         "StoreState": _positioninfo_storestate,
         "CheckState": _positioninfo_checkstate,
+        "PositionsTotal": _positioninfo_positionstotal,
+        "PositionsGet": _positioninfo_positionsget,
     },
     "SymbolInfo": {
         "Refresh": _symbolinfo_refresh,
@@ -2784,6 +3032,7 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "SetAsyncMode": _trade_setasyncmode,
         "SetMarginMode": _trade_setmarginmode,
         "OrderOpen": _trade_orderopen,
+        "OrderCheck": _trade_ordercheck,
         "OrderModify": _trade_ordermodify,
         "OrderDelete": _trade_orderdelete,
         "PositionOpen": _trade_positionopen,

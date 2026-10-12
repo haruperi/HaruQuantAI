@@ -34,8 +34,17 @@ string g_lock_name = "";
 double g_lock_owner = 0.0;
 bool   g_lock_owned = false;
 
+class CBridgeTrade : public CTrade
+  {
+public:
+   void SetCheckResult(const MqlTradeCheckResult &res) { m_check_result=res; }
+   ulong GetDeviation() const { return m_deviation; }
+   ENUM_ORDER_TYPE_FILLING GetTypeFilling() const { return m_type_filling; }
+   ulong GetMagic() const { return m_magic; }
+  };
+
 // Per-proxy native objects. Each Python proxy ID gets its own C* instance.
-string g_trade_ids[];        CTrade *g_trade_objs[];
+string g_trade_ids[];        CBridgeTrade *g_trade_objs[];
 string g_account_ids[];      CAccountInfo *g_account_objs[];
 string g_symbol_ids[];       CSymbolInfo *g_symbol_objs[];
 string g_order_ids[];        COrderInfo *g_order_objs[];
@@ -49,6 +58,7 @@ ulong  g_request_ids[];
 string g_request_commands[];
 
 //--------------------------- JSON / wire helpers -----------------------------
+string JsonDecodeString(string raw);
 string JsonEscape(const string value)
   {
    string out="";
@@ -145,6 +155,7 @@ string ULongToStringExact(ulong value)
 
 ulong ParseULongExact(string value)
   {
+   value=JsonDecodeString(value);
    if(StringFind(value,"@i64:")==0 || StringFind(value,"@u64:")==0)
       value=StringSubstr(value,5);
    ulong result=0;
@@ -284,6 +295,31 @@ bool JsonGetString(const string json,const string key,string &out)
    if(!JsonExtractRaw(json,key,raw)) return false;
    out=JsonDecodeString(raw);
    return true;
+  }
+
+long JsonGetInt(const string json,const string key,const long def=0)
+  {
+   string raw;
+   if(!JsonExtractRaw(json,key,raw)) return def;
+   raw=JsonDecodeString(raw);
+   if(StringFind(raw,"@i64:")==0 || StringFind(raw,"@u64:")==0) raw=StringSubstr(raw,5);
+   return (long)StringToInteger(raw);
+  }
+
+ulong JsonGetULong(const string json,const string key,const ulong def=0)
+  {
+   string raw;
+   if(!JsonExtractRaw(json,key,raw)) return def;
+   return ParseULongExact(raw);
+  }
+
+double JsonGetDouble(const string json,const string key,const double def=0.0)
+  {
+   string raw;
+   if(!JsonExtractRaw(json,key,raw)) return def;
+   raw=JsonDecodeString(raw);
+   if(StringFind(raw,"@i64:")==0 || StringFind(raw,"@u64:")==0) raw=StringSubstr(raw,5);
+   return StringToDouble(raw);
   }
 
 bool JsonArrayTokens(const string raw,string &tokens[])
@@ -659,8 +695,18 @@ bool SocketSendText(const string text)
    uchar bytes[];
    int count=StringToCharArray(text,bytes,0,WHOLE_ARRAY,CP_UTF8);
    if(count<=1) return false;
-   int sent=SocketSend(g_socket,bytes,(uint)(count-1));
-   return sent==(count-1);
+   int total=count-1;
+   int sent_total=0;
+   while(sent_total<total)
+     {
+      uchar chunk[];
+      int remaining=total-sent_total;
+      ArrayCopy(chunk,bytes,0,sent_total,remaining);
+      int sent=SocketSend(g_socket,chunk,(uint)remaining);
+      if(sent<=0) return false;
+      sent_total+=sent;
+     }
+   return true;
   }
 
 bool SendJson(const string json)
@@ -703,11 +749,11 @@ string PropertyStringJson(const bool ok,const string value,const string error=""
   }
 
 //----------------------------- object registry -------------------------------
-CTrade* GetTrade(const string id)
+CBridgeTrade* GetTrade(const string id)
   {
    for(int i=0;i<ArraySize(g_trade_ids);i++) if(g_trade_ids[i]==id) return g_trade_objs[i];
    int n=ArraySize(g_trade_ids); ArrayResize(g_trade_ids,n+1); ArrayResize(g_trade_objs,n+1);
-   g_trade_ids[n]=id; g_trade_objs[n]=new CTrade; return g_trade_objs[n];
+   g_trade_ids[n]=id; g_trade_objs[n]=new CBridgeTrade; return g_trade_objs[n];
   }
 CAccountInfo* GetAccount(const string id)
   {
@@ -840,10 +886,11 @@ void RespondTradeBool(const string command_id,CTrade &obj,const bool value)
 //------------------------------ dispatchers ----------------------------------
 void DispatchTrade(const string command_id,const string object_id,const string method,string &args[])
   {
-   CTrade *p=GetTrade(object_id);
+   CBridgeTrade *p=GetTrade(object_id);
    if(CheckPointer(p)==POINTER_INVALID) { RespondError(command_id,"OBJECT_CREATE_FAILED","CTrade allocation failed"); return; }
-   CTrade *obj=p;
+   CBridgeTrade *obj=p;
 
+   if(method=="ReloadEA") { ChartSetSymbolPeriod(0,_Symbol,_Period); RespondBool(command_id,true,true); return; }
    if(method=="LogLevel") { obj.LogLevel(ParseLogLevel(args,0)); RespondBool(command_id,true,true); return; }
    if(method=="SetExpertMagicNumber") { obj.SetExpertMagicNumber(ArgULong(args,0)); RespondBool(command_id,true,true); return; }
    if(method=="SetDeviationInPoints") { obj.SetDeviationInPoints(ArgULong(args,0)); RespondBool(command_id,true,true); return; }
@@ -858,6 +905,78 @@ void DispatchTrade(const string command_id,const string object_id,const string m
                             ArgDouble(args,4),ArgDouble(args,5),ArgDouble(args,6),ParseOrderTime(args,7),
                             (datetime)ArgLong(args,8),ArgString(args,9,""));
       RespondTradeBool(command_id,p,ok); return;
+     }
+   if(method=="OrderCheck")
+     {
+      MqlTradeRequest chk_req;
+      MqlTradeCheckResult chk_res;
+      ZeroMemory(chk_req);
+      ZeroMemory(chk_res);
+      chk_req.action=TRADE_ACTION_DEAL;
+      chk_req.type=ORDER_TYPE_BUY;
+      chk_req.magic=obj.GetMagic();
+      chk_req.deviation=obj.GetDeviation();
+      chk_req.type_filling=obj.GetTypeFilling();
+      if(ArraySize(args)>0)
+        {
+         if(StringFind(args[0],"{")>=0)
+           {
+            string val;
+            if(JsonGetString(args[0],"symbol",val)) chk_req.symbol=val;
+            chk_req.action=(ENUM_TRADE_REQUEST_ACTIONS)JsonGetInt(args[0],"action",chk_req.action);
+            string ot_key=(StringFind(args[0],"\"order_type\"")>=0 ? "order_type" : "type");
+            chk_req.type=(ENUM_ORDER_TYPE)JsonGetInt(args[0],ot_key,chk_req.type);
+            chk_req.volume=JsonGetDouble(args[0],"volume",chk_req.volume);
+            chk_req.price=JsonGetDouble(args[0],"price",chk_req.price);
+            chk_req.sl=JsonGetDouble(args[0],"sl",chk_req.sl);
+            chk_req.tp=JsonGetDouble(args[0],"tp",chk_req.tp);
+            chk_req.deviation=JsonGetULong(args[0],"deviation",chk_req.deviation);
+            chk_req.magic=JsonGetULong(args[0],"magic",chk_req.magic);
+            if(JsonExtractRaw(args[0],"type_filling",val))
+               chk_req.type_filling=(ENUM_ORDER_TYPE_FILLING)JsonGetInt(args[0],"type_filling",chk_req.type_filling);
+           }
+         else if(ArraySize(args)>=3)
+           {
+            chk_req.action=TRADE_ACTION_DEAL;
+            chk_req.symbol=ArgString(args,0);
+            chk_req.type=ParseOrderType(args,1);
+            chk_req.volume=ArgDouble(args,2);
+            if(ArraySize(args)>3) chk_req.price=ArgDouble(args,3);
+            if(ArraySize(args)>4) chk_req.sl=ArgDouble(args,4);
+            if(ArraySize(args)>5) chk_req.tp=ArgDouble(args,5);
+            if(ArraySize(args)>6) chk_req.deviation=ArgULong(args,6,10);
+           }
+        }
+      if(chk_req.type_filling==0)
+        {
+         uint filling=(uint)SymbolInfoInteger(chk_req.symbol,SYMBOL_FILLING_MODE);
+         if((filling&SYMBOL_FILLING_FOK)==SYMBOL_FILLING_FOK) chk_req.type_filling=ORDER_FILLING_FOK;
+         else if((filling&SYMBOL_FILLING_IOC)==SYMBOL_FILLING_IOC) chk_req.type_filling=ORDER_FILLING_IOC;
+         else chk_req.type_filling=ORDER_FILLING_RETURN;
+        }
+      if(chk_req.price<=0.0)
+        {
+         chk_req.price=SymbolInfoDouble(chk_req.symbol,chk_req.type==ORDER_TYPE_SELL ? SYMBOL_BID : SYMBOL_ASK);
+        }
+      ResetLastError();
+      bool ok=obj.OrderCheck(chk_req,chk_res);
+      int err=GetLastError();
+      if(!ok && chk_res.retcode==0)
+        {
+         chk_res.retcode=(err!=0 ? err : 10013);
+        }
+      if(chk_res.comment=="")
+        {
+         chk_res.comment=StringFormat("ok=%d ret=%d err=%d price=%.5f vol=%.2f fill=%d act=%d type=%d",
+                                      ok, chk_res.retcode, err, chk_req.price, chk_req.volume,
+                                      chk_req.type_filling, chk_req.action, chk_req.type);
+        }
+      PrintFormat("PythonBridge OrderCheck: action=%d sym=%s type=%d vol=%.2f price=%.5f filling=%d -> ok=%s retcode=%d comment=%s margin=%.2f",
+                  chk_req.action, chk_req.symbol, chk_req.type, chk_req.volume, chk_req.price, chk_req.type_filling,
+                  ok ? "true" : "false", chk_res.retcode, chk_res.comment, chk_res.margin);
+      obj.SetCheckResult(chk_res);
+      RespondBool(command_id,true,ok);
+      return;
      }
    if(method=="OrderModify")
      {
@@ -1401,6 +1520,63 @@ void DispatchOrder(const string command_id,const string object_id,const string m
    if(method=="CheckState") { RespondBool(command_id,true,obj.CheckState()); return; }
    if(method=="Select") { RespondBool(command_id,true,obj.Select(ArgULong(args,0))); return; }
    if(method=="SelectByIndex") { RespondBool(command_id,true,obj.SelectByIndex((int)ArgLong(args,0))); return; }
+   if(method=="OrdersTotal") { RespondLong(command_id,true,(long)OrdersTotal()); return; }
+   if(method=="OrdersGet")
+     {
+      string filter_sym=""; string filter_grp=""; ulong filter_tkt=0;
+      if(ArraySize(args)>0 && args[0]!="null" && StringLen(args[0])>0)
+        {
+         if(StringFind(args[0],"{")>=0)
+           {
+            JsonGetString(args[0],"symbol",filter_sym);
+            JsonGetString(args[0],"group",filter_grp);
+            filter_tkt=JsonGetULong(args[0],"ticket",0);
+           }
+         else
+           {
+            filter_sym=ArgString(args,0);
+            if(ArraySize(args)>1) filter_grp=ArgString(args,1);
+            if(ArraySize(args)>2) filter_tkt=ArgULong(args,2);
+           }
+        }
+      string out="[";
+      int count=OrdersTotal();
+      bool first=true;
+      for(int i=0;i<count;i++)
+        {
+         ulong ticket=OrderGetTicket(i);
+         if(ticket==0) continue;
+         string sym=OrderGetString(ORDER_SYMBOL);
+         if(filter_tkt!=0 && ticket!=filter_tkt) continue;
+         if(StringLen(filter_sym)>0 && sym!=filter_sym) continue;
+         if(StringLen(filter_grp)>0 && !MatchSymbolGroup(sym,filter_grp)) continue;
+         if(!first) out+=",";
+         first=false;
+         out+="{\"ticket\":"+JsonULong(ticket)+
+              ",\"symbol\":"+JsonQuote(sym)+
+              ",\"order_type\":"+JsonLong(OrderGetInteger(ORDER_TYPE))+
+              ",\"state\":"+JsonLong(OrderGetInteger(ORDER_STATE))+
+              ",\"volume_initial\":"+JsonDouble(OrderGetDouble(ORDER_VOLUME_INITIAL))+
+              ",\"volume_current\":"+JsonDouble(OrderGetDouble(ORDER_VOLUME_CURRENT))+
+              ",\"price_open\":"+JsonDouble(OrderGetDouble(ORDER_PRICE_OPEN))+
+              ",\"sl\":"+JsonDouble(OrderGetDouble(ORDER_SL))+
+              ",\"tp\":"+JsonDouble(OrderGetDouble(ORDER_TP))+
+              ",\"price_current\":"+JsonDouble(OrderGetDouble(ORDER_PRICE_CURRENT))+
+              ",\"price_stop_limit\":"+JsonDouble(OrderGetDouble(ORDER_PRICE_STOPLIMIT))+
+              ",\"time_setup\":"+JsonLong(OrderGetInteger(ORDER_TIME_SETUP))+
+              ",\"time_done\":"+JsonLong(OrderGetInteger(ORDER_TIME_DONE))+
+              ",\"time_expiration\":"+JsonLong(OrderGetInteger(ORDER_TIME_EXPIRATION))+
+              ",\"type_filling\":"+JsonLong(OrderGetInteger(ORDER_TYPE_FILLING))+
+              ",\"type_time\":"+JsonLong(OrderGetInteger(ORDER_TYPE_TIME))+
+              ",\"magic\":"+JsonULong(OrderGetInteger(ORDER_MAGIC))+
+              ",\"position_id\":"+JsonULong(OrderGetInteger(ORDER_POSITION_ID))+
+              ",\"comment\":"+JsonQuote(OrderGetString(ORDER_COMMENT))+
+              "}";
+        }
+      out+="]";
+      RespondRaw(command_id,true,out);
+      return;
+     }
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown COrderInfo method: "+method);
   }
 
@@ -1448,6 +1624,73 @@ void DispatchHistory(const string command_id,const string object_id,const string
       RespondBool(command_id,true,selected);
       return;
      }
+   if(method=="HistoryOrdersTotal")
+     {
+      HistorySelect(0,TimeCurrent());
+      RespondLong(command_id,true,(long)HistoryOrdersTotal());
+      return;
+     }
+   if(method=="HistoryOrdersGet")
+     {
+      HistorySelect(0,TimeCurrent());
+      string filter_sym=""; string filter_grp=""; ulong filter_tkt=0; ulong filter_pos=0;
+      if(ArraySize(args)>0 && args[0]!="null" && StringLen(args[0])>0)
+        {
+         if(StringFind(args[0],"{")>=0)
+           {
+            JsonGetString(args[0],"symbol",filter_sym);
+            JsonGetString(args[0],"group",filter_grp);
+            filter_tkt=JsonGetULong(args[0],"ticket",0);
+            filter_pos=JsonGetULong(args[0],"position",0);
+           }
+         else
+           {
+            filter_sym=ArgString(args,0);
+            if(ArraySize(args)>1) filter_grp=ArgString(args,1);
+            if(ArraySize(args)>2) filter_tkt=ArgULong(args,2);
+            if(ArraySize(args)>3) filter_pos=ArgULong(args,3);
+           }
+        }
+      string out="[";
+      int count=HistoryOrdersTotal();
+      bool first=true;
+      for(int i=0;i<count;i++)
+        {
+         ulong ticket=HistoryOrderGetTicket(i);
+         if(ticket==0) continue;
+         string sym=HistoryOrderGetString(ticket,ORDER_SYMBOL);
+         ulong pos=HistoryOrderGetInteger(ticket,ORDER_POSITION_ID);
+         if(filter_tkt!=0 && ticket!=filter_tkt) continue;
+         if(filter_pos!=0 && pos!=filter_pos) continue;
+         if(StringLen(filter_sym)>0 && sym!=filter_sym) continue;
+         if(StringLen(filter_grp)>0 && !MatchSymbolGroup(sym,filter_grp)) continue;
+         if(!first) out+=",";
+         first=false;
+         out+="{\"ticket\":"+JsonULong(ticket)+
+              ",\"symbol\":"+JsonQuote(sym)+
+              ",\"order_type\":"+JsonLong(HistoryOrderGetInteger(ticket,ORDER_TYPE))+
+              ",\"state\":"+JsonLong(HistoryOrderGetInteger(ticket,ORDER_STATE))+
+              ",\"volume_initial\":"+JsonDouble(HistoryOrderGetDouble(ticket,ORDER_VOLUME_INITIAL))+
+              ",\"volume_current\":"+JsonDouble(HistoryOrderGetDouble(ticket,ORDER_VOLUME_CURRENT))+
+              ",\"price_open\":"+JsonDouble(HistoryOrderGetDouble(ticket,ORDER_PRICE_OPEN))+
+              ",\"sl\":"+JsonDouble(HistoryOrderGetDouble(ticket,ORDER_SL))+
+              ",\"tp\":"+JsonDouble(HistoryOrderGetDouble(ticket,ORDER_TP))+
+              ",\"price_current\":"+JsonDouble(HistoryOrderGetDouble(ticket,ORDER_PRICE_CURRENT))+
+              ",\"price_stop_limit\":"+JsonDouble(HistoryOrderGetDouble(ticket,ORDER_PRICE_STOPLIMIT))+
+              ",\"time_setup\":"+JsonLong(HistoryOrderGetInteger(ticket,ORDER_TIME_SETUP))+
+              ",\"time_done\":"+JsonLong(HistoryOrderGetInteger(ticket,ORDER_TIME_DONE))+
+              ",\"time_expiration\":"+JsonLong(HistoryOrderGetInteger(ticket,ORDER_TIME_EXPIRATION))+
+              ",\"type_filling\":"+JsonLong(HistoryOrderGetInteger(ticket,ORDER_TYPE_FILLING))+
+              ",\"type_time\":"+JsonLong(HistoryOrderGetInteger(ticket,ORDER_TYPE_TIME))+
+              ",\"magic\":"+JsonULong(HistoryOrderGetInteger(ticket,ORDER_MAGIC))+
+              ",\"position_id\":"+JsonULong(pos)+
+              ",\"comment\":"+JsonQuote(HistoryOrderGetString(ticket,ORDER_COMMENT))+
+              "}";
+        }
+      out+="]";
+      RespondRaw(command_id,true,out);
+      return;
+     }
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown CHistoryOrderInfo method: "+method);
   }
 
@@ -1482,6 +1725,60 @@ void DispatchPosition(const string command_id,const string object_id,const strin
    if(method=="SelectByTicket") { RespondBool(command_id,true,obj.SelectByTicket(ArgULong(args,0))); return; }
    if(method=="StoreState") { obj.StoreState(); RespondBool(command_id,true,true); return; }
    if(method=="CheckState") { RespondBool(command_id,true,obj.CheckState()); return; }
+   if(method=="PositionsTotal") { RespondLong(command_id,true,(long)PositionsTotal()); return; }
+   if(method=="PositionsGet")
+     {
+      string filter_sym=""; string filter_grp=""; ulong filter_tkt=0;
+      if(ArraySize(args)>0 && args[0]!="null" && StringLen(args[0])>0)
+        {
+         if(StringFind(args[0],"{")>=0)
+           {
+            JsonGetString(args[0],"symbol",filter_sym);
+            JsonGetString(args[0],"group",filter_grp);
+            filter_tkt=JsonGetULong(args[0],"ticket",0);
+           }
+         else
+           {
+            filter_sym=ArgString(args,0);
+            if(ArraySize(args)>1) filter_grp=ArgString(args,1);
+            if(ArraySize(args)>2) filter_tkt=ArgULong(args,2);
+           }
+        }
+      string out="[";
+      int count=PositionsTotal();
+      bool first=true;
+      for(int i=0;i<count;i++)
+        {
+         ulong ticket=PositionGetTicket(i);
+         if(ticket==0) continue;
+         string sym=PositionGetString(POSITION_SYMBOL);
+         if(filter_tkt!=0 && ticket!=filter_tkt) continue;
+         if(StringLen(filter_sym)>0 && sym!=filter_sym) continue;
+         if(StringLen(filter_grp)>0 && !MatchSymbolGroup(sym,filter_grp)) continue;
+         if(!first) out+=",";
+         first=false;
+         out+="{\"ticket\":"+JsonULong(ticket)+
+              ",\"identifier\":"+JsonULong(PositionGetInteger(POSITION_IDENTIFIER))+
+              ",\"symbol\":"+JsonQuote(sym)+
+              ",\"position_type\":"+JsonLong(PositionGetInteger(POSITION_TYPE))+
+              ",\"volume\":"+JsonDouble(PositionGetDouble(POSITION_VOLUME))+
+              ",\"price_open\":"+JsonDouble(PositionGetDouble(POSITION_PRICE_OPEN))+
+              ",\"price_current\":"+JsonDouble(PositionGetDouble(POSITION_PRICE_CURRENT))+
+              ",\"sl\":"+JsonDouble(PositionGetDouble(POSITION_SL))+
+              ",\"tp\":"+JsonDouble(PositionGetDouble(POSITION_TP))+
+              ",\"commission\":"+JsonDouble(PositionGetDouble(POSITION_COMMISSION))+
+              ",\"swap\":"+JsonDouble(PositionGetDouble(POSITION_SWAP))+
+              ",\"profit\":"+JsonDouble(PositionGetDouble(POSITION_PROFIT))+
+              ",\"magic\":"+JsonULong(PositionGetInteger(POSITION_MAGIC))+
+              ",\"comment\":"+JsonQuote(PositionGetString(POSITION_COMMENT))+
+              ",\"time\":"+JsonLong(PositionGetInteger(POSITION_TIME))+
+              ",\"time_update\":"+JsonLong(PositionGetInteger(POSITION_TIME_UPDATE))+
+              "}";
+        }
+      out+="]";
+      RespondRaw(command_id,true,out);
+      return;
+     }
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown CPositionInfo method: "+method);
   }
 
@@ -1525,6 +1822,68 @@ void DispatchDeal(const string command_id,const string object_id,const string me
       bool selected=HistorySelect(0,TimeCurrent());
       if(selected) selected=obj.SelectByIndex((int)ArgLong(args,0));
       RespondBool(command_id,true,selected);
+      return;
+     }
+   if(method=="HistoryDealsTotal")
+     {
+      HistorySelect(0,TimeCurrent());
+      RespondLong(command_id,true,(long)HistoryDealsTotal());
+      return;
+     }
+   if(method=="HistoryDealsGet")
+     {
+      HistorySelect(0,TimeCurrent());
+      string filter_sym=""; string filter_grp=""; ulong filter_tkt=0; ulong filter_pos=0;
+      if(ArraySize(args)>0 && args[0]!="null" && StringLen(args[0])>0)
+        {
+         if(StringFind(args[0],"{")>=0)
+           {
+            JsonGetString(args[0],"symbol",filter_sym);
+            JsonGetString(args[0],"group",filter_grp);
+            filter_tkt=JsonGetULong(args[0],"ticket",0);
+            filter_pos=JsonGetULong(args[0],"position",0);
+           }
+         else
+           {
+            filter_sym=ArgString(args,0);
+            if(ArraySize(args)>1) filter_grp=ArgString(args,1);
+            if(ArraySize(args)>2) filter_tkt=ArgULong(args,2);
+            if(ArraySize(args)>3) filter_pos=ArgULong(args,3);
+           }
+        }
+      string out="[";
+      int count=HistoryDealsTotal();
+      bool first=true;
+      for(int i=0;i<count;i++)
+        {
+         ulong ticket=HistoryDealGetTicket(i);
+         if(ticket==0) continue;
+         string sym=HistoryDealGetString(ticket,DEAL_SYMBOL);
+         ulong pos=HistoryDealGetInteger(ticket,DEAL_POSITION_ID);
+         if(filter_tkt!=0 && ticket!=filter_tkt) continue;
+         if(filter_pos!=0 && pos!=filter_pos) continue;
+         if(StringLen(filter_sym)>0 && sym!=filter_sym) continue;
+         if(StringLen(filter_grp)>0 && !MatchSymbolGroup(sym,filter_grp)) continue;
+         if(!first) out+=",";
+         first=false;
+         out+="{\"ticket\":"+JsonULong(ticket)+
+              ",\"order\":"+JsonULong(HistoryDealGetInteger(ticket,DEAL_ORDER))+
+              ",\"position_id\":"+JsonULong(pos)+
+              ",\"symbol\":"+JsonQuote(sym)+
+              ",\"deal_type\":"+JsonLong(HistoryDealGetInteger(ticket,DEAL_TYPE))+
+              ",\"entry\":"+JsonLong(HistoryDealGetInteger(ticket,DEAL_ENTRY))+
+              ",\"volume\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_VOLUME))+
+              ",\"price\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_PRICE))+
+              ",\"commission\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_COMMISSION))+
+              ",\"swap\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_SWAP))+
+              ",\"profit\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_PROFIT))+
+              ",\"magic\":"+JsonULong(HistoryDealGetInteger(ticket,DEAL_MAGIC))+
+              ",\"comment\":"+JsonQuote(HistoryDealGetString(ticket,DEAL_COMMENT))+
+              ",\"time\":"+JsonLong(HistoryDealGetInteger(ticket,DEAL_TIME))+
+              "}";
+        }
+      out+="]";
+      RespondRaw(command_id,true,out);
       return;
      }
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown CDealInfo method: "+method);

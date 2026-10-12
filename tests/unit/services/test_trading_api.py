@@ -32,13 +32,13 @@ from app.services.brokers.simulator import SimulationBackend
 @pytest.mark.parametrize(
     ("name", "count"),
     [
-        ("Trade", 67),
+        ("Trade", 68),
         ("AccountInfo", 38),
         ("SymbolInfo", 123),
-        ("OrderInfo", 32),
-        ("HistoryOrderInfo", 29),
-        ("PositionInfo", 27),
-        ("DealInfo", 22),
+        ("OrderInfo", 34),
+        ("HistoryOrderInfo", 31),
+        ("PositionInfo", 29),
+        ("DealInfo", 24),
         ("TerminalInfo", 32),
     ],
 )

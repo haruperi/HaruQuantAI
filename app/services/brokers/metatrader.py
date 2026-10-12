@@ -47,7 +47,8 @@ import secrets
 import time
 import uuid
 from collections.abc import Mapping
-from dataclasses import replace
+from dataclasses import asdict, is_dataclass, replace
+from datetime import datetime
 from pathlib import Path
 from types import TracebackType
 from typing import Any, Self, override
@@ -95,6 +96,10 @@ def _pack(value: Any) -> Any:
         return [_pack(item) for item in value]
     if isinstance(value, dict):
         return {str(k): _pack(v) for k, v in value.items()}
+    if is_dataclass(value) and not isinstance(value, type):
+        return _pack(asdict(value))
+    if isinstance(value, datetime):
+        return f"@i64:{int(value.timestamp())}"
     raise TypeError(f"unsupported wire value: {type(value).__name__}")
 
 
@@ -228,7 +233,9 @@ class Bridge:
     async def start(self) -> None:
         if self._server is not None:
             return
-        self._server = await asyncio.start_server(self._accept, self.host, self.port)
+        self._server = await asyncio.start_server(
+            self._accept, self.host, self.port, limit=MAX_FRAME_BYTES
+        )
 
     async def close(self) -> None:
         self.disarm()

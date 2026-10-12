@@ -153,3 +153,15 @@ class HistoryOrderInfo(TradingClass):
     async def SelectByIndex(self, *args: Any) -> Any:
         """Await the backend HistoryOrderInfo.SelectByIndex operation."""
         return await self._call("SelectByIndex", *args)
+
+    async def HistoryOrdersTotal(self, *args: Any, **kwargs: Any) -> Any:
+        """Await the backend HistoryOrderInfo.HistoryOrdersTotal operation."""
+        if kwargs:
+            return await self._call("HistoryOrdersTotal", kwargs)
+        return await self._call("HistoryOrdersTotal", *args)
+
+    async def HistoryOrdersGet(self, *args: Any, **kwargs: Any) -> Any:
+        """Await the backend HistoryOrderInfo.HistoryOrdersGet operation."""
+        if kwargs:
+            return await self._call("HistoryOrdersGet", kwargs)
+        return await self._call("HistoryOrdersGet", *args)

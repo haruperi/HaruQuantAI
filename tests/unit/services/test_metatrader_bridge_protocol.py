@@ -37,9 +37,12 @@ from app.services.brokers import metatrader
 from app.services.brokers.contracts import (
     BookInfo,
     BookType,
+    OrderType,
     Receipt,
     ReceiptStatus,
     SymbolSpec,
+    TradeAction,
+    TradeRequest,
 )
 from app.services.brokers.metatrader import Bridge, MT5Backend
 from app.services.brokers.simulator import SimulationBackend
@@ -314,7 +317,7 @@ def test_connection_example_displays_observed_receipt(
             assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
             assert receipt.value is True
         finally:
-            await brokers.example_20_shutdown(ctx)
+            await brokers.example_21_shutdown(ctx)
 
     asyncio.run(scenario())
     output = capsys.readouterr().out
@@ -382,7 +385,7 @@ def test_connection_example_rejects_invalid_receipt(
                 await brokers.example_01_connect(ctx)
             assert ctx.results == []
         finally:
-            await brokers.example_20_shutdown(ctx)
+            await brokers.example_21_shutdown(ctx)
 
     asyncio.run(scenario())
 
@@ -414,7 +417,7 @@ def test_connection_example_rejects_false_or_nonboolean_probe(
                 await brokers.example_01_connect(ctx)
             assert ctx.results == []
         finally:
-            await brokers.example_20_shutdown(ctx)
+            await brokers.example_21_shutdown(ctx)
 
     asyncio.run(scenario())
 
@@ -518,6 +521,7 @@ def test_connection_evidence_preserves_complete_simulation_walkthrough(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Run all examples through actual model operations with observed first evidence."""
+    monkeypatch.setattr(asyncio, "sleep", AsyncMock())
     examples = tuple(
         getattr(brokers, name)
         for name in (
@@ -528,18 +532,19 @@ def test_connection_evidence_preserves_complete_simulation_walkthrough(
             "example_05_historical_bars",
             "example_06_tick_data",
             "example_07_order_book",
-            "example_08_position",
-            "example_09_order",
-            "example_10_history_order",
-            "example_11_history_deal",
-            "example_12_open_position",
-            "example_13_calc_profit_margin",
-            "example_14_modify_position",
-            "example_15_close_partial_position",
-            "example_16_close_position",
-            "example_17_pending_orders",
-            "example_18_modify_pending_orders",
-            "example_19_delete_pending_orders",
+            "example_08_order_check",
+            "example_09_open_position",
+            "example_10_calc_profit_margin",
+            "example_11_position",
+            "example_12_modify_position",
+            "example_13_close_partial_position",
+            "example_14_close_position",
+            "example_15_pending_orders",
+            "example_16_order",
+            "example_17_modify_pending_orders",
+            "example_18_delete_pending_orders",
+            "example_19_history_order",
+            "example_20_history_deal",
         )
     )
     monkeypatch.setattr(brokers, "EXAMPLES", examples)
@@ -547,6 +552,44 @@ def test_connection_evidence_preserves_complete_simulation_walkthrough(
     results = asyncio.run(brokers.run_examples(backend, allow_writes=True))
     assert results == []
     assert backend.positions() == [] and backend.orders() == []
+
+
+def test_trading_extended_query_and_check_methods() -> None:
+    """Verify OrderCheck, PositionsTotal/Get, OrdersTotal/Get, HistoryOrdersTotal/Get, HistoryDealsTotal/Get."""
+    sim = brokers.create_backend("simulator")
+    trading = Trading(sim)
+
+    async def scenario() -> None:
+        req = TradeRequest(
+            action=TradeAction.DEAL,
+            symbol="EURUSD",
+            volume=0.01,
+            order_type=OrderType.BUY,
+            price=1.1000,
+        )
+        assert await trading.trade.OrderCheck(req) is True
+        assert await trading.trade.CheckResultRetcode() == 10009
+        assert await trading.trade.CheckResultMargin() > 0
+
+        assert await trading.position.PositionsTotal() == 0
+        assert await trading.position.PositionsGet() == []
+        assert await trading.position.PositionsGet(symbol="EURUSD") == []
+        assert await trading.position.PositionsGet(group="*USD*") == []
+
+        assert await trading.order.OrdersTotal() == 0
+        assert await trading.order.OrdersGet() == []
+        assert await trading.order.OrdersGet(symbol="EURUSD") == []
+        assert await trading.order.OrdersGet(group="*USD*") == []
+
+        assert await trading.history_order.HistoryOrdersTotal() == 0
+        assert await trading.history_order.HistoryOrdersGet() == []
+        assert await trading.history_order.HistoryOrdersGet(symbol="EURUSD") == []
+
+        assert await trading.deal.HistoryDealsTotal() == 0
+        assert await trading.deal.HistoryDealsGet() == []
+        assert await trading.deal.HistoryDealsGet(symbol="EURUSD") == []
+
+    asyncio.run(scenario())
 
 
 def test_terminal_info_extended_properties_parity() -> None:
