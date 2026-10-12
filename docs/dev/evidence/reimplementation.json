@@ -8565,8 +8565,424 @@
         "snippets",
         "pips"
       ]
+    },
+    "SQX145-EV-000200": {
+      "topic": "strategy.blocks.other_types",
+      "title": "StrategyQuant X Other building blocks primitive type and variable evaluations",
+      "question": "How does StrategyQuant X represent and evaluate basic type and variable building blocks in internal/extend/Snippets/SQ/Blocks/Other?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "strategy",
+          "services"
+        ],
+        "conditions": [
+          "Static inspection of 5 Java snippet sources in internal/extend/Snippets/SQ/Blocks/Other."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX Other building blocks provide primitive type evaluation for constants (Boolean, Number) and variables (BooleanVariable, DoubleVariable, IntVariable), evaluating boolean constants and variables as 1.0 (True) or 0.0 (False) and numeric constants and variables as floating point numbers.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Static donor inspection does not execute donor runtime; dynamic variable binding requires strategy state context."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Other/Boolean.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "56-60",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates boolean constant to 1.0 if true else 0.0."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "bab06e1b215983604f8845434fb7aef7843ea7630affead242d179654d0e812b"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Other/BooleanVariable.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "45-49",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates boolean variable to 1.0 if true else 0.0."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "402859c200b8decfd7fc980dd4f65bd07a268991b6eec21dba3af7c93fa526a4"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Other/DoubleVariable.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "45-49",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates double variable directly returning its value."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4e6bc82338506005d7696bcc0e256cf8de610edd29b9b2c8027ca884ee2e9bf8"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Other/IntVariable.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "45-49",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates int variable directly returning its value cast to double."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b59a44c31cb31934eb6433df269b365ec3566eabe47364f6433bc18f4f74bd79"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Other/Number.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "45-49",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates number constant directly returning its value."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4ce4b249c4714e4dc9ced9fad9b53a4d522b173eb9054e4b17dd3230b59d4035"
+          },
+          "accessed_at": "2026-10-12"
+        }
+      ],
+      "target_mapping": {
+        "domain": "strategy",
+        "feature_ids": [
+          "FEAT-SERVICES-TYPES"
+        ],
+        "requirement_ids": [
+          "FR-SERVICES-TYPES-BOOLEAN",
+          "FR-SERVICES-TYPES-VARIABLES",
+          "FR-SERVICES-TYPES-NUMBER",
+          "FR-SERVICES-TYPES-FACADE"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/reimplementation.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature FEAT-SERVICES-TYPES proposed for type and variable building blocks matching SQX Snippets/SQ/Blocks/Other suite.",
+        "proposed_owner_readme": "app/services/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Statically inspect and verify all 5 type block java snippets under SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Blocks/Other.",
+        "expected_observation": "Type blocks evaluate boolean constants and variables as 1.0 or 0.0, and number/int/double variables and constants as floating point numbers.",
+        "actual_observation": "Inspected all 5 files in SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Blocks/Other; confirmed boolean evaluation maps True to 1.0 and False to 0.0, and numeric types return the underlying value.",
+        "artifact_paths": [
+          "internal/extend/Snippets/SQ/Blocks/Other"
+        ],
+        "executed_at": "2026-10-12T21:45:00.000Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "ddb6946f207062e46b5503afebac13c8783a5994",
+        "created_at": "2026-10-12T21:45:00.000Z",
+        "updated_at": "2026-10-12T21:45:00.000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased behavioral and evaluation rules only; no proprietary code copied."
+      },
+      "tags": [
+        "services",
+        "blocks",
+        "types",
+        "variables",
+        "static",
+        "snippets"
+      ]
+    },
+    "SQX145-EV-000201": {
+      "topic": "strategy.blocks.other_actions",
+      "title": "StrategyQuant X OtherActions building blocks actions and side-effect descriptors",
+      "question": "How does StrategyQuant X implement action blocks in internal/extend/Snippets/SQ/Blocks/OtherActions?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "strategy",
+          "services"
+        ],
+        "conditions": [
+          "Static inspection of 8 Java snippet sources in internal/extend/Snippets/SQ/Blocks/OtherActions."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX OtherActions building blocks provide side-effect actions including variable assignment (coercing formula results with 0 and Order.NOT_DEFINED (-1) mapped to False), chart drawing placeholders (DrawDownArrow, DrawUpArrow, DrawVerticalLine with bar shift parameter), logging actions (LogToFile, LogToJournal), and email notification actions (SendEmail).",
+        "confidence": "confirmed",
+        "limitations": [
+          "Static donor inspection does not execute donor runtime; chart drawing and email dispatching require runtime charting or notification transport implementations."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/OtherActions/AssignVariable.java",
+          "location": {
+            "section": "action",
+            "symbol": "OnAction",
+            "line_range": "51-60",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Assigns variable value; if boolean formula, 0 or Order.NOT_DEFINED (-1) becomes false, else true."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "71cbe2c94df14f9608ad9366257b2bc2c0ea8bab5b13aaa1c493e84363d9ed42"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/OtherActions/CustomAction.java",
+          "location": {
+            "section": "action",
+            "symbol": "OnAction",
+            "line_range": "45-49",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines custom command string action placeholder."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ea765766d0f48057745996f177325820665d1e137663c36d2f82a760f6f92f4f"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/OtherActions/DrawDownArrow.java",
+          "location": {
+            "section": "action",
+            "symbol": "OnAction",
+            "line_range": "44-48",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines down arrow drawing action with relative shift parameter."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "32fe21360f2fd2e5aeb803fc727b028cb2d38a9270b8af0060017f2ed10dfb4c"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/OtherActions/DrawUpArrow.java",
+          "location": {
+            "section": "action",
+            "symbol": "OnAction",
+            "line_range": "43-47",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines up arrow drawing action with relative shift parameter."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a25cff80471e3d08123c5117c8effecd024edaa11e1f48223221a69399b9d118"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/OtherActions/DrawVerticalLine.java",
+          "location": {
+            "section": "action",
+            "symbol": "OnAction",
+            "line_range": "43-47",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines vertical line drawing action with relative shift parameter."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4b47558e2d118812ea97a8f5c1bec24038dcf7749f11e68450c2422cab1d4638"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/OtherActions/LogToFile.java",
+          "location": {
+            "section": "action",
+            "symbol": "OnAction",
+            "line_range": "51-55",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines file logging action with filename and message parameters."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c9709bef8f644f449de75f8d7e2ca2ec80eac1db4732809aa77e7a54e7540931"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/OtherActions/LogToJournal.java",
+          "location": {
+            "section": "action",
+            "symbol": "OnAction",
+            "line_range": "47-51",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines journal logging action with message parameter."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8673234ab36ef6d96d7d8fe8457a5c745ff35bc23be8921880797b9329df5114"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/OtherActions/SendEmail.java",
+          "location": {
+            "section": "action",
+            "symbol": "OnAction",
+            "line_range": "51-55",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines email notification action with email subject and message parameters."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ceaf5d5fde2c701d6b6db9d65181b104ab3bf819df6f552937ba8e6edf9e5fda"
+          },
+          "accessed_at": "2026-10-12"
+        }
+      ],
+      "target_mapping": {
+        "domain": "strategy",
+        "feature_ids": [
+          "FEAT-SERVICES-ACTIONS"
+        ],
+        "requirement_ids": [
+          "FR-SERVICES-ACTION-ASSIGN",
+          "FR-SERVICES-ACTION-CUSTOM",
+          "FR-SERVICES-ACTION-DRAW",
+          "FR-SERVICES-ACTION-LOG",
+          "FR-SERVICES-ACTION-EMAIL",
+          "FR-SERVICES-ACTIONS-FACADE"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/reimplementation.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature FEAT-SERVICES-ACTIONS proposed for action building blocks matching SQX Snippets/SQ/Blocks/OtherActions suite.",
+        "proposed_owner_readme": "app/services/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Statically inspect and verify all 8 action block java snippets under SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Blocks/OtherActions.",
+        "expected_observation": "Action blocks support variable assignment with boolean coercion, custom command string descriptors, shift-based chart annotations, file and journal logging, and email notifications.",
+        "actual_observation": "Inspected all 8 files in SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Blocks/OtherActions; verified boolean assignment coerces 0 and Order.NOT_DEFINED (-1) to False, and drawing/logging/email actions encapsulate parameters cleanly.",
+        "artifact_paths": [
+          "internal/extend/Snippets/SQ/Blocks/OtherActions"
+        ],
+        "executed_at": "2026-10-12T21:45:00.000Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "ddb6946f207062e46b5503afebac13c8783a5994",
+        "created_at": "2026-10-12T21:45:00.000Z",
+        "updated_at": "2026-10-12T21:45:00.000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased behavioral and action execution rules only; no proprietary code copied."
+      },
+      "tags": [
+        "services",
+        "blocks",
+        "actions",
+        "logging",
+        "drawing",
+        "static",
+        "snippets"
+      ]
     }
   },
   "minimum_record_number": 132,
-  "allocation_high_water_mark": 199
+  "allocation_high_water_mark": 201
 }
