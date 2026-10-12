@@ -233,26 +233,19 @@ async def example_03_account(ctx: ExampleContext) -> None:
     """Demonstrate printing account information using AccountInfo."""
     _header("Account Information")
     account = ctx.trading.account
-    _report(
-        ctx,
-        3,
-        "Account information",
-        {
-            "Currency": await account.Currency(),
-            "Leverage": await account.Leverage(),
-            "Trade mode": await account.TradeModeDescription(),
-            "Margin mode": await account.MarginModeDescription(),
-            "Trade allowed": await account.TradeAllowed(),
-            "Expert allowed": await account.TradeExpert(),
-            "Balance": await account.Balance(),
-            "Credit": await account.Credit(),
-            "Profit": await account.Profit(),
-            "Equity": await account.Equity(),
-            "Margin": await account.Margin(),
-            "Free margin": await account.FreeMargin(),
-            "Margin level": await account.MarginLevel(),
-        },
-    )
+    print(f"Currency: {await account.Currency()}")
+    print(f"Leverage: {await account.Leverage()}")
+    print(f"Trade mode: {await account.TradeModeDescription()}")
+    print(f"Margin mode: {await account.MarginModeDescription()}")
+    print(f"Trade allowed: {await account.TradeAllowed()}")
+    print(f"Expert allowed: {await account.TradeExpert()}")
+    print(f"Balance: {await account.Balance()}")
+    print(f"Credit: {await account.Credit()}")
+    print(f"Profit: {await account.Profit()}")
+    print(f"Equity: {await account.Equity()}")
+    print(f"Margin: {await account.Margin()}")
+    print(f"Free margin: {await account.FreeMargin()}")
+    print(f"Margin level: {await account.MarginLevel()}")
 
 
 async def example_04_symbol(ctx: ExampleContext) -> None:
@@ -266,125 +259,114 @@ async def example_04_symbol(ctx: ExampleContext) -> None:
     ):
         ctx.trading.disarm()
         raise ExampleError("Configured symbol or quote is unavailable")
-    _report(
-        ctx,
-        4,
-        "Symbol information",
-        {
-            "Name": await symbol.Name(),
-            "Digits": await symbol.Digits(),
-            "Point": await symbol.Point(),
-            "Tick size": await symbol.TickSize(),
-            "Bid": await symbol.Bid(),
-            "Ask": await symbol.Ask(),
-            "Last": await symbol.Last(),
-            "Spread": await symbol.Spread(),
-            "Trade mode": await symbol.TradeModeDescription(),
-            "Contract size": await symbol.ContractSize(),
-            "Min lot": await symbol.LotsMin(),
-            "Max lot": await symbol.LotsMax(),
-            "Lot step": await symbol.LotsStep(),
-            "Swap mode": await symbol.SwapMode(),
-            "Swap long": await symbol.SwapLong(),
-            "Swap short": await symbol.SwapShort(),
-        },
-    )
+    print(f"Name: {await symbol.Name()}")
+    print(f"Digits: {await symbol.Digits()}")
+    print(f"Point: {await symbol.Point()}")
+    print(f"Tick size: {await symbol.TickSize()}")
+    print(f"Bid: {await symbol.Bid()}")
+    print(f"Ask: {await symbol.Ask()}")
+    print(f"Last: {await symbol.Last()}")
+    print(f"Spread: {await symbol.Spread()}")
+    print(f"Trade mode: {await symbol.TradeModeDescription()}")
+    print(f"Contract size: {await symbol.ContractSize()}")
+    print(f"Min lot: {await symbol.LotsMin()}")
+    print(f"Max lot: {await symbol.LotsMax()}")
+    print(f"Lot step: {await symbol.LotsStep()}")
+    print(f"Swap mode: {await symbol.SwapMode()}")
+    print(f"Swap long: {await symbol.SwapLong()}")
+    print(f"Swap short: {await symbol.SwapShort()}")
 
 
 async def example_05_position(ctx: ExampleContext) -> None:
     """Demonstrate printing an open-position preview using PositionInfo."""
     _header("Position Information")
     position = ctx.trading.position
-    rows = []
+    found = False
     for index in range(PREVIEW_LIMIT):
         if not await position.SelectByIndex(index):
             break
-        rows.append(
-            {
-                "Symbol": await position.Symbol(),
-                "Type": await position.TypeDescription(),
-                "Volume": await position.Volume(),
-                "Open price": await position.PriceOpen(),
-                "Current price": await position.PriceCurrent(),
-                "SL": await position.StopLoss(),
-                "TP": await position.TakeProfit(),
-                "Profit": await position.Profit(),
-                "Swap": await position.Swap(),
-            }
-        )
-    _report(ctx, 5, "Open positions (preview)", rows)
+        found = True
+        print(f"Position [{index}]:")
+        print(f"  Symbol: {await position.Symbol()}")
+        print(f"  Type: {await position.TypeDescription()}")
+        print(f"  Volume: {await position.Volume()}")
+        print(f"  Open price: {await position.PriceOpen()}")
+        print(f"  Current price: {await position.PriceCurrent()}")
+        print(f"  SL: {await position.StopLoss()}")
+        print(f"  TP: {await position.TakeProfit()}")
+        print(f"  Profit: {await position.Profit()}")
+        print(f"  Swap: {await position.Swap()}")
+    if not found:
+        print("No open positions")
 
 
 async def example_06_order(ctx: ExampleContext) -> None:
     """Demonstrate printing a pending-order preview using OrderInfo."""
     _header("Order Information")
     order = ctx.trading.order
-    rows = []
+    found = False
     for index in range(PREVIEW_LIMIT):
         if not await order.SelectByIndex(index):
             break
-        rows.append(
-            {
-                "Symbol": await order.Symbol(),
-                "Type": await order.TypeDescription(),
-                "Volume": await order.VolumeCurrent(),
-                "Price": await order.PriceOpen(),
-                "SL": await order.StopLoss(),
-                "TP": await order.TakeProfit(),
-            }
-        )
-    _report(ctx, 6, "Pending orders (preview)", rows)
+        found = True
+        print(f"Order [{index}]:")
+        print(f"  Symbol: {await order.Symbol()}")
+        print(f"  Type: {await order.TypeDescription()}")
+        print(f"  Volume: {await order.VolumeCurrent()}")
+        print(f"  Price: {await order.PriceOpen()}")
+        print(f"  SL: {await order.StopLoss()}")
+        print(f"  TP: {await order.TakeProfit()}")
+    if not found:
+        print("No pending orders")
 
 
 async def example_07_history_order(ctx: ExampleContext) -> None:
     """Demonstrate printing historical orders using HistoryOrderInfo."""
     _header("History Order Information")
     order = ctx.trading.history_order
-    rows = []
+    found = False
     for index in range(PREVIEW_LIMIT):
         if not await order.SelectByIndex(index):
             break
-        rows.append(
-            {
-                "Symbol": await order.Symbol(),
-                "Type": await order.TypeDescription(),
-                "State": await order.StateDescription(),
-                "Volume": await order.VolumeInitial(),
-                "Price": await order.PriceOpen(),
-                "Done time": await order.TimeDone(),
-            }
-        )
-    _report(ctx, 7, "History orders (preview)", rows)
+        found = True
+        print(f"History Order [{index}]:")
+        print(f"  Symbol: {await order.Symbol()}")
+        print(f"  Type: {await order.TypeDescription()}")
+        print(f"  State: {await order.StateDescription()}")
+        print(f"  Volume: {await order.VolumeInitial()}")
+        print(f"  Price: {await order.PriceOpen()}")
+        print(f"  Done time: {format_timestamp(await order.TimeDone())}")
+    if not found:
+        print("No history orders")
 
 
 async def example_08_history_deal(ctx: ExampleContext) -> None:
     """Demonstrate printing historical deals using DealInfo."""
     _header("Deal Information")
     deal = ctx.trading.deal
-    rows = []
+    found = False
     for index in range(PREVIEW_LIMIT):
         if not await deal.SelectByIndex(index):
             break
-        rows.append(
-            {
-                "Symbol": await deal.Symbol(),
-                "Type": await deal.TypeDescription(),
-                "Entry": await deal.EntryDescription(),
-                "Volume": await deal.Volume(),
-                "Price": await deal.Price(),
-                "Profit": await deal.Profit(),
-                "Commission": await deal.Commission(),
-                "Swap": await deal.Swap(),
-            }
-        )
-    _report(ctx, 8, "History deals (preview)", rows)
+        found = True
+        print(f"Deal [{index}]:")
+        print(f"  Symbol: {await deal.Symbol()}")
+        print(f"  Type: {await deal.TypeDescription()}")
+        print(f"  Entry: {await deal.EntryDescription()}")
+        print(f"  Volume: {await deal.Volume()}")
+        print(f"  Price: {await deal.Price()}")
+        print(f"  Profit: {await deal.Profit()}")
+        print(f"  Commission: {await deal.Commission()}")
+        print(f"  Swap: {await deal.Swap()}")
+    if not found:
+        print("No history deals")
 
 
 async def example_09_open_position(ctx: ExampleContext) -> None:
     """Demonstrate opening a buy position using Trade."""
     _header("Open Position")
     if not ctx.allow_writes:
-        _report(ctx, 9, "Open position", "live writes disabled", skipped=True)
+        print("Live writes disabled; skipping open position")
         return
     trading = ctx.trading
     if ctx.position_ticket or int(await trading.account.MarginMode()) != int(
@@ -414,7 +396,7 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
     trading.arm()
     sent = await trading.trade.Buy(2 * VOLUME, SYMBOL)
     retcode = int(await trading.trade.ResultRetcode())
-    print("Buy dispatch: %s; retcode=%s", sent, retcode)
+    print(f"Buy dispatch: {sent}; retcode={retcode}")
     if not sent or retcode != 10009:
         ctx.trading.disarm()
         raise ExampleError("Buy not confirmed; check trade outcome before rerunning")
@@ -439,7 +421,7 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
     if not ctx.position_ticket:
         ctx.trading.disarm()
         raise ExampleError("Buy position ownership could not be confirmed")
-    _report(ctx, 9, "Open owned position", {"Volume": 2 * VOLUME, "Retcode": retcode})
+    print(f"Opened owned position with volume: {2 * VOLUME}; retcode={retcode}")
 
 
 async def example_10_calc_profit_margin(ctx: ExampleContext) -> None:
@@ -448,19 +430,15 @@ async def example_10_calc_profit_margin(ctx: ExampleContext) -> None:
     ask = float(await ctx.trading.symbol.Ask())
     point = float(await ctx.trading.symbol.Point())
     account = ctx.trading.account
-    _report(
-        ctx,
-        10,
-        "Calculate profit and margin",
-        {
-            "Margin": await account.MarginCheck(SYMBOL, OrderType.BUY, 2 * VOLUME, ask),
-            "Profit": await account.OrderProfitCheck(
-                SYMBOL, OrderType.BUY, 2 * VOLUME, ask, ask + 100 * point
-            ),
-            "Free margin check": await account.FreeMarginCheck(
-                SYMBOL, OrderType.BUY, 2 * VOLUME, ask
-            ),
-        },
+    print(
+        f"Margin: {await account.MarginCheck(SYMBOL, OrderType.BUY, 2 * VOLUME, ask)}"
+    )
+    print(
+        "Profit: "
+        f"{await account.OrderProfitCheck(SYMBOL, OrderType.BUY, 2 * VOLUME, ask, ask + 100 * point)}"
+    )
+    print(
+        f"Free margin check: {await account.FreeMarginCheck(SYMBOL, OrderType.BUY, 2 * VOLUME, ask)}"
     )
 
 
@@ -468,7 +446,7 @@ async def example_11_modify_position(ctx: ExampleContext) -> None:
     """Demonstrate modifying the owned position's SL/TP using Trade."""
     _header("Modify Position")
     if not ctx.allow_writes:
-        _report(ctx, 11, "Modify position", "live writes disabled", skipped=True)
+        print("Live writes disabled; skipping modify position")
         return
     pos, symbol, trade = ctx.trading.position, ctx.trading.symbol, ctx.trading.trade
     if (
@@ -488,7 +466,7 @@ async def example_11_modify_position(ctx: ExampleContext) -> None:
     sl, tp = round(bid - distance, digits), round(bid + distance, digits)
     sent = await trade.PositionModify(ctx.position_ticket, sl, tp)
     retcode = int(await trade.ResultRetcode())
-    print("Position modify dispatch: %s; retcode=%s", sent, retcode)
+    print(f"Position modify dispatch: {sent}; retcode={retcode}")
     if (
         not sent
         or retcode != 10009
@@ -498,14 +476,14 @@ async def example_11_modify_position(ctx: ExampleContext) -> None:
     ):
         ctx.trading.disarm()
         raise ExampleError("Position modification not confirmed; inspect trade outcome")
-    _report(ctx, 11, "Modify owned position SL/TP", {"SL": sl, "TP": tp})
+    print(f"Modified owned position SL={sl}, TP={tp}")
 
 
 async def example_12_close_partial_position(ctx: ExampleContext) -> None:
     """Demonstrate partially closing the owned position using Trade."""
     _header("Close Partial Position")
     if not ctx.allow_writes:
-        _report(ctx, 12, "Partial close", "live writes disabled", skipped=True)
+        print("Live writes disabled; skipping partial close")
         return
     pos, trade = ctx.trading.position, ctx.trading.trade
     if (
@@ -520,7 +498,7 @@ async def example_12_close_partial_position(ctx: ExampleContext) -> None:
     before = float(await pos.Volume())
     sent = await trade.PositionClosePartial(ctx.position_ticket, VOLUME)
     retcode = int(await trade.ResultRetcode())
-    print("Partial close dispatch: %s; retcode=%s", sent, retcode)
+    print(f"Partial close dispatch: {sent}; retcode={retcode}")
     if (
         not sent
         or retcode != 10009
@@ -532,14 +510,14 @@ async def example_12_close_partial_position(ctx: ExampleContext) -> None:
     if remaining <= 0 or not math.isclose(remaining, before - VOLUME):
         ctx.trading.disarm()
         raise ExampleError("Partial-close remaining volume did not match")
-    _report(ctx, 12, "Partial close owned position", f"remaining volume {remaining}")
+    print(f"Partial close successful; remaining volume: {remaining}")
 
 
 async def example_13_close_position(ctx: ExampleContext) -> None:
     """Demonstrate fully closing the remaining owned position using Trade."""
     _header("Close Position")
     if not ctx.allow_writes:
-        _report(ctx, 13, "Close position", "live writes disabled", skipped=True)
+        print("Live writes disabled; skipping close position")
         return
     pos, trade = ctx.trading.position, ctx.trading.trade
     if (
@@ -553,19 +531,19 @@ async def example_13_close_position(ctx: ExampleContext) -> None:
         raise ExampleError("Position ownership must be confirmed before closing")
     sent = await trade.PositionClose(ctx.position_ticket)
     retcode = int(await trade.ResultRetcode())
-    print("Position close dispatch: %s; retcode=%s", sent, retcode)
+    print(f"Position close dispatch: {sent}; retcode={retcode}")
     if not sent or retcode != 10009 or await pos.SelectByTicket(ctx.position_ticket):
         ctx.trading.disarm()
         raise ExampleError("Position close not confirmed; inspect trade outcome")
     ctx.position_ticket = 0
-    _report(ctx, 13, "Close remaining owned position", True)
+    print("Closed remaining owned position")
 
 
 async def example_14_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate placing a BuyLimit pending order using Trade."""
     _header("Place Pending Order")
     if not ctx.allow_writes:
-        _report(ctx, 14, "Place pending order", "live writes disabled", skipped=True)
+        print("Live writes disabled; skipping place pending order")
         return
     if ctx.pending_ticket:
         ctx.trading.disarm()
@@ -580,7 +558,7 @@ async def example_14_pending_orders(ctx: ExampleContext) -> None:
     )
     sent = await trade.BuyLimit(VOLUME, ctx.pending_price, SYMBOL)
     retcode = int(await trade.ResultRetcode())
-    print("BuyLimit dispatch: %s; retcode=%s", sent, retcode)
+    print(f"BuyLimit dispatch: {sent}; retcode={retcode}")
     if not sent or retcode not in (10008, 10009):
         ctx.trading.disarm()
         raise ExampleError("Pending order not confirmed; inspect trade outcome")
@@ -593,19 +571,14 @@ async def example_14_pending_orders(ctx: ExampleContext) -> None:
     ):
         ctx.trading.disarm()
         raise ExampleError("Pending order ownership could not be confirmed")
-    _report(
-        ctx,
-        14,
-        "Place owned pending order",
-        {"Price": ctx.pending_price, "Volume": VOLUME},
-    )
+    print(f"Placed owned pending order at price: {ctx.pending_price}; volume: {VOLUME}")
 
 
 async def example_15_modify_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate modifying the owned pending order using Trade."""
     _header("Modify Pending Order")
     if not ctx.allow_writes:
-        _report(ctx, 15, "Modify pending order", "live writes disabled", skipped=True)
+        print("Live writes disabled; skipping modify pending order")
         return
     order, symbol, trade = ctx.trading.order, ctx.trading.symbol, ctx.trading.trade
     if (
@@ -625,7 +598,7 @@ async def example_15_modify_pending_orders(ctx: ExampleContext) -> None:
         ctx.pending_ticket, price, 0.0, 0.0, OrderTime.GTC, 0
     )
     retcode = int(await trade.ResultRetcode())
-    print("Order modify dispatch: %s; retcode=%s", sent, retcode)
+    print(f"Order modify dispatch: {sent}; retcode={retcode}")
     if (
         not sent
         or retcode != 10009
@@ -635,14 +608,14 @@ async def example_15_modify_pending_orders(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("Order modification not confirmed; inspect trade outcome")
     ctx.pending_price = price
-    _report(ctx, 15, "Modify owned pending order", {"Price": price})
+    print(f"Modified owned pending order price: {price}")
 
 
 async def example_16_delete_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate cancelling the owned pending order using Trade."""
     _header("Cancel Pending Order")
     if not ctx.allow_writes:
-        _report(ctx, 16, "Cancel pending order", "live writes disabled", skipped=True)
+        print("Live writes disabled; skipping delete pending order")
         return
     order, trade = ctx.trading.order, ctx.trading.trade
     if (
@@ -655,12 +628,12 @@ async def example_16_delete_pending_orders(ctx: ExampleContext) -> None:
         raise ExampleError("Order ownership must be confirmed before cancellation")
     sent = await trade.OrderDelete(ctx.pending_ticket)
     retcode = int(await trade.ResultRetcode())
-    print("Order delete dispatch: %s; retcode=%s", sent, retcode)
+    print(f"Order delete dispatch: {sent}; retcode={retcode}")
     if not sent or retcode != 10009 or await order.Select(ctx.pending_ticket):
         ctx.trading.disarm()
         raise ExampleError("Order cancellation not confirmed; inspect trade outcome")
     ctx.pending_ticket = 0
-    _report(ctx, 16, "Delete owned pending order", True)
+    print("Deleted owned pending order")
 
 
 async def example_17_shutdown(ctx: ExampleContext) -> None:
@@ -670,7 +643,7 @@ async def example_17_shutdown(ctx: ExampleContext) -> None:
         ctx.closed = True
         ctx.trading.disarm()
         await ctx.trading.close()
-        _report(ctx, 17, "Shutdown", True)
+        print("Broker connection closed successfully")
 
 
 async def example_18_historical_bars(ctx: ExampleContext) -> None:
@@ -691,20 +664,13 @@ async def example_18_historical_bars(ctx: ExampleContext) -> None:
         SYMBOL, TIMEFRAME, date_from=DATE_FROM
     )
     through_current = await trading.get_historical_bars(SYMBOL, TIMEFRAME, start_pos=2)
-    _report(
-        ctx,
-        18,
-        "Historical bars",
-        {
-            "Range count": len(bars),
-            "Range sample": bars[:PREVIEW_LIMIT],
-            "Date/count": from_date[:PREVIEW_LIMIT],
-            "Index/count": from_index[:PREVIEW_LIMIT],
-            "Latest": latest[:PREVIEW_LIMIT],
-            "Date until now count": len(until_now),
-            "Index through current": through_current[:PREVIEW_LIMIT],
-        },
-    )
+    print(f"Range count: {len(bars)}")
+    print(f"Range sample: {bars[:PREVIEW_LIMIT]}")
+    print(f"Date/count: {from_date[:PREVIEW_LIMIT]}")
+    print(f"Index/count: {from_index[:PREVIEW_LIMIT]}")
+    print(f"Latest: {latest[:PREVIEW_LIMIT]}")
+    print(f"Date until now count: {len(until_now)}")
+    print(f"Index through current: {through_current[:PREVIEW_LIMIT]}")
 
 
 async def example_19_tick_data(ctx: ExampleContext) -> None:
@@ -715,18 +681,11 @@ async def example_19_tick_data(ctx: ExampleContext) -> None:
     from_date = await trading.get_ticks(SYMBOL, date_from=TICK_DATE_FROM, count=3)
     latest = await trading.get_ticks(SYMBOL, count=3)
     until_now = await trading.get_ticks(SYMBOL, date_from=TICK_DATE_FROM)
-    _report(
-        ctx,
-        19,
-        "Historical ticks",
-        {
-            "Range count": len(ticks),
-            "Range sample": ticks[:PREVIEW_LIMIT],
-            "Date/count": from_date[:PREVIEW_LIMIT],
-            "Latest": latest[:PREVIEW_LIMIT],
-            "Date until now count": len(until_now),
-        },
-    )
+    print(f"Range count: {len(ticks)}")
+    print(f"Range sample: {ticks[:PREVIEW_LIMIT]}")
+    print(f"Date/count: {from_date[:PREVIEW_LIMIT]}")
+    print(f"Latest: {latest[:PREVIEW_LIMIT]}")
+    print(f"Date until now count: {len(until_now)}")
 
 
 EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
@@ -761,11 +720,7 @@ async def run_examples(
             await example(ctx)
     finally:
         await example_17_shutdown(ctx)
-    print(
-        "Examples complete: %s passed, %s skipped",
-        sum(item.status == "passed" for item in ctx.results),
-        sum(item.status == "skipped" for item in ctx.results),
-    )
+    print("\nExamples completed successfully.")
     return ctx.results
 
 
