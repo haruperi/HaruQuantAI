@@ -29,16 +29,19 @@ Key Capabilities:
       `TimeConditions.bar_day_of_week_is()`,
       `TimeConditions.is_month_first_trading_day()`, `TimeConditions.always_true()`.
       Logging: DEBUG on condition evaluations.
+    - FR-SERVICES-FORMAT-TIMESTAMP: Format POSIX timestamps and datetimes
+      into UTC or local offset strings.
+      Associated: `format_timestamp()`.
+      Logging: Passive string formatting; emits no operational log events.
 
 Python API Usage:
     ```python
-    from app.services.bar_time import BarTime, DateTimeSeries, TimeConditions
+    from app.services.utils.bar_time import BarTime, DateTimeSeries, format_timestamp
 
     ts = [1704110400, 1704153600]
     bt = BarTime(ts)
     h = bt.bar_hour(shift=0)
-    tc = TimeConditions(bt)
-    is_trading_hour = tc.bar_hour_is_bigger(8, shift=0)
+    formatted = format_timestamp(ts[0], use_local_tz=True)
     ```
 
 CLI Usage:
@@ -93,6 +96,73 @@ def normalize_timestamps(timestamps: Any) -> np.ndarray[Any, np.dtype[np.int64]]
             dt_64 = np.datetime64(ts, "s").astype("int64")
             res.append(int(dt_64))
     return np.array(res, dtype=np.int64)
+
+
+def _parse_timestamp(timestamp: float | datetime) -> datetime:
+    """Normalize POSIX timestamp or datetime into UTC datetime."""
+    if isinstance(timestamp, bool):
+        raise TypeError("Unsupported timestamp type: bool")
+    if isinstance(timestamp, (int, float)):
+        sec = float(timestamp)
+        if abs(sec) > MS_THRESHOLD:
+            sec /= 1000.0
+        return datetime.fromtimestamp(sec, tz=UTC)
+    if isinstance(timestamp, datetime):
+        dt = (
+            timestamp if timestamp.tzinfo is not None else timestamp.replace(tzinfo=UTC)
+        )
+        return dt.astimezone(UTC)
+    raise TypeError(f"Unsupported timestamp type: {type(timestamp).__name__}")
+
+
+def format_timestamp(
+    timestamp: float | datetime | None,
+    *,
+    fmt: str = "%Y-%m-%d %H:%M:%S.%f",
+    include_tz: bool = True,
+    use_local_tz: bool = False,
+    precision: int | None = 3,
+) -> str:
+    """Format a POSIX timestamp or datetime into a standardized string.
+
+    Args:
+        timestamp: POSIX seconds or milliseconds (float/int), datetime, or None.
+        fmt: strftime format string (default "%Y-%m-%d %H:%M:%S.%f") or 'iso'.
+        include_tz: Whether to append timezone suffix or offset (default True).
+        use_local_tz: Whether to convert time to current local timezone and display
+            its offset rather than UTC (default False).
+        precision: Fractional second precision (default 3 for milliseconds).
+            Pass None to keep all 6 digits of %f.
+
+    Returns:
+        Formatted timestamp string, or 'N/A' if timestamp is None.
+
+    Raises:
+        TypeError: If timestamp is not a float, int, datetime, or None.
+    """
+    if timestamp is None:
+        return "N/A"
+
+    dt = _parse_timestamp(timestamp)
+    if use_local_tz:
+        dt = dt.astimezone()
+
+    if fmt.lower() == "iso":
+        return dt.isoformat() if include_tz else dt.replace(tzinfo=None).isoformat()
+
+    if precision is not None and ".%f" in fmt:
+        micro = dt.strftime("%f")
+        frac = micro[:precision] if precision > 0 else ""
+        base = dt.strftime(fmt.replace(".%f", ""))
+        formatted = f"{base}.{frac}" if frac else base
+    else:
+        formatted = dt.strftime(fmt)
+
+    if not include_tz:
+        return formatted
+
+    suffix = dt.strftime("%:z") if use_local_tz else "UTC"
+    return f"{formatted} {suffix}"
 
 
 class DateTimeSeries:
@@ -609,5 +679,6 @@ __all__ = [
     "BarTime",
     "DateTimeSeries",
     "TimeConditions",
+    "format_timestamp",
     "normalize_timestamps",
 ]

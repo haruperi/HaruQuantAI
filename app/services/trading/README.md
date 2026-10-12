@@ -257,3 +257,21 @@ frame limits and absence of automatic retries/saving remain unchanged.
 Example functions 18 and 19 demonstrate the selectors directly. Recompile/reload
 the updated EA before using the extended wire routes; deployed files are not
 updated by editing repository source.
+
+
+## Connection evidence in example one
+
+Example one first awaits backend readiness, then calls `TerminalInfo.IsConnected`
+and immediately reads that command's receipt. Its output shows the actual returned
+boolean, probe name, command ID, resolved receipt status and send/acknowledgment/
+resolution timestamps. Missing/mismatched/incomplete evidence or a false terminal
+connection stops the example instead of printing a hardcoded success.
+
+MT5 readiness means Python validated the EA hello/token and issued hello_ack. The
+correlated terminal response then supplies observable two-way bridge evidence;
+IsConnected also indicates the terminal's broker connection. Simulator readiness
+and receipt are local model evidence and do not claim a native network handshake.
+Evidence applies at that instant, not indefinitely and not as proof of trade fills.
+Credentials, account identity, raw receipt metadata and private session state are
+never included in this report. No EA protocol change/rebuild is needed for this
+example-only evidence change.

@@ -32,7 +32,7 @@ from datetime import UTC, datetime
 import numpy as np
 import pytest
 from app.services.indicators.base import IndicatorSeries
-from app.services.price import (
+from app.services.utils.price import (
     BarPrice,
     HeikenAshiPrice,
     MTFPrice,

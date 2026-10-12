@@ -25,13 +25,15 @@ CLI Usage:
 
 import asyncio
 import json
+from dataclasses import replace
 from pathlib import Path
-from typing import Any
-from unittest.mock import Mock
+from typing import Any, cast
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 from app.host.persistence.engine import DEFAULT_DATABASE_PATH
 from app.services.brokers import metatrader
+from app.services.brokers.contracts import Receipt, ReceiptStatus
 from app.services.brokers.metatrader import Bridge, MT5Backend
 from app.services.trading import (
     AccountInfo,
@@ -43,6 +45,7 @@ from app.services.trading import (
     TerminalInfo,
     Trade,
 )
+from scripts.examples import brokers
 
 
 def test_wire_bytes_and_round_trip() -> None:
@@ -284,3 +287,259 @@ def test_native_reconnect_logs_suppress_identical_failures() -> None:
     assert "ConnectBridge();" in timer
     assert "InpVerboseReconnectLogs" not in timer
     assert "g_last_connect_error" not in timer
+
+
+def test_connection_example_displays_observed_receipt(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Read an actual local probe and expose its matching resolved receipt."""
+    backend = brokers.create_backend("simulator")
+    ctx = brokers.ExampleContext(brokers.Trading(backend))
+
+    async def scenario() -> None:
+        try:
+            await brokers.example_01_connect(ctx)
+            command = ctx.trading.terminal.last_command_id
+            assert command is not None
+            receipt = ctx.trading.receipt(command)
+            assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
+            assert command in ctx.results[0].summary
+            assert "TerminalInfo.IsConnected" in ctx.results[0].summary
+            assert "Acknowledged at" in ctx.results[0].summary
+            assert "Resolved at" in ctx.results[0].summary
+            assert receipt.value is True
+        finally:
+            await brokers.example_17_shutdown(ctx)
+
+    asyncio.run(scenario())
+    output = capsys.readouterr().out
+    assert "Command ID" in output and "Terminal connected" in output
+
+
+@pytest.mark.parametrize(
+    "mismatch",
+    [
+        "missing",
+        "status",
+        "command",
+        "object",
+        "class",
+        "method",
+        "value",
+        "error",
+        "sent",
+        "acknowledged",
+        "resolved",
+        "nan_timestamp",
+        "boolean_timestamp",
+        "string_timestamp",
+    ],
+)
+def test_connection_example_rejects_invalid_receipt(
+    mismatch: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Missing or mismatched evidence cannot become a passed connection example."""
+    backend = brokers.create_backend("simulator")
+    ctx = brokers.ExampleContext(brokers.Trading(backend))
+    original_receipt = backend.receipt
+
+    def altered_receipt(command_id: str) -> Receipt | None:
+        receipt = original_receipt(command_id)
+        assert receipt is not None
+        if mismatch == "missing":
+            return None
+        changes: dict[str, Any] = {
+            "status": {"status": ReceiptStatus.CREATED},
+            "command": {"command_id": "different-command"},
+            "object": {"object_id": "different-object"},
+            "class": {"class_name": "Trade"},
+            "method": {"method_name": "Buy"},
+            "value": {"value": False},
+            "error": {"error": {"message": "private-message"}},
+            "sent": {"sent_at": None},
+            "acknowledged": {"acknowledged_at": None},
+            "resolved": {"resolved_at": None},
+            "nan_timestamp": {"acknowledged_at": float("nan")},
+            "boolean_timestamp": {"sent_at": False},
+            "string_timestamp": {"resolved_at": "private-value"},
+        }[mismatch]
+        return replace(receipt, **changes)
+
+    monkeypatch.setattr(backend, "receipt", altered_receipt)
+
+    async def scenario() -> None:
+        try:
+            with pytest.raises(brokers.ExampleError, match="missing or mismatched"):
+                await brokers.example_01_connect(ctx)
+            assert ctx.results == []
+        finally:
+            await brokers.example_17_shutdown(ctx)
+
+    asyncio.run(scenario())
+
+
+@pytest.mark.parametrize("probe_value", [False, 1])
+def test_connection_example_rejects_false_or_nonboolean_probe(
+    probe_value: bool | int,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A resolved response must be a genuine True boolean, not truthy data."""
+    backend = brokers.create_backend("simulator")
+    ctx = brokers.ExampleContext(brokers.Trading(backend))
+    original_probe = ctx.trading.terminal.IsConnected
+
+    async def probe() -> bool | int:
+        await original_probe()
+        command = ctx.trading.terminal.last_command_id
+        assert command is not None
+        receipt = backend.receipt(command)
+        assert receipt is not None
+        backend._receipts[command] = replace(receipt, value=probe_value)
+        return probe_value
+
+    monkeypatch.setattr(ctx.trading.terminal, "IsConnected", probe)
+
+    async def scenario() -> None:
+        try:
+            with pytest.raises(brokers.ExampleError):
+                await brokers.example_01_connect(ctx)
+            assert ctx.results == []
+        finally:
+            await brokers.example_17_shutdown(ctx)
+
+    asyncio.run(scenario())
+
+
+def test_connection_example_timeout_closes_backend(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The runner closes on readiness failure without issuing a success/probe."""
+    backend = brokers.create_backend("simulator")
+    trading = brokers.Trading(backend)
+    close = AsyncMock(wraps=trading.close)
+    probe = AsyncMock()
+    monkeypatch.setattr(trading, "close", close)
+    monkeypatch.setattr(trading, "wait_connected", AsyncMock(side_effect=TimeoutError))
+    monkeypatch.setattr(trading.terminal, "IsConnected", probe)
+    monkeypatch.setattr(brokers, "Trading", Mock(return_value=trading))
+    with pytest.raises(TimeoutError):
+        asyncio.run(brokers.run_examples(backend))
+    close.assert_awaited_once()
+    probe.assert_not_awaited()
+
+
+@pytest.mark.parametrize("valid_token", [True, False])
+def test_hello_ack_and_correlated_probe_without_listener(
+    valid_token: bool,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Exercise real handshake/framing/receipts through isolated in-memory streams."""
+
+    async def scenario() -> None:
+        native = MT5Backend(
+            auth_token="isolated-test-token", journal_path=tmp_path / "handshake.db"
+        )
+        monkeypatch.setattr(native, "start", AsyncMock())
+        reader = asyncio.StreamReader()
+        writer = Mock()
+        writer.get_extra_info.return_value = ("127.0.0.1", 12345)
+        writer.is_closing.return_value = False
+        writer.drain = AsyncMock()
+        writer.wait_closed = AsyncMock()
+        frames: list[dict[str, Any]] = []
+
+        def write(data: bytes) -> None:
+            frame = metatrader.decode_frame(data)
+            frames.append(frame)
+            if frame["kind"] == "call":
+                reader.feed_data(
+                    metatrader.encode_frame(
+                        {
+                            "v": 1,
+                            "kind": "response",
+                            "command_id": frame["command_id"],
+                            "ok": True,
+                            "value": True,
+                        }
+                    )
+                )
+
+        writer.write.side_effect = write
+        reader.feed_data(
+            metatrader.encode_frame(
+                {
+                    "v": 1,
+                    "kind": "hello",
+                    "token": "isolated-test-token"
+                    if valid_token
+                    else "wrong-test-token",
+                }
+            )
+        )
+        accepted = asyncio.create_task(
+            native.bridge._accept(reader, cast("asyncio.StreamWriter", writer))
+        )
+        ctx = brokers.ExampleContext(brokers.Trading(native))
+        try:
+            if valid_token:
+                await asyncio.wait_for(brokers.example_01_connect(ctx), timeout=1)
+                assert native.bridge.connected
+                assert [frame["kind"] for frame in frames] == ["hello_ack", "call"]
+                assert frames[1]["class"] == "TerminalInfo"
+                assert frames[1]["method"] == "IsConnected"
+                receipt = native.receipt(frames[1]["command_id"])
+                assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
+                assert receipt.command_id in ctx.results[0].summary
+                assert "isolated-test-token" not in ctx.results[0].summary
+            else:
+                await asyncio.wait_for(accepted, timeout=1)
+                with pytest.raises(TimeoutError):
+                    await native.wait_connected(timeout=0.01)
+                assert not native.bridge.connected
+                assert frames[0]["code"] == "AUTH_FAILED"
+                assert not any(frame["kind"] == "call" for frame in frames)
+        finally:
+            reader.feed_eof()
+            await asyncio.wait_for(accepted, timeout=1)
+            await native.close()
+
+    asyncio.run(scenario())
+
+
+def test_connection_evidence_preserves_complete_simulation_walkthrough(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Run all examples through actual model operations with observed first evidence."""
+    examples = tuple(
+        getattr(brokers, name)
+        for name in (
+            "example_01_connect",
+            "example_02_terminal",
+            "example_03_account",
+            "example_04_symbol",
+            "example_05_position",
+            "example_06_order",
+            "example_07_history_order",
+            "example_08_history_deal",
+            "example_09_open_position",
+            "example_10_calc_profit_margin",
+            "example_11_modify_position",
+            "example_12_close_partial_position",
+            "example_13_close_position",
+            "example_14_pending_orders",
+            "example_15_modify_pending_orders",
+            "example_16_delete_pending_orders",
+            "example_18_historical_bars",
+            "example_19_tick_data",
+        )
+    )
+    monkeypatch.setattr(brokers, "EXAMPLES", examples)
+    backend = brokers.create_backend("simulator")
+    results = asyncio.run(brokers.run_examples(backend, allow_writes=True))
+    assert [result.number for result in results] == [*range(1, 17), 18, 19, 17]
+    assert all(result.status == "passed" for result in results)
+    assert "Command ID" in results[0].summary
+    assert "Receipt status" in results[0].summary
+    assert backend.positions() == [] and backend.orders() == []

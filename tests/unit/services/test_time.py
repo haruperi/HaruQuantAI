@@ -9,7 +9,8 @@ Purpose:
 
 Key Capabilities:
     - FR-SERVICES-TEST-TIME: Assert exact temporal calculations and condition logic.
-      Associated: `test_date_time_series()`, `test_bar_time()`, `test_time_conditions()`
+      Associated: `test_date_time_series()`, `test_bar_time()`,
+        `test_time_conditions()`, `test_format_timestamp()`.
       Logging: DEBUG on test execution.
 
 Python API Usage:
@@ -28,8 +29,13 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
-from app.services.bar_time import BarTime, DateTimeSeries, TimeConditions
 from app.services.indicators.base import IndicatorSeries
+from app.services.utils.bar_time import (
+    BarTime,
+    DateTimeSeries,
+    TimeConditions,
+    format_timestamp,
+)
 
 
 def test_date_time_series() -> None:
@@ -209,3 +215,54 @@ def test_time_conditions() -> None:
     dts = DateTimeSeries(ts)
     tc3 = TimeConditions(dts)
     assert tc3.bar_hour_is(18, shift=0) is True
+
+
+def test_format_timestamp() -> None:
+    """Verify format_timestamp with seconds, milliseconds, datetimes, and edge cases."""
+    # 2024-01-01 12:00:00 UTC = 1704110400
+    ts_sec = 1704110400.123456
+    ts_int_sec = 1704110400
+    ts_ms = 1704110400123
+
+    # Default formatting (UTC with 3-digit ms precision)
+    assert format_timestamp(ts_sec) == "2024-01-01 12:00:00.123 UTC"
+    assert format_timestamp(ts_int_sec) == "2024-01-01 12:00:00.000 UTC"
+    assert format_timestamp(ts_ms) == "2024-01-01 12:00:00.123 UTC"
+
+    # None handling
+    assert format_timestamp(None) == "N/A"
+
+    # datetime instances (both naive and tz-aware)
+    dt_aware = datetime(2024, 1, 1, 12, 0, 0, 500000, tzinfo=UTC)
+    assert format_timestamp(dt_aware) == "2024-01-01 12:00:00.500 UTC"
+
+    dt_naive = datetime.fromisoformat("2024-01-01T12:00:00.500000")
+    assert format_timestamp(dt_naive) == "2024-01-01 12:00:00.500 UTC"
+
+    # ISO format option
+    iso_res = format_timestamp(ts_int_sec, fmt="iso")
+    assert iso_res == "2024-01-01T12:00:00+00:00"
+
+    # Custom format and precision options
+    assert format_timestamp(ts_sec, precision=None) == "2024-01-01 12:00:00.123456 UTC"
+    assert format_timestamp(ts_sec, precision=0) == "2024-01-01 12:00:00 UTC"
+    assert format_timestamp(ts_sec, include_tz=False) == "2024-01-01 12:00:00.123"
+
+    # Local timezone offset formatting
+    local_expected = datetime.fromtimestamp(ts_sec, tz=UTC).astimezone()
+    offset = local_expected.strftime("%:z")
+    local_str = format_timestamp(ts_sec, use_local_tz=True)
+    assert local_str.endswith(offset)
+    assert local_expected.strftime("%Y-%m-%d %H:%M:%S.123") in local_str
+
+    # Local ISO format
+    local_iso = format_timestamp(ts_int_sec, fmt="iso", use_local_tz=True)
+    assert local_iso == local_expected.replace(microsecond=0).isoformat()
+    assert local_iso.endswith(offset)
+
+    # Type validation rejections
+    with pytest.raises(TypeError, match="Unsupported timestamp type: bool"):
+        format_timestamp(True)
+
+    with pytest.raises(TypeError, match="Unsupported timestamp type: str"):
+        format_timestamp("2024-01-01")  # type: ignore[arg-type]

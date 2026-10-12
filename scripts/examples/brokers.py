@@ -53,6 +53,7 @@ from app.services.brokers.contracts import (
     MarketTick,
     OrderTime,
     OrderType,
+    ReceiptStatus,
     SymbolSpec,
     Timeframe,
     TradingBackend,
@@ -60,6 +61,7 @@ from app.services.brokers.contracts import (
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
 from app.services.trading import Trading
+from app.services.utils import format_timestamp
 
 BROKER: Literal["simulator", "mt5"] = "mt5"
 ALLOW_LIVE_TRADING = True
@@ -144,11 +146,7 @@ def _report(
         ExampleResult(number, title, "skipped" if skipped else "passed", summary)
     )
     print(
-        "Example %02d/19 - %s - %s: %s",
-        number,
-        title,
-        "skipped" if skipped else "passed",
-        summary,
+        f"Example {number:02d}/19 - {title} - {'skipped' if skipped else 'passed'}: {summary}"
     )
 
 
@@ -160,30 +158,99 @@ def _header(title: str) -> None:
 
 
 async def example_01_connect(ctx: ExampleContext) -> None:
-    """Demonstrate connecting to the selected broker."""
+    """Verify backend readiness, then show an observed terminal probe and receipt.
+
+    MT5 readiness validates the EA hello/token; the resolved read proves a return
+    path through the bridge. Simulation supplies local readiness/probe evidence.
+    Terminal connectivity measures its broker connection at the probe's instant.
+    """
     _header("Connect to Broker")
     await ctx.trading.start()
     print(f"Waiting for backend readiness; timeout={CONNECT_TIMEOUT} seconds")
     await ctx.trading.wait_connected(timeout=CONNECT_TIMEOUT)
-    _report(ctx, 1, "Connect", True)
+    connected = await ctx.trading.terminal.IsConnected()
+    command_id = ctx.trading.terminal.last_command_id
+    receipt = ctx.trading.receipt(command_id) if command_id is not None else None
+    if (
+        type(connected) is not bool
+        or receipt is None
+        or receipt.status != ReceiptStatus.RESOLVED
+        or receipt.command_id != command_id
+        or receipt.object_id != ctx.trading.terminal.object_id
+        or receipt.class_name != "TerminalInfo"
+        or receipt.method_name != "IsConnected"
+        or receipt.value is not connected
+        or receipt.error is not None
+        or receipt.sent_at is None
+        or receipt.acknowledged_at is None
+        or receipt.resolved_at is None
+        or not all(
+            isinstance(stamp, (int, float))
+            and not isinstance(stamp, bool)
+            and math.isfinite(stamp)
+            for stamp in (receipt.sent_at, receipt.acknowledged_at, receipt.resolved_at)
+        )
+    ):
+        ctx.trading.disarm()
+        raise ExampleError(
+            "Connection probe has missing or mismatched response evidence"
+        )
+    if not connected:
+        ctx.trading.disarm()
+        raise ExampleError("Terminal responded but is disconnected from its broker")
+    print(f"Terminal connected : {connected}")
+    print(f"Probe : {receipt.class_name}.{receipt.method_name}")
+    print(f"Command ID : {receipt.command_id}")
+    print(f"Receipt status : {receipt.status.value}")
+    print(f"Sent at : {format_timestamp(receipt.sent_at)}")
+    print(f"Acknowledged at : {format_timestamp(receipt.acknowledged_at)}")
+    print(f"Resolved at : {format_timestamp(receipt.resolved_at)}")
+    _report(
+        ctx,
+        1,
+        "Connect",
+        {
+            "Terminal connected": connected,
+            "Probe": f"{receipt.class_name}.{receipt.method_name}",
+            "Command ID": receipt.command_id,
+            "Receipt status": receipt.status.value,
+            "Sent at": format_timestamp(receipt.sent_at),
+            "Acknowledged at": format_timestamp(receipt.acknowledged_at),
+            "Resolved at": format_timestamp(receipt.resolved_at),
+        },
+    )
 
 
 async def example_02_terminal(ctx: ExampleContext) -> None:
     """Demonstrate printing terminal information using TerminalInfo."""
     _header("Terminal Information")
     terminal = ctx.trading.terminal
+    name = await terminal.Name()
+    company = await terminal.Company()
+    build = await terminal.Build()
+    language = await terminal.Language()
+    connected = await terminal.IsConnected()
+    trade_allowed = await terminal.IsTradeAllowed()
+    dlls_allowed = await terminal.IsDLLsAllowed()
+    print(f"Name: {name}")
+    print(f"Company: {company}")
+    print(f"Build: {build}")
+    print(f"Language: {language}")
+    print(f"Connected: {connected}")
+    print(f"Trade allowed: {trade_allowed}")
+    print(f"DLLs allowed: {dlls_allowed}")
     _report(
         ctx,
         2,
         "Terminal information",
         {
-            "Name": await terminal.Name(),
-            "Company": await terminal.Company(),
-            "Build": await terminal.Build(),
-            "Language": await terminal.Language(),
-            "Connected": await terminal.IsConnected(),
-            "Trade allowed": await terminal.IsTradeAllowed(),
-            "DLLs allowed": await terminal.IsDLLsAllowed(),
+            "Name": name,
+            "Company": company,
+            "Build": build,
+            "Language": language,
+            "Connected": connected,
+            "Trade allowed": trade_allowed,
+            "DLLs allowed": dlls_allowed,
         },
     )
 
@@ -690,7 +757,7 @@ async def example_19_tick_data(ctx: ExampleContext) -> None:
 
 EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_01_connect,
-    # example_02_terminal,
+    example_02_terminal,
     # example_03_account,
     # example_04_symbol,
     # example_05_position,
