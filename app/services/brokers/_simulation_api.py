@@ -280,6 +280,34 @@ def _accountinfo_company(self: _ObjectState) -> str:
     return cast("str", _accountinfo__a(self).company)
 
 
+def _accountinfo_currencydigits(self: _ObjectState) -> int:
+    return int(_accountinfo__a(self).currency_digits)
+
+
+def _accountinfo_fifoclose(self: _ObjectState) -> bool:
+    return bool(_accountinfo__a(self).fifo_close)
+
+
+def _accountinfo_margininitial(self: _ObjectState) -> float:
+    return float(_accountinfo__a(self).margin_initial)
+
+
+def _accountinfo_marginmaintenance(self: _ObjectState) -> float:
+    return float(_accountinfo__a(self).margin_maintenance)
+
+
+def _accountinfo_assets(self: _ObjectState) -> float:
+    return float(_accountinfo__a(self).assets)
+
+
+def _accountinfo_liabilities(self: _ObjectState) -> float:
+    return float(_accountinfo__a(self).liabilities)
+
+
+def _accountinfo_commissionblocked(self: _ObjectState) -> float:
+    return float(_accountinfo__a(self).commission_blocked)
+
+
 def _accountinfo_infointeger(self: _ObjectState, property_id: int | str) -> int:
     value = self._backend.info_value("account", property_id)
     if value is None and isinstance(property_id, str):
@@ -2063,6 +2091,13 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "MarginCheck": _accountinfo_margincheck,
         "FreeMarginCheck": _accountinfo_freemargincheck,
         "MaxLotCheck": _accountinfo_maxlotcheck,
+        "CurrencyDigits": _accountinfo_currencydigits,
+        "FifoClose": _accountinfo_fifoclose,
+        "MarginInitial": _accountinfo_margininitial,
+        "MarginMaintenance": _accountinfo_marginmaintenance,
+        "Assets": _accountinfo_assets,
+        "Liabilities": _accountinfo_liabilities,
+        "CommissionBlocked": _accountinfo_commissionblocked,
     },
     "DealInfo": {
         "Order": _dealinfo_order,

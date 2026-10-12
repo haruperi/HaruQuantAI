@@ -539,6 +539,13 @@ class AccountSnapshot:
     server: str = "Simulation"
     currency: str = "USD"
     company: str = "HaruQuantAI"
+    currency_digits: int = 2
+    fifo_close: bool = False
+    margin_initial: float = 0.0
+    margin_maintenance: float = 0.0
+    assets: float = 0.0
+    liabilities: float = 0.0
+    commission_blocked: float = 0.0
 
 
 @dataclass(slots=True)

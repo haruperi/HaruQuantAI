@@ -233,12 +233,16 @@ async def example_03_account(ctx: ExampleContext) -> None:
     """Demonstrate printing account information using AccountInfo."""
     _header("Account Information")
     account = ctx.trading.account
-    print(f"Currency: {await account.Currency()}")
+    print(f"Login: {await account.Login()}")
+    print(f"Trade mode: {await account.TradeMode()}")
     print(f"Leverage: {await account.Leverage()}")
-    print(f"Trade mode: {await account.TradeModeDescription()}")
-    print(f"Margin mode: {await account.MarginModeDescription()}")
+    print(f"Limit orders: {await account.LimitOrders()}")
+    print(f"Margin SO mode: {await account.StopoutMode()}")
     print(f"Trade allowed: {await account.TradeAllowed()}")
-    print(f"Expert allowed: {await account.TradeExpert()}")
+    print(f"Trade expert: {await account.TradeExpert()}")
+    print(f"Margin mode: {await account.MarginMode()}")
+    print(f"Currency digits: {await account.CurrencyDigits()}")
+    print(f"FIFO close: {await account.FifoClose()}")
     print(f"Balance: {await account.Balance()}")
     print(f"Credit: {await account.Credit()}")
     print(f"Profit: {await account.Profit()}")
@@ -246,6 +250,17 @@ async def example_03_account(ctx: ExampleContext) -> None:
     print(f"Margin: {await account.Margin()}")
     print(f"Free margin: {await account.FreeMargin()}")
     print(f"Margin level: {await account.MarginLevel()}")
+    print(f"Margin SO call: {await account.MarginCall()}")
+    print(f"Margin SO SO: {await account.MarginStopOut()}")
+    print(f"Margin initial: {await account.MarginInitial()}")
+    print(f"Margin maintenance: {await account.MarginMaintenance()}")
+    print(f"Assets: {await account.Assets()}")
+    print(f"Liabilities: {await account.Liabilities()}")
+    print(f"Commission blocked: {await account.CommissionBlocked()}")
+    print(f"Name: {await account.Name()}")
+    print(f"Server: {await account.Server()}")
+    print(f"Currency: {await account.Currency()}")
+    print(f"Company: {await account.Company()}")
 
 
 async def example_04_symbol(ctx: ExampleContext) -> None:
@@ -691,7 +706,7 @@ async def example_19_tick_data(ctx: ExampleContext) -> None:
 EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_01_connect,
     example_02_terminal,
-    # example_03_account,
+    example_03_account,
     # example_04_symbol,
     # example_05_position,
     # example_06_order,

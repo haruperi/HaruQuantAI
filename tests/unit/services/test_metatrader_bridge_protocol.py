@@ -558,3 +558,21 @@ def test_terminal_info_extended_properties_parity() -> None:
         assert await terminal.Retransmission() == 0.0
 
     asyncio.run(scenario())
+
+
+def test_account_info_extended_properties_parity() -> None:
+    """Verify new AccountInfo properties resolve on simulator."""
+    sim = SimulationBackend()
+    trading = Trading(sim)
+    account = trading.account
+
+    async def scenario() -> None:
+        assert await account.CurrencyDigits() == 2
+        assert await account.FifoClose() is False
+        assert await account.MarginInitial() == 0.0
+        assert await account.MarginMaintenance() == 0.0
+        assert await account.Assets() == 0.0
+        assert await account.Liabilities() == 0.0
+        assert await account.CommissionBlocked() == 0.0
+
+    asyncio.run(scenario())

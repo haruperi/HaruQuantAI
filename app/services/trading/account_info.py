@@ -159,3 +159,31 @@ class AccountInfo(TradingClass):
     async def MaxLotCheck(self, *args: Any) -> Any:
         """Await the backend AccountInfo.MaxLotCheck operation."""
         return await self._call("MaxLotCheck", *args)
+
+    async def CurrencyDigits(self, *args: Any) -> Any:
+        """Await the backend AccountInfo.CurrencyDigits operation."""
+        return await self._call("CurrencyDigits", *args)
+
+    async def FifoClose(self, *args: Any) -> Any:
+        """Await the backend AccountInfo.FifoClose operation."""
+        return await self._call("FifoClose", *args)
+
+    async def MarginInitial(self, *args: Any) -> Any:
+        """Await the backend AccountInfo.MarginInitial operation."""
+        return await self._call("MarginInitial", *args)
+
+    async def MarginMaintenance(self, *args: Any) -> Any:
+        """Await the backend AccountInfo.MarginMaintenance operation."""
+        return await self._call("MarginMaintenance", *args)
+
+    async def Assets(self, *args: Any) -> Any:
+        """Await the backend AccountInfo.Assets operation."""
+        return await self._call("Assets", *args)
+
+    async def Liabilities(self, *args: Any) -> Any:
+        """Await the backend AccountInfo.Liabilities operation."""
+        return await self._call("Liabilities", *args)
+
+    async def CommissionBlocked(self, *args: Any) -> Any:
+        """Await the backend AccountInfo.CommissionBlocked operation."""
+        return await self._call("CommissionBlocked", *args)

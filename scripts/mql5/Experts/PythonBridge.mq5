@@ -403,6 +403,13 @@ long ParseEnumCode(string &args[],int index)
    if(s=="ACCOUNT_SERVER") return ACCOUNT_SERVER;
    if(s=="ACCOUNT_CURRENCY") return ACCOUNT_CURRENCY;
    if(s=="ACCOUNT_COMPANY") return ACCOUNT_COMPANY;
+   if(s=="ACCOUNT_CURRENCY_DIGITS") return ACCOUNT_CURRENCY_DIGITS;
+   if(s=="ACCOUNT_FIFO_CLOSE") return ACCOUNT_FIFO_CLOSE;
+   if(s=="ACCOUNT_MARGIN_INITIAL") return ACCOUNT_MARGIN_INITIAL;
+   if(s=="ACCOUNT_MARGIN_MAINTENANCE") return ACCOUNT_MARGIN_MAINTENANCE;
+   if(s=="ACCOUNT_ASSETS") return ACCOUNT_ASSETS;
+   if(s=="ACCOUNT_LIABILITIES") return ACCOUNT_LIABILITIES;
+   if(s=="ACCOUNT_COMMISSION_BLOCKED") return ACCOUNT_COMMISSION_BLOCKED;
 
    // Common order / position / deal properties
    if(s=="ORDER_TICKET") return ORDER_TICKET;
@@ -873,6 +880,13 @@ void DispatchAccount(const string command_id,const string object_id,const string
    if(method=="Server") { RespondString(command_id, true, obj.Server()); return; }
    if(method=="Currency") { RespondString(command_id, true, obj.Currency()); return; }
    if(method=="Company") { RespondString(command_id, true, obj.Company()); return; }
+   if(method=="CurrencyDigits") { RespondLong(command_id, true, (long)AccountInfoInteger(ACCOUNT_CURRENCY_DIGITS)); return; }
+   if(method=="FifoClose") { RespondBool(command_id, true, (bool)AccountInfoInteger(ACCOUNT_FIFO_CLOSE)); return; }
+   if(method=="MarginInitial") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_MARGIN_INITIAL)); return; }
+   if(method=="MarginMaintenance") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_MARGIN_MAINTENANCE)); return; }
+   if(method=="Assets") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_ASSETS)); return; }
+   if(method=="Liabilities") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_LIABILITIES)); return; }
+   if(method=="CommissionBlocked") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_COMMISSION_BLOCKED)); return; }
    if(method=="InfoInteger") { RespondLong(command_id,true,obj.InfoInteger((ENUM_ACCOUNT_INFO_INTEGER)ParseEnumCode(args,0))); return; }
    if(method=="InfoDouble") { RespondDouble(command_id,true,obj.InfoDouble((ENUM_ACCOUNT_INFO_DOUBLE)ParseEnumCode(args,0))); return; }
    if(method=="InfoString") { RespondString(command_id,true,obj.InfoString((ENUM_ACCOUNT_INFO_STRING)ParseEnumCode(args,0))); return; }
