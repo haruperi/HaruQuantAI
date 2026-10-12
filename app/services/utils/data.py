@@ -3,20 +3,20 @@
 Description:
     Provides transformation functions that convert domain market data sequences
     (such as MarketBar, MarketTick, Tick, or compatible dictionary representations)
-    into analysis-ready pandas DataFrames indexed by UTC DateTime. Ensures consistent
-    column naming, precision, and temporal indexing across quant strategies, indicators,
-    and broker inspection workflows.
+    into analysis-ready pandas DataFrames indexed by timezone-naive DateTime.
+    Ensures consistent column naming, precision, and temporal indexing across quant
+    strategies, indicators, and broker inspection workflows.
 
 Purpose:
     FEAT-SERVICES-DATA: Expose standardized DataFrame conversion utilities.
 
 Key Capabilities:
     - FR-SERVICES-DATA-BARS-DATAFRAME: Convert historical bars into a structured
-      pandas DataFrame indexed by UTC DateTime.
+      pandas DataFrame indexed by timezone-naive DateTime (second resolution).
       Associated: `bars_to_dataframe()`, `bars_to_df()`
       Logging: DEBUG converted bar count and resulting DataFrame shape.
     - FR-SERVICES-DATA-TICKS-DATAFRAME: Convert historical ticks into a structured
-      pandas DataFrame indexed by UTC DateTime.
+      pandas DataFrame indexed by timezone-naive DateTime (millisecond resolution).
       Associated: `ticks_to_dataframe()`, `ticks_to_df()`
       Logging: DEBUG converted tick count and resulting DataFrame shape.
 
@@ -41,7 +41,7 @@ CLI Usage:
 from __future__ import annotations
 
 from collections.abc import Iterable
-from datetime import UTC, datetime
+from datetime import datetime
 from typing import Any
 
 import pandas as pd
@@ -115,15 +115,16 @@ def _parse_tick_record(
 def bars_to_dataframe(bars: Iterable[MarketBar | dict[str, Any]]) -> pd.DataFrame:
     """Convert an iterable of MarketBar records or dicts to a pandas DataFrame.
 
-    The resulting DataFrame is indexed by a UTC DatetimeIndex named 'DateTime'
-    and contains columns: Open, High, Low, Close, Volume, Spread.
-    Volume is derived from tick_volume.
+    The resulting DataFrame is indexed by a timezone-naive DatetimeIndex
+    named 'DateTime' with second resolution ('datetime64[s]') and contains
+    columns: Open, High, Low, Close, Volume, Spread. Volume is derived from
+    tick_volume.
 
     Args:
         bars: Sequence of MarketBar objects or dictionaries containing bar fields.
 
     Returns:
-        pd.DataFrame indexed by UTC DateTime.
+        pd.DataFrame indexed by timezone-naive DateTime.
     """
     timestamps: list[datetime | int | float | str] = []
     opens: list[float] = []
@@ -144,7 +145,7 @@ def bars_to_dataframe(bars: Iterable[MarketBar | dict[str, Any]]) -> pd.DataFram
         spreads.append(s)
 
     if not timestamps:
-        idx = pd.DatetimeIndex([], name="DateTime", tz=UTC)
+        idx = pd.DatetimeIndex([], name="DateTime", dtype="datetime64[s]")
         col_types = {
             "Open": "float64",
             "High": "float64",
@@ -163,9 +164,13 @@ def bars_to_dataframe(bars: Iterable[MarketBar | dict[str, Any]]) -> pd.DataFram
         return df
 
     if all(isinstance(t, (int, float)) for t in timestamps):
-        index = pd.to_datetime(timestamps, unit="s", utc=True)
+        index = (
+            pd.to_datetime(timestamps, unit="s", utc=True)
+            .tz_localize(None)
+            .as_unit("s")
+        )
     else:
-        index = pd.to_datetime(timestamps, utc=True)
+        index = pd.to_datetime(timestamps, utc=True).tz_localize(None).as_unit("s")
 
     index.name = "DateTime"
     df = pd.DataFrame(
@@ -192,14 +197,15 @@ def ticks_to_dataframe(
 ) -> pd.DataFrame:
     """Convert an iterable of MarketTick, Tick, or dicts to a pandas DataFrame.
 
-    The resulting DataFrame is indexed by a UTC DatetimeIndex named 'DateTime'
-    and contains columns: Bid, Ask.
+    The resulting DataFrame is indexed by a timezone-naive DatetimeIndex
+    named 'DateTime' with millisecond resolution ('datetime64[ms]') and contains
+    columns: Bid, Ask.
 
     Args:
         ticks: Sequence of MarketTick, Tick, or dictionary tick representations.
 
     Returns:
-        pd.DataFrame indexed by UTC DateTime.
+        pd.DataFrame indexed by timezone-naive DateTime.
     """
     timestamps: list[datetime | int | float | str] = []
     use_ms: bool = False
@@ -215,7 +221,7 @@ def ticks_to_dataframe(
         asks.append(a)
 
     if not timestamps:
-        idx = pd.DatetimeIndex([], name="DateTime", tz=UTC)
+        idx = pd.DatetimeIndex([], name="DateTime", dtype="datetime64[ms]")
         df = pd.DataFrame(
             {col: pd.Series(dtype="float64") for col in TICK_COLUMNS},
             index=idx,
@@ -226,11 +232,19 @@ def ticks_to_dataframe(
         return df
 
     if use_ms and all(isinstance(t, (int, float)) for t in timestamps):
-        index = pd.to_datetime(timestamps, unit="ms", utc=True)
+        index = (
+            pd.to_datetime(timestamps, unit="ms", utc=True)
+            .tz_localize(None)
+            .as_unit("ms")
+        )
     elif all(isinstance(t, (int, float)) for t in timestamps):
-        index = pd.to_datetime(timestamps, unit="s", utc=True)
+        index = (
+            pd.to_datetime(timestamps, unit="s", utc=True)
+            .tz_localize(None)
+            .as_unit("ms")
+        )
     else:
-        index = pd.to_datetime(timestamps, utc=True)
+        index = pd.to_datetime(timestamps, utc=True).tz_localize(None).as_unit("ms")
 
     index.name = "DateTime"
     df = pd.DataFrame(

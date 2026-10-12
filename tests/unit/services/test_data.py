@@ -72,10 +72,12 @@ def test_bars_to_dataframe_from_market_bars() -> None:
     assert list(df.columns) == ["Open", "High", "Low", "Close", "Volume", "Spread"]
     assert df.index.name == "DateTime"
     assert isinstance(df.index, pd.DatetimeIndex)
-    assert str(df.index.tz) == "UTC"
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[s]"
 
-    # Verify first row values
-    assert df.index[0] == pd.Timestamp("2023-11-14 22:13:20+0000", tz="UTC")
+    # Verify first row values and second precision representation
+    assert df.index[0] == pd.Timestamp("2023-11-14 22:13:20")
+    assert str(df.index[0]) == "2023-11-14 22:13:20"
     assert df["Open"].iloc[0] == pytest.approx(1.1000)
     assert df["High"].iloc[0] == pytest.approx(1.1050)
     assert df["Low"].iloc[0] == pytest.approx(1.0950)
@@ -117,6 +119,8 @@ def test_bars_to_dataframe_from_dicts() -> None:
 
     df = bars_to_dataframe(bar_dicts)
     assert len(df) == 2
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[s]"
     assert df["Open"].iloc[0] == pytest.approx(1.05)
     assert df["Volume"].iloc[0] == 50
     assert df["Open"].iloc[1] == pytest.approx(1.055)
@@ -139,6 +143,8 @@ def test_bars_to_dataframe_from_custom_objects() -> None:
     bars = [CustomBar(1700000000, 1.20, 1.22, 1.19, 1.21, 300, 5)]
     df = bars_to_dataframe(bars)
     assert len(df) == 1
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[s]"
     assert df["Volume"].iloc[0] == 300
     assert df["Spread"].iloc[0] == 5
 
@@ -151,6 +157,8 @@ def test_bars_to_dataframe_empty() -> None:
     assert list(df.columns) == ["Open", "High", "Low", "Close", "Volume", "Spread"]
     assert df.index.name == "DateTime"
     assert isinstance(df.index, pd.DatetimeIndex)
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[s]"
 
 
 def test_ticks_to_dataframe_from_market_ticks() -> None:
@@ -183,11 +191,13 @@ def test_ticks_to_dataframe_from_market_ticks() -> None:
     assert list(df.columns) == ["Bid", "Ask"]
     assert df.index.name == "DateTime"
     assert isinstance(df.index, pd.DatetimeIndex)
-    assert str(df.index.tz) == "UTC"
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[ms]"
 
-    # Millisecond precision preserved
-    assert df.index[0] == pd.Timestamp("2023-11-14 22:13:20.123000+0000", tz="UTC")
-    assert df.index[1] == pd.Timestamp("2023-11-14 22:13:20.456000+0000", tz="UTC")
+    # Millisecond precision preserved without timezone offset
+    assert df.index[0] == pd.Timestamp("2023-11-14 22:13:20.123")
+    assert df.index[1] == pd.Timestamp("2023-11-14 22:13:20.456")
+    assert "2023-11-14 22:13:20.123" in df.to_string()
     assert df["Bid"].iloc[0] == pytest.approx(1.1000)
     assert df["Ask"].iloc[0] == pytest.approx(1.1002)
 
@@ -201,7 +211,7 @@ def test_ticks_to_dataframe_from_tick_objects() -> None:
     ticks = [
         Tick(
             symbol="EURUSD",
-            time=datetime(2026, 10, 12, 14, 30, 0, tzinfo=UTC),
+            time=datetime(2026, 10, 12, 14, 30, 0, 210000, tzinfo=UTC),
             bid=1.0950,
             ask=1.0952,
         ),
@@ -210,9 +220,12 @@ def test_ticks_to_dataframe_from_tick_objects() -> None:
     df = ticks_to_dataframe(ticks)
     assert len(df) == 1
     assert list(df.columns) == ["Bid", "Ask"]
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[ms]"
     assert df["Bid"].iloc[0] == pytest.approx(1.0950)
     assert df["Ask"].iloc[0] == pytest.approx(1.0952)
-    assert df.index[0] == pd.Timestamp("2026-10-12 14:30:00+0000", tz="UTC")
+    assert df.index[0] == pd.Timestamp("2026-10-12 14:30:00.210")
+    assert "2026-10-12 14:30:00.210" in df.to_string()
 
 
 def test_ticks_to_dataframe_from_dicts() -> None:
@@ -224,6 +237,8 @@ def test_ticks_to_dataframe_from_dicts() -> None:
 
     df = ticks_to_dataframe(tick_dicts)
     assert len(df) == 2
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[ms]"
     assert df["Bid"].iloc[0] == pytest.approx(1.25)
     assert df["Ask"].iloc[0] == pytest.approx(1.26)
     assert df["Bid"].iloc[1] == pytest.approx(1.255)
@@ -251,6 +266,8 @@ def test_ticks_to_dataframe_from_custom_objects() -> None:
     ]
     df = ticks_to_dataframe(ticks)
     assert len(df) == 2
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[ms]"
     assert df["Bid"].iloc[0] == pytest.approx(1.30)
     assert df["Bid"].iloc[1] == pytest.approx(1.305)
 
@@ -263,3 +280,5 @@ def test_ticks_to_dataframe_empty() -> None:
     assert list(df.columns) == ["Bid", "Ask"]
     assert df.index.name == "DateTime"
     assert isinstance(df.index, pd.DatetimeIndex)
+    assert df.index.tz is None
+    assert str(df.index.dtype) == "datetime64[ms]"
