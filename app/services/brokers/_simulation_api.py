@@ -22,6 +22,7 @@ CLI Usage:
 
 from __future__ import annotations
 
+import fnmatch
 import json
 from collections.abc import Callable
 from copy import deepcopy
@@ -49,6 +50,7 @@ from app.services.brokers.contracts import (
     PositionType,
     StopoutMode,
     SymbolCalcMode,
+    SymbolSpec,
     SymbolSwapMode,
     SymbolTradeExecution,
     SymbolTradeMode,
@@ -1272,6 +1274,289 @@ def _symbolinfo_normalizeprice(self: _ObjectState, price: float) -> float:
     return round(float(price), _symbolinfo_digits(self))
 
 
+def _match_symbol_pattern(name: str, group: str | None) -> bool:
+    if not group or group == "*":
+        return True
+    patterns = [p.strip() for p in group.split(",") if p.strip()]
+    includes = [p for p in patterns if not p.startswith("!")]
+    excludes = [p[1:] for p in patterns if p.startswith("!")]
+    if includes and not any(fnmatch.fnmatch(name, p) for p in includes):
+        return False
+    return not any(fnmatch.fnmatch(name, p) for p in excludes)
+
+
+def _symbolinfo_symbolstotal(self: _ObjectState, selected: bool = False) -> int:
+    symbols_fn = getattr(self._backend, "symbols", None)
+    symbols: list[SymbolSpec] = symbols_fn() if callable(symbols_fn) else []
+    if selected:
+        return sum(1 for s in symbols if getattr(s, "selected", True))
+    return len(symbols)
+
+
+def _symbolinfo_symbolsget(self: _ObjectState, group: str | None = None) -> list[str]:
+    symbols_fn = getattr(self._backend, "symbols", None)
+    symbols: list[SymbolSpec] = symbols_fn() if callable(symbols_fn) else []
+    names = [s.name for s in symbols]
+    return [name for name in names if _match_symbol_pattern(name, group)]
+
+
+def _symbolinfo_custom(self: _ObjectState) -> bool:
+    return bool(_symbolinfo__s(self).custom)
+
+
+def _symbolinfo_chartmode(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).chart_mode)
+
+
+def _symbolinfo_visible(self: _ObjectState) -> bool:
+    return bool(_symbolinfo__s(self).visible)
+
+
+def _symbolinfo_starttime(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).start_time)
+
+
+def _symbolinfo_expirationtime(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).expiration_time)
+
+
+def _symbolinfo_marginhedgeduseleg(self: _ObjectState) -> bool:
+    return bool(_symbolinfo__s(self).margin_hedged_use_leg)
+
+
+def _symbolinfo_expirationmode(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).expiration_mode)
+
+
+def _symbolinfo_fillingmode(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).filling_mode)
+
+
+def _symbolinfo_ordermode(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).order_mode)
+
+
+def _symbolinfo_ordergtcmode(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).order_gtc_mode)
+
+
+def _symbolinfo_optionmode(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).option_mode)
+
+
+def _symbolinfo_optionright(self: _ObjectState) -> int:
+    return int(_symbolinfo__s(self).option_right)
+
+
+def _symbolinfo_volumereal(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).volume_real)
+
+
+def _symbolinfo_volumehighreal(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).volumehigh_real)
+
+
+def _symbolinfo_volumelowreal(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).volumelow_real)
+
+
+def _symbolinfo_optionstrike(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).option_strike)
+
+
+def _symbolinfo_tradeaccruedinterest(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).trade_accrued_interest)
+
+
+def _symbolinfo_tradefacevalue(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).trade_face_value)
+
+
+def _symbolinfo_tradeliquidityrate(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).trade_liquidity_rate)
+
+
+def _symbolinfo_sessionvolume(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).session_volume)
+
+
+def _symbolinfo_marginhedged(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).margin_hedged)
+
+
+def _symbolinfo_pricechange(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_change)
+
+
+def _symbolinfo_pricevolatility(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_volatility)
+
+
+def _symbolinfo_pricetheoretical(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_theoretical)
+
+
+def _symbolinfo_pricegreeksdelta(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_greeks_delta)
+
+
+def _symbolinfo_pricegreekstheta(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_greeks_theta)
+
+
+def _symbolinfo_pricegreeksgamma(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_greeks_gamma)
+
+
+def _symbolinfo_pricegreeksvega(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_greeks_vega)
+
+
+def _symbolinfo_pricegreeksrho(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_greeks_rho)
+
+
+def _symbolinfo_pricegreeksomega(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_greeks_omega)
+
+
+def _symbolinfo_pricesensitivity(self: _ObjectState) -> float:
+    return float(_symbolinfo__s(self).price_sensitivity)
+
+
+def _symbolinfo_basis(self: _ObjectState) -> str:
+    return cast("str", _symbolinfo__s(self).basis)
+
+
+def _symbolinfo_category(self: _ObjectState) -> str:
+    return cast("str", _symbolinfo__s(self).category)
+
+
+def _symbolinfo_exchange(self: _ObjectState) -> str:
+    return cast("str", _symbolinfo__s(self).exchange)
+
+
+def _symbolinfo_formula(self: _ObjectState) -> str:
+    return cast("str", _symbolinfo__s(self).formula)
+
+
+def _symbolinfo_isin(self: _ObjectState) -> str:
+    return cast("str", _symbolinfo__s(self).isin)
+
+
+def _symbolinfo_page(self: _ObjectState) -> str:
+    return cast("str", _symbolinfo__s(self).page)
+
+
+def _symbolinfo_asdict(self: _ObjectState) -> dict[str, Any]:
+    s = _symbolinfo__s(self)
+    tick = _symbolinfo__t(self)
+    point = float(s.point)
+    spread = (
+        round((tick.ask - tick.bid) / point)
+        if tick is not None and point > 0
+        else int(s.spread)
+    )
+    return {
+        "custom": bool(s.custom),
+        "chart_mode": int(s.chart_mode),
+        "select": bool(s.selected),
+        "visible": bool(s.visible),
+        "session_deals": int(s.session_deals),
+        "session_buy_orders": int(s.session_buy_orders),
+        "session_sell_orders": int(s.session_sell_orders),
+        "volume": int(tick.volume if tick else 0),
+        "volumehigh": int(getattr(s, "volume_high", tick.volume if tick else 0)),
+        "volumelow": int(getattr(s, "volume_low", tick.volume if tick else 0)),
+        "time": epoch_seconds(tick.time) if tick else 0,
+        "digits": int(s.digits),
+        "spread": spread,
+        "spread_float": bool(s.spread_float),
+        "ticks_bookdepth": int(s.ticks_book_depth),
+        "trade_calc_mode": int(s.trade_calc_mode),
+        "trade_mode": int(s.trade_mode),
+        "start_time": int(s.start_time),
+        "expiration_time": int(s.expiration_time),
+        "trade_stops_level": int(s.stops_level),
+        "trade_freeze_level": int(s.freeze_level),
+        "trade_exemode": int(s.trade_execution),
+        "swap_mode": int(s.swap_mode),
+        "swap_rollover3days": int(s.swap_rollover3days),
+        "margin_hedged_use_leg": bool(s.margin_hedged_use_leg),
+        "expiration_mode": int(s.expiration_mode),
+        "filling_mode": int(s.filling_mode),
+        "order_mode": int(s.order_mode),
+        "order_gtc_mode": int(s.order_gtc_mode),
+        "option_mode": int(s.option_mode),
+        "option_right": int(s.option_right),
+        "bid": float(tick.bid if tick else 0.0),
+        "bidhigh": float(getattr(s, "bid_high", tick.bid if tick else 0.0)),
+        "bidlow": float(getattr(s, "bid_low", tick.bid if tick else 0.0)),
+        "ask": float(tick.ask if tick else 0.0),
+        "askhigh": float(getattr(s, "ask_high", tick.ask if tick else 0.0)),
+        "asklow": float(getattr(s, "ask_low", tick.ask if tick else 0.0)),
+        "last": float(tick.last if tick else 0.0),
+        "lasthigh": float(getattr(s, "last_high", tick.last if tick else 0.0)),
+        "lastlow": float(getattr(s, "last_low", tick.last if tick else 0.0)),
+        "volume_real": float(s.volume_real),
+        "volumehigh_real": float(s.volumehigh_real),
+        "volumelow_real": float(s.volumelow_real),
+        "option_strike": float(s.option_strike),
+        "point": point,
+        "trade_tick_value": float(s.tick_value),
+        "trade_tick_value_profit": float(s.tick_value_profit),
+        "trade_tick_value_loss": float(s.tick_value_loss),
+        "trade_tick_size": float(s.tick_size),
+        "trade_contract_size": float(s.contract_size),
+        "trade_accrued_interest": float(s.trade_accrued_interest),
+        "trade_face_value": float(s.trade_face_value),
+        "trade_liquidity_rate": float(s.trade_liquidity_rate),
+        "volume_min": float(s.lots_min),
+        "volume_max": float(s.lots_max),
+        "volume_step": float(s.lots_step),
+        "volume_limit": float(s.lots_limit),
+        "swap_long": float(s.swap_long),
+        "swap_short": float(s.swap_short),
+        "margin_initial": float(s.margin_initial),
+        "margin_maintenance": float(s.margin_maintenance),
+        "session_volume": float(s.session_volume),
+        "session_turnover": float(s.session_turnover),
+        "session_interest": float(s.session_interest),
+        "session_buy_orders_volume": float(s.session_buy_orders_volume),
+        "session_sell_orders_volume": float(s.session_sell_orders_volume),
+        "session_open": float(s.session_open),
+        "session_close": float(s.session_close),
+        "session_aw": float(s.session_aw),
+        "session_price_settlement": float(s.session_price_settlement),
+        "session_price_limit_min": float(s.session_price_limit_min),
+        "session_price_limit_max": float(s.session_price_limit_max),
+        "margin_hedged": float(s.margin_hedged),
+        "price_change": float(s.price_change),
+        "price_volatility": float(s.price_volatility),
+        "price_theoretical": float(s.price_theoretical),
+        "price_greeks_delta": float(s.price_greeks_delta),
+        "price_greeks_theta": float(s.price_greeks_theta),
+        "price_greeks_gamma": float(s.price_greeks_gamma),
+        "price_greeks_vega": float(s.price_greeks_vega),
+        "price_greeks_rho": float(s.price_greeks_rho),
+        "price_greeks_omega": float(s.price_greeks_omega),
+        "price_sensitivity": float(s.price_sensitivity),
+        "basis": str(s.basis),
+        "category": str(s.category),
+        "currency_base": str(s.currency_base),
+        "currency_profit": str(s.currency_profit),
+        "currency_margin": str(s.currency_margin),
+        "bank": str(s.bank),
+        "description": str(s.description),
+        "exchange": str(s.exchange),
+        "formula": str(s.formula),
+        "isin": str(s.isin),
+        "name": str(s.name),
+        "page": str(s.page),
+        "path": str(s.path),
+    }
+
+
 def _terminalinfo___init__(self: _ObjectState, backend: BrokerBackend) -> None:
     self._backend = backend
 
@@ -2296,6 +2581,46 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "InfoDouble": _symbolinfo_infodouble,
         "InfoString": _symbolinfo_infostring,
         "NormalizePrice": _symbolinfo_normalizeprice,
+        "SymbolsTotal": _symbolinfo_symbolstotal,
+        "SymbolsGet": _symbolinfo_symbolsget,
+        "Custom": _symbolinfo_custom,
+        "ChartMode": _symbolinfo_chartmode,
+        "Visible": _symbolinfo_visible,
+        "StartTime": _symbolinfo_starttime,
+        "ExpirationTime": _symbolinfo_expirationtime,
+        "MarginHedgedUseLeg": _symbolinfo_marginhedgeduseleg,
+        "ExpirationMode": _symbolinfo_expirationmode,
+        "FillingMode": _symbolinfo_fillingmode,
+        "OrderMode": _symbolinfo_ordermode,
+        "OrderGTCMode": _symbolinfo_ordergtcmode,
+        "OptionMode": _symbolinfo_optionmode,
+        "OptionRight": _symbolinfo_optionright,
+        "VolumeReal": _symbolinfo_volumereal,
+        "VolumeHighReal": _symbolinfo_volumehighreal,
+        "VolumeLowReal": _symbolinfo_volumelowreal,
+        "OptionStrike": _symbolinfo_optionstrike,
+        "TradeAccruedInterest": _symbolinfo_tradeaccruedinterest,
+        "TradeFaceValue": _symbolinfo_tradefacevalue,
+        "TradeLiquidityRate": _symbolinfo_tradeliquidityrate,
+        "SessionVolume": _symbolinfo_sessionvolume,
+        "MarginHedged": _symbolinfo_marginhedged,
+        "PriceChange": _symbolinfo_pricechange,
+        "PriceVolatility": _symbolinfo_pricevolatility,
+        "PriceTheoretical": _symbolinfo_pricetheoretical,
+        "PriceGreeksDelta": _symbolinfo_pricegreeksdelta,
+        "PriceGreeksTheta": _symbolinfo_pricegreekstheta,
+        "PriceGreeksGamma": _symbolinfo_pricegreeksgamma,
+        "PriceGreeksVega": _symbolinfo_pricegreeksvega,
+        "PriceGreeksRho": _symbolinfo_pricegreeksrho,
+        "PriceGreeksOmega": _symbolinfo_pricegreeksomega,
+        "PriceSensitivity": _symbolinfo_pricesensitivity,
+        "Basis": _symbolinfo_basis,
+        "Category": _symbolinfo_category,
+        "Exchange": _symbolinfo_exchange,
+        "Formula": _symbolinfo_formula,
+        "ISIN": _symbolinfo_isin,
+        "Page": _symbolinfo_page,
+        "as_dict": _symbolinfo_asdict,
     },
     "TerminalInfo": {
         "Build": _terminalinfo_build,

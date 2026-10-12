@@ -349,3 +349,163 @@ class SymbolInfo(TradingClass):
     async def NormalizePrice(self, *args: Any) -> Any:
         """Await the backend SymbolInfo.NormalizePrice operation."""
         return await self._call("NormalizePrice", *args)
+
+    async def SymbolsTotal(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.SymbolsTotal operation."""
+        return await self._call("SymbolsTotal", *args)
+
+    async def SymbolsGet(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.SymbolsGet operation."""
+        return await self._call("SymbolsGet", *args)
+
+    async def Custom(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.Custom operation."""
+        return await self._call("Custom", *args)
+
+    async def ChartMode(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.ChartMode operation."""
+        return await self._call("ChartMode", *args)
+
+    async def Visible(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.Visible operation."""
+        return await self._call("Visible", *args)
+
+    async def StartTime(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.StartTime operation."""
+        return await self._call("StartTime", *args)
+
+    async def ExpirationTime(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.ExpirationTime operation."""
+        return await self._call("ExpirationTime", *args)
+
+    async def MarginHedgedUseLeg(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.MarginHedgedUseLeg operation."""
+        return await self._call("MarginHedgedUseLeg", *args)
+
+    async def ExpirationMode(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.ExpirationMode operation."""
+        return await self._call("ExpirationMode", *args)
+
+    async def FillingMode(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.FillingMode operation."""
+        return await self._call("FillingMode", *args)
+
+    async def OrderMode(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.OrderMode operation."""
+        return await self._call("OrderMode", *args)
+
+    async def OrderGTCMode(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.OrderGTCMode operation."""
+        return await self._call("OrderGTCMode", *args)
+
+    async def OptionMode(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.OptionMode operation."""
+        return await self._call("OptionMode", *args)
+
+    async def OptionRight(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.OptionRight operation."""
+        return await self._call("OptionRight", *args)
+
+    async def VolumeReal(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.VolumeReal operation."""
+        return await self._call("VolumeReal", *args)
+
+    async def VolumeHighReal(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.VolumeHighReal operation."""
+        return await self._call("VolumeHighReal", *args)
+
+    async def VolumeLowReal(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.VolumeLowReal operation."""
+        return await self._call("VolumeLowReal", *args)
+
+    async def OptionStrike(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.OptionStrike operation."""
+        return await self._call("OptionStrike", *args)
+
+    async def TradeAccruedInterest(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.TradeAccruedInterest operation."""
+        return await self._call("TradeAccruedInterest", *args)
+
+    async def TradeFaceValue(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.TradeFaceValue operation."""
+        return await self._call("TradeFaceValue", *args)
+
+    async def TradeLiquidityRate(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.TradeLiquidityRate operation."""
+        return await self._call("TradeLiquidityRate", *args)
+
+    async def SessionVolume(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.SessionVolume operation."""
+        return await self._call("SessionVolume", *args)
+
+    async def MarginHedged(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.MarginHedged operation."""
+        return await self._call("MarginHedged", *args)
+
+    async def PriceChange(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceChange operation."""
+        return await self._call("PriceChange", *args)
+
+    async def PriceVolatility(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceVolatility operation."""
+        return await self._call("PriceVolatility", *args)
+
+    async def PriceTheoretical(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceTheoretical operation."""
+        return await self._call("PriceTheoretical", *args)
+
+    async def PriceGreeksDelta(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceGreeksDelta operation."""
+        return await self._call("PriceGreeksDelta", *args)
+
+    async def PriceGreeksTheta(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceGreeksTheta operation."""
+        return await self._call("PriceGreeksTheta", *args)
+
+    async def PriceGreeksGamma(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceGreeksGamma operation."""
+        return await self._call("PriceGreeksGamma", *args)
+
+    async def PriceGreeksVega(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceGreeksVega operation."""
+        return await self._call("PriceGreeksVega", *args)
+
+    async def PriceGreeksRho(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceGreeksRho operation."""
+        return await self._call("PriceGreeksRho", *args)
+
+    async def PriceGreeksOmega(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceGreeksOmega operation."""
+        return await self._call("PriceGreeksOmega", *args)
+
+    async def PriceSensitivity(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.PriceSensitivity operation."""
+        return await self._call("PriceSensitivity", *args)
+
+    async def Basis(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.Basis operation."""
+        return await self._call("Basis", *args)
+
+    async def Category(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.Category operation."""
+        return await self._call("Category", *args)
+
+    async def Exchange(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.Exchange operation."""
+        return await self._call("Exchange", *args)
+
+    async def Formula(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.Formula operation."""
+        return await self._call("Formula", *args)
+
+    async def ISIN(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.ISIN operation."""
+        return await self._call("ISIN", *args)
+
+    async def Page(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.Page operation."""
+        return await self._call("Page", *args)
+
+    async def as_dict(self, *args: Any) -> Any:
+        """Await the backend SymbolInfo.as_dict operation."""
+        return await self._call("as_dict", *args)

@@ -225,6 +225,10 @@ class SimulationBackend(BrokerBackend):
         return replace(spec) if spec is not None else None
 
     @override
+    def symbols(self) -> list[SymbolSpec]:
+        return [replace(v) for v in self._symbols.values()]
+
+    @override
     def select_symbol(self, name: str, selected: bool) -> bool:
         spec = self._symbols.get(name)
         if spec is None:

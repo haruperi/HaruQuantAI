@@ -33,7 +33,7 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from app.host.persistence.engine import DEFAULT_DATABASE_PATH
 from app.services.brokers import metatrader
-from app.services.brokers.contracts import Receipt, ReceiptStatus
+from app.services.brokers.contracts import Receipt, ReceiptStatus, SymbolSpec
 from app.services.brokers.metatrader import Bridge, MT5Backend
 from app.services.brokers.simulator import SimulationBackend
 from app.services.trading import (
@@ -574,5 +574,48 @@ def test_account_info_extended_properties_parity() -> None:
         assert await account.Assets() == 0.0
         assert await account.Liabilities() == 0.0
         assert await account.CommissionBlocked() == 0.0
+
+    asyncio.run(scenario())
+
+
+def test_symbol_info_extended_properties_and_search_parity() -> None:
+    """Verify SymbolsTotal, SymbolsGet, and extended SymbolInfo properties on simulator."""
+    sim = SimulationBackend()
+    sim.add_symbol(SymbolSpec(name="EURUSD", selected=True))
+    sim.add_symbol(SymbolSpec(name="USDRUB", selected=False))
+    sim.add_symbol(SymbolSpec(name="XAUUSD", selected=True))
+    sim.add_symbol(SymbolSpec(name="BTCUSD", selected=False))
+    trading = Trading(sim)
+    symbol = trading.symbol
+
+    async def scenario() -> None:
+        await symbol.Name("EURUSD")
+        # 1. SymbolsTotal
+        assert await symbol.SymbolsTotal(False) == 4
+        assert await symbol.SymbolsTotal(True) == 2
+
+        # 2. SymbolsGet
+        all_syms = await symbol.SymbolsGet()
+        assert set(all_syms) == {"EURUSD", "USDRUB", "XAUUSD", "BTCUSD"}
+        rub_syms = await symbol.SymbolsGet("*RUB*")
+        assert rub_syms == ["USDRUB"]
+        no_majors = await symbol.SymbolsGet("*,!*USD*,!*EUR*,!*JPY*,!*GBP*")
+        assert no_majors == []
+
+        # 3. Extended Properties
+        assert await symbol.Custom() is False
+        assert await symbol.ChartMode() == 0
+        assert await symbol.Visible() is True
+        assert await symbol.MarginHedged() == 0.0
+        assert await symbol.PriceChange() == 0.0
+
+        # 4. as_dict
+        d = await symbol.as_dict()
+        assert isinstance(d, dict)
+        assert len(d) == 96
+        assert d["name"] == "EURUSD"
+        assert d["digits"] == 5
+        assert d["select"] is True
+        assert d["custom"] is False
 
     asyncio.run(scenario())

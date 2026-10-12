@@ -267,6 +267,19 @@ async def example_04_symbol(ctx: ExampleContext) -> None:
     """Demonstrate printing symbol specification information using SymbolInfo."""
     _header("Symbol Information")
     symbol = ctx.trading.symbol
+
+    total = await symbol.SymbolsTotal(False)
+    selected = await symbol.SymbolsTotal(True)
+    print(f"Symbols total (server): {total}")
+    print(f"Symbols total (watchlist): {selected}")
+
+    all_symbols = await symbol.SymbolsGet()
+    ru_symbols = await symbol.SymbolsGet("*RU*")
+    no_majors = await symbol.SymbolsGet("*,!*USD*,!*EUR*,!*JPY*,!*GBP*")
+    print(f"Symbols get (all count): {len(all_symbols)}")
+    print(f"Symbols get (*RU*): {ru_symbols}")
+    print(f"Symbols get (no USD/EUR/JPY/GBP): {no_majors}")
+
     if (
         not await symbol.Name(SYMBOL)
         or not await symbol.Select(True)
@@ -707,7 +720,7 @@ EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_01_connect,
     example_02_terminal,
     example_03_account,
-    # example_04_symbol,
+    example_04_symbol,
     # example_05_position,
     # example_06_order,
     # example_07_history_order,

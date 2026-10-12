@@ -514,6 +514,43 @@ class SymbolSpec:
     session_price_settlement: float = 0.0
     session_price_limit_min: float = 0.0
     session_price_limit_max: float = 0.0
+    custom: bool = False
+    chart_mode: int = 0
+    visible: bool = True
+    start_time: int = 0
+    expiration_time: int = 0
+    margin_hedged_use_leg: bool = False
+    expiration_mode: int = 7
+    filling_mode: int = 1
+    order_mode: int = 127
+    order_gtc_mode: int = 0
+    option_mode: int = 0
+    option_right: int = 0
+    volume_real: float = 0.0
+    volumehigh_real: float = 0.0
+    volumelow_real: float = 0.0
+    option_strike: float = 0.0
+    trade_accrued_interest: float = 0.0
+    trade_face_value: float = 0.0
+    trade_liquidity_rate: float = 0.0
+    session_volume: float = 0.0
+    margin_hedged: float = 0.0
+    price_change: float = 0.0
+    price_volatility: float = 0.0
+    price_theoretical: float = 0.0
+    price_greeks_delta: float = 0.0
+    price_greeks_theta: float = 0.0
+    price_greeks_gamma: float = 0.0
+    price_greeks_vega: float = 0.0
+    price_greeks_rho: float = 0.0
+    price_greeks_omega: float = 0.0
+    price_sensitivity: float = 0.0
+    basis: str = ""
+    category: str = ""
+    exchange: str = ""
+    formula: str = ""
+    isin: str = ""
+    page: str = ""
 
 
 @dataclass(slots=True)
@@ -719,6 +756,10 @@ class BrokerBackend(ABC):
 
     @abstractmethod
     def symbol(self, name: str) -> SymbolSpec | None: ...
+
+    def symbols(self) -> list[SymbolSpec]:
+        """Optional symbol catalog enumeration used by market information lookups."""
+        return []
 
     @abstractmethod
     def select_symbol(self, name: str, selected: bool) -> bool: ...
