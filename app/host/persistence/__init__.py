@@ -112,6 +112,7 @@ from app.host.persistence.engine import (
     MAX_BATCH_SIZE,
     MAX_READ_LIMIT,
     SCHEMA_VERSION,
+    SETTINGS_RECORD_SCHEMA_VERSION,
     DatabaseManager,
     canonical_json,
     get_database_manager,
@@ -139,8 +140,11 @@ from app.host.persistence.models import (
     SettingsPage,
 )
 from app.host.persistence.schema import (
+    CURRENT_SCHEMA_VERSION,
     SchemaManager,
-    _migrate_datamgr_tables,
+    ensure_host_session_schema,
+    ensure_settings_schema,
+    validate_settings_schema,
 )
 from app.host.persistence.stores.baskets import BasketStore
 from app.host.persistence.stores.brokers import BrokerStore
@@ -153,11 +157,13 @@ from app.host.persistence.stores.settings import SettingsStore
 from app.host.persistence.stores.trading_sessions import SessionStore
 
 __all__ = [
+    "CURRENT_SCHEMA_VERSION",
     "DEFAULT_DATABASE_PATH",
     "DEFAULT_READ_LIMIT",
     "MAX_BATCH_SIZE",
     "MAX_READ_LIMIT",
     "SCHEMA_VERSION",
+    "SETTINGS_RECORD_SCHEMA_VERSION",
     "BasketStore",
     "BrokerStore",
     "CorruptDataError",
@@ -185,11 +191,13 @@ __all__ = [
     "StorageBusyError",
     "TypedRepository",
     "ValidationError",
-    "_migrate_datamgr_tables",
     "canonical_json",
+    "ensure_host_session_schema",
+    "ensure_settings_schema",
     "get_database_manager",
     "now_utc_iso",
     "query_duckdb",
     "validate_identifier",
     "validate_json_depth",
+    "validate_settings_schema",
 ]

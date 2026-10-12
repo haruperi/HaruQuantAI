@@ -554,6 +554,11 @@ class HostRuntime:
             self.db_manager = get_database_manager(
                 getattr(self.settings, "db_path", None)
             )
+        integrity = self.db_manager.check_integrity()
+        if integrity.lower() != "ok":
+            raise IncompatibleSchemaError(
+                f"Database integrity check failed during startup: {integrity}"
+            )
         self.db_manager.initialize()
         return self.db_manager
 

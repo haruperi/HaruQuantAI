@@ -37,8 +37,9 @@ from typing import TYPE_CHECKING
 
 from app.host.logging import get_logger
 from app.host.persistence.engine import MAX_READ_LIMIT
-from app.host.persistence.errors import IncompatibleSchemaError, ValidationError
+from app.host.persistence.errors import ValidationError
 from app.host.persistence.models import HostSessionRecord
+from app.host.persistence.schema import ensure_host_session_schema
 
 if TYPE_CHECKING:
     from app.host.persistence.engine import DatabaseManager
@@ -63,38 +64,7 @@ class HostSessionStore:
         if self._initialized:
             return
         with self._db.transaction() as conn:
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS host_session ("
-                "session_id TEXT PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE, "
-                "username TEXT NOT NULL, peer_id TEXT NOT NULL, "
-                "created_at_utc TEXT NOT NULL, expires_at_utc TEXT NOT NULL, "
-                "revoked_at_utc TEXT, status TEXT NOT NULL)"
-            )
-            columns = conn.execute("PRAGMA table_info(host_session)").fetchall()
-            shape = [(r["name"], r["type"], r["notnull"], r["pk"]) for r in columns]
-            if shape != [
-                ("session_id", "TEXT", 0, 1),
-                ("token_hash", "TEXT", 1, 0),
-                ("username", "TEXT", 1, 0),
-                ("peer_id", "TEXT", 1, 0),
-                ("created_at_utc", "TEXT", 1, 0),
-                ("expires_at_utc", "TEXT", 1, 0),
-                ("revoked_at_utc", "TEXT", 0, 0),
-                ("status", "TEXT", 1, 0),
-            ]:
-                raise IncompatibleSchemaError("Host session schema differs")
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_host_session_status "
-                "ON host_session(status)"
-            )
-            conn.execute(
-                "CREATE INDEX IF NOT EXISTS idx_host_session_peer_id "
-                "ON host_session(peer_id)"
-            )
-            conn.execute(
-                "CREATE UNIQUE INDEX IF NOT EXISTS idx_host_session_token_hash "
-                "ON host_session(token_hash)"
-            )
+            ensure_host_session_schema(conn)
         self._initialized = True
         logger.info(
             "Host session storage verified",

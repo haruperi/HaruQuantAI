@@ -76,7 +76,8 @@ DEFAULT_DATABASE_PATH: Path = (
 MAX_BATCH_SIZE: int = 100
 MAX_READ_LIMIT: int = 1000
 DEFAULT_READ_LIMIT: int = 50
-SCHEMA_VERSION: int = 1
+SETTINGS_RECORD_SCHEMA_VERSION: int = 1
+SCHEMA_VERSION: int = SETTINGS_RECORD_SCHEMA_VERSION  # Backward-compatibility alias
 
 _MAX_IDENTIFIER_LENGTH: int = 128
 _IDENTIFIER_PATTERN: re.Pattern[str] = re.compile(r"^[A-Za-z0-9_.:-]+$")
@@ -84,7 +85,6 @@ _MAX_PAYLOAD_BYTES: int = 1024 * 1024  # 1 MiB
 _MAX_JSON_DEPTH: int = 16
 _BUSY_TIMEOUT_MS: int = 5000
 _BUSY_TIMEOUT_SECONDS: float = 5.0
-_CURRENT_SCHEMA_VERSION: int = 1
 
 
 def validate_identifier(value: str, field_name: str) -> None:

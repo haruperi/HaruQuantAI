@@ -25,6 +25,7 @@ from app.host.jobs import LeaseManager
 from app.host.persistence import (
     CorruptDataError,
     DatabaseManager,
+    HostSessionStore,
     IncompatibleSchemaError,
     JobStore,
     LeaseExpiredError,
@@ -130,7 +131,7 @@ def test_obsolete_session_cleanup_rejects_invalid_predicates(
 
 def test_legacy_host_jobs_table_migrates_cleanly(tmp_path: Path) -> None:
     """Verify that a legacy host_jobs table with obsolete group_id NOT NULL constraint
-    is automatically migrated to the canonical schema upon initialize()."""
+    fails closed with IncompatibleSchemaError, preserving data and schema intact."""
     db_file = tmp_path / "legacy_jobs.db"
     conn = sqlite3.connect(db_file)
     conn.execute(
@@ -153,8 +154,8 @@ def test_legacy_host_jobs_table_migrates_cleanly(tmp_path: Path) -> None:
             job_id, group_id, operation, state, resource_class,
             config_hash, payload_json, created_at_utc
         ) VALUES (
-            'legacy-job-1', 'grp1', 'op1', 'COMPLETED', 'res1',
-            'hash1', '{}', '2025-01-01T00:00:00Z'
+            'legacy-job-1', 'grp1', 'op1', 'RUNNING', 'res1',
+            'hash1', '{"key": "value"}', '2025-01-01T00:00:00Z'
         );
         """
     )
@@ -162,47 +163,24 @@ def test_legacy_host_jobs_table_migrates_cleanly(tmp_path: Path) -> None:
     conn.close()
 
     db = DatabaseManager(database_path=db_file)
-    db.initialize()
+    with pytest.raises(IncompatibleSchemaError):
+        db.initialize()
 
-    # Verify table schema has canonical columns and no group_id
-    with db.connection(query_only=True) as conn:
-        cols = [r[1] for r in conn.execute("PRAGMA table_info(host_jobs)").fetchall()]
-        assert "group_id" not in cols
-        assert "job_id" in cols
-        assert "owner" in cols
-        assert "kind" in cols
-        assert "status" in cols
-
-    # Verify upserting a modern job record succeeds without IntegrityError
-    store = JobStore(db=db)
-    store.upsert_job(
-        {
-            "job_id": "modern-job-1",
-            "owner": "test_owner",
-            "kind": "provider_download",
-            "status": "QUEUED",
-            "progress": 0.0,
-            "accepted": 0,
-            "rejected": 0,
-            "message": "Starting download",
-            "attempt_id": 1,
-            "max_retries": 0,
-            "retry_count": 0,
-            "dedup_key": None,
-            "parent_job_id": None,
-            "child_job_ids_json": "[]",
-            "budget_json": "{}",
-            "submitted_at_utc": "2026-10-11T12:00:00Z",
-            "started_at_utc": None,
-            "finished_at_utc": None,
-            "error_message": None,
-            "error_location": None,
-        }
-    )
-    job = store.get_job("modern-job-1")
-    assert job is not None
-    assert job["owner"] == "test_owner"
-    assert job["status"] == "QUEUED"
+    # Verify table schema has preserved group_id and data is intact without lossy changes
+    check_conn = sqlite3.connect(db_file)
+    try:
+        cols = [
+            r[1] for r in check_conn.execute("PRAGMA table_info(host_jobs)").fetchall()
+        ]
+        assert "group_id" in cols
+        row = check_conn.execute(
+            "SELECT state, payload_json FROM host_jobs WHERE job_id = 'legacy-job-1'"
+        ).fetchone()
+        assert row is not None
+        assert row[0] == "RUNNING"
+        assert row[1] == '{"key": "value"}'
+    finally:
+        check_conn.close()
 
 
 @pytest.fixture
@@ -1612,9 +1590,8 @@ def test_host_session_store_rejects_incompatible_schema(
 def test_dataset_delete_legacy_foreign_key_tolerance(
     db_manager: DatabaseManager,
 ) -> None:
-    """Deleting a dataset cleans up legacy referencing tables without FK errors."""
-    from app.host.persistence import _migrate_datamgr_tables
-
+    """Deleting a dataset cleans up legacy referencing tables without FK errors,
+    and legacy tables remain preserved intact without automatic startup purge."""
     dataset_record = {
         "id": "ds_legacy_fk_test",
         "source": "MT5",
@@ -1682,10 +1659,716 @@ def test_dataset_delete_legacy_foreign_key_tolerance(
     assert db_manager.datasets.delete("ds_legacy_fk_test") is True
     assert db_manager.datasets.get_by_id("ds_legacy_fk_test") is None
 
-    # Verify _migrate_datamgr_tables purges obsolete legacy tables
-    with db_manager.transaction() as conn:
-        _migrate_datamgr_tables(conn)
-        remaining = conn.execute(
-            "SELECT name FROM sqlite_master WHERE name IN ('source_datasets', 'source_partitions')"
+    # Verify legacy tables are preserved intact without automatic deletion
+    with db_manager.connection(query_only=True) as conn:
+        remaining = [
+            r[0]
+            for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE name IN ('source_datasets', 'source_partitions')"
+            ).fetchall()
+        ]
+        assert "source_datasets" in remaining
+        assert "source_partitions" in remaining
+
+
+def test_schema_verification_rejects_future_version(tmp_path: Path) -> None:
+    """Verify that verify_schema() and initialize() reject version 999."""
+    db_file = tmp_path / "future_ver.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    with db.transaction() as conn:
+        conn.execute(
+            "INSERT INTO schema_migrations (version, name, applied_at_utc, checksum) "
+            "VALUES (999, 'future_migration', '2026-10-12T00:00:00Z', 'hash999');"
+        )
+
+    db2 = DatabaseManager(database_path=db_file)
+    with pytest.raises(
+        IncompatibleSchemaError,
+        match="Unsupported future database schema version 999",
+    ):
+        db2.schema.verify_schema()
+
+    with pytest.raises(
+        IncompatibleSchemaError,
+        match="Unsupported future database schema version 999",
+    ):
+        db2.initialize()
+
+
+def test_schema_verification_rejects_missing_core_table(tmp_path: Path) -> None:
+    """Verify that dropping a core table causes verify_schema() and initialize() to fail closed."""
+    db_file = tmp_path / "missing_core.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    with db.transaction() as conn:
+        conn.execute("DROP TABLE datamgr_datasets;")
+
+    db2 = DatabaseManager(database_path=db_file)
+    with pytest.raises(IncompatibleSchemaError, match="missing required tables"):
+        db2.schema.verify_schema()
+
+    with pytest.raises(IncompatibleSchemaError, match="missing required tables"):
+        db2.initialize()
+
+
+def test_schema_initialization_rejects_unversioned_core_tables(
+    tmp_path: Path,
+) -> None:
+    """Verify that an unversioned database with core tables is rejected."""
+    db_file = tmp_path / "unversioned.db"
+    conn = sqlite3.connect(db_file)
+    conn.execute(
+        """
+        CREATE TABLE host_entities (
+            entity_id TEXT PRIMARY KEY,
+            entity_type TEXT NOT NULL,
+            scope TEXT NOT NULL,
+            payload TEXT NOT NULL,
+            revision INTEGER NOT NULL
+        );
+        """
+    )
+    conn.commit()
+    conn.close()
+
+    db = DatabaseManager(database_path=db_file)
+    with pytest.raises(
+        IncompatibleSchemaError, match="without schema_migrations ledger"
+    ):
+        db.initialize()
+
+
+def test_settings_and_session_stores_initialize_in_isolation(
+    tmp_path: Path,
+) -> None:
+    """Verify SettingsStore and HostSessionStore initialize standalone."""
+    # SettingsStore in isolation
+    s_db_file = tmp_path / "settings_only.db"
+    s_store = SettingsStore(db_path=s_db_file)
+    s_store.initialize()
+
+    conn1 = sqlite3.connect(s_db_file)
+    try:
+        tables = {
+            r[0]
+            for r in conn1.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        }
+        assert tables == {"host_settings"}
+        assert "schema_migrations" not in tables
+        assert "host_jobs" not in tables
+        assert "datamgr_datasets" not in tables
+    finally:
+        conn1.close()
+
+    # HostSessionStore in isolation
+    sess_db_file = tmp_path / "session_only.db"
+    sess_db = DatabaseManager(database_path=sess_db_file)
+    sess_store = HostSessionStore(sess_db)
+    sess_store.initialize()
+
+    conn2 = sqlite3.connect(sess_db_file)
+    try:
+        tables = {
+            r[0]
+            for r in conn2.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        }
+        assert tables == {"host_session"}
+        assert "schema_migrations" not in tables
+        assert "host_jobs" not in tables
+    finally:
+        conn2.close()
+
+    # Now verify that SchemaManager can adopt these existing tables during full initialization
+    full_db = DatabaseManager(database_path=s_db_file)
+    full_db.initialize()
+    conn3 = sqlite3.connect(s_db_file)
+    try:
+        tables = {
+            r[0]
+            for r in conn3.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        }
+        assert "schema_migrations" in tables
+        assert "host_settings" in tables
+        assert "host_jobs" in tables
+    finally:
+        conn3.close()
+
+
+def test_schema_verification_rejects_missing_dataset_path_column(
+    tmp_path: Path,
+) -> None:
+    """Verify that removing datamgr_datasets.path causes verify_schema() to fail closed."""
+    db_file = tmp_path / "missing_dataset_path.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    with db.transaction() as conn:
+        conn.execute("ALTER TABLE datamgr_datasets DROP COLUMN path;")
+
+    db2 = DatabaseManager(database_path=db_file)
+    with pytest.raises(
+        IncompatibleSchemaError,
+        match="Missing required column in datamgr_datasets: path",
+    ):
+        db2.schema.verify_schema()
+
+
+def test_schema_verification_rejects_malformed_settings_constraints(
+    tmp_path: Path,
+) -> None:
+    """Verify that host_settings with wrong column types or missing PK fails closed."""
+    db_file = tmp_path / "malformed_settings.db"
+    conn = sqlite3.connect(db_file)
+    try:
+        conn.execute(
+            """
+            CREATE TABLE host_settings (
+                scope TEXT,
+                key TEXT,
+                value_json TEXT,
+                schema_version TEXT,
+                updated_at_utc TEXT
+            );
+            """
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    db = DatabaseManager(database_path=db_file)
+    with pytest.raises(IncompatibleSchemaError):
+        db.schema.verify_schema()
+
+    s_store = SettingsStore(db_path=db_file)
+    with pytest.raises(IncompatibleSchemaError):
+        s_store.initialize()
+
+
+def test_schema_verification_rejects_missing_job_or_entity_columns(
+    tmp_path: Path,
+) -> None:
+    """Verify that host_jobs and host_entities missing operational columns fail closed."""
+    db_file = tmp_path / "missing_job_col.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    with db.transaction() as conn:
+        conn.execute("DROP INDEX IF EXISTS idx_host_jobs_status;")
+        conn.execute("ALTER TABLE host_jobs DROP COLUMN status;")
+
+    db2 = DatabaseManager(database_path=db_file)
+    with pytest.raises(
+        IncompatibleSchemaError,
+        match="Missing required column in host_jobs: status",
+    ):
+        db2.schema.verify_schema()
+
+
+def test_session_schema_rejects_partial_unique_index_and_preserves_data(
+    tmp_path: Path,
+) -> None:
+    """Verify that a partial unique index on token_hash is rejected and preserves data."""
+    db_file = tmp_path / "partial_session.db"
+    conn = sqlite3.connect(db_file)
+    try:
+        conn.execute(
+            """
+            CREATE TABLE host_session (
+                session_id TEXT PRIMARY KEY,
+                token_hash TEXT NOT NULL,
+                username TEXT NOT NULL,
+                peer_id TEXT NOT NULL,
+                created_at_utc TEXT NOT NULL,
+                expires_at_utc TEXT NOT NULL,
+                revoked_at_utc TEXT,
+                status TEXT NOT NULL
+            );
+            """
+        )
+        conn.execute(
+            """
+            CREATE UNIQUE INDEX idx_host_session_token_hash
+            ON host_session(token_hash) WHERE status = 'ACTIVE';
+            """
+        )
+        conn.execute(
+            """
+            INSERT INTO host_session VALUES
+            ('s1', 'shared_hash', 'user1', 'peer1', '2026-01-01T00:00:00Z', '2026-01-02T00:00:00Z', '2026-01-01T12:00:00Z', 'REVOKED'),
+            ('s2', 'shared_hash', 'user2', 'peer2', '2026-01-01T00:00:00Z', '2026-01-02T00:00:00Z', '2026-01-01T12:00:00Z', 'REVOKED');
+            """
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    db = DatabaseManager(database_path=db_file)
+    sess_store = HostSessionStore(db)
+
+    with pytest.raises(
+        IncompatibleSchemaError,
+        match="partial unique index on token_hash is not permitted",
+    ):
+        sess_store.initialize()
+
+    conn2 = sqlite3.connect(db_file)
+    try:
+        rows = conn2.execute(
+            "SELECT session_id, token_hash, status FROM host_session ORDER BY session_id"
         ).fetchall()
-        assert remaining == []
+        assert len(rows) == 2
+        assert rows[0] == ("s1", "shared_hash", "REVOKED")
+        assert rows[1] == ("s2", "shared_hash", "REVOKED")
+    finally:
+        conn2.close()
+
+
+def test_schema_initialization_fault_injection_rolls_back_and_remains_retryable(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Verify that if core DDL is faulty, initialize() rolls back and does not cache success."""
+    import app.host.persistence.schema as schema_mod
+
+    db_file = tmp_path / "fault_injection.db"
+    db = DatabaseManager(database_path=db_file)
+
+    monkeypatch.setattr(
+        schema_mod,
+        "DATAMGR_DATASETS_DDL",
+        "CREATE TABLE datamgr_datasets (id TEXT);",
+    )
+
+    with pytest.raises(IncompatibleSchemaError):
+        db.initialize()
+
+    assert db.schema._initialized is False
+
+    conn = sqlite3.connect(db_file)
+    try:
+        tables = {
+            r[0]
+            for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        }
+        assert (
+            "schema_migrations" not in tables
+            or conn.execute("SELECT COUNT(*) FROM schema_migrations").fetchone()[0] == 0
+        )
+    finally:
+        conn.close()
+
+    monkeypatch.undo()
+    db.initialize()
+    assert db.schema._initialized is True
+    assert db.schema.verify_schema() is True
+
+
+@pytest.mark.parametrize(
+    ("table_name", "col_to_drop"),
+    [
+        ("datamgr_sessions", "windows_json"),
+        ("datamgr_sessions", "holidays_json"),
+        ("datamgr_sessions", "is_default"),
+        ("datamgr_instruments", "order_size_multiplier"),
+        ("datamgr_instruments", "min_distance"),
+        ("datamgr_instruments", "cot"),
+        ("datamgr_broker", "stockpicker_use"),
+        ("datamgr_broker", "mt_use"),
+        ("datamgr_broker", "server_timezone"),
+        ("datamgr_stock", "date_to"),
+        ("datamgr_datasets", "path"),
+        ("datamgr_datasets", "lineage_json"),
+        ("host_jobs", "error_location"),
+        ("host_jobs", "child_job_ids_json"),
+        ("host_leases", "metadata"),
+        ("host_entities", "payload"),
+        ("datamgr_logs", "details"),
+    ],
+)
+def test_schema_verify_rejects_missing_operational_columns(
+    tmp_path: Path, table_name: str, col_to_drop: str
+) -> None:
+    """Verify that dropping any operational column fails verify_schema with IncompatibleSchemaError."""
+    db_file = tmp_path / f"missing_col_{table_name}_{col_to_drop}.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+    assert db.schema.verify_schema() is True
+
+    with db.transaction() as conn:
+        conn.execute(f"ALTER TABLE {table_name} DROP COLUMN {col_to_drop};")
+
+    with pytest.raises(
+        IncompatibleSchemaError,
+        match=f"Missing required column in {table_name}: {col_to_drop}",
+    ):
+        db.schema.verify_schema()
+
+
+@pytest.mark.parametrize(
+    ("table_name", "ddl_recreate", "expected_err_match"),
+    [
+        (
+            "datamgr_datasets",
+            """
+            CREATE TABLE datamgr_datasets (
+                id TEXT,
+                source TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                underlying TEXT NOT NULL,
+                instrument TEXT NOT NULL,
+                timeframe TEXT NOT NULL,
+                broker TEXT NOT NULL,
+                broker_name TEXT NOT NULL,
+                timezone TEXT NOT NULL,
+                category TEXT NOT NULL,
+                date_from TEXT NOT NULL,
+                date_to TEXT NOT NULL,
+                bars INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                path TEXT NOT NULL DEFAULT '',
+                data_kind TEXT NOT NULL DEFAULT 'bars',
+                quality_score REAL NOT NULL DEFAULT 1.0,
+                lineage_json TEXT NOT NULL DEFAULT '{}',
+                schema_version INTEGER NOT NULL DEFAULT 1,
+                PRIMARY KEY (id, source)
+            );
+            """,
+            r"primary key mismatch: expected \('id',\), got \('id', 'source'\)",
+        ),
+        (
+            "host_jobs",
+            """
+            CREATE TABLE host_jobs (
+                job_id TEXT,
+                owner TEXT NOT NULL,
+                kind TEXT NOT NULL,
+                status TEXT NOT NULL,
+                progress REAL NOT NULL DEFAULT 0.0,
+                accepted INTEGER NOT NULL DEFAULT 0,
+                rejected INTEGER NOT NULL DEFAULT 0,
+                message TEXT,
+                attempt_id TEXT,
+                max_retries INTEGER NOT NULL DEFAULT 0,
+                retry_count INTEGER NOT NULL DEFAULT 0,
+                dedup_key TEXT,
+                parent_job_id TEXT,
+                child_job_ids_json TEXT NOT NULL DEFAULT '[]',
+                budget_json TEXT NOT NULL DEFAULT '{}',
+                submitted_at_utc TEXT NOT NULL DEFAULT '',
+                started_at_utc TEXT,
+                finished_at_utc TEXT,
+                error_message TEXT,
+                error_location TEXT,
+                PRIMARY KEY (job_id, owner)
+            );
+            """,
+            r"primary key mismatch: expected \('job_id',\), got \('job_id', 'owner'\)",
+        ),
+        (
+            "host_entities",
+            """
+            CREATE TABLE host_entities (
+                entity_id TEXT PRIMARY KEY,
+                entity_type TEXT NOT NULL,
+                scope TEXT NOT NULL,
+                payload TEXT NOT NULL,
+                revision INTEGER NOT NULL DEFAULT 1,
+                created_at_utc TEXT NOT NULL,
+                updated_at_utc TEXT NOT NULL
+            );
+            """,
+            r"primary key mismatch: expected \('entity_id', 'entity_type'\), got \('entity_id',\)",
+        ),
+        (
+            "host_leases",
+            """
+            CREATE TABLE host_leases (
+                lease_key TEXT,
+                holder_id TEXT NOT NULL,
+                scope TEXT NOT NULL,
+                acquired_at_utc TEXT NOT NULL,
+                expires_at_utc TEXT NOT NULL,
+                metadata TEXT NOT NULL,
+                PRIMARY KEY (lease_key, holder_id)
+            );
+            """,
+            r"primary key mismatch: expected \('lease_key',\), got \('lease_key', 'holder_id'\)",
+        ),
+    ],
+)
+def test_schema_verify_rejects_primary_key_mismatches(
+    tmp_path: Path, table_name: str, ddl_recreate: str, expected_err_match: str
+) -> None:
+    """Verify that non-matching composite or partial primary keys are rejected."""
+    db_file = tmp_path / f"pk_mismatch_{table_name}.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    with db.transaction() as conn:
+        conn.execute(f"DROP TABLE {table_name};")
+        conn.execute(ddl_recreate)
+
+    with pytest.raises(IncompatibleSchemaError, match=expected_err_match):
+        db.schema.verify_schema()
+
+
+@pytest.mark.parametrize(
+    ("table_name", "ddl_recreate", "expected_err_match"),
+    [
+        (
+            "datamgr_instruments",
+            """
+            CREATE TABLE datamgr_instruments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                symbol TEXT NOT NULL,
+                connection TEXT DEFAULT '',
+                broker_id INTEGER DEFAULT -1,
+                description TEXT DEFAULT '',
+                tick_size REAL NOT NULL DEFAULT 0.00001,
+                tick_step REAL NOT NULL DEFAULT 0.00001,
+                tick_value_in_money REAL NOT NULL DEFAULT 10.0,
+                point_value REAL NOT NULL DEFAULT 100000.0,
+                decimals INTEGER NOT NULL DEFAULT 5,
+                default_spread REAL NOT NULL DEFAULT 0.0001,
+                default_slippage REAL NOT NULL DEFAULT 0.0,
+                min_volume REAL NOT NULL DEFAULT 0.01,
+                max_volume REAL NOT NULL DEFAULT 100.0,
+                lot_step REAL NOT NULL DEFAULT 0.01,
+                margin_rate REAL NOT NULL DEFAULT 0.05,
+                swap_long REAL NOT NULL DEFAULT 0.0,
+                swap_short REAL NOT NULL DEFAULT 0.0,
+                swap_3day_day INTEGER NOT NULL DEFAULT 3,
+                commissions TEXT DEFAULT '0.0',
+                data_type TEXT DEFAULT 'Forex',
+                alias TEXT DEFAULT '',
+                exchange TEXT DEFAULT '',
+                country TEXT DEFAULT '',
+                sector TEXT DEFAULT '',
+                min_distance REAL NOT NULL DEFAULT 0.0,
+                order_size_multiplier REAL NOT NULL DEFAULT 1.0,
+                order_size_step REAL NOT NULL DEFAULT 0.0,
+                cot TEXT DEFAULT NULL,
+                created_at_utc TEXT NOT NULL,
+                updated_at_utc TEXT NOT NULL
+            );
+            """,
+            r"missing non-partial UNIQUE constraint or index on \('symbol',\)",
+        ),
+        (
+            "datamgr_sessions",
+            """
+            CREATE TABLE datamgr_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                broker_id INTEGER NOT NULL DEFAULT -1,
+                description TEXT DEFAULT '',
+                timezone TEXT NOT NULL DEFAULT 'UTC',
+                windows_json TEXT NOT NULL DEFAULT '[]',
+                holidays_json TEXT NOT NULL DEFAULT '[]',
+                is_default INTEGER NOT NULL DEFAULT 0
+            );
+            """,
+            r"missing non-partial UNIQUE constraint or index on \('name',\)",
+        ),
+        (
+            "datamgr_sessions",
+            """
+            CREATE TABLE datamgr_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                broker_id INTEGER NOT NULL DEFAULT -1,
+                description TEXT DEFAULT '',
+                timezone TEXT NOT NULL DEFAULT 'UTC',
+                windows_json TEXT NOT NULL DEFAULT '[]',
+                holidays_json TEXT NOT NULL DEFAULT '[]',
+                is_default INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE UNIQUE INDEX idx_sess_partial ON datamgr_sessions(name) WHERE is_default = 1;
+            """,
+            r"missing non-partial UNIQUE constraint or index on \('name',\)",
+        ),
+        (
+            "datamgr_broker",
+            """
+            CREATE TABLE datamgr_broker (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                is_system INTEGER NOT NULL DEFAULT 0,
+                description TEXT DEFAULT '',
+                server_timezone TEXT DEFAULT 'UTC',
+                postfix TEXT DEFAULT '',
+                enabled INTEGER NOT NULL DEFAULT 1,
+                mt_use INTEGER NOT NULL DEFAULT 0,
+                stockpicker_use INTEGER NOT NULL DEFAULT 0,
+                created_at_utc TEXT NOT NULL,
+                updated_at_utc TEXT NOT NULL
+            );
+            """,
+            r"missing non-partial UNIQUE constraint or index on \('name',\)",
+        ),
+        (
+            "datamgr_stock_group",
+            """
+            CREATE TABLE datamgr_stock_group (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                system INTEGER NOT NULL DEFAULT 0,
+                description TEXT DEFAULT ''
+            );
+            """,
+            r"missing non-partial UNIQUE constraint or index on \('name',\)",
+        ),
+    ],
+)
+def test_schema_verify_rejects_missing_or_partial_unique_targets(
+    tmp_path: Path, table_name: str, ddl_recreate: str, expected_err_match: str
+) -> None:
+    """Verify that tables missing required non-partial UNIQUE constraints fail verify_schema."""
+    db_file = tmp_path / f"unique_target_{table_name}.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    with db.transaction() as conn:
+        conn.execute(f"DROP TABLE {table_name};")
+        conn.executescript(ddl_recreate)
+
+    with pytest.raises(IncompatibleSchemaError, match=expected_err_match):
+        db.schema.verify_schema()
+
+
+def test_schema_verify_rejects_foreign_key_target_mismatch(tmp_path: Path) -> None:
+    """Verify that datamgr_stock referencing datamgr_broker is rejected."""
+    db_file = tmp_path / "fk_mismatch.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    with db.transaction() as conn:
+        conn.execute("DROP TABLE datamgr_stock;")
+        conn.execute(
+            """
+            CREATE TABLE datamgr_stock (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ticker TEXT NOT NULL,
+                basket_id INTEGER NOT NULL,
+                date_from TEXT NOT NULL,
+                date_to TEXT,
+                FOREIGN KEY(basket_id) REFERENCES datamgr_broker(id)
+            );
+            """
+        )
+
+    with pytest.raises(
+        IncompatibleSchemaError,
+        match=r"missing foreign key basket_id -> datamgr_stock_group\(id\)",
+    ):
+        db.schema.verify_schema()
+
+
+@pytest.mark.parametrize(
+    ("table_name", "ddl_recreate", "expected_err_match"),
+    [
+        (
+            "datamgr_datasets",
+            """
+            CREATE TABLE datamgr_datasets (
+                id TEXT PRIMARY KEY,
+                source TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                underlying TEXT NOT NULL,
+                instrument TEXT NOT NULL,
+                timeframe TEXT NOT NULL,
+                broker TEXT NOT NULL,
+                broker_name TEXT NOT NULL,
+                timezone TEXT NOT NULL,
+                category TEXT NOT NULL,
+                date_from TEXT NOT NULL,
+                date_to TEXT NOT NULL,
+                bars BLOB,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                path TEXT NOT NULL DEFAULT '',
+                data_kind TEXT NOT NULL DEFAULT 'bars',
+                quality_score REAL NOT NULL DEFAULT 1.0,
+                lineage_json TEXT NOT NULL DEFAULT '{}',
+                schema_version INTEGER NOT NULL DEFAULT 1
+            );
+            """,
+            r"Column datamgr_datasets\.bars type 'BLOB' has affinity 'BLOB', expected one of \('INTEGER',\)",
+        ),
+        (
+            "datamgr_datasets",
+            """
+            CREATE TABLE datamgr_datasets (
+                id TEXT PRIMARY KEY,
+                source TEXT NOT NULL,
+                symbol TEXT NOT NULL,
+                underlying TEXT NOT NULL,
+                instrument TEXT NOT NULL,
+                timeframe TEXT NOT NULL,
+                broker TEXT NOT NULL,
+                broker_name TEXT NOT NULL,
+                timezone TEXT NOT NULL,
+                category TEXT NOT NULL,
+                date_from TEXT NOT NULL,
+                date_to TEXT NOT NULL,
+                bars INTEGER,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                path TEXT NOT NULL DEFAULT '',
+                data_kind TEXT NOT NULL DEFAULT 'bars',
+                quality_score REAL NOT NULL DEFAULT 1.0,
+                lineage_json TEXT NOT NULL DEFAULT '{}',
+                schema_version INTEGER NOT NULL DEFAULT 1
+            );
+            """,
+            r"Column datamgr_datasets\.bars must be NOT NULL",
+        ),
+        (
+            "datamgr_broker_stock",
+            """
+            CREATE TABLE datamgr_broker_stock (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ticker TEXT NOT NULL,
+                broker_id INTEGER NOT NULL,
+                FOREIGN KEY(broker_id) REFERENCES datamgr_stock_group(id)
+            );
+            """,
+            r"missing foreign key broker_id -> datamgr_broker\(id\)",
+        ),
+    ],
+)
+def test_schema_verify_rejects_type_affinity_and_nullability_mismatches(
+    tmp_path: Path, table_name: str, ddl_recreate: str, expected_err_match: str
+) -> None:
+    """Verify that type affinity and nullability mismatches fail verify_schema."""
+    db_file = tmp_path / f"type_mismatch_{table_name}.db"
+    db = DatabaseManager(database_path=db_file)
+    db.initialize()
+
+    with db.transaction() as conn:
+        conn.execute(f"DROP TABLE {table_name};")
+        conn.execute(ddl_recreate)
+
+    with pytest.raises(IncompatibleSchemaError, match=expected_err_match):
+        db.schema.verify_schema()
+
+
+def test_live_database_schema_passes_readonly_preflight() -> None:
+    """Verify the existing operational database schema passes read-only shape verification."""
+    from app.host.persistence.schema import _verify_core_shapes
+
+    db_path = Path("data/database/haruquantai.db")
+    if not db_path.exists():
+        pytest.skip("Live database not found at data/database/haruquantai.db")
+
+    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    try:
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA query_only = ON;")
+        _verify_core_shapes(conn)
+    finally:
+        conn.close()

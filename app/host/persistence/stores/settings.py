@@ -44,7 +44,7 @@ from app.host.persistence.engine import (
     DEFAULT_READ_LIMIT,
     MAX_BATCH_SIZE,
     MAX_READ_LIMIT,
-    SCHEMA_VERSION,
+    SETTINGS_RECORD_SCHEMA_VERSION,
     DatabaseManager,
     canonical_json,
     now_utc_iso,
@@ -59,6 +59,7 @@ from app.host.persistence.errors import (
     ValidationError,
 )
 from app.host.persistence.models import SettingRecord, SettingsPage
+from app.host.persistence.schema import ensure_settings_schema
 
 logger = get_logger(__name__)
 
@@ -111,86 +112,28 @@ class SettingsStore:
             "SettingsStore.initialize storage operation",
             extra={"fr_id": "FR-HOST-PERSISTENCE-SETTINGS"},
         )
-        self._db.schema.initialize()
-        with self._db.connection(query_only=False) as conn:
-            try:
-                row = conn.execute(
-                    "SELECT sql FROM sqlite_master WHERE type = 'table' "
-                    "AND name = 'host_settings'"
-                ).fetchone()
-
-                if row is None:
-                    self._create_settings_table(conn)
-                    self._ensure_revision_exists(conn)
-                    logger.info(
-                        "FR-HOST-SETTINGS-SCHEMA: Initialized host_settings table.",
-                        extra={
-                            "db_path": str(self._db.database_path),
-                            "fr_id": "FR-HOST-SETTINGS-SCHEMA",
-                        },
-                    )
-                    return
-
-                self._verify_existing_schema(conn)
+        try:
+            with self._db.transaction() as conn:
+                ensure_settings_schema(conn)
                 self._ensure_revision_exists(conn)
-                logger.debug(
-                    "FR-HOST-SETTINGS-SCHEMA: Verified host_settings schema.",
-                    extra={"fr_id": "FR-HOST-SETTINGS-SCHEMA"},
-                )
-            except sqlite3.OperationalError as exc:
-                if "busy" in str(exc).lower() or "locked" in str(exc).lower():
-                    raise StorageBusyError(
-                        "Database is busy during schema initialization"
-                    ) from exc
-                raise PersistenceError("Failed to initialize database schema") from exc
+        except IncompatibleSchemaError, StorageBusyError:
+            raise
+        except sqlite3.OperationalError as exc:
+            if "busy" in str(exc).lower() or "locked" in str(exc).lower():
+                raise StorageBusyError(
+                    "Database is busy during schema initialization"
+                ) from exc
+            raise PersistenceError("Failed to initialize database schema") from exc
+        except Exception as exc:
+            raise PersistenceError("Failed to initialize database schema") from exc
 
-    def _create_settings_table(self, conn: sqlite3.Connection) -> None:
-        """Create the host_settings table inside an immediate transaction."""
-        conn.execute("BEGIN IMMEDIATE")
-        conn.execute(
-            """
-            CREATE TABLE host_settings (
-                scope TEXT NOT NULL,
-                key TEXT NOT NULL,
-                value_json TEXT NOT NULL,
-                schema_version INTEGER NOT NULL DEFAULT 1,
-                updated_at_utc TEXT NOT NULL,
-                PRIMARY KEY (scope, key)
-            )
-            """
+        logger.info(
+            "FR-HOST-SETTINGS-SCHEMA: Initialized host_settings table.",
+            extra={
+                "db_path": str(self._db.database_path),
+                "fr_id": "FR-HOST-SETTINGS-SCHEMA",
+            },
         )
-        conn.execute("COMMIT")
-
-    def _verify_existing_schema(self, conn: sqlite3.Connection) -> None:
-        """Verify columns and constraints of existing host_settings table.
-
-        Raises:
-            IncompatibleSchemaError: If any column definition or constraint mismatches.
-        """
-        info_rows = conn.execute("PRAGMA table_info(host_settings)").fetchall()
-        cols: dict[str, sqlite3.Row] = {r["name"]: r for r in info_rows}
-        required: dict[str, tuple[str, int, int]] = {
-            "scope": ("TEXT", 1, 1),
-            "key": ("TEXT", 1, 2),
-            "value_json": ("TEXT", 1, 0),
-            "schema_version": ("INTEGER", 1, 0),
-            "updated_at_utc": ("TEXT", 1, 0),
-        }
-
-        for col_name, (expected_type, notnull, pk) in required.items():
-            if col_name not in cols:
-                raise IncompatibleSchemaError(
-                    f"Missing required column '{col_name}' in host_settings"
-                )
-            col = cols[col_name]
-            if (
-                col["type"].upper() != expected_type
-                or col["notnull"] != notnull
-                or col["pk"] != pk
-            ):
-                raise IncompatibleSchemaError(
-                    f"Incompatible column definition for '{col_name}' in host_settings"
-                )
 
     def _ensure_revision_exists(self, conn: sqlite3.Connection) -> None:
         """Ensure the internal _system:revision key exists in host_settings."""
@@ -200,7 +143,6 @@ class SettingsStore:
         ).fetchone()
         if row is None:
             now_ts = now_utc_iso()
-            conn.execute("BEGIN IMMEDIATE")
             conn.execute(
                 """
                 INSERT OR IGNORE INTO host_settings (
@@ -208,9 +150,8 @@ class SettingsStore:
                 )
                 VALUES ('_system', 'revision', '1', ?, ?)
                 """,
-                (SCHEMA_VERSION, now_ts),
+                (SETTINGS_RECORD_SCHEMA_VERSION, now_ts),
             )
-            conn.execute("COMMIT")
 
     def get_revision(self) -> int:
         """Query current monotonic revision counter."""
@@ -473,7 +414,7 @@ class SettingsStore:
                         schema_version = excluded.schema_version,
                         updated_at_utc = excluded.updated_at_utc
                     """,
-                    (scope, key, raw_json, SCHEMA_VERSION, now_ts),
+                    (scope, key, raw_json, SETTINGS_RECORD_SCHEMA_VERSION, now_ts),
                 )
                 changed_count += 1
 
@@ -499,7 +440,7 @@ class SettingsStore:
                         schema_version = excluded.schema_version,
                         updated_at_utc = excluded.updated_at_utc
                     """,
-                    (json.dumps(new_revision), SCHEMA_VERSION, now_ts),
+                    (json.dumps(new_revision), SETTINGS_RECORD_SCHEMA_VERSION, now_ts),
                 )
 
         logger.info(
@@ -559,7 +500,7 @@ class SettingsStore:
     @staticmethod
     def _row_to_record(row: sqlite3.Row) -> SettingRecord:
         """Convert SQLite Row to SettingRecord."""
-        if row["schema_version"] != SCHEMA_VERSION:
+        if row["schema_version"] != SETTINGS_RECORD_SCHEMA_VERSION:
             raise CorruptDataError(
                 f"Unsupported schema version {row['schema_version']} "
                 f"for key '{row['key']}'"

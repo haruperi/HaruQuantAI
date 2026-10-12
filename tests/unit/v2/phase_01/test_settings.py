@@ -251,15 +251,40 @@ def test_settings_store_initialize_and_seed(temp_db: Path) -> None:
 
 
 def test_settings_store_schema_validation_failure(temp_db: Path) -> None:
-    """Test IncompatibleSchemaError when host_settings has mismatched schema."""
+    """Test IncompatibleSchemaError when host_settings has mismatched schema,
+    and verify existing unrelated tables are not mutated or dropped."""
     conn = sqlite3.connect(temp_db)
     # Create invalid table without required columns
     conn.execute("CREATE TABLE host_settings (wrong_col TEXT)")
+    # Create unrelated legacy table with data
+    conn.execute("CREATE TABLE source_datasets (id TEXT PRIMARY KEY, val TEXT)")
+    conn.execute("INSERT INTO source_datasets VALUES ('d1', 'v1')")
+    conn.commit()
     conn.close()
 
     store = SettingsStore(temp_db)
     with pytest.raises(IncompatibleSchemaError):
         store.initialize()
+
+    # Unrelated legacy table must still exist with data intact
+    check_conn = sqlite3.connect(temp_db)
+    try:
+        row = check_conn.execute(
+            "SELECT val FROM source_datasets WHERE id = 'd1'"
+        ).fetchone()
+        assert row is not None
+        assert row[0] == "v1"
+        # And full core schema was not generated
+        tables = {
+            r[0]
+            for r in check_conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+        assert "host_jobs" not in tables
+        assert "datamgr_datasets" not in tables
+    finally:
+        check_conn.close()
 
 
 def test_settings_store_corrupt_data(temp_db: Path) -> None:
@@ -1178,3 +1203,22 @@ def test_consolidation_rejects_unapproved_or_invalid_account(temp_db: Path) -> N
     with pytest.raises(ValidationError):
         consolidate_settings(target, apply=True, allowed_deletions=())
     assert target.get_snapshot() == before
+
+
+def test_settings_record_schema_version_applied(temp_db: Path) -> None:
+    """Verify that host_settings rows are written with SETTINGS_RECORD_SCHEMA_VERSION."""
+    from app.host.persistence import SETTINGS_RECORD_SCHEMA_VERSION
+
+    store = SettingsStore(temp_db)
+    store.initialize()
+    store.update_batch({"app_general": {"theme": "dark"}})
+
+    conn = sqlite3.connect(temp_db)
+    try:
+        row = conn.execute(
+            "SELECT schema_version FROM host_settings WHERE scope='app_general' AND key='theme'"
+        ).fetchone()
+        assert row is not None
+        assert row[0] == SETTINGS_RECORD_SCHEMA_VERSION
+    finally:
+        conn.close()
