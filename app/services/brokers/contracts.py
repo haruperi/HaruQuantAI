@@ -21,7 +21,8 @@ Purpose:
 Key Capabilities:
     - FR-BROKER-CONTRACTS-RECORDS: Describe receipts, properties and broker events.
       Associated: `Receipt`, `PropertyValue`, `BridgeEvent`, `ReceiptStatus`,
-        `TradeResolution`, `BridgeArg`, `Timeframe`, `MarketBar`, `MarketTick`
+        `TradeResolution`, `BridgeArg`, `Timeframe`, `MarketBar`, `MarketTick`,
+        `BookType`, `BookInfo`, `MqlBookInfo`
       Logging: Passive model declarations; operational logging belongs to the
         consuming transport and journal, not model construction.
     - FR-BROKER-CONTRACTS-ERRORS: Carry failure code and outcome uncertainty.
@@ -374,6 +375,15 @@ class TradeRetcode(IntEnum):
     HEDGE_PROHIBITED = 10046
 
 
+class BookType(IntEnum):
+    """Depth of Market (DOM) order types matching MQL5 ENUM_BOOK_TYPE."""
+
+    BOOK_TYPE_SELL = 1
+    BOOK_TYPE_BUY = 2
+    BOOK_TYPE_SELL_MARKET = 3
+    BOOK_TYPE_BUY_MARKET = 4
+
+
 ORDER_TYPE_DESCRIPTIONS = {
     OrderType.BUY: "Buy",
     OrderType.SELL: "Sell",
@@ -414,6 +424,12 @@ DEAL_TYPE_DESCRIPTIONS = {
 DEAL_ENTRY_DESCRIPTIONS = {
     item: item.name.replace("_", " ").title() for item in DealEntry
 }
+BOOK_TYPE_DESCRIPTIONS: dict[BookType, str] = {
+    BookType.BOOK_TYPE_SELL: "Sell",
+    BookType.BOOK_TYPE_BUY: "Buy",
+    BookType.BOOK_TYPE_SELL_MARKET: "Sell Market",
+    BookType.BOOK_TYPE_BUY_MARKET: "Buy Market",
+}
 
 
 # ****************************************************************************
@@ -446,6 +462,33 @@ class MarketTick:
     volume: int
     flags: int
     volume_real: float
+
+
+@dataclass(frozen=True, slots=True)
+class BookInfo:
+    """Market depth (DOM) entry matching MQL5 MqlBookInfo."""
+
+    type: BookType
+    price: float
+    volume: int
+    volume_real: float
+
+    @property
+    def type_description(self) -> str:
+        """Human-readable order type description."""
+        return BOOK_TYPE_DESCRIPTIONS.get(self.type, "Unknown")
+
+    def _asdict(self) -> dict[str, Any]:
+        """Convert entry to a dictionary matching Python MT5 BookInfo._asdict()."""
+        return {
+            "type": int(self.type),
+            "price": self.price,
+            "volume": self.volume,
+            "volume_real": self.volume_real,
+        }
+
+
+MqlBookInfo = BookInfo
 
 
 @dataclass(slots=True)

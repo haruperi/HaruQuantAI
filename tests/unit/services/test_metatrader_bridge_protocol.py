@@ -34,7 +34,13 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from app.host.persistence.engine import DEFAULT_DATABASE_PATH
 from app.services.brokers import metatrader
-from app.services.brokers.contracts import Receipt, ReceiptStatus, SymbolSpec
+from app.services.brokers.contracts import (
+    BookInfo,
+    BookType,
+    Receipt,
+    ReceiptStatus,
+    SymbolSpec,
+)
 from app.services.brokers.metatrader import Bridge, MT5Backend
 from app.services.brokers.simulator import SimulationBackend
 from app.services.trading import (
@@ -308,7 +314,7 @@ def test_connection_example_displays_observed_receipt(
             assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
             assert receipt.value is True
         finally:
-            await brokers.example_19_shutdown(ctx)
+            await brokers.example_20_shutdown(ctx)
 
     asyncio.run(scenario())
     output = capsys.readouterr().out
@@ -376,7 +382,7 @@ def test_connection_example_rejects_invalid_receipt(
                 await brokers.example_01_connect(ctx)
             assert ctx.results == []
         finally:
-            await brokers.example_19_shutdown(ctx)
+            await brokers.example_20_shutdown(ctx)
 
     asyncio.run(scenario())
 
@@ -408,7 +414,7 @@ def test_connection_example_rejects_false_or_nonboolean_probe(
                 await brokers.example_01_connect(ctx)
             assert ctx.results == []
         finally:
-            await brokers.example_19_shutdown(ctx)
+            await brokers.example_20_shutdown(ctx)
 
     asyncio.run(scenario())
 
@@ -521,18 +527,19 @@ def test_connection_evidence_preserves_complete_simulation_walkthrough(
             "example_04_symbol",
             "example_05_historical_bars",
             "example_06_tick_data",
-            "example_07_position",
-            "example_08_order",
-            "example_09_history_order",
-            "example_10_history_deal",
-            "example_11_open_position",
-            "example_12_calc_profit_margin",
-            "example_13_modify_position",
-            "example_14_close_partial_position",
-            "example_15_close_position",
-            "example_16_pending_orders",
-            "example_17_modify_pending_orders",
-            "example_18_delete_pending_orders",
+            "example_07_order_book",
+            "example_08_position",
+            "example_09_order",
+            "example_10_history_order",
+            "example_11_history_deal",
+            "example_12_open_position",
+            "example_13_calc_profit_margin",
+            "example_14_modify_position",
+            "example_15_close_partial_position",
+            "example_16_close_position",
+            "example_17_pending_orders",
+            "example_18_modify_pending_orders",
+            "example_19_delete_pending_orders",
         )
     )
     monkeypatch.setattr(brokers, "EXAMPLES", examples)
@@ -640,5 +647,50 @@ def test_symbol_info_extended_properties_and_search_parity() -> None:
 
         # Unseeded tick returns None
         assert await symbol.SymbolInfoTick("BTCUSD") is None
+
+    asyncio.run(scenario())
+
+
+def test_symbol_info_market_book() -> None:
+    """Verify MarketBookAdd, MarketBookGet, and MarketBookRelease on simulation."""
+    sim = SimulationBackend()
+    sim.add_symbol(SymbolSpec(name="EURUSD", selected=True))
+    trading = Trading(sim)
+    symbol = trading.symbol
+
+    async def scenario() -> None:
+        # Seed tick for EURUSD
+        sim.feed_tick(
+            "EURUSD",
+            bid=1.09500,
+            ask=1.09520,
+            time=datetime(2026, 10, 12, 12, 0, 0, tzinfo=UTC),
+        )
+
+        # Before subscription: MarketBookGet returns empty tuple
+        assert await symbol.MarketBookGet("EURUSD") == ()
+
+        # Subscribe
+        assert await symbol.MarketBookAdd("EURUSD") is True
+
+        # Fetch book
+        book = await symbol.MarketBookGet("EURUSD")
+        assert isinstance(book, tuple)
+        assert len(book) == 6
+        assert all(isinstance(entry, BookInfo) for entry in book)
+
+        # Check sell entries and buy entries
+        sells = [e for e in book if e.type == BookType.BOOK_TYPE_SELL]
+        buys = [e for e in book if e.type == BookType.BOOK_TYPE_BUY]
+        assert len(sells) == 3
+        assert len(buys) == 3
+        assert all(e.price > 1.09520 for e in sells)
+        assert all(e.price <= 1.09500 for e in buys)
+        assert sells[0].type_description == "Sell"
+        assert buys[0].type_description == "Buy"
+
+        # Release subscription
+        assert await symbol.MarketBookRelease("EURUSD") is True
+        assert await symbol.MarketBookGet("EURUSD") == ()
 
     asyncio.run(scenario())

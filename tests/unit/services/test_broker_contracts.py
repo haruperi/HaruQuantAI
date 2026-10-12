@@ -146,3 +146,31 @@ def test_timeframe_enum_members() -> None:
         assert member == value
         assert member.value == value
         assert contracts.Timeframe(value) is member
+
+
+def test_book_info_and_enum() -> None:
+    """Verify BookType, BookInfo dataclass, and MqlBookInfo alias."""
+    assert contracts.BookType.BOOK_TYPE_SELL == 1
+    assert contracts.BookType.BOOK_TYPE_BUY == 2
+    assert contracts.BookType.BOOK_TYPE_SELL_MARKET == 3
+    assert contracts.BookType.BOOK_TYPE_BUY_MARKET == 4
+
+    assert contracts.MqlBookInfo is contracts.BookInfo
+
+    book_entry = contracts.BookInfo(
+        type=contracts.BookType.BOOK_TYPE_SELL,
+        price=1.09550,
+        volume=10,
+        volume_real=10.0,
+    )
+    assert book_entry.type == contracts.BookType.BOOK_TYPE_SELL
+    assert book_entry.type_description == "Sell"
+    assert book_entry.price == 1.09550
+    assert book_entry.volume == 10
+    assert book_entry.volume_real == 10.0
+    assert book_entry._asdict() == {
+        "type": 1,
+        "price": 1.09550,
+        "volume": 10,
+        "volume_real": 10.0,
+    }

@@ -102,7 +102,7 @@ Tests exercise actual local models and bounded native transport fixtures. They d
 not connect to a live terminal or certify real broker fills.
 
 
-## Nineteen named usage functions
+## Twenty named usage functions
 
 Run `uv run python -m scripts.examples.brokers` from the repository root.
 Select `BROKER = "mt5"` or `"simulator"` in `scripts/examples/brokers.py`.
@@ -110,7 +110,7 @@ Only the setup factory imports providers; all example functions use `Trading`.
 The current owner-selected flags are preserved. Keep `ALLOW_LIVE_TRADING = False`
 for read-only MT5. Simulation runs all functions with explicitly seeded history.
 
-The nineteen-function sequence is implemented as async functions:
+The twenty-function sequence is implemented as async functions:
 
 1. `example_01_connect`
 2. `example_02_terminal`
@@ -118,23 +118,24 @@ The nineteen-function sequence is implemented as async functions:
 4. `example_04_symbol`
 5. `example_05_historical_bars`
 6. `example_06_tick_data`
-7. `example_07_position`
-8. `example_08_order`
-9. `example_09_history_order`
-10. `example_10_history_deal`
-11. `example_11_open_position`
-12. `example_12_calc_profit_margin`
-13. `example_13_modify_position`
-14. `example_14_close_partial_position`
-15. `example_15_close_position`
-16. `example_16_pending_orders`
-17. `example_17_modify_pending_orders`
-18. `example_18_delete_pending_orders`
-19. `example_19_shutdown`
+7. `example_07_order_book`
+8. `example_08_position`
+9. `example_09_order`
+10. `example_10_history_order`
+11. `example_11_history_deal`
+12. `example_12_open_position`
+13. `example_13_calc_profit_margin`
+14. `example_14_modify_position`
+15. `example_15_close_partial_position`
+16. `example_16_close_position`
+17. `example_17_pending_orders`
+18. `example_18_modify_pending_orders`
+19. `example_19_delete_pending_orders`
+20. `example_20_shutdown`
 
 Shutdown runs last and also once on failure. Each function accepts an explicit `ExampleContext` from the
 script, so callers may run selected functions after connection/symbol setup.
-`EXAMPLES` contains the eighteen non-shutdown functions; `run_examples` owns the
+`EXAMPLES` contains the nineteen non-shutdown functions; `run_examples` owns the
 final shutdown and reports one result per function.
 
 Each function directly calls the relevant trading class and reports its fields.
@@ -148,7 +149,7 @@ Account identity, local paths, comments and arbitrary exception messages
 are excluded from output. Useful financial/specification fields and up to five
 bar/tick samples are displayed with their field names. Logs never contain authentication.
 
-Live functions 9 and 11–16 require `ALLOW_LIVE_TRADING = True` and hedging mode.
+Live functions 12 and 14–19 require `ALLOW_LIVE_TRADING = True` and hedging mode.
 The buy opens **twice VOLUME** (currently 0.02 lots); partial close removes VOLUME
 (0.01), and full close removes the remainder. Lot constraints are checked before
 buying. Position modification sets distant SL/TP; the pending BuyLimit is placed,
@@ -253,7 +254,7 @@ date_to combined with count, booleans/non-integer count/index, nonpositive count
 and negative/out-of-native-range indices. Existing deadlines, DTO validation,
 frame limits and absence of automatic retries/saving remain unchanged.
 
-Example functions 18 and 19 demonstrate the selectors directly. Recompile/reload
+Example functions 5 and 6 demonstrate the selectors directly. Recompile/reload
 the updated EA before using the extended wire routes; deployed files are not
 updated by editing repository source.
 

@@ -1185,6 +1185,43 @@ void DispatchSymbol(const string command_id,const string object_id,const string 
       RespondBool(command_id, true, SymbolSelect(sym, enable));
       return;
      }
+   if(method=="MarketBookAdd")
+     {
+      string sym = (ArraySize(args) > 0 && args[0] != "") ? ArgString(args, 0) : obj.Name();
+      RespondBool(command_id, true, MarketBookAdd(sym));
+      return;
+     }
+   if(method=="MarketBookRelease")
+     {
+      string sym = (ArraySize(args) > 0 && args[0] != "") ? ArgString(args, 0) : obj.Name();
+      RespondBool(command_id, true, MarketBookRelease(sym));
+      return;
+     }
+   if(method=="MarketBookGet")
+     {
+      string sym = (ArraySize(args) > 0 && args[0] != "") ? ArgString(args, 0) : obj.Name();
+      MqlBookInfo book[];
+      if(!MarketBookGet(sym, book))
+        {
+         RespondRaw(command_id, true, "[]");
+         return;
+        }
+      int size = ArraySize(book);
+      string json = "[";
+      for(int i = 0; i < size; i++)
+        {
+         if(i > 0) json += ",";
+         json += "{";
+         json += "\"type\":" + JsonLong((long)book[i].type) + ",";
+         json += "\"price\":" + JsonDouble(book[i].price) + ",";
+         json += "\"volume\":" + JsonLong((long)book[i].volume) + ",";
+         json += "\"volume_real\":" + JsonDouble(book[i].volume_real);
+         json += "}";
+        }
+      json += "]";
+      RespondRaw(command_id, true, json);
+      return;
+     }
    if(method=="Custom") { RespondBool(command_id, true, (bool)SymbolInfoInteger(obj.Name(), SYMBOL_CUSTOM)); return; }
    if(method=="ChartMode") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_CHART_MODE)); return; }
    if(method=="Visible") { RespondBool(command_id, true, (bool)SymbolInfoInteger(obj.Name(), SYMBOL_VISIBLE)); return; }

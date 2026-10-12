@@ -1,18 +1,18 @@
-"""Nineteen named async trading examples with a switchable broker.
+"""Twenty named async trading examples with a switchable broker.
 
 Description:
     Adapt the legacy seventeen-function trading walkthrough to the shared Trading
-    facade, then add historical bars and ticks. Backend-specific setup stays in
-    create_backend; ExampleContext owns only this run's trade identities and state.
-    Shutdown runs last and on errors. Explicit live writes can leave open resources
-    when outcomes are uncertain; never retry or close an unknown position.
+    facade, then add historical bars, ticks, and order book. Backend-specific setup
+    stays in create_backend; ExampleContext owns only this run's trade identities and
+    state. Shutdown runs last and on errors. Explicit live writes can leave open
+    resources when outcomes are uncertain; never retry or close an unknown position.
 
 Purpose:
     FEAT-TRADING-USAGE: Demonstrate the same API on MT5 and seeded simulation.
 
 Key Capabilities:
-    - FR-TRADING-USAGE-EXAMPLES: Execute nineteen named functions and field previews.
-      Associated: `example_01_connect()` through `example_19_shutdown()`
+    - FR-TRADING-USAGE-EXAMPLES: Execute twenty named functions and field previews.
+      Associated: `example_01_connect()` through `example_20_shutdown()`
       Logging: INFO number/title/status and labelled values, no credentials,
         identity/path/comment/request dumps or arbitrary exception messages.
     - FR-TRADING-USAGE-LIFECYCLE: Select providers and close exactly once.
@@ -341,7 +341,27 @@ async def example_06_tick_data(ctx: ExampleContext) -> None:
     print(ticks_df.head())
 
 
-async def example_07_position(ctx: ExampleContext) -> None:
+async def example_07_order_book(ctx: ExampleContext) -> None:
+    """Demonstrate subscribing to, fetching, and releasing Market Depth entries."""
+    _header("Order Book")
+    symbol = ctx.trading.symbol
+    add_ok = await symbol.MarketBookAdd(SYMBOL)
+    print(f"MarketBookAdd({SYMBOL}): {add_ok}")
+
+    book = await symbol.MarketBookGet(SYMBOL)
+    print(f"MarketBookGet count: {len(book)}")
+    for i, entry in enumerate(book[:PREVIEW_LIMIT]):
+        print(
+            f"  [{i}] {entry.type_description} "
+            f"price={entry.price} volume={entry.volume} volume_real={entry.volume_real}"
+        )
+        print(f"      dict: {entry._asdict()}")
+
+    release_ok = await symbol.MarketBookRelease(SYMBOL)
+    print(f"MarketBookRelease({SYMBOL}): {release_ok}")
+
+
+async def example_08_position(ctx: ExampleContext) -> None:
     """Demonstrate printing an open-position preview using PositionInfo."""
     _header("Position Information")
     position = ctx.trading.position
@@ -364,7 +384,7 @@ async def example_07_position(ctx: ExampleContext) -> None:
         print("No open positions")
 
 
-async def example_08_order(ctx: ExampleContext) -> None:
+async def example_09_order(ctx: ExampleContext) -> None:
     """Demonstrate printing a pending-order preview using OrderInfo."""
     _header("Order Information")
     order = ctx.trading.order
@@ -384,7 +404,7 @@ async def example_08_order(ctx: ExampleContext) -> None:
         print("No pending orders")
 
 
-async def example_09_history_order(ctx: ExampleContext) -> None:
+async def example_10_history_order(ctx: ExampleContext) -> None:
     """Demonstrate printing historical orders using HistoryOrderInfo."""
     _header("History Order Information")
     order = ctx.trading.history_order
@@ -404,7 +424,7 @@ async def example_09_history_order(ctx: ExampleContext) -> None:
         print("No history orders")
 
 
-async def example_10_history_deal(ctx: ExampleContext) -> None:
+async def example_11_history_deal(ctx: ExampleContext) -> None:
     """Demonstrate printing historical deals using DealInfo."""
     _header("Deal Information")
     deal = ctx.trading.deal
@@ -426,7 +446,7 @@ async def example_10_history_deal(ctx: ExampleContext) -> None:
         print("No history deals")
 
 
-async def example_11_open_position(ctx: ExampleContext) -> None:
+async def example_12_open_position(ctx: ExampleContext) -> None:
     """Demonstrate opening a buy position using Trade."""
     _header("Open Position")
     if not ctx.allow_writes:
@@ -488,7 +508,7 @@ async def example_11_open_position(ctx: ExampleContext) -> None:
     print(f"Opened owned position with volume: {2 * VOLUME}; retcode={retcode}")
 
 
-async def example_12_calc_profit_margin(ctx: ExampleContext) -> None:
+async def example_13_calc_profit_margin(ctx: ExampleContext) -> None:
     """Demonstrate calculating expected profit and required margin using AccountInfo."""
     _header("Calculate Profit and Margin")
     ask = float(await ctx.trading.symbol.Ask())
@@ -506,7 +526,7 @@ async def example_12_calc_profit_margin(ctx: ExampleContext) -> None:
     )
 
 
-async def example_13_modify_position(ctx: ExampleContext) -> None:
+async def example_14_modify_position(ctx: ExampleContext) -> None:
     """Demonstrate modifying the owned position's SL/TP using Trade."""
     _header("Modify Position")
     if not ctx.allow_writes:
@@ -543,7 +563,7 @@ async def example_13_modify_position(ctx: ExampleContext) -> None:
     print(f"Modified owned position SL={sl}, TP={tp}")
 
 
-async def example_14_close_partial_position(ctx: ExampleContext) -> None:
+async def example_15_close_partial_position(ctx: ExampleContext) -> None:
     """Demonstrate partially closing the owned position using Trade."""
     _header("Close Partial Position")
     if not ctx.allow_writes:
@@ -577,7 +597,7 @@ async def example_14_close_partial_position(ctx: ExampleContext) -> None:
     print(f"Partial close successful; remaining volume: {remaining}")
 
 
-async def example_15_close_position(ctx: ExampleContext) -> None:
+async def example_16_close_position(ctx: ExampleContext) -> None:
     """Demonstrate fully closing the remaining owned position using Trade."""
     _header("Close Position")
     if not ctx.allow_writes:
@@ -603,7 +623,7 @@ async def example_15_close_position(ctx: ExampleContext) -> None:
     print("Closed remaining owned position")
 
 
-async def example_16_pending_orders(ctx: ExampleContext) -> None:
+async def example_17_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate placing a BuyLimit pending order using Trade."""
     _header("Place Pending Order")
     if not ctx.allow_writes:
@@ -638,7 +658,7 @@ async def example_16_pending_orders(ctx: ExampleContext) -> None:
     print(f"Placed owned pending order at price: {ctx.pending_price}; volume: {VOLUME}")
 
 
-async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
+async def example_18_modify_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate modifying the owned pending order using Trade."""
     _header("Modify Pending Order")
     if not ctx.allow_writes:
@@ -675,7 +695,7 @@ async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
     print(f"Modified owned pending order price: {price}")
 
 
-async def example_18_delete_pending_orders(ctx: ExampleContext) -> None:
+async def example_19_delete_pending_orders(ctx: ExampleContext) -> None:
     """Demonstrate cancelling the owned pending order using Trade."""
     _header("Cancel Pending Order")
     if not ctx.allow_writes:
@@ -700,7 +720,7 @@ async def example_18_delete_pending_orders(ctx: ExampleContext) -> None:
     print("Deleted owned pending order")
 
 
-async def example_19_shutdown(ctx: ExampleContext) -> None:
+async def example_20_shutdown(ctx: ExampleContext) -> None:
     """Demonstrate shutting down the broker connection."""
     _header("Shutdown")
     if not ctx.closed:
@@ -710,7 +730,8 @@ async def example_19_shutdown(ctx: ExampleContext) -> None:
         print("Broker connection closed successfully")
 
 
-example_17_shutdown = example_19_shutdown
+example_17_shutdown = example_20_shutdown
+example_19_shutdown = example_20_shutdown
 
 
 EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
@@ -720,18 +741,19 @@ EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_04_symbol,
     example_05_historical_bars,
     example_06_tick_data,
-    # example_07_position,
-    # example_08_order,
-    # example_09_history_order,
-    # example_10_history_deal,
-    # example_11_open_position,
-    # example_12_calc_profit_margin,
-    # example_13_modify_position,
-    # example_14_close_partial_position,
-    # example_15_close_position,
-    # example_16_pending_orders,
-    # example_17_modify_pending_orders,
-    # example_18_delete_pending_orders,
+    example_07_order_book,
+    # example_08_position,
+    # example_09_order,
+    # example_10_history_order,
+    # example_11_history_deal,
+    # example_12_open_position,
+    # example_13_calc_profit_margin,
+    # example_14_modify_position,
+    # example_15_close_partial_position,
+    # example_16_close_position,
+    # example_17_pending_orders,
+    # example_18_modify_pending_orders,
+    # example_19_delete_pending_orders,
 )
 
 
@@ -744,7 +766,7 @@ async def run_examples(
         for example in EXAMPLES:
             await example(ctx)
     finally:
-        await example_19_shutdown(ctx)
+        await example_20_shutdown(ctx)
     print("\nExamples completed successfully.")
     return ctx.results
 

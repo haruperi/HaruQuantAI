@@ -28,7 +28,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.services.brokers.contracts import PropertyValue
+from app.services.brokers.contracts import BookInfo, BookType, PropertyValue
 
 from .base import TradingClass
 
@@ -365,6 +365,36 @@ class SymbolInfo(TradingClass):
     async def SymbolSelect(self, *args: Any) -> Any:
         """Await the backend SymbolInfo.SymbolSelect operation."""
         return await self._call("SymbolSelect", *args)
+
+    async def MarketBookAdd(self, *args: Any) -> Any:
+        """Subscribes the MetaTrader 5 terminal to Market Depth change events."""
+        return await self._call("MarketBookAdd", *args)
+
+    async def MarketBookGet(self, *args: Any) -> tuple[BookInfo, ...]:
+        """Return a tuple of BookInfo featuring Market Depth entries for a symbol."""
+        raw = await self._call("MarketBookGet", *args)
+        if not raw:
+            return ()
+        entries: list[BookInfo] = []
+        for item in raw:
+            if isinstance(item, BookInfo):
+                entries.append(item)
+            elif isinstance(item, dict):
+                entries.append(
+                    BookInfo(
+                        type=BookType(int(item.get("type", BookType.BOOK_TYPE_BUY))),
+                        price=float(item.get("price", 0.0)),
+                        volume=int(item.get("volume", 0)),
+                        volume_real=float(
+                            item.get("volume_real", item.get("volume", 0.0))
+                        ),
+                    )
+                )
+        return tuple(entries)
+
+    async def MarketBookRelease(self, *args: Any) -> Any:
+        """Cancel subscription of terminal to Market Depth change events."""
+        return await self._call("MarketBookRelease", *args)
 
     async def Custom(self, *args: Any) -> Any:
         """Await the backend SymbolInfo.Custom operation."""

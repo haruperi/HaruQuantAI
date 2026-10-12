@@ -41,6 +41,7 @@ from app.services.brokers.contracts import (
     ORDER_TYPE_DESCRIPTIONS,
     POSITION_TYPE_DESCRIPTIONS,
     AccountTradeMode,
+    BookType,
     BridgeError,
     BrokerBackend,
     MarginMode,
@@ -1337,6 +1338,82 @@ def _symbolinfo_symbolselect(
     return bool(self._backend.select_symbol(sym, is_enabled))
 
 
+def _symbolinfo_marketbookadd(self: _ObjectState, symbol: str | None = None) -> bool:
+    sym = symbol or self.symbol_name
+    if not sym:
+        return False
+    if self._backend.symbol(sym) is None:
+        return False
+    subscriptions: set[str] | None = getattr(
+        self._backend, "_market_book_subscriptions", None
+    )
+    if subscriptions is None:
+        subscriptions = set()
+        setattr(self._backend, "_market_book_subscriptions", subscriptions)
+    subscriptions.add(sym)
+    return True
+
+
+def _symbolinfo_marketbookrelease(
+    self: _ObjectState, symbol: str | None = None
+) -> bool:
+    sym = symbol or self.symbol_name
+    if not sym:
+        return False
+    subscriptions: set[str] | None = getattr(
+        self._backend, "_market_book_subscriptions", None
+    )
+    if subscriptions is not None:
+        subscriptions.discard(sym)
+    return True
+
+
+def _symbolinfo_marketbookget(
+    self: _ObjectState, symbol: str | None = None
+) -> list[dict[str, Any]]:
+    sym = symbol or self.symbol_name
+    if not sym:
+        return []
+    subscriptions: set[str] | None = getattr(
+        self._backend, "_market_book_subscriptions", None
+    )
+    if subscriptions is None or sym not in subscriptions:
+        return []
+    tick = self._backend.tick(sym)
+    if tick is None:
+        return []
+    spec = self._backend.symbol(sym)
+    point = float(spec.point) if spec else 0.00001
+    digits = int(spec.digits) if spec else 5
+    bid = float(tick.bid)
+    ask = float(tick.ask)
+
+    entries: list[dict[str, Any]] = []
+    for level in (3, 2, 1):
+        price = round(ask + level * point, digits)
+        vol = level * 10
+        entries.append(
+            {
+                "type": int(BookType.BOOK_TYPE_SELL),
+                "price": price,
+                "volume": vol,
+                "volume_real": float(vol),
+            }
+        )
+    for level in (0, 1, 2):
+        price = round(bid - level * point, digits)
+        vol = (level + 1) * 15
+        entries.append(
+            {
+                "type": int(BookType.BOOK_TYPE_BUY),
+                "price": price,
+                "volume": vol,
+                "volume_real": float(vol),
+            }
+        )
+    return entries
+
+
 def _symbolinfo_custom(self: _ObjectState) -> bool:
     return bool(_symbolinfo__s(self).custom)
 
@@ -2622,6 +2699,9 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "SymbolsGet": _symbolinfo_symbolsget,
         "SymbolInfoTick": _symbolinfo_symbolinfotick,
         "SymbolSelect": _symbolinfo_symbolselect,
+        "MarketBookAdd": _symbolinfo_marketbookadd,
+        "MarketBookGet": _symbolinfo_marketbookget,
+        "MarketBookRelease": _symbolinfo_marketbookrelease,
         "Custom": _symbolinfo_custom,
         "ChartMode": _symbolinfo_chartmode,
         "Visible": _symbolinfo_visible,
