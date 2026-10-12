@@ -8346,8 +8346,227 @@
         "static",
         "snippets"
       ]
+    },
+    "SQX145-EV-000199": {
+      "topic": "strategy.blocks.functions",
+      "title": "StrategyQuant X Functions building blocks semantics, arithmetic safeguards, and pip conversions",
+      "question": "How does StrategyQuant X implement arithmetic, mathematical, temporal, ranking, and pip conversion blocks in internal/extend/Snippets/SQ/Blocks/Functions?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "strategy",
+          "services"
+        ],
+        "conditions": [
+          "Static inspection of 18 Java snippet sources in internal/extend/Snippets/SQ/Blocks/Functions."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX Functions building blocks provide 4 basic arithmetic operators (Plus, Minus, Multiplication, Division) with safe Double.MAX_VALUE return on zero-division, 7 mathematical primitives (Abs, Round, Exponential, Logarithm, SquareRoot, Maximum, Minimum), 2 temporal numeric builders (GetDate returning YYYYMMDD, GetTime returning HHMMSS), 2 rolling-window Nth-rank extractors (IndicatorHighest, IndicatorLowest) returning -1 on out-of-range NthValue, 2 price-to-pip and pip-to-price conversion blocks delegating to broker symbol specifications, and an extensible CustomFunction block.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Static donor inspection does not execute donor runtime; broker point scaling requires MT5 symbol.Point() integration."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Functions/Division.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "44-52",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Evaluates division with Double.MAX_VALUE returned when right value is 0."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "dda0aa4319db57ccc3f53a841b51d5c3e2d47c83fea3b010aa4f3ad583a860ce"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Functions/ConvertToPips.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "47-49",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Converts real price difference to pips using symbol specification."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f9e5559491c7eb2599f78cf8e5d70a46f9c99529298297e0aa8771f9f51a74ae"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Functions/ConvertToRealPips.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "47-49",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Converts pips to real price level using symbol specification."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2d6829eb863becd469a7a6770aaedc3d9ddca8eabc44c5fa68f4e2549b315a5e"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Functions/GetDate.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "48-50",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Returns YYYYMMDD date integer matching SQTime.getYmd."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4fde12b183e90c5cdaf036393272846ecb32d0f536371d2860f5717f46df6308"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Functions/GetTime.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "49-51",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Returns HHMMSS time integer matching SQTime.getHms."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e8f6377e181cee149958f5ef9db5c72172bd1b77a23bda8cbebd3eaea3ea1f2d"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Functions/IndicatorHighest.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "56-75",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Extracts Nth highest value in period, returning -1 if NthValue is out of bounds."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "6cb5ec6af306f54d45b43b2af7a3c4c2f227b1aad0936acbed3b960199511ead"
+          },
+          "accessed_at": "2026-10-12"
+        },
+        {
+          "catalog_id": "E-L14",
+          "artifact_locator": "internal/extend/Snippets/SQ/Blocks/Functions/IndicatorLowest.java",
+          "location": {
+            "section": "evaluation",
+            "symbol": "OnBlockEvaluate",
+            "line_range": "55-74",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Extracts Nth lowest value in period, returning -1 if NthValue is out of bounds."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "d308b652c013629ad834e7df2937bd62f5453c3cab5c182a9a036281f3ba3112"
+          },
+          "accessed_at": "2026-10-12"
+        }
+      ],
+      "target_mapping": {
+        "domain": "strategy",
+        "feature_ids": [
+          "FEAT-SERVICES-FUNCTIONS"
+        ],
+        "requirement_ids": [
+          "FR-SERVICES-FUNCTION-ARITHMETIC",
+          "FR-SERVICES-FUNCTION-MATH",
+          "FR-SERVICES-FUNCTION-TEMPORAL",
+          "FR-SERVICES-FUNCTION-RANK",
+          "FR-SERVICES-FUNCTION-PIPS",
+          "FR-SERVICES-FUNCTION-CUSTOM",
+          "FR-SERVICES-FUNCTIONS-FACADE"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/dev/evidence/reimplementation.json"
+        ],
+        "registration_status": "proposed",
+        "registration_gap": "Feature FEAT-SERVICES-FUNCTIONS proposed for functions building blocks matching SQX Snippets/SQ/Blocks/Functions suite.",
+        "proposed_owner_readme": "app/services/README.md"
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Statically inspect and verify all 18 function block java snippets under SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Blocks/Functions.",
+        "expected_observation": "Functions blocks implement safe zero-division, math functions, integer date/time formatting, Nth-rank extractors, and pip conversions.",
+        "actual_observation": "Inspected all 18 files in SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Blocks/Functions; verified Double.MAX_VALUE returned on division by zero, YYYYMMDD date and HHMMSS time encoding, ascending array sort for Nth-highest and Nth-lowest, and price/pip conversion architecture.",
+        "artifact_paths": [
+          "internal/extend/Snippets/SQ/Blocks/Functions"
+        ],
+        "executed_at": "2026-10-12T21:25:00.000Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "f1be5a17a82ff17485b48550183aa3928d1611c8",
+        "created_at": "2026-10-12T21:25:00.000Z",
+        "updated_at": "2026-10-12T21:25:00.000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased behavioral and mathematical evaluation rules only; no proprietary code copied."
+      },
+      "tags": [
+        "services",
+        "blocks",
+        "functions",
+        "static",
+        "snippets",
+        "pips"
+      ]
     }
   },
   "minimum_record_number": 132,
-  "allocation_high_water_mark": 198
+  "allocation_high_water_mark": 199
 }
