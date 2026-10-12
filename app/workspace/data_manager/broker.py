@@ -136,6 +136,120 @@ class XmlOverviewItem(BaseModel):
     description: str = ""
 
 
+DEFAULT_BROKERS: list[dict[str, Any]] = [
+    {
+        "id": 1,
+        "name": "[[XTB]]",
+        "is_system": 1,
+        "description": "XTB broker",
+        "stockpicker_use": 1,
+        "mt_use": 0,
+        "server_timezone": "UTC",
+        "postfix": "",
+    },
+    {
+        "id": 2,
+        "name": "[[RoboForex]]",
+        "is_system": 1,
+        "description": "RoboForex",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "EET",
+        "postfix": "_roboforex",
+    },
+    {
+        "id": 3,
+        "name": "[[Dukascopy]]",
+        "is_system": 1,
+        "description": "Dukascopy",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "EETUS",
+        "postfix": "_dukascopy",
+    },
+    {
+        "id": 4,
+        "name": "[[Darwinex]]",
+        "is_system": 1,
+        "description": "Darwinex CFDs",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "EETUS",
+        "postfix": "_darwinex",
+    },
+    {
+        "id": 5,
+        "name": "[[ICMarkets]]",
+        "is_system": 1,
+        "description": "ICMarkets",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "EETUS",
+        "postfix": "_icmarkets",
+    },
+    {
+        "id": 6,
+        "name": "[[Pepperstone]]",
+        "is_system": 1,
+        "description": "Pepperstone",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "EETUS",
+        "postfix": "_pepperstone",
+    },
+    {
+        "id": 7,
+        "name": "[[OANDA]]",
+        "is_system": 1,
+        "description": "OANDA",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "EETUS",
+        "postfix": "_oanda",
+    },
+    {
+        "id": 8,
+        "name": "[[FTMO]]",
+        "is_system": 1,
+        "description": "FTMO",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "EETUS",
+        "postfix": "_ftmo",
+    },
+    {
+        "id": 9,
+        "name": "[[The5ers]]",
+        "is_system": 1,
+        "description": "The5ers",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "Asia/Jerusalem",
+        "postfix": "_the5ers",
+    },
+    {
+        "id": 10,
+        "name": "[[Monevis]]",
+        "is_system": 1,
+        "description": "Monevis",
+        "stockpicker_use": 0,
+        "mt_use": 1,
+        "server_timezone": "EETUS",
+        "postfix": "_monevis",
+    },
+    {
+        "id": 11,
+        "name": "[[Darwinex Zero]]",
+        "is_system": 1,
+        "description": "Darwinex Zero",
+        "stockpicker_use": 1,
+        "mt_use": 0,
+        "server_timezone": "UTC",
+        "postfix": "",
+    },
+]
+
+
 class BrokerService:
     """Central domain service managing broker profile configurations."""
 
@@ -145,7 +259,11 @@ class BrokerService:
 
     def ensure_defaults(self) -> None:
         """Ensure standard SQX system broker profiles exist in storage."""
-        self._db.brokers.ensure_defaults()
+        self._db.brokers.seed_defaults(DEFAULT_BROKERS)
+        logger.info(
+            "System broker profile defaults ensured",
+            extra={"fr_id": "FR-WORKSPACE-DATAMGR-BROKER"},
+        )
 
     def list_brokers(self) -> list[BrokerProfileRecord]:
         """Retrieve configured broker profiles from datamgr_broker table.

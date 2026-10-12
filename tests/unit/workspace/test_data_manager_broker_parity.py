@@ -439,7 +439,7 @@ def test_broker_fastapi_routes(test_db: DatabaseManager, tmp_path: Path) -> None
 def test_broker_persistence_timestamps(test_db: DatabaseManager) -> None:
     """Verify created_at_utc and updated_at_utc are properly populated and updated."""
     # 1. System defaults have timestamps
-    test_db.brokers.ensure_defaults()
+    BrokerService(test_db).ensure_defaults()
     for row in test_db.brokers.list_profiles():
         assert "created_at_utc" in row
         assert row["created_at_utc"]
@@ -492,3 +492,46 @@ def test_broker_profile_stocks_populated(
     p1 = broker_service.get_broker(created.id)
     assert p1 is not None
     assert p1.stocks == ["AAPL", "MSFT", "TSLA"]
+
+
+def test_broker_replace_stocks_system_profile_blocked(
+    test_db: DatabaseManager,
+) -> None:
+    """Verify that replace_stocks on system broker profile is rejected."""
+    from app.host.persistence.errors import PersistenceError
+
+    BrokerService(test_db).ensure_defaults()
+    with pytest.raises(
+        PersistenceError, match="Cannot modify stocks for system broker profile"
+    ):
+        test_db.brokers.replace_stocks(1, ["TEST"])
+
+
+def test_broker_replace_stocks_non_stockpicker_blocked(
+    test_db: DatabaseManager,
+) -> None:
+    """Verify that replace_stocks on non-stockpicker profile is rejected."""
+    from app.host.persistence.errors import PersistenceError
+
+    b_id = test_db.brokers.create_profile(
+        {
+            "name": "NonStockPicker Broker",
+            "stockpicker_use": 0,
+            "mt_use": 1,
+        }
+    )
+    with pytest.raises(
+        PersistenceError, match="Broker profile is not configured for stockpicker use"
+    ):
+        test_db.brokers.replace_stocks(b_id, ["TEST"])
+
+
+def test_broker_update_profile_system_profile_blocked(
+    test_db: DatabaseManager,
+) -> None:
+    """Verify that update_profile on system broker profile is rejected."""
+    from app.host.persistence.errors import PersistenceError
+
+    BrokerService(test_db).ensure_defaults()
+    with pytest.raises(PersistenceError, match="Cannot modify system broker profile"):
+        test_db.brokers.update_profile(1, {"description": "Altered System Profile"})

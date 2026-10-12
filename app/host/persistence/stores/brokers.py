@@ -3,7 +3,8 @@
 Description:
     Provides transactional CRUD operations against `datamgr_brokers` and
     `datamgr_broker_stocks`, managing broker profiles, server timezone offsets,
-    and associated symbol mappings.
+    and associated symbol mappings. Default profiles belong to BrokerService in
+    the workspace.
 
 Purpose:
     FEAT-HOST-PERSISTENCE: Broker profile and stock configuration persistence.
@@ -14,7 +15,8 @@ Key Capabilities:
         `BrokerStore.get_profile_by_name()`, `BrokerStore.create_profile()`,
         `BrokerStore.update_profile()`, `BrokerStore.delete_profile()`,
         `BrokerStore.list_stocks()`, `BrokerStore.replace_stocks()`,
-        `BrokerStore.get_counts()`, `BrokerStore.ensure_defaults()`
+        `BrokerStore.get_counts()`, `BrokerStore.count()`,
+        `BrokerStore.seed_defaults()`
       Logging: DEBUG reads; INFO writes and lifecycle events.
 
 Python API Usage:
@@ -36,6 +38,7 @@ CLI Usage:
 from __future__ import annotations
 
 import sqlite3
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
@@ -57,221 +60,276 @@ class BrokerStore:
 
     def list_profiles(self) -> list[dict[str, Any]]:
         """Return all broker rows ordered by id ascending."""
-        with self._db.connection(query_only=True) as conn:
-            exists: sqlite3.Row | None = conn.execute(
-                "SELECT 1 FROM sqlite_master WHERE type='table' "
-                "AND name='datamgr_broker'"
-            ).fetchone()
-            if not exists:
-                return []
-            rows = conn.execute(
-                "SELECT * FROM datamgr_broker ORDER BY id ASC"
-            ).fetchall()
         logger.debug(
-            "Broker rows read",
-            extra={"count": len(rows), "fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
+            "BrokerStore.list_profiles storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
         )
-        return [dict(row) for row in rows]
+        sql = """
+            SELECT id, name, is_system, description, server_timezone,
+                   postfix, enabled, mt_use, stockpicker_use,
+                   created_at_utc, updated_at_utc
+            FROM datamgr_broker
+            ORDER BY id ASC;
+        """
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql)
+            return [dict(r) for r in cur.fetchall()]
+
+    def count(self) -> int:
+        """Return the number of stored broker profiles."""
+        logger.debug(
+            "BrokerStore.count storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
+        )
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT COUNT(*) FROM datamgr_broker;")
+            return int(cur.fetchone()[0])
 
     def get_profile(self, broker_id: int) -> dict[str, Any] | None:
-        """Fetch a single broker profile by ID."""
-        with self._db.connection(query_only=True) as conn:
-            row = conn.execute(
-                "SELECT * FROM datamgr_broker WHERE id = ?", (broker_id,)
-            ).fetchone()
+        """Return a single broker profile by ID, or None if not found."""
         logger.debug(
-            "Broker profile read by id",
-            extra={
-                "broker_id": broker_id,
-                "found": row is not None,
-                "fr_id": "FR-HOST-PERSISTENCE-BROKERS",
-            },
+            "BrokerStore.get_profile storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
         )
-        return dict(row) if row else None
+        sql = """
+            SELECT id, name, is_system, description, server_timezone,
+                   postfix, enabled, mt_use, stockpicker_use,
+                   created_at_utc, updated_at_utc
+            FROM datamgr_broker
+            WHERE id = ?;
+        """
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (broker_id,))
+            row = cur.fetchone()
+            return dict(row) if row else None
 
     def get_profile_by_name(self, name: str) -> dict[str, Any] | None:
-        """Fetch a single broker profile by name (case-insensitive)."""
-        clean = name.strip()
-        with self._db.connection(query_only=True) as conn:
-            row = conn.execute(
-                "SELECT * FROM datamgr_broker WHERE LOWER(name) = LOWER(?)",
-                (clean,),
-            ).fetchone()
+        """Return a single broker profile by name (case-insensitive), or None."""
         logger.debug(
-            "Broker profile read by name",
-            extra={
-                "broker_name": name,
-                "found": row is not None,
-                "fr_id": "FR-HOST-PERSISTENCE-BROKERS",
-            },
+            "BrokerStore.get_profile_by_name storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
         )
-        return dict(row) if row else None
+        sql = """
+            SELECT id, name, is_system, description, server_timezone,
+                   postfix, enabled, mt_use, stockpicker_use,
+                   created_at_utc, updated_at_utc
+            FROM datamgr_broker
+            WHERE UPPER(name) = UPPER(?);
+        """
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (name,))
+            row = cur.fetchone()
+            return dict(row) if row else None
 
-    def create_profile(self, data: dict[str, Any]) -> int:
-        """Create a new broker profile record."""
-        name = str(data.get("name", "")).strip()
-        if not name:
-            raise ValidationError("Broker profile name must not be empty")
-        now_str = datetime.now(UTC).isoformat()
+    def create_profile(self, profile: dict[str, Any]) -> int:
+        """Insert a new broker profile record. Returns the new broker id."""
+        logger.debug(
+            "BrokerStore.create_profile storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
+        )
+        if not profile.get("name") or not str(profile["name"]).strip():
+            raise ValidationError("Broker name must not be empty.")
+        now = datetime.now(UTC).isoformat()
+        sql = """
+            INSERT INTO datamgr_broker (
+                name, is_system, description, server_timezone, postfix,
+                enabled, mt_use, stockpicker_use, created_at_utc, updated_at_utc
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """
+        params = (
+            str(profile["name"]).strip(),
+            int(bool(profile.get("is_system", False))),
+            str(profile.get("description", "")),
+            str(profile.get("server_timezone", "UTC")),
+            str(profile.get("postfix", "")),
+            int(bool(profile.get("enabled", True))),
+            int(bool(profile.get("mt_use", True))),
+            int(bool(profile.get("stockpicker_use", False))),
+            now,
+            now,
+        )
         with self._db.transaction() as conn:
-            cursor = conn.execute(
-                """
-                INSERT INTO datamgr_broker (
-                    name, is_system, description, server_timezone,
-                    postfix, enabled, mt_use, stockpicker_use,
-                    created_at_utc, updated_at_utc
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    name,
-                    int(bool(data.get("is_system", 0))),
-                    str(data.get("description", "")),
-                    str(data.get("server_timezone", "UTC")),
-                    str(data.get("postfix", "")),
-                    int(bool(data.get("enabled", 1))),
-                    int(bool(data.get("mt_use", 0))),
-                    int(bool(data.get("stockpicker_use", 0))),
-                    str(data.get("created_at_utc") or now_str),
-                    str(data.get("updated_at_utc") or now_str),
-                ),
-            )
-            broker_id = cursor.lastrowid or 0
+            try:
+                cur = conn.cursor()
+                cur.execute(sql, params)
+                new_id = cur.lastrowid
+                if new_id is None:
+                    raise PersistenceError("Insert failed to return row id.")
+            except sqlite3.IntegrityError as exc:
+                raise PersistenceError(
+                    f"Broker name '{profile['name']}' already exists."
+                ) from exc
         logger.info(
             "Broker profile created",
-            extra={
-                "broker_id": broker_id,
-                "broker_name": name,
-                "fr_id": "FR-HOST-PERSISTENCE-BROKERS",
-            },
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS", "broker_id": new_id},
         )
-        return broker_id
+        return new_id
 
-    def update_profile(self, broker_id: int, data: dict[str, Any]) -> bool:
-        """Update an existing broker profile."""
-        now_str = datetime.now(UTC).isoformat()
+    @staticmethod
+    def _to_int_bool(val: object) -> int:
+        """Convert a boolean or integer-like value to 0 or 1."""
+        return int(bool(val))
+
+    def update_profile(self, broker_id: int, updates: dict[str, Any]) -> bool:
+        """Update an existing non-system broker profile.
+
+        Raises:
+            ValidationError: If broker name is empty.
+            PersistenceError: If profile is a system broker or update fails.
+        """
+        logger.debug(
+            "BrokerStore.update_profile storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
+        )
+        now = datetime.now(UTC).isoformat()
+        allowed_fields: dict[str, Callable[[Any], Any]] = {
+            "name": str,
+            "description": str,
+            "server_timezone": str,
+            "postfix": str,
+            "enabled": self._to_int_bool,
+            "mt_use": self._to_int_bool,
+            "stockpicker_use": self._to_int_bool,
+        }
+        set_clauses: list[str] = []
+        params: list[Any] = []
+        for key, val in updates.items():
+            if key in allowed_fields:
+                if key == "name" and (val is None or not str(val).strip()):
+                    raise ValidationError("Broker name must not be empty.")
+                converter = allowed_fields[key]
+                converted = converter(val) if val is not None else val
+                set_clauses.append(f"{key} = ?")
+                params.append(converted)
+        if not set_clauses:
+            return False
+        set_clauses.append("updated_at_utc = ?")
+        params.append(now)
+        params.append(broker_id)
+        sql = f"UPDATE datamgr_broker SET {', '.join(set_clauses)} WHERE id = ?;"  # noqa: S608
         with self._db.transaction() as conn:
-            existing = conn.execute(
-                "SELECT is_system FROM datamgr_broker WHERE id = ?", (broker_id,)
-            ).fetchone()
-            if not existing:
-                raise PersistenceError(f"Broker profile ID {broker_id} does not exist")
-            if bool(existing["is_system"]):
-                raise PersistenceError("System broker profile cannot be modified")
-
-            name = str(data.get("name", "")).strip()
-            if not name:
-                raise ValidationError("Broker profile name must not be empty")
-
-            conn.execute(
-                """
-                UPDATE datamgr_broker
-                SET name = ?, description = ?, server_timezone = ?,
-                    postfix = ?, enabled = ?, mt_use = ?, stockpicker_use = ?,
-                    updated_at_utc = ?
-                WHERE id = ?
-                """,
-                (
-                    name,
-                    str(data.get("description", "")),
-                    str(data.get("server_timezone", "UTC")),
-                    str(data.get("postfix", "")),
-                    int(bool(data.get("enabled", 1))),
-                    int(bool(data.get("mt_use", 0))),
-                    int(bool(data.get("stockpicker_use", 0))),
-                    str(data.get("updated_at_utc") or now_str),
-                    broker_id,
-                ),
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT is_system, name FROM datamgr_broker WHERE id = ?;",
+                (broker_id,),
             )
-        logger.info(
-            "Broker profile updated",
-            extra={
-                "broker_id": broker_id,
-                "broker_name": name,
-                "fr_id": "FR-HOST-PERSISTENCE-BROKERS",
-            },
-        )
-        return True
-
-    def delete_profile(self, broker_id: int) -> bool:
-        """Delete a broker profile after validating dependency invariants."""
-        with self._db.transaction() as conn:
-            existing = conn.execute(
-                "SELECT is_system, name FROM datamgr_broker WHERE id = ?", (broker_id,)
-            ).fetchone()
+            existing = cur.fetchone()
             if not existing:
                 return False
             if bool(existing["is_system"]):
-                raise PersistenceError("Cannot delete system broker profile")
-
-            # Check instrument dependencies
-            inst_count_row = conn.execute(
-                "SELECT COUNT(*) FROM datamgr_instruments WHERE broker_id = ?",
-                (broker_id,),
-            ).fetchone()
-            if inst_count_row and inst_count_row[0] > 0:
                 raise PersistenceError(
-                    f"Cannot delete broker profile '{existing['name']}' because "
-                    f"{inst_count_row[0]} instruments reference it"
+                    f"Cannot modify system broker profile '{existing['name']}' "
+                    f"(id={broker_id})."
                 )
+            try:
+                cur.execute(sql, params)
+                updated = cur.rowcount > 0
+            except sqlite3.IntegrityError as exc:
+                raise PersistenceError(
+                    f"Broker update failed: name conflict on id={broker_id}."
+                ) from exc
+        logger.info(
+            "Broker profile updated",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS", "broker_id": broker_id},
+        )
+        return updated
 
-            # Check session dependencies
-            sess_cols = {
-                col[1]
-                for col in conn.execute(
-                    "PRAGMA table_info(datamgr_sessions)"
-                ).fetchall()
-            }
-            if "broker_id" in sess_cols:
-                sess_count_row = conn.execute(
-                    "SELECT COUNT(*) FROM datamgr_sessions WHERE broker_id = ?",
-                    (broker_id,),
-                ).fetchone()
-                if sess_count_row and sess_count_row[0] > 0:
-                    raise PersistenceError(
-                        f"Broker profile '{existing['name']}' is used by "
-                        f"{sess_count_row[0]} session(s)"
-                    )
-
-            # Remove associated stocks and profile
-            conn.execute(
-                "DELETE FROM datamgr_broker_stock WHERE broker_id = ?", (broker_id,)
+    def delete_profile(self, broker_id: int) -> bool:
+        """Delete a non-system broker profile and cascade to datamgr_broker_stock."""
+        logger.debug(
+            "BrokerStore.delete_profile storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
+        )
+        with self._db.transaction() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT is_system, name FROM datamgr_broker WHERE id = ?;", (broker_id,)
             )
-            conn.execute("DELETE FROM datamgr_broker WHERE id = ?", (broker_id,))
+            row = cur.fetchone()
+            if not row:
+                return False
+            if bool(row["is_system"]):
+                raise PersistenceError(
+                    f"Cannot delete system broker profile '{row['name']}' "
+                    f"(id={broker_id})."
+                )
+            cur.execute(
+                "SELECT COUNT(*) FROM datamgr_instruments WHERE broker_id = ?;",
+                (broker_id,),
+            )
+            inst_count = cur.fetchone()[0]
+            if inst_count > 0:
+                raise PersistenceError(
+                    f"Cannot delete broker profile '{row['name']}' because "
+                    f"{inst_count} instruments reference it"
+                )
+            sess_table = cur.execute(
+                "SELECT 1 FROM sqlite_master "
+                "WHERE type='table' AND name='datamgr_sessions';"
+            ).fetchone()
+            if sess_table:
+                sess_cols = {
+                    r["name"]
+                    for r in cur.execute(
+                        "PRAGMA table_info(datamgr_sessions);"
+                    ).fetchall()
+                }
+                if "broker_id" in sess_cols:
+                    cur.execute(
+                        "SELECT COUNT(*) FROM datamgr_sessions WHERE broker_id = ?;",
+                        (broker_id,),
+                    )
+                    sess_count = cur.fetchone()[0]
+                    if sess_count > 0:
+                        raise PersistenceError(
+                            f"Cannot delete broker profile '{row['name']}' because "
+                            f"{sess_count} sessions reference it"
+                        )
+            cur.execute(
+                "DELETE FROM datamgr_broker_stock WHERE broker_id = ?;", (broker_id,)
+            )
+            cur.execute("DELETE FROM datamgr_broker WHERE id = ?;", (broker_id,))
+            deleted = cur.rowcount > 0
         logger.info(
             "Broker profile deleted",
-            extra={
-                "broker_id": broker_id,
-                "broker_name": existing["name"],
-                "fr_id": "FR-HOST-PERSISTENCE-BROKERS",
-            },
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS", "broker_id": broker_id},
         )
-        return True
+        return deleted
 
     def list_stocks(self, broker_id: int) -> list[str]:
-        """Fetch stock tickers associated with a broker profile."""
-        with self._db.connection(query_only=True) as conn:
-            rows = conn.execute(
-                "SELECT ticker FROM datamgr_broker_stock WHERE broker_id = ? "
-                "ORDER BY id ASC",
-                (broker_id,),
-            ).fetchall()
+        """Return list of uppercase tickers associated with a broker."""
         logger.debug(
-            "Broker stocks read",
-            extra={
-                "broker_id": broker_id,
-                "count": len(rows),
-                "fr_id": "FR-HOST-PERSISTENCE-BROKERS",
-            },
+            "BrokerStore.list_stocks storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
         )
-        return [str(row[0]) for row in rows]
+        sql = """
+            SELECT ticker FROM datamgr_broker_stock
+            WHERE broker_id = ?
+            ORDER BY ticker ASC;
+        """
+        with self._db.connection(query_only=True) as conn:
+            cur = conn.cursor()
+            cur.execute(sql, (broker_id,))
+            return [r[0] for r in cur.fetchall()]
 
-    def replace_stocks(self, broker_id: int, tickers: list[str]) -> None:
-        """Replace all stock tickers for a broker profile."""
+    def replace_stocks(self, broker_id: int, tickers: list[str]) -> int:
+        """Replace the constituent stocks list for a broker in an atomic transaction."""
+        logger.debug(
+            "BrokerStore.replace_stocks storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
+        )
+        unique_tickers = sorted({t.strip().upper() for t in tickers if t.strip()})
         with self._db.transaction() as conn:
-            existing = conn.execute(
-                "SELECT is_system, stockpicker_use FROM datamgr_broker WHERE id = ?",
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT is_system, stockpicker_use FROM datamgr_broker WHERE id = ?;",
                 (broker_id,),
-            ).fetchone()
+            )
+            existing = cur.fetchone()
             if not existing:
                 raise PersistenceError(f"Broker profile ID {broker_id} does not exist")
             if bool(existing["is_system"]):
@@ -280,171 +338,70 @@ class BrokerStore:
                 raise PersistenceError(
                     "Broker profile is not configured for stockpicker use"
                 )
-
-            conn.execute(
-                "DELETE FROM datamgr_broker_stock WHERE broker_id = ?", (broker_id,)
+            cur.execute(
+                "DELETE FROM datamgr_broker_stock WHERE broker_id = ?;", (broker_id,)
             )
-            clean_tickers = sorted({t.strip() for t in tickers if t.strip()})
-            for ticker in clean_tickers:
-                conn.execute(
+            if unique_tickers:
+                insert_sql = (
                     "INSERT INTO datamgr_broker_stock (broker_id, ticker) "
-                    "VALUES (?, ?)",
-                    (broker_id, ticker),
+                    "VALUES (?, ?);"
                 )
+                cur.executemany(insert_sql, [(broker_id, t) for t in unique_tickers])
         logger.info(
-            "Broker stocks updated",
+            "Broker constituent stocks replaced",
             extra={
-                "broker_id": broker_id,
-                "count": len(clean_tickers),
                 "fr_id": "FR-HOST-PERSISTENCE-BROKERS",
+                "broker_id": broker_id,
+                "count": len(unique_tickers),
             },
         )
+        return len(unique_tickers)
 
     def get_counts(self, broker_id: int) -> dict[str, int]:
-        """Compute customized stocks, instruments, and sessions counts."""
+        """Return counts of dependent records (stocks, instruments, sessions)."""
+        logger.debug(
+            "BrokerStore.get_counts storage operation",
+            extra={"fr_id": "FR-HOST-PERSISTENCE-BROKERS"},
+        )
         with self._db.connection(query_only=True) as conn:
-            stocks_row = conn.execute(
-                "SELECT COUNT(*) FROM datamgr_broker_stock WHERE broker_id = ?",
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT COUNT(*) FROM datamgr_broker_stock WHERE broker_id = ?;",
                 (broker_id,),
-            ).fetchone()
-            inst_row = conn.execute(
-                "SELECT COUNT(*) FROM datamgr_instruments WHERE broker_id = ?",
+            )
+            stock_row = cur.fetchone()
+            cur.execute(
+                "SELECT COUNT(*) FROM datamgr_instruments WHERE broker_id = ?;",
                 (broker_id,),
-            ).fetchone()
-            sess_cols = {
-                col[1]
-                for col in conn.execute(
-                    "PRAGMA table_info(datamgr_sessions)"
-                ).fetchall()
-            }
+            )
+            inst_row = cur.fetchone()
             sess_count = 0
-            if "broker_id" in sess_cols:
-                sess_row = conn.execute(
-                    "SELECT COUNT(*) FROM datamgr_sessions WHERE broker_id = ?",
-                    (broker_id,),
-                ).fetchone()
-                sess_count = int(sess_row[0]) if sess_row else 0
+            sess_table = cur.execute(
+                "SELECT 1 FROM sqlite_master "
+                "WHERE type='table' AND name='datamgr_sessions';"
+            ).fetchone()
+            if sess_table:
+                sess_cols = {
+                    r["name"]
+                    for r in cur.execute(
+                        "PRAGMA table_info(datamgr_sessions);"
+                    ).fetchall()
+                }
+                if "broker_id" in sess_cols:
+                    cur.execute(
+                        "SELECT COUNT(*) FROM datamgr_sessions WHERE broker_id = ?;",
+                        (broker_id,),
+                    )
+                    sess_count = int(cur.fetchone()[0])
 
         return {
-            "customized_stocks": int(stocks_row[0]) if stocks_row else 0,
+            "customized_stocks": int(stock_row[0]) if stock_row else 0,
             "customized_instruments": int(inst_row[0]) if inst_row else 0,
             "customized_sessions": sess_count,
         }
 
-    def ensure_defaults(self) -> None:
-        """Seed the 11 authoritative StrategyQuant X default system broker profiles."""
-        system_defaults: list[dict[str, Any]] = [
-            {
-                "id": 1,
-                "name": "[[XTB]]",
-                "is_system": 1,
-                "description": "XTB broker",
-                "stockpicker_use": 1,
-                "mt_use": 0,
-                "server_timezone": "UTC",
-                "postfix": "",
-            },
-            {
-                "id": 2,
-                "name": "[[RoboForex]]",
-                "is_system": 1,
-                "description": "RoboForex",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "EET",
-                "postfix": "_roboforex",
-            },
-            {
-                "id": 3,
-                "name": "[[Dukascopy]]",
-                "is_system": 1,
-                "description": "Dukascopy",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "EETUS",
-                "postfix": "_dukascopy",
-            },
-            {
-                "id": 4,
-                "name": "[[Darwinex]]",
-                "is_system": 1,
-                "description": "Darwinex CFDs",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "EETUS",
-                "postfix": "_darwinex",
-            },
-            {
-                "id": 5,
-                "name": "[[ICMarkets]]",
-                "is_system": 1,
-                "description": "ICMarkets",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "EETUS",
-                "postfix": "_icmarkets",
-            },
-            {
-                "id": 6,
-                "name": "[[Pepperstone]]",
-                "is_system": 1,
-                "description": "Pepperstone",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "EETUS",
-                "postfix": "_pepperstone",
-            },
-            {
-                "id": 7,
-                "name": "[[OANDA]]",
-                "is_system": 1,
-                "description": "OANDA",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "EETUS",
-                "postfix": "_oanda",
-            },
-            {
-                "id": 8,
-                "name": "[[FTMO]]",
-                "is_system": 1,
-                "description": "FTMO",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "EETUS",
-                "postfix": "_ftmo",
-            },
-            {
-                "id": 9,
-                "name": "[[The5ers]]",
-                "is_system": 1,
-                "description": "The5ers",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "Asia/Jerusalem",
-                "postfix": "_the5ers",
-            },
-            {
-                "id": 10,
-                "name": "[[Monevis]]",
-                "is_system": 1,
-                "description": "Monevis",
-                "stockpicker_use": 0,
-                "mt_use": 1,
-                "server_timezone": "EETUS",
-                "postfix": "_monevis",
-            },
-            {
-                "id": 11,
-                "name": "[[Darwinex Zero]]",
-                "is_system": 1,
-                "description": "Darwinex Zero",
-                "stockpicker_use": 1,
-                "mt_use": 0,
-                "server_timezone": "UTC",
-                "postfix": "",
-            },
-        ]
+    def seed_defaults(self, defaults: list[dict[str, Any]]) -> None:
+        """Seed default system broker profiles from caller-provided definitions."""
         with self._db.transaction() as conn:
             exists = conn.execute(
                 "SELECT 1 FROM sqlite_master WHERE type='table' "
@@ -453,7 +410,7 @@ class BrokerStore:
             if not exists:
                 return
             now_str = datetime.now(UTC).isoformat()
-            for item in system_defaults:
+            for item in defaults:
                 row = conn.execute(
                     "SELECT id, name FROM datamgr_broker WHERE id = ? OR name = ?",
                     (item["id"], item["name"]),

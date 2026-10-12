@@ -10,12 +10,15 @@ Key Capabilities Verified:
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import re
+import sqlite3
 from pathlib import Path
+from typing import Any
 
 import pytest
-from app.host.persistence import DatabaseManager, normalize_sqx_date
+from app.host.persistence import DatabaseManager, ValidationError
 from app.host.resources import ResourceManager
 from app.workspace.data_manager.baskets import (
     BasketDefinition,
@@ -24,6 +27,7 @@ from app.workspace.data_manager.baskets import (
     export_groups_xml,
     format_stock_lines,
     import_groups_xml,
+    normalize_sqx_date,
     parse_stock_lines,
 )
 from app.workspace.data_manager.instruments import InstrumentService
@@ -513,8 +517,6 @@ def test_normalize_sqx_date_helper() -> None:
 
 def test_sqx_legacy_schema_and_date_formats(tmp_path: Path) -> None:
     """Validate compatibility with legacy SQX uppercase SQLite schema and integer dates."""
-    import sqlite3
-
     db_path = tmp_path / "legacy_sqx.db"
     conn = sqlite3.connect(db_path)
     # Replicate exact SQX table DDL (uppercase columns, no unique constraint on NAME)
@@ -536,6 +538,17 @@ def test_sqx_legacy_schema_and_date_formats(tmp_path: Path) -> None:
             BASKET_ID INTEGER NOT NULL,
             DATE_FROM INTEGER NOT NULL,
             DATE_TO INTEGER NOT NULL
+        );
+        """
+    )
+    conn.execute(
+        """
+        CREATE TABLE datamgr_datasets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            symbol VARCHAR(20) NOT NULL,
+            date_from VARCHAR(30),
+            date_to VARCHAR(30),
+            bars INTEGER
         );
         """
     )
@@ -607,10 +620,9 @@ def test_sqx_legacy_schema_and_date_formats(tmp_path: Path) -> None:
 
 def test_ensure_defaults_canonical_sqx_groups(test_db: DatabaseManager) -> None:
     """Verify that ensure_defaults seeds exactly the 10 canonical SQX double-bracketed groups."""
-    from app.host.persistence import BasketStore
-
-    store = BasketStore(test_db)
-    store.ensure_defaults()
+    service = BasketService(test_db)
+    service.ensure_defaults()
+    store = test_db.baskets
 
     groups = store.list_groups()
     assert len(groups) == 10
@@ -634,5 +646,155 @@ def test_ensure_defaults_canonical_sqx_groups(test_db: DatabaseManager) -> None:
         assert g["name"].startswith("[[") and g["name"].endswith("]]")
 
     # Idempotent re-run
-    store.ensure_defaults()
+    service.ensure_defaults()
     assert store.count() == 10
+
+
+def test_read_overview_rows_query_count(test_db: DatabaseManager) -> None:
+    """Verify read_overview_rows executes exactly 3 queries under one read transaction."""
+    queries: list[str] = []
+    orig_connection = test_db.connection
+
+    @contextlib.contextmanager
+    def tracked_connection(*args: Any, **kwargs: Any):
+        with orig_connection(*args, **kwargs) as conn:
+            conn.set_trace_callback(queries.append)
+            try:
+                yield conn
+            finally:
+                conn.set_trace_callback(None)
+
+    test_db.connection = tracked_connection  # type: ignore[assignment]
+    try:
+        groups, stocks, datasets = test_db.baskets.read_overview_rows()
+    finally:
+        test_db.connection = orig_connection
+
+    select_queries = [q for q in queries if q.strip().upper().startswith("SELECT")]
+    assert len(select_queries) == 3
+    assert any("datamgr_stock_group" in q for q in select_queries)
+    assert any("datamgr_stock" in q for q in select_queries)
+    assert any("datamgr_datasets" in q for q in select_queries)
+    assert not any("sqlite_master" in q.lower() for q in queries)
+
+
+def test_read_overview_rows_fails_closed_when_datasets_missing(tmp_path: Path) -> None:
+    """Verify read_overview_rows fails closed if datamgr_datasets table is missing."""
+    db_path = tmp_path / "missing_datasets.db"
+    conn = sqlite3.connect(db_path)
+    conn.execute(
+        "CREATE TABLE datamgr_stock_group "
+        "(id INTEGER PRIMARY KEY, name TEXT, system INT, description TEXT)"
+    )
+    conn.execute(
+        "CREATE TABLE datamgr_stock "
+        "(id INTEGER PRIMARY KEY, ticker TEXT, basket_id INTEGER, date_from TEXT, date_to TEXT)"
+    )
+    conn.close()
+
+    db = DatabaseManager(database_path=db_path)
+    with pytest.raises(
+        sqlite3.OperationalError, match="no such table: datamgr_datasets"
+    ):
+        db.baskets.read_overview_rows()
+
+
+def test_expired_member_active_count_is_zero(test_db: DatabaseManager) -> None:
+    """Verify BasketService calculates active_count as 0 for past expired constituents."""
+    # Ensure BasketStore no longer retains duplicate list_groups_overview
+    assert not hasattr(test_db.baskets, "list_groups_overview")
+
+    service = BasketService(test_db)
+    basket = BasketDefinition(
+        name="Expired Historical Group",
+        description="Constituent expired in 2020",
+        system=False,
+        items=[
+            BasketItem(
+                symbol="DEAD",
+                date_from="2000-01-01",
+                date_to="2020-01-01",
+            )
+        ],
+    )
+    service.save_basket(basket)
+
+    overview = service.list_baskets_overview()
+    target = next((o for o in overview if o.name == "Expired Historical Group"), None)
+    assert target is not None
+    assert target.total_count == 1
+    assert target.active_count == 0
+    assert target.symbols_count == 1
+
+
+def test_seed_defaults_rejects_incomplete_group_record(
+    test_db: DatabaseManager,
+) -> None:
+    """Verify seed_defaults fails closed on missing group fields without inventing defaults."""
+    # Missing system
+    with pytest.raises(ValidationError, match="missing required 'system' field"):
+        test_db.baskets.seed_defaults(
+            [{"name": "No System", "description": "desc", "members": []}]
+        )
+
+    # Missing description
+    with pytest.raises(ValidationError, match="missing required 'description' field"):
+        test_db.baskets.seed_defaults([{"name": "No Desc", "system": 1, "members": []}])
+
+    # Missing members
+    with pytest.raises(ValidationError, match="missing required 'members' list"):
+        test_db.baskets.seed_defaults(
+            [{"name": "No Members", "system": 1, "description": "desc"}]
+        )
+
+    # Empty name
+    with pytest.raises(ValidationError, match="must contain a non-empty 'name'"):
+        test_db.baskets.seed_defaults(
+            [{"name": "  ", "system": 1, "description": "desc", "members": []}]
+        )
+
+
+def test_seed_defaults_rejects_incomplete_member_record(
+    test_db: DatabaseManager,
+) -> None:
+    """Verify seed_defaults fails closed on missing constituent member fields without inventing defaults."""
+    # Missing date_from
+    with pytest.raises(ValidationError, match="must have explicit 'date_from'"):
+        test_db.baskets.seed_defaults(
+            [
+                {
+                    "name": "Group",
+                    "system": 1,
+                    "description": "desc",
+                    "members": [{"ticker": "AAPL", "date_to": None}],
+                }
+            ]
+        )
+
+    # Missing date_to
+    with pytest.raises(ValidationError, match="must have explicit 'date_to'"):
+        test_db.baskets.seed_defaults(
+            [
+                {
+                    "name": "Group",
+                    "system": 1,
+                    "description": "desc",
+                    "members": [{"ticker": "AAPL", "date_from": "1900-01-01"}],
+                }
+            ]
+        )
+
+    # Missing/empty ticker
+    with pytest.raises(ValidationError, match="must have a non-empty 'ticker'"):
+        test_db.baskets.seed_defaults(
+            [
+                {
+                    "name": "Group",
+                    "system": 1,
+                    "description": "desc",
+                    "members": [
+                        {"ticker": "", "date_from": "1900-01-01", "date_to": None}
+                    ],
+                }
+            ]
+        )

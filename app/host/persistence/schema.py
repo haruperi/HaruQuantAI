@@ -458,8 +458,6 @@ class SchemaManager:
                 )
 
         self._initialized = True
-        self._db.brokers.ensure_defaults()
-        self._db.baskets.ensure_defaults()
         logger.info(
             "Host database schema initialized",
             extra={

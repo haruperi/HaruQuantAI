@@ -38,11 +38,9 @@ CLI Usage:
 
 from __future__ import annotations
 
-import contextlib
 import json
 import sqlite3
 from collections.abc import Mapping
-from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -296,39 +294,3 @@ class JobStore:
             extra={"count": count, "fr_id": "FR-HOST-PERSISTENCE-JOBS"},
         )
         return count
-
-
-_MS_EPOCH_THRESHOLD = 1e11
-_ISO_DATE_LENGTH = 10
-
-
-def normalize_sqx_date(val: Any) -> str | None:
-    """Normalize SQX dates (epoch ms, epoch s, -1, ISO) to YYYY-MM-DD or None."""
-    if val is None:
-        return None
-    s = str(val).strip()
-    if not s or s in ("-1", "None", "null", "none"):
-        return None
-    try:
-        num = float(s)
-        if num != -1:
-            seconds = num / 1000.0 if abs(num) >= _MS_EPOCH_THRESHOLD else num
-            base = datetime(1970, 1, 1, tzinfo=UTC)
-            return (base + timedelta(seconds=seconds)).strftime("%Y-%m-%d")
-        return None
-    except ValueError:
-        pass
-    except OverflowError:
-        pass
-    if "." in s:
-        with contextlib.suppress(ValueError):
-            return (
-                datetime.strptime(s, "%d.%m.%Y")
-                .replace(tzinfo=UTC)
-                .strftime("%Y-%m-%d")
-            )
-    return (
-        s[:_ISO_DATE_LENGTH]
-        if (len(s) >= _ISO_DATE_LENGTH and s[4] == "-" and s[7] == "-")
-        else s
-    )

@@ -834,6 +834,7 @@ class DataRouterService:
         self.baskets = BasketService(db)
         self.baskets.ensure_defaults()
         self.broker = BrokerService(db)
+        self.broker.ensure_defaults()
         self.home = DataManagerHomeService(db)
         self.log = DataManagerLogService(db)
         self.help = DataManagerHelpService()

@@ -5,7 +5,7 @@ from app.host.persistence.stores.brokers import BrokerStore
 from app.host.persistence.stores.datasets import DatasetStore
 from app.host.persistence.stores.host_sessions import HostSessionStore
 from app.host.persistence.stores.instruments import InstrumentStore
-from app.host.persistence.stores.jobs import JobStore, LeaseStore, normalize_sqx_date
+from app.host.persistence.stores.jobs import JobStore, LeaseStore
 from app.host.persistence.stores.logs import LogStore
 from app.host.persistence.stores.settings import SettingsStore
 from app.host.persistence.stores.trading_sessions import SessionStore
@@ -21,5 +21,4 @@ __all__ = [
     "LogStore",
     "SessionStore",
     "SettingsStore",
-    "normalize_sqx_date",
 ]

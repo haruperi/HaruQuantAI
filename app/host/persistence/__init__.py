@@ -147,7 +147,7 @@ from app.host.persistence.stores.brokers import BrokerStore
 from app.host.persistence.stores.datasets import DatasetStore
 from app.host.persistence.stores.host_sessions import HostSessionStore
 from app.host.persistence.stores.instruments import InstrumentStore
-from app.host.persistence.stores.jobs import JobStore, LeaseStore, normalize_sqx_date
+from app.host.persistence.stores.jobs import JobStore, LeaseStore
 from app.host.persistence.stores.logs import LogStore
 from app.host.persistence.stores.settings import SettingsStore
 from app.host.persistence.stores.trading_sessions import SessionStore
@@ -188,7 +188,6 @@ __all__ = [
     "_migrate_datamgr_tables",
     "canonical_json",
     "get_database_manager",
-    "normalize_sqx_date",
     "now_utc_iso",
     "query_duckdb",
     "validate_identifier",

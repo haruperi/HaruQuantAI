@@ -80,10 +80,10 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
-import re
+import contextlib
 import sys
 import xml.etree.ElementTree as ET
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from xml.dom import minidom
 
@@ -99,34 +99,41 @@ _ISO_DATE_PARTS = 3
 _MIN_CSV_DATE_PARTS = 2
 
 
-def parse_date_to_iso(value: str | None) -> str | None:
-    """Normalize date inputs to ISO-8601 YYYY-MM-DD.
+_MS_EPOCH_THRESHOLD = 1e11
+_ISO_DATE_LENGTH = 10
 
-    Supports DD.MM.YYYY, YYYY-MM-DD, and epoch millisecond timestamps.
-    Returns None if value is empty, None, or represents an unbounded boundary.
-    """
-    if value is None:
-        return None
-    raw = value.strip()
-    if not raw or raw in ("-1", "0", "-"):
-        return None
 
-    iso_result: str | None = None
-    # Epoch milliseconds (e.g. SQX XML format)
-    if re.fullmatch(r"-?\d{10,14}", raw):
-        ms = int(raw)
-        if ms > 0:
-            iso_result = datetime.fromtimestamp(ms / 1000.0, tz=UTC).strftime(
-                "%Y-%m-%d"
+def normalize_sqx_date(val: Any) -> str | None:
+    """Normalize SQX dates (epoch ms, epoch s, -1, ISO) to YYYY-MM-DD or None."""
+    if val is None:
+        return None
+    s = str(val).strip()
+    if not s or s in ("-1", "0", "-", "None", "null", "none"):
+        return None
+    try:
+        num = float(s)
+        if num not in (-1, 0):
+            seconds = num / 1000.0 if abs(num) >= _MS_EPOCH_THRESHOLD else num
+            base = datetime(1970, 1, 1, tzinfo=UTC)
+            return (base + timedelta(seconds=seconds)).strftime("%Y-%m-%d")
+        return None
+    except ValueError, OverflowError:
+        pass
+    if "." in s:
+        with contextlib.suppress(ValueError):
+            return (
+                datetime.strptime(s, "%d.%m.%Y")
+                .replace(tzinfo=UTC)
+                .strftime("%Y-%m-%d")
             )
-    elif match_dmy := re.fullmatch(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", raw):
-        d, m, y = match_dmy.groups()
-        iso_result = f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
-    elif match_ymd := re.fullmatch(r"(\d{4})-(\d{1,2})-(\d{1,2})", raw):
-        y, m, d = match_ymd.groups()
-        iso_result = f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
+    return (
+        s[:_ISO_DATE_LENGTH]
+        if (len(s) >= _ISO_DATE_LENGTH and s[4] == "-" and s[7] == "-")
+        else s
+    )
 
-    return iso_result
+
+parse_date_to_iso = normalize_sqx_date
 
 
 def format_iso_to_sqx_date(value: str | None) -> str:
@@ -378,6 +385,400 @@ def import_groups_xml(xml_content: str) -> list[BasketDefinition]:
     return baskets
 
 
+DEFAULT_BASKETS: list[dict[str, Any]] = [
+    {
+        "name": "[[Dow Jones Industrial Average]]",
+        "system": 1,
+        "description": "Dow Jones Industrial Average index",
+        "stocks": [
+            "AAPL",
+            "AMGN",
+            "AXP",
+            "BA",
+            "CAT",
+            "CRM",
+            "CSCO",
+            "CVX",
+            "DIS",
+            "DOW",
+            "GS",
+            "HD",
+            "HON",
+            "IBM",
+            "INTC",
+            "JNJ",
+            "JPM",
+            "KO",
+            "MCD",
+            "MMM",
+            "MRK",
+            "MSFT",
+            "NKE",
+            "PG",
+            "TRV",
+            "UNH",
+            "V",
+            "VZ",
+            "WBA",
+            "WMT",
+        ],
+    },
+    {
+        "name": "[[Nasdaq 100]]",
+        "system": 1,
+        "description": "Nasdaq 100 index",
+        "stocks": [
+            "AAPL",
+            "ABNB",
+            "ADBE",
+            "ADI",
+            "ADP",
+            "ADSK",
+            "AEP",
+            "AMAT",
+            "AMD",
+            "AMGN",
+            "AMZN",
+            "ANSS",
+            "ASML",
+            "AVGO",
+            "AZN",
+            "BIIB",
+            "BKNG",
+            "BKR",
+            "CDNS",
+            "CEG",
+            "CHTR",
+            "CMCSA",
+            "COST",
+            "CPRT",
+            "CRWD",
+            "CSCO",
+            "CSGP",
+            "CSX",
+            "CTAS",
+            "CTSH",
+            "DDOG",
+            "DLTR",
+            "DXCM",
+            "EA",
+            "EXC",
+            "FANG",
+            "FAST",
+            "FTNT",
+            "GEHC",
+            "GFS",
+            "GILD",
+            "GOOG",
+            "GOOGL",
+            "HON",
+            "IDXX",
+            "ILMN",
+            "INTC",
+            "INTU",
+            "ISRG",
+            "KDP",
+            "KHC",
+            "KLAC",
+            "LRCX",
+            "LULU",
+            "MAR",
+            "MCHP",
+            "MDLZ",
+            "MELI",
+            "META",
+            "MNST",
+            "MRNA",
+            "MRVL",
+            "MSFT",
+            "MU",
+            "NFLX",
+            "NVDA",
+            "NXPI",
+            "ODFL",
+            "ON",
+            "ORLY",
+            "PANW",
+            "PAYX",
+            "PCAR",
+            "PDD",
+            "PEP",
+            "PYPL",
+            "QCOM",
+            "REGN",
+            "ROP",
+            "ROST",
+            "SBUX",
+            "SIRI",
+            "SNPS",
+            "SPLK",
+            "TEAM",
+            "TMUS",
+            "TSLA",
+            "TTD",
+            "TXN",
+            "VRSK",
+            "VRTX",
+            "WBA",
+            "WBD",
+            "WDAY",
+            "XEL",
+            "ZS",
+        ],
+    },
+    {
+        "name": "[[Nasdaq Biotechnology]]",
+        "system": 1,
+        "description": "Nasdaq Biotechnology index",
+        "stocks": [
+            "AMGN",
+            "GILD",
+            "VRTX",
+            "REGN",
+            "BIIB",
+            "MRNA",
+            "ALNY",
+            "ILMN",
+            "SGEN",
+            "BMRN",
+        ],
+    },
+    {
+        "name": "[[Russell 1000]]",
+        "system": 1,
+        "description": "Russell 1000 index",
+        "stocks": [
+            "AAPL",
+            "MSFT",
+            "AMZN",
+            "NVDA",
+            "GOOGL",
+            "META",
+            "GOOG",
+            "BRK.B",
+            "TSLA",
+            "UNH",
+        ],
+    },
+    {
+        "name": "[[Russell 2000]]",
+        "system": 1,
+        "description": "Russell 2000 index",
+        "stocks": [
+            "SMCI",
+            "FTAI",
+            "VRT",
+            "SAIA",
+            "ELF",
+            "FN",
+            "ENSG",
+            "COHR",
+            "MEDP",
+            "ONTO",
+        ],
+    },
+    {
+        "name": "[[Russell 3000]]",
+        "system": 1,
+        "description": "Russell 3000 index",
+        "stocks": [
+            "AAPL",
+            "MSFT",
+            "AMZN",
+            "NVDA",
+            "GOOGL",
+            "META",
+            "TSLA",
+            "UNH",
+            "JNJ",
+            "JPM",
+        ],
+    },
+    {
+        "name": "[[S&P 100 limited]]",
+        "system": 1,
+        "description": "S&P 100 limited index sample for clean installation",
+        "stocks": [
+            "AAPL",
+            "ABBV",
+            "ABT",
+            "ACN",
+            "ADBE",
+            "AIG",
+            "AMD",
+            "AMGN",
+            "AMT",
+            "AMZN",
+            "AVGO",
+            "AXP",
+            "BA",
+            "BAC",
+            "BK",
+            "BKNG",
+            "BLK",
+            "BMY",
+            "BRK.B",
+            "C",
+            "CAT",
+            "CHTR",
+            "CL",
+            "CMCSA",
+            "COF",
+            "COP",
+            "COST",
+            "CRM",
+            "CSCO",
+            "CVS",
+            "CVX",
+            "DE",
+            "DHR",
+            "DIS",
+            "DOW",
+            "DUK",
+            "EMR",
+            "EXC",
+            "F",
+            "FDX",
+            "GD",
+            "GE",
+            "GILD",
+            "GM",
+            "GOOG",
+            "GOOGL",
+            "GS",
+            "HD",
+            "HON",
+            "IBM",
+            "INTC",
+            "INTU",
+            "ISRG",
+            "JNJ",
+            "JPM",
+            "KHC",
+            "KO",
+            "LIN",
+            "LLY",
+            "LMT",
+            "LOW",
+            "MA",
+            "MCD",
+            "MDLZ",
+            "MDT",
+            "MET",
+            "META",
+            "MMM",
+            "MO",
+            "MRK",
+            "MS",
+            "MSFT",
+            "NEE",
+            "NFLX",
+            "NKE",
+            "NVDA",
+            "ORCL",
+            "PEP",
+            "PFE",
+            "PG",
+            "PM",
+            "PYPL",
+            "QCOM",
+            "RTX",
+            "SBUX",
+            "SCHW",
+            "SO",
+            "SPG",
+            "T",
+            "TGT",
+            "TMO",
+            "TMUS",
+            "TSLA",
+            "TXN",
+            "UNH",
+            "UNP",
+            "UPS",
+            "USB",
+            "V",
+            "VZ",
+            "WBA",
+            "WFC",
+            "WMT",
+            "XOM",
+        ],
+    },
+    {
+        "name": "[[S&P 100]]",
+        "system": 1,
+        "description": "S&P 100 index",
+        "stocks": [
+            "AAPL",
+            "ABBV",
+            "ABT",
+            "ACN",
+            "ADBE",
+            "AIG",
+            "AMD",
+            "AMGN",
+            "AMT",
+            "AMZN",
+            "AVGO",
+            "AXP",
+            "BA",
+            "BAC",
+            "BK",
+            "BKNG",
+            "BLK",
+            "BMY",
+            "BRK.B",
+            "C",
+        ],
+    },
+    {
+        "name": "[[S&P 500]]",
+        "system": 1,
+        "description": "S&P 500 index",
+        "stocks": [
+            "AAPL",
+            "MSFT",
+            "AMZN",
+            "NVDA",
+            "GOOGL",
+            "META",
+            "GOOG",
+            "BRK.B",
+            "TSLA",
+            "UNH",
+            "JNJ",
+            "JPM",
+            "V",
+            "PG",
+            "XOM",
+            "MA",
+            "HD",
+            "CVX",
+            "MRK",
+            "ABBV",
+        ],
+    },
+    {
+        "name": "[[S&P MidCap 400]]",
+        "system": 1,
+        "description": "S&P MidCap 400 index",
+        "stocks": [
+            "DECK",
+            "SAIA",
+            "MANH",
+            "RL",
+            "WSO",
+            "FIX",
+            "RPM",
+            "RS",
+            "SFM",
+            "HUBB",
+        ],
+    },
+]
+
+
 class BasketService:
     """Service managing stock groups, baskets, and multi-symbol alignment."""
 
@@ -495,9 +896,78 @@ class BasketService:
             for g in groups
         ]
 
+    @staticmethod
+    def calculate_group_metrics(
+        g_dict: dict[str, Any],
+        stocks: list[Any],
+        available_map: dict[str, dict[str, Any]],
+        today: str,
+    ) -> dict[str, Any]:
+        """Compute constituent metrics, bounds, and readiness for a group."""
+        total_count = len(stocks)
+        active_count = 0
+        distinct_tickers: set[str] = set()
+        downloaded_tickers: set[str] = set()
+        group_dfs: list[str] = []
+        group_dts: list[str] = []
+
+        for s in stocks:
+            s_dict = {k.lower(): v for k, v in dict(s).items()}
+            tkr = str(s_dict.get("ticker") or s_dict.get("TICKER", "")).strip().upper()
+            if not tkr:
+                continue
+            distinct_tickers.add(tkr)
+            df = normalize_sqx_date(s_dict.get("date_from") or s_dict.get("DATE_FROM"))
+            dt = normalize_sqx_date(s_dict.get("date_to") or s_dict.get("DATE_TO"))
+            if (not df or df <= today) and (not dt or dt >= today):
+                active_count += 1
+            if tkr in available_map:
+                downloaded_tickers.add(tkr)
+                ds_info = available_map[tkr]
+                if ds_info["date_from"]:
+                    group_dfs.append(str(ds_info["date_from"]))
+                if ds_info["date_to"]:
+                    group_dts.append(str(ds_info["date_to"]))
+
+        missing = sorted(distinct_tickers - downloaded_tickers)
+        num_symbols = len(distinct_tickers)
+        downloaded_count = len(downloaded_tickers)
+        desc = g_dict.get("description") or g_dict.get("desc") or ""
+
+        return {
+            "id": int(g_dict["id"]),
+            "name": str(g_dict.get("name", "")),
+            "description": str(desc),
+            "system": bool(g_dict.get("system", 0)),
+            "active_count": active_count,
+            "total_count": total_count,
+            "symbols_count": num_symbols,
+            "downloaded_count": downloaded_count,
+            "is_ready": num_symbols > 0 and len(missing) == 0,
+            "missing_symbols": missing,
+            "data_from": min(group_dfs) if group_dfs else "",
+            "data_to": max(group_dts) if group_dts else "",
+        }
+
     def ensure_defaults(self) -> None:
         """Seed default StrategyQuant X stock groups if uninitialized."""
-        self._db.baskets.ensure_defaults()
+        seed_records = [
+            {
+                "name": str(group["name"]),
+                "system": int(group.get("system", 1)),
+                "description": str(group.get("description", "")),
+                "members": [
+                    {
+                        "ticker": str(tkr).strip(),
+                        "date_from": "1900-01-01",
+                        "date_to": None,
+                    }
+                    for tkr in group["stocks"]
+                ],
+            }
+            for group in DEFAULT_BASKETS
+        ]
+        self._db.baskets.seed_defaults(seed_records)
         logger.info(
             "FR-DATA-BASKETS-GROUPS: Verified and seeded default stock groups",
             extra={"fr_id": "FR-DATA-BASKETS-GROUPS"},
@@ -505,25 +975,42 @@ class BasketService:
 
     def list_baskets_overview(self) -> list[BasketOverviewItem]:
         """List enriched overview rows matching the 8-column SQX table grid."""
-        rows = self._db.baskets.list_groups_overview()
+        groups_rows, stocks_rows, ds_rows = self._db.baskets.read_overview_rows()
+        available_map: dict[str, dict[str, Any]] = {
+            str(row["sym"]): {
+                "date_from": row["df"],
+                "date_to": row["dt"],
+                "bars": row["tb"],
+            }
+            for row in ds_rows
+            if row["tb"] is not None and int(row["tb"]) > 0
+        }
+        stocks_by_basket: dict[int, list[Any]] = {}
+        for s in stocks_rows:
+            stocks_by_basket.setdefault(int(s["basket_id"]), []).append(s)
+
+        today = datetime.now(tz=UTC).strftime("%Y-%m-%d")
         overview_items: list[BasketOverviewItem] = []
-        for r in rows:
-            df = r["data_from"]
-            dt = r["data_to"]
+        for g in groups_rows:
+            g_dict = {k.lower(): v for k, v in dict(g).items()}
+            stocks = stocks_by_basket.get(int(g_dict["id"]), [])
+            metrics = self.calculate_group_metrics(g_dict, stocks, available_map, today)
+            df = metrics["data_from"]
+            dt = metrics["data_to"]
             df_sqx = format_iso_to_sqx_date(df) if df else "-"
             dt_sqx = format_iso_to_sqx_date(dt) if dt else "-"
             overview_items.append(
                 BasketOverviewItem(
-                    id=r["id"],
-                    name=r["name"],
-                    description=r["description"],
-                    system=r["system"],
-                    active_count=r["active_count"],
-                    total_count=r["total_count"],
-                    symbols_count=r["symbols_count"],
-                    downloaded_count=r["downloaded_count"],
-                    is_ready=r["is_ready"],
-                    missing_symbols=r["missing_symbols"],
+                    id=metrics["id"],
+                    name=metrics["name"],
+                    description=metrics["description"],
+                    system=metrics["system"],
+                    active_count=metrics["active_count"],
+                    total_count=metrics["total_count"],
+                    symbols_count=metrics["symbols_count"],
+                    downloaded_count=metrics["downloaded_count"],
+                    is_ready=metrics["is_ready"],
+                    missing_symbols=metrics["missing_symbols"],
                     data_from=df,
                     data_to=dt,
                     data_from_sqx=df_sqx,

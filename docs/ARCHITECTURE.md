@@ -108,8 +108,8 @@ The host boot sequence executes sequentially through well-defined stages:
 * **Dynamic Import Isolation:** Loads plugin modules dynamically using `importlib.util.spec_from_file_location` without hard-coded package dependencies.
 * **Instance Registry:** Provides `get_instance(plugin_id)` and `get_instances_for_slot(slot_id)` with lazy instantiation and thread-safe caching.
 
-### 4.3 Persistence & Storage Custody (`app/host/persistence.py`)
-* **SQLite Import Isolation:** Enforces strict isolation: `sqlite3` must NEVER be imported anywhere outside `app/host/persistence.py`. Violations trigger immediate test failures.
+### 4.3 Persistence & Storage Custody (`app/host/persistence/`)
+* **SQLite Import Isolation:** Enforces strict isolation: `sqlite3` must NEVER be imported anywhere outside `app/host/persistence/`. Violations trigger immediate test failures.
 * **WAL Mode & Concurrency:** Configured with `journal_mode=WAL`, `synchronous=NORMAL`, and busy timeout handling for robust concurrent read/write operations.
 * **Transactions & Migrations:** Centralizes schema creation, migrations, and transactional execution. Schema initialization does not seed business data.
 * **CRUD-only Boundary:** Small stores group related row operations. No application module outside persistence.py may execute SQL or borrow connections/cursors. Stores return records/results; atomic revision, lease and group/member predicates stay inside transactions.

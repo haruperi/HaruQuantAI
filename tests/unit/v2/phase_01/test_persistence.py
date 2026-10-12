@@ -1253,9 +1253,11 @@ def test_application_database_boundary() -> None:
 def test_storage_initialization_has_no_domain_seeds(
     db_manager: DatabaseManager,
 ) -> None:
-    """Creating tables must never decide which instruments or sessions exist."""
+    """Creating tables must never decide which instruments, sessions, baskets, or brokers exist."""
     assert db_manager.instruments.count() == 0
     assert db_manager.sessions.count() == 0
+    assert db_manager.baskets.count() == 0
+    assert db_manager.brokers.count() == 0
 
 
 def test_basket_replacement_rolls_back(db_manager: DatabaseManager) -> None:
