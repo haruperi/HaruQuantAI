@@ -164,7 +164,7 @@ def _selectionbase__info(self: _ObjectState, property_id: int | str) -> Any:
         return value
     if isinstance(property_id, str):
         normalized = property_id.strip().lower()
-        data = (
+        data: dict[str, Any] = (
             record_dict(_selectionbase__require(self))
             if self.selected is not None
             else {}
@@ -360,7 +360,7 @@ def _accountinfo_maxlotcheck(
         else:
             high = mid
     steps = int((low + 1e-12) / step)
-    return cast("float", round(min(spec.lots_max, steps * step), 8))
+    return float(round(min(float(spec.lots_max), steps * step), 8))
 
 
 def _dealinfo_order(self: _ObjectState) -> int:
@@ -891,11 +891,11 @@ def _symbolinfo__t(self: _ObjectState) -> Any:
 
 
 def _symbolinfo_refresh(self: _ObjectState) -> bool:
-    return self._backend.symbol(self.symbol_name) is not None
+    return bool(self._backend.symbol(self.symbol_name) is not None)
 
 
 def _symbolinfo_refreshrates(self: _ObjectState) -> bool:
-    return self._backend.tick(self.symbol_name) is not None
+    return bool(self._backend.tick(self.symbol_name) is not None)
 
 
 def _symbolinfo_name(self: _ObjectState, value: str | None = None) -> str | bool:
@@ -1354,6 +1354,38 @@ def _terminalinfo_infostring(self: _ObjectState, property_id: int | str) -> str:
     return str(value or "")
 
 
+def _terminalinfo_communityaccount(self: _ObjectState) -> bool:
+    return bool(_terminalinfo__t(self).community_account)
+
+
+def _terminalinfo_communityconnection(self: _ObjectState) -> bool:
+    return bool(_terminalinfo__t(self).community_connection)
+
+
+def _terminalinfo_tradeapidisabled(self: _ObjectState) -> bool:
+    return bool(_terminalinfo__t(self).tradeapi_disabled)
+
+
+def _terminalinfo_notificationsenabled(self: _ObjectState) -> bool:
+    return bool(_terminalinfo__t(self).notifications_enabled)
+
+
+def _terminalinfo_mqid(self: _ObjectState) -> bool:
+    return bool(_terminalinfo__t(self).mqid)
+
+
+def _terminalinfo_pinglast(self: _ObjectState) -> int:
+    return int(_terminalinfo__t(self).ping_last)
+
+
+def _terminalinfo_communitybalance(self: _ObjectState) -> float:
+    return float(_terminalinfo__t(self).community_balance)
+
+
+def _terminalinfo_retransmission(self: _ObjectState) -> float:
+    return float(_terminalinfo__t(self).retransmission)
+
+
 def _trade___init__(self: _ObjectState, backend: BrokerBackend) -> None:
     self._backend = backend
     self._log_level = 0
@@ -1398,15 +1430,15 @@ def _trade__position(self: _ObjectState, symbol_or_ticket: str | int) -> Any:
 
 
 def _trade_loglevel(self: _ObjectState, log_level: int) -> None:
-    self._log_level = int(log_level)
+    self._log_level = log_level
 
 
 def _trade_setexpertmagicnumber(self: _ObjectState, magic: int) -> None:
-    self._magic = int(magic)
+    self._magic = magic
 
 
 def _trade_setdeviationinpoints(self: _ObjectState, deviation: int) -> None:
-    self._deviation = int(deviation)
+    self._deviation = deviation
 
 
 def _trade_settypefilling(self: _ObjectState, filling: OrderFilling | int) -> None:
@@ -1428,7 +1460,7 @@ def _trade_settypefillingbysymbol(self: _ObjectState, symbol: str) -> bool:
 
 
 def _trade_setasyncmode(self: _ObjectState, mode: bool) -> None:
-    self._async = bool(mode)
+    self._async = mode
 
 
 def _trade_setmarginmode(self: _ObjectState) -> None:
@@ -1589,7 +1621,7 @@ def _trade_positionclose(
             volume=position.volume,
             order_type=opposite,
             price=price,
-            deviation=self._deviation if deviation is None else int(deviation),
+            deviation=self._deviation if deviation is None else deviation,
             magic=self._magic,
             type_filling=self._filling,
             comment="position close",
@@ -1626,7 +1658,7 @@ def _trade_positionclosepartial(
             volume=volume,
             order_type=opposite,
             price=price,
-            deviation=self._deviation if deviation is None else int(deviation),
+            deviation=self._deviation if deviation is None else deviation,
             magic=self._magic,
             type_filling=self._filling,
             comment="partial close",
@@ -2255,6 +2287,14 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "CommonDataPath": _terminalinfo_commondatapath,
         "InfoInteger": _terminalinfo_infointeger,
         "InfoString": _terminalinfo_infostring,
+        "CommunityAccount": _terminalinfo_communityaccount,
+        "CommunityConnection": _terminalinfo_communityconnection,
+        "TradeAPIDisabled": _terminalinfo_tradeapidisabled,
+        "NotificationsEnabled": _terminalinfo_notificationsenabled,
+        "MQID": _terminalinfo_mqid,
+        "PingLast": _terminalinfo_pinglast,
+        "CommunityBalance": _terminalinfo_communitybalance,
+        "Retransmission": _terminalinfo_retransmission,
     },
     "Trade": {
         "LogLevel": _trade_loglevel,

@@ -565,6 +565,14 @@ class TerminalSnapshot:
     path: str = ""
     data_path: str = ""
     common_data_path: str = ""
+    community_account: bool = False
+    community_connection: bool = False
+    tradeapi_disabled: bool = False
+    notifications_enabled: bool = False
+    mqid: bool = False
+    ping_last: int = 0
+    community_balance: float = 0.0
+    retransmission: float = 0.0
 
 
 @dataclass(slots=True)

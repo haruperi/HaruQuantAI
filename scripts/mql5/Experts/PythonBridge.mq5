@@ -518,6 +518,11 @@ long ParseEnumCode(string &args[],int index)
    if(s=="TERMINAL_PATH") return TERMINAL_PATH;
    if(s=="TERMINAL_DATA_PATH") return TERMINAL_DATA_PATH;
    if(s=="TERMINAL_COMMONDATA_PATH") return TERMINAL_COMMONDATA_PATH;
+   if(s=="TERMINAL_COMMUNITY_ACCOUNT") return TERMINAL_COMMUNITY_ACCOUNT;
+   if(s=="TERMINAL_COMMUNITY_CONNECTION") return TERMINAL_COMMUNITY_CONNECTION;
+   if(s=="TERMINAL_NOTIFICATIONS_ENABLED") return TERMINAL_NOTIFICATIONS_ENABLED;
+   if(s=="TERMINAL_MQID") return TERMINAL_MQID;
+   if(s=="TERMINAL_PING_LAST") return TERMINAL_PING_LAST;
 
    return StringToInteger(s);
   }
@@ -1178,6 +1183,14 @@ void DispatchTerminal(const string command_id,const string object_id,const strin
    if(method=="CommonDataPath") { RespondString(command_id, true, obj.CommonDataPath()); return; }
    if(method=="InfoInteger") { RespondLong(command_id,true,obj.InfoInteger((ENUM_TERMINAL_INFO_INTEGER)ParseEnumCode(args,0))); return; }
    if(method=="InfoString") { RespondString(command_id,true,obj.InfoString((ENUM_TERMINAL_INFO_STRING)ParseEnumCode(args,0))); return; }
+   if(method=="CommunityAccount") { RespondBool(command_id, true, (bool)TerminalInfoInteger(TERMINAL_COMMUNITY_ACCOUNT)); return; }
+   if(method=="CommunityConnection") { RespondBool(command_id, true, (bool)TerminalInfoInteger(TERMINAL_COMMUNITY_CONNECTION)); return; }
+   if(method=="TradeAPIDisabled") { RespondBool(command_id, true, false); return; }
+   if(method=="NotificationsEnabled") { RespondBool(command_id, true, (bool)TerminalInfoInteger(TERMINAL_NOTIFICATIONS_ENABLED)); return; }
+   if(method=="MQID") { RespondBool(command_id, true, (bool)TerminalInfoInteger(TERMINAL_MQID)); return; }
+   if(method=="PingLast") { RespondLong(command_id, true, (long)TerminalInfoInteger(TERMINAL_PING_LAST)); return; }
+   if(method=="CommunityBalance") { RespondDouble(command_id, true, TerminalInfoDouble(TERMINAL_COMMUNITY_BALANCE)); return; }
+   if(method=="Retransmission") { RespondDouble(command_id, true, TerminalInfoDouble(TERMINAL_RETRANSMISSION)); return; }
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown CTerminalInfo method: "+method);
   }
 

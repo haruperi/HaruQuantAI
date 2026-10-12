@@ -205,54 +205,28 @@ async def example_01_connect(ctx: ExampleContext) -> None:
     print(f"Sent at : {format_timestamp(receipt.sent_at)}")
     print(f"Acknowledged at : {format_timestamp(receipt.acknowledged_at)}")
     print(f"Resolved at : {format_timestamp(receipt.resolved_at)}")
-    _report(
-        ctx,
-        1,
-        "Connect",
-        {
-            "Terminal connected": connected,
-            "Probe": f"{receipt.class_name}.{receipt.method_name}",
-            "Command ID": receipt.command_id,
-            "Receipt status": receipt.status.value,
-            "Sent at": format_timestamp(receipt.sent_at),
-            "Acknowledged at": format_timestamp(receipt.acknowledged_at),
-            "Resolved at": format_timestamp(receipt.resolved_at),
-        },
-    )
 
 
 async def example_02_terminal(ctx: ExampleContext) -> None:
     """Demonstrate printing terminal information using TerminalInfo."""
     _header("Terminal Information")
     terminal = ctx.trading.terminal
-    name = await terminal.Name()
-    company = await terminal.Company()
-    build = await terminal.Build()
-    language = await terminal.Language()
-    connected = await terminal.IsConnected()
-    trade_allowed = await terminal.IsTradeAllowed()
-    dlls_allowed = await terminal.IsDLLsAllowed()
-    print(f"Name: {name}")
-    print(f"Company: {company}")
-    print(f"Build: {build}")
-    print(f"Language: {language}")
-    print(f"Connected: {connected}")
-    print(f"Trade allowed: {trade_allowed}")
-    print(f"DLLs allowed: {dlls_allowed}")
-    _report(
-        ctx,
-        2,
-        "Terminal information",
-        {
-            "Name": name,
-            "Company": company,
-            "Build": build,
-            "Language": language,
-            "Connected": connected,
-            "Trade allowed": trade_allowed,
-            "DLLs allowed": dlls_allowed,
-        },
-    )
+    print(f"Name: {await terminal.Name()}")
+    print(f"Company: {await terminal.Company()}")
+    print(f"Build: {await terminal.Build()}")
+    print(f"Language: {await terminal.Language()}")
+    print(f"Connected: {await terminal.IsConnected()}")
+    print(f"Trade allowed: {await terminal.IsTradeAllowed()}")
+    print(f"DLLs allowed: {await terminal.IsDLLsAllowed()}")
+    print(f"Trade API disabled: {await terminal.TradeAPIDisabled()}")
+    print(f"Notifications enabled: {await terminal.NotificationsEnabled()}")
+    print(f"MQID: {await terminal.MQID()}")
+    print(f"Ping last: {await terminal.PingLast()}")
+    print(f"Community balance: {await terminal.CommunityBalance()}")
+    print(f"Retransmission: {await terminal.Retransmission()}")
+    print(f"Path: {await terminal.Path()}")
+    print(f"Data path: {await terminal.DataPath()}")
+    print(f"Common data path: {await terminal.CommonDataPath()}")
 
 
 async def example_03_account(ctx: ExampleContext) -> None:

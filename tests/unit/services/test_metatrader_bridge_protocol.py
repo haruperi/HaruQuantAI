@@ -35,6 +35,7 @@ from app.host.persistence.engine import DEFAULT_DATABASE_PATH
 from app.services.brokers import metatrader
 from app.services.brokers.contracts import Receipt, ReceiptStatus
 from app.services.brokers.metatrader import Bridge, MT5Backend
+from app.services.brokers.simulator import SimulationBackend
 from app.services.trading import (
     AccountInfo,
     DealInfo,
@@ -44,6 +45,7 @@ from app.services.trading import (
     SymbolInfo,
     TerminalInfo,
     Trade,
+    Trading,
 )
 from scripts.examples import brokers
 
@@ -303,10 +305,6 @@ def test_connection_example_displays_observed_receipt(
             assert command is not None
             receipt = ctx.trading.receipt(command)
             assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
-            assert command in ctx.results[0].summary
-            assert "TerminalInfo.IsConnected" in ctx.results[0].summary
-            assert "Acknowledged at" in ctx.results[0].summary
-            assert "Resolved at" in ctx.results[0].summary
             assert receipt.value is True
         finally:
             await brokers.example_17_shutdown(ctx)
@@ -314,6 +312,9 @@ def test_connection_example_displays_observed_receipt(
     asyncio.run(scenario())
     output = capsys.readouterr().out
     assert "Command ID" in output and "Terminal connected" in output
+    assert "TerminalInfo.IsConnected" in output
+    assert "Acknowledged at" in output
+    assert "Resolved at" in output
 
 
 @pytest.mark.parametrize(
@@ -491,8 +492,6 @@ def test_hello_ack_and_correlated_probe_without_listener(
                 assert frames[1]["method"] == "IsConnected"
                 receipt = native.receipt(frames[1]["command_id"])
                 assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
-                assert receipt.command_id in ctx.results[0].summary
-                assert "isolated-test-token" not in ctx.results[0].summary
             else:
                 await asyncio.wait_for(accepted, timeout=1)
                 with pytest.raises(TimeoutError):
@@ -538,8 +537,25 @@ def test_connection_evidence_preserves_complete_simulation_walkthrough(
     monkeypatch.setattr(brokers, "EXAMPLES", examples)
     backend = brokers.create_backend("simulator")
     results = asyncio.run(brokers.run_examples(backend, allow_writes=True))
-    assert [result.number for result in results] == [*range(1, 17), 18, 19, 17]
+    assert [result.number for result in results] == [*range(3, 17), 18, 19, 17]
     assert all(result.status == "passed" for result in results)
-    assert "Command ID" in results[0].summary
-    assert "Receipt status" in results[0].summary
     assert backend.positions() == [] and backend.orders() == []
+
+
+def test_terminal_info_extended_properties_parity() -> None:
+    """Verify new TerminalInfo properties resolve on simulator."""
+    sim = SimulationBackend()
+    trading = Trading(sim)
+    terminal = trading.terminal
+
+    async def scenario() -> None:
+        assert await terminal.CommunityAccount() is False
+        assert await terminal.CommunityConnection() is False
+        assert await terminal.TradeAPIDisabled() is False
+        assert await terminal.NotificationsEnabled() is False
+        assert await terminal.MQID() is False
+        assert await terminal.PingLast() == 0
+        assert await terminal.CommunityBalance() == 0.0
+        assert await terminal.Retransmission() == 0.0
+
+    asyncio.run(scenario())

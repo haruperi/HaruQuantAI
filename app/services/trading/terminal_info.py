@@ -131,3 +131,35 @@ class TerminalInfo(TradingClass):
     async def InfoString(self, *args: Any) -> Any:
         """Await the backend TerminalInfo.InfoString operation."""
         return await self._call("InfoString", *args)
+
+    async def CommunityAccount(self, *args: Any) -> Any:
+        """Await the backend TerminalInfo.CommunityAccount operation."""
+        return await self._call("CommunityAccount", *args)
+
+    async def CommunityConnection(self, *args: Any) -> Any:
+        """Await the backend TerminalInfo.CommunityConnection operation."""
+        return await self._call("CommunityConnection", *args)
+
+    async def TradeAPIDisabled(self, *args: Any) -> Any:
+        """Await the backend TerminalInfo.TradeAPIDisabled operation."""
+        return await self._call("TradeAPIDisabled", *args)
+
+    async def NotificationsEnabled(self, *args: Any) -> Any:
+        """Await the backend TerminalInfo.NotificationsEnabled operation."""
+        return await self._call("NotificationsEnabled", *args)
+
+    async def MQID(self, *args: Any) -> Any:
+        """Await the backend TerminalInfo.MQID operation."""
+        return await self._call("MQID", *args)
+
+    async def PingLast(self, *args: Any) -> Any:
+        """Await the backend TerminalInfo.PingLast operation."""
+        return await self._call("PingLast", *args)
+
+    async def CommunityBalance(self, *args: Any) -> Any:
+        """Await the backend TerminalInfo.CommunityBalance operation."""
+        return await self._call("CommunityBalance", *args)
+
+    async def Retransmission(self, *args: Any) -> Any:
+        """Await the backend TerminalInfo.Retransmission operation."""
+        return await self._call("Retransmission", *args)
