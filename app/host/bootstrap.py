@@ -99,6 +99,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 
+from app.api.settings import create_settings_router
 from app.host.diagnostics import (
     create_database_diagnostics_router,
     create_diagnostics_router,
@@ -139,10 +140,7 @@ from app.host.session import (
     SessionTokenManager,
     create_sessions_router,
 )
-from app.host.settings import (
-    HostSettings,
-    create_settings_router,
-)
+from app.host.settings import HostSettings
 from app.host.settings import settings as default_host_settings
 from app.host.transport import (
     TransportMiddleware,

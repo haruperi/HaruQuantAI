@@ -1455,11 +1455,13 @@ def test_settings_access_and_update_boundary() -> None:
 
 
 def test_capability_adapter_ownership() -> None:
-    """HTTP access stays with its business owner; diagnostics only observes."""
+    """HTTP access belongs in dedicated API layer; host settings is pure business logic."""
+    from app.api import settings as api_settings
     from app.host import bootstrap, diagnostics, jobs
     from app.host import settings as settings_module
 
-    assert settings_module.create_settings_router.__module__ == "app.host.settings"
+    assert not hasattr(settings_module, "create_settings_router")
+    assert api_settings.create_settings_router.__module__ == "app.api.settings"
     assert jobs.create_leases_router.__module__ == "app.host.jobs"
     assert bootstrap.create_recovery_router.__module__ == "app.host.bootstrap"
     assert bootstrap.create_persistence_router.__module__ == "app.host.bootstrap"

@@ -7,30 +7,24 @@ Description:
     lazy; reads use a local cache, updates refresh it, and reload() observes other
     writers. Constructor overrides affect the in-memory view only; snapshots
     describe persisted values. Database handles, SQL, schemas and storage checks
-    belong to persistence. Settings HTTP access belongs here because it serves
-    the same retrieval/update capability; filesystem inspection belongs to
-    diagnostics. HTTP snapshots allowlist fields and redact nested secrets;
-    session supplies the access dependency and owns authentication/provisioning.
-    Successful HTTP writes notify connected readers through an injected revision
-    callback. Notification failure is logged without rejecting a committed save.
-    Configuration preferences include data_frame_guard (warn/stop/off) and
-    cleanup_interval_mins (0 means never). These are validated storage contracts;
-    engine execution and Java runtime effects belong to their capability owners.
-    The catalogue maps nested application records to legacy dotted scopes and
-    stores explicit saves only in existing application group JSON. Consolidation
-    is an explicit backed-up operation, never a startup migration. Secret replacement
-    is write-only; account password policy/routes stay in session.
-    Do not add another store wrapper or filesystem probes here.
+    belong to persistence. HTTP REST projections belong in app.api.settings; this
+    module provides pure business logic and persistence coordination. Filesystem
+    inspection belongs to diagnostics. Session supplies the access dependency and
+    owns authentication/provisioning. Configuration preferences include
+    data_frame_guard (warn/stop/off) and cleanup_interval_mins (0 means never).
+    These are validated storage contracts; engine execution and Java runtime
+    effects belong to their capability owners. The catalogue maps nested
+    application records to legacy dotted scopes and stores explicit saves only in
+    existing application group JSON. Consolidation is an explicit backed-up
+    operation, never a startup migration. Secret replacement is write-only;
+    account password policy/routes stay in session. Do not add another store
+    wrapper or filesystem probes here.
 
 Purpose:
     FEAT-HOST-SETTINGS: Retrieve configuration and validate/update it through the
     single database authority, with convenient scoped access.
 
 Key Capabilities:
-    - FR-HOST-SETTINGS-PROJECTION: Expose settings reads and updates over HTTP.
-      Associated: `create_settings_router()`
-      Logging: DEBUG reads; INFO updates; ERROR failed post-commit notification;
-        delegated validation logs failures.
     - FR-HOST-SETTINGS-LOAD: Load settings and rebuild the local access cache.
       Associated: `HostSettings.reload()`, `_cache_snapshot()`
       Logging: INFO counts/revision; WARNING unavailable initialization; ERROR
@@ -61,7 +55,7 @@ Python API Usage:
     ```
 
 CLI Usage:
-    Settings HTTP inspection is composed by bootstrap; this module has no CLI:
+    Settings management is accessed through Python APIs and app.api REST routes:
     ```bash
     uv run python -m app.main
     ```
@@ -69,14 +63,11 @@ CLI Usage:
 
 from __future__ import annotations
 
-import json
 import math
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, override
 
-from fastapi import APIRouter, Depends, Request, status
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.host.logging import get_logger
@@ -84,7 +75,6 @@ from app.host.persistence import (
     CorruptDataError,
     IncompatibleSchemaError,
     PersistenceError,
-    RevisionConflictError,
     SettingRecord,
     ValidationError,
 )
@@ -93,7 +83,6 @@ from app.host.persistence import SettingsStore as _SettingsStore
 __all__ = [
     "HostSettings",
     "HostSettingsSnapshot",
-    "create_settings_router",
     "settings",
     "validate_configuration_values",
 ]
@@ -820,29 +809,6 @@ class HostSettings(_SettingsNode):
 settings = HostSettings()
 
 
-def _extract_put_payload(body: Any) -> tuple[int, dict[str, dict[str, Any]]]:
-    """Validate and extract expected revision and changes from PUT body."""
-    if not isinstance(body, dict):
-        raise ValidationError("Request body must be a JSON object")
-    expected_rev = body.get("expected_revision")
-    if not isinstance(expected_rev, int) or expected_rev < 0:
-        raise ValidationError("expected_revision must be a non-negative integer")
-    changes = body.get("changes")
-    if not isinstance(changes, dict):
-        raise ValidationError("changes must be a dictionary of scoped settings")
-    for scope, fields in changes.items():
-        if scope == "user_access" or scope not in SETTINGS_GROUPS:
-            raise ValidationError("Unsupported or protected settings scope.")
-        if not isinstance(fields, dict):
-            raise ValidationError("Setting changes must be objects.")
-        group = SETTINGS_GROUPS[scope]
-        for field, value in fields.items():
-            _validate_catalogue_field(group, field, value, secrets=False)
-    if isinstance(expected_rev, bool):
-        raise ValidationError("expected_revision must be an integer")
-    return expected_rev, changes
-
-
 SETTINGS_FIELDS: dict[str, dict[str, str]] = {
     "app_general": {
         "theme": "str",
@@ -1528,225 +1494,6 @@ def settings_catalogue(snapshot: HostSettingsSnapshot) -> dict[str, Any]:
     )
     unknown = _unknown_settings_metadata(snapshot.values)
     logger.debug(
-        "Settings catalogue projected", extra={"fr_id": "FR-HOST-SETTINGS-PROJECTION"}
+        "Settings catalogue projected", extra={"fr_id": "FR-HOST-SETTINGS-LOAD"}
     )
     return {"revision": snapshot.revision, "fields": fields, "unknown": unknown}
-
-
-def _public_settings_snapshot(snapshot: HostSettingsSnapshot) -> dict[str, Any]:
-    """Exclude account credentials from browser-facing settings projections."""
-    values = effective_settings_values(snapshot.values)
-    public: dict[str, dict[str, Any]] = {}
-    for scope, group in SETTINGS_GROUPS.items():
-        row = values.get(scope, {})
-        safe: dict[str, Any] = {}
-        for field in SETTINGS_FIELDS.get(group, {}):
-            if not _is_secret(field) and group != "user_access":
-                value = _field_value(row, field, _MISSING)
-                if value is not _MISSING:
-                    _set_field(safe, field, value)
-        public[scope] = safe
-    return {"revision": snapshot.revision, "values": public}
-
-
-def _extract_secret_payload(body: Any) -> tuple[int, dict[str, dict[str, Any]]]:
-    """Validate an atomic mixed preference/secret update without echoing values."""
-    if not isinstance(body, dict) or type(body.get("expected_revision")) is not int:
-        raise ValidationError("Expected revision is required.")
-    changes = body.get("changes")
-    if not isinstance(changes, dict):
-        raise ValidationError("Secret changes must be scoped objects.")
-    for scope, fields in changes.items():
-        group = SETTINGS_GROUPS.get(scope)
-        if group is None or not isinstance(fields, dict):
-            raise ValidationError("Unsupported secret scope.")
-        for field, value in fields.items():
-            _validate_catalogue_field(group, field, value, secrets=_is_secret(field))
-    return body["expected_revision"], changes
-
-
-def _create_catalogue_router(
-    target_settings: HostSettings, on_updated: Callable[[int], None] | None
-) -> APIRouter:
-    """Compose settings catalogue and write-only secret projection routes."""
-    router = APIRouter()
-
-    @router.get("/settings/catalogue")
-    async def get_catalogue_endpoint() -> JSONResponse:
-        """Read known fields without returning secret values or unknown payloads."""
-        return JSONResponse(
-            content={
-                "status": "success",
-                "data": settings_catalogue(target_settings.get_snapshot()),
-            }
-        )
-
-    @router.put("/settings/secrets")
-    async def replace_secrets_endpoint(request: Request) -> JSONResponse:
-        """Replace/explicitly clear secret leaves without returning stored material."""
-        try:
-            body = await request.json()
-            expected_revision, changes = _extract_secret_payload(body)
-            snapshot = target_settings.update(
-                changes, expected_revision=expected_revision
-            )
-            if on_updated is not None and any(changes.values()):
-                try:
-                    on_updated(snapshot.revision)
-                except Exception:  # noqa: BLE001 - A hint failure cannot undo a committed save.
-                    logger.error(  # noqa: TRY400 - Never log secret-bearing callback errors.
-                        "Settings notification failed",
-                        extra={"fr_id": "FR-HOST-SETTINGS-PROJECTION"},
-                    )
-            return JSONResponse(
-                content={"status": "success", "data": settings_catalogue(snapshot)}
-            )
-        except RevisionConflictError:
-            return JSONResponse(
-                status_code=409,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "SETTINGS_CONFLICT",
-                        "message": "Settings changed. Reopen and retry.",
-                    },
-                },
-            )
-        except ValueError, TypeError, ValidationError:
-            logger.warning(
-                "Secret settings update rejected",
-                extra={"fr_id": "FR-HOST-SETTINGS-VALIDATION"},
-            )
-            return JSONResponse(
-                status_code=422,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "INVALID_SETTINGS",
-                        "message": "Invalid secret settings request.",
-                    },
-                },
-            )
-        except PersistenceError:
-            return JSONResponse(
-                status_code=503,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "UNAVAILABLE",
-                        "message": "Settings store unavailable.",
-                    },
-                },
-            )
-
-    return router
-
-
-def create_settings_router(
-    settings_instance: HostSettings | None = None,
-    *,
-    require_session: Callable[[Request], None] | None = None,
-    on_updated: Callable[[int], None] | None = None,
-) -> APIRouter:
-    """Create FastAPI APIRouter exposing host settings REST projections.
-
-    Args:
-        settings_instance: HostSettings instance to expose. Defaults to
-            global singleton.
-        require_session: Optional session access dependency supplied by bootstrap.
-        on_updated: Optional committed-revision notification supplied by bootstrap.
-
-    Returns:
-        Configured FastAPI APIRouter.
-    """
-    router = APIRouter(
-        dependencies=[Depends(require_session)] if require_session is not None else []
-    )
-    target_settings = settings_instance if settings_instance is not None else settings
-
-    router.include_router(_create_catalogue_router(target_settings, on_updated))
-
-    @router.get("/settings")
-    async def get_settings_endpoint() -> JSONResponse:
-        """Retrieve current shell settings and preferences snapshot."""
-        logger.debug(
-            "FR-HOST-SETTINGS-PROJECTION: Handling GET /settings query.",
-            extra={"fr_id": "FR-HOST-SETTINGS-PROJECTION"},
-        )
-        snapshot = target_settings.get_snapshot()
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={"status": "success", "data": _public_settings_snapshot(snapshot)},
-        )
-
-    @router.put("/settings")
-    async def put_settings_endpoint(request: Request) -> JSONResponse:
-        """Atomically update host settings with revision check."""
-        try:
-            body = await request.json()
-        except ValueError, TypeError, json.JSONDecodeError:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "INVALID_JSON",
-                        "message": "Malformed JSON payload in request body",
-                    },
-                },
-            )
-
-        try:
-            expected_rev, changes = _extract_put_payload(body)
-            snapshot = target_settings.update(changes, expected_revision=expected_rev)
-            if on_updated is not None and any(changes.values()):
-                try:
-                    on_updated(snapshot.revision)
-                except Exception:  # noqa: BLE001 - A refresh hint must not undo a save.
-                    logger.error(  # noqa: TRY400 - Never log callback exception secrets.
-                        "Settings committed but revision notification failed",
-                        extra={
-                            "fr_id": "FR-HOST-SETTINGS-PROJECTION",
-                            "revision": snapshot.revision,
-                        },
-                    )
-            logger.info(
-                "FR-HOST-SETTINGS-PROJECTION: Updated settings to revision %d.",
-                snapshot.revision,
-                extra={
-                    "fr_id": "FR-HOST-SETTINGS-PROJECTION",
-                    "revision": snapshot.revision,
-                },
-            )
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content={
-                    "status": "success",
-                    "data": _public_settings_snapshot(snapshot),
-                },
-            )
-        except RevisionConflictError as exc:
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "REVISION_CONFLICT",
-                        "message": str(exc),
-                        "current_revision": target_settings.revision,
-                    },
-                },
-            )
-        except ValidationError as exc:
-            return JSONResponse(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                content={
-                    "status": "error",
-                    "error": {
-                        "code": "VALIDATION_ERROR",
-                        "message": str(exc),
-                    },
-                },
-            )
-
-    return router

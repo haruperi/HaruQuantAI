@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.api.settings import create_settings_router
 from app.host.bootstrap import HostRuntime
 from app.host.persistence import (
     MAX_BATCH_SIZE,
@@ -32,7 +33,6 @@ from app.host.settings import (
     HostSettings,
     _field_value,
     consolidate_settings,
-    create_settings_router,
     effective_settings_values,
     settings_catalogue,
     validate_configuration_values,
