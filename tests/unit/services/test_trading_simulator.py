@@ -45,7 +45,7 @@ def test_market_positions_history_and_clock(mode: MarginMode) -> None:
         now = datetime(2026, 1, 1, tzinfo=UTC)
         backend.feed_tick("EURUSD", bid=1.1, ask=1.1002, time=now)
         async with Trading(backend) as trading:
-            assert await trading.account.Balance() == 10_000
+            assert (await trading.account.AccountInfo()).balance == 10_000
             assert await trading.symbol.Name("EURUSD") is True
             assert await trading.symbol.Name() == "EURUSD"
             assert await trading.symbol.Bid() == 1.1
@@ -146,7 +146,7 @@ def test_rejection_and_unknown_operation() -> None:
                 object_id="test", class_name="Trade", method_name="Unknown", args=[]
             )
         with pytest.raises(BridgeError, match="numeric property"):
-            await trading.account.InfoInteger(999)
+            await trading.terminal.InfoInteger(999)
         with pytest.raises(BridgeError, match="queued asynchronous"):
             await trading.trade.SetAsyncMode(True)
         assert backend.positions() == []
@@ -178,7 +178,7 @@ def test_stops_close_by_and_local_events() -> None:
         )
         assert backend.positions() == []
         with pytest.raises(BridgeError, match="unsupported"):
-            await trading.account.InfoDouble("does_not_exist")
+            await trading.symbol.InfoDouble("does_not_exist")
         await trading.close()
 
     asyncio.run(scenario())

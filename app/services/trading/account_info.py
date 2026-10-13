@@ -1,32 +1,46 @@
 # ruff: noqa: N802 -- public names preserve the eight-class compatibility API.
-"""Shared AccountInfo proxy for native broker operations.
+"""Shared AccountInfo proxy for native and simulated broker operations.
 
 Description:
-    Forwards the current MQL5 AccountInfo method surface through TradingClass.
-    Stateful selection and request/result objects retain per-proxy serialization.
-    Placement is shared; current method semantics remain those of native MT5.
+    Forwards asynchronous account snapshot queries and trade margin/profit
+    pre-calculations through TradingClass. Account property reads are consolidated
+    into a single atomic AccountInfo() call returning a strongly typed
+    AccountSnapshot dataclass to eliminate IPC latency and temporal skew.
 
 Purpose:
     FEAT-BROKER-PROXIES: Expose explicit asynchronous broker class operations
     without duplicating transport or persistence ownership.
 
 Key Capabilities:
-    - FR-BROKER-PROXIES-ACCOUNTINFO-FORWARDING: Forward native methods.
-      Associated: `AccountInfo`, `TradingClass._call()`
-      Logging: Transport emits DEBUG encoding-attempt metadata for remote calls;
-        no payload logging or proxy logging configuration is introduced here.
+    - FR-BROKER-PROXIES-ACCOUNTINFO-SNAPSHOT: Query full account snapshot.
+      Associated: `AccountInfo.AccountInfo()`, `AccountInfo.__call__()`
+      Logging: DEBUG transport invocation metadata emitted via TradingClass;
+        no secret or payload logging occurs here.
+    - FR-BROKER-PROXIES-ACCOUNTINFO-CHECKS: Execute pre-trade margin and profit checks.
+      Associated: `AccountInfo.OrderProfitCheck()`, `AccountInfo.MarginCheck()`,
+        `AccountInfo.FreeMarginCheck()`, `AccountInfo.MaxLotCheck()`
+      Logging: DEBUG invocation metadata emitted via TradingClass._call().
 
 Python API Usage:
-    Access this proxy through a configured MetaTrader facade or bind it to the
-    async backend capability. Remote calls are asynchronous.
+    ```python
+    from app.services.trading import Trading
+
+    async with Trading(backend) as trading:
+        info = await trading.account.AccountInfo()
+        print(f"Balance: {info.balance}, Equity: {info.equity}")
+    ```
 
 CLI Usage:
+    ```bash
     uv run pytest tests/unit/services/test_metatrader_bridge_protocol.py --no-cov
+    ```
 """
 
 from __future__ import annotations
 
 from typing import Any
+
+from app.services.brokers.contracts import AccountSnapshot
 
 from .base import TradingClass
 
@@ -36,113 +50,18 @@ class AccountInfo(TradingClass):
 
     CLASS_NAME = "AccountInfo"
 
-    async def Login(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Login operation."""
-        return await self._call("Login", *args)
+    async def AccountInfo(self, *args: Any) -> AccountSnapshot:
+        """Await the backend AccountInfo snapshot."""
+        data = await self._call("AccountInfo", *args)
+        if isinstance(data, AccountSnapshot):
+            return data
+        if isinstance(data, dict):
+            return AccountSnapshot(**data)
+        raise TypeError(f"unexpected account snapshot type: {type(data).__name__}")
 
-    async def TradeMode(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.TradeMode operation."""
-        return await self._call("TradeMode", *args)
-
-    async def TradeModeDescription(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.TradeModeDescription operation."""
-        return await self._call("TradeModeDescription", *args)
-
-    async def Leverage(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Leverage operation."""
-        return await self._call("Leverage", *args)
-
-    async def StopoutMode(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.StopoutMode operation."""
-        return await self._call("StopoutMode", *args)
-
-    async def StopoutModeDescription(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.StopoutModeDescription operation."""
-        return await self._call("StopoutModeDescription", *args)
-
-    async def MarginMode(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.MarginMode operation."""
-        return await self._call("MarginMode", *args)
-
-    async def MarginModeDescription(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.MarginModeDescription operation."""
-        return await self._call("MarginModeDescription", *args)
-
-    async def TradeAllowed(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.TradeAllowed operation."""
-        return await self._call("TradeAllowed", *args)
-
-    async def TradeExpert(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.TradeExpert operation."""
-        return await self._call("TradeExpert", *args)
-
-    async def LimitOrders(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.LimitOrders operation."""
-        return await self._call("LimitOrders", *args)
-
-    async def Balance(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Balance operation."""
-        return await self._call("Balance", *args)
-
-    async def Credit(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Credit operation."""
-        return await self._call("Credit", *args)
-
-    async def Profit(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Profit operation."""
-        return await self._call("Profit", *args)
-
-    async def Equity(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Equity operation."""
-        return await self._call("Equity", *args)
-
-    async def Margin(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Margin operation."""
-        return await self._call("Margin", *args)
-
-    async def FreeMargin(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.FreeMargin operation."""
-        return await self._call("FreeMargin", *args)
-
-    async def MarginLevel(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.MarginLevel operation."""
-        return await self._call("MarginLevel", *args)
-
-    async def MarginCall(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.MarginCall operation."""
-        return await self._call("MarginCall", *args)
-
-    async def MarginStopOut(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.MarginStopOut operation."""
-        return await self._call("MarginStopOut", *args)
-
-    async def Name(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Name operation."""
-        return await self._call("Name", *args)
-
-    async def Server(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Server operation."""
-        return await self._call("Server", *args)
-
-    async def Currency(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Currency operation."""
-        return await self._call("Currency", *args)
-
-    async def Company(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Company operation."""
-        return await self._call("Company", *args)
-
-    async def InfoInteger(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.InfoInteger operation."""
-        return await self._call("InfoInteger", *args)
-
-    async def InfoDouble(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.InfoDouble operation."""
-        return await self._call("InfoDouble", *args)
-
-    async def InfoString(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.InfoString operation."""
-        return await self._call("InfoString", *args)
+    async def __call__(self, *args: Any) -> AccountSnapshot:
+        """Await the backend AccountInfo snapshot directly via call syntax."""
+        return await self.AccountInfo(*args)
 
     async def OrderProfitCheck(self, *args: Any) -> Any:
         """Await the backend AccountInfo.OrderProfitCheck operation."""
@@ -159,31 +78,3 @@ class AccountInfo(TradingClass):
     async def MaxLotCheck(self, *args: Any) -> Any:
         """Await the backend AccountInfo.MaxLotCheck operation."""
         return await self._call("MaxLotCheck", *args)
-
-    async def CurrencyDigits(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.CurrencyDigits operation."""
-        return await self._call("CurrencyDigits", *args)
-
-    async def FifoClose(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.FifoClose operation."""
-        return await self._call("FifoClose", *args)
-
-    async def MarginInitial(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.MarginInitial operation."""
-        return await self._call("MarginInitial", *args)
-
-    async def MarginMaintenance(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.MarginMaintenance operation."""
-        return await self._call("MarginMaintenance", *args)
-
-    async def Assets(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Assets operation."""
-        return await self._call("Assets", *args)
-
-    async def Liabilities(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.Liabilities operation."""
-        return await self._call("Liabilities", *args)
-
-    async def CommissionBlocked(self, *args: Any) -> Any:
-        """Await the backend AccountInfo.CommissionBlocked operation."""
-        return await self._call("CommissionBlocked", *args)

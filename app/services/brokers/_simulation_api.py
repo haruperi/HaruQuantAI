@@ -40,6 +40,7 @@ from app.services.brokers.contracts import (
     ORDER_TIME_DESCRIPTIONS,
     ORDER_TYPE_DESCRIPTIONS,
     POSITION_TYPE_DESCRIPTIONS,
+    AccountSnapshot,
     AccountTradeMode,
     BookType,
     BridgeError,
@@ -246,6 +247,30 @@ def _accountinfo___init__(self: _ObjectState, backend: BrokerBackend) -> None:
 
 def _accountinfo__a(self: _ObjectState) -> Any:
     return self._backend.account()
+
+
+def _accountinfo_accountinfo(self: _ObjectState) -> AccountSnapshot:
+    account = _accountinfo__a(self)
+    if is_dataclass(account) and not isinstance(account, type):
+        trade_mode = AccountTradeMode(account.trade_mode)
+        stopout_mode = StopoutMode(account.stopout_mode)
+        margin_mode = MarginMode(account.margin_mode)
+        return replace(
+            account,
+            trade_mode_description=(
+                account.trade_mode_description
+                or trade_mode.name.replace("_", " ").title()
+            ),
+            stopout_mode_description=(
+                account.stopout_mode_description
+                or stopout_mode.name.replace("_", " ").title()
+            ),
+            margin_mode_description=(
+                account.margin_mode_description
+                or margin_mode.name.replace("_", " ").title()
+            ),
+        )
+    return cast("AccountSnapshot", account)
 
 
 def _accountinfo_login(self: _ObjectState) -> int:
@@ -2699,44 +2724,11 @@ def _trade_formatrequestresult(self: _ObjectState) -> str:
 
 HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
     "AccountInfo": {
-        "Login": _accountinfo_login,
-        "TradeMode": _accountinfo_trademode,
-        "TradeModeDescription": _accountinfo_trademodedescription,
-        "Leverage": _accountinfo_leverage,
-        "StopoutMode": _accountinfo_stopoutmode,
-        "StopoutModeDescription": _accountinfo_stopoutmodedescription,
-        "MarginMode": _accountinfo_marginmode,
-        "MarginModeDescription": _accountinfo_marginmodedescription,
-        "TradeAllowed": _accountinfo_tradeallowed,
-        "TradeExpert": _accountinfo_tradeexpert,
-        "LimitOrders": _accountinfo_limitorders,
-        "Balance": _accountinfo_balance,
-        "Credit": _accountinfo_credit,
-        "Profit": _accountinfo_profit,
-        "Equity": _accountinfo_equity,
-        "Margin": _accountinfo_margin,
-        "FreeMargin": _accountinfo_freemargin,
-        "MarginLevel": _accountinfo_marginlevel,
-        "MarginCall": _accountinfo_margincall,
-        "MarginStopOut": _accountinfo_marginstopout,
-        "Name": _accountinfo_name,
-        "Server": _accountinfo_server,
-        "Currency": _accountinfo_currency,
-        "Company": _accountinfo_company,
-        "InfoInteger": _accountinfo_infointeger,
-        "InfoDouble": _accountinfo_infodouble,
-        "InfoString": _accountinfo_infostring,
+        "AccountInfo": _accountinfo_accountinfo,
         "OrderProfitCheck": _accountinfo_orderprofitcheck,
         "MarginCheck": _accountinfo_margincheck,
         "FreeMarginCheck": _accountinfo_freemargincheck,
         "MaxLotCheck": _accountinfo_maxlotcheck,
-        "CurrencyDigits": _accountinfo_currencydigits,
-        "FifoClose": _accountinfo_fifoclose,
-        "MarginInitial": _accountinfo_margininitial,
-        "MarginMaintenance": _accountinfo_marginmaintenance,
-        "Assets": _accountinfo_assets,
-        "Liabilities": _accountinfo_liabilities,
-        "CommissionBlocked": _accountinfo_commissionblocked,
     },
     "DealInfo": {
         "Order": _dealinfo_order,

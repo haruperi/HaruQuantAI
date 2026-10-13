@@ -1,3 +1,4 @@
+# ruff: noqa: D101, D102, D103, D205, ARG002 -- public enum, dataclass, and abstract method contracts.
 """Shared broker command, event, result and error contracts.
 MT5-compatible enumerations used by the shared broker API.
 
@@ -626,6 +627,9 @@ class AccountSnapshot:
     assets: float = 0.0
     liabilities: float = 0.0
     commission_blocked: float = 0.0
+    trade_mode_description: str = ""
+    stopout_mode_description: str = ""
+    margin_mode_description: str = ""
 
 
 @dataclass(slots=True)

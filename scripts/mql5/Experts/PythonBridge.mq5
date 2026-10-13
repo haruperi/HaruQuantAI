@@ -867,6 +867,43 @@ string CheckResultJson(const MqlTradeCheckResult &r)
       "}";
   }
 
+string AccountInfoJson(CAccountInfo *obj)
+  {
+   return "{"
+      "\"login\":"+JsonULong((ulong)obj.Login())+
+      ",\"trade_mode\":"+JsonLong((long)obj.TradeMode())+
+      ",\"trade_mode_description\":"+JsonQuote(obj.TradeModeDescription())+
+      ",\"leverage\":"+JsonULong((ulong)obj.Leverage())+
+      ",\"stopout_mode\":"+JsonLong((long)obj.StopoutMode())+
+      ",\"stopout_mode_description\":"+JsonQuote(obj.StopoutModeDescription())+
+      ",\"margin_mode\":"+JsonLong((long)obj.MarginMode())+
+      ",\"margin_mode_description\":"+JsonQuote(obj.MarginModeDescription())+
+      ",\"trade_allowed\":"+JsonBool(obj.TradeAllowed())+
+      ",\"trade_expert\":"+JsonBool(obj.TradeExpert())+
+      ",\"limit_orders\":"+JsonLong((long)obj.LimitOrders())+
+      ",\"balance\":"+JsonDouble((double)obj.Balance())+
+      ",\"credit\":"+JsonDouble((double)obj.Credit())+
+      ",\"profit\":"+JsonDouble((double)obj.Profit())+
+      ",\"equity\":"+JsonDouble((double)obj.Equity())+
+      ",\"margin\":"+JsonDouble((double)obj.Margin())+
+      ",\"free_margin\":"+JsonDouble((double)obj.FreeMargin())+
+      ",\"margin_level\":"+JsonDouble((double)obj.MarginLevel())+
+      ",\"margin_call\":"+JsonDouble((double)obj.MarginCall())+
+      ",\"margin_stop_out\":"+JsonDouble((double)obj.MarginStopOut())+
+      ",\"name\":"+JsonQuote(obj.Name())+
+      ",\"server\":"+JsonQuote(obj.Server())+
+      ",\"currency\":"+JsonQuote(obj.Currency())+
+      ",\"company\":"+JsonQuote(obj.Company())+
+      ",\"currency_digits\":"+JsonLong((long)AccountInfoInteger(ACCOUNT_CURRENCY_DIGITS))+
+      ",\"fifo_close\":"+JsonBool((bool)AccountInfoInteger(ACCOUNT_FIFO_CLOSE))+
+      ",\"margin_initial\":"+JsonDouble(AccountInfoDouble(ACCOUNT_MARGIN_INITIAL))+
+      ",\"margin_maintenance\":"+JsonDouble(AccountInfoDouble(ACCOUNT_MARGIN_MAINTENANCE))+
+      ",\"assets\":"+JsonDouble(AccountInfoDouble(ACCOUNT_ASSETS))+
+      ",\"liabilities\":"+JsonDouble(AccountInfoDouble(ACCOUNT_LIABILITIES))+
+      ",\"commission_blocked\":"+JsonDouble(AccountInfoDouble(ACCOUNT_COMMISSION_BLOCKED))+
+      "}";
+  }
+
 string TradeMeta(CTrade &obj)
   {
    MqlTradeResult r; ZeroMemory(r); obj.Result(r);
@@ -1093,40 +1130,7 @@ void DispatchAccount(const string command_id,const string object_id,const string
   {
    CAccountInfo *p=GetAccount(object_id); if(CheckPointer(p)==POINTER_INVALID) { RespondError(command_id,"OBJECT_CREATE_FAILED","CAccountInfo allocation failed"); return; }
    CAccountInfo *obj=p;
-   if(method=="Login") { RespondULong(command_id, true, (ulong)(obj.Login())); return; }
-   if(method=="TradeMode") { RespondLong(command_id, true, (long)(obj.TradeMode())); return; }
-   if(method=="TradeModeDescription") { RespondString(command_id, true, obj.TradeModeDescription()); return; }
-   if(method=="Leverage") { RespondULong(command_id, true, (ulong)(obj.Leverage())); return; }
-   if(method=="StopoutMode") { RespondLong(command_id, true, (long)(obj.StopoutMode())); return; }
-   if(method=="StopoutModeDescription") { RespondString(command_id, true, obj.StopoutModeDescription()); return; }
-   if(method=="MarginMode") { RespondLong(command_id, true, (long)(obj.MarginMode())); return; }
-   if(method=="MarginModeDescription") { RespondString(command_id, true, obj.MarginModeDescription()); return; }
-   if(method=="TradeAllowed") { RespondBool(command_id, true, obj.TradeAllowed()); return; }
-   if(method=="TradeExpert") { RespondBool(command_id, true, obj.TradeExpert()); return; }
-   if(method=="LimitOrders") { RespondLong(command_id, true, (long)(obj.LimitOrders())); return; }
-   if(method=="Balance") { RespondDouble(command_id, true, (double)(obj.Balance())); return; }
-   if(method=="Credit") { RespondDouble(command_id, true, (double)(obj.Credit())); return; }
-   if(method=="Profit") { RespondDouble(command_id, true, (double)(obj.Profit())); return; }
-   if(method=="Equity") { RespondDouble(command_id, true, (double)(obj.Equity())); return; }
-   if(method=="Margin") { RespondDouble(command_id, true, (double)(obj.Margin())); return; }
-   if(method=="FreeMargin") { RespondDouble(command_id, true, (double)(obj.FreeMargin())); return; }
-   if(method=="MarginLevel") { RespondDouble(command_id, true, (double)(obj.MarginLevel())); return; }
-   if(method=="MarginCall") { RespondDouble(command_id, true, (double)(obj.MarginCall())); return; }
-   if(method=="MarginStopOut") { RespondDouble(command_id, true, (double)(obj.MarginStopOut())); return; }
-   if(method=="Name") { RespondString(command_id, true, obj.Name()); return; }
-   if(method=="Server") { RespondString(command_id, true, obj.Server()); return; }
-   if(method=="Currency") { RespondString(command_id, true, obj.Currency()); return; }
-   if(method=="Company") { RespondString(command_id, true, obj.Company()); return; }
-   if(method=="CurrencyDigits") { RespondLong(command_id, true, (long)AccountInfoInteger(ACCOUNT_CURRENCY_DIGITS)); return; }
-   if(method=="FifoClose") { RespondBool(command_id, true, (bool)AccountInfoInteger(ACCOUNT_FIFO_CLOSE)); return; }
-   if(method=="MarginInitial") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_MARGIN_INITIAL)); return; }
-   if(method=="MarginMaintenance") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_MARGIN_MAINTENANCE)); return; }
-   if(method=="Assets") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_ASSETS)); return; }
-   if(method=="Liabilities") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_LIABILITIES)); return; }
-   if(method=="CommissionBlocked") { RespondDouble(command_id, true, AccountInfoDouble(ACCOUNT_COMMISSION_BLOCKED)); return; }
-   if(method=="InfoInteger") { RespondLong(command_id,true,obj.InfoInteger((ENUM_ACCOUNT_INFO_INTEGER)ParseEnumCode(args,0))); return; }
-   if(method=="InfoDouble") { RespondDouble(command_id,true,obj.InfoDouble((ENUM_ACCOUNT_INFO_DOUBLE)ParseEnumCode(args,0))); return; }
-   if(method=="InfoString") { RespondString(command_id,true,obj.InfoString((ENUM_ACCOUNT_INFO_STRING)ParseEnumCode(args,0))); return; }
+   if(method=="AccountInfo") { RespondRaw(command_id, true, AccountInfoJson(obj)); return; }
    if(method=="OrderProfitCheck") { RespondDouble(command_id,true,obj.OrderProfitCheck(ArgString(args,0),ParseOrderType(args,1),ArgDouble(args,2),ArgDouble(args,3),ArgDouble(args,4))); return; }
    if(method=="MarginCheck") { RespondDouble(command_id,true,obj.MarginCheck(ArgString(args,0),ParseOrderType(args,1),ArgDouble(args,2),ArgDouble(args,3))); return; }
    if(method=="FreeMarginCheck") { RespondDouble(command_id,true,obj.FreeMarginCheck(ArgString(args,0),ParseOrderType(args,1),ArgDouble(args,2),ArgDouble(args,3))); return; }
@@ -1766,7 +1770,7 @@ void DispatchPosition(const string command_id,const string object_id,const strin
               ",\"price_current\":"+JsonDouble(PositionGetDouble(POSITION_PRICE_CURRENT))+
               ",\"sl\":"+JsonDouble(PositionGetDouble(POSITION_SL))+
               ",\"tp\":"+JsonDouble(PositionGetDouble(POSITION_TP))+
-              ",\"commission\":"+JsonDouble(PositionGetDouble(POSITION_COMMISSION))+
+              ",\"commission\":"+JsonDouble(0.0)+
               ",\"swap\":"+JsonDouble(PositionGetDouble(POSITION_SWAP))+
               ",\"profit\":"+JsonDouble(PositionGetDouble(POSITION_PROFIT))+
               ",\"magic\":"+JsonULong(PositionGetInteger(POSITION_MAGIC))+

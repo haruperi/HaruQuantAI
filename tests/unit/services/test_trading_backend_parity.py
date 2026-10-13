@@ -45,12 +45,20 @@ def test_native_forwarding_and_result_parity(
         model.add_symbol(SymbolSpec(name="EURUSD"))
         local = Trading(model)
         call = AsyncMock(
-            side_effect=[10_000.0, True, "EURUSD", {"ok": True, "value": 0.00001}, 0]
+            side_effect=[
+                {"balance": 10_000.0, "trade_mode": 0},
+                True,
+                "EURUSD",
+                {"ok": True, "value": 0.00001},
+                {"balance": 10_000.0, "trade_mode": 0},
+            ]
         )
         monkeypatch.setattr(native.bridge, "call", call)
         try:
             assert type(native.account) is type(local.account)
-            assert await native.account.Balance() == await local.account.Balance()
+            assert (await native.account.AccountInfo()).balance == (
+                await local.account.AccountInfo()
+            ).balance
             assert await native.symbol.Name("EURUSD") == await local.symbol.Name(
                 "EURUSD"
             )
@@ -62,14 +70,13 @@ def test_native_forwarding_and_result_parity(
             )
             first = call.call_args_list[0].kwargs
             assert first["class_name"] == "AccountInfo"
-            assert first["method_name"] == "Balance"
+            assert first["method_name"] == "AccountInfo"
             assert not first["requires_arm"]
             assert first["args"] == []
             assert first["object_id"] == native.account.object_id
-            native_mode = await native.account.TradeMode()
-            local_mode = await local.account.TradeMode()
-            assert type(native_mode) is type(local_mode) is int
-            assert native_mode == local_mode
+            native_info = await native.account.AccountInfo()
+            local_info = await local.account.AccountInfo()
+            assert native_info.trade_mode == local_info.trade_mode
         finally:
             await native.close()
             await local.close()

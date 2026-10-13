@@ -618,13 +618,14 @@ def test_account_info_extended_properties_parity() -> None:
     account = trading.account
 
     async def scenario() -> None:
-        assert await account.CurrencyDigits() == 2
-        assert await account.FifoClose() is False
-        assert await account.MarginInitial() == 0.0
-        assert await account.MarginMaintenance() == 0.0
-        assert await account.Assets() == 0.0
-        assert await account.Liabilities() == 0.0
-        assert await account.CommissionBlocked() == 0.0
+        info = await account.AccountInfo()
+        assert info.currency_digits == 2
+        assert info.fifo_close is False
+        assert info.margin_initial == 0.0
+        assert info.margin_maintenance == 0.0
+        assert info.assets == 0.0
+        assert info.liabilities == 0.0
+        assert info.commission_blocked == 0.0
 
     asyncio.run(scenario())
 

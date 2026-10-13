@@ -240,34 +240,35 @@ async def example_03_account(ctx: ExampleContext) -> None:
     """Demonstrate printing account information using AccountInfo."""
     _header("Account Information")
     account = ctx.trading.account
-    print(f"Login: {await account.Login()}")
-    print(f"Trade mode: {await account.TradeMode()}")
-    print(f"Leverage: {await account.Leverage()}")
-    print(f"Limit orders: {await account.LimitOrders()}")
-    print(f"Margin SO mode: {await account.StopoutMode()}")
-    print(f"Trade allowed: {await account.TradeAllowed()}")
-    print(f"Trade expert: {await account.TradeExpert()}")
-    print(f"Margin mode: {await account.MarginMode()}")
-    print(f"Currency digits: {await account.CurrencyDigits()}")
-    print(f"FIFO close: {await account.FifoClose()}")
-    print(f"Balance: {await account.Balance()}")
-    print(f"Credit: {await account.Credit()}")
-    print(f"Profit: {await account.Profit()}")
-    print(f"Equity: {await account.Equity()}")
-    print(f"Margin: {await account.Margin()}")
-    print(f"Free margin: {await account.FreeMargin()}")
-    print(f"Margin level: {await account.MarginLevel()}")
-    print(f"Margin SO call: {await account.MarginCall()}")
-    print(f"Margin SO SO: {await account.MarginStopOut()}")
-    print(f"Margin initial: {await account.MarginInitial()}")
-    print(f"Margin maintenance: {await account.MarginMaintenance()}")
-    print(f"Assets: {await account.Assets()}")
-    print(f"Liabilities: {await account.Liabilities()}")
-    print(f"Commission blocked: {await account.CommissionBlocked()}")
-    print(f"Name: {await account.Name()}")
-    print(f"Server: {await account.Server()}")
-    print(f"Currency: {await account.Currency()}")
-    print(f"Company: {await account.Company()}")
+    info = await account.AccountInfo()
+    print(f"Login: {info.login}")
+    print(f"Trade mode: {info.trade_mode}")
+    print(f"Leverage: {info.leverage}")
+    print(f"Limit orders: {info.limit_orders}")
+    print(f"Margin SO mode: {info.stopout_mode}")
+    print(f"Trade allowed: {info.trade_allowed}")
+    print(f"Trade expert: {info.trade_expert}")
+    print(f"Margin mode: {info.margin_mode}")
+    print(f"Currency digits: {info.currency_digits}")
+    print(f"FIFO close: {info.fifo_close}")
+    print(f"Balance: {info.balance}")
+    print(f"Credit: {info.credit}")
+    print(f"Profit: {info.profit}")
+    print(f"Equity: {info.equity}")
+    print(f"Margin: {info.margin}")
+    print(f"Free margin: {info.free_margin}")
+    print(f"Margin level: {info.margin_level}")
+    print(f"Margin SO call: {info.margin_call}")
+    print(f"Margin SO SO: {info.margin_stop_out}")
+    print(f"Margin initial: {info.margin_initial}")
+    print(f"Margin maintenance: {info.margin_maintenance}")
+    print(f"Assets: {info.assets}")
+    print(f"Liabilities: {info.liabilities}")
+    print(f"Commission blocked: {info.commission_blocked}")
+    print(f"Name: {info.name}")
+    print(f"Server: {info.server}")
+    print(f"Currency: {info.currency}")
+    print(f"Company: {info.company}")
 
 
 async def example_04_symbol(ctx: ExampleContext) -> None:
@@ -413,7 +414,8 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
         print("Live writes disabled; skipping open position")
         return
     trading = ctx.trading
-    if ctx.position_ticket or int(await trading.account.MarginMode()) != int(
+    account_info = await trading.account.AccountInfo()
+    if ctx.position_ticket or int(account_info.margin_mode) != int(
         MarginMode.RETAIL_HEDGING
     ):
         ctx.trading.disarm()
@@ -852,23 +854,23 @@ EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_01_connect,
     example_02_terminal,
     example_03_account,
-    example_04_symbol,
-    example_05_historical_bars,
-    example_06_tick_data,
-    example_07_order_book,
-    example_08_order_check,
-    example_09_open_position,
-    example_10_calc_profit_margin,
-    example_11_position,
-    example_12_modify_position,
-    example_13_close_partial_position,
-    example_14_close_position,
-    example_15_pending_orders,
-    example_16_order,
-    example_17_modify_pending_orders,
-    example_18_delete_pending_orders,
-    example_19_history_order,
-    example_20_history_deal,
+    # example_04_symbol,
+    # example_05_historical_bars,
+    # example_06_tick_data,
+    # example_07_order_book,
+    # example_08_order_check,
+    # example_09_open_position,
+    # example_10_calc_profit_margin,
+    # example_11_position,
+    # example_12_modify_position,
+    # example_13_close_partial_position,
+    # example_14_close_position,
+    # example_15_pending_orders,
+    # example_16_order,
+    # example_17_modify_pending_orders,
+    # example_18_delete_pending_orders,
+    # example_19_history_order,
+    # example_20_history_deal,
 )
 
 
