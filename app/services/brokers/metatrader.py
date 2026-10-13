@@ -64,7 +64,7 @@ from app.services.brokers.contracts import (
     ReceiptStatus,
     TradeResolution,
 )
-from app.services.trading.facade import Trading
+from app.services.libs.trading import Trading
 
 __all__ = [
     "Bridge",

@@ -35,7 +35,7 @@ from app.services.brokers.contracts import (
 )
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
-from app.services.trading import Trading
+from app.services.libs.trading import Trading
 
 
 def test_native_forwarding_and_result_parity(

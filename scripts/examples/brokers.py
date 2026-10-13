@@ -63,7 +63,7 @@ from app.services.brokers.contracts import (
 )
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
-from app.services.trading import Trading
+from app.services.libs.trading import Trading
 from app.services.utils import (
     bars_to_dataframe,
     format_timestamp,
@@ -112,10 +112,11 @@ class ExampleContext:
     closed: bool = False
 
 
-def create_backend(name: str = BROKER) -> TradingBackend:
+def create_backend(name: str | None = None) -> TradingBackend:
     """Select and seed the provider; example bodies use only Trading."""
+    selected = BROKER if name is None else name
     print("FR-TRADING-USAGE-LIFECYCLE: selecting backend")
-    if name == "simulator":
+    if selected == "simulator":
         backend = SimulationBackend()
         backend.add_symbol(SymbolSpec(name=SYMBOL))
         backend.feed_tick(SYMBOL, bid=1.1, ask=1.1002, time=DATE_TO)
@@ -137,7 +138,7 @@ def create_backend(name: str = BROKER) -> TradingBackend:
             ],
         )
         return backend
-    if name == "mt5":
+    if selected == "mt5":
         token = os.environ.get(
             "MT5_BRIDGE_TOKEN", "P8H5yPraTVSz4vkuaMVgWN8qcfeXUswuxIV70QES0Co"
         )

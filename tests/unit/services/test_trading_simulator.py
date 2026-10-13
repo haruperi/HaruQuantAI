@@ -33,7 +33,7 @@ from app.services.brokers.contracts import (
     TradeAction,
 )
 from app.services.brokers.simulator import SimulationBackend
-from app.services.trading import (
+from app.services.libs.trading import (
     SymbolInfo,
     TradeCheckResult,
     TradeRequest,

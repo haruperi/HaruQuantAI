@@ -6,22 +6,28 @@ Description:
     or price aggregation occurs here. Validate returned shapes before exposing data.
 
 Purpose:
-    FEAT-TRADING-MARKET-DATA: Broker-neutral bounded historical data retrieval.
+    FEAT-LIBS-DATA: Broker-neutral bounded historical data retrieval.
 
 Key Capabilities:
-    - FR-TRADING-HISTORICAL-READS: Fetch chronological bars and millisecond ticks.
+    - FR-DATA-HISTORICAL-READS: Fetch chronological bars and millisecond ticks.
       Associated: `get_historical_bars()`, `get_ticks()`
       Logging: DEBUG every read attempt with operation only, no payloads or paths.
-    - FR-TRADING-HISTORY-VALIDATION: Reject invalid or excessive historical data.
+    - FR-DATA-HISTORY-VALIDATION: Reject invalid or excessive historical data.
       Associated: `validate_rows()`, `validate_request()`
       Logging: DEBUG validation attempts; errors have bounded diagnostic codes.
 
 Python API Usage:
-    Await Trading(backend).get_historical_bars(symbol, timeframe, start, end).
-    Await Trading(backend).get_ticks(symbol, start, end) for historical ticks.
+    ```python
+    from app.services.libs.data import get_historical_bars, get_ticks
+
+    bars = await get_historical_bars(backend, "EURUSD", Timeframe.PERIOD_M1)
+    ticks = await get_ticks(backend, "EURUSD")
+    ```
 
 CLI Usage:
+    ```bash
     uv run pytest tests/unit/services/test_trading_market_data.py --no-cov
+    ```
 """
 
 from __future__ import annotations
@@ -69,7 +75,7 @@ def validate_request(
     timeframe: Timeframe | None = None,
 ) -> None:
     """Enforce the same bounds at the shared and simulated read boundaries."""
-    logger.debug("FR-TRADING-HISTORY-VALIDATION: validating request")
+    logger.debug("FR-DATA-HISTORY-VALIDATION: validating request")
     if not symbol or any(type(value) is not int for value in (start, end, limit)):
         raise BridgeError("invalid history request", code="BAD_REQUEST")
     if start < 0 or end < start or not 1 <= limit <= MAX_RECORDS:
@@ -104,7 +110,7 @@ def validate_rows(
     limit: int,
 ) -> list[MarketBar] | list[MarketTick]:
     """Validate immutable records and chronology, without losing integer precision."""
-    logger.debug("FR-TRADING-HISTORY-VALIDATION: validating rows")
+    logger.debug("FR-DATA-HISTORY-VALIDATION: validating rows")
     if not isinstance(payload, list) or len(payload) > limit:
         raise BridgeError("invalid history payload", code="INVALID_MARKET_DATA")
     record_type = MarketBar if kind == "bars" else MarketTick
@@ -202,7 +208,7 @@ async def get_historical_bars(
     limit: int = MAX_RECORDS,
 ) -> list[MarketBar]:
     """Read bars by date range, forward date/count or native index/count."""
-    logger.debug("FR-TRADING-HISTORICAL-READS: requesting bars")
+    logger.debug("FR-DATA-HISTORICAL-READS: requesting bars")
     mode, start, end, number = _route(
         date_from, date_to, start_pos, count, limit, scale=1
     )
@@ -238,7 +244,7 @@ async def get_ticks(
     limit: int = MAX_RECORDS,
 ) -> list[MarketTick]:
     """Read ticks by date range, forward date/count or latest count."""
-    logger.debug("FR-TRADING-HISTORICAL-READS: requesting ticks")
+    logger.debug("FR-DATA-HISTORICAL-READS: requesting ticks")
     mode, start, end, number = _route(
         date_from, date_to, None, count, limit, scale=1000
     )

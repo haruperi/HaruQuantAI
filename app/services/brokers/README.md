@@ -1,6 +1,6 @@
 # Broker execution backends
 
-The public eight-class API lives in app/services/trading. Strategies compose
+The public eight-class API lives in app/services/libs/trading.py. Strategies compose
 Trading(backend) and await the same Trade, AccountInfo, SymbolInfo, OrderInfo,
 HistoryOrderInfo, PositionInfo, DealInfo and TerminalInfo methods for either live
 MT5 or local simulation. Backend-specific behavior stays here.
@@ -8,18 +8,10 @@ MT5 or local simulation. Backend-specific behavior stays here.
 ## Ownership and layout
 
 ```text
-app/services/trading/
-  __init__.py          # Eight public classes and Trading
-  facade.py            # Backend-neutral composition/lifecycle delegation
-  base.py              # Object IDs, serialization and property adaptation
-  trade.py
-  account_info.py
-  symbol_info.py
-  order_info.py
-  history_order_info.py
-  position_info.py
-  deal_info.py
-  terminal_info.py
+app/services/libs/
+  __init__.py          # Public re-exports for Trading and market data helpers
+  trading.py           # Consolidated eight classes, base adaptors, and Trading facade
+  data.py              # Market data helpers (get_historical_bars, get_ticks)
 
 app/services/brokers/
   contracts.py         # Async TradingBackend and shared data/model contracts
@@ -53,7 +45,7 @@ not certified or enabled as a universal live backend by this task.
 ```python
 import os
 from app.services.brokers.metatrader import MT5Backend
-from app.services.trading import Trading
+from app.services.libs.trading import Trading
 
 token = os.environ["MT5_BRIDGE_TOKEN"]
 backend = MT5Backend(auth_token=token)
@@ -96,7 +88,7 @@ Only caller-supplied tick/clock changes advance simulated time. Selection/trade
 configuration is keyed by object ID; receipts are in-memory and do not open SQL.
 Explicit simulated arming permits local mutations without authorizing live trades.
 
-See ../trading/README.md for named-property support and explicit unsupported numeric
+See ../libs/README.md for named-property support and explicit unsupported numeric
 property/native-request-correlation and queued-trade behavior. Local events are simulation events;
 text formatting is model-specific. Future brokers implement the async capability
 and map supported operations into this vocabulary, rejecting unavailable features.
@@ -105,7 +97,7 @@ and map supported operations into this vocabulary, rejecting unavailable feature
 
 ```powershell
 uv run pytest tests/unit/services/test_trading_api.py tests/unit/services/test_trading_backend_parity.py tests/unit/services/test_trading_simulator.py tests/unit/services/test_metatrader_bridge_protocol.py tests/unit/services/test_broker_contracts.py tests/unit/services/test_mt5bridge_journal.py --no-cov
-uv run mypy --strict --follow-imports=silent app/services/trading app/services/brokers/contracts.py app/services/brokers/metatrader.py app/services/brokers/simulator.py app/services/brokers/_simulation_api.py
+uv run mypy --strict --follow-imports=silent app/services/libs app/services/brokers/contracts.py app/services/brokers/metatrader.py app/services/brokers/simulator.py app/services/brokers/_simulation_api.py
 ```
 
 Checks use isolated stores and local/native-fixture execution. Compile and validate
@@ -163,7 +155,9 @@ bars = await trading.get_historical_bars(symbol, timeframe, date_from=start, cou
 # Bars by native index: zero is the current, potentially unfinished bar.
 bars = await trading.get_historical_bars(symbol, timeframe, start_pos=10, count=100)
 # Inclusive date range (existing positional dates also work).
-bars = await trading.get_historical_bars(symbol, timeframe, date_from=start, date_to=end)
+bars = await trading.get_historical_bars(
+    symbol, timeframe, date_from=start, date_to=end
+)
 # Latest bars; a date alone runs through the current UTC instant.
 bars = await trading.get_historical_bars(symbol, timeframe, count=100)
 bars = await trading.get_historical_bars(symbol, timeframe, date_from=start)

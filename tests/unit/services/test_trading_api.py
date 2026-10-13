@@ -23,10 +23,10 @@ import inspect
 from unittest.mock import AsyncMock
 
 import pytest
-from app.services import trading
 from app.services.brokers._simulation_api import HANDLERS
 from app.services.brokers.contracts import TradingBackend
 from app.services.brokers.simulator import SimulationBackend
+from app.services.libs import trading
 
 
 @pytest.mark.parametrize(
@@ -52,7 +52,7 @@ def test_one_complete_async_class(name: str, count: int) -> None:
     }
     assert len(methods) == count
     assert methods == set(HANDLERS[name])
-    assert cls.__module__.startswith("app.services.trading.")
+    assert cls.__module__ == "app.services.libs.trading"
 
 
 def test_per_object_serialization(monkeypatch: pytest.MonkeyPatch) -> None:

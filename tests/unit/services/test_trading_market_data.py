@@ -39,7 +39,8 @@ from app.services.brokers.contracts import (
 )
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
-from app.services.trading import Trading, market_data
+from app.services.libs import data as market_data
+from app.services.libs.trading import Trading
 
 START = datetime(2026, 1, 1, tzinfo=UTC)
 STAMP = int(START.timestamp())
