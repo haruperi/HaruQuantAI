@@ -9,50 +9,79 @@
 
 ## 1. Direct Observations: SQX-145 System & Architecture (`observed`, `high`/`confirmed`)
 
-### 1.1 Runtime Topology & Process Launchers
+### 1.1 Runtime Topology, Process Boundaries & Launchers
 
 Inspection of `SQX_REFERENCE_ROOT` shows that StrategyQuant X is a **hybrid Java + embedded Jetty + Electron/Web + embedded Python** desktop and CLI system sharing a single installation root:
 
 | Launcher / Binary | Config Artifact | Java Main Class & Flags | Role |
 | :--- | :--- | :--- | :--- |
-| `StrategyQuantX.exe` | `SQX_REFERENCE_ROOT/StrategyQuantX.config` | `com.strategyquant.strategyquant.SQStarter` (`-Xms4g`, `-XX:+UseParallelGC`, `--enable-native-access=ALL-UNNAMED`) | Full desktop workstation (starts embedded Jetty server + Electron UI shell) |
+| `StrategyQuantX.exe` | `SQX_REFERENCE_ROOT/StrategyQuantX.config` | `com.strategyquant.strategyquant.SQStarter` (`-Xms4g`, `-XX:+UseParallelGC`, `--enable-native-access=ALL-UNNAMED`) | Full desktop workstation (starts embedded Jetty server + spawns Electron UI shell) |
 | `sqcli.exe` | `SQX_REFERENCE_ROOT/sqcli.config` | `com.strategyquant.strategyquant.SQConsoleStarter` (`-Dsqx.console=true`) | Headless CLI (`SQConsole` / `QDMConsole`) for batch projects, databanks, and data jobs ([`cli/README.md`](cli/README.md)) |
 | `CodeEditor.exe` | `SQX_REFERENCE_ROOT/CodeEditor.config` | `com.strategyquant.ce.CEStarter` (`-Dsqx.productcode=SQEDITOR`) | Standalone Java/FreeMarker snippet and building-block IDE |
 
-* **Embedded Web Server & UI Bridge:** One 64-bit JVM (`SQX_REFERENCE_ROOT/j64`) embeds a **Jetty** HTTP + WebSocket server (`SQX_REFERENCE_ROOT/internal/libs/jetty-all-uber.jar`; default port `5050` in `SQX_REFERENCE_ROOT/internal/AppSettings.txt`, user runtime port `8080` in `SQX_REFERENCE_ROOT/user/settings/settings.xml`). The GUI (`SQX_REFERENCE_ROOT/internal/electron` + `SQX_REFERENCE_ROOT/internal/web/*`) renders AngularJS workspaces (`BUILDER`, `RETESTER`, `OPTIMIZER`, `SQMANAGER`, `TASKMANAGER`, `PORTFOLIOMASTER`, `PORTFOLIOCOMPOSER`, `NEURALNETWORK`, `GRIDCONTROL`, `GRIDTEST`, `MTANALYZER`, `SQXBUSINESS`, `MARKETPLACE`, `DEBUGCONSOLE`) alongside newer Vue/iframe applications (`AlgoWizard`, `RESULTS2`, `SQAI`).
-* **Embedded Python Sub-Runtime:** `SQX_REFERENCE_ROOT/internal/python/runtime` ships an embedded Python interpreter used by `SQX_REFERENCE_ROOT/internal/python/scripts/mt5api.py` and `mt5_symbol_overrides.json` to bridge MetaTrader 5 terminal data imports.
+#### Two-Process OS Execution Boundary (`observed`)
+At runtime in desktop mode, SQX executes across **two distinct operating-system processes**:
+1. **Presentation Process (`SQX_REFERENCE_ROOT/internal/electron/StrategyQuantX_ui.exe`):**
+   - Packaged with a Chromium/V8 runtime, `SQX_REFERENCE_ROOT/internal/electron/resources/app.asar`, and `SQX_REFERENCE_ROOT/internal/electron/resources/preload.js` (plus `sq.ico` and `ce.ico` application icons).
+   - Hosts the web frontend (`SQX_REFERENCE_ROOT/internal/web/*`), combining an AngularJS shell (`app/`, `HOME/`, `BUILDER/`, `RETESTER/`, `OPTIMIZER/`, `SQMANAGER/`, `TASKMANAGER/`, `PORTFOLIOMASTER/`, `PORTFOLIOCOMPOSER/`, `NEURALNETWORK/`, `GRIDCONTROL/`, `GRIDTEST/`, `MTANALYZER/`, `SQXBUSINESS/`, `MARKETPLACE/`, `DEBUGCONSOLE/`) with newer Vue/iframe applications (`AlgoWizard/`, `RESULTS2/`, `SQAI/`).
+   - **Zero Quantitative Logic in UI:** Contains no backtesting, simulation, or indicator math; communicates with the JVM backend exclusively over HTTP REST and WebSockets (`ws://`).
+2. **Backend JVM Process (`StrategyQuantX.exe` / `sqcli.exe` / `CodeEditor.exe` via `SQX_REFERENCE_ROOT/j64`):**
+   - Embeds Eclipse Jetty (`SQX_REFERENCE_ROOT/internal/libs/jetty-all-uber.jar`; default port `5050` in `SQX_REFERENCE_ROOT/internal/AppSettings.txt`, user runtime port `8080` in `SQX_REFERENCE_ROOT/user/settings/settings.xml`).
+   - Maintains host state files in `SQX_REFERENCE_ROOT/internal/` (`AppSettings.txt`, `license.db`, `SQUANT.dat`) and user state under `SQX_REFERENCE_ROOT/user/`.
+   - Spawns an embedded Python sub-runtime (`SQX_REFERENCE_ROOT/internal/python/runtime`) executing `SQX_REFERENCE_ROOT/internal/python/scripts/mt5api.py` (with `mt5_symbol_overrides.json`) for low-level MetaTrader 5 terminal IPC.
+
+#### Four-Tier Logical Execution Pipeline in Donor (`observed` + `inferred`)
+Within those two OS processes, SQX enforces a 4-tier logical separation of concerns:
+
+$$\text{Tier 1 (Electron/Web UI)} \xrightarrow{\text{HTTP / WS}} \text{Tier 2 (Jetty + Servlets + Host Services)} \xrightarrow{\text{JSPF Pipeline}} \text{Tier 3 (Workflow Tasks / Projects / Settings / Results)} \xrightarrow{\text{Direct Invocations}} \text{Tier 4 (Core Sim / DataSeries / Snippets / Math)}$$
 
 ```mermaid
 flowchart TB
-    subgraph Shell["UI & CLI Frontends (SQX_REFERENCE_ROOT)"]
-        Electron["Electron Shell + Web Apps (internal/web/*)"]
-        CLI["Headless CLI (sqcli.exe / qdmcli)"]
+    subgraph Proc1["OS Process 1: Presentation Tier (StrategyQuantX_ui.exe)"]
+        Electron["Electron Shell (resources/app.asar + preload.js)"]
+        WebSPA["AngularJS Shell + Vue Apps (internal/web/*)"]
+        Electron --> WebSPA
     end
 
-    subgraph JVM["Single 64-bit JVM Process (j64 + internal/libs)"]
-        Jetty["Embedded Jetty HTTP + WebSocket Server (Servlet* Plugins)"]
-        JSPF["JSPF Plugin Host (SQPluginLib + 182 internal/plugins/*)"]
-        TradingLib["SQAppLib / SQTradingLib (com.strategyquant.tradinglib.* - 893 classes)"]
-        DataLib["SQDataLib (com.strategyquant.datalib.* - 191 classes)"]
-        CoreLib["SQLib (com.strategyquant.lib.* - 52 classes)"]
-        Snippets["Compiled Snippets (Snippets.jar + internal/extend/Snippets/SQ/*)"]
-        FreeMarker["FreeMarker Code Generator (internal/extend/Code/<Engine>/*)"]
+    subgraph Proc2["OS Process 2: 64-bit JVM (StrategyQuantX.exe / sqcli.exe)"]
+        subgraph DonorT2["Donor Tier 2: Transport & Host Infrastructure"]
+            Jetty["Embedded Jetty HTTP + WS Server (jetty-all-uber.jar + webguilib.*)"]
+            Servlets["11 Servlet* Plugins (HttpJSONServlet / IServletPlugin)"]
+            GridIPC["Grid & Messaging (SQGridLib2 + Netty + ActiveMQ Artemis + JGroups)"]
+            HostSvc["Host Scheduling & Guards (SQJobsLib, SQLib MemoryUsageChecker / CpuInfo)"]
+        end
+
+        subgraph DonorT3["Donor Tier 3: Workflow & Orchestration Plugins (JSPF)"]
+            JSPF["JSPF Microkernel (jspf.core.jar + SQPluginLib.jar.enc)"]
+            Plugins["182 Modular Plugins (App*, Task*, Settings*, CrossCheck*, Results*, DataManager*, DataSource*)"]
+        end
+
+        subgraph DonorT4["Donor Tier 4: Domain Core, Simulation & Primitives"]
+            TradingLib["SQAppLib.jar.enc (com.strategyquant.tradinglib.* - 893 classes)"]
+            DataLib["SQDataLib.jar.enc (com.strategyquant.datalib.* - 191 classes)"]
+            CoreLib["SQLib.jar.enc (com.strategyquant.lib.* - 52 classes)"]
+            Snippets["Compiled Snippets (Snippets.jar + internal/extend/Snippets/SQ/*)"]
+            FreeMarker["FreeMarker Code Generator (internal/extend/Code/<Engine>/*)"]
+        end
     end
 
-    subgraph Storage["On-Disk State (user/ + internal/ctemplate/)"]
-        CFX["Projects: user/projects/<Name>/project.cfx + databanks/*.sqx"]
-        MarketData["Data: user/data/data.db (SQLite), *.h2.db (H2), History/*.dat"]
-        CustomData["Custom Data & COT: user/customdata/customdata.db"]
+    subgraph Storage["On-Disk Persistence (user/ + internal/)"]
+        HostFiles["internal/: AppSettings.txt, license.db, SQUANT.dat"]
+        CFX["user/projects/<Name>/project.cfx + databanks/*.sqx"]
+        MarketData["user/data/: data.db (SQLite), *.h2.db (H2), History/*.dat"]
+        CustomData["user/customdata/customdata.db (SQLite COT/Custom Series)"]
     end
 
-    Electron <-->|HTTP / WS| Jetty
-    CLI --> JSPF
-    Jetty --> JSPF
-    JSPF --> TradingLib
+    WebSPA <-->|HTTP REST / WebSocket| Jetty
+    Jetty --> Servlets
+    Servlets --> JSPF
+    JSPF --> Plugins
+    Plugins --> TradingLib
     TradingLib --> DataLib
     TradingLib --> Snippets
     TradingLib --> FreeMarker
     DataLib --> CoreLib
+    HostSvc <--> HostFiles
     TradingLib <--> CFX
     DataLib <--> MarketData
     DataLib <--> CustomData
@@ -60,20 +89,33 @@ flowchart TB
 
 ---
 
-### 1.2 Core Java Libraries (`SQX_REFERENCE_ROOT/internal/libs/`)
+### 1.2 Core Java Libraries & Third-Party Foundations (`SQX_REFERENCE_ROOT/internal/libs/`)
 
-SQX separates its Java backend into **7 encrypted core JARs (`.jar.enc`)**, **1 compiled Snippets JAR (`Snippets.jar`)**, and third-party libraries (`ta-lib-0.4.0.jar`, `watchmaker-framework-0.7.1.jar`, `uncommons-maths-1.2.2a.jar`, `fastutil-8.3.0.jar`, `freemarker-2.3.28.jar`, `jdom-2.0.0.jar`, `sqlite-jdbc-3.51.2.0.jar`, `h2-1.3.149.jar`, `jspf.core.jar`, `mcp-0.17.2.jar`):
+SQX packages its proprietary Java backend into **7 encrypted core JARs (`.jar.enc`)** and **1 compiled Snippets JAR (`Snippets.jar`)**:
+
+> [!NOTE]
+> **Packaging Clarification (`observed`):** There is no standalone file named `SQWebGUILib.jar` or `SQTradingLib.jar` in `SQX_REFERENCE_ROOT/internal/libs/`. Instead, both `com.strategyquant.tradinglib.*` and `com.strategyquant.webguilib.*` (`HttpJSONServlet`, `WebAppManager`, `BrowserGUI`, `AbstractUIWebServer`) are packaged inside `SQAppLib.jar.enc` (3,153,232 bytes).
 
 | Artifact (`internal/libs/`) | Size | Package Root | Scope & Cataloged Structure |
 | :--- | :--- | :--- | :--- |
-| `SQLib.jar.enc` | 395,587 B | `com.strategyquant.lib.*` | **52 classes, 943 methods** ([`libs/SQLib.md`](libs/SQLib.md)) across `(root)`, `memory`, and `utils`: `SQTime` (financial timestamps, DST, session date/time arithmetic), `IRandomGenerator`, `MemoryInfo` & off-heap memory pools (`lib.memory`), XML/settings maps (`SettingsMap`, `ValuesMap`), localization (`L`). |
+| `SQLib.jar.enc` | 395,587 B | `com.strategyquant.lib.*` | **52 classes, 943 methods** ([`libs/SQLib.md`](libs/SQLib.md)) across `(root)`, `memory`, and `utils`: `SQTime` (financial timestamps, DST, session date/time arithmetic), `IRandomGenerator`, `MemoryInfo` & off-heap memory pools (`lib.memory`), hardware/memory probes (`CpuInfo`, `MemoryUsageChecker`), XML/settings maps (`SettingsMap`, `ValuesMap`), localization (`L`). |
 | `SQDataLib.jar.enc` | 459,144 B | `com.strategyquant.datalib.*` | **191 classes, 3,136 methods** ([`libs/SQDataLib.md`](libs/SQDataLib.md)) across **18 subpackages**: `ChartDef`, `DataInfo`, `DataSeries` (off-heap double series with `IndyStartingBar` and `Shift`), `InstrumentInfo`, `bartype`, `basket`, `broker`, `consts`, `customData`, `darwinex`, `data`, `dataseries`, `historyData`, `indicators`, `instrument`, `metatrader4`, `session`, `ticksimulator`, `timeframe`, `timezone`, `validation`. |
-| `SQAppLib.jar.enc` | 3,153,232 B | `com.strategyquant.tradinglib.*` | **893 classes, 14,063 methods** ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) across **89 subpackages**: `StrategyBase`, `ATM`, `ATMExit`, `backtest`, `backtestrunner`, `benchmark`, `blocks`, `build`, `charts`, `commissions`, `conditions`, `connection`, `correlation`, `cot`, `crosscheck`, `customanalysis`, `dailyEquity`, `databank`, `engine`, `equitychart`, `execution`, `exit`, `fitnessfunction`, `formulas`, `generator`, `gp` (genetic programming), `historyData`, `indicator`, `moneymanagement`, `montecarlo`, `optimization`, `options`, `order`, `portfolioMaster`, `project`, `quality`, `results`, `riskmanagement`, `robustnesstests`, `scaling`, `simulator`, `strategy`, `swap`, `talib`, `task`, `tradeanalysis`, `tradelist`, `wfo`, `whatif`. |
+| `SQAppLib.jar.enc` | 3,153,232 B | `com.strategyquant.tradinglib.*` & `com.strategyquant.webguilib.*` | **893 tradinglib classes, 14,063 methods** ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) across **89 subpackages** (`StrategyBase`, `ATM`, `ATMExit`, `backtest`, `backtestrunner`, `benchmark`, `blocks`, `build`, `charts`, `commissions`, `conditions`, `connection`, `correlation`, `cot`, `crosscheck`, `customanalysis`, `dailyEquity`, `databank`, `engine`, `equitychart`, `execution`, `exit`, `fitnessfunction`, `formulas`, `generator`, `gp`, `historyData`, `indicator`, `moneymanagement`, `montecarlo`, `optimization`, `options`, `order`, `portfolioMaster`, `project`, `quality`, `results`, `riskmanagement`, `robustnesstests`, `scaling`, `simulator`, `strategy`, `swap`, `talib`, `task`, `tradeanalysis`, `tradelist`, `wfo`, `whatif`) plus web GUI server classes (`webguilib.*`). |
 | `SQPluginLib.jar.enc` | 17,851 B | `com.strategyquant.pluginlib.*` | JSPF-based plugin discovery, registration, and lifecycle contracts. |
 | `SQJobsLib.jar.enc` | 9,968 B | `com.strategyquant.jobslib.*` | Multi-threaded background job and worker pool coordination. |
 | `SQGridLib2.jar.enc` | 128,430 B | `com.strategyquant.gridlib.*` | Distributed grid node topology and remote backtest job dispatch. |
 | `StrategyQuant.jar.enc` | 35,977 B | `com.strategyquant.strategyquant.*` | Application bootstrap (`SQStarter`, `SQConsoleStarter`). |
 | `Snippets.jar` | 1,548,548 B | `SQ.*` | Compiled bytecode of all extensible Java snippets under `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/`. |
+
+#### Key Third-Party Runtime Libraries (`SQX_REFERENCE_ROOT/internal/libs/`)
+
+| Category | Observed JAR Artifacts | Architectural Role in Donor |
+| :--- | :--- | :--- |
+| **Plugin Microkernel** | `jspf.core.jar` (327 KB), `jspf.remote.jar` (5 KB) | Java Simple Plugin Framework governing dynamic plugin discovery and classloader isolation. |
+| **Web, Transport & Grid IPC** | `jetty-all-uber.jar`, `netty-all-4.1.5.Final.jar` (3.50 MB), `artemis-core-client-1.5.0.jar` (629 KB), `artemis-jms-client-1.5.0.jar` (178 KB), `artemis-commons-1.5.0.jar` (185 KB), `artemis-selector-1.5.0.jar` (105 KB), `jgroups-3.6.9.Final.jar`, `okhttp-jvm-5.3.2.jar` | Embedded HTTP/WS server, async network I/O, and ActiveMQ Artemis message queues for remote Grid compute nodes. |
+| **Math, Collections & GP** | `commons-math3-3.6.1.jar` (2.21 MB), `fastutil-8.3.0.jar` (18.85 MB), `watchmaker-framework-0.7.1.jar` (90 KB), `uncommons-maths-1.2.2a.jar` (49 KB), `ta-lib-0.4.0.jar`, `fst-2.57.jar` | Statistical math, primitive type collections, evolutionary computation framework, technical indicators, and fast binary serialization. |
+| **Persistence, XML & Code Gen** | `sqlite-jdbc-3.51.2.0.jar` (14.43 MB), `h2-1.3.149.jar`, `jdom-2.0.0.jar`, `xstream-1.4.9.jar`, `freemarker-2.3.28.jar`, `jackson-*-2.21.1.jar`, `zip4j-1.3.2.jar` | Embedded SQLite (`data.db`, `customdata.db`, `license.db`) and H2 (`*.h2.db`) engines, `.cfx`/`.sqx` ZIP/XML handling, and FreeMarker platform code generation. |
+| **AI / MCP & Telemetry** | `mcp-0.17.2.jar`, `mcp-core-0.17.2.jar`, `mcp-json-jackson2-0.17.2.jar`, `logback-core-1.4.14.jar`, `logback-classic-1.4.14.jar`, `slf4j-api-2.0.17.jar`, `opentelemetry-*-1.61.0.jar`, `oshi-core-5.8.5.jar`, `WMI4Java-1.6.3.jar` | Model Context Protocol server/client for SQAI, structured logging, telemetry, and OS hardware/process inspection. |
 
 ---
 
@@ -89,12 +131,30 @@ Every directory in `SQX_REFERENCE_ROOT/internal/plugins/<PluginName>/` is a vert
 | **`Task*` & `TaskManager*`** | 22 | Pipeline task executors: `TaskApplyMassConfig`, `TaskAutomaticPortfolioBuilder`, `TaskAutomaticRetest`, `TaskBuild`, `TaskCallExternalScript`, `TaskClearDatabanks`, `TaskCreatePortfolio`, `TaskCustomAnalysis`, `TaskDeleteFile`, `TaskFiltering`, `TaskGoToTask`, `TaskLoadFromFiles`, `TaskLogDatabankStats`, `TaskNeuralNetworkTrainer`, `TaskNotification`, `TaskOptimize`, `TaskRetest`, `TaskSaveToFiles`, `TaskStopAndStart`, `TaskUpdateData`, `TaskWaitFor`, plus `TaskManagerProjects`, `TaskManagerTasks`. |
 | **`DataSource*` & `CryptoExchange*`** | 15 | 9 market data feed plugins (`DataSourceCrypto`, `DataSourceDarwinex`, `DataSourceDukascopy`, `DataSourceFiles`, `DataSourceMt5Api`, `DataSourceSQEquityData`, `DataSourceSQFuturesData`, `DataSourceTD`, `DataSourceYahoo`) + 6 exchange adapters (`CryptoExchangeBinance`, `CryptoExchangeBinanceCoinM`, `CryptoExchangeBinanceUsdtM`, `CryptoExchangeBitfinex`, `CryptoExchangeCoinbasePro`, `CryptoExchangePoloniex`). |
 | **`DataManager*`** | 11 | QuantDataManager (QDM) panels: `DataManagerActions`, `DataManagerBasket`, `DataManagerBroker`, `DataManagerConnections`, `DataManagerCustomData`, `DataManagerData`, `DataManagerHelp`, `DataManagerHome`, `DataManagerInstruments`, `DataManagerLog`, `DataManagerSessions`. |
-| **`Servlet*`** | 11 | Jetty HTTP/WebSocket endpoints: `ServletAlgoCloud`, `ServletAlgoWizard`, `ServletBuilder`, `ServletCodeEditor`, `ServletConnection`, `ServletConstants`, `ServletGridControl`, `ServletProject`, `ServletRenameTool`, `ServletSQAI`, `ServletStrategy`. |
+| **`Servlet*`** | 11 | Jetty HTTP/WebSocket JSON bridges: `ServletAlgoCloud`, `ServletAlgoWizard`, `ServletBuilder`, `ServletCodeEditor`, `ServletConnection`, `ServletConstants`, `ServletGridControl`, `ServletProject`, `ServletRenameTool`, `ServletSQAI`, `ServletStrategy`. |
 | **`CrossCheck*`** | 9 | Robustness & validation engines: `CrossCheckMonteCarloManipulation`, `CrossCheckMonteCarloRetest`, `CrossCheckOptProfileSysParamPermutation`, `CrossCheckRetestOnAdditionalMarkets`, `CrossCheckRetestWithHigherPrecision`, `CrossCheckSequentialOptimization`, `CrossCheckWalkForwardMatrix`, `CrossCheckWalkForwardOptimization`, `CrossCheckWhatIf`. |
 | **`Project*`** | 9 | Project container views (`ProjectDatabanks`, `ProjectResources`, `ProjectResults`, `ProjectSettings`) + 5 `GoToTask` loop-condition plugins (`ProjectConditionCyclesCount`, `ProjectConditionGoToActivated`, `ProjectConditionGoToEvaluated`, `ProjectConditionResultsCount`, `ProjectConditionRunTime`). |
 | **`Loader*` & `Saver*`** | 6 | Strategy & report serializers: `LoaderSQ3`, `LoaderSQ4`, `SaverHTML`, `SaverPDF`, `SaverSQ3`, `SaverStrategyTrades`. |
 | **`FitnessMethod*`** | 3 | Fitness calculators: `FitnessMethodExistingPortfolio`, `FitnessMethodStrategyResult`, `FitnessMethodWFResult`. |
 | **Other UI / Bridges** | 18 | `CodeEditorImportExport`, `CodeEditorIndicatorTester`, `ConnectionLiveTest`, `ConnectionMT4`, `ConnectionTest`, `CustomDatabankActions`, `CustomResultsPluginActions`, `DashboardPanel`, `DashboardResults`, `DatabankFilterByCorrelation`, `DatabankRename`, `EnginePanel`, `HomeAbout`, `PortfolioComposer`, `SkinDark`, `SkinLight`. |
+
+#### 1.3.1 Full 11-Servlet HTTP/JSON Bridge Inventory (`SQX_REFERENCE_ROOT/internal/plugins/Servlet*`)
+
+Each `Servlet*` plugin implements `IServletPlugin` and exposes JSON endpoints through Jetty's `HttpJSONServlet`:
+
+| Donor Servlet Plugin | Functional Role |
+| :--- | :--- |
+| `ServletConnection` | Data provider connections, broker health checks, and latency ping/heartbeat. |
+| `ServletConstants` | Exposes system enumerations, building-block catalogs, indicators, and UI type definitions. |
+| `ServletStrategy` | Strategy inspection, XML/source serialization, and Databank result extraction. |
+| `ServletBuilder` | Strategy generation engine controls, genetic progress, and candidate emission. |
+| `ServletAlgoWizard` | Visual rule-tree editor serialization, validation, and code-generation bridge. |
+| `ServletProject` | Custom Projects workflow engine (`config.xml` & task XML management, `.cfx` validation/import, databank routing, execution state). |
+| `ServletCodeEditor` | Java snippet compilation, syntax checking, and CodeEditor filesystem operations. |
+| `ServletGridControl` | Distributed grid compute manager, node registration, and remote task dispatch. |
+| `ServletRenameTool` | Atomic cross-entity renaming (strategies, databanks, project tasks). |
+| `ServletSQAI` | AI research assistant (`Q`) chat, MCP tool execution, and prompt routing. |
+| `ServletAlgoCloud` | AlgoCloud synchronization and stockpicker/community strategy publishing. |
 
 ---
 
@@ -131,10 +191,17 @@ Every directory in `SQX_REFERENCE_ROOT/internal/plugins/<PluginName>/` is a vert
 
 Following the backend reset (`e2c72ab`), `HARUQUANTAI_ROOT` is at a clean **backend-reset baseline** ([`../PROJECT.md`](../PROJECT.md), [`../ARCHITECTURE.md`](../ARCHITECTURE.md)):
 * **Retained Frontend (`HARUQUANTAI_ROOT/ui/`):** Complete React/TypeScript UI organized into `ui/app/host/`, `ui/app/workspace/<17 workspaces>`, and `ui/app/plugins/<4 families>`.
-* **Ratified Architecture ([`../ARCHITECTURE.md`](../ARCHITECTURE.md)):** Enforces the **3-Tier Architecture** (`app/host/`, `app/workspace/`, `app/plugins/`) plus shared mathematical primitives (`app/kernel/`) and the **Five Laws of Spatial Composability (`SC-01`–`SC-05`)**.
+* **Ratified Architecture ([`../ARCHITECTURE.md`](../ARCHITECTURE.md)):** Enforces the **3-Tier Backend Architecture** (`app/host/`, `app/workspace/`, `app/plugins/`) plus shared mathematical primitives (`app/kernel/`) and the **Five Laws of Spatial Composability (`SC-01`–`SC-05`)**.
 * **Registry & Evidence Gate:** Because `app/`, `tests/`, and `scripts/` were reset, domain `README.md` registries (`app/host/README.md`, `app/workspace/*/README.md`) and `reimplementation.json` records (`SQX145-EV-NNNNNN`) must be registered and approved per phase under [`AGENTS.md`](../../AGENTS.md) before implementation.
 
-### 3.2 Mapping SQX Subsystems to HaruQuantAI Python Tiers
+### 3.2 Reconciling Donor Logical Tiers with HaruQuantAI's Ratified Python Architecture
+
+| Donor Logical Layer (`SQX_REFERENCE_ROOT`) | HaruQuantAI Target Layer (`HARUQUANTAI_ROOT`) | Architectural Responsibility ([`../ARCHITECTURE.md`](../ARCHITECTURE.md)) |
+| :--- | :--- | :--- |
+| **Donor Tier 1: Presentation** (`StrategyQuantX_ui.exe` + `internal/web/*`) | **UI Layer (`ui/app/`)** | React/TypeScript SPA (`ui/app/host/`, `ui/app/workspace/*`, `ui/app/plugins/*`, `ui/app/components/`). Pure presentation; communicates exclusively over REST and WebSocket/SSE. |
+| **Donor Tier 2: Transport & Host** (`Jetty`, `webguilib.*`, `Servlet*`, `SQPluginLib`, `SQJobsLib`, `SQLib` guards) | **Backend Tier 1: Host Platform (`app/host/`)** | `bootstrap.py`, `discovery.py`, `persistence/` (isolated SQLite WAL), `resources.py`, `transport.py`, `response.py`, `jobs.py`, `settings.py`, `session.py`. Zero quantitative/trading logic. |
+| **Donor Tier 3: JSPF Workflow & Orchestration** (`App*`, `DataManager*`, `Task*`, `Settings*`, `Results*`, `Project*` + `DataSource*`, `CrossCheck*`, `Snippets/SQ/*`, `extend/Code/*`) | **Backend Tier 2: Workspaces (`app/workspace/<domain>/`) + Backend Tier 3: Dynamic Plugins (`app/plugins/<slot>/<name>/`)** | Workspaces coordinate domain pipelines and mount `/api/v2/...` routers; Dynamic Plugins attach to workspaces via explicit typed slots (`SC-03`, e.g., `slot: "data.provider"`). |
+| **Donor Tier 4: Domain Core & Math Primitives** (`SQLib.SQTime`, `IRandomGenerator`, `SQDataLib.DataSeries`, `commons-math3`, `fastutil`, `ta-lib`) | **Primitives (`app/kernel/`) + Domain Engines (`app/workspace/simulator/`, etc.)** | Reusable mathematical routines, financial timestamps (`SQTime`), seeded RNG, vectorized columnar series (`Polars`, `NumPy`, `PyArrow`, `DuckDB`), and indicator kernels. |
 
 ```mermaid
 flowchart TD
