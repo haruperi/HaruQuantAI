@@ -394,7 +394,7 @@ def test_provider_download_async_job_submits_to_job_manager(
 
 def test_dukascopy_symbol_resolution() -> None:
     """Verify DukascopyBroker._clean_symbol maps custom postfixed symbols to canonical instruments."""
-    from app.plugins.brokers.dukascopy import DukascopyBroker
+    from app.services.brokers.dukascopy import DukascopyBroker
 
     broker = DukascopyBroker()
     assert broker._clean_symbol("GBPUSD") == "GBPUSD"

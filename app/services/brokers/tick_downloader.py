@@ -18,7 +18,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.plugins.brokers.tick_downloader.adapter import create_adapter
+    from app.services.brokers.tick_downloader.adapter import create_adapter
 
     adapter = create_adapter()
     caps = adapter.capabilities
@@ -37,6 +37,8 @@ from typing import Any, override
 
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
+from app.services.brokers._base_data import DataBrokerBackend
+from app.services.brokers.contracts import SymbolSnapshot
 from app.workspace.data_manager.connections import (
     BaseDataProvider,
     CancellationToken,
@@ -72,7 +74,7 @@ PLUGIN_MANIFEST: dict[str, Any] = {
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
 
 
-__all__ = ["TickDownloaderProvider", "create_adapter"]
+__all__ = ["TickDownloaderBroker", "TickDownloaderProvider", "create_adapter"]
 
 
 class TickDownloaderProvider(BaseDataProvider):
@@ -129,6 +131,51 @@ class TickDownloaderProvider(BaseDataProvider):
                 logger.debug("Failed to read local tick partition: %s", e)
 
         return []
+
+
+class TickDownloaderBroker(DataBrokerBackend):
+    """Tick data downloader broker conforming to TradingBackend."""
+
+    def __init__(
+        self, name: str = "TickDownloader", data_dir: str | Path | None = None
+    ) -> None:
+        """Initialize tick downloader broker."""
+        super().__init__(name=name)
+        self.data_dir = Path(data_dir) if data_dir else DEFAULT_DATA_DIR
+
+    @override
+    def symbol_info(self, symbol: str) -> SymbolSnapshot:
+        """Resolve symbol metadata as canonical SymbolSnapshot."""
+        return SymbolSnapshot(name=symbol.upper(), digits=5, point=0.00001)
+
+    @override
+    def symbols_get(self) -> list[str]:
+        """Return list of supported symbol names."""
+        return ["EURUSD", "GBPUSD", "USDJPY"]
+
+    @override
+    def fetch_ticks(
+        self,
+        *,
+        symbol: str,
+        mode: str,
+        start_ms: int,
+        end_ms: int,
+        count: int,
+        limit: int,
+    ) -> list[dict[str, Any]]:
+        """Download tick data delegating to Dukascopy datafeed."""
+        from app.services.brokers.dukascopy import DukascopyBroker
+
+        broker = DukascopyBroker()
+        return broker.fetch_ticks(
+            symbol=symbol,
+            mode=mode,
+            start_ms=start_ms,
+            end_ms=end_ms,
+            count=count,
+            limit=limit,
+        )
 
 
 def create_adapter(_context: PluginHostContext | None = None) -> BaseDataProvider:

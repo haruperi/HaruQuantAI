@@ -61,6 +61,7 @@ from app.services.brokers.contracts import (
     TradeRequest,
     TradingBackend,
 )
+from app.services.brokers.ctrader import CTraderBackend
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
 from app.services.libs.trading import Trading
@@ -70,8 +71,8 @@ from app.services.utils import (
     ticks_to_dataframe,
 )
 
-BROKER: Literal["simulator", "mt5"] = "mt5"
-ALLOW_LIVE_TRADING = True
+BROKER: Literal["simulator", "mt5", "ctrader"] = "ctrader"
+ALLOW_LIVE_TRADING = False
 SYMBOL = "EURUSD"
 VOLUME = 0.01  # Partial-close volume; the example buy opens twice this amount.
 CONNECT_TIMEOUT = 60.0
@@ -143,7 +144,9 @@ def create_backend(name: str | None = None) -> TradingBackend:
             "MT5_BRIDGE_TOKEN", "P8H5yPraTVSz4vkuaMVgWN8qcfeXUswuxIV70QES0Co"
         )
         return MT5Backend(auth_token=token)
-    raise ValueError("BROKER must be simulator or mt5")
+    if selected == "ctrader":
+        return CTraderBackend()
+    raise ValueError("BROKER must be simulator, mt5, or ctrader")
 
 
 def _report(
@@ -979,13 +982,28 @@ def main() -> int:
                 )
             )
         except ExampleError as error:
-            print("Example failed: %s", error)
+            print(f"Example failed: {error}")
             return 1
         except BridgeError as error:
             code = (
                 error.code
                 if error.code
                 in {
+                    "SYMBOL_NOT_FOUND",
+                    "AUTH_FAILED",
+                    "CONNECT_FAILED",
+                    "MODULE_NOT_FOUND",
+                    "CTRADER_CONFIG_INVALID",
+                    "CTRADER_ENVIRONMENT_MISMATCH",
+                    "CTRADER_REAUTHORIZE_REQUIRED",
+                    "CTRADER_TOKEN_PERSIST_FAILED",
+                    "CTRADER_ACCOUNT_ID_IS_LOGIN",
+                    "CTRADER_ACCOUNT_NOT_AUTHORIZED",
+                    "CH_ACCESS_TOKEN_INVALID",
+                    "OA_AUTH_TOKEN_EXPIRED",
+                    "CH_CLIENT_AUTH_FAILURE",
+                    "ACCOUNT_NOT_AUTHORIZED",
+                    "CH_CTID_TRADER_ACCOUNT_NOT_FOUND",
                     "DATA_NOT_READY",
                     "DATA_LIMIT_EXCEEDED",
                     "INVALID_MARKET_DATA",
@@ -998,10 +1016,10 @@ def main() -> int:
                 }
                 else "BRIDGE_ERROR"
             )
-            print("Example failed: %s", code)
+            print(f"Example failed: {code}")
             return 1
         except Exception as error:
-            print("Example failed: %s", type(error).__name__)
+            print(f"Example failed: {type(error).__name__}")
             return 1
     return 0
 

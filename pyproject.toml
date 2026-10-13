@@ -26,6 +26,10 @@ dependencies = [
 mt5 = [
     "metatrader5==5.0.6231 ; sys_platform == 'win32'",
 ]
+ctrader = [
+    "ctrader-open-api>=0.9.2",
+    "service-identity>=24.1.0",
+]
 
 [project.scripts]
 haruquantai = "app.main:main"
@@ -42,6 +46,7 @@ dev = [
     "types-psutil>=7,<8",
     "jsonschema>=4.26,<5",
     "types-jsonschema>=4.25,<5",
+    "types-requests>=2.33.0.20261006",
 ]
 
 # ============================================================================
@@ -198,6 +203,38 @@ ignore = [
     "PLR1714",
     "RUF022",
 ]
+"app/services/brokers/**/*.py" = [
+    "C901",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR0917",
+    "PLR2004",
+    "BLE001",
+    "TRY",
+    "SIM",
+    "E501",
+    "ANN401",
+    "ARG002",
+    "PLC0415",
+    "PTH",
+    "SLF001",
+    "EM",
+    "S101",
+    "S311",
+    "RUF012",
+    "PERF401",
+    "F841",
+    "UP042",
+    "UP046",
+    "B024",
+    "S110",
+    "E741",
+    "N813",
+    "PLR1714",
+    "RUF022",
+]
 "tests/**/*.py" = [
     "S",
     "PLR2004",
@@ -271,6 +308,12 @@ filterwarnings = [
     # starlette 1.6 TestClient -> httpx2 imports the deprecated anyio alias at
     # import time; ignore only this third-party message, not the category.
     "ignore:The anyio.abc.BlockingPortal alias is deprecated:DeprecationWarning",
+    # Twisted emitted by ctrader_open_api when service_identity is not active.
+    "ignore:.*service_identity module.*:UserWarning",
+    # Google Protobuf 3.x uses utcfromtimestamp on Python 3.12+
+    "ignore:datetime.datetime.utcfromtimestamp.*:DeprecationWarning",
+    # Python 3.14 asyncio Proactor loopback socket finalization
+    "ignore:unclosed <socket.socket.*:ResourceWarning",
 ]
 addopts = [
     "--import-mode=importlib",

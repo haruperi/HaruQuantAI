@@ -17,8 +17,8 @@ app/services/brokers/
   contracts.py         # Async TradingBackend and shared data/model contracts
   metatrader.py        # Native Bridge and MT5Backend adapter
   simulator.py         # Local model and async execution adapter
+  ctrader.py           # Spotware cTrader Open API Protobuf/TLS backend and broker adapter
   _simulation_api.py   # Private method handlers/per-object state
-  haruquant.py         # Incomplete legacy snapshot adapter; not production-wired
 
 app/host/persistence/
   mt5bridge_journal.py  # Dedicated journal connection/CRUD
@@ -35,10 +35,8 @@ previously in protocol.py/bridge.py. Manifest/verifier files are absent. Existin
 app/plugins/brokers/contracts.py remains a separate plugin-facing contract layer.
 
 TradingBackend is the async lifecycle/operation capability. BrokerBackend is a
-synchronous internal snapshot-model ABC for simulator/legacy implementations;
+synchronous internal snapshot-model ABC for simulator implementations;
 MT5 does not pretend to implement that model or locally recalculate broker data.
-HaruQuantBackend's imports are repaired, but its existing fallback semantics are
-not certified or enabled as a universal live backend by this task.
 
 ## Live MT5
 
@@ -92,6 +90,83 @@ See ../libs/README.md for named-property support and explicit unsupported numeri
 property/native-request-correlation and queued-trade behavior. Local events are simulation events;
 text formatting is model-specific. Future brokers implement the async capability
 and map supported operations into this vocabulary, rejecting unavailable features.
+
+## cTrader Open API (`CTraderBackend`)
+
+```python
+from app.services.brokers.ctrader import CTraderBackend
+from app.services.libs.trading import Trading
+
+backend = CTraderBackend(
+    client_id="...",
+    client_secret="...",
+    access_token="...",
+    account_id=1234567,
+    environment="demo",
+)
+trading = Trading(backend)
+# async with backend: account = await trading.account.AccountInfo()
+```
+
+`CTraderBackend` connects to Spotware Open API via length-prefixed Protocol Buffers
+over TLS (`live.ctraderapi.com:5035` or demo). It maps Spotware Open API payloads
+into canonical `Trading` properties, symbols, depth of market, trendbars, positions,
+and order execution checks. When protobuf modules are absent, it gracefully raises
+`BridgeError("cTrader Open API protobuf modules not available", code="MODULE_NOT_FOUND")`.
+
+Authentication first authorizes the application, then fetches the accounts allowed
+by the access token, validates the configured account/environment, and finally
+authorizes that account. `account_id` must be the API `ctidTraderAccountId`, not
+the `traderLogin` shown in the cTrader UI. A login-number match raises
+`CTRADER_ACCOUNT_ID_IS_LOGIN` with the correct API ID. No account is selected
+implicitly. The account's `isLive` must match `environment` and the gateway.
+
+Configuration precedence is explicit constructor arguments, `CTRADER_*`
+environment variables, `settings.config_ctrader`, then defaults. Omitted
+`environment` and `gateway_port` now respect settings. Defaults are `demo` and
+5035; a configured host that contradicts the environment is rejected. Configure
+both `environment="live"` and `gateway_host="live.ctraderapi.com"` for live, or
+both demo values for demo. An explicitly configured gateway is preserved.
+
+A rejected or expired access token triggers at most one protobuf token refresh
+and account-list retry. If no usable refresh token exists, startup raises
+`CTRADER_REAUTHORIZE_REQUIRED`; obtain fresh account consent/tokens through the
+[cTrader authentication flow](https://help.ctrader.com/open-api/account-authentication/).
+Refreshing invalidates the old access and refresh tokens. When the entire
+credential set came from host settings, the rotated pair is saved atomically
+through the host settings API with revision checks. For explicit or environment
+credentials, the caller must securely store `backend.client.access_token` and
+`backend.client.refresh_token` after rotation; do not log them. A host persistence
+conflict stops startup with `CTRADER_TOKEN_PERSIST_FAILED`, retaining the new pair
+on the client for secure recovery. No broker code runs SQL or migrates settings.
+
+The usage example defaults `ALLOW_LIVE_TRADING=False`, keeping external mutation
+examples disabled. Authentication/configuration failures expose safe error codes;
+server descriptions and token contents are excluded from auth diagnostics.
+
+### Historical downloads
+
+cTrader historical bars and ticks support explicit date ranges through
+`Trading.get_historical_bars` and `Trading.get_ticks`. The backend resolves the
+broker symbol ID, forwards inclusive date bounds in milliseconds, normalizes
+`M1`/`PERIOD_M1` timeframes, and rejects unsupported timeframes. Caller limits
+are enforced without silently truncating data. Position, latest and date/count
+modes currently raise `UNSUPPORTED_OPERATION`; supply both range boundaries.
+
+Requests are paced below five historical requests per second, with bounded
+pagination (64 pages per stream) and caller limits up to 10,000 records. Bars
+use one-day windows; ticks use windows no longer than one week. Incomplete or
+nonprogressing pages fail explicitly. Bid/ask tick timestamps and prices are
+both decoded from signed deltas after the first absolute sample. Overlapping
+page boundaries are deduplicated and returned records are chronological.
+Tick flags identify the updated side; the other side is carried forward only
+from prior observations within the requested range. Zero denotes an unobserved
+side. Historical candles carry spread=0 because the API does not supply it.
+
+Historical downloads now use actual server data. Live SymbolSnapshot/spot quote
+metadata, order book and some trading calculations remain legacy placeholder
+implementations; completing the read-only example does not certify those
+capabilities or authorize trading.
 
 ## Focused verification
 

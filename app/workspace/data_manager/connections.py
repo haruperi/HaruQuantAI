@@ -54,6 +54,7 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import time
 from abc import ABC, abstractmethod
@@ -171,6 +172,35 @@ def _parse_iso(iso_str: str | None) -> datetime | None:
         return None
 
 
+def _map_timeframe_contract(timeframe_str: str) -> Any:
+    """Map string timeframe to canonical Timeframe enum."""
+    from app.services.brokers.contracts import Timeframe
+
+    s = str(timeframe_str).upper().strip()
+    mapping = {
+        "M1": Timeframe.PERIOD_M1,
+        "1M": Timeframe.PERIOD_M1,
+        "M2": Timeframe.PERIOD_M2,
+        "M5": Timeframe.PERIOD_M5,
+        "5M": Timeframe.PERIOD_M5,
+        "M15": Timeframe.PERIOD_M15,
+        "15M": Timeframe.PERIOD_M15,
+        "M30": Timeframe.PERIOD_M30,
+        "30M": Timeframe.PERIOD_M30,
+        "H1": Timeframe.PERIOD_H1,
+        "1H": Timeframe.PERIOD_H1,
+        "H4": Timeframe.PERIOD_H4,
+        "4H": Timeframe.PERIOD_H4,
+        "D1": Timeframe.PERIOD_D1,
+        "1D": Timeframe.PERIOD_D1,
+        "W1": Timeframe.PERIOD_W1,
+        "1W": Timeframe.PERIOD_W1,
+        "MN1": Timeframe.PERIOD_MN1,
+        "1MN": Timeframe.PERIOD_MN1,
+    }
+    return mapping.get(s, Timeframe.PERIOD_D1)
+
+
 class SyntheticMockHelper:
     """Helper previously generating mock bars (DEPRECATED: Strict Real-Data Policy)."""
 
@@ -199,6 +229,7 @@ class BaseDataProvider(ABC):
         """Initialize adapter with static capabilities and rate limiter."""
         self._capabilities = capabilities
         self._rate_limiter = RateLimiter(capabilities.rate_limit_rps)
+        self.logger = logger
 
     @property
     def capabilities(self) -> ProviderCapabilities:
@@ -329,30 +360,35 @@ class BinanceProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.crypto import BinanceBroker
+        import asyncio
+
+        from app.services.brokers.crypto import BinanceBroker
+        from app.services.libs.data import get_historical_bars
 
         broker = BinanceBroker(default_market=self._variant)
         dt_from = _parse_iso(request.date_from)
         dt_to = _parse_iso(request.date_to)
-        resp = broker.get_bars(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            date_from=dt_from,
-            date_to=dt_to,
-        )
-        if not resp.is_success or not resp.data:
-            return []
-        return [
-            BarRecord(
-                timestamp_utc=b.time.isoformat(),
-                open=b.open,
-                high=b.high,
-                low=b.low,
-                close=b.close,
-                volume=float(b.real_volume or b.tick_volume),
+        tf = _map_timeframe_contract(request.timeframe)
+        try:
+            bars = asyncio.run(
+                get_historical_bars(
+                    broker, request.symbol, tf, date_from=dt_from, date_to=dt_to
+                )
             )
-            for b in resp.data
-        ]
+            return [
+                BarRecord(
+                    timestamp_utc=datetime.fromtimestamp(b.time, tz=UTC).isoformat(),
+                    open=b.open,
+                    high=b.high,
+                    low=b.low,
+                    close=b.close,
+                    volume=float(b.real_volume or b.tick_volume),
+                )
+                for b in bars
+            ]
+        except Exception as exc:  # noqa: BLE001
+            self.logger.warning("BinanceProvider fetch failed: %s", exc)
+            return []
 
 
 class BitfinexProvider(BaseDataProvider):
@@ -463,30 +499,35 @@ class DarwinexProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.darwinex import DarwinexBroker
+        import asyncio
+
+        from app.services.brokers.darwinex import DarwinexBroker
+        from app.services.libs.data import get_historical_bars
 
         broker = DarwinexBroker()
         dt_from = _parse_iso(request.date_from)
         dt_to = _parse_iso(request.date_to)
-        resp = broker.get_bars(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            date_from=dt_from,
-            date_to=dt_to,
-        )
-        if not resp.is_success or not resp.data:
-            return []
-        return [
-            BarRecord(
-                timestamp_utc=b.time.isoformat(),
-                open=b.open,
-                high=b.high,
-                low=b.low,
-                close=b.close,
-                volume=float(b.real_volume or b.tick_volume),
+        tf = _map_timeframe_contract(request.timeframe)
+        try:
+            bars = asyncio.run(
+                get_historical_bars(
+                    broker, request.symbol, tf, date_from=dt_from, date_to=dt_to
+                )
             )
-            for b in resp.data
-        ]
+            return [
+                BarRecord(
+                    timestamp_utc=datetime.fromtimestamp(b.time, tz=UTC).isoformat(),
+                    open=b.open,
+                    high=b.high,
+                    low=b.low,
+                    close=b.close,
+                    volume=float(b.real_volume or b.tick_volume),
+                )
+                for b in bars
+            ]
+        except Exception as exc:  # noqa: BLE001
+            self.logger.warning("DarwinexProvider fetch failed: %s", exc)
+            return []
 
 
 class DukascopyProvider(BaseDataProvider):
@@ -510,31 +551,36 @@ class DukascopyProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.dukascopy import DukascopyBroker
+        import asyncio
+
+        from app.services.brokers.dukascopy import DukascopyBroker
+        from app.services.libs.data import get_historical_bars
 
         broker = DukascopyBroker()
         dt_from = _parse_iso(request.date_from)
         dt_to = _parse_iso(request.date_to)
         provider_sym = request.extra_params.get("underlying") or request.symbol
-        resp = broker.get_bars(
-            symbol=provider_sym,
-            timeframe=request.timeframe,
-            date_from=dt_from,
-            date_to=dt_to,
-        )
-        if not resp.is_success or not resp.data:
-            return []
-        return [
-            BarRecord(
-                timestamp_utc=b.time.isoformat(),
-                open=b.open,
-                high=b.high,
-                low=b.low,
-                close=b.close,
-                volume=float(b.real_volume or b.tick_volume),
+        tf = _map_timeframe_contract(request.timeframe)
+        try:
+            bars = asyncio.run(
+                get_historical_bars(
+                    broker, provider_sym, tf, date_from=dt_from, date_to=dt_to
+                )
             )
-            for b in resp.data
-        ]
+            return [
+                BarRecord(
+                    timestamp_utc=datetime.fromtimestamp(b.time, tz=UTC).isoformat(),
+                    open=b.open,
+                    high=b.high,
+                    low=b.low,
+                    close=b.close,
+                    volume=float(b.real_volume or b.tick_volume),
+                )
+                for b in bars
+            ]
+        except Exception as exc:  # noqa: BLE001
+            self.logger.warning("DukascopyProvider fetch failed: %s", exc)
+            return []
 
 
 class MT5Provider(BaseDataProvider):
@@ -557,30 +603,35 @@ class MT5Provider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.metatrader import MetaTraderBroker
+        import asyncio
 
-        broker = MetaTraderBroker()
-        dt_from = _parse_iso(request.date_from)
-        dt_to = _parse_iso(request.date_to)
-        resp = broker.get_bars(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            date_from=dt_from,
-            date_to=dt_to,
-        )
-        if not resp.is_success or not resp.data:
-            return []
-        return [
-            BarRecord(
-                timestamp_utc=b.time.isoformat(),
-                open=b.open,
-                high=b.high,
-                low=b.low,
-                close=b.close,
-                volume=float(b.real_volume or b.tick_volume),
+        from app.services.brokers.contracts import BridgeError
+        from app.services.brokers.metatrader import MT5Backend
+        from app.services.libs.data import get_historical_bars
+
+        auth_token = os.environ.get("MT5_AUTH_TOKEN", "default_token")
+        backend = MT5Backend(auth_token=auth_token)
+        tf_contract = _map_timeframe_contract(request.timeframe)
+        try:
+            bars = asyncio.run(
+                get_historical_bars(backend, request.symbol, tf_contract)
             )
-            for b in resp.data
-        ]
+            return [
+                BarRecord(
+                    timestamp_utc=b.time.isoformat()
+                    if hasattr(b.time, "isoformat")
+                    else datetime.fromtimestamp(b.time, tz=UTC).isoformat(),
+                    open=b.open,
+                    high=b.high,
+                    low=b.low,
+                    close=b.close,
+                    volume=float(b.real_volume or b.tick_volume),
+                )
+                for b in bars
+            ]
+        except (BridgeError, OSError, RuntimeError, ValueError) as err:
+            self.logger.warning("MT5Provider fetch failed: %s", err)
+            return []
 
 
 class SQEquityProvider(BaseDataProvider):
@@ -603,30 +654,35 @@ class SQEquityProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.sq_equity import SQEquityBroker
+        import asyncio
+
+        from app.services.brokers.sq_equity import SQEquityBroker
+        from app.services.libs.data import get_historical_bars
 
         broker = SQEquityBroker()
         dt_from = _parse_iso(request.date_from)
         dt_to = _parse_iso(request.date_to)
-        resp = broker.get_bars(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            date_from=dt_from,
-            date_to=dt_to,
-        )
-        if not resp.is_success or not resp.data:
-            return []
-        return [
-            BarRecord(
-                timestamp_utc=b.time.isoformat(),
-                open=b.open,
-                high=b.high,
-                low=b.low,
-                close=b.close,
-                volume=float(b.real_volume or b.tick_volume),
+        tf = _map_timeframe_contract(request.timeframe)
+        try:
+            bars = asyncio.run(
+                get_historical_bars(
+                    broker, request.symbol, tf, date_from=dt_from, date_to=dt_to
+                )
             )
-            for b in resp.data
-        ]
+            return [
+                BarRecord(
+                    timestamp_utc=datetime.fromtimestamp(b.time, tz=UTC).isoformat(),
+                    open=b.open,
+                    high=b.high,
+                    low=b.low,
+                    close=b.close,
+                    volume=float(b.real_volume or b.tick_volume),
+                )
+                for b in bars
+            ]
+        except Exception as exc:  # noqa: BLE001
+            self.logger.warning("SQEquityProvider fetch failed: %s", exc)
+            return []
 
 
 class SQFuturesProvider(BaseDataProvider):
@@ -649,30 +705,35 @@ class SQFuturesProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.sq_futures import SQFuturesBroker
+        import asyncio
+
+        from app.services.brokers.sq_futures import SQFuturesBroker
+        from app.services.libs.data import get_historical_bars
 
         broker = SQFuturesBroker()
         dt_from = _parse_iso(request.date_from)
         dt_to = _parse_iso(request.date_to)
-        resp = broker.get_bars(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            date_from=dt_from,
-            date_to=dt_to,
-        )
-        if not resp.is_success or not resp.data:
-            return []
-        return [
-            BarRecord(
-                timestamp_utc=b.time.isoformat(),
-                open=b.open,
-                high=b.high,
-                low=b.low,
-                close=b.close,
-                volume=float(b.real_volume or b.tick_volume),
+        tf = _map_timeframe_contract(request.timeframe)
+        try:
+            bars = asyncio.run(
+                get_historical_bars(
+                    broker, request.symbol, tf, date_from=dt_from, date_to=dt_to
+                )
             )
-            for b in resp.data
-        ]
+            return [
+                BarRecord(
+                    timestamp_utc=datetime.fromtimestamp(b.time, tz=UTC).isoformat(),
+                    open=b.open,
+                    high=b.high,
+                    low=b.low,
+                    close=b.close,
+                    volume=float(b.real_volume or b.tick_volume),
+                )
+                for b in bars
+            ]
+        except Exception as exc:  # noqa: BLE001
+            self.logger.warning("SQFuturesProvider fetch failed: %s", exc)
+            return []
 
 
 class TDProvider(BaseDataProvider):
@@ -725,30 +786,35 @@ class YahooProvider(BaseDataProvider):
         self, request: DownloadRequest, token: CancellationToken
     ) -> list[BarRecord]:
         token.check_cancelled()
-        from app.plugins.brokers.yahoo import YahooBroker
+        import asyncio
+
+        from app.services.brokers.yahoo import YahooBroker
+        from app.services.libs.data import get_historical_bars
 
         broker = YahooBroker()
         dt_from = _parse_iso(request.date_from)
         dt_to = _parse_iso(request.date_to)
-        resp = broker.get_bars(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            date_from=dt_from,
-            date_to=dt_to,
-        )
-        if not resp.is_success or not resp.data:
-            return []
-        return [
-            BarRecord(
-                timestamp_utc=b.time.isoformat(),
-                open=b.open,
-                high=b.high,
-                low=b.low,
-                close=b.close,
-                volume=float(b.real_volume or b.tick_volume),
+        tf = _map_timeframe_contract(request.timeframe)
+        try:
+            bars = asyncio.run(
+                get_historical_bars(
+                    broker, request.symbol, tf, date_from=dt_from, date_to=dt_to
+                )
             )
-            for b in resp.data
-        ]
+            return [
+                BarRecord(
+                    timestamp_utc=datetime.fromtimestamp(b.time, tz=UTC).isoformat(),
+                    open=b.open,
+                    high=b.high,
+                    low=b.low,
+                    close=b.close,
+                    volume=float(b.real_volume or b.tick_volume),
+                )
+                for b in bars
+            ]
+        except Exception as exc:  # noqa: BLE001
+            self.logger.warning("YahooProvider fetch failed: %s", exc)
+            return []
 
 
 class ProviderManager:
