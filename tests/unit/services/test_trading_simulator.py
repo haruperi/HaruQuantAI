@@ -27,7 +27,6 @@ from app.services.brokers.contracts import (
     BridgeError,
     MarginMode,
     OrderTime,
-    PropertyValue,
     ReceiptStatus,
     SymbolSpec,
 )
@@ -48,13 +47,12 @@ def test_market_positions_history_and_clock(mode: MarginMode) -> None:
             assert (await trading.account.AccountInfo()).balance == 10_000
             assert await trading.symbol.Name("EURUSD") is True
             assert await trading.symbol.Name() == "EURUSD"
-            assert await trading.symbol.Bid() == 1.1
-            assert await trading.symbol.Time() == int(now.timestamp())
+            info = await trading.symbol.SymbolInfo()
+            assert info.bid == 1.1
+            assert info.time == int(now.timestamp())
             separate = SymbolInfo(backend)
             assert await separate.Name() == ""
-            assert await trading.symbol.InfoDouble("point") == PropertyValue(
-                ok=True, value=0.00001
-            )
+            assert info.point == 0.00001
             with pytest.raises(BridgeError, match="disarmed"):
                 await trading.trade.Buy(0.1, "EURUSD")
             trading.arm()
@@ -84,7 +82,7 @@ def test_market_positions_history_and_clock(mode: MarginMode) -> None:
             assert await trading.history_order.Ticket() > 0
             assert await trading.deal.SelectByIndex(0)
             assert await trading.deal.Commission() == await trading.deal.Commision()
-            assert await trading.symbol.Time() == int(now.timestamp())
+            assert (await trading.symbol.SymbolInfo()).time == int(now.timestamp())
 
     asyncio.run(scenario())
 
@@ -146,7 +144,7 @@ def test_rejection_and_unknown_operation() -> None:
                 object_id="test", class_name="Trade", method_name="Unknown", args=[]
             )
         with pytest.raises(BridgeError, match="numeric property"):
-            await trading.symbol.InfoInteger(999)
+            await trading.order.InfoInteger(999)
         assert (await trading.terminal.TerminalInfo()).connected is True
         with pytest.raises(BridgeError, match="queued asynchronous"):
             await trading.trade.SetAsyncMode(True)
@@ -179,7 +177,7 @@ def test_stops_close_by_and_local_events() -> None:
         )
         assert backend.positions() == []
         with pytest.raises(BridgeError, match="unsupported"):
-            await trading.symbol.InfoDouble("does_not_exist")
+            await trading.order.InfoDouble("does_not_exist")
         await trading.close()
 
     asyncio.run(scenario())

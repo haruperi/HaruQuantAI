@@ -30,10 +30,10 @@ from app.services.trading import Trading
 async def read_account(backend):
     async with Trading(backend) as trading:
         await trading.wait_connected(timeout=60)
-        balance = await trading.account.Balance()
+        account = await trading.account.AccountInfo()
         await trading.symbol.Name("EURUSD")
-        bid = await trading.symbol.Bid()
-        return balance, bid
+        symbol = await trading.symbol.SymbolInfo()
+        return account.balance, symbol.bid
 ```
 
 Supply MT5Backend for live MT5, or SimulationBackend with registered symbols and
@@ -42,8 +42,8 @@ such as backend.account, but they are instances of these same canonical classes.
 There are no alternative classes/proxies folders under brokers.
 
 Generic selected-object InfoInteger/InfoDouble/InfoString calls return
-PropertyValue. AccountInfo/TerminalInfo calls return typed snapshots
-(AccountSnapshot, TerminalSnapshot). Trade Request/Result/CheckResult return
+PropertyValue. AccountInfo/TerminalInfo/SymbolInfo calls return typed snapshots
+(AccountSnapshot, TerminalSnapshot, SymbolSnapshot). Trade Request/Result/CheckResult return
 dictionaries. Enums retain native numeric values;
 seconds/milliseconds stay integer values. Symbol Name() reads the binding;
 Name("EURUSD") returns a binding boolean. StoreState and void native setters return

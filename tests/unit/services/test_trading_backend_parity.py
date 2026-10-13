@@ -26,7 +26,7 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 from app.services.brokers import _simulation_api, simulator
-from app.services.brokers.contracts import BridgeError, PropertyValue, SymbolSpec
+from app.services.brokers.contracts import BridgeError, SymbolSpec
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
 from app.services.trading import Trading
@@ -49,7 +49,7 @@ def test_native_forwarding_and_result_parity(
                 {"balance": 10_000.0, "trade_mode": 0},
                 True,
                 "EURUSD",
-                {"ok": True, "value": 0.00001},
+                {"point": 0.00001},
                 {"balance": 10_000.0, "trade_mode": 0},
             ]
         )
@@ -64,9 +64,9 @@ def test_native_forwarding_and_result_parity(
             )
             assert await native.symbol.Name() == await local.symbol.Name()
             assert (
-                await native.symbol.InfoDouble("point")
-                == await local.symbol.InfoDouble("point")
-                == PropertyValue(ok=True, value=0.00001)
+                (await native.symbol.SymbolInfo()).point
+                == (await local.symbol.SymbolInfo()).point
+                == 0.00001
             )
             first = call.call_args_list[0].kwargs
             assert first["class_name"] == "AccountInfo"

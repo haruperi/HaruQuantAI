@@ -656,12 +656,16 @@ def test_symbol_info_extended_properties_and_search_parity() -> None:
         no_majors = await symbol.SymbolsGet("*,!*USD*,!*EUR*,!*JPY*,!*GBP*")
         assert no_majors == []
 
-        # 3. Extended Properties
-        assert await symbol.Custom() is False
-        assert await symbol.ChartMode() == 0
-        assert await symbol.Visible() is True
-        assert await symbol.MarginHedged() == 0.0
-        assert await symbol.PriceChange() == 0.0
+        # 3. Snapshot Properties
+        info = await symbol.SymbolInfo()
+        assert info.custom is False
+        assert info.chart_mode == 0
+        assert info.visible is True
+        assert info.margin_hedged == 0.0
+        assert info.price_change == 0.0
+        assert info.digits == 5
+        assert info.point == 0.00001
+        assert info.lots_min == 0.01
 
         # 4. as_dict
         d = await symbol.as_dict()

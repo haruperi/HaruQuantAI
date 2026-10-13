@@ -667,6 +667,154 @@ class TerminalSnapshot:
 
 
 @dataclass(slots=True)
+class SymbolSnapshot:
+    name: str = ""
+    custom: bool = False
+    chart_mode: int = 0
+    select: bool = True
+    visible: bool = True
+    session_deals: int = 0
+    session_buy_orders: int = 0
+    session_sell_orders: int = 0
+    volume: int = 0
+    volumehigh: int = 0
+    volumelow: int = 0
+    time: int = 0
+    digits: int = 5
+    spread: int = 0
+    spread_float: bool = True
+    ticks_bookdepth: int = 0
+    trade_calc_mode: int = 0
+    trade_calc_mode_description: str = ""
+    trade_mode: int = 0
+    trade_mode_description: str = ""
+    start_time: int = 0
+    expiration_time: int = 0
+    trade_stops_level: int = 0
+    trade_freeze_level: int = 0
+    trade_exemode: int = 0
+    trade_execution_description: str = ""
+    swap_mode: int = 0
+    swap_mode_description: str = ""
+    swap_rollover3days: int = 3
+    swap_rollover3days_description: str = ""
+    margin_hedged_use_leg: bool = False
+    expiration_mode: int = 7
+    filling_mode: int = 1
+    order_mode: int = 127
+    order_gtc_mode: int = 0
+    option_mode: int = 0
+    option_right: int = 0
+    bid: float = 0.0
+    bidhigh: float = 0.0
+    bidlow: float = 0.0
+    ask: float = 0.0
+    askhigh: float = 0.0
+    asklow: float = 0.0
+    last: float = 0.0
+    lasthigh: float = 0.0
+    lastlow: float = 0.0
+    volume_real: float = 0.0
+    volumehigh_real: float = 0.0
+    volumelow_real: float = 0.0
+    option_strike: float = 0.0
+    point: float = 0.00001
+    trade_tick_value: float = 1.0
+    trade_tick_value_profit: float = 1.0
+    trade_tick_value_loss: float = 1.0
+    trade_tick_size: float = 0.00001
+    trade_contract_size: float = 100_000.0
+    trade_accrued_interest: float = 0.0
+    trade_face_value: float = 0.0
+    trade_liquidity_rate: float = 0.0
+    volume_min: float = 0.01
+    volume_max: float = 100.0
+    volume_step: float = 0.01
+    volume_limit: float = 0.0
+    swap_long: float = 0.0
+    swap_short: float = 0.0
+    margin_initial: float = 0.0
+    margin_maintenance: float = 0.0
+    margin_long: float = 1.0
+    margin_short: float = 1.0
+    margin_limit: float = 1.0
+    margin_stop: float = 1.0
+    margin_stop_limit: float = 1.0
+    trade_time_flags: int = 0
+    trade_fill_flags: int = 3
+    session_volume: float = 0.0
+    session_turnover: float = 0.0
+    session_interest: float = 0.0
+    session_buy_orders_volume: float = 0.0
+    session_sell_orders_volume: float = 0.0
+    session_open: float = 0.0
+    session_close: float = 0.0
+    session_aw: float = 0.0
+    session_price_settlement: float = 0.0
+    session_price_limit_min: float = 0.0
+    session_price_limit_max: float = 0.0
+    margin_hedged: float = 0.0
+    price_change: float = 0.0
+    price_volatility: float = 0.0
+    price_theoretical: float = 0.0
+    price_greeks_delta: float = 0.0
+    price_greeks_theta: float = 0.0
+    price_greeks_gamma: float = 0.0
+    price_greeks_vega: float = 0.0
+    price_greeks_rho: float = 0.0
+    price_greeks_omega: float = 0.0
+    price_sensitivity: float = 0.0
+    basis: str = ""
+    category: str = ""
+    currency_base: str = ""
+    currency_profit: str = "USD"
+    currency_margin: str = "USD"
+    bank: str = ""
+    description: str = ""
+    exchange: str = ""
+    formula: str = ""
+    isin: str = ""
+    page: str = ""
+    path: str = ""
+
+    @property
+    def lots_min(self) -> float:
+        return self.volume_min
+
+    @property
+    def lots_max(self) -> float:
+        return self.volume_max
+
+    @property
+    def lots_step(self) -> float:
+        return self.volume_step
+
+    @property
+    def lots_limit(self) -> float:
+        return self.volume_limit
+
+    @property
+    def tick_size(self) -> float:
+        return self.trade_tick_size
+
+    @property
+    def tick_value(self) -> float:
+        return self.trade_tick_value
+
+    @property
+    def contract_size(self) -> float:
+        return self.trade_contract_size
+
+    @property
+    def stops_level(self) -> int:
+        return self.trade_stops_level
+
+    @property
+    def freeze_level(self) -> int:
+        return self.trade_freeze_level
+
+
+@dataclass(slots=True)
 class OrderRecord:
     ticket: int
     symbol: str

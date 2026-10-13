@@ -51,11 +51,8 @@ from app.services.brokers.contracts import (
     OrderType,
     PositionType,
     StopoutMode,
-    SymbolCalcMode,
+    SymbolSnapshot,
     SymbolSpec,
-    SymbolSwapMode,
-    SymbolTradeExecution,
-    SymbolTradeMode,
     TerminalSnapshot,
     TradeAction,
     TradeCheckResult,
@@ -1146,332 +1143,8 @@ def _symbolinfo_issynchronized(self: _ObjectState) -> bool:
     return bool(_symbolinfo__s(self).synchronized)
 
 
-def _symbolinfo_volume(self: _ObjectState) -> float:
-    tick = _symbolinfo__t(self)
-    return float(tick.volume if tick else 0.0)
-
-
-def _symbolinfo_volumehigh(self: _ObjectState) -> float:
-    value = self._backend.info_value("symbol", "volume_high", self.symbol_name)
-    return float(value if value is not None else _symbolinfo_volume(self))
-
-
-def _symbolinfo_volumelow(self: _ObjectState) -> float:
-    value = self._backend.info_value("symbol", "volume_low", self.symbol_name)
-    return float(value if value is not None else _symbolinfo_volume(self))
-
-
-def _symbolinfo_time(self: _ObjectState) -> int:
-    tick = _symbolinfo__t(self)
-    return epoch_seconds(tick.time) if tick else 0
-
-
-def _symbolinfo_spread(self: _ObjectState) -> int:
-    tick = _symbolinfo__t(self)
-    if tick is not None and _symbolinfo_point(self) > 0:
-        spread: float = (tick.ask - tick.bid) / _symbolinfo_point(self)
-        return round(spread)
-    return int(_symbolinfo__s(self).spread)
-
-
-def _symbolinfo_spreadfloat(self: _ObjectState) -> bool:
-    return bool(_symbolinfo__s(self).spread_float)
-
-
-def _symbolinfo_ticksbookdepth(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).ticks_book_depth)
-
-
-def _symbolinfo_stopslevel(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).stops_level)
-
-
-def _symbolinfo_freezelevel(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).freeze_level)
-
-
-def _symbolinfo_bid(self: _ObjectState) -> float:
-    tick = _symbolinfo__t(self)
-    return float(tick.bid if tick else 0.0)
-
-
-def _symbolinfo_bidhigh(self: _ObjectState) -> float:
-    value = self._backend.info_value("symbol", "bid_high", self.symbol_name)
-    return float(value if value is not None else _symbolinfo_bid(self))
-
-
-def _symbolinfo_bidlow(self: _ObjectState) -> float:
-    value = self._backend.info_value("symbol", "bid_low", self.symbol_name)
-    return float(value if value is not None else _symbolinfo_bid(self))
-
-
-def _symbolinfo_ask(self: _ObjectState) -> float:
-    tick = _symbolinfo__t(self)
-    return float(tick.ask if tick else 0.0)
-
-
-def _symbolinfo_askhigh(self: _ObjectState) -> float:
-    value = self._backend.info_value("symbol", "ask_high", self.symbol_name)
-    return float(value if value is not None else _symbolinfo_ask(self))
-
-
-def _symbolinfo_asklow(self: _ObjectState) -> float:
-    value = self._backend.info_value("symbol", "ask_low", self.symbol_name)
-    return float(value if value is not None else _symbolinfo_ask(self))
-
-
-def _symbolinfo_last(self: _ObjectState) -> float:
-    tick = _symbolinfo__t(self)
-    return float(tick.last if tick else 0.0)
-
-
-def _symbolinfo_lasthigh(self: _ObjectState) -> float:
-    value = self._backend.info_value("symbol", "last_high", self.symbol_name)
-    return float(value if value is not None else _symbolinfo_last(self))
-
-
-def _symbolinfo_lastlow(self: _ObjectState) -> float:
-    value = self._backend.info_value("symbol", "last_low", self.symbol_name)
-    return float(value if value is not None else _symbolinfo_last(self))
-
-
-def _symbolinfo_tradecalcmode(self: _ObjectState) -> SymbolCalcMode:
-    return SymbolCalcMode(_symbolinfo__s(self).trade_calc_mode)
-
-
-def _symbolinfo_tradecalcmodedescription(self: _ObjectState) -> str:
-    return _symbolinfo_tradecalcmode(self).name.replace("_", " ").title()
-
-
-def _symbolinfo_trademode(self: _ObjectState) -> SymbolTradeMode:
-    return SymbolTradeMode(_symbolinfo__s(self).trade_mode)
-
-
-def _symbolinfo_trademodedescription(self: _ObjectState) -> str:
-    return _symbolinfo_trademode(self).name.replace("_", " ").title()
-
-
-def _symbolinfo_tradeexecution(self: _ObjectState) -> SymbolTradeExecution:
-    return SymbolTradeExecution(_symbolinfo__s(self).trade_execution)
-
-
-def _symbolinfo_tradeexecutiondescription(self: _ObjectState) -> str:
-    return _symbolinfo_tradeexecution(self).name.replace("_", " ").title()
-
-
-def _symbolinfo_swapmode(self: _ObjectState) -> SymbolSwapMode:
-    return SymbolSwapMode(_symbolinfo__s(self).swap_mode)
-
-
-def _symbolinfo_swapmodedescription(self: _ObjectState) -> str:
-    return _symbolinfo_swapmode(self).name.replace("_", " ").title()
-
-
-def _symbolinfo_swaprollover3days(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).swap_rollover3days)
-
-
-def _symbolinfo_swaprollover3daysdescription(self: _ObjectState) -> str:
-    days = (
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    )
-    value = _symbolinfo_swaprollover3days(self)
-    return days[value] if 0 <= value < len(days) else str(value)
-
-
-def _symbolinfo_margininitial(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).margin_initial)
-
-
-def _symbolinfo_marginmaintenance(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).margin_maintenance)
-
-
-def _symbolinfo_marginlong(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).margin_long)
-
-
-def _symbolinfo_marginshort(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).margin_short)
-
-
-def _symbolinfo_marginlimit(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).margin_limit)
-
-
-def _symbolinfo_marginstop(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).margin_stop)
-
-
-def _symbolinfo_marginstoplimit(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).margin_stop_limit)
-
-
-def _symbolinfo_tradetimeflags(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).trade_time_flags)
-
-
-def _symbolinfo_tradefillflags(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).trade_fill_flags)
-
-
-def _symbolinfo_digits(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).digits)
-
-
-def _symbolinfo_point(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).point)
-
-
-def _symbolinfo_tickvalue(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).tick_value)
-
-
-def _symbolinfo_tickvalueprofit(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).tick_value_profit)
-
-
-def _symbolinfo_tickvalueloss(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).tick_value_loss)
-
-
-def _symbolinfo_ticksize(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).tick_size)
-
-
-def _symbolinfo_contractsize(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).contract_size)
-
-
-def _symbolinfo_lotsmin(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).lots_min)
-
-
-def _symbolinfo_lotsmax(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).lots_max)
-
-
-def _symbolinfo_lotsstep(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).lots_step)
-
-
-def _symbolinfo_lotslimit(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).lots_limit)
-
-
-def _symbolinfo_swaplong(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).swap_long)
-
-
-def _symbolinfo_swapshort(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).swap_short)
-
-
-def _symbolinfo_currencybase(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).currency_base)
-
-
-def _symbolinfo_currencyprofit(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).currency_profit)
-
-
-def _symbolinfo_currencymargin(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).currency_margin)
-
-
-def _symbolinfo_bank(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).bank)
-
-
-def _symbolinfo_description(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).description)
-
-
-def _symbolinfo_path(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).path)
-
-
-def _symbolinfo_sessiondeals(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).session_deals)
-
-
-def _symbolinfo_sessionbuyorders(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).session_buy_orders)
-
-
-def _symbolinfo_sessionsellorders(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).session_sell_orders)
-
-
-def _symbolinfo_sessionturnover(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_turnover)
-
-
-def _symbolinfo_sessioninterest(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_interest)
-
-
-def _symbolinfo_sessionbuyordersvolume(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_buy_orders_volume)
-
-
-def _symbolinfo_sessionsellordersvolume(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_sell_orders_volume)
-
-
-def _symbolinfo_sessionopen(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_open)
-
-
-def _symbolinfo_sessionclose(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_close)
-
-
-def _symbolinfo_sessionaw(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_aw)
-
-
-def _symbolinfo_sessionpricesettlement(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_price_settlement)
-
-
-def _symbolinfo_sessionpricelimitmin(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_price_limit_min)
-
-
-def _symbolinfo_sessionpricelimitmax(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_price_limit_max)
-
-
-def _symbolinfo_infointeger(self: _ObjectState, property_id: int | str) -> int:
-    value = self._backend.info_value("symbol", property_id, self.symbol_name)
-    if value is None and isinstance(property_id, str):
-        value = getattr(_symbolinfo__s(self), property_id.strip().lower(), 0)
-    return int(value or 0)
-
-
-def _symbolinfo_infodouble(self: _ObjectState, property_id: int | str) -> float:
-    value = self._backend.info_value("symbol", property_id, self.symbol_name)
-    if value is None and isinstance(property_id, str):
-        value = getattr(_symbolinfo__s(self), property_id.strip().lower(), 0.0)
-    return float(value or 0.0)
-
-
-def _symbolinfo_infostring(self: _ObjectState, property_id: int | str) -> str:
-    value = self._backend.info_value("symbol", property_id, self.symbol_name)
-    if value is None and isinstance(property_id, str):
-        value = getattr(_symbolinfo__s(self), property_id.strip().lower(), "")
-    return str(value or "")
-
-
 def _symbolinfo_normalizeprice(self: _ObjectState, price: float) -> float:
-    return round(float(price), _symbolinfo_digits(self))
+    return round(float(price), int(_symbolinfo__s(self).digits))
 
 
 def _match_symbol_pattern(name: str, group: str | None) -> bool:
@@ -1613,154 +1286,6 @@ def _symbolinfo_marketbookget(
     return entries
 
 
-def _symbolinfo_custom(self: _ObjectState) -> bool:
-    return bool(_symbolinfo__s(self).custom)
-
-
-def _symbolinfo_chartmode(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).chart_mode)
-
-
-def _symbolinfo_visible(self: _ObjectState) -> bool:
-    return bool(_symbolinfo__s(self).visible)
-
-
-def _symbolinfo_starttime(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).start_time)
-
-
-def _symbolinfo_expirationtime(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).expiration_time)
-
-
-def _symbolinfo_marginhedgeduseleg(self: _ObjectState) -> bool:
-    return bool(_symbolinfo__s(self).margin_hedged_use_leg)
-
-
-def _symbolinfo_expirationmode(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).expiration_mode)
-
-
-def _symbolinfo_fillingmode(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).filling_mode)
-
-
-def _symbolinfo_ordermode(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).order_mode)
-
-
-def _symbolinfo_ordergtcmode(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).order_gtc_mode)
-
-
-def _symbolinfo_optionmode(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).option_mode)
-
-
-def _symbolinfo_optionright(self: _ObjectState) -> int:
-    return int(_symbolinfo__s(self).option_right)
-
-
-def _symbolinfo_volumereal(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).volume_real)
-
-
-def _symbolinfo_volumehighreal(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).volumehigh_real)
-
-
-def _symbolinfo_volumelowreal(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).volumelow_real)
-
-
-def _symbolinfo_optionstrike(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).option_strike)
-
-
-def _symbolinfo_tradeaccruedinterest(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).trade_accrued_interest)
-
-
-def _symbolinfo_tradefacevalue(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).trade_face_value)
-
-
-def _symbolinfo_tradeliquidityrate(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).trade_liquidity_rate)
-
-
-def _symbolinfo_sessionvolume(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).session_volume)
-
-
-def _symbolinfo_marginhedged(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).margin_hedged)
-
-
-def _symbolinfo_pricechange(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_change)
-
-
-def _symbolinfo_pricevolatility(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_volatility)
-
-
-def _symbolinfo_pricetheoretical(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_theoretical)
-
-
-def _symbolinfo_pricegreeksdelta(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_greeks_delta)
-
-
-def _symbolinfo_pricegreekstheta(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_greeks_theta)
-
-
-def _symbolinfo_pricegreeksgamma(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_greeks_gamma)
-
-
-def _symbolinfo_pricegreeksvega(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_greeks_vega)
-
-
-def _symbolinfo_pricegreeksrho(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_greeks_rho)
-
-
-def _symbolinfo_pricegreeksomega(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_greeks_omega)
-
-
-def _symbolinfo_pricesensitivity(self: _ObjectState) -> float:
-    return float(_symbolinfo__s(self).price_sensitivity)
-
-
-def _symbolinfo_basis(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).basis)
-
-
-def _symbolinfo_category(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).category)
-
-
-def _symbolinfo_exchange(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).exchange)
-
-
-def _symbolinfo_formula(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).formula)
-
-
-def _symbolinfo_isin(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).isin)
-
-
-def _symbolinfo_page(self: _ObjectState) -> str:
-    return cast("str", _symbolinfo__s(self).page)
-
-
 def _symbolinfo_asdict(self: _ObjectState) -> dict[str, Any]:
     s = _symbolinfo__s(self)
     tick = _symbolinfo__t(self)
@@ -1868,6 +1393,30 @@ def _symbolinfo_asdict(self: _ObjectState) -> dict[str, Any]:
         "page": str(s.page),
         "path": str(s.path),
     }
+
+
+def _symbolinfo_symbolinfo(
+    self: _ObjectState, symbol: str | None = None
+) -> SymbolSnapshot:
+    if symbol:
+        self.symbol_name = symbol
+    d = _symbolinfo_asdict(self)
+    s = _symbolinfo__s(self)
+    return SymbolSnapshot(
+        trade_calc_mode_description=s.trade_calc_mode.name.replace("_", " ").title(),
+        trade_mode_description=s.trade_mode.name.replace("_", " ").title(),
+        trade_execution_description=s.trade_execution.name.replace("_", " ").title(),
+        swap_mode_description=s.swap_mode.name.replace("_", " ").title(),
+        swap_rollover3days_description=str(s.swap_rollover3days),
+        margin_long=float(s.margin_long),
+        margin_short=float(s.margin_short),
+        margin_limit=float(s.margin_limit),
+        margin_stop=float(s.margin_stop),
+        margin_stop_limit=float(s.margin_stop_limit),
+        trade_time_flags=int(s.trade_time_flags),
+        trade_fill_flags=int(s.trade_fill_flags),
+        **d,
+    )
 
 
 def _terminalinfo___init__(self: _ObjectState, backend: BrokerBackend) -> None:
@@ -2734,78 +2283,6 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "Name": _symbolinfo_name,
         "Select": _symbolinfo_select,
         "IsSynchronized": _symbolinfo_issynchronized,
-        "Volume": _symbolinfo_volume,
-        "VolumeHigh": _symbolinfo_volumehigh,
-        "VolumeLow": _symbolinfo_volumelow,
-        "Time": _symbolinfo_time,
-        "Spread": _symbolinfo_spread,
-        "SpreadFloat": _symbolinfo_spreadfloat,
-        "TicksBookDepth": _symbolinfo_ticksbookdepth,
-        "StopsLevel": _symbolinfo_stopslevel,
-        "FreezeLevel": _symbolinfo_freezelevel,
-        "Bid": _symbolinfo_bid,
-        "BidHigh": _symbolinfo_bidhigh,
-        "BidLow": _symbolinfo_bidlow,
-        "Ask": _symbolinfo_ask,
-        "AskHigh": _symbolinfo_askhigh,
-        "AskLow": _symbolinfo_asklow,
-        "Last": _symbolinfo_last,
-        "LastHigh": _symbolinfo_lasthigh,
-        "LastLow": _symbolinfo_lastlow,
-        "TradeCalcMode": _symbolinfo_tradecalcmode,
-        "TradeCalcModeDescription": _symbolinfo_tradecalcmodedescription,
-        "TradeMode": _symbolinfo_trademode,
-        "TradeModeDescription": _symbolinfo_trademodedescription,
-        "TradeExecution": _symbolinfo_tradeexecution,
-        "TradeExecutionDescription": _symbolinfo_tradeexecutiondescription,
-        "SwapMode": _symbolinfo_swapmode,
-        "SwapModeDescription": _symbolinfo_swapmodedescription,
-        "SwapRollover3days": _symbolinfo_swaprollover3days,
-        "SwapRollover3daysDescription": _symbolinfo_swaprollover3daysdescription,
-        "MarginInitial": _symbolinfo_margininitial,
-        "MarginMaintenance": _symbolinfo_marginmaintenance,
-        "MarginLong": _symbolinfo_marginlong,
-        "MarginShort": _symbolinfo_marginshort,
-        "MarginLimit": _symbolinfo_marginlimit,
-        "MarginStop": _symbolinfo_marginstop,
-        "MarginStopLimit": _symbolinfo_marginstoplimit,
-        "TradeTimeFlags": _symbolinfo_tradetimeflags,
-        "TradeFillFlags": _symbolinfo_tradefillflags,
-        "Digits": _symbolinfo_digits,
-        "Point": _symbolinfo_point,
-        "TickValue": _symbolinfo_tickvalue,
-        "TickValueProfit": _symbolinfo_tickvalueprofit,
-        "TickValueLoss": _symbolinfo_tickvalueloss,
-        "TickSize": _symbolinfo_ticksize,
-        "ContractSize": _symbolinfo_contractsize,
-        "LotsMin": _symbolinfo_lotsmin,
-        "LotsMax": _symbolinfo_lotsmax,
-        "LotsStep": _symbolinfo_lotsstep,
-        "LotsLimit": _symbolinfo_lotslimit,
-        "SwapLong": _symbolinfo_swaplong,
-        "SwapShort": _symbolinfo_swapshort,
-        "CurrencyBase": _symbolinfo_currencybase,
-        "CurrencyProfit": _symbolinfo_currencyprofit,
-        "CurrencyMargin": _symbolinfo_currencymargin,
-        "Bank": _symbolinfo_bank,
-        "Description": _symbolinfo_description,
-        "Path": _symbolinfo_path,
-        "SessionDeals": _symbolinfo_sessiondeals,
-        "SessionBuyOrders": _symbolinfo_sessionbuyorders,
-        "SessionSellOrders": _symbolinfo_sessionsellorders,
-        "SessionTurnover": _symbolinfo_sessionturnover,
-        "SessionInterest": _symbolinfo_sessioninterest,
-        "SessionBuyOrdersVolume": _symbolinfo_sessionbuyordersvolume,
-        "SessionSellOrdersVolume": _symbolinfo_sessionsellordersvolume,
-        "SessionOpen": _symbolinfo_sessionopen,
-        "SessionClose": _symbolinfo_sessionclose,
-        "SessionAW": _symbolinfo_sessionaw,
-        "SessionPriceSettlement": _symbolinfo_sessionpricesettlement,
-        "SessionPriceLimitMin": _symbolinfo_sessionpricelimitmin,
-        "SessionPriceLimitMax": _symbolinfo_sessionpricelimitmax,
-        "InfoInteger": _symbolinfo_infointeger,
-        "InfoDouble": _symbolinfo_infodouble,
-        "InfoString": _symbolinfo_infostring,
         "NormalizePrice": _symbolinfo_normalizeprice,
         "SymbolsTotal": _symbolinfo_symbolstotal,
         "SymbolsGet": _symbolinfo_symbolsget,
@@ -2814,43 +2291,7 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "MarketBookAdd": _symbolinfo_marketbookadd,
         "MarketBookGet": _symbolinfo_marketbookget,
         "MarketBookRelease": _symbolinfo_marketbookrelease,
-        "Custom": _symbolinfo_custom,
-        "ChartMode": _symbolinfo_chartmode,
-        "Visible": _symbolinfo_visible,
-        "StartTime": _symbolinfo_starttime,
-        "ExpirationTime": _symbolinfo_expirationtime,
-        "MarginHedgedUseLeg": _symbolinfo_marginhedgeduseleg,
-        "ExpirationMode": _symbolinfo_expirationmode,
-        "FillingMode": _symbolinfo_fillingmode,
-        "OrderMode": _symbolinfo_ordermode,
-        "OrderGTCMode": _symbolinfo_ordergtcmode,
-        "OptionMode": _symbolinfo_optionmode,
-        "OptionRight": _symbolinfo_optionright,
-        "VolumeReal": _symbolinfo_volumereal,
-        "VolumeHighReal": _symbolinfo_volumehighreal,
-        "VolumeLowReal": _symbolinfo_volumelowreal,
-        "OptionStrike": _symbolinfo_optionstrike,
-        "TradeAccruedInterest": _symbolinfo_tradeaccruedinterest,
-        "TradeFaceValue": _symbolinfo_tradefacevalue,
-        "TradeLiquidityRate": _symbolinfo_tradeliquidityrate,
-        "SessionVolume": _symbolinfo_sessionvolume,
-        "MarginHedged": _symbolinfo_marginhedged,
-        "PriceChange": _symbolinfo_pricechange,
-        "PriceVolatility": _symbolinfo_pricevolatility,
-        "PriceTheoretical": _symbolinfo_pricetheoretical,
-        "PriceGreeksDelta": _symbolinfo_pricegreeksdelta,
-        "PriceGreeksTheta": _symbolinfo_pricegreekstheta,
-        "PriceGreeksGamma": _symbolinfo_pricegreeksgamma,
-        "PriceGreeksVega": _symbolinfo_pricegreeksvega,
-        "PriceGreeksRho": _symbolinfo_pricegreeksrho,
-        "PriceGreeksOmega": _symbolinfo_pricegreeksomega,
-        "PriceSensitivity": _symbolinfo_pricesensitivity,
-        "Basis": _symbolinfo_basis,
-        "Category": _symbolinfo_category,
-        "Exchange": _symbolinfo_exchange,
-        "Formula": _symbolinfo_formula,
-        "ISIN": _symbolinfo_isin,
-        "Page": _symbolinfo_page,
+        "SymbolInfo": _symbolinfo_symbolinfo,
         "as_dict": _symbolinfo_asdict,
     },
     "TerminalInfo": {

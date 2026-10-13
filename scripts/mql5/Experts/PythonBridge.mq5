@@ -1174,6 +1174,125 @@ void DispatchAccount(const string command_id,const string object_id,const string
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown CAccountInfo method: "+method);
   }
 
+string SymbolInfoJson(CSymbolInfo *obj, const string explicit_symbol = "")
+  {
+   if(explicit_symbol != "" && explicit_symbol != obj.Name())
+     {
+      obj.Name(explicit_symbol);
+     }
+   string sym = obj.Name();
+   string j = "{";
+   j += "\"name\":" + JsonQuote(sym) + ",";
+   j += "\"custom\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_CUSTOM)) + ",";
+   j += "\"chart_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_CHART_MODE)) + ",";
+   j += "\"select\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_SELECT)) + ",";
+   j += "\"visible\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_VISIBLE)) + ",";
+   j += "\"session_deals\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SESSION_DEALS)) + ",";
+   j += "\"session_buy_orders\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SESSION_BUY_ORDERS)) + ",";
+   j += "\"session_sell_orders\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SESSION_SELL_ORDERS)) + ",";
+   j += "\"volume\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_VOLUME)) + ",";
+   j += "\"volumehigh\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_VOLUMEHIGH)) + ",";
+   j += "\"volumelow\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_VOLUMELOW)) + ",";
+   j += "\"time\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TIME)) + ",";
+   j += "\"digits\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_DIGITS)) + ",";
+   j += "\"spread\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SPREAD)) + ",";
+   j += "\"spread_float\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_SPREAD_FLOAT)) + ",";
+   j += "\"ticks_bookdepth\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TICKS_BOOKDEPTH)) + ",";
+   j += "\"trade_calc_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_CALC_MODE)) + ",";
+   j += "\"trade_calc_mode_description\":" + JsonQuote(obj.TradeCalcModeDescription()) + ",";
+   j += "\"trade_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_MODE)) + ",";
+   j += "\"trade_mode_description\":" + JsonQuote(obj.TradeModeDescription()) + ",";
+   j += "\"start_time\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_START_TIME)) + ",";
+   j += "\"expiration_time\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_EXPIRATION_TIME)) + ",";
+   j += "\"trade_stops_level\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_STOPS_LEVEL)) + ",";
+   j += "\"trade_freeze_level\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_FREEZE_LEVEL)) + ",";
+   j += "\"trade_exemode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_EXEMODE)) + ",";
+   j += "\"trade_execution_description\":" + JsonQuote(obj.TradeExecutionDescription()) + ",";
+   j += "\"swap_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SWAP_MODE)) + ",";
+   j += "\"swap_mode_description\":" + JsonQuote(obj.SwapModeDescription()) + ",";
+   j += "\"swap_rollover3days\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SWAP_ROLLOVER3DAYS)) + ",";
+   j += "\"swap_rollover3days_description\":" + JsonQuote(obj.SwapRollover3daysDescription()) + ",";
+   j += "\"margin_hedged_use_leg\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_MARGIN_HEDGED_USE_LEG)) + ",";
+   j += "\"expiration_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_EXPIRATION_MODE)) + ",";
+   j += "\"filling_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_FILLING_MODE)) + ",";
+   j += "\"order_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_ORDER_MODE)) + ",";
+   j += "\"order_gtc_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_ORDER_GTC_MODE)) + ",";
+   j += "\"option_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_OPTION_MODE)) + ",";
+   j += "\"option_right\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_OPTION_RIGHT)) + ",";
+   j += "\"bid\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_BID)) + ",";
+   j += "\"bidhigh\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_BIDHIGH)) + ",";
+   j += "\"bidlow\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_BIDLOW)) + ",";
+   j += "\"ask\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_ASK)) + ",";
+   j += "\"askhigh\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_ASKHIGH)) + ",";
+   j += "\"asklow\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_ASKLOW)) + ",";
+   j += "\"last\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_LAST)) + ",";
+   j += "\"lasthigh\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_LASTHIGH)) + ",";
+   j += "\"lastlow\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_LASTLOW)) + ",";
+   j += "\"volume_real\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_REAL)) + ",";
+   j += "\"volumehigh_real\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUMEHIGH_REAL)) + ",";
+   j += "\"volumelow_real\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUMELOW_REAL)) + ",";
+   j += "\"option_strike\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_OPTION_STRIKE)) + ",";
+   j += "\"point\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_POINT)) + ",";
+   j += "\"trade_tick_value\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_TICK_VALUE)) + ",";
+   j += "\"trade_tick_value_profit\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_TICK_VALUE_PROFIT)) + ",";
+   j += "\"trade_tick_value_loss\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_TICK_VALUE_LOSS)) + ",";
+   j += "\"trade_tick_size\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_TICK_SIZE)) + ",";
+   j += "\"trade_contract_size\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_CONTRACT_SIZE)) + ",";
+   j += "\"trade_accrued_interest\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_ACCRUED_INTEREST)) + ",";
+   j += "\"trade_face_value\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_FACE_VALUE)) + ",";
+   j += "\"trade_liquidity_rate\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_LIQUIDITY_RATE)) + ",";
+   j += "\"volume_min\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_MIN)) + ",";
+   j += "\"volume_max\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_MAX)) + ",";
+   j += "\"volume_step\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_STEP)) + ",";
+   j += "\"volume_limit\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_LIMIT)) + ",";
+   j += "\"swap_long\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SWAP_LONG)) + ",";
+   j += "\"swap_short\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SWAP_SHORT)) + ",";
+   j += "\"margin_initial\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_MARGIN_INITIAL)) + ",";
+   j += "\"margin_maintenance\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_MARGIN_MAINTENANCE)) + ",";
+   j += "\"margin_long\":" + JsonDouble((double)obj.MarginLong()) + ",";
+   j += "\"margin_short\":" + JsonDouble((double)obj.MarginShort()) + ",";
+   j += "\"margin_limit\":" + JsonDouble((double)obj.MarginLimit()) + ",";
+   j += "\"margin_stop\":" + JsonDouble((double)obj.MarginStop()) + ",";
+   j += "\"margin_stop_limit\":" + JsonDouble((double)obj.MarginStopLimit()) + ",";
+   j += "\"trade_time_flags\":" + JsonLong((long)obj.TradeTimeFlags()) + ",";
+   j += "\"trade_fill_flags\":" + JsonLong((long)obj.TradeFillFlags()) + ",";
+   j += "\"session_volume\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_VOLUME)) + ",";
+   j += "\"session_turnover\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_TURNOVER)) + ",";
+   j += "\"session_interest\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_INTEREST)) + ",";
+   j += "\"session_buy_orders_volume\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_BUY_ORDERS_VOLUME)) + ",";
+   j += "\"session_sell_orders_volume\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_SELL_ORDERS_VOLUME)) + ",";
+   j += "\"session_open\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_OPEN)) + ",";
+   j += "\"session_close\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_CLOSE)) + ",";
+   j += "\"session_aw\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_AW)) + ",";
+   j += "\"session_price_settlement\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_PRICE_SETTLEMENT)) + ",";
+   j += "\"session_price_limit_min\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_PRICE_LIMIT_MIN)) + ",";
+   j += "\"session_price_limit_max\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_PRICE_LIMIT_MAX)) + ",";
+   j += "\"margin_hedged\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_MARGIN_HEDGED)) + ",";
+   j += "\"price_change\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_CHANGE)) + ",";
+   j += "\"price_volatility\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_VOLATILITY)) + ",";
+   j += "\"price_theoretical\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_THEORETICAL)) + ",";
+   j += "\"price_greeks_delta\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_DELTA)) + ",";
+   j += "\"price_greeks_theta\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_THETA)) + ",";
+   j += "\"price_greeks_gamma\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_GAMMA)) + ",";
+   j += "\"price_greeks_vega\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_VEGA)) + ",";
+   j += "\"price_greeks_rho\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_RHO)) + ",";
+   j += "\"price_greeks_omega\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_OMEGA)) + ",";
+   j += "\"price_sensitivity\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_SENSITIVITY)) + ",";
+   j += "\"basis\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_BASIS)) + ",";
+   j += "\"category\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_CATEGORY)) + ",";
+   j += "\"currency_base\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_CURRENCY_BASE)) + ",";
+   j += "\"currency_profit\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_CURRENCY_PROFIT)) + ",";
+   j += "\"currency_margin\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_CURRENCY_MARGIN)) + ",";
+   j += "\"bank\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_BANK)) + ",";
+   j += "\"description\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_DESCRIPTION)) + ",";
+   j += "\"exchange\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_EXCHANGE)) + ",";
+   j += "\"formula\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_FORMULA)) + ",";
+   j += "\"isin\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_ISIN)) + ",";
+   j += "\"page\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_PAGE)) + ",";
+   j += "\"path\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_PATH)) + "}";
+   return j;
+  }
+
 void DispatchSymbol(const string command_id,const string object_id,const string method,string &args[])
   {
    CSymbolInfo *p=GetSymbol(object_id); if(CheckPointer(p)==POINTER_INVALID) { RespondError(command_id,"OBJECT_CREATE_FAILED","CSymbolInfo allocation failed"); return; }
@@ -1193,90 +1312,6 @@ void DispatchSymbol(const string command_id,const string object_id,const string 
    if(method=="Refresh") { RespondBool(command_id, true, obj.Refresh()); return; }
    if(method=="RefreshRates") { RespondBool(command_id, true, obj.RefreshRates()); return; }
    if(method=="IsSynchronized") { RespondBool(command_id, true, obj.IsSynchronized()); return; }
-   if(method=="SpreadFloat") { RespondBool(command_id, true, obj.SpreadFloat()); return; }
-   if(method=="Volume") { RespondLong(command_id, true, (long)(obj.Volume())); return; }
-   if(method=="VolumeHigh") { RespondLong(command_id, true, (long)(obj.VolumeHigh())); return; }
-   if(method=="VolumeLow") { RespondLong(command_id, true, (long)(obj.VolumeLow())); return; }
-   if(method=="Time") { RespondLong(command_id, true, (long)(obj.Time())); return; }
-   if(method=="Spread") { RespondLong(command_id, true, (long)(obj.Spread())); return; }
-   if(method=="TicksBookDepth") { RespondLong(command_id, true, (long)(obj.TicksBookDepth())); return; }
-   if(method=="StopsLevel") { RespondLong(command_id, true, (long)(obj.StopsLevel())); return; }
-   if(method=="FreezeLevel") { RespondLong(command_id, true, (long)(obj.FreezeLevel())); return; }
-   if(method=="TradeCalcMode") { RespondLong(command_id, true, (long)(obj.TradeCalcMode())); return; }
-   if(method=="TradeMode") { RespondLong(command_id, true, (long)(obj.TradeMode())); return; }
-   if(method=="TradeExecution") { RespondLong(command_id, true, (long)(obj.TradeExecution())); return; }
-   if(method=="SwapMode") { RespondLong(command_id, true, (long)(obj.SwapMode())); return; }
-   if(method=="SwapRollover3days") { RespondLong(command_id, true, (long)(obj.SwapRollover3days())); return; }
-   if(method=="TradeTimeFlags") { RespondLong(command_id, true, (long)(obj.TradeTimeFlags())); return; }
-   if(method=="TradeFillFlags") { RespondLong(command_id, true, (long)(obj.TradeFillFlags())); return; }
-   if(method=="Digits") { RespondLong(command_id, true, (long)(obj.Digits())); return; }
-   if(method=="SessionDeals") { RespondLong(command_id, true, (long)(obj.SessionDeals())); return; }
-   if(method=="SessionBuyOrders") { RespondLong(command_id, true, (long)(obj.SessionBuyOrders())); return; }
-   if(method=="SessionSellOrders") { RespondLong(command_id, true, (long)(obj.SessionSellOrders())); return; }
-   if(method=="Bid") { RespondDouble(command_id, true, (double)(obj.Bid())); return; }
-   if(method=="BidHigh") { RespondDouble(command_id, true, (double)(obj.BidHigh())); return; }
-   if(method=="BidLow") { RespondDouble(command_id, true, (double)(obj.BidLow())); return; }
-   if(method=="Ask") { RespondDouble(command_id, true, (double)(obj.Ask())); return; }
-   if(method=="AskHigh") { RespondDouble(command_id, true, (double)(obj.AskHigh())); return; }
-   if(method=="AskLow") { RespondDouble(command_id, true, (double)(obj.AskLow())); return; }
-   if(method=="Last") { RespondDouble(command_id, true, (double)(obj.Last())); return; }
-   if(method=="LastHigh") { RespondDouble(command_id, true, (double)(obj.LastHigh())); return; }
-   if(method=="LastLow") { RespondDouble(command_id, true, (double)(obj.LastLow())); return; }
-   if(method=="MarginInitial") { RespondDouble(command_id, true, (double)(obj.MarginInitial())); return; }
-   if(method=="MarginMaintenance") { RespondDouble(command_id, true, (double)(obj.MarginMaintenance())); return; }
-   if(method=="MarginLong") { RespondDouble(command_id, true, (double)(obj.MarginLong())); return; }
-   if(method=="MarginShort") { RespondDouble(command_id, true, (double)(obj.MarginShort())); return; }
-   if(method=="MarginLimit") { RespondDouble(command_id, true, (double)(obj.MarginLimit())); return; }
-   if(method=="MarginStop") { RespondDouble(command_id, true, (double)(obj.MarginStop())); return; }
-   if(method=="MarginStopLimit") { RespondDouble(command_id, true, (double)(obj.MarginStopLimit())); return; }
-   if(method=="Point") { RespondDouble(command_id, true, (double)(obj.Point())); return; }
-   if(method=="TickValue") { RespondDouble(command_id, true, (double)(obj.TickValue())); return; }
-   if(method=="TickValueProfit") { RespondDouble(command_id, true, (double)(obj.TickValueProfit())); return; }
-   if(method=="TickValueLoss") { RespondDouble(command_id, true, (double)(obj.TickValueLoss())); return; }
-   if(method=="TickSize") { RespondDouble(command_id, true, (double)(obj.TickSize())); return; }
-   if(method=="ContractSize") { RespondDouble(command_id, true, (double)(obj.ContractSize())); return; }
-   if(method=="LotsMin") { RespondDouble(command_id, true, (double)(obj.LotsMin())); return; }
-   if(method=="LotsMax") { RespondDouble(command_id, true, (double)(obj.LotsMax())); return; }
-   if(method=="LotsStep") { RespondDouble(command_id, true, (double)(obj.LotsStep())); return; }
-   if(method=="LotsLimit") { RespondDouble(command_id, true, (double)(obj.LotsLimit())); return; }
-   if(method=="SwapLong") { RespondDouble(command_id, true, (double)(obj.SwapLong())); return; }
-   if(method=="SwapShort") { RespondDouble(command_id, true, (double)(obj.SwapShort())); return; }
-   if(method=="SessionTurnover") { RespondDouble(command_id, true, (double)(obj.SessionTurnover())); return; }
-   if(method=="SessionInterest") { RespondDouble(command_id, true, (double)(obj.SessionInterest())); return; }
-   if(method=="SessionBuyOrdersVolume") { RespondDouble(command_id, true, (double)(obj.SessionBuyOrdersVolume())); return; }
-   if(method=="SessionSellOrdersVolume") { RespondDouble(command_id, true, (double)(obj.SessionSellOrdersVolume())); return; }
-   if(method=="SessionOpen") { RespondDouble(command_id, true, (double)(obj.SessionOpen())); return; }
-   if(method=="SessionClose") { RespondDouble(command_id, true, (double)(obj.SessionClose())); return; }
-   if(method=="SessionAW") { RespondDouble(command_id, true, (double)(obj.SessionAW())); return; }
-   if(method=="SessionPriceSettlement") { RespondDouble(command_id, true, (double)(obj.SessionPriceSettlement())); return; }
-   if(method=="SessionPriceLimitMin") { RespondDouble(command_id, true, (double)(obj.SessionPriceLimitMin())); return; }
-   if(method=="SessionPriceLimitMax") { RespondDouble(command_id, true, (double)(obj.SessionPriceLimitMax())); return; }
-   if(method=="TradeCalcModeDescription") { RespondString(command_id, true, obj.TradeCalcModeDescription()); return; }
-   if(method=="TradeModeDescription") { RespondString(command_id, true, obj.TradeModeDescription()); return; }
-   if(method=="TradeExecutionDescription") { RespondString(command_id, true, obj.TradeExecutionDescription()); return; }
-   if(method=="SwapModeDescription") { RespondString(command_id, true, obj.SwapModeDescription()); return; }
-   if(method=="SwapRollover3daysDescription") { RespondString(command_id, true, obj.SwapRollover3daysDescription()); return; }
-   if(method=="CurrencyBase") { RespondString(command_id, true, obj.CurrencyBase()); return; }
-   if(method=="CurrencyProfit") { RespondString(command_id, true, obj.CurrencyProfit()); return; }
-   if(method=="CurrencyMargin") { RespondString(command_id, true, obj.CurrencyMargin()); return; }
-   if(method=="Bank") { RespondString(command_id, true, obj.Bank()); return; }
-   if(method=="Description") { RespondString(command_id, true, obj.Description()); return; }
-   if(method=="Path") { RespondString(command_id, true, obj.Path()); return; }
-   if(method=="InfoInteger")
-     {
-      long value=0; bool ok=obj.InfoInteger((ENUM_SYMBOL_INFO_INTEGER)ParseEnumCode(args,0),value);
-      RespondRaw(command_id,true,PropertyLongJson(ok,value,ok ? "" : "InfoInteger failed")); return;
-     }
-   if(method=="InfoDouble")
-     {
-      double value=0; bool ok=obj.InfoDouble((ENUM_SYMBOL_INFO_DOUBLE)ParseEnumCode(args,0),value);
-      RespondRaw(command_id,true,PropertyDoubleJson(ok,value,ok ? "" : "InfoDouble failed")); return;
-     }
-   if(method=="InfoString")
-     {
-      string value=""; bool ok=obj.InfoString((ENUM_SYMBOL_INFO_STRING)ParseEnumCode(args,0),value);
-      RespondRaw(command_id,true,PropertyStringJson(ok,value,ok ? "" : "InfoString failed")); return;
-     }
    if(method=="NormalizePrice") { RespondDouble(command_id,true,obj.NormalizePrice(ArgDouble(args,0))); return; }
    if(method=="SymbolsTotal")
      {
@@ -1381,144 +1416,10 @@ void DispatchSymbol(const string command_id,const string object_id,const string 
       RespondRaw(command_id, true, json);
       return;
      }
-   if(method=="Custom") { RespondBool(command_id, true, (bool)SymbolInfoInteger(obj.Name(), SYMBOL_CUSTOM)); return; }
-   if(method=="ChartMode") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_CHART_MODE)); return; }
-   if(method=="Visible") { RespondBool(command_id, true, (bool)SymbolInfoInteger(obj.Name(), SYMBOL_VISIBLE)); return; }
-   if(method=="StartTime") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_START_TIME)); return; }
-   if(method=="ExpirationTime") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_EXPIRATION_TIME)); return; }
-   if(method=="MarginHedgedUseLeg") { RespondBool(command_id, true, (bool)SymbolInfoInteger(obj.Name(), SYMBOL_MARGIN_HEDGED_USE_LEG)); return; }
-   if(method=="ExpirationMode") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_EXPIRATION_MODE)); return; }
-   if(method=="FillingMode") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_FILLING_MODE)); return; }
-   if(method=="OrderMode") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_ORDER_MODE)); return; }
-   if(method=="OrderGTCMode") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_ORDER_GTC_MODE)); return; }
-   if(method=="OptionMode") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_OPTION_MODE)); return; }
-   if(method=="OptionRight") { RespondLong(command_id, true, (long)SymbolInfoInteger(obj.Name(), SYMBOL_OPTION_RIGHT)); return; }
-   if(method=="VolumeReal") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_VOLUME_REAL)); return; }
-   if(method=="VolumeHighReal") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_VOLUMEHIGH_REAL)); return; }
-   if(method=="VolumeLowReal") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_VOLUMELOW_REAL)); return; }
-   if(method=="OptionStrike") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_OPTION_STRIKE)); return; }
-   if(method=="TradeAccruedInterest") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_TRADE_ACCRUED_INTEREST)); return; }
-   if(method=="TradeFaceValue") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_TRADE_FACE_VALUE)); return; }
-   if(method=="TradeLiquidityRate") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_TRADE_LIQUIDITY_RATE)); return; }
-   if(method=="SessionVolume") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_SESSION_VOLUME)); return; }
-   if(method=="MarginHedged") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_MARGIN_HEDGED)); return; }
-   if(method=="PriceChange") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_CHANGE)); return; }
-   if(method=="PriceVolatility") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_VOLATILITY)); return; }
-   if(method=="PriceTheoretical") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_THEORETICAL)); return; }
-   if(method=="PriceGreeksDelta") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_DELTA)); return; }
-   if(method=="PriceGreeksTheta") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_THETA)); return; }
-   if(method=="PriceGreeksGamma") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_GAMMA)); return; }
-   if(method=="PriceGreeksVega") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_VEGA)); return; }
-   if(method=="PriceGreeksRho") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_RHO)); return; }
-   if(method=="PriceGreeksOmega") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_OMEGA)); return; }
-   if(method=="PriceSensitivity") { RespondDouble(command_id, true, SymbolInfoDouble(obj.Name(), SYMBOL_PRICE_SENSITIVITY)); return; }
-   if(method=="Basis") { RespondString(command_id, true, SymbolInfoString(obj.Name(), SYMBOL_BASIS)); return; }
-   if(method=="Category") { RespondString(command_id, true, SymbolInfoString(obj.Name(), SYMBOL_CATEGORY)); return; }
-   if(method=="Exchange") { RespondString(command_id, true, SymbolInfoString(obj.Name(), SYMBOL_EXCHANGE)); return; }
-   if(method=="Formula") { RespondString(command_id, true, SymbolInfoString(obj.Name(), SYMBOL_FORMULA)); return; }
-   if(method=="ISIN") { RespondString(command_id, true, SymbolInfoString(obj.Name(), SYMBOL_ISIN)); return; }
-   if(method=="Page") { RespondString(command_id, true, SymbolInfoString(obj.Name(), SYMBOL_PAGE)); return; }
-   if(method=="as_dict")
+   if(method=="SymbolInfo" || method=="as_dict")
      {
-      string sym = obj.Name();
-      string j = "{";
-      j += "\"custom\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_CUSTOM)) + ",";
-      j += "\"chart_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_CHART_MODE)) + ",";
-      j += "\"select\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_SELECT)) + ",";
-      j += "\"visible\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_VISIBLE)) + ",";
-      j += "\"session_deals\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SESSION_DEALS)) + ",";
-      j += "\"session_buy_orders\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SESSION_BUY_ORDERS)) + ",";
-      j += "\"session_sell_orders\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SESSION_SELL_ORDERS)) + ",";
-      j += "\"volume\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_VOLUME)) + ",";
-      j += "\"volumehigh\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_VOLUMEHIGH)) + ",";
-      j += "\"volumelow\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_VOLUMELOW)) + ",";
-      j += "\"time\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TIME)) + ",";
-      j += "\"digits\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_DIGITS)) + ",";
-      j += "\"spread\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SPREAD)) + ",";
-      j += "\"spread_float\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_SPREAD_FLOAT)) + ",";
-      j += "\"ticks_bookdepth\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TICKS_BOOKDEPTH)) + ",";
-      j += "\"trade_calc_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_CALC_MODE)) + ",";
-      j += "\"trade_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_MODE)) + ",";
-      j += "\"start_time\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_START_TIME)) + ",";
-      j += "\"expiration_time\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_EXPIRATION_TIME)) + ",";
-      j += "\"trade_stops_level\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_STOPS_LEVEL)) + ",";
-      j += "\"trade_freeze_level\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_FREEZE_LEVEL)) + ",";
-      j += "\"trade_exemode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_TRADE_EXEMODE)) + ",";
-      j += "\"swap_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SWAP_MODE)) + ",";
-      j += "\"swap_rollover3days\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_SWAP_ROLLOVER3DAYS)) + ",";
-      j += "\"margin_hedged_use_leg\":" + JsonBool((bool)SymbolInfoInteger(sym, SYMBOL_MARGIN_HEDGED_USE_LEG)) + ",";
-      j += "\"expiration_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_EXPIRATION_MODE)) + ",";
-      j += "\"filling_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_FILLING_MODE)) + ",";
-      j += "\"order_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_ORDER_MODE)) + ",";
-      j += "\"order_gtc_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_ORDER_GTC_MODE)) + ",";
-      j += "\"option_mode\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_OPTION_MODE)) + ",";
-      j += "\"option_right\":" + JsonLong((long)SymbolInfoInteger(sym, SYMBOL_OPTION_RIGHT)) + ",";
-      j += "\"bid\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_BID)) + ",";
-      j += "\"bidhigh\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_BIDHIGH)) + ",";
-      j += "\"bidlow\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_BIDLOW)) + ",";
-      j += "\"ask\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_ASK)) + ",";
-      j += "\"askhigh\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_ASKHIGH)) + ",";
-      j += "\"asklow\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_ASKLOW)) + ",";
-      j += "\"last\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_LAST)) + ",";
-      j += "\"lasthigh\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_LASTHIGH)) + ",";
-      j += "\"lastlow\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_LASTLOW)) + ",";
-      j += "\"volume_real\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_REAL)) + ",";
-      j += "\"volumehigh_real\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUMEHIGH_REAL)) + ",";
-      j += "\"volumelow_real\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUMELOW_REAL)) + ",";
-      j += "\"option_strike\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_OPTION_STRIKE)) + ",";
-      j += "\"point\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_POINT)) + ",";
-      j += "\"trade_tick_value\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_TICK_VALUE)) + ",";
-      j += "\"trade_tick_value_profit\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_TICK_VALUE_PROFIT)) + ",";
-      j += "\"trade_tick_value_loss\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_TICK_VALUE_LOSS)) + ",";
-      j += "\"trade_tick_size\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_TICK_SIZE)) + ",";
-      j += "\"trade_contract_size\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_CONTRACT_SIZE)) + ",";
-      j += "\"trade_accrued_interest\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_ACCRUED_INTEREST)) + ",";
-      j += "\"trade_face_value\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_FACE_VALUE)) + ",";
-      j += "\"trade_liquidity_rate\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_TRADE_LIQUIDITY_RATE)) + ",";
-      j += "\"volume_min\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_MIN)) + ",";
-      j += "\"volume_max\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_MAX)) + ",";
-      j += "\"volume_step\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_STEP)) + ",";
-      j += "\"volume_limit\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_VOLUME_LIMIT)) + ",";
-      j += "\"swap_long\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SWAP_LONG)) + ",";
-      j += "\"swap_short\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SWAP_SHORT)) + ",";
-      j += "\"margin_initial\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_MARGIN_INITIAL)) + ",";
-      j += "\"margin_maintenance\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_MARGIN_MAINTENANCE)) + ",";
-      j += "\"session_volume\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_VOLUME)) + ",";
-      j += "\"session_turnover\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_TURNOVER)) + ",";
-      j += "\"session_interest\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_INTEREST)) + ",";
-      j += "\"session_buy_orders_volume\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_BUY_ORDERS_VOLUME)) + ",";
-      j += "\"session_sell_orders_volume\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_SELL_ORDERS_VOLUME)) + ",";
-      j += "\"session_open\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_OPEN)) + ",";
-      j += "\"session_close\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_CLOSE)) + ",";
-      j += "\"session_aw\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_AW)) + ",";
-      j += "\"session_price_settlement\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_PRICE_SETTLEMENT)) + ",";
-      j += "\"session_price_limit_min\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_PRICE_LIMIT_MIN)) + ",";
-      j += "\"session_price_limit_max\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_SESSION_PRICE_LIMIT_MAX)) + ",";
-      j += "\"margin_hedged\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_MARGIN_HEDGED)) + ",";
-      j += "\"price_change\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_CHANGE)) + ",";
-      j += "\"price_volatility\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_VOLATILITY)) + ",";
-      j += "\"price_theoretical\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_THEORETICAL)) + ",";
-      j += "\"price_greeks_delta\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_DELTA)) + ",";
-      j += "\"price_greeks_theta\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_THETA)) + ",";
-      j += "\"price_greeks_gamma\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_GAMMA)) + ",";
-      j += "\"price_greeks_vega\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_VEGA)) + ",";
-      j += "\"price_greeks_rho\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_RHO)) + ",";
-      j += "\"price_greeks_omega\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_OMEGA)) + ",";
-      j += "\"price_sensitivity\":" + JsonDouble(SymbolInfoDouble(sym, SYMBOL_PRICE_SENSITIVITY)) + ",";
-      j += "\"basis\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_BASIS)) + ",";
-      j += "\"category\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_CATEGORY)) + ",";
-      j += "\"currency_base\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_CURRENCY_BASE)) + ",";
-      j += "\"currency_profit\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_CURRENCY_PROFIT)) + ",";
-      j += "\"currency_margin\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_CURRENCY_MARGIN)) + ",";
-      j += "\"bank\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_BANK)) + ",";
-      j += "\"description\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_DESCRIPTION)) + ",";
-      j += "\"exchange\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_EXCHANGE)) + ",";
-      j += "\"formula\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_FORMULA)) + ",";
-      j += "\"isin\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_ISIN)) + ",";
-      j += "\"name\":" + JsonQuote(sym) + ",";
-      j += "\"page\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_PAGE)) + ",";
-      j += "\"path\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_PATH)) + "}";
-      RespondRaw(command_id, true, j);
+      string sym = (ArraySize(args) > 0 && args[0] != "") ? ArgString(args, 0) : obj.Name();
+      RespondRaw(command_id, true, SymbolInfoJson(obj, sym));
       return;
      }
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown CSymbolInfo method: "+method);

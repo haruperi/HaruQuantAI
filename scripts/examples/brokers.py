@@ -310,22 +310,23 @@ async def example_04_symbol(ctx: ExampleContext) -> None:
     ):
         ctx.trading.disarm()
         raise ExampleError("Configured symbol or quote is unavailable")
-    print(f"Name: {await symbol.Name()}")
-    print(f"Digits: {await symbol.Digits()}")
-    print(f"Point: {await symbol.Point()}")
-    print(f"Tick size: {await symbol.TickSize()}")
-    print(f"Bid: {await symbol.Bid()}")
-    print(f"Ask: {await symbol.Ask()}")
-    print(f"Last: {await symbol.Last()}")
-    print(f"Spread: {await symbol.Spread()}")
-    print(f"Trade mode: {await symbol.TradeModeDescription()}")
-    print(f"Contract size: {await symbol.ContractSize()}")
-    print(f"Min lot: {await symbol.LotsMin()}")
-    print(f"Max lot: {await symbol.LotsMax()}")
-    print(f"Lot step: {await symbol.LotsStep()}")
-    print(f"Swap mode: {await symbol.SwapMode()}")
-    print(f"Swap long: {await symbol.SwapLong()}")
-    print(f"Swap short: {await symbol.SwapShort()}")
+    info = await symbol.SymbolInfo()
+    print(f"Name: {info.name}")
+    print(f"Digits: {info.digits}")
+    print(f"Point: {info.point}")
+    print(f"Tick size: {info.tick_size}")
+    print(f"Bid: {info.bid}")
+    print(f"Ask: {info.ask}")
+    print(f"Last: {info.last}")
+    print(f"Spread: {info.spread}")
+    print(f"Trade mode: {info.trade_mode_description}")
+    print(f"Contract size: {info.contract_size}")
+    print(f"Min lot: {info.lots_min}")
+    print(f"Max lot: {info.lots_max}")
+    print(f"Lot step: {info.lots_step}")
+    print(f"Swap mode: {info.swap_mode}")
+    print(f"Swap long: {info.swap_long}")
+    print(f"Swap short: {info.swap_short}")
 
 
 async def example_05_historical_bars(ctx: ExampleContext) -> None:
@@ -381,12 +382,13 @@ async def example_08_order_check(ctx: ExampleContext) -> None:
     symbol = SYMBOL
     await trading.symbol.Name(symbol)
     await trading.symbol.RefreshRates()
-    ask = float(await trading.symbol.Ask())
+    sym_info = await trading.symbol.SymbolInfo()
+    ask = float(sym_info.ask)
     await trading.trade.SetExpertMagicNumber(ctx.magic)
     await trading.trade.SetDeviationInPoints(20)
     await trading.trade.SetTypeFillingBySymbol(symbol)
 
-    fill_flags = int(await trading.symbol.TradeFillFlags())
+    fill_flags = sym_info.trade_fill_flags
     if fill_flags & 1:
         filling = OrderFilling.FOK
     elif fill_flags & 2:
@@ -429,9 +431,10 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
     ):
         ctx.trading.disarm()
         raise ExampleError("A new hedging position is required for this example")
-    minimum = float(await trading.symbol.LotsMin())
-    maximum = float(await trading.symbol.LotsMax())
-    step = float(await trading.symbol.LotsStep())
+    sym_info = await trading.symbol.SymbolInfo()
+    minimum = float(sym_info.lots_min)
+    maximum = float(sym_info.lots_max)
+    step = float(sym_info.lots_step)
     if (
         not math.isfinite(VOLUME)
         or step <= 0
@@ -482,8 +485,9 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
 async def example_10_calc_profit_margin(ctx: ExampleContext) -> None:
     """Demonstrate calculating expected profit and required margin using AccountInfo."""
     _header("Calculate Profit and Margin")
-    ask = float(await ctx.trading.symbol.Ask())
-    point = float(await ctx.trading.symbol.Point())
+    sym_info = await ctx.trading.symbol.SymbolInfo()
+    ask = float(sym_info.ask)
+    point = float(sym_info.point)
     account = ctx.trading.account
     print(
         f"Margin: {await account.MarginCheck(SYMBOL, OrderType.BUY, 2 * VOLUME, ask)}"
@@ -552,10 +556,13 @@ async def example_12_modify_position(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before modification")
     await symbol.RefreshRates()
+    sym_info = await symbol.SymbolInfo()
     distance = max(
-        1000, int(await symbol.StopsLevel()) + 20, int(await symbol.FreezeLevel()) + 20
-    ) * float(await symbol.Point())
-    bid, digits = float(await symbol.Bid()), int(await symbol.Digits())
+        1000,
+        sym_info.trade_stops_level + 20,
+        sym_info.trade_freeze_level + 20,
+    ) * float(sym_info.point)
+    bid, digits = float(sym_info.bid), sym_info.digits
     sl, tp = round(bid - distance, digits), round(bid + distance, digits)
     sent = await trade.PositionModify(ctx.position_ticket, sl, tp)
     retcode = int(await trade.ResultRetcode())
@@ -643,12 +650,13 @@ async def example_15_pending_orders(ctx: ExampleContext) -> None:
         raise ExampleError("This example already owns a pending order")
     symbol, trade, order = ctx.trading.symbol, ctx.trading.trade, ctx.trading.order
     await symbol.RefreshRates()
+    sym_info = await symbol.SymbolInfo()
     distance = max(
-        1000, int(await symbol.StopsLevel()) + 20, int(await symbol.FreezeLevel()) + 20
-    ) * float(await symbol.Point())
-    ctx.pending_price = round(
-        float(await symbol.Bid()) - distance, int(await symbol.Digits())
-    )
+        1000,
+        sym_info.trade_stops_level + 20,
+        sym_info.trade_freeze_level + 20,
+    ) * float(sym_info.point)
+    ctx.pending_price = round(float(sym_info.bid) - distance, sym_info.digits)
     sent = await trade.BuyLimit(VOLUME, ctx.pending_price, SYMBOL)
     retcode = int(await trade.ResultRetcode())
     print(f"BuyLimit dispatch: {sent}; retcode={retcode}")
@@ -718,10 +726,13 @@ async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("Order ownership must be confirmed before modification")
     await symbol.RefreshRates()
+    sym_info = await symbol.SymbolInfo()
     distance = max(
-        1000, int(await symbol.StopsLevel()) + 20, int(await symbol.FreezeLevel()) + 20
-    ) * float(await symbol.Point())
-    price = round(ctx.pending_price - distance, int(await symbol.Digits()))
+        1000,
+        sym_info.trade_stops_level + 20,
+        sym_info.trade_freeze_level + 20,
+    ) * float(sym_info.point)
+    price = round(ctx.pending_price - distance, sym_info.digits)
     sent = await trade.OrderModify(
         ctx.pending_ticket, price, 0.0, 0.0, OrderTime.GTC, 0
     )
@@ -863,7 +874,7 @@ EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_01_connect,
     example_02_terminal,
     example_03_account,
-    # example_04_symbol,
+    example_04_symbol,
     # example_05_historical_bars,
     # example_06_tick_data,
     # example_07_order_book,

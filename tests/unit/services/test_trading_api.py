@@ -34,7 +34,7 @@ from app.services.brokers.simulator import SimulationBackend
     [
         ("Trade", 68),
         ("AccountInfo", 5),
-        ("SymbolInfo", 123),
+        ("SymbolInfo", 15),
         ("OrderInfo", 34),
         ("HistoryOrderInfo", 31),
         ("PositionInfo", 29),
