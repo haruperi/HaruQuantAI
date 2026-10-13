@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.api.debug_console import create_debug_console_router
 from app.host.logging import (
     BoundLogger,
     LogRingBuffer,
@@ -21,7 +22,6 @@ from app.host.logging import (
     TelemetryEngine,
     bridge_standard_logging,
     configure_host_logging,
-    create_debug_console_router,
     fingerprint_secret,
     flush,
     get_logger,

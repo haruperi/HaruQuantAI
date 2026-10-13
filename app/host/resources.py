@@ -11,15 +11,14 @@ Description:
     bombs (decompression denial-of-service), uncontained symbolic link escapes, and
     memory exhaustion from unbounded caching or runaway downloads.
 
-    Externally, it serves four critical operational workflows: (1) host bootstrap
-    or lifespan composition mounts the resources router via
-    `create_resources_router()`; (2) domain workspaces and plugins interact
-    through scoped `ResourceAccess` capability facades to stage, publish, and
-    retrieve artifacts without escaping tenant boundaries; (3) remote archive
-    sources are acquired through bounded `acquire_remote()` streaming pipelines
-    with content validation and automatic rollback; and (4) routine host
-    maintenance purges orphaned staging files via `cleanup_staging()` to enforce
-    bounded disk utilization.
+    Externally, it serves three critical operational workflows: (1) domain
+    workspaces and plugins interact through scoped `ResourceAccess` capability
+    facades to stage, publish, and retrieve artifacts without escaping tenant
+    boundaries; (2) remote archive sources are acquired through bounded
+    `acquire_remote()` streaming pipelines with content validation and automatic
+    rollback; and (3) routine host maintenance purges orphaned staging files via
+    `cleanup_staging()` to enforce bounded disk utilization. Presentation REST
+    endpoints are decoupled and maintained in `app.api.resources`.
 
     Internally, `validate_contained_path()` canonicalizes filesystem paths and
     resolves junctions/symlinks against sandbox boundaries; `inspect_archive()`
@@ -67,10 +66,6 @@ Key Capabilities:
       Associated: `[ResourceManager.cleanup_staging()]`
       Logging: Emits INFO log recording the number of orphaned staging
       directories purged and freed disk capacity.
-    - FR-HOST-RESOURCES-REST-PROJECTION: FastAPI REST Endpoints Projection
-      Associated: `[create_resources_router()]`
-      Logging: Emits DEBUG log on router mounting; INFO log on stage, acquire,
-      publish, inspect, extract, and cleanup API invocations.
 
 Python API Usage:
     ```python
@@ -129,32 +124,18 @@ from collections import OrderedDict
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Any
 
 import httpx
-from fastapi import (
-    APIRouter,
-    HTTPException,
-    Query,
-    Request,
-    Response,
-    status,
-)
-from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from app.host.logging import get_logger
-from app.host.response import StandardResponse
 
 logger = get_logger(__name__)
-
-# Canonical envelope alias matching transport conventions
-ApiResponse = StandardResponse
 
 __all__ = [
     "AcquireRemoteRequest",
     "AcquisitionError",
-    "ApiResponse",
     "ArchiveBombError",
     "ArchiveEntryInfo",
     "ArchiveFormat",
@@ -172,13 +153,11 @@ __all__ = [
     "ResourceManager",
     "ResourceMetadata",
     "ResourceNotFoundError",
-    "ResourceRouterService",
     "ResourceScope",
     "ResourceSecurityError",
     "ResourceStatus",
     "StagingRequest",
     "acquire_remote",
-    "create_resources_router",
     "inspect_archive",
     "main",
     "safe_extract_archive",
@@ -1743,373 +1722,6 @@ class ResourceAccess:
             msg = f"Unauthorized: access to resource scope '{meta.scope}' denied"
             raise ResourceSecurityError(msg)
         return self._manager.read_bytes(resource_id)
-
-
-# ============================================================================
-# REST Transport Projection
-# ============================================================================
-
-
-class ResourceRouterService:
-    """Internal service adapter translating HTTP requests to ResourceManager actions."""
-
-    def __init__(self, manager: ResourceManager) -> None:
-        self._manager = manager
-
-    async def stage_upload(
-        self,
-        request: Request,
-        name: Annotated[str | None, Query()] = None,
-        scope: Annotated[ResourceScope, Query()] = ResourceScope.WORKSPACE,
-        expires_in_seconds: Annotated[int | None, Query()] = None,
-    ) -> Response:
-        """Stage an uploaded binary payload."""
-        req_id = request.headers.get("x-request-id")
-        data = await request.body()
-        filename = (
-            name or request.headers.get("x-file-name") or f"upload_{uuid.uuid4().hex}"
-        )
-        meta = self._manager.stage_bytes(
-            data,
-            name=filename,
-            scope=scope,
-            expires_in_seconds=expires_in_seconds,
-        )
-        resp = ApiResponse.success(
-            data=meta.model_dump(mode="json"),
-            message=f"Resource {meta.resource_id} staged successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def stage_json(
-        self,
-        request: Request,
-        req: StagingRequest,
-    ) -> Response:
-        """Stage an empty or initialized resource via JSON payload."""
-        req_id = request.headers.get("x-request-id")
-        meta = self._manager.stage_bytes(
-            b"",
-            name=req.name,
-            scope=req.scope,
-            tags=req.tags,
-            attributes=req.attributes,
-            expires_in_seconds=req.expires_in_seconds,
-        )
-        resp = ApiResponse.success(
-            data=meta.model_dump(mode="json"),
-            message=f"Resource {meta.resource_id} staged successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def acquire_remote_endpoint(
-        self,
-        request: Request,
-        req: AcquireRemoteRequest,
-    ) -> Response:
-        """Fetch remote artifact via HTTP and stage in custody."""
-        req_id = request.headers.get("x-request-id")
-        res_id = f"res_{uuid.uuid4().hex}"
-        url_path = urllib.parse.urlparse(req.url).path
-        file_name = req.name or Path(url_path).name or f"remote_{res_id}"
-
-        stage_sub = self._manager.staging_dir / res_id
-        stage_sub.mkdir(parents=True, exist_ok=True)
-        dest_path = stage_sub / file_name
-
-        try:
-            size_bytes, digest = acquire_remote(
-                req.url,
-                dest_path,
-                max_bytes=req.max_bytes,
-                timeout_seconds=req.timeout_seconds,
-            )
-        except (ResourceSecurityError, AcquisitionError) as exc:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=str(exc),
-            ) from exc
-
-        mime, _ = mimetypes.guess_type(file_name)
-        mime_type = mime or "application/octet-stream"
-
-        meta = ResourceMetadata(
-            resource_id=res_id,
-            scope=req.scope,
-            name=file_name,
-            content_hash=digest,
-            size_bytes=size_bytes,
-            mime_type=mime_type,
-            status=ResourceStatus.STAGED,
-            created_at_utc=datetime.now(UTC),
-            tags=req.tags,
-            attributes=req.attributes,
-        )
-        self._manager.register_resource(meta)
-        resp = ApiResponse.success(
-            data=meta.model_dump(mode="json"),
-            message=f"Remote artifact acquired and staged as {res_id}.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def publish_resource(
-        self,
-        request: Request,
-        resource_id: str,
-        req: PublishRequest | None = None,
-    ) -> Response:
-        """Publish a staged resource to immutable store."""
-        req_id = request.headers.get("x-request-id")
-        expected = req.expected_hash if req else None
-        extra_tags = req.tags if req else None
-        try:
-            meta = self._manager.publish(
-                resource_id, expected_hash=expected, tags=extra_tags
-            )
-            resp = ApiResponse.success(
-                data=meta.model_dump(mode="json"),
-                message=f"Resource {resource_id} published successfully.",
-                request_id=req_id,
-            )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except ResourceNotFoundError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)
-            ) from exc
-        except (ResourceConflictError, CorruptResourceError) as exc:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=str(exc),
-            ) from exc
-
-    def get_metadata(
-        self,
-        request: Request,
-        resource_id: str,
-    ) -> Response:
-        """Query metadata for a resource."""
-        req_id = request.headers.get("x-request-id")
-        try:
-            meta = self._manager.get_metadata(resource_id)
-            resp = ApiResponse.success(
-                data=meta.model_dump(mode="json"),
-                message=f"Retrieved metadata for {resource_id}.",
-                request_id=req_id,
-            )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except ResourceNotFoundError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)
-            ) from exc
-
-    def get_content(
-        self,
-        resource_id: str,
-    ) -> Response:
-        """Download raw binary content of a resource."""
-        try:
-            meta = self._manager.get_metadata(resource_id)
-            path = self._manager.get_content_path(resource_id)
-            return FileResponse(
-                path=path,
-                media_type=meta.mime_type,
-                filename=meta.name,
-            )
-        except ResourceNotFoundError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)
-            ) from exc
-
-    def tombstone_resource(
-        self,
-        request: Request,
-        resource_id: str,
-    ) -> Response:
-        """Tombstone / delete a resource."""
-        req_id = request.headers.get("x-request-id")
-        try:
-            meta = self._manager.tombstone(resource_id)
-            resp = ApiResponse.success(
-                data=meta.model_dump(mode="json"),
-                message=f"Resource {resource_id} tombstoned successfully.",
-                request_id=req_id,
-            )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except ResourceNotFoundError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)
-            ) from exc
-
-    def inspect_archive_endpoint(
-        self,
-        request: Request,
-        req: InspectArchiveRequest,
-    ) -> Response:
-        """Inspect an archive resource for safety and structure."""
-        req_id = request.headers.get("x-request-id")
-        try:
-            report = self._manager.inspect_resource_archive(
-                req.resource_id, limits=req.limits
-            )
-            resp = ApiResponse.success(
-                data=report.model_dump(mode="json"),
-                message=f"Inspected archive for resource {req.resource_id}.",
-                request_id=req_id,
-            )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except ResourceNotFoundError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)
-            ) from exc
-        except ResourceSecurityError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=str(exc),
-            ) from exc
-
-    def extract_archive_endpoint(
-        self,
-        request: Request,
-        req: ExtractArchiveRequest,
-    ) -> Response:
-        """Safely extract an archive resource into a contained subfolder."""
-        req_id = request.headers.get("x-request-id")
-        try:
-            paths = self._manager.extract_resource_archive(
-                req.resource_id,
-                req.target_subpath,
-                limits=req.limits,
-            )
-            resp = ApiResponse.success(
-                data={"extracted_paths": [str(p) for p in paths], "count": len(paths)},
-                message=f"Archive for {req.resource_id} extracted successfully.",
-                request_id=req_id,
-            )
-            return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-        except ResourceNotFoundError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)
-            ) from exc
-        except (ArchiveBombError, ResourceSecurityError) as exc:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-                detail=str(exc),
-            ) from exc
-
-    def cache_status(self, request: Request) -> Response:
-        """Get cache telemetry metrics snapshot."""
-        req_id = request.headers.get("x-request-id")
-        stats = self._manager.cache.get_stats()
-        resp = ApiResponse.success(
-            data=stats.model_dump(mode="json"),
-            message="Cache metrics retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def cleanup_staging_endpoint(
-        self,
-        request: Request,
-        max_age_seconds: Annotated[float, Query(ge=0.0)] = 3600.0,
-    ) -> Response:
-        """Purge expired or orphaned staging directories."""
-        req_id = request.headers.get("x-request-id")
-        cleaned = self._manager.cleanup_staging(max_age_seconds=max_age_seconds)
-        resp = ApiResponse.success(
-            data={"purged_count": cleaned},
-            message=f"Purged {cleaned} orphaned staging directories.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-
-def create_resources_router(manager: ResourceManager) -> APIRouter:
-    """Create and configure FastAPI APIRouter exposing resource endpoints.
-
-    Args:
-        manager: Central host ResourceManager instance.
-
-    Returns:
-        Configured FastAPI APIRouter.
-    """
-    service = ResourceRouterService(manager)
-    router = APIRouter(prefix="/resources", tags=["resources"])
-
-    router.add_api_route(
-        "/stage/upload",
-        service.stage_upload,
-        methods=["POST"],
-        summary="Stage an uploaded multipart file",
-    )
-    router.add_api_route(
-        "/stage",
-        service.stage_json,
-        methods=["POST"],
-        summary="Stage an artifact via JSON",
-    )
-    router.add_api_route(
-        "/acquire",
-        service.acquire_remote_endpoint,
-        methods=["POST"],
-        summary="Acquire and stage a remote artifact via HTTP",
-    )
-    router.add_api_route(
-        "/{resource_id}/publish",
-        service.publish_resource,
-        methods=["POST"],
-        summary="Publish a staged resource into immutable storage",
-    )
-    router.add_api_route(
-        "/{resource_id}",
-        service.get_metadata,
-        methods=["GET"],
-        summary="Retrieve resource metadata",
-    )
-    router.add_api_route(
-        "/{resource_id}/content",
-        service.get_content,
-        methods=["GET"],
-        summary="Download raw resource binary content",
-    )
-    router.add_api_route(
-        "/{resource_id}",
-        service.tombstone_resource,
-        methods=["DELETE"],
-        summary="Tombstone a resource",
-    )
-    router.add_api_route(
-        "/archive/inspect",
-        service.inspect_archive_endpoint,
-        methods=["POST"],
-        summary="Inspect an archive resource",
-    )
-    router.add_api_route(
-        "/archive/extract",
-        service.extract_archive_endpoint,
-        methods=["POST"],
-        summary="Safely extract an archive resource",
-    )
-    router.add_api_route(
-        "/cache/status",
-        service.cache_status,
-        methods=["GET"],
-        summary="Get artifact cache telemetry",
-    )
-    router.add_api_route(
-        "/staging/cleanup",
-        service.cleanup_staging_endpoint,
-        methods=["POST"],
-        summary="Purge orphaned staging directories",
-    )
-
-    logger.debug(
-        "Resources REST router initialized",
-        extra={"fr_id": "FR-HOST-RESOURCES-REST-PROJECTION"},
-    )
-    return router
 
 
 # ============================================================================

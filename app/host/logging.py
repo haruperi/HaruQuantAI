@@ -48,9 +48,10 @@ Key Capabilities:
     - FR-HOST-LOG-RING-BUFFER: In-memory bounded ring buffer with cursor tracking.
       Associated: `LogRingBuffer.append()`, `LogRingBuffer.get_snapshot()`
       Logging: Buffers recent events, tracks monotonic cursors, and flags gaps.
-    - FR-HOST-LOG-DEBUG-CONSOLE-PROJECTION: HTTP endpoints for DebugConsole UI.
-      Associated: `create_debug_console_router()`, route handlers
-      Logging: Emits INFO on log retrieval, category queries, and log clearance.
+    - FR-HOST-LOG-DEBUG-CONSOLE-MODELS: Pydantic schemas and snapshot models
+      for UI telemetry.
+      Associated: `DebugConsoleSnapshot`, `ClearResponse`
+      Logging: Formats telemetry snapshots and buffer clearance metadata.
     - FR-HOST-LOG-REQUEST-CORRELATION: Scope request metadata via contextvars.
       Associated: `request_context()`
       Logging: Injects scoped correlation tokens into concurrent async event contexts.
@@ -72,7 +73,6 @@ Python API Usage:
     from pathlib import Path
     from app.host.logging import (
         configure_host_logging,
-        create_debug_console_router,
         get_logger,
         request_context,
         reset_logging,
@@ -86,10 +86,7 @@ Python API Usage:
     with request_context(request_id="req-999"):
         log.info("Processing job", extra={"task": "backtest"})
 
-    # 3. Mount DebugConsole router in FastAPI
-    router = create_debug_console_router(engine)
-
-    # 4. Clean teardown at shutdown
+    # 3. Clean teardown at shutdown
     reset_logging()
     ```
 
@@ -125,7 +122,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Final, TextIO, override
 
-from fastapi import APIRouter, Query, status
 from pydantic import BaseModel, ConfigDict, Field
 
 if TYPE_CHECKING:
@@ -144,7 +140,6 @@ __all__ = [
     "TelemetryEngine",
     "bridge_standard_logging",
     "configure_host_logging",
-    "create_debug_console_router",
     "fingerprint_secret",
     "flush",
     "format_human_record",
@@ -1359,88 +1354,6 @@ def bridge_standard_logging(logger_names: tuple[str, ...]) -> None:
             handler = HostBridgeHandler(category=category)
             stdlib_logger.addHandler(handler)
             stdlib_logger.propagate = False
-
-
-# ============================================================================
-# Debug Console FastAPI Router
-# ============================================================================
-
-
-def create_debug_console_router(
-    engine: TelemetryEngine | None = None,
-) -> APIRouter:
-    """Create FastAPI router for the browser DebugConsole workspace.
-
-    Provides endpoints matching the UI projection contract and legacy SQX
-    plugin path `/debugconsole`.
-
-    Args:
-        engine: Optional TelemetryEngine instance. Defaults to active singleton.
-
-    Returns:
-        APIRouter configured with DebugConsole projection endpoints.
-    """
-    router = APIRouter(tags=["debugconsole"])
-
-    def _get_engine() -> TelemetryEngine:
-        return engine if engine is not None else TelemetryEngine.get_or_create()
-
-    @router.get(
-        "/api/v1/debugconsole/logs",
-        response_model=DebugConsoleSnapshot,
-        summary="Query DebugConsole logs",
-    )
-    @router.get(
-        "/debugconsole/logs",
-        response_model=DebugConsoleSnapshot,
-        include_in_schema=False,
-    )
-    async def get_logs(
-        after_cursor: int | None = Query(default=None, description="Cursor offset"),
-        category: str = Query(default="All", description="Category filter"),
-        query: str | None = Query(default=None, description="Message filter search"),
-        limit: int = Query(default=100, ge=1, le=1000, description="Page limit"),
-    ) -> DebugConsoleSnapshot:
-        eng = _get_engine()
-        return eng.ring_buffer.get_snapshot(
-            after_cursor=after_cursor,
-            category=category,
-            query=query,
-            limit=limit,
-        )
-
-    @router.get(
-        "/api/v1/debugconsole/categories",
-        response_model=list[str],
-        summary="List active DebugConsole categories",
-    )
-    @router.get(
-        "/debugconsole/categories",
-        response_model=list[str],
-        include_in_schema=False,
-    )
-    async def get_categories() -> list[str]:
-        eng = _get_engine()
-        return eng.ring_buffer.get_categories()
-
-    @router.post(
-        "/api/v1/debugconsole/clear",
-        response_model=ClearResponse,
-        status_code=status.HTTP_200_OK,
-        summary="Clear DebugConsole log buffer",
-    )
-    @router.post(
-        "/debugconsole/clear",
-        response_model=ClearResponse,
-        status_code=status.HTTP_200_OK,
-        include_in_schema=False,
-    )
-    async def clear_logs() -> ClearResponse:
-        eng = _get_engine()
-        cleared_cursor = eng.ring_buffer.clear()
-        return ClearResponse(cleared=True, cleared_at_cursor=cleared_cursor)
-
-    return router
 
 
 # ============================================================================

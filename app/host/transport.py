@@ -53,10 +53,6 @@ Key Capabilities:
       Associated: `[sse_event_generator()]`,
       `[TransportService.handle_events_stream()]`
       Logging: Emits INFO on stream connect/disconnect; WARNING on slow-consumer
-    - FR-HOST-TRANSPORT-REST-PROJECTION: FastAPI transport router exposing
-      endpoints `/auth/login`, `/events`, `/events/publish`, and `/events/snapshot`.
-      Associated: `[create_transport_router()]`
-      Logging: Emits DEBUG on transport router composition.
 
 Python API Usage:
     ```python
@@ -64,7 +60,6 @@ Python API Usage:
         EventBus,
         SessionTokenManager,
         TransportMiddleware,
-        create_transport_router,
     )
     from fastapi import FastAPI
 
@@ -73,8 +68,7 @@ Python API Usage:
     tokens = SessionTokenManager()
 
     app.add_middleware(TransportMiddleware)
-    router = create_transport_router(event_bus=bus, token_manager=tokens)
-    app.include_router(router, prefix="/api/v1")
+    # Presentation transport routes are mounted from app.api.transport
 
     # Publish an event
     event = bus.publish(
@@ -105,9 +99,9 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, Final
 
-from fastapi import APIRouter, FastAPI, HTTPException, Query, Request, Response, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
@@ -116,15 +110,12 @@ from app.host.logging import get_logger
 from app.host.response import StandardError, StandardResponse
 from app.host.session import (
     AuthenticationError,
-    HostAuthentication,
     LoginRequest,
     SessionExpiredError,
     SessionTokenManager,
-    create_auth_router,
     get_global_session_manager,
 )
 from app.host.session import SessionToken as LoginResponse
-from app.host.settings import HostSettings
 
 __all__ = [
     "ApiResponse",
@@ -141,9 +132,7 @@ __all__ = [
     "SlowConsumerError",
     "TransportError",
     "TransportMiddleware",
-    "TransportService",
     "ValidationIssue",
-    "create_transport_router",
     "get_event_bus",
     "get_global_event_bus",
     "get_global_token_manager",
@@ -653,155 +642,6 @@ def register_transport_exception_handlers(app: FastAPI) -> None:
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             content=resp.to_dict(),
         )
-
-
-# -----------------------------------------------------------------------------
-# Transport Service Handler Operations
-# -----------------------------------------------------------------------------
-
-
-class TransportService:
-    """Coordinates authentication and event routing for HTTP transport."""
-
-    def __init__(self, bus: EventBus, tokens: SessionTokenManager) -> None:
-        self.bus = bus
-        self.tokens = tokens
-
-    def resolve_token(self, request: Request, token_query: str | None) -> str | None:
-        """Extract token from Authorization Bearer header or query parameter."""
-        auth_header = request.headers.get("authorization")
-        if auth_header and auth_header.lower().startswith("bearer "):
-            return auth_header[7:].strip()
-        if token_query and token_query.strip():
-            return token_query.strip()
-        return None
-
-    async def handle_events_stream(
-        self,
-        request: Request,
-        channels: str = Query(
-            default="*", description="Comma-separated channel filter"
-        ),
-        since_cursor: int | None = Query(
-            default=None, description="Replay starting after this cursor"
-        ),
-        token: str | None = Query(
-            default=None, description="Optional bearer token in query"
-        ),
-        limit: int | None = Query(
-            default=None, description="Optional maximum number of events to receive"
-        ),
-    ) -> Response:
-        """Stream real-time server-sent events for authorized subscribers."""
-        req_id = request.headers.get("x-request-id")
-        resolved = self.resolve_token(request, token)
-        if not resolved or not self.tokens.is_valid(resolved):
-            err = StandardError(
-                code="UNAUTHORIZED",
-                message="Host session required or expired.",
-            )
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content=StandardResponse.failure(
-                    message="Unauthorized.",
-                    error=err,
-                    request_id=req_id,
-                ).to_dict(),
-            )
-
-        last_id = request.headers.get("last-event-id")
-        effective_cursor = since_cursor
-        if effective_cursor is None and last_id and last_id.isdigit():
-            effective_cursor = int(last_id)
-
-        parsed_channels = [c.strip() for c in channels.split(",") if c.strip()]
-        if not parsed_channels:
-            parsed_channels = ["*"]
-
-        return StreamingResponse(
-            sse_event_generator(
-                event_bus=self.bus,
-                channels=parsed_channels,
-                since_cursor=effective_cursor,
-                request=request,
-                limit=limit,
-                session_valid=lambda: self.tokens.is_valid(resolved),
-            ),
-            media_type="text/event-stream",
-            headers={
-                "Cache-Control": "no-cache",
-                "Connection": "keep-alive",
-                "X-Accel-Buffering": "no",
-            },
-        )
-
-    async def handle_publish(
-        self, event_in: PublishEventRequest, request: Request
-    ) -> JSONResponse:
-        """Publish an event to the host event bus."""
-        req_id = request.headers.get("x-request-id")
-        event = self.bus.publish(
-            channel=event_in.channel,
-            event_type=event_in.event_type,
-            payload=event_in.payload,
-        )
-        resp = StandardResponse.success(
-            data=event.model_dump(),
-            message="Event published successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_snapshot(
-        self,
-        request: Request,
-        channel: str = Query(default="*", description="Target channel name"),
-        since_cursor: int | None = Query(
-            default=None, description="Cursor lower bound"
-        ),
-        limit: int = Query(default=100, ge=1, le=1000),
-    ) -> JSONResponse:
-        """Query channel snapshot and retained history."""
-        req_id = request.headers.get("x-request-id")
-        snapshot = self.bus.get_snapshot(
-            channel=channel, since_cursor=since_cursor, limit=limit
-        )
-        resp = StandardResponse.success(
-            data=snapshot.model_dump(),
-            message="Snapshot retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-
-# -----------------------------------------------------------------------------
-# FastAPI Router Factory
-# -----------------------------------------------------------------------------
-
-
-def create_transport_router(
-    event_bus: EventBus | None = None,
-    token_manager: SessionTokenManager | None = None,
-) -> APIRouter:
-    """Create FastAPI router exposing auth and event transport endpoints."""
-    bus = event_bus if event_bus is not None else get_global_event_bus()
-    tokens = token_manager if token_manager is not None else get_global_token_manager()
-    service = TransportService(bus, tokens)
-    router = APIRouter(tags=["transport"])
-
-    authentication = tokens.authentication or HostAuthentication(
-        HostSettings(), tokens.manager
-    )
-    router.include_router(create_auth_router(authentication))
-    router.add_api_route("/events", service.handle_events_stream, methods=["GET"])
-    router.add_api_route("/events/publish", service.handle_publish, methods=["POST"])
-    router.add_api_route("/events/snapshot", service.handle_snapshot, methods=["GET"])
-
-    logger.debug(
-        "create_transport_router composed",
-        extra={"requirement": "FR-HOST-TRANSPORT-REST-PROJECTION"},
-    )
-    return router
 
 
 # -----------------------------------------------------------------------------

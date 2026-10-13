@@ -17,12 +17,14 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from app.api.diagnostics import (
+    create_diagnostics_router,
+    create_settings_paths_router,
+)
 from app.host.diagnostics import (
     BenchmarkRunner,
     apply_thread_affinity,
     calculate_worker_allocation,
-    create_diagnostics_router,
-    create_settings_paths_router,
     get_worker_capacity,
     inspect_gpu_qualification,
     inspect_thread_affinity,

@@ -18,6 +18,12 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.api.sessions import (
+    create_auth_router,
+    create_sessions_router,
+    extract_bearer_token,
+    get_current_session,
+)
 from app.host.session import (
     AuthenticationError,
     DistinctAuthorityCoordinator,
@@ -40,10 +46,6 @@ from app.host.session import (
     SessionExpiredError,
     SessionManager,
     StandardScope,
-    create_auth_router,
-    create_sessions_router,
-    extract_bearer_token,
-    get_current_session,
     get_tls_remote_deployment_proposal,
     hash_password,
     main,

@@ -28,10 +28,10 @@ Key Capabilities:
     - FR-HOST-SETTINGS-PATH-VALIDATION: Inspect configured directory existence.
       Associated: `validate_settings_paths()`
       Logging: INFO available directories; WARNING absent directories.
-    - FR-HOST-PERSISTENCE-REST-PROJECTION: Project storage diagnostics over HTTP.
-      Associated: `DatabaseDiagnosticsService`, `create_database_diagnostics_router()`
-      Logging: DEBUG router composition; delegated stores/services log every
-        inspection without payload values.
+    - FR-HOST-PERSISTENCE-INSPECTION: Database operational status and schema
+      inspections.
+      Associated: `DatabaseManager.get_status()`, `DatabaseManager.check_integrity()`
+      Logging: Inspects database health and migrations safely.
     - FR-HOST-DIAG-SYSTEM-PROBE: Probe CPU, memory, disk, and process metrics with
       bounded execution and explicit zero-vs-unavailable discrimination.
       Associated: `probe_cpu()`, `probe_memory()`, `probe_disk()`, `probe_process()`
@@ -54,17 +54,11 @@ Key Capabilities:
       Associated: `BenchmarkRunner.run_benchmark()`, `start_benchmark_job()`
       Logging: Emits INFO on benchmark start, completion, and cancellation;
         never synthesizes or fakes computational performance scores.
-    - FR-HOST-DIAG-PROJECTION: Expose FastAPI REST endpoints for real-time system
-      diagnostics and benchmark lifecycle management.
-      Associated: `create_diagnostics_router()`, route handlers
-      Logging: Emits DEBUG telemetry on routine diagnostic inspection requests;
-        emits INFO on benchmark job submissions and cancellations.
 
 Python API Usage:
     ```python
     from app.host.diagnostics import (
         calculate_worker_allocation,
-        create_diagnostics_router,
         probe_system_diagnostics,
         run_cpu_benchmark,
     )
@@ -80,9 +74,6 @@ Python API Usage:
     # 3. Run real computational benchmark
     results = run_cpu_benchmark(iterations=100_000)
     print(f"Throughput: {results.throughput_ops_per_sec:.0f} ops/sec")
-
-    # 4. Mount diagnostics router in FastAPI
-    router = create_diagnostics_router()
     ```
 
 CLI Usage:
@@ -105,7 +96,6 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
-import asyncio
 import math
 import os
 import platform
@@ -118,13 +108,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final
 
 import psutil
-from fastapi import APIRouter, HTTPException, Query, Request, Response, status
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.host.logging import get_logger, redact_paths
 from app.host.persistence import DatabaseManager
-from app.host.response import StandardResponse as ApiResponse
 
 if TYPE_CHECKING:
     from app.host.settings import HostSettings
@@ -134,7 +121,6 @@ __all__ = [
     "BenchmarkResults",
     "BenchmarkRunner",
     "CpuObservation",
-    "DatabaseDiagnosticsService",
     "DiskObservation",
     "MemoryObservation",
     "PlatformObservation",
@@ -143,9 +129,6 @@ __all__ = [
     "WorkerCapacity",
     "apply_thread_affinity",
     "calculate_worker_allocation",
-    "create_database_diagnostics_router",
-    "create_diagnostics_router",
-    "create_settings_paths_router",
     "get_worker_capacity",
     "inspect_gpu_qualification",
     "inspect_thread_affinity",
@@ -1087,211 +1070,6 @@ class BenchmarkRunner:
 _BENCHMARK_RUNNER = BenchmarkRunner()
 
 
-# ============================================================================
-# FastAPI Diagnostics Router
-# ============================================================================
-
-
-def _mount_system_routes(router: APIRouter) -> None:
-    """Mount hardware and capacity probe inspection routes."""
-
-    @router.get(
-        "/system",
-        response_model=SystemDiagnosticsSnapshot,
-        summary="Query system diagnostics snapshot",
-    )
-    async def get_system_diagnostics() -> SystemDiagnosticsSnapshot:
-        return probe_system_diagnostics()
-
-    @router.get(
-        "/cpu",
-        response_model=CpuObservation,
-        summary="Query CPU topology and utilization",
-    )
-    async def get_cpu() -> CpuObservation:
-        return probe_cpu()
-
-    @router.get(
-        "/memory",
-        response_model=MemoryObservation,
-        summary="Query memory capacity and load",
-    )
-    async def get_memory() -> MemoryObservation:
-        return probe_memory()
-
-    @router.get(
-        "/disk",
-        response_model=DiskObservation,
-        summary="Query storage volume metrics",
-    )
-    async def get_disk() -> DiskObservation:
-        return probe_disk()
-
-    @router.get(
-        "/process",
-        response_model=ProcessObservation,
-        summary="Query host process health",
-    )
-    async def get_process() -> ProcessObservation:
-        return probe_process()
-
-    @router.get(
-        "/workers",
-        response_model=WorkerCapacity,
-        summary="Query worker capacity and limits",
-    )
-    async def get_workers(
-        mode: str = Query(default="reserve-one", description="Core usage mode"),
-        custom_cores: int = Query(default=1, ge=1, description="Custom cores limit"),
-    ) -> WorkerCapacity:
-        return get_worker_capacity(mode=mode, custom_cores=custom_cores)
-
-
-def _mount_benchmark_routes(router: APIRouter, runner: BenchmarkRunner) -> None:
-    """Mount computational benchmark lifecycle routes."""
-
-    @router.post(
-        "/benchmark/run",
-        response_model=BenchmarkJob,
-        status_code=status.HTTP_202_ACCEPTED,
-        summary="Initiate CPU benchmark run",
-    )
-    async def post_run_benchmark(
-        iterations: int = Query(
-            default=DEFAULT_BENCHMARK_ITERATIONS,
-            ge=1000,
-            le=5_000_000,
-            description="Benchmark tick iterations",
-        ),
-    ) -> BenchmarkJob:
-        return runner.start_job(iterations=iterations)
-
-    @router.get(
-        "/benchmark/{job_id}",
-        response_model=BenchmarkJob,
-        summary="Query benchmark job status",
-    )
-    async def get_benchmark_job(job_id: str) -> BenchmarkJob:
-        job = runner.get_job(job_id)
-        if job is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Benchmark job '{job_id}' not found",
-            )
-        return job
-
-    @router.post(
-        "/benchmark/{job_id}/cancel",
-        response_model=BenchmarkJob,
-        summary="Cancel running benchmark job",
-    )
-    async def post_cancel_benchmark(job_id: str) -> BenchmarkJob:
-        job = runner.get_job(job_id)
-        if job is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Benchmark job '{job_id}' not found",
-            )
-        runner.cancel_job(job_id)
-        await asyncio.sleep(0.05)
-        updated = runner.get_job(job_id)
-        return updated or job
-
-
-def create_diagnostics_router(
-    runner: BenchmarkRunner | None = None,
-) -> APIRouter:
-    """Create FastAPI router providing diagnostics and benchmark REST endpoints.
-
-    Args:
-        runner: Optional BenchmarkRunner instance. Defaults to global instance.
-
-    Returns:
-        APIRouter configured under `/api/v1/diagnostics`.
-    """
-    router = APIRouter(prefix="/api/v1/diagnostics", tags=["diagnostics"])
-    bench_runner = runner or _BENCHMARK_RUNNER
-    _mount_system_routes(router)
-    _mount_benchmark_routes(router, bench_runner)
-    return router
-
-
-class DatabaseDiagnosticsService:
-    """HTTP access to database operational inspection."""
-
-    def __init__(self, db: DatabaseManager) -> None:
-        self._db = db
-
-    def get_status(self, request: Request) -> Response:
-        """Get database operational metrics snapshot."""
-        req_id = request.headers.get("x-request-id")
-        status_rec = self._db.get_status()
-        resp = ApiResponse.success(
-            data=status_rec.model_dump(mode="json"),
-            message="Database status retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def get_schema(self, request: Request) -> Response:
-        """Get schema migration ledger records."""
-        req_id = request.headers.get("x-request-id")
-        migrations = self._db.schema.list_migrations()
-        resp = ApiResponse.success(
-            data=[m.model_dump(mode="json") for m in migrations],
-            message="Schema migrations retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def check_integrity_endpoint(self, request: Request) -> Response:
-        """Run physical SQLite database integrity verification."""
-        req_id = request.headers.get("x-request-id")
-        res = self._db.check_integrity()
-        resp = ApiResponse.success(
-            data={"integrity": res, "integrity_check": res},
-            message=f"Database integrity verified: {res}",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-
-def create_database_diagnostics_router(db: DatabaseManager) -> APIRouter:
-    """Expose database status, schema and integrity inspection over HTTP."""
-    service = DatabaseDiagnosticsService(db)
-    router = APIRouter(prefix="/persistence", tags=["persistence"])
-
-    router.add_api_route(
-        "/status",
-        service.get_status,
-        methods=["GET"],
-        summary="Query database status and health",
-    )
-    router.add_api_route(
-        "/schema",
-        service.get_schema,
-        methods=["GET"],
-        summary="List applied schema migrations",
-    )
-    router.add_api_route(
-        "/schema/migrations",
-        service.get_schema,
-        methods=["GET"],
-        summary="List applied schema migrations alias",
-    )
-    router.add_api_route(
-        "/integrity-check",
-        service.check_integrity_endpoint,
-        methods=["POST"],
-        summary="Execute PRAGMA integrity_check",
-    )
-    logger.debug(
-        "Persistence REST router initialized",
-        extra={"fr_id": "FR-HOST-PERSISTENCE-REST-PROJECTION"},
-    )
-    return router
-
-
 def validate_settings_paths(settings_instance: HostSettings) -> dict[str, bool]:
     """Validate configured workspace directories on disk.
 
@@ -1342,30 +1120,6 @@ def validate_settings_paths(settings_instance: HostSettings) -> dict[str, bool]:
             )
 
     return results
-
-
-def create_settings_paths_router(settings_instance: HostSettings) -> APIRouter:
-    """Expose configured directory inspection at its existing HTTP URL."""
-    router = APIRouter()
-    target_settings = settings_instance
-
-    @router.get("/settings/paths/validate")
-    async def validate_paths_endpoint() -> JSONResponse:
-        """Validate configured workspace directories on disk."""
-        statuses = validate_settings_paths(target_settings)
-        all_valid = all(statuses.values())
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "status": "success",
-                "data": {
-                    "paths": statuses,
-                    "all_valid": all_valid,
-                },
-            },
-        )
-
-    return router
 
 
 def main() -> int:

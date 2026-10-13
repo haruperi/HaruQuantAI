@@ -14,13 +14,13 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from app.api.shell import create_recovery_router
 from app.host.bootstrap import (
     HostRuntime,
     HostSettings,
     LifespanStage,
     ReadinessState,
     create_host_app,
-    create_recovery_router,
     reconcile_database,
 )
 from app.host.bootstrap import (
@@ -291,7 +291,7 @@ def test_fastapi_shell_endpoints_and_lifespan(
         assert data["data"]["version"] == "2.1.0"
         assert data["data"]["reference_cohort"] == "SQX145 Dev 1"
         for detected, expected in ((12, 12), (None, 1), (0, 1)):
-            with patch("app.host.bootstrap.os.cpu_count", return_value=detected):
+            with patch("app.api.shell.os.cpu_count", return_value=detected):
                 assert (
                     client.get("/api/v1/status").json()["data"]["cpu_count"] == expected
                 )

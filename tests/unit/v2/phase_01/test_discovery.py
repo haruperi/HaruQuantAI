@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.api.discovery import create_discovery_router
 from app.host.discovery import (
     MAX_MANIFEST_BYTES,
     ManifestValidationError,
@@ -32,7 +33,6 @@ from app.host.discovery import (
     SlotRegistry,
     _is_version_compatible,
     _parse_semver,
-    create_discovery_router,
     main,
 )
 from fastapi import APIRouter, FastAPI

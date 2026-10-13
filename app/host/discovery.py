@@ -48,10 +48,6 @@ Key Capabilities:
       disabling, reload, and uninstallation with resource cleanup.
       Associated: `PluginLifecycleManager`
       Logging: Emits INFO on lifecycle state transitions; ERROR on factory failure.
-    - FR-HOST-DISC-BROWSER-PROJECTION: FastAPI REST projection endpoints exposing
-      discovered packages, status, slot bindings, and lifecycle operations.
-      Associated: `create_discovery_router()`
-      Logging: Emits DEBUG on status queries; INFO on state mutations.
 
 Python API Usage:
     ```python
@@ -89,9 +85,11 @@ from collections.abc import Callable, Sequence
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
-from typing import Annotated, Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from fastapi import APIRouter, HTTPException, Query, status
+if TYPE_CHECKING:
+    from fastapi import APIRouter
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.host.logging import BoundLogger, get_logger
@@ -1555,210 +1553,6 @@ default_discovery_engine: PluginDiscoveryEngine = PluginDiscoveryEngine(
 default_lifecycle_manager: PluginLifecycleManager = PluginLifecycleManager(
     discovery_engine=default_discovery_engine
 )
-
-
-# -----------------------------------------------------------------------------
-# FastAPI Browser REST Router
-# -----------------------------------------------------------------------------
-
-
-class _DiscoveryEndpointHandler:
-    """REST endpoint handlers for plugin discovery projections."""
-
-    def __init__(self, manager: PluginLifecycleManager) -> None:
-        self.manager: PluginLifecycleManager = manager
-
-    async def list_plugins(
-        self,
-        slot: Annotated[str | None, Query(description="Filter by slot ID")] = None,
-        state: Annotated[
-            PluginState | None, Query(description="Filter by state")
-        ] = None,
-    ) -> PluginListResponse:
-        """List all discovered plugins with optional filtering."""
-        records = self.manager.records.values()
-        summaries: list[PluginSummary] = []
-        states_count: dict[str, int] = {}
-
-        for rec in records:
-            s_name = rec.state.value
-            states_count[s_name] = states_count.get(s_name, 0) + 1
-
-            if slot is not None and rec.manifest.slot != slot:
-                continue
-            if state is not None and rec.state != state:
-                continue
-
-            summaries.append(
-                PluginSummary(
-                    id=rec.manifest.id,
-                    name=rec.manifest.name,
-                    version=rec.manifest.version,
-                    slot=rec.manifest.slot,
-                    state=rec.state,
-                    enabled=rec.manifest.enabled,
-                    description=rec.manifest.description,
-                    package_dir=rec.package_dir,
-                    error_message=rec.error_message,
-                    discovered_at=rec.discovered_at,
-                    attached_at=rec.attached_at,
-                )
-            )
-
-        logger.debug(
-            "FR-HOST-DISC-BROWSER-PROJECTION: Queried plugins list "
-            "(total=%d, filtered=%d)",
-            len(records),
-            len(summaries),
-            extra={
-                "fr_id": "FR-HOST-DISC-BROWSER-PROJECTION",
-                "total": len(records),
-                "filtered": len(summaries),
-            },
-        )
-        return PluginListResponse(
-            total=len(summaries),
-            states_count=states_count,
-            plugins=summaries,
-        )
-
-    async def get_plugin(self, plugin_id: str) -> PluginRecord:
-        """Retrieve full details of a specific plugin."""
-        record = self.manager.get_record(plugin_id)
-        if record is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Plugin '{plugin_id}' not found",
-            )
-        return record
-
-    async def enable_plugin(self, plugin_id: str) -> PluginRecord:
-        """Enable and attach a plugin."""
-        success = self.manager.enable(plugin_id)
-        rec = self.manager.get_record(plugin_id)
-        if rec is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Plugin '{plugin_id}' not found",
-            )
-        if not success:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=rec.error_message or "Failed to enable plugin",
-            )
-        return rec
-
-    async def disable_plugin(self, plugin_id: str) -> PluginRecord:
-        """Disable a plugin and release its attached resources."""
-        success = self.manager.disable(plugin_id)
-        rec = self.manager.get_record(plugin_id)
-        if rec is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Plugin '{plugin_id}' not found",
-            )
-        if not success:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Failed to disable plugin",
-            )
-        return rec
-
-    async def reload_plugin(self, plugin_id: str) -> PluginRecord:
-        """Reload a plugin by disabling, re-reading manifest, and re-attaching."""
-        success = self.manager.reload(plugin_id)
-        rec = self.manager.get_record(plugin_id)
-        if rec is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Plugin '{plugin_id}' not found",
-            )
-        if not success:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=rec.error_message or "Failed to reload plugin",
-            )
-        return rec
-
-    async def list_slots(self) -> list[SlotSummary]:
-        """List all extension slots and currently attached plugins."""
-        slots = self.manager.engine.slot_registry.list_slots()
-        records = self.manager.records.values()
-
-        summaries: list[SlotSummary] = []
-        for s in slots:
-            attached = [
-                r.manifest.id
-                for r in records
-                if r.manifest.slot == s.slot_id and r.state == PluginState.ATTACHED
-            ]
-            summaries.append(
-                SlotSummary(
-                    slot_id=s.slot_id,
-                    description=s.description,
-                    multi_instance=s.multi_instance,
-                    required_capabilities=s.required_capabilities,
-                    attached_plugins=attached,
-                )
-            )
-        return summaries
-
-
-def create_discovery_router(
-    manager: PluginLifecycleManager | None = None,
-) -> APIRouter:
-    """Create and return FastAPI router for browser plugin queries.
-
-    Fires FR-HOST-DISC-BROWSER-PROJECTION.
-    """
-    mgr = manager or default_lifecycle_manager
-    handler = _DiscoveryEndpointHandler(mgr)
-    router = APIRouter(prefix="/discovery", tags=["Discovery"])
-
-    router.add_api_route(
-        "/plugins",
-        handler.list_plugins,
-        methods=["GET"],
-        response_model=PluginListResponse,
-        summary="List discovered plugins",
-    )
-    router.add_api_route(
-        "/plugins/{plugin_id}",
-        handler.get_plugin,
-        methods=["GET"],
-        response_model=PluginRecord,
-        summary="Get plugin details",
-    )
-    router.add_api_route(
-        "/plugins/{plugin_id}/enable",
-        handler.enable_plugin,
-        methods=["POST"],
-        response_model=PluginRecord,
-        summary="Enable and attach plugin",
-    )
-    router.add_api_route(
-        "/plugins/{plugin_id}/disable",
-        handler.disable_plugin,
-        methods=["POST"],
-        response_model=PluginRecord,
-        summary="Disable and teardown plugin",
-    )
-    router.add_api_route(
-        "/plugins/{plugin_id}/reload",
-        handler.reload_plugin,
-        methods=["POST"],
-        response_model=PluginRecord,
-        summary="Reload plugin",
-    )
-    router.add_api_route(
-        "/slots",
-        handler.list_slots,
-        methods=["GET"],
-        response_model=list[SlotSummary],
-        summary="List extension slots",
-    )
-
-    return router
 
 
 # -----------------------------------------------------------------------------

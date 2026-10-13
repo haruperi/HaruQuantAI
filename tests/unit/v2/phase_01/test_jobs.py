@@ -14,6 +14,10 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.api.jobs import (
+    create_jobs_router,
+    create_leases_router,
+)
 from app.host.jobs import (
     Budget,
     BudgetExceededError,
@@ -28,8 +32,6 @@ from app.host.jobs import (
     JobRecord,
     JobStatus,
     JobStore,
-    create_jobs_router,
-    create_leases_router,
     create_pool,
     diagnostics,
     main,

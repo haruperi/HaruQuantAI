@@ -13,6 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from app.api.transport import create_transport_router
 from app.host.logging import TelemetryEngine
 from app.host.session import hash_password
 from app.host.settings import HostSettings
@@ -25,7 +26,6 @@ from app.host.transport import (
     SessionExpiredError,
     SessionTokenManager,
     TransportMiddleware,
-    create_transport_router,
     get_global_event_bus,
     get_global_token_manager,
     main,
@@ -52,7 +52,7 @@ def isolated_default_settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -
             }
         }
     )
-    monkeypatch.setattr("app.host.transport.HostSettings", lambda: settings)
+    monkeypatch.setattr("app.api.transport.HostSettings", lambda: settings)
 
 
 # -----------------------------------------------------------------------------

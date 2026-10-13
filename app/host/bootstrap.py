@@ -24,7 +24,7 @@ Purpose:
 
 Key Capabilities:
     - FR-HOST-BOOT-PERSISTENCE-RECOVERY: Sequence startup storage audit and cleanup.
-      Associated: `HostRuntime.reconcile_persistence()`, `create_recovery_router()`,
+      Associated: `HostRuntime.reconcile_persistence()`,
         `reconcile_database()`
       Logging: INFO recovery report; failed integrity/schema checks stop startup.
     - FR-HOST-BOOT-LIFECYCLE-STAGES: Strict progression through ordered host
@@ -82,11 +82,10 @@ from __future__ import annotations
 import argparse
 import asyncio
 import inspect
-import os
 import sys
 import time
 import uuid
-from collections.abc import AsyncGenerator, Callable
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -94,33 +93,24 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, FastAPI, Request, status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
 
-from app.api.settings import create_settings_router
-from app.host.diagnostics import (
-    create_database_diagnostics_router,
-    create_diagnostics_router,
-    create_settings_paths_router,
-)
+from app import api
+from app.api.sessions import make_require_session
 from app.host.discovery import (
     PluginDiscoveryEngine,
     PluginLifecycleManager,
     PluginState,
     SlotRegistry,
-    create_discovery_router,
 )
 from app.host.jobs import (
     JobManager,
     LeaseManager,
-    create_jobs_router,
-    create_leases_router,
 )
 from app.host.logging import (
     configure_host_logging,
-    create_debug_console_router,
     get_logger,
     shutdown,
 )
@@ -132,19 +122,16 @@ from app.host.persistence import (
     PersistenceError,
     get_database_manager,
 )
-from app.host.resources import ResourceManager, create_resources_router
-from app.host.response import StandardResponse
+from app.host.resources import ResourceManager
 from app.host.session import (
     HostAuthentication,
     SessionManager,
     SessionTokenManager,
-    create_sessions_router,
 )
 from app.host.settings import HostSettings
 from app.host.settings import settings as default_host_settings
 from app.host.transport import (
     TransportMiddleware,
-    create_transport_router,
     get_event_bus,
     register_transport_exception_handlers,
 )
@@ -158,8 +145,6 @@ __all__ = [
     "ReadinessSnapshot",
     "ReadinessState",
     "create_host_app",
-    "create_persistence_router",
-    "create_recovery_router",
     "reconcile_database",
 ]
 
@@ -827,108 +812,6 @@ class HostRuntime:
         )
 
 
-def _create_shell_router(settings: HostSettings) -> APIRouter:
-    """Create shell endpoints under the configured API prefix."""
-    router = APIRouter(prefix=settings.api_prefix)
-
-    @router.get("/status")
-    async def get_status(request: Request) -> JSONResponse:
-        """Return general host status, CPU capacity, and runtime state."""
-        rt: HostRuntime = request.app.state.runtime
-        readiness = rt.get_readiness()
-        logger.debug(
-            "FR-HOST-BOOT-SHELL-PROJECTION: Handling /status query.",
-            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "status": "success",
-                "data": {
-                    "state": readiness.state.value,
-                    "host_instance_id": rt.host_instance_id,
-                    "is_ready": readiness.is_ready,
-                    "cpu_count": max(1, os.cpu_count() or 1),
-                    "uptime_seconds": readiness.uptime_seconds,
-                    "version": settings.version,
-                    "reference_cohort": settings.reference_cohort,
-                },
-            },
-        )
-
-    @router.get("/readiness")
-    async def get_readiness_endpoint(request: Request) -> JSONResponse:
-        """Return the host readiness assessment snapshot."""
-        rt: HostRuntime = request.app.state.runtime
-        readiness = rt.get_readiness()
-        logger.debug(
-            "FR-HOST-BOOT-SHELL-PROJECTION: Readiness endpoint evaluated: is_ready=%s",
-            readiness.is_ready,
-            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
-        )
-        http_status = (
-            status.HTTP_200_OK
-            if readiness.is_ready
-            else status.HTTP_503_SERVICE_UNAVAILABLE
-        )
-        return JSONResponse(
-            status_code=http_status,
-            content={
-                "status": "success" if readiness.is_ready else "error",
-                "data": readiness.model_dump(),
-            },
-        )
-
-    @router.post("/app-loaded")
-    async def post_app_loaded(request: Request) -> JSONResponse:
-        """Acknowledge the browser shell frontend completion of load."""
-        rt: HostRuntime = request.app.state.runtime
-        request.app.state.authentication.require_session(request)
-        rt.acknowledge_app_loaded()
-        logger.info(
-            "FR-HOST-BOOT-SHELL-PROJECTION: Browser shell app-loaded received "
-            "for host=%s",
-            rt.host_instance_id,
-            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "status": "success",
-                "data": {
-                    "acknowledged": True,
-                    "host_instance_id": rt.host_instance_id,
-                },
-            },
-        )
-
-    @router.get("/about")
-    async def get_about(request: Request) -> JSONResponse:
-        """Provide application identity, version, and clean-room provenance."""
-        rt: HostRuntime = request.app.state.runtime
-        logger.info(
-            "FR-HOST-BOOT-SHELL-PROJECTION: Delivering /about metadata.",
-            extra={"fr_id": "FR-HOST-BOOT-SHELL-PROJECTION"},
-        )
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content={
-                "status": "success",
-                "data": {
-                    "application": "HaruQuantAI",
-                    "title": settings.title,
-                    "version": settings.version,
-                    "reference_cohort": settings.reference_cohort,
-                    "runtime": "CPython 3.14 (FastAPI)",
-                    "disposition": "Clean-room Python host replacing JVM mechanics",
-                    "host_instance_id": rt.host_instance_id,
-                },
-            },
-        )
-
-    return router
-
-
 def _mount_host_routers(
     app: FastAPI,
     resolved_settings: HostSettings,
@@ -941,12 +824,12 @@ def _mount_host_routers(
     )
     app.state.authentication = authentication
     # 1. Shell Router (/api/v1/status, /api/v1/readiness, /api/v1/about, etc.)
-    shell_router = _create_shell_router(resolved_settings)
+    shell_router = api.create_shell_router(resolved_settings)
     app.include_router(shell_router)
 
     # 2. Settings Router (/api/v1/settings, /api/v1/settings/paths/validate)
     app.include_router(
-        create_settings_paths_router(resolved_config),
+        api.create_settings_paths_router(resolved_config),
         prefix=resolved_settings.api_prefix,
     )
 
@@ -958,15 +841,15 @@ def _mount_host_routers(
             default_host_settings.reload()
         get_event_bus().publish("settings.changed", "updated", {"revision": revision})
 
-    settings_router = create_settings_router(
+    settings_router = api.create_settings_router(
         resolved_config,
-        require_session=authentication.require_session,
+        require_session=make_require_session(authentication),
         on_updated=publish_settings_revision,
     )
     app.include_router(settings_router, prefix=resolved_settings.api_prefix)
 
     # 3. Transport Router (/events, /auth/status, /events/publish, /events/snapshot)
-    transport_router = create_transport_router(
+    transport_router = api.create_transport_router(
         token_manager=SessionTokenManager(
             manager=resolved_runtime.session_manager, authentication=authentication
         )
@@ -975,20 +858,20 @@ def _mount_host_routers(
     app.include_router(transport_router, prefix=resolved_settings.api_prefix)
 
     # 4. Debug Console Router (/debugconsole/..., /api/v1/debugconsole/...)
-    debug_console_router = create_debug_console_router()
+    debug_console_router = api.create_debug_console_router()
     app.include_router(debug_console_router)
 
     # 5. Diagnostics Router (/api/v1/diagnostics/...)
-    diagnostics_router = create_diagnostics_router()
+    diagnostics_router = api.create_diagnostics_router()
     app.include_router(diagnostics_router)
 
     # 6. Discovery Router (/api/v1/discovery/...)
     disc_mgr = resolved_runtime.init_discovery()
-    discovery_router = create_discovery_router(disc_mgr)
+    discovery_router = api.create_discovery_router(disc_mgr)
     app.include_router(discovery_router, prefix=resolved_settings.api_prefix)
 
     # 7. Sessions Router (/api/v1/sessions/...)
-    sessions_router = create_sessions_router(
+    sessions_router = api.create_sessions_router(
         resolved_runtime.session_manager, authentication=authentication
     )
     app.include_router(sessions_router, prefix=resolved_settings.api_prefix)
@@ -1002,7 +885,7 @@ def _mount_host_routers(
             db_target = resolved_config.db_path
         resolved_runtime.db_manager = get_database_manager(db_target)
     persistence_db = resolved_runtime.db_manager
-    persistence_router = create_persistence_router(
+    persistence_router = api.create_persistence_router(
         resolved_runtime.db_manager,
         reconcile=lambda: resolved_runtime.reconcile_persistence(persistence_db),
     )
@@ -1018,7 +901,7 @@ def _mount_host_routers(
             db_path=resolved_runtime.db_manager.database_path,
             auto_reconcile=False,
         )
-    jobs_router = create_jobs_router(resolved_runtime.job_manager)
+    jobs_router = api.create_jobs_router(resolved_runtime.job_manager)
     app.include_router(jobs_router, prefix=resolved_settings.api_prefix)
 
     # 10. Resources Router (/api/v1/resources/...)
@@ -1029,7 +912,7 @@ def _mount_host_routers(
             else Path("data/resources")
         )
         resolved_runtime.resource_manager = ResourceManager(root_dir=res_dir)
-    resources_router = create_resources_router(resolved_runtime.resource_manager)
+    resources_router = api.create_resources_router(resolved_runtime.resource_manager)
     app.include_router(resources_router, prefix=resolved_settings.api_prefix)
 
     # 11. Market Data Router (/data/..., /api/v1/data/...)
@@ -1114,42 +997,6 @@ def create_host_app(
         extra={"fr_id": "FR-HOST-BOOT-APP-COMPOSITION"},
     )
     return app
-
-
-def create_recovery_router(reconcile: Callable[[], dict[str, Any]]) -> APIRouter:
-    """Expose bootstrap recovery using the supplied lifecycle workflow."""
-    router = APIRouter(prefix="/persistence/recovery", tags=["persistence"])
-
-    @router.post("/reconcile", summary="Trigger restart recovery reconciliation")
-    def reconcile_endpoint(request: Request) -> JSONResponse:
-        """Run the bootstrap-owned recovery sequence."""
-        response = StandardResponse.success(
-            data=reconcile(),
-            message="Recovery reconciliation completed.",
-            request_id=request.headers.get("x-request-id"),
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=response.to_dict())
-
-    logger.debug(
-        "Recovery REST router initialized",
-        extra={"fr_id": "FR-HOST-BOOT-PERSISTENCE-RECOVERY"},
-    )
-    return router
-
-
-def create_persistence_router(
-    db: DatabaseManager, *, reconcile: Callable[[], dict[str, Any]]
-) -> APIRouter:
-    """Compose separately owned capabilities at the legacy persistence URLs."""
-    router = APIRouter()
-    router.include_router(create_database_diagnostics_router(db))
-    router.include_router(create_leases_router(db))
-    router.include_router(create_recovery_router(reconcile))
-    logger.debug(
-        "Persistence REST capabilities composed",
-        extra={"fr_id": "FR-HOST-BOOT-APP-COMPOSITION"},
-    )
-    return router
 
 
 def reconcile_database(database_path: Path) -> int:

@@ -18,7 +18,8 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-from app.host.bootstrap import HostRuntime, create_persistence_router
+from app.api.diagnostics import create_persistence_router
+from app.host.bootstrap import HostRuntime
 from app.host.bootstrap import main as bootstrap_main
 from app.host.diagnostics import main
 from app.host.jobs import LeaseManager
@@ -1455,16 +1456,23 @@ def test_settings_access_and_update_boundary() -> None:
 
 
 def test_capability_adapter_ownership() -> None:
-    """HTTP access belongs in dedicated API layer; host settings is pure business logic."""
+    """HTTP access belongs in dedicated API layer; host modules are pure business logic."""
+    from app.api import diagnostics as api_diagnostics
+    from app.api import jobs as api_jobs
     from app.api import settings as api_settings
+    from app.api import shell as api_shell
     from app.host import bootstrap, diagnostics, jobs
     from app.host import settings as settings_module
 
     assert not hasattr(settings_module, "create_settings_router")
     assert api_settings.create_settings_router.__module__ == "app.api.settings"
-    assert jobs.create_leases_router.__module__ == "app.host.jobs"
-    assert bootstrap.create_recovery_router.__module__ == "app.host.bootstrap"
-    assert bootstrap.create_persistence_router.__module__ == "app.host.bootstrap"
+    assert not hasattr(jobs, "create_leases_router")
+    assert not hasattr(jobs, "create_jobs_router")
+    assert api_jobs.create_leases_router.__module__ == "app.api.jobs"
+    assert not hasattr(bootstrap, "create_recovery_router")
+    assert not hasattr(bootstrap, "create_persistence_router")
+    assert api_shell.create_recovery_router.__module__ == "app.api.shell"
+    assert api_diagnostics.create_persistence_router.__module__ == "app.api.diagnostics"
     assert not hasattr(diagnostics, "create_settings_router")
     assert not hasattr(diagnostics, "AcquireLeaseRequest")
     assert not hasattr(diagnostics, "create_persistence_router")

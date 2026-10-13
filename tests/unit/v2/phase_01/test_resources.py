@@ -19,6 +19,7 @@ from typing import Literal
 from unittest.mock import MagicMock, patch
 
 import pytest
+from app.api.resources import create_resources_router
 from app.host.resources import (
     AcquisitionError,
     ArchiveFormat,
@@ -33,7 +34,6 @@ from app.host.resources import (
     ResourceSecurityError,
     ResourceStatus,
     acquire_remote,
-    create_resources_router,
     inspect_archive,
     main,
     safe_extract_archive,
