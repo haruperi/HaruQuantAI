@@ -9,6 +9,7 @@ internals): [`diagrams/`](diagrams/README.md).
 
 | Level | Folder | Covers |
 |---|---|---|
+| 0 Clean-room blueprint | [`architecture-and-reimplementation.md`](architecture-and-reimplementation.md) | SQX-145 system topology, core JARs (`libs/`), 182-plugin inventory, `.cfx`/`.sqx` persistence, and HaruQuantAI Python reimplementation map |
 | 1 Functional / product | [`overview/`](overview/README.md) | Modules, workflow, data flow; per-tab detail in [Results tabs](overview/results-tabs/README.md), [Settings tabs](overview/settings/README.md) |
 | 2 Developer / architecture | [`onboard/`](onboard/README.md) | Subprojects, engines, startup, per-module architecture (mainly backend) |
 | 3 Build and run | [`build-and-run.md`](build-and-run.md) | Gradle tasks, launchers, `j64` JDK, release/miniBuild packaging |
