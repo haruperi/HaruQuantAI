@@ -1,0 +1,13 @@
+{
+  "QDM": {
+    "screens": ["08-data-manager"],
+    "frames": { "#data-manager-frame": "#iframe_dm" },
+    "dropPreconditions": ["shell.nav.dm"],
+    "excludeRefs": [
+      "dm.ribbon.custom-data", "dm.tab.custom-data",
+      "dm.ribbon.baskets", "dm.tab.baskets",
+      "dm.brokers.edit-stocks",
+      "dm.datasource.sqequitydata", "dm.datasource.sqfuturesdata"
+    ]
+  }
+}
