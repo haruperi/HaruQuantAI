@@ -463,16 +463,18 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
     if not deal or not await trading.deal.Ticket(deal):
         ctx.trading.disarm()
         raise ExampleError("Buy deal history could not be selected")
-    ctx.position_id = int(await trading.deal.PositionId())
+    deal_info = await trading.deal.DealInfo()
+    ctx.position_id = deal_info.position_id
     if not ctx.position_id:
         ctx.trading.disarm()
         raise ExampleError("Buy deal position identifier is unavailable")
     for ticket in (int(result.get("order", 0)), ctx.position_id):
         if ticket and await trading.position.SelectByTicket(ticket):
+            pos_info = await trading.position.PositionInfo()
             if (
-                int(await trading.position.Identifier()) == ctx.position_id
-                and int(await trading.position.Magic()) == ctx.magic
-                and await trading.position.Symbol() == SYMBOL
+                pos_info.identifier == ctx.position_id
+                and pos_info.magic == ctx.magic
+                and pos_info.symbol == SYMBOL
             ):
                 ctx.position_ticket = ticket
                 break
@@ -525,16 +527,17 @@ async def example_11_position(ctx: ExampleContext) -> None:
         if not await position.SelectByIndex(index):
             break
         found = True
+        pos = await position.PositionInfo()
         print(f"Position [{index}]:")
-        print(f"  Symbol: {await position.Symbol()}")
-        print(f"  Type: {await position.TypeDescription()}")
-        print(f"  Volume: {await position.Volume()}")
-        print(f"  Open price: {await position.PriceOpen()}")
-        print(f"  Current price: {await position.PriceCurrent()}")
-        print(f"  SL: {await position.StopLoss()}")
-        print(f"  TP: {await position.TakeProfit()}")
-        print(f"  Profit: {await position.Profit()}")
-        print(f"  Swap: {await position.Swap()}")
+        print(f"  Symbol: {pos.symbol}")
+        print(f"  Type: {pos.type_description}")
+        print(f"  Volume: {pos.volume}")
+        print(f"  Open price: {pos.price_open}")
+        print(f"  Current price: {pos.price_current}")
+        print(f"  SL: {pos.sl}")
+        print(f"  TP: {pos.tp}")
+        print(f"  Profit: {pos.profit}")
+        print(f"  Swap: {pos.swap}")
     if not found:
         print("No open positions")
 
@@ -546,12 +549,14 @@ async def example_12_modify_position(ctx: ExampleContext) -> None:
         print("Live writes disabled; skipping modify position")
         return
     pos, symbol, trade = ctx.trading.position, ctx.trading.symbol, ctx.trading.trade
+    if not ctx.position_ticket or not await pos.SelectByTicket(ctx.position_ticket):
+        ctx.trading.disarm()
+        raise ExampleError("Position ownership must be confirmed before modification")
+    pos_info = await pos.PositionInfo()
     if (
-        not ctx.position_ticket
-        or not await pos.SelectByTicket(ctx.position_ticket)
-        or int(await pos.Identifier()) != ctx.position_id
-        or int(await pos.Magic()) != ctx.magic
-        or await pos.Symbol() != SYMBOL
+        pos_info.identifier != ctx.position_id
+        or pos_info.magic != ctx.magic
+        or pos_info.symbol != SYMBOL
     ):
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before modification")
@@ -571,9 +576,11 @@ async def example_12_modify_position(ctx: ExampleContext) -> None:
         not sent
         or retcode != 10009
         or not await pos.SelectByTicket(ctx.position_ticket)
-        or not math.isclose(float(await pos.StopLoss()), sl)
-        or not math.isclose(float(await pos.TakeProfit()), tp)
     ):
+        ctx.trading.disarm()
+        raise ExampleError("Position modification not confirmed; inspect trade outcome")
+    pos_info = await pos.PositionInfo()
+    if not math.isclose(pos_info.sl, sl) or not math.isclose(pos_info.tp, tp):
         ctx.trading.disarm()
         raise ExampleError("Position modification not confirmed; inspect trade outcome")
     print(f"Modified owned position SL={sl}, TP={tp}")
@@ -586,16 +593,18 @@ async def example_13_close_partial_position(ctx: ExampleContext) -> None:
         print("Live writes disabled; skipping partial close")
         return
     pos, trade = ctx.trading.position, ctx.trading.trade
+    if not ctx.position_ticket or not await pos.SelectByTicket(ctx.position_ticket):
+        ctx.trading.disarm()
+        raise ExampleError("Position ownership must be confirmed before partial close")
+    pos_info = await pos.PositionInfo()
     if (
-        not ctx.position_ticket
-        or not await pos.SelectByTicket(ctx.position_ticket)
-        or int(await pos.Identifier()) != ctx.position_id
-        or int(await pos.Magic()) != ctx.magic
-        or await pos.Symbol() != SYMBOL
+        pos_info.identifier != ctx.position_id
+        or pos_info.magic != ctx.magic
+        or pos_info.symbol != SYMBOL
     ):
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before partial close")
-    before = float(await pos.Volume())
+    before = pos_info.volume
     sent = await trade.PositionClosePartial(ctx.position_ticket, VOLUME)
     retcode = int(await trade.ResultRetcode())
     print(f"Partial close dispatch: {sent}; retcode={retcode}")
@@ -606,7 +615,8 @@ async def example_13_close_partial_position(ctx: ExampleContext) -> None:
     ):
         ctx.trading.disarm()
         raise ExampleError("Partial close not confirmed; inspect trade outcome")
-    remaining = float(await pos.Volume())
+    pos_info = await pos.PositionInfo()
+    remaining = pos_info.volume
     if remaining <= 0 or not math.isclose(remaining, before - VOLUME):
         ctx.trading.disarm()
         raise ExampleError("Partial-close remaining volume did not match")
@@ -620,12 +630,14 @@ async def example_14_close_position(ctx: ExampleContext) -> None:
         print("Live writes disabled; skipping close position")
         return
     pos, trade = ctx.trading.position, ctx.trading.trade
+    if not ctx.position_ticket or not await pos.SelectByTicket(ctx.position_ticket):
+        ctx.trading.disarm()
+        raise ExampleError("Position ownership must be confirmed before closing")
+    pos_info = await pos.PositionInfo()
     if (
-        not ctx.position_ticket
-        or not await pos.SelectByTicket(ctx.position_ticket)
-        or int(await pos.Identifier()) != ctx.position_id
-        or int(await pos.Magic()) != ctx.magic
-        or await pos.Symbol() != SYMBOL
+        pos_info.identifier != ctx.position_id
+        or pos_info.magic != ctx.magic
+        or pos_info.symbol != SYMBOL
     ):
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before closing")
@@ -664,12 +676,11 @@ async def example_15_pending_orders(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("Pending order not confirmed; inspect trade outcome")
     ctx.pending_ticket = int(await trade.ResultOrder())
-    if (
-        not ctx.pending_ticket
-        or not await order.Select(ctx.pending_ticket)
-        or int(await order.Magic()) != ctx.magic
-        or await order.Symbol() != SYMBOL
-    ):
+    if not ctx.pending_ticket or not await order.Select(ctx.pending_ticket):
+        ctx.trading.disarm()
+        raise ExampleError("Pending order ownership could not be confirmed")
+    ord_info = await order.OrderInfo()
+    if ord_info.magic != ctx.magic or ord_info.symbol != SYMBOL:
         ctx.trading.disarm()
         raise ExampleError("Pending order ownership could not be confirmed")
     print(f"Placed owned pending order at price: {ctx.pending_price}; volume: {VOLUME}")
@@ -699,13 +710,14 @@ async def example_16_order(ctx: ExampleContext) -> None:
         if not await order.SelectByIndex(index):
             break
         found = True
+        ord_info = await order.OrderInfo()
         print(f"Order [{index}]:")
-        print(f"  Symbol: {await order.Symbol()}")
-        print(f"  Type: {await order.TypeDescription()}")
-        print(f"  Volume: {await order.VolumeCurrent()}")
-        print(f"  Price: {await order.PriceOpen()}")
-        print(f"  SL: {await order.StopLoss()}")
-        print(f"  TP: {await order.TakeProfit()}")
+        print(f"  Symbol: {ord_info.symbol}")
+        print(f"  Type: {ord_info.type_description}")
+        print(f"  Volume: {ord_info.volume_current}")
+        print(f"  Price: {ord_info.price_open}")
+        print(f"  SL: {ord_info.sl}")
+        print(f"  TP: {ord_info.tp}")
     if not found:
         print("No pending orders")
 
@@ -717,12 +729,11 @@ async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
         print("Live writes disabled; skipping modify pending order")
         return
     order, symbol, trade = ctx.trading.order, ctx.trading.symbol, ctx.trading.trade
-    if (
-        not ctx.pending_ticket
-        or not await order.Select(ctx.pending_ticket)
-        or int(await order.Magic()) != ctx.magic
-        or await order.Symbol() != SYMBOL
-    ):
+    if not ctx.pending_ticket or not await order.Select(ctx.pending_ticket):
+        ctx.trading.disarm()
+        raise ExampleError("Order ownership must be confirmed before modification")
+    ord_info = await order.OrderInfo()
+    if ord_info.magic != ctx.magic or ord_info.symbol != SYMBOL:
         ctx.trading.disarm()
         raise ExampleError("Order ownership must be confirmed before modification")
     await symbol.RefreshRates()
@@ -738,12 +749,11 @@ async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
     )
     retcode = int(await trade.ResultRetcode())
     print(f"Order modify dispatch: {sent}; retcode={retcode}")
-    if (
-        not sent
-        or retcode != 10009
-        or not await order.Select(ctx.pending_ticket)
-        or not math.isclose(float(await order.PriceOpen()), price)
-    ):
+    if not sent or retcode != 10009 or not await order.Select(ctx.pending_ticket):
+        ctx.trading.disarm()
+        raise ExampleError("Order modification not confirmed; inspect trade outcome")
+    ord_info = await order.OrderInfo()
+    if not math.isclose(ord_info.price_open, price):
         ctx.trading.disarm()
         raise ExampleError("Order modification not confirmed; inspect trade outcome")
     ctx.pending_price = price
@@ -757,12 +767,11 @@ async def example_18_delete_pending_orders(ctx: ExampleContext) -> None:
         print("Live writes disabled; skipping delete pending order")
         return
     order, trade = ctx.trading.order, ctx.trading.trade
-    if (
-        not ctx.pending_ticket
-        or not await order.Select(ctx.pending_ticket)
-        or int(await order.Magic()) != ctx.magic
-        or await order.Symbol() != SYMBOL
-    ):
+    if not ctx.pending_ticket or not await order.Select(ctx.pending_ticket):
+        ctx.trading.disarm()
+        raise ExampleError("Order ownership must be confirmed before cancellation")
+    ord_info = await order.OrderInfo()
+    if ord_info.magic != ctx.magic or ord_info.symbol != SYMBOL:
         ctx.trading.disarm()
         raise ExampleError("Order ownership must be confirmed before cancellation")
     sent = await trade.OrderDelete(ctx.pending_ticket)
@@ -805,13 +814,14 @@ async def example_19_history_order(ctx: ExampleContext) -> None:
         if not await order.SelectByIndex(index):
             break
         found = True
+        h_order = await order.HistoryOrderInfo()
         print(f"History Order [{index}]:")
-        print(f"  Symbol: {await order.Symbol()}")
-        print(f"  Type: {await order.TypeDescription()}")
-        print(f"  State: {await order.StateDescription()}")
-        print(f"  Volume: {await order.VolumeInitial()}")
-        print(f"  Price: {await order.PriceOpen()}")
-        print(f"  Done time: {format_timestamp(await order.TimeDone())}")
+        print(f"  Symbol: {h_order.symbol}")
+        print(f"  Type: {h_order.type_description}")
+        print(f"  State: {h_order.state_description}")
+        print(f"  Volume: {h_order.volume_initial}")
+        print(f"  Price: {h_order.price_open}")
+        print(f"  Done time: {format_timestamp(h_order.time_done)}")
     if not found:
         print("No history orders")
 
@@ -842,15 +852,16 @@ async def example_20_history_deal(ctx: ExampleContext) -> None:
         if not await deal.SelectByIndex(index):
             break
         found = True
+        d_info = await deal.DealInfo()
         print(f"Deal [{index}]:")
-        print(f"  Symbol: {await deal.Symbol()}")
-        print(f"  Type: {await deal.TypeDescription()}")
-        print(f"  Entry: {await deal.EntryDescription()}")
-        print(f"  Volume: {await deal.Volume()}")
-        print(f"  Price: {await deal.Price()}")
-        print(f"  Profit: {await deal.Profit()}")
-        print(f"  Commission: {await deal.Commission()}")
-        print(f"  Swap: {await deal.Swap()}")
+        print(f"  Symbol: {d_info.symbol}")
+        print(f"  Type: {d_info.type_description}")
+        print(f"  Entry: {d_info.entry_description}")
+        print(f"  Volume: {d_info.volume}")
+        print(f"  Price: {d_info.price}")
+        print(f"  Profit: {d_info.profit}")
+        print(f"  Commission: {d_info.commission}")
+        print(f"  Swap: {d_info.swap}")
     if not found:
         print("No history deals")
 
@@ -875,22 +886,22 @@ EXAMPLES: tuple[Callable[[ExampleContext], Awaitable[None]], ...] = (
     example_02_terminal,
     example_03_account,
     example_04_symbol,
-    # example_05_historical_bars,
-    # example_06_tick_data,
-    # example_07_order_book,
-    # example_08_order_check,
-    # example_09_open_position,
-    # example_10_calc_profit_margin,
-    # example_11_position,
-    # example_12_modify_position,
-    # example_13_close_partial_position,
-    # example_14_close_position,
-    # example_15_pending_orders,
-    # example_16_order,
-    # example_17_modify_pending_orders,
-    # example_18_delete_pending_orders,
-    # example_19_history_order,
-    # example_20_history_deal,
+    example_05_historical_bars,
+    example_06_tick_data,
+    example_07_order_book,
+    example_08_order_check,
+    example_09_open_position,
+    example_10_calc_profit_margin,
+    example_11_position,
+    example_12_modify_position,
+    example_13_close_partial_position,
+    example_14_close_position,
+    example_15_pending_orders,
+    example_16_order,
+    example_17_modify_pending_orders,
+    example_18_delete_pending_orders,
+    example_19_history_order,
+    example_20_history_deal,
 )
 
 

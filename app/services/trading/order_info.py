@@ -1,34 +1,52 @@
 # ruff: noqa: N802 -- public names preserve the eight-class compatibility API.
-"""Shared OrderInfo proxy for native broker operations.
+"""Shared OrderInfo proxy for native and simulated broker operations.
 
 Description:
-    Forwards the current MQL5 OrderInfo method surface through TradingClass.
-    Stateful selection and request/result objects retain per-proxy serialization.
-    Placement is shared; current method semantics remain those of native MT5.
+    Forwards asynchronous order snapshot queries, order selection, and state
+    checks through TradingClass. Order property reads are consolidated into a
+    single atomic OrderInfo() call returning a strongly typed OrderSnapshot
+    dataclass to eliminate IPC round-trips and temporal skew across properties.
+    OrdersGet() returns a strongly typed list of OrderSnapshot dataclasses.
 
 Purpose:
     FEAT-BROKER-PROXIES: Expose explicit asynchronous broker class operations
     without duplicating transport or persistence ownership.
 
 Key Capabilities:
-    - FR-BROKER-PROXIES-ORDERINFO-FORWARDING: Forward native methods.
-      Associated: `OrderInfo`, `TradingClass._call()`
-      Logging: Transport emits DEBUG encoding-attempt metadata for remote calls;
-        no payload logging or proxy logging configuration is introduced here.
+    - FR-BROKER-PROXIES-ORDERINFO-SNAPSHOT: Query full order specification
+      and state snapshot.
+      Associated: `OrderInfo.OrderInfo()`, `OrderInfo.__call__()`,
+        `OrderInfo.as_dict()`
+      Logging: DEBUG transport invocation metadata emitted via TradingClass;
+        no secret or payload logging occurs here.
+    - FR-BROKER-PROXIES-ORDERINFO-OPERATIONS: Select orders and inspect totals.
+      Associated: `OrderInfo.Select()`, `OrderInfo.SelectByIndex()`,
+        `OrderInfo.StoreState()`, `OrderInfo.CheckState()`,
+        `OrderInfo.OrdersTotal()`, `OrderInfo.OrdersGet()`
+      Logging: DEBUG transport invocation metadata emitted via TradingClass._call().
 
 Python API Usage:
-    Access this proxy through a configured MetaTrader facade or bind it to the
-    async backend capability. Remote calls are asynchronous.
+    ```python
+    from app.services.trading import Trading
+
+    async with Trading(backend) as trading:
+        orders = await trading.order.OrdersGet()
+        for ord_item in orders:
+            print(f"Ticket: {ord_item.ticket}, Price: {ord_item.price_open}")
+    ```
 
 CLI Usage:
+    ```bash
     uv run pytest tests/unit/services/test_metatrader_bridge_protocol.py --no-cov
+    ```
 """
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from typing import Any
 
-from app.services.brokers.contracts import PropertyValue
+from app.services.brokers.contracts import OrderSnapshot
 
 from .base import TradingClass
 
@@ -38,125 +56,27 @@ class OrderInfo(TradingClass):
 
     CLASS_NAME = "OrderInfo"
 
-    async def Ticket(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.Ticket operation."""
-        return await self._call("Ticket", *args)
+    async def OrderInfo(self, *args: Any) -> OrderSnapshot:
+        """Await the backend OrderInfo snapshot."""
+        data = await self._call("OrderInfo", *args)
+        if isinstance(data, OrderSnapshot):
+            return data
+        if isinstance(data, dict):
+            return OrderSnapshot(**data)
+        raise TypeError(f"unexpected order snapshot type: {type(data).__name__}")
 
-    async def TimeSetup(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TimeSetup operation."""
-        return await self._call("TimeSetup", *args)
+    async def __call__(self, *args: Any) -> OrderSnapshot:
+        """Await the backend OrderInfo snapshot directly via call syntax."""
+        return await self.OrderInfo(*args)
 
-    async def TimeSetupMsc(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TimeSetupMsc operation."""
-        return await self._call("TimeSetupMsc", *args)
-
-    async def OrderType(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.OrderType operation."""
-        return await self._call("OrderType", *args)
-
-    async def TypeDescription(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TypeDescription operation."""
-        return await self._call("TypeDescription", *args)
-
-    async def State(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.State operation."""
-        return await self._call("State", *args)
-
-    async def StateDescription(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.StateDescription operation."""
-        return await self._call("StateDescription", *args)
-
-    async def TimeExpiration(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TimeExpiration operation."""
-        return await self._call("TimeExpiration", *args)
-
-    async def TimeDone(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TimeDone operation."""
-        return await self._call("TimeDone", *args)
-
-    async def TimeDoneMsc(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TimeDoneMsc operation."""
-        return await self._call("TimeDoneMsc", *args)
-
-    async def TypeFilling(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TypeFilling operation."""
-        return await self._call("TypeFilling", *args)
-
-    async def TypeFillingDescription(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TypeFillingDescription operation."""
-        return await self._call("TypeFillingDescription", *args)
-
-    async def TypeTime(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TypeTime operation."""
-        return await self._call("TypeTime", *args)
-
-    async def TypeTimeDescription(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TypeTimeDescription operation."""
-        return await self._call("TypeTimeDescription", *args)
-
-    async def Magic(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.Magic operation."""
-        return await self._call("Magic", *args)
-
-    async def PositionId(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.PositionId operation."""
-        return await self._call("PositionId", *args)
-
-    async def VolumeInitial(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.VolumeInitial operation."""
-        return await self._call("VolumeInitial", *args)
-
-    async def VolumeCurrent(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.VolumeCurrent operation."""
-        return await self._call("VolumeCurrent", *args)
-
-    async def PriceOpen(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.PriceOpen operation."""
-        return await self._call("PriceOpen", *args)
-
-    async def StopLoss(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.StopLoss operation."""
-        return await self._call("StopLoss", *args)
-
-    async def TakeProfit(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.TakeProfit operation."""
-        return await self._call("TakeProfit", *args)
-
-    async def PriceCurrent(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.PriceCurrent operation."""
-        return await self._call("PriceCurrent", *args)
-
-    async def PriceStopLimit(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.PriceStopLimit operation."""
-        return await self._call("PriceStopLimit", *args)
-
-    async def Symbol(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.Symbol operation."""
-        return await self._call("Symbol", *args)
-
-    async def Comment(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.Comment operation."""
-        return await self._call("Comment", *args)
-
-    async def InfoInteger(self, prop_id: int | str) -> PropertyValue:
-        """Await the backend OrderInfo.InfoInteger operation."""
-        return await self._property("InfoInteger", prop_id)
-
-    async def InfoDouble(self, prop_id: int | str) -> PropertyValue:
-        """Await the backend OrderInfo.InfoDouble operation."""
-        return await self._property("InfoDouble", prop_id)
-
-    async def InfoString(self, prop_id: int | str) -> PropertyValue:
-        """Await the backend OrderInfo.InfoString operation."""
-        return await self._property("InfoString", prop_id)
-
-    async def StoreState(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.StoreState operation."""
-        return await self._call("StoreState", *args)
-
-    async def CheckState(self, *args: Any) -> Any:
-        """Await the backend OrderInfo.CheckState operation."""
-        return await self._call("CheckState", *args)
+    async def as_dict(self, *args: Any) -> dict[str, Any]:
+        """Await the backend order snapshot represented as a dictionary."""
+        data = await self._call("as_dict", *args)
+        if isinstance(data, dict):
+            return data
+        if isinstance(data, OrderSnapshot):
+            return asdict(data)
+        raise TypeError(f"unexpected order dictionary type: {type(data).__name__}")
 
     async def Select(self, *args: Any) -> Any:
         """Await the backend OrderInfo.Select operation."""
@@ -166,12 +86,28 @@ class OrderInfo(TradingClass):
         """Await the backend OrderInfo.SelectByIndex operation."""
         return await self._call("SelectByIndex", *args)
 
+    async def StoreState(self, *args: Any) -> Any:
+        """Await the backend OrderInfo.StoreState operation."""
+        return await self._call("StoreState", *args)
+
+    async def CheckState(self, *args: Any) -> Any:
+        """Await the backend OrderInfo.CheckState operation."""
+        return await self._call("CheckState", *args)
+
     async def OrdersTotal(self, *args: Any) -> Any:
         """Await the backend OrderInfo.OrdersTotal operation."""
         return await self._call("OrdersTotal", *args)
 
-    async def OrdersGet(self, *args: Any, **kwargs: Any) -> Any:
+    async def OrdersGet(self, *args: Any, **kwargs: Any) -> list[OrderSnapshot]:
         """Await the backend OrderInfo.OrdersGet operation."""
-        if kwargs:
-            return await self._call("OrdersGet", kwargs)
-        return await self._call("OrdersGet", *args)
+        data = (
+            await self._call("OrdersGet", kwargs)
+            if kwargs
+            else await self._call("OrdersGet", *args)
+        )
+        if isinstance(data, list):
+            return [
+                item if isinstance(item, OrderSnapshot) else OrderSnapshot(**item)
+                for item in data
+            ]
+        raise TypeError(f"unexpected OrdersGet return type: {type(data).__name__}")

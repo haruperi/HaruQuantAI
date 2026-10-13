@@ -45,10 +45,14 @@ from app.services.brokers.contracts import (
     BookType,
     BridgeError,
     BrokerBackend,
+    DealSnapshot,
+    HistoryOrderSnapshot,
     MarginMode,
     OrderFilling,
+    OrderSnapshot,
     OrderTime,
     OrderType,
+    PositionSnapshot,
     PositionType,
     StopoutMode,
     SymbolSnapshot,
@@ -68,7 +72,6 @@ from app.services.brokers.contracts import OrderFilling as OrderFillingEnum
 from app.services.brokers.contracts import OrderState as OrderStateEnum
 from app.services.brokers.contracts import OrderTime as OrderTimeEnum
 from app.services.brokers.contracts import OrderType as OrderTypeEnum
-from app.services.brokers.contracts import PositionType as PositionTypeEnum
 
 logger = get_logger(__name__)
 
@@ -478,89 +481,184 @@ def _accountinfo_maxlotcheck(
     return float(round(min(float(spec.lots_max), steps * step), 8))
 
 
-def _dealinfo_order(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "order"))
-
-
-def _dealinfo_time(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time", None))
-
-
-def _dealinfo_timemsc(self: _ObjectState) -> int:
-    return epoch_millis(_selectionbase__value(self, "time", None))
-
-
-def _dealinfo_dealtype(self: _ObjectState) -> DealTypeEnum:
-    return DealTypeEnum(_selectionbase__value(self, "deal_type"))
-
-
-def _dealinfo_typedescription(self: _ObjectState) -> str:
-    return DEAL_TYPE_DESCRIPTIONS.get(
-        _dealinfo_dealtype(self), _dealinfo_dealtype(self).name
+def _dict_to_deal_snapshot(d: dict[str, Any]) -> DealSnapshot:
+    deal_type = int(d.get("deal_type", 0))
+    entry = int(d.get("entry", 0))
+    t_val = d.get("time", 0)
+    t_sec = epoch_seconds(t_val) if isinstance(t_val, datetime) else int(t_val or 0)
+    deal_type_enum = (
+        DealTypeEnum(deal_type)
+        if deal_type in DealTypeEnum._value2member_map_
+        else None
+    )
+    deal_type_desc = (
+        DEAL_TYPE_DESCRIPTIONS.get(deal_type_enum, "")
+        if deal_type_enum is not None
+        else ""
+    )
+    entry_enum = (
+        DealEntryEnum(entry) if entry in DealEntryEnum._value2member_map_ else None
+    )
+    entry_desc = (
+        DEAL_ENTRY_DESCRIPTIONS.get(entry_enum, "") if entry_enum is not None else ""
+    )
+    return DealSnapshot(
+        ticket=int(d.get("ticket", 0)),
+        order=int(d.get("order", 0)),
+        position_id=int(d.get("position_id", 0)),
+        symbol=str(d.get("symbol", "")),
+        deal_type=deal_type,
+        type_description=d.get("type_description") or deal_type_desc,
+        entry=entry,
+        entry_description=d.get("entry_description") or entry_desc,
+        volume=float(d.get("volume", 0.0)),
+        price=float(d.get("price", 0.0)),
+        commission=float(d.get("commission", 0.0)),
+        swap=float(d.get("swap", 0.0)),
+        profit=float(d.get("profit", 0.0)),
+        magic=int(d.get("magic", 0)),
+        comment=str(d.get("comment", "")),
+        time=t_sec,
+        time_msc=int(d.get("time_msc", t_sec * 1000)),
     )
 
 
-def _dealinfo_entry(self: _ObjectState) -> DealEntryEnum:
-    return DealEntryEnum(_selectionbase__value(self, "entry"))
-
-
-def _dealinfo_entrydescription(self: _ObjectState) -> str:
-    return DEAL_ENTRY_DESCRIPTIONS.get(
-        _dealinfo_entry(self), _dealinfo_entry(self).name
+def _dict_to_order_snapshot(d: dict[str, Any]) -> OrderSnapshot:
+    ord_type = int(d.get("order_type", 0))
+    state = int(d.get("state", 0))
+    filling = int(d.get("type_filling", 0))
+    ord_time = int(d.get("type_time", 0))
+    t_setup = d.get("time_setup", 0)
+    t_setup_sec = (
+        epoch_seconds(t_setup) if isinstance(t_setup, datetime) else int(t_setup or 0)
+    )
+    t_done = d.get("time_done", 0)
+    t_done_sec = (
+        epoch_seconds(t_done) if isinstance(t_done, datetime) else int(t_done or 0)
+    )
+    t_exp = d.get("time_expiration", 0)
+    t_exp_sec = epoch_seconds(t_exp) if isinstance(t_exp, datetime) else int(t_exp or 0)
+    ord_type_enum = (
+        OrderTypeEnum(ord_type)
+        if ord_type in OrderTypeEnum._value2member_map_
+        else None
+    )
+    ord_type_desc = (
+        ORDER_TYPE_DESCRIPTIONS.get(ord_type_enum, "")
+        if ord_type_enum is not None
+        else ""
+    )
+    state_enum = (
+        OrderStateEnum(state) if state in OrderStateEnum._value2member_map_ else None
+    )
+    state_desc = (
+        ORDER_STATE_DESCRIPTIONS.get(state_enum, "") if state_enum is not None else ""
+    )
+    filling_enum = (
+        OrderFillingEnum(filling)
+        if filling in OrderFillingEnum._value2member_map_
+        else None
+    )
+    filling_desc = (
+        ORDER_FILLING_DESCRIPTIONS.get(filling_enum, "")
+        if filling_enum is not None
+        else ""
+    )
+    ord_time_enum = (
+        OrderTimeEnum(ord_time)
+        if ord_time in OrderTimeEnum._value2member_map_
+        else None
+    )
+    ord_time_desc = (
+        ORDER_TIME_DESCRIPTIONS.get(ord_time_enum, "")
+        if ord_time_enum is not None
+        else ""
+    )
+    return OrderSnapshot(
+        ticket=int(d.get("ticket", 0)),
+        symbol=str(d.get("symbol", "")),
+        order_type=ord_type,
+        type_description=d.get("type_description") or ord_type_desc,
+        state=state,
+        state_description=d.get("state_description") or state_desc,
+        volume_initial=float(d.get("volume_initial", 0.0)),
+        volume_current=float(d.get("volume_current", 0.0)),
+        price_open=float(d.get("price_open", 0.0)),
+        sl=float(d.get("sl", 0.0)),
+        tp=float(d.get("tp", 0.0)),
+        price_current=float(d.get("price_current", 0.0)),
+        price_stop_limit=float(d.get("price_stop_limit", 0.0)),
+        time_setup=t_setup_sec,
+        time_setup_msc=int(d.get("time_setup_msc", t_setup_sec * 1000)),
+        time_done=t_done_sec,
+        time_done_msc=int(d.get("time_done_msc", t_done_sec * 1000)),
+        time_expiration=t_exp_sec,
+        type_filling=filling,
+        type_filling_description=d.get("type_filling_description") or filling_desc,
+        type_time=ord_time,
+        type_time_description=d.get("type_time_description") or ord_time_desc,
+        magic=int(d.get("magic", 0)),
+        position_id=int(d.get("position_id", 0)),
+        comment=str(d.get("comment", "")),
     )
 
 
-def _dealinfo_magic(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "magic"))
+def _dict_to_position_snapshot(d: dict[str, Any]) -> PositionSnapshot:
+    pos_type = int(d.get("position_type", 0))
+    time_val = d.get("time", 0)
+    time_sec = (
+        epoch_seconds(time_val)
+        if isinstance(time_val, datetime)
+        else int(time_val or 0)
+    )
+    time_up_val = d.get("time_update", 0)
+    time_up_sec = (
+        epoch_seconds(time_up_val)
+        if isinstance(time_up_val, datetime)
+        else int(time_up_val or 0)
+    )
+    pos_type_enum = (
+        PositionType(pos_type) if pos_type in PositionType._value2member_map_ else None
+    )
+    pos_type_desc = (
+        POSITION_TYPE_DESCRIPTIONS.get(
+            pos_type_enum, "Buy" if pos_type == 0 else "Sell"
+        )
+        if pos_type_enum is not None
+        else ("Buy" if pos_type == 0 else "Sell")
+    )
+    return PositionSnapshot(
+        ticket=int(d.get("ticket", 0)),
+        identifier=int(d.get("identifier", 0)),
+        symbol=str(d.get("symbol", "")),
+        position_type=pos_type,
+        type_description=d.get("type_description") or pos_type_desc,
+        volume=float(d.get("volume", 0.0)),
+        price_open=float(d.get("price_open", 0.0)),
+        price_current=float(d.get("price_current", 0.0)),
+        sl=float(d.get("sl", 0.0)),
+        tp=float(d.get("tp", 0.0)),
+        commission=float(d.get("commission", 0.0)),
+        swap=float(d.get("swap", 0.0)),
+        profit=float(d.get("profit", 0.0)),
+        magic=int(d.get("magic", 0)),
+        comment=str(d.get("comment", "")),
+        time=time_sec,
+        time_msc=int(d.get("time_msc", time_sec * 1000)),
+        time_update=time_up_sec,
+        time_update_msc=int(d.get("time_update_msc", time_up_sec * 1000)),
+    )
 
 
-def _dealinfo_positionid(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "position_id"))
+def _dealinfo_dealinfo(self: _ObjectState, ticket: int | None = None) -> DealSnapshot:
+    if ticket is not None:
+        _dealinfo_ticket(self, ticket)
+    selected = _selectionbase__require(self)
+    return _dict_to_deal_snapshot(record_dict(selected))
 
 
-def _dealinfo_volume(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "volume"))
-
-
-def _dealinfo_price(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price"))
-
-
-def _dealinfo_commision(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "commission"))
-
-
-def _dealinfo_commission(self: _ObjectState) -> float:
-    """Alias matching the actual CDealInfo method signature/source spelling."""
-    return _dealinfo_commision(self)
-
-
-def _dealinfo_swap(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "swap"))
-
-
-def _dealinfo_profit(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "profit"))
-
-
-def _dealinfo_symbol(self: _ObjectState) -> str:
-    return str(_selectionbase__value(self, "symbol", ""))
-
-
-def _dealinfo_comment(self: _ObjectState) -> str:
-    return str(_selectionbase__value(self, "comment", ""))
-
-
-def _dealinfo_infointeger(self: _ObjectState, property_id: int | str) -> int:
-    return int(_selectionbase__info(self, property_id) or 0)
-
-
-def _dealinfo_infodouble(self: _ObjectState, property_id: int | str) -> float:
-    return float(_selectionbase__info(self, property_id) or 0.0)
-
-
-def _dealinfo_infostring(self: _ObjectState, property_id: int | str) -> str:
-    return str(_selectionbase__info(self, property_id) or "")
+def _dealinfo_asdict(self: _ObjectState, ticket: int | None = None) -> dict[str, Any]:
+    return asdict(_dealinfo_dealinfo(self, ticket))
 
 
 def _dealinfo_ticket(self: _ObjectState, ticket: int | None = None) -> int:
@@ -607,123 +705,22 @@ def _dealinfo_historydealsget(
         deals = [d for d in deals if d.symbol == symbol]
     if group is not None:
         deals = [d for d in deals if fnmatch.fnmatch(d.symbol, group)]
-    return [record_dict(d) for d in deals]
+    return [asdict(_dict_to_deal_snapshot(record_dict(d))) for d in deals]
 
 
-def _historyorderinfo_timesetup(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time_setup", None))
+def _historyorderinfo_historyorderinfo(
+    self: _ObjectState, ticket: int | None = None
+) -> HistoryOrderSnapshot:
+    if ticket is not None:
+        _historyorderinfo_ticket(self, ticket)
+    selected = _selectionbase__require(self)
+    return _dict_to_order_snapshot(record_dict(selected))
 
 
-def _historyorderinfo_timesetupmsc(self: _ObjectState) -> int:
-    return epoch_millis(_selectionbase__value(self, "time_setup", None))
-
-
-def _historyorderinfo_ordertype(self: _ObjectState) -> OrderTypeEnum:
-    return OrderTypeEnum(_selectionbase__value(self, "order_type"))
-
-
-def _historyorderinfo_typedescription(self: _ObjectState) -> str:
-    return ORDER_TYPE_DESCRIPTIONS.get(
-        _historyorderinfo_ordertype(self), _historyorderinfo_ordertype(self).name
-    )
-
-
-def _historyorderinfo_state(self: _ObjectState) -> OrderStateEnum:
-    return OrderStateEnum(_selectionbase__value(self, "state"))
-
-
-def _historyorderinfo_statedescription(self: _ObjectState) -> str:
-    return ORDER_STATE_DESCRIPTIONS.get(
-        _historyorderinfo_state(self), _historyorderinfo_state(self).name
-    )
-
-
-def _historyorderinfo_timeexpiration(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time_expiration", None))
-
-
-def _historyorderinfo_timedone(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time_done", None))
-
-
-def _historyorderinfo_timedonemsc(self: _ObjectState) -> int:
-    return epoch_millis(_selectionbase__value(self, "time_done", None))
-
-
-def _historyorderinfo_typefilling(self: _ObjectState) -> OrderFillingEnum:
-    return OrderFillingEnum(_selectionbase__value(self, "type_filling"))
-
-
-def _historyorderinfo_typefillingdescription(self: _ObjectState) -> str:
-    return ORDER_FILLING_DESCRIPTIONS.get(
-        _historyorderinfo_typefilling(self), _historyorderinfo_typefilling(self).name
-    )
-
-
-def _historyorderinfo_typetime(self: _ObjectState) -> OrderTimeEnum:
-    return OrderTimeEnum(_selectionbase__value(self, "type_time"))
-
-
-def _historyorderinfo_typetimedescription(self: _ObjectState) -> str:
-    return ORDER_TIME_DESCRIPTIONS.get(
-        _historyorderinfo_typetime(self), _historyorderinfo_typetime(self).name
-    )
-
-
-def _historyorderinfo_magic(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "magic"))
-
-
-def _historyorderinfo_positionid(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "position_id"))
-
-
-def _historyorderinfo_volumeinitial(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "volume_initial"))
-
-
-def _historyorderinfo_volumecurrent(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "volume_current"))
-
-
-def _historyorderinfo_priceopen(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price_open"))
-
-
-def _historyorderinfo_stoploss(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "sl"))
-
-
-def _historyorderinfo_takeprofit(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "tp"))
-
-
-def _historyorderinfo_pricecurrent(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price_current"))
-
-
-def _historyorderinfo_pricestoplimit(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price_stop_limit"))
-
-
-def _historyorderinfo_symbol(self: _ObjectState) -> str:
-    return str(_selectionbase__value(self, "symbol", ""))
-
-
-def _historyorderinfo_comment(self: _ObjectState) -> str:
-    return str(_selectionbase__value(self, "comment", ""))
-
-
-def _historyorderinfo_infointeger(self: _ObjectState, property_id: int | str) -> int:
-    return int(_selectionbase__info(self, property_id) or 0)
-
-
-def _historyorderinfo_infodouble(self: _ObjectState, property_id: int | str) -> float:
-    return float(_selectionbase__info(self, property_id) or 0.0)
-
-
-def _historyorderinfo_infostring(self: _ObjectState, property_id: int | str) -> str:
-    return str(_selectionbase__info(self, property_id) or "")
+def _historyorderinfo_asdict(
+    self: _ObjectState, ticket: int | None = None
+) -> dict[str, Any]:
+    return asdict(_historyorderinfo_historyorderinfo(self, ticket))
 
 
 def _historyorderinfo_ticket(self: _ObjectState, ticket: int | None = None) -> int:
@@ -783,130 +780,20 @@ def _historyorderinfo_historyordersget(
         orders = [o for o in orders if o.symbol == symbol]
     if group is not None:
         orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
-    return [record_dict(o) for o in orders]
+    return [asdict(_dict_to_order_snapshot(record_dict(o))) for o in orders]
 
 
-def _orderinfo_ticket(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "ticket"))
+def _orderinfo_orderinfo(
+    self: _ObjectState, ticket: int | None = None
+) -> OrderSnapshot:
+    if ticket is not None:
+        _orderinfo_select(self, ticket)
+    selected = _selectionbase__require(self)
+    return _dict_to_order_snapshot(record_dict(selected))
 
 
-def _orderinfo_timesetup(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time_setup", None))
-
-
-def _orderinfo_timesetupmsc(self: _ObjectState) -> int:
-    return epoch_millis(_selectionbase__value(self, "time_setup", None))
-
-
-def _orderinfo_ordertype(self: _ObjectState) -> OrderTypeEnum:
-    return OrderTypeEnum(_selectionbase__value(self, "order_type"))
-
-
-def _orderinfo_typedescription(self: _ObjectState) -> str:
-    return ORDER_TYPE_DESCRIPTIONS.get(
-        _orderinfo_ordertype(self), _orderinfo_ordertype(self).name
-    )
-
-
-def _orderinfo_state(self: _ObjectState) -> OrderStateEnum:
-    return OrderStateEnum(_selectionbase__value(self, "state"))
-
-
-def _orderinfo_statedescription(self: _ObjectState) -> str:
-    return ORDER_STATE_DESCRIPTIONS.get(
-        _orderinfo_state(self), _orderinfo_state(self).name
-    )
-
-
-def _orderinfo_timeexpiration(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time_expiration", None))
-
-
-def _orderinfo_timedone(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time_done", None))
-
-
-def _orderinfo_timedonemsc(self: _ObjectState) -> int:
-    return epoch_millis(_selectionbase__value(self, "time_done", None))
-
-
-def _orderinfo_typefilling(self: _ObjectState) -> OrderFillingEnum:
-    return OrderFillingEnum(_selectionbase__value(self, "type_filling"))
-
-
-def _orderinfo_typefillingdescription(self: _ObjectState) -> str:
-    return ORDER_FILLING_DESCRIPTIONS.get(
-        _orderinfo_typefilling(self), _orderinfo_typefilling(self).name
-    )
-
-
-def _orderinfo_typetime(self: _ObjectState) -> OrderTimeEnum:
-    return OrderTimeEnum(_selectionbase__value(self, "type_time"))
-
-
-def _orderinfo_typetimedescription(self: _ObjectState) -> str:
-    return ORDER_TIME_DESCRIPTIONS.get(
-        _orderinfo_typetime(self), _orderinfo_typetime(self).name
-    )
-
-
-def _orderinfo_magic(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "magic"))
-
-
-def _orderinfo_positionid(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "position_id"))
-
-
-def _orderinfo_volumeinitial(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "volume_initial"))
-
-
-def _orderinfo_volumecurrent(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "volume_current"))
-
-
-def _orderinfo_priceopen(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price_open"))
-
-
-def _orderinfo_stoploss(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "sl"))
-
-
-def _orderinfo_takeprofit(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "tp"))
-
-
-def _orderinfo_pricecurrent(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price_current"))
-
-
-def _orderinfo_pricestoplimit(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price_stop_limit"))
-
-
-def _orderinfo_symbol(self: _ObjectState) -> str:
-    return str(_selectionbase__value(self, "symbol", ""))
-
-
-def _orderinfo_comment(self: _ObjectState) -> str:
-    return str(_selectionbase__value(self, "comment", ""))
-
-
-def _orderinfo_infointeger(self: _ObjectState, property_id: int | str) -> int:
-    value = _selectionbase__info(self, property_id)
-    return int(value or 0)
-
-
-def _orderinfo_infodouble(self: _ObjectState, property_id: int | str) -> float:
-    value = _selectionbase__info(self, property_id)
-    return float(value or 0.0)
-
-
-def _orderinfo_infostring(self: _ObjectState, property_id: int | str) -> str:
-    value = _selectionbase__info(self, property_id)
-    return str(value or "")
+def _orderinfo_asdict(self: _ObjectState, ticket: int | None = None) -> dict[str, Any]:
+    return asdict(_orderinfo_orderinfo(self, ticket))
 
 
 def _orderinfo_storestate(self: _ObjectState) -> None:
@@ -914,7 +801,7 @@ def _orderinfo_storestate(self: _ObjectState) -> None:
 
 
 def _orderinfo_checkstate(self: _ObjectState) -> bool:
-    ticket = _orderinfo_ticket(self)
+    ticket = int(_selectionbase__value(self, "ticket"))
     _orderinfo_select(self, ticket)
     return _selectionbase__check(self)
 
@@ -948,93 +835,22 @@ def _orderinfo_ordersget(
         orders = [o for o in orders if o.symbol == symbol]
     if group is not None:
         orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
-    return [record_dict(o) for o in orders]
+    return [asdict(_dict_to_order_snapshot(record_dict(o))) for o in orders]
 
 
-def _positioninfo_time(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time", None))
+def _positioninfo_positioninfo(
+    self: _ObjectState, ticket: int | None = None
+) -> PositionSnapshot:
+    if ticket is not None:
+        _positioninfo_selectbyticket(self, ticket)
+    selected = _selectionbase__require(self)
+    return _dict_to_position_snapshot(record_dict(selected))
 
 
-def _positioninfo_timemsc(self: _ObjectState) -> int:
-    return epoch_millis(_selectionbase__value(self, "time", None))
-
-
-def _positioninfo_timeupdate(self: _ObjectState) -> int:
-    return epoch_seconds(_selectionbase__value(self, "time_update", None))
-
-
-def _positioninfo_timeupdatemsc(self: _ObjectState) -> int:
-    return epoch_millis(_selectionbase__value(self, "time_update", None))
-
-
-def _positioninfo_positiontype(self: _ObjectState) -> PositionTypeEnum:
-    return PositionTypeEnum(_selectionbase__value(self, "position_type"))
-
-
-def _positioninfo_typedescription(self: _ObjectState) -> str:
-    return POSITION_TYPE_DESCRIPTIONS.get(
-        _positioninfo_positiontype(self), _positioninfo_positiontype(self).name
-    )
-
-
-def _positioninfo_magic(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "magic"))
-
-
-def _positioninfo_identifier(self: _ObjectState) -> int:
-    return int(_selectionbase__value(self, "identifier"))
-
-
-def _positioninfo_volume(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "volume"))
-
-
-def _positioninfo_priceopen(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price_open"))
-
-
-def _positioninfo_stoploss(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "sl"))
-
-
-def _positioninfo_takeprofit(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "tp"))
-
-
-def _positioninfo_pricecurrent(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "price_current"))
-
-
-def _positioninfo_commission(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "commission"))
-
-
-def _positioninfo_swap(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "swap"))
-
-
-def _positioninfo_profit(self: _ObjectState) -> float:
-    return float(_selectionbase__value(self, "profit"))
-
-
-def _positioninfo_symbol(self: _ObjectState) -> str:
-    return str(_selectionbase__value(self, "symbol", ""))
-
-
-def _positioninfo_comment(self: _ObjectState) -> str:
-    return str(_selectionbase__value(self, "comment", ""))
-
-
-def _positioninfo_infointeger(self: _ObjectState, property_id: int | str) -> int:
-    return int(_selectionbase__info(self, property_id) or 0)
-
-
-def _positioninfo_infodouble(self: _ObjectState, property_id: int | str) -> float:
-    return float(_selectionbase__info(self, property_id) or 0.0)
-
-
-def _positioninfo_infostring(self: _ObjectState, property_id: int | str) -> str:
-    return str(_selectionbase__info(self, property_id) or "")
+def _positioninfo_asdict(
+    self: _ObjectState, ticket: int | None = None
+) -> dict[str, Any]:
+    return asdict(_positioninfo_positioninfo(self, ticket))
 
 
 def _positioninfo_select(self: _ObjectState, symbol: str) -> bool:
@@ -1096,7 +912,7 @@ def _positioninfo_positionsget(
         positions = [p for p in positions if p.symbol == symbol]
     if group is not None:
         positions = [p for p in positions if fnmatch.fnmatch(p.symbol, group)]
-    return [record_dict(p) for p in positions]
+    return [asdict(_dict_to_position_snapshot(record_dict(p))) for p in positions]
 
 
 def _symbolinfo___init__(
@@ -2152,122 +1968,32 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "MaxLotCheck": _accountinfo_maxlotcheck,
     },
     "DealInfo": {
-        "Order": _dealinfo_order,
-        "Time": _dealinfo_time,
-        "TimeMsc": _dealinfo_timemsc,
-        "DealType": _dealinfo_dealtype,
-        "TypeDescription": _dealinfo_typedescription,
-        "Entry": _dealinfo_entry,
-        "EntryDescription": _dealinfo_entrydescription,
-        "Magic": _dealinfo_magic,
-        "PositionId": _dealinfo_positionid,
-        "Volume": _dealinfo_volume,
-        "Price": _dealinfo_price,
-        "Commision": _dealinfo_commision,
-        "Commission": _dealinfo_commission,
-        "Swap": _dealinfo_swap,
-        "Profit": _dealinfo_profit,
-        "Symbol": _dealinfo_symbol,
-        "Comment": _dealinfo_comment,
-        "InfoInteger": _dealinfo_infointeger,
-        "InfoDouble": _dealinfo_infodouble,
-        "InfoString": _dealinfo_infostring,
         "Ticket": _dealinfo_ticket,
         "SelectByIndex": _dealinfo_selectbyindex,
         "HistoryDealsTotal": _dealinfo_historydealstotal,
         "HistoryDealsGet": _dealinfo_historydealsget,
+        "DealInfo": _dealinfo_dealinfo,
+        "as_dict": _dealinfo_asdict,
     },
     "HistoryOrderInfo": {
-        "TimeSetup": _historyorderinfo_timesetup,
-        "TimeSetupMsc": _historyorderinfo_timesetupmsc,
-        "OrderType": _historyorderinfo_ordertype,
-        "TypeDescription": _historyorderinfo_typedescription,
-        "State": _historyorderinfo_state,
-        "StateDescription": _historyorderinfo_statedescription,
-        "TimeExpiration": _historyorderinfo_timeexpiration,
-        "TimeDone": _historyorderinfo_timedone,
-        "TimeDoneMsc": _historyorderinfo_timedonemsc,
-        "TypeFilling": _historyorderinfo_typefilling,
-        "TypeFillingDescription": _historyorderinfo_typefillingdescription,
-        "TypeTime": _historyorderinfo_typetime,
-        "TypeTimeDescription": _historyorderinfo_typetimedescription,
-        "Magic": _historyorderinfo_magic,
-        "PositionId": _historyorderinfo_positionid,
-        "VolumeInitial": _historyorderinfo_volumeinitial,
-        "VolumeCurrent": _historyorderinfo_volumecurrent,
-        "PriceOpen": _historyorderinfo_priceopen,
-        "StopLoss": _historyorderinfo_stoploss,
-        "TakeProfit": _historyorderinfo_takeprofit,
-        "PriceCurrent": _historyorderinfo_pricecurrent,
-        "PriceStopLimit": _historyorderinfo_pricestoplimit,
-        "Symbol": _historyorderinfo_symbol,
-        "Comment": _historyorderinfo_comment,
-        "InfoInteger": _historyorderinfo_infointeger,
-        "InfoDouble": _historyorderinfo_infodouble,
-        "InfoString": _historyorderinfo_infostring,
         "Ticket": _historyorderinfo_ticket,
         "SelectByIndex": _historyorderinfo_selectbyindex,
         "HistoryOrdersTotal": _historyorderinfo_historyorderstotal,
         "HistoryOrdersGet": _historyorderinfo_historyordersget,
+        "HistoryOrderInfo": _historyorderinfo_historyorderinfo,
+        "as_dict": _historyorderinfo_asdict,
     },
     "OrderInfo": {
-        "Ticket": _orderinfo_ticket,
-        "TimeSetup": _orderinfo_timesetup,
-        "TimeSetupMsc": _orderinfo_timesetupmsc,
-        "OrderType": _orderinfo_ordertype,
-        "TypeDescription": _orderinfo_typedescription,
-        "State": _orderinfo_state,
-        "StateDescription": _orderinfo_statedescription,
-        "TimeExpiration": _orderinfo_timeexpiration,
-        "TimeDone": _orderinfo_timedone,
-        "TimeDoneMsc": _orderinfo_timedonemsc,
-        "TypeFilling": _orderinfo_typefilling,
-        "TypeFillingDescription": _orderinfo_typefillingdescription,
-        "TypeTime": _orderinfo_typetime,
-        "TypeTimeDescription": _orderinfo_typetimedescription,
-        "Magic": _orderinfo_magic,
-        "PositionId": _orderinfo_positionid,
-        "VolumeInitial": _orderinfo_volumeinitial,
-        "VolumeCurrent": _orderinfo_volumecurrent,
-        "PriceOpen": _orderinfo_priceopen,
-        "StopLoss": _orderinfo_stoploss,
-        "TakeProfit": _orderinfo_takeprofit,
-        "PriceCurrent": _orderinfo_pricecurrent,
-        "PriceStopLimit": _orderinfo_pricestoplimit,
-        "Symbol": _orderinfo_symbol,
-        "Comment": _orderinfo_comment,
-        "InfoInteger": _orderinfo_infointeger,
-        "InfoDouble": _orderinfo_infodouble,
-        "InfoString": _orderinfo_infostring,
         "StoreState": _orderinfo_storestate,
         "CheckState": _orderinfo_checkstate,
         "Select": _orderinfo_select,
         "SelectByIndex": _orderinfo_selectbyindex,
         "OrdersTotal": _orderinfo_orderstotal,
         "OrdersGet": _orderinfo_ordersget,
+        "OrderInfo": _orderinfo_orderinfo,
+        "as_dict": _orderinfo_asdict,
     },
     "PositionInfo": {
-        "Time": _positioninfo_time,
-        "TimeMsc": _positioninfo_timemsc,
-        "TimeUpdate": _positioninfo_timeupdate,
-        "TimeUpdateMsc": _positioninfo_timeupdatemsc,
-        "PositionType": _positioninfo_positiontype,
-        "TypeDescription": _positioninfo_typedescription,
-        "Magic": _positioninfo_magic,
-        "Identifier": _positioninfo_identifier,
-        "Volume": _positioninfo_volume,
-        "PriceOpen": _positioninfo_priceopen,
-        "StopLoss": _positioninfo_stoploss,
-        "TakeProfit": _positioninfo_takeprofit,
-        "PriceCurrent": _positioninfo_pricecurrent,
-        "Commission": _positioninfo_commission,
-        "Swap": _positioninfo_swap,
-        "Profit": _positioninfo_profit,
-        "Symbol": _positioninfo_symbol,
-        "Comment": _positioninfo_comment,
-        "InfoInteger": _positioninfo_infointeger,
-        "InfoDouble": _positioninfo_infodouble,
-        "InfoString": _positioninfo_infostring,
         "Select": _positioninfo_select,
         "SelectByIndex": _positioninfo_selectbyindex,
         "SelectByMagic": _positioninfo_selectbymagic,
@@ -2276,6 +2002,8 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "CheckState": _positioninfo_checkstate,
         "PositionsTotal": _positioninfo_positionstotal,
         "PositionsGet": _positioninfo_positionsget,
+        "PositionInfo": _positioninfo_positioninfo,
+        "as_dict": _positioninfo_asdict,
     },
     "SymbolInfo": {
         "Refresh": _symbolinfo_refresh,
@@ -2437,50 +2165,11 @@ def execute(
 def prepare_args(
     state: _ObjectState, model: Any, class_name: str, method_name: str, args: list[Any]
 ) -> list[Any]:
-    """Validate local property support without fabricating missing values."""
+    """Validate local execution without fabricating missing values."""
+    del state, model
     if class_name == "Trade" and method_name == "SetAsyncMode" and args and args[0]:
         raise BridgeError(
             "local model does not support queued asynchronous trade execution",
             code="UNSUPPORTED_OPERATION",
         )
-    if method_name.startswith("Info") and args and isinstance(args[0], int):
-        raise BridgeError(
-            "numeric property IDs are not supported by the local model",
-            code="UNSUPPORTED_OPERATION",
-        )
-    if method_name in {"InfoInteger", "InfoDouble", "InfoString"} and args:
-        scope = {
-            "AccountInfo": "account",
-            "TerminalInfo": "terminal",
-            "SymbolInfo": "symbol",
-            "OrderInfo": "order",
-            "HistoryOrderInfo": "history_order",
-            "PositionInfo": "position",
-            "DealInfo": "deal",
-        }[class_name]
-        key = str(args[0]).lower()
-        key = key.removeprefix(scope.replace("history_", "") + "_")
-        aliases = {
-            "margin_free": "free_margin",
-            "margin_so_call": "margin_call",
-            "margin_so_so": "margin_stop_out",
-            "trade_tick_value": "tick_value",
-            "trade_tick_size": "tick_size",
-            "trade_contract_size": "contract_size",
-            "volume_min": "lots_min",
-            "volume_max": "lots_max",
-            "volume_step": "lots_step",
-        }
-        key = aliases.get(key, key)
-        selector = (
-            state.symbol_name
-            if class_name == "SymbolInfo"
-            else getattr(state.selected, "ticket", None)
-        )
-        if model.info_value(scope, key, selector) is None:
-            raise BridgeError(
-                "unsupported or unavailable simulated property",
-                code="UNSUPPORTED_OPERATION",
-            )
-        args = [key, *args[1:]]
     return args

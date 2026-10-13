@@ -67,7 +67,7 @@ def test_market_positions_history_and_clock(mode: MarginMode) -> None:
             assert isinstance(await trading.trade.Result(), dict)
             assert isinstance(await trading.trade.CheckResult(), dict)
             assert await trading.position.Select("EURUSD")
-            assert await trading.position.Volume() == 0.1
+            assert (await trading.position.PositionInfo()).volume == 0.1
             ticket = await trading.position.SelectByIndex(0)
             assert ticket
             assert await trading.position.StoreState() is True
@@ -75,13 +75,15 @@ def test_market_positions_history_and_clock(mode: MarginMode) -> None:
             if mode == MarginMode.RETAIL_HEDGING:
                 assert await trading.trade.PositionClosePartial("EURUSD", 0.04)
                 assert await trading.position.Select("EURUSD")
-                assert await trading.position.Volume() == pytest.approx(0.06)
+                assert (await trading.position.PositionInfo()).volume == pytest.approx(
+                    0.06
+                )
             assert await trading.trade.PositionClose("EURUSD")
             assert backend.positions() == []
             assert await trading.history_order.SelectByIndex(0)
             assert await trading.history_order.Ticket() > 0
             assert await trading.deal.SelectByIndex(0)
-            assert await trading.deal.Commission() == await trading.deal.Commision()
+            assert (await trading.deal.DealInfo()).commission == 0.0
             assert (await trading.symbol.SymbolInfo()).time == int(now.timestamp())
 
     asyncio.run(scenario())
@@ -99,7 +101,7 @@ def test_pending_modify_cancel_trigger_and_expiration() -> None:
         trading.arm()
         assert await trading.trade("buy_limit", "EURUSD", 0.1, price=1.09)
         assert await trading.order.SelectByIndex(0)
-        ticket = await trading.order.Ticket()
+        ticket = (await trading.order.OrderInfo()).ticket
         assert await trading.trade.OrderModify(ticket, 1.08, 0.0, 0.0)
         assert await trading.trade.OrderDelete(ticket)
         assert backend.orders() == []
@@ -143,8 +145,13 @@ def test_rejection_and_unknown_operation() -> None:
             await backend.call(
                 object_id="test", class_name="Trade", method_name="Unknown", args=[]
             )
-        with pytest.raises(BridgeError, match="numeric property"):
-            await trading.order.InfoInteger(999)
+        with pytest.raises(BridgeError, match="unsupported"):
+            await backend.call(
+                object_id="test",
+                class_name="OrderInfo",
+                method_name="InfoInteger",
+                args=[999],
+            )
         assert (await trading.terminal.TerminalInfo()).connected is True
         with pytest.raises(BridgeError, match="queued asynchronous"):
             await trading.trade.SetAsyncMode(True)
@@ -177,7 +184,12 @@ def test_stops_close_by_and_local_events() -> None:
         )
         assert backend.positions() == []
         with pytest.raises(BridgeError, match="unsupported"):
-            await trading.order.InfoDouble("does_not_exist")
+            await backend.call(
+                object_id="test",
+                class_name="SymbolInfo",
+                method_name="InfoDouble",
+                args=["does_not_exist"],
+            )
         await trading.close()
 
     asyncio.run(scenario())

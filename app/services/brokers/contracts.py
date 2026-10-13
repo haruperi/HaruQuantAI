@@ -815,6 +815,114 @@ class SymbolSnapshot:
 
 
 @dataclass(slots=True)
+class PositionSnapshot:
+    ticket: int = 0
+    identifier: int = 0
+    symbol: str = ""
+    position_type: int = 0
+    type_description: str = ""
+    volume: float = 0.0
+    price_open: float = 0.0
+    price_current: float = 0.0
+    sl: float = 0.0
+    tp: float = 0.0
+    commission: float = 0.0
+    swap: float = 0.0
+    profit: float = 0.0
+    magic: int = 0
+    comment: str = ""
+    time: int = 0
+    time_msc: int = 0
+    time_update: int = 0
+    time_update_msc: int = 0
+
+    @property
+    def stop_loss(self) -> float:
+        return self.sl
+
+    @property
+    def take_profit(self) -> float:
+        return self.tp
+
+    @property
+    def type(self) -> int:
+        return self.position_type
+
+
+@dataclass(slots=True)
+class OrderSnapshot:
+    ticket: int = 0
+    symbol: str = ""
+    order_type: int = 0
+    type_description: str = ""
+    state: int = 0
+    state_description: str = ""
+    volume_initial: float = 0.0
+    volume_current: float = 0.0
+    price_open: float = 0.0
+    sl: float = 0.0
+    tp: float = 0.0
+    price_current: float = 0.0
+    price_stop_limit: float = 0.0
+    time_setup: int = 0
+    time_setup_msc: int = 0
+    time_done: int = 0
+    time_done_msc: int = 0
+    time_expiration: int = 0
+    type_filling: int = 0
+    type_filling_description: str = ""
+    type_time: int = 0
+    type_time_description: str = ""
+    magic: int = 0
+    position_id: int = 0
+    comment: str = ""
+
+    @property
+    def stop_loss(self) -> float:
+        return self.sl
+
+    @property
+    def take_profit(self) -> float:
+        return self.tp
+
+    @property
+    def type(self) -> int:
+        return self.order_type
+
+
+HistoryOrderSnapshot = OrderSnapshot
+
+
+@dataclass(slots=True)
+class DealSnapshot:
+    ticket: int = 0
+    order: int = 0
+    position_id: int = 0
+    symbol: str = ""
+    deal_type: int = 0
+    type_description: str = ""
+    entry: int = 0
+    entry_description: str = ""
+    volume: float = 0.0
+    price: float = 0.0
+    commission: float = 0.0
+    swap: float = 0.0
+    profit: float = 0.0
+    magic: int = 0
+    comment: str = ""
+    time: int = 0
+    time_msc: int = 0
+
+    @property
+    def order_ticket(self) -> int:
+        return self.order
+
+    @property
+    def type(self) -> int:
+        return self.deal_type
+
+
+@dataclass(slots=True)
 class OrderRecord:
     ticket: int
     symbol: str

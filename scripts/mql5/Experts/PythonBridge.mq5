@@ -940,6 +940,118 @@ string TerminalInfoJson(CTerminalInfo *obj)
       "}";
   }
 
+string PositionInfoJson(CPositionInfo *obj)
+  {
+   ulong ticket=PositionGetInteger(POSITION_TICKET);
+   if(ticket==0) ticket=obj.Identifier();
+   return "{"
+      "\"ticket\":"+JsonULong(ticket)+
+      ",\"identifier\":"+JsonULong(obj.Identifier())+
+      ",\"symbol\":"+JsonQuote(obj.Symbol())+
+      ",\"position_type\":"+JsonLong(obj.PositionType())+
+      ",\"type_description\":"+JsonQuote(obj.TypeDescription())+
+      ",\"volume\":"+JsonDouble(obj.Volume())+
+      ",\"price_open\":"+JsonDouble(obj.PriceOpen())+
+      ",\"price_current\":"+JsonDouble(obj.PriceCurrent())+
+      ",\"sl\":"+JsonDouble(obj.StopLoss())+
+      ",\"tp\":"+JsonDouble(obj.TakeProfit())+
+      ",\"commission\":"+JsonDouble(obj.Commission())+
+      ",\"swap\":"+JsonDouble(obj.Swap())+
+      ",\"profit\":"+JsonDouble(obj.Profit())+
+      ",\"magic\":"+JsonULong(obj.Magic())+
+      ",\"comment\":"+JsonQuote(obj.Comment())+
+      ",\"time\":"+JsonLong(obj.Time())+
+      ",\"time_msc\":"+JsonLong(obj.TimeMsc())+
+      ",\"time_update\":"+JsonLong(obj.TimeUpdate())+
+      ",\"time_update_msc\":"+JsonLong(obj.TimeUpdateMsc())+
+      "}";
+  }
+
+string OrderInfoJson(COrderInfo *obj)
+  {
+   return "{"
+      "\"ticket\":"+JsonULong(obj.Ticket())+
+      ",\"symbol\":"+JsonQuote(obj.Symbol())+
+      ",\"order_type\":"+JsonLong(obj.OrderType())+
+      ",\"type_description\":"+JsonQuote(obj.TypeDescription())+
+      ",\"state\":"+JsonLong(obj.State())+
+      ",\"state_description\":"+JsonQuote(obj.StateDescription())+
+      ",\"volume_initial\":"+JsonDouble(obj.VolumeInitial())+
+      ",\"volume_current\":"+JsonDouble(obj.VolumeCurrent())+
+      ",\"price_open\":"+JsonDouble(obj.PriceOpen())+
+      ",\"sl\":"+JsonDouble(obj.StopLoss())+
+      ",\"tp\":"+JsonDouble(obj.TakeProfit())+
+      ",\"price_current\":"+JsonDouble(obj.PriceCurrent())+
+      ",\"price_stop_limit\":"+JsonDouble(obj.PriceStopLimit())+
+      ",\"time_setup\":"+JsonLong(obj.TimeSetup())+
+      ",\"time_setup_msc\":"+JsonLong(obj.TimeSetupMsc())+
+      ",\"time_done\":"+JsonLong(obj.TimeDone())+
+      ",\"time_done_msc\":"+JsonLong(obj.TimeDoneMsc())+
+      ",\"time_expiration\":"+JsonLong(obj.TimeExpiration())+
+      ",\"type_filling\":"+JsonLong(obj.TypeFilling())+
+      ",\"type_filling_description\":"+JsonQuote(obj.TypeFillingDescription())+
+      ",\"type_time\":"+JsonLong(obj.TypeTime())+
+      ",\"type_time_description\":"+JsonQuote(obj.TypeTimeDescription())+
+      ",\"magic\":"+JsonULong(obj.Magic())+
+      ",\"position_id\":"+JsonULong(obj.PositionId())+
+      ",\"comment\":"+JsonQuote(obj.Comment())+
+      "}";
+  }
+
+string HistoryOrderInfoJson(CHistoryOrderInfo *obj)
+  {
+   return "{"
+      "\"ticket\":"+JsonULong(obj.Ticket())+
+      ",\"symbol\":"+JsonQuote(obj.Symbol())+
+      ",\"order_type\":"+JsonLong(obj.OrderType())+
+      ",\"type_description\":"+JsonQuote(obj.TypeDescription())+
+      ",\"state\":"+JsonLong(obj.State())+
+      ",\"state_description\":"+JsonQuote(obj.StateDescription())+
+      ",\"volume_initial\":"+JsonDouble(obj.VolumeInitial())+
+      ",\"volume_current\":"+JsonDouble(obj.VolumeCurrent())+
+      ",\"price_open\":"+JsonDouble(obj.PriceOpen())+
+      ",\"sl\":"+JsonDouble(obj.StopLoss())+
+      ",\"tp\":"+JsonDouble(obj.TakeProfit())+
+      ",\"price_current\":"+JsonDouble(obj.PriceCurrent())+
+      ",\"price_stop_limit\":"+JsonDouble(obj.PriceStopLimit())+
+      ",\"time_setup\":"+JsonLong(obj.TimeSetup())+
+      ",\"time_setup_msc\":"+JsonLong(obj.TimeSetupMsc())+
+      ",\"time_done\":"+JsonLong(obj.TimeDone())+
+      ",\"time_done_msc\":"+JsonLong(obj.TimeDoneMsc())+
+      ",\"time_expiration\":"+JsonLong(obj.TimeExpiration())+
+      ",\"type_filling\":"+JsonLong(obj.TypeFilling())+
+      ",\"type_filling_description\":"+JsonQuote(obj.TypeFillingDescription())+
+      ",\"type_time\":"+JsonLong(obj.TypeTime())+
+      ",\"type_time_description\":"+JsonQuote(obj.TypeTimeDescription())+
+      ",\"magic\":"+JsonULong(obj.Magic())+
+      ",\"position_id\":"+JsonULong(obj.PositionId())+
+      ",\"comment\":"+JsonQuote(obj.Comment())+
+      "}";
+  }
+
+string DealInfoJson(CDealInfo *obj)
+  {
+   return "{"
+      "\"ticket\":"+JsonULong(obj.Ticket())+
+      ",\"order\":"+JsonULong(obj.Order())+
+      ",\"position_id\":"+JsonULong(obj.PositionId())+
+      ",\"symbol\":"+JsonQuote(obj.Symbol())+
+      ",\"deal_type\":"+JsonLong(obj.DealType())+
+      ",\"type_description\":"+JsonQuote(obj.TypeDescription())+
+      ",\"entry\":"+JsonLong(obj.Entry())+
+      ",\"entry_description\":"+JsonQuote(obj.EntryDescription())+
+      ",\"volume\":"+JsonDouble(obj.Volume())+
+      ",\"price\":"+JsonDouble(obj.Price())+
+      ",\"commission\":"+JsonDouble(obj.Commission())+
+      ",\"swap\":"+JsonDouble(obj.Swap())+
+      ",\"profit\":"+JsonDouble(obj.Profit())+
+      ",\"magic\":"+JsonULong(obj.Magic())+
+      ",\"comment\":"+JsonQuote(obj.Comment())+
+      ",\"time\":"+JsonLong(obj.Time())+
+      ",\"time_msc\":"+JsonLong(obj.TimeMsc())+
+      "}";
+  }
+
 string TradeMeta(CTrade &obj)
   {
    MqlTradeResult r; ZeroMemory(r); obj.Result(r);
@@ -1429,34 +1541,16 @@ void DispatchOrder(const string command_id,const string object_id,const string m
   {
    COrderInfo *p=GetOrder(object_id); if(CheckPointer(p)==POINTER_INVALID) { RespondError(command_id,"OBJECT_CREATE_FAILED","COrderInfo allocation failed"); return; }
    COrderInfo *obj=p;
-   if(method=="Ticket") { RespondULong(command_id, true, (ulong)(obj.Ticket())); return; }
-   if(method=="TimeSetup") { RespondLong(command_id, true, (long)(obj.TimeSetup())); return; }
-   if(method=="TimeSetupMsc") { RespondLong(command_id, true, (long)(obj.TimeSetupMsc())); return; }
-   if(method=="OrderType") { RespondLong(command_id, true, (long)(obj.OrderType())); return; }
-   if(method=="State") { RespondLong(command_id, true, (long)(obj.State())); return; }
-   if(method=="TimeExpiration") { RespondLong(command_id, true, (long)(obj.TimeExpiration())); return; }
-   if(method=="TimeDone") { RespondLong(command_id, true, (long)(obj.TimeDone())); return; }
-   if(method=="TimeDoneMsc") { RespondLong(command_id, true, (long)(obj.TimeDoneMsc())); return; }
-   if(method=="TypeFilling") { RespondLong(command_id, true, (long)(obj.TypeFilling())); return; }
-   if(method=="TypeTime") { RespondLong(command_id, true, (long)(obj.TypeTime())); return; }
-   if(method=="Magic") { RespondULong(command_id, true, (ulong)(obj.Magic())); return; }
-   if(method=="PositionId") { RespondULong(command_id, true, (ulong)(obj.PositionId())); return; }
-   if(method=="TypeDescription") { RespondString(command_id, true, obj.TypeDescription()); return; }
-   if(method=="StateDescription") { RespondString(command_id, true, obj.StateDescription()); return; }
-   if(method=="TypeFillingDescription") { RespondString(command_id, true, obj.TypeFillingDescription()); return; }
-   if(method=="TypeTimeDescription") { RespondString(command_id, true, obj.TypeTimeDescription()); return; }
-   if(method=="Symbol") { RespondString(command_id, true, obj.Symbol()); return; }
-   if(method=="Comment") { RespondString(command_id, true, obj.Comment()); return; }
-   if(method=="VolumeInitial") { RespondDouble(command_id, true, (double)(obj.VolumeInitial())); return; }
-   if(method=="VolumeCurrent") { RespondDouble(command_id, true, (double)(obj.VolumeCurrent())); return; }
-   if(method=="PriceOpen") { RespondDouble(command_id, true, (double)(obj.PriceOpen())); return; }
-   if(method=="StopLoss") { RespondDouble(command_id, true, (double)(obj.StopLoss())); return; }
-   if(method=="TakeProfit") { RespondDouble(command_id, true, (double)(obj.TakeProfit())); return; }
-   if(method=="PriceCurrent") { RespondDouble(command_id, true, (double)(obj.PriceCurrent())); return; }
-   if(method=="PriceStopLimit") { RespondDouble(command_id, true, (double)(obj.PriceStopLimit())); return; }
-   if(method=="InfoInteger") { long v=0; bool ok=obj.InfoInteger((ENUM_ORDER_PROPERTY_INTEGER)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyLongJson(ok,v,ok?"":"InfoInteger failed")); return; }
-   if(method=="InfoDouble") { double v=0; bool ok=obj.InfoDouble((ENUM_ORDER_PROPERTY_DOUBLE)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyDoubleJson(ok,v,ok?"":"InfoDouble failed")); return; }
-   if(method=="InfoString") { string v=""; bool ok=obj.InfoString((ENUM_ORDER_PROPERTY_STRING)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyStringJson(ok,v,ok?"":"InfoString failed")); return; }
+   if(method=="OrderInfo" || method=="as_dict")
+     {
+      if(ArraySize(args)>0 && args[0]!="" && args[0]!="null")
+        {
+         ulong ticket=ArgULong(args,0);
+         if(ticket!=0) obj.Select(ticket);
+        }
+      RespondRaw(command_id, true, OrderInfoJson(obj));
+      return;
+     }
    if(method=="StoreState") { obj.StoreState(); RespondBool(command_id,true,true); return; }
    if(method=="CheckState") { RespondBool(command_id,true,obj.CheckState()); return; }
    if(method=="Select") { RespondBool(command_id,true,obj.Select(ArgULong(args,0))); return; }
@@ -1525,33 +1619,17 @@ void DispatchHistory(const string command_id,const string object_id,const string
   {
    CHistoryOrderInfo *p=GetHistory(object_id); if(CheckPointer(p)==POINTER_INVALID) { RespondError(command_id,"OBJECT_CREATE_FAILED","CHistoryOrderInfo allocation failed"); return; }
    CHistoryOrderInfo *obj=p;
-   if(method=="TimeSetup") { RespondLong(command_id, true, (long)(obj.TimeSetup())); return; }
-   if(method=="TimeSetupMsc") { RespondLong(command_id, true, (long)(obj.TimeSetupMsc())); return; }
-   if(method=="OrderType") { RespondLong(command_id, true, (long)(obj.OrderType())); return; }
-   if(method=="State") { RespondLong(command_id, true, (long)(obj.State())); return; }
-   if(method=="TimeExpiration") { RespondLong(command_id, true, (long)(obj.TimeExpiration())); return; }
-   if(method=="TimeDone") { RespondLong(command_id, true, (long)(obj.TimeDone())); return; }
-   if(method=="TimeDoneMsc") { RespondLong(command_id, true, (long)(obj.TimeDoneMsc())); return; }
-   if(method=="TypeFilling") { RespondLong(command_id, true, (long)(obj.TypeFilling())); return; }
-   if(method=="TypeTime") { RespondLong(command_id, true, (long)(obj.TypeTime())); return; }
-   if(method=="Magic") { RespondULong(command_id, true, (ulong)(obj.Magic())); return; }
-   if(method=="PositionId") { RespondULong(command_id, true, (ulong)(obj.PositionId())); return; }
-   if(method=="TypeDescription") { RespondString(command_id, true, obj.TypeDescription()); return; }
-   if(method=="StateDescription") { RespondString(command_id, true, obj.StateDescription()); return; }
-   if(method=="TypeFillingDescription") { RespondString(command_id, true, obj.TypeFillingDescription()); return; }
-   if(method=="TypeTimeDescription") { RespondString(command_id, true, obj.TypeTimeDescription()); return; }
-   if(method=="Symbol") { RespondString(command_id, true, obj.Symbol()); return; }
-   if(method=="Comment") { RespondString(command_id, true, obj.Comment()); return; }
-   if(method=="VolumeInitial") { RespondDouble(command_id, true, (double)(obj.VolumeInitial())); return; }
-   if(method=="VolumeCurrent") { RespondDouble(command_id, true, (double)(obj.VolumeCurrent())); return; }
-   if(method=="PriceOpen") { RespondDouble(command_id, true, (double)(obj.PriceOpen())); return; }
-   if(method=="StopLoss") { RespondDouble(command_id, true, (double)(obj.StopLoss())); return; }
-   if(method=="TakeProfit") { RespondDouble(command_id, true, (double)(obj.TakeProfit())); return; }
-   if(method=="PriceCurrent") { RespondDouble(command_id, true, (double)(obj.PriceCurrent())); return; }
-   if(method=="PriceStopLimit") { RespondDouble(command_id, true, (double)(obj.PriceStopLimit())); return; }
-   if(method=="InfoInteger") { long v=0; bool ok=obj.InfoInteger((ENUM_ORDER_PROPERTY_INTEGER)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyLongJson(ok,v,ok?"":"InfoInteger failed")); return; }
-   if(method=="InfoDouble") { double v=0; bool ok=obj.InfoDouble((ENUM_ORDER_PROPERTY_DOUBLE)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyDoubleJson(ok,v,ok?"":"InfoDouble failed")); return; }
-   if(method=="InfoString") { string v=""; bool ok=obj.InfoString((ENUM_ORDER_PROPERTY_STRING)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyStringJson(ok,v,ok?"":"InfoString failed")); return; }
+   if(method=="HistoryOrderInfo" || method=="as_dict")
+     {
+      HistorySelect(0,TimeCurrent());
+      if(ArraySize(args)>0 && args[0]!="" && args[0]!="null")
+        {
+         ulong ticket=ArgULong(args,0);
+         if(ticket!=0) obj.Ticket(ticket);
+        }
+      RespondRaw(command_id, true, HistoryOrderInfoJson(obj));
+      return;
+     }
    if(method=="Ticket")
      {
       if(ArraySize(args)==0) RespondULong(command_id,true,obj.Ticket());
@@ -1639,27 +1717,16 @@ void DispatchPosition(const string command_id,const string object_id,const strin
   {
    CPositionInfo *p=GetPosition(object_id); if(CheckPointer(p)==POINTER_INVALID) { RespondError(command_id,"OBJECT_CREATE_FAILED","CPositionInfo allocation failed"); return; }
    CPositionInfo *obj=p;
-   if(method=="Time") { RespondLong(command_id, true, (long)(obj.Time())); return; }
-   if(method=="TimeMsc") { RespondLong(command_id, true, (long)(obj.TimeMsc())); return; }
-   if(method=="TimeUpdate") { RespondLong(command_id, true, (long)(obj.TimeUpdate())); return; }
-   if(method=="TimeUpdateMsc") { RespondLong(command_id, true, (long)(obj.TimeUpdateMsc())); return; }
-   if(method=="PositionType") { RespondLong(command_id, true, (long)(obj.PositionType())); return; }
-   if(method=="Magic") { RespondULong(command_id, true, (ulong)(obj.Magic())); return; }
-   if(method=="Identifier") { RespondULong(command_id, true, (ulong)(obj.Identifier())); return; }
-   if(method=="TypeDescription") { RespondString(command_id, true, obj.TypeDescription()); return; }
-   if(method=="Symbol") { RespondString(command_id, true, obj.Symbol()); return; }
-   if(method=="Comment") { RespondString(command_id, true, obj.Comment()); return; }
-   if(method=="Volume") { RespondDouble(command_id, true, (double)(obj.Volume())); return; }
-   if(method=="PriceOpen") { RespondDouble(command_id, true, (double)(obj.PriceOpen())); return; }
-   if(method=="StopLoss") { RespondDouble(command_id, true, (double)(obj.StopLoss())); return; }
-   if(method=="TakeProfit") { RespondDouble(command_id, true, (double)(obj.TakeProfit())); return; }
-   if(method=="PriceCurrent") { RespondDouble(command_id, true, (double)(obj.PriceCurrent())); return; }
-   if(method=="Commission") { RespondDouble(command_id, true, (double)(obj.Commission())); return; }
-   if(method=="Swap") { RespondDouble(command_id, true, (double)(obj.Swap())); return; }
-   if(method=="Profit") { RespondDouble(command_id, true, (double)(obj.Profit())); return; }
-   if(method=="InfoInteger") { long v=0; bool ok=obj.InfoInteger((ENUM_POSITION_PROPERTY_INTEGER)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyLongJson(ok,v,ok?"":"InfoInteger failed")); return; }
-   if(method=="InfoDouble") { double v=0; bool ok=obj.InfoDouble((ENUM_POSITION_PROPERTY_DOUBLE)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyDoubleJson(ok,v,ok?"":"InfoDouble failed")); return; }
-   if(method=="InfoString") { string v=""; bool ok=obj.InfoString((ENUM_POSITION_PROPERTY_STRING)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyStringJson(ok,v,ok?"":"InfoString failed")); return; }
+   if(method=="PositionInfo" || method=="as_dict")
+     {
+      if(ArraySize(args)>0 && args[0]!="" && args[0]!="null")
+        {
+         ulong ticket=ArgULong(args,0);
+         if(ticket!=0) obj.SelectByTicket(ticket);
+        }
+      RespondRaw(command_id, true, PositionInfoJson(obj));
+      return;
+     }
    if(method=="Select") { RespondBool(command_id,true,obj.Select(ArgString(args,0))); return; }
    if(method=="SelectByIndex") { RespondBool(command_id,true,obj.SelectByIndex((int)ArgLong(args,0))); return; }
    if(method=="SelectByMagic") { RespondBool(command_id,true,obj.SelectByMagic(ArgString(args,0),ArgULong(args,1))); return; }
@@ -1727,25 +1794,20 @@ void DispatchDeal(const string command_id,const string object_id,const string me
   {
    CDealInfo *p=GetDeal(object_id); if(CheckPointer(p)==POINTER_INVALID) { RespondError(command_id,"OBJECT_CREATE_FAILED","CDealInfo allocation failed"); return; }
    CDealInfo *obj=p;
-   if(method=="Order") { RespondULong(command_id, true, (ulong)(obj.Order())); return; }
-   if(method=="Time") { RespondLong(command_id, true, (long)(obj.Time())); return; }
-   if(method=="TimeMsc") { RespondLong(command_id, true, (long)(obj.TimeMsc())); return; }
-   if(method=="DealType") { RespondLong(command_id, true, (long)(obj.DealType())); return; }
-   if(method=="Entry") { RespondLong(command_id, true, (long)(obj.Entry())); return; }
-   if(method=="Magic") { RespondULong(command_id, true, (ulong)(obj.Magic())); return; }
-   if(method=="PositionId") { RespondULong(command_id, true, (ulong)(obj.PositionId())); return; }
-   if(method=="TypeDescription") { RespondString(command_id, true, obj.TypeDescription()); return; }
-   if(method=="EntryDescription") { RespondString(command_id, true, obj.EntryDescription()); return; }
-   if(method=="Symbol") { RespondString(command_id, true, obj.Symbol()); return; }
-   if(method=="Comment") { RespondString(command_id, true, obj.Comment()); return; }
-   if(method=="Volume") { RespondDouble(command_id, true, (double)(obj.Volume())); return; }
-   if(method=="Price") { RespondDouble(command_id, true, (double)(obj.Price())); return; }
-   if(method=="Commision") { RespondDouble(command_id, true, (double)(obj.Commission())); return; }
-   if(method=="Swap") { RespondDouble(command_id, true, (double)(obj.Swap())); return; }
-   if(method=="Profit") { RespondDouble(command_id, true, (double)(obj.Profit())); return; }
-   if(method=="InfoInteger") { long v=0; bool ok=obj.InfoInteger((ENUM_DEAL_PROPERTY_INTEGER)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyLongJson(ok,v,ok?"":"InfoInteger failed")); return; }
-   if(method=="InfoDouble") { double v=0; bool ok=obj.InfoDouble((ENUM_DEAL_PROPERTY_DOUBLE)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyDoubleJson(ok,v,ok?"":"InfoDouble failed")); return; }
-   if(method=="InfoString") { string v=""; bool ok=obj.InfoString((ENUM_DEAL_PROPERTY_STRING)ParseEnumCode(args,0),v); RespondRaw(command_id,true,PropertyStringJson(ok,v,ok?"":"InfoString failed")); return; }
+   if(method=="DealInfo" || method=="as_dict")
+     {
+      if(ArraySize(args)>0 && args[0]!="" && args[0]!="null")
+        {
+         ulong ticket=ArgULong(args,0);
+         if(ticket!=0)
+           {
+            HistoryDealSelect(ticket);
+            obj.Ticket(ticket);
+           }
+        }
+      RespondRaw(command_id, true, DealInfoJson(obj));
+      return;
+     }
    if(method=="Ticket")
      {
       if(ArraySize(args)==0) RespondULong(command_id,true,obj.Ticket());

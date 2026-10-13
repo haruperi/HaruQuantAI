@@ -1,34 +1,53 @@
 # ruff: noqa: N802 -- public names preserve the eight-class compatibility API.
-"""Shared PositionInfo proxy for native broker operations.
+"""Shared PositionInfo proxy for native and simulated broker operations.
 
 Description:
-    Forwards the current MQL5 PositionInfo method surface through TradingClass.
-    Stateful selection and request/result objects retain per-proxy serialization.
-    Placement is shared; current method semantics remain those of native MT5.
+    Forwards asynchronous position snapshot queries, position selection, and state
+    checks through TradingClass. Position property reads are consolidated into a
+    single atomic PositionInfo() call returning a strongly typed PositionSnapshot
+    dataclass to eliminate IPC round-trips and temporal skew across properties.
+    PositionsGet() returns a strongly typed list of PositionSnapshot dataclasses.
 
 Purpose:
     FEAT-BROKER-PROXIES: Expose explicit asynchronous broker class operations
     without duplicating transport or persistence ownership.
 
 Key Capabilities:
-    - FR-BROKER-PROXIES-POSITIONINFO-FORWARDING: Forward native methods.
-      Associated: `PositionInfo`, `TradingClass._call()`
-      Logging: Transport emits DEBUG encoding-attempt metadata for remote calls;
-        no payload logging or proxy logging configuration is introduced here.
+    - FR-BROKER-PROXIES-POSITIONINFO-SNAPSHOT: Query full position specification
+      and state snapshot.
+      Associated: `PositionInfo.PositionInfo()`, `PositionInfo.__call__()`,
+        `PositionInfo.as_dict()`
+      Logging: DEBUG transport invocation metadata emitted via TradingClass;
+        no secret or payload logging occurs here.
+    - FR-BROKER-PROXIES-POSITIONINFO-OPERATIONS: Select positions and inspect totals.
+      Associated: `PositionInfo.Select()`, `PositionInfo.SelectByIndex()`,
+        `PositionInfo.SelectByMagic()`, `PositionInfo.SelectByTicket()`,
+        `PositionInfo.StoreState()`, `PositionInfo.CheckState()`,
+        `PositionInfo.PositionsTotal()`, `PositionInfo.PositionsGet()`
+      Logging: DEBUG transport invocation metadata emitted via TradingClass._call().
 
 Python API Usage:
-    Access this proxy through a configured MetaTrader facade or bind it to the
-    async backend capability. Remote calls are asynchronous.
+    ```python
+    from app.services.trading import Trading
+
+    async with Trading(backend) as trading:
+        positions = await trading.position.PositionsGet()
+        for pos in positions:
+            print(f"Ticket: {pos.ticket}, Profit: {pos.profit}")
+    ```
 
 CLI Usage:
+    ```bash
     uv run pytest tests/unit/services/test_metatrader_bridge_protocol.py --no-cov
+    ```
 """
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from typing import Any
 
-from app.services.brokers.contracts import PropertyValue
+from app.services.brokers.contracts import PositionSnapshot
 
 from .base import TradingClass
 
@@ -38,89 +57,27 @@ class PositionInfo(TradingClass):
 
     CLASS_NAME = "PositionInfo"
 
-    async def Time(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Time operation."""
-        return await self._call("Time", *args)
+    async def PositionInfo(self, *args: Any) -> PositionSnapshot:
+        """Await the backend PositionInfo snapshot."""
+        data = await self._call("PositionInfo", *args)
+        if isinstance(data, PositionSnapshot):
+            return data
+        if isinstance(data, dict):
+            return PositionSnapshot(**data)
+        raise TypeError(f"unexpected position snapshot type: {type(data).__name__}")
 
-    async def TimeMsc(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.TimeMsc operation."""
-        return await self._call("TimeMsc", *args)
+    async def __call__(self, *args: Any) -> PositionSnapshot:
+        """Await the backend PositionInfo snapshot directly via call syntax."""
+        return await self.PositionInfo(*args)
 
-    async def TimeUpdate(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.TimeUpdate operation."""
-        return await self._call("TimeUpdate", *args)
-
-    async def TimeUpdateMsc(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.TimeUpdateMsc operation."""
-        return await self._call("TimeUpdateMsc", *args)
-
-    async def PositionType(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.PositionType operation."""
-        return await self._call("PositionType", *args)
-
-    async def TypeDescription(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.TypeDescription operation."""
-        return await self._call("TypeDescription", *args)
-
-    async def Magic(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Magic operation."""
-        return await self._call("Magic", *args)
-
-    async def Identifier(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Identifier operation."""
-        return await self._call("Identifier", *args)
-
-    async def Volume(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Volume operation."""
-        return await self._call("Volume", *args)
-
-    async def PriceOpen(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.PriceOpen operation."""
-        return await self._call("PriceOpen", *args)
-
-    async def StopLoss(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.StopLoss operation."""
-        return await self._call("StopLoss", *args)
-
-    async def TakeProfit(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.TakeProfit operation."""
-        return await self._call("TakeProfit", *args)
-
-    async def PriceCurrent(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.PriceCurrent operation."""
-        return await self._call("PriceCurrent", *args)
-
-    async def Commission(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Commission operation."""
-        return await self._call("Commission", *args)
-
-    async def Swap(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Swap operation."""
-        return await self._call("Swap", *args)
-
-    async def Profit(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Profit operation."""
-        return await self._call("Profit", *args)
-
-    async def Symbol(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Symbol operation."""
-        return await self._call("Symbol", *args)
-
-    async def Comment(self, *args: Any) -> Any:
-        """Await the backend PositionInfo.Comment operation."""
-        return await self._call("Comment", *args)
-
-    async def InfoInteger(self, prop_id: int | str) -> PropertyValue:
-        """Await the backend PositionInfo.InfoInteger operation."""
-        return await self._property("InfoInteger", prop_id)
-
-    async def InfoDouble(self, prop_id: int | str) -> PropertyValue:
-        """Await the backend PositionInfo.InfoDouble operation."""
-        return await self._property("InfoDouble", prop_id)
-
-    async def InfoString(self, prop_id: int | str) -> PropertyValue:
-        """Await the backend PositionInfo.InfoString operation."""
-        return await self._property("InfoString", prop_id)
+    async def as_dict(self, *args: Any) -> dict[str, Any]:
+        """Await the backend position snapshot represented as a dictionary."""
+        data = await self._call("as_dict", *args)
+        if isinstance(data, dict):
+            return data
+        if isinstance(data, PositionSnapshot):
+            return asdict(data)
+        raise TypeError(f"unexpected position dictionary type: {type(data).__name__}")
 
     async def Select(self, *args: Any) -> Any:
         """Await the backend PositionInfo.Select operation."""
@@ -150,8 +107,16 @@ class PositionInfo(TradingClass):
         """Await the backend PositionInfo.PositionsTotal operation."""
         return await self._call("PositionsTotal", *args)
 
-    async def PositionsGet(self, *args: Any, **kwargs: Any) -> Any:
+    async def PositionsGet(self, *args: Any, **kwargs: Any) -> list[PositionSnapshot]:
         """Await the backend PositionInfo.PositionsGet operation."""
-        if kwargs:
-            return await self._call("PositionsGet", kwargs)
-        return await self._call("PositionsGet", *args)
+        data = (
+            await self._call("PositionsGet", kwargs)
+            if kwargs
+            else await self._call("PositionsGet", *args)
+        )
+        if isinstance(data, list):
+            return [
+                item if isinstance(item, PositionSnapshot) else PositionSnapshot(**item)
+                for item in data
+            ]
+        raise TypeError(f"unexpected PositionsGet return type: {type(data).__name__}")
