@@ -237,7 +237,7 @@ class SimulationBackend(BrokerBackend):
         spec = self._symbols.get(name)
         if spec is None:
             return False
-        spec.selected = bool(selected)
+        spec.selected = selected
         return True
 
     @override
@@ -510,7 +510,7 @@ class SimulationBackend(BrokerBackend):
             request.action == TradeAction.DEAL
             and spec.trade_execution == SymbolTradeExecution.MARKET
         ):
-            flags = int(spec.trade_fill_flags)
+            flags = spec.trade_fill_flags
             if request.type_filling == OrderFilling.FOK and not (flags & 1):
                 return TradeRetcode.INVALID_FILL, "FOK filling is not supported"
             if request.type_filling == OrderFilling.IOC and not (flags & 2):
