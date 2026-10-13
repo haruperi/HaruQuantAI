@@ -26,7 +26,13 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 from app.services.brokers import _simulation_api, simulator
-from app.services.brokers.contracts import BridgeError, SymbolSpec
+from app.services.brokers.contracts import (
+    BridgeError,
+    OrderType,
+    SymbolSpec,
+    TradeAction,
+    TradeRequest,
+)
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
 from app.services.trading import Trading
@@ -93,16 +99,34 @@ def test_expiration_and_naive_time_guard(
         backend = MT5Backend(
             auth_token="isolated-test-token", journal_path=tmp_path / "expiration.db"
         )
-        call = AsyncMock(return_value=True)
+        call = AsyncMock(return_value={"retcode": 10009})
         monkeypatch.setattr(backend.bridge, "call", call)
         try:
             when = datetime(2026, 1, 1, tzinfo=UTC)
-            await backend.trade.BuyLimit(0.1, 1.0, "EURUSD", 0.0, 0.0, 2, when)
+            await backend.trade.OrderSend(
+                TradeRequest(
+                    action=TradeAction.PENDING,
+                    symbol="EURUSD",
+                    volume=0.1,
+                    order_type=OrderType.BUY_LIMIT,
+                    price=1.0,
+                    expiration=when,
+                )
+            )
             assert call.call_args.kwargs["requires_arm"]
-            assert call.call_args.kwargs["args"][6] == int(when.timestamp())
+            assert call.call_args.kwargs["args"][0]["expiration"] == int(
+                when.timestamp()
+            )
             with pytest.raises(ValueError, match="timezone"):
-                await backend.trade.BuyLimit(
-                    0.1, 1.0, "EURUSD", 0.0, 0.0, 2, when.replace(tzinfo=None)
+                await backend.trade.OrderSend(
+                    TradeRequest(
+                        action=TradeAction.PENDING,
+                        symbol="EURUSD",
+                        volume=0.1,
+                        order_type=OrderType.BUY_LIMIT,
+                        price=1.0,
+                        expiration=when.replace(tzinfo=None),
+                    )
                 )
             assert call.call_count == 1
         finally:
@@ -124,9 +148,15 @@ def test_simulation_logs_exclude_payloads(monkeypatch: pytest.MonkeyPatch) -> No
         model.feed_tick("EURUSD", bid=1.1, ask=1.1002)
         facade = Trading(model)
         facade.arm()
-        assert await facade.trade.Buy(
-            0.1, "EURUSD", 0.0, 0.0, 0.0, "private-comment-marker"
+        res = await facade.trade.OrderSend(
+            TradeRequest(
+                action=TradeAction.DEAL,
+                symbol="EURUSD",
+                volume=0.1,
+                comment="private-comment-marker",
+            )
         )
+        assert res.retcode == 10009
         assert await facade.trade.PrintRequest()
         assert await facade.trade.PrintResult()
         await facade.close()
@@ -174,7 +204,13 @@ def test_native_timeout_retains_uncertainty(
             facade = Trading(backend)
             facade.arm()
             with pytest.raises(BridgeError, match="timed out") as error:
-                await facade.trade.Buy(0.1, "EURUSD")
+                await facade.trade.OrderSend(
+                    TradeRequest(
+                        action=TradeAction.DEAL,
+                        symbol="EURUSD",
+                        volume=0.1,
+                    )
+                )
             assert error.value.uncertain
             assert not bridge.armed
             command = facade.trade.last_command_id

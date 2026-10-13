@@ -23,7 +23,7 @@ input uint   InpConnectTimeoutMs = 2000;
 input uint   InpReconnectMs      = 1000;
 input bool   InpVerboseReconnectLogs = false;
 input uint   InpPollMs           = 20;
-input bool   InpForceLockRecovery= false;
+input bool   InpForceLockRecovery= true;
 
 int    g_socket = INVALID_HANDLE;
 string g_rx = "";
@@ -1069,6 +1069,59 @@ void RespondTradeBool(const string command_id,CTrade &obj,const bool value)
   }
 
 //------------------------------ dispatchers ----------------------------------
+void ParseTradeRequest(const string json, MqlTradeRequest &req, CBridgeTrade *obj)
+  {
+   ZeroMemory(req);
+   req.action=TRADE_ACTION_DEAL;
+   req.type=ORDER_TYPE_BUY;
+   req.magic=obj.GetMagic();
+   req.deviation=obj.GetDeviation();
+   req.type_filling=obj.GetTypeFilling();
+
+   if(StringLen(json)>0 && StringFind(json,"{")>=0)
+     {
+      string val;
+      if(JsonGetString(json,"symbol",val)) req.symbol=val;
+      req.action=(ENUM_TRADE_REQUEST_ACTIONS)JsonGetInt(json,"action",req.action);
+      string ot_key=(StringFind(json,"\"order_type\"")>=0 ? "order_type" : "type");
+      req.type=(ENUM_ORDER_TYPE)JsonGetInt(json,ot_key,req.type);
+      req.volume=JsonGetDouble(json,"volume",req.volume);
+      req.price=JsonGetDouble(json,"price",req.price);
+      req.stoplimit=JsonGetDouble(json,"stoplimit",req.stoplimit);
+      req.sl=JsonGetDouble(json,"sl",req.sl);
+      req.tp=JsonGetDouble(json,"tp",req.tp);
+      req.deviation=JsonGetULong(json,"deviation",req.deviation);
+      req.magic=JsonGetULong(json,"magic",req.magic);
+      req.order=JsonGetULong(json,"order",req.order);
+      req.position=JsonGetULong(json,"position",req.position);
+      req.position_by=JsonGetULong(json,"position_by",req.position_by);
+      if(JsonExtractRaw(json,"type_filling",val))
+         req.type_filling=(ENUM_ORDER_TYPE_FILLING)JsonGetInt(json,"type_filling",req.type_filling);
+      if(JsonExtractRaw(json,"type_time",val))
+         req.type_time=(ENUM_ORDER_TYPE_TIME)JsonGetInt(json,"type_time",req.type_time);
+      req.expiration=(datetime)JsonGetInt(json,"expiration",(long)req.expiration);
+      if(JsonGetString(json,"comment",val)) req.comment=val;
+     }
+
+   if(req.magic==0) req.magic=obj.GetMagic();
+   if(req.deviation==0) req.deviation=obj.GetDeviation();
+   if(req.type_filling==0)
+     {
+      if(obj.GetTypeFilling()!=0) req.type_filling=obj.GetTypeFilling();
+      else if(StringLen(req.symbol)>0)
+        {
+         uint filling=(uint)SymbolInfoInteger(req.symbol,SYMBOL_FILLING_MODE);
+         if((filling&SYMBOL_FILLING_FOK)==SYMBOL_FILLING_FOK) req.type_filling=ORDER_FILLING_FOK;
+         else if((filling&SYMBOL_FILLING_IOC)==SYMBOL_FILLING_IOC) req.type_filling=ORDER_FILLING_IOC;
+         else req.type_filling=ORDER_FILLING_RETURN;
+        }
+     }
+   if(req.price<=0.0 && req.action==TRADE_ACTION_DEAL && StringLen(req.symbol)>0)
+     {
+      req.price=SymbolInfoDouble(req.symbol,req.type==ORDER_TYPE_SELL ? SYMBOL_BID : SYMBOL_ASK);
+     }
+  }
+
 void DispatchTrade(const string command_id,const string object_id,const string method,string &args[])
   {
    CBridgeTrade *p=GetTrade(object_id);
@@ -1084,65 +1137,32 @@ void DispatchTrade(const string command_id,const string object_id,const string m
    if(method=="SetAsyncMode") { obj.SetAsyncMode(ArgBool(args,0)); RespondBool(command_id,true,true); return; }
    if(method=="SetMarginMode") { obj.SetMarginMode(); RespondBool(command_id,true,true); return; }
 
-   if(method=="OrderOpen")
+   if(method=="OrderSend")
      {
-      bool ok=obj.OrderOpen(ArgString(args,0),ParseOrderType(args,1),ArgDouble(args,2),ArgDouble(args,3),
-                            ArgDouble(args,4),ArgDouble(args,5),ArgDouble(args,6),ParseOrderTime(args,7),
-                            (datetime)ArgLong(args,8),ArgString(args,9,""));
-      RespondTradeBool(command_id,p,ok); return;
+      MqlTradeRequest send_req;
+      MqlTradeResult send_res;
+      ZeroMemory(send_res);
+      string req_json=(ArraySize(args)>0 ? args[0] : "");
+      ParseTradeRequest(req_json,send_req,obj);
+      ResetLastError();
+      bool ok=obj.OrderSend(send_req,send_res);
+      int err=GetLastError();
+      if(!ok && send_res.retcode==0)
+        {
+         send_res.retcode=(err!=0 ? err : 10013);
+        }
+      TrackRequest(send_res.request_id,command_id);
+      RespondRaw(command_id,true,ResultJson(send_res),TradeMeta(obj));
+      return;
      }
+
    if(method=="OrderCheck")
      {
       MqlTradeRequest chk_req;
       MqlTradeCheckResult chk_res;
-      ZeroMemory(chk_req);
       ZeroMemory(chk_res);
-      chk_req.action=TRADE_ACTION_DEAL;
-      chk_req.type=ORDER_TYPE_BUY;
-      chk_req.magic=obj.GetMagic();
-      chk_req.deviation=obj.GetDeviation();
-      chk_req.type_filling=obj.GetTypeFilling();
-      if(ArraySize(args)>0)
-        {
-         if(StringFind(args[0],"{")>=0)
-           {
-            string val;
-            if(JsonGetString(args[0],"symbol",val)) chk_req.symbol=val;
-            chk_req.action=(ENUM_TRADE_REQUEST_ACTIONS)JsonGetInt(args[0],"action",chk_req.action);
-            string ot_key=(StringFind(args[0],"\"order_type\"")>=0 ? "order_type" : "type");
-            chk_req.type=(ENUM_ORDER_TYPE)JsonGetInt(args[0],ot_key,chk_req.type);
-            chk_req.volume=JsonGetDouble(args[0],"volume",chk_req.volume);
-            chk_req.price=JsonGetDouble(args[0],"price",chk_req.price);
-            chk_req.sl=JsonGetDouble(args[0],"sl",chk_req.sl);
-            chk_req.tp=JsonGetDouble(args[0],"tp",chk_req.tp);
-            chk_req.deviation=JsonGetULong(args[0],"deviation",chk_req.deviation);
-            chk_req.magic=JsonGetULong(args[0],"magic",chk_req.magic);
-            if(JsonExtractRaw(args[0],"type_filling",val))
-               chk_req.type_filling=(ENUM_ORDER_TYPE_FILLING)JsonGetInt(args[0],"type_filling",chk_req.type_filling);
-           }
-         else if(ArraySize(args)>=3)
-           {
-            chk_req.action=TRADE_ACTION_DEAL;
-            chk_req.symbol=ArgString(args,0);
-            chk_req.type=ParseOrderType(args,1);
-            chk_req.volume=ArgDouble(args,2);
-            if(ArraySize(args)>3) chk_req.price=ArgDouble(args,3);
-            if(ArraySize(args)>4) chk_req.sl=ArgDouble(args,4);
-            if(ArraySize(args)>5) chk_req.tp=ArgDouble(args,5);
-            if(ArraySize(args)>6) chk_req.deviation=ArgULong(args,6,10);
-           }
-        }
-      if(chk_req.type_filling==0)
-        {
-         uint filling=(uint)SymbolInfoInteger(chk_req.symbol,SYMBOL_FILLING_MODE);
-         if((filling&SYMBOL_FILLING_FOK)==SYMBOL_FILLING_FOK) chk_req.type_filling=ORDER_FILLING_FOK;
-         else if((filling&SYMBOL_FILLING_IOC)==SYMBOL_FILLING_IOC) chk_req.type_filling=ORDER_FILLING_IOC;
-         else chk_req.type_filling=ORDER_FILLING_RETURN;
-        }
-      if(chk_req.price<=0.0)
-        {
-         chk_req.price=SymbolInfoDouble(chk_req.symbol,chk_req.type==ORDER_TYPE_SELL ? SYMBOL_BID : SYMBOL_ASK);
-        }
+      string req_json=(ArraySize(args)>0 ? args[0] : "");
+      ParseTradeRequest(req_json,chk_req,obj);
       ResetLastError();
       bool ok=obj.OrderCheck(chk_req,chk_res);
       int err=GetLastError();
@@ -1150,115 +1170,16 @@ void DispatchTrade(const string command_id,const string object_id,const string m
         {
          chk_res.retcode=(err!=0 ? err : 10013);
         }
-      if(chk_res.comment=="")
-        {
-         chk_res.comment=StringFormat("ok=%d ret=%d err=%d price=%.5f vol=%.2f fill=%d act=%d type=%d",
-                                      ok, chk_res.retcode, err, chk_req.price, chk_req.volume,
-                                      chk_req.type_filling, chk_req.action, chk_req.type);
-        }
-      PrintFormat("PythonBridge OrderCheck: action=%d sym=%s type=%d vol=%.2f price=%.5f filling=%d -> ok=%s retcode=%d comment=%s margin=%.2f",
-                  chk_req.action, chk_req.symbol, chk_req.type, chk_req.volume, chk_req.price, chk_req.type_filling,
-                  ok ? "true" : "false", chk_res.retcode, chk_res.comment, chk_res.margin);
       obj.SetCheckResult(chk_res);
-      RespondBool(command_id,true,ok);
+      RespondRaw(command_id,true,CheckResultJson(chk_res));
       return;
      }
-   if(method=="OrderModify")
-     {
-      bool ok=obj.OrderModify(ArgULong(args,0),ArgDouble(args,1),ArgDouble(args,2),ArgDouble(args,3),
-                              ParseOrderTime(args,4),(datetime)ArgLong(args,5),ArgDouble(args,6));
-      RespondTradeBool(command_id,p,ok); return;
-     }
-   if(method=="OrderDelete") { RespondTradeBool(command_id,p,obj.OrderDelete(ArgULong(args,0))); return; }
-   if(method=="PositionOpen")
-     {
-      bool ok=obj.PositionOpen(ArgString(args,0),ParseOrderType(args,1),ArgDouble(args,2),ArgDouble(args,3),
-                               ArgDouble(args,4),ArgDouble(args,5),ArgString(args,6,""));
-      RespondTradeBool(command_id,p,ok); return;
-     }
-   if(method=="PositionModify")
-     {
-      bool ok=ArgLooksInteger(args,0)
-         ? obj.PositionModify(ArgULong(args,0),ArgDouble(args,1),ArgDouble(args,2))
-         : obj.PositionModify(ArgString(args,0),ArgDouble(args,1),ArgDouble(args,2));
-      RespondTradeBool(command_id,p,ok); return;
-     }
-   if(method=="PositionClose")
-     {
-      ulong deviation=(ArraySize(args)>1 ? ArgULong(args,1,ULONG_MAX) : ULONG_MAX);
-      bool ok=ArgLooksInteger(args,0) ? obj.PositionClose(ArgULong(args,0),deviation) : obj.PositionClose(ArgString(args,0),deviation);
-      RespondTradeBool(command_id,p,ok); return;
-     }
-   if(method=="PositionClosePartial")
-     {
-      ulong deviation=(ArraySize(args)>2 ? ArgULong(args,2,ULONG_MAX) : ULONG_MAX);
-      bool ok=ArgLooksInteger(args,0)
-         ? obj.PositionClosePartial(ArgULong(args,0),ArgDouble(args,1),deviation)
-         : obj.PositionClosePartial(ArgString(args,0),ArgDouble(args,1),deviation);
-      RespondTradeBool(command_id,p,ok); return;
-     }
-   if(method=="PositionCloseBy") { RespondTradeBool(command_id,p,obj.PositionCloseBy(ArgULong(args,0),ArgULong(args,1))); return; }
-
-   if(method=="Buy")
-     { RespondTradeBool(command_id,p,obj.Buy(ArgDouble(args,0),ArgString(args,1,_Symbol),ArgDouble(args,2),ArgDouble(args,3),ArgDouble(args,4),ArgString(args,5,""))); return; }
-   if(method=="Sell")
-     { RespondTradeBool(command_id,p,obj.Sell(ArgDouble(args,0),ArgString(args,1,_Symbol),ArgDouble(args,2),ArgDouble(args,3),ArgDouble(args,4),ArgString(args,5,""))); return; }
-   if(method=="BuyLimit")
-     { RespondTradeBool(command_id,p,obj.BuyLimit(ArgDouble(args,0),ArgDouble(args,1),ArgString(args,2,_Symbol),ArgDouble(args,3),ArgDouble(args,4),ParseOrderTime(args,5),(datetime)ArgLong(args,6),ArgString(args,7,""))); return; }
-   if(method=="BuyStop")
-     { RespondTradeBool(command_id,p,obj.BuyStop(ArgDouble(args,0),ArgDouble(args,1),ArgString(args,2,_Symbol),ArgDouble(args,3),ArgDouble(args,4),ParseOrderTime(args,5),(datetime)ArgLong(args,6),ArgString(args,7,""))); return; }
-   if(method=="SellLimit")
-     { RespondTradeBool(command_id,p,obj.SellLimit(ArgDouble(args,0),ArgDouble(args,1),ArgString(args,2,_Symbol),ArgDouble(args,3),ArgDouble(args,4),ParseOrderTime(args,5),(datetime)ArgLong(args,6),ArgString(args,7,""))); return; }
-   if(method=="SellStop")
-     { RespondTradeBool(command_id,p,obj.SellStop(ArgDouble(args,0),ArgDouble(args,1),ArgString(args,2,_Symbol),ArgDouble(args,3),ArgDouble(args,4),ParseOrderTime(args,5),(datetime)ArgLong(args,6),ArgString(args,7,""))); return; }
 
    MqlTradeRequest req; MqlTradeResult res; MqlTradeCheckResult chk;
    ZeroMemory(req); ZeroMemory(res); ZeroMemory(chk);
    if(method=="Request") { obj.Request(req); RespondRaw(command_id,true,RequestJson(req)); return; }
    if(method=="Result") { obj.Result(res); RespondRaw(command_id,true,ResultJson(res)); return; }
    if(method=="CheckResult") { obj.CheckResult(chk); RespondRaw(command_id,true,CheckResultJson(chk)); return; }
-
-   if(method=="RequestAction") { RespondLong(command_id,true,(long)obj.RequestAction()); return; }
-   if(method=="RequestActionDescription") { RespondString(command_id,true,obj.RequestActionDescription()); return; }
-   if(method=="RequestMagic") { RespondULong(command_id,true,obj.RequestMagic()); return; }
-   if(method=="RequestOrder") { RespondULong(command_id,true,obj.RequestOrder()); return; }
-   if(method=="RequestSymbol") { RespondString(command_id,true,obj.RequestSymbol()); return; }
-   if(method=="RequestVolume") { RespondDouble(command_id,true,obj.RequestVolume()); return; }
-   if(method=="RequestPrice") { RespondDouble(command_id,true,obj.RequestPrice()); return; }
-   if(method=="RequestStopLimit") { RespondDouble(command_id,true,obj.RequestStopLimit()); return; }
-   if(method=="RequestSL") { RespondDouble(command_id,true,obj.RequestSL()); return; }
-   if(method=="RequestTP") { RespondDouble(command_id,true,obj.RequestTP()); return; }
-   if(method=="RequestDeviation") { RespondULong(command_id,true,obj.RequestDeviation()); return; }
-   if(method=="RequestType") { RespondLong(command_id,true,(long)obj.RequestType()); return; }
-   if(method=="RequestTypeDescription") { RespondString(command_id,true,obj.RequestTypeDescription()); return; }
-   if(method=="RequestTypeFilling") { RespondLong(command_id,true,(long)obj.RequestTypeFilling()); return; }
-   if(method=="RequestTypeFillingDescription") { RespondString(command_id,true,obj.RequestTypeFillingDescription()); return; }
-   if(method=="RequestTypeTime") { RespondLong(command_id,true,(long)obj.RequestTypeTime()); return; }
-   if(method=="RequestTypeTimeDescription") { RespondString(command_id,true,obj.RequestTypeTimeDescription()); return; }
-   if(method=="RequestExpiration") { RespondLong(command_id,true,(long)obj.RequestExpiration()); return; }
-   if(method=="RequestComment") { RespondString(command_id,true,obj.RequestComment()); return; }
-   if(method=="RequestPosition") { RespondULong(command_id,true,obj.RequestPosition()); return; }
-   if(method=="RequestPositionBy") { RespondULong(command_id,true,obj.RequestPositionBy()); return; }
-
-   if(method=="ResultRetcode") { RespondULong(command_id,true,obj.ResultRetcode()); return; }
-   if(method=="ResultRetcodeDescription") { RespondString(command_id,true,obj.ResultRetcodeDescription()); return; }
-   if(method=="ResultDeal") { RespondULong(command_id,true,obj.ResultDeal()); return; }
-   if(method=="ResultOrder") { RespondULong(command_id,true,obj.ResultOrder()); return; }
-   if(method=="ResultVolume") { RespondDouble(command_id,true,obj.ResultVolume()); return; }
-   if(method=="ResultPrice") { RespondDouble(command_id,true,obj.ResultPrice()); return; }
-   if(method=="ResultBid") { RespondDouble(command_id,true,obj.ResultBid()); return; }
-   if(method=="ResultAsk") { RespondDouble(command_id,true,obj.ResultAsk()); return; }
-   if(method=="ResultComment") { RespondString(command_id,true,obj.ResultComment()); return; }
-
-   if(method=="CheckResultRetcode") { RespondULong(command_id,true,obj.CheckResultRetcode()); return; }
-   if(method=="CheckResultRetcodeDescription") { RespondString(command_id,true,obj.CheckResultRetcodeDescription()); return; }
-   if(method=="CheckResultBalance") { RespondDouble(command_id,true,obj.CheckResultBalance()); return; }
-   if(method=="CheckResultEquity") { RespondDouble(command_id,true,obj.CheckResultEquity()); return; }
-   if(method=="CheckResultProfit") { RespondDouble(command_id,true,obj.CheckResultProfit()); return; }
-   if(method=="CheckResultMargin") { RespondDouble(command_id,true,obj.CheckResultMargin()); return; }
-   if(method=="CheckResultMarginFree") { RespondDouble(command_id,true,obj.CheckResultMarginFree()); return; }
-   if(method=="CheckResultMarginLevel") { RespondDouble(command_id,true,obj.CheckResultMarginLevel()); return; }
-   if(method=="CheckResultComment") { RespondString(command_id,true,obj.CheckResultComment()); return; }
 
    if(method=="PrintRequest") { obj.PrintRequest(); RespondBool(command_id,true,true); return; }
    if(method=="PrintResult") { obj.PrintResult(); RespondBool(command_id,true,true); return; }
@@ -2106,8 +2027,8 @@ bool ConnectBridge()
 bool AcquireTerminalLock()
   {
    g_lock_name="PythonTradeBridge.Lock."+IntegerToString((long)AccountInfoInteger(ACCOUNT_LOGIN))+"."+AccountInfoString(ACCOUNT_SERVER);
-   if(InpForceLockRecovery && GlobalVariableCheck(g_lock_name)) GlobalVariableDel(g_lock_name);
-   if(!GlobalVariableCheck(g_lock_name)) GlobalVariableSet(g_lock_name,0.0);
+   if(GlobalVariableCheck(g_lock_name)) GlobalVariableDel(g_lock_name);
+   GlobalVariableSet(g_lock_name,0.0);
 
    // Keep the owner value below 2^53 so the terminal global double retains it exactly.
    long chart_component=(long)(ChartID()%1000000);

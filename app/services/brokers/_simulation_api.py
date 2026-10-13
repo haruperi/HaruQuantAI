@@ -252,7 +252,7 @@ def _accountinfo__a(self: _ObjectState) -> Any:
 
 def _accountinfo_accountinfo(self: _ObjectState) -> AccountSnapshot:
     account = _accountinfo__a(self)
-    if is_dataclass(account) and not isinstance(account, type):
+    if isinstance(account, AccountSnapshot):
         trade_mode = AccountTradeMode(account.trade_mode)
         stopout_mode = StopoutMode(account.stopout_mode)
         margin_mode = MarginMode(account.margin_mode)
@@ -1260,25 +1260,53 @@ def _trade___init__(self: _ObjectState, backend: BrokerBackend) -> None:
     self._last_check = TradeCheckResult()
 
 
-def _trade__send(self: _ObjectState, request: TradeRequest) -> bool:
-    self._last_request = replace(request)
-    self._last_check = self._backend.order_check(request)
-    if self._last_check.retcode not in {
-        0,
-        int(TradeRetcode.DONE),
-        int(TradeRetcode.PLACED),
-        int(TradeRetcode.DONE_PARTIAL),
-    }:
-        self._last_result = TradeResult(
-            retcode=self._last_check.retcode, comment=self._last_check.comment
-        )
-        return False
-    self._last_result = self._backend.order_send(request)
-    return self._last_result.retcode in {
-        int(TradeRetcode.DONE),
-        int(TradeRetcode.PLACED),
-        int(TradeRetcode.DONE_PARTIAL),
-        int(TradeRetcode.NO_CHANGES),
+def _result_to_dict(res: TradeResult) -> dict[str, Any]:
+    return {
+        "retcode": res.retcode,
+        "deal": res.deal,
+        "order": res.order,
+        "volume": res.volume,
+        "price": res.price,
+        "bid": res.bid,
+        "ask": res.ask,
+        "comment": res.comment,
+        "request_id": res.request_id,
+        "retcode_external": res.retcode_external,
+    }
+
+
+def _check_result_to_dict(chk: TradeCheckResult) -> dict[str, Any]:
+    return {
+        "retcode": chk.retcode,
+        "balance": chk.balance,
+        "equity": chk.equity,
+        "profit": chk.profit,
+        "margin": chk.margin,
+        "margin_free": chk.margin_free,
+        "margin_level": chk.margin_level,
+        "comment": chk.comment,
+    }
+
+
+def _request_to_dict(req: TradeRequest) -> dict[str, Any]:
+    return {
+        "action": int(req.action),
+        "symbol": req.symbol,
+        "volume": req.volume,
+        "order_type": int(req.order_type),
+        "price": req.price,
+        "stoplimit": req.stoplimit,
+        "sl": req.sl,
+        "tp": req.tp,
+        "deviation": req.deviation,
+        "magic": req.magic,
+        "order": req.order,
+        "position": req.position,
+        "position_by": req.position_by,
+        "type_filling": int(req.type_filling),
+        "type_time": int(req.type_time),
+        "expiration": int(req.expiration.timestamp()) if req.expiration else None,
+        "comment": req.comment,
     }
 
 
@@ -1295,9 +1323,8 @@ def _parse_trade_request(self: _ObjectState, data: dict[str, Any]) -> TradeReque
         if isinstance(type_val, str)
         else OrderType(type_val)
     )
-    fill_val = data.get(
-        "type_filling", data.get("filling", self._filling or OrderFilling.FOK)
-    )
+    fill_raw = data.get("type_filling", data.get("filling", 0))
+    fill_val = fill_raw or (self._filling or OrderFilling.FOK)
     filling = (
         OrderFilling[fill_val.removeprefix("ORDER_FILLING_")]
         if isinstance(fill_val, str)
@@ -1309,69 +1336,90 @@ def _parse_trade_request(self: _ObjectState, data: dict[str, Any]) -> TradeReque
         if isinstance(time_val, str)
         else OrderTime(time_val)
     )
+    symbol = str(data.get("symbol", self.symbol_name or ""))
+    price = float(data.get("price", 0.0))
+    if price == 0.0 and action == TradeAction.DEAL and symbol:
+        tick = self._backend.tick(symbol)
+        if tick is not None:
+            price = tick.ask if order_type == OrderType.BUY else tick.bid
+
+    exp = data.get("expiration")
+    if isinstance(exp, (int, float)):
+        exp_dt = datetime.fromtimestamp(exp, tz=UTC) if exp else None
+    elif isinstance(exp, datetime):
+        exp_dt = exp
+    else:
+        exp_dt = None
+
+    magic_req = int(data.get("magic", 0))
+    magic = magic_req if magic_req != 0 else (self._magic or 0)
+    dev_req = int(data.get("deviation", 0))
+    deviation = dev_req if dev_req != 0 else (self._deviation or 10)
+
     return TradeRequest(
         action=action,
-        symbol=str(data.get("symbol", self.symbol_name or "")),
+        symbol=symbol,
         volume=float(data.get("volume", 0.0)),
         order_type=order_type,
-        price=float(data.get("price", 0.0)),
+        price=price,
         stoplimit=float(data.get("stoplimit", 0.0)),
         sl=float(data.get("sl", 0.0)),
         tp=float(data.get("tp", 0.0)),
-        deviation=int(data.get("deviation", self._deviation or 10)),
-        magic=int(data.get("magic", self._magic or 0)),
+        deviation=deviation,
+        magic=magic,
         order=int(data.get("order", 0)),
         position=int(data.get("position", 0)),
         position_by=int(data.get("position_by", 0)),
         type_filling=filling,
         type_time=time_type,
-        expiration=data.get("expiration"),
+        expiration=exp_dt,
         comment=str(data.get("comment", "")),
     )
 
 
-def _trade_ordercheck(self: _ObjectState, *args: Any, **kwargs: Any) -> bool:
-    if args and isinstance(args[0], TradeRequest):
-        req = args[0]
-    elif args and isinstance(args[0], dict):
-        req = _parse_trade_request(self, args[0])
-    elif kwargs:
-        req = _parse_trade_request(self, kwargs)
-    else:
-        req = replace(self._last_request)
+def _trade_ordersend(self: _ObjectState, data: dict[str, Any]) -> dict[str, Any]:
+    req = _parse_trade_request(self, data)
     self._last_request = replace(req)
     self._last_check = self._backend.order_check(req)
-    return self._last_check.retcode in {
+    if self._last_check.retcode not in {
         0,
         int(TradeRetcode.DONE),
         int(TradeRetcode.PLACED),
         int(TradeRetcode.DONE_PARTIAL),
-    }
+    }:
+        self._last_result = TradeResult(
+            retcode=self._last_check.retcode, comment=self._last_check.comment
+        )
+    else:
+        self._last_result = self._backend.order_send(req)
+    return _result_to_dict(self._last_result)
 
 
-def _trade__position(self: _ObjectState, symbol_or_ticket: str | int) -> Any:
-    positions = self._backend.positions()
-    if isinstance(symbol_or_ticket, int):
-        return next((p for p in positions if p.ticket == symbol_or_ticket), None)
-    candidates = [p for p in positions if p.symbol == symbol_or_ticket]
-    candidates.sort(key=lambda p: p.ticket)
-    return candidates[0] if candidates else None
+def _trade_ordercheck(self: _ObjectState, data: dict[str, Any]) -> dict[str, Any]:
+    req = _parse_trade_request(self, data)
+    self._last_request = replace(req)
+    self._last_check = self._backend.order_check(req)
+    return _check_result_to_dict(self._last_check)
 
 
-def _trade_loglevel(self: _ObjectState, log_level: int) -> None:
+def _trade_loglevel(self: _ObjectState, log_level: int) -> bool:
     self._log_level = log_level
+    return True
 
 
-def _trade_setexpertmagicnumber(self: _ObjectState, magic: int) -> None:
+def _trade_setexpertmagicnumber(self: _ObjectState, magic: int) -> bool:
     self._magic = magic
+    return True
 
 
-def _trade_setdeviationinpoints(self: _ObjectState, deviation: int) -> None:
+def _trade_setdeviationinpoints(self: _ObjectState, deviation: int) -> bool:
     self._deviation = deviation
+    return True
 
 
-def _trade_settypefilling(self: _ObjectState, filling: OrderFilling | int) -> None:
+def _trade_settypefilling(self: _ObjectState, filling: OrderFilling | int) -> bool:
     self._filling = OrderFilling(filling)
+    return True
 
 
 def _trade_settypefillingbysymbol(self: _ObjectState, symbol: str) -> bool:
@@ -1388,559 +1436,38 @@ def _trade_settypefillingbysymbol(self: _ObjectState, symbol: str) -> bool:
     return True
 
 
-def _trade_setasyncmode(self: _ObjectState, mode: bool) -> None:
+def _trade_setasyncmode(self: _ObjectState, mode: bool) -> bool:
     self._async = mode
+    return True
 
 
-def _trade_setmarginmode(self: _ObjectState) -> None:
+def _trade_setmarginmode(self: _ObjectState) -> bool:
     _ = self._backend.account().margin_mode
+    return True
 
 
-def _trade_orderopen(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    symbol: str,
-    order_type: OrderType | int,
-    volume: float,
-    limit_price: float,
-    price: float,
-    sl: float = 0.0,
-    tp: float = 0.0,
-    type_time: OrderTime | int = OrderTime.GTC,
-    expiration: datetime | None = None,
-    comment: str = "",
-) -> bool:
-    return _trade__send(
-        self,
-        TradeRequest(
-            action=TradeAction.PENDING,
-            symbol=symbol,
-            volume=volume,
-            order_type=OrderType(order_type),
-            price=price,
-            stoplimit=limit_price,
-            sl=sl,
-            tp=tp,
-            deviation=self._deviation,
-            magic=self._magic,
-            type_filling=self._filling,
-            type_time=OrderTime(type_time),
-            expiration=expiration,
-            comment=comment,
-        ),
-    )
+def _trade_request(self: _ObjectState) -> dict[str, Any]:
+    return _request_to_dict(self._last_request)
 
 
-def _trade_ordermodify(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    ticket: int,
-    price: float,
-    sl: float,
-    tp: float,
-    type_time: OrderTime | int = OrderTime.GTC,
-    expiration: datetime | None = None,
-    stoplimit: float = 0.0,
-) -> bool:
-    order = next((o for o in self._backend.orders() if o.ticket == ticket), None)
-    if order is None:
-        self._last_result = TradeResult(
-            retcode=int(TradeRetcode.INVALID_ORDER), comment=f"Order {ticket} not found"
-        )
-        return False
-    return _trade__send(
-        self,
-        TradeRequest(
-            action=TradeAction.MODIFY,
-            symbol=order.symbol,
-            order=ticket,
-            volume=order.volume_current,
-            order_type=order.order_type,
-            price=price,
-            stoplimit=stoplimit,
-            sl=sl,
-            tp=tp,
-            magic=self._magic,
-            type_filling=order.type_filling,
-            type_time=OrderTime(type_time),
-            expiration=expiration,
-            comment=order.comment,
-        ),
-    )
+def _trade_result(self: _ObjectState) -> dict[str, Any]:
+    return _result_to_dict(self._last_result)
 
 
-def _trade_orderdelete(self: _ObjectState, ticket: int) -> bool:
-    return _trade__send(
-        self, TradeRequest(action=TradeAction.REMOVE, order=ticket, magic=self._magic)
-    )
+def _trade_checkresult(self: _ObjectState) -> dict[str, Any]:
+    return _check_result_to_dict(self._last_check)
 
 
-def _trade_positionopen(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    symbol: str,
-    order_type: OrderType | int,
-    volume: float,
-    price: float = 0.0,
-    sl: float = 0.0,
-    tp: float = 0.0,
-    comment: str = "",
-) -> bool:
-    return _trade__send(
-        self,
-        TradeRequest(
-            action=TradeAction.DEAL,
-            symbol=symbol,
-            volume=volume,
-            order_type=OrderType(order_type),
-            price=price,
-            sl=sl,
-            tp=tp,
-            deviation=self._deviation,
-            magic=self._magic,
-            type_filling=self._filling,
-            comment=comment,
-        ),
-    )
-
-
-def _trade_positionmodify(
-    self: _ObjectState, symbol_or_ticket: str | int, sl: float, tp: float
-) -> bool:
-    position = _trade__position(self, symbol_or_ticket)
-    if position is None:
-        self._last_result = TradeResult(
-            retcode=int(TradeRetcode.POSITION_CLOSED),
-            comment=f"Position {symbol_or_ticket!r} not found",
-        )
-        return False
-    return _trade__send(
-        self,
-        TradeRequest(
-            action=TradeAction.SLTP,
-            symbol=position.symbol,
-            position=position.ticket,
-            sl=sl,
-            tp=tp,
-            magic=self._magic,
-        ),
-    )
-
-
-def _trade_positionclose(
-    self: _ObjectState, symbol_or_ticket: str | int, deviation: int | None = None
-) -> bool:
-    position = _trade__position(self, symbol_or_ticket)
-    if position is None:
-        self._last_result = TradeResult(
-            retcode=int(TradeRetcode.POSITION_CLOSED),
-            comment=f"Position {symbol_or_ticket!r} not found",
-        )
-        return False
-    opposite = (
-        OrderType.SELL if position.position_type == PositionType.BUY else OrderType.BUY
-    )
-    tick = self._backend.tick(position.symbol)
-    price = 0.0
-    if tick is not None:
-        price = tick.bid if opposite == OrderType.SELL else tick.ask
-    return _trade__send(
-        self,
-        TradeRequest(
-            action=TradeAction.DEAL,
-            symbol=position.symbol,
-            position=position.ticket,
-            volume=position.volume,
-            order_type=opposite,
-            price=price,
-            deviation=self._deviation if deviation is None else deviation,
-            magic=self._magic,
-            type_filling=self._filling,
-            comment="position close",
-        ),
-    )
-
-
-def _trade_positionclosepartial(
-    self: _ObjectState,
-    symbol_or_ticket: str | int,
-    volume: float,
-    deviation: int | None = None,
-) -> bool:
-    position = _trade__position(self, symbol_or_ticket)
-    if position is None:
-        self._last_result = TradeResult(
-            retcode=int(TradeRetcode.POSITION_CLOSED),
-            comment=f"Position {symbol_or_ticket!r} not found",
-        )
-        return False
-    opposite = (
-        OrderType.SELL if position.position_type == PositionType.BUY else OrderType.BUY
-    )
-    tick = self._backend.tick(position.symbol)
-    price = 0.0
-    if tick is not None:
-        price = tick.bid if opposite == OrderType.SELL else tick.ask
-    return _trade__send(
-        self,
-        TradeRequest(
-            action=TradeAction.DEAL,
-            symbol=position.symbol,
-            position=position.ticket,
-            volume=volume,
-            order_type=opposite,
-            price=price,
-            deviation=self._deviation if deviation is None else deviation,
-            magic=self._magic,
-            type_filling=self._filling,
-            comment="partial close",
-        ),
-    )
-
-
-def _trade_positioncloseby(self: _ObjectState, ticket: int, ticket_by: int) -> bool:
-    return _trade__send(
-        self,
-        TradeRequest(
-            action=TradeAction.CLOSE_BY,
-            position=ticket,
-            position_by=ticket_by,
-            magic=self._magic,
-        ),
-    )
-
-
-def _trade_buy(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    volume: float,
-    symbol: str | None = None,
-    price: float = 0.0,
-    sl: float = 0.0,
-    tp: float = 0.0,
-    comment: str = "",
-) -> bool:
-    if not symbol:
-        raise ValueError("symbol is required")
-    if price == 0.0:
-        tick = self._backend.tick(symbol)
-        if tick is not None:
-            price = tick.ask
-    return _trade_positionopen(
-        self, symbol, OrderType.BUY, volume, price, sl, tp, comment
-    )
-
-
-def _trade_sell(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    volume: float,
-    symbol: str | None = None,
-    price: float = 0.0,
-    sl: float = 0.0,
-    tp: float = 0.0,
-    comment: str = "",
-) -> bool:
-    if not symbol:
-        raise ValueError("symbol is required")
-    if price == 0.0:
-        tick = self._backend.tick(symbol)
-        if tick is not None:
-            price = tick.bid
-    return _trade_positionopen(
-        self, symbol, OrderType.SELL, volume, price, sl, tp, comment
-    )
-
-
-def _trade_buylimit(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    volume: float,
-    price: float,
-    symbol: str | None = None,
-    sl: float = 0.0,
-    tp: float = 0.0,
-    type_time: OrderTime | int = OrderTime.GTC,
-    expiration: datetime | None = None,
-    comment: str = "",
-) -> bool:
-    if not symbol:
-        raise ValueError("symbol is required")
-    return _trade_orderopen(
-        self,
-        symbol,
-        OrderType.BUY_LIMIT,
-        volume,
-        0.0,
-        price,
-        sl,
-        tp,
-        type_time,
-        expiration,
-        comment,
-    )
-
-
-def _trade_buystop(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    volume: float,
-    price: float,
-    symbol: str | None = None,
-    sl: float = 0.0,
-    tp: float = 0.0,
-    type_time: OrderTime | int = OrderTime.GTC,
-    expiration: datetime | None = None,
-    comment: str = "",
-) -> bool:
-    if not symbol:
-        raise ValueError("symbol is required")
-    return _trade_orderopen(
-        self,
-        symbol,
-        OrderType.BUY_STOP,
-        volume,
-        0.0,
-        price,
-        sl,
-        tp,
-        type_time,
-        expiration,
-        comment,
-    )
-
-
-def _trade_selllimit(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    volume: float,
-    price: float,
-    symbol: str | None = None,
-    sl: float = 0.0,
-    tp: float = 0.0,
-    type_time: OrderTime | int = OrderTime.GTC,
-    expiration: datetime | None = None,
-    comment: str = "",
-) -> bool:
-    if not symbol:
-        raise ValueError("symbol is required")
-    return _trade_orderopen(
-        self,
-        symbol,
-        OrderType.SELL_LIMIT,
-        volume,
-        0.0,
-        price,
-        sl,
-        tp,
-        type_time,
-        expiration,
-        comment,
-    )
-
-
-def _trade_sellstop(  # noqa: PLR0917 -- native compatibility signature
-    self: _ObjectState,
-    volume: float,
-    price: float,
-    symbol: str | None = None,
-    sl: float = 0.0,
-    tp: float = 0.0,
-    type_time: OrderTime | int = OrderTime.GTC,
-    expiration: datetime | None = None,
-    comment: str = "",
-) -> bool:
-    if not symbol:
-        raise ValueError("symbol is required")
-    return _trade_orderopen(
-        self,
-        symbol,
-        OrderType.SELL_STOP,
-        volume,
-        0.0,
-        price,
-        sl,
-        tp,
-        type_time,
-        expiration,
-        comment,
-    )
-
-
-def _trade_request(self: _ObjectState) -> TradeRequest:
-    return cast("TradeRequest", replace(self._last_request))
-
-
-def _trade_requestaction(self: _ObjectState) -> TradeAction:
-    return TradeAction(self._last_request.action)
-
-
-def _trade_requestactiondescription(self: _ObjectState) -> str:
-    return _trade_requestaction(self).name.replace("_", " ").title()
-
-
-def _trade_requestmagic(self: _ObjectState) -> int:
-    return int(self._last_request.magic)
-
-
-def _trade_requestorder(self: _ObjectState) -> int:
-    return int(self._last_request.order)
-
-
-def _trade_requestsymbol(self: _ObjectState) -> str:
-    return cast("str", self._last_request.symbol)
-
-
-def _trade_requestvolume(self: _ObjectState) -> float:
-    return float(self._last_request.volume)
-
-
-def _trade_requestprice(self: _ObjectState) -> float:
-    return float(self._last_request.price)
-
-
-def _trade_requeststoplimit(self: _ObjectState) -> float:
-    return float(self._last_request.stoplimit)
-
-
-def _trade_requestsl(self: _ObjectState) -> float:
-    return float(self._last_request.sl)
-
-
-def _trade_requesttp(self: _ObjectState) -> float:
-    return float(self._last_request.tp)
-
-
-def _trade_requestdeviation(self: _ObjectState) -> int:
-    return int(self._last_request.deviation)
-
-
-def _trade_requesttype(self: _ObjectState) -> OrderType:
-    return OrderType(self._last_request.order_type)
-
-
-def _trade_requesttypedescription(self: _ObjectState) -> str:
-    return ORDER_TYPE_DESCRIPTIONS.get(
-        _trade_requesttype(self), _trade_requesttype(self).name
-    )
-
-
-def _trade_requesttypefilling(self: _ObjectState) -> OrderFilling:
-    return OrderFilling(self._last_request.type_filling)
-
-
-def _trade_requesttypefillingdescription(self: _ObjectState) -> str:
-    return ORDER_FILLING_DESCRIPTIONS.get(
-        _trade_requesttypefilling(self), _trade_requesttypefilling(self).name
-    )
-
-
-def _trade_requesttypetime(self: _ObjectState) -> OrderTime:
-    return OrderTime(self._last_request.type_time)
-
-
-def _trade_requesttypetimedescription(self: _ObjectState) -> str:
-    return ORDER_TIME_DESCRIPTIONS.get(
-        _trade_requesttypetime(self), _trade_requesttypetime(self).name
-    )
-
-
-def _trade_requestexpiration(self: _ObjectState) -> datetime | None:
-    return cast("datetime | None", self._last_request.expiration)
-
-
-def _trade_requestcomment(self: _ObjectState) -> str:
-    return cast("str", self._last_request.comment)
-
-
-def _trade_requestposition(self: _ObjectState) -> int:
-    return int(self._last_request.position)
-
-
-def _trade_requestpositionby(self: _ObjectState) -> int:
-    return int(self._last_request.position_by)
-
-
-def _trade_result(self: _ObjectState) -> TradeResult:
-    return cast("TradeResult", replace(self._last_result))
-
-
-def _trade_resultretcode(self: _ObjectState) -> int:
-    return int(self._last_result.retcode)
-
-
-def _trade_resultretcodedescription(self: _ObjectState) -> str:
-    return _retcode_description(_trade_resultretcode(self))
-
-
-def _trade_resultdeal(self: _ObjectState) -> int:
-    return int(self._last_result.deal)
-
-
-def _trade_resultorder(self: _ObjectState) -> int:
-    return int(self._last_result.order)
-
-
-def _trade_resultvolume(self: _ObjectState) -> float:
-    return float(self._last_result.volume)
-
-
-def _trade_resultprice(self: _ObjectState) -> float:
-    return float(self._last_result.price)
-
-
-def _trade_resultbid(self: _ObjectState) -> float:
-    return float(self._last_result.bid)
-
-
-def _trade_resultask(self: _ObjectState) -> float:
-    return float(self._last_result.ask)
-
-
-def _trade_resultcomment(self: _ObjectState) -> str:
-    return cast("str", self._last_result.comment)
-
-
-def _trade_checkresult(self: _ObjectState) -> TradeCheckResult:
-    return cast("TradeCheckResult", replace(self._last_check))
-
-
-def _trade_checkresultretcode(self: _ObjectState) -> int:
-    return int(self._last_check.retcode)
-
-
-def _trade_checkresultretcodedescription(self: _ObjectState) -> str:
-    return _retcode_description(_trade_checkresultretcode(self))
-
-
-def _trade_checkresultbalance(self: _ObjectState) -> float:
-    return float(self._last_check.balance)
-
-
-def _trade_checkresultequity(self: _ObjectState) -> float:
-    return float(self._last_check.equity)
-
-
-def _trade_checkresultprofit(self: _ObjectState) -> float:
-    return float(self._last_check.profit)
-
-
-def _trade_checkresultmargin(self: _ObjectState) -> float:
-    return float(self._last_check.margin)
-
-
-def _trade_checkresultmarginfree(self: _ObjectState) -> float:
-    return float(self._last_check.margin_free)
-
-
-def _trade_checkresultmarginlevel(self: _ObjectState) -> float:
-    return float(self._last_check.margin_level)
-
-
-def _trade_checkresultcomment(self: _ObjectState) -> str:
-    return cast("str", self._last_check.comment)
-
-
-def _trade_printrequest(self: _ObjectState) -> None:
+def _trade_printrequest(self: _ObjectState) -> bool:
     del self
     logger.info("FR-SIMULATION-DISPATCH: native print operation")
+    return True
 
 
-def _trade_printresult(self: _ObjectState) -> None:
+def _trade_printresult(self: _ObjectState) -> bool:
     del self
     logger.info("FR-SIMULATION-DISPATCH: native print operation")
+    return True
 
 
 def _trade_formatrequest(self: _ObjectState) -> str:
@@ -2033,63 +1560,11 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "SetTypeFillingBySymbol": _trade_settypefillingbysymbol,
         "SetAsyncMode": _trade_setasyncmode,
         "SetMarginMode": _trade_setmarginmode,
-        "OrderOpen": _trade_orderopen,
+        "OrderSend": _trade_ordersend,
         "OrderCheck": _trade_ordercheck,
-        "OrderModify": _trade_ordermodify,
-        "OrderDelete": _trade_orderdelete,
-        "PositionOpen": _trade_positionopen,
-        "PositionModify": _trade_positionmodify,
-        "PositionClose": _trade_positionclose,
-        "PositionClosePartial": _trade_positionclosepartial,
-        "PositionCloseBy": _trade_positioncloseby,
-        "Buy": _trade_buy,
-        "Sell": _trade_sell,
-        "BuyLimit": _trade_buylimit,
-        "BuyStop": _trade_buystop,
-        "SellLimit": _trade_selllimit,
-        "SellStop": _trade_sellstop,
         "Request": _trade_request,
-        "RequestAction": _trade_requestaction,
-        "RequestActionDescription": _trade_requestactiondescription,
-        "RequestMagic": _trade_requestmagic,
-        "RequestOrder": _trade_requestorder,
-        "RequestSymbol": _trade_requestsymbol,
-        "RequestVolume": _trade_requestvolume,
-        "RequestPrice": _trade_requestprice,
-        "RequestStopLimit": _trade_requeststoplimit,
-        "RequestSL": _trade_requestsl,
-        "RequestTP": _trade_requesttp,
-        "RequestDeviation": _trade_requestdeviation,
-        "RequestType": _trade_requesttype,
-        "RequestTypeDescription": _trade_requesttypedescription,
-        "RequestTypeFilling": _trade_requesttypefilling,
-        "RequestTypeFillingDescription": _trade_requesttypefillingdescription,
-        "RequestTypeTime": _trade_requesttypetime,
-        "RequestTypeTimeDescription": _trade_requesttypetimedescription,
-        "RequestExpiration": _trade_requestexpiration,
-        "RequestComment": _trade_requestcomment,
-        "RequestPosition": _trade_requestposition,
-        "RequestPositionBy": _trade_requestpositionby,
         "Result": _trade_result,
-        "ResultRetcode": _trade_resultretcode,
-        "ResultRetcodeDescription": _trade_resultretcodedescription,
-        "ResultDeal": _trade_resultdeal,
-        "ResultOrder": _trade_resultorder,
-        "ResultVolume": _trade_resultvolume,
-        "ResultPrice": _trade_resultprice,
-        "ResultBid": _trade_resultbid,
-        "ResultAsk": _trade_resultask,
-        "ResultComment": _trade_resultcomment,
         "CheckResult": _trade_checkresult,
-        "CheckResultRetcode": _trade_checkresultretcode,
-        "CheckResultRetcodeDescription": _trade_checkresultretcodedescription,
-        "CheckResultBalance": _trade_checkresultbalance,
-        "CheckResultEquity": _trade_checkresultequity,
-        "CheckResultProfit": _trade_checkresultprofit,
-        "CheckResultMargin": _trade_checkresultmargin,
-        "CheckResultMarginFree": _trade_checkresultmarginfree,
-        "CheckResultMarginLevel": _trade_checkresultmarginlevel,
-        "CheckResultComment": _trade_checkresultcomment,
         "PrintRequest": _trade_printrequest,
         "PrintResult": _trade_printresult,
         "FormatRequest": _trade_formatrequest,

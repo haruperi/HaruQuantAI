@@ -52,7 +52,6 @@ from app.services.brokers.contracts import (
     MarketBar,
     MarketTick,
     OrderFilling,
-    OrderTime,
     OrderType,
     ReceiptStatus,
     SymbolSpec,
@@ -406,16 +405,10 @@ async def example_08_order_check(ctx: ExampleContext) -> None:
         magic=ctx.magic,
         type_filling=filling,
     )
-    checked = await trading.trade.OrderCheck(req)
-    retcode = int(await trading.trade.CheckResultRetcode())
-    desc = await trading.trade.CheckResultRetcodeDescription()
-    margin = float(await trading.trade.CheckResultMargin())
-    margin_free = float(await trading.trade.CheckResultMarginFree())
-    comment = await trading.trade.CheckResultComment()
-    print(f"OrderCheck result: {checked}; retcode={retcode} ({desc})")
-    print(f"  Margin required: {margin:.2f}")
-    print(f"  Margin free: {margin_free:.2f}")
-    print(f"  Comment: {comment}")
+    chk_res = await trading.trade.OrderCheck(req)
+    print(f"OrderCheck result: retcode={chk_res.retcode} ({chk_res.comment})")
+    print(f"  Margin required: {chk_res.margin:.2f}")
+    print(f"  Margin free: {chk_res.margin_free:.2f}")
 
 
 async def example_09_open_position(ctx: ExampleContext) -> None:
@@ -452,14 +445,22 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("Symbol filling policy is unavailable")
     trading.arm()
-    sent = await trading.trade.Buy(2 * VOLUME, SYMBOL)
-    retcode = int(await trading.trade.ResultRetcode())
-    print(f"Buy dispatch: {sent}; retcode={retcode}")
-    if not sent or retcode != 10009:
+    req = TradeRequest(
+        action=TradeAction.DEAL,
+        symbol=SYMBOL,
+        volume=2 * VOLUME,
+        order_type=OrderType.BUY,
+        price=float((await trading.symbol.SymbolInfo()).ask),
+        deviation=20,
+        magic=ctx.magic,
+    )
+    result = await trading.trade.OrderSend(req)
+    retcode = result.retcode
+    print(f"Buy dispatch retcode={retcode}")
+    if retcode != 10009:
         ctx.trading.disarm()
         raise ExampleError("Buy not confirmed; check trade outcome before rerunning")
-    result = await trading.trade.Result()
-    deal = int(result.get("deal", 0))
+    deal = result.deal
     if not deal or not await trading.deal.Ticket(deal):
         ctx.trading.disarm()
         raise ExampleError("Buy deal history could not be selected")
@@ -468,7 +469,7 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
     if not ctx.position_id:
         ctx.trading.disarm()
         raise ExampleError("Buy deal position identifier is unavailable")
-    for ticket in (int(result.get("order", 0)), ctx.position_id):
+    for ticket in (result.order, ctx.position_id):
         if ticket and await trading.position.SelectByTicket(ticket):
             pos_info = await trading.position.PositionInfo()
             if (
@@ -569,14 +570,18 @@ async def example_12_modify_position(ctx: ExampleContext) -> None:
     ) * float(sym_info.point)
     bid, digits = float(sym_info.bid), sym_info.digits
     sl, tp = round(bid - distance, digits), round(bid + distance, digits)
-    sent = await trade.PositionModify(ctx.position_ticket, sl, tp)
-    retcode = int(await trade.ResultRetcode())
-    print(f"Position modify dispatch: {sent}; retcode={retcode}")
-    if (
-        not sent
-        or retcode != 10009
-        or not await pos.SelectByTicket(ctx.position_ticket)
-    ):
+    req = TradeRequest(
+        action=TradeAction.SLTP,
+        position=ctx.position_ticket,
+        symbol=SYMBOL,
+        sl=sl,
+        tp=tp,
+        magic=ctx.magic,
+    )
+    result = await trade.OrderSend(req)
+    retcode = result.retcode
+    print(f"Position modify dispatch retcode={retcode}")
+    if retcode != 10009 or not await pos.SelectByTicket(ctx.position_ticket):
         ctx.trading.disarm()
         raise ExampleError("Position modification not confirmed; inspect trade outcome")
     pos_info = await pos.PositionInfo()
@@ -592,7 +597,11 @@ async def example_13_close_partial_position(ctx: ExampleContext) -> None:
     if not ctx.allow_writes:
         print("Live writes disabled; skipping partial close")
         return
-    pos, trade = ctx.trading.position, ctx.trading.trade
+    pos, trade, symbol = (
+        ctx.trading.position,
+        ctx.trading.trade,
+        ctx.trading.symbol,
+    )
     if not ctx.position_ticket or not await pos.SelectByTicket(ctx.position_ticket):
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before partial close")
@@ -605,14 +614,20 @@ async def example_13_close_partial_position(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before partial close")
     before = pos_info.volume
-    sent = await trade.PositionClosePartial(ctx.position_ticket, VOLUME)
-    retcode = int(await trade.ResultRetcode())
-    print(f"Partial close dispatch: {sent}; retcode={retcode}")
-    if (
-        not sent
-        or retcode != 10009
-        or not await pos.SelectByTicket(ctx.position_ticket)
-    ):
+    req = TradeRequest(
+        action=TradeAction.DEAL,
+        position=ctx.position_ticket,
+        symbol=SYMBOL,
+        volume=VOLUME,
+        order_type=OrderType.SELL,
+        price=float((await symbol.SymbolInfo()).bid),
+        deviation=20,
+        magic=ctx.magic,
+    )
+    result = await trade.OrderSend(req)
+    retcode = result.retcode
+    print(f"Partial close dispatch retcode={retcode}")
+    if retcode != 10009 or not await pos.SelectByTicket(ctx.position_ticket):
         ctx.trading.disarm()
         raise ExampleError("Partial close not confirmed; inspect trade outcome")
     pos_info = await pos.PositionInfo()
@@ -629,7 +644,11 @@ async def example_14_close_position(ctx: ExampleContext) -> None:
     if not ctx.allow_writes:
         print("Live writes disabled; skipping close position")
         return
-    pos, trade = ctx.trading.position, ctx.trading.trade
+    pos, trade, symbol = (
+        ctx.trading.position,
+        ctx.trading.trade,
+        ctx.trading.symbol,
+    )
     if not ctx.position_ticket or not await pos.SelectByTicket(ctx.position_ticket):
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before closing")
@@ -641,10 +660,20 @@ async def example_14_close_position(ctx: ExampleContext) -> None:
     ):
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before closing")
-    sent = await trade.PositionClose(ctx.position_ticket)
-    retcode = int(await trade.ResultRetcode())
-    print(f"Position close dispatch: {sent}; retcode={retcode}")
-    if not sent or retcode != 10009 or await pos.SelectByTicket(ctx.position_ticket):
+    req = TradeRequest(
+        action=TradeAction.DEAL,
+        position=ctx.position_ticket,
+        symbol=SYMBOL,
+        volume=pos_info.volume,
+        order_type=OrderType.SELL,
+        price=float((await symbol.SymbolInfo()).bid),
+        deviation=20,
+        magic=ctx.magic,
+    )
+    result = await trade.OrderSend(req)
+    retcode = result.retcode
+    print(f"Position close dispatch retcode={retcode}")
+    if retcode != 10009 or await pos.SelectByTicket(ctx.position_ticket):
         ctx.trading.disarm()
         raise ExampleError("Position close not confirmed; inspect trade outcome")
     ctx.position_ticket = 0
@@ -669,13 +698,21 @@ async def example_15_pending_orders(ctx: ExampleContext) -> None:
         sym_info.trade_freeze_level + 20,
     ) * float(sym_info.point)
     ctx.pending_price = round(float(sym_info.bid) - distance, sym_info.digits)
-    sent = await trade.BuyLimit(VOLUME, ctx.pending_price, SYMBOL)
-    retcode = int(await trade.ResultRetcode())
-    print(f"BuyLimit dispatch: {sent}; retcode={retcode}")
-    if not sent or retcode not in (10008, 10009):
+    req = TradeRequest(
+        action=TradeAction.PENDING,
+        symbol=SYMBOL,
+        volume=VOLUME,
+        order_type=OrderType.BUY_LIMIT,
+        price=ctx.pending_price,
+        magic=ctx.magic,
+    )
+    result = await trade.OrderSend(req)
+    retcode = result.retcode
+    print(f"BuyLimit dispatch retcode={retcode}")
+    if retcode not in (10008, 10009):
         ctx.trading.disarm()
         raise ExampleError("Pending order not confirmed; inspect trade outcome")
-    ctx.pending_ticket = int(await trade.ResultOrder())
+    ctx.pending_ticket = result.order
     if not ctx.pending_ticket or not await order.Select(ctx.pending_ticket):
         ctx.trading.disarm()
         raise ExampleError("Pending order ownership could not be confirmed")
@@ -744,12 +781,16 @@ async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
         sym_info.trade_freeze_level + 20,
     ) * float(sym_info.point)
     price = round(ctx.pending_price - distance, sym_info.digits)
-    sent = await trade.OrderModify(
-        ctx.pending_ticket, price, 0.0, 0.0, OrderTime.GTC, 0
+    req = TradeRequest(
+        action=TradeAction.MODIFY,
+        order=ctx.pending_ticket,
+        price=price,
+        magic=ctx.magic,
     )
-    retcode = int(await trade.ResultRetcode())
-    print(f"Order modify dispatch: {sent}; retcode={retcode}")
-    if not sent or retcode != 10009 or not await order.Select(ctx.pending_ticket):
+    result = await trade.OrderSend(req)
+    retcode = result.retcode
+    print(f"Order modify dispatch retcode={retcode}")
+    if retcode != 10009 or not await order.Select(ctx.pending_ticket):
         ctx.trading.disarm()
         raise ExampleError("Order modification not confirmed; inspect trade outcome")
     ord_info = await order.OrderInfo()
@@ -774,10 +815,15 @@ async def example_18_delete_pending_orders(ctx: ExampleContext) -> None:
     if ord_info.magic != ctx.magic or ord_info.symbol != SYMBOL:
         ctx.trading.disarm()
         raise ExampleError("Order ownership must be confirmed before cancellation")
-    sent = await trade.OrderDelete(ctx.pending_ticket)
-    retcode = int(await trade.ResultRetcode())
-    print(f"Order delete dispatch: {sent}; retcode={retcode}")
-    if not sent or retcode != 10009 or await order.Select(ctx.pending_ticket):
+    req = TradeRequest(
+        action=TradeAction.REMOVE,
+        order=ctx.pending_ticket,
+        magic=ctx.magic,
+    )
+    result = await trade.OrderSend(req)
+    retcode = result.retcode
+    print(f"Order delete dispatch retcode={retcode}")
+    if retcode != 10009 or await order.Select(ctx.pending_ticket):
         ctx.trading.disarm()
         raise ExampleError("Order cancellation not confirmed; inspect trade outcome")
     ctx.pending_ticket = 0

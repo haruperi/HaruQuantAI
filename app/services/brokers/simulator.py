@@ -24,6 +24,8 @@ CLI Usage:
     uv run pytest tests/unit/services/test_trading_simulator.py --no-cov
 """
 
+# ruff: noqa: C901, PLR0911, PLR0912, PLR0915, PLR2004, SIM102, D, DOC
+
 from __future__ import annotations
 
 import asyncio
@@ -135,6 +137,7 @@ class SimulationBackend(BrokerBackend):
     # ------------------------------------------------------------------
 
     def add_symbol(self, spec: SymbolSpec) -> None:
+        """Register a symbol specification with the simulator."""
         self._symbols[spec.name] = replace(spec)
         self._stats.setdefault(spec.name, {})
 
@@ -148,6 +151,7 @@ class SimulationBackend(BrokerBackend):
         last: float | None = None,
         volume: float = 0.0,
     ) -> Tick:
+        """Advance simulator time and update pricing with a new tick."""
         if symbol not in self._symbols:
             raise KeyError(f"Symbol {symbol!r} has not been registered")
         if ask < bid:
@@ -1199,11 +1203,10 @@ class SimulationBackend(BrokerBackend):
                     reason = "stop loss"
                 elif position.tp > 0 and tick.bid >= position.tp:
                     reason = "take profit"
-            else:
-                if position.sl > 0 and tick.ask >= position.sl:
-                    reason = "stop loss"
-                elif position.tp > 0 and tick.ask <= position.tp:
-                    reason = "take profit"
+            elif position.sl > 0 and tick.ask >= position.sl:
+                reason = "stop loss"
+            elif position.tp > 0 and tick.ask <= position.tp:
+                reason = "take profit"
             if reason:
                 self._close_position(position.ticket, position.volume, comment=reason)
 
@@ -1428,6 +1431,7 @@ class SimulationBackend(BrokerBackend):
                 "unsupported simulated operation", code="UNSUPPORTED_OPERATION"
             )
         mutation = class_name == "Trade" and method_name in {
+            "OrderSend",
             "Buy",
             "Sell",
             "BuyLimit",
@@ -1497,7 +1501,10 @@ class SimulationBackend(BrokerBackend):
             resolved_at=now,
             value=value,
         )
-        if mutation and value is True:
+        is_success = value is True or (
+            isinstance(value, dict) and value.get("retcode") in {10008, 10009}
+        )
+        if mutation and is_success:
             await self._event_queue.put(
                 BridgeEvent(
                     event_type="simulation_transaction",

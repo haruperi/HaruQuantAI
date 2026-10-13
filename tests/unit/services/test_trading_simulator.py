@@ -27,11 +27,19 @@ from app.services.brokers.contracts import (
     BridgeError,
     MarginMode,
     OrderTime,
+    OrderType,
     ReceiptStatus,
     SymbolSpec,
+    TradeAction,
 )
 from app.services.brokers.simulator import SimulationBackend
-from app.services.trading import SymbolInfo, Trading
+from app.services.trading import (
+    SymbolInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+    Trading,
+)
 
 
 @pytest.mark.parametrize("mode", [MarginMode.RETAIL_HEDGING, MarginMode.RETAIL_NETTING])
@@ -53,32 +61,61 @@ def test_market_positions_history_and_clock(mode: MarginMode) -> None:
             separate = SymbolInfo(backend)
             assert await separate.Name() == ""
             assert info.point == 0.00001
+            buy_req = TradeRequest(
+                action=TradeAction.DEAL,
+                symbol="EURUSD",
+                volume=0.1,
+                order_type=OrderType.BUY,
+                price=1.1002,
+            )
             with pytest.raises(BridgeError, match="disarmed"):
-                await trading.trade.Buy(0.1, "EURUSD")
+                await trading.trade.OrderSend(buy_req)
             trading.arm()
-            assert await trading.trade.Buy(0.1, "EURUSD")
+            res = await trading.trade.OrderSend(buy_req)
+            assert res.retcode == 10009
             command = trading.trade.last_command_id
             assert command is not None
             receipt = backend.receipt(command)
             assert receipt is not None
             assert receipt.status == ReceiptStatus.RESOLVED
-            assert await trading.trade.ResultRetcode() == 10009
-            assert isinstance(await trading.trade.Request(), dict)
-            assert isinstance(await trading.trade.Result(), dict)
-            assert isinstance(await trading.trade.CheckResult(), dict)
+            assert (await trading.trade.Result()).retcode == 10009
+            assert isinstance(await trading.trade.Request(), TradeRequest)
+            assert isinstance(await trading.trade.Result(), TradeResult)
+            assert isinstance(await trading.trade.CheckResult(), TradeCheckResult)
             assert await trading.position.Select("EURUSD")
             assert (await trading.position.PositionInfo()).volume == 0.1
-            ticket = await trading.position.SelectByIndex(0)
-            assert ticket
+            assert await trading.position.SelectByIndex(0)
+            ticket = (await trading.position.PositionInfo()).ticket
+            assert ticket > 0
             assert await trading.position.StoreState() is True
             assert await trading.position.CheckState()
             if mode == MarginMode.RETAIL_HEDGING:
-                assert await trading.trade.PositionClosePartial("EURUSD", 0.04)
+                res_partial = await trading.trade.OrderSend(
+                    TradeRequest(
+                        action=TradeAction.DEAL,
+                        symbol="EURUSD",
+                        volume=0.04,
+                        order_type=OrderType.SELL,
+                        price=1.1,
+                        position=ticket,
+                    )
+                )
+                assert res_partial.retcode == 10009
                 assert await trading.position.Select("EURUSD")
                 assert (await trading.position.PositionInfo()).volume == pytest.approx(
                     0.06
                 )
-            assert await trading.trade.PositionClose("EURUSD")
+            res_close = await trading.trade.OrderSend(
+                TradeRequest(
+                    action=TradeAction.DEAL,
+                    symbol="EURUSD",
+                    volume=0.06 if mode == MarginMode.RETAIL_HEDGING else 0.1,
+                    order_type=OrderType.SELL,
+                    price=1.1,
+                    position=ticket,
+                )
+            )
+            assert res_close.retcode == 10009
             assert backend.positions() == []
             assert await trading.history_order.SelectByIndex(0)
             assert await trading.history_order.Ticket() > 0
@@ -99,28 +136,66 @@ def test_pending_modify_cancel_trigger_and_expiration() -> None:
         backend.feed_tick("EURUSD", bid=1.1, ask=1.1002, time=now)
         trading = Trading(backend)
         trading.arm()
-        assert await trading.trade("buy_limit", "EURUSD", 0.1, price=1.09)
+        limit_req = TradeRequest(
+            action=TradeAction.PENDING,
+            symbol="EURUSD",
+            volume=0.1,
+            order_type=OrderType.BUY_LIMIT,
+            price=1.09,
+        )
+        res = await trading.trade(limit_req)
+        assert res.retcode == 10008
         assert await trading.order.SelectByIndex(0)
         ticket = (await trading.order.OrderInfo()).ticket
-        assert await trading.trade.OrderModify(ticket, 1.08, 0.0, 0.0)
-        assert await trading.trade.OrderDelete(ticket)
+        mod_req = TradeRequest(
+            action=TradeAction.MODIFY,
+            order=ticket,
+            price=1.08,
+            symbol="EURUSD",
+        )
+        res_mod = await trading.trade.OrderSend(mod_req)
+        assert res_mod.retcode == 10009
+        del_req = TradeRequest(
+            action=TradeAction.REMOVE,
+            order=ticket,
+            symbol="EURUSD",
+        )
+        res_del = await trading.trade.OrderSend(del_req)
+        assert res_del.retcode == 10009
         assert backend.orders() == []
-        assert await trading.trade.BuyStop(0.1, 1.11, "EURUSD")
+        stop_req = TradeRequest(
+            action=TradeAction.PENDING,
+            symbol="EURUSD",
+            volume=0.1,
+            order_type=OrderType.BUY_STOP,
+            price=1.11,
+        )
+        assert (await trading.trade.OrderSend(stop_req)).retcode == 10008
         backend.feed_tick(
             "EURUSD", bid=1.111, ask=1.1112, time=now + timedelta(seconds=1)
         )
         assert backend.orders() == []
         assert len(backend.positions()) == 1
-        assert await trading.trade.PositionClose("EURUSD")
-        assert await trading.trade.BuyLimit(
-            0.1,
-            1.09,
-            "EURUSD",
-            0.0,
-            0.0,
-            OrderTime.SPECIFIED,
-            now + timedelta(minutes=1),
+        pos_ticket = backend.positions()[0].ticket
+        close_req = TradeRequest(
+            action=TradeAction.DEAL,
+            symbol="EURUSD",
+            volume=0.1,
+            order_type=OrderType.SELL,
+            price=1.111,
+            position=pos_ticket,
         )
+        assert (await trading.trade.OrderSend(close_req)).retcode == 10009
+        limit_exp_req = TradeRequest(
+            action=TradeAction.PENDING,
+            symbol="EURUSD",
+            volume=0.1,
+            order_type=OrderType.BUY_LIMIT,
+            price=1.09,
+            type_time=OrderTime.SPECIFIED,
+            expiration=now + timedelta(minutes=1),
+        )
+        assert (await trading.trade.OrderSend(limit_exp_req)).retcode == 10008
         backend.set_clock(now + timedelta(minutes=2))
         assert backend.orders() == []
         assert backend.positions() == []
@@ -138,8 +213,16 @@ def test_rejection_and_unknown_operation() -> None:
         backend.feed_tick("EURUSD", bid=1.1, ask=1.1002)
         trading = Trading(backend)
         trading.arm()
-        assert not await trading.trade.Buy(1.0, "EURUSD")
-        assert await trading.trade.ResultRetcode() == 10019
+        bad_req = TradeRequest(
+            action=TradeAction.DEAL,
+            symbol="EURUSD",
+            volume=1.0,
+            order_type=OrderType.BUY,
+            price=1.1002,
+        )
+        bad_res = await trading.trade.OrderSend(bad_req)
+        assert bad_res.retcode == 10019
+        assert (await trading.trade.Result()).retcode == 10019
         assert backend.positions() == []
         with pytest.raises(BridgeError, match="unsupported"):
             await backend.call(
@@ -170,18 +253,51 @@ def test_stops_close_by_and_local_events() -> None:
         backend.feed_tick("EURUSD", bid=1.1, ask=1.1002)
         trading = Trading(backend)
         trading.arm()
-        assert await trading.trade.Buy(0.1, "EURUSD", 0.0, 1.09, 1.12)
+        buy_req = TradeRequest(
+            action=TradeAction.DEAL,
+            symbol="EURUSD",
+            volume=0.1,
+            order_type=OrderType.BUY,
+            price=1.1002,
+            sl=1.09,
+            tp=1.12,
+        )
+        assert (await trading.trade.OrderSend(buy_req)).retcode == 10009
         event = await backend.next_event(timeout=0.1)
         assert event.event_type == "simulation_transaction"
         backend.feed_tick("EURUSD", bid=1.121, ask=1.1212)
         assert backend.positions() == []
-        assert await trading.trade.Buy(0.1, "EURUSD")
-        assert await trading.trade.Sell(0.1, "EURUSD")
+        assert (
+            await trading.trade.OrderSend(
+                TradeRequest(
+                    action=TradeAction.DEAL,
+                    symbol="EURUSD",
+                    volume=0.1,
+                    order_type=OrderType.BUY,
+                    price=1.1212,
+                )
+            )
+        ).retcode == 10009
+        assert (
+            await trading.trade.OrderSend(
+                TradeRequest(
+                    action=TradeAction.DEAL,
+                    symbol="EURUSD",
+                    volume=0.1,
+                    order_type=OrderType.SELL,
+                    price=1.121,
+                )
+            )
+        ).retcode == 10009
         positions = backend.positions()
         assert len(positions) == 2
-        assert await trading.trade.PositionCloseBy(
-            positions[0].ticket, positions[1].ticket
+        close_by_req = TradeRequest(
+            action=TradeAction.CLOSE_BY,
+            symbol="EURUSD",
+            position=positions[0].ticket,
+            position_by=positions[1].ticket,
         )
+        assert (await trading.trade.OrderSend(close_by_req)).retcode == 10009
         assert backend.positions() == []
         with pytest.raises(BridgeError, match="unsupported"):
             await backend.call(

@@ -1,5 +1,11 @@
 """Shared native broker proxy classes."""
 
+from app.services.brokers.contracts import (
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
+
 from .account_info import AccountInfo
 from .deal_info import DealInfo
 from .facade import Trading
@@ -20,6 +26,9 @@ __all__ = [
     "SymbolInfo",
     "TerminalInfo",
     "Trade",
+    "TradeCheckResult",
+    "TradeRequest",
+    "TradeResult",
     "Trading",
     "get_historical_bars",
     "get_ticks",

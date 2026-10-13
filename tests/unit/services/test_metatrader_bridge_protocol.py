@@ -568,9 +568,10 @@ def test_trading_extended_query_and_check_methods() -> None:
             order_type=OrderType.BUY,
             price=1.1000,
         )
-        assert await trading.trade.OrderCheck(req) is True
-        assert await trading.trade.CheckResultRetcode() == 10009
-        assert await trading.trade.CheckResultMargin() > 0
+        check_res = await trading.trade.OrderCheck(req)
+        assert check_res.retcode == 10009
+        assert check_res.margin > 0
+        assert (await trading.trade.CheckResult()).retcode == 10009
 
         assert await trading.position.PositionsTotal() == 0
         assert await trading.position.PositionsGet() == []
