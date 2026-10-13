@@ -264,21 +264,219 @@ flowchart TD
 
 ---
 
-### 3.3 Phased Reimplementation Sequence
+### 3.3 Concrete Python Engineering Specifications by Tier (`normative`)
 
-Following the delivery order ratified in [`../PROJECT.md`](../PROJECT.md) (*"Deliver import -> author -> backtest -> inspect/export first, then generation, optimization/robustness, portfolios and projects"*):
+#### A. Foundational Domain Core & Primitives (`app/kernel/` & Domain Engines — `F02`–`F05`)
+> **Constraint:** Pure headless financial math, time-series structures, and deterministic simulation loops; zero dependencies on FastAPI, SQLite, or UI state.
 
-1. **Stage 0 — Evidence & Qualification Foundation (`P00`):**
-   - Establish `reimplementation.schema.json`, `reimplementation.json`, `docs/dev/evidence/`, `tests/reference/validate.py`, and `scripts/ci_check.py`.
-2. **Stage 1 — Tier 1 Host Platform (`F01` — `app/host/`):**
-   - Implement `persistence/` (SQLite WAL isolation, `schema.py`, `SettingsStore`, `HostSessionStore`), `settings.py`, `session.py`, `resources.py`, `jobs.py`, `discovery.py`, `transport.py`, `response.py`, and `bootstrap.py`, reconnecting the retained `ui/app/host/` shell.
-3. **Stage 2 — Mathematical Kernel & Market Data (`F02` — `app/kernel/` + `app/workspace/data_manager/` + `app/plugins/data_source/`):**
-   - Build `SQTime`, `DataSeries`, `InstrumentInfo`, session calendars, `.dat`/Parquet/DuckDB bar & tick storage, the 11 Data Manager workspace modules, and the 9 `data.provider` plugins.
-4. **Stage 3 — Strategy Model, Building Blocks, AlgoWizard & Exporters (`F03` — `app/workspace/strategies/`):**
-   - Implement the canonical Strategy AST (`.sqx` & `ctemplate` compatible), indicator kernels (`ta-lib` + custom SQ indicators such as `SqATR`, `SqKAMA`, `SqIchimoku`, `SqSuperTrend`, `SqVolumeProfile`, `SqCOT`), building blocks, `Negater` rules, AlgoWizard backend routes, and template-based code exporters (`MT4`, `MT5`, `NT8`, `EasyLanguage`, `JForex`, `PseudoCode`).
-5. **Stage 4 — Simulation Engine, Databanks & Results (`F04` & `F05` — `app/workspace/simulator/` & `app/workspace/results/`):**
-   - Build the backtest execution engine (bar & tick precision, order types, SL/PT/Trailing/SL2BE, ATM, Money Management, commissions/swap), Databank storage/ranking, and the 60+ `SQStats` calculators + Results views.
-6. **Stage 5 — Builder, Retester & Optimizer (`F06` & `F07` — `app/workspace/builder/`, `retester/`, `optimizer/`):**
-   - Implement Random and Genetic Programming strategy generation, followed by the 9 CrossCheck plugins (Monte Carlo trade manipulation & retest, Higher Precision, Multi-Market, WFO, WFM, Sequential Optimization, SPP, What-If).
-7. **Stage 6 — Portfolios, Custom Projects & Advanced Ecosystem (`F08`–`F13`):**
-   - Deliver Portfolio Master, Portfolio Composer, Custom Projects (`.cfx` pipeline engine & 20 task plugins), and optional `F10`–`F13` extensions.
+1. **Market Data Engine (`SQDataLib` Equivalent — `app/kernel/` + `app/workspace/data_manager/`):**
+   - **Immutable Time-Series Records:**
+     - `Bar`: Typed record containing timestamp (`int64` UTC/exchange milliseconds via `SQTime`), `open`, `high`, `low`, `close`, `volume`, and `spread`.
+     - `Tick`: High-resolution record with `timestamp`, `bid`, `ask`, `last_price`, and `volume`.
+     - `Timeframe`: Standard bar intervals (`M1`, `M5`, `M15`, `M30`, `H1`, `H4`, `D1`, `W1`, `MN1`) plus custom tick/range/volume bar types.
+   - **Session Calendars & Instrument Specifications:**
+     - `TradingSession` (`sessions.py`): Weekly day-of-week windows, Sunday open, daily session rollover, and NinjaTrader XML session import/export.
+     - `InstrumentInfo` (`instruments.py`): `point_value`, `tick_size`, `pip_value`, `decimals`, `order_size_step`, `order_size_multiplier`, `min_distance`, initial margin, and commission/swap models.
+   - **Columnar Storage & Feed Ingestion:**
+     - **Apache Arrow / Parquet / Polars / DuckDB** for historical bar and tick storage alongside `.dat` compatibility.
+     - Provider feed adapters (`app/plugins/data_source/*`, `slot: "data.provider"`): Dukascopy (`.bi5`), Darwinex, MetaTrader 4/5 (CSV/HST/FXT + MT5 terminal bridge), SQ Equity, SQ Futures, Crypto (Binance/Bitfinex/CoinbasePro/Poloniex), Local Files (CSV/Parquet/TSV), Yahoo Finance, and Tick Downloader.
+
+2. **Backtesting & Execution Engine (`SQTradingLib.simulator` Equivalent — `app/workspace/simulator/`):**
+   - **Order State Machine:**
+     - Lifecycle states: `PENDING` $\to$ `OPEN` $\to$ `FILLED` $\to$ `PARTIALLY_FILLED` $\to$ `CLOSED` $\to$ `CANCELLED` / `EXPIRED` (`#BarsValid#`).
+     - Order types: `EnterAtMarket`, `EnterAtStop`, `EnterAtLimit`, `EnterReverseAtMarket`, and parent-child OCO bracket/exit linkages (`StopLoss`, `ProfitTarget`, `MoveSL2BE` + `#SL2BEAddPips#`, `TrailingStop` + `#TrailingActivation#`, `ExitAfterBars`, and multi-exit `ATM` / `ATMExit`).
+     - Fill & cost simulation: Intra-bar price-path resolution, broker spread/slippage models, commission tiers, and overnight rollover swaps.
+   - **Deterministic Multi-Precision Simulation Loop:**
+     - Single-pass event/vector hybrid loop supporting `Selected TF`, `1-minute`, and `Real Tick` intrabar precision to prevent lookahead bias.
+     - `StrategyBase` execution hooks: evaluates `sq4` / `sq4fuzzy` signal rules first, then dispatches entry/exit actions and order events (`on_bar_update`, `on_order_event`).
+   - **Performance & Statistics Engine (`app/workspace/results/`):**
+     - Computes all 60+ `SQStats` metrics across In-Sample Training (`IST`), In-Sample Validation (`ISV`), and Out-of-Sample (`OOS`) segments: `NetProfit`, `ProfitInPips`, `ProfitFactor`, `ReturnDDRatio`, `MaxDrawdown` ($ and %), `SharpeRatio`, `CAGR`, `Stability` ($R^2$ linear regression), `SQN` / `SQNScore`, `WinPercentage`, `Expectancy` / `RExpectancy`, `Exposure`, `Stagnation` (days and %), `ZScore`, and Long/Short `Symmetry`.
+
+3. **Strategy Building Blocks & Indicator Taxonomy (`Snippets.jar` Equivalent — `app/workspace/strategies/` & `app/plugins/blocks/`):**
+   - **Vectorized Indicator Library:** `NumPy` / `Polars`-backed indicator kernels covering trend (`SMA`, `EMA`, `LWMA`, `SMMA`, `HullMA`, `KAMA`, `MACD`, `ParabolicSAR`, `SuperTrend`, `ADX`, `Aroon`, `Ichimoku`, `LinReg`, `GannHiLo`), momentum/oscillators (`RSI`, `LaguerreRSI`, `Stochastic`, `CCI`, `WilliamsPR`, `ROC`, `QQE`, `Reflex`, `STC`, `WaveTrend`, `DeMarker`, `AwesomeOscillator`), volatility (`ATR`, `MTATR`, `BollingerBands`, `KeltnerChannel`, `MTKeltnerChannel`, `StdDev`, `UlcerIndex`, `TrueRange`), and volume/orderflow (`AvgVolume`, `VWAP`, `AnchoredVWAP`, `VolumeProfile`, `TPOProfile`, `COT`).
+   - **Declarative Strategy AST:** Immutable Pydantic/XML document representation of rules, conditions, `OppositeBlock`/`Negater` pairs, money management, trading options, and template placeholders (`RandomCondition`, `NegatedCondition`, `RandomAction`) compilable to vectorized evaluation and target-platform source templates (`MT4`, `MT5`, `NinjaTrader 8`, `EasyLanguage`, `JForex`, `PseudoCode`).
+
+---
+
+#### B. Tier 1: Host Platform & Transport Infrastructure (`app/host/` — `F01`)
+> **Constraint:** Universal runtime, persistence isolation, plugin discovery, background multiprocessing/thread supervision, and API transport envelopes. Zero trading logic.
+
+```mermaid
+flowchart LR
+    Host["FastAPI Host Server (transport.py)"] --> EventBus["Async EventBus (Pub/Sub)"]
+    Host --> JobMgr["JobManager (Thread / Process Pool)"]
+    Host --> DB["Isolated SQLite WAL (persistence/)"]
+    JobMgr --> Workers["Bounded Workers (psutil CPU/RAM Guarded)"]
+    EventBus --> Streaming["WebSockets & SSE (/api/v2/...)"]
+```
+
+1. **Progressive Bootstrap State Machine (`app/host/bootstrap.py`):**
+   - Ordered startup sequence with automatic reverse-order teardown on failure or shutdown:
+     $$\text{CONFIGURING} \longrightarrow \text{PATHS} \longrightarrow \text{LOGGING} \longrightarrow \text{PERSISTENCE} \longrightarrow \text{SERVICES} \longrightarrow \text{ROUTES} \longrightarrow \text{READY}$$
+2. **Persistence & Storage Custody (`app/host/persistence/`):**
+   - Strict `sqlite3` import isolation (AST-guarded in tests; zero SQL outside `app/host/persistence/`).
+   - Configured with `PRAGMA journal_mode=WAL`, `synchronous=NORMAL`, and `busy_timeout=5000`.
+   - `schema.py` is the sole owner of DDL and compatibility checks (failing closed with `IncompatibleSchemaError` on unsupported versions).
+   - Narrow CRUD stores (`SettingsStore`, `HostSessionStore`, job/workspace stores) with atomic revision checks.
+3. **Telemetry, Redacted Logging & Diagnostics (`app/host/diagnostics.py`):**
+   - Every operation logs its explicit `FR-*` capability label with zero silent failures.
+   - Recursive secret redaction and path normalization; in-memory ring buffer (`collections.deque`) streaming live logs to the `DebugConsole` workspace.
+4. **Resource Governance & Background Job Coordinator (`app/host/resources.py`, `app/host/jobs.py`):**
+   - `psutil` hardware/memory probes, configurable worker allocation ($\text{workers} = \max(1, \text{cpu\_cores} - 2)$), memory cleanup/data-frame guards, and isolated per-job scratch directories.
+   - `JobManager` managing `QUEUED`, `RUNNING`, `COMPLETED`, `FAILED`, and `CANCELLED` states with cooperative cancellation tokens and startup orphan-job recovery.
+5. **Uniform Envelopes & Event Bus (`app/host/response.py`, `app/host/transport.py`):**
+   - `ApiResponse[T]` (`data`, `error`, `timestamp`, `version`) and RFC 7807 `StandardError` schemas.
+   - In-memory async `EventBus` distributing `jobs`, `system`, `logs`, `databanks`, and `settings.changed` events over WebSockets/SSE.
+
+---
+
+#### C. Tier 2 & Tier 3: Workflow Workspaces & Dynamic Plugins (`app/workspace/` & `app/plugins/` — `F06`–`F09`)
+
+1. **Genetic Strategy Builder (`app/workspace/builder/` — `F06`):**
+   - Supports **Random Generation** and **Genetic Evolution** (multi-island subpopulations evolving across worker processes with periodic migration, crossover of rule subtrees, mutation of blocks/parameters, initial-population decimation, fresh-blood replacement, and evolution restart management).
+2. **Databanks & Filtering (`app/workspace/results/` — `F05`):**
+   - Project-scoped `Databank` containers keeping top-$N$ strategies ranked by `FitnessMethod*` criteria and filtered by hard `<Conditions>` predicates, supporting configurable `syncType` and column views.
+3. **Parameter Optimizer & Walk-Forward (`app/workspace/optimizer/` — `F07`):**
+   - Simple brute-force grid search, genetic parameter optimization, Sequential one-parameter-at-a-time stability search, Walk-Forward Optimization (sliding/anchoring IS/OOS windows), and Walk-Forward Matrix (`WFM`) 3D surface cluster evaluation.
+4. **Robustness & Cross-Check Suite (`app/workspace/retester/` & `app/plugins/crosschecks/` — `F07`):**
+   - All 9 `CrossCheck*` plugins: Monte Carlo Trade Manipulation (trade shuffling, random skipping), Monte Carlo Retest (parameter jitter, history ATR perturbation, randomized starting bar across confidence levels `50, 60, 70, 80, 90, 92, 95, 97, 98, 99, 100`), Higher Precision retest, Additional Markets multi-market retest, WFO, WFM, Sequential Optimization, System Parameter Permutation (`SPP`), and `WhatIf` trade manipulation filters.
+5. **Portfolio Master, Portfolio Composer & Custom Projects (`F08` & `F09`):**
+   - **Portfolio Master:** Brute-force and genetic K-strategy combination search with correlation (`CorrelationOf`) and sector constraints.
+   - **Portfolio Composer:** Per-strategy weight multipliers with daily account balance, leverage, and free-margin simulation + `Composer Log`.
+   - **Custom Projects:** `.cfx` archive validator/loader and task pipeline runner executing all 20 `Task*` types with `GoToTask` conditional loops (`ProjectCondition*`).
+
+---
+
+### 3.4 Ratified Technology Stack (`HARUQUANTAI_ROOT/pyproject.toml` & `ui/package.json`)
+
+| Subsystem | Ratified Technology | Role in HaruQuantAI |
+| :--- | :--- | :--- |
+| **Language & Typing** | Python `>=3.14`, `mypy --strict`, `ruff` | Modern type syntax, strict static verification, 88-char formatting, 5-section `FR-*` module docstrings. |
+| **Data Validation & Schemas** | `pydantic>=2.11,<3`, `jsonschema>=4.26,<5` | Immutable domain models, strategy AST validation, `plugin.json` and `reimplementation.schema.json` verification. |
+| **Columnar & Numerical Kernel** | `polars>=1.30,<2`, `pyarrow>=21,<24`, `duckdb>=1.3,<2`, `numpy>=2.5.3`, `pandas>=3.0.6` | High-speed vectorized `DataSeries`, indicator computation, and Parquet/Arrow/DuckDB market data storage. |
+| **Host Web & Streaming Gateway** | `fastapi>=0.135,<1`, `uvicorn>=0.53.0,<1`, `websockets>=15,<18`, `httpx>=0.28,<1` | Asynchronous REST routers (`/api/v2/...`), uniform `ApiResponse[T]` envelopes, and WebSocket/SSE streaming. |
+| **State Persistence** | Python `sqlite3` (WAL Mode) | Single-authority host/workspace metadata persistence isolated strictly inside `app/host/persistence/`. |
+| **Process & Resource Governance** | `concurrent.futures`, `psutil>=7,<8`, `tzdata>=2025.2` | Multi-core backtest/GP worker pools, CPU/RAM guardrails, and IANA/exchange timezone normalization. |
+| **Frontend Cockpit (`ui/`)** | React, TypeScript, Vite, Vitest, Playwright | Retained 17-workspace web frontend (`ui/app/host/`, `ui/app/workspace/`, `ui/app/plugins/`). |
+
+---
+
+### 3.5 Bottom-Up Dependency & Phased Reimplementation Sequence
+
+```mermaid
+flowchart TD
+    subgraph Stage0["Stage 0: Qualification & Evidence Infrastructure (P00)"]
+        P00["reimplementation.schema.json + reimplementation.json + tests/reference/validate.py"]
+    end
+
+    subgraph Stage1["Stage 1: Tier 1 Host Platform (F01 — app/host/)"]
+        H_Persist["SQLite WAL Persistence & Schema Custody"]
+        H_Core["Settings, Session Auth, Redacted FR-* Logging & Diagnostics"]
+        H_Jobs["ResourceManager, JobManager & Dynamic Plugin Discovery"]
+        H_API["FastAPI Gateway, Uniform Envelopes & Async EventBus"]
+        H_Persist --> H_Core --> H_Jobs --> H_API
+    end
+
+    subgraph Stage2_4["Stages 2–4: Foundational Domain Core & Workspaces (F02–F05)"]
+        D_Data["Stage 2: app/kernel/ (SQTime, DataSeries) + Data Manager Workspace + 9 data.provider Plugins (F02)"]
+        D_Strat["Stage 3: Strategy AST, Building Blocks, Indicators, AlgoWizard & Code Exporters (F03)"]
+        D_Sim["Stage 4: Multi-Precision Simulator, ATM/MM, Databanks & 60+ SQStats Results (F04–F05)"]
+        D_Data --> D_Strat --> D_Sim
+    end
+
+    subgraph Stage5_6["Stages 5–6: Generation, Robustness, Portfolios & Automation (F06–F13)"]
+        W_Build["Stage 5A: Random & Genetic Builder Engine (F06)"]
+        W_Valid["Stage 5B: Retester, Optimizer, WFO/WFM & 9 CrossCheck Plugins (F07)"]
+        W_Port["Stage 6A: Portfolio Master & Portfolio Composer (F08)"]
+        W_Proj["Stage 6B: Custom Projects .cfx Pipeline & 20 Task Plugins (F09)"]
+        W_Adv["Stage 6C: Distributed Compute, Neural Models, Connections & Q Assistant (F10–F13)"]
+        W_Build --> W_Valid --> W_Port --> W_Proj --> W_Adv
+    end
+
+    Stage0 --> Stage1 --> Stage2_4 --> Stage5_6
+```
+
+Following the delivery order ratified in [`../PROJECT.md`](../PROJECT.md) (*"Deliver import -> author -> backtest -> inspect/export first, then generation, optimization/robustness, portfolios and projects"*), each stage below specifies **what is built in Python**, its **exact `SQX_REFERENCE_ROOT` donor sources**, its **connected `ui/app/` surface**, and its **verification gate**:
+
+---
+
+#### Stage 0 — Reference Qualification & Evidence Infrastructure (`P00`)
+
+| Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
+| :--- | :--- | :--- | :--- |
+| **0A: Evidence Ledger & Schema** | `reimplementation.schema.json`, `reimplementation.json`, `docs/dev/evidence/README.md`, `docs/dev/evidence/p00-release-matrix.md` | All `SQX_REFERENCE_ROOT` artifacts (`StrategyQuantX.config`, `sqcli.config`, `CodeEditor.config`, `internal/libs/*.jar.enc`, `Snippets.jar`, `internal/plugins/*`, `internal/extend/*`) | `uv run python -m tests.reference.validate` (JSON syntax, schema compliance, monotonic `SQX145-EV-NNNNNN` IDs, SHA-256 fingerprints, clean-room flags). |
+| **0B: CI & Architecture Guards** | `tests/reference/validate.py` (`--check-donor`), `scripts/ci_check.py`, `app/host/README.md` (`FEAT-*`, `FR-*`, `DEC-*` registration) | [`libs/SQLib.md`](libs/SQLib.md), [`libs/SQDataLib.md`](libs/SQDataLib.md), [`libs/SQTradingLib.md`](libs/SQTradingLib.md) | `uv run python scripts/ci_check.py` (Ruff, `mypy --strict`, `pytest` >=80% branch coverage, UI `typecheck`/`test`/`build`). |
+
+---
+
+#### Stage 1 — Tier 1: Host Platform & Transport Infrastructure (`F01` — `app/host/`)
+
+| Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
+| :--- | :--- | :--- | :--- |
+| **1A: Isolated SQLite WAL Persistence** | `app/host/persistence/database.py`, `schema.py` (sole DDL owner, `IncompatibleSchemaError`), `settings_store.py` (`ensure_settings_schema`), `session_store.py` (`ensure_host_session_schema`), `job_store.py` | `SQX_REFERENCE_ROOT/internal/libs/sqlite-jdbc-3.51.2.0.jar`, `internal/license.db`, `internal/SQUANT.dat`, `com.strategyquant.lib.utils.SettingsMap` / `ValuesMap` ([`libs/SQLib.md`](libs/SQLib.md)) | AST architecture test enforcing zero `sqlite3` imports or raw SQL outside `app/host/persistence/`; WAL mode & atomic revision tests. |
+| **1B: Host Settings & Session Auth** | `app/host/settings.py` (`HostSettings`, field catalogue, HTTP allowlist, recursive secret redaction, revision-checked atomic merge), `app/host/session.py` (`SessionManager`, 24h opaque token, password hashing, `/sessions/me`) | `SQX_REFERENCE_ROOT/internal/AppSettings.txt`, `user/settings/settings.xml` (`<WebServerPortUsed>`, `<BrowserToken>`, `<skin>`, `<language>`, `<gpuAccelerated>`), `com.strategyquant.lib.L` ([`libs/SQLib.md`](libs/SQLib.md)) | Connects `ui/app/host/HostConnection.tsx`, `GlobalSettingsMenu.tsx`, `HostSettingsPanels.tsx` (7-tab Configuration UI). |
+| **1C: Telemetry, Redacted Logging & Diagnostics** | `app/host/logging.py` (multi-sink `app.log`/`access.log`/`errors.log`, secret redaction, path normalization, `collections.deque` ring buffer, mandatory `FR-*` tags), `app/host/diagnostics.py` (DB/workspace path & hardware probes) | `SQX_REFERENCE_ROOT/internal/libs/logback-core-1.4.14.jar`, `logback-classic-1.4.14.jar`, `slf4j-api-2.0.17.jar`, `opentelemetry-*-1.61.0.jar`, `internal/plugins/AppDebugConsole`, `user/log/*` | Connects `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx`; verifies zero silent executions and explicit `FR-*` log emission. |
+| **1D: Resource Governance & Multiprocessing `JobManager`** | `app/host/resources.py` (`psutil` CPU/RAM monitor, $\text{workers} = \max(1, \text{cpu\_cores} - 2)$, data-frame/memory cleanup guards, per-job scratch sandboxes), `app/host/jobs.py` (`JobManager`, `QUEUED`/`RUNNING`/`COMPLETED`/`FAILED`/`CANCELLED`, cooperative cancellation, startup orphan-job recovery) | `SQX_REFERENCE_ROOT/internal/libs/SQJobsLib.jar.enc`, `oshi-core-5.8.5.jar`, `WMI4Java-1.6.3.jar`, `com.strategyquant.lib.MemoryInfo` & `lib.memory.*` (`CpuInfo`, `MemoryUsageChecker` in [`libs/SQLib.md`](libs/SQLib.md)), `com.strategyquant.tradinglib.jobs.*` | Connects background job progress bars & cancellation controls across `ui/app/host/` and workspace progress views. |
+| **1E: Dynamic Plugin Discovery Engine** | `app/host/discovery.py` (`plugin.json` manifest validator, `importlib.util.spec_from_file_location` isolated loader, lazy thread-safe `get_instance` / `get_instances_for_slot` registry) | `SQX_REFERENCE_ROOT/internal/libs/SQPluginLib.jar.enc`, `jspf.core.jar`, `jspf.remote.jar`, `com.strategyquant.tradinglib.plugindef.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) | Verifies `SC-02` (Orthogonality) & `SC-03` (Explicit Typed Slots): adding/removing a plugin requires zero host/peer edits. |
+| **1F: FastAPI Gateway, Envelopes & Async `EventBus`** | `app/host/response.py` (`ApiResponse[T]`, RFC 7807 `StandardError`), `app/host/transport.py` (FastAPI app, WebSocket `/ws` & SSE `/events`, `EventBus` channels: `jobs`, `system`, `logs`, `databanks`, `settings.changed`) | `SQX_REFERENCE_ROOT/internal/libs/jetty-all-uber.jar`, `com.strategyquant.webguilib.*` (`HttpJSONServlet`, `WebAppManager`, `AbstractUIWebServer` in `SQAppLib.jar.enc`), `internal/plugins/ServletConstants`, `ServletRenameTool` | Connects `ui/app/host/transport.ts`, `router.tsx`, `HeaderApplications.tsx`, `ui/app/workspace/Home/HomeScreen.tsx`. |
+| **1G: Progressive 7-Stage Bootstrap & CLI** | `app/host/bootstrap.py` (`CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES -> READY` + reverse-order teardown), `app/main.py` (`haruquantai` CLI entrypoint) | `SQX_REFERENCE_ROOT/StrategyQuantX.config`, `sqcli.config`, `CodeEditor.config`, `StrategyQuant.jar.enc` (`SQStarter`, `SQConsoleStarter`), [`cli/README.md`](cli/README.md) | Full startup/teardown lifecycle integration test and headless CLI smoke test. |
+
+---
+
+#### Stage 2 — Mathematical Kernel & Market Data (`F02` — `app/kernel/` + `app/workspace/data_manager/` + `app/plugins/data_source/`)
+
+| Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
+| :--- | :--- | :--- | :--- |
+| **2A: Time, Seeded RNG & Columnar `DataSeries` Kernel** | `app/kernel/sq_time.py` (`SQTime` date/time/DOW/DST/session arithmetic), `app/kernel/rng.py` (`IRandomGenerator` deterministic seeded RNG), `app/kernel/series.py` (`Bar`, `Tick`, `Timeframe`, `Polars`/`PyArrow`/`NumPy` `DataSeries` with `IndyStartingBar` & `Shift`) | `com.strategyquant.lib.SQTime`, `IRandomGenerator` ([`libs/SQLib.md`](libs/SQLib.md)); `com.strategyquant.datalib.DataSeries`, `ChartDef`, `DataInfo`, `dataseries.*`, `timeframe.*`, `timezone.*`, `bartype.*`, `ticksimulator.*` ([`libs/SQDataLib.md`](libs/SQDataLib.md)) | Unit & property tests verifying `SQTime` timestamp conversions, DST boundaries, and zero-copy `DataSeries` indexing. |
+| **2B: Authoritative Data Manager Workspace (11 Modules)** | `app/workspace/data_manager/`: `home.py`, `data.py` (Parquet/DuckDB/`.dat` catalog & ingestion), `instruments.py` (`InstrumentInfo`), `sessions.py` (`TradingSession`, NinjaTrader XML), `baskets.py`, `broker.py`, `connections.py` (`ProviderManager`), `custom_data.py` (`COT`), `log.py`, `help.py`, `actions/review/quality.py` (`DataQualityInspector`), `actions/transform/transforms.py` (`SeriesTransformer`), `routes.py` (`/api/v2/data/...`) | `SQX_REFERENCE_ROOT/internal/plugins/DataManager*` (all 11 plugins: `DataManagerHome`, `DataManagerData`, `DataManagerInstruments`, `DataManagerSessions`, `DataManagerBasket`, `DataManagerBroker`, `DataManagerConnections`, `DataManagerCustomData`, `DataManagerActions`, `DataManagerLog`, `DataManagerHelp`), `ServletConnection`, `user/data/data.db`, `user/data/History/*/*.dat`, `com.strategyquant.datalib.instrument.*`, `session.*`, `basket.*`, `broker.*`, `validation.*` ([`libs/SQDataLib.md`](libs/SQDataLib.md)), [`cli/qdmcli.md`](cli/qdmcli.md) | Connects `ui/app/workspace/DataManager/DataManager.tsx`, `DataManagerHome.tsx`, `dataManagerLogClient.ts`, and `ui/app/plugins/data_source/*`. |
+| **2C: Dynamic Market Data Provider Plugins (`slot: "data.provider"`)** | `app/plugins/data_source/`: `dukascopy` (`.bi5`), `darwinex`, `metatrader` (MT4/MT5 CSV/HST/FXT + MT5 bridge), `sq_equity`, `sq_futures`, `crypto` (Binance/Bitfinex/CoinbasePro/Poloniex), `files` (CSV/Parquet/TSV), `yahoo`, `tick_downloader` | `SQX_REFERENCE_ROOT/internal/plugins/DataSource*` (9 plugins) + `CryptoExchange*` (6 plugins), `internal/python/scripts/mt5api.py`, `mt5_symbol_overrides.json`, `user/data/data_futures.h2.db`, `data_stock.h2.db`, `user/customdata/customdata.db`, `COT/*`, `com.strategyquant.datalib.customData.*`, `metatrader4.*`, `darwinex.*` ([`libs/SQDataLib.md`](libs/SQDataLib.md)), `com.strategyquant.tradinglib.dukascopy.*`, `yahoo.*`, `mt4.*`, `mt5api.*`, `crypto.*`, `cot.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) | Independent feed parser & round-trip export verification (CSV, Parquet, HST/FXT) + provider removal fallback test (`SC-02`). |
+
+---
+
+#### Stage 3 — Strategy Model, Building Blocks, Indicators & Code Exporters (`F03` — `app/workspace/strategies/` + `app/plugins/blocks/` & `exporters/`)
+
+| Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
+| :--- | :--- | :--- | :--- |
+| **3A: Vectorized Indicator Kernels & Specialist Indicators** | `app/kernel/indicators.py` & `app/plugins/indicators/`: 52+ indicator families (`SMA`, `EMA`, `LWMA`, `SMMA`, `HullMA`, `KAMA`, `ADX`, `Aroon`, `ATR`, `MTATR`, `BollingerBands`, `KeltnerChannel`, `CCI`, `RSI`, `LaguerreRSI`, `Stochastic`, `MACD`, `Ichimoku`, `ParabolicSAR`, `SuperTrend`, `LinReg`, `QQE`, `Reflex`, `STC`, `UlcerIndex`, `Vortex`, `VWAP`, `AnchoredVWAP`, `WaveTrend`, `VolumeProfile`, `TPOProfile`, `COT`, `CandlePattern`, `Fibo`, `Fractal`, `Pivots`, `SessionOHLC`, `HeikenAshi`) | `SQX_REFERENCE_ROOT/internal/libs/ta-lib-0.4.0.jar`, `internal/ctemplate/talibs.xml`, `internal/extend/Snippets/SQ/Blocks/Indicators/*`, `Snippets/SQ/TALibIndicators/*`, `Snippets/SQ/Calculators/*`, `custom_indicators/MetaTrader4/Indicators/*.mq4`, `custom_indicators/MetaTrader5/Indicators/*.mq5`, `custom_indicators/NinjaTrader/Indicators/*.cs`, `custom_indicators/Tradestation/*`, `VolumeProfile/*`, `COT/*`, `com.strategyquant.tradinglib.talib.*`, `indicator.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) | Numerical parity tests comparing Python indicator series against decrypted Java snippet / MQL5 / C# reference formulas (`SqCalculators`, `SqATR`, `SqRSI`, etc.). |
+| **3B: Strategy AST, Building Blocks, `Negater` & AlgoWizard / CodeEditor** | `app/workspace/strategies/` (`ast.py`, `loader.py` for `.sqx` / `.str`, `validator.py`, `algowizard_routes.py`, `code_editor_routes.py`), `app/plugins/blocks/` (`BarAndTime`, `CandlePatterns`, `Comparisons`, `Functions`, `Indicators`, `Order`, `Other`, `OtherActions`, `Price`, `StrategyControl`), `Negater` symmetry engine (`OppositeBlocks`) | `SQX_REFERENCE_ROOT/internal/ctemplate/*.xml` (`config.xml`, `conditions.xml`, `values.xml`, `actions.xml`, `comparisons.xml`, `events.xml`, `wizard.xml`), `internal/extend/Snippets/SQ/Blocks/*`, `Snippets/SQ/Negater/*.java`, `Snippets/SQ/Formulas/*`, `Snippets/SQ/Functions/*`, `Snippets/SQ/Internal/XmlStrategy.java`, `user/settings/OppositeBlocks_example.csv`, `internal/plugins/AppWizard`, `ServletAlgoWizard`, `AppCodeEditor`, `ServletCodeEditor`, `CodeEditorImportExport`, `CodeEditorIndicatorTester`, `LoaderSQ3`, `LoaderSQ4`, `SaverSQ3` | Connects `ui/app/workspace/AlgoWizard/*`, `ui/app/workspace/CodeEditor/*`; validates `.sqx` round-trip serialization and `OppositeBlock` negation symmetry. |
+| **3C: Template-Driven Platform Source Exporters (`slot: "export.platform"`)** | `app/plugins/exporters/`: `metatrader4` (`.mq4`), `metatrader5` (`.mq5`), `ninjatrader8` (`.cs`), `easylanguage` (`.el`), `jforex` (`.java`), `pseudocode` (`.txt`), plus shared macros (`cotCollectSymbols`, `printBlockChild`) | `SQX_REFERENCE_ROOT/internal/extend/Code/global/*`, `Code/MetaTrader4/*`, `Code/MetaTrader5/*`, `Code/NinjaTrader/*`, `Code/EasyLanguage/*`, `Code/JForex/*`, `Code/PseudoCode/*`, `internal/libs/freemarker-2.3.28.jar`, [`overview/export-engines/README.md`](overview/export-engines/README.md) | Connects `ui/app/workspace/AlgoWizard/StrategyCodeExportModal.tsx` and `ui/app/plugins/project/ResultsSourceCode`; verifies syntax-valid code generation across all 6 target platforms. |
+
+---
+
+#### Stage 4 — Simulation Engine, Databanks & Results (`F04` & `F05` — `app/workspace/simulator/` & `app/workspace/results/`)
+
+| Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
+| :--- | :--- | :--- | :--- |
+| **4A: Order State Machine, Exit Methods, ATM & Money Management** | `app/workspace/simulator/orders.py` (`Market`, `Stop`, `Limit`, `ReverseAtMarket`, `#BarsValid#`, `#ReplaceExisting#`, `#MagicNumber#`, `#AllowDuplicateTrades#`), `exits.py` (`StopLoss`, `ProfitTarget`, `MoveSL2BE`, `TrailingStop`, `ExitAfterBars`, `_ExitRule_`), `atm.py` (`ATM`, `ATMExit`), `app/plugins/money_management/` (`FixedSize`, `FixedAmount`, `RiskFixedBalancePct`, `RiskFixedPctOfAccount`, `ATRRiskBasedSizing`, `SimpleMartingaleMM`, `StocksSizeByPrice`, `Crypto*`, `Picker*`), `trading_options/` (`ExitAtEndOfDay`, `ExitOnFriday`, `LimitTimeRange`, `MaxTradesPerDay`, `MinMaxSLPT`, `DontTradeOnWeekends`), `costs.py` (spread, slippage, commissions, swap) | `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/MoneyManagement/*.java`, `Snippets/SQ/ExitMethods/*`, `Snippets/SQ/TradingOptions/*.java`, `Snippets/SQ/Trading/Commissions/*`, `Snippets/SQ/Trading/Scaling/*`, `Snippets/SQ/RiskManagement/*`, `com.strategyquant.tradinglib.ATM`, `ATMExit`, `atm.*`, `order.*`, `exit.*`, `moneymanagement.*`, `options.*`, `commissions.*`, `swap.*`, `scaling.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)), [`custom-projects/strategy-styles.md`](custom-projects/strategy-styles.md) | Connects `ui/app/plugins/project/SettingsMoneyManagement`, `SettingsOptions`, `SettingsAdvancedTM`; unit tests for every MM sizing formula, ATM partial exit, and SL/PT/Trailing transition. |
+| **4B: Multi-Precision Deterministic Simulation Loop & Execution Profiles** | `app/workspace/simulator/engine.py` (`Selected TF`, `1-minute`, and `Real Tick` intrabar simulation loop), execution profile adapters (`MT4`, `MT5 Hedged`, `MT5 Netted`, `TradeStation`, `NinjaTrader 8`, `JForex`, `Stockpicker`), `ServletStrategy` backtest runner routes | `com.strategyquant.tradinglib.StrategyBase`, `simulator.*` (18 classes), `engine.*` (48 classes), `execution.*`, `backtest.*` (38 classes), `backtestrunner.*` (7 classes), `algocloud.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)), `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Strategies/*.java` (`TestStrategyAskBid.java`, `CompleteStrategySample.java`, etc.) | Connects `ui/app/workspace/Chart/ChartWorkspace.tsx` and `ui/app/plugins/project/EnginePanel`; verifies deterministic trade lists on donor test strategies (`Snippets/SQ/Strategies/`). |
+| **4C: Databanks, 60+ `SQStats` Metrics & Results Analysis Views** | `app/workspace/results/databank.py` (top-$N$ heap/table, `IST`/`ISV`/`OOS` split stats, column views, `syncType`, `.sqx`/CSV/HTML/PDF export), `metrics.py` (all 60+ `DatabankColumn` calculators), `equity_chart.py`, `trade_analysis.py`, `routes.py` | `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Columns/Databanks/*.java`, `Snippets/SQ/Stats/Overview/*.java`, `Snippets/SQ/TradeAnalysis/*.java`, `Snippets/SQ/EngineCharts/*`, `Snippets/SQ/Checker/*`, `internal/plugins/AppResults`, `Results*` (23 plugins), `EquityChart*` (5 plugins), `DatabankFilterByCorrelation`, `DatabankRename`, `SaverHTML`, `SaverPDF`, `SaverStrategyTrades`, `FitnessMethod*` (3 plugins), `com.strategyquant.tradinglib.databank.*`, `results.*`, `equitychart.*`, `tradelist.*`, `tradeanalysis.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)), [`overview/stats-metrics.md`](overview/stats-metrics.md) | Connects `ui/app/workspace/Results/*`, `ui/app/plugins/databank/*`, and `ui/app/plugins/project/Results*`; verifies metric formulas (`NetProfit`, `ProfitFactor`, `ReturnDD`, `Sharpe`, `SQN`, `Stability`, `Stagnation`, `Symmetry`) against decrypted `Snippets/SQ/Columns/` & `Stats/`. |
+
+---
+
+#### Stage 5 — Strategy Generation, Optimization & Robustness Validation (`F06` & `F07` — `app/workspace/builder/`, `optimizer/`, `retester/` + `app/plugins/crosschecks/`)
+
+| Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
+| :--- | :--- | :--- | :--- |
+| **5A: Random & Genetic Programming Builder Engine (`F06`)** | `app/workspace/builder/`: `random_generator.py` (template/placeholder expansion, weighted block sampling, complexity constraints), `gp_engine.py` (multi-island evolution, tournament/roulette selection, subtree crossover, block/parameter mutation, initial population decimation, fresh-blood duplicate/weakest replacement, evolution restart management), `routes.py` | `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder`, `TaskBuild` (`task_forex.xml`, `task_futures.xml`, `task_stockpicker.xml`, `indicatorsCalibration`), `ServletBuilder`, `SettingsWhatToBuild`, `SettingsBlocks`, `SettingsGeneticOptions`, `SettingsPartsToImprove`, `SettingsRankings`, `internal/web/BUILDER/simpleTemplates/*`, `internal/libs/watchmaker-framework-0.7.1.jar`, `com.strategyquant.tradinglib.build.*`, `generator.*` (25 classes), `gp.*` (43 classes), `blocks.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)), [`overview/builder.md`](overview/builder.md) | Connects `ui/app/workspace/Builder/*` (`BuilderWorkspace.tsx`, `FullSettingsView.tsx`, `ProgressDashboard.tsx`, `FitnessEvolutionModal.tsx`); verifies seeded reproducibility and `Last generation` / `Results` databank population. |
+| **5B: Parameter Optimizer & Walk-Forward Matrix (`F07`)** | `app/workspace/optimizer/`: `simple_optimizer.py` (brute-force grid & genetic parameter search), `sequential_optimizer.py` (1D parameter stability search), `walk_forward.py` (sliding & anchored WFO), `wf_matrix.py` (`WFM` Start/Stop/Increment grid across runs $\times$ OOS%, 3D score surface, $3\times 3$ cluster pass/fail evaluator), `sys_param_permutation.py` (`SPP`), `routes.py` | `SQX_REFERENCE_ROOT/internal/plugins/AppOptimizer`, `TaskOptimize`, `SettingsOptimization`, `CrossCheckWalkForwardOptimization`, `CrossCheckWalkForwardMatrix`, `CrossCheckSequentialOptimization`, `CrossCheckOptProfileSysParamPermutation`, `ResultsWalkForward`, `ResultsOptimizationProfile`, `ResultsSequentialOptimization`, `ResultsSysParamPermutation`, `FitnessMethodWFResult`, `com.strategyquant.tradinglib.optimization.*` (50 classes), `wfo.*` (4 classes) ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)), [`overview/optimizer.md`](overview/optimizer.md) | Connects `ui/app/workspace/Optimizer/*` (`OptimizerWorkspace.tsx`, `OptimizationParameters.tsx`, `WalkForwardMatrixView.tsx`) and `ui/app/plugins/optimization/*`. |
+| **5C: Retester & 9 `CrossCheck*` Robustness / Monte Carlo / What-If Plugins (`F07`)** | `app/workspace/retester/` (`retester.py`, `auto_retest.py`, `routes.py`) + `app/plugins/crosschecks/` (`slot: "validation.crosscheck"`): `mc_manipulation` (`RandomizeTradesOrder`, `SkipTradesRandomly`), `mc_retest` (`RandomizeStrategyParameters`, `RandomizeHistoryData`, `RandomizeStartingBar` at confidence levels `50..100`), `higher_precision`, `additional_markets`, `wfo`, `wfm`, `sequential_opt`, `spp`, `whatif` (14 `WhatIf` trade filters: `ByDays`, `ByHours`, `ByMonths`, `ExcludePctTradesWithBiggestPl`, `ExcludeShortTrades`, `ExludeOverlappingTrades`, `TakeMaxTradesPerDay`, `UseFixedLots`, etc.) | `SQX_REFERENCE_ROOT/internal/plugins/AppRetester`, `TaskRetest`, `TaskAutomaticRetest`, `SettingsWhatToRetest`, `SettingsAutoRetestData`, `SettingsCrossChecks`, `CrossCheck*` (all 9 plugins), `ResultsRobustnessTests`, `internal/extend/Snippets/SQ/MonteCarlo/Manipulation/*.java`, `Snippets/SQ/MonteCarlo/Retest/*.java`, `Snippets/SQ/WhatIf/*.java`, `com.strategyquant.tradinglib.crosscheck.*` (10 classes), `robustnesstests.*` (9 classes), `montecarlo.*`, `whatif.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)), [`overview/retester.md`](overview/retester.md) | Connects `ui/app/workspace/Retester/*` and `ui/app/plugins/project/SettingsCrossChecks`, `ResultsRobustnessTests`; verifies exact MC confidence-percentile interpolation (`50, 60, 70, 80, 90, 92, 95, 97, 98, 99, 100`) and `WhatIf` trade filtering against donor Java snippets. |
+
+---
+
+#### Stage 6 — Portfolios & Custom Projects Automation (`F08` & `F09` — `app/workspace/portfolio_master/`, `portfolio_composer/`, `custom_projects/`)
+
+| Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
+| :--- | :--- | :--- | :--- |
+| **6A: Portfolio Master & Portfolio Composer (`F08`)** | `app/workspace/portfolio_master/` (brute-force & genetic K-strategy combination search, pairwise correlation filter via `CorrelationOf`, sector/market caps, `PortfolioMasterFitness`), `app/workspace/portfolio_composer/` (interactive per-strategy weight multiplier, account balance/leverage/free-margin daily simulation, `Composer Log`) | `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster`, `TaskAutomaticPortfolioBuilder`, `TaskCreatePortfolio`, `SettingsAutomaticPortfolioBuilder`, `SettingsCreatePortfolio`, `AppPortfolioComposer`, `PortfolioComposer`, `ResultsPortfolioCorrelation`, `ResultsPortfolioComposerChart`, `ResultsPortfolioComposerLog`, `FitnessMethodExistingPortfolio`, `internal/extend/Snippets/SQ/PortfolioMasterFitness/*.java` (`NetProfit.java`, `PctStagnation.java`, `ReturnDD.java`), `Snippets/SQ/CorrelationOf/*.java`, `com.strategyquant.tradinglib.portfolioMaster.*`, `correlation.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)), [`overview/portfolio-master.md`](overview/portfolio-master.md), [`overview/portfolio-composer.md`](overview/portfolio-composer.md) | Connects `ui/app/workspace/PortfolioMaster/*` and `ui/app/workspace/PortfolioComposer/*`; verifies correlation matrix math and margin-constrained daily order skipping log. |
+| **6B: Custom Projects `.cfx` Engine, 20 `Task*` & 5 `ProjectCondition*` Plugins (`F09`)** | `app/workspace/custom_projects/`: `cfx.py` (`.cfx` Flavour A project & Flavour B template ZIP reader/writer, `project_backup.cfx` atomic save), `validator.py` (`ProjectFileValidator`: `open -> config -> tasks -> templates -> settings`), `runner.py` (sequential/loop task pipeline, `from-first` / `from-here` / `this-task-only`, `GoToTask` reachability & cycle counters), plus all 20 `Task*` plugins (`Build`, `Retest`, `AutomaticRetest`, `Optimize`, `AutomaticPortfolioBuilder`, `CreatePortfolio`, `Filtering`, `ClearDatabanks`, `LoadFromFiles`, `SaveToFiles`, `DeleteFile`, `ApplyMassConfig`, `CustomAnalysis`, `LogDatabankStats`, `UpdateData`, `CallExternalScript`, `Notification`, `StopAndStart`, `WaitFor`, `GoToTask`) & 5 `ProjectCondition*` plugins | `SQX_REFERENCE_ROOT/internal/plugins/AppTaskManager`, `TaskManagerProjects`, `TaskManagerTasks`, `ServletProject`, `ProjectDatabanks`, `ProjectResources`, `ProjectResults`, `ProjectSettings`, `ProjectCondition*` (5 plugins), `Task*` (20 plugins), `Settings*` (task-specific tabs), `internal/extend/Snippets/SQ/CustomAnalysis/*`, `user/projects/*/project.cfx`, `com.strategyquant.tradinglib.project.*` (83 classes), `task.*` (20 classes), `taskImpl.*`, `tasks.*`, `file.SQFileManager` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)), [`custom-projects/cfx-format.md`](custom-projects/cfx-format.md), [`custom-projects/project-config.md`](custom-projects/project-config.md) | Connects `ui/app/workspace/CustomProjects/*` and `ui/app/plugins/project/ProjectWorkbench`; validates loading and executing real donor `.cfx` archives from `SQX_REFERENCE_ROOT/user/projects/`. |
+
+---
+
+#### Stage 7 — Advanced Ecosystem Tracks (`F10`–`F13`)
+
+| Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
+| :--- | :--- | :--- | :--- |
+| **7A: Distributed Compute Grid (`F10`)** | `app/workspace/grid_control/` & remote worker agent using identical `JobManager` task contracts | `SQX_REFERENCE_ROOT/internal/libs/SQGridLib2.jar.enc`, `netty-all-4.1.5.Final.jar`, `artemis-*-1.5.0.jar`, `internal/plugins/AppGridControl`, `AppGridTest`, `ServletGridControl`, `com.strategyquant.tradinglib.simplegrid.*` | Connects `ui/app/workspace/GridControl/GridControlWorkspace.tsx` and `ui/app/workspace/GridTest/GridTestWorkspace.tsx`. |
+| **7B: Neural Network Trainer (`F11`)** | `app/workspace/neural_network/` (bounded temporal feature preprocessing, walk-forward model training, retained artifact inference) | `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork`, `TaskNeuralNetworkTrainer`, `docs/SQX/custom-projects/task-settings/neural-network-trainer.md` | Connects `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`. |
+| **7C: Connections, MTAnalyzer, AlgoCloud & Business (`F12`)** | `app/workspace/trading/`, `app/workspace/mt_analyzer/`, `app/workspace/business/`, `app/plugins/brokers/` (live mutations disabled by default; requires separate authorization) | `SQX_REFERENCE_ROOT/internal/plugins/ConnectionMT4`, `ConnectionLiveTest`, `ConnectionTest`, `AppSQXBusiness`, `AppMarketplace`, `ServletAlgoCloud`, `internal/web/MTANALYZER`, `docs/SQX/algocloud/*`, `com.strategyquant.tradinglib.connection.*` | Connects `ui/app/workspace/Trading/*`, `ui/app/workspace/MTAnalyzer/*`, `ui/app/workspace/Business/*`. |
+| **7D: Bounded `Q` AI Research Assistant & MCP Tools (`F13`)** | `app/workspace/sqai/` (typed read/validation/project MCP tools, isolated scratchpad, zero autonomous live trading authority) | `SQX_REFERENCE_ROOT/internal/plugins/ServletSQAI`, `internal/libs/mcp-0.17.2.jar`, `internal/web/SQAI`, `user/extend/AIPlugins/*`, `com.strategyquant.tradinglib.AITool.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) | Connects `ui/app/workspace/AlgoWizard/AlgoWizardAI.tsx` and `ui/app/workspace/Business/ConfigureMcpModal.tsx`. |
