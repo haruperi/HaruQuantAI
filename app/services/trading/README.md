@@ -42,8 +42,9 @@ such as backend.account, but they are instances of these same canonical classes.
 There are no alternative classes/proxies folders under brokers.
 
 Generic selected-object InfoInteger/InfoDouble/InfoString calls return
-PropertyValue. AccountInfo/TerminalInfo property calls return scalars. Trade
-Request/Result/CheckResult return dictionaries. Enums retain native numeric values;
+PropertyValue. AccountInfo/TerminalInfo calls return typed snapshots
+(AccountSnapshot, TerminalSnapshot). Trade Request/Result/CheckResult return
+dictionaries. Enums retain native numeric values;
 seconds/milliseconds stay integer values. Symbol Name() reads the binding;
 Name("EURUSD") returns a binding boolean. StoreState and void native setters return
 booleans consistently across backends.

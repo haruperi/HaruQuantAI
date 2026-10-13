@@ -904,6 +904,42 @@ string AccountInfoJson(CAccountInfo *obj)
       "}";
   }
 
+string TerminalInfoJson(CTerminalInfo *obj)
+  {
+   return "{"
+      "\"build\":"+JsonLong((long)obj.Build())+
+      ",\"connected\":"+JsonBool(obj.IsConnected())+
+      ",\"dlls_allowed\":"+JsonBool(obj.IsDLLsAllowed())+
+      ",\"trade_allowed\":"+JsonBool(obj.IsTradeAllowed())+
+      ",\"email_enabled\":"+JsonBool(obj.IsEmailEnabled())+
+      ",\"ftp_enabled\":"+JsonBool(obj.IsFtpEnabled())+
+      ",\"max_bars\":"+JsonLong((long)obj.MaxBars())+
+      ",\"code_page\":"+JsonLong((long)obj.CodePage())+
+      ",\"cpu_cores\":"+JsonLong((long)obj.CPUCores())+
+      ",\"memory_physical\":"+JsonLong((long)obj.MemoryPhysical())+
+      ",\"memory_total\":"+JsonLong((long)obj.MemoryTotal())+
+      ",\"memory_available\":"+JsonLong((long)obj.MemoryAvailable())+
+      ",\"memory_used\":"+JsonLong((long)obj.MemoryUsed())+
+      ",\"is_x64\":"+JsonBool(obj.IsX64())+
+      ",\"opencl_support\":"+JsonLong((long)obj.OpenCLSupport())+
+      ",\"disk_space\":"+JsonLong((long)obj.DiskSpace())+
+      ",\"language\":"+JsonQuote(obj.Language())+
+      ",\"name\":"+JsonQuote(obj.Name())+
+      ",\"company\":"+JsonQuote(obj.Company())+
+      ",\"path\":"+JsonQuote(obj.Path())+
+      ",\"data_path\":"+JsonQuote(obj.DataPath())+
+      ",\"common_data_path\":"+JsonQuote(obj.CommonDataPath())+
+      ",\"community_account\":"+JsonBool((bool)TerminalInfoInteger(TERMINAL_COMMUNITY_ACCOUNT))+
+      ",\"community_connection\":"+JsonBool((bool)TerminalInfoInteger(TERMINAL_COMMUNITY_CONNECTION))+
+      ",\"tradeapi_disabled\":"+JsonBool(false)+
+      ",\"notifications_enabled\":"+JsonBool((bool)TerminalInfoInteger(TERMINAL_NOTIFICATIONS_ENABLED))+
+      ",\"mqid\":"+JsonBool((bool)TerminalInfoInteger(TERMINAL_MQID))+
+      ",\"ping_last\":"+JsonLong((long)TerminalInfoInteger(TERMINAL_PING_LAST))+
+      ",\"community_balance\":"+JsonDouble(TerminalInfoDouble(TERMINAL_COMMUNITY_BALANCE))+
+      ",\"retransmission\":"+JsonDouble(TerminalInfoDouble(TERMINAL_RETRANSMISSION))+
+      "}";
+  }
+
 string TradeMeta(CTrade &obj)
   {
    MqlTradeResult r; ZeroMemory(r); obj.Result(r);
@@ -1897,38 +1933,7 @@ void DispatchTerminal(const string command_id,const string object_id,const strin
   {
    CTerminalInfo *p=GetTerminal(object_id); if(CheckPointer(p)==POINTER_INVALID) { RespondError(command_id,"OBJECT_CREATE_FAILED","CTerminalInfo allocation failed"); return; }
    CTerminalInfo *obj=p;
-   if(method=="Build") { RespondLong(command_id, true, (long)(obj.Build())); return; }
-   if(method=="IsConnected") { RespondBool(command_id, true, obj.IsConnected()); return; }
-   if(method=="IsDLLsAllowed") { RespondBool(command_id, true, obj.IsDLLsAllowed()); return; }
-   if(method=="IsTradeAllowed") { RespondBool(command_id, true, obj.IsTradeAllowed()); return; }
-   if(method=="IsEmailEnabled") { RespondBool(command_id, true, obj.IsEmailEnabled()); return; }
-   if(method=="IsFtpEnabled") { RespondBool(command_id, true, obj.IsFtpEnabled()); return; }
-   if(method=="MaxBars") { RespondLong(command_id, true, (long)(obj.MaxBars())); return; }
-   if(method=="CodePage") { RespondLong(command_id, true, (long)(obj.CodePage())); return; }
-   if(method=="CPUCores") { RespondLong(command_id, true, (long)(obj.CPUCores())); return; }
-   if(method=="MemoryPhysical") { RespondLong(command_id, true, (long)(obj.MemoryPhysical())); return; }
-   if(method=="MemoryTotal") { RespondLong(command_id, true, (long)(obj.MemoryTotal())); return; }
-   if(method=="MemoryAvailable") { RespondLong(command_id, true, (long)(obj.MemoryAvailable())); return; }
-   if(method=="MemoryUsed") { RespondLong(command_id, true, (long)(obj.MemoryUsed())); return; }
-   if(method=="IsX64") { RespondBool(command_id, true, obj.IsX64()); return; }
-   if(method=="OpenCLSupport") { RespondLong(command_id, true, (long)(obj.OpenCLSupport())); return; }
-   if(method=="DiskSpace") { RespondLong(command_id, true, (long)(obj.DiskSpace())); return; }
-   if(method=="Language") { RespondString(command_id, true, obj.Language()); return; }
-   if(method=="Name") { RespondString(command_id, true, obj.Name()); return; }
-   if(method=="Company") { RespondString(command_id, true, obj.Company()); return; }
-   if(method=="Path") { RespondString(command_id, true, obj.Path()); return; }
-   if(method=="DataPath") { RespondString(command_id, true, obj.DataPath()); return; }
-   if(method=="CommonDataPath") { RespondString(command_id, true, obj.CommonDataPath()); return; }
-   if(method=="InfoInteger") { RespondLong(command_id,true,obj.InfoInteger((ENUM_TERMINAL_INFO_INTEGER)ParseEnumCode(args,0))); return; }
-   if(method=="InfoString") { RespondString(command_id,true,obj.InfoString((ENUM_TERMINAL_INFO_STRING)ParseEnumCode(args,0))); return; }
-   if(method=="CommunityAccount") { RespondBool(command_id, true, (bool)TerminalInfoInteger(TERMINAL_COMMUNITY_ACCOUNT)); return; }
-   if(method=="CommunityConnection") { RespondBool(command_id, true, (bool)TerminalInfoInteger(TERMINAL_COMMUNITY_CONNECTION)); return; }
-   if(method=="TradeAPIDisabled") { RespondBool(command_id, true, false); return; }
-   if(method=="NotificationsEnabled") { RespondBool(command_id, true, (bool)TerminalInfoInteger(TERMINAL_NOTIFICATIONS_ENABLED)); return; }
-   if(method=="MQID") { RespondBool(command_id, true, (bool)TerminalInfoInteger(TERMINAL_MQID)); return; }
-   if(method=="PingLast") { RespondLong(command_id, true, (long)TerminalInfoInteger(TERMINAL_PING_LAST)); return; }
-   if(method=="CommunityBalance") { RespondDouble(command_id, true, TerminalInfoDouble(TERMINAL_COMMUNITY_BALANCE)); return; }
-   if(method=="Retransmission") { RespondDouble(command_id, true, TerminalInfoDouble(TERMINAL_RETRANSMISSION)); return; }
+   if(method=="TerminalInfo") { RespondRaw(command_id, true, TerminalInfoJson(obj)); return; }
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown CTerminalInfo method: "+method);
   }
 

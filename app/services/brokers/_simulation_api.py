@@ -56,6 +56,7 @@ from app.services.brokers.contracts import (
     SymbolSwapMode,
     SymbolTradeExecution,
     SymbolTradeMode,
+    TerminalSnapshot,
     TradeAction,
     TradeCheckResult,
     TradeRequest,
@@ -1873,142 +1874,13 @@ def _terminalinfo___init__(self: _ObjectState, backend: BrokerBackend) -> None:
     self._backend = backend
 
 
-def _terminalinfo__t(self: _ObjectState) -> Any:
-    return self._backend.terminal()
-
-
-def _terminalinfo_build(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).build)
-
-
-def _terminalinfo_isconnected(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).connected)
-
-
-def _terminalinfo_isdllsallowed(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).dlls_allowed)
-
-
-def _terminalinfo_istradeallowed(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).trade_allowed)
-
-
-def _terminalinfo_isemailenabled(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).email_enabled)
-
-
-def _terminalinfo_isftpenabled(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).ftp_enabled)
-
-
-def _terminalinfo_maxbars(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).max_bars)
-
-
-def _terminalinfo_codepage(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).code_page)
-
-
-def _terminalinfo_cpucores(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).cpu_cores)
-
-
-def _terminalinfo_memoryphysical(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).memory_physical)
-
-
-def _terminalinfo_memorytotal(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).memory_total)
-
-
-def _terminalinfo_memoryavailable(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).memory_available)
-
-
-def _terminalinfo_memoryused(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).memory_used)
-
-
-def _terminalinfo_isx64(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).is_x64)
-
-
-def _terminalinfo_openclsupport(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).opencl_support)
-
-
-def _terminalinfo_diskspace(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).disk_space)
-
-
-def _terminalinfo_language(self: _ObjectState) -> str:
-    return cast("str", _terminalinfo__t(self).language)
-
-
-def _terminalinfo_name(self: _ObjectState) -> str:
-    return cast("str", _terminalinfo__t(self).name)
-
-
-def _terminalinfo_company(self: _ObjectState) -> str:
-    return cast("str", _terminalinfo__t(self).company)
-
-
-def _terminalinfo_path(self: _ObjectState) -> str:
-    return cast("str", _terminalinfo__t(self).path)
-
-
-def _terminalinfo_datapath(self: _ObjectState) -> str:
-    return cast("str", _terminalinfo__t(self).data_path)
-
-
-def _terminalinfo_commondatapath(self: _ObjectState) -> str:
-    return cast("str", _terminalinfo__t(self).common_data_path)
-
-
-def _terminalinfo_infointeger(self: _ObjectState, property_id: int | str) -> int:
-    value = self._backend.info_value("terminal", property_id)
-    if value is None and isinstance(property_id, str):
-        value = getattr(_terminalinfo__t(self), property_id.strip().lower(), 0)
-    return int(value or 0)
-
-
-def _terminalinfo_infostring(self: _ObjectState, property_id: int | str) -> str:
-    value = self._backend.info_value("terminal", property_id)
-    if value is None and isinstance(property_id, str):
-        value = getattr(_terminalinfo__t(self), property_id.strip().lower(), "")
-    return str(value or "")
-
-
-def _terminalinfo_communityaccount(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).community_account)
-
-
-def _terminalinfo_communityconnection(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).community_connection)
-
-
-def _terminalinfo_tradeapidisabled(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).tradeapi_disabled)
-
-
-def _terminalinfo_notificationsenabled(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).notifications_enabled)
-
-
-def _terminalinfo_mqid(self: _ObjectState) -> bool:
-    return bool(_terminalinfo__t(self).mqid)
-
-
-def _terminalinfo_pinglast(self: _ObjectState) -> int:
-    return int(_terminalinfo__t(self).ping_last)
-
-
-def _terminalinfo_communitybalance(self: _ObjectState) -> float:
-    return float(_terminalinfo__t(self).community_balance)
-
-
-def _terminalinfo_retransmission(self: _ObjectState) -> float:
-    return float(_terminalinfo__t(self).retransmission)
+def _terminalinfo_terminalinfo(self: _ObjectState) -> TerminalSnapshot:
+    terminal = self._backend.terminal()
+    if is_dataclass(terminal) and not isinstance(terminal, type):
+        return cast("TerminalSnapshot", terminal)
+    if isinstance(terminal, dict):
+        return TerminalSnapshot(**terminal)
+    raise TypeError(f"unexpected terminal snapshot type: {type(terminal).__name__}")
 
 
 def _trade___init__(self: _ObjectState, backend: BrokerBackend) -> None:
@@ -2982,38 +2854,7 @@ HANDLERS: dict[str, dict[str, Callable[..., Any]]] = {
         "as_dict": _symbolinfo_asdict,
     },
     "TerminalInfo": {
-        "Build": _terminalinfo_build,
-        "IsConnected": _terminalinfo_isconnected,
-        "IsDLLsAllowed": _terminalinfo_isdllsallowed,
-        "IsTradeAllowed": _terminalinfo_istradeallowed,
-        "IsEmailEnabled": _terminalinfo_isemailenabled,
-        "IsFtpEnabled": _terminalinfo_isftpenabled,
-        "MaxBars": _terminalinfo_maxbars,
-        "CodePage": _terminalinfo_codepage,
-        "CPUCores": _terminalinfo_cpucores,
-        "MemoryPhysical": _terminalinfo_memoryphysical,
-        "MemoryTotal": _terminalinfo_memorytotal,
-        "MemoryAvailable": _terminalinfo_memoryavailable,
-        "MemoryUsed": _terminalinfo_memoryused,
-        "IsX64": _terminalinfo_isx64,
-        "OpenCLSupport": _terminalinfo_openclsupport,
-        "DiskSpace": _terminalinfo_diskspace,
-        "Language": _terminalinfo_language,
-        "Name": _terminalinfo_name,
-        "Company": _terminalinfo_company,
-        "Path": _terminalinfo_path,
-        "DataPath": _terminalinfo_datapath,
-        "CommonDataPath": _terminalinfo_commondatapath,
-        "InfoInteger": _terminalinfo_infointeger,
-        "InfoString": _terminalinfo_infostring,
-        "CommunityAccount": _terminalinfo_communityaccount,
-        "CommunityConnection": _terminalinfo_communityconnection,
-        "TradeAPIDisabled": _terminalinfo_tradeapidisabled,
-        "NotificationsEnabled": _terminalinfo_notificationsenabled,
-        "MQID": _terminalinfo_mqid,
-        "PingLast": _terminalinfo_pinglast,
-        "CommunityBalance": _terminalinfo_communitybalance,
-        "Retransmission": _terminalinfo_retransmission,
+        "TerminalInfo": _terminalinfo_terminalinfo,
     },
     "Trade": {
         "LogLevel": _trade_loglevel,

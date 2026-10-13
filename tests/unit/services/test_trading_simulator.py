@@ -146,7 +146,8 @@ def test_rejection_and_unknown_operation() -> None:
                 object_id="test", class_name="Trade", method_name="Unknown", args=[]
             )
         with pytest.raises(BridgeError, match="numeric property"):
-            await trading.terminal.InfoInteger(999)
+            await trading.symbol.InfoInteger(999)
+        assert (await trading.terminal.TerminalInfo()).connected is True
         with pytest.raises(BridgeError, match="queued asynchronous"):
             await trading.trade.SetAsyncMode(True)
         assert backend.positions() == []

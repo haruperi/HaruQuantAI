@@ -39,7 +39,7 @@ from app.services.brokers.simulator import SimulationBackend
         ("HistoryOrderInfo", 31),
         ("PositionInfo", 29),
         ("DealInfo", 24),
-        ("TerminalInfo", 32),
+        ("TerminalInfo", 1),
     ],
 )
 def test_one_complete_async_class(name: str, count: int) -> None:

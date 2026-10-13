@@ -56,6 +56,7 @@ from app.services.brokers.contracts import (
     OrderType,
     ReceiptStatus,
     SymbolSpec,
+    TerminalSnapshot,
     Timeframe,
     TradeAction,
     TradeRequest,
@@ -175,18 +176,25 @@ async def example_01_connect(ctx: ExampleContext) -> None:
     await ctx.trading.start()
     print(f"Waiting for backend readiness; timeout={CONNECT_TIMEOUT} seconds")
     await ctx.trading.wait_connected(timeout=CONNECT_TIMEOUT)
-    connected = await ctx.trading.terminal.IsConnected()
+    connected_info = await ctx.trading.terminal.TerminalInfo()
     command_id = ctx.trading.terminal.last_command_id
     receipt = ctx.trading.receipt(command_id) if command_id is not None else None
+    receipt_connected = (
+        receipt.value.connected
+        if receipt is not None and isinstance(receipt.value, TerminalSnapshot)
+        else receipt.value.get("connected")
+        if receipt is not None and isinstance(receipt.value, dict)
+        else None
+    )
     if (
-        type(connected) is not bool
+        not isinstance(connected_info, TerminalSnapshot)
         or receipt is None
         or receipt.status != ReceiptStatus.RESOLVED
         or receipt.command_id != command_id
         or receipt.object_id != ctx.trading.terminal.object_id
         or receipt.class_name != "TerminalInfo"
-        or receipt.method_name != "IsConnected"
-        or receipt.value is not connected
+        or receipt.method_name != "TerminalInfo"
+        or receipt_connected is not True
         or receipt.error is not None
         or receipt.sent_at is None
         or receipt.acknowledged_at is None
@@ -202,10 +210,10 @@ async def example_01_connect(ctx: ExampleContext) -> None:
         raise ExampleError(
             "Connection probe has missing or mismatched response evidence"
         )
-    if not connected:
+    if not connected_info.connected:
         ctx.trading.disarm()
         raise ExampleError("Terminal responded but is disconnected from its broker")
-    print(f"Terminal connected : {connected}")
+    print(f"Terminal connected : {connected_info.connected}")
     print(f"Probe : {receipt.class_name}.{receipt.method_name}")
     print(f"Command ID : {receipt.command_id}")
     print(f"Receipt status : {receipt.status.value}")
@@ -218,22 +226,23 @@ async def example_02_terminal(ctx: ExampleContext) -> None:
     """Demonstrate printing terminal information using TerminalInfo."""
     _header("Terminal Information")
     terminal = ctx.trading.terminal
-    print(f"Name: {await terminal.Name()}")
-    print(f"Company: {await terminal.Company()}")
-    print(f"Build: {await terminal.Build()}")
-    print(f"Language: {await terminal.Language()}")
-    print(f"Connected: {await terminal.IsConnected()}")
-    print(f"Trade allowed: {await terminal.IsTradeAllowed()}")
-    print(f"DLLs allowed: {await terminal.IsDLLsAllowed()}")
-    print(f"Trade API disabled: {await terminal.TradeAPIDisabled()}")
-    print(f"Notifications enabled: {await terminal.NotificationsEnabled()}")
-    print(f"MQID: {await terminal.MQID()}")
-    print(f"Ping last: {await terminal.PingLast()}")
-    print(f"Community balance: {await terminal.CommunityBalance()}")
-    print(f"Retransmission: {await terminal.Retransmission()}")
-    print(f"Path: {await terminal.Path()}")
-    print(f"Data path: {await terminal.DataPath()}")
-    print(f"Common data path: {await terminal.CommonDataPath()}")
+    info = await terminal.TerminalInfo()
+    print(f"Name: {info.name}")
+    print(f"Company: {info.company}")
+    print(f"Build: {info.build}")
+    print(f"Language: {info.language}")
+    print(f"Connected: {info.connected}")
+    print(f"Trade allowed: {info.trade_allowed}")
+    print(f"DLLs allowed: {info.dlls_allowed}")
+    print(f"Trade API disabled: {info.tradeapi_disabled}")
+    print(f"Notifications enabled: {info.notifications_enabled}")
+    print(f"MQID: {info.mqid}")
+    print(f"Ping last: {info.ping_last}")
+    print(f"Community balance: {info.community_balance}")
+    print(f"Retransmission: {info.retransmission}")
+    print(f"Path: {info.path}")
+    print(f"Data path: {info.data_path}")
+    print(f"Common data path: {info.common_data_path}")
 
 
 async def example_03_account(ctx: ExampleContext) -> None:

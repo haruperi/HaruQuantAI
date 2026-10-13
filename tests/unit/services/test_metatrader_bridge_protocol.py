@@ -41,6 +41,7 @@ from app.services.brokers.contracts import (
     Receipt,
     ReceiptStatus,
     SymbolSpec,
+    TerminalSnapshot,
     TradeAction,
     TradeRequest,
 )
@@ -315,14 +316,14 @@ def test_connection_example_displays_observed_receipt(
             assert command is not None
             receipt = ctx.trading.receipt(command)
             assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
-            assert receipt.value is True
+            assert receipt.value.get("connected") is True
         finally:
             await brokers.example_21_shutdown(ctx)
 
     asyncio.run(scenario())
     output = capsys.readouterr().out
     assert "Command ID" in output and "Terminal connected" in output
-    assert "TerminalInfo.IsConnected" in output
+    assert "TerminalInfo.TerminalInfo" in output
     assert "Acknowledged at" in output
     assert "Resolved at" in output
 
@@ -390,18 +391,18 @@ def test_connection_example_rejects_invalid_receipt(
     asyncio.run(scenario())
 
 
-@pytest.mark.parametrize("probe_value", [False, 1])
+@pytest.mark.parametrize("probe_value", [TerminalSnapshot(connected=False), 1])
 def test_connection_example_rejects_false_or_nonboolean_probe(
-    probe_value: bool | int,
+    probe_value: Any,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A resolved response must be a genuine True boolean, not truthy data."""
+    """A resolved response must be a genuine connected snapshot."""
     backend = brokers.create_backend("simulator")
     ctx = brokers.ExampleContext(brokers.Trading(backend))
-    original_probe = ctx.trading.terminal.IsConnected
+    original_probe = ctx.trading.terminal.TerminalInfo
 
-    async def probe() -> bool | int:
-        await original_probe()
+    async def probe(*args: Any) -> Any:
+        await original_probe(*args)
         command = ctx.trading.terminal.last_command_id
         assert command is not None
         receipt = backend.receipt(command)
@@ -409,7 +410,7 @@ def test_connection_example_rejects_false_or_nonboolean_probe(
         backend._receipts[command] = replace(receipt, value=probe_value)
         return probe_value
 
-    monkeypatch.setattr(ctx.trading.terminal, "IsConnected", probe)
+    monkeypatch.setattr(ctx.trading.terminal, "TerminalInfo", probe)
 
     async def scenario() -> None:
         try:
@@ -432,7 +433,7 @@ def test_connection_example_timeout_closes_backend(
     probe = AsyncMock()
     monkeypatch.setattr(trading, "close", close)
     monkeypatch.setattr(trading, "wait_connected", AsyncMock(side_effect=TimeoutError))
-    monkeypatch.setattr(trading.terminal, "IsConnected", probe)
+    monkeypatch.setattr(trading.terminal, "TerminalInfo", probe)
     monkeypatch.setattr(brokers, "Trading", Mock(return_value=trading))
     with pytest.raises(TimeoutError):
         asyncio.run(brokers.run_examples(backend))
@@ -472,7 +473,7 @@ def test_hello_ack_and_correlated_probe_without_listener(
                             "kind": "response",
                             "command_id": frame["command_id"],
                             "ok": True,
-                            "value": True,
+                            "value": {"connected": True},
                         }
                     )
                 )
@@ -499,7 +500,7 @@ def test_hello_ack_and_correlated_probe_without_listener(
                 assert native.bridge.connected
                 assert [frame["kind"] for frame in frames] == ["hello_ack", "call"]
                 assert frames[1]["class"] == "TerminalInfo"
-                assert frames[1]["method"] == "IsConnected"
+                assert frames[1]["method"] == "TerminalInfo"
                 receipt = native.receipt(frames[1]["command_id"])
                 assert receipt is not None and receipt.status == ReceiptStatus.RESOLVED
             else:
@@ -599,14 +600,15 @@ def test_terminal_info_extended_properties_parity() -> None:
     terminal = trading.terminal
 
     async def scenario() -> None:
-        assert await terminal.CommunityAccount() is False
-        assert await terminal.CommunityConnection() is False
-        assert await terminal.TradeAPIDisabled() is False
-        assert await terminal.NotificationsEnabled() is False
-        assert await terminal.MQID() is False
-        assert await terminal.PingLast() == 0
-        assert await terminal.CommunityBalance() == 0.0
-        assert await terminal.Retransmission() == 0.0
+        info = await terminal.TerminalInfo()
+        assert info.community_account is False
+        assert info.community_connection is False
+        assert info.tradeapi_disabled is False
+        assert info.notifications_enabled is False
+        assert info.mqid is False
+        assert info.ping_last == 0
+        assert info.community_balance == 0.0
+        assert info.retransmission == 0.0
 
     asyncio.run(scenario())
 
