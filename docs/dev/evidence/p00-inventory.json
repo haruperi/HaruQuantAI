@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-10-13T21:55:00+03:00",
+  "reference_cohort": "145-dev1",
+  "installed_build": null,
+  "activation_status": "unverified",
+  "donor_artifacts": [
+    {
+      "locator": "StrategyQuantX.config",
+      "sha256": "fc1b6de40f29090a61892ae161f9daca80e277366c7bfae0f4396248ee58799d",
+      "family": "config",
+      "stage": "Stage 1",
+      "proposed_feature_id": "FEAT-HOST-BOOT"
+    },
+    {
+      "locator": "sqcli.config",
+      "sha256": "cc75c454d24a45214728ccffd926e279351ff721ced0f31ea4d700ff6dcc4b35",
+      "family": "config",
+      "stage": "Stage 1",
+      "proposed_feature_id": "FEAT-HOST-CLI"
+    },
+    {
+      "locator": "CodeEditor.config",
+      "sha256": "fcdc4a8c3fa1e8231ca1be06c3cb37a9771f0c812b1fbe37868d14c644481b03",
+      "family": "config",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-CODE-EDITOR"
+    },
+    {
+      "locator": "Extending_SQX.pdf",
+      "sha256": "4a45282879332c8ff9f8db8c5e393b187225bd3c0887f567eb54cd3947c4507d",
+      "family": "documentation",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-SNIPPETS"
+    },
+    {
+      "locator": "internal/AppSettings.txt",
+      "sha256": "b40d451825e2169517b134ebdacda384fe768d2250873617d517a6f386168959",
+      "family": "config",
+      "stage": "Stage 1",
+      "proposed_feature_id": "FEAT-HOST-SETTINGS"
+    },
+    {
+      "locator": "internal/libs/CodeEditor.jar.enc",
+      "sha256": "6b93ad276e377fa804d2b6c2d2b87af94ece99a6555163fd61ad095b22b37dfe",
+      "family": "encrypted_jar",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-CODE-EDITOR"
+    },
+    {
+      "locator": "internal/libs/SQAppLib.jar.enc",
+      "sha256": "58e4a0506f24c999660477aefcce6af80150f782149f3f7ae82764b6463ccb35",
+      "family": "encrypted_jar",
+      "stage": "Stage 4",
+      "proposed_feature_id": "FEAT-SIMULATOR-CORE"
+    },
+    {
+      "locator": "internal/libs/SQDataLib.jar.enc",
+      "sha256": "3f6846d04cd1c4e7e1a0f6c991735eb40d3e6519600f5ed0979228c006fdf8a2",
+      "family": "encrypted_jar",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-DATA-SERIES"
+    },
+    {
+      "locator": "internal/libs/SQGridLib2.jar.enc",
+      "sha256": "5766249c7278755128c498cdce2e5bf197435f822a3ae07469b42716229bf87d",
+      "family": "encrypted_jar",
+      "stage": "Stage 7",
+      "proposed_feature_id": "FEAT-COMPUTE-GRID"
+    },
+    {
+      "locator": "internal/libs/SQJobsLib.jar.enc",
+      "sha256": "c30e69867c90c82ec7109093763d4b40b34c3facea3fd8791331d6b5372d5323",
+      "family": "encrypted_jar",
+      "stage": "Stage 1",
+      "proposed_feature_id": "FEAT-HOST-JOBS"
+    },
+    {
+      "locator": "internal/libs/SQLib.jar.enc",
+      "sha256": "d41a4dbb975bd4b47a6181ef150da88e5cdda05221382d654befdc84c0dc721a",
+      "family": "encrypted_jar",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-KERNEL-PRIMITIVES"
+    },
+    {
+      "locator": "internal/libs/SQPluginLib.jar.enc",
+      "sha256": "1a8453375854c48e430bcf454d69f25ecd351ec81f8d552bc4da052e4cb9de76",
+      "family": "encrypted_jar",
+      "stage": "Stage 1",
+      "proposed_feature_id": "FEAT-HOST-DISCOVERY"
+    },
+    {
+      "locator": "internal/libs/StrategyQuant.jar.enc",
+      "sha256": "bce664aabb83867a8cd6fead3ab54b1d0f55b6148846489d4fbd65ed750f6f81",
+      "family": "encrypted_jar",
+      "stage": "Stage 1",
+      "proposed_feature_id": "FEAT-HOST-BOOT"
+    },
+    {
+      "locator": "internal/libs/Snippets.jar",
+      "sha256": "6815d5acd6e411d078a423f80b605940e2778736d901cade987ea3f421d52924",
+      "family": "library",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-SNIPPETS"
+    },
+    {
+      "locator": "internal/ctemplate/config.xml",
+      "sha256": "aa9c8cb8dbf5241885a1ccc51647081adc793bb83d88b12e741b19fe42b38b84",
+      "family": "xml_template",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-BLOCKS"
+    },
+    {
+      "locator": "internal/ctemplate/conditions.xml",
+      "sha256": "9b81d802cf12ec8e106b052dd3f7b819d4b16279016feffaadde0049286dbf51",
+      "family": "xml_template",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-BLOCKS"
+    },
+    {
+      "locator": "internal/ctemplate/values.xml",
+      "sha256": "58e2db48ff337f38019b40e67534789443c09ebfce98ba01ba656e8ff8c10a54",
+      "family": "xml_template",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-BLOCKS"
+    },
+    {
+      "locator": "internal/ctemplate/actions.xml",
+      "sha256": "cfa3a05360bb3ac5152b265852b71d539736cfdd4dfebece834c4d2adf573b4c",
+      "family": "xml_template",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-BLOCKS"
+    },
+    {
+      "locator": "internal/ctemplate/comparisons.xml",
+      "sha256": "46ac1de3828037322ad110aa946258ee40d452648a646e431d6fa1320a1e8f8b",
+      "family": "xml_template",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-BLOCKS"
+    },
+    {
+      "locator": "internal/ctemplate/events.xml",
+      "sha256": "3ee4d810014f99055ab8ca2110cec24af440c1acf151febdf38fdf3e90f4be08",
+      "family": "xml_template",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-BLOCKS"
+    },
+    {
+      "locator": "internal/ctemplate/talibs.xml",
+      "sha256": "90f26e8b35065aeb943332496926ed5397cfeea0b4106d8b0a426eb6ad975a2c",
+      "family": "xml_template",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-INDICATORS"
+    },
+    {
+      "locator": "internal/ctemplate/wizard.xml",
+      "sha256": "ab0cd18f4a265302f09d1ed1fa4f38cb0ca0d4891d3b2b0d9f52168cf45952f5",
+      "family": "xml_template",
+      "stage": "Stage 3",
+      "proposed_feature_id": "FEAT-STRATEGIES-WIZARD"
+    }
+  ],
+  "repository_sources": [
+    {
+      "locator": "AGENTS.md",
+      "sha256": "d30de3df8a39d55eb3f3a6e34b1e1f41f974c9f85ae67cea7fe9336c797c419a"
+    },
+    {
+      "locator": "docs/PROJECT.md",
+      "sha256": "383193fe95a621145357be96e8fcd8278510a0b71701c81f3edb769b48e778cc"
+    },
+    {
+      "locator": "docs/ARCHITECTURE.md",
+      "sha256": "837954b40c54f46ef57fffd1f8a86d01088029febb630a6d712a7c88bec14fc0"
+    },
+    {
+      "locator": "docs/SQX/README.md",
+      "sha256": "09816af4f357112d1aa965b75ea3bb9b766b5b85a3ff0bd3668458754bc2ed45"
+    },
+    {
+      "locator": "docs/SQX/architecture-and-reimplementation.md",
+      "sha256": "e32dd2fcc2a879c85fd4b29bbb9a889d4f75102abf7c10cabfc809b8a1362573"
+    },
+    {
+      "locator": "docs/SQX/libs/SQLib.md",
+      "sha256": "8d993cc1643819de044587561339d50a8bb2bf512fe62c5ea3da6fb00789dd3d"
+    },
+    {
+      "locator": "docs/SQX/libs/SQDataLib.md",
+      "sha256": "650a73e94f7d9b32820dedb10ceef0161956b1fb77bd4e0f2f65f40982836c64"
+    },
+    {
+      "locator": "docs/SQX/libs/SQTradingLib.md",
+      "sha256": "825a94f15a6709f0ae858fbd72f332afd268ae250b28f143be5aab9a19afa78c"
+    }
+  ],
+  "totals": {
+    "donor_artifacts": 22,
+    "encrypted_jars": 8,
+    "xml_templates": 8,
+    "plugin_directories": 182,
+    "snippet_java_files": 1049
+  }
+}

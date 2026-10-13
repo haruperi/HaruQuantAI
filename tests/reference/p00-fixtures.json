@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "runtime_status": "unavailable",
+  "cases": [
+    {
+      "case_id": "encrypted-jar-count",
+      "feature_id": "FEAT-HOST-EVIDENCE",
+      "requirement_id": "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION",
+      "decision_ids": [
+        "DEC-HOST-P00-BOUNDED-FIXTURES",
+        "DEC-HOST-P00-RELEASE-GATES"
+      ],
+      "evidence_ids": [
+        "SQX145-EV-000002"
+      ],
+      "artifact": "docs/dev/evidence/p00-inventory.json",
+      "artifact_sha256": "066328ad34fda13c15b9ee40bc94e1046b11ca8b1be6b8a88ee32b03a7046334",
+      "location": "/totals/encrypted_jars",
+      "observation_kind": "static",
+      "inspection_method": "archive_inventory",
+      "captured_at": "2026-10-13T21:55:00+03:00",
+      "capture_artifact": "docs/dev/evidence/p00-inventory.json",
+      "input": {
+        "scope": "SQX_REFERENCE_ROOT/internal/libs/*.jar.enc"
+      },
+      "expected": 8,
+      "actual": 8,
+      "units": "count",
+      "tolerance": 0,
+      "failure_behavior": "Encrypted JAR count or hash drift fails qualification.",
+      "limitations": [
+        "Independent static observation only; no donor runtime output is implied."
+      ]
+    },
+    {
+      "case_id": "plugin-directory-count",
+      "feature_id": "FEAT-HOST-EVIDENCE",
+      "requirement_id": "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION",
+      "decision_ids": [
+        "DEC-HOST-P00-BOUNDED-FIXTURES",
+        "DEC-HOST-P00-RELEASE-GATES"
+      ],
+      "evidence_ids": [
+        "SQX145-EV-000003"
+      ],
+      "artifact": "docs/dev/evidence/p00-inventory.json",
+      "artifact_sha256": "066328ad34fda13c15b9ee40bc94e1046b11ca8b1be6b8a88ee32b03a7046334",
+      "location": "/totals/plugin_directories",
+      "observation_kind": "static",
+      "inspection_method": "archive_inventory",
+      "captured_at": "2026-10-13T21:55:00+03:00",
+      "capture_artifact": "docs/dev/evidence/p00-inventory.json",
+      "input": {
+        "scope": "SQX_REFERENCE_ROOT/internal/plugins/*"
+      },
+      "expected": 182,
+      "actual": 182,
+      "units": "count",
+      "tolerance": 0,
+      "failure_behavior": "Plugin bundle directory count drift fails qualification.",
+      "limitations": [
+        "Independent static observation only; no donor runtime output is implied."
+      ]
+    },
+    {
+      "case_id": "snippet-java-count",
+      "feature_id": "FEAT-HOST-EVIDENCE",
+      "requirement_id": "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION",
+      "decision_ids": [
+        "DEC-HOST-P00-BOUNDED-FIXTURES",
+        "DEC-HOST-P00-RELEASE-GATES"
+      ],
+      "evidence_ids": [
+        "SQX145-EV-000004"
+      ],
+      "artifact": "docs/dev/evidence/p00-inventory.json",
+      "artifact_sha256": "066328ad34fda13c15b9ee40bc94e1046b11ca8b1be6b8a88ee32b03a7046334",
+      "location": "/totals/snippet_java_files",
+      "observation_kind": "static",
+      "inspection_method": "archive_inventory",
+      "captured_at": "2026-10-13T21:55:00+03:00",
+      "capture_artifact": "docs/dev/evidence/p00-inventory.json",
+      "input": {
+        "scope": "SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/**/*.java"
+      },
+      "expected": 1049,
+      "actual": 1049,
+      "units": "count",
+      "tolerance": 0,
+      "failure_behavior": "Extensible Java snippet file count drift fails qualification.",
+      "limitations": [
+        "Independent static observation only; no donor runtime output is implied."
+      ]
+    }
+  ]
+}

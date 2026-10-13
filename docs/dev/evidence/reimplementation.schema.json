@@ -1,0 +1,783 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reimplementation.schema.json",
+  "title": "HaruQuantAI SQX145 Clean-Room Evidence Ledger Schema (v4)",
+  "description": "Strict clean-room evidence ledger schema. Each record captures one atomic, independently testable claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "ledger_id",
+    "reference_product",
+    "target_project",
+    "source_catalog",
+    "records",
+    "installed_product_status",
+    "minimum_record_number",
+    "allocation_high_water_mark"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./reimplementation.schema.json"
+    },
+    "schema_version": {
+      "const": 4
+    },
+    "ledger_id": {
+      "const": "haruquantai.sqx.reimplementation"
+    },
+    "reference_product": {
+      "$ref": "#/$defs/referenceProduct"
+    },
+    "target_project": {
+      "$ref": "#/$defs/targetProject"
+    },
+    "source_catalog": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternProperties": {
+        "^E-[LROT][0-9]{2}$": {
+          "$ref": "#/$defs/sourceCatalogEntry"
+        }
+      }
+    },
+    "records": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternProperties": {
+        "^SQX145-EV-[0-9]{6}$": {
+          "$ref": "#/$defs/evidenceRecord"
+        }
+      }
+    },
+    "installed_product_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "build",
+        "activation",
+        "runtime_parity"
+      ],
+      "properties": {
+        "build": {
+          "type": "null"
+        },
+        "activation": {
+          "const": "unverified"
+        },
+        "runtime_parity": {
+          "const": "unqualified"
+        }
+      }
+    },
+    "minimum_record_number": {
+      "const": 1
+    },
+    "allocation_high_water_mark": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullableString": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "relativeLocator": {
+      "type": "string",
+      "pattern": "^(?![A-Za-z]:)(?![/\\\\])(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "stringSet": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "referenceProduct": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "build",
+        "installation_root_variable"
+      ],
+      "properties": {
+        "name": {
+          "const": "StrategyQuant X"
+        },
+        "build": {
+          "const": "145-dev1"
+        },
+        "installation_root_variable": {
+          "const": "SQX_REFERENCE_ROOT"
+        }
+      }
+    },
+    "targetProject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "repository_root_variable",
+        "authority_files"
+      ],
+      "properties": {
+        "name": {
+          "const": "HaruQuantAI"
+        },
+        "repository_root_variable": {
+          "const": "HARUQUANTAI_ROOT"
+        },
+        "authority_files": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "$ref": "#/$defs/relativeLocator"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "sourceCatalogEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "kind",
+        "root",
+        "locators",
+        "scope",
+        "confidence",
+        "limitations"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "kind": {
+          "enum": [
+            "local_directory",
+            "repository",
+            "official_web",
+            "runtime_observation"
+          ]
+        },
+        "root": {
+          "enum": [
+            "SQX_REFERENCE_ROOT",
+            "HARUQUANTAI_ROOT",
+            null
+          ]
+        },
+        "locators": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "uniqueItems": true
+        },
+        "scope": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "confidence": {
+          "enum": [
+            "confirmed",
+            "high",
+            "medium",
+            "low",
+            "unverified"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "referenceScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "build",
+        "application_areas",
+        "conditions"
+      ],
+      "properties": {
+        "build": {
+          "const": "145-dev1"
+        },
+        "application_areas": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "uniqueItems": true
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "statement",
+        "confidence",
+        "limitations"
+      ],
+      "properties": {
+        "classification": {
+          "enum": [
+            "observed",
+            "inferred",
+            "normative",
+            "unverified"
+          ]
+        },
+        "statement": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "confidence": {
+          "enum": [
+            "confirmed",
+            "high",
+            "medium",
+            "low",
+            "unverified"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "sourceLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "symbol",
+        "line_range",
+        "json_pointer",
+        "xpath",
+        "notes"
+      ],
+      "properties": {
+        "section": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "symbol": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "line_range": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "json_pointer": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "xpath": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "notes": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "fingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "sourceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "catalog_id",
+        "artifact_locator",
+        "location",
+        "inspection_method",
+        "relation",
+        "fingerprint",
+        "accessed_at"
+      ],
+      "properties": {
+        "catalog_id": {
+          "type": "string",
+          "pattern": "^E-[LROT][0-9]{2}$"
+        },
+        "artifact_locator": {
+          "$ref": "#/$defs/relativeLocator"
+        },
+        "location": {
+          "$ref": "#/$defs/sourceLocation"
+        },
+        "inspection_method": {
+          "enum": [
+            "archive_inventory",
+            "bytecode_inspection",
+            "decrypted_source_inspection",
+            "config_inspection",
+            "xml_schema_inspection",
+            "repository_audit",
+            "documentation_review",
+            "black_box"
+          ]
+        },
+        "relation": {
+          "enum": [
+            "supports",
+            "contextualizes",
+            "contradicts"
+          ]
+        },
+        "fingerprint": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/fingerprint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accessed_at": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "targetMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "domain",
+        "registration_status",
+        "feature_ids",
+        "requirement_ids",
+        "decision_ids",
+        "proposed_owner",
+        "proposed_feature_id",
+        "proposed_requirement_ids",
+        "proposed_decision_ids",
+        "notes"
+      ],
+      "properties": {
+        "domain": {
+          "enum": [
+            "host",
+            "kernel",
+            "workspace",
+            "plugins"
+          ]
+        },
+        "registration_status": {
+          "enum": [
+            "registered",
+            "proposed"
+          ]
+        },
+        "feature_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^FEAT-[A-Z0-9-]+$"
+          },
+          "uniqueItems": true
+        },
+        "requirement_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^FR-[A-Z0-9-]+$"
+          },
+          "uniqueItems": true
+        },
+        "decision_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^DEC-[A-Z0-9-]+$"
+          },
+          "uniqueItems": true
+        },
+        "proposed_owner": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "proposed_feature_id": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "proposed_requirement_ids": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "proposed_decision_ids": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "notes": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "kind",
+        "procedure",
+        "expected_observation",
+        "actual_observation",
+        "artifact_paths",
+        "executed_at"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "pending",
+            "passed",
+            "failed",
+            "not_applicable"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "static",
+            "runtime",
+            "authority"
+          ]
+        },
+        "procedure": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "expected_observation": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "actual_observation": {
+          "$ref": "#/$defs/nullableString"
+        },
+        "artifact_paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relativeLocator"
+          },
+          "uniqueItems": true
+        },
+        "executed_at": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "passed"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "actual_observation": {
+                "$ref": "#/$defs/nonEmptyString"
+              },
+              "executed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "artifact_paths": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/relativeLocator"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "recordIdSet": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SQX145-EV-[0-9]{6}$"
+      },
+      "uniqueItems": true
+    },
+    "relationships": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supports_records",
+        "contradicts_records",
+        "supersedes_records",
+        "superseded_by"
+      ],
+      "properties": {
+        "supports_records": {
+          "$ref": "#/$defs/recordIdSet"
+        },
+        "contradicts_records": {
+          "$ref": "#/$defs/recordIdSet"
+        },
+        "supersedes_records": {
+          "$ref": "#/$defs/recordIdSet"
+        },
+        "superseded_by": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^SQX145-EV-[0-9]{6}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_commit",
+        "created_at",
+        "updated_at",
+        "review_state"
+      ],
+      "properties": {
+        "repository_commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "review_state": {
+          "enum": [
+            "unreviewed",
+            "reviewed",
+            "changes_requested"
+          ]
+        }
+      }
+    },
+    "cleanRoom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contains_proprietary_source",
+        "contains_sensitive_data",
+        "contains_personal_data",
+        "paraphrased_behavior_only",
+        "notes"
+      ],
+      "properties": {
+        "contains_proprietary_source": {
+          "const": false
+        },
+        "contains_sensitive_data": {
+          "const": false
+        },
+        "contains_personal_data": {
+          "const": false
+        },
+        "paraphrased_behavior_only": {
+          "const": true
+        },
+        "notes": {
+          "$ref": "#/$defs/nullableString"
+        }
+      }
+    },
+    "evidenceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "topic",
+        "title",
+        "question",
+        "record_status",
+        "reference_scope",
+        "claim",
+        "sources",
+        "target_mapping",
+        "validation",
+        "relationships",
+        "provenance",
+        "clean_room",
+        "tags"
+      ],
+      "properties": {
+        "topic": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"
+        },
+        "title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "question": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "record_status": {
+          "enum": [
+            "active",
+            "superseded",
+            "rejected"
+          ]
+        },
+        "reference_scope": {
+          "$ref": "#/$defs/referenceScope"
+        },
+        "claim": {
+          "$ref": "#/$defs/claim"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sourceReference"
+          }
+        },
+        "target_mapping": {
+          "$ref": "#/$defs/targetMapping"
+        },
+        "validation": {
+          "$ref": "#/$defs/validation"
+        },
+        "relationships": {
+          "$ref": "#/$defs/relationships"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "clean_room": {
+          "$ref": "#/$defs/cleanRoom"
+        },
+        "tags": {
+          "$ref": "#/$defs/stringSet"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "record_status": {
+                "const": "superseded"
+              }
+            },
+            "required": [
+              "record_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "relationships": {
+                "properties": {
+                  "superseded_by": {
+                    "type": "string",
+                    "pattern": "^SQX145-EV-[0-9]{6}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "validation": {
+                "properties": {
+                  "state": {
+                    "const": "passed"
+                  }
+                },
+                "required": [
+                  "state"
+                ]
+              }
+            },
+            "required": [
+              "validation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "sources": {
+                "items": {
+                  "properties": {
+                    "fingerprint": {
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "fingerprint"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
