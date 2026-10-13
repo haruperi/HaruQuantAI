@@ -242,7 +242,7 @@ flowchart TD
 
     UI --> Tier1
     Tier1 --> Tier2
-    Tier3 -.->|Attaches via Typed Slots (SC-03)| Tier2
+    Tier3 -.->|"Attaches via Typed Slots (SC-03)"| Tier2
     Tier2 --> Kernel
     Tier3 --> Kernel
 ```
