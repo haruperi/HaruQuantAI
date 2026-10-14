@@ -1496,7 +1496,7 @@ class PluginDiscoveryEngine:
             )
         return self._default_lifecycle
 
-    def get_instance(self, plugin_id: str) -> Any | None:
+    def get_instance(self, plugin_id: str) -> Any:
         """Thread-safe lazy instantiation and caching of a validated plugin."""
         return self._ensure_default_lifecycle().get_instance(plugin_id)
 
@@ -1797,7 +1797,7 @@ class PluginLifecycleManager:
         for name in mod_names:
             sys.modules.pop(name, None)
 
-    def get_instance(self, plugin_id: str) -> Any | None:
+    def get_instance(self, plugin_id: str) -> Any:
         """Thread-safe lazy instantiation and caching of a validated plugin."""
         with self._lock:
             record = self.discovery.registry.get(plugin_id)
