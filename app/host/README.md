@@ -11,6 +11,7 @@ Host runtime services (`F01`) belong to Stage 1 (`1A`–`1G`) and are registered
 | Identity | Responsibility | Status |
 | --- | --- | --- |
 | `FEAT-HOST-EVIDENCE` | Host-governed reference manifests, fixtures, and clean-room ledger qualification in `tests/reference` | Implemented tooling (`Stage 0` / `P00`); static reference readiness verified; application runtime qualification belongs to owning Stage 1–7 features |
+| `FEAT-HOST-PERSISTENCE` | Isolated SQLite WAL persistence and CRUD operations across all 25 operational database tables | Implemented runtime persistence (`Stage 1` / `1A`); WAL mode, schema DDL, and CRUD operations across host, data manager, and transport domains |
 
 ## Registered functional requirements
 
@@ -23,6 +24,14 @@ Host runtime services (`F01`) belong to Stage 1 (`1A`–`1G`) and are registered
 | `FR-HOST-EVIDENCE-LEDGER-INTEGRITY` | Validate Draft 2020-12 schema v4, atomic `SQX145-EV-NNNNNN` records, monotonic ID allocation, source catalog bindings, reciprocal supersession/contradiction links, and pass artifacts. | DEBUG checks, INFO checked record counts, ERROR stable failure codes; structured `fr_id`; no physical paths or secret values. |
 | `FR-HOST-EVIDENCE-OWNERSHIP-GATES` | Verify mapped `FEAT-*`, `FR-*`, and `DEC-*` identities against domain registries or explicit `proposed` status, and block premature runtime parity claims. | DEBUG checks, WARNING unresolved runtime authority, INFO checked mappings, ERROR stable failure codes; structured `fr_id`. |
 | `FR-HOST-EVIDENCE-QUALIFICATION-CLI` | Execute offline evidence qualification by default and optional read-only `--check-donor` verification; emit structured outcome logs and nonzero exit codes on failure. | INFO start and completion status, ERROR failure diagnostics; structured `fr_id`. |
+| `FR-HOST-PERSISTENCE-CONNECT` | Establish SQLite connection with WAL journal mode, busy timeout, foreign key enforcement, and path containment. | DEBUG open and WAL status; ERROR connection failure; structured `fr_id`. |
+| `FR-HOST-PERSISTENCE-CREATE-SCHEMA` | Idempotently create and verify all 25 operational database tables. | DEBUG start; INFO completed table count; ERROR DDL failure; structured `fr_id`. |
+| `FR-HOST-PERSISTENCE-INSERT` | Parameterized record insertion across approved database tables. | DEBUG insert execution and lastrowid; ERROR constraint or table validation failure; structured `fr_id`. |
+| `FR-HOST-PERSISTENCE-READ-BY-PK` | Point query for single row by primary key or composite primary key. | DEBUG query and row match; ERROR query failure; structured `fr_id`. |
+| `FR-HOST-PERSISTENCE-LIST` | Parameterized record listing with filtering, ordering, and pagination bounds. | DEBUG query; INFO non-empty result count; ERROR query failure; structured `fr_id`. |
+| `FR-HOST-PERSISTENCE-UPDATE-BY-PK` | Atomic record update targeting primary key. | DEBUG update execution; WARNING 0 rows affected; ERROR execution failure; structured `fr_id`. |
+| `FR-HOST-PERSISTENCE-DELETE-BY-PK` | Parameterized record deletion targeting primary key. | DEBUG delete execution; WARNING 0 rows affected; ERROR execution failure; structured `fr_id`. |
+| `FR-HOST-PERSISTENCE-DELETE-WHERE` | Parameterized record deletion targeting non-empty filter criteria. | DEBUG delete execution and affected count; ERROR execution failure; structured `fr_id`. |
 
 ## Ratified reference decisions
 
