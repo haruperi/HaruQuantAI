@@ -171,7 +171,7 @@
     },
     {
       "locator": "docs/ARCHITECTURE.md",
-      "sha256": "837954b40c54f46ef57fffd1f8a86d01088029febb630a6d712a7c88bec14fc0"
+      "sha256": "45eaaaa82576e761e37dd386b185bdafe21a2157a5e0695c899a59d410eac619"
     },
     {
       "locator": "docs/SQX/README.md",
@@ -179,7 +179,7 @@
     },
     {
       "locator": "docs/SQX/architecture-and-reimplementation.md",
-      "sha256": "e32dd2fcc2a879c85fd4b29bbb9a889d4f75102abf7c10cabfc809b8a1362573"
+      "sha256": "4380656889696c1ea6d4c75b5017b48e21e70f0cf36d820c78fbdec971f90c1f"
     },
     {
       "locator": "docs/SQX/libs/SQLib.md",

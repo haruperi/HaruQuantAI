@@ -42,20 +42,56 @@ CLI Usage:
 
 from __future__ import annotations
 
-import logging
 import sqlite3
-from collections.abc import Mapping
+from collections.abc import Generator, Mapping
+from contextlib import contextmanager
+from pathlib import Path
 from typing import Any
 
-from app.host.persistence.create import TABLE_PRIMARY_KEYS, PersistenceError
+from app.host.logging import get_logger
+from app.host.persistence.create import (
+    TABLE_PRIMARY_KEYS,
+    PersistenceError,
+    get_connection,
+)
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 READ_PK_FR = "FR-HOST-PERSISTENCE-READ-BY-PK"
 LIST_FR = "FR-HOST-PERSISTENCE-LIST"
 COUNT_FR = "FR-HOST-PERSISTENCE-COUNT"
 
 ORDER_BY_PARTS_MAX = 2
+
+
+@contextmanager
+def resolve_connection(
+    conn: sqlite3.Connection | Path | str | None = None,
+) -> Generator[sqlite3.Connection]:
+    """Yield active connection or deterministically manage a connection.
+
+    Args:
+        conn: Optional existing open SQLite connection or database filesystem path.
+            If None, opens default connection via get_connection() and closes it
+            deterministically on block exit.
+
+    Yields:
+        sqlite3.Connection ready for execution.
+    """
+    if isinstance(conn, sqlite3.Connection):
+        yield conn
+    elif conn is not None:
+        file_conn = get_connection(conn)
+        try:
+            yield file_conn
+        finally:
+            file_conn.close()
+    else:
+        auto_conn = get_connection()
+        try:
+            yield auto_conn
+        finally:
+            auto_conn.close()
 
 
 def _build_where_clause(
@@ -96,11 +132,11 @@ def _build_limit_clause(limit: int | None, offset: int | None) -> str:
         return ""
     if limit < 0:
         raise PersistenceError("Limit must be a non-negative integer.")
-    limit_sql = f" LIMIT {int(limit)}"
+    limit_sql = f" LIMIT {limit}"
     if offset is not None:
         if offset < 0:
             raise PersistenceError("Offset must be a non-negative integer.")
-        limit_sql += f" OFFSET {int(offset)}"
+        limit_sql += f" OFFSET {offset}"
     return limit_sql
 
 
@@ -311,83 +347,211 @@ def count_rows(
 
 
 def get_host_setting(
-    conn: sqlite3.Connection,
-    scope: str,
-    key: str,
+    conn_or_scope: sqlite3.Connection | str,
+    scope_or_key: str,
+    key_opt: str | None = None,
 ) -> dict[str, Any] | None:
-    """Get host setting by composite key (scope, key)."""
-    return read_row_by_pk(conn, "host_settings", {"scope": scope, "key": key})
+    """Get host setting by composite key (scope, key).
+
+    Supports both (conn, scope, key) and (scope, key) calling signatures.
+    """
+    if isinstance(conn_or_scope, sqlite3.Connection):
+        active_conn = conn_or_scope
+        scope = scope_or_key
+        key = key_opt or ""
+        return read_row_by_pk(
+            active_conn, "host_settings", {"scope": scope, "key": key}
+        )
+    with resolve_connection() as active_conn:
+        return read_row_by_pk(
+            active_conn, "host_settings", {"scope": conn_or_scope, "key": scope_or_key}
+        )
 
 
 def list_host_settings(
-    conn: sqlite3.Connection,
+    conn: sqlite3.Connection | None = None,
     *,
     scope: str | None = None,
 ) -> list[dict[str, Any]]:
-    """List host settings, optionally filtered by scope."""
-    where = {"scope": scope} if scope is not None else None
-    return read_rows(conn, "host_settings", where=where, order_by="key ASC")
+    """List host settings, optionally filtered by scope.
+
+    Args:
+        conn: Optional SQLite connection. If omitted, opens and closes default
+            connection.
+        scope: Optional scope string filter.
+
+    Returns:
+        List of setting row dictionaries.
+    """
+    with resolve_connection(conn) as active_conn:
+        where = {"scope": scope} if scope is not None else None
+        return read_rows(active_conn, "host_settings", where=where, order_by="key ASC")
 
 
 def get_host_session(
-    conn: sqlite3.Connection,
-    session_id: str,
+    conn_or_session_id: sqlite3.Connection | Path | str | None = None,
+    session_id: str | None = None,
+    *,
+    conn: sqlite3.Connection | Path | str | None = None,
 ) -> dict[str, Any] | None:
     """Get host session record by session ID."""
-    return read_row_by_pk(conn, "host_session", {"session_id": session_id})
+    active_conn = conn
+    target_id = session_id
+    if isinstance(conn_or_session_id, (sqlite3.Connection, Path)):
+        active_conn = conn_or_session_id
+    elif isinstance(conn_or_session_id, str):
+        if session_id is None:
+            target_id = conn_or_session_id
+        else:
+            active_conn = conn_or_session_id
+
+    if target_id is None:
+        raise PersistenceError("session_id must be provided to get_host_session")
+
+    with resolve_connection(active_conn) as c:
+        return read_row_by_pk(c, "host_session", {"session_id": target_id})
 
 
 def get_host_session_by_token_hash(
-    conn: sqlite3.Connection,
-    token_hash: str,
+    conn_or_token_hash: sqlite3.Connection | Path | str | None = None,
+    token_hash: str | None = None,
+    *,
+    conn: sqlite3.Connection | Path | str | None = None,
 ) -> dict[str, Any] | None:
     """Get host session record by token hash."""
-    results = read_rows(conn, "host_session", where={"token_hash": token_hash}, limit=1)
-    return results[0] if results else None
+    active_conn = conn
+    target_hash = token_hash
+    if isinstance(conn_or_token_hash, (sqlite3.Connection, Path)):
+        active_conn = conn_or_token_hash
+    elif isinstance(conn_or_token_hash, str):
+        if token_hash is None:
+            target_hash = conn_or_token_hash
+        else:
+            active_conn = conn_or_token_hash
+
+    if target_hash is None:
+        raise PersistenceError(
+            "token_hash must be provided to get_host_session_by_token_hash"
+        )
+
+    with resolve_connection(active_conn) as c:
+        results = read_rows(
+            c, "host_session", where={"token_hash": target_hash}, limit=1
+        )
+        return results[0] if results else None
 
 
 def get_host_job(
-    conn: sqlite3.Connection,
-    job_id: str,
+    conn_or_job_id: sqlite3.Connection | Path | str | None = None,
+    job_id: str | None = None,
+    *,
+    conn: sqlite3.Connection | Path | str | None = None,
 ) -> dict[str, Any] | None:
     """Get host job record by job ID."""
-    return read_row_by_pk(conn, "host_jobs", {"job_id": job_id})
+    active_conn = conn
+    target_id = job_id
+
+    if isinstance(conn_or_job_id, (sqlite3.Connection, Path)):
+        active_conn = conn_or_job_id
+    elif isinstance(conn_or_job_id, str):
+        if job_id is None:
+            target_id = conn_or_job_id
+        else:
+            active_conn = conn_or_job_id
+
+    if target_id is None:
+        raise PersistenceError("job_id must be provided to get_host_job")
+
+    with resolve_connection(active_conn) as c:
+        return read_row_by_pk(c, "host_jobs", {"job_id": target_id})
 
 
 def list_host_jobs(
-    conn: sqlite3.Connection,
+    conn: sqlite3.Connection | Path | str | None = None,
     *,
     status: str | None = None,
     limit: int = 100,
 ) -> list[dict[str, Any]]:
-    """List host jobs ordered by submitted timestamp descending."""
-    where = {"status": status} if status is not None else None
-    return read_rows(
-        conn, "host_jobs", where=where, order_by="submitted_at_utc DESC", limit=limit
-    )
+    """List host jobs ordered by submitted timestamp descending.
+
+    Args:
+        conn: Optional SQLite connection or path. If omitted, opens and closes
+            default connection.
+        status: Optional status string filter.
+        limit: Maximum rows to return.
+
+    Returns:
+        List of job row dictionaries.
+    """
+    with resolve_connection(conn) as active_conn:
+        where = {"status": status} if status is not None else None
+        return read_rows(
+            active_conn,
+            "host_jobs",
+            where=where,
+            order_by="submitted_at_utc DESC",
+            limit=limit,
+        )
 
 
 def get_host_job_attempts(
-    conn: sqlite3.Connection,
-    job_id: str,
+    conn_or_job_id: sqlite3.Connection | Path | str | None = None,
+    job_id: str | None = None,
+    *,
+    conn: sqlite3.Connection | Path | str | None = None,
 ) -> list[dict[str, Any]]:
     """Get all attempts for a given job ID ordered by sequence."""
-    return read_rows(
-        conn, "host_job_attempts", where={"job_id": job_id}, order_by="sequence ASC"
-    )
+    active_conn = conn
+    target_id = job_id
+
+    if isinstance(conn_or_job_id, (sqlite3.Connection, Path)):
+        active_conn = conn_or_job_id
+    elif isinstance(conn_or_job_id, str):
+        if job_id is None:
+            target_id = conn_or_job_id
+        else:
+            active_conn = conn_or_job_id
+
+    if target_id is None:
+        raise PersistenceError("job_id must be provided to get_host_job_attempts")
+
+    with resolve_connection(active_conn) as c:
+        return read_rows(
+            c,
+            "host_job_attempts",
+            where={"job_id": target_id},
+            order_by="sequence ASC",
+        )
 
 
 def get_host_job_events(
-    conn: sqlite3.Connection,
-    job_id: str,
+    conn_or_job_id: sqlite3.Connection | Path | str | None = None,
+    job_id: str | None = None,
+    *,
+    conn: sqlite3.Connection | Path | str | None = None,
 ) -> list[dict[str, Any]]:
     """Get all events for a given job ID ordered by creation timestamp."""
-    return read_rows(
-        conn,
-        "host_job_events",
-        where={"job_id": job_id},
-        order_by="created_at_utc ASC",
-    )
+    active_conn = conn
+    target_id = job_id
+
+    if isinstance(conn_or_job_id, (sqlite3.Connection, Path)):
+        active_conn = conn_or_job_id
+    elif isinstance(conn_or_job_id, str):
+        if job_id is None:
+            target_id = conn_or_job_id
+        else:
+            active_conn = conn_or_job_id
+
+    if target_id is None:
+        raise PersistenceError("job_id must be provided to get_host_job_events")
+
+    with resolve_connection(active_conn) as c:
+        return read_rows(
+            c,
+            "host_job_events",
+            where={"job_id": target_id},
+            order_by="created_at_utc ASC",
+        )
 
 
 def get_host_entity(
@@ -452,13 +616,25 @@ def get_datamgr_instrument(
 
 
 def list_datamgr_instruments(
-    conn: sqlite3.Connection,
+    conn: sqlite3.Connection | None = None,
     *,
     broker_id: int | None = None,
 ) -> list[dict[str, Any]]:
-    """List datamgr instruments, optionally filtered by broker_id."""
-    where = {"broker_id": broker_id} if broker_id is not None else None
-    return read_rows(conn, "datamgr_instruments", where=where, order_by="symbol ASC")
+    """List datamgr instruments, optionally filtered by broker_id.
+
+    Args:
+        conn: Optional SQLite connection. If omitted, opens and closes default
+            connection.
+        broker_id: Optional broker ID integer filter.
+
+    Returns:
+        List of instrument row dictionaries.
+    """
+    with resolve_connection(conn) as active_conn:
+        where = {"broker_id": broker_id} if broker_id is not None else None
+        return read_rows(
+            active_conn, "datamgr_instruments", where=where, order_by="symbol ASC"
+        )
 
 
 def get_datamgr_quality_report(
@@ -486,7 +662,36 @@ def get_mt5_command(
 
 
 def get_schema_migrations(
-    conn: sqlite3.Connection,
+    conn: sqlite3.Connection | None = None,
 ) -> list[dict[str, Any]]:
-    """Get applied schema migrations ordered by version ascending."""
-    return read_rows(conn, "schema_migrations", order_by="version ASC")
+    """Get applied schema migrations ordered by version ascending.
+
+    Args:
+        conn: Optional SQLite connection. If omitted, opens and closes default
+            connection.
+
+    Returns:
+        List of migration row dictionaries.
+    """
+    with resolve_connection(conn) as active_conn:
+        return read_rows(active_conn, "schema_migrations", order_by="version ASC")
+
+
+def count_database_tables(
+    conn: sqlite3.Connection | Path | str | None = None,
+) -> int:
+    """Count non-system user tables in the database.
+
+    Args:
+        conn: Optional SQLite connection or database path. If omitted,
+            resolves the canonical default host database.
+
+    Returns:
+        Number of user tables in the database.
+    """
+    with resolve_connection(conn) as active_conn:
+        cursor = active_conn.execute(
+            "SELECT COUNT(*) FROM sqlite_master "
+            "WHERE type='table' AND name NOT LIKE 'sqlite_%';"
+        )
+        return int(cursor.fetchone()[0])

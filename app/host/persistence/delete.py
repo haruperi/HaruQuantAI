@@ -40,14 +40,16 @@ CLI Usage:
 
 from __future__ import annotations
 
-import logging
 import sqlite3
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any
 
+from app.host.logging import get_logger
 from app.host.persistence.create import TABLE_PRIMARY_KEYS, PersistenceError
+from app.host.persistence.read import resolve_connection
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 DELETE_PK_FR = "FR-HOST-PERSISTENCE-DELETE-BY-PK"
 DELETE_WHERE_FR = "FR-HOST-PERSISTENCE-DELETE-WHERE"
@@ -237,12 +239,29 @@ def delete_host_session(
 
 
 def delete_host_job(
-    conn: sqlite3.Connection,
-    job_id: str,
+    conn_or_job_id: sqlite3.Connection | Path | str | None = None,
+    job_id: str | None = None,
+    *,
+    conn: sqlite3.Connection | Path | str | None = None,
 ) -> bool:
     """Delete a host job by job ID."""
-    deleted = delete_row_by_pk(conn, "host_jobs", {"job_id": job_id})
-    return deleted > 0
+    active_conn = conn
+    target_id = job_id
+
+    if isinstance(conn_or_job_id, (sqlite3.Connection, Path)):
+        active_conn = conn_or_job_id
+    elif isinstance(conn_or_job_id, str):
+        if job_id is None:
+            target_id = conn_or_job_id
+        else:
+            active_conn = conn_or_job_id
+
+    if target_id is None:
+        raise PersistenceError("job_id must be provided to delete_host_job")
+
+    with resolve_connection(active_conn) as c:
+        deleted = delete_row_by_pk(c, "host_jobs", {"job_id": target_id})
+        return deleted > 0
 
 
 def delete_host_entity(

@@ -93,15 +93,15 @@ Every module, workspace, and plugin in HaruQuantAI strictly complies with the **
 
 The Host platform provides universal infrastructure to workspaces and plugins:
 
-### 4.1 Bootstrap & Lifecycle Management (`app/host/bootstrap.py`)
-The host boot sequence executes sequentially through well-defined stages:
-1. **Config & Logging:** Loads settings, sets log levels, initializes secret redaction.
-2. **Persistence:** Starts `DatabaseManager`, verifies schema migrations, configures SQLite WAL mode.
-3. **Resource Governance:** Sets memory and CPU limits via `ResourceManager`.
-4. **Job Coordination:** Initializes `JobManager` thread pool.
-5. **Plugin Discovery & Registration:** Asynchronously scans plugin directories, validates manifests, dynamically imports adapters, and registers them into workspace managers.
-6. **Router Mounting:** Mounts workspace REST routers onto the FastAPI application.
-7. **Graceful Teardown:** Shuts down jobs, drains queues, releases plugin adapters in reverse order, and closes database connections.
+### 4.1 Bootstrap & Lifecycle Management (`app/host/bootstrap.py`, `app/main.py`, `app/cli.py`)
+The host boot sequence executes sequentially through 7 ordered stages (`CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES -> READY`) for both the UI/FastAPI server entrypoint (`app/main.py`) and the headless CLI entrypoint (`app/cli.py`):
+1. **CONFIGURING:** Validates host bind address, port, debug flags, and runtime thresholds.
+2. **PATHS:** Creates and inspects workspace directories (`database`, `logs`, `scratch`, `plugins`, `resources`).
+3. **LOGGING:** Initializes asynchronous multi-sink telemetry (`app.log`, `access.log`, `errors.log`), SHA-256 secret redaction, and the 2000-record ring buffer.
+4. **PERSISTENCE:** Configures SQLite WAL mode (`busy_timeout=5000`), initializes all 25 operational tables via `app/host/persistence/create.py`, and reloads `settings`.
+5. **SERVICES:** Starts `SessionManager`, `ResourceManager` (`MemoryWatchdog`), `JobManager` (reconciling orphan `RUNNING` jobs to `INTERRUPTED`), `PluginLifecycleManager` (scanning and attaching dynamic plugins), and `TransportGatewayService`.
+6. **ROUTES:** Mounts FastAPI gateway & discovery REST/SSE/WebSocket routers (or headless CLI command dispatchers).
+7. **READY & Reverse LIFO Teardown:** Transitions to `READY` and guarantees reverse-order (LIFO) teardown (`READY -> ROUTES -> SERVICES -> PERSISTENCE -> LOGGING -> PATHS -> CONFIGURING`) on stop or failure.
 
 ### 4.2 Dynamic Plugin Discovery Engine (`app/host/discovery.py`)
 * **Manifest Verification:** Inspects each plugin directory for a valid `plugin.json` declaring `id`, `name`, `version`, `slot`, `entry_point`, and `capabilities`.
@@ -110,26 +110,29 @@ The host boot sequence executes sequentially through well-defined stages:
 
 ### 4.3 Persistence & Storage Custody (`app/host/persistence/`)
 * **SQLite Import Isolation:** Enforces strict isolation: `sqlite3` must NEVER be imported anywhere outside `app/host/persistence/`. Violations trigger immediate test failures.
-* **WAL Mode & Concurrency:** Configured with `journal_mode=WAL`, `synchronous=NORMAL`, and busy timeout handling for robust concurrent read/write operations.
-* **Single DDL Ownership & Explicit Migration Boundaries:** `schema.py` is the sole owner of canonical table creation, indexes, and compatibility verification across host and workspace domains. Existing database startup inspects ledger versions and core shapes before writes; unsupported versions (>1) and unversioned core databases fail closed with `IncompatibleSchemaError`. Legacy conversions (e.g., obsolete `host_jobs` shapes or legacy tables) are never run automatically on startup or during settings initialization, preserving user data intact pending explicit authorized migrations.
-* **Isolated Standalone Storage:** `SettingsStore` and `HostSessionStore` initialize their own tables via narrow schema operations (`ensure_settings_schema`, `ensure_host_session_schema`) without creating unrelated tables or triggering core schema migrations.
-* **CRUD-only Boundary:** Small stores group related row operations. No application module outside persistence may execute SQL or borrow connections/cursors. Stores return records/results; atomic revision, lease and group/member predicates stay inside transactions.
-* **Business Owners:** settings owns validation/snapshots; jobs owns job lifecycle and worker leases; session owns scope binding/authorization, password authentication, local credential provisioning and the single ephemeral session store; bootstrap sequences recovery; diagnostics owns database/workspace path inspection and its HTTP/CLI access. Each business owner may provide Python, UI, HTTP and CLI access to that same capability. Persistence remains CRUD and its required database infrastructure only. Workspace instrument/session services explicitly initialize business defaults.
+* **WAL Mode & Concurrency:** Configured with `journal_mode=WAL`, `synchronous=NORMAL`, and `busy_timeout=5000` for robust concurrent read/write operations.
+* **Single DDL Ownership & Functional CRUD Modules:** `app/host/persistence/create.py` is the sole owner of canonical table creation (`create_schema`) and connection configuration (`get_connection`), paired with typed functional CRUD operations in `read.py`, `update.py`, and `delete.py`.
+* **CRUD-only Boundary:** Functional CRUD helpers (`list_host_settings`, `batch_save_host_settings`, `save_host_session`, `get_host_session_by_token_hash`, `save_host_job`, `list_host_jobs`, `reconcile_running_host_jobs`) group related row operations without redundant `*Store` wrapper classes. No application module outside `app/host/persistence/` may execute SQL or borrow connections/cursors. Settings batches acquire `BEGIN IMMEDIATE` before reading the revision, then validate and mutate in one transaction. Empty batches retain their revision; caller connections with an active transaction are rejected without committing or rolling it back.
+* **Business Owners:** `settings.py` owns configuration retrieval, revision tracking, and atomic batch updates; `jobs.py` owns job lifecycle and worker leases; `session.py` owns scope binding/authorization, password authentication, local credential provisioning, and ephemeral session invalidation; `bootstrap.py` sequences recovery; `resources.py` owns database/workspace path inspection, hardware/storage diagnostics, worker sizing, memory watchdogs, scratch sandboxing, and their HTTP/CLI access. Persistence remains CRUD and its required database infrastructure only.
 * **Regression Guard:** AST architecture tests enforce database-driver/SQL/handle isolation and prohibit service/transport dependencies in persistence.
 * **Default Ownership:** Workspace models/services supply business defaults, complete creation records, domain timestamps and dataset conflict-update columns. Persistence does not invent trading values, session definitions, dataset IDs or quality scores. Existing schema defaults, storage audit timestamps, serialization limits and revision checks remain database infrastructure.
 
-### 4.4 Resource Management (`app/host/resources.py`)
-* **Process & Memory Quotas:** Tracks active memory and process limits.
+### 4.4 System Diagnostics, Resource Governance & Memory Watchdog (`app/host/resources.py`)
+* **Hardware, Storage & Database Inspection:** Inspects CPU cores, RAM headroom, disk space, and host process metrics via `psutil`, alongside read-only SQLite database and workspace directory health probes.
+* **Core Allocation Policy:** Derives worker concurrency limits using $\text{workers} = \max(1, \text{cpu\_cores} - 2)$ by default (plus explicit `single`, `reserve-one`, `maximum`, and `custom` modes), CPU core affinity, GPU qualification, and computational benchmarking.
+* **Active Memory Watchdog:** Monitors live system RAM headroom and rejects or pauses tasks if available system RAM drops below 15%, alongside data-frame (`warn`/`stop`/`off`) and periodic memory cleanup guards.
 * **Temporary Storage Sandboxing:** Allocates isolated scratch directories per task/job with automatic cleanup.
 
 ### 4.5 Transports & Uniform Response Envelope (`app/host/transport.py`, `app/host/response.py`)
-* **Uniform Envelopes:** Standard API responses follow `ApiResponse[T]`, guaranteeing consistent formatting (`data`, `error`, `timestamp`, `version`).
-* **Error Handling:** RFC 7807 compliant error schemas (`StandardError`) prevent leaked stack traces or sensitive internals.
-* **Event Bus:** In-memory asynchronous pub/sub event distribution (`EventBus`) for decoupling system events from direct callers.
+* **Uniform Envelopes:** Standard API responses follow `StandardResponse`, guaranteeing consistent formatting (`status`, `message`, `data`, `error`, `metadata`).
+* **Error Handling:** RFC 7807 / structured error schemas (`StandardError`) prevent leaked stack traces or sensitive internals.
+* **Telemetry Delivery & Lifecycle:** Log entries are automatically fingerprinted and forwarded from the asynchronous telemetry listener to the `logs` channel; subscriber delivery runs on its owning event loop with bounded pending callbacks and recursive broker diagnostics excluded. Configured authentication and capability scopes protect settings, diagnostics/resources, and job reads/cancellation. All three file sinks share the asynchronous queue. Partial service acquisition is registered for cleanup before initialization, and telemetry is drained and stopped after final teardown diagnostics.
+* **Event Bus & Gateway Routes:** In-memory asynchronous pub/sub event distribution (`EventBus`) and FastAPI REST/SSE/WS endpoints (`/api/v1/auth/login`, `/api/v1/sessions/me`, `/api/v1/settings`, `/api/v1/diagnostics`, `/api/v1/resources`, `/api/v1/jobs`, `/api/v1/events`, `/api/v1/ws`).
 
-### 4.6 Background Job Coordinator (`app/host/jobs.py`)
-* **Non-blocking Execution:** Executes long-running tasks (historical data downloads, transform jobs, quality audits) via thread pools.
-* **Job States:** Lifecycle states: `QUEUED`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`.
+### 4.6 Multiprocessing Background Job Coordinator (`app/host/jobs.py`)
+* **Multiprocessing Worker Pool:** Executes compute-intensive and long-running tasks via an OS process pool (`concurrent.futures.ProcessPoolExecutor`) to bypass Python's Global Interpreter Lock (GIL), gated by the `resources.py` memory watchdog.
+* **Cooperative Cancellation (`JobContext`):** Provides cooperative cancellation tokens (`JobContext`) and isolated scratch paths allowing safe termination when task code next checks its cancellation token; arbitrary code without checkpoints cannot be interrupted immediately.
+* **Job States & Restart Reconciliation:** Manages `QUEUED`, `RUNNING`, `PAUSED`, `COMPLETED`, `FAILED`, `CANCELLED`, and `INTERRUPTED` states; on system boot, orphan jobs left in `RUNNING` state are marked `INTERRUPTED`.
 
 ---
 
@@ -213,18 +216,7 @@ All HaruQuantAI modules adhere to the strict quality baseline enforced by CI and
 * **Ruff Formatting & Linting:** 88-character line limit, Google-style docstrings, organized imports (I001), and PEP 604 modern typing syntax.
 * **Branch-Aware Coverage:** Focused, change-scoped pytest verification with a minimum of 80% branch coverage required for production releases.
 
-HostSettings directly composes persistence.SettingsStore for retrieval and
-validated updates. The global `settings = HostSettings()` is lazy; scoped dot
-access uses cached values, updates refresh that cache, and reload observes other
-writers. Settings HTTP handlers belong in settings.py; filesystem probes belong
-in diagnostics.py. There is no second settings service/store wrapper. Persisted
-snapshots exclude constructor runtime overrides. Authenticated UI reads and writes
-use this same HostSettings -> SettingsStore -> host_settings path. Bootstrap wires
-revision-only settings.changed notifications to the existing event bus after
-committed HTTP writes. Open dialogs submit against their opening revision; stale
-drafts are rejected, and failed saves retain drafts. Host settings are not stored
-in browser local storage. Remote/SMTP preferences do not activate their services
-or persist passwords.
+`_HostSettings` (`settings` in `app/host/settings.py`) directly composes `app/host/persistence/read.py` (`list_host_settings`) and `app/host/persistence/update.py` (`batch_save_host_settings`) for retrieval and revision-checked atomic batch updates. The global `settings` instance is lazy and bootstrap binds it to the database path rather than a borrowed connection; scoped dot access uses cached values, `update_batch()` serializes cache refresh, and `reload()` observes other writers. Read failures propagate and preserve the last successful snapshot. Filesystem probes belong in `resources.py`. Authenticated UI reads and writes use this `settings -> app/host/persistence/` path, and `transport.py` publishes `settings.changed` notifications to the `EventBus` after committed HTTP writes. Open dialogs submit against their opening revision; stale drafts are rejected (`RevisionConflictError` / HTTP 409), and failed saves retain drafts. Host settings are not stored in browser local storage. Remote/SMTP preferences do not activate their services or persist passwords.
 
 
 Browser host sessions retain their opaque token and server-issued 24-hour expiry
@@ -236,8 +228,8 @@ Server sessions still reside in the shared runtime SessionManager; backend
 restart invalidates them. Browser storage failures are surfaced explicitly.
 
 The seven-tab Configuration UI follows SQX reference presentation while retaining
-HaruQuantAI settings storage contracts. HostSettings validates preference types
-and modes; persistence.SettingsStore owns all SQL and atomic row writes. The
+HaruQuantAI settings storage contracts. `settings.py` validates preference types
+and modes; `app/host/persistence/update.py` owns all SQL and atomic row writes. The
 data-frame guard is a warn/stop/off preference; memory cleanup uses 0 minutes for
 never. Default databank sync uses null for never and 0 for immediately. CPU count
 is runtime status, not a database preference. Java/engine/browser execution
@@ -250,7 +242,7 @@ Host settings forms use a settings-owned field catalogue with an HTTP allowlist,
 primitive/list validation and recursive secret redaction. Nested application
 records are the sole persisted preferences/account source; dotted HTTP names are
 in-memory aliases. Explicit revision-checked saves merge JSON leaves atomically through
-`HostSettings -> persistence.SettingsStore`. No startup migration or ad-hoc SQL
+`settings.update_batch() -> batch_save_host_settings()`. No startup migration or ad-hoc SQL
 is introduced. Unknown metadata and system-owned revision/bound port are read-only.
 
 Notification, broker and AI credentials use write-only replacement/clear controls;

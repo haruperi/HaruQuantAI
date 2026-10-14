@@ -1,0 +1,635 @@
+"""Unit tests for Stage 1F FastAPI Gateway, Envelopes & Async EventBus."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+import pytest
+from app.host.persistence.create import create_schema, get_connection
+from app.host.response import (
+    ResponseMetadata,
+    StandardError,
+    StandardResponse,
+)
+from app.host.session import SessionManager, hash_password
+from app.host.transport import (
+    CORE_EVENT_CHANNELS,
+    ApiResponse,
+    EventBus,
+    TransportMiddleware,
+    _format_iso_expiry,
+    _parse_channels_param,
+    _resolve_since_cursor,
+    create_host_app,
+    extract_bearer_token,
+    get_global_event_bus,
+    main,
+    register_transport_exception_handlers,
+)
+from fastapi import APIRouter, FastAPI, HTTPException
+from fastapi.testclient import TestClient
+from pydantic import BaseModel
+
+
+def _create_isolated_session_manager(tmp_path: Path) -> SessionManager:
+    """Create a SessionManager backed by an isolated temporary SQLite DB."""
+    db_file = tmp_path / "transport_test.db"
+    conn = get_connection(db_file)
+    try:
+        create_schema(conn)
+    finally:
+        conn.close()
+    return SessionManager(db_path=db_file, host_instance_id="test-host-01")
+
+
+# ============================================================================
+# 1. Response Envelope & StandardError Tests (app/host/response.py)
+# ============================================================================
+
+
+def test_standard_response_and_error_invariants() -> None:
+    """Verify StandardResponse/ApiResponse success, failure, unwrap, and errors."""
+    assert ApiResponse is StandardResponse
+
+    ok = StandardResponse.success(
+        data={"symbol": "EURUSD"},
+        message="Fetched",
+        request_id="req-100",
+        duration_ms=1.5,
+        side_effects=False,
+        extensions={"source": "cache"},
+    )
+    assert ok.is_success is True
+    assert ok.is_error is False
+    assert bool(ok) is True
+    assert ok.unwrap() == {"symbol": "EURUSD"}
+    assert ok.error_code is None
+    assert ok.request_id == "req-100"
+    ok_dict = ok.to_dict()
+    assert ok_dict["status"] == "success"
+    assert ok_dict["request_id"] == "req-100"
+
+    err = StandardError(
+        code="FEED_DOWN",
+        message="Feed offline",
+        details={"retry_in": 5},
+        retryable=True,
+    )
+    fail: StandardResponse[dict[str, Any]] = StandardResponse.failure(
+        message="Operation failed",
+        error=err,
+        request_id="req-101",
+        duration_ms=2.0,
+    )
+    assert fail.is_error is True
+    assert fail.is_success is False
+    assert bool(fail) is False
+    assert fail.error_code == "FEED_DOWN"
+    with pytest.raises(RuntimeError, match="FEED_DOWN"):
+        fail.unwrap()
+
+    # Invariant checks
+    with pytest.raises(ValueError, match="Error code"):
+        StandardError(code="  ", message="msg")
+    with pytest.raises(ValueError, match="Error message"):
+        StandardError(code="CODE", message="")
+    with pytest.raises(ValueError, match="timestamp_utc"):
+        ResponseMetadata(timestamp_utc="")
+    with pytest.raises(ValueError, match="duration_ms cannot be negative"):
+        ResponseMetadata(timestamp_utc="2026-01-01T00:00:00Z", duration_ms=-1.0)
+
+    meta = ResponseMetadata(timestamp_utc="2026-01-01T00:00:00Z")
+    with pytest.raises(ValueError, match="Invalid status"):
+        StandardResponse(
+            status="invalid",  # type: ignore[arg-type]
+            message="m",
+            data=None,
+            error=None,
+            metadata=meta,
+        )
+    with pytest.raises(ValueError, match="must not contain an error"):
+        StandardResponse(
+            status="success",
+            message="m",
+            data=None,
+            error=err,
+            metadata=meta,
+        )
+    with pytest.raises(ValueError, match="must contain a StandardError"):
+        StandardResponse(
+            status="error",
+            message="m",
+            data=None,
+            error=None,
+            metadata=meta,
+        )
+    with pytest.raises(TypeError, match="instance of StandardError"):
+        StandardResponse(
+            status="error",
+            message="m",
+            data=None,
+            error="bad",  # type: ignore[arg-type]
+            metadata=meta,
+        )
+
+
+# ============================================================================
+# 2. EventBus Multi-Channel Pub/Sub, Replay, Gap & Slow Consumer Tests
+# ============================================================================
+
+
+def test_sensitive_routes_require_session_and_scope(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from unittest.mock import Mock
+
+    from app.host.persistence.create import create_schema, get_connection
+    from app.host.settings import _HostSettings
+
+    db = tmp_path / "protected.db"
+    conn = get_connection(db)
+    create_schema(conn)
+    conn.close()
+    config = _HostSettings()
+    config.reload(conn=db)
+    monkeypatch.setattr("app.host.transport.settings", config)
+    sessions = SessionManager(db_path=db)
+    token, session = sessions.create_session("admin", "audit")
+    headers = {"Authorization": f"Bearer {token}"}
+    jobs = Mock()
+    jobs.list_jobs.return_value = []
+    jobs.get_job.return_value = None
+    jobs.cancel_job.return_value = True
+    client = TestClient(
+        create_host_app(session_mgr=sessions, job_mgr=jobs, require_auth=True)
+    )
+    routes = [
+        ("GET", "/settings", None),
+        ("PUT", "/settings", {"settings": {"audit": {"value": 1}}, "revision": 0}),
+        ("GET", "/diagnostics", None),
+        ("GET", "/resources", None),
+        ("GET", "/jobs", None),
+        ("GET", "/jobs/job-audit", None),
+        ("POST", "/jobs/job-audit/cancel", None),
+    ]
+    for prefix in ("", "/api/v1", "/api/v2"):
+        for method, path, payload in routes:
+            assert (
+                client.request(method, prefix + path, json=payload).status_code == 401
+            )
+    jobs.cancel_job.assert_not_called()
+    assert client.get("/api/v1/jobs", headers=headers).status_code == 200
+    assert (
+        client.post("/api/v1/jobs/job-audit/cancel", headers=headers).status_code == 200
+    )
+    jobs.cancel_job.assert_called_once_with("job-audit")
+    jobs.cancel_job.reset_mock()
+    monkeypatch.setattr(sessions, "authorize", lambda *_: False)
+    for method, path, payload in routes:
+        assert (
+            client.request(
+                method, "/api/v1" + path, headers=headers, json=payload
+            ).status_code
+            == 403
+        )
+    jobs.cancel_job.assert_not_called()
+    sessions.revoke_session(session.session_id)
+    assert client.get("/api/v1/jobs", headers=headers).status_code == 401
+
+
+def test_event_bus_publish_subscribe_replay_gap_and_slow_consumer() -> None:
+    """Verify EventBus monotonic cursors, ring buffer gap, and queue bounds."""
+    bus = EventBus(ring_capacity=3, max_queue_size=2)
+    assert set(CORE_EVENT_CHANNELS).issubset(set(bus.channels))
+
+    # Subscribe to specific channel and wildcard
+    sub_jobs, q_jobs, replay_0, gap_0 = bus.subscribe(channels=["jobs"])
+    assert replay_0 == []
+    assert gap_0 is False
+
+    ev1 = bus.publish("jobs", "started", {"job_id": "j1"})
+    ev2 = bus.publish("settings.changed", "update", {"revision": 2})
+    ev3 = bus.publish("jobs", "progress", {"job_id": "j1", "pct": 50})
+
+    assert ev1.cursor == 1
+    assert ev2.cursor == 2
+    assert ev3.cursor == 3
+    assert bus.current_cursor == 3
+
+    # q_jobs should have ev1 and ev3 (maxsize=2 is now full)
+    assert q_jobs.qsize() == 2
+
+    # Publishing a 3rd 'jobs' event triggers slow-consumer drop without raising
+    ev4 = bus.publish("jobs", "completed", {"job_id": "j1"})
+    assert ev4.cursor == 4
+    assert q_jobs.qsize() == 2
+
+    # Ring capacity is 3 (cursors 2, 3, 4 retained; cursor 1 evicted)
+    # Requesting since_cursor=0 should report has_gap=True
+    sub_late, _, replay_late, gap_late = bus.subscribe(
+        channels=["jobs"], since_cursor=0
+    )
+    assert gap_late is True
+    assert [e.cursor for e in replay_late] == [3, 4]
+
+    # Update subscription dynamically
+    assert bus.update_subscription(sub_late, ["system", "logs"]) is True
+    assert bus.update_subscription("nonexistent-sub", ["system"]) is False
+
+    # Snapshot queries
+    snap = bus.get_snapshot(channel="jobs", since_cursor=0, limit=10)
+    assert snap.has_gap is True
+    assert snap.newest_cursor == 4
+    assert [e.cursor for e in snap.events] == [3, 4]
+
+    bus.unsubscribe(sub_jobs)
+    bus.unsubscribe(sub_late)
+    bus.clear()
+    assert bus.get_snapshot("*").events == []
+
+    # Global singleton check
+    global_bus = get_global_event_bus()
+    assert isinstance(global_bus, EventBus)
+
+
+def test_helper_parsers_and_token_extraction() -> None:
+    """Verify helper functions for bearer tokens, channels, cursors, and dates."""
+    assert extract_bearer_token("Bearer abc123") == "abc123"
+    assert extract_bearer_token(None, "query_tok") == "query_tok"
+    assert extract_bearer_token("Basic xyz", None) is None
+    assert extract_bearer_token("Bearer   ", None) is None
+
+    assert _parse_channels_param(None) == ["*"]
+    assert _parse_channels_param("  ") == ["*"]
+    assert _parse_channels_param("jobs, settings.changed ") == [
+        "jobs",
+        "settings.changed",
+    ]
+
+    assert _resolve_since_cursor(5, "10") == 5
+    assert _resolve_since_cursor(None, "12") == 12
+    assert _resolve_since_cursor(None, "not-a-num") is None
+
+    iso = _format_iso_expiry("2026-10-15 12:00:00")
+    assert "2026-10-15T12:00:00" in iso
+    assert _format_iso_expiry("2026-10-15T12:00:00+00:00") == (
+        "2026-10-15T12:00:00+00:00"
+    )
+    assert _format_iso_expiry("invalid-date") == "invalid-date"
+
+
+# ============================================================================
+# 3. Middleware & Exception Handler Envelopes
+# ============================================================================
+
+
+def test_middleware_and_exception_handlers() -> None:
+    """Verify X-Request-Id, X-Response-Time-Ms, 500, HTTPException, and 422."""
+    app = FastAPI()
+    app.add_middleware(TransportMiddleware)
+    register_transport_exception_handlers(app)
+
+    class ItemBody(BaseModel):
+        count: int
+
+    @app.post("/validate-test")
+    def validate_route(body: ItemBody) -> dict[str, int]:
+        return {"count": body.count}
+
+    @app.get("/http-err")
+    def http_err_route() -> None:
+        raise HTTPException(status_code=409, detail={"reason": "revision conflict"})
+
+    @app.get("/unhandled-err")
+    def unhandled_err_route() -> None:
+        raise RuntimeError("unexpected database crash")
+
+    client = TestClient(app, raise_server_exceptions=False)
+
+    # 1. Validation error (422) with custom X-Request-Id
+    r_val = client.post(
+        "/validate-test",
+        json={"count": "not-an-int"},
+        headers={"X-Request-Id": "req-custom-422"},
+    )
+    assert r_val.status_code == 422
+    assert r_val.headers["X-Request-Id"] == "req-custom-422"
+    assert "X-Response-Time-Ms" in r_val.headers
+    val_body = r_val.json()
+    assert val_body["status"] == "error"
+    assert val_body["error"]["code"] == "VALIDATION_ERROR"
+    assert len(val_body["error"]["issues"]) >= 1
+
+    # 2. HTTPException (409) with auto-generated X-Request-Id
+    r_http = client.get("/http-err")
+    assert r_http.status_code == 409
+    assert r_http.headers["X-Request-Id"].startswith("req-")
+    http_body = r_http.json()
+    assert http_body["status"] == "error"
+    assert http_body["error"]["code"] == "HTTP_409"
+
+    # 3. Unhandled RuntimeError caught by TransportMiddleware (500)
+    r_500 = client.get("/unhandled-err")
+    assert r_500.status_code == 500
+    body_500 = r_500.json()
+    assert body_500["status"] == "error"
+    assert body_500["error"]["code"] == "INTERNAL_SERVER_ERROR"
+    assert "unexpected database crash" in body_500["error"]["message"]
+
+
+# ============================================================================
+# 4. Host Gateway Auth, Shell Status, SSE (/events) & WebSocket (/ws)
+# ============================================================================
+
+
+def test_gateway_auth_shell_and_event_routes(tmp_path: Path) -> None:
+    """Verify /auth/login, /sessions/me, /status, /readiness, /app-loaded, /about."""
+    sess_mgr = _create_isolated_session_manager(tmp_path)
+    bus = EventBus()
+    pw_hash = hash_password("correct-secret")
+
+    extra_router = APIRouter()
+
+    @extra_router.get("/custom-extra")
+    def extra_endpoint() -> dict[str, bool]:
+        return {"extra": True}
+
+    app = create_host_app(
+        event_bus=bus,
+        session_mgr=sess_mgr,
+        password_hash=pw_hash,
+        require_auth=True,
+        heartbeat_sec=0.05,
+        extra_routers=[extra_router],
+    )
+    client = TestClient(app)
+
+    # Extra router mounted
+    assert client.get("/custom-extra").status_code == 200
+
+    # Invalid password -> 401
+    bad_login = client.post("/api/v1/auth/login", json={"password": "wrong-password"})
+    assert bad_login.status_code == 401
+    assert bad_login.json()["error"]["code"] == "INVALID_CREDENTIALS"
+
+    # Unauthenticated /sessions/me & /app-loaded -> 401
+    assert client.get("/api/v1/sessions/me").status_code == 401
+    assert client.post("/api/v1/app-loaded", json={}).status_code == 401
+
+    # Valid login -> 200 with opaque token and ISO expires_at
+    ok_login = client.post(
+        "/api/v1/auth/login",
+        json={"username": "operator", "password": "correct-secret"},
+    )
+    assert ok_login.status_code == 200
+    login_data = ok_login.json()["data"]
+    token = login_data["token"]
+    assert len(token) == 64
+    assert "T" in login_data["expires_at"]
+
+    auth_headers = {"Authorization": f"Bearer {token}"}
+
+    # Verified /sessions/me
+    me_res = client.get("/api/v1/sessions/me", headers=auth_headers)
+    assert me_res.status_code == 200
+    assert me_res.json()["data"]["username"] == "operator"
+
+    # Shell endpoints: /status, /readiness, /app-loaded, /about
+    status_res = client.get("/api/v1/status")
+    assert status_res.status_code == 200
+    assert status_res.json()["data"]["cpu_count"] >= 1
+    assert status_res.json()["data"]["app_loaded"] is False
+
+    loaded_res = client.post("/api/v1/app-loaded", json={}, headers=auth_headers)
+    assert loaded_res.status_code == 200
+    assert loaded_res.json()["data"]["acknowledged"] is True
+    assert client.get("/api/v1/status").json()["data"]["app_loaded"] is True
+
+    ready_res = client.get("/api/v1/readiness")
+    assert ready_res.status_code == 200
+    assert ready_res.json()["data"]["is_ready"] is True
+
+    about_res = client.get("/api/v1/about")
+    assert about_res.status_code == 200
+    assert about_res.json()["data"]["application"] == "HaruQuantAI"
+
+    # Publish & snapshot REST routes
+    pub_res = client.post(
+        "/api/v1/events/publish",
+        json={
+            "channel": "settings.changed",
+            "event_type": "update",
+            "payload": {"revision": 3},
+        },
+    )
+    assert pub_res.status_code == 200
+
+    snap_res = client.get("/api/v1/events/snapshot?channel=settings.changed")
+    assert snap_res.status_code == 200
+    assert len(snap_res.json()["data"]["events"]) == 1
+
+    ch_res = client.get("/api/v1/events/channels")
+    assert ch_res.status_code == 200
+    assert "settings.changed" in ch_res.json()["data"]["active_channels"]
+
+
+def test_sse_events_streaming_replay_gap_and_heartbeat(tmp_path: Path) -> None:
+    """Verify GET /api/v1/events SSE streaming with replay, gap, and auth."""
+    sess_mgr = _create_isolated_session_manager(tmp_path)
+    bus = EventBus(ring_capacity=2)
+    app = create_host_app(
+        event_bus=bus,
+        session_mgr=sess_mgr,
+        require_auth=True,
+        heartbeat_sec=0.02,
+    )
+    client = TestClient(app)
+
+    # Unauthorized SSE attempt -> 401
+    unauth_sse = client.get("/api/v1/events?channels=settings.changed")
+    assert unauth_sse.status_code == 401
+
+    token, _ = sess_mgr.create_session("operator", "127.0.0.1")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Publish 3 events on ring_capacity=2 so cursor 1 is evicted (gap at since_cursor=0)
+    bus.publish("settings.changed", "update", {"revision": 1})
+    bus.publish("settings.changed", "update", {"revision": 2})
+    bus.publish("settings.changed", "update", {"revision": 3})
+
+    sse_res = client.get(
+        "/api/v1/events?channels=settings.changed&since_cursor=0&limit=2",
+        headers=headers,
+    )
+    assert sse_res.status_code == 200
+    assert "text/event-stream" in sse_res.headers["content-type"]
+    body_text = sse_res.text
+    assert "event: system.gap" in body_text
+    assert "event: settings.changed" in body_text
+    assert '"revision":2' in body_text or '"revision": 2' in body_text
+    assert '"revision":3' in body_text or '"revision": 3' in body_text
+
+
+def test_websocket_streaming_and_commands(tmp_path: Path) -> None:
+    """Verify WebSocket /api/v1/ws replay, ping/pong, subscribe, and publish."""
+    sess_mgr = _create_isolated_session_manager(tmp_path)
+    bus = EventBus(ring_capacity=2)
+    bus.publish("jobs", "queued", {"job_id": "j-1"})
+    bus.publish("jobs", "running", {"job_id": "j-1"})
+    bus.publish("jobs", "done", {"job_id": "j-1"})
+
+    app = create_host_app(
+        event_bus=bus,
+        session_mgr=sess_mgr,
+        require_auth=False,
+    )
+    client = TestClient(app)
+
+    with client.websocket_connect("/api/v1/ws?channels=jobs&since_cursor=0") as ws:
+        # 1. Should receive initial gap frame + 2 replay frames (cursors 2 and 3)
+        gap_msg = ws.receive_json()
+        assert gap_msg["event_type"] == "gap"
+        rep1 = ws.receive_json()
+        rep2 = ws.receive_json()
+        assert rep1["cursor"] == 2
+        assert rep2["cursor"] == 3
+
+        # 2. Ping -> Pong
+        ws.send_json({"action": "ping"})
+        pong = ws.receive_json()
+        assert pong["event_type"] == "pong"
+
+        # 3. Dynamic channel subscription update
+        ws.send_json({"action": "subscribe", "channels": ["databanks", "jobs"]})
+        sub_ack = ws.receive_json()
+        assert sub_ack["event_type"] == "subscribed"
+
+        # 4. Publish via WebSocket and receive broadcast
+        ws.send_json(
+            {
+                "action": "publish",
+                "channel": "databanks",
+                "event_type": "strategy_added",
+                "payload": {"strategy_id": "strat-42"},
+            }
+        )
+        live_ev = ws.receive_json()
+        assert live_ev["channel"] == "databanks"
+        assert live_ev["payload"]["strategy_id"] == "strat-42"
+
+        # 5. Clean close action
+        ws.send_json({"action": "close"})
+
+
+def test_transport_cli_main(capsys: pytest.CaptureFixture[str]) -> None:
+    """Verify standalone CLI main() execution."""
+    assert main(["--test-bus"]) == 0
+    out_test = capsys.readouterr().out
+    assert "settings.changed" in out_test
+
+    assert main([]) == 0
+    out_default = capsys.readouterr().out
+    assert "core_channels" in out_default
+
+
+def test_gateway_settings_diagnostics_and_jobs_routes(tmp_path: Path) -> None:
+    """Verify /api/v1/auth, /api/v1/settings, /api/v1/diagnostics, and /api/v1/jobs."""
+    from app.host.jobs import JobManager
+    from app.host.resources import ResourceManager
+    from app.host.settings import settings as host_settings
+
+    db_file = tmp_path / "gateway_gov.db"
+    conn = get_connection(db_file)
+    try:
+        create_schema(conn)
+    finally:
+        conn.close()
+
+    host_settings.reload(conn=db_file)
+    sess_mgr = SessionManager(db_path=db_file, host_instance_id="gov-host-01")
+    res_mgr = ResourceManager(scratch_root=tmp_path / "scratch")
+    job_mgr = JobManager(
+        db_path=db_file,
+        resource_mgr=res_mgr,
+        use_process_pool=False,
+    )
+
+    try:
+        bus = EventBus()
+        app = create_host_app(
+            event_bus=bus,
+            session_mgr=sess_mgr,
+            resource_mgr=res_mgr,
+            job_mgr=job_mgr,
+            require_auth=False,
+        )
+        client = TestClient(app)
+
+        # 1. /api/v1/auth (POST login and GET session verification)
+        login_res = client.post(
+            "/api/v1/auth",
+            json={"username": "admin", "password": "any"},
+        )
+        assert login_res.status_code == 200
+        tok = login_res.json()["data"]["token"]
+        auth_me = client.get(
+            "/api/v1/auth",
+            headers={"Authorization": f"Bearer {tok}"},
+        )
+        assert auth_me.status_code == 200
+        assert auth_me.json()["data"]["username"] == "admin"
+
+        # 2. /api/v1/diagnostics & /api/v1/resources
+        diag_res = client.get("/api/v1/diagnostics")
+        assert diag_res.status_code == 200
+        diag_data = diag_res.json()["data"]
+        assert "hardware" in diag_data
+        assert "worker_capacity" in diag_data
+        assert "memory_watchdog" in diag_data
+
+        res_res = client.get("/api/v1/resources")
+        assert res_res.status_code == 200
+        assert res_res.json()["data"]["worker_capacity"]["allocated_workers"] >= 1
+
+        # 3. /api/v1/settings GET & PUT with revision conflict checks
+        get_set = client.get("/api/v1/settings")
+        assert get_set.status_code == 200
+        rev0 = get_set.json()["data"]["revision"]
+
+        put_ok = client.put(
+            "/api/v1/settings",
+            json={
+                "revision": rev0,
+                "settings": {"user_access": {"username": "gateway_user"}},
+            },
+        )
+        assert put_ok.status_code == 200
+        rev1 = put_ok.json()["data"]["revision"]
+        assert rev1 >= 1
+
+        put_conflict = client.put(
+            "/api/v1/settings",
+            json={
+                "revision": rev0,
+                "settings": {"user_access": {"username": "stale_write"}},
+            },
+        )
+        assert put_conflict.status_code == 409
+        assert put_conflict.json()["error"]["code"] == "REVISION_CONFLICT"
+
+        # 4. /api/v1/jobs, /api/v1/jobs/{job_id}, /api/v1/jobs/{job_id}/cancel
+        list_res = client.get("/api/v1/jobs")
+        assert list_res.status_code == 200
+        assert "jobs" in list_res.json()["data"]
+
+        missing_job = client.get("/api/v1/jobs/nonexistent-job-999")
+        assert missing_job.status_code == 404
+        assert missing_job.json()["error"]["code"] == "JOB_NOT_FOUND"
+
+        cancel_missing = client.post("/api/v1/jobs/nonexistent-job-999/cancel")
+        assert cancel_missing.status_code == 404
+        assert cancel_missing.json()["error"]["code"] == "JOB_NOT_CANCELLABLE"
+    finally:
+        job_mgr.shutdown(wait=True)
+        res_mgr.watchdog.stop()

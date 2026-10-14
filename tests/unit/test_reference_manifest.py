@@ -244,7 +244,11 @@ def test_load_manifest_and_verify_inventory(
             ResourceFile(locator="docs/README.md", sha256="0" * 64),
         )
 
+
+def test_manifest_schema_and_corruption_rejections(tmp_path: Path) -> None:
+    repo, _, manifest_path = _create_synthetic_tree(tmp_path)
     raw = json.loads(manifest_path.read_text(encoding="utf-8"))
+
     dup = json.loads(json.dumps(raw))
     dup["donor_artifacts"].append(dup["donor_artifacts"][0])
     manifest_path.write_text(json.dumps(dup), encoding="utf-8")
@@ -263,7 +267,10 @@ def test_load_manifest_and_verify_inventory(
     with pytest.raises(EvidenceError, match="MANIFEST_INVALID"):
         load_manifest(manifest_path)
 
-    manifest_path.write_text(json.dumps(raw), encoding="utf-8")
+
+def test_verify_inventory_drift_rejections(tmp_path: Path) -> None:
+    repo, donor, manifest_path = _create_synthetic_tree(tmp_path)
+    roots = ReferenceRoots(repo, donor)
     valid_manifest = load_manifest(manifest_path)
 
     (donor / "internal/plugins/PluginExtra").mkdir()

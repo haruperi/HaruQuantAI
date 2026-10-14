@@ -44,14 +44,15 @@ CLI Usage:
 
 from __future__ import annotations
 
-import logging
 import sqlite3
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-logger = logging.getLogger(__name__)
+from app.host.logging import get_logger
+
+logger = get_logger(__name__)
 
 CONNECT_FR = "FR-HOST-PERSISTENCE-CONNECT"
 CREATE_SCHEMA_FR = "FR-HOST-PERSISTENCE-CREATE-SCHEMA"

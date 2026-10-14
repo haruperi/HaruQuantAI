@@ -18,6 +18,11 @@ Key Capabilities:
       `update_datamgr_dataset()`, `update_datamgr_instrument()`
       Logging: DEBUG emitted on successful update with affected row count; WARNING
       when no rows matched; ERROR on constraint or execution failure.
+    - FR-HOST-PERSISTENCE-BATCH-SETTINGS-REVISION: Atomic batch settings upsert
+      with optimistic revision conflict verification.
+      Associated: `batch_save_host_settings()`, `RevisionConflictError`
+      Logging: INFO emitted on committed batch settings update with new revision;
+      WARNING emitted when revision conflict is detected.
 
 Python API Usage:
     ```python
@@ -39,20 +44,36 @@ CLI Usage:
 
 from __future__ import annotations
 
-import logging
+import json
 import sqlite3
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Any
 
+from app.host.logging import get_logger
 from app.host.persistence.create import (
     TABLE_PRIMARY_KEYS,
     PersistenceError,
     current_utc_iso,
 )
+from app.host.persistence.read import resolve_connection
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 UPDATE_FR = "FR-HOST-PERSISTENCE-UPDATE-BY-PK"
+BATCH_SETTINGS_FR = "FR-HOST-PERSISTENCE-BATCH-SETTINGS-REVISION"
+
+
+class RevisionConflictError(PersistenceError):
+    """Raised when an atomic settings batch update encounters a stale revision."""
+
+    def __init__(self, expected_revision: int, current_revision: int) -> None:
+        self.expected_revision = expected_revision
+        self.current_revision = current_revision
+        super().__init__(
+            f"Settings revision conflict: expected revision {expected_revision}, "
+            f"but current database revision is {current_revision}."
+        )
 
 
 def update_row_by_pk(
@@ -177,31 +198,374 @@ def update_host_setting(
     return affected > 0
 
 
-def update_host_session_status(
-    conn: sqlite3.Connection,
+def _verify_settings_revision(expected_revision: int | None, current_rev: int) -> None:
+    """Raise ``RevisionConflictError`` if ``expected_revision`` mismatches DB state."""
+    if expected_revision is not None and expected_revision != current_rev:
+        logger.warning(
+            "%s: rejected batch settings save due to revision conflict "
+            "(expected=%d, current=%d)",
+            BATCH_SETTINGS_FR,
+            expected_revision,
+            current_rev,
+            extra={
+                "fr_id": BATCH_SETTINGS_FR,
+                "expected_revision": expected_revision,
+                "current_revision": current_rev,
+            },
+        )
+        raise RevisionConflictError(
+            expected_revision=expected_revision,
+            current_revision=current_rev,
+        )
+
+
+def batch_save_host_settings(
+    updates: Mapping[str, Mapping[str, Any]],
+    *,
+    expected_revision: int | None = None,
+    conn: sqlite3.Connection | Path | str | None = None,
+) -> int:
+    """Atomically upsert settings after acquiring the SQLite writer reservation.
+
+    Args:
+        updates: Nested mapping of ``{scope: {key: value}}`` to persist.
+        expected_revision: Optional revision expected by caller; raises
+            ``RevisionConflictError`` if current DB revision differs.
+        conn: Optional SQLite connection or database file path.
+
+    Returns:
+        Committed revision; an empty batch returns the unchanged revision.
+
+    Raises:
+        PersistenceError: Connection already has a transaction, or saving fails.
+        RevisionConflictError: Expected revision differs from the locked snapshot.
+    """
+    with resolve_connection(conn) as active_conn:
+        if active_conn.in_transaction:
+            logger.error("%s: caller transaction is already active", BATCH_SETTINGS_FR)
+            raise PersistenceError("Settings batches require an idle connection.")
+        active_conn.execute(
+            'CREATE TABLE IF NOT EXISTS "host_settings" ('
+            "scope TEXT NOT NULL, "
+            "key TEXT NOT NULL, "
+            "value_json TEXT NOT NULL, "
+            "schema_version INTEGER NOT NULL DEFAULT 1, "
+            "updated_at_utc TEXT NOT NULL, "
+            "PRIMARY KEY (scope, key))"
+        )
+        try:
+            with active_conn:
+                active_conn.execute("BEGIN IMMEDIATE")
+                row = active_conn.execute(
+                    "SELECT COALESCE(MAX(schema_version), 0) AS rev "
+                    'FROM "host_settings"'
+                ).fetchone()
+                current_rev = int(row["rev"]) if row is not None else 0
+                _verify_settings_revision(expected_revision, current_rev)
+
+                next_rev = current_rev + int(any(updates.values()))
+                now_iso = current_utc_iso()
+                total_keys = 0
+                for scope, scope_map in updates.items():
+                    for key, raw_val in scope_map.items():
+                        val_json = json.dumps(raw_val)
+                        active_conn.execute(
+                            'INSERT INTO "host_settings" '
+                            "(scope, key, value_json, schema_version, updated_at_utc) "
+                            "VALUES (?, ?, ?, ?, ?) "
+                            "ON CONFLICT(scope, key) DO UPDATE SET "
+                            "value_json = excluded.value_json, "
+                            "schema_version = excluded.schema_version, "
+                            "updated_at_utc = excluded.updated_at_utc",
+                            (scope, key, val_json, next_rev, now_iso),
+                        )
+                        total_keys += 1
+
+                if total_keys > 0:
+                    active_conn.execute(
+                        'UPDATE "host_settings" SET schema_version = ?',
+                        (next_rev,),
+                    )
+        except (sqlite3.Error, TypeError, ValueError) as err:
+            logger.exception(
+                "%s: atomic batch settings save failed",
+                BATCH_SETTINGS_FR,
+                extra={"fr_id": BATCH_SETTINGS_FR, "error": str(err)},
+            )
+            raise PersistenceError(f"Batch settings save failed: {err}") from err
+
+    logger.info(
+        "%s: committed atomic batch settings update (keys=%d, revision=%d)",
+        BATCH_SETTINGS_FR,
+        total_keys,
+        next_rev,
+        extra={
+            "fr_id": BATCH_SETTINGS_FR,
+            "keys": total_keys,
+            "revision": next_rev,
+        },
+    )
+    return next_rev
+
+
+def save_host_session(
     session_id: str,
-    status: str,
+    token_hash: str,
+    username: str,
+    peer_id: str,
+    created_at_utc: str,
+    *,
+    expires_at_utc: str,
+    status: str = "ACTIVE",
+    revoked_at_utc: str | None = None,
+    conn: sqlite3.Connection | Path | str | None = None,
+) -> bool:
+    """Save or upsert a host session record."""
+    with resolve_connection(conn) as active_conn:
+        active_conn.execute(
+            "CREATE TABLE IF NOT EXISTS host_session ("
+            "session_id TEXT PRIMARY KEY, "
+            "token_hash TEXT NOT NULL UNIQUE, "
+            "username TEXT NOT NULL, "
+            "peer_id TEXT NOT NULL, "
+            "created_at_utc TEXT NOT NULL, "
+            "expires_at_utc TEXT NOT NULL, "
+            "revoked_at_utc TEXT, "
+            "status TEXT NOT NULL)"
+        )
+        active_conn.execute(
+            "INSERT INTO host_session "
+            "(session_id, token_hash, username, peer_id, "
+            "created_at_utc, expires_at_utc, revoked_at_utc, status) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(session_id) DO UPDATE SET "
+            "status=excluded.status, "
+            "revoked_at_utc=excluded.revoked_at_utc",
+            (
+                session_id,
+                token_hash,
+                username,
+                peer_id,
+                created_at_utc,
+                expires_at_utc,
+                revoked_at_utc,
+                status,
+            ),
+        )
+        active_conn.commit()
+        return True
+
+
+def update_host_session_status(
+    conn_or_session_id: sqlite3.Connection | Path | str | None = None,
+    session_id_or_status: str | None = None,
+    status: str | None = None,
     *,
     revoked_at_utc: str | None = None,
+    conn: sqlite3.Connection | Path | str | None = None,
 ) -> bool:
     """Update status and optional revocation timestamp of a host session."""
-    updates: dict[str, Any] = {"status": status}
+    active_conn = conn
+    target_id: str | None = None
+    target_status: str | None = status
+
+    if isinstance(conn_or_session_id, (sqlite3.Connection, Path)):
+        active_conn = conn_or_session_id
+        target_id = session_id_or_status
+    elif isinstance(conn_or_session_id, str):
+        if status is None and session_id_or_status is not None:
+            target_id = conn_or_session_id
+            target_status = session_id_or_status
+        else:
+            active_conn = conn_or_session_id
+            target_id = session_id_or_status
+
+    if target_id is None or target_status is None:
+        raise PersistenceError(
+            "session_id and status must be provided to update_host_session_status"
+        )
+
+    updates: dict[str, Any] = {"status": target_status}
     if revoked_at_utc is not None:
         updates["revoked_at_utc"] = revoked_at_utc
-    affected = update_row_by_pk(
-        conn, "host_session", {"session_id": session_id}, updates
-    )
-    return affected > 0
+
+    with resolve_connection(active_conn) as c:
+        affected = update_row_by_pk(
+            c, "host_session", {"session_id": target_id}, updates
+        )
+        return affected > 0
+
+
+def save_host_job(
+    job_id: str,
+    *,
+    owner: str = "default",
+    kind: str = "compute",
+    status: str = "QUEUED",
+    progress: float = 0.0,
+    accepted: int = 0,
+    rejected: int = 0,
+    message: str = "",
+    attempt_id: int = 1,
+    max_retries: int = 0,
+    retry_count: int = 0,
+    dedup_key: str | None = None,
+    parent_job_id: str | None = None,
+    child_job_ids_json: str = "[]",
+    budget_json: str = "{}",
+    submitted_at_utc: str | None = None,
+    started_at_utc: str | None = None,
+    finished_at_utc: str | None = None,
+    error_message: str | None = None,
+    error_location: str | None = None,
+    conn: sqlite3.Connection | Path | str | None = None,
+) -> bool:
+    """Save or upsert a host job record."""
+    with resolve_connection(conn) as active_conn:
+        active_conn.execute(
+            'CREATE TABLE IF NOT EXISTS "host_jobs" ('
+            "job_id TEXT PRIMARY KEY, "
+            "owner TEXT NOT NULL DEFAULT 'default', "
+            "kind TEXT NOT NULL DEFAULT 'compute', "
+            "status TEXT NOT NULL DEFAULT 'completed', "
+            "progress REAL NOT NULL DEFAULT 0.0, "
+            "accepted INTEGER NOT NULL DEFAULT 0, "
+            "rejected INTEGER NOT NULL DEFAULT 0, "
+            "message TEXT NOT NULL DEFAULT '', "
+            "attempt_id INTEGER NOT NULL DEFAULT 1, "
+            "max_retries INTEGER NOT NULL DEFAULT 0, "
+            "retry_count INTEGER NOT NULL DEFAULT 0, "
+            "dedup_key TEXT, "
+            "parent_job_id TEXT, "
+            "child_job_ids_json TEXT NOT NULL DEFAULT '[]', "
+            "budget_json TEXT NOT NULL DEFAULT '{}', "
+            "submitted_at_utc TEXT NOT NULL DEFAULT '', "
+            "started_at_utc TEXT, "
+            "finished_at_utc TEXT, "
+            "error_message TEXT, "
+            "error_location TEXT)"
+        )
+        effective_submitted = submitted_at_utc or current_utc_iso()
+        active_conn.execute(
+            'INSERT INTO "host_jobs" ('
+            "job_id, owner, kind, status, progress, accepted, rejected, message, "
+            "attempt_id, max_retries, retry_count, dedup_key, parent_job_id, "
+            "child_job_ids_json, budget_json, submitted_at_utc, started_at_utc, "
+            "finished_at_utc, error_message, error_location"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(job_id) DO UPDATE SET "
+            "status=excluded.status, "
+            "progress=excluded.progress, "
+            "accepted=excluded.accepted, "
+            "rejected=excluded.rejected, "
+            "message=excluded.message, "
+            "attempt_id=excluded.attempt_id, "
+            "retry_count=excluded.retry_count, "
+            "started_at_utc=excluded.started_at_utc, "
+            "finished_at_utc=excluded.finished_at_utc, "
+            "error_message=excluded.error_message, "
+            "error_location=excluded.error_location",
+            (
+                job_id,
+                owner,
+                kind,
+                status,
+                progress,
+                accepted,
+                rejected,
+                message,
+                attempt_id,
+                max_retries,
+                retry_count,
+                dedup_key,
+                parent_job_id,
+                child_job_ids_json,
+                budget_json,
+                effective_submitted,
+                started_at_utc,
+                finished_at_utc,
+                error_message,
+                error_location,
+            ),
+        )
+        active_conn.commit()
+        return True
+
+
+def record_host_job_event(
+    event_id: str,
+    job_id: str,
+    to_state: str,
+    *,
+    from_state: str | None = None,
+    attempt_id: str | None = None,
+    details_json: str = "{}",
+    created_at_utc: str | None = None,
+    conn: sqlite3.Connection | Path | str | None = None,
+) -> bool:
+    """Record a state transition event in host_job_events."""
+    with resolve_connection(conn) as active_conn:
+        active_conn.execute(
+            'CREATE TABLE IF NOT EXISTS "host_job_events" ('
+            "event_id TEXT PRIMARY KEY, "
+            "job_id TEXT NOT NULL, "
+            "attempt_id TEXT, "
+            "from_state TEXT, "
+            "to_state TEXT NOT NULL, "
+            "details_json TEXT NOT NULL, "
+            "created_at_utc TEXT NOT NULL)"
+        )
+        effective_created = created_at_utc or current_utc_iso()
+        active_conn.execute(
+            'INSERT OR REPLACE INTO "host_job_events" '
+            "(event_id, job_id, attempt_id, from_state, to_state, "
+            "details_json, created_at_utc) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                event_id,
+                job_id,
+                attempt_id,
+                from_state,
+                to_state,
+                details_json,
+                effective_created,
+            ),
+        )
+        active_conn.commit()
+        return True
 
 
 def update_host_job(
-    conn: sqlite3.Connection,
-    job_id: str,
-    updates: Mapping[str, Any],
+    conn_or_job_id: sqlite3.Connection | Path | str | None = None,
+    job_id_or_updates: str | Mapping[str, Any] | None = None,
+    updates: Mapping[str, Any] | None = None,
+    *,
+    conn: sqlite3.Connection | Path | str | None = None,
 ) -> bool:
     """Update attributes of a host job."""
-    affected = update_row_by_pk(conn, "host_jobs", {"job_id": job_id}, updates)
-    return affected > 0
+    active_conn = conn
+    target_id: str | None = None
+    target_updates: Mapping[str, Any] | None = updates
+
+    if isinstance(conn_or_job_id, (sqlite3.Connection, Path)):
+        active_conn = conn_or_job_id
+        if isinstance(job_id_or_updates, str):
+            target_id = job_id_or_updates
+    elif isinstance(conn_or_job_id, str):
+        if isinstance(job_id_or_updates, Mapping) and updates is None:
+            target_id = conn_or_job_id
+            target_updates = job_id_or_updates
+        elif isinstance(job_id_or_updates, str):
+            active_conn = conn_or_job_id
+            target_id = job_id_or_updates
+
+    if target_id is None or target_updates is None:
+        raise PersistenceError("job_id and updates must be provided to update_host_job")
+
+    with resolve_connection(active_conn) as c:
+        affected = update_row_by_pk(
+            c, "host_jobs", {"job_id": target_id}, target_updates
+        )
+        return affected > 0
 
 
 def update_host_job_attempt(
