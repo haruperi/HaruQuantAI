@@ -35,9 +35,17 @@ from typing import Any
 import pytest
 from app.services.trading import (
     BOOK_TYPE_DESCRIPTIONS,
+    DEAL_ENTRY_DESCRIPTIONS,
+    DEAL_TYPE_DESCRIPTIONS,
     ORDER_FILLING_DESCRIPTIONS,
+    ORDER_STATE_DESCRIPTIONS,
     ORDER_TIME_DESCRIPTIONS,
     ORDER_TYPE_DESCRIPTIONS,
+    POSITION_TYPE_DESCRIPTIONS,
+    SWAP_MODE_DESCRIPTIONS,
+    SYMBOL_CALC_MODE_DESCRIPTIONS,
+    SYMBOL_TRADE_EXECUTION_DESCRIPTIONS,
+    SYMBOL_TRADE_MODE_DESCRIPTIONS,
     AccountInfo,
     AccountSnapshot,
     AccountTradeMode,
@@ -45,8 +53,10 @@ from app.services.trading import (
     BookInfo,
     BookType,
     BridgeEvent,
+    DealEntry,
     DealInfo,
     DealSnapshot,
+    DealType,
     HistoryOrderInfo,
     HistoryOrderSnapshot,
     MarginMode,
@@ -54,16 +64,23 @@ from app.services.trading import (
     OrderFilling,
     OrderInfo,
     OrderSnapshot,
+    OrderState,
     OrderTime,
     OrderType,
     PositionInfo,
     PositionSnapshot,
+    PositionType,
     PropertyValue,
     Receipt,
     ReceiptStatus,
     StopoutMode,
+    SymbolCalcMode,
     SymbolInfo,
     SymbolSnapshot,
+    SymbolSpec,
+    SymbolSwapMode,
+    SymbolTradeExecution,
+    SymbolTradeMode,
     TerminalInfo,
     TerminalSnapshot,
     Trade,
@@ -237,6 +254,43 @@ def test_trading_enums_values() -> None:
     assert BookType.BOOK_TYPE_SELL.value == 1
     assert BookType.BOOK_TYPE_BUY.value == 2
 
+    assert PositionType.BUY.value == 0
+    assert PositionType.SELL.value == 1
+
+    assert OrderState.STARTED.value == 0
+    assert OrderState.PLACED.value == 1
+    assert OrderState.CANCELED.value == 2
+    assert OrderState.PARTIAL.value == 3
+    assert OrderState.FILLED.value == 4
+    assert OrderState.REJECTED.value == 5
+    assert OrderState.EXPIRED.value == 6
+
+    assert DealType.BUY.value == 0
+    assert DealType.SELL.value == 1
+
+    assert DealEntry.IN.value == 0
+    assert DealEntry.OUT.value == 1
+    assert DealEntry.INOUT.value == 2
+
+    assert SymbolTradeMode.DISABLED.value == 0
+    assert SymbolTradeMode.LONGONLY.value == 1
+    assert SymbolTradeMode.SHORTONLY.value == 2
+    assert SymbolTradeMode.CLOSEONLY.value == 3
+    assert SymbolTradeMode.FULL.value == 4
+
+    assert SymbolTradeExecution.REQUEST.value == 0
+    assert SymbolTradeExecution.INSTANT.value == 1
+    assert SymbolTradeExecution.MARKET.value == 2
+    assert SymbolTradeExecution.EXCHANGE.value == 3
+
+    assert SymbolSwapMode.DISABLED.value == 0
+    assert SymbolSwapMode.POINTS.value == 1
+
+    assert SymbolCalcMode.FOREX.value == 0
+    assert SymbolCalcMode.FOREX_NO_LEVERAGE.value == 1
+    assert SymbolCalcMode.FUTURES.value == 2
+    assert SymbolCalcMode.CFD.value == 3
+
 
 def test_trading_backend_protocol() -> None:
     """Verify TradingBackend protocol exports and runtime conformance."""
@@ -246,21 +300,24 @@ def test_trading_backend_protocol() -> None:
 
 def test_trading_description_mappings() -> None:
     """Verify description dictionaries contain human-readable string descriptions."""
-    for ot in OrderType:
-        assert ot in ORDER_TYPE_DESCRIPTIONS
-        assert isinstance(ORDER_TYPE_DESCRIPTIONS[ot], str)
-
-    for of in OrderFilling:
-        assert of in ORDER_FILLING_DESCRIPTIONS
-        assert isinstance(ORDER_FILLING_DESCRIPTIONS[of], str)
-
-    for otm in OrderTime:
-        assert otm in ORDER_TIME_DESCRIPTIONS
-        assert isinstance(ORDER_TIME_DESCRIPTIONS[otm], str)
-
-    for bt in BookType:
-        assert bt in BOOK_TYPE_DESCRIPTIONS
-        assert isinstance(BOOK_TYPE_DESCRIPTIONS[bt], str)
+    check_groups: list[tuple[type, dict[Any, str]]] = [
+        (OrderType, ORDER_TYPE_DESCRIPTIONS),
+        (OrderFilling, ORDER_FILLING_DESCRIPTIONS),
+        (OrderTime, ORDER_TIME_DESCRIPTIONS),
+        (BookType, BOOK_TYPE_DESCRIPTIONS),
+        (PositionType, POSITION_TYPE_DESCRIPTIONS),
+        (OrderState, ORDER_STATE_DESCRIPTIONS),
+        (DealType, DEAL_TYPE_DESCRIPTIONS),
+        (DealEntry, DEAL_ENTRY_DESCRIPTIONS),
+        (SymbolTradeMode, SYMBOL_TRADE_MODE_DESCRIPTIONS),
+        (SymbolTradeExecution, SYMBOL_TRADE_EXECUTION_DESCRIPTIONS),
+        (SymbolSwapMode, SWAP_MODE_DESCRIPTIONS),
+        (SymbolCalcMode, SYMBOL_CALC_MODE_DESCRIPTIONS),
+    ]
+    for enum_cls, desc_map in check_groups:
+        for member in enum_cls:  # type: ignore[attr-defined]
+            assert member in desc_map
+            assert isinstance(desc_map[member], str)
 
 
 # ============================================================================
@@ -349,6 +406,7 @@ def test_terminal_snapshot_defaults() -> None:
 
 def test_symbol_snapshot_aliases() -> None:
     """Verify SymbolSnapshot property aliases match underlying fields."""
+    assert SymbolSpec is SymbolSnapshot
     sym = SymbolSnapshot(
         volume_min=0.01,
         volume_max=50.0,
@@ -369,6 +427,15 @@ def test_symbol_snapshot_aliases() -> None:
     assert sym.contract_size == 100_000.0
     assert sym.stops_level == 5
     assert sym.freeze_level == 2
+    assert sym.selected is True
+    sym.selected = False
+    assert sym.select is False
+    assert sym.ticks_book_depth == 0
+    sym.ticks_book_depth = 10
+    assert sym.ticks_bookdepth == 10
+    assert sym.trade_execution == SymbolTradeExecution.MARKET
+    sym.trade_execution = SymbolTradeExecution.EXCHANGE
+    assert sym.trade_exemode == int(SymbolTradeExecution.EXCHANGE)
 
 
 def test_position_snapshot_aliases() -> None:

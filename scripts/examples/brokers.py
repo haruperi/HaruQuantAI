@@ -46,7 +46,6 @@ from typing import Any, Literal
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
-from app.services.brokers.contracts import SymbolSpec
 from app.services.brokers.ctrader import CTraderBackend
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
@@ -65,6 +64,7 @@ from app.services.trading import (
     OrderFilling,
     OrderType,
     ReceiptStatus,
+    SymbolSpec,
     TerminalSnapshot,
     TradeAction,
     TradeRequest,

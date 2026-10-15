@@ -52,6 +52,8 @@ from .enums import (
     OrderTime,
     OrderType,
     StopoutMode,
+    SymbolTradeExecution,
+    SymbolTradeMode,
     TradeAction,
     TradeRetcode,
 )
@@ -65,6 +67,7 @@ __all__ = [
     "OrderSnapshot",
     "PositionSnapshot",
     "SymbolSnapshot",
+    "SymbolSpec",
     "TerminalSnapshot",
     "TradeCheckResult",
     "TradeRequest",
@@ -196,14 +199,14 @@ class SymbolSnapshot:
     ticks_bookdepth: int = 0
     trade_calc_mode: int = 0
     trade_calc_mode_description: str = ""
-    trade_mode: int = 0
-    trade_mode_description: str = ""
+    trade_mode: int = int(SymbolTradeMode.FULL)
+    trade_mode_description: str = "Full Access"
     start_time: int = 0
     expiration_time: int = 0
     trade_stops_level: int = 0
     trade_freeze_level: int = 0
-    trade_exemode: int = 0
-    trade_execution_description: str = ""
+    trade_exemode: int = int(SymbolTradeExecution.MARKET)
+    trade_execution_description: str = "Market"
     swap_mode: int = 0
     swap_mode_description: str = ""
     swap_rollover3days: int = 3
@@ -331,6 +334,40 @@ class SymbolSnapshot:
     def freeze_level(self) -> int:
         """Alias for trade_freeze_level."""
         return self.trade_freeze_level
+
+    @property
+    def selected(self) -> bool:
+        """Alias for select."""
+        return self.select
+
+    @selected.setter
+    def selected(self, value: bool) -> None:
+        self.select = value
+
+    @property
+    def ticks_book_depth(self) -> int:
+        """Alias for ticks_bookdepth."""
+        return self.ticks_bookdepth
+
+    @ticks_book_depth.setter
+    def ticks_book_depth(self, value: int) -> None:
+        self.ticks_bookdepth = value
+
+    @property
+    def trade_execution(self) -> SymbolTradeExecution:
+        """Symbol trade execution policy enum."""
+        return (
+            SymbolTradeExecution(self.trade_exemode)
+            if self.trade_exemode in SymbolTradeExecution._value2member_map_
+            else SymbolTradeExecution.MARKET
+        )
+
+    @trade_execution.setter
+    def trade_execution(self, value: SymbolTradeExecution | int) -> None:
+        self.trade_exemode = int(value)
+
+
+SymbolSpec = SymbolSnapshot
 
 
 @dataclass(slots=True)

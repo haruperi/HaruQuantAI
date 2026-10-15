@@ -32,38 +32,42 @@ from inspect import signature
 from typing import Any, cast
 
 from app.host.logging import get_logger
-from app.services.brokers.contracts import (
-    DEAL_ENTRY_DESCRIPTIONS,
-    DEAL_TYPE_DESCRIPTIONS,
-    ORDER_STATE_DESCRIPTIONS,
-    POSITION_TYPE_DESCRIPTIONS,
+from app.services.brokers.base import (
     BrokerBackend,
-    PositionType,
-    SymbolSpec,
     epoch_millis,
     epoch_seconds,
 )
-from app.services.brokers.contracts import DealEntry as DealEntryEnum
-from app.services.brokers.contracts import DealType as DealTypeEnum
-from app.services.brokers.contracts import OrderState as OrderStateEnum
 from app.services.data import BridgeError
 from app.services.trading import (
+    DEAL_ENTRY_DESCRIPTIONS,
+    DEAL_TYPE_DESCRIPTIONS,
     ORDER_FILLING_DESCRIPTIONS,
+    ORDER_STATE_DESCRIPTIONS,
     ORDER_TIME_DESCRIPTIONS,
     ORDER_TYPE_DESCRIPTIONS,
+    POSITION_TYPE_DESCRIPTIONS,
     AccountSnapshot,
     AccountTradeMode,
     BookType,
+    DealEntry,
     DealSnapshot,
+    DealType,
     HistoryOrderSnapshot,
     MarginMode,
     OrderFilling,
     OrderSnapshot,
+    OrderState,
     OrderTime,
     OrderType,
     PositionSnapshot,
+    PositionType,
     StopoutMode,
+    SymbolCalcMode,
     SymbolSnapshot,
+    SymbolSpec,
+    SymbolSwapMode,
+    SymbolTradeExecution,
+    SymbolTradeMode,
     TerminalSnapshot,
     TradeAction,
     TradeCheckResult,
@@ -71,9 +75,13 @@ from app.services.trading import (
     TradeResult,
     TradeRetcode,
 )
-from app.services.trading import OrderFilling as OrderFillingEnum
-from app.services.trading import OrderTime as OrderTimeEnum
-from app.services.trading import OrderType as OrderTypeEnum
+
+DealEntryEnum = DealEntry
+DealTypeEnum = DealType
+OrderStateEnum = OrderState
+OrderFillingEnum = OrderFilling
+OrderTimeEnum = OrderTime
+OrderTypeEnum = OrderType
 
 logger = get_logger(__name__)
 
@@ -654,6 +662,8 @@ def _dealinfo_dealinfo(self: _ObjectState, ticket: int | None = None) -> DealSna
     if ticket is not None:
         _dealinfo_ticket(self, ticket)
     selected = _selectionbase__require(self)
+    if isinstance(selected, DealSnapshot):
+        return replace(selected)
     return _dict_to_deal_snapshot(record_dict(selected))
 
 
@@ -705,7 +715,12 @@ def _dealinfo_historydealsget(
         deals = [d for d in deals if d.symbol == symbol]
     if group is not None:
         deals = [d for d in deals if fnmatch.fnmatch(d.symbol, group)]
-    return [asdict(_dict_to_deal_snapshot(record_dict(d))) for d in deals]
+    return [
+        asdict(d)
+        if isinstance(d, DealSnapshot)
+        else asdict(_dict_to_deal_snapshot(record_dict(d)))
+        for d in deals
+    ]
 
 
 def _historyorderinfo_historyorderinfo(
@@ -714,6 +729,8 @@ def _historyorderinfo_historyorderinfo(
     if ticket is not None:
         _historyorderinfo_ticket(self, ticket)
     selected = _selectionbase__require(self)
+    if isinstance(selected, OrderSnapshot):
+        return replace(selected)
     return _dict_to_order_snapshot(record_dict(selected))
 
 
@@ -780,7 +797,12 @@ def _historyorderinfo_historyordersget(
         orders = [o for o in orders if o.symbol == symbol]
     if group is not None:
         orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
-    return [asdict(_dict_to_order_snapshot(record_dict(o))) for o in orders]
+    return [
+        asdict(o)
+        if isinstance(o, OrderSnapshot)
+        else asdict(_dict_to_order_snapshot(record_dict(o)))
+        for o in orders
+    ]
 
 
 def _orderinfo_orderinfo(
@@ -789,6 +811,8 @@ def _orderinfo_orderinfo(
     if ticket is not None:
         _orderinfo_select(self, ticket)
     selected = _selectionbase__require(self)
+    if isinstance(selected, OrderSnapshot):
+        return replace(selected)
     return _dict_to_order_snapshot(record_dict(selected))
 
 
@@ -835,7 +859,12 @@ def _orderinfo_ordersget(
         orders = [o for o in orders if o.symbol == symbol]
     if group is not None:
         orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
-    return [asdict(_dict_to_order_snapshot(record_dict(o))) for o in orders]
+    return [
+        asdict(o)
+        if isinstance(o, OrderSnapshot)
+        else asdict(_dict_to_order_snapshot(record_dict(o)))
+        for o in orders
+    ]
 
 
 def _positioninfo_positioninfo(
@@ -844,6 +873,8 @@ def _positioninfo_positioninfo(
     if ticket is not None:
         _positioninfo_selectbyticket(self, ticket)
     selected = _selectionbase__require(self)
+    if isinstance(selected, PositionSnapshot):
+        return replace(selected)
     return _dict_to_position_snapshot(record_dict(selected))
 
 
@@ -912,7 +943,12 @@ def _positioninfo_positionsget(
         positions = [p for p in positions if p.symbol == symbol]
     if group is not None:
         positions = [p for p in positions if fnmatch.fnmatch(p.symbol, group)]
-    return [asdict(_dict_to_position_snapshot(record_dict(p))) for p in positions]
+    return [
+        asdict(p)
+        if isinstance(p, PositionSnapshot)
+        else asdict(_dict_to_position_snapshot(record_dict(p)))
+        for p in positions
+    ]
 
 
 def _symbolinfo___init__(
@@ -1218,11 +1254,43 @@ def _symbolinfo_symbolinfo(
         self.symbol_name = symbol
     d = _symbolinfo_asdict(self)
     s = _symbolinfo__s(self)
+    calc_mode = (
+        SymbolCalcMode(s.trade_calc_mode)
+        if s.trade_calc_mode in SymbolCalcMode._value2member_map_
+        else None
+    )
+    trade_mode = (
+        SymbolTradeMode(s.trade_mode)
+        if s.trade_mode in SymbolTradeMode._value2member_map_
+        else None
+    )
+    trade_ex = (
+        SymbolTradeExecution(s.trade_execution)
+        if s.trade_execution in SymbolTradeExecution._value2member_map_
+        else None
+    )
+    swap_mode = (
+        SymbolSwapMode(s.swap_mode)
+        if s.swap_mode in SymbolSwapMode._value2member_map_
+        else None
+    )
     return SymbolSnapshot(
-        trade_calc_mode_description=s.trade_calc_mode.name.replace("_", " ").title(),
-        trade_mode_description=s.trade_mode.name.replace("_", " ").title(),
-        trade_execution_description=s.trade_execution.name.replace("_", " ").title(),
-        swap_mode_description=s.swap_mode.name.replace("_", " ").title(),
+        trade_calc_mode_description=(
+            s.trade_calc_mode_description
+            or (calc_mode.name.replace("_", " ").title() if calc_mode else "")
+        ),
+        trade_mode_description=(
+            s.trade_mode_description
+            or (trade_mode.name.replace("_", " ").title() if trade_mode else "")
+        ),
+        trade_execution_description=(
+            s.trade_execution_description
+            or (trade_ex.name.replace("_", " ").title() if trade_ex else "")
+        ),
+        swap_mode_description=(
+            s.swap_mode_description
+            or (swap_mode.name.replace("_", " ").title() if swap_mode else "")
+        ),
         swap_rollover3days_description=str(s.swap_rollover3days),
         margin_long=float(s.margin_long),
         margin_short=float(s.margin_short),

@@ -50,20 +50,37 @@ from app.host.logging import get_logger
 
 __all__ = [
     "BOOK_TYPE_DESCRIPTIONS",
+    "DEAL_ENTRY_DESCRIPTIONS",
+    "DEAL_TYPE_DESCRIPTIONS",
     "ORDER_FILLING_DESCRIPTIONS",
+    "ORDER_STATE_DESCRIPTIONS",
     "ORDER_TIME_DESCRIPTIONS",
     "ORDER_TYPE_DESCRIPTIONS",
+    "POSITION_TYPE_DESCRIPTIONS",
+    "SWAP_MODE_DESCRIPTIONS",
+    "SYMBOL_CALC_MODE_DESCRIPTIONS",
+    "SYMBOL_SWAP_MODE_DESCRIPTIONS",
+    "SYMBOL_TRADE_EXECUTION_DESCRIPTIONS",
+    "SYMBOL_TRADE_MODE_DESCRIPTIONS",
     "AccountTradeMode",
     "BookType",
     "BridgeEvent",
+    "DealEntry",
+    "DealType",
     "MarginMode",
     "OrderFilling",
+    "OrderState",
     "OrderTime",
     "OrderType",
+    "PositionType",
     "PropertyValue",
     "Receipt",
     "ReceiptStatus",
     "StopoutMode",
+    "SymbolCalcMode",
+    "SymbolSwapMode",
+    "SymbolTradeExecution",
+    "SymbolTradeMode",
     "TradeAction",
     "TradeResolution",
     "TradeRetcode",
@@ -346,6 +363,141 @@ BOOK_TYPE_DESCRIPTIONS: dict[BookType, str] = {
     BookType.BOOK_TYPE_BUY: "Buy",
     BookType.BOOK_TYPE_SELL_MARKET: "Sell Market",
     BookType.BOOK_TYPE_BUY_MARKET: "Buy Market",
+}
+
+
+class PositionType(IntEnum):
+    """Position type enumeration."""
+
+    BUY = 0
+    SELL = 1
+
+
+class OrderState(IntEnum):
+    """Order lifecycle state enumeration."""
+
+    STARTED = 0
+    PLACED = 1
+    CANCELED = 2
+    PARTIAL = 3
+    FILLED = 4
+    REJECTED = 5
+    EXPIRED = 6
+    REQUEST_ADD = 7
+    REQUEST_MODIFY = 8
+    REQUEST_CANCEL = 9
+
+
+class DealType(IntEnum):
+    """Deal execution type enumeration."""
+
+    BUY = 0
+    SELL = 1
+    BALANCE = 2
+    CREDIT = 3
+    CHARGE = 4
+    CORRECTION = 5
+    BONUS = 6
+    COMMISSION = 7
+    COMMISSION_DAILY = 8
+    COMMISSION_MONTHLY = 9
+    COMMISSION_AGENT_DAILY = 10
+    COMMISSION_AGENT_MONTHLY = 11
+    INTEREST = 12
+    BUY_CANCELED = 13
+    SELL_CANCELED = 14
+    DIVIDEND = 15
+    DIVIDEND_FRANKED = 16
+    TAX = 17
+
+
+class DealEntry(IntEnum):
+    """Deal position entry direction enumeration."""
+
+    IN = 0
+    OUT = 1
+    INOUT = 2
+    OUT_BY = 3
+
+
+class SymbolTradeMode(IntEnum):
+    """Symbol trading mode enumeration."""
+
+    DISABLED = 0
+    LONGONLY = 1
+    SHORTONLY = 2
+    CLOSEONLY = 3
+    FULL = 4
+
+
+class SymbolTradeExecution(IntEnum):
+    """Symbol order execution policy enumeration."""
+
+    REQUEST = 0
+    INSTANT = 1
+    MARKET = 2
+    EXCHANGE = 3
+
+
+class SymbolSwapMode(IntEnum):
+    """Symbol overnight swap calculation mode."""
+
+    DISABLED = 0
+    POINTS = 1
+    CURRENCY_SYMBOL = 2
+    CURRENCY_MARGIN = 3
+    CURRENCY_DEPOSIT = 4
+    INTEREST_CURRENT = 5
+    INTEREST_OPEN = 6
+    REOPEN_CURRENT = 7
+    REOPEN_BID = 8
+
+
+class SymbolCalcMode(IntEnum):
+    """Symbol margin and profit calculation mode."""
+
+    FOREX = 0
+    FOREX_NO_LEVERAGE = 1
+    FUTURES = 2
+    CFD = 3
+    CFDINDEX = 4
+    CFDLEVERAGE = 5
+    EXCH_STOCKS = 32
+    EXCH_FUTURES = 33
+
+
+POSITION_TYPE_DESCRIPTIONS: dict[PositionType, str] = {
+    PositionType.BUY: "Buy",
+    PositionType.SELL: "Sell",
+}
+
+ORDER_STATE_DESCRIPTIONS: dict[OrderState, str] = {
+    item: item.name.replace("_", " ").title() for item in OrderState
+}
+
+DEAL_TYPE_DESCRIPTIONS: dict[DealType, str] = {
+    item: item.name.replace("_", " ").title() for item in DealType
+}
+
+DEAL_ENTRY_DESCRIPTIONS: dict[DealEntry, str] = {
+    item: item.name.replace("_", " ").title() for item in DealEntry
+}
+
+SYMBOL_TRADE_MODE_DESCRIPTIONS: dict[SymbolTradeMode, str] = {
+    item: item.name.replace("_", " ").title() for item in SymbolTradeMode
+}
+
+SYMBOL_TRADE_EXECUTION_DESCRIPTIONS: dict[SymbolTradeExecution, str] = {
+    item: item.name.replace("_", " ").title() for item in SymbolTradeExecution
+}
+
+SYMBOL_SWAP_MODE_DESCRIPTIONS: dict[SymbolSwapMode, str] = {
+    item: item.name.replace("_", " ").title() for item in SymbolSwapMode
+}
+SWAP_MODE_DESCRIPTIONS = SYMBOL_SWAP_MODE_DESCRIPTIONS
+
+SYMBOL_CALC_MODE_DESCRIPTIONS: dict[SymbolCalcMode, str] = {
+    item: item.name.replace("_", " ").title() for item in SymbolCalcMode
 }
 
 

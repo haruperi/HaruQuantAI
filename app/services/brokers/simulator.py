@@ -45,19 +45,9 @@ from app.services.brokers._simulation_api import (
     new_state,
     prepare_args,
 )
-from app.services.brokers.contracts import (
+from app.services.brokers.base import (
     BrokerBackend,
-    DealEntry,
-    DealRecord,
-    DealType,
-    OrderRecord,
-    OrderState,
-    PositionRecord,
-    PositionType,
-    SymbolSpec,
-    SymbolTradeExecution,
-    SymbolTradeMode,
-    Tick,
+    epoch_seconds,
     utc_now,
 )
 from app.services.data import (
@@ -69,12 +59,23 @@ from app.services.data import (
 from app.services.trading import (
     AccountSnapshot,
     BridgeEvent,
+    DealEntry,
+    DealSnapshot,
+    DealType,
     MarginMode,
     OrderFilling,
+    OrderSnapshot,
+    OrderState,
     OrderTime,
     OrderType,
+    PositionSnapshot,
+    PositionType,
     Receipt,
     ReceiptStatus,
+    SymbolSnapshot,
+    SymbolSpec,
+    SymbolTradeExecution,
+    SymbolTradeMode,
     TerminalSnapshot,
     TradeAction,
     TradeCheckResult,
@@ -107,14 +108,14 @@ class SimulationBackend(BrokerBackend):
         self._event_queue: asyncio.Queue[BridgeEvent] = asyncio.Queue()
         self._connected = True
         self._clock = utc_now()
-        self._symbols: dict[str, SymbolSpec] = {}
-        self._ticks: dict[str, Tick] = {}
+        self._symbols: dict[str, SymbolSnapshot] = {}
+        self._ticks: dict[str, MarketTick] = {}
         self._bar_history: dict[tuple[str, Timeframe], tuple[MarketBar, ...]] = {}
         self._tick_history: dict[str, tuple[MarketTick, ...]] = {}
-        self._orders: dict[int, OrderRecord] = {}
-        self._history_orders: list[OrderRecord] = []
-        self._positions: dict[int, PositionRecord] = {}
-        self._deals: list[DealRecord] = []
+        self._orders: dict[int, OrderSnapshot] = {}
+        self._history_orders: list[OrderSnapshot] = []
+        self._positions: dict[int, PositionSnapshot] = {}
+        self._deals: list[DealSnapshot] = []
         self._order_ids = count(1)
         self._deal_ids = count(1_000_001)
         self._position_ids = count(10_000_001)
@@ -152,7 +153,7 @@ class SimulationBackend(BrokerBackend):
         time: datetime | None = None,
         last: float | None = None,
         volume: float = 0.0,
-    ) -> Tick:
+    ) -> MarketTick:
         """Advance simulator time and update pricing with a new tick."""
         if symbol not in self._symbols:
             raise KeyError(f"Symbol {symbol!r} has not been registered")
@@ -162,13 +163,14 @@ class SimulationBackend(BrokerBackend):
         if now.tzinfo is None:
             now = now.replace(tzinfo=UTC)
         self._clock = now
-        tick = Tick(
-            symbol=symbol,
-            time=now,
+        last_price = float(last if last is not None else (bid + ask) / 2.0)
+        tick = MarketTick(
+            time_msc=int(now.timestamp() * 1000),
             bid=float(bid),
             ask=float(ask),
-            last=float(last if last is not None else (bid + ask) / 2.0),
-            volume=float(volume),
+            last=last_price,
+            volume=int(volume),
+            volume_real=float(volume),
         )
         self._ticks[symbol] = tick
         stats = self._stats.setdefault(symbol, {})
@@ -226,12 +228,12 @@ class SimulationBackend(BrokerBackend):
         return replace(self._account)
 
     @override
-    def symbol(self, name: str) -> SymbolSpec | None:
+    def symbol(self, name: str) -> SymbolSnapshot | None:
         spec = self._symbols.get(name)
         return replace(spec) if spec is not None else None
 
     @override
-    def symbols(self) -> list[SymbolSpec]:
+    def symbols(self) -> list[SymbolSnapshot]:
         return [replace(v) for v in self._symbols.values()]
 
     @override
@@ -243,25 +245,25 @@ class SimulationBackend(BrokerBackend):
         return True
 
     @override
-    def tick(self, name: str) -> Tick | None:
+    def tick(self, name: str) -> MarketTick | None:
         value = self._ticks.get(name)
         return replace(value) if value is not None else None
 
     @override
-    def orders(self) -> list[OrderRecord]:
+    def orders(self) -> list[OrderSnapshot]:
         return [replace(v) for _, v in sorted(self._orders.items())]
 
     @override
-    def history_orders(self) -> list[OrderRecord]:
+    def history_orders(self) -> list[OrderSnapshot]:
         return [replace(v) for v in self._history_orders]
 
     @override
-    def positions(self) -> list[PositionRecord]:
+    def positions(self) -> list[PositionSnapshot]:
         self._mark_to_market()
         return [replace(v) for _, v in sorted(self._positions.items())]
 
     @override
-    def deals(self) -> list[DealRecord]:
+    def deals(self) -> list[DealSnapshot]:
         return [replace(v) for v in self._deals]
 
     @override
@@ -433,7 +435,7 @@ class SimulationBackend(BrokerBackend):
                 request,
                 symbol=order.symbol,
                 volume=order.volume_current,
-                order_type=order.order_type,
+                order_type=OrderType(order.order_type),
                 price=request.price or order.price_open,
                 stoplimit=request.stoplimit or order.price_stop_limit,
             )
@@ -451,7 +453,7 @@ class SimulationBackend(BrokerBackend):
             tick = self._ticks.get(position.symbol)
             if spec is not None and tick is not None:
                 minimum = spec.stops_level * spec.point
-                if position.position_type == PositionType.BUY:
+                if position.position_type == int(PositionType.BUY):
                     if request.sl and tick.bid - request.sl < minimum - 1e-12:
                         return TradeRetcode.INVALID_STOPS, "Invalid stop loss"
                     if request.tp and request.tp - tick.bid < minimum - 1e-12:
@@ -560,7 +562,7 @@ class SimulationBackend(BrokerBackend):
                 p.volume
                 for p in self._positions.values()
                 if p.symbol == request.symbol
-                and ((p.position_type == PositionType.BUY) == same_side)
+                and ((p.position_type == int(PositionType.BUY)) == same_side)
             ) + sum(
                 o.volume_current
                 for o in self._orders.values()
@@ -572,7 +574,7 @@ class SimulationBackend(BrokerBackend):
 
         return TradeRetcode.DONE, "Done"
 
-    def _pending_price_valid(self, request: TradeRequest, spec: SymbolSpec) -> bool:
+    def _pending_price_valid(self, request: TradeRequest, spec: SymbolSnapshot) -> bool:
         if request.action not in {TradeAction.PENDING, TradeAction.MODIFY}:
             return True
         tick = self._ticks.get(request.symbol)
@@ -603,14 +605,14 @@ class SimulationBackend(BrokerBackend):
         return False
 
     @staticmethod
-    def _volume_valid(spec: SymbolSpec, volume: float) -> bool:
+    def _volume_valid(spec: SymbolSnapshot, volume: float) -> bool:
         if volume < spec.lots_min - 1e-12 or volume > spec.lots_max + 1e-12:
             return False
         step = max(spec.lots_step, 1e-12)
         n = (volume - spec.lots_min) / step
         return abs(n - round(n)) <= 1e-7
 
-    def _stops_valid(self, request: TradeRequest, spec: SymbolSpec) -> bool:
+    def _stops_valid(self, request: TradeRequest, spec: SymbolSnapshot) -> bool:
         minimum = spec.stops_level * spec.point
         if minimum <= 0:
             return True
@@ -662,11 +664,16 @@ class SimulationBackend(BrokerBackend):
                 in {OrderType.BUY_LIMIT, OrderType.BUY_STOP, OrderType.BUY_STOP_LIMIT}
                 else tick.bid
             )
-        record = OrderRecord(
+        now_sec = int(self._clock.timestamp())
+        now_msc = int(self._clock.timestamp() * 1000)
+        exp_sec = epoch_seconds(request.expiration)
+        record = OrderSnapshot(
             ticket=ticket,
             symbol=request.symbol,
-            order_type=request.order_type,
-            state=OrderState.PLACED,
+            order_type=int(request.order_type),
+            type_description=request.order_type.name.replace("_", " ").title(),
+            state=int(OrderState.PLACED),
+            state_description=OrderState.PLACED.name.replace("_", " ").title(),
             volume_initial=request.volume,
             volume_current=request.volume,
             price_open=request.price,
@@ -674,10 +681,15 @@ class SimulationBackend(BrokerBackend):
             tp=request.tp,
             price_current=current,
             price_stop_limit=request.stoplimit,
-            time_setup=self._clock,
-            time_expiration=request.expiration,
-            type_filling=request.type_filling,
-            type_time=request.type_time,
+            time_setup=now_sec,
+            time_setup_msc=now_msc,
+            time_expiration=exp_sec,
+            type_filling=int(request.type_filling),
+            type_filling_description=request.type_filling.name.replace(
+                "_", " "
+            ).title(),
+            type_time=int(request.type_time),
+            type_time_description=request.type_time.name.replace("_", " ").title(),
             magic=request.magic,
             comment=request.comment,
         )
@@ -709,8 +721,12 @@ class SimulationBackend(BrokerBackend):
             return TradeResult(
                 retcode=int(TradeRetcode.INVALID_ORDER), comment="Order not found"
             )
-        order.state = OrderState.CANCELED
-        order.time_done = self._clock
+        order.state = int(OrderState.CANCELED)
+        order.state_description = OrderState.CANCELED.name.replace("_", " ").title()
+        now_sec = int(self._clock.timestamp())
+        now_msc = int(self._clock.timestamp() * 1000)
+        order.time_done = now_sec
+        order.time_done_msc = now_msc
         self._history_orders.append(replace(order))
         return TradeResult(
             retcode=int(TradeRetcode.DONE), order=ticket, comment="Order canceled"
@@ -723,14 +739,22 @@ class SimulationBackend(BrokerBackend):
                 retcode=int(TradeRetcode.INVALID_ORDER), comment="Order not found"
             )
         changed = False
-        for name, value in (
+        updates: list[tuple[str, Any]] = [
             ("price_open", request.price),
             ("sl", request.sl),
             ("tp", request.tp),
             ("price_stop_limit", request.stoplimit),
-            ("time_expiration", request.expiration),
-            ("type_time", request.type_time),
-        ):
+        ]
+        if request.expiration is not None:
+            updates.append(("time_expiration", epoch_seconds(request.expiration)))
+        updates.append(("type_time", int(request.type_time)))
+        updates.append(
+            (
+                "type_time_description",
+                request.type_time.name.replace("_", " ").title(),
+            )
+        )
+        for name, value in updates:
             if value is not None and getattr(order, name) != value:
                 setattr(order, name, value)
                 changed = True
@@ -760,7 +784,9 @@ class SimulationBackend(BrokerBackend):
             )
         position.sl = request.sl
         position.tp = request.tp
-        position.time_update = self._clock
+        now_sec = int(self._clock.timestamp())
+        position.time_update = now_sec
+        position.time_update_msc = int(self._clock.timestamp() * 1000)
         return TradeResult(
             retcode=int(TradeRetcode.DONE),
             order=position.ticket,
@@ -786,7 +812,7 @@ class SimulationBackend(BrokerBackend):
                     if request.order_type == OrderType.BUY
                     else PositionType.SELL
                 )
-                if existing.position_type == requested_side:
+                if existing.position_type == int(requested_side):
                     return self._netting_add(existing, request, price, tick)
                 return self._netting_offset(existing, request, price, tick)
 
@@ -796,7 +822,7 @@ class SimulationBackend(BrokerBackend):
         self,
         request: TradeRequest,
         price: float,
-        tick: Tick,
+        tick: MarketTick,
         *,
         order_ticket: int | None = None,
     ) -> TradeResult:
@@ -809,37 +835,46 @@ class SimulationBackend(BrokerBackend):
             else PositionType.SELL
         )
         commission = abs(request.volume) * self._commission_per_lot
+        now_sec = int(self._clock.timestamp())
+        now_msc = int(self._clock.timestamp() * 1000)
 
-        position = PositionRecord(
+        position = PositionSnapshot(
             ticket=position_ticket,
             identifier=position_ticket,
             symbol=request.symbol,
-            position_type=side,
+            position_type=int(side),
+            type_description=side.name.replace("_", " ").title(),
             volume=request.volume,
             price_open=price,
             price_current=price,
             sl=request.sl,
             tp=request.tp,
             commission=commission,
-            time=self._clock,
-            time_update=self._clock,
+            time=now_sec,
+            time_msc=now_msc,
+            time_update=now_sec,
+            time_update_msc=now_msc,
             magic=request.magic,
             comment=request.comment,
         )
         self._positions[position_ticket] = position
         self._account.balance -= commission
 
-        deal = DealRecord(
+        deal_type = DealType.BUY if side == PositionType.BUY else DealType.SELL
+        deal = DealSnapshot(
             ticket=deal_ticket,
             order=order_ticket,
             position_id=position_ticket,
             symbol=request.symbol,
-            deal_type=DealType.BUY if side == PositionType.BUY else DealType.SELL,
-            entry=DealEntry.IN,
+            deal_type=int(deal_type),
+            type_description=deal_type.name.replace("_", " ").title(),
+            entry=int(DealEntry.IN),
+            entry_description=DealEntry.IN.name.replace("_", " ").title(),
             volume=request.volume,
             price=price,
             commission=-commission,
-            time=self._clock,
+            time=now_sec,
+            time_msc=now_msc,
             magic=request.magic,
             comment=request.comment,
         )
@@ -862,10 +897,10 @@ class SimulationBackend(BrokerBackend):
 
     def _netting_add(
         self,
-        existing: PositionRecord,
+        existing: PositionSnapshot,
         request: TradeRequest,
         price: float,
-        tick: Tick,
+        tick: MarketTick,
     ) -> TradeResult:
         order_ticket = next(self._order_ids)
         deal_ticket = next(self._deal_ids)
@@ -876,7 +911,10 @@ class SimulationBackend(BrokerBackend):
         ) / new_volume
         existing.volume = new_volume
         existing.price_current = price
-        existing.time_update = self._clock
+        now_sec = int(self._clock.timestamp())
+        now_msc = int(self._clock.timestamp() * 1000)
+        existing.time_update = now_sec
+        existing.time_update_msc = now_msc
         if request.sl:
             existing.sl = request.sl
         if request.tp:
@@ -885,19 +923,23 @@ class SimulationBackend(BrokerBackend):
         existing.commission += commission
         self._account.balance -= commission
 
-        side = existing.position_type
+        side = PositionType(existing.position_type)
+        deal_type = DealType.BUY if side == PositionType.BUY else DealType.SELL
         self._deals.append(
-            DealRecord(
+            DealSnapshot(
                 ticket=deal_ticket,
                 order=order_ticket,
                 position_id=existing.ticket,
                 symbol=existing.symbol,
-                deal_type=DealType.BUY if side == PositionType.BUY else DealType.SELL,
-                entry=DealEntry.IN,
+                deal_type=int(deal_type),
+                type_description=deal_type.name.replace("_", " ").title(),
+                entry=int(DealEntry.IN),
+                entry_description=DealEntry.IN.name.replace("_", " ").title(),
                 volume=request.volume,
                 price=price,
                 commission=-commission,
-                time=self._clock,
+                time=now_sec,
+                time_msc=now_msc,
                 magic=request.magic,
                 comment=request.comment,
             )
@@ -917,10 +959,10 @@ class SimulationBackend(BrokerBackend):
 
     def _netting_offset(
         self,
-        existing: PositionRecord,
+        existing: PositionSnapshot,
         request: TradeRequest,
         price: float,
-        tick: Tick,
+        tick: MarketTick,
     ) -> TradeResult:
         close_volume = min(existing.volume, request.volume)
         result = self._close_position(
@@ -959,11 +1001,13 @@ class SimulationBackend(BrokerBackend):
             )
         if close_price is None:
             close_price = (
-                tick.bid if position.position_type == PositionType.BUY else tick.ask
+                tick.bid
+                if position.position_type == int(PositionType.BUY)
+                else tick.ask
             )
         original_order_type = (
             OrderType.BUY
-            if position.position_type == PositionType.BUY
+            if position.position_type == int(PositionType.BUY)
             else OrderType.SELL
         )
         profit = self.order_calc_profit(
@@ -983,7 +1027,7 @@ class SimulationBackend(BrokerBackend):
         deal_ticket = next(self._deal_ids)
         close_order_type = (
             OrderType.SELL
-            if position.position_type == PositionType.BUY
+            if position.position_type == int(PositionType.BUY)
             else OrderType.BUY
         )
         close_request = TradeRequest(
@@ -998,22 +1042,30 @@ class SimulationBackend(BrokerBackend):
         self._append_filled_order(
             close_request, order_ticket, position.ticket, close_price
         )
+        now_sec = int(self._clock.timestamp())
+        now_msc = int(self._clock.timestamp() * 1000)
+        deal_type = (
+            DealType.SELL
+            if position.position_type == int(PositionType.BUY)
+            else DealType.BUY
+        )
         self._deals.append(
-            DealRecord(
+            DealSnapshot(
                 ticket=deal_ticket,
                 order=order_ticket,
                 position_id=position.identifier,
                 symbol=position.symbol,
-                deal_type=DealType.SELL
-                if position.position_type == PositionType.BUY
-                else DealType.BUY,
-                entry=DealEntry.OUT,
+                deal_type=int(deal_type),
+                type_description=deal_type.name.replace("_", " ").title(),
+                entry=int(DealEntry.OUT),
+                entry_description=DealEntry.OUT.name.replace("_", " ").title(),
                 volume=volume,
                 price=close_price,
                 commission=-commission,
                 swap=allocated_swap,
                 profit=profit,
-                time=self._clock,
+                time=now_sec,
+                time_msc=now_msc,
                 magic=position.magic,
                 comment=comment,
             )
@@ -1021,7 +1073,8 @@ class SimulationBackend(BrokerBackend):
 
         position.volume -= volume
         position.swap -= allocated_swap
-        position.time_update = self._clock
+        position.time_update = now_sec
+        position.time_update_msc = now_msc
         if position.volume <= 1e-12:
             del self._positions[ticket]
         else:
@@ -1077,12 +1130,17 @@ class SimulationBackend(BrokerBackend):
         position_id: int,
         price: float,
     ) -> None:
+        now_sec = int(self._clock.timestamp())
+        now_msc = int(self._clock.timestamp() * 1000)
+        exp_sec = epoch_seconds(request.expiration)
         self._history_orders.append(
-            OrderRecord(
+            OrderSnapshot(
                 ticket=ticket,
                 symbol=request.symbol,
-                order_type=request.order_type,
-                state=OrderState.FILLED,
+                order_type=int(request.order_type),
+                type_description=request.order_type.name.replace("_", " ").title(),
+                state=int(OrderState.FILLED),
+                state_description=OrderState.FILLED.name.replace("_", " ").title(),
                 volume_initial=request.volume,
                 volume_current=0.0,
                 price_open=price,
@@ -1090,11 +1148,17 @@ class SimulationBackend(BrokerBackend):
                 tp=request.tp,
                 price_current=price,
                 price_stop_limit=request.stoplimit,
-                time_setup=self._clock,
-                time_done=self._clock,
-                time_expiration=request.expiration,
-                type_filling=request.type_filling,
-                type_time=request.type_time,
+                time_setup=now_sec,
+                time_setup_msc=now_msc,
+                time_done=now_sec,
+                time_done_msc=now_msc,
+                time_expiration=exp_sec,
+                type_filling=int(request.type_filling),
+                type_filling_description=request.type_filling.name.replace(
+                    "_", " "
+                ).title(),
+                type_time=int(request.type_time),
+                type_time_description=request.type_time.name.replace("_", " ").title(),
                 magic=request.magic,
                 position_id=position_id,
                 comment=request.comment,
@@ -1106,58 +1170,74 @@ class SimulationBackend(BrokerBackend):
     # ------------------------------------------------------------------
 
     def _expire_orders(self) -> None:
+        now_sec = int(self._clock.timestamp())
+        now_msc = int(self._clock.timestamp() * 1000)
         expired = [
             ticket
             for ticket, order in self._orders.items()
-            if order.type_time in {OrderTime.SPECIFIED, OrderTime.SPECIFIED_DAY}
-            and order.time_expiration is not None
-            and self._clock >= order.time_expiration
+            if order.type_time
+            in {int(OrderTime.SPECIFIED), int(OrderTime.SPECIFIED_DAY)}
+            and order.time_expiration > 0
+            and now_sec >= order.time_expiration
         ]
         for ticket in expired:
             order = self._orders.pop(ticket)
-            order.state = OrderState.EXPIRED
-            order.time_done = self._clock
+            order.state = int(OrderState.EXPIRED)
+            order.state_description = OrderState.EXPIRED.name.replace("_", " ").title()
+            order.time_done = now_sec
+            order.time_done_msc = now_msc
             self._history_orders.append(replace(order))
 
-    def _trigger_pending(self, symbol: str, tick: Tick) -> None:
+    def _trigger_pending(self, symbol: str, tick: MarketTick) -> None:
         for ticket, order in list(self._orders.items()):
             if order.symbol != symbol:
                 continue
 
             triggered = False
             fill_price = order.price_open
-            if order.order_type == OrderType.BUY_LIMIT and tick.ask <= order.price_open:
+            if (
+                order.order_type == int(OrderType.BUY_LIMIT)
+                and tick.ask <= order.price_open
+            ):
                 triggered = True
                 fill_price = min(order.price_open, tick.ask)
             elif (
-                order.order_type == OrderType.SELL_LIMIT
+                order.order_type == int(OrderType.SELL_LIMIT)
                 and tick.bid >= order.price_open
             ):
                 triggered = True
                 fill_price = max(order.price_open, tick.bid)
             elif (
-                order.order_type == OrderType.BUY_STOP and tick.ask >= order.price_open
+                order.order_type == int(OrderType.BUY_STOP)
+                and tick.ask >= order.price_open
             ):
                 triggered = True
                 fill_price = tick.ask
             elif (
-                order.order_type == OrderType.SELL_STOP and tick.bid <= order.price_open
+                order.order_type == int(OrderType.SELL_STOP)
+                and tick.bid <= order.price_open
             ):
                 triggered = True
                 fill_price = tick.bid
             elif (
-                order.order_type == OrderType.BUY_STOP_LIMIT
+                order.order_type == int(OrderType.BUY_STOP_LIMIT)
                 and tick.ask >= order.price_open
             ):
-                order.order_type = OrderType.BUY_LIMIT
+                order.order_type = int(OrderType.BUY_LIMIT)
+                order.type_description = OrderType.BUY_LIMIT.name.replace(
+                    "_", " "
+                ).title()
                 order.price_open = order.price_stop_limit or order.price_open
                 order.price_stop_limit = 0.0
                 continue
             elif (
-                order.order_type == OrderType.SELL_STOP_LIMIT
+                order.order_type == int(OrderType.SELL_STOP_LIMIT)
                 and tick.bid <= order.price_open
             ):
-                order.order_type = OrderType.SELL_LIMIT
+                order.order_type = int(OrderType.SELL_LIMIT)
+                order.type_description = OrderType.SELL_LIMIT.name.replace(
+                    "_", " "
+                ).title()
                 order.price_open = order.price_stop_limit or order.price_open
                 order.price_stop_limit = 0.0
                 continue
@@ -1166,8 +1246,12 @@ class SimulationBackend(BrokerBackend):
                 continue
 
             del self._orders[ticket]
-            order.state = OrderState.FILLED
-            order.time_done = self._clock
+            now_sec = int(self._clock.timestamp())
+            now_msc = int(self._clock.timestamp() * 1000)
+            order.state = int(OrderState.FILLED)
+            order.state_description = OrderState.FILLED.name.replace("_", " ").title()
+            order.time_done = now_sec
+            order.time_done_msc = now_msc
             order.volume_current = 0.0
             order.price_current = fill_price
             self._history_orders.append(replace(order))
@@ -1177,15 +1261,24 @@ class SimulationBackend(BrokerBackend):
                 symbol=order.symbol,
                 volume=order.volume_initial,
                 order_type=OrderType.BUY
-                if order.order_type in {OrderType.BUY_LIMIT, OrderType.BUY_STOP}
+                if order.order_type
+                in {int(OrderType.BUY_LIMIT), int(OrderType.BUY_STOP)}
                 else OrderType.SELL,
                 price=fill_price,
                 sl=order.sl,
                 tp=order.tp,
                 magic=order.magic,
-                type_filling=order.type_filling,
-                type_time=order.type_time,
-                expiration=order.time_expiration,
+                type_filling=OrderFilling(order.type_filling)
+                if order.type_filling in OrderFilling._value2member_map_
+                else OrderFilling.FOK,
+                type_time=OrderTime(order.type_time)
+                if order.type_time in OrderTime._value2member_map_
+                else OrderTime.GTC,
+                expiration=(
+                    datetime.fromtimestamp(order.time_expiration, tz=UTC)
+                    if order.time_expiration
+                    else None
+                ),
                 comment=order.comment,
             )
             if self._account.margin_mode == MarginMode.RETAIL_HEDGING:
@@ -1195,12 +1288,12 @@ class SimulationBackend(BrokerBackend):
                 # entry added above only for the common open-new case.
                 self._market_open(replace(request, price=fill_price))
 
-    def _trigger_stops(self, symbol: str, tick: Tick) -> None:
+    def _trigger_stops(self, symbol: str, tick: MarketTick) -> None:
         for position in list(self._positions.values()):
             if position.symbol != symbol:
                 continue
             reason = ""
-            if position.position_type == PositionType.BUY:
+            if position.position_type == int(PositionType.BUY):
                 if position.sl > 0 and tick.bid <= position.sl:
                     reason = "stop loss"
                 elif position.tp > 0 and tick.bid >= position.tp:
@@ -1220,12 +1313,14 @@ class SimulationBackend(BrokerBackend):
             if tick is None:
                 continue
             current = (
-                tick.bid if position.position_type == PositionType.BUY else tick.ask
+                tick.bid
+                if position.position_type == int(PositionType.BUY)
+                else tick.ask
             )
             position.price_current = current
             order_type = (
                 OrderType.BUY
-                if position.position_type == PositionType.BUY
+                if position.position_type == int(PositionType.BUY)
                 else OrderType.SELL
             )
             position.profit = self.order_calc_profit(

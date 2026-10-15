@@ -23,8 +23,7 @@ import importlib
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from app.services.brokers.base import BaseBrokerBackend
-    from app.services.brokers.contracts import SymbolSpec
+    from app.services.brokers.base import BaseBrokerBackend, BrokerBackend
     from app.services.brokers.crypto import BinanceBroker
     from app.services.brokers.ctrader import CTraderBackend
     from app.services.brokers.darwinex import DarwinexBroker
@@ -53,6 +52,7 @@ if TYPE_CHECKING:
         Receipt,
         ReceiptStatus,
         SymbolSnapshot,
+        SymbolSpec,
         TerminalSnapshot,
         TradeAction,
         TradeCheckResult,
@@ -65,6 +65,7 @@ _SINGLETONS: dict[str, Any] = {}
 
 _MODULE_MAPPING: dict[str, tuple[str, str]] = {
     "BaseBrokerBackend": ("app.services.brokers.base", "BaseBrokerBackend"),
+    "BrokerBackend": ("app.services.brokers.base", "BrokerBackend"),
     "BridgeError": ("app.services.brokers.base", "BridgeError"),
     "DataBrokerBackend": ("app.services.data", "DataBrokerBackend"),
     "BinanceBroker": ("app.services.brokers.crypto", "BinanceBroker"),
@@ -81,7 +82,7 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
         "TickDownloaderBroker",
     ),
     "YahooBroker": ("app.services.brokers.yahoo", "YahooBroker"),
-    "SymbolSpec": ("app.services.brokers.contracts", "SymbolSpec"),
+    "SymbolSpec": ("app.services.trading", "SymbolSpec"),
     "MarketBar": ("app.services.data", "MarketBar"),
     "MarketTick": ("app.services.data", "MarketTick"),
     "Timeframe": ("app.services.data", "Timeframe"),
@@ -160,6 +161,7 @@ __all__ = [
     "BinanceBroker",
     "BridgeError",
     "BridgeEvent",
+    "BrokerBackend",
     "CTraderBackend",
     "DarwinexBroker",
     "DataBrokerBackend",

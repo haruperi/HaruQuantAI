@@ -64,6 +64,14 @@ class TestTradingPackageExports:
         assert trading_pkg.TradeAction is trading_enums.TradeAction
         assert trading_pkg.TradeRetcode is trading_enums.TradeRetcode
         assert trading_pkg.BookType is trading_enums.BookType
+        assert trading_pkg.PositionType is trading_enums.PositionType
+        assert trading_pkg.OrderState is trading_enums.OrderState
+        assert trading_pkg.DealType is trading_enums.DealType
+        assert trading_pkg.DealEntry is trading_enums.DealEntry
+        assert trading_pkg.SymbolTradeMode is trading_enums.SymbolTradeMode
+        assert trading_pkg.SymbolTradeExecution is trading_enums.SymbolTradeExecution
+        assert trading_pkg.SymbolSwapMode is trading_enums.SymbolSwapMode
+        assert trading_pkg.SymbolCalcMode is trading_enums.SymbolCalcMode
         assert (
             trading_pkg.ORDER_TYPE_DESCRIPTIONS is trading_enums.ORDER_TYPE_DESCRIPTIONS
         )
@@ -77,6 +85,35 @@ class TestTradingPackageExports:
         assert (
             trading_pkg.BOOK_TYPE_DESCRIPTIONS is trading_enums.BOOK_TYPE_DESCRIPTIONS
         )
+        assert (
+            trading_pkg.POSITION_TYPE_DESCRIPTIONS
+            is trading_enums.POSITION_TYPE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.ORDER_STATE_DESCRIPTIONS
+            is trading_enums.ORDER_STATE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.DEAL_TYPE_DESCRIPTIONS is trading_enums.DEAL_TYPE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.DEAL_ENTRY_DESCRIPTIONS is trading_enums.DEAL_ENTRY_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.SYMBOL_TRADE_MODE_DESCRIPTIONS
+            is trading_enums.SYMBOL_TRADE_MODE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
+            is trading_enums.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.SWAP_MODE_DESCRIPTIONS is trading_enums.SWAP_MODE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.SYMBOL_CALC_MODE_DESCRIPTIONS
+            is trading_enums.SYMBOL_CALC_MODE_DESCRIPTIONS
+        )
 
     def test_snapshots_exports_identity(self) -> None:
         """Verify snapshot models match between package and submodule."""
@@ -85,6 +122,8 @@ class TestTradingPackageExports:
         assert trading_pkg.AccountSnapshot is trading_snapshots.AccountSnapshot
         assert trading_pkg.TerminalSnapshot is trading_snapshots.TerminalSnapshot
         assert trading_pkg.SymbolSnapshot is trading_snapshots.SymbolSnapshot
+        assert trading_pkg.SymbolSpec is trading_snapshots.SymbolSpec
+        assert trading_pkg.SymbolSpec is trading_snapshots.SymbolSnapshot
         assert trading_pkg.PositionSnapshot is trading_snapshots.PositionSnapshot
         assert trading_pkg.OrderSnapshot is trading_snapshots.OrderSnapshot
         assert (
@@ -157,6 +196,8 @@ class TestLayeringAndAntiCircularRules:
             )
 
     def test_no_backward_compatibility_shim(self) -> None:
-        """Verify that app.services.libs.trading is completely deleted."""
+        """Verify that legacy modules are completely deleted without shims."""
         with pytest.raises(ModuleNotFoundError):
             importlib.import_module("app.services.libs.trading")
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("app.services.brokers.contracts")

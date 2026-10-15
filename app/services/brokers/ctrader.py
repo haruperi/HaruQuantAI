@@ -70,8 +70,7 @@ from typing import Any, Self, cast, override
 
 from app.host.logging import get_logger
 from app.host.settings import settings
-from app.services.brokers.contracts import Tick
-from app.services.data import BridgeError
+from app.services.data import BridgeError, MarketTick
 from app.services.trading import (
     AccountSnapshot,
     AccountTradeMode,
@@ -1392,16 +1391,16 @@ class CTraderBackend(Trading):
             )
         return handler()
 
-    def _get_symbol_tick(self, symbol: str) -> Tick:
+    def _get_symbol_tick(self, symbol: str) -> MarketTick:
         snap = self.client.symbol_info(symbol)
         now_dt = datetime.now(UTC)
-        return Tick(
-            symbol=snap.name,
-            time=now_dt,
+        time_msc = int(now_dt.timestamp() * 1000)
+        return MarketTick(
+            time_msc=time_msc,
             bid=snap.bid,
             ask=snap.ask,
             last=0.0,
-            volume=0.0,
+            volume=0,
         )
 
     def _add_book(self, symbol: str) -> bool:

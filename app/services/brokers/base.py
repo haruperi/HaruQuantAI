@@ -42,22 +42,179 @@ from __future__ import annotations
 import contextvars
 import time
 import uuid
+from abc import ABC, abstractmethod
 from dataclasses import asdict, is_dataclass, replace
+from datetime import UTC, datetime
 from types import TracebackType
-from typing import Any, Self
+from typing import TYPE_CHECKING, Any, Self
+
+if TYPE_CHECKING:
+    from app.services.data import MarketTick
 
 from app.host.logging import get_logger
 from app.services.trading import (
+    AccountSnapshot,
     BridgeEvent,
+    DealSnapshot,
+    OrderSnapshot,
+    OrderType,
+    PositionSnapshot,
     Receipt,
     ReceiptStatus,
     SymbolSnapshot,
     TerminalSnapshot,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
 )
 
 logger = get_logger(__name__)
 
-__all__ = ["BaseBrokerBackend", "BridgeError"]
+__all__ = [
+    "BaseBrokerBackend",
+    "BridgeError",
+    "BrokerBackend",
+    "epoch_millis",
+    "epoch_seconds",
+    "utc_now",
+]
+
+
+def utc_now() -> datetime:
+    """Return the current UTC datetime."""
+    return datetime.now(tz=UTC)
+
+
+def epoch_seconds(value: datetime | float | None) -> int:
+    """Convert an optional datetime or numeric timestamp to integer epoch seconds."""
+    if value is None:
+        return 0
+    if isinstance(value, (int, float)):
+        return int(value) if value < 100_000_000_000 else int(value // 1000)
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return int(value.timestamp())
+
+
+def epoch_millis(value: datetime | float | None) -> int:
+    """Convert an optional datetime or numeric timestamp to integer epoch milliseconds."""
+    if value is None:
+        return 0
+    if isinstance(value, (int, float)):
+        return int(value * 1000) if value < 100_000_000_000 else int(value)
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return int(value.timestamp() * 1000)
+
+
+class BrokerBackend(ABC):
+    """Internal synchronous snapshot-model capability for simulator handlers."""
+
+    @abstractmethod
+    def connect(self) -> bool:
+        """Establish synchronous connectivity to the broker backend."""
+        ...
+
+    @abstractmethod
+    def disconnect(self) -> None:
+        """Terminate connection and release resources."""
+        ...
+
+    @abstractmethod
+    def terminal(self) -> TerminalSnapshot:
+        """Retrieve the current terminal state snapshot."""
+        ...
+
+    @abstractmethod
+    def account(self) -> AccountSnapshot:
+        """Retrieve the current account state snapshot."""
+        ...
+
+    @abstractmethod
+    def symbol(self, name: str) -> SymbolSnapshot | None:
+        """Lookup a symbol snapshot by instrument ticker."""
+        ...
+
+    def symbols(self) -> list[SymbolSnapshot]:
+        """Optional symbol catalog enumeration used by market information lookups."""
+        return []
+
+    @abstractmethod
+    def select_symbol(self, name: str, selected: bool) -> bool:
+        """Select or unselect a symbol in Market Watch."""
+        ...
+
+    @abstractmethod
+    def tick(self, name: str) -> MarketTick | None:
+        """Retrieve the latest market tick for the specified symbol."""
+        ...
+
+    @abstractmethod
+    def orders(self) -> list[OrderSnapshot]:
+        """Retrieve all currently active working orders."""
+        ...
+
+    @abstractmethod
+    def history_orders(self) -> list[OrderSnapshot]:
+        """Retrieve historical completed and canceled orders."""
+        ...
+
+    @abstractmethod
+    def positions(self) -> list[PositionSnapshot]:
+        """Retrieve all open market positions."""
+        ...
+
+    @abstractmethod
+    def deals(self) -> list[DealSnapshot]:
+        """Retrieve all historical execution deals."""
+        ...
+
+    @abstractmethod
+    def order_check(self, request: TradeRequest) -> TradeCheckResult:
+        """Pre-validate a trade request and calculate margin requirements."""
+        ...
+
+    @abstractmethod
+    def order_send(self, request: TradeRequest) -> TradeResult:
+        """Execute or place an order transaction against the backend."""
+        ...
+
+    @abstractmethod
+    def order_calc_profit(
+        self,
+        order_type: OrderType,
+        symbol: str,
+        volume: float,
+        price_open: float,
+        price_close: float,
+    ) -> float:
+        """Calculate hypothetical floating or realized profit for an order."""
+        ...
+
+    @abstractmethod
+    def order_calc_margin(
+        self,
+        order_type: OrderType,
+        symbol: str,
+        volume: float,
+        price: float,
+    ) -> float:
+        """Calculate required margin for an order."""
+        ...
+
+    def info_value(
+        self,
+        scope: str,
+        property_id: int | str,
+        selector: str | int | None = None,
+    ) -> Any:
+        """Optional generic property lookup used by Info* methods."""
+        del scope, property_id, selector
+        return None
+
+    def set_clock(self, now: datetime) -> None:
+        """Optional simulator clock hook."""
+        del now
 
 
 class BridgeError(RuntimeError):
