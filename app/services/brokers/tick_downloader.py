@@ -61,8 +61,8 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderUnsupportedError,
 )
-from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
+from app.workspace.data_manager.history import DataBrokerBackend
 
 ADAPTERS_FR = "FR-DATA-PROVIDERS-ADAPTERS"
 HEALTH_FR = "FR-DATA-PROVIDERS-HEALTH"

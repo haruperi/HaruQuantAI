@@ -27,7 +27,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.dukascopy import DukascopyBroker
-    from app.services.data import get_historical_bars
+    from app.workspace.data_manager.history import get_historical_bars
     from app.workspace.data_manager.contracts import Timeframe
 
     broker = DukascopyBroker()
@@ -69,8 +69,8 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderUnsupportedError,
 )
-from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
+from app.workspace.data_manager.history import DataBrokerBackend
 
 logger = get_logger(__name__)
 

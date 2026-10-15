@@ -91,7 +91,6 @@ from app.services.brokers.capabilities import (
     ProviderCapabilities,
     ProviderHealth,
 )
-from app.services.data import DataBrokerBackend
 from app.services.trading import (
     BridgeEvent,
     PropertyValue,
@@ -101,6 +100,7 @@ from app.services.trading import (
     TradeResolution,
     Trading,
 )
+from app.workspace.data_manager.history import DataBrokerBackend
 
 PLUGIN_MANIFEST = {
     "id": "metatrader",

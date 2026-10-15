@@ -6,28 +6,49 @@ Description:
     and structured conversion routines into pandas DataFrames.
 
 Purpose:
-    FEAT-DATA-HISTORY: Historical market data retrieval, validation, and conversion.
+    FEAT-DATAMGR-HISTORY: Historical market data retrieval, validation, and conversion.
 
 Key Capabilities:
-    - FR-DATA-HISTORICAL-READS: Fetch chronological bars and millisecond ticks.
-      Associated: `get_historical_bars()`, `get_ticks()`.
-      Logging: DEBUG every read attempt with operation only, no payloads or paths.
-    - FR-DATA-HISTORY-VALIDATION: Reject invalid or excessive historical data.
-      Associated: `validate_rows()`, `validate_request()`.
-      Logging: DEBUG validation attempts; errors carry bounded diagnostic codes.
-    - FR-DATA-DATAFRAME-CONVERSIONS: Convert historical bars and ticks into structured
-      pandas DataFrames.
-      Associated: `bars_to_dataframe()`, `ticks_to_dataframe()`, `bars_to_df()`,
-        `ticks_to_df()`.
-    - FR-DATA-BROKER-BACKEND: Base market data provider adapter with Bars/Ticks
-      dispatch.
-      Associated: `DataBrokerBackend`, `DataBrokerBackend.fetch_bars()`,
-        `DataBrokerBackend.fetch_ticks()`.
+    - FR-DATAMGR-HISTORY-BAR-COLUMNS: Canonical bar column tuple specification.
+      Associated: `BAR_COLUMNS`.
+      Logging: Constant schema tuple with zero side effects.
+    - FR-DATAMGR-HISTORY-TICK-COLUMNS: Canonical tick column tuple specification.
+      Associated: `TICK_COLUMNS`.
+      Logging: Constant schema tuple with zero side effects.
+    - FR-DATAMGR-HISTORY-BACKEND-PROTOCOL: Execution protocol for market data readers.
+      Associated: `DataBackend`.
+      Logging: Protocol definition with zero side effects.
+    - FR-DATAMGR-HISTORY-BROKER-BACKEND: Base market data provider adapter.
+      Associated: `DataBrokerBackend`.
       Logging: DEBUG market data dispatch lifecycle through BaseBrokerBackend.
+    - FR-DATAMGR-HISTORY-BARS-TO-DATAFRAME: Convert historical bars to pandas DataFrame.
+      Associated: `bars_to_dataframe()`.
+      Logging: In-memory vectorized DataFrame construction.
+    - FR-DATAMGR-HISTORY-BARS-TO-DF: Shorthand alias for bars DataFrame conversion.
+      Associated: `bars_to_df()`.
+      Logging: In-memory vectorized DataFrame construction.
+    - FR-DATAMGR-HISTORY-GET-HISTORICAL-BARS: Fetch historical bars from broker backend.
+      Associated: `get_historical_bars()`.
+      Logging: DEBUG historical bar query bounds.
+    - FR-DATAMGR-HISTORY-GET-TICKS: Fetch historical ticks from broker backend.
+      Associated: `get_ticks()`.
+      Logging: DEBUG historical tick query bounds.
+    - FR-DATAMGR-HISTORY-TICKS-TO-DATAFRAME: Convert historical ticks to DataFrame.
+      Associated: `ticks_to_dataframe()`.
+      Logging: In-memory vectorized DataFrame construction.
+    - FR-DATAMGR-HISTORY-TICKS-TO-DF: Shorthand alias for ticks DataFrame conversion.
+      Associated: `ticks_to_df()`.
+      Logging: In-memory vectorized DataFrame construction.
+    - FR-DATAMGR-HISTORY-VALIDATE-REQUEST: Validate historical data request parameters.
+      Associated: `validate_request()`.
+      Logging: DEBUG request parameters with error codes on validation failure.
+    - FR-DATAMGR-HISTORY-VALIDATE-ROWS: Validate row counts and boundaries.
+      Associated: `validate_rows()`.
+      Logging: DEBUG row boundaries with error codes on validation failure.
 
 Python API Usage:
     ```python
-    from app.services.data.history import (
+    from app.workspace.data_manager.history import (
         bars_to_dataframe,
         get_historical_bars,
         validate_request,
@@ -37,7 +58,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.data.history
+    uv run python -m app.workspace.data_manager.history
     ```
 """
 

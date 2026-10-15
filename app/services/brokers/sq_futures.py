@@ -25,7 +25,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.sq_futures import SQFuturesBroker
-    from app.services.data import get_historical_bars
+    from app.workspace.data_manager.history import get_historical_bars
     from app.workspace.data_manager.contracts import Timeframe
 
     broker = SQFuturesBroker()
@@ -61,8 +61,8 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderValidationError,
 )
-from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
+from app.workspace.data_manager.history import DataBrokerBackend
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 

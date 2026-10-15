@@ -23,7 +23,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.crypto import BinanceBroker
-    from app.services.data import get_historical_bars, get_ticks
+    from app.workspace.data_manager.history import get_historical_bars, get_ticks
     from app.workspace.data_manager.contracts import Timeframe
 
     broker = BinanceBroker()
@@ -55,9 +55,9 @@ from app.services.brokers.capabilities import (
     ProviderUnsupportedError,
     ProviderValidationError,
 )
-from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
 from app.workspace.data_manager.contracts import Timeframe
+from app.workspace.data_manager.history import DataBrokerBackend
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 

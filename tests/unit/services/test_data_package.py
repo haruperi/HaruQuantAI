@@ -1,137 +1,127 @@
-"""Unit tests for the app.services.data package structure, exports, and layering.
+"""Unit tests verifying removal of app.services.data and unification into data_manager.
 
 Description:
-    Verifies that app.services.data satisfies the modular package architecture:
-    - Layer 1: series.py, history.py, simulation.py, generation.py
-    - Layer 2: __init__.py unified public export surface
-    - Zero circular imports between submodules
-    - Complete removal of app.services.data.catalog (merged into data_manager.data)
-    - Complete removal of app.services.data.primitives (moved to data_manager.contracts)
-    - Complete removal of app.services.libs.data (no backward compatibility)
+    Verifies that the legacy app.services.data package and all its submodules have
+    been completely removed with zero backward compatibility shims, and that all
+    canonical market data capabilities (history, simulation, generation, series,
+    contracts) are properly consolidated and exported from app.workspace.data_manager.
+
+Purpose:
+    FEAT-DATAMGR-UNIFICATION: Zero-shim removal verification of legacy data package.
+
+Key Capabilities:
+    - FR-DATA-PACKAGE-REMOVAL: Verify all legacy app.services.data modules raise
+      ModuleNotFoundError on import.
+    - FR-DATAMGR-EXPORT-PARITY: Verify unified public export surface in
+      app.workspace.data_manager matches underlying submodules.
+    - FR-DATAMGR-LAYERING-RULES: Verify submodules do not import upward from __init__.
+
+Python API Usage:
+    ```bash
+    uv run pytest tests/unit/services/test_data_package.py --no-cov
+    ```
 """
 
 from __future__ import annotations
 
 import importlib
+import inspect
 
-import app.services.data as data_pkg
-import app.services.data.generation as data_gen
-import app.services.data.history as data_hist
-import app.services.data.series as data_ser
-import app.services.data.simulation as data_sim
+import app.workspace.data_manager as dm_pkg
+import app.workspace.data_manager.generation as dm_gen
+import app.workspace.data_manager.history as dm_hist
+import app.workspace.data_manager.simulation as dm_sim
 import pytest
 
 
-class TestDataPackageExports:
-    """Verify package-level public exports and submodule parity."""
+class TestLegacyDataPackageRemoved:
+    """Verify complete removal of legacy app.services.data package and shims."""
 
-    def test_primitives_module_removed(self) -> None:
-        """Verify primitives.py is deleted without backward compatibility shim."""
+    @pytest.mark.parametrize(
+        "legacy_module",
+        [
+            "app.services.data",
+            "app.services.data.primitives",
+            "app.services.data.catalog",
+            "app.services.data.series",
+            "app.services.data.history",
+            "app.services.data.simulation",
+            "app.services.data.generation",
+            "app.services.libs.data",
+        ],
+    )
+    def test_legacy_module_removed(self, legacy_module: str) -> None:
+        """Verify that legacy module raises ModuleNotFoundError on import."""
         with pytest.raises(ModuleNotFoundError):
-            importlib.import_module("app.services.data.primitives")
+            importlib.import_module(legacy_module)
 
-    def test_catalog_module_removed(self) -> None:
-        """Verify catalog.py is deleted without backward compatibility shim."""
-        with pytest.raises(ModuleNotFoundError):
-            importlib.import_module("app.services.data.catalog")
 
-    def test_series_exports_identity(self) -> None:
-        """Verify series symbols match between package and submodule."""
-        assert data_pkg.DataSeries is data_ser.DataSeries
-        assert data_pkg.DataSeriesTypes is data_ser.DataSeriesTypes
-        assert data_pkg.MedianDataSeries is data_ser.MedianDataSeries
-        assert data_pkg.TypicalDataSeries is data_ser.TypicalDataSeries
-        assert data_pkg.WeightedDataSeries is data_ser.WeightedDataSeries
+class TestDataManagerExportParity:
+    """Verify package-level public exports and submodule parity in data_manager."""
 
     def test_history_exports_identity(self) -> None:
-        """Verify history symbols match between package and submodule."""
-        assert data_pkg.DataBackend is data_hist.DataBackend
-        assert data_pkg.DataBrokerBackend is data_hist.DataBrokerBackend
-        assert data_pkg.validate_request is data_hist.validate_request
-        assert data_pkg.validate_rows is data_hist.validate_rows
-        assert data_pkg.get_historical_bars is data_hist.get_historical_bars
-        assert data_pkg.get_ticks is data_hist.get_ticks
-        assert data_pkg.BAR_COLUMNS is data_hist.BAR_COLUMNS
-        assert data_pkg.TICK_COLUMNS is data_hist.TICK_COLUMNS
-        assert data_pkg.bars_to_dataframe is data_hist.bars_to_dataframe
-        assert data_pkg.ticks_to_dataframe is data_hist.ticks_to_dataframe
-        assert data_pkg.bars_to_df is data_hist.bars_to_df
-        assert data_pkg.ticks_to_df is data_hist.ticks_to_df
+        """Verify history symbols match between data_manager and history submodule."""
+        assert dm_pkg.DataBackend is dm_hist.DataBackend
+        assert dm_pkg.DataBrokerBackend is dm_hist.DataBrokerBackend
+        assert dm_pkg.validate_request is dm_hist.validate_request
+        assert dm_pkg.validate_rows is dm_hist.validate_rows
+        assert dm_pkg.get_historical_bars is dm_hist.get_historical_bars
+        assert dm_pkg.get_ticks is dm_hist.get_ticks
+        assert dm_pkg.BAR_COLUMNS is dm_hist.BAR_COLUMNS
+        assert dm_pkg.TICK_COLUMNS is dm_hist.TICK_COLUMNS
+        assert dm_pkg.bars_to_dataframe is dm_hist.bars_to_dataframe
+        assert dm_pkg.ticks_to_dataframe is dm_hist.ticks_to_dataframe
+        assert dm_pkg.bars_to_df is dm_hist.bars_to_df
+        assert dm_pkg.ticks_to_df is dm_hist.ticks_to_df
 
     def test_simulation_exports_identity(self) -> None:
-        """Verify simulation symbols match between package and submodule."""
-        assert data_pkg.TickEvent is data_sim.TickEvent
-        assert data_pkg.SpreadsMap is data_sim.SpreadsMap
-        assert data_pkg.ITickSimulator is data_sim.ITickSimulator
-        assert data_pkg.DefaultTickSimulator is data_sim.DefaultTickSimulator
-        assert data_pkg.TSTickSimulator is data_sim.TSTickSimulator
+        """Verify simulation symbols match between data_manager and simulation."""
+        assert dm_pkg.TickEvent is dm_sim.TickEvent
+        assert dm_pkg.SpreadsMap is dm_sim.SpreadsMap
+        assert dm_pkg.ITickSimulator is dm_sim.ITickSimulator
+        assert dm_pkg.DefaultTickSimulator is dm_sim.DefaultTickSimulator
+        assert dm_pkg.TSTickSimulator is dm_sim.TSTickSimulator
 
     def test_generation_exports_identity(self) -> None:
-        """Verify generation symbols match between package and submodule."""
-        assert data_pkg.TICK_MODEL_REAL == data_gen.TICK_MODEL_REAL
-        assert data_pkg.TICK_MODEL_GENERATED == data_gen.TICK_MODEL_GENERATED
-        assert data_pkg.TICK_MODEL_TRADING_BAR == data_gen.TICK_MODEL_TRADING_BAR
-        assert data_pkg.TICK_MODEL_OHLC_M1 == data_gen.TICK_MODEL_OHLC_M1
-        assert data_pkg.SPREAD_FIXED == data_gen.SPREAD_FIXED
-        assert data_pkg.SPREAD_NATIVE == data_gen.SPREAD_NATIVE
-        assert data_pkg.SPREAD_VARIABLE == data_gen.SPREAD_VARIABLE
-        assert data_pkg.SUPPORTED_TICK_MODELS is data_gen.SUPPORTED_TICK_MODELS
-        assert data_pkg.SUPPORTED_SPREAD_MODELS is data_gen.SUPPORTED_SPREAD_MODELS
-        assert data_pkg.PHASE_OPEN_CODE == data_gen.PHASE_OPEN_CODE
-        assert data_pkg.PHASE_HIGH_CODE == data_gen.PHASE_HIGH_CODE
-        assert data_pkg.PHASE_LOW_CODE == data_gen.PHASE_LOW_CODE
-        assert data_pkg.PHASE_CLOSE_CODE == data_gen.PHASE_CLOSE_CODE
-        assert data_pkg.TicksGenerator is data_gen.TicksGenerator
-        assert data_pkg.generate_ticks is data_gen.generate_ticks
-        assert data_pkg.generate_ticks_to_parquet is data_gen.generate_ticks_to_parquet
+        """Verify generation symbols match between data_manager and generation."""
+        assert dm_pkg.TICK_MODEL_REAL == dm_gen.TICK_MODEL_REAL
+        assert dm_pkg.TICK_MODEL_GENERATED == dm_gen.TICK_MODEL_GENERATED
+        assert dm_pkg.TICK_MODEL_TRADING_BAR == dm_gen.TICK_MODEL_TRADING_BAR
+        assert dm_pkg.TICK_MODEL_OHLC_M1 == dm_gen.TICK_MODEL_OHLC_M1
+        assert dm_pkg.SPREAD_FIXED == dm_gen.SPREAD_FIXED
+        assert dm_pkg.SPREAD_NATIVE == dm_gen.SPREAD_NATIVE
+        assert dm_pkg.SPREAD_VARIABLE == dm_gen.SPREAD_VARIABLE
+        assert dm_pkg.SUPPORTED_TICK_MODELS is dm_gen.SUPPORTED_TICK_MODELS
+        assert dm_pkg.SUPPORTED_SPREAD_MODELS is dm_gen.SUPPORTED_SPREAD_MODELS
+        assert dm_pkg.PHASE_OPEN_CODE == dm_gen.PHASE_OPEN_CODE
+        assert dm_pkg.PHASE_HIGH_CODE == dm_gen.PHASE_HIGH_CODE
+        assert dm_pkg.PHASE_LOW_CODE == dm_gen.PHASE_LOW_CODE
+        assert dm_pkg.PHASE_CLOSE_CODE == dm_gen.PHASE_CLOSE_CODE
+        assert dm_pkg.TicksGenerator is dm_gen.TicksGenerator
+        assert dm_pkg.generate_ticks is dm_gen.generate_ticks
+        assert dm_pkg.generate_ticks_to_parquet is dm_gen.generate_ticks_to_parquet
 
     def test_all_exports_present_in_package(self) -> None:
-        """Ensure every name in __all__ can be resolved from the package."""
-        for name in data_pkg.__all__:
-            assert hasattr(data_pkg, name), f"Missing export: {name}"
+        """Ensure every name in __all__ can be resolved from data_manager."""
+        for name in dm_pkg.__all__:
+            assert hasattr(dm_pkg, name), f"Missing export: {name}"
 
 
 class TestLayeringAndAntiCircularRules:
     """Verify architectural layering rules and absence of circular imports."""
 
-    def test_dataseries_subclassing_and_factories(self) -> None:
-        """Rule 2: Ensure DataSeries and derived classes coordinate without cycles."""
-        high = [10.0, 11.0, 12.0]
-        low = [8.0, 9.0, 10.0]
-        close = [9.5, 10.5, 11.5]
-
-        median = data_ser.DataSeries.create_median(high, low)
-        assert isinstance(median, data_ser.MedianDataSeries)
-        assert isinstance(median, data_ser.DataSeries)
-
-        typical = data_ser.DataSeries.create_typical(high, low, close)
-        assert isinstance(typical, data_ser.TypicalDataSeries)
-        assert isinstance(typical, data_ser.DataSeries)
-
-        weighted = data_ser.DataSeries.create_weighted(high, low, close)
-        assert isinstance(weighted, data_ser.WeightedDataSeries)
-        assert isinstance(weighted, data_ser.DataSeries)
-
     def test_submodules_do_not_import_package_init(self) -> None:
-        """Rule 1: Submodules must not import upward from app.services.data."""
-        import inspect
-
+        """Rule: Submodules must not import upward from app.workspace.data_manager."""
         submodules = [
-            data_ser,
-            data_hist,
-            data_sim,
-            data_gen,
+            dm_hist,
+            dm_sim,
+            dm_gen,
         ]
         for submod in submodules:
             source = inspect.getsource(submod)
-            assert "from app.services.data import" not in source, (
-                f"{submod.__name__} violates Rule 1 by importing from package top"
+            assert "from app.workspace.data_manager import" not in source, (
+                f"{submod.__name__} violates layering by importing from package top"
             )
-            assert "import app.services.data\n" not in source, (
-                f"{submod.__name__} violates Rule 1 by importing app.services.data"
+            assert "import app.workspace.data_manager\n" not in source, (
+                f"{submod.__name__} violates layering by importing package top"
             )
-
-    def test_no_backward_compatibility_shim(self) -> None:
-        """Verify that app.services.libs.data is completely deleted."""
-        with pytest.raises(ModuleNotFoundError):
-            importlib.import_module("app.services.libs.data")

@@ -58,12 +58,6 @@ CLI Usage:
 
 from __future__ import annotations
 
-from app.services.data import (
-    bars_to_dataframe,
-    bars_to_df,
-    ticks_to_dataframe,
-    ticks_to_df,
-)
 from app.services.libs.bar_time import (
     BarTime,
     DateTimeSeries,
@@ -164,6 +158,12 @@ from app.services.utils.types import (
     double_variable,
     int_variable,
     number_constant,
+)
+from app.workspace.data_manager.history import (
+    bars_to_dataframe,
+    bars_to_df,
+    ticks_to_dataframe,
+    ticks_to_df,
 )
 
 __all__ = [

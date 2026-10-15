@@ -7,18 +7,61 @@ Description:
     (generate_ticks_to_parquet).
 
 Purpose:
-    FEAT-DATA-GENERATION: Vectorized batch tick generation and streaming.
+    FEAT-DATAMGR-GENERATION: Vectorized batch tick generation and streaming.
 
 Key Capabilities:
-    - FR-DATA-BATCH-TICK-GENERATOR: Vectorized batch tick generation and Parquet
-      streaming.
-      Associated: `TicksGenerator`, `generate_ticks`, `generate_ticks_to_parquet`,
-        `SUPPORTED_TICK_MODELS`, `SUPPORTED_SPREAD_MODELS`.
-      Logging: DEBUG tick batch generation and Parquet streaming lifecycle.
+    - FR-DATAMGR-GENERATION-PHASE-OPEN: Numeric phase code for bar Open tick.
+      Associated: `PHASE_OPEN_CODE`.
+      Logging: Constant numerical code.
+    - FR-DATAMGR-GENERATION-PHASE-HIGH: Numeric phase code for bar High tick.
+      Associated: `PHASE_HIGH_CODE`.
+      Logging: Constant numerical code.
+    - FR-DATAMGR-GENERATION-PHASE-LOW: Numeric phase code for bar Low tick.
+      Associated: `PHASE_LOW_CODE`.
+      Logging: Constant numerical code.
+    - FR-DATAMGR-GENERATION-PHASE-CLOSE: Numeric phase code for bar Close tick.
+      Associated: `PHASE_CLOSE_CODE`.
+      Logging: Constant numerical code.
+    - FR-DATAMGR-GENERATION-SPREAD-FIXED: Fixed spread model identifier.
+      Associated: `SPREAD_FIXED`.
+      Logging: Constant string identifier.
+    - FR-DATAMGR-GENERATION-SPREAD-NATIVE: Native recorded spread model identifier.
+      Associated: `SPREAD_NATIVE`.
+      Logging: Constant string identifier.
+    - FR-DATAMGR-GENERATION-SPREAD-VARIABLE: Deterministic variable spread model.
+      Associated: `SPREAD_VARIABLE`.
+      Logging: Constant string identifier.
+    - FR-DATAMGR-GENERATION-SUPPORTED-SPREAD-MODELS: Qualified spread model codes.
+      Associated: `SUPPORTED_SPREAD_MODELS`.
+      Logging: Constant configuration set.
+    - FR-DATAMGR-GENERATION-SUPPORTED-TICK-MODELS: Set of qualified tick model codes.
+      Associated: `SUPPORTED_TICK_MODELS`.
+      Logging: Constant configuration set.
+    - FR-DATAMGR-GENERATION-TICK-MODEL-GENERATED: Four-phase synthetic tick model.
+      Associated: `TICK_MODEL_GENERATED`.
+      Logging: Constant string identifier.
+    - FR-DATAMGR-GENERATION-TICK-MODEL-OHLC-M1: 1-minute OHLC tick generation model.
+      Associated: `TICK_MODEL_OHLC_M1`.
+      Logging: Constant string identifier.
+    - FR-DATAMGR-GENERATION-TICK-MODEL-REAL: Pass-through native real tick model code.
+      Associated: `TICK_MODEL_REAL`.
+      Logging: Constant string identifier.
+    - FR-DATAMGR-GENERATION-TICK-MODEL-TRADING-BAR: Trading bar tick model code.
+      Associated: `TICK_MODEL_TRADING_BAR`.
+      Logging: Constant string identifier.
+    - FR-DATAMGR-GENERATION-TICKS-GENERATOR: Vectorized batch tick generation engine.
+      Associated: `TicksGenerator`.
+      Logging: DEBUG tick batch generation lifecycle.
+    - FR-DATAMGR-GENERATION-GENERATE-TICKS: Vectorized batch tick generation.
+      Associated: `generate_ticks()`.
+      Logging: DEBUG tick batch generation parameters and row counts.
+    - FR-DATAMGR-GENERATION-GENERATE-TICKS-TO-PARQUET: Stream ticks to Parquet.
+      Associated: `generate_ticks_to_parquet()`.
+      Logging: DEBUG Parquet file streaming lifecycle and chunk counts.
 
 Python API Usage:
     ```python
-    from app.services.data.generation import (
+    from app.workspace.data_manager.generation import (
         TICK_MODEL_OHLC_M1,
         TicksGenerator,
         generate_ticks,
@@ -27,7 +70,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.data.generation
+    uv run python -m app.workspace.data_manager.generation
     ```
 """
 
@@ -255,7 +298,7 @@ class TicksGenerator:
         if len(index) > 1:
             deltas = index.to_series().diff().dropna()
             if not deltas.empty:
-                return int(max(1, deltas.median().total_seconds()))
+                return int(max(1, float(deltas.median().total_seconds())))
         return _DEFAULT_BAR_SECONDS
 
     def _configured_bar_seconds(self) -> int:

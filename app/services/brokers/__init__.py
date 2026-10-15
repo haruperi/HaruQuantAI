@@ -61,7 +61,6 @@ if TYPE_CHECKING:
     from app.services.brokers.sq_futures import SQFuturesBroker
     from app.services.brokers.tick_downloader import TickDownloaderBroker
     from app.services.brokers.yahoo import YahooBroker
-    from app.services.data import DataBrokerBackend
     from app.services.trading import (
         AccountSnapshot,
         BridgeEvent,
@@ -85,6 +84,7 @@ if TYPE_CHECKING:
         MarketTick,
         Timeframe,
     )
+    from app.workspace.data_manager.history import DataBrokerBackend
 
 _SINGLETONS: dict[str, Any] = {}
 
@@ -92,7 +92,7 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
     "BaseBrokerBackend": ("app.services.brokers.base", "BaseBrokerBackend"),
     "BrokerBackend": ("app.services.brokers.base", "BrokerBackend"),
     "BridgeError": ("app.services.brokers.base", "BridgeError"),
-    "DataBrokerBackend": ("app.services.data", "DataBrokerBackend"),
+    "DataBrokerBackend": ("app.workspace.data_manager.history", "DataBrokerBackend"),
     "BinanceBroker": ("app.services.brokers.crypto", "BinanceBroker"),
     "CryptoBroker": ("app.services.brokers.crypto", "CryptoBroker"),
     "CTraderBackend": ("app.services.brokers.ctrader", "CTraderBackend"),
@@ -158,9 +158,9 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
         "ProviderValidationError",
     ),
     "SymbolSpec": ("app.services.trading", "SymbolSpec"),
-    "MarketBar": ("app.services.data", "MarketBar"),
-    "MarketTick": ("app.services.data", "MarketTick"),
-    "Timeframe": ("app.services.data", "Timeframe"),
+    "MarketBar": ("app.workspace.data_manager.contracts", "MarketBar"),
+    "MarketTick": ("app.workspace.data_manager.contracts", "MarketTick"),
+    "Timeframe": ("app.workspace.data_manager.contracts", "Timeframe"),
     "AccountSnapshot": ("app.services.trading", "AccountSnapshot"),
     "BridgeEvent": ("app.services.trading", "BridgeEvent"),
     "DealSnapshot": ("app.services.trading", "DealSnapshot"),

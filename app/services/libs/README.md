@@ -7,4 +7,4 @@ This package provides foundational utility modules for time arithmetic, bar time
 
 > [!NOTE]
 > Trading primitives, proxies, and facades have been modularized into `app.services.trading`.
-> Market data primitives, readers, and simulators have been modularized into `app.services.data`.
+> Market data primitives, readers, and simulators have been modularized into `app.workspace.data_manager`.

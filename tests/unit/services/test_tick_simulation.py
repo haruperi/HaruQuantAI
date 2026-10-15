@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd  # type: ignore[import-untyped]
 import pyarrow.parquet as pq
 import pytest
-from app.services.data import (
+from app.workspace.data_manager import (
     PHASE_CLOSE_CODE,
     PHASE_HIGH_CODE,
     PHASE_LOW_CODE,

@@ -26,7 +26,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.yahoo import YahooBroker
-    from app.services.data import get_historical_bars
+    from app.workspace.data_manager.history import get_historical_bars
     from app.workspace.data_manager.contracts import Timeframe
 
     broker = YahooBroker()
@@ -63,9 +63,9 @@ from app.services.brokers.capabilities import (
     ProviderRateLimitError,
     ProviderUnsupportedError,
 )
-from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
 from app.workspace.data_manager.contracts import Timeframe
+from app.workspace.data_manager.history import DataBrokerBackend
 
 MARKET_DATA_FR = "FR-BROKER-YAHOO-MARKET-DATA"
 SYMBOL_METADATA_FR = "FR-BROKER-YAHOO-SYMBOL-METADATA"

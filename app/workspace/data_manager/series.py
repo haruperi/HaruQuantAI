@@ -7,22 +7,36 @@ Description:
     price series (MedianDataSeries, TypicalDataSeries, WeightedDataSeries).
 
 Purpose:
-    FEAT-DATA-SERIES: High-throughput market data series and derived series kernel.
+    FEAT-DATAMGR-SERIES: High-throughput market data series and derived series kernel.
 
 Key Capabilities:
-    - FR-DATA-COLUMNAR-SERIES: High-performance columnar series kernel with
+    - FR-DATAMGR-SERIES-COLUMNAR: High-performance columnar series kernel with
       dual-mode indexing.
       Associated: `DataSeries`, `DataSeries.get()`, `DataSeries.set()`.
       Logging: In-memory array operations with zero side effects.
-    - FR-DATA-DERIVED-SERIES: Derived price series and data series types enumeration.
-      Associated: `DataSeriesTypes`, `MedianDataSeries`, `TypicalDataSeries`,
-        `WeightedDataSeries`.
+    - FR-DATAMGR-SERIES-TYPES: Standard bar series data types enumeration
+      matching SQX DataSeriesTypes.
+      Associated: `DataSeriesTypes`, `DataSeriesTypes.from_name()`.
+      Logging: Integer enumeration mapping with zero side effects.
+    - FR-DATAMGR-SERIES-MEDIAN: Dynamic median price series computing
+      (High + Low) / 2.0.
+      Associated: `MedianDataSeries`, `MedianDataSeries.compute_value()`.
+      Logging: Pure vectorized and on-the-fly series calculations with
+        zero side effects.
+    - FR-DATAMGR-SERIES-TYPICAL: Dynamic typical price series computing
+      (High + Low + Close) / 3.0.
+      Associated: `TypicalDataSeries`, `TypicalDataSeries.compute_value()`.
+      Logging: Pure vectorized and on-the-fly series calculations with
+        zero side effects.
+    - FR-DATAMGR-SERIES-WEIGHTED: Dynamic weighted price series computing
+      (High + Low + 2*Close) / 4.0.
+      Associated: `WeightedDataSeries`, `WeightedDataSeries.compute_value()`.
       Logging: Pure vectorized and on-the-fly series calculations with
         zero side effects.
 
 Python API Usage:
     ```python
-    from app.services.data.series import (
+    from app.workspace.data_manager.series import (
         DataSeries,
         DataSeriesTypes,
         MedianDataSeries,
@@ -37,7 +51,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.data.series
+    uv run python -m app.workspace.data_manager.series
     ```
 """
 

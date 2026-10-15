@@ -6,17 +6,33 @@ Description:
     Close or Open -> Low -> High -> Close) into a mutable TickEvent cursor.
 
 Purpose:
-    FEAT-DATA-SIMULATION: In-memory streaming tick simulator cursors.
+    FEAT-DATAMGR-SIMULATION: In-memory streaming tick simulator cursors.
 
 Key Capabilities:
-    - FR-DATA-STREAMING-TICK-SIMULATOR: In-memory streaming intra-bar tick cursors.
-      Associated: `TickEvent`, `SpreadsMap`, `ITickSimulator`,
-        `DefaultTickSimulator`, `TSTickSimulator`.
+    - FR-DATAMGR-SIMULATION-TICK-EVENT: Mutable market tick event buffer for
+      zero-allocation simulation cursors.
+      Associated: `TickEvent`.
+      Logging: Pure in-memory streaming tick cursors with zero allocation overhead.
+    - FR-DATAMGR-SIMULATION-SPREADS-MAP: Historical timestamped spreads lookup mapping.
+      Associated: `SpreadsMap`.
+      Logging: Pure in-memory lookup table with zero side effects.
+    - FR-DATAMGR-SIMULATION-INTERFACE: Protocol contract for streaming intra-bar
+      tick cursors.
+      Associated: `ITickSimulator`.
+      Logging: Abstract simulation protocol.
+    - FR-DATAMGR-SIMULATION-DEFAULT: Default four-phase intra-bar tick cursor.
+      Associated: `DefaultTickSimulator`.
+      Logging: Pure in-memory streaming tick cursors with zero allocation overhead.
+    - FR-DATAMGR-SIMULATION-TS: StrategyQuant TSTickSimulator parity cursor.
+      Associated: `TSTickSimulator`.
       Logging: Pure in-memory streaming tick cursors with zero allocation overhead.
 
 Python API Usage:
     ```python
-    from app.services.data.simulation import DefaultTickSimulator, TickEvent
+    from app.workspace.data_manager.simulation import (
+        DefaultTickSimulator,
+        TickEvent,
+    )
 
     sim = DefaultTickSimulator()
     sim.init(bars)
@@ -27,7 +43,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.data.simulation
+    uv run python -m app.workspace.data_manager.simulation
     ```
 """
 
@@ -217,7 +233,7 @@ class DefaultTickSimulator:
         self._point_value = max(1e-10, float(point_value))
         self._symbol = symbol
         self._symbol_hash = symbol_hash
-        self._bar_duration_ms = max(1000, int(bar_duration_seconds * 1000))
+        self._bar_duration_ms = max(1000, bar_duration_seconds * 1000)
         self._spreads_map = SpreadsMap()
         self._bars: list[Any] = []
         self._bar_index = 0

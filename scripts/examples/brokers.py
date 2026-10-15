@@ -50,12 +50,6 @@ from app.services.brokers.base import BridgeError
 from app.services.brokers.ctrader import CTraderBackend
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
-from app.services.data import (
-    bars_to_dataframe,
-    get_historical_bars,
-    get_ticks,
-    ticks_to_dataframe,
-)
 from app.services.trading import (
     MarginMode,
     OrderFilling,
@@ -73,6 +67,12 @@ from app.workspace.data_manager.contracts import (
     MarketBar,
     MarketTick,
     Timeframe,
+)
+from app.workspace.data_manager.history import (
+    bars_to_dataframe,
+    get_historical_bars,
+    get_ticks,
+    ticks_to_dataframe,
 )
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = "ctrader"

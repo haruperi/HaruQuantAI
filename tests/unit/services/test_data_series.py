@@ -4,7 +4,7 @@ Description:
     Validates functionality, boundary conditions, numerical integrity,
     dual-indexing, warmup constraints, condition predicates, columnar
     conversions, and market data contracts (Timeframe, MarketBar, MarketTick,
-    BridgeError) in app.services.data.
+    BridgeError) in app.workspace.data_manager.
 
 Purpose:
     FEAT-LIBS-DATA: Test suite for consolidated market data library and series kernel.
@@ -31,7 +31,7 @@ import pandas as pd  # type: ignore[import-untyped]
 import polars as pl
 import pyarrow as pa
 import pytest
-from app.services.data import (
+from app.workspace.data_manager import (
     BAR_COLUMNS,
     TICK_COLUMNS,
     DataBackend,
@@ -47,40 +47,40 @@ from app.services.data import (
     validate_request,
     validate_rows,
 )
-from app.services.data.history import (
-    DataBackend as DirectDataBackend,
-)
-from app.services.data.history import (
-    bars_to_dataframe as direct_bars_to_dataframe,
-)
-from app.services.data.history import (
-    ticks_to_dataframe as direct_ticks_to_dataframe,
-)
-from app.services.data.series import (
-    DataSeries as DirectDataSeries,
-)
-from app.services.data.series import (
-    DataSeriesTypes as DirectDataSeriesTypes,
-)
-from app.services.data.series import (
-    MedianDataSeries as DirectMedianDataSeries,
-)
-from app.services.data.series import (
-    TypicalDataSeries as DirectTypicalDataSeries,
-)
-from app.services.data.series import (
-    WeightedDataSeries as DirectWeightedDataSeries,
-)
 from app.workspace.data_manager.contracts import (
     BridgeError,
     MarketBar,
     MarketTick,
     Timeframe,
 )
+from app.workspace.data_manager.history import (
+    DataBackend as DirectDataBackend,
+)
+from app.workspace.data_manager.history import (
+    bars_to_dataframe as direct_bars_to_dataframe,
+)
+from app.workspace.data_manager.history import (
+    ticks_to_dataframe as direct_ticks_to_dataframe,
+)
+from app.workspace.data_manager.series import (
+    DataSeries as DirectDataSeries,
+)
+from app.workspace.data_manager.series import (
+    DataSeriesTypes as DirectDataSeriesTypes,
+)
+from app.workspace.data_manager.series import (
+    MedianDataSeries as DirectMedianDataSeries,
+)
+from app.workspace.data_manager.series import (
+    TypicalDataSeries as DirectTypicalDataSeries,
+)
+from app.workspace.data_manager.series import (
+    WeightedDataSeries as DirectWeightedDataSeries,
+)
 
 
 def test_public_reexports() -> None:
-    """Verify DataSeries and history symbols are exported from app.services.data."""
+    """Verify DataSeries and history symbols are exported from their respective packages."""
     assert DataBackend is DirectDataBackend
     assert DataSeries is DirectDataSeries
     assert DataSeriesTypes is DirectDataSeriesTypes
