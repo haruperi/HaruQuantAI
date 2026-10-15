@@ -37,7 +37,7 @@ from typing import Any, override
 
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
-from app.services.libs.data import DataBrokerBackend
+from app.services.data import DataBrokerBackend
 from app.services.libs.trading import SymbolSnapshot
 
 

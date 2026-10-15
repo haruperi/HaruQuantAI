@@ -26,7 +26,7 @@ import asyncio
 
 import pytest
 from app.services.brokers.base import BaseBrokerBackend, BridgeError
-from app.services.libs.data import (
+from app.services.data import (
     DataBrokerBackend,
     MarketBar,
     MarketTick,

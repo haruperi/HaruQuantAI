@@ -26,9 +26,9 @@ CLI Usage:
 
 from __future__ import annotations
 
-from app.services.libs import ChartDef as LibsChartDef
-from app.services.libs import DataInfo as LibsDataInfo
-from app.services.libs.data import ChartDef, DataInfo, Timeframe
+from app.services.data import ChartDef, DataInfo, Timeframe
+from app.services.data.catalog import ChartDef as CatalogChartDef
+from app.services.data.catalog import DataInfo as CatalogDataInfo
 
 
 class TestChartDef:
@@ -329,10 +329,10 @@ class TestDataInfo:
         assert restored == info
 
 
-class TestLibsReExports:
-    """Verify ChartDef and DataInfo are re-exported from app.services.libs."""
+class TestPackageReExports:
+    """Verify ChartDef and DataInfo are re-exported from app.services.data."""
 
     def test_re_exports_match(self) -> None:
-        """Ensure Libs exports point to the exact same classes."""
-        assert LibsChartDef is ChartDef
-        assert LibsDataInfo is DataInfo
+        """Ensure package exports point to the exact same classes."""
+        assert CatalogChartDef is ChartDef
+        assert CatalogDataInfo is DataInfo

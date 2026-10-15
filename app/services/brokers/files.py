@@ -20,7 +20,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.libs.data import Timeframe, get_historical_bars
+    from app.services.data import Timeframe, get_historical_bars
     from app.services.brokers.files import FilesBroker
 
     broker = FilesBroker(data_dir="data/market/sq_equity/d1")
@@ -42,7 +42,7 @@ from typing import Any, override
 
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
-from app.services.libs.data import BridgeError, DataBrokerBackend
+from app.services.data import BridgeError, DataBrokerBackend
 from app.services.libs.trading import SymbolSnapshot
 
 logger = get_logger(__name__)

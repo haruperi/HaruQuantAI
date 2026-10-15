@@ -4,7 +4,7 @@ Description:
     Validates functionality, boundary conditions, numerical integrity,
     dual-indexing, warmup constraints, condition predicates, columnar
     conversions, and market data contracts (Timeframe, MarketBar, MarketTick,
-    BridgeError) in app.services.libs.data.
+    BridgeError) in app.services.data.
 
 Purpose:
     FEAT-LIBS-DATA: Test suite for consolidated market data library and series kernel.
@@ -31,7 +31,7 @@ import pandas as pd  # type: ignore[import-untyped]
 import polars as pl
 import pyarrow as pa
 import pytest
-from app.services.libs import (
+from app.services.data import (
     BAR_COLUMNS,
     TICK_COLUMNS,
     BridgeError,
@@ -48,51 +48,49 @@ from app.services.libs import (
     bars_to_df,
     ticks_to_dataframe,
     ticks_to_df,
-)
-from app.services.libs.data import (
-    BridgeError as DirectBridgeError,
-)
-from app.services.libs.data import (
-    DataBackend as DirectDataBackend,
-)
-from app.services.libs.data import (
-    DataSeries as DirectDataSeries,
-)
-from app.services.libs.data import (
-    DataSeriesTypes as DirectDataSeriesTypes,
-)
-from app.services.libs.data import (
-    MarketBar as DirectMarketBar,
-)
-from app.services.libs.data import (
-    MarketTick as DirectMarketTick,
-)
-from app.services.libs.data import (
-    MedianDataSeries as DirectMedianDataSeries,
-)
-from app.services.libs.data import (
-    Timeframe as DirectTimeframe,
-)
-from app.services.libs.data import (
-    TypicalDataSeries as DirectTypicalDataSeries,
-)
-from app.services.libs.data import (
-    WeightedDataSeries as DirectWeightedDataSeries,
-)
-from app.services.libs.data import (
-    bars_to_dataframe as direct_bars_to_dataframe,
-)
-from app.services.libs.data import (
-    ticks_to_dataframe as direct_ticks_to_dataframe,
-)
-from app.services.libs.data import (
     validate_request,
     validate_rows,
+)
+from app.services.data.history import (
+    DataBackend as DirectDataBackend,
+)
+from app.services.data.history import (
+    bars_to_dataframe as direct_bars_to_dataframe,
+)
+from app.services.data.history import (
+    ticks_to_dataframe as direct_ticks_to_dataframe,
+)
+from app.services.data.primitives import (
+    BridgeError as DirectBridgeError,
+)
+from app.services.data.primitives import (
+    MarketBar as DirectMarketBar,
+)
+from app.services.data.primitives import (
+    MarketTick as DirectMarketTick,
+)
+from app.services.data.primitives import (
+    Timeframe as DirectTimeframe,
+)
+from app.services.data.series import (
+    DataSeries as DirectDataSeries,
+)
+from app.services.data.series import (
+    DataSeriesTypes as DirectDataSeriesTypes,
+)
+from app.services.data.series import (
+    MedianDataSeries as DirectMedianDataSeries,
+)
+from app.services.data.series import (
+    TypicalDataSeries as DirectTypicalDataSeries,
+)
+from app.services.data.series import (
+    WeightedDataSeries as DirectWeightedDataSeries,
 )
 
 
 def test_public_reexports() -> None:
-    """Verify market primitives and DataSeries are exported from app.services.libs."""
+    """Verify market primitives and DataSeries are exported from app.services.data."""
     assert BridgeError is DirectBridgeError
     assert DataBackend is DirectDataBackend
     assert DataSeries is DirectDataSeries
@@ -110,16 +108,16 @@ class TestTimeframe:
 
     def test_timeframe_constants_and_aliases(self) -> None:
         """Verify standard timeframe values and aliases."""
-        assert Timeframe.PERIOD_M1 == "M1"
-        assert Timeframe.M1 == "M1"
-        assert Timeframe.PERIOD_H1 == "H1"
-        assert Timeframe.H1 == "H1"
-        assert Timeframe.PERIOD_D1 == "D1"
-        assert Timeframe.D1 == "D1"
-        assert Timeframe.PERIOD_W1 == "W1"
-        assert Timeframe.W1 == "W1"
-        assert Timeframe.PERIOD_MN1 == "MN1"
-        assert Timeframe.MN1 == "MN1"
+        assert Timeframe.PERIOD_M1.value == "M1"
+        assert Timeframe.M1.value == "M1"
+        assert Timeframe.PERIOD_H1.value == "H1"
+        assert Timeframe.H1.value == "H1"
+        assert Timeframe.PERIOD_D1.value == "D1"
+        assert Timeframe.D1.value == "D1"
+        assert Timeframe.PERIOD_W1.value == "W1"
+        assert Timeframe.W1.value == "W1"
+        assert Timeframe.PERIOD_MN1.value == "MN1"
+        assert Timeframe.MN1.value == "MN1"
 
     def test_to_seconds_and_minutes(self) -> None:
         """Verify to_seconds and to_minutes methods."""
@@ -601,7 +599,7 @@ class TestBarsToDataframe:
             volume = 50
             spread = 2
 
-        df = bars_to_dataframe([CustomBar()])
+        df = bars_to_dataframe([CustomBar()])  # type: ignore[list-item]
         assert len(df) == 1
         assert df.index[0] == pd.Timestamp("2024-01-01 12:00:00")
         assert df["Close"].iloc[0] == 102.0
@@ -687,22 +685,22 @@ class TestDataSeriesTypes:
 
     def test_values_and_aliases(self) -> None:
         """Verify integer enum values and PascalCase aliases."""
-        assert DataSeriesTypes.OPEN == 0
-        assert DataSeriesTypes.Open == 0
-        assert DataSeriesTypes.HIGH == 1
-        assert DataSeriesTypes.High == 1
-        assert DataSeriesTypes.LOW == 2
-        assert DataSeriesTypes.Low == 2
-        assert DataSeriesTypes.CLOSE == 3
-        assert DataSeriesTypes.Close == 3
-        assert DataSeriesTypes.VOLUME == 4
-        assert DataSeriesTypes.Volume == 4
-        assert DataSeriesTypes.MEDIAN == 5
-        assert DataSeriesTypes.Median == 5
-        assert DataSeriesTypes.TYPICAL == 6
-        assert DataSeriesTypes.Typical == 6
-        assert DataSeriesTypes.WEIGHTED == 7
-        assert DataSeriesTypes.Weighted == 7
+        assert DataSeriesTypes.OPEN.value == 0
+        assert DataSeriesTypes.Open.value == 0
+        assert DataSeriesTypes.HIGH.value == 1
+        assert DataSeriesTypes.High.value == 1
+        assert DataSeriesTypes.LOW.value == 2
+        assert DataSeriesTypes.Low.value == 2
+        assert DataSeriesTypes.CLOSE.value == 3
+        assert DataSeriesTypes.Close.value == 3
+        assert DataSeriesTypes.VOLUME.value == 4
+        assert DataSeriesTypes.Volume.value == 4
+        assert DataSeriesTypes.MEDIAN.value == 5
+        assert DataSeriesTypes.Median.value == 5
+        assert DataSeriesTypes.TYPICAL.value == 6
+        assert DataSeriesTypes.Typical.value == 6
+        assert DataSeriesTypes.WEIGHTED.value == 7
+        assert DataSeriesTypes.Weighted.value == 7
 
     def test_from_name_valid(self) -> None:
         """Verify from_name with case-insensitive strings."""

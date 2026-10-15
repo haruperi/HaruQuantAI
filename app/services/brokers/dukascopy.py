@@ -22,7 +22,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.libs.data import Timeframe, get_historical_bars
+    from app.services.data import Timeframe, get_historical_bars
     from app.services.brokers.dukascopy import DukascopyBroker
 
     broker = DukascopyBroker()
@@ -47,7 +47,7 @@ from typing import Any, override
 import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
-from app.services.libs.data import BridgeError, DataBrokerBackend
+from app.services.data import BridgeError, DataBrokerBackend
 from app.services.libs.trading import SymbolSnapshot
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry

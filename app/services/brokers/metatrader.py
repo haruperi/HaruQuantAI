@@ -83,7 +83,7 @@ except ImportError:
             pass
 
 
-from app.services.libs.data import BridgeError
+from app.services.data import BridgeError
 from app.services.libs.trading import (
     BridgeEvent,
     PropertyValue,

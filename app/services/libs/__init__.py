@@ -1,5 +1,5 @@
 # ruff: noqa: F822 -- lazy exports via PEP 562 __getattr__
-"""Core library modules for trading, simulation, data, and time arithmetic."""
+"""Core library modules for trading, simulation, and time arithmetic."""
 
 from __future__ import annotations
 
@@ -14,57 +14,6 @@ from .bar_time import (
 )
 from .generators import RandomGenerator
 from .time import HQTime
-
-_DATA_SYMBOLS = {
-    "BAR_COLUMNS",
-    "DefaultTickSimulator",
-    "ITickSimulator",
-    "MAX_POSITION",
-    "MAX_RECORDS",
-    "PHASE_CLOSE_CODE",
-    "PHASE_HIGH_CODE",
-    "PHASE_LOW_CODE",
-    "PHASE_OPEN_CODE",
-    "READ_TIMEOUT",
-    "SPREAD_FIXED",
-    "SPREAD_NATIVE",
-    "SPREAD_VARIABLE",
-    "SUPPORTED_SPREAD_MODELS",
-    "SUPPORTED_TICK_MODELS",
-    "SpreadsMap",
-    "TICK_COLUMNS",
-    "TICK_MODEL_GENERATED",
-    "TICK_MODEL_OHLC_M1",
-    "TICK_MODEL_REAL",
-    "TICK_MODEL_TRADING_BAR",
-    "TIMEFRAME_SECONDS",
-    "TSTickSimulator",
-    "TickEvent",
-    "TicksGenerator",
-    "BridgeError",
-    "ChartDef",
-    "DataBackend",
-    "DataBrokerBackend",
-    "DataInfo",
-    "DataSeries",
-    "DataSeriesTypes",
-    "MarketBar",
-    "MarketTick",
-    "MedianDataSeries",
-    "Timeframe",
-    "TypicalDataSeries",
-    "WeightedDataSeries",
-    "bars_to_dataframe",
-    "bars_to_df",
-    "generate_ticks",
-    "generate_ticks_to_parquet",
-    "get_historical_bars",
-    "get_ticks",
-    "ticks_to_dataframe",
-    "ticks_to_df",
-    "validate_request",
-    "validate_rows",
-}
 
 _TRADING_SYMBOLS = {
     "AccountInfo",
@@ -107,11 +56,7 @@ _TRADING_SYMBOLS = {
 
 
 def __getattr__(name: str) -> Any:
-    """Lazily import trading, data, and broker symbols on demand."""
-    if name in _DATA_SYMBOLS:
-        from app.services.libs import data
-
-        return getattr(data, name)
+    """Lazily import trading symbols on demand."""
     if name in _TRADING_SYMBOLS:
         from app.services.libs import trading
 
@@ -120,49 +65,18 @@ def __getattr__(name: str) -> Any:
 
 
 __all__ = [
-    "BAR_COLUMNS",
-    "MAX_POSITION",
-    "MAX_RECORDS",
-    "PHASE_CLOSE_CODE",
-    "PHASE_HIGH_CODE",
-    "PHASE_LOW_CODE",
-    "PHASE_OPEN_CODE",
-    "READ_TIMEOUT",
-    "SPREAD_FIXED",
-    "SPREAD_NATIVE",
-    "SPREAD_VARIABLE",
-    "SUPPORTED_SPREAD_MODELS",
-    "SUPPORTED_TICK_MODELS",
-    "TICK_COLUMNS",
-    "TICK_MODEL_GENERATED",
-    "TICK_MODEL_OHLC_M1",
-    "TICK_MODEL_REAL",
-    "TICK_MODEL_TRADING_BAR",
-    "TIMEFRAME_SECONDS",
     "AccountInfo",
     "AccountSnapshot",
     "BarTime",
     "BaseTradingClass",
     "BookInfo",
     "BookType",
-    "BridgeError",
-    "ChartDef",
-    "DataBackend",
-    "DataBrokerBackend",
-    "DataInfo",
-    "DataSeries",
-    "DataSeriesTypes",
     "DateTimeSeries",
     "DealInfo",
     "DealSnapshot",
-    "DefaultTickSimulator",
     "HQTime",
     "HistoryOrderInfo",
     "HistoryOrderSnapshot",
-    "ITickSimulator",
-    "MarketBar",
-    "MarketTick",
-    "MedianDataSeries",
     "OrderFilling",
     "OrderInfo",
     "OrderSnapshot",
@@ -171,16 +85,11 @@ __all__ = [
     "PositionInfo",
     "PositionSnapshot",
     "RandomGenerator",
-    "SpreadsMap",
     "SymbolInfo",
     "SymbolSnapshot",
-    "TSTickSimulator",
     "TerminalInfo",
     "TerminalSnapshot",
-    "TickEvent",
-    "TicksGenerator",
     "TimeConditions",
-    "Timeframe",
     "Trade",
     "TradeAction",
     "TradeCheckResult",
@@ -189,18 +98,6 @@ __all__ = [
     "Trading",
     "TradingBackend",
     "TradingClass",
-    "TypicalDataSeries",
-    "WeightedDataSeries",
-    "bars_to_dataframe",
-    "bars_to_df",
     "format_timestamp",
-    "generate_ticks",
-    "generate_ticks_to_parquet",
-    "get_historical_bars",
-    "get_ticks",
     "normalize_timestamps",
-    "ticks_to_dataframe",
-    "ticks_to_df",
-    "validate_request",
-    "validate_rows",
 ]

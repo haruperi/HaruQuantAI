@@ -22,7 +22,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.libs.data import Timeframe, get_historical_bars, get_ticks
+    from app.services.data import Timeframe, get_historical_bars, get_ticks
     from app.services.brokers.crypto import BinanceBroker
 
     broker = BinanceBroker()
@@ -44,7 +44,7 @@ from typing import Any, override
 import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
-from app.services.libs.data import (
+from app.services.data import (
     BridgeError,
     DataBrokerBackend,
     Timeframe,

@@ -1,9 +1,9 @@
 # Canonical Trading and Data Libraries (`app/services/libs`)
 
 This package provides the strategy-facing implementation of the MQL5-shaped
-trading classes and historical data retrieval:
+trading classes (historical market data primitives and readers reside in `app.services.data`):
 - `app.services.libs.trading`: Defines `Trade`, `AccountInfo`, `SymbolInfo`, `OrderInfo`, `HistoryOrderInfo`, `PositionInfo`, `DealInfo`, `TerminalInfo`, and the master `Trading` facade.
-- `app.services.libs.data`: Stateless asynchronous historical bars and ticks reading (`get_historical_bars`, `get_ticks`) and boundary validation (`validate_rows`, `validate_request`).
+- `app.services.data`: Market data primitives, timeframes, columnar series, historical readers, streaming tick simulators, and catalog records.
 
 ```text
 strategy -> Trading facade -> eight async classes -> TradingBackend capability

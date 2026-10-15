@@ -46,7 +46,7 @@ from app.services.brokers.contracts import (
 from app.services.brokers.contracts import DealEntry as DealEntryEnum
 from app.services.brokers.contracts import DealType as DealTypeEnum
 from app.services.brokers.contracts import OrderState as OrderStateEnum
-from app.services.libs.data import BridgeError
+from app.services.data import BridgeError
 from app.services.libs.trading import (
     ORDER_FILLING_DESCRIPTIONS,
     ORDER_TIME_DESCRIPTIONS,

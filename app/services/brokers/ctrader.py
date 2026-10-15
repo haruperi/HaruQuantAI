@@ -71,7 +71,7 @@ from typing import Any, Self, cast, override
 from app.host.logging import get_logger
 from app.host.settings import settings
 from app.services.brokers.contracts import Tick
-from app.services.libs.data import BridgeError
+from app.services.data import BridgeError
 from app.services.libs.trading import (
     AccountSnapshot,
     AccountTradeMode,

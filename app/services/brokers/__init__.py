@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from app.services.brokers.sq_futures import SQFuturesBroker
     from app.services.brokers.tick_downloader import TickDownloaderBroker
     from app.services.brokers.yahoo import YahooBroker
-    from app.services.libs.data import (
+    from app.services.data import (
         BridgeError,
         DataBrokerBackend,
         MarketBar,
@@ -66,7 +66,7 @@ _SINGLETONS: dict[str, Any] = {}
 _MODULE_MAPPING: dict[str, tuple[str, str]] = {
     "BaseBrokerBackend": ("app.services.brokers.base", "BaseBrokerBackend"),
     "BridgeError": ("app.services.brokers.base", "BridgeError"),
-    "DataBrokerBackend": ("app.services.libs.data", "DataBrokerBackend"),
+    "DataBrokerBackend": ("app.services.data", "DataBrokerBackend"),
     "BinanceBroker": ("app.services.brokers.crypto", "BinanceBroker"),
     "CTraderBackend": ("app.services.brokers.ctrader", "CTraderBackend"),
     "DarwinexBroker": ("app.services.brokers.darwinex", "DarwinexBroker"),
@@ -82,9 +82,9 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
     ),
     "YahooBroker": ("app.services.brokers.yahoo", "YahooBroker"),
     "SymbolSpec": ("app.services.brokers.contracts", "SymbolSpec"),
-    "MarketBar": ("app.services.libs.data", "MarketBar"),
-    "MarketTick": ("app.services.libs.data", "MarketTick"),
-    "Timeframe": ("app.services.libs.data", "Timeframe"),
+    "MarketBar": ("app.services.data", "MarketBar"),
+    "MarketTick": ("app.services.data", "MarketTick"),
+    "Timeframe": ("app.services.data", "Timeframe"),
     "AccountSnapshot": ("app.services.libs.trading", "AccountSnapshot"),
     "BridgeEvent": ("app.services.libs.trading", "BridgeEvent"),
     "DealSnapshot": ("app.services.libs.trading", "DealSnapshot"),

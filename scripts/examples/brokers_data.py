@@ -3,7 +3,7 @@
 Description:
     Demonstrates downloading real historical candlestick bars and ticks from all
     available data providers via the canonical quantitative data API in
-    `app.services.libs.data` (`get_historical_bars` and `get_ticks`).
+    `app.services.data` (`get_historical_bars` and `get_ticks`).
     Each data broker implements the `TradingBackend` protocol, allowing callers to
     retrieve normalized, validated `MarketBar` and `MarketTick` sequences regardless
     of the underlying vendor transport (Yahoo REST, Binance REST, StrategyQuant CDN,
@@ -53,7 +53,7 @@ from app.services.brokers import (
     YahooBroker,
 )
 from app.services.brokers.contracts import SymbolSpec
-from app.services.libs.data import (
+from app.services.data import (
     MarketBar,
     MarketTick,
     Timeframe,

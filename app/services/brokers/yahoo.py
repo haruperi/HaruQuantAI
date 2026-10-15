@@ -20,7 +20,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.libs.data import Timeframe, get_historical_bars
+    from app.services.data import Timeframe, get_historical_bars
     from app.services.brokers.yahoo import YahooBroker
 
     broker = YahooBroker()
@@ -39,7 +39,7 @@ from typing import Any, override
 import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
-from app.services.libs.data import (
+from app.services.data import (
     BridgeError,
     DataBrokerBackend,
     Timeframe,

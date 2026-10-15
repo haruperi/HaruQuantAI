@@ -50,12 +50,11 @@ from app.services.brokers.contracts import SymbolSpec
 from app.services.brokers.ctrader import CTraderBackend
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
-from app.services.libs.data import (
+from app.services.data import (
     BridgeError,
     MarketBar,
     MarketTick,
     Timeframe,
-    TradingBackend,
     bars_to_dataframe,
     get_historical_bars,
     get_ticks,
@@ -70,6 +69,7 @@ from app.services.libs.trading import (
     TradeAction,
     TradeRequest,
     Trading,
+    TradingBackend,
 )
 from app.services.utils import format_timestamp
 
