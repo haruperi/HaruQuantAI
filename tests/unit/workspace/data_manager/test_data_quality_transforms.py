@@ -141,7 +141,7 @@ def test_data_service_lifecycle_and_exports(test_db_path: Path, tmp_path: Path) 
     r1 = service.import_dataset(
         {"symbol": "GBPUSD", "timeframe": "M1", "csv_content": sample_csv}
     )
-    mass_res = service.mass_delete_datasets([r1.id], action="remove")
+    mass_res = service.mass_delete_datasets([str(r1.id)], action="remove")
     assert mass_res["affected_count"] == 1
 
     data_mod.main()
@@ -302,7 +302,7 @@ def test_data_quality_inspector(test_db_path: Path, tmp_path: Path) -> None:
     clean_rec = data_svc.import_dataset(
         {"symbol": "CLEAN", "timeframe": "M1", "csv_content": clean_csv}
     )
-    clean_rep = inspector.inspect_dataset(clean_rec.id)
+    clean_rep = inspector.inspect_dataset(str(clean_rec.id))
     assert clean_rep.quality_score >= 0.95
 
     # Synthesize anomalies including NaN and intra-day gap
@@ -367,7 +367,7 @@ def test_data_quality_inspector(test_db_path: Path, tmp_path: Path) -> None:
     bad_df = pd.DataFrame(bad_rows)
     bad_rec = data_svc.upsert_dataset({"id": "file:ANOMALIES"}, bars_df=bad_df)
 
-    rep = inspector.inspect_dataset(bad_rec.id)
+    rep = inspector.inspect_dataset(str(bad_rec.id))
     assert rep.anomaly_counts["NON_POSITIVE_PRICE"] >= 1
     assert rep.anomaly_counts["OHLC_ENVELOPE_VIOLATION"] >= 1
     assert rep.anomaly_counts["DUPLICATE_TIMESTAMP"] >= 1
@@ -378,16 +378,16 @@ def test_data_quality_inspector(test_db_path: Path, tmp_path: Path) -> None:
     assert rep.quality_score < 1.0
 
     # Summary and details
-    summary = inspector.get_quality_summary(bad_rec.id)
+    summary = inspector.get_quality_summary(str(bad_rec.id))
     assert summary["dataset_id"] == bad_rec.id
     assert summary["total_anomalies"] >= 7
 
-    details = inspector.get_quality_details(bad_rec.id, limit=2, offset=0)
+    details = inspector.get_quality_details(str(bad_rec.id), limit=2, offset=0)
     assert len(details["anomalies"]) == 2
 
     # Invalidate quality report
-    inspector.invalidate_report(bad_rec.id)
-    reset_summary = inspector.get_quality_summary(bad_rec.id)
+    inspector.invalidate_report(str(bad_rec.id))
+    reset_summary = inspector.get_quality_summary(str(bad_rec.id))
     assert reset_summary["quality_score"] == 0.0
 
     quality_mod.main()
@@ -420,7 +420,7 @@ def test_series_transformer(test_db_path: Path, tmp_path: Path) -> None:
 
     # Resample M1 -> M5
     resampled = transformer.resample_dataset(
-        ResampleConfig(dataset_id=source_rec.id, target_timeframe="M5")
+        ResampleConfig(dataset_id=str(source_rec.id), target_timeframe="M5")
     )
     assert resampled.timeframe == "M5"
     assert resampled.bars > 0
@@ -429,26 +429,26 @@ def test_series_transformer(test_db_path: Path, tmp_path: Path) -> None:
     # Enforce resolution hierarchy: rejecting downsampling M5 -> M1
     with pytest.raises(ValueError, match="Cannot downsample"):
         transformer.resample_dataset(
-            ResampleConfig(dataset_id=resampled.id, target_timeframe="M1")
+            ResampleConfig(dataset_id=str(resampled.id), target_timeframe="M1")
         )
 
     # Clone timezone +2 hours and remove weekends
     cloned = transformer.clone_timezone(
         CloneTimezoneConfig(
-            dataset_id=source_rec.id,
+            dataset_id=str(source_rec.id),
             shift_hours=2,
             remove_weekends=True,
             postfix="_EET",
         )
     )
-    assert "_EET" in cloned.id
+    assert "_EET" in str(cloned.id)
     assert cloned.bars > 0
 
     # Rejection of invalid IANA timezone
     with pytest.raises(ValueError, match="Unknown or invalid timezone"):
         transformer.clone_timezone(
             CloneTimezoneConfig(
-                dataset_id=source_rec.id,
+                dataset_id=str(source_rec.id),
                 timezone_type="iana",
                 timezone="Invalid/Timezone_Name",
             )
@@ -466,7 +466,7 @@ def test_series_transformer(test_db_path: Path, tmp_path: Path) -> None:
             )
         ],
     )
-    df = data_svc.read_bars_dataframe(source_rec.id)
+    df = data_svc.read_bars_dataframe(str(source_rec.id))
     filtered = transformer.apply_session_filter(df, session)
     assert len(filtered) <= len(df)
 

@@ -250,25 +250,25 @@ class TestDataSeriesTypes:
 
     def test_standard_values(self) -> None:
         """Verify standard SQX DataSeriesTypes integer values."""
-        assert DataSeriesTypes.OPEN == 0
-        assert DataSeriesTypes.HIGH == 1
-        assert DataSeriesTypes.LOW == 2
-        assert DataSeriesTypes.CLOSE == 3
-        assert DataSeriesTypes.VOLUME == 4
-        assert DataSeriesTypes.MEDIAN == 5
-        assert DataSeriesTypes.TYPICAL == 6
-        assert DataSeriesTypes.WEIGHTED == 7
+        assert DataSeriesTypes.OPEN.value == 0
+        assert DataSeriesTypes.HIGH.value == 1
+        assert DataSeriesTypes.LOW.value == 2
+        assert DataSeriesTypes.CLOSE.value == 3
+        assert DataSeriesTypes.VOLUME.value == 4
+        assert DataSeriesTypes.MEDIAN.value == 5
+        assert DataSeriesTypes.TYPICAL.value == 6
+        assert DataSeriesTypes.WEIGHTED.value == 7
 
     def test_pascal_case_aliases(self) -> None:
         """Verify SQX PascalCase aliases."""
-        assert DataSeriesTypes.Open == 0
-        assert DataSeriesTypes.High == 1
-        assert DataSeriesTypes.Low == 2
-        assert DataSeriesTypes.Close == 3
-        assert DataSeriesTypes.Volume == 4
-        assert DataSeriesTypes.Median == 5
-        assert DataSeriesTypes.Typical == 6
-        assert DataSeriesTypes.Weighted == 7
+        assert DataSeriesTypes.Open.value == 0
+        assert DataSeriesTypes.High.value == 1
+        assert DataSeriesTypes.Low.value == 2
+        assert DataSeriesTypes.Close.value == 3
+        assert DataSeriesTypes.Volume.value == 4
+        assert DataSeriesTypes.Median.value == 5
+        assert DataSeriesTypes.Typical.value == 6
+        assert DataSeriesTypes.Weighted.value == 7
 
     def test_from_name(self) -> None:
         """Verify case-insensitive name resolution."""
