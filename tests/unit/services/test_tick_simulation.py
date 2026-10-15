@@ -28,14 +28,16 @@ from app.services.data import (
     TICK_MODEL_REAL,
     TICK_MODEL_TRADING_BAR,
     DefaultTickSimulator,
-    MarketBar,
-    MarketTick,
     SpreadsMap,
     TickEvent,
     TicksGenerator,
     TSTickSimulator,
     generate_ticks,
     generate_ticks_to_parquet,
+)
+from app.workspace.data_manager.contracts import (
+    MarketBar,
+    MarketTick,
 )
 
 

@@ -2,10 +2,10 @@
 
 Description:
     Verifies that app.services.data satisfies the modular package architecture:
-    - Layer 0: primitives.py
     - Layer 1: series.py, history.py, simulation.py, generation.py, catalog.py
     - Layer 2: __init__.py unified public export surface
     - Zero circular imports between submodules
+    - Complete removal of app.services.data.primitives (moved to data_manager.contracts)
     - Complete removal of app.services.libs.data (no backward compatibility)
 """
 
@@ -17,7 +17,6 @@ import app.services.data as data_pkg
 import app.services.data.catalog as data_catalog
 import app.services.data.generation as data_gen
 import app.services.data.history as data_hist
-import app.services.data.primitives as data_prim
 import app.services.data.series as data_ser
 import app.services.data.simulation as data_sim
 import pytest
@@ -26,16 +25,10 @@ import pytest
 class TestDataPackageExports:
     """Verify package-level public exports and submodule parity."""
 
-    def test_primitives_exports_identity(self) -> None:
-        """Verify primitives symbols match between package and submodule."""
-        assert data_pkg.Timeframe is data_prim.Timeframe
-        assert data_pkg.TIMEFRAME_SECONDS is data_prim.TIMEFRAME_SECONDS
-        assert data_pkg.MarketBar is data_prim.MarketBar
-        assert data_pkg.MarketTick is data_prim.MarketTick
-        assert data_pkg.BridgeError is data_prim.BridgeError
-        assert data_pkg.MAX_RECORDS == data_prim.MAX_RECORDS
-        assert data_pkg.MAX_POSITION == data_prim.MAX_POSITION
-        assert data_pkg.READ_TIMEOUT == data_prim.READ_TIMEOUT
+    def test_primitives_module_removed(self) -> None:
+        """Verify primitives.py is deleted without backward compatibility shim."""
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("app.services.data.primitives")
 
     def test_series_exports_identity(self) -> None:
         """Verify series symbols match between package and submodule."""
@@ -124,7 +117,6 @@ class TestLayeringAndAntiCircularRules:
         import inspect
 
         submodules = [
-            data_prim,
             data_ser,
             data_hist,
             data_sim,

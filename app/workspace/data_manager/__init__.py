@@ -27,6 +27,16 @@ from app.workspace.data_manager.connections import (
     ProviderConnectionsService,
     ProviderConnectionStatus,
 )
+from app.workspace.data_manager.contracts import (
+    MAX_POSITION,
+    MAX_RECORDS,
+    READ_TIMEOUT,
+    TIMEFRAME_SECONDS,
+    BridgeError,
+    MarketBar,
+    MarketTick,
+    Timeframe,
+)
 from app.workspace.data_manager.custom_data import (
     CustomDataService,
     ExternalIndicatorDefinition,
@@ -71,11 +81,16 @@ from app.workspace.data_manager.sessions import (
 )
 
 __all__ = [
+    "MAX_POSITION",
+    "MAX_RECORDS",
+    "READ_TIMEOUT",
+    "TIMEFRAME_SECONDS",
     "BaseDataProvider",
     "BasketDefinition",
     "BasketMember",
     "BasketOverviewItem",
     "BasketsCatalogService",
+    "BridgeError",
     "BrokerProfileRecord",
     "BrokerProfilesService",
     "ChartBarSlice",
@@ -101,6 +116,8 @@ __all__ = [
     "InstrumentAliasRecord",
     "InstrumentInfo",
     "InstrumentsCatalogService",
+    "MarketBar",
+    "MarketTick",
     "OperationLogEntry",
     "ProviderConnectionStatus",
     "ProviderConnectionsService",
@@ -110,6 +127,7 @@ __all__ = [
     "SeriesTransformer",
     "SessionWindow",
     "SessionsCatalogService",
+    "Timeframe",
     "TradingHoliday",
     "TradingSession",
     "XmlOverviewItem",

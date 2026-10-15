@@ -33,11 +33,11 @@ from typing import Any, cast
 
 from app.host.logging import get_logger
 from app.services.brokers.base import (
+    BridgeError,
     BrokerBackend,
     epoch_millis,
     epoch_seconds,
 )
-from app.services.data import BridgeError
 from app.services.trading import (
     DEAL_ENTRY_DESCRIPTIONS,
     DEAL_TYPE_DESCRIPTIONS,

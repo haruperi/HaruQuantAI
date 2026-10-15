@@ -34,14 +34,10 @@ import pytest
 from app.services.data import (
     BAR_COLUMNS,
     TICK_COLUMNS,
-    BridgeError,
     DataBackend,
     DataSeries,
     DataSeriesTypes,
-    MarketBar,
-    MarketTick,
     MedianDataSeries,
-    Timeframe,
     TypicalDataSeries,
     WeightedDataSeries,
     bars_to_dataframe,
@@ -60,18 +56,6 @@ from app.services.data.history import (
 from app.services.data.history import (
     ticks_to_dataframe as direct_ticks_to_dataframe,
 )
-from app.services.data.primitives import (
-    BridgeError as DirectBridgeError,
-)
-from app.services.data.primitives import (
-    MarketBar as DirectMarketBar,
-)
-from app.services.data.primitives import (
-    MarketTick as DirectMarketTick,
-)
-from app.services.data.primitives import (
-    Timeframe as DirectTimeframe,
-)
 from app.services.data.series import (
     DataSeries as DirectDataSeries,
 )
@@ -87,18 +71,20 @@ from app.services.data.series import (
 from app.services.data.series import (
     WeightedDataSeries as DirectWeightedDataSeries,
 )
+from app.workspace.data_manager.contracts import (
+    BridgeError,
+    MarketBar,
+    MarketTick,
+    Timeframe,
+)
 
 
 def test_public_reexports() -> None:
-    """Verify market primitives and DataSeries are exported from app.services.data."""
-    assert BridgeError is DirectBridgeError
+    """Verify DataSeries and history symbols are exported from app.services.data."""
     assert DataBackend is DirectDataBackend
     assert DataSeries is DirectDataSeries
     assert DataSeriesTypes is DirectDataSeriesTypes
-    assert MarketBar is DirectMarketBar
-    assert MarketTick is DirectMarketTick
     assert MedianDataSeries is DirectMedianDataSeries
-    assert Timeframe is DirectTimeframe
     assert TypicalDataSeries is DirectTypicalDataSeries
     assert WeightedDataSeries is DirectWeightedDataSeries
 

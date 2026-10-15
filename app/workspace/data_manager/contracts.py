@@ -1,26 +1,52 @@
-"""Foundational market data primitives, timeframes, and bridge exceptions.
+"""Foundational market data contracts, timeframe models, and bridge exceptions.
 
 Description:
-    Provides broker-neutral immutable primitives for financial market data,
-    including discrete candlestick bars (MarketBar), millisecond ticks
-    (MarketTick), standardized timeframe enumerations (Timeframe), duration
-    mappings, boundary limits, and shared bridge error types.
+    Provides broker-neutral immutable contracts and primitives for financial
+    market data within the Data Manager workspace, including discrete
+    candlestick bars (MarketBar), millisecond ticks (MarketTick), standardized
+    timeframe enumerations (Timeframe), duration mappings, boundary limits,
+    and shared bridge error types.
 
 Purpose:
-    FEAT-DATA-PRIMITIVES: Core market data primitive records and timeframes.
+    FEAT-DATAMGR-CONTRACTS: Foundational market data contracts, timeframe models,
+    and primitives.
 
 Key Capabilities:
-    - FR-DATA-MARKET-PRIMITIVES: Standard timeframe enums, immutable bar and
-      tick records.
-      Associated: `Timeframe`, `MarketBar`, `MarketTick`, `BridgeError`.
+    - FR-DATAMGR-CONTRACTS-TIMEFRAME: Standard timeframe enums, duration
+      calculations, and string parsing.
+      Associated: `Timeframe`.
       Logging: Pure numerical data structures with zero logging overhead.
-    - FR-DATA-BOUNDARY-LIMITS: Global request pagination and timeout bounds.
-      Associated: `MAX_RECORDS`, `MAX_POSITION`, `READ_TIMEOUT`.
-      Logging: Constant definitions with zero logging overhead.
+    - FR-DATAMGR-CONTRACTS-TIMEFRAME-SECONDS: Timeframe duration lookup mapping
+      for interval arithmetic.
+      Associated: `TIMEFRAME_SECONDS`.
+      Logging: Constant lookup dictionary with zero logging overhead.
+    - FR-DATAMGR-CONTRACTS-MARKET-BAR: Immutable historical OHLC candlestick
+      bar record and candle metrics.
+      Associated: `MarketBar`.
+      Logging: Pure numerical data structures with zero logging overhead.
+    - FR-DATAMGR-CONTRACTS-MARKET-TICK: Immutable millisecond tick record with
+      instantaneous spread and midpoint.
+      Associated: `MarketTick`.
+      Logging: Pure numerical data structures with zero logging overhead.
+    - FR-DATAMGR-CONTRACTS-BRIDGE-ERROR: Shared base exception for data broker
+      bridge communication failures.
+      Associated: `BridgeError`.
+      Logging: Exception definition with zero logging overhead.
+    - FR-DATAMGR-CONTRACTS-PAGINATION-LIMIT: Default and maximum batch pagination
+      record limit.
+      Associated: `MAX_RECORDS`.
+      Logging: Constant boundary definition with zero logging overhead.
+    - FR-DATAMGR-CONTRACTS-POSITION-BOUND: Maximum position index boundary
+      limit for historical windowing.
+      Associated: `MAX_POSITION`.
+      Logging: Constant boundary definition with zero logging overhead.
+    - FR-DATAMGR-CONTRACTS-TIMEOUT-BOUND: Global default network read timeout limit.
+      Associated: `READ_TIMEOUT`.
+      Logging: Constant boundary definition with zero logging overhead.
 
 Python API Usage:
     ```python
-    from app.services.data.primitives import (
+    from app.workspace.data_manager.contracts import (
         BridgeError,
         MarketBar,
         MarketTick,
@@ -34,7 +60,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.data.primitives
+    uv run python -m app.workspace.data_manager.contracts
     ```
 """
 

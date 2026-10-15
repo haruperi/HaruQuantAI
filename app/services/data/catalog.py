@@ -34,8 +34,7 @@ from dataclasses import asdict, dataclass, fields, replace
 from typing import Any
 
 from app.host.logging import get_logger
-
-from .primitives import Timeframe
+from app.workspace.data_manager.contracts import Timeframe
 
 __all__ = [
     "ChartDef",

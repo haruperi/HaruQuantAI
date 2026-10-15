@@ -60,7 +60,10 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from app.services.data.catalog import DataInfo
 
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
@@ -68,7 +71,6 @@ from app.host.persistence.create import create_schema, insert_row
 from app.host.persistence.delete import delete_row_by_pk, delete_rows
 from app.host.persistence.read import read_rows, resolve_connection
 from app.host.persistence.update import update_row_by_pk
-from app.services.data.catalog import DataInfo
 from app.workspace.data_manager.log import DataManagerLogService
 
 __all__ = [
@@ -134,6 +136,8 @@ class DatasetRecord:
 
     def to_data_info(self) -> DataInfo:
         """Convert to Tier 2 DataInfo domain object."""
+        from app.services.data.catalog import DataInfo
+
         return DataInfo(
             symbol=self.symbol,
             timeframe=self.timeframe,

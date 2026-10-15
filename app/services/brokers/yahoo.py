@@ -26,7 +26,8 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.yahoo import YahooBroker
-    from app.services.data import Timeframe, get_historical_bars
+    from app.services.data import get_historical_bars
+    from app.workspace.data_manager.contracts import Timeframe
 
     broker = YahooBroker()
     health = broker.check_health()
@@ -51,6 +52,7 @@ from typing import Any, override
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
 from app.services.brokers._http import create_http_session, execute_bounded_get
+from app.services.brokers.base import BridgeError
 from app.services.brokers.capabilities import (
     CancellationToken,
     HistoryPage,
@@ -61,8 +63,9 @@ from app.services.brokers.capabilities import (
     ProviderRateLimitError,
     ProviderUnsupportedError,
 )
-from app.services.data import BridgeError, DataBrokerBackend, Timeframe
+from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
+from app.workspace.data_manager.contracts import Timeframe
 
 MARKET_DATA_FR = "FR-BROKER-YAHOO-MARKET-DATA"
 SYMBOL_METADATA_FR = "FR-BROKER-YAHOO-SYMBOL-METADATA"

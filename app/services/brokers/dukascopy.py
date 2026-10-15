@@ -27,7 +27,8 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.dukascopy import DukascopyBroker
-    from app.services.data import Timeframe, get_historical_bars
+    from app.services.data import get_historical_bars
+    from app.workspace.data_manager.contracts import Timeframe
 
     broker = DukascopyBroker()
     bars = await get_historical_bars(broker, "EURUSD", Timeframe.PERIOD_M1, count=5)
@@ -59,6 +60,7 @@ from app.services.brokers._native_history import (
     decode_bi5_ticks,
     decompress_bi5,
 )
+from app.services.brokers.base import BridgeError
 from app.services.brokers.capabilities import (
     CancellationToken,
     HistoryPage,
@@ -67,7 +69,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderUnsupportedError,
 )
-from app.services.data import BridgeError, DataBrokerBackend
+from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
 
 logger = get_logger(__name__)

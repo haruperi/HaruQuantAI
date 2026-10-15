@@ -68,7 +68,7 @@ def test_mt5_backend_execution_preservation() -> None:
     assert not backend.bridge.armed
 
     # Verify arming guards (cannot arm when disconnected)
-    from app.services.data import BridgeError
+    from app.services.brokers.base import BridgeError
 
     with pytest.raises(BridgeError, match="cannot arm while the EA is disconnected"):
         backend.arm()

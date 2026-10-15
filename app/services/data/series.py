@@ -53,8 +53,7 @@ import numpy as np
 import polars as pl
 import pyarrow as pa
 from app.host.logging import get_logger
-
-from .primitives import MarketBar
+from app.workspace.data_manager.contracts import MarketBar
 
 __all__ = [
     "DataSeries",

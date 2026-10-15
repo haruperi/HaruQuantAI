@@ -25,7 +25,8 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.files import FilesBroker
-    from app.services.data import Timeframe, get_historical_bars
+    from app.services.data import get_historical_bars
+    from app.workspace.data_manager.contracts import Timeframe
 
     broker = FilesBroker(data_dir="data/market")
     health = broker.check_health()
@@ -60,6 +61,7 @@ from app.services.brokers._native_history import (
     decode_fxt_bytes,
     decode_hst_bytes,
 )
+from app.services.brokers.base import BridgeError
 from app.services.brokers.capabilities import (
     CancellationToken,
     HistoryPage,
@@ -67,7 +69,7 @@ from app.services.brokers.capabilities import (
     ProviderCapabilities,
     ProviderHealth,
 )
-from app.services.data import BridgeError, DataBrokerBackend
+from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
 
 PARSING_FR = "FR-BROKER-FILES-PARSING"

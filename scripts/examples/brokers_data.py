@@ -53,13 +53,15 @@ from app.services.brokers import (
     YahooBroker,
 )
 from app.services.data import (
-    MarketBar,
-    MarketTick,
-    Timeframe,
     get_historical_bars,
     get_ticks,
 )
 from app.services.trading import SymbolSpec
+from app.workspace.data_manager.contracts import (
+    MarketBar,
+    MarketTick,
+    Timeframe,
+)
 
 logger = get_logger(__name__)
 

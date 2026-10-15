@@ -43,8 +43,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from app.host.logging import get_logger
 from app.services.libs.generators import RandomGenerator
-
-from .primitives import TIMEFRAME_SECONDS, Timeframe
+from app.workspace.data_manager.contracts import TIMEFRAME_SECONDS, Timeframe
 
 __all__ = [
     "PHASE_CLOSE_CODE",

@@ -22,8 +22,9 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.data import Timeframe, get_historical_bars, get_ticks
     from app.services.brokers.crypto import BinanceBroker
+    from app.services.data import get_historical_bars, get_ticks
+    from app.workspace.data_manager.contracts import Timeframe
 
     broker = BinanceBroker()
     bars = await get_historical_bars(broker, "BTCUSDT", Timeframe.PERIOD_H1, count=5)
@@ -44,6 +45,7 @@ import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
 from app.services.brokers._http import execute_bounded_get
+from app.services.brokers.base import BridgeError
 from app.services.brokers.capabilities import (
     CancellationToken,
     HistoryPage,
@@ -53,12 +55,9 @@ from app.services.brokers.capabilities import (
     ProviderUnsupportedError,
     ProviderValidationError,
 )
-from app.services.data import (
-    BridgeError,
-    DataBrokerBackend,
-    Timeframe,
-)
+from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
+from app.workspace.data_manager.contracts import Timeframe
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 

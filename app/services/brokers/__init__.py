@@ -26,7 +26,7 @@ import importlib
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from app.services.brokers.base import BaseBrokerBackend, BrokerBackend
+    from app.services.brokers.base import BaseBrokerBackend, BridgeError, BrokerBackend
     from app.services.brokers.capabilities import (
         CancellationToken,
         HistoryKind,
@@ -61,13 +61,7 @@ if TYPE_CHECKING:
     from app.services.brokers.sq_futures import SQFuturesBroker
     from app.services.brokers.tick_downloader import TickDownloaderBroker
     from app.services.brokers.yahoo import YahooBroker
-    from app.services.data import (
-        BridgeError,
-        DataBrokerBackend,
-        MarketBar,
-        MarketTick,
-        Timeframe,
-    )
+    from app.services.data import DataBrokerBackend
     from app.services.trading import (
         AccountSnapshot,
         BridgeEvent,
@@ -85,6 +79,11 @@ if TYPE_CHECKING:
         TradeRequest,
         TradeResult,
         TradingBackend,
+    )
+    from app.workspace.data_manager.contracts import (
+        MarketBar,
+        MarketTick,
+        Timeframe,
     )
 
 _SINGLETONS: dict[str, Any] = {}

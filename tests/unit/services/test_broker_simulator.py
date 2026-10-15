@@ -29,7 +29,6 @@ from __future__ import annotations
 
 import pytest
 from app.services.brokers.simulator import SimulationBackend
-from app.services.data import MarketTick
 from app.services.trading import (
     DealEntry,
     DealSnapshot,
@@ -48,6 +47,7 @@ from app.services.trading import (
     TradeRequest,
     TradeRetcode,
 )
+from app.workspace.data_manager.contracts import MarketTick
 
 
 @pytest.fixture

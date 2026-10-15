@@ -26,9 +26,10 @@ CLI Usage:
 
 from __future__ import annotations
 
-from app.services.data import ChartDef, DataInfo, Timeframe
+from app.services.data import ChartDef, DataInfo
 from app.services.data.catalog import ChartDef as CatalogChartDef
 from app.services.data.catalog import DataInfo as CatalogDataInfo
+from app.workspace.data_manager.contracts import Timeframe
 
 
 class TestChartDef:

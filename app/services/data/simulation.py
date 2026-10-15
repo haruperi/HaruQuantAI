@@ -40,8 +40,7 @@ from typing import Any, Protocol, override
 
 import numpy as np
 from app.host.logging import get_logger
-
-from .primitives import MarketTick
+from app.workspace.data_manager.contracts import MarketTick
 
 __all__ = [
     "DefaultTickSimulator",

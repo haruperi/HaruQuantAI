@@ -46,14 +46,11 @@ from typing import Any, Literal
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
+from app.services.brokers.base import BridgeError
 from app.services.brokers.ctrader import CTraderBackend
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
 from app.services.data import (
-    BridgeError,
-    MarketBar,
-    MarketTick,
-    Timeframe,
     bars_to_dataframe,
     get_historical_bars,
     get_ticks,
@@ -72,6 +69,11 @@ from app.services.trading import (
     TradingBackend,
 )
 from app.services.utils import format_timestamp
+from app.workspace.data_manager.contracts import (
+    MarketBar,
+    MarketTick,
+    Timeframe,
+)
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = "ctrader"
 ALLOW_LIVE_TRADING = False

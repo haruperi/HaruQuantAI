@@ -65,7 +65,7 @@ from app.services.brokers.capabilities import (
     ProviderNotFoundError,
 )
 from app.services.brokers.registry import BrokerRegistry
-from app.services.data import MarketBar
+from app.workspace.data_manager.contracts import MarketBar
 from app.workspace.data_manager.data import DataManagerDataService
 from app.workspace.data_manager.log import DataManagerLogService
 

@@ -26,7 +26,8 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.darwinex import DarwinexBroker
-    from app.services.data import Timeframe, get_historical_bars
+    from app.services.data import get_historical_bars
+    from app.workspace.data_manager.contracts import Timeframe
 
     broker = DarwinexBroker()
     bars = await get_historical_bars(broker, "EURUSD", Timeframe.PERIOD_D1, count=5)
@@ -55,6 +56,7 @@ from app.services.brokers._file_history import (
 )
 from app.services.brokers._http import create_http_session, execute_bounded_get
 from app.services.brokers._native_history import decode_darwinex_dat
+from app.services.brokers.base import BridgeError
 from app.services.brokers.capabilities import (
     CancellationToken,
     HistoryPage,
@@ -64,7 +66,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderUnsupportedError,
 )
-from app.services.data import BridgeError, DataBrokerBackend
+from app.services.data import DataBrokerBackend
 from app.services.trading import SymbolSnapshot
 
 logger = get_logger(__name__)

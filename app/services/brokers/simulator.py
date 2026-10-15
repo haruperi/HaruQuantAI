@@ -46,15 +46,10 @@ from app.services.brokers._simulation_api import (
     prepare_args,
 )
 from app.services.brokers.base import (
+    BridgeError,
     BrokerBackend,
     epoch_seconds,
     utc_now,
-)
-from app.services.data import (
-    BridgeError,
-    MarketBar,
-    MarketTick,
-    Timeframe,
 )
 from app.services.trading import (
     AccountSnapshot,
@@ -82,6 +77,11 @@ from app.services.trading import (
     TradeRequest,
     TradeResult,
     TradeRetcode,
+)
+from app.workspace.data_manager.contracts import (
+    MarketBar,
+    MarketTick,
+    Timeframe,
 )
 
 logger = get_logger(__name__)
@@ -1407,7 +1407,8 @@ class SimulationBackend(BrokerBackend):
         bars: Sequence[MarketBar],
     ) -> None:
         """Register an immutable chronological bar series without advancing time."""
-        from app.services.data import TIMEFRAME_SECONDS, validate_rows
+        from app.services.data import validate_rows
+        from app.workspace.data_manager.contracts import TIMEFRAME_SECONDS
 
         logger.debug("FR-SIMULATION-HISTORY: seeding bars")
         if symbol not in self._symbols or timeframe not in TIMEFRAME_SECONDS:
@@ -1428,7 +1429,8 @@ class SimulationBackend(BrokerBackend):
         self._tick_history[symbol] = tuple(ticks)
 
     def _market_data(self, method: str, args: list[Any]) -> list[dict[str, Any]]:
-        from app.services.data import MAX_POSITION, validate_request
+        from app.services.data import validate_request
+        from app.workspace.data_manager.contracts import MAX_POSITION
 
         logger.debug("FR-SIMULATION-HISTORY: reading seeded history")
         bars = method == "Bars"

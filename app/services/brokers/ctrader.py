@@ -70,7 +70,7 @@ from typing import Any, Self, cast, override
 
 from app.host.logging import get_logger
 from app.host.settings import settings
-from app.services.data import BridgeError, MarketTick
+from app.services.brokers.base import BridgeError
 from app.services.trading import (
     AccountSnapshot,
     AccountTradeMode,
@@ -92,6 +92,7 @@ from app.services.trading import (
     TradeRetcode,
     Trading,
 )
+from app.workspace.data_manager.contracts import MarketTick
 
 logger = get_logger(__name__)
 

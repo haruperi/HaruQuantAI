@@ -9,7 +9,6 @@ import pytest
 from app.host.persistence.create import create_schema
 from app.host.persistence.read import resolve_connection
 from app.host.transport import EventBus
-from app.services.data import MarketBar
 from app.workspace.data_manager import (
     connections,
     custom_data,
@@ -28,6 +27,7 @@ from app.workspace.data_manager.actions.transform.transforms import (
 from app.workspace.data_manager.connections import (
     ProviderConnectionsService,
 )
+from app.workspace.data_manager.contracts import MarketBar
 from app.workspace.data_manager.custom_data import CustomDataService
 from app.workspace.data_manager.data import DataManagerDataService
 from app.workspace.data_manager.log import DataManagerLogService
