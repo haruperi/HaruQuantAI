@@ -26,10 +26,14 @@ CLI Usage:
 
 from __future__ import annotations
 
-from app.services.data import ChartDef, DataInfo
-from app.services.data.catalog import ChartDef as CatalogChartDef
-from app.services.data.catalog import DataInfo as CatalogDataInfo
+from app.workspace.data_manager import ChartDef, DataInfo
 from app.workspace.data_manager.contracts import Timeframe
+from app.workspace.data_manager.data import (
+    ChartDef as ModuleChartDef,
+)
+from app.workspace.data_manager.data import (
+    DataInfo as ModuleDataInfo,
+)
 
 
 class TestChartDef:
@@ -331,9 +335,9 @@ class TestDataInfo:
 
 
 class TestPackageReExports:
-    """Verify ChartDef and DataInfo are re-exported from app.services.data."""
+    """Verify ChartDef and DataInfo are re-exported from app.workspace.data_manager."""
 
     def test_re_exports_match(self) -> None:
         """Ensure package exports point to the exact same classes."""
-        assert CatalogChartDef is ChartDef
-        assert CatalogDataInfo is DataInfo
+        assert ModuleChartDef is ChartDef
+        assert ModuleDataInfo is DataInfo

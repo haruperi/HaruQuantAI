@@ -4,40 +4,54 @@ Description:
     Provides domain logic for dataset catalog records (`datamgr_datasets`),
     partitioned Apache Parquet time-series persistence, chart review slicing,
     interactive bar editing, and multi-platform export (CSV, MetaTrader 4, and
-    MetaTrader 5). Bridges workspace datasets to Tier 2 `DataInfo` and `ChartDef`
-    without importing `sqlite3`.
+    MetaTrader 5). Unifies historical market data representations under canonical
+    `DataInfo` and `ChartDef` without importing `sqlite3`.
 
 Purpose:
     FEAT-DATAMGR-DATA: Historical dataset catalog and Parquet bar/tick lifecycle.
 
 Key Capabilities:
+    - FR-DATAMGR-DATA-CHART-DEF: Market data request specification and resample
+      compatibility abstraction.
+      Associated: `ChartDef`.
+      Logging: Zero logging overhead.
+    - FR-DATAMGR-DATA-CATALOG-MODEL: Unified historical market dataset catalog
+      metadata record and domain abstraction.
+      Associated: `DataInfo`.
+      Logging: Zero logging overhead.
     - FR-DATAMGR-DATA-CATALOG-CRUD: Manage dataset catalog records in
       `datamgr_datasets`.
       Associated: `DataManagerDataService.list_datasets()`,
       `DataManagerDataService.upsert_dataset()`,
-      `DataManagerDataService.delete_dataset()`
+      `DataManagerDataService.delete_dataset()`.
       Logging: Emits INFO on dataset creation, clearing, deletion, and
       mass actions.
     - FR-DATAMGR-DATA-PARQUET-IO: Read and write bar and tick series to
       partitioned Parquet files.
       Associated: `DataManagerDataService.write_bars_dataframe()`,
-      `DataManagerDataService.read_bars_dataframe()`
+      `DataManagerDataService.read_bars_dataframe()`.
       Logging: Emits DEBUG on Parquet file I/O with record counts and paths.
     - FR-DATAMGR-DATA-REVIEW-AND-EDIT: Slice chart bars, paginate rows,
       and commit edits.
       Associated: `DataManagerDataService.get_review_chart_bars()`,
-      `DataManagerDataService.save_review_changes()`
+      `DataManagerDataService.save_review_changes()`.
       Logging: Emits INFO on manual bar updates and row deletions.
     - FR-DATAMGR-DATA-EXPORT-ENGINE: Manage CSV export formats and export to
       MT4/MT5/CSV.
       Associated: `DataManagerDataService.export_datasets()`,
-      `DataManagerDataService.save_csv_format()`
+      `DataManagerDataService.save_csv_format()`.
       Logging: Emits INFO on dataset export with artifact format and count.
 
 Python API Usage:
     ```python
-    from app.workspace.data_manager.data import DataManagerDataService
+    from app.workspace.data_manager.data import (
+        ChartDef,
+        DataInfo,
+        DataManagerDataService,
+    )
 
+    chart = ChartDef(symbol="EURUSD", timeframe="M1")
+    info = DataInfo(symbol="EURUSD", timeframe="M1")
     service = DataManagerDataService()
     datasets = service.list_datasets()
     df = service.read_bars_dataframe(datasets[0].id) if datasets else None
@@ -57,13 +71,10 @@ import json
 import re
 import tempfile
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, fields, replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    from app.services.data.catalog import DataInfo
+from typing import Any
 
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
@@ -71,17 +82,21 @@ from app.host.persistence.create import create_schema, insert_row
 from app.host.persistence.delete import delete_row_by_pk, delete_rows
 from app.host.persistence.read import read_rows, resolve_connection
 from app.host.persistence.update import update_row_by_pk
+from app.workspace.data_manager.contracts import Timeframe
 from app.workspace.data_manager.log import DataManagerLogService
 
 __all__ = [
     "ChartBarSlice",
+    "ChartDef",
+    "DataInfo",
     "DataManagerDataService",
-    "DatasetRecord",
     "ExportArtifactResult",
 ]
 
 logger = get_logger(__name__)
 
+CHART_DEF_FR = "FR-DATAMGR-DATA-CHART-DEF"
+CATALOG_MODEL_FR = "FR-DATAMGR-DATA-CATALOG-MODEL"
 CATALOG_CRUD_FR = "FR-DATAMGR-DATA-CATALOG-CRUD"
 PARQUET_IO_FR = "FR-DATAMGR-DATA-PARQUET-IO"
 REVIEW_EDIT_FR = "FR-DATAMGR-DATA-REVIEW-AND-EDIT"
@@ -89,21 +104,324 @@ EXPORT_ENGINE_FR = "FR-DATAMGR-DATA-EXPORT-ENGINE"
 
 
 @dataclass
-class DatasetRecord:
-    """Represents a historical dataset catalog record."""
+class ChartDef:
+    """Market data request specification and resample compatibility abstraction.
 
-    id: str
-    source: str
+    Corresponds to `com.strategyquant.datalib.ChartDef`. Defines chart properties,
+    symbol identifiers, sessions, spread settings, and resample predicates.
+    """
+
     symbol: str
-    underlying: str
-    instrument: str
-    timeframe: str = "M1"
+    timeframe: str | Timeframe = "M1"
+    instrument: str = "Forex"
+    session: str = "Default"
+    connection_name: str = ""
+    connection_hash: int = 0
+    symbol_hash: int = 0
+    history_from: int = 0
+    history_to: int = 0
+    loaded_history_from: int = 0
+    spread: float = 0.0
+    real_spread: bool = False
+    bar_time_type: int = 0
+    min_distance: float = 0.0
+    is_backtest_data_def: bool = False
+    backload_type: int = 0
+    backload_number: int = 0
+    registered: bool = False
+
+    def __post_init__(self) -> None:
+        """Normalize timeframe string and initialize deterministic hashes."""
+        if isinstance(self.timeframe, Timeframe):
+            self.timeframe = self.timeframe.value
+        if not self.connection_hash and self.connection_name:
+            self.connection_hash = abs(hash(self.connection_name))
+        if not self.symbol_hash and self.symbol:
+            self.symbol_hash = abs(hash(self.symbol))
+
+    @property
+    def timeframe_str(self) -> str:
+        """String representation of timeframe."""
+        return str(self.timeframe)
+
+    @property
+    def timeframe_seconds(self) -> int:
+        """Timeframe duration in seconds."""
+        if isinstance(self.timeframe, Timeframe):
+            return self.timeframe.to_seconds()
+        tf_str = self.timeframe.strip().upper()
+        if tf_str in ("TICK", "TICKS"):
+            return 0
+        try:
+            return Timeframe.from_string(tf_str).to_seconds()
+        except ValueError:
+            pass
+        if tf_str.startswith("S") and tf_str[1:].isdigit():
+            return int(tf_str[1:])
+        return 0
+
+    def is_registered(self) -> bool:
+        """Check if chart definition is registered."""
+        return self.registered
+
+    def set_registered(self, registered: bool = True) -> None:
+        """Set registration flag."""
+        self.registered = registered
+
+    def get_symbol(self) -> str:
+        """Get chart symbol."""
+        return self.symbol
+
+    def set_symbol(self, symbol: str) -> None:
+        """Set chart symbol and recompute symbol hash."""
+        self.symbol = symbol
+        self.symbol_hash = abs(hash(symbol))
+
+    def get_instrument(self) -> str:
+        """Get instrument class."""
+        return self.instrument
+
+    def get_instrument_info(self) -> str:
+        """Get instrument class info."""
+        return self.instrument
+
+    def get_symbol_info(self) -> str:
+        """Get symbol instrument info."""
+        return self.instrument
+
+    def get_timeframe(self) -> str:
+        """Get timeframe string."""
+        return str(self.timeframe)
+
+    def get_session(self) -> str:
+        """Get chart session identifier."""
+        return self.session
+
+    def set_session(self, session: str) -> None:
+        """Set chart session identifier."""
+        self.session = session
+
+    def get_connection_name(self) -> str:
+        """Get connection provider name."""
+        return self.connection_name
+
+    def get_connection_hash(self) -> int:
+        """Get connection hash."""
+        return self.connection_hash
+
+    def get_symbol_hash(self) -> int:
+        """Get symbol hash."""
+        return self.symbol_hash
+
+    def get_history_from(self) -> int:
+        """Get history start timestamp."""
+        return self.history_from
+
+    def set_history_from(self, history_from: int) -> None:
+        """Set history start timestamp."""
+        self.history_from = history_from
+
+    def get_history_to(self) -> int:
+        """Get history end timestamp."""
+        return self.history_to
+
+    def set_history_to(self, history_to: int) -> None:
+        """Set history end timestamp."""
+        self.history_to = history_to
+
+    def get_loaded_history_from(self) -> int:
+        """Get loaded history start timestamp."""
+        return self.loaded_history_from
+
+    def set_loaded_history_from(self, loaded_history_from: int) -> None:
+        """Set loaded history start timestamp."""
+        self.loaded_history_from = loaded_history_from
+
+    def get_spread(self) -> float:
+        """Get fixed spread points/price units."""
+        return self.spread
+
+    def set_spread(self, spread: float) -> None:
+        """Set fixed spread."""
+        self.spread = spread
+
+    def modify_spread(self, spread: float) -> None:
+        """Modify fixed spread."""
+        self.spread = spread
+
+    def set_real_spread(self, real_spread: bool) -> None:
+        """Set whether real variable spread is active."""
+        self.real_spread = real_spread
+
+    def get_min_distance(self) -> float:
+        """Get minimum distance in points."""
+        return self.min_distance
+
+    def set_min_distance(self, min_distance: float) -> None:
+        """Set minimum distance in points."""
+        self.min_distance = min_distance
+
+    def get_bar_time_type(self) -> int:
+        """Get bar timestamp anchor type (0=Open, 1=Close)."""
+        return self.bar_time_type
+
+    def get_effective_bar_time_type(self) -> int:
+        """Get effective bar timestamp anchor type."""
+        return self.bar_time_type
+
+    def get_backload_type(self) -> int:
+        """Get backload type."""
+        return self.backload_type
+
+    def get_backload_number(self) -> int:
+        """Get backload count / number."""
+        return self.backload_number
+
+    def get_is_backtest_data_def(self) -> bool:
+        """Check if this chart definition is designated for backtesting."""
+        return self.is_backtest_data_def
+
+    def is_symbol_recognized(self) -> bool:
+        """Check if symbol is valid/recognized."""
+        return bool(self.symbol and len(self.symbol.strip()) > 0)
+
+    def is_smaller_than(self, other: ChartDef) -> bool:
+        """Evaluate if this chart's timeframe is strictly smaller than other's."""
+        return self.timeframe_seconds < other.timeframe_seconds
+
+    def can_be_computed_from(self, other: ChartDef) -> bool:
+        """Evaluate if this chart can be resampled/computed from another chart.
+
+        Conditions:
+        - Symbols match (case-insensitive).
+        - Sessions match (or either is 'Default').
+        - other's timeframe is smaller than or equal to this timeframe.
+        - other's timeframe evenly divides this timeframe (or other is tick data).
+        - other's historical range covers this chart's range (if specified).
+        """
+        if self.symbol.strip().upper() != other.symbol.strip().upper():
+            return False
+
+        if (
+            self.session
+            and other.session
+            and self.session != "Default"
+            and other.session not in ("Default", self.session)
+        ):
+            return False
+
+        other_sec = other.timeframe_seconds
+        self_sec = self.timeframe_seconds
+
+        if other_sec > self_sec:
+            return False
+
+        if other_sec > 0 and self_sec % other_sec != 0:
+            return False
+
+        has_from_mismatch = (
+            self.history_from > 0
+            and other.history_from > 0
+            and other.history_from > self.history_from
+        )
+        has_to_mismatch = (
+            self.history_to > 0
+            and other.history_to > 0
+            and other.history_to < self.history_to
+        )
+        return not (has_from_mismatch or has_to_mismatch)
+
+    def is_same_connection_symbol(self, other: ChartDef) -> bool:
+        """Check if both charts share identical connection name and symbol."""
+        return (
+            self.symbol.strip().upper() == other.symbol.strip().upper()
+            and self.connection_name.strip().upper()
+            == other.connection_name.strip().upper()
+        )
+
+    def get_charts_hash(self) -> str:
+        """Compute unique identifier hash string for chart."""
+        return f"{self.connection_name}_{self.symbol}_{self.timeframe}_{self.session}"
+
+    def clone(
+        self,
+        symbol: str | None = None,
+        history_from: int | None = None,
+        history_to: int | None = None,
+    ) -> ChartDef:
+        """Clone this ChartDef, optionally overriding symbol or date ranges."""
+        overrides: dict[str, Any] = {}
+        if symbol is not None:
+            overrides["symbol"] = symbol
+            overrides["symbol_hash"] = abs(hash(symbol))
+        if history_from is not None:
+            overrides["history_from"] = history_from
+        if history_to is not None:
+            overrides["history_to"] = history_to
+        return replace(self, **overrides)
+
+    def get_clone(
+        self,
+        symbol: str | None = None,
+        history_from: int | None = None,
+        history_to: int | None = None,
+    ) -> ChartDef:
+        """SQX donor alias for clone()."""
+        return self.clone(
+            symbol=symbol, history_from=history_from, history_to=history_to
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize ChartDef to a dictionary."""
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> ChartDef:
+        """Construct ChartDef from a dictionary."""
+        valid_keys = {f.name for f in fields(cls)}
+        filtered = {k: v for k, v in data.items() if k in valid_keys}
+        return cls(**filtered)
+
+
+@dataclass
+class DataInfo:
+    """Historical market dataset catalog metadata record.
+
+    Corresponds to `com.strategyquant.datalib.DataInfo` unified with the Data
+    Manager dataset persistence entity. Encapsulates dataset identity, symbol,
+    timeframe, boundaries, row counts, and storage file metadata.
+    """
+
+    id: str | int = 0
+    symbol: str = ""
+    timeframe: str | Timeframe = "M1"
+    instrument: str = "Forex"
+    connection: str = ""
+    timezone: str = "UTC"
+    decimals: int = 4
+    date_from: str | int = 0
+    date_from_str: str = ""
+    date_to: str | int = 0
+    date_to_str: str = ""
+    rows: int = 0
+    total_days: int = 0
+    filename: str = ""
+    file_hash: int = 0
+    bar_time_type: int = 0
+    remove_weekends: bool = True
+    show: bool = True
+    source: str | int = 0
+    source_data_id: int = 0
+    basket_id: int = 0
+    broker_id: int = 0
+    original_symbol: str = ""
+    seconds_records: int = 0
+    u_symbol: str = ""
+    u_symbol_name: str = ""
+    underlying: str = ""
     broker: str = "Default"
     broker_name: str = "Default"
-    timezone: str = "UTC"
     category: str = "Forex"
-    date_from: str = ""
-    date_to: str = ""
     bars: int = 0
     bar_type: str = "start"
     updated_at_utc: str = ""
@@ -111,51 +429,94 @@ class DatasetRecord:
     data_kind: str = "bars"
     quality_score: float = 1.0
 
-    def to_dict(self) -> dict[str, Any]:
-        """Convert dataset record to dictionary representation."""
-        return {
-            "id": self.id,
-            "source": self.source,
-            "symbol": self.symbol,
-            "underlying": self.underlying,
-            "instrument": self.instrument,
-            "timeframe": self.timeframe,
-            "broker": self.broker,
-            "broker_name": self.broker_name,
-            "timezone": self.timezone,
-            "category": self.category,
-            "date_from": self.date_from,
-            "date_to": self.date_to,
-            "bars": self.bars,
-            "bar_type": self.bar_type,
-            "updated_at_utc": self.updated_at_utc,
-            "path": self.path,
-            "data_kind": self.data_kind,
-            "quality_score": self.quality_score,
-        }
+    def __post_init__(self) -> None:
+        """Harmonize aliases, default fields, and normalized types."""
+        if isinstance(self.timeframe, Timeframe):
+            self.timeframe = self.timeframe.value
+        self._sync_paths_and_counts()
+        self._sync_dates()
+        self._sync_identifiers()
 
-    def to_data_info(self) -> DataInfo:
-        """Convert to Tier 2 DataInfo domain object."""
-        from app.services.data.catalog import DataInfo
+    def _sync_paths_and_counts(self) -> None:
+        """Synchronize file paths and row counts."""
+        if not self.path and self.filename:
+            self.path = self.filename
+        elif not self.filename and self.path:
+            self.filename = self.path
+        if not self.bars and self.rows:
+            self.bars = self.rows
+        elif not self.rows and self.bars:
+            self.rows = self.bars
 
-        return DataInfo(
+    def _sync_dates(self) -> None:
+        """Synchronize start and end dates."""
+        if not self.date_from_str and isinstance(self.date_from, str):
+            self.date_from_str = self.date_from
+        elif not self.date_from and self.date_from_str:
+            self.date_from = self.date_from_str
+        if not self.date_to_str and isinstance(self.date_to, str):
+            self.date_to_str = self.date_to
+        elif not self.date_to and self.date_to_str:
+            self.date_to = self.date_to_str
+
+    def _sync_identifiers(self) -> None:
+        """Synchronize source, broker, and underlying symbol identifiers."""
+        if not self.connection and isinstance(self.source, str) and self.source:
+            self.connection = self.source
+        elif (self.source == 0 or not self.source) and self.connection:
+            self.source = self.connection
+        if not self.underlying and self.symbol:
+            self.underlying = self.symbol
+        if not self.broker_name and self.broker:
+            self.broker_name = self.broker
+        elif not self.broker and self.broker_name:
+            self.broker = self.broker_name
+
+    def clone(self) -> DataInfo:
+        """Clone this DataInfo record."""
+        return replace(self)
+
+    def to_chart_def(self) -> ChartDef:
+        """Convert catalog metadata record into an operational ChartDef."""
+        h_from = self.date_from if isinstance(self.date_from, int) else 0
+        h_to = self.date_to if isinstance(self.date_to, int) else 0
+        conn_name = str(self.connection or self.source or "")
+        return ChartDef(
             symbol=self.symbol,
-            timeframe=self.timeframe,
-            date_from_str=self.date_from,
-            date_to_str=self.date_to,
-            rows=self.bars,
-            connection=self.source,
-            timezone=self.timezone,
+            timeframe=str(self.timeframe),
             instrument=self.instrument,
-            filename=self.path,
+            connection_name=conn_name,
+            history_from=h_from,
+            history_to=h_to,
+            bar_time_type=self.bar_time_type,
         )
 
+    def to_data_info(self) -> DataInfo:
+        """Self-identity adapter for backwards-compatible call sites."""
+        return self
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize DataInfo to a dictionary."""
+        return asdict(self)
+
     @classmethod
-    def from_row(cls, row: Mapping[str, Any]) -> DatasetRecord:
-        """Construct DatasetRecord from database row or mapping."""
+    def from_dict(cls, data: dict[str, Any]) -> DataInfo:
+        """Construct DataInfo from a dictionary."""
+        valid_keys = {f.name for f in fields(cls)}
+        filtered = {k: v for k, v in data.items() if k in valid_keys}
+        return cls(**filtered)
+
+    @classmethod
+    def from_row(cls, row: Mapping[str, Any]) -> DataInfo:
+        """Construct DataInfo from database row or mapping."""
+        d_from = str(row.get("date_from", ""))
+        d_to = str(row.get("date_to", ""))
+        bar_count = int(row.get("bars", 0))
+        f_path = str(row.get("path", ""))
+        src = str(row.get("source", "file"))
         return cls(
             id=str(row.get("id", "")),
-            source=str(row.get("source", "file")),
+            source=src,
             symbol=str(row.get("symbol", "")),
             underlying=str(row.get("underlying", "")),
             instrument=str(row.get("instrument", "")),
@@ -164,14 +525,19 @@ class DatasetRecord:
             broker_name=str(row.get("broker_name", "Default")),
             timezone=str(row.get("timezone", "UTC")),
             category=str(row.get("category", "Forex")),
-            date_from=str(row.get("date_from", "")),
-            date_to=str(row.get("date_to", "")),
-            bars=int(row.get("bars", 0)),
+            date_from=d_from,
+            date_to=d_to,
+            date_from_str=d_from,
+            date_to_str=d_to,
+            bars=bar_count,
+            rows=bar_count,
             bar_type=str(row.get("bar_type", "start")),
             updated_at_utc=str(row.get("updated_at", row.get("updated_at_utc", ""))),
-            path=str(row.get("path", "")),
+            path=f_path,
+            filename=f_path,
             data_kind=str(row.get("data_kind", "bars")),
             quality_score=float(row.get("quality_score", 1.0)),
+            connection=src,
         )
 
 
@@ -357,7 +723,7 @@ def _format_standard_csv(df: pd.DataFrame, decimals: int) -> str:
 
 def _export_single_dataset(
     *,
-    rec: DatasetRecord | None,
+    rec: DataInfo | None,
     tid: str,
     df: pd.DataFrame,
     export_format: str,
@@ -392,7 +758,7 @@ def _export_single_dataset(
         filename = f"{symbol}_{tf}.csv"
 
     return ExportArtifactResult(
-        target_id=rec.id if rec else tid,
+        target_id=str(rec.id) if rec else tid,
         symbol=symbol,
         format=export_format,
         filename=filename,
@@ -458,7 +824,7 @@ class DataManagerDataService:
         self,
         source: str | None = None,
         symbol: str | None = None,
-    ) -> list[DatasetRecord]:
+    ) -> list[DataInfo]:
         """List dataset catalog records matching optional filters."""
         where: dict[str, Any] = {}
         if source:
@@ -473,9 +839,9 @@ class DataManagerDataService:
                 where=where or None,
                 order_by="symbol ASC",
             )
-        return [DatasetRecord.from_row(r) for r in rows]
+        return [DataInfo.from_row(r) for r in rows]
 
-    def get_dataset(self, dataset_id: str) -> DatasetRecord | None:
+    def get_dataset(self, dataset_id: str) -> DataInfo | None:
         """Retrieve a dataset catalog record by its unique ID."""
         clean = dataset_id.strip()
         with resolve_connection(self.db_path) as conn:
@@ -487,13 +853,13 @@ class DataManagerDataService:
             )
         if not rows:
             return None
-        return DatasetRecord.from_row(rows[0])
+        return DataInfo.from_row(rows[0])
 
     def upsert_dataset(
         self,
         payload: Mapping[str, Any],
         bars_df: pd.DataFrame | None = None,
-    ) -> DatasetRecord:
+    ) -> DataInfo:
         """Create or update a dataset catalog record."""
         clean_id = str(payload.get("id", "")).strip()
         symbol = str(payload.get("symbol", clean_id.split(":")[-1])).strip().upper()
@@ -543,7 +909,7 @@ class DataManagerDataService:
             else:
                 insert_row(conn, "datamgr_datasets", row_data)
 
-        rec = DatasetRecord.from_row(row_data)
+        rec = DataInfo.from_row(row_data)
         logger.info(
             "%s: Upserted dataset id=%s symbol=%s bars=%d",
             CATALOG_CRUD_FR,
@@ -559,13 +925,11 @@ class DataManagerDataService:
         )
 
         if bars_df is not None and not bars_df.empty:
-            return self.write_bars_dataframe(rec.id, bars_df)
+            return self.write_bars_dataframe(str(rec.id), bars_df)
 
         return rec
 
-    def update_dataset(
-        self, dataset_id: str, updates: Mapping[str, Any]
-    ) -> DatasetRecord:
+    def update_dataset(self, dataset_id: str, updates: Mapping[str, Any]) -> DataInfo:
         """Update fields of an existing dataset record."""
         existing = self.get_dataset(dataset_id)
         if existing is None:
@@ -575,7 +939,7 @@ class DataManagerDataService:
         data.update(updates)
         return self.upsert_dataset(data)
 
-    def write_bars_dataframe(self, dataset_id: str, df: pd.DataFrame) -> DatasetRecord:
+    def write_bars_dataframe(self, dataset_id: str, df: pd.DataFrame) -> DataInfo:
         """Persist sorted OHLCV bars or ticks DataFrame to Parquet."""
         rec = self.get_dataset(dataset_id)
         if rec is None:
@@ -657,7 +1021,7 @@ class DataManagerDataService:
         )
         return pd.DataFrame()
 
-    def import_dataset(self, payload: Mapping[str, Any]) -> DatasetRecord:
+    def import_dataset(self, payload: Mapping[str, Any]) -> DataInfo:
         """Import historical dataset from CSV text or synthetic generation."""
         symbol = str(payload.get("symbol", "EURUSD")).strip().upper()
         source = str(payload.get("source", "file")).strip()
@@ -1090,7 +1454,7 @@ class DataManagerDataService:
         artifacts: list[ExportArtifactResult] = []
         for tid in target_ids:
             rec = self.get_dataset(tid)
-            df = self.read_bars_dataframe(rec.id if rec else tid)
+            df = self.read_bars_dataframe(str(rec.id) if rec else tid)
             artifact = _export_single_dataset(
                 rec=rec,
                 tid=tid,
@@ -1129,7 +1493,12 @@ class DataManagerDataService:
 
 
 def main() -> None:
-    """Execute real-usage demonstration of DataManagerDataService."""
+    """Execute real-usage demonstration of DataManagerDataService and models."""
+    chart = ChartDef(symbol="EURUSD", timeframe="M1")
+    info = DataInfo(symbol="EURUSD", timeframe="M1", decimals=5)
+    print(f"ChartDef created: symbol={chart.symbol}, timeframe={chart.timeframe}")
+    print(f"DataInfo created: symbol={info.symbol}, rows={info.rows}")
+
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
         temp_path = Path(temp_dir)
         db_file = temp_path / "test_data.db"
@@ -1159,7 +1528,9 @@ def main() -> None:
         for b in chart_bars:
             print(f" - {b['time']}: O={b['open']} C={b['close']}")
 
-        export_res = service.export_datasets({"dataset_ids": [rec.id], "format": "MT4"})
+        export_res = service.export_datasets(
+            {"dataset_ids": [str(rec.id)], "format": "MT4"}
+        )
         print(f"Exported result: count={export_res['exported_count']}")
 
 

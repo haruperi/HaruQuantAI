@@ -45,8 +45,9 @@ from app.workspace.data_manager.custom_data import (
 )
 from app.workspace.data_manager.data import (
     ChartBarSlice,
+    ChartDef,
+    DataInfo,
     DataManagerDataService,
-    DatasetRecord,
     ExportArtifactResult,
 )
 from app.workspace.data_manager.help import (
@@ -94,8 +95,10 @@ __all__ = [
     "BrokerProfileRecord",
     "BrokerProfilesService",
     "ChartBarSlice",
+    "ChartDef",
     "CloneTimezoneConfig",
     "CustomDataService",
+    "DataInfo",
     "DataManagerDataService",
     "DataManagerHelpService",
     "DataManagerHomeService",
@@ -103,7 +106,6 @@ __all__ = [
     "DataManagerLogService",
     "DataManagerWorkspace",
     "DataQualityInspector",
-    "DatasetRecord",
     "DocLinkItem",
     "DownloadJobResult",
     "ExportArtifactResult",

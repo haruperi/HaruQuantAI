@@ -58,7 +58,7 @@ import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.host.persistence.create import create_schema
 from app.host.persistence.read import resolve_connection
-from app.workspace.data_manager.data import DataManagerDataService, DatasetRecord
+from app.workspace.data_manager.data import DataInfo, DataManagerDataService
 from app.workspace.data_manager.log import DataManagerLogService
 from app.workspace.data_manager.sessions import TradingSession
 
@@ -231,7 +231,7 @@ class SeriesTransformer:
         )
         return resampled_df
 
-    def resample_dataset(self, config: ResampleConfig) -> DatasetRecord:
+    def resample_dataset(self, config: ResampleConfig) -> DataInfo:
         """Resample a registered historical dataset and persist new dataset record."""
         source_rec = self.data_service.get_dataset(config.dataset_id)
         if source_rec is None:
@@ -251,7 +251,7 @@ class SeriesTransformer:
         symbol = (config.new_symbol or source_rec.symbol).strip().upper()
         target_id = f"{source_rec.source}:{symbol}_{target_tf}"
 
-        df = self.data_service.read_bars_dataframe(source_rec.id)
+        df = self.data_service.read_bars_dataframe(str(source_rec.id))
         resampled_df = self.resample_dataframe(df, target_tf)
 
         new_rec = self.data_service.upsert_dataset(
@@ -303,14 +303,14 @@ class SeriesTransformer:
         )
         return new_rec
 
-    def clone_timezone(self, config: CloneTimezoneConfig) -> DatasetRecord:
+    def clone_timezone(self, config: CloneTimezoneConfig) -> DataInfo:
         """Clone dataset series with hour offset and optional weekend bar stripping."""
         source_rec = self.data_service.get_dataset(config.dataset_id)
         if source_rec is None:
             raise KeyError(f"Source dataset '{config.dataset_id}' not found.")
 
         target_id = f"{source_rec.id}{config.postfix}"
-        df = self.data_service.read_bars_dataframe(source_rec.id)
+        df = self.data_service.read_bars_dataframe(str(source_rec.id))
         if df.empty:
             raise ValueError(f"Source dataset '{source_rec.id}' contains no bars.")
 
@@ -456,13 +456,13 @@ def main() -> None:
         print(f"Loaded source dataset: {source_rec.id} ({source_rec.bars} bars)")
 
         resampled = transformer.resample_dataset(
-            ResampleConfig(dataset_id=source_rec.id, target_timeframe="M5")
+            ResampleConfig(dataset_id=str(source_rec.id), target_timeframe="M5")
         )
         print(f"Resampled dataset: {resampled.id} ({resampled.bars} bars)")
 
         cloned = transformer.clone_timezone(
             CloneTimezoneConfig(
-                dataset_id=source_rec.id,
+                dataset_id=str(source_rec.id),
                 shift_hours=2,
                 remove_weekends=True,
                 postfix="_EET",

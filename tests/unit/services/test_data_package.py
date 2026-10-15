@@ -2,9 +2,10 @@
 
 Description:
     Verifies that app.services.data satisfies the modular package architecture:
-    - Layer 1: series.py, history.py, simulation.py, generation.py, catalog.py
+    - Layer 1: series.py, history.py, simulation.py, generation.py
     - Layer 2: __init__.py unified public export surface
     - Zero circular imports between submodules
+    - Complete removal of app.services.data.catalog (merged into data_manager.data)
     - Complete removal of app.services.data.primitives (moved to data_manager.contracts)
     - Complete removal of app.services.libs.data (no backward compatibility)
 """
@@ -14,7 +15,6 @@ from __future__ import annotations
 import importlib
 
 import app.services.data as data_pkg
-import app.services.data.catalog as data_catalog
 import app.services.data.generation as data_gen
 import app.services.data.history as data_hist
 import app.services.data.series as data_ser
@@ -29,6 +29,11 @@ class TestDataPackageExports:
         """Verify primitives.py is deleted without backward compatibility shim."""
         with pytest.raises(ModuleNotFoundError):
             importlib.import_module("app.services.data.primitives")
+
+    def test_catalog_module_removed(self) -> None:
+        """Verify catalog.py is deleted without backward compatibility shim."""
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("app.services.data.catalog")
 
     def test_series_exports_identity(self) -> None:
         """Verify series symbols match between package and submodule."""
@@ -80,11 +85,6 @@ class TestDataPackageExports:
         assert data_pkg.generate_ticks is data_gen.generate_ticks
         assert data_pkg.generate_ticks_to_parquet is data_gen.generate_ticks_to_parquet
 
-    def test_catalog_exports_identity(self) -> None:
-        """Verify catalog symbols match between package and submodule."""
-        assert data_pkg.ChartDef is data_catalog.ChartDef
-        assert data_pkg.DataInfo is data_catalog.DataInfo
-
     def test_all_exports_present_in_package(self) -> None:
         """Ensure every name in __all__ can be resolved from the package."""
         for name in data_pkg.__all__:
@@ -121,7 +121,6 @@ class TestLayeringAndAntiCircularRules:
             data_hist,
             data_sim,
             data_gen,
-            data_catalog,
         ]
         for submod in submodules:
             source = inspect.getsource(submod)

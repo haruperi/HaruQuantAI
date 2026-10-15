@@ -553,9 +553,11 @@ class DataQualityInspector:
 
         row = rows[0]
         raw_counts = row.get("anomaly_counts_json", "{}")
-        counts = json.loads(raw_counts) if isinstance(raw_counts, str) else {}
+        counts: dict[str, int] = (
+            json.loads(raw_counts) if isinstance(raw_counts, str) else {}
+        )
         raw_anomalies = row.get("anomalies_json", "[]")
-        anomalies_list = (
+        anomalies_list: list[dict[str, Any]] = (
             json.loads(raw_anomalies) if isinstance(raw_anomalies, str) else []
         )
 
@@ -643,14 +645,14 @@ def main() -> None:
         )
 
         inspector = DataQualityInspector(db_path=db_file, data_service=data_svc)
-        report = inspector.inspect_dataset(rec.id)
+        report = inspector.inspect_dataset(str(rec.id))
         print(
             f"Quality report: score={report.quality_score:.4f}, "
             f"records={report.total_records}"
         )
         print(f"Anomaly counts: {report.anomaly_counts}")
 
-        summary = inspector.get_quality_summary(rec.id)
+        summary = inspector.get_quality_summary(str(rec.id))
         print(f"Quality summary: {summary}")
 
 

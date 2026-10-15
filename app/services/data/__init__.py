@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-from .catalog import (
-    ChartDef,
-    DataInfo,
-)
 from .generation import (
     PHASE_CLOSE_CODE,
     PHASE_HIGH_CODE,
@@ -69,10 +65,8 @@ __all__ = [
     "TICK_MODEL_OHLC_M1",
     "TICK_MODEL_REAL",
     "TICK_MODEL_TRADING_BAR",
-    "ChartDef",
     "DataBackend",
     "DataBrokerBackend",
-    "DataInfo",
     "DataSeries",
     "DataSeriesTypes",
     "DefaultTickSimulator",
