@@ -60,7 +60,7 @@ from app.services.data import (
     get_ticks,
     ticks_to_dataframe,
 )
-from app.services.libs.trading import (
+from app.services.trading import (
     MarginMode,
     OrderFilling,
     OrderType,

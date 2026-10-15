@@ -51,7 +51,7 @@ import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
 from app.services.data import BridgeError, DataBrokerBackend
-from app.services.libs.trading import SymbolSnapshot
+from app.services.trading import SymbolSnapshot
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 

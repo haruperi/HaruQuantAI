@@ -5,7 +5,7 @@ Description:
     Defines low-level broker execution contracts, symbol specifications,
     and broker backend abstraction (BrokerBackend). All public trading
     snapshots, execution requests, and trading enums are owned by
-    app.services.libs.trading.
+    app.services.trading.
 
 Purpose:
     FEAT-BROKER-CONTRACTS: Low-level broker backend models and records.
@@ -39,7 +39,7 @@ from datetime import UTC, datetime
 from enum import IntEnum
 from typing import Any
 
-from app.services.libs.trading import (
+from app.services.trading import (
     AccountSnapshot,
     OrderFilling,
     OrderTime,

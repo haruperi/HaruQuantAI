@@ -47,7 +47,7 @@ from app.services.brokers.contracts import DealEntry as DealEntryEnum
 from app.services.brokers.contracts import DealType as DealTypeEnum
 from app.services.brokers.contracts import OrderState as OrderStateEnum
 from app.services.data import BridgeError
-from app.services.libs.trading import (
+from app.services.trading import (
     ORDER_FILLING_DESCRIPTIONS,
     ORDER_TIME_DESCRIPTIONS,
     ORDER_TYPE_DESCRIPTIONS,
@@ -71,9 +71,9 @@ from app.services.libs.trading import (
     TradeResult,
     TradeRetcode,
 )
-from app.services.libs.trading import OrderFilling as OrderFillingEnum
-from app.services.libs.trading import OrderTime as OrderTimeEnum
-from app.services.libs.trading import OrderType as OrderTypeEnum
+from app.services.trading import OrderFilling as OrderFillingEnum
+from app.services.trading import OrderTime as OrderTimeEnum
+from app.services.trading import OrderType as OrderTypeEnum
 
 logger = get_logger(__name__)
 

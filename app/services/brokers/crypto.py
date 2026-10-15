@@ -49,7 +49,7 @@ from app.services.data import (
     DataBrokerBackend,
     Timeframe,
 )
-from app.services.libs.trading import SymbolSnapshot
+from app.services.trading import SymbolSnapshot
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 

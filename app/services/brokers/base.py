@@ -47,7 +47,7 @@ from types import TracebackType
 from typing import Any, Self
 
 from app.host.logging import get_logger
-from app.services.libs.trading import (
+from app.services.trading import (
     BridgeEvent,
     Receipt,
     ReceiptStatus,

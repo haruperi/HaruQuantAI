@@ -84,7 +84,7 @@ except ImportError:
 
 
 from app.services.data import BridgeError
-from app.services.libs.trading import (
+from app.services.trading import (
     BridgeEvent,
     PropertyValue,
     Receipt,

@@ -5,7 +5,7 @@ Description:
     property aliases, proxy dispatch, and error handling for all trading contracts,
     snapshots, enums, proxy classes (Trade, AccountInfo, SymbolInfo, TerminalInfo,
     PositionInfo, OrderInfo, HistoryOrderInfo, DealInfo), and the master Trading facade
-    in app.services.libs.trading.
+    in app.services.trading.
 
 Purpose:
     FEAT-TRADING-CONTRACTS-TESTS: Test suite for consolidated trading library.
@@ -33,8 +33,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
-from app.services.libs import TradingBackend as LibsTradingBackend
-from app.services.libs.trading import (
+from app.services.trading import (
     BOOK_TYPE_DESCRIPTIONS,
     ORDER_FILLING_DESCRIPTIONS,
     ORDER_TIME_DESCRIPTIONS,
@@ -241,7 +240,6 @@ def test_trading_enums_values() -> None:
 
 def test_trading_backend_protocol() -> None:
     """Verify TradingBackend protocol exports and runtime conformance."""
-    assert TradingBackend is LibsTradingBackend
     backend = MockTradingBackend()
     assert isinstance(backend, TradingBackend)
 

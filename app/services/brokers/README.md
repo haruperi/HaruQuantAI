@@ -43,7 +43,7 @@ MT5 does not pretend to implement that model or locally recalculate broker data.
 ```python
 import os
 from app.services.brokers.metatrader import MT5Backend
-from app.services.libs.trading import Trading
+from app.services.trading import Trading
 
 token = os.environ["MT5_BRIDGE_TOKEN"]
 backend = MT5Backend(auth_token=token)
@@ -95,7 +95,7 @@ and map supported operations into this vocabulary, rejecting unavailable feature
 
 ```python
 from app.services.brokers.ctrader import CTraderBackend
-from app.services.libs.trading import Trading
+from app.services.trading import Trading
 
 backend = CTraderBackend(
     client_id="...",

@@ -34,7 +34,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.ctrader import CTraderBackend
-    from app.services.libs.trading import Trading
+    from app.services.trading import Trading
 
     backend = CTraderBackend()
     trading = Trading(backend)
@@ -72,7 +72,7 @@ from app.host.logging import get_logger
 from app.host.settings import settings
 from app.services.brokers.contracts import Tick
 from app.services.data import BridgeError
-from app.services.libs.trading import (
+from app.services.trading import (
     AccountSnapshot,
     AccountTradeMode,
     BookInfo,
