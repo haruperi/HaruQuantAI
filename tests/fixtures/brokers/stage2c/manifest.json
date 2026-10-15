@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "fixtures": {
+    "bi5/eurusd_m1.bi5": {
+      "sha256": "414260b2c1813e60d951afac43e25ebe085e605e8822655a4cc05ecaeee37caa",
+      "size_bytes": 54
+    },
+    "bi5/eurusd_ticks.bi5": {
+      "sha256": "409108d67a96ebe44c0059108083523863f5e0ad7f3044e0b030ef2c6bcb8ae9",
+      "size_bytes": 70
+    },
+    "csv/sample_bars_metatrader.csv": {
+      "sha256": "2a10b05cb87adfb96717e0345072d29206315f188b3afdbadd52763bf9e7bc62",
+      "size_bytes": 138
+    },
+    "csv/sample_bars_standard.csv": {
+      "sha256": "98a605d73f94b816f5e6d9d9d45a43f754489582842480d612d1dd9db5a52c18",
+      "size_bytes": 144
+    },
+    "csv/sample_ticks.csv": {
+      "sha256": "ab47127548516e2df19752203af92ff611aacc960b1e3f780c76e469f86d4e59",
+      "size_bytes": 112
+    },
+    "fxt/eurusd_m1_v405.fxt": {
+      "sha256": "c420e0894abfb770dddaa8cbf37b18c95623799619750763034b3679a996bdcd",
+      "size_bytes": 836
+    },
+    "hst/eurusd_m1_v400.hst": {
+      "sha256": "cf03682749bc85865f221fc743abe9e7508c65c1d48d83796f8ec39d39b70059",
+      "size_bytes": 236
+    },
+    "hst/eurusd_m1_v401.hst": {
+      "sha256": "db9fc7bc9fba988ac62235b008aebcd5b4ae73999c54a7344e4fb8b5db43f803",
+      "size_bytes": 268
+    },
+    "parquet/sample_bars.parquet": {
+      "sha256": "f1d7293db8194ff2f472b49cd331162af855daf2f61d4cb00fc3e5e249b8d09d",
+      "size_bytes": 5029
+    },
+    "sq_dat/aapl_d1.dat": {
+      "sha256": "9c8c856dfe11be46c73162b295bb9f27eca359884198e89dc1332c2a1fd940ea",
+      "size_bytes": 70
+    }
+  }
+}

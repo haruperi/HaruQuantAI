@@ -38,12 +38,21 @@ CLI Usage:
 
 from __future__ import annotations
 
-import math
 from typing import Any, override
 
 import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
+from app.services.brokers._http import execute_bounded_get
+from app.services.brokers.capabilities import (
+    CancellationToken,
+    HistoryPage,
+    HistoryRequest,
+    ProviderCapabilities,
+    ProviderHealth,
+    ProviderUnsupportedError,
+    ProviderValidationError,
+)
 from app.services.data import (
     BridgeError,
     DataBrokerBackend,
@@ -110,14 +119,27 @@ DEFAULT_CRYPTO_SYMBOLS = [
     "XRPUSDT",
 ]
 
+PLUGIN_MANIFEST = {
+    "id": "crypto",
+    "name": "Crypto",
+    "version": "1.0.0",
+    "slot": "data.provider",
+    "entry_point": "crypto:create_adapter",
+    "description": "Cryptocurrency exchanges provider (Binance, Bitfinex, Coinbase, Poloniex)",
+    "capabilities": ["data.fetch"],
+}
+
 __all__ = [
     "BINANCE_FUTURES_COIN_BASE_URL",
     "BINANCE_FUTURES_USDT_BASE_URL",
     "BINANCE_SPOT_BASE_URL",
     "BinanceBroker",
+    "CryptoBroker",
+    "PLUGIN_MANIFEST",
     "_calc_digits",
     "_map_timeframe",
     "create_adapter",
+    "main",
 ]
 
 
@@ -146,9 +168,11 @@ class BinanceBroker(DataBrokerBackend):
         default_market: str = "spot",
         venue: str | None = None,
         api_key: str | None = None,
+        exchange: str = "binance",
     ) -> None:
         """Initialize Binance broker."""
         super().__init__(name=name)
+        self.exchange = exchange.lower().strip()
         self.venue = (venue or default_market).lower().strip()
         if self.venue in ("usdt-m", "fapi", "futures_usdt"):
             self.base_url = FUTURES_USDT_BASE_URL
@@ -175,6 +199,69 @@ class BinanceBroker(DataBrokerBackend):
         self.session.headers.update({"User-Agent": USER_AGENT})
 
         self._symbols_cache: dict[str, SymbolSnapshot] = {}
+
+        self.capabilities = ProviderCapabilities(
+            provider_id="crypto",
+            display_name="Crypto",
+            category="Crypto",
+            supported_timeframes=(
+                "M1",
+                "M5",
+                "M15",
+                "M30",
+                "H1",
+                "H2",
+                "H4",
+                "D1",
+                "W1",
+            ),
+            supported_modes=("bars", "ticks"),
+            requires_auth=False,
+            rate_limit_rps=10.0,
+            default_timeout_seconds=30.0,
+            supports_pagination=True,
+            has_local_archive=False,
+            description="Cryptocurrency exchange provider (Binance, Bitfinex, Coinbase, Poloniex)",
+        )
+        self._exchange_adapters: dict[str, Any] = {}
+
+    @override
+    def close_sync(self) -> None:
+        """Close session resources synchronously."""
+        self._is_connected = False
+        if hasattr(self, "session"):
+            self.session.close()
+        for adapter in getattr(self, "_exchange_adapters", {}).values():
+            if hasattr(adapter, "session") and adapter.session is not self.session:
+                adapter.session.close()
+
+    @override
+    async def close(self) -> None:
+        """Close session resources asynchronously."""
+        self.close_sync()
+
+    def check_health(self) -> Any:
+        """Inspect exchange connectivity."""
+        try:
+            r = self.session.get(f"{self.base_url}{self.api_prefix}/ping", timeout=5.0)
+            conn = r.status_code == 200
+            return ProviderHealth(
+                provider_id="crypto",
+                status="available" if conn else "failed",
+                connected=conn,
+                message=f"Exchange '{self.exchange}' ping OK"
+                if conn
+                else f"Ping status {r.status_code}",
+                capabilities=self.capabilities,
+            )
+        except Exception as exc:
+            return ProviderHealth(
+                provider_id="crypto",
+                status="failed",
+                connected=False,
+                message=f"Ping error: {exc}",
+                capabilities=self.capabilities,
+            )
 
     def _normalize_symbol(self, symbol: str) -> str:
         """Normalize symbol string."""
@@ -253,8 +340,42 @@ class BinanceBroker(DataBrokerBackend):
         count: int,
         limit: int,
     ) -> list[dict[str, Any]]:
-        """Retrieve real historical candlestick bars from Binance REST klines API."""
+        """Retrieve real historical candlestick bars from configured crypto exchange."""
         del mode
+        if self.exchange == "bitfinex":
+            from app.services.brokers.exchanges.bitfinex import BitfinexExchangeAdapter
+
+            return BitfinexExchangeAdapter(session=self.session).fetch_bars(
+                symbol=symbol,
+                timeframe=timeframe,
+                start=start,
+                end=end,
+                count=count,
+                limit=limit,
+            )
+        if self.exchange == "coinbase":
+            from app.services.brokers.exchanges.coinbase import CoinbaseExchangeAdapter
+
+            return CoinbaseExchangeAdapter(session=self.session).fetch_bars(
+                symbol=symbol,
+                timeframe=timeframe,
+                start=start,
+                end=end,
+                count=count,
+                limit=limit,
+            )
+        if self.exchange == "poloniex":
+            from app.services.brokers.exchanges.poloniex import PoloniexExchangeAdapter
+
+            return PoloniexExchangeAdapter(session=self.session).fetch_bars(
+                symbol=symbol,
+                timeframe=timeframe,
+                start=start,
+                end=end,
+                count=count,
+                limit=limit,
+            )
+
         sym_clean = self._normalize_symbol(symbol)
         interval = self._map_timeframe(timeframe)
         url = f"{self.base_url}{self.api_prefix}/klines"
@@ -275,7 +396,12 @@ class BinanceBroker(DataBrokerBackend):
             params["startTime"] = start * 1000
 
         try:
-            r = self.session.get(url, params=params, timeout=(5.0, 20.0))
+            r = execute_bounded_get(
+                self.session,
+                url,
+                params=params,
+                provider="crypto:binance",
+            )
             if r.status_code != 200:
                 raise BridgeError(
                     f"Binance klines request failed with status {r.status_code}: {r.text}",
@@ -295,12 +421,12 @@ class BinanceBroker(DataBrokerBackend):
                     {
                         "time": int(open_ts_ms / 1000),
                         "open": o,
-                        "high": max(h, o, c),
-                        "low": min(l, o, c),
+                        "high": h,
+                        "low": l,
                         "close": c,
                         "tick_volume": count_trades if count_trades > 0 else int(vol),
                         "spread": 0,
-                        "real_volume": int(vol),
+                        "real_volume": vol,
                     }
                 )
 
@@ -334,37 +460,46 @@ class BinanceBroker(DataBrokerBackend):
         count: int = 0,
         limit: int = 1000,
     ) -> list[dict[str, Any]]:
-        """Retrieve real trades from Binance REST API."""
-        del mode, start_ms, end_ms
+        """Retrieve historical aggregate trades from Binance REST API."""
+        del mode
         sym_clean = self._normalize_symbol(symbol)
         target_count = count if count > 0 else limit
         req_limit = min(target_count or 100, 1000)
-        url = f"{self.base_url}{self.api_prefix}/trades"
+        url = f"{self.base_url}{self.api_prefix}/aggTrades"
         params: dict[str, Any] = {
             "symbol": sym_clean,
             "limit": req_limit,
         }
+        if start_ms > 0:
+            params["startTime"] = start_ms
+        if end_ms > 0:
+            params["endTime"] = end_ms
 
         try:
-            r = self.session.get(url, params=params, timeout=(5.0, 15.0))
+            r = execute_bounded_get(
+                self.session,
+                url,
+                params=params,
+                provider="crypto:binance",
+            )
             if r.status_code != 200:
                 raise BridgeError(
-                    f"Binance trades request failed with status {r.status_code}: {r.text}",
+                    f"Binance aggTrades request failed with status {r.status_code}: {r.text}",
                     code="REMOTE_ERROR",
                 )
             raw_trades: list[dict[str, Any]] = r.json()
             rows: list[dict[str, Any]] = []
             for t in raw_trades:
-                p = float(t.get("price") or 0.0)
-                qty = float(t.get("qty") or 0.0)
-                t_ms = int(t.get("time") or 0)
+                p = float(t.get("p") or 0.0)
+                qty = float(t.get("q") or 0.0)
+                t_ms = int(t.get("T") or 0)
                 rows.append(
                     {
                         "time_msc": t_ms,
                         "bid": p,
                         "ask": p,
                         "last": p,
-                        "volume": math.ceil(qty),
+                        "volume": qty,
                         "flags": 0,
                         "volume_real": qty,
                     }
@@ -381,8 +516,160 @@ class BinanceBroker(DataBrokerBackend):
                 code="TRADES_ERROR",
             ) from exc
 
+    def read_history(
+        self,
+        request: HistoryRequest,
+        token: CancellationToken | None = None,
+    ) -> HistoryPage:
+        """Fetch historical records adhering to Stage 2C contract."""
+        request.validate()
+        exch = (request.exchange or self.exchange or "binance").lower().strip()
+        if exch not in ("binance", "bitfinex", "coinbase", "poloniex"):
+            raise ProviderValidationError(
+                f"Unknown crypto exchange '{exch}'. Supported: binance, bitfinex, coinbase, poloniex",
+                provider="crypto",
+            )
+
+        if exch in ("bitfinex", "coinbase", "poloniex"):
+            if request.kind == "ticks" or request.timeframe.upper() == "TICK":
+                raise ProviderUnsupportedError(
+                    f"{exch.capitalize()} exchange does not support tick history; only bars are supported",
+                    provider="crypto",
+                )
+
+        start_sec = request.start_epoch() or 0
+        end_sec = request.end_epoch() or 0
+
+        if exch == "bitfinex":
+            if "bitfinex" not in self._exchange_adapters:
+                from app.services.brokers.exchanges.bitfinex import (
+                    BitfinexExchangeAdapter,
+                )
+
+                self._exchange_adapters["bitfinex"] = BitfinexExchangeAdapter(
+                    session=self.session
+                )
+            bf_adapter = self._exchange_adapters["bitfinex"]
+            rows = bf_adapter.fetch_bars(
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                count=request.count,
+                start=start_sec,
+                end=end_sec,
+                token=token,
+            )
+            return HistoryPage(
+                provider="crypto",
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                kind=request.kind,
+                rows=rows,
+                is_complete=True,
+                provenance={"exchange": "bitfinex"},
+            )
+        if exch == "coinbase":
+            if "coinbase" not in self._exchange_adapters:
+                from app.services.brokers.exchanges.coinbase import (
+                    CoinbaseExchangeAdapter,
+                )
+
+                self._exchange_adapters["coinbase"] = CoinbaseExchangeAdapter(
+                    session=self.session
+                )
+            cb_adapter = self._exchange_adapters["coinbase"]
+            rows = cb_adapter.fetch_bars(
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                count=request.count,
+                start=start_sec,
+                end=end_sec,
+                token=token,
+            )
+            return HistoryPage(
+                provider="crypto",
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                kind=request.kind,
+                rows=rows,
+                is_complete=True,
+                provenance={"exchange": "coinbase"},
+            )
+        if exch == "poloniex":
+            if "poloniex" not in self._exchange_adapters:
+                from app.services.brokers.exchanges.poloniex import (
+                    PoloniexExchangeAdapter,
+                )
+
+                self._exchange_adapters["poloniex"] = PoloniexExchangeAdapter(
+                    session=self.session
+                )
+            px_adapter = self._exchange_adapters["poloniex"]
+            rows = px_adapter.fetch_bars(
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                count=request.count,
+                start=start_sec,
+                end=end_sec,
+                token=token,
+            )
+            return HistoryPage(
+                provider="crypto",
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                kind=request.kind,
+                rows=rows,
+                is_complete=True,
+                provenance={"exchange": "poloniex"},
+            )
+
+        # Default: Binance
+        if token is not None:
+            token.check_cancelled()
+        if request.kind == "ticks" or request.timeframe.upper() == "TICK":
+            rows = self.fetch_ticks(
+                symbol=request.symbol,
+                mode=request.mode,
+                start_ms=(request.start_epoch() or 0) * 1000,
+                end_ms=(request.end_epoch() or 0) * 1000,
+                count=request.count,
+                limit=request.limit,
+            )
+        else:
+            rows = self.fetch_bars(
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                mode=request.mode,
+                start=start_sec,
+                end=end_sec,
+                count=request.count,
+                limit=request.limit,
+            )
+        return HistoryPage(
+            provider="crypto",
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            kind=request.kind,
+            rows=rows,
+            is_complete=True,
+            provenance={"exchange": "binance"},
+        )
+
+
+CryptoBroker = BinanceBroker
+
 
 def create_adapter(context: PluginHostContext | None = None) -> BinanceBroker:
     """Factory creating configured BinanceBroker adapter."""
     del context
     return BinanceBroker()
+
+
+def main() -> None:
+    """Demonstrate executable usage of BinanceBroker."""
+    broker = BinanceBroker()
+    health = broker.check_health()
+    logger.info("Binance health: %s (connected=%s)", health.status, health.connected)
+
+
+if __name__ == "__main__":
+    main()

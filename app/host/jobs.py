@@ -394,6 +394,7 @@ class _DeferredSubmission:
     kind: str
     submitted_at_utc: str
     done_event: threading.Event = field(default_factory=threading.Event)
+    executor_kind: str | None = None
 
 
 class JobManager:
@@ -446,6 +447,7 @@ class JobManager:
 
         self._lock = threading.Lock()
         self._pool: ProcessPoolExecutor | ThreadPoolExecutor | None = None
+        self._io_pool: ThreadPoolExecutor | None = None
         self._jobs: dict[str, JobRecord] = {}
         self._contexts: dict[str, JobContext] = {}
         self._futures: dict[str, Future[tuple[int, Any]]] = {}
@@ -505,6 +507,24 @@ class JobManager:
                     },
                 )
             return self._pool
+
+    def ensure_io_pool(self) -> ThreadPoolExecutor:
+        """Lazily create and return the dedicated I/O thread pool executor."""
+        with self._lock:
+            if self._io_pool is None:
+                workers = min(4, self._max_workers)
+                self._io_pool = ThreadPoolExecutor(max_workers=workers)
+                logger.info(
+                    "%s: started I/O ThreadPoolExecutor with %d workers",
+                    POOL_LIFECYCLE_FR,
+                    workers,
+                    extra={
+                        "fr_id": POOL_LIFECYCLE_FR,
+                        "pool_type": "ThreadPoolExecutor",
+                        "max_workers": workers,
+                    },
+                )
+            return self._io_pool
 
     def reconcile_orphan_jobs(self) -> list[str]:
         """Mark orphan jobs left in RUNNING state as INTERRUPTED on system boot.
@@ -610,6 +630,7 @@ class JobManager:
         kind: str = "compute",
         pass_context: bool | None = None,
         on_memory_pressure: str | None = None,
+        executor_kind: str | None = None,
         **kwargs: Any,
     ) -> JobRecord:
         """Submit a task to the multiprocessing worker pool with watchdog gating.
@@ -623,6 +644,7 @@ class JobManager:
             pass_context: Whether to pass JobContext as the first argument to fn.
                 If None, auto-detected from fn's signature.
             on_memory_pressure: Watchdog policy override ('reject' or 'pause').
+            executor_kind: Optional executor selection ('process' or 'thread').
             **kwargs: Keyword arguments forwarded to fn.
 
         Returns:
@@ -750,6 +772,7 @@ class JobManager:
                     kind=kind,
                     submitted_at_utc=submitted_at,
                     done_event=done_evt,
+                    executor_kind=executor_kind,
                 )
             logger.warning(
                 "%s: job %s queued in PAUSED state due to low RAM (%.1f%%)",
@@ -771,6 +794,7 @@ class JobManager:
             kind=kind,
             submitted_at=submitted_at,
             done_evt=done_evt,
+            executor_kind=executor_kind,
         )
 
     def _dispatch_to_pool(
@@ -786,6 +810,7 @@ class JobManager:
         kind: str,
         submitted_at: str,
         done_evt: threading.Event,
+        executor_kind: str | None = None,
     ) -> JobRecord:
         """Dispatch an admitted job to the worker pool executor."""
         started_at = datetime.now(UTC).isoformat()
@@ -823,7 +848,11 @@ class JobManager:
             conn=self._db_path,
         )
 
-        pool = self.ensure_pool()
+        if executor_kind == "thread":
+            pool: ProcessPoolExecutor | ThreadPoolExecutor = self.ensure_io_pool()
+        else:
+            pool = self.ensure_pool()
+
         with self._lock:
             self._jobs[jid] = running_rec
             self._contexts[jid] = ctx
@@ -1134,6 +1163,7 @@ class JobManager:
                 kind=deferred.kind,
                 submitted_at=deferred.submitted_at_utc,
                 done_evt=deferred.done_event,
+                executor_kind=deferred.executor_kind,
             )
             return True
 
@@ -1352,10 +1382,19 @@ class JobManager:
         with self._lock:
             pool = self._pool
             self._pool = None
+            io_pool = self._io_pool
+            self._io_pool = None
         if pool is not None:
             pool.shutdown(wait=wait, cancel_futures=cancel_futures)
             logger.info(
                 "%s: shut down worker pool executor",
+                POOL_LIFECYCLE_FR,
+                extra={"fr_id": POOL_LIFECYCLE_FR},
+            )
+        if io_pool is not None:
+            io_pool.shutdown(wait=wait, cancel_futures=cancel_futures)
+            logger.info(
+                "%s: shut down I/O worker pool executor",
                 POOL_LIFECYCLE_FR,
                 extra={"fr_id": POOL_LIFECYCLE_FR},
             )

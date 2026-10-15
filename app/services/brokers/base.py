@@ -259,9 +259,13 @@ class BaseBrokerBackend:
         del timeout
         self._is_connected = True
 
+    def close_sync(self) -> None:
+        """Close provider connection session synchronously."""
+        self._is_connected = False
+
     async def close(self) -> None:
         """Close provider connection session."""
-        self._is_connected = False
+        self.close_sync()
 
     def arm(self) -> None:
         """Arm the broker for live trade actions."""

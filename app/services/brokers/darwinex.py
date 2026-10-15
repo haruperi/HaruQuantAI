@@ -3,9 +3,10 @@
 Description:
     Implements an unauthenticated market data and symbol metadata broker
     for Darwinex conforming to the `TradingBackend` protocol.
-    Fetches historical candlestick bars and ticks in memory from StrategyQuant CDN,
-    and dynamically resolves instrument specifications from the authoritative
-    catalog CSV (`data/market/darwinex/darwinex.csv`) returning canonical `SymbolSnapshot`.
+    Fetches historical candlestick bars and ticks in memory from StrategyQuant CDN
+    or local archives, and dynamically resolves instrument specifications from the
+    authoritative catalog CSV (`data/market/darwinex/darwinex.csv`) returning canonical
+    `SymbolSnapshot`.
 
 Purpose:
     FEAT-BROKER-DARWINEX: Darwinex Market Data and Symbol Catalog Provider.
@@ -18,11 +19,14 @@ Key Capabilities:
     - FR-BROKER-DARWINEX-SYMBOLS: Authoritative Symbol Catalog Resolution
       Associated: `[DarwinexBroker.symbol_info()]`, `[DarwinexBroker.symbols_get()]`
       Logging: Emits INFO log upon catalog parsing, and WARNING if symbol is not found.
+    - FR-BROKER-DARWINEX-HEALTH: Connectivity and health check reporting.
+      Associated: `[DarwinexBroker.check_health()]`
+      Logging: Emits INFO on successful probe and WARNING on network failures.
 
 Python API Usage:
     ```python
-    from app.services.data import Timeframe, get_historical_bars
     from app.services.brokers.darwinex import DarwinexBroker
+    from app.services.data import Timeframe, get_historical_bars
 
     broker = DarwinexBroker()
     bars = await get_historical_bars(broker, "EURUSD", Timeframe.PERIOD_D1, count=5)
@@ -36,7 +40,6 @@ CLI Usage:
 from __future__ import annotations
 
 import io
-import struct
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -45,10 +48,24 @@ from typing import Any, override
 import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
+from app.services.brokers._file_history import (
+    find_matching_partitions,
+    parse_delimited_bars,
+    read_parquet_bars,
+)
+from app.services.brokers._http import create_http_session, execute_bounded_get
+from app.services.brokers._native_history import decode_darwinex_dat
+from app.services.brokers.capabilities import (
+    CancellationToken,
+    HistoryPage,
+    HistoryRequest,
+    ProviderCapabilities,
+    ProviderError,
+    ProviderHealth,
+    ProviderUnsupportedError,
+)
 from app.services.data import BridgeError, DataBrokerBackend
 from app.services.trading import SymbolSnapshot
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 
 logger = get_logger(__name__)
 
@@ -66,7 +83,17 @@ USER_AGENT = (
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
 
-__all__ = ["DarwinexBroker", "create_adapter"]
+PLUGIN_MANIFEST = {
+    "id": "darwinex",
+    "name": "Darwinex",
+    "version": "1.0.0",
+    "slot": "data.provider",
+    "entry_point": "darwinex:create_adapter",
+    "description": "Darwinex institutional tick and bar market data provider",
+    "capabilities": ["data.fetch"],
+}
+
+__all__ = ["PLUGIN_MANIFEST", "DarwinexBroker", "create_adapter", "main"]
 
 
 class DarwinexBroker(DataBrokerBackend):
@@ -77,76 +104,108 @@ class DarwinexBroker(DataBrokerBackend):
         name: str = "Darwinex",
         catalog_path: str | Path | None = None,
         session: requests.Session | None = None,
+        data_dir: str | Path | None = None,
     ) -> None:
         """Initialize Darwinex broker."""
         super().__init__(name=name)
         self.catalog_path = Path(catalog_path) if catalog_path else DEFAULT_CATALOG_PATH
-
-        if session is not None:
-            self.session = session
-        else:
-            self.session = requests.Session()
-            retries: Any = Retry(
-                total=3,
-                backoff_factor=0.3,
-                status_forcelist=[500, 502, 503, 504],
-                raise_on_status=False,
-            )
-            adapter = HTTPAdapter(max_retries=retries)
-            self.session.mount("https://", adapter)
-            self.session.mount("http://", adapter)
-            self.session.headers.update({"User-Agent": USER_AGENT})
-
+        self.data_dir = Path(data_dir) if data_dir else None
+        self.session = session or create_http_session(
+            USER_AGENT, retries=3, backoff=0.3
+        )
         self._catalog: dict[str, SymbolSnapshot] = {}
+        self.capabilities = ProviderCapabilities(
+            provider_id="darwinex",
+            display_name="Darwinex",
+            category="Forex",
+            supported_timeframes=("M1", "TICK", "D1"),
+            supported_modes=("bars", "ticks"),
+            requires_auth=False,
+            rate_limit_rps=3.0,
+            default_timeout_seconds=30.0,
+            supports_pagination=True,
+            has_local_archive=self.data_dir is not None and self.data_dir.exists(),
+            description="Darwinex institutional tick and bar market data provider",
+        )
+
+    @override
+    def close_sync(self) -> None:
+        """Synchronously close session resources."""
+        self._is_connected = False
+        if hasattr(self, "session"):
+            self.session.close()
+
+    @override
+    async def close(self) -> None:
+        """Asynchronously close session resources."""
+        self.close_sync()
+
+    def check_health(self) -> ProviderHealth:
+        """Check Darwinex CDN connectivity."""
+        try:
+            resp = self.session.head(CDN_BASE_URL, timeout=5.0)
+            connected = resp.status_code in (200, 301, 302, 403, 404)
+            return ProviderHealth(
+                provider_id="darwinex",
+                status="available" if connected else "failed",
+                connected=connected,
+                message="Darwinex CDN reachable"
+                if connected
+                else "Darwinex CDN unreachable",
+                capabilities=self.capabilities,
+            )
+        except Exception as exc:
+            return ProviderHealth(
+                provider_id="darwinex",
+                status="failed",
+                connected=False,
+                message=f"Health probe error: {exc}",
+                capabilities=self.capabilities,
+            )
 
     def _ensure_catalog(self) -> None:
-        """Load and parse the authoritative Darwinex catalog if not already loaded."""
+        """Parse and cache symbol definitions from CSV catalog."""
         if self._catalog:
             return
-
         if not self.catalog_path.exists():
             self.logger.warning(
-                "FR-BROKER-DARWINEX-SYMBOLS: Catalog path %s does not exist",
-                self.catalog_path,
+                "FR-BROKER-DARWINEX-SYMBOLS: Catalog not found at %s", self.catalog_path
             )
             return
 
         try:
             with open(self.catalog_path, encoding="latin1") as f:
-                for raw_line in f:
-                    line = raw_line.strip()
-                    if not line:
+                for line in f:
+                    line_str = line.strip()
+                    if not line_str:
                         continue
-                    parts = line.split(";")
-                    if len(parts) < 8:
+                    parts = line_str.split(";")
+                    if len(parts) < 11:
                         continue
-
                     sym = parts[0].strip().upper()
                     try:
-                        decimals = int(parts[2].strip())
-                        tick_value = float(parts[3].strip())
-                        default_spread = float(parts[4].strip())
-                        tick_size = float(parts[5].strip())
-                    except ValueError:
-                        continue
-
-                    point = tick_size if tick_size > 0 else (10.0**-decimals)
-                    contract_size = tick_value if tick_value > 0 else 100_000.0
+                        dec = int(parts[6].strip())
+                        point_sz = float(parts[7].strip())
+                        spread = float(parts[8].strip())
+                        contract_sz = float(parts[10].strip())
+                    except ValueError, IndexError:
+                        dec = 5
+                        point_sz = 0.00001
+                        spread = 0.0
+                        contract_sz = 100000.0
 
                     self._catalog[sym] = SymbolSnapshot(
                         name=sym,
-                        custom=False,
-                        digits=decimals,
-                        point=point,
-                        spread=int(default_spread),
-                        trade_contract_size=contract_size,
+                        digits=dec,
+                        point=point_sz,
+                        spread=int(spread),
+                        trade_contract_size=contract_sz,
                     )
             self.logger.info(
-                "FR-BROKER-DARWINEX-SYMBOLS: Loaded %d instruments from catalog",
-                len(self._catalog),
+                "FR-BROKER-DARWINEX-SYMBOLS: Loaded %d symbols", len(self._catalog)
             )
         except Exception as exc:
-            self.logger.error(
+            self.logger.warning(
                 "FR-BROKER-DARWINEX-SYMBOLS: Error parsing catalog: %s", exc
             )
 
@@ -172,88 +231,133 @@ class DarwinexBroker(DataBrokerBackend):
         *,
         symbol: str,
         timeframe: str,
-        mode: str,
-        start: int,
-        end: int,
-        count: int,
-        limit: int,
+        mode: str = "range",
+        start: int = 0,
+        end: int = 0,
+        count: int = 100,
+        limit: int = 1000,
     ) -> list[dict[str, Any]]:
-        """Download candlestick bars from StrategyQuant CDN in memory."""
-        del timeframe, mode
+        """Download candlestick bars from local archives or Darwinex CDN."""
         self._ensure_catalog()
         sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
         snap = self.symbol_info(sym_clean)
         decimals = snap.digits
-        scale = 10.0 ** (decimals + 1)
         target_count = count if count > 0 else limit
+
+        tf_norm = timeframe.strip().upper()
+        if tf_norm not in ("M1", "D1"):
+            raise ProviderUnsupportedError(
+                f"Darwinex only supports M1 and D1 bar aggregation, got '{timeframe}'",
+                provider="darwinex",
+            )
 
         date_from = datetime.fromtimestamp(start, tz=UTC) if 0 < start < 2**40 else None
         date_to = datetime.fromtimestamp(end, tz=UTC) if 0 < end < 2**40 else None
-        target_year = date_from.year if date_from else 2023
-        url = f"{CDN_BASE_URL}/{sym_clean}/{target_year}.zip"
+
+        # Check local data_dir
+        if self.data_dir and self.data_dir.exists():
+            matched = find_matching_partitions(self.data_dir, sym_clean, timeframe)
+            all_local: list[dict[str, Any]] = []
+            for p in matched:
+                if p.suffix.lower() == ".parquet":
+                    all_local.extend(read_parquet_bars(p, count=target_count))
+                elif p.suffix.lower() in (".csv", ".tsv", ".txt"):
+                    all_local.extend(
+                        parse_delimited_bars(
+                            p.read_text(encoding="utf-8", errors="replace"),
+                            sym_clean,
+                            timeframe,
+                        )
+                    )
+            if all_local:
+                all_local.sort(key=lambda r: r["time"])
+                filtered = [
+                    r
+                    for r in all_local
+                    if (not date_from or r["time"] >= int(date_from.timestamp()))
+                    and (not date_to or r["time"] <= int(date_to.timestamp()))
+                ]
+                if filtered:
+                    return filtered[-target_count:] if target_count else filtered
+
+        start_year = date_from.year if date_from else 2023
+        end_year = date_to.year if date_to else start_year
+        years = list(range(start_year, min(end_year, start_year + 3) + 1))
+        period_sec = 86400 if tf_norm == "D1" else 60
+        buckets: dict[int, dict[str, Any]] = {}
 
         try:
-            resp = self.session.get(url, timeout=30)
-            if resp.status_code != 200:
-                raise BridgeError(
-                    f"No bars available for '{sym_clean}' from Darwinex CDN (HTTP {resp.status_code})",
-                    code="NO_DATA",
-                )
-
-            rows: list[dict[str, Any]] = []
-            with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
-                dat_names = sorted([n for n in z.namelist() if n.endswith(".dat")])
-                for name in dat_names[-target_count:]:
-                    dat_bytes = z.read(name)
-                    idx = dat_bytes.find(b"\xbb\xbb")
-                    if idx == -1:
-                        continue
-                    offset = idx + 2
-                    if len(dat_bytes) < offset + 48:
-                        continue
-                    base_ts, ask_raw, bid_raw = struct.unpack(
-                        ">qqq", dat_bytes[offset : offset + 24]
+            for target_year in years:
+                url = f"{CDN_BASE_URL}/{sym_clean}/{target_year}.zip"
+                try:
+                    resp = execute_bounded_get(
+                        self.session,
+                        url,
+                        timeout=(5.0, 30.0),
+                        provider="darwinex",
                     )
-                    ask_price = ask_raw / scale
-                    bid_price = bid_raw / scale
-                    ts_sec = int(base_ts / 1000.0)
-                    dt = datetime.fromtimestamp(ts_sec, tz=UTC)
-                    if date_from and dt < date_from:
+                    if resp.status_code != 200 or not resp.content:
                         continue
-                    if date_to and dt > date_to:
-                        continue
-                    rows.append(
-                        {
-                            "time": ts_sec,
-                            "open": bid_price,
-                            "high": max(bid_price, ask_price),
-                            "low": min(bid_price, ask_price),
-                            "close": bid_price,
-                            "tick_volume": 1,
-                            "spread": 0,
-                            "real_volume": 1,
-                        }
+
+                    with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
+                        dat_names = sorted(
+                            [n for n in z.namelist() if n.endswith(".dat")]
+                        )
+                        for name in dat_names:
+                            dat_bytes = z.read(name)
+                            ticks = decode_darwinex_dat(dat_bytes, digits=decimals)
+                            for t in ticks:
+                                ts_sec = int(t["time_msc"] / 1000.0)
+                                if date_from and ts_sec < int(date_from.timestamp()):
+                                    continue
+                                if date_to and ts_sec > int(date_to.timestamp()):
+                                    continue
+                                bucket_time = (ts_sec // period_sec) * period_sec
+                                mid_p = round(
+                                    (float(t["bid"]) + float(t["ask"])) / 2.0, decimals
+                                )
+                                if bucket_time not in buckets:
+                                    buckets[bucket_time] = {
+                                        "time": bucket_time,
+                                        "open": mid_p,
+                                        "high": mid_p,
+                                        "low": mid_p,
+                                        "close": mid_p,
+                                        "tick_volume": 1,
+                                        "spread": round(
+                                            (float(t["ask"]) - float(t["bid"]))
+                                            * (10**decimals)
+                                        ),
+                                        "real_volume": 1.0,
+                                    }
+                                else:
+                                    b = buckets[bucket_time]
+                                    b["high"] = max(b["high"], mid_p)
+                                    b["low"] = min(b["low"], mid_p)
+                                    b["close"] = mid_p
+                                    b["tick_volume"] += 1
+                                    b["real_volume"] += 1.0
+                except ProviderError:
+                    raise
+                except Exception as exc:
+                    self.logger.debug(
+                        "FR-BROKER-DARWINEX-MARKET-DATA: Error downloading %d: %s",
+                        target_year,
+                        exc,
                     )
 
-            if not rows:
+            if not buckets:
                 raise BridgeError(
                     f"No bars available for '{sym_clean}' from Darwinex CDN",
                     code="NO_DATA",
                 )
 
-            rows.sort(key=lambda r: r["time"])
-            deduped: list[dict[str, Any]] = []
-            last_t: int | None = None
-            for r in rows:
-                if last_t is None or r["time"] > last_t:
-                    deduped.append(r)
-                    last_t = r["time"]
-
-            if target_count and len(deduped) > target_count:
-                deduped = deduped[-target_count:]
-            return deduped
+            rows = [buckets[k] for k in sorted(buckets.keys())]
+            if target_count and len(rows) > target_count:
+                rows = rows[-target_count:]
+            return rows
         except Exception as exc:
-            if isinstance(exc, BridgeError):
+            if isinstance(exc, (BridgeError, ProviderError)):
                 raise
             raise BridgeError(
                 f"Failed to fetch Darwinex bars for {sym_clean}: {exc}",
@@ -265,70 +369,154 @@ class DarwinexBroker(DataBrokerBackend):
         self,
         *,
         symbol: str,
-        mode: str,
-        start_ms: int,
-        end_ms: int,
-        count: int,
-        limit: int,
+        mode: str = "range",
+        start_ms: int = 0,
+        end_ms: int = 0,
+        count: int = 100,
+        limit: int = 1000,
     ) -> list[dict[str, Any]]:
-        """Download tick data from Darwinex CDN in memory."""
-        del mode, end_ms
+        """Download tick data from local archives or Darwinex CDN."""
         self._ensure_catalog()
         sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
+        snap = self.symbol_info(sym_clean)
+        decimals = snap.digits
         target_count = count if count > 0 else limit
-        target_year = (
+        start_year = (
             datetime.fromtimestamp(start_ms / 1000.0, tz=UTC).year
             if 0 < start_ms < 2**50
             else 2023
         )
-        url = f"{CDN_BASE_URL}/{sym_clean}/{target_year}.zip"
+        end_year = (
+            datetime.fromtimestamp(end_ms / 1000.0, tz=UTC).year
+            if 0 < end_ms < 2**50
+            else start_year
+        )
+        years = list(range(start_year, min(end_year, start_year + 3) + 1))
+        all_ticks: list[dict[str, Any]] = []
 
         try:
-            resp = self.session.get(url, timeout=30)
-            if resp.status_code != 200:
+            for target_year in years:
+                url = f"{CDN_BASE_URL}/{sym_clean}/{target_year}.zip"
+                try:
+                    resp = execute_bounded_get(
+                        self.session,
+                        url,
+                        timeout=(5.0, 30.0),
+                        provider="darwinex",
+                    )
+                    if resp.status_code != 200 or not resp.content:
+                        continue
+
+                    with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
+                        dat_names = sorted(
+                            [n for n in z.namelist() if n.endswith(".dat")]
+                        )
+                        for name in dat_names:
+                            dat_bytes = z.read(name)
+                            ticks = decode_darwinex_dat(dat_bytes, digits=decimals)
+                            for t in ticks:
+                                if start_ms > 0 and t["time_msc"] < start_ms:
+                                    continue
+                                if end_ms > 0 and t["time_msc"] > end_ms:
+                                    continue
+                                all_ticks.append(t)
+                except ProviderError:
+                    raise
+                except Exception as exc:
+                    self.logger.debug(
+                        "FR-BROKER-DARWINEX-MARKET-DATA: Error downloading %d ticks: %s",
+                        target_year,
+                        exc,
+                    )
+
+            if not all_ticks:
                 raise BridgeError(
-                    f"No ticks available for '{sym_clean}' from Darwinex CDN (HTTP {resp.status_code})",
+                    f"No ticks available for '{sym_clean}' from Darwinex CDN",
                     code="NO_DATA",
                 )
-            rows: list[dict[str, Any]] = []
-            snap = self.symbol_info(sym_clean)
-            scale = 10.0 ** (snap.digits + 1)
-            with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
-                dat_names = sorted([n for n in z.namelist() if n.endswith(".dat")])
-                for name in dat_names[-target_count:]:
-                    dat_bytes = z.read(name)
-                    idx = dat_bytes.find(b"\xbb\xbb")
-                    if idx != -1 and len(dat_bytes) >= idx + 26:
-                        offset = idx + 2
-                        base_ts, ask_raw, bid_raw = struct.unpack(
-                            ">qqq", dat_bytes[offset : offset + 24]
-                        )
-                        ask = ask_raw / scale
-                        bid = bid_raw / scale
-                        rows.append(
-                            {
-                                "time_msc": int(base_ts),
-                                "bid": bid,
-                                "ask": ask,
-                                "last": (ask + bid) / 2.0,
-                                "volume": 1,
-                                "flags": 0,
-                                "volume_real": 1.0,
-                            }
-                        )
-            rows.sort(key=lambda r: r["time_msc"])
-            if target_count and len(rows) > target_count:
-                rows = rows[-target_count:]
-            return rows
+
+            all_ticks.sort(key=lambda r: r["time_msc"])
+            if target_count and len(all_ticks) > target_count:
+                all_ticks = all_ticks[-target_count:]
+            return all_ticks
         except Exception as exc:
-            if isinstance(exc, BridgeError):
+            if isinstance(exc, (BridgeError, ProviderError)):
                 raise
             raise BridgeError(
-                f"Failed to fetch Darwinex ticks: {exc}", code="DOWNLOAD_ERROR"
+                f"Failed to fetch Darwinex ticks for {sym_clean}: {exc}",
+                code="DOWNLOAD_ERROR",
             ) from exc
+
+    def read_history(
+        self,
+        request: HistoryRequest,
+        token: CancellationToken | None = None,
+    ) -> HistoryPage:
+        """Acquire historical bars or ticks according to typed request specification."""
+        if token is not None:
+            token.check_cancelled()
+        request.validate()
+
+        if request.kind == "ticks" or request.timeframe.upper() == "TICK":
+            start_ms = (request.start_epoch() or 0) * 1000
+            end_ms = (request.end_epoch() or 0) * 1000
+            rows = self.fetch_ticks(
+                symbol=request.symbol,
+                mode=request.mode,
+                start_ms=start_ms,
+                end_ms=end_ms,
+                count=request.count,
+                limit=request.limit,
+            )
+        else:
+            tf = request.timeframe.upper()
+            if tf not in ("M1", "D1"):
+                raise ProviderUnsupportedError(
+                    f"Timeframe '{request.timeframe}' not supported by Darwinex. Supported: M1, D1",
+                    provider="darwinex",
+                )
+            start_s = request.start_epoch() or 0
+            end_s = request.end_epoch() or 0
+            rows = self.fetch_bars(
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                mode=request.mode,
+                start=start_s,
+                end=end_s,
+                count=request.count,
+                limit=request.limit,
+            )
+
+        if token is not None:
+            token.check_cancelled()
+
+        return HistoryPage(
+            provider="darwinex",
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            kind=request.kind,
+            rows=rows,
+            cursor=None,
+            is_complete=True,
+            provenance={
+                "source": "darwinex",
+                "data_dir": str(self.data_dir) if self.data_dir else None,
+            },
+        )
 
 
 def create_adapter(context: PluginHostContext | None = None) -> DarwinexBroker:
     """Factory creating configured DarwinexBroker adapter."""
-    del context
-    return DarwinexBroker()
+    data_dir = context.data_dir if context is not None else None
+    return DarwinexBroker(data_dir=data_dir)
+
+
+def main() -> None:
+    """Demonstrate executable usage of DarwinexBroker."""
+    broker = DarwinexBroker()
+    health = broker.check_health()
+    logger.info("Darwinex health: %s (connected=%s)", health.status, health.connected)
+
+
+if __name__ == "__main__":
+    main()

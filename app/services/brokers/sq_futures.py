@@ -48,8 +48,17 @@ from pathlib import Path
 from typing import Any, override
 
 import requests
-from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
+from app.services.brokers._http import execute_bounded_get
+from app.services.brokers._native_history import SQ_MAGIC_HEADER_V42
+from app.services.brokers.capabilities import (
+    CancellationToken,
+    HistoryPage,
+    HistoryRequest,
+    ProviderCapabilities,
+    ProviderHealth,
+    ProviderValidationError,
+)
 from app.services.data import BridgeError, DataBrokerBackend
 from app.services.trading import SymbolSnapshot
 from requests.adapters import HTTPAdapter
@@ -64,9 +73,23 @@ DEFAULT_CATALOG_PATH = DEFAULT_DATA_DIR / "symbols.csv"
 CDN_BASE_URL = "https://cdn.strategyquantcdn.com/data/barchart_test/eod"
 USER_AGENT = "HaruQuantAI-SQFuturesConnector/1.0"
 
-SQ_MAGIC_HEADER_V42 = b"\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb"
+PLUGIN_MANIFEST = {
+    "id": "sq_futures",
+    "name": "SQ Futures Free Data",
+    "version": "1.0.0",
+    "slot": "data.provider",
+    "entry_point": "sq_futures:create_adapter",
+    "description": "StrategyQuant Continuous Futures historical data provider",
+    "capabilities": ["data.fetch"],
+}
 
-__all__ = ["CDN_BASE_URL", "SQFuturesBroker", "create_adapter"]
+__all__ = [
+    "CDN_BASE_URL",
+    "PLUGIN_MANIFEST",
+    "SQFuturesBroker",
+    "create_adapter",
+    "main",
+]
 
 
 def _clean_symbol(sym: str) -> str:
@@ -383,6 +406,43 @@ class SQFuturesBroker(DataBrokerBackend):
 
         self._catalog: dict[str, SymbolSnapshot] = {}
 
+        self.capabilities = ProviderCapabilities(
+            provider_id="sq_futures",
+            display_name="SQ Futures Free Data",
+            category="Futures",
+            supported_timeframes=("M1", "D1"),
+            supported_modes=("bars",),
+            requires_auth=False,
+            rate_limit_rps=5.0,
+            default_timeout_seconds=30.0,
+            supports_pagination=True,
+            has_local_archive=self.data_dir.exists(),
+            description="StrategyQuant Continuous Futures historical data provider",
+        )
+
+    @override
+    def close_sync(self) -> None:
+        """Close session resources synchronously."""
+        self._is_connected = False
+        if hasattr(self, "session"):
+            self.session.close()
+
+    @override
+    async def close(self) -> None:
+        """Close session resources asynchronously."""
+        self.close_sync()
+
+    def check_health(self) -> Any:
+        """Inspect provider health and local archive readiness."""
+        has_dir = self.data_dir.exists()
+        return ProviderHealth(
+            provider_id="sq_futures",
+            status="available" if has_dir else "unconfigured",
+            connected=has_dir,
+            message="SQ Futures ready" if has_dir else "Local data_dir not found",
+            capabilities=self.capabilities,
+        )
+
     def _ensure_catalog(self) -> None:
         """Load and cache the SQ Futures instrument catalog."""
         if self._catalog:
@@ -460,7 +520,9 @@ class SQFuturesBroker(DataBrokerBackend):
         for zip_name in zip_targets:
             url = f"{CDN_BASE_URL}/{clean_sym}/{zip_name}"
             try:
-                resp = self.session.get(url, timeout=10)
+                resp = execute_bounded_get(
+                    self.session, url, timeout=(5.0, 15.0), provider="sq_futures"
+                )
                 if resp.status_code == 200 and resp.content:
                     with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
                         dat_names = sorted(
@@ -537,8 +599,9 @@ class SQFuturesBroker(DataBrokerBackend):
             except Exception as exc:
                 self.logger.warning("Failed to decode dat file %s: %s", dat_file, exc)
 
-        # 3. StrategyQuant CDN
-        if self.enable_cdn_download:
+        # 3. StrategyQuant CDN (Daily bars only; D1 cannot satisfy M1)
+        is_d1 = timeframe.upper() in ("D1", "1D")
+        if self.enable_cdn_download and is_d1:
             cdn_bars = self._fetch_cdn_bars(
                 symbol, count=target_count, date_from=date_from, date_to=date_to
             )
@@ -546,10 +609,68 @@ class SQFuturesBroker(DataBrokerBackend):
                 return cdn_bars
 
         raise BridgeError(
-            f"No futures data found for symbol '{symbol}'", code="NO_DATA"
+            f"No futures data found for symbol '{symbol}' ({timeframe})",
+            code="NO_DATA",
+        )
+
+    def read_history(
+        self,
+        request: HistoryRequest,
+        token: CancellationToken | None = None,
+    ) -> HistoryPage:
+        """Fetch historical records adhering to Stage 2C contract."""
+        request.validate()
+        tf = request.timeframe.strip().upper()
+        if tf not in ("D1", "M1"):
+            raise ProviderValidationError(
+                f"StrategyQuant Futures only supports D1 and M1 timeframes, got '{request.timeframe}'",
+                provider="sq_futures",
+            )
+        if request.kind == "ticks":
+            raise ProviderValidationError(
+                "StrategyQuant Futures does not support ticks",
+                provider="sq_futures",
+            )
+        if token is not None:
+            token.check_cancelled()
+        try:
+            rows = self.fetch_bars(
+                symbol=request.symbol,
+                timeframe=tf,
+                mode=request.mode,
+                start=request.start_epoch() or 0,
+                end=request.end_epoch() or 0,
+                count=request.count,
+                limit=request.limit,
+            )
+        except BridgeError as be:
+            if be.code == "NO_DATA":
+                rows = []
+            else:
+                raise
+        return HistoryPage(
+            provider="sq_futures",
+            symbol=request.symbol,
+            timeframe=tf,
+            kind="bars",
+            rows=rows,
+            is_complete=True,
+            provenance={"source": "sq_futures"},
         )
 
 
-def create_adapter(_context: PluginHostContext | None = None) -> SQFuturesBroker:
+def create_adapter(context: Any = None) -> SQFuturesBroker:
     """Plugin entrypoint factory constructing SQFuturesBroker adapter."""
-    return SQFuturesBroker()
+    data_dir = getattr(context, "data_dir", None)
+    return SQFuturesBroker(data_dir=data_dir)
+
+
+def main() -> None:
+    """Demonstrate executable usage of SQFuturesBroker."""
+    broker = SQFuturesBroker()
+    health = broker.check_health()
+    logger.info("SQ Futures health: %s (connected=%s)", health.status, health.connected)
+
+
+if __name__ == "__main__":
+    main()

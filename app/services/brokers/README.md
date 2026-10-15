@@ -282,3 +282,31 @@ The timer/reconnect interval and socket timeout remain unchanged; quiet logging
 does not stop monitoring or reconnection. Startup token/lock diagnostics remain.
 The existing connected message describes TCP/hello-send success, not completed
 authentication. Recompile/reload the updated EA to use the new input.
+
+## Stage 2C: Dynamic Market Data Providers (`slot: "data.provider"`)
+
+Stage 2C introduces typed market data provider plugins discoverable under slot
+`data.provider` coordinated through `BrokerRegistry`. It bridges historical data
+acquisition across local file archives, binary codecs, remote HTTP feeds, and
+active trading broker instances without duplicating or mutating broker state.
+
+### Registered Data Providers
+
+1. `dukascopy`: Dukascopy Bank SA historical tick and bar provider (BI5 binary codec & CDN feeds).
+2. `darwinex`: Darwinex tick archives (gzipped / custom binary `.dat` feeds).
+3. `metatrader`: MetaTrader 5 Bridge historical data provider (delegating to active `MT5Backend` or local HST/FXT archives).
+4. `sq_equity`: StrategyQuant US Equities bundled D1 daily historical data provider.
+5. `sq_futures`: StrategyQuant Continuous Futures bundled M1 and D1 historical data provider.
+6. `crypto`: Cryptocurrency Spot and USD-M Futures candle provider (Binance, Bitfinex, Coinbase, Poloniex).
+7. `files`: Local filesystem market data broker supporting CSV, Parquet, MT4 HST, and FXT historical files.
+8. `yahoo`: Yahoo Finance public market data and symbol metadata provider (v8 chart API).
+9. `tick_downloader`: High-precision tick and trade volume historical data downloader plugin.
+
+### Typed Contracts and Invariants
+
+- **Capability Descriptor**: `ProviderCapabilities` declares supported timeframes, modes (`bars`, `ticks`), auth requirements, and rate limits.
+- **Request / Response Models**: `HistoryRequest` enforces strict date bounds and count validation; `HistoryPage` encapsulates typed records, cursor, and provenance metadata.
+- **Cancellation**: Cooperative, thread-safe cancellation via `CancellationToken`.
+- **Health Probing**: Every provider exposes `check_health() -> ProviderHealth` verifying reachability, filesystem accessibility, or credentials.
+- **Strict Real-Data Policy**: Production download paths never synthesize synthetic mock records. Unavailable history fails explicitly with typed `ProviderError` subtypes (`ProviderNotFoundError`, `ProviderValidationError`, `ProviderUnsupportedError`, `ProviderRateLimitError`, `ProviderTimeoutError`).
+- **Resource Management**: Registry leases (`with registry.lease(name) as broker:`) coordinate concurrent access and orderly lifecycle release (`close_sync` / `close`).

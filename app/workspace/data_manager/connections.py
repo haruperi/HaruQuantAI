@@ -42,14 +42,14 @@ CLI Usage:
 
 from __future__ import annotations
 
-import contextlib
+import asyncio
 import io
 import tempfile
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, override, runtime_checkable
 
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.discovery import PluginLifecycleManager
@@ -57,6 +57,14 @@ from app.host.logging import get_logger
 from app.host.persistence.create import create_schema
 from app.host.persistence.read import resolve_connection
 from app.host.transport import EventBus
+from app.services.brokers.capabilities import (
+    CancellationToken,
+    HistoryRequest,
+    ProviderDisabledError,
+    ProviderError,
+    ProviderNotFoundError,
+)
+from app.services.brokers.registry import BrokerRegistry
 from app.services.data import MarketBar
 from app.workspace.data_manager.data import DataManagerDataService
 from app.workspace.data_manager.log import DataManagerLogService
@@ -132,10 +140,11 @@ class DownloadJobResult:
     date_from: str
     date_to: str
     status: str = "completed"
+    job_id: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert download result to dictionary representation."""
-        return {
+        d = {
             "dataset_id": self.dataset_id,
             "provider": self.provider,
             "symbol": self.symbol,
@@ -145,6 +154,9 @@ class DownloadJobResult:
             "date_to": self.date_to,
             "status": self.status,
         }
+        if self.job_id is not None:
+            d["job_id"] = self.job_id
+        return d
 
 
 _BUILTIN_PROVIDERS: tuple[ProviderConnectionStatus, ...] = (
@@ -200,6 +212,25 @@ _BUILTIN_PROVIDERS: tuple[ProviderConnectionStatus, ...] = (
 )
 
 
+class _JobContextCancellationToken(CancellationToken):
+    """CancellationToken wrapper that observes a JobContext cancellation marker."""
+
+    def __init__(self, ctx: Any) -> None:
+        super().__init__()
+        self._ctx = ctx
+
+    @property
+    @override
+    def is_cancelled(self) -> bool:
+        if (
+            self._ctx is not None
+            and hasattr(self._ctx, "is_cancelled")
+            and bool(self._ctx.is_cancelled())
+        ):
+            return True
+        return self._is_cancelled
+
+
 class ProviderConnectionsService:
     """Service governing data provider connections, health, and downloads."""
 
@@ -212,6 +243,8 @@ class ProviderConnectionsService:
         log_service: DataManagerLogService | None = None,
         event_bus: EventBus | None = None,
         plugin_mgr: PluginLifecycleManager | None = None,
+        broker_registry: BrokerRegistry | None = None,
+        job_manager: Any | None = None,
     ) -> None:
         """Initialize provider connections service."""
         self.db_path = Path(db_path) if db_path is not None else None
@@ -220,6 +253,8 @@ class ProviderConnectionsService:
         self.log_service = log_service
         self.event_bus = event_bus
         self.plugin_mgr = plugin_mgr
+        self.broker_registry = broker_registry
+        self.job_manager = job_manager
         self._adapters: dict[str, BaseDataProvider] = {}
 
     def register_adapter(self, provider_id: str, adapter: BaseDataProvider) -> None:
@@ -235,32 +270,39 @@ class ProviderConnectionsService:
 
     def list_providers(self) -> list[ProviderConnectionStatus]:
         """List all available built-in and dynamic plugin data providers."""
-        providers_dict = {p.provider_id.lower(): p for p in _BUILTIN_PROVIDERS}
+        providers_dict: dict[str, ProviderConnectionStatus] = {}
+        if self.broker_registry is not None:
+            for prov in self.broker_registry.list_historical_providers():
+                canon_id = prov.name.lower()
+                enabled = self.broker_registry.is_enabled(canon_id)
+                health = self.broker_registry.check_provider_health(canon_id)
+                caps = prov.capabilities
+                providers_dict[canon_id] = ProviderConnectionStatus(
+                    provider_id=prov.name,
+                    display_name=caps.display_name if caps else prov.name,
+                    slot="data.provider",
+                    connected=health.connected if enabled else False,
+                    supported_timeframes=(
+                        list(caps.supported_timeframes) if caps else ["M1", "H1", "D1"]
+                    ),
+                    category=caps.category if caps else "Broker Provider",
+                    message=health.message if enabled else "Provider disabled",
+                )
+        else:
+            for p in _BUILTIN_PROVIDERS:
+                providers_dict[p.provider_id.lower()] = p
+
         for pid, adapter in self._adapters.items():
-            providers_dict[pid] = ProviderConnectionStatus(
-                provider_id=adapter.provider_id,
-                display_name=adapter.display_name,
-                slot="data.provider",
-                connected=True,
-                supported_timeframes=list(adapter.supported_timeframes),
-                category="Active Adapter",
-                message="Registered adapter active",
-            )
-        if self.plugin_mgr is not None:
-            with contextlib.suppress(AttributeError, KeyError):
-                for reg in self.plugin_mgr.discovery.registry.values():
-                    if reg.manifest.slot == "data.provider":
-                        providers_dict[reg.manifest.id.lower()] = (
-                            ProviderConnectionStatus(
-                                provider_id=reg.manifest.id,
-                                display_name=reg.manifest.name,
-                                slot=reg.manifest.slot,
-                                connected=True,
-                                supported_timeframes=["M1", "H1", "D1"],
-                                category="Plugin",
-                                message="Dynamic data provider plugin",
-                            )
-                        )
+            if pid not in providers_dict:
+                providers_dict[pid] = ProviderConnectionStatus(
+                    provider_id=adapter.provider_id,
+                    display_name=adapter.display_name,
+                    slot="data.provider",
+                    connected=True,
+                    supported_timeframes=list(adapter.supported_timeframes),
+                    category="Active Adapter",
+                    message="Registered adapter active",
+                )
 
         providers = list(providers_dict.values())
         logger.debug(
@@ -278,16 +320,51 @@ class ProviderConnectionsService:
     def check_connection(self, provider_id: str) -> ProviderConnectionStatus:
         """Probe provider connection status and verify latency/readiness."""
         clean = provider_id.strip().lower()
+        if self.broker_registry is not None:
+            if not self.broker_registry.is_enabled(clean):
+                return ProviderConnectionStatus(
+                    provider_id=clean,
+                    display_name=clean,
+                    connected=False,
+                    message="Provider disabled",
+                )
+            if self.broker_registry.has_broker(clean):
+                health = self.broker_registry.check_provider_health(clean)
+                caps = health.capabilities
+                logger.info(
+                    "%s: Checked registry provider %s: status=%s",
+                    HEALTH_CHECK_FR,
+                    clean,
+                    health.status,
+                    extra={
+                        "fr_id": HEALTH_CHECK_FR,
+                        "provider_id": clean,
+                        "connected": health.connected,
+                    },
+                )
+                return ProviderConnectionStatus(
+                    provider_id=clean,
+                    display_name=caps.display_name if caps else clean,
+                    slot="data.provider",
+                    connected=health.connected,
+                    supported_timeframes=(
+                        list(caps.supported_timeframes) if caps else []
+                    ),
+                    category=caps.category if caps else "Broker Provider",
+                    message=health.message,
+                )
+
         for p in self.list_providers():
             if p.provider_id.lower() == clean:
                 logger.info(
-                    "%s: Checked provider %s: status=CONNECTED",
+                    "%s: Checked provider %s: status=%s",
                     HEALTH_CHECK_FR,
                     p.provider_id,
+                    "CONNECTED" if p.connected else "DISCONNECTED",
                     extra={
                         "fr_id": HEALTH_CHECK_FR,
                         "provider_id": p.provider_id,
-                        "connected": True,
+                        "connected": p.connected,
                     },
                 )
                 return p
@@ -310,8 +387,334 @@ class ProviderConnectionsService:
         )
         return unknown
 
-    def download_historical_data(self, payload: Mapping[str, Any]) -> DownloadJobResult:
+    async def download_historical_data_async(
+        self,
+        payload: Mapping[str, Any],
+        token: CancellationToken | None = None,
+    ) -> DownloadJobResult:
+        """Asynchronously execute historical data acquisition and persistence."""
+        if bool(payload.get("async_job")) and self.job_manager is not None:
+            provider = (
+                str(
+                    payload.get("provider")
+                    or payload.get("connection")
+                    or payload.get("broker")
+                    or "dukascopy"
+                )
+                .strip()
+                .lower()
+            )
+            symbol = str(payload.get("symbol", "EURUSD")).strip().upper()
+            timeframe = str(payload.get("timeframe", "M1")).strip().upper()
+            kind = str(payload.get("kind", "bars")).strip().lower()
+            if kind not in ("bars", "ticks"):
+                kind = "bars"
+            dataset_id = str(
+                payload.get("dataset_id") or f"{provider}:{symbol}_{timeframe}:{kind}"
+            )
+
+            def _job_worker(ctx: Any) -> DownloadJobResult:
+                tok = token or _JobContextCancellationToken(ctx)
+                return self.download_historical_data(payload, token=tok)
+
+            rec = self.job_manager.submit_job(
+                _job_worker,
+                kind="ingest",
+                executor_kind="thread",
+                pass_context=True,
+            )
+            return DownloadJobResult(
+                dataset_id=dataset_id,
+                provider=provider,
+                symbol=symbol,
+                timeframe=timeframe,
+                bars_downloaded=0,
+                date_from=str(payload.get("date_from", "")),
+                date_to=str(payload.get("date_to", "")),
+                status="queued",
+                job_id=rec.job_id,
+            )
+        return await asyncio.to_thread(
+            self.download_historical_data, payload, token=token
+        )
+
+    def _fetch_from_broker_instance(
+        self,
+        broker: Any,
+        *,
+        provider: str,
+        symbol: str,
+        timeframe: str,
+        date_from: str,
+        date_to: str,
+        token: CancellationToken | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query bars from a broker instance via read_history or fetch_bars."""
+        if token is not None:
+            token.check_cancelled()
+
+        if hasattr(broker, "read_history"):
+            req = HistoryRequest(
+                provider=provider,
+                symbol=symbol,
+                timeframe=timeframe,
+                kind="bars",
+                start=date_from,
+                end=date_to,
+                count=1000,
+                limit=1000,
+            )
+            result_rows: list[dict[str, Any]] = []
+            page_count = 0
+            max_pages = 50
+            max_rows = 50_000
+            current_req = req
+
+            while True:
+                if token is not None:
+                    token.check_cancelled()
+                page = broker.read_history(current_req)
+                result_rows.extend(page.rows)
+                page_count += 1
+                if page.is_complete:
+                    break
+                if page_count >= max_pages or len(result_rows) >= max_rows:
+                    raise ProviderError(
+                        f"Provider '{provider}' exceeded bounded pagination limits "
+                        f"({max_pages} pages, {max_rows} rows) before completion.",
+                        code="INCOMPLETE_HISTORY",
+                        status_code=502,
+                        provider=provider,
+                    )
+                if not page.cursor:
+                    raise ProviderError(
+                        f"Provider '{provider}' returned incomplete history "
+                        "without a cursor.",
+                        code="INCOMPLETE_HISTORY",
+                        status_code=502,
+                        provider=provider,
+                    )
+                current_req = HistoryRequest(
+                    provider=provider,
+                    symbol=symbol,
+                    timeframe=timeframe,
+                    kind="bars",
+                    start=page.cursor,
+                    end=date_to,
+                    count=1000,
+                    limit=1000,
+                )
+            return result_rows
+
+        if hasattr(broker, "fetch_bars"):
+            if token is not None:
+                token.check_cancelled()
+            req = HistoryRequest(
+                provider=provider,
+                symbol=symbol,
+                timeframe=timeframe,
+                kind="bars",
+                start=date_from,
+                end=date_to,
+            )
+            return broker.fetch_bars(  # type: ignore[no-any-return]
+                symbol=symbol,
+                timeframe=timeframe,
+                mode="range",
+                start=req.start_epoch(),
+                end=req.end_epoch(),
+                count=1000,
+                limit=1000,
+            )
+        return []
+
+    def _records_to_df(self, bars_data: list[dict[str, Any]]) -> pd.DataFrame:
+        """Convert raw broker bar dictionaries into a normalized pandas DataFrame."""
+        rows: list[dict[str, Any]] = []
+        for b in bars_data:
+            t_val = b["time"]
+            ts = datetime.fromtimestamp(t_val, tz=UTC).strftime("%Y-%m-%d %H:%M:%S")
+            if "real_volume" in b and b["real_volume"] is not None:
+                vol = float(b["real_volume"])
+            elif "tick_volume" in b and b["tick_volume"] is not None:
+                vol = float(b["tick_volume"])
+            elif "volume" in b and b["volume"] is not None:
+                vol = float(b["volume"])
+            else:
+                vol = 1.0
+            rows.append(
+                {
+                    "timestamp": ts,
+                    "open": float(b["open"]),
+                    "high": float(b["high"]),
+                    "low": float(b["low"]),
+                    "close": float(b["close"]),
+                    "volume": vol,
+                    "spread": float(b.get("spread", 0.0)),
+                }
+            )
+        return pd.DataFrame(rows)
+
+    def _fetch_from_registry_or_broker(
+        self,
+        *,
+        provider: str,
+        symbol: str,
+        timeframe: str,
+        date_from: str,
+        date_to: str,
+        token: CancellationToken | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch bars from registered broker or fallback broker factory."""
+        if self.broker_registry is not None:
+            if not self.broker_registry.is_enabled(provider):
+                raise ProviderDisabledError(
+                    f"Provider '{provider}' is disabled.",
+                    provider=provider,
+                )
+            if self.broker_registry.has_broker(provider):
+                with self.broker_registry.lease(provider) as broker:
+                    return self._fetch_from_broker_instance(
+                        broker,
+                        provider=provider,
+                        symbol=symbol,
+                        timeframe=timeframe,
+                        date_from=date_from,
+                        date_to=date_to,
+                        token=token,
+                    )
+            raise ProviderNotFoundError(
+                f"Provider '{provider}' is not registered.",
+                provider=provider,
+            )
+
+        try:
+            from app.services.brokers import get_broker
+
+            broker = get_broker(provider)
+            return self._fetch_from_broker_instance(
+                broker,
+                provider=provider,
+                symbol=symbol,
+                timeframe=timeframe,
+                date_from=date_from,
+                date_to=date_to,
+                token=token,
+            )
+        except Exception as exc:
+            if isinstance(exc, (ValueError, ProviderError)):
+                raise
+            raise ValueError(
+                f"Unsupported or unconfigured data provider '{provider}'. Reason: {exc}"
+            ) from exc
+
+    def _df_from_adapter(
+        self,
+        adapter: BaseDataProvider,
+        *,
+        provider: str,
+        symbol: str,
+        timeframe: str,
+        date_from: str,
+        date_to: str,
+        token: CancellationToken | None = None,
+    ) -> pd.DataFrame:
+        """Fetch bars from an in-memory adapter and convert to DataFrame."""
+        if token is not None:
+            token.check_cancelled()
+        bars = adapter.fetch_bars(symbol, timeframe, date_from, date_to)
+        if not bars:
+            raise ValueError(
+                f"Provider '{provider}' returned zero bars for {symbol} ({timeframe})"
+            )
+        rows: list[dict[str, Any]] = []
+        for b in bars:
+            ts = datetime.fromtimestamp(b.time, tz=UTC).strftime("%Y-%m-%d %H:%M:%S")
+            if getattr(b, "real_volume", None) is not None:
+                vol = float(b.real_volume)
+            elif getattr(b, "tick_volume", None) is not None:
+                vol = float(b.tick_volume)
+            else:
+                vol = 1.0
+            rows.append(
+                {
+                    "timestamp": ts,
+                    "open": float(b.open),
+                    "high": float(b.high),
+                    "low": float(b.low),
+                    "close": float(b.close),
+                    "volume": vol,
+                    "spread": float(b.spread),
+                }
+            )
+        return pd.DataFrame(rows)
+
+    def _resolve_bars_dataframe(
+        self,
+        payload: Mapping[str, Any],
+        *,
+        provider: str,
+        symbol: str,
+        timeframe: str,
+        date_from: str,
+        date_to: str,
+        token: CancellationToken | None = None,
+    ) -> pd.DataFrame:
+        """Resolve and download bars DataFrame from payload, adapters, or brokers."""
+        if token is not None:
+            token.check_cancelled()
+
+        if "bars_df" in payload and isinstance(payload["bars_df"], pd.DataFrame):
+            return payload["bars_df"]
+        if payload.get("csv_content"):
+            csv_io = io.StringIO(str(payload["csv_content"]))
+            return pd.read_csv(csv_io)
+
+        if self.broker_registry is not None and not self.broker_registry.is_enabled(
+            provider
+        ):
+            raise ProviderDisabledError(
+                f"Provider '{provider}' is disabled.",
+                provider=provider,
+            )
+
+        if provider in self._adapters:
+            return self._df_from_adapter(
+                self._adapters[provider],
+                provider=provider,
+                symbol=symbol,
+                timeframe=timeframe,
+                date_from=date_from,
+                date_to=date_to,
+                token=token,
+            )
+
+        bars_data = self._fetch_from_registry_or_broker(
+            provider=provider,
+            symbol=symbol,
+            timeframe=timeframe,
+            date_from=date_from,
+            date_to=date_to,
+            token=token,
+        )
+        if not bars_data:
+            raise ProviderError(
+                f"Provider '{provider}' returned zero bars for {symbol} ({timeframe})",
+                code="EMPTY_SERIES",
+                status_code=404,
+                provider=provider,
+            )
+        return self._records_to_df(bars_data)
+
+    def download_historical_data(
+        self,
+        payload: Mapping[str, Any],
+        token: CancellationToken | None = None,
+    ) -> DownloadJobResult:
         """Execute historical bar download and persist to Parquet and catalog."""
+        if token is not None:
+            token.check_cancelled()
+
         provider = (
             str(
                 payload.get("provider")
@@ -324,50 +727,28 @@ class ProviderConnectionsService:
         )
         symbol = str(payload.get("symbol", "EURUSD")).strip().upper()
         timeframe = str(payload.get("timeframe", "M1")).strip().upper()
+        has_kind_param = "kind" in payload
+        kind = str(payload.get("kind", "bars")).strip().lower()
+        if kind not in ("bars", "ticks"):
+            kind = "bars"
         date_from = str(payload.get("date_from", "2026-01-01"))
         date_to = str(payload.get("date_to", "2026-01-10"))
-        dataset_id = str(
-            payload.get("dataset_id") or f"{provider}:{symbol}_{timeframe}"
+        default_ds_id = (
+            f"{provider}:{symbol}_{timeframe}:{kind}"
+            if has_kind_param
+            else f"{provider}:{symbol}_{timeframe}"
         )
+        dataset_id = str(payload.get("dataset_id") or default_ds_id)
 
-        bars_df: pd.DataFrame
-        if "bars_df" in payload and isinstance(payload["bars_df"], pd.DataFrame):
-            bars_df = payload["bars_df"]
-        elif payload.get("csv_content"):
-            csv_io = io.StringIO(str(payload["csv_content"]))
-            bars_df = pd.read_csv(csv_io)
-        elif provider in self._adapters:
-            adapter = self._adapters[provider]
-            bars = adapter.fetch_bars(symbol, timeframe, date_from, date_to)
-            if not bars:
-                raise ValueError(
-                    f"Provider '{provider}' returned zero bars for "
-                    f"{symbol} ({timeframe})"
-                )
-            rows: list[dict[str, Any]] = []
-            for b in bars:
-                ts = datetime.fromtimestamp(b.time, tz=UTC).strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                )
-                vol = float(b.real_volume or b.tick_volume)
-                rows.append(
-                    {
-                        "timestamp": ts,
-                        "open": float(b.open),
-                        "high": float(b.high),
-                        "low": float(b.low),
-                        "close": float(b.close),
-                        "volume": vol,
-                        "spread": float(b.spread),
-                    }
-                )
-            bars_df = pd.DataFrame(rows)
-        else:
-            raise ValueError(
-                f"Unsupported or unconfigured data provider '{provider}'. "
-                "Live acquisition requires an active BaseDataProvider adapter "
-                "or explicit payload bars."
-            )
+        bars_df = self._resolve_bars_dataframe(
+            payload,
+            provider=provider,
+            symbol=symbol,
+            timeframe=timeframe,
+            date_from=date_from,
+            date_to=date_to,
+            token=token,
+        )
 
         if bars_df.empty:
             raise ValueError(
@@ -380,14 +761,22 @@ class ProviderConnectionsService:
         actual_date_to = str(bars_df["timestamp"].iloc[-1])
 
         if self.data_service is not None:
+            if token is not None:
+                token.check_cancelled()
             self.data_service.upsert_dataset(
                 {
                     "id": dataset_id,
                     "source": provider,
                     "symbol": symbol,
                     "timeframe": timeframe,
+                    "data_kind": kind,
                     "category": "Forex" if "USD" in symbol else "Equities",
                     "timezone": "UTC",
+                    "provenance": {
+                        "source": provider,
+                        "kind": kind,
+                        "is_complete": True,
+                    },
                 },
                 bars_df=bars_df,
             )

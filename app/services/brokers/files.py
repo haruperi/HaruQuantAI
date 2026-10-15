@@ -3,53 +3,92 @@
 Description:
     Implements a local filesystem market data and symbol catalog broker
     accessing historical bars, ticks, and instrument specifications stored as
-    CSV, TXT, or Parquet files on disk. Conforms directly to the `TradingBackend` protocol.
-    Exposes canonical `SymbolSnapshot` objects and normalized historical bars.
+    CSV, TXT, Parquet, MT4 HST, or MT4 FXT files on disk. Conforms directly
+    to the `TradingBackend` protocol and Stage 2C `data.provider` specification.
+    Exposes canonical `SymbolSnapshot` objects and normalized historical records.
 
 Purpose:
     FEAT-DATA-SOURCE-FILES: Local Filesystem Historical Market Data Ingestion.
 
 Key Capabilities:
-    - FR-BROKER-FILES-PARSING: CSV/TXT and Parquet Historical Bar and Tick Ingestion
-      Associated: `[FilesBroker.fetch_bars()]`, `[FilesBroker.fetch_ticks()]`
-      Logging: Emits INFO log with parsed record counts, or WARNING on absent paths.
+    - FR-BROKER-FILES-PARSING: CSV, Parquet, HST, and FXT Bar and Tick Ingestion
+      Associated: `[FilesBroker.fetch_bars()]`, `[FilesBroker.fetch_ticks()]`, `[FilesBroker.read_history()]`
+      Logging: Emits INFO on parsed record counts, and WARNING on absent paths.
     - FR-BROKER-FILES-SYMBOLS: Filesystem Symbol Discovery and Specification Resolution
       Associated: `[FilesBroker.symbol_info()]`, `[FilesBroker.symbols_get()]`
-      Logging: Emits INFO log upon resolving symbol info or catalog count,
+      Logging: Emits INFO upon resolving symbol info or catalog count,
       and WARNING if symbol is not found.
+    - FR-BROKER-FILES-HEALTH: Filesystem Directory Accessibility and Health Inspection
+      Associated: `[FilesBroker.check_health()]`
+      Logging: Emits INFO on accessible directory probe and WARNING on inaccessible path.
 
 Python API Usage:
     ```python
-    from app.services.data import Timeframe, get_historical_bars
     from app.services.brokers.files import FilesBroker
+    from app.services.data import Timeframe, get_historical_bars
 
-    broker = FilesBroker(data_dir="data/market/sq_equity/d1")
-    bars = await get_historical_bars(broker, "AAPL", Timeframe.PERIOD_D1, count=5)
-    assert len(bars) > 0
+    broker = FilesBroker(data_dir="data/market")
+    health = broker.check_health()
+    assert health.connected is True
+    bars = await get_historical_bars(broker, "EURUSD", Timeframe.PERIOD_M1, count=5)
     ```
 
 CLI Usage:
-    `uv run python -m scripts.examples.brokers_data --broker files`
+    ```bash
+    uv run python -m app.services.brokers.files
+    ```
 """
 
 from __future__ import annotations
 
-import csv
 import re
+import tempfile
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
+from app.services.brokers._file_history import (
+    find_matching_partitions,
+    parse_delimited_bars,
+    parse_delimited_ticks,
+    read_parquet_bars,
+)
+from app.services.brokers._native_history import (
+    decode_fxt_bytes,
+    decode_hst_bytes,
+)
+from app.services.brokers.capabilities import (
+    CancellationToken,
+    HistoryPage,
+    HistoryRequest,
+    ProviderCapabilities,
+    ProviderHealth,
+)
 from app.services.data import BridgeError, DataBrokerBackend
 from app.services.trading import SymbolSnapshot
 
-logger = get_logger(__name__)
+PARSING_FR = "FR-BROKER-FILES-PARSING"
+SYMBOLS_FR = "FR-BROKER-FILES-SYMBOLS"
+HEALTH_FR = "FR-BROKER-FILES-HEALTH"
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
 
-__all__ = ["FilesBroker", "create_adapter"]
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "id": "files",
+    "name": "Local Files",
+    "version": "1.0.0",
+    "slot": "data.provider",
+    "entry_point": "files:create_adapter",
+    "description": "Local filesystem market data broker supporting CSV, Parquet, HST, and FXT historical files.",
+    "capabilities": ["data.fetch"],
+}
+
+__all__ = ["PLUGIN_MANIFEST", "FilesBroker", "create_adapter"]
+
+logger = get_logger(__name__)
 
 
 def _parse_timestamp(ts_str: str) -> datetime:
@@ -101,14 +140,105 @@ class FilesBroker(DataBrokerBackend):
         """Initialize Files broker."""
         super().__init__(name=name)
         self.data_dir = Path(data_dir) if data_dir else DEFAULT_DATA_DIR
+        self._is_connected = True
+        self.capabilities = ProviderCapabilities(
+            provider_id="files",
+            display_name="Local File Storage",
+            category="Multi-Asset",
+            supported_timeframes=(
+                "TICK",
+                "M1",
+                "M5",
+                "M15",
+                "M30",
+                "H1",
+                "H4",
+                "D1",
+                "W1",
+                "MN1",
+            ),
+            supported_modes=("bars", "ticks"),
+            requires_auth=False,
+            rate_limit_rps=100.0,
+            default_timeout_seconds=30.0,
+            supports_pagination=False,
+            has_local_archive=True,
+            description="Local filesystem market data broker supporting CSV, Parquet, HST, and FXT files.",
+        )
+
+    @override
+    def close_sync(self) -> None:
+        """Synchronously release local resources."""
+        self._is_connected = False
+
+    @override
+    async def close(self) -> None:
+        """Asynchronously release local resources."""
+        self.close_sync()
+
+    def check_health(self) -> ProviderHealth:
+        """Check accessibility and readability of the local data directory."""
+        t0 = time.monotonic()
+        if not self.data_dir.exists():
+            latency = (time.monotonic() - t0) * 1000.0
+            logger.warning(
+                "%s: Local data directory does not exist: %s",
+                HEALTH_FR,
+                self.data_dir,
+                extra={"fr_id": HEALTH_FR, "data_dir": str(self.data_dir)},
+            )
+            return ProviderHealth(
+                provider_id="files",
+                status="DEGRADED",
+                connected=False,
+                message=f"Local data directory does not exist: {self.data_dir}",
+                latency_ms=latency,
+                capabilities=self.capabilities,
+            )
+
+        try:
+            # Verify readability
+            _ = list(self.data_dir.glob("*"))[:5]
+            latency = (time.monotonic() - t0) * 1000.0
+            logger.info(
+                "%s: Local data directory is accessible: %s (latency=%.2fms)",
+                HEALTH_FR,
+                self.data_dir,
+                latency,
+                extra={"fr_id": HEALTH_FR, "data_dir": str(self.data_dir)},
+            )
+            return ProviderHealth(
+                provider_id="files",
+                status="HEALTHY",
+                connected=True,
+                message=f"Local data directory accessible: {self.data_dir}",
+                latency_ms=latency,
+                capabilities=self.capabilities,
+            )
+        except Exception as exc:
+            latency = (time.monotonic() - t0) * 1000.0
+            logger.warning(
+                "%s: Failed to read local data directory: %s",
+                HEALTH_FR,
+                exc,
+                extra={"fr_id": HEALTH_FR, "error": str(exc)},
+            )
+            return ProviderHealth(
+                provider_id="files",
+                status="UNHEALTHY",
+                connected=False,
+                message=f"Cannot read local data directory: {exc}",
+                latency_ms=latency,
+                capabilities=self.capabilities,
+            )
 
     def _scan_catalog(self) -> dict[str, list[Path]]:
-        """Index symbols dynamically by discovering CSV, TXT, and Parquet files."""
+        """Index symbols dynamically by discovering files."""
         catalog: dict[str, list[Path]] = {}
         if not self.data_dir.exists():
             return catalog
 
-        for ext in ("*.parquet", "*.csv", "*.txt"):
+        for ext in ("*.parquet", "*.csv", "*.txt", "*.hst", "*.fxt", "*.tsv"):
             for p in self.data_dir.rglob(ext):
                 raw_sym = p.stem.upper()
                 for token in ("_M1", "_D1", "_H1", "_TICK", "_TICKS", "_BARS"):
@@ -123,7 +253,7 @@ class FilesBroker(DataBrokerBackend):
         symbol: str,
         timeframe: str | None = None,
     ) -> list[Path]:
-        """Find CSV or Parquet files associated with symbol."""
+        """Find data files associated with symbol."""
         sym_clean = symbol.lower().replace("/", "").replace("_", "").replace("-", "")
         matches: list[Path] = []
         if not self.data_dir.exists():
@@ -131,7 +261,7 @@ class FilesBroker(DataBrokerBackend):
 
         tf_token = str(timeframe).lower().strip() if timeframe else None
 
-        for ext in ("*.parquet", "*.csv", "*.txt"):
+        for ext in ("*.parquet", "*.csv", "*.txt", "*.hst", "*.fxt", "*.tsv"):
             for p in self.data_dir.rglob(ext):
                 name_clean = (
                     p.stem.lower().replace("/", "").replace("_", "").replace("-", "")
@@ -164,6 +294,12 @@ class FilesBroker(DataBrokerBackend):
     def symbol_info(self, symbol: str) -> SymbolSnapshot:
         """Resolve symbol metadata as canonical SymbolSnapshot."""
         sym_upper = symbol.upper()
+        logger.info(
+            "%s: Resolved symbol info for %s",
+            SYMBOLS_FR,
+            sym_upper,
+            extra={"fr_id": SYMBOLS_FR, "symbol": sym_upper},
+        )
         return SymbolSnapshot(
             name=sym_upper,
             custom=True,
@@ -176,7 +312,14 @@ class FilesBroker(DataBrokerBackend):
     def symbols_get(self) -> list[str]:
         """Return list of distinct symbol names discovered in filesystem."""
         catalog = self._scan_catalog()
-        return sorted(catalog.keys())
+        symbols = sorted(catalog.keys())
+        logger.info(
+            "%s: Discovered %d symbols in filesystem catalog",
+            SYMBOLS_FR,
+            len(symbols),
+            extra={"fr_id": SYMBOLS_FR, "count": len(symbols)},
+        )
+        return symbols
 
     @override
     def fetch_bars(
@@ -190,16 +333,26 @@ class FilesBroker(DataBrokerBackend):
         count: int,
         limit: int,
     ) -> list[dict[str, Any]]:
-        """Retrieve historical candlestick bars from local CSV or Parquet files."""
+        """Retrieve historical candlestick bars from local files."""
         del mode
-        files = self._find_symbol_files(symbol, timeframe=timeframe)
+        # Exact partition matching first
+        files = find_matching_partitions(self.data_dir, symbol, timeframe)
         if not files:
+            files = self._find_symbol_files(symbol, timeframe=timeframe)
+        if not files:
+            logger.warning(
+                "%s: No files found for %s %s in %s",
+                PARSING_FR,
+                symbol,
+                timeframe,
+                self.data_dir,
+                extra={"fr_id": PARSING_FR, "symbol": symbol, "timeframe": timeframe},
+            )
             raise BridgeError(
                 f"No local files found for symbol '{symbol}' in {self.data_dir}",
                 code="FILE_NOT_FOUND",
             )
 
-        target_file = files[-1]
         target_count = count if count > 0 else limit
         date_from = datetime.fromtimestamp(start, tz=UTC) if 0 < start < 2**40 else None
         date_to = datetime.fromtimestamp(end, tz=UTC) if 0 < end < 2**40 else None
@@ -207,125 +360,66 @@ class FilesBroker(DataBrokerBackend):
         rows: list[dict[str, Any]] = []
 
         try:
-            if target_file.suffix == ".parquet":
-                import pyarrow.parquet as pq
-
-                table = pq.read_table(target_file)
-                data_dict = table.to_pydict()
-                dts = (
-                    data_dict.get("DateTime")
-                    or data_dict.get("datetime")
-                    or data_dict.get("Date")
-                    or []
-                )
-                opens = data_dict.get("Open") or data_dict.get("open") or []
-                highs = data_dict.get("High") or data_dict.get("high") or []
-                lows = data_dict.get("Low") or data_dict.get("low") or []
-                closes = data_dict.get("Close") or data_dict.get("close") or []
-                vols = data_dict.get("Volume") or data_dict.get("volume") or []
-
-                for i in range(len(dts)):
-                    dt = dts[i]
-                    if hasattr(dt, "to_pydatetime"):
-                        dt = dt.to_pydatetime()
-                    if dt.tzinfo is None:
-                        dt = dt.replace(tzinfo=UTC)
-
-                    if date_from and dt < date_from:
-                        continue
-                    if date_to and dt > date_to:
-                        continue
-
-                    vol = int(vols[i]) if i < len(vols) else 0
-                    o = float(opens[i])
-                    c = float(closes[i])
-                    h = max(float(highs[i]), o, c)
-                    l = min(float(lows[i]), o, c)
-                    rows.append(
-                        {
-                            "time": int(dt.timestamp()),
-                            "open": o,
-                            "high": h,
-                            "low": l,
-                            "close": c,
-                            "tick_volume": vol,
-                            "spread": 0,
-                            "real_volume": vol,
-                        }
+            for file_path in files:
+                if file_path.suffix == ".parquet":
+                    rows.extend(read_parquet_bars(file_path, count=None))
+                elif file_path.suffix == ".hst":
+                    data = file_path.read_bytes()
+                    rows.extend(decode_hst_bytes(data))
+                elif file_path.suffix == ".fxt":
+                    data = file_path.read_bytes()
+                    rows.extend(decode_fxt_bytes(data))
+                elif file_path.suffix in (".csv", ".txt", ".tsv"):
+                    content = file_path.read_text(encoding="utf-8", errors="replace")
+                    rows.extend(
+                        parse_delimited_bars(
+                            content, symbol=symbol, timeframe=timeframe
+                        )
                     )
-            elif target_file.suffix in (".csv", ".txt"):
-                with target_file.open("r", encoding="utf-8", errors="replace") as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        low_row = {
-                            k.lower().strip().replace("<", "").replace(">", ""): v
-                            for k, v in row.items()
-                            if k
-                        }
-                        dt_val = (
-                            low_row.get("datetime")
-                            or low_row.get("date_time")
-                            or low_row.get("timestamp")
-                        )
-                        if not dt_val:
-                            d_col = low_row.get("date")
-                            t_col = low_row.get("time")
-                            if d_col and t_col:
-                                dt_val = f"{d_col} {t_col}"
-                            elif d_col:
-                                dt_val = d_col
-                            elif t_col:
-                                dt_val = t_col
-                        if not dt_val:
-                            continue
+                else:
+                    logger.warning(
+                        "%s: Skipping unsupported file format: %s",
+                        PARSING_FR,
+                        file_path.suffix,
+                    )
 
-                        dt = _parse_timestamp(dt_val)
-                        if date_from and dt < date_from:
-                            continue
-                        if date_to and dt > date_to:
-                            continue
+            # Date filtering across all aggregated partitions
+            filtered: list[dict[str, Any]] = []
+            for r in rows:
+                t = r["time"]
+                dt = datetime.fromtimestamp(t, tz=UTC)
+                if date_from and dt < date_from:
+                    continue
+                if date_to and dt > date_to:
+                    continue
+                filtered.append(r)
 
-                        o = float(low_row.get("open", 0.0))
-                        c = float(low_row.get("close", 0.0))
-                        h = max(float(low_row.get("high", 0.0)), o, c)
-                        l = min(float(low_row.get("low", 0.0)), o, c)
-                        vol = int(
-                            float(
-                                low_row.get("volume")
-                                or low_row.get("vol")
-                                or low_row.get("tick_volume")
-                                or 0.0
-                            )
-                        )
-                        rows.append(
-                            {
-                                "time": int(dt.timestamp()),
-                                "open": o,
-                                "high": h,
-                                "low": l,
-                                "close": c,
-                                "tick_volume": vol,
-                                "spread": 0,
-                                "real_volume": vol,
-                            }
-                        )
-
-            rows.sort(key=lambda r: r["time"])
+            filtered.sort(key=lambda r: r["time"])
             deduped: list[dict[str, Any]] = []
             last_t: int | None = None
-            for r in rows:
+            for r in filtered:
                 if last_t is None or r["time"] > last_t:
                     deduped.append(r)
                     last_t = r["time"]
 
             if target_count and len(deduped) > target_count:
                 deduped = deduped[-target_count:]
+
+            logger.info(
+                "%s: Parsed %d bars for %s %s from %d partition file(s)",
+                PARSING_FR,
+                len(deduped),
+                symbol,
+                timeframe,
+                len(files),
+                extra={"fr_id": PARSING_FR, "count": len(deduped), "symbol": symbol},
+            )
             return deduped
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise
             raise BridgeError(
-                f"Failed to parse bars from {target_file}: {exc}", code="READ_ERROR"
+                f"Failed to parse bars for {symbol}: {exc}", code="READ_ERROR"
             ) from exc
 
     @override
@@ -339,9 +433,11 @@ class FilesBroker(DataBrokerBackend):
         count: int,
         limit: int,
     ) -> list[dict[str, Any]]:
-        """Retrieve historical ticks from local CSV or Parquet files."""
+        """Retrieve historical ticks from local files."""
         del mode
-        files = self._find_symbol_files(symbol, timeframe="tick")
+        files = find_matching_partitions(self.data_dir, symbol, "tick")
+        if not files:
+            files = self._find_symbol_files(symbol, timeframe="tick")
         if not files:
             files = self._find_symbol_files(symbol)
         if not files:
@@ -349,62 +445,156 @@ class FilesBroker(DataBrokerBackend):
                 f"No local files found for symbol '{symbol}'", code="FILE_NOT_FOUND"
             )
 
-        target_file = files[-1]
         target_count = count if count > 0 else limit
         rows: list[dict[str, Any]] = []
 
         try:
-            if target_file.suffix in (".csv", ".txt"):
-                with target_file.open("r", encoding="utf-8", errors="replace") as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        low_row = {
-                            k.lower().strip().replace("<", "").replace(">", ""): v
-                            for k, v in row.items()
-                            if k
-                        }
-                        dt_val = (
-                            low_row.get("datetime")
-                            or low_row.get("date_time")
-                            or low_row.get("timestamp")
-                        )
-                        if not dt_val:
-                            continue
-                        dt = _parse_timestamp(dt_val)
-                        t_ms = int(dt.timestamp() * 1000)
-                        if start_ms > 0 and t_ms < start_ms:
-                            continue
-                        if end_ms > 0 and t_ms > end_ms:
-                            continue
-
-                        bid = float(low_row.get("bid", 0.0))
-                        ask = float(low_row.get("ask", 0.0))
-                        last = float(low_row.get("last", (bid + ask) / 2.0))
-                        vol = float(low_row.get("volume", 1.0))
+            for file_path in files:
+                if file_path.suffix == ".fxt":
+                    data = file_path.read_bytes()
+                    bar_rows = decode_fxt_bytes(data)
+                    for b in bar_rows:
                         rows.append(
                             {
-                                "time_msc": t_ms,
-                                "bid": bid,
-                                "ask": ask,
-                                "last": last,
-                                "volume": int(vol),
+                                "time_msc": b["time"] * 1000,
+                                "bid": b["close"],
+                                "ask": b["close"],
+                                "last": b["close"],
+                                "volume": b.get("volume", b.get("tick_volume", 1)),
                                 "flags": 0,
-                                "volume_real": vol,
+                                "volume_real": float(
+                                    b.get("volume", b.get("tick_volume", 1))
+                                ),
                             }
                         )
+                elif file_path.suffix in (".csv", ".txt", ".tsv"):
+                    content = file_path.read_text(encoding="utf-8", errors="replace")
+                    rows.extend(parse_delimited_ticks(content, symbol=symbol))
+                else:
+                    logger.warning(
+                        "%s: Skipping unsupported tick file format: %s",
+                        PARSING_FR,
+                        file_path.suffix,
+                    )
 
-            rows.sort(key=lambda r: r["time_msc"])
-            if target_count and len(rows) > target_count:
-                rows = rows[-target_count:]
-            return rows
+            filtered: list[dict[str, Any]] = []
+            for r in rows:
+                t_ms = r["time_msc"]
+                if start_ms > 0 and t_ms < start_ms:
+                    continue
+                if end_ms > 0 and t_ms > end_ms:
+                    continue
+                filtered.append(r)
+
+            filtered.sort(key=lambda r: r["time_msc"])
+            if target_count and len(filtered) > target_count:
+                filtered = filtered[-target_count:]
+
+            logger.info(
+                "%s: Parsed %d ticks for %s from %d partition file(s)",
+                PARSING_FR,
+                len(filtered),
+                symbol,
+                len(files),
+                extra={"fr_id": PARSING_FR, "count": len(filtered), "symbol": symbol},
+            )
+            return filtered
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise
             raise BridgeError(
-                f"Failed to parse ticks from {target_file}: {exc}", code="READ_ERROR"
+                f"Failed to parse ticks for {symbol}: {exc}", code="READ_ERROR"
             ) from exc
+
+    def read_history(
+        self,
+        request: HistoryRequest,
+        token: CancellationToken | None = None,
+    ) -> HistoryPage:
+        """Acquire historical bars or ticks according to typed request specification."""
+        if token is not None:
+            token.check_cancelled()
+        request.validate()
+
+        if request.kind == "ticks" or request.timeframe.upper() == "TICK":
+            start_ms = (request.start_epoch() or 0) * 1000
+            end_ms = (request.end_epoch() or 0) * 1000
+            rows = self.fetch_ticks(
+                symbol=request.symbol,
+                mode=request.mode,
+                start_ms=start_ms,
+                end_ms=end_ms,
+                count=request.count,
+                limit=request.limit,
+            )
+        else:
+            start_s = request.start_epoch() or 0
+            end_s = request.end_epoch() or 0
+            rows = self.fetch_bars(
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                mode=request.mode,
+                start=start_s,
+                end=end_s,
+                count=request.count,
+                limit=request.limit,
+            )
+
+        if token is not None:
+            token.check_cancelled()
+
+        return HistoryPage(
+            provider="files",
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            kind=request.kind,
+            rows=rows,
+            cursor=None,
+            is_complete=True,
+            provenance={"source": "local_files", "data_dir": str(self.data_dir)},
+        )
 
 
 def create_adapter(_context: PluginHostContext | None = None) -> FilesBroker:
     """Plugin entrypoint factory constructing FilesBroker adapter."""
     return FilesBroker()
+
+
+def main() -> None:
+    """Demonstrate executable usage of FilesBroker."""
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        csv_file = tmp_path / "EURUSD_M1.csv"
+        csv_file.write_text(
+            "timestamp,open,high,low,close,volume\n"
+            "2026-01-01 00:00:00,1.1000,1.1010,1.0990,1.1005,100\n"
+            "2026-01-01 00:01:00,1.1005,1.1015,1.1000,1.1010,120\n",
+            encoding="utf-8",
+        )
+        broker = FilesBroker(data_dir=tmp_path)
+        health = broker.check_health()
+        print(f"Health: {health.status} (connected={health.connected})")
+        bars = broker.fetch_bars(
+            symbol="EURUSD",
+            timeframe="M1",
+            mode="range",
+            start=0,
+            end=0,
+            count=10,
+            limit=10,
+        )
+        print(f"Read {len(bars)} bars successfully from {csv_file.name}")
+        req = HistoryRequest(
+            provider="files",
+            symbol="EURUSD",
+            timeframe="M1",
+            kind="bars",
+            count=5,
+        )
+        page = broker.read_history(req)
+        print(f"Page rows: {page.row_count}")
+        broker.close_sync()
+
+
+if __name__ == "__main__":
+    main()

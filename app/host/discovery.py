@@ -853,7 +853,7 @@ class PluginDiscoveryEngine:
 
         root_resolved = search_dir.resolve()
         for item in sorted(root_resolved.iterdir()):
-            if item.name.startswith(".") or item.name == "__pycache__":
+            if item.name.startswith(".") or item.name in ("__pycache__", "exchanges"):
                 continue
             self._inspect_root_entry(item, root_resolved)
 
@@ -1059,26 +1059,36 @@ class PluginDiscoveryEngine:
     ) -> dict[str, Any] | None:
         """Extract literal ``PLUGIN_MANIFEST`` dict from a parsed AST module."""
         for node in tree.body:
-            if not isinstance(node, ast.Assign):
-                continue
-            for target in node.targets:
-                if isinstance(target, ast.Name) and target.id == "PLUGIN_MANIFEST":
-                    try:
-                        evaluated = ast.literal_eval(node.value)
-                    except (ValueError, SyntaxError) as exc:
-                        self.record_diagnostic(
-                            plugin_id=None,
-                            source_path=file_path,
-                            severity="ERROR",
-                            code="INVALID_AST_MANIFEST",
-                            message=(
-                                "PLUGIN_MANIFEST must be a static literal "
-                                f"dictionary: {exc}"
-                            ),
-                        )
-                        return None
-                    if isinstance(evaluated, dict):
-                        return evaluated
+            val_node = None
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id == "PLUGIN_MANIFEST":
+                        val_node = node.value
+                        break
+            elif (
+                isinstance(node, ast.AnnAssign)
+                and isinstance(node.target, ast.Name)
+                and node.target.id == "PLUGIN_MANIFEST"
+            ):
+                val_node = node.value
+
+            if val_node is not None:
+                try:
+                    evaluated = ast.literal_eval(val_node)
+                except (ValueError, SyntaxError) as exc:
+                    self.record_diagnostic(
+                        plugin_id=None,
+                        source_path=file_path,
+                        severity="ERROR",
+                        code="INVALID_AST_MANIFEST",
+                        message=(
+                            "PLUGIN_MANIFEST must be a static literal "
+                            f"dictionary: {exc}"
+                        ),
+                    )
+                    return None
+                if isinstance(evaluated, dict):
+                    return evaluated
         return None
 
     def _register_parsed_manifest(
@@ -1518,11 +1528,15 @@ class PluginLifecycleManager:
         discovery_engine: PluginDiscoveryEngine,
         data_root: Path,
         plugin_settings: dict[str, dict[str, Any]] | None = None,
+        instance_factory_hook: (
+            Callable[[str, PluginRecord, PluginHostContext], Any] | None
+        ) = None,
     ) -> None:
         """Initialize the lifecycle manager."""
         self.discovery = discovery_engine
         self.data_root = Path(data_root)
         self.plugin_settings: dict[str, dict[str, Any]] = dict(plugin_settings or {})
+        self.instance_factory_hook = instance_factory_hook
         self._contexts: dict[str, PluginHostContext] = {}
         self._loaded_modules: dict[str, list[str]] = {}
         self._lock = threading.RLock()
@@ -1652,11 +1666,15 @@ class PluginLifecycleManager:
         )
 
         try:
-            module = self._load_plugin_module(plugin_id, record, mod_part)
-            target_callable = self._resolve_entrypoint_callable(
-                module, mod_part, attr_name, record.manifest.entry_point
-            )
-            instance = self._invoke_entrypoint(target_callable, ctx)
+            instance = None
+            if self.instance_factory_hook is not None:
+                instance = self.instance_factory_hook(plugin_id, record, ctx)
+            if instance is None:
+                module = self._load_plugin_module(plugin_id, record, mod_part)
+                target_callable = self._resolve_entrypoint_callable(
+                    module, mod_part, attr_name, record.manifest.entry_point
+                )
+                instance = self._invoke_entrypoint(target_callable, ctx)
         except Exception as exc:
             record.state = PluginState.FAILED
             record.instance = None

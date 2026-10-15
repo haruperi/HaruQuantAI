@@ -3,50 +3,70 @@
 Description:
     Implements a zero-credential, web-based market data broker querying Yahoo Finance
     v8 chart and v7 quote REST endpoints. Conforms directly to the canonical
-    `TradingBackend` protocol via `DataBrokerBackend`. Provides normalized historical
-    candlestick bars (`MarketData.Bars`) and symbol specifications (`SymbolSnapshot`).
+    `TradingBackend` protocol and Stage 2C `data.provider` specification. Provides
+    normalized historical candlestick bars (`MarketData.Bars`) and symbol
+    specifications (`SymbolSnapshot`). Enforces strict timeframe guards, rejecting
+    tick data requests, and maps upstream HTTP 429/5xx status codes to typed provider errors.
 
 Purpose:
     FEAT-BROKER-YAHOO: Public Market Data and Symbol Metadata Provider.
 
 Key Capabilities:
-    - FR-BROKER-YAHOO-MARKET-DATA: Historical Candlestick Bars
-      Associated: `[YahooBroker.fetch_bars()]`
+    - FR-BROKER-YAHOO-MARKET-DATA: Historical Candlestick Bars Ingestion
+      Associated: `[YahooBroker.fetch_bars()]`, `[YahooBroker.read_history()]`
       Logging: Emits INFO log upon parsing chart results, and WARNING log if
-      symbol is not found or payload is malformed.
+      symbol is not found, rate limit is exceeded, or payload is malformed.
     - FR-BROKER-YAHOO-SYMBOL-METADATA: Symbol Metadata and Quote Resolution
-      Associated: `[YahooBroker.symbol_info()]`
+      Associated: `[YahooBroker.symbol_info()]`, `[YahooBroker.symbols_get()]`
       Logging: Emits INFO log upon quote resolution, and WARNING on request failure.
+    - FR-BROKER-YAHOO-HEALTH: Remote Endpoint Health and Latency Inspection
+      Associated: `[YahooBroker.check_health()]`
+      Logging: Emits INFO on reachable probe and WARNING on network or rate limit failure.
 
 Python API Usage:
     ```python
-    from app.services.data import Timeframe, get_historical_bars
     from app.services.brokers.yahoo import YahooBroker
+    from app.services.data import Timeframe, get_historical_bars
 
     broker = YahooBroker()
+    health = broker.check_health()
     bars = await get_historical_bars(broker, "AAPL", Timeframe.PERIOD_D1, count=5)
     assert len(bars) > 0
+    broker.close_sync()
     ```
 
 CLI Usage:
-    `uv run python -m scripts.examples.brokers_data --broker yahoo`
+    ```bash
+    uv run python -m app.services.brokers.yahoo
+    ```
 """
 
 from __future__ import annotations
 
+import json
+import time
+from pathlib import Path
 from typing import Any, override
 
-import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
-from app.services.data import (
-    BridgeError,
-    DataBrokerBackend,
-    Timeframe,
+from app.services.brokers._http import create_http_session, execute_bounded_get
+from app.services.brokers.capabilities import (
+    CancellationToken,
+    HistoryPage,
+    HistoryRequest,
+    ProviderCapabilities,
+    ProviderError,
+    ProviderHealth,
+    ProviderRateLimitError,
+    ProviderUnsupportedError,
 )
+from app.services.data import BridgeError, DataBrokerBackend, Timeframe
 from app.services.trading import SymbolSnapshot
 
-logger = get_logger(__name__)
+MARKET_DATA_FR = "FR-BROKER-YAHOO-MARKET-DATA"
+SYMBOL_METADATA_FR = "FR-BROKER-YAHOO-SYMBOL-METADATA"
+HEALTH_FR = "FR-BROKER-YAHOO-HEALTH"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -88,7 +108,19 @@ TIMEFRAME_TO_YAHOO_INTERVAL: dict[str, str] = {
 
 DEFAULT_SYMBOLS = ["AAPL", "MSFT", "GOOGL", "AMZN", "SPY", "QQQ"]
 
-__all__ = ["YahooBroker", "create_adapter"]
+PLUGIN_MANIFEST: dict[str, Any] = {
+    "id": "yahoo",
+    "name": "Yahoo Finance",
+    "version": "1.0.0",
+    "slot": "data.provider",
+    "entry_point": "yahoo:create_adapter",
+    "description": "Yahoo Finance public market data and symbol metadata provider",
+    "capabilities": ["data.fetch"],
+}
+
+__all__ = ["PLUGIN_MANIFEST", "YahooBroker", "create_adapter", "main"]
+
+logger = get_logger(__name__)
 
 
 class YahooBroker(DataBrokerBackend):
@@ -99,12 +131,129 @@ class YahooBroker(DataBrokerBackend):
     COOKIE_URL = "https://fc.yahoo.com"
     CRUMB_URL = "https://query2.finance.yahoo.com/v1/test/getcrumb"
 
-    def __init__(self, name: str = "Yahoo") -> None:
+    def __init__(
+        self,
+        name: str = "Yahoo",
+        cache_dir: str | Path | None = None,
+    ) -> None:
         """Initialize Yahoo Finance broker backend."""
         super().__init__(name=name)
-        self.session = requests.Session()
-        self.session.headers.update({"User-Agent": USER_AGENT})
+        self.session = create_http_session(
+            USER_AGENT, retries=2, backoff=0.5, pool_size=8
+        )
         self.crumb: str | None = None
+        self.cache_dir = Path(cache_dir) if cache_dir else None
+        self._is_connected = True
+        self.capabilities = ProviderCapabilities(
+            provider_id="yahoo",
+            display_name="Yahoo Finance",
+            category="Equities",
+            supported_timeframes=(
+                "M1",
+                "M2",
+                "M5",
+                "M15",
+                "M30",
+                "H1",
+                "D1",
+                "W1",
+                "MN1",
+            ),
+            supported_modes=("bars",),
+            requires_auth=False,
+            rate_limit_rps=2.0,
+            default_timeout_seconds=15.0,
+            supports_pagination=False,
+            has_local_archive=self.cache_dir is not None and self.cache_dir.exists(),
+            description="Yahoo Finance public market data and symbol metadata provider",
+        )
+
+    @override
+    def close_sync(self) -> None:
+        """Synchronously close session resources."""
+        self._is_connected = False
+        if hasattr(self, "session"):
+            self.session.close()
+
+    @override
+    async def close(self) -> None:
+        """Asynchronously close session resources."""
+        self.close_sync()
+
+    def check_health(self) -> ProviderHealth:
+        """Verify reachability and latency of Yahoo Finance quote endpoints."""
+        t0 = time.monotonic()
+        try:
+            crumb = self._ensure_crumb()
+            params: dict[str, Any] = {"symbols": "AAPL"}
+            if crumb:
+                params["crumb"] = crumb
+            resp = self.session.get(
+                self.QUOTE_URL,
+                params=params,
+                timeout=5.0,
+            )
+            latency = (time.monotonic() - t0) * 1000.0
+            if resp.status_code == 200:
+                logger.info(
+                    "%s: Health check SUCCESS (latency=%.2fms)",
+                    HEALTH_FR,
+                    latency,
+                    extra={"fr_id": HEALTH_FR, "latency_ms": latency},
+                )
+                return ProviderHealth(
+                    provider_id="yahoo",
+                    status="HEALTHY",
+                    connected=True,
+                    message="Yahoo Finance REST endpoints reachable",
+                    latency_ms=latency,
+                    capabilities=self.capabilities,
+                )
+            if resp.status_code == 429:
+                logger.warning(
+                    "%s: Health check RATE_LIMITED (latency=%.2fms)",
+                    HEALTH_FR,
+                    latency,
+                    extra={"fr_id": HEALTH_FR, "status_code": 429},
+                )
+                return ProviderHealth(
+                    provider_id="yahoo",
+                    status="DEGRADED",
+                    connected=False,
+                    message="Yahoo Finance rate limit encountered (HTTP 429)",
+                    latency_ms=latency,
+                    capabilities=self.capabilities,
+                )
+            logger.warning(
+                "%s: Health check UNEXPECTED_STATUS HTTP %d",
+                HEALTH_FR,
+                resp.status_code,
+                extra={"fr_id": HEALTH_FR, "status_code": resp.status_code},
+            )
+            return ProviderHealth(
+                provider_id="yahoo",
+                status="DEGRADED",
+                connected=False,
+                message=f"Yahoo Finance returned HTTP {resp.status_code}",
+                latency_ms=latency,
+                capabilities=self.capabilities,
+            )
+        except Exception as exc:
+            latency = (time.monotonic() - t0) * 1000.0
+            logger.warning(
+                "%s: Health check UNREACHABLE: %s",
+                HEALTH_FR,
+                exc,
+                extra={"fr_id": HEALTH_FR, "error": str(exc)},
+            )
+            return ProviderHealth(
+                provider_id="yahoo",
+                status="UNHEALTHY",
+                connected=False,
+                message=f"Yahoo Finance unreachable: {exc}",
+                latency_ms=latency,
+                capabilities=self.capabilities,
+            )
 
     def _ensure_crumb(self) -> str | None:
         """Acquire and cache Yahoo Finance session cookie and crumb token."""
@@ -131,12 +280,20 @@ class YahooBroker(DataBrokerBackend):
     def _map_interval(self, timeframe: str) -> str:
         """Map standard timeframe string to Yahoo Finance interval."""
         tf_clean = str(timeframe).upper().strip()
+        if tf_clean in ("TICK", "TICKS"):
+            raise ProviderUnsupportedError(
+                "Yahoo Finance does not provide tick-level data",
+                provider="yahoo",
+            )
         if tf_clean in TIMEFRAME_TO_YAHOO_INTERVAL:
             return TIMEFRAME_TO_YAHOO_INTERVAL[tf_clean]
         for tf_str, interval in TIMEFRAME_TO_YAHOO_INTERVAL.items():
             if tf_clean.endswith(tf_str) or tf_str.endswith(tf_clean):
                 return interval
-        return "1d"
+        raise ProviderUnsupportedError(
+            f"Unsupported timeframe '{timeframe}' for Yahoo Finance",
+            provider="yahoo",
+        )
 
     @override
     def fetch_bars(
@@ -171,15 +328,51 @@ class YahooBroker(DataBrokerBackend):
         else:
             params["range"] = "2y"
 
+        cache_file: Path | None = None
+        if self.cache_dir is not None:
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+            cache_file = self.cache_dir / f"{sym_clean}_{interval}.json"
+
         try:
             url = self.CHART_URL.format(symbol=sym_clean)
-            resp = self.session.get(url, params=params, timeout=15)
+            resp = execute_bounded_get(
+                self.session, url, params=params, provider="yahoo"
+            )
+            if resp.status_code == 429:
+                logger.warning(
+                    "%s: Yahoo rate limit exceeded for %s",
+                    MARKET_DATA_FR,
+                    sym_clean,
+                    extra={"fr_id": MARKET_DATA_FR, "symbol": sym_clean},
+                )
+                raise ProviderRateLimitError(
+                    f"Yahoo Finance rate limit exceeded (HTTP 429) for {sym_clean}",
+                    provider="yahoo",
+                )
+            if resp.status_code >= 500:
+                logger.warning(
+                    "%s: Yahoo upstream service error HTTP %d for %s",
+                    MARKET_DATA_FR,
+                    resp.status_code,
+                    sym_clean,
+                    extra={"fr_id": MARKET_DATA_FR, "status_code": resp.status_code},
+                )
+                raise ProviderError(
+                    f"Yahoo upstream server error HTTP {resp.status_code}",
+                    code="UPSTREAM_UNAVAILABLE",
+                    status_code=503,
+                    provider="yahoo",
+                )
             if resp.status_code != 200:
                 raise BridgeError(
                     f"Yahoo API failed with HTTP {resp.status_code}",
                     code="REMOTE_ERROR",
                 )
+
             payload = resp.json()
+            if cache_file is not None:
+                cache_file.write_text(json.dumps(payload), encoding="utf-8")
+
             res_list = payload.get("chart", {}).get("result", [])
             if not res_list:
                 raise BridgeError(
@@ -212,8 +405,8 @@ class YahooBroker(DataBrokerBackend):
                     vol = int(volumes[i] or 0) if i < len(volumes) else 0
                     o = float(opens[i])
                     c = float(closes[i])
-                    h = max(float(highs[i]), o, c)
-                    l = min(float(lows[i]), o, c)
+                    h = float(highs[i])
+                    l = float(lows[i])
                     rows.append(
                         {
                             "time": int(ts),
@@ -239,14 +432,92 @@ class YahooBroker(DataBrokerBackend):
             target_count = count if count > 0 else limit
             if target_count and len(deduped) > target_count:
                 deduped = deduped[-target_count:]
+
+            logger.info(
+                "%s: Parsed %d bars for %s (%s)",
+                MARKET_DATA_FR,
+                len(deduped),
+                sym_clean,
+                interval,
+                extra={
+                    "fr_id": MARKET_DATA_FR,
+                    "count": len(deduped),
+                    "symbol": sym_clean,
+                },
+            )
             return deduped
         except Exception as exc:
-            if isinstance(exc, BridgeError):
+            if isinstance(exc, (BridgeError, ProviderError)):
                 raise
             raise BridgeError(
                 f"Error downloading Yahoo bars for {sym_clean}: {exc}",
                 code="DOWNLOAD_ERROR",
             ) from exc
+
+    @override
+    def fetch_ticks(
+        self,
+        *,
+        symbol: str,
+        mode: str,
+        start_ms: int,
+        end_ms: int,
+        count: int,
+        limit: int,
+    ) -> list[dict[str, Any]]:
+        """Reject tick data requests, as Yahoo Finance does not provide ticks."""
+        del symbol, mode, start_ms, end_ms, count, limit
+        logger.warning(
+            "%s: Rejected tick download request on Yahoo Finance",
+            MARKET_DATA_FR,
+            extra={"fr_id": MARKET_DATA_FR},
+        )
+        raise ProviderUnsupportedError(
+            "Yahoo Finance does not provide tick-level market data",
+            provider="yahoo",
+        )
+
+    def read_history(
+        self,
+        request: HistoryRequest,
+        token: CancellationToken | None = None,
+    ) -> HistoryPage:
+        """Acquire historical bars conforming to typed request model."""
+        if token is not None:
+            token.check_cancelled()
+        request.validate()
+
+        if request.kind == "ticks" or request.timeframe.upper() == "TICK":
+            raise ProviderUnsupportedError(
+                "Yahoo Finance does not support tick history",
+                provider="yahoo",
+            )
+
+        start_s = request.start_epoch() or 0
+        end_s = request.end_epoch() or 0
+        rows = self.fetch_bars(
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            mode=request.mode,
+            start=start_s,
+            end=end_s,
+            count=request.count,
+            limit=request.limit,
+        )
+
+        if token is not None:
+            token.check_cancelled()
+
+        return HistoryPage(
+            provider="yahoo",
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            kind=request.kind,
+            rows=rows,
+            cursor=None,
+            is_complete=True,
+            provenance={"source": "yahoo_v8_chart", "url": self.CHART_URL},
+        )
 
     @override
     def symbol_info(self, symbol: str) -> SymbolSnapshot:
@@ -274,9 +545,20 @@ class YahooBroker(DataBrokerBackend):
                     ask = float(item.get("ask") or price)
         except Exception as exc:
             logger.warning(
-                "Could not fetch live quote for %s from Yahoo: %s", sym_clean, exc
+                "%s: Could not fetch live quote for %s from Yahoo: %s",
+                SYMBOL_METADATA_FR,
+                sym_clean,
+                exc,
+                extra={"fr_id": SYMBOL_METADATA_FR, "symbol": sym_clean},
             )
 
+        logger.info(
+            "%s: Resolved symbol info for %s (price=%.2f)",
+            SYMBOL_METADATA_FR,
+            sym_clean,
+            price,
+            extra={"fr_id": SYMBOL_METADATA_FR, "symbol": sym_clean, "price": price},
+        )
         return SymbolSnapshot(
             name=sym_clean,
             custom=False,
@@ -290,6 +572,12 @@ class YahooBroker(DataBrokerBackend):
     @override
     def symbols_get(self) -> list[str]:
         """Return default popular symbols available on Yahoo."""
+        logger.info(
+            "%s: Returning default Yahoo symbol list (%d items)",
+            SYMBOL_METADATA_FR,
+            len(DEFAULT_SYMBOLS),
+            extra={"fr_id": SYMBOL_METADATA_FR, "count": len(DEFAULT_SYMBOLS)},
+        )
         return list(DEFAULT_SYMBOLS)
 
 
@@ -297,3 +585,19 @@ def create_adapter(context: PluginHostContext | None = None) -> YahooBroker:
     """Factory creating configured YahooBroker adapter."""
     del context
     return YahooBroker()
+
+
+def main() -> None:
+    """Demonstrate executable usage of YahooBroker."""
+    broker = YahooBroker()
+    health = broker.check_health()
+    logger.info("Yahoo Health: %s (connected=%s)", health.status, health.connected)
+    symbols = broker.symbols_get()
+    logger.info("Supported symbols: %s...", symbols[:3])
+    info = broker.symbol_info("AAPL")
+    logger.info("AAPL info: digits=%s point=%s", info.digits, info.point)
+    broker.close_sync()
+
+
+if __name__ == "__main__":
+    main()

@@ -51,6 +51,8 @@ from app.host.persistence.read import resolve_connection
 from app.host.response import StandardError, StandardResponse
 from app.host.session import SessionManager
 from app.host.transport import EventBus, extract_bearer_token
+from app.services.brokers.capabilities import ProviderError
+from app.services.brokers.registry import BrokerRegistry
 from app.workspace.data_manager.actions.review.quality import DataQualityInspector
 from app.workspace.data_manager.actions.transform.transforms import (
     CloneTimezoneConfig,
@@ -86,16 +88,21 @@ class DataManagerWorkspace:
 
     def __init__(
         self,
+        *,
         db_path: Path | str | None = None,
         data_dir: Path | str | None = None,
         event_bus: EventBus | None = None,
         plugin_mgr: PluginLifecycleManager | None = None,
+        broker_registry: BrokerRegistry | None = None,
+        job_manager: Any | None = None,
     ) -> None:
         """Instantiate workspace with database path and event broker."""
         self.db_path = Path(db_path) if db_path is not None else None
         self.data_dir = Path(data_dir) if data_dir is not None else Path("data")
         self.event_bus = event_bus
         self.plugin_mgr = plugin_mgr
+        self.broker_registry = broker_registry
+        self.job_manager = job_manager
 
         # Initialize all 11 domain services
         self.log = DataManagerLogService(db_path=self.db_path)
@@ -129,6 +136,8 @@ class DataManagerWorkspace:
             log_service=self.log,
             event_bus=self.event_bus,
             plugin_mgr=self.plugin_mgr,
+            broker_registry=self.broker_registry,
+            job_manager=self.job_manager,
         )
         self.custom_data = CustomDataService(
             db_path=self.db_path,
@@ -787,8 +796,11 @@ def _register_broker_stocks_routes(router: APIRouter, ws: DataManagerWorkspace) 
 def _register_providers_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:
     @router.get("/providers/{provider_id}/health")
     def check_provider_health(provider_id: str) -> JSONResponse:
-        status = ws.connections.check_connection(provider_id).to_dict()
-        return _success(status)
+        try:
+            status = ws.connections.check_connection(provider_id).to_dict()
+            return _success(status)
+        except ProviderError as exc:
+            return _error(exc.code, exc.message, exc.status_code)
 
     @router.get("/providers")
     def list_providers() -> JSONResponse:
@@ -796,10 +808,15 @@ def _register_providers_routes(router: APIRouter, ws: DataManagerWorkspace) -> N
         return _success(providers)
 
     @router.post("/providers/download")
-    def download_data(payload: dict[str, Any] | None = None) -> JSONResponse:
+    async def download_data(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        res = ws.connections.download_historical_data(p).to_dict()
-        return _success(res)
+        try:
+            res = await ws.connections.download_historical_data_async(p)
+            return _success(res.to_dict())
+        except ProviderError as exc:
+            return _error(exc.code, exc.message, exc.status_code)
+        except ValueError as exc:
+            return _error("VALIDATION_ERROR", str(exc), 422)
 
 
 def _register_custom_data_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:

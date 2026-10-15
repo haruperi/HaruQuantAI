@@ -10,11 +10,14 @@ Description:
     - YahooBroker (Yahoo Finance v8 chart / v7 quote)
     - DukascopyBroker (Dukascopy CDN & datafeed)
     - DarwinexBroker (Darwinex CDN ticks & bars)
-    - BinanceBroker (Binance REST Spot & Futures)
+    - BinanceBroker / CryptoBroker (Binance REST Spot & Futures)
     - SQEquityBroker (StrategyQuant US Equities)
     - SQFuturesBroker (StrategyQuant Continuous Futures)
-    - FilesBroker (Local CSV / Parquet data archives)
+    - FilesBroker (Local CSV / Parquet / HST / FXT data archives)
     - TickDownloaderBroker (Tick data downloader)
+    As well as unified registry and typed data capabilities:
+    - BrokerRegistry, BrokerKey, HistoricalProviderView
+    - ProviderCapabilities, HistoryRequest, HistoryPage, ProviderHealth
 """
 
 from __future__ import annotations
@@ -24,12 +27,35 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from app.services.brokers.base import BaseBrokerBackend, BrokerBackend
-    from app.services.brokers.crypto import BinanceBroker
+    from app.services.brokers.capabilities import (
+        CancellationToken,
+        HistoryKind,
+        HistoryPage,
+        HistoryRequest,
+        ProviderAuthError,
+        ProviderCancelledError,
+        ProviderCapabilities,
+        ProviderDisabledError,
+        ProviderError,
+        ProviderHealth,
+        ProviderNotFoundError,
+        ProviderRateLimitError,
+        ProviderTimeoutError,
+        ProviderUnsupportedError,
+        ProviderValidationError,
+    )
+    from app.services.brokers.crypto import BinanceBroker, CryptoBroker
     from app.services.brokers.ctrader import CTraderBackend
     from app.services.brokers.darwinex import DarwinexBroker
     from app.services.brokers.dukascopy import DukascopyBroker
     from app.services.brokers.files import FilesBroker
     from app.services.brokers.metatrader import MT5Backend
+    from app.services.brokers.registry import (
+        BrokerKey,
+        BrokerRegistry,
+        HistoricalProviderView,
+        normalize_broker_name,
+    )
     from app.services.brokers.simulator import SimulationBackend
     from app.services.brokers.sq_equity import SQEquityBroker
     from app.services.brokers.sq_futures import SQFuturesBroker
@@ -69,6 +95,7 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
     "BridgeError": ("app.services.brokers.base", "BridgeError"),
     "DataBrokerBackend": ("app.services.data", "DataBrokerBackend"),
     "BinanceBroker": ("app.services.brokers.crypto", "BinanceBroker"),
+    "CryptoBroker": ("app.services.brokers.crypto", "CryptoBroker"),
     "CTraderBackend": ("app.services.brokers.ctrader", "CTraderBackend"),
     "DarwinexBroker": ("app.services.brokers.darwinex", "DarwinexBroker"),
     "DukascopyBroker": ("app.services.brokers.dukascopy", "DukascopyBroker"),
@@ -82,6 +109,55 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
         "TickDownloaderBroker",
     ),
     "YahooBroker": ("app.services.brokers.yahoo", "YahooBroker"),
+    "BrokerRegistry": ("app.services.brokers.registry", "BrokerRegistry"),
+    "BrokerKey": ("app.services.brokers.registry", "BrokerKey"),
+    "HistoricalProviderView": (
+        "app.services.brokers.registry",
+        "HistoricalProviderView",
+    ),
+    "normalize_broker_name": (
+        "app.services.brokers.registry",
+        "normalize_broker_name",
+    ),
+    "CancellationToken": ("app.services.brokers.capabilities", "CancellationToken"),
+    "HistoryKind": ("app.services.brokers.capabilities", "HistoryKind"),
+    "HistoryPage": ("app.services.brokers.capabilities", "HistoryPage"),
+    "HistoryRequest": ("app.services.brokers.capabilities", "HistoryRequest"),
+    "ProviderAuthError": ("app.services.brokers.capabilities", "ProviderAuthError"),
+    "ProviderCapabilities": (
+        "app.services.brokers.capabilities",
+        "ProviderCapabilities",
+    ),
+    "ProviderCancelledError": (
+        "app.services.brokers.capabilities",
+        "ProviderCancelledError",
+    ),
+    "ProviderDisabledError": (
+        "app.services.brokers.capabilities",
+        "ProviderDisabledError",
+    ),
+    "ProviderError": ("app.services.brokers.capabilities", "ProviderError"),
+    "ProviderHealth": ("app.services.brokers.capabilities", "ProviderHealth"),
+    "ProviderNotFoundError": (
+        "app.services.brokers.capabilities",
+        "ProviderNotFoundError",
+    ),
+    "ProviderRateLimitError": (
+        "app.services.brokers.capabilities",
+        "ProviderRateLimitError",
+    ),
+    "ProviderTimeoutError": (
+        "app.services.brokers.capabilities",
+        "ProviderTimeoutError",
+    ),
+    "ProviderUnsupportedError": (
+        "app.services.brokers.capabilities",
+        "ProviderUnsupportedError",
+    ),
+    "ProviderValidationError": (
+        "app.services.brokers.capabilities",
+        "ProviderValidationError",
+    ),
     "SymbolSpec": ("app.services.trading", "SymbolSpec"),
     "MarketBar": ("app.services.data", "MarketBar"),
     "MarketTick": ("app.services.data", "MarketTick"),
@@ -109,6 +185,7 @@ _SINGLETON_FACTORIES: dict[str, tuple[str, str]] = {
     "darwinex": ("app.services.brokers.darwinex", "DarwinexBroker"),
     "sq_equity": ("app.services.brokers.sq_equity", "SQEquityBroker"),
     "sq_futures": ("app.services.brokers.sq_futures", "SQFuturesBroker"),
+    "crypto": ("app.services.brokers.crypto", "CryptoBroker"),
     "binance": ("app.services.brokers.crypto", "BinanceBroker"),
     "files": ("app.services.brokers.files", "FilesBroker"),
     "tick_downloader": ("app.services.brokers.tick_downloader", "TickDownloaderBroker"),
@@ -122,16 +199,22 @@ _ALIASES: dict[str, str] = {
     "equity": "sq_equity",
     "sq_futures": "sq_futures",
     "futures": "sq_futures",
-    "binance": "binance",
-    "crypto": "binance",
+    "binance": "crypto",
+    "crypto": "crypto",
     "files": "files",
     "file": "files",
     "tick_downloader": "tick_downloader",
 }
 
 
-def get_broker(name: str) -> Any:
-    """Resolve a data broker singleton by name or alias."""
+def get_broker(name: str, registry: Any = None) -> Any:
+    """Resolve a data broker singleton by name or alias, optionally querying a registry."""
+    if registry is not None and hasattr(registry, "resolve_broker"):
+        try:
+            return registry.resolve_broker(name)
+        except KeyError:
+            pass
+
     key = name.lower().strip()
     target = _ALIASES.get(key)
     if target is None:
@@ -162,18 +245,37 @@ __all__ = [
     "BridgeError",
     "BridgeEvent",
     "BrokerBackend",
+    "BrokerKey",
+    "BrokerRegistry",
+    "CancellationToken",
     "CTraderBackend",
+    "CryptoBroker",
     "DarwinexBroker",
     "DataBrokerBackend",
     "DealSnapshot",
     "DukascopyBroker",
     "FilesBroker",
+    "HistoricalProviderView",
+    "HistoryKind",
     "HistoryOrderSnapshot",
+    "HistoryPage",
+    "HistoryRequest",
     "MT5Backend",
     "MarketBar",
     "MarketTick",
     "OrderSnapshot",
     "PositionSnapshot",
+    "ProviderAuthError",
+    "ProviderCapabilities",
+    "ProviderCancelledError",
+    "ProviderDisabledError",
+    "ProviderError",
+    "ProviderHealth",
+    "ProviderNotFoundError",
+    "ProviderRateLimitError",
+    "ProviderTimeoutError",
+    "ProviderUnsupportedError",
+    "ProviderValidationError",
     "Receipt",
     "ReceiptStatus",
     "SQEquityBroker",
@@ -191,10 +293,12 @@ __all__ = [
     "TradingBackend",
     "YahooBroker",
     "binance",
+    "crypto",
     "darwinex",
     "dukascopy",
     "files",
     "get_broker",
+    "normalize_broker_name",
     "sq_equity",
     "sq_futures",
     "tick_downloader",

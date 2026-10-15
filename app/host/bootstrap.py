@@ -132,6 +132,7 @@ from app.host.transport import (
     get_global_event_bus,
     register_transport_exception_handlers,
 )
+from app.services.brokers.registry import BrokerRegistry
 from app.workspace.data_manager import (
     DataManagerWorkspace,
     create_data_manager_router,
@@ -343,6 +344,7 @@ class HostRuntime:
         resource_mgr: ResourceManager | None = None,
         job_mgr: JobManager | None = None,
         plugin_mgr: PluginLifecycleManager | None = None,
+        broker_registry: BrokerRegistry | None = None,
         extra_routers: list[APIRouter] | None = None,
         stage_hooks: dict[LifespanStage, Callable[[HostRuntime], Any]] | None = None,
     ) -> None:
@@ -378,6 +380,7 @@ class HostRuntime:
         self.resource_manager: ResourceManager | None = resource_mgr
         self.job_manager: JobManager | None = job_mgr
         self.plugin_manager: PluginLifecycleManager | None = plugin_mgr
+        self.broker_registry: BrokerRegistry | None = broker_registry
         self.gateway_service: TransportGatewayService | None = None
         self.data_manager: DataManagerWorkspace | None = None
 
@@ -669,14 +672,43 @@ class HostRuntime:
 
         plugins_dir = self.config.resolved_plugins_dir
         plugins_dir.mkdir(parents=True, exist_ok=True)
+        search_dirs = [plugins_dir]
+        brokers_dir = Path(__file__).resolve().parents[1] / "services" / "brokers"
+        if brokers_dir.exists():
+            search_dirs.append(brokers_dir)
+
         engine = PluginDiscoveryEngine(
-            search_dirs=[plugins_dir],
+            search_dirs=search_dirs,
             slot_registry=slot_registry,
         )
         engine.discover()
+        if self.broker_registry is None:
+            self.broker_registry = BrokerRegistry(
+                data_root=Path(self.config.data_dir),
+                discovery_engine=engine,
+            )
+
+        def _broker_instance_factory(plugin_id: str, record: Any, ctx: Any) -> Any:
+            del ctx
+            slot = getattr(getattr(record, "manifest", None), "slot", None)
+            if slot == "data.provider" and self.broker_registry is not None:
+                from app.services.brokers.registry import (
+                    BrokerKey,
+                    normalize_provider_id,
+                )
+
+                manifest_id = getattr(
+                    getattr(record, "manifest", None), "id", plugin_id
+                )
+                canon = normalize_provider_id(manifest_id)
+                bkey = BrokerKey(provider=canon, data_root=str(self.config.data_dir))
+                return self.broker_registry.acquire(bkey)
+            return None
+
         lifecycle = PluginLifecycleManager(
             discovery_engine=engine,
             data_root=Path(self.config.data_dir) / "plugins_data",
+            instance_factory_hook=_broker_instance_factory,
         )
         self.plugin_manager = lifecycle
         lifecycle.load_and_attach_all()
@@ -685,6 +717,18 @@ class HostRuntime:
     def _cleanup_services(self) -> None:
         """Release plugins, job pool, resource watchdog, and sessions in reverse."""
         cleanups: list[Callable[[], Any]] = []
+
+        # 1. Drain background job pool and cancel futures before teardown
+        if self.job_manager is not None:
+            cleanups.append(
+                partial(self.job_manager.shutdown, wait=True, cancel_futures=True)
+            )
+
+        # 2. Stop resource watchdog
+        if self.resource_manager is not None:
+            cleanups.append(self.resource_manager.watchdog.stop)
+
+        # 3. Disable plugins
         if self.plugin_manager is not None:
             for pid in reversed(list(self.plugin_manager.discovery.registry.keys())):
                 rec = self.plugin_manager.discovery.registry.get(pid)
@@ -694,14 +738,11 @@ class HostRuntime:
                 ):
                     cleanups.append(partial(self.plugin_manager.disable_plugin, pid))
 
-        if self.job_manager is not None:
-            cleanups.append(
-                partial(self.job_manager.shutdown, wait=True, cancel_futures=True)
-            )
+        # 4. Close broker registry instances after workers/plugins are drained
+        if self.broker_registry is not None:
+            cleanups.append(self.broker_registry.close_all)
 
-        if self.resource_manager is not None:
-            cleanups.append(self.resource_manager.watchdog.stop)
-
+        # 5. Reset session manager
         if self.session_manager is not None:
             cleanups.append(self.session_manager.reset)
         for cleanup in cleanups:
@@ -767,13 +808,15 @@ class HostRuntime:
             require_auth=self.config.require_auth,
         )
 
-        # 5.6 DataManagerWorkspace (Stage 2B)
+        # 5.6 DataManagerWorkspace (Stage 2B & 2C)
         if self.data_manager is None:
             self.data_manager = DataManagerWorkspace(
                 db_path=db_path,
                 data_dir=Path(self.config.data_dir),
                 event_bus=self.event_bus,
                 plugin_mgr=plugin_mgr,
+                broker_registry=self.broker_registry,
+                job_manager=self.job_manager,
             )
         self.data_manager.initialize_defaults()
 
