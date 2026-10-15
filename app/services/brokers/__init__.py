@@ -1,3 +1,4 @@
+# ruff: noqa: F822 -- lazy exports via PEP 562 __getattr__
 """Broker backends, providers, and unified registry.
 
 Description:
@@ -18,77 +19,144 @@ Description:
 
 from __future__ import annotations
 
-from app.services.brokers._base_data import DataBrokerBackend
-from app.services.brokers.contracts import (
-    AccountSnapshot,
-    BridgeError,
-    BridgeEvent,
-    DealSnapshot,
-    HistoryOrderSnapshot,
-    MarketBar,
-    MarketTick,
-    OrderSnapshot,
-    PositionSnapshot,
-    Receipt,
-    ReceiptStatus,
-    SymbolSnapshot,
-    SymbolSpec,
-    TerminalSnapshot,
-    Timeframe,
-    TradeAction,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
-    TradingBackend,
-)
-from app.services.brokers.crypto import BinanceBroker
-from app.services.brokers.ctrader import CTraderBackend
-from app.services.brokers.darwinex import DarwinexBroker
-from app.services.brokers.dukascopy import DukascopyBroker
-from app.services.brokers.files import FilesBroker
-from app.services.brokers.metatrader import MT5Backend
-from app.services.brokers.simulator import SimulationBackend
-from app.services.brokers.sq_equity import SQEquityBroker
-from app.services.brokers.sq_futures import SQFuturesBroker
-from app.services.brokers.tick_downloader import TickDownloaderBroker
-from app.services.brokers.yahoo import YahooBroker
+import importlib
+from typing import TYPE_CHECKING, Any
 
-# Pre-instantiated data broker singletons
-yahoo = YahooBroker()
-dukascopy = DukascopyBroker()
-darwinex = DarwinexBroker()
-sq_equity = SQEquityBroker()
-sq_futures = SQFuturesBroker()
-binance = BinanceBroker()
-files = FilesBroker()
-tick_downloader = TickDownloaderBroker()
+if TYPE_CHECKING:
+    from app.services.brokers.base import BaseBrokerBackend
+    from app.services.brokers.contracts import SymbolSpec
+    from app.services.brokers.crypto import BinanceBroker
+    from app.services.brokers.ctrader import CTraderBackend
+    from app.services.brokers.darwinex import DarwinexBroker
+    from app.services.brokers.dukascopy import DukascopyBroker
+    from app.services.brokers.files import FilesBroker
+    from app.services.brokers.metatrader import MT5Backend
+    from app.services.brokers.simulator import SimulationBackend
+    from app.services.brokers.sq_equity import SQEquityBroker
+    from app.services.brokers.sq_futures import SQFuturesBroker
+    from app.services.brokers.tick_downloader import TickDownloaderBroker
+    from app.services.brokers.yahoo import YahooBroker
+    from app.services.libs.data import (
+        BridgeError,
+        DataBrokerBackend,
+        MarketBar,
+        MarketTick,
+        Timeframe,
+    )
+    from app.services.libs.trading import (
+        AccountSnapshot,
+        BridgeEvent,
+        DealSnapshot,
+        HistoryOrderSnapshot,
+        OrderSnapshot,
+        PositionSnapshot,
+        Receipt,
+        ReceiptStatus,
+        SymbolSnapshot,
+        TerminalSnapshot,
+        TradeAction,
+        TradeCheckResult,
+        TradeRequest,
+        TradeResult,
+        TradingBackend,
+    )
 
-_REGISTRY: dict[str, DataBrokerBackend] = {
-    "yahoo": yahoo,
-    "dukascopy": dukascopy,
-    "darwinex": darwinex,
-    "sq_equity": sq_equity,
-    "equity": sq_equity,
-    "sq_futures": sq_futures,
-    "futures": sq_futures,
-    "binance": binance,
-    "crypto": binance,
-    "files": files,
-    "file": files,
-    "tick_downloader": tick_downloader,
+_SINGLETONS: dict[str, Any] = {}
+
+_MODULE_MAPPING: dict[str, tuple[str, str]] = {
+    "BaseBrokerBackend": ("app.services.brokers.base", "BaseBrokerBackend"),
+    "BridgeError": ("app.services.brokers.base", "BridgeError"),
+    "DataBrokerBackend": ("app.services.libs.data", "DataBrokerBackend"),
+    "BinanceBroker": ("app.services.brokers.crypto", "BinanceBroker"),
+    "CTraderBackend": ("app.services.brokers.ctrader", "CTraderBackend"),
+    "DarwinexBroker": ("app.services.brokers.darwinex", "DarwinexBroker"),
+    "DukascopyBroker": ("app.services.brokers.dukascopy", "DukascopyBroker"),
+    "FilesBroker": ("app.services.brokers.files", "FilesBroker"),
+    "MT5Backend": ("app.services.brokers.metatrader", "MT5Backend"),
+    "SimulationBackend": ("app.services.brokers.simulator", "SimulationBackend"),
+    "SQEquityBroker": ("app.services.brokers.sq_equity", "SQEquityBroker"),
+    "SQFuturesBroker": ("app.services.brokers.sq_futures", "SQFuturesBroker"),
+    "TickDownloaderBroker": (
+        "app.services.brokers.tick_downloader",
+        "TickDownloaderBroker",
+    ),
+    "YahooBroker": ("app.services.brokers.yahoo", "YahooBroker"),
+    "SymbolSpec": ("app.services.brokers.contracts", "SymbolSpec"),
+    "MarketBar": ("app.services.libs.data", "MarketBar"),
+    "MarketTick": ("app.services.libs.data", "MarketTick"),
+    "Timeframe": ("app.services.libs.data", "Timeframe"),
+    "AccountSnapshot": ("app.services.libs.trading", "AccountSnapshot"),
+    "BridgeEvent": ("app.services.libs.trading", "BridgeEvent"),
+    "DealSnapshot": ("app.services.libs.trading", "DealSnapshot"),
+    "HistoryOrderSnapshot": ("app.services.libs.trading", "HistoryOrderSnapshot"),
+    "OrderSnapshot": ("app.services.libs.trading", "OrderSnapshot"),
+    "PositionSnapshot": ("app.services.libs.trading", "PositionSnapshot"),
+    "Receipt": ("app.services.libs.trading", "Receipt"),
+    "ReceiptStatus": ("app.services.libs.trading", "ReceiptStatus"),
+    "SymbolSnapshot": ("app.services.libs.trading", "SymbolSnapshot"),
+    "TerminalSnapshot": ("app.services.libs.trading", "TerminalSnapshot"),
+    "TradeAction": ("app.services.libs.trading", "TradeAction"),
+    "TradeCheckResult": ("app.services.libs.trading", "TradeCheckResult"),
+    "TradeRequest": ("app.services.libs.trading", "TradeRequest"),
+    "TradeResult": ("app.services.libs.trading", "TradeResult"),
+    "TradingBackend": ("app.services.libs.trading", "TradingBackend"),
+}
+
+_SINGLETON_FACTORIES: dict[str, tuple[str, str]] = {
+    "yahoo": ("app.services.brokers.yahoo", "YahooBroker"),
+    "dukascopy": ("app.services.brokers.dukascopy", "DukascopyBroker"),
+    "darwinex": ("app.services.brokers.darwinex", "DarwinexBroker"),
+    "sq_equity": ("app.services.brokers.sq_equity", "SQEquityBroker"),
+    "sq_futures": ("app.services.brokers.sq_futures", "SQFuturesBroker"),
+    "binance": ("app.services.brokers.crypto", "BinanceBroker"),
+    "files": ("app.services.brokers.files", "FilesBroker"),
+    "tick_downloader": ("app.services.brokers.tick_downloader", "TickDownloaderBroker"),
+}
+
+_ALIASES: dict[str, str] = {
+    "yahoo": "yahoo",
+    "dukascopy": "dukascopy",
+    "darwinex": "darwinex",
+    "sq_equity": "sq_equity",
+    "equity": "sq_equity",
+    "sq_futures": "sq_futures",
+    "futures": "sq_futures",
+    "binance": "binance",
+    "crypto": "binance",
+    "files": "files",
+    "file": "files",
+    "tick_downloader": "tick_downloader",
 }
 
 
-def get_broker(name: str) -> DataBrokerBackend:
-    """Resolve a data broker by name or alias."""
+def get_broker(name: str) -> Any:
+    """Resolve a data broker singleton by name or alias."""
     key = name.lower().strip()
-    if key in _REGISTRY:
-        return _REGISTRY[key]
-    raise KeyError(f"Unknown broker: {name}")
+    target = _ALIASES.get(key)
+    if target is None:
+        raise KeyError(f"Unknown broker: {name}")
+    if target not in _SINGLETONS:
+        mod_path, cls_name = _SINGLETON_FACTORIES[target]
+        mod = importlib.import_module(mod_path)
+        cls = getattr(mod, cls_name)
+        _SINGLETONS[target] = cls()
+    return _SINGLETONS[target]
+
+
+def __getattr__(name: str) -> Any:
+    """Lazily import broker classes and singletons on demand."""
+    if name in _SINGLETON_FACTORIES:
+        return get_broker(name)
+    if name in _MODULE_MAPPING:
+        mod_path, attr_name = _MODULE_MAPPING[name]
+        mod = importlib.import_module(mod_path)
+        return getattr(mod, attr_name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 __all__ = [
     "AccountSnapshot",
+    "BaseBrokerBackend",
     "BinanceBroker",
     "BridgeError",
     "BridgeEvent",

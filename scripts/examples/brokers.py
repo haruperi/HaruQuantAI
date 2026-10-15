@@ -46,30 +46,32 @@ from typing import Any, Literal
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
-from app.services.brokers.contracts import (
-    BridgeError,
-    MarginMode,
-    MarketBar,
-    MarketTick,
-    OrderFilling,
-    OrderType,
-    ReceiptStatus,
-    SymbolSpec,
-    TerminalSnapshot,
-    Timeframe,
-    TradeAction,
-    TradeRequest,
-    TradingBackend,
-)
+from app.services.brokers.contracts import SymbolSpec
 from app.services.brokers.ctrader import CTraderBackend
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
-from app.services.libs.trading import Trading
-from app.services.utils import (
+from app.services.libs.data import (
+    BridgeError,
+    MarketBar,
+    MarketTick,
+    Timeframe,
+    TradingBackend,
     bars_to_dataframe,
-    format_timestamp,
+    get_historical_bars,
+    get_ticks,
     ticks_to_dataframe,
 )
+from app.services.libs.trading import (
+    MarginMode,
+    OrderFilling,
+    OrderType,
+    ReceiptStatus,
+    TerminalSnapshot,
+    TradeAction,
+    TradeRequest,
+    Trading,
+)
+from app.services.utils import format_timestamp
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = "ctrader"
 ALLOW_LIVE_TRADING = False
@@ -335,9 +337,9 @@ async def example_04_symbol(ctx: ExampleContext) -> None:
 async def example_05_historical_bars(ctx: ExampleContext) -> None:
     """Demonstrate bars by date range converted to a DataFrame."""
     _header("Historical Bars")
-    trading = ctx.trading
-    bars = await trading.get_historical_bars(
-        SYMBOL, TIMEFRAME, DATE_FROM, DATE_TO, limit=DATA_LIMIT
+    backend = ctx.trading.backend
+    bars = await get_historical_bars(
+        backend, SYMBOL, TIMEFRAME, DATE_FROM, DATE_TO, limit=DATA_LIMIT
     )
     print(f"Range count: {len(bars)}")
     print(f"Range sample: {bars[:PREVIEW_LIMIT]}")
@@ -349,8 +351,8 @@ async def example_05_historical_bars(ctx: ExampleContext) -> None:
 async def example_06_tick_data(ctx: ExampleContext) -> None:
     """Demonstrate ticks by date range converted to a DataFrame."""
     _header("Historical Ticks")
-    trading = ctx.trading
-    ticks = await trading.get_ticks(SYMBOL, TICK_DATE_FROM, DATE_TO, limit=DATA_LIMIT)
+    backend = ctx.trading.backend
+    ticks = await get_ticks(backend, SYMBOL, TICK_DATE_FROM, DATE_TO, limit=DATA_LIMIT)
     print(f"Range count: {len(ticks)}")
     print(f"Range sample: {ticks[:PREVIEW_LIMIT]}")
     ticks_df = ticks_to_dataframe(ticks)

@@ -1,34 +1,40 @@
-"""Base asynchronous data broker backend conforming to TradingBackend.
+"""Base broker backend adapter and canonical bridge exceptions.
 
 Description:
-    Provides a lightweight base class for read-only market data providers that conforms
-    to the canonical `TradingBackend` protocol. Routes `MarketData.Bars` and
-    `MarketData.Ticks` to typed provider retrieval hooks, returns `SymbolSnapshot`
-    for symbol queries, and manages audit receipts without live trade mutation overhead.
+    Provides the foundational BaseBrokerBackend adapter class conforming to the
+    unified TradingBackend protocol. Implements asynchronous request dispatch
+    for common broker queries (symbol info, terminal status), per-command audit
+    receipts, lifecycle hooks, and the canonical BridgeError exception.
 
 Purpose:
-    FEAT-BROKER-DATA-BASE: Uniform base backend for market data providers.
+    FEAT-BROKER-BASE: Foundational broker backend adapters and base protocols.
 
 Key Capabilities:
-    - FR-DATA-BACKEND-ROUTING: Route MarketData and SymbolInfo calls to subclass hooks.
-      Associated: `DataBrokerBackend.call()`, `fetch_bars()`, `fetch_ticks()`
-      Logging: DEBUG on call routing with operation name; no raw payloads.
-    - FR-DATA-BACKEND-LIFECYCLE: Manage session start/stop and connection state.
-      Associated: `DataBrokerBackend.start()`, `DataBrokerBackend.close()`
-      Logging: INFO on session start/close.
+    - FR-BROKER-BASE-ROUTING: Asynchronous dispatch routing for symbol info and
+      terminal status queries with structured receipts.
+      Associated: `BaseBrokerBackend.call()`, `BaseBrokerBackend.symbol_info()`,
+        `BaseBrokerBackend.symbols_get()`.
+      Logging: DEBUG execution lifecycle and receipt generation through logger.
+    - FR-BROKER-BASE-LIFECYCLE: Connection session management, arming, and receipts.
+      Associated: `BaseBrokerBackend.start()`, `BaseBrokerBackend.close()`,
+        `BaseBrokerBackend.wait_connected()`, `BaseBrokerBackend.arm()`,
+        `BaseBrokerBackend.disarm()`, `BaseBrokerBackend.receipt()`.
+      Logging: DEBUG connection status changes.
 
 Python API Usage:
     ```python
-    from app.services.brokers._base_data import DataBrokerBackend
+    from app.services.brokers.base import BaseBrokerBackend
 
 
-    class MyDataBroker(DataBrokerBackend):
+    class CustomBroker(BaseBrokerBackend):
         def __init__(self) -> None:
-            super().__init__(name="MyDataBroker")
-```
+            super().__init__("custom_broker")
+    ```
 
 CLI Usage:
-    `uv run pytest tests/unit/services/brokers/ --no-cov`
+    ```bash
+    uv run pytest tests/unit/services/test_broker_base.py --no-cov
+    ```
 """
 
 from __future__ import annotations
@@ -41,11 +47,8 @@ from types import TracebackType
 from typing import Any, Self
 
 from app.host.logging import get_logger
-from app.services.brokers.contracts import (
-    BridgeError,
+from app.services.libs.trading import (
     BridgeEvent,
-    MarketBar,
-    MarketTick,
     Receipt,
     ReceiptStatus,
     SymbolSnapshot,
@@ -54,12 +57,31 @@ from app.services.brokers.contracts import (
 
 logger = get_logger(__name__)
 
+__all__ = ["BaseBrokerBackend", "BridgeError"]
 
-class DataBrokerBackend:
-    """Base class for market data providers conforming to TradingBackend."""
+
+class BridgeError(RuntimeError):
+    """Base runtime exception for broker and market data bridge operations."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        code: str = "BRIDGE_ERROR",
+        command_id: str | None = None,
+        uncertain: bool = False,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.command_id = command_id
+        self.uncertain = uncertain
+
+
+class BaseBrokerBackend:
+    """Base class for broker providers conforming to TradingBackend."""
 
     def __init__(self, name: str) -> None:
-        """Initialize data broker backend."""
+        """Initialize base broker backend."""
         self.name = name
         self.logger = get_logger(f"app.services.brokers.{name.lower()}")
         self._last_cmd: contextvars.ContextVar[str | None] = contextvars.ContextVar(
@@ -72,7 +94,10 @@ class DataBrokerBackend:
         """Start or initialize provider connection session."""
         self._is_connected = True
 
-    async def wait_connected(self, timeout: float | None = None) -> None:  # noqa: ASYNC109 -- backend deadline
+    async def wait_connected(
+        self,
+        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline
+    ) -> None:
         """Confirm provider readiness."""
         del timeout
         self._is_connected = True
@@ -82,10 +107,10 @@ class DataBrokerBackend:
         self._is_connected = False
 
     def arm(self) -> None:
-        """No-op for read-only data brokers."""
+        """Arm the broker for live trade actions."""
 
     def disarm(self) -> None:
-        """No-op for read-only data brokers."""
+        """Disarm the broker against trade actions."""
 
     def last_command_id(self) -> str | None:
         """Return the ID of the most recent dispatched command."""
@@ -95,11 +120,14 @@ class DataBrokerBackend:
         """Return the execution receipt for a previously dispatched command."""
         return self._receipts.get(command_id)
 
-    async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109 -- backend deadline
-        """Data brokers do not emit transaction events."""
+    async def next_event(
+        self,
+        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline
+    ) -> BridgeEvent:
+        """Default event poll stub."""
         del timeout
         raise NotImplementedError(
-            f"{self.name} is a read-only market data broker and does not emit transaction events"
+            f"{self.name} does not emit asynchronous transaction events"
         )
 
     async def await_request_event(
@@ -107,10 +135,10 @@ class DataBrokerBackend:
         request_id: int,
         timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline
     ) -> BridgeEvent:
-        """Data brokers do not emit transaction events."""
+        """Default event correlation stub."""
         del request_id, timeout
         raise NotImplementedError(
-            f"{self.name} is a read-only market data broker and does not emit transaction events"
+            f"{self.name} does not emit asynchronous transaction events"
         )
 
     async def __aenter__(self) -> Self:
@@ -138,7 +166,7 @@ class DataBrokerBackend:
         requires_arm: bool = False,
         timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline
     ) -> Any:
-        """Execute a canonical market data or metadata query."""
+        """Execute a canonical broker or metadata query."""
         del requires_arm, timeout
         cmd_id = f"cmd-{uuid.uuid4().hex[:12]}"
         self._last_cmd.set(cmd_id)
@@ -168,7 +196,7 @@ class DataBrokerBackend:
             )
             return val
         except Exception as exc:
-            code = getattr(exc, "code", "DATA_BROKER_ERROR")
+            code = getattr(exc, "code", "BROKER_ERROR")
             self._receipts[cmd_id] = replace(
                 receipt,
                 status=ReceiptStatus.REJECTED,
@@ -181,11 +209,6 @@ class DataBrokerBackend:
 
     def _dispatch(self, class_name: str, method_name: str, args: list[Any]) -> Any:
         """Route call to subclass methods."""
-        if class_name == "MarketData":
-            if method_name == "Bars":
-                return self._dispatch_bars(args)
-            if method_name == "Ticks":
-                return self._dispatch_ticks(args)
         if class_name == "SymbolInfo":
             if method_name in ("SymbolInfo", "info"):
                 symbol = str(args[0]) if args else "EURUSD"
@@ -201,79 +224,6 @@ class DataBrokerBackend:
             )
         raise BridgeError(
             f"{self.name} does not support {class_name}.{method_name}",
-            code="UNSUPPORTED_OPERATION",
-        )
-
-    def _dispatch_bars(self, args: list[Any]) -> list[dict[str, Any]] | list[MarketBar]:
-        """Unpack canonical args and invoke fetch_bars."""
-        symbol = str(args[0]) if len(args) > 0 else "EURUSD"
-        timeframe = str(args[1]) if len(args) > 1 else "H1"
-        mode = str(args[2]) if len(args) > 2 else "latest"
-        start = int(args[3]) if len(args) > 3 else 0
-        end = int(args[4]) if len(args) > 4 else 0
-        count = int(args[5]) if len(args) > 5 else 0
-        limit = int(args[6]) if len(args) > 6 else 1000
-        return self.fetch_bars(
-            symbol=symbol,
-            timeframe=timeframe,
-            mode=mode,
-            start=start,
-            end=end,
-            count=count,
-            limit=limit,
-        )
-
-    def _dispatch_ticks(
-        self, args: list[Any]
-    ) -> list[dict[str, Any]] | list[MarketTick]:
-        """Unpack canonical args and invoke fetch_ticks."""
-        symbol = str(args[0]) if len(args) > 0 else "EURUSD"
-        mode = str(args[1]) if len(args) > 1 else "latest"
-        start_ms = int(args[2]) if len(args) > 2 else 0
-        end_ms = int(args[3]) if len(args) > 3 else 0
-        count = int(args[4]) if len(args) > 4 else 0
-        limit = int(args[5]) if len(args) > 5 else 1000
-        return self.fetch_ticks(
-            symbol=symbol,
-            mode=mode,
-            start_ms=start_ms,
-            end_ms=end_ms,
-            count=count,
-            limit=limit,
-        )
-
-    def fetch_bars(
-        self,
-        *,
-        symbol: str,
-        timeframe: str,
-        mode: str,
-        start: int,
-        end: int,
-        count: int,
-        limit: int,
-    ) -> list[dict[str, Any]] | list[MarketBar]:
-        """Subclass hook to fetch historical candlestick bars."""
-        del symbol, timeframe, mode, start, end, count, limit
-        raise BridgeError(
-            f"{self.name} does not support historical bars",
-            code="UNSUPPORTED_OPERATION",
-        )
-
-    def fetch_ticks(
-        self,
-        *,
-        symbol: str,
-        mode: str,
-        start_ms: int,
-        end_ms: int,
-        count: int,
-        limit: int,
-    ) -> list[dict[str, Any]] | list[MarketTick]:
-        """Subclass hook to fetch historical or live ticks."""
-        del symbol, mode, start_ms, end_ms, count, limit
-        raise BridgeError(
-            f"{self.name} does not support tick history",
             code="UNSUPPORTED_OPERATION",
         )
 

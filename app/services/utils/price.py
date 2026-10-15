@@ -78,7 +78,7 @@ import numpy as np
 from app.host.logging import get_logger
 from app.services.indicators.base import IndicatorSeries
 from app.services.indicators.price_action.heiken_ashi import HeikenAshi
-from app.services.utils.bar_time import normalize_timestamps
+from app.services.libs.bar_time import normalize_timestamps
 
 logger = get_logger(__name__)
 

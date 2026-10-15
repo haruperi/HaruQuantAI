@@ -69,13 +69,14 @@ from types import TracebackType
 from typing import Any, Self, cast, override
 
 from app.host.logging import get_logger
-from app.host.settings import effective_settings_values, settings
-from app.services.brokers.contracts import (
+from app.host.settings import settings
+from app.services.brokers.contracts import Tick
+from app.services.libs.data import BridgeError
+from app.services.libs.trading import (
     AccountSnapshot,
     AccountTradeMode,
     BookInfo,
     BookType,
-    BridgeError,
     BridgeEvent,
     MarginMode,
     OrderFilling,
@@ -85,14 +86,13 @@ from app.services.brokers.contracts import (
     ReceiptStatus,
     SymbolSnapshot,
     TerminalSnapshot,
-    Tick,
     TradeAction,
     TradeCheckResult,
     TradeRequest,
     TradeResult,
     TradeRetcode,
+    Trading,
 )
-from app.services.libs.trading import Trading
 
 logger = get_logger(__name__)
 
@@ -467,16 +467,16 @@ class CTraderClient:
                 "cTrader access token rejected; reauthorize or configure a refresh token",
                 code="CTRADER_REAUTHORIZE_REQUIRED",
             )
-        snapshot = None
+        expected_revision: int | None = None
         if self._host_owned_tokens:
             try:
-                snapshot = settings.get_snapshot()
+                cfg = settings.get_scope("config_ctrader")
+                expected_revision = settings.revision
             except Exception:
                 raise BridgeError(
                     "Cannot read saved cTrader credentials before token rotation",
                     code="CTRADER_TOKEN_PERSIST_FAILED",
                 ) from None
-            cfg = effective_settings_values(snapshot.values).get("config_ctrader", {})
             if any(
                 cfg.get(name) != getattr(self, name)
                 for name in (
@@ -509,16 +509,16 @@ class CTraderClient:
         # never be printed, and old tokens are invalid after successful rotation.
         self.access_token = result.accessToken
         self.refresh_token = result.refreshToken
-        if snapshot is not None:
+        if expected_revision is not None:
             try:
-                settings.update(
+                settings.update_batch(
                     {
                         "config_ctrader": {
                             "access_token": self.access_token,
                             "refresh_token": self.refresh_token,
                         }
                     },
-                    expected_revision=snapshot.revision,
+                    expected_revision=expected_revision,
                 )
             except Exception:
                 raise BridgeError(

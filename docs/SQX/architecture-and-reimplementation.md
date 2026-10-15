@@ -191,7 +191,7 @@ Each `Servlet*` plugin implements `IServletPlugin` and exposes JSON endpoints th
 
 Following the backend reset (`e2c72ab`), `HARUQUANTAI_ROOT` is at a clean **backend-reset baseline** ([`../PROJECT.md`](../PROJECT.md), [`../ARCHITECTURE.md`](../ARCHITECTURE.md)):
 * **Retained Frontend (`HARUQUANTAI_ROOT/ui/`):** Complete React/TypeScript UI organized into `ui/app/host/`, `ui/app/workspace/<17 workspaces>`, and `ui/app/plugins/<4 families>`.
-* **Ratified Architecture ([`../ARCHITECTURE.md`](../ARCHITECTURE.md)):** Enforces the **3-Tier Backend Architecture** (`app/host/`, `app/workspace/`, `app/plugins/`) plus shared mathematical primitives (`app/kernel/`) and the **Five Laws of Spatial Composability (`SC-01`–`SC-05`)**.
+* **Ratified Architecture ([`../ARCHITECTURE.md`](../ARCHITECTURE.md)):** Enforces the **3-Tier Backend Architecture** (`app/host/`, `app/workspace/`, `app/plugins/`) plus shared mathematical primitives (`app/services/libs/`) and the **Five Laws of Spatial Composability (`SC-01`–`SC-05`)**.
 * **Registry & Evidence Gate:** Because `app/`, `tests/`, and `scripts/` were reset, domain `README.md` registries (`app/host/README.md`, `app/workspace/*/README.md`) and `reimplementation.json` records (`SQX145-EV-NNNNNN`) must be registered and approved per phase under [`AGENTS.md`](../../AGENTS.md) before implementation.
 
 ### 3.2 Reconciling Donor Logical Tiers with HaruQuantAI's Ratified Python Architecture
@@ -201,7 +201,7 @@ Following the backend reset (`e2c72ab`), `HARUQUANTAI_ROOT` is at a clean **back
 | **Donor Tier 1: Presentation** (`StrategyQuantX_ui.exe` + `internal/web/*`) | **UI Layer (`ui/app/`)** | React/TypeScript SPA (`ui/app/host/`, `ui/app/workspace/*`, `ui/app/plugins/*`, `ui/app/components/`). Pure presentation; communicates exclusively over REST and WebSocket/SSE. |
 | **Donor Tier 2: Transport & Host** (`Jetty`, `webguilib.*`, `Servlet*`, `SQPluginLib`, `SQJobsLib`, `SQLib` guards) | **Backend Tier 1: Host Platform (`app/host/`)** | `bootstrap.py`, `discovery.py`, `persistence/` (isolated SQLite WAL), `resources.py`, `transport.py`, `response.py`, `jobs.py`, `settings.py`, `session.py`. Zero quantitative/trading logic. |
 | **Donor Tier 3: JSPF Workflow & Orchestration** (`App*`, `DataManager*`, `Task*`, `Settings*`, `Results*`, `Project*` + `DataSource*`, `CrossCheck*`, `Snippets/SQ/*`, `extend/Code/*`) | **Backend Tier 2: Workspaces (`app/workspace/<domain>/`) + Backend Tier 3: Dynamic Plugins (`app/plugins/<slot>/<name>/`)** | Workspaces coordinate domain pipelines and mount `/api/v2/...` routers; Dynamic Plugins attach to workspaces via explicit typed slots (`SC-03`, e.g., `slot: "data.provider"`). |
-| **Donor Tier 4: Domain Core & Math Primitives** (`SQLib.SQTime`, `IRandomGenerator`, `SQDataLib.DataSeries`, `commons-math3`, `fastutil`, `ta-lib`) | **Primitives (`app/kernel/`) + Domain Engines (`app/workspace/simulator/`, etc.)** | Reusable mathematical routines, financial timestamps (`SQTime`), seeded RNG, vectorized columnar series (`Polars`, `NumPy`, `PyArrow`, `DuckDB`), and indicator kernels. |
+| **Donor Tier 4: Domain Core & Math Primitives** (`SQLib.SQTime`, `IRandomGenerator`, `SQDataLib.DataSeries`, `commons-math3`, `fastutil`, `ta-lib`) | **Primitives (`app/services/libs/`) + Domain Engines (`app/workspace/simulator/`, etc.)** | Reusable mathematical routines, financial timestamps (`HQTime`), seeded RNG, vectorized columnar series (`Polars`, `NumPy`, `PyArrow`, `DuckDB`), and indicator kernels. |
 
 ```mermaid
 flowchart TD
@@ -234,10 +234,10 @@ flowchart TD
         PExport["exporters/* (Template generators: MT4, MT5, NT8, EL, JForex, PseudoCode)"]
     end
 
-    subgraph Kernel["Mathematical & Time Primitives (app/kernel/)"]
-        KTime["sq_time.py (SQTime parity) & rng.py (Seeded IRandomGenerator)"]
-        KSeries["series.py (Polars/NumPy/PyArrow vectorized DataSeries)"]
-        KInd["indicators.py (Vectorized TA-Lib / custom indicator kernels)"]
+    subgraph Kernel["Mathematical & Time Primitives (app/services/libs/)"]
+        KTime["time.py (HQTime parity) & generators.py (Seeded IRandomGenerator)"]
+        KSeries["data.py (Polars/NumPy/PyArrow DataSeries & Derived Series)"]
+        KInd["app/services/indicators/ (Vectorized TA-Lib / custom indicator kernels)"]
     end
 
     UI --> Tier1
@@ -250,7 +250,7 @@ flowchart TD
 | SQX Donor Layer | HaruQuantAI Python Target | Key Technical Design in Python (`>=3.14`) |
 | :--- | :--- | :--- |
 | `StrategyQuant.jar`, `SQPluginLib`, `SQJobsLib`, `Servlet*` | **Tier 1: `app/host/`** (`F01`) | `FastAPI` + `uvicorn` + `websockets`; `persistence/` owns all `sqlite3` WAL DDL (`schema.py`); `discovery.py` loads `plugin.json` manifests via `importlib`; `JobManager` coordinates bounded async/process jobs; zero quantitative logic. |
-| `SQLib` (`SQTime`, `IRandomGenerator`), `SQDataLib` (`DataSeries`), `ta-lib` | **Primitives: `app/kernel/`** (`F02`–`F04`) | Pure, deterministic numerical primitives: `SQTime` calendar/session arithmetic, seeded `IRandomGenerator`, and `NumPy`/`Polars`/`PyArrow`-backed `DataSeries` replacing Java off-heap arrays with vectorized columnar buffers. |
+| `SQLib` (`SQTime`, `IRandomGenerator`), `SQDataLib` (`DataSeries`), `ta-lib` | **Primitives: `app/services/libs/` & `indicators/`** (`F02`–`F04`) | Pure, deterministic numerical primitives: `HQTime` calendar/session arithmetic, seeded `RandomGenerator`, and `NumPy`/`Polars`/`PyArrow`-backed `DataSeries` (and `Median`/`Typical`/`Weighted` series) replacing Java off-heap arrays with vectorized columnar buffers. |
 | `DataManager*` (11 plugins) + `SQDataLib` | **Tier 2: `app/workspace/data_manager/`** (`F02`) | The 11 cohesive modules specified in [`../ARCHITECTURE.md`](../ARCHITECTURE.md) (`home`, `data`, `instruments`, `sessions`, `baskets`, `broker`, `connections`, `custom_data`, `log`, `help`, `actions/review`, `actions/transform`). |
 | `DataSource*` & `CryptoExchange*` (15 plugins) | **Tier 3: `app/plugins/data_source/`** (`F02`) | 9 modular plugins declaring `slot: "data.provider"` (`dukascopy`, `darwinex`, `metatrader`, `sq_equity`, `sq_futures`, `crypto`, `files`, `yahoo`, `tick_downloader`). |
 | `internal/ctemplate/*`, `AppWizard`, `AppCodeEditor`, `internal/extend/Code/*`, `Loader*`/`Saver*` | **Tier 2: `app/workspace/strategies/` + Tier 3: `app/plugins/blocks/` & `exporters/`** (`F03`) | Pydantic-typed immutable Strategy AST (`.sqx` XML/ZIP compatible); schema-driven block catalog (`SC-05`); template-driven source code exporters for MT4, MT5, NinjaTrader 8, EasyLanguage, JForex, and PseudoCode. |
@@ -266,10 +266,10 @@ flowchart TD
 
 ### 3.3 Concrete Python Engineering Specifications by Tier (`normative`)
 
-#### A. Foundational Domain Core & Primitives (`app/kernel/` & Domain Engines — `F02`–`F05`)
+#### A. Foundational Domain Core & Primitives (`app/services/libs/` & Domain Engines — `F02`–`F05`)
 > **Constraint:** Pure headless financial math, time-series structures, and deterministic simulation loops; zero dependencies on FastAPI, SQLite, or UI state.
 
-1. **Market Data Engine (`SQDataLib` Equivalent — `app/kernel/` + `app/workspace/data_manager/`):**
+1. **Market Data Engine (`SQDataLib` Equivalent — `app/services/libs/data.py` + `app/workspace/data_manager/`):**
    - **Immutable Time-Series Records:**
      - `Bar`: Typed record containing timestamp (`int64` UTC/exchange milliseconds via `SQTime`), `open`, `high`, `low`, `close`, `volume`, and `spread`.
      - `Tick`: High-resolution record with `timestamp`, `bid`, `ask`, `last_price`, and `volume`.
@@ -377,7 +377,7 @@ flowchart TD
     end
 
     subgraph Stage2_4["Stages 2–4: Foundational Domain Core & Workspaces (F02–F05)"]
-        D_Data["Stage 2: app/kernel/ (SQTime, DataSeries) + Data Manager Workspace + 9 data.provider Plugins (F02)"]
+        D_Data["Stage 2: app/services/libs/ (HQTime, DataSeries) + Data Manager Workspace + 9 data.provider Plugins (F02)"]
         D_Strat["Stage 3: Strategy AST, Building Blocks, Indicators, AlgoWizard & Code Exporters (F03)"]
         D_Sim["Stage 4: Multi-Precision Simulator, ATM/MM, Databanks & 60+ SQStats Results (F04–F05)"]
         D_Data --> D_Strat --> D_Sim
@@ -422,11 +422,11 @@ Following the delivery order ratified in [`../PROJECT.md`](../PROJECT.md) (*"Del
 
 ---
 
-#### Stage 2 — Mathematical Kernel & Market Data (`F02` — `app/kernel/` + `app/workspace/data_manager/` + `app/plugins/data_source/`)
+#### Stage 2 — Mathematical Kernel & Market Data (`F02` — `app/services/libs/` + `app/workspace/data_manager/` + `app/plugins/data_source/`)
 
 | Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
 | :--- | :--- | :--- | :--- |
-| **2A: Time, Seeded RNG & Columnar `DataSeries` Kernel** | `app/kernel/sq_time.py` (`SQTime` date/time/DOW/DST/session arithmetic), `app/kernel/rng.py` (`IRandomGenerator` deterministic seeded RNG), `app/kernel/series.py` (`Bar`, `Tick`, `Timeframe`, `Polars`/`PyArrow`/`NumPy` `DataSeries` with `IndyStartingBar` & `Shift`) | `com.strategyquant.lib.SQTime`, `IRandomGenerator` ([`libs/SQLib.md`](libs/SQLib.md)); `com.strategyquant.datalib.DataSeries`, `ChartDef`, `DataInfo`, `dataseries.*`, `timeframe.*`, `timezone.*`, `bartype.*`, `ticksimulator.*` ([`libs/SQDataLib.md`](libs/SQDataLib.md)) | Unit & property tests verifying `SQTime` timestamp conversions, DST boundaries, and zero-copy `DataSeries` indexing. |
+| **2A: Time, Seeded RNG & Columnar `DataSeries` Kernel** | `app/services/libs/time.py` (`HQTime` date/time/DOW/DST/session arithmetic), `app/services/libs/generators.py` (`RandomGenerator` deterministic seeded RNG), `app/services/libs/data.py` (`MarketBar`, `MarketTick`, `Timeframe`, `Polars`/`PyArrow`/`NumPy` `DataSeries` with `IndyStartingBar` & `Shift`, and `Median`/`Typical`/`Weighted` derived series) | `com.strategyquant.lib.SQTime`, `IRandomGenerator` ([`libs/SQLib.md`](libs/SQLib.md)); `com.strategyquant.datalib.DataSeries`, `DataSeriesTypes`, `MedianDataSeries`, `TypicalDataSeries`, `WeightedDataSeries`, `ChartDef`, `DataInfo`, `dataseries.*`, `timeframe.*`, `timezone.*`, `bartype.*`, `ticksimulator.*` ([`libs/SQDataLib.md`](libs/SQDataLib.md)) | Unit & property tests verifying `HQTime` timestamp conversions, DST boundaries, zero-copy `DataSeries` indexing, and derived series accuracy. |
 | **2B: Authoritative Data Manager Workspace (11 Modules)** | `app/workspace/data_manager/`: `home.py`, `data.py` (Parquet/DuckDB/`.dat` catalog & ingestion), `instruments.py` (`InstrumentInfo`), `sessions.py` (`TradingSession`, NinjaTrader XML), `baskets.py`, `broker.py`, `connections.py` (`ProviderManager`), `custom_data.py` (`COT`), `log.py`, `help.py`, `actions/review/quality.py` (`DataQualityInspector`), `actions/transform/transforms.py` (`SeriesTransformer`), `routes.py` (`/api/v2/data/...`) | `SQX_REFERENCE_ROOT/internal/plugins/DataManager*` (all 11 plugins: `DataManagerHome`, `DataManagerData`, `DataManagerInstruments`, `DataManagerSessions`, `DataManagerBasket`, `DataManagerBroker`, `DataManagerConnections`, `DataManagerCustomData`, `DataManagerActions`, `DataManagerLog`, `DataManagerHelp`), `ServletConnection`, `user/data/data.db`, `user/data/History/*/*.dat`, `com.strategyquant.datalib.instrument.*`, `session.*`, `basket.*`, `broker.*`, `validation.*` ([`libs/SQDataLib.md`](libs/SQDataLib.md)), [`cli/qdmcli.md`](cli/qdmcli.md) | Connects `ui/app/workspace/DataManager/DataManager.tsx`, `DataManagerHome.tsx`, `dataManagerLogClient.ts`, and `ui/app/plugins/data_source/*`. |
 | **2C: Dynamic Market Data Provider Plugins (`slot: "data.provider"`)** | `app/plugins/data_source/`: `dukascopy` (`.bi5`), `darwinex`, `metatrader` (MT4/MT5 CSV/HST/FXT + MT5 bridge), `sq_equity`, `sq_futures`, `crypto` (Binance/Bitfinex/CoinbasePro/Poloniex), `files` (CSV/Parquet/TSV), `yahoo`, `tick_downloader` | `SQX_REFERENCE_ROOT/internal/plugins/DataSource*` (9 plugins) + `CryptoExchange*` (6 plugins), `internal/python/scripts/mt5api.py`, `mt5_symbol_overrides.json`, `user/data/data_futures.h2.db`, `data_stock.h2.db`, `user/customdata/customdata.db`, `COT/*`, `com.strategyquant.datalib.customData.*`, `metatrader4.*`, `darwinex.*` ([`libs/SQDataLib.md`](libs/SQDataLib.md)), `com.strategyquant.tradinglib.dukascopy.*`, `yahoo.*`, `mt4.*`, `mt5api.*`, `crypto.*`, `cot.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) | Independent feed parser & round-trip export verification (CSV, Parquet, HST/FXT) + provider removal fallback test (`SC-02`). |
 
@@ -436,7 +436,7 @@ Following the delivery order ratified in [`../PROJECT.md`](../PROJECT.md) (*"Del
 
 | Sub-Stage | Target Python Deliverables (`HARUQUANTAI_ROOT`) | Exact SQX-145 Donor Sources (`SQX_REFERENCE_ROOT` & `docs/SQX/`) | Connected UI / Verification Gate |
 | :--- | :--- | :--- | :--- |
-| **3A: Vectorized Indicator Kernels & Specialist Indicators** | `app/kernel/indicators.py` & `app/plugins/indicators/`: 52+ indicator families (`SMA`, `EMA`, `LWMA`, `SMMA`, `HullMA`, `KAMA`, `ADX`, `Aroon`, `ATR`, `MTATR`, `BollingerBands`, `KeltnerChannel`, `CCI`, `RSI`, `LaguerreRSI`, `Stochastic`, `MACD`, `Ichimoku`, `ParabolicSAR`, `SuperTrend`, `LinReg`, `QQE`, `Reflex`, `STC`, `UlcerIndex`, `Vortex`, `VWAP`, `AnchoredVWAP`, `WaveTrend`, `VolumeProfile`, `TPOProfile`, `COT`, `CandlePattern`, `Fibo`, `Fractal`, `Pivots`, `SessionOHLC`, `HeikenAshi`) | `SQX_REFERENCE_ROOT/internal/libs/ta-lib-0.4.0.jar`, `internal/ctemplate/talibs.xml`, `internal/extend/Snippets/SQ/Blocks/Indicators/*`, `Snippets/SQ/TALibIndicators/*`, `Snippets/SQ/Calculators/*`, `custom_indicators/MetaTrader4/Indicators/*.mq4`, `custom_indicators/MetaTrader5/Indicators/*.mq5`, `custom_indicators/NinjaTrader/Indicators/*.cs`, `custom_indicators/Tradestation/*`, `VolumeProfile/*`, `COT/*`, `com.strategyquant.tradinglib.talib.*`, `indicator.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) | Numerical parity tests comparing Python indicator series against decrypted Java snippet / MQL5 / C# reference formulas (`SqCalculators`, `SqATR`, `SqRSI`, etc.). |
+| **3A: Vectorized Indicator Kernels & Specialist Indicators** | `app/services/indicators/`: 52+ indicator families (`SMA`, `EMA`, `LWMA`, `SMMA`, `HullMA`, `KAMA`, `ADX`, `Aroon`, `ATR`, `MTATR`, `BollingerBands`, `KeltnerChannel`, `CCI`, `RSI`, `LaguerreRSI`, `Stochastic`, `MACD`, `Ichimoku`, `ParabolicSAR`, `SuperTrend`, `LinReg`, `QQE`, `Reflex`, `STC`, `UlcerIndex`, `Vortex`, `VWAP`, `AnchoredVWAP`, `WaveTrend`, `VolumeProfile`, `TPOProfile`, `COT`, `CandlePattern`, `Fibo`, `Fractal`, `Pivots`, `SessionOHLC`, `HeikenAshi`) | `SQX_REFERENCE_ROOT/internal/libs/ta-lib-0.4.0.jar`, `internal/ctemplate/talibs.xml`, `internal/extend/Snippets/SQ/Blocks/Indicators/*`, `Snippets/SQ/TALibIndicators/*`, `Snippets/SQ/Calculators/*`, `custom_indicators/MetaTrader4/Indicators/*.mq4`, `custom_indicators/MetaTrader5/Indicators/*.mq5`, `custom_indicators/NinjaTrader/Indicators/*.cs`, `custom_indicators/Tradestation/*`, `VolumeProfile/*`, `COT/*`, `com.strategyquant.tradinglib.talib.*`, `indicator.*` ([`libs/SQTradingLib.md`](libs/SQTradingLib.md)) | Numerical parity tests comparing Python indicator series against decrypted Java snippet / MQL5 / C# reference formulas (`SqCalculators`, `SqATR`, `SqRSI`, etc.). |
 | **3B: Strategy AST, Building Blocks, `Negater` & AlgoWizard / CodeEditor** | `app/workspace/strategies/` (`ast.py`, `loader.py` for `.sqx` / `.str`, `validator.py`, `algowizard_routes.py`, `code_editor_routes.py`), `app/plugins/blocks/` (`BarAndTime`, `CandlePatterns`, `Comparisons`, `Functions`, `Indicators`, `Order`, `Other`, `OtherActions`, `Price`, `StrategyControl`), `Negater` symmetry engine (`OppositeBlocks`) | `SQX_REFERENCE_ROOT/internal/ctemplate/*.xml` (`config.xml`, `conditions.xml`, `values.xml`, `actions.xml`, `comparisons.xml`, `events.xml`, `wizard.xml`), `internal/extend/Snippets/SQ/Blocks/*`, `Snippets/SQ/Negater/*.java`, `Snippets/SQ/Formulas/*`, `Snippets/SQ/Functions/*`, `Snippets/SQ/Internal/XmlStrategy.java`, `user/settings/OppositeBlocks_example.csv`, `internal/plugins/AppWizard`, `ServletAlgoWizard`, `AppCodeEditor`, `ServletCodeEditor`, `CodeEditorImportExport`, `CodeEditorIndicatorTester`, `LoaderSQ3`, `LoaderSQ4`, `SaverSQ3` | Connects `ui/app/workspace/AlgoWizard/*`, `ui/app/workspace/CodeEditor/*`; validates `.sqx` round-trip serialization and `OppositeBlock` negation symmetry. |
 | **3C: Template-Driven Platform Source Exporters (`slot: "export.platform"`)** | `app/plugins/exporters/`: `metatrader4` (`.mq4`), `metatrader5` (`.mq5`), `ninjatrader8` (`.cs`), `easylanguage` (`.el`), `jforex` (`.java`), `pseudocode` (`.txt`), plus shared macros (`cotCollectSymbols`, `printBlockChild`) | `SQX_REFERENCE_ROOT/internal/extend/Code/global/*`, `Code/MetaTrader4/*`, `Code/MetaTrader5/*`, `Code/NinjaTrader/*`, `Code/EasyLanguage/*`, `Code/JForex/*`, `Code/PseudoCode/*`, `internal/libs/freemarker-2.3.28.jar`, [`overview/export-engines/README.md`](overview/export-engines/README.md) | Connects `ui/app/workspace/AlgoWizard/StrategyCodeExportModal.tsx` and `ui/app/plugins/project/ResultsSourceCode`; verifies syntax-valid code generation across all 6 target platforms. |
 

@@ -18,8 +18,7 @@ strategy -> Trading facade -> eight async classes -> TradingBackend capability
 ## Calling Code
 
 ```python
-from app.services.libs.trading import Trading
-from app.services.brokers.contracts import TradeRequest, TradeAction, OrderType
+from app.services.libs.trading import OrderType, TradeAction, TradeRequest, Trading
 
 
 async def run(backend):
@@ -41,6 +40,6 @@ async def run(backend):
 ## Architecture
 
 - The 8 proxy classes (`AccountInfo`, `DealInfo`, `HistoryOrderInfo`, `OrderInfo`, `PositionInfo`, `SymbolInfo`, `TerminalInfo`, `Trade`) inherit from `TradingClass` (`BaseTradingClass`), using per-object locks and proxy IDs.
-- Atomic snapshot queries (`AccountInfo()`, `TerminalInfo()`, `SymbolInfo()`, `PositionInfo()`, `OrderInfo()`, `HistoryOrderInfo()`, `DealInfo()`) return strongly typed dataclasses from `app.services.brokers.contracts`.
+- Atomic snapshot queries (`AccountInfo()`, `TerminalInfo()`, `SymbolInfo()`, `PositionInfo()`, `OrderInfo()`, `HistoryOrderInfo()`, `DealInfo()`) return strongly typed dataclasses from `app.services.libs.trading`.
 - Order operations are consolidated into canonical `OrderSend(req)` and `OrderCheck(req)` primitives.
 - Historical market data helpers in `data.py` provide bounded, validated bar and tick retrieval over any `TradingBackend`.

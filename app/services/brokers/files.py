@@ -20,9 +20,8 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.brokers.contracts import Timeframe
+    from app.services.libs.data import Timeframe, get_historical_bars
     from app.services.brokers.files import FilesBroker
-    from app.services.libs.data import get_historical_bars
 
     broker = FilesBroker(data_dir="data/market/sq_equity/d1")
     bars = await get_historical_bars(broker, "AAPL", Timeframe.PERIOD_D1, count=5)
@@ -43,11 +42,8 @@ from typing import Any, override
 
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
-from app.services.brokers._base_data import DataBrokerBackend
-from app.services.brokers.contracts import (
-    BridgeError,
-    SymbolSnapshot,
-)
+from app.services.libs.data import BridgeError, DataBrokerBackend
+from app.services.libs.trading import SymbolSnapshot
 
 logger = get_logger(__name__)
 

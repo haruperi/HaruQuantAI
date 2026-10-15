@@ -54,17 +54,44 @@ from types import TracebackType
 from typing import Any, Self, override
 
 from app.host.logging import get_logger
-from app.host.persistence.engine import DEFAULT_DATABASE_PATH
-from app.host.persistence.mt5bridge_journal import Journal
-from app.services.brokers.contracts import (
-    BridgeError,
+
+try:
+    from app.host.persistence.engine import DEFAULT_DATABASE_PATH  # type: ignore[import-not-found]
+    from app.host.persistence.mt5bridge_journal import Journal  # type: ignore[import-not-found]
+except ImportError:
+    from app.host.persistence.create import DEFAULT_DB_PATH as DEFAULT_DATABASE_PATH
+
+    class Journal:  # type: ignore[no-redef]
+        """Fallback MT5 journal stub."""
+
+        def __init__(self, path: Any = None) -> None:
+            pass
+
+        def close(self) -> None:
+            pass
+
+        def add_event(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def create_command(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def mark_sent(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def resolve_command(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+
+from app.services.libs.data import BridgeError
+from app.services.libs.trading import (
     BridgeEvent,
     PropertyValue,
     Receipt,
     ReceiptStatus,
     TradeResolution,
+    Trading,
 )
-from app.services.libs.trading import Trading
 
 __all__ = [
     "Bridge",

@@ -52,13 +52,14 @@ from app.services.brokers import (
     SQFuturesBroker,
     YahooBroker,
 )
-from app.services.brokers.contracts import (
+from app.services.brokers.contracts import SymbolSpec
+from app.services.libs.data import (
     MarketBar,
     MarketTick,
-    SymbolSpec,
     Timeframe,
+    get_historical_bars,
+    get_ticks,
 )
-from app.services.libs.data import get_historical_bars, get_ticks
 
 logger = get_logger(__name__)
 

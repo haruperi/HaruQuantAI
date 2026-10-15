@@ -37,15 +37,80 @@ from typing import Any, override
 
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
-from app.services.brokers._base_data import DataBrokerBackend
-from app.services.brokers.contracts import SymbolSnapshot
-from app.workspace.data_manager.connections import (
-    BaseDataProvider,
-    CancellationToken,
-    DownloadRequest,
-    ProviderCapabilities,
-)
-from app.workspace.data_manager.data import BarRecord
+from app.services.libs.data import DataBrokerBackend
+from app.services.libs.trading import SymbolSnapshot
+
+
+class ProviderCapabilities:
+    """Provider capabilities metadata."""
+
+    def __init__(
+        self,
+        *,
+        name: str = "",
+        display_name: str = "",
+        asset_classes: list[str] | None = None,
+        timeframes: list[str] | None = None,
+        requires_auth: bool = False,
+        rate_limit_rps: float = 0.0,
+        **kwargs: Any,
+    ) -> None:
+        self.name = name
+        self.display_name = display_name
+        self.asset_classes = asset_classes or []
+        self.timeframes = timeframes or []
+        self.requires_auth = requires_auth
+        self.rate_limit_rps = rate_limit_rps
+        self.extra = kwargs
+
+
+class BaseDataProvider:
+    """Base data provider interface."""
+
+    def __init__(self, capabilities: ProviderCapabilities | None = None) -> None:
+        self.capabilities = capabilities
+
+    def _fetch_bars(
+        self, request: DownloadRequest, token: CancellationToken
+    ) -> list[BarRecord]:
+        return []
+
+
+class CancellationToken:
+    """Cancellation token for download requests."""
+
+    def check_cancelled(self) -> None:
+        """Raise if cancelled."""
+
+
+class DownloadRequest:
+    """Data download request parameters."""
+
+    symbol: str = ""
+
+
+class BarRecord:
+    """Historical bar record."""
+
+    def __init__(
+        self,
+        *,
+        timestamp_utc: str = "",
+        open: float = 0.0,  # noqa: A002
+        high: float = 0.0,
+        low: float = 0.0,
+        close: float = 0.0,
+        volume: float = 0.0,
+        **kwargs: Any,
+    ) -> None:
+        self.timestamp_utc = timestamp_utc
+        self.open = open
+        self.high = high
+        self.low = low
+        self.close = close
+        self.volume = volume
+        self.extra = kwargs
+
 
 logger = get_logger(__name__)
 

@@ -178,7 +178,7 @@ class BooleanVariable:
             if isinstance(self.variable, Variable)
             else self.variable
         )
-        res = 1.0 if bool(raw_val) else 0.0
+        res = 1.0 if raw_val else 0.0
         logger.debug(
             "FR-SERVICES-TYPES-VARIABLES: BooleanVariable(shift=%d) -> %s",
             shift,
@@ -321,7 +321,7 @@ def boolean_variable(variable: Variable[bool] | bool, shift: int = 0) -> float:
         1.0 if variable evaluates to True else 0.0.
     """
     raw_val = variable.get_value() if isinstance(variable, Variable) else variable
-    res = 1.0 if bool(raw_val) else 0.0
+    res = 1.0 if raw_val else 0.0
     logger.debug(
         "FR-SERVICES-TYPES-VARIABLES: boolean_variable(shift=%d) -> %s",
         shift,
