@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  BookOpen, ChevronDown, ChevronUp, Database, Download, ExternalLink,
-  FileSpreadsheet, HardDrive, Layers, Radio, RefreshCw, Terminal, Clock,
+  Clock,
+  Database,
+  Download,
+  FileSpreadsheet,
+  HardDrive,
+  Layers,
+  Radio,
+  RefreshCw,
 } from 'lucide-react';
 import { createDomainClient } from '../../host/transport';
 
 const dataClient = createDomainClient('/data');
 
-export interface HomeOverviewData {
+export interface DataHomeSummary {
   workspace_name?: string;
   datasets_count: number;
   instruments_count: number;
@@ -15,14 +21,23 @@ export interface HomeOverviewData {
   baskets_count: number;
   active_providers_count: number;
   total_bars: number;
+  storage_bytes?: number;
+  parquet_files_count?: number;
 }
 
-export interface DocLinkItem {
-  id: string;
-  title: string;
-  description: string;
-  icon?: string;
-  url: string;
+export interface DataHomeDashboard {
+  symbol: string;
+  instrument: string;
+  broker_profile: string;
+  underlying_symbol: string;
+  timeframe: string;
+  timezone: string;
+  date_from: string;
+  date_to: string;
+  total_days: number;
+  total_records: number;
+  source: string;
+  data_type: string;
 }
 
 interface DataManagerHomeProps {
@@ -31,66 +46,8 @@ interface DataManagerHomeProps {
   onOpenDownload?: () => void;
 }
 
-const defaultDocLinks: DocLinkItem[] = [
-  {
-    id: 'import-mt4',
-    title: 'Import History Data MT4',
-    description: 'Learn how to import historical data to MetaTrader 4',
-    url: 'https://strategyquant.com/doc/quantdatamanager/import-history-data-metatrader-4/',
-  },
-  {
-    id: 'test-mt4',
-    title: 'Test Strategy MT4',
-    description: 'Test your strategy in MT4 with tick precision',
-    url: 'https://strategyquant.com/doc/quantdatamanager/test-strategy-metatrader-4-tick-precision/',
-  },
-  {
-    id: 'import-mt5',
-    title: 'Import Data to MT5',
-    description: 'How to import data to MetaTrader 5',
-    url: 'https://strategyquant.com/doc/quantdatamanager/how-to-import-data-to-metatrader-5/',
-  },
-  {
-    id: 'export-mt5',
-    title: 'Export Data from MT5',
-    description: 'How to export data from MetaTrader 5',
-    url: 'https://strategyquant.com/doc/quantdatamanager/how-to-export-data-from-metatrader-5/',
-  },
-  {
-    id: 'cli-intro',
-    title: 'Introduction to CLI',
-    description: 'What is CLI and how to use it for data automation',
-    url: 'https://strategyquant.com/doc/cli-command-line/introduction-to-cli/',
-  },
-  {
-    id: 'full-doc',
-    title: 'Full Documentation',
-    description: 'Browse complete Data Manager documentation and guides',
-    url: 'https://strategyquant.com/doc/quantdatamanager/',
-  },
-];
-
-const faqs = [
-  {
-    q: 'Is the data provided for free? What is the data source?',
-    a: 'High quality tick data for forex and CFDs are provided for free by Dukascopy and multiple connected online providers. HaruQuantAI downloads, decompresses, normalizes, and stores this data into high-performance partitioned Parquet format on your local machine.',
-  },
-  {
-    q: 'What does Verified downloads mean?',
-    a: 'Verified downloads ensure that the data downloaded is bit-for-bit validated against checksums and server headers from the source provider (e.g. Dukascopy, Darwinex, Yahoo). Corrupt or partial downloads are automatically discarded and retried.',
-  },
-  {
-    q: 'Can HaruQuantAI download data for stocks, commodities, crypto?',
-    a: 'Yes. HaruQuantAI supports multiple data providers including Dukascopy, Yahoo Finance (stocks & ETFs), Binance/Coinbase (crypto), Darwinex, and custom local file formats (CSV, NinjaTrader, MetaTrader).',
-  },
-  {
-    q: 'How can I transfer tick data to MetaTrader?',
-    a: 'HaruQuantAI allows direct export to MetaTrader 4 FXT & HST files with tick precision modeling quality, as well as MetaTrader 5 custom symbol CSV formats via the Export tab.',
-  },
-];
-
 export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }: DataManagerHomeProps) {
-  const [overview, setOverview] = useState<HomeOverviewData>({
+  const [overview, setOverview] = useState<DataHomeSummary>({
     datasets_count: 0,
     instruments_count: 0,
     sessions_count: 0,
@@ -98,14 +55,13 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
     active_providers_count: 0,
     total_bars: 0,
   });
-  const [docLinks, setDocLinks] = useState<DocLinkItem[]>(defaultDocLinks);
+  const [datasets, setDatasets] = useState<DataHomeDashboard[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const fetchOverview = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await dataClient.get<HomeOverviewData>('/home/overview');
+      const data = await dataClient.get<DataHomeSummary>('/home/overview');
       if (data) {
         setOverview(data);
       }
@@ -116,21 +72,21 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
     }
   }, []);
 
-  const fetchDocLinks = useCallback(async () => {
+  const fetchDatasets = useCallback(async () => {
     try {
-      const links = await dataClient.get<DocLinkItem[]>('/home/doc-links');
-      if (Array.isArray(links) && links.length > 0) {
-        setDocLinks(links);
+      const items = await dataClient.get<DataHomeDashboard[]>('/home/datasets');
+      if (Array.isArray(items)) {
+        setDatasets(items);
       }
     } catch {
-      // Fall back to default links
+      // Keep existing datasets on error
     }
   }, []);
 
   useEffect(() => {
     fetchOverview();
-    fetchDocLinks();
-  }, [fetchOverview, fetchDocLinks]);
+    fetchDatasets();
+  }, [fetchOverview, fetchDatasets]);
 
   return (
     <div className="dm-home-container" role="region" aria-label="Data Manager Home">
@@ -154,7 +110,10 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
           </div>
           <button
             className="dm-refresh-btn"
-            onClick={fetchOverview}
+            onClick={() => {
+              fetchOverview();
+              fetchDatasets();
+            }}
             disabled={loading}
             aria-label="Refresh overview"
           >
@@ -250,7 +209,7 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
             <Download size={18} />
             <div className="dm-action-text">
               <strong>Import Market Data</strong>
-              <span>Import CSV, TXT, or MetaTrader history files</span>
+              <span>Import CSV, TXT, or history files</span>
             </div>
           </button>
           <button
@@ -260,7 +219,7 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
             <Radio size={18} />
             <div className="dm-action-text">
               <strong>Download Online Data</strong>
-              <span>Fetch tick & M1 bars from Dukascopy, Yahoo, or Crypto</span>
+              <span>Fetch tick & M1 bars from data providers</span>
             </div>
           </button>
           <button
@@ -286,63 +245,57 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
         </div>
       </section>
 
-      {/* Documentation & Guides Grid (mirroring SQX offline/index.html) */}
-      <section className="dm-docs-section" aria-label="Documentation and Guides">
-        <h2 className="dm-section-title">Documentation & Tutorials</h2>
-        <div className="dm-docs-grid">
-          {docLinks.map(link => (
-            <a
-              key={link.id}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="dm-doc-card"
-            >
-              <div className="dm-doc-icon">
-                {link.id.includes('cli') ? (
-                  <Terminal size={18} />
-                ) : link.id.includes('mt') ? (
-                  <FileSpreadsheet size={18} />
-                ) : (
-                  <BookOpen size={18} />
-                )}
-              </div>
-              <div className="dm-doc-content">
-                <div className="dm-doc-header">
-                  <h3 className="dm-doc-title">{link.title}</h3>
-                  <ExternalLink size={12} className="dm-doc-ext" />
-                </div>
-                <p className="dm-doc-desc">{link.description}</p>
-              </div>
-            </a>
-          ))}
+      {/* Saved Datasets Catalog Table */}
+      <section className="dm-datasets-section" aria-label="Saved Datasets Catalog">
+        <div className="dm-datasets-header">
+          <h2 className="dm-section-title">Saved Datasets Catalog ({datasets.length})</h2>
+          <span className="dm-datasets-caption">Live data partitioned from SQLite datamgr_datasets</span>
         </div>
-      </section>
-
-      {/* Frequently Asked Questions (mirroring SQX offline/index.html) */}
-      <section className="dm-faq-section" aria-label="Frequently Asked Questions">
-        <h2 className="dm-section-title">Frequently Asked Questions</h2>
-        <div className="dm-faq-list">
-          {faqs.map((faq, idx) => {
-            const isOpen = activeFaq === idx;
-            return (
-              <div key={idx} className={`dm-faq-item ${isOpen ? 'active' : ''}`}>
-                <button
-                  className="dm-faq-question"
-                  onClick={() => setActiveFaq(isOpen ? null : idx)}
-                  aria-expanded={isOpen}
-                >
-                  <span className="dm-faq-question-text">{faq.q}</span>
-                  {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
-                {isOpen && (
-                  <div className="dm-faq-answer">
-                    <p>{faq.a}</p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="dm-datasets-table-wrap">
+          <table className="dm-datasets-table" aria-label="Saved datasets table">
+            <thead>
+              <tr>
+                <th>Symbol Name</th>
+                <th>Instrument</th>
+                <th>Broker profile</th>
+                <th>Underlying Symbol</th>
+                <th>Timeframe</th>
+                <th>Timezone</th>
+                <th>Date from</th>
+                <th>Date to</th>
+                <th style={{ textAlign: 'right' }}>Total Days</th>
+                <th style={{ textAlign: 'right' }}>Total Records</th>
+                <th>Source</th>
+                <th>Data type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {datasets.length === 0 ? (
+                <tr>
+                  <td colSpan={12} style={{ textAlign: 'center', padding: '24px', color: 'var(--muted)' }}>
+                    No saved datasets found in catalog.
+                  </td>
+                </tr>
+              ) : (
+                datasets.map((ds, idx) => (
+                  <tr key={`${ds.symbol}-${ds.broker_profile}-${ds.timeframe}-${idx}`}>
+                    <td className="dm-cell-bold">{ds.symbol}</td>
+                    <td>{ds.instrument}</td>
+                    <td>{ds.broker_profile}</td>
+                    <td>{ds.underlying_symbol}</td>
+                    <td><span className="dm-badge-tf">{ds.timeframe}</span></td>
+                    <td>{ds.timezone}</td>
+                    <td>{ds.date_from || '-'}</td>
+                    <td>{ds.date_to || '-'}</td>
+                    <td style={{ textAlign: 'right' }}>{ds.total_days.toLocaleString()}</td>
+                    <td style={{ textAlign: 'right', fontWeight: 600 }}>{ds.total_records.toLocaleString()}</td>
+                    <td>{ds.source}</td>
+                    <td><span className="dm-badge-type">{ds.data_type}</span></td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </section>
     </div>

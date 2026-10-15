@@ -1,33 +1,45 @@
-"""Dashboard overview, storage health metrics, and documentation links.
+"""Data Manager dashboard metrics and saved datasets catalog.
 
 Description:
     Provides high-level dashboard metrics for the Data Manager workspace,
     aggregating dataset counts, stored bar totals, catalog counts (instruments,
-    sessions, stock groups/baskets), active provider connections, and storage
-    health (Parquet footprint and file counts). Exposes curated documentation
-    and quick-start workflow links matching StrategyQuant X.
+    sessions, stock groups/baskets), and active provider connections from the
+    authoritative database. Exposes saved datasets catalog and summaries.
+    Operates as a read-only database presentation service without physical
+    storage auditing or data reconciliation.
 
 Purpose:
-    FEAT-DATAMGR-HOME: Data Manager dashboard overview and storage diagnostics.
+    FEAT-DATAMGR-HOME: Data Manager dashboard overview and catalog presentation.
 
 Key Capabilities:
-    - FR-DATAMGR-HOME-OVERVIEW: Compute aggregate counts across catalogs and storage.
-      Associated: `DataManagerHomeService.get_overview()`
+    - FR-DATAMGR-HOME-OVERVIEW: Compute aggregate counts across database catalogs.
+      Associated: `DataHomeService.get_overview()`
       Logging: Emits INFO on overview computation with summary numbers.
-    - FR-DATAMGR-HOME-DOC-LINKS: Curate workflow guides and documentation links.
-      Associated: `DataManagerHomeService.get_doc_links()`
-      Logging: Emits DEBUG when retrieving documentation links.
-    - FR-DATAMGR-HOME-STORAGE-AUDIT: Audit Parquet file storage on disk.
-      Associated: `DataManagerHomeService.audit_storage()`
-      Logging: Emits DEBUG on scanning storage files and calculating bytes.
+    - FR-DATAMGR-HOME-DATASETS-CATALOG: Retrieve saved datasets catalog for display.
+      Associated: `DataHomeService.get_saved_datasets()`
+      Logging: Emits DEBUG when listing saved dataset catalog entries.
+    - FR-DATAMGR-HOME-SUMMARY: Structured representation of home overview metrics.
+      Associated: `DataHomeSummary.to_dict()`
+      Logging: Emits DEBUG when converting summary metric items.
+    - FR-DATAMGR-HOME-DASHBOARD: Structured representation of saved dataset items.
+      Associated: `DataHomeDashboard.to_dict()`
+      Logging: Emits DEBUG when converting dataset dashboard items.
+    - FR-DATAMGR-HOME-CLI: Headless CLI formatting and table rendering.
+      Associated: `DataHomeCLI.format_dataset_table()`,
+      `DataHomeCLI.format_home_dashboard()`
+      Logging: Emits DEBUG when formatting dashboard or ASCII tables.
 
 Python API Usage:
     ```python
-    from app.workspace.data_manager.home import DataManagerHomeService
+    from app.workspace.data_manager.home import (
+        DataHomeCLI,
+        DataHomeService,
+    )
 
-    home_service = DataManagerHomeService()
+    home_service = DataHomeService()
     overview = home_service.get_overview()
-    print(f"Total datasets: {overview.datasets_count}, bars: {overview.total_bars}")
+    datasets = home_service.get_saved_datasets()
+    print(DataHomeCLI.format_home_dashboard(overview, datasets))
     ```
 
 CLI Usage:
@@ -38,32 +50,33 @@ CLI Usage:
 
 from __future__ import annotations
 
-import tempfile
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from pathlib import Path
+from datetime import datetime
 from typing import Any
 
 from app.host.logging import get_logger
-from app.host.persistence.create import create_schema
 from app.host.persistence.read import count_rows, read_rows, resolve_connection
 
 __all__ = [
-    "DataManagerHomeService",
-    "DocLinkItem",
-    "HomeOverviewData",
+    "DataHomeCLI",
+    "DataHomeDashboard",
+    "DataHomeService",
+    "DataHomeSummary",
 ]
 
 logger = get_logger(__name__)
 
 OVERVIEW_FR = "FR-DATAMGR-HOME-OVERVIEW"
-DOC_LINKS_FR = "FR-DATAMGR-HOME-DOC-LINKS"
-STORAGE_AUDIT_FR = "FR-DATAMGR-HOME-STORAGE-AUDIT"
+DATASETS_CATALOG_FR = "FR-DATAMGR-HOME-DATASETS-CATALOG"
+SUMMARY_FR = "FR-DATAMGR-HOME-SUMMARY"
+DASHBOARD_FR = "FR-DATAMGR-HOME-DASHBOARD"
+CLI_FR = "FR-DATAMGR-HOME-CLI"
 
 
 @dataclass(frozen=True)
-class HomeOverviewData:
-    """Aggregated metrics across the Data Manager catalogs and storage."""
+class DataHomeSummary:
+    """Aggregated metrics across the Data Manager catalogs."""
 
     datasets_count: int
     instruments_count: int
@@ -76,6 +89,11 @@ class HomeOverviewData:
 
     def to_dict(self) -> dict[str, Any]:
         """Convert metrics to dictionary representation."""
+        logger.debug(
+            "%s: Serializing home summary metrics",
+            SUMMARY_FR,
+            extra={"fr_id": SUMMARY_FR},
+        )
         return {
             "datasets_count": self.datasets_count,
             "instruments_count": self.instruments_count,
@@ -89,129 +107,60 @@ class HomeOverviewData:
 
 
 @dataclass(frozen=True)
-class DocLinkItem:
-    """Curated documentation or workflow link item."""
+class DataHomeDashboard:
+    """Summary item for a saved dataset catalog entry."""
 
-    id: str
-    title: str
-    description: str
-    url: str
-    category: str = "guide"
+    symbol: str
+    instrument: str
+    broker: str
+    underlying: str
+    timeframe: str
+    timezone: str
+    date_from: str
+    date_to: str
+    total_days: int
+    total_records: int
+    source: str
+    data_type: str
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert documentation link item to dictionary representation."""
+        """Convert dataset summary item to dictionary representation."""
+        logger.debug(
+            "%s: Serializing dataset summary for %s",
+            DASHBOARD_FR,
+            self.symbol,
+            extra={"fr_id": DASHBOARD_FR, "symbol": self.symbol},
+        )
         return {
-            "id": self.id,
-            "title": self.title,
-            "description": self.description,
-            "url": self.url,
-            "category": self.category,
+            "symbol": self.symbol,
+            "instrument": self.instrument,
+            "broker": self.broker,
+            "underlying": self.underlying,
+            "timeframe": self.timeframe,
+            "timezone": self.timezone,
+            "date_from": self.date_from,
+            "date_to": self.date_to,
+            "total_days": self.total_days,
+            "total_records": self.total_records,
+            "source": self.source,
+            "data_type": self.data_type,
         }
 
 
-_DEFAULT_DOC_LINKS: tuple[DocLinkItem, ...] = (
-    DocLinkItem(
-        id="guide-importing-data",
-        title="Importing Historical Data",
-        description=(
-            "Learn how to import CSV/text market data and configure column formats."
-        ),
-        url="https://strategyquant.com/doc/strategyquant/importing-data-into-strategyquant/",
-        category="data",
-    ),
-    DocLinkItem(
-        id="guide-simulation-modes",
-        title="Tick vs M1 Simulation",
-        description=(
-            "Understanding precision, execution speed, and spread/slippage modeling."
-        ),
-        url="https://strategyquant.com/doc/strategyquant/tick-vs-m1-simulation/",
-        category="simulation",
-    ),
-    DocLinkItem(
-        id="guide-instruments-commissions",
-        title="Instruments & Commissions",
-        description=(
-            "Configuring tick sizes, point values, swap rules, and margin rates."
-        ),
-        url="https://strategyquant.com/doc/strategyquant/custom-instrument-settings/",
-        category="instruments",
-    ),
-    DocLinkItem(
-        id="guide-trading-sessions",
-        title="Trading Sessions & Holidays",
-        description="Defining custom session schedules and exchange holiday calendars.",
-        url="https://strategyquant.com/doc/strategyquant/trading-sessions/",
-        category="sessions",
-    ),
-    DocLinkItem(
-        id="guide-stock-groups",
-        title="Survivorship-Bias-Free Stock Groups",
-        description=(
-            "Building dynamic multi-asset baskets with dated constituent memberships."
-        ),
-        url="https://strategyquant.com/doc/strategyquant/stock-groups/",
-        category="baskets",
-    ),
-    DocLinkItem(
-        id="guide-exporting-data",
-        title="Exporting to MT4, MT5, and CSV",
-        description="Exporting clean historical series to external trading platforms.",
-        url="https://strategyquant.com/doc/strategyquant/exporting-data/",
-        category="export",
-    ),
-)
-
-
-class DataManagerHomeService:
-    """Service providing high-level overview metrics and storage audits."""
+class DataHomeService:
+    """Service providing high-level overview metrics and dataset catalog."""
 
     def __init__(
         self,
-        db_path: Path | str | None = None,
-        data_dir: Path | str | None = None,
+        *,
         active_providers_getter: Callable[[], int] | None = None,
     ) -> None:
-        """Initialize home service with database and filesystem paths."""
-        self.db_path = Path(db_path) if db_path is not None else None
-        self.data_dir = Path(data_dir) if data_dir is not None else Path("data")
+        """Initialize home service with optional active providers callback."""
         self._providers_getter = active_providers_getter
 
-    def audit_storage(self) -> tuple[int, int]:
-        """Audit physical Parquet files and total byte footprint."""
-        logger.debug(
-            "%s: Auditing historical storage at %s",
-            STORAGE_AUDIT_FR,
-            self.data_dir,
-            extra={"fr_id": STORAGE_AUDIT_FR, "data_dir": str(self.data_dir)},
-        )
-        total_bytes = 0
-        parquet_count = 0
-        history_dir = self.data_dir / "history"
-        if history_dir.is_dir():
-            for p in history_dir.rglob("*.parquet"):
-                if p.is_file():
-                    try:
-                        total_bytes += p.stat().st_size
-                        parquet_count += 1
-                    except OSError:
-                        pass
-
-        custom_dir = self.data_dir / "custom_data"
-        if custom_dir.is_dir():
-            for p in custom_dir.rglob("*.parquet"):
-                if p.is_file():
-                    try:
-                        total_bytes += p.stat().st_size
-                        parquet_count += 1
-                    except OSError:
-                        pass
-
-        return total_bytes, parquet_count
-
-    def get_overview(self) -> HomeOverviewData:
-        """Compute aggregate counts across catalogs and storage."""
-        with resolve_connection(self.db_path) as conn:
+    def get_overview(self) -> DataHomeSummary:
+        """Compute aggregate counts across database catalogs."""
+        with resolve_connection() as conn:
             datasets_count = count_rows(conn, "datamgr_datasets")
             instruments_count = count_rows(conn, "datamgr_instruments")
             sessions_count = count_rows(conn, "datamgr_sessions")
@@ -224,17 +173,14 @@ class DataManagerHomeService:
         active_providers = (
             self._providers_getter() if self._providers_getter is not None else 0
         )
-        storage_bytes, parquet_files_count = self.audit_storage()
 
-        data = HomeOverviewData(
+        data = DataHomeSummary(
             datasets_count=datasets_count,
             instruments_count=instruments_count,
             sessions_count=sessions_count,
             baskets_count=baskets_count,
             active_providers_count=active_providers,
             total_bars=total_bars,
-            storage_bytes=storage_bytes,
-            parquet_files_count=parquet_files_count,
         )
         logger.info(
             "%s: Overview computed (datasets=%d, instruments=%d, bars=%d)",
@@ -251,37 +197,177 @@ class DataManagerHomeService:
         )
         return data
 
-    def get_doc_links(self) -> list[DocLinkItem]:
-        """Return curated documentation links for Data Manager."""
+    def get_saved_datasets(self) -> list[DataHomeDashboard]:
+        """Retrieve saved dataset catalog items from the datamgr_datasets table."""
+        with resolve_connection() as conn:
+            rows = read_rows(conn, "datamgr_datasets")
+
+        datasets: list[DataHomeDashboard] = []
+        for r in rows:
+            symbol = str(r.get("symbol", ""))
+            instrument = str(r.get("instrument", ""))
+            broker = str(r.get("broker", "default"))
+            underlying = str(r.get("underlying", ""))
+            timeframe = str(r.get("timeframe", ""))
+            timezone = str(r.get("timezone", "Exchange"))
+            date_from = str(r.get("date_from", ""))
+            date_to = str(r.get("date_to", ""))
+            records = int(r.get("bars", 0))
+            source = str(r.get("source", ""))
+            data_type = str(r.get("category", ""))
+
+            total_days = 0
+            if date_from and date_to:
+                try:
+                    d_from = datetime.fromisoformat(date_from.replace(".", "-"))
+                    d_to = datetime.fromisoformat(date_to.replace(".", "-"))
+                    total_days = max(0, (d_to - d_from).days)
+                except ValueError:
+                    total_days = 0
+
+            datasets.append(
+                DataHomeDashboard(
+                    symbol=symbol,
+                    instrument=instrument,
+                    broker=broker,
+                    underlying=underlying,
+                    timeframe=timeframe,
+                    timezone=timezone,
+                    date_from=date_from,
+                    date_to=date_to,
+                    total_days=total_days,
+                    total_records=records,
+                    source=source,
+                    data_type=data_type,
+                )
+            )
+
         logger.debug(
-            "%s: Returning %d documentation links",
-            DOC_LINKS_FR,
-            len(_DEFAULT_DOC_LINKS),
-            extra={"fr_id": DOC_LINKS_FR, "count": len(_DEFAULT_DOC_LINKS)},
+            "%s: Retrieved %d saved dataset catalog items",
+            DATASETS_CATALOG_FR,
+            len(datasets),
+            extra={"fr_id": DATASETS_CATALOG_FR, "count": len(datasets)},
         )
-        return list(_DEFAULT_DOC_LINKS)
+        return datasets
+
+
+class DataHomeCLI:
+    """Headless CLI formatter and table presentation for Data Manager home."""
+
+    MAX_UNDERLYING_DISPLAY_LEN: int = 32
+    TRUNCATE_LEN: int = 30
+
+    @classmethod
+    def format_dataset_table(
+        cls,
+        saved_datasets: Sequence[DataHomeDashboard],
+    ) -> str:
+        """Format ASCII table of saved dataset catalog entries."""
+        logger.debug(
+            "%s: formatting %d saved datasets as ASCII table",
+            CLI_FR,
+            len(saved_datasets),
+            extra={"fr_id": CLI_FR, "count": len(saved_datasets)},
+        )
+        count = len(saved_datasets)
+        lines: list[str] = [f"=== Saved Datasets Catalog ({count} items) ==="]
+        header_fmt = (
+            "| {sym:<14} | {inst:<15} | {brk:<12} | {und:<32} | {tf:<4} "
+            "| {tz:<8} | {d_from:<10} | {d_to:<10} | {days:>6} | {recs:>10} "
+            "| {src:<16} | {cat:<8} |"
+        )
+        divider = (
+            "|-"
+            + "-|-".join(
+                [
+                    "-" * 14,
+                    "-" * 15,
+                    "-" * 12,
+                    "-" * 32,
+                    "-" * 4,
+                    "-" * 8,
+                    "-" * 10,
+                    "-" * 10,
+                    "-" * 6,
+                    "-" * 10,
+                    "-" * 16,
+                    "-" * 8,
+                ]
+            )
+            + "-|"
+        )
+        lines.append(
+            header_fmt.format(
+                sym="Symbol Name",
+                inst="Instrument",
+                brk="Broker profile",
+                und="Underlying Symbol",
+                tf="TF",
+                tz="Timezone",
+                d_from="Date from",
+                d_to="Date to",
+                days="Days",
+                recs="Records",
+                src="Source",
+                cat="Data type",
+            )
+        )
+        lines.append(divider)
+        for ds in saved_datasets:
+            if len(ds.underlying) > cls.MAX_UNDERLYING_DISPLAY_LEN:
+                und_preview = ds.underlying[: cls.TRUNCATE_LEN] + ".."
+            else:
+                und_preview = ds.underlying
+            lines.append(
+                header_fmt.format(
+                    sym=ds.symbol,
+                    inst=ds.instrument,
+                    brk=ds.broker,
+                    und=und_preview,
+                    tf=ds.timeframe,
+                    tz=ds.timezone,
+                    d_from=ds.date_from or "-",
+                    d_to=ds.date_to or "-",
+                    days=ds.total_days,
+                    recs=f"{ds.total_records:,}",
+                    src=ds.source,
+                    cat=ds.data_type,
+                )
+            )
+        return "\n".join(lines)
+
+    @classmethod
+    def format_home_dashboard(
+        cls,
+        overview: DataHomeSummary,
+        saved_datasets: Sequence[DataHomeDashboard],
+    ) -> str:
+        """Format complete human-readable dashboard output."""
+        logger.debug(
+            "%s: formatting home overview and dataset table",
+            CLI_FR,
+            extra={"fr_id": CLI_FR},
+        )
+        lines = [
+            "=== Data Manager Home: Live Database Overview ===",
+            f"Total Datasets:       {overview.datasets_count}",
+            f"Historical Bars:      {overview.total_bars:,}",
+            f"Instruments Catalog:  {overview.instruments_count}",
+            f"Trading Sessions:     {overview.sessions_count}",
+            f"Custom Baskets:       {overview.baskets_count}",
+            f"Active Providers:     {overview.active_providers_count}",
+            "",
+            cls.format_dataset_table(saved_datasets),
+        ]
+        return "\n".join(lines)
 
 
 def main() -> None:
-    """Execute real-usage demonstration of DataManagerHomeService."""
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
-        temp_path = Path(temp_dir)
-        db_file = temp_path / "test_home.db"
-        with resolve_connection(db_file) as conn:
-            create_schema(conn)
-
-        service = DataManagerHomeService(
-            db_path=db_file,
-            data_dir=temp_path / "data",
-            active_providers_getter=lambda: 3,
-        )
-        overview = service.get_overview()
-        print(f"Data Manager Overview: {overview.to_dict()}")
-
-        links = service.get_doc_links()
-        print(f"Retrieved {len(links)} doc links:")
-        for link in links:
-            print(f" - [{link.category}] {link.title} ({link.url})")
+    """Execute live database read-only demonstration of DataHomeService."""
+    service = DataHomeService()
+    overview = service.get_overview()
+    saved_datasets = service.get_saved_datasets()
+    print(DataHomeCLI.format_home_dashboard(overview, saved_datasets))
 
 
 if __name__ == "__main__":

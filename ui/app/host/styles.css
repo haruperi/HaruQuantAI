@@ -1146,3 +1146,70 @@ html[data-theme="light"] .host-settings-panel input:not([type="checkbox"]), html
   background: #346ea8;
   border-color: #4b8cd4;
 }
+
+/* ==================== Data Manager Home Datasets Table ==================== */
+.dm-datasets-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+.dm-datasets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.dm-datasets-caption {
+  font-size: 11px;
+  color: var(--muted);
+}
+.dm-datasets-table-wrap {
+  overflow-x: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.dm-datasets-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+.dm-datasets-table th {
+  background: var(--panel2);
+  color: var(--muted);
+  font-weight: 600;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.dm-datasets-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line2);
+  white-space: nowrap;
+  color: var(--text);
+}
+.dm-datasets-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+.dm-cell-bold {
+  font-weight: 600;
+  color: var(--accent);
+}
+.dm-badge-tf {
+  display: inline-block;
+  background: rgba(96, 165, 250, 0.15);
+  color: #60a5fa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.dm-badge-type {
+  display: inline-block;
+  background: rgba(45, 212, 191, 0.15);
+  color: #2dd4bf;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+}

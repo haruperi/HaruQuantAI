@@ -85,6 +85,8 @@ SCOPE_AUTH_FR = "FR-HOST-SESSION-SCOPE-AUTH"
 HASH_ITERATIONS: int = 100_000
 SALT_BYTES: int = 16
 RAW_TOKEN_LENGTH: int = 64
+MODULAR_CRYPT_PARTS: int = 4
+SALT_HASH_PARTS: int = 2
 
 DEFAULT_OPERATOR_SCOPES: frozenset[str] = frozenset(
     {
@@ -144,7 +146,7 @@ def verify_password(
 
     Args:
         password: Plaintext candidate password.
-        password_hash: Stored `salt$hash` string.
+        password_hash: Stored `salt$hash` or modular crypt PBKDF2 string.
         iterations: Optional PBKDF2 iteration count. Defaults to HASH_ITERATIONS.
 
     Returns:
@@ -154,8 +156,24 @@ def verify_password(
         logger.warning("%s: invalid password hash format", CREDENTIALS_FR)
         return False
 
-    salt, expected_hex = password_hash.split("$", 1)
-    candidate_hash = hash_password(password, salt=salt, iterations=iterations)
+    parts = password_hash.split("$")
+    effective_iterations: int
+    if len(parts) == MODULAR_CRYPT_PARTS and parts[0] in (
+        "pbkdf2-sha256",
+        "pbkdf2_sha256",
+    ):
+        effective_iterations = int(parts[1]) if iterations is None else iterations
+        salt = parts[2]
+        expected_hex = parts[3]
+    elif len(parts) == SALT_HASH_PARTS:
+        salt = parts[0]
+        expected_hex = parts[1]
+        effective_iterations = iterations if iterations is not None else HASH_ITERATIONS
+    else:
+        salt, expected_hex = password_hash.split("$", 1)
+        effective_iterations = iterations if iterations is not None else HASH_ITERATIONS
+
+    candidate_hash = hash_password(password, salt=salt, iterations=effective_iterations)
     candidate_hex = candidate_hash.split("$", 1)[1]
 
     matches = hmac.compare_digest(candidate_hex, expected_hex)

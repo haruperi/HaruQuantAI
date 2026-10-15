@@ -213,6 +213,12 @@ def test_session_credentials_hashing_and_verification(
     assert verify_password(test_password, hashed) is True
     assert verify_password("wrong_attempt", hashed) is False
 
+    # Modular crypt 4-part format pbkdf2-sha256$iterations$salt$hash
+    salt, exp_hex = hashed.split("$", 1)
+    modular_hash = f"pbkdf2-sha256$1000${salt}${exp_hex}"
+    assert verify_password(test_password, modular_hash) is True
+    assert verify_password("wrong_attempt", modular_hash) is False
+
     # Corrupt or malformed hash returns False safely
     assert verify_password(test_password, "invalid_hash_string") is False
     assert verify_password(test_password, "bad$delimiter$hash") is False

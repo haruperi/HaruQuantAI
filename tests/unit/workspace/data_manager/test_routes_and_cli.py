@@ -34,9 +34,9 @@ def test_routes_fastapi_contracts(tmp_path: Path) -> None:
         res_raw = client.get("/data/home/overview")
         assert res_raw.status_code == 200
 
-        res = client.get("/api/v1/data/home/doc-links")
+        res = client.get("/api/v1/data/home/datasets")
         assert res.status_code == 200
-        assert len(res.json()["data"]) >= 6
+        assert isinstance(res.json()["data"], list)
 
         # 2. Catalogs (Seeded on startup)
         res = client.get("/api/v1/data/instruments")
@@ -199,6 +199,7 @@ def test_headless_cli_data_operations(tmp_path: Path) -> None:
     """Test headless CLI data command execution across all actions."""
     data_dir = tmp_path / "cli_data"
     actions = [
+        "home",
         "overview",
         "datasets",
         "instruments",
@@ -214,6 +215,12 @@ def test_headless_cli_data_operations(tmp_path: Path) -> None:
         )
         assert exit_code == 0, f"Action '{act}' failed with output: {output}"
         assert '"status": "success"' in output or '"command": "data"' in output
+
+    # Test positional subcommand syntax and text mode rendering
+    exit_code_pos, out_pos = run_cli(["data", "home", "--data-dir", str(data_dir)])
+    assert exit_code_pos == 0
+    assert "=== Data Manager Home: Live Database Overview ===" in out_pos
+    assert "Saved Datasets Catalog" in out_pos
 
 
 def _check_no_sqlite(tree: ast.AST, py_file: Path) -> None:

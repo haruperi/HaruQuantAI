@@ -37,8 +37,8 @@ describe('DataManagerHome component and store wiring', () => {
     expect(html).toContain('SQLite (datamgr_datasets)');
     expect(html).toContain('Catalog Overview Metrics');
     expect(html).toContain('Quick Actions');
-    expect(html).toContain('Documentation &amp; Tutorials');
-    expect(html).toContain('Frequently Asked Questions');
+    expect(html).toContain('Saved Datasets Catalog');
+    expect(html).toContain('SQLite datamgr_datasets');
   });
 
   it('renders all 6 overview metric cards', () => {
@@ -61,24 +61,21 @@ describe('DataManagerHome component and store wiring', () => {
     expect(html).toContain('Trading Sessions');
   });
 
-  it('renders SQX documentation and tutorial cards', () => {
+  it('renders saved datasets catalog table headers and columns', () => {
     const html = renderToString(<DataManagerHome />);
 
-    expect(html).toContain('Import History Data MT4');
-    expect(html).toContain('Test Strategy MT4');
-    expect(html).toContain('Import Data to MT5');
-    expect(html).toContain('Export Data from MT5');
-    expect(html).toContain('Introduction to CLI');
-    expect(html).toContain('Full Documentation');
-  });
-
-  it('renders SQX FAQ questions', () => {
-    const html = renderToString(<DataManagerHome />);
-
-    expect(html).toContain('Is the data provided for free? What is the data source?');
-    expect(html).toContain('What does Verified downloads mean?');
-    expect(html).toContain('Can HaruQuantAI download data for stocks, commodities, crypto?');
-    expect(html).toContain('How can I transfer tick data to MetaTrader?');
+    expect(html).toContain('Symbol Name');
+    expect(html).toContain('Instrument');
+    expect(html).toContain('Broker profile');
+    expect(html).toContain('Underlying Symbol');
+    expect(html).toContain('Timeframe');
+    expect(html).toContain('Timezone');
+    expect(html).toContain('Date from');
+    expect(html).toContain('Date to');
+    expect(html).toContain('Total Days');
+    expect(html).toContain('Total Records');
+    expect(html).toContain('Source');
+    expect(html).toContain('Data type');
   });
 
   it('fetches remote datasets and maps fields accurately', async () => {

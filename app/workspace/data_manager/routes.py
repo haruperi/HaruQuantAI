@@ -65,7 +65,7 @@ from app.workspace.data_manager.connections import ProviderConnectionsService
 from app.workspace.data_manager.custom_data import CustomDataService
 from app.workspace.data_manager.data import DataManagerDataService
 from app.workspace.data_manager.help import DataManagerHelpService
-from app.workspace.data_manager.home import DataManagerHomeService
+from app.workspace.data_manager.home import DataHomeService
 from app.workspace.data_manager.instruments import InstrumentsCatalogService
 from app.workspace.data_manager.log import DataManagerLogService
 from app.workspace.data_manager.sessions import SessionsCatalogService
@@ -152,9 +152,7 @@ class DataManagerWorkspace:
             data_service=self.data,
             log_service=self.log,
         )
-        self.home = DataManagerHomeService(
-            db_path=self.db_path,
-            data_dir=self.data_dir,
+        self.home = DataHomeService(
             active_providers_getter=self.connections.active_providers_count,
         )
         logger.info(
@@ -208,10 +206,10 @@ def _register_home_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:
         data = ws.home.get_overview().to_dict()
         return _success(data)
 
-    @router.get("/home/doc-links")
-    def get_home_doc_links() -> JSONResponse:
-        links = [d.to_dict() for d in ws.home.get_doc_links()]
-        return _success(links)
+    @router.get("/home/datasets")
+    def get_home_datasets() -> JSONResponse:
+        datasets = [d.to_dict() for d in ws.home.get_saved_datasets()]
+        return _success(datasets)
 
 
 def _register_logs_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:

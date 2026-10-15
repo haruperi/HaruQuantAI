@@ -111,10 +111,16 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help="Headless command to execute after 7-stage bootstrap.",
     )
     parser.add_argument(
+        "subcommand",
+        nargs="?",
+        default=None,
+        help="Subcommand or action for command (e.g. 'home' for 'data home').",
+    )
+    parser.add_argument(
         "--action",
         type=str,
-        default="list",
-        help="Sub-action for jobs/plugins/settings commands (default: list).",
+        default=None,
+        help="Sub-action for jobs/plugins/settings/data commands (default: list).",
     )
     parser.add_argument(
         "--data-dir",
@@ -291,14 +297,20 @@ class HeadlessCliRunner:
         if dm is None:
             raise RuntimeError("DataManagerWorkspace is not initialized.")
 
+        from app.workspace.data_manager.home import DataHomeCLI
+
         act = action.strip().lower()
         res: dict[str, Any]
-        if act in ("overview", "list", "status"):
+        if act in ("home", "overview", "dashboard", "list", "status"):
             overview = dm.home.get_overview()
+            saved_datasets = dm.home.get_saved_datasets()
+            rendered = DataHomeCLI.format_home_dashboard(overview, saved_datasets)
             res = {
                 "command": "data",
-                "action": "overview",
+                "action": "home",
+                "rendered": rendered,
                 "overview": overview.to_dict(),
+                "saved_datasets": [ds.to_dict() for ds in saved_datasets],
             }
         elif act in ("datasets", "dataset"):
             datasets = dm.data.list_datasets()
@@ -385,6 +397,9 @@ def format_cli_output(
         return f"ERROR [{error.code}]: {error.message}"
 
     payload = data or {}
+    if not as_json and "rendered" in payload:
+        return str(payload["rendered"])
+
     ok_resp = StandardResponse.success(
         data=payload,
         message=f"Executed CLI command '{payload.get('command', 'unknown')}'.",
@@ -421,10 +436,14 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
         data_dir,
         extra={"fr_id": CLI_BOOTSTRAP_FR, "command": args.command},
     )
+    effective_action = args.action
+    if effective_action is None:
+        effective_action = args.subcommand if args.subcommand is not None else "list"
+
     try:
         with bootstrap_context(config) as runtime:
             runner = HeadlessCliRunner(runtime)
-            result = runner.execute(args.command, action=args.action)
+            result = runner.execute(args.command, action=effective_action)
             result["stages_completed"] = len(runtime.completed_stages)
         output = format_cli_output(result, as_json=bool(args.json))
         return 0, output
@@ -456,6 +475,10 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     effective_argv = list(argv) if argv is not None else sys.argv[1:]
     if "--data-dir" not in effective_argv and "--db-path" not in effective_argv:
+        if Path("data").is_dir():
+            code, rendered = run_cli(effective_argv)
+            print(rendered)
+            return code
         with tempfile.TemporaryDirectory(
             prefix="hqai_cli_run_",
             ignore_cleanup_errors=True,

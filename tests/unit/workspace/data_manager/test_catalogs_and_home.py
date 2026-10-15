@@ -25,7 +25,12 @@ from app.workspace.data_manager.baskets import BasketsCatalogService
 from app.workspace.data_manager.broker import BrokerProfilesService
 from app.workspace.data_manager.data import DataManagerDataService
 from app.workspace.data_manager.help import DataManagerHelpService
-from app.workspace.data_manager.home import DataManagerHomeService
+from app.workspace.data_manager.home import (
+    DataHomeCLI,
+    DataHomeDashboard,
+    DataHomeService,
+    DataHomeSummary,
+)
 from app.workspace.data_manager.instruments import (
     InstrumentsCatalogService,
 )
@@ -47,12 +52,17 @@ def test_db_path(tmp_path: Path) -> Path:
 
 
 # ============================================================================
-# 1. DataManagerHomeService Tests
+# 1. DataHomeService Tests
 # ============================================================================
 
 
-def test_home_service_overview_and_links(test_db_path: Path, tmp_path: Path) -> None:
+def test_home_service_overview_and_links(
+    test_db_path: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Test Home dashboard metrics, document links, and storage audit."""
+    monkeypatch.setattr("app.host.persistence.create.DEFAULT_DB_PATH", test_db_path)
     data_svc = DataManagerDataService(db_path=test_db_path, data_dir=tmp_path / "data")
     inst_svc = InstrumentsCatalogService(db_path=test_db_path)
     inst_svc.ensure_default_instruments()
@@ -73,29 +83,38 @@ def test_home_service_overview_and_links(test_db_path: Path, tmp_path: Path) -> 
         }
     )
 
-    home_svc = DataManagerHomeService(
-        db_path=test_db_path,
-        data_dir=tmp_path / "data",
+    home_svc = DataHomeService(
         active_providers_getter=lambda: 2,
     )
     overview = home_svc.get_overview()
+    assert isinstance(overview, DataHomeSummary)
     assert overview.datasets_count >= 1
     assert overview.instruments_count >= 7
     assert overview.sessions_count >= 4
     assert overview.active_providers_count == 2
     assert overview.total_bars >= 100
-    assert overview.storage_bytes >= 0
-    assert overview.parquet_files_count >= 1
+    assert overview.storage_bytes == 0
+    assert overview.parquet_files_count == 0
 
     d = overview.to_dict()
     assert d["datasets_count"] == overview.datasets_count
 
-    links = home_svc.get_doc_links()
-    assert len(links) == 6
-    assert all(link.url.startswith("https://") for link in links)
-    assert links[0].to_dict()["id"] == links[0].id
+    saved_datasets = home_svc.get_saved_datasets()
+    assert len(saved_datasets) >= 1
+    assert isinstance(saved_datasets[0], DataHomeDashboard)
+    assert saved_datasets[0].symbol == "EURUSD"
+    assert saved_datasets[0].total_records == 100
+    assert saved_datasets[0].to_dict()["symbol"] == "EURUSD"
 
-    # Test main()
+    rendered_dashboard = DataHomeCLI.format_home_dashboard(overview, saved_datasets)
+    assert "Live Database Overview" in rendered_dashboard
+    assert "EURUSD" in rendered_dashboard
+
+    table_text = DataHomeCLI.format_dataset_table(saved_datasets)
+    assert "Saved Datasets Catalog" in table_text
+    assert "EURUSD" in table_text
+
+    # Test main() with isolated test database
     home.main()
 
 
