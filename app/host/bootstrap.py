@@ -132,6 +132,10 @@ from app.host.transport import (
     get_global_event_bus,
     register_transport_exception_handlers,
 )
+from app.workspace.data_manager import (
+    DataManagerWorkspace,
+    create_data_manager_router,
+)
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -375,6 +379,7 @@ class HostRuntime:
         self.job_manager: JobManager | None = job_mgr
         self.plugin_manager: PluginLifecycleManager | None = plugin_mgr
         self.gateway_service: TransportGatewayService | None = None
+        self.data_manager: DataManagerWorkspace | None = None
 
     @property
     def state(self) -> ReadinessState:
@@ -762,6 +767,16 @@ class HostRuntime:
             require_auth=self.config.require_auth,
         )
 
+        # 5.6 DataManagerWorkspace (Stage 2B)
+        if self.data_manager is None:
+            self.data_manager = DataManagerWorkspace(
+                db_path=db_path,
+                data_dir=Path(self.config.data_dir),
+                event_bus=self.event_bus,
+                plugin_mgr=plugin_mgr,
+            )
+        self.data_manager.initialize_defaults()
+
         self._details["services"] = {
             "max_workers": self.job_manager.max_workers,
             "reconciled_orphan_jobs": reconciled_jobs,
@@ -796,6 +811,7 @@ class HostRuntime:
                 "plugins",
                 "settings",
                 "reconcile",
+                "data",
             ]
             self._mounted_routes = list(cli_commands)
             logger.info(
@@ -1065,6 +1081,22 @@ def _mount_gateway_and_discovery_routers(
     app.include_router(disc_router)
     app.include_router(disc_router, prefix="/api/v1")
     app.include_router(disc_router, prefix="/api/v2")
+
+    dm_workspace = runtime.data_manager or DataManagerWorkspace(
+        db_path=runtime.config.resolved_db_path,
+        data_dir=Path(runtime.config.data_dir),
+        event_bus=runtime.event_bus,
+        plugin_mgr=runtime.plugin_manager,
+    )
+    runtime.data_manager = dm_workspace
+    dm_router = create_data_manager_router(
+        dm_workspace,
+        session_mgr=runtime.session_manager,
+        require_auth=runtime.config.require_auth,
+    )
+    app.include_router(dm_router)
+    app.include_router(dm_router, prefix="/api/v1")
+    app.include_router(dm_router, prefix="/api/v2")
 
     for extra_router in runtime._extra_routers:  # noqa: SLF001
         app.include_router(extra_router)

@@ -57,7 +57,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -93,6 +93,7 @@ SUPPORTED_CLI_COMMANDS: tuple[str, ...] = (
     "plugins",
     "settings",
     "reconcile",
+    "data",
 )
 
 
@@ -170,7 +171,7 @@ class HeadlessCliRunner:
                 "action": act,
             },
         )
-        handlers = {
+        handlers: dict[str, Callable[[], dict[str, Any]]] = {
             "status": self._cmd_status,
             "health": self._cmd_health,
             "resources": self._cmd_resources,
@@ -178,6 +179,7 @@ class HeadlessCliRunner:
             "plugins": lambda: self._cmd_plugins(act),
             "settings": lambda: self._cmd_settings(act),
             "reconcile": self._cmd_reconcile,
+            "data": lambda: self._cmd_data(act),
         }
         handler = handlers.get(cmd)
         if handler is None:
@@ -282,6 +284,81 @@ class HeadlessCliRunner:
             "command": "reconcile",
             **rec_report,
         }
+
+    def _cmd_data(self, action: str) -> dict[str, Any]:
+        """Dispatch headless data manager workspace operations."""
+        dm = self.runtime.data_manager
+        if dm is None:
+            raise RuntimeError("DataManagerWorkspace is not initialized.")
+
+        act = action.strip().lower()
+        res: dict[str, Any]
+        if act in ("overview", "list", "status"):
+            overview = dm.home.get_overview()
+            res = {
+                "command": "data",
+                "action": "overview",
+                "overview": overview.to_dict(),
+            }
+        elif act in ("datasets", "dataset"):
+            datasets = dm.data.list_datasets()
+            res = {
+                "command": "data",
+                "action": "datasets",
+                "count": len(datasets),
+                "datasets": [d.to_dict() for d in datasets],
+            }
+        elif act in ("instruments", "instrument"):
+            instruments = dm.instruments.list_instruments()
+            res = {
+                "command": "data",
+                "action": "instruments",
+                "count": len(instruments),
+                "instruments": [i.to_dict() for i in instruments],
+            }
+        elif act in ("sessions", "session"):
+            sessions = dm.sessions.list_sessions()
+            res = {
+                "command": "data",
+                "action": "sessions",
+                "count": len(sessions),
+                "sessions": [s.to_dict() for s in sessions],
+            }
+        elif act in ("baskets", "basket", "stock_groups"):
+            overview_items = dm.baskets.get_baskets_overview()
+            res = {
+                "command": "data",
+                "action": "baskets",
+                "count": len(overview_items),
+                "baskets": [b.to_dict() for b in overview_items],
+            }
+        elif act in ("brokers", "broker"):
+            brokers = dm.broker.list_brokers()
+            res = {
+                "command": "data",
+                "action": "brokers",
+                "count": len(brokers),
+                "brokers": [b.to_dict() for b in brokers],
+            }
+        elif act in ("providers", "provider"):
+            providers = dm.connections.list_providers()
+            res = {
+                "command": "data",
+                "action": "providers",
+                "count": len(providers),
+                "providers": [p.to_dict() for p in providers],
+            }
+        elif act in ("logs", "log"):
+            logs = dm.log.list_logs(limit=50)
+            res = {
+                "command": "data",
+                "action": "logs",
+                "count": len(logs),
+                "logs": [entry.to_dict() for entry in logs],
+            }
+        else:
+            raise ValueError(f"Unsupported data action: '{action}'")
+        return res
 
 
 def format_cli_output(
