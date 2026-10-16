@@ -10,6 +10,8 @@ from ._common import (
     BridgeError,
     ChartDef,
     DataInfo,
+    InstrumentAliasRecord,
+    InstrumentInfo,
     MarketBar,
     MarketTick,
     Timeframe,
@@ -96,9 +98,8 @@ from .home import (
     HomeCLI,
 )
 from .instruments import (
-    InstrumentAliasRecord,
-    InstrumentInfo,
-    InstrumentsCatalogService,
+    Instruments,
+    InstrumentsCLI,
 )
 from .log import (
     DataManagerLogEntry,
@@ -188,7 +189,8 @@ __all__ = [
     "ITickSimulator",
     "InstrumentAliasRecord",
     "InstrumentInfo",
-    "InstrumentsCatalogService",
+    "Instruments",
+    "InstrumentsCLI",
     "MarketBar",
     "MarketTick",
     "MedianDataSeries",

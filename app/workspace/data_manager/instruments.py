@@ -1,42 +1,66 @@
-"""Instrument specifications, trading cost models, and symbol catalogs.
+"""Instrument specifications, financial attributes, and symbol catalog management.
 
 Description:
     Provides domain logic for financial instrument specifications (`InstrumentInfo`),
     tick size/step rounding, contract sizing, commission and swap models, symbol
-    aliases, and StrategyQuant X XML import/export. Governs the `datamgr_instruments`
-    relational catalog and `host_entities` alias mappings with zero direct `sqlite3`
-    calls and non-silent requirement logging.
+    aliases, and standard XML specification import/export. Governs the
+    `datamgr_instruments` relational catalog and `host_entities` alias mappings with
+    zero direct `sqlite3` calls and non-silent requirement logging.
 
 Purpose:
     FEAT-DATAMGR-INSTRUMENTS: Instrument catalog and financial specification.
 
 Key Capabilities:
-    - FR-DATAMGR-INSTRUMENTS-MODEL: Specification model with tick rounding and
-      SymbolSpec conversion.
-      Associated: `InstrumentInfo.round_to_tick_size()`,
-      `InstrumentInfo.to_symbol_spec()`
-      Logging: Emits DEBUG on price rounding and symbol conversion.
-    - FR-DATAMGR-INSTRUMENTS-CATALOG-CRUD: Manage instrument records in
-      `datamgr_instruments`.
-      Associated: `InstrumentsCatalogService.list_instruments()`,
-      `InstrumentsCatalogService.save_instrument()`,
-      `InstrumentsCatalogService.delete_instrument()`
-      Logging: Emits INFO on creation, update, cloning, mass edit, and deletion.
-    - FR-DATAMGR-INSTRUMENTS-XML-AND-ALIASES: SQX XML import/export and alias
-      management.
-      Associated: `InstrumentsCatalogService.export_xml()`,
-      `InstrumentsCatalogService.import_xml()`,
-      `InstrumentsCatalogService.save_alias()`
-      Logging: Emits INFO on XML import/export and alias mutation.
+    - FR-DATAMGR-INSTRUMENTS-SEED: Seed default canonical financial instruments.
+      Associated: `Instruments.ensure_default_instruments()`
+      Logging: Emits INFO on seeded instrument count.
+    - FR-DATAMGR-INSTRUMENTS-LIST: List instrument specifications matching criteria.
+      Associated: `Instruments.list_instruments()`
+      Logging: Emits INFO on listed count and query parameters.
+    - FR-DATAMGR-INSTRUMENTS-GET: Retrieve specification details by instrument symbol.
+      Associated: `Instruments.get_instrument()`
+      Logging: Emits DEBUG on retrieval outcome.
+    - FR-DATAMGR-INSTRUMENTS-SAVE: Create or upsert an instrument specification.
+      Associated: `Instruments.save_instrument()`
+      Logging: Emits INFO on saved instrument symbol and id.
+    - FR-DATAMGR-INSTRUMENTS-UPDATE: Update attributes of an existing instrument.
+      Associated: `Instruments.update_instrument()`
+      Logging: Emits INFO on updated instrument symbol.
+    - FR-DATAMGR-INSTRUMENTS-DELETE: Delete an instrument specification by symbol.
+      Associated: `Instruments.delete_instrument()`
+      Logging: Emits INFO on deleted instrument symbol and status.
+    - FR-DATAMGR-INSTRUMENTS-CLONE: Duplicate an instrument under a new target symbol.
+      Associated: `Instruments.clone_instrument()`
+      Logging: Emits INFO on source and cloned symbol names.
+    - FR-DATAMGR-INSTRUMENTS-MASS-EDIT: Apply batch field updates across instruments.
+      Associated: `Instruments.mass_edit_instruments()`
+      Logging: Emits INFO on mass-edited count.
+    - FR-DATAMGR-INSTRUMENTS-MASS-DELETE: Delete a collection of instruments by symbol.
+      Associated: `Instruments.mass_delete_instruments()`
+      Logging: Emits INFO on deleted instrument count.
+    - FR-DATAMGR-INSTRUMENTS-EXPORT-XML: Export specifications to standard XML format.
+      Associated: `Instruments.export_xml()`
+      Logging: Emits INFO on exported instrument count.
+    - FR-DATAMGR-INSTRUMENTS-IMPORT-XML: Parse and import specifications from XML.
+      Associated: `Instruments.import_xml()`
+      Logging: Emits INFO on imported, overwritten, and skipped counts.
+    - FR-DATAMGR-INSTRUMENTS-LIST-ALIASES: List all registered symbol alias mappings.
+      Associated: `Instruments.list_aliases()`
+      Logging: Emits INFO on listed alias count.
+    - FR-DATAMGR-INSTRUMENTS-SAVE-ALIAS: Create or update a symbol alias mapping.
+      Associated: `Instruments.save_alias()`
+      Logging: Emits INFO on saved alias and target instrument.
+    - FR-DATAMGR-INSTRUMENTS-DELETE-ALIAS: Remove a symbol alias mapping.
+      Associated: `Instruments.delete_alias()`
+      Logging: Emits INFO on deleted alias name and removal status.
 
 Python API Usage:
     ```python
-    from app.workspace.data_manager.instruments import InstrumentsCatalogService
+    from app.workspace.data_manager.instruments import Instruments, InstrumentsCLI
 
-    service = InstrumentsCatalogService()
-    instrument = service.get_instrument("EURUSD")
-    if instrument:
-        rounded_price = instrument.round_to_tick_size(1.085427)
+    service = Instruments()
+    instruments = service.list_instruments()
+    print(InstrumentsCLI.format_instruments_table(instruments))
     ```
 
 CLI Usage:
@@ -62,189 +86,45 @@ from app.host.persistence.create import create_schema, insert_row
 from app.host.persistence.delete import delete_row_by_pk, delete_rows
 from app.host.persistence.read import count_rows, read_rows, resolve_connection
 from app.host.persistence.update import update_row_by_pk
-from app.services.trading import SymbolSpec
 
+from ._common import InstrumentAliasRecord, InstrumentInfo
 from .log import DataManagerLogService
 
 __all__ = [
-    "InstrumentAliasRecord",
-    "InstrumentInfo",
-    "InstrumentsCatalogService",
+    "Instruments",
+    "InstrumentsCLI",
 ]
 
 logger = get_logger(__name__)
 
-INSTRUMENTS_MODEL_FR = "FR-DATAMGR-INSTRUMENTS-MODEL"
-CATALOG_CRUD_FR = "FR-DATAMGR-INSTRUMENTS-CATALOG-CRUD"
-XML_ALIASES_FR = "FR-DATAMGR-INSTRUMENTS-XML-AND-ALIASES"
-
-
-@dataclass
-class InstrumentInfo:
-    """Represents a financial instrument's specification and trading costs."""
-
-    id: int | None = None
-    symbol: str = ""
-    connection: str = ""
-    broker_id: int = 0
-    description: str = ""
-    tick_size: float = 0.00001
-    tick_step: float = 0.00001
-    tick_value_in_money: float = 10.0
-    point_value: float = 100000.0
-    decimals: int = 5
-    default_spread: float = 0.0001
-    default_slippage: float = 0.0
-    min_volume: float = 0.01
-    max_volume: float = 100.0
-    lot_step: float = 0.01
-    margin_rate: float = 0.05
-    swap_long: float = 0.0
-    swap_short: float = 0.0
-    swap_3day_day: int = 3
-    commissions: str = "0.0"
-    data_type: str = "Forex"
-    alias: str = ""
-    exchange: str = ""
-    country: str = ""
-    sector: str = ""
-    min_distance: float = 0.0
-    order_size_multiplier: float = 1.0
-    order_size_step: float = 0.0
-    cot: str | None = None
-    created_at_utc: str = ""
-    updated_at_utc: str = ""
-
-    def round_to_tick_size(self, price: float) -> float:
-        """Round a price to the instrument's minimum tick size."""
-        step = self.tick_size if self.tick_size > 0.0 else 0.0001
-        rounded = round(round(price / step) * step, self.decimals)
-        logger.debug(
-            "%s: Rounded price %f to %f (step=%f)",
-            INSTRUMENTS_MODEL_FR,
-            price,
-            rounded,
-            step,
-            extra={
-                "fr_id": INSTRUMENTS_MODEL_FR,
-                "price": price,
-                "rounded": rounded,
-            },
-        )
-        return rounded
-
-    def to_symbol_spec(self) -> SymbolSpec:
-        """Convert specification to the Tier 2 SymbolSpec domain model."""
-        logger.debug(
-            "%s: Converting instrument %s to SymbolSpec",
-            INSTRUMENTS_MODEL_FR,
-            self.symbol,
-            extra={"fr_id": INSTRUMENTS_MODEL_FR, "symbol": self.symbol},
-        )
-        return SymbolSpec(
-            name=self.symbol,
-            digits=self.decimals,
-            point=self.tick_size,
-            trade_tick_size=self.tick_size,
-            trade_tick_value=self.tick_value_in_money,
-            trade_contract_size=self.point_value,
-            volume_min=self.min_volume,
-            volume_max=self.max_volume,
-            volume_step=self.lot_step,
-            margin_initial=self.margin_rate,
-            swap_long=self.swap_long,
-            swap_short=self.swap_short,
-            swap_rollover3days=self.swap_3day_day,
-        )
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert specification to dictionary representation."""
-        return {
-            "id": self.id,
-            "symbol": self.symbol,
-            "connection": self.connection,
-            "broker_id": self.broker_id,
-            "description": self.description,
-            "tick_size": self.tick_size,
-            "tick_step": self.tick_step,
-            "tick_value_in_money": self.tick_value_in_money,
-            "point_value": self.point_value,
-            "decimals": self.decimals,
-            "default_spread": self.default_spread,
-            "default_slippage": self.default_slippage,
-            "min_volume": self.min_volume,
-            "max_volume": self.max_volume,
-            "lot_step": self.lot_step,
-            "margin_rate": self.margin_rate,
-            "swap_long": self.swap_long,
-            "swap_short": self.swap_short,
-            "swap_3day_day": self.swap_3day_day,
-            "commissions": self.commissions,
-            "data_type": self.data_type,
-            "alias": self.alias,
-            "exchange": self.exchange,
-            "country": self.country,
-            "sector": self.sector,
-            "min_distance": self.min_distance,
-            "order_size_multiplier": self.order_size_multiplier,
-            "order_size_step": self.order_size_step,
-            "cot": self.cot,
-            "created_at_utc": self.created_at_utc,
-            "updated_at_utc": self.updated_at_utc,
-        }
-
-    @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> InstrumentInfo:
-        """Construct InstrumentInfo from row or dictionary data."""
-        return cls(
-            id=data.get("id"),
-            symbol=str(data.get("symbol", "")),
-            connection=str(data.get("connection", "")),
-            broker_id=int(data.get("broker_id", -1)),
-            description=str(data.get("description", "")),
-            tick_size=float(data.get("tick_size", 0.0001)),
-            tick_step=float(data.get("tick_step", 0.00001)),
-            tick_value_in_money=float(data.get("tick_value_in_money", 10.0)),
-            point_value=float(data.get("point_value", 100000.0)),
-            decimals=int(data.get("decimals", 5)),
-            default_spread=float(data.get("default_spread", 1.0)),
-            default_slippage=float(data.get("default_slippage", 0.0)),
-            min_volume=float(data.get("min_volume", 0.01)),
-            max_volume=float(data.get("max_volume", 100.0)),
-            lot_step=float(data.get("lot_step", 0.01)),
-            margin_rate=float(data.get("margin_rate", 0.05)),
-            swap_long=float(data.get("swap_long", 0.0)),
-            swap_short=float(data.get("swap_short", 0.0)),
-            swap_3day_day=int(data.get("swap_3day_day", 3)),
-            commissions=str(data.get("commissions", "0.0")),
-            data_type=str(data.get("data_type", "Forex")),
-            alias=str(data.get("alias", "")),
-            exchange=str(data.get("exchange", "")),
-            country=str(data.get("country", "")),
-            sector=str(data.get("sector", "")),
-            min_distance=float(data.get("min_distance", 0.0)),
-            order_size_multiplier=float(data.get("order_size_multiplier", 1.0)),
-            order_size_step=float(data.get("order_size_step", 0.01)),
-            cot=str(data["cot"]) if data.get("cot") is not None else None,
-            created_at_utc=str(data.get("created_at_utc", "")),
-            updated_at_utc=str(data.get("updated_at_utc", "")),
-        )
+SEED_FR = "FR-DATAMGR-INSTRUMENTS-SEED"
+LIST_FR = "FR-DATAMGR-INSTRUMENTS-LIST"
+GET_FR = "FR-DATAMGR-INSTRUMENTS-GET"
+SAVE_FR = "FR-DATAMGR-INSTRUMENTS-SAVE"
+UPDATE_FR = "FR-DATAMGR-INSTRUMENTS-UPDATE"
+DELETE_FR = "FR-DATAMGR-INSTRUMENTS-DELETE"
+CLONE_FR = "FR-DATAMGR-INSTRUMENTS-CLONE"
+MASS_EDIT_FR = "FR-DATAMGR-INSTRUMENTS-MASS-EDIT"
+MASS_DELETE_FR = "FR-DATAMGR-INSTRUMENTS-MASS-DELETE"
+EXPORT_XML_FR = "FR-DATAMGR-INSTRUMENTS-EXPORT-XML"
+IMPORT_XML_FR = "FR-DATAMGR-INSTRUMENTS-IMPORT-XML"
+LIST_ALIASES_FR = "FR-DATAMGR-INSTRUMENTS-LIST-ALIASES"
+SAVE_ALIAS_FR = "FR-DATAMGR-INSTRUMENTS-SAVE-ALIAS"
+DELETE_ALIAS_FR = "FR-DATAMGR-INSTRUMENTS-DELETE-ALIAS"
 
 
 @dataclass(frozen=True)
-class InstrumentAliasRecord:
-    """Represents a symbol alias mapping."""
+class _Config:
+    """Internal module configuration and execution parameters."""
 
-    alias: str
-    instrument: str
-    description: str = ""
+    db_path: Path | None = None
+    default_data_type: str = "Forex"
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert alias record to dictionary representation."""
+        """Convert internal config or metrics to standard dictionary."""
         return {
-            "alias": self.alias,
-            "instrument": self.instrument,
-            "description": self.description,
+            "db_path": str(self.db_path) if self.db_path else None,
+            "default_data_type": self.default_data_type,
         }
 
 
@@ -336,23 +216,36 @@ _DEFAULT_SEEDED_INSTRUMENTS: tuple[dict[str, Any], ...] = (
 )
 
 
-class InstrumentsCatalogService:
+class Instruments:
     """Service governing instrument specifications, CRUD, and XML transfer."""
 
     def __init__(
         self,
         db_path: Path | str | None = None,
         log_service: DataManagerLogService | None = None,
+        config: _Config | None = None,
     ) -> None:
         """Initialize instruments service with optional DB path and logger."""
-        self.db_path = Path(db_path) if db_path is not None else None
+        resolved_db = Path(db_path) if db_path is not None else None
+        self._config = config or _Config(db_path=resolved_db)
         self.log_service = log_service
+
+    @property
+    def db_path(self) -> Path | None:
+        """Return configured SQLite database file path."""
+        return self._config.db_path
 
     def ensure_default_instruments(self) -> int:
         """Seed default canonical instruments if catalog is empty."""
         with resolve_connection(self.db_path) as conn:
             existing = count_rows(conn, "datamgr_instruments")
             if existing > 0:
+                logger.debug(
+                    "%s: Catalog already contains %d instruments",
+                    SEED_FR,
+                    existing,
+                    extra={"fr_id": SEED_FR, "existing": existing},
+                )
                 return 0
 
             seeded = 0
@@ -366,9 +259,9 @@ class InstrumentsCatalogService:
 
         logger.info(
             "%s: Seeded %d default instruments",
-            CATALOG_CRUD_FR,
+            SEED_FR,
             seeded,
-            extra={"fr_id": CATALOG_CRUD_FR, "seeded": seeded},
+            extra={"fr_id": SEED_FR, "seeded": seeded},
         )
         return seeded
 
@@ -403,6 +296,18 @@ class InstrumentsCatalogService:
             if q and q not in inst.symbol.lower() and q not in inst.description.lower():
                 continue
             results.append(inst)
+
+        logger.info(
+            "%s: Listed %d instruments",
+            LIST_FR,
+            len(results),
+            extra={
+                "fr_id": LIST_FR,
+                "count": len(results),
+                "connection": connection,
+                "data_type": data_type,
+            },
+        )
         return results
 
     def get_instrument(self, symbol: str) -> InstrumentInfo | None:
@@ -415,9 +320,15 @@ class InstrumentsCatalogService:
                 where={"symbol": clean},
                 limit=1,
             )
-        if not rows:
-            return None
-        return InstrumentInfo.from_dict(rows[0])
+        result = InstrumentInfo.from_dict(rows[0]) if rows else None
+        logger.debug(
+            "%s: Retrieved instrument symbol=%s found=%s",
+            GET_FR,
+            clean,
+            result is not None,
+            extra={"fr_id": GET_FR, "symbol": clean, "found": result is not None},
+        )
+        return result
 
     def save_instrument(self, payload: Mapping[str, Any]) -> InstrumentInfo:
         """Create or upsert an instrument specification."""
@@ -456,11 +367,11 @@ class InstrumentsCatalogService:
         )
         logger.info(
             "%s: Saved instrument symbol=%s id=%s",
-            CATALOG_CRUD_FR,
+            SAVE_FR,
             result.symbol,
             result.id,
             extra={
-                "fr_id": CATALOG_CRUD_FR,
+                "fr_id": SAVE_FR,
                 "symbol": result.symbol,
                 "id": result.id,
             },
@@ -477,12 +388,25 @@ class InstrumentsCatalogService:
 
         data = inst.to_dict()
         data.update(updates)
-        return self.save_instrument(data)
+        saved = self.save_instrument(data)
+        logger.info(
+            "%s: Updated instrument symbol=%s",
+            UPDATE_FR,
+            symbol,
+            extra={"fr_id": UPDATE_FR, "symbol": symbol},
+        )
+        return saved
 
     def delete_instrument(self, symbol: str) -> bool:
         """Delete an instrument specification by symbol."""
         inst = self.get_instrument(symbol)
         if inst is None or inst.id is None:
+            logger.debug(
+                "%s: Instrument %s not found for deletion",
+                DELETE_FR,
+                symbol,
+                extra={"fr_id": DELETE_FR, "symbol": symbol},
+            )
             return False
 
         with resolve_connection(self.db_path) as conn:
@@ -490,11 +414,11 @@ class InstrumentsCatalogService:
 
         logger.info(
             "%s: Deleted instrument symbol=%s deleted=%s",
-            CATALOG_CRUD_FR,
+            DELETE_FR,
             symbol,
             deleted,
             extra={
-                "fr_id": CATALOG_CRUD_FR,
+                "fr_id": DELETE_FR,
                 "symbol": symbol,
                 "deleted": deleted,
             },
@@ -522,7 +446,15 @@ class InstrumentsCatalogService:
         data["id"] = None
         data["symbol"] = target_name
         data["broker_id"] = broker_id
-        return self.save_instrument(data)
+        cloned = self.save_instrument(data)
+        logger.info(
+            "%s: Cloned instrument %s -> %s",
+            CLONE_FR,
+            symbol,
+            target_name,
+            extra={"fr_id": CLONE_FR, "source": symbol, "target": target_name},
+        )
+        return cloned
 
     def mass_edit_instruments(
         self,
@@ -557,9 +489,9 @@ class InstrumentsCatalogService:
 
         logger.info(
             "%s: Mass-edited %d instruments",
-            CATALOG_CRUD_FR,
+            MASS_EDIT_FR,
             count,
-            extra={"fr_id": CATALOG_CRUD_FR, "count": count},
+            extra={"fr_id": MASS_EDIT_FR, "count": count},
         )
         return count
 
@@ -572,14 +504,14 @@ class InstrumentsCatalogService:
 
         logger.info(
             "%s: Mass-deleted %d instruments",
-            CATALOG_CRUD_FR,
+            MASS_DELETE_FR,
             deleted_count,
-            extra={"fr_id": CATALOG_CRUD_FR, "deleted_count": deleted_count},
+            extra={"fr_id": MASS_DELETE_FR, "deleted_count": deleted_count},
         )
         return {"deleted_count": deleted_count, "is_async": False}
 
     def export_xml(self, symbols: Sequence[str] | None = None) -> str:
-        """Export instrument specifications to StrategyQuant X XML format."""
+        """Export instrument specifications to XML specification format."""
         all_inst = self.list_instruments()
         target_symbols = {s.strip().upper() for s in symbols} if symbols else None
 
@@ -609,17 +541,17 @@ class InstrumentsCatalogService:
 
         xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
         logger.info(
-            "%s: Exported %d instruments to SQX XML",
-            XML_ALIASES_FR,
+            "%s: Exported %d instruments to XML",
+            EXPORT_XML_FR,
             len(root),
-            extra={"fr_id": XML_ALIASES_FR, "count": len(root)},
+            extra={"fr_id": EXPORT_XML_FR, "count": len(root)},
         )
         return str(xml_str)
 
     def import_xml(
         self, xml_content: str, conflict_policy: str = "overwrite_all"
     ) -> dict[str, Any]:
-        """Safely import SQX Instruments XML using defusedxml."""
+        """Safely import instruments XML using defusedxml."""
         root = DefusedET.fromstring(xml_content)
         imported = 0
         overwritten = 0
@@ -665,12 +597,12 @@ class InstrumentsCatalogService:
 
         logger.info(
             "%s: Imported instruments XML (imported=%d, overwritten=%d, skipped=%d)",
-            XML_ALIASES_FR,
+            IMPORT_XML_FR,
             imported,
             overwritten,
             skipped,
             extra={
-                "fr_id": XML_ALIASES_FR,
+                "fr_id": IMPORT_XML_FR,
                 "imported": imported,
                 "overwritten": overwritten,
                 "skipped": skipped,
@@ -706,9 +638,16 @@ class InstrumentsCatalogService:
             except (json.JSONDecodeError, TypeError, KeyError) as exc:
                 logger.debug(
                     "%s: Skipping malformed alias record: %s",
-                    XML_ALIASES_FR,
+                    LIST_ALIASES_FR,
                     exc,
                 )
+
+        logger.info(
+            "%s: Listed %d instrument aliases",
+            LIST_ALIASES_FR,
+            len(aliases),
+            extra={"fr_id": LIST_ALIASES_FR, "count": len(aliases)},
+        )
         return aliases
 
     def save_alias(
@@ -750,11 +689,11 @@ class InstrumentsCatalogService:
         )
         logger.info(
             "%s: Saved symbol alias %s -> %s",
-            XML_ALIASES_FR,
+            SAVE_ALIAS_FR,
             clean_alias,
             clean_inst,
             extra={
-                "fr_id": XML_ALIASES_FR,
+                "fr_id": SAVE_ALIAS_FR,
                 "alias": clean_alias,
                 "instrument": clean_inst,
             },
@@ -776,11 +715,11 @@ class InstrumentsCatalogService:
         removed = count > 0
         logger.info(
             "%s: Deleted alias %s removed=%s",
-            XML_ALIASES_FR,
+            DELETE_ALIAS_FR,
             clean_alias,
             removed,
             extra={
-                "fr_id": XML_ALIASES_FR,
+                "fr_id": DELETE_ALIAS_FR,
                 "alias": clean_alias,
                 "removed": removed,
             },
@@ -788,14 +727,85 @@ class InstrumentsCatalogService:
         return removed
 
 
-def main() -> None:
-    """Execute real-usage demonstration of InstrumentsCatalogService."""
+class InstrumentsCLI:
+    """Headless CLI formatter and table presentation for Data Manager instruments."""
+
+    MAX_DESC_LEN: int = 28
+    TRUNCATE_LEN: int = 26
+
+    @classmethod
+    def format_instruments_table(
+        cls,
+        instruments: Sequence[InstrumentInfo],
+    ) -> str:
+        """Format ASCII table of instrument specification records."""
+        logger.debug("Formatting %d instruments as ASCII table", len(instruments))
+        lines: list[str] = [f"=== Instruments Catalog ({len(instruments)} items) ==="]
+        header = (
+            "| {sym:<12} | {desc:<28} | {dtype:<10} | {tick:>10} "
+            "| {point:>10} | {dec:>4} | {spread:>8} |"
+        )
+        divider = (
+            "|-"
+            + "-|-".join(
+                [
+                    "-" * 12,
+                    "-" * 28,
+                    "-" * 10,
+                    "-" * 10,
+                    "-" * 10,
+                    "-" * 4,
+                    "-" * 8,
+                ]
+            )
+            + "-|"
+        )
+        lines.append(
+            header.format(
+                sym="Symbol",
+                desc="Description",
+                dtype="Data Type",
+                tick="Tick Size",
+                point="Point Val",
+                dec="Dec",
+                spread="Spread",
+            )
+        )
+        lines.append(divider)
+        for inst in instruments:
+            desc = (
+                inst.description[: cls.TRUNCATE_LEN] + ".."
+                if len(inst.description) > cls.MAX_DESC_LEN
+                else inst.description
+            )
+            lines.append(
+                header.format(
+                    sym=inst.symbol,
+                    desc=desc,
+                    dtype=inst.data_type,
+                    tick=f"{inst.tick_size:.5f}",
+                    point=f"{inst.point_value:.1f}",
+                    dec=str(inst.decimals),
+                    spread=f"{inst.default_spread:.1f}",
+                )
+            )
+        return "\n".join(lines)
+
+    @classmethod
+    def format_output(cls, data: Mapping[str, Any]) -> str:
+        """Format data into human-readable terminal output."""
+        logger.debug("Formatting instruments output")
+        lines = [f"{k}: {v}" for k, v in data.items()]
+        return "\n".join(lines)
+
+
+if __name__ == "__main__":
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
         db_file = Path(temp_dir) / "test_instruments.db"
         with resolve_connection(db_file) as conn:
             create_schema(conn)
 
-        service = InstrumentsCatalogService(db_path=db_file)
+        service = Instruments(db_path=db_file)
         seeded = service.ensure_default_instruments()
         print(f"Seeded {seeded} instruments")
 
@@ -816,6 +826,5 @@ def main() -> None:
         xml_out = service.export_xml(["EURUSD", "EURUSD_ECN"])
         print(f"Exported XML snippet:\n{xml_out[:180]}...")
 
-
-if __name__ == "__main__":
-    main()
+        insts = service.list_instruments()
+        print(InstrumentsCLI.format_instruments_table(insts))

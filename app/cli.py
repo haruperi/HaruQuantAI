@@ -297,7 +297,7 @@ class HeadlessCliRunner:
         if dm is None:
             raise RuntimeError("DataManagerWorkspace is not initialized.")
 
-        from app.workspace.data_manager import HomeCLI
+        from app.workspace.data_manager import HomeCLI, InstrumentsCLI
 
         act = action.strip().lower()
         res: dict[str, Any]
@@ -322,9 +322,11 @@ class HeadlessCliRunner:
             }
         elif act in ("instruments", "instrument"):
             instruments = dm.instruments.list_instruments()
+            rendered = InstrumentsCLI.format_instruments_table(instruments)
             res = {
                 "command": "data",
                 "action": "instruments",
+                "rendered": rendered,
                 "count": len(instruments),
                 "instruments": [i.to_dict() for i in instruments],
             }

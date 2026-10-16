@@ -12,7 +12,6 @@ from app.host.persistence.read import resolve_connection
 from app.workspace.data_manager import (
     baskets,
     broker,
-    instruments,
     sessions,
 )
 from app.workspace.data_manager import (
@@ -30,7 +29,8 @@ from app.workspace.data_manager.home import (
     HomeCLI,
 )
 from app.workspace.data_manager.instruments import (
-    InstrumentsCatalogService,
+    Instruments,
+    InstrumentsCLI,
 )
 from app.workspace.data_manager.log import DataManagerLogService
 from app.workspace.data_manager.sessions import (
@@ -64,7 +64,7 @@ def test_home_service_overview_and_links(
     """Test Home dashboard metrics, document links, and storage audit."""
     monkeypatch.setattr("app.host.persistence.create.DEFAULT_DB_PATH", test_db_path)
     data_svc = DataManagerDataService(db_path=test_db_path, data_dir=tmp_path / "data")
-    inst_svc = InstrumentsCatalogService(db_path=test_db_path)
+    inst_svc = Instruments(db_path=test_db_path)
     inst_svc.ensure_default_instruments()
     sess_svc = SessionsCatalogService(db_path=test_db_path)
     sess_svc.ensure_default_sessions()
@@ -123,10 +123,11 @@ def test_home_service_overview_and_links(
 # ============================================================================
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_instruments_service_lifecycle(test_db_path: Path) -> None:
     """Test instrument specifications, rounding, CRUD, aliases, and XML transfer."""
     log_svc = DataManagerLogService(db_path=test_db_path)
-    service = InstrumentsCatalogService(db_path=test_db_path, log_service=log_svc)
+    service = Instruments(db_path=test_db_path, log_service=log_svc)
 
     seeded = service.ensure_default_instruments()
     assert seeded >= 7
@@ -167,7 +168,7 @@ def test_instruments_service_lifecycle(test_db_path: Path) -> None:
     assert service.get_instrument("EURUSD_VIP") is None
 
     # Symbol aliases
-    alias = service.save_alias("EUR.USD", "EURUSD", "MT4 symbol format")
+    alias = service.save_alias("EUR.USD", "EURUSD", "Broker symbol format")
     assert alias.alias == "EUR.USD"
     aliases = service.list_aliases()
     assert any(a.alias == "EUR.USD" for a in aliases)
@@ -183,8 +184,13 @@ def test_instruments_service_lifecycle(test_db_path: Path) -> None:
     skip_res = service.import_xml(xml_data, conflict_policy="skip")
     assert skip_res["skipped"] >= 2
 
-    # Test main()
-    instruments.main()
+    # Test InstrumentsCLI formatting
+    table_text = InstrumentsCLI.format_instruments_table(forex_list)
+    assert "Instruments Catalog" in table_text
+    assert "EURUSD" in table_text
+
+    # Test execution under __main__
+    runpy.run_module("app.workspace.data_manager.instruments", run_name="__main__")
 
 
 # ============================================================================
@@ -336,7 +342,7 @@ def test_baskets_service_lifecycle(test_db_path: Path, tmp_path: Path) -> None:
 
 def test_broker_profiles_lifecycle(test_db_path: Path, tmp_path: Path) -> None:
     """Test broker profiles, stock lists, CSV import/export, and XML migration."""
-    inst_svc = InstrumentsCatalogService(db_path=test_db_path)
+    inst_svc = Instruments(db_path=test_db_path)
     inst_svc.ensure_default_instruments()
     sess_svc = SessionsCatalogService(db_path=test_db_path)
     sess_svc.ensure_default_sessions()

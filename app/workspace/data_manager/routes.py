@@ -69,7 +69,7 @@ from .custom_data import CustomDataService
 from .data import DataManagerDataService
 from .help import DataManagerHelpService
 from .home import Home
-from .instruments import InstrumentsCatalogService
+from .instruments import Instruments
 from .log import DataManagerLogService
 from .sessions import SessionsCatalogService
 
@@ -112,7 +112,7 @@ class DataManagerWorkspace:
             data_dir=self.data_dir,
             log_service=self.log,
         )
-        self.instruments = InstrumentsCatalogService(
+        self.instruments = Instruments(
             db_path=self.db_path,
             log_service=self.log,
         )

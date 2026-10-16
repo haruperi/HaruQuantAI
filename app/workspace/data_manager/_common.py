@@ -8,6 +8,7 @@ from enum import StrEnum
 from typing import Any
 
 from app.services.brokers.base import BridgeError
+from app.services.trading import SymbolSpec
 
 __all__ = [
     "MAX_POSITION",
@@ -19,6 +20,8 @@ __all__ = [
     "BridgeError",
     "ChartDef",
     "DataInfo",
+    "InstrumentAliasRecord",
+    "InstrumentInfo",
     "MarketBar",
     "MarketTick",
     "Timeframe",
@@ -672,6 +675,156 @@ class DataInfo:
             quality_score=float(row.get("quality_score", 1.0)),
             connection=src,
         )
+
+
+@dataclass
+class InstrumentInfo:
+    """Represents a financial instrument's specification and trading costs."""
+
+    id: int | None = None
+    symbol: str = ""
+    connection: str = ""
+    broker_id: int = 0
+    description: str = ""
+    tick_size: float = 0.00001
+    tick_step: float = 0.00001
+    tick_value_in_money: float = 10.0
+    point_value: float = 100000.0
+    decimals: int = 5
+    default_spread: float = 0.0001
+    default_slippage: float = 0.0
+    min_volume: float = 0.01
+    max_volume: float = 100.0
+    lot_step: float = 0.01
+    margin_rate: float = 0.05
+    swap_long: float = 0.0
+    swap_short: float = 0.0
+    swap_3day_day: int = 3
+    commissions: str = "0.0"
+    data_type: str = "Forex"
+    alias: str = ""
+    exchange: str = ""
+    country: str = ""
+    sector: str = ""
+    min_distance: float = 0.0
+    order_size_multiplier: float = 1.0
+    order_size_step: float = 0.0
+    cot: str | None = None
+    created_at_utc: str = ""
+    updated_at_utc: str = ""
+
+    def round_to_tick_size(self, price: float) -> float:
+        """Round a price to the instrument's minimum tick size."""
+        step = self.tick_size if self.tick_size > 0.0 else 0.0001
+        return round(round(price / step) * step, self.decimals)
+
+    def to_symbol_spec(self) -> SymbolSpec:
+        """Convert specification to the Tier 2 SymbolSpec domain model."""
+        return SymbolSpec(
+            name=self.symbol,
+            digits=self.decimals,
+            point=self.tick_size,
+            trade_tick_size=self.tick_size,
+            trade_tick_value=self.tick_value_in_money,
+            trade_contract_size=self.point_value,
+            volume_min=self.min_volume,
+            volume_max=self.max_volume,
+            volume_step=self.lot_step,
+            margin_initial=self.margin_rate,
+            swap_long=self.swap_long,
+            swap_short=self.swap_short,
+            swap_rollover3days=self.swap_3day_day,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert specification to dictionary representation."""
+        return {
+            "id": self.id,
+            "symbol": self.symbol,
+            "connection": self.connection,
+            "broker_id": self.broker_id,
+            "description": self.description,
+            "tick_size": self.tick_size,
+            "tick_step": self.tick_step,
+            "tick_value_in_money": self.tick_value_in_money,
+            "point_value": self.point_value,
+            "decimals": self.decimals,
+            "default_spread": self.default_spread,
+            "default_slippage": self.default_slippage,
+            "min_volume": self.min_volume,
+            "max_volume": self.max_volume,
+            "lot_step": self.lot_step,
+            "margin_rate": self.margin_rate,
+            "swap_long": self.swap_long,
+            "swap_short": self.swap_short,
+            "swap_3day_day": self.swap_3day_day,
+            "commissions": self.commissions,
+            "data_type": self.data_type,
+            "alias": self.alias,
+            "exchange": self.exchange,
+            "country": self.country,
+            "sector": self.sector,
+            "min_distance": self.min_distance,
+            "order_size_multiplier": self.order_size_multiplier,
+            "order_size_step": self.order_size_step,
+            "cot": self.cot,
+            "created_at_utc": self.created_at_utc,
+            "updated_at_utc": self.updated_at_utc,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> InstrumentInfo:
+        """Construct InstrumentInfo from row or dictionary data."""
+        return cls(
+            id=data.get("id"),
+            symbol=str(data.get("symbol", "")),
+            connection=str(data.get("connection", "")),
+            broker_id=int(data.get("broker_id", -1)),
+            description=str(data.get("description", "")),
+            tick_size=float(data.get("tick_size", 0.0001)),
+            tick_step=float(data.get("tick_step", 0.00001)),
+            tick_value_in_money=float(data.get("tick_value_in_money", 10.0)),
+            point_value=float(data.get("point_value", 100000.0)),
+            decimals=int(data.get("decimals", 5)),
+            default_spread=float(data.get("default_spread", 1.0)),
+            default_slippage=float(data.get("default_slippage", 0.0)),
+            min_volume=float(data.get("min_volume", 0.01)),
+            max_volume=float(data.get("max_volume", 100.0)),
+            lot_step=float(data.get("lot_step", 0.01)),
+            margin_rate=float(data.get("margin_rate", 0.05)),
+            swap_long=float(data.get("swap_long", 0.0)),
+            swap_short=float(data.get("swap_short", 0.0)),
+            swap_3day_day=int(data.get("swap_3day_day", 3)),
+            commissions=str(data.get("commissions", "0.0")),
+            data_type=str(data.get("data_type", "Forex")),
+            alias=str(data.get("alias", "")),
+            exchange=str(data.get("exchange", "")),
+            country=str(data.get("country", "")),
+            sector=str(data.get("sector", "")),
+            min_distance=float(data.get("min_distance", 0.0)),
+            order_size_multiplier=float(data.get("order_size_multiplier", 1.0)),
+            order_size_step=float(data.get("order_size_step", 0.01)),
+            cot=str(data["cot"]) if data.get("cot") is not None else None,
+            created_at_utc=str(data.get("created_at_utc", "")),
+            updated_at_utc=str(data.get("updated_at_utc", "")),
+        )
+
+
+@dataclass(frozen=True)
+class InstrumentAliasRecord:
+    """Represents a symbol alias mapping."""
+
+    alias: str
+    instrument: str
+    description: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert alias record to dictionary representation."""
+        return {
+            "alias": self.alias,
+            "instrument": self.instrument,
+            "description": self.description,
+        }
 
 
 MAX_UNDERLYING_DISPLAY_LEN: int = 32

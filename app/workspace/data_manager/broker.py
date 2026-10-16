@@ -71,7 +71,7 @@ from app.host.persistence.update import update_row_by_pk
 from defusedxml.common import DefusedXmlException  # type: ignore[import-untyped]
 
 from .data import DataManagerDataService
-from .instruments import InstrumentsCatalogService
+from .instruments import Instruments
 from .sessions import SessionsCatalogService
 
 __all__ = [
@@ -232,7 +232,7 @@ class BrokerProfilesService:
     def __init__(
         self,
         db_path: Path | str | None = None,
-        instruments_service: InstrumentsCatalogService | None = None,
+        instruments_service: Instruments | None = None,
         sessions_service: SessionsCatalogService | None = None,
         data_service: DataManagerDataService | None = None,
     ) -> None:

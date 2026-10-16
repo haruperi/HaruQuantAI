@@ -14,6 +14,8 @@ from app.workspace.data_manager import (
     BridgeError,
     ChartDef,
     DataInfo,
+    InstrumentAliasRecord,
+    InstrumentInfo,
     MarketBar,
     MarketTick,
     Timeframe,
@@ -321,3 +323,79 @@ class TestFormatters:
         rendered_obj = format_home_dashboard(_MockOverview(), [ds])
         assert "Total Datasets:       1" in rendered_obj
         assert "Historical Bars:      500" in rendered_obj
+
+
+class TestContractsInstrumentInfo:
+    """Verify InstrumentInfo model defaults, tick rounding, and conversions."""
+
+    def test_instrument_info_defaults_and_tick_rounding(self) -> None:
+        """Verify price rounding to tick size and decimal precision."""
+        inst = InstrumentInfo(
+            symbol="EURUSD",
+            tick_size=0.00001,
+            decimals=5,
+            point_value=100000.0,
+            tick_value_in_money=10.0,
+        )
+        assert inst.symbol == "EURUSD"
+        assert inst.decimals == 5
+        assert inst.round_to_tick_size(1.085427) == 1.08543
+        assert inst.round_to_tick_size(1.085422) == 1.08542
+
+    def test_instrument_info_to_symbol_spec(self) -> None:
+        """Verify conversion to Tier 2 trading domain SymbolSpec."""
+        inst = InstrumentInfo(
+            symbol="EURUSD",
+            tick_size=0.00001,
+            decimals=5,
+            point_value=100000.0,
+            tick_value_in_money=10.0,
+            min_volume=0.01,
+            max_volume=100.0,
+            lot_step=0.01,
+            margin_rate=0.033,
+        )
+        spec = inst.to_symbol_spec()
+        assert spec.name == "EURUSD"
+        assert spec.digits == 5
+        assert spec.point == 0.00001
+        assert spec.trade_contract_size == 100000.0
+        assert spec.volume_min == 0.01
+        assert spec.volume_max == 100.0
+
+    def test_instrument_info_to_dict_and_from_dict(self) -> None:
+        """Verify bidirectional serialization with dictionary payloads."""
+        inst = InstrumentInfo(
+            symbol="BTCUSDT",
+            data_type="Crypto",
+            tick_size=0.01,
+            point_value=1.0,
+            decimals=2,
+        )
+        d = inst.to_dict()
+        assert d["symbol"] == "BTCUSDT"
+        assert d["data_type"] == "Crypto"
+        rebuilt = InstrumentInfo.from_dict(d)
+        assert rebuilt.symbol == "BTCUSDT"
+        assert rebuilt.data_type == "Crypto"
+        assert rebuilt.tick_size == 0.01
+
+
+class TestContractsInstrumentAliasRecord:
+    """Verify InstrumentAliasRecord dataclass serialization."""
+
+    def test_alias_record_to_dict(self) -> None:
+        """Verify alias record fields and dictionary output."""
+        rec = InstrumentAliasRecord(
+            alias="EUR.USD",
+            instrument="EURUSD",
+            description="Broker symbol format",
+        )
+        assert rec.alias == "EUR.USD"
+        assert rec.instrument == "EURUSD"
+        d = rec.to_dict()
+        assert d == {
+            "alias": "EUR.USD",
+            "instrument": "EURUSD",
+            "description": "Broker symbol format",
+        }
