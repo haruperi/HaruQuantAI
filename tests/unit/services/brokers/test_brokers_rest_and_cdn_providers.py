@@ -409,6 +409,7 @@ def test_tick_downloader_compatibility() -> None:
 def test_binance_bars_and_ticks_integer_validation() -> None:
     """Verify Binance fetch_bars and fetch_ticks produce integer volumes accepted by validate_rows."""
     from app.services.brokers.crypto import BinanceBroker
+    from app.workspace.data_manager import MarketBar, MarketTick
     from app.workspace.data_manager.history import validate_rows
 
     broker = BinanceBroker()
@@ -446,6 +447,7 @@ def test_binance_bars_and_ticks_integer_validation() -> None:
         assert isinstance(bars[0]["tick_volume"], int)
         validated_bars = validate_rows(bars, "bars", 0, 2**63 - 1, 10)
         assert len(validated_bars) == 1
+        assert isinstance(validated_bars[0], MarketBar)
         assert validated_bars[0].real_volume == 12
 
     # 2. Ticks integer volume validation
@@ -479,5 +481,6 @@ def test_binance_bars_and_ticks_integer_validation() -> None:
         assert ticks[0]["volume_real"] == 0.125
         validated_ticks = validate_rows(ticks, "ticks", 0, 2**63 - 1, 10)
         assert len(validated_ticks) == 1
+        assert isinstance(validated_ticks[0], MarketTick)
         assert validated_ticks[0].volume == 1
         assert validated_ticks[0].volume_real == 0.125
