@@ -9,6 +9,7 @@ import pytest
 from app.host.persistence.create import create_schema
 from app.host.persistence.read import resolve_connection
 from app.host.transport import EventBus
+from app.services.include.contracts import SessionWindow, TradingSession
 from app.workspace.data_manager import (
     MarketBar,
     connections,
@@ -31,7 +32,6 @@ from app.workspace.data_manager.connections import (
 from app.workspace.data_manager.custom_data import CustomDataService
 from app.workspace.data_manager.data import DataManagerDataService
 from app.workspace.data_manager.log import DataManagerLogService
-from app.workspace.data_manager.sessions import SessionWindow, TradingSession
 
 
 @pytest.fixture

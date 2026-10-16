@@ -330,7 +330,7 @@ class DarwinexBroker(DataBrokerBackend):
                                             (float(t["ask"]) - float(t["bid"]))
                                             * (10**decimals)
                                         ),
-                                        "real_volume": 1.0,
+                                        "real_volume": 1,
                                     }
                                 else:
                                     b = buckets[bucket_time]
@@ -338,7 +338,7 @@ class DarwinexBroker(DataBrokerBackend):
                                     b["low"] = min(b["low"], mid_p)
                                     b["close"] = mid_p
                                     b["tick_volume"] += 1
-                                    b["real_volume"] += 1.0
+                                    b["real_volume"] += 1
                 except ProviderError:
                     raise
                 except Exception as exc:

@@ -237,9 +237,7 @@ def parse_delimited_bars(
             if spread_idx != -1 and spread_idx < len(row)
             else 0.0
         )
-        vol_clean: int | float = (
-            int(vol_val) if vol_val.is_integer() else float(vol_val)
-        )
+        vol_clean: int = int(vol_val) if vol_val >= 1.0 else (1 if vol_val > 0 else 0)
 
         rows.append(
             {
@@ -250,7 +248,7 @@ def parse_delimited_bars(
                 "close": c_val,
                 "tick_volume": vol_clean,
                 "spread": int(spread_val),
-                "real_volume": float(vol_val),
+                "real_volume": vol_clean,
             }
         )
 
@@ -386,25 +384,68 @@ def read_parquet_bars(
     if df.empty:
         return []
 
-    rows: list[dict[str, Any]] = []
-    target_count = min(len(df), count) if count is not None and count > 0 else len(df)
+    df.columns = [str(c).lower().strip() for c in df.columns]
 
-    for i in range(target_count):
-        row_s = df.iloc[i]
-        ts_val = row_s["timestamp"] if "timestamp" in row_s else row_s.get("time")
-        dt = parse_timestamp_flexible(ts_val)
-        rows.append(
-            {
-                "time": int(dt.timestamp()),
-                "open": float(row_s["open"]),
-                "high": float(row_s["high"]),
-                "low": float(row_s["low"]),
-                "close": float(row_s["close"]),
-                "tick_volume": int(row_s.get("volume", row_s.get("tick_volume", 1))),
-                "spread": int(row_s.get("spread", 0)),
-                "real_volume": int(row_s.get("real_volume", row_s.get("volume", 1))),
-            }
+    if count is not None and count > 0 and len(df) > count:
+        df = df.iloc[-count:]
+
+    ts_col = (
+        "timestamp"
+        if "timestamp" in df.columns
+        else ("time" if "time" in df.columns else "datetime")
+    )
+    if ts_col not in df.columns or "open" not in df.columns:
+        return []
+
+    opens = [float(x) for x in df["open"]]
+    highs = [float(x) for x in df["high"]]
+    lows = [float(x) for x in df["low"]]
+    closes = [float(x) for x in df["close"]]
+    timestamps = [int(parse_timestamp_flexible(x).timestamp()) for x in df[ts_col]]
+
+    vol_col = (
+        "volume"
+        if "volume" in df.columns
+        else ("tick_volume" if "tick_volume" in df.columns else None)
+    )
+    if vol_col:
+        vols = [
+            int(x) if x >= 1.0 else (1 if x > 0 else 0)
+            for x in df[vol_col].astype(float)
+        ]
+    else:
+        vols = [1] * len(df)
+
+    spread_col = "spread" if "spread" in df.columns else None
+    if spread_col:
+        spreads = [int(x or 0) for x in df[spread_col].astype(float)]
+    else:
+        spreads = [0] * len(df)
+
+    rvol_col = "real_volume" if "real_volume" in df.columns else None
+    if rvol_col:
+        rvols = [
+            int(x) if x >= 1.0 else (1 if x > 0 else 0)
+            for x in df[rvol_col].astype(float)
+        ]
+    else:
+        rvols = vols
+
+    rows: list[dict[str, Any]] = [
+        {
+            "time": t,
+            "open": o,
+            "high": h,
+            "low": l,
+            "close": c,
+            "tick_volume": v,
+            "spread": sp,
+            "real_volume": rv,
+        }
+        for t, o, h, l, c, v, sp, rv in zip(
+            timestamps, opens, highs, lows, closes, vols, spreads, rvols, strict=False
         )
+    ]
 
     logger.debug(
         "%s: Read %d Parquet bars from %s",

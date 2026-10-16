@@ -416,6 +416,7 @@ class BinanceBroker(DataBrokerBackend):
                 c = float(row[4])
                 vol = float(row[5])
                 count_trades = int(row[8])
+                r_vol = int(vol) if vol >= 1.0 else (1 if vol > 0 else 0)
                 rows.append(
                     {
                         "time": int(open_ts_ms / 1000),
@@ -423,9 +424,9 @@ class BinanceBroker(DataBrokerBackend):
                         "high": h,
                         "low": l,
                         "close": c,
-                        "tick_volume": count_trades if count_trades > 0 else int(vol),
+                        "tick_volume": count_trades if count_trades > 0 else r_vol,
                         "spread": 0,
-                        "real_volume": vol,
+                        "real_volume": r_vol,
                     }
                 )
 
@@ -492,13 +493,14 @@ class BinanceBroker(DataBrokerBackend):
                 p = float(t.get("p") or 0.0)
                 qty = float(t.get("q") or 0.0)
                 t_ms = int(t.get("T") or 0)
+                t_vol = int(qty) if qty >= 1.0 else (1 if qty > 0 else 0)
                 rows.append(
                     {
                         "time_msc": t_ms,
                         "bid": p,
                         "ask": p,
                         "last": p,
-                        "volume": qty,
+                        "volume": t_vol,
                         "flags": 0,
                         "volume_real": qty,
                     }

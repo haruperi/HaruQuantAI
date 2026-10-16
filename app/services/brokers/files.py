@@ -361,22 +361,30 @@ class FilesBroker(DataBrokerBackend):
 
         rows: list[dict[str, Any]] = []
 
+        eval_files = (
+            list(reversed(files))
+            if not date_from and not date_to and target_count
+            else files
+        )
+
         try:
-            for file_path in files:
+            for file_path in eval_files:
+                batch: list[dict[str, Any]] = []
                 if file_path.suffix == ".parquet":
-                    rows.extend(read_parquet_bars(file_path, count=None))
+                    batch = read_parquet_bars(
+                        file_path,
+                        count=target_count if not date_from and not date_to else None,
+                    )
                 elif file_path.suffix == ".hst":
                     data = file_path.read_bytes()
-                    rows.extend(decode_hst_bytes(data))
+                    batch = decode_hst_bytes(data)
                 elif file_path.suffix == ".fxt":
                     data = file_path.read_bytes()
-                    rows.extend(decode_fxt_bytes(data))
+                    batch = decode_fxt_bytes(data)
                 elif file_path.suffix in (".csv", ".txt", ".tsv"):
                     content = file_path.read_text(encoding="utf-8", errors="replace")
-                    rows.extend(
-                        parse_delimited_bars(
-                            content, symbol=symbol, timeframe=timeframe
-                        )
+                    batch = parse_delimited_bars(
+                        content, symbol=symbol, timeframe=timeframe
                     )
                 else:
                     logger.warning(
@@ -384,6 +392,13 @@ class FilesBroker(DataBrokerBackend):
                         PARSING_FR,
                         file_path.suffix,
                     )
+
+                if not date_from and not date_to and target_count:
+                    rows = batch + rows
+                    if len(rows) >= target_count:
+                        break
+                else:
+                    rows.extend(batch)
 
             # Date filtering across all aggregated partitions
             filtered: list[dict[str, Any]] = []

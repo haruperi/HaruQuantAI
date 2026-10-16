@@ -173,10 +173,10 @@ async def demo_sq_futures(count: int = 5) -> list[MarketBar]:
 
 
 async def demo_files(count: int = 5) -> list[MarketBar]:
-    """Download historical Daily bars for AAPL from local filesystem Parquet archives."""
-    broker = FilesBroker(data_dir="data/market/sq_equity/d1")
-    symbol = "AAPL"
-    bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_D1, count=count)
+    """Download historical M1 bars for EURUSD from local filesystem Parquet archives."""
+    broker = FilesBroker(data_dir="data/market/dukascopy/m1")
+    symbol = "EURUSD"
+    bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_M1, count=count)
     _print_bars_table("Local Filesystem", symbol, bars)
     assert len(bars) > 0, "FilesBroker returned no bars"
     return bars

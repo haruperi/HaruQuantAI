@@ -404,3 +404,80 @@ def test_tick_downloader_compatibility() -> None:
     ):
         page = broker.read_history(req)
         assert page.row_count == 0
+
+
+def test_binance_bars_and_ticks_integer_validation() -> None:
+    """Verify Binance fetch_bars and fetch_ticks produce integer volumes accepted by validate_rows."""
+    from app.services.brokers.crypto import BinanceBroker
+    from app.workspace.data_manager.history import validate_rows
+
+    broker = BinanceBroker()
+
+    # 1. Bars integer volume validation
+    with patch("app.services.brokers.crypto.execute_bounded_get") as mock_get:
+        resp = MagicMock()
+        resp.status_code = 200
+        resp.json.return_value = [
+            [
+                1700000000000,
+                "50000.0",
+                "50100.0",
+                "49900.0",
+                "50050.0",
+                "12.345",
+                1700000059999,
+                "617250",
+                150,
+            ]
+        ]
+        mock_get.return_value = resp
+
+        bars = broker.fetch_bars(
+            symbol="BTCUSDT",
+            timeframe="M1",
+            mode="range",
+            start=1700000000,
+            end=1700000060,
+            count=1,
+            limit=10,
+        )
+        assert len(bars) == 1
+        assert isinstance(bars[0]["real_volume"], int)
+        assert isinstance(bars[0]["tick_volume"], int)
+        validated_bars = validate_rows(bars, "bars", 0, 2**63 - 1, 10)
+        assert len(validated_bars) == 1
+        assert validated_bars[0].real_volume == 12
+
+    # 2. Ticks integer volume validation
+    with patch("app.services.brokers.crypto.execute_bounded_get") as mock_get:
+        resp = MagicMock()
+        resp.status_code = 200
+        resp.json.return_value = [
+            {
+                "a": 1,
+                "p": "50000.0",
+                "q": "0.125",
+                "f": 1,
+                "l": 1,
+                "T": 1700000001000,
+                "m": True,
+            }
+        ]
+        mock_get.return_value = resp
+
+        ticks = broker.fetch_ticks(
+            symbol="BTCUSDT",
+            start_ms=1700000000000,
+            end_ms=1700000010000,
+            count=1,
+            limit=10,
+        )
+        assert len(ticks) == 1
+        assert isinstance(ticks[0]["volume"], int)
+        assert isinstance(ticks[0]["volume_real"], float)
+        assert ticks[0]["volume"] == 1
+        assert ticks[0]["volume_real"] == 0.125
+        validated_ticks = validate_rows(ticks, "ticks", 0, 2**63 - 1, 10)
+        assert len(validated_ticks) == 1
+        assert validated_ticks[0].volume == 1
+        assert validated_ticks[0].volume_real == 0.125
