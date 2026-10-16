@@ -959,7 +959,7 @@ class ChartDef:
         """Timeframe duration in seconds."""
         if isinstance(self.timeframe, Timeframe):
             return self.timeframe.to_seconds()
-        tf_str = str(self.timeframe).strip().upper()
+        tf_str = self.timeframe.strip().upper()
         if tf_str in ("TICK", "TICKS"):
             return 0
         try:
