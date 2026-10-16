@@ -83,7 +83,7 @@ def redact_url_or_message(text: str) -> str:
     """Redact sensitive query parameters, credentials, and tokens from URLs and errors."""
     if not text:
         return ""
-    s = _SECRET_PATTERN.sub(r"\1=REDACTED", str(text))
+    s = _SECRET_PATTERN.sub(r"\1=REDACTED", text)
     return _USERINFO_PATTERN.sub(r"://***:***@", s)
 
 

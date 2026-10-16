@@ -446,29 +446,108 @@ def decode_darwinex_dat(
     idx = buf.find(b"\xbb\xbb")
     if idx == -1:
         return []
-    offset = idx + 2
     scale = 10.0**digits
     rows: list[dict[str, Any]] = []
 
-    rec_size = 24
-    num_recs = (len(buf) - offset) // rec_size
-    max_recs = min(num_recs, count) if count is not None and count > 0 else num_recs
+    if buf.startswith(b"\x00\x034.2"):
+        # StrategyQuant 4.2 compressed tick stream (4 fields: ts_ms, ask, bid, vol)
+        seq = bytes(range(15))
+        block_offsets: list[tuple[int, int]] = []
+        idx_seq = 0
+        while True:
+            pos = buf.find(seq, idx_seq)
+            if pos == -1:
+                break
+            bb_pos = buf.find(b"\xbb\xbb", pos)
+            if bb_pos == -1:
+                break
+            block_offsets.append((pos, bb_pos))
+            idx_seq = bb_pos + 2
 
-    for i in range(max_recs):
-        ts_ms, ask_raw, bid_raw = struct.unpack_from(">qqq", buf, offset + i * rec_size)
-        ask = ask_raw / scale
-        bid = bid_raw / scale
-        rows.append(
-            {
-                "time_msc": int(ts_ms),
-                "bid": bid,
-                "ask": ask,
-                "last": (ask + bid) / 2.0,
-                "volume": 1,
-                "flags": 0,
-                "volume_real": 1.0,
-            }
-        )
+        if not block_offsets:
+            bb_pos = buf.find(b"\xbb\xbb")
+            if bb_pos != -1:
+                block_offsets.append((0, bb_pos))
+
+        for b_i, (_, bb_pos) in enumerate(block_offsets):
+            next_b_start = (
+                block_offsets[b_i + 1][0] if b_i + 1 < len(block_offsets) else len(buf)
+            )
+            curr = bb_pos + 2
+            if curr + 32 > len(buf):
+                continue
+            ts_ms, ask_raw, bid_raw, vol_raw = struct.unpack_from(">4q", buf, curr)
+            curr += 32
+            rows.append(
+                {
+                    "time_msc": int(ts_ms),
+                    "bid": bid_raw / 1_000_000.0,
+                    "ask": ask_raw / 1_000_000.0,
+                    "last": (ask_raw + bid_raw) / 2_000_000.0,
+                    "volume": max(1, int(vol_raw // 100_000_000_000)),
+                    "flags": 0,
+                    "volume_real": max(1.0, float(vol_raw / 100_000_000_000.0)),
+                }
+            )
+            while curr < next_b_start:
+                if curr + 2 > next_b_start:
+                    break
+                b0, b1 = buf[curr], buf[curr + 1]
+                curr += 2
+                nybbles = ((b0 >> 4) & 0xF, b0 & 0xF, (b1 >> 4) & 0xF, b1 & 0xF)
+                deltas: list[int] = []
+                for nyb in nybbles:
+                    field_len = 1 << (nyb & 0x03)
+                    if curr + field_len > next_b_start:
+                        break
+                    sign = 1 if (nyb & 0x04) else -1
+                    raw_val = int.from_bytes(buf[curr : curr + field_len], "big")
+                    curr += field_len
+                    deltas.append(sign * raw_val)
+                if len(deltas) < 4:
+                    break
+                ts_ms += deltas[0]
+                ask_raw += deltas[1]
+                bid_raw += deltas[2]
+                vol_raw += deltas[3]
+                rows.append(
+                    {
+                        "time_msc": int(ts_ms),
+                        "bid": bid_raw / 1_000_000.0,
+                        "ask": ask_raw / 1_000_000.0,
+                        "last": (ask_raw + bid_raw) / 2_000_000.0,
+                        "volume": max(1, int(vol_raw // 100_000_000_000)),
+                        "flags": 0,
+                        "volume_real": max(1.0, float(vol_raw / 100_000_000_000.0)),
+                    }
+                )
+    else:
+        # Fixed 24-byte uncompressed records
+        offset = idx + 2
+        rec_size = 24
+        num_recs = (len(buf) - offset) // rec_size
+        max_recs = min(num_recs, count) if count is not None and count > 0 else num_recs
+
+        for i in range(max_recs):
+            ts_ms, ask_raw, bid_raw = struct.unpack_from(
+                ">qqq", buf, offset + i * rec_size
+            )
+            ask = ask_raw / scale
+            bid = bid_raw / scale
+            rows.append(
+                {
+                    "time_msc": int(ts_ms),
+                    "bid": bid,
+                    "ask": ask,
+                    "last": (ask + bid) / 2.0,
+                    "volume": 1,
+                    "flags": 0,
+                    "volume_real": 1.0,
+                }
+            )
+
+    if count is not None and count > 0 and len(rows) > count:
+        rows = rows[-count:]
     return rows
 
 
@@ -484,12 +563,15 @@ def decode_sq_dat_bytes(
 
     blocks: list[int] = []
     idx = 0
-    while True:
-        pos = buf.find(SQ_MAGIC_HEADER_V42, idx)
+    while idx < len(buf):
+        pos = buf.find(b"\xbb\xbb\xbb", idx)
         if pos == -1:
             break
         blocks.append(pos)
-        idx = pos + 15
+        end_pos = pos + 3
+        while end_pos < len(buf) and buf[end_pos] == 0xBB:
+            end_pos += 1
+        idx = end_pos
 
     if not blocks:
         return []
@@ -498,10 +580,21 @@ def decode_sq_dat_bytes(
 
     for b_idx_rel, b_off in enumerate(blocks):
         next_b_off = blocks[b_idx_rel + 1] if b_idx_rel + 1 < len(blocks) else len(buf)
-        curr = b_off + 15 + 7
-        if curr + 48 > next_b_off:
+        curr = b_off + 3
+        while curr < next_b_off and buf[curr] == 0xBB:
+            curr += 1
+
+        anchor_off = None
+        for offset in range(curr, min(curr + 16, next_b_off - 48 + 1)):
+            val = struct.unpack_from(">Q", buf, offset)[0]
+            if 500_000_000_000 <= val <= 5_000_000_000_000:
+                anchor_off = offset
+                break
+
+        if anchor_off is None:
             continue
 
+        curr = anchor_off
         ts_ms = struct.unpack_from(">Q", buf, curr)[0]
         o_raw, h_raw, l_raw, c_raw, v_raw = struct.unpack_from(">5q", buf, curr + 8)
         curr += 48
@@ -513,14 +606,23 @@ def decode_sq_dat_bytes(
         if date_to and dt > date_to:
             include = False
 
-        if include:
+        o_val = o_raw / 1_000_000.0
+        h_val = h_raw / 1_000_000.0
+        l_val = l_raw / 1_000_000.0
+        c_val = c_raw / 1_000_000.0
+
+        if (
+            include
+            and l_val > 0
+            and l_val <= min(o_val, c_val) <= max(o_val, c_val) <= h_val
+        ):
             rows.append(
                 {
                     "time": int(ts_ms / 1000.0),
-                    "open": o_raw / 1_000_000.0,
-                    "high": h_raw / 1_000_000.0,
-                    "low": l_raw / 1_000_000.0,
-                    "close": c_raw / 1_000_000.0,
+                    "open": o_val,
+                    "high": h_val,
+                    "low": l_val,
+                    "close": c_val,
                     "tick_volume": max(0, int(v_raw // 100_000)),
                     "spread": 0,
                     "real_volume": max(0, int(v_raw // 100_000)),
@@ -568,18 +670,24 @@ def decode_sq_dat_bytes(
             if date_to and bar_dt > date_to:
                 continue
 
-            rows.append(
-                {
-                    "time": int(ts_ms / 1000.0),
-                    "open": o_raw / 1_000_000.0,
-                    "high": h_raw / 1_000_000.0,
-                    "low": l_raw / 1_000_000.0,
-                    "close": c_raw / 1_000_000.0,
-                    "tick_volume": max(0, int(v_raw // 100_000)),
-                    "spread": 0,
-                    "real_volume": max(0, int(v_raw // 100_000)),
-                }
-            )
+            o_val = o_raw / 1_000_000.0
+            h_val = h_raw / 1_000_000.0
+            l_val = l_raw / 1_000_000.0
+            c_val = c_raw / 1_000_000.0
+
+            if l_val > 0 and l_val <= min(o_val, c_val) <= max(o_val, c_val) <= h_val:
+                rows.append(
+                    {
+                        "time": int(ts_ms / 1000.0),
+                        "open": o_val,
+                        "high": h_val,
+                        "low": l_val,
+                        "close": c_val,
+                        "tick_volume": max(0, int(v_raw // 100_000)),
+                        "spread": 0,
+                        "real_volume": max(0, int(v_raw // 100_000)),
+                    }
+                )
 
     rows.sort(key=lambda r: r["time"])
     if count is not None and count > 0 and len(rows) > count:

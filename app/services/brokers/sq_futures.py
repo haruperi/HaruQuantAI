@@ -51,7 +51,6 @@ from typing import Any, override
 import requests
 from app.host.logging import get_logger
 from app.services.brokers._http import execute_bounded_get
-from app.services.brokers._native_history import SQ_MAGIC_HEADER_V42
 from app.services.brokers.base import BridgeError
 from app.services.brokers.capabilities import (
     CancellationToken,
@@ -128,7 +127,7 @@ def _find_sq_dat_file(base_dir: Path, symbol: str, timeframe: str) -> Path | Non
     if not clean:
         return None
 
-    tf_str = str(timeframe).upper()
+    tf_str = timeframe.upper()
     is_m1 = "M1" in tf_str or "1M" in tf_str
     tf_tag = "M1" if is_m1 else "D1"
 
@@ -161,12 +160,15 @@ def _decode_sq_dat_bytes(
 
     blocks: list[int] = []
     idx = 0
-    while True:
-        pos = buf.find(SQ_MAGIC_HEADER_V42, idx)
+    while idx < len(buf):
+        pos = buf.find(b"\xbb\xbb\xbb", idx)
         if pos == -1:
             break
         blocks.append(pos)
-        idx = pos + 15
+        end_pos = pos + 3
+        while end_pos < len(buf) and buf[end_pos] == 0xBB:
+            end_pos += 1
+        idx = end_pos
 
     if not blocks:
         return []
@@ -178,11 +180,21 @@ def _decode_sq_dat_bytes(
 
     for b_idx_rel, b_off in enumerate(blocks):
         next_b_off = blocks[b_idx_rel + 1] if b_idx_rel + 1 < len(blocks) else len(buf)
-        curr = b_off + 15 + 7
+        curr = b_off + 3
+        while curr < next_b_off and buf[curr] == 0xBB:
+            curr += 1
 
-        if curr + 48 > next_b_off:
+        anchor_off = None
+        for offset in range(curr, min(curr + 16, next_b_off - 48 + 1)):
+            val = struct.unpack_from(">Q", buf, offset)[0]
+            if 500_000_000_000 <= val <= 5_000_000_000_000:
+                anchor_off = offset
+                break
+
+        if anchor_off is None:
             continue
 
+        curr = anchor_off
         ts_ms = struct.unpack_from(">Q", buf, curr)[0]
         o_raw, h_raw, l_raw, c_raw, v_raw = struct.unpack_from(">5q", buf, curr + 8)
         curr += 48
@@ -194,14 +206,23 @@ def _decode_sq_dat_bytes(
         if norm_to and dt > norm_to:
             include = False
 
-        if include:
+        o_val = o_raw / 1_000_000.0
+        h_val = h_raw / 1_000_000.0
+        l_val = l_raw / 1_000_000.0
+        c_val = c_raw / 1_000_000.0
+
+        if (
+            include
+            and l_val > 0
+            and l_val <= min(o_val, c_val) <= max(o_val, c_val) <= h_val
+        ):
             rows.append(
                 {
                     "time": int(ts_ms / 1000.0),
-                    "open": o_raw / 1_000_000.0,
-                    "high": h_raw / 1_000_000.0,
-                    "low": l_raw / 1_000_000.0,
-                    "close": c_raw / 1_000_000.0,
+                    "open": o_val,
+                    "high": h_val,
+                    "low": l_val,
+                    "close": c_val,
                     "tick_volume": max(0, int(v_raw // 100_000)),
                     "spread": 0,
                     "real_volume": max(0, int(v_raw // 100_000)),
@@ -248,18 +269,24 @@ def _decode_sq_dat_bytes(
             if norm_to and bar_dt > norm_to:
                 continue
 
-            rows.append(
-                {
-                    "time": int(ts_ms / 1000.0),
-                    "open": o_raw / 1_000_000.0,
-                    "high": h_raw / 1_000_000.0,
-                    "low": l_raw / 1_000_000.0,
-                    "close": c_raw / 1_000_000.0,
-                    "tick_volume": max(0, int(v_raw // 100_000)),
-                    "spread": 0,
-                    "real_volume": max(0, int(v_raw // 100_000)),
-                }
-            )
+            o_val = o_raw / 1_000_000.0
+            h_val = h_raw / 1_000_000.0
+            l_val = l_raw / 1_000_000.0
+            c_val = c_raw / 1_000_000.0
+
+            if l_val > 0 and l_val <= min(o_val, c_val) <= max(o_val, c_val) <= h_val:
+                rows.append(
+                    {
+                        "time": int(ts_ms / 1000.0),
+                        "open": o_val,
+                        "high": h_val,
+                        "low": l_val,
+                        "close": c_val,
+                        "tick_volume": max(0, int(v_raw // 100_000)),
+                        "spread": 0,
+                        "real_volume": max(0, int(v_raw // 100_000)),
+                    }
+                )
 
     rows.sort(key=lambda r: r["time"])
     if count and count > 0 and len(rows) > count:
@@ -281,7 +308,7 @@ def _read_parquet_bars(
 
     clean = _clean_symbol(symbol).lower()
     variants = [clean, clean.removeprefix("@"), f"@{clean.removeprefix('@')}"]
-    tf_str = str(timeframe).upper()
+    tf_str = timeframe.upper()
     is_m1 = "M1" in tf_str or "1M" in tf_str
     tf_tag = "m1" if is_m1 else "d1"
 
@@ -633,6 +660,7 @@ class SQFuturesBroker(DataBrokerBackend):
             )
         if token is not None:
             token.check_cancelled()
+        rows: list[dict[str, Any]] = []
         try:
             rows = self.fetch_bars(
                 symbol=request.symbol,

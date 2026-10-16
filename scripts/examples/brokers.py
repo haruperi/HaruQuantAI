@@ -78,7 +78,7 @@ from app.workspace.data_manager.history import (
 )
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = "ctrader"
-ALLOW_LIVE_TRADING = False
+ALLOW_LIVE_TRADING = True
 SYMBOL = "EURUSD"
 VOLUME = 0.01  # Partial-close volume; the example buy opens twice this amount.
 CONNECT_TIMEOUT = 60.0

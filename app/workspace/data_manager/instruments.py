@@ -512,10 +512,11 @@ class Instruments:
             or str(i.get("symbol", "")).upper() in target_symbols
         ]
 
-        payload = {
+        brokers: list[str] = []
+        payload: dict[str, Any] = {
             "version": 1,
             "kind": "instruments",
-            "brokers": [],
+            "brokers": brokers,
             "instruments": exported,
         }
         json_content = json.dumps(payload, indent=2)
@@ -573,6 +574,7 @@ def _parse_cli_arguments(
     args: Sequence[str] | Mapping[str, Any],
 ) -> tuple[str, dict[str, Any]]:
     """Parse CLI argument list or mapping into an action name and parameter dict."""
+    params: dict[str, Any]
     if isinstance(args, Mapping):
         params = dict(args)
     else:

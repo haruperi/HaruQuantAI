@@ -58,6 +58,7 @@ from app.services.brokers._http import create_http_session, execute_bounded_get
 from app.services.brokers._native_history import (
     decode_bi5_bars,
     decode_bi5_ticks,
+    decode_sq_dat_bytes,
     decompress_bi5,
 )
 from app.services.brokers.base import BridgeError
@@ -79,13 +80,8 @@ USER_AGENT = (
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
 
-DEFAULT_CATALOG_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "data"
-    / "market"
-    / "dukascopy"
-    / "dukascopy.csv"
-)
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market" / "dukascopy"
+DEFAULT_CATALOG_PATH = DEFAULT_DATA_DIR / "dukascopy.csv"
 
 PLUGIN_MANIFEST = {
     "id": "dukascopy",
@@ -118,7 +114,11 @@ class DukascopyBroker(DataBrokerBackend):
         """Initialize Dukascopy broker."""
         super().__init__(name=name)
         self.catalog_path = Path(catalog_path) if catalog_path else DEFAULT_CATALOG_PATH
-        self.data_dir = Path(data_dir) if data_dir else None
+        self.data_dir: Path | None = (
+            Path(data_dir)
+            if data_dir is not None
+            else (DEFAULT_DATA_DIR if DEFAULT_DATA_DIR.exists() else None)
+        )
         self._catalog: dict[str, SymbolInfo] | None = None
         self.session = create_http_session(
             USER_AGENT, retries=3, backoff=0.3, pool_size=16
@@ -354,7 +354,7 @@ class DukascopyBroker(DataBrokerBackend):
         date_to = datetime.fromtimestamp(end, tz=UTC) if 0 < end < 2**40 else None
 
         # Check local data_dir if available
-        if self.data_dir and self.data_dir.exists():
+        if self.data_dir is not None and self.data_dir.exists():
             matched = find_matching_partitions(self.data_dir, sym_clean, timeframe)
             all_local_bars: list[dict[str, Any]] = []
             for p in matched:
@@ -402,17 +402,24 @@ class DukascopyBroker(DataBrokerBackend):
                 rows: list[dict[str, Any]] = []
                 with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
                     for name in z.namelist():
-                        if not name.endswith(".bi5") and not name.endswith(".dat"):
-                            continue
-                        decomp = decompress_bi5(z.read(name))
-                        if not decomp:
-                            continue
-                        rec_count = len(decomp) // 24
-                        base_dt = datetime(target_year, 1, 1, tzinfo=UTC)
-                        sub_bars = decode_bi5_bars(
-                            decomp, base_dt, digits=decimals, count=target_count
-                        )
-                        rows.extend(sub_bars)
+                        if name.endswith(".bi5"):
+                            decomp = decompress_bi5(z.read(name))
+                            if not decomp:
+                                continue
+                            base_dt = datetime(target_year, 1, 1, tzinfo=UTC)
+                            sub_bars = decode_bi5_bars(
+                                decomp, base_dt, digits=decimals, count=target_count
+                            )
+                            rows.extend(sub_bars)
+                        elif name.endswith(".dat"):
+                            dat_buf = z.read(name)
+                            sub_bars = decode_sq_dat_bytes(
+                                dat_buf,
+                                count=target_count,
+                                date_from=date_from,
+                                date_to=date_to,
+                            )
+                            rows.extend(sub_bars)
 
                 if rows:
                     rows.sort(key=lambda r: r["time"])
@@ -478,7 +485,7 @@ class DukascopyBroker(DataBrokerBackend):
         target_count = count if count > 0 else limit
 
         # Check local data_dir if available
-        if self.data_dir and self.data_dir.exists():
+        if self.data_dir is not None and self.data_dir.exists():
             matched = find_matching_partitions(self.data_dir, sym_clean, "TICK")
             all_local_ticks: list[dict[str, Any]] = []
             for p in matched:
@@ -532,6 +539,7 @@ class DukascopyBroker(DataBrokerBackend):
         request.validate()
         if token is not None:
             token.check_cancelled()
+        rows: list[dict[str, Any]] = []
         try:
             if request.kind == "ticks" or request.timeframe.upper() == "TICK":
                 rows = self.fetch_ticks(

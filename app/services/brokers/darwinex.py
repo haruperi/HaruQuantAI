@@ -182,14 +182,14 @@ class DarwinexBroker(DataBrokerBackend):
                     if not line_str:
                         continue
                     parts = line_str.split(";")
-                    if len(parts) < 11:
+                    if len(parts) < 8:
                         continue
                     sym = parts[0].strip().upper()
                     try:
-                        dec = int(parts[6].strip())
-                        point_sz = float(parts[7].strip())
-                        spread = float(parts[8].strip())
-                        contract_sz = float(parts[10].strip())
+                        dec = int(parts[2].strip())
+                        contract_sz = float(parts[3].strip())
+                        point_sz = float(parts[6].strip())
+                        spread = float(parts[7].strip())
                     except ValueError, IndexError:
                         dec = 5
                         point_sz = 0.00001
@@ -295,8 +295,9 @@ class DarwinexBroker(DataBrokerBackend):
                     resp = execute_bounded_get(
                         self.session,
                         url,
-                        timeout=(5.0, 30.0),
+                        timeout=(10.0, 60.0),
                         provider="darwinex",
+                        max_bytes=100 * 1024 * 1024,
                     )
                     if resp.status_code != 200 or not resp.content:
                         continue
@@ -305,6 +306,34 @@ class DarwinexBroker(DataBrokerBackend):
                         dat_names = sorted(
                             [n for n in z.namelist() if n.endswith(".dat")]
                         )
+                        if date_from or date_to:
+                            filtered_names: list[str] = []
+                            for name in dat_names:
+                                stem = Path(name).stem
+                                try:
+                                    dt_parts = [int(x) for x in stem.split("_")]
+                                    f_dt = datetime(
+                                        dt_parts[0],
+                                        dt_parts[1],
+                                        dt_parts[2],
+                                        tzinfo=UTC,
+                                    )
+                                    if date_from and f_dt.date() < date_from.date():
+                                        continue
+                                    if date_to and f_dt.date() > date_to.date():
+                                        continue
+                                    filtered_names.append(name)
+                                except Exception:
+                                    filtered_names.append(name)
+                            dat_names = filtered_names
+                        elif target_count and target_count > 0:
+                            slice_count = (
+                                max(target_count * 2, 10)
+                                if tf_norm == "D1"
+                                else max(target_count // 30, 2)
+                            )
+                            dat_names = dat_names[-slice_count:]
+
                         for name in dat_names:
                             dat_bytes = z.read(name)
                             ticks = decode_darwinex_dat(dat_bytes, digits=decimals)
@@ -326,9 +355,12 @@ class DarwinexBroker(DataBrokerBackend):
                                         "low": mid_p,
                                         "close": mid_p,
                                         "tick_volume": 1,
-                                        "spread": round(
-                                            (float(t["ask"]) - float(t["bid"]))
-                                            * (10**decimals)
+                                        "spread": max(
+                                            0,
+                                            round(
+                                                (float(t["ask"]) - float(t["bid"]))
+                                                * (10**decimals)
+                                            ),
                                         ),
                                         "real_volume": 1,
                                     }

@@ -303,6 +303,7 @@ api_keys.json
 # Job queue files
 job_queue/
 worker_state/
+state/
 
 # INI configuration files (may contain sensitive credentials)
 *.ini

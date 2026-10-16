@@ -261,7 +261,7 @@ class FilesBroker(DataBrokerBackend):
         if not self.data_dir.exists():
             return matches
 
-        tf_token = str(timeframe).lower().strip() if timeframe else None
+        tf_token = timeframe.lower().strip() if timeframe else None
 
         for ext in ("*.parquet", "*.csv", "*.txt", "*.hst", "*.fxt", "*.tsv"):
             for p in self.data_dir.rglob(ext):
