@@ -72,65 +72,58 @@ class TestChartDef:
         assert chart.connection_hash > 0
         assert chart.symbol_hash > 0
 
-    def test_getters_and_setters(self) -> None:
-        """Verify accessors and mutating setters."""
+    def test_direct_access_and_mutation(self) -> None:
+        """Verify direct attribute access and in-place mutations."""
         chart = ChartDef("USDJPY")
-        assert chart.get_symbol() == "USDJPY"
-        assert chart.get_timeframe() == "M1"
-        assert chart.get_instrument() == "Forex"
-        assert chart.get_instrument_info() == "Forex"
-        assert chart.get_symbol_info() == "Forex"
-        assert chart.get_session() == "Default"
-        assert chart.get_spread() == 0.0
-        assert chart.is_registered() is False
+        assert chart.symbol == "USDJPY"
+        assert chart.timeframe == "M1"
+        assert chart.instrument == "Forex"
+        assert chart.session == "Default"
+        assert chart.spread == 0.0
+        assert chart.registered is False
 
-        chart.set_symbol("EURJPY")
-        assert chart.get_symbol() == "EURJPY"
+        chart.symbol = "EURJPY"
+        assert chart.symbol == "EURJPY"
 
-        chart.set_session("Tokyo")
-        assert chart.get_session() == "Tokyo"
+        chart.session = "Tokyo"
+        assert chart.session == "Tokyo"
 
-        chart.set_spread(1.5)
-        assert chart.get_spread() == 1.5
+        chart.spread = 1.5
+        assert chart.spread == 1.5
 
-        chart.modify_spread(2.0)
-        assert chart.get_spread() == 2.0
-
-        chart.set_real_spread(True)
+        chart.real_spread = True
         assert chart.real_spread is True
 
-        chart.set_registered(True)
-        assert chart.is_registered() is True
+        chart.registered = True
+        assert chart.registered is True
 
-        chart.set_history_from(1000)
-        assert chart.get_history_from() == 1000
+        chart.history_from = 1000
+        assert chart.history_from == 1000
 
-        chart.set_history_to(5000)
-        assert chart.get_history_to() == 5000
+        chart.history_to = 5000
+        assert chart.history_to == 5000
 
-        chart.set_loaded_history_from(1500)
-        assert chart.get_loaded_history_from() == 1500
+        chart.loaded_history_from = 1500
+        assert chart.loaded_history_from == 1500
 
-        chart.set_min_distance(5.0)
-        assert chart.get_min_distance() == 5.0
+        chart.min_distance = 5.0
+        assert chart.min_distance == 5.0
 
-        assert chart.get_bar_time_type() == 0
-        assert chart.get_effective_bar_time_type() == 0
-        assert chart.get_backload_type() == 0
-        assert chart.get_backload_number() == 0
+        assert chart.bar_time_type == 0
+        assert chart.backload_type == 0
+        assert chart.backload_number == 0
         assert chart.is_backtest_data_def is False
-        assert chart.get_is_backtest_data_def() is False
 
     def test_timeframe_seconds(self) -> None:
         """Verify timeframe conversion to seconds across variants."""
-        assert ChartDef("EURUSD", "M1").timeframe_seconds == 60
-        assert ChartDef("EURUSD", "M5").timeframe_seconds == 300
-        assert ChartDef("EURUSD", "H1").timeframe_seconds == 3600
-        assert ChartDef("EURUSD", "D1").timeframe_seconds == 86400
-        assert ChartDef("EURUSD", "W1").timeframe_seconds == 604800
-        assert ChartDef("EURUSD", "TICK").timeframe_seconds == 0
-        assert ChartDef("EURUSD", "S30").timeframe_seconds == 30
-        assert ChartDef("EURUSD", "UNKNOWN").timeframe_seconds == 0
+        assert ChartDef("EURUSD", "M1").timeframe_seconds() == 60
+        assert ChartDef("EURUSD", "M5").timeframe_seconds() == 300
+        assert ChartDef("EURUSD", "H1").timeframe_seconds() == 3600
+        assert ChartDef("EURUSD", "D1").timeframe_seconds() == 86400
+        assert ChartDef("EURUSD", "W1").timeframe_seconds() == 604800
+        assert ChartDef("EURUSD", "TICK").timeframe_seconds() == 0
+        assert ChartDef("EURUSD", "S30").timeframe_seconds() == 30
+        assert ChartDef("EURUSD", "UNKNOWN").timeframe_seconds() == 0
 
     def test_is_smaller_than(self) -> None:
         """Verify is_smaller_than compares timeframe durations correctly."""
@@ -197,7 +190,7 @@ class TestChartDef:
         chart = ChartDef("EURUSD", "H1", session="Default", connection_name="MT5")
         assert chart.get_charts_hash() == "MT5_EURUSD_H1_Default"
 
-    def test_clone_and_get_clone(self) -> None:
+    def test_clone(self) -> None:
         """Verify cloning and optional field overrides."""
         chart = ChartDef(
             symbol="EURUSD",
@@ -214,8 +207,7 @@ class TestChartDef:
         assert cloned.history_to == 5000
         assert cloned.symbol_hash == abs(hash("USDCHF"))
 
-        # SQX alias
-        cloned2 = chart.get_clone(history_to=9000)
+        cloned2 = chart.clone(history_to=9000)
         assert cloned2.history_to == 9000
         assert cloned2.symbol == "EURUSD"
 
@@ -377,5 +369,12 @@ class TestPackageReExports:
 
     def test_re_exports_match(self) -> None:
         """Ensure package exports point to the exact same classes."""
-        assert ModuleChartDef is ChartDef
-        assert ModuleDataInfo is DataInfo
+        from app.services.libs.contracts import (
+            ChartDef as LibChartDef,
+        )
+        from app.services.libs.contracts import (
+            DataInfo as LibDataInfo,
+        )
+
+        assert ModuleChartDef is ChartDef is LibChartDef
+        assert ModuleDataInfo is DataInfo is LibDataInfo

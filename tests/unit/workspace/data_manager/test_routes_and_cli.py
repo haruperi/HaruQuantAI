@@ -245,8 +245,8 @@ def _check_file_invariants(py_file: Path) -> None:
     # Invariant 1: ZERO direct sqlite3 imports
     _check_no_sqlite(tree, py_file)
 
-    # Skip docstring check for package markers and pure contract definitions
-    if py_file.name in ("__init__.py", "_common.py"):
+    # Skip docstring check for package markers
+    if py_file.name in ("__init__.py",):
         return
 
     # Invariant 2: 5-section docstring

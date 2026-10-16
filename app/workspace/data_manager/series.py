@@ -67,8 +67,7 @@ import numpy as np
 import polars as pl
 import pyarrow as pa
 from app.host.logging import get_logger
-
-from ._common import MarketBar
+from app.services.libs.contracts import MarketBar
 
 __all__ = [
     "DataSeries",
@@ -648,7 +647,7 @@ class MedianDataSeries(DataSeries):
         if self.close is not None:
             self.close.add(bar.close)
         if self.volume is not None:
-            self.volume.add(bar.volume)
+            self.volume.add(bar.volume())
         self.add((bar.high + bar.low) / 2.0)
 
     @classmethod
@@ -673,7 +672,7 @@ class MedianDataSeries(DataSeries):
         lows = [b.low for b in bars]
         opens = [b.open for b in bars]
         closes = [b.close for b in bars]
-        volumes = [b.volume for b in bars]
+        volumes = [b.volume() for b in bars]
         return cls(
             high=highs,
             low=lows,
@@ -821,7 +820,7 @@ class TypicalDataSeries(DataSeries):
         if self.open is not None:
             self.open.add(bar.open)
         if self.volume is not None:
-            self.volume.add(bar.volume)
+            self.volume.add(bar.volume())
         self.add((bar.high + bar.low + bar.close) / 3.0)
 
     @classmethod
@@ -846,7 +845,7 @@ class TypicalDataSeries(DataSeries):
         lows = [b.low for b in bars]
         closes = [b.close for b in bars]
         opens = [b.open for b in bars]
-        volumes = [b.volume for b in bars]
+        volumes = [b.volume() for b in bars]
         return cls(
             high=highs,
             low=lows,
@@ -994,7 +993,7 @@ class WeightedDataSeries(DataSeries):
         if self.open is not None:
             self.open.add(bar.open)
         if self.volume is not None:
-            self.volume.add(bar.volume)
+            self.volume.add(bar.volume())
         self.add((bar.high + bar.low + 2.0 * bar.close) / 4.0)
 
     @classmethod
@@ -1019,7 +1018,7 @@ class WeightedDataSeries(DataSeries):
         lows = [b.low for b in bars]
         closes = [b.close for b in bars]
         opens = [b.open for b in bars]
-        volumes = [b.volume for b in bars]
+        volumes = [b.volume() for b in bars]
         return cls(
             high=highs,
             low=lows,

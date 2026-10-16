@@ -56,8 +56,7 @@ from typing import Any, Protocol, override
 
 import numpy as np
 from app.host.logging import get_logger
-
-from ._common import MarketTick
+from app.services.libs.contracts import MarketTick
 
 __all__ = [
     "DefaultTickSimulator",
@@ -343,7 +342,9 @@ class DefaultTickSimulator:
             h = float(getattr(bar, "high", 0.0))
             low_price = float(getattr(bar, "low", 0.0))
             c = float(getattr(bar, "close", 0.0))
-            v = float(getattr(bar, "volume", 1.0))
+            v_raw = getattr(bar, "volume", 1.0)
+            v_val = v_raw() if callable(v_raw) else v_raw
+            v = float(v_val) if v_val is not None else 1.0
             t_val = getattr(bar, "time", 0)
 
         if isinstance(t_val, datetime):

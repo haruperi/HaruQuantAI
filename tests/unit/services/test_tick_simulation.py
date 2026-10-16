@@ -119,7 +119,7 @@ class TestTickEvent:
         event.set(time=5000, bid=1.25, ask=1.27, volume=2.5)
         tick = event.to_market_tick()
         assert isinstance(tick, MarketTick)
-        assert tick.time == 5000
+        assert tick.time_msc == 5000
         assert tick.bid == 1.25
         assert tick.ask == 1.27
         assert tick.last == 1.25

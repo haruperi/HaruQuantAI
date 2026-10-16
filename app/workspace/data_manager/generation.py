@@ -85,9 +85,8 @@ import pandas as pd  # type: ignore[import-untyped]
 import pyarrow as pa
 import pyarrow.parquet as pq
 from app.host.logging import get_logger
+from app.services.libs.enums import TIMEFRAME_SECONDS, Timeframe
 from app.services.libs.generators import RandomGenerator
-
-from ._common import TIMEFRAME_SECONDS, Timeframe
 
 __all__ = [
     "PHASE_CLOSE_CODE",

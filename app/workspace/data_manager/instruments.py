@@ -1,7 +1,7 @@
 """Instrument specifications, financial attributes, and symbol catalog management.
 
 Description:
-    Provides domain logic for financial instrument specifications (`InstrumentInfo`),
+    Provides domain logic for financial instrument specifications (`SymbolInfo`),
     tick size/step rounding, contract sizing, commission and swap models, symbol
     aliases, and standard XML specification import/export. Governs the
     `datamgr_instruments` relational catalog and `host_entities` alias mappings with
@@ -86,8 +86,8 @@ from app.host.persistence.create import create_schema, insert_row
 from app.host.persistence.delete import delete_row_by_pk, delete_rows
 from app.host.persistence.read import count_rows, read_rows, resolve_connection
 from app.host.persistence.update import update_row_by_pk
+from app.services.libs.contracts import SymbolAliasRecord, SymbolInfo
 
-from ._common import InstrumentAliasRecord, InstrumentInfo
 from .log import DataManagerLogService
 
 __all__ = [
@@ -271,7 +271,7 @@ class Instruments:
         data_type: str | None = None,
         broker_id: int | None = None,
         search: str | None = None,
-    ) -> list[InstrumentInfo]:
+    ) -> list[SymbolInfo]:
         """List instruments matching optional filter criteria."""
         where: dict[str, Any] = {}
         if connection:
@@ -289,10 +289,10 @@ class Instruments:
                 order_by="symbol ASC",
             )
 
-        results: list[InstrumentInfo] = []
+        results: list[SymbolInfo] = []
         q = search.strip().lower() if search else None
         for r in rows:
-            inst = InstrumentInfo.from_dict(r)
+            inst = SymbolInfo.from_dict(r)
             if q and q not in inst.symbol.lower() and q not in inst.description.lower():
                 continue
             results.append(inst)
@@ -310,7 +310,7 @@ class Instruments:
         )
         return results
 
-    def get_instrument(self, symbol: str) -> InstrumentInfo | None:
+    def get_instrument(self, symbol: str) -> SymbolInfo | None:
         """Retrieve instrument specification by symbol."""
         clean = symbol.strip().upper()
         with resolve_connection(self.db_path) as conn:
@@ -320,7 +320,7 @@ class Instruments:
                 where={"symbol": clean},
                 limit=1,
             )
-        result = InstrumentInfo.from_dict(rows[0]) if rows else None
+        result = SymbolInfo.from_dict(rows[0]) if rows else None
         logger.debug(
             "%s: Retrieved instrument symbol=%s found=%s",
             GET_FR,
@@ -330,7 +330,7 @@ class Instruments:
         )
         return result
 
-    def save_instrument(self, payload: Mapping[str, Any]) -> InstrumentInfo:
+    def save_instrument(self, payload: Mapping[str, Any]) -> SymbolInfo:
         """Create or upsert an instrument specification."""
         clean_symbol = str(payload.get("symbol", "")).strip().upper()
         if not clean_symbol:
@@ -352,19 +352,52 @@ class Instruments:
         row_data["symbol"] = clean_symbol
         row_data["updated_at_utc"] = now_iso
 
+        db_cols = {
+            "id",
+            "symbol",
+            "connection",
+            "broker_id",
+            "description",
+            "tick_size",
+            "tick_step",
+            "tick_value_in_money",
+            "point_value",
+            "decimals",
+            "default_spread",
+            "default_slippage",
+            "min_volume",
+            "max_volume",
+            "lot_step",
+            "margin_rate",
+            "swap_long",
+            "swap_short",
+            "swap_3day_day",
+            "commissions",
+            "data_type",
+            "alias",
+            "exchange",
+            "country",
+            "sector",
+            "created_at_utc",
+            "updated_at_utc",
+            "min_distance",
+            "order_size_multiplier",
+            "order_size_step",
+            "cot",
+        }
+        db_payload = {k: v for k, v in row_data.items() if k in db_cols}
+
         with resolve_connection(self.db_path) as conn:
             if existing is not None and existing.id is not None:
                 update_row_by_pk(
-                    conn, "datamgr_instruments", {"id": existing.id}, row_data
+                    conn, "datamgr_instruments", {"id": existing.id}, db_payload
                 )
             else:
-                inserted = insert_row(conn, "datamgr_instruments", row_data)
+                inserted = insert_row(conn, "datamgr_instruments", db_payload)
                 row_data["id"] = int(inserted)
 
         reloaded = self.get_instrument(clean_symbol)
-        result = (
-            reloaded if reloaded is not None else InstrumentInfo.from_dict(row_data)
-        )
+        result = reloaded if reloaded is not None else SymbolInfo.from_dict(row_data)
         logger.info(
             "%s: Saved instrument symbol=%s id=%s",
             SAVE_FR,
@@ -378,9 +411,7 @@ class Instruments:
         )
         return result
 
-    def update_instrument(
-        self, symbol: str, updates: Mapping[str, Any]
-    ) -> InstrumentInfo:
+    def update_instrument(self, symbol: str, updates: Mapping[str, Any]) -> SymbolInfo:
         """Update an existing instrument specification."""
         inst = self.get_instrument(symbol)
         if inst is None:
@@ -431,7 +462,7 @@ class Instruments:
         clone_name: str,
         broker_id: int = -1,
         broker_postfix: str = "",
-    ) -> InstrumentInfo:
+    ) -> SymbolInfo:
         """Clone an existing instrument specification with a new symbol name."""
         source = self.get_instrument(symbol)
         if source is None:
@@ -615,7 +646,7 @@ class Instruments:
             "symbols": symbols_list,
         }
 
-    def list_aliases(self) -> list[InstrumentAliasRecord]:
+    def list_aliases(self) -> list[SymbolAliasRecord]:
         """List all instrument symbol aliases stored in host_entities."""
         with resolve_connection(self.db_path) as conn:
             rows = read_rows(
@@ -624,14 +655,17 @@ class Instruments:
                 where={"entity_type": "datamgr_instrument_alias"},
             )
 
-        aliases: list[InstrumentAliasRecord] = []
+        aliases: list[SymbolAliasRecord] = []
         for r in rows:
             try:
                 payload = json.loads(str(r.get("payload", "{}")))
+                target_sym = str(
+                    payload.get("instrument", "") or payload.get("symbol", "")
+                )
                 aliases.append(
-                    InstrumentAliasRecord(
+                    SymbolAliasRecord(
                         alias=str(r.get("entity_id", "")),
-                        instrument=str(payload.get("instrument", "")),
+                        symbol=target_sym,
                         description=str(payload.get("description", "")),
                     )
                 )
@@ -652,7 +686,7 @@ class Instruments:
 
     def save_alias(
         self, alias: str, instrument: str, description: str = ""
-    ) -> InstrumentAliasRecord:
+    ) -> SymbolAliasRecord:
         """Create or update a symbol alias mapping in host_entities."""
         clean_alias = alias.strip().upper()
         clean_inst = instrument.strip().upper()
@@ -684,8 +718,8 @@ class Instruments:
                 },
             )
 
-        rec = InstrumentAliasRecord(
-            alias=clean_alias, instrument=clean_inst, description=description
+        rec = SymbolAliasRecord(
+            alias=clean_alias, symbol=clean_inst, description=description
         )
         logger.info(
             "%s: Saved symbol alias %s -> %s",
@@ -736,7 +770,7 @@ class InstrumentsCLI:
     @classmethod
     def format_instruments_table(
         cls,
-        instruments: Sequence[InstrumentInfo],
+        instruments: Sequence[SymbolInfo],
     ) -> str:
         """Format ASCII table of instrument specification records."""
         logger.debug("Formatting %d instruments as ASCII table", len(instruments))
@@ -823,7 +857,7 @@ if __name__ == "__main__":
         print(f"Cloned instrument: {cloned.symbol}")
 
         alias = service.save_alias("EUR.USD", "EURUSD", "Broker symbol format")
-        print(f"Saved alias: {alias.alias} -> {alias.instrument}")
+        print(f"Saved alias: {alias.alias} -> {alias.symbol}")
 
         xml_out = service.export_xml(["EURUSD", "EURUSD_ECN"])
         print(f"Exported XML snippet:\n{xml_out[:180]}...")

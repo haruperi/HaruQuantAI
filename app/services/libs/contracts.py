@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import asdict, dataclass, fields, replace
 from datetime import datetime
 from typing import Any
 
@@ -16,21 +17,34 @@ from .enums import (
     StopoutMode,
     SymbolTradeExecution,
     SymbolTradeMode,
+    Timeframe,
     TradeAction,
 )
 
 __all__ = [
+    "MAX_POSITION",
+    "MAX_RECORDS",
+    "READ_TIMEOUT",
     "AccountInfo",
     "BookInfo",
+    "ChartDef",
+    "DataInfo",
     "DealInfo",
+    "MarketBar",
+    "MarketTick",
     "OrderInfo",
     "PositionInfo",
+    "SymbolAliasRecord",
     "SymbolInfo",
     "TerminalInfo",
     "TradeCheckResult",
     "TradeRequest",
     "TradeResult",
 ]
+
+MAX_RECORDS: int = 1000
+MAX_POSITION: int = 2**31 - 1
+READ_TIMEOUT: float = 60.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,6 +64,65 @@ class BookInfo:
             "volume": self.volume,
             "volume_real": self.volume_real,
         }
+
+
+@dataclass(frozen=True, slots=True)
+class MarketBar:
+    """Historical OHLC bar with its opening time in epoch seconds."""
+
+    time: int
+    open: float
+    high: float
+    low: float
+    close: float
+    tick_volume: int = 0
+    spread: int = 0
+    real_volume: int = 0
+
+    def is_bullish(self) -> bool:
+        """Check if candle closed higher than open."""
+        return self.close > self.open
+
+    def is_bearish(self) -> bool:
+        """Check if candle closed lower than open."""
+        return self.close < self.open
+
+    def is_doji(self) -> bool:
+        """Check if candle closed at open."""
+        return self.close == self.open
+
+    def range(self) -> float:
+        """Calculate total bar price range (High - Low)."""
+        return self.high - self.low
+
+    def body(self) -> float:
+        """Calculate candle body size abs(Close - Open)."""
+        return abs(self.close - self.open)
+
+    def volume(self) -> float:
+        """Calculate primary volume (real_volume if present, else tick_volume)."""
+        return float(self.real_volume or self.tick_volume)
+
+
+@dataclass(frozen=True, slots=True)
+class MarketTick:
+    """Historical tick retaining epoch milliseconds and native flags."""
+
+    time_msc: int
+    bid: float
+    ask: float
+    last: float = 0.0
+    volume: int = 0
+    flags: int = 0
+    volume_real: float = 0.0
+
+    def spread(self) -> float:
+        """Calculate instantaneous spread (Ask - Bid)."""
+        return self.ask - self.bid
+
+    def mid(self) -> float:
+        """Calculate midpoint price."""
+        return (self.ask + self.bid) / 2.0
 
 
 @dataclass(slots=True)
@@ -125,11 +198,26 @@ class TerminalInfo:
     retransmission: float = 0.0
 
 
+_DEFAULT_DIGITS: int = 5
+_DEFAULT_TICK_SIZE: float = 0.00001
+_DEFAULT_CONTRACT_SIZE: float = 100_000.0
+_DEFAULT_TICK_VALUE: float = 1.0
+_DEFAULT_TICK_VALUE_IN_MONEY: float = 10.0
+_DEFAULT_VOLUME_MIN: float = 0.01
+_DEFAULT_VOLUME_MAX: float = 100.0
+_DEFAULT_VOLUME_STEP: float = 0.01
+_DEFAULT_SWAP_ROLLOVER_DAYS: int = 3
+
+
 @dataclass(slots=True)
 class SymbolInfo:
     """Atomic state of symbol specification, execution modes, rates, and spreads."""
 
     name: str = ""
+    symbol: str = ""
+    id: int | None = None
+    connection: str = ""
+    broker_id: int = 0
     custom: bool = False
     chart_mode: int = 0
     select: bool = True
@@ -237,11 +325,273 @@ class SymbolInfo:
     isin: str = ""
     page: str = ""
     path: str = ""
+    default_spread: float = 0.0
+    default_slippage: float = 0.0
+    commissions: str = "0.0"
+    alias: str = ""
+    country: str = ""
+    sector: str = ""
+    order_size_multiplier: float = 1.0
+    order_size_step: float = 0.0
+    cot: str | None = None
+    created_at_utc: str = ""
+    updated_at_utc: str = ""
+    decimals: int = 5
+    tick_size: float = 0.00001
+    tick_step: float = 0.00001
+    point_value: float = 100_000.0
+    tick_value_in_money: float = 1.0
+    min_volume: float = 0.01
+    max_volume: float = 100.0
+    lot_step: float = 0.01
+    margin_rate: float = 0.0
+    data_type: str = ""
+    min_distance: float = 0.0
+    swap_3day_day: int = 3
+
+    def __post_init__(self) -> None:
+        """Synchronize name/symbol and dual-named instrument attributes."""
+        self._sync_identifiers()
+        self._sync_digits_and_ticks()
+        self._sync_contracts_and_values()
+        self._sync_volumes_and_swaps()
+
+    def _sync_identifiers(self) -> None:
+        """Synchronize name/symbol and category/data_type."""
+        if not self.name and self.symbol:
+            self.name = self.symbol
+        elif not self.symbol and self.name:
+            self.symbol = self.name
+
+        if not self.category and self.data_type:
+            self.category = self.data_type
+        elif not self.data_type and self.category:
+            self.data_type = self.category
+
+    def _sync_digits_and_ticks(self) -> None:
+        """Synchronize digits, tick_size, and tick_step."""
+        if self.digits != _DEFAULT_DIGITS and self.decimals == _DEFAULT_DIGITS:
+            self.decimals = self.digits
+        elif self.decimals != _DEFAULT_DIGITS and self.digits == _DEFAULT_DIGITS:
+            self.digits = self.decimals
+
+        if (
+            self.trade_tick_size != _DEFAULT_TICK_SIZE
+            and self.tick_size == _DEFAULT_TICK_SIZE
+        ):
+            self.tick_size = self.trade_tick_size
+        elif (
+            self.tick_size != _DEFAULT_TICK_SIZE
+            and self.trade_tick_size == _DEFAULT_TICK_SIZE
+        ):
+            self.trade_tick_size = self.tick_size
+
+        if (
+            self.tick_step == _DEFAULT_TICK_SIZE
+            and self.tick_size != _DEFAULT_TICK_SIZE
+        ):
+            self.tick_step = self.tick_size
+        elif (
+            self.tick_size == _DEFAULT_TICK_SIZE
+            and self.tick_step != _DEFAULT_TICK_SIZE
+        ):
+            self.tick_size = self.tick_step
+
+    def _sync_contracts_and_values(self) -> None:
+        """Synchronize contract size and tick value."""
+        if (
+            self.trade_contract_size != _DEFAULT_CONTRACT_SIZE
+            and self.point_value == _DEFAULT_CONTRACT_SIZE
+        ):
+            self.point_value = self.trade_contract_size
+        elif (
+            self.point_value != _DEFAULT_CONTRACT_SIZE
+            and self.trade_contract_size == _DEFAULT_CONTRACT_SIZE
+        ):
+            self.trade_contract_size = self.point_value
+
+        if (
+            self.trade_tick_value != _DEFAULT_TICK_VALUE
+            and self.tick_value_in_money == _DEFAULT_TICK_VALUE_IN_MONEY
+        ):
+            self.tick_value_in_money = self.trade_tick_value
+        elif (
+            self.tick_value_in_money != _DEFAULT_TICK_VALUE_IN_MONEY
+            and self.trade_tick_value == _DEFAULT_TICK_VALUE
+        ):
+            self.trade_tick_value = self.tick_value_in_money
+
+    def _sync_volumes_and_swaps(self) -> None:
+        """Synchronize volume and swap parameters."""
+        if (
+            self.volume_min != _DEFAULT_VOLUME_MIN
+            and self.min_volume == _DEFAULT_VOLUME_MIN
+        ):
+            self.min_volume = self.volume_min
+        elif (
+            self.min_volume != _DEFAULT_VOLUME_MIN
+            and self.volume_min == _DEFAULT_VOLUME_MIN
+        ):
+            self.volume_min = self.min_volume
+
+        if (
+            self.volume_max != _DEFAULT_VOLUME_MAX
+            and self.max_volume == _DEFAULT_VOLUME_MAX
+        ):
+            self.max_volume = self.volume_max
+        elif (
+            self.max_volume != _DEFAULT_VOLUME_MAX
+            and self.volume_max == _DEFAULT_VOLUME_MAX
+        ):
+            self.volume_max = self.max_volume
+
+        if (
+            self.volume_step != _DEFAULT_VOLUME_STEP
+            and self.lot_step == _DEFAULT_VOLUME_STEP
+        ):
+            self.lot_step = self.volume_step
+        elif (
+            self.lot_step != _DEFAULT_VOLUME_STEP
+            and self.volume_step == _DEFAULT_VOLUME_STEP
+        ):
+            self.volume_step = self.lot_step
+
+        if (
+            self.swap_rollover3days != _DEFAULT_SWAP_ROLLOVER_DAYS
+            and self.swap_3day_day == _DEFAULT_SWAP_ROLLOVER_DAYS
+        ):
+            self.swap_3day_day = self.swap_rollover3days
+        elif (
+            self.swap_3day_day != _DEFAULT_SWAP_ROLLOVER_DAYS
+            and self.swap_rollover3days == _DEFAULT_SWAP_ROLLOVER_DAYS
+        ):
+            self.swap_rollover3days = self.swap_3day_day
 
     def round_to_tick_size(self, price: float) -> float:
         """Round a price to the symbol's minimum tick size."""
-        step = self.trade_tick_size if self.trade_tick_size > 0.0 else 0.00001
-        return round(round(price / step) * step, self.digits)
+        step = (
+            self.trade_tick_size
+            if self.trade_tick_size > 0.0
+            else (self.tick_size if self.tick_size > 0.0 else 0.00001)
+        )
+        digits = self.digits if self.digits > 0 else self.decimals
+        return round(round(price / step) * step, digits)
+
+    def to_symbol_info(self) -> SymbolInfo:
+        """Self-identity adapter."""
+        return self
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert specification to dictionary representation."""
+        return {
+            "id": self.id,
+            "symbol": self.symbol or self.name,
+            "connection": self.connection,
+            "broker_id": self.broker_id,
+            "description": self.description,
+            "tick_size": self.tick_size,
+            "tick_step": self.tick_step or self.tick_size,
+            "tick_value_in_money": self.tick_value_in_money,
+            "point_value": self.point_value,
+            "decimals": self.decimals,
+            "default_spread": self.default_spread,
+            "default_slippage": self.default_slippage,
+            "min_volume": self.min_volume,
+            "max_volume": self.max_volume,
+            "lot_step": self.lot_step,
+            "margin_rate": self.margin_rate,
+            "swap_long": self.swap_long,
+            "swap_short": self.swap_short,
+            "swap_3day_day": self.swap_3day_day or self.swap_rollover3days,
+            "commissions": self.commissions,
+            "data_type": self.data_type or self.category or "Forex",
+            "alias": self.alias,
+            "exchange": self.exchange,
+            "country": self.country,
+            "sector": self.sector,
+            "min_distance": self.min_distance or float(self.trade_stops_level),
+            "order_size_multiplier": self.order_size_multiplier,
+            "order_size_step": self.order_size_step,
+            "cot": self.cot,
+            "created_at_utc": self.created_at_utc,
+            "updated_at_utc": self.updated_at_utc,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> SymbolInfo:
+        """Construct SymbolInfo from dictionary data."""
+        sym = str(data.get("symbol") or data.get("name") or "")
+        digits = int(data.get("decimals") or data.get("digits") or 5)
+        tick_sz = float(data.get("tick_size") or data.get("trade_tick_size") or 0.00001)
+        tick_st = float(data.get("tick_step") or tick_sz)
+        point_val = float(
+            data.get("point_value") or data.get("trade_contract_size") or 100000.0
+        )
+        tick_val = float(
+            data.get("tick_value_in_money") or data.get("trade_tick_value") or 10.0
+        )
+        v_min = float(data.get("min_volume") or data.get("volume_min") or 0.01)
+        v_max = float(data.get("max_volume") or data.get("volume_max") or 100.0)
+        v_step = float(data.get("lot_step") or data.get("volume_step") or 0.01)
+        m_rate = float(data.get("margin_rate") or data.get("margin_initial") or 0.05)
+        sw_long = float(data.get("swap_long") or 0.0)
+        sw_short = float(data.get("swap_short") or 0.0)
+        sw_3day = int(data.get("swap_3day_day") or data.get("swap_rollover3days") or 3)
+        cat = str(data.get("data_type") or data.get("category") or "Forex")
+        min_dist = float(
+            data.get("min_distance") or data.get("trade_stops_level") or 0.0
+        )
+        return cls(
+            id=data.get("id"),
+            name=sym,
+            symbol=sym,
+            digits=digits,
+            decimals=digits,
+            point=tick_sz,
+            trade_tick_size=tick_sz,
+            tick_size=tick_sz,
+            tick_step=tick_st,
+            trade_tick_value=tick_val,
+            tick_value_in_money=tick_val,
+            trade_contract_size=point_val,
+            point_value=point_val,
+            volume_min=v_min,
+            min_volume=v_min,
+            volume_max=v_max,
+            max_volume=v_max,
+            volume_step=v_step,
+            lot_step=v_step,
+            margin_initial=m_rate,
+            margin_rate=m_rate,
+            swap_long=sw_long,
+            swap_short=sw_short,
+            swap_rollover3days=sw_3day,
+            swap_3day_day=sw_3day,
+            trade_stops_level=int(min_dist),
+            min_distance=min_dist,
+            category=cat,
+            data_type=cat,
+            connection=str(data.get("connection", "")),
+            broker_id=int(data.get("broker_id", 0)),
+            description=str(data.get("description", "")),
+            default_spread=float(data.get("default_spread", 0.0)),
+            default_slippage=float(data.get("default_slippage", 0.0)),
+            commissions=str(data.get("commissions", "0.0")),
+            alias=str(data.get("alias", "")),
+            exchange=str(data.get("exchange", "")),
+            country=str(data.get("country", "")),
+            sector=str(data.get("sector", "")),
+            order_size_multiplier=float(data.get("order_size_multiplier", 1.0)),
+            order_size_step=float(data.get("order_size_step", 0.0)),
+            cot=str(data["cot"]) if data.get("cot") is not None else None,
+            created_at_utc=str(data.get("created_at_utc", "")),
+            updated_at_utc=str(data.get("updated_at_utc", "")),
+        )
+
+    @classmethod
+    def from_row(cls, row: Mapping[str, Any]) -> SymbolInfo:
+        """Construct SymbolInfo from database row mapping."""
+        return cls.from_dict(row)
 
 
 @dataclass(slots=True)
@@ -383,3 +733,325 @@ class TradeCheckResult:
     margin_level: float = 0.0
     comment: str = ""
     raw: Any = None
+
+
+@dataclass
+class ChartDef:
+    """Market data request specification and resample compatibility abstraction."""
+
+    symbol: str
+    timeframe: str | Timeframe = "M1"
+    instrument: str = "Forex"
+    session: str = "Default"
+    connection_name: str = ""
+    connection_hash: int = 0
+    symbol_hash: int = 0
+    history_from: int = 0
+    history_to: int = 0
+    loaded_history_from: int = 0
+    spread: float = 0.0
+    real_spread: bool = False
+    bar_time_type: int = 0
+    min_distance: float = 0.0
+    is_backtest_data_def: bool = False
+    backload_type: int = 0
+    backload_number: int = 0
+    registered: bool = False
+
+    def __post_init__(self) -> None:
+        """Normalize timeframe string and initialize deterministic hashes."""
+        if isinstance(self.timeframe, Timeframe):
+            self.timeframe = self.timeframe.value
+        if not self.connection_hash and self.connection_name:
+            self.connection_hash = abs(hash(self.connection_name))
+        if not self.symbol_hash and self.symbol:
+            self.symbol_hash = abs(hash(self.symbol))
+
+    def timeframe_seconds(self) -> int:
+        """Timeframe duration in seconds."""
+        if isinstance(self.timeframe, Timeframe):
+            return self.timeframe.to_seconds()
+        tf_str = str(self.timeframe).strip().upper()
+        if tf_str in ("TICK", "TICKS"):
+            return 0
+        try:
+            return Timeframe.from_string(tf_str).to_seconds()
+        except ValueError:
+            pass
+        if tf_str.startswith("S") and tf_str[1:].isdigit():
+            return int(tf_str[1:])
+        return 0
+
+    def is_symbol_recognized(self) -> bool:
+        """Check if symbol is valid/recognized."""
+        return bool(self.symbol and len(self.symbol.strip()) > 0)
+
+    def is_smaller_than(self, other: ChartDef) -> bool:
+        """Evaluate if this chart's timeframe is strictly smaller than other's."""
+        return self.timeframe_seconds() < other.timeframe_seconds()
+
+    def can_be_computed_from(self, other: ChartDef) -> bool:
+        """Evaluate if this chart can be resampled/computed from another chart."""
+        if self.symbol.strip().upper() != other.symbol.strip().upper():
+            return False
+
+        if (
+            self.session
+            and other.session
+            and self.session != "Default"
+            and other.session not in ("Default", self.session)
+        ):
+            return False
+
+        other_sec = other.timeframe_seconds()
+        self_sec = self.timeframe_seconds()
+
+        if other_sec > self_sec:
+            return False
+
+        if other_sec > 0 and self_sec % other_sec != 0:
+            return False
+
+        has_from_mismatch = (
+            self.history_from > 0
+            and other.history_from > 0
+            and other.history_from > self.history_from
+        )
+        has_to_mismatch = (
+            self.history_to > 0
+            and other.history_to > 0
+            and other.history_to < self.history_to
+        )
+        return not (has_from_mismatch or has_to_mismatch)
+
+    def is_same_connection_symbol(self, other: ChartDef) -> bool:
+        """Check if both charts share identical connection name and symbol."""
+        return (
+            self.symbol.strip().upper() == other.symbol.strip().upper()
+            and self.connection_name.strip().upper()
+            == other.connection_name.strip().upper()
+        )
+
+    def get_charts_hash(self) -> str:
+        """Compute unique identifier hash string for chart."""
+        return f"{self.connection_name}_{self.symbol}_{self.timeframe}_{self.session}"
+
+    def clone(
+        self,
+        symbol: str | None = None,
+        history_from: int | None = None,
+        history_to: int | None = None,
+    ) -> ChartDef:
+        """Clone this ChartDef, optionally overriding symbol or date ranges."""
+        overrides: dict[str, Any] = {}
+        if symbol is not None:
+            overrides["symbol"] = symbol
+            overrides["symbol_hash"] = abs(hash(symbol))
+        if history_from is not None:
+            overrides["history_from"] = history_from
+        if history_to is not None:
+            overrides["history_to"] = history_to
+        return replace(self, **overrides)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize ChartDef to a dictionary."""
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> ChartDef:
+        """Construct ChartDef from a dictionary."""
+        valid_keys = {f.name for f in fields(cls)}
+        filtered = {k: v for k, v in data.items() if k in valid_keys}
+        return cls(**filtered)
+
+
+@dataclass
+class DataInfo:
+    """Historical market dataset catalog metadata record."""
+
+    id: str | int = 0
+    symbol: str = ""
+    timeframe: str | Timeframe = "M1"
+    instrument: str = "Forex"
+    connection: str = ""
+    timezone: str = "UTC"
+    decimals: int = 4
+    date_from: str | int = 0
+    date_from_str: str = ""
+    date_to: str | int = 0
+    date_to_str: str = ""
+    rows: int = 0
+    total_days: int = 0
+    filename: str = ""
+    file_hash: int = 0
+    bar_time_type: int = 0
+    remove_weekends: bool = True
+    show: bool = True
+    source: str | int = 0
+    source_data_id: int = 0
+    basket_id: int = 0
+    broker_id: int = 0
+    original_symbol: str = ""
+    seconds_records: int = 0
+    u_symbol: str = ""
+    u_symbol_name: str = ""
+    underlying: str = ""
+    broker: str = "Default"
+    broker_name: str = "Default"
+    category: str = "Forex"
+    bars: int = 0
+    bar_type: str = "start"
+    updated_at_utc: str = ""
+    path: str = ""
+    data_kind: str = "bars"
+    quality_score: float = 1.0
+    total_records: int = 0
+    data_type: str = ""
+
+    def __post_init__(self) -> None:
+        """Harmonize aliases, default fields, and normalized types."""
+        if isinstance(self.timeframe, Timeframe):
+            self.timeframe = self.timeframe.value
+        self._sync_paths_and_counts()
+        self._sync_dates()
+        self._sync_identifiers()
+
+    def _sync_paths_and_counts(self) -> None:
+        """Synchronize file paths and row counts."""
+        if not self.path and self.filename:
+            self.path = self.filename
+        elif not self.filename and self.path:
+            self.filename = self.path
+        if not self.bars and self.rows:
+            self.bars = self.rows
+        elif not self.rows and self.bars:
+            self.rows = self.bars
+        if not self.total_records and (self.bars or self.rows):
+            self.total_records = self.bars or self.rows
+        elif not self.bars and self.total_records:
+            self.bars = self.total_records
+            self.rows = self.total_records
+
+    def _sync_dates(self) -> None:
+        """Synchronize start and end dates."""
+        if not self.date_from_str and isinstance(self.date_from, str):
+            self.date_from_str = self.date_from
+        elif not self.date_from and self.date_from_str:
+            self.date_from = self.date_from_str
+        if not self.date_to_str and isinstance(self.date_to, str):
+            self.date_to_str = self.date_to
+        elif not self.date_to and self.date_to_str:
+            self.date_to = self.date_to_str
+
+    def _sync_identifiers(self) -> None:
+        """Synchronize source, broker, and underlying symbol identifiers."""
+        if not self.connection and isinstance(self.source, str) and self.source:
+            self.connection = self.source
+        elif (self.source == 0 or not self.source) and self.connection:
+            self.source = self.connection
+        if not self.underlying and self.symbol:
+            self.underlying = self.symbol
+        if not self.broker_name and self.broker:
+            self.broker_name = self.broker
+        elif not self.broker and self.broker_name:
+            self.broker = self.broker_name
+        if self.data_type and (not self.category or self.category == "Forex"):
+            self.category = self.data_type
+        elif self.category and not self.data_type:
+            self.data_type = self.category
+
+    def clone(self) -> DataInfo:
+        """Clone this DataInfo record."""
+        return replace(self)
+
+    def to_chart_def(self) -> ChartDef:
+        """Convert catalog metadata record into an operational ChartDef."""
+        h_from = self.date_from if isinstance(self.date_from, int) else 0
+        h_to = self.date_to if isinstance(self.date_to, int) else 0
+        conn_name = str(self.connection or self.source or "")
+        return ChartDef(
+            symbol=self.symbol,
+            timeframe=str(self.timeframe),
+            instrument=self.instrument,
+            connection_name=conn_name,
+            history_from=h_from,
+            history_to=h_to,
+            bar_time_type=self.bar_time_type,
+        )
+
+    def to_data_info(self) -> DataInfo:
+        """Self-identity adapter for data info queries."""
+        return self
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize DataInfo to a dictionary."""
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> DataInfo:
+        """Construct DataInfo from a dictionary."""
+        valid_keys = {f.name for f in fields(cls)}
+        filtered = {k: v for k, v in data.items() if k in valid_keys}
+        return cls(**filtered)
+
+    @classmethod
+    def from_row(cls, row: Mapping[str, Any]) -> DataInfo:
+        """Construct DataInfo from database row or mapping."""
+        d_from = str(row.get("date_from", ""))
+        d_to = str(row.get("date_to", ""))
+        bar_count = int(row.get("bars", 0))
+        f_path = str(row.get("path", ""))
+        src = str(row.get("source", "file"))
+        cat = str(row.get("category", "Forex"))
+        return cls(
+            id=str(row.get("id", "")),
+            source=src,
+            symbol=str(row.get("symbol", "")),
+            underlying=str(row.get("underlying", "")),
+            instrument=str(row.get("instrument", "")),
+            timeframe=str(row.get("timeframe", "M1")),
+            broker=str(row.get("broker", "Default")),
+            broker_name=str(row.get("broker_name", "Default")),
+            timezone=str(row.get("timezone", "UTC")),
+            category=cat,
+            date_from=d_from,
+            date_to=d_to,
+            date_from_str=d_from,
+            date_to_str=d_to,
+            bars=bar_count,
+            rows=bar_count,
+            total_records=bar_count,
+            data_type=cat,
+            bar_type=str(row.get("bar_type", "start")),
+            updated_at_utc=str(row.get("updated_at", row.get("updated_at_utc", ""))),
+            path=f_path,
+            filename=f_path,
+            data_kind=str(row.get("data_kind", "bars")),
+            quality_score=float(row.get("quality_score", 1.0)),
+            connection=src,
+        )
+
+
+@dataclass(slots=True)
+class SymbolAliasRecord:
+    """Represents a symbol alias mapping."""
+
+    alias: str
+    symbol: str = ""
+    instrument: str = ""
+    description: str = ""
+
+    def __post_init__(self) -> None:
+        """Synchronize symbol and instrument identifiers."""
+        if not self.symbol and self.instrument:
+            self.symbol = self.instrument
+        elif not self.instrument and self.symbol:
+            self.instrument = self.symbol
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert alias record to dictionary representation."""
+        return {
+            "alias": self.alias,
+            "symbol": self.symbol or self.instrument,
+            "description": self.description,
+        }

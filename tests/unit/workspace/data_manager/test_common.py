@@ -14,10 +14,10 @@ from app.workspace.data_manager import (
     BridgeError,
     ChartDef,
     DataInfo,
-    InstrumentAliasRecord,
-    InstrumentInfo,
     MarketBar,
     MarketTick,
+    SymbolAliasRecord,
+    SymbolInfo,
     Timeframe,
     format_dataset_table,
     format_home_dashboard,
@@ -150,12 +150,12 @@ class TestContractsMarketBar:
             tick_volume=150,
             spread=3,
         )
-        assert bar.is_bullish is True
-        assert bar.is_bearish is False
-        assert bar.is_doji is False
-        assert pytest.approx(bar.range, rel=1e-6) == 0.0030
-        assert pytest.approx(bar.body, rel=1e-6) == 0.0015
-        assert bar.volume == 150.0
+        assert bar.is_bullish() is True
+        assert bar.is_bearish() is False
+        assert bar.is_doji() is False
+        assert pytest.approx(bar.range(), rel=1e-6) == 0.0030
+        assert pytest.approx(bar.body(), rel=1e-6) == 0.0015
+        assert bar.volume() == 150.0
 
     def test_bearish_and_doji_bar(self) -> None:
         """Verify bearish and doji candle computations."""
@@ -168,12 +168,12 @@ class TestContractsMarketBar:
             tick_volume=100,
             real_volume=500,
         )
-        assert bearish.is_bullish is False
-        assert bearish.is_bearish is True
-        assert bearish.is_doji is False
-        assert pytest.approx(bearish.range, rel=1e-6) == 0.0040
-        assert pytest.approx(bearish.body, rel=1e-6) == 0.0030
-        assert bearish.volume == 500.0
+        assert bearish.is_bullish() is False
+        assert bearish.is_bearish() is True
+        assert bearish.is_doji() is False
+        assert pytest.approx(bearish.range(), rel=1e-6) == 0.0040
+        assert pytest.approx(bearish.body(), rel=1e-6) == 0.0030
+        assert bearish.volume() == 500.0
 
         doji = MarketBar(
             time=1700000120,
@@ -182,10 +182,10 @@ class TestContractsMarketBar:
             low=1.0825,
             close=1.0835,
         )
-        assert doji.is_bullish is False
-        assert doji.is_bearish is False
-        assert doji.is_doji is True
-        assert pytest.approx(doji.body, rel=1e-6) == 0.0
+        assert doji.is_bullish() is False
+        assert doji.is_bearish() is False
+        assert doji.is_doji() is True
+        assert pytest.approx(doji.body(), rel=1e-6) == 0.0
 
     def test_immutability(self) -> None:
         """Verify MarketBar is frozen and rejects attribute assignment."""
@@ -206,9 +206,9 @@ class TestContractsMarketTick:
             last=1.0855,
             volume=50,
         )
-        assert tick.time == 1700000000123
-        assert pytest.approx(tick.spread, rel=1e-6) == 0.0002
-        assert pytest.approx(tick.mid, rel=1e-6) == 1.0855
+        assert tick.time_msc == 1700000000123
+        assert pytest.approx(tick.spread(), rel=1e-6) == 0.0002
+        assert pytest.approx(tick.mid(), rel=1e-6) == 1.0855
 
     def test_immutability(self) -> None:
         """Verify MarketTick is frozen and rejects attribute assignment."""
@@ -241,7 +241,7 @@ class TestContractsConstantsAndReexports:
         chart = ChartDef(symbol="EURUSD", timeframe="M1", connection_name="dukascopy")
         assert chart.symbol == "EURUSD"
         assert chart.timeframe == "M1"
-        assert chart.timeframe_seconds == 60
+        assert chart.timeframe_seconds() == 60
         assert chart.connection_name == "dukascopy"
         assert chart.is_symbol_recognized()
         # Verify DataInfo.to_chart_def() interoperability
@@ -325,35 +325,35 @@ class TestFormatters:
         assert "Historical Bars:      500" in rendered_obj
 
 
-class TestContractsInstrumentInfo:
-    """Verify InstrumentInfo model defaults, tick rounding, and conversions."""
+class TestContractsSymbolInfo:
+    """Verify SymbolInfo model defaults, tick rounding, and conversions."""
 
-    def test_instrument_info_defaults_and_tick_rounding(self) -> None:
+    def test_symbol_info_defaults_and_tick_rounding(self) -> None:
         """Verify price rounding to tick size and decimal precision."""
-        inst = InstrumentInfo(
+        inst = SymbolInfo(
             symbol="EURUSD",
-            tick_size=0.00001,
-            decimals=5,
-            point_value=100000.0,
-            tick_value_in_money=10.0,
+            trade_tick_size=0.00001,
+            digits=5,
+            trade_contract_size=100000.0,
+            trade_tick_value=10.0,
         )
         assert inst.symbol == "EURUSD"
-        assert inst.decimals == 5
+        assert inst.digits == 5
         assert inst.round_to_tick_size(1.085427) == 1.08543
         assert inst.round_to_tick_size(1.085422) == 1.08542
 
-    def test_instrument_info_to_symbol_info(self) -> None:
+    def test_symbol_info_to_symbol_info(self) -> None:
         """Verify conversion to Tier 2 trading domain SymbolInfo."""
-        inst = InstrumentInfo(
+        inst = SymbolInfo(
             symbol="EURUSD",
-            tick_size=0.00001,
-            decimals=5,
-            point_value=100000.0,
-            tick_value_in_money=10.0,
-            min_volume=0.01,
-            max_volume=100.0,
-            lot_step=0.01,
-            margin_rate=0.033,
+            trade_tick_size=0.00001,
+            digits=5,
+            trade_contract_size=100000.0,
+            trade_tick_value=10.0,
+            volume_min=0.01,
+            volume_max=100.0,
+            volume_step=0.01,
+            margin_initial=0.033,
         )
         spec = inst.to_symbol_info()
         assert spec.name == "EURUSD"
@@ -363,39 +363,39 @@ class TestContractsInstrumentInfo:
         assert spec.volume_min == 0.01
         assert spec.volume_max == 100.0
 
-    def test_instrument_info_to_dict_and_from_dict(self) -> None:
+    def test_symbol_info_to_dict_and_from_dict(self) -> None:
         """Verify bidirectional serialization with dictionary payloads."""
-        inst = InstrumentInfo(
+        inst = SymbolInfo(
             symbol="BTCUSDT",
-            data_type="Crypto",
-            tick_size=0.01,
-            point_value=1.0,
-            decimals=2,
+            category="Crypto",
+            trade_tick_size=0.01,
+            trade_contract_size=1.0,
+            digits=2,
         )
         d = inst.to_dict()
         assert d["symbol"] == "BTCUSDT"
         assert d["data_type"] == "Crypto"
-        rebuilt = InstrumentInfo.from_dict(d)
+        rebuilt = SymbolInfo.from_dict(d)
         assert rebuilt.symbol == "BTCUSDT"
-        assert rebuilt.data_type == "Crypto"
-        assert rebuilt.tick_size == 0.01
+        assert rebuilt.category == "Crypto"
+        assert rebuilt.trade_tick_size == 0.01
 
 
-class TestContractsInstrumentAliasRecord:
-    """Verify InstrumentAliasRecord dataclass serialization."""
+class TestContractsSymbolAliasRecord:
+    """Verify SymbolAliasRecord dataclass serialization."""
 
     def test_alias_record_to_dict(self) -> None:
         """Verify alias record fields and dictionary output."""
-        rec = InstrumentAliasRecord(
+        rec = SymbolAliasRecord(
             alias="EUR.USD",
-            instrument="EURUSD",
+            symbol="EURUSD",
             description="Broker symbol format",
         )
         assert rec.alias == "EUR.USD"
-        assert rec.instrument == "EURUSD"
+        assert rec.symbol == "EURUSD"
         d = rec.to_dict()
         assert d == {
             "alias": "EUR.USD",
-            "instrument": "EURUSD",
+            "symbol": "EURUSD",
             "description": "Broker symbol format",
         }

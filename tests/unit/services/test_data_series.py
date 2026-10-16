@@ -176,30 +176,30 @@ class TestMarketRecords:
         assert bar.tick_volume == 50
         assert bar.spread == 2
         assert bar.real_volume == 100
-        assert bar.volume == 100.0
-        assert bar.is_bullish is True
-        assert bar.is_bearish is False
-        assert bar.is_doji is False
-        assert bar.range == pytest.approx(15.0)
-        assert bar.body == pytest.approx(8.0)
+        assert bar.volume() == 100.0
+        assert bar.is_bullish() is True
+        assert bar.is_bearish() is False
+        assert bar.is_doji() is False
+        assert bar.range() == pytest.approx(15.0)
+        assert bar.body() == pytest.approx(8.0)
 
     def test_market_bar_properties_bearish_and_doji(self) -> None:
         """Verify MarketBar bearish and doji candles."""
         bearish = MarketBar(
             time=1000, open=105.0, high=110.0, low=95.0, close=98.0, tick_volume=20
         )
-        assert bearish.is_bullish is False
-        assert bearish.is_bearish is True
-        assert bearish.is_doji is False
-        assert bearish.body == pytest.approx(7.0)
-        assert bearish.volume == 20.0
+        assert bearish.is_bullish() is False
+        assert bearish.is_bearish() is True
+        assert bearish.is_doji() is False
+        assert bearish.body() == pytest.approx(7.0)
+        assert bearish.volume() == 20.0
 
         doji = MarketBar(time=1000, open=100.0, high=105.0, low=95.0, close=100.0)
-        assert doji.is_bullish is False
-        assert doji.is_bearish is False
-        assert doji.is_doji is True
-        assert doji.body == pytest.approx(0.0)
-        assert doji.volume == 0.0
+        assert doji.is_bullish() is False
+        assert doji.is_bearish() is False
+        assert doji.is_doji() is True
+        assert doji.body() == pytest.approx(0.0)
+        assert doji.volume() == 0.0
 
     def test_market_tick_properties(self) -> None:
         """Verify MarketTick spread and midpoint computations."""
@@ -219,8 +219,8 @@ class TestMarketRecords:
         assert tick.volume == 10
         assert tick.flags == 6
         assert tick.volume_real == 10.5
-        assert tick.spread == pytest.approx(0.5)
-        assert tick.mid == pytest.approx(100.25)
+        assert tick.spread() == pytest.approx(0.5)
+        assert tick.mid() == pytest.approx(100.25)
 
 
 class TestDataSeriesCore:

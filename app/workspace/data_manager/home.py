@@ -47,14 +47,7 @@ from typing import Any
 
 from app.host.logging import get_logger
 from app.host.persistence.read import count_rows, read_rows, resolve_connection
-
-from ._common import (
-    MAX_UNDERLYING_DISPLAY_LEN,
-    TRUNCATE_LEN,
-    DataInfo,
-    format_dataset_table,
-    format_home_dashboard,
-)
+from app.services.libs.contracts import DataInfo
 
 __all__ = [
     "Home",
@@ -202,6 +195,114 @@ class Home:
             extra={"fr_id": DATASETS_CATALOG_FR, "count": len(datasets)},
         )
         return datasets
+
+
+MAX_UNDERLYING_DISPLAY_LEN: int = 32
+TRUNCATE_LEN: int = 30
+
+
+def format_dataset_table(saved_datasets: Sequence[DataInfo]) -> str:
+    """Format ASCII table of saved dataset catalog entries."""
+    count = len(saved_datasets)
+    lines: list[str] = [f"=== Saved Datasets Catalog ({count} items) ==="]
+    header_fmt = (
+        "| {sym:<14} | {inst:<15} | {brk:<12} | {und:<32} | {tf:<4} "
+        "| {tz:<8} | {d_from:<10} | {d_to:<10} | {days:>6} | {recs:>10} "
+        "| {src:<16} | {cat:<8} |"
+    )
+    divider = (
+        "|-"
+        + "-|-".join(
+            [
+                "-" * 14,
+                "-" * 15,
+                "-" * 12,
+                "-" * 32,
+                "-" * 4,
+                "-" * 8,
+                "-" * 10,
+                "-" * 10,
+                "-" * 6,
+                "-" * 10,
+                "-" * 16,
+                "-" * 8,
+            ]
+        )
+        + "-|"
+    )
+    lines.append(
+        header_fmt.format(
+            sym="Symbol Name",
+            inst="Instrument",
+            brk="Broker profile",
+            und="Underlying Symbol",
+            tf="TF",
+            tz="Timezone",
+            d_from="Date from",
+            d_to="Date to",
+            days="Days",
+            recs="Records",
+            src="Source",
+            cat="Data type",
+        )
+    )
+    lines.append(divider)
+    for ds in saved_datasets:
+        if len(ds.underlying) > MAX_UNDERLYING_DISPLAY_LEN:
+            und_preview = ds.underlying[:TRUNCATE_LEN] + ".."
+        else:
+            und_preview = ds.underlying
+        lines.append(
+            header_fmt.format(
+                sym=ds.symbol,
+                inst=ds.instrument,
+                brk=ds.broker,
+                und=und_preview,
+                tf=str(ds.timeframe),
+                tz=ds.timezone,
+                d_from=str(ds.date_from) or "-",
+                d_to=str(ds.date_to) or "-",
+                days=ds.total_days,
+                recs=f"{ds.total_records:,}",
+                src=str(ds.source),
+                cat=ds.data_type,
+            )
+        )
+    return "\n".join(lines)
+
+
+def format_home_dashboard(
+    overview: Mapping[str, Any] | Any,
+    saved_datasets: Sequence[DataInfo],
+) -> str:
+    """Format complete human-readable dashboard output."""
+    if isinstance(overview, Mapping):
+        ds_count = overview.get("datasets_count", 0)
+        total_bars = int(overview.get("total_bars", 0))
+        inst_count = overview.get("instruments_count", 0)
+        sess_count = overview.get("sessions_count", 0)
+        bask_count = overview.get("baskets_count", 0)
+        act_prov = overview.get("active_providers_count", 0)
+    else:
+        ds_count = getattr(overview, "datasets_count", 0)
+        total_bars = int(getattr(overview, "total_bars", 0))
+        inst_count = getattr(overview, "instruments_count", 0)
+        sess_count = getattr(overview, "sessions_count", 0)
+        bask_count = getattr(overview, "baskets_count", 0)
+        act_prov = getattr(overview, "active_providers_count", 0)
+
+    lines = [
+        "=== Data Manager Home: Live Database Overview ===",
+        f"Total Datasets:       {ds_count}",
+        f"Historical Bars:      {total_bars:,}",
+        f"Instruments Catalog:  {inst_count}",
+        f"Trading Sessions:     {sess_count}",
+        f"Custom Baskets:       {bask_count}",
+        f"Active Providers:     {act_prov}",
+        "",
+        format_dataset_table(saved_datasets),
+    ]
+    return "\n".join(lines)
 
 
 class HomeCLI:

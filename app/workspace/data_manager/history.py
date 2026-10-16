@@ -72,16 +72,16 @@ from typing import Any, Literal, Protocol, override
 
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
-from app.services.brokers.base import BaseBrokerBackend
-
-from ._common import (
+from app.services.brokers.base import BaseBrokerBackend, BridgeError
+from app.services.libs.contracts import (
     MAX_POSITION,
     MAX_RECORDS,
     READ_TIMEOUT,
-    TIMEFRAME_SECONDS,
-    BridgeError,
     MarketBar,
     MarketTick,
+)
+from app.services.libs.enums import (
+    TIMEFRAME_SECONDS,
     Timeframe,
 )
 

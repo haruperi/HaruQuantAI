@@ -21,6 +21,7 @@ __all__ = [
     "SYMBOL_SWAP_MODE_DESCRIPTIONS",
     "SYMBOL_TRADE_EXECUTION_DESCRIPTIONS",
     "SYMBOL_TRADE_MODE_DESCRIPTIONS",
+    "TIMEFRAME_SECONDS",
     "AccountTradeMode",
     "BookType",
     "BridgeEvent",
@@ -40,6 +41,7 @@ __all__ = [
     "SymbolSwapMode",
     "SymbolTradeExecution",
     "SymbolTradeMode",
+    "Timeframe",
     "TradeAction",
     "TradeResolution",
     "TradeRetcode",
@@ -455,4 +457,140 @@ SWAP_MODE_DESCRIPTIONS = SYMBOL_SWAP_MODE_DESCRIPTIONS
 
 SYMBOL_CALC_MODE_DESCRIPTIONS: dict[SymbolCalcMode, str] = {
     item: item.name.replace("_", " ").title() for item in SymbolCalcMode
+}
+
+
+class Timeframe(StrEnum):
+    """Chart and series timeframe enumeration."""
+
+    PERIOD_CURRENT = "CURRENT"
+    PERIOD_M1 = "M1"
+    PERIOD_M2 = "M2"
+    PERIOD_M3 = "M3"
+    PERIOD_M4 = "M4"
+    PERIOD_M5 = "M5"
+    PERIOD_M6 = "M6"
+    PERIOD_M10 = "M10"
+    PERIOD_M12 = "M12"
+    PERIOD_M15 = "M15"
+    PERIOD_M20 = "M20"
+    PERIOD_M30 = "M30"
+    PERIOD_H1 = "H1"
+    PERIOD_H2 = "H2"
+    PERIOD_H3 = "H3"
+    PERIOD_H4 = "H4"
+    PERIOD_H6 = "H6"
+    PERIOD_H8 = "H8"
+    PERIOD_H12 = "H12"
+    PERIOD_D1 = "D1"
+    PERIOD_W1 = "W1"
+    PERIOD_MN1 = "MN1"
+
+    # Shorthand aliases
+    M1 = "M1"
+    M2 = "M2"
+    M3 = "M3"
+    M4 = "M4"
+    M5 = "M5"
+    M6 = "M6"
+    M10 = "M10"
+    M12 = "M12"
+    M15 = "M15"
+    M20 = "M20"
+    M30 = "M30"
+    H1 = "H1"
+    H2 = "H2"
+    H3 = "H3"
+    H4 = "H4"
+    H6 = "H6"
+    H8 = "H8"
+    H12 = "H12"
+    D1 = "D1"
+    W1 = "W1"
+    MN1 = "MN1"
+
+    def to_seconds(self) -> int:
+        """Convert timeframe duration to whole seconds."""
+        val = self.value
+        if val.startswith("M") and self != Timeframe.PERIOD_MN1:
+            return int(val[1:]) * 60
+        if val.startswith("H"):
+            return int(val[1:]) * 3600
+        fixed = {
+            Timeframe.PERIOD_D1: 86400,
+            Timeframe.PERIOD_W1: 604800,
+            Timeframe.PERIOD_MN1: 2419200,
+        }
+        return fixed.get(self, 0)
+
+    def to_minutes(self) -> int:
+        """Convert timeframe duration to whole minutes."""
+        return self.to_seconds() // 60
+
+    @classmethod
+    def from_string(cls, name: str) -> Timeframe:
+        """Parse timeframe from common string representations."""
+        cleaned = name.strip().upper()
+        mapping: dict[str, Timeframe] = {
+            "M1": cls.PERIOD_M1,
+            "1M": cls.PERIOD_M1,
+            "1MIN": cls.PERIOD_M1,
+            "M2": cls.PERIOD_M2,
+            "2M": cls.PERIOD_M2,
+            "M3": cls.PERIOD_M3,
+            "3M": cls.PERIOD_M3,
+            "M4": cls.PERIOD_M4,
+            "4M": cls.PERIOD_M4,
+            "M5": cls.PERIOD_M5,
+            "5M": cls.PERIOD_M5,
+            "5MIN": cls.PERIOD_M5,
+            "M6": cls.PERIOD_M6,
+            "6M": cls.PERIOD_M6,
+            "M10": cls.PERIOD_M10,
+            "10M": cls.PERIOD_M10,
+            "M12": cls.PERIOD_M12,
+            "12M": cls.PERIOD_M12,
+            "M15": cls.PERIOD_M15,
+            "15M": cls.PERIOD_M15,
+            "15MIN": cls.PERIOD_M15,
+            "M20": cls.PERIOD_M20,
+            "20M": cls.PERIOD_M20,
+            "M30": cls.PERIOD_M30,
+            "30M": cls.PERIOD_M30,
+            "30MIN": cls.PERIOD_M30,
+            "H1": cls.PERIOD_H1,
+            "1H": cls.PERIOD_H1,
+            "60M": cls.PERIOD_H1,
+            "H2": cls.PERIOD_H2,
+            "2H": cls.PERIOD_H2,
+            "H3": cls.PERIOD_H3,
+            "3H": cls.PERIOD_H3,
+            "H4": cls.PERIOD_H4,
+            "4H": cls.PERIOD_H4,
+            "240M": cls.PERIOD_H4,
+            "H6": cls.PERIOD_H6,
+            "6H": cls.PERIOD_H6,
+            "H8": cls.PERIOD_H8,
+            "8H": cls.PERIOD_H8,
+            "H12": cls.PERIOD_H12,
+            "12H": cls.PERIOD_H12,
+            "D1": cls.PERIOD_D1,
+            "1D": cls.PERIOD_D1,
+            "DAY": cls.PERIOD_D1,
+            "W1": cls.PERIOD_W1,
+            "1W": cls.PERIOD_W1,
+            "WEEK": cls.PERIOD_W1,
+            "MN1": cls.PERIOD_MN1,
+            "1MN": cls.PERIOD_MN1,
+            "MONTH": cls.PERIOD_MN1,
+        }
+        if cleaned in mapping:
+            return mapping[cleaned]
+        raise ValueError(f"Unknown timeframe identifier: {name!r}")
+
+
+TIMEFRAME_SECONDS: dict[Timeframe, int] = {
+    frame: frame.to_seconds()
+    for frame in Timeframe
+    if frame != Timeframe.PERIOD_CURRENT
 }
