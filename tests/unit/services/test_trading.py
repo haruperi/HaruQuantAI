@@ -54,8 +54,8 @@ from app.services.trading import (
     ORDER_TIME_DESCRIPTIONS,
     ORDER_TYPE_DESCRIPTIONS,
     POSITION_TYPE_DESCRIPTIONS,
-    SWAP_MODE_DESCRIPTIONS,
     SYMBOL_CALC_MODE_DESCRIPTIONS,
+    SYMBOL_SWAP_MODE_DESCRIPTIONS,
     SYMBOL_TRADE_EXECUTION_DESCRIPTIONS,
     SYMBOL_TRADE_MODE_DESCRIPTIONS,
     AccountProxy,
@@ -310,7 +310,7 @@ def test_trading_description_mappings() -> None:
         (DealEntry, DEAL_ENTRY_DESCRIPTIONS),
         (SymbolTradeMode, SYMBOL_TRADE_MODE_DESCRIPTIONS),
         (SymbolTradeExecution, SYMBOL_TRADE_EXECUTION_DESCRIPTIONS),
-        (SymbolSwapMode, SWAP_MODE_DESCRIPTIONS),
+        (SymbolSwapMode, SYMBOL_SWAP_MODE_DESCRIPTIONS),
         (SymbolCalcMode, SYMBOL_CALC_MODE_DESCRIPTIONS),
     ]
     for enum_cls, desc_map in check_groups:

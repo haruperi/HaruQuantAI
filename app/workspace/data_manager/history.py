@@ -77,11 +77,11 @@ from app.services.libs.contracts import (
     MAX_POSITION,
     MAX_RECORDS,
     READ_TIMEOUT,
+    TIMEFRAME_SECONDS,
     MarketBar,
     MarketTick,
 )
 from app.services.libs.enums import (
-    TIMEFRAME_SECONDS,
     Timeframe,
 )
 

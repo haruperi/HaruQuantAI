@@ -53,9 +53,11 @@ from app.services.brokers.base import (
 )
 from app.services.libs.contracts import (
     AccountInfo,
+    BridgeEvent,
     DealInfo,
     OrderInfo,
     PositionInfo,
+    Receipt,
     SymbolInfo,
     TerminalInfo,
     TradeCheckResult,
@@ -63,7 +65,6 @@ from app.services.libs.contracts import (
     TradeResult,
 )
 from app.services.libs.enums import (
-    BridgeEvent,
     DealEntry,
     DealType,
     MarginMode,
@@ -72,7 +73,6 @@ from app.services.libs.enums import (
     OrderTime,
     OrderType,
     PositionType,
-    Receipt,
     ReceiptStatus,
     SymbolTradeExecution,
     SymbolTradeMode,

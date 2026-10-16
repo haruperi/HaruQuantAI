@@ -63,21 +63,21 @@ if TYPE_CHECKING:
     from app.services.brokers.yahoo import YahooBroker
     from app.services.libs.contracts import (
         AccountInfo,
+        BridgeEvent,
         DealInfo,
         OrderInfo,
         PositionInfo,
+        Receipt,
         SymbolInfo,
         TerminalInfo,
         TradeCheckResult,
         TradeRequest,
         TradeResult,
+        TradingBackend,
     )
     from app.services.libs.enums import (
-        BridgeEvent,
-        Receipt,
         ReceiptStatus,
         TradeAction,
-        TradingBackend,
     )
     from app.workspace.data_manager import (
         MarketBar,

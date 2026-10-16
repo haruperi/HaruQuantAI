@@ -3,18 +3,6 @@
 from __future__ import annotations
 
 from app.services.libs.contracts import (
-    AccountInfo,
-    BookInfo,
-    DealInfo,
-    OrderInfo,
-    PositionInfo,
-    SymbolInfo,
-    TerminalInfo,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
-)
-from app.services.libs.enums import (
     BOOK_TYPE_DESCRIPTIONS,
     DEAL_ENTRY_DESCRIPTIONS,
     DEAL_TYPE_DESCRIPTIONS,
@@ -23,14 +11,28 @@ from app.services.libs.enums import (
     ORDER_TIME_DESCRIPTIONS,
     ORDER_TYPE_DESCRIPTIONS,
     POSITION_TYPE_DESCRIPTIONS,
-    SWAP_MODE_DESCRIPTIONS,
     SYMBOL_CALC_MODE_DESCRIPTIONS,
     SYMBOL_SWAP_MODE_DESCRIPTIONS,
     SYMBOL_TRADE_EXECUTION_DESCRIPTIONS,
     SYMBOL_TRADE_MODE_DESCRIPTIONS,
+    AccountInfo,
+    BookInfo,
+    BridgeEvent,
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    PropertyValue,
+    Receipt,
+    SymbolInfo,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+    TradingBackend,
+)
+from app.services.libs.enums import (
     AccountTradeMode,
     BookType,
-    BridgeEvent,
     DealEntry,
     DealType,
     MarginMode,
@@ -39,8 +41,6 @@ from app.services.libs.enums import (
     OrderTime,
     OrderType,
     PositionType,
-    PropertyValue,
-    Receipt,
     ReceiptStatus,
     StopoutMode,
     SymbolCalcMode,
@@ -50,7 +50,6 @@ from app.services.libs.enums import (
     TradeAction,
     TradeResolution,
     TradeRetcode,
-    TradingBackend,
 )
 
 from .base import (
@@ -87,7 +86,6 @@ __all__ = [
     "ORDER_TIME_DESCRIPTIONS",
     "ORDER_TYPE_DESCRIPTIONS",
     "POSITION_TYPE_DESCRIPTIONS",
-    "SWAP_MODE_DESCRIPTIONS",
     "SYMBOL_CALC_MODE_DESCRIPTIONS",
     "SYMBOL_SWAP_MODE_DESCRIPTIONS",
     "SYMBOL_TRADE_EXECUTION_DESCRIPTIONS",

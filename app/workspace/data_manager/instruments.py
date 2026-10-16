@@ -848,7 +848,7 @@ if __name__ == "__main__":
             print(f"Loaded EURUSD: decimals={eur.decimals}, tick={eur.tick_size}")
             rounded = eur.round_to_tick_size(1.085427)
             print(f"EURUSD rounded price 1.085427 -> {rounded}")
-            spec = eur.to_symbol_info()
+            spec = eur
             print(
                 f"Generated SymbolInfo: {spec.name} contract={spec.trade_contract_size}"
             )

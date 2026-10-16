@@ -90,18 +90,13 @@ def test_public_reexports() -> None:
 class TestTimeframe:
     """Test suite for Timeframe enumeration and conversion helpers."""
 
-    def test_timeframe_constants_and_aliases(self) -> None:
-        """Verify standard timeframe values and aliases."""
+    def test_timeframe_constants(self) -> None:
+        """Verify standard timeframe values."""
         assert Timeframe.PERIOD_M1.value == "M1"
-        assert Timeframe.M1.value == "M1"
         assert Timeframe.PERIOD_H1.value == "H1"
-        assert Timeframe.H1.value == "H1"
         assert Timeframe.PERIOD_D1.value == "D1"
-        assert Timeframe.D1.value == "D1"
         assert Timeframe.PERIOD_W1.value == "W1"
-        assert Timeframe.W1.value == "W1"
         assert Timeframe.PERIOD_MN1.value == "MN1"
-        assert Timeframe.MN1.value == "MN1"
 
     def test_to_seconds_and_minutes(self) -> None:
         """Verify to_seconds and to_minutes methods."""

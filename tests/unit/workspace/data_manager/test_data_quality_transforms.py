@@ -71,7 +71,7 @@ def test_data_service_lifecycle_and_exports(test_db_path: Path, tmp_path: Path) 
     )
     assert rec.id == "dukascopy:EURUSD"
     assert rec.bars >= 100
-    assert rec.to_data_info().symbol == "EURUSD"
+    assert rec.symbol == "EURUSD"
 
     # Parquet read/write roundtrip
     df = service.read_bars_dataframe(rec.id)

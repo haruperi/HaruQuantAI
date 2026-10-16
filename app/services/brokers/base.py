@@ -54,9 +54,11 @@ if TYPE_CHECKING:
 from app.host.logging import get_logger
 from app.services.libs.contracts import (
     AccountInfo,
+    BridgeEvent,
     DealInfo,
     OrderInfo,
     PositionInfo,
+    Receipt,
     SymbolInfo,
     TerminalInfo,
     TradeCheckResult,
@@ -64,9 +66,7 @@ from app.services.libs.contracts import (
     TradeResult,
 )
 from app.services.libs.enums import (
-    BridgeEvent,
     OrderType,
-    Receipt,
     ReceiptStatus,
 )
 

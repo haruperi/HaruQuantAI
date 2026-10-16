@@ -39,6 +39,13 @@ from app.services.brokers.base import (
     epoch_seconds,
 )
 from app.services.libs.contracts import (
+    DEAL_ENTRY_DESCRIPTIONS,
+    DEAL_TYPE_DESCRIPTIONS,
+    ORDER_FILLING_DESCRIPTIONS,
+    ORDER_STATE_DESCRIPTIONS,
+    ORDER_TIME_DESCRIPTIONS,
+    ORDER_TYPE_DESCRIPTIONS,
+    POSITION_TYPE_DESCRIPTIONS,
     AccountInfo,
     DealInfo,
     OrderInfo,
@@ -50,13 +57,6 @@ from app.services.libs.contracts import (
     TradeResult,
 )
 from app.services.libs.enums import (
-    DEAL_ENTRY_DESCRIPTIONS,
-    DEAL_TYPE_DESCRIPTIONS,
-    ORDER_FILLING_DESCRIPTIONS,
-    ORDER_STATE_DESCRIPTIONS,
-    ORDER_TIME_DESCRIPTIONS,
-    ORDER_TYPE_DESCRIPTIONS,
-    POSITION_TYPE_DESCRIPTIONS,
     AccountTradeMode,
     BookType,
     DealEntry,
@@ -75,13 +75,6 @@ from app.services.libs.enums import (
     TradeAction,
     TradeRetcode,
 )
-
-DealEntryEnum = DealEntry
-DealTypeEnum = DealType
-OrderStateEnum = OrderState
-OrderFillingEnum = OrderFilling
-OrderTimeEnum = OrderTime
-OrderTypeEnum = OrderType
 
 logger = get_logger(__name__)
 
@@ -495,18 +488,14 @@ def _dict_to_deal_info(d: dict[str, Any]) -> DealInfo:
     t_val = d.get("time", 0)
     t_sec = epoch_seconds(t_val) if isinstance(t_val, datetime) else int(t_val or 0)
     deal_type_enum = (
-        DealTypeEnum(deal_type)
-        if deal_type in DealTypeEnum._value2member_map_
-        else None
+        DealType(deal_type) if deal_type in DealType._value2member_map_ else None
     )
     deal_type_desc = (
         DEAL_TYPE_DESCRIPTIONS.get(deal_type_enum, "")
         if deal_type_enum is not None
         else ""
     )
-    entry_enum = (
-        DealEntryEnum(entry) if entry in DealEntryEnum._value2member_map_ else None
-    )
+    entry_enum = DealEntry(entry) if entry in DealEntry._value2member_map_ else None
     entry_desc = (
         DEAL_ENTRY_DESCRIPTIONS.get(entry_enum, "") if entry_enum is not None else ""
     )
@@ -547,25 +536,19 @@ def _dict_to_order_info(d: dict[str, Any]) -> OrderInfo:
     t_exp = d.get("time_expiration", 0)
     t_exp_sec = epoch_seconds(t_exp) if isinstance(t_exp, datetime) else int(t_exp or 0)
     ord_type_enum = (
-        OrderTypeEnum(ord_type)
-        if ord_type in OrderTypeEnum._value2member_map_
-        else None
+        OrderType(ord_type) if ord_type in OrderType._value2member_map_ else None
     )
     ord_type_desc = (
         ORDER_TYPE_DESCRIPTIONS.get(ord_type_enum, "")
         if ord_type_enum is not None
         else ""
     )
-    state_enum = (
-        OrderStateEnum(state) if state in OrderStateEnum._value2member_map_ else None
-    )
+    state_enum = OrderState(state) if state in OrderState._value2member_map_ else None
     state_desc = (
         ORDER_STATE_DESCRIPTIONS.get(state_enum, "") if state_enum is not None else ""
     )
     filling_enum = (
-        OrderFillingEnum(filling)
-        if filling in OrderFillingEnum._value2member_map_
-        else None
+        OrderFilling(filling) if filling in OrderFilling._value2member_map_ else None
     )
     filling_desc = (
         ORDER_FILLING_DESCRIPTIONS.get(filling_enum, "")
@@ -573,9 +556,7 @@ def _dict_to_order_info(d: dict[str, Any]) -> OrderInfo:
         else ""
     )
     ord_time_enum = (
-        OrderTimeEnum(ord_time)
-        if ord_time in OrderTimeEnum._value2member_map_
-        else None
+        OrderTime(ord_time) if ord_time in OrderTime._value2member_map_ else None
     )
     ord_time_desc = (
         ORDER_TIME_DESCRIPTIONS.get(ord_time_enum, "")

@@ -2,29 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
-from typing import Any, Protocol, runtime_checkable
 
 __all__ = [
-    "BOOK_TYPE_DESCRIPTIONS",
-    "DEAL_ENTRY_DESCRIPTIONS",
-    "DEAL_TYPE_DESCRIPTIONS",
-    "ORDER_FILLING_DESCRIPTIONS",
-    "ORDER_STATE_DESCRIPTIONS",
-    "ORDER_TIME_DESCRIPTIONS",
-    "ORDER_TYPE_DESCRIPTIONS",
-    "POSITION_TYPE_DESCRIPTIONS",
-    "SWAP_MODE_DESCRIPTIONS",
-    "SYMBOL_CALC_MODE_DESCRIPTIONS",
-    "SYMBOL_SWAP_MODE_DESCRIPTIONS",
-    "SYMBOL_TRADE_EXECUTION_DESCRIPTIONS",
-    "SYMBOL_TRADE_MODE_DESCRIPTIONS",
-    "TIMEFRAME_SECONDS",
     "AccountTradeMode",
     "BookType",
-    "BridgeEvent",
     "DealEntry",
     "DealType",
     "MarginMode",
@@ -33,8 +15,6 @@ __all__ = [
     "OrderTime",
     "OrderType",
     "PositionType",
-    "PropertyValue",
-    "Receipt",
     "ReceiptStatus",
     "StopoutMode",
     "SymbolCalcMode",
@@ -45,7 +25,6 @@ __all__ = [
     "TradeAction",
     "TradeResolution",
     "TradeRetcode",
-    "TradingBackend",
 ]
 
 
@@ -72,102 +51,6 @@ class TradeResolution(StrEnum):
     EXPIRED = "expired"
     NOT_FOUND = "not_found"
     UNCERTAIN = "uncertain"
-
-
-@dataclass(frozen=True, slots=True)
-class PropertyValue:
-    """Container for a typed scalar property query result or failure."""
-
-    ok: bool
-    value: Any = None
-    error: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class Receipt:
-    """Immutable audit record tracking the lifecycle of an IPC command."""
-
-    command_id: str
-    object_id: str
-    class_name: str
-    method_name: str
-    status: ReceiptStatus
-    created_at: float
-    sent_at: float | None = None
-    acknowledged_at: float | None = None
-    resolved_at: float | None = None
-    native_request_id: int | None = None
-    value: Any = None
-    meta: Mapping[str, Any] = field(default_factory=dict)
-    error: Mapping[str, Any] | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class BridgeEvent:
-    """Parsed asynchronous event dispatched from the trading bridge."""
-
-    event_type: str
-    payload: Mapping[str, Any]
-    command_id: str | None = None
-    request_id: int | None = None
-
-
-@runtime_checkable
-class TradingBackend(Protocol):
-    """Async execution capability consumed by trading and market data APIs."""
-
-    async def start(self) -> None:
-        """Backend capability: start."""
-        ...
-
-    async def wait_connected(self, timeout: float | None = None) -> None:  # noqa: ASYNC109 -- backend deadline capability
-        """Backend capability: wait connected."""
-        ...
-
-    async def close(self) -> None:
-        """Backend capability: close."""
-        ...
-
-    def arm(self) -> None:
-        """Backend capability: arm."""
-        ...
-
-    def disarm(self) -> None:
-        """Backend capability: disarm."""
-        ...
-
-    def last_command_id(self) -> str | None:
-        """Backend capability: last command id."""
-        ...
-
-    def receipt(self, command_id: str) -> Receipt | None:
-        """Backend capability: receipt."""
-        ...
-
-    async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109 -- backend deadline capability
-        """Backend capability: next event."""
-        ...
-
-    async def await_request_event(
-        self,
-        request_id: int,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline capability
-    ) -> BridgeEvent:
-        """Backend capability: await request event."""
-        ...
-
-    async def call(
-        self,
-        *,
-        object_id: str,
-        class_name: str,
-        method_name: str,
-        args: list[Any],
-        requires_arm: bool = False,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline capability
-    ) -> Any:
-        """Backend capability: call."""
-        ...
 
 
 class AccountTradeMode(IntEnum):
@@ -291,40 +174,6 @@ class BookType(IntEnum):
     BOOK_TYPE_BUY_MARKET = 4
 
 
-ORDER_TYPE_DESCRIPTIONS: dict[OrderType, str] = {
-    OrderType.BUY: "Buy",
-    OrderType.SELL: "Sell",
-    OrderType.BUY_LIMIT: "Buy Limit",
-    OrderType.SELL_LIMIT: "Sell Limit",
-    OrderType.BUY_STOP: "Buy Stop",
-    OrderType.SELL_STOP: "Sell Stop",
-    OrderType.BUY_STOP_LIMIT: "Buy Stop Limit",
-    OrderType.SELL_STOP_LIMIT: "Sell Stop Limit",
-    OrderType.CLOSE_BY: "Close By",
-}
-
-ORDER_FILLING_DESCRIPTIONS: dict[OrderFilling, str] = {
-    OrderFilling.FOK: "Fill or Kill",
-    OrderFilling.IOC: "Immediate or Cancel",
-    OrderFilling.RETURN: "Return",
-    OrderFilling.BOC: "Book or Cancel",
-}
-
-ORDER_TIME_DESCRIPTIONS: dict[OrderTime, str] = {
-    OrderTime.GTC: "Good Till Cancelled",
-    OrderTime.DAY: "Day",
-    OrderTime.SPECIFIED: "Specified",
-    OrderTime.SPECIFIED_DAY: "Specified Day",
-}
-
-BOOK_TYPE_DESCRIPTIONS: dict[BookType, str] = {
-    BookType.BOOK_TYPE_SELL: "Sell",
-    BookType.BOOK_TYPE_BUY: "Buy",
-    BookType.BOOK_TYPE_SELL_MARKET: "Sell Market",
-    BookType.BOOK_TYPE_BUY_MARKET: "Buy Market",
-}
-
-
 class PositionType(IntEnum):
     """Position type enumeration."""
 
@@ -425,41 +274,6 @@ class SymbolCalcMode(IntEnum):
     EXCH_FUTURES = 33
 
 
-POSITION_TYPE_DESCRIPTIONS: dict[PositionType, str] = {
-    PositionType.BUY: "Buy",
-    PositionType.SELL: "Sell",
-}
-
-ORDER_STATE_DESCRIPTIONS: dict[OrderState, str] = {
-    item: item.name.replace("_", " ").title() for item in OrderState
-}
-
-DEAL_TYPE_DESCRIPTIONS: dict[DealType, str] = {
-    item: item.name.replace("_", " ").title() for item in DealType
-}
-
-DEAL_ENTRY_DESCRIPTIONS: dict[DealEntry, str] = {
-    item: item.name.replace("_", " ").title() for item in DealEntry
-}
-
-SYMBOL_TRADE_MODE_DESCRIPTIONS: dict[SymbolTradeMode, str] = {
-    item: item.name.replace("_", " ").title() for item in SymbolTradeMode
-}
-
-SYMBOL_TRADE_EXECUTION_DESCRIPTIONS: dict[SymbolTradeExecution, str] = {
-    item: item.name.replace("_", " ").title() for item in SymbolTradeExecution
-}
-
-SYMBOL_SWAP_MODE_DESCRIPTIONS: dict[SymbolSwapMode, str] = {
-    item: item.name.replace("_", " ").title() for item in SymbolSwapMode
-}
-SWAP_MODE_DESCRIPTIONS = SYMBOL_SWAP_MODE_DESCRIPTIONS
-
-SYMBOL_CALC_MODE_DESCRIPTIONS: dict[SymbolCalcMode, str] = {
-    item: item.name.replace("_", " ").title() for item in SymbolCalcMode
-}
-
-
 class Timeframe(StrEnum):
     """Chart and series timeframe enumeration."""
 
@@ -485,29 +299,6 @@ class Timeframe(StrEnum):
     PERIOD_D1 = "D1"
     PERIOD_W1 = "W1"
     PERIOD_MN1 = "MN1"
-
-    # Shorthand aliases
-    M1 = "M1"
-    M2 = "M2"
-    M3 = "M3"
-    M4 = "M4"
-    M5 = "M5"
-    M6 = "M6"
-    M10 = "M10"
-    M12 = "M12"
-    M15 = "M15"
-    M20 = "M20"
-    M30 = "M30"
-    H1 = "H1"
-    H2 = "H2"
-    H3 = "H3"
-    H4 = "H4"
-    H6 = "H6"
-    H8 = "H8"
-    H12 = "H12"
-    D1 = "D1"
-    W1 = "W1"
-    MN1 = "MN1"
 
     def to_seconds(self) -> int:
         """Convert timeframe duration to whole seconds."""
@@ -587,10 +378,3 @@ class Timeframe(StrEnum):
         if cleaned in mapping:
             return mapping[cleaned]
         raise ValueError(f"Unknown timeframe identifier: {name!r}")
-
-
-TIMEFRAME_SECONDS: dict[Timeframe, int] = {
-    frame: frame.to_seconds()
-    for frame in Timeframe
-    if frame != Timeframe.PERIOD_CURRENT
-}

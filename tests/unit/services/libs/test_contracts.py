@@ -17,13 +17,27 @@ Key Capabilities:
 
 from __future__ import annotations
 
-from app.services.libs import contracts
+from app.services.libs import contracts, enums
 from app.services.libs.contracts import (
+    BOOK_TYPE_DESCRIPTIONS,
+    DEAL_ENTRY_DESCRIPTIONS,
+    DEAL_TYPE_DESCRIPTIONS,
     MAX_POSITION,
     MAX_RECORDS,
+    ORDER_FILLING_DESCRIPTIONS,
+    ORDER_STATE_DESCRIPTIONS,
+    ORDER_TIME_DESCRIPTIONS,
+    ORDER_TYPE_DESCRIPTIONS,
+    POSITION_TYPE_DESCRIPTIONS,
     READ_TIMEOUT,
+    SYMBOL_CALC_MODE_DESCRIPTIONS,
+    SYMBOL_SWAP_MODE_DESCRIPTIONS,
+    SYMBOL_TRADE_EXECUTION_DESCRIPTIONS,
+    SYMBOL_TRADE_MODE_DESCRIPTIONS,
+    TIMEFRAME_SECONDS,
     AccountInfo,
     BookInfo,
+    BridgeEvent,
     ChartDef,
     DataInfo,
     DealInfo,
@@ -31,12 +45,15 @@ from app.services.libs.contracts import (
     MarketTick,
     OrderInfo,
     PositionInfo,
+    PropertyValue,
+    Receipt,
     SymbolAliasRecord,
     SymbolInfo,
     TerminalInfo,
     TradeCheckResult,
     TradeRequest,
     TradeResult,
+    TradingBackend,
 )
 from app.services.libs.enums import (
     AccountTradeMode,
@@ -44,9 +61,16 @@ from app.services.libs.enums import (
     DealEntry,
     DealType,
     MarginMode,
+    OrderFilling,
     OrderState,
+    OrderTime,
     OrderType,
     PositionType,
+    ReceiptStatus,
+    SymbolCalcMode,
+    SymbolSwapMode,
+    SymbolTradeExecution,
+    SymbolTradeMode,
     Timeframe,
     TradeAction,
     TradeRetcode,
@@ -303,7 +327,6 @@ def test_symbol_info_reconciled_serialization() -> None:
     )
     assert sym.symbol == "EURUSD"
     assert sym.name == "EURUSD"
-    assert sym.to_symbol_info() is sym
 
     data = sym.to_dict()
     assert data["symbol"] == "EURUSD"
@@ -335,8 +358,104 @@ def test_symbol_alias_record() -> None:
     }
 
 
-def test_zero_shims_invariant() -> None:
-    """Verify strict absence of legacy compatibility shims."""
+def test_bridge_contracts() -> None:
+    """Verify PropertyValue, Receipt, and BridgeEvent dataclasses."""
+    pv = PropertyValue(ok=True, value=123)
+    assert pv.ok is True
+    assert pv.value == 123
+    assert pv.error is None
+
+    rcpt = Receipt(
+        command_id="cmd-1",
+        object_id="obj-1",
+        class_name="Trading",
+        method_name="buy",
+        status=ReceiptStatus.RESOLVED,
+        created_at=1000.0,
+    )
+    assert rcpt.command_id == "cmd-1"
+    assert rcpt.status == ReceiptStatus.RESOLVED
+
+    ev = BridgeEvent(event_type="on_quote", payload={"bid": 1.105})
+    assert ev.event_type == "on_quote"
+    assert ev.payload["bid"] == 1.105
+
+
+class _MockBackend:
+    """Mock implementation satisfying TradingBackend protocol."""
+
+    async def start(self) -> None: ...
+    async def wait_connected(self, timeout: float | None = None) -> None: ...  # noqa: ASYNC109 -- backend deadline capability
+    async def close(self) -> None: ...
+    def arm(self) -> None: ...
+    def disarm(self) -> None: ...
+    def last_command_id(self) -> str | None:
+        return None
+
+    def receipt(self, command_id: str) -> Receipt | None:
+        return None
+
+    async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109 -- backend deadline capability
+        return BridgeEvent(event_type="", payload={})
+
+    async def await_request_event(
+        self,
+        request_id: int,
+        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline capability
+    ) -> BridgeEvent:
+        return BridgeEvent(event_type="", payload={})
+
+    async def call(
+        self,
+        *,
+        object_id: str,
+        class_name: str,
+        method_name: str,
+        args: list[object],
+        requires_arm: bool = False,
+        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline capability
+    ) -> object:
+        return None
+
+
+def test_trading_backend_protocol() -> None:
+    """Verify TradingBackend runtime checkable protocol."""
+    assert isinstance(_MockBackend(), TradingBackend)
+
+
+def test_description_mappings_and_timeframe_seconds() -> None:
+    """Verify description dictionaries and timeframe duration mapping in contracts."""
+    assert ORDER_TYPE_DESCRIPTIONS[OrderType.BUY] == "Buy"
+    assert ORDER_FILLING_DESCRIPTIONS[OrderFilling.FOK] == "Fill or Kill"
+    assert ORDER_TIME_DESCRIPTIONS[OrderTime.GTC] == "Good Till Cancelled"
+    assert BOOK_TYPE_DESCRIPTIONS[BookType.BOOK_TYPE_SELL] == "Sell"
+    assert POSITION_TYPE_DESCRIPTIONS[PositionType.BUY] == "Buy"
+    assert ORDER_STATE_DESCRIPTIONS[OrderState.FILLED] == "Filled"
+    assert DEAL_TYPE_DESCRIPTIONS[DealType.BUY] == "Buy"
+    assert DEAL_ENTRY_DESCRIPTIONS[DealEntry.IN] == "In"
+    assert SYMBOL_TRADE_MODE_DESCRIPTIONS[SymbolTradeMode.FULL] == "Full"
+    assert SYMBOL_TRADE_EXECUTION_DESCRIPTIONS[SymbolTradeExecution.MARKET] == "Market"
+    assert SYMBOL_SWAP_MODE_DESCRIPTIONS[SymbolSwapMode.POINTS] == "Points"
+    assert SYMBOL_CALC_MODE_DESCRIPTIONS[SymbolCalcMode.FOREX] == "Forex"
+
+    assert TIMEFRAME_SECONDS[Timeframe.PERIOD_M1] == 60
+    assert TIMEFRAME_SECONDS[Timeframe.PERIOD_H1] == 3600
+    assert Timeframe.PERIOD_CURRENT not in TIMEFRAME_SECONDS
+
+
+def test_enums_module_strictly_only_enums() -> None:
+    """Verify that app.services.libs.enums contains strictly Enum subclasses."""
+    from enum import Enum
+
+    for name in enums.__all__:
+        attr = getattr(enums, name)
+        assert isinstance(attr, type) and issubclass(attr, Enum), (
+            f"Non-enum found in enums.__all__: {name} ({attr})"
+        )
+
+
+def test_zero_shims_and_aliases_invariant() -> None:
+    """Verify strict absence of legacy compatibility shims and aliases."""
     legacy_shims = [
         "MqlBookInfo",
         "SymbolSpec",
@@ -349,8 +468,21 @@ def test_zero_shims_invariant() -> None:
         "DealSnapshot",
         "InstrumentInfo",
         "InstrumentAliasRecord",
+        "SWAP_MODE_DESCRIPTIONS",
     ]
     for shim in legacy_shims:
         assert not hasattr(contracts, shim), (
             f"Forbidden shim found in contracts: {shim}"
+        )
+        assert not hasattr(enums, shim), f"Forbidden shim found in enums: {shim}"
+
+    # Invariant: SymbolInfo and DataInfo have zero self-identity adapter shims
+    assert not hasattr(SymbolInfo, "to_symbol_info")
+    assert not hasattr(DataInfo, "to_data_info")
+
+    # Invariant: Timeframe has zero shorthand aliases
+    shorthands = ["M1", "M5", "H1", "H4", "D1", "W1", "MN1"]
+    for sh in shorthands:
+        assert sh not in Timeframe.__members__, (
+            f"Forbidden shorthand alias on Timeframe: {sh}"
         )

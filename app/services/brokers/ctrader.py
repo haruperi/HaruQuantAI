@@ -74,6 +74,8 @@ from app.services.brokers.base import BridgeError
 from app.services.libs.contracts import (
     AccountInfo,
     BookInfo,
+    BridgeEvent,
+    Receipt,
     SymbolInfo,
     TerminalInfo,
     TradeCheckResult,
@@ -83,12 +85,10 @@ from app.services.libs.contracts import (
 from app.services.libs.enums import (
     AccountTradeMode,
     BookType,
-    BridgeEvent,
     MarginMode,
     OrderFilling,
     OrderTime,
     OrderType,
-    Receipt,
     ReceiptStatus,
     TradeAction,
     TradeRetcode,

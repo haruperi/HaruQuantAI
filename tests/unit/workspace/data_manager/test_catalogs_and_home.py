@@ -137,7 +137,7 @@ def test_instruments_service_lifecycle(test_db_path: Path) -> None:
     assert eur is not None
     assert eur.decimals == 5
     assert eur.round_to_tick_size(1.085427) == 1.08543
-    info = eur.to_symbol_info()
+    info = eur
     assert info.name == "EURUSD"
     assert info.digits == 5
 

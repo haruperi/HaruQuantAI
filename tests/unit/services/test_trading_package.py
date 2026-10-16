@@ -49,13 +49,9 @@ class TestTradingPackageExports:
     """Verify package-level public exports and submodule parity."""
 
     def test_enums_exports_identity(self) -> None:
-        """Verify enum symbols and descriptions match between package and submodule."""
+        """Verify enum symbols match between package and enums submodule."""
         assert trading_pkg.ReceiptStatus is libs_enums.ReceiptStatus
         assert trading_pkg.TradeResolution is libs_enums.TradeResolution
-        assert trading_pkg.PropertyValue is libs_enums.PropertyValue
-        assert trading_pkg.Receipt is libs_enums.Receipt
-        assert trading_pkg.BridgeEvent is libs_enums.BridgeEvent
-        assert trading_pkg.TradingBackend is libs_enums.TradingBackend
         assert trading_pkg.AccountTradeMode is libs_enums.AccountTradeMode
         assert trading_pkg.StopoutMode is libs_enums.StopoutMode
         assert trading_pkg.MarginMode is libs_enums.MarginMode
@@ -73,41 +69,69 @@ class TestTradingPackageExports:
         assert trading_pkg.SymbolTradeExecution is libs_enums.SymbolTradeExecution
         assert trading_pkg.SymbolSwapMode is libs_enums.SymbolSwapMode
         assert trading_pkg.SymbolCalcMode is libs_enums.SymbolCalcMode
-        assert trading_pkg.ORDER_TYPE_DESCRIPTIONS is libs_enums.ORDER_TYPE_DESCRIPTIONS
-        assert (
-            trading_pkg.ORDER_FILLING_DESCRIPTIONS
-            is libs_enums.ORDER_FILLING_DESCRIPTIONS
-        )
-        assert trading_pkg.ORDER_TIME_DESCRIPTIONS is libs_enums.ORDER_TIME_DESCRIPTIONS
-        assert trading_pkg.BOOK_TYPE_DESCRIPTIONS is libs_enums.BOOK_TYPE_DESCRIPTIONS
-        assert (
-            trading_pkg.POSITION_TYPE_DESCRIPTIONS
-            is libs_enums.POSITION_TYPE_DESCRIPTIONS
-        )
-        assert (
-            trading_pkg.ORDER_STATE_DESCRIPTIONS is libs_enums.ORDER_STATE_DESCRIPTIONS
-        )
-        assert trading_pkg.DEAL_TYPE_DESCRIPTIONS is libs_enums.DEAL_TYPE_DESCRIPTIONS
-        assert trading_pkg.DEAL_ENTRY_DESCRIPTIONS is libs_enums.DEAL_ENTRY_DESCRIPTIONS
-        assert (
-            trading_pkg.SYMBOL_TRADE_MODE_DESCRIPTIONS
-            is libs_enums.SYMBOL_TRADE_MODE_DESCRIPTIONS
-        )
-        assert (
-            trading_pkg.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
-            is libs_enums.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
-        )
-        assert trading_pkg.SWAP_MODE_DESCRIPTIONS is libs_enums.SWAP_MODE_DESCRIPTIONS
-        assert (
-            trading_pkg.SYMBOL_CALC_MODE_DESCRIPTIONS
-            is libs_enums.SYMBOL_CALC_MODE_DESCRIPTIONS
-        )
 
     def test_contracts_exports_identity(self) -> None:
-        """Verify contract models match between package and contracts submodule."""
+        """Verify contract models, bridge types, and descriptions match between package and contracts."""
         assert trading_pkg.BookInfo is libs_contracts.BookInfo
         assert trading_pkg.AccountInfo is libs_contracts.AccountInfo
         assert trading_pkg.TerminalInfo is libs_contracts.TerminalInfo
+        assert trading_pkg.SymbolInfo is libs_contracts.SymbolInfo
+        assert trading_pkg.PositionInfo is libs_contracts.PositionInfo
+        assert trading_pkg.OrderInfo is libs_contracts.OrderInfo
+        assert trading_pkg.DealInfo is libs_contracts.DealInfo
+        assert trading_pkg.TradeRequest is libs_contracts.TradeRequest
+        assert trading_pkg.TradeResult is libs_contracts.TradeResult
+        assert trading_pkg.TradeCheckResult is libs_contracts.TradeCheckResult
+        assert trading_pkg.PropertyValue is libs_contracts.PropertyValue
+        assert trading_pkg.Receipt is libs_contracts.Receipt
+        assert trading_pkg.BridgeEvent is libs_contracts.BridgeEvent
+        assert trading_pkg.TradingBackend is libs_contracts.TradingBackend
+        assert (
+            trading_pkg.ORDER_TYPE_DESCRIPTIONS
+            is libs_contracts.ORDER_TYPE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.ORDER_FILLING_DESCRIPTIONS
+            is libs_contracts.ORDER_FILLING_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.ORDER_TIME_DESCRIPTIONS
+            is libs_contracts.ORDER_TIME_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.BOOK_TYPE_DESCRIPTIONS is libs_contracts.BOOK_TYPE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.POSITION_TYPE_DESCRIPTIONS
+            is libs_contracts.POSITION_TYPE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.ORDER_STATE_DESCRIPTIONS
+            is libs_contracts.ORDER_STATE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.DEAL_TYPE_DESCRIPTIONS is libs_contracts.DEAL_TYPE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.DEAL_ENTRY_DESCRIPTIONS
+            is libs_contracts.DEAL_ENTRY_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.SYMBOL_TRADE_MODE_DESCRIPTIONS
+            is libs_contracts.SYMBOL_TRADE_MODE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
+            is libs_contracts.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.SYMBOL_SWAP_MODE_DESCRIPTIONS
+            is libs_contracts.SYMBOL_SWAP_MODE_DESCRIPTIONS
+        )
+        assert (
+            trading_pkg.SYMBOL_CALC_MODE_DESCRIPTIONS
+            is libs_contracts.SYMBOL_CALC_MODE_DESCRIPTIONS
+        )
         assert trading_pkg.SymbolInfo is libs_contracts.SymbolInfo
         assert trading_pkg.PositionInfo is libs_contracts.PositionInfo
         assert trading_pkg.OrderInfo is libs_contracts.OrderInfo

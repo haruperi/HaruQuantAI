@@ -27,18 +27,13 @@ from app.workspace.data_manager import (
 class TestContractsTimeframe:
     """Verify Timeframe enum properties, calculations, and parsers."""
 
-    def test_timeframe_string_values_and_aliases(self) -> None:
-        """Verify enum string values and shorthand aliases match."""
+    def test_timeframe_string_values(self) -> None:
+        """Verify enum string values match."""
         assert Timeframe.PERIOD_M1.value == "M1"
-        assert Timeframe.M1.value == "M1"
         assert Timeframe.PERIOD_H1.value == "H1"
-        assert Timeframe.H1.value == "H1"
         assert Timeframe.PERIOD_D1.value == "D1"
-        assert Timeframe.D1.value == "D1"
         assert Timeframe.PERIOD_W1.value == "W1"
-        assert Timeframe.W1.value == "W1"
         assert Timeframe.PERIOD_MN1.value == "MN1"
-        assert Timeframe.MN1.value == "MN1"
 
     def test_to_seconds_and_to_minutes(self) -> None:
         """Verify seconds and minutes duration calculations across timeframes."""
@@ -341,27 +336,6 @@ class TestContractsSymbolInfo:
         assert inst.digits == 5
         assert inst.round_to_tick_size(1.085427) == 1.08543
         assert inst.round_to_tick_size(1.085422) == 1.08542
-
-    def test_symbol_info_to_symbol_info(self) -> None:
-        """Verify conversion to Tier 2 trading domain SymbolInfo."""
-        inst = SymbolInfo(
-            symbol="EURUSD",
-            trade_tick_size=0.00001,
-            digits=5,
-            trade_contract_size=100000.0,
-            trade_tick_value=10.0,
-            volume_min=0.01,
-            volume_max=100.0,
-            volume_step=0.01,
-            margin_initial=0.033,
-        )
-        spec = inst.to_symbol_info()
-        assert spec.name == "EURUSD"
-        assert spec.digits == 5
-        assert spec.point == 0.00001
-        assert spec.trade_contract_size == 100000.0
-        assert spec.volume_min == 0.01
-        assert spec.volume_max == 100.0
 
     def test_symbol_info_to_dict_and_from_dict(self) -> None:
         """Verify bidirectional serialization with dictionary payloads."""

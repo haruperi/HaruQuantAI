@@ -85,7 +85,8 @@ import pandas as pd  # type: ignore[import-untyped]
 import pyarrow as pa
 import pyarrow.parquet as pq
 from app.host.logging import get_logger
-from app.services.libs.enums import TIMEFRAME_SECONDS, Timeframe
+from app.services.libs.contracts import TIMEFRAME_SECONDS
+from app.services.libs.enums import Timeframe
 from app.services.libs.generators import RandomGenerator
 
 __all__ = [

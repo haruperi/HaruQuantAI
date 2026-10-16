@@ -5,6 +5,7 @@ from app.services.libs.contracts import (
     MAX_POSITION,
     MAX_RECORDS,
     READ_TIMEOUT,
+    TIMEFRAME_SECONDS,
     ChartDef,
     DataInfo,
     MarketBar,
@@ -13,7 +14,6 @@ from app.services.libs.contracts import (
     SymbolInfo,
 )
 from app.services.libs.enums import (
-    TIMEFRAME_SECONDS,
     Timeframe,
 )
 
