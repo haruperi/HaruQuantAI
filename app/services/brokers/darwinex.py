@@ -27,7 +27,7 @@ Python API Usage:
     ```python
     from app.services.brokers.darwinex import DarwinexBroker
     from app.workspace.data_manager.history import get_historical_bars
-    from app.workspace.data_manager.contracts import Timeframe
+    from app.workspace.data_manager import Timeframe
 
     broker = DarwinexBroker()
     bars = await get_historical_bars(broker, "EURUSD", Timeframe.PERIOD_D1, count=5)

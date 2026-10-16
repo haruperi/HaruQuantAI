@@ -49,7 +49,7 @@ from types import TracebackType
 from typing import TYPE_CHECKING, Any, Self
 
 if TYPE_CHECKING:
-    from app.workspace.data_manager.contracts import MarketTick
+    from app.workspace.data_manager import MarketTick
 
 from app.host.logging import get_logger
 from app.services.trading import (

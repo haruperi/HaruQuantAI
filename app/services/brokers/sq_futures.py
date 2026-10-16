@@ -26,7 +26,7 @@ Python API Usage:
     ```python
     from app.services.brokers.sq_futures import SQFuturesBroker
     from app.workspace.data_manager.history import get_historical_bars
-    from app.workspace.data_manager.contracts import Timeframe
+    from app.workspace.data_manager import Timeframe
 
     broker = SQFuturesBroker()
     bars = await get_historical_bars(broker, "@ES", Timeframe.PERIOD_D1, count=5)

@@ -24,7 +24,7 @@ Python API Usage:
     ```python
     from app.services.brokers.crypto import BinanceBroker
     from app.workspace.data_manager.history import get_historical_bars, get_ticks
-    from app.workspace.data_manager.contracts import Timeframe
+    from app.workspace.data_manager import Timeframe
 
     broker = BinanceBroker()
     bars = await get_historical_bars(broker, "BTCUSDT", Timeframe.PERIOD_H1, count=5)
@@ -56,7 +56,7 @@ from app.services.brokers.capabilities import (
     ProviderValidationError,
 )
 from app.services.trading import SymbolSnapshot
-from app.workspace.data_manager.contracts import Timeframe
+from app.workspace.data_manager import Timeframe
 from app.workspace.data_manager.history import DataBrokerBackend
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry

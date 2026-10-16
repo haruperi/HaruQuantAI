@@ -4,16 +4,21 @@ from __future__ import annotations
 
 import pytest
 from app.services.brokers.base import BridgeError as BaseBridgeError
-from app.workspace.data_manager.contracts import (
+from app.workspace.data_manager import (
     MAX_POSITION,
     MAX_RECORDS,
+    MAX_UNDERLYING_DISPLAY_LEN,
     READ_TIMEOUT,
     TIMEFRAME_SECONDS,
+    TRUNCATE_LEN,
     BridgeError,
+    ChartDef,
+    DataInfo,
     MarketBar,
     MarketTick,
     Timeframe,
-    main,
+    format_dataset_table,
+    format_home_dashboard,
 )
 
 
@@ -211,7 +216,7 @@ class TestContractsMarketTick:
 
 
 class TestContractsConstantsAndReexports:
-    """Verify boundary limits, bridge error re-export, and main demonstration."""
+    """Verify boundary limits, bridge error re-export, and DataInfo export."""
 
     def test_constants_and_bridge_error(self) -> None:
         """Verify boundary constants and BridgeError identity."""
@@ -220,10 +225,99 @@ class TestContractsConstantsAndReexports:
         assert READ_TIMEOUT == 60.0
         assert BridgeError is BaseBridgeError
 
-    def test_main_demonstration(self, capsys: pytest.CaptureFixture[str]) -> None:
-        """Verify that contracts main() executes and prints expected diagnostics."""
-        main()
-        captured = capsys.readouterr().out
-        assert "Timeframe: M1" in captured
-        assert "Bar: bullish=True" in captured
-        assert "Tick: mid=" in captured
+    def test_datainfo_contract(self) -> None:
+        """Verify DataInfo is exported from contracts and initializes cleanly."""
+        info = DataInfo(symbol="EURUSD", timeframe="M1", bars=100)
+        assert info.symbol == "EURUSD"
+        assert info.timeframe == "M1"
+        assert info.bars == 100
+        assert info.total_records == 100
+        assert info.data_type == "Forex"
+
+    def test_chart_def_contract(self) -> None:
+        """Verify ChartDef is exported from contracts and initializes cleanly."""
+        chart = ChartDef(symbol="EURUSD", timeframe="M1", connection_name="dukascopy")
+        assert chart.symbol == "EURUSD"
+        assert chart.timeframe == "M1"
+        assert chart.timeframe_seconds == 60
+        assert chart.connection_name == "dukascopy"
+        assert chart.is_symbol_recognized()
+        # Verify DataInfo.to_chart_def() interoperability
+        info = DataInfo(symbol="EURUSD", timeframe="M1", connection="dukascopy")
+        converted = info.to_chart_def()
+        assert isinstance(converted, ChartDef)
+        assert converted.symbol == "EURUSD"
+        assert converted.connection_name == "dukascopy"
+
+
+class TestFormatters:
+    """Verify dataset table and home dashboard standalone formatters."""
+
+    def test_format_dataset_table_and_truncation(self) -> None:
+        """Verify format_dataset_table renders correctly and truncates long underlying."""
+        short_ds = DataInfo(
+            symbol="EURUSD",
+            instrument="Forex",
+            broker="dukascopy",
+            underlying="EUR/USD",
+            timeframe="M1",
+            timezone="UTC",
+            date_from="2025-01-01",
+            date_to="2025-01-02",
+            total_days=1,
+            total_records=1440,
+            source="file",
+            data_type="Forex",
+        )
+        long_ds = DataInfo(
+            symbol="LONG_SYM",
+            instrument="Crypto",
+            broker="binance",
+            underlying="VERY_LONG_UNDERLYING_NAME_THAT_EXCEEDS_MAX_LENGTH",
+            timeframe="H1",
+            timezone="UTC",
+            date_from="2025-01-01",
+            date_to="2025-01-02",
+            total_days=1,
+            total_records=24,
+            source="api",
+            data_type="Crypto",
+        )
+        rendered = format_dataset_table([short_ds, long_ds])
+        assert "=== Saved Datasets Catalog (2 items) ===" in rendered
+        assert "EURUSD" in rendered
+        assert "EUR/USD" in rendered
+        assert "VERY_LONG_UNDERLYING_NAME_THAT" in rendered
+        assert ".." in rendered
+        assert MAX_UNDERLYING_DISPLAY_LEN == 32
+        assert TRUNCATE_LEN == 30
+
+    def test_format_home_dashboard_mapping_and_object(self) -> None:
+        """Verify format_home_dashboard renders summary block with mapping or object."""
+        ds = DataInfo(symbol="AAPL", timeframe="D1", bars=250)
+        overview_dict = {
+            "datasets_count": 5,
+            "total_bars": 100000,
+            "instruments_count": 12,
+            "sessions_count": 3,
+            "baskets_count": 2,
+            "active_providers_count": 4,
+        }
+        rendered_map = format_home_dashboard(overview_dict, [ds])
+        assert "=== Data Manager Home: Live Database Overview ===" in rendered_map
+        assert "Total Datasets:       5" in rendered_map
+        assert "Historical Bars:      100,000" in rendered_map
+        assert "Instruments Catalog:  12" in rendered_map
+        assert "AAPL" in rendered_map
+
+        class _MockOverview:
+            datasets_count = 1
+            total_bars = 500
+            instruments_count = 2
+            sessions_count = 1
+            baskets_count = 0
+            active_providers_count = 1
+
+        rendered_obj = format_home_dashboard(_MockOverview(), [ds])
+        assert "Total Datasets:       1" in rendered_obj
+        assert "Historical Bars:      500" in rendered_obj

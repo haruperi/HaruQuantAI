@@ -1,56 +1,60 @@
 """Data Manager workspace package re-exporting primary services and models."""
 
-from app.workspace.data_manager.actions.review.quality import (
+from ._common import (
+    MAX_POSITION,
+    MAX_RECORDS,
+    MAX_UNDERLYING_DISPLAY_LEN,
+    READ_TIMEOUT,
+    TIMEFRAME_SECONDS,
+    TRUNCATE_LEN,
+    BridgeError,
+    ChartDef,
+    DataInfo,
+    MarketBar,
+    MarketTick,
+    Timeframe,
+    format_dataset_table,
+    format_home_dashboard,
+)
+from .actions.review.quality import (
     DataQualityInspector,
     QualityAnomaly,
     QualityReport,
 )
-from app.workspace.data_manager.actions.transform.transforms import (
+from .actions.transform.transforms import (
     CloneTimezoneConfig,
     ResampleConfig,
     SeriesTransformer,
 )
-from app.workspace.data_manager.baskets import (
+from .baskets import (
     BasketDefinition,
     BasketMember,
     BasketOverviewItem,
     BasketsCatalogService,
 )
-from app.workspace.data_manager.broker import (
+from .broker import (
     BrokerProfileRecord,
     BrokerProfilesService,
     XmlOverviewItem,
 )
-from app.workspace.data_manager.connections import (
+from .connections import (
     BaseDataProvider,
     DownloadJobResult,
     ProviderConnectionsService,
     ProviderConnectionStatus,
 )
-from app.workspace.data_manager.contracts import (
-    MAX_POSITION,
-    MAX_RECORDS,
-    READ_TIMEOUT,
-    TIMEFRAME_SECONDS,
-    BridgeError,
-    MarketBar,
-    MarketTick,
-    Timeframe,
-)
-from app.workspace.data_manager.custom_data import (
+from .custom_data import (
     CustomDataService,
     ExternalIndicatorDefinition,
     ExternalIndicatorLine,
     ExternalIndicatorRecord,
 )
-from app.workspace.data_manager.data import (
+from .data import (
     ChartBarSlice,
-    ChartDef,
-    DataInfo,
     DataManagerDataService,
     ExportArtifactResult,
 )
-from app.workspace.data_manager.generation import (
+from .generation import (
     PHASE_CLOSE_CODE,
     PHASE_HIGH_CODE,
     PHASE_LOW_CODE,
@@ -68,12 +72,12 @@ from app.workspace.data_manager.generation import (
     generate_ticks,
     generate_ticks_to_parquet,
 )
-from app.workspace.data_manager.help import (
+from .help import (
     DataManagerHelpService,
     HelpFaqItem,
     HelpTopic,
 )
-from app.workspace.data_manager.history import (
+from .history import (
     BAR_COLUMNS,
     TICK_COLUMNS,
     DataBackend,
@@ -87,40 +91,38 @@ from app.workspace.data_manager.history import (
     validate_request,
     validate_rows,
 )
-from app.workspace.data_manager.home import (
-    DataHomeCLI,
-    DataHomeDashboard,
-    DataHomeService,
-    DataHomeSummary,
+from .home import (
+    Home,
+    HomeCLI,
 )
-from app.workspace.data_manager.instruments import (
+from .instruments import (
     InstrumentAliasRecord,
     InstrumentInfo,
     InstrumentsCatalogService,
 )
-from app.workspace.data_manager.log import (
+from .log import (
     DataManagerLogEntry,
     DataManagerLogService,
     OperationLogEntry,
 )
-from app.workspace.data_manager.routes import (
+from .routes import (
     DataManagerWorkspace,
     create_data_manager_router,
 )
-from app.workspace.data_manager.series import (
+from .series import (
     DataSeries,
     DataSeriesTypes,
     MedianDataSeries,
     TypicalDataSeries,
     WeightedDataSeries,
 )
-from app.workspace.data_manager.sessions import (
+from .sessions import (
     SessionsCatalogService,
     SessionWindow,
     TradingHoliday,
     TradingSession,
 )
-from app.workspace.data_manager.simulation import (
+from .simulation import (
     DefaultTickSimulator,
     ITickSimulator,
     SpreadsMap,
@@ -132,6 +134,7 @@ __all__ = [
     "BAR_COLUMNS",
     "MAX_POSITION",
     "MAX_RECORDS",
+    "MAX_UNDERLYING_DISPLAY_LEN",
     "PHASE_CLOSE_CODE",
     "PHASE_HIGH_CODE",
     "PHASE_LOW_CODE",
@@ -148,6 +151,7 @@ __all__ = [
     "TICK_MODEL_REAL",
     "TICK_MODEL_TRADING_BAR",
     "TIMEFRAME_SECONDS",
+    "TRUNCATE_LEN",
     "BaseDataProvider",
     "BasketDefinition",
     "BasketMember",
@@ -162,10 +166,6 @@ __all__ = [
     "CustomDataService",
     "DataBackend",
     "DataBrokerBackend",
-    "DataHomeCLI",
-    "DataHomeDashboard",
-    "DataHomeService",
-    "DataHomeSummary",
     "DataInfo",
     "DataManagerDataService",
     "DataManagerHelpService",
@@ -183,6 +183,8 @@ __all__ = [
     "ExternalIndicatorRecord",
     "HelpFaqItem",
     "HelpTopic",
+    "Home",
+    "HomeCLI",
     "ITickSimulator",
     "InstrumentAliasRecord",
     "InstrumentInfo",
@@ -212,6 +214,8 @@ __all__ = [
     "bars_to_dataframe",
     "bars_to_df",
     "create_data_manager_router",
+    "format_dataset_table",
+    "format_home_dashboard",
     "generate_ticks",
     "generate_ticks_to_parquet",
     "get_historical_bars",

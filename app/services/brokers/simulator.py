@@ -78,7 +78,7 @@ from app.services.trading import (
     TradeResult,
     TradeRetcode,
 )
-from app.workspace.data_manager.contracts import (
+from app.workspace.data_manager import (
     MarketBar,
     MarketTick,
     Timeframe,
@@ -1407,7 +1407,7 @@ class SimulationBackend(BrokerBackend):
         bars: Sequence[MarketBar],
     ) -> None:
         """Register an immutable chronological bar series without advancing time."""
-        from app.workspace.data_manager.contracts import TIMEFRAME_SECONDS
+        from app.workspace.data_manager import TIMEFRAME_SECONDS
         from app.workspace.data_manager.history import validate_rows
 
         logger.debug("FR-SIMULATION-HISTORY: seeding bars")
@@ -1429,7 +1429,7 @@ class SimulationBackend(BrokerBackend):
         self._tick_history[symbol] = tuple(ticks)
 
     def _market_data(self, method: str, args: list[Any]) -> list[dict[str, Any]]:
-        from app.workspace.data_manager.contracts import MAX_POSITION
+        from app.workspace.data_manager import MAX_POSITION
         from app.workspace.data_manager.history import validate_request
 
         logger.debug("FR-SIMULATION-HISTORY: reading seeded history")

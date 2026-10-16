@@ -92,7 +92,7 @@ from app.services.trading import (
     TradeRetcode,
     Trading,
 )
-from app.workspace.data_manager.contracts import MarketTick
+from app.workspace.data_manager import MarketTick
 
 logger = get_logger(__name__)
 

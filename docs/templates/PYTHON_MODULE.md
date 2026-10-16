@@ -1,181 +1,152 @@
-# Standard Python Module Docstring and Logging Specification
+# Standard Python Feature Module Specification
 
-> **Authority:** This document defines the mandatory repository-wide standard for top-of-file module docstrings and functional requirement (FR) logging.
-> **Canonical Implementation:** `app/host/bootstrap.py`
-> **Constitutional Mandate:** `AGENTS.md` Section 4 & `docs/ARCHITECTURE.md` Section 8.
+> **Authority:** Mandatory repository-wide standard for Python feature and service
+> modules.
+> **Constitutional Mandate:** `AGENTS.md` Section 2.
+> **Clean-Room Brand Invariant:** Under clean-room implementation rules, no
+> third-party brand names or proprietary acronyms (e.g., StrategyQuant, SQX, etc.)
+> may appear anywhere in code, comments, docstrings, constants, or identifiers.
+> **Exclusions:** Pure contracts (`_common.py`), package facades (`__init__.py`),
+> unit/integration tests, and non-feature helper libraries.
 
 ---
 
-## 1. Top-of-File Module Docstring Structure
+## Canonical Python Feature Module Template
 
-Every Python source file in the repository (excluding empty/docstring-only `__init__.py` files) must begin with a comprehensive module docstring containing a concise summary line, a blank line, and exactly five standardized sections formatted as follows:
+All sections, docstrings, exports, classes, and architectural invariants are
+demonstrated below in a single self-documenting template:
 
 ```python
 """[Concise Single-Line Module Summary Ending With A Period].
 
 Description:
-    [Business logic description: Explain why this file exists, its role within the
-    broader quantitative or host system, its external relations and workflows with
-    other files/subsystems, and the internal coordination/flow between classes and
-    functions declared within this file.]
+    [Business logic description: System rationale, architectural role, external
+    relations/workflows with other subsystems, and internal flow between classes.
+    Clean-room invariant: Zero references to third-party brand names or acronyms
+    (e.g., StrategyQuant, SQX, etc.) in docstrings, comments, or code.]
 
 Purpose:
-    [Feature identifier and technical feature scope. Follow the feature naming
-    convention: FEAT-<SUBSYSTEM>-<NAME> (e.g. FEAT-HOST-BOOT, FEAT-DATA-DUKASCOPY).]
+    [Feature identifier and scope: FEAT-<SUBSYSTEM>-<NAME> (e.g. FEAT-DATAMGR-HOME).]
 
 Key Capabilities:
-    - FR-<SUBSYSTEM>-<CAPABILITY-SLUG>: [Descriptive capability summary]
-      Associated: `[Class.method()]`, `[function()]`
-      Logging: [Explicit description of the log emission when this requirement fires.
-      NO functional requirement may run silently; every firing or lifecycle transition
-      must be logged with appropriate severity (DEBUG, INFO, WARNING, ERROR).]
+    - FR-<SUBSYSTEM>-<NAME>-<CAPABILITY>: [Descriptive semantic summary]
+      Associated: `[Feature.method()]`
+      Logging: [Explicit log level (DEBUG, INFO, WARNING, ERROR) and payload.
+      NO functional requirement may execute silently.]
 
 Python API Usage:
     ```python
-    [Self-contained Python code snippet illustrating typical imports, instantiation,
-    invocation of public methods, and cleanup.]
+    from app.domain.feature import Feature, FeatureCLI
+
+    service = Feature()
+    result = service.execute_task()
+    print(FeatureCLI.format_output(result))
     ```
 
 CLI Usage:
-    [Self-contained shell commands showing how this feature or its enclosing
-    entrypoint is executed externally via the command line.]
     ```bash
-    [CLI command examples]
+    uv run python -m app.domain.feature
     ```
 """
-```
 
----
+from __future__ import annotations
 
-## 2. Detailed Section Rules
-
-### 2.1 Description (Business Logic vs Technical Detail)
-
-- **Why this file exists:** State the system rationale, architectural role, and domain responsibility.
-- **External relations (workflows):** Detail how external components interact with this file during key application flows (e.g., startup sequence, data acquisition flow, strategy execution graph, websocket streaming).
-- **Internal relationship of functions:** Describe how functions and classes inside this file coordinate with each other (e.g., state machines, coordinators, helper dispatch).
-
-### 2.2 Purpose (Feature Tracking)
-
-- Follow the feature naming convention: `FEAT-<SUBSYSTEM>-<CONCEPT>` (e.g., `FEAT-HOST-BOOT`, `FEAT-HOST-SESSION`, `FEAT-HOST-TRANSPORT`, `FEAT-DATA-DUKASCOPY`).
-- Do not use arbitrary numbers (e.g., avoid `FEAT-001`). Use uppercase kebab-case tokens representing subsystem and concept.
-- Provide a 2–3 sentence operational summary of the feature.
-
-### 2.3 Key Capabilities (Functional Requirements & Non-Silent Logging)
-
-- **Descriptive Labels (No Numbers):** Functional requirements must use descriptive semantic labels matching the feature naming convention, e.g., `FR-HOST-BOOT-STAGE-PROGRESSION`, `FR-HOST-BOOT-LIFECYCLE-HOOKS`, `FR-HOST-BOOT-CLIENT-HANDSHAKE`. **Never use sequential numbers like `FR-BOOT-001` or `FR-002`**.
-- **Traceability:** Explicitly link each capability to the concrete class methods or functions implementing it (`Associated: ...`).
-- **Non-Silent Logging Invariant:**
-  - **No functional requirement may execute silently.**
-  - Every time a functional requirement is triggered, executes work, or transitions state, a structured log event must be emitted using the module's `logger = get_logger(__name__)`.
-  - The docstring must document the exact log level (`DEBUG`, `INFO`, `WARNING`, `ERROR`), message intent, and structured attributes emitted.
-
-#### Centralized Logger Requirement
-
-- Every Python module covered by this specification must import the centralized
-  logger factory and create its module-level logger using exactly this pattern:
-
-  ```python
-  from app.host.logging import get_logger
-
-  # After all imports and the module's __all__ declaration:
-  logger = get_logger(__name__)
-  ```
-- Place the import with the other imports, keep `__all__` immediately after all
-  imports, and initialize `logger` after `__all__`, before feature code.
-- Emit module logs through this `logger`. Consuming modules must not import the
-  standard-library `logging` module, call `logging.getLogger()`, use direct
-  standard-library logging calls, or substitute another logger provider.
-- Keep `logger` and the imported `get_logger` internal rather than re-exporting
-  them. Logging configuration belongs to the host lifecycle; consuming modules
-  must not configure handlers or perform hidden logging setup except if its a special case and logger re-configration is needed.
-- The centralized provider, `app/host/logging.py`, may use standard-library
-  logging internally to implement this capability and must not import itself.
-  Empty or docstring-only `__init__.py` files retain their existing exemption.
-
-### 2.4 Python API Usage
-
-- Provide a clean, copy-pasteable Python snippet demonstrating how peer modules or test harnesses import and invoke this module's public interfaces.
-- Show configuration, async execution (if applicable), and resource cleanup.
-
-### 2.5 CLI Usage
-
-- Show practical command-line invocations via `uv run python -m ...` demonstrating direct execution, entrypoint flags, or CLI utility commands.
-- Include the command that runs this module's executable `main()` demonstration.
-
-### 2.6 Executable Real-Usage Demonstration
-
-- Every Python source file covered by this specification must define a typed
-  `main()` function and invoke it through an `if __name__ == "__main__":` guard.
-  Empty or docstring-only `__init__.py` files retain their existing exemption.
-- The executable `main()` block must demonstrate real usage of the feature
-  implemented in that file by calling its actual functions or classes with
-  representative inputs; placeholders and mock-only demonstrations do not qualify.
-- Show the required configuration, async execution where applicable, and resource
-  cleanup. Follow the existing logging rules for every triggered capability.
-- Keep the docstring's Python API and CLI usage examples consistent with this
-  runnable demonstration. Importing the module must not run the demonstration. Don't use logger in the `main()` of usage demonstration, use `print()`.
-
----
-
-## 3. Public Module Exports (`__all__`)
-
-1. **Placement:** Declare a static `__all__` immediately after all imports and
-   before constants, instance creation, functions, classes, or other module code.
-   List exported names as strings so their definitions can appear later.
-2. **Minimal core API:** Export only essential interfaces, preferably matching
-   documented functional requirements. The number of exported names must not
-   exceed the module's documented FR count: five FRs allow at most five exports,
-   and fewer are preferred. Do not invent FRs to justify additional exports.
-   Defining a class does not automatically make it part of the public API.
-3. **Prefer suitable shared instances:** Where a shared read-only interface makes
-   sense, export an instantiated variable such as `settings = HostSettings()`
-   instead of the class. Consumers can then import `settings` and access its
-   attributes with dot notation. Use this pattern only when initialization is safe
-   at import time and one shared instance fits the feature's ownership model.
-   Export a class or factory when callers need independent configuration, mutable
-   state, or explicit lifecycle ownership. Instantiation alone does not make an
-   object's attributes read-only; enforce that property in the implementation.
-4. **Internal implementation:** Keep helpers, implementation classes, imported
-   dependencies, and demonstration-only `main()` out of `__all__` unless they are
-   necessary core interfaces. Prefer underscore prefixes for internal definitions.
-   Use an empty `__all__` when the module has no public API. `__all__` declares the
-   supported API; it does not prevent direct access to other module attributes.
-5. **Explicit and consistent names:** Each export must be unique and resolve to an
-   actual module attribute. Avoid dynamic mutation of `__all__`, wildcard imports,
-   and incidental re-exports of dependencies. Keep Python API usage examples
-   aligned with the declared exports.
-
-Illustrative excerpt from `settings.py` (the full module must also satisfy the
-docstring, logging, and executable demonstration requirements):
-
-```python
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from typing import Any
 
 from app.host.logging import get_logger
 
-__all__ = ["settings"]
+# Domain-internal models and contracts imported from relative _common
+from ._common import DomainContract
 
+# 1. Public Exports: Export ONLY the main service class and optional CLI class.
+# Never export internal _Config, logger, helpers, or external dependencies.
+__all__ = [
+    "Feature",
+    "FeatureCLI",
+]
+
+# 2. Centralized Logger: Consuming modules must not import standard logging.
 logger = get_logger(__name__)
 
 
+# 3. Internal Module Settings Config: Standardized naming convention `_Config`.
+# Strictly private to this file (prefixed with _), holds parameters/metrics.
+# Never exported in __all__ or imported by external modules.
 @dataclass(frozen=True)
-class _HostSettings:
-    """Hold shared read-only host settings."""
+class _Config:
+    """Internal module configuration and execution parameters."""
 
-    environment: str = "development"
+    timeout_seconds: int = 30
+    batch_size: int = 100
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert internal config or metrics to standard dictionary."""
+        return {
+            "timeout_seconds": self.timeout_seconds,
+            "batch_size": self.batch_size,
+        }
 
 
-settings = _HostSettings()
+# 4. Main Feature Service Class: Named identically to file basename in PascalCase.
+# (e.g., class Home: for home.py, class Data: for data.py).
+class Feature:
+    """Service implementing core business logic for this feature."""
+
+    def __init__(self, config: _Config | None = None) -> None:
+        """Initialize service with optional internal configuration."""
+        self._config = config or _Config()
+
+    # 1:1 Mapping: Exactly one public method per functional requirement (FR-*).
+    # If a file declares 5 FRs, it must contain exactly 5 public methods.
+    # No extraneous public helper methods on the service class.
+    def execute_task(self) -> dict[str, Any]:
+        """Execute core functional requirement."""
+        self._validate_prerequisites()
+        # No functional requirement may execute silently. Every FR must be logged.
+        # To state what the function did, we use a f-string if there is values to show.
+        logger.info(f"State what the function did (add any params if needed)")
+        return self._config.to_dict()
+
+    # Helper methods: MUST always be prefixed with a leading underscore `_*`.
+    # Deduplication hierarchy:
+    # - If duplicated within this domain folder -> move to <domain>/_common.py
+    # - If duplicated across different domains -> move to app/services/libs/
+    def _validate_prerequisites(self) -> None:
+        """Private internal helper method validating execution prerequisites."""
+        return None
+
+
+# 6. CLI Class (Optional): Headless CLI formatter for app/cli.py and main demo.
+#  Replace the `Feature` of FeatureCLI with the filename just like #5
+class FeatureCLI:
+    """Headless CLI formatter and table presentation helper."""
+
+    @classmethod
+    def format_output(cls, data: Mapping[str, Any]) -> str:
+        """Format data into human-readable terminal output e.g tables, key-value pairs."""
+        logger.debug("Any necessary info")
+        lines = [f"{k}: {v}" for k, v in data.items()]
+        return "\n".join(lines)
+
+
+# 7. Executable Demonstration: Real-usage demonstration using `print()` (not logger).
+if __name__ == "__main__":
+    """Demonstrate real usage of the feature."""
+    service = Feature()
+    output = service.execute_task()
+    print(FeatureCLI.format_output(output))
 ```
-
-Consumers use `from settings import settings`, then `settings.environment`.
-The implementation class stays internal; only the shared instance is exported.
 
 ---
 
-## 4. Formatting & Linter Rules
+## Formatting, Clean-Room & Linter Rules
 
-1. **Line Length:** Strictly $\le 88$ characters per line. Indented text, code blocks, and list items must wrap cleanly to avoid `line-too-long` violations under `ruff`.
-2. **Indentation:** Four spaces for section bodies and list items; two additional spaces for nested metadata (`Associated:`, `Logging:`).
-3. **Markdown Syntax in Docstrings:** Use backticks for symbols, parameters, and classes. Enclose Python snippets in `` ```python `` and CLI commands in `` ```bash ``.
+- **Clean-Room Brand Prohibition:** Zero references to third-party proprietary
+  brands, trademarks, or acronyms (e.g., StrategyQuant, SQX) in comments,
+  docstrings, constants, string literals, or identifiers.
+- **Line Length:** Strictly $\le 88$ characters per line under `ruff`.
+- **Docstrings:** Google-style docstrings with four-space indentation.
+- **Typing:** Strict Mypy compliance with all public arguments and return types
+  explicitly annotated.

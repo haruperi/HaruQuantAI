@@ -53,7 +53,7 @@ from app.services.brokers import (
     YahooBroker,
 )
 from app.services.trading import SymbolSpec
-from app.workspace.data_manager.contracts import (
+from app.workspace.data_manager import (
     MarketBar,
     MarketTick,
     Timeframe,

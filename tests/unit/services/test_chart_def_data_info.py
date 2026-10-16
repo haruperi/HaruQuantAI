@@ -26,8 +26,7 @@ CLI Usage:
 
 from __future__ import annotations
 
-from app.workspace.data_manager import ChartDef, DataInfo
-from app.workspace.data_manager.contracts import Timeframe
+from app.workspace.data_manager import ChartDef, DataInfo, Timeframe
 from app.workspace.data_manager.data import (
     ChartDef as ModuleChartDef,
 )
@@ -324,14 +323,53 @@ class TestDataInfo:
             bar_time_type=0,
             remove_weekends=False,
             show=True,
+            category="Crypto",
         )
         d = info.to_dict()
         assert isinstance(d, dict)
         assert d["symbol"] == "BTCUSD"
         assert d["rows"] == 1000
+        assert d["total_records"] == 1000
+        assert d["data_type"] == "Crypto"
 
         restored = DataInfo.from_dict(d)
         assert restored == info
+
+    def test_total_records_and_data_type_sync(self) -> None:
+        """Verify automatic synchronization of total_records with bars and data_type with category."""
+        # 1. Total records initialized from bars
+        info1 = DataInfo(symbol="EURUSD", bars=250, category="Forex")
+        assert info1.total_records == 250
+        assert info1.rows == 250
+        assert info1.data_type == "Forex"
+
+        # 2. Bars initialized from total_records
+        info2 = DataInfo(symbol="GBPUSD", total_records=500, data_type="Crypto")
+        assert info2.bars == 500
+        assert info2.rows == 500
+        assert info2.category == "Crypto"
+
+        # 3. Explicit total_records preserved
+        info3 = DataInfo(symbol="USDJPY", total_records=100)
+        assert info3.total_records == 100
+        assert info3.bars == 100
+
+    def test_from_row_with_total_records_and_data_type(self) -> None:
+        """Verify DataInfo.from_row populates total_records and data_type accurately."""
+        row = {
+            "id": "file:EURUSD",
+            "symbol": "EURUSD",
+            "timeframe": "M1",
+            "category": "Forex",
+            "bars": 1200,
+            "source": "file",
+        }
+        info = DataInfo.from_row(row)
+        assert info.bars == 1200
+        assert info.rows == 1200
+        assert info.total_records == 1200
+        assert info.category == "Forex"
+        assert info.data_type == "Forex"
 
 
 class TestPackageReExports:

@@ -1,6 +1,6 @@
 """Quality review actions for the Data Manager."""
 
-from app.workspace.data_manager.actions.review.quality import (
+from .quality import (
     DataQualityInspector,
     QualityAnomaly,
     QualityReport,

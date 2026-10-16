@@ -31,8 +31,8 @@ from app.services.trading import (
     SymbolSnapshot,
     TerminalSnapshot,
 )
-from app.workspace.data_manager import DataBrokerBackend
-from app.workspace.data_manager.contracts import (
+from app.workspace.data_manager import (
+    DataBrokerBackend,
     MarketBar,
     MarketTick,
 )

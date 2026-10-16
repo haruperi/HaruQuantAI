@@ -297,19 +297,19 @@ class HeadlessCliRunner:
         if dm is None:
             raise RuntimeError("DataManagerWorkspace is not initialized.")
 
-        from app.workspace.data_manager.home import DataHomeCLI
+        from app.workspace.data_manager import HomeCLI
 
         act = action.strip().lower()
         res: dict[str, Any]
         if act in ("home", "overview", "dashboard", "list", "status"):
             overview = dm.home.get_overview()
             saved_datasets = dm.home.get_saved_datasets()
-            rendered = DataHomeCLI.format_home_dashboard(overview, saved_datasets)
+            rendered = HomeCLI.format_home_dashboard(overview, saved_datasets)
             res = {
                 "command": "data",
                 "action": "home",
                 "rendered": rendered,
-                "overview": overview.to_dict(),
+                "overview": overview,
                 "saved_datasets": [ds.to_dict() for ds in saved_datasets],
             }
         elif act in ("datasets", "dataset"):

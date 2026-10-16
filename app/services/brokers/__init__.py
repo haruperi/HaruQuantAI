@@ -79,7 +79,7 @@ if TYPE_CHECKING:
         TradeResult,
         TradingBackend,
     )
-    from app.workspace.data_manager.contracts import (
+    from app.workspace.data_manager import (
         MarketBar,
         MarketTick,
         Timeframe,
@@ -158,9 +158,9 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
         "ProviderValidationError",
     ),
     "SymbolSpec": ("app.services.trading", "SymbolSpec"),
-    "MarketBar": ("app.workspace.data_manager.contracts", "MarketBar"),
-    "MarketTick": ("app.workspace.data_manager.contracts", "MarketTick"),
-    "Timeframe": ("app.workspace.data_manager.contracts", "Timeframe"),
+    "MarketBar": ("app.workspace.data_manager", "MarketBar"),
+    "MarketTick": ("app.workspace.data_manager", "MarketTick"),
+    "Timeframe": ("app.workspace.data_manager", "Timeframe"),
     "AccountSnapshot": ("app.services.trading", "AccountSnapshot"),
     "BridgeEvent": ("app.services.trading", "BridgeEvent"),
     "DealSnapshot": ("app.services.trading", "DealSnapshot"),

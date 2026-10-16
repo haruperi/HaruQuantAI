@@ -13,33 +13,23 @@ Purpose:
 
 Key Capabilities:
     - FR-DATAMGR-HOME-OVERVIEW: Compute aggregate counts across database catalogs.
-      Associated: `DataHomeService.get_overview()`
+      Associated: `Home.get_overview()`
       Logging: Emits INFO on overview computation with summary numbers.
     - FR-DATAMGR-HOME-DATASETS-CATALOG: Retrieve saved datasets catalog for display.
-      Associated: `DataHomeService.get_saved_datasets()`
+      Associated: `Home.get_saved_datasets()`
       Logging: Emits DEBUG when listing saved dataset catalog entries.
-    - FR-DATAMGR-HOME-SUMMARY: Structured representation of home overview metrics.
-      Associated: `DataHomeSummary.to_dict()`
-      Logging: Emits DEBUG when converting summary metric items.
-    - FR-DATAMGR-HOME-DASHBOARD: Structured representation of saved dataset items.
-      Associated: `DataHomeDashboard.to_dict()`
-      Logging: Emits DEBUG when converting dataset dashboard items.
-    - FR-DATAMGR-HOME-CLI: Headless CLI formatting and table rendering.
-      Associated: `DataHomeCLI.format_dataset_table()`,
-      `DataHomeCLI.format_home_dashboard()`
-      Logging: Emits DEBUG when formatting dashboard or ASCII tables.
 
 Python API Usage:
     ```python
     from app.workspace.data_manager.home import (
-        DataHomeCLI,
-        DataHomeService,
+        Home,
+        HomeCLI,
     )
 
-    home_service = DataHomeService()
+    home_service = Home()
     overview = home_service.get_overview()
     datasets = home_service.get_saved_datasets()
-    print(DataHomeCLI.format_home_dashboard(overview, datasets))
+    print(HomeCLI.format_home_dashboard(overview, datasets))
     ```
 
 CLI Usage:
@@ -50,7 +40,7 @@ CLI Usage:
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -58,42 +48,40 @@ from typing import Any
 from app.host.logging import get_logger
 from app.host.persistence.read import count_rows, read_rows, resolve_connection
 
+from ._common import (
+    MAX_UNDERLYING_DISPLAY_LEN,
+    TRUNCATE_LEN,
+    DataInfo,
+    format_dataset_table,
+    format_home_dashboard,
+)
+
 __all__ = [
-    "DataHomeCLI",
-    "DataHomeDashboard",
-    "DataHomeService",
-    "DataHomeSummary",
+    "Home",
+    "HomeCLI",
 ]
 
 logger = get_logger(__name__)
 
 OVERVIEW_FR = "FR-DATAMGR-HOME-OVERVIEW"
 DATASETS_CATALOG_FR = "FR-DATAMGR-HOME-DATASETS-CATALOG"
-SUMMARY_FR = "FR-DATAMGR-HOME-SUMMARY"
-DASHBOARD_FR = "FR-DATAMGR-HOME-DASHBOARD"
-CLI_FR = "FR-DATAMGR-HOME-CLI"
 
 
 @dataclass(frozen=True)
-class DataHomeSummary:
-    """Aggregated metrics across the Data Manager catalogs."""
+class _Config:
+    """Internal aggregated metrics and configuration for Data Manager home."""
 
-    datasets_count: int
-    instruments_count: int
-    sessions_count: int
-    baskets_count: int
-    active_providers_count: int
-    total_bars: int
+    datasets_count: int = 0
+    instruments_count: int = 0
+    sessions_count: int = 0
+    baskets_count: int = 0
+    active_providers_count: int = 0
+    total_bars: int = 0
     storage_bytes: int = 0
     parquet_files_count: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Convert metrics to dictionary representation."""
-        logger.debug(
-            "%s: Serializing home summary metrics",
-            SUMMARY_FR,
-            extra={"fr_id": SUMMARY_FR},
-        )
         return {
             "datasets_count": self.datasets_count,
             "instruments_count": self.instruments_count,
@@ -106,48 +94,7 @@ class DataHomeSummary:
         }
 
 
-@dataclass(frozen=True)
-class DataHomeDashboard:
-    """Summary item for a saved dataset catalog entry."""
-
-    symbol: str
-    instrument: str
-    broker: str
-    underlying: str
-    timeframe: str
-    timezone: str
-    date_from: str
-    date_to: str
-    total_days: int
-    total_records: int
-    source: str
-    data_type: str
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert dataset summary item to dictionary representation."""
-        logger.debug(
-            "%s: Serializing dataset summary for %s",
-            DASHBOARD_FR,
-            self.symbol,
-            extra={"fr_id": DASHBOARD_FR, "symbol": self.symbol},
-        )
-        return {
-            "symbol": self.symbol,
-            "instrument": self.instrument,
-            "broker": self.broker,
-            "underlying": self.underlying,
-            "timeframe": self.timeframe,
-            "timezone": self.timezone,
-            "date_from": self.date_from,
-            "date_to": self.date_to,
-            "total_days": self.total_days,
-            "total_records": self.total_records,
-            "source": self.source,
-            "data_type": self.data_type,
-        }
-
-
-class DataHomeService:
+class Home:
     """Service providing high-level overview metrics and dataset catalog."""
 
     def __init__(
@@ -158,7 +105,7 @@ class DataHomeService:
         """Initialize home service with optional active providers callback."""
         self._providers_getter = active_providers_getter
 
-    def get_overview(self) -> DataHomeSummary:
+    def get_overview(self) -> dict[str, Any]:
         """Compute aggregate counts across database catalogs."""
         with resolve_connection() as conn:
             datasets_count = count_rows(conn, "datamgr_datasets")
@@ -174,7 +121,7 @@ class DataHomeService:
             self._providers_getter() if self._providers_getter is not None else 0
         )
 
-        data = DataHomeSummary(
+        config = _Config(
             datasets_count=datasets_count,
             instruments_count=instruments_count,
             sessions_count=sessions_count,
@@ -185,24 +132,24 @@ class DataHomeService:
         logger.info(
             "%s: Overview computed (datasets=%d, instruments=%d, bars=%d)",
             OVERVIEW_FR,
-            data.datasets_count,
-            data.instruments_count,
-            data.total_bars,
+            config.datasets_count,
+            config.instruments_count,
+            config.total_bars,
             extra={
                 "fr_id": OVERVIEW_FR,
-                "datasets_count": data.datasets_count,
-                "instruments_count": data.instruments_count,
-                "total_bars": data.total_bars,
+                "datasets_count": config.datasets_count,
+                "instruments_count": config.instruments_count,
+                "total_bars": config.total_bars,
             },
         )
-        return data
+        return config.to_dict()
 
-    def get_saved_datasets(self) -> list[DataHomeDashboard]:
+    def get_saved_datasets(self) -> list[DataInfo]:
         """Retrieve saved dataset catalog items from the datamgr_datasets table."""
         with resolve_connection() as conn:
             rows = read_rows(conn, "datamgr_datasets")
 
-        datasets: list[DataHomeDashboard] = []
+        datasets: list[DataInfo] = []
         for r in rows:
             symbol = str(r.get("symbol", ""))
             instrument = str(r.get("instrument", ""))
@@ -226,10 +173,12 @@ class DataHomeService:
                     total_days = 0
 
             datasets.append(
-                DataHomeDashboard(
+                DataInfo(
+                    id=str(r.get("id", f"{source}:{symbol}")),
                     symbol=symbol,
                     instrument=instrument,
                     broker=broker,
+                    broker_name=str(r.get("broker_name", broker)),
                     underlying=underlying,
                     timeframe=timeframe,
                     timezone=timezone,
@@ -237,8 +186,12 @@ class DataHomeService:
                     date_to=date_to,
                     total_days=total_days,
                     total_records=records,
+                    bars=records,
+                    rows=records,
                     source=source,
+                    connection=source,
                     data_type=data_type,
+                    category=data_type,
                 )
             )
 
@@ -251,124 +204,37 @@ class DataHomeService:
         return datasets
 
 
-class DataHomeCLI:
+class HomeCLI:
     """Headless CLI formatter and table presentation for Data Manager home."""
 
-    MAX_UNDERLYING_DISPLAY_LEN: int = 32
-    TRUNCATE_LEN: int = 30
+    MAX_UNDERLYING_DISPLAY_LEN: int = MAX_UNDERLYING_DISPLAY_LEN
+    TRUNCATE_LEN: int = TRUNCATE_LEN
 
     @classmethod
     def format_dataset_table(
         cls,
-        saved_datasets: Sequence[DataHomeDashboard],
+        saved_datasets: Sequence[DataInfo],
     ) -> str:
         """Format ASCII table of saved dataset catalog entries."""
         logger.debug(
-            "%s: formatting %d saved datasets as ASCII table",
-            CLI_FR,
+            "Formatting %d saved datasets as ASCII table",
             len(saved_datasets),
-            extra={"fr_id": CLI_FR, "count": len(saved_datasets)},
         )
-        count = len(saved_datasets)
-        lines: list[str] = [f"=== Saved Datasets Catalog ({count} items) ==="]
-        header_fmt = (
-            "| {sym:<14} | {inst:<15} | {brk:<12} | {und:<32} | {tf:<4} "
-            "| {tz:<8} | {d_from:<10} | {d_to:<10} | {days:>6} | {recs:>10} "
-            "| {src:<16} | {cat:<8} |"
-        )
-        divider = (
-            "|-"
-            + "-|-".join(
-                [
-                    "-" * 14,
-                    "-" * 15,
-                    "-" * 12,
-                    "-" * 32,
-                    "-" * 4,
-                    "-" * 8,
-                    "-" * 10,
-                    "-" * 10,
-                    "-" * 6,
-                    "-" * 10,
-                    "-" * 16,
-                    "-" * 8,
-                ]
-            )
-            + "-|"
-        )
-        lines.append(
-            header_fmt.format(
-                sym="Symbol Name",
-                inst="Instrument",
-                brk="Broker profile",
-                und="Underlying Symbol",
-                tf="TF",
-                tz="Timezone",
-                d_from="Date from",
-                d_to="Date to",
-                days="Days",
-                recs="Records",
-                src="Source",
-                cat="Data type",
-            )
-        )
-        lines.append(divider)
-        for ds in saved_datasets:
-            if len(ds.underlying) > cls.MAX_UNDERLYING_DISPLAY_LEN:
-                und_preview = ds.underlying[: cls.TRUNCATE_LEN] + ".."
-            else:
-                und_preview = ds.underlying
-            lines.append(
-                header_fmt.format(
-                    sym=ds.symbol,
-                    inst=ds.instrument,
-                    brk=ds.broker,
-                    und=und_preview,
-                    tf=ds.timeframe,
-                    tz=ds.timezone,
-                    d_from=ds.date_from or "-",
-                    d_to=ds.date_to or "-",
-                    days=ds.total_days,
-                    recs=f"{ds.total_records:,}",
-                    src=ds.source,
-                    cat=ds.data_type,
-                )
-            )
-        return "\n".join(lines)
+        return format_dataset_table(saved_datasets)
 
     @classmethod
     def format_home_dashboard(
         cls,
-        overview: DataHomeSummary,
-        saved_datasets: Sequence[DataHomeDashboard],
+        overview: Mapping[str, Any] | _Config,
+        saved_datasets: Sequence[DataInfo],
     ) -> str:
         """Format complete human-readable dashboard output."""
-        logger.debug(
-            "%s: formatting home overview and dataset table",
-            CLI_FR,
-            extra={"fr_id": CLI_FR},
-        )
-        lines = [
-            "=== Data Manager Home: Live Database Overview ===",
-            f"Total Datasets:       {overview.datasets_count}",
-            f"Historical Bars:      {overview.total_bars:,}",
-            f"Instruments Catalog:  {overview.instruments_count}",
-            f"Trading Sessions:     {overview.sessions_count}",
-            f"Custom Baskets:       {overview.baskets_count}",
-            f"Active Providers:     {overview.active_providers_count}",
-            "",
-            cls.format_dataset_table(saved_datasets),
-        ]
-        return "\n".join(lines)
-
-
-def main() -> None:
-    """Execute live database read-only demonstration of DataHomeService."""
-    service = DataHomeService()
-    overview = service.get_overview()
-    saved_datasets = service.get_saved_datasets()
-    print(DataHomeCLI.format_home_dashboard(overview, saved_datasets))
+        logger.debug("Formatting home overview and dataset table")
+        return format_home_dashboard(overview, saved_datasets)
 
 
 if __name__ == "__main__":
-    main()
+    home = Home()
+    overview = home.get_overview()
+    saved_datasets = home.get_saved_datasets()
+    print(HomeCLI.format_home_dashboard(overview, saved_datasets))

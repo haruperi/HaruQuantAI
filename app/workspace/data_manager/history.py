@@ -73,7 +73,8 @@ from typing import Any, Literal, Protocol, override
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.services.brokers.base import BaseBrokerBackend
-from app.workspace.data_manager.contracts import (
+
+from ._common import (
     MAX_POSITION,
     MAX_RECORDS,
     READ_TIMEOUT,

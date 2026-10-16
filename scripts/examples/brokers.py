@@ -63,7 +63,7 @@ from app.services.trading import (
     TradingBackend,
 )
 from app.services.utils import format_timestamp
-from app.workspace.data_manager.contracts import (
+from app.workspace.data_manager import (
     MarketBar,
     MarketTick,
     Timeframe,

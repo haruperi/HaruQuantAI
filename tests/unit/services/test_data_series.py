@@ -34,10 +34,14 @@ import pytest
 from app.workspace.data_manager import (
     BAR_COLUMNS,
     TICK_COLUMNS,
+    BridgeError,
     DataBackend,
     DataSeries,
     DataSeriesTypes,
+    MarketBar,
+    MarketTick,
     MedianDataSeries,
+    Timeframe,
     TypicalDataSeries,
     WeightedDataSeries,
     bars_to_dataframe,
@@ -46,12 +50,6 @@ from app.workspace.data_manager import (
     ticks_to_df,
     validate_request,
     validate_rows,
-)
-from app.workspace.data_manager.contracts import (
-    BridgeError,
-    MarketBar,
-    MarketTick,
-    Timeframe,
 )
 from app.workspace.data_manager.history import (
     DataBackend as DirectDataBackend,

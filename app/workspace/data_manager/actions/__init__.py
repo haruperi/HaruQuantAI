@@ -1,11 +1,11 @@
 """Data Manager actions subpackage."""
 
-from app.workspace.data_manager.actions.review.quality import (
+from .review.quality import (
     DataQualityInspector,
     QualityAnomaly,
     QualityReport,
 )
-from app.workspace.data_manager.actions.transform.transforms import (
+from .transform.transforms import (
     CloneTimezoneConfig,
     ResampleConfig,
     SeriesTransformer,

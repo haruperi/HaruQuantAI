@@ -63,7 +63,8 @@ from app.host.persistence.delete import delete_row_by_pk, delete_rows
 from app.host.persistence.read import count_rows, read_rows, resolve_connection
 from app.host.persistence.update import update_row_by_pk
 from app.services.trading import SymbolSpec
-from app.workspace.data_manager.log import DataManagerLogService
+
+from .log import DataManagerLogService
 
 __all__ = [
     "InstrumentAliasRecord",

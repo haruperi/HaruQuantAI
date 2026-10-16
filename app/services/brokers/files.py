@@ -26,7 +26,7 @@ Python API Usage:
     ```python
     from app.services.brokers.files import FilesBroker
     from app.workspace.data_manager.history import get_historical_bars
-    from app.workspace.data_manager.contracts import Timeframe
+    from app.workspace.data_manager import Timeframe
 
     broker = FilesBroker(data_dir="data/market")
     health = broker.check_health()

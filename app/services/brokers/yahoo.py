@@ -27,7 +27,7 @@ Python API Usage:
     ```python
     from app.services.brokers.yahoo import YahooBroker
     from app.workspace.data_manager.history import get_historical_bars
-    from app.workspace.data_manager.contracts import Timeframe
+    from app.workspace.data_manager import Timeframe
 
     broker = YahooBroker()
     health = broker.check_health()
@@ -64,7 +64,7 @@ from app.services.brokers.capabilities import (
     ProviderUnsupportedError,
 )
 from app.services.trading import SymbolSnapshot
-from app.workspace.data_manager.contracts import Timeframe
+from app.workspace.data_manager import Timeframe
 from app.workspace.data_manager.history import DataBrokerBackend
 
 MARKET_DATA_FR = "FR-BROKER-YAHOO-MARKET-DATA"

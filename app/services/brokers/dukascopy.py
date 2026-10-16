@@ -28,7 +28,7 @@ Python API Usage:
     ```python
     from app.services.brokers.dukascopy import DukascopyBroker
     from app.workspace.data_manager.history import get_historical_bars
-    from app.workspace.data_manager.contracts import Timeframe
+    from app.workspace.data_manager import Timeframe
 
     broker = DukascopyBroker()
     bars = await get_historical_bars(broker, "EURUSD", Timeframe.PERIOD_M1, count=5)

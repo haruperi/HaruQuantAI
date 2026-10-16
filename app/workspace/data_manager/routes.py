@@ -53,24 +53,25 @@ from app.host.session import SessionManager
 from app.host.transport import EventBus, extract_bearer_token
 from app.services.brokers.capabilities import ProviderError
 from app.services.brokers.registry import BrokerRegistry
-from app.workspace.data_manager.actions.review.quality import DataQualityInspector
-from app.workspace.data_manager.actions.transform.transforms import (
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi.responses import JSONResponse
+
+from .actions.review.quality import DataQualityInspector
+from .actions.transform.transforms import (
     CloneTimezoneConfig,
     ResampleConfig,
     SeriesTransformer,
 )
-from app.workspace.data_manager.baskets import BasketsCatalogService
-from app.workspace.data_manager.broker import BrokerProfilesService
-from app.workspace.data_manager.connections import ProviderConnectionsService
-from app.workspace.data_manager.custom_data import CustomDataService
-from app.workspace.data_manager.data import DataManagerDataService
-from app.workspace.data_manager.help import DataManagerHelpService
-from app.workspace.data_manager.home import DataHomeService
-from app.workspace.data_manager.instruments import InstrumentsCatalogService
-from app.workspace.data_manager.log import DataManagerLogService
-from app.workspace.data_manager.sessions import SessionsCatalogService
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
-from fastapi.responses import JSONResponse
+from .baskets import BasketsCatalogService
+from .broker import BrokerProfilesService
+from .connections import ProviderConnectionsService
+from .custom_data import CustomDataService
+from .data import DataManagerDataService
+from .help import DataManagerHelpService
+from .home import Home
+from .instruments import InstrumentsCatalogService
+from .log import DataManagerLogService
+from .sessions import SessionsCatalogService
 
 __all__ = [
     "DataManagerWorkspace",
@@ -152,7 +153,7 @@ class DataManagerWorkspace:
             data_service=self.data,
             log_service=self.log,
         )
-        self.home = DataHomeService(
+        self.home = Home(
             active_providers_getter=self.connections.active_providers_count,
         )
         logger.info(
@@ -203,7 +204,7 @@ def _error(code: str, message: str, status_code: int = 400) -> JSONResponse:
 def _register_home_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:
     @router.get("/home/overview")
     def get_home_overview() -> JSONResponse:
-        data = ws.home.get_overview().to_dict()
+        data = ws.home.get_overview()
         return _success(data)
 
     @router.get("/home/datasets")
@@ -977,7 +978,7 @@ def main() -> None:
         print(f"Created Data Manager router with {len(router.routes)} endpoints")
 
         overview = workspace.home.get_overview()
-        print(f"Workspace overview: {overview.to_dict()}")
+        print(f"Workspace overview: {overview}")
 
 
 if __name__ == "__main__":

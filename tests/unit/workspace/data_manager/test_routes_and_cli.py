@@ -245,8 +245,8 @@ def _check_file_invariants(py_file: Path) -> None:
     # Invariant 1: ZERO direct sqlite3 imports
     _check_no_sqlite(tree, py_file)
 
-    # Skip docstring check for package markers
-    if py_file.name == "__init__.py":
+    # Skip docstring check for package markers and pure contract definitions
+    if py_file.name in ("__init__.py", "_common.py"):
         return
 
     # Invariant 2: 5-section docstring
@@ -280,11 +280,20 @@ def _check_file_invariants(py_file: Path) -> None:
         f"{py_file} must initialize logger using 'get_logger(__name__)'"
     )
 
-    # Invariant 5: def main() -> None:
+    # Invariant 5: def main() -> None: or if __name__ == "__main__":
     has_main = any(
         isinstance(node, ast.FunctionDef) and node.name == "main" for node in tree.body
     )
-    assert has_main, f"{py_file} missing 'def main() -> None:' entrypoint"
+    has_if_main = any(
+        isinstance(node, ast.If)
+        and isinstance(node.test, ast.Compare)
+        and isinstance(node.test.left, ast.Name)
+        and node.test.left.id == "__name__"
+        for node in tree.body
+    )
+    assert has_main or has_if_main, (
+        f"{py_file} missing entrypoint ('def main() -> None:' or 'if __name__ == \"__main__\":')"
+    )
 
 
 def test_ast_architectural_invariants() -> None:

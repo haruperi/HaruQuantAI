@@ -47,7 +47,7 @@ from app.services.trading import (
     TradeRequest,
     TradeRetcode,
 )
-from app.workspace.data_manager.contracts import MarketTick
+from app.workspace.data_manager import MarketTick
 
 
 @pytest.fixture

@@ -68,10 +68,11 @@ from app.host.persistence.create import create_schema, insert_row
 from app.host.persistence.delete import delete_row_by_pk, delete_rows
 from app.host.persistence.read import count_rows, read_rows, resolve_connection
 from app.host.persistence.update import update_row_by_pk
-from app.workspace.data_manager.data import DataManagerDataService
-from app.workspace.data_manager.instruments import InstrumentsCatalogService
-from app.workspace.data_manager.sessions import SessionsCatalogService
 from defusedxml.common import DefusedXmlException  # type: ignore[import-untyped]
+
+from .data import DataManagerDataService
+from .instruments import InstrumentsCatalogService
+from .sessions import SessionsCatalogService
 
 __all__ = [
     "BrokerProfileRecord",
