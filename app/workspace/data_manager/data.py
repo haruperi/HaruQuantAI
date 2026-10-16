@@ -82,7 +82,7 @@ from app.host.persistence.create import create_schema, insert_row
 from app.host.persistence.delete import delete_row_by_pk, delete_rows
 from app.host.persistence.read import read_rows, resolve_connection
 from app.host.persistence.update import update_row_by_pk
-from app.services.libs.contracts import ChartDef, DataInfo
+from app.services.include.contracts import ChartDef, DataInfo
 
 from .log import DataManagerLogService
 

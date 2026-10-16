@@ -25,7 +25,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.libs.time import HQTime
+    from app.services.include.time import HQTime
 
     ms = HQTime.to_long(2026, 10, 14, 15, 30, 0)
     ymd = HQTime.get_ymd(ms)  # 20261014

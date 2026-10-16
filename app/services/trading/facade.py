@@ -34,7 +34,7 @@ from types import TracebackType
 from typing import Self
 
 from app.host.logging import get_logger
-from app.services.libs.contracts import BridgeEvent, Receipt, TradingBackend
+from app.services.include.contracts import BridgeEvent, Receipt, TradingBackend
 
 from .proxies import (
     AccountProxy,

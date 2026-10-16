@@ -71,7 +71,7 @@ from typing import Any, Self, cast, override
 from app.host.logging import get_logger
 from app.host.settings import settings
 from app.services.brokers.base import BridgeError
-from app.services.libs.contracts import (
+from app.services.include.contracts import (
     AccountInfo,
     BookInfo,
     BridgeEvent,
@@ -82,7 +82,7 @@ from app.services.libs.contracts import (
     TradeRequest,
     TradeResult,
 )
-from app.services.libs.enums import (
+from app.services.include.enums import (
     AccountTradeMode,
     BookType,
     MarginMode,

@@ -112,7 +112,7 @@ class Feature:
     # Helper methods: MUST always be prefixed with a leading underscore `_*`.
     # Deduplication hierarchy:
     # - If duplicated within this domain folder -> move to <domain>/_common.py
-    # - If duplicated across different domains -> move to app/services/libs/
+    # - If duplicated across different domains -> move to app/services/include/
     def _validate_prerequisites(self) -> None:
         """Private internal helper method validating execution prerequisites."""
         return None

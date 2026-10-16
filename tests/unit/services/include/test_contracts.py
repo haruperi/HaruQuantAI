@@ -3,7 +3,7 @@
 Description:
     Validates instantiation, default field states, methods, and strict absence of
     legacy alias shims across the canonical contracts and enums defined in
-    app.services.libs.
+    app.services.include.
 
 Purpose:
     FEAT-LIBS-CONTRACTS: Core data contract verification.
@@ -17,8 +17,9 @@ Key Capabilities:
 
 from __future__ import annotations
 
-from app.services.libs import contracts, enums
-from app.services.libs.contracts import (
+import pytest
+from app.services.include import contracts, enums
+from app.services.include.contracts import (
     BOOK_TYPE_DESCRIPTIONS,
     DEAL_ENTRY_DESCRIPTIONS,
     DEAL_TYPE_DESCRIPTIONS,
@@ -55,7 +56,7 @@ from app.services.libs.contracts import (
     TradeResult,
     TradingBackend,
 )
-from app.services.libs.enums import (
+from app.services.include.enums import (
     AccountTradeMode,
     BookType,
     DealEntry,
@@ -444,7 +445,7 @@ def test_description_mappings_and_timeframe_seconds() -> None:
 
 
 def test_enums_module_strictly_only_enums() -> None:
-    """Verify that app.services.libs.enums contains strictly Enum subclasses."""
+    """Verify that app.services.include.enums contains strictly Enum subclasses."""
     from enum import Enum
 
     for name in enums.__all__:
@@ -452,6 +453,18 @@ def test_enums_module_strictly_only_enums() -> None:
         assert isinstance(attr, type) and issubclass(attr, Enum), (
             f"Non-enum found in enums.__all__: {name} ({attr})"
         )
+
+
+def test_no_app_services_libs_module() -> None:
+    """Verify that legacy app.services.libs package is completely removed without shims."""
+    import importlib
+
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.libs")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.libs.contracts")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.libs.enums")
 
 
 def test_zero_shims_and_aliases_invariant() -> None:

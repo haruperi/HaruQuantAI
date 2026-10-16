@@ -47,7 +47,7 @@ from typing import Any
 
 from app.host.logging import get_logger
 from app.host.persistence.read import count_rows, read_rows, resolve_connection
-from app.services.libs.contracts import DataInfo
+from app.services.include.contracts import DataInfo
 
 __all__ = [
     "Home",

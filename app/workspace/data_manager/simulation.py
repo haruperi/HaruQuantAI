@@ -56,7 +56,7 @@ from typing import Any, Protocol, override
 
 import numpy as np
 from app.host.logging import get_logger
-from app.services.libs.contracts import MarketTick
+from app.services.include.contracts import MarketTick
 
 __all__ = [
     "DefaultTickSimulator",

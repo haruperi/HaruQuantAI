@@ -52,7 +52,7 @@ if TYPE_CHECKING:
     from app.workspace.data_manager import MarketTick
 
 from app.host.logging import get_logger
-from app.services.libs.contracts import (
+from app.services.include.contracts import (
     AccountInfo,
     BridgeEvent,
     DealInfo,
@@ -65,7 +65,7 @@ from app.services.libs.contracts import (
     TradeRequest,
     TradeResult,
 )
-from app.services.libs.enums import (
+from app.services.include.enums import (
     OrderType,
     ReceiptStatus,
 )

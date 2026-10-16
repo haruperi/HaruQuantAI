@@ -2,8 +2,8 @@
 
 Description:
     Verifies that app.services.trading satisfies the modular package architecture:
-    - Layer 0: app.services.libs.enums
-    - Layer 1: app.services.libs.contracts, base.py
+    - Layer 0: app.services.include.enums
+    - Layer 1: app.services.include.contracts, base.py
     - Layer 2: proxies.py, trade.py
     - Layer 3: facade.py
     - Unified package exports via __init__.py
@@ -35,8 +35,8 @@ from __future__ import annotations
 import importlib
 import inspect
 
-import app.services.libs.contracts as libs_contracts
-import app.services.libs.enums as libs_enums
+import app.services.include.contracts as include_contracts
+import app.services.include.enums as include_enums
 import app.services.trading as trading_pkg
 import app.services.trading.base as trading_base
 import app.services.trading.facade as trading_facade
@@ -50,95 +50,97 @@ class TestTradingPackageExports:
 
     def test_enums_exports_identity(self) -> None:
         """Verify enum symbols match between package and enums submodule."""
-        assert trading_pkg.ReceiptStatus is libs_enums.ReceiptStatus
-        assert trading_pkg.TradeResolution is libs_enums.TradeResolution
-        assert trading_pkg.AccountTradeMode is libs_enums.AccountTradeMode
-        assert trading_pkg.StopoutMode is libs_enums.StopoutMode
-        assert trading_pkg.MarginMode is libs_enums.MarginMode
-        assert trading_pkg.OrderType is libs_enums.OrderType
-        assert trading_pkg.OrderFilling is libs_enums.OrderFilling
-        assert trading_pkg.OrderTime is libs_enums.OrderTime
-        assert trading_pkg.TradeAction is libs_enums.TradeAction
-        assert trading_pkg.TradeRetcode is libs_enums.TradeRetcode
-        assert trading_pkg.BookType is libs_enums.BookType
-        assert trading_pkg.PositionType is libs_enums.PositionType
-        assert trading_pkg.OrderState is libs_enums.OrderState
-        assert trading_pkg.DealType is libs_enums.DealType
-        assert trading_pkg.DealEntry is libs_enums.DealEntry
-        assert trading_pkg.SymbolTradeMode is libs_enums.SymbolTradeMode
-        assert trading_pkg.SymbolTradeExecution is libs_enums.SymbolTradeExecution
-        assert trading_pkg.SymbolSwapMode is libs_enums.SymbolSwapMode
-        assert trading_pkg.SymbolCalcMode is libs_enums.SymbolCalcMode
+        assert trading_pkg.ReceiptStatus is include_enums.ReceiptStatus
+        assert trading_pkg.TradeResolution is include_enums.TradeResolution
+        assert trading_pkg.AccountTradeMode is include_enums.AccountTradeMode
+        assert trading_pkg.StopoutMode is include_enums.StopoutMode
+        assert trading_pkg.MarginMode is include_enums.MarginMode
+        assert trading_pkg.OrderType is include_enums.OrderType
+        assert trading_pkg.OrderFilling is include_enums.OrderFilling
+        assert trading_pkg.OrderTime is include_enums.OrderTime
+        assert trading_pkg.TradeAction is include_enums.TradeAction
+        assert trading_pkg.TradeRetcode is include_enums.TradeRetcode
+        assert trading_pkg.BookType is include_enums.BookType
+        assert trading_pkg.PositionType is include_enums.PositionType
+        assert trading_pkg.OrderState is include_enums.OrderState
+        assert trading_pkg.DealType is include_enums.DealType
+        assert trading_pkg.DealEntry is include_enums.DealEntry
+        assert trading_pkg.SymbolTradeMode is include_enums.SymbolTradeMode
+        assert trading_pkg.SymbolTradeExecution is include_enums.SymbolTradeExecution
+        assert trading_pkg.SymbolSwapMode is include_enums.SymbolSwapMode
+        assert trading_pkg.SymbolCalcMode is include_enums.SymbolCalcMode
 
     def test_contracts_exports_identity(self) -> None:
         """Verify contract models, bridge types, and descriptions match between package and contracts."""
-        assert trading_pkg.BookInfo is libs_contracts.BookInfo
-        assert trading_pkg.AccountInfo is libs_contracts.AccountInfo
-        assert trading_pkg.TerminalInfo is libs_contracts.TerminalInfo
-        assert trading_pkg.SymbolInfo is libs_contracts.SymbolInfo
-        assert trading_pkg.PositionInfo is libs_contracts.PositionInfo
-        assert trading_pkg.OrderInfo is libs_contracts.OrderInfo
-        assert trading_pkg.DealInfo is libs_contracts.DealInfo
-        assert trading_pkg.TradeRequest is libs_contracts.TradeRequest
-        assert trading_pkg.TradeResult is libs_contracts.TradeResult
-        assert trading_pkg.TradeCheckResult is libs_contracts.TradeCheckResult
-        assert trading_pkg.PropertyValue is libs_contracts.PropertyValue
-        assert trading_pkg.Receipt is libs_contracts.Receipt
-        assert trading_pkg.BridgeEvent is libs_contracts.BridgeEvent
-        assert trading_pkg.TradingBackend is libs_contracts.TradingBackend
+        assert trading_pkg.BookInfo is include_contracts.BookInfo
+        assert trading_pkg.AccountInfo is include_contracts.AccountInfo
+        assert trading_pkg.TerminalInfo is include_contracts.TerminalInfo
+        assert trading_pkg.SymbolInfo is include_contracts.SymbolInfo
+        assert trading_pkg.PositionInfo is include_contracts.PositionInfo
+        assert trading_pkg.OrderInfo is include_contracts.OrderInfo
+        assert trading_pkg.DealInfo is include_contracts.DealInfo
+        assert trading_pkg.TradeRequest is include_contracts.TradeRequest
+        assert trading_pkg.TradeResult is include_contracts.TradeResult
+        assert trading_pkg.TradeCheckResult is include_contracts.TradeCheckResult
+        assert trading_pkg.PropertyValue is include_contracts.PropertyValue
+        assert trading_pkg.Receipt is include_contracts.Receipt
+        assert trading_pkg.BridgeEvent is include_contracts.BridgeEvent
+        assert trading_pkg.TradingBackend is include_contracts.TradingBackend
         assert (
             trading_pkg.ORDER_TYPE_DESCRIPTIONS
-            is libs_contracts.ORDER_TYPE_DESCRIPTIONS
+            is include_contracts.ORDER_TYPE_DESCRIPTIONS
         )
         assert (
             trading_pkg.ORDER_FILLING_DESCRIPTIONS
-            is libs_contracts.ORDER_FILLING_DESCRIPTIONS
+            is include_contracts.ORDER_FILLING_DESCRIPTIONS
         )
         assert (
             trading_pkg.ORDER_TIME_DESCRIPTIONS
-            is libs_contracts.ORDER_TIME_DESCRIPTIONS
+            is include_contracts.ORDER_TIME_DESCRIPTIONS
         )
         assert (
-            trading_pkg.BOOK_TYPE_DESCRIPTIONS is libs_contracts.BOOK_TYPE_DESCRIPTIONS
+            trading_pkg.BOOK_TYPE_DESCRIPTIONS
+            is include_contracts.BOOK_TYPE_DESCRIPTIONS
         )
         assert (
             trading_pkg.POSITION_TYPE_DESCRIPTIONS
-            is libs_contracts.POSITION_TYPE_DESCRIPTIONS
+            is include_contracts.POSITION_TYPE_DESCRIPTIONS
         )
         assert (
             trading_pkg.ORDER_STATE_DESCRIPTIONS
-            is libs_contracts.ORDER_STATE_DESCRIPTIONS
+            is include_contracts.ORDER_STATE_DESCRIPTIONS
         )
         assert (
-            trading_pkg.DEAL_TYPE_DESCRIPTIONS is libs_contracts.DEAL_TYPE_DESCRIPTIONS
+            trading_pkg.DEAL_TYPE_DESCRIPTIONS
+            is include_contracts.DEAL_TYPE_DESCRIPTIONS
         )
         assert (
             trading_pkg.DEAL_ENTRY_DESCRIPTIONS
-            is libs_contracts.DEAL_ENTRY_DESCRIPTIONS
+            is include_contracts.DEAL_ENTRY_DESCRIPTIONS
         )
         assert (
             trading_pkg.SYMBOL_TRADE_MODE_DESCRIPTIONS
-            is libs_contracts.SYMBOL_TRADE_MODE_DESCRIPTIONS
+            is include_contracts.SYMBOL_TRADE_MODE_DESCRIPTIONS
         )
         assert (
             trading_pkg.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
-            is libs_contracts.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
+            is include_contracts.SYMBOL_TRADE_EXECUTION_DESCRIPTIONS
         )
         assert (
             trading_pkg.SYMBOL_SWAP_MODE_DESCRIPTIONS
-            is libs_contracts.SYMBOL_SWAP_MODE_DESCRIPTIONS
+            is include_contracts.SYMBOL_SWAP_MODE_DESCRIPTIONS
         )
         assert (
             trading_pkg.SYMBOL_CALC_MODE_DESCRIPTIONS
-            is libs_contracts.SYMBOL_CALC_MODE_DESCRIPTIONS
+            is include_contracts.SYMBOL_CALC_MODE_DESCRIPTIONS
         )
-        assert trading_pkg.SymbolInfo is libs_contracts.SymbolInfo
-        assert trading_pkg.PositionInfo is libs_contracts.PositionInfo
-        assert trading_pkg.OrderInfo is libs_contracts.OrderInfo
-        assert trading_pkg.DealInfo is libs_contracts.DealInfo
-        assert trading_pkg.TradeRequest is libs_contracts.TradeRequest
-        assert trading_pkg.TradeResult is libs_contracts.TradeResult
-        assert trading_pkg.TradeCheckResult is libs_contracts.TradeCheckResult
+        assert trading_pkg.SymbolInfo is include_contracts.SymbolInfo
+        assert trading_pkg.PositionInfo is include_contracts.PositionInfo
+        assert trading_pkg.OrderInfo is include_contracts.OrderInfo
+        assert trading_pkg.DealInfo is include_contracts.DealInfo
+        assert trading_pkg.TradeRequest is include_contracts.TradeRequest
+        assert trading_pkg.TradeResult is include_contracts.TradeResult
+        assert trading_pkg.TradeCheckResult is include_contracts.TradeCheckResult
 
     def test_base_exports_identity(self) -> None:
         """Verify base trading proxy class matches between package and submodule."""
@@ -205,6 +207,8 @@ class TestLayeringAndAntiCircularRules:
             importlib.import_module("app.services.trading.enums")
         with pytest.raises(ModuleNotFoundError):
             importlib.import_module("app.services.trading.snapshots")
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("app.services.libs")
         with pytest.raises(ModuleNotFoundError):
             importlib.import_module("app.services.libs.trading")
         with pytest.raises(ModuleNotFoundError):

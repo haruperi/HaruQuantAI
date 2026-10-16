@@ -1,7 +1,7 @@
 """Unit tests for ChartDef and DataInfo market data abstractions.
 
 Description:
-    Tests verification of ChartDef and DataInfo classes in app/services/libs/data.py,
+    Tests verification of ChartDef and DataInfo classes in app/services/include/contracts.py,
     including timeframe calculations, resample compatibility predicates,
     cloning, serialization, and catalog-to-chart-def conversion.
 
@@ -369,10 +369,10 @@ class TestPackageReExports:
 
     def test_re_exports_match(self) -> None:
         """Ensure package exports point to the exact same classes."""
-        from app.services.libs.contracts import (
+        from app.services.include.contracts import (
             ChartDef as LibChartDef,
         )
-        from app.services.libs.contracts import (
+        from app.services.include.contracts import (
             DataInfo as LibDataInfo,
         )
 

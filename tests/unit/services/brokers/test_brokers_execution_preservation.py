@@ -46,7 +46,7 @@ from app.services.brokers.registry import (
     HistoricalProviderView,
 )
 from app.services.brokers.simulator import SimulationBackend
-from app.services.libs.contracts import SymbolInfo
+from app.services.include.contracts import SymbolInfo
 from app.services.trading import (
     MarginMode,
 )

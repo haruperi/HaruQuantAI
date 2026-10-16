@@ -32,7 +32,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.libs.bar_time import BarTime, DateTimeSeries, format_timestamp
+    from app.services.include.bar_time import BarTime, DateTimeSeries, format_timestamp
 
     ts = [1704110400, 1704153600]
     bt = BarTime(ts)
@@ -54,8 +54,8 @@ from typing import Any
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.time import HQTime
 from app.services.indicators.base import IndicatorSeries
-from app.services.libs.time import HQTime
 
 __all__ = [
     "BarTime",

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.services.libs.contracts import (
+from app.services.include.contracts import (
     BOOK_TYPE_DESCRIPTIONS,
     DEAL_ENTRY_DESCRIPTIONS,
     DEAL_TYPE_DESCRIPTIONS,
@@ -30,7 +30,7 @@ from app.services.libs.contracts import (
     TradeResult,
     TradingBackend,
 )
-from app.services.libs.enums import (
+from app.services.include.enums import (
     AccountTradeMode,
     BookType,
     DealEntry,

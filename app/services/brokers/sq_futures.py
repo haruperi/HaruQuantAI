@@ -61,7 +61,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderValidationError,
 )
-from app.services.libs.contracts import SymbolInfo
+from app.services.include.contracts import SymbolInfo
 from app.workspace.data_manager.history import DataBrokerBackend
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry

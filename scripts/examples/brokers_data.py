@@ -52,7 +52,7 @@ from app.services.brokers import (
     SQFuturesBroker,
     YahooBroker,
 )
-from app.services.libs.contracts import SymbolInfo
+from app.services.include.contracts import SymbolInfo
 from app.workspace.data_manager import (
     MarketBar,
     MarketTick,

@@ -29,14 +29,14 @@ from __future__ import annotations
 
 import pytest
 from app.services.brokers.simulator import SimulationBackend
-from app.services.libs.contracts import (
+from app.services.include.contracts import (
     DealInfo,
     OrderInfo,
     PositionInfo,
     SymbolInfo,
     TradeRequest,
 )
-from app.services.libs.enums import (
+from app.services.include.enums import (
     DealEntry,
     DealType,
     MarginMode,

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import random
 
-from app.services.libs.generators import RandomGenerator
+from app.services.include.generators import RandomGenerator
 
 
 def test_seed_reproducibility() -> None:

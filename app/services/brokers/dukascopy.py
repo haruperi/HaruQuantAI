@@ -69,7 +69,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderUnsupportedError,
 )
-from app.services.libs.contracts import SymbolInfo
+from app.services.include.contracts import SymbolInfo
 from app.workspace.data_manager.history import DataBrokerBackend
 
 logger = get_logger(__name__)

@@ -36,7 +36,7 @@ from datetime import datetime
 from typing import Any
 
 from app.host.logging import get_logger
-from app.services.libs.contracts import PropertyValue, TradingBackend
+from app.services.include.contracts import PropertyValue, TradingBackend
 
 __all__ = [
     "BaseTradingClass",

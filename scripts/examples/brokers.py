@@ -50,7 +50,7 @@ from app.services.brokers.base import BridgeError
 from app.services.brokers.ctrader import CTraderBackend
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
-from app.services.libs.contracts import (
+from app.services.include.contracts import (
     SymbolInfo,
     TerminalInfo,
     TradeRequest,

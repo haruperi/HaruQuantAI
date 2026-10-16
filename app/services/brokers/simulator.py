@@ -51,7 +51,7 @@ from app.services.brokers.base import (
     epoch_seconds,
     utc_now,
 )
-from app.services.libs.contracts import (
+from app.services.include.contracts import (
     AccountInfo,
     BridgeEvent,
     DealInfo,
@@ -64,7 +64,7 @@ from app.services.libs.contracts import (
     TradeRequest,
     TradeResult,
 )
-from app.services.libs.enums import (
+from app.services.include.enums import (
     DealEntry,
     DealType,
     MarginMode,
@@ -1429,7 +1429,7 @@ class SimulationBackend(BrokerBackend):
         self._tick_history[symbol] = tuple(ticks)
 
     def _market_data(self, method: str, args: list[Any]) -> list[dict[str, Any]]:
-        from app.services.libs.contracts import MAX_POSITION
+        from app.services.include.contracts import MAX_POSITION
         from app.workspace.data_manager.history import validate_request
 
         logger.debug("FR-SIMULATION-HISTORY: reading seeded history")

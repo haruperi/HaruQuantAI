@@ -67,7 +67,7 @@ import numpy as np
 import polars as pl
 import pyarrow as pa
 from app.host.logging import get_logger
-from app.services.libs.contracts import MarketBar
+from app.services.include.contracts import MarketBar
 
 __all__ = [
     "DataSeries",

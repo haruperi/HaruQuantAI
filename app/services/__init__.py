@@ -38,7 +38,7 @@ def __getattr__(name: str) -> Any:
         "format_timestamp",
         "normalize_timestamps",
     ):
-        from app.services.libs import bar_time
+        from app.services.include import bar_time
 
         return getattr(bar_time, name)
     if name in __all__:

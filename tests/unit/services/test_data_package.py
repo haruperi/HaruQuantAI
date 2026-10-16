@@ -47,6 +47,7 @@ class TestLegacyDataPackageRemoved:
             "app.services.data.history",
             "app.services.data.simulation",
             "app.services.data.generation",
+            "app.services.libs",
             "app.services.libs.data",
         ],
     )

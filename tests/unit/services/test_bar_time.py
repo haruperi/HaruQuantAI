@@ -1,10 +1,10 @@
-"""Unit tests for BarTime, DateTimeSeries, and TimeConditions in app.services.libs.bar_time."""
+"""Unit tests for BarTime, DateTimeSeries, and TimeConditions in app.services.include.bar_time."""
 
 from datetime import UTC, datetime
 
 import numpy as np
 import pytest
-from app.services.libs.bar_time import (
+from app.services.include.bar_time import (
     BarTime,
     DateTimeSeries,
     TimeConditions,

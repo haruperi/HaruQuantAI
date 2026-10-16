@@ -69,7 +69,7 @@ from app.services.brokers.capabilities import (
     ProviderCapabilities,
     ProviderHealth,
 )
-from app.services.libs.contracts import SymbolInfo
+from app.services.include.contracts import SymbolInfo
 from app.workspace.data_manager.history import DataBrokerBackend
 
 PARSING_FR = "FR-BROKER-FILES-PARSING"

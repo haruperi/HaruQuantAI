@@ -33,7 +33,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
-from app.services.libs.contracts import (
+from app.services.include.contracts import (
     AccountInfo,
     BookInfo,
     DealInfo,

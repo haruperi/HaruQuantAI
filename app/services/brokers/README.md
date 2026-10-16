@@ -1,6 +1,6 @@
 # Broker execution backends
 
-The public eight-class API lives in app/services/libs/trading.py. Strategies compose
+The public trading API lives in app/services/trading/. Strategies compose
 Trading(backend) and await the same Trade, AccountInfo, SymbolInfo, OrderInfo,
 HistoryOrderInfo, PositionInfo, DealInfo and TerminalInfo methods for either live
 MT5 or local simulation. Backend-specific behavior stays here.
@@ -8,10 +8,10 @@ MT5 or local simulation. Backend-specific behavior stays here.
 ## Ownership and layout
 
 ```text
-app/services/libs/
-  __init__.py          # Public re-exports for Trading and market data helpers
-  trading.py           # Consolidated eight classes, base adaptors, and Trading facade
-  data.py              # Market data helpers (get_historical_bars, get_ticks)
+app/services/include/
+  __init__.py          # Public re-exports for contracts, enums, temporal helpers
+  contracts.py         # Consolidated domain data contracts
+  enums.py             # Canonical trading enumerations
 
 app/services/brokers/
   contracts.py         # Async TradingBackend and shared data/model contracts
@@ -86,7 +86,7 @@ Only caller-supplied tick/clock changes advance simulated time. Selection/trade
 configuration is keyed by object ID; receipts are in-memory and do not open SQL.
 Explicit simulated arming permits local mutations without authorizing live trades.
 
-See ../libs/README.md for named-property support and explicit unsupported numeric
+See ../include/README.md for named-property support and explicit unsupported numeric
 property/native-request-correlation and queued-trade behavior. Local events are simulation events;
 text formatting is model-specific. Future brokers implement the async capability
 and map supported operations into this vocabulary, rejecting unavailable features.
@@ -172,7 +172,7 @@ capabilities or authorize trading.
 
 ```powershell
 uv run pytest tests/unit/services/test_trading_api.py tests/unit/services/test_trading_backend_parity.py tests/unit/services/test_trading_simulator.py tests/unit/services/test_metatrader_bridge_protocol.py tests/unit/services/test_broker_contracts.py tests/unit/services/test_mt5bridge_journal.py --no-cov
-uv run mypy --strict --follow-imports=silent app/services/libs app/services/brokers/contracts.py app/services/brokers/metatrader.py app/services/brokers/simulator.py app/services/brokers/_simulation_api.py
+uv run mypy --strict --follow-imports=silent app/services/include app/services/brokers/base.py app/services/brokers/metatrader.py app/services/brokers/simulator.py app/services/brokers/_simulation_api.py
 ```
 
 Checks use isolated stores and local/native-fixture execution. Compile and validate

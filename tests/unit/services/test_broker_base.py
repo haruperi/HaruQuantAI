@@ -26,11 +26,11 @@ import asyncio
 
 import pytest
 from app.services.brokers.base import BaseBrokerBackend, BridgeError
-from app.services.libs.contracts import (
+from app.services.include.contracts import (
     SymbolInfo,
     TerminalInfo,
 )
-from app.services.libs.enums import ReceiptStatus
+from app.services.include.enums import ReceiptStatus
 from app.workspace.data_manager import (
     DataBrokerBackend,
     MarketBar,

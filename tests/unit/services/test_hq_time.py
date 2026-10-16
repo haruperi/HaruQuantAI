@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from app.services.libs.time import HQTime
+from app.services.include.time import HQTime
 
 
 def test_hqtime_constants() -> None:

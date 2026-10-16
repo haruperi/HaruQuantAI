@@ -31,7 +31,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.libs.generators import RandomGenerator
+    from app.services.include.generators import RandomGenerator
 
     rng = RandomGenerator(seed=42)
     val = rng.next_double()  # Uniform [0.0, 1.0)

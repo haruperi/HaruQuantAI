@@ -61,7 +61,7 @@ if TYPE_CHECKING:
     from app.services.brokers.sq_futures import SQFuturesBroker
     from app.services.brokers.tick_downloader import TickDownloaderBroker
     from app.services.brokers.yahoo import YahooBroker
-    from app.services.libs.contracts import (
+    from app.services.include.contracts import (
         AccountInfo,
         BridgeEvent,
         DealInfo,
@@ -75,7 +75,7 @@ if TYPE_CHECKING:
         TradeResult,
         TradingBackend,
     )
-    from app.services.libs.enums import (
+    from app.services.include.enums import (
         ReceiptStatus,
         TradeAction,
     )
@@ -160,20 +160,20 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
     "MarketBar": ("app.workspace.data_manager", "MarketBar"),
     "MarketTick": ("app.workspace.data_manager", "MarketTick"),
     "Timeframe": ("app.workspace.data_manager", "Timeframe"),
-    "AccountInfo": ("app.services.libs.contracts", "AccountInfo"),
-    "BridgeEvent": ("app.services.libs.enums", "BridgeEvent"),
-    "DealInfo": ("app.services.libs.contracts", "DealInfo"),
-    "OrderInfo": ("app.services.libs.contracts", "OrderInfo"),
-    "PositionInfo": ("app.services.libs.contracts", "PositionInfo"),
-    "Receipt": ("app.services.libs.enums", "Receipt"),
-    "ReceiptStatus": ("app.services.libs.enums", "ReceiptStatus"),
-    "SymbolInfo": ("app.services.libs.contracts", "SymbolInfo"),
-    "TerminalInfo": ("app.services.libs.contracts", "TerminalInfo"),
-    "TradeAction": ("app.services.libs.enums", "TradeAction"),
-    "TradeCheckResult": ("app.services.libs.contracts", "TradeCheckResult"),
-    "TradeRequest": ("app.services.libs.contracts", "TradeRequest"),
-    "TradeResult": ("app.services.libs.contracts", "TradeResult"),
-    "TradingBackend": ("app.services.libs.enums", "TradingBackend"),
+    "AccountInfo": ("app.services.include.contracts", "AccountInfo"),
+    "BridgeEvent": ("app.services.include.contracts", "BridgeEvent"),
+    "DealInfo": ("app.services.include.contracts", "DealInfo"),
+    "OrderInfo": ("app.services.include.contracts", "OrderInfo"),
+    "PositionInfo": ("app.services.include.contracts", "PositionInfo"),
+    "Receipt": ("app.services.include.contracts", "Receipt"),
+    "ReceiptStatus": ("app.services.include.enums", "ReceiptStatus"),
+    "SymbolInfo": ("app.services.include.contracts", "SymbolInfo"),
+    "TerminalInfo": ("app.services.include.contracts", "TerminalInfo"),
+    "TradeAction": ("app.services.include.enums", "TradeAction"),
+    "TradeCheckResult": ("app.services.include.contracts", "TradeCheckResult"),
+    "TradeRequest": ("app.services.include.contracts", "TradeRequest"),
+    "TradeResult": ("app.services.include.contracts", "TradeResult"),
+    "TradingBackend": ("app.services.include.contracts", "TradingBackend"),
 }
 
 _SINGLETON_FACTORIES: dict[str, tuple[str, str]] = {

@@ -58,7 +58,7 @@ import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.host.persistence.create import create_schema
 from app.host.persistence.read import resolve_connection
-from app.services.libs.contracts import DataInfo
+from app.services.include.contracts import DataInfo
 from app.workspace.data_manager.data import DataManagerDataService
 from app.workspace.data_manager.log import DataManagerLogService
 from app.workspace.data_manager.sessions import TradingSession
