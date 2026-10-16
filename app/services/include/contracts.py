@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass, field, fields, replace
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, Protocol, runtime_checkable
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from .enums import (
     AccountTradeMode,
@@ -57,6 +59,7 @@ __all__ = [
     "PositionInfo",
     "PropertyValue",
     "Receipt",
+    "SessionWindow",
     "SymbolAliasRecord",
     "SymbolInfo",
     "TerminalInfo",
@@ -64,6 +67,8 @@ __all__ = [
     "TradeRequest",
     "TradeResult",
     "TradingBackend",
+    "TradingHoliday",
+    "TradingSession",
 ]
 
 MAX_RECORDS: int = 1000
@@ -1231,3 +1236,217 @@ class SymbolAliasRecord:
             "symbol": self.symbol,
             "description": self.description,
         }
+
+
+_DAY_NAME_TO_INT: dict[str, int] = {
+    "mon": 0,
+    "monday": 0,
+    "tue": 1,
+    "tuesday": 1,
+    "wed": 2,
+    "wednesday": 2,
+    "thu": 3,
+    "thursday": 3,
+    "fri": 4,
+    "friday": 4,
+    "sat": 5,
+    "saturday": 5,
+    "sun": 6,
+    "sunday": 6,
+}
+
+
+@dataclass(frozen=True)
+class SessionWindow:
+    """Represents a continuous trading interval on specific days of week."""
+
+    day_from: str = "Mon"
+    day_to: str = "Mon"
+    start_time: str = "00:00"
+    end_time: str = "23:59"
+    eod: bool = False
+    session_type: str = "Regular"
+    day_of_week: int | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert session window to dictionary representation."""
+        return {
+            "day_from": self.day_from,
+            "day_to": self.day_to,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "eod": self.eod,
+            "session_type": self.session_type,
+            "day_of_week": self.day_of_week,
+        }
+
+
+@dataclass(frozen=True)
+class TradingHoliday:
+    """Represents a date when markets are closed."""
+
+    date_str: str
+    description: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert holiday to dictionary representation."""
+        return {
+            "date_str": self.date_str,
+            "description": self.description,
+        }
+
+
+def _window_intervals(w: SessionWindow) -> list[tuple[int, int]]:
+    """Derive list of (start_minute, end_minute) weekly intervals for window."""
+    try:
+        start_day = _DAY_NAME_TO_INT.get(w.day_from.lower(), w.day_of_week or 0)
+        end_day = _DAY_NAME_TO_INT.get(w.day_to.lower(), start_day)
+        sh, sm = (int(x) for x in w.start_time.split(":")[:2])
+        eh, em = (int(x) for x in w.end_time.split(":")[:2])
+        s_min = sh * 60 + sm
+        e_min = eh * 60 + em
+
+        if (end_day - start_day) % 7 == 1 and s_min > e_min:
+            return [(start_day * 1440 + s_min, end_day * 1440 + e_min)]
+
+        if start_day == end_day and s_min > e_min:
+            return [(start_day * 1440 + s_min, ((start_day + 1) % 7) * 1440 + e_min)]
+
+        days: list[int] = []
+        curr = start_day
+        for _ in range(7):
+            days.append(curr)
+            if curr == end_day:
+                break
+            curr = (curr + 1) % 7
+
+        intervals: list[tuple[int, int]] = []
+        for d in days:
+            if s_min <= e_min:
+                intervals.append((d * 1440 + s_min, d * 1440 + e_min))
+            else:
+                intervals.append((d * 1440 + s_min, ((d + 1) % 7) * 1440 + e_min))
+        return intervals
+    except ValueError, TypeError, AttributeError:
+        return []
+
+
+def _is_window_active(w: SessionWindow, minute_of_week: int) -> bool:
+    """Check if session window covers the specified minute of week (0..10079)."""
+    for s, e in _window_intervals(w):
+        if s <= e and s <= minute_of_week <= e:
+            return True
+        if s > e and (minute_of_week >= s or minute_of_week <= e):
+            return True
+    return False
+
+
+@dataclass
+class TradingSession:
+    """Represents an authoritative trading session calendar."""
+
+    id: int | None = None
+    name: str = ""
+    broker_id: int = -1
+    broker_name: str = "Default"
+    description: str = ""
+    timezone: str = "UTC"
+    windows: list[SessionWindow] = field(default_factory=list)
+    holidays: list[TradingHoliday] = field(default_factory=list)
+    is_default: bool = False
+
+    def is_within_session(self, dt: datetime) -> bool:
+        """Evaluate if datetime falls within active trading schedule."""
+        try:
+            target_tz = ZoneInfo(self.timezone)
+        except KeyError, ValueError, ZoneInfoNotFoundError:
+            target_tz = ZoneInfo("UTC")
+
+        if dt.tzinfo is not None:
+            dt_tz = dt.astimezone(target_tz)
+        else:
+            dt_tz = dt.replace(tzinfo=UTC).astimezone(target_tz)
+
+        date_iso = dt_tz.strftime("%Y-%m-%d")
+        for h in self.holidays:
+            if h.date_str == date_iso:
+                return False
+
+        if not self.windows:
+            return False
+
+        minute_of_week = dt_tz.weekday() * 1440 + dt_tz.hour * 60 + dt_tz.minute
+
+        return any(_is_window_active(w, minute_of_week) for w in self.windows)
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert trading session to dictionary representation."""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "broker_id": self.broker_id,
+            "broker_name": self.broker_name,
+            "description": self.description,
+            "timezone": self.timezone,
+            "windows": [w.to_dict() for w in self.windows],
+            "holidays": [h.to_dict() for h in self.holidays],
+            "is_default": self.is_default,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Mapping[str, Any]) -> TradingSession:
+        """Construct TradingSession from dictionary or database row."""
+        raw_windows = data.get("windows_json", "[]")
+        windows: list[SessionWindow] = []
+        if isinstance(raw_windows, str):
+            try:
+                parsed_w = json.loads(raw_windows)
+                windows = [
+                    SessionWindow(
+                        day_from=str(w.get("day_from", "Mon")),
+                        day_to=str(w.get("day_to", "Mon")),
+                        start_time=str(w.get("start_time", "00:00")),
+                        end_time=str(w.get("end_time", "23:59")),
+                        eod=bool(w.get("eod", False)),
+                        session_type=str(w.get("session_type", "Regular")),
+                        day_of_week=w.get("day_of_week"),
+                    )
+                    for w in parsed_w
+                ]
+            except json.JSONDecodeError, TypeError, KeyError:
+                windows = []
+        elif isinstance(raw_windows, list):
+            windows = [
+                SessionWindow(**w) if isinstance(w, dict) else w for w in raw_windows
+            ]
+
+        raw_holidays = data.get("holidays_json", "[]")
+        holidays: list[TradingHoliday] = []
+        if isinstance(raw_holidays, str):
+            try:
+                parsed_h = json.loads(raw_holidays)
+                holidays = [
+                    TradingHoliday(
+                        date_str=str(h.get("date_str", "")),
+                        description=str(h.get("description", "")),
+                    )
+                    for h in parsed_h
+                ]
+            except json.JSONDecodeError, TypeError, KeyError:
+                holidays = []
+        elif isinstance(raw_holidays, list):
+            holidays = [
+                TradingHoliday(**h) if isinstance(h, dict) else h for h in raw_holidays
+            ]
+
+        return cls(
+            id=data.get("id"),
+            name=str(data.get("name", "")),
+            broker_id=int(data.get("broker_id", -1)),
+            broker_name=str(data.get("broker_name", "Default")),
+            description=str(data.get("description", "")),
+            timezone=str(data.get("timezone", "UTC")),
+            windows=windows,
+            holidays=holidays,
+            is_default=bool(data.get("is_default", 0)),
+        )

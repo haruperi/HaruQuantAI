@@ -94,6 +94,10 @@ SUPPORTED_CLI_COMMANDS: tuple[str, ...] = (
     "settings",
     "reconcile",
     "data",
+    "instrument",
+    "-instrument",
+    "sessions",
+    "-sessions",
 )
 
 
@@ -109,6 +113,18 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         default="status",
         choices=SUPPORTED_CLI_COMMANDS,
         help="Headless command to execute after 7-stage bootstrap.",
+    )
+    parser.add_argument(
+        "-instrument",
+        dest="dash_instrument",
+        action="store_true",
+        help="Manage instruments in headless mode (alias for 'instrument').",
+    )
+    parser.add_argument(
+        "-sessions",
+        dest="dash_sessions",
+        action="store_true",
+        help="Manage sessions in headless mode (alias for 'sessions').",
     )
     parser.add_argument(
         "subcommand",
@@ -162,7 +178,13 @@ class HeadlessCliRunner:
         """Bind the runner to a bootstrapped ``HostRuntime``."""
         self.runtime = runtime
 
-    def execute(self, command: str, *, action: str = "list") -> dict[str, Any]:
+    def execute(
+        self,
+        command: str,
+        *,
+        action: str = "list",
+        extra_args: Sequence[str] | None = None,
+    ) -> dict[str, Any]:
         """Dispatch ``command`` against the active ``HostRuntime`` services."""
         cmd = command.strip().lower()
         act = action.strip().lower()
@@ -186,6 +208,10 @@ class HeadlessCliRunner:
             "settings": lambda: self._cmd_settings(act),
             "reconcile": self._cmd_reconcile,
             "data": lambda: self._cmd_data(act),
+            "instrument": lambda: self._cmd_instrument(act, extra_args),
+            "-instrument": lambda: self._cmd_instrument(act, extra_args),
+            "sessions": lambda: self._cmd_sessions(act, extra_args),
+            "-sessions": lambda: self._cmd_sessions(act, extra_args),
         }
         handler = handlers.get(cmd)
         if handler is None:
@@ -321,22 +347,26 @@ class HeadlessCliRunner:
                 "datasets": [d.to_dict() for d in datasets],
             }
         elif act in ("instruments", "instrument"):
-            instruments = dm.instruments.list_instruments()
+            instruments = dm.instruments.view()
             rendered = InstrumentsCLI.format_instruments_table(instruments)
             res = {
                 "command": "data",
                 "action": "instruments",
                 "rendered": rendered,
                 "count": len(instruments),
-                "instruments": [i.to_dict() for i in instruments],
+                "instruments": instruments,
             }
         elif act in ("sessions", "session"):
-            sessions = dm.sessions.list_sessions()
+            sessions = dm.sessions.view()
+            from app.workspace.data_manager import SessionsCLI
+
+            rendered = SessionsCLI.format_sessions_table(sessions)
             res = {
                 "command": "data",
                 "action": "sessions",
+                "rendered": rendered,
                 "count": len(sessions),
-                "sessions": [s.to_dict() for s in sessions],
+                "sessions": sessions,
             }
         elif act in ("baskets", "basket", "stock_groups"):
             overview_items = dm.baskets.get_baskets_overview()
@@ -373,6 +403,44 @@ class HeadlessCliRunner:
         else:
             raise ValueError(f"Unsupported data action: '{action}'")
         return res
+
+    def _cmd_instrument(
+        self, action: str, extra_args: Sequence[str] | None = None
+    ) -> dict[str, Any]:
+        """Dispatch headless instrument operations conforming to qdmcli."""
+        dm = self.runtime.data_manager
+        if dm is None:
+            raise RuntimeError("DataManagerWorkspace is not initialized.")
+
+        from app.workspace.data_manager import InstrumentsCLI
+
+        all_args = list(extra_args or [])
+        clean_act = action.strip()
+        if clean_act:
+            if "=" in clean_act:
+                all_args.append(clean_act)
+            else:
+                all_args.insert(0, f"action={clean_act}")
+        return InstrumentsCLI.dispatch(all_args, dm.instruments)
+
+    def _cmd_sessions(
+        self, action: str, extra_args: Sequence[str] | None = None
+    ) -> dict[str, Any]:
+        """Dispatch headless session operations conforming to qdmcli."""
+        dm = self.runtime.data_manager
+        if dm is None:
+            raise RuntimeError("DataManagerWorkspace is not initialized.")
+
+        from app.workspace.data_manager import SessionsCLI
+
+        all_args = list(extra_args or [])
+        clean_act = action.strip()
+        if clean_act:
+            if "=" in clean_act:
+                all_args.append(clean_act)
+            else:
+                all_args.insert(0, f"action={clean_act}")
+        return SessionsCLI.dispatch(all_args, dm.sessions)
 
 
 def format_cli_output(
@@ -420,7 +488,7 @@ def format_cli_output(
 def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
     """Run the 7-stage headless bootstrap, execute command, and tear down."""
     parser = _build_cli_parser()
-    args = parser.parse_args(list(argv) if argv is not None else [])
+    args, unknown = parser.parse_known_args(list(argv) if argv is not None else [])
     data_dir = Path(args.data_dir) if args.data_dir is not None else Path("data")
 
     config = BootstrapConfig(
@@ -431,12 +499,18 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
         plugins_dir=args.plugins_dir,
         use_process_pool=False,
     )
+    if getattr(args, "dash_instrument", False):
+        cmd = "instrument"
+    elif getattr(args, "dash_sessions", False):
+        cmd = "sessions"
+    else:
+        cmd = args.command
     logger.info(
         "%s: Starting 7-stage headless CLI bootstrap (command=%s data_dir=%s).",
         CLI_BOOTSTRAP_FR,
-        args.command,
+        cmd,
         data_dir,
-        extra={"fr_id": CLI_BOOTSTRAP_FR, "command": args.command},
+        extra={"fr_id": CLI_BOOTSTRAP_FR, "command": cmd},
     )
     effective_action = args.action
     if effective_action is None:
@@ -445,7 +519,7 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
     try:
         with bootstrap_context(config) as runtime:
             runner = HeadlessCliRunner(runtime)
-            result = runner.execute(args.command, action=effective_action)
+            result = runner.execute(cmd, action=effective_action, extra_args=unknown)
             result["stages_completed"] = len(runtime.completed_stages)
         output = format_cli_output(result, as_json=bool(args.json))
         return 0, output

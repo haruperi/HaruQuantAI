@@ -1,956 +1,856 @@
-"""Trading session calendar engine, holiday management, and XML templates.
+"""Trading session calendar engine and market schedule catalog management.
 
 Description:
-    Provides calendar evaluation logic (`TradingSession`, `SessionWindow`),
-    exchange holiday handling, regular and electronic trading hours schedule
-    filtering, SQX Sessions XML serialization/deserialization, and NinjaTrader 8
-    TradingHours XML template import. Governs the `datamgr_sessions` database
-    table without direct `sqlite3` imports.
+    Provides domain logic for trading session calendars, schedule viewing,
+    editing, cloning, deletion, and canonical JSON specification import and
+    export. Operates strictly via host persistence layer functions
+    (`list_datamgr_sessions`, `get_datamgr_session`, `create_datamgr_session`,
+    `update_datamgr_session`, `delete_datamgr_session`) with zero direct database
+    queries and non-silent requirement logging.
 
 Purpose:
-    FEAT-DATAMGR-SESSIONS: Trading session calendars and exchange holiday governance.
+    FEAT-DATAMGR-SESSIONS: Trading session calendar and schedule catalog governance.
 
 Key Capabilities:
-    - FR-DATAMGR-SESSIONS-CALENDAR-MODEL: Session windows and holiday schedule.
-      Associated: `TradingSession.is_within_session()`
-      Logging: Emits DEBUG when evaluating datetime against session schedule.
-    - FR-DATAMGR-SESSIONS-CATALOG-CRUD: Manage session calendar records in
-      `datamgr_sessions`.
-      Associated: `SessionsCatalogService.list_sessions()`,
-      `SessionsCatalogService.save_session()`
-      Logging: Emits INFO on creation, cloning, and deletion of session
-      schedules.
-    - FR-DATAMGR-SESSIONS-SQX-XML: Native SQX Sessions XML import and export.
-      Associated: `SessionsCatalogService.export_sqx_xml()`,
-      `SessionsCatalogService.import_sqx_xml()`
-      Logging: Emits INFO on XML export and import with parsed session count.
-    - FR-DATAMGR-SESSIONS-NT8-IMPORT: Discover and import NinjaTrader 8
-      TradingHours templates.
-      Associated: `SessionsCatalogService.list_nt_templates()`,
-      `SessionsCatalogService.import_nt_sessions()`
-      Logging: Emits INFO on NinjaTrader 8 template import.
+    - FR-DATAMGR-SESSIONS-VIEW: Retrieve and filter session records from the catalog.
+      Associated: `Sessions.view()`
+      Logging: Emits INFO on listed count and query parameters.
+    - FR-DATAMGR-SESSIONS-ADD: Add a trading session specification to the catalog.
+      Associated: `Sessions.add()`
+      Logging: Emits INFO on added session name and id.
+    - FR-DATAMGR-SESSIONS-EDIT: Edit one or multiple existing session records.
+      Associated: `Sessions.edit()`
+      Logging: Emits INFO on edited session(s) and updated count.
+    - FR-DATAMGR-SESSIONS-CLONE: Duplicate a session schedule under a new name.
+      Associated: `Sessions.clone()`
+      Logging: Emits INFO on source and cloned target session names.
+    - FR-DATAMGR-SESSIONS-DELETE: Delete one or multiple sessions from the catalog.
+      Associated: `Sessions.delete()`
+      Logging: Emits INFO on deleted session name(s) and count.
+    - FR-DATAMGR-SESSIONS-IMPORT: Load session specifications from a selected JSON file.
+      Associated: `Sessions.import_()`
+      Logging: Emits INFO on imported, overwritten, and skipped session counts.
+    - FR-DATAMGR-SESSIONS-EXPORT: Save session specifications to a JSON file.
+      Associated: `Sessions.export()`
+      Logging: Emits INFO on exported session count and target path.
+    - FR-DATAMGR-SESSIONS-CLI: Headless CLI interface for session catalog management.
+      Associated: `SessionsCLI.dispatch()`
+      Logging: Emits INFO on headless command dispatch and parameter evaluation.
 
 Python API Usage:
     ```python
-    from datetime import datetime
-    from app.workspace.data_manager.sessions import SessionsCatalogService
+    from app.workspace.data_manager.sessions import Sessions, SessionsCLI
 
-    service = SessionsCatalogService()
-    session = service.get_session("Forex 24/5")
-    if session:
-        is_open = session.is_within_session(datetime(2026, 10, 15, 14, 30))
+    service = Sessions()
+    sessions = service.view()
+    print(SessionsCLI.format_sessions_table(sessions))
     ```
 
 CLI Usage:
     ```bash
-    uv run python -m app.workspace.data_manager.sessions
+    uv run python -m app.cli sessions action=list
+    uv run python -m app.cli sessions action=add session="24/7" timezone=UTC
+    uv run python -m app.cli sessions action=list csv=true
     ```
 """
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import tempfile
-import xml.etree.ElementTree as ET
-from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-import defusedxml.ElementTree as DefusedET  # type: ignore[import-untyped]
 from app.host.logging import get_logger
-from app.host.persistence.create import create_schema, insert_row
-from app.host.persistence.delete import delete_row_by_pk
-from app.host.persistence.read import count_rows, read_rows, resolve_connection
-from app.host.persistence.update import update_row_by_pk
-from defusedxml.common import DefusedXmlException  # type: ignore[import-untyped]
+from app.host.persistence.create import create_datamgr_session, create_schema
+from app.host.persistence.delete import delete_datamgr_session
+from app.host.persistence.read import (
+    get_datamgr_session,
+    list_datamgr_sessions,
+    resolve_connection,
+)
+from app.host.persistence.update import update_datamgr_session
 
 __all__ = [
-    "SessionWindow",
+    "Sessions",
+    "SessionsCLI",
     "SessionsCatalogService",
-    "TradingHoliday",
-    "TradingSession",
 ]
 
 logger = get_logger(__name__)
 
-CALENDAR_MODEL_FR = "FR-DATAMGR-SESSIONS-CALENDAR-MODEL"
-CATALOG_CRUD_FR = "FR-DATAMGR-SESSIONS-CATALOG-CRUD"
-SQX_XML_FR = "FR-DATAMGR-SESSIONS-SQX-XML"
-NT8_IMPORT_FR = "FR-DATAMGR-SESSIONS-NT8-IMPORT"
+VIEW_FR = "FR-DATAMGR-SESSIONS-VIEW"
+ADD_FR = "FR-DATAMGR-SESSIONS-ADD"
+EDIT_FR = "FR-DATAMGR-SESSIONS-EDIT"
+CLONE_FR = "FR-DATAMGR-SESSIONS-CLONE"
+DELETE_FR = "FR-DATAMGR-SESSIONS-DELETE"
+IMPORT_FR = "FR-DATAMGR-SESSIONS-IMPORT"
+EXPORT_FR = "FR-DATAMGR-SESSIONS-EXPORT"
+CLI_FR = "FR-DATAMGR-SESSIONS-CLI"
 
-_DAY_NAME_TO_INT: dict[str, int] = {
-    "mon": 0,
-    "monday": 0,
-    "tue": 1,
-    "tuesday": 1,
-    "wed": 2,
-    "wednesday": 2,
-    "thu": 3,
-    "thursday": 3,
-    "fri": 4,
-    "friday": 4,
-    "sat": 5,
-    "saturday": 5,
-    "sun": 6,
-    "sunday": 6,
+
+@dataclass(frozen=True)
+class _Config:
+    """Internal module configuration and execution parameters."""
+
+    db_path: Path | None = None
+    default_timezone: str = "UTC"
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert internal config to standard dictionary."""
+        return {
+            "db_path": str(self.db_path) if self.db_path else None,
+            "default_timezone": self.default_timezone,
+        }
+
+
+_VALID_SESSION_COLS: frozenset[str] = frozenset(
+    {
+        "name",
+        "description",
+        "timezone",
+        "windows_json",
+        "holidays_json",
+        "is_default",
+        "broker_id",
+    }
+)
+
+_SESSION_FIELD_ALIASES: dict[str, str] = {
+    "session": "name",
+    "session_name": "name",
+    "tz": "timezone",
+    "time_zone": "timezone",
+    "broker": "broker_id",
+    "default": "is_default",
 }
 
 
-@dataclass(frozen=True)
-class SessionWindow:
-    """Represents a continuous trading interval on specific days of week."""
-
-    day_from: str = "Mon"
-    day_to: str = "Mon"
-    start_time: str = "00:00"
-    end_time: str = "23:59"
-    eod: bool = False
-    session_type: str = "Regular"
-    day_of_week: int | None = None
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert session window to dictionary representation."""
-        return {
-            "day_from": self.day_from,
-            "day_to": self.day_to,
-            "start_time": self.start_time,
-            "end_time": self.end_time,
-            "eod": self.eod,
-            "session_type": self.session_type,
-            "day_of_week": self.day_of_week,
-        }
+def _serialize_windows(raw: Any) -> str:
+    """Serialize windows structure to JSON string."""
+    if isinstance(raw, str):
+        return raw
+    if isinstance(raw, list):
+        items: list[dict[str, Any]] = []
+        for item in raw:
+            if hasattr(item, "to_dict"):
+                items.append(item.to_dict())
+            elif isinstance(item, dict):
+                items.append(item)
+        return json.dumps(items)
+    return "[]"
 
 
-@dataclass(frozen=True)
-class TradingHoliday:
-    """Represents a date when markets are closed."""
-
-    date_str: str
-    description: str = ""
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert holiday to dictionary representation."""
-        return {
-            "date_str": self.date_str,
-            "description": self.description,
-        }
-
-
-def _window_intervals(w: SessionWindow) -> list[tuple[int, int]]:
-    """Derive list of (start_minute, end_minute) weekly intervals for window."""
-    try:
-        start_day = _DAY_NAME_TO_INT.get(w.day_from.lower(), w.day_of_week or 0)
-        end_day = _DAY_NAME_TO_INT.get(w.day_to.lower(), start_day)
-        sh, sm = (int(x) for x in w.start_time.split(":")[:2])
-        eh, em = (int(x) for x in w.end_time.split(":")[:2])
-        s_min = sh * 60 + sm
-        e_min = eh * 60 + em
-
-        if (end_day - start_day) % 7 == 1 and s_min > e_min:
-            return [(start_day * 1440 + s_min, end_day * 1440 + e_min)]
-
-        if start_day == end_day and s_min > e_min:
-            return [(start_day * 1440 + s_min, ((start_day + 1) % 7) * 1440 + e_min)]
-
-        days: list[int] = []
-        curr = start_day
-        for _ in range(7):
-            days.append(curr)
-            if curr == end_day:
-                break
-            curr = (curr + 1) % 7
-
-        intervals: list[tuple[int, int]] = []
-        for d in days:
-            if s_min <= e_min:
-                intervals.append((d * 1440 + s_min, d * 1440 + e_min))
-            else:
-                intervals.append((d * 1440 + s_min, ((d + 1) % 7) * 1440 + e_min))
-        return intervals
-    except ValueError, TypeError, AttributeError:
-        return []
+def _serialize_holidays(raw: Any) -> str:
+    """Serialize holidays structure to JSON string."""
+    if isinstance(raw, str):
+        return raw
+    if isinstance(raw, list):
+        items: list[dict[str, Any]] = []
+        for item in raw:
+            if hasattr(item, "to_dict"):
+                items.append(item.to_dict())
+            elif isinstance(item, dict):
+                items.append(item)
+        return json.dumps(items)
+    return "[]"
 
 
-def _is_window_active(w: SessionWindow, minute_of_week: int) -> bool:
-    """Check if session window covers the specified minute of week (0..10079)."""
-    for s, e in _window_intervals(w):
-        if s <= e and s <= minute_of_week <= e:
-            return True
-        if s > e and (minute_of_week >= s or minute_of_week <= e):
-            return True
-    return False
-
-
-@dataclass
-class TradingSession:
-    """Represents an authoritative trading session calendar."""
-
-    id: int | None = None
-    name: str = ""
-    broker_id: int = -1
-    broker_name: str = "SQ default"
-    description: str = ""
-    timezone: str = "UTC"
-    windows: list[SessionWindow] = field(default_factory=list)
-    holidays: list[TradingHoliday] = field(default_factory=list)
-    is_default: bool = False
-
-    def is_within_session(self, dt: datetime) -> bool:
-        """Evaluate if datetime falls within active trading schedule."""
-        try:
-            target_tz = ZoneInfo(self.timezone)
-        except KeyError, ValueError, ZoneInfoNotFoundError:
-            target_tz = ZoneInfo("UTC")
-
-        if dt.tzinfo is not None:
-            dt_tz = dt.astimezone(target_tz)
+def _parse_json_payload(
+    file_path_or_content: str | Path | Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """Parse JSON file path, string, or mapping into a list of session dicts."""
+    if isinstance(file_path_or_content, Mapping):
+        raw: Any = dict(file_path_or_content)
+    else:
+        target = Path(file_path_or_content)
+        if target.is_file():
+            raw = json.loads(target.read_text(encoding="utf-8"))
         else:
-            dt_tz = dt.replace(tzinfo=UTC).astimezone(target_tz)
+            raw = json.loads(str(file_path_or_content))
 
-        date_iso = dt_tz.strftime("%Y-%m-%d")
-        for h in self.holidays:
-            if h.date_str == date_iso:
-                logger.debug(
-                    "%s: Date %s falls on holiday %s",
-                    CALENDAR_MODEL_FR,
-                    date_iso,
-                    h.description,
-                    extra={
-                        "fr_id": CALENDAR_MODEL_FR,
-                        "date": date_iso,
-                        "holiday": h.description,
-                    },
-                )
-                return False
-
-        if not self.windows:
-            return False
-
-        minute_of_week = dt_tz.weekday() * 1440 + dt_tz.hour * 60 + dt_tz.minute
-
-        for w in self.windows:
-            if _is_window_active(w, minute_of_week):
-                return True
-
-        logger.debug(
-            "%s: %s outside session windows for %s",
-            CALENDAR_MODEL_FR,
-            dt.isoformat(),
-            self.name,
-            extra={
-                "fr_id": CALENDAR_MODEL_FR,
-                "dt": dt.isoformat(),
-                "session": self.name,
-            },
-        )
-        return False
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert trading session to dictionary representation."""
-        return {
-            "id": self.id,
-            "name": self.name,
-            "broker_id": self.broker_id,
-            "broker_name": self.broker_name,
-            "description": self.description,
-            "timezone": self.timezone,
-            "windows": [w.to_dict() for w in self.windows],
-            "holidays": [h.to_dict() for h in self.holidays],
-            "is_default": self.is_default,
-        }
-
-    @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> TradingSession:
-        """Construct TradingSession from dictionary or database row."""
-        raw_windows = data.get("windows_json", "[]")
-        windows: list[SessionWindow] = []
-        if isinstance(raw_windows, str):
-            try:
-                parsed_w = json.loads(raw_windows)
-                windows = [
-                    SessionWindow(
-                        day_from=str(w.get("day_from", "Mon")),
-                        day_to=str(w.get("day_to", "Mon")),
-                        start_time=str(w.get("start_time", "00:00")),
-                        end_time=str(w.get("end_time", "23:59")),
-                        eod=bool(w.get("eod", False)),
-                        session_type=str(w.get("session_type", "Regular")),
-                        day_of_week=w.get("day_of_week"),
-                    )
-                    for w in parsed_w
-                ]
-            except json.JSONDecodeError, TypeError, KeyError:
-                windows = []
-        elif isinstance(raw_windows, list):
-            windows = [
-                SessionWindow(**w) if isinstance(w, dict) else w for w in raw_windows
-            ]
-
-        raw_holidays = data.get("holidays_json", "[]")
-        holidays: list[TradingHoliday] = []
-        if isinstance(raw_holidays, str):
-            try:
-                parsed_h = json.loads(raw_holidays)
-                holidays = [
-                    TradingHoliday(
-                        date_str=str(h.get("date_str", "")),
-                        description=str(h.get("description", "")),
-                    )
-                    for h in parsed_h
-                ]
-            except json.JSONDecodeError, TypeError, KeyError:
-                holidays = []
-        elif isinstance(raw_holidays, list):
-            holidays = [
-                TradingHoliday(**h) if isinstance(h, dict) else h for h in raw_holidays
-            ]
-
-        return cls(
-            id=data.get("id"),
-            name=str(data.get("name", "")),
-            broker_id=int(data.get("broker_id", -1)),
-            broker_name=str(data.get("broker_name", "SQ default")),
-            description=str(data.get("description", "")),
-            timezone=str(data.get("timezone", "UTC")),
-            windows=windows,
-            holidays=holidays,
-            is_default=bool(data.get("is_default", 0)),
-        )
+    if isinstance(raw, dict):
+        return list(raw.get("sessions", []))
+    if isinstance(raw, list):
+        return list(raw)
+    return []
 
 
-_DEFAULT_SEEDED_SESSIONS: tuple[dict[str, Any], ...] = (
-    {
-        "name": "24/7",
-        "description": "Continuous 24/7 trading for Crypto markets",
-        "timezone": "UTC",
-        "is_default": 1,
-        "windows_json": json.dumps(
-            [
-                {
-                    "day_from": "Mon",
-                    "day_to": "Sun",
-                    "start_time": "00:00",
-                    "end_time": "23:59",
-                    "session_type": "Regular",
-                }
-            ]
-        ),
-        "holidays_json": "[]",
-    },
-    {
-        "name": "Forex 24/5",
-        "description": "Standard Forex trading from Sunday 22:00 to Friday 22:00 UTC",
-        "timezone": "UTC",
-        "is_default": 0,
-        "windows_json": json.dumps(
-            [
-                {
-                    "day_from": "Mon",
-                    "day_to": "Thu",
-                    "start_time": "00:00",
-                    "end_time": "23:59",
-                    "session_type": "Regular",
-                },
-                {
-                    "day_from": "Fri",
-                    "day_to": "Fri",
-                    "start_time": "00:00",
-                    "end_time": "22:00",
-                    "session_type": "Regular",
-                },
-                {
-                    "day_from": "Sun",
-                    "day_to": "Sun",
-                    "start_time": "22:00",
-                    "end_time": "23:59",
-                    "session_type": "Regular",
-                },
-            ]
-        ),
-        "holidays_json": "[]",
-    },
-    {
-        "name": "US Equities RTH",
-        "description": "US Stock Market Regular Trading Hours (09:30 - 16:00 EST)",
-        "timezone": "America/New_York",
-        "is_default": 0,
-        "windows_json": json.dumps(
-            [
-                {
-                    "day_from": "Mon",
-                    "day_to": "Fri",
-                    "start_time": "09:30",
-                    "end_time": "16:00",
-                    "session_type": "Regular",
-                }
-            ]
-        ),
-        "holidays_json": json.dumps(
-            [
-                {"date_str": "2026-01-01", "description": "New Year's Day"},
-                {
-                    "date_str": "2026-07-04",
-                    "description": "Independence Day",
-                },
-                {"date_str": "2026-12-25", "description": "Christmas Day"},
-            ]
-        ),
-    },
-    {
-        "name": "CME Futures Globex",
-        "description": "CME Index Futures electronic trading hours",
-        "timezone": "America/Chicago",
-        "is_default": 0,
-        "windows_json": json.dumps(
-            [
-                {
-                    "day_from": "Mon",
-                    "day_to": "Fri",
-                    "start_time": "17:00",
-                    "end_time": "16:00",
-                    "session_type": "Regular",
-                }
-            ]
-        ),
-        "holidays_json": "[]",
-    },
-)
-
-
-class SessionsCatalogService:
-    """Service governing session calendar CRUD, NT8 import, and XML transfer."""
+class Sessions:
+    """Service governing trading sessions via host persistence CRUD."""
 
     def __init__(
         self,
         db_path: Path | str | None = None,
-        data_dir: Path | str | None = None,
+        config: _Config | None = None,
+        log_service: Any = None,
     ) -> None:
-        """Initialize session service with database and templates directories."""
-        self.db_path = Path(db_path) if db_path is not None else None
-        self.data_dir = Path(data_dir) if data_dir is not None else Path("data")
+        """Initialize sessions service with optional DB path and configuration."""
+        resolved_db = Path(db_path) if db_path is not None else None
+        self._config = config or _Config(db_path=resolved_db)
+        self.log_service = log_service
 
-    def ensure_default_sessions(self) -> int:
-        """Seed default canonical trading sessions if table is empty."""
-        with resolve_connection(self.db_path) as conn:
-            existing = count_rows(conn, "datamgr_sessions")
-            if existing > 0:
-                return 0
+    @property
+    def db_path(self) -> Path | None:
+        """Return configured database file path."""
+        return self._config.db_path
 
-            seeded = 0
-            for item in _DEFAULT_SEEDED_SESSIONS:
-                insert_row(conn, "datamgr_sessions", dict(item))
-                seeded += 1
-
-        logger.info(
-            "%s: Seeded %d default trading sessions",
-            CATALOG_CRUD_FR,
-            seeded,
-            extra={"fr_id": CATALOG_CRUD_FR, "seeded": seeded},
-        )
-        return seeded
-
-    def list_sessions(
+    def view(
         self,
         broker_id: int | None = None,
         search: str | None = None,
-    ) -> list[TradingSession]:
-        """List sessions matching optional broker ID and search query."""
-        where: dict[str, Any] = {}
-        if broker_id is not None and broker_id >= 0:
-            where["broker_id"] = broker_id
-
-        with resolve_connection(self.db_path) as conn:
-            rows = read_rows(
-                conn,
-                "datamgr_sessions",
-                where=where or None,
-                order_by="name ASC",
-            )
-
-        results: list[TradingSession] = []
+    ) -> list[dict[str, Any]]:
+        """Return sessions in datamgr_sessions matching optional filter criteria."""
+        rows = list_datamgr_sessions(
+            self._config.db_path,
+            broker_id=broker_id if broker_id is not None and broker_id >= 0 else None,
+        )
+        results: list[dict[str, Any]] = []
         q = search.strip().lower() if search else None
+
         for r in rows:
-            session = TradingSession.from_dict(r)
-            if (
-                q
-                and q not in session.name.lower()
-                and q not in session.description.lower()
-            ):
-                continue
-            results.append(session)
+            if q:
+                name_str = str(r.get("name", "")).lower()
+                desc_str = str(r.get("description", "")).lower()
+                if q not in name_str and q not in desc_str:
+                    continue
+            results.append(r)
+
+        logger.info(
+            "%s: Listed %d sessions",
+            VIEW_FR,
+            len(results),
+            extra={
+                "fr_id": VIEW_FR,
+                "count": len(results),
+                "broker_id": broker_id,
+                "search": search,
+            },
+        )
         return results
 
-    def get_session(self, name: str) -> TradingSession | None:
-        """Retrieve a trading session by its unique name."""
-        clean = name.strip()
-        with resolve_connection(self.db_path) as conn:
-            rows = read_rows(
-                conn,
-                "datamgr_sessions",
-                where={"name": clean},
-                limit=1,
-            )
-        if not rows:
-            return None
-        return TradingSession.from_dict(rows[0])
-
-    def save_session(self, payload: Mapping[str, Any]) -> TradingSession:
-        """Create or update a trading session calendar."""
-        clean_name = str(payload.get("name", "")).strip()
+    def add(self, payload: Mapping[str, Any]) -> dict[str, Any]:
+        """Add a trading session specification to datamgr_sessions."""
+        clean_name = str(payload.get("name", "") or payload.get("session", "")).strip()
         if not clean_name:
             raise ValueError("Session name is required.")
 
-        windows_json = payload.get("windows_json")
-        if windows_json is None:
-            raw_w = payload.get("windows", [])
-            windows_json = json.dumps(
-                [w.to_dict() if hasattr(w, "to_dict") else w for w in raw_w]
+        windows_raw = payload.get("windows_json") or payload.get("windows", [])
+        holidays_raw = payload.get("holidays_json") or payload.get("holidays", [])
+        windows_json = _serialize_windows(windows_raw)
+        holidays_json = _serialize_holidays(holidays_raw)
+
+        description = str(payload.get("description", "")).strip()
+        timezone = str(
+            payload.get("timezone", payload.get("tz", self._config.default_timezone))
+        ).strip()
+        is_default = 1 if payload.get("is_default") or payload.get("default") else 0
+        broker_id = int(payload.get("broker_id", payload.get("broker", -1)))
+
+        existing = get_datamgr_session(self._config.db_path, clean_name)
+        if existing is not None:
+            updates: dict[str, Any] = {
+                "name": clean_name,
+                "description": description,
+                "timezone": timezone,
+                "windows_json": windows_json,
+                "holidays_json": holidays_json,
+                "is_default": is_default,
+                "broker_id": broker_id,
+            }
+            update_datamgr_session(self._config.db_path, clean_name, updates)
+            res = get_datamgr_session(self._config.db_path, clean_name)
+            result = res if res is not None else dict(updates)
+        else:
+            inserted_id = create_datamgr_session(
+                self._config.db_path,
+                name=clean_name,
+                description=description,
+                timezone_name=timezone,
+                windows_json=windows_json,
+                holidays_json=holidays_json,
+                is_default=is_default,
+                broker_id=broker_id,
             )
+            res = get_datamgr_session(self._config.db_path, clean_name)
+            result = res if res is not None else {"id": inserted_id, "name": clean_name}
 
-        holidays_json = payload.get("holidays_json")
-        if holidays_json is None:
-            raw_h = payload.get("holidays", [])
-            holidays_json = json.dumps(
-                [h.to_dict() if hasattr(h, "to_dict") else h for h in raw_h]
-            )
-
-        row_data: dict[str, Any] = {
-            "name": clean_name,
-            "description": str(payload.get("description", "")),
-            "timezone": str(payload.get("timezone", "UTC")),
-            "windows_json": windows_json,
-            "holidays_json": holidays_json,
-            "is_default": 1 if payload.get("is_default") else 0,
-            "broker_id": int(payload.get("broker_id", -1)),
-        }
-
-        existing = self.get_session(clean_name)
-        with resolve_connection(self.db_path) as conn:
-            if existing is not None and existing.id is not None:
-                row_data["id"] = existing.id
-                update_row_by_pk(
-                    conn, "datamgr_sessions", {"id": existing.id}, row_data
-                )
-            else:
-                row_data.pop("id", None)
-                inserted = insert_row(conn, "datamgr_sessions", row_data)
-                row_data["id"] = int(inserted)
-
-        result = TradingSession.from_dict(row_data)
         logger.info(
-            "%s: Saved session calendar name=%s id=%s",
-            CATALOG_CRUD_FR,
-            result.name,
-            result.id,
-            extra={
-                "fr_id": CATALOG_CRUD_FR,
-                "session_name": result.name,
-                "id": result.id,
-            },
+            "%s: Added session name=%s id=%s",
+            ADD_FR,
+            clean_name,
+            result.get("id"),
+            extra={"fr_id": ADD_FR, "session_name": clean_name, "id": result.get("id")},
         )
         return result
 
-    def delete_session(self, name: str) -> bool:
-        """Delete a trading session by name."""
-        session = self.get_session(name)
-        if session is None or session.id is None:
-            return False
-
-        with resolve_connection(self.db_path) as conn:
-            deleted = delete_row_by_pk(conn, "datamgr_sessions", {"id": session.id}) > 0
-
-        logger.info(
-            "%s: Deleted session name=%s deleted=%s",
-            CATALOG_CRUD_FR,
-            name,
-            deleted,
-            extra={
-                "fr_id": CATALOG_CRUD_FR,
-                "session_name": name,
-                "deleted": deleted,
-            },
-        )
-        return deleted
-
-    def clone_session(
+    def edit(
         self,
-        source_name: str,
-        new_name: str,
-        broker_id: int = -1,
-        broker_postfix: str = "",
-    ) -> TradingSession:
-        """Clone an existing session schedule with a new name."""
-        source = self.get_session(source_name)
-        if source is None:
-            raise KeyError(f"Source session '{source_name}' not found.")
+        name_or_names: str | Sequence[str],
+        updates: Mapping[str, Any],
+        change_flags: Mapping[str, bool] | None = None,
+    ) -> dict[str, Any] | int:
+        """Edit one or multiple sessions in datamgr_sessions."""
+        filtered_updates: dict[str, Any] = {}
+        for k, v in updates.items():
+            norm_k = _SESSION_FIELD_ALIASES.get(k.lower(), k)
+            if (
+                norm_k in _VALID_SESSION_COLS
+                and norm_k != "id"
+                and (change_flags is None or change_flags.get(k, True))
+            ):
+                if norm_k == "windows":
+                    filtered_updates["windows_json"] = _serialize_windows(v)
+                elif norm_k == "holidays":
+                    filtered_updates["holidays_json"] = _serialize_holidays(v)
+                else:
+                    filtered_updates[norm_k] = v
 
-        target_name = (
-            new_name.strip() if new_name else f"{source.name}{broker_postfix}".strip()
-        )
-        data = source.to_dict()
-        data["id"] = None
-        data["name"] = target_name
-        data["broker_id"] = broker_id
-        return self.save_session(data)
+        if isinstance(name_or_names, str):
+            clean_name = name_or_names.strip()
+            current = get_datamgr_session(self._config.db_path, clean_name)
+            if current is None:
+                raise KeyError(f"Session '{clean_name}' not found.")
+            update_datamgr_session(self._config.db_path, clean_name, filtered_updates)
+            updated = get_datamgr_session(self._config.db_path, clean_name)
+            res = updated if updated is not None else dict(filtered_updates)
+            logger.info(
+                "%s: Edited session name=%s",
+                EDIT_FR,
+                clean_name,
+                extra={"fr_id": EDIT_FR, "session_name": clean_name},
+            )
+            return res
 
-    def mass_delete_sessions(self, names: Sequence[str]) -> int:
-        """Delete multiple sessions by name."""
         count = 0
-        for name in names:
-            if self.delete_session(name):
+        for name in name_or_names:
+            clean_name = name.strip()
+            if update_datamgr_session(
+                self._config.db_path, clean_name, filtered_updates
+            ):
                 count += 1
         logger.info(
-            "%s: Mass-deleted %d sessions",
-            CATALOG_CRUD_FR,
+            "%s: Edited %d sessions",
+            EDIT_FR,
             count,
-            extra={"fr_id": CATALOG_CRUD_FR, "count": count},
+            extra={"fr_id": EDIT_FR, "count": count},
         )
         return count
 
-    def list_nt_templates(self, folder_path: str | None = None) -> dict[str, Any]:
-        """Discover NinjaTrader 8 TradingHours template files in folder."""
-        target_dir = (
-            Path(folder_path)
-            if folder_path
-            else self.data_dir / "templates" / "ninjatrader"
-        )
-        exists = target_dir.is_dir()
-        templates: list[str] = []
-        if exists:
-            templates.extend(p.stem for p in target_dir.glob("*.xml"))
-
-        logger.info(
-            "%s: Discovered %d NT8 templates in %s",
-            NT8_IMPORT_FR,
-            len(templates),
-            target_dir,
-            extra={
-                "fr_id": NT8_IMPORT_FR,
-                "count": len(templates),
-                "folder": str(target_dir),
-            },
-        )
-        return {
-            "folder": str(target_dir),
-            "exists": exists,
-            "templates": templates,
-            "count": len(templates),
-        }
-
-    def import_nt_sessions(
+    def clone(
         self,
-        xml_content: str | None = None,
-        folder_path: str | None = None,
-        conflict_policy: str = "overwrite",
+        name: str = "",
+        clone_name: str = "",
+        broker_id: int = -1,
+        broker_postfix: str = "",
+        source_name: str = "",
     ) -> dict[str, Any]:
-        """Import NinjaTrader 8 TradingHours XML definitions."""
-        imported: list[str] = []
-        skipped: list[str] = []
-        failed: list[str] = []
-        total_holidays_parsed = 0
+        """Copy one session to create a new session in datamgr_sessions."""
+        target_src = source_name or name
+        clean_name = target_src.strip()
+        source = get_datamgr_session(self._config.db_path, clean_name)
+        if source is None:
+            raise KeyError(f"Source session '{clean_name}' not found.")
 
-        xml_snippets: list[str] = []
-        if xml_content:
-            xml_snippets.append(xml_content)
-        elif folder_path and Path(folder_path).is_dir():
-            for p in Path(folder_path).glob("*.xml"):
-                try:
-                    xml_snippets.append(p.read_text(encoding="utf-8"))
-                except OSError:
-                    failed.append(p.name)
+        target_name = (
+            clone_name.strip()
+            if clone_name
+            else f"{source['name']}{broker_postfix}".strip()
+        )
+        data = dict(source)
+        data.pop("id", None)
+        data["name"] = target_name
+        data["broker_id"] = broker_id if broker_id >= 0 else source.get("broker_id", -1)
+        cloned = self.add(data)
+        logger.info(
+            "%s: Cloned session %s -> %s",
+            CLONE_FR,
+            clean_name,
+            target_name,
+            extra={"fr_id": CLONE_FR, "source": clean_name, "target": target_name},
+        )
+        return cloned
 
-        for content in xml_snippets:
-            try:
-                root = DefusedET.fromstring(content)
-                name = (
-                    root.findtext(".//Name")
-                    or root.findtext("Name")
-                    or root.get("name", "NT8_Session")
-                )
-                clean_name = name.strip()
-                existing = self.get_session(clean_name)
-                if existing and conflict_policy == "skip":
-                    skipped.append(clean_name)
-                    continue
+    def delete(self, name_or_names: str | Sequence[str]) -> bool | int:
+        """Remove one or more sessions from datamgr_sessions."""
+        if isinstance(name_or_names, str):
+            clean_name = name_or_names.strip()
+            deleted = delete_datamgr_session(self._config.db_path, clean_name)
+            logger.info(
+                "%s: Deleted session name=%s status=%s",
+                DELETE_FR,
+                clean_name,
+                deleted,
+                extra={
+                    "fr_id": DELETE_FR,
+                    "session_name": clean_name,
+                    "deleted": deleted,
+                },
+            )
+            return deleted
 
-                windows = [
-                    {
-                        "day_from": s.findtext("Day") or "Mon",
-                        "day_to": s.findtext("Day") or "Mon",
-                        "start_time": s.findtext("StartTime") or "00:00",
-                        "end_time": s.findtext("EndTime") or "23:59",
-                        "session_type": "Regular",
-                    }
-                    for s in root.findall(".//Session")
-                ]
+        deleted_count = 0
+        for name in name_or_names:
+            clean_name = name.strip()
+            if delete_datamgr_session(self._config.db_path, clean_name):
+                deleted_count += 1
+        logger.info(
+            "%s: Deleted %d sessions",
+            DELETE_FR,
+            deleted_count,
+            extra={"fr_id": DELETE_FR, "deleted_count": deleted_count},
+        )
+        return deleted_count
 
-                holidays: list[dict[str, str]] = []
-                for he in root.findall(".//Holiday"):
-                    h_date = (
-                        he.findtext("Date")
-                        or he.findtext("date")
-                        or he.get("date")
-                        or he.get("Date")
-                        or ""
-                    ).strip()
-                    if h_date:
-                        h_date = h_date.split("T")[0].split(" ")[0]
-                        h_desc = (
-                            he.findtext("Description")
-                            or he.findtext("description")
-                            or he.get("description")
-                            or he.get("Description")
-                            or ""
-                        ).strip()
-                        holidays.append({"date_str": h_date, "description": h_desc})
-                total_holidays_parsed += len(holidays)
+    def import_(
+        self,
+        file_path_or_content: str | Path | Mapping[str, Any],
+        conflict_policy: str = "overwrite_all",
+    ) -> dict[str, Any]:
+        """Add new sessions from a selected JSON file or structure."""
+        items = _parse_json_payload(file_path_or_content)
+        imported = 0
+        overwritten = 0
+        skipped = 0
+        sessions_list: list[str] = []
 
-                self.save_session(
-                    {
-                        "name": clean_name,
-                        "description": f"Imported NT8 template ({clean_name})",
-                        "timezone": (
-                            root.findtext(".//TimeZone")
-                            or root.findtext("TimeZone")
-                            or "UTC"
-                        ),
-                        "windows_json": json.dumps(windows),
-                        "holidays_json": json.dumps(holidays),
-                    }
-                )
-                imported.append(clean_name)
-            except (
-                DefusedXmlException,
-                ET.ParseError,
-                ValueError,
-                TypeError,
-            ):
-                failed.append("XML_PARSE_ERROR")
+        for item in items:
+            name = str(item.get("name", "") or item.get("session", "")).strip()
+            if not name:
+                continue
+            existing = get_datamgr_session(self._config.db_path, name)
+            if existing and conflict_policy == "skip":
+                skipped += 1
+                continue
+            self.add(item)
+            sessions_list.append(name)
+            if existing:
+                overwritten += 1
+            else:
+                imported += 1
 
         logger.info(
-            "%s: NT8 import completed: %d imported, %d skipped, %d failed",
-            NT8_IMPORT_FR,
-            len(imported),
-            len(skipped),
-            len(failed),
+            "%s: Imported sessions JSON (imported=%d, overwritten=%d, skipped=%d)",
+            IMPORT_FR,
+            imported,
+            overwritten,
+            skipped,
             extra={
-                "fr_id": NT8_IMPORT_FR,
-                "imported": len(imported),
-                "skipped": len(skipped),
+                "fr_id": IMPORT_FR,
+                "imported": imported,
+                "overwritten": overwritten,
+                "skipped": skipped,
             },
         )
         return {
             "imported": imported,
+            "overwritten": overwritten,
             "skipped": skipped,
-            "failed": failed,
-            "dropped_holidays": 0,
-            "dropped_partial_holidays": 0,
-            "holidays_imported": total_holidays_parsed,
-            "success": len(failed) == 0,
+            "sessions": sessions_list,
         }
 
-    def export_sqx_xml(self, names: Sequence[str] | None = None) -> str:
-        """Export trading sessions to native StrategyQuant X XML format."""
-        sessions = self.list_sessions()
-        target_names = {n.strip() for n in names} if names else None
+    # Programmatic aliases
+    import_json = import_
 
-        root = ET.Element("Sessions")
-        for s in sessions:
-            if target_names and s.name not in target_names:
-                continue
-            item = ET.SubElement(root, "Session")
-            item.set("name", s.name)
-            item.set("brokerId", str(s.broker_id))
-            item.set("broker_id", str(s.broker_id))
-            item.set("description", s.description)
-            item.set("timezone", s.timezone)
-            item.set("isDefault", "true" if s.is_default else "false")
+    def export(
+        self,
+        file_path: str | Path | None = None,
+        names: Sequence[str] | None = None,
+    ) -> str | Path:
+        """Save selected sessions to a JSON file or structure."""
+        all_sessions = self.view()
+        target_names = {n.strip() for n in names} if names is not None else None
+        exported = [
+            s
+            for s in all_sessions
+            if target_names is None or str(s.get("name", "")).strip() in target_names
+        ]
 
-            windows_elem = ET.SubElement(item, "Windows")
-            for w in s.windows:
-                we = ET.SubElement(windows_elem, "Window")
-                we.set("dayFrom", w.day_from)
-                we.set("dayTo", w.day_to)
-                we.set("startTime", w.start_time)
-                we.set("endTime", w.end_time)
-                we.set("sessionType", w.session_type)
-                we.set("eod", "true" if w.eod else "false")
+        payload = {
+            "version": 1,
+            "kind": "sessions",
+            "sessions": exported,
+        }
+        json_content = json.dumps(payload, indent=2)
 
-            holidays_elem = ET.SubElement(item, "Holidays")
-            for h in s.holidays:
-                he = ET.SubElement(holidays_elem, "Holiday")
-                he.set("date", h.date_str)
-                he.set("description", h.description)
-
-        xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
-        logger.info(
-            "%s: Exported %d sessions to SQX XML",
-            SQX_XML_FR,
-            len(root),
-            extra={"fr_id": SQX_XML_FR, "count": len(root)},
-        )
-        return str(xml_str)
-
-    def import_sqx_xml(
-        self, xml_content: str, policy: str = "overwrite"
-    ) -> dict[str, Any]:
-        """Safely import native SQX Sessions XML."""
-        root = DefusedET.fromstring(xml_content)
-        imported: list[TradingSession] = []
-        skipped: list[str] = []
-
-        session_nodes = root.findall("Session")
-        if not session_nodes and root.tag == "Session":
-            session_nodes = [root]
-
-        for item in session_nodes:
-            name = item.get("name", "").strip()
-            if not name:
-                continue
-
-            existing = self.get_session(name)
-            if existing and policy == "skip":
-                skipped.append(name)
-                continue
-
-            broker_id_raw = item.get("brokerId") or item.get("broker_id") or "-1"
-            try:
-                broker_id = int(broker_id_raw)
-            except ValueError:
-                broker_id = -1
-
-            window_nodes = item.findall(".//Window")
-            if not window_nodes:
-                window_nodes = item.findall(".//SessionElement")
-
-            windows: list[dict[str, Any]] = []
-            for we in window_nodes:
-                day_from = (
-                    we.get("dayFrom")
-                    or we.get("day_from")
-                    or we.get("startDay")
-                    or we.get("Day")
-                    or "Mon"
-                )
-                day_to = (
-                    we.get("dayTo")
-                    or we.get("day_to")
-                    or we.get("endDay")
-                    or we.get("Day")
-                    or day_from
-                )
-                start_time = (
-                    we.get("startTime")
-                    or we.get("start_time")
-                    or we.get("StartTime")
-                    or "00:00"
-                )
-                end_time = (
-                    we.get("endTime")
-                    or we.get("end_time")
-                    or we.get("EndTime")
-                    or "23:59"
-                )
-                session_type = (
-                    we.get("sessionType")
-                    or we.get("session_type")
-                    or we.get("SessionType")
-                    or "Regular"
-                )
-                eod_str = (
-                    we.get("eod") or we.get("Eod") or we.get("seoc") or "false"
-                ).lower()
-                eod = eod_str in ("true", "1", "yes")
-
-                windows.append(
-                    {
-                        "day_from": day_from,
-                        "day_to": day_to,
-                        "start_time": start_time,
-                        "end_time": end_time,
-                        "session_type": session_type,
-                        "eod": eod,
-                    }
-                )
-
-            holidays = [
-                {
-                    "date_str": (
-                        he.get("date") or he.get("Date") or he.findtext("Date") or ""
-                    ),
-                    "description": (
-                        he.get("description")
-                        or he.get("Description")
-                        or he.findtext("Description")
-                        or ""
-                    ),
-                }
-                for he in item.findall(".//Holiday")
-            ]
-
-            saved = self.save_session(
-                {
-                    "name": name,
-                    "broker_id": broker_id,
-                    "description": item.get("description", ""),
-                    "timezone": item.get("timezone", "UTC"),
-                    "windows_json": json.dumps(windows),
-                    "holidays_json": json.dumps(holidays),
-                    "is_default": item.get("isDefault", "false").lower() == "true",
-                }
+        if file_path is not None:
+            p = Path(file_path)
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(json_content, encoding="utf-8")
+            logger.info(
+                "%s: Exported %d sessions to file %s",
+                EXPORT_FR,
+                len(exported),
+                str(p),
+                extra={
+                    "fr_id": EXPORT_FR,
+                    "count": len(exported),
+                    "path": str(p),
+                },
             )
-            imported.append(saved)
+            return p
 
         logger.info(
-            "%s: Imported %d SQX sessions (%d skipped)",
-            SQX_XML_FR,
-            len(imported),
-            len(skipped),
-            extra={
-                "fr_id": SQX_XML_FR,
-                "imported": len(imported),
-                "skipped": len(skipped),
-            },
+            "%s: Exported %d sessions as JSON string",
+            EXPORT_FR,
+            len(exported),
+            extra={"fr_id": EXPORT_FR, "count": len(exported)},
+        )
+        return json_content
+
+
+# Bind import attribute to import_ method for dynamic call support
+setattr(Sessions, "import", Sessions.import_)
+
+
+class SessionsCLI:
+    """Headless CLI presentation and dispatcher for session operations."""
+
+    MAX_DESC_LEN: int = 32
+    TRUNCATE_LEN: int = 29
+    _CLI_EXCLUDE_KEYS: frozenset[str] = frozenset(
+        ("action", "session", "name", "sa", "se", "sl", "sd", "sc", "si", "sx")
+    )
+
+    @classmethod
+    def _parse_cli_args(
+        cls, args: Sequence[str] | Mapping[str, Any]
+    ) -> tuple[str, dict[str, Any]]:
+        """Parse raw CLI arguments and return normalized (action, params)."""
+        if isinstance(args, Mapping):
+            params = dict(args)
+        else:
+            params = {}
+            for item in args:
+                if "=" in item:
+                    k, v = item.split("=", 1)
+                    params[k.lstrip("-").strip().lower()] = v.strip()
+                elif item.startswith("-"):
+                    params[item.lstrip("-").strip().lower()] = True
+                elif "action" not in params:
+                    params["action"] = item.strip().lower()
+
+        raw_action = str(params.get("action", "")).strip().lower()
+        if raw_action.startswith("action="):
+            raw_action = raw_action.split("=", 1)[1].strip()
+
+        alias_map = {
+            "sl": "list",
+            "sa": "add",
+            "se": "edit",
+            "sd": "delete",
+            "sc": "clone",
+            "si": "import",
+            "sx": "export",
+        }
+        action = raw_action or next(
+            (act for flag, act in alias_map.items() if flag in params), "list"
+        )
+        return action, params
+
+    @classmethod
+    def dispatch(
+        cls,
+        args: Sequence[str] | Mapping[str, Any],
+        service: Sessions | None = None,
+    ) -> dict[str, Any]:
+        """Dispatch headless CLI session commands and flags."""
+        svc = service or Sessions()
+        raw_action, params = cls._parse_cli_args(args)
+
+        logger.info(
+            "%s: Executing CLI action '%s' with %d parameters",
+            CLI_FR,
+            raw_action,
+            len(params),
+            extra={"fr_id": CLI_FR, "action": raw_action, "params": params},
+        )
+
+        handlers: dict[str, Callable[[], dict[str, Any]]] = {
+            "list": lambda: cls._handle_list(svc, params),
+            "view": lambda: cls._handle_list(svc, params),
+            "-sl": lambda: cls._handle_list(svc, params),
+            "add": lambda: cls._handle_add(svc, params),
+            "-sa": lambda: cls._handle_add(svc, params),
+            "edit": lambda: cls._handle_edit(svc, params),
+            "-se": lambda: cls._handle_edit(svc, params),
+            "delete": lambda: cls._handle_delete(svc, params),
+            "-sd": lambda: cls._handle_delete(svc, params),
+            "clone": lambda: cls._handle_clone(svc, params),
+            "-sc": lambda: cls._handle_clone(svc, params),
+            "import": lambda: cls._handle_import(svc, params),
+            "load": lambda: cls._handle_import(svc, params),
+            "-si": lambda: cls._handle_import(svc, params),
+            "export": lambda: cls._handle_export(svc, params),
+            "save": lambda: cls._handle_export(svc, params),
+            "-sx": lambda: cls._handle_export(svc, params),
+        }
+
+        handler = handlers.get(raw_action)
+        if handler is None:
+            raise ValueError(f"Unsupported session action: '{raw_action}'")
+        return handler()
+
+    @classmethod
+    def _handle_list(cls, svc: Sessions, params: Mapping[str, Any]) -> dict[str, Any]:
+        broker_id = int(params["broker_id"]) if "broker_id" in params else None
+        sessions = svc.view(
+            broker_id=broker_id,
+            search=params.get("search"),
+        )
+        as_csv = str(params.get("csv", "false")).lower() in ("true", "1", "yes")
+        rendered = (
+            cls.format_sessions_csv(sessions)
+            if as_csv
+            else cls.format_sessions_table(sessions)
         )
         return {
-            "imported": [s.to_dict() for s in imported],
-            "skipped": skipped,
+            "command": "sessions",
+            "action": "list",
+            "count": len(sessions),
+            "rendered": rendered,
+            "sessions": sessions,
         }
 
-
-def main() -> None:
-    """Execute real-usage demonstration of SessionsCatalogService."""
-    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
-        temp_path = Path(temp_dir)
-        db_file = temp_path / "test_sessions.db"
-        with resolve_connection(db_file) as conn:
-            create_schema(conn)
-
-        service = SessionsCatalogService(db_path=db_file, data_dir=temp_path / "data")
-        seeded = service.ensure_default_sessions()
-        print(f"Seeded {seeded} default sessions")
-
-        forex = service.get_session("Forex 24/5")
-        if forex:
-            test_dt_open = datetime(2026, 10, 14, 15, 30, tzinfo=UTC)
-            test_dt_closed = datetime(2026, 10, 17, 12, 0, tzinfo=UTC)
-            print(
-                f"Forex 24/5 open on Wednesday: {forex.is_within_session(test_dt_open)}"
+    @classmethod
+    def _handle_add(cls, svc: Sessions, params: Mapping[str, Any]) -> dict[str, Any]:
+        name = params.get("session") or params.get("name")
+        if not name:
+            raise ValueError(
+                "Parameter 'session' or 'name' is required for action=add."
             )
-            print(
-                "Forex 24/5 open on Saturday: "
-                f"{forex.is_within_session(test_dt_closed)}"
+        payload = {k: v for k, v in params.items() if k not in cls._CLI_EXCLUDE_KEYS}
+        payload["name"] = name
+        added = svc.add(payload)
+        return {
+            "command": "sessions",
+            "action": "add",
+            "rendered": f"Added session '{added.get('name')}'.",
+            "session": added,
+        }
+
+    @classmethod
+    def _handle_edit(cls, svc: Sessions, params: Mapping[str, Any]) -> dict[str, Any]:
+        name = params.get("session") or params.get("name")
+        if not name:
+            raise ValueError(
+                "Parameter 'session' or 'name' is required for action=edit."
             )
+        payload = {k: v for k, v in params.items() if k not in cls._CLI_EXCLUDE_KEYS}
+        edited = svc.edit(str(name), payload)
+        return {
+            "command": "sessions",
+            "action": "edit",
+            "rendered": f"Edited session '{name}'.",
+            "session": edited,
+        }
 
-        cloned = service.clone_session("24/7", "Crypto Weekend Only")
-        print(f"Cloned session: {cloned.name}")
+    @classmethod
+    def _handle_delete(cls, svc: Sessions, params: Mapping[str, Any]) -> dict[str, Any]:
+        names_raw = (
+            params.get("sessions") or params.get("session") or params.get("name")
+        )
+        if not names_raw:
+            raise ValueError(
+                "Parameter 'sessions' or 'name' is required for action=delete."
+            )
+        name_list = [s.strip() for s in str(names_raw).split(",") if s.strip()]
+        if len(name_list) == 1:
+            deleted = svc.delete(name_list[0])
+            return {
+                "command": "sessions",
+                "action": "delete",
+                "rendered": f"Deleted session '{name_list[0]}' (status={deleted}).",
+                "deleted": deleted,
+            }
+        count = svc.delete(name_list)
+        return {
+            "command": "sessions",
+            "action": "delete",
+            "rendered": f"Deleted {count} sessions.",
+            "deleted_count": count,
+        }
 
-        xml_out = service.export_sqx_xml(["Forex 24/5"])
-        print(f"Exported SQX XML:\n{xml_out[:180]}...")
+    @classmethod
+    def _handle_clone(cls, svc: Sessions, params: Mapping[str, Any]) -> dict[str, Any]:
+        name = params.get("session") or params.get("name")
+        if not name:
+            raise ValueError(
+                "Parameter 'session' or 'name' is required for action=clone."
+            )
+        clone_name = str(params.get("clone_name", params.get("new_name", "")))
+        broker_id = int(params.get("broker_id", -1))
+        broker_postfix = str(params.get("broker_postfix", ""))
+        cloned = svc.clone(
+            str(name),
+            clone_name=clone_name,
+            broker_id=broker_id,
+            broker_postfix=broker_postfix,
+        )
+        return {
+            "command": "sessions",
+            "action": "clone",
+            "rendered": f"Cloned session '{name}' -> '{cloned.get('name')}'.",
+            "session": cloned,
+        }
 
+    @classmethod
+    def _handle_import(cls, svc: Sessions, params: Mapping[str, Any]) -> dict[str, Any]:
+        filepath = params.get("filepath") or params.get("file")
+        if not filepath:
+            raise ValueError("Parameter 'filepath' is required for action=import.")
+        policy = str(params.get("conflict_policy", "overwrite_all"))
+        report = svc.import_(filepath, conflict_policy=policy)
+        return {
+            "command": "sessions",
+            "action": "import",
+            "rendered": (
+                f"Imported {report.get('imported', 0)} sessions "
+                f"(overwritten={report.get('overwritten', 0)}, "
+                f"skipped={report.get('skipped', 0)})."
+            ),
+            **report,
+        }
+
+    @classmethod
+    def _handle_export(cls, svc: Sessions, params: Mapping[str, Any]) -> dict[str, Any]:
+        filepath = params.get("filepath") or params.get("file")
+        names_raw = params.get("sessions") or params.get("names")
+        names = (
+            [s.strip() for s in str(names_raw).split(",") if s.strip()]
+            if names_raw
+            else None
+        )
+        output = svc.export(filepath, names=names)
+        rendered = f"Exported sessions to {output}" if filepath else str(output)
+        return {
+            "command": "sessions",
+            "action": "export",
+            "rendered": rendered,
+            "output": str(output),
+        }
+
+    @classmethod
+    def format_sessions_table(cls, sessions: Sequence[Mapping[str, Any]]) -> str:
+        """Format sessions sequence into clean ASCII table."""
+        if not sessions:
+            return "No sessions found."
+
+        col_w = {
+            "Name": 20,
+            "Timezone": 18,
+            "Default": 8,
+            "Broker": 8,
+            "Windows": 8,
+            "Description": cls.MAX_DESC_LEN,
+        }
+        for s in sessions:
+            name_len = len(str(s.get("name", "")))
+            if name_len > col_w["Name"]:
+                col_w["Name"] = min(name_len, 28)
+
+        hdr = (
+            f"{'Name':<{col_w['Name']}}  "
+            f"{'Timezone':<{col_w['Timezone']}}  "
+            f"{'Default':<{col_w['Default']}}  "
+            f"{'Broker':<{col_w['Broker']}}  "
+            f"{'Windows':<{col_w['Windows']}}  "
+            f"{'Description':<{col_w['Description']}}"
+        )
+        sep = (
+            f"{'-' * col_w['Name']}  "
+            f"{'-' * col_w['Timezone']}  "
+            f"{'-' * col_w['Default']}  "
+            f"{'-' * col_w['Broker']}  "
+            f"{'-' * col_w['Windows']}  "
+            f"{'-' * col_w['Description']}"
+        )
+        lines = [hdr, sep]
+
+        for s in sessions:
+            name = str(s.get("name", ""))
+            tz = str(s.get("timezone", "UTC"))
+            is_def = "Yes" if s.get("is_default") else "No"
+            b_id = str(s.get("broker_id", -1))
+            raw_w = s.get("windows_json", "[]")
+            w_count = 0
+            if isinstance(raw_w, str):
+                try:
+                    w_count = len(json.loads(raw_w))
+                except json.JSONDecodeError:
+                    w_count = 0
+            elif isinstance(raw_w, list):
+                w_count = len(raw_w)
+
+            desc = str(s.get("description", ""))
+            if len(desc) > cls.MAX_DESC_LEN:
+                desc = desc[: cls.TRUNCATE_LEN] + "..."
+
+            lines.append(
+                f"{name:<{col_w['Name']}}  "
+                f"{tz:<{col_w['Timezone']}}  "
+                f"{is_def:<{col_w['Default']}}  "
+                f"{b_id:<{col_w['Broker']}}  "
+                f"{w_count:<{col_w['Windows']}}  "
+                f"{desc:<{col_w['Description']}}"
+            )
+        return "\n".join(lines)
+
+    @classmethod
+    def format_sessions_csv(cls, sessions: Sequence[Mapping[str, Any]]) -> str:
+        """Format sessions sequence as RFC-4180 CSV string."""
+        buf = io.StringIO()
+        fieldnames = [
+            "name",
+            "timezone",
+            "is_default",
+            "broker_id",
+            "windows_json",
+            "holidays_json",
+            "description",
+        ]
+        writer = csv.DictWriter(buf, fieldnames=fieldnames, extrasaction="ignore")
+        writer.writeheader()
+        for s in sessions:
+            writer.writerow(dict(s))
+        return buf.getvalue().strip()
+
+    @classmethod
+    def format_output(cls, data: Mapping[str, Any]) -> str:
+        """Format generic dictionary output for terminal display."""
+        logger.debug("Formatting session output: %d keys", len(data))
+        lines = [f"{k}: {v}" for k, v in data.items() if k != "rendered"]
+        return "\n".join(lines)
+
+
+SessionsCatalogService = Sessions
 
 if __name__ == "__main__":
-    main()
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
+        temp_db = Path(temp_dir) / "demo_sessions.db"
+        with resolve_connection(temp_db) as conn:
+            create_schema(conn)
+
+        service = Sessions(db_path=temp_db)
+        service.add(
+            {
+                "name": "24/7 Crypto",
+                "description": "Continuous crypto schedule",
+                "timezone": "UTC",
+                "is_default": 1,
+            }
+        )
+        service.add(
+            {
+                "name": "US Equities RTH",
+                "description": "US Stock Market Regular Trading Hours",
+                "timezone": "America/New_York",
+                "is_default": 0,
+            }
+        )
+        all_sessions = service.view()
+        print(SessionsCLI.format_sessions_table(all_sessions))

@@ -10,8 +10,11 @@ from app.services.include.contracts import (
     DataInfo,
     MarketBar,
     MarketTick,
+    SessionWindow,
     SymbolAliasRecord,
     SymbolInfo,
+    TradingHoliday,
+    TradingSession,
 )
 from app.services.include.enums import (
     Timeframe,
@@ -121,10 +124,8 @@ from .series import (
     WeightedDataSeries,
 )
 from .sessions import (
-    SessionsCatalogService,
-    SessionWindow,
-    TradingHoliday,
-    TradingSession,
+    Sessions,
+    SessionsCLI,
 )
 from .simulation import (
     DefaultTickSimulator,
@@ -133,6 +134,8 @@ from .simulation import (
     TickEvent,
     TSTickSimulator,
 )
+
+SessionsCatalogService = Sessions
 
 __all__ = [
     "BAR_COLUMNS",
@@ -203,6 +206,8 @@ __all__ = [
     "ResampleConfig",
     "SeriesTransformer",
     "SessionWindow",
+    "Sessions",
+    "SessionsCLI",
     "SessionsCatalogService",
     "SpreadsMap",
     "SymbolAliasRecord",

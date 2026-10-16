@@ -119,6 +119,7 @@ from app.host.persistence.read import (
     get_mt5_command,
     get_schema_migrations,
     list_datamgr_instruments,
+    list_datamgr_sessions,
     list_host_jobs,
     list_host_settings,
     read_row_by_pk,
@@ -552,10 +553,26 @@ def test_crud_datamgr_instrument_and_session(
     assert session is not None
     assert session["name"] == "Forex 24/5"
 
+    # Lookup by name
+    session_by_name = get_datamgr_session(temp_db, "Forex 24/5")
+    assert session_by_name is not None
+    assert session_by_name["id"] == sid
+
+    # List sessions
+    sessions_list = list_datamgr_sessions(temp_db)
+    assert len(sessions_list) == 1
+    assert sessions_list[0]["name"] == "Forex 24/5"
+
     assert (
-        update_datamgr_session(temp_db, sid, {"description": "Standard Forex"}) is True
+        update_datamgr_session(temp_db, "Forex 24/5", {"description": "Standard Forex"})
+        is True
     )
-    assert delete_datamgr_session(temp_db, sid) is True
+    assert (
+        update_datamgr_session(temp_db, "NONEXISTENT", {"description": "None"}) is False
+    )
+
+    assert delete_datamgr_session(temp_db, "Forex 24/5") is True
+    assert delete_datamgr_session(temp_db, "NONEXISTENT") is False
 
 
 def test_crud_mt5_commands_and_events(temp_db: sqlite3.Connection) -> None:

@@ -38,14 +38,58 @@ def test_routes_fastapi_contracts(tmp_path: Path) -> None:
         assert res.status_code == 200
         assert isinstance(res.json()["data"], list)
 
-        # 2. Catalogs (Seeded on startup)
+        # 2. Catalogs (Instruments CRUD)
         res = client.get("/api/v1/data/instruments")
         assert res.status_code == 200
-        assert len(res.json()["data"]) >= 7
+        assert isinstance(res.json()["data"], list)
+
+        add_res = client.post(
+            "/api/v1/data/instruments",
+            json={
+                "symbol": "EURUSD",
+                "name": "Euro / US Dollar",
+                "instrument_type": "Forex",
+                "point_value": 100000.0,
+                "pip_size": 0.0001,
+            },
+        )
+        assert add_res.status_code == 200
+
+        res = client.get("/api/v1/data/instruments")
+        assert res.status_code == 200
+        assert len(res.json()["data"]) >= 1
+
+        edit_res = client.put(
+            "/api/v1/data/instruments/EURUSD",
+            json={"description": "Updated EURUSD"},
+        )
+        assert edit_res.status_code == 200
+
+        clone_res = client.post(
+            "/api/v1/data/instruments/clone",
+            json={"symbol": "EURUSD", "clone_name": "EURUSD_COPY"},
+        )
+        assert clone_res.status_code == 200
+
+        save_res = client.post(
+            "/api/v1/data/instruments/save",
+            json={"symbols": ["EURUSD"]},
+        )
+        assert save_res.status_code == 200
+        assert "content" in save_res.json()["data"]
+
+        load_res = client.post(
+            "/api/v1/data/instruments/load",
+            json={"content": save_res.json()["data"]["content"]},
+        )
+        assert load_res.status_code == 200
+
+        del_res = client.delete("/api/v1/data/instruments/EURUSD_COPY")
+        assert del_res.status_code == 200
 
         res = client.get("/api/v1/data/sessions")
         assert res.status_code == 200
-        assert len(res.json()["data"]) >= 4
+        assert isinstance(res.json()["data"], list)
 
         res = client.get("/api/v1/data/baskets")
         assert res.status_code == 200
@@ -221,6 +265,13 @@ def test_headless_cli_data_operations(tmp_path: Path) -> None:
     assert exit_code_pos == 0
     assert "=== Data Manager Home: Live Database Overview ===" in out_pos
     assert "Saved Datasets Catalog" in out_pos
+
+    # Test direct sessions CLI command
+    code_sess, out_sess = run_cli(
+        ["sessions", "action=list", "--data-dir", str(data_dir)]
+    )
+    assert code_sess == 0
+    assert "Name" in out_sess or "No sessions found." in out_sess
 
 
 def _check_no_sqlite(tree: ast.AST, py_file: Path) -> None:

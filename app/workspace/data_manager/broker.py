@@ -72,7 +72,7 @@ from defusedxml.common import DefusedXmlException  # type: ignore[import-untyped
 
 from .data import DataManagerDataService
 from .instruments import Instruments
-from .sessions import SessionsCatalogService
+from .sessions import Sessions
 
 __all__ = [
     "BrokerProfileRecord",
@@ -233,7 +233,7 @@ class BrokerProfilesService:
         self,
         db_path: Path | str | None = None,
         instruments_service: Instruments | None = None,
-        sessions_service: SessionsCatalogService | None = None,
+        sessions_service: Sessions | None = None,
         data_service: DataManagerDataService | None = None,
     ) -> None:
         """Initialize broker profiles service with optional catalog dependencies."""
@@ -606,7 +606,7 @@ class BrokerProfilesService:
                 if not sym or sym.lower() not in selected_set:
                     continue
                 target_sym = f"{sym}{postfix}".strip().upper()
-                self.instruments_service.save_instrument(
+                self.instruments_service.add(
                     {
                         "symbol": target_sym,
                         "description": item.get("description", ""),
@@ -684,7 +684,7 @@ class BrokerProfilesService:
                     }
                     for he in s.findall(".//Holiday")
                 ]
-                self.sessions_service.save_session(
+                self.sessions_service.add(
                     {
                         "name": target_name,
                         "description": s.get("description", ""),

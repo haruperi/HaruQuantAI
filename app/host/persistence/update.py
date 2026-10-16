@@ -640,35 +640,50 @@ def update_datamgr_dataset(
 
 
 def update_datamgr_instrument(
-    conn: sqlite3.Connection,
-    symbol: str,
-    updates: Mapping[str, Any],
+    conn: sqlite3.Connection | Path | str | None = None,
+    symbol: str = "",
+    updates: Mapping[str, Any] | None = None,
 ) -> bool:
     """Update fields of a datamgr instrument identified by symbol."""
     from app.host.persistence.read import get_datamgr_instrument
 
-    current = get_datamgr_instrument(conn, symbol)
-    if current is None:
-        logger.warning(
-            "%s: instrument '%s' not found for update",
-            UPDATE_FR,
-            symbol,
-            extra={"fr_id": UPDATE_FR, "symbol": symbol},
+    with resolve_connection(conn) as active_conn:
+        current = get_datamgr_instrument(active_conn, symbol)
+        if current is None:
+            logger.warning(
+                "%s: instrument '%s' not found for update",
+                UPDATE_FR,
+                symbol,
+                extra={"fr_id": UPDATE_FR, "symbol": symbol},
+            )
+            return False
+        affected = update_row_by_pk(
+            active_conn, "datamgr_instruments", {"id": current["id"]}, updates or {}
         )
-        return False
-    affected = update_row_by_pk(
-        conn, "datamgr_instruments", {"id": current["id"]}, updates
-    )
     return affected > 0
 
 
 def update_datamgr_session(
-    conn: sqlite3.Connection,
-    session_id: int,
-    updates: Mapping[str, Any],
+    conn: sqlite3.Connection | Path | str | None = None,
+    name_or_id: str | int = "",
+    updates: Mapping[str, Any] | None = None,
 ) -> bool:
     """Update trading session schedule or configuration."""
-    affected = update_row_by_pk(conn, "datamgr_sessions", {"id": session_id}, updates)
+    from app.host.persistence.read import get_datamgr_session
+
+    with resolve_connection(conn) as active_conn:
+        current = get_datamgr_session(active_conn, name_or_id)
+        if current is None:
+            logger.warning(
+                "%s: session '%s' not found for update",
+                UPDATE_FR,
+                name_or_id,
+                extra={"fr_id": UPDATE_FR, "session": name_or_id},
+            )
+            return False
+        affected = update_row_by_pk(
+            active_conn, "datamgr_sessions", {"id": current["id"]}, updates or {}
+        )
     return affected > 0
 
 

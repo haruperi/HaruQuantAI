@@ -9,10 +9,14 @@ from pathlib import Path
 import pytest
 from app.host.persistence.create import create_schema
 from app.host.persistence.read import resolve_connection
+from app.services.include.contracts import (
+    SessionWindow,
+    TradingHoliday,
+    TradingSession,
+)
 from app.workspace.data_manager import (
     baskets,
     broker,
-    sessions,
 )
 from app.workspace.data_manager import (
     help as help_mod,
@@ -34,9 +38,8 @@ from app.workspace.data_manager.instruments import (
 )
 from app.workspace.data_manager.log import DataManagerLogService
 from app.workspace.data_manager.sessions import (
-    SessionsCatalogService,
-    SessionWindow,
-    TradingHoliday,
+    Sessions,
+    SessionsCLI,
 )
 
 
@@ -65,9 +68,21 @@ def test_home_service_overview_and_links(
     monkeypatch.setattr("app.host.persistence.create.DEFAULT_DB_PATH", test_db_path)
     data_svc = DataManagerDataService(db_path=test_db_path, data_dir=tmp_path / "data")
     inst_svc = Instruments(db_path=test_db_path)
-    inst_svc.ensure_default_instruments()
-    sess_svc = SessionsCatalogService(db_path=test_db_path)
-    sess_svc.ensure_default_sessions()
+    for sym in ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "USDCHF", "NZDUSD"]:
+        inst_svc.add(
+            {
+                "symbol": sym,
+                "description": f"{sym} Currency Pair",
+                "data_type": "Forex",
+                "tick_size": 0.00001,
+                "point_value": 100000.0,
+                "decimals": 5,
+                "default_spread": 1.0,
+            }
+        )
+    sess_svc = Sessions(db_path=test_db_path)
+    for s_name in ["Forex 24/5", "24/7", "US Equities RTH", "Futures ETH"]:
+        sess_svc.add({"name": s_name, "timezone": "UTC", "description": s_name})
 
     # Import sample dataset with 100 explicit bars
     sample_csv = "timestamp,open,high,low,close,volume,spread\n" + "\n".join(
@@ -124,72 +139,145 @@ def test_home_service_overview_and_links(
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
-def test_instruments_service_lifecycle(test_db_path: Path) -> None:
-    """Test instrument specifications, rounding, CRUD, aliases, and XML transfer."""
+def test_instruments_service_lifecycle(test_db_path: Path, tmp_path: Path) -> None:
+    """Test instrument domain operations (view, add, edit, clone, delete, import, export)."""
     log_svc = DataManagerLogService(db_path=test_db_path)
     service = Instruments(db_path=test_db_path, log_service=log_svc)
 
-    seeded = service.ensure_default_instruments()
-    assert seeded >= 7
-    assert service.ensure_default_instruments() == 0
+    # 1. Add instruments
+    eur = service.add(
+        {
+            "symbol": "EURUSD",
+            "description": "Euro vs US Dollar",
+            "data_type": "Forex",
+            "tick_size": 0.00001,
+            "point_value": 100000.0,
+            "decimals": 5,
+            "default_spread": 1.2,
+        }
+    )
+    assert eur["symbol"] == "EURUSD"
+    assert eur["decimals"] == 5
 
-    eur = service.get_instrument("EURUSD")
-    assert eur is not None
-    assert eur.decimals == 5
-    assert eur.round_to_tick_size(1.085427) == 1.08543
-    info = eur
-    assert info.name == "EURUSD"
-    assert info.digits == 5
+    service.add(
+        {
+            "symbol": "GBPUSD",
+            "description": "British Pound vs US Dollar",
+            "data_type": "Forex",
+            "tick_size": 0.00001,
+            "point_value": 100000.0,
+            "decimals": 5,
+            "default_spread": 1.5,
+        }
+    )
+    service.add(
+        {
+            "symbol": "USDJPY",
+            "description": "US Dollar vs Japanese Yen",
+            "data_type": "Forex",
+            "tick_size": 0.001,
+            "point_value": 100000.0,
+            "decimals": 3,
+            "default_spread": 1.0,
+        }
+    )
 
-    # Filtered listing
-    forex_list = service.list_instruments(data_type="Forex")
+    # 2. View instruments
+    all_inst = service.view()
+    assert len(all_inst) >= 3
+
+    forex_list = service.view(data_type="Forex")
     assert len(forex_list) >= 3
-    searched = service.list_instruments(search="Dollar")
-    assert len(searched) >= 2
 
-    # Update
-    updated = service.update_instrument("EURUSD", {"default_spread": 2.0})
-    assert updated.default_spread == 2.0
+    searched = service.view(search="Dollar")
+    assert len(searched) >= 3
 
-    # Clone
-    cloned = service.clone_instrument("EURUSD", "EURUSD_VIP", broker_id=2)
-    assert cloned.symbol == "EURUSD_VIP"
-    assert cloned.broker_id == 2
+    # 3. Edit instrument (single and multiple)
+    updated = service.edit("EURUSD", {"default_spread": 2.0})
+    assert isinstance(updated, dict)
+    assert updated["default_spread"] == 2.0
 
-    # Mass edit
-    edited = service.mass_edit_instruments(["EURUSD_VIP"], {"min_volume": 0.1})
-    assert edited == 1
-    reloaded = service.get_instrument("EURUSD_VIP")
-    assert reloaded is not None and reloaded.min_volume == 0.1
+    multi_count = service.edit(["EURUSD"], {"min_volume": 0.1})
+    assert multi_count == 1
 
-    # Mass delete
-    del_res = service.mass_delete_instruments(["EURUSD_VIP"])
-    assert del_res["deleted_count"] == 1
-    assert service.get_instrument("EURUSD_VIP") is None
+    # 4. Clone instrument
+    cloned = service.clone("EURUSD", "EURUSD_VIP", broker_id=2)
+    assert cloned["symbol"] == "EURUSD_VIP"
+    assert cloned["broker_id"] == 2
 
-    # Symbol aliases
-    alias = service.save_alias("EUR.USD", "EURUSD", "Broker symbol format")
-    assert alias.alias == "EUR.USD"
-    aliases = service.list_aliases()
-    assert any(a.alias == "EUR.USD" for a in aliases)
-    assert service.delete_alias("EUR.USD") is True
-    assert service.delete_alias("EUR.USD") is False
+    # 5. Delete instrument (single and multiple)
+    assert service.delete("EURUSD_VIP") is True
+    assert service.delete("NON_EXISTENT") is False
+    assert service.delete(["NON_EXISTENT_1", "NON_EXISTENT_2"]) == 0
 
-    # XML export and import
-    xml_data = service.export_xml(["EURUSD", "GBPUSD"])
-    assert "<Instruments>" in xml_data
-    import_res = service.import_xml(xml_data, conflict_policy="overwrite_all")
-    assert import_res["overwritten"] >= 2
+    # 6. Export and Import JSON
+    exp_file = tmp_path / "instruments_export.json"
+    exported_path = service.export(file_path=exp_file, symbols=["EURUSD", "GBPUSD"])
+    assert Path(exported_path).is_file()
 
-    skip_res = service.import_xml(xml_data, conflict_policy="skip")
-    assert skip_res["skipped"] >= 2
+    # Export string
+    exported_str = service.export(symbols=["EURUSD"])
+    assert isinstance(exported_str, str)
+    assert "EURUSD" in exported_str
 
-    # Test InstrumentsCLI formatting
-    table_text = InstrumentsCLI.format_instruments_table(forex_list)
-    assert "Instruments Catalog" in table_text
-    assert "EURUSD" in table_text
+    # Import from file
+    import_report = service.import_(exp_file, conflict_policy="overwrite_all")
+    assert import_report["overwritten"] >= 2
 
-    # Test execution under __main__
+    # Dynamic attribute import alias
+    getattr(service, "import")(exp_file, conflict_policy="skip")
+
+    # 7. InstrumentsCLI dispatching
+    cli_list = InstrumentsCLI.dispatch(["list"], service=service)
+    assert cli_list["count"] >= 2
+    assert "symbol" in cli_list["rendered"].lower()
+
+    cli_csv = InstrumentsCLI.dispatch(["-il", "csv=true"], service=service)
+    assert "Symbol,Description" in cli_csv["rendered"]
+
+    cli_add = InstrumentsCLI.dispatch(
+        [
+            "add",
+            "symbol=CLI_TEST",
+            "type=Forex",
+            "tick_size=0.0001",
+            "point_value=100000.0",
+        ],
+        service=service,
+    )
+    assert cli_add["instrument"]["symbol"] == "CLI_TEST"
+
+    cli_edit = InstrumentsCLI.dispatch(
+        ["edit", "symbol=CLI_TEST", "description=CLI Updated"],
+        service=service,
+    )
+    assert cli_edit["instrument"]["description"] == "CLI Updated"
+
+    cli_clone = InstrumentsCLI.dispatch(
+        ["clone", "symbol=CLI_TEST", "clone_symbol=CLI_CLONED"],
+        service=service,
+    )
+    assert cli_clone["instrument"]["symbol"] == "CLI_CLONED"
+
+    cli_export = InstrumentsCLI.dispatch(
+        ["export", f"filepath={tmp_path / 'cli_export.json'}", "symbols=CLI_TEST"],
+        service=service,
+    )
+    assert "Exported" in cli_export["rendered"]
+
+    cli_import = InstrumentsCLI.dispatch(
+        ["import", f"filepath={tmp_path / 'cli_export.json'}"],
+        service=service,
+    )
+    assert "Imported" in cli_import["rendered"]
+
+    cli_delete = InstrumentsCLI.dispatch(
+        ["delete", "symbols=CLI_TEST,CLI_CLONED"],
+        service=service,
+    )
+    assert cli_delete["deleted_count"] == 2
+
+    # 8. Test execution under __main__
     runpy.run_module("app.workspace.data_manager.instruments", run_name="__main__")
 
 
@@ -198,26 +286,70 @@ def test_instruments_service_lifecycle(test_db_path: Path) -> None:
 # ============================================================================
 
 
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 def test_sessions_service_lifecycle(test_db_path: Path, tmp_path: Path) -> None:
-    """Test session schedules, RTH/ETH windows, holidays, NT8 import, and XML."""
-    service = SessionsCatalogService(db_path=test_db_path, data_dir=tmp_path / "data")
+    """Test session schedules, calendar contract evaluation, CRUD, and CLI."""
+    service = Sessions(db_path=test_db_path)
 
-    seeded = service.ensure_default_sessions()
-    assert seeded >= 4
-    assert service.ensure_default_sessions() == 0
+    # 1. Add sessions
+    forex = service.add(
+        {
+            "name": "Forex 24/5",
+            "timezone": "UTC",
+            "description": "Standard 24/5 Forex schedule",
+            "windows": [
+                SessionWindow(
+                    day_from="Mon",
+                    day_to="Fri",
+                    start_time="00:00",
+                    end_time="23:59",
+                    session_type="Regular",
+                ),
+            ],
+            "holidays": [],
+            "is_default": 0,
+        }
+    )
+    assert forex["name"] == "Forex 24/5"
 
-    all_sess = service.list_sessions()
-    assert len(all_sess) >= 4
+    crypto = service.add(
+        {
+            "name": "24/7 Crypto",
+            "timezone": "UTC",
+            "description": "Continuous crypto trading",
+            "windows": [
+                SessionWindow(
+                    day_from="Mon",
+                    day_to="Sun",
+                    start_time="00:00",
+                    end_time="23:59",
+                )
+            ],
+            "is_default": 1,
+        }
+    )
+    assert crypto["name"] == "24/7 Crypto"
 
-    forex = service.get_session("Forex 24/5")
-    assert forex is not None
-    # Wednesday 15:30 -> open
-    assert forex.is_within_session(datetime(2026, 10, 14, 15, 30, tzinfo=UTC)) is True
-    # Saturday 12:00 -> closed
-    assert forex.is_within_session(datetime(2026, 10, 17, 12, 0, tzinfo=UTC)) is False
+    # 2. View sessions
+    all_sess = service.view()
+    assert len(all_sess) >= 2
+    filtered = service.view(search="Forex")
+    assert len(filtered) == 1
+    assert filtered[0]["name"] == "Forex 24/5"
 
-    # Custom session with holidays
-    custom = service.save_session(
+    # 3. Calendar contract evaluation
+    trading_sess = TradingSession.from_dict(forex)
+    assert (
+        trading_sess.is_within_session(datetime(2026, 10, 14, 15, 30, tzinfo=UTC))
+        is True
+    )
+    assert (
+        trading_sess.is_within_session(datetime(2026, 10, 17, 12, 0, tzinfo=UTC))
+        is False
+    )
+
+    # 4. Custom session with holidays
+    custom = service.add(
         {
             "name": "Custom RTH",
             "timezone": "UTC",
@@ -234,44 +366,98 @@ def test_sessions_service_lifecycle(test_db_path: Path, tmp_path: Path) -> None:
             ],
         }
     )
-    assert custom.name == "Custom RTH"
+    custom_model = TradingSession.from_dict(custom)
     # Holiday -> closed
-    assert custom.is_within_session(datetime(2026, 10, 15, 10, 0, tzinfo=UTC)) is False
+    assert (
+        custom_model.is_within_session(datetime(2026, 10, 15, 10, 0, tzinfo=UTC))
+        is False
+    )
     # Normal open day
-    assert custom.is_within_session(datetime(2026, 10, 16, 10, 0, tzinfo=UTC)) is True
+    assert (
+        custom_model.is_within_session(datetime(2026, 10, 16, 10, 0, tzinfo=UTC))
+        is True
+    )
 
-    # Clone and mass delete
-    cloned = service.clone_session("Custom RTH", "Custom RTH Cloned")
-    assert cloned.name == "Custom RTH Cloned"
-    assert service.mass_delete_sessions(["Custom RTH Cloned"]) == 1
+    # 5. Edit session
+    edited = service.edit("Custom RTH", {"description": "Updated RTH Description"})
+    assert isinstance(edited, dict)
+    assert edited["description"] == "Updated RTH Description"
 
-    # SQX XML
-    xml_out = service.export_sqx_xml(["Forex 24/5"])
-    assert "<Sessions>" in xml_out
-    imported = service.import_sqx_xml(xml_out, policy="overwrite")
-    assert len(imported["imported"]) == 1
+    # Multi-edit
+    count_edited = service.edit(["Custom RTH"], {"description": "Multi Updated"})
+    assert count_edited == 1
 
-    # NT8 Template Import
-    nt_xml = """<?xml version="1.0" encoding="utf-8"?>
-    <NinjaTrader>
-        <TradingHours>
-            <Name>CME US Index Futures</Name>
-            <TimeZone>Central Standard Time</TimeZone>
-            <Sessions>
-                <Session>
-                    <Day>Monday</Day>
-                    <StartTime>17:00</StartTime>
-                    <EndTime>16:00</EndTime>
-                </Session>
-            </Sessions>
-        </TradingHours>
-    </NinjaTrader>"""
-    nt_res = service.import_nt_sessions(xml_content=nt_xml)
-    assert nt_res["success"] is True
-    assert "CME US Index Futures" in nt_res["imported"]
+    # 6. Clone session
+    cloned = service.clone("Custom RTH", "Custom RTH Cloned")
+    assert cloned["name"] == "Custom RTH Cloned"
 
-    # Test main()
-    sessions.main()
+    # 7. Delete sessions (single and multi)
+    assert service.delete("Custom RTH Cloned") is True
+    assert service.delete(["NonExistentSession"]) == 0
+
+    # 8. Export and Import JSON
+    export_path = tmp_path / "sessions_export.json"
+    exported_file = service.export(file_path=export_path, names=["Custom RTH"])
+    assert Path(exported_file).is_file()
+
+    # Raw string export
+    exported_str = service.export(names=["Custom RTH"])
+    assert isinstance(exported_str, str)
+    assert "Custom RTH" in exported_str
+
+    # Import
+    import_report = service.import_(export_path, conflict_policy="overwrite_all")
+    assert import_report["overwritten"] >= 1
+
+    # Dynamic alias import
+    getattr(service, "import")(export_path, conflict_policy="skip")
+
+    # 9. CLI Dispatching & Formatting
+    cli_list = SessionsCLI.dispatch(["list"], service=service)
+    assert cli_list["count"] >= 2
+    assert "Name" in cli_list["rendered"]
+
+    cli_csv = SessionsCLI.dispatch(["action=list", "csv=true"], service=service)
+    assert "name,timezone" in cli_csv["rendered"]
+
+    cli_add = SessionsCLI.dispatch(
+        ["action=add", "session=CLI_SESS", "timezone=UTC", "description=CLI created"],
+        service=service,
+    )
+    assert cli_add["session"]["name"] == "CLI_SESS"
+
+    cli_edit = SessionsCLI.dispatch(
+        ["action=edit", "session=CLI_SESS", "description=CLI updated"],
+        service=service,
+    )
+    assert cli_edit["session"]["description"] == "CLI updated"
+
+    cli_clone = SessionsCLI.dispatch(
+        ["action=clone", "session=CLI_SESS", "clone_name=CLI_SESS_CLONED"],
+        service=service,
+    )
+    assert cli_clone["session"]["name"] == "CLI_SESS_CLONED"
+
+    cli_export = SessionsCLI.dispatch(
+        ["action=export", f"filepath={tmp_path / 'cli_export.json'}"],
+        service=service,
+    )
+    assert "Exported" in cli_export["rendered"]
+
+    cli_import = SessionsCLI.dispatch(
+        ["action=import", f"filepath={tmp_path / 'cli_export.json'}"],
+        service=service,
+    )
+    assert "Imported" in cli_import["rendered"]
+
+    cli_del = SessionsCLI.dispatch(
+        ["action=delete", "sessions=CLI_SESS,CLI_SESS_CLONED"],
+        service=service,
+    )
+    assert cli_del["deleted_count"] == 2
+
+    # Run standalone demo
+    runpy.run_module("app.workspace.data_manager.sessions", run_name="__main__")
 
 
 # ============================================================================
@@ -343,9 +529,22 @@ def test_baskets_service_lifecycle(test_db_path: Path, tmp_path: Path) -> None:
 def test_broker_profiles_lifecycle(test_db_path: Path, tmp_path: Path) -> None:
     """Test broker profiles, stock lists, CSV import/export, and XML migration."""
     inst_svc = Instruments(db_path=test_db_path)
-    inst_svc.ensure_default_instruments()
-    sess_svc = SessionsCatalogService(db_path=test_db_path)
-    sess_svc.ensure_default_sessions()
+    inst_svc.add(
+        {
+            "symbol": "EURUSD",
+            "description": "Euro vs US Dollar",
+            "data_type": "Forex",
+            "tick_size": 0.00001,
+            "point_value": 100000.0,
+            "decimals": 5,
+            "default_spread": 1.2,
+        }
+    )
+    sess_svc = Sessions(db_path=test_db_path)
+    sess_svc.add({"name": "24/7", "timezone": "UTC", "description": "Continuous 24/7"})
+    sess_svc.add(
+        {"name": "Forex 24/5", "timezone": "UTC", "description": "Standard Forex"}
+    )
     data_svc = DataManagerDataService(db_path=test_db_path, data_dir=tmp_path / "data")
 
     service = BrokerProfilesService(
@@ -410,7 +609,7 @@ def test_broker_profiles_lifecycle(test_db_path: Path, tmp_path: Path) -> None:
         selected_names=["AUDUSD"],
     )
     assert rec_count == 1
-    assert inst_svc.get_instrument("AUDUSD_ECN") is not None
+    assert any(i["symbol"] == "AUDUSD_ECN" for i in inst_svc.view())
 
     # Trigger broker data update
     up_res = service.trigger_broker_data_update(custom.id)

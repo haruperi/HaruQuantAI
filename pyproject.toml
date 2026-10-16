@@ -33,6 +33,7 @@ ctrader = [
 
 [project.scripts]
 haruquantai = "app.main:main"
+"app.cli" = "app.cli:main"
 
 [dependency-groups]
 dev = [

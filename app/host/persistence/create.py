@@ -732,11 +732,11 @@ def create_datamgr_dataset(
 
 
 def create_datamgr_instrument(
-    conn: sqlite3.Connection,
-    symbol: str,
+    conn: sqlite3.Connection | Path | str | None = None,
+    symbol: str = "",
     *,
-    created_at_utc: str,
-    updated_at_utc: str,
+    created_at_utc: str | None = None,
+    updated_at_utc: str | None = None,
     connection: str = "",
     broker_id: int = 0,
     description: str = "",
@@ -766,6 +766,11 @@ def create_datamgr_instrument(
     cot: str | None = None,
 ) -> int:
     """Insert a datamgr_instruments record."""
+    from datetime import UTC, datetime
+
+    from app.host.persistence.read import resolve_connection
+
+    now_iso = datetime.now(UTC).isoformat()
     data = {
         "symbol": symbol,
         "connection": connection,
@@ -791,20 +796,21 @@ def create_datamgr_instrument(
         "exchange": exchange,
         "country": country,
         "sector": sector,
-        "created_at_utc": created_at_utc,
-        "updated_at_utc": updated_at_utc,
+        "created_at_utc": created_at_utc or now_iso,
+        "updated_at_utc": updated_at_utc or now_iso,
         "min_distance": min_distance,
         "order_size_multiplier": order_size_multiplier,
         "order_size_step": order_size_step,
         "cot": cot,
     }
-    res = insert_row(conn, "datamgr_instruments", data)
+    with resolve_connection(conn) as active_conn:
+        res = insert_row(active_conn, "datamgr_instruments", data)
     return int(res)
 
 
 def create_datamgr_session(
-    conn: sqlite3.Connection,
-    name: str,
+    conn: sqlite3.Connection | Path | str | None = None,
+    name: str = "",
     *,
     description: str = "",
     timezone_name: str = "UTC",
@@ -814,6 +820,8 @@ def create_datamgr_session(
     broker_id: int = -1,
 ) -> int:
     """Insert a datamgr_sessions record."""
+    from app.host.persistence.read import resolve_connection
+
     data = {
         "name": name,
         "description": description,
@@ -823,7 +831,8 @@ def create_datamgr_session(
         "is_default": is_default,
         "broker_id": broker_id,
     }
-    res = insert_row(conn, "datamgr_sessions", data)
+    with resolve_connection(conn) as active_conn:
+        res = insert_row(active_conn, "datamgr_sessions", data)
     return int(res)
 
 

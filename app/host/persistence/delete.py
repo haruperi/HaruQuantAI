@@ -315,31 +315,48 @@ def delete_datamgr_dataset(
 
 
 def delete_datamgr_instrument(
-    conn: sqlite3.Connection,
-    symbol: str,
+    conn: sqlite3.Connection | Path | str | None = None,
+    symbol: str = "",
 ) -> bool:
     """Delete a datamgr instrument identified by symbol."""
     from app.host.persistence.read import get_datamgr_instrument
 
-    current = get_datamgr_instrument(conn, symbol)
-    if current is None:
-        logger.warning(
-            "%s: instrument '%s' not found for delete",
-            DELETE_PK_FR,
-            symbol,
-            extra={"fr_id": DELETE_PK_FR, "symbol": symbol},
+    with resolve_connection(conn) as active_conn:
+        current = get_datamgr_instrument(active_conn, symbol)
+        if current is None:
+            logger.warning(
+                "%s: instrument '%s' not found for delete",
+                DELETE_PK_FR,
+                symbol,
+                extra={"fr_id": DELETE_PK_FR, "symbol": symbol},
+            )
+            return False
+        deleted = delete_row_by_pk(
+            active_conn, "datamgr_instruments", {"id": current["id"]}
         )
-        return False
-    deleted = delete_row_by_pk(conn, "datamgr_instruments", {"id": current["id"]})
     return deleted > 0
 
 
 def delete_datamgr_session(
-    conn: sqlite3.Connection,
-    session_id: int,
+    conn: sqlite3.Connection | Path | str | None = None,
+    name_or_id: str | int = "",
 ) -> bool:
-    """Delete a trading session by ID."""
-    deleted = delete_row_by_pk(conn, "datamgr_sessions", {"id": session_id})
+    """Delete a datamgr session identified by name or ID."""
+    from app.host.persistence.read import get_datamgr_session
+
+    with resolve_connection(conn) as active_conn:
+        current = get_datamgr_session(active_conn, name_or_id)
+        if current is None:
+            logger.warning(
+                "%s: session '%s' not found for delete",
+                DELETE_PK_FR,
+                name_or_id,
+                extra={"fr_id": DELETE_PK_FR, "session": name_or_id},
+            )
+            return False
+        deleted = delete_row_by_pk(
+            active_conn, "datamgr_sessions", {"id": current["id"]}
+        )
     return deleted > 0
 
 

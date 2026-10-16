@@ -607,16 +607,19 @@ def get_datamgr_dataset(
 
 
 def get_datamgr_instrument(
-    conn: sqlite3.Connection,
-    symbol: str,
+    conn: sqlite3.Connection | Path | str | None = None,
+    symbol: str = "",
 ) -> dict[str, Any] | None:
     """Get datamgr instrument by symbol."""
-    results = read_rows(conn, "datamgr_instruments", where={"symbol": symbol}, limit=1)
+    with resolve_connection(conn) as active_conn:
+        results = read_rows(
+            active_conn, "datamgr_instruments", where={"symbol": symbol}, limit=1
+        )
     return results[0] if results else None
 
 
 def list_datamgr_instruments(
-    conn: sqlite3.Connection | None = None,
+    conn: sqlite3.Connection | Path | str | None = None,
     *,
     broker_id: int | None = None,
 ) -> list[dict[str, Any]]:
@@ -646,11 +649,40 @@ def get_datamgr_quality_report(
 
 
 def get_datamgr_session(
-    conn: sqlite3.Connection,
-    session_id: int,
+    conn: sqlite3.Connection | Path | str | None = None,
+    name_or_id: str | int = "",
 ) -> dict[str, Any] | None:
-    """Get trading session by ID."""
-    return read_row_by_pk(conn, "datamgr_sessions", {"id": session_id})
+    """Get datamgr session by unique name or ID."""
+    with resolve_connection(conn) as active_conn:
+        if isinstance(name_or_id, int):
+            return read_row_by_pk(active_conn, "datamgr_sessions", {"id": name_or_id})
+        if isinstance(name_or_id, str) and name_or_id.isdigit():
+            by_id = read_row_by_pk(
+                active_conn, "datamgr_sessions", {"id": int(name_or_id)}
+            )
+            if by_id is not None:
+                return by_id
+        rows = read_rows(
+            active_conn, "datamgr_sessions", where={"name": str(name_or_id)}, limit=1
+        )
+        return rows[0] if rows else None
+
+
+def list_datamgr_sessions(
+    conn: sqlite3.Connection | Path | str | None = None,
+    *,
+    broker_id: int | None = None,
+) -> list[dict[str, Any]]:
+    """List datamgr sessions, optionally filtered by broker_id."""
+    with resolve_connection(conn) as active_conn:
+        where = (
+            {"broker_id": broker_id}
+            if broker_id is not None and broker_id >= 0
+            else None
+        )
+        return read_rows(
+            active_conn, "datamgr_sessions", where=where, order_by="name ASC"
+        )
 
 
 def get_mt5_command(

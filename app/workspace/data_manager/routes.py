@@ -71,7 +71,7 @@ from .help import DataManagerHelpService
 from .home import Home
 from .instruments import Instruments
 from .log import DataManagerLogService
-from .sessions import SessionsCatalogService
+from .sessions import Sessions
 
 __all__ = [
     "DataManagerWorkspace",
@@ -116,9 +116,9 @@ class DataManagerWorkspace:
             db_path=self.db_path,
             log_service=self.log,
         )
-        self.sessions = SessionsCatalogService(
+        self.sessions = Sessions(
             db_path=self.db_path,
-            data_dir=self.data_dir,
+            log_service=self.log,
         )
         self.baskets = BasketsCatalogService(
             db_path=self.db_path,
@@ -167,8 +167,8 @@ class DataManagerWorkspace:
     def initialize_defaults(self) -> dict[str, int]:
         """Seed default canonical brokers, instruments, sessions, and baskets."""
         brokers = self.broker.ensure_default_brokers()
-        instruments = self.instruments.ensure_default_instruments()
-        sessions = self.sessions.ensure_default_sessions()
+        instruments = len(self.instruments.view())
+        sessions = len(self.sessions.view())
         baskets = self.baskets.ensure_default_baskets()
 
         counts = {
@@ -423,42 +423,43 @@ def _register_instruments_crud_routes(
         broker_id: int | None = None,
         search: str | None = None,
     ) -> JSONResponse:
-        items = [
-            i.to_dict()
-            for i in ws.instruments.list_instruments(
-                connection=connection,
-                data_type=data_type,
-                broker_id=broker_id,
-                search=search,
-            )
-        ]
+        items = ws.instruments.view(
+            connection=connection,
+            data_type=data_type,
+            broker_id=broker_id,
+            search=search,
+        )
         return _success(items)
 
     @router.post("/instruments")
     def create_instrument(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        inst = ws.instruments.save_instrument(p)
-        return _success(inst.to_dict())
+        inst = ws.instruments.add(p)
+        return _success(inst)
 
     @router.get("/instruments/{symbol}")
     def get_instrument(symbol: str) -> JSONResponse:
-        inst = ws.instruments.get_instrument(symbol)
-        if inst is None:
+        items = ws.instruments.view(search=symbol)
+        clean = symbol.strip().upper()
+        matched = next(
+            (i for i in items if str(i.get("symbol", "")).upper() == clean), None
+        )
+        if matched is None:
             return _error("NOT_FOUND", f"Instrument '{symbol}' not found", 404)
-        return _success(inst.to_dict())
+        return _success(matched)
 
     @router.put("/instruments/{symbol}")
     def update_instrument(
         symbol: str, payload: dict[str, Any] | None = None
     ) -> JSONResponse:
         p = payload or {}
-        inst = ws.instruments.update_instrument(symbol, p)
-        return _success(inst.to_dict())
+        inst = ws.instruments.edit(symbol, p)
+        return _success(inst)
 
     @router.delete("/instruments/{symbol}")
     def delete_instrument(symbol: str) -> JSONResponse:
-        deleted = ws.instruments.delete_instrument(symbol)
-        return _success({"deleted": deleted})
+        deleted = ws.instruments.delete(symbol)
+        return _success({"deleted": bool(deleted)})
 
     @router.post("/instruments/mass-edit")
     def mass_edit_instruments(payload: dict[str, Any] | None = None) -> JSONResponse:
@@ -466,76 +467,163 @@ def _register_instruments_crud_routes(
         symbols = p.get("symbols") or []
         updates = p.get("updates") or {}
         change_flags = p.get("change_flags")
-        count = ws.instruments.mass_edit_instruments(symbols, updates, change_flags)
+        count = ws.instruments.edit(symbols, updates, change_flags)
         return _success({"updated_count": count})
 
     @router.post("/instruments/mass-delete")
     def mass_delete_instruments(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
         symbols = p.get("symbols") or []
-        res = ws.instruments.mass_delete_instruments(symbols)
-        return _success(res)
+        count = ws.instruments.delete(symbols)
+        return _success({"deleted_count": count, "is_async": False})
 
 
 def _register_instruments_alias_routes(
     router: APIRouter, ws: DataManagerWorkspace
 ) -> None:
+    import json
+    from datetime import UTC, datetime
+
+    from app.host.persistence.create import insert_row
+    from app.host.persistence.delete import delete_rows
+    from app.host.persistence.read import read_rows
+
     @router.get("/instruments/aliases")
     def list_aliases() -> JSONResponse:
-        aliases = [a.to_dict() for a in ws.instruments.list_aliases()]
+        with resolve_connection(ws.db_path) as conn:
+            rows = read_rows(
+                conn,
+                "host_entities",
+                where={"entity_type": "datamgr_instrument_alias"},
+            )
+        aliases = []
+        for r in rows:
+            try:
+                payload = json.loads(str(r.get("payload", "{}")))
+                aliases.append(
+                    {
+                        "alias": str(r.get("entity_id", "")),
+                        "instrument": str(
+                            payload.get("instrument", "") or payload.get("symbol", "")
+                        ),
+                        "description": str(payload.get("description", "")),
+                    }
+                )
+            except (json.JSONDecodeError, KeyError, TypeError) as exc:
+                logger.debug(
+                    "Skipping malformed instrument alias: %s",
+                    exc,
+                )
         return _success(aliases)
 
     @router.post("/instruments/aliases")
     def create_alias(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        rec = ws.instruments.save_alias(
-            alias=str(p.get("alias", "")),
-            instrument=str(p.get("instrument", "")),
-            description=str(p.get("description", "")),
-        )
-        return _success(rec.to_dict())
+        alias = str(p.get("alias", "")).strip().upper()
+        inst = str(p.get("instrument", "")).strip().upper()
+        desc = str(p.get("description", ""))
+        now_iso = datetime.now(UTC).isoformat()
+        with resolve_connection(ws.db_path) as conn:
+            delete_rows(
+                conn,
+                "host_entities",
+                where={
+                    "entity_id": alias,
+                    "entity_type": "datamgr_instrument_alias",
+                },
+            )
+            insert_row(
+                conn,
+                "host_entities",
+                {
+                    "entity_id": alias,
+                    "entity_type": "datamgr_instrument_alias",
+                    "scope": "workspace",
+                    "payload": json.dumps({"instrument": inst, "description": desc}),
+                    "revision": 1,
+                    "created_at_utc": now_iso,
+                    "updated_at_utc": now_iso,
+                },
+            )
+        return _success({"alias": alias, "instrument": inst, "description": desc})
 
     @router.put("/instruments/aliases/{alias}")
     def update_alias(alias: str, payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        rec = ws.instruments.save_alias(
-            alias=alias,
-            instrument=str(p.get("instrument", "")),
-            description=str(p.get("description", "")),
-        )
-        return _success(rec.to_dict())
+        clean_alias = alias.strip().upper()
+        inst = str(p.get("instrument", "")).strip().upper()
+        desc = str(p.get("description", ""))
+        now_iso = datetime.now(UTC).isoformat()
+        with resolve_connection(ws.db_path) as conn:
+            delete_rows(
+                conn,
+                "host_entities",
+                where={
+                    "entity_id": clean_alias,
+                    "entity_type": "datamgr_instrument_alias",
+                },
+            )
+            insert_row(
+                conn,
+                "host_entities",
+                {
+                    "entity_id": clean_alias,
+                    "entity_type": "datamgr_instrument_alias",
+                    "scope": "workspace",
+                    "payload": json.dumps({"instrument": inst, "description": desc}),
+                    "revision": 1,
+                    "created_at_utc": now_iso,
+                    "updated_at_utc": now_iso,
+                },
+            )
+        return _success({"alias": clean_alias, "instrument": inst, "description": desc})
 
     @router.delete("/instruments/aliases/{alias}")
     def delete_alias(alias: str) -> JSONResponse:
-        removed = ws.instruments.delete_alias(alias)
-        return _success({"removed": removed})
+        clean_alias = alias.strip().upper()
+        with resolve_connection(ws.db_path) as conn:
+            count = delete_rows(
+                conn,
+                "host_entities",
+                where={
+                    "entity_id": clean_alias,
+                    "entity_type": "datamgr_instrument_alias",
+                },
+            )
+        return _success({"removed": count > 0})
 
     @router.post("/instruments/clone")
     def clone_instrument(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        rec = ws.instruments.clone_instrument(
+        rec = ws.instruments.clone(
             symbol=str(p.get("symbol", "")),
             clone_name=str(p.get("clone_name", "")),
             broker_id=int(p.get("broker_id", -1)),
             broker_postfix=str(p.get("broker_postfix", "")),
         )
-        return _success(rec.to_dict())
+        return _success(rec)
 
     @router.post("/instruments/save")
-    def export_instruments_xml(
+    def export_instruments(
         payload: dict[str, Any] | None = None,
     ) -> JSONResponse:
         p = payload or {}
         symbols = p.get("symbols")
-        xml_str = ws.instruments.export_xml(symbols)
-        return _success({"xml": xml_str})
+        out = ws.instruments.export(symbols=symbols)
+        return _success({"content": str(out), "json": str(out)})
 
     @router.post("/instruments/load")
-    def import_instruments_xml(payload: dict[str, Any] | None = None) -> JSONResponse:
+    def import_instruments(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        xml_content = str(p.get("xml_content") or p.get("xml", ""))
+        content = (
+            p.get("content")
+            or p.get("json_content")
+            or p.get("instruments")
+            or p.get("xml_content")
+            or p.get("filepath", "")
+        )
         policy = str(p.get("conflict_policy", "overwrite_all"))
-        res = ws.instruments.import_xml(xml_content, conflict_policy=policy)
+        res = ws.instruments.import_(content, conflict_policy=policy)
         return _success(res)
 
 
@@ -545,82 +633,73 @@ def _register_sessions_crud_routes(router: APIRouter, ws: DataManagerWorkspace) 
         broker_id: int | None = None,
         search: str | None = None,
     ) -> JSONResponse:
-        items = [
-            s.to_dict()
-            for s in ws.sessions.list_sessions(broker_id=broker_id, search=search)
-        ]
+        items = ws.sessions.view(broker_id=broker_id, search=search)
         return _success(items)
 
     @router.post("/sessions")
     def create_session(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        rec = ws.sessions.save_session(p)
-        return _success(rec.to_dict())
+        rec = ws.sessions.add(p)
+        return _success(rec)
+
+    @router.put("/sessions/{name}")
+    def edit_session(name: str, payload: dict[str, Any] | None = None) -> JSONResponse:
+        p = payload or {}
+        rec = ws.sessions.edit(name, p)
+        return _success(rec)
 
     @router.get("/sessions/{name}")
     def get_session(name: str) -> JSONResponse:
-        sess = ws.sessions.get_session(name)
-        if sess is None:
+        items = ws.sessions.view(search=name)
+        match = next((s for s in items if s.get("name") == name), None)
+        if match is None:
             return _error("NOT_FOUND", f"Session '{name}' not found", 404)
-        return _success(sess.to_dict())
+        return _success(match)
 
     @router.delete("/sessions/{name}")
     def delete_session(name: str) -> JSONResponse:
-        deleted = ws.sessions.delete_session(name)
+        deleted = ws.sessions.delete(name)
         return _success({"deleted": deleted})
 
     @router.post("/sessions/clone")
     def clone_session(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        rec = ws.sessions.clone_session(
-            source_name=str(p.get("source_name", "")),
-            new_name=str(p.get("new_name", "")),
+        rec = ws.sessions.clone(
+            source_name=str(p.get("source_name", p.get("name", ""))),
+            clone_name=str(p.get("clone_name", p.get("new_name", ""))),
             broker_id=int(p.get("broker_id", -1)),
             broker_postfix=str(p.get("broker_postfix", "")),
         )
-        return _success(rec.to_dict())
+        return _success(rec)
 
+
+def _register_sessions_io_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:
     @router.post("/sessions/mass-delete")
     def mass_delete_sessions(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
         names = p.get("names") or []
-        count = ws.sessions.mass_delete_sessions(names)
+        count = ws.sessions.delete(names)
         return _success({"deleted_count": count})
 
-
-def _register_sessions_template_routes(
-    router: APIRouter, ws: DataManagerWorkspace
-) -> None:
-    @router.get("/sessions/nt-templates")
-    def list_nt_templates(folder_path: str | None = None) -> JSONResponse:
-        return _success(ws.sessions.list_nt_templates(folder_path))
-
-    @router.post("/sessions/import-nt")
-    def import_nt_sessions(payload: dict[str, Any] | None = None) -> JSONResponse:
-        p = payload or {}
-        xml_content = p.get("xml_content")
-        folder = p.get("folder_path")
-        policy = str(p.get("conflict_policy", "overwrite"))
-        res = ws.sessions.import_nt_sessions(
-            xml_content=xml_content, folder_path=folder, conflict_policy=policy
-        )
-        return _success(res)
-
-    @router.post("/sessions/export-xml")
-    def export_sessions_xml(
+    @router.post("/sessions/save")
+    def export_sessions(
         payload: dict[str, Any] | None = None,
     ) -> JSONResponse:
         p = payload or {}
         names = p.get("names")
-        xml_str = ws.sessions.export_sqx_xml(names)
-        return _success(xml_str)
+        out = ws.sessions.export(names=names)
+        return _success({"content": str(out), "json": str(out)})
 
-    @router.post("/sessions/import-xml")
-    def import_sessions_xml(payload: dict[str, Any] | None = None) -> JSONResponse:
+    @router.post("/sessions/load")
+    def import_sessions(payload: dict[str, Any] | None = None) -> JSONResponse:
         p = payload or {}
-        xml_content = str(p.get("xml_content") or p.get("xml", ""))
-        policy = str(p.get("policy", "overwrite"))
-        res = ws.sessions.import_sqx_xml(xml_content, policy=policy)
+        content = (
+            p.get("content")
+            or p.get("json_content")
+            or p.get("sessions")
+            or p.get("filepath", "")
+        )
+        res = ws.sessions.import_(content)
         return _success(res)
 
 
@@ -942,8 +1021,8 @@ def create_data_manager_router(
     _register_datasets_crud_routes(router, ws)
     _register_instruments_alias_routes(router, ws)
     _register_instruments_crud_routes(router, ws)
-    _register_sessions_template_routes(router, ws)
     _register_sessions_crud_routes(router, ws)
+    _register_sessions_io_routes(router, ws)
     _register_baskets_io_routes(router, ws)
     _register_baskets_crud_routes(router, ws)
     _register_broker_io_routes(router, ws)
