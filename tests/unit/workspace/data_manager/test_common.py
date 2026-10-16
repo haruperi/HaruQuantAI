@@ -342,8 +342,8 @@ class TestContractsInstrumentInfo:
         assert inst.round_to_tick_size(1.085427) == 1.08543
         assert inst.round_to_tick_size(1.085422) == 1.08542
 
-    def test_instrument_info_to_symbol_spec(self) -> None:
-        """Verify conversion to Tier 2 trading domain SymbolSpec."""
+    def test_instrument_info_to_symbol_info(self) -> None:
+        """Verify conversion to Tier 2 trading domain SymbolInfo."""
         inst = InstrumentInfo(
             symbol="EURUSD",
             tick_size=0.00001,
@@ -355,7 +355,7 @@ class TestContractsInstrumentInfo:
             lot_step=0.01,
             margin_rate=0.033,
         )
-        spec = inst.to_symbol_spec()
+        spec = inst.to_symbol_info()
         assert spec.name == "EURUSD"
         assert spec.digits == 5
         assert spec.point == 0.00001

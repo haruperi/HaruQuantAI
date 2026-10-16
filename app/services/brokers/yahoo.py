@@ -5,7 +5,7 @@ Description:
     v8 chart and v7 quote REST endpoints. Conforms directly to the canonical
     `TradingBackend` protocol and Stage 2C `data.provider` specification. Provides
     normalized historical candlestick bars (`MarketData.Bars`) and symbol
-    specifications (`SymbolSnapshot`). Enforces strict timeframe guards, rejecting
+    specifications (`SymbolInfo`). Enforces strict timeframe guards, rejecting
     tick data requests, and maps upstream HTTP 429/5xx status codes to typed provider errors.
 
 Purpose:
@@ -63,7 +63,7 @@ from app.services.brokers.capabilities import (
     ProviderRateLimitError,
     ProviderUnsupportedError,
 )
-from app.services.trading import SymbolSnapshot
+from app.services.libs.contracts import SymbolInfo
 from app.workspace.data_manager import Timeframe
 from app.workspace.data_manager.history import DataBrokerBackend
 
@@ -523,8 +523,8 @@ class YahooBroker(DataBrokerBackend):
         )
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Resolve instrument specifications as a canonical SymbolSnapshot."""
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Resolve instrument specifications as a canonical SymbolInfo."""
         sym_clean = symbol.upper().strip()
         params: dict[str, Any] = {"symbols": sym_clean}
         crumb = self._ensure_crumb()
@@ -562,7 +562,7 @@ class YahooBroker(DataBrokerBackend):
             price,
             extra={"fr_id": SYMBOL_METADATA_FR, "symbol": sym_clean, "price": price},
         )
-        return SymbolSnapshot(
+        return SymbolInfo(
             name=sym_clean,
             custom=False,
             digits=2,

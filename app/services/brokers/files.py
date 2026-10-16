@@ -5,7 +5,7 @@ Description:
     accessing historical bars, ticks, and instrument specifications stored as
     CSV, TXT, Parquet, MT4 HST, or MT4 FXT files on disk. Conforms directly
     to the `TradingBackend` protocol and Stage 2C `data.provider` specification.
-    Exposes canonical `SymbolSnapshot` objects and normalized historical records.
+    Exposes canonical `SymbolInfo` objects and normalized historical records.
 
 Purpose:
     FEAT-DATA-SOURCE-FILES: Local Filesystem Historical Market Data Ingestion.
@@ -69,7 +69,7 @@ from app.services.brokers.capabilities import (
     ProviderCapabilities,
     ProviderHealth,
 )
-from app.services.trading import SymbolSnapshot
+from app.services.libs.contracts import SymbolInfo
 from app.workspace.data_manager.history import DataBrokerBackend
 
 PARSING_FR = "FR-BROKER-FILES-PARSING"
@@ -293,8 +293,8 @@ class FilesBroker(DataBrokerBackend):
         return sorted(matches)
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Resolve symbol metadata as canonical SymbolSnapshot."""
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Resolve symbol metadata as canonical SymbolInfo."""
         sym_upper = symbol.upper()
         logger.info(
             "%s: Resolved symbol info for %s",
@@ -302,7 +302,7 @@ class FilesBroker(DataBrokerBackend):
             sym_upper,
             extra={"fr_id": SYMBOLS_FR, "symbol": sym_upper},
         )
-        return SymbolSnapshot(
+        return SymbolInfo(
             name=sym_upper,
             custom=True,
             digits=2,

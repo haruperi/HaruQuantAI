@@ -1,39 +1,4 @@
-"""Immutable dataclass snapshots of trading accounts, symbols, and orders.
-
-Description:
-    Provides strongly typed immutable value objects and dataclasses matching MQL5
-    data structures, including account, terminal, symbol, position, order, and deal
-    snapshots, as well as trade request and result containers.
-
-Purpose:
-    FEAT-TRADING-SNAPSHOTS: Strongly typed market and account snapshot objects.
-
-Key Capabilities:
-    - FR-TRADING-MARKET-SNAPSHOTS: Immutable account, symbol, and order records.
-      Associated: `AccountSnapshot`, `TerminalSnapshot`, `SymbolSnapshot`,
-        `PositionSnapshot`, `OrderSnapshot`, `DealSnapshot`, `BookInfo`.
-      Logging: Pure in-memory data structures with zero logging overhead.
-    - FR-TRADING-ORDER-REQUESTS: Structured trade requests and verification results.
-      Associated: `TradeRequest`, `TradeResult`, `TradeCheckResult`.
-      Logging: Pure data structures with zero logging overhead.
-
-Python API Usage:
-    ```python
-    from app.services.trading.snapshots import (
-        AccountSnapshot,
-        TradeRequest,
-        TradeResult,
-    )
-
-    account = AccountSnapshot(login=12345, balance=10000.0)
-    req = TradeRequest(symbol="EURUSD", volume=0.01)
-    ```
-
-CLI Usage:
-    ```bash
-    uv run python -m app.services.trading.snapshots
-    ```
-"""
+"""Domain value objects and contracts for accounts, symbols, orders, and deals."""
 
 from __future__ import annotations
 
@@ -41,10 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from app.host.logging import get_logger
-
 from .enums import (
-    BOOK_TYPE_DESCRIPTIONS,
     AccountTradeMode,
     BookType,
     MarginMode,
@@ -55,44 +17,33 @@ from .enums import (
     SymbolTradeExecution,
     SymbolTradeMode,
     TradeAction,
-    TradeRetcode,
 )
 
 __all__ = [
-    "AccountSnapshot",
+    "AccountInfo",
     "BookInfo",
-    "DealSnapshot",
-    "HistoryOrderSnapshot",
-    "MqlBookInfo",
-    "OrderSnapshot",
-    "PositionSnapshot",
-    "SymbolSnapshot",
-    "SymbolSpec",
-    "TerminalSnapshot",
+    "DealInfo",
+    "OrderInfo",
+    "PositionInfo",
+    "SymbolInfo",
+    "TerminalInfo",
     "TradeCheckResult",
     "TradeRequest",
     "TradeResult",
 ]
 
-logger = get_logger(__name__)
-
 
 @dataclass(frozen=True, slots=True)
 class BookInfo:
-    """Market depth (DOM) entry matching MQL5 MqlBookInfo."""
+    """Market depth (DOM) book entry."""
 
     type: BookType
     price: float
     volume: int
     volume_real: float
 
-    @property
-    def type_description(self) -> str:
-        """Human-readable order type description."""
-        return BOOK_TYPE_DESCRIPTIONS.get(self.type, "Unknown")
-
     def _asdict(self) -> dict[str, Any]:
-        """Convert entry to a dictionary matching Python MT5 BookInfo._asdict()."""
+        """Convert entry to a dictionary."""
         return {
             "type": int(self.type),
             "price": self.price,
@@ -101,12 +52,9 @@ class BookInfo:
         }
 
 
-MqlBookInfo = BookInfo
-
-
 @dataclass(slots=True)
-class AccountSnapshot:
-    """Atomic snapshot of account balance, margin, leverage, and trading permissions."""
+class AccountInfo:
+    """Atomic state of account balance, margin, leverage, and trading permissions."""
 
     login: int = 0
     trade_mode: AccountTradeMode = AccountTradeMode.DEMO
@@ -142,8 +90,8 @@ class AccountSnapshot:
 
 
 @dataclass(slots=True)
-class TerminalSnapshot:
-    """Atomic snapshot of terminal state, connectivity, paths, and platform metadata."""
+class TerminalInfo:
+    """Atomic state of terminal connectivity, paths, and platform metadata."""
 
     build: int = 0
     connected: bool = True
@@ -178,8 +126,8 @@ class TerminalSnapshot:
 
 
 @dataclass(slots=True)
-class SymbolSnapshot:
-    """Atomic snapshot of symbol specification, execution modes, rates, and spreads."""
+class SymbolInfo:
+    """Atomic state of symbol specification, execution modes, rates, and spreads."""
 
     name: str = ""
     custom: bool = False
@@ -290,89 +238,15 @@ class SymbolSnapshot:
     page: str = ""
     path: str = ""
 
-    @property
-    def lots_min(self) -> float:
-        """Alias for volume_min."""
-        return self.volume_min
-
-    @property
-    def lots_max(self) -> float:
-        """Alias for volume_max."""
-        return self.volume_max
-
-    @property
-    def lots_step(self) -> float:
-        """Alias for volume_step."""
-        return self.volume_step
-
-    @property
-    def lots_limit(self) -> float:
-        """Alias for volume_limit."""
-        return self.volume_limit
-
-    @property
-    def tick_size(self) -> float:
-        """Alias for trade_tick_size."""
-        return self.trade_tick_size
-
-    @property
-    def tick_value(self) -> float:
-        """Alias for trade_tick_value."""
-        return self.trade_tick_value
-
-    @property
-    def contract_size(self) -> float:
-        """Alias for trade_contract_size."""
-        return self.trade_contract_size
-
-    @property
-    def stops_level(self) -> int:
-        """Alias for trade_stops_level."""
-        return self.trade_stops_level
-
-    @property
-    def freeze_level(self) -> int:
-        """Alias for trade_freeze_level."""
-        return self.trade_freeze_level
-
-    @property
-    def selected(self) -> bool:
-        """Alias for select."""
-        return self.select
-
-    @selected.setter
-    def selected(self, value: bool) -> None:
-        self.select = value
-
-    @property
-    def ticks_book_depth(self) -> int:
-        """Alias for ticks_bookdepth."""
-        return self.ticks_bookdepth
-
-    @ticks_book_depth.setter
-    def ticks_book_depth(self, value: int) -> None:
-        self.ticks_bookdepth = value
-
-    @property
-    def trade_execution(self) -> SymbolTradeExecution:
-        """Symbol trade execution policy enum."""
-        return (
-            SymbolTradeExecution(self.trade_exemode)
-            if self.trade_exemode in SymbolTradeExecution._value2member_map_
-            else SymbolTradeExecution.MARKET
-        )
-
-    @trade_execution.setter
-    def trade_execution(self, value: SymbolTradeExecution | int) -> None:
-        self.trade_exemode = int(value)
-
-
-SymbolSpec = SymbolSnapshot
+    def round_to_tick_size(self, price: float) -> float:
+        """Round a price to the symbol's minimum tick size."""
+        step = self.trade_tick_size if self.trade_tick_size > 0.0 else 0.00001
+        return round(round(price / step) * step, self.digits)
 
 
 @dataclass(slots=True)
-class PositionSnapshot:
-    """Atomic snapshot of an open market position."""
+class PositionInfo:
+    """Atomic state of an open market position."""
 
     ticket: int = 0
     identifier: int = 0
@@ -394,25 +268,10 @@ class PositionSnapshot:
     time_update: int = 0
     time_update_msc: int = 0
 
-    @property
-    def stop_loss(self) -> float:
-        """Alias for sl."""
-        return self.sl
-
-    @property
-    def take_profit(self) -> float:
-        """Alias for tp."""
-        return self.tp
-
-    @property
-    def type(self) -> int:
-        """Alias for position_type."""
-        return self.position_type
-
 
 @dataclass(slots=True)
-class OrderSnapshot:
-    """Atomic snapshot of a pending or historical order."""
+class OrderInfo:
+    """Atomic state of an active or historical trade order."""
 
     ticket: int = 0
     symbol: str = ""
@@ -438,30 +297,14 @@ class OrderSnapshot:
     type_time_description: str = ""
     magic: int = 0
     position_id: int = 0
+    position_by_id: int = 0
     comment: str = ""
-
-    @property
-    def stop_loss(self) -> float:
-        """Alias for sl."""
-        return self.sl
-
-    @property
-    def take_profit(self) -> float:
-        """Alias for tp."""
-        return self.tp
-
-    @property
-    def type(self) -> int:
-        """Alias for order_type."""
-        return self.order_type
-
-
-HistoryOrderSnapshot = OrderSnapshot
+    reason: int = 0
 
 
 @dataclass(slots=True)
-class DealSnapshot:
-    """Atomic snapshot of an executed trade deal."""
+class DealInfo:
+    """Atomic state of an executed trade deal."""
 
     ticket: int = 0
     order: int = 0
@@ -476,50 +319,44 @@ class DealSnapshot:
     commission: float = 0.0
     swap: float = 0.0
     profit: float = 0.0
+    fee: float = 0.0
+    sl: float = 0.0
+    tp: float = 0.0
     magic: int = 0
+    reason: int = 0
     comment: str = ""
     time: int = 0
     time_msc: int = 0
 
-    @property
-    def order_ticket(self) -> int:
-        """Alias for order."""
-        return self.order
-
-    @property
-    def type(self) -> int:
-        """Alias for deal_type."""
-        return self.deal_type
-
 
 @dataclass(slots=True)
 class TradeRequest:
-    """Execution order request specification."""
+    """Strongly typed trading operation parameters."""
 
-    action: TradeAction
+    action: TradeAction = TradeAction.DEAL
+    magic: int = 0
+    order: int = 0
     symbol: str = ""
     volume: float = 0.0
-    order_type: OrderType = OrderType.BUY
     price: float = 0.0
     stoplimit: float = 0.0
     sl: float = 0.0
     tp: float = 0.0
     deviation: int = 0
-    magic: int = 0
-    order: int = 0
-    position: int = 0
-    position_by: int = 0
+    order_type: OrderType = OrderType.BUY
     type_filling: OrderFilling = OrderFilling.FOK
     type_time: OrderTime = OrderTime.GTC
     expiration: datetime | None = None
     comment: str = ""
+    position: int = 0
+    position_by: int = 0
 
 
 @dataclass(slots=True)
 class TradeResult:
-    """Order dispatch execution outcome returned by Trade.OrderSend()."""
+    """Strongly typed result of a sent trade operation."""
 
-    retcode: int = int(TradeRetcode.ERROR)
+    retcode: int = 0
     deal: int = 0
     order: int = 0
     volume: float = 0.0
@@ -529,33 +366,20 @@ class TradeResult:
     comment: str = ""
     request_id: int = 0
     retcode_external: int = 0
+    retcode_description: str = ""
     raw: Any = None
 
 
 @dataclass(slots=True)
 class TradeCheckResult:
-    """Pre-trade verification outcome returned by Trade.OrderCheck()."""
+    """Strongly typed result of pre-trade checks."""
 
-    retcode: int = int(TradeRetcode.DONE)
+    retcode: int = 0
     balance: float = 0.0
     equity: float = 0.0
     profit: float = 0.0
     margin: float = 0.0
     margin_free: float = 0.0
     margin_level: float = 0.0
-    comment: str = "Done"
+    comment: str = ""
     raw: Any = None
-
-
-def main() -> None:
-    """Demonstrate trading snapshots and request structures."""
-    account = AccountSnapshot(login=12345, balance=10000.0, equity=10000.0)
-    print(f"Account: login={account.login}, balance={account.balance}")
-    req = TradeRequest(action=TradeAction.DEAL, symbol="EURUSD", volume=0.01)
-    print(
-        f"TradeRequest: action={req.action}, symbol={req.symbol}, volume={req.volume}"
-    )
-
-
-if __name__ == "__main__":
-    main()

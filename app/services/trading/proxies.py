@@ -2,25 +2,25 @@
 
 Description:
     Provides canonical asynchronous query proxy classes matching MQL5 APIs
-    (AccountInfo, TerminalInfo, SymbolInfo, PositionInfo, OrderInfo,
-    HistoryOrderInfo, DealInfo), querying live and historical states through
-    the TradingBackend protocol.
+    (AccountProxy, TerminalProxy, SymbolProxy, PositionProxy, OrderProxy,
+    HistoryOrderProxy, DealProxy), querying live and historical states through
+    the TradingBackend protocol and returning typed contract objects.
 
 Purpose:
     FEAT-TRADING-PROXIES: Query proxies for trading state inspection.
 
 Key Capabilities:
     - FR-TRADING-QUERY-PROXIES: State inspection and property resolution.
-      Associated: `AccountInfo`, `TerminalInfo`, `SymbolInfo`, `PositionInfo`,
-        `OrderInfo`, `HistoryOrderInfo`, `DealInfo`.
+      Associated: `AccountProxy`, `TerminalProxy`, `SymbolProxy`, `PositionProxy`,
+        `OrderProxy`, `HistoryOrderProxy`, `DealProxy`.
       Logging: DEBUG queries dispatched through BaseTradingClass.
 
 Python API Usage:
     ```python
-    from app.services.trading.proxies import AccountInfo, SymbolInfo
+    from app.services.trading.proxies import AccountProxy, SymbolProxy
 
-    account_info = AccountInfo(backend)
-    symbol_info = SymbolInfo(backend)
+    account_proxy = AccountProxy(backend)
+    symbol_proxy = SymbolProxy(backend)
     ```
 
 CLI Usage:
@@ -36,49 +36,40 @@ from dataclasses import asdict
 from typing import Any
 
 from app.host.logging import get_logger
+from app.services.libs import contracts
+from app.services.libs.enums import BookType
 
 from .base import TradingClass
-from .enums import BookType
-from .snapshots import (
-    AccountSnapshot,
-    BookInfo,
-    DealSnapshot,
-    HistoryOrderSnapshot,
-    OrderSnapshot,
-    PositionSnapshot,
-    SymbolSnapshot,
-    TerminalSnapshot,
-)
 
 __all__ = [
-    "AccountInfo",
-    "DealInfo",
-    "HistoryOrderInfo",
-    "OrderInfo",
-    "PositionInfo",
-    "SymbolInfo",
-    "TerminalInfo",
+    "AccountProxy",
+    "DealProxy",
+    "HistoryOrderProxy",
+    "OrderProxy",
+    "PositionProxy",
+    "SymbolProxy",
+    "TerminalProxy",
 ]
 
 logger = get_logger(__name__)
 
 
-class AccountInfo(TradingClass):
-    """Canonical asynchronous AccountInfo API."""
+class AccountProxy(TradingClass):
+    """Canonical asynchronous AccountInfo API proxy."""
 
     CLASS_NAME = "AccountInfo"
 
-    async def AccountInfo(self, *args: Any) -> AccountSnapshot:
+    async def AccountInfo(self, *args: Any) -> contracts.AccountInfo:
         """Await the backend AccountInfo snapshot."""
         logger.debug("FR-TRADING-ACCOUNT-SNAPSHOT: querying account snapshot")
         data = await self._call("AccountInfo", *args)
-        if isinstance(data, AccountSnapshot):
+        if isinstance(data, contracts.AccountInfo):
             return data
         if isinstance(data, dict):
-            return AccountSnapshot(**data)
-        raise TypeError(f"unexpected account snapshot type: {type(data).__name__}")
+            return contracts.AccountInfo(**data)
+        raise TypeError(f"unexpected account info type: {type(data).__name__}")
 
-    async def __call__(self, *args: Any) -> AccountSnapshot:
+    async def __call__(self, *args: Any) -> contracts.AccountInfo:
         """Await the backend AccountInfo snapshot directly via call syntax."""
         return await self.AccountInfo(*args)
 
@@ -100,51 +91,51 @@ class AccountInfo(TradingClass):
 
 
 # ============================================================================
-# TerminalInfo Proxy
+# TerminalProxy
 # ============================================================================
 
 
-class TerminalInfo(TradingClass):
-    """Canonical asynchronous TerminalInfo API."""
+class TerminalProxy(TradingClass):
+    """Canonical asynchronous TerminalInfo API proxy."""
 
     CLASS_NAME = "TerminalInfo"
 
-    async def TerminalInfo(self, *args: Any) -> TerminalSnapshot:
+    async def TerminalInfo(self, *args: Any) -> contracts.TerminalInfo:
         """Await the backend TerminalInfo snapshot."""
         logger.debug("FR-TRADING-TERMINAL-SNAPSHOT: querying terminal snapshot")
         data = await self._call("TerminalInfo", *args)
-        if isinstance(data, TerminalSnapshot):
+        if isinstance(data, contracts.TerminalInfo):
             return data
         if isinstance(data, dict):
-            return TerminalSnapshot(**data)
-        raise TypeError(f"unexpected terminal snapshot type: {type(data).__name__}")
+            return contracts.TerminalInfo(**data)
+        raise TypeError(f"unexpected terminal info type: {type(data).__name__}")
 
-    async def __call__(self, *args: Any) -> TerminalSnapshot:
+    async def __call__(self, *args: Any) -> contracts.TerminalInfo:
         """Await the backend TerminalInfo snapshot directly via call syntax."""
         return await self.TerminalInfo(*args)
 
 
 # ============================================================================
-# SymbolInfo Proxy
+# SymbolProxy
 # ============================================================================
 
 
-class SymbolInfo(TradingClass):
-    """Canonical asynchronous SymbolInfo API."""
+class SymbolProxy(TradingClass):
+    """Canonical asynchronous SymbolInfo API proxy."""
 
     CLASS_NAME = "SymbolInfo"
 
-    async def SymbolInfo(self, *args: Any) -> SymbolSnapshot:
+    async def SymbolInfo(self, *args: Any) -> contracts.SymbolInfo:
         """Await the backend SymbolInfo snapshot."""
         logger.debug("FR-TRADING-SYMBOL-SNAPSHOT: querying symbol snapshot")
         data = await self._call("SymbolInfo", *args)
-        if isinstance(data, SymbolSnapshot):
+        if isinstance(data, contracts.SymbolInfo):
             return data
         if isinstance(data, dict):
-            return SymbolSnapshot(**data)
-        raise TypeError(f"unexpected symbol snapshot type: {type(data).__name__}")
+            return contracts.SymbolInfo(**data)
+        raise TypeError(f"unexpected symbol info type: {type(data).__name__}")
 
-    async def __call__(self, *args: Any) -> SymbolSnapshot:
+    async def __call__(self, *args: Any) -> contracts.SymbolInfo:
         """Await the backend SymbolInfo snapshot directly via call syntax."""
         return await self.SymbolInfo(*args)
 
@@ -153,7 +144,7 @@ class SymbolInfo(TradingClass):
         data = await self._call("as_dict", *args)
         if isinstance(data, dict):
             return data
-        if isinstance(data, SymbolSnapshot):
+        if isinstance(data, contracts.SymbolInfo):
             return asdict(data)
         raise TypeError(f"unexpected symbol dictionary type: {type(data).__name__}")
 
@@ -201,22 +192,22 @@ class SymbolInfo(TradingClass):
         """Subscribes the MetaTrader 5 terminal to Market Depth change events."""
         return await self._call("MarketBookAdd", *args)
 
-    async def MarketBookGet(self, *args: Any) -> tuple[BookInfo, ...]:
+    async def MarketBookGet(self, *args: Any) -> tuple[contracts.BookInfo, ...]:
         """Return a tuple of BookInfo featuring Market Depth entries for a symbol."""
         logger.debug("FR-TRADING-SYMBOL-SNAPSHOT: reading market depth")
         raw = await self._call("MarketBookGet", *args)
         if not raw:
             return ()
-        entries: list[BookInfo] = []
+        entries: list[contracts.BookInfo] = []
         for item in raw:
-            if isinstance(item, BookInfo):
+            if isinstance(item, contracts.BookInfo):
                 entries.append(item)
             elif isinstance(item, dict):
                 raw_vol = item.get("volume_real")
                 if raw_vol is None:
                     raw_vol = item.get("volume", 0.0)
                 entries.append(
-                    BookInfo(
+                    contracts.BookInfo(
                         type=BookType(int(item.get("type", BookType.BOOK_TYPE_BUY))),
                         price=float(item.get("price", 0.0)),
                         volume=int(item.get("volume", 0)),
@@ -231,26 +222,26 @@ class SymbolInfo(TradingClass):
 
 
 # ============================================================================
-# PositionInfo Proxy
+# PositionProxy
 # ============================================================================
 
 
-class PositionInfo(TradingClass):
-    """Canonical asynchronous PositionInfo API."""
+class PositionProxy(TradingClass):
+    """Canonical asynchronous PositionInfo API proxy."""
 
     CLASS_NAME = "PositionInfo"
 
-    async def PositionInfo(self, *args: Any) -> PositionSnapshot:
+    async def PositionInfo(self, *args: Any) -> contracts.PositionInfo:
         """Await the backend PositionInfo snapshot."""
         logger.debug("FR-TRADING-POSITIONS: querying position snapshot")
         data = await self._call("PositionInfo", *args)
-        if isinstance(data, PositionSnapshot):
+        if isinstance(data, contracts.PositionInfo):
             return data
         if isinstance(data, dict):
-            return PositionSnapshot(**data)
-        raise TypeError(f"unexpected position snapshot type: {type(data).__name__}")
+            return contracts.PositionInfo(**data)
+        raise TypeError(f"unexpected position info type: {type(data).__name__}")
 
-    async def __call__(self, *args: Any) -> PositionSnapshot:
+    async def __call__(self, *args: Any) -> contracts.PositionInfo:
         """Await the backend PositionInfo snapshot directly via call syntax."""
         return await self.PositionInfo(*args)
 
@@ -259,7 +250,7 @@ class PositionInfo(TradingClass):
         data = await self._call("as_dict", *args)
         if isinstance(data, dict):
             return data
-        if isinstance(data, PositionSnapshot):
+        if isinstance(data, contracts.PositionInfo):
             return asdict(data)
         raise TypeError(f"unexpected position dictionary type: {type(data).__name__}")
 
@@ -291,7 +282,9 @@ class PositionInfo(TradingClass):
         """Await the backend PositionInfo.PositionsTotal operation."""
         return await self._call("PositionsTotal", *args)
 
-    async def PositionsGet(self, *args: Any, **kwargs: Any) -> list[PositionSnapshot]:
+    async def PositionsGet(
+        self, *args: Any, **kwargs: Any
+    ) -> list[contracts.PositionInfo]:
         """Await the backend PositionInfo.PositionsGet operation."""
         logger.debug("FR-TRADING-POSITIONS: querying positions collection")
         data = (
@@ -301,33 +294,35 @@ class PositionInfo(TradingClass):
         )
         if isinstance(data, list):
             return [
-                item if isinstance(item, PositionSnapshot) else PositionSnapshot(**item)
+                item
+                if isinstance(item, contracts.PositionInfo)
+                else contracts.PositionInfo(**item)
                 for item in data
             ]
         raise TypeError(f"unexpected PositionsGet return type: {type(data).__name__}")
 
 
 # ============================================================================
-# OrderInfo Proxy
+# OrderProxy
 # ============================================================================
 
 
-class OrderInfo(TradingClass):
-    """Canonical asynchronous OrderInfo API."""
+class OrderProxy(TradingClass):
+    """Canonical asynchronous OrderInfo API proxy."""
 
     CLASS_NAME = "OrderInfo"
 
-    async def OrderInfo(self, *args: Any) -> OrderSnapshot:
+    async def OrderInfo(self, *args: Any) -> contracts.OrderInfo:
         """Await the backend OrderInfo snapshot."""
         logger.debug("FR-TRADING-ORDERS: querying order snapshot")
         data = await self._call("OrderInfo", *args)
-        if isinstance(data, OrderSnapshot):
+        if isinstance(data, contracts.OrderInfo):
             return data
         if isinstance(data, dict):
-            return OrderSnapshot(**data)
-        raise TypeError(f"unexpected order snapshot type: {type(data).__name__}")
+            return contracts.OrderInfo(**data)
+        raise TypeError(f"unexpected order info type: {type(data).__name__}")
 
-    async def __call__(self, *args: Any) -> OrderSnapshot:
+    async def __call__(self, *args: Any) -> contracts.OrderInfo:
         """Await the backend OrderInfo snapshot directly via call syntax."""
         return await self.OrderInfo(*args)
 
@@ -336,7 +331,7 @@ class OrderInfo(TradingClass):
         data = await self._call("as_dict", *args)
         if isinstance(data, dict):
             return data
-        if isinstance(data, OrderSnapshot):
+        if isinstance(data, contracts.OrderInfo):
             return asdict(data)
         raise TypeError(f"unexpected order dictionary type: {type(data).__name__}")
 
@@ -360,7 +355,7 @@ class OrderInfo(TradingClass):
         """Await the backend OrderInfo.OrdersTotal operation."""
         return await self._call("OrdersTotal", *args)
 
-    async def OrdersGet(self, *args: Any, **kwargs: Any) -> list[OrderSnapshot]:
+    async def OrdersGet(self, *args: Any, **kwargs: Any) -> list[contracts.OrderInfo]:
         """Await the backend OrderInfo.OrdersGet operation."""
         logger.debug("FR-TRADING-ORDERS: querying orders collection")
         data = (
@@ -370,35 +365,35 @@ class OrderInfo(TradingClass):
         )
         if isinstance(data, list):
             return [
-                item if isinstance(item, OrderSnapshot) else OrderSnapshot(**item)
+                item
+                if isinstance(item, contracts.OrderInfo)
+                else contracts.OrderInfo(**item)
                 for item in data
             ]
         raise TypeError(f"unexpected OrdersGet return type: {type(data).__name__}")
 
 
 # ============================================================================
-# HistoryOrderInfo Proxy
+# HistoryOrderProxy
 # ============================================================================
 
 
-class HistoryOrderInfo(TradingClass):
-    """Canonical asynchronous HistoryOrderInfo API."""
+class HistoryOrderProxy(TradingClass):
+    """Canonical asynchronous HistoryOrderInfo API proxy."""
 
     CLASS_NAME = "HistoryOrderInfo"
 
-    async def HistoryOrderInfo(self, *args: Any) -> HistoryOrderSnapshot:
+    async def HistoryOrderInfo(self, *args: Any) -> contracts.OrderInfo:
         """Await the backend HistoryOrderInfo snapshot."""
         logger.debug("FR-TRADING-HISTORY: querying history order snapshot")
         data = await self._call("HistoryOrderInfo", *args)
-        if isinstance(data, HistoryOrderSnapshot):
+        if isinstance(data, contracts.OrderInfo):
             return data
         if isinstance(data, dict):
-            return HistoryOrderSnapshot(**data)
-        raise TypeError(
-            f"unexpected history order snapshot type: {type(data).__name__}"
-        )
+            return contracts.OrderInfo(**data)
+        raise TypeError(f"unexpected history order info type: {type(data).__name__}")
 
-    async def __call__(self, *args: Any) -> HistoryOrderSnapshot:
+    async def __call__(self, *args: Any) -> contracts.OrderInfo:
         """Await the backend HistoryOrderInfo snapshot directly via call syntax."""
         return await self.HistoryOrderInfo(*args)
 
@@ -407,7 +402,7 @@ class HistoryOrderInfo(TradingClass):
         data = await self._call("as_dict", *args)
         if isinstance(data, dict):
             return data
-        if isinstance(data, HistoryOrderSnapshot):
+        if isinstance(data, contracts.OrderInfo):
             return asdict(data)
         raise TypeError(
             f"unexpected history order dictionary type: {type(data).__name__}"
@@ -429,7 +424,7 @@ class HistoryOrderInfo(TradingClass):
 
     async def HistoryOrdersGet(
         self, *args: Any, **kwargs: Any
-    ) -> list[HistoryOrderSnapshot]:
+    ) -> list[contracts.OrderInfo]:
         """Await the backend HistoryOrderInfo.HistoryOrdersGet operation."""
         logger.debug("FR-TRADING-HISTORY: querying history orders collection")
         data = (
@@ -440,8 +435,8 @@ class HistoryOrderInfo(TradingClass):
         if isinstance(data, list):
             return [
                 item
-                if isinstance(item, HistoryOrderSnapshot)
-                else HistoryOrderSnapshot(**item)
+                if isinstance(item, contracts.OrderInfo)
+                else contracts.OrderInfo(**item)
                 for item in data
             ]
         raise TypeError(
@@ -450,26 +445,26 @@ class HistoryOrderInfo(TradingClass):
 
 
 # ============================================================================
-# DealInfo Proxy
+# DealProxy
 # ============================================================================
 
 
-class DealInfo(TradingClass):
-    """Canonical asynchronous DealInfo API."""
+class DealProxy(TradingClass):
+    """Canonical asynchronous DealInfo API proxy."""
 
     CLASS_NAME = "DealInfo"
 
-    async def DealInfo(self, *args: Any) -> DealSnapshot:
+    async def DealInfo(self, *args: Any) -> contracts.DealInfo:
         """Await the backend DealInfo snapshot."""
         logger.debug("FR-TRADING-HISTORY: querying deal snapshot")
         data = await self._call("DealInfo", *args)
-        if isinstance(data, DealSnapshot):
+        if isinstance(data, contracts.DealInfo):
             return data
         if isinstance(data, dict):
-            return DealSnapshot(**data)
-        raise TypeError(f"unexpected deal snapshot type: {type(data).__name__}")
+            return contracts.DealInfo(**data)
+        raise TypeError(f"unexpected deal info type: {type(data).__name__}")
 
-    async def __call__(self, *args: Any) -> DealSnapshot:
+    async def __call__(self, *args: Any) -> contracts.DealInfo:
         """Await the backend DealInfo snapshot directly via call syntax."""
         return await self.DealInfo(*args)
 
@@ -478,7 +473,7 @@ class DealInfo(TradingClass):
         data = await self._call("as_dict", *args)
         if isinstance(data, dict):
             return data
-        if isinstance(data, DealSnapshot):
+        if isinstance(data, contracts.DealInfo):
             return asdict(data)
         raise TypeError(f"unexpected deal dictionary type: {type(data).__name__}")
 
@@ -496,7 +491,9 @@ class DealInfo(TradingClass):
             return await self._call("HistoryDealsTotal", kwargs)
         return await self._call("HistoryDealsTotal", *args)
 
-    async def HistoryDealsGet(self, *args: Any, **kwargs: Any) -> list[DealSnapshot]:
+    async def HistoryDealsGet(
+        self, *args: Any, **kwargs: Any
+    ) -> list[contracts.DealInfo]:
         """Await the backend DealInfo.HistoryDealsGet operation."""
         logger.debug("FR-TRADING-HISTORY: querying history deals collection")
         data = (
@@ -506,27 +503,11 @@ class DealInfo(TradingClass):
         )
         if isinstance(data, list):
             return [
-                item if isinstance(item, DealSnapshot) else DealSnapshot(**item)
+                item
+                if isinstance(item, contracts.DealInfo)
+                else contracts.DealInfo(**item)
                 for item in data
             ]
         raise TypeError(
             f"unexpected HistoryDealsGet return type: {type(data).__name__}"
         )
-
-
-def main() -> None:
-    """Demonstrate proxy class definitions."""
-    proxies = [
-        AccountInfo,
-        TerminalInfo,
-        SymbolInfo,
-        PositionInfo,
-        OrderInfo,
-        HistoryOrderInfo,
-        DealInfo,
-    ]
-    print(f"Initialized {len(proxies)} trading proxy classes.")
-
-
-if __name__ == "__main__":
-    main()

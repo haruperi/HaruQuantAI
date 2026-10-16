@@ -6,7 +6,7 @@ Description:
     Fetches historical candlestick bars and ticks in memory from StrategyQuant CDN
     or local archives, and dynamically resolves instrument specifications from the
     authoritative catalog CSV (`data/market/darwinex/darwinex.csv`) returning canonical
-    `SymbolSnapshot`.
+    `SymbolInfo`.
 
 Purpose:
     FEAT-BROKER-DARWINEX: Darwinex Market Data and Symbol Catalog Provider.
@@ -66,7 +66,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderUnsupportedError,
 )
-from app.services.trading import SymbolSnapshot
+from app.services.libs.contracts import SymbolInfo
 from app.workspace.data_manager.history import DataBrokerBackend
 
 logger = get_logger(__name__)
@@ -115,7 +115,7 @@ class DarwinexBroker(DataBrokerBackend):
         self.session = session or create_http_session(
             USER_AGENT, retries=3, backoff=0.3
         )
-        self._catalog: dict[str, SymbolSnapshot] = {}
+        self._catalog: dict[str, SymbolInfo] = {}
         self.capabilities = ProviderCapabilities(
             provider_id="darwinex",
             display_name="Darwinex",
@@ -196,7 +196,7 @@ class DarwinexBroker(DataBrokerBackend):
                         spread = 0.0
                         contract_sz = 100000.0
 
-                    self._catalog[sym] = SymbolSnapshot(
+                    self._catalog[sym] = SymbolInfo(
                         name=sym,
                         digits=dec,
                         point=point_sz,
@@ -212,14 +212,14 @@ class DarwinexBroker(DataBrokerBackend):
             )
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Retrieve instrument specifications as canonical SymbolSnapshot."""
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Retrieve instrument specifications as canonical SymbolInfo."""
         self._ensure_catalog()
         sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
         snap = self._catalog.get(sym_clean)
         if snap is not None:
             return snap
-        return SymbolSnapshot(name=sym_clean, digits=5, point=0.00001)
+        return SymbolInfo(name=sym_clean, digits=5, point=0.00001)
 
     @override
     def symbols_get(self) -> list[str]:

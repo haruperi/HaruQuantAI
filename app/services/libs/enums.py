@@ -1,43 +1,4 @@
-"""Execution status codes, resolution enums, and TradingBackend protocol.
-
-Description:
-    Provides broker-neutral enumerations and data structures representing trade
-    execution results, receipts, property values, bridge events, and the core
-    TradingBackend async communication protocol.
-
-Purpose:
-    FEAT-TRADING-ENUMS: Execution statuses, resolutions, and protocol contracts.
-
-Key Capabilities:
-    - FR-TRADING-LIFECYCLE-ENUMS: Receipt and resolution enumerations.
-      Associated: `ReceiptStatus`, `TradeResolution`, `Receipt`, `BridgeEvent`.
-      Logging: Constant definitions and value objects with zero logging overhead.
-    - FR-TRADING-MQL5-ENUMS: Standard MQL5-shaped trading and order enums.
-      Associated: `AccountTradeMode`, `StopoutMode`, `MarginMode`, `OrderType`,
-        `OrderFilling`, `OrderTime`, `TradeAction`, `TradeRetcode`, `BookType`.
-      Logging: Constant enumerations and description dictionaries.
-    - FR-TRADING-BACKEND-PROTOCOL: Async backend protocol contract.
-      Associated: `TradingBackend`.
-      Logging: Interface definition only.
-
-Python API Usage:
-    ```python
-    from app.services.trading.enums import (
-        OrderType,
-        ReceiptStatus,
-        TradeAction,
-        TradeRetcode,
-    )
-
-    action = TradeAction.DEAL
-    retcode = TradeRetcode.DONE
-    ```
-
-CLI Usage:
-    ```bash
-    uv run python -m app.services.trading.enums
-    ```
-"""
+"""Domain enumeration definitions and execution statuses."""
 
 from __future__ import annotations
 
@@ -45,8 +6,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
 from typing import Any, Protocol, runtime_checkable
-
-from app.host.logging import get_logger
 
 __all__ = [
     "BOOK_TYPE_DESCRIPTIONS",
@@ -86,8 +45,6 @@ __all__ = [
     "TradeRetcode",
     "TradingBackend",
 ]
-
-logger = get_logger(__name__)
 
 
 class ReceiptStatus(StrEnum):
@@ -145,7 +102,7 @@ class Receipt:
 
 @dataclass(frozen=True, slots=True)
 class BridgeEvent:
-    """Parsed asynchronous event dispatched from the MetaTrader 5 terminal EA."""
+    """Parsed asynchronous event dispatched from the trading bridge."""
 
     event_type: str
     payload: Mapping[str, Any]
@@ -499,22 +456,3 @@ SWAP_MODE_DESCRIPTIONS = SYMBOL_SWAP_MODE_DESCRIPTIONS
 SYMBOL_CALC_MODE_DESCRIPTIONS: dict[SymbolCalcMode, str] = {
     item: item.name.replace("_", " ").title() for item in SymbolCalcMode
 }
-
-
-def main() -> None:
-    """Demonstrate trading enums and descriptions."""
-    print(f"OrderType.BUY: {OrderType.BUY} ({ORDER_TYPE_DESCRIPTIONS[OrderType.BUY]})")
-    print(f"TradeAction.DEAL: {TradeAction.DEAL}")
-    receipt = Receipt(
-        command_id="cmd-1",
-        object_id="obj-1",
-        class_name="Trade",
-        method_name="OrderSend",
-        status=ReceiptStatus.RESOLVED,
-        created_at=0.0,
-    )
-    print(f"Receipt: id={receipt.command_id}, status={receipt.status}")
-
-
-if __name__ == "__main__":
-    main()

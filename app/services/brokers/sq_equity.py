@@ -7,7 +7,7 @@ Description:
     1. Local native StrategyQuant 4.2 binary (.dat) archives.
     2. Local partitioned Parquet stores (D1 and M1).
     3. Direct remote streaming of Daily (EOD) historical bars from StrategyQuant CDN.
-    Exposes canonical `SymbolSnapshot` objects and normalized historical bars.
+    Exposes canonical `SymbolInfo` objects and normalized historical bars.
 
 Purpose:
     FEAT-BROKER-SQ-EQUITY: StrategyQuant US Equity Market Data and Catalog Broker.
@@ -61,7 +61,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderValidationError,
 )
-from app.services.trading import SymbolSnapshot
+from app.services.libs.contracts import SymbolInfo
 from app.workspace.data_manager.history import DataBrokerBackend
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -400,7 +400,7 @@ class SQEquityBroker(DataBrokerBackend):
         self.session.mount("http://", adapter)
         self.session.mount("https://", adapter)
 
-        self._catalog: dict[str, SymbolSnapshot] = {}
+        self._catalog: dict[str, SymbolInfo] = {}
 
         self.capabilities = ProviderCapabilities(
             provider_id="sq_equity",
@@ -453,7 +453,7 @@ class SQEquityBroker(DataBrokerBackend):
         if not catalog_file.is_file():
             # Minimal default catalog fallback if file missing
             for s in ("AAPL", "MSFT", "GOOGL", "AMZN", "SPY", "QQQ", "NVDA", "TSLA"):
-                self._catalog[s] = SymbolSnapshot(
+                self._catalog[s] = SymbolInfo(
                     name=s, digits=2, point=0.01, trade_contract_size=1.0
                 )
             return
@@ -470,7 +470,7 @@ class SQEquityBroker(DataBrokerBackend):
                     pt = float(row.get("point") or 0.01)
                     spread = int(float(row.get("spread") or 0))
                     c_size = float(row.get("contract_size") or 1.0)
-                    self._catalog[clean_sym] = SymbolSnapshot(
+                    self._catalog[clean_sym] = SymbolInfo(
                         name=clean_sym,
                         digits=dec,
                         point=pt,
@@ -481,14 +481,14 @@ class SQEquityBroker(DataBrokerBackend):
             self.logger.warning("Error parsing SQ Equity catalog: %s", exc)
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Resolve instrument specifications as canonical SymbolSnapshot."""
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Resolve instrument specifications as canonical SymbolInfo."""
         self._ensure_catalog()
         clean = _clean_symbol(symbol).upper()
         snap = self._catalog.get(clean)
         if snap is not None:
             return snap
-        return SymbolSnapshot(name=clean, digits=2, point=0.01, trade_contract_size=1.0)
+        return SymbolInfo(name=clean, digits=2, point=0.01, trade_contract_size=1.0)
 
     @override
     def symbols_get(self) -> list[str]:

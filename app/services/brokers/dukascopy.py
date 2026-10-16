@@ -6,7 +6,7 @@ Description:
     Fetches historical candlestick bars and ticks over HTTP in memory or from local
     data directories, and dynamically resolves instrument specifications from the
     authoritative catalog CSV (`data/market/dukascopy/dukascopy.csv`) returning canonical
-    `SymbolSnapshot` objects.
+    `SymbolInfo` objects.
 
 Purpose:
     FEAT-BROKER-DUKASCOPY: Dukascopy Market Data and Symbol Catalog Provider.
@@ -69,7 +69,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderUnsupportedError,
 )
-from app.services.trading import SymbolSnapshot
+from app.services.libs.contracts import SymbolInfo
 from app.workspace.data_manager.history import DataBrokerBackend
 
 logger = get_logger(__name__)
@@ -119,7 +119,7 @@ class DukascopyBroker(DataBrokerBackend):
         super().__init__(name=name)
         self.catalog_path = Path(catalog_path) if catalog_path else DEFAULT_CATALOG_PATH
         self.data_dir = Path(data_dir) if data_dir else None
-        self._catalog: dict[str, SymbolSnapshot] | None = None
+        self._catalog: dict[str, SymbolInfo] | None = None
         self.session = create_http_session(
             USER_AGENT, retries=3, backoff=0.3, pool_size=16
         )
@@ -172,12 +172,12 @@ class DukascopyBroker(DataBrokerBackend):
                 capabilities=self.capabilities,
             )
 
-    def _ensure_catalog(self) -> dict[str, SymbolSnapshot]:
+    def _ensure_catalog(self) -> dict[str, SymbolInfo]:
         """Parse and cache symbol definitions from data/market/dukascopy/dukascopy.csv."""
         if self._catalog is not None:
             return self._catalog
 
-        catalog: dict[str, SymbolSnapshot] = {}
+        catalog: dict[str, SymbolInfo] = {}
         if not self.catalog_path.exists():
             self.logger.warning(
                 "FR-BROKER-DUKASCOPY-SYMBOLS: Catalog CSV file not found at %s",
@@ -207,7 +207,7 @@ class DukascopyBroker(DataBrokerBackend):
                         spread = 0.0
                         contract_sz = 100000.0
 
-                    catalog[sym] = SymbolSnapshot(
+                    catalog[sym] = SymbolInfo(
                         name=sym,
                         digits=dec,
                         point=point_sz,
@@ -249,14 +249,14 @@ class DukascopyBroker(DataBrokerBackend):
         return s
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Retrieve instrument specifications as canonical SymbolSnapshot."""
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Retrieve instrument specifications as canonical SymbolInfo."""
         sym_clean = self._clean_symbol(symbol)
         catalog = self._ensure_catalog()
         snap = catalog.get(sym_clean)
         if snap is not None:
             return snap
-        return SymbolSnapshot(name=sym_clean, digits=5, point=0.00001)
+        return SymbolInfo(name=sym_clean, digits=5, point=0.00001)
 
     @override
     def symbols_get(self) -> list[str]:

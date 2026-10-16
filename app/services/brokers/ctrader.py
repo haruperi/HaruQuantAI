@@ -71,10 +71,17 @@ from typing import Any, Self, cast, override
 from app.host.logging import get_logger
 from app.host.settings import settings
 from app.services.brokers.base import BridgeError
-from app.services.trading import (
-    AccountSnapshot,
-    AccountTradeMode,
+from app.services.libs.contracts import (
+    AccountInfo,
     BookInfo,
+    SymbolInfo,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
+from app.services.libs.enums import (
+    AccountTradeMode,
     BookType,
     BridgeEvent,
     MarginMode,
@@ -83,15 +90,10 @@ from app.services.trading import (
     OrderType,
     Receipt,
     ReceiptStatus,
-    SymbolSnapshot,
-    TerminalSnapshot,
     TradeAction,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
     TradeRetcode,
-    Trading,
 )
+from app.services.trading import Trading
 from app.workspace.data_manager import MarketTick
 
 logger = get_logger(__name__)
@@ -278,7 +280,7 @@ class CTraderClient:
         self._last_error: tuple[Any, str] = (0, "No error")
         self._symbol_id_map: dict[int, str] = {}
         self._symbol_name_map: dict[str, int] = {}
-        self._symbol_cache: dict[str, SymbolSnapshot] = {}
+        self._symbol_cache: dict[str, SymbolInfo] = {}
         self._history_next_request = 0.0
 
     @property
@@ -636,7 +638,7 @@ class CTraderClient:
             self._authenticated = False
             self._app_authorized = False
 
-    def account_info(self) -> AccountSnapshot:
+    def account_info(self) -> AccountInfo:
         """Query account telemetry via ProtoOATraderReq."""
         logger.debug("FR-BROKER-CTRADER-FACADE-DISPATCH: querying account info")
         if not self._authenticated:
@@ -660,7 +662,7 @@ class CTraderClient:
             trader = trader_res.trader
             bal = float(trader.balance) / 100.0 if trader.balance else 0.0
             lev = int(trader.leverageInCents) // 100 if trader.leverageInCents else 30
-            return AccountSnapshot(
+            return AccountInfo(
                 login=trader.ctidTraderAccountId,
                 trade_mode=AccountTradeMode.REAL
                 if self.environment == "live"
@@ -700,11 +702,9 @@ class CTraderClient:
                 names.append(s_name)
             return names
 
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Resolve a SymbolSnapshot for the given symbol."""
-        logger.debug(
-            "FR-BROKER-CTRADER-MARKET-DATA: resolving symbol snapshot %s", symbol
-        )
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Resolve a SymbolInfo for the given symbol."""
+        logger.debug("FR-BROKER-CTRADER-MARKET-DATA: resolving symbol info %s", symbol)
         if not self._authenticated:
             raise BridgeError(
                 "cTrader client is not authenticated", code="NOT_AUTHENTICATED"
@@ -718,7 +718,7 @@ class CTraderClient:
         ask = bid + 20 * point
         curr_b = sym_clean[:3] if len(sym_clean) >= MIN_SYMBOL_CHARS else "USD"
         curr_p = sym_clean[3:6] if len(sym_clean) >= MIN_SYMBOL_CHARS else "USD"
-        snap = SymbolSnapshot(
+        snap = SymbolInfo(
             name=sym_clean,
             digits=digits,
             point=point,
@@ -1323,7 +1323,7 @@ class CTraderBackend(Trading):
 
     def _dispatch_terminal(self, method_name: str) -> Any:
         if method_name in {"TerminalInfo", "as_dict"}:
-            snap = TerminalSnapshot(
+            snap = TerminalInfo(
                 name="cTrader",
                 company="Spotware cTrader",
                 connected=self.client.is_connected,

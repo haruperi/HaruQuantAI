@@ -34,16 +34,16 @@ from types import TracebackType
 from typing import Self
 
 from app.host.logging import get_logger
+from app.services.libs.enums import BridgeEvent, Receipt, TradingBackend
 
-from .enums import BridgeEvent, Receipt, TradingBackend
 from .proxies import (
-    AccountInfo,
-    DealInfo,
-    HistoryOrderInfo,
-    OrderInfo,
-    PositionInfo,
-    SymbolInfo,
-    TerminalInfo,
+    AccountProxy,
+    DealProxy,
+    HistoryOrderProxy,
+    OrderProxy,
+    PositionProxy,
+    SymbolProxy,
+    TerminalProxy,
 )
 from .trade import Trade
 
@@ -61,13 +61,13 @@ class Trading:
         logger.debug("FR-TRADING-COMPOSITION: composing trading classes")
         self.backend = backend
         self.trade = Trade(backend)
-        self.account = AccountInfo(backend)
-        self.symbol = SymbolInfo(backend)
-        self.order = OrderInfo(backend)
-        self.history_order = HistoryOrderInfo(backend)
-        self.position = PositionInfo(backend)
-        self.deal = DealInfo(backend)
-        self.terminal = TerminalInfo(backend)
+        self.account = AccountProxy(backend)
+        self.symbol = SymbolProxy(backend)
+        self.order = OrderProxy(backend)
+        self.history_order = HistoryOrderProxy(backend)
+        self.position = PositionProxy(backend)
+        self.deal = DealProxy(backend)
+        self.terminal = TerminalProxy(backend)
 
     async def start(self) -> None:
         """Start the selected backend."""

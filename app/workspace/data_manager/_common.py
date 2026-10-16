@@ -8,7 +8,7 @@ from enum import StrEnum
 from typing import Any
 
 from app.services.brokers.base import BridgeError
-from app.services.trading import SymbolSpec
+from app.services.libs.contracts import SymbolInfo
 
 __all__ = [
     "MAX_POSITION",
@@ -718,9 +718,9 @@ class InstrumentInfo:
         step = self.tick_size if self.tick_size > 0.0 else 0.0001
         return round(round(price / step) * step, self.decimals)
 
-    def to_symbol_spec(self) -> SymbolSpec:
-        """Convert specification to the Tier 2 SymbolSpec domain model."""
-        return SymbolSpec(
+    def to_symbol_info(self) -> SymbolInfo:
+        """Convert specification to the Tier 2 SymbolInfo domain model."""
+        return SymbolInfo(
             name=self.symbol,
             digits=self.decimals,
             point=self.tick_size,

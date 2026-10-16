@@ -3,15 +3,15 @@
 Description:
     Validates functionality, boundary conditions, serialization, type safety,
     property aliases, proxy dispatch, and error handling for all trading contracts,
-    snapshots, enums, proxy classes (Trade, AccountInfo, SymbolInfo, TerminalInfo,
-    PositionInfo, OrderInfo, HistoryOrderInfo, DealInfo), and the master Trading facade
+    enums, proxy classes (Trade, AccountProxy, SymbolProxy, TerminalProxy,
+    PositionProxy, OrderProxy, HistoryOrderProxy, DealProxy), and the master Trading facade
     in app.services.trading.
 
 Purpose:
     FEAT-TRADING-CONTRACTS-TESTS: Test suite for consolidated trading library.
 
 Key Capabilities:
-    - FR-TRADING-CONTRACTS-MODELS: Verify trading dataclasses, snapshots, and enums.
+    - FR-TRADING-CONTRACTS-MODELS: Verify trading dataclasses, info contracts, and enums.
     - FR-TRADING-COMPOSITION: Verify Trading facade and child proxy composition.
     - FR-TRADING-MUTATION: Verify order execution, checks, and payload serialization.
     - FR-TRADING-STATE-QUERIES: Verify account, symbol, terminal, position, order queries.
@@ -33,6 +33,18 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
+from app.services.libs.contracts import (
+    AccountInfo,
+    BookInfo,
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    SymbolInfo,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
 from app.services.trading import (
     BOOK_TYPE_DESCRIPTIONS,
     DEAL_ENTRY_DESCRIPTIONS,
@@ -46,49 +58,36 @@ from app.services.trading import (
     SYMBOL_CALC_MODE_DESCRIPTIONS,
     SYMBOL_TRADE_EXECUTION_DESCRIPTIONS,
     SYMBOL_TRADE_MODE_DESCRIPTIONS,
-    AccountInfo,
-    AccountSnapshot,
+    AccountProxy,
     AccountTradeMode,
     BaseTradingClass,
-    BookInfo,
     BookType,
     BridgeEvent,
     DealEntry,
-    DealInfo,
-    DealSnapshot,
+    DealProxy,
     DealType,
-    HistoryOrderInfo,
-    HistoryOrderSnapshot,
+    HistoryOrderProxy,
     MarginMode,
-    MqlBookInfo,
     OrderFilling,
-    OrderInfo,
-    OrderSnapshot,
+    OrderProxy,
     OrderState,
     OrderTime,
     OrderType,
-    PositionInfo,
-    PositionSnapshot,
+    PositionProxy,
     PositionType,
     PropertyValue,
     Receipt,
     ReceiptStatus,
     StopoutMode,
     SymbolCalcMode,
-    SymbolInfo,
-    SymbolSnapshot,
-    SymbolSpec,
+    SymbolProxy,
     SymbolSwapMode,
     SymbolTradeExecution,
     SymbolTradeMode,
-    TerminalInfo,
-    TerminalSnapshot,
+    TerminalProxy,
     Trade,
     TradeAction,
-    TradeCheckResult,
-    TradeRequest,
     TradeResolution,
-    TradeResult,
     TradeRetcode,
     Trading,
     TradingBackend,
@@ -360,35 +359,24 @@ def test_bridge_event() -> None:
 
 
 def test_book_info_properties() -> None:
-    """Verify BookInfo and MqlBookInfo properties and dictionary serialization."""
-    assert MqlBookInfo is BookInfo
-
+    """Verify BookInfo initialization and dictionary serialization."""
     entry = BookInfo(
         type=BookType.BOOK_TYPE_BUY,
         price=1.0500,
         volume=10,
         volume_real=10.0,
     )
-    assert entry.type_description == "Buy"
+    assert entry.type == BookType.BOOK_TYPE_BUY
     d = entry._asdict()
     assert d["type"] == int(BookType.BOOK_TYPE_BUY)
     assert d["price"] == 1.0500
     assert d["volume"] == 10
     assert d["volume_real"] == 10.0
 
-    # Fallback for unknown type
-    unknown_entry = BookInfo(
-        type=999,  # type: ignore[arg-type]
-        price=1.0,
-        volume=1,
-        volume_real=1.0,
-    )
-    assert unknown_entry.type_description == "Unknown"
 
-
-def test_account_snapshot_defaults() -> None:
-    """Verify AccountSnapshot default attributes."""
-    acc = AccountSnapshot(balance=25_000.0, equity=25_500.0)
+def test_account_info_defaults() -> None:
+    """Verify AccountInfo default attributes."""
+    acc = AccountInfo(balance=25_000.0, equity=25_500.0)
     assert acc.balance == 25_000.0
     assert acc.equity == 25_500.0
     assert acc.trade_mode == AccountTradeMode.DEMO
@@ -396,18 +384,17 @@ def test_account_snapshot_defaults() -> None:
     assert acc.currency == "USD"
 
 
-def test_terminal_snapshot_defaults() -> None:
-    """Verify TerminalSnapshot default attributes."""
-    term = TerminalSnapshot(build=4500, connected=True)
+def test_terminal_info_defaults() -> None:
+    """Verify TerminalInfo default attributes."""
+    term = TerminalInfo(build=4500, connected=True)
     assert term.build == 4500
     assert term.connected is True
     assert term.max_bars == 100_000
 
 
-def test_symbol_snapshot_aliases() -> None:
-    """Verify SymbolSnapshot property aliases match underlying fields."""
-    assert SymbolSpec is SymbolSnapshot
-    sym = SymbolSnapshot(
+def test_symbol_info_fields() -> None:
+    """Verify SymbolInfo field values and assignments."""
+    sym = SymbolInfo(
         volume_min=0.01,
         volume_max=50.0,
         volume_step=0.01,
@@ -418,65 +405,63 @@ def test_symbol_snapshot_aliases() -> None:
         trade_stops_level=5,
         trade_freeze_level=2,
     )
-    assert sym.lots_min == 0.01
-    assert sym.lots_max == 50.0
-    assert sym.lots_step == 0.01
-    assert sym.lots_limit == 100.0
-    assert sym.tick_size == 0.00001
-    assert sym.tick_value == 1.0
-    assert sym.contract_size == 100_000.0
-    assert sym.stops_level == 5
-    assert sym.freeze_level == 2
-    assert sym.selected is True
-    sym.selected = False
+    assert sym.volume_min == 0.01
+    assert sym.volume_max == 50.0
+    assert sym.volume_step == 0.01
+    assert sym.volume_limit == 100.0
+    assert sym.trade_tick_size == 0.00001
+    assert sym.trade_tick_value == 1.0
+    assert sym.trade_contract_size == 100_000.0
+    assert sym.trade_stops_level == 5
+    assert sym.trade_freeze_level == 2
+    assert sym.select is True
+    sym.select = False
     assert sym.select is False
-    assert sym.ticks_book_depth == 0
-    sym.ticks_book_depth = 10
+    assert sym.ticks_bookdepth == 0
+    sym.ticks_bookdepth = 10
     assert sym.ticks_bookdepth == 10
-    assert sym.trade_execution == SymbolTradeExecution.MARKET
-    sym.trade_execution = SymbolTradeExecution.EXCHANGE
+    assert sym.trade_exemode == int(SymbolTradeExecution.MARKET)
+    sym.trade_exemode = int(SymbolTradeExecution.EXCHANGE)
     assert sym.trade_exemode == int(SymbolTradeExecution.EXCHANGE)
 
 
-def test_position_snapshot_aliases() -> None:
-    """Verify PositionSnapshot property aliases."""
-    pos = PositionSnapshot(
+def test_position_info_fields() -> None:
+    """Verify PositionInfo fields."""
+    pos = PositionInfo(
         ticket=123,
         symbol="EURUSD",
         position_type=0,
         sl=1.0450,
         tp=1.0600,
     )
-    assert pos.stop_loss == 1.0450
-    assert pos.take_profit == 1.0600
-    assert pos.type == 0
+    assert pos.sl == 1.0450
+    assert pos.tp == 1.0600
+    assert pos.position_type == 0
 
 
-def test_order_snapshot_aliases() -> None:
-    """Verify OrderSnapshot and HistoryOrderSnapshot aliases."""
-    assert HistoryOrderSnapshot is OrderSnapshot
-
-    order = OrderSnapshot(
+def test_order_info_fields() -> None:
+    """Verify OrderInfo fields."""
+    order = OrderInfo(
         ticket=456,
         symbol="GBPUSD",
         order_type=1,
         sl=1.2900,
         tp=1.2800,
     )
-    assert order.stop_loss == 1.2900
-    assert order.take_profit == 1.2800
-    assert order.type == 1
+    assert order.sl == 1.2900
+    assert order.tp == 1.2800
+    assert order.order_type == 1
 
 
-def test_deal_snapshot_aliases() -> None:
-    """Verify DealSnapshot property aliases."""
-    deal = DealSnapshot(
+def test_deal_info_fields() -> None:
+    """Verify DealInfo fields."""
+    deal = DealInfo(
         ticket=789,
         order=456,
         deal_type=0,
     )
-    assert deal.order_ticket == 456
-    assert deal.type == 0
+    assert deal.order == 456
+    assert deal.deal_type == 0
 
 
 def test_trade_request_result_check_dataclasses() -> None:
@@ -666,21 +651,21 @@ async def test_account_info_proxy() -> None:
     backend.call_responses[("AccountInfo", "FreeMarginCheck")] = 49_500.0
     backend.call_responses[("AccountInfo", "MaxLotCheck")] = 10.0
 
-    acc = AccountInfo(backend)
+    acc = AccountProxy(backend)
 
     # Via method
     info = await acc.AccountInfo()
-    assert isinstance(info, AccountSnapshot)
+    assert isinstance(info, AccountInfo)
     assert info.login == 99999
     assert info.balance == 50_000.0
 
     # Via __call__
     info2 = await acc()
-    assert isinstance(info2, AccountSnapshot)
+    assert isinstance(info2, AccountInfo)
     assert info2.equity == 52_000.0
 
-    # Pre-instantiated snapshot return
-    backend.call_responses[("AccountInfo", "AccountInfo")] = AccountSnapshot(
+    # Pre-instantiated info return
+    backend.call_responses[("AccountInfo", "AccountInfo")] = AccountInfo(
         login=11111, balance=1000.0
     )
     info3 = await acc.AccountInfo()
@@ -688,7 +673,7 @@ async def test_account_info_proxy() -> None:
 
     # Invalid return type raises TypeError
     backend.call_responses[("AccountInfo", "AccountInfo")] = "unexpected_string"
-    with pytest.raises(TypeError, match="unexpected account snapshot type"):
+    with pytest.raises(TypeError, match="unexpected account info type"):
         await acc.AccountInfo()
 
     # Checks
@@ -712,28 +697,26 @@ async def test_terminal_info_proxy() -> None:
         "connected": True,
         "name": "Live Terminal",
     }
-    term = TerminalInfo(backend)
+    term = TerminalProxy(backend)
 
     info = await term.TerminalInfo()
-    assert isinstance(info, TerminalSnapshot)
+    assert isinstance(info, TerminalInfo)
     assert info.build == 5000
     assert info.name == "Live Terminal"
 
     # Via __call__
     info2 = await term()
-    assert isinstance(info2, TerminalSnapshot)
+    assert isinstance(info2, TerminalInfo)
     assert info2.connected is True
 
-    # Pre-instantiated snapshot return
-    backend.call_responses[("TerminalInfo", "TerminalInfo")] = TerminalSnapshot(
-        build=5001
-    )
+    # Pre-instantiated info return
+    backend.call_responses[("TerminalInfo", "TerminalInfo")] = TerminalInfo(build=5001)
     info3 = await term.TerminalInfo()
     assert info3.build == 5001
 
     # Invalid type
     backend.call_responses[("TerminalInfo", "TerminalInfo")] = 12345
-    with pytest.raises(TypeError, match="unexpected terminal snapshot type"):
+    with pytest.raises(TypeError, match="unexpected terminal info type"):
         await term.TerminalInfo()
 
 
@@ -771,30 +754,30 @@ async def test_symbol_info_proxy() -> None:
     ]
     backend.call_responses[("SymbolInfo", "MarketBookRelease")] = True
 
-    symbol = SymbolInfo(backend)
+    symbol = SymbolProxy(backend)
 
     info = await symbol.SymbolInfo("EURUSD")
-    assert isinstance(info, SymbolSnapshot)
+    assert isinstance(info, SymbolInfo)
     assert info.name == "EURUSD"
     assert info.digits == 5
 
     # Via __call__
     info2 = await symbol("EURUSD")
-    assert isinstance(info2, SymbolSnapshot)
+    assert isinstance(info2, SymbolInfo)
 
     # as_dict
     d = await symbol.as_dict("EURUSD")
     assert isinstance(d, dict)
     assert d["name"] == "EURUSD"
 
-    # as_dict with SymbolSnapshot response
-    backend.call_responses[("SymbolInfo", "as_dict")] = SymbolSnapshot(name="GBPUSD")
+    # as_dict with SymbolInfo response
+    backend.call_responses[("SymbolInfo", "as_dict")] = SymbolInfo(name="GBPUSD")
     d2 = await symbol.as_dict("GBPUSD")
     assert d2["name"] == "GBPUSD"
 
     # Invalid type for SymbolInfo
     backend.call_responses[("SymbolInfo", "SymbolInfo")] = 999
-    with pytest.raises(TypeError, match="unexpected symbol snapshot type"):
+    with pytest.raises(TypeError, match="unexpected symbol info type"):
         await symbol.SymbolInfo("EURUSD")
 
     # Invalid type for as_dict
@@ -853,30 +836,30 @@ async def test_position_info_proxy() -> None:
     backend.call_responses[("PositionInfo", "PositionsTotal")] = 1
     backend.call_responses[("PositionInfo", "PositionsGet")] = [
         pos_data,
-        PositionSnapshot(ticket=1235, symbol="GBPUSD"),
+        PositionInfo(ticket=1235, symbol="GBPUSD"),
     ]
 
-    pos = PositionInfo(backend)
+    pos = PositionProxy(backend)
 
     info = await pos.PositionInfo()
-    assert isinstance(info, PositionSnapshot)
+    assert isinstance(info, PositionInfo)
     assert info.ticket == 1234
 
     # Via __call__
     info2 = await pos()
-    assert isinstance(info2, PositionSnapshot)
+    assert isinstance(info2, PositionInfo)
 
     # as_dict
     d = await pos.as_dict()
     assert d["ticket"] == 1234
 
-    backend.call_responses[("PositionInfo", "as_dict")] = PositionSnapshot(ticket=999)
+    backend.call_responses[("PositionInfo", "as_dict")] = PositionInfo(ticket=999)
     d2 = await pos.as_dict()
     assert d2["ticket"] == 999
 
     # Invalid type
     backend.call_responses[("PositionInfo", "PositionInfo")] = "bad"
-    with pytest.raises(TypeError, match="unexpected position snapshot type"):
+    with pytest.raises(TypeError, match="unexpected position info type"):
         await pos.PositionInfo()
 
     backend.call_responses[("PositionInfo", "as_dict")] = "bad"
@@ -923,13 +906,13 @@ async def test_order_info_proxy() -> None:
     backend.call_responses[("OrderInfo", "OrdersTotal")] = 1
     backend.call_responses[("OrderInfo", "OrdersGet")] = [
         order_data,
-        OrderSnapshot(ticket=5679),
+        OrderInfo(ticket=5679),
     ]
 
-    orders = OrderInfo(backend)
+    orders = OrderProxy(backend)
 
     info = await orders.OrderInfo()
-    assert isinstance(info, OrderSnapshot)
+    assert isinstance(info, OrderInfo)
     assert info.ticket == 5678
 
     info2 = await orders()
@@ -938,7 +921,7 @@ async def test_order_info_proxy() -> None:
     d = await orders.as_dict()
     assert d["ticket"] == 5678
 
-    backend.call_responses[("OrderInfo", "as_dict")] = OrderSnapshot(ticket=999)
+    backend.call_responses[("OrderInfo", "as_dict")] = OrderInfo(ticket=999)
     assert (await orders.as_dict())["ticket"] == 999
 
     assert await orders.Select(5678) is True
@@ -952,7 +935,7 @@ async def test_order_info_proxy() -> None:
 
     # Error handling
     backend.call_responses[("OrderInfo", "OrderInfo")] = 42
-    with pytest.raises(TypeError, match="unexpected order snapshot type"):
+    with pytest.raises(TypeError, match="unexpected order info type"):
         await orders.OrderInfo()
 
     backend.call_responses[("OrderInfo", "as_dict")] = 42
@@ -976,13 +959,13 @@ async def test_history_order_info_proxy() -> None:
     backend.call_responses[("HistoryOrderInfo", "HistoryOrdersTotal")] = 5
     backend.call_responses[("HistoryOrderInfo", "HistoryOrdersGet")] = [
         horder_data,
-        HistoryOrderSnapshot(ticket=9013),
+        OrderInfo(ticket=9013),
     ]
 
-    horders = HistoryOrderInfo(backend)
+    horders = HistoryOrderProxy(backend)
 
     info = await horders.HistoryOrderInfo()
-    assert isinstance(info, HistoryOrderSnapshot)
+    assert isinstance(info, OrderInfo)
     assert info.ticket == 9012
 
     info2 = await horders()
@@ -991,9 +974,7 @@ async def test_history_order_info_proxy() -> None:
     d = await horders.as_dict()
     assert d["ticket"] == 9012
 
-    backend.call_responses[("HistoryOrderInfo", "as_dict")] = HistoryOrderSnapshot(
-        ticket=1000
-    )
+    backend.call_responses[("HistoryOrderInfo", "as_dict")] = OrderInfo(ticket=1000)
     assert (await horders.as_dict())["ticket"] == 1000
 
     assert await horders.Ticket() == 9012
@@ -1006,7 +987,7 @@ async def test_history_order_info_proxy() -> None:
 
     # Error handling
     backend.call_responses[("HistoryOrderInfo", "HistoryOrderInfo")] = 42
-    with pytest.raises(TypeError, match="unexpected history order snapshot type"):
+    with pytest.raises(TypeError, match="unexpected history order info type"):
         await horders.HistoryOrderInfo()
 
     backend.call_responses[("HistoryOrderInfo", "as_dict")] = 42
@@ -1035,13 +1016,13 @@ async def test_deal_info_proxy() -> None:
     backend.call_responses[("DealInfo", "HistoryDealsTotal")] = 3
     backend.call_responses[("DealInfo", "HistoryDealsGet")] = [
         deal_data,
-        DealSnapshot(ticket=3457),
+        DealInfo(ticket=3457),
     ]
 
-    deals = DealInfo(backend)
+    deals = DealProxy(backend)
 
     info = await deals.DealInfo()
-    assert isinstance(info, DealSnapshot)
+    assert isinstance(info, DealInfo)
     assert info.ticket == 3456
 
     info2 = await deals()
@@ -1050,7 +1031,7 @@ async def test_deal_info_proxy() -> None:
     d = await deals.as_dict()
     assert d["ticket"] == 3456
 
-    backend.call_responses[("DealInfo", "as_dict")] = DealSnapshot(ticket=999)
+    backend.call_responses[("DealInfo", "as_dict")] = DealInfo(ticket=999)
     assert (await deals.as_dict())["ticket"] == 999
 
     assert await deals.Ticket() == 3456
@@ -1063,7 +1044,7 @@ async def test_deal_info_proxy() -> None:
 
     # Error handling
     backend.call_responses[("DealInfo", "DealInfo")] = 42
-    with pytest.raises(TypeError, match="unexpected deal snapshot type"):
+    with pytest.raises(TypeError, match="unexpected deal info type"):
         await deals.DealInfo()
 
     backend.call_responses[("DealInfo", "as_dict")] = 42
@@ -1189,13 +1170,13 @@ async def test_master_trading_facade() -> None:
 
     # Check child proxies
     assert isinstance(trading.trade, Trade)
-    assert isinstance(trading.account, AccountInfo)
-    assert isinstance(trading.symbol, SymbolInfo)
-    assert isinstance(trading.order, OrderInfo)
-    assert isinstance(trading.history_order, HistoryOrderInfo)
-    assert isinstance(trading.position, PositionInfo)
-    assert isinstance(trading.deal, DealInfo)
-    assert isinstance(trading.terminal, TerminalInfo)
+    assert isinstance(trading.account, AccountProxy)
+    assert isinstance(trading.symbol, SymbolProxy)
+    assert isinstance(trading.order, OrderProxy)
+    assert isinstance(trading.history_order, HistoryOrderProxy)
+    assert isinstance(trading.position, PositionProxy)
+    assert isinstance(trading.deal, DealProxy)
+    assert isinstance(trading.terminal, TerminalProxy)
 
     # Lifecycle
     await trading.start()

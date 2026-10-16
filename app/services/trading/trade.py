@@ -35,20 +35,20 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.host.logging import get_logger
-
-from .base import TradingClass
-from .enums import (
+from app.services.libs.contracts import (
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
+from app.services.libs.enums import (
     OrderFilling,
     OrderTime,
     OrderType,
     TradeAction,
     TradeRetcode,
 )
-from .snapshots import (
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
-)
+
+from .base import TradingClass
 
 __all__ = [
     "Trade",

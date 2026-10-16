@@ -91,15 +91,15 @@ from app.services.brokers.capabilities import (
     ProviderCapabilities,
     ProviderHealth,
 )
-from app.services.trading import (
+from app.services.libs.contracts import SymbolInfo
+from app.services.libs.enums import (
     BridgeEvent,
     PropertyValue,
     Receipt,
     ReceiptStatus,
-    SymbolSnapshot,
     TradeResolution,
-    Trading,
 )
+from app.services.trading import Trading
 from app.workspace.data_manager.history import DataBrokerBackend
 
 PLUGIN_MANIFEST = {
@@ -937,14 +937,14 @@ class MetaTraderDataBroker(DataBrokerBackend):
         )
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
+    def symbol_info(self, symbol: str) -> SymbolInfo:
         if self.backend is not None:
             resolver = getattr(self.backend, "symbol_info", None)
             if callable(resolver):
                 res = resolver(symbol)
-                if isinstance(res, SymbolSnapshot):
+                if isinstance(res, SymbolInfo):
                     return res
-        return SymbolSnapshot(name=symbol.upper(), digits=5, point=0.00001)
+        return SymbolInfo(name=symbol.upper(), digits=5, point=0.00001)
 
     @override
     def symbols_get(self) -> list[str]:

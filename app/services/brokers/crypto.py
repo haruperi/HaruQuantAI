@@ -5,7 +5,7 @@ Description:
     directly to Binance public REST APIs (Spot, USDT-M, and Coin-M).
     Conforms directly to the canonical `TradingBackend` protocol via `DataBrokerBackend`.
     Provides normalized historical candlestick bars (`MarketData.Bars`), trade ticks
-    (`MarketData.Ticks`), and symbol specifications (`SymbolSnapshot`).
+    (`MarketData.Ticks`), and symbol specifications (`SymbolInfo`).
 
 Purpose:
     FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE: Binance Exchange Integration.
@@ -55,7 +55,7 @@ from app.services.brokers.capabilities import (
     ProviderUnsupportedError,
     ProviderValidationError,
 )
-from app.services.trading import SymbolSnapshot
+from app.services.libs.contracts import SymbolInfo
 from app.workspace.data_manager import Timeframe
 from app.workspace.data_manager.history import DataBrokerBackend
 from requests.adapters import HTTPAdapter
@@ -197,7 +197,7 @@ class BinanceBroker(DataBrokerBackend):
         self.session.mount("http://", adapter)
         self.session.headers.update({"User-Agent": USER_AGENT})
 
-        self._symbols_cache: dict[str, SymbolSnapshot] = {}
+        self._symbols_cache: dict[str, SymbolInfo] = {}
 
         self.capabilities = ProviderCapabilities(
             provider_id="crypto",
@@ -275,8 +275,8 @@ class BinanceBroker(DataBrokerBackend):
         return TIMEFRAME_MAP.get(tf_str, "1h")
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Resolve instrument specifications as canonical SymbolSnapshot."""
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Resolve instrument specifications as canonical SymbolInfo."""
         sym_clean = self._normalize_symbol(symbol)
         if sym_clean in self._symbols_cache:
             return self._symbols_cache[sym_clean]
@@ -298,7 +298,7 @@ class BinanceBroker(DataBrokerBackend):
                         elif ft == "LOT_SIZE":
                             step_size = float(f.get("stepSize") or 1.0)
                     dec = _calc_digits(tick_size)
-                    snap = SymbolSnapshot(
+                    snap = SymbolInfo(
                         name=sym_clean,
                         custom=False,
                         digits=dec,
@@ -316,7 +316,7 @@ class BinanceBroker(DataBrokerBackend):
                 "FR-BROKER-BINANCE-SYMBOLS: Error fetching exchangeInfo: %s", exc
             )
 
-        snap = SymbolSnapshot(name=sym_clean, digits=2, point=0.01)
+        snap = SymbolInfo(name=sym_clean, digits=2, point=0.01)
         self._symbols_cache[sym_clean] = snap
         return snap
 

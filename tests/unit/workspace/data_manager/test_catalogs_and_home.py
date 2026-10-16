@@ -137,9 +137,9 @@ def test_instruments_service_lifecycle(test_db_path: Path) -> None:
     assert eur is not None
     assert eur.decimals == 5
     assert eur.round_to_tick_size(1.085427) == 1.08543
-    spec = eur.to_symbol_spec()
-    assert spec.name == "EURUSD"
-    assert spec.digits == 5
+    info = eur.to_symbol_info()
+    assert info.name == "EURUSD"
+    assert info.digits == 5
 
     # Filtered listing
     forex_list = service.list_instruments(data_type="Forex")

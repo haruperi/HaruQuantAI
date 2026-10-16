@@ -36,8 +36,7 @@ from datetime import datetime
 from typing import Any
 
 from app.host.logging import get_logger
-
-from .enums import PropertyValue, TradingBackend
+from app.services.libs.enums import PropertyValue, TradingBackend
 
 __all__ = [
     "BaseTradingClass",

@@ -52,7 +52,7 @@ from app.services.brokers import (
     SQFuturesBroker,
     YahooBroker,
 )
-from app.services.trading import SymbolSpec
+from app.services.libs.contracts import SymbolInfo
 from app.workspace.data_manager import (
     MarketBar,
     MarketTick,
@@ -186,7 +186,7 @@ async def demo_simulator(count: int = 5) -> list[MarketBar]:
     """Download seeded historical M1 bars for EURUSD from SimulationBackend."""
     sim = SimulationBackend()
     symbol = "EURUSD"
-    sim.add_symbol(SymbolSpec(name=symbol))
+    sim.add_symbol(SymbolInfo(name=symbol))
     base_ts = 1704100000
     seed_bars = [
         MarketBar(

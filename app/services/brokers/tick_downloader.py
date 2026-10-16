@@ -61,7 +61,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
     ProviderUnsupportedError,
 )
-from app.services.trading import SymbolSnapshot
+from app.services.libs.contracts import SymbolInfo
 from app.workspace.data_manager.history import DataBrokerBackend
 
 ADAPTERS_FR = "FR-DATA-PROVIDERS-ADAPTERS"
@@ -212,9 +212,9 @@ class TickDownloaderBroker(DataBrokerBackend, BaseDataProvider):
         )
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Resolve symbol metadata as canonical SymbolSnapshot."""
-        return SymbolSnapshot(name=symbol.upper(), digits=5, point=0.00001)
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Resolve symbol metadata as canonical SymbolInfo."""
+        return SymbolInfo(name=symbol.upper(), digits=5, point=0.00001)
 
     @override
     def symbols_get(self) -> list[str]:

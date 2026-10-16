@@ -52,20 +52,22 @@ if TYPE_CHECKING:
     from app.workspace.data_manager import MarketTick
 
 from app.host.logging import get_logger
-from app.services.trading import (
-    AccountSnapshot,
-    BridgeEvent,
-    DealSnapshot,
-    OrderSnapshot,
-    OrderType,
-    PositionSnapshot,
-    Receipt,
-    ReceiptStatus,
-    SymbolSnapshot,
-    TerminalSnapshot,
+from app.services.libs.contracts import (
+    AccountInfo,
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    SymbolInfo,
+    TerminalInfo,
     TradeCheckResult,
     TradeRequest,
     TradeResult,
+)
+from app.services.libs.enums import (
+    BridgeEvent,
+    OrderType,
+    Receipt,
+    ReceiptStatus,
 )
 
 logger = get_logger(__name__)
@@ -108,7 +110,7 @@ def epoch_millis(value: datetime | float | None) -> int:
 
 
 class BrokerBackend(ABC):
-    """Internal synchronous snapshot-model capability for simulator handlers."""
+    """Internal synchronous info-model capability for simulator handlers."""
 
     @abstractmethod
     def connect(self) -> bool:
@@ -121,21 +123,21 @@ class BrokerBackend(ABC):
         ...
 
     @abstractmethod
-    def terminal(self) -> TerminalSnapshot:
-        """Retrieve the current terminal state snapshot."""
+    def terminal(self) -> TerminalInfo:
+        """Retrieve the current terminal state info."""
         ...
 
     @abstractmethod
-    def account(self) -> AccountSnapshot:
-        """Retrieve the current account state snapshot."""
+    def account(self) -> AccountInfo:
+        """Retrieve the current account state info."""
         ...
 
     @abstractmethod
-    def symbol(self, name: str) -> SymbolSnapshot | None:
-        """Lookup a symbol snapshot by instrument ticker."""
+    def symbol(self, name: str) -> SymbolInfo | None:
+        """Lookup a symbol info by instrument ticker."""
         ...
 
-    def symbols(self) -> list[SymbolSnapshot]:
+    def symbols(self) -> list[SymbolInfo]:
         """Optional symbol catalog enumeration used by market information lookups."""
         return []
 
@@ -150,22 +152,22 @@ class BrokerBackend(ABC):
         ...
 
     @abstractmethod
-    def orders(self) -> list[OrderSnapshot]:
+    def orders(self) -> list[OrderInfo]:
         """Retrieve all currently active working orders."""
         ...
 
     @abstractmethod
-    def history_orders(self) -> list[OrderSnapshot]:
+    def history_orders(self) -> list[OrderInfo]:
         """Retrieve historical completed and canceled orders."""
         ...
 
     @abstractmethod
-    def positions(self) -> list[PositionSnapshot]:
+    def positions(self) -> list[PositionInfo]:
         """Retrieve all open market positions."""
         ...
 
     @abstractmethod
-    def deals(self) -> list[DealSnapshot]:
+    def deals(self) -> list[DealInfo]:
         """Retrieve all historical execution deals."""
         ...
 
@@ -377,7 +379,7 @@ class BaseBrokerBackend:
             if method_name in ("SymbolsGet", "symbols"):
                 return self.symbols_get()
         if class_name == "TerminalInfo" and method_name in ("TerminalInfo", "info"):
-            return TerminalSnapshot(
+            return TerminalInfo(
                 name=self.name,
                 company=self.name,
                 connected=self._is_connected,
@@ -388,9 +390,9 @@ class BaseBrokerBackend:
             code="UNSUPPORTED_OPERATION",
         )
 
-    def symbol_info(self, symbol: str) -> SymbolSnapshot:
-        """Subclass hook to query symbol properties as SymbolSnapshot."""
-        return SymbolSnapshot(name=symbol)
+    def symbol_info(self, symbol: str) -> SymbolInfo:
+        """Subclass hook to query symbol properties as SymbolInfo."""
+        return SymbolInfo(name=symbol)
 
     def symbols_get(self) -> list[str]:
         """Subclass hook to query available symbols."""

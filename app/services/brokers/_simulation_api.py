@@ -38,7 +38,18 @@ from app.services.brokers.base import (
     epoch_millis,
     epoch_seconds,
 )
-from app.services.trading import (
+from app.services.libs.contracts import (
+    AccountInfo,
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    SymbolInfo,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
+from app.services.libs.enums import (
     DEAL_ENTRY_DESCRIPTIONS,
     DEAL_TYPE_DESCRIPTIONS,
     ORDER_FILLING_DESCRIPTIONS,
@@ -46,33 +57,22 @@ from app.services.trading import (
     ORDER_TIME_DESCRIPTIONS,
     ORDER_TYPE_DESCRIPTIONS,
     POSITION_TYPE_DESCRIPTIONS,
-    AccountSnapshot,
     AccountTradeMode,
     BookType,
     DealEntry,
-    DealSnapshot,
     DealType,
-    HistoryOrderSnapshot,
     MarginMode,
     OrderFilling,
-    OrderSnapshot,
     OrderState,
     OrderTime,
     OrderType,
-    PositionSnapshot,
     PositionType,
     StopoutMode,
     SymbolCalcMode,
-    SymbolSnapshot,
-    SymbolSpec,
     SymbolSwapMode,
     SymbolTradeExecution,
     SymbolTradeMode,
-    TerminalSnapshot,
     TradeAction,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
     TradeRetcode,
 )
 
@@ -258,9 +258,9 @@ def _accountinfo__a(self: _ObjectState) -> Any:
     return self._backend.account()
 
 
-def _accountinfo_accountinfo(self: _ObjectState) -> AccountSnapshot:
+def _accountinfo_accountinfo(self: _ObjectState) -> AccountInfo:
     account = _accountinfo__a(self)
-    if isinstance(account, AccountSnapshot):
+    if isinstance(account, AccountInfo):
         trade_mode = AccountTradeMode(account.trade_mode)
         stopout_mode = StopoutMode(account.stopout_mode)
         margin_mode = MarginMode(account.margin_mode)
@@ -279,7 +279,7 @@ def _accountinfo_accountinfo(self: _ObjectState) -> AccountSnapshot:
                 or margin_mode.name.replace("_", " ").title()
             ),
         )
-    return cast("AccountSnapshot", account)
+    return cast("AccountInfo", account)
 
 
 def _accountinfo_login(self: _ObjectState) -> int:
@@ -475,8 +475,8 @@ def _accountinfo_maxlotcheck(
     if spec is None:
         return 0.0
     low = 0.0
-    high = spec.lots_max
-    step = max(spec.lots_step, 1e-12)
+    high = spec.volume_max
+    step = max(spec.volume_step, 1e-12)
     free_margin = _accountinfo_freemargin(self)
     for _ in range(64):
         mid = (low + high) / 2.0
@@ -486,10 +486,10 @@ def _accountinfo_maxlotcheck(
         else:
             high = mid
     steps = int((low + 1e-12) / step)
-    return float(round(min(float(spec.lots_max), steps * step), 8))
+    return float(round(min(float(spec.volume_max), steps * step), 8))
 
 
-def _dict_to_deal_snapshot(d: dict[str, Any]) -> DealSnapshot:
+def _dict_to_deal_info(d: dict[str, Any]) -> DealInfo:
     deal_type = int(d.get("deal_type", 0))
     entry = int(d.get("entry", 0))
     t_val = d.get("time", 0)
@@ -510,7 +510,7 @@ def _dict_to_deal_snapshot(d: dict[str, Any]) -> DealSnapshot:
     entry_desc = (
         DEAL_ENTRY_DESCRIPTIONS.get(entry_enum, "") if entry_enum is not None else ""
     )
-    return DealSnapshot(
+    return DealInfo(
         ticket=int(d.get("ticket", 0)),
         order=int(d.get("order", 0)),
         position_id=int(d.get("position_id", 0)),
@@ -531,7 +531,7 @@ def _dict_to_deal_snapshot(d: dict[str, Any]) -> DealSnapshot:
     )
 
 
-def _dict_to_order_snapshot(d: dict[str, Any]) -> OrderSnapshot:
+def _dict_to_order_info(d: dict[str, Any]) -> OrderInfo:
     ord_type = int(d.get("order_type", 0))
     state = int(d.get("state", 0))
     filling = int(d.get("type_filling", 0))
@@ -582,7 +582,7 @@ def _dict_to_order_snapshot(d: dict[str, Any]) -> OrderSnapshot:
         if ord_time_enum is not None
         else ""
     )
-    return OrderSnapshot(
+    return OrderInfo(
         ticket=int(d.get("ticket", 0)),
         symbol=str(d.get("symbol", "")),
         order_type=ord_type,
@@ -611,7 +611,7 @@ def _dict_to_order_snapshot(d: dict[str, Any]) -> OrderSnapshot:
     )
 
 
-def _dict_to_position_snapshot(d: dict[str, Any]) -> PositionSnapshot:
+def _dict_to_position_info(d: dict[str, Any]) -> PositionInfo:
     pos_type = int(d.get("position_type", 0))
     time_val = d.get("time", 0)
     time_sec = (
@@ -635,7 +635,7 @@ def _dict_to_position_snapshot(d: dict[str, Any]) -> PositionSnapshot:
         if pos_type_enum is not None
         else ("Buy" if pos_type == 0 else "Sell")
     )
-    return PositionSnapshot(
+    return PositionInfo(
         ticket=int(d.get("ticket", 0)),
         identifier=int(d.get("identifier", 0)),
         symbol=str(d.get("symbol", "")),
@@ -658,13 +658,13 @@ def _dict_to_position_snapshot(d: dict[str, Any]) -> PositionSnapshot:
     )
 
 
-def _dealinfo_dealinfo(self: _ObjectState, ticket: int | None = None) -> DealSnapshot:
+def _dealinfo_dealinfo(self: _ObjectState, ticket: int | None = None) -> DealInfo:
     if ticket is not None:
         _dealinfo_ticket(self, ticket)
     selected = _selectionbase__require(self)
-    if isinstance(selected, DealSnapshot):
+    if isinstance(selected, DealInfo):
         return replace(selected)
-    return _dict_to_deal_snapshot(record_dict(selected))
+    return _dict_to_deal_info(record_dict(selected))
 
 
 def _dealinfo_asdict(self: _ObjectState, ticket: int | None = None) -> dict[str, Any]:
@@ -717,21 +717,21 @@ def _dealinfo_historydealsget(
         deals = [d for d in deals if fnmatch.fnmatch(d.symbol, group)]
     return [
         asdict(d)
-        if isinstance(d, DealSnapshot)
-        else asdict(_dict_to_deal_snapshot(record_dict(d)))
+        if isinstance(d, DealInfo)
+        else asdict(_dict_to_deal_info(record_dict(d)))
         for d in deals
     ]
 
 
 def _historyorderinfo_historyorderinfo(
     self: _ObjectState, ticket: int | None = None
-) -> HistoryOrderSnapshot:
+) -> OrderInfo:
     if ticket is not None:
         _historyorderinfo_ticket(self, ticket)
     selected = _selectionbase__require(self)
-    if isinstance(selected, OrderSnapshot):
+    if isinstance(selected, OrderInfo):
         return replace(selected)
-    return _dict_to_order_snapshot(record_dict(selected))
+    return _dict_to_order_info(record_dict(selected))
 
 
 def _historyorderinfo_asdict(
@@ -799,21 +799,19 @@ def _historyorderinfo_historyordersget(
         orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
     return [
         asdict(o)
-        if isinstance(o, OrderSnapshot)
-        else asdict(_dict_to_order_snapshot(record_dict(o)))
+        if isinstance(o, OrderInfo)
+        else asdict(_dict_to_order_info(record_dict(o)))
         for o in orders
     ]
 
 
-def _orderinfo_orderinfo(
-    self: _ObjectState, ticket: int | None = None
-) -> OrderSnapshot:
+def _orderinfo_orderinfo(self: _ObjectState, ticket: int | None = None) -> OrderInfo:
     if ticket is not None:
         _orderinfo_select(self, ticket)
     selected = _selectionbase__require(self)
-    if isinstance(selected, OrderSnapshot):
+    if isinstance(selected, OrderInfo):
         return replace(selected)
-    return _dict_to_order_snapshot(record_dict(selected))
+    return _dict_to_order_info(record_dict(selected))
 
 
 def _orderinfo_asdict(self: _ObjectState, ticket: int | None = None) -> dict[str, Any]:
@@ -861,21 +859,21 @@ def _orderinfo_ordersget(
         orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
     return [
         asdict(o)
-        if isinstance(o, OrderSnapshot)
-        else asdict(_dict_to_order_snapshot(record_dict(o)))
+        if isinstance(o, OrderInfo)
+        else asdict(_dict_to_order_info(record_dict(o)))
         for o in orders
     ]
 
 
 def _positioninfo_positioninfo(
     self: _ObjectState, ticket: int | None = None
-) -> PositionSnapshot:
+) -> PositionInfo:
     if ticket is not None:
         _positioninfo_selectbyticket(self, ticket)
     selected = _selectionbase__require(self)
-    if isinstance(selected, PositionSnapshot):
+    if isinstance(selected, PositionInfo):
         return replace(selected)
-    return _dict_to_position_snapshot(record_dict(selected))
+    return _dict_to_position_info(record_dict(selected))
 
 
 def _positioninfo_asdict(
@@ -945,8 +943,8 @@ def _positioninfo_positionsget(
         positions = [p for p in positions if fnmatch.fnmatch(p.symbol, group)]
     return [
         asdict(p)
-        if isinstance(p, PositionSnapshot)
-        else asdict(_dict_to_position_snapshot(record_dict(p)))
+        if isinstance(p, PositionInfo)
+        else asdict(_dict_to_position_info(record_dict(p)))
         for p in positions
     ]
 
@@ -988,7 +986,7 @@ def _symbolinfo_name(self: _ObjectState, value: str | None = None) -> str | bool
 def _symbolinfo_select(self: _ObjectState, value: bool | None = None) -> bool:
     if value is not None:
         return cast("bool", self._backend.select_symbol(self.symbol_name, value))
-    return bool(_symbolinfo__s(self).selected)
+    return bool(_symbolinfo__s(self).select)
 
 
 def _symbolinfo_issynchronized(self: _ObjectState) -> bool:
@@ -1012,7 +1010,7 @@ def _match_symbol_pattern(name: str, group: str | None) -> bool:
 
 def _symbolinfo_symbolstotal(self: _ObjectState, selected: bool = False) -> int:
     symbols_fn = getattr(self._backend, "symbols", None)
-    symbols: list[SymbolSpec] = symbols_fn() if callable(symbols_fn) else []
+    symbols: list[SymbolInfo] = symbols_fn() if callable(symbols_fn) else []
     if selected:
         return sum(1 for s in symbols if getattr(s, "selected", True))
     return len(symbols)
@@ -1020,7 +1018,7 @@ def _symbolinfo_symbolstotal(self: _ObjectState, selected: bool = False) -> int:
 
 def _symbolinfo_symbolsget(self: _ObjectState, group: str | None = None) -> list[str]:
     symbols_fn = getattr(self._backend, "symbols", None)
-    symbols: list[SymbolSpec] = symbols_fn() if callable(symbols_fn) else []
+    symbols: list[SymbolInfo] = symbols_fn() if callable(symbols_fn) else []
     names = [s.name for s in symbols]
     return [name for name in names if _match_symbol_pattern(name, group)]
 
@@ -1150,7 +1148,7 @@ def _symbolinfo_asdict(self: _ObjectState) -> dict[str, Any]:
     return {
         "custom": bool(s.custom),
         "chart_mode": int(s.chart_mode),
-        "select": bool(s.selected),
+        "select": bool(s.select),
         "visible": bool(s.visible),
         "session_deals": int(s.session_deals),
         "session_buy_orders": int(s.session_buy_orders),
@@ -1162,14 +1160,14 @@ def _symbolinfo_asdict(self: _ObjectState) -> dict[str, Any]:
         "digits": int(s.digits),
         "spread": spread,
         "spread_float": bool(s.spread_float),
-        "ticks_bookdepth": int(s.ticks_book_depth),
+        "ticks_bookdepth": int(s.ticks_bookdepth),
         "trade_calc_mode": int(s.trade_calc_mode),
         "trade_mode": int(s.trade_mode),
         "start_time": int(s.start_time),
         "expiration_time": int(s.expiration_time),
-        "trade_stops_level": int(s.stops_level),
-        "trade_freeze_level": int(s.freeze_level),
-        "trade_exemode": int(s.trade_execution),
+        "trade_stops_level": int(s.trade_stops_level),
+        "trade_freeze_level": int(s.trade_freeze_level),
+        "trade_exemode": int(s.trade_exemode),
         "swap_mode": int(s.swap_mode),
         "swap_rollover3days": int(s.swap_rollover3days),
         "margin_hedged_use_leg": bool(s.margin_hedged_use_leg),
@@ -1193,18 +1191,18 @@ def _symbolinfo_asdict(self: _ObjectState) -> dict[str, Any]:
         "volumelow_real": float(s.volumelow_real),
         "option_strike": float(s.option_strike),
         "point": point,
-        "trade_tick_value": float(s.tick_value),
-        "trade_tick_value_profit": float(s.tick_value_profit),
-        "trade_tick_value_loss": float(s.tick_value_loss),
-        "trade_tick_size": float(s.tick_size),
-        "trade_contract_size": float(s.contract_size),
+        "trade_tick_value": float(s.trade_tick_value),
+        "trade_tick_value_profit": float(s.trade_tick_value_profit),
+        "trade_tick_value_loss": float(s.trade_tick_value_loss),
+        "trade_tick_size": float(s.trade_tick_size),
+        "trade_contract_size": float(s.trade_contract_size),
         "trade_accrued_interest": float(s.trade_accrued_interest),
         "trade_face_value": float(s.trade_face_value),
         "trade_liquidity_rate": float(s.trade_liquidity_rate),
-        "volume_min": float(s.lots_min),
-        "volume_max": float(s.lots_max),
-        "volume_step": float(s.lots_step),
-        "volume_limit": float(s.lots_limit),
+        "volume_min": float(s.volume_min),
+        "volume_max": float(s.volume_max),
+        "volume_step": float(s.volume_step),
+        "volume_limit": float(s.volume_limit),
         "swap_long": float(s.swap_long),
         "swap_short": float(s.swap_short),
         "margin_initial": float(s.margin_initial),
@@ -1247,9 +1245,7 @@ def _symbolinfo_asdict(self: _ObjectState) -> dict[str, Any]:
     }
 
 
-def _symbolinfo_symbolinfo(
-    self: _ObjectState, symbol: str | None = None
-) -> SymbolSnapshot:
+def _symbolinfo_symbolinfo(self: _ObjectState, symbol: str | None = None) -> SymbolInfo:
     if symbol:
         self.symbol_name = symbol
     d = _symbolinfo_asdict(self)
@@ -1265,8 +1261,8 @@ def _symbolinfo_symbolinfo(
         else None
     )
     trade_ex = (
-        SymbolTradeExecution(s.trade_execution)
-        if s.trade_execution in SymbolTradeExecution._value2member_map_
+        SymbolTradeExecution(s.trade_exemode)
+        if s.trade_exemode in SymbolTradeExecution._value2member_map_
         else None
     )
     swap_mode = (
@@ -1274,7 +1270,7 @@ def _symbolinfo_symbolinfo(
         if s.swap_mode in SymbolSwapMode._value2member_map_
         else None
     )
-    return SymbolSnapshot(
+    return SymbolInfo(
         trade_calc_mode_description=(
             s.trade_calc_mode_description
             or (calc_mode.name.replace("_", " ").title() if calc_mode else "")
@@ -1307,13 +1303,13 @@ def _terminalinfo___init__(self: _ObjectState, backend: BrokerBackend) -> None:
     self._backend = backend
 
 
-def _terminalinfo_terminalinfo(self: _ObjectState) -> TerminalSnapshot:
+def _terminalinfo_terminalinfo(self: _ObjectState) -> TerminalInfo:
     terminal = self._backend.terminal()
     if is_dataclass(terminal) and not isinstance(terminal, type):
-        return cast("TerminalSnapshot", terminal)
+        return cast("TerminalInfo", terminal)
     if isinstance(terminal, dict):
-        return TerminalSnapshot(**terminal)
-    raise TypeError(f"unexpected terminal snapshot type: {type(terminal).__name__}")
+        return TerminalInfo(**terminal)
+    raise TypeError(f"unexpected terminal info type: {type(terminal).__name__}")
 
 
 def _trade___init__(self: _ObjectState, backend: BrokerBackend) -> None:

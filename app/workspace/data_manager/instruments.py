@@ -814,8 +814,10 @@ if __name__ == "__main__":
             print(f"Loaded EURUSD: decimals={eur.decimals}, tick={eur.tick_size}")
             rounded = eur.round_to_tick_size(1.085427)
             print(f"EURUSD rounded price 1.085427 -> {rounded}")
-            spec = eur.to_symbol_spec()
-            print(f"Generated SymbolSpec: {spec.name} contract={spec.contract_size}")
+            spec = eur.to_symbol_info()
+            print(
+                f"Generated SymbolInfo: {spec.name} contract={spec.trade_contract_size}"
+            )
 
         cloned = service.clone_instrument("EURUSD", "EURUSD_ECN")
         print(f"Cloned instrument: {cloned.symbol}")

@@ -10,7 +10,7 @@ Purpose:
 
 Key Capabilities:
     - FR-BROKER-BASE-ROUTING: Verify dispatch routing for symbol queries and
-      terminal snapshot lookups.
+      terminal info lookups.
     - FR-BROKER-BASE-LIFECYCLE: Verify connection session start/stop, readiness
       confirmation, and context management.
 
@@ -26,11 +26,11 @@ import asyncio
 
 import pytest
 from app.services.brokers.base import BaseBrokerBackend, BridgeError
-from app.services.trading import (
-    ReceiptStatus,
-    SymbolSnapshot,
-    TerminalSnapshot,
+from app.services.libs.contracts import (
+    SymbolInfo,
+    TerminalInfo,
 )
+from app.services.libs.enums import ReceiptStatus
 from app.workspace.data_manager import (
     DataBrokerBackend,
     MarketBar,
@@ -75,7 +75,7 @@ class TestBaseBrokerBackend:
         asyncio.run(run_lifecycle())
 
         info = broker.symbol_info("EURUSD")
-        assert isinstance(info, SymbolSnapshot)
+        assert isinstance(info, SymbolInfo)
         assert info.name == "EURUSD"
         assert broker.symbols_get() == []
 
@@ -93,7 +93,7 @@ class TestBaseBrokerBackend:
                 method_name="SymbolInfo",
                 args=["EURUSD"],
             )
-            assert isinstance(sym, SymbolSnapshot)
+            assert isinstance(sym, SymbolInfo)
             assert sym.name == "EURUSD"
             cmd_id = broker.last_command_id()
             assert cmd_id is not None
@@ -117,7 +117,7 @@ class TestBaseBrokerBackend:
                 method_name="TerminalInfo",
                 args=[],
             )
-            assert isinstance(terminal, TerminalSnapshot)
+            assert isinstance(terminal, TerminalInfo)
             assert terminal.name == "base_broker"
             assert terminal.connected is True
             assert terminal.trade_allowed is False

@@ -46,9 +46,9 @@ from app.services.brokers.registry import (
     HistoricalProviderView,
 )
 from app.services.brokers.simulator import SimulationBackend
+from app.services.libs.contracts import SymbolInfo
 from app.services.trading import (
     MarginMode,
-    SymbolSnapshot,
 )
 
 # ============================================================================
@@ -117,9 +117,9 @@ def test_simulation_backend_intact() -> None:
     terminal = sim.terminal()
     assert terminal.trade_allowed is True
 
-    # Register and query symbol snapshot
+    # Register and query symbol info
     sim.add_symbol(
-        SymbolSnapshot(
+        SymbolInfo(
             name="EURUSD",
             point=0.00001,
             digits=5,

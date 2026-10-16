@@ -2,11 +2,19 @@
 
 from __future__ import annotations
 
-from .base import (
-    BaseTradingClass,
-    TradingClass,
+from app.services.libs.contracts import (
+    AccountInfo,
+    BookInfo,
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    SymbolInfo,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
 )
-from .enums import (
+from app.services.libs.enums import (
     BOOK_TYPE_DESCRIPTIONS,
     DEAL_ENTRY_DESCRIPTIONS,
     DEAL_TYPE_DESCRIPTIONS,
@@ -44,32 +52,22 @@ from .enums import (
     TradeRetcode,
     TradingBackend,
 )
+
+from .base import (
+    BaseTradingClass,
+    TradingClass,
+)
 from .facade import (
     Trading,
 )
 from .proxies import (
-    AccountInfo,
-    DealInfo,
-    HistoryOrderInfo,
-    OrderInfo,
-    PositionInfo,
-    SymbolInfo,
-    TerminalInfo,
-)
-from .snapshots import (
-    AccountSnapshot,
-    BookInfo,
-    DealSnapshot,
-    HistoryOrderSnapshot,
-    MqlBookInfo,
-    OrderSnapshot,
-    PositionSnapshot,
-    SymbolSnapshot,
-    SymbolSpec,
-    TerminalSnapshot,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
+    AccountProxy,
+    DealProxy,
+    HistoryOrderProxy,
+    OrderProxy,
+    PositionProxy,
+    SymbolProxy,
+    TerminalProxy,
 )
 from .trade import (
     Trade,
@@ -95,7 +93,7 @@ __all__ = [
     "SYMBOL_TRADE_EXECUTION_DESCRIPTIONS",
     "SYMBOL_TRADE_MODE_DESCRIPTIONS",
     "AccountInfo",
-    "AccountSnapshot",
+    "AccountProxy",
     "AccountTradeMode",
     "BaseTradingClass",
     "BookInfo",
@@ -103,20 +101,18 @@ __all__ = [
     "BridgeEvent",
     "DealEntry",
     "DealInfo",
-    "DealSnapshot",
+    "DealProxy",
     "DealType",
-    "HistoryOrderInfo",
-    "HistoryOrderSnapshot",
+    "HistoryOrderProxy",
     "MarginMode",
-    "MqlBookInfo",
     "OrderFilling",
     "OrderInfo",
-    "OrderSnapshot",
+    "OrderProxy",
     "OrderState",
     "OrderTime",
     "OrderType",
     "PositionInfo",
-    "PositionSnapshot",
+    "PositionProxy",
     "PositionType",
     "PropertyValue",
     "Receipt",
@@ -124,13 +120,12 @@ __all__ = [
     "StopoutMode",
     "SymbolCalcMode",
     "SymbolInfo",
-    "SymbolSnapshot",
-    "SymbolSpec",
+    "SymbolProxy",
     "SymbolSwapMode",
     "SymbolTradeExecution",
     "SymbolTradeMode",
     "TerminalInfo",
-    "TerminalSnapshot",
+    "TerminalProxy",
     "Trade",
     "TradeAction",
     "TradeCheckResult",

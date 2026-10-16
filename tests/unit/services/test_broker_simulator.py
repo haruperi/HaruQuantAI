@@ -3,14 +3,14 @@
 Description:
     Validates in-memory execution, tick feeding, market order placement,
     pending orders, position management, deals, mark-to-market calculations,
-    and unified snapshot data structures in SimulationBackend.
+    and unified info data structures in SimulationBackend.
 
 Purpose:
     FEAT-BROKER-SIMULATION-TESTS: Verification suite for simulation backend.
 
 Key Capabilities:
-    - FR-SIMULATION-MODELS: Verify snapshot models (OrderSnapshot, PositionSnapshot,
-      DealSnapshot, SymbolSnapshot, MarketTick) returned directly by simulator.
+    - FR-SIMULATION-MODELS: Verify info models (OrderInfo, PositionInfo,
+      DealInfo, SymbolInfo, MarketTick) returned directly by simulator.
     - FR-SIMULATION-EXECUTION: Verify order lifecycle, execution fills, and stops.
     - FR-SIMULATION-DISPATCH: Verify async call dispatch with execution receipts.
 
@@ -29,22 +29,24 @@ from __future__ import annotations
 
 import pytest
 from app.services.brokers.simulator import SimulationBackend
-from app.services.trading import (
+from app.services.libs.contracts import (
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    SymbolInfo,
+    TradeRequest,
+)
+from app.services.libs.enums import (
     DealEntry,
-    DealSnapshot,
     DealType,
     MarginMode,
     OrderFilling,
-    OrderSnapshot,
     OrderState,
     OrderTime,
     OrderType,
-    PositionSnapshot,
     PositionType,
     ReceiptStatus,
-    SymbolSnapshot,
     TradeAction,
-    TradeRequest,
     TradeRetcode,
 )
 from app.workspace.data_manager import MarketTick
@@ -62,7 +64,7 @@ def sim_backend() -> SimulationBackend:
     backend.connect()
     backend.arm()
     backend.add_symbol(
-        SymbolSnapshot(
+        SymbolInfo(
             name="EURUSD",
             point=0.00001,
             digits=5,
@@ -78,19 +80,19 @@ def sim_backend() -> SimulationBackend:
 
 
 class TestSimulationBackendModels:
-    """Verify that backend methods operate on and return unified snapshot models."""
+    """Verify that backend methods operate on and return unified info models."""
 
     def test_symbol_and_tick_models(self, sim_backend: SimulationBackend) -> None:
-        """Verify symbol lookups and ticks return snapshot models."""
+        """Verify symbol lookups and ticks return info models."""
         spec = sim_backend.symbol("EURUSD")
         assert spec is not None
-        assert isinstance(spec, SymbolSnapshot)
+        assert isinstance(spec, SymbolInfo)
         assert spec.name == "EURUSD"
         assert spec.digits == 5
 
         symbols = sim_backend.symbols()
         assert len(symbols) == 1
-        assert isinstance(symbols[0], SymbolSnapshot)
+        assert isinstance(symbols[0], SymbolInfo)
 
         tick = sim_backend.tick("EURUSD")
         assert tick is not None
@@ -102,7 +104,7 @@ class TestSimulationBackendModels:
     def test_market_buy_and_position_deal_models(
         self, sim_backend: SimulationBackend
     ) -> None:
-        """Verify market execution creates PositionSnapshot and DealSnapshot."""
+        """Verify market execution creates PositionInfo and DealInfo."""
         req = TradeRequest(
             action=TradeAction.DEAL,
             symbol="EURUSD",
@@ -117,7 +119,7 @@ class TestSimulationBackendModels:
         positions = sim_backend.positions()
         assert len(positions) == 1
         pos = positions[0]
-        assert isinstance(pos, PositionSnapshot)
+        assert isinstance(pos, PositionInfo)
         assert pos.symbol == "EURUSD"
         assert pos.position_type == int(PositionType.BUY)
         assert pos.volume == 0.1
@@ -128,7 +130,7 @@ class TestSimulationBackendModels:
         deals = sim_backend.deals()
         assert len(deals) == 1
         deal = deals[0]
-        assert isinstance(deal, DealSnapshot)
+        assert isinstance(deal, DealInfo)
         assert deal.deal_type == int(DealType.BUY)
         assert deal.entry == int(DealEntry.IN)
         assert deal.volume == 0.1
@@ -162,14 +164,14 @@ class TestSimulationBackendModels:
         deals = sim_backend.deals()
         assert len(deals) == 2
         out_deal = deals[1]
-        assert isinstance(out_deal, DealSnapshot)
+        assert isinstance(out_deal, DealInfo)
         assert out_deal.entry == int(DealEntry.OUT)
         assert out_deal.profit > 0.0
 
     def test_pending_order_models_and_expiration(
         self, sim_backend: SimulationBackend
     ) -> None:
-        """Verify pending order placement returns OrderSnapshot and tracks history."""
+        """Verify pending order placement returns OrderInfo and tracks history."""
         req = TradeRequest(
             action=TradeAction.PENDING,
             symbol="EURUSD",
@@ -185,13 +187,13 @@ class TestSimulationBackendModels:
 
         orders = sim_backend.orders()
         assert len(orders) == 1
-        ord_snapshot = orders[0]
-        assert isinstance(ord_snapshot, OrderSnapshot)
-        assert ord_snapshot.state == int(OrderState.PLACED)
-        assert ord_snapshot.price_open == 1.0950
+        ord_info = orders[0]
+        assert isinstance(ord_info, OrderInfo)
+        assert ord_info.state == int(OrderState.PLACED)
+        assert ord_info.price_open == 1.0950
 
         # Cancel the pending order
-        cancel_req = TradeRequest(action=TradeAction.REMOVE, order=ord_snapshot.ticket)
+        cancel_req = TradeRequest(action=TradeAction.REMOVE, order=ord_info.ticket)
         cancel_res = sim_backend.order_send(cancel_req)
         assert cancel_res.retcode == int(TradeRetcode.DONE)
 
@@ -199,7 +201,7 @@ class TestSimulationBackendModels:
         hist_orders = sim_backend.history_orders()
         assert len(hist_orders) == 1
         canceled_ord = hist_orders[0]
-        assert isinstance(canceled_ord, OrderSnapshot)
+        assert isinstance(canceled_ord, OrderInfo)
         assert canceled_ord.state == int(OrderState.CANCELED)
 
 

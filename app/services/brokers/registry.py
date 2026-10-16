@@ -266,7 +266,7 @@ class HistoricalProviderView:
         )
 
     def symbol_info(self, symbol: str) -> Any:
-        """Retrieve instrument specifications as canonical SymbolSnapshot."""
+        """Retrieve instrument specifications as canonical SymbolInfo."""
         resolver = getattr(self._backend, "symbol_info", None)
         if not callable(resolver):
             return None

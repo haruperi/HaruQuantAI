@@ -50,15 +50,17 @@ from app.services.brokers.base import BridgeError
 from app.services.brokers.ctrader import CTraderBackend
 from app.services.brokers.metatrader import MT5Backend
 from app.services.brokers.simulator import SimulationBackend
+from app.services.libs.contracts import (
+    SymbolInfo,
+    TerminalInfo,
+    TradeRequest,
+)
 from app.services.trading import (
     MarginMode,
     OrderFilling,
     OrderType,
     ReceiptStatus,
-    SymbolSpec,
-    TerminalSnapshot,
     TradeAction,
-    TradeRequest,
     Trading,
     TradingBackend,
 )
@@ -123,7 +125,7 @@ def create_backend(name: str | None = None) -> TradingBackend:
     print("FR-TRADING-USAGE-LIFECYCLE: selecting backend")
     if selected == "simulator":
         backend = SimulationBackend()
-        backend.add_symbol(SymbolSpec(name=SYMBOL))
+        backend.add_symbol(SymbolInfo(name=SYMBOL))
         backend.feed_tick(SYMBOL, bid=1.1, ask=1.1002, time=DATE_TO)
         base = int(DATE_FROM.timestamp())
         backend.seed_bar_history(
@@ -188,13 +190,13 @@ async def example_01_connect(ctx: ExampleContext) -> None:
     receipt = ctx.trading.receipt(command_id) if command_id is not None else None
     receipt_connected = (
         receipt.value.connected
-        if receipt is not None and isinstance(receipt.value, TerminalSnapshot)
+        if receipt is not None and isinstance(receipt.value, TerminalInfo)
         else receipt.value.get("connected")
         if receipt is not None and isinstance(receipt.value, dict)
         else None
     )
     if (
-        not isinstance(connected_info, TerminalSnapshot)
+        not isinstance(connected_info, TerminalInfo)
         or receipt is None
         or receipt.status != ReceiptStatus.RESOLVED
         or receipt.command_id != command_id
@@ -321,16 +323,16 @@ async def example_04_symbol(ctx: ExampleContext) -> None:
     print(f"Name: {info.name}")
     print(f"Digits: {info.digits}")
     print(f"Point: {info.point}")
-    print(f"Tick size: {info.tick_size}")
+    print(f"Tick size: {info.trade_tick_size}")
     print(f"Bid: {info.bid}")
     print(f"Ask: {info.ask}")
     print(f"Last: {info.last}")
     print(f"Spread: {info.spread}")
     print(f"Trade mode: {info.trade_mode_description}")
-    print(f"Contract size: {info.contract_size}")
-    print(f"Min lot: {info.lots_min}")
-    print(f"Max lot: {info.lots_max}")
-    print(f"Lot step: {info.lots_step}")
+    print(f"Contract size: {info.trade_contract_size}")
+    print(f"Min lot: {info.volume_min}")
+    print(f"Max lot: {info.volume_max}")
+    print(f"Lot step: {info.volume_step}")
     print(f"Swap mode: {info.swap_mode}")
     print(f"Swap long: {info.swap_long}")
     print(f"Swap short: {info.swap_short}")
@@ -373,7 +375,7 @@ async def example_07_order_book(ctx: ExampleContext) -> None:
     print(f"MarketBookGet count: {len(book)}")
     for i, entry in enumerate(book[:PREVIEW_LIMIT]):
         print(
-            f"  [{i}] {entry.type_description} "
+            f"  [{i}] {entry.type.name} "
             f"price={entry.price} volume={entry.volume} volume_real={entry.volume_real}"
         )
         print(f"      dict: {entry._asdict()}")
@@ -433,9 +435,9 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("A new hedging position is required for this example")
     sym_info = await trading.symbol.SymbolInfo()
-    minimum = float(sym_info.lots_min)
-    maximum = float(sym_info.lots_max)
-    step = float(sym_info.lots_step)
+    minimum = float(sym_info.volume_min)
+    maximum = float(sym_info.volume_max)
+    step = float(sym_info.volume_step)
     if (
         not math.isfinite(VOLUME)
         or step <= 0
