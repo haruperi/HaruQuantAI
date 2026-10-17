@@ -1,6 +1,6 @@
-# StrategyQuant X — Master Workspaces & Reimplementation Blueprint
+# Quantitative Workstation — Master Workspaces & Clean Room Architecture Blueprint
 
-This document unites the **complete system architecture**, the **workspace-by-workspace implementation order**, the **HaruQuantAI file and project structure**, and the **detailed functional specifications with code implementation mappings** into a single cohesive reference for reimplementing StrategyQuant X.
+This document unites the **complete system architecture**, the **workspace-by-workspace implementation order**, the **HaruQuantAI file and project structure**, and the **detailed functional specifications with code implementation mappings** into a single cohesive reference for clean room reimplementation of the quantitative trading workstation.
 
 # TARGET STACK (the reimplementation must use this)
 - Frontend: React + TypeScript + Vite + Tailwind CSS
@@ -25,10 +25,10 @@ This document unites the **complete system architecture**, the **workspace-by-wo
 ```mermaid
 flowchart TD
     subgraph S1["1. Foundation"]
-        Host["AppStrategyQuant & AppSQXHome<br/>(Host runtime & shell)"] --> DataMgr["AppDataManager<br/>(Market data engine: QDM)"]
+        Host["AppPlatform & AppHome<br/>(Host runtime & shell)"] --> DataMgr["AppDataManager<br/>(Market data engine)"]
     end
     subgraph S2["2. Strategy Authoring"]
-        DataMgr --> CodeEd["AppCodeEditor<br/>(Java/MQL snippets & indicators)"]
+        DataMgr --> CodeEd["AppCodeEditor<br/>(Snippets, indicators & extensions)"]
         DataMgr --> Wiz["AppWizard<br/>(AlgoWizard manual visual editor)"]
         DataMgr --> Bld["AppBuilder<br/>(Automated genetic strategy generator)"]
     end
@@ -54,7 +54,7 @@ flowchart TD
     end
     subgraph S7["7. Scaling & Ecosystem"]
         TM --> Grid["AppGridControl / AppGridTest<br/>(Distributed remote worker nodes)"]
-        Host --> Tools["AppMarketplace / AppSQXBusiness / AppDebugConsole"]
+        Host --> Tools["AppMarketplace / AppBusiness / AppDebugConsole"]
     end
 ```
 
@@ -82,7 +82,7 @@ HaruQuantAI/
 │   │   ├── settings.py                     # Central configuration & revision-tracked batch saves
 │   │   └── transport.py                    # FastAPI gateway, REST routes, WebSocket event bus
 │   ├── workspace/                          # Tier 2: Domain Workspaces (Cohesive business workflows)
-│   │   ├── data_manager/                   # QDM market data catalog, instruments, sessions, baskets, broker profiles
+│   │   ├── data_manager/                   # Central market data catalog, instruments, sessions, baskets, broker profiles
 │   │   ├── code_editor/                    # Monaco-backed snippet and extension development
 │   │   ├── algo_wizard/                    # Visual rule authoring, logic trees, code generator
 │   │   ├── builder/                        # Genetic strategy generation, candidate engines, ranking models
@@ -140,7 +140,7 @@ HaruQuantAI/
 
 ---
 
-## 1. AppStrategyQuant — Host Application Runtime & Shared Services
+## 1. AppPlatform — Host Application Runtime & Shared Services
 
 - **Primary Role**: The root host application container. Bootstraps the embedded web server, dependency injection container, plugin registry, and global event bus. All other workspaces and plugins load into this runtime.
 - **Dependencies**: None (Root Host)
@@ -148,7 +148,7 @@ HaruQuantAI/
 
 ### Phase 1.1: Core Application Container
 
-#### `AppStrategyQuant`
+#### `AppPlatform`
 *Feature:* Host application lifecycle, dependency injection, and event bus runtime
 *Implementation Files:*
 - **Backend:** `app/host/bootstrap.py`
@@ -320,15 +320,15 @@ HaruQuantAI/
 - authenticate cloud user account and fetch plan quotas and subscription limits -> `ServletAlgoCloud.get_user_plan()`
 - download pre-built shared strategy templates and market data packages -> `ServletAlgoCloud.download_package()`
 
-#### `ServletSQAI`
-*Feature:* Built-in AI Assistant streaming endpoints (SSE / WebSocket)
+#### `ServletAI`
+*Feature:* AI assistant chat streaming and context injection gateway
 *Implementation Files:*
 - **Backend:** `app/workspace/neural_network/routes.py`
 - **Frontend:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
 *Functional Requirements & Implementation:*
-- accept natural language user queries regarding strategy development and codebase -> `ServletSQAI.send_message()`
-- stream AI assistant reasoning and code responses over Server-Sent Events (SSE) or WebSocket -> `ServletSQAI.stream_response()`
-- inject strategy rules, backtest statistics, and logs as context into LLM prompt -> `ServletSQAI.clear_history()`
+- accept natural language user queries regarding strategy development and codebase -> `ServletAI.send_message()`
+- stream AI assistant reasoning and code responses over Server-Sent Events (SSE) or WebSocket -> `ServletAI.stream_response()`
+- inject strategy rules, backtest statistics, and logs as context into LLM prompt -> `ServletAI.clear_history()`
 
 #### `SkinDark`
 *Feature:* Tailwind CSS dark theme tokens and appearance state management
@@ -350,39 +350,39 @@ HaruQuantAI/
 
 ---
 
-## 2. AppSQXHome — Getting Started & Shell Landing
+## 2. AppHome — Getting Started & Shell Landing
 
 - **Primary Role**: The default welcome landing workspace. Provides onboarding tutorials, recent project shortcuts, release version information, and offline documentation fallback.
-- **Dependencies**: AppStrategyQuant
+- **Dependencies**: AppPlatform
 - **Outputs / Downstream Role**: User onboarding, navigation entry points, and version inspection.
 
 ### Phase 2.1: Welcome & Landing Interface
 
-#### `AppSQXHome`
-*Feature:* Main getting started dashboard and offline onboarding interface
+#### `AppHome`
+*Feature:* Home dashboard, onboarding flow, and navigation launcher
 *Implementation Files:*
 - **Backend:** `app/workspace/home/routes.py`
 - **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`
 *Functional Requirements & Implementation:*
-- display welcome home view with quick-start action shortcuts -> `SQXHome.index()`
-- render offline onboarding flow and tutorial cards when disconnected -> `SQXHome.get_recent_projects()`
-- fetch and show latest release changelog and version updates -> `SQXHome.check_updates()`
+- display welcome home view with quick-start action shortcuts -> `Home.index()`
+- render offline onboarding flow and tutorial cards when disconnected -> `Home.get_recent_projects()`
+- fetch and show latest release changelog and version updates -> `Home.check_updates()`
 
 #### `HomeAbout`
-*Feature:* Application version information and diagnostic metadata dialog
+*Feature:* Application release metadata, system build specifications, and about dialog
 *Implementation Files:*
 - **Backend:** `app/workspace/home/routes.py`
 - **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`
 *Functional Requirements & Implementation:*
-- display StrategyQuant X version, build timestamp, and license details -> `About.about()`
-- display JVM/Python environment runtime details and installed extension list -> `About.get_system_info()`
+- display platform version, build timestamp, and license details -> `About.about()`
+- show active system directory paths, database status, and memory stats -> `About.diagnostics()`
 
 ---
 
-## 3. AppDataManager — Market Data Engine (QuantDataManager)
+## 3. AppDataManager — Market Data Engine
 
 - **Primary Role**: The historical market data repository. Manages instrument specifications, trading sessions, broker profiles, and central price bar data (M1, H1, D1, Tick). Every strategy backtesting, generation, and optimization workspace depends directly on this engine.
-- **Dependencies**: AppStrategyQuant
+- **Dependencies**: AppPlatform
 - **Outputs / Downstream Role**: Historical price bars, instrument specifications, and trading sessions for backtesting.
 
 ```mermaid
@@ -397,13 +397,13 @@ flowchart TD
         Basket["DataManagerBasket"]
     end
     subgraph S3["3. Central Catalog"]
-        Data["DataManagerData (DMDataService)"]
+        Data["DataManagerData (DataService)"]
     end
     subgraph S4["4. Data Ingestion"]
         DSFiles["DataSourceFiles"]
         DSPublic["DataSourceYahoo / Dukascopy / Crypto / TD"]
         DSBridges["DataSourceDarwinex / DataSourceMt5Api"]
-        DSSub["DataSourceSQEquityData / DataSourceSQFuturesData"]
+        DSSub["DataSourceEquities / DataSourceFutures"]
     end
     subgraph S5["5. Custom Series & Actions"]
         CustomData["DataManagerCustomData"]
@@ -530,7 +530,7 @@ flowchart TD
 *Functional Requirements & Implementation:*
 - add Dukascopy data symbols to the database -> `Dukascopy.add()`
 - identify and select instruments for Dukascopy data -> `Dukascopy.select_instruments()`
-- display StrategyQuant CDN data disclaimer -> `Dukascopy.cdn_disclaimer()`
+- display provider CDN data disclaimer -> `Dukascopy.cdn_disclaimer()`
 - display Dukascopy data disclaimer -> `Dukascopy.disclaimer()`
 - download and import Dukascopy tick and minute price data -> `Dukascopy.import_data()`
 
@@ -571,25 +571,25 @@ flowchart TD
 *Functional Requirements & Implementation:*
 - import price data directly from MetaTrader 5 terminal via Python API -> `Mt5Api.import_data()`
 
-#### `DataSourceSQEquityData`
-*Feature:* StrategyQuant US Equities subscription historical data client
+#### `DataSourceEquities`
+*Feature:* US Equities subscription historical data client
 *Implementation Files:*
-- **Backend:** `app/services/brokers/sq_equity.py`
-- **Frontend:** `ui/app/plugins/data_source/SQData/SQDataModal.tsx`
+- **Backend:** `app/services/brokers/equities.py`
+- **Frontend:** `ui/app/plugins/data_source/Equities/EquitiesModal.tsx`
 *Functional Requirements & Implementation:*
-- add StrategyQuant equity data symbols to database -> `SQEquityData.add()`
-- display StrategyQuant data usage terms and conditions -> `SQEquityData.data_usage_conditions()`
-- update existing equity historical data with latest trading sessions -> `SQEquityData.update()`
+- add US equities data symbols to database -> `EquitiesData.add()`
+- display equities data usage terms and conditions -> `EquitiesData.data_usage_conditions()`
+- update existing equity historical data with latest trading sessions -> `EquitiesData.update()`
 
-#### `DataSourceSQFuturesData`
-*Feature:* StrategyQuant Futures & BMF subscription historical data client
+#### `DataSourceFutures`
+*Feature:* Futures & Commodities subscription historical data client
 *Implementation Files:*
-- **Backend:** `app/services/brokers/sq_futures.py`
-- **Frontend:** `ui/app/plugins/data_source/SQData/SQFuturesModal.tsx`
+- **Backend:** `app/services/brokers/futures.py`
+- **Frontend:** `ui/app/plugins/data_source/Futures/FuturesModal.tsx`
 *Functional Requirements & Implementation:*
-- add StrategyQuant futures data symbols to database -> `SQFuturesData.add()`
-- display StrategyQuant futures data usage conditions -> `SQFuturesData.data_usage_conditions()`
-- update existing futures historical data with latest session bars -> `SQFuturesData.update()`
+- add futures data symbols to database -> `FuturesData.add()`
+- display futures data usage conditions -> `FuturesData.data_usage_conditions()`
+- update existing futures historical data with latest session bars -> `FuturesData.update()`
 
 ### Phase 3.5: Custom & Auxiliary Data Series
 
@@ -1031,15 +1031,15 @@ flowchart TD
 - create a new custom result analysis plugin -> `ProjectResults.new_custom_plugin()`
 
 #### `ResultsOverview`
-*Feature:* Executive strategy performance summary and template renderer
+*Feature:* Comprehensive backtest summary statistics, profit metrics, and drawdowns
 *Implementation Files:*
 - **Backend:** `app/workspace/results/reports/overview.py`
 - **Frontend:** `ui/app/workspace/Builder/results/tabs/OverviewTab.tsx`
 *Functional Requirements & Implementation:*
-- display strategy overview and key performance summary -> `Overview.overview()`
-- render strategy overview with StrategyQuant default HTML template -> `Overview.sqdefault_template()`
-- render strategy overview with TradeStation report template -> `Overview.ts_template()`
-- render strategy overview with AlgoWizard shared template -> `Overview.awshareddefault_template()`
+- render strategy overview with default HTML template -> `Overview.default_template()`
+- calculate total net profit, profit factor, Sharpe/Sortino ratios, and return/drawdown -> `Overview.calculate_metrics()`
+- display annualized returns, winning percentage, and average trade expectancy -> `Overview.annualized_stats()`
+- export performance summary report to JSON and CSV -> `Overview.export_report()`
 
 #### `ResultsReport`
 *Feature:* Comprehensive backtest performance metrics report
@@ -1256,14 +1256,15 @@ flowchart TD
 ### Phase 7.7: Source Code Generation, Savers & Loaders
 
 #### `ResultsSourceCode`
-*Feature:* Multi-language code generator (Python, MQL4, MQL5, EasyLanguage)
+*Feature:* Multi-platform strategy trading code generator and export viewer
 *Implementation Files:*
 - **Backend:** `app/workspace/results/reports/source_code.py`
 - **Frontend:** `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`
 *Functional Requirements & Implementation:*
-- display strategy generated source code -> `SourceCode.source_code()`
-- guide importing StrategyQuant custom indicators to target trading platform -> `SourceCode.custom_indicators()`
-- configure target trading platform terminal path -> `SourceCode.terminal_config()`
+- display generated strategy source code for selected platform -> `SourceCode.source_code()`
+- guide importing custom indicators to target trading platform -> `SourceCode.custom_indicators()`
+- copy generated source code to clipboard -> `SourceCode.copy_clipboard()`
+- save strategy code directly to disk (.mq4, .mq5, .cs, .py) -> `SourceCode.save_code()`
 
 #### `ResultsPlugins`
 *Feature:* Custom analysis plugin iframe sandbox
@@ -1274,14 +1275,13 @@ flowchart TD
 - display external custom analysis plugin in sandboxed iframe -> `Plugins.plugin_iframe()`
 
 #### `SaverHTML`
-*Feature:* Export backtest report to standalone HTML file
+*Feature:* Interactive HTML report exporter with embedded charts and metrics
 *Implementation Files:*
 - **Backend:** `app/workspace/results/exporters/saver_html.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
-- save report using AlgoWizard shared HTML template -> `SaverHTML.awshareddefault_template()`
-- save report using StrategyQuant default HTML template -> `SaverHTML.sqdefault_template()`
-- save report using TradeStation HTML template -> `SaverHTML.ts_template()`
+- save report using default HTML template -> `SaverHTML.default_template()`
+- export performance overview, trade list, and equity curve into self-contained HTML file -> `SaverHTML.export_html()`
 
 #### `SaverPDF`
 *Feature:* Export strategy backtest reports to PDF format
@@ -1292,13 +1292,13 @@ flowchart TD
 - render performance metrics, equity curves, and drawdowns into PDF document -> `SaverPDF.generate_pdf()`
 - generate printable executive tear-sheets with Sharpe, Sortino, and trade logs -> `SaverPDF.render_tearsheet()`
 
-#### `SaverSQ3`
-*Feature:* Legacy StrategyQuant 3 file exporter
+#### `SaverLegacyV3`
+*Feature:* Legacy binary strategy file exporter
 *Implementation Files:*
-- **Backend:** `app/workspace/results/exporters/saver_sq3.py`
+- **Backend:** `app/workspace/results/exporters/saver_legacy_v3.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
-- export strategies into legacy StrategyQuant 3 binary file format -> `SaverSQ3.export_sq3()`
+- export strategies into legacy binary file format -> `LegacySaver.export_legacy_v3()`
 
 #### `SaverStrategyTrades`
 *Feature:* Export strategy trade history to Parquet and CSV files
@@ -1309,21 +1309,21 @@ flowchart TD
 - serialize trade list to PyArrow table and write compressed Parquet file -> `SaverTrades.to_parquet()`
 - export trade records to standard CSV file format -> `SaverTrades.to_csv()`
 
-#### `LoaderSQ3`
-*Feature:* Parser and importer for legacy StrategyQuant 3 files
+#### `LoaderLegacyV3`
+*Feature:* Parser and importer for legacy v3 strategy files
 *Implementation Files:*
-- **Backend:** `app/workspace/results/loaders/loader_sq3.py`
+- **Backend:** `app/workspace/results/loaders/loader_legacy_v3.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
-- parse and deserialize StrategyQuant 3 strategy files into memory -> `LoaderSQ3.load_sq3()`
+- parse and deserialize legacy v3 strategy files into memory -> `LegacyLoader.load_legacy_v3()`
 
-#### `LoaderSQ4`
-*Feature:* Parser and importer for StrategyQuant 4 files
+#### `LoaderLegacyV4`
+*Feature:* Parser and importer for legacy v4 strategy files
 *Implementation Files:*
-- **Backend:** `app/workspace/results/loaders/loader_sq4.py`
+- **Backend:** `app/workspace/results/loaders/loader_legacy_v4.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
-- parse and deserialize StrategyQuant 4 strategy files into memory -> `LoaderSQ4.load_sq4()`
+- parse and deserialize legacy v4 strategy files into memory -> `LegacyLoader.load_legacy_v4()`
 
 ---
 
@@ -2052,7 +2052,7 @@ flowchart TD
 
 ## 13. AppGridControl & AppGridTest — Distributed Grid Computing Workspaces
 
-- **Primary Role**: Distributed computation management. Connects local StrategyQuant X instances to remote grid worker nodes to scale heavy genetic builds, Walk-Forward optimizations, and Monte Carlo simulations across clusters of machines.
+- **Primary Role**: Distributed computation management. Connects local platform instances to remote grid worker nodes to scale heavy genetic builds, Walk-Forward optimizations, and Monte Carlo simulations across clusters of machines.
 - **Dependencies**: AppTaskManager, AppBuilder, AppOptimizer
 - **Outputs / Downstream Role**: Distributed computing cluster management and worker node validation.
 
@@ -2083,7 +2083,7 @@ flowchart TD
 ## 14. AppMarketplace — Community Extensions & Marketplace Workspace
 
 - **Primary Role**: Ecosystem repository for discovering, downloading, and sharing custom indicators, building blocks, presets, and strategy templates.
-- **Dependencies**: AppCodeEditor, AppStrategyQuant
+- **Dependencies**: AppCodeEditor, AppPlatform
 - **Outputs / Downstream Role**: Installed community extensions and presets.
 
 ### Phase 14.1: Marketplace Client
@@ -2100,29 +2100,29 @@ flowchart TD
 
 ---
 
-## 15. AppSQXBusiness — Enterprise & Institutional Features Workspace
+## 15. AppBusiness — Enterprise & Institutional Features Workspace
 
 - **Primary Role**: Commercial and B2B workspace offering white-labeling, institutional analytics, and enterprise multi-account licensing management.
-- **Dependencies**: AppStrategyQuant
+- **Dependencies**: AppPlatform
 - **Outputs / Downstream Role**: Enterprise management features.
 
 ### Phase 15.1: Commercial Client
 
-#### `AppSQXBusiness`
+#### `AppBusiness`
 *Feature:* Enterprise multi-account licensing and institutional features
 *Implementation Files:*
 - **Backend:** `app/workspace/business/business.py`
 - **Frontend:** `ui/app/workspace/Business/BusinessWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- manage institutional enterprise licenses and multi-account permissions -> `SQXBusiness.manage_licenses()`
-- export white-label executive strategy fact-sheets and compliance reports -> `SQXBusiness.generate_audit_report()`
+- manage institutional enterprise licenses and multi-account permissions -> `Business.manage_licenses()`
+- export white-label executive strategy fact-sheets and compliance reports -> `Business.generate_audit_report()`
 
 ---
 
 ## 16. AppDebugConsole — Diagnostic Logging & Memory Monitor Workspace
 
 - **Primary Role**: Developer diagnostic workspace. Provides real-time JVM memory usage graphs, active thread monitoring, garbage collection triggers, and system error log inspection.
-- **Dependencies**: AppStrategyQuant
+- **Dependencies**: AppPlatform
 - **Outputs / Downstream Role**: System health metrics and debugging telemetry.
 
 ### Phase 16.1: Diagnostic Tools
