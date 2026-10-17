@@ -154,11 +154,11 @@ HaruQuantAI/
 - **Backend:** `app/host/bootstrap.py`
 - **Frontend:** `ui/app/host/HostConnectionModal.tsx`
 *Functional Requirements & Implementation:*
-- bootstrap FastAPI backend application with CORS, security headers, and Uvicorn server -> `AppHost.startup()`
-- initialize SQLite database with WAL mode and coordinated write locks -> `AppHost.initialize_db()`
-- register and initialize all domain feature modules and background worker processes -> `AppHost.register_modules()`
-- provide global in-memory event bus and WebSocket broadcast channel -> `AppHost.broadcast_event()`
-- manage application graceful shutdown, process termination, and resource cleanup -> `AppHost.shutdown()`
+- [ ] bootstrap FastAPI backend application with CORS, security headers, and Uvicorn server -> `AppHost.startup()`
+- [ ] initialize SQLite database with WAL mode and coordinated write locks -> `AppHost.initialize_db()`
+- [ ] register and initialize all domain feature modules and background worker processes -> `AppHost.register_modules()`
+- [ ] provide global in-memory event bus and WebSocket broadcast channel -> `AppHost.broadcast_event()`
+- [ ] manage application graceful shutdown, process termination, and resource cleanup -> `AppHost.shutdown()`
 
 ### Phase 1.2: Platform & Broker Connectivity
 
@@ -168,9 +168,9 @@ HaruQuantAI/
 - **Backend:** `app/host/transport.py`
 - **Frontend:** `ui/app/host/HostConnectionModal.tsx`
 *Functional Requirements & Implementation:*
-- ping remote and local server endpoints to verify network connectivity -> `ConnectionTest.ping_endpoint()`
-- measure round-trip latency and report packet loss -> `ConnectionTest.check_latency()`
-- diagnose DNS resolution and socket connection failures -> `ConnectionTest.diagnose_network()`
+- [ ] ping remote and local server endpoints to verify network connectivity -> `ConnectionTest.ping_endpoint()`
+- [ ] measure round-trip latency and report packet loss -> `ConnectionTest.check_latency()`
+- [ ] diagnose DNS resolution and socket connection failures -> `ConnectionTest.diagnose_network()`
 
 #### `ConnectionLiveTest`
 *Feature:* Live trading account authentication and latency verification
@@ -178,9 +178,9 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/registry.py`
 - **Frontend:** `ui/app/workspace/Trading/TradingDashboard.tsx`
 *Functional Requirements & Implementation:*
-- validate live broker credentials and API tokens against broker gateways -> `LiveTest.validate_credentials()`
-- measure order placement and quote streaming round-trip latency -> `LiveTest.measure_trading_latency()`
-- verify account trading permissions and margin currency settings -> `LiveTest.verify_trading_permissions()`
+- [ ] validate live broker credentials and API tokens against broker gateways -> `LiveTest.validate_credentials()`
+- [ ] measure order placement and quote streaming round-trip latency -> `LiveTest.measure_trading_latency()`
+- [ ] verify account trading permissions and margin currency settings -> `LiveTest.verify_trading_permissions()`
 
 #### `ConnectionMT4`
 *Feature:* MetaTrader terminal bridge adapter (Target Stack: MetaTrader 5 Python adapter)
@@ -188,11 +188,11 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/metatrader.py`
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
 *Functional Requirements & Implementation:*
-- initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python package -> `ConnectionMT5.initialize()`
-- query account balance, equity, leverage, server time, and broker specifications -> `ConnectionMT5.get_account_info()`
-- stream live tick and bar price feeds into memory queues -> `ConnectionMT5.stream_ticks()`
-- dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal -> `ConnectionMT5.send_order()`
-- terminate terminal connection session and release resources -> `ConnectionMT5.shutdown()`
+- [ ] initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python package -> `ConnectionMT5.initialize()`
+- [ ] query account balance, equity, leverage, server time, and broker specifications -> `ConnectionMT5.get_account_info()`
+- [ ] stream live tick and bar price feeds into memory queues -> `ConnectionMT5.stream_ticks()`
+- [ ] dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal -> `ConnectionMT5.send_order()`
+- [ ] terminate terminal connection session and release resources -> `ConnectionMT5.shutdown()`
 
 ### Phase 1.3: Cryptocurrency Exchange Adapters
 
@@ -202,10 +202,10 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- fetch Binance spot exchange info, tradable symbols, and price filters -> `BinanceSpot.get_exchange_info()`
-- stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket -> `BinanceSpot.stream_klines()`
-- download historical Kline bar archives for backtesting -> `BinanceSpot.download_historical_bars()`
-- execute spot limit and market orders with HMAC SHA256 signature authentication -> `BinanceSpot.place_order()`
+- [ ] fetch Binance spot exchange info, tradable symbols, and price filters -> `BinanceSpot.get_exchange_info()`
+- [ ] stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket -> `BinanceSpot.stream_klines()`
+- [ ] download historical Kline bar archives for backtesting -> `BinanceSpot.download_historical_bars()`
+- [ ] execute spot limit and market orders with HMAC SHA256 signature authentication -> `BinanceSpot.place_order()`
 
 #### `CryptoExchangeBinanceCoinM`
 *Feature:* Binance Coin-Margined Delivery and Perpetual Futures adapter
@@ -213,10 +213,10 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- fetch Coin-M contract specifications and index prices -> `BinanceCoinM.get_contracts()`
-- fetch Coin-M funding rates and historical intervals -> `BinanceCoinM.get_funding_rate()`
-- stream real-time futures mark price and order book depth -> `BinanceCoinM.stream_mark_price()`
-- manage Coin-M positions, leverage brackets, and margin types -> `BinanceCoinM.set_leverage()`
+- [ ] fetch Coin-M contract specifications and index prices -> `BinanceCoinM.get_contracts()`
+- [ ] fetch Coin-M funding rates and historical intervals -> `BinanceCoinM.get_funding_rate()`
+- [ ] stream real-time futures mark price and order book depth -> `BinanceCoinM.stream_mark_price()`
+- [ ] manage Coin-M positions, leverage brackets, and margin types -> `BinanceCoinM.set_leverage()`
 
 #### `CryptoExchangeBinanceUsdtM`
 *Feature:* Binance USDT-Margined Perpetual Futures adapter
@@ -224,10 +224,10 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- fetch USDT-M contract rules, tick sizes, step sizes, and funding intervals -> `BinanceUsdtM.get_exchange_info()`
-- stream real-time USDT-M Kline bars and aggregated trade events -> `BinanceUsdtM.stream_trades()`
-- download historical USDT-M futures Kline bar archives -> `BinanceUsdtM.download_futures_klines()`
-- place and cancel futures limit, stop-market, and trailing stop orders -> `BinanceUsdtM.send_futures_order()`
+- [ ] fetch USDT-M contract rules, tick sizes, step sizes, and funding intervals -> `BinanceUsdtM.get_exchange_info()`
+- [ ] stream real-time USDT-M Kline bars and aggregated trade events -> `BinanceUsdtM.stream_trades()`
+- [ ] download historical USDT-M futures Kline bar archives -> `BinanceUsdtM.download_futures_klines()`
+- [ ] place and cancel futures limit, stop-market, and trailing stop orders -> `BinanceUsdtM.send_futures_order()`
 
 #### `CryptoExchangeBitfinex`
 *Feature:* Bitfinex exchange REST and WebSocket market data adapter
@@ -235,9 +235,9 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/exchanges/bitfinex.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- fetch Bitfinex currency pairs, symbols, and minimum order sizes -> `Bitfinex.get_symbols()`
-- stream real-time raw book and candle feeds over WebSocket -> `Bitfinex.stream_candles()`
-- query historical candle archives for backtesting -> `Bitfinex.fetch_candles()`
+- [ ] fetch Bitfinex currency pairs, symbols, and minimum order sizes -> `Bitfinex.get_symbols()`
+- [ ] stream real-time raw book and candle feeds over WebSocket -> `Bitfinex.stream_candles()`
+- [ ] query historical candle archives for backtesting -> `Bitfinex.fetch_candles()`
 
 #### `CryptoExchangeCoinbasePro`
 *Feature:* Coinbase Advanced Trade REST and WebSocket client
@@ -245,9 +245,9 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/exchanges/coinbase.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- fetch Coinbase product catalog, base/quote currencies, and increments -> `Coinbase.get_products()`
-- stream live market trades and heartbeats via Coinbase WebSocket -> `Coinbase.stream_market_data()`
-- download historical candle data chunks and save to Parquet -> `Coinbase.download_candles()`
+- [ ] fetch Coinbase product catalog, base/quote currencies, and increments -> `Coinbase.get_products()`
+- [ ] stream live market trades and heartbeats via Coinbase WebSocket -> `Coinbase.stream_market_data()`
+- [ ] download historical candle data chunks and save to Parquet -> `Coinbase.download_candles()`
 
 #### `CryptoExchangePoloniex`
 *Feature:* Poloniex exchange market data connector
@@ -255,8 +255,8 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/exchanges/poloniex.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- query Poloniex market definitions and trading rules -> `Poloniex.get_markets()`
-- fetch historical candlestick records for crypto asset pairs -> `Poloniex.get_candles()`
+- [ ] query Poloniex market definitions and trading rules -> `Poloniex.get_markets()`
+- [ ] fetch historical candlestick records for crypto asset pairs -> `Poloniex.get_candles()`
 
 ### Phase 1.4: Core Infrastructure Servlets & Theming
 
@@ -266,10 +266,10 @@ HaruQuantAI/
 - **Backend:** `app/host/transport.py`
 - **Frontend:** `ui/app/host/HostConnectionModal.tsx`
 *Functional Requirements & Implementation:*
-- list existing broker and exchange connections -> `ServletConnection.list_connections()`
-- save or update connection credentials in SQLite -> `ServletConnection.save_connection()`
-- delete connection configuration and cached tokens -> `ServletConnection.delete_connection()`
-- test connection credentials and report latency status to frontend -> `ServletConnection.test_connection()`
+- [ ] list existing broker and exchange connections -> `ServletConnection.list_connections()`
+- [ ] save or update connection credentials in SQLite -> `ServletConnection.save_connection()`
+- [ ] delete connection configuration and cached tokens -> `ServletConnection.delete_connection()`
+- [ ] test connection credentials and report latency status to frontend -> `ServletConnection.test_connection()`
 
 #### `ServletConstants`
 *Feature:* System constants, environment paths, and runtime metadata endpoints
@@ -277,8 +277,8 @@ HaruQuantAI/
 - **Backend:** `app/host/transport.py`
 - **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 *Functional Requirements & Implementation:*
-- expose application version, build timestamp, and runtime environment paths -> `ServletConstants.get_constants()`
-- serve system resource limits, hardware concurrency specs, and supported timeframes -> `ServletConstants.get_system_specs()`
+- [ ] expose application version, build timestamp, and runtime environment paths -> `ServletConstants.get_constants()`
+- [ ] serve system resource limits, hardware concurrency specs, and supported timeframes -> `ServletConstants.get_system_specs()`
 
 #### `ServletProject`
 *Feature:* FastAPI project manifest persistence router
@@ -286,10 +286,10 @@ HaruQuantAI/
 - **Backend:** `app/workspace/custom_projects/routes.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/projectClient.ts`
 *Functional Requirements & Implementation:*
-- list existing projects with last-modified timestamps and execution statuses -> `ServletProject.list_projects()`
-- load project definition, task configuration, and workflow pipeline -> `ServletProject.load_project()`
-- save or update project definitions and task DAG to SQLite -> `ServletProject.save_project()`
-- delete project configuration and associated temporary artifacts -> `ServletProject.delete_project()`
+- [ ] list existing projects with last-modified timestamps and execution statuses -> `ServletProject.list_projects()`
+- [ ] load project definition, task configuration, and workflow pipeline -> `ServletProject.load_project()`
+- [ ] save or update project definitions and task DAG to SQLite -> `ServletProject.save_project()`
+- [ ] delete project configuration and associated temporary artifacts -> `ServletProject.delete_project()`
 
 #### `ServletRenameTool`
 *Feature:* Bulk renaming and alias management API
@@ -297,8 +297,8 @@ HaruQuantAI/
 - **Backend:** `app/workspace/results/databank/rename.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankRenameController.tsx`
 *Functional Requirements & Implementation:*
-- apply regex and template pattern replacements across symbol, databank, and strategy names -> `ServletRenameTool.batch_rename()`
-- validate proposed renamed entities for naming collisions and illegal characters -> `ServletRenameTool.validate_names()`
+- [ ] apply regex and template pattern replacements across symbol, databank, and strategy names -> `ServletRenameTool.batch_rename()`
+- [ ] validate proposed renamed entities for naming collisions and illegal characters -> `ServletRenameTool.validate_names()`
 
 #### `ServletGridControl`
 *Feature:* FastAPI WebSocket and IPC router for distributed worker nodes
@@ -306,9 +306,9 @@ HaruQuantAI/
 - **Backend:** `app/workspace/grid_control/routes.py`
 - **Frontend:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- authenticate and accept remote worker node WebSocket connections -> `ServletGridControl.register_worker()`
-- route calculation jobs (backtests, optimizations, Monte Carlo) to idle workers -> `ServletGridControl.stream_worker_status()`
-- stream worker health metrics and heartbeats to frontend Dockview panel -> `ServletGridControl.cancel_task()`
+- [ ] authenticate and accept remote worker node WebSocket connections -> `ServletGridControl.register_worker()`
+- [ ] route calculation jobs (backtests, optimizations, Monte Carlo) to idle workers -> `ServletGridControl.stream_worker_status()`
+- [ ] stream worker health metrics and heartbeats to frontend Dockview panel -> `ServletGridControl.cancel_task()`
 
 #### `ServletAlgoCloud`
 *Feature:* Cloud synchronization and strategy sharing endpoints
@@ -316,9 +316,9 @@ HaruQuantAI/
 - **Backend:** `app/workspace/marketplace/routes.py`
 - **Frontend:** `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- synchronize strategies and databanks with AlgoCloud cloud platform -> `ServletAlgoCloud.sync_strategies()`
-- authenticate cloud user account and fetch plan quotas and subscription limits -> `ServletAlgoCloud.get_user_plan()`
-- download pre-built shared strategy templates and market data packages -> `ServletAlgoCloud.download_package()`
+- [ ] synchronize strategies and databanks with AlgoCloud cloud platform -> `ServletAlgoCloud.sync_strategies()`
+- [ ] authenticate cloud user account and fetch plan quotas and subscription limits -> `ServletAlgoCloud.get_user_plan()`
+- [ ] download pre-built shared strategy templates and market data packages -> `ServletAlgoCloud.download_package()`
 
 #### `ServletAI`
 *Feature:* AI assistant chat streaming and context injection gateway
@@ -326,9 +326,9 @@ HaruQuantAI/
 - **Backend:** `app/workspace/neural_network/routes.py`
 - **Frontend:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
 *Functional Requirements & Implementation:*
-- accept natural language user queries regarding strategy development and codebase -> `ServletAI.send_message()`
-- stream AI assistant reasoning and code responses over Server-Sent Events (SSE) or WebSocket -> `ServletAI.stream_response()`
-- inject strategy rules, backtest statistics, and logs as context into LLM prompt -> `ServletAI.clear_history()`
+- [ ] accept natural language user queries regarding strategy development and codebase -> `ServletAI.send_message()`
+- [ ] stream AI assistant reasoning and code responses over Server-Sent Events (SSE) or WebSocket -> `ServletAI.stream_response()`
+- [ ] inject strategy rules, backtest statistics, and logs as context into LLM prompt -> `ServletAI.clear_history()`
 
 #### `SkinDark`
 *Feature:* Tailwind CSS dark theme tokens and appearance state management
@@ -336,8 +336,8 @@ HaruQuantAI/
 - **Backend:** `app/host/settings.py`
 - **Frontend:** `ui/app/components/ThemeToggle.tsx`
 *Functional Requirements & Implementation:*
-- apply dark theme class to root HTML element and style Dockview headers -> `Theme.set_dark()`
-- provide dark mode color variables, background shades, and typography tokens -> `Theme.get_tokens()`
+- [ ] apply dark theme class to root HTML element and style Dockview headers -> `Theme.set_dark()`
+- [ ] provide dark mode color variables, background shades, and typography tokens -> `Theme.get_tokens()`
 
 #### `SkinLight`
 *Feature:* Tailwind CSS light theme tokens and palette definitions
@@ -345,8 +345,8 @@ HaruQuantAI/
 - **Backend:** `app/host/settings.py`
 - **Frontend:** `ui/app/components/ThemeToggle.tsx`
 *Functional Requirements & Implementation:*
-- provide light mode color variables, clean white/gray surfaces, and contrast borders -> `Theme.set_light()`
-- apply light theme styling to Dockview panels, TanStack tables, and charts -> `Theme.get_light_tokens()`
+- [ ] provide light mode color variables, clean white/gray surfaces, and contrast borders -> `Theme.set_light()`
+- [ ] apply light theme styling to Dockview panels, TanStack tables, and charts -> `Theme.get_light_tokens()`
 
 ---
 
@@ -364,9 +364,9 @@ HaruQuantAI/
 - **Backend:** `app/workspace/home/routes.py`
 - **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`
 *Functional Requirements & Implementation:*
-- display welcome home view with quick-start action shortcuts -> `Home.index()`
-- render offline onboarding flow and tutorial cards when disconnected -> `Home.get_recent_projects()`
-- fetch and show latest release changelog and version updates -> `Home.check_updates()`
+- [ ] display welcome home view with quick-start action shortcuts -> `Home.index()`
+- [ ] render offline onboarding flow and tutorial cards when disconnected -> `Home.get_recent_projects()`
+- [ ] fetch and show latest release changelog and version updates -> `Home.check_updates()`
 
 #### `HomeAbout`
 *Feature:* Application release metadata, system build specifications, and about dialog
@@ -374,8 +374,8 @@ HaruQuantAI/
 - **Backend:** `app/workspace/home/routes.py`
 - **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`
 *Functional Requirements & Implementation:*
-- display platform version, build timestamp, and license details -> `About.about()`
-- show active system directory paths, database status, and memory stats -> `About.diagnostics()`
+- [ ] display platform version, build timestamp, and license details -> `About.about()`
+- [ ] show active system directory paths, database status, and memory stats -> `About.diagnostics()`
 
 ---
 
@@ -436,10 +436,10 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/instruments.py`
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/Instruments/InstrumentsModal.tsx`
 *Functional Requirements & Implementation:*
-- list all configured instruments with point/pip sizes, contract sizes, and margins -> `Instruments.instruments()`
-- add new instrument specifications to SQLite database -> `Instruments.add_instrument()`
-- edit one or more existing instrument definitions in bulk -> `Instruments.mass_edit_instruments()`
-- clone an existing instrument to create a new specification -> `Instruments.clone_instrument()`
+- [ ] list all configured instruments with point/pip sizes, contract sizes, and margins -> `Instruments.instruments()`
+- [ ] add new instrument specifications to SQLite database -> `Instruments.add_instrument()`
+- [ ] edit one or more existing instrument definitions in bulk -> `Instruments.mass_edit_instruments()`
+- [ ] clone an existing instrument to create a new specification -> `Instruments.clone_instrument()`
 
 #### `DataManagerSessions`
 *Feature:* Trading session profiles and market hours scheduler
@@ -447,10 +447,10 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/sessions.py`
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/Sessions/SessionsModal.tsx`
 *Functional Requirements & Implementation:*
-- list all trading session profiles and holiday calendars -> `Sessions.sessions()`
-- create, clone, and delete trading sessions with timezone shifts -> `Sessions.clone_session()`
-- add and configure session time intervals (daily open, close, lunch pauses) -> `Sessions.session_element()`
-- configure and save reusable session templates -> `Sessions.session_template()`
+- [ ] list all trading session profiles and holiday calendars -> `Sessions.sessions()`
+- [ ] create, clone, and delete trading sessions with timezone shifts -> `Sessions.clone_session()`
+- [ ] add and configure session time intervals (daily open, close, lunch pauses) -> `Sessions.session_element()`
+- [ ] configure and save reusable session templates -> `Sessions.session_template()`
 
 #### `DataManagerConnections`
 *Feature:* Data feed and broker account connection manager
@@ -458,9 +458,9 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/connections.py`
 - **Frontend:** `ui/app/plugins/data_source/Common/DataSourceRibbon.tsx`
 *Functional Requirements & Implementation:*
-- list all external market data provider connections -> `Connections.list_connections()`
-- add or edit external market data provider credentials -> `Connections.add_connection()`
-- test real-time connectivity and authenticate data subscription feeds -> `Connections.test_feed_connection()`
+- [ ] list all external market data provider connections -> `Connections.list_connections()`
+- [ ] add or edit external market data provider credentials -> `Connections.add_connection()`
+- [ ] test real-time connectivity and authenticate data subscription feeds -> `Connections.test_feed_connection()`
 
 ### Phase 3.2: Profiles & Grouping Aggregators
 
@@ -470,11 +470,11 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/broker.py`
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
 *Functional Requirements & Implementation:*
-- list all broker profiles configured in the system -> `Broker.brokers()`
-- add or edit broker profiles with custom spread and commission models -> `Broker.add_broker()`
-- edit stock symbols assigned to a broker profile -> `Broker.edit_stocks()`
-- import instrument definitions from external XML/JSON files -> `Broker.import_instruments()`
-- import trading session definitions from external XML/JSON files -> `Broker.import_sessions()`
+- [ ] list all broker profiles configured in the system -> `Broker.brokers()`
+- [ ] add or edit broker profiles with custom spread and commission models -> `Broker.add_broker()`
+- [ ] edit stock symbols assigned to a broker profile -> `Broker.edit_stocks()`
+- [ ] import instrument definitions from external XML/JSON files -> `Broker.import_instruments()`
+- [ ] import trading session definitions from external XML/JSON files -> `Broker.import_sessions()`
 
 #### `DataManagerBasket`
 *Feature:* Stock basket and symbol grouping watchlist manager
@@ -482,9 +482,9 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/baskets.py`
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/StockGroups/StockGroupsModal.tsx`
 *Functional Requirements & Implementation:*
-- list all stock baskets and symbol groupings -> `Basket.baskets()`
-- create new stock basket groups (e.g. S&P 500, Tech, Forex Majors) -> `Basket.add_basket()`
-- edit and maintain symbol membership in selected baskets -> `Basket.edit_stocks()`
+- [ ] list all stock baskets and symbol groupings -> `Basket.baskets()`
+- [ ] create new stock basket groups (e.g. S&P 500, Tech, Forex Majors) -> `Basket.add_basket()`
+- [ ] edit and maintain symbol membership in selected baskets -> `Basket.edit_stocks()`
 
 ### Phase 3.3: Central Data Hub & Catalog Engine
 
@@ -494,10 +494,10 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/data.py`
 - **Frontend:** `ui/app/workspace/DataManager/DataManager.tsx`
 *Functional Requirements & Implementation:*
-- list all imported price data symbols with timeframes, date ranges, and bar counts -> `Data.data()`
-- edit symbol properties, associated broker profile, and session template -> `Data.data_edit()`
-- confirm and delete selected price data symbols and clear cached bar files -> `Data.data_delete_confirm()`
-- add BMF futures data symbols to the database -> `Data.add_br()`
+- [ ] list all imported price data symbols with timeframes, date ranges, and bar counts -> `Data.data()`
+- [ ] edit symbol properties, associated broker profile, and session template -> `Data.data_edit()`
+- [ ] confirm and delete selected price data symbols and clear cached bar files -> `Data.data_delete_confirm()`
+- [ ] add BMF futures data symbols to the database -> `Data.add_br()`
 
 ### Phase 3.4: Data Ingestion (Data Sources)
 
@@ -507,11 +507,11 @@ flowchart TD
 - **Backend:** `app/services/brokers/files.py`
 - **Frontend:** `ui/app/plugins/data_source/FileImport/FileImportModal.tsx`
 *Functional Requirements & Implementation:*
-- add new symbol definition from local historical data file -> `Files.add()`
-- import price data from local files into Parquet storage -> `Files.import_data()`
-- import price data directly from external trading applications -> `Files.app_import()`
-- define and save custom text/CSV file delimiter and column formats -> `Files.new_format()`
-- perform bulk mass import of multiple data files across directories -> `Files.mass_import()`
+- [ ] add new symbol definition from local historical data file -> `Files.add()`
+- [ ] import price data from local files into Parquet storage -> `Files.import_data()`
+- [ ] import price data directly from external trading applications -> `Files.app_import()`
+- [ ] define and save custom text/CSV file delimiter and column formats -> `Files.new_format()`
+- [ ] perform bulk mass import of multiple data files across directories -> `Files.mass_import()`
 
 #### `DataSourceYahoo`
 *Feature:* Yahoo Finance historical daily and weekly data downloader
@@ -519,8 +519,8 @@ flowchart TD
 - **Backend:** `app/services/brokers/yahoo.py`
 - **Frontend:** `ui/app/plugins/data_source/Yahoo/YahooModal.tsx`
 *Functional Requirements & Implementation:*
-- add Yahoo Finance data symbols to the database -> `Yahoo.add()`
-- download historical OHLCV price bars from Yahoo Finance -> `Yahoo.download()`
+- [ ] add Yahoo Finance data symbols to the database -> `Yahoo.add()`
+- [ ] download historical OHLCV price bars from Yahoo Finance -> `Yahoo.download()`
 
 #### `DataSourceDukascopy`
 *Feature:* Dukascopy high-precision forex and CFD data downloader
@@ -528,11 +528,11 @@ flowchart TD
 - **Backend:** `app/services/brokers/dukascopy.py`
 - **Frontend:** `ui/app/plugins/data_source/Dukascopy/DukascopyModal.tsx`
 *Functional Requirements & Implementation:*
-- add Dukascopy data symbols to the database -> `Dukascopy.add()`
-- identify and select instruments for Dukascopy data -> `Dukascopy.select_instruments()`
-- display provider CDN data disclaimer -> `Dukascopy.cdn_disclaimer()`
-- display Dukascopy data disclaimer -> `Dukascopy.disclaimer()`
-- download and import Dukascopy tick and minute price data -> `Dukascopy.import_data()`
+- [ ] add Dukascopy data symbols to the database -> `Dukascopy.add()`
+- [ ] identify and select instruments for Dukascopy data -> `Dukascopy.select_instruments()`
+- [ ] display provider CDN data disclaimer -> `Dukascopy.cdn_disclaimer()`
+- [ ] display Dukascopy data disclaimer -> `Dukascopy.disclaimer()`
+- [ ] download and import Dukascopy tick and minute price data -> `Dukascopy.import_data()`
 
 #### `DataSourceCrypto`
 *Feature:* Cryptocurrency exchange historical price data downloader
@@ -540,8 +540,8 @@ flowchart TD
 - **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- add cryptocurrency data symbols and exchange pairs to database -> `Crypto.add()`
-- download and import historical crypto candlestick data -> `Crypto.import_data()`
+- [ ] add cryptocurrency data symbols and exchange pairs to database -> `Crypto.add()`
+- [ ] download and import historical crypto candlestick data -> `Crypto.import_data()`
 
 #### `DataSourceTD`
 *Feature:* TickDownloader historical data importer
@@ -549,7 +549,7 @@ flowchart TD
 - **Backend:** `app/services/brokers/tick_downloader.py`
 - **Frontend:** `ui/app/plugins/data_source/TickDownloader/TickDownloaderModal.tsx`
 *Functional Requirements & Implementation:*
-- import historical tick and minute price data generated by TickDownloader -> `TD.import_data()`
+- [ ] import historical tick and minute price data generated by TickDownloader -> `TD.import_data()`
 
 #### `DataSourceDarwinex`
 *Feature:* Darwinex broker tick/minute data bridge
@@ -557,11 +557,11 @@ flowchart TD
 - **Backend:** `app/services/brokers/darwinex.py`
 - **Frontend:** `ui/app/plugins/data_source/Darwinex/DarwinexModal.tsx`
 *Functional Requirements & Implementation:*
-- add Darwinex data symbols to the database -> `Darwinex.add()`
-- display Darwinex data disclaimer -> `Darwinex.darwinex_disclaimer()`
-- download data from Darwinex -> `Darwinex.download()`
-- import data downloaded from Darwinex -> `Darwinex.import_data()`
-- identify and select instruments for Darwinex data -> `Darwinex.select_instruments()`
+- [ ] add Darwinex data symbols to the database -> `Darwinex.add()`
+- [ ] display Darwinex data disclaimer -> `Darwinex.darwinex_disclaimer()`
+- [ ] download data from Darwinex -> `Darwinex.download()`
+- [ ] import data downloaded from Darwinex -> `Darwinex.import_data()`
+- [ ] identify and select instruments for Darwinex data -> `Darwinex.select_instruments()`
 
 #### `DataSourceMt5Api`
 *Feature:* MetaTrader 5 API direct historical data importer
@@ -569,7 +569,7 @@ flowchart TD
 - **Backend:** `app/services/brokers/metatrader.py`
 - **Frontend:** `ui/app/plugins/data_source/MetaTrader/Mt5ImportModal.tsx`
 *Functional Requirements & Implementation:*
-- import price data directly from MetaTrader 5 terminal via Python API -> `Mt5Api.import_data()`
+- [ ] import price data directly from MetaTrader 5 terminal via Python API -> `Mt5Api.import_data()`
 
 #### `DataSourceEquities`
 *Feature:* US Equities subscription historical data client
@@ -577,9 +577,9 @@ flowchart TD
 - **Backend:** `app/services/brokers/equities.py`
 - **Frontend:** `ui/app/plugins/data_source/Equities/EquitiesModal.tsx`
 *Functional Requirements & Implementation:*
-- add US equities data symbols to database -> `EquitiesData.add()`
-- display equities data usage terms and conditions -> `EquitiesData.data_usage_conditions()`
-- update existing equity historical data with latest trading sessions -> `EquitiesData.update()`
+- [ ] add US equities data symbols to database -> `EquitiesData.add()`
+- [ ] display equities data usage terms and conditions -> `EquitiesData.data_usage_conditions()`
+- [ ] update existing equity historical data with latest trading sessions -> `EquitiesData.update()`
 
 #### `DataSourceFutures`
 *Feature:* Futures & Commodities subscription historical data client
@@ -587,9 +587,9 @@ flowchart TD
 - **Backend:** `app/services/brokers/futures.py`
 - **Frontend:** `ui/app/plugins/data_source/Futures/FuturesModal.tsx`
 *Functional Requirements & Implementation:*
-- add futures data symbols to database -> `FuturesData.add()`
-- display futures data usage conditions -> `FuturesData.data_usage_conditions()`
-- update existing futures historical data with latest session bars -> `FuturesData.update()`
+- [ ] add futures data symbols to database -> `FuturesData.add()`
+- [ ] display futures data usage conditions -> `FuturesData.data_usage_conditions()`
+- [ ] update existing futures historical data with latest session bars -> `FuturesData.update()`
 
 ### Phase 3.5: Custom & Auxiliary Data Series
 
@@ -599,14 +599,14 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/custom_data.py`
 - **Frontend:** `ui/app/plugins/data_source/Tools/CustomDataModal.tsx`
 *Functional Requirements & Implementation:*
-- list all custom and external data series -> `CustomData.custom_data()`
-- add external indicators and non-price custom data to database -> `CustomData.custom_data_add()`
-- update Commitments of Traders (COT) historical data reports -> `CustomData.custom_data_cot()`
-- import custom indicator and macro series from files -> `CustomData.custom_data_import()`
-- create new data format definitions for custom data import -> `CustomData.custom_data_new_format()`
-- recognize custom data structure and delimiters automatically from file -> `CustomData.custom_data_recognize()`
-- view custom data records in table and interactive chart -> `CustomData.custom_data_view()`
-- confirm deletion of custom data series -> `CustomData.custom_data_delete_confirm()`
+- [ ] list all custom and external data series -> `CustomData.custom_data()`
+- [ ] add external indicators and non-price custom data to database -> `CustomData.custom_data_add()`
+- [ ] update Commitments of Traders (COT) historical data reports -> `CustomData.custom_data_cot()`
+- [ ] import custom indicator and macro series from files -> `CustomData.custom_data_import()`
+- [ ] create new data format definitions for custom data import -> `CustomData.custom_data_new_format()`
+- [ ] recognize custom data structure and delimiters automatically from file -> `CustomData.custom_data_recognize()`
+- [ ] view custom data records in table and interactive chart -> `CustomData.custom_data_view()`
+- [ ] confirm deletion of custom data series -> `CustomData.custom_data_delete_confirm()`
 
 ### Phase 3.6: Post-Processing, Transformations & Exports
 
@@ -616,15 +616,15 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/actions/review/quality.py`
 - **Frontend:** `ui/app/plugins/data_source/Tools/DataToolsModal.tsx`
 *Functional Requirements & Implementation:*
-- clone price data to a specified timezone offset with bar timestamp shifts -> `Actions.clone_to_timezone()`
-- export price data to CSV format with custom headers and delimiters -> `Actions.export_to_csv()`
-- create new CSV export format configurations -> `Actions.new_format()`
-- export price data to MetaTrader 4 FXT and HST files -> `Actions.export_to_mt4()`
-- export price data to MetaTrader 5 format -> `Actions.export_to_mt5()`
-- open data review modal to view data details and summary statistics -> `Actions.review()`
-- display interactive candlestick price chart in data review -> `Actions.review_chart()`
-- display raw bar table in data review -> `Actions.review_data()`
-- perform data quality audit and gap analysis across timeframes -> `Actions.quality()`
+- [ ] clone price data to a specified timezone offset with bar timestamp shifts -> `Actions.clone_to_timezone()`
+- [ ] export price data to CSV format with custom headers and delimiters -> `Actions.export_to_csv()`
+- [ ] create new CSV export format configurations -> `Actions.new_format()`
+- [ ] export price data to MetaTrader 4 FXT and HST files -> `Actions.export_to_mt4()`
+- [ ] export price data to MetaTrader 5 format -> `Actions.export_to_mt5()`
+- [ ] open data review modal to view data details and summary statistics -> `Actions.review()`
+- [ ] display interactive candlestick price chart in data review -> `Actions.review_chart()`
+- [ ] display raw bar table in data review -> `Actions.review_data()`
+- [ ] perform data quality audit and gap analysis across timeframes -> `Actions.quality()`
 
 ### Phase 3.7: Monitoring, Shell & UI Support
 
@@ -634,8 +634,8 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/routes.py`
 - **Frontend:** `ui/app/workspace/DataManager/DataManager.tsx`
 *Functional Requirements & Implementation:*
-- host dockable tabs for Instruments, Sessions, Brokers, Data, and Custom Data -> `AppDataManager.init_workspace()`
-- coordinate active symbol selections and synchronize data tables with charts -> `AppDataManager.open_tab()`
+- [ ] host dockable tabs for Instruments, Sessions, Brokers, Data, and Custom Data -> `AppDataManager.init_workspace()`
+- [ ] coordinate active symbol selections and synchronize data tables with charts -> `AppDataManager.open_tab()`
 
 #### `DataManagerLog`
 *Feature:* Real-time WebSocket log viewer for data operations
@@ -643,8 +643,8 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/log.py`
 - **Frontend:** `ui/app/workspace/DataManager/dataManagerLogClient.ts`
 *Functional Requirements & Implementation:*
-- stream live data download, import, and export logs via WebSocket -> `DataLog.data_log()`
-- display progress bars, error highlights, and cancellation controls -> `DataLog.clear_log()`
+- [ ] stream live data download, import, and export logs via WebSocket -> `DataLog.data_log()`
+- [ ] display progress bars, error highlights, and cancellation controls -> `DataLog.clear_log()`
 
 #### `DataManagerHome`
 *Feature:* Data Manager landing dashboard and storage overview
@@ -652,8 +652,8 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/home.py`
 - **Frontend:** `ui/app/workspace/DataManager/DataManagerHome.tsx`
 *Functional Requirements & Implementation:*
-- display Data Manager overview with disk storage usage and symbol counts -> `DMHome.home()`
-- provide offline fallback view when internet connectivity is lost -> `DMHome.index()`
+- [ ] display Data Manager overview with disk storage usage and symbol counts -> `DMHome.home()`
+- [ ] provide offline fallback view when internet connectivity is lost -> `DMHome.index()`
 
 #### `DataManagerHelp`
 *Feature:* Built-in documentation and user guide for Data Manager
@@ -661,7 +661,7 @@ flowchart TD
 - **Backend:** `app/workspace/data_manager/help.py`
 - **Frontend:** `ui/app/components/HelpTooltip.tsx`
 *Functional Requirements & Implementation:*
-- display contextual documentation and tutorials for data management operations -> `DMHelp.help()`
+- [ ] display contextual documentation and tutorials for data management operations -> `DMHelp.help()`
 
 ---
 
@@ -679,8 +679,8 @@ flowchart TD
 - **Backend:** `app/workspace/code_editor/editor.py`
 - **Frontend:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host dockable editor panels, file navigators, and bottom log panes -> `AppCodeEditor.init_workspace()`
-- manage active open code documents and syntax highlighting mode -> `AppCodeEditor.open_file_tab()`
+- [ ] host dockable editor panels, file navigators, and bottom log panes -> `AppCodeEditor.init_workspace()`
+- [ ] manage active open code documents and syntax highlighting mode -> `AppCodeEditor.open_file_tab()`
 
 #### `ServletCodeEditor`
 *Feature:* Monaco code editor, virtual file system, and project file CRUD
@@ -688,20 +688,20 @@ flowchart TD
 - **Backend:** `app/workspace/code_editor/routes.py`
 - **Frontend:** `ui/app/workspace/CodeEditor/codeEditorClient.ts`
 *Functional Requirements & Implementation:*
-- display code editor main menu, toolbar, and build actions -> `CodeEditor.menu()`
-- manage open editor document tabs -> `CodeEditor.maintabs()`
-- list open editor files with dirty/unsaved indicators -> `CodeEditor.editors()`
-- display file system directory tree and code symbol navigator -> `CodeEditor.navigator()`
-- display right sidebar tabs container -> `CodeEditor.righttabs()`
-- display bottom tabs container for compilation logs and search results -> `CodeEditor.bottomtabs()`
-- display compilation, error, and build output log pane -> `CodeEditor.logpane()`
-- display find-in-files search results pane -> `CodeEditor.searchpane()`
-- create a new source code file -> `CodeEditor.new_file()`
-- create a new directory in the code workspace -> `CodeEditor.new_dir()`
-- create a new custom indicator, snippet, or class template -> `CodeEditor.create_new()`
-- clone an existing code file or snippet -> `CodeEditor.clone()`
-- rename a source file or directory -> `CodeEditor.rename_file()`
-- search for text patterns across project files -> `CodeEditor.find_in_files()`
+- [ ] display code editor main menu, toolbar, and build actions -> `CodeEditor.menu()`
+- [ ] manage open editor document tabs -> `CodeEditor.maintabs()`
+- [ ] list open editor files with dirty/unsaved indicators -> `CodeEditor.editors()`
+- [ ] display file system directory tree and code symbol navigator -> `CodeEditor.navigator()`
+- [ ] display right sidebar tabs container -> `CodeEditor.righttabs()`
+- [ ] display bottom tabs container for compilation logs and search results -> `CodeEditor.bottomtabs()`
+- [ ] display compilation, error, and build output log pane -> `CodeEditor.logpane()`
+- [ ] display find-in-files search results pane -> `CodeEditor.searchpane()`
+- [ ] create a new source code file -> `CodeEditor.new_file()`
+- [ ] create a new directory in the code workspace -> `CodeEditor.new_dir()`
+- [ ] create a new custom indicator, snippet, or class template -> `CodeEditor.create_new()`
+- [ ] clone an existing code file or snippet -> `CodeEditor.clone()`
+- [ ] rename a source file or directory -> `CodeEditor.rename_file()`
+- [ ] search for text patterns across project files -> `CodeEditor.find_in_files()`
 
 ### Phase 4.2: Extensions Import / Export
 
@@ -711,9 +711,9 @@ flowchart TD
 - **Backend:** `app/workspace/code_editor/import_export.py`
 - **Frontend:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- export code editor extensions, indicators, or snippets to zip packages -> `ImportExport.export()`
-- display list of imported files and compilation verification status -> `ImportExport.imported_files()`
-- confirm overwriting existing code files during import -> `ImportExport.overwrite_confirm()`
+- [ ] export code editor extensions, indicators, or snippets to zip packages -> `ImportExport.export()`
+- [ ] display list of imported files and compilation verification status -> `ImportExport.imported_files()`
+- [ ] confirm overwriting existing code files during import -> `ImportExport.overwrite_confirm()`
 
 ### Phase 4.3: Indicator Testing & Verification
 
@@ -723,10 +723,10 @@ flowchart TD
 - **Backend:** `app/workspace/code_editor/indicator_tester.py`
 - **Frontend:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
 *Functional Requirements & Implementation:*
-- open indicator tester dialog to execute indicator logic over market data -> `IndicatorTester.indicator_tester()`
-- modify indicator input parameters and re-run calculation on the fly -> `IndicatorTester.edit_indy_params()`
-- display compilation and runtime error logs encountered during indicator execution -> `IndicatorTester.indicator_tester_error()`
-- create a new indicator test configuration with target symbol and timeframe -> `IndicatorTester.new_indy_test()`
+- [ ] open indicator tester dialog to execute indicator logic over market data -> `IndicatorTester.indicator_tester()`
+- [ ] modify indicator input parameters and re-run calculation on the fly -> `IndicatorTester.edit_indy_params()`
+- [ ] display compilation and runtime error logs encountered during indicator execution -> `IndicatorTester.indicator_tester_error()`
+- [ ] create a new indicator test configuration with target symbol and timeframe -> `IndicatorTester.new_indy_test()`
 
 ---
 
@@ -744,8 +744,8 @@ flowchart TD
 - **Backend:** `app/workspace/algo_wizard/wizard.py`
 - **Frontend:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host dockable canvas panels for visual rule-based strategy editing -> `AppWizard.init_workspace()`
-- manage active strategy manifest and synchronize with Results databank -> `AppWizard.load_strategy()`
+- [ ] host dockable canvas panels for visual rule-based strategy editing -> `AppWizard.init_workspace()`
+- [ ] manage active strategy manifest and synchronize with Results databank -> `AppWizard.load_strategy()`
 
 #### `ServletAlgoWizard`
 *Feature:* AlgoWizard visual rule builder canvas API
@@ -753,9 +753,9 @@ flowchart TD
 - **Backend:** `app/workspace/algo_wizard/routes.py`
 - **Frontend:** `ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx`
 *Functional Requirements & Implementation:*
-- render visual drag-and-drop rule canvas for trading conditions and actions -> `AlgoWizard.render_canvas()`
-- validate condition node connectivity, operator types, and signal logic -> `AlgoWizard.validate_rules()`
-- retrieve abstract syntax tree of trading rules for compilation -> `AlgoWizard.get_rule_tree()`
+- [ ] render visual drag-and-drop rule canvas for trading conditions and actions -> `AlgoWizard.render_canvas()`
+- [ ] validate condition node connectivity, operator types, and signal logic -> `AlgoWizard.validate_rules()`
+- [ ] retrieve abstract syntax tree of trading rules for compilation -> `AlgoWizard.get_rule_tree()`
 
 #### `ServletBuilder`
 *Feature:* Visual condition tree compiler and strategy structure builder
@@ -763,8 +763,8 @@ flowchart TD
 - **Backend:** `app/workspace/builder/routes.py`
 - **Frontend:** `ui/app/workspace/Builder/builderClient.ts`
 *Functional Requirements & Implementation:*
-- compile visual rule trees into executable Python/Numba strategy functions -> `BuilderServlet.compile_rules()`
-- generate entry, exit, stop loss, and trailing stop logic structures -> `BuilderServlet.generate_code()`
+- [ ] compile visual rule trees into executable Python/Numba strategy functions -> `BuilderServlet.compile_rules()`
+- [ ] generate entry, exit, stop loss, and trailing stop logic structures -> `BuilderServlet.generate_code()`
 
 #### `ServletStrategy`
 *Feature:* Strategy serialization and XML/JSON strategy definition bridge
@@ -772,8 +772,8 @@ flowchart TD
 - **Backend:** `app/workspace/builder/strategy_servlet.py`
 - **Frontend:** `ui/app/workspace/Builder/resultsModel.ts`
 *Functional Requirements & Implementation:*
-- serialize strategy objects into portable XML/JSON strategy manifests -> `StrategyServlet.serialize_strategy()`
-- parse and deserialize external strategy files into memory structures -> `StrategyServlet.deserialize_strategy()`
+- [ ] serialize strategy objects into portable XML/JSON strategy manifests -> `StrategyServlet.serialize_strategy()`
+- [ ] parse and deserialize external strategy files into memory structures -> `StrategyServlet.deserialize_strategy()`
 
 ---
 
@@ -801,14 +801,14 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/what_to_build.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/WhatToBuildTab.tsx`
 *Functional Requirements & Implementation:*
-- display strategy architecture and build requirements overview -> `WhatToBuild.what_to_build()`
-- configure strategy generation mode (genetic programming, random search) -> `WhatToBuild.build_mode()`
-- configure strategy style and architecture (momentum, mean reversion, breakout) -> `WhatToBuild.strategy_architecture()`
-- configure trading conditions and timeframe periods -> `WhatToBuild.conditions_and_periods()`
-- configure profit target rules and allowable ranges -> `WhatToBuild.profit_target()`
-- configure stop loss rules and allowable ranges -> `WhatToBuild.stop_loss()`
-- configure allowed trading directions (long only, short only, both) -> `WhatToBuild.trading_directions()`
-- configure additional strategy build settings and constraints -> `WhatToBuild.additional_config()`
+- [ ] display strategy architecture and build requirements overview -> `WhatToBuild.what_to_build()`
+- [ ] configure strategy generation mode (genetic programming, random search) -> `WhatToBuild.build_mode()`
+- [ ] configure strategy style and architecture (momentum, mean reversion, breakout) -> `WhatToBuild.strategy_architecture()`
+- [ ] configure trading conditions and timeframe periods -> `WhatToBuild.conditions_and_periods()`
+- [ ] configure profit target rules and allowable ranges -> `WhatToBuild.profit_target()`
+- [ ] configure stop loss rules and allowable ranges -> `WhatToBuild.stop_loss()`
+- [ ] configure allowed trading directions (long only, short only, both) -> `WhatToBuild.trading_directions()`
+- [ ] configure additional strategy build settings and constraints -> `WhatToBuild.additional_config()`
 
 ### Phase 6.2: Backtest Environment & Symbol Configuration
 
@@ -818,7 +818,7 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/data_setup.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/DataTab.tsx`
 *Functional Requirements & Implementation:*
-- configure backtest symbols, primary/secondary timeframes, and date ranges -> `DataSettings.data()`
+- [ ] configure backtest symbols, primary/secondary timeframes, and date ranges -> `DataSettings.data()`
 
 ### Phase 6.3: Building Blocks & Indicator Selection
 
@@ -828,9 +828,9 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/blocks.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`
 *Functional Requirements & Implementation:*
-- configure allowable building blocks (technical indicators, price patterns, order types) -> `Blocks.blocks()`
-- edit parameter ranges and step increments for individual building blocks -> `Blocks.block_parameters()`
-- edit possible values and discrete options for building blocks -> `Blocks.possible_options()`
+- [ ] configure allowable building blocks (technical indicators, price patterns, order types) -> `Blocks.blocks()`
+- [ ] edit parameter ranges and step increments for individual building blocks -> `Blocks.block_parameters()`
+- [ ] edit possible values and discrete options for building blocks -> `Blocks.possible_options()`
 
 ### Phase 6.4: Genetic Evolution & Mutation Controls
 
@@ -840,7 +840,7 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/genetic_options.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/GeneticOptionsTab.tsx`
 *Functional Requirements & Implementation:*
-- configure genetic algorithm parameters, population, mutation, and crossover -> `GeneticOptions.genetic_options()`
+- [ ] configure genetic algorithm parameters, population, mutation, and crossover -> `GeneticOptions.genetic_options()`
 
 #### `SettingsPartsToImprove`
 *Feature:* Selective genetic mutation and improvement component picker
@@ -848,7 +848,7 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/parts_to_improve.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/PartsToImproveTab.tsx`
 *Functional Requirements & Implementation:*
-- select which strategy components to evolve or mutate (entry rules, exit rules, stops) -> `PartsToImprove.parts_to_improve()`
+- [ ] select which strategy components to evolve or mutate (entry rules, exit rules, stops) -> `PartsToImprove.parts_to_improve()`
 
 ### Phase 6.5: Trade Execution, Money Management & Advanced Exits
 
@@ -858,7 +858,7 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/options.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/TradingOptionsTab.tsx`
 *Functional Requirements & Implementation:*
-- configure trade execution constraints (max simultaneous trades, min trades, trading hours filter, weekend exit) -> `BuildOptions.options()`
+- [ ] configure trade execution constraints (max simultaneous trades, min trades, trading hours filter, weekend exit) -> `BuildOptions.options()`
 
 #### `SettingsAdvancedTM`
 *Feature:* Advanced Trade Management scale-out and multi-exit configuration
@@ -866,8 +866,8 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/advanced_tm.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx`
 *Functional Requirements & Implementation:*
-- configure Advanced Trade Management scale-out and multiple partial exits -> `AdvancedTM.advanced_tm()`
-- add or modify an exit target in Advanced Trade Management -> `AdvancedTM.add_new_exit()`
+- [ ] configure Advanced Trade Management scale-out and multiple partial exits -> `AdvancedTM.advanced_tm()`
+- [ ] add or modify an exit target in Advanced Trade Management -> `AdvancedTM.add_new_exit()`
 
 #### `SettingsMoneyManagement`
 *Feature:* Capital allocation, lot sizing, and risk per trade configuration
@@ -875,7 +875,7 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/money_management.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx`
 *Functional Requirements & Implementation:*
-- configure initial capital, margin currency, and position sizing models (fixed lot, % equity risk, volatility sizing) -> `MoneyManagement.money_management()`
+- [ ] configure initial capital, margin currency, and position sizing models (fixed lot, % equity risk, volatility sizing) -> `MoneyManagement.money_management()`
 
 ### Phase 6.6: Fitness Function, Ranking & Auto-Dismissal
 
@@ -885,10 +885,10 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/rankings.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/RankingTab.tsx`
 *Functional Requirements & Implementation:*
-- configure databank ranking criteria and maximum strategy storage limits -> `Rankings.ranking()`
-- configure strategy ranking fitness function weighted criteria (Net Profit, Sharpe, Drawdown) -> `Rankings.fitness_function()`
-- configure automatic dismissal conditions for poorly performing candidate strategies -> `Rankings.auto_dismissal()`
-- configure portfolio correlation limits during generation ranking -> `Rankings.fit_portfolio_correlation()`
+- [ ] configure databank ranking criteria and maximum strategy storage limits -> `Rankings.ranking()`
+- [ ] configure strategy ranking fitness function weighted criteria (Net Profit, Sharpe, Drawdown) -> `Rankings.fitness_function()`
+- [ ] configure automatic dismissal conditions for poorly performing candidate strategies -> `Rankings.auto_dismissal()`
+- [ ] configure portfolio correlation limits during generation ranking -> `Rankings.fit_portfolio_correlation()`
 
 ### Phase 6.7: Builder Container & Task Execution
 
@@ -898,9 +898,9 @@ flowchart LR
 - **Backend:** `app/workspace/builder/builder.py`
 - **Frontend:** `ui/app/workspace/Builder/BuilderWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host dockable builder tabs, execution progress bars, and live generation statistics -> `AppBuilder.init_workspace()`
-- trigger autonomous genetic strategy generation pipeline -> `AppBuilder.start_generation()`
-- abort or pause active genetic generation run -> `AppBuilder.stop_generation()`
+- [ ] host dockable builder tabs, execution progress bars, and live generation statistics -> `AppBuilder.init_workspace()`
+- [ ] trigger autonomous genetic strategy generation pipeline -> `AppBuilder.start_generation()`
+- [ ] abort or pause active genetic generation run -> `AppBuilder.stop_generation()`
 
 #### `SettingsPanel`
 *Feature:* Dockview builder settings host container
@@ -908,7 +908,7 @@ flowchart LR
 - **Backend:** `app/workspace/builder/settings/controls.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/SettingsControls.tsx`
 *Functional Requirements & Implementation:*
-- display container panel for strategy builder and retester settings -> `SettingsPanel.settings()`
+- [ ] display container panel for strategy builder and retester settings -> `SettingsPanel.settings()`
 
 #### `TaskBuild`
 *Feature:* Worker process executing genetic strategy generation and calibration
@@ -916,8 +916,8 @@ flowchart LR
 - **Backend:** `app/workspace/builder/engine/build_task.py`
 - **Frontend:** `ui/app/workspace/Builder/EnginePanel.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for strategy build task -> `BuildTask.simple_settings()`
-- calibrate indicator parameter ranges for strategy building based on target volatility -> `BuildTask.indicators_calibration()`
+- [ ] configure simple settings for strategy build task -> `BuildTask.simple_settings()`
+- [ ] calibrate indicator parameter ranges for strategy building based on target volatility -> `BuildTask.indicators_calibration()`
 
 ---
 
@@ -951,8 +951,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/results.py`
 - **Frontend:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host dockable databank tables, performance overview, equity charts, and trade logs -> `AppResults.init_workspace()`
-- select active strategy and load comprehensive performance metrics -> `AppResults.select_strategy()`
+- [ ] host dockable databank tables, performance overview, equity charts, and trade logs -> `AppResults.init_workspace()`
+- [ ] select active strategy and load comprehensive performance metrics -> `AppResults.select_strategy()`
 
 #### `ProjectDatabanks`
 *Feature:* SQLite databank collection manager and strategy table view
@@ -960,8 +960,8 @@ flowchart TD
 - **Backend:** `app/workspace/builder/project_databanks.py`
 - **Frontend:** `ui/app/workspace/Builder/ResultsColumn.tsx`
 *Functional Requirements & Implementation:*
-- display all databanks and databank management toolbar -> `Databanks.databanks()`
-- display single databank table with strategy candidates and metrics -> `Databanks.databank()`
+- [ ] display all databanks and databank management toolbar -> `Databanks.databanks()`
+- [ ] display single databank table with strategy candidates and metrics -> `Databanks.databank()`
 
 #### `ResultsDatabankViews`
 *Feature:* Custom column configurations and metric visibility presets
@@ -969,7 +969,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_databank_views.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsDatabankViewsView.tsx`
 *Functional Requirements & Implementation:*
-- manage databank column views and customized table layouts -> `DatabankViews.databank_views()`
+- [ ] manage databank column views and customized table layouts -> `DatabankViews.databank_views()`
 
 #### `ResultsDatabankActions`
 *Feature:* Databank command actions and strategy manipulation
@@ -977,15 +977,15 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_databank_actions.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsDatabankActionsView.tsx`
 *Functional Requirements & Implementation:*
-- create a new databank in SQLite database -> `DatabankActions.new_databank()`
-- load strategies into databank from external files -> `DatabankActions.load()`
-- save strategies from databank to disk -> `DatabankActions.save()`
-- merge selected strategies into a portfolio strategy -> `DatabankActions.merge_strategies()`
-- compare settings and parameters of two selected strategies side-by-side -> `DatabankActions.compare_strategies()`
-- edit trading parameters of strategy directly in databank -> `DatabankActions.edit_parameters()`
-- copy selected strategies to Retester workspace -> `DatabankActions.retest()`
-- run custom analysis script over databank strategies -> `DatabankActions.run_ca()`
-- set rich-text note for selected strategies -> `DatabankActions.set_note()`
+- [ ] create a new databank in SQLite database -> `DatabankActions.new_databank()`
+- [ ] load strategies into databank from external files -> `DatabankActions.load()`
+- [ ] save strategies from databank to disk -> `DatabankActions.save()`
+- [ ] merge selected strategies into a portfolio strategy -> `DatabankActions.merge_strategies()`
+- [ ] compare settings and parameters of two selected strategies side-by-side -> `DatabankActions.compare_strategies()`
+- [ ] edit trading parameters of strategy directly in databank -> `DatabankActions.edit_parameters()`
+- [ ] copy selected strategies to Retester workspace -> `DatabankActions.retest()`
+- [ ] run custom analysis script over databank strategies -> `DatabankActions.run_ca()`
+- [ ] set rich-text note for selected strategies -> `DatabankActions.set_note()`
 
 #### `DatabankRename`
 *Feature:* Bulk strategy renaming utility
@@ -993,7 +993,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/databank/databank_rename.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankRename.tsx`
 *Functional Requirements & Implementation:*
-- rename selected strategies in databank using pattern templates -> `DatabankRename.databank_rename()`
+- [ ] rename selected strategies in databank using pattern templates -> `DatabankRename.databank_rename()`
 
 #### `DatabankFilterByCorrelation`
 *Feature:* Correlation-based strategy databank filtering
@@ -1001,7 +1001,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/databank/databank_filter_by_correlation.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankFilterByCorrelation.tsx`
 *Functional Requirements & Implementation:*
-- filter strategies in databank by return correlation threshold -> `DatabankFilter.databank_filter_by_correlation()`
+- [ ] filter strategies in databank by return correlation threshold -> `DatabankFilter.databank_filter_by_correlation()`
 
 #### `CustomDatabankActions`
 *Feature:* Custom databank action hook registry
@@ -1009,7 +1009,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/databank/custom_databank_actions.py`
 - **Frontend:** `ui/app/plugins/databank/CustomDatabankActions.tsx`
 *Functional Requirements & Implementation:*
-- rename a databank and update references in SQLite -> `CustomDatabank.rename_databank()`
+- [ ] rename a databank and update references in SQLite -> `CustomDatabank.rename_databank()`
 
 #### `CustomResultsPluginActions`
 *Feature:* Custom results analysis plugin manager
@@ -1017,7 +1017,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/custom_results_plugin_actions.py`
 - **Frontend:** `ui/app/workspace/Results/views/CustomResultsPluginActionsView.tsx`
 *Functional Requirements & Implementation:*
-- rename a custom analysis plugin tab -> `CustomResults.rename_results_plugin()`
+- [ ] rename a custom analysis plugin tab -> `CustomResults.rename_results_plugin()`
 
 ### Phase 7.2: Strategy Overview & Performance Reports
 
@@ -1027,8 +1027,8 @@ flowchart TD
 - **Backend:** `app/workspace/builder/project_results.py`
 - **Frontend:** `ui/app/workspace/Builder/ResultsView.tsx`
 *Functional Requirements & Implementation:*
-- display strategy test results and analysis tabs -> `ProjectResults.results()`
-- create a new custom result analysis plugin -> `ProjectResults.new_custom_plugin()`
+- [ ] display strategy test results and analysis tabs -> `ProjectResults.results()`
+- [ ] create a new custom result analysis plugin -> `ProjectResults.new_custom_plugin()`
 
 #### `ResultsOverview`
 *Feature:* Comprehensive backtest summary statistics, profit metrics, and drawdowns
@@ -1036,10 +1036,10 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/overview.py`
 - **Frontend:** `ui/app/workspace/Builder/results/tabs/OverviewTab.tsx`
 *Functional Requirements & Implementation:*
-- render strategy overview with default HTML template -> `Overview.default_template()`
-- calculate total net profit, profit factor, Sharpe/Sortino ratios, and return/drawdown -> `Overview.calculate_metrics()`
-- display annualized returns, winning percentage, and average trade expectancy -> `Overview.annualized_stats()`
-- export performance summary report to JSON and CSV -> `Overview.export_report()`
+- [ ] render strategy overview with default HTML template -> `Overview.default_template()`
+- [ ] calculate total net profit, profit factor, Sharpe/Sortino ratios, and return/drawdown -> `Overview.calculate_metrics()`
+- [ ] display annualized returns, winning percentage, and average trade expectancy -> `Overview.annualized_stats()`
+- [ ] export performance summary report to JSON and CSV -> `Overview.export_report()`
 
 #### `ResultsReport`
 *Feature:* Comprehensive backtest performance metrics report
@@ -1047,7 +1047,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_report.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsReportView.tsx`
 *Functional Requirements & Implementation:*
-- display comprehensive strategy performance report: Sharpe, Sortino, Drawdown, Profit Factor, Win Rate, CAGR -> `Report.report()`
+- [ ] display comprehensive strategy performance report: Sharpe, Sortino, Drawdown, Profit Factor, Win Rate, CAGR -> `Report.report()`
 
 #### `ResultsStrategyConfig`
 *Feature:* Strategy build manifest and parameter inspector
@@ -1055,7 +1055,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_strategy_config.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsStrategyConfigView.tsx`
 *Functional Requirements & Implementation:*
-- display full strategy build configuration, trading rules, and indicator parameters -> `StrategyConfig.strategyconfig()`
+- [ ] display full strategy build configuration, trading rules, and indicator parameters -> `StrategyConfig.strategyconfig()`
 
 #### `DashboardPanel`
 *Feature:* Top-level KPI performance dashboard panel
@@ -1063,7 +1063,7 @@ flowchart TD
 - **Backend:** `app/workspace/builder/dashboard_panel.py`
 - **Frontend:** `ui/app/workspace/Builder/ProgressDashboard.tsx`
 *Functional Requirements & Implementation:*
-- display the main dashboard overview panel with aggregate system statistics -> `Dashboard.dashboard()`
+- [ ] display the main dashboard overview panel with aggregate system statistics -> `Dashboard.dashboard()`
 
 #### `DashboardResults`
 *Feature:* Strategy result summary card and quick-inspect widget
@@ -1071,8 +1071,8 @@ flowchart TD
 - **Backend:** `app/workspace/builder/dashboard_results.py`
 - **Frontend:** `ui/app/workspace/Builder/results/ResultsCharts.tsx`
 *Functional Requirements & Implementation:*
-- display project results overview on the dashboard -> `DashboardResults.dashboard_results()`
-- display individual result summary panel widget -> `DashboardResults.result_panel()`
+- [ ] display project results overview on the dashboard -> `DashboardResults.dashboard_results()`
+- [ ] display individual result summary panel widget -> `DashboardResults.result_panel()`
 
 ### Phase 7.3: Equity & Drawdown Charting
 
@@ -1082,8 +1082,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/equity_chart.py`
 - **Frontend:** `ui/app/workspace/Builder/results/tabs/EquityChartTab.tsx`
 *Functional Requirements & Implementation:*
-- display equity curve and drawdown chart using Lightweight Charts -> `EquityChart.equity_chart()`
-- configure and display benchmark equity overlay on chart -> `EquityChart.benchmark()`
+- [ ] display equity curve and drawdown chart using Lightweight Charts -> `EquityChart.equity_chart()`
+- [ ] configure and display benchmark equity overlay on chart -> `EquityChart.benchmark()`
 
 #### `ResultsChart`
 *Feature:* Interactive price chart with trade entry and exit markers
@@ -1091,7 +1091,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_chart.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsChartView.tsx`
 *Functional Requirements & Implementation:*
-- display strategy performance chart with price bars and trade executions -> `Chart.chart()`
+- [ ] display strategy performance chart with price bars and trade executions -> `Chart.chart()`
 
 #### `ResultsProfileChart`
 *Feature:* 2D/3D strategy parameter sensitivity profile chart
@@ -1099,7 +1099,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_profile_chart.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsProfileChartView.tsx`
 *Functional Requirements & Implementation:*
-- display strategy parameter profile chart -> `ProfileChart.profile_chart()`
+- [ ] display strategy parameter profile chart -> `ProfileChart.profile_chart()`
 
 #### `EquityChartBenchmark`
 *Feature:* Benchmark equity curve calculation and alignment engine
@@ -1107,8 +1107,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/charts/benchmark.py`
 - **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
 *Functional Requirements & Implementation:*
-- calculate normalized benchmark equity curve (e.g. S&P 500, Buy & Hold) -> `BenchmarkEngine.calculate_benchmark()`
-- align benchmark timestamps with strategy trade timestamps -> `BenchmarkEngine.align_series()`
+- [ ] calculate normalized benchmark equity curve (e.g. S&P 500, Buy & Hold) -> `BenchmarkEngine.calculate_benchmark()`
+- [ ] align benchmark timestamps with strategy trade timestamps -> `BenchmarkEngine.align_series()`
 
 #### `EquityChartDailyChart`
 *Feature:* Daily PnL bar chart calculation engine
@@ -1116,7 +1116,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/charts/daily_chart.py`
 - **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
 *Functional Requirements & Implementation:*
-- aggregate trade profits into daily PnL buckets and render bar charts -> `DailyChartEngine.aggregate_daily_pnl()`
+- [ ] aggregate trade profits into daily PnL buckets and render bar charts -> `DailyChartEngine.aggregate_daily_pnl()`
 
 #### `EquityChartDrawdown`
 *Feature:* Peak-to-trough percentage drawdown calculator
@@ -1124,7 +1124,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/charts/drawdown.py`
 - **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
 *Functional Requirements & Implementation:*
-- compute underwater drawdown percentage series from equity curve -> `DrawdownEngine.calculate_drawdown_series()`
+- [ ] compute underwater drawdown percentage series from equity curve -> `DrawdownEngine.calculate_drawdown_series()`
 
 #### `EquityChartVolatility`
 *Feature:* Rolling equity volatility calculator
@@ -1132,7 +1132,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/charts/volatility.py`
 - **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
 *Functional Requirements & Implementation:*
-- calculate rolling 30-day and 90-day annualized equity volatility -> `VolatilityEngine.calculate_rolling_volatility()`
+- [ ] calculate rolling 30-day and 90-day annualized equity volatility -> `VolatilityEngine.calculate_rolling_volatility()`
 
 #### `EquityChartVolume`
 *Feature:* Traded volume distribution analysis engine
@@ -1140,7 +1140,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/charts/volume.py`
 - **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
 *Functional Requirements & Implementation:*
-- analyze volume distribution per trade, instrument, and time session -> `VolumeEngine.calculate_volume_distribution()`
+- [ ] analyze volume distribution per trade, instrument, and time session -> `VolumeEngine.calculate_volume_distribution()`
 
 ### Phase 7.4: Trade Execution & Trade Analysis
 
@@ -1150,7 +1150,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/trade_list.py`
 - **Frontend:** `ui/app/workspace/Builder/results/tabs/TradeListTab.tsx`
 *Functional Requirements & Implementation:*
-- list all trades executed by strategy with entry/exit times, prices, and profits -> `TradeList.trade_list()`
+- [ ] list all trades executed by strategy with entry/exit times, prices, and profits -> `TradeList.trade_list()`
 
 #### `ResultsTradelistViews`
 *Feature:* Custom column filter presets and trade view manager
@@ -1158,7 +1158,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_tradelist_views.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsTradelistViewsView.tsx`
 *Functional Requirements & Implementation:*
-- manage custom column views and filtering presets for trade list -> `TradelistViews.tradelist_views()`
+- [ ] manage custom column views and filtering presets for trade list -> `TradelistViews.tradelist_views()`
 
 #### `ResultsTradeAnalysis`
 *Feature:* Periodic trade breakdown by hour, day of week, and duration
@@ -1166,8 +1166,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/trade_analysis.py`
 - **Frontend:** `ui/app/workspace/Results/views/TradeAnalysisView.tsx`
 *Functional Requirements & Implementation:*
-- display trade analysis breakdown by periods, days of week, and hours -> `TradeAnalysis.trade_analysis()`
-- display trade analysis charts panel -> `TradeAnalysis.trade_analysis_panel()`
+- [ ] display trade analysis breakdown by periods, days of week, and hours -> `TradeAnalysis.trade_analysis()`
+- [ ] display trade analysis charts panel -> `TradeAnalysis.trade_analysis_panel()`
 
 ### Phase 7.5: Portfolio & Correlation Analysis in Results
 
@@ -1177,11 +1177,11 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/portfolio_correlation.py`
 - **Frontend:** `ui/app/workspace/Results/views/PortfolioCorrelationView.tsx`
 *Functional Requirements & Implementation:*
-- display portfolio correlation analysis -> `PortfolioCorrelation.portfolio_correlation()`
-- display strategy correlation matrix table -> `PortfolioCorrelation.correlation_matrix()`
-- display correlation detail between two selected strategies -> `PortfolioCorrelation.correlation_matrix_detail()`
-- display overlapping trades matrix -> `PortfolioCorrelation.overlapping_trades()`
-- display overlapping trades detail between strategies -> `PortfolioCorrelation.overlapping_trades_detail()`
+- [ ] display portfolio correlation analysis -> `PortfolioCorrelation.portfolio_correlation()`
+- [ ] display strategy correlation matrix table -> `PortfolioCorrelation.correlation_matrix()`
+- [ ] display correlation detail between two selected strategies -> `PortfolioCorrelation.correlation_matrix_detail()`
+- [ ] display overlapping trades matrix -> `PortfolioCorrelation.overlapping_trades()`
+- [ ] display overlapping trades detail between strategies -> `PortfolioCorrelation.overlapping_trades_detail()`
 
 #### `ResultsPortfolioComposerChart`
 *Feature:* Blended portfolio performance chart in Results
@@ -1189,7 +1189,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_portfolio_composer_chart.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsPortfolioComposerChartView.tsx`
 *Functional Requirements & Implementation:*
-- display portfolio composer performance chart -> `PortfolioComposerChart.portfolio_composer_chart()`
+- [ ] display portfolio composer performance chart -> `PortfolioComposerChart.portfolio_composer_chart()`
 
 #### `ResultsPortfolioComposerLog`
 *Feature:* Portfolio backtest calculation log in Results
@@ -1197,7 +1197,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_portfolio_composer_log.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsPortfolioComposerLogView.tsx`
 *Functional Requirements & Implementation:*
-- display calculation log for portfolio composer -> `PortfolioComposerLog.portfolio_composer_log()`
+- [ ] display calculation log for portfolio composer -> `PortfolioComposerLog.portfolio_composer_log()`
 
 ### Phase 7.6: Advanced Exploration & Stock Picking
 
@@ -1207,7 +1207,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_explore.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsExploreView.tsx`
 *Functional Requirements & Implementation:*
-- display strategy exploration and parameter spaces -> `Explore.explore()`
+- [ ] display strategy exploration and parameter spaces -> `Explore.explore()`
 
 #### `ResultsSPOverview`
 *Feature:* Stock picker overview: universe list, stats, and treemap
@@ -1215,11 +1215,11 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_sp_overview.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsSPOverviewView.tsx`
 *Functional Requirements & Implementation:*
-- display stock picker overview dashboard -> `SPOverview.sp_overview()`
-- display stock picker list view -> `SPOverview.sp_overview_list()`
-- display stock picker performance statistics -> `SPOverview.sp_overview_stats()`
-- display top performing stocks chart -> `SPOverview.sp_overview_top_chart()`
-- display stocks treemap visualization -> `SPOverview.sp_overview_tree_map()`
+- [ ] display stock picker overview dashboard -> `SPOverview.sp_overview()`
+- [ ] display stock picker list view -> `SPOverview.sp_overview_list()`
+- [ ] display stock picker performance statistics -> `SPOverview.sp_overview_stats()`
+- [ ] display top performing stocks chart -> `SPOverview.sp_overview_top_chart()`
+- [ ] display stocks treemap visualization -> `SPOverview.sp_overview_tree_map()`
 
 #### `ResultsStockpicker`
 *Feature:* Stock picker strategy execution results
@@ -1227,7 +1227,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_stockpicker.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsStockpickerView.tsx`
 *Functional Requirements & Implementation:*
-- display stock picker strategy execution results and rebalance dates -> `Stockpicker.stockpicker()`
+- [ ] display stock picker strategy execution results and rebalance dates -> `Stockpicker.stockpicker()`
 
 #### `FitnessMethodExistingPortfolio`
 *Feature:* Fitness calculation against existing portfolio
@@ -1235,7 +1235,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/fitness/existing_portfolio.py`
 - **Frontend:** `ui/app/workspace/Builder/FitnessEvolutionModal.tsx`
 *Functional Requirements & Implementation:*
-- configures fitness calculation against existing portfolio -> `FitnessPortfolio.fitness_method_existing_portfolio()`
+- [ ] configures fitness calculation against existing portfolio -> `FitnessPortfolio.fitness_method_existing_portfolio()`
 
 #### `FitnessMethodStrategyResult`
 *Feature:* Fitness calculation based on strategy backtest result
@@ -1243,7 +1243,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/fitness/strategy_result.py`
 - **Frontend:** `ui/app/workspace/Builder/FitnessEvolutionModal.tsx`
 *Functional Requirements & Implementation:*
-- configures fitness calculation based on strategy backtest result -> `FitnessStrategy.fitness_method_strategy_result()`
+- [ ] configures fitness calculation based on strategy backtest result -> `FitnessStrategy.fitness_method_strategy_result()`
 
 #### `FitnessMethodWFResult`
 *Feature:* Fitness calculation from Walk-Forward optimization results
@@ -1251,7 +1251,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/fitness/wf_result.py`
 - **Frontend:** `ui/app/workspace/Builder/FitnessEvolutionModal.tsx`
 *Functional Requirements & Implementation:*
-- evaluate Walk-Forward efficiency index and consistency score -> `FitnessWF.calculate_wf_fitness()`
+- [ ] evaluate Walk-Forward efficiency index and consistency score -> `FitnessWF.calculate_wf_fitness()`
 
 ### Phase 7.7: Source Code Generation, Savers & Loaders
 
@@ -1261,10 +1261,10 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/source_code.py`
 - **Frontend:** `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`
 *Functional Requirements & Implementation:*
-- display generated strategy source code for selected platform -> `SourceCode.source_code()`
-- guide importing custom indicators to target trading platform -> `SourceCode.custom_indicators()`
-- copy generated source code to clipboard -> `SourceCode.copy_clipboard()`
-- save strategy code directly to disk (.mq4, .mq5, .cs, .py) -> `SourceCode.save_code()`
+- [ ] display generated strategy source code for selected platform -> `SourceCode.source_code()`
+- [ ] guide importing custom indicators to target trading platform -> `SourceCode.custom_indicators()`
+- [ ] copy generated source code to clipboard -> `SourceCode.copy_clipboard()`
+- [ ] save strategy code directly to disk (.mq4, .mq5, .cs, .py) -> `SourceCode.save_code()`
 
 #### `ResultsPlugins`
 *Feature:* Custom analysis plugin iframe sandbox
@@ -1272,7 +1272,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_plugins.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsPluginsView.tsx`
 *Functional Requirements & Implementation:*
-- display external custom analysis plugin in sandboxed iframe -> `Plugins.plugin_iframe()`
+- [ ] display external custom analysis plugin in sandboxed iframe -> `Plugins.plugin_iframe()`
 
 #### `SaverHTML`
 *Feature:* Interactive HTML report exporter with embedded charts and metrics
@@ -1280,8 +1280,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/exporters/saver_html.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
-- save report using default HTML template -> `SaverHTML.default_template()`
-- export performance overview, trade list, and equity curve into self-contained HTML file -> `SaverHTML.export_html()`
+- [ ] save report using default HTML template -> `SaverHTML.default_template()`
+- [ ] export performance overview, trade list, and equity curve into self-contained HTML file -> `SaverHTML.export_html()`
 
 #### `SaverPDF`
 *Feature:* Export strategy backtest reports to PDF format
@@ -1289,8 +1289,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/exporters/saver_pdf.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
-- render performance metrics, equity curves, and drawdowns into PDF document -> `SaverPDF.generate_pdf()`
-- generate printable executive tear-sheets with Sharpe, Sortino, and trade logs -> `SaverPDF.render_tearsheet()`
+- [ ] render performance metrics, equity curves, and drawdowns into PDF document -> `SaverPDF.generate_pdf()`
+- [ ] generate printable executive tear-sheets with Sharpe, Sortino, and trade logs -> `SaverPDF.render_tearsheet()`
 
 #### `SaverLegacyV3`
 *Feature:* Legacy binary strategy file exporter
@@ -1298,7 +1298,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/exporters/saver_legacy_v3.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
-- export strategies into legacy binary file format -> `LegacySaver.export_legacy_v3()`
+- [ ] export strategies into legacy binary file format -> `LegacySaver.export_legacy_v3()`
 
 #### `SaverStrategyTrades`
 *Feature:* Export strategy trade history to Parquet and CSV files
@@ -1306,8 +1306,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/exporters/saver_trades.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
-- serialize trade list to PyArrow table and write compressed Parquet file -> `SaverTrades.to_parquet()`
-- export trade records to standard CSV file format -> `SaverTrades.to_csv()`
+- [ ] serialize trade list to PyArrow table and write compressed Parquet file -> `SaverTrades.to_parquet()`
+- [ ] export trade records to standard CSV file format -> `SaverTrades.to_csv()`
 
 #### `LoaderLegacyV3`
 *Feature:* Parser and importer for legacy v3 strategy files
@@ -1315,7 +1315,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/loaders/loader_legacy_v3.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
-- parse and deserialize legacy v3 strategy files into memory -> `LegacyLoader.load_legacy_v3()`
+- [ ] parse and deserialize legacy v3 strategy files into memory -> `LegacyLoader.load_legacy_v3()`
 
 #### `LoaderLegacyV4`
 *Feature:* Parser and importer for legacy v4 strategy files
@@ -1323,7 +1323,7 @@ flowchart TD
 - **Backend:** `app/workspace/results/loaders/loader_legacy_v4.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
-- parse and deserialize legacy v4 strategy files into memory -> `LegacyLoader.load_legacy_v4()`
+- [ ] parse and deserialize legacy v4 strategy files into memory -> `LegacyLoader.load_legacy_v4()`
 
 ---
 
@@ -1341,8 +1341,8 @@ flowchart TD
 - **Backend:** `app/workspace/retester/retester.py`
 - **Frontend:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host dockable retest settings, cross-check cards, and robustness dashboards -> `AppRetester.init_workspace()`
-- trigger multi-market robustness retesting across selected strategies -> `AppRetester.start_retest()`
+- [ ] host dockable retest settings, cross-check cards, and robustness dashboards -> `AppRetester.init_workspace()`
+- [ ] trigger multi-market robustness retesting across selected strategies -> `AppRetester.start_retest()`
 
 #### `SettingsWhatToRetest`
 *Feature:* Databank strategy selection for robustness retesting
@@ -1350,7 +1350,7 @@ flowchart TD
 - **Backend:** `app/workspace/retester/settings/what_to_retest.py`
 - **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
 *Functional Requirements & Implementation:*
-- configure which strategies from databanks to retest -> `WhatToRetest.what_to_retest()`
+- [ ] configure which strategies from databanks to retest -> `WhatToRetest.what_to_retest()`
 
 #### `SettingsAutomaticRetest`
 *Feature:* Automated background retesting trigger configuration
@@ -1358,7 +1358,7 @@ flowchart TD
 - **Backend:** `app/workspace/retester/settings/automatic_retest.py`
 - **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
 *Functional Requirements & Implementation:*
-- configure automatic retest triggers and target databanks -> `AutomaticRetest.automatic_retest()`
+- [ ] configure automatic retest triggers and target databanks -> `AutomaticRetest.automatic_retest()`
 
 ### Phase 8.2: Cross-Checks Framework & Acceptance Criteria
 
@@ -1368,10 +1368,10 @@ flowchart TD
 - **Backend:** `app/workspace/builder/settings/cross_checks.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/CrossChecksTab.tsx`
 *Functional Requirements & Implementation:*
-- display and toggle available robustness cross checks -> `CrossChecks.cross_checks()`
-- display individual cross-check configuration row -> `CrossChecks.cross_check()`
-- configure acceptance criteria and thresholds for cross checks -> `CrossChecks.cross_check_acceptance_settings()`
-- configure specific cross-check test options -> `CrossChecks.cross_check_settings()`
+- [ ] display and toggle available robustness cross checks -> `CrossChecks.cross_checks()`
+- [ ] display individual cross-check configuration row -> `CrossChecks.cross_check()`
+- [ ] configure acceptance criteria and thresholds for cross checks -> `CrossChecks.cross_check_acceptance_settings()`
+- [ ] configure specific cross-check test options -> `CrossChecks.cross_check_settings()`
 
 ### Phase 8.3: Robustness & Cross-Check Verification Modules
 
@@ -1381,8 +1381,8 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/cross_check_monte_carlo_manipulation.py`
 - **Frontend:** `ui/app/workspace/Retester/views/CrossCheckMonteCarloManipulationModal.tsx`
 *Functional Requirements & Implementation:*
-- configure Monte Carlo data/trades manipulation settings (skip trades, shuffle trades, permute slippage) -> `MonteCarloManipulation.settings()`
-- configure fitness function for Monte Carlo manipulation -> `MonteCarloManipulation.mc_manipulation_fitness()`
+- [ ] configure Monte Carlo data/trades manipulation settings (skip trades, shuffle trades, permute slippage) -> `MonteCarloManipulation.settings()`
+- [ ] configure fitness function for Monte Carlo manipulation -> `MonteCarloManipulation.mc_manipulation_fitness()`
 
 #### `CrossCheckMonteCarloRetest`
 *Feature:* Monte Carlo price bar randomization test
@@ -1390,8 +1390,8 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/cross_check_monte_carlo_retest.py`
 - **Frontend:** `ui/app/workspace/Retester/views/CrossCheckMonteCarloRetestModal.tsx`
 *Functional Requirements & Implementation:*
-- configure Monte Carlo retest settings across randomized historical bar data -> `MonteCarloRetest.settings()`
-- configure fitness function for Monte Carlo retest -> `MonteCarloRetest.mc_retest_fitness()`
+- [ ] configure Monte Carlo retest settings across randomized historical bar data -> `MonteCarloRetest.settings()`
+- [ ] configure fitness function for Monte Carlo retest -> `MonteCarloRetest.mc_retest_fitness()`
 
 #### `CrossCheckRetestWithHigherPrecision`
 *Feature:* High-resolution 1-minute and tick data verification
@@ -1399,8 +1399,8 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/cross_check_retest_with_higher_precision.py`
 - **Frontend:** `ui/app/workspace/Retester/views/CrossCheckRetestWithHigherPrecisionModal.tsx`
 *Functional Requirements & Implementation:*
-- configure retest with higher precision settings -> `HigherPrecision.settings()`
-- configure fitness function for higher precision cross-check -> `HigherPrecision.cc_higher_precision()`
+- [ ] configure retest with higher precision settings -> `HigherPrecision.settings()`
+- [ ] configure fitness function for higher precision cross-check -> `HigherPrecision.cc_higher_precision()`
 
 #### `CrossCheckRetestOnAdditionalMarkets`
 *Feature:* Multi-market universality test across uncorrelated symbols
@@ -1408,9 +1408,9 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/cross_check_retest_on_additional_markets.py`
 - **Frontend:** `ui/app/workspace/Retester/views/CrossCheckRetestOnAdditionalMarketsModal.tsx`
 *Functional Requirements & Implementation:*
-- configure additional backtest markets and timeframes -> `AdditionalMarkets.settings()`
-- configure filtering conditions for additional markets retest -> `AdditionalMarkets.filtering()`
-- configure portfolio fitness function for additional markets -> `AdditionalMarkets.portfolio_fitness()`
+- [ ] configure additional backtest markets and timeframes -> `AdditionalMarkets.settings()`
+- [ ] configure filtering conditions for additional markets retest -> `AdditionalMarkets.filtering()`
+- [ ] configure portfolio fitness function for additional markets -> `AdditionalMarkets.portfolio_fitness()`
 
 #### `CrossCheckOptProfileSysParamPermutation`
 *Feature:* System Parameter Permutation (SPP) plateau stability test
@@ -1418,8 +1418,8 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/cross_check_opt_profile_sys_param_permutation.py`
 - **Frontend:** `ui/app/workspace/Retester/views/CrossCheckOptProfileSysParamPermutationModal.tsx`
 *Functional Requirements & Implementation:*
-- configure parameter permutation cross-check settings -> `SPPCheck.settings()`
-- configure filtering conditions for Optimization Profile / SPP -> `SPPCheck.filtering()`
+- [ ] configure parameter permutation cross-check settings -> `SPPCheck.settings()`
+- [ ] configure filtering conditions for Optimization Profile / SPP -> `SPPCheck.filtering()`
 
 #### `CrossCheckSequentialOptimization`
 *Feature:* Sequential parameter optimization robustness test
@@ -1427,8 +1427,8 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/cross_check_sequential_optimization.py`
 - **Frontend:** `ui/app/workspace/Retester/views/CrossCheckSequentialOptimizationModal.tsx`
 *Functional Requirements & Implementation:*
-- configure sequential optimization parameters -> `SequentialOptCheck.settings()`
-- configure filtering conditions for sequential optimization -> `SequentialOptCheck.filtering()`
+- [ ] configure sequential optimization parameters -> `SequentialOptCheck.settings()`
+- [ ] configure filtering conditions for sequential optimization -> `SequentialOptCheck.filtering()`
 
 #### `CrossCheckWalkForwardMatrix`
 *Feature:* Walk-Forward matrix robustness test
@@ -1436,8 +1436,8 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/cross_check_walk_forward_matrix.py`
 - **Frontend:** `ui/app/workspace/Retester/views/CrossCheckWalkForwardMatrixModal.tsx`
 *Functional Requirements & Implementation:*
-- configure walk-forward matrix cross-check settings across window variations -> `WFMatrixCheck.settings()`
-- configure filtering conditions for walk-forward matrix -> `WFMatrixCheck.filtering()`
+- [ ] configure walk-forward matrix cross-check settings across window variations -> `WFMatrixCheck.settings()`
+- [ ] configure filtering conditions for walk-forward matrix -> `WFMatrixCheck.filtering()`
 
 #### `CrossCheckWalkForwardOptimization`
 *Feature:* Standard Walk-Forward Optimization robustness test
@@ -1445,8 +1445,8 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/cross_check_walk_forward_optimization.py`
 - **Frontend:** `ui/app/workspace/Retester/views/CrossCheckWalkForwardOptimizationModal.tsx`
 *Functional Requirements & Implementation:*
-- configure walk-forward optimization cross-check settings -> `WFOptCheck.settings()`
-- configure filtering conditions for walk-forward optimization -> `WFOptCheck.filtering()`
+- [ ] configure walk-forward optimization cross-check settings -> `WFOptCheck.settings()`
+- [ ] configure filtering conditions for walk-forward optimization -> `WFOptCheck.filtering()`
 
 #### `CrossCheckWhatIf`
 *Feature:* What-If stress scenario simulator
@@ -1454,7 +1454,7 @@ flowchart TD
 - **Backend:** `app/workspace/retester/cross_checks/what_if.py`
 - **Frontend:** `ui/app/workspace/Retester/views/WhatIfModal.tsx`
 *Functional Requirements & Implementation:*
-- configure What-If scenarios cross-check settings (skip worst trades, high spread periods, trading hours) -> `WhatIf.settings()`
+- [ ] configure What-If scenarios cross-check settings (skip worst trades, high spread periods, trading hours) -> `WhatIf.settings()`
 
 ### Phase 8.4: Verification Results Views
 
@@ -1464,9 +1464,9 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_robustness_tests.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsRobustnessTestsView.tsx`
 *Functional Requirements & Implementation:*
-- display strategy robustness tests dashboard -> `RobustnessTests.robustness_tests()`
-- manage views for robustness tests -> `RobustnessTests.manageviews()`
-- display detailed robustness analysis metrics and pass rates -> `RobustnessTests.robustness_analysis()`
+- [ ] display strategy robustness tests dashboard -> `RobustnessTests.robustness_tests()`
+- [ ] manage views for robustness tests -> `RobustnessTests.manageviews()`
+- [ ] display detailed robustness analysis metrics and pass rates -> `RobustnessTests.robustness_analysis()`
 
 #### `ResultsSysParamPermutation`
 *Feature:* System Parameter Permutation (SPP) results view and 3D surface
@@ -1474,8 +1474,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_sys_param_permutation.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsSysParamPermutationView.tsx`
 *Functional Requirements & Implementation:*
-- display System Parameter Permutation (SPP) results -> `SysParamPermutation.sys_param_permutation()`
-- display System Parameter Permutation chart panel -> `SysParamPermutation.spp_panel()`
+- [ ] display System Parameter Permutation (SPP) results -> `SysParamPermutation.sys_param_permutation()`
+- [ ] display System Parameter Permutation chart panel -> `SysParamPermutation.spp_panel()`
 
 #### `ResultsSequentialOptimization`
 *Feature:* Sequential optimization results table and parameter chart
@@ -1483,8 +1483,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_sequential_optimization.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsSequentialOptimizationView.tsx`
 *Functional Requirements & Implementation:*
-- display sequential optimization results -> `SequentialOptimization.sequential_optimization()`
-- display sequential parameter change chart -> `SequentialOptimization.sequential_param_chart()`
+- [ ] display sequential optimization results -> `SequentialOptimization.sequential_optimization()`
+- [ ] display sequential parameter change chart -> `SequentialOptimization.sequential_param_chart()`
 
 #### `ResultsWalkForward`
 *Feature:* Walk-Forward optimization matrix grid and consistency score
@@ -1492,8 +1492,8 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_walk_forward.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsWalkForwardView.tsx`
 *Functional Requirements & Implementation:*
-- display walk-forward optimization matrix and test results -> `WalkForward.wfresults()`
-- manage views for walk-forward results -> `WalkForward.manageviews()`
+- [ ] display walk-forward optimization matrix and test results -> `WalkForward.wfresults()`
+- [ ] manage views for walk-forward results -> `WalkForward.manageviews()`
 
 ### Phase 8.5: Retest Task Execution
 
@@ -1503,7 +1503,7 @@ flowchart TD
 - **Backend:** `app/workspace/retester/engine/retest_task.py`
 - **Frontend:** `ui/app/workspace/Retester/retesterClient.ts`
 *Functional Requirements & Implementation:*
-- configure simple settings for strategy retest task -> `RetestTask.simple_settings()`
+- [ ] configure simple settings for strategy retest task -> `RetestTask.simple_settings()`
 
 #### `TaskAutomaticRetest`
 *Feature:* Worker process for automatic background retesting
@@ -1511,7 +1511,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/auto_retest.py`
 - **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for automatic retest task -> `AutoRetestTask.simple_settings()`
+- [ ] configure simple settings for automatic retest task -> `AutoRetestTask.simple_settings()`
 
 ---
 
@@ -1529,8 +1529,8 @@ flowchart TD
 - **Backend:** `app/workspace/optimizer/optimizer.py`
 - **Frontend:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host dockable optimizer setup panels, parameter distribution inputs, and 3D surface charts -> `AppOptimizer.init_workspace()`
-- trigger parameter grid or genetic optimization run -> `AppOptimizer.start_optimization()`
+- [ ] host dockable optimizer setup panels, parameter distribution inputs, and 3D surface charts -> `AppOptimizer.init_workspace()`
+- [ ] trigger parameter grid or genetic optimization run -> `AppOptimizer.start_optimization()`
 
 #### `SettingsOptimization`
 *Feature:* Optimization algorithm, parameter ranges, and auto-presets
@@ -1538,8 +1538,8 @@ flowchart TD
 - **Backend:** `app/workspace/optimizer/settings/optimization_settings.py`
 - **Frontend:** `ui/app/workspace/Optimizer/OptimizerSettings.tsx`
 *Functional Requirements & Implementation:*
-- configure optimization algorithm (Grid, Simple Genetic, Walk-Forward), parameters, and ranges -> `Optimization.optimization()`
-- auto-preset parameter distribution ranges for optimization -> `Optimization.auto_preset()`
+- [ ] configure optimization algorithm (Grid, Simple Genetic, Walk-Forward), parameters, and ranges -> `Optimization.optimization()`
+- [ ] auto-preset parameter distribution ranges for optimization -> `Optimization.auto_preset()`
 
 ### Phase 9.2: Optimization Profile Surface Visualization
 
@@ -1549,9 +1549,9 @@ flowchart TD
 - **Backend:** `app/workspace/results/reports/results_optimization_profile.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsOptimizationProfileView.tsx`
 *Functional Requirements & Implementation:*
-- display strategy optimization profile surface -> `OptimizationProfile.optimization_profile()`
-- configure 2D/3D optimization profile levels -> `OptimizationProfile.optim_profile_levels()`
-- manages views for optimization profile -> `OptimizationProfile.manageviews()`
+- [ ] display strategy optimization profile surface -> `OptimizationProfile.optimization_profile()`
+- [ ] configure 2D/3D optimization profile levels -> `OptimizationProfile.optim_profile_levels()`
+- [ ] manages views for optimization profile -> `OptimizationProfile.manageviews()`
 
 ### Phase 9.3: Optimization Task Execution
 
@@ -1561,7 +1561,7 @@ flowchart TD
 - **Backend:** `app/workspace/optimizer/engine/optimize_task.py`
 - **Frontend:** `ui/app/workspace/Optimizer/optimizerClient.ts`
 *Functional Requirements & Implementation:*
-- configure simple settings for strategy optimization task -> `OptimizeTask.simple_settings()`
+- [ ] configure simple settings for strategy optimization task -> `OptimizeTask.simple_settings()`
 
 ---
 
@@ -1579,8 +1579,8 @@ flowchart TD
 - **Backend:** `app/workspace/neural_network/neural_net.py`
 - **Frontend:** `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`
 *Functional Requirements & Implementation:*
-- host neural network training parameter panels, loss curves, and prediction accuracy views -> `AppNeuralNetwork.init_workspace()`
-- trigger neural network training and validation pipeline -> `AppNeuralNetwork.start_training()`
+- [ ] host neural network training parameter panels, loss curves, and prediction accuracy views -> `AppNeuralNetwork.init_workspace()`
+- [ ] trigger neural network training and validation pipeline -> `AppNeuralNetwork.start_training()`
 
 #### `TaskNeuralNetworkTrainer`
 *Feature:* Feature matrix preparation, model training, and validation worker
@@ -1588,10 +1588,10 @@ flowchart TD
 - **Backend:** `app/workspace/neural_network/trainer.py`
 - **Frontend:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
 *Functional Requirements & Implementation:*
-- prepare feature matrix from historical prices and technical indicators -> `NNTrainer.prepare_features()`
-- train neural network model with PyTorch/Numba -> `NNTrainer.train_model()`
-- validate out-of-sample prediction accuracy and confusion matrix -> `NNTrainer.evaluate_accuracy()`
-- export trained model weights into strategy rule conditions -> `NNTrainer.export_model()`
+- [ ] prepare feature matrix from historical prices and technical indicators -> `NNTrainer.prepare_features()`
+- [ ] train neural network model with PyTorch/Numba -> `NNTrainer.train_model()`
+- [ ] validate out-of-sample prediction accuracy and confusion matrix -> `NNTrainer.evaluate_accuracy()`
+- [ ] export trained model weights into strategy rule conditions -> `NNTrainer.export_model()`
 
 ---
 
@@ -1609,8 +1609,8 @@ flowchart TD
 - **Backend:** `app/workspace/portfolio/composer.py`
 - **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host dockable portfolio strategy list, weight allocation sliders, and combined equity curves -> `AppPortfolioComposer.init_workspace()`
-- compute portfolio metrics, correlation matrix, and aggregate drawdown -> `AppPortfolioComposer.compute_portfolio()`
+- [ ] host dockable portfolio strategy list, weight allocation sliders, and combined equity curves -> `AppPortfolioComposer.init_workspace()`
+- [ ] compute portfolio metrics, correlation matrix, and aggregate drawdown -> `AppPortfolioComposer.compute_portfolio()`
 
 #### `PortfolioComposer`
 *Feature:* Interactive portfolio canvas, weight allocator, and benchmark comparison
@@ -1618,13 +1618,13 @@ flowchart TD
 - **Backend:** `app/workspace/portfolio/composer.py`
 - **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- display Portfolio Composer main view -> `Composer.portfolio_composer()`
-- display portfolio backtest results and metrics -> `Composer.results()`
-- configure portfolio composition settings -> `Composer.settings()`
-- configure automatic recomputation of portfolio upon weight modification -> `Composer.autocomputation()`
-- configure portfolio strategy weights and selection -> `Composer.composition()`
-- configure portfolio calculation parameters -> `Composer.configuration()`
-- add Buy and Hold benchmark strategy to portfolio -> `Composer.add_buy_hold_str()`
+- [ ] display Portfolio Composer main view -> `Composer.portfolio_composer()`
+- [ ] display portfolio backtest results and metrics -> `Composer.results()`
+- [ ] configure portfolio composition settings -> `Composer.settings()`
+- [ ] configure automatic recomputation of portfolio upon weight modification -> `Composer.autocomputation()`
+- [ ] configure portfolio strategy weights and selection -> `Composer.composition()`
+- [ ] configure portfolio calculation parameters -> `Composer.configuration()`
+- [ ] add Buy and Hold benchmark strategy to portfolio -> `Composer.add_buy_hold_str()`
 
 #### `SettingsCreatePortfolio`
 *Feature:* Strategy selection and capital weighting for portfolio creation
@@ -1632,7 +1632,7 @@ flowchart TD
 - **Backend:** `app/workspace/portfolio/settings/create_portfolio.py`
 - **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx`
 *Functional Requirements & Implementation:*
-- configure strategy selection and weighting for portfolio creation -> `CreatePortfolio.settings_create_portfolio()`
+- [ ] configure strategy selection and weighting for portfolio creation -> `CreatePortfolio.settings_create_portfolio()`
 
 #### `TaskCreatePortfolio`
 *Feature:* Worker process computing blended portfolio equity curves
@@ -1640,7 +1640,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/create_portfolio.py`
 - **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for portfolio creation task -> `CreatePortfolioTask.simple_settings()`
+- [ ] configure simple settings for portfolio creation task -> `CreatePortfolioTask.simple_settings()`
 
 ### Phase 11.2: Automated Portfolio Combination Search (Portfolio Master)
 
@@ -1650,8 +1650,8 @@ flowchart TD
 - **Backend:** `app/workspace/portfolio/master.py`
 - **Frontend:** `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host automated portfolio discovery controls and Pareto frontier visualizations -> `AppPortfolioMaster.init_workspace()`
-- trigger genetic portfolio search across databank candidate pools -> `AppPortfolioMaster.start_search()`
+- [ ] host automated portfolio discovery controls and Pareto frontier visualizations -> `AppPortfolioMaster.init_workspace()`
+- [ ] trigger genetic portfolio search across databank candidate pools -> `AppPortfolioMaster.start_search()`
 
 #### `SettingsAutomaticPortfolioBuilder`
 *Feature:* Genetic portfolio search parameters and correlation constraints
@@ -1659,9 +1659,9 @@ flowchart TD
 - **Backend:** `app/workspace/portfolio/settings/auto_builder.py`
 - **Frontend:** `ui/app/workspace/PortfolioMaster/PortfolioMasterSettings.tsx`
 *Functional Requirements & Implementation:*
-- configure automatic portfolio builder search and sizing -> `AutoPortfolioBuilder.automatic_portfolio_builder()`
-- configure portfolio correlation limits and thresholds -> `AutoPortfolioBuilder.correlation_settings()`
-- configure genetic algorithm parameters for portfolio evolution -> `AutoPortfolioBuilder.genetic_settings()`
+- [ ] configure automatic portfolio builder search and sizing -> `AutoPortfolioBuilder.automatic_portfolio_builder()`
+- [ ] configure portfolio correlation limits and thresholds -> `AutoPortfolioBuilder.correlation_settings()`
+- [ ] configure genetic algorithm parameters for portfolio evolution -> `AutoPortfolioBuilder.genetic_settings()`
 
 #### `TaskAutomaticPortfolioBuilder`
 *Feature:* Worker process evolving optimal combinations of uncorrelated strategies
@@ -1669,7 +1669,7 @@ flowchart TD
 - **Backend:** `app/workspace/portfolio/master_task.py`
 - **Frontend:** `ui/app/workspace/PortfolioMaster/portfolioMasterModel.ts`
 *Functional Requirements & Implementation:*
-- configure simple settings for automatic portfolio builder task -> `AutoPortfolioTask.simple_settings()`
+- [ ] configure simple settings for automatic portfolio builder task -> `AutoPortfolioTask.simple_settings()`
 
 ---
 
@@ -1697,8 +1697,8 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/projects.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- host dockable project explorer, visual task pipeline DAG canvas, and execution console -> `AppTaskManager.init_workspace()`
-- execute automated multi-task custom project pipeline -> `AppTaskManager.run_project()`
+- [ ] host dockable project explorer, visual task pipeline DAG canvas, and execution console -> `AppTaskManager.init_workspace()`
+- [ ] execute automated multi-task custom project pipeline -> `AppTaskManager.run_project()`
 
 #### `TaskManagerProjects`
 *Feature:* Project CRUD, bulk symbol modification, and execution controls
@@ -1706,11 +1706,11 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/projects_manager.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- list all custom projects -> `TMProjects.projects()`
-- create a new custom project -> `TMProjects.new_project()`
-- rename a custom project -> `TMProjects.rename_project()`
-- modify custom project symbols in bulk across all tasks -> `TMProjects.modify_symbols()`
-- provide control actions (run, pause, stop) for a project -> `TMProjects.tm_project_control()`
+- [ ] list all custom projects -> `TMProjects.projects()`
+- [ ] create a new custom project -> `TMProjects.new_project()`
+- [ ] rename a custom project -> `TMProjects.rename_project()`
+- [ ] modify custom project symbols in bulk across all tasks -> `TMProjects.modify_symbols()`
+- [ ] provide control actions (run, pause, stop) for a project -> `TMProjects.tm_project_control()`
 
 #### `TaskManagerTasks`
 *Feature:* Task CRUD, task reordering, configuration copying, and card UI
@@ -1718,12 +1718,12 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks_manager.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- list and reorder tasks in a project -> `TMTasks.tasks()`
-- create a new task within a project -> `TMTasks.new_task()`
-- rename an existing task -> `TMTasks.rename_task()`
-- copy configuration from an existing task -> `TMTasks.copy_from_task()`
-- copy configuration to one or more tasks -> `TMTasks.copy_to_tasks()`
-- display individual task item card in task manager -> `TMTasks.tmtask()`
+- [ ] list and reorder tasks in a project -> `TMTasks.tasks()`
+- [ ] create a new task within a project -> `TMTasks.new_task()`
+- [ ] rename an existing task -> `TMTasks.rename_task()`
+- [ ] copy configuration from an existing task -> `TMTasks.copy_from_task()`
+- [ ] copy configuration to one or more tasks -> `TMTasks.copy_to_tasks()`
+- [ ] display individual task item card in task manager -> `TMTasks.tmtask()`
 
 #### `ProjectResources`
 *Feature:* Symbol and indicator dependency resolver for project pipelines
@@ -1731,10 +1731,10 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/project_resources.py`
 - **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
 *Functional Requirements & Implementation:*
-- display newly added project resources -> `Resources.added_resources()`
-- display symbol differences between strategies and project -> `Resources.diff_resources()`
-- resolve custom indicator/data resources for project -> `Resources.resolve_custom_resources()`
-- resolve missing symbols and data resources for project -> `Resources.resolve_resources()`
+- [ ] display newly added project resources -> `Resources.added_resources()`
+- [ ] display symbol differences between strategies and project -> `Resources.diff_resources()`
+- [ ] resolve custom indicator/data resources for project -> `Resources.resolve_custom_resources()`
+- [ ] resolve missing symbols and data resources for project -> `Resources.resolve_resources()`
 
 #### `ProjectSettings`
 *Feature:* Project metadata and default databank assignments
@@ -1742,7 +1742,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/project_settings.py`
 - **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
 *Functional Requirements & Implementation:*
-- display project settings overview panel -> `PMSettings.settings()`
+- [ ] display project settings overview panel -> `PMSettings.settings()`
 
 #### `EnginePanel`
 *Feature:* Live execution monitor: engine state, accepted/dismissed counters, DAG flow, real-time log
@@ -1750,15 +1750,15 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/engine_panel.py`
 - **Frontend:** `ui/app/workspace/Builder/EnginePanel.tsx`
 *Functional Requirements & Implementation:*
-- display engine control and execution overview -> `Engine.engine()`
-- display strategy acceptance statistics -> `Engine.accepted_stats()`
-- display strategy dismissal statistics -> `Engine.dismissal_stats()`
-- display total execution times per engine stage -> `Engine.duration_stats()`
-- display help on configuring project flow -> `Engine.project_config_help()`
-- display text execution log for project -> `Engine.text_log()`
-- display visual project flow and execution steps -> `Engine.visual_log()`
-- display live generation charts panel -> `Engine.engine_chart_panel()`
-- display fitness evolution chart -> `Engine.fitness_evolution()`
+- [ ] display engine control and execution overview -> `Engine.engine()`
+- [ ] display strategy acceptance statistics -> `Engine.accepted_stats()`
+- [ ] display strategy dismissal statistics -> `Engine.dismissal_stats()`
+- [ ] display total execution times per engine stage -> `Engine.duration_stats()`
+- [ ] display help on configuring project flow -> `Engine.project_config_help()`
+- [ ] display text execution log for project -> `Engine.text_log()`
+- [ ] display visual project flow and execution steps -> `Engine.visual_log()`
+- [ ] display live generation charts panel -> `Engine.engine_chart_panel()`
+- [ ] display fitness evolution chart -> `Engine.fitness_evolution()`
 
 ### Phase 12.2: Flow Control, Branching & Alerts
 
@@ -1768,7 +1768,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/goto.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/GoToTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for task flow jump/goto task -> `GoToTask.simple_settings()`
+- [ ] configure simple settings for task flow jump/goto task -> `GoToTask.simple_settings()`
 
 #### `SettingsGoToTask`
 *Feature:* Conditional jump logic and target task configuration
@@ -1776,7 +1776,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/goto.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/GoToTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure conditional branching and jump to another task -> `GoToSettings.settings_go_to_task()`
+- [ ] configure conditional branching and jump to another task -> `GoToSettings.settings_go_to_task()`
 
 #### `TaskWaitFor`
 *Feature:* Delay timer and file availability wait runner
@@ -1784,7 +1784,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/wait.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/WaitTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for wait task -> `WaitForTask.simple_settings()`
+- [ ] configure simple settings for wait task -> `WaitForTask.simple_settings()`
 
 #### `SettingsWaitFor`
 *Feature:* Delay time and file condition configuration
@@ -1792,7 +1792,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/wait.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/WaitTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure wait condition (delay time or file presence) -> `WaitForSettings.settings_wait_for()`
+- [ ] configure wait condition (delay time or file presence) -> `WaitForSettings.settings_wait_for()`
 
 #### `TaskStopAndStart`
 *Feature:* Process lifecycle and external command runner
@@ -1800,7 +1800,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/stop_start.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/StopStartTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for stopping and starting tasks -> `StopAndStartTask.simple_settings()`
+- [ ] configure simple settings for stopping and starting tasks -> `StopAndStartTask.simple_settings()`
 
 #### `SettingsStopAndStart`
 *Feature:* External task start/stop configuration
@@ -1808,7 +1808,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/stop_start.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/StopStartTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure stopping and starting external tasks or programs -> `StopAndStartSettings.settings_stop_and_start()`
+- [ ] configure stopping and starting external tasks or programs -> `StopAndStartSettings.settings_stop_and_start()`
 
 #### `TaskNotification`
 *Feature:* System, audio, and email alert runner
@@ -1816,7 +1816,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/notify.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/NotifyTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for notification task -> `NotificationTask.simple_settings()`
+- [ ] configure simple settings for notification task -> `NotificationTask.simple_settings()`
 
 #### `SettingsNotification`
 *Feature:* Notification alerts and execution pause configuration
@@ -1824,7 +1824,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/notification.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/NotifyTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure email/audio notifications and pause on task completion -> `NotificationSettings.settings_notification()`
+- [ ] configure email/audio notifications and pause on task completion -> `NotificationSettings.settings_notification()`
 
 #### `SettingsNotes`
 *Feature:* Rich-text documentation and project notes storage
@@ -1832,7 +1832,7 @@ flowchart TD
 - **Backend:** `app/workspace/builder/settings/notes.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/NotesTab.tsx`
 *Functional Requirements & Implementation:*
-- display and edit notes for project or task -> `Notes.notes()`
+- [ ] display and edit notes for project or task -> `Notes.notes()`
 
 #### `ProjectConditionCyclesCount`
 *Feature:* Condition evaluator: triggers based on engine cycle count
@@ -1840,7 +1840,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/conditions/cycles_count.py`
 - **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
 *Functional Requirements & Implementation:*
-- evaluate whether engine cycle count reaches defined target threshold -> `CyclesCondition.evaluate()`
+- [ ] evaluate whether engine cycle count reaches defined target threshold -> `CyclesCondition.evaluate()`
 
 #### `ProjectConditionGoToActivated`
 *Feature:* Condition evaluator: tracks GoTo jump activations
@@ -1848,7 +1848,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/conditions/goto_activated.py`
 - **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
 *Functional Requirements & Implementation:*
-- monitor whether target GoTo jump condition has been activated -> `GoToActivatedCondition.evaluate()`
+- [ ] monitor whether target GoTo jump condition has been activated -> `GoToActivatedCondition.evaluate()`
 
 #### `ProjectConditionGoToEvaluated`
 *Feature:* Condition evaluator: monitors conditional branch evaluations
@@ -1856,7 +1856,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/conditions/goto_evaluated.py`
 - **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
 *Functional Requirements & Implementation:*
-- evaluate result of conditional expression in project DAG -> `GoToEvaluatedCondition.evaluate()`
+- [ ] evaluate result of conditional expression in project DAG -> `GoToEvaluatedCondition.evaluate()`
 
 #### `ProjectConditionResultsCount`
 *Feature:* Condition evaluator: triggers when databank strategy count threshold is met
@@ -1864,7 +1864,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/conditions/results_count.py`
 - **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
 *Functional Requirements & Implementation:*
-- evaluate whether databank contains sufficient number of accepted strategies -> `ResultsCountCondition.evaluate()`
+- [ ] evaluate whether databank contains sufficient number of accepted strategies -> `ResultsCountCondition.evaluate()`
 
 #### `ProjectConditionRunTime`
 *Feature:* Condition evaluator: triggers based on elapsed task execution time
@@ -1872,7 +1872,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/conditions/run_time.py`
 - **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
 *Functional Requirements & Implementation:*
-- evaluate whether task execution duration exceeds time limit -> `RunTimeCondition.evaluate()`
+- [ ] evaluate whether task execution duration exceeds time limit -> `RunTimeCondition.evaluate()`
 
 ### Phase 12.3: Data & Databank Pipeline Steps
 
@@ -1882,7 +1882,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/data_update.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DataUpdateTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for data updating task -> `UpdateDataTask.simple_settings()`
+- [ ] configure simple settings for data updating task -> `UpdateDataTask.simple_settings()`
 
 #### `SettingsUpdateData`
 *Feature:* Automated historical data update settings
@@ -1890,7 +1890,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/update_data.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DataUpdateTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure automated historical data updates -> `UpdateDataSettings.settings_update_data()`
+- [ ] configure automated historical data updates -> `UpdateDataSettings.settings_update_data()`
 
 #### `SettingsAutoRetestData`
 *Feature:* Market data and commission profile assigner for automated retesting
@@ -1898,7 +1898,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/auto_retest.py`
 - **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
 *Functional Requirements & Implementation:*
-- configure data and commissions for automatic retesting -> `AutoRetestData.auto_retest_data()`
+- [ ] configure data and commissions for automatic retesting -> `AutoRetestData.auto_retest_data()`
 
 #### `TaskLoadFromFiles`
 *Feature:* External strategy file importer task runner
@@ -1906,7 +1906,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/load_files.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for loading strategies task -> `LoadFromFilesTask.simple_settings()`
+- [ ] configure simple settings for loading strategies task -> `LoadFromFilesTask.simple_settings()`
 
 #### `SettingsLoadFromFiles`
 *Feature:* File paths and filters for strategy loading settings
@@ -1914,7 +1914,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/load_files.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
-- configure loading strategies from files into databank -> `LoadFromFilesSettings.settings_load_from_files()`
+- [ ] configure loading strategies from files into databank -> `LoadFromFilesSettings.settings_load_from_files()`
 
 #### `TaskClearDatabanks`
 *Feature:* Databank clearing task runner
@@ -1922,7 +1922,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/databank_clear.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DatabankClearTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for clearing databanks task -> `ClearDatabanksTask.simple_settings()`
+- [ ] configure simple settings for clearing databanks task -> `ClearDatabanksTask.simple_settings()`
 
 #### `SettingsClearDatabanks`
 *Feature:* Databank clearing selection settings
@@ -1930,7 +1930,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/clear_databanks.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DatabankClearTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure which databanks to clear during task execution -> `ClearDatabanksSettings.clear_databanks()`
+- [ ] configure which databanks to clear during task execution -> `ClearDatabanksSettings.clear_databanks()`
 
 #### `TaskFiltering`
 *Feature:* Databank strategy filter and ranking task runner
@@ -1938,7 +1938,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/filtering.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankViews.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for filtering task -> `FilteringTask.simple_settings()`
+- [ ] configure simple settings for filtering task -> `FilteringTask.simple_settings()`
 
 #### `SettingsFiltering`
 *Feature:* Databank filtering conditions and actions settings
@@ -1946,7 +1946,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/filtering.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankViews.tsx`
 *Functional Requirements & Implementation:*
-- configure databank filtering conditions and actions -> `FilteringSettings.settings_filtering()`
+- [ ] configure databank filtering conditions and actions -> `FilteringSettings.settings_filtering()`
 
 #### `TaskLogDatabankStats`
 *Feature:* Statistical metric logger for databanks task runner
@@ -1954,7 +1954,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/log_stats.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for logging databank statistics task -> `LogDatabankStatsTask.simple_settings()`
+- [ ] configure simple settings for logging databank statistics task -> `LogDatabankStatsTask.simple_settings()`
 
 #### `SettingsLogDatabankStats`
 *Feature:* Databank statistical logging conditions settings
@@ -1962,9 +1962,9 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/log_stats.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
-- configure logging of databank statistics -> `LogStatsSettings.log_databank_stats()`
-- add a new databank statistics logging rule -> `LogStatsSettings.new_log_databank_stats()`
-- configure databank stat calculation type and conditions -> `LogStatsSettings.log_databank_stats_type()`
+- [ ] configure logging of databank statistics -> `LogStatsSettings.log_databank_stats()`
+- [ ] add a new databank statistics logging rule -> `LogStatsSettings.new_log_databank_stats()`
+- [ ] configure databank stat calculation type and conditions -> `LogStatsSettings.log_databank_stats_type()`
 
 #### `TaskSaveToFiles`
 *Feature:* Strategy file exporter (.str, platform code) task runner
@@ -1972,7 +1972,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/save_files.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for saving strategies task -> `SaveToFilesTask.simple_settings()`
+- [ ] configure simple settings for saving strategies task -> `SaveToFilesTask.simple_settings()`
 
 #### `SettingsSaveToFiles`
 *Feature:* Strategy file save destinations and formats settings
@@ -1980,7 +1980,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/save_files.py`
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
-- configure saving databank strategies to disk -> `SaveToFilesSettings.settings_save_to_files()`
+- [ ] configure saving databank strategies to disk -> `SaveToFilesSettings.settings_save_to_files()`
 
 #### `TaskDeleteFile`
 *Feature:* Temporary file cleanup task runner
@@ -1988,7 +1988,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/delete_file.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DeleteFileTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for file deletion task -> `DeleteFileTask.simple_settings()`
+- [ ] configure simple settings for file deletion task -> `DeleteFileTask.simple_settings()`
 
 #### `SettingsDeleteFile`
 *Feature:* File deletion paths and patterns settings
@@ -1996,7 +1996,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/delete_file.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DeleteFileTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure file deletion paths and patterns -> `DeleteFileSettings.settings_delete_file()`
+- [ ] configure file deletion paths and patterns -> `DeleteFileSettings.settings_delete_file()`
 
 ### Phase 12.4: Integration & Batch Configuration
 
@@ -2006,7 +2006,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/external_script.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/ExternalScriptTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for external script execution task -> `CallScriptTask.simple_settings()`
+- [ ] configure simple settings for external script execution task -> `CallScriptTask.simple_settings()`
 
 #### `SettingsCallExternalScript`
 *Feature:* External executable path and command-line arguments settings
@@ -2014,7 +2014,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/external_script.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/ExternalScriptTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure external script/executable call settings -> `CallScriptSettings.settings_call_external_script()`
+- [ ] configure external script/executable call settings -> `CallScriptSettings.settings_call_external_script()`
 
 #### `TaskCustomAnalysis`
 *Feature:* Custom databank analysis task runner
@@ -2022,7 +2022,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/custom_analysis.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for custom analysis task -> `CustomAnalysisTask.simple_settings()`
+- [ ] configure simple settings for custom analysis task -> `CustomAnalysisTask.simple_settings()`
 
 #### `SettingsCustomAnalysis`
 *Feature:* Custom analysis script and databank targets settings
@@ -2030,7 +2030,7 @@ flowchart TD
 - **Backend:** `app/workspace/builder/settings/custom_analysis.py`
 - **Frontend:** `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx`
 *Functional Requirements & Implementation:*
-- configure custom analysis script and databank targets -> `CustomAnalysisSettings.settings_custom_analysis()`
+- [ ] configure custom analysis script and databank targets -> `CustomAnalysisSettings.settings_custom_analysis()`
 
 #### `TaskApplyMassConfig`
 *Feature:* Mass configuration template applier task runner
@@ -2038,7 +2038,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/mass_config.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/MassConfigTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure simple settings for mass configuration task -> `ApplyMassConfigTask.simple_settings()`
+- [ ] configure simple settings for mass configuration task -> `ApplyMassConfigTask.simple_settings()`
 
 #### `SettingsApplyMassConfig`
 *Feature:* Mass configuration parameters settings
@@ -2046,7 +2046,7 @@ flowchart TD
 - **Backend:** `app/workspace/custom_projects/tasks/settings/mass_config.py`
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/MassConfigTaskModal.tsx`
 *Functional Requirements & Implementation:*
-- configure mass settings application across multiple tasks -> `ApplyMassConfigSettings.apply_mass_config()`
+- [ ] configure mass settings application across multiple tasks -> `ApplyMassConfigSettings.apply_mass_config()`
 
 ---
 
@@ -2064,10 +2064,10 @@ flowchart TD
 - **Backend:** `app/workspace/grid_control/grid_control.py`
 - **Frontend:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- maintain connection pool to remote Python worker nodes over WebSocket / local IPC -> `GridControl.connect_worker()`
-- partition and dispatch heavy backtest, optimization, and Monte Carlo batches across cluster -> `GridControl.dispatch_batch()`
-- aggregate remote worker result batches into local SQLite job ledger -> `GridControl.collect_results()`
-- monitor worker node CPU utilization, memory pressure, and heartbeat latency -> `GridControl.get_cluster_status()`
+- [ ] maintain connection pool to remote Python worker nodes over WebSocket / local IPC -> `GridControl.connect_worker()`
+- [ ] partition and dispatch heavy backtest, optimization, and Monte Carlo batches across cluster -> `GridControl.dispatch_batch()`
+- [ ] aggregate remote worker result batches into local SQLite job ledger -> `GridControl.collect_results()`
+- [ ] monitor worker node CPU utilization, memory pressure, and heartbeat latency -> `GridControl.get_cluster_status()`
 
 #### `AppGridTest`
 *Feature:* Grid worker node connectivity and throughput test suite
@@ -2075,8 +2075,8 @@ flowchart TD
 - **Backend:** `app/workspace/grid_test/grid_test.py`
 - **Frontend:** `ui/app/workspace/GridTest/GridTestWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- send benchmark calculation jobs to remote workers and verify throughput -> `GridTest.run_benchmark()`
-- measure round-trip latency and report worker node execution errors -> `GridTest.verify_worker()`
+- [ ] send benchmark calculation jobs to remote workers and verify throughput -> `GridTest.run_benchmark()`
+- [ ] measure round-trip latency and report worker node execution errors -> `GridTest.verify_worker()`
 
 ---
 
@@ -2094,9 +2094,9 @@ flowchart TD
 - **Backend:** `app/workspace/marketplace/marketplace.py`
 - **Frontend:** `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- browse and search marketplace catalog for community indicators and snippets -> `Marketplace.browse_catalog()`
-- download and install verified extension packages into local workspace -> `Marketplace.install_package()`
-- publish custom user indicators or strategy presets to marketplace -> `Marketplace.publish_item()`
+- [ ] browse and search marketplace catalog for community indicators and snippets -> `Marketplace.browse_catalog()`
+- [ ] download and install verified extension packages into local workspace -> `Marketplace.install_package()`
+- [ ] publish custom user indicators or strategy presets to marketplace -> `Marketplace.publish_item()`
 
 ---
 
@@ -2114,8 +2114,8 @@ flowchart TD
 - **Backend:** `app/workspace/business/business.py`
 - **Frontend:** `ui/app/workspace/Business/BusinessWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- manage institutional enterprise licenses and multi-account permissions -> `Business.manage_licenses()`
-- export white-label executive strategy fact-sheets and compliance reports -> `Business.generate_audit_report()`
+- [ ] manage institutional enterprise licenses and multi-account permissions -> `Business.manage_licenses()`
+- [ ] export white-label executive strategy fact-sheets and compliance reports -> `Business.generate_audit_report()`
 
 ---
 
@@ -2133,8 +2133,8 @@ flowchart TD
 - **Backend:** `app/workspace/debug_console/debug_console.py`
 - **Frontend:** `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx`
 *Functional Requirements & Implementation:*
-- display live CPU, RAM, and background worker thread telemetry -> `DebugConsole.get_telemetry()`
-- stream system warning and error logs over WebSocket to Dockview console -> `DebugConsole.stream_system_logs()`
-- trigger manual garbage collection and memory cache cleanup -> `DebugConsole.clear_caches()`
+- [ ] display live CPU, RAM, and background worker thread telemetry -> `DebugConsole.get_telemetry()`
+- [ ] stream system warning and error logs over WebSocket to Dockview console -> `DebugConsole.stream_system_logs()`
+- [ ] trigger manual garbage collection and memory cache cleanup -> `DebugConsole.clear_caches()`
 
 ---
