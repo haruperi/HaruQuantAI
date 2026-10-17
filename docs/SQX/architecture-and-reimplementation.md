@@ -1,6 +1,6 @@
 # StrategyQuant X — Master Workspaces & Reimplementation Blueprint
 
-This document unites the **complete system architecture**, the **workspace-by-workspace implementation order**, and the **detailed feature specifications** into a single cohesive reference for reimplementing StrategyQuant X.
+This document unites the **complete system architecture**, the **workspace-by-workspace implementation order**, the **HaruQuantAI file and project structure**, and the **detailed functional specifications with code implementation mappings** into a single cohesive reference for reimplementing StrategyQuant X.
 
 # TARGET STACK (the reimplementation must use this)
 - Frontend: React + TypeScript + Vite + Tailwind CSS
@@ -60,6 +60,86 @@ flowchart TD
 
 ---
 
+## HaruQuantAI Project & File Structure
+
+The reimplementation strictly follows the **3-Tier Spatial Architecture** defined in `HaruQuantAI`:
+1. **Tier 1: Host Platform (`app/host/` & `ui/app/host/`)** — Pure universal platform foundation (lifecycle, settings, SQLite WAL persistence, multi-sink logging, ProcessPool background jobs, transports, and dynamic plugin discovery). Zero domain or quantitative logic.
+2. **Tier 2: Domain Workspaces (`app/workspace/` & `ui/app/workspace/`)** — Autonomous operational centers encapsulating business logic, calculation pipelines, and FastAPI REST/WebSocket routers (Data Manager, Strategy Builder, Results/Databank, Retester, Optimizer, Portfolio Composer, Custom Projects).
+3. **Tier 3: Dynamic Plugins (`app/plugins/` & `ui/app/plugins/`)** — Decoupled add-on packages declaring typed extension slots (e.g. `data.provider`, `builder.candidate`), scanned and attached dynamically at runtime.
+4. **Domain Services & Primitives (`app/services/` & `ui/app/components/`)** — Mathematical routines, indicator libraries, broker/feed bridges, and reusable UI components.
+
+```
+HaruQuantAI/
+├── app/                                    # Python Backend (FastAPI, Pydantic, SQLite WAL, NumPy/Numba)
+│   ├── host/                               # Tier 1: Platform Host (Lifecycle, persistence, jobs, transports)
+│   │   ├── persistence/                    # SQLite WAL database CRUD (create.py, read.py, update.py, delete.py)
+│   │   ├── bootstrap.py                    # Multi-stage startup & LIFO teardown
+│   │   ├── discovery.py                    # Dynamic plugin scanner & manifest loader
+│   │   ├── jobs.py                         # Multiprocessing job coordinator & ProcessPoolExecutor
+│   │   ├── logging.py                      # Multi-sink asynchronous telemetry & redaction
+│   │   ├── resources.py                    # Hardware inspection & memory watchdog
+│   │   ├── session.py                      # Ephemeral authentication & scope guards
+│   │   ├── settings.py                     # Central configuration & revision-tracked batch saves
+│   │   └── transport.py                    # FastAPI gateway, REST routes, WebSocket event bus
+│   ├── workspace/                          # Tier 2: Domain Workspaces (Cohesive business workflows)
+│   │   ├── data_manager/                   # QDM market data catalog, instruments, sessions, baskets, broker profiles
+│   │   ├── code_editor/                    # Monaco-backed snippet and extension development
+│   │   ├── algo_wizard/                    # Visual rule authoring, logic trees, code generator
+│   │   ├── builder/                        # Genetic strategy generation, candidate engines, ranking models
+│   │   ├── results/                        # Databank storage, strategy comparison, performance reports, equity curves
+│   │   ├── retesting/                      # Multi-market cross-checks, Monte Carlo, SPP, Walk-Forward
+│   │   ├── optimizer/                      # Grid/genetic parameter tuning, Walk-Forward Matrix, 3D surface charts
+│   │   ├── neural_network/                 # Feature extraction, PyTorch/Numba model training, signal classifiers
+│   │   ├── portfolio/                      # Portfolio Composer (interactive) & Portfolio Master (genetic search)
+│   │   ├── custom_projects/                # Automated task pipeline DAG engine (Custom Projects)
+│   │   ├── grid_control/                   # Distributed computing worker pool & cluster node coordinator
+│   │   ├── grid_test/                      # Cluster benchmark test suite & latency probes
+│   │   ├── marketplace/                    # Community extension package repository client
+│   │   ├── business/                       # Multi-account licensing & institutional compliance reporting
+│   │   ├── debug_console/                  # Live system telemetry & memory diagnostics
+│   │   ├── home/                           # Landing dashboard & system overview
+│   │   └── chart/                          # Standalone charting engine & visual analytics
+│   ├── services/                           # Shared Domain Primitives & Adapters
+│   │   ├── brokers/                        # Data feeds & broker bridges (Dukascopy, Darwinex, MT5, Yahoo, etc.)
+│   │   │   └── exchanges/                  # Crypto exchange connectors (Binance Spot, USDT-M, Coin-M)
+│   │   ├── indicators/                     # Mathematical indicators (momentum, price_action, regime, trend, volatility, volume)
+│   │   ├── trading/                        # Order execution, position management, trade simulation
+│   │   └── utils/                          # Common math, comparisons, time utils, formatters
+│   └── plugins/                            # Tier 3: Dynamic Add-on Packages (Loaded dynamically via manifests)
+│       └── data_source/                    # Modular data provider extensions
+├── ui/                                     # React Frontend (TypeScript, Vite, Tailwind CSS, Dockview)
+│   └── app/
+│       ├── host/                           # Platform UI (Connection modals, settings, top header, status bar)
+│       ├── components/                     # Reusable UI primitives (buttons, modals, tables, charts, dockview wrappers)
+│       ├── plugins/                        # Plugin UI widgets & dialogs
+│       │   ├── databank/                   # Databank tables, toolbars, view filters, comparison modal
+│       │   ├── data_source/                # Data provider import modals (Dukascopy, Darwinex, MT5, Yahoo, Catalogs)
+│       │   ├── optimization/               # Optimization 3D surface visualizers
+│       │   └── project/                    # Project task workbench & DAG canvas
+│       └── workspace/                      # Domain Workspace Views (Dockview panel views)
+│           ├── DataManager/                # Data catalog & symbol explorer
+│           ├── CodeEditor/                 # Code editor workspace & extension modals
+│           ├── AlgoWizard/                 # Drag-and-drop strategy rule canvas
+│           ├── Builder/                    # Strategy builder dashboard, engine panel, settings tabs
+│           ├── Results/                    # Strategy databanks, trade analysis, equity charts
+│           ├── Retester/                   # Retesting workspace, cross-check modals, progress monitors
+│           ├── Optimizer/                  # Parameter optimization workspace & Walk-Forward Matrix view
+│           ├── NeuralNetwork/              # Model training curves & confusion matrix views
+│           ├── PortfolioComposer/          # Interactive portfolio allocation & correlation matrix
+│           ├── PortfolioMaster/            # Automated genetic portfolio search workbench
+│           ├── CustomProjects/             # Task pipeline orchestrator & task modals
+│           ├── GridControl/                # Worker node management panel
+│           ├── GridTest/                   # Cluster benchmark runner
+│           ├── Business/                   # Enterprise license management
+│           ├── DebugConsole/               # Live telemetry & log streaming console
+│           ├── Home/                       # Welcome screen & quick-action cards
+│           ├── Chart/                      # Advanced multi-timeframe interactive charting engine
+│           └── Trading/                    # Live trade monitoring dashboard
+└── docs/                                   # Architectural specifications & guides
+```
+
+---
+
 ## 1. AppStrategyQuant — Host Application Runtime & Shared Services
 
 - **Primary Role**: The root host application container. Bootstraps the embedded web server, dependency injection container, plugin registry, and global event bus. All other workspaces and plugins load into this runtime.
@@ -70,223 +150,203 @@ flowchart TD
 
 #### `AppStrategyQuant`
 *Feature:* Host application lifecycle, dependency injection, and event bus runtime
-*Functional Requirements:*
-- bootstrap FastAPI backend application with CORS, security headers, and Uvicorn server
-- initialize SQLite database with WAL mode and coordinated write locks
-- register and initialize all domain feature modules and background worker processes
-- provide global in-memory event bus and WebSocket broadcast channel
-- manage application graceful shutdown, process termination, and resource cleanup
-*Functions to Create:*
-- AppHost.startup()
-- AppHost.initialize_db()
-- AppHost.register_modules()
-- AppHost.broadcast_event()
-- AppHost.shutdown()
+*Implementation Files:*
+- **Backend:** `app/host/bootstrap.py`
+- **Frontend:** `ui/app/host/HostConnectionModal.tsx`
+*Functional Requirements & Implementation:*
+- bootstrap FastAPI backend application with CORS, security headers, and Uvicorn server -> `AppHost.startup()`
+- initialize SQLite database with WAL mode and coordinated write locks -> `AppHost.initialize_db()`
+- register and initialize all domain feature modules and background worker processes -> `AppHost.register_modules()`
+- provide global in-memory event bus and WebSocket broadcast channel -> `AppHost.broadcast_event()`
+- manage application graceful shutdown, process termination, and resource cleanup -> `AppHost.shutdown()`
 
 ### Phase 1.2: Platform & Broker Connectivity
 
 #### `ConnectionTest`
 *Feature:* Endpoint ping and network connectivity validation utility
-*Functional Requirements:*
-- ping remote and local server endpoints to verify network connectivity
-- measure round-trip latency and report packet loss
-- diagnose DNS resolution and socket connection failures
-*Functions to Create:*
-- ConnectionTest.ping_endpoint()
-- ConnectionTest.check_latency()
-- ConnectionTest.diagnose_network()
+*Implementation Files:*
+- **Backend:** `app/host/transport.py`
+- **Frontend:** `ui/app/host/HostConnectionModal.tsx`
+*Functional Requirements & Implementation:*
+- ping remote and local server endpoints to verify network connectivity -> `ConnectionTest.ping_endpoint()`
+- measure round-trip latency and report packet loss -> `ConnectionTest.check_latency()`
+- diagnose DNS resolution and socket connection failures -> `ConnectionTest.diagnose_network()`
 
 #### `ConnectionLiveTest`
 *Feature:* Live trading account authentication and latency verification
-*Functional Requirements:*
-- validate live broker credentials and API tokens against broker gateways
-- measure order placement and quote streaming round-trip latency
-- verify account trading permissions and margin currency settings
-*Functions to Create:*
-- LiveTest.validate_credentials()
-- LiveTest.measure_trading_latency()
-- LiveTest.verify_trading_permissions()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/registry.py`
+- **Frontend:** `ui/app/workspace/Trading/TradingDashboard.tsx`
+*Functional Requirements & Implementation:*
+- validate live broker credentials and API tokens against broker gateways -> `LiveTest.validate_credentials()`
+- measure order placement and quote streaming round-trip latency -> `LiveTest.measure_trading_latency()`
+- verify account trading permissions and margin currency settings -> `LiveTest.verify_trading_permissions()`
 
 #### `ConnectionMT4`
 *Feature:* MetaTrader terminal bridge adapter (Target Stack: MetaTrader 5 Python adapter)
-*Functional Requirements:*
-- initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python package
-- query account balance, equity, leverage, server time, and broker specifications
-- stream live tick and bar price feeds into memory queues
-- dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal
-*Functions to Create:*
-- ConnectionMT5.initialize()
-- ConnectionMT5.get_account_info()
-- ConnectionMT5.stream_ticks()
-- ConnectionMT5.send_order()
-- ConnectionMT5.shutdown()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/metatrader.py`
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
+*Functional Requirements & Implementation:*
+- initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python package -> `ConnectionMT5.initialize()`
+- query account balance, equity, leverage, server time, and broker specifications -> `ConnectionMT5.get_account_info()`
+- stream live tick and bar price feeds into memory queues -> `ConnectionMT5.stream_ticks()`
+- dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal -> `ConnectionMT5.send_order()`
+- terminate terminal connection session and release resources -> `ConnectionMT5.shutdown()`
 
 ### Phase 1.3: Cryptocurrency Exchange Adapters
 
 #### `CryptoExchangeBinance`
 *Feature:* Binance Spot exchange REST and WebSocket client
-*Functional Requirements:*
-- fetch Binance spot exchange info, tradable symbols, and price filters
-- stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket
-- download historical Kline bar archives for backtesting
-- execute spot limit and market orders with HMAC SHA256 signature authentication
-*Functions to Create:*
-- BinanceSpot.get_exchange_info()
-- BinanceSpot.stream_klines()
-- BinanceSpot.download_historical_bars()
-- BinanceSpot.place_order()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/crypto.py`
+- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
+*Functional Requirements & Implementation:*
+- fetch Binance spot exchange info, tradable symbols, and price filters -> `BinanceSpot.get_exchange_info()`
+- stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket -> `BinanceSpot.stream_klines()`
+- download historical Kline bar archives for backtesting -> `BinanceSpot.download_historical_bars()`
+- execute spot limit and market orders with HMAC SHA256 signature authentication -> `BinanceSpot.place_order()`
 
 #### `CryptoExchangeBinanceCoinM`
 *Feature:* Binance Coin-Margined Delivery and Perpetual Futures adapter
-*Functional Requirements:*
-- fetch Coin-M contract specifications, index prices, and funding rates
-- stream real-time futures mark price and order book depth
-- manage Coin-M positions, leverage brackets, and margin types
-*Functions to Create:*
-- BinanceCoinM.get_contracts()
-- BinanceCoinM.get_funding_rate()
-- BinanceCoinM.stream_mark_price()
-- BinanceCoinM.set_leverage()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/crypto.py`
+- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
+*Functional Requirements & Implementation:*
+- fetch Coin-M contract specifications and index prices -> `BinanceCoinM.get_contracts()`
+- fetch Coin-M funding rates and historical intervals -> `BinanceCoinM.get_funding_rate()`
+- stream real-time futures mark price and order book depth -> `BinanceCoinM.stream_mark_price()`
+- manage Coin-M positions, leverage brackets, and margin types -> `BinanceCoinM.set_leverage()`
 
 #### `CryptoExchangeBinanceUsdtM`
 *Feature:* Binance USDT-Margined Perpetual Futures adapter
-*Functional Requirements:*
-- fetch USDT-M contract rules, tick sizes, step sizes, and funding intervals
-- stream real-time USDT-M Kline bars and aggregated trade events
-- place and cancel futures limit, stop-market, and trailing stop orders
-*Functions to Create:*
-- BinanceUsdtM.get_exchange_info()
-- BinanceUsdtM.stream_trades()
-- BinanceUsdtM.download_futures_klines()
-- BinanceUsdtM.send_futures_order()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/crypto.py`
+- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
+*Functional Requirements & Implementation:*
+- fetch USDT-M contract rules, tick sizes, step sizes, and funding intervals -> `BinanceUsdtM.get_exchange_info()`
+- stream real-time USDT-M Kline bars and aggregated trade events -> `BinanceUsdtM.stream_trades()`
+- download historical USDT-M futures Kline bar archives -> `BinanceUsdtM.download_futures_klines()`
+- place and cancel futures limit, stop-market, and trailing stop orders -> `BinanceUsdtM.send_futures_order()`
 
 #### `CryptoExchangeBitfinex`
 *Feature:* Bitfinex exchange REST and WebSocket market data adapter
-*Functional Requirements:*
-- fetch Bitfinex currency pairs, symbols, and minimum order sizes
-- stream real-time raw book and candle feeds over WebSocket
-- query historical candle archives for backtesting
-*Functions to Create:*
-- Bitfinex.get_symbols()
-- Bitfinex.stream_candles()
-- Bitfinex.fetch_candles()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/exchanges/bitfinex.py`
+- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
+*Functional Requirements & Implementation:*
+- fetch Bitfinex currency pairs, symbols, and minimum order sizes -> `Bitfinex.get_symbols()`
+- stream real-time raw book and candle feeds over WebSocket -> `Bitfinex.stream_candles()`
+- query historical candle archives for backtesting -> `Bitfinex.fetch_candles()`
 
 #### `CryptoExchangeCoinbasePro`
 *Feature:* Coinbase Advanced Trade REST and WebSocket client
-*Functional Requirements:*
-- fetch Coinbase product catalog, base/quote currencies, and increments
-- stream live market trades and heartbeats via Coinbase WebSocket
-- download historical candle data chunks and save to Parquet
-*Functions to Create:*
-- Coinbase.get_products()
-- Coinbase.stream_market_data()
-- Coinbase.download_candles()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/exchanges/coinbase.py`
+- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
+*Functional Requirements & Implementation:*
+- fetch Coinbase product catalog, base/quote currencies, and increments -> `Coinbase.get_products()`
+- stream live market trades and heartbeats via Coinbase WebSocket -> `Coinbase.stream_market_data()`
+- download historical candle data chunks and save to Parquet -> `Coinbase.download_candles()`
 
 #### `CryptoExchangePoloniex`
 *Feature:* Poloniex exchange market data connector
-*Functional Requirements:*
-- query Poloniex market definitions and trading rules
-- fetch historical candlestick records for crypto asset pairs
-*Functions to Create:*
-- Poloniex.get_markets()
-- Poloniex.get_candles()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/exchanges/poloniex.py`
+- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
+*Functional Requirements & Implementation:*
+- query Poloniex market definitions and trading rules -> `Poloniex.get_markets()`
+- fetch historical candlestick records for crypto asset pairs -> `Poloniex.get_candles()`
 
 ### Phase 1.4: Core Infrastructure Servlets & Theming
 
 #### `ServletConnection`
 *Feature:* FastAPI REST router for broker and exchange connections CRUD
-*Functional Requirements:*
-- create, read, update, and delete broker/exchange connection credentials in SQLite
-- test connection credentials and report latency status to frontend
-- provide active connection list to trading and data ingestion modules
-*Functions to Create:*
-- ServletConnection.list_connections()
-- ServletConnection.save_connection()
-- ServletConnection.delete_connection()
-- ServletConnection.test_connection()
+*Implementation Files:*
+- **Backend:** `app/host/transport.py`
+- **Frontend:** `ui/app/host/HostConnectionModal.tsx`
+*Functional Requirements & Implementation:*
+- list existing broker and exchange connections -> `ServletConnection.list_connections()`
+- save or update connection credentials in SQLite -> `ServletConnection.save_connection()`
+- delete connection configuration and cached tokens -> `ServletConnection.delete_connection()`
+- test connection credentials and report latency status to frontend -> `ServletConnection.test_connection()`
 
 #### `ServletConstants`
 *Feature:* System constants, environment paths, and runtime metadata endpoints
-*Functional Requirements:*
-- expose application version, build timestamp, and runtime environment paths
-- provide default platform constants (supported timeframes, bar types, currencies)
-- serve system resource limits and hardware concurrency specs
-*Functions to Create:*
-- ServletConstants.get_constants()
-- ServletConstants.get_system_specs()
+*Implementation Files:*
+- **Backend:** `app/host/transport.py`
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
+*Functional Requirements & Implementation:*
+- expose application version, build timestamp, and runtime environment paths -> `ServletConstants.get_constants()`
+- serve system resource limits, hardware concurrency specs, and supported timeframes -> `ServletConstants.get_system_specs()`
 
 #### `ServletProject`
 *Feature:* FastAPI project manifest persistence router
-*Functional Requirements:*
-- save and load project definitions, task configurations, and pipelines to SQLite
-- list existing projects with last-modified timestamps and execution statuses
-- clone or delete projects and their associated task configurations
-*Functions to Create:*
-- ServletProject.list_projects()
-- ServletProject.load_project()
-- ServletProject.save_project()
-- ServletProject.delete_project()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/routes.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/projectClient.ts`
+*Functional Requirements & Implementation:*
+- list existing projects with last-modified timestamps and execution statuses -> `ServletProject.list_projects()`
+- load project definition, task configuration, and workflow pipeline -> `ServletProject.load_project()`
+- save or update project definitions and task DAG to SQLite -> `ServletProject.save_project()`
+- delete project configuration and associated temporary artifacts -> `ServletProject.delete_project()`
 
 #### `ServletRenameTool`
 *Feature:* Bulk renaming and alias management API
-*Functional Requirements:*
-- apply regex and template pattern replacements across symbol, databank, and strategy names
-- validate proposed renamed entities for naming collisions and illegal characters
-*Functions to Create:*
-- ServletRenameTool.batch_rename()
-- ServletRenameTool.validate_names()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/databank/rename.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankRenameController.tsx`
+*Functional Requirements & Implementation:*
+- apply regex and template pattern replacements across symbol, databank, and strategy names -> `ServletRenameTool.batch_rename()`
+- validate proposed renamed entities for naming collisions and illegal characters -> `ServletRenameTool.validate_names()`
 
 #### `ServletGridControl`
 *Feature:* FastAPI WebSocket and IPC router for distributed worker nodes
-*Functional Requirements:*
-- authenticate and accept remote worker node WebSocket connections
-- route calculation jobs (backtests, optimizations, Monte Carlo) to idle workers
-- stream worker health metrics and heartbeats to frontend Dockview panel
-*Functions to Create:*
-- ServletGridControl.register_worker()
-- ServletGridControl.stream_worker_status()
-- ServletGridControl.cancel_task()
+*Implementation Files:*
+- **Backend:** `app/workspace/grid_control/routes.py`
+- **Frontend:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- authenticate and accept remote worker node WebSocket connections -> `ServletGridControl.register_worker()`
+- route calculation jobs (backtests, optimizations, Monte Carlo) to idle workers -> `ServletGridControl.stream_worker_status()`
+- stream worker health metrics and heartbeats to frontend Dockview panel -> `ServletGridControl.cancel_task()`
 
 #### `ServletAlgoCloud`
 *Feature:* Cloud synchronization and strategy sharing endpoints
-*Functional Requirements:*
-- synchronize strategies and databanks with AlgoCloud cloud platform
-- authenticate cloud user account and fetch plan quotas and subscription limits
-- download pre-built shared strategy templates and market data packages
-*Functions to Create:*
-- ServletAlgoCloud.sync_strategies()
-- ServletAlgoCloud.get_user_plan()
-- ServletAlgoCloud.download_package()
+*Implementation Files:*
+- **Backend:** `app/workspace/marketplace/routes.py`
+- **Frontend:** `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- synchronize strategies and databanks with AlgoCloud cloud platform -> `ServletAlgoCloud.sync_strategies()`
+- authenticate cloud user account and fetch plan quotas and subscription limits -> `ServletAlgoCloud.get_user_plan()`
+- download pre-built shared strategy templates and market data packages -> `ServletAlgoCloud.download_package()`
 
 #### `ServletSQAI`
 *Feature:* Built-in AI Assistant streaming endpoints (SSE / WebSocket)
-*Functional Requirements:*
-- accept natural language user queries regarding strategy development and codebase
-- stream AI assistant reasoning and code responses over Server-Sent Events (SSE) or WebSocket
-- inject strategy rules, backtest statistics, and logs as context into LLM prompt
-*Functions to Create:*
-- ServletSQAI.send_message()
-- ServletSQAI.stream_response()
-- ServletSQAI.clear_history()
+*Implementation Files:*
+- **Backend:** `app/workspace/neural_network/routes.py`
+- **Frontend:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
+*Functional Requirements & Implementation:*
+- accept natural language user queries regarding strategy development and codebase -> `ServletSQAI.send_message()`
+- stream AI assistant reasoning and code responses over Server-Sent Events (SSE) or WebSocket -> `ServletSQAI.stream_response()`
+- inject strategy rules, backtest statistics, and logs as context into LLM prompt -> `ServletSQAI.clear_history()`
 
 #### `SkinDark`
 *Feature:* Tailwind CSS dark theme tokens and appearance state management
-*Functional Requirements:*
-- provide dark mode color variables, background shades, and high-contrast typography tokens
-- persist dark theme user preference in SQLite settings and browser local storage
-- apply dark theme class to root HTML element and style Dockview headers
-*Functions to Create:*
-- Theme.set_dark()
-- Theme.get_tokens()
+*Implementation Files:*
+- **Backend:** `app/host/settings.py`
+- **Frontend:** `ui/app/components/ThemeToggle.tsx`
+*Functional Requirements & Implementation:*
+- apply dark theme class to root HTML element and style Dockview headers -> `Theme.set_dark()`
+- provide dark mode color variables, background shades, and typography tokens -> `Theme.get_tokens()`
 
 #### `SkinLight`
 *Feature:* Tailwind CSS light theme tokens and palette definitions
-*Functional Requirements:*
-- provide light mode color variables, clean white/gray surfaces, and contrast borders
-- apply light theme styling to Dockview panels, TanStack tables, and charts
-*Functions to Create:*
-- Theme.set_light()
-- Theme.get_light_tokens()
+*Implementation Files:*
+- **Backend:** `app/host/settings.py`
+- **Frontend:** `ui/app/components/ThemeToggle.tsx`
+*Functional Requirements & Implementation:*
+- provide light mode color variables, clean white/gray surfaces, and contrast borders -> `Theme.set_light()`
+- apply light theme styling to Dockview panels, TanStack tables, and charts -> `Theme.get_light_tokens()`
 
 ---
 
@@ -300,23 +360,22 @@ flowchart TD
 
 #### `AppSQXHome`
 *Feature:* Main getting started dashboard and offline onboarding interface
-*Functional Requirements:*
-- display welcome home view with quick-start action shortcuts
-- render offline onboarding flow and tutorial cards when disconnected
-- fetch and show latest release changelog and version updates
-*Functions to Create:*
-- SQXHome.index()
-- SQXHome.get_recent_projects()
-- SQXHome.check_updates()
+*Implementation Files:*
+- **Backend:** `app/workspace/home/routes.py`
+- **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`
+*Functional Requirements & Implementation:*
+- display welcome home view with quick-start action shortcuts -> `SQXHome.index()`
+- render offline onboarding flow and tutorial cards when disconnected -> `SQXHome.get_recent_projects()`
+- fetch and show latest release changelog and version updates -> `SQXHome.check_updates()`
 
 #### `HomeAbout`
 *Feature:* Application version information and diagnostic metadata dialog
-*Functional Requirements:*
-- display StrategyQuant X version, build timestamp, and license details
-- display JVM/Python environment runtime details and installed extension list
-*Functions to Create:*
-- About.about()
-- About.get_system_info()
+*Implementation Files:*
+- **Backend:** `app/workspace/home/routes.py`
+- **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`
+*Functional Requirements & Implementation:*
+- display StrategyQuant X version, build timestamp, and license details -> `About.about()`
+- display JVM/Python environment runtime details and installed extension list -> `About.get_system_info()`
 
 ---
 
@@ -373,269 +432,236 @@ flowchart TD
 
 #### `DataManagerInstruments`
 *Feature:* Financial instrument specifications and symbol definition manager
-*Functional Requirements:*
-- list all configured instruments with point/pip sizes, contract sizes, and margins
-- add new instrument specifications to SQLite database
-- edit one or more existing instrument definitions in bulk
-- clone an existing instrument to create a new specification
-*Functions to Create:*
-- Instruments.instruments()
-- Instruments.add_instrument()
-- Instruments.mass_edit_instruments()
-- Instruments.clone_instrument()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/instruments.py`
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/Instruments/InstrumentsModal.tsx`
+*Functional Requirements & Implementation:*
+- list all configured instruments with point/pip sizes, contract sizes, and margins -> `Instruments.instruments()`
+- add new instrument specifications to SQLite database -> `Instruments.add_instrument()`
+- edit one or more existing instrument definitions in bulk -> `Instruments.mass_edit_instruments()`
+- clone an existing instrument to create a new specification -> `Instruments.clone_instrument()`
 
 #### `DataManagerSessions`
 *Feature:* Trading session profiles and market hours scheduler
-*Functional Requirements:*
-- list all trading session profiles and holiday calendars
-- create, clone, and delete trading sessions with timezone shifts
-- add and configure session time intervals (daily open, close, lunch pauses)
-- configure and save reusable session templates
-*Functions to Create:*
-- Sessions.sessions()
-- Sessions.clone_session()
-- Sessions.session_element()
-- Sessions.session_template()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/sessions.py`
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/Sessions/SessionsModal.tsx`
+*Functional Requirements & Implementation:*
+- list all trading session profiles and holiday calendars -> `Sessions.sessions()`
+- create, clone, and delete trading sessions with timezone shifts -> `Sessions.clone_session()`
+- add and configure session time intervals (daily open, close, lunch pauses) -> `Sessions.session_element()`
+- configure and save reusable session templates -> `Sessions.session_template()`
 
 #### `DataManagerConnections`
 *Feature:* Data feed and broker account connection manager
-*Functional Requirements:*
-- manage connection credentials for external market data providers
-- test real-time connectivity and authenticate data subscription feeds
-*Functions to Create:*
-- Connections.list_connections()
-- Connections.add_connection()
-- Connections.test_feed_connection()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/connections.py`
+- **Frontend:** `ui/app/plugins/data_source/Common/DataSourceRibbon.tsx`
+*Functional Requirements & Implementation:*
+- list all external market data provider connections -> `Connections.list_connections()`
+- add or edit external market data provider credentials -> `Connections.add_connection()`
+- test real-time connectivity and authenticate data subscription feeds -> `Connections.test_feed_connection()`
 
 ### Phase 3.2: Profiles & Grouping Aggregators
 
 #### `DataManagerBroker`
 *Feature:* Broker profile manager combining instruments, sessions, and commissions
-*Functional Requirements:*
-- list all broker profiles configured in the system
-- add or edit broker profiles with custom spread and commission models
-- edit stock symbols assigned to a broker profile
-- import instrument definitions from external XML/JSON files
-- import trading session definitions from external XML/JSON files
-*Functions to Create:*
-- Broker.brokers()
-- Broker.add_broker()
-- Broker.edit_stocks()
-- Broker.import_instruments()
-- Broker.import_sessions()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/broker.py`
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
+*Functional Requirements & Implementation:*
+- list all broker profiles configured in the system -> `Broker.brokers()`
+- add or edit broker profiles with custom spread and commission models -> `Broker.add_broker()`
+- edit stock symbols assigned to a broker profile -> `Broker.edit_stocks()`
+- import instrument definitions from external XML/JSON files -> `Broker.import_instruments()`
+- import trading session definitions from external XML/JSON files -> `Broker.import_sessions()`
 
 #### `DataManagerBasket`
 *Feature:* Stock basket and symbol grouping watchlist manager
-*Functional Requirements:*
-- list all stock baskets and symbol groupings
-- create new stock basket groups (e.g. S&P 500, Tech, Forex Majors)
-- edit and maintain symbol membership in selected baskets
-*Functions to Create:*
-- Basket.baskets()
-- Basket.add_basket()
-- Basket.edit_stocks()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/baskets.py`
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/StockGroups/StockGroupsModal.tsx`
+*Functional Requirements & Implementation:*
+- list all stock baskets and symbol groupings -> `Basket.baskets()`
+- create new stock basket groups (e.g. S&P 500, Tech, Forex Majors) -> `Basket.add_basket()`
+- edit and maintain symbol membership in selected baskets -> `Basket.edit_stocks()`
 
 ### Phase 3.3: Central Data Hub & Catalog Engine
 
 #### `DataManagerData`
 *Feature:* Central price data catalog and timeframe storage manager
-*Functional Requirements:*
-- list all imported price data symbols with timeframes, date ranges, and bar counts
-- edit symbol properties, associated broker profile, and session template
-- confirm and delete selected price data symbols and clear cached bar files
-- add BMF futures data symbols to the database
-*Functions to Create:*
-- Data.data()
-- Data.data_edit()
-- Data.data_delete_confirm()
-- Data.add_br()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/data.py`
+- **Frontend:** `ui/app/workspace/DataManager/DataManager.tsx`
+*Functional Requirements & Implementation:*
+- list all imported price data symbols with timeframes, date ranges, and bar counts -> `Data.data()`
+- edit symbol properties, associated broker profile, and session template -> `Data.data_edit()`
+- confirm and delete selected price data symbols and clear cached bar files -> `Data.data_delete_confirm()`
+- add BMF futures data symbols to the database -> `Data.add_br()`
 
 ### Phase 3.4: Data Ingestion (Data Sources)
 
 #### `DataSourceFiles`
 *Feature:* Local CSV, TXT, and archive file historical data importer
-*Functional Requirements:*
-- add new symbol definition from local historical data file
-- import price data from local files into Parquet storage
-- import price data directly from external trading applications
-- define and save custom text/CSV file delimiter and column formats
-- perform bulk mass import of multiple data files across directories
-*Functions to Create:*
-- Files.add()
-- Files.import_data()
-- Files.app_import()
-- Files.new_format()
-- Files.mass_import()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/files.py`
+- **Frontend:** `ui/app/plugins/data_source/FileImport/FileImportModal.tsx`
+*Functional Requirements & Implementation:*
+- add new symbol definition from local historical data file -> `Files.add()`
+- import price data from local files into Parquet storage -> `Files.import_data()`
+- import price data directly from external trading applications -> `Files.app_import()`
+- define and save custom text/CSV file delimiter and column formats -> `Files.new_format()`
+- perform bulk mass import of multiple data files across directories -> `Files.mass_import()`
 
 #### `DataSourceYahoo`
 *Feature:* Yahoo Finance historical daily and weekly data downloader
-*Functional Requirements:*
-- add Yahoo Finance data symbols to the database
-- download historical OHLCV price bars from Yahoo Finance
-*Functions to Create:*
-- Yahoo.add()
-- Yahoo.download()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/yahoo.py`
+- **Frontend:** `ui/app/plugins/data_source/Yahoo/YahooModal.tsx`
+*Functional Requirements & Implementation:*
+- add Yahoo Finance data symbols to the database -> `Yahoo.add()`
+- download historical OHLCV price bars from Yahoo Finance -> `Yahoo.download()`
 
 #### `DataSourceDukascopy`
 *Feature:* Dukascopy high-precision forex and CFD data downloader
-*Functional Requirements:*
-- add Dukascopy data symbols to the database
-- identify and select instruments for Dukascopy data
-- display StrategyQuant CDN data disclaimer
-- display Dukascopy data disclaimer
-- download and import Dukascopy tick and minute price data
-*Functions to Create:*
-- Dukascopy.add()
-- Dukascopy.select_instruments()
-- Dukascopy.cdn_disclaimer()
-- Dukascopy.disclaimer()
-- Dukascopy.import_data()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/dukascopy.py`
+- **Frontend:** `ui/app/plugins/data_source/Dukascopy/DukascopyModal.tsx`
+*Functional Requirements & Implementation:*
+- add Dukascopy data symbols to the database -> `Dukascopy.add()`
+- identify and select instruments for Dukascopy data -> `Dukascopy.select_instruments()`
+- display StrategyQuant CDN data disclaimer -> `Dukascopy.cdn_disclaimer()`
+- display Dukascopy data disclaimer -> `Dukascopy.disclaimer()`
+- download and import Dukascopy tick and minute price data -> `Dukascopy.import_data()`
 
 #### `DataSourceCrypto`
 *Feature:* Cryptocurrency exchange historical price data downloader
-*Functional Requirements:*
-- add cryptocurrency data symbols and exchange pairs to database
-- download and import historical crypto candlestick data
-*Functions to Create:*
-- Crypto.add()
-- Crypto.import_data()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/crypto.py`
+- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
+*Functional Requirements & Implementation:*
+- add cryptocurrency data symbols and exchange pairs to database -> `Crypto.add()`
+- download and import historical crypto candlestick data -> `Crypto.import_data()`
 
 #### `DataSourceTD`
 *Feature:* TickDownloader historical data importer
-*Functional Requirements:*
-- import historical tick and minute price data generated by TickDownloader
-- validate timestamp formatting and gapless bar continuity
-*Functions to Create:*
-- TD.import_data()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/tick_downloader.py`
+- **Frontend:** `ui/app/plugins/data_source/TickDownloader/TickDownloaderModal.tsx`
+*Functional Requirements & Implementation:*
+- import historical tick and minute price data generated by TickDownloader -> `TD.import_data()`
 
 #### `DataSourceDarwinex`
 *Feature:* Darwinex broker tick/minute data bridge
-*Functional Requirements:*
-- add Darwinex data symbols to the database
-- display Darwinex data disclaimer
-- download data from Darwinex
-- import data downloaded from Darwinex
-- identify and select instruments for Darwinex data
-*Functions to Create:*
-- Darwinex.add()
-- Darwinex.darwinex_disclaimer()
-- Darwinex.download()
-- Darwinex.import_data()
-- Darwinex.select_instruments()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/darwinex.py`
+- **Frontend:** `ui/app/plugins/data_source/Darwinex/DarwinexModal.tsx`
+*Functional Requirements & Implementation:*
+- add Darwinex data symbols to the database -> `Darwinex.add()`
+- display Darwinex data disclaimer -> `Darwinex.darwinex_disclaimer()`
+- download data from Darwinex -> `Darwinex.download()`
+- import data downloaded from Darwinex -> `Darwinex.import_data()`
+- identify and select instruments for Darwinex data -> `Darwinex.select_instruments()`
 
 #### `DataSourceMt5Api`
 *Feature:* MetaTrader 5 API direct historical data importer
-*Functional Requirements:*
-- import price data directly from MetaTrader 5 terminal via Python API
-- select terminal instance, symbol, timeframe, and date range
-*Functions to Create:*
-- Mt5Api.import_data()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/metatrader.py`
+- **Frontend:** `ui/app/plugins/data_source/MetaTrader/Mt5ImportModal.tsx`
+*Functional Requirements & Implementation:*
+- import price data directly from MetaTrader 5 terminal via Python API -> `Mt5Api.import_data()`
 
 #### `DataSourceSQEquityData`
 *Feature:* StrategyQuant US Equities subscription historical data client
-*Functional Requirements:*
-- add StrategyQuant equity data symbols to database
-- display StrategyQuant data usage terms and conditions
-- update existing equity historical data with latest trading sessions
-*Functions to Create:*
-- SQEquityData.add()
-- SQEquityData.data_usage_conditions()
-- SQEquityData.update()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/sq_equity.py`
+- **Frontend:** `ui/app/plugins/data_source/SQData/SQDataModal.tsx`
+*Functional Requirements & Implementation:*
+- add StrategyQuant equity data symbols to database -> `SQEquityData.add()`
+- display StrategyQuant data usage terms and conditions -> `SQEquityData.data_usage_conditions()`
+- update existing equity historical data with latest trading sessions -> `SQEquityData.update()`
 
 #### `DataSourceSQFuturesData`
 *Feature:* StrategyQuant Futures & BMF subscription historical data client
-*Functional Requirements:*
-- add StrategyQuant futures data symbols to database
-- display StrategyQuant futures data usage conditions
-- update existing futures historical data with latest session bars
-*Functions to Create:*
-- SQFuturesData.add()
-- SQFuturesData.data_usage_conditions()
-- SQFuturesData.update()
+*Implementation Files:*
+- **Backend:** `app/services/brokers/sq_futures.py`
+- **Frontend:** `ui/app/plugins/data_source/SQData/SQFuturesModal.tsx`
+*Functional Requirements & Implementation:*
+- add StrategyQuant futures data symbols to database -> `SQFuturesData.add()`
+- display StrategyQuant futures data usage conditions -> `SQFuturesData.data_usage_conditions()`
+- update existing futures historical data with latest session bars -> `SQFuturesData.update()`
 
 ### Phase 3.5: Custom & Auxiliary Data Series
 
 #### `DataManagerCustomData`
 *Feature:* Macroeconomic and non-price custom time-series data manager
-*Functional Requirements:*
-- list all custom and external data series
-- add external indicators and non-price custom data to database
-- update Commitments of Traders (COT) historical data reports
-- import custom indicator and macro series from files
-- create new data format definitions for custom data import
-- recognize custom data structure and delimiters automatically from file
-- view custom data records in table and interactive chart
-- confirm deletion of custom data series
-*Functions to Create:*
-- CustomData.custom_data()
-- CustomData.custom_data_add()
-- CustomData.custom_data_cot()
-- CustomData.custom_data_import()
-- CustomData.custom_data_new_format()
-- CustomData.custom_data_recognize()
-- CustomData.custom_data_view()
-- CustomData.custom_data_delete_confirm()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/custom_data.py`
+- **Frontend:** `ui/app/plugins/data_source/Tools/CustomDataModal.tsx`
+*Functional Requirements & Implementation:*
+- list all custom and external data series -> `CustomData.custom_data()`
+- add external indicators and non-price custom data to database -> `CustomData.custom_data_add()`
+- update Commitments of Traders (COT) historical data reports -> `CustomData.custom_data_cot()`
+- import custom indicator and macro series from files -> `CustomData.custom_data_import()`
+- create new data format definitions for custom data import -> `CustomData.custom_data_new_format()`
+- recognize custom data structure and delimiters automatically from file -> `CustomData.custom_data_recognize()`
+- view custom data records in table and interactive chart -> `CustomData.custom_data_view()`
+- confirm deletion of custom data series -> `CustomData.custom_data_delete_confirm()`
 
 ### Phase 3.6: Post-Processing, Transformations & Exports
 
 #### `DataManagerActions`
 *Feature:* Historical data export, timezone transformation, and quality audit actions
-*Functional Requirements:*
-- clone price data to a specified timezone offset with bar timestamp shifts
-- export price data to CSV format with custom headers and delimiters
-- create new CSV export format configurations
-- export price data to MetaTrader 4 FXT and HST files
-- export price data to MetaTrader 5 format
-- open data review modal to view data details and summary statistics
-- display interactive candlestick price chart in data review
-- display raw bar table in data review
-- perform data quality audit and gap analysis across timeframes
-*Functions to Create:*
-- Actions.clone_to_timezone()
-- Actions.export_to_csv()
-- Actions.new_format()
-- Actions.export_to_mt4()
-- Actions.export_to_mt5()
-- Actions.review()
-- Actions.review_chart()
-- Actions.review_data()
-- Actions.quality()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/actions/review/quality.py`
+- **Frontend:** `ui/app/plugins/data_source/Tools/DataToolsModal.tsx`
+*Functional Requirements & Implementation:*
+- clone price data to a specified timezone offset with bar timestamp shifts -> `Actions.clone_to_timezone()`
+- export price data to CSV format with custom headers and delimiters -> `Actions.export_to_csv()`
+- create new CSV export format configurations -> `Actions.new_format()`
+- export price data to MetaTrader 4 FXT and HST files -> `Actions.export_to_mt4()`
+- export price data to MetaTrader 5 format -> `Actions.export_to_mt5()`
+- open data review modal to view data details and summary statistics -> `Actions.review()`
+- display interactive candlestick price chart in data review -> `Actions.review_chart()`
+- display raw bar table in data review -> `Actions.review_data()`
+- perform data quality audit and gap analysis across timeframes -> `Actions.quality()`
 
 ### Phase 3.7: Monitoring, Shell & UI Support
 
 #### `AppDataManager`
 *Feature:* Data Manager workspace Dockview container
-*Functional Requirements:*
-- host dockable tabs for Instruments, Sessions, Brokers, Data, and Custom Data
-- coordinate active symbol selections and synchronize data tables with charts
-*Functions to Create:*
-- AppDataManager.init_workspace()
-- AppDataManager.open_tab()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/routes.py`
+- **Frontend:** `ui/app/workspace/DataManager/DataManager.tsx`
+*Functional Requirements & Implementation:*
+- host dockable tabs for Instruments, Sessions, Brokers, Data, and Custom Data -> `AppDataManager.init_workspace()`
+- coordinate active symbol selections and synchronize data tables with charts -> `AppDataManager.open_tab()`
 
 #### `DataManagerLog`
 *Feature:* Real-time WebSocket log viewer for data operations
-*Functional Requirements:*
-- stream live data download, import, and export logs via WebSocket
-- display progress bars, error highlights, and cancellation controls
-*Functions to Create:*
-- DataLog.data_log()
-- DataLog.clear_log()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/log.py`
+- **Frontend:** `ui/app/workspace/DataManager/dataManagerLogClient.ts`
+*Functional Requirements & Implementation:*
+- stream live data download, import, and export logs via WebSocket -> `DataLog.data_log()`
+- display progress bars, error highlights, and cancellation controls -> `DataLog.clear_log()`
 
 #### `DataManagerHome`
 *Feature:* Data Manager landing dashboard and storage overview
-*Functional Requirements:*
-- display Data Manager overview with disk storage usage and symbol counts
-- provide offline fallback view when internet connectivity is lost
-*Functions to Create:*
-- DMHome.home()
-- DMHome.index()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/home.py`
+- **Frontend:** `ui/app/workspace/DataManager/DataManagerHome.tsx`
+*Functional Requirements & Implementation:*
+- display Data Manager overview with disk storage usage and symbol counts -> `DMHome.home()`
+- provide offline fallback view when internet connectivity is lost -> `DMHome.index()`
 
 #### `DataManagerHelp`
 *Feature:* Built-in documentation and user guide for Data Manager
-*Functional Requirements:*
-- display contextual documentation and tutorials for data management operations
-*Functions to Create:*
-- DMHelp.help()
+*Implementation Files:*
+- **Backend:** `app/workspace/data_manager/help.py`
+- **Frontend:** `ui/app/components/HelpTooltip.tsx`
+*Functional Requirements & Implementation:*
+- display contextual documentation and tutorials for data management operations -> `DMHelp.help()`
 
 ---
 
@@ -649,73 +675,58 @@ flowchart TD
 
 #### `AppCodeEditor`
 *Feature:* Code Editor workspace Dockview container
-*Functional Requirements:*
-- host dockable editor panels, file navigators, and bottom log panes
-- manage active open code documents and syntax highlighting mode
-*Functions to Create:*
-- AppCodeEditor.init_workspace()
-- AppCodeEditor.open_file_tab()
+*Implementation Files:*
+- **Backend:** `app/workspace/code_editor/editor.py`
+- **Frontend:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host dockable editor panels, file navigators, and bottom log panes -> `AppCodeEditor.init_workspace()`
+- manage active open code documents and syntax highlighting mode -> `AppCodeEditor.open_file_tab()`
 
 #### `ServletCodeEditor`
 *Feature:* Monaco code editor, virtual file system, and project file CRUD
-*Functional Requirements:*
-- display code editor main menu, toolbar, and build actions
-- manage open editor document tabs
-- list open editor files with dirty/unsaved indicators
-- display file system directory tree and code symbol navigator
-- display right sidebar tabs container
-- display bottom tabs container for compilation logs and search results
-- display compilation, error, and build output log pane
-- display find-in-files search results pane
-- create a new source code file
-- create a new directory in the code workspace
-- create a new custom indicator, snippet, or class template
-- clone an existing code file or snippet
-- rename a source file or directory
-- search for text patterns across project files
-*Functions to Create:*
-- CodeEditor.menu()
-- CodeEditor.maintabs()
-- CodeEditor.editors()
-- CodeEditor.navigator()
-- CodeEditor.righttabs()
-- CodeEditor.bottomtabs()
-- CodeEditor.logpane()
-- CodeEditor.searchpane()
-- CodeEditor.new_file()
-- CodeEditor.new_dir()
-- CodeEditor.create_new()
-- CodeEditor.clone()
-- CodeEditor.rename_file()
-- CodeEditor.find_in_files()
+*Implementation Files:*
+- **Backend:** `app/workspace/code_editor/routes.py`
+- **Frontend:** `ui/app/workspace/CodeEditor/codeEditorClient.ts`
+*Functional Requirements & Implementation:*
+- display code editor main menu, toolbar, and build actions -> `CodeEditor.menu()`
+- manage open editor document tabs -> `CodeEditor.maintabs()`
+- list open editor files with dirty/unsaved indicators -> `CodeEditor.editors()`
+- display file system directory tree and code symbol navigator -> `CodeEditor.navigator()`
+- display right sidebar tabs container -> `CodeEditor.righttabs()`
+- display bottom tabs container for compilation logs and search results -> `CodeEditor.bottomtabs()`
+- display compilation, error, and build output log pane -> `CodeEditor.logpane()`
+- display find-in-files search results pane -> `CodeEditor.searchpane()`
+- create a new source code file -> `CodeEditor.new_file()`
+- create a new directory in the code workspace -> `CodeEditor.new_dir()`
+- create a new custom indicator, snippet, or class template -> `CodeEditor.create_new()`
+- clone an existing code file or snippet -> `CodeEditor.clone()`
+- rename a source file or directory -> `CodeEditor.rename_file()`
+- search for text patterns across project files -> `CodeEditor.find_in_files()`
 
 ### Phase 4.2: Extensions Import / Export
 
 #### `CodeEditorImportExport`
 *Feature:* Code editor snippet package import and export manager
-*Functional Requirements:*
-- export code editor extensions, indicators, or snippets to zip packages
-- display list of imported files and compilation verification status
-- confirm overwriting existing code files during import
-*Functions to Create:*
-- ImportExport.export()
-- ImportExport.imported_files()
-- ImportExport.overwrite_confirm()
+*Implementation Files:*
+- **Backend:** `app/workspace/code_editor/import_export.py`
+- **Frontend:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- export code editor extensions, indicators, or snippets to zip packages -> `ImportExport.export()`
+- display list of imported files and compilation verification status -> `ImportExport.imported_files()`
+- confirm overwriting existing code files during import -> `ImportExport.overwrite_confirm()`
 
 ### Phase 4.3: Indicator Testing & Verification
 
 #### `CodeEditorIndicatorTester`
 *Feature:* Indicator test runner and Lightweight Charts visualizer
-*Functional Requirements:*
-- open indicator tester dialog to execute indicator logic over market data
-- modify indicator input parameters and re-run calculation on the fly
-- display compilation and runtime error logs encountered during indicator execution
-- create a new indicator test configuration with target symbol and timeframe
-*Functions to Create:*
-- IndicatorTester.indicator_tester()
-- IndicatorTester.edit_indy_params()
-- IndicatorTester.indicator_tester_error()
-- IndicatorTester.new_indy_test()
+*Implementation Files:*
+- **Backend:** `app/workspace/code_editor/indicator_tester.py`
+- **Frontend:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
+*Functional Requirements & Implementation:*
+- open indicator tester dialog to execute indicator logic over market data -> `IndicatorTester.indicator_tester()`
+- modify indicator input parameters and re-run calculation on the fly -> `IndicatorTester.edit_indy_params()`
+- display compilation and runtime error logs encountered during indicator execution -> `IndicatorTester.indicator_tester_error()`
+- create a new indicator test configuration with target symbol and timeframe -> `IndicatorTester.new_indy_test()`
 
 ---
 
@@ -729,40 +740,40 @@ flowchart TD
 
 #### `AppWizard`
 *Feature:* AlgoWizard visual strategy authoring workspace container
-*Functional Requirements:*
-- host dockable canvas panels for visual rule-based strategy editing
-- manage active strategy manifest and synchronize with Results databank
-*Functions to Create:*
-- AppWizard.init_workspace()
-- AppWizard.load_strategy()
+*Implementation Files:*
+- **Backend:** `app/workspace/algo_wizard/wizard.py`
+- **Frontend:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host dockable canvas panels for visual rule-based strategy editing -> `AppWizard.init_workspace()`
+- manage active strategy manifest and synchronize with Results databank -> `AppWizard.load_strategy()`
 
 #### `ServletAlgoWizard`
 *Feature:* AlgoWizard visual rule builder canvas API
-*Functional Requirements:*
-- render visual drag-and-drop rule canvas for trading conditions and actions
-- validate condition node connectivity, operator types, and signal logic
-*Functions to Create:*
-- AlgoWizard.render_canvas()
-- AlgoWizard.validate_rules()
-- AlgoWizard.get_rule_tree()
+*Implementation Files:*
+- **Backend:** `app/workspace/algo_wizard/routes.py`
+- **Frontend:** `ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx`
+*Functional Requirements & Implementation:*
+- render visual drag-and-drop rule canvas for trading conditions and actions -> `AlgoWizard.render_canvas()`
+- validate condition node connectivity, operator types, and signal logic -> `AlgoWizard.validate_rules()`
+- retrieve abstract syntax tree of trading rules for compilation -> `AlgoWizard.get_rule_tree()`
 
 #### `ServletBuilder`
 *Feature:* Visual condition tree compiler and strategy structure builder
-*Functional Requirements:*
-- compile visual rule trees into executable Python/Numba strategy functions
-- generate entry, exit, stop loss, and trailing stop logic structures
-*Functions to Create:*
-- BuilderServlet.compile_rules()
-- BuilderServlet.generate_code()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/routes.py`
+- **Frontend:** `ui/app/workspace/Builder/builderClient.ts`
+*Functional Requirements & Implementation:*
+- compile visual rule trees into executable Python/Numba strategy functions -> `BuilderServlet.compile_rules()`
+- generate entry, exit, stop loss, and trailing stop logic structures -> `BuilderServlet.generate_code()`
 
 #### `ServletStrategy`
 *Feature:* Strategy serialization and XML/JSON strategy definition bridge
-*Functional Requirements:*
-- serialize strategy objects into portable XML/JSON strategy manifests
-- parse and deserialize external strategy files into memory structures
-*Functions to Create:*
-- StrategyServlet.serialize_strategy()
-- StrategyServlet.deserialize_strategy()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/strategy_servlet.py`
+- **Frontend:** `ui/app/workspace/Builder/resultsModel.ts`
+*Functional Requirements & Implementation:*
+- serialize strategy objects into portable XML/JSON strategy manifests -> `StrategyServlet.serialize_strategy()`
+- parse and deserialize external strategy files into memory structures -> `StrategyServlet.deserialize_strategy()`
 
 ---
 
@@ -786,133 +797,127 @@ flowchart LR
 
 #### `SettingsWhatToBuild`
 *Feature:* Strategy architecture, build mode, and target style configuration
-*Functional Requirements:*
-- display strategy architecture and build requirements overview
-- configure strategy generation mode (genetic programming, random search)
-- configure strategy style and architecture (momentum, mean reversion, breakout)
-- configure trading conditions and timeframe periods
-- configure profit target rules and allowable ranges
-- configure stop loss rules and allowable ranges
-- configure allowed trading directions (long only, short only, both)
-- configure additional strategy build settings and constraints
-*Functions to Create:*
-- WhatToBuild.what_to_build()
-- WhatToBuild.build_mode()
-- WhatToBuild.strategy_architecture()
-- WhatToBuild.conditions_and_periods()
-- WhatToBuild.profit_target()
-- WhatToBuild.stop_loss()
-- WhatToBuild.trading_directions()
-- WhatToBuild.additional_config()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/what_to_build.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/WhatToBuildTab.tsx`
+*Functional Requirements & Implementation:*
+- display strategy architecture and build requirements overview -> `WhatToBuild.what_to_build()`
+- configure strategy generation mode (genetic programming, random search) -> `WhatToBuild.build_mode()`
+- configure strategy style and architecture (momentum, mean reversion, breakout) -> `WhatToBuild.strategy_architecture()`
+- configure trading conditions and timeframe periods -> `WhatToBuild.conditions_and_periods()`
+- configure profit target rules and allowable ranges -> `WhatToBuild.profit_target()`
+- configure stop loss rules and allowable ranges -> `WhatToBuild.stop_loss()`
+- configure allowed trading directions (long only, short only, both) -> `WhatToBuild.trading_directions()`
+- configure additional strategy build settings and constraints -> `WhatToBuild.additional_config()`
 
 ### Phase 6.2: Backtest Environment & Symbol Configuration
 
 #### `SettingsData`
 *Feature:* Backtest data environment and symbol timeframe configuration
-*Functional Requirements:*
-- configure backtest symbols, primary timeframe, and secondary confirmation timeframes
-- configure in-sample and out-of-sample date ranges
-- configure broker commission models, spread buffers, and slippage simulation
-*Functions to Create:*
-- DataSettings.data()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/data_setup.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/DataTab.tsx`
+*Functional Requirements & Implementation:*
+- configure backtest symbols, primary/secondary timeframes, and date ranges -> `DataSettings.data()`
 
 ### Phase 6.3: Building Blocks & Indicator Selection
 
 #### `SettingsBlocks`
 *Feature:* Building block indicator library, operators, and parameter bounds
-*Functional Requirements:*
-- configure allowable building blocks (technical indicators, price patterns, order types)
-- edit parameter ranges and step increments for individual building blocks
-- edit possible values and discrete options for building blocks
-*Functions to Create:*
-- Blocks.blocks()
-- Blocks.block_parameters()
-- Blocks.possible_options()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/blocks.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`
+*Functional Requirements & Implementation:*
+- configure allowable building blocks (technical indicators, price patterns, order types) -> `Blocks.blocks()`
+- edit parameter ranges and step increments for individual building blocks -> `Blocks.block_parameters()`
+- edit possible values and discrete options for building blocks -> `Blocks.possible_options()`
 
 ### Phase 6.4: Genetic Evolution & Mutation Controls
 
 #### `SettingsGeneticOptions`
 *Feature:* Genetic evolution algorithm and population parameters
-*Functional Requirements:*
-- configure genetic algorithm parameters: population size, generations, island models
-- configure crossover probability, mutation rates, and tournament selection pressure
-*Functions to Create:*
-- GeneticOptions.genetic_options()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/genetic_options.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/GeneticOptionsTab.tsx`
+*Functional Requirements & Implementation:*
+- configure genetic algorithm parameters, population, mutation, and crossover -> `GeneticOptions.genetic_options()`
 
 #### `SettingsPartsToImprove`
 *Feature:* Selective genetic mutation and improvement component picker
-*Functional Requirements:*
-- select which strategy components to evolve or mutate (entry rules, exit rules, stops)
-*Functions to Create:*
-- PartsToImprove.parts_to_improve()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/parts_to_improve.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/PartsToImproveTab.tsx`
+*Functional Requirements & Implementation:*
+- select which strategy components to evolve or mutate (entry rules, exit rules, stops) -> `PartsToImprove.parts_to_improve()`
 
 ### Phase 6.5: Trade Execution, Money Management & Advanced Exits
 
 #### `SettingsOptions`
 *Feature:* Trade execution constraints and strategy filtering options
-*Functional Requirements:*
-- configure trade execution constraints (max simultaneous trades, min trades, trading hours filter, weekend exit)
-*Functions to Create:*
-- BuildOptions.options()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/options.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/TradingOptionsTab.tsx`
+*Functional Requirements & Implementation:*
+- configure trade execution constraints (max simultaneous trades, min trades, trading hours filter, weekend exit) -> `BuildOptions.options()`
 
 #### `SettingsAdvancedTM`
 *Feature:* Advanced Trade Management scale-out and multi-exit configuration
-*Functional Requirements:*
-- configure Advanced Trade Management scale-out and multiple partial exits
-- add or modify an exit target in Advanced Trade Management
-*Functions to Create:*
-- AdvancedTM.advanced_tm()
-- AdvancedTM.add_new_exit()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/advanced_tm.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx`
+*Functional Requirements & Implementation:*
+- configure Advanced Trade Management scale-out and multiple partial exits -> `AdvancedTM.advanced_tm()`
+- add or modify an exit target in Advanced Trade Management -> `AdvancedTM.add_new_exit()`
 
 #### `SettingsMoneyManagement`
 *Feature:* Capital allocation, lot sizing, and risk per trade configuration
-*Functional Requirements:*
-- configure initial capital, margin currency, and position sizing models (fixed lot, % equity risk, volatility sizing)
-*Functions to Create:*
-- MoneyManagement.money_management()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/money_management.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx`
+*Functional Requirements & Implementation:*
+- configure initial capital, margin currency, and position sizing models (fixed lot, % equity risk, volatility sizing) -> `MoneyManagement.money_management()`
 
 ### Phase 6.6: Fitness Function, Ranking & Auto-Dismissal
 
 #### `SettingsRankings`
 *Feature:* Fitness function ranking, auto-dismissal rules, and databank caps
-*Functional Requirements:*
-- configure databank ranking criteria and maximum strategy storage limits
-- configure strategy ranking fitness function weighted criteria (Net Profit, Sharpe, Drawdown)
-- configure automatic dismissal conditions for poorly performing candidate strategies
-- configure portfolio correlation limits during generation ranking
-*Functions to Create:*
-- Rankings.ranking()
-- Rankings.fitness_function()
-- Rankings.auto_dismissal()
-- Rankings.fit_portfolio_correlation()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/rankings.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/RankingTab.tsx`
+*Functional Requirements & Implementation:*
+- configure databank ranking criteria and maximum strategy storage limits -> `Rankings.ranking()`
+- configure strategy ranking fitness function weighted criteria (Net Profit, Sharpe, Drawdown) -> `Rankings.fitness_function()`
+- configure automatic dismissal conditions for poorly performing candidate strategies -> `Rankings.auto_dismissal()`
+- configure portfolio correlation limits during generation ranking -> `Rankings.fit_portfolio_correlation()`
 
 ### Phase 6.7: Builder Container & Task Execution
 
 #### `AppBuilder`
 *Feature:* Builder workspace Dockview container
-*Functional Requirements:*
-- host dockable builder tabs, execution progress bars, and live generation statistics
-*Functions to Create:*
-- AppBuilder.init_workspace()
-- AppBuilder.start_generation()
-- AppBuilder.stop_generation()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/builder.py`
+- **Frontend:** `ui/app/workspace/Builder/BuilderWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host dockable builder tabs, execution progress bars, and live generation statistics -> `AppBuilder.init_workspace()`
+- trigger autonomous genetic strategy generation pipeline -> `AppBuilder.start_generation()`
+- abort or pause active genetic generation run -> `AppBuilder.stop_generation()`
 
 #### `SettingsPanel`
 *Feature:* Dockview builder settings host container
-*Functional Requirements:*
-- display container panel for strategy builder and retester settings
-- save, load, and switch between build configuration presets
-*Functions to Create:*
-- SettingsPanel.settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/controls.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/SettingsControls.tsx`
+*Functional Requirements & Implementation:*
+- display container panel for strategy builder and retester settings -> `SettingsPanel.settings()`
 
 #### `TaskBuild`
 *Feature:* Worker process executing genetic strategy generation and calibration
-*Functional Requirements:*
-- configure simple settings for strategy build task
-- calibrate indicator parameter ranges for strategy building based on target volatility
-*Functions to Create:*
-- BuildTask.simple_settings()
-- BuildTask.indicators_calibration()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/engine/build_task.py`
+- **Frontend:** `ui/app/workspace/Builder/EnginePanel.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for strategy build task -> `BuildTask.simple_settings()`
+- calibrate indicator parameter ranges for strategy building based on target volatility -> `BuildTask.indicators_calibration()`
 
 ---
 
@@ -942,372 +947,383 @@ flowchart TD
 
 #### `AppResults`
 *Feature:* Results workspace Dockview container
-*Functional Requirements:*
-- host dockable databank tables, performance overview, equity charts, and trade logs
-*Functions to Create:*
-- AppResults.init_workspace()
-- AppResults.select_strategy()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/results.py`
+- **Frontend:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host dockable databank tables, performance overview, equity charts, and trade logs -> `AppResults.init_workspace()`
+- select active strategy and load comprehensive performance metrics -> `AppResults.select_strategy()`
 
 #### `ProjectDatabanks`
 *Feature:* SQLite databank collection manager and strategy table view
-*Functional Requirements:*
-- display all databanks and databank management toolbar
-- display single databank table with strategy candidates and metrics
-*Functions to Create:*
-- Databanks.databanks()
-- Databanks.databank()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/project_databanks.py`
+- **Frontend:** `ui/app/workspace/Builder/ResultsColumn.tsx`
+*Functional Requirements & Implementation:*
+- display all databanks and databank management toolbar -> `Databanks.databanks()`
+- display single databank table with strategy candidates and metrics -> `Databanks.databank()`
 
 #### `ResultsDatabankViews`
 *Feature:* Custom column configurations and metric visibility presets
-*Functional Requirements:*
-- manage databank column views and customized table layouts
-*Functions to Create:*
-- DatabankViews.databank_views()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_databank_views.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsDatabankViewsView.tsx`
+*Functional Requirements & Implementation:*
+- manage databank column views and customized table layouts -> `DatabankViews.databank_views()`
 
 #### `ResultsDatabankActions`
 *Feature:* Databank command actions and strategy manipulation
-*Functional Requirements:*
-- create a new databank in SQLite database
-- load strategies into databank from external files
-- save strategies from databank to disk
-- merge selected strategies into a portfolio strategy
-- compare settings and parameters of two selected strategies side-by-side
-- edit trading parameters of strategy directly in databank
-- copy selected strategies to Retester workspace
-- run custom analysis script over databank strategies
-- set rich-text note for selected strategies
-*Functions to Create:*
-- DatabankActions.new_databank()
-- DatabankActions.load()
-- DatabankActions.save()
-- DatabankActions.merge_strategies()
-- DatabankActions.compare_strategies()
-- DatabankActions.edit_parameters()
-- DatabankActions.retest()
-- DatabankActions.run_ca()
-- DatabankActions.set_note()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_databank_actions.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsDatabankActionsView.tsx`
+*Functional Requirements & Implementation:*
+- create a new databank in SQLite database -> `DatabankActions.new_databank()`
+- load strategies into databank from external files -> `DatabankActions.load()`
+- save strategies from databank to disk -> `DatabankActions.save()`
+- merge selected strategies into a portfolio strategy -> `DatabankActions.merge_strategies()`
+- compare settings and parameters of two selected strategies side-by-side -> `DatabankActions.compare_strategies()`
+- edit trading parameters of strategy directly in databank -> `DatabankActions.edit_parameters()`
+- copy selected strategies to Retester workspace -> `DatabankActions.retest()`
+- run custom analysis script over databank strategies -> `DatabankActions.run_ca()`
+- set rich-text note for selected strategies -> `DatabankActions.set_note()`
 
 #### `DatabankRename`
 *Feature:* Bulk strategy renaming utility
-*Functional Requirements:*
-- rename selected strategies in databank using pattern templates
-*Functions to Create:*
-- DatabankRename.databank_rename()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/databank/databank_rename.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankRename.tsx`
+*Functional Requirements & Implementation:*
+- rename selected strategies in databank using pattern templates -> `DatabankRename.databank_rename()`
 
 #### `DatabankFilterByCorrelation`
 *Feature:* Correlation-based strategy databank filtering
-*Functional Requirements:*
-- filter strategies in databank by return correlation threshold
-*Functions to Create:*
-- DatabankFilter.databank_filter_by_correlation()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/databank/databank_filter_by_correlation.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankFilterByCorrelation.tsx`
+*Functional Requirements & Implementation:*
+- filter strategies in databank by return correlation threshold -> `DatabankFilter.databank_filter_by_correlation()`
 
 #### `CustomDatabankActions`
 *Feature:* Custom databank action hook registry
-*Functional Requirements:*
-- rename a databank and update references in SQLite
-*Functions to Create:*
-- CustomDatabank.rename_databank()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/databank/custom_databank_actions.py`
+- **Frontend:** `ui/app/plugins/databank/CustomDatabankActions.tsx`
+*Functional Requirements & Implementation:*
+- rename a databank and update references in SQLite -> `CustomDatabank.rename_databank()`
 
 #### `CustomResultsPluginActions`
 *Feature:* Custom results analysis plugin manager
-*Functional Requirements:*
-- rename a custom analysis plugin tab
-*Functions to Create:*
-- CustomResults.rename_results_plugin()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/custom_results_plugin_actions.py`
+- **Frontend:** `ui/app/workspace/Results/views/CustomResultsPluginActionsView.tsx`
+*Functional Requirements & Implementation:*
+- rename a custom analysis plugin tab -> `CustomResults.rename_results_plugin()`
 
 ### Phase 7.2: Strategy Overview & Performance Reports
 
 #### `ProjectResults`
 *Feature:* Results tab container and custom plugin creator
-*Functional Requirements:*
-- display strategy test results and analysis tabs
-- create a new custom result analysis plugin
-*Functions to Create:*
-- ProjectResults.results()
-- ProjectResults.new_custom_plugin()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/project_results.py`
+- **Frontend:** `ui/app/workspace/Builder/ResultsView.tsx`
+*Functional Requirements & Implementation:*
+- display strategy test results and analysis tabs -> `ProjectResults.results()`
+- create a new custom result analysis plugin -> `ProjectResults.new_custom_plugin()`
 
 #### `ResultsOverview`
 *Feature:* Executive strategy performance summary and template renderer
-*Functional Requirements:*
-- display strategy overview and key performance summary
-- render strategy overview with StrategyQuant default HTML template
-- render strategy overview with TradeStation report template
-- render strategy overview with AlgoWizard shared template
-*Functions to Create:*
-- Overview.overview()
-- Overview.sqdefault_template()
-- Overview.ts_template()
-- Overview.awshareddefault_template()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/overview.py`
+- **Frontend:** `ui/app/workspace/Builder/results/tabs/OverviewTab.tsx`
+*Functional Requirements & Implementation:*
+- display strategy overview and key performance summary -> `Overview.overview()`
+- render strategy overview with StrategyQuant default HTML template -> `Overview.sqdefault_template()`
+- render strategy overview with TradeStation report template -> `Overview.ts_template()`
+- render strategy overview with AlgoWizard shared template -> `Overview.awshareddefault_template()`
 
 #### `ResultsReport`
 *Feature:* Comprehensive backtest performance metrics report
-*Functional Requirements:*
-- display comprehensive strategy performance report: Sharpe, Sortino, Drawdown, Profit Factor, Win Rate, CAGR
-*Functions to Create:*
-- Report.report()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_report.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsReportView.tsx`
+*Functional Requirements & Implementation:*
+- display comprehensive strategy performance report: Sharpe, Sortino, Drawdown, Profit Factor, Win Rate, CAGR -> `Report.report()`
 
 #### `ResultsStrategyConfig`
 *Feature:* Strategy build manifest and parameter inspector
-*Functional Requirements:*
-- display full strategy build configuration, trading rules, and indicator parameters
-*Functions to Create:*
-- StrategyConfig.strategyconfig()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_strategy_config.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsStrategyConfigView.tsx`
+*Functional Requirements & Implementation:*
+- display full strategy build configuration, trading rules, and indicator parameters -> `StrategyConfig.strategyconfig()`
 
 #### `DashboardPanel`
 *Feature:* Top-level KPI performance dashboard panel
-*Functional Requirements:*
-- display the main dashboard overview panel with aggregate system statistics
-*Functions to Create:*
-- Dashboard.dashboard()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/dashboard_panel.py`
+- **Frontend:** `ui/app/workspace/Builder/ProgressDashboard.tsx`
+*Functional Requirements & Implementation:*
+- display the main dashboard overview panel with aggregate system statistics -> `Dashboard.dashboard()`
 
 #### `DashboardResults`
 *Feature:* Strategy result summary card and quick-inspect widget
-*Functional Requirements:*
-- display project results overview on the dashboard
-- display individual result summary panel widget
-*Functions to Create:*
-- DashboardResults.dashboard_results()
-- DashboardResults.result_panel()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/dashboard_results.py`
+- **Frontend:** `ui/app/workspace/Builder/results/ResultsCharts.tsx`
+*Functional Requirements & Implementation:*
+- display project results overview on the dashboard -> `DashboardResults.dashboard_results()`
+- display individual result summary panel widget -> `DashboardResults.result_panel()`
 
 ### Phase 7.3: Equity & Drawdown Charting
 
 #### `ResultsEquityChart`
 *Feature:* Lightweight Charts equity curve, drawdown underwater chart, and benchmark overlay
-*Functional Requirements:*
-- display equity curve and drawdown chart using Lightweight Charts
-- configure and display benchmark equity overlay on chart
-*Functions to Create:*
-- EquityChart.equity_chart()
-- EquityChart.benchmark()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/equity_chart.py`
+- **Frontend:** `ui/app/workspace/Builder/results/tabs/EquityChartTab.tsx`
+*Functional Requirements & Implementation:*
+- display equity curve and drawdown chart using Lightweight Charts -> `EquityChart.equity_chart()`
+- configure and display benchmark equity overlay on chart -> `EquityChart.benchmark()`
 
 #### `ResultsChart`
 *Feature:* Interactive price chart with trade entry and exit markers
-*Functional Requirements:*
-- display strategy performance chart with price bars and trade executions
-*Functions to Create:*
-- Chart.chart()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_chart.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsChartView.tsx`
+*Functional Requirements & Implementation:*
+- display strategy performance chart with price bars and trade executions -> `Chart.chart()`
 
 #### `ResultsProfileChart`
 *Feature:* 2D/3D strategy parameter sensitivity profile chart
-*Functional Requirements:*
-- display strategy parameter profile chart
-*Functions to Create:*
-- ProfileChart.profile_chart()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_profile_chart.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsProfileChartView.tsx`
+*Functional Requirements & Implementation:*
+- display strategy parameter profile chart -> `ProfileChart.profile_chart()`
 
 #### `EquityChartBenchmark`
 *Feature:* Benchmark equity curve calculation and alignment engine
-*Functional Requirements:*
-- calculate normalized benchmark equity curve (e.g. S&P 500, Buy & Hold)
-- align benchmark timestamps with strategy trade timestamps
-*Functions to Create:*
-- BenchmarkEngine.calculate_benchmark()
-- BenchmarkEngine.align_series()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/charts/benchmark.py`
+- **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
+*Functional Requirements & Implementation:*
+- calculate normalized benchmark equity curve (e.g. S&P 500, Buy & Hold) -> `BenchmarkEngine.calculate_benchmark()`
+- align benchmark timestamps with strategy trade timestamps -> `BenchmarkEngine.align_series()`
 
 #### `EquityChartDailyChart`
 *Feature:* Daily PnL bar chart calculation engine
-*Functional Requirements:*
-- aggregate trade profits into daily PnL buckets and render bar charts
-*Functions to Create:*
-- DailyChartEngine.aggregate_daily_pnl()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/charts/daily_chart.py`
+- **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
+*Functional Requirements & Implementation:*
+- aggregate trade profits into daily PnL buckets and render bar charts -> `DailyChartEngine.aggregate_daily_pnl()`
 
 #### `EquityChartDrawdown`
 *Feature:* Peak-to-trough percentage drawdown calculator
-*Functional Requirements:*
-- compute underwater drawdown percentage series from equity curve
-*Functions to Create:*
-- DrawdownEngine.calculate_drawdown_series()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/charts/drawdown.py`
+- **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
+*Functional Requirements & Implementation:*
+- compute underwater drawdown percentage series from equity curve -> `DrawdownEngine.calculate_drawdown_series()`
 
 #### `EquityChartVolatility`
 *Feature:* Rolling equity volatility calculator
-*Functional Requirements:*
-- calculate rolling 30-day and 90-day annualized equity volatility
-*Functions to Create:*
-- VolatilityEngine.calculate_rolling_volatility()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/charts/volatility.py`
+- **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
+*Functional Requirements & Implementation:*
+- calculate rolling 30-day and 90-day annualized equity volatility -> `VolatilityEngine.calculate_rolling_volatility()`
 
 #### `EquityChartVolume`
 *Feature:* Traded volume distribution analysis engine
-*Functional Requirements:*
-- analyze volume distribution per trade, instrument, and time session
-*Functions to Create:*
-- VolumeEngine.calculate_volume_distribution()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/charts/volume.py`
+- **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`
+*Functional Requirements & Implementation:*
+- analyze volume distribution per trade, instrument, and time session -> `VolumeEngine.calculate_volume_distribution()`
 
 ### Phase 7.4: Trade Execution & Trade Analysis
 
 #### `ResultsTradeList`
 *Feature:* Virtualized trade log table (TanStack Virtual)
-*Functional Requirements:*
-- list all trades executed by strategy with entry/exit times, prices, and profits
-*Functions to Create:*
-- TradeList.trade_list()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/trade_list.py`
+- **Frontend:** `ui/app/workspace/Builder/results/tabs/TradeListTab.tsx`
+*Functional Requirements & Implementation:*
+- list all trades executed by strategy with entry/exit times, prices, and profits -> `TradeList.trade_list()`
 
 #### `ResultsTradelistViews`
 *Feature:* Custom column filter presets and trade view manager
-*Functional Requirements:*
-- manage custom column views and filtering presets for trade list
-*Functions to Create:*
-- TradelistViews.tradelist_views()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_tradelist_views.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsTradelistViewsView.tsx`
+*Functional Requirements & Implementation:*
+- manage custom column views and filtering presets for trade list -> `TradelistViews.tradelist_views()`
 
 #### `ResultsTradeAnalysis`
 *Feature:* Periodic trade breakdown by hour, day of week, and duration
-*Functional Requirements:*
-- display trade analysis breakdown by periods, days of week, and hours
-- display trade analysis charts panel
-*Functions to Create:*
-- TradeAnalysis.trade_analysis()
-- TradeAnalysis.trade_analysis_panel()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/trade_analysis.py`
+- **Frontend:** `ui/app/workspace/Results/views/TradeAnalysisView.tsx`
+*Functional Requirements & Implementation:*
+- display trade analysis breakdown by periods, days of week, and hours -> `TradeAnalysis.trade_analysis()`
+- display trade analysis charts panel -> `TradeAnalysis.trade_analysis_panel()`
 
 ### Phase 7.5: Portfolio & Correlation Analysis in Results
 
 #### `ResultsPortfolioCorrelation`
 *Feature:* Portfolio correlation matrix heatmap and overlapping trade analysis
-*Functional Requirements:*
-- display portfolio correlation analysis
-- display strategy correlation matrix table
-- display correlation detail between two selected strategies
-- display overlapping trades matrix
-- display overlapping trades detail between strategies
-*Functions to Create:*
-- PortfolioCorrelation.portfolio_correlation()
-- PortfolioCorrelation.correlation_matrix()
-- PortfolioCorrelation.correlation_matrix_detail()
-- PortfolioCorrelation.overlapping_trades()
-- PortfolioCorrelation.overlapping_trades_detail()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/portfolio_correlation.py`
+- **Frontend:** `ui/app/workspace/Results/views/PortfolioCorrelationView.tsx`
+*Functional Requirements & Implementation:*
+- display portfolio correlation analysis -> `PortfolioCorrelation.portfolio_correlation()`
+- display strategy correlation matrix table -> `PortfolioCorrelation.correlation_matrix()`
+- display correlation detail between two selected strategies -> `PortfolioCorrelation.correlation_matrix_detail()`
+- display overlapping trades matrix -> `PortfolioCorrelation.overlapping_trades()`
+- display overlapping trades detail between strategies -> `PortfolioCorrelation.overlapping_trades_detail()`
 
 #### `ResultsPortfolioComposerChart`
 *Feature:* Blended portfolio performance chart in Results
-*Functional Requirements:*
-- display portfolio composer performance chart
-*Functions to Create:*
-- PortfolioComposerChart.portfolio_composer_chart()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_portfolio_composer_chart.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsPortfolioComposerChartView.tsx`
+*Functional Requirements & Implementation:*
+- display portfolio composer performance chart -> `PortfolioComposerChart.portfolio_composer_chart()`
 
 #### `ResultsPortfolioComposerLog`
 *Feature:* Portfolio backtest calculation log in Results
-*Functional Requirements:*
-- display calculation log for portfolio composer
-*Functions to Create:*
-- PortfolioComposerLog.portfolio_composer_log()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_portfolio_composer_log.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsPortfolioComposerLogView.tsx`
+*Functional Requirements & Implementation:*
+- display calculation log for portfolio composer -> `PortfolioComposerLog.portfolio_composer_log()`
 
 ### Phase 7.6: Advanced Exploration & Stock Picking
 
 #### `ResultsExplore`
 *Feature:* Parameter space exploration viewer
-*Functional Requirements:*
-- display strategy exploration and parameter spaces
-*Functions to Create:*
-- Explore.explore()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_explore.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsExploreView.tsx`
+*Functional Requirements & Implementation:*
+- display strategy exploration and parameter spaces -> `Explore.explore()`
 
 #### `ResultsSPOverview`
 *Feature:* Stock picker overview: universe list, stats, and treemap
-*Functional Requirements:*
-- display stock picker overview dashboard
-- display stock picker list view
-- display stock picker performance statistics
-- display top performing stocks chart
-- display stocks treemap visualization
-*Functions to Create:*
-- SPOverview.sp_overview()
-- SPOverview.sp_overview_list()
-- SPOverview.sp_overview_stats()
-- SPOverview.sp_overview_top_chart()
-- SPOverview.sp_overview_tree_map()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_sp_overview.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsSPOverviewView.tsx`
+*Functional Requirements & Implementation:*
+- display stock picker overview dashboard -> `SPOverview.sp_overview()`
+- display stock picker list view -> `SPOverview.sp_overview_list()`
+- display stock picker performance statistics -> `SPOverview.sp_overview_stats()`
+- display top performing stocks chart -> `SPOverview.sp_overview_top_chart()`
+- display stocks treemap visualization -> `SPOverview.sp_overview_tree_map()`
 
 #### `ResultsStockpicker`
 *Feature:* Stock picker strategy execution results
-*Functional Requirements:*
-- display stock picker strategy execution results and rebalance dates
-*Functions to Create:*
-- Stockpicker.stockpicker()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_stockpicker.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsStockpickerView.tsx`
+*Functional Requirements & Implementation:*
+- display stock picker strategy execution results and rebalance dates -> `Stockpicker.stockpicker()`
 
 #### `FitnessMethodExistingPortfolio`
 *Feature:* Fitness calculation against existing portfolio
-*Functional Requirements:*
-- configures fitness calculation against existing portfolio
-*Functions to Create:*
-- FitnessPortfolio.fitness_method_existing_portfolio()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/fitness/existing_portfolio.py`
+- **Frontend:** `ui/app/workspace/Builder/FitnessEvolutionModal.tsx`
+*Functional Requirements & Implementation:*
+- configures fitness calculation against existing portfolio -> `FitnessPortfolio.fitness_method_existing_portfolio()`
 
 #### `FitnessMethodStrategyResult`
 *Feature:* Fitness calculation based on strategy backtest result
-*Functional Requirements:*
-- configures fitness calculation based on strategy backtest result
-*Functions to Create:*
-- FitnessStrategy.fitness_method_strategy_result()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/fitness/strategy_result.py`
+- **Frontend:** `ui/app/workspace/Builder/FitnessEvolutionModal.tsx`
+*Functional Requirements & Implementation:*
+- configures fitness calculation based on strategy backtest result -> `FitnessStrategy.fitness_method_strategy_result()`
 
 #### `FitnessMethodWFResult`
 *Feature:* Fitness calculation from Walk-Forward optimization results
-*Functional Requirements:*
-- evaluate Walk-Forward efficiency index and consistency score
-*Functions to Create:*
-- FitnessWF.calculate_wf_fitness()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/fitness/wf_result.py`
+- **Frontend:** `ui/app/workspace/Builder/FitnessEvolutionModal.tsx`
+*Functional Requirements & Implementation:*
+- evaluate Walk-Forward efficiency index and consistency score -> `FitnessWF.calculate_wf_fitness()`
 
 ### Phase 7.7: Source Code Generation, Savers & Loaders
 
 #### `ResultsSourceCode`
 *Feature:* Multi-language code generator (Python, MQL4, MQL5, EasyLanguage)
-*Functional Requirements:*
-- display strategy generated source code
-- guide importing StrategyQuant custom indicators to target trading platform
-- configure target trading platform terminal path
-*Functions to Create:*
-- SourceCode.source_code()
-- SourceCode.custom_indicators()
-- SourceCode.terminal_config()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/source_code.py`
+- **Frontend:** `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`
+*Functional Requirements & Implementation:*
+- display strategy generated source code -> `SourceCode.source_code()`
+- guide importing StrategyQuant custom indicators to target trading platform -> `SourceCode.custom_indicators()`
+- configure target trading platform terminal path -> `SourceCode.terminal_config()`
 
 #### `ResultsPlugins`
 *Feature:* Custom analysis plugin iframe sandbox
-*Functional Requirements:*
-- display external custom analysis plugin in sandboxed iframe
-*Functions to Create:*
-- Plugins.plugin_iframe()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_plugins.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsPluginsView.tsx`
+*Functional Requirements & Implementation:*
+- display external custom analysis plugin in sandboxed iframe -> `Plugins.plugin_iframe()`
 
 #### `SaverHTML`
 *Feature:* Export backtest report to standalone HTML file
-*Functional Requirements:*
-- save report using AlgoWizard shared HTML template
-- save report using StrategyQuant default HTML template
-- save report using TradeStation HTML template
-*Functions to Create:*
-- SaverHTML.awshareddefault_template()
-- SaverHTML.sqdefault_template()
-- SaverHTML.ts_template()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/exporters/saver_html.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
+*Functional Requirements & Implementation:*
+- save report using AlgoWizard shared HTML template -> `SaverHTML.awshareddefault_template()`
+- save report using StrategyQuant default HTML template -> `SaverHTML.sqdefault_template()`
+- save report using TradeStation HTML template -> `SaverHTML.ts_template()`
 
 #### `SaverPDF`
 *Feature:* Export strategy backtest reports to PDF format
-*Functional Requirements:*
-- render performance metrics, equity curves, and drawdowns into PDF document
-- generate printable executive tear-sheets with Sharpe, Sortino, and trade logs
-*Functions to Create:*
-- SaverPDF.generate_pdf()
-- SaverPDF.render_tearsheet()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/exporters/saver_pdf.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
+*Functional Requirements & Implementation:*
+- render performance metrics, equity curves, and drawdowns into PDF document -> `SaverPDF.generate_pdf()`
+- generate printable executive tear-sheets with Sharpe, Sortino, and trade logs -> `SaverPDF.render_tearsheet()`
 
 #### `SaverSQ3`
 *Feature:* Legacy StrategyQuant 3 file exporter
-*Functional Requirements:*
-- export strategies into legacy StrategyQuant 3 binary file format
-*Functions to Create:*
-- SaverSQ3.export_sq3()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/exporters/saver_sq3.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
+*Functional Requirements & Implementation:*
+- export strategies into legacy StrategyQuant 3 binary file format -> `SaverSQ3.export_sq3()`
 
 #### `SaverStrategyTrades`
 *Feature:* Export strategy trade history to Parquet and CSV files
-*Functional Requirements:*
-- serialize trade list to PyArrow table and write compressed Parquet file
-- export trade records to standard CSV file format
-*Functions to Create:*
-- SaverTrades.to_parquet()
-- SaverTrades.to_csv()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/exporters/saver_trades.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
+*Functional Requirements & Implementation:*
+- serialize trade list to PyArrow table and write compressed Parquet file -> `SaverTrades.to_parquet()`
+- export trade records to standard CSV file format -> `SaverTrades.to_csv()`
 
 #### `LoaderSQ3`
 *Feature:* Parser and importer for legacy StrategyQuant 3 files
-*Functional Requirements:*
-- parse and deserialize StrategyQuant 3 strategy files into memory
-*Functions to Create:*
-- LoaderSQ3.load_sq3()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/loaders/loader_sq3.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
+*Functional Requirements & Implementation:*
+- parse and deserialize StrategyQuant 3 strategy files into memory -> `LoaderSQ3.load_sq3()`
 
 #### `LoaderSQ4`
 *Feature:* Parser and importer for StrategyQuant 4 files
-*Functional Requirements:*
-- parse and deserialize StrategyQuant 4 strategy files into memory
-*Functions to Create:*
-- LoaderSQ4.load_sq4()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/loaders/loader_sq4.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
+*Functional Requirements & Implementation:*
+- parse and deserialize StrategyQuant 4 strategy files into memory -> `LoaderSQ4.load_sq4()`
 
 ---
 
@@ -1321,179 +1337,181 @@ flowchart TD
 
 #### `AppRetester`
 *Feature:* Retester workspace Dockview container
-*Functional Requirements:*
-- host dockable retest settings, cross-check cards, and robustness dashboards
-*Functions to Create:*
-- AppRetester.init_workspace()
-- AppRetester.start_retest()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/retester.py`
+- **Frontend:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host dockable retest settings, cross-check cards, and robustness dashboards -> `AppRetester.init_workspace()`
+- trigger multi-market robustness retesting across selected strategies -> `AppRetester.start_retest()`
 
 #### `SettingsWhatToRetest`
 *Feature:* Databank strategy selection for robustness retesting
-*Functional Requirements:*
-- configure which strategies from databanks to retest
-*Functions to Create:*
-- WhatToRetest.what_to_retest()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/settings/what_to_retest.py`
+- **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
+*Functional Requirements & Implementation:*
+- configure which strategies from databanks to retest -> `WhatToRetest.what_to_retest()`
 
 #### `SettingsAutomaticRetest`
 *Feature:* Automated background retesting trigger configuration
-*Functional Requirements:*
-- configure automatic retest triggers and target databanks
-*Functions to Create:*
-- AutomaticRetest.automatic_retest()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/settings/automatic_retest.py`
+- **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
+*Functional Requirements & Implementation:*
+- configure automatic retest triggers and target databanks -> `AutomaticRetest.automatic_retest()`
 
 ### Phase 8.2: Cross-Checks Framework & Acceptance Criteria
 
 #### `SettingsCrossChecks`
 *Feature:* Robustness cross-check test manager and acceptance thresholds
-*Functional Requirements:*
-- display and toggle available robustness cross checks
-- display individual cross-check configuration row
-- configure acceptance criteria and thresholds for cross checks
-- configure specific cross-check test options
-*Functions to Create:*
-- CrossChecks.cross_checks()
-- CrossChecks.cross_check()
-- CrossChecks.cross_check_acceptance_settings()
-- CrossChecks.cross_check_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/cross_checks.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/CrossChecksTab.tsx`
+*Functional Requirements & Implementation:*
+- display and toggle available robustness cross checks -> `CrossChecks.cross_checks()`
+- display individual cross-check configuration row -> `CrossChecks.cross_check()`
+- configure acceptance criteria and thresholds for cross checks -> `CrossChecks.cross_check_acceptance_settings()`
+- configure specific cross-check test options -> `CrossChecks.cross_check_settings()`
 
 ### Phase 8.3: Robustness & Cross-Check Verification Modules
 
 #### `CrossCheckMonteCarloManipulation`
 *Feature:* Monte Carlo trade manipulation stress-testing
-*Functional Requirements:*
-- configure Monte Carlo data/trades manipulation settings (skip trades, shuffle trades, permute slippage)
-- configure fitness function for Monte Carlo manipulation
-*Functions to Create:*
-- MonteCarloManipulation.settings()
-- MonteCarloManipulation.mc_manipulation_fitness()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/cross_check_monte_carlo_manipulation.py`
+- **Frontend:** `ui/app/workspace/Retester/views/CrossCheckMonteCarloManipulationModal.tsx`
+*Functional Requirements & Implementation:*
+- configure Monte Carlo data/trades manipulation settings (skip trades, shuffle trades, permute slippage) -> `MonteCarloManipulation.settings()`
+- configure fitness function for Monte Carlo manipulation -> `MonteCarloManipulation.mc_manipulation_fitness()`
 
 #### `CrossCheckMonteCarloRetest`
 *Feature:* Monte Carlo price bar randomization test
-*Functional Requirements:*
-- configure Monte Carlo retest settings across randomized historical bar data
-- configure fitness function for Monte Carlo retest
-*Functions to Create:*
-- MonteCarloRetest.settings()
-- MonteCarloRetest.mc_retest_fitness()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/cross_check_monte_carlo_retest.py`
+- **Frontend:** `ui/app/workspace/Retester/views/CrossCheckMonteCarloRetestModal.tsx`
+*Functional Requirements & Implementation:*
+- configure Monte Carlo retest settings across randomized historical bar data -> `MonteCarloRetest.settings()`
+- configure fitness function for Monte Carlo retest -> `MonteCarloRetest.mc_retest_fitness()`
 
 #### `CrossCheckRetestWithHigherPrecision`
 *Feature:* High-resolution 1-minute and tick data verification
-*Functional Requirements:*
-- configure retest with higher precision settings
-- configure fitness function for higher precision cross-check
-*Functions to Create:*
-- HigherPrecision.settings()
-- HigherPrecision.cc_higher_precision()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/cross_check_retest_with_higher_precision.py`
+- **Frontend:** `ui/app/workspace/Retester/views/CrossCheckRetestWithHigherPrecisionModal.tsx`
+*Functional Requirements & Implementation:*
+- configure retest with higher precision settings -> `HigherPrecision.settings()`
+- configure fitness function for higher precision cross-check -> `HigherPrecision.cc_higher_precision()`
 
 #### `CrossCheckRetestOnAdditionalMarkets`
 *Feature:* Multi-market universality test across uncorrelated symbols
-*Functional Requirements:*
-- configure additional backtest markets and timeframes
-- configure filtering conditions for additional markets retest
-- configure portfolio fitness function for additional markets
-*Functions to Create:*
-- AdditionalMarkets.settings()
-- AdditionalMarkets.filtering()
-- AdditionalMarkets.portfolio_fitness()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/cross_check_retest_on_additional_markets.py`
+- **Frontend:** `ui/app/workspace/Retester/views/CrossCheckRetestOnAdditionalMarketsModal.tsx`
+*Functional Requirements & Implementation:*
+- configure additional backtest markets and timeframes -> `AdditionalMarkets.settings()`
+- configure filtering conditions for additional markets retest -> `AdditionalMarkets.filtering()`
+- configure portfolio fitness function for additional markets -> `AdditionalMarkets.portfolio_fitness()`
 
 #### `CrossCheckOptProfileSysParamPermutation`
 *Feature:* System Parameter Permutation (SPP) plateau stability test
-*Functional Requirements:*
-- configure parameter permutation cross-check settings
-- configure filtering conditions for Optimization Profile / SPP
-*Functions to Create:*
-- SPPCheck.settings()
-- SPPCheck.filtering()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/cross_check_opt_profile_sys_param_permutation.py`
+- **Frontend:** `ui/app/workspace/Retester/views/CrossCheckOptProfileSysParamPermutationModal.tsx`
+*Functional Requirements & Implementation:*
+- configure parameter permutation cross-check settings -> `SPPCheck.settings()`
+- configure filtering conditions for Optimization Profile / SPP -> `SPPCheck.filtering()`
 
 #### `CrossCheckSequentialOptimization`
 *Feature:* Sequential parameter optimization robustness test
-*Functional Requirements:*
-- configure sequential optimization parameters
-- configure filtering conditions for sequential optimization
-*Functions to Create:*
-- SequentialOptCheck.settings()
-- SequentialOptCheck.filtering()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/cross_check_sequential_optimization.py`
+- **Frontend:** `ui/app/workspace/Retester/views/CrossCheckSequentialOptimizationModal.tsx`
+*Functional Requirements & Implementation:*
+- configure sequential optimization parameters -> `SequentialOptCheck.settings()`
+- configure filtering conditions for sequential optimization -> `SequentialOptCheck.filtering()`
 
 #### `CrossCheckWalkForwardMatrix`
 *Feature:* Walk-Forward matrix robustness test
-*Functional Requirements:*
-- configure walk-forward matrix cross-check settings across window variations
-- configure filtering conditions for walk-forward matrix
-*Functions to Create:*
-- WFMatrixCheck.settings()
-- WFMatrixCheck.filtering()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/cross_check_walk_forward_matrix.py`
+- **Frontend:** `ui/app/workspace/Retester/views/CrossCheckWalkForwardMatrixModal.tsx`
+*Functional Requirements & Implementation:*
+- configure walk-forward matrix cross-check settings across window variations -> `WFMatrixCheck.settings()`
+- configure filtering conditions for walk-forward matrix -> `WFMatrixCheck.filtering()`
 
 #### `CrossCheckWalkForwardOptimization`
 *Feature:* Standard Walk-Forward Optimization robustness test
-*Functional Requirements:*
-- configure walk-forward optimization cross-check settings
-- configure filtering conditions for walk-forward optimization
-*Functions to Create:*
-- WFOptCheck.settings()
-- WFOptCheck.filtering()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/cross_check_walk_forward_optimization.py`
+- **Frontend:** `ui/app/workspace/Retester/views/CrossCheckWalkForwardOptimizationModal.tsx`
+*Functional Requirements & Implementation:*
+- configure walk-forward optimization cross-check settings -> `WFOptCheck.settings()`
+- configure filtering conditions for walk-forward optimization -> `WFOptCheck.filtering()`
 
 #### `CrossCheckWhatIf`
 *Feature:* What-If stress scenario simulator
-*Functional Requirements:*
-- configure What-If scenarios cross-check settings (skip worst trades, high spread periods, trading hours)
-*Functions to Create:*
-- WhatIf.settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/cross_checks/what_if.py`
+- **Frontend:** `ui/app/workspace/Retester/views/WhatIfModal.tsx`
+*Functional Requirements & Implementation:*
+- configure What-If scenarios cross-check settings (skip worst trades, high spread periods, trading hours) -> `WhatIf.settings()`
 
 ### Phase 8.4: Verification Results Views
 
 #### `ResultsRobustnessTests`
 *Feature:* Robustness test summary dashboard and confidence interval metrics
-*Functional Requirements:*
-- display strategy robustness tests dashboard
-- manage views for robustness tests
-- display detailed robustness analysis metrics and pass rates
-*Functions to Create:*
-- RobustnessTests.robustness_tests()
-- RobustnessTests.manageviews()
-- RobustnessTests.robustness_analysis()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_robustness_tests.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsRobustnessTestsView.tsx`
+*Functional Requirements & Implementation:*
+- display strategy robustness tests dashboard -> `RobustnessTests.robustness_tests()`
+- manage views for robustness tests -> `RobustnessTests.manageviews()`
+- display detailed robustness analysis metrics and pass rates -> `RobustnessTests.robustness_analysis()`
 
 #### `ResultsSysParamPermutation`
 *Feature:* System Parameter Permutation (SPP) results view and 3D surface
-*Functional Requirements:*
-- display System Parameter Permutation (SPP) results
-- display System Parameter Permutation chart panel
-*Functions to Create:*
-- SysParamPermutation.sys_param_permutation()
-- SysParamPermutation.spp_panel()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_sys_param_permutation.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsSysParamPermutationView.tsx`
+*Functional Requirements & Implementation:*
+- display System Parameter Permutation (SPP) results -> `SysParamPermutation.sys_param_permutation()`
+- display System Parameter Permutation chart panel -> `SysParamPermutation.spp_panel()`
 
 #### `ResultsSequentialOptimization`
 *Feature:* Sequential optimization results table and parameter chart
-*Functional Requirements:*
-- display sequential optimization results
-- display sequential parameter change chart
-*Functions to Create:*
-- SequentialOptimization.sequential_optimization()
-- SequentialOptimization.sequential_param_chart()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_sequential_optimization.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsSequentialOptimizationView.tsx`
+*Functional Requirements & Implementation:*
+- display sequential optimization results -> `SequentialOptimization.sequential_optimization()`
+- display sequential parameter change chart -> `SequentialOptimization.sequential_param_chart()`
 
 #### `ResultsWalkForward`
 *Feature:* Walk-Forward optimization matrix grid and consistency score
-*Functional Requirements:*
-- display walk-forward optimization matrix and test results
-- manage views for walk-forward results
-*Functions to Create:*
-- WalkForward.wfresults()
-- WalkForward.manageviews()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_walk_forward.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsWalkForwardView.tsx`
+*Functional Requirements & Implementation:*
+- display walk-forward optimization matrix and test results -> `WalkForward.wfresults()`
+- manage views for walk-forward results -> `WalkForward.manageviews()`
 
 ### Phase 8.5: Retest Task Execution
 
 #### `TaskRetest`
 *Feature:* Worker process executing strategy robustness retests
-*Functional Requirements:*
-- configure simple settings for strategy retest task
-*Functions to Create:*
-- RetestTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/retester/engine/retest_task.py`
+- **Frontend:** `ui/app/workspace/Retester/retesterClient.ts`
+*Functional Requirements & Implementation:*
+- configure simple settings for strategy retest task -> `RetestTask.simple_settings()`
 
 #### `TaskAutomaticRetest`
 *Feature:* Worker process for automatic background retesting
-*Functional Requirements:*
-- configure simple settings for automatic retest task
-*Functions to Create:*
-- AutoRetestTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/auto_retest.py`
+- **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for automatic retest task -> `AutoRetestTask.simple_settings()`
 
 ---
 
@@ -1507,42 +1525,43 @@ flowchart TD
 
 #### `AppOptimizer`
 *Feature:* Optimizer workspace Dockview container
-*Functional Requirements:*
-- host dockable optimizer setup panels, parameter distribution inputs, and 3D surface charts
-*Functions to Create:*
-- AppOptimizer.init_workspace()
-- AppOptimizer.start_optimization()
+*Implementation Files:*
+- **Backend:** `app/workspace/optimizer/optimizer.py`
+- **Frontend:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host dockable optimizer setup panels, parameter distribution inputs, and 3D surface charts -> `AppOptimizer.init_workspace()`
+- trigger parameter grid or genetic optimization run -> `AppOptimizer.start_optimization()`
 
 #### `SettingsOptimization`
 *Feature:* Optimization algorithm, parameter ranges, and auto-presets
-*Functional Requirements:*
-- configure optimization algorithm (Grid, Simple Genetic, Walk-Forward), parameters, and ranges
-- auto-preset parameter distribution ranges for optimization
-*Functions to Create:*
-- Optimization.optimization()
-- Optimization.auto_preset()
+*Implementation Files:*
+- **Backend:** `app/workspace/optimizer/settings/optimization_settings.py`
+- **Frontend:** `ui/app/workspace/Optimizer/OptimizerSettings.tsx`
+*Functional Requirements & Implementation:*
+- configure optimization algorithm (Grid, Simple Genetic, Walk-Forward), parameters, and ranges -> `Optimization.optimization()`
+- auto-preset parameter distribution ranges for optimization -> `Optimization.auto_preset()`
 
 ### Phase 9.2: Optimization Profile Surface Visualization
 
 #### `ResultsOptimizationProfile`
 *Feature:* 2D/3D parameter surface chart showing robust parameter plateaus
-*Functional Requirements:*
-- display strategy optimization profile surface
-- configure 2D/3D optimization profile levels
-- manages views for optimization profile
-*Functions to Create:*
-- OptimizationProfile.optimization_profile()
-- OptimizationProfile.optim_profile_levels()
-- OptimizationProfile.manageviews()
+*Implementation Files:*
+- **Backend:** `app/workspace/results/reports/results_optimization_profile.py`
+- **Frontend:** `ui/app/workspace/Results/views/ResultsOptimizationProfileView.tsx`
+*Functional Requirements & Implementation:*
+- display strategy optimization profile surface -> `OptimizationProfile.optimization_profile()`
+- configure 2D/3D optimization profile levels -> `OptimizationProfile.optim_profile_levels()`
+- manages views for optimization profile -> `OptimizationProfile.manageviews()`
 
 ### Phase 9.3: Optimization Task Execution
 
 #### `TaskOptimize`
 *Feature:* Worker process executing parameter optimization runs
-*Functional Requirements:*
-- configure simple settings for strategy optimization task
-*Functions to Create:*
-- OptimizeTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/optimizer/engine/optimize_task.py`
+- **Frontend:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+*Functional Requirements & Implementation:*
+- configure simple settings for strategy optimization task -> `OptimizeTask.simple_settings()`
 
 ---
 
@@ -1556,23 +1575,23 @@ flowchart TD
 
 #### `AppNeuralNetwork`
 *Feature:* Neural Network Trainer workspace Dockview container
-*Functional Requirements:*
-- host neural network training parameter panels, loss curves, and prediction accuracy views
-*Functions to Create:*
-- AppNeuralNetwork.init_workspace()
-- AppNeuralNetwork.start_training()
+*Implementation Files:*
+- **Backend:** `app/workspace/neural_network/neural_net.py`
+- **Frontend:** `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`
+*Functional Requirements & Implementation:*
+- host neural network training parameter panels, loss curves, and prediction accuracy views -> `AppNeuralNetwork.init_workspace()`
+- trigger neural network training and validation pipeline -> `AppNeuralNetwork.start_training()`
 
 #### `TaskNeuralNetworkTrainer`
 *Feature:* Feature matrix preparation, model training, and validation worker
-*Functional Requirements:*
-- prepare feature matrix from historical prices and technical indicators
-- train neural network model with PyTorch/Numba and validate out-of-sample accuracy
-- export trained model weights into strategy rule conditions
-*Functions to Create:*
-- NNTrainer.prepare_features()
-- NNTrainer.train_model()
-- NNTrainer.evaluate_accuracy()
-- NNTrainer.export_model()
+*Implementation Files:*
+- **Backend:** `app/workspace/neural_network/trainer.py`
+- **Frontend:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
+*Functional Requirements & Implementation:*
+- prepare feature matrix from historical prices and technical indicators -> `NNTrainer.prepare_features()`
+- train neural network model with PyTorch/Numba -> `NNTrainer.train_model()`
+- validate out-of-sample prediction accuracy and confusion matrix -> `NNTrainer.evaluate_accuracy()`
+- export trained model weights into strategy rule conditions -> `NNTrainer.export_model()`
 
 ---
 
@@ -1586,72 +1605,71 @@ flowchart TD
 
 #### `AppPortfolioComposer`
 *Feature:* Interactive Portfolio Composer workspace Dockview container
-*Functional Requirements:*
-- host dockable portfolio strategy list, weight allocation sliders, and combined equity curves
-*Functions to Create:*
-- AppPortfolioComposer.init_workspace()
-- AppPortfolioComposer.compute_portfolio()
+*Implementation Files:*
+- **Backend:** `app/workspace/portfolio/composer.py`
+- **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host dockable portfolio strategy list, weight allocation sliders, and combined equity curves -> `AppPortfolioComposer.init_workspace()`
+- compute portfolio metrics, correlation matrix, and aggregate drawdown -> `AppPortfolioComposer.compute_portfolio()`
 
 #### `PortfolioComposer`
 *Feature:* Interactive portfolio canvas, weight allocator, and benchmark comparison
-*Functional Requirements:*
-- display Portfolio Composer main view
-- display portfolio backtest results and metrics
-- configure portfolio composition settings
-- configure automatic recomputation of portfolio upon weight modification
-- configure portfolio strategy weights and selection
-- configure portfolio calculation parameters
-- add Buy and Hold benchmark strategy to portfolio
-*Functions to Create:*
-- Composer.portfolio_composer()
-- Composer.results()
-- Composer.settings()
-- Composer.autocomputation()
-- Composer.composition()
-- Composer.configuration()
-- Composer.add_buy_hold_str()
+*Implementation Files:*
+- **Backend:** `app/workspace/portfolio/composer.py`
+- **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- display Portfolio Composer main view -> `Composer.portfolio_composer()`
+- display portfolio backtest results and metrics -> `Composer.results()`
+- configure portfolio composition settings -> `Composer.settings()`
+- configure automatic recomputation of portfolio upon weight modification -> `Composer.autocomputation()`
+- configure portfolio strategy weights and selection -> `Composer.composition()`
+- configure portfolio calculation parameters -> `Composer.configuration()`
+- add Buy and Hold benchmark strategy to portfolio -> `Composer.add_buy_hold_str()`
 
 #### `SettingsCreatePortfolio`
 *Feature:* Strategy selection and capital weighting for portfolio creation
-*Functional Requirements:*
-- configure strategy selection and weighting for portfolio creation
-*Functions to Create:*
-- CreatePortfolio.settings_create_portfolio()
+*Implementation Files:*
+- **Backend:** `app/workspace/portfolio/settings/create_portfolio.py`
+- **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx`
+*Functional Requirements & Implementation:*
+- configure strategy selection and weighting for portfolio creation -> `CreatePortfolio.settings_create_portfolio()`
 
 #### `TaskCreatePortfolio`
 *Feature:* Worker process computing blended portfolio equity curves
-*Functional Requirements:*
-- configure simple settings for portfolio creation task
-*Functions to Create:*
-- CreatePortfolioTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/create_portfolio.py`
+- **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for portfolio creation task -> `CreatePortfolioTask.simple_settings()`
 
 ### Phase 11.2: Automated Portfolio Combination Search (Portfolio Master)
 
 #### `AppPortfolioMaster`
 *Feature:* Portfolio Master workspace Dockview container
-*Functional Requirements:*
-- host automated portfolio discovery controls and Pareto frontier visualizations
-*Functions to Create:*
-- AppPortfolioMaster.init_workspace()
-- AppPortfolioMaster.start_search()
+*Implementation Files:*
+- **Backend:** `app/workspace/portfolio/master.py`
+- **Frontend:** `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host automated portfolio discovery controls and Pareto frontier visualizations -> `AppPortfolioMaster.init_workspace()`
+- trigger genetic portfolio search across databank candidate pools -> `AppPortfolioMaster.start_search()`
 
 #### `SettingsAutomaticPortfolioBuilder`
 *Feature:* Genetic portfolio search parameters and correlation constraints
-*Functional Requirements:*
-- configure automatic portfolio builder search and sizing
-- configure portfolio correlation limits and thresholds
-- configure genetic algorithm parameters for portfolio evolution
-*Functions to Create:*
-- AutoPortfolioBuilder.automatic_portfolio_builder()
-- AutoPortfolioBuilder.correlation_settings()
-- AutoPortfolioBuilder.genetic_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/portfolio/settings/auto_builder.py`
+- **Frontend:** `ui/app/workspace/PortfolioMaster/PortfolioMasterSettings.tsx`
+*Functional Requirements & Implementation:*
+- configure automatic portfolio builder search and sizing -> `AutoPortfolioBuilder.automatic_portfolio_builder()`
+- configure portfolio correlation limits and thresholds -> `AutoPortfolioBuilder.correlation_settings()`
+- configure genetic algorithm parameters for portfolio evolution -> `AutoPortfolioBuilder.genetic_settings()`
 
 #### `TaskAutomaticPortfolioBuilder`
 *Feature:* Worker process evolving optimal combinations of uncorrelated strategies
-*Functional Requirements:*
-- configure simple settings for automatic portfolio builder task
-*Functions to Create:*
-- AutoPortfolioTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/portfolio/master_task.py`
+- **Frontend:** `ui/app/workspace/PortfolioMaster/portfolioMasterModel.ts`
+*Functional Requirements & Implementation:*
+- configure simple settings for automatic portfolio builder task -> `AutoPortfolioTask.simple_settings()`
 
 ---
 
@@ -1675,341 +1693,360 @@ flowchart TD
 
 #### `AppTaskManager`
 *Feature:* Custom Projects pipeline orchestrator workspace Dockview container
-*Functional Requirements:*
-- host dockable project explorer, visual task pipeline DAG canvas, and execution console
-*Functions to Create:*
-- AppTaskManager.init_workspace()
-- AppTaskManager.run_project()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/projects.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- host dockable project explorer, visual task pipeline DAG canvas, and execution console -> `AppTaskManager.init_workspace()`
+- execute automated multi-task custom project pipeline -> `AppTaskManager.run_project()`
 
 #### `TaskManagerProjects`
 *Feature:* Project CRUD, bulk symbol modification, and execution controls
-*Functional Requirements:*
-- list all custom projects
-- create a new custom project
-- rename a custom project
-- modify custom project symbols in bulk across all tasks
-- provide control actions (run, pause, stop) for a project
-*Functions to Create:*
-- TMProjects.projects()
-- TMProjects.new_project()
-- TMProjects.rename_project()
-- TMProjects.modify_symbols()
-- TMProjects.tm_project_control()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/projects_manager.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- list all custom projects -> `TMProjects.projects()`
+- create a new custom project -> `TMProjects.new_project()`
+- rename a custom project -> `TMProjects.rename_project()`
+- modify custom project symbols in bulk across all tasks -> `TMProjects.modify_symbols()`
+- provide control actions (run, pause, stop) for a project -> `TMProjects.tm_project_control()`
 
 #### `TaskManagerTasks`
 *Feature:* Task CRUD, task reordering, configuration copying, and card UI
-*Functional Requirements:*
-- list and reorder tasks in a project
-- create a new task within a project
-- rename an existing task
-- copy configuration from an existing task
-- copy configuration to one or more tasks
-- display individual task item card in task manager
-*Functions to Create:*
-- TMTasks.tasks()
-- TMTasks.new_task()
-- TMTasks.rename_task()
-- TMTasks.copy_from_task()
-- TMTasks.copy_to_tasks()
-- TMTasks.tmtask()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks_manager.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- list and reorder tasks in a project -> `TMTasks.tasks()`
+- create a new task within a project -> `TMTasks.new_task()`
+- rename an existing task -> `TMTasks.rename_task()`
+- copy configuration from an existing task -> `TMTasks.copy_from_task()`
+- copy configuration to one or more tasks -> `TMTasks.copy_to_tasks()`
+- display individual task item card in task manager -> `TMTasks.tmtask()`
 
 #### `ProjectResources`
 *Feature:* Symbol and indicator dependency resolver for project pipelines
-*Functional Requirements:*
-- display newly added project resources
-- display symbol differences between strategies and project
-- resolve custom indicator/data resources for project
-- resolve missing symbols and data resources for project
-*Functions to Create:*
-- Resources.added_resources()
-- Resources.diff_resources()
-- Resources.resolve_custom_resources()
-- Resources.resolve_resources()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/project_resources.py`
+- **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
+*Functional Requirements & Implementation:*
+- display newly added project resources -> `Resources.added_resources()`
+- display symbol differences between strategies and project -> `Resources.diff_resources()`
+- resolve custom indicator/data resources for project -> `Resources.resolve_custom_resources()`
+- resolve missing symbols and data resources for project -> `Resources.resolve_resources()`
 
 #### `ProjectSettings`
 *Feature:* Project metadata and default databank assignments
-*Functional Requirements:*
-- display project settings overview panel
-*Functions to Create:*
-- PMSettings.settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/project_settings.py`
+- **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
+*Functional Requirements & Implementation:*
+- display project settings overview panel -> `PMSettings.settings()`
 
 #### `EnginePanel`
 *Feature:* Live execution monitor: engine state, accepted/dismissed counters, DAG flow, real-time log
-*Functional Requirements:*
-- display engine control and execution overview
-- display strategy acceptance statistics
-- display strategy dismissal statistics
-- display total execution times per engine stage
-- display help on configuring project flow
-- display text execution log for project
-- display visual project flow and execution steps
-- display live generation charts panel
-- display fitness evolution chart
-*Functions to Create:*
-- Engine.engine()
-- Engine.accepted_stats()
-- Engine.dismissal_stats()
-- Engine.duration_stats()
-- Engine.project_config_help()
-- Engine.text_log()
-- Engine.visual_log()
-- Engine.engine_chart_panel()
-- Engine.fitness_evolution()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/engine_panel.py`
+- **Frontend:** `ui/app/workspace/Builder/EnginePanel.tsx`
+*Functional Requirements & Implementation:*
+- display engine control and execution overview -> `Engine.engine()`
+- display strategy acceptance statistics -> `Engine.accepted_stats()`
+- display strategy dismissal statistics -> `Engine.dismissal_stats()`
+- display total execution times per engine stage -> `Engine.duration_stats()`
+- display help on configuring project flow -> `Engine.project_config_help()`
+- display text execution log for project -> `Engine.text_log()`
+- display visual project flow and execution steps -> `Engine.visual_log()`
+- display live generation charts panel -> `Engine.engine_chart_panel()`
+- display fitness evolution chart -> `Engine.fitness_evolution()`
 
 ### Phase 12.2: Flow Control, Branching & Alerts
 
 #### `TaskGoToTask`
 *Feature:* Conditional branching and loop jump task runner
-*Functional Requirements:*
-- configure simple settings for task flow jump/goto task
-*Functions to Create:*
-- GoToTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/goto.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/GoToTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for task flow jump/goto task -> `GoToTask.simple_settings()`
 
 #### `SettingsGoToTask`
 *Feature:* Conditional jump logic and target task configuration
-*Functional Requirements:*
-- configure conditional branching and jump to another task
-*Functions to Create:*
-- GoToSettings.settings_go_to_task()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/goto.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/GoToTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure conditional branching and jump to another task -> `GoToSettings.settings_go_to_task()`
 
 #### `TaskWaitFor`
 *Feature:* Delay timer and file availability wait runner
-*Functional Requirements:*
-- configure simple settings for wait task
-*Functions to Create:*
-- WaitForTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/wait.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/WaitTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for wait task -> `WaitForTask.simple_settings()`
 
 #### `SettingsWaitFor`
 *Feature:* Delay time and file condition configuration
-*Functional Requirements:*
-- configure wait condition (delay time or file presence)
-*Functions to Create:*
-- WaitForSettings.settings_wait_for()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/wait.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/WaitTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure wait condition (delay time or file presence) -> `WaitForSettings.settings_wait_for()`
 
 #### `TaskStopAndStart`
 *Feature:* Process lifecycle and external command runner
-*Functional Requirements:*
-- configure simple settings for stopping and starting tasks
-*Functions to Create:*
-- StopAndStartTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/stop_start.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/StopStartTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for stopping and starting tasks -> `StopAndStartTask.simple_settings()`
 
 #### `SettingsStopAndStart`
 *Feature:* External task start/stop configuration
-*Functional Requirements:*
-- configure stopping and starting external tasks or programs
-*Functions to Create:*
-- StopAndStartSettings.settings_stop_and_start()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/stop_start.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/StopStartTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure stopping and starting external tasks or programs -> `StopAndStartSettings.settings_stop_and_start()`
 
 #### `TaskNotification`
 *Feature:* System, audio, and email alert runner
-*Functional Requirements:*
-- configure simple settings for notification task
-*Functions to Create:*
-- NotificationTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/notify.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/NotifyTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for notification task -> `NotificationTask.simple_settings()`
 
 #### `SettingsNotification`
 *Feature:* Notification alerts and execution pause configuration
-*Functional Requirements:*
-- configure email/audio notifications and pause on task completion
-*Functions to Create:*
-- NotificationSettings.settings_notification()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/notification.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/NotifyTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure email/audio notifications and pause on task completion -> `NotificationSettings.settings_notification()`
 
 #### `SettingsNotes`
 *Feature:* Rich-text documentation and project notes storage
-*Functional Requirements:*
-- display and edit notes for project or task
-*Functions to Create:*
-- Notes.notes()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/notes.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/NotesTab.tsx`
+*Functional Requirements & Implementation:*
+- display and edit notes for project or task -> `Notes.notes()`
 
 #### `ProjectConditionCyclesCount`
 *Feature:* Condition evaluator: triggers based on engine cycle count
-*Functional Requirements:*
-- evaluate whether engine cycle count reaches defined target threshold
-*Functions to Create:*
-- CyclesCondition.evaluate()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/conditions/cycles_count.py`
+- **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
+*Functional Requirements & Implementation:*
+- evaluate whether engine cycle count reaches defined target threshold -> `CyclesCondition.evaluate()`
 
 #### `ProjectConditionGoToActivated`
 *Feature:* Condition evaluator: tracks GoTo jump activations
-*Functional Requirements:*
-- monitor whether target GoTo jump condition has been activated
-*Functions to Create:*
-- GoToActivatedCondition.evaluate()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/conditions/goto_activated.py`
+- **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
+*Functional Requirements & Implementation:*
+- monitor whether target GoTo jump condition has been activated -> `GoToActivatedCondition.evaluate()`
 
 #### `ProjectConditionGoToEvaluated`
 *Feature:* Condition evaluator: monitors conditional branch evaluations
-*Functional Requirements:*
-- evaluate result of conditional expression in project DAG
-*Functions to Create:*
-- GoToEvaluatedCondition.evaluate()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/conditions/goto_evaluated.py`
+- **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
+*Functional Requirements & Implementation:*
+- evaluate result of conditional expression in project DAG -> `GoToEvaluatedCondition.evaluate()`
 
 #### `ProjectConditionResultsCount`
 *Feature:* Condition evaluator: triggers when databank strategy count threshold is met
-*Functional Requirements:*
-- evaluate whether databank contains sufficient number of accepted strategies
-*Functions to Create:*
-- ResultsCountCondition.evaluate()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/conditions/results_count.py`
+- **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
+*Functional Requirements & Implementation:*
+- evaluate whether databank contains sufficient number of accepted strategies -> `ResultsCountCondition.evaluate()`
 
 #### `ProjectConditionRunTime`
 *Feature:* Condition evaluator: triggers based on elapsed task execution time
-*Functional Requirements:*
-- evaluate whether task execution duration exceeds time limit
-*Functions to Create:*
-- RunTimeCondition.evaluate()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/conditions/run_time.py`
+- **Frontend:** `ui/app/plugins/project/ProjectWorkbench.tsx`
+*Functional Requirements & Implementation:*
+- evaluate whether task execution duration exceeds time limit -> `RunTimeCondition.evaluate()`
 
 ### Phase 12.3: Data & Databank Pipeline Steps
 
 #### `TaskUpdateData`
 *Feature:* Automated market data update task runner
-*Functional Requirements:*
-- configure simple settings for data updating task
-*Functions to Create:*
-- UpdateDataTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/data_update.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/DataUpdateTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for data updating task -> `UpdateDataTask.simple_settings()`
 
 #### `SettingsUpdateData`
 *Feature:* Automated historical data update settings
-*Functional Requirements:*
-- configure automated historical data updates
-*Functions to Create:*
-- UpdateDataSettings.settings_update_data()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/update_data.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/DataUpdateTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure automated historical data updates -> `UpdateDataSettings.settings_update_data()`
 
 #### `SettingsAutoRetestData`
 *Feature:* Market data and commission profile assigner for automated retesting
-*Functional Requirements:*
-- configure data and commissions for automatic retesting
-*Functions to Create:*
-- AutoRetestData.auto_retest_data()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/auto_retest.py`
+- **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
+*Functional Requirements & Implementation:*
+- configure data and commissions for automatic retesting -> `AutoRetestData.auto_retest_data()`
 
 #### `TaskLoadFromFiles`
 *Feature:* External strategy file importer task runner
-*Functional Requirements:*
-- configure simple settings for loading strategies task
-*Functions to Create:*
-- LoadFromFilesTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/load_files.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for loading strategies task -> `LoadFromFilesTask.simple_settings()`
 
 #### `SettingsLoadFromFiles`
 *Feature:* File paths and filters for strategy loading settings
-*Functional Requirements:*
-- configure loading strategies from files into databank
-*Functions to Create:*
-- LoadFromFilesSettings.settings_load_from_files()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/load_files.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
+*Functional Requirements & Implementation:*
+- configure loading strategies from files into databank -> `LoadFromFilesSettings.settings_load_from_files()`
 
 #### `TaskClearDatabanks`
 *Feature:* Databank clearing task runner
-*Functional Requirements:*
-- configure simple settings for clearing databanks task
-*Functions to Create:*
-- ClearDatabanksTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/databank_clear.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/DatabankClearTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for clearing databanks task -> `ClearDatabanksTask.simple_settings()`
 
 #### `SettingsClearDatabanks`
 *Feature:* Databank clearing selection settings
-*Functional Requirements:*
-- configure which databanks to clear during task execution
-*Functions to Create:*
-- ClearDatabanksSettings.clear_databanks()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/clear_databanks.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/DatabankClearTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure which databanks to clear during task execution -> `ClearDatabanksSettings.clear_databanks()`
 
 #### `TaskFiltering`
 *Feature:* Databank strategy filter and ranking task runner
-*Functional Requirements:*
-- configure simple settings for filtering task
-*Functions to Create:*
-- FilteringTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/filtering.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankViews.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for filtering task -> `FilteringTask.simple_settings()`
 
 #### `SettingsFiltering`
 *Feature:* Databank filtering conditions and actions settings
-*Functional Requirements:*
-- configure databank filtering conditions and actions
-*Functions to Create:*
-- FilteringSettings.settings_filtering()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/filtering.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankViews.tsx`
+*Functional Requirements & Implementation:*
+- configure databank filtering conditions and actions -> `FilteringSettings.settings_filtering()`
 
 #### `TaskLogDatabankStats`
 *Feature:* Statistical metric logger for databanks task runner
-*Functional Requirements:*
-- configure simple settings for logging databank statistics task
-*Functions to Create:*
-- LogDatabankStatsTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/log_stats.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for logging databank statistics task -> `LogDatabankStatsTask.simple_settings()`
 
 #### `SettingsLogDatabankStats`
 *Feature:* Databank statistical logging conditions settings
-*Functional Requirements:*
-- configure logging of databank statistics
-- add a new databank statistics logging rule
-- configure databank stat calculation type and conditions
-*Functions to Create:*
-- LogStatsSettings.log_databank_stats()
-- LogStatsSettings.new_log_databank_stats()
-- LogStatsSettings.log_databank_stats_type()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/log_stats.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
+*Functional Requirements & Implementation:*
+- configure logging of databank statistics -> `LogStatsSettings.log_databank_stats()`
+- add a new databank statistics logging rule -> `LogStatsSettings.new_log_databank_stats()`
+- configure databank stat calculation type and conditions -> `LogStatsSettings.log_databank_stats_type()`
 
 #### `TaskSaveToFiles`
 *Feature:* Strategy file exporter (.str, platform code) task runner
-*Functional Requirements:*
-- configure simple settings for saving strategies task
-*Functions to Create:*
-- SaveToFilesTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/save_files.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for saving strategies task -> `SaveToFilesTask.simple_settings()`
 
 #### `SettingsSaveToFiles`
 *Feature:* Strategy file save destinations and formats settings
-*Functional Requirements:*
-- configure saving databank strategies to disk
-*Functions to Create:*
-- SaveToFilesSettings.settings_save_to_files()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/save_files.py`
+- **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
+*Functional Requirements & Implementation:*
+- configure saving databank strategies to disk -> `SaveToFilesSettings.settings_save_to_files()`
 
 #### `TaskDeleteFile`
 *Feature:* Temporary file cleanup task runner
-*Functional Requirements:*
-- configure simple settings for file deletion task
-*Functions to Create:*
-- DeleteFileTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/delete_file.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/DeleteFileTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for file deletion task -> `DeleteFileTask.simple_settings()`
 
 #### `SettingsDeleteFile`
 *Feature:* File deletion paths and patterns settings
-*Functional Requirements:*
-- configure file deletion paths and patterns
-*Functions to Create:*
-- DeleteFileSettings.settings_delete_file()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/delete_file.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/DeleteFileTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure file deletion paths and patterns -> `DeleteFileSettings.settings_delete_file()`
 
 ### Phase 12.4: Integration & Batch Configuration
 
 #### `TaskCallExternalScript`
 *Feature:* External Python/Shell script task runner
-*Functional Requirements:*
-- configure simple settings for external script execution task
-*Functions to Create:*
-- CallScriptTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/external_script.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/ExternalScriptTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for external script execution task -> `CallScriptTask.simple_settings()`
 
 #### `SettingsCallExternalScript`
 *Feature:* External executable path and command-line arguments settings
-*Functional Requirements:*
-- configure external script/executable call settings
-*Functions to Create:*
-- CallScriptSettings.settings_call_external_script()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/external_script.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/ExternalScriptTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure external script/executable call settings -> `CallScriptSettings.settings_call_external_script()`
 
 #### `TaskCustomAnalysis`
 *Feature:* Custom databank analysis task runner
-*Functional Requirements:*
-- configure simple settings for custom analysis task
-*Functions to Create:*
-- CustomAnalysisTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/custom_analysis.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for custom analysis task -> `CustomAnalysisTask.simple_settings()`
 
 #### `SettingsCustomAnalysis`
 *Feature:* Custom analysis script and databank targets settings
-*Functional Requirements:*
-- configure custom analysis script and databank targets
-*Functions to Create:*
-- CustomAnalysisSettings.settings_custom_analysis()
+*Implementation Files:*
+- **Backend:** `app/workspace/builder/settings/custom_analysis.py`
+- **Frontend:** `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx`
+*Functional Requirements & Implementation:*
+- configure custom analysis script and databank targets -> `CustomAnalysisSettings.settings_custom_analysis()`
 
 #### `TaskApplyMassConfig`
 *Feature:* Mass configuration template applier task runner
-*Functional Requirements:*
-- configure simple settings for mass configuration task
-*Functions to Create:*
-- ApplyMassConfigTask.simple_settings()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/mass_config.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/MassConfigTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure simple settings for mass configuration task -> `ApplyMassConfigTask.simple_settings()`
 
 #### `SettingsApplyMassConfig`
 *Feature:* Mass configuration parameters settings
-*Functional Requirements:*
-- configure mass settings application across multiple tasks
-*Functions to Create:*
-- ApplyMassConfigSettings.apply_mass_config()
+*Implementation Files:*
+- **Backend:** `app/workspace/custom_projects/tasks/settings/mass_config.py`
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/MassConfigTaskModal.tsx`
+*Functional Requirements & Implementation:*
+- configure mass settings application across multiple tasks -> `ApplyMassConfigSettings.apply_mass_config()`
 
 ---
 
@@ -2023,25 +2060,23 @@ flowchart TD
 
 #### `AppGridControl`
 *Feature:* Distributed worker node connection pool and job dispatch coordinator
-*Functional Requirements:*
-- maintain connection pool to remote Python worker nodes over WebSocket / local IPC
-- partition and dispatch heavy backtest, optimization, and Monte Carlo batches across cluster
-- aggregate remote worker result batches into local SQLite job ledger
-- monitor worker node CPU utilization, memory pressure, and heartbeat latency
-*Functions to Create:*
-- GridControl.connect_worker()
-- GridControl.dispatch_batch()
-- GridControl.collect_results()
-- GridControl.get_cluster_status()
+*Implementation Files:*
+- **Backend:** `app/workspace/grid_control/grid_control.py`
+- **Frontend:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- maintain connection pool to remote Python worker nodes over WebSocket / local IPC -> `GridControl.connect_worker()`
+- partition and dispatch heavy backtest, optimization, and Monte Carlo batches across cluster -> `GridControl.dispatch_batch()`
+- aggregate remote worker result batches into local SQLite job ledger -> `GridControl.collect_results()`
+- monitor worker node CPU utilization, memory pressure, and heartbeat latency -> `GridControl.get_cluster_status()`
 
 #### `AppGridTest`
 *Feature:* Grid worker node connectivity and throughput test suite
-*Functional Requirements:*
-- send benchmark calculation jobs to remote workers and verify throughput
-- measure round-trip latency and report worker node execution errors
-*Functions to Create:*
-- GridTest.run_benchmark()
-- GridTest.verify_worker()
+*Implementation Files:*
+- **Backend:** `app/workspace/grid_test/grid_test.py`
+- **Frontend:** `ui/app/workspace/GridTest/GridTestWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- send benchmark calculation jobs to remote workers and verify throughput -> `GridTest.run_benchmark()`
+- measure round-trip latency and report worker node execution errors -> `GridTest.verify_worker()`
 
 ---
 
@@ -2055,14 +2090,13 @@ flowchart TD
 
 #### `AppMarketplace`
 *Feature:* Community extensions, indicator presets, and strategy template marketplace client
-*Functional Requirements:*
-- browse and search marketplace catalog for community indicators and snippets
-- download and install verified extension packages into local workspace
-- publish custom user indicators or strategy presets to marketplace
-*Functions to Create:*
-- Marketplace.browse_catalog()
-- Marketplace.install_package()
-- Marketplace.publish_item()
+*Implementation Files:*
+- **Backend:** `app/workspace/marketplace/marketplace.py`
+- **Frontend:** `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- browse and search marketplace catalog for community indicators and snippets -> `Marketplace.browse_catalog()`
+- download and install verified extension packages into local workspace -> `Marketplace.install_package()`
+- publish custom user indicators or strategy presets to marketplace -> `Marketplace.publish_item()`
 
 ---
 
@@ -2076,12 +2110,12 @@ flowchart TD
 
 #### `AppSQXBusiness`
 *Feature:* Enterprise multi-account licensing and institutional features
-*Functional Requirements:*
-- manage institutional enterprise licenses and multi-account permissions
-- export white-label executive strategy fact-sheets and compliance reports
-*Functions to Create:*
-- SQXBusiness.manage_licenses()
-- SQXBusiness.generate_audit_report()
+*Implementation Files:*
+- **Backend:** `app/workspace/business/business.py`
+- **Frontend:** `ui/app/workspace/Business/BusinessWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- manage institutional enterprise licenses and multi-account permissions -> `SQXBusiness.manage_licenses()`
+- export white-label executive strategy fact-sheets and compliance reports -> `SQXBusiness.generate_audit_report()`
 
 ---
 
@@ -2095,13 +2129,12 @@ flowchart TD
 
 #### `AppDebugConsole`
 *Feature:* Real-time system diagnostics, memory monitoring, and WebSocket logging console
-*Functional Requirements:*
-- display live CPU, RAM, and background worker thread telemetry
-- stream system warning and error logs over WebSocket to Dockview console
-- trigger manual garbage collection and memory cache cleanup
-*Functions to Create:*
-- DebugConsole.get_telemetry()
-- DebugConsole.stream_system_logs()
-- DebugConsole.clear_caches()
+*Implementation Files:*
+- **Backend:** `app/workspace/debug_console/debug_console.py`
+- **Frontend:** `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- display live CPU, RAM, and background worker thread telemetry -> `DebugConsole.get_telemetry()`
+- stream system warning and error logs over WebSocket to Dockview console -> `DebugConsole.stream_system_logs()`
+- trigger manual garbage collection and memory cache cleanup -> `DebugConsole.clear_caches()`
 
 ---
