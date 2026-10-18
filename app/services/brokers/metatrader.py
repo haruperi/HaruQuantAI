@@ -19,6 +19,10 @@ Key Capabilities:
     - FR-MT5-BRIDGE-FRAME-DECODING: Restore values and validate incoming frames.
       Associated: `decode_frame()`, `_unpack()`, `Bridge._accept()`
       Logging: DEBUG on every decode attempt with operation and frame_bytes.
+    - FR-MT5-MARKET-DATA: Non-blocking terminal market data retrieval for bars and ticks.
+      Associated: `MetaTraderClient.get_bars()`, `MetaTraderClient.get_ticks()`,
+        `MetaTraderClient.fetch_bars()`, `MetaTraderClient.fetch_ticks()`.
+      Logging: DEBUG on retrieval queries.
 
 Python API Usage:
     ```python
@@ -46,12 +50,12 @@ import json
 import secrets
 import time
 import uuid
-from collections.abc import Mapping
+from collections.abc import Awaitable, Mapping
 from dataclasses import asdict, is_dataclass, replace
 from datetime import datetime
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Self, cast, override
+from typing import Any, Self, override
 
 from app.host.logging import get_logger
 
@@ -83,49 +87,30 @@ except ImportError:
             pass
 
 
-from app.services.brokers.base import BridgeError
-from app.services.brokers.capabilities import (
-    CancellationToken,
-    HistoryPage,
-    HistoryRequest,
-    ProviderCapabilities,
-    ProviderHealth,
+from app.services.brokers.base import (
+    BridgeError,
+    TradingClient,
 )
 from app.services.include.contracts import (
+    READ_TIMEOUT,
     BridgeEvent,
-    PropertyValue,
+    MarketBar,
+    MarketTick,
     Receipt,
     SymbolInfo,
+    TerminalInfo,
 )
-from app.services.include.data import DataBrokerBackend
 from app.services.include.enums import (
     ReceiptStatus,
-    TradeResolution,
+    Timeframe,
 )
 from app.services.include.trading import Trading
 
-PLUGIN_MANIFEST = {
-    "id": "metatrader",
-    "name": "MetaTrader",
-    "version": "1.0.0",
-    "slot": "data.provider",
-    "entry_point": "metatrader:create_adapter",
-    "description": "MetaTrader 4/5 terminal bridge and archive provider",
-    "capabilities": ["data.fetch"],
-}
-
 __all__ = [
     "Bridge",
-    "BridgeError",
-    "MT5Backend",
-    "MetaTraderDataBroker",
-    "PLUGIN_MANIFEST",
-    "PropertyValue",
-    "Receipt",
-    "ReceiptStatus",
-    "TradeResolution",
-    "create_adapter",
-    "main",
+    "MetaTraderClient",
+    "decode_frame",
+    "encode_frame",
 ]
 
 logger = get_logger(__name__)
@@ -670,52 +655,97 @@ class Bridge:
             self._pending.pop(command_id, None)
 
 
-class MT5Backend(Trading):
-    """Live MT5 facade backed only by the custom EA bridge."""
+class MetaTraderClient(TradingClient):
+    """Unified MetaTrader 4/5 client connecting over the EA TCP bridge."""
 
     def __init__(
         self,
         *,
-        auth_token: str,
+        auth_token: str = "",
         host: str = "127.0.0.1",
         port: int = 8765,
         journal_path: str | Path = DEFAULT_DATABASE_PATH,
         command_timeout: float = 10.0,
+        name: str = "MetaTrader",
+        backend: MetaTraderClient | None = None,
     ) -> None:
-        self.bridge = Bridge(
-            host=host,
-            port=port,
-            auth_token=auth_token,
-            journal_path=journal_path,
-            command_timeout=command_timeout,
-        )
-        super().__init__(self)
+        super().__init__(name=name)
+        self.bridge: Bridge
+        if backend is not None:
+            self.bridge = backend.bridge
+        else:
+            token = (
+                auth_token
+                if auth_token and len(auth_token) >= 16
+                else Bridge.generate_auth_token()
+            )
+            self.bridge = Bridge(
+                host=host,
+                port=port,
+                auth_token=token,
+                journal_path=journal_path,
+                command_timeout=command_timeout,
+            )
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._connected = False
+
+        # Facade composition for direct proxy access if callers use client.<proxy>
+        self.trading = Trading(self)
+        self.account = self.trading.account
+        self.terminal = self.trading.terminal
+        self.symbol = self.trading.symbol
+        self.trade = self.trading.trade
+        self.position = self.trading.position
+        self.order = self.trading.order
+        self.history_order = self.trading.history_order
+        self.deal = self.trading.deal
+
+    @override
+    def connect(self) -> bool:
+        """Establish connectivity."""
+        self._connected = True
+        return True
+
+    @override
+    def disconnect(self) -> None:
+        """Terminate connectivity."""
+        self._connected = False
 
     @override
     async def start(self) -> None:
         """Start the bridge listener server."""
         self._loop = asyncio.get_running_loop()
         await self.bridge.start()
+        self._connected = True
 
     @override
     async def wait_connected(self, timeout: float | None = None) -> None:
         """Wait until the MetaTrader EA connects and authenticates."""
         await self.bridge.wait_connected(timeout)
+        self._connected = True
 
     @override
     def arm(self) -> None:
         """Arm the bridge to allow live trade mutation commands."""
         self.bridge.arm()
+        self._armed = True
 
     @override
     def disarm(self) -> None:
         """Disarm the bridge to reject mutating trade commands."""
         self.bridge.disarm()
+        self._armed = False
 
     @override
     async def close(self) -> None:
         """Close the bridge server and release client connections."""
         await self.bridge.close()
+        self._connected = False
+
+    @override
+    def close_sync(self) -> None:
+        """Synchronously release local resources."""
+        self._connected = False
 
     @override
     async def __aenter__(self) -> Self:
@@ -733,15 +763,16 @@ class MT5Backend(Trading):
         """Exit asynchronous runtime context and close listener."""
         await self.close()
 
+    @override
     async def call(
         self,
         *,
-        object_id: str,
+        object_id: str = "broker",
         class_name: str,
         method_name: str,
         args: list[Any],
         requires_arm: bool = False,
-        timeout: float | None = None,  # noqa: ASYNC109 -- forwarded deadline
+        timeout: float | None = None,
     ) -> Any:
         """Delegate a canonical trading call to the native bridge."""
         return await self.bridge.call(
@@ -777,403 +808,150 @@ class MT5Backend(Trading):
         """Wait for an event correlated to a native request."""
         return await self.bridge.await_request_event(request_id, timeout)
 
-
-def _normalize_terminal_bar(b: Any) -> dict[str, Any]:
-    if isinstance(b, dict):
-        vol = (
-            b.get("tick_volume")
-            if b.get("tick_volume") is not None
-            else b.get("volume", 0)
-        )
-        rvol = (
-            b.get("real_volume")
-            if b.get("real_volume") is not None
-            else b.get("volume", 0)
-        )
-        return {
-            "time": int(b.get("time") or 0),
-            "open": float(b.get("open") or 0.0),
-            "high": float(b.get("high") or 0.0),
-            "low": float(b.get("low") or 0.0),
-            "close": float(b.get("close") or 0.0),
-            "tick_volume": int(vol or 0),
-            "spread": int(b.get("spread") or 0),
-            "real_volume": int(rvol or 0),
-        }
-    vol_attr = getattr(b, "tick_volume", None) or getattr(b, "volume", 0)
-    rvol_attr = getattr(b, "real_volume", None) or getattr(b, "volume", 0)
-    return {
-        "time": int(getattr(b, "time", 0) or 0),
-        "open": float(getattr(b, "open", 0.0) or 0.0),
-        "high": float(getattr(b, "high", 0.0) or 0.0),
-        "low": float(getattr(b, "low", 0.0) or 0.0),
-        "close": float(getattr(b, "close", 0.0) or 0.0),
-        "tick_volume": int(vol_attr or 0),
-        "spread": int(getattr(b, "spread", 0) or 0),
-        "real_volume": int(rvol_attr or 0),
-    }
-
-
-def _normalize_terminal_tick(t: Any) -> dict[str, Any]:
-    if isinstance(t, dict):
-        t_ms = (
-            int(t["time_msc"])
-            if "time_msc" in t
-            else int(float(t.get("time") or 0) * 1000)
-        )
-        last_val = t.get("last") if t.get("last") is not None else t.get("bid", 0.0)
-        rvol_val = (
-            t.get("volume_real")
-            if t.get("volume_real") is not None
-            else t.get("volume", 1.0)
-        )
-        return {
-            "time_msc": t_ms,
-            "bid": float(t.get("bid") or 0.0),
-            "ask": float(t.get("ask") or 0.0),
-            "last": float(last_val or 0.0),
-            "volume": float(t.get("volume") or 1.0),
-            "flags": int(t.get("flags") or 0),
-            "volume_real": float(rvol_val or 1.0),
-        }
-    t_ms = (
-        int(t.time_msc)
-        if hasattr(t, "time_msc")
-        else int(float(getattr(t, "time", 0) or 0) * 1000)
-    )
-    last_attr = getattr(t, "last", None) or getattr(t, "bid", 0.0)
-    rvol_attr = getattr(t, "volume_real", None) or getattr(t, "volume", 1.0)
-    return {
-        "time_msc": t_ms,
-        "bid": float(getattr(t, "bid", 0.0) or 0.0),
-        "ask": float(getattr(t, "ask", 0.0) or 0.0),
-        "last": float(last_attr or 0.0),
-        "volume": float(getattr(t, "volume", 1.0) or 1.0),
-        "flags": int(getattr(t, "flags", 0) or 0),
-        "volume_real": float(rvol_attr or 1.0),
-    }
-
-
-def _run_coroutine_or_future(coro: Any, backend: Any, timeout: float = 30.0) -> Any:
-    loop = getattr(backend, "_loop", None) or getattr(
-        getattr(backend, "bridge", None), "_loop", None
-    )
-    if loop is not None and loop.is_running():
-        try:
-            curr = asyncio.get_running_loop()
-        except RuntimeError:
-            curr = None
-        if curr is not loop:
-            future = asyncio.run_coroutine_threadsafe(coro, loop)
-            return future.result(timeout=timeout)
-    try:
-        return asyncio.run(coro)
-    except RuntimeError:
-        import concurrent.futures
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-            return pool.submit(asyncio.run, coro).result(timeout=timeout)
-
-
-class MetaTraderDataBroker(DataBrokerBackend):
-    """Historical data provider for MetaTrader terminals and archives."""
-
-    def __init__(
-        self,
-        name: str = "MetaTrader",
-        data_dir: str | Path | None = None,
-        backend: MT5Backend | None = None,
-        mode: str = "archive",
-    ) -> None:
-        super().__init__(name=name)
-        self.data_dir = Path(data_dir) if data_dir else None
-        self.backend = backend
-        self._borrowed_backend = backend is not None
-        self.mode = mode.lower().strip()
-
-        self.capabilities = ProviderCapabilities(
-            provider_id="metatrader",
-            display_name="MetaTrader",
-            category="Multi-Asset",
-            supported_timeframes=("M1", "M5", "M15", "M30", "H1", "H4", "D1"),
-            supported_modes=("bars", "ticks"),
-            requires_auth=False,
-            rate_limit_rps=10.0,
-            default_timeout_seconds=30.0,
-            supports_pagination=True,
-            has_local_archive=self.data_dir is not None and self.data_dir.exists(),
-            description="MetaTrader 4/5 terminal bridge and archive provider",
-        )
-
-    def check_health(self) -> Any:
-        """Inspect health status of MetaTrader terminal connection or archive files."""
-        if self.mode == "terminal" and self.backend is not None:
-            conn = bool(getattr(self.backend.bridge, "connected", False))
-            return ProviderHealth(
-                provider_id="metatrader",
-                status="available" if conn else "unconfigured",
-                connected=conn,
-                message="MT5 terminal connected"
-                if conn
-                else "MT5 terminal not connected",
-                capabilities=self.capabilities,
-            )
-        has_dir = self.data_dir is not None and self.data_dir.exists()
-        return ProviderHealth(
-            provider_id="metatrader",
-            status="available" if has_dir else "unconfigured",
-            connected=has_dir,
-            message="MetaTrader archive ready"
-            if has_dir
-            else "Archive data_dir not found",
-            capabilities=self.capabilities,
+    @override
+    def get_terminal_info(self) -> TerminalInfo:
+        """Return terminal information from bridge."""
+        return TerminalInfo(
+            name=self.name,
+            company=self.name,
+            connected=bool(self.bridge.connected),
+            trade_allowed=bool(self.bridge.armed),
         )
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolInfo:
-        if self.backend is not None:
-            resolver = getattr(self.backend, "symbol_info", None)
-            if callable(resolver):
-                res = resolver(symbol)
-                if isinstance(res, SymbolInfo):
-                    return res
+    def get_symbol_info(self, symbol: str) -> SymbolInfo:
+        """Resolve symbol metadata as canonical SymbolInfo."""
         return SymbolInfo(name=symbol.upper(), digits=5, point=0.00001)
 
     @override
-    def symbols_get(self) -> list[str]:
-        if self.backend is not None:
-            getter = getattr(self.backend, "symbols_get", None)
-            if callable(getter):
-                syms = getter()
-                if isinstance(syms, list):
-                    return [str(s) for s in syms]
-        if self.data_dir and self.data_dir.exists():
-            from app.services.brokers._file_history import find_matching_partitions
-
-            matched = find_matching_partitions(self.data_dir, "", "")
-            return sorted({p.stem.split("_")[0] for p in matched})
+    def get_symbols(self) -> list[str]:
+        """Return list of symbol names when terminal is not queried asynchronously."""
         return []
 
     @override
-    def fetch_bars(
+    def get_bars(
         self,
-        *,
         symbol: str,
-        timeframe: str,
-        mode: str = "range",
-        start: int = 0,
-        end: int = 0,
-        count: int = 100,
+        timeframe: Timeframe | str = Timeframe.PERIOD_H1,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        start_pos: int | None = None,
+        count: int | None = None,
         limit: int = 1000,
-    ) -> list[dict[str, Any]]:
-        target_count = count if count > 0 else limit
-        clean_sym = symbol.strip().upper()
-
-        if self.mode == "terminal" and self.backend is not None:
-            if hasattr(self.backend, "fetch_bars"):
-                bars_fn = getattr(self.backend, "fetch_bars")  # noqa: B009
-                return cast(
-                    "list[dict[str, Any]]",
-                    bars_fn(
-                        symbol=clean_sym,
-                        timeframe=timeframe,
-                        mode=mode,
-                        start=start,
-                        end=end,
-                        count=target_count,
-                        limit=limit,
-                    ),
-                )
-            if hasattr(self.backend, "call"):
-                caller = getattr(self.backend, "call")  # noqa: B009
-                res_or_coro = caller(
-                    object_id="market-data",
-                    class_name="MarketData",
-                    method_name="Bars",
-                    args=[clean_sym, timeframe, mode, start, end, target_count, limit],
-                )
-                if asyncio.iscoroutine(res_or_coro):
-                    res = _run_coroutine_or_future(res_or_coro, self.backend)
-                else:
-                    res = res_or_coro
-                if isinstance(res, list):
-                    return [_normalize_terminal_bar(b) for b in res]
-                raise BridgeError(
-                    f"Invalid terminal bars response for {clean_sym}: {res!r}",
-                    code="READ_ERROR",
-                )
-
-        if self.data_dir and self.data_dir.exists():
-            from app.services.brokers._file_history import (
-                find_matching_partitions,
-                parse_delimited_bars,
-                read_parquet_bars,
+    ) -> Awaitable[list[MarketBar]]:
+        """Fetch historical candlestick bars directly from the connected MT5 terminal bridge."""
+        if not self.bridge.connected:
+            raise BridgeError(
+                "MetaTrader terminal bridge is not connected",
+                code="NOT_CONNECTED",
             )
-            from app.services.brokers._native_history import (
-                decode_fxt_bytes,
-                decode_hst_bytes,
-            )
-
-            matched = find_matching_partitions(self.data_dir, clean_sym, timeframe)
-            rows: list[dict[str, Any]] = []
-            for p in matched:
-                if p.suffix.lower() == ".hst":
-                    rows.extend(decode_hst_bytes(p.read_bytes(), count=target_count))
-                elif p.suffix.lower() == ".fxt":
-                    rows.extend(decode_fxt_bytes(p.read_bytes(), count=target_count))
-                elif p.suffix.lower() == ".parquet":
-                    rows.extend(read_parquet_bars(p, count=target_count))
-                elif p.suffix.lower() in (".csv", ".tsv", ".txt"):
-                    rows.extend(
-                        parse_delimited_bars(
-                            p.read_text(encoding="utf-8", errors="replace"),
-                            clean_sym,
-                            timeframe,
-                        )
-                    )
-
-            if rows:
-                rows.sort(key=lambda r: r["time"])
-                filtered = [
-                    r
-                    for r in rows
-                    if (start <= 0 or r["time"] >= start)
-                    and (end <= 0 or r["time"] <= end)
-                ]
-                if filtered:
-                    return filtered[-target_count:] if target_count else filtered
-
-        raise BridgeError(
-            f"No bars available for '{clean_sym}' in MetaTrader archives",
-            code="NO_DATA",
+        return self._get_bars_terminal(
+            symbol=symbol,
+            timeframe=timeframe,
+            date_from=date_from,
+            date_to=date_to,
+            start_pos=start_pos,
+            count=count,
+            limit=limit,
         )
 
-    @override
-    def fetch_ticks(
+    async def _get_bars_terminal(
         self,
-        *,
         symbol: str,
-        mode: str = "range",
-        start_ms: int = 0,
-        end_ms: int = 0,
-        count: int = 100,
+        timeframe: Timeframe | str,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        start_pos: int | None = None,
+        count: int | None = None,
         limit: int = 1000,
-    ) -> list[dict[str, Any]]:
-        target_count = count if count > 0 else limit
+    ) -> list[MarketBar]:
+        """Asynchronously retrieve and validate historical bars from MT5 terminal bridge."""
+        logger.debug(
+            "FR-MT5-MARKET-DATA: requesting bars via terminal bridge",
+            extra={"symbol": symbol},
+        )
+        from app.services.include.data import _route, validate_rows
+
+        mode, start, end, number = _route(
+            date_from, date_to, start_pos, count, limit, scale=1
+        )
         clean_sym = symbol.strip().upper()
+        tf_str = timeframe.value if isinstance(timeframe, Timeframe) else str(timeframe)
+        payload = await self.call(
+            object_id="market-data",
+            class_name="MarketData",
+            method_name="Bars",
+            args=[clean_sym, tf_str, mode, start, end, number, limit],
+            timeout=READ_TIMEOUT,
+        )
+        rows = validate_rows(
+            payload, "bars", 0 if mode == "position" else start, end, number or limit
+        )
+        return [row for row in rows if isinstance(row, MarketBar)]
 
-        if self.mode == "terminal" and self.backend is not None:
-            if hasattr(self.backend, "fetch_ticks"):
-                ticks_fn = getattr(self.backend, "fetch_ticks")  # noqa: B009
-                return cast(
-                    "list[dict[str, Any]]",
-                    ticks_fn(
-                        symbol=clean_sym,
-                        mode=mode,
-                        start_ms=start_ms,
-                        end_ms=end_ms,
-                        count=target_count,
-                        limit=limit,
-                    ),
-                )
-            if hasattr(self.backend, "call"):
-                caller = getattr(self.backend, "call")  # noqa: B009
-                res_or_coro = caller(
-                    object_id="market-data",
-                    class_name="MarketData",
-                    method_name="Ticks",
-                    args=[clean_sym, mode, start_ms, end_ms, target_count, limit],
-                )
-                if asyncio.iscoroutine(res_or_coro):
-                    res = _run_coroutine_or_future(res_or_coro, self.backend)
-                else:
-                    res = res_or_coro
-                if isinstance(res, list):
-                    return [_normalize_terminal_tick(t) for t in res]
-                raise BridgeError(
-                    f"Invalid terminal ticks response for {clean_sym}: {res!r}",
-                    code="READ_ERROR",
-                )
-
-        if self.data_dir and self.data_dir.exists():
-            from app.services.brokers._file_history import (
-                find_matching_partitions,
-                parse_delimited_ticks,
+    @override
+    def get_ticks(
+        self,
+        symbol: str,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> Awaitable[list[MarketTick]]:
+        """Fetch historical market ticks directly from the connected MT5 terminal bridge."""
+        if not self.bridge.connected:
+            raise BridgeError(
+                "MetaTrader terminal bridge is not connected",
+                code="NOT_CONNECTED",
             )
-            from app.services.brokers._native_history import decode_fxt_bytes
-
-            matched = find_matching_partitions(self.data_dir, clean_sym, "TICK")
-            rows: list[dict[str, Any]] = []
-            for p in matched:
-                if p.suffix.lower() == ".fxt":
-                    fxt_bars = decode_fxt_bytes(p.read_bytes(), count=target_count)
-                    for b in fxt_bars:
-                        rows.append(
-                            {
-                                "time_msc": int(b["tick_time"] * 1000)
-                                if b.get("tick_time")
-                                else int(b["time"] * 1000),
-                                "bid": b["close"],
-                                "ask": b["close"],
-                                "last": b["close"],
-                                "volume": b.get("volume", 1),
-                                "flags": b.get("flag", 0),
-                                "volume_real": float(b.get("volume", 1)),
-                            }
-                        )
-                elif p.suffix.lower() in (".csv", ".tsv", ".txt"):
-                    rows.extend(
-                        parse_delimited_ticks(
-                            p.read_text(encoding="utf-8", errors="replace"), clean_sym
-                        )
-                    )
-
-            if rows:
-                rows.sort(key=lambda r: r["time_msc"])
-                filtered = [
-                    r
-                    for r in rows
-                    if (start_ms <= 0 or r["time_msc"] >= start_ms)
-                    and (end_ms <= 0 or r["time_msc"] <= end_ms)
-                ]
-                if filtered:
-                    return filtered[-target_count:] if target_count else filtered
-
-        raise BridgeError(
-            f"No ticks available for '{clean_sym}' in MetaTrader archives",
-            code="NO_DATA",
+        return self._get_ticks_terminal(
+            symbol=symbol,
+            date_from=date_from,
+            date_to=date_to,
+            count=count,
+            limit=limit,
         )
 
-    @override
-    def read_history(
+    async def _get_ticks_terminal(
         self,
-        request: HistoryRequest,
-        token: CancellationToken | None = None,
-    ) -> HistoryPage:
-        """Acquire historical bars or ticks from MetaTrader terminal or archives."""
-        page = super().read_history(request, token)
-        page.provenance = {
-            "source": "metatrader",
-            "mode": self.mode,
-            "data_dir": str(self.data_dir) if self.data_dir else None,
-        }
-        return page
+        symbol: str,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> list[MarketTick]:
+        """Asynchronously retrieve and validate historical ticks from MT5 terminal bridge."""
+        logger.debug(
+            "FR-MT5-MARKET-DATA: requesting ticks via terminal bridge",
+            extra={"symbol": symbol},
+        )
+        from app.services.include.data import _route, validate_rows
 
-
-def create_adapter(context: Any = None) -> MetaTraderDataBroker:
-    """Factory creating configured MetaTraderDataBroker adapter."""
-    data_dir = getattr(context, "data_dir", None)
-    settings = getattr(context, "settings", {}) or {}
-    mode = str(settings.get("mode", "archive"))
-    backend = getattr(context, "backend", getattr(context, "client", None))
-    return MetaTraderDataBroker(data_dir=data_dir, backend=backend, mode=mode)
+        mode, start, end, number = _route(
+            date_from, date_to, None, count, limit, scale=1000
+        )
+        clean_sym = symbol.strip().upper()
+        payload = await self.call(
+            object_id="market-data",
+            class_name="MarketData",
+            method_name="Ticks",
+            args=[clean_sym, mode, start, end, number, limit],
+            timeout=READ_TIMEOUT,
+        )
+        rows = validate_rows(
+            payload, "ticks", 0 if mode == "latest" else start, end, number or limit
+        )
+        return [row for row in rows if isinstance(row, MarketTick)]
 
 
 def main() -> None:
-    """Demonstrate executable usage of MetaTraderDataBroker."""
-    broker = MetaTraderDataBroker(mode="archive")
-    health = broker.check_health()
-    logger.info("MetaTrader health: %s (connected=%s)", health.status, health.connected)
+    """Demonstrate executable usage of MetaTraderClient."""
+    client = MetaTraderClient()
+    logger.info("MetaTrader client initialized (connected=%s)", client.is_connected)
 
 
 if __name__ == "__main__":

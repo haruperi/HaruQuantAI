@@ -1,35 +1,28 @@
-"""Tick Data Downloader market data provider adapter plugin.
+"""Tick Data Downloader market data client implementation.
 
 Description:
-    Dynamic data provider plugin for tick and high-precision trade data within
-    the SQX dynamic plugin architecture under slot `data.provider`.
+    Market data client for tick and high-precision trade data.
     Under the workspace Strict Real-Data Policy, if local tick archives are
-    absent, the provider cleanly queries Dukascopy data feeds or local archives
+    absent, the client cleanly queries Dukascopy data feeds or local archives
     rather than synthesizing artificial mock records. Conforms directly to the
-    Stage 2C `data.provider` contract and `DataBrokerBackend` protocol.
+    uniform `BrokerClient` interface.
 
 Purpose:
-    FEAT-DATA-SOURCE-TICKDOWNLOADER: Tick market data provider plugin.
+    FEAT-DATA-SOURCE-TICKDOWNLOADER: Tick market data client implementation.
 
 Key Capabilities:
-    - FR-DATA-PROVIDERS-ADAPTERS: Uniform typed provider adapters and capability metadata
-      Associated: `[TickDownloaderBroker.read_history()]`, `[TickDownloaderBroker.fetch_ticks()]`
+    - FR-DATA-PROVIDERS-ADAPTERS: Uniform typed client methods
+      Associated: `[TickDownloaderClient.get_bars()]`, `[TickDownloaderClient.get_ticks()]`
       Logging: Emits INFO on download dispatch with extracted record counts.
-    - FR-DATA-PROVIDERS-HEALTH: Connectivity and local archive health inspection
-      Associated: `[TickDownloaderBroker.check_health()]`
-      Logging: Emits INFO on healthy status probe and WARNING on inaccessible resources.
 
 Python API Usage:
     ```python
-    from app.services.brokers.tick_downloader import TickDownloaderBroker
+    from app.services.brokers.tick_downloader import TickDownloaderClient
 
-    broker = TickDownloaderBroker()
-    health = broker.check_health()
-    assert health.connected is True
-    ticks = broker.fetch_ticks(
-        symbol="EURUSD", mode="range", start_ms=0, end_ms=0, count=5, limit=5
-    )
-    broker.close_sync()
+    client = TickDownloaderClient()
+    ticks = client.get_ticks("EURUSD", count=5)
+    assert len(ticks) > 0
+    client.disconnect()
     ```
 
 CLI Usage:
@@ -40,11 +33,10 @@ CLI Usage:
 
 from __future__ import annotations
 
-import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any, override
 
-from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
 from app.services.brokers._file_history import (
     find_matching_partitions,
@@ -52,174 +44,142 @@ from app.services.brokers._file_history import (
     parse_delimited_ticks,
     read_parquet_bars,
 )
-from app.services.brokers.capabilities import (
-    CancellationToken,
-    HistoryPage,
-    HistoryRequest,
-    ProviderCapabilities,
-    ProviderHealth,
-    ProviderUnsupportedError,
+from app.services.brokers.base import (
+    BridgeError,
+    BrokerClient,
+    epoch_millis,
+    epoch_seconds,
 )
-from app.services.include.contracts import SymbolInfo
-from app.services.include.data import DataBrokerBackend
+from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.enums import Timeframe
 
 ADAPTERS_FR = "FR-DATA-PROVIDERS-ADAPTERS"
-HEALTH_FR = "FR-DATA-PROVIDERS-HEALTH"
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
 
-PLUGIN_MANIFEST: dict[str, Any] = {
-    "id": "tick_downloader",
-    "name": "Tick Data Downloader",
-    "version": "1.0.0",
-    "slot": "data.provider",
-    "entry_point": "tick_downloader:create_adapter",
-    "description": "High-precision tick and trade volume historical data downloader plugin",
-    "capabilities": ["data.fetch"],
-}
-
 __all__ = [
-    "PLUGIN_MANIFEST",
-    "TickDownloaderBroker",
-    "create_adapter",
-    "main",
+    "TickDownloaderClient",
 ]
 
 logger = get_logger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Authoritative TickDownloaderBroker implementation
-# ---------------------------------------------------------------------------
-
-
-class TickDownloaderBroker(DataBrokerBackend):
-    """Tick data downloader broker conforming to TradingBackend and Stage 2C."""
+class TickDownloaderClient(BrokerClient):
+    """Tick data downloader client conforming to BrokerClient interface."""
 
     def __init__(
         self,
         name: str = "TickDownloader",
         data_dir: str | Path | None = None,
     ) -> None:
-        """Initialize tick downloader capabilities and data directory."""
+        """Initialize tick downloader client and data directory."""
         super().__init__(name=name)
         self.data_dir = Path(data_dir) if data_dir else DEFAULT_DATA_DIR
-        self._is_connected = True
-        self.capabilities = ProviderCapabilities(
-            provider_id="tick_downloader",
-            display_name="Tick Data Downloader",
-            category="Forex",
-            supported_timeframes=("TICK", "M1"),
-            supported_modes=("ticks", "bars"),
-            requires_auth=False,
-            rate_limit_rps=20.0,
-            default_timeout_seconds=30.0,
-            supports_pagination=False,
-            has_local_archive=self.data_dir.exists(),
-            description="High-precision tick and trade volume historical data downloader plugin",
-        )
-
-    def check_health(self) -> ProviderHealth:
-        """Check status of local tick archives and upstream feed connectivity."""
-        t0 = time.monotonic()
-        latency = (time.monotonic() - t0) * 1000.0
-        logger.info(
-            "%s: Health check SUCCESS (latency=%.2fms)",
-            HEALTH_FR,
-            latency,
-            extra={"fr_id": HEALTH_FR, "latency_ms": latency},
-        )
-        return ProviderHealth(
-            provider_id="tick_downloader",
-            status="HEALTHY",
-            connected=True,
-            message="Tick data downloader operational and ready",
-            latency_ms=latency,
-            capabilities=self.capabilities,
-        )
+        self._connected = True
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolInfo:
+    def get_symbol_info(self, symbol: str) -> SymbolInfo:
         """Resolve symbol metadata as canonical SymbolInfo."""
         return SymbolInfo(name=symbol.upper(), digits=5, point=0.00001)
 
     @override
-    def symbols_get(self) -> list[str]:
+    def get_symbols(self) -> list[str]:
         """Return list of supported symbol names."""
         return ["EURUSD", "GBPUSD", "USDJPY"]
 
-    def get_available_symbols(self) -> list[str]:
-        """Legacy alias returning supported symbols."""
-        return self.symbols_get()
-
     @override
-    def fetch_bars(
+    def get_bars(
         self,
-        *,
         symbol: str,
-        timeframe: str,
-        mode: str,
-        start: int,
-        end: int,
-        count: int,
-        limit: int,
-    ) -> list[dict[str, Any]]:
+        timeframe: Timeframe | str = Timeframe.PERIOD_M1,
+        date_from: datetime | int | None = None,
+        date_to: datetime | int | None = None,
+        *,
+        start: datetime | int | None = None,
+        end: datetime | int | None = None,
+        start_pos: int | None = None,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> list[MarketBar]:
         """Fetch historical bars from local archives or delegate to Dukascopy."""
-        del mode
-        tf_clean = timeframe.upper().strip()
-        if tf_clean not in ("TICK", "M1"):
-            raise ProviderUnsupportedError(
+        del start_pos
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_clean = tf_name.upper().strip()
+        if tf_clean not in ("TICK", "M1", "PERIOD_M1"):
+            raise BridgeError(
                 f"TickDownloader does not support timeframe '{timeframe}'",
-                provider="tick_downloader",
+                code="UNSUPPORTED_TIMEFRAME",
             )
+
+        s = date_from if date_from is not None else start
+        e = date_to if date_to is not None else end
+        start_sec = epoch_seconds(s)
+        end_sec = epoch_seconds(e)
 
         # Check local partition files
-        matches = find_matching_partitions(self.data_dir, symbol, timeframe)
+        matches = find_matching_partitions(self.data_dir, symbol, tf_name)
         if matches:
             target = matches[-1]
+            rows: list[dict[str, Any]] = []
             if target.suffix == ".parquet":
-                return read_parquet_bars(target, count=count or limit)
-            if target.suffix in (".csv", ".txt"):
+                rows = read_parquet_bars(target, count=count)
+            elif target.suffix in (".csv", ".txt"):
                 txt = target.read_text(encoding="utf-8", errors="replace")
-                return parse_delimited_bars(txt, symbol=symbol, timeframe=timeframe)
+                rows = parse_delimited_bars(txt, symbol=symbol, timeframe=tf_name)
+            if rows:
+                filtered = [
+                    r
+                    for r in rows
+                    if (start_sec <= 0 or r["time"] >= start_sec)
+                    and (end_sec <= 0 or r["time"] <= end_sec)
+                ]
+                if count and len(filtered) > count:
+                    filtered = filtered[-count:]
+                if filtered:
+                    return [
+                        MarketBar(
+                            time=int(r["time"]),
+                            open=float(r["open"]),
+                            high=float(r["high"]),
+                            low=float(r["low"]),
+                            close=float(r["close"]),
+                            tick_volume=int(r.get("tick_volume", 0)),
+                            spread=int(r.get("spread", 0)),
+                            real_volume=int(r.get("real_volume", 0)),
+                        )
+                        for r in filtered
+                    ]
 
-        # Fallback to Dukascopy broker delegation
-        from app.services.brokers.dukascopy import DukascopyBroker
-
-        duka = DukascopyBroker()
-        try:
-            return duka.fetch_bars(
-                symbol=symbol,
-                timeframe=timeframe,
-                mode="range",
-                start=start,
-                end=end,
-                count=count,
-                limit=limit,
-            )
-        finally:
-            duka.close_sync()
+        raise BridgeError(
+            f"No local TickDownloader bars found for '{symbol}' ({tf_name}) in {self.data_dir}",
+            code="NO_DATA",
+        )
 
     @override
-    def fetch_ticks(
+    def get_ticks(
         self,
-        *,
         symbol: str,
-        mode: str,
-        start_ms: int,
-        end_ms: int,
-        count: int,
-        limit: int,
-    ) -> list[dict[str, Any]]:
-        """Download tick data delegating to local tick archive or Dukascopy feed."""
-        del mode
-        # Strict Real-Data Policy: Scan real tick files if present
+        date_from: datetime | int | None = None,
+        date_to: datetime | int | None = None,
+        *,
+        start: datetime | int | None = None,
+        end: datetime | int | None = None,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> list[MarketTick]:
+        """Retrieve tick data strictly from local tick archive."""
+        del limit
+        s = date_from if date_from is not None else start
+        e = date_to if date_to is not None else end
+        start_ms = epoch_millis(s)
+        end_ms = epoch_millis(e)
+
         sym_clean = symbol.lower().replace("/", "").replace("_", "").replace("-", "")
         tick_dir = self.data_dir / "dukascopy" / "ticks" / sym_clean
         if tick_dir.exists():
             for p in sorted(tick_dir.rglob("*.csv")):
-                content = p.read_text(encoding="utf-8", errors="replace")
-                ticks = parse_delimited_ticks(content, symbol=symbol)
+                file_content = p.read_text(encoding="utf-8", errors="replace")
+                ticks = parse_delimited_ticks(file_content, symbol=symbol)
                 if ticks:
                     filtered = [
                         t
@@ -227,73 +187,35 @@ class TickDownloaderBroker(DataBrokerBackend):
                         if (start_ms <= 0 or t["time_msc"] >= start_ms)
                         and (end_ms <= 0 or t["time_msc"] <= end_ms)
                     ]
-                    target_count = count if count > 0 else limit
+                    target_count = count
                     if target_count and len(filtered) > target_count:
                         filtered = filtered[-target_count:]
-                    return filtered
+                    if filtered:
+                        return [
+                            MarketTick(
+                                time_msc=int(t["time_msc"]),
+                                bid=float(t["bid"]),
+                                ask=float(t["ask"]),
+                                last=float(t.get("last", t["bid"])),
+                                volume=int(t.get("volume", 1)),
+                                flags=int(t.get("flags", 0)),
+                                volume_real=float(t.get("volume_real", 1.0)),
+                            )
+                            for t in filtered
+                        ]
 
-        from app.services.brokers.dukascopy import DukascopyBroker
-
-        duka = DukascopyBroker()
-        try:
-            return duka.fetch_ticks(
-                symbol=symbol,
-                mode="range",
-                start_ms=start_ms,
-                end_ms=end_ms,
-                count=count,
-                limit=limit,
-            )
-        finally:
-            duka.close_sync()
-
-    @override
-    def read_history(
-        self,
-        request: HistoryRequest,
-        token: CancellationToken | None = None,
-    ) -> HistoryPage:
-        """Acquire historical ticks or M1 bars conforming to typed request model."""
-        page = super().read_history(request, token)
-        logger.info(
-            "%s: Acquired %d records for %s from TickDownloader",
-            ADAPTERS_FR,
-            len(page.rows),
-            request.symbol,
-            extra={
-                "fr_id": ADAPTERS_FR,
-                "count": len(page.rows),
-                "symbol": request.symbol,
-            },
+        raise BridgeError(
+            f"No local TickDownloader ticks found for '{symbol}' in {self.data_dir}",
+            code="NO_DATA",
         )
-        page.provenance = {"source": "tick_downloader", "data_dir": str(self.data_dir)}
-        return page
-
-
-def create_adapter(
-    _context: PluginHostContext | None = None,
-) -> TickDownloaderBroker:
-    """Plugin entrypoint factory constructing TickDownloaderBroker adapter."""
-    logger.info("Initializing Tick Data Downloader provider plugin adapter.")
-    return TickDownloaderBroker()
 
 
 def main() -> None:
-    """Demonstrate executable usage of TickDownloaderBroker."""
-    broker = TickDownloaderBroker()
-    health = broker.check_health()
-    print(f"Tick Downloader Health: {health.status} (connected={health.connected})")
-    symbols = broker.symbols_get()
-    print(f"Supported symbols: {symbols}")
-    req = HistoryRequest(
-        provider="tick_downloader",
-        symbol="EURUSD",
-        timeframe="M1",
-        kind="bars",
-        count=5,
-    )
-    print(f"Request validated: {req.provider} {req.symbol}")
-    broker.close_sync()
+    """Demonstrate executable usage of TickDownloaderClient."""
+    client = TickDownloaderClient()
+    symbols = client.get_symbols()
+    logger.info("Supported symbols: %s", symbols)
+    client.disconnect()
 
 
 if __name__ == "__main__":

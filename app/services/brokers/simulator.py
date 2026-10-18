@@ -10,18 +10,25 @@ Purpose:
 
 Key Capabilities:
     - FR-SIMULATION-DISPATCH: Execute native-shaped operations with receipts.
-      Associated: `SimulationBackend.call()`
+      Associated: `SimulatorClient.call()`
       Logging: DEBUG every dispatch with class/method metadata, never arguments.
     - FR-SIMULATION-HISTORY: Seed and query historical bars and ticks.
       Associated: `seed_bar_history()`, `seed_tick_history()`, `_market_data()`
       Logging: DEBUG each seeding/read attempt, without row contents.
 
 Python API Usage:
-    Supply SimulationBackend to Trading; feed symbols/ticks and seed history
-    explicitly before querying. No data is fabricated by historical requests.
+    ```python
+    from app.services.brokers.simulator import SimulatorClient
+
+    client = SimulatorClient()
+    client.connect()
+    account = client.get_account_info()
+    ```
 
 CLI Usage:
-    uv run pytest tests/unit/services/test_trading_simulator.py --no-cov
+    ```bash
+    uv run pytest tests/unit/services/test_broker_simulator.py --no-cov
+    ```
 """
 
 from __future__ import annotations
@@ -29,30 +36,22 @@ from __future__ import annotations
 import asyncio
 import contextvars
 import os
-import uuid
 from collections.abc import Sequence
-from dataclasses import asdict, is_dataclass, replace
+from dataclasses import asdict, replace
 from datetime import UTC, datetime
-from enum import IntEnum
 from itertools import count
 from typing import Any, override
 
 from app.host.logging import get_logger
-from app.services.brokers._simulation_api import (
-    HANDLERS,
-    _ObjectState,
-    execute,
-    new_state,
-    prepare_args,
-)
 from app.services.brokers.base import (
     BridgeError,
-    BrokerBackend,
+    TradingClient,
     epoch_seconds,
     utc_now,
 )
 from app.services.include.contracts import (
     AccountInfo,
+    BookInfo,
     BridgeEvent,
     DealInfo,
     OrderInfo,
@@ -65,6 +64,7 @@ from app.services.include.contracts import (
     TradeResult,
 )
 from app.services.include.enums import (
+    BookType,
     DealEntry,
     DealType,
     MarginMode,
@@ -73,7 +73,6 @@ from app.services.include.enums import (
     OrderTime,
     OrderType,
     PositionType,
-    ReceiptStatus,
     SymbolTradeExecution,
     SymbolTradeMode,
     TradeAction,
@@ -88,8 +87,8 @@ from app.workspace.data_manager import (
 logger = get_logger(__name__)
 
 
-class SimulationBackend(BrokerBackend):
-    """In-memory broker simulator with MT5-oriented execution semantics."""
+class SimulatorClient(TradingClient):
+    """Deterministic in-memory broker simulator with MT5-oriented execution semantics."""
 
     def __init__(
         self,
@@ -99,8 +98,29 @@ class SimulationBackend(BrokerBackend):
         margin_mode: MarginMode = MarginMode.RETAIL_HEDGING,
         currency: str = "USD",
         commission_per_lot: float = 0.0,
+        name: str = "Simulator",
+        backend: SimulatorClient | None = None,
+        **kwargs: Any,
     ) -> None:
-        self._objects: dict[str, tuple[str, _ObjectState]] = {}
+        super().__init__(name=name)
+        self._initial_balance: float
+        self._leverage: int
+        self._margin_mode: MarginMode
+        self._currency: str
+        self._commission_per_lot: float
+        if backend is not None:
+            self._initial_balance = backend._initial_balance
+            self._leverage = backend._leverage
+            self._margin_mode = backend._margin_mode
+            self._currency = backend._currency
+            self._commission_per_lot = backend._commission_per_lot
+        else:
+            self._initial_balance = float(initial_balance)
+            self._leverage = max(1, int(leverage))
+            self._margin_mode = margin_mode
+            self._currency = str(currency).upper()
+            self._commission_per_lot = float(commission_per_lot)
+
         self._receipts: dict[str, Receipt] = {}
         self._last_command: contextvars.ContextVar[str | None] = contextvars.ContextVar(
             "simulation_last_command", default=None
@@ -120,21 +140,40 @@ class SimulationBackend(BrokerBackend):
         self._order_ids = count(1)
         self._deal_ids = count(1_000_001)
         self._position_ids = count(10_000_001)
-        self._commission_per_lot = float(commission_per_lot)
         self._stats: dict[str, dict[str, float]] = {}
+        self._selected_symbol: str = "EURUSD"
+        self._selected_position_ticket: int = 0
+        self._selected_order_ticket: int = 0
+        self._selected_history_order_ticket: int = 0
+        self._selected_deal_ticket: int = 0
+        self._last_request = TradeRequest(action=TradeAction.DEAL)
+        self._last_result = TradeResult()
+        self._last_check = TradeCheckResult()
         self._account = AccountInfo(
-            leverage=leverage,
-            margin_mode=margin_mode,
-            balance=float(initial_balance),
-            equity=float(initial_balance),
-            free_margin=float(initial_balance),
-            currency=currency,
+            leverage=self._leverage,
+            margin_mode=self._margin_mode,
+            balance=float(self._initial_balance),
+            equity=float(self._initial_balance),
+            free_margin=float(self._initial_balance),
+            currency=self._currency,
         )
         self._terminal = TerminalInfo(
             connected=True,
             trade_allowed=True,
             cpu_cores=os.cpu_count() or 1,
         )
+
+        from app.services.include.trading import Trading
+
+        self.trading = Trading(self)
+        self.account_proxy = self.trading.account
+        self.terminal_proxy = self.trading.terminal
+        self.symbol_proxy = self.trading.symbol
+        self.trade_proxy = self.trading.trade
+        self.position_proxy = self.trading.position
+        self.order_proxy = self.trading.order
+        self.history_order_proxy = self.trading.history_order
+        self.deal_proxy = self.trading.deal
 
     # ------------------------------------------------------------------
     # Configuration / market feed
@@ -196,8 +235,8 @@ class SimulationBackend(BrokerBackend):
         self._mark_to_market()
         return tick
 
-    @override
     def set_clock(self, now: datetime) -> None:
+        """Advance simulated engine clock and process order expirations."""
         if now.tzinfo is None:
             now = now.replace(tzinfo=UTC)
         self._clock = now
@@ -219,53 +258,144 @@ class SimulationBackend(BrokerBackend):
         self._connected = False
         self._terminal.connected = False
 
-    @override
     def terminal(self) -> TerminalInfo:
+        """Return simulated terminal snapshot."""
         return replace(self._terminal)
 
-    @override
     def account(self) -> AccountInfo:
+        """Return simulated account snapshot."""
         self._mark_to_market()
         return replace(self._account)
 
-    @override
     def symbol(self, name: str) -> SymbolInfo | None:
+        """Return simulated symbol specifications."""
         spec = self._symbols.get(name)
-        return replace(spec) if spec is not None else None
+        if spec is None:
+            return None
+        t = self._ticks.get(name)
+        if t is not None:
+            return replace(spec, bid=t.bid, ask=t.ask, last=t.last)
+        return replace(spec)
 
-    @override
     def symbols(self) -> list[SymbolInfo]:
-        return [replace(v) for v in self._symbols.values()]
+        """Return all simulated symbol specifications."""
+        res: list[SymbolInfo] = []
+        for name, spec in self._symbols.items():
+            t = self._ticks.get(name)
+            if t is not None:
+                res.append(replace(spec, bid=t.bid, ask=t.ask, last=t.last))
+            else:
+                res.append(replace(spec))
+        return res
 
     @override
     def select_symbol(self, name: str, selected: bool) -> bool:
+        """Set symbol market watch selection state."""
         spec = self._symbols.get(name)
         if spec is None:
             return False
         spec.select = selected
         return True
 
-    @override
     def tick(self, name: str) -> MarketTick | None:
+        """Return latest cached market tick for symbol."""
         value = self._ticks.get(name)
         return replace(value) if value is not None else None
 
-    @override
     def orders(self) -> list[OrderInfo]:
+        """Return active simulated orders."""
         return [replace(v) for _, v in sorted(self._orders.items())]
 
-    @override
     def history_orders(self) -> list[OrderInfo]:
+        """Return historical executed/cancelled orders."""
         return [replace(v) for v in self._history_orders]
 
-    @override
     def positions(self) -> list[PositionInfo]:
+        """Return open positions after mark-to-market revaluation."""
         self._mark_to_market()
         return [replace(v) for _, v in sorted(self._positions.items())]
 
-    @override
     def deals(self) -> list[DealInfo]:
+        """Return executed historical deals."""
         return [replace(v) for v in self._deals]
+
+    @override
+    def get_terminal_info(self) -> TerminalInfo:
+        """Retrieve current simulated terminal state."""
+        return self.terminal()
+
+    @override
+    def get_account_info(self) -> AccountInfo:
+        """Retrieve current simulated account snapshot."""
+        return self.account()
+
+    @override
+    def get_symbol_info(self, symbol: str) -> SymbolInfo | None:
+        """Retrieve symbol metadata specification."""
+        return self.symbol(symbol)
+
+    @override
+    def get_symbols(self) -> list[str]:
+        """List available symbol names."""
+        return [s.name for s in self.symbols()]
+
+    @override
+    def get_positions(self) -> list[PositionInfo]:
+        """Retrieve open simulated positions."""
+        return self.positions()
+
+    @override
+    def get_orders(self) -> list[OrderInfo]:
+        """Retrieve working simulated orders."""
+        return self.orders()
+
+    @override
+    def get_history_orders(self) -> list[OrderInfo]:
+        """Retrieve completed or cancelled simulated orders."""
+        return self.history_orders()
+
+    @override
+    def get_deals(self) -> list[DealInfo]:
+        """Retrieve simulated transaction deals."""
+        return self.deals()
+
+    @override
+    def get_tick(self, name: str) -> MarketTick | None:
+        """Retrieve the latest market tick for symbol."""
+        return self.tick(name)
+
+    @override
+    def subscribe_book(self, name: str) -> bool:
+        """Subscribe to simulated market depth."""
+        del name
+        return True
+
+    @override
+    def release_book(self, name: str) -> bool:
+        """Release simulated market depth."""
+        del name
+        return True
+
+    @override
+    def get_book(self, name: str) -> tuple[BookInfo, ...]:
+        """Retrieve simulated order book."""
+        t = self.get_tick(name)
+        if t is None:
+            return ()
+        return (
+            BookInfo(
+                type=BookType.BOOK_TYPE_SELL,
+                price=t.ask,
+                volume=10,
+                volume_real=10.0,
+            ),
+            BookInfo(
+                type=BookType.BOOK_TYPE_BUY,
+                price=t.bid,
+                volume=10,
+                volume_real=10.0,
+            ),
+        )
 
     @override
     def order_check(self, request: TradeRequest) -> TradeCheckResult:
@@ -340,7 +470,6 @@ class SimulationBackend(BrokerBackend):
             comment=f"Unsupported action {request.action}",
         )
 
-    @override
     def order_calc_profit(
         self,
         order_type: OrderType,
@@ -349,6 +478,7 @@ class SimulationBackend(BrokerBackend):
         price_open: float,
         price_close: float,
     ) -> float:
+        """Calculate projected trade profit for given order parameters."""
         spec = self._symbols.get(symbol)
         if spec is None:
             return 0.0
@@ -360,7 +490,6 @@ class SimulationBackend(BrokerBackend):
             * spec.trade_contract_size
         )
 
-    @override
     def order_calc_margin(
         self,
         order_type: OrderType,
@@ -368,6 +497,7 @@ class SimulationBackend(BrokerBackend):
         volume: float,
         price: float,
     ) -> float:
+        """Calculate required margin for given order parameters."""
         del order_type
         spec = self._symbols.get(symbol)
         if spec is None or volume <= 0:
@@ -377,13 +507,13 @@ class SimulationBackend(BrokerBackend):
         leverage = max(1, self._account.leverage)
         return spec.trade_contract_size * volume * max(price, spec.point) / leverage
 
-    @override
     def info_value(
         self,
         scope: str,
         property_id: int | str,
         selector: str | int | None = None,
     ) -> Any:
+        """Retrieve property value from account, terminal, or symbol scope."""
         if not isinstance(property_id, str):
             return None
         key = property_id.strip().lower()
@@ -1345,24 +1475,28 @@ class SimulationBackend(BrokerBackend):
             (self._account.equity / margin) * 100.0 if margin > 0 else 0.0
         )
 
+    @override
     async def start(self) -> None:
         """Start the local backend without advancing simulated time."""
         logger.debug("FR-SIMULATION-DISPATCH: starting backend")
         self.connect()
 
-    async def wait_connected(self, timeout: float | None = None) -> None:  # noqa: ASYNC109 -- backend deadline capability
+    @override
+    async def wait_connected(self, timeout: float | None = None) -> None:
         """Check readiness without I/O or clock advancement."""
         del timeout
         logger.debug("FR-SIMULATION-DISPATCH: checking readiness")
         if not self._connected:
             raise BridgeError("simulator disconnected", code="NOT_CONNECTED")
 
+    @override
     async def close(self) -> None:
         """Disconnect local execution and revoke mutation permission."""
         logger.debug("FR-SIMULATION-DISPATCH: closing backend")
         self.disarm()
         self.disconnect()
 
+    @override
     def arm(self) -> None:
         """Permit local simulated mutations; grants no live authority."""
         logger.debug("FR-SIMULATION-DISPATCH: arming local execution")
@@ -1370,28 +1504,33 @@ class SimulationBackend(BrokerBackend):
             raise BridgeError("simulator disconnected", code="NOT_CONNECTED")
         self._armed = True
 
+    @override
     def disarm(self) -> None:
         """Revoke local mutation permission."""
         logger.debug("FR-SIMULATION-DISPATCH: disarming local execution")
         self._armed = False
 
+    @override
     def last_command_id(self) -> str | None:
         """Return the current async task's last simulated command ID."""
-        return self._last_command.get()
+        return super().last_command_id()
 
+    @override
     def receipt(self, command_id: str) -> Receipt | None:
         """Read an immutable in-memory command receipt."""
-        return self._receipts.get(command_id)
+        return super().receipt(command_id)
 
-    async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109 -- backend deadline capability
+    @override
+    async def next_event(self, timeout: float | None = None) -> BridgeEvent:
         """Wait for locally emitted transaction events."""
         async with asyncio.timeout(timeout):
             return await self._event_queue.get()
 
+    @override
     async def await_request_event(
         self,
         request_id: int,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline capability
+        timeout: float | None = None,
     ) -> BridgeEvent:
         """Reject unsupported native-request correlation explicitly."""
         del request_id, timeout
@@ -1428,242 +1567,86 @@ class SimulationBackend(BrokerBackend):
         validate_rows(rows, "ticks", 0, 2**63 - 1, len(rows))
         self._tick_history[symbol] = tuple(ticks)
 
-    def _market_data(self, method: str, args: list[Any]) -> list[dict[str, Any]]:
-        from app.services.include.contracts import MAX_POSITION
-        from app.services.include.data import validate_request
-
-        logger.debug("FR-SIMULATION-HISTORY: reading seeded history")
-        bars = method == "Bars"
-        if bars:
-            symbol, frame, mode, start, end, count, limit = args
-            try:
-                timeframe = Timeframe(frame)
-            except ValueError as exc:
-                raise BridgeError(
-                    "unsupported timeframe", code="UNSUPPORTED_TIMEFRAME"
-                ) from exc
-            validate_request(
-                symbol,
-                start if mode != "position" else 0,
-                end if mode == "range" else (start if mode == "date_count" else 0),
-                limit,
-                timeframe,
-            )
-            if (symbol, timeframe) not in self._bar_history:
-                raise BridgeError("history is not seeded", code="DATA_NOT_READY")
-            records = [
-                asdict(row)
-                for row in self._bar_history[symbol, timeframe]
-                if row.time <= int(self._clock.timestamp())
-            ]
-        else:
-            symbol, mode, start, end, count, limit = args
-            validate_request(
-                symbol,
-                1 if mode == "latest" else start,
-                end if mode == "range" else (start if mode == "date_count" else 1),
-                limit,
-            )
-            if symbol not in self._tick_history:
-                raise BridgeError("history is not seeded", code="DATA_NOT_READY")
-            records = [
-                asdict(row)
-                for row in self._tick_history[symbol]
-                if row.time_msc <= int(self._clock.timestamp() * 1000)
-            ]
-        if (
-            mode
-            not in (
-                {"range", "date_count", "position"}
-                if bars
-                else {"range", "date_count", "latest"}
-            )
-            or type(count) is not int
-            or type(start) is not int
-            or start < 0
-            or (mode == "latest" and start != 0)
-            or (mode == "position" and start > MAX_POSITION)
-            or (mode == "range" and count != 0)
-            or (mode != "range" and not 1 <= count <= limit)
-        ):
-            raise BridgeError("invalid history route", code="BAD_REQUEST")
-        key = "time" if bars else "time_msc"
-        if mode == "range":
-            selected = [row for row in records if start <= row[key] <= end]
-        elif mode == "date_count":
-            selected = [row for row in records if row[key] >= start][:count]
-        elif mode == "position":
-            stop = max(0, len(records) - start)
-            selected = records[max(0, stop - count) : stop]
-        else:
-            selected = records[-count:]
-        if len(selected) > limit:
-            raise BridgeError("narrow the date range", code="DATA_LIMIT_EXCEEDED")
-        return selected
-
-    async def call(
+    @override
+    def calc_margin(
         self,
+        order_type: OrderType,
+        symbol: str,
+        volume: float,
+        price: float,
+    ) -> float:
+        """Calculate required margin for an order."""
+        return self.order_calc_margin(order_type, symbol, volume, price)
+
+    @override
+    def calc_profit(
+        self,
+        order_type: OrderType,
+        symbol: str,
+        volume: float,
+        price_open: float,
+        price_close: float,
+    ) -> float:
+        """Calculate hypothetical floating or realized profit for an order."""
+        return self.order_calc_profit(
+            order_type, symbol, volume, price_open, price_close
+        )
+
+    @override
+    def get_bars(
+        self,
+        symbol: str,
+        timeframe: Timeframe | str = Timeframe.PERIOD_H1,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
         *,
-        object_id: str,
-        class_name: str,
-        method_name: str,
-        args: list[Any],
-        requires_arm: bool = False,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline capability
-    ) -> Any:
-        """Execute a bounded native-style operation against local model state."""
-        logger.debug(
-            "FR-SIMULATION-DISPATCH: dispatching",
-            extra={"class_name": class_name, "method_name": method_name},
+        start_pos: int | None = None,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> list[MarketBar]:
+        """Fetch historical candlestick bars directly from seeded history."""
+        del start_pos
+        tf = (
+            timeframe if isinstance(timeframe, Timeframe) else Timeframe(str(timeframe))
         )
-        if timeout is not None and timeout <= 0:
-            raise BridgeError(
-                "simulation command deadline expired", code="COMMAND_TIMEOUT"
-            )
-        if not self._connected:
-            raise BridgeError("simulator disconnected", code="NOT_CONNECTED")
-        market_data = class_name == "MarketData" and method_name in {"Bars", "Ticks"}
-        if not market_data and (
-            class_name not in HANDLERS or method_name not in HANDLERS[class_name]
-        ):
-            raise BridgeError(
-                "unsupported simulated operation", code="UNSUPPORTED_OPERATION"
-            )
-        mutation = class_name == "Trade" and method_name in {
-            "OrderSend",
-            "Buy",
-            "Sell",
-            "BuyLimit",
-            "BuyStop",
-            "SellLimit",
-            "SellStop",
-            "OrderOpen",
-            "OrderModify",
-            "OrderDelete",
-            "PositionOpen",
-            "PositionModify",
-            "PositionClose",
-            "PositionClosePartial",
-            "PositionCloseBy",
-        }
-        if (requires_arm or mutation) and not self._armed:
-            raise BridgeError("simulation backend is disarmed", code="DISARMED")
-        existing = self._objects.get(object_id)
-        if existing is not None and existing[0] != class_name:
-            raise BridgeError("object class mismatch", code="INVALID_OBJECT")
-        state = (
-            existing[1]
-            if existing is not None
-            else new_state("SymbolInfo" if market_data else class_name, self)
-        )
-        self._objects[object_id] = (class_name, state)
-        if not market_data:
-            args = prepare_args(state, self, class_name, method_name, args)
-        command_id = uuid.uuid4().hex
-        self._last_command.set(command_id)
-        now = self._clock.timestamp()
-        receipt = Receipt(
-            command_id=command_id,
-            object_id=object_id,
-            class_name=class_name,
-            method_name=method_name,
-            status=ReceiptStatus.CREATED,
-            created_at=now,
-        )
-        self._receipts[command_id] = receipt
-        try:
-            value = (
-                self._market_data(method_name, args)
-                if market_data
-                else execute(state, class_name, method_name, args)
-            )
-        except (ValueError, TypeError, RuntimeError, KeyError) as exc:
-            self._receipts[command_id] = replace(
-                receipt,
-                status=ReceiptStatus.REJECTED,
-                resolved_at=now,
-                error={"code": "SIMULATION_OPERATION_FAILED"},
-            )
-            if isinstance(exc, BridgeError):
-                raise
-            raise BridgeError(
-                "simulation operation failed",
-                code="SIMULATION_OPERATION_FAILED",
-                command_id=command_id,
-            ) from exc
-        value = _normalize_result(value, class_name, method_name, args)
-        self._receipts[command_id] = replace(
-            receipt,
-            status=ReceiptStatus.RESOLVED,
-            sent_at=now,
-            acknowledged_at=now,
-            resolved_at=now,
-            value=value,
-        )
-        is_success = value is True or (
-            isinstance(value, dict) and value.get("retcode") in {10008, 10009}
-        )
-        if mutation and is_success:
-            await self._event_queue.put(
-                BridgeEvent(
-                    event_type="simulation_transaction",
-                    payload={"method": method_name},
-                    command_id=command_id,
-                )
-            )
-        return value
+        if (symbol, tf) not in self._bar_history:
+            raise BridgeError("history is not seeded", code="DATA_NOT_READY")
+        now_ts = int(self._clock.timestamp())
+        bars = [b for b in self._bar_history[symbol, tf] if b.time <= now_ts]
+        start_s = int(date_from.timestamp()) if date_from else 0
+        end_s = int(date_to.timestamp()) if date_to else now_ts
+        if date_from or date_to:
+            bars = [b for b in bars if start_s <= b.time <= end_s]
+        target_count = count if count is not None and count > 0 else limit
+        if target_count and len(bars) > target_count:
+            bars = bars[-target_count:]
+        return list(bars)
+
+    @override
+    def get_ticks(
+        self,
+        symbol: str,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> list[MarketTick]:
+        """Fetch historical market ticks directly from seeded history."""
+        if symbol not in self._tick_history:
+            raise BridgeError("history is not seeded", code="DATA_NOT_READY")
+        now_ms = int(self._clock.timestamp() * 1000)
+        ticks = [t for t in self._tick_history[symbol] if t.time_msc <= now_ms]
+        start_ms = int(date_from.timestamp() * 1000) if date_from else 0
+        end_ms = int(date_to.timestamp() * 1000) if date_to else now_ms
+        if date_from or date_to:
+            ticks = [t for t in ticks if start_ms <= t.time_msc <= end_ms]
+        target_count = count if count is not None and count > 0 else limit
+        if target_count and len(ticks) > target_count:
+            ticks = ticks[-target_count:]
+        return list(ticks)
 
 
-def _normalize_result(
-    value: Any, class_name: str, method_name: str, args: list[Any]
-) -> Any:
-    """Adapt local model output to the native public result contract."""
-    if is_dataclass(value) and not isinstance(value, type):
-        value = asdict(value)
-        value.pop("raw", None)
-        if method_name == "Request":
-            value["type"] = value.pop("order_type")
-            expiration = value.get("expiration")
-            value["expiration"] = (
-                int(expiration.timestamp()) if isinstance(expiration, datetime) else 0
-            )
-    if (
-        class_name == "Trade"
-        and (
-            method_name.startswith("Set")
-            or method_name in {"LogLevel", "PrintRequest", "PrintResult"}
-        )
-        and value is None
-    ):
-        value = True
-    if method_name == "StoreState":
-        value = True
-    if class_name == "SymbolInfo" and method_name == "Name" and args:
-        value = value is not False
-    if (
-        class_name in {"HistoryOrderInfo", "DealInfo"}
-        and method_name == "Ticket"
-        and args
-    ):
-        value = True
-    # Generic selected-object properties have the same envelope as native MT5.
-    if class_name in {
-        "SymbolInfo",
-        "OrderInfo",
-        "HistoryOrderInfo",
-        "PositionInfo",
-        "DealInfo",
-    } and method_name in {"InfoInteger", "InfoDouble", "InfoString"}:
-        value = {"ok": True, "value": value}
-    return _wire_result(value)
-
-
-def _wire_result(value: Any) -> Any:
-    """Normalize local enums and compound values to native wire result types."""
-    if isinstance(value, IntEnum):
-        return int(value)
-    if isinstance(value, dict):
-        return {key: _wire_result(item) for key, item in value.items()}
-    if isinstance(value, list):
-        return [_wire_result(item) for item in value]
-    return value
+__all__ = [
+    "SimulatorClient",
+]

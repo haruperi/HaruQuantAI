@@ -47,9 +47,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
 from app.services.brokers.base import BridgeError
-from app.services.brokers.ctrader import CTraderBackend
-from app.services.brokers.metatrader import MT5Backend
-from app.services.brokers.simulator import SimulationBackend
+from app.services.brokers.ctrader import CTraderClient
+from app.services.brokers.metatrader import MetaTraderClient
+from app.services.brokers.simulator import SimulatorClient
 from app.services.include.contracts import (
     SymbolInfo,
     TerminalInfo,
@@ -77,9 +77,9 @@ from app.workspace.data_manager import (
     Timeframe,
 )
 
-BROKER: Literal["simulator", "mt5", "ctrader"] = "ctrader"
+BROKER: Literal["simulator", "mt5", "ctrader"] = os.getenv("BROKER", "mt5")  # type: ignore[assignment]
 ALLOW_LIVE_TRADING = True
-SYMBOL = "EURUSD"
+SYMBOL = "BTCUSD"
 VOLUME = 0.01  # Partial-close volume; the example buy opens twice this amount.
 CONNECT_TIMEOUT = 60.0
 TIMEFRAME = Timeframe.PERIOD_M1
@@ -124,7 +124,7 @@ def create_backend(name: str | None = None) -> TradingBackend:
     selected = BROKER if name is None else name
     print("FR-TRADING-USAGE-LIFECYCLE: selecting backend")
     if selected == "simulator":
-        backend = SimulationBackend()
+        backend = SimulatorClient()
         backend.add_symbol(SymbolInfo(name=SYMBOL))
         backend.feed_tick(SYMBOL, bid=1.1, ask=1.1002, time=DATE_TO)
         base = int(DATE_FROM.timestamp())
@@ -149,9 +149,9 @@ def create_backend(name: str | None = None) -> TradingBackend:
         token = os.environ.get(
             "MT5_BRIDGE_TOKEN", "P8H5yPraTVSz4vkuaMVgWN8qcfeXUswuxIV70QES0Co"
         )
-        return MT5Backend(auth_token=token)
+        return MetaTraderClient(auth_token=token)
     if selected == "ctrader":
-        return CTraderBackend()
+        return CTraderClient()
     raise ValueError("BROKER must be simulator, mt5, or ctrader")
 
 
@@ -574,10 +574,10 @@ async def example_12_modify_position(ctx: ExampleContext) -> None:
     await symbol.RefreshRates()
     sym_info = await symbol.SymbolInfo()
     distance = max(
-        1000,
-        sym_info.trade_stops_level + 20,
-        sym_info.trade_freeze_level + 20,
-    ) * float(sym_info.point)
+        max(1000, sym_info.trade_stops_level + 20, sym_info.trade_freeze_level + 20)
+        * float(sym_info.point),
+        0.05 * float(sym_info.bid),
+    )
     bid, digits = float(sym_info.bid), sym_info.digits
     sl, tp = round(bid - distance, digits), round(bid + distance, digits)
     req = TradeRequest(
@@ -703,10 +703,10 @@ async def example_15_pending_orders(ctx: ExampleContext) -> None:
     await symbol.RefreshRates()
     sym_info = await symbol.SymbolInfo()
     distance = max(
-        1000,
-        sym_info.trade_stops_level + 20,
-        sym_info.trade_freeze_level + 20,
-    ) * float(sym_info.point)
+        max(1000, sym_info.trade_stops_level + 20, sym_info.trade_freeze_level + 20)
+        * float(sym_info.point),
+        0.05 * float(sym_info.bid),
+    )
     ctx.pending_price = round(float(sym_info.bid) - distance, sym_info.digits)
     req = TradeRequest(
         action=TradeAction.PENDING,
@@ -786,10 +786,10 @@ async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
     await symbol.RefreshRates()
     sym_info = await symbol.SymbolInfo()
     distance = max(
-        1000,
-        sym_info.trade_stops_level + 20,
-        sym_info.trade_freeze_level + 20,
-    ) * float(sym_info.point)
+        max(1000, sym_info.trade_stops_level + 20, sym_info.trade_freeze_level + 20)
+        * float(sym_info.point),
+        0.05 * float(sym_info.bid),
+    )
     price = round(ctx.pending_price - distance, sym_info.digits)
     req = TradeRequest(
         action=TradeAction.MODIFY,

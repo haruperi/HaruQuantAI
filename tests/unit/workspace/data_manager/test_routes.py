@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from app.host.bootstrap import BootstrapConfig, create_bootstrap_app
+from app.host.bootstrap import AppHost
 from app.host.persistence.create import create_schema
 from app.host.persistence.read import resolve_connection
 from app.workspace.data_manager import (
@@ -125,12 +125,12 @@ def test_routes_bootstrap_app_integration(tmp_path: Path) -> None:
     """Test full bootstrap app integration mounting Data Manager routes under /api/v1."""
     data_dir = tmp_path / "data"
     db_file = data_dir / "haruquantai.db"
-    cfg = BootstrapConfig(
+    host = AppHost(
         data_dir=data_dir,
         db_path=db_file,
         headless=False,
     )
-    app = create_bootstrap_app(cfg)
+    app = host.create_app()
 
     with TestClient(app) as client:
         res = client.get("/api/v1/data/home/overview")

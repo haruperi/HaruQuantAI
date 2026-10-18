@@ -1,8 +1,8 @@
-"""Dukascopy market data and authoritative symbol catalog broker implementation.
+"""Dukascopy market data and authoritative symbol catalog client implementation.
 
 Description:
-    Implements an unauthenticated market data and symbol metadata broker
-    for Dukascopy Bank SA conforming to the `TradingBackend` protocol.
+    Implements an unauthenticated market data and symbol metadata client
+    for Dukascopy Bank SA conforming to the uniform `BrokerClient` interface.
     Fetches historical candlestick bars and ticks over HTTP in memory or from local
     data directories, and dynamically resolves instrument specifications from the
     authoritative catalog CSV (`data/market/dukascopy/dukascopy.csv`) returning canonical
@@ -13,26 +13,23 @@ Purpose:
 
 Key Capabilities:
     - FR-BROKER-DUKASCOPY-MARKET-DATA: Historical Candlestick Bars and Ticks
-      Associated: `[DukascopyBroker.fetch_bars()]`, `[DukascopyBroker.fetch_ticks()]`
+      Associated: `[DukascopyClient.get_bars()]`, `[DukascopyClient.get_ticks()]`
       Logging: Emits INFO log upon successfully downloading and parsing bars with
       extracted count, and WARNING log on network failure or non-200 HTTP response.
     - FR-BROKER-DUKASCOPY-SYMBOLS: Authoritative Symbol Catalog Resolution
-      Associated: `[DukascopyBroker.symbol_info()]`, `[DukascopyBroker.symbols_get()]`
+      Associated: `[DukascopyClient.get_symbol_info()]`, `[DukascopyClient.get_symbols()]`
       Logging: Emits INFO log upon successfully loading or querying catalog items,
       and WARNING log if symbol is not found in the CSV catalog.
-    - FR-BROKER-DUKASCOPY-HEALTH: Provider health and connectivity inspection.
-      Associated: `[DukascopyBroker.check_health()]`
-      Logging: Emits INFO on successful probe and WARNING on network failures.
 
 Python API Usage:
     ```python
-    from app.services.brokers.dukascopy import DukascopyBroker
-    from app.services.include.data import get_historical_bars
-    from app.workspace.data_manager import Timeframe
+    from app.services.brokers.dukascopy import DukascopyClient
+    from app.services.include.enums import Timeframe
 
-    broker = DukascopyBroker()
-    bars = await get_historical_bars(broker, "EURUSD", Timeframe.PERIOD_M1, count=5)
+    client = DukascopyClient()
+    bars = client.get_bars("EURUSD", Timeframe.PERIOD_M1, count=5)
     assert len(bars) > 0
+    client.disconnect()
     ```
 
 CLI Usage:
@@ -41,13 +38,10 @@ CLI Usage:
 
 from __future__ import annotations
 
-import io
-import zipfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, override
 
-from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
 from app.services.brokers._file_history import (
     find_matching_partitions,
@@ -58,20 +52,16 @@ from app.services.brokers._http import create_http_session, execute_bounded_get
 from app.services.brokers._native_history import (
     decode_bi5_bars,
     decode_bi5_ticks,
-    decode_sq_dat_bytes,
     decompress_bi5,
 )
-from app.services.brokers.base import BridgeError
-from app.services.brokers.capabilities import (
-    CancellationToken,
-    HistoryPage,
-    HistoryRequest,
-    ProviderCapabilities,
-    ProviderHealth,
-    ProviderUnsupportedError,
+from app.services.brokers.base import (
+    BridgeError,
+    BrokerClient,
+    epoch_millis,
+    epoch_seconds,
 )
-from app.services.include.contracts import SymbolInfo
-from app.services.include.data import DataBrokerBackend
+from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
 
@@ -83,24 +73,14 @@ USER_AGENT = (
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market" / "dukascopy"
 DEFAULT_CATALOG_PATH = DEFAULT_DATA_DIR / "dukascopy.csv"
 
-PLUGIN_MANIFEST = {
-    "id": "dukascopy",
-    "name": "Dukascopy",
-    "version": "1.0.0",
-    "slot": "data.provider",
-    "entry_point": "dukascopy:create_adapter",
-    "description": "Dukascopy Bank SA historical tick and bar provider",
-    "capabilities": ["data.fetch"],
-}
-
-__all__ = ["PLUGIN_MANIFEST", "DukascopyBroker", "create_adapter", "main"]
+__all__ = ["DukascopyClient"]
 
 # Compatibility alias
 _decompress_bi5 = decompress_bi5
 
 
-class DukascopyBroker(DataBrokerBackend):
-    """Dukascopy market data and symbol catalog broker."""
+class DukascopyClient(BrokerClient):
+    """Dukascopy market data and symbol catalog client."""
 
     CDN_BASE_URL = "https://cdn.strategyquantcdn.com/data/dukascopy"
     DATAFEED_BASE_URL = "https://datafeed.dukascopy.com/datafeed"
@@ -111,7 +91,7 @@ class DukascopyBroker(DataBrokerBackend):
         catalog_path: str | Path | None = None,
         data_dir: str | Path | None = None,
     ) -> None:
-        """Initialize Dukascopy broker."""
+        """Initialize Dukascopy broker client."""
         super().__init__(name=name)
         self.catalog_path = Path(catalog_path) if catalog_path else DEFAULT_CATALOG_PATH
         self.data_dir: Path | None = (
@@ -123,57 +103,20 @@ class DukascopyBroker(DataBrokerBackend):
         self.session = create_http_session(
             USER_AGENT, retries=3, backoff=0.3, pool_size=16
         )
-        self.capabilities = ProviderCapabilities(
-            provider_id="dukascopy",
-            display_name="Dukascopy",
-            category="Forex",
-            supported_timeframes=("M1", "M5", "M15", "M30", "H1", "D1"),
-            supported_modes=("bars", "ticks"),
-            requires_auth=False,
-            rate_limit_rps=5.0,
-            default_timeout_seconds=30.0,
-            supports_pagination=True,
-            has_local_archive=self.data_dir is not None and self.data_dir.exists(),
-            description="Dukascopy Bank SA historical tick and bar provider",
-        )
-
-    def check_health(self) -> ProviderHealth:
-        """Check Dukascopy feed connectivity."""
-        try:
-            resp = self.session.head(self.CDN_BASE_URL, timeout=5.0)
-            connected = resp.status_code in (200, 301, 302, 403, 404)
-            return ProviderHealth(
-                provider_id="dukascopy",
-                status="available" if connected else "failed",
-                connected=connected,
-                message="Dukascopy CDN reachable"
-                if connected
-                else "Dukascopy CDN unreachable",
-                capabilities=self.capabilities,
-            )
-        except Exception as exc:
-            return ProviderHealth(
-                provider_id="dukascopy",
-                status="failed",
-                connected=False,
-                message=f"Health probe error: {exc}",
-                capabilities=self.capabilities,
-            )
+        self._connected = True
 
     def _ensure_catalog(self) -> dict[str, SymbolInfo]:
         """Parse and cache symbol definitions from data/market/dukascopy/dukascopy.csv."""
         if self._catalog is not None:
             return self._catalog
 
-        catalog: dict[str, SymbolInfo] = {}
         if not self.catalog_path.exists():
-            self.logger.warning(
-                "FR-BROKER-DUKASCOPY-SYMBOLS: Catalog CSV file not found at %s",
-                self.catalog_path,
+            raise BridgeError(
+                f"Dukascopy catalog CSV file not found at {self.catalog_path}",
+                code="CATALOG_NOT_FOUND",
             )
-            self._catalog = catalog
-            return self._catalog
 
+        catalog: dict[str, SymbolInfo] = {}
         try:
             with open(self.catalog_path, encoding="latin1") as f:
                 for line in f:
@@ -182,18 +125,15 @@ class DukascopyBroker(DataBrokerBackend):
                         continue
                     parts = line_str.split(";")
                     if len(parts) < 11:
-                        continue
+                        raise BridgeError(
+                            f"Malformed Dukascopy catalog row: {line_str}",
+                            code="INVALID_CATALOG",
+                        )
                     sym = parts[0].strip().upper()
-                    try:
-                        dec = int(parts[6].strip())
-                        point_sz = float(parts[7].strip())
-                        spread = float(parts[8].strip())
-                        contract_sz = float(parts[10].strip())
-                    except ValueError, IndexError:
-                        dec = 5
-                        point_sz = 0.00001
-                        spread = 0.0
-                        contract_sz = 100000.0
+                    dec = int(parts[6].strip())
+                    point_sz = float(parts[7].strip())
+                    spread = float(parts[8].strip())
+                    contract_sz = float(parts[10].strip())
 
                     catalog[sym] = SymbolInfo(
                         name=sym,
@@ -209,11 +149,12 @@ class DukascopyBroker(DataBrokerBackend):
             )
             return catalog
         except Exception as exc:
-            self.logger.warning(
-                "FR-BROKER-DUKASCOPY-SYMBOLS: Error parsing catalog CSV: %s", exc
-            )
-            self._catalog = catalog
-            return catalog
+            if isinstance(exc, BridgeError):
+                raise
+            raise BridgeError(
+                f"Error parsing Dukascopy catalog CSV at {self.catalog_path}: {exc}",
+                code="INVALID_CATALOG",
+            ) from exc
 
     def _clean_symbol(self, symbol: str) -> str:
         """Strip delimiters and match symbol against catalog."""
@@ -237,17 +178,20 @@ class DukascopyBroker(DataBrokerBackend):
         return s
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolInfo:
-        """Retrieve instrument specifications as canonical SymbolInfo."""
+    def get_symbol_info(self, symbol: str) -> SymbolInfo:
+        """Retrieve instrument specifications strictly from the Dukascopy catalog."""
         sym_clean = self._clean_symbol(symbol)
         catalog = self._ensure_catalog()
         snap = catalog.get(sym_clean)
-        if snap is not None:
-            return snap
-        return SymbolInfo(name=sym_clean, digits=5, point=0.00001)
+        if snap is None:
+            raise BridgeError(
+                f"Symbol '{symbol}' not found in Dukascopy catalog",
+                code="SYMBOL_NOT_FOUND",
+            )
+        return snap
 
     @override
-    def symbols_get(self) -> list[str]:
+    def get_symbols(self) -> list[str]:
         """Get the list of symbol names available in the catalog."""
         catalog = self._ensure_catalog()
         return list(catalog.keys())
@@ -264,24 +208,25 @@ class DukascopyBroker(DataBrokerBackend):
             f"{self.DATAFEED_BASE_URL}/{sym_clean}/{dt.year}/{dt.month - 1:02d}/"
             f"{dt.day:02d}/BID_candles_min_1.bi5"
         )
-        try:
-            resp = execute_bounded_get(
-                self.session,
-                feed_url,
-                timeout=(5.0, 15.0),
-                provider="dukascopy",
+        resp = execute_bounded_get(
+            self.session,
+            feed_url,
+            timeout=(5.0, 15.0),
+            provider="dukascopy",
+        )
+        if resp.status_code != 200 or not resp.content:
+            raise BridgeError(
+                f"No bars available for '{sym_clean}' from Dukascopy datafeed (HTTP {resp.status_code})",
+                code="NO_DATA",
             )
-            if resp.status_code != 200 or not resp.content:
-                return []
-            decomp = decompress_bi5(resp.content)
-            base_dt = datetime(dt.year, dt.month, dt.day, tzinfo=UTC)
-            return decode_bi5_bars(decomp, base_dt, digits=decimals, count=count)
-        except Exception as exc:
-            self.logger.debug(
-                "FR-BROKER-DUKASCOPY-MARKET-DATA: Datafeed candle fetch failed: %s",
-                exc,
+        decomp = decompress_bi5(resp.content)
+        if not decomp:
+            raise BridgeError(
+                f"Empty or corrupt BI5 bar payload for '{sym_clean}' from Dukascopy",
+                code="INVALID_MARKET_DATA",
             )
-            return []
+        base_dt = datetime(dt.year, dt.month, dt.day, tzinfo=UTC)
+        return decode_bi5_bars(decomp, base_dt, digits=decimals, count=count)
 
     def _fetch_datafeed_ticks(
         self,
@@ -295,55 +240,69 @@ class DukascopyBroker(DataBrokerBackend):
             f"{self.DATAFEED_BASE_URL}/{sym_clean}/{dt.year}/{dt.month - 1:02d}/"
             f"{dt.day:02d}/{dt.hour:02d}h_ticks.bi5"
         )
-        try:
-            resp = execute_bounded_get(
-                self.session,
-                feed_url,
-                timeout=(5.0, 15.0),
-                provider="dukascopy",
+        resp = execute_bounded_get(
+            self.session,
+            feed_url,
+            timeout=(5.0, 15.0),
+            provider="dukascopy",
+        )
+        if resp.status_code != 200 or not resp.content:
+            raise BridgeError(
+                f"No ticks available for '{sym_clean}' from Dukascopy datafeed (HTTP {resp.status_code})",
+                code="NO_DATA",
             )
-            if resp.status_code != 200 or not resp.content:
-                return []
-            decomp = decompress_bi5(resp.content)
-            base_dt = datetime(dt.year, dt.month, dt.day, dt.hour, tzinfo=UTC)
-            return decode_bi5_ticks(decomp, base_dt, digits=decimals, count=count)
-        except Exception as exc:
-            self.logger.debug(
-                "FR-BROKER-DUKASCOPY-MARKET-DATA: Datafeed tick fetch failed: %s", exc
+        decomp = decompress_bi5(resp.content)
+        if not decomp:
+            raise BridgeError(
+                f"Empty or corrupt BI5 tick payload for '{sym_clean}' from Dukascopy",
+                code="INVALID_MARKET_DATA",
             )
-            return []
+        base_dt = datetime(dt.year, dt.month, dt.day, dt.hour, tzinfo=UTC)
+        return decode_bi5_ticks(decomp, base_dt, digits=decimals, count=count)
 
     @override
-    def fetch_bars(
+    def get_bars(
         self,
-        *,
         symbol: str,
-        timeframe: str,
-        mode: str = "range",
-        start: int = 0,
-        end: int = 0,
-        count: int = 100,
+        timeframe: Timeframe | str = Timeframe.PERIOD_M1,
+        date_from: datetime | int | None = None,
+        date_to: datetime | int | None = None,
+        *,
+        start: datetime | int | None = None,
+        end: datetime | int | None = None,
+        start_pos: int | None = None,
+        count: int | None = None,
         limit: int = 1000,
-    ) -> list[dict[str, Any]]:
-        """Download candlestick bars from local storage, CDN, or datafeed."""
+    ) -> list[MarketBar]:
+        """Download candlestick bars from local storage or Dukascopy datafeed."""
+        del start_pos
         sym_clean = self._clean_symbol(symbol)
-        snap = self.symbol_info(sym_clean)
+        snap = self.get_symbol_info(sym_clean)
         decimals = snap.digits
-        target_count = count if count > 0 else limit
+        target_count = count or limit or 100
 
-        tf_norm = timeframe.strip().upper()
-        if tf_norm not in ("M1", "TICK"):
-            raise ProviderUnsupportedError(
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_norm = tf_name.strip().upper()
+        if tf_norm not in ("M1", "PERIOD_M1", "TICK"):
+            raise BridgeError(
                 f"Timeframe '{timeframe}' not supported by Dukascopy. Supported: M1, TICK",
-                provider="dukascopy",
+                code="UNSUPPORTED_TIMEFRAME",
             )
 
-        date_from = datetime.fromtimestamp(start, tz=UTC) if 0 < start < 2**40 else None
-        date_to = datetime.fromtimestamp(end, tz=UTC) if 0 < end < 2**40 else None
+        s = date_from if date_from is not None else start
+        e = date_to if date_to is not None else end
+        start_sec = epoch_seconds(s)
+        end_sec = epoch_seconds(e)
+        date_from = (
+            datetime.fromtimestamp(start_sec, tz=UTC) if 0 < start_sec < 2**40 else None
+        )
+        date_to = (
+            datetime.fromtimestamp(end_sec, tz=UTC) if 0 < end_sec < 2**40 else None
+        )
 
         # Check local data_dir if available
         if self.data_dir is not None and self.data_dir.exists():
-            matched = find_matching_partitions(self.data_dir, sym_clean, timeframe)
+            matched = find_matching_partitions(self.data_dir, sym_clean, tf_norm)
             all_local_bars: list[dict[str, Any]] = []
             for p in matched:
                 if p.suffix.lower() == ".parquet":
@@ -353,7 +312,7 @@ class DukascopyBroker(DataBrokerBackend):
                         parse_delimited_bars(
                             p.read_text(encoding="utf-8", errors="replace"),
                             sym_clean,
-                            timeframe,
+                            tf_norm,
                         )
                     )
                 elif p.suffix.lower() == ".bi5":
@@ -373,60 +332,20 @@ class DukascopyBroker(DataBrokerBackend):
                     and (not date_to or r["time"] <= int(date_to.timestamp()))
                 ]
                 if filtered:
-                    return filtered[-target_count:] if target_count else filtered
-
-        target_year = date_from.year if date_from else 2023
-        cdn_url = f"{self.CDN_BASE_URL}/m1/{sym_clean}/{target_year}.zip"
-        scale = 10.0 ** (decimals + 1)
-
-        try:
-            resp = execute_bounded_get(
-                self.session,
-                cdn_url,
-                timeout=(5.0, 30.0),
-                provider="dukascopy",
-            )
-            if resp.status_code == 200 and resp.content:
-                rows: list[dict[str, Any]] = []
-                with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
-                    for name in z.namelist():
-                        if name.endswith(".bi5"):
-                            decomp = decompress_bi5(z.read(name))
-                            if not decomp:
-                                continue
-                            base_dt = datetime(target_year, 1, 1, tzinfo=UTC)
-                            sub_bars = decode_bi5_bars(
-                                decomp, base_dt, digits=decimals, count=target_count
-                            )
-                            rows.extend(sub_bars)
-                        elif name.endswith(".dat"):
-                            dat_buf = z.read(name)
-                            sub_bars = decode_sq_dat_bytes(
-                                dat_buf,
-                                count=target_count,
-                                date_from=date_from,
-                                date_to=date_to,
-                            )
-                            rows.extend(sub_bars)
-
-                if rows:
-                    rows.sort(key=lambda r: r["time"])
-                    deduped: list[dict[str, Any]] = []
-                    last_t: int | None = None
-                    for r in rows:
-                        if (date_from and r["time"] < int(date_from.timestamp())) or (
-                            date_to and r["time"] > int(date_to.timestamp())
-                        ):
-                            continue
-                        if last_t is None or r["time"] > last_t:
-                            deduped.append(r)
-                            last_t = r["time"]
-                    if deduped:
-                        return deduped[-target_count:] if target_count else deduped
-        except Exception as exc:
-            self.logger.debug(
-                "FR-BROKER-DUKASCOPY-MARKET-DATA: CDN download failed: %s", exc
-            )
+                    selected = filtered[-target_count:] if target_count else filtered
+                    return [
+                        MarketBar(
+                            time=int(r["time"]),
+                            open=float(r["open"]),
+                            high=float(r["high"]),
+                            low=float(r["low"]),
+                            close=float(r["close"]),
+                            tick_volume=int(r.get("tick_volume", 0)),
+                            spread=int(r.get("spread", 0)),
+                            real_volume=int(r.get("real_volume", 0)),
+                        )
+                        for r in selected
+                    ]
 
         feed_dt = date_to or (
             date_from + timedelta(days=1)
@@ -439,38 +358,54 @@ class DukascopyBroker(DataBrokerBackend):
             decimals=decimals,
             count=target_count,
         )
-        if feed_bars:
-            feed_bars.sort(key=lambda r: r["time"])
-            filtered = [
-                r
-                for r in feed_bars
-                if (not date_from or r["time"] >= int(date_from.timestamp()))
-                and (not date_to or r["time"] <= int(date_to.timestamp()))
-            ]
-            if filtered:
-                return filtered[-target_count:] if target_count else filtered
-
-        raise BridgeError(
-            f"No bars available for '{sym_clean}' from Dukascopy",
-            code="NO_DATA",
-        )
+        feed_bars.sort(key=lambda r: r["time"])
+        filtered = [
+            r
+            for r in feed_bars
+            if (not date_from or r["time"] >= int(date_from.timestamp()))
+            and (not date_to or r["time"] <= int(date_to.timestamp()))
+        ]
+        if not filtered:
+            raise BridgeError(
+                f"No bars available for '{sym_clean}' from Dukascopy",
+                code="NO_DATA",
+            )
+        selected = filtered[-target_count:] if target_count else filtered
+        return [
+            MarketBar(
+                time=int(r["time"]),
+                open=float(r["open"]),
+                high=float(r["high"]),
+                low=float(r["low"]),
+                close=float(r["close"]),
+                tick_volume=int(r.get("tick_volume", 0)),
+                spread=int(r.get("spread", 0)),
+                real_volume=int(r.get("real_volume", 0)),
+            )
+            for r in selected
+        ]
 
     @override
-    def fetch_ticks(
+    def get_ticks(
         self,
-        *,
         symbol: str,
-        mode: str = "range",
-        start_ms: int = 0,
-        end_ms: int = 0,
-        count: int = 100,
+        date_from: datetime | int | None = None,
+        date_to: datetime | int | None = None,
+        *,
+        start: datetime | int | None = None,
+        end: datetime | int | None = None,
+        count: int | None = None,
         limit: int = 1000,
-    ) -> list[dict[str, Any]]:
+    ) -> list[MarketTick]:
         """Download tick data from local archives or Dukascopy direct datafeed."""
         sym_clean = self._clean_symbol(symbol)
-        snap = self.symbol_info(sym_clean)
+        snap = self.get_symbol_info(sym_clean)
         decimals = snap.digits
-        target_count = count if count > 0 else limit
+        target_count = count or limit or 100
+        s = date_from if date_from is not None else start
+        e = date_to if date_to is not None else end
+        start_ms = epoch_millis(s)
+        end_ms = epoch_millis(e)
 
         # Check local data_dir if available
         if self.data_dir is not None and self.data_dir.exists():
@@ -498,7 +433,19 @@ class DukascopyBroker(DataBrokerBackend):
                     and (end_ms <= 0 or r["time_msc"] <= end_ms)
                 ]
                 if filtered:
-                    return filtered[-target_count:] if target_count else filtered
+                    selected = filtered[-target_count:] if target_count else filtered
+                    return [
+                        MarketTick(
+                            time_msc=int(t["time_msc"]),
+                            bid=float(t["bid"]),
+                            ask=float(t["ask"]),
+                            last=float(t.get("last", t["bid"])),
+                            volume=int(t.get("volume", 1)),
+                            flags=int(t.get("flags", 0)),
+                            volume_real=float(t.get("volume_real", 1.0)),
+                        )
+                        for t in selected
+                    ]
 
         target_dt = (
             datetime.fromtimestamp(start_ms / 1000.0, tz=UTC)
@@ -514,50 +461,33 @@ class DukascopyBroker(DataBrokerBackend):
         ticks.sort(key=lambda r: r["time_msc"])
         if end_ms > 0:
             ticks = [t for t in ticks if t["time_msc"] <= end_ms]
+        if not ticks:
+            raise BridgeError(
+                f"No ticks available for '{sym_clean}' from Dukascopy",
+                code="NO_DATA",
+            )
         if target_count and len(ticks) > target_count:
             ticks = ticks[-target_count:]
-        return ticks
-
-    @override
-    def read_history(
-        self,
-        request: HistoryRequest,
-        token: CancellationToken | None = None,
-    ) -> HistoryPage:
-        """Fetch historical records adhering to Stage 2C contract."""
-        tf = request.timeframe.strip().upper()
-        if request.kind != "ticks" and tf != "TICK" and tf != "M1":
-            raise ProviderUnsupportedError(
-                f"Timeframe '{request.timeframe}' not supported by Dukascopy. Supported: M1, TICK",
-                provider="dukascopy",
+        return [
+            MarketTick(
+                time_msc=int(t["time_msc"]),
+                bid=float(t["bid"]),
+                ask=float(t["ask"]),
+                last=float(t.get("last", t["bid"])),
+                volume=int(t.get("volume", 1)),
+                flags=int(t.get("flags", 0)),
+                volume_real=float(t.get("volume_real", 1.0)),
             )
-        try:
-            return super().read_history(request, token)
-        except BridgeError as be:
-            if be.code == "NO_DATA":
-                return HistoryPage(
-                    provider="dukascopy",
-                    symbol=request.symbol,
-                    timeframe=request.timeframe,
-                    kind=request.kind,
-                    rows=[],
-                    is_complete=True,
-                    provenance={"source": "dukascopy"},
-                )
-            raise
-
-
-def create_adapter(context: PluginHostContext | None = None) -> DukascopyBroker:
-    """Factory creating configured DukascopyBroker adapter."""
-    data_dir = context.data_dir if context is not None else None
-    return DukascopyBroker(data_dir=data_dir)
+            for t in ticks
+        ]
 
 
 def main() -> None:
-    """Demonstrate executable usage of DukascopyBroker."""
-    broker = DukascopyBroker()
-    health = broker.check_health()
-    logger.info("Dukascopy health: %s (connected=%s)", health.status, health.connected)
+    """Demonstrate executable usage of DukascopyClient."""
+    client = DukascopyClient()
+    symbols = client.get_symbols()
+    logger.info("Dukascopy catalog symbols: %d available", len(symbols))
+    client.disconnect()
 
 
 if __name__ == "__main__":

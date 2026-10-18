@@ -1,23 +1,21 @@
 # ruff: noqa: F822 -- lazy exports via PEP 562 __getattr__
-"""Broker backends, providers, and unified registry.
+"""Broker clients, execution backends, and data providers.
 
 Description:
-    Exposes modern TradingBackend implementations:
-    - MT5Backend (pilot MetaTrader 5 EA bridge)
-    - CTraderBackend (cTrader Open API Protobuf/TLS)
-    - SimulationBackend (deterministic in-memory trading engine)
-    And market data broker providers:
-    - YahooBroker (Yahoo Finance v8 chart / v7 quote)
-    - DukascopyBroker (Dukascopy CDN & datafeed)
-    - DarwinexBroker (Darwinex CDN ticks & bars)
-    - BinanceBroker / CryptoBroker (Binance REST Spot & Futures)
-    - SQEquityBroker (StrategyQuant US Equities)
-    - SQFuturesBroker (StrategyQuant Continuous Futures)
-    - FilesBroker (Local CSV / Parquet / HST / FXT data archives)
-    - TickDownloaderBroker (Tick data downloader)
-    As well as unified registry and typed data capabilities:
-    - BrokerRegistry, BrokerKey, HistoricalProviderView
-    - ProviderCapabilities, HistoryRequest, HistoryPage, ProviderHealth
+    Exposes uniform BrokerClient and TradingClient implementations:
+    - MetaTraderClient (pilot MetaTrader 4/5 EA bridge and archives)
+    - CTraderClient (cTrader Open API Protobuf/TLS)
+    - SimulatorClient (deterministic in-memory trading engine)
+    And uniform market data broker clients:
+    - YahooClient (Yahoo Finance v8 chart / v7 quote)
+    - DukascopyClient (Dukascopy CDN & datafeed)
+    - DarwinexClient (Darwinex CDN ticks & bars)
+    - CryptoClient / BinanceClient / BitfinexClient / CoinbaseClient / PoloniexClient
+    - SQEquityClient (StrategyQuant US Equities)
+    - SQFuturesClient (StrategyQuant Continuous Futures)
+    - FilesClient (Local CSV / Parquet / HST / FXT data archives)
+    - TickDownloaderClient (Tick data downloader)
+    Along with base client contracts, errors, and data contracts.
 """
 
 from __future__ import annotations
@@ -26,41 +24,28 @@ import importlib
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from app.services.brokers.base import BaseBrokerBackend, BridgeError, BrokerBackend
-    from app.services.brokers.capabilities import (
-        CancellationToken,
-        HistoryKind,
-        HistoryPage,
-        HistoryRequest,
-        ProviderAuthError,
-        ProviderCancelledError,
-        ProviderCapabilities,
-        ProviderDisabledError,
-        ProviderError,
-        ProviderHealth,
-        ProviderNotFoundError,
-        ProviderRateLimitError,
-        ProviderTimeoutError,
-        ProviderUnsupportedError,
-        ProviderValidationError,
+    from app.services.brokers.base import (
+        BridgeError,
+        BrokerClient,
+        TradingClient,
     )
-    from app.services.brokers.crypto import BinanceBroker, CryptoBroker
-    from app.services.brokers.ctrader import CTraderBackend
-    from app.services.brokers.darwinex import DarwinexBroker
-    from app.services.brokers.dukascopy import DukascopyBroker
-    from app.services.brokers.files import FilesBroker
-    from app.services.brokers.metatrader import MT5Backend
-    from app.services.brokers.registry import (
-        BrokerKey,
-        BrokerRegistry,
-        HistoricalProviderView,
-        normalize_broker_name,
+    from app.services.brokers.crypto import (
+        BinanceClient,
+        BitfinexClient,
+        CoinbaseClient,
+        CryptoClient,
+        PoloniexClient,
     )
-    from app.services.brokers.simulator import SimulationBackend
-    from app.services.brokers.sq_equity import SQEquityBroker
-    from app.services.brokers.sq_futures import SQFuturesBroker
-    from app.services.brokers.tick_downloader import TickDownloaderBroker
-    from app.services.brokers.yahoo import YahooBroker
+    from app.services.brokers.ctrader import CTraderClient
+    from app.services.brokers.darwinex import DarwinexClient
+    from app.services.brokers.dukascopy import DukascopyClient
+    from app.services.brokers.files import FilesClient
+    from app.services.brokers.metatrader import MetaTraderClient
+    from app.services.brokers.simulator import SimulatorClient
+    from app.services.brokers.sq_equity import SQEquityClient
+    from app.services.brokers.sq_futures import SQFuturesClient
+    from app.services.brokers.tick_downloader import TickDownloaderClient
+    from app.services.brokers.yahoo import YahooClient
     from app.services.include.contracts import (
         AccountInfo,
         BridgeEvent,
@@ -75,7 +60,6 @@ if TYPE_CHECKING:
         TradeResult,
         TradingBackend,
     )
-    from app.services.include.data import DataBrokerBackend
     from app.services.include.enums import (
         ReceiptStatus,
         TradeAction,
@@ -89,74 +73,30 @@ if TYPE_CHECKING:
 _SINGLETONS: dict[str, Any] = {}
 
 _MODULE_MAPPING: dict[str, tuple[str, str]] = {
-    "BaseBrokerBackend": ("app.services.brokers.base", "BaseBrokerBackend"),
-    "BrokerBackend": ("app.services.brokers.base", "BrokerBackend"),
+    # Base Client and Error Hierarchy
+    "BrokerClient": ("app.services.brokers.base", "BrokerClient"),
+    "TradingClient": ("app.services.brokers.base", "TradingClient"),
     "BridgeError": ("app.services.brokers.base", "BridgeError"),
-    "DataBrokerBackend": ("app.services.include.data", "DataBrokerBackend"),
-    "BinanceBroker": ("app.services.brokers.crypto", "BinanceBroker"),
-    "CryptoBroker": ("app.services.brokers.crypto", "CryptoBroker"),
-    "CTraderBackend": ("app.services.brokers.ctrader", "CTraderBackend"),
-    "DarwinexBroker": ("app.services.brokers.darwinex", "DarwinexBroker"),
-    "DukascopyBroker": ("app.services.brokers.dukascopy", "DukascopyBroker"),
-    "FilesBroker": ("app.services.brokers.files", "FilesBroker"),
-    "MT5Backend": ("app.services.brokers.metatrader", "MT5Backend"),
-    "SimulationBackend": ("app.services.brokers.simulator", "SimulationBackend"),
-    "SQEquityBroker": ("app.services.brokers.sq_equity", "SQEquityBroker"),
-    "SQFuturesBroker": ("app.services.brokers.sq_futures", "SQFuturesBroker"),
-    "TickDownloaderBroker": (
+    # Uniform Clients
+    "MetaTraderClient": ("app.services.brokers.metatrader", "MetaTraderClient"),
+    "CTraderClient": ("app.services.brokers.ctrader", "CTraderClient"),
+    "SimulatorClient": ("app.services.brokers.simulator", "SimulatorClient"),
+    "YahooClient": ("app.services.brokers.yahoo", "YahooClient"),
+    "DukascopyClient": ("app.services.brokers.dukascopy", "DukascopyClient"),
+    "DarwinexClient": ("app.services.brokers.darwinex", "DarwinexClient"),
+    "CryptoClient": ("app.services.brokers.crypto", "CryptoClient"),
+    "BinanceClient": ("app.services.brokers.crypto", "BinanceClient"),
+    "BitfinexClient": ("app.services.brokers.crypto", "BitfinexClient"),
+    "CoinbaseClient": ("app.services.brokers.crypto", "CoinbaseClient"),
+    "PoloniexClient": ("app.services.brokers.crypto", "PoloniexClient"),
+    "FilesClient": ("app.services.brokers.files", "FilesClient"),
+    "SQEquityClient": ("app.services.brokers.sq_equity", "SQEquityClient"),
+    "SQFuturesClient": ("app.services.brokers.sq_futures", "SQFuturesClient"),
+    "TickDownloaderClient": (
         "app.services.brokers.tick_downloader",
-        "TickDownloaderBroker",
+        "TickDownloaderClient",
     ),
-    "YahooBroker": ("app.services.brokers.yahoo", "YahooBroker"),
-    "BrokerRegistry": ("app.services.brokers.registry", "BrokerRegistry"),
-    "BrokerKey": ("app.services.brokers.registry", "BrokerKey"),
-    "HistoricalProviderView": (
-        "app.services.brokers.registry",
-        "HistoricalProviderView",
-    ),
-    "normalize_broker_name": (
-        "app.services.brokers.registry",
-        "normalize_broker_name",
-    ),
-    "CancellationToken": ("app.services.brokers.capabilities", "CancellationToken"),
-    "HistoryKind": ("app.services.brokers.capabilities", "HistoryKind"),
-    "HistoryPage": ("app.services.brokers.capabilities", "HistoryPage"),
-    "HistoryRequest": ("app.services.brokers.capabilities", "HistoryRequest"),
-    "ProviderAuthError": ("app.services.brokers.capabilities", "ProviderAuthError"),
-    "ProviderCapabilities": (
-        "app.services.brokers.capabilities",
-        "ProviderCapabilities",
-    ),
-    "ProviderCancelledError": (
-        "app.services.brokers.capabilities",
-        "ProviderCancelledError",
-    ),
-    "ProviderDisabledError": (
-        "app.services.brokers.capabilities",
-        "ProviderDisabledError",
-    ),
-    "ProviderError": ("app.services.brokers.capabilities", "ProviderError"),
-    "ProviderHealth": ("app.services.brokers.capabilities", "ProviderHealth"),
-    "ProviderNotFoundError": (
-        "app.services.brokers.capabilities",
-        "ProviderNotFoundError",
-    ),
-    "ProviderRateLimitError": (
-        "app.services.brokers.capabilities",
-        "ProviderRateLimitError",
-    ),
-    "ProviderTimeoutError": (
-        "app.services.brokers.capabilities",
-        "ProviderTimeoutError",
-    ),
-    "ProviderUnsupportedError": (
-        "app.services.brokers.capabilities",
-        "ProviderUnsupportedError",
-    ),
-    "ProviderValidationError": (
-        "app.services.brokers.capabilities",
-        "ProviderValidationError",
-    ),
+    # Contracts & Enums
     "MarketBar": ("app.workspace.data_manager", "MarketBar"),
     "MarketTick": ("app.workspace.data_manager", "MarketTick"),
     "Timeframe": ("app.workspace.data_manager", "Timeframe"),
@@ -177,28 +117,47 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
 }
 
 _SINGLETON_FACTORIES: dict[str, tuple[str, str]] = {
-    "yahoo": ("app.services.brokers.yahoo", "YahooBroker"),
-    "dukascopy": ("app.services.brokers.dukascopy", "DukascopyBroker"),
-    "darwinex": ("app.services.brokers.darwinex", "DarwinexBroker"),
-    "sq_equity": ("app.services.brokers.sq_equity", "SQEquityBroker"),
-    "sq_futures": ("app.services.brokers.sq_futures", "SQFuturesBroker"),
-    "crypto": ("app.services.brokers.crypto", "CryptoBroker"),
-    "binance": ("app.services.brokers.crypto", "BinanceBroker"),
-    "files": ("app.services.brokers.files", "FilesBroker"),
-    "tick_downloader": ("app.services.brokers.tick_downloader", "TickDownloaderBroker"),
+    "yahoo": ("app.services.brokers.yahoo", "YahooClient"),
+    "dukascopy": ("app.services.brokers.dukascopy", "DukascopyClient"),
+    "darwinex": ("app.services.brokers.darwinex", "DarwinexClient"),
+    "sq_equity": ("app.services.brokers.sq_equity", "SQEquityClient"),
+    "sq_futures": ("app.services.brokers.sq_futures", "SQFuturesClient"),
+    "crypto": ("app.services.brokers.crypto", "CryptoClient"),
+    "binance": ("app.services.brokers.crypto", "BinanceClient"),
+    "files": ("app.services.brokers.files", "FilesClient"),
+    "tick_downloader": ("app.services.brokers.tick_downloader", "TickDownloaderClient"),
+    "metatrader": ("app.services.brokers.metatrader", "MetaTraderClient"),
+    "ctrader": ("app.services.brokers.ctrader", "CTraderClient"),
+    "simulator": ("app.services.brokers.simulator", "SimulatorClient"),
 }
 
 
+def normalize_provider_id(name: str) -> str:
+    """Normalize broker name or alias to canonical identifier."""
+    cleaned = name.lower().strip().replace("-", "_").replace(" ", "_")
+    for suffix in ("_broker", "_backend", "_client"):
+        cleaned = cleaned.removesuffix(suffix)
+    aliases = {
+        "strategyquant_equity": "sq_equity",
+        "strategyquant_futures": "sq_futures",
+        "csv": "files",
+        "parquet": "files",
+        "local": "files",
+        "yahoo_finance": "yahoo",
+        "yfinance": "yahoo",
+        "mt5": "metatrader",
+    }
+    return aliases.get(cleaned, cleaned)
+
+
+def normalize_broker_name(name: str) -> str:
+    """Backward-compatible alias for normalize_provider_id."""
+    return normalize_provider_id(name)
+
+
 def get_broker(name: str, registry: Any = None) -> Any:
-    """Resolve a data broker singleton by name or alias, optionally querying a registry."""
-    if registry is not None and hasattr(registry, "resolve_broker"):
-        try:
-            return registry.resolve_broker(name)
-        except KeyError:
-            pass
-
-    from app.services.brokers.registry import normalize_provider_id
-
+    """Resolve a broker singleton by name or alias."""
+    del registry
     target = normalize_provider_id(name)
     if target not in _SINGLETON_FACTORIES:
         raise KeyError(f"Unknown broker: {name}")
@@ -223,63 +182,51 @@ def __getattr__(name: str) -> Any:
 
 __all__ = [
     "AccountInfo",
-    "BaseBrokerBackend",
-    "BinanceBroker",
+    "BinanceClient",
+    "BitfinexClient",
     "BridgeError",
     "BridgeEvent",
-    "BrokerBackend",
-    "BrokerKey",
-    "BrokerRegistry",
-    "CancellationToken",
-    "CTraderBackend",
-    "CryptoBroker",
-    "DarwinexBroker",
-    "DataBrokerBackend",
+    "BrokerClient",
+    "CTraderClient",
+    "CoinbaseClient",
+    "CryptoClient",
+    "DarwinexClient",
     "DealInfo",
-    "DukascopyBroker",
-    "FilesBroker",
-    "HistoricalProviderView",
-    "HistoryKind",
-    "HistoryPage",
-    "HistoryRequest",
-    "MT5Backend",
+    "DukascopyClient",
+    "FilesClient",
     "MarketBar",
     "MarketTick",
+    "MetaTraderClient",
     "OrderInfo",
+    "PoloniexClient",
     "PositionInfo",
-    "ProviderAuthError",
-    "ProviderCapabilities",
-    "ProviderCancelledError",
-    "ProviderDisabledError",
-    "ProviderError",
-    "ProviderHealth",
-    "ProviderNotFoundError",
-    "ProviderRateLimitError",
-    "ProviderTimeoutError",
-    "ProviderUnsupportedError",
-    "ProviderValidationError",
     "Receipt",
     "ReceiptStatus",
-    "SQEquityBroker",
-    "SQFuturesBroker",
-    "SimulationBackend",
+    "SQEquityClient",
+    "SQFuturesClient",
+    "SimulatorClient",
     "SymbolInfo",
     "TerminalInfo",
-    "TickDownloaderBroker",
+    "TickDownloaderClient",
     "Timeframe",
     "TradeAction",
     "TradeCheckResult",
     "TradeRequest",
     "TradeResult",
     "TradingBackend",
-    "YahooBroker",
+    "TradingClient",
+    "YahooClient",
     "binance",
     "crypto",
+    "ctrader",
     "darwinex",
     "dukascopy",
     "files",
     "get_broker",
+    "metatrader",
     "normalize_broker_name",
+    "normalize_provider_id",
+    "simulator",
     "sq_equity",
     "sq_futures",
     "tick_downloader",

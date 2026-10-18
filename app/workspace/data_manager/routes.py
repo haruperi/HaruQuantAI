@@ -54,7 +54,6 @@ if TYPE_CHECKING:
     from app.host.discovery import PluginLifecycleManager
     from app.host.session import SessionManager
     from app.host.transport import EventBus
-    from app.services.brokers.registry import BrokerRegistry
 
 __all__ = [
     "DataManagerWorkspace",
@@ -77,7 +76,7 @@ class DataManagerWorkspace:
         data_dir: Path | str | None = None,
         event_bus: EventBus | None = None,
         plugin_mgr: PluginLifecycleManager | None = None,
-        broker_registry: BrokerRegistry | None = None,
+        broker_registry: Any | None = None,
         job_manager: Any | None = None,
     ) -> None:
         """Instantiate workspace with database path and event broker."""

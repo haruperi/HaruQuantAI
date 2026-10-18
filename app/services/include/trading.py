@@ -49,7 +49,7 @@ import uuid
 from dataclasses import asdict
 from datetime import UTC, datetime
 from types import TracebackType
-from typing import Any, Self
+from typing import Any, Self, cast
 
 from app.host.logging import get_logger
 
@@ -182,9 +182,7 @@ class TradingClass:
     CLASS_NAME = "Base"
     TRADING_METHODS: frozenset[str] = frozenset()
 
-    def __init__(
-        self, backend: TradingBackend, *, object_id: str | None = None
-    ) -> None:
+    def __init__(self, backend: Any, *, object_id: str | None = None) -> None:
         logger.debug("FR-TRADING-COMPOSITION: creating object")
         self.backend = backend
         self.object_id = object_id or f"{self.CLASS_NAME.lower()}-{uuid.uuid4().hex}"
@@ -193,7 +191,7 @@ class TradingClass:
     @property
     def last_command_id(self) -> str | None:
         """Return the last command in this task context."""
-        return self.backend.last_command_id()
+        return cast("str | None", self.backend.last_command_id())
 
     async def _call(self, method: str, *args: Any) -> Any:
         logger.debug(
@@ -409,8 +407,14 @@ class Trade(TradingClass):
         logger.debug("FR-TRADING-MUTATION: executing OrderSend")
         wire_payload = _serialize_request(request)
         raw = await self._call("OrderSend", wire_payload)
-        data = raw if isinstance(raw, dict) else {}
-        res = _build_trade_result(data)
+        if isinstance(raw, TradeResult):
+            res = raw
+        elif isinstance(raw, dict):
+            res = _build_trade_result(raw)
+        else:
+            raise TypeError(
+                f"Expected TradeResult or dict from OrderSend, got {type(raw).__name__}"
+            )
         if result is not None:
             for k, v in asdict(res).items():
                 if hasattr(result, k):
@@ -426,8 +430,15 @@ class Trade(TradingClass):
         logger.debug("FR-TRADING-MUTATION: executing OrderCheck")
         wire_payload = _serialize_request(request)
         raw = await self._call("OrderCheck", wire_payload)
-        data = raw if isinstance(raw, dict) else {}
-        res = _build_trade_check_result(data)
+        if isinstance(raw, TradeCheckResult):
+            res = raw
+        elif isinstance(raw, dict):
+            res = _build_trade_check_result(raw)
+        else:
+            raise TypeError(
+                "Expected TradeCheckResult or dict from OrderCheck, "
+                f"got {type(raw).__name__}"
+            )
         if result is not None:
             for k, v in asdict(res).items():
                 if hasattr(result, k):
@@ -445,20 +456,36 @@ class Trade(TradingClass):
     async def Request(self) -> TradeRequest:
         """Fetch the last trade request snapshot."""
         raw = await self._call("Request")
-        data = raw if isinstance(raw, dict) else {}
-        return _build_trade_request(data)
+        if isinstance(raw, TradeRequest):
+            return raw
+        if isinstance(raw, dict):
+            return _build_trade_request(raw)
+        raise TypeError(
+            f"Expected TradeRequest or dict from Request, got {type(raw).__name__}"
+        )
 
     async def Result(self) -> TradeResult:
         """Fetch the last trade result snapshot."""
         raw = await self._call("Result")
-        data = raw if isinstance(raw, dict) else {}
-        return _build_trade_result(data)
+        if isinstance(raw, TradeResult):
+            return raw
+        if isinstance(raw, dict):
+            return _build_trade_result(raw)
+        raise TypeError(
+            f"Expected TradeResult or dict from Result, got {type(raw).__name__}"
+        )
 
     async def CheckResult(self) -> TradeCheckResult:
         """Fetch the last trade check result snapshot."""
         raw = await self._call("CheckResult")
-        data = raw if isinstance(raw, dict) else {}
-        return _build_trade_check_result(data)
+        if isinstance(raw, TradeCheckResult):
+            return raw
+        if isinstance(raw, dict):
+            return _build_trade_check_result(raw)
+        raise TypeError(
+            "Expected TradeCheckResult or dict from CheckResult, "
+            f"got {type(raw).__name__}"
+        )
 
     async def PrintRequest(self) -> bool:
         """Log the last trade request metadata."""
@@ -919,7 +946,7 @@ class DealProxy(TradingClass):
 class Trading:
     """The unified eight-class composition for every async trading backend."""
 
-    def __init__(self, backend: TradingBackend) -> None:
+    def __init__(self, backend: Any) -> None:
         logger.debug("FR-TRADING-COMPOSITION: composing trading classes")
         self.backend = backend
         self.trade = Trade(backend)
@@ -959,17 +986,17 @@ class Trading:
     def last_command_id(self) -> str | None:
         """Read the current task's last backend command identifier."""
         logger.debug("FR-TRADING-COMPOSITION: reading command identity")
-        return self.backend.last_command_id()
+        return cast("str | None", self.backend.last_command_id())
 
     def receipt(self, command_id: str) -> Receipt | None:
         """Read a backend command receipt."""
         logger.debug("FR-TRADING-COMPOSITION: reading receipt")
-        return self.backend.receipt(command_id)
+        return cast("Receipt | None", self.backend.receipt(command_id))
 
     async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109
         """Wait for a backend event within the requested timeout."""
         logger.debug("FR-TRADING-COMPOSITION: waiting for event")
-        return await self.backend.next_event(timeout)
+        return cast("BridgeEvent", await self.backend.next_event(timeout))
 
     async def await_request_event(
         self,
@@ -978,7 +1005,9 @@ class Trading:
     ) -> BridgeEvent:
         """Delegate supported request correlation, or surface capability failure."""
         logger.debug("FR-TRADING-COMPOSITION: waiting for correlated event")
-        return await self.backend.await_request_event(request_id, timeout)
+        return cast(
+            "BridgeEvent", await self.backend.await_request_event(request_id, timeout)
+        )
 
     async def __aenter__(self) -> Self:
         """Start the selected backend on context entry."""

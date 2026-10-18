@@ -58,7 +58,7 @@ from app.services.brokers._native_history import (
     encode_fxt_bytes,
     encode_hst_bytes,
 )
-from app.services.brokers.capabilities import ProviderValidationError
+from app.services.brokers.base import BridgeError
 
 FIXTURES_DIR = Path(__file__).resolve().parents[3] / "fixtures" / "brokers" / "stage2c"
 
@@ -191,7 +191,7 @@ def test_hst_round_trip_encode_decode() -> None:
 
 def test_hst_truncated_header_rejects() -> None:
     """Verify HST rejects truncated header with ProviderValidationError."""
-    with pytest.raises(ProviderValidationError, match="HST file too small"):
+    with pytest.raises(BridgeError, match="HST file too small"):
         decode_hst_bytes(b"\x91\x01\x00\x00" + b"\x00" * 20)
 
 
@@ -239,7 +239,7 @@ def test_fxt_round_trip_encode_decode() -> None:
 
 def test_fxt_truncated_header_rejects() -> None:
     """Verify FXT rejects truncated header with ProviderValidationError."""
-    with pytest.raises(ProviderValidationError, match="FXT file too small"):
+    with pytest.raises(BridgeError, match="FXT file too small"):
         decode_fxt_bytes(b"\x95\x01\x00\x00" + b"\x00" * 100)
 
 

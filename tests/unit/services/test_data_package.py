@@ -62,7 +62,6 @@ class TestDataManagerExportParity:
     def test_history_exports_identity(self) -> None:
         """Verify history symbols match between data_manager and history submodule."""
         assert dm_pkg.DataBackend is dm_hist.DataBackend
-        assert dm_pkg.DataBrokerBackend is dm_hist.DataBrokerBackend
         assert dm_pkg.validate_request is dm_hist.validate_request
         assert dm_pkg.validate_rows is dm_hist.validate_rows
         assert dm_pkg.get_historical_bars is dm_hist.get_historical_bars

@@ -15,9 +15,9 @@ Key Capabilities:
     - FR-TEST-EXEC-PRESERVATION: Assert MT5 and simulation trading methods are intact.
       Associated: `test_mt5_backend_execution_preservation()`, `test_simulation_backend_intact()`
       Logging: Validates trading state snapshots and disarmed execution guards.
-    - FR-TEST-EXEC-ISOLATION: Assert HistoricalProviderView rejects trade dispatch.
-      Associated: `test_historical_view_blocks_execution_mutations()`
-      Logging: Validates read-only lease boundaries.
+    - FR-TEST-EXEC-ISOLATION: Assert BrokerClient rejects trade dispatch.
+      Associated: `test_data_broker_client_blocks_execution_mutations()`
+      Logging: Validates data-only client boundaries.
 
 Python API Usage:
     ```bash
@@ -30,22 +30,16 @@ CLI Usage:
     ```
 """
 
-from __future__ import annotations
-
 import pytest
+from app.services.brokers.base import BrokerClient, TradingClient
 from app.services.brokers.metatrader import (
     Bridge,
-    MetaTraderDataBroker,
-    MT5Backend,
+    MetaTraderClient,
     decode_frame,
     encode_frame,
 )
-from app.services.brokers.registry import (
-    BrokerKey,
-    BrokerRegistry,
-    HistoricalProviderView,
-)
-from app.services.brokers.simulator import SimulationBackend
+from app.services.brokers.simulator import SimulatorClient
+from app.services.brokers.yahoo import YahooClient
 from app.services.include.contracts import SymbolInfo
 from app.services.include.trading import (
     MarginMode,
@@ -61,7 +55,7 @@ def test_mt5_backend_execution_preservation() -> None:
     token = Bridge.generate_auth_token()
     assert len(token) >= 32
 
-    backend = MT5Backend(auth_token=token)
+    backend = MetaTraderClient(auth_token=token)
     assert backend.bridge.auth_token == token
     assert backend.bridge.host == "127.0.0.1"
     assert not backend.bridge.connected
@@ -87,11 +81,78 @@ def test_legacy_bridge_frame_codec() -> None:
 
 def test_metatrader_data_broker_coexistence() -> None:
     """Verify MetaTraderDataBroker coexists without impacting execution."""
-    data_broker = MetaTraderDataBroker()
+    data_broker = MetaTraderClient()
     assert data_broker.name == "MetaTrader"
-    assert data_broker.capabilities.provider_id == "metatrader"
-    health = data_broker.check_health()
-    assert health.provider_id == "metatrader"
+    assert isinstance(data_broker, TradingClient)
+    assert isinstance(data_broker, BrokerClient)
+    assert hasattr(data_broker, "get_bars")
+    assert hasattr(data_broker, "get_ticks")
+    assert hasattr(data_broker, "order_send")
+
+
+def test_metatrader_client_terminal_bars_awaitable() -> None:
+    """Verify MetaTraderClient returns awaitable coroutines for bars and ticks when connected."""
+    import asyncio
+    import inspect
+    from unittest.mock import AsyncMock
+
+    async def _test() -> None:
+        client = MetaTraderClient()
+        client.bridge._connected.set()
+        client.bridge._authenticated = True
+
+        mock_bar = {
+            "time": 1700000000,
+            "open": 1.1,
+            "high": 1.2,
+            "low": 1.0,
+            "close": 1.15,
+            "tick_volume": 100,
+            "spread": 10,
+            "real_volume": 50,
+        }
+        client.call = AsyncMock(return_value=[mock_bar])  # type: ignore[method-assign]
+
+        coro = client.get_bars("EURUSD", "M1", count=1)
+        assert inspect.isawaitable(coro)
+        bars = await coro
+        assert len(bars) == 1
+        assert bars[0].time == 1700000000
+        assert bars[0].open == 1.1
+
+        mock_tick = {
+            "time_msc": 1700000000000,
+            "bid": 1.1,
+            "ask": 1.1002,
+            "last": 1.1001,
+            "volume": 10,
+            "flags": 6,
+            "volume_real": 10.0,
+        }
+        client.call = AsyncMock(return_value=[mock_tick])  # type: ignore[method-assign]
+        tick_coro = client.get_ticks("EURUSD", count=1)
+        assert inspect.isawaitable(tick_coro)
+        ticks = await tick_coro
+        assert len(ticks) == 1
+        assert ticks[0].time_msc == 1700000000000
+
+    asyncio.run(_test())
+
+
+def test_metatrader_disconnected_hard_failure() -> None:
+    """Verify MetaTraderClient get_bars and get_ticks hard-fail with BridgeError when disconnected."""
+    from app.services.brokers.base import BridgeError
+
+    client = MetaTraderClient()
+    assert not client.bridge.connected
+
+    with pytest.raises(BridgeError) as exc_bars:
+        client.get_bars("EURUSD", "M1", count=1)
+    assert exc_bars.value.code == "NOT_CONNECTED"
+
+    with pytest.raises(BridgeError) as exc_ticks:
+        client.get_ticks("EURUSD", count=1)
+    assert exc_ticks.value.code == "NOT_CONNECTED"
 
 
 # ============================================================================
@@ -101,7 +162,7 @@ def test_metatrader_data_broker_coexistence() -> None:
 
 def test_simulation_backend_intact() -> None:
     """Verify SimulationBackend execution, balance, and symbol snapshot registration."""
-    sim = SimulationBackend(
+    sim = SimulatorClient(
         initial_balance=10000.0,
         leverage=100,
         margin_mode=MarginMode.RETAIL_HEDGING,
@@ -135,25 +196,23 @@ def test_simulation_backend_intact() -> None:
 
 
 # ============================================================================
-# HistoricalProviderView Read-Only Lease Protection
+# BrokerClient vs TradingClient Execution Isolation Tests
 # ============================================================================
 
 
-def test_historical_view_blocks_execution_mutations() -> None:
-    """Verify HistoricalProviderView only allows reads and blocks trading methods."""
-    token = Bridge.generate_auth_token()
-    backend = MT5Backend(auth_token=token)
-    key = BrokerKey(provider="metatrader")
-    view = HistoricalProviderView(backend, key)
-
-    assert view.provider_id == "metatrader"
-    assert view.key == key
+def test_data_broker_client_blocks_execution_mutations() -> None:
+    """Verify BrokerClient data classes only allow data reads and do not expose trading methods."""
+    data_client = YahooClient()
+    assert isinstance(data_client, BrokerClient)
+    assert not isinstance(data_client, TradingClient)
 
     # Allowed read operations
-    health = view.check_health()
-    assert health.provider_id == "metatrader"
+    assert hasattr(data_client, "get_bars")
+    assert hasattr(data_client, "get_ticks")
+    assert hasattr(data_client, "get_symbol_info")
+    assert hasattr(data_client, "get_symbols")
 
-    # Disallowed execution methods must NOT be present on HistoricalProviderView
+    # Execution methods must NOT be present on BrokerClient data clients
     for forbidden_attr in (
         "arm",
         "disarm",
@@ -164,26 +223,31 @@ def test_historical_view_blocks_execution_mutations() -> None:
         "positions",
         "orders",
         "history_orders",
-        "history_deals",
+        "deals",
     ):
-        assert not hasattr(view, forbidden_attr), (
-            f"HistoricalProviderView must not expose {forbidden_attr}!"
+        assert not hasattr(data_client, forbidden_attr), (
+            f"BrokerClient must not expose {forbidden_attr}!"
         )
 
 
-def test_registry_historical_views_are_isolated() -> None:
-    """Verify registry.list_historical_providers returns read-only views."""
-    registry = BrokerRegistry()
-    views = registry.list_historical_providers()
+def test_trading_client_exposes_execution_methods() -> None:
+    """Verify TradingClient classes implement trading execution methods."""
+    sim = SimulatorClient()
+    assert isinstance(sim, BrokerClient)
+    assert isinstance(sim, TradingClient)
 
-    assert len(views) == 9
-    for v in views:
-        assert isinstance(v, HistoricalProviderView)
-        assert hasattr(v, "fetch_bars")
-        assert hasattr(v, "fetch_ticks")
-        assert hasattr(v, "check_health")
-        # Trading mutations must never be exposed on historical views
-        assert not hasattr(v, "order_send")
-        assert not hasattr(v, "arm")
-
-    registry.close()
+    for required_attr in (
+        "arm",
+        "disarm",
+        "order_send",
+        "order_check",
+        "order_calc_margin",
+        "order_calc_profit",
+        "positions",
+        "orders",
+        "history_orders",
+        "deals",
+    ):
+        assert hasattr(sim, required_attr), (
+            f"TradingClient must expose {required_attr}!"
+        )

@@ -14,24 +14,21 @@ app/services/include/
   enums.py             # Canonical trading enumerations
 
 app/services/brokers/
-  base.py              # BaseBrokerBackend template lifecycle, session cleanup, read_history
-  capabilities.py      # ProviderCapabilities, HistoryRequest, HistoryPage, ProviderHealth
-  registry.py          # Centralized BrokerRegistry, lease tracking, alias normalization
+  base.py              # BrokerClient, TradingClient, BridgeError, Provider*Error, CancellationToken
   _http.py             # Bounded HTTP transport, retries, redacted logging, connection pooling
   _file_history.py     # Partition matching, delimited text parsing, local parquet/bar loaders
   _native_history.py   # HST, FXT, StrategyQuant DAT binary codecs and bi5 decompression
-  _simulation_api.py   # Private method handlers/per-object state for simulation
-  metatrader.py        # Native Bridge and MT5Backend adapter
-  simulator.py         # Local model and async execution adapter
-  ctrader.py           # Spotware cTrader Open API Protobuf/TLS backend and unified dispatch
-  dukascopy.py         # Dukascopy CDN market data broker
-  darwinex.py          # Darwinex tick & bar market data broker
-  crypto.py            # Cryptocurrency market data broker (Binance, Bitfinex, Coinbase, Poloniex)
-  files.py             # Local filesystem market data broker (CSV, Parquet, HST, FXT)
-  yahoo.py             # Yahoo Finance market data broker
-  tick_downloader.py   # Historical tick downloader broker
-  sq_equity.py         # StrategyQuant US Equities daily bundled broker
-  sq_futures.py        # StrategyQuant Continuous Futures minute/daily bundled broker
+  metatrader.py        # MetaTraderClient(TradingClient) - Native Bridge and MT5 trading client
+  simulator.py         # SimulatorClient(TradingClient) - Local model and async execution client
+  ctrader.py           # CTraderClient(TradingClient) - Spotware cTrader Open API Protobuf/TLS trading client
+  dukascopy.py         # DukascopyClient(BrokerClient) - Dukascopy CDN market data client
+  darwinex.py          # DarwinexClient(BrokerClient) - Darwinex tick & bar market data client
+  crypto.py            # CryptoClient / BinanceClient(BrokerClient) - Cryptocurrency market data client
+  files.py             # FilesClient(BrokerClient) - Local filesystem market data client (CSV, Parquet, HST, FXT)
+  yahoo.py             # YahooClient(BrokerClient) - Yahoo Finance market data client
+  tick_downloader.py   # TickDownloaderClient(BrokerClient) - Historical tick downloader client
+  sq_equity.py         # SQEquityClient(BrokerClient) - StrategyQuant US Equities daily bundled client
+  sq_futures.py        # SQFuturesClient(BrokerClient) - StrategyQuant Continuous Futures minute/daily bundled client
 
 app/host/persistence/
   mt5bridge_journal.py # Dedicated journal connection/CRUD
@@ -45,18 +42,18 @@ scripts/
 The brokers package provides unified broker abstractions across execution backends and
 market data providers. Shared foundation modules (`base.py`, `_http.py`, `_file_history.py`,
 `_native_history.py`) eliminate boilerplate across provider adapters:
-- `BaseBrokerBackend` automatically manages HTTP session lifecycles in `close_sync()`
-  and provides a default `read_history()` template validating requests, token cancellation,
-  and dispatching to `fetch_bars` / `fetch_ticks`.
+- `BrokerClient` is the base class for all market data clients, offering uniform async
+  `get_bars()`, `get_ticks()`, `get_symbol_info()`, `get_symbols()`, and `get_terminal_info()` methods.
+- `TradingClient(BrokerClient)` extends data capabilities with unified trading operations:
+  `get_account_info()`, `order_send()`, `order_check()`, `account_info()`, `terminal_info()`, etc.
 - `_file_history.load_local_partition_bars` and `load_local_partition_ticks` unify
   multi-partition file discovery, decoding, date filtering, and deduplication across file-based
   providers (`files.py`, `sq_equity.py`, `sq_futures.py`).
-- `BrokerRegistry` centralizes alias normalization via `normalize_provider_id` and
-  guarantees safe idempotent resource disposal across synchronous and asynchronous callers.
+- Direct method invocation (`client.get_bars(...)`, `client.get_ticks(...)`) replaces legacy
+  string RPC dispatch dictionaries.
 
-TradingBackend is the async lifecycle/operation capability. BrokerBackend is a
-synchronous internal snapshot-model ABC for simulator implementations;
-MT5 does not pretend to implement that model or locally recalculate broker data.
+`TradingClient` is the async lifecycle/operation capability. `SimulatorClient` provides
+a pure Python in-memory simulation client implementing `TradingClient`.
 
 ## Live MT5
 
@@ -100,7 +97,7 @@ conversion. Codec logs exclude message contents and secrets.
 
 ## Simulation and future backends
 
-SimulationBackend implements the same async execution boundary over the existing
+SimulatorClient implements the same async execution boundary over the existing
 local MT5-semantics model. Register SymbolSpec records and feed ticks explicitly.
 Only caller-supplied tick/clock changes advance simulated time. Selection/trade
 configuration is keyed by object ID; receipts are in-memory and do not open SQL.
@@ -111,13 +108,13 @@ property/native-request-correlation and queued-trade behavior. Local events are 
 text formatting is model-specific. Future brokers implement the async capability
 and map supported operations into this vocabulary, rejecting unavailable features.
 
-## cTrader Open API (`CTraderBackend`)
+## cTrader Open API (`CTraderClient`)
 
 ```python
-from app.services.brokers.ctrader import CTraderBackend
+from app.services.brokers.ctrader import CTraderClient
 from app.services.include.trading import Trading
 
-backend = CTraderBackend(
+backend = CTraderClient(
     client_id="...",
     client_secret="...",
     access_token="...",
@@ -128,7 +125,7 @@ trading = Trading(backend)
 # async with backend: account = await trading.account.AccountInfo()
 ```
 
-`CTraderBackend` connects to Spotware Open API via length-prefixed Protocol Buffers
+`CTraderClient` connects to Spotware Open API via length-prefixed Protocol Buffers
 over TLS (`live.ctraderapi.com:5035` or demo). It maps Spotware Open API payloads
 into canonical `Trading` properties, symbols, depth of market, trendbars, positions,
 and order execution checks. When protobuf modules are absent, it gracefully raises
@@ -303,30 +300,28 @@ does not stop monitoring or reconnection. Startup token/lock diagnostics remain.
 The existing connected message describes TCP/hello-send success, not completed
 authentication. Recompile/reload the updated EA to use the new input.
 
-## Stage 2C: Dynamic Market Data Providers (`slot: "data.provider"`)
+## Market Data and Execution Clients
 
-Stage 2C introduces typed market data provider plugins discoverable under slot
-`data.provider` coordinated through `BrokerRegistry`. It bridges historical data
-acquisition across local file archives, binary codecs, remote HTTP feeds, and
-active trading broker instances without duplicating or mutating broker state.
+The broker architecture organizes all brokers into standard Python classes inheriting from
+`BrokerClient` (for data ingestion) or `TradingClient` (for data and execution):
 
-### Registered Data Providers
+### Available Clients
 
-1. `dukascopy`: Dukascopy Bank SA historical tick and bar provider (BI5 binary codec & CDN feeds).
-2. `darwinex`: Darwinex tick archives (gzipped / custom binary `.dat` feeds).
-3. `metatrader`: MetaTrader 5 Bridge historical data provider (delegating to active `MT5Backend` or local HST/FXT archives).
-4. `sq_equity`: StrategyQuant US Equities bundled D1 daily historical data provider.
-5. `sq_futures`: StrategyQuant Continuous Futures bundled M1 and D1 historical data provider.
-6. `crypto`: Cryptocurrency Spot and USD-M Futures candle provider (Binance, Bitfinex, Coinbase, Poloniex).
-7. `files`: Local filesystem market data broker supporting CSV, Parquet, MT4 HST, and FXT historical files.
-8. `yahoo`: Yahoo Finance public market data and symbol metadata provider (v8 chart API).
-9. `tick_downloader`: High-precision tick and trade volume historical data downloader plugin.
+1. `DukascopyClient`: Dukascopy Bank SA historical tick and bar client (BI5 binary codec & CDN feeds).
+2. `DarwinexClient`: Darwinex tick archives (gzipped / custom binary `.dat` feeds).
+3. `MetaTraderClient`: MetaTrader 5 Bridge client (delegating to active MQL5 bridge EA or local HST/FXT archives).
+4. `SQEquityClient`: StrategyQuant US Equities bundled D1 daily historical data client.
+5. `SQFuturesClient`: StrategyQuant Continuous Futures bundled M1 and D1 historical data client.
+6. `CryptoClient` / `BinanceClient`: Cryptocurrency Spot and USD-M Futures candle client (Binance, Bitfinex, Coinbase, Poloniex).
+7. `FilesClient`: Local filesystem market data client supporting CSV, Parquet, MT4 HST, and FXT historical files.
+8. `YahooClient`: Yahoo Finance public market data and symbol metadata client (v8 chart API).
+9. `TickDownloaderClient`: High-precision tick and trade volume historical data downloader client.
+10. `SimulatorClient`: Headless pure-Python execution and historical simulation client.
+11. `CTraderClient`: Spotware cTrader Open API Protobuf/TLS execution and data client.
 
 ### Typed Contracts and Invariants
 
-- **Capability Descriptor**: `ProviderCapabilities` declares supported timeframes, modes (`bars`, `ticks`), auth requirements, and rate limits.
-- **Request / Response Models**: `HistoryRequest` enforces strict date bounds and count validation; `HistoryPage` encapsulates typed records, cursor, and provenance metadata.
+- **Direct Method Dispatch**: Callers use `client.get_bars(...)`, `client.get_ticks(...)`, `client.get_symbol_info(...)` directly.
 - **Cancellation**: Cooperative, thread-safe cancellation via `CancellationToken`.
-- **Health Probing**: Every provider exposes `check_health() -> ProviderHealth` verifying reachability, filesystem accessibility, or credentials.
 - **Strict Real-Data Policy**: Production download paths never synthesize synthetic mock records. Unavailable history fails explicitly with typed `ProviderError` subtypes (`ProviderNotFoundError`, `ProviderValidationError`, `ProviderUnsupportedError`, `ProviderRateLimitError`, `ProviderTimeoutError`).
-- **Resource Management**: Registry leases (`with registry.lease(name) as broker:`) coordinate concurrent access and orderly lifecycle release (`close_sync` / `close`).
+- **Resource Management**: Safe idempotent lifecycle release (`close_sync` / `close` / `aclose`).

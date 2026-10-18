@@ -48,7 +48,7 @@ import pandas as pd  # type: ignore[import-untyped]
 import pyarrow as pa
 import pyarrow.parquet as pq
 from app.host.logging import get_logger
-from app.services.brokers.capabilities import ProviderValidationError
+from app.services.brokers.base import BridgeError
 
 logger = get_logger(__name__)
 
@@ -112,9 +112,7 @@ def parse_timestamp_flexible(val: Any) -> datetime:
         except ValueError, IndexError:
             pass
 
-    raise ProviderValidationError(
-        f"Cannot parse datetime from timestamp value: '{val}'"
-    )
+    raise BridgeError(f"Cannot parse datetime from timestamp value: '{val}'")
 
 
 def _detect_delimiter(first_line: str) -> str:
@@ -157,7 +155,7 @@ def parse_delimited_bars(
             has_ts = True
             ts_idx = headers.index("date")
         else:
-            raise ProviderValidationError(
+            raise BridgeError(
                 f"Delimited bars file missing timestamp/date column: {headers}"
             )
     else:
@@ -176,7 +174,7 @@ def parse_delimited_bars(
             clean_c = re.sub(r"[<>]", "", c.lower())
             if clean_c in headers:
                 return headers.index(clean_c)
-        raise ProviderValidationError(
+        raise BridgeError(
             f"Missing required price column among {cands} in headers: {headers}"
         )
 
@@ -213,7 +211,7 @@ def parse_delimited_bars(
             l_val = float(row[l_idx])
             c_val = float(row[c_idx])
         except (ValueError, IndexError) as exc:
-            raise ProviderValidationError(
+            raise BridgeError(
                 f"Malformed row in delimited bars: {row} ({exc})"
             ) from exc
 
@@ -223,13 +221,11 @@ def parse_delimited_bars(
             or math.isnan(l_val)
             or math.isnan(c_val)
         ):
-            raise ProviderValidationError(f"NaN price detected in bar row: {row}")
+            raise BridgeError(f"NaN price detected in bar row: {row}")
         if o_val <= 0 or h_val <= 0 or l_val <= 0 or c_val <= 0:
-            raise ProviderValidationError(
-                f"Non-positive price detected in bar row: {row}"
-            )
+            raise BridgeError(f"Non-positive price detected in bar row: {row}")
         if h_val < max(o_val, c_val) or l_val > min(o_val, c_val):
-            raise ProviderValidationError(
+            raise BridgeError(
                 f"Invalid OHLC relationship in row: open={o_val}, high={h_val}, low={l_val}, close={c_val}"
             )
 
@@ -284,9 +280,7 @@ def parse_delimited_ticks(content: str, symbol: str = "") -> list[dict[str, Any]
             ts_idx = headers.index(c)
             break
     if ts_idx == -1:
-        raise ProviderValidationError(
-            f"Missing timestamp column in tick headers: {headers}"
-        )
+        raise BridgeError(f"Missing timestamp column in tick headers: {headers}")
 
     bid_idx = -1
     ask_idx = -1
@@ -306,9 +300,7 @@ def parse_delimited_ticks(content: str, symbol: str = "") -> list[dict[str, Any]
                 price_idx = headers.index(c)
                 break
         if price_idx == -1:
-            raise ProviderValidationError(
-                f"Tick file requires bid/ask or price columns: {headers}"
-            )
+            raise BridgeError(f"Tick file requires bid/ask or price columns: {headers}")
 
     vol_idx = -1
     for c in ("volume", "vol", "size", "qty", "quantity"):
@@ -337,18 +329,16 @@ def parse_delimited_ticks(content: str, symbol: str = "") -> list[dict[str, Any]
                 float(row[vol_idx]) if vol_idx != -1 and vol_idx < len(row) else 1.0
             )
         except (ValueError, IndexError) as exc:
-            raise ProviderValidationError(
+            raise BridgeError(
                 f"Malformed row in delimited ticks: {row} ({exc})"
             ) from exc
 
         if math.isnan(bid_val) or math.isnan(ask_val) or math.isnan(last_val):
-            raise ProviderValidationError(f"NaN price in tick row: {row}")
+            raise BridgeError(f"NaN price in tick row: {row}")
         if bid_val <= 0 or ask_val <= 0 or last_val <= 0:
-            raise ProviderValidationError(f"Non-positive price in tick row: {row}")
+            raise BridgeError(f"Non-positive price in tick row: {row}")
         if bid_val > ask_val:
-            raise ProviderValidationError(
-                f"Bid price exceeds ask price in tick row: {row}"
-            )
+            raise BridgeError(f"Bid price exceeds ask price in tick row: {row}")
 
         vol_clean = int(vol_val) if vol_val.is_integer() else float(vol_val)
         rows.append(

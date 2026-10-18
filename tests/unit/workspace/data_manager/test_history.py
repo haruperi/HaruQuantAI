@@ -36,7 +36,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 import pytest
-from app.services.brokers.base import BaseBrokerBackend, BridgeError
+from app.services.brokers.base import BridgeError, BrokerClient
 from app.services.include.contracts import (
     MAX_RECORDS,
     MarketBar,
@@ -46,7 +46,6 @@ from app.services.include.data import (
     BAR_COLUMNS,
     TICK_COLUMNS,
     DataBackend,
-    DataBrokerBackend,
     _bounds,
     _route,
     bars_to_dataframe,
@@ -106,96 +105,81 @@ class TestDataBackendProtocol:
         assert hasattr(DataBackend, "call")
 
 
-class TestDataBrokerBackend:
-    """Verify DataBrokerBackend subclassing, routing, and default stubs."""
+class TestBrokerClient:
+    """Verify BrokerClient subclassing and default stubs."""
 
     def test_default_stub_raises(self) -> None:
-        """Verify default fetch_bars and fetch_ticks raise BridgeError."""
-        backend = DataBrokerBackend("test_broker")
+        """Verify default get_bars and get_ticks raise BridgeError."""
+        backend = BrokerClient("test_broker")
         assert backend.name == "test_broker"
-        assert isinstance(backend, BaseBrokerBackend)
 
         with pytest.raises(
             BridgeError, match="test_broker does not support historical bars"
         ):
-            backend.fetch_bars(
-                symbol="EURUSD",
-                timeframe="M1",
-                mode="latest",
-                start=0,
-                end=0,
-                count=10,
-                limit=100,
-            )
+            backend.get_bars("EURUSD")
 
         with pytest.raises(
             BridgeError, match="test_broker does not support tick history"
         ):
-            backend.fetch_ticks(
-                symbol="EURUSD",
-                mode="latest",
-                start_ms=0,
-                end_ms=0,
-                count=10,
-                limit=100,
-            )
+            backend.get_ticks("EURUSD")
 
-    def test_dispatch_bars_and_ticks(self) -> None:
-        """Verify _dispatch delegates MarketData Bars and Ticks to respective methods."""
+    def test_custom_broker_client(self) -> None:
+        """Verify custom BrokerClient subclass returns MarketBar and MarketTick."""
 
-        class CustomDataBroker(DataBrokerBackend):
-            def fetch_bars(
+        class CustomDataBroker(BrokerClient):
+            def get_bars(
                 self,
-                *,
                 symbol: str,
-                timeframe: str,
-                mode: str,
-                start: int,
-                end: int,
-                count: int,
-                limit: int,
-            ) -> list[dict[str, Any]]:
+                timeframe: Timeframe | str = Timeframe.PERIOD_M1,
+                date_from: datetime | None = None,
+                date_to: datetime | None = None,
+                *,
+                start_pos: int | None = None,
+                count: int | None = None,
+                limit: int = 1000,
+            ) -> list[MarketBar]:
                 return [
-                    {
-                        "time": 100,
-                        "open": 1.0,
-                        "high": 1.2,
-                        "low": 0.9,
-                        "close": 1.1,
-                        "tick_volume": 5,
-                        "spread": 0,
-                    }
+                    MarketBar(
+                        time=100,
+                        open=1.0,
+                        high=1.2,
+                        low=0.9,
+                        close=1.1,
+                        tick_volume=5,
+                        spread=0,
+                        real_volume=0,
+                    )
                 ]
 
-            def fetch_ticks(
+            def get_ticks(
                 self,
-                *,
                 symbol: str,
-                mode: str,
-                start_ms: int,
-                end_ms: int,
-                count: int,
-                limit: int,
-            ) -> list[dict[str, Any]]:
-                return [{"time_msc": 1000, "bid": 1.1, "ask": 1.2}]
+                date_from: datetime | None = None,
+                date_to: datetime | None = None,
+                *,
+                count: int | None = None,
+                limit: int = 1000,
+            ) -> list[MarketTick]:
+                return [
+                    MarketTick(
+                        time_msc=1000,
+                        bid=1.1,
+                        ask=1.2,
+                        last=1.15,
+                        volume=1,
+                        flags=0,
+                        volume_real=1.0,
+                    )
+                ]
 
         broker = CustomDataBroker("custom")
-        bars_res = broker._dispatch(
-            "MarketData", "Bars", ["EURUSD", "M1", "latest", 0, 0, 10, 100]
-        )
+        bars_res = broker.get_bars("EURUSD", "M1")
         assert len(bars_res) == 1
-        assert bars_res[0]["open"] == 1.0
+        assert bars_res[0].open == 1.0
 
-        ticks_res = broker._dispatch(
-            "MarketData", "Ticks", ["EURUSD", "latest", 0, 0, 10, 100]
-        )
+        ticks_res = broker.get_ticks("EURUSD")
         assert len(ticks_res) == 1
-        assert ticks_res[0]["bid"] == 1.1
-
-        with pytest.raises(
-            BridgeError, match=r"does not support MarketData\.UnknownMethod"
-        ):
-            broker._dispatch("MarketData", "UnknownMethod", [])
+        assert ticks_res[0].bid == 1.1
 
 
 class TestRequestValidation:
@@ -293,6 +277,52 @@ class TestRowValidation:
         assert len(ticks) == 1
         assert isinstance(ticks[0], MarketTick)
         assert ticks[0].bid == 1.1
+
+    def test_valid_bars_dataclass(self) -> None:
+        """Verify already instantiated MarketBar objects pass validate_rows."""
+        payload = [
+            MarketBar(
+                time=100,
+                open=1.1,
+                high=1.2,
+                low=1.0,
+                close=1.15,
+                tick_volume=10,
+                spread=1,
+                real_volume=0,
+            ),
+            MarketBar(
+                time=160,
+                open=1.15,
+                high=1.25,
+                low=1.10,
+                close=1.20,
+                tick_volume=15,
+                spread=1,
+                real_volume=0,
+            ),
+        ]
+        bars = validate_rows(payload, "bars", 50, 200, 10)
+        assert len(bars) == 2
+        assert bars[0] is payload[0]
+        assert bars[1] is payload[1]
+
+    def test_valid_ticks_dataclass(self) -> None:
+        """Verify already instantiated MarketTick objects pass validate_rows."""
+        payload = [
+            MarketTick(
+                time_msc=1000,
+                bid=1.1,
+                ask=1.2,
+                last=1.15,
+                volume=10,
+                flags=0,
+                volume_real=0.0,
+            )
+        ]
+        ticks = validate_rows(payload, "ticks", 500, 1500, 10)
+        assert len(ticks) == 1
+        assert ticks[0] is payload[0]
 
     def test_invalid_payload_cases(self) -> None:
         """Verify invalid schema, numbers, chronology, and OHLC raise BridgeError."""
@@ -522,29 +552,28 @@ class TestAsyncHistoricalRetrieval:
         """Verify get_historical_bars with date range."""
 
         class MockBackend:
-            async def call(
+            async def get_bars(
                 self,
+                symbol: str,
+                timeframe: Timeframe | str = Timeframe.PERIOD_M1,
+                date_from: datetime | None = None,
+                date_to: datetime | None = None,
                 *,
-                object_id: str,
-                class_name: str,
-                method_name: str,
-                args: list[Any],
-                requires_arm: bool = False,
-                timeout: float | None = None,  # noqa: ASYNC109
-            ) -> Any:
-                assert class_name == "MarketData"
-                assert method_name == "Bars"
+                start_pos: int | None = None,
+                count: int | None = None,
+                limit: int = 1000,
+            ) -> list[MarketBar]:
                 return [
-                    {
-                        "time": 1672531200,
-                        "open": 1.1,
-                        "high": 1.2,
-                        "low": 1.0,
-                        "close": 1.15,
-                        "tick_volume": 10,
-                        "spread": 1,
-                        "real_volume": 0,
-                    }
+                    MarketBar(
+                        time=1672531200,
+                        open=1.1,
+                        high=1.2,
+                        low=1.0,
+                        close=1.15,
+                        tick_volume=10,
+                        spread=1,
+                        real_volume=0,
+                    )
                 ]
 
         backend = MockBackend()
@@ -560,28 +589,25 @@ class TestAsyncHistoricalRetrieval:
         """Verify get_ticks with count limit."""
 
         class MockBackend:
-            async def call(
+            async def get_ticks(
                 self,
+                symbol: str,
+                date_from: datetime | None = None,
+                date_to: datetime | None = None,
                 *,
-                object_id: str,
-                class_name: str,
-                method_name: str,
-                args: list[Any],
-                requires_arm: bool = False,
-                timeout: float | None = None,  # noqa: ASYNC109
-            ) -> Any:
-                assert class_name == "MarketData"
-                assert method_name == "Ticks"
+                count: int | None = None,
+                limit: int = 1000,
+            ) -> list[MarketTick]:
                 return [
-                    {
-                        "time_msc": 1672531200100,
-                        "bid": 1.100,
-                        "ask": 1.102,
-                        "last": 1.101,
-                        "volume": 5,
-                        "flags": 0,
-                        "volume_real": 0.0,
-                    }
+                    MarketTick(
+                        time_msc=1672531200100,
+                        bid=1.100,
+                        ask=1.102,
+                        last=1.101,
+                        volume=5,
+                        flags=0,
+                        volume_real=0.0,
+                    )
                 ]
 
         backend = MockBackend()

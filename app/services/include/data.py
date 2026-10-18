@@ -18,9 +18,6 @@ Key Capabilities:
     - FR-INCLUDE-DATA-BACKEND-PROTOCOL: Execution protocol for market data readers.
       Associated: `DataBackend`.
       Logging: Protocol definition with zero side effects.
-    - FR-INCLUDE-DATA-BROKER-BACKEND: Base market data provider adapter.
-      Associated: `DataBrokerBackend`.
-      Logging: DEBUG market data dispatch lifecycle through BaseBrokerBackend.
     - FR-INCLUDE-DATA-BARS-TO-DATAFRAME: Convert historical bars to pandas DataFrame.
       Associated: `bars_to_dataframe()`, `bars_to_df()`.
       Logging: In-memory vectorized DataFrame construction.
@@ -52,20 +49,20 @@ CLI Usage:
 
 from __future__ import annotations
 
+import inspect
 import math
 from collections.abc import Iterable
-from dataclasses import fields
+from dataclasses import asdict, fields
 from datetime import UTC, datetime
-from typing import Any, Literal, Protocol, override
+from typing import Any, Literal, Protocol
 
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
-from app.services.brokers.base import BaseBrokerBackend, BridgeError
+from app.services.brokers.base import BridgeError
 
 from .contracts import (
     MAX_POSITION,
     MAX_RECORDS,
-    READ_TIMEOUT,
     TIMEFRAME_SECONDS,
     MarketBar,
     MarketTick,
@@ -76,7 +73,6 @@ __all__ = [
     "BAR_COLUMNS",
     "TICK_COLUMNS",
     "DataBackend",
-    "DataBrokerBackend",
     "bars_to_dataframe",
     "bars_to_df",
     "get_historical_bars",
@@ -91,7 +87,7 @@ logger = get_logger(__name__)
 
 
 class DataBackend(Protocol):
-    """Execution protocol for market data readers."""
+    """Execution protocol for market data readers supporting interfaces."""
 
     async def call(
         self,
@@ -105,95 +101,6 @@ class DataBackend(Protocol):
     ) -> Any:
         """Execute a market data query over backend transport."""
         ...
-
-
-class DataBrokerBackend(BaseBrokerBackend):
-    """Base adapter for market data providers conforming to DataBackend."""
-
-    @override
-    def _dispatch(self, class_name: str, method_name: str, args: list[Any]) -> Any:
-        """Route call to subclass methods, handling MarketData queries."""
-        if class_name == "MarketData":
-            if method_name == "Bars":
-                return self._dispatch_bars(args)
-            if method_name == "Ticks":
-                return self._dispatch_ticks(args)
-        return super()._dispatch(class_name, method_name, args)
-
-    def _dispatch_bars(self, args: list[Any]) -> list[dict[str, Any]] | list[MarketBar]:
-        """Unpack canonical args and invoke fetch_bars."""
-        padded: list[Any] = list(args) + [None] * 7
-        symbol = str(padded[0]) if padded[0] is not None else "EURUSD"
-        timeframe = str(padded[1]) if padded[1] is not None else "H1"
-        mode = str(padded[2]) if padded[2] is not None else "latest"
-        start = int(padded[3]) if padded[3] is not None else 0
-        end = int(padded[4]) if padded[4] is not None else 0
-        count = int(padded[5]) if padded[5] is not None else 0
-        limit = int(padded[6]) if padded[6] is not None else 1000
-        return self.fetch_bars(
-            symbol=symbol,
-            timeframe=timeframe,
-            mode=mode,
-            start=start,
-            end=end,
-            count=count,
-            limit=limit,
-        )
-
-    def _dispatch_ticks(
-        self, args: list[Any]
-    ) -> list[dict[str, Any]] | list[MarketTick]:
-        """Unpack canonical args and invoke fetch_ticks."""
-        padded: list[Any] = list(args) + [None] * 6
-        symbol = str(padded[0]) if padded[0] is not None else "EURUSD"
-        mode = str(padded[1]) if padded[1] is not None else "latest"
-        start_ms = int(padded[2]) if padded[2] is not None else 0
-        end_ms = int(padded[3]) if padded[3] is not None else 0
-        count = int(padded[4]) if padded[4] is not None else 0
-        limit = int(padded[5]) if padded[5] is not None else 1000
-        return self.fetch_ticks(
-            symbol=symbol,
-            mode=mode,
-            start_ms=start_ms,
-            end_ms=end_ms,
-            count=count,
-            limit=limit,
-        )
-
-    def fetch_bars(
-        self,
-        *,
-        symbol: str,
-        timeframe: str,
-        mode: str,
-        start: int,
-        end: int,
-        count: int,
-        limit: int,
-    ) -> list[dict[str, Any]] | list[MarketBar]:
-        """Subclass hook to fetch historical candlestick bars."""
-        del symbol, timeframe, mode, start, end, count, limit
-        raise BridgeError(
-            f"{self.name} does not support historical bars",
-            code="UNSUPPORTED_OPERATION",
-        )
-
-    def fetch_ticks(
-        self,
-        *,
-        symbol: str,
-        mode: str,
-        start_ms: int,
-        end_ms: int,
-        count: int,
-        limit: int,
-    ) -> list[dict[str, Any]] | list[MarketTick]:
-        """Subclass hook to fetch historical or live ticks."""
-        del symbol, mode, start_ms, end_ms, count, limit
-        raise BridgeError(
-            f"{self.name} does not support tick history",
-            code="UNSUPPORTED_OPERATION",
-        )
 
 
 def validate_request(
@@ -252,9 +159,13 @@ def validate_rows(
     previous: int | None = None
     result: list[Any] = []
     for row in payload:
-        if not isinstance(row, dict) or set(row) != names:
+        if isinstance(row, record_type):
+            row_dict = asdict(row)
+        elif isinstance(row, dict) and set(row) == names:
+            row_dict = row
+        else:
             raise BridgeError("invalid history row", code="INVALID_MARKET_DATA")
-        for name, value in row.items():
+        for name, value in row_dict.items():
             valid = (
                 type(value) is int and value >= 0
                 if name in integer_names
@@ -264,21 +175,24 @@ def validate_rows(
             )
             if not valid:
                 raise BridgeError("invalid history number", code="INVALID_MARKET_DATA")
-        stamp = row["time" if kind == "bars" else "time_msc"]
+        stamp = row_dict["time" if kind == "bars" else "time_msc"]
         if not start <= stamp <= end or (
             previous is not None
             and (stamp <= previous if kind == "bars" else stamp < previous)
         ):
             raise BridgeError("invalid history chronology", code="INVALID_MARKET_DATA")
         if kind == "bars" and not (
-            row["low"]
-            <= min(row["open"], row["close"])
-            <= max(row["open"], row["close"])
-            <= row["high"]
+            row_dict["low"]
+            <= min(row_dict["open"], row_dict["close"])
+            <= max(row_dict["open"], row_dict["close"])
+            <= row_dict["high"]
         ):
             raise BridgeError("invalid OHLC values", code="INVALID_MARKET_DATA")
         previous = stamp
-        result.append(record_type(**row))
+        if isinstance(row, record_type):
+            result.append(row)
+        else:
+            result.append(record_type(**row_dict))
     return result
 
 
@@ -326,7 +240,7 @@ def _route(
 
 
 async def get_historical_bars(
-    backend: DataBackend,
+    backend: Any,
     symbol: str,
     timeframe: Timeframe,
     date_from: datetime | None = None,
@@ -350,13 +264,23 @@ async def get_historical_bars(
     )
     if mode == "range" and start > end:
         return []
-    payload = await backend.call(
-        object_id="market-data",
-        class_name="MarketData",
-        method_name="Bars",
-        args=[symbol, timeframe.value, mode, start, end, number, limit],
-        timeout=READ_TIMEOUT,
+
+    if not hasattr(backend, "get_bars"):
+        raise BridgeError(
+            f"Backend {type(backend).__name__} does not implement get_bars()",
+            code="UNSUPPORTED_OPERATION",
+        )
+    payload = backend.get_bars(
+        symbol=symbol,
+        timeframe=timeframe,
+        date_from=date_from,
+        date_to=date_to,
+        start_pos=start_pos,
+        count=count,
+        limit=limit,
     )
+    if inspect.isawaitable(payload):
+        payload = await payload
     rows = validate_rows(
         payload, "bars", 0 if mode == "position" else start, end, number or limit
     )
@@ -364,7 +288,7 @@ async def get_historical_bars(
 
 
 async def get_ticks(
-    backend: DataBackend,
+    backend: Any,
     symbol: str,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
@@ -385,13 +309,21 @@ async def get_ticks(
     )
     if mode == "range" and start > end:
         return []
-    payload = await backend.call(
-        object_id="market-data",
-        class_name="MarketData",
-        method_name="Ticks",
-        args=[symbol, mode, start, end, number, limit],
-        timeout=READ_TIMEOUT,
+
+    if not hasattr(backend, "get_ticks"):
+        raise BridgeError(
+            f"Backend {type(backend).__name__} does not implement get_ticks()",
+            code="UNSUPPORTED_OPERATION",
+        )
+    payload = backend.get_ticks(
+        symbol=symbol,
+        date_from=date_from,
+        date_to=date_to,
+        count=count,
+        limit=limit,
     )
+    if inspect.isawaitable(payload):
+        payload = await payload
     rows = validate_rows(payload, "ticks", start, end, number or limit)
     return [row for row in rows if isinstance(row, MarketTick)]
 

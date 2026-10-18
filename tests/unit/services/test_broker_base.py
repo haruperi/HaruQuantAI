@@ -1,12 +1,12 @@
-"""Unit tests for BaseBrokerBackend in app.services.brokers.base and DataBrokerBackend.
+"""Unit tests for BrokerClient and TradingClient in app.services.brokers.base.
 
 Description:
     Validates lifecycle hooks, asynchronous dispatch routing, execution receipts,
-    context management, and error handling for the foundational BaseBrokerBackend
-    and DataBrokerBackend adapters.
+    context management, and error handling for the foundational BrokerClient
+    and TradingClient implementations.
 
 Purpose:
-    FEAT-BROKER-BASE: Unit test suite for foundational broker backend adapters.
+    FEAT-BROKER-BASE: Unit test suite for foundational broker client classes.
 
 Key Capabilities:
     - FR-BROKER-BASE-ROUTING: Verify dispatch routing for symbol queries and
@@ -25,236 +25,139 @@ from __future__ import annotations
 import asyncio
 
 import pytest
-from app.services.brokers.base import BaseBrokerBackend, BridgeError
+from app.services.brokers.base import (
+    BridgeError,
+    BrokerClient,
+    TradingClient,
+)
 from app.services.include.contracts import (
     SymbolInfo,
     TerminalInfo,
 )
 from app.services.include.enums import ReceiptStatus
-from app.workspace.data_manager import (
-    DataBrokerBackend,
-    MarketBar,
-    MarketTick,
-)
 
 
-class TestBaseBrokerBackend:
-    """Test suite for BaseBrokerBackend in brokers.base."""
+class TestBrokerClient:
+    """Test suite for BrokerClient in brokers.base."""
 
     def test_default_lifecycle_and_stubs(self) -> None:
         """Verify default base class methods and lifecycle hooks."""
-        broker = BaseBrokerBackend("base_broker")
-        assert broker.name == "base_broker"
-        broker.arm()
-        broker.disarm()
+        client = BrokerClient("base_client")
+        assert client.name == "base_client"
+        assert not client.connected
+        client.connect()
+        assert client.connected
+        client.disconnect()
+        assert not client.connected
+
+        info = client.get_symbol_info("EURUSD")
+        assert isinstance(info, SymbolInfo)
+        assert info.name == "EURUSD"
+        assert client.get_symbols() == []
+
+        with pytest.raises(BridgeError, match="does not support historical bars"):
+            client.get_bars("EURUSD")
+
+        with pytest.raises(BridgeError, match="does not support tick history"):
+            client.get_ticks("EURUSD")
+
+
+class TestTradingClient:
+    """Test suite for TradingClient in brokers.base."""
+
+    def test_default_lifecycle_and_stubs(self) -> None:
+        """Verify default trading class methods and lifecycle hooks."""
+        client = TradingClient("base_trading")
+        assert client.name == "base_trading"
+        assert not client.is_armed
+        client.arm()
+        assert client.is_armed
+        client.disarm()
+        assert not client.is_armed
 
         async def run_lifecycle() -> None:
-            await broker.start()
-            assert bool(broker._is_connected)
-            await broker.wait_connected()
-            assert bool(broker._is_connected)
-            await broker.close()
-            assert not broker._is_connected
+            await client.start()
+            assert client.connected
+            await client.wait_connected()
+            assert client.connected
+            await client.close()
+            assert not client.connected
 
-            async with broker as b:
-                assert b is broker
-                assert bool(broker._is_connected)
-
-            with pytest.raises(
-                NotImplementedError,
-                match="does not emit asynchronous transaction events",
-            ):
-                await broker.next_event()
+            async with client as c:
+                assert c is client
+                assert client.connected
 
             with pytest.raises(
                 NotImplementedError,
                 match="does not emit asynchronous transaction events",
             ):
-                await broker.await_request_event(1)
+                await client.next_event()
+
+            with pytest.raises(
+                NotImplementedError,
+                match="does not emit asynchronous transaction events",
+            ):
+                await client.await_request_event(1)
 
         asyncio.run(run_lifecycle())
 
-        info = broker.symbol_info("EURUSD")
-        assert isinstance(info, SymbolInfo)
-        assert info.name == "EURUSD"
-        assert broker.symbols_get() == []
-
     def test_call_routing_and_receipts(self) -> None:
         """Verify method call routing, receipts, and execution tracking."""
-        broker = BaseBrokerBackend("base_broker")
-        assert broker.last_command_id() is None
-        assert broker.receipt("nonexistent") is None
+        client = TradingClient("base_trading")
+        assert client.last_command_id() is None
+        assert client.receipt("nonexistent") is None
 
         async def run_calls() -> None:
             # Call SymbolInfo.SymbolInfo
-            sym = await broker.call(
-                object_id="broker",
+            sym = await client.call(
+                object_id="client",
                 class_name="SymbolInfo",
                 method_name="SymbolInfo",
                 args=["EURUSD"],
             )
             assert isinstance(sym, SymbolInfo)
             assert sym.name == "EURUSD"
-            cmd_id = broker.last_command_id()
+            cmd_id = client.last_command_id()
             assert cmd_id is not None
-            rcpt = broker.receipt(cmd_id)
+            rcpt = client.receipt(cmd_id)
             assert rcpt is not None
             assert rcpt.status == ReceiptStatus.RESOLVED
 
             # Call SymbolInfo.SymbolsGet
-            symbols = await broker.call(
-                object_id="broker",
+            symbols = await client.call(
+                object_id="client",
                 class_name="SymbolInfo",
                 method_name="SymbolsGet",
                 args=[],
             )
             assert symbols == []
 
-            # Call TerminalInfo.TerminalInfo
-            terminal = await broker.call(
-                object_id="broker",
+            # Call TerminalInfo
+            terminal = await client.call(
+                object_id="client",
                 class_name="TerminalInfo",
                 method_name="TerminalInfo",
                 args=[],
             )
             assert isinstance(terminal, TerminalInfo)
-            assert terminal.name == "base_broker"
+            assert terminal.name == "base_trading"
             assert terminal.connected is True
             assert terminal.trade_allowed is False
 
             # Unsupported method raises BridgeError and sets REJECTED receipt
             with pytest.raises(
-                BridgeError, match=r"base_broker does not support Trading\.OrderSend"
+                BridgeError, match=r"base_trading does not support Nonexistent\.Foo"
             ):
-                await broker.call(
-                    object_id="broker",
-                    class_name="Trading",
-                    method_name="OrderSend",
+                await client.call(
+                    object_id="client",
+                    class_name="Nonexistent",
+                    method_name="Foo",
                     args=[],
                 )
-            unsupported_cmd_id = broker.last_command_id()
+            unsupported_cmd_id = client.last_command_id()
             assert unsupported_cmd_id is not None
-            unsupported_rcpt = broker.receipt(unsupported_cmd_id)
+            unsupported_rcpt = client.receipt(unsupported_cmd_id)
             assert unsupported_rcpt is not None
             assert unsupported_rcpt.status == ReceiptStatus.REJECTED
-
-        asyncio.run(run_calls())
-
-
-class TestDataBrokerBackend:
-    """Test suite for DataBrokerBackend in libs.data."""
-
-    def test_default_data_hooks(self) -> None:
-        """Verify default data hooks raise BridgeError."""
-        broker = DataBrokerBackend("base_data")
-        assert broker.name == "base_data"
-        assert isinstance(broker, BaseBrokerBackend)
-
-        with pytest.raises(
-            BridgeError, match="base_data does not support historical bars"
-        ):
-            broker.fetch_bars(
-                symbol="EURUSD",
-                timeframe="M1",
-                mode="latest",
-                start=0,
-                end=0,
-                count=100,
-                limit=1000,
-            )
-
-        with pytest.raises(
-            BridgeError, match="base_data does not support tick history"
-        ):
-            broker.fetch_ticks(
-                symbol="EURUSD",
-                mode="latest",
-                start_ms=0,
-                end_ms=0,
-                count=100,
-                limit=1000,
-            )
-
-    def test_market_data_dispatch(self) -> None:
-        """Verify MarketData dispatch routing for bars and ticks."""
-
-        class MockDataBroker(DataBrokerBackend):
-            def __init__(self) -> None:
-                super().__init__("mock_data_broker")
-
-            def fetch_bars(
-                self,
-                *,
-                symbol: str,
-                timeframe: str,
-                mode: str,
-                start: int,
-                end: int,
-                count: int,
-                limit: int,
-            ) -> list[MarketBar]:
-                if symbol == "FAIL":
-                    raise ValueError("bar failure")
-                return [
-                    MarketBar(
-                        time=1700000000,
-                        open=1.1,
-                        high=1.2,
-                        low=1.0,
-                        close=1.15,
-                        tick_volume=10,
-                        spread=1,
-                        real_volume=100,
-                    )
-                ]
-
-            def fetch_ticks(
-                self,
-                *,
-                symbol: str,
-                mode: str,
-                start_ms: int,
-                end_ms: int,
-                count: int,
-                limit: int,
-            ) -> list[MarketTick]:
-                return [
-                    MarketTick(
-                        time_msc=1700000000000,
-                        bid=1.1,
-                        ask=1.2,
-                        last=1.15,
-                        volume=10,
-                        flags=6,
-                        volume_real=10.0,
-                    )
-                ]
-
-        broker = MockDataBroker()
-
-        async def run_calls() -> None:
-            bars = await broker.call(
-                object_id="broker",
-                class_name="MarketData",
-                method_name="Bars",
-                args=["EURUSD", "M1", "latest", 0, 0, 10, 1000],
-            )
-            assert len(bars) == 1
-
-            ticks = await broker.call(
-                object_id="broker",
-                class_name="MarketData",
-                method_name="Ticks",
-                args=["EURUSD", "latest", 0, 0, 10, 1000],
-            )
-            assert len(ticks) == 1
-
-            with pytest.raises(ValueError, match="bar failure"):
-                await broker.call(
-                    object_id="broker",
-                    class_name="MarketData",
-                    method_name="Bars",
-                    args=["FAIL", "M1"],
-                )
 
         asyncio.run(run_calls())

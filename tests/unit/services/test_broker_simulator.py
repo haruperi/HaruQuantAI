@@ -1,9 +1,9 @@
-"""Unit tests for SimulationBackend and _simulation_api dispatch models.
+"""Unit tests for SimulatorClient and _simulation_api dispatch models.
 
 Description:
     Validates in-memory execution, tick feeding, market order placement,
     pending orders, position management, deals, mark-to-market calculations,
-    and unified info data structures in SimulationBackend.
+    and unified info data structures in SimulatorClient.
 
 Purpose:
     FEAT-BROKER-SIMULATION-TESTS: Verification suite for simulation backend.
@@ -28,7 +28,7 @@ CLI Usage:
 from __future__ import annotations
 
 import pytest
-from app.services.brokers.simulator import SimulationBackend
+from app.services.brokers.simulator import SimulatorClient
 from app.services.include.contracts import (
     DealInfo,
     OrderInfo,
@@ -53,9 +53,9 @@ from app.workspace.data_manager import MarketTick
 
 
 @pytest.fixture
-def sim_backend() -> SimulationBackend:
-    """Provide an armed and connected SimulationBackend with EURUSD registered."""
-    backend = SimulationBackend(
+def sim_backend() -> SimulatorClient:
+    """Provide an armed and connected SimulatorClient with EURUSD registered."""
+    backend = SimulatorClient(
         initial_balance=10_000.0,
         leverage=100,
         margin_mode=MarginMode.RETAIL_HEDGING,
@@ -79,10 +79,10 @@ def sim_backend() -> SimulationBackend:
     return backend
 
 
-class TestSimulationBackendModels:
+class TestSimulatorClientModels:
     """Verify that backend methods operate on and return unified info models."""
 
-    def test_symbol_and_tick_models(self, sim_backend: SimulationBackend) -> None:
+    def test_symbol_and_tick_models(self, sim_backend: SimulatorClient) -> None:
         """Verify symbol lookups and ticks return info models."""
         spec = sim_backend.symbol("EURUSD")
         assert spec is not None
@@ -102,7 +102,7 @@ class TestSimulationBackendModels:
         assert tick.time_msc > 0
 
     def test_market_buy_and_position_deal_models(
-        self, sim_backend: SimulationBackend
+        self, sim_backend: SimulatorClient
     ) -> None:
         """Verify market execution creates PositionInfo and DealInfo."""
         req = TradeRequest(
@@ -136,7 +136,7 @@ class TestSimulationBackendModels:
         assert deal.volume == 0.1
         assert deal.price == 1.1002
 
-    def test_market_close_deal_model(self, sim_backend: SimulationBackend) -> None:
+    def test_market_close_deal_model(self, sim_backend: SimulatorClient) -> None:
         """Verify closing a position creates an OUT deal and clears the position."""
         open_req = TradeRequest(
             action=TradeAction.DEAL,
@@ -169,7 +169,7 @@ class TestSimulationBackendModels:
         assert out_deal.profit > 0.0
 
     def test_pending_order_models_and_expiration(
-        self, sim_backend: SimulationBackend
+        self, sim_backend: SimulatorClient
     ) -> None:
         """Verify pending order placement returns OrderInfo and tracks history."""
         req = TradeRequest(
@@ -205,11 +205,11 @@ class TestSimulationBackendModels:
         assert canceled_ord.state == int(OrderState.CANCELED)
 
 
-class TestSimulationBackendDispatch:
+class TestSimulatorClientDispatch:
     """Verify asynchronous call dispatch and receipts."""
 
     @pytest.mark.anyio
-    async def test_call_symbol_info(self, sim_backend: SimulationBackend) -> None:
+    async def test_call_symbol_info(self, sim_backend: SimulatorClient) -> None:
         """Verify SymbolInfo dispatch via call returns structured data."""
         res = await sim_backend.call(
             object_id="sym_1",
@@ -225,7 +225,7 @@ class TestSimulationBackendDispatch:
         assert receipt.status == ReceiptStatus.RESOLVED
 
     @pytest.mark.anyio
-    async def test_call_account_info(self, sim_backend: SimulationBackend) -> None:
+    async def test_call_account_info(self, sim_backend: SimulatorClient) -> None:
         """Verify AccountInfo dispatch via call."""
         info = await sim_backend.call(
             object_id="acc_1",
@@ -237,7 +237,7 @@ class TestSimulationBackendDispatch:
         assert balance == 10_000.0
 
     @pytest.mark.anyio
-    async def test_call_trade_order_send(self, sim_backend: SimulationBackend) -> None:
+    async def test_call_trade_order_send(self, sim_backend: SimulatorClient) -> None:
         """Verify Trade.OrderSend dispatch via call creates event and receipt."""
         res = await sim_backend.call(
             object_id="trade_1",

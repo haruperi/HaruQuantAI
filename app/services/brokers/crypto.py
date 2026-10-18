@@ -1,46 +1,45 @@
-"""Binance and cryptocurrency exchange market data and symbol metadata broker.
+"""Binance and cryptocurrency exchange market data and symbol metadata clients.
 
 Description:
-    Implements a cryptocurrency market data and symbol catalog broker connecting
+    Implements cryptocurrency market data and symbol catalog clients connecting
     directly to Binance (Spot, USDT-M, and Coin-M) and supported exchange venues
-    (Bitfinex, Coinbase, and Poloniex). Conforms directly to the canonical
-    `TradingBackend` protocol via `DataBrokerBackend`. Provides normalized
-    historical candlestick bars (`MarketData.Bars`), trade ticks
-    (`MarketData.Ticks`), and symbol specifications (`SymbolInfo`).
+    (Bitfinex, Coinbase, and Poloniex). Conforms directly to the uniform `BrokerClient`
+    interface. Provides normalized historical candlestick bars (`MarketBar`),
+    trade ticks (`MarketTick`), and symbol specifications (`SymbolInfo`).
 
 Purpose:
     FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE: Cryptocurrency exchange integrations.
 
 Key Capabilities:
     - FR-BROKER-BINANCE-SYMBOLS: Binance ExchangeInfo Symbol Resolution
-      Associated: `[BinanceBroker.symbol_info()]`, `[BinanceBroker.symbols_get()]`
+      Associated: `[BinanceClient.get_symbol_info()]`, `[BinanceClient.get_symbols()]`
       Logging: Emits INFO log upon resolving symbol info or catalog count,
       and WARNING log if symbol is not found or request fails.
     - FR-BROKER-BINANCE-MARKET-DATA: Historical Kline Extraction and Real Trades
-      Associated: `[BinanceBroker.fetch_bars()]`, `[BinanceBroker.fetch_ticks()]`
+      Associated: `[BinanceClient.get_bars()]`, `[BinanceClient.get_ticks()]`
       Logging: Emits INFO log with bar counts retrieved from Binance API, and
       ERROR log on network or parsing failure.
     - FR-BROKER-BITFINEX-CANDLES: Fetch and normalize historical candles from Bitfinex API v2.
-      Associated: `[BitfinexExchangeAdapter.fetch_bars()]`
+      Associated: `[BitfinexExchangeAdapter.get_bars()]`
       Logging: Emits DEBUG when requesting candles and logging received record counts.
     - FR-BROKER-COINBASE-CANDLES: Fetch and normalize historical candles from Coinbase API.
-      Associated: `[CoinbaseExchangeAdapter.fetch_bars()]`
+      Associated: `[CoinbaseExchangeAdapter.get_bars()]`
       Logging: Emits DEBUG when requesting candles and logging received record counts.
     - FR-BROKER-POLONIEX-CANDLES: Fetch and normalize historical candles from Poloniex API.
-      Associated: `[PoloniexExchangeAdapter.fetch_bars()]`
+      Associated: `[PoloniexExchangeAdapter.get_bars()]`
       Logging: Emits DEBUG when requesting candles and logging received record counts.
 
 Python API Usage:
     ```python
-    from app.services.brokers.crypto import BinanceBroker
-    from app.services.include.data import get_historical_bars, get_ticks
+    from app.services.brokers.crypto import BinanceClient
     from app.services.include.enums import Timeframe
 
-    broker = BinanceBroker()
-    bars = await get_historical_bars(broker, "BTCUSDT", Timeframe.PERIOD_H1, count=5)
+    client = BinanceClient()
+    bars = client.get_bars("BTCUSDT", Timeframe.PERIOD_H1, count=5)
     assert len(bars) > 0
-    ticks = await get_ticks(broker, "BTCUSDT", count=5)
+    ticks = client.get_ticks("BTCUSDT", count=5)
     assert len(ticks) > 0
+    client.disconnect()
     ```
 
 CLI Usage:
@@ -53,21 +52,15 @@ from datetime import UTC, datetime
 from typing import Any, override
 
 import requests
-from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
 from app.services.brokers._http import create_http_session, execute_bounded_get
-from app.services.brokers.base import BridgeError
-from app.services.brokers.capabilities import (
-    CancellationToken,
-    HistoryPage,
-    HistoryRequest,
-    ProviderCapabilities,
-    ProviderHealth,
-    ProviderUnsupportedError,
-    ProviderValidationError,
+from app.services.brokers.base import (
+    BridgeError,
+    BrokerClient,
+    epoch_millis,
+    epoch_seconds,
 )
-from app.services.include.contracts import SymbolInfo
-from app.services.include.data import DataBrokerBackend
+from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
@@ -107,39 +100,12 @@ DEFAULT_CRYPTO_SYMBOLS = [
     "XRPUSDT",
 ]
 
-PLUGIN_MANIFEST = {
-    "id": "crypto",
-    "name": "Crypto",
-    "version": "1.0.0",
-    "slot": "data.provider",
-    "entry_point": "crypto:create_adapter",
-    "description": "Cryptocurrency exchanges provider (Binance, Bitfinex, Coinbase, Poloniex)",
-    "capabilities": ["data.fetch"],
-}
-
 __all__ = [
-    "BINANCE_FUTURES_COIN_BASE_URL",
-    "BINANCE_FUTURES_USDT_BASE_URL",
-    "BINANCE_SPOT_BASE_URL",
-    "BINANCE_TIMEFRAME_MAP",
-    "BITFINEX_CANDLES_FR",
-    "BITFINEX_TIMEFRAME_MAP",
-    "BinanceBroker",
-    "BitfinexExchangeAdapter",
-    "COINBASE_CANDLES_FR",
-    "COINBASE_GRANULARITY_MAP",
-    "COINBASE_SUPPORTED_GRANULARITIES",
-    "CoinbaseExchangeAdapter",
-    "CryptoBroker",
-    "PLUGIN_MANIFEST",
-    "POLONIEX_CANDLES_FR",
-    "POLONIEX_INTERVAL_MAP",
-    "PoloniexExchangeAdapter",
-    "TIMEFRAME_MAP",
-    "_calc_digits",
-    "_map_timeframe",
-    "create_adapter",
-    "main",
+    "BinanceClient",
+    "BitfinexClient",
+    "CoinbaseClient",
+    "CryptoClient",
+    "PoloniexClient",
 ]
 
 BITFINEX_CANDLES_FR = "FR-BROKER-BITFINEX-CANDLES"
@@ -197,268 +163,257 @@ class BitfinexExchangeAdapter:
     def __init__(self, session: requests.Session | None = None) -> None:
         self.session = session or create_http_session("HaruQuantAI-BitfinexAdapter/1.0")
 
-    def fetch_bars(
+    def get_bars(
         self,
         *,
         symbol: str,
-        timeframe: str,
+        timeframe: str | Timeframe,
         start: int = 0,
         end: int = 0,
-        count: int = 100,
+        count: int = 0,
         limit: int = 1000,
-        token: CancellationToken | None = None,
-        **kwargs: Any,
-    ) -> list[dict[str, Any]]:
-        """Fetch historical candlestick bars from Bitfinex v2 candles endpoint."""
-        sym = symbol.strip().upper()
-        if not sym.startswith("T"):
+    ) -> list[MarketBar]:
+        """Fetch historical candlestick bars from Bitfinex API v2."""
+        tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_H1)
+        interval = BITFINEX_TIMEFRAME_MAP.get(tf, "1h")
+        sym = symbol.strip().upper().replace("/", "").replace("_", "").replace("-", "")
+        if not sym.startswith("t"):
             sym = f"t{sym}"
 
-        parsed_tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
-        tf = BITFINEX_TIMEFRAME_MAP.get(parsed_tf, "1m")
-        url = f"{self.BASE_URL}/v2/candles/trade:{tf}:{sym}/hist"
+        params: dict[str, Any] = {"limit": min(count or limit, 1000), "sort": 1}
+        if start > 0:
+            params["start"] = start * 1000
+        if end > 0:
+            params["end"] = end * 1000
 
-        target_limit = min(max(count, limit), 1000)
-        params: dict[str, Any] = {"limit": target_limit, "sort": 1}
-        if start and start > 0:
-            params["start"] = start * 1000 if start < 100_000_000_000 else start
-        if end and end > 0:
-            params["end"] = end * 1000 if end < 100_000_000_000 else end
-
-        resp = execute_bounded_get(
-            self.session,
-            url,
-            params=params,
-            token=token,
-            provider="crypto:bitfinex",
+        url = f"{self.BASE_URL}/v2/candles/trade:{interval}:{sym}/hist"
+        r = execute_bounded_get(
+            self.session, url, params=params, provider="crypto:bitfinex"
         )
-        if resp.status_code != 200:
-            logger.warning(
-                "%s: Bitfinex returned status %d for %s",
-                BITFINEX_CANDLES_FR,
-                resp.status_code,
-                sym,
+        if r.status_code == 429:
+            raise BridgeError(
+                "Bitfinex rate limit exceeded (HTTP 429)", code="RATE_LIMITED"
             )
-            return []
-
-        payload = resp.json()
-        if not isinstance(payload, list):
-            return []
-
-        rows: list[dict[str, Any]] = []
-        for item in payload:
-            if not isinstance(item, list) or len(item) < 6:
-                continue
-            # Layout: [MTS, OPEN, CLOSE, HIGH, LOW, VOLUME]
-            mts, o, c, h, l, v = item[0], item[1], item[2], item[3], item[4], item[5]
-            rows.append(
-                {
-                    "time": int(mts // 1000),
-                    "open": float(o),
-                    "high": float(h),
-                    "low": float(l),
-                    "close": float(c),
-                    "tick_volume": int(v) if v else 1,
-                    "spread": 0,
-                    "real_volume": int(v) if v else 1,
-                }
+        if r.status_code != 200:
+            raise BridgeError(
+                f"Bitfinex candle fetch failed: HTTP {r.status_code}",
+                code="REMOTE_ERROR",
             )
 
-        rows.sort(key=lambda r: r["time"])
+        data = r.json()
+        if not isinstance(data, list):
+            raise BridgeError(
+                f"Invalid Bitfinex candle payload for {sym}: expected list, got {type(data).__name__}",
+                code="INVALID_PAYLOAD",
+            )
+
+        bars: list[MarketBar] = []
+        for c in data:
+            if not isinstance(c, list) or len(c) < 6:
+                raise BridgeError(
+                    f"Malformed Bitfinex candle record for {sym}",
+                    code="INVALID_PAYLOAD",
+                )
+            ts_ms, open_p, close_p, high_p, low_p, vol = c[:6]
+            r_vol = int(vol) if vol >= 1.0 else (1 if vol > 0 else 0)
+            bars.append(
+                MarketBar(
+                    time=int(ts_ms / 1000),
+                    open=float(open_p),
+                    high=float(high_p),
+                    low=float(low_p),
+                    close=float(close_p),
+                    tick_volume=r_vol,
+                    spread=0,
+                    real_volume=r_vol,
+                )
+            )
+
+        bars.sort(key=lambda b: b.time)
         logger.debug(
-            "%s: Retrieved %d bars for %s", BITFINEX_CANDLES_FR, len(rows), sym
+            "%s: Retrieved %d bars for %s", BITFINEX_CANDLES_FR, len(bars), sym
         )
-        return rows
+        return bars
 
 
 class CoinbaseExchangeAdapter:
-    """Read-only market data adapter for Coinbase exchange."""
+    """Read-only market data adapter for Coinbase API."""
 
     BASE_URL = "https://api.exchange.coinbase.com"
 
     def __init__(self, session: requests.Session | None = None) -> None:
         self.session = session or create_http_session("HaruQuantAI-CoinbaseAdapter/1.0")
 
-    def fetch_bars(
+    def _format_product_id(self, symbol: str) -> str:
+        s = symbol.strip().upper()
+        if "-" in s:
+            return s
+        for quote in ("USDT", "USD", "EUR", "GBP", "BTC"):
+            if s.endswith(quote) and len(s) > len(quote):
+                return f"{s[: -len(quote)]}-{quote}"
+        return s
+
+    def get_bars(
         self,
         *,
         symbol: str,
-        timeframe: str,
+        timeframe: str | Timeframe,
         start: int = 0,
         end: int = 0,
-        count: int = 100,
+        count: int = 0,
         limit: int = 300,
-        token: CancellationToken | None = None,
-        **kwargs: Any,
-    ) -> list[dict[str, Any]]:
-        """Fetch historical candlestick bars from Coinbase products candles endpoint."""
-        sym = symbol.strip().upper()
-        if "-" not in sym:
-            if sym.endswith("USDT"):
-                sym = f"{sym[:-4]}-USDT"
-            elif sym.endswith("USD"):
-                sym = f"{sym[:-3]}-USD"
+    ) -> list[MarketBar]:
+        """Fetch historical candles from Coinbase API."""
+        tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
+        granularity = COINBASE_GRANULARITY_MAP.get(tf, 60)
+        product_id = self._format_product_id(symbol)
 
-        parsed_tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
-        sec = parsed_tf.to_seconds()
-        gran = sec if sec in COINBASE_SUPPORTED_GRANULARITIES else 60
-        url = f"{self.BASE_URL}/products/{sym}/candles"
+        params: dict[str, Any] = {"granularity": granularity}
+        if start > 0:
+            params["start"] = datetime.fromtimestamp(start, tz=UTC).isoformat()
+        if end > 0:
+            params["end"] = datetime.fromtimestamp(end, tz=UTC).isoformat()
 
-        params: dict[str, Any] = {"granularity": gran}
-        if start and start > 0:
-            ts = start if start < 100_000_000_000 else start // 1000
-            params["start"] = datetime.fromtimestamp(ts, tz=UTC).isoformat()
-        if end and end > 0:
-            ts = end if end < 100_000_000_000 else end // 1000
-            params["end"] = datetime.fromtimestamp(ts, tz=UTC).isoformat()
-
-        resp = execute_bounded_get(
-            self.session,
-            url,
-            params=params,
-            token=token,
-            provider="crypto:coinbase",
+        url = f"{self.BASE_URL}/products/{product_id}/candles"
+        r = execute_bounded_get(
+            self.session, url, params=params, provider="crypto:coinbase"
         )
-        if resp.status_code != 200:
-            logger.warning(
-                "%s: Coinbase returned status %d for %s",
-                COINBASE_CANDLES_FR,
-                resp.status_code,
-                sym,
+        if r.status_code == 429:
+            raise BridgeError(
+                "Coinbase rate limit exceeded (HTTP 429)", code="RATE_LIMITED"
             )
-            return []
-
-        payload = resp.json()
-        if not isinstance(payload, list):
-            return []
-
-        rows: list[dict[str, Any]] = []
-        for item in payload:
-            if not isinstance(item, list) or len(item) < 6:
-                continue
-            # Layout: [time, low, high, open, close, volume]
-            t, low_val, high_val, open_val, close_val, vol = (
-                item[0],
-                item[1],
-                item[2],
-                item[3],
-                item[4],
-                item[5],
-            )
-            rows.append(
-                {
-                    "time": int(t),
-                    "open": float(open_val),
-                    "high": float(high_val),
-                    "low": float(low_val),
-                    "close": float(close_val),
-                    "tick_volume": int(vol) if vol else 1,
-                    "spread": 0,
-                    "real_volume": int(vol) if vol else 1,
-                }
+        if r.status_code != 200:
+            raise BridgeError(
+                f"Coinbase candle fetch failed: HTTP {r.status_code}",
+                code="REMOTE_ERROR",
             )
 
-        rows.sort(key=lambda r: r["time"])
+        data = r.json()
+        if not isinstance(data, list):
+            raise BridgeError(
+                f"Invalid Coinbase candle payload for {product_id}: expected list, got {type(data).__name__}",
+                code="INVALID_PAYLOAD",
+            )
+
+        bars: list[MarketBar] = []
+        for c in data:
+            if not isinstance(c, list) or len(c) < 6:
+                raise BridgeError(
+                    f"Malformed Coinbase candle record for {product_id}",
+                    code="INVALID_PAYLOAD",
+                )
+            ts, low_p, high_p, open_p, close_p, vol = c[:6]
+            r_vol = int(vol) if vol >= 1.0 else (1 if vol > 0 else 0)
+            bars.append(
+                MarketBar(
+                    time=int(ts),
+                    open=float(open_p),
+                    high=float(high_p),
+                    low=float(low_p),
+                    close=float(close_p),
+                    tick_volume=r_vol,
+                    spread=0,
+                    real_volume=r_vol,
+                )
+            )
+
+        bars.sort(key=lambda b: b.time)
         target_count = count if count > 0 else limit
-        if target_count and len(rows) > target_count:
-            rows = rows[-target_count:]
-
+        if target_count and len(bars) > target_count:
+            bars = bars[-target_count:]
         logger.debug(
-            "%s: Retrieved %d bars for %s", COINBASE_CANDLES_FR, len(rows), sym
+            "%s: Retrieved %d bars for %s", COINBASE_CANDLES_FR, len(bars), product_id
         )
-        return rows
+        return bars
 
 
 class PoloniexExchangeAdapter:
-    """Read-only market data adapter for Poloniex exchange."""
+    """Read-only market data adapter for Poloniex API."""
 
     BASE_URL = "https://api.poloniex.com"
 
     def __init__(self, session: requests.Session | None = None) -> None:
         self.session = session or create_http_session("HaruQuantAI-PoloniexAdapter/1.0")
 
-    def fetch_bars(
+    def _format_symbol(self, symbol: str) -> str:
+        s = symbol.strip().upper()
+        if "_" in s:
+            return s
+        for quote in ("USDT", "USD", "BTC", "USDC", "ETH"):
+            if s.endswith(quote) and len(s) > len(quote):
+                return f"{s[: -len(quote)]}_{quote}"
+        return s
+
+    def get_bars(
         self,
         *,
         symbol: str,
-        timeframe: str,
+        timeframe: str | Timeframe,
         start: int = 0,
         end: int = 0,
-        count: int = 100,
+        count: int = 0,
         limit: int = 500,
-        token: CancellationToken | None = None,
-        **kwargs: Any,
-    ) -> list[dict[str, Any]]:
-        """Fetch historical candlestick bars from Poloniex markets candles endpoint."""
-        sym = symbol.strip().upper()
-        if "_" not in sym:
-            if sym.endswith("USDT"):
-                sym = f"{sym[:-4]}_USDT"
-            elif sym.endswith("USD"):
-                sym = f"{sym[:-3]}_USD"
+    ) -> list[MarketBar]:
+        """Fetch historical candlestick bars from Poloniex API."""
+        tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_H1)
+        interval = POLONIEX_INTERVAL_MAP.get(tf, "HOUR_1")
+        sym = self._format_symbol(symbol)
 
-        parsed_tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
-        interval = POLONIEX_INTERVAL_MAP.get(parsed_tf, "MINUTE_1")
+        params: dict[str, Any] = {"limit": min(count or limit, 500)}
+        if start > 0:
+            params["startTime"] = start * 1000
+        if end > 0:
+            params["endTime"] = end * 1000
+
         url = f"{self.BASE_URL}/markets/{sym}/candles"
-
-        target_limit = min(max(count, limit), 500)
-        params: dict[str, Any] = {"interval": interval, "limit": target_limit}
-        if start and start > 0:
-            params["startTime"] = start * 1000 if start < 100_000_000_000 else start
-        if end and end > 0:
-            params["endTime"] = end * 1000 if end < 100_000_000_000 else end
-
-        resp = execute_bounded_get(
-            self.session,
-            url,
-            params=params,
-            token=token,
-            provider="crypto:poloniex",
+        params["interval"] = interval
+        r = execute_bounded_get(
+            self.session, url, params=params, provider="crypto:poloniex"
         )
-        if resp.status_code != 200:
-            logger.warning(
-                "%s: Poloniex returned status %d for %s",
-                POLONIEX_CANDLES_FR,
-                resp.status_code,
-                sym,
+        if r.status_code == 429:
+            raise BridgeError(
+                "Poloniex rate limit exceeded (HTTP 429)", code="RATE_LIMITED"
             )
-            return []
-
-        payload = resp.json()
-        if not isinstance(payload, list):
-            return []
-
-        rows: list[dict[str, Any]] = []
-        for item in payload:
-            if not isinstance(item, list) or len(item) < 13:
-                continue
-            # Layout: [low, high, open, close, amount, quantity, buyTakerAmount, buyTakerQuantity, tradeCount, ts, weightedAverage, interval, startTime, closeTime]
-            low_val, high_val, open_val, close_val, qty, start_ts = (
-                item[0],
-                item[1],
-                item[2],
-                item[3],
-                item[5],
-                item[12],
-            )
-            rows.append(
-                {
-                    "time": int(start_ts // 1000),
-                    "open": float(open_val),
-                    "high": float(high_val),
-                    "low": float(low_val),
-                    "close": float(close_val),
-                    "tick_volume": int(float(qty)) if qty else 1,
-                    "spread": 0,
-                    "real_volume": int(float(qty)) if qty else 1,
-                }
+        if r.status_code != 200:
+            raise BridgeError(
+                f"Poloniex candle fetch failed: HTTP {r.status_code}",
+                code="REMOTE_ERROR",
             )
 
-        rows.sort(key=lambda r: r["time"])
+        data = r.json()
+        if not isinstance(data, list):
+            raise BridgeError(
+                f"Invalid Poloniex candle payload for {sym}: expected list, got {type(data).__name__}",
+                code="INVALID_PAYLOAD",
+            )
+
+        bars: list[MarketBar] = []
+        for c in data:
+            if not isinstance(c, list) or len(c) < 14:
+                raise BridgeError(
+                    f"Malformed Poloniex candle record for {sym}",
+                    code="INVALID_PAYLOAD",
+                )
+            low_val, high_val, open_val, close_val, qty = c[0], c[1], c[2], c[3], c[5]
+            start_ts = int(c[12]) if len(c) > 12 else 0
+            bars.append(
+                MarketBar(
+                    time=int(start_ts / 1000),
+                    open=float(open_val),
+                    high=float(high_val),
+                    low=float(low_val),
+                    close=float(close_val),
+                    tick_volume=int(float(qty)) if qty else 1,
+                    spread=0,
+                    real_volume=int(float(qty)) if qty else 1,
+                )
+            )
+
+        bars.sort(key=lambda b: b.time)
         logger.debug(
-            "%s: Retrieved %d bars for %s", POLONIEX_CANDLES_FR, len(rows), sym
+            "%s: Retrieved %d bars for %s", POLONIEX_CANDLES_FR, len(bars), sym
         )
-        return rows
+        return bars
 
 
 def _calc_digits(tick_size: float) -> int:
@@ -477,18 +432,18 @@ def _map_timeframe(timeframe: str | Timeframe) -> str:
     return BINANCE_TIMEFRAME_MAP.get(tf, "1m")
 
 
-class BinanceBroker(DataBrokerBackend):
-    """Binance cryptocurrency market data and symbol catalog broker."""
+class CryptoClient(BrokerClient):
+    """Uniform cryptocurrency client supporting Binance, Bitfinex, Coinbase, Poloniex."""
 
     def __init__(
         self,
-        name: str = "Binance",
+        name: str = "Crypto",
         default_market: str = "spot",
         venue: str | None = None,
         api_key: str | None = None,
         exchange: str = "binance",
     ) -> None:
-        """Initialize Binance broker."""
+        """Initialize cryptocurrency broker client."""
         super().__init__(name=name)
         self.exchange = exchange.lower().strip()
         self.venue = (venue or default_market).lower().strip()
@@ -509,36 +464,13 @@ class BinanceBroker(DataBrokerBackend):
             self.session.headers["X-MBX-APIKEY"] = api_key
 
         self._symbols_cache: dict[str, SymbolInfo] = {}
-
-        self.capabilities = ProviderCapabilities(
-            provider_id="crypto",
-            display_name="Crypto",
-            category="Crypto",
-            supported_timeframes=(
-                "M1",
-                "M5",
-                "M15",
-                "M30",
-                "H1",
-                "H2",
-                "H4",
-                "D1",
-                "W1",
-            ),
-            supported_modes=("bars", "ticks"),
-            requires_auth=False,
-            rate_limit_rps=10.0,
-            default_timeout_seconds=30.0,
-            supports_pagination=True,
-            has_local_archive=False,
-            description="Cryptocurrency exchange provider (Binance, Bitfinex, Coinbase, Poloniex)",
-        )
         self._exchange_adapters: dict[str, Any] = {}
+        self._connected = True
 
     @override
-    def close_sync(self) -> None:
-        """Close session resources synchronously."""
-        super().close_sync()
+    def disconnect(self) -> None:
+        """Close session resources."""
+        super().disconnect()
         for adapter in getattr(self, "_exchange_adapters", {}).values():
             if hasattr(adapter, "session") and adapter.session is not self.session:
                 adapter.session.close()
@@ -560,29 +492,6 @@ class BinanceBroker(DataBrokerBackend):
                 )
         return self._exchange_adapters[exch]
 
-    def check_health(self) -> Any:
-        """Inspect exchange connectivity."""
-        try:
-            r = self.session.get(f"{self.base_url}{self.api_prefix}/ping", timeout=5.0)
-            conn = r.status_code == 200
-            return ProviderHealth(
-                provider_id="crypto",
-                status="available" if conn else "failed",
-                connected=conn,
-                message=f"Exchange '{self.exchange}' ping OK"
-                if conn
-                else f"Ping status {r.status_code}",
-                capabilities=self.capabilities,
-            )
-        except Exception as exc:
-            return ProviderHealth(
-                provider_id="crypto",
-                status="failed",
-                connected=False,
-                message=f"Ping error: {exc}",
-                capabilities=self.capabilities,
-            )
-
     def _normalize_symbol(self, symbol: str) -> str:
         """Normalize symbol string."""
         sym = symbol.strip().upper().replace("/", "").replace("_", "").replace("-", "")
@@ -596,101 +505,112 @@ class BinanceBroker(DataBrokerBackend):
         return BINANCE_TIMEFRAME_MAP.get(tf, "1h")
 
     @override
-    def symbol_info(self, symbol: str) -> SymbolInfo:
-        """Resolve instrument specifications as canonical SymbolInfo."""
+    def get_symbol_info(self, symbol: str) -> SymbolInfo:
+        """Resolve instrument specifications strictly from Binance exchangeInfo."""
         sym_clean = self._normalize_symbol(symbol)
         if sym_clean in self._symbols_cache:
             return self._symbols_cache[sym_clean]
 
         url = f"{self.base_url}{self.api_prefix}/exchangeInfo"
-        try:
-            r = self.session.get(url, params={"symbol": sym_clean}, timeout=(5.0, 10.0))
-            if r.status_code == 200:
-                data = r.json()
-                symbols_list = data.get("symbols", [])
-                if symbols_list:
-                    s_data = symbols_list[0]
-                    tick_size = 0.01
-                    step_size = 1.0
-                    for f in s_data.get("filters", []):
-                        ft = f.get("filterType")
-                        if ft == "PRICE_FILTER":
-                            tick_size = float(f.get("tickSize") or 0.01)
-                        elif ft == "LOT_SIZE":
-                            step_size = float(f.get("stepSize") or 1.0)
-                    dec = _calc_digits(tick_size)
-                    snap = SymbolInfo(
-                        name=sym_clean,
-                        custom=False,
-                        digits=dec,
-                        point=tick_size,
-                        currency_base=s_data.get("baseAsset", ""),
-                        currency_profit=s_data.get("quoteAsset", ""),
-                        trade_contract_size=step_size,
-                        trade_tick_size=tick_size,
-                        trade_tick_value=tick_size,
-                    )
-                    self._symbols_cache[sym_clean] = snap
-                    return snap
-        except Exception as exc:
-            self.logger.warning(
-                "FR-BROKER-BINANCE-SYMBOLS: Error fetching exchangeInfo: %s", exc
+        r = execute_bounded_get(
+            self.session,
+            url,
+            params={"symbol": sym_clean},
+            timeout=(5.0, 10.0),
+            provider="crypto:binance",
+        )
+        if r.status_code != 200:
+            raise BridgeError(
+                f"Binance exchangeInfo request failed for '{sym_clean}' with HTTP {r.status_code}: {r.text}",
+                code="REMOTE_ERROR",
             )
-
-        snap = SymbolInfo(name=sym_clean, digits=2, point=0.01)
+        data = r.json()
+        symbols_list = data.get("symbols", []) if isinstance(data, dict) else []
+        if not symbols_list:
+            raise BridgeError(
+                f"Symbol '{sym_clean}' not found in Binance exchangeInfo",
+                code="SYMBOL_NOT_FOUND",
+            )
+        s_data = symbols_list[0]
+        tick_size = 0.01
+        step_size = 1.0
+        for f in s_data.get("filters", []):
+            ft = f.get("filterType")
+            if ft == "PRICE_FILTER":
+                tick_size = float(f.get("tickSize") or 0.01)
+            elif ft == "LOT_SIZE":
+                step_size = float(f.get("stepSize") or 1.0)
+        dec = _calc_digits(tick_size)
+        snap = SymbolInfo(
+            name=sym_clean,
+            custom=False,
+            digits=dec,
+            point=tick_size,
+            currency_base=s_data.get("baseAsset", ""),
+            currency_profit=s_data.get("quoteAsset", ""),
+            trade_contract_size=step_size,
+            trade_tick_size=tick_size,
+            trade_tick_value=tick_size,
+        )
         self._symbols_cache[sym_clean] = snap
         return snap
 
     @override
-    def symbols_get(self) -> list[str]:
+    def get_symbols(self) -> list[str]:
         """Return default popular symbols or cached symbols."""
         if self._symbols_cache:
             return list(self._symbols_cache.keys())
         return list(DEFAULT_CRYPTO_SYMBOLS)
 
     @override
-    def fetch_bars(
+    def get_bars(
         self,
-        *,
         symbol: str,
-        timeframe: str,
-        mode: str,
-        start: int,
-        end: int,
-        count: int,
-        limit: int,
-    ) -> list[dict[str, Any]]:
+        timeframe: Timeframe | str = Timeframe.PERIOD_H1,
+        date_from: datetime | int | None = None,
+        date_to: datetime | int | None = None,
+        *,
+        start: datetime | int | None = None,
+        end: datetime | int | None = None,
+        start_pos: int | None = None,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> list[MarketBar]:
         """Retrieve real historical candlestick bars from configured crypto exchange."""
-        del mode
+        del start_pos
+        s = date_from if date_from is not None else start
+        e = date_to if date_to is not None else end
+        start_sec = epoch_seconds(s)
+        end_sec = epoch_seconds(e)
+
         if self.exchange in ("bitfinex", "coinbase", "poloniex"):
             adapter = self._get_exchange_adapter(self.exchange)
-            return adapter.fetch_bars(  # type: ignore[no-any-return]
+            exchange_bars: list[MarketBar] = adapter.get_bars(
                 symbol=symbol,
                 timeframe=timeframe,
-                start=start,
-                end=end,
-                count=count,
+                start=start_sec,
+                end=end_sec,
+                count=count or 0,
                 limit=limit,
             )
+            return exchange_bars
 
         sym_clean = self._normalize_symbol(symbol)
         interval = self._map_timeframe(timeframe)
         url = f"{self.base_url}{self.api_prefix}/klines"
-        target_count = count if count > 0 else limit
-        req_limit = min(target_count or 500, 1000)
-
+        req_limit = min(count or 500, 1000)
         params: dict[str, Any] = {
             "symbol": sym_clean,
             "interval": interval,
             "limit": req_limit,
         }
-        if start > 0 and 0 < end < 2**40 and end >= start:
-            params["startTime"] = start * 1000
-            params["endTime"] = end * 1000
-        elif 0 < end < 2**40 and start == 0:
-            params["endTime"] = end * 1000
-        elif start > 0:
-            params["startTime"] = start * 1000
+        if start_sec > 0 and 0 < end_sec < 2**40 and end_sec >= start_sec:
+            params["startTime"] = start_sec * 1000
+            params["endTime"] = end_sec * 1000
+        elif 0 < end_sec < 2**40 and start_sec == 0:
+            params["endTime"] = end_sec * 1000
+        elif start_sec > 0:
+            params["startTime"] = start_sec * 1000
 
         try:
             r = execute_bounded_get(
@@ -705,7 +625,7 @@ class BinanceBroker(DataBrokerBackend):
                     code="REMOTE_ERROR",
                 )
             raw_klines: list[list[Any]] = r.json()
-            rows: list[dict[str, Any]] = []
+            bars: list[MarketBar] = []
             for row in raw_klines:
                 open_ts_ms = int(row[0])
                 o = float(row[1])
@@ -715,29 +635,29 @@ class BinanceBroker(DataBrokerBackend):
                 vol = float(row[5])
                 count_trades = int(row[8])
                 r_vol = int(vol) if vol >= 1.0 else (1 if vol > 0 else 0)
-                rows.append(
-                    {
-                        "time": int(open_ts_ms / 1000),
-                        "open": o,
-                        "high": h,
-                        "low": l,
-                        "close": c,
-                        "tick_volume": count_trades if count_trades > 0 else r_vol,
-                        "spread": 0,
-                        "real_volume": r_vol,
-                    }
+                bars.append(
+                    MarketBar(
+                        time=int(open_ts_ms / 1000),
+                        open=o,
+                        high=h,
+                        low=l,
+                        close=c,
+                        tick_volume=count_trades if count_trades > 0 else r_vol,
+                        spread=0,
+                        real_volume=r_vol,
+                    )
                 )
 
-            rows.sort(key=lambda item: item["time"])
-            deduped: list[dict[str, Any]] = []
+            bars.sort(key=lambda item: item.time)
+            deduped: list[MarketBar] = []
             last_t: int | None = None
-            for row_item in rows:
-                if last_t is None or row_item["time"] > last_t:
-                    deduped.append(row_item)
-                    last_t = row_item["time"]
+            for b in bars:
+                if last_t is None or b.time > last_t:
+                    deduped.append(b)
+                    last_t = b.time
 
-            if target_count and len(deduped) > target_count:
-                deduped = deduped[-target_count:]
+            if count and len(deduped) > count:
+                deduped = deduped[-count:]
             return deduped
         except Exception as exc:
             if isinstance(exc, BridgeError):
@@ -748,26 +668,35 @@ class BinanceBroker(DataBrokerBackend):
             ) from exc
 
     @override
-    def fetch_ticks(
+    def get_ticks(
         self,
-        *,
         symbol: str,
-        mode: str = "latest",
-        start_ms: int = 0,
-        end_ms: int = 0,
-        count: int = 0,
+        date_from: datetime | int | None = None,
+        date_to: datetime | int | None = None,
+        *,
+        start: datetime | int | None = None,
+        end: datetime | int | None = None,
+        count: int | None = None,
         limit: int = 1000,
-    ) -> list[dict[str, Any]]:
+    ) -> list[MarketTick]:
         """Retrieve historical aggregate trades from Binance REST API."""
-        del mode
+        if self.exchange in ("bitfinex", "coinbase", "poloniex"):
+            raise BridgeError(
+                f"{self.exchange.capitalize()} exchange does not support tick history; only bars are supported",
+                code="UNSUPPORTED_OPERATION",
+            )
         sym_clean = self._normalize_symbol(symbol)
-        target_count = count if count > 0 else limit
-        req_limit = min(target_count or 100, 1000)
+        target_count = count or limit or 100
+        req_limit = min(target_count, 1000)
         url = f"{self.base_url}{self.api_prefix}/aggTrades"
         params: dict[str, Any] = {
             "symbol": sym_clean,
             "limit": req_limit,
         }
+        s = date_from if date_from is not None else start
+        e = date_to if date_to is not None else end
+        start_ms = epoch_millis(s)
+        end_ms = epoch_millis(e)
         if start_ms > 0:
             params["startTime"] = start_ms
         if end_ms > 0:
@@ -786,27 +715,27 @@ class BinanceBroker(DataBrokerBackend):
                     code="REMOTE_ERROR",
                 )
             raw_trades: list[dict[str, Any]] = r.json()
-            rows: list[dict[str, Any]] = []
+            ticks: list[MarketTick] = []
             for t in raw_trades:
                 p = float(t.get("p") or 0.0)
                 qty = float(t.get("q") or 0.0)
                 t_ms = int(t.get("T") or 0)
                 t_vol = int(qty) if qty >= 1.0 else (1 if qty > 0 else 0)
-                rows.append(
-                    {
-                        "time_msc": t_ms,
-                        "bid": p,
-                        "ask": p,
-                        "last": p,
-                        "volume": t_vol,
-                        "flags": 0,
-                        "volume_real": qty,
-                    }
+                ticks.append(
+                    MarketTick(
+                        time_msc=t_ms,
+                        bid=p,
+                        ask=p,
+                        last=p,
+                        volume=t_vol,
+                        flags=0,
+                        volume_real=qty,
+                    )
                 )
-            rows.sort(key=lambda r: r["time_msc"])
-            if target_count and len(rows) > target_count:
-                rows = rows[-target_count:]
-            return rows
+            ticks.sort(key=lambda item: item.time_msc)
+            if count and len(ticks) > count:
+                ticks = ticks[-count:]
+            return ticks
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise
@@ -815,65 +744,60 @@ class BinanceBroker(DataBrokerBackend):
                 code="TRADES_ERROR",
             ) from exc
 
-    @override
-    def read_history(
+
+class BinanceClient(CryptoClient):
+    """Binance cryptocurrency client."""
+
+    def __init__(
         self,
-        request: HistoryRequest,
-        token: CancellationToken | None = None,
-    ) -> HistoryPage:
-        """Fetch historical records adhering to Stage 2C contract."""
-        request.validate()
-        exch = (request.exchange or self.exchange or "binance").lower().strip()
-        if exch not in ("binance", "bitfinex", "coinbase", "poloniex"):
-            raise ProviderValidationError(
-                f"Unknown crypto exchange '{exch}'. Supported: binance, bitfinex, coinbase, poloniex",
-                provider="crypto",
-            )
-
-        if exch in ("bitfinex", "coinbase", "poloniex"):
-            if request.kind == "ticks" or request.timeframe.upper() == "TICK":
-                raise ProviderUnsupportedError(
-                    f"{exch.capitalize()} exchange does not support tick history; only bars are supported",
-                    provider="crypto",
-                )
-            adapter = self._get_exchange_adapter(exch)
-            rows = adapter.fetch_bars(
-                symbol=request.symbol,
-                timeframe=request.timeframe,
-                count=request.count,
-                start=request.start_epoch() or 0,
-                end=request.end_epoch() or 0,
-                token=token,
-            )
-            return HistoryPage(
-                provider="crypto",
-                symbol=request.symbol,
-                timeframe=request.timeframe,
-                kind=request.kind,
-                rows=rows,
-                is_complete=True,
-                provenance={"exchange": exch},
-            )
-
-        page = super().read_history(request, token=token)
-        page.provenance = {"exchange": "binance"}
-        return page
+        name: str = "Binance",
+        default_market: str = "spot",
+        venue: str | None = None,
+        api_key: str | None = None,
+        exchange: str = "binance",
+    ) -> None:
+        super().__init__(
+            name=name,
+            default_market=default_market,
+            venue=venue,
+            api_key=api_key,
+            exchange=exchange,
+        )
 
 
-CryptoBroker = BinanceBroker
+class BitfinexClient(CryptoClient):
+    """Bitfinex cryptocurrency client."""
+
+    def __init__(self, name: str = "Bitfinex") -> None:
+        super().__init__(name=name, exchange="bitfinex")
 
 
-def create_adapter(context: PluginHostContext | None = None) -> BinanceBroker:
-    """Factory creating configured BinanceBroker adapter."""
+class CoinbaseClient(CryptoClient):
+    """Coinbase cryptocurrency client."""
+
+    def __init__(self, name: str = "Coinbase") -> None:
+        super().__init__(name=name, exchange="coinbase")
+
+
+class PoloniexClient(CryptoClient):
+    """Poloniex cryptocurrency client."""
+
+    def __init__(self, name: str = "Poloniex") -> None:
+        super().__init__(name=name, exchange="poloniex")
+
+
+def create_adapter(context: Any | None = None) -> BinanceClient:
+    """Factory creating configured BinanceClient adapter."""
     del context
-    return BinanceBroker()
+    return BinanceClient()
 
 
 def main() -> None:
-    """Demonstrate executable usage of BinanceBroker."""
-    broker = BinanceBroker()
-    health = broker.check_health()
-    logger.info("Binance health: %s (connected=%s)", health.status, health.connected)
+    """Demonstrate executable usage of BinanceClient."""
+    client = BinanceClient()
+    symbols = client.get_symbols()
+    logger.info("Binance symbols: %s", symbols[:3])
+    client.disconnect()
 
 
 if __name__ == "__main__":

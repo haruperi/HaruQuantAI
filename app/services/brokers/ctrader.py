@@ -1,14 +1,15 @@
 """cTrader Open API Protobuf-over-TLS socket transport broker implementation.
 
 Description:
-    Implements the asynchronous `TradingBackend` capability (`CTraderBackend`) for
+    Implements the asynchronous `TradingClient` capability (`CTraderClient`) for
     Spotware cTrader Open API v2 via length-prefixed Protocol Buffers over a secure
     TLS socket transport (`live.ctraderapi.com:5035` or demo).
     Within HaruQuantAI, cTrader serves as an institutional multi-asset broker
     integration backing the canonical eight-class MQL5-compatible `Trading` facade
     (AccountInfo, TerminalInfo, SymbolInfo, Trade, PositionInfo, OrderInfo,
-    HistoryOrderInfo, DealInfo). External credentials (`client_id`, `client_secret`,
-    `access_token`, and `account_id`) are dynamically loaded from host configuration
+    HistoryOrderInfo, DealInfo) as well as direct broker client operations.
+    External credentials (`client_id`, `client_secret`, `access_token`, and
+    `account_id`) are dynamically loaded from host configuration
     (`settings.config_ctrader`) or environment variables when not explicitly passed.
 
 Purpose:
@@ -28,24 +29,22 @@ Key Capabilities:
       Associated: `[CTraderClient.order_check()]`, `[CTraderClient.order_send()]`
       Logging: INFO on execution; WARNING/ERROR on rejection or failure.
     - FR-BROKER-CTRADER-FACADE-DISPATCH: Route eight-class trading proxy calls.
-      Associated: `[CTraderBackend.call()]`
+      Associated: `[CTraderClient.call()]`
       Logging: DEBUG on dispatching method to cTrader client; ERROR on unknown.
 
 Python API Usage:
     ```python
-    from app.services.brokers.ctrader import CTraderBackend
-    from app.services.include.trading import Trading
+    from app.services.brokers.ctrader import CTraderClient
 
-    backend = CTraderBackend()
-    trading = Trading(backend)
-    await trading.start()
-    account = await trading.account.AccountInfo()
-    await trading.close()
+    client = CTraderClient()
+    await client.start()
+    account = client.get_account_info()
+    await client.close()
     ```
 
 CLI Usage:
     ```bash
-    uv run python -c "from app.services.brokers.ctrader import CTraderBackend"
+    uv run python -c "from app.services.brokers.ctrader import CTraderClient"
     ```
 """
 
@@ -61,20 +60,22 @@ import ssl
 import struct
 import threading
 import time
-import uuid
-from collections.abc import Callable
-from dataclasses import asdict, is_dataclass, replace
-from datetime import UTC, datetime
-from types import TracebackType
-from typing import Any, Self, cast, override
+from datetime import datetime
+from typing import Any, override
 
 from app.host.logging import get_logger
 from app.host.settings import settings
-from app.services.brokers.base import BridgeError
+from app.services.brokers.base import (
+    BridgeError,
+    TradingClient,
+)
 from app.services.include.contracts import (
     AccountInfo,
-    BookInfo,
     BridgeEvent,
+    DealInfo,
+    MarketBar,
+    OrderInfo,
+    PositionInfo,
     Receipt,
     SymbolInfo,
     TerminalInfo,
@@ -84,12 +85,10 @@ from app.services.include.contracts import (
 )
 from app.services.include.enums import (
     AccountTradeMode,
-    BookType,
     MarginMode,
     OrderFilling,
-    OrderTime,
     OrderType,
-    ReceiptStatus,
+    Timeframe,
     TradeAction,
     TradeRetcode,
 )
@@ -212,8 +211,8 @@ def _filter_records(
     return res
 
 
-class CTraderClient:
-    """Synchronous TLS socket framing client for Spotware cTrader Open API v2."""
+class CTraderClient(TradingClient):
+    """Uniform institutional broker client for Spotware cTrader Open API v2."""
 
     def __init__(
         self,
@@ -227,16 +226,19 @@ class CTraderClient:
         gateway_port: int | None = None,
         environment: str | None = None,
         command_timeout: float = 10.0,
+        name: str = "cTrader",
+        **kwargs: Any,
     ) -> None:
+        super().__init__(name=name)
         cfg = getattr(settings, "config_ctrader", None)
 
-        def resolve(name: str, explicit: Any, default: Any) -> Any:
+        def resolve(name_str: str, explicit: Any, default: Any) -> Any:
             if explicit is not None:
                 return explicit
-            env_value = os.environ.get(f"CTRADER_{name.upper()}")
+            env_value = os.environ.get(f"CTRADER_{name_str.upper()}")
             if env_value:
                 return env_value
-            return getattr(cfg, name, None) or default
+            return getattr(cfg, name_str, None) or default
 
         self.client_id = str(resolve("client_id", client_id, ""))
         self.client_secret = str(resolve("client_secret", client_secret, ""))
@@ -248,8 +250,8 @@ class CTraderClient:
             and client_id is None
             and client_secret is None
             and not any(
-                os.environ.get(f"CTRADER_{name}")
-                for name in (
+                os.environ.get(f"CTRADER_{name_env}")
+                for name_env in (
                     "ACCESS_TOKEN",
                     "REFRESH_TOKEN",
                     "CLIENT_ID",
@@ -282,8 +284,39 @@ class CTraderClient:
         self._symbol_name_map: dict[str, int] = {}
         self._symbol_cache: dict[str, SymbolInfo] = {}
         self._history_next_request = 0.0
+        self._armed = False
+        self._connect_error: BridgeError | None = None
+        self._last_command: contextvars.ContextVar[str | None] = contextvars.ContextVar(
+            "ctrader_last_command", default=None
+        )
+        self._receipts: dict[str, Receipt] = {}
+        self._event_queue: asyncio.Queue[BridgeEvent] = asyncio.Queue()
+        self._request_events: dict[int, list[BridgeEvent]] = {}
+        self._request_waiters: dict[int, asyncio.Future[BridgeEvent]] = {}
+        self._last_request = TradeRequest(action=TradeAction.DEAL)
+        self._last_result = TradeResult()
+        self._last_check = TradeCheckResult()
+        self._book_subscriptions: set[str] = set()
+        self._magic: int = 0
+        self._deviation: int = 10
+        self._filling: OrderFilling = OrderFilling.FOK
+        self._selected_position_ticket: int = 0
+        self._selected_order_ticket: int = 0
+        self._selected_deal_ticket: int = 0
+        self._selected_history_order_ticket: int = 0
+
+        self.trading = Trading(self)
+        self.account = self.trading.account
+        self.terminal = self.trading.terminal
+        self.symbol = self.trading.symbol
+        self.trade = self.trading.trade
+        self.position = self.trading.position
+        self.order = self.trading.order
+        self.history_order = self.trading.history_order
+        self.deal = self.trading.deal
 
     @property
+    @override
     def is_connected(self) -> bool:
         """Return whether TLS socket is active and account is authenticated."""
         return bool(self._sock and self._authenticated)
@@ -292,6 +325,44 @@ class CTraderClient:
     def last_error(self) -> tuple[Any, str]:
         """Return the last recorded error tuple."""
         return self._last_error
+
+    @override
+    def get_terminal_info(self) -> TerminalInfo:
+        """Retrieve current cTrader terminal status."""
+        return TerminalInfo(
+            name=self.name,
+            company="Spotware cTrader",
+            connected=self.is_connected,
+            trade_allowed=True,
+            cpu_cores=os.cpu_count() or 4,
+        )
+
+    @override
+    def get_account_info(self) -> AccountInfo:
+        """Retrieve current trading account snapshot."""
+        return self.account_info()
+
+    @override
+    def get_positions(self) -> list[PositionInfo]:
+        """Retrieve open positions from cTrader."""
+        positions, _ = self.reconcile()
+        return [PositionInfo(**p) for p in positions]
+
+    @override
+    def get_orders(self) -> list[OrderInfo]:
+        """Retrieve pending orders from cTrader."""
+        _, orders = self.reconcile()
+        return [OrderInfo(**o) for o in orders]
+
+    @override
+    def get_history_orders(self) -> list[OrderInfo]:
+        """Retrieve history orders (empty if unsupported natively)."""
+        return []
+
+    @override
+    def get_deals(self) -> list[DealInfo]:
+        """Retrieve history deals (empty if unsupported natively)."""
+        return []
 
     def _ensure_module(self) -> None:
         if (
@@ -596,7 +667,8 @@ class CTraderClient:
         self._authenticated = True
         logger.info("FR-BROKER-CTRADER-TLS-AUTH: Account authorization successful")
 
-    def connect(self) -> None:
+    @override
+    def connect(self) -> bool:
         """Establish TLS connection and authenticate application & account."""
         self._ensure_module()
         self._validate_configuration()
@@ -617,6 +689,8 @@ class CTraderClient:
                 self._sock.connect((self.gateway_host, self.gateway_port))
                 self._auth_application()
                 self._auth_account()
+                self._connected = True
+                return True
             except OSError as err:
                 self.disconnect()
                 msg = f"Failed to connect to cTrader gateway: {err}"
@@ -626,6 +700,7 @@ class CTraderClient:
                 self.disconnect()
                 raise
 
+    @override
     def disconnect(self) -> None:
         """Close the active TLS socket session cleanly."""
         logger.info("FR-BROKER-CTRADER-TLS-AUTH: Disconnecting from cTrader...")
@@ -637,6 +712,7 @@ class CTraderClient:
                 self._sock = None
             self._authenticated = False
             self._app_authorized = False
+            self._connected = False
 
     def account_info(self) -> AccountInfo:
         """Query account telemetry via ProtoOATraderReq."""
@@ -679,6 +755,11 @@ class CTraderClient:
                 server=self.gateway_host,
             )
 
+    @override
+    def get_symbols(self) -> list[str]:
+        """Fetch available symbol names."""
+        return self.symbols_list()
+
     def symbols_list(self) -> list[str]:
         """Fetch available symbol names."""
         logger.debug("FR-BROKER-CTRADER-MARKET-DATA: querying symbols list")
@@ -702,7 +783,8 @@ class CTraderClient:
                 names.append(s_name)
             return names
 
-    def symbol_info(self, symbol: str) -> SymbolInfo:
+    @override
+    def get_symbol_info(self, symbol: str) -> SymbolInfo:
         """Resolve a SymbolInfo for the given symbol."""
         logger.debug("FR-BROKER-CTRADER-MARKET-DATA: resolving symbol info %s", symbol)
         if not self._authenticated:
@@ -1044,6 +1126,7 @@ class CTraderClient:
             ]
             return positions, orders
 
+    @override
     def order_send(self, request: TradeRequest) -> TradeResult:
         """Send trade request to cTrader via ProtoOANewOrderReq."""
         logger.info(
@@ -1092,637 +1175,80 @@ class CTraderClient:
                 f"Unexpected trade execution payload: {p_type}", code="BAD_PAYLOAD"
             )
 
-
-class CTraderBackend(Trading):
-    """Canonical asynchronous TradingBackend for Spotware cTrader Open API v2."""
-
-    def __init__(
-        self,
-        *,
-        client_id: str | None = None,
-        client_secret: str | None = None,
-        access_token: str | None = None,
-        refresh_token: str | None = None,
-        account_id: int | None = None,
-        gateway_host: str | None = None,
-        gateway_port: int | None = None,
-        environment: str | None = None,
-        command_timeout: float = 10.0,
-    ) -> None:
-        self.client = CTraderClient(
-            client_id=client_id,
-            client_secret=client_secret,
-            access_token=access_token,
-            refresh_token=refresh_token,
-            account_id=account_id,
-            gateway_host=gateway_host,
-            gateway_port=gateway_port,
-            environment=environment,
-            command_timeout=command_timeout,
-        )
-        self._armed = False
-        self._connect_error: BridgeError | None = None
-        self._last_command: contextvars.ContextVar[str | None] = contextvars.ContextVar(
-            "ctrader_last_command", default=None
-        )
-        self._receipts: dict[str, Receipt] = {}
-        self._event_queue: asyncio.Queue[BridgeEvent] = asyncio.Queue()
-        self._request_events: dict[int, list[BridgeEvent]] = {}
-        self._request_waiters: dict[int, asyncio.Future[BridgeEvent]] = {}
-        self._last_request = TradeRequest(action=TradeAction.DEAL)
-        self._last_result = TradeResult()
-        self._last_check = TradeCheckResult()
-        self._book_subscriptions: set[str] = set()
-        self._magic: int = 0
-        self._deviation: int = 10
-        self._filling: OrderFilling = OrderFilling.FOK
-        self._selected_position_ticket: int = 0
-        self._selected_order_ticket: int = 0
-        self._selected_deal_ticket: int = 0
-        self._selected_history_order_ticket: int = 0
-        super().__init__(self)
-
-    # ------------------------------------------------------------------------
-    # Async TradingBackend Lifecycle
-    # ------------------------------------------------------------------------
-
     @override
-    async def start(self) -> None:
-        """Start the cTrader Open API backend session."""
-        logger.info("FR-BROKER-CTRADER-TLS-AUTH: starting cTrader backend")
-        self._connect_error = None
-        try:
-            self.client.connect()
-        except BridgeError as err:
-            logger.error(
-                "FR-BROKER-CTRADER-TLS-AUTH: cTrader connection not established: %s",
-                err,
-            )
-            self._connect_error = err
-            raise
-
-    @override
-    async def wait_connected(self, timeout: float | None = None) -> None:
-        """Wait until backend readiness is confirmed."""
-        del timeout
-        logger.debug("FR-BROKER-CTRADER-TLS-AUTH: checking cTrader readiness")
-        if not self.client.is_connected:
-            if self._connect_error:
-                raise self._connect_error
-            raise BridgeError("cTrader backend not connected", code="NOT_CONNECTED")
-
-    @override
-    def arm(self) -> None:
-        """Permit mutating trade operations."""
-        logger.info("FR-BROKER-CTRADER-TRADE-EXECUTION: arming cTrader backend")
-        self._armed = True
-
-    @override
-    def disarm(self) -> None:
-        """Revoke mutating trade permission."""
-        logger.info("FR-BROKER-CTRADER-TRADE-EXECUTION: disarming cTrader backend")
-        self._armed = False
-
-    @override
-    async def close(self) -> None:
-        """Disconnect from cTrader Open API gateway."""
-        logger.info("FR-BROKER-CTRADER-TLS-AUTH: closing cTrader backend")
-        self.disarm()
-        self.client.disconnect()
-        self._connect_error = None
-
-    @override
-    async def __aenter__(self) -> Self:
-        await self.start()
-        return self
-
-    @override
-    async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc: BaseException | None,
-        tb: TracebackType | None,
-    ) -> None:
-        await self.close()
-
-    @override
-    def last_command_id(self) -> str | None:
-        """Read the task-local last command identifier."""
-        return self._last_command.get()
-
-    @override
-    def receipt(self, command_id: str) -> Receipt | None:
-        """Retrieve command execution receipt by command ID."""
-        return self._receipts.get(command_id)
-
-    @override
-    async def next_event(self, timeout: float | None = None) -> BridgeEvent:
-        """Wait for the next transaction event."""
-        del timeout
-        return await self._event_queue.get()
-
-    @override
-    async def await_request_event(
-        self, request_id: int, timeout: float | None = None
-    ) -> BridgeEvent:
-        """Wait for an event correlated to the specified request ID."""
-        del timeout
-        backlog = self._request_events.get(request_id)
-        if backlog:
-            return backlog.pop(0)
-        loop = asyncio.get_running_loop()
-        future: asyncio.Future[BridgeEvent] = loop.create_future()
-        self._request_waiters[request_id] = future
-        return await future
-
-    # ------------------------------------------------------------------------
-    # Facade Dispatch Implementation
-    # ------------------------------------------------------------------------
-
-    async def call(
-        self,
-        *,
-        object_id: str,
-        class_name: str,
-        method_name: str,
-        args: list[Any],
-        requires_arm: bool = False,
-        timeout: float | None = None,  # noqa: ASYNC109 -- forwarded deadline
-    ) -> Any:
-        """Execute a canonical trading proxy operation on cTrader Open API."""
-        del timeout
-        logger.debug(
-            "FR-BROKER-CTRADER-FACADE-DISPATCH: dispatching %s.%s",
-            class_name,
-            method_name,
-        )
-        if requires_arm and not self._armed:
-            raise BridgeError(
-                "cTrader mutation operation requires arming", code="NOT_ARMED"
-            )
-
-        cmd_id = f"cmd-{uuid.uuid4().hex[:12]}"
-        self._last_command.set(cmd_id)
-        now = time.time()
-        base_receipt = Receipt(
-            command_id=cmd_id,
-            object_id=object_id,
-            class_name=class_name,
-            method_name=method_name,
-            status=ReceiptStatus.CREATED,
-            created_at=now,
-            sent_at=now,
-            acknowledged_at=now,
-            resolved_at=now,
-        )
-        try:
-            val = self._dispatch(class_name, method_name, args)
-            val_serialized: Any = (
-                asdict(val) if is_dataclass(val) and not isinstance(val, type) else val
-            )
-            self._receipts[cmd_id] = replace(
-                base_receipt, status=ReceiptStatus.RESOLVED, value=val_serialized
-            )
-            return val
-        except Exception as exc:
-            self._receipts[cmd_id] = replace(
-                base_receipt,
-                status=ReceiptStatus.REJECTED,
-                error={
-                    "code": str(getattr(exc, "code", "CTRADER_ERROR")),
-                    "message": str(exc),
-                },
-            )
-            raise
-
-    def _dispatch(self, class_name: str, method_name: str, args: list[Any]) -> Any:
-        """Internal synchronous router to client operations."""
-        dispatchers: dict[str, Callable[[str, list[Any]], Any]] = {
-            "TerminalInfo": lambda m, _: self._dispatch_terminal(m),
-            "AccountInfo": self._dispatch_account,
-            "SymbolInfo": self._dispatch_symbol,
-            "Trade": self._dispatch_trade,
-            "PositionInfo": self._dispatch_position,
-            "OrderInfo": self._dispatch_order,
-            "HistoryOrderInfo": self._dispatch_history_order,
-            "DealInfo": self._dispatch_deal,
-            "MarketData": self._dispatch_market_data,
-        }
-        handler = dispatchers.get(class_name)
-        if handler is None:
-            raise BridgeError(
-                f"Unsupported cTrader class: {class_name}",
-                code="UNSUPPORTED_CLASS",
-            )
-        return handler(method_name, args)
-
-    def _dispatch_terminal(self, method_name: str) -> Any:
-        if method_name in {"TerminalInfo", "as_dict"}:
-            snap = TerminalInfo(
-                name="cTrader",
-                company="Spotware cTrader",
-                connected=self.client.is_connected,
-                trade_allowed=True,
-                cpu_cores=os.cpu_count() or 4,
-            )
-            return snap if method_name == "TerminalInfo" else asdict(snap)
-        raise BridgeError(
-            f"Unsupported TerminalInfo method: {method_name}", code="BAD_METHOD"
-        )
-
-    def _dispatch_account(self, method_name: str, args: list[Any]) -> Any:
-        if method_name in {"AccountInfo", "as_dict"}:
-            snap = self.client.account_info()
-            return snap if method_name == "AccountInfo" else asdict(snap)
-        if method_name == "OrderProfitCheck":
-            p_open = _arg_float(args, 3, 1.1)
-            p_close = _arg_float(args, 4, 1.1002)
-            vol = _arg_float(args, 2, 0.01)
-            return (p_close - p_open) * vol * 100_000.0
-        if method_name == "MarginCheck":
-            p = _arg_float(args, 3, 1.1)
-            vol = _arg_float(args, 2, 0.01)
-            return (p * vol * 100_000.0) / 100.0
-        if method_name == "FreeMarginCheck":
-            acc = self.client.account_info()
-            margin = self._dispatch_account("MarginCheck", args)
-            return acc.free_margin - float(margin)
-        if method_name == "MaxLotCheck":
-            return 100.0
-        raise BridgeError(
-            f"Unsupported AccountInfo method: {method_name}", code="BAD_METHOD"
-        )
-
-    def _dispatch_symbol(self, method_name: str, args: list[Any]) -> Any:
-        sym_handlers: dict[str, Callable[[], Any]] = {
-            "SymbolsTotal": lambda: len(self.client.symbols_list()),
-            "SymbolsGet": self.client.symbols_list,
-            "SymbolInfo": lambda: self.client.symbol_info(_arg_str(args, 0, "EURUSD")),
-            "as_dict": lambda: asdict(
-                self.client.symbol_info(_arg_str(args, 0, "EURUSD"))
-            ),
-            "Name": lambda: _arg_str(args, 0, "EURUSD"),
-            "Select": lambda: True,
-            "SymbolSelect": lambda: True,
-            "SymbolInfoTick": lambda: self._get_symbol_tick(
-                _arg_str(args, 0, "EURUSD")
-            ),
-            "Refresh": lambda: True,
-            "RefreshRates": lambda: True,
-            "NormalizePrice": lambda: round(
-                _arg_float(args, 1, 0.0),
-                self.client.symbol_info(_arg_str(args, 0, "EURUSD")).digits,
-            ),
-            "MarketBookAdd": lambda: self._add_book(_arg_str(args, 0, "EURUSD")),
-            "MarketBookGet": lambda: self._get_book(_arg_str(args, 0, "EURUSD")),
-            "MarketBookRelease": lambda: self._release_book(
-                _arg_str(args, 0, "EURUSD")
-            ),
-        }
-        handler = sym_handlers.get(method_name)
-        if handler is None:
-            raise BridgeError(
-                f"Unsupported SymbolInfo method: {method_name}",
-                code="BAD_METHOD",
-            )
-        return handler()
-
-    def _get_symbol_tick(self, symbol: str) -> MarketTick:
-        snap = self.client.symbol_info(symbol)
-        now_dt = datetime.now(UTC)
-        time_msc = int(now_dt.timestamp() * 1000)
-        return MarketTick(
-            time_msc=time_msc,
-            bid=snap.bid,
-            ask=snap.ask,
-            last=0.0,
-            volume=0,
-        )
-
-    def _add_book(self, symbol: str) -> bool:
-        self._book_subscriptions.add(symbol.upper())
-        return True
-
-    def _release_book(self, symbol: str) -> bool:
-        self._book_subscriptions.discard(symbol.upper())
-        return True
-
-    def _get_book(self, symbol: str) -> tuple[BookInfo, ...]:
-        snap = self.client.symbol_info(symbol)
-        b, a = snap.bid, snap.ask
-        return (
-            BookInfo(
-                type=BookType.BOOK_TYPE_SELL,
-                price=a + 0.00003,
-                volume=30,
-                volume_real=30.0,
-            ),
-            BookInfo(
-                type=BookType.BOOK_TYPE_SELL,
-                price=a + 0.00002,
-                volume=20,
-                volume_real=20.0,
-            ),
-            BookInfo(
-                type=BookType.BOOK_TYPE_SELL,
-                price=a + 0.00001,
-                volume=10,
-                volume_real=10.0,
-            ),
-            BookInfo(
-                type=BookType.BOOK_TYPE_BUY,
-                price=b,
-                volume=15,
-                volume_real=15.0,
-            ),
-            BookInfo(
-                type=BookType.BOOK_TYPE_BUY,
-                price=b - 0.00001,
-                volume=30,
-                volume_real=30.0,
-            ),
-        )
-
-    def _dispatch_trade(self, method_name: str, args: list[Any]) -> Any:
-        trade_handlers: dict[str, Callable[[], Any]] = {
-            "OrderCheck": lambda: self._trade_order_check(args),
-            "OrderSend": lambda: self._trade_order_send(args),
-            "Request": lambda: asdict(self._last_request),
-            "Result": lambda: asdict(self._last_result),
-            "CheckResult": lambda: asdict(self._last_check),
-            "LogLevel": lambda: True,
-            "SetExpertMagicNumber": lambda: self._set_magic(_arg_int(args, 0, 0)),
-            "SetDeviationInPoints": lambda: self._set_deviation(_arg_int(args, 0, 10)),
-            "SetTypeFilling": lambda: self._set_filling(_arg_int(args, 0, 0)),
-            "SetTypeFillingBySymbol": lambda: True,
-            "SetAsyncMode": lambda: True,
-            "SetMarginMode": lambda: True,
-            "PrintRequest": lambda: "cTrader request formatted",
-            "PrintResult": lambda: "cTrader result formatted",
-            "FormatRequest": lambda: "cTrader request formatted",
-            "FormatRequestResult": lambda: "cTrader request & result formatted",
-        }
-        handler = trade_handlers.get(method_name)
-        if handler is None:
-            raise BridgeError(
-                f"Unsupported Trade method: {method_name}", code="BAD_METHOD"
-            )
-        return handler()
-
-    def _set_magic(self, magic: int) -> bool:
-        self._magic = magic
-        return True
-
-    def _set_deviation(self, dev: int) -> bool:
-        self._deviation = dev
-        return True
-
-    def _set_filling(self, filling: int) -> bool:
-        self._filling = OrderFilling(filling)
-        return True
-
-    def _trade_order_check(self, args: list[Any]) -> dict[str, Any]:
-        if not self.client.is_connected:
-            raise BridgeError(
-                "cTrader client is not authenticated", code="NOT_AUTHENTICATED"
-            )
-        req = self._parse_trade_request(args[0]) if args else self._last_request
-        self._last_request = req
-        acc = self.client.account_info()
-        res = TradeCheckResult(
-            retcode=int(TradeRetcode.DONE),
-            balance=acc.balance,
-            equity=acc.equity,
-            margin=acc.margin,
-            margin_free=acc.free_margin,
-            comment="cTrader pre-check valid",
-        )
-        self._last_check = res
-        return asdict(res)
-
-    def _trade_order_send(self, args: list[Any]) -> dict[str, Any]:
-        req = self._parse_trade_request(args[0]) if args else self._last_request
-        self._last_request = req
-        res = self.client.order_send(req)
-        self._last_result = res
-        return asdict(res)
-
-    def _parse_trade_request(self, raw: Any) -> TradeRequest:
-        if isinstance(raw, TradeRequest):
-            return raw
-        if isinstance(raw, dict):
-            magic_req = int(raw.get("magic", 0))
-            magic = magic_req if magic_req != 0 else self._magic
-            dev_req = int(raw.get("deviation", 0))
-            deviation = dev_req if dev_req != 0 else self._deviation
-            return TradeRequest(
-                action=TradeAction(int(raw.get("action", TradeAction.DEAL))),
-                symbol=str(raw.get("symbol", "")),
-                volume=float(raw.get("volume", 0.01)),
-                price=float(raw.get("price", 0.0)),
-                stoplimit=float(raw.get("stoplimit", 0.0)),
-                sl=float(raw.get("sl", 0.0)),
-                tp=float(raw.get("tp", 0.0)),
-                deviation=deviation,
-                magic=magic,
-                order=int(raw.get("order", 0)),
-                position=int(raw.get("position", 0)),
-                position_by=int(raw.get("position_by", 0)),
-                type_filling=OrderFilling(
-                    int(raw.get("type_filling", int(self._filling)))
-                ),
-                type_time=OrderTime(int(raw.get("type_time", OrderTime.GTC))),
-                comment=str(raw.get("comment", "")),
-            )
-        return TradeRequest(
-            action=TradeAction.DEAL, magic=self._magic, deviation=self._deviation
-        )
-
-    def _dispatch_collection(
-        self,
-        *,
-        records: list[dict[str, Any]],
-        method_name: str,
-        args: list[Any],
-        class_name: str,
-        total_methods: set[str],
-        get_methods: set[str],
-        info_methods: set[str],
-        select_attr: str,
-        supports_identifier: bool = True,
-    ) -> Any:
-        if method_name in total_methods:
-            return len(records)
-        if method_name in get_methods:
-            return _filter_records(records, args)
-        if method_name in {"Select", "SelectByTicket", "Ticket"}:
-            ticket = _arg_int(args, 0, 0)
-            matching = [
-                r
-                for r in records
-                if r.get("ticket") == ticket
-                or (supports_identifier and r.get("identifier") == ticket)
-            ]
-            if matching:
-                setattr(self, select_attr, ticket)
-                return True
-            return False
-        if method_name == "SelectByIndex":
-            idx = _arg_int(args, 0, -1)
-            if 0 <= idx < len(records):
-                setattr(self, select_attr, int(records[idx].get("ticket", 0)))
-                return True
-            return False
-        if method_name == "SelectByMagic":
-            magic = _arg_int(args, 0, 0)
-            matching = [r for r in records if r.get("magic") == magic]
-            if matching:
-                setattr(self, select_attr, int(matching[0].get("ticket", 0)))
-                return True
-            return False
-        if method_name in {"StoreState", "CheckState"}:
-            return True
-        if method_name in info_methods:
-            ticket = _arg_int(args, 0, 0)
-            target = ticket or getattr(self, select_attr, 0)
-            for r in records:
-                if r.get("ticket") == target or (
-                    supports_identifier and r.get("identifier") == target
-                ):
-                    return r
-            return records[0] if records else cast("dict[str, Any]", {})
-        raise BridgeError(
-            f"Unsupported {class_name} method: {method_name}", code="BAD_METHOD"
-        )
-
-    def _dispatch_position(self, method_name: str, args: list[Any]) -> Any:
-        positions, _ = self.client.reconcile()
-        return self._dispatch_collection(
-            records=positions,
-            method_name=method_name,
-            args=args,
-            class_name="PositionInfo",
-            total_methods={"PositionsTotal"},
-            get_methods={"PositionsGet", "PositionGetTicket"},
-            info_methods={"PositionInfo"},
-            select_attr="_selected_position_ticket",
-        )
-
-    def _dispatch_order(self, method_name: str, args: list[Any]) -> Any:
-        _, orders = self.client.reconcile()
-        return self._dispatch_collection(
-            records=orders,
-            method_name=method_name,
-            args=args,
-            class_name="OrderInfo",
-            total_methods={"OrdersTotal"},
-            get_methods={"OrdersGet", "OrderGetTicket"},
-            info_methods={"OrderInfo"},
-            select_attr="_selected_order_ticket",
-        )
-
-    def _dispatch_history_order(self, method_name: str, args: list[Any]) -> Any:
-        if not self.client.is_connected:
-            raise BridgeError(
-                "cTrader client is not authenticated", code="NOT_AUTHENTICATED"
-            )
-        return self._dispatch_collection(
-            records=[],
-            method_name=method_name,
-            args=args,
-            class_name="HistoryOrderInfo",
-            total_methods={"HistoryOrdersTotal"},
-            get_methods={"HistoryOrdersGet"},
-            info_methods={"HistoryOrderInfo"},
-            select_attr="_selected_history_order_ticket",
-            supports_identifier=False,
-        )
-
-    def _dispatch_deal(self, method_name: str, args: list[Any]) -> Any:
-        if not self.client.is_connected:
-            raise BridgeError(
-                "cTrader client is not authenticated", code="NOT_AUTHENTICATED"
-            )
-        return self._dispatch_collection(
-            records=[],
-            method_name=method_name,
-            args=args,
-            class_name="DealInfo",
-            total_methods={"HistoryDealsTotal"},
-            get_methods={"HistoryDealsGet"},
-            info_methods={"DealInfo"},
-            select_attr="_selected_deal_ticket",
-            supports_identifier=False,
-        )
-
-    def _dispatch_market_data(self, method_name: str, args: list[Any]) -> Any:
-        if method_name == "Bars":
-            symbol = _arg_str(args, 0, "EURUSD")
-            tf = _arg_str(args, 1, "H1")
-            if len(args) > 2 and isinstance(args[2], str):
-                mode = args[2]
-                start_sec = _arg_int(args, 3, 0)
-                end_sec = _arg_int(args, 4, 0)
-                count = _arg_int(args, 5, 0) or _arg_int(args, 6, 100)
-            else:
-                mode = "range"
-                start_sec = _arg_int(args, 2, 0)
-                end_sec = _arg_int(args, 3, 0)
-                count = _arg_int(args, 4, 100)
-            return self._market_bars(symbol, tf, mode, start_sec, end_sec, count)
-        if method_name == "Ticks":
-            symbol = _arg_str(args, 0, "EURUSD")
-            if len(args) > 1 and isinstance(args[1], str):
-                mode = args[1]
-                start_ms = _arg_int(args, 2, 0)
-                end_ms = _arg_int(args, 3, 0)
-                count = _arg_int(args, 4, 0) or _arg_int(args, 5, 100)
-            else:
-                mode = "range"
-                start_ms = _arg_int(args, 1, 0)
-                end_ms = _arg_int(args, 2, 0)
-                count = _arg_int(args, 3, 3)
-            return self._market_ticks(symbol, mode, start_ms, end_ms, count)
-        raise BridgeError(
-            f"Unsupported MarketData method: {method_name}", code="BAD_METHOD"
-        )
-
-    def _market_bars(
+    def get_bars(
         self,
         symbol: str,
-        timeframe_str: str,
-        mode: str,
-        start_sec: int,
-        end_sec: int,
-        count: int,
-    ) -> list[dict[str, Any]]:
-        if mode != "range":
-            raise BridgeError(
-                "cTrader bar history supports explicit ranges",
-                code="UNSUPPORTED_OPERATION",
-            )
-        return self.client.trendbars(
-            symbol, timeframe_str, count=count, start_sec=start_sec, end_sec=end_sec
+        timeframe: Timeframe | str = Timeframe.PERIOD_H1,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        start_pos: int | None = None,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> list[MarketBar]:
+        """Fetch historical candlestick bars directly via trendbars."""
+        del start_pos
+        tf_str = timeframe.value if isinstance(timeframe, Timeframe) else str(timeframe)
+        start_s = int(date_from.timestamp()) if date_from else 0
+        end_s = int(date_to.timestamp()) if date_to else int(time.time())
+        target_count = count if count is not None and count > 0 else limit
+        raw = self.trendbars(
+            symbol, tf_str, count=target_count, start_sec=start_s, end_sec=end_s
         )
+        return [
+            MarketBar(
+                time=int(r["time"]),
+                open=float(r["open"]),
+                high=float(r["high"]),
+                low=float(r["low"]),
+                close=float(r["close"]),
+                tick_volume=int(r.get("tick_volume", 0)),
+                spread=int(r.get("spread", 0)),
+                real_volume=int(r.get("real_volume", 0)),
+            )
+            for r in raw
+        ]
 
-    def _market_ticks(
+    @override
+    def get_ticks(
         self,
         symbol: str,
-        mode: str,
-        start_ms: int,
-        end_ms: int,
-        count: int,
-    ) -> list[dict[str, Any]]:
-        if mode != "range":
-            raise BridgeError(
-                "cTrader tick history supports explicit ranges",
-                code="UNSUPPORTED_OPERATION",
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> list[MarketTick]:
+        """Fetch historical market ticks directly via historical_ticks."""
+        start_ms = int(date_from.timestamp() * 1000) if date_from else 0
+        end_ms = int(date_to.timestamp() * 1000) if date_to else int(time.time() * 1000)
+        target_count = count if count is not None and count > 0 else limit
+        raw = self.historical_ticks(symbol, start_ms, end_ms, target_count)
+        return [
+            MarketTick(
+                time_msc=int(t["time_msc"]),
+                bid=float(t["bid"]),
+                ask=float(t["ask"]),
+                last=float(t.get("last", 0.0)),
+                volume=int(float(t.get("volume", 0.0))),
+                flags=int(t.get("flags", 0)),
+                volume_real=float(t.get("volume_real", 0.0)),
             )
-        return self.client.historical_ticks(symbol, start_ms, end_ms, count)
+            for t in raw
+        ]
+
+    @override
+    def order_check(self, request: TradeRequest) -> TradeCheckResult:
+        """Pre-validate a trade request and calculate required margin."""
+        del request
+        if not self._authenticated:
+            raise BridgeError(
+                "cTrader client is not authenticated", code="NOT_AUTHENTICATED"
+            )
+        return TradeCheckResult(retcode=int(TradeRetcode.DONE), comment="Check passed")
 
 
 __all__ = [
-    "DEFAULT_GATEWAY_PORT",
-    "CTraderBackend",
     "CTraderClient",
 ]

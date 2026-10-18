@@ -134,7 +134,6 @@ from app.host.transport import (
     get_global_event_bus,
     register_transport_exception_handlers,
 )
-from app.services.brokers.registry import BrokerRegistry
 from app.workspace.data_manager import (
     DataManagerWorkspace,
     create_data_manager_router,
@@ -363,7 +362,7 @@ class AppHost:
         resource_mgr: ResourceManager | None = None,
         job_mgr: JobManager | None = None,
         plugin_mgr: PluginLifecycleManager | None = None,
-        broker_registry: BrokerRegistry | None = None,
+        broker_registry: Any | None = None,
         extra_routers: list[APIRouter] | None = None,
         stage_hooks: dict[_LifespanStage, Callable[[AppHost], Any]] | None = None,
     ) -> None:
@@ -418,7 +417,7 @@ class AppHost:
         self.resource_manager: ResourceManager | None = resource_mgr
         self.job_manager: JobManager | None = job_mgr
         self.plugin_manager: PluginLifecycleManager | None = plugin_mgr
-        self.broker_registry: BrokerRegistry | None = broker_registry
+        self.broker_registry: Any | None = broker_registry
         self.gateway_service: TransportGatewayService | None = None
         self.data_manager: DataManagerWorkspace | None = None
 
@@ -746,34 +745,18 @@ class AppHost:
             slot_registry=slot_registry,
         )
         engine.discover()
-        if self.broker_registry is None:
-            self.broker_registry = BrokerRegistry(
-                data_root=Path(self.config.data_dir),
-                discovery_engine=engine,
-            )
 
         def _broker_instance_factory(plugin_id: str, record: Any, ctx: Any) -> Any:
             del ctx
             slot = getattr(getattr(record, "manifest", None), "slot", None)
-            if slot == "data.provider" and self.broker_registry is not None:
-                from app.services.brokers.registry import (
-                    CANONICAL_PROVIDERS,
-                    BrokerKey,
-                    normalize_provider_id,
-                )
+            if slot == "data.provider":
+                from app.services.brokers import get_broker
 
                 manifest_id = getattr(
                     getattr(record, "manifest", None), "id", plugin_id
                 )
                 try:
-                    canon = normalize_provider_id(manifest_id)
-                except AttributeError, ValueError, TypeError:
-                    return None
-                if canon not in CANONICAL_PROVIDERS:
-                    return None
-                bkey = BrokerKey(provider=canon, data_root=str(self.config.data_dir))
-                try:
-                    return self.broker_registry.acquire(bkey)
+                    return get_broker(manifest_id)
                 except (
                     RuntimeError,
                     ValueError,
@@ -783,7 +766,7 @@ class AppHost:
                     ImportError,
                 ) as err:
                     logger.warning(
-                        "%s: Could not acquire broker for %s: %s",
+                        "%s: Could not acquire broker client for %s: %s",
                         SERVICES_STAGE_FR,
                         manifest_id,
                         err,

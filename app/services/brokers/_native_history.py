@@ -47,7 +47,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from app.host.logging import get_logger
-from app.services.brokers.capabilities import ProviderValidationError
+from app.services.brokers.base import BridgeError
 
 logger = get_logger(__name__)
 
@@ -90,11 +90,11 @@ def decompress_bi5(data: bytes, max_bytes: int = MAX_DECOMPRESSED_BYTES) -> byte
     try:
         decomp = lzma.decompress(data, format=lzma.FORMAT_ALONE)
         if len(decomp) > max_bytes:
-            raise ProviderValidationError(
+            raise BridgeError(
                 f"Decompressed BI5 payload exceeds limit ({len(decomp)} > {max_bytes})"
             )
         return decomp
-    except ProviderValidationError:
+    except BridgeError:
         raise
     except Exception:
         pass
@@ -104,22 +104,22 @@ def decompress_bi5(data: bytes, max_bytes: int = MAX_DECOMPRESSED_BYTES) -> byte
         alone_header = props + struct.pack("<Q", 2**64 - 1)
         decomp = lzma.decompress(alone_header + payload, format=lzma.FORMAT_ALONE)
         if len(decomp) > max_bytes:
-            raise ProviderValidationError(
+            raise BridgeError(
                 f"Decompressed BI5 payload exceeds limit ({len(decomp)} > {max_bytes})"
             )
         return decomp
-    except ProviderValidationError:
+    except BridgeError:
         raise
     except Exception:
         pass
     try:
         decomp = lzma.decompress(data, format=lzma.FORMAT_RAW)
         if len(decomp) > max_bytes:
-            raise ProviderValidationError(
+            raise BridgeError(
                 f"Decompressed BI5 payload exceeds limit ({len(decomp)} > {max_bytes})"
             )
         return decomp
-    except ProviderValidationError:
+    except BridgeError:
         raise
     except Exception:
         return b""
@@ -211,20 +211,18 @@ def decode_bi5_bars(
 def decode_hst_bytes(data: bytes, count: int | None = None) -> list[dict[str, Any]]:
     """Decode MetaTrader 4 HST binary files (version 400 or 401)."""
     if len(data) < 148:
-        raise ProviderValidationError(
-            "HST file too small to contain valid 148-byte header"
-        )
+        raise BridgeError("HST file too small to contain valid 148-byte header")
 
     version, _raw_cr, raw_sym, period, digits = struct.unpack_from(
         "<i64s12sii", data, 0
     )
     if version not in (400, 401):
-        raise ProviderValidationError(f"Unsupported HST version: {version}")
+        raise BridgeError(f"Unsupported HST version: {version}")
 
     rec_size = 44 if version == 400 else 60
     payload_len = len(data) - 148
     if payload_len % rec_size != 0:
-        raise ProviderValidationError(
+        raise BridgeError(
             f"HST file contains truncated records: {payload_len} bytes not divisible by record size {rec_size}"
         )
 
@@ -339,7 +337,7 @@ def encode_hst_bytes(
                 )
             )
     else:
-        raise ProviderValidationError(f"Unsupported encode HST version: {version}")
+        raise BridgeError(f"Unsupported encode HST version: {version}")
 
     return buf.getvalue()
 
@@ -347,13 +345,13 @@ def encode_hst_bytes(
 def decode_fxt_bytes(data: bytes, count: int | None = None) -> list[dict[str, Any]]:
     """Decode MetaTrader 4 FXT testing files (version 405)."""
     if len(data) < 724:
-        raise ProviderValidationError("FXT file too small to contain valid header")
+        raise BridgeError("FXT file too small to contain valid header")
 
     version, _raw_desc, _raw_srv, raw_sym, period, _model, bars_count = (
         struct.unpack_from("<i64s128s16siii", data, 0)
     )
     if version != 405:
-        raise ProviderValidationError(f"Unsupported FXT version: {version}")
+        raise BridgeError(f"Unsupported FXT version: {version}")
 
     rec_size = 56
     if len(data) >= 728 and (len(data) - 728) % rec_size == 0:
@@ -361,7 +359,7 @@ def decode_fxt_bytes(data: bytes, count: int | None = None) -> list[dict[str, An
     elif len(data) >= 724 and (len(data) - 724) % rec_size == 0:
         offset = 724
     else:
-        raise ProviderValidationError(
+        raise BridgeError(
             f"FXT file contains truncated records: length {len(data)} does not match 724/728 + N*{rec_size}"
         )
 

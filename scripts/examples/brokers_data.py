@@ -43,14 +43,14 @@ from datetime import UTC, datetime
 
 from app.host.logging import get_logger
 from app.services.brokers import (
-    BinanceBroker,
-    DarwinexBroker,
-    DukascopyBroker,
-    FilesBroker,
-    SimulationBackend,
-    SQEquityBroker,
-    SQFuturesBroker,
-    YahooBroker,
+    BinanceClient,
+    DarwinexClient,
+    DukascopyClient,
+    FilesClient,
+    SimulatorClient,
+    SQEquityClient,
+    SQFuturesClient,
+    YahooClient,
 )
 from app.services.include.contracts import SymbolInfo
 from app.services.include.data import (
@@ -110,7 +110,7 @@ def _print_ticks_table(name: str, symbol: str, ticks: Sequence[MarketTick]) -> N
 
 async def demo_yahoo(count: int = 5) -> list[MarketBar]:
     """Download historical Daily bars for AAPL from Yahoo Finance."""
-    broker = YahooBroker()
+    broker = YahooClient()
     symbol = "AAPL"
     bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_D1, count=count)
     _print_bars_table("Yahoo Finance", symbol, bars)
@@ -120,7 +120,7 @@ async def demo_yahoo(count: int = 5) -> list[MarketBar]:
 
 async def demo_binance(count: int = 5) -> tuple[list[MarketBar], list[MarketTick]]:
     """Download historical 1H klines and live ticks for BTCUSDT from Binance."""
-    broker = BinanceBroker()
+    broker = BinanceClient()
     symbol = "BTCUSDT"
     bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_H1, count=count)
     _print_bars_table("Binance (Klines)", symbol, bars)
@@ -134,7 +134,7 @@ async def demo_binance(count: int = 5) -> tuple[list[MarketBar], list[MarketTick
 
 async def demo_dukascopy(count: int = 5) -> list[MarketBar]:
     """Download historical M1 bars for EURUSD from Dukascopy CDN."""
-    broker = DukascopyBroker()
+    broker = DukascopyClient()
     symbol = "EURUSD"
     bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_M1, count=count)
     _print_bars_table("Dukascopy Bank", symbol, bars)
@@ -144,7 +144,7 @@ async def demo_dukascopy(count: int = 5) -> list[MarketBar]:
 
 async def demo_darwinex(count: int = 5) -> list[MarketBar]:
     """Download historical Daily bars for EURUSD from Darwinex CDN."""
-    broker = DarwinexBroker()
+    broker = DarwinexClient()
     symbol = "EURUSD"
     bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_D1, count=count)
     _print_bars_table("Darwinex Institutional", symbol, bars)
@@ -154,7 +154,7 @@ async def demo_darwinex(count: int = 5) -> list[MarketBar]:
 
 async def demo_sq_equity(count: int = 5) -> list[MarketBar]:
     """Download historical Daily bars for AAPL from StrategyQuant US Equities."""
-    broker = SQEquityBroker()
+    broker = SQEquityClient()
     symbol = "AAPL"
     bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_D1, count=count)
     _print_bars_table("SQ US Equities", symbol, bars)
@@ -164,7 +164,7 @@ async def demo_sq_equity(count: int = 5) -> list[MarketBar]:
 
 async def demo_sq_futures(count: int = 5) -> list[MarketBar]:
     """Download historical Daily bars for @ES from StrategyQuant Continuous Futures."""
-    broker = SQFuturesBroker()
+    broker = SQFuturesClient()
     symbol = "@ES"
     bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_D1, count=count)
     _print_bars_table("SQ Continuous Futures", symbol, bars)
@@ -174,7 +174,7 @@ async def demo_sq_futures(count: int = 5) -> list[MarketBar]:
 
 async def demo_files(count: int = 5) -> list[MarketBar]:
     """Download historical M1 bars for EURUSD from local filesystem Parquet archives."""
-    broker = FilesBroker(data_dir="data/market/dukascopy/m1")
+    broker = FilesClient(data_dir="data/market/dukascopy/m1")
     symbol = "EURUSD"
     bars = await get_historical_bars(broker, symbol, Timeframe.PERIOD_M1, count=count)
     _print_bars_table("Local Filesystem", symbol, bars)
@@ -184,7 +184,7 @@ async def demo_files(count: int = 5) -> list[MarketBar]:
 
 async def demo_simulator(count: int = 5) -> list[MarketBar]:
     """Download seeded historical M1 bars for EURUSD from SimulationBackend."""
-    sim = SimulationBackend()
+    sim = SimulatorClient()
     symbol = "EURUSD"
     sim.add_symbol(SymbolInfo(name=symbol))
     base_ts = 1704100000
