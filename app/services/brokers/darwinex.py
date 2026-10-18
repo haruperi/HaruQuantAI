@@ -26,7 +26,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.darwinex import DarwinexBroker
-    from app.workspace.data_manager.history import get_historical_bars
+    from app.services.include.data import get_historical_bars
     from app.workspace.data_manager import Timeframe
 
     broker = DarwinexBroker()
@@ -67,7 +67,7 @@ from app.services.brokers.capabilities import (
     ProviderUnsupportedError,
 )
 from app.services.include.contracts import SymbolInfo
-from app.workspace.data_manager.history import DataBrokerBackend
+from app.services.include.data import DataBrokerBackend
 
 logger = get_logger(__name__)
 

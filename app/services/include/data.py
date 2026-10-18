@@ -6,49 +6,37 @@ Description:
     and structured conversion routines into pandas DataFrames.
 
 Purpose:
-    FEAT-DATAMGR-HISTORY: Historical market data retrieval, validation, and conversion.
+    FEAT-INCLUDE-DATA: Historical market data retrieval, validation, and conversion.
 
 Key Capabilities:
-    - FR-DATAMGR-HISTORY-BAR-COLUMNS: Canonical bar column tuple specification.
+    - FR-INCLUDE-DATA-BAR-COLUMNS: Canonical bar column tuple specification.
       Associated: `BAR_COLUMNS`.
       Logging: Constant schema tuple with zero side effects.
-    - FR-DATAMGR-HISTORY-TICK-COLUMNS: Canonical tick column tuple specification.
+    - FR-INCLUDE-DATA-TICK-COLUMNS: Canonical tick column tuple specification.
       Associated: `TICK_COLUMNS`.
       Logging: Constant schema tuple with zero side effects.
-    - FR-DATAMGR-HISTORY-BACKEND-PROTOCOL: Execution protocol for market data readers.
+    - FR-INCLUDE-DATA-BACKEND-PROTOCOL: Execution protocol for market data readers.
       Associated: `DataBackend`.
       Logging: Protocol definition with zero side effects.
-    - FR-DATAMGR-HISTORY-BROKER-BACKEND: Base market data provider adapter.
+    - FR-INCLUDE-DATA-BROKER-BACKEND: Base market data provider adapter.
       Associated: `DataBrokerBackend`.
       Logging: DEBUG market data dispatch lifecycle through BaseBrokerBackend.
-    - FR-DATAMGR-HISTORY-BARS-TO-DATAFRAME: Convert historical bars to pandas DataFrame.
-      Associated: `bars_to_dataframe()`.
+    - FR-INCLUDE-DATA-BARS-TO-DATAFRAME: Convert historical bars to pandas DataFrame.
+      Associated: `bars_to_dataframe()`, `bars_to_df()`.
       Logging: In-memory vectorized DataFrame construction.
-    - FR-DATAMGR-HISTORY-BARS-TO-DF: Shorthand alias for bars DataFrame conversion.
-      Associated: `bars_to_df()`.
+    - FR-INCLUDE-DATA-HISTORICAL-READS: Fetch historical bars and ticks from backends.
+      Associated: `get_historical_bars()`, `get_ticks()`.
+      Logging: DEBUG on historical bar and tick query bounds.
+    - FR-INCLUDE-DATA-TICKS-TO-DATAFRAME: Convert historical ticks to DataFrame.
+      Associated: `ticks_to_dataframe()`, `ticks_to_df()`.
       Logging: In-memory vectorized DataFrame construction.
-    - FR-DATAMGR-HISTORY-GET-HISTORICAL-BARS: Fetch historical bars from broker backend.
-      Associated: `get_historical_bars()`.
-      Logging: DEBUG historical bar query bounds.
-    - FR-DATAMGR-HISTORY-GET-TICKS: Fetch historical ticks from broker backend.
-      Associated: `get_ticks()`.
-      Logging: DEBUG historical tick query bounds.
-    - FR-DATAMGR-HISTORY-TICKS-TO-DATAFRAME: Convert historical ticks to DataFrame.
-      Associated: `ticks_to_dataframe()`.
-      Logging: In-memory vectorized DataFrame construction.
-    - FR-DATAMGR-HISTORY-TICKS-TO-DF: Shorthand alias for ticks DataFrame conversion.
-      Associated: `ticks_to_df()`.
-      Logging: In-memory vectorized DataFrame construction.
-    - FR-DATAMGR-HISTORY-VALIDATE-REQUEST: Validate historical data request parameters.
-      Associated: `validate_request()`.
-      Logging: DEBUG request parameters with error codes on validation failure.
-    - FR-DATAMGR-HISTORY-VALIDATE-ROWS: Validate row counts and boundaries.
-      Associated: `validate_rows()`.
-      Logging: DEBUG row boundaries with error codes on validation failure.
+    - FR-INCLUDE-DATA-VALIDATION: Validate request bounds and row data.
+      Associated: `validate_request()`, `validate_rows()`.
+      Logging: DEBUG on validation failure or bounded checks.
 
 Python API Usage:
     ```python
-    from app.workspace.data_manager.history import (
+    from app.services.include.data import (
         bars_to_dataframe,
         get_historical_bars,
         validate_request,
@@ -58,7 +46,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.workspace.data_manager.history
+    uv run python -m app.services.include.data
     ```
 """
 
@@ -73,7 +61,8 @@ from typing import Any, Literal, Protocol, override
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.services.brokers.base import BaseBrokerBackend, BridgeError
-from app.services.include.contracts import (
+
+from .contracts import (
     MAX_POSITION,
     MAX_RECORDS,
     READ_TIMEOUT,
@@ -81,9 +70,7 @@ from app.services.include.contracts import (
     MarketBar,
     MarketTick,
 )
-from app.services.include.enums import (
-    Timeframe,
-)
+from .enums import Timeframe
 
 __all__ = [
     "BAR_COLUMNS",
@@ -501,19 +488,7 @@ def _parse_tick_record(
 
 
 def bars_to_dataframe(bars: Iterable[MarketBar | dict[str, Any]]) -> pd.DataFrame:
-    """Convert an iterable of MarketBar records or dicts to a pandas DataFrame.
-
-    The resulting DataFrame is indexed by a timezone-naive DatetimeIndex
-    named 'DateTime' with second resolution ('datetime64[s]') and contains
-    columns: Open, High, Low, Close, Volume, Spread. Volume is derived from
-    tick_volume.
-
-    Args:
-        bars: Sequence of MarketBar objects or dictionaries containing bar fields.
-
-    Returns:
-        pd.DataFrame indexed by timezone-naive DateTime.
-    """
+    """Convert an iterable of MarketBar records or dicts to a pandas DataFrame."""
     timestamps: list[datetime | int | float | str] = []
     opens: list[float] = []
     highs: list[float] = []
@@ -583,18 +558,7 @@ def bars_to_dataframe(bars: Iterable[MarketBar | dict[str, Any]]) -> pd.DataFram
 def ticks_to_dataframe(
     ticks: Iterable[MarketTick | Any],
 ) -> pd.DataFrame:
-    """Convert an iterable of MarketTick, Tick, or dicts to a pandas DataFrame.
-
-    The resulting DataFrame is indexed by a timezone-naive DatetimeIndex
-    named 'DateTime' with millisecond resolution ('datetime64[ms]') and contains
-    columns: Bid, Ask.
-
-    Args:
-        ticks: Sequence of MarketTick, Tick, or dictionary tick representations.
-
-    Returns:
-        pd.DataFrame indexed by timezone-naive DateTime.
-    """
+    """Convert an iterable of MarketTick, Tick, or dicts to a pandas DataFrame."""
     timestamps: list[datetime | int | float | str] = []
     use_ms: bool = False
     bids: list[float] = []
@@ -658,7 +622,11 @@ def main() -> None:
     """Demonstrate historical data converters and row validation."""
     bar = MarketBar(time=1700000000, open=1.1, high=1.2, low=1.0, close=1.15)
     df = bars_to_dataframe([bar])
-    print(f"Historical bars DataFrame shape: {df.shape}, columns: {list(df.columns)}")
+    logger.info(
+        "Historical bars DataFrame shape: %s, columns: %s",
+        df.shape,
+        list(df.columns),
+    )
     row = {
         "time": 1700000000,
         "open": 1.1,
@@ -670,7 +638,7 @@ def main() -> None:
         "real_volume": 0,
     }
     validated = validate_rows([row], "bars", 1699999900, 1700000100, MAX_RECORDS)
-    print(f"Validated rows: count={len(validated)}")
+    logger.info("Validated rows: count=%d", len(validated))
 
 
 if __name__ == "__main__":

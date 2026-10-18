@@ -97,12 +97,12 @@ from app.services.include.contracts import (
     Receipt,
     SymbolInfo,
 )
+from app.services.include.data import DataBrokerBackend
 from app.services.include.enums import (
     ReceiptStatus,
     TradeResolution,
 )
 from app.services.include.trading import Trading
-from app.workspace.data_manager.history import DataBrokerBackend
 
 PLUGIN_MANIFEST = {
     "id": "metatrader",

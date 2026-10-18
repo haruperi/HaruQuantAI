@@ -61,7 +61,7 @@ from app.services.brokers.capabilities import (
     ProviderUnsupportedError,
 )
 from app.services.include.contracts import SymbolInfo
-from app.workspace.data_manager.history import DataBrokerBackend
+from app.services.include.data import DataBrokerBackend
 
 ADAPTERS_FR = "FR-DATA-PROVIDERS-ADAPTERS"
 HEALTH_FR = "FR-DATA-PROVIDERS-HEALTH"

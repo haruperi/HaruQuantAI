@@ -65,6 +65,12 @@ from app.services.include.bar_time import (
     format_timestamp,
     normalize_timestamps,
 )
+from app.services.include.data import (
+    bars_to_dataframe,
+    bars_to_df,
+    ticks_to_dataframe,
+    ticks_to_df,
+)
 from app.services.utils.actions import (
     ActionRecord,
     Actions,
@@ -158,12 +164,6 @@ from app.services.utils.types import (
     double_variable,
     int_variable,
     number_constant,
-)
-from app.workspace.data_manager.history import (
-    bars_to_dataframe,
-    bars_to_df,
-    ticks_to_dataframe,
-    ticks_to_df,
 )
 
 __all__ = [

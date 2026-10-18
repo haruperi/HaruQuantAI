@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 from .bar_time import (
     BarTime,
     DateTimeSeries,
@@ -46,6 +48,22 @@ from .contracts import (
     TradeResult,
     TradingBackend,
 )
+
+if TYPE_CHECKING:
+    from .data import (
+        BAR_COLUMNS,
+        TICK_COLUMNS,
+        DataBackend,
+        DataBrokerBackend,
+        bars_to_dataframe,
+        bars_to_df,
+        get_historical_bars,
+        get_ticks,
+        ticks_to_dataframe,
+        ticks_to_df,
+        validate_request,
+        validate_rows,
+    )
 from .enums import (
     AccountTradeMode,
     BookType,
@@ -90,6 +108,7 @@ from .trading import (
 )
 
 __all__ = [
+    "BAR_COLUMNS",
     "BOOK_TYPE_DESCRIPTIONS",
     "DEAL_ENTRY_DESCRIPTIONS",
     "DEAL_TYPE_DESCRIPTIONS",
@@ -105,6 +124,7 @@ __all__ = [
     "SYMBOL_SWAP_MODE_DESCRIPTIONS",
     "SYMBOL_TRADE_EXECUTION_DESCRIPTIONS",
     "SYMBOL_TRADE_MODE_DESCRIPTIONS",
+    "TICK_COLUMNS",
     "TIMEFRAME_SECONDS",
     "AccountInfo",
     "AccountProxy",
@@ -115,6 +135,8 @@ __all__ = [
     "BookType",
     "BridgeEvent",
     "ChartDef",
+    "DataBackend",
+    "DataBrokerBackend",
     "DataInfo",
     "DateTimeSeries",
     "DealEntry",
@@ -166,6 +188,40 @@ __all__ = [
     "_build_trade_result",
     "_serialize_dict_request",
     "_serialize_request",
+    "bars_to_dataframe",
+    "bars_to_df",
     "format_timestamp",
+    "get_historical_bars",
+    "get_ticks",
     "normalize_timestamps",
+    "ticks_to_dataframe",
+    "ticks_to_df",
+    "validate_request",
+    "validate_rows",
 ]
+
+_DATA_EXPORTS = {
+    "BAR_COLUMNS",
+    "TICK_COLUMNS",
+    "DataBackend",
+    "DataBrokerBackend",
+    "bars_to_dataframe",
+    "bars_to_df",
+    "get_historical_bars",
+    "get_ticks",
+    "ticks_to_dataframe",
+    "ticks_to_df",
+    "validate_request",
+    "validate_rows",
+}
+
+
+def __getattr__(name: str) -> Any:
+    """Lazily load historical market data symbols to avoid circular package imports."""
+    if name in _DATA_EXPORTS:
+        from . import data
+
+        value = getattr(data, name)
+        globals()[name] = value
+        return value
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

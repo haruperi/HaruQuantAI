@@ -25,7 +25,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.sq_futures import SQFuturesBroker
-    from app.workspace.data_manager.history import get_historical_bars
+    from app.services.include.data import get_historical_bars
     from app.workspace.data_manager import Timeframe
 
     broker = SQFuturesBroker()

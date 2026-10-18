@@ -3,7 +3,7 @@
 Description:
     Validates functionality, boundary conditions, numerical integrity,
     date routing, request parameter validation, row boundary validation,
-    and DataFrame conversions for bars and ticks in app.workspace.data_manager.history.
+    and DataFrame conversions for bars and ticks in app.services.include.data.
 
 Purpose:
     FEAT-DATAMGR-HISTORY: Unit tests for historical market data capabilities.
@@ -31,6 +31,7 @@ Python API Usage:
 from __future__ import annotations
 
 import asyncio
+import importlib
 from datetime import UTC, datetime
 from typing import Any
 
@@ -41,8 +42,7 @@ from app.services.include.contracts import (
     MarketBar,
     MarketTick,
 )
-from app.services.include.enums import Timeframe
-from app.workspace.data_manager.history import (
+from app.services.include.data import (
     BAR_COLUMNS,
     TICK_COLUMNS,
     DataBackend,
@@ -58,9 +58,10 @@ from app.workspace.data_manager.history import (
     validate_request,
     validate_rows,
 )
-from app.workspace.data_manager.history import (
+from app.services.include.data import (
     main as history_main,
 )
+from app.services.include.enums import Timeframe
 
 
 class TestColumnsAndAliases:
@@ -592,9 +593,18 @@ class TestAsyncHistoricalRetrieval:
 class TestMainDemo:
     """Verify module main execution."""
 
-    def test_main(self, capsys: pytest.CaptureFixture[str]) -> None:
+    def test_main(self, caplog: pytest.LogCaptureFixture) -> None:
         """Verify main() executes without error."""
-        history_main()
-        captured = capsys.readouterr()
-        assert "Historical bars DataFrame shape:" in captured.out
-        assert "Validated rows: count=1" in captured.out
+        with caplog.at_level("INFO"):
+            history_main()
+        assert "Historical bars DataFrame shape:" in caplog.text
+        assert "Validated rows: count=1" in caplog.text
+
+
+class TestAntiShim:
+    """Verify strict deletion of legacy app.workspace.data_manager.history path."""
+
+    def test_legacy_history_raises_module_not_found(self) -> None:
+        """Verify importing app.workspace.data_manager.history raises ModuleNotFoundError."""
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("app.workspace.data_manager.history")

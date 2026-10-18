@@ -27,10 +27,8 @@ from __future__ import annotations
 import importlib
 import inspect
 
+import app.services.include.data as dm_hist
 import app.workspace.data_manager as dm_pkg
-import app.workspace.data_manager.generation as dm_gen
-import app.workspace.data_manager.history as dm_hist
-import app.workspace.data_manager.simulation as dm_sim
 import pytest
 
 
@@ -49,6 +47,7 @@ class TestLegacyDataPackageRemoved:
             "app.services.data.generation",
             "app.services.libs",
             "app.services.libs.data",
+            "app.workspace.data_manager.history",
         ],
     )
     def test_legacy_module_removed(self, legacy_module: str) -> None:
@@ -75,33 +74,6 @@ class TestDataManagerExportParity:
         assert dm_pkg.bars_to_df is dm_hist.bars_to_df
         assert dm_pkg.ticks_to_df is dm_hist.ticks_to_df
 
-    def test_simulation_exports_identity(self) -> None:
-        """Verify simulation symbols match between data_manager and simulation."""
-        assert dm_pkg.TickEvent is dm_sim.TickEvent
-        assert dm_pkg.SpreadsMap is dm_sim.SpreadsMap
-        assert dm_pkg.ITickSimulator is dm_sim.ITickSimulator
-        assert dm_pkg.DefaultTickSimulator is dm_sim.DefaultTickSimulator
-        assert dm_pkg.TSTickSimulator is dm_sim.TSTickSimulator
-
-    def test_generation_exports_identity(self) -> None:
-        """Verify generation symbols match between data_manager and generation."""
-        assert dm_pkg.TICK_MODEL_REAL == dm_gen.TICK_MODEL_REAL
-        assert dm_pkg.TICK_MODEL_GENERATED == dm_gen.TICK_MODEL_GENERATED
-        assert dm_pkg.TICK_MODEL_TRADING_BAR == dm_gen.TICK_MODEL_TRADING_BAR
-        assert dm_pkg.TICK_MODEL_OHLC_M1 == dm_gen.TICK_MODEL_OHLC_M1
-        assert dm_pkg.SPREAD_FIXED == dm_gen.SPREAD_FIXED
-        assert dm_pkg.SPREAD_NATIVE == dm_gen.SPREAD_NATIVE
-        assert dm_pkg.SPREAD_VARIABLE == dm_gen.SPREAD_VARIABLE
-        assert dm_pkg.SUPPORTED_TICK_MODELS is dm_gen.SUPPORTED_TICK_MODELS
-        assert dm_pkg.SUPPORTED_SPREAD_MODELS is dm_gen.SUPPORTED_SPREAD_MODELS
-        assert dm_pkg.PHASE_OPEN_CODE == dm_gen.PHASE_OPEN_CODE
-        assert dm_pkg.PHASE_HIGH_CODE == dm_gen.PHASE_HIGH_CODE
-        assert dm_pkg.PHASE_LOW_CODE == dm_gen.PHASE_LOW_CODE
-        assert dm_pkg.PHASE_CLOSE_CODE == dm_gen.PHASE_CLOSE_CODE
-        assert dm_pkg.TicksGenerator is dm_gen.TicksGenerator
-        assert dm_pkg.generate_ticks is dm_gen.generate_ticks
-        assert dm_pkg.generate_ticks_to_parquet is dm_gen.generate_ticks_to_parquet
-
     def test_all_exports_present_in_package(self) -> None:
         """Ensure every name in __all__ can be resolved from data_manager."""
         for name in dm_pkg.__all__:
@@ -113,16 +85,10 @@ class TestLayeringAndAntiCircularRules:
 
     def test_submodules_do_not_import_package_init(self) -> None:
         """Rule: Submodules must not import upward from app.workspace.data_manager."""
-        submodules = [
-            dm_hist,
-            dm_sim,
-            dm_gen,
-        ]
-        for submod in submodules:
-            source = inspect.getsource(submod)
-            assert "from app.workspace.data_manager import" not in source, (
-                f"{submod.__name__} violates layering by importing from package top"
-            )
-            assert "import app.workspace.data_manager\n" not in source, (
-                f"{submod.__name__} violates layering by importing package top"
-            )
+        source = inspect.getsource(dm_hist)
+        assert "from app.workspace.data_manager import" not in source, (
+            f"{dm_hist.__name__} violates layering by importing from package top"
+        )
+        assert "import app.workspace.data_manager\n" not in source, (
+            f"{dm_hist.__name__} violates layering by importing package top"
+        )

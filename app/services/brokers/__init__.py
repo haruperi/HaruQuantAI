@@ -75,6 +75,7 @@ if TYPE_CHECKING:
         TradeResult,
         TradingBackend,
     )
+    from app.services.include.data import DataBrokerBackend
     from app.services.include.enums import (
         ReceiptStatus,
         TradeAction,
@@ -84,7 +85,6 @@ if TYPE_CHECKING:
         MarketTick,
         Timeframe,
     )
-    from app.workspace.data_manager.history import DataBrokerBackend
 
 _SINGLETONS: dict[str, Any] = {}
 
@@ -92,7 +92,7 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
     "BaseBrokerBackend": ("app.services.brokers.base", "BaseBrokerBackend"),
     "BrokerBackend": ("app.services.brokers.base", "BrokerBackend"),
     "BridgeError": ("app.services.brokers.base", "BridgeError"),
-    "DataBrokerBackend": ("app.workspace.data_manager.history", "DataBrokerBackend"),
+    "DataBrokerBackend": ("app.services.include.data", "DataBrokerBackend"),
     "BinanceBroker": ("app.services.brokers.crypto", "BinanceBroker"),
     "CryptoBroker": ("app.services.brokers.crypto", "CryptoBroker"),
     "CTraderBackend": ("app.services.brokers.ctrader", "CTraderBackend"),

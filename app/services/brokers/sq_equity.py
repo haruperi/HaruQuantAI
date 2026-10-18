@@ -25,7 +25,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.sq_equity import SQEquityBroker
-    from app.workspace.data_manager.history import get_historical_bars
+    from app.services.include.data import get_historical_bars
     from app.workspace.data_manager import Timeframe
 
     broker = SQEquityBroker()
@@ -61,7 +61,7 @@ from app.services.brokers.capabilities import (
     ProviderValidationError,
 )
 from app.services.include.contracts import SymbolInfo
-from app.workspace.data_manager.history import DataBrokerBackend
+from app.services.include.data import DataBrokerBackend
 
 logger = get_logger(__name__)
 

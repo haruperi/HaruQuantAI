@@ -55,6 +55,12 @@ from app.services.include.contracts import (
     TerminalInfo,
     TradeRequest,
 )
+from app.services.include.data import (
+    bars_to_dataframe,
+    get_historical_bars,
+    get_ticks,
+    ticks_to_dataframe,
+)
 from app.services.include.trading import (
     MarginMode,
     OrderFilling,
@@ -69,12 +75,6 @@ from app.workspace.data_manager import (
     MarketBar,
     MarketTick,
     Timeframe,
-)
-from app.workspace.data_manager.history import (
-    bars_to_dataframe,
-    get_historical_bars,
-    get_ticks,
-    ticks_to_dataframe,
 )
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = "ctrader"

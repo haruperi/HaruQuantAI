@@ -25,7 +25,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.files import FilesBroker
-    from app.workspace.data_manager.history import get_historical_bars
+    from app.services.include.data import get_historical_bars
     from app.workspace.data_manager import Timeframe
 
     broker = FilesBroker(data_dir="data/market")
@@ -63,7 +63,7 @@ from app.services.brokers.capabilities import (
     ProviderHealth,
 )
 from app.services.include.contracts import SymbolInfo
-from app.workspace.data_manager.history import DataBrokerBackend
+from app.services.include.data import DataBrokerBackend
 
 PARSING_FR = "FR-BROKER-FILES-PARSING"
 SYMBOLS_FR = "FR-BROKER-FILES-SYMBOLS"

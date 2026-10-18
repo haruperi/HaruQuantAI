@@ -409,8 +409,8 @@ def test_tick_downloader_compatibility() -> None:
 def test_binance_bars_and_ticks_integer_validation() -> None:
     """Verify Binance fetch_bars and fetch_ticks produce integer volumes accepted by validate_rows."""
     from app.services.brokers.crypto import BinanceBroker
+    from app.services.include.data import validate_rows
     from app.workspace.data_manager import MarketBar, MarketTick
-    from app.workspace.data_manager.history import validate_rows
 
     broker = BinanceBroker()
 

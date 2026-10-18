@@ -7,6 +7,4 @@ This package provides foundational utility modules for time arithmetic, bar time
 - `app.services.include.contracts`: Provides foundational data contracts and domain value objects.
 - `app.services.include.enums`: Provides canonical trading enumerations and statuses.
 - `app.services.include.trading`: Provides MQL5 asynchronous trading proxy library, mutation builders, and master `Trading` facade.
-
-> [!NOTE]
-> Market data primitives, readers, and simulators have been modularized into `app.workspace.data_manager`.
+- `app.services.include.data`: Provides historical market data readers (`get_historical_bars`, `get_ticks`), boundary validators (`validate_request`, `validate_rows`), DataFrame converters (`bars_to_dataframe`, `ticks_to_dataframe`), and provider protocols (`DataBackend`, `DataBrokerBackend`).
