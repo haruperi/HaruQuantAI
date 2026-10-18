@@ -42,10 +42,8 @@ CLI Usage:
 
 from __future__ import annotations
 
-import re
 import tempfile
 import time
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
@@ -53,13 +51,8 @@ from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
 from app.services.brokers._file_history import (
     find_matching_partitions,
-    parse_delimited_bars,
-    parse_delimited_ticks,
-    read_parquet_bars,
-)
-from app.services.brokers._native_history import (
-    decode_fxt_bytes,
-    decode_hst_bytes,
+    load_local_partition_bars,
+    load_local_partition_ticks,
 )
 from app.services.brokers.base import BridgeError
 from app.services.brokers.capabilities import (
@@ -91,44 +84,6 @@ PLUGIN_MANIFEST: dict[str, Any] = {
 __all__ = ["PLUGIN_MANIFEST", "FilesBroker", "create_adapter"]
 
 logger = get_logger(__name__)
-
-
-def _parse_timestamp(ts_str: str) -> datetime:
-    """Parse timestamp strings across diverse date-time formats."""
-    s = ts_str.strip()
-    iso_candidate = s.replace("Z", "+00:00").replace("/", "-")
-    try:
-        dt = datetime.fromisoformat(iso_candidate)
-        return dt if dt.tzinfo is not None else dt.replace(tzinfo=UTC)
-    except ValueError:
-        pass
-
-    clean_s = re.sub(r"[^\d]", " ", s).strip()
-    tokens = [t for t in clean_s.split() if t]
-
-    if len(tokens) >= 3:
-        try:
-            year = int(tokens[0])
-            month = int(tokens[1])
-            day = int(tokens[2])
-            hour = int(tokens[3]) if len(tokens) > 3 else 0
-            minute = int(tokens[4]) if len(tokens) > 4 else 0
-            second = int(tokens[5]) if len(tokens) > 5 else 0
-            microsecond = int(tokens[6][:6].ljust(6, "0")) if len(tokens) > 6 else 0
-            return datetime(
-                year,
-                month,
-                day,
-                hour,
-                minute,
-                second,
-                microsecond,
-                tzinfo=UTC,
-            )
-        except ValueError, IndexError:
-            pass
-
-    return datetime.now(tz=UTC)
 
 
 class FilesBroker(DataBrokerBackend):
@@ -355,73 +310,16 @@ class FilesBroker(DataBrokerBackend):
                 code="FILE_NOT_FOUND",
             )
 
-        target_count = count if count > 0 else limit
-        date_from = datetime.fromtimestamp(start, tz=UTC) if 0 < start < 2**40 else None
-        date_to = datetime.fromtimestamp(end, tz=UTC) if 0 < end < 2**40 else None
-
-        rows: list[dict[str, Any]] = []
-
-        eval_files = (
-            list(reversed(files))
-            if not date_from and not date_to and target_count
-            else files
-        )
-
         try:
-            for file_path in eval_files:
-                batch: list[dict[str, Any]] = []
-                if file_path.suffix == ".parquet":
-                    batch = read_parquet_bars(
-                        file_path,
-                        count=target_count if not date_from and not date_to else None,
-                    )
-                elif file_path.suffix == ".hst":
-                    data = file_path.read_bytes()
-                    batch = decode_hst_bytes(data)
-                elif file_path.suffix == ".fxt":
-                    data = file_path.read_bytes()
-                    batch = decode_fxt_bytes(data)
-                elif file_path.suffix in (".csv", ".txt", ".tsv"):
-                    content = file_path.read_text(encoding="utf-8", errors="replace")
-                    batch = parse_delimited_bars(
-                        content, symbol=symbol, timeframe=timeframe
-                    )
-                else:
-                    logger.warning(
-                        "%s: Skipping unsupported file format: %s",
-                        PARSING_FR,
-                        file_path.suffix,
-                    )
-
-                if not date_from and not date_to and target_count:
-                    rows = batch + rows
-                    if len(rows) >= target_count:
-                        break
-                else:
-                    rows.extend(batch)
-
-            # Date filtering across all aggregated partitions
-            filtered: list[dict[str, Any]] = []
-            for r in rows:
-                t = r["time"]
-                dt = datetime.fromtimestamp(t, tz=UTC)
-                if date_from and dt < date_from:
-                    continue
-                if date_to and dt > date_to:
-                    continue
-                filtered.append(r)
-
-            filtered.sort(key=lambda r: r["time"])
-            deduped: list[dict[str, Any]] = []
-            last_t: int | None = None
-            for r in filtered:
-                if last_t is None or r["time"] > last_t:
-                    deduped.append(r)
-                    last_t = r["time"]
-
-            if target_count and len(deduped) > target_count:
-                deduped = deduped[-target_count:]
-
+            deduped = load_local_partition_bars(
+                files,
+                symbol=symbol,
+                timeframe=timeframe,
+                start=start,
+                end=end,
+                count=count,
+                limit=limit,
+            )
             logger.info(
                 "%s: Parsed %d bars for %s %s from %d partition file(s)",
                 PARSING_FR,
@@ -462,60 +360,24 @@ class FilesBroker(DataBrokerBackend):
                 f"No local files found for symbol '{symbol}'", code="FILE_NOT_FOUND"
             )
 
-        target_count = count if count > 0 else limit
-        rows: list[dict[str, Any]] = []
-
         try:
-            for file_path in files:
-                if file_path.suffix == ".fxt":
-                    data = file_path.read_bytes()
-                    bar_rows = decode_fxt_bytes(data)
-                    for b in bar_rows:
-                        rows.append(
-                            {
-                                "time_msc": b["time"] * 1000,
-                                "bid": b["close"],
-                                "ask": b["close"],
-                                "last": b["close"],
-                                "volume": b.get("volume", b.get("tick_volume", 1)),
-                                "flags": 0,
-                                "volume_real": float(
-                                    b.get("volume", b.get("tick_volume", 1))
-                                ),
-                            }
-                        )
-                elif file_path.suffix in (".csv", ".txt", ".tsv"):
-                    content = file_path.read_text(encoding="utf-8", errors="replace")
-                    rows.extend(parse_delimited_ticks(content, symbol=symbol))
-                else:
-                    logger.warning(
-                        "%s: Skipping unsupported tick file format: %s",
-                        PARSING_FR,
-                        file_path.suffix,
-                    )
-
-            filtered: list[dict[str, Any]] = []
-            for r in rows:
-                t_ms = r["time_msc"]
-                if start_ms > 0 and t_ms < start_ms:
-                    continue
-                if end_ms > 0 and t_ms > end_ms:
-                    continue
-                filtered.append(r)
-
-            filtered.sort(key=lambda r: r["time_msc"])
-            if target_count and len(filtered) > target_count:
-                filtered = filtered[-target_count:]
-
+            deduped = load_local_partition_ticks(
+                files,
+                symbol=symbol,
+                start_ms=start_ms,
+                end_ms=end_ms,
+                count=count,
+                limit=limit,
+            )
             logger.info(
                 "%s: Parsed %d ticks for %s from %d partition file(s)",
                 PARSING_FR,
-                len(filtered),
+                len(deduped),
                 symbol,
                 len(files),
-                extra={"fr_id": PARSING_FR, "count": len(filtered), "symbol": symbol},
+                extra={"fr_id": PARSING_FR, "count": len(deduped), "symbol": symbol},
             )
-            return filtered
+            return deduped
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise
@@ -523,53 +385,16 @@ class FilesBroker(DataBrokerBackend):
                 f"Failed to parse ticks for {symbol}: {exc}", code="READ_ERROR"
             ) from exc
 
+    @override
     def read_history(
         self,
         request: HistoryRequest,
         token: CancellationToken | None = None,
     ) -> HistoryPage:
         """Acquire historical bars or ticks according to typed request specification."""
-        if token is not None:
-            token.check_cancelled()
-        request.validate()
-
-        if request.kind == "ticks" or request.timeframe.upper() == "TICK":
-            start_ms = (request.start_epoch() or 0) * 1000
-            end_ms = (request.end_epoch() or 0) * 1000
-            rows = self.fetch_ticks(
-                symbol=request.symbol,
-                mode=request.mode,
-                start_ms=start_ms,
-                end_ms=end_ms,
-                count=request.count,
-                limit=request.limit,
-            )
-        else:
-            start_s = request.start_epoch() or 0
-            end_s = request.end_epoch() or 0
-            rows = self.fetch_bars(
-                symbol=request.symbol,
-                timeframe=request.timeframe,
-                mode=request.mode,
-                start=start_s,
-                end=end_s,
-                count=request.count,
-                limit=request.limit,
-            )
-
-        if token is not None:
-            token.check_cancelled()
-
-        return HistoryPage(
-            provider="files",
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            kind=request.kind,
-            rows=rows,
-            cursor=None,
-            is_complete=True,
-            provenance={"source": "local_files", "data_dir": str(self.data_dir)},
-        )
+        page = super().read_history(request, token)
+        page.provenance = {"source": "local_files", "data_dir": str(self.data_dir)}
+        return page
 
 
 def create_adapter(_context: PluginHostContext | None = None) -> FilesBroker:

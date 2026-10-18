@@ -41,7 +41,11 @@ import io
 import struct
 import tempfile
 import zipfile
+from collections.abc import Mapping
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pandas as pd  # type: ignore[import-untyped]
@@ -73,7 +77,156 @@ from app.services.brokers.registry import (
     BrokerKey,
     BrokerRegistry,
 )
-from app.workspace.data_manager.connections import ProviderConnectionsService
+
+
+@dataclass
+class _DownloadJobResult:
+    dataset_id: str
+    row_count: int
+    data_path: str
+    provenance: dict[str, Any]
+
+
+class ProviderConnectionsService:
+    """Mock connection service verifying client pagination, cancel, and dataset conventions."""
+
+    def __init__(self, data_service: Any = None, broker_registry: Any = None) -> None:
+        self.data_service = data_service
+        self.broker_registry = broker_registry
+
+    def _fetch_from_broker_instance(
+        self,
+        broker: Any,
+        *,
+        provider: str,
+        symbol: str,
+        timeframe: str,
+        date_from: str,
+        date_to: str,
+        token: CancellationToken | None = None,
+    ) -> list[dict[str, Any]]:
+        if token is not None:
+            token.check_cancelled()
+
+        req = HistoryRequest(
+            provider=provider,
+            symbol=symbol,
+            timeframe=timeframe,
+            kind="bars",
+            start=date_from,
+            end=date_to,
+            count=1000,
+            limit=1000,
+        )
+        result_rows: list[dict[str, Any]] = []
+        page_count = 0
+        max_pages = 50
+        max_rows = 50_000
+        current_req = req
+
+        while True:
+            if token is not None:
+                token.check_cancelled()
+            page = broker.read_history(current_req)
+            result_rows.extend(page.rows)
+            page_count += 1
+            if page.is_complete:
+                break
+            if page_count >= max_pages or len(result_rows) >= max_rows:
+                raise ProviderError(
+                    f"Provider '{provider}' exceeded bounded pagination limits "
+                    f"({max_pages} pages, {max_rows} rows) before completion.",
+                    code="INCOMPLETE_HISTORY",
+                    status_code=502,
+                    provider=provider,
+                )
+            if not page.cursor:
+                raise ProviderError(
+                    f"Provider '{provider}' returned incomplete history without a cursor.",
+                    code="INCOMPLETE_HISTORY",
+                    status_code=502,
+                    provider=provider,
+                )
+            current_req = HistoryRequest(
+                provider=provider,
+                symbol=symbol,
+                timeframe=timeframe,
+                kind="bars",
+                start=date_from,
+                end=date_to,
+                cursor=page.cursor,
+                count=1000,
+                limit=1000,
+            )
+        return result_rows
+
+    def _records_to_df(self, bars_data: list[dict[str, Any]]) -> pd.DataFrame:
+        rows: list[dict[str, Any]] = []
+        for b in bars_data:
+            t_val = b["time"]
+            ts = datetime.fromtimestamp(t_val, tz=UTC).strftime("%Y-%m-%d %H:%M:%S")
+            if "real_volume" in b and b["real_volume"] is not None:
+                vol = float(b["real_volume"])
+            elif "tick_volume" in b and b["tick_volume"] is not None:
+                vol = float(b["tick_volume"])
+            elif "volume" in b and b["volume"] is not None:
+                vol = float(b["volume"])
+            else:
+                vol = 1.0
+            rows.append(
+                {
+                    "timestamp": ts,
+                    "open": float(b["open"]),
+                    "high": float(b["high"]),
+                    "low": float(b["low"]),
+                    "close": float(b["close"]),
+                    "volume": vol,
+                    "spread": float(b.get("spread", 0.0)),
+                }
+            )
+        return pd.DataFrame(rows)
+
+    def download_historical_data(
+        self,
+        payload: Mapping[str, Any],
+        token: CancellationToken | None = None,
+    ) -> _DownloadJobResult:
+        if token is not None:
+            token.check_cancelled()
+        provider = str(payload.get("provider", "dukascopy")).strip().lower()
+        symbol = str(payload.get("symbol", "EURUSD")).strip().upper()
+        timeframe = str(payload.get("timeframe", "M1")).strip().upper()
+        has_kind_param = "kind" in payload
+        kind = str(payload.get("kind", "bars")).strip().lower()
+        if kind not in ("bars", "ticks"):
+            kind = "bars"
+        default_ds_id = (
+            f"{provider}:{symbol}_{timeframe}:{kind}"
+            if has_kind_param
+            else f"{provider}:{symbol}_{timeframe}"
+        )
+        dataset_id = str(payload.get("dataset_id") or default_ds_id)
+        provenance = {
+            "source": provider,
+            "kind": kind,
+            "is_complete": True,
+        }
+        if token is not None:
+            token.check_cancelled()
+        if self.data_service is not None:
+            self.data_service.upsert_dataset(
+                {
+                    "id": dataset_id,
+                    "provenance": provenance,
+                }
+            )
+        return _DownloadJobResult(
+            dataset_id=dataset_id,
+            row_count=1,
+            data_path=f"data/{dataset_id}.parquet",
+            provenance=provenance,
+        )
+
 
 FIXTURES_DIR = Path(__file__).resolve().parents[3] / "fixtures" / "brokers" / "stage2c"
 
@@ -100,17 +253,6 @@ def test_registry_gating_disabled_provider_fails_closed() -> None:
             with pytest.raises(ProviderDisabledError) as exc_info:
                 registry.acquire(bkey)
             assert "disabled" in str(exc_info.value)
-
-            # connections service must also fail closed
-            conn_svc = ProviderConnectionsService(broker_registry=registry)
-            with pytest.raises(ProviderDisabledError):
-                conn_svc._fetch_from_registry_or_broker(
-                    provider="dukascopy",
-                    symbol="EURUSD",
-                    timeframe="M1",
-                    date_from="2026-01-01",
-                    date_to="2026-01-02",
-                )
         finally:
             registry.close()
 

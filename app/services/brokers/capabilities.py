@@ -354,6 +354,7 @@ class HistoryRequest:
     exchange: str | None = None
     source_policy: str = "remote"
     timeout_seconds: float = 30.0
+    cursor: str | None = None
 
     def validate(self) -> None:
         """Validate request invariants, raising ProviderValidationError if invalid."""

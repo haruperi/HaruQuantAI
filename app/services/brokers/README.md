@@ -14,14 +14,27 @@ app/services/include/
   enums.py             # Canonical trading enumerations
 
 app/services/brokers/
-  contracts.py         # Async TradingBackend and shared data/model contracts
+  base.py              # BaseBrokerBackend template lifecycle, session cleanup, read_history
+  capabilities.py      # ProviderCapabilities, HistoryRequest, HistoryPage, ProviderHealth
+  registry.py          # Centralized BrokerRegistry, lease tracking, alias normalization
+  _http.py             # Bounded HTTP transport, retries, redacted logging, connection pooling
+  _file_history.py     # Partition matching, delimited text parsing, local parquet/bar loaders
+  _native_history.py   # HST, FXT, StrategyQuant DAT binary codecs and bi5 decompression
+  _simulation_api.py   # Private method handlers/per-object state for simulation
   metatrader.py        # Native Bridge and MT5Backend adapter
   simulator.py         # Local model and async execution adapter
-  ctrader.py           # Spotware cTrader Open API Protobuf/TLS backend and broker adapter
-  _simulation_api.py   # Private method handlers/per-object state
+  ctrader.py           # Spotware cTrader Open API Protobuf/TLS backend and unified dispatch
+  dukascopy.py         # Dukascopy CDN market data broker
+  darwinex.py          # Darwinex tick & bar market data broker
+  crypto.py            # Cryptocurrency market data broker (Binance, Bitfinex, Coinbase, Poloniex)
+  files.py             # Local filesystem market data broker (CSV, Parquet, HST, FXT)
+  yahoo.py             # Yahoo Finance market data broker
+  tick_downloader.py   # Historical tick downloader broker
+  sq_equity.py         # StrategyQuant US Equities daily bundled broker
+  sq_futures.py        # StrategyQuant Continuous Futures minute/daily bundled broker
 
 app/host/persistence/
-  mt5bridge_journal.py  # Dedicated journal connection/CRUD
+  mt5bridge_journal.py # Dedicated journal connection/CRUD
   schema.py            # Isolated journal DDL and compatibility checks
 
 scripts/
@@ -29,10 +42,17 @@ scripts/
   mql5/Experts/PythonBridge.mq5
 ```
 
-The former brokers/classes and brokers/proxies folders are removed. There is one
-public class implementation per concept. metatrader.py still owns the TCP codec
-previously in protocol.py/bridge.py. Manifest/verifier files are absent. Existing
-app/plugins/brokers/contracts.py remains a separate plugin-facing contract layer.
+The brokers package provides unified broker abstractions across execution backends and
+market data providers. Shared foundation modules (`base.py`, `_http.py`, `_file_history.py`,
+`_native_history.py`) eliminate boilerplate across provider adapters:
+- `BaseBrokerBackend` automatically manages HTTP session lifecycles in `close_sync()`
+  and provides a default `read_history()` template validating requests, token cancellation,
+  and dispatching to `fetch_bars` / `fetch_ticks`.
+- `_file_history.load_local_partition_bars` and `load_local_partition_ticks` unify
+  multi-partition file discovery, decoding, date filtering, and deduplication across file-based
+  providers (`files.py`, `sq_equity.py`, `sq_futures.py`).
+- `BrokerRegistry` centralizes alias normalization via `normalize_provider_id` and
+  guarantees safe idempotent resource disposal across synchronous and asynchronous callers.
 
 TradingBackend is the async lifecycle/operation capability. BrokerBackend is a
 synchronous internal snapshot-model ABC for simulator implementations;

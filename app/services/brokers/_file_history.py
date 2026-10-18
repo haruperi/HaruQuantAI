@@ -60,6 +60,8 @@ __all__ = [
     "export_bars_to_csv",
     "export_bars_to_parquet",
     "find_matching_partitions",
+    "load_local_partition_bars",
+    "load_local_partition_ticks",
     "main",
     "parse_delimited_bars",
     "parse_delimited_ticks",
@@ -517,6 +519,157 @@ def find_matching_partitions(
         extra={"fr_id": PARTITION_FR, "matches": len(matches), "symbol": clean_sym},
     )
     return matches
+
+
+def load_local_partition_bars(
+    files: list[Path],
+    symbol: str,
+    timeframe: str,
+    start: int = 0,
+    end: int = 0,
+    count: int = 0,
+    limit: int = 1000,
+) -> list[dict[str, Any]]:
+    """Load, decode, aggregate, filter, and sort bar records from local partition files."""
+    from app.services.brokers._native_history import (
+        decode_fxt_bytes,
+        decode_hst_bytes,
+        decode_sq_dat_bytes,
+    )
+
+    target_count = count if count > 0 else limit
+    date_from = datetime.fromtimestamp(start, tz=UTC) if 0 < start < 2**40 else None
+    date_to = datetime.fromtimestamp(end, tz=UTC) if 0 < end < 2**40 else None
+
+    eval_files = (
+        list(reversed(files))
+        if not date_from and not date_to and target_count
+        else files
+    )
+
+    rows: list[dict[str, Any]] = []
+    for file_path in eval_files:
+        batch: list[dict[str, Any]] = []
+        if file_path.suffix == ".parquet":
+            batch = read_parquet_bars(
+                file_path,
+                count=target_count if not date_from and not date_to else None,
+            )
+        elif file_path.suffix == ".hst":
+            batch = decode_hst_bytes(file_path.read_bytes())
+        elif file_path.suffix == ".fxt":
+            batch = decode_fxt_bytes(file_path.read_bytes())
+        elif file_path.suffix == ".dat":
+            batch = decode_sq_dat_bytes(file_path.read_bytes())
+        elif file_path.suffix in (".csv", ".txt", ".tsv"):
+            content = file_path.read_text(encoding="utf-8", errors="replace")
+            batch = parse_delimited_bars(content, symbol=symbol, timeframe=timeframe)
+        else:
+            logger.warning(
+                "%s: Skipping unsupported bar file format: %s",
+                PARTITION_FR,
+                file_path.suffix,
+            )
+
+        if not date_from and not date_to and target_count:
+            rows = batch + rows
+            if len(rows) >= target_count:
+                break
+        else:
+            rows.extend(batch)
+
+    filtered: list[dict[str, Any]] = []
+    for r in rows:
+        t = r["time"]
+        dt = datetime.fromtimestamp(t, tz=UTC)
+        if date_from and dt < date_from:
+            continue
+        if date_to and dt > date_to:
+            continue
+        filtered.append(r)
+
+    filtered.sort(key=lambda r: r["time"])
+    deduped: list[dict[str, Any]] = []
+    last_t: int | None = None
+    for r in filtered:
+        if last_t is None or r["time"] > last_t:
+            deduped.append(r)
+            last_t = r["time"]
+
+    if target_count and len(deduped) > target_count:
+        deduped = deduped[-target_count:]
+    return deduped
+
+
+def load_local_partition_ticks(
+    files: list[Path],
+    symbol: str,
+    start_ms: int = 0,
+    end_ms: int = 0,
+    count: int = 0,
+    limit: int = 1000,
+) -> list[dict[str, Any]]:
+    """Load, decode, aggregate, filter, and sort tick records from local partition files."""
+    from app.services.brokers._native_history import (
+        decode_bi5_ticks,
+        decompress_bi5,
+    )
+
+    target_count = count if count > 0 else limit
+    rows: list[dict[str, Any]] = []
+
+    eval_files = (
+        list(reversed(files))
+        if start_ms <= 0 and end_ms <= 0 and target_count
+        else files
+    )
+
+    for file_path in eval_files:
+        batch: list[dict[str, Any]] = []
+        if file_path.suffix == ".parquet":
+            table = pq.read_table(file_path)
+            batch = table.to_pylist()
+        elif file_path.suffix == ".bi5":
+            decomp = decompress_bi5(file_path.read_bytes())
+            base_dt = datetime(2023, 1, 1, 0, 0, 0, tzinfo=UTC)
+            batch = decode_bi5_ticks(decomp, base_dt, count=target_count)
+        elif file_path.suffix in (".csv", ".txt", ".tsv"):
+            content = file_path.read_text(encoding="utf-8", errors="replace")
+            batch = parse_delimited_ticks(content, symbol=symbol)
+        else:
+            logger.warning(
+                "%s: Skipping unsupported tick file format: %s",
+                PARTITION_FR,
+                file_path.suffix,
+            )
+
+        if start_ms <= 0 and end_ms <= 0 and target_count:
+            rows = batch + rows
+            if len(rows) >= target_count:
+                break
+        else:
+            rows.extend(batch)
+
+    filtered: list[dict[str, Any]] = []
+    for r in rows:
+        t = r["time_msc"]
+        if start_ms > 0 and t < start_ms:
+            continue
+        if end_ms > 0 and t > end_ms:
+            continue
+        filtered.append(r)
+
+    filtered.sort(key=lambda r: r["time_msc"])
+    deduped: list[dict[str, Any]] = []
+    last_t: int | None = None
+    for r in filtered:
+        if last_t is None or r["time_msc"] > last_t:
+            deduped.append(r)
+            last_t = r["time_msc"]
+
+    if target_count and len(deduped) > target_count:
+        deduped = deduped[-target_count:]
+    return deduped
 
 
 def export_bars_to_csv(rows: list[dict[str, Any]], target_path: Path | str) -> None:

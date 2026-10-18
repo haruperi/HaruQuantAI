@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import fnmatch
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from copy import deepcopy
 from dataclasses import asdict, dataclass, is_dataclass, replace
 from datetime import UTC, datetime
@@ -275,151 +275,6 @@ def _accountinfo_accountinfo(self: _ObjectState) -> AccountInfo:
     return cast("AccountInfo", account)
 
 
-def _accountinfo_login(self: _ObjectState) -> int:
-    return int(_accountinfo__a(self).login)
-
-
-def _accountinfo_trademode(self: _ObjectState) -> AccountTradeMode:
-    return AccountTradeMode(_accountinfo__a(self).trade_mode)
-
-
-def _accountinfo_trademodedescription(self: _ObjectState) -> str:
-    return _accountinfo_trademode(self).name.replace("_", " ").title()
-
-
-def _accountinfo_leverage(self: _ObjectState) -> int:
-    return int(_accountinfo__a(self).leverage)
-
-
-def _accountinfo_stopoutmode(self: _ObjectState) -> StopoutMode:
-    return StopoutMode(_accountinfo__a(self).stopout_mode)
-
-
-def _accountinfo_stopoutmodedescription(self: _ObjectState) -> str:
-    return _accountinfo_stopoutmode(self).name.replace("_", " ").title()
-
-
-def _accountinfo_marginmode(self: _ObjectState) -> MarginMode:
-    return MarginMode(_accountinfo__a(self).margin_mode)
-
-
-def _accountinfo_marginmodedescription(self: _ObjectState) -> str:
-    return _accountinfo_marginmode(self).name.replace("_", " ").title()
-
-
-def _accountinfo_tradeallowed(self: _ObjectState) -> bool:
-    return bool(_accountinfo__a(self).trade_allowed)
-
-
-def _accountinfo_tradeexpert(self: _ObjectState) -> bool:
-    return bool(_accountinfo__a(self).trade_expert)
-
-
-def _accountinfo_limitorders(self: _ObjectState) -> int:
-    return int(_accountinfo__a(self).limit_orders)
-
-
-def _accountinfo_balance(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).balance)
-
-
-def _accountinfo_credit(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).credit)
-
-
-def _accountinfo_profit(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).profit)
-
-
-def _accountinfo_equity(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).equity)
-
-
-def _accountinfo_margin(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).margin)
-
-
-def _accountinfo_freemargin(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).free_margin)
-
-
-def _accountinfo_marginlevel(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).margin_level)
-
-
-def _accountinfo_margincall(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).margin_call)
-
-
-def _accountinfo_marginstopout(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).margin_stop_out)
-
-
-def _accountinfo_name(self: _ObjectState) -> str:
-    return cast("str", _accountinfo__a(self).name)
-
-
-def _accountinfo_server(self: _ObjectState) -> str:
-    return cast("str", _accountinfo__a(self).server)
-
-
-def _accountinfo_currency(self: _ObjectState) -> str:
-    return cast("str", _accountinfo__a(self).currency)
-
-
-def _accountinfo_company(self: _ObjectState) -> str:
-    return cast("str", _accountinfo__a(self).company)
-
-
-def _accountinfo_currencydigits(self: _ObjectState) -> int:
-    return int(_accountinfo__a(self).currency_digits)
-
-
-def _accountinfo_fifoclose(self: _ObjectState) -> bool:
-    return bool(_accountinfo__a(self).fifo_close)
-
-
-def _accountinfo_margininitial(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).margin_initial)
-
-
-def _accountinfo_marginmaintenance(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).margin_maintenance)
-
-
-def _accountinfo_assets(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).assets)
-
-
-def _accountinfo_liabilities(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).liabilities)
-
-
-def _accountinfo_commissionblocked(self: _ObjectState) -> float:
-    return float(_accountinfo__a(self).commission_blocked)
-
-
-def _accountinfo_infointeger(self: _ObjectState, property_id: int | str) -> int:
-    value = self._backend.info_value("account", property_id)
-    if value is None and isinstance(property_id, str):
-        value = getattr(_accountinfo__a(self), property_id.strip().lower(), 0)
-    return int(value or 0)
-
-
-def _accountinfo_infodouble(self: _ObjectState, property_id: int | str) -> float:
-    value = self._backend.info_value("account", property_id)
-    if value is None and isinstance(property_id, str):
-        value = getattr(_accountinfo__a(self), property_id.strip().lower(), 0.0)
-    return float(value or 0.0)
-
-
-def _accountinfo_infostring(self: _ObjectState, property_id: int | str) -> str:
-    value = self._backend.info_value("account", property_id)
-    if value is None and isinstance(property_id, str):
-        value = getattr(_accountinfo__a(self), property_id.strip().lower(), "")
-    return str(value or "")
-
-
 def _accountinfo_orderprofitcheck(
     self: _ObjectState,
     symbol: str,
@@ -456,7 +311,7 @@ def _accountinfo_freemargincheck(
     volume: float,
     price: float,
 ) -> float:
-    return _accountinfo_freemargin(self) - _accountinfo_margincheck(
+    return float(_accountinfo__a(self).free_margin) - _accountinfo_margincheck(
         self, symbol, order_type, volume, price
     )
 
@@ -470,7 +325,7 @@ def _accountinfo_maxlotcheck(
     low = 0.0
     high = spec.volume_max
     step = max(spec.volume_step, 1e-12)
-    free_margin = _accountinfo_freemargin(self)
+    free_margin = float(_accountinfo__a(self).free_margin)
     for _ in range(64):
         mid = (low + high) / 2.0
         required = _accountinfo_margincheck(self, symbol, order_type, mid, price)
@@ -639,13 +494,92 @@ def _dict_to_position_info(d: dict[str, Any]) -> PositionInfo:
     )
 
 
+def _require_typed(self: _ObjectState, cls: type[Any], converter: Any) -> Any:
+    selected = _selectionbase__require(self)
+    return (
+        replace(selected)
+        if isinstance(selected, cls)
+        else converter(record_dict(selected))
+    )
+
+
+def _select_ticket(self: _ObjectState, items: Sequence[Any], ticket: int) -> bool:
+    return _selectionbase__select(
+        self, next((item for item in items if item.ticket == ticket), None)
+    )
+
+
+def _select_index(self: _ObjectState, items: Sequence[Any], index: int) -> bool:
+    return _selectionbase__select(
+        self, items[index] if 0 <= index < len(values := items) else None
+    )
+
+
+def _history_total(
+    items: Sequence[Any], args: tuple[Any, ...], kwargs: dict[str, Any], time_fn: Any
+) -> int:
+    date_from = args[0] if len(args) > 0 else kwargs.get("date_from")
+    date_to = args[1] if len(args) > 1 else kwargs.get("date_to")
+    if date_from is not None and date_to is not None:
+        t_from, t_to = _to_epoch(date_from), _to_epoch(date_to)
+        items = [x for x in items if t_from <= _to_epoch(time_fn(x)) <= t_to]
+    return len(items)
+
+
+def _history_get(
+    items: Sequence[Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+    time_fn: Any,
+    cls: type[Any],
+    converter: Any,
+) -> list[dict[str, Any]]:
+    date_from, date_to, symbol, group, ticket, position = _extract_history_query(
+        args, kwargs
+    )
+    rows = list(items)
+    if date_from is not None and date_to is not None:
+        t_from, t_to = _to_epoch(date_from), _to_epoch(date_to)
+        rows = [x for x in rows if t_from <= _to_epoch(time_fn(x)) <= t_to]
+    if ticket is not None:
+        rows = [x for x in rows if x.ticket == ticket]
+    if position is not None:
+        rows = [x for x in rows if x.position_id == position]
+    if symbol is not None:
+        rows = [x for x in rows if x.symbol == symbol]
+    if group is not None:
+        rows = [x for x in rows if fnmatch.fnmatch(x.symbol, group)]
+    return [
+        asdict(x) if isinstance(x, cls) else asdict(converter(record_dict(x)))
+        for x in rows
+    ]
+
+
+def _active_get(
+    items: Sequence[Any],
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+    cls: type[Any],
+    converter: Any,
+) -> list[dict[str, Any]]:
+    symbol, group, ticket = _extract_active_query(args, kwargs)
+    rows = list(items)
+    if ticket is not None:
+        rows = [x for x in rows if x.ticket == ticket]
+    if symbol is not None:
+        rows = [x for x in rows if x.symbol == symbol]
+    if group is not None:
+        rows = [x for x in rows if fnmatch.fnmatch(x.symbol, group)]
+    return [
+        asdict(x) if isinstance(x, cls) else asdict(converter(record_dict(x)))
+        for x in rows
+    ]
+
+
 def _dealinfo_dealinfo(self: _ObjectState, ticket: int | None = None) -> DealInfo:
     if ticket is not None:
         _dealinfo_ticket(self, ticket)
-    selected = _selectionbase__require(self)
-    if isinstance(selected, DealInfo):
-        return replace(selected)
-    return _dict_to_deal_info(record_dict(selected))
+    return cast("DealInfo", _require_typed(self, DealInfo, _dict_to_deal_info))
 
 
 def _dealinfo_asdict(self: _ObjectState, ticket: int | None = None) -> dict[str, Any]:
@@ -654,54 +588,29 @@ def _dealinfo_asdict(self: _ObjectState, ticket: int | None = None) -> dict[str,
 
 def _dealinfo_ticket(self: _ObjectState, ticket: int | None = None) -> int:
     if ticket is not None:
-        _selectionbase__select(
-            self, next((d for d in self._backend.deals() if d.ticket == ticket), None)
-        )
+        _select_ticket(self, self._backend.deals(), ticket)
     return int(_selectionbase__value(self, "ticket"))
 
 
 def _dealinfo_selectbyindex(self: _ObjectState, index: int) -> bool:
-    values = self._backend.deals()
-    return _selectionbase__select(
-        self, values[index] if 0 <= index < len(values) else None
-    )
+    return _select_index(self, self._backend.deals(), index)
 
 
 def _dealinfo_historydealstotal(self: _ObjectState, *args: Any, **kwargs: Any) -> int:
-    date_from = args[0] if len(args) > 0 else kwargs.get("date_from")
-    date_to = args[1] if len(args) > 1 else kwargs.get("date_to")
-    deals = self._backend.deals()
-    if date_from is not None and date_to is not None:
-        t_from = _to_epoch(date_from)
-        t_to = _to_epoch(date_to)
-        deals = [d for d in deals if t_from <= _to_epoch(d.time) <= t_to]
-    return len(deals)
+    return _history_total(self._backend.deals(), args, kwargs, lambda d: d.time)
 
 
 def _dealinfo_historydealsget(
     self: _ObjectState, *args: Any, **kwargs: Any
 ) -> list[dict[str, Any]]:
-    date_from, date_to, symbol, group, ticket, position = _extract_history_query(
-        args, kwargs
+    return _history_get(
+        self._backend.deals(),
+        args,
+        kwargs,
+        lambda d: d.time,
+        DealInfo,
+        _dict_to_deal_info,
     )
-    deals = list(self._backend.deals())
-    if date_from is not None and date_to is not None:
-        t_from, t_to = _to_epoch(date_from), _to_epoch(date_to)
-        deals = [d for d in deals if t_from <= _to_epoch(d.time) <= t_to]
-    if ticket is not None:
-        deals = [d for d in deals if d.ticket == ticket]
-    if position is not None:
-        deals = [d for d in deals if d.position_id == position]
-    if symbol is not None:
-        deals = [d for d in deals if d.symbol == symbol]
-    if group is not None:
-        deals = [d for d in deals if fnmatch.fnmatch(d.symbol, group)]
-    return [
-        asdict(d)
-        if isinstance(d, DealInfo)
-        else asdict(_dict_to_deal_info(record_dict(d)))
-        for d in deals
-    ]
 
 
 def _historyorderinfo_historyorderinfo(
@@ -709,10 +618,7 @@ def _historyorderinfo_historyorderinfo(
 ) -> OrderInfo:
     if ticket is not None:
         _historyorderinfo_ticket(self, ticket)
-    selected = _selectionbase__require(self)
-    if isinstance(selected, OrderInfo):
-        return replace(selected)
-    return _dict_to_order_info(record_dict(selected))
+    return cast("OrderInfo", _require_typed(self, OrderInfo, _dict_to_order_info))
 
 
 def _historyorderinfo_asdict(
@@ -723,76 +629,42 @@ def _historyorderinfo_asdict(
 
 def _historyorderinfo_ticket(self: _ObjectState, ticket: int | None = None) -> int:
     if ticket is not None:
-        _selectionbase__select(
-            self,
-            next(
-                (o for o in self._backend.history_orders() if o.ticket == ticket), None
-            ),
-        )
+        _select_ticket(self, self._backend.history_orders(), ticket)
     return int(_selectionbase__value(self, "ticket"))
 
 
 def _historyorderinfo_selectbyindex(self: _ObjectState, index: int) -> bool:
-    values = self._backend.history_orders()
-    return _selectionbase__select(
-        self, values[index] if 0 <= index < len(values) else None
-    )
+    return _select_index(self, self._backend.history_orders(), index)
 
 
 def _historyorderinfo_historyorderstotal(
     self: _ObjectState, *args: Any, **kwargs: Any
 ) -> int:
-    date_from = args[0] if len(args) > 0 else kwargs.get("date_from")
-    date_to = args[1] if len(args) > 1 else kwargs.get("date_to")
-    orders = self._backend.history_orders()
-    if date_from is not None and date_to is not None:
-        t_from = _to_epoch(date_from)
-        t_to = _to_epoch(date_to)
-        orders = [
-            o
-            for o in orders
-            if t_from <= _to_epoch(o.time_done or o.time_setup) <= t_to
-        ]
-    return len(orders)
+    return _history_total(
+        self._backend.history_orders(),
+        args,
+        kwargs,
+        lambda o: o.time_done or o.time_setup,
+    )
 
 
 def _historyorderinfo_historyordersget(
     self: _ObjectState, *args: Any, **kwargs: Any
 ) -> list[dict[str, Any]]:
-    date_from, date_to, symbol, group, ticket, position = _extract_history_query(
-        args, kwargs
+    return _history_get(
+        self._backend.history_orders(),
+        args,
+        kwargs,
+        lambda o: o.time_done or o.time_setup,
+        OrderInfo,
+        _dict_to_order_info,
     )
-    orders = list(self._backend.history_orders())
-    if date_from is not None and date_to is not None:
-        t_from, t_to = _to_epoch(date_from), _to_epoch(date_to)
-        orders = [
-            o
-            for o in orders
-            if t_from <= _to_epoch(o.time_done or o.time_setup) <= t_to
-        ]
-    if ticket is not None:
-        orders = [o for o in orders if o.ticket == ticket]
-    if position is not None:
-        orders = [o for o in orders if o.position_id == position]
-    if symbol is not None:
-        orders = [o for o in orders if o.symbol == symbol]
-    if group is not None:
-        orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
-    return [
-        asdict(o)
-        if isinstance(o, OrderInfo)
-        else asdict(_dict_to_order_info(record_dict(o)))
-        for o in orders
-    ]
 
 
 def _orderinfo_orderinfo(self: _ObjectState, ticket: int | None = None) -> OrderInfo:
     if ticket is not None:
         _orderinfo_select(self, ticket)
-    selected = _selectionbase__require(self)
-    if isinstance(selected, OrderInfo):
-        return replace(selected)
-    return _dict_to_order_info(record_dict(selected))
+    return cast("OrderInfo", _require_typed(self, OrderInfo, _dict_to_order_info))
 
 
 def _orderinfo_asdict(self: _ObjectState, ticket: int | None = None) -> dict[str, Any]:
@@ -804,22 +676,16 @@ def _orderinfo_storestate(self: _ObjectState) -> None:
 
 
 def _orderinfo_checkstate(self: _ObjectState) -> bool:
-    ticket = int(_selectionbase__value(self, "ticket"))
-    _orderinfo_select(self, ticket)
+    _orderinfo_select(self, int(_selectionbase__value(self, "ticket")))
     return _selectionbase__check(self)
 
 
 def _orderinfo_select(self: _ObjectState, ticket: int) -> bool:
-    return _selectionbase__select(
-        self, next((o for o in self._backend.orders() if o.ticket == ticket), None)
-    )
+    return _select_ticket(self, self._backend.orders(), ticket)
 
 
 def _orderinfo_selectbyindex(self: _ObjectState, index: int) -> bool:
-    values = self._backend.orders()
-    return _selectionbase__select(
-        self, values[index] if 0 <= index < len(values) else None
-    )
+    return _select_index(self, self._backend.orders(), index)
 
 
 def _orderinfo_orderstotal(self: _ObjectState, *args: Any) -> int:
@@ -830,20 +696,9 @@ def _orderinfo_orderstotal(self: _ObjectState, *args: Any) -> int:
 def _orderinfo_ordersget(
     self: _ObjectState, *args: Any, **kwargs: Any
 ) -> list[dict[str, Any]]:
-    symbol, group, ticket = _extract_active_query(args, kwargs)
-    orders = list(self._backend.orders())
-    if ticket is not None:
-        orders = [o for o in orders if o.ticket == ticket]
-    if symbol is not None:
-        orders = [o for o in orders if o.symbol == symbol]
-    if group is not None:
-        orders = [o for o in orders if fnmatch.fnmatch(o.symbol, group)]
-    return [
-        asdict(o)
-        if isinstance(o, OrderInfo)
-        else asdict(_dict_to_order_info(record_dict(o)))
-        for o in orders
-    ]
+    return _active_get(
+        self._backend.orders(), args, kwargs, OrderInfo, _dict_to_order_info
+    )
 
 
 def _positioninfo_positioninfo(
@@ -851,10 +706,9 @@ def _positioninfo_positioninfo(
 ) -> PositionInfo:
     if ticket is not None:
         _positioninfo_selectbyticket(self, ticket)
-    selected = _selectionbase__require(self)
-    if isinstance(selected, PositionInfo):
-        return replace(selected)
-    return _dict_to_position_info(record_dict(selected))
+    return cast(
+        "PositionInfo", _require_typed(self, PositionInfo, _dict_to_position_info)
+    )
 
 
 def _positioninfo_asdict(
@@ -864,16 +718,15 @@ def _positioninfo_asdict(
 
 
 def _positioninfo_select(self: _ObjectState, symbol: str) -> bool:
-    values = [p for p in self._backend.positions() if p.symbol == symbol]
-    values.sort(key=lambda p: p.ticket)
+    values = sorted(
+        (p for p in self._backend.positions() if p.symbol == symbol),
+        key=lambda p: p.ticket,
+    )
     return _selectionbase__select(self, values[0] if values else None)
 
 
 def _positioninfo_selectbyindex(self: _ObjectState, index: int) -> bool:
-    values = self._backend.positions()
-    return _selectionbase__select(
-        self, values[index] if 0 <= index < len(values) else None
-    )
+    return _select_index(self, self._backend.positions(), index)
 
 
 def _positioninfo_selectbymagic(self: _ObjectState, symbol: str, magic: int) -> bool:
@@ -891,9 +744,7 @@ def _positioninfo_selectbymagic(self: _ObjectState, symbol: str, magic: int) -> 
 
 
 def _positioninfo_selectbyticket(self: _ObjectState, ticket: int) -> bool:
-    return _selectionbase__select(
-        self, next((p for p in self._backend.positions() if p.ticket == ticket), None)
-    )
+    return _select_ticket(self, self._backend.positions(), ticket)
 
 
 def _positioninfo_storestate(self: _ObjectState) -> None:
@@ -901,8 +752,7 @@ def _positioninfo_storestate(self: _ObjectState) -> None:
 
 
 def _positioninfo_checkstate(self: _ObjectState) -> bool:
-    ticket = int(_selectionbase__value(self, "ticket"))
-    _positioninfo_selectbyticket(self, ticket)
+    _positioninfo_selectbyticket(self, int(_selectionbase__value(self, "ticket")))
     return _selectionbase__check(self)
 
 
@@ -914,20 +764,9 @@ def _positioninfo_positionstotal(self: _ObjectState, *args: Any) -> int:
 def _positioninfo_positionsget(
     self: _ObjectState, *args: Any, **kwargs: Any
 ) -> list[dict[str, Any]]:
-    symbol, group, ticket = _extract_active_query(args, kwargs)
-    positions = list(self._backend.positions())
-    if ticket is not None:
-        positions = [p for p in positions if p.ticket == ticket]
-    if symbol is not None:
-        positions = [p for p in positions if p.symbol == symbol]
-    if group is not None:
-        positions = [p for p in positions if fnmatch.fnmatch(p.symbol, group)]
-    return [
-        asdict(p)
-        if isinstance(p, PositionInfo)
-        else asdict(_dict_to_position_info(record_dict(p)))
-        for p in positions
-    ]
+    return _active_get(
+        self._backend.positions(), args, kwargs, PositionInfo, _dict_to_position_info
+    )
 
 
 def _symbolinfo___init__(
@@ -1126,104 +965,52 @@ def _symbolinfo_asdict(self: _ObjectState) -> dict[str, Any]:
         if tick is not None and point > 0
         else int(s.spread)
     )
-    return {
-        "custom": bool(s.custom),
-        "chart_mode": int(s.chart_mode),
-        "select": bool(s.select),
-        "visible": bool(s.visible),
-        "session_deals": int(s.session_deals),
-        "session_buy_orders": int(s.session_buy_orders),
-        "session_sell_orders": int(s.session_sell_orders),
-        "volume": int(tick.volume if tick else 0),
-        "volumehigh": int(getattr(s, "volume_high", tick.volume if tick else 0)),
-        "volumelow": int(getattr(s, "volume_low", tick.volume if tick else 0)),
-        "time": epoch_seconds(tick.time) if tick else 0,
-        "digits": int(s.digits),
-        "spread": spread,
-        "spread_float": bool(s.spread_float),
-        "ticks_bookdepth": int(s.ticks_bookdepth),
-        "trade_calc_mode": int(s.trade_calc_mode),
-        "trade_mode": int(s.trade_mode),
-        "start_time": int(s.start_time),
-        "expiration_time": int(s.expiration_time),
-        "trade_stops_level": int(s.trade_stops_level),
-        "trade_freeze_level": int(s.trade_freeze_level),
-        "trade_exemode": int(s.trade_exemode),
-        "swap_mode": int(s.swap_mode),
-        "swap_rollover3days": int(s.swap_rollover3days),
-        "margin_hedged_use_leg": bool(s.margin_hedged_use_leg),
-        "expiration_mode": int(s.expiration_mode),
-        "filling_mode": int(s.filling_mode),
-        "order_mode": int(s.order_mode),
-        "order_gtc_mode": int(s.order_gtc_mode),
-        "option_mode": int(s.option_mode),
-        "option_right": int(s.option_right),
-        "bid": float(tick.bid if tick else 0.0),
-        "bidhigh": float(getattr(s, "bid_high", tick.bid if tick else 0.0)),
-        "bidlow": float(getattr(s, "bid_low", tick.bid if tick else 0.0)),
-        "ask": float(tick.ask if tick else 0.0),
-        "askhigh": float(getattr(s, "ask_high", tick.ask if tick else 0.0)),
-        "asklow": float(getattr(s, "ask_low", tick.ask if tick else 0.0)),
-        "last": float(tick.last if tick else 0.0),
-        "lasthigh": float(getattr(s, "last_high", tick.last if tick else 0.0)),
-        "lastlow": float(getattr(s, "last_low", tick.last if tick else 0.0)),
-        "volume_real": float(s.volume_real),
-        "volumehigh_real": float(s.volumehigh_real),
-        "volumelow_real": float(s.volumelow_real),
-        "option_strike": float(s.option_strike),
-        "point": point,
-        "trade_tick_value": float(s.trade_tick_value),
-        "trade_tick_value_profit": float(s.trade_tick_value_profit),
-        "trade_tick_value_loss": float(s.trade_tick_value_loss),
-        "trade_tick_size": float(s.trade_tick_size),
-        "trade_contract_size": float(s.trade_contract_size),
-        "trade_accrued_interest": float(s.trade_accrued_interest),
-        "trade_face_value": float(s.trade_face_value),
-        "trade_liquidity_rate": float(s.trade_liquidity_rate),
-        "volume_min": float(s.volume_min),
-        "volume_max": float(s.volume_max),
-        "volume_step": float(s.volume_step),
-        "volume_limit": float(s.volume_limit),
-        "swap_long": float(s.swap_long),
-        "swap_short": float(s.swap_short),
-        "margin_initial": float(s.margin_initial),
-        "margin_maintenance": float(s.margin_maintenance),
-        "session_volume": float(s.session_volume),
-        "session_turnover": float(s.session_turnover),
-        "session_interest": float(s.session_interest),
-        "session_buy_orders_volume": float(s.session_buy_orders_volume),
-        "session_sell_orders_volume": float(s.session_sell_orders_volume),
-        "session_open": float(s.session_open),
-        "session_close": float(s.session_close),
-        "session_aw": float(s.session_aw),
-        "session_price_settlement": float(s.session_price_settlement),
-        "session_price_limit_min": float(s.session_price_limit_min),
-        "session_price_limit_max": float(s.session_price_limit_max),
-        "margin_hedged": float(s.margin_hedged),
-        "price_change": float(s.price_change),
-        "price_volatility": float(s.price_volatility),
-        "price_theoretical": float(s.price_theoretical),
-        "price_greeks_delta": float(s.price_greeks_delta),
-        "price_greeks_theta": float(s.price_greeks_theta),
-        "price_greeks_gamma": float(s.price_greeks_gamma),
-        "price_greeks_vega": float(s.price_greeks_vega),
-        "price_greeks_rho": float(s.price_greeks_rho),
-        "price_greeks_omega": float(s.price_greeks_omega),
-        "price_sensitivity": float(s.price_sensitivity),
-        "basis": str(s.basis),
-        "category": str(s.category),
-        "currency_base": str(s.currency_base),
-        "currency_profit": str(s.currency_profit),
-        "currency_margin": str(s.currency_margin),
-        "bank": str(s.bank),
-        "description": str(s.description),
-        "exchange": str(s.exchange),
-        "formula": str(s.formula),
-        "isin": str(s.isin),
-        "name": str(s.name),
-        "page": str(s.page),
-        "path": str(s.path),
-    }
+    result = asdict(s)
+    result.update(
+        {
+            "spread": spread,
+            "volume": int(tick.volume if tick else 0),
+            "volumehigh": int(
+                getattr(
+                    s,
+                    "volume_high",
+                    getattr(s, "volumehigh", tick.volume if tick else 0),
+                )
+            ),
+            "volumelow": int(
+                getattr(
+                    s, "volume_low", getattr(s, "volumelow", tick.volume if tick else 0)
+                )
+            ),
+            "time": epoch_seconds(tick.time) if tick else 0,
+            "bid": float(tick.bid if tick else 0.0),
+            "bidhigh": float(
+                getattr(s, "bid_high", getattr(s, "bidhigh", tick.bid if tick else 0.0))
+            ),
+            "bidlow": float(
+                getattr(s, "bid_low", getattr(s, "bidlow", tick.bid if tick else 0.0))
+            ),
+            "ask": float(tick.ask if tick else 0.0),
+            "askhigh": float(
+                getattr(s, "ask_high", getattr(s, "askhigh", tick.ask if tick else 0.0))
+            ),
+            "asklow": float(
+                getattr(s, "ask_low", getattr(s, "asklow", tick.ask if tick else 0.0))
+            ),
+            "last": float(tick.last if tick else 0.0),
+            "lasthigh": float(
+                getattr(
+                    s, "last_high", getattr(s, "lasthigh", tick.last if tick else 0.0)
+                )
+            ),
+            "lastlow": float(
+                getattr(
+                    s, "last_low", getattr(s, "lastlow", tick.last if tick else 0.0)
+                )
+            ),
+        }
+    )
+    return result
 
 
 def _symbolinfo_symbolinfo(self: _ObjectState, symbol: str | None = None) -> SymbolInfo:

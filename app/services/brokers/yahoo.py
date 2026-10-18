@@ -171,18 +171,6 @@ class YahooBroker(DataBrokerBackend):
             description="Yahoo Finance public market data and symbol metadata provider",
         )
 
-    @override
-    def close_sync(self) -> None:
-        """Synchronously close session resources."""
-        self._is_connected = False
-        if hasattr(self, "session"):
-            self.session.close()
-
-    @override
-    async def close(self) -> None:
-        """Asynchronously close session resources."""
-        self.close_sync()
-
     def check_health(self) -> ProviderHealth:
         """Verify reachability and latency of Yahoo Finance quote endpoints."""
         t0 = time.monotonic()
@@ -480,47 +468,21 @@ class YahooBroker(DataBrokerBackend):
             provider="yahoo",
         )
 
+    @override
     def read_history(
         self,
         request: HistoryRequest,
         token: CancellationToken | None = None,
     ) -> HistoryPage:
         """Acquire historical bars conforming to typed request model."""
-        if token is not None:
-            token.check_cancelled()
-        request.validate()
-
         if request.kind == "ticks" or request.timeframe.upper() == "TICK":
             raise ProviderUnsupportedError(
                 "Yahoo Finance does not support tick history",
                 provider="yahoo",
             )
-
-        start_s = request.start_epoch() or 0
-        end_s = request.end_epoch() or 0
-        rows = self.fetch_bars(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            mode=request.mode,
-            start=start_s,
-            end=end_s,
-            count=request.count,
-            limit=request.limit,
-        )
-
-        if token is not None:
-            token.check_cancelled()
-
-        return HistoryPage(
-            provider="yahoo",
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            kind=request.kind,
-            rows=rows,
-            cursor=None,
-            is_complete=True,
-            provenance={"source": "yahoo_v8_chart", "url": self.CHART_URL},
-        )
+        page = super().read_history(request, token)
+        page.provenance = {"source": "yahoo_v8_chart", "url": self.CHART_URL}
+        return page
 
     @override
     def symbol_info(self, symbol: str) -> SymbolInfo:

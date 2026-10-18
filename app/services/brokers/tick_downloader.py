@@ -41,7 +41,6 @@ CLI Usage:
 from __future__ import annotations
 
 import time
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
@@ -80,74 +79,13 @@ PLUGIN_MANIFEST: dict[str, Any] = {
 }
 
 __all__ = [
-    "BarRecord",
-    "BaseDataProvider",
-    "CancellationToken",
-    "DownloadRequest",
     "PLUGIN_MANIFEST",
-    "ProviderCapabilities",
     "TickDownloaderBroker",
-    "TickDownloaderProvider",
     "create_adapter",
+    "main",
 ]
 
 logger = get_logger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Backward-compatibility legacy container models
-# ---------------------------------------------------------------------------
-
-
-class DownloadRequest:
-    """Legacy data download request parameters."""
-
-    def __init__(
-        self,
-        symbol: str = "",
-        timeframe: str = "TICK",
-        start: Any = None,
-        end: Any = None,
-    ) -> None:
-        self.symbol = symbol
-        self.timeframe = timeframe
-        self.start = start
-        self.end = end
-
-
-class BarRecord:
-    """Legacy historical bar record container."""
-
-    def __init__(
-        self,
-        *,
-        timestamp_utc: str = "",
-        open: float = 0.0,  # noqa: A002
-        high: float = 0.0,
-        low: float = 0.0,
-        close: float = 0.0,
-        volume: float = 0.0,
-        **kwargs: Any,
-    ) -> None:
-        self.timestamp_utc = timestamp_utc
-        self.open = open
-        self.high = high
-        self.low = low
-        self.close = close
-        self.volume = volume
-        self.extra = kwargs
-
-
-class BaseDataProvider:
-    """Base data provider interface for legacy consumers."""
-
-    def __init__(self, capabilities: ProviderCapabilities | None = None) -> None:
-        self.capabilities = capabilities
-
-    def _fetch_bars(
-        self, request: DownloadRequest, token: CancellationToken
-    ) -> list[BarRecord]:
-        return []
 
 
 # ---------------------------------------------------------------------------
@@ -155,7 +93,7 @@ class BaseDataProvider:
 # ---------------------------------------------------------------------------
 
 
-class TickDownloaderBroker(DataBrokerBackend, BaseDataProvider):
+class TickDownloaderBroker(DataBrokerBackend):
     """Tick data downloader broker conforming to TradingBackend and Stage 2C."""
 
     def __init__(
@@ -180,17 +118,6 @@ class TickDownloaderBroker(DataBrokerBackend, BaseDataProvider):
             has_local_archive=self.data_dir.exists(),
             description="High-precision tick and trade volume historical data downloader plugin",
         )
-        BaseDataProvider.__init__(self, self.capabilities)
-
-    @override
-    def close_sync(self) -> None:
-        """Synchronously release local resources."""
-        self._is_connected = False
-
-    @override
-    async def close(self) -> None:
-        """Asynchronously release local resources."""
-        self.close_sync()
 
     def check_health(self) -> ProviderHealth:
         """Check status of local tick archives and upstream feed connectivity."""
@@ -320,94 +247,27 @@ class TickDownloaderBroker(DataBrokerBackend, BaseDataProvider):
         finally:
             duka.close_sync()
 
+    @override
     def read_history(
         self,
         request: HistoryRequest,
         token: CancellationToken | None = None,
     ) -> HistoryPage:
         """Acquire historical ticks or M1 bars conforming to typed request model."""
-        if token is not None:
-            token.check_cancelled()
-        request.validate()
-
-        if request.kind == "ticks" or request.timeframe.upper() == "TICK":
-            start_ms = (request.start_epoch() or 0) * 1000
-            end_ms = (request.end_epoch() or 0) * 1000
-            rows = self.fetch_ticks(
-                symbol=request.symbol,
-                mode=request.mode,
-                start_ms=start_ms,
-                end_ms=end_ms,
-                count=request.count,
-                limit=request.limit,
-            )
-        else:
-            start_s = request.start_epoch() or 0
-            end_s = request.end_epoch() or 0
-            rows = self.fetch_bars(
-                symbol=request.symbol,
-                timeframe=request.timeframe,
-                mode=request.mode,
-                start=start_s,
-                end=end_s,
-                count=request.count,
-                limit=request.limit,
-            )
-
-        if token is not None:
-            token.check_cancelled()
-
+        page = super().read_history(request, token)
         logger.info(
             "%s: Acquired %d records for %s from TickDownloader",
             ADAPTERS_FR,
-            len(rows),
+            len(page.rows),
             request.symbol,
-            extra={"fr_id": ADAPTERS_FR, "count": len(rows), "symbol": request.symbol},
+            extra={
+                "fr_id": ADAPTERS_FR,
+                "count": len(page.rows),
+                "symbol": request.symbol,
+            },
         )
-        return HistoryPage(
-            provider="tick_downloader",
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            kind=request.kind,
-            rows=rows,
-            cursor=None,
-            is_complete=True,
-            provenance={"source": "tick_downloader", "data_dir": str(self.data_dir)},
-        )
-
-    @override
-    def _fetch_bars(
-        self, request: DownloadRequest, token: CancellationToken
-    ) -> list[BarRecord]:
-        """Support legacy BaseDataProvider callers."""
-        token.check_cancelled()
-        rows = self.fetch_bars(
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            mode="range",
-            start=0,
-            end=0,
-            count=100,
-            limit=100,
-        )
-        records: list[BarRecord] = []
-        for r in rows:
-            dt_iso = datetime.fromtimestamp(r["time"], tz=UTC).isoformat()
-            records.append(
-                BarRecord(
-                    timestamp_utc=dt_iso,
-                    open=r["open"],
-                    high=r["high"],
-                    low=r["low"],
-                    close=r["close"],
-                    volume=r.get("tick_volume", 1.0),
-                )
-            )
-        return records
-
-
-# Backward-compatibility alias
-TickDownloaderProvider = TickDownloaderBroker
+        page.provenance = {"source": "tick_downloader", "data_dir": str(self.data_dir)}
+        return page
 
 
 def create_adapter(

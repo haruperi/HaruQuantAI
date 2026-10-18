@@ -137,18 +137,6 @@ class DukascopyBroker(DataBrokerBackend):
             description="Dukascopy Bank SA historical tick and bar provider",
         )
 
-    @override
-    def close_sync(self) -> None:
-        """Synchronously close session resources."""
-        self._is_connected = False
-        if hasattr(self, "session"):
-            self.session.close()
-
-    @override
-    async def close(self) -> None:
-        """Asynchronously close session resources."""
-        self.close_sync()
-
     def check_health(self) -> ProviderHealth:
         """Check Dukascopy feed connectivity."""
         try:
@@ -530,56 +518,33 @@ class DukascopyBroker(DataBrokerBackend):
             ticks = ticks[-target_count:]
         return ticks
 
+    @override
     def read_history(
         self,
         request: HistoryRequest,
         token: CancellationToken | None = None,
     ) -> HistoryPage:
         """Fetch historical records adhering to Stage 2C contract."""
-        request.validate()
-        if token is not None:
-            token.check_cancelled()
-        rows: list[dict[str, Any]] = []
+        tf = request.timeframe.strip().upper()
+        if request.kind != "ticks" and tf != "TICK" and tf != "M1":
+            raise ProviderUnsupportedError(
+                f"Timeframe '{request.timeframe}' not supported by Dukascopy. Supported: M1, TICK",
+                provider="dukascopy",
+            )
         try:
-            if request.kind == "ticks" or request.timeframe.upper() == "TICK":
-                rows = self.fetch_ticks(
-                    symbol=request.symbol,
-                    mode=request.mode,
-                    start_ms=(request.start_epoch() or 0) * 1000,
-                    end_ms=(request.end_epoch() or 0) * 1000,
-                    count=request.count,
-                    limit=request.limit,
-                )
-            else:
-                tf = request.timeframe.strip().upper()
-                if tf != "M1":
-                    raise ProviderUnsupportedError(
-                        f"Timeframe '{request.timeframe}' not supported by Dukascopy. Supported: M1, TICK",
-                        provider="dukascopy",
-                    )
-                rows = self.fetch_bars(
-                    symbol=request.symbol,
-                    timeframe=request.timeframe,
-                    mode=request.mode,
-                    start=request.start_epoch() or 0,
-                    end=request.end_epoch() or 0,
-                    count=request.count,
-                    limit=request.limit,
-                )
+            return super().read_history(request, token)
         except BridgeError as be:
             if be.code == "NO_DATA":
-                rows = []
-            else:
-                raise
-        return HistoryPage(
-            provider="dukascopy",
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            kind=request.kind,
-            rows=rows,
-            is_complete=True,
-            provenance={"source": "dukascopy"},
-        )
+                return HistoryPage(
+                    provider="dukascopy",
+                    symbol=request.symbol,
+                    timeframe=request.timeframe,
+                    kind=request.kind,
+                    rows=[],
+                    is_complete=True,
+                    provenance={"source": "dukascopy"},
+                )
+            raise
 
 
 def create_adapter(context: PluginHostContext | None = None) -> DukascopyBroker:

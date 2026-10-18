@@ -130,18 +130,6 @@ class DarwinexBroker(DataBrokerBackend):
             description="Darwinex institutional tick and bar market data provider",
         )
 
-    @override
-    def close_sync(self) -> None:
-        """Synchronously close session resources."""
-        self._is_connected = False
-        if hasattr(self, "session"):
-            self.session.close()
-
-    @override
-    async def close(self) -> None:
-        """Asynchronously close session resources."""
-        self.close_sync()
-
     def check_health(self) -> ProviderHealth:
         """Check Darwinex CDN connectivity."""
         try:
@@ -481,62 +469,25 @@ class DarwinexBroker(DataBrokerBackend):
                 code="DOWNLOAD_ERROR",
             ) from exc
 
+    @override
     def read_history(
         self,
         request: HistoryRequest,
         token: CancellationToken | None = None,
     ) -> HistoryPage:
         """Acquire historical bars or ticks according to typed request specification."""
-        if token is not None:
-            token.check_cancelled()
-        request.validate()
-
-        if request.kind == "ticks" or request.timeframe.upper() == "TICK":
-            start_ms = (request.start_epoch() or 0) * 1000
-            end_ms = (request.end_epoch() or 0) * 1000
-            rows = self.fetch_ticks(
-                symbol=request.symbol,
-                mode=request.mode,
-                start_ms=start_ms,
-                end_ms=end_ms,
-                count=request.count,
-                limit=request.limit,
+        tf = request.timeframe.upper()
+        if request.kind != "ticks" and tf != "TICK" and tf not in ("M1", "D1"):
+            raise ProviderUnsupportedError(
+                f"Timeframe '{request.timeframe}' not supported by Darwinex. Supported: M1, D1",
+                provider="darwinex",
             )
-        else:
-            tf = request.timeframe.upper()
-            if tf not in ("M1", "D1"):
-                raise ProviderUnsupportedError(
-                    f"Timeframe '{request.timeframe}' not supported by Darwinex. Supported: M1, D1",
-                    provider="darwinex",
-                )
-            start_s = request.start_epoch() or 0
-            end_s = request.end_epoch() or 0
-            rows = self.fetch_bars(
-                symbol=request.symbol,
-                timeframe=request.timeframe,
-                mode=request.mode,
-                start=start_s,
-                end=end_s,
-                count=request.count,
-                limit=request.limit,
-            )
-
-        if token is not None:
-            token.check_cancelled()
-
-        return HistoryPage(
-            provider="darwinex",
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            kind=request.kind,
-            rows=rows,
-            cursor=None,
-            is_complete=True,
-            provenance={
-                "source": "darwinex",
-                "data_dir": str(self.data_dir) if self.data_dir else None,
-            },
-        )
+        page = super().read_history(request, token)
+        page.provenance = {
+            "source": "darwinex",
+            "data_dir": str(self.data_dir) if self.data_dir else None,
+        }
+        return page
 
 
 def create_adapter(context: PluginHostContext | None = None) -> DarwinexBroker:

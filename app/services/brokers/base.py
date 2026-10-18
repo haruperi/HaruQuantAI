@@ -39,6 +39,7 @@ CLI Usage:
 
 from __future__ import annotations
 
+import contextlib
 import contextvars
 import time
 import uuid
@@ -52,6 +53,13 @@ if TYPE_CHECKING:
     from app.workspace.data_manager import MarketTick
 
 from app.host.logging import get_logger
+from app.services.brokers.capabilities import (
+    CancellationToken,
+    HistoryPage,
+    HistoryRequest,
+    ProviderCapabilities,
+    ProviderUnsupportedError,
+)
 from app.services.include.contracts import (
     AccountInfo,
     BridgeEvent,
@@ -264,10 +272,98 @@ class BaseBrokerBackend:
     def close_sync(self) -> None:
         """Close provider connection session synchronously."""
         self._is_connected = False
+        sess = getattr(self, "session", None) or getattr(self, "_session", None)
+        if sess is not None and hasattr(sess, "close") and callable(sess.close):
+            with contextlib.suppress(Exception):
+                sess.close()
 
     async def close(self) -> None:
         """Close provider connection session."""
         self.close_sync()
+
+    def read_history(
+        self,
+        request: HistoryRequest,
+        token: CancellationToken | None = None,
+    ) -> HistoryPage:
+        """Acquire historical bars or ticks conforming to typed request model."""
+        request.validate()
+        if token is not None:
+            token.check_cancelled()
+
+        caps: ProviderCapabilities | None = getattr(self, "capabilities", None)
+        is_tick = request.kind == "ticks" or request.timeframe.strip().upper() == "TICK"
+
+        if caps is not None:
+            if is_tick and not caps.supports_kind("ticks"):
+                raise ProviderUnsupportedError(
+                    f"{caps.display_name or self.name} does not provide tick-level market data",
+                    provider=caps.provider_id or self.name.lower(),
+                )
+            if not is_tick:
+                tf_upper = request.timeframe.strip().upper()
+                if caps.supported_timeframes and not caps.supports_timeframe(tf_upper):
+                    raise ProviderUnsupportedError(
+                        f"Unsupported timeframe '{request.timeframe}' for {caps.display_name or self.name}",
+                        provider=caps.provider_id or self.name.lower(),
+                    )
+
+        start_s = request.start_epoch() or 0
+        end_s = request.end_epoch() or 0
+
+        fetch_bars_fn = getattr(self, "fetch_bars", None)
+        fetch_ticks_fn = getattr(self, "fetch_ticks", None)
+
+        if is_tick:
+            if not callable(fetch_ticks_fn):
+                raise ProviderUnsupportedError(
+                    f"{self.name} does not support tick history",
+                    provider=self.name.lower(),
+                )
+            start_ms = start_s * 1000 if start_s > 0 else 0
+            end_ms = end_s * 1000 if end_s > 0 else 0
+            rows = fetch_ticks_fn(
+                symbol=request.symbol,
+                mode=request.mode,
+                start_ms=start_ms,
+                end_ms=end_ms,
+                count=request.count,
+                limit=request.limit,
+            )
+        else:
+            if not callable(fetch_bars_fn):
+                raise ProviderUnsupportedError(
+                    f"{self.name} does not support bar history",
+                    provider=self.name.lower(),
+                )
+            rows = fetch_bars_fn(
+                symbol=request.symbol,
+                timeframe=request.timeframe,
+                mode=request.mode,
+                start=start_s,
+                end=end_s,
+                count=request.count,
+                limit=request.limit,
+            )
+
+        if token is not None:
+            token.check_cancelled()
+
+        prov_id = (
+            caps.provider_id
+            if caps is not None and caps.provider_id
+            else self.name.lower()
+        )
+        return HistoryPage(
+            provider=prov_id,
+            symbol=request.symbol,
+            timeframe=request.timeframe,
+            kind="ticks" if is_tick else "bars",
+            rows=rows,
+            cursor=None,
+            is_complete=True,
+            provenance={"provider": prov_id},
+        )
 
     def arm(self) -> None:
         """Arm the broker for live trade actions."""

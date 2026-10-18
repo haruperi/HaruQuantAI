@@ -188,21 +188,6 @@ _SINGLETON_FACTORIES: dict[str, tuple[str, str]] = {
     "tick_downloader": ("app.services.brokers.tick_downloader", "TickDownloaderBroker"),
 }
 
-_ALIASES: dict[str, str] = {
-    "yahoo": "yahoo",
-    "dukascopy": "dukascopy",
-    "darwinex": "darwinex",
-    "sq_equity": "sq_equity",
-    "equity": "sq_equity",
-    "sq_futures": "sq_futures",
-    "futures": "sq_futures",
-    "binance": "crypto",
-    "crypto": "crypto",
-    "files": "files",
-    "file": "files",
-    "tick_downloader": "tick_downloader",
-}
-
 
 def get_broker(name: str, registry: Any = None) -> Any:
     """Resolve a data broker singleton by name or alias, optionally querying a registry."""
@@ -212,9 +197,10 @@ def get_broker(name: str, registry: Any = None) -> Any:
         except KeyError:
             pass
 
-    key = name.lower().strip()
-    target = _ALIASES.get(key)
-    if target is None:
+    from app.services.brokers.registry import normalize_provider_id
+
+    target = normalize_provider_id(name)
+    if target not in _SINGLETON_FACTORIES:
         raise KeyError(f"Unknown broker: {name}")
     if target not in _SINGLETONS:
         mod_path, cls_name = _SINGLETON_FACTORIES[target]

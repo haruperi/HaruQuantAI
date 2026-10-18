@@ -905,15 +905,6 @@ class MetaTraderDataBroker(DataBrokerBackend):
             description="MetaTrader 4/5 terminal bridge and archive provider",
         )
 
-    @override
-    def close_sync(self) -> None:
-        """Close provider resources; preserves borrowed backend."""
-        self._is_connected = False
-
-    @override
-    async def close(self) -> None:
-        self.close_sync()
-
     def check_health(self) -> Any:
         """Inspect health status of MetaTrader terminal connection or archive files."""
         if self.mode == "terminal" and self.backend is not None:
@@ -1153,57 +1144,20 @@ class MetaTraderDataBroker(DataBrokerBackend):
             code="NO_DATA",
         )
 
+    @override
     def read_history(
         self,
         request: HistoryRequest,
         token: CancellationToken | None = None,
     ) -> HistoryPage:
         """Acquire historical bars or ticks from MetaTrader terminal or archives."""
-        if token is not None:
-            token.check_cancelled()
-        request.validate()
-
-        if request.kind == "ticks" or request.timeframe.upper() == "TICK":
-            start_ms = (request.start_epoch() or 0) * 1000
-            end_ms = (request.end_epoch() or 0) * 1000
-            rows = self.fetch_ticks(
-                symbol=request.symbol,
-                mode=request.mode,
-                start_ms=start_ms,
-                end_ms=end_ms,
-                count=request.count,
-                limit=request.limit,
-            )
-        else:
-            start_s = request.start_epoch() or 0
-            end_s = request.end_epoch() or 0
-            rows = self.fetch_bars(
-                symbol=request.symbol,
-                timeframe=request.timeframe,
-                mode=request.mode,
-                start=start_s,
-                end=end_s,
-                count=request.count,
-                limit=request.limit,
-            )
-
-        if token is not None:
-            token.check_cancelled()
-
-        return HistoryPage(
-            provider="metatrader",
-            symbol=request.symbol,
-            timeframe=request.timeframe,
-            kind=request.kind,
-            rows=rows,
-            cursor=None,
-            is_complete=True,
-            provenance={
-                "source": "metatrader",
-                "mode": self.mode,
-                "data_dir": str(self.data_dir) if self.data_dir else None,
-            },
-        )
+        page = super().read_history(request, token)
+        page.provenance = {
+            "source": "metatrader",
+            "mode": self.mode,
+            "data_dir": str(self.data_dir) if self.data_dir else None,
+        }
+        return page
 
 
 def create_adapter(context: Any = None) -> MetaTraderDataBroker:

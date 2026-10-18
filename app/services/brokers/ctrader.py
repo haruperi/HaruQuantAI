@@ -1264,39 +1264,34 @@ class CTraderBackend(Trading):
         cmd_id = f"cmd-{uuid.uuid4().hex[:12]}"
         self._last_command.set(cmd_id)
         now = time.time()
-        receipt = Receipt(
+        base_receipt = Receipt(
             command_id=cmd_id,
             object_id=object_id,
             class_name=class_name,
             method_name=method_name,
             status=ReceiptStatus.CREATED,
             created_at=now,
+            sent_at=now,
+            acknowledged_at=now,
+            resolved_at=now,
         )
-        self._receipts[cmd_id] = receipt
-
         try:
             val = self._dispatch(class_name, method_name, args)
             val_serialized: Any = (
                 asdict(val) if is_dataclass(val) and not isinstance(val, type) else val
             )
             self._receipts[cmd_id] = replace(
-                receipt,
-                status=ReceiptStatus.RESOLVED,
-                sent_at=now,
-                acknowledged_at=now,
-                resolved_at=now,
-                value=val_serialized,
+                base_receipt, status=ReceiptStatus.RESOLVED, value=val_serialized
             )
             return val
         except Exception as exc:
-            code = getattr(exc, "code", "CTRADER_ERROR")
             self._receipts[cmd_id] = replace(
-                receipt,
+                base_receipt,
                 status=ReceiptStatus.REJECTED,
-                sent_at=now,
-                acknowledged_at=now,
-                resolved_at=now,
-                error={"code": str(code), "message": str(exc)},
+                error={
+                    "code": str(getattr(exc, "code", "CTRADER_ERROR")),
+                    "message": str(exc),
+                },
             )
             raise
 
@@ -1543,94 +1538,87 @@ class CTraderBackend(Trading):
             action=TradeAction.DEAL, magic=self._magic, deviation=self._deviation
         )
 
-    def _dispatch_position(self, method_name: str, args: list[Any]) -> Any:
-        positions, _ = self.client.reconcile()
-        if method_name == "PositionsTotal":
-            return len(positions)
-        if method_name in {"PositionsGet", "PositionGetTicket"}:
-            return _filter_records(positions, args)
-        if method_name == "Select":
+    def _dispatch_collection(
+        self,
+        *,
+        records: list[dict[str, Any]],
+        method_name: str,
+        args: list[Any],
+        class_name: str,
+        total_methods: set[str],
+        get_methods: set[str],
+        info_methods: set[str],
+        select_attr: str,
+        supports_identifier: bool = True,
+    ) -> Any:
+        if method_name in total_methods:
+            return len(records)
+        if method_name in get_methods:
+            return _filter_records(records, args)
+        if method_name in {"Select", "SelectByTicket", "Ticket"}:
             ticket = _arg_int(args, 0, 0)
             matching = [
-                p
-                for p in positions
-                if p.get("ticket") == ticket or p.get("identifier") == ticket
+                r
+                for r in records
+                if r.get("ticket") == ticket
+                or (supports_identifier and r.get("identifier") == ticket)
             ]
             if matching:
-                self._selected_position_ticket = ticket
+                setattr(self, select_attr, ticket)
                 return True
             return False
         if method_name == "SelectByIndex":
             idx = _arg_int(args, 0, -1)
-            if 0 <= idx < len(positions):
-                self._selected_position_ticket = int(positions[idx].get("ticket", 0))
-                return True
-            return False
-        if method_name == "SelectByTicket":
-            ticket = _arg_int(args, 0, 0)
-            matching = [
-                p
-                for p in positions
-                if p.get("ticket") == ticket or p.get("identifier") == ticket
-            ]
-            if matching:
-                self._selected_position_ticket = ticket
+            if 0 <= idx < len(records):
+                setattr(self, select_attr, int(records[idx].get("ticket", 0)))
                 return True
             return False
         if method_name == "SelectByMagic":
             magic = _arg_int(args, 0, 0)
-            matching = [p for p in positions if p.get("magic") == magic]
+            matching = [r for r in records if r.get("magic") == magic]
             if matching:
-                self._selected_position_ticket = int(matching[0].get("ticket", 0))
+                setattr(self, select_attr, int(matching[0].get("ticket", 0)))
                 return True
             return False
         if method_name in {"StoreState", "CheckState"}:
             return True
-        if method_name == "PositionInfo":
+        if method_name in info_methods:
             ticket = _arg_int(args, 0, 0)
-            target = ticket or self._selected_position_ticket
-            for p in positions:
-                if p.get("ticket") == target or p.get("identifier") == target:
-                    return p
-            return positions[0] if positions else cast("dict[str, Any]", {})
+            target = ticket or getattr(self, select_attr, 0)
+            for r in records:
+                if r.get("ticket") == target or (
+                    supports_identifier and r.get("identifier") == target
+                ):
+                    return r
+            return records[0] if records else cast("dict[str, Any]", {})
         raise BridgeError(
-            f"Unsupported PositionInfo method: {method_name}", code="BAD_METHOD"
+            f"Unsupported {class_name} method: {method_name}", code="BAD_METHOD"
+        )
+
+    def _dispatch_position(self, method_name: str, args: list[Any]) -> Any:
+        positions, _ = self.client.reconcile()
+        return self._dispatch_collection(
+            records=positions,
+            method_name=method_name,
+            args=args,
+            class_name="PositionInfo",
+            total_methods={"PositionsTotal"},
+            get_methods={"PositionsGet", "PositionGetTicket"},
+            info_methods={"PositionInfo"},
+            select_attr="_selected_position_ticket",
         )
 
     def _dispatch_order(self, method_name: str, args: list[Any]) -> Any:
         _, orders = self.client.reconcile()
-        if method_name == "OrdersTotal":
-            return len(orders)
-        if method_name in {"OrdersGet", "OrderGetTicket"}:
-            return _filter_records(orders, args)
-        if method_name in {"Select", "SelectByTicket"}:
-            ticket = _arg_int(args, 0, 0)
-            matching = [
-                o
-                for o in orders
-                if o.get("ticket") == ticket or o.get("identifier") == ticket
-            ]
-            if matching:
-                self._selected_order_ticket = ticket
-                return True
-            return False
-        if method_name == "SelectByIndex":
-            idx = _arg_int(args, 0, -1)
-            if 0 <= idx < len(orders):
-                self._selected_order_ticket = int(orders[idx].get("ticket", 0))
-                return True
-            return False
-        if method_name in {"StoreState", "CheckState"}:
-            return True
-        if method_name == "OrderInfo":
-            ticket = _arg_int(args, 0, 0)
-            target = ticket or self._selected_order_ticket
-            for o in orders:
-                if o.get("ticket") == target or o.get("identifier") == target:
-                    return o
-            return orders[0] if orders else cast("dict[str, Any]", {})
-        raise BridgeError(
-            f"Unsupported OrderInfo method: {method_name}", code="BAD_METHOD"
+        return self._dispatch_collection(
+            records=orders,
+            method_name=method_name,
+            args=args,
+            class_name="OrderInfo",
+            total_methods={"OrdersTotal"},
+            get_methods={"OrdersGet", "OrderGetTicket"},
+            info_methods={"OrderInfo"},
+            select_attr="_selected_order_ticket",
         )
 
     def _dispatch_history_order(self, method_name: str, args: list[Any]) -> Any:
@@ -1638,35 +1626,16 @@ class CTraderBackend(Trading):
             raise BridgeError(
                 "cTrader client is not authenticated", code="NOT_AUTHENTICATED"
             )
-        history: list[dict[str, Any]] = []
-        if method_name == "HistoryOrdersTotal":
-            return len(history)
-        if method_name == "HistoryOrdersGet":
-            filtered = _filter_records(history, args)
-            return filtered or cast("list[dict[str, Any]]", [])
-        if method_name == "Ticket":
-            ticket = _arg_int(args, 0, 0)
-            matching = [h for h in history if h.get("ticket") == ticket]
-            if matching:
-                self._selected_history_order_ticket = ticket
-                return True
-            return False
-        if method_name == "SelectByIndex":
-            idx = _arg_int(args, 0, -1)
-            if 0 <= idx < len(history):
-                self._selected_history_order_ticket = int(history[idx].get("ticket", 0))
-                return True
-            return False
-        if method_name == "HistoryOrderInfo":
-            ticket = _arg_int(args, 0, 0)
-            target = ticket or self._selected_history_order_ticket
-            for h in history:
-                if h.get("ticket") == target:
-                    return h
-            return history[0] if history else cast("dict[str, Any]", {})
-        raise BridgeError(
-            f"Unsupported HistoryOrderInfo method: {method_name}",
-            code="BAD_METHOD",
+        return self._dispatch_collection(
+            records=[],
+            method_name=method_name,
+            args=args,
+            class_name="HistoryOrderInfo",
+            total_methods={"HistoryOrdersTotal"},
+            get_methods={"HistoryOrdersGet"},
+            info_methods={"HistoryOrderInfo"},
+            select_attr="_selected_history_order_ticket",
+            supports_identifier=False,
         )
 
     def _dispatch_deal(self, method_name: str, args: list[Any]) -> Any:
@@ -1674,34 +1643,16 @@ class CTraderBackend(Trading):
             raise BridgeError(
                 "cTrader client is not authenticated", code="NOT_AUTHENTICATED"
             )
-        deals: list[dict[str, Any]] = []
-        if method_name == "HistoryDealsTotal":
-            return len(deals)
-        if method_name == "HistoryDealsGet":
-            filtered = _filter_records(deals, args)
-            return filtered or cast("list[dict[str, Any]]", [])
-        if method_name == "Ticket":
-            ticket = _arg_int(args, 0, 0)
-            matching = [d for d in deals if d.get("ticket") == ticket]
-            if matching:
-                self._selected_deal_ticket = ticket
-                return True
-            return False
-        if method_name == "SelectByIndex":
-            idx = _arg_int(args, 0, -1)
-            if 0 <= idx < len(deals):
-                self._selected_deal_ticket = int(deals[idx].get("ticket", 0))
-                return True
-            return False
-        if method_name == "DealInfo":
-            ticket = _arg_int(args, 0, 0)
-            target = ticket or self._selected_deal_ticket
-            for d in deals:
-                if d.get("ticket") == target:
-                    return d
-            return deals[0] if deals else cast("dict[str, Any]", {})
-        raise BridgeError(
-            f"Unsupported DealInfo method: {method_name}", code="BAD_METHOD"
+        return self._dispatch_collection(
+            records=[],
+            method_name=method_name,
+            args=args,
+            class_name="DealInfo",
+            total_methods={"HistoryDealsTotal"},
+            get_methods={"HistoryDealsGet"},
+            info_methods={"DealInfo"},
+            select_attr="_selected_deal_ticket",
+            supports_identifier=False,
         )
 
     def _dispatch_market_data(self, method_name: str, args: list[Any]) -> Any:

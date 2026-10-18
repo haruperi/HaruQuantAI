@@ -551,33 +551,38 @@ class BrokerRegistry:
                 return None
             return self._instances.get(bkey)
 
+    @staticmethod
+    def _teardown_instance_sync(bkey: BrokerKey, instance: Any) -> None:
+        """Teardown a broker instance synchronously."""
+        close_sync = getattr(instance, "close_sync", None)
+        if callable(close_sync):
+            try:
+                close_sync()
+            except Exception as exc:
+                logger.warning(
+                    "%s: Error closing broker %s via close_sync: %s",
+                    LIFECYCLE_FR,
+                    bkey.canonical_id(),
+                    exc,
+                )
+        else:
+            close_fn = getattr(instance, "close", None)
+            if callable(close_fn) and not inspect.iscoroutinefunction(close_fn):
+                try:
+                    close_fn()
+                except Exception as exc:
+                    logger.warning(
+                        "%s: Error closing broker %s: %s",
+                        LIFECYCLE_FR,
+                        bkey.canonical_id(),
+                        exc,
+                    )
+
     def close(self) -> None:
         """Close all managed broker instances and release held resources synchronously."""
         with self._lock:
             for bkey, instance in list(self._instances.items()):
-                close_sync = getattr(instance, "close_sync", None)
-                if callable(close_sync):
-                    try:
-                        close_sync()
-                    except Exception as exc:
-                        logger.warning(
-                            "%s: Error closing broker %s via close_sync: %s",
-                            LIFECYCLE_FR,
-                            bkey.canonical_id(),
-                            exc,
-                        )
-                else:
-                    close_fn = getattr(instance, "close", None)
-                    if callable(close_fn) and not inspect.iscoroutinefunction(close_fn):
-                        try:
-                            close_fn()
-                        except Exception as exc:
-                            logger.warning(
-                                "%s: Error closing broker %s: %s",
-                                LIFECYCLE_FR,
-                                bkey.canonical_id(),
-                                exc,
-                            )
+                self._teardown_instance_sync(bkey, instance)
             self._historical_views.clear()
             self._instances.clear()
             self._leases.clear()
@@ -599,6 +604,7 @@ class BrokerRegistry:
                     res = close_fn()
                     if inspect.isawaitable(res):
                         await res
+                        continue
                 except Exception as exc:
                     logger.warning(
                         "%s: Error closing broker %s asynchronously: %s",
@@ -606,18 +612,8 @@ class BrokerRegistry:
                         bkey.canonical_id(),
                         exc,
                     )
-            else:
-                close_sync = getattr(instance, "close_sync", None)
-                if callable(close_sync):
-                    try:
-                        close_sync()
-                    except Exception as exc:
-                        logger.warning(
-                            "%s: Error closing broker %s via close_sync: %s",
-                            LIFECYCLE_FR,
-                            bkey.canonical_id(),
-                            exc,
-                        )
+                    continue
+            self._teardown_instance_sync(bkey, instance)
         logger.info("%s: BrokerRegistry aclosed all instances", LIFECYCLE_FR)
 
     def _build_default_instance(self, key: BrokerKey) -> Any:
