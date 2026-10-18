@@ -6,7 +6,7 @@ This package provides foundational utility modules for time arithmetic, bar time
 - `app.services.include.generators`: Provides `RandomGenerator` for reproducible simulation series.
 - `app.services.include.contracts`: Provides foundational data contracts and domain value objects.
 - `app.services.include.enums`: Provides canonical trading enumerations and statuses.
+- `app.services.include.trading`: Provides MQL5 asynchronous trading proxy library, mutation builders, and master `Trading` facade.
 
 > [!NOTE]
-> Trading primitives, proxies, and facades have been modularized into `app.services.trading`.
 > Market data primitives, readers, and simulators have been modularized into `app.workspace.data_manager`.

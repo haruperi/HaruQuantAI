@@ -1,20 +1,20 @@
-"""Unit tests for the app.services.trading module structure and exports.
+"""Unit tests for the app.services.include.trading module structure and exports.
 
 Description:
-    Verifies that app.services.trading satisfies the consolidated module architecture:
+    Verifies that app.services.include.trading satisfies the consolidated module architecture:
     - Layer 0: app.services.include.enums
     - Layer 1: app.services.include.contracts
-    - Consolidated single-module exports via app.services.trading
-    - Complete removal of legacy package submodules (base, facade, proxies, trade)
+    - Consolidated single-module exports via app.services.include.trading
+    - Complete removal of legacy app.services.trading module
     - Zero backward-compatibility shims
 
 Purpose:
-    FEAT-TRADING-PACKAGE-TESTS: Verification suite for consolidated trading module.
+    FEAT-TRADING-PACKAGE-TESTS: Verification suite for include trading module.
 
 Key Capabilities:
     - FR-TRADING-PKG-EXPORTS: Verify public exports parity and contract identities.
-    - FR-TRADING-PKG-LAYERING: Verify module consolidation and absence of submodules.
-    - FR-TRADING-PKG-CLEANUP: Verify strict deletion of legacy snapshots, enums, and shims.
+    - FR-TRADING-PKG-LAYERING: Verify module consolidation and include re-exports.
+    - FR-TRADING-PKG-CLEANUP: Verify strict deletion of legacy trading module and shims.
 
 Python API Usage:
     ```bash
@@ -32,9 +32,10 @@ from __future__ import annotations
 import importlib
 import inspect
 
+import app.services.include as include_pkg
 import app.services.include.contracts as include_contracts
 import app.services.include.enums as include_enums
-import app.services.trading as trading_mod
+import app.services.include.trading as trading_mod
 import pytest
 
 
@@ -172,9 +173,28 @@ class TestTradingModuleExports:
             assert hasattr(trading_mod, name), f"Missing export: {name}"
         assert len(trading_mod.__all__) == 61
 
+    def test_include_package_reexports_trading(self) -> None:
+        """Verify that app.services.include package re-exports Trading facade and proxies."""
+        assert include_pkg.Trading is trading_mod.Trading
+        assert include_pkg.Trade is trading_mod.Trade
+        assert include_pkg.TradingClass is trading_mod.TradingClass
+        assert include_pkg.BaseTradingClass is trading_mod.BaseTradingClass
+        assert include_pkg.AccountProxy is trading_mod.AccountProxy
+        assert include_pkg.SymbolProxy is trading_mod.SymbolProxy
+        assert include_pkg.PositionProxy is trading_mod.PositionProxy
+        assert include_pkg.OrderProxy is trading_mod.OrderProxy
+        assert include_pkg.HistoryOrderProxy is trading_mod.HistoryOrderProxy
+        assert include_pkg.DealProxy is trading_mod.DealProxy
+        assert include_pkg.TerminalProxy is trading_mod.TerminalProxy
+
 
 class TestModuleConsolidationAndNoShims:
     """Verify architectural consolidation and absence of lingering submodules."""
+
+    def test_trading_legacy_module_cannot_be_imported(self) -> None:
+        """Verify that former app.services.trading cannot be imported."""
+        with pytest.raises(ModuleNotFoundError):
+            importlib.import_module("app.services.trading")
 
     def test_submodules_cannot_be_imported(self) -> None:
         """Verify that former package submodules cannot be imported."""

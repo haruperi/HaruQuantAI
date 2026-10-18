@@ -34,7 +34,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.services.brokers.ctrader import CTraderBackend
-    from app.services.trading import Trading
+    from app.services.include.trading import Trading
 
     backend = CTraderBackend()
     trading = Trading(backend)
@@ -93,7 +93,7 @@ from app.services.include.enums import (
     TradeAction,
     TradeRetcode,
 )
-from app.services.trading import Trading
+from app.services.include.trading import Trading
 from app.workspace.data_manager import MarketTick
 
 logger = get_logger(__name__)

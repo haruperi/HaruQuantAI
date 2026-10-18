@@ -55,7 +55,7 @@ from app.services.include.contracts import (
     TerminalInfo,
     TradeRequest,
 )
-from app.services.trading import (
+from app.services.include.trading import (
     MarginMode,
     OrderFilling,
     OrderType,

@@ -8,7 +8,7 @@ Description:
     coordinating all child proxies for any TradingBackend.
 
 Purpose:
-    FEAT-TRADING-LIBRARY: Consolidated trading proxies, builders, and master facade.
+    FEAT-INCLUDE-TRADING: Consolidated trading proxies, builders, and master facade.
 
 Key Capabilities:
     - FR-TRADING-BASE-PROXY: Base proxy identity and serialized async command locking.
@@ -28,7 +28,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.trading import Trading
+    from app.services.include.trading import Trading
 
     async with Trading(backend) as trading:
         await trading.wait_connected()
@@ -37,7 +37,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.trading
+    uv run python -m app.services.include.trading
     ```
 """
 
@@ -52,8 +52,9 @@ from types import TracebackType
 from typing import Any, Self
 
 from app.host.logging import get_logger
-from app.services.include import contracts
-from app.services.include.contracts import (
+
+from . import contracts
+from .contracts import (
     BOOK_TYPE_DESCRIPTIONS,
     DEAL_ENTRY_DESCRIPTIONS,
     DEAL_TYPE_DESCRIPTIONS,
@@ -81,7 +82,7 @@ from app.services.include.contracts import (
     TradeResult,
     TradingBackend,
 )
-from app.services.include.enums import (
+from .enums import (
     AccountTradeMode,
     BookType,
     DealEntry,

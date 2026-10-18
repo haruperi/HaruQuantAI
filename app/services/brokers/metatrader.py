@@ -101,7 +101,7 @@ from app.services.include.enums import (
     ReceiptStatus,
     TradeResolution,
 )
-from app.services.trading import Trading
+from app.services.include.trading import Trading
 from app.workspace.data_manager.history import DataBrokerBackend
 
 PLUGIN_MANIFEST = {

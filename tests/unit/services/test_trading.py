@@ -5,7 +5,7 @@ Description:
     property aliases, proxy dispatch, and error handling for all trading contracts,
     enums, proxy classes (Trade, AccountProxy, SymbolProxy, TerminalProxy,
     PositionProxy, OrderProxy, HistoryOrderProxy, DealProxy), and the master Trading facade
-    in app.services.trading.
+    in app.services.include.trading.
 
 Purpose:
     FEAT-TRADING-CONTRACTS-TESTS: Test suite for consolidated trading library.
@@ -45,7 +45,7 @@ from app.services.include.contracts import (
     TradeRequest,
     TradeResult,
 )
-from app.services.trading import (
+from app.services.include.trading import (
     BOOK_TYPE_DESCRIPTIONS,
     DEAL_ENTRY_DESCRIPTIONS,
     DEAL_TYPE_DESCRIPTIONS,
