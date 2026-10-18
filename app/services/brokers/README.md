@@ -1,6 +1,6 @@
 # Broker execution backends
 
-The public trading API lives in app/services/trading/. Strategies compose
+The public trading API lives in app/services/trading.py. Strategies compose
 Trading(backend) and await the same Trade, AccountInfo, SymbolInfo, OrderInfo,
 HistoryOrderInfo, PositionInfo, DealInfo and TerminalInfo methods for either live
 MT5 or local simulation. Backend-specific behavior stays here.
