@@ -5,7 +5,7 @@ Description:
     (invoked via `uv run python -m app.main` or the `haruquantai` script).
     Resolves host bind address, port, debug flags, and workspace directories
     from CLI arguments and database settings, composes the FastAPI gateway
-    application bound to the progressive 7-stage HostRuntime state machine
+    application bound to the progressive 7-stage AppHost state machine
     (CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES ->
     READY), and launches the Uvicorn ASGI server. On server exit or failure,
     executes reverse-order (LIFO) stage teardown and drains queued telemetry
@@ -18,11 +18,11 @@ Purpose:
 Key Capabilities:
     - FR-HOST-MAIN-CONFIG-RESOLUTION: Resolve host bind address, port, debug
       mode, and workspace paths from CLI arguments and database settings into
-      an immutable BootstrapConfig(headless=False).
+      an immutable AppHost.Config(headless=False).
       Associated: `resolve_main_config()`, `_build_parser()`
       Logging: Emits INFO detailing resolved host, port, debug, and data_dir.
     - FR-HOST-MAIN-APP-FACTORY: Compose the FastAPI application (create_app)
-      bound to HostRuntime so entering the ASGI lifespan executes all 7
+      bound to AppHost so entering the ASGI lifespan executes all 7
       bootstrap stages and mounts UI/API routers.
       Associated: `create_app()`
       Logging: Emits INFO when composing the FastAPI application and binding
@@ -36,10 +36,9 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from pathlib import Path
     from app.main import create_app, resolve_main_config
 
-    cfg = resolve_main_config(["--port", "8080", "--data-dir", "data"])
+    cfg, _ = resolve_main_config(["--port", "8080", "--data-dir", "data"])
     app = create_app(config=cfg)
     ```
 
@@ -59,12 +58,7 @@ from pathlib import Path
 from typing import Any
 
 import uvicorn
-from app.host.bootstrap import (
-    BootstrapConfig,
-    HostRuntime,
-    bootstrap_context,
-    create_bootstrap_app,
-)
+from app.host.bootstrap import AppHost
 from app.host.logging import get_logger, setup_logging, shutdown_logging
 from app.host.settings import settings as default_host_settings
 from fastapi import FastAPI
@@ -149,8 +143,8 @@ def resolve_main_config(
     argv: Sequence[str] | None = None,
     *,
     settings_source: Any | None = None,
-) -> tuple[BootstrapConfig, argparse.Namespace]:
-    """Resolve CLI arguments and database settings into a ``BootstrapConfig``."""
+) -> tuple[Any, argparse.Namespace]:
+    """Resolve CLI arguments and database settings into an ``AppHost.Config``."""
     parser = _build_parser()
     args = parser.parse_args(list(argv) if argv is not None else [])
     cfg_src = settings_source if settings_source is not None else default_host_settings
@@ -165,7 +159,7 @@ def resolve_main_config(
     debug = bool(args.debug) if args.debug is not None else db_debug
     data_dir = Path(args.data_dir) if args.data_dir is not None else Path("data")
 
-    config = BootstrapConfig(
+    config = AppHost.Config(
         host=host,
         port=port,
         debug=debug,
@@ -193,11 +187,11 @@ def resolve_main_config(
 
 
 def create_app(
-    config: BootstrapConfig | None = None,
+    config: Any | None = None,
     *,
-    runtime: HostRuntime | None = None,
+    runtime: AppHost | None = None,
 ) -> FastAPI:
-    """Create the FastAPI application bound to the 7-stage HostRuntime lifespan."""
+    """Create the FastAPI application bound to the 7-stage AppHost lifespan."""
     if config is None:
         resolved_config, _ = resolve_main_config([])
     else:
@@ -210,7 +204,8 @@ def create_app(
         resolved_config.port,
         extra={"fr_id": APP_FACTORY_FR},
     )
-    return create_bootstrap_app(config=resolved_config, runtime=runtime)
+    host = runtime or AppHost(config=resolved_config)
+    return host.create_app()
 
 
 def run_server(
@@ -235,10 +230,10 @@ def run_server(
     )
     try:
         if args.check_only:
-            runtime = HostRuntime(config=config)
-            app = create_app(config=config, runtime=runtime)
-            with bootstrap_context(runtime=runtime):
-                snap = runtime.get_readiness()
+            host = AppHost(config=config)
+            app = create_app(config=config, runtime=host)
+            with host:
+                snap = host.get_readiness()
                 logger.info(
                     "%s: Check-only verified %d stages and %d FastAPI routes.",
                     UVICORN_LIFECYCLE_FR,

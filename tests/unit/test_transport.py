@@ -15,8 +15,10 @@ from app.host.response import (
 from app.host.session import SessionManager, hash_password
 from app.host.transport import (
     CORE_EVENT_CHANNELS,
-    ApiResponse,
+    ConnectionTest,
     EventBus,
+    ServletConnection,
+    ServletConstants,
     TransportMiddleware,
     _format_iso_expiry,
     _parse_channels_param,
@@ -49,9 +51,7 @@ def _create_isolated_session_manager(tmp_path: Path) -> SessionManager:
 
 
 def test_standard_response_and_error_invariants() -> None:
-    """Verify StandardResponse/ApiResponse success, failure, unwrap, and errors."""
-    assert ApiResponse is StandardResponse
-
+    """Verify StandardResponse success, failure, unwrap, and errors."""
     ok = StandardResponse.success(
         data={"symbol": "EURUSD"},
         message="Fetched",
@@ -145,13 +145,13 @@ def test_sensitive_routes_require_session_and_scope(
     from unittest.mock import Mock
 
     from app.host.persistence.create import create_schema, get_connection
-    from app.host.settings import _HostSettings
+    from app.host.settings import HostSettings
 
     db = tmp_path / "protected.db"
     conn = get_connection(db)
     create_schema(conn)
     conn.close()
-    config = _HostSettings()
+    config = HostSettings()
     config.reload(conn=db)
     monkeypatch.setattr("app.host.transport.settings", config)
     sessions = SessionManager(db_path=db)
@@ -633,3 +633,98 @@ def test_gateway_settings_diagnostics_and_jobs_routes(tmp_path: Path) -> None:
     finally:
         job_mgr.shutdown(wait=True)
         res_mgr.watchdog.stop()
+
+
+def test_security_headers_injected_on_responses() -> None:
+    """Verify FR-HOST-TRANSPORT-MIDDLEWARE injects security headers."""
+    app = create_host_app()
+    with TestClient(app) as client:
+        resp = client.get("/status")
+        assert resp.status_code == 200
+        assert resp.headers.get("x-content-type-options") == "nosniff"
+        assert resp.headers.get("x-frame-options") == "DENY"
+        assert resp.headers.get("referrer-policy") == "no-referrer"
+        assert "x-request-id" in resp.headers
+        assert "x-response-time-ms" in resp.headers
+
+
+def test_connection_test_utility() -> None:
+    """Verify FR-HOST-TRANSPORT-CONNECTION-TEST reachability, latency, and diagnostics."""
+    ping_res = ConnectionTest.ping_endpoint("127.0.0.1")
+    assert "reachable" in ping_res
+    assert "latency_ms" in ping_res
+    assert ping_res["host"] == "127.0.0.1"
+
+    latency_res = ConnectionTest.check_latency("127.0.0.1", samples=2)
+    assert latency_res["samples"] == 2
+    assert "avg_latency_ms" in latency_res
+    assert "packet_loss_pct" in latency_res
+
+    diag_res = ConnectionTest.diagnose_network("127.0.0.1", port=80)
+    assert diag_res["dns_resolved"] is True
+    assert "127.0.0.1" in diag_res["ip_addresses"]
+
+
+def test_servlet_connection_crud_and_routes(tmp_path: Path) -> None:
+    """Verify FR-HOST-TRANSPORT-SERVLET-CONNECTION endpoints and in-memory fallback."""
+    servlet = ServletConnection()
+    assert isinstance(servlet.list_connections(), list)
+
+    sessions = _create_isolated_session_manager(tmp_path)
+    app = create_host_app(session_mgr=sessions)
+    with TestClient(app) as client:
+        # 1. List initially empty
+        res = client.get("/api/v1/connections")
+        assert res.status_code == 200
+        assert "connections" in res.json()["data"]
+
+        # 2. Save connection
+        payload = {
+            "name": "Binance Spot Test",
+            "endpoint": "127.0.0.1",
+            "api_key": "test_key",
+            "api_secret": "super_secret_token",
+        }
+        save_res = client.post("/api/v1/connections", json=payload)
+        assert save_res.status_code == 200
+        saved_data = save_res.json()["data"]
+        cid = saved_data["connection_id"]
+        assert saved_data["name"] == "Binance Spot Test"
+        assert saved_data["api_secret"] != "super_secret_token"
+
+        # 3. Test connection
+        test_res = client.post(f"/api/v1/connections/{cid}/test")
+        assert test_res.status_code == 200
+        assert "test_result" in test_res.json()["data"]
+
+        # 4. Delete connection
+        del_res = client.delete(f"/api/v1/connections/{cid}")
+        assert del_res.status_code == 200
+        assert del_res.json()["data"]["deleted"] is True
+
+        # 5. Delete non-existent returns 404
+        del_404 = client.delete("/api/v1/connections/nonexistent-conn-999")
+        assert del_404.status_code == 404
+
+
+def test_servlet_constants_and_specs(tmp_path: Path) -> None:
+    """Verify FR-HOST-TRANSPORT-SERVLET-CONSTANTS constants and hardware specs."""
+    sessions = _create_isolated_session_manager(tmp_path)
+    constants_servlet = ServletConstants(session_mgr=sessions)
+    assert constants_servlet.get_constants()["application"] == "HaruQuantAI"
+    assert constants_servlet.get_system_specs()["cpu_cores"] >= 1
+
+    app = create_host_app(session_mgr=sessions)
+    with TestClient(app) as client:
+        const_res = client.get("/api/v1/constants")
+        assert const_res.status_code == 200
+        const_data = const_res.json()["data"]
+        assert const_data["application"] == "HaruQuantAI"
+        assert "supported_timeframes" in const_data
+        assert "1m" in const_data["supported_timeframes"]
+
+        spec_res = client.get("/api/v1/specs")
+        assert spec_res.status_code == 200
+        spec_data = spec_res.json()["data"]
+        assert spec_data["cpu_cores"] >= 1
+        assert "worker_capacity" in spec_data

@@ -2,29 +2,28 @@
 
 Description:
     Provides the headless command-line interface for HaruQuantAI (invoked via
-    `uv run python -m app.cli`, mirroring SQX's `sqcli` / `SQConsoleStarter`).
-    Executes the progressive 7-stage host bootstrap state machine
-    (CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES ->
-    READY) in headless mode (headless=True, without launching a Uvicorn HTTP
-    server), dispatches operator commands (status, health, resources, jobs,
-    plugins, settings, reconcile) directly against the live bootstrapped
-    HostRuntime services, and guarantees reverse-order (LIFO) teardown and
-    telemetry draining on exit.
+    `uv run python -m app.cli`). Executes the progressive 7-stage host
+    bootstrap state machine (CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE ->
+    SERVICES -> ROUTES -> READY) in headless mode (headless=True, without
+    launching a Uvicorn HTTP server), dispatches operator commands (status,
+    health, resources, jobs, plugins, settings, reconcile) directly against the
+    live bootstrapped AppHost services, and guarantees reverse-order (LIFO)
+    teardown and telemetry draining on exit.
 
 Purpose:
     FEAT-HOST-CLI: Headless CLI entrypoint executing the 7-stage host
     bootstrap and dispatching host/workspace commands without a web server.
 
 Key Capabilities:
-    - FR-HOST-CLI-BOOTSTRAP-CONTEXT: Boot the headless HostRuntime through all
+    - FR-HOST-CLI-BOOTSTRAP-CONTEXT: Boot the headless AppHost through all
       7 stages (CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES ->
-      ROUTES -> READY) via bootstrap_context(headless=True) and guarantee
+      ROUTES -> READY) via `with AppHost(headless=True)` and guarantee
       reverse-order LIFO teardown on exit.
       Associated: `HeadlessCliRunner`, `run_cli()`
       Logging: Emits INFO on headless 7-stage startup and LIFO teardown.
     - FR-HOST-CLI-COMMAND-DISPATCH: Parse and dispatch headless CLI commands
       (status, health, resources, jobs, plugins, settings, reconcile) against
-      live bootstrapped HostRuntime services.
+      live bootstrapped AppHost services.
       Associated: `HeadlessCliRunner.execute()`, `_build_cli_parser()`
       Logging: Emits INFO on command dispatch and WARNING/ERROR on invalid
       command arguments.
@@ -36,7 +35,6 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from pathlib import Path
     from app.cli import run_cli
 
     exit_code, output = run_cli(["status", "--json", "--data-dir", "data"])
@@ -62,12 +60,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from app.host.bootstrap import (
-    BootstrapConfig,
-    HostRuntime,
-    bootstrap_context,
-    reconcile_database,
-)
+from app.host.bootstrap import AppHost
 from app.host.logging import get_logger, shutdown_logging
 from app.host.resources import get_worker_capacity, probe_hardware
 from app.host.response import StandardError, StandardResponse
@@ -172,10 +165,10 @@ def _build_cli_parser() -> argparse.ArgumentParser:
 
 
 class HeadlessCliRunner:
-    """Executes headless CLI commands inside an active 7-stage HostRuntime."""
+    """Executes headless CLI commands inside an active 7-stage AppHost."""
 
-    def __init__(self, runtime: HostRuntime) -> None:
-        """Bind the runner to a bootstrapped ``HostRuntime``."""
+    def __init__(self, runtime: AppHost) -> None:
+        """Bind the runner to a bootstrapped ``AppHost``."""
         self.runtime = runtime
 
     def execute(
@@ -185,7 +178,7 @@ class HeadlessCliRunner:
         action: str = "list",
         extra_args: Sequence[str] | None = None,
     ) -> dict[str, Any]:
-        """Dispatch ``command`` against the active ``HostRuntime`` services."""
+        """Dispatch ``command`` against the active ``AppHost`` services."""
         cmd = command.strip().lower()
         act = action.strip().lower()
         logger.info(
@@ -311,7 +304,7 @@ class HeadlessCliRunner:
         }
 
     def _cmd_reconcile(self) -> dict[str, Any]:
-        rec_report = reconcile_database(self.runtime.config.resolved_db_path)
+        rec_report = AppHost.reconcile_database(self.runtime.config.resolved_db_path)
         return {
             "command": "reconcile",
             **rec_report,
@@ -319,11 +312,15 @@ class HeadlessCliRunner:
 
     def _cmd_data(self, action: str) -> dict[str, Any]:
         """Dispatch headless data manager workspace operations."""
-        dm = self.runtime.data_manager
+        dm: Any = self.runtime.data_manager
         if dm is None:
             raise RuntimeError("DataManagerWorkspace is not initialized.")
 
-        from app.workspace.data_manager import HomeCLI, InstrumentsCLI
+        import app.workspace.data_manager as dm_pkg
+        from app.workspace.data_manager import HomeCLI
+
+        instruments_cli: Any = getattr(dm_pkg, "InstrumentsCLI", None)
+        sessions_cli: Any = getattr(dm_pkg, "SessionsCLI", None)
 
         act = action.strip().lower()
         res: dict[str, Any]
@@ -348,7 +345,11 @@ class HeadlessCliRunner:
             }
         elif act in ("instruments", "instrument"):
             instruments = dm.instruments.view()
-            rendered = InstrumentsCLI.format_instruments_table(instruments)
+            rendered = (
+                instruments_cli.format_instruments_table(instruments)
+                if instruments_cli is not None
+                else str(instruments)
+            )
             res = {
                 "command": "data",
                 "action": "instruments",
@@ -358,9 +359,11 @@ class HeadlessCliRunner:
             }
         elif act in ("sessions", "session"):
             sessions = dm.sessions.view()
-            from app.workspace.data_manager import SessionsCLI
-
-            rendered = SessionsCLI.format_sessions_table(sessions)
+            rendered = (
+                sessions_cli.format_sessions_table(sessions)
+                if sessions_cli is not None
+                else str(sessions)
+            )
             res = {
                 "command": "data",
                 "action": "sessions",
@@ -407,12 +410,16 @@ class HeadlessCliRunner:
     def _cmd_instrument(
         self, action: str, extra_args: Sequence[str] | None = None
     ) -> dict[str, Any]:
-        """Dispatch headless instrument operations conforming to qdmcli."""
-        dm = self.runtime.data_manager
+        """Dispatch headless instrument operations."""
+        dm: Any = self.runtime.data_manager
         if dm is None:
             raise RuntimeError("DataManagerWorkspace is not initialized.")
 
-        from app.workspace.data_manager import InstrumentsCLI
+        import app.workspace.data_manager as dm_pkg
+
+        instruments_cli: Any = getattr(dm_pkg, "InstrumentsCLI", None)
+        if instruments_cli is None:
+            raise RuntimeError("InstrumentsCLI is not available.")
 
         all_args = list(extra_args or [])
         clean_act = action.strip()
@@ -421,17 +428,21 @@ class HeadlessCliRunner:
                 all_args.append(clean_act)
             else:
                 all_args.insert(0, f"action={clean_act}")
-        return InstrumentsCLI.dispatch(all_args, dm.instruments)
+        return dict(instruments_cli.dispatch(all_args, dm.instruments))
 
     def _cmd_sessions(
         self, action: str, extra_args: Sequence[str] | None = None
     ) -> dict[str, Any]:
-        """Dispatch headless session operations conforming to qdmcli."""
-        dm = self.runtime.data_manager
+        """Dispatch headless session operations."""
+        dm: Any = self.runtime.data_manager
         if dm is None:
             raise RuntimeError("DataManagerWorkspace is not initialized.")
 
-        from app.workspace.data_manager import SessionsCLI
+        import app.workspace.data_manager as dm_pkg
+
+        sessions_cli: Any = getattr(dm_pkg, "SessionsCLI", None)
+        if sessions_cli is None:
+            raise RuntimeError("SessionsCLI is not available.")
 
         all_args = list(extra_args or [])
         clean_act = action.strip()
@@ -440,7 +451,7 @@ class HeadlessCliRunner:
                 all_args.append(clean_act)
             else:
                 all_args.insert(0, f"action={clean_act}")
-        return SessionsCLI.dispatch(all_args, dm.sessions)
+        return dict(sessions_cli.dispatch(all_args, dm.sessions))
 
 
 def format_cli_output(
@@ -491,7 +502,7 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
     args, unknown = parser.parse_known_args(list(argv) if argv is not None else [])
     data_dir = Path(args.data_dir) if args.data_dir is not None else Path("data")
 
-    config = BootstrapConfig(
+    host = AppHost(
         headless=True,
         debug=bool(args.debug),
         data_dir=data_dir,
@@ -517,7 +528,7 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
         effective_action = args.subcommand if args.subcommand is not None else "list"
 
     try:
-        with bootstrap_context(config) as runtime:
+        with host as runtime:
             runner = HeadlessCliRunner(runtime)
             result = runner.execute(cmd, action=effective_action, extra_args=unknown)
             result["stages_completed"] = len(runtime.completed_stages)

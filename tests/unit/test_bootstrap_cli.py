@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+import app.host.bootstrap
 import pytest
 from app.cli import (
     HeadlessCliRunner,
@@ -17,14 +18,7 @@ from app.cli import (
     main as cli_main,
 )
 from app.host.bootstrap import (
-    ORDERED_BOOT_STAGES,
-    BootstrapConfig,
-    HostRuntime,
-    LifespanStage,
-    ReadinessState,
-    bootstrap_context,
-    create_bootstrap_app,
-    reconcile_database,
+    AppHost,
 )
 from app.host.bootstrap import (
     main as bootstrap_main,
@@ -95,9 +89,8 @@ def test_bootstrapped_settings_http_writes_and_telemetry_shutdown(
     import app.host.logging as telemetry
     from app.host.persistence.read import list_host_settings
 
-    config = BootstrapConfig(data_dir=tmp_path, use_process_pool=False)
-    runtime = HostRuntime(config)
-    app = create_bootstrap_app(runtime=runtime)
+    runtime = AppHost(data_dir=tmp_path, use_process_pool=False)
+    app = runtime.create_app()
     with TestClient(app) as client:
         telemetry.flush_logs()
         with client.websocket_connect("/api/v1/ws?channels=logs") as websocket:
@@ -134,7 +127,7 @@ def test_bootstrapped_settings_http_writes_and_telemetry_shutdown(
             ).status_code
             == 409
         )
-        conn = get_connection(config.resolved_db_path)
+        conn = get_connection(runtime.config.resolved_db_path)
         try:
             assert any(row["key"] == "theme" for row in list_host_settings(conn=conn))
         finally:
@@ -157,7 +150,7 @@ def test_partial_service_initialization_releases_acquired_resources(
 
     import app.host.logging as telemetry
 
-    runtime = HostRuntime(BootstrapConfig(data_dir=tmp_path, use_process_pool=False))
+    runtime = AppHost(data_dir=tmp_path, use_process_pool=False)
     reset = Mock()
     stopped = Mock(side_effect=RuntimeError("one cleanup failed"))
 
@@ -170,11 +163,11 @@ def test_partial_service_initialization_releases_acquired_resources(
 
     monkeypatch.setattr(runtime, "init_discovery", fail_discovery)
     with pytest.raises(RuntimeError, match="discovery initialization failed"):
-        runtime.start_sync()
+        runtime.startup_sync()
     stopped.assert_called_once_with(wait=True, cancel_futures=True)
     reset.assert_called_once()
-    assert LifespanStage.SERVICES in runtime.teardown_stages
-    assert runtime.state == ReadinessState.FAILED
+    assert AppHost.Stage.SERVICES in runtime.teardown_stages
+    assert runtime.state == AppHost.State.FAILED
     assert not telemetry._BOOTSTRAPPED
 
 
@@ -192,7 +185,7 @@ def test_seven_stage_progression_and_reverse_lifo_teardown(tmp_path: Path) -> No
     _seed_orphan_running_job(db_path, "job-orphan-01")
     _write_sample_plugin(plugins_dir)
 
-    cfg = BootstrapConfig(
+    runtime = AppHost(
         data_dir=data_dir,
         db_path=db_path,
         plugins_dir=plugins_dir,
@@ -200,25 +193,24 @@ def test_seven_stage_progression_and_reverse_lifo_teardown(tmp_path: Path) -> No
         debug=True,
         use_process_pool=False,
     )
-    runtime = HostRuntime(config=cfg)
 
     # Pre-boot state
     pre_snap = runtime.get_readiness()
-    assert pre_snap.state == ReadinessState.UNINITIALIZED
+    assert pre_snap.state == AppHost.State.UNINITIALIZED
     assert pre_snap.is_ready is False
-    assert runtime.stop_sync().state == ReadinessState.STOPPED
+    assert runtime.shutdown_sync().state == AppHost.State.STOPPED
 
     # Execute 7-stage startup
-    ready_snap = runtime.start_sync()
-    assert ready_snap.state == ReadinessState.READY
+    ready_snap = runtime.startup_sync()
+    assert ready_snap.state == AppHost.State.READY
     assert ready_snap.is_ready is True
-    assert tuple(ready_snap.completed_stages) == ORDERED_BOOT_STAGES
-    assert tuple(runtime.completed_stages) == ORDERED_BOOT_STAGES
-    assert runtime.active_stage == LifespanStage.READY
+    assert tuple(ready_snap.completed_stages) == AppHost.ORDERED_STAGES
+    assert tuple(runtime.completed_stages) == AppHost.ORDERED_STAGES
+    assert runtime.active_stage == AppHost.Stage.READY
     assert all(ready_snap.checks.values())
 
-    # Calling start() again while READY is idempotent
-    again_snap = runtime.start_sync()
+    # Calling startup_sync() again while READY is idempotent
+    again_snap = runtime.startup_sync()
     assert again_snap.host_instance_id == ready_snap.host_instance_id
 
     # Verify Stage 5 reconciled the orphan RUNNING job -> INTERRUPTED
@@ -229,84 +221,82 @@ def test_seven_stage_progression_and_reverse_lifo_teardown(tmp_path: Path) -> No
     assert ready_snap.details["services"]["plugins_enabled"] >= 1
 
     # Execute reverse-order LIFO teardown
-    stop_snap = runtime.stop_sync()
-    assert stop_snap.state == ReadinessState.STOPPED
+    stop_snap = runtime.shutdown_sync()
+    assert stop_snap.state == AppHost.State.STOPPED
     assert stop_snap.is_ready is False
-    assert tuple(runtime.teardown_stages) == tuple(reversed(ORDERED_BOOT_STAGES))
+    assert tuple(runtime.teardown_stages) == tuple(reversed(AppHost.ORDERED_STAGES))
 
-    # Calling stop() again while STOPPED is idempotent
-    assert runtime.stop_sync().state == ReadinessState.STOPPED
+    # Calling shutdown_sync() again while STOPPED is idempotent
+    assert runtime.shutdown_sync().state == AppHost.State.STOPPED
 
 
 def test_bootstrap_failure_triggers_reverse_rollback(tmp_path: Path) -> None:
     """Verify mid-boot failure rolls back only acquired stages in LIFO order."""
     # 1. Invalid port fails in Stage 1 (CONFIGURING) before stage acquisition
-    bad_cfg = BootstrapConfig(data_dir=tmp_path / "bad_port", port=70000)
-    rt_bad = HostRuntime(config=bad_cfg)
+    rt_bad = AppHost(data_dir=tmp_path / "bad_port", port=70000)
     with pytest.raises(ValueError, match="Invalid host port"):
-        rt_bad.start_sync()
-    assert rt_bad.state == ReadinessState.FAILED
+        rt_bad.startup_sync()
+    assert rt_bad.state == AppHost.State.FAILED
     assert rt_bad.teardown_stages == []
 
     # 2. Failure injected via stage hook at Stage 5 (SERVICES) rolls back 5..1
     hook_order: list[str] = []
 
-    async def _fail_on_services(rt: HostRuntime) -> None:
+    async def _fail_on_services(rt: AppHost) -> None:
         hook_order.append(f"hook:{rt.active_stage}")
         # Register a custom cleanup that raises to verify exception isolation
         rt._acquired_stack.append(
             rt._acquired_stack[-1].__class__(
-                stage=LifespanStage.SERVICES,
+                stage=AppHost.Stage.SERVICES,
                 check_key="services",
                 cleanup=lambda: (_ for _ in ()).throw(RuntimeError("cleanup boom")),
             )
         )
         raise RuntimeError("Simulated service initialization failure")
 
-    cfg_mid = BootstrapConfig(
+    rt_mid = AppHost(
         data_dir=tmp_path / "mid_fail",
         headless=True,
         use_process_pool=False,
-    )
-    rt_mid = HostRuntime(
-        config=cfg_mid,
-        stage_hooks={LifespanStage.SERVICES: _fail_on_services},
+        stage_hooks={AppHost.Stage.SERVICES: _fail_on_services},
     )
     with pytest.raises(RuntimeError, match="Simulated service initialization"):
-        rt_mid.start_sync()
+        rt_mid.startup_sync()
 
-    assert rt_mid.state == ReadinessState.FAILED
+    assert rt_mid.state == AppHost.State.FAILED
     # Stages 1..4 completed before Stage 5 failed; rollback released SERVICES..CONFIGURING
-    assert LifespanStage.CONFIGURING in rt_mid.teardown_stages
-    assert LifespanStage.PERSISTENCE in rt_mid.teardown_stages
-    assert rt_mid.teardown_stages[-1] == LifespanStage.CONFIGURING
+    assert AppHost.Stage.CONFIGURING in rt_mid.teardown_stages
+    assert AppHost.Stage.PERSISTENCE in rt_mid.teardown_stages
+    assert rt_mid.teardown_stages[-1] == AppHost.Stage.CONFIGURING
 
 
 def test_sync_and_async_bootstrap_context_and_reconcile(tmp_path: Path) -> None:
-    """Verify both sync and async bootstrap_context managers and CLI main."""
-    cfg = BootstrapConfig(
+    """Verify both sync and async AppHost context managers and CLI main."""
+    with AppHost(
         data_dir=tmp_path / "ctx_test",
         headless=True,
         use_process_pool=False,
-    )
-
-    with bootstrap_context(cfg) as rt_sync:
+    ) as rt_sync:
         assert rt_sync.is_ready() is True
-    assert rt_sync.state == ReadinessState.STOPPED
+    assert rt_sync.state == AppHost.State.STOPPED
 
     async def _run_async_ctx() -> None:
-        async with bootstrap_context(cfg) as rt_async:
+        async with AppHost(
+            data_dir=tmp_path / "ctx_test",
+            headless=True,
+            use_process_pool=False,
+        ) as rt_async:
             assert rt_async.is_ready() is True
             snap_dict = rt_async.get_readiness().to_dict()
             assert snap_dict["state"] == "READY"
-        assert rt_async.state == ReadinessState.STOPPED
+        assert rt_async.state == AppHost.State.STOPPED
 
     asyncio.run(_run_async_ctx())
 
     # Database reconciliation helper
     db_file = tmp_path / "reconcile_only" / "haruquantai.db"
     _seed_orphan_running_job(db_file, "job-rec-99")
-    rep = reconcile_database(db_file)
+    rep = AppHost.reconcile_database(db_file)
     assert rep["status"] == "reconciled"
     assert "job-rec-99" in rep["reconciled_orphan_jobs"]
 
@@ -350,13 +340,13 @@ def test_main_ui_server_lifespan_and_uvicorn_modes(tmp_path: Path) -> None:
     def _custom_ping() -> dict[str, bool]:
         return {"pong": True}
 
-    runtime = HostRuntime(config=cfg, extra_routers=[extra])
-    app = create_bootstrap_app(config=cfg, runtime=runtime)
+    runtime = AppHost(config=cfg, extra_routers=[extra])
+    app = runtime.create_app()
 
-    # Entering TestClient context runs FastAPI lifespan -> 7-stage HostRuntime.start()
+    # Entering TestClient context runs FastAPI lifespan -> 7-stage AppHost.startup()
     with TestClient(app) as client:
         assert runtime.is_ready() is True
-        assert tuple(runtime.completed_stages) == ORDERED_BOOT_STAGES
+        assert tuple(runtime.completed_stages) == AppHost.ORDERED_STAGES
 
         r_status = client.get("/api/v1/status")
         assert r_status.status_code == 200
@@ -382,8 +372,8 @@ def test_main_ui_server_lifespan_and_uvicorn_modes(tmp_path: Path) -> None:
         assert r_extra.status_code == 200
 
     # Exiting TestClient context runs FastAPI lifespan -> reverse LIFO teardown
-    assert runtime.state == ReadinessState.STOPPED
-    assert tuple(runtime.teardown_stages) == tuple(reversed(ORDERED_BOOT_STAGES))
+    assert runtime.state == AppHost.State.STOPPED
+    assert tuple(runtime.teardown_stages) == tuple(reversed(AppHost.ORDERED_STAGES))
 
     # Test run_server() in production mode and --reload mode with fake uvicorn runner
     calls: list[dict[str, Any]] = []
@@ -499,8 +489,7 @@ def test_headless_cli_commands_and_7_stage_bootstrap(
     err_json = json.loads(format_cli_output(None, as_json=True, error=err_obj))
     assert err_json["status"] == "error"
 
-    cfg = BootstrapConfig(data_dir=data_dir, headless=True, use_process_pool=False)
-    with bootstrap_context(cfg) as rt:
+    with AppHost(data_dir=data_dir, headless=True, use_process_pool=False) as rt:
         runner = HeadlessCliRunner(rt)
         with pytest.raises(ValueError, match="Unsupported CLI command"):
             runner.execute("nonexistent-cmd")
@@ -511,3 +500,80 @@ def test_headless_cli_commands_and_7_stage_bootstrap(
 
     # 8. Standalone cli.py main()
     assert cli_main(["status", "--json"]) == 0
+
+
+def test_app_host_blueprint_methods_and_single_export(tmp_path: Path) -> None:
+    """Verify __all__ == ['AppHost'] and AppHost methods without aliases."""
+    assert app.host.bootstrap.__all__ == ["AppHost"]
+
+    host = AppHost(
+        data_dir=tmp_path,
+        headless=True,
+        use_process_pool=False,
+    )
+
+    # 1. Test write_lock context manager
+    with host.write_lock():
+        locked = True
+    assert locked is True
+
+    # 2. Test initialize_db
+    db_info = host.initialize_db()
+    assert Path(db_info["db_path"]).exists()
+    assert db_info["table_count"] >= 25
+
+    # 3. Test register_modules
+    summary = host.register_modules()
+    assert summary["max_workers"] >= 1
+    assert "reconciled_orphan_jobs" in summary
+    assert "slots_registered" in summary
+
+    # 4. Test broadcast_event
+    ev = host.broadcast_event(
+        channel="test-channel",
+        event_type="test.event",
+        payload={"msg": "ping"},
+    )
+    assert ev.channel == "test-channel"
+    assert ev.event_type == "test.event"
+    assert ev.payload == {"msg": "ping"}
+
+    # 5. Test async startup & shutdown
+    async def _run_lifecycle() -> None:
+        snap_up = await host.startup()
+        assert snap_up.is_ready is True
+        assert snap_up.state == AppHost.State.READY
+        assert len(snap_up.completed_stages) == 7
+
+        snap_down = await host.shutdown()
+        assert snap_down.state == AppHost.State.STOPPED
+        assert len(host.teardown_stages) == 7
+
+    asyncio.run(_run_lifecycle())
+
+
+def test_app_host_create_app_and_routes(tmp_path: Path) -> None:
+    """Verify AppHost.create_app mounts routes and returns security headers."""
+    host = AppHost(
+        data_dir=tmp_path,
+        headless=False,
+        use_process_pool=False,
+    )
+    app_instance = host.create_app()
+    assert app_instance.state.runtime is host
+
+    with TestClient(app_instance) as client:
+        resp_status = client.get("/status")
+        assert resp_status.status_code == 200
+        assert resp_status.json()["status"] == "success"
+        assert resp_status.headers["x-content-type-options"] == "nosniff"
+        assert resp_status.headers["x-frame-options"] == "DENY"
+        assert resp_status.headers["referrer-policy"] == "no-referrer"
+
+        resp_specs = client.get("/specs")
+        assert resp_specs.status_code == 200
+        assert resp_specs.json()["status"] == "success"
+
+        resp_constants = client.get("/constants")
+        assert resp_constants.status_code == 200
+        assert resp_constants.json()["status"] == "success"

@@ -21,53 +21,53 @@ Key Capabilities:
     - FR-HOST-BOOT-STAGE-PROGRESSION: Execute the ordered 7-stage startup state
       machine (CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES ->
       ROUTES -> READY), recording stage checks and cleanup hooks.
-      Associated: `LifespanStage`, `HostRuntime.start()`, `HostRuntime.start_sync()`
+      Associated: `AppHost.Stage`, `AppHost.startup()`, `AppHost.startup_sync()`
       Logging: Emits INFO on each stage entry and advancement; ERROR on stage
       failure.
     - FR-HOST-BOOT-REVERSE-TEARDOWN: Roll back or shut down acquired bootstrap
       stages in strict reverse LIFO order, isolating cleanup exceptions.
-      Associated: `HostRuntime.stop()`, `HostRuntime.stop_sync()`,
-      `HostRuntime._rollback_stages()`
+      Associated: `AppHost.shutdown()`, `AppHost.shutdown_sync()`,
+      `AppHost._rollback_stages()`
       Logging: Emits INFO on teardown start and stage release; ERROR on cleanup
       exceptions.
     - FR-HOST-BOOT-PERSISTENCE-STAGE: Initialize SQLite WAL persistence via
       app.host.persistence.create, verify all 25 operational tables, and reload
       host settings without importing sqlite3.
-      Associated: `HostRuntime._boot_stage_persistence()`, `reconcile_database()`
+      Associated: `AppHost.initialize_db()`, `AppHost.write_lock()`,
+      `AppHost.reconcile_database()`
       Logging: Emits INFO on schema verification and table inventory count;
       ERROR on persistence failure.
     - FR-HOST-BOOT-SERVICES-STAGE: Initialize and coordinate EventBus,
       SessionManager, ResourceManager, JobManager (with startup orphan-job
       reconciliation RUNNING -> INTERRUPTED), and PluginLifecycleManager.
-      Associated: `HostRuntime._boot_stage_services()`,
-      `HostRuntime.init_discovery()`
+      Associated: `AppHost.register_modules()`, `AppHost.broadcast_event()`,
+      `AppHost.init_discovery()`
       Logging: Emits INFO on service initialization and orphan job recovery.
     - FR-HOST-BOOT-ROUTES-STAGE: Mount and verify FastAPI transport and
       discovery routers (/api/v1, /api/v2) in UI/server mode or verify headless
       CLI command dispatch routes in CLI mode.
-      Associated: `HostRuntime._boot_stage_routes()`, `create_bootstrap_app()`
+      Associated: `AppHost.create_app()`
       Logging: Emits INFO on route registration and verification.
-    - FR-HOST-BOOT-READINESS-SNAPSHOT: Capture immutable ReadinessSnapshot
+    - FR-HOST-BOOT-READINESS-SNAPSHOT: Capture immutable readiness snapshot
       reports detailing active/completed stages, stage check statuses, uptime,
       and host_instance_id.
-      Associated: `ReadinessState`, `ReadinessSnapshot`,
-      `HostRuntime.get_readiness()`, `HostRuntime.is_ready()`
+      Associated: `AppHost.State`, `AppHost.get_readiness()`,
+      `AppHost.is_ready()`
       Logging: Emits DEBUG when ready and WARNING when queried while not ready.
-    - FR-HOST-BOOT-LIFESPAN-CONTEXT: Provide dual sync/async bootstrap_context
-      context managers and FastAPI lifespan composition via
-      create_bootstrap_app().
-      Associated: `BootstrapConfig`, `bootstrap_context()`,
-      `create_bootstrap_app()`
+    - FR-HOST-BOOT-LIFESPAN-CONTEXT: Provide dual sync/async context manager
+      support (`with AppHost(...)` and `async with AppHost(...)`) and FastAPI
+      lifespan composition via `AppHost.create_app()`.
+      Associated: `AppHost.__enter__()`, `AppHost.__aenter__()`,
+      `AppHost.create_app()`
       Logging: Emits INFO when entering and exiting bootstrap lifespan contexts.
 
 Python API Usage:
     ```python
     from pathlib import Path
-    from app.host.bootstrap import BootstrapConfig, bootstrap_context
+    from app.host.bootstrap import AppHost
 
-    cfg = BootstrapConfig(data_dir=Path("data"), headless=True)
-    with bootstrap_context(cfg) as runtime:
-        snap = runtime.get_readiness()
+    with AppHost(data_dir=Path("data"), headless=True) as host:
+        snap = host.get_readiness()
         assert snap.is_ready is True
     ```
 
@@ -83,16 +83,17 @@ from __future__ import annotations
 import argparse
 import asyncio
 import inspect
+import threading
 import time
 import uuid
-from collections.abc import AsyncGenerator, Callable
-from contextlib import asynccontextmanager
+from collections.abc import AsyncGenerator, Callable, Generator
+from contextlib import asynccontextmanager, contextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 from app.host.discovery import (
     PluginDiscoveryEngine,
@@ -126,6 +127,7 @@ from app.host.session import SessionManager
 from app.host.settings import settings as host_settings
 from app.host.transport import (
     EventBus,
+    HostEvent,
     TransportGatewayService,
     TransportMiddleware,
     create_transport_router,
@@ -141,13 +143,7 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 __all__ = [
-    "BootstrapConfig",
-    "HostRuntime",
-    "LifespanStage",
-    "ReadinessSnapshot",
-    "ReadinessState",
-    "bootstrap_context",
-    "create_bootstrap_app",
+    "AppHost",
 ]
 
 logger = get_logger(__name__)
@@ -193,11 +189,11 @@ DEFAULT_SLOTS: tuple[SlotDefinition, ...] = (
 
 
 # ============================================================================
-# Progressive 7-Stage Enums & Immutable Snapshots
+# Internal Progressive 7-Stage Enums & Immutable Snapshots
 # ============================================================================
 
 
-class LifespanStage(StrEnum):
+class _LifespanStage(StrEnum):
     """Canonical 7-stage progressive bootstrap sequence."""
 
     CONFIGURING = "CONFIGURING"
@@ -209,29 +205,29 @@ class LifespanStage(StrEnum):
     READY = "READY"
 
 
-ORDERED_BOOT_STAGES: tuple[LifespanStage, ...] = (
-    LifespanStage.CONFIGURING,
-    LifespanStage.PATHS,
-    LifespanStage.LOGGING,
-    LifespanStage.PERSISTENCE,
-    LifespanStage.SERVICES,
-    LifespanStage.ROUTES,
-    LifespanStage.READY,
+_ORDERED_BOOT_STAGES: tuple[_LifespanStage, ...] = (
+    _LifespanStage.CONFIGURING,
+    _LifespanStage.PATHS,
+    _LifespanStage.LOGGING,
+    _LifespanStage.PERSISTENCE,
+    _LifespanStage.SERVICES,
+    _LifespanStage.ROUTES,
+    _LifespanStage.READY,
 )
 
-STAGE_CHECK_KEYS: dict[LifespanStage, str] = {
-    LifespanStage.CONFIGURING: "configuration",
-    LifespanStage.PATHS: "paths",
-    LifespanStage.LOGGING: "logging",
-    LifespanStage.PERSISTENCE: "persistence",
-    LifespanStage.SERVICES: "services",
-    LifespanStage.ROUTES: "routes",
-    LifespanStage.READY: "ready",
+_STAGE_CHECK_KEYS: dict[_LifespanStage, str] = {
+    _LifespanStage.CONFIGURING: "configuration",
+    _LifespanStage.PATHS: "paths",
+    _LifespanStage.LOGGING: "logging",
+    _LifespanStage.PERSISTENCE: "persistence",
+    _LifespanStage.SERVICES: "services",
+    _LifespanStage.ROUTES: "routes",
+    _LifespanStage.READY: "ready",
 }
 
 
-class ReadinessState(StrEnum):
-    """High-level lifecycle states of the HostRuntime."""
+class _ReadinessState(StrEnum):
+    """High-level lifecycle states of AppHost."""
 
     UNINITIALIZED = "UNINITIALIZED"
     STARTING = "STARTING"
@@ -242,7 +238,7 @@ class ReadinessState(StrEnum):
 
 
 @dataclass(frozen=True)
-class BootstrapConfig:
+class _BootstrapConfig:
     """Configuration parameters governing the 7-stage host bootstrap."""
 
     title: str = "HaruQuantAI Host Gateway"
@@ -293,22 +289,22 @@ class BootstrapConfig:
 
 
 @dataclass(frozen=True)
-class ReadinessSnapshot:
-    """Immutable point-in-time readiness report of the HostRuntime."""
+class _ReadinessSnapshot:
+    """Immutable point-in-time readiness report of AppHost."""
 
-    state: ReadinessState
+    state: _ReadinessState
     is_ready: bool
     headless: bool
     host_instance_id: str
     uptime_seconds: float
     timestamp: str
-    active_stage: LifespanStage | None
-    completed_stages: list[LifespanStage]
+    active_stage: _LifespanStage | None
+    completed_stages: list[_LifespanStage]
     checks: dict[str, bool]
     details: dict[str, Any]
 
     def to_dict(self) -> dict[str, Any]:
-        """Serialize ReadinessSnapshot to a plain dictionary."""
+        """Serialize _ReadinessSnapshot to a plain dictionary."""
         raw = asdict(self)
         raw["state"] = str(self.state)
         raw["active_stage"] = (
@@ -322,23 +318,46 @@ class ReadinessSnapshot:
 class _AcquiredStage:
     """Internal LIFO stack entry recording an acquired stage and its cleanup."""
 
-    stage: LifespanStage
+    stage: _LifespanStage
     check_key: str
     cleanup: Callable[[], Any] | None = None
 
 
 # ============================================================================
-# Progressive 7-Stage HostRuntime Coordinator
+# Progressive 7-Stage AppHost Coordinator
 # ============================================================================
 
 
-class HostRuntime:
+class AppHost:
     """Progressive 7-stage host runtime state machine with reverse LIFO teardown."""
+
+    Stage = _LifespanStage
+    State = _ReadinessState
+    ORDERED_STAGES = _ORDERED_BOOT_STAGES
+    Config = _BootstrapConfig
+    Snapshot = _ReadinessSnapshot
 
     def __init__(
         self,
-        config: BootstrapConfig | None = None,
+        config: _BootstrapConfig | None = None,
         *,
+        title: str = "HaruQuantAI Host Gateway",
+        version: str = "1.0.0",
+        host: str = "127.0.0.1",
+        port: int = 8000,
+        debug: bool = False,
+        headless: bool = False,
+        require_auth: bool = False,
+        password_hash: str | None = None,
+        data_dir: Path | None = None,
+        db_path: Path | None = None,
+        log_dir: Path | None = None,
+        scratch_root: Path | None = None,
+        plugins_dir: Path | None = None,
+        max_workers: int | None = None,
+        use_process_pool: bool = True,
+        min_available_ram_pct: float = MIN_AVAILABLE_RAM_PCT,
+        timeout_graceful_shutdown: int = 10,
         event_bus: EventBus | None = None,
         session_mgr: SessionManager | None = None,
         resource_mgr: ResourceManager | None = None,
@@ -346,16 +365,35 @@ class HostRuntime:
         plugin_mgr: PluginLifecycleManager | None = None,
         broker_registry: BrokerRegistry | None = None,
         extra_routers: list[APIRouter] | None = None,
-        stage_hooks: dict[LifespanStage, Callable[[HostRuntime], Any]] | None = None,
+        stage_hooks: dict[_LifespanStage, Callable[[AppHost], Any]] | None = None,
     ) -> None:
-        """Initialize the HostRuntime state machine in UNINITIALIZED state."""
-        self.config = config or BootstrapConfig()
+        """Initialize the AppHost state machine in UNINITIALIZED state."""
+        self.config = config or _BootstrapConfig(
+            title=title,
+            version=version,
+            host=host,
+            port=port,
+            debug=debug,
+            headless=headless,
+            require_auth=require_auth,
+            password_hash=password_hash,
+            data_dir=data_dir if data_dir is not None else Path("data"),
+            db_path=db_path,
+            log_dir=log_dir,
+            scratch_root=scratch_root,
+            plugins_dir=plugins_dir,
+            max_workers=max_workers,
+            use_process_pool=use_process_pool,
+            min_available_ram_pct=min_available_ram_pct,
+            timeout_graceful_shutdown=timeout_graceful_shutdown,
+        )
         self.host_instance_id = f"host-{uuid.uuid4().hex[:12]}"
         self._lock = asyncio.Lock()
-        self._state = ReadinessState.UNINITIALIZED
-        self._active_stage: LifespanStage | None = None
-        self._completed_stages: list[LifespanStage] = []
-        self._teardown_stages: list[LifespanStage] = []
+        self._write_lock = threading.RLock()
+        self._state = _ReadinessState.UNINITIALIZED
+        self._active_stage: _LifespanStage | None = None
+        self._completed_stages: list[_LifespanStage] = []
+        self._teardown_stages: list[_LifespanStage] = []
         self._acquired_stack: list[_AcquiredStage] = []
         self._start_time: float | None = None
         self._checks: dict[str, bool] = {
@@ -385,22 +423,22 @@ class HostRuntime:
         self.data_manager: DataManagerWorkspace | None = None
 
     @property
-    def state(self) -> ReadinessState:
-        """Return current ReadinessState."""
+    def state(self) -> _ReadinessState:
+        """Return current readiness state."""
         return self._state
 
     @property
-    def active_stage(self) -> LifespanStage | None:
-        """Return currently active LifespanStage."""
+    def active_stage(self) -> _LifespanStage | None:
+        """Return currently active bootstrap stage."""
         return self._active_stage
 
     @property
-    def completed_stages(self) -> list[LifespanStage]:
+    def completed_stages(self) -> list[_LifespanStage]:
         """Return ordered list of completed bootstrap stages."""
         return list(self._completed_stages)
 
     @property
-    def teardown_stages(self) -> list[LifespanStage]:
+    def teardown_stages(self) -> list[_LifespanStage]:
         """Return ordered list of stages released during the most recent teardown."""
         return list(self._teardown_stages)
 
@@ -412,13 +450,13 @@ class HostRuntime:
     def is_ready(self) -> bool:
         """Return True if all 7 stages completed and state is READY."""
         return (
-            self._state == ReadinessState.READY
-            and self._active_stage == LifespanStage.READY
+            self._state == _ReadinessState.READY
+            and self._active_stage == _LifespanStage.READY
             and all(self._checks.values())
         )
 
-    def get_readiness(self) -> ReadinessSnapshot:
-        """Capture and return an immutable ReadinessSnapshot."""
+    def get_readiness(self) -> _ReadinessSnapshot:
+        """Capture and return an immutable readiness snapshot."""
         ready = self.is_ready()
         now_iso = datetime.now(UTC).isoformat()
         uptime = (
@@ -444,7 +482,7 @@ class HostRuntime:
                 self._checks,
                 extra={"fr_id": READINESS_SNAPSHOT_FR},
             )
-        return ReadinessSnapshot(
+        return _ReadinessSnapshot(
             state=self._state,
             is_ready=ready,
             headless=self.config.headless,
@@ -459,11 +497,11 @@ class HostRuntime:
 
     async def _advance_stage(
         self,
-        stage: LifespanStage,
+        stage: _LifespanStage,
         cleanup: Callable[[], Any] | None = None,
     ) -> None:
         """Mark stage completed, push cleanup onto LIFO stack, and run hook."""
-        check_key = STAGE_CHECK_KEYS[stage]
+        check_key = _STAGE_CHECK_KEYS[stage]
         self._active_stage = stage
         if not any(item.stage == stage for item in self._acquired_stack):
             self._acquired_stack.append(
@@ -539,7 +577,7 @@ class HostRuntime:
 
     async def _boot_stage_configuring(self) -> None:
         """Stage 1/7: CONFIGURING — Validate host, port, and runtime configuration."""
-        self._active_stage = LifespanStage.CONFIGURING
+        self._active_stage = _LifespanStage.CONFIGURING
         logger.info(
             "%s: [1/7] Stage CONFIGURING (host=%s port=%d headless=%s debug=%s).",
             STAGE_PROGRESSION_FR,
@@ -550,7 +588,7 @@ class HostRuntime:
             extra={"fr_id": STAGE_PROGRESSION_FR, "stage": "CONFIGURING"},
         )
         if not self.config.host or not self.config.host.strip():
-            raise ValueError("BootstrapConfig.host must be a non-empty string.")
+            raise ValueError("AppHost host must be a non-empty string.")
         if not (_MIN_PORT <= self.config.port <= _MAX_PORT):
             raise ValueError(
                 f"Invalid host port number: {self.config.port} "
@@ -562,7 +600,7 @@ class HostRuntime:
         self._details["mode"] = "headless_cli" if self.config.headless else "ui_server"
         self._details["host"] = self.config.host
         self._details["port"] = self.config.port
-        await self._advance_stage(LifespanStage.CONFIGURING)
+        await self._advance_stage(_LifespanStage.CONFIGURING)
 
     async def _boot_stage_paths(self) -> None:
         """Stage 2/7: PATHS — Create and verify workspace directory hierarchy."""
@@ -598,7 +636,7 @@ class HostRuntime:
             "plugins_dir": str(plugins_dir),
             "inspected_count": len(dir_report),
         }
-        await self._advance_stage(LifespanStage.PATHS)
+        await self._advance_stage(_LifespanStage.PATHS)
 
     async def _boot_stage_logging(self) -> None:
         """Stage 3/7: LOGGING — Configure multi-sink telemetry and ring buffer."""
@@ -619,14 +657,33 @@ class HostRuntime:
             "ring_buffer_records": len(ring),
             "ring_buffer_capacity": ring.maxlen,
         }
-        await self._advance_stage(LifespanStage.LOGGING, cleanup=flush_logs)
+        await self._advance_stage(_LifespanStage.LOGGING, cleanup=flush_logs)
 
     def _publish_log(self, entry: dict[str, Any]) -> None:
         """Forward scrubbed telemetry to the runtime's bounded event broker."""
         self.event_bus.publish(channel="logs", event_type="log", payload=entry)
 
-    async def _boot_stage_persistence(self) -> None:
-        """Stage 4/7: PERSISTENCE — Initialize SQLite WAL schema and verify tables."""
+    def broadcast_event(
+        self,
+        channel: str,
+        event_type: str = "update",
+        payload: dict[str, Any] | None = None,
+    ) -> HostEvent:
+        """Broadcast an event across the event bus to all subscribers."""
+        return self.event_bus.publish(
+            channel=channel,
+            event_type=event_type,
+            payload=payload or {},
+        )
+
+    @contextmanager
+    def write_lock(self) -> Generator[None]:
+        """Thread-safe context manager for coordinated database write locks."""
+        with self._write_lock:
+            yield
+
+    def initialize_db(self) -> dict[str, Any]:
+        """Initialize SQLite WAL database, create schema, and reload settings."""
         db_path = self.config.resolved_db_path
         logger.info(
             "%s: [4/7] Stage PERSISTENCE (initializing WAL schema at %s).",
@@ -647,6 +704,13 @@ class HostRuntime:
                 f"Database schema verification failed: expected >= "
                 f"{_EXPECTED_TABLE_COUNT} tables, found {table_count}."
             )
+        return {"db_path": str(db_path), "table_count": table_count}
+
+    async def _boot_stage_persistence(self) -> None:
+        """Stage 4/7: PERSISTENCE — Initialize SQLite WAL schema and verify tables."""
+        db_path = self.config.resolved_db_path
+        res = self.initialize_db()
+        table_count = res["table_count"]
 
         self._details["persistence"] = {
             "db_name": db_path.name,
@@ -659,7 +723,7 @@ class HostRuntime:
             table_count,
             extra={"fr_id": PERSISTENCE_STAGE_FR, "table_count": table_count},
         )
-        await self._advance_stage(LifespanStage.PERSISTENCE)
+        await self._advance_stage(_LifespanStage.PERSISTENCE)
 
     def init_discovery(self) -> PluginLifecycleManager:
         """Initialize the dynamic plugin discovery and lifecycle manager."""
@@ -693,6 +757,7 @@ class HostRuntime:
             slot = getattr(getattr(record, "manifest", None), "slot", None)
             if slot == "data.provider" and self.broker_registry is not None:
                 from app.services.brokers.registry import (
+                    CANONICAL_PROVIDERS,
                     BrokerKey,
                     normalize_provider_id,
                 )
@@ -700,9 +765,31 @@ class HostRuntime:
                 manifest_id = getattr(
                     getattr(record, "manifest", None), "id", plugin_id
                 )
-                canon = normalize_provider_id(manifest_id)
+                try:
+                    canon = normalize_provider_id(manifest_id)
+                except AttributeError, ValueError, TypeError:
+                    return None
+                if canon not in CANONICAL_PROVIDERS:
+                    return None
                 bkey = BrokerKey(provider=canon, data_root=str(self.config.data_dir))
-                return self.broker_registry.acquire(bkey)
+                try:
+                    return self.broker_registry.acquire(bkey)
+                except (
+                    RuntimeError,
+                    ValueError,
+                    TypeError,
+                    KeyError,
+                    OSError,
+                    ImportError,
+                ) as err:
+                    logger.warning(
+                        "%s: Could not acquire broker for %s: %s",
+                        SERVICES_STAGE_FR,
+                        manifest_id,
+                        err,
+                        extra={"fr_id": SERVICES_STAGE_FR},
+                    )
+                    return None
             return None
 
         lifecycle = PluginLifecycleManager(
@@ -713,6 +800,77 @@ class HostRuntime:
         self.plugin_manager = lifecycle
         lifecycle.load_and_attach_all()
         return lifecycle
+
+    def register_modules(self, app: FastAPI | None = None) -> dict[str, Any]:
+        """Initialize core services and optionally mount routers onto FastAPI app."""
+        db_path = self.config.resolved_db_path
+
+        # 1. SessionManager
+        if self.session_manager is None:
+            self.session_manager = SessionManager(
+                db_path=db_path,
+                host_instance_id=self.host_instance_id,
+            )
+
+        # 2. ResourceManager & MemoryWatchdog
+        if self.resource_manager is None:
+            self.resource_manager = ResourceManager(
+                min_available_ram_pct=self.config.min_available_ram_pct,
+                scratch_root=self.config.resolved_scratch_root,
+            )
+
+        # 3. JobManager & Startup Orphan Job Reconciliation (RUNNING -> INTERRUPTED)
+        if self.job_manager is None:
+            self.job_manager = JobManager(
+                db_path=db_path,
+                max_workers=self.config.max_workers,
+                resource_mgr=self.resource_manager,
+                min_available_ram_pct=self.config.min_available_ram_pct,
+                use_process_pool=self.config.use_process_pool,
+                reconcile_on_startup=False,
+            )
+        reconciled_jobs = self.job_manager.reconcile_orphan_jobs()
+
+        # 4. Dynamic Plugin Discovery Engine
+        plugin_mgr = self.init_discovery()
+        report = plugin_mgr.build_report()
+
+        # 5. TransportGatewayService
+        if self.gateway_service is None:
+            self.gateway_service = TransportGatewayService(
+                event_bus=self.event_bus,
+                session_mgr=self.session_manager,
+                resource_mgr=self.resource_manager,
+                job_mgr=self.job_manager,
+                password_hash=self.config.password_hash,
+                require_auth=self.config.require_auth,
+            )
+
+        # 6. DataManagerWorkspace (Stage 2B & 2C)
+        if self.data_manager is None:
+            self.data_manager = DataManagerWorkspace(
+                db_path=db_path,
+                data_dir=Path(self.config.data_dir),
+                event_bus=self.event_bus,
+                plugin_mgr=plugin_mgr,
+                broker_registry=self.broker_registry,
+                job_manager=self.job_manager,
+            )
+        self.data_manager.initialize_defaults()
+
+        mounted_routes: list[str] = []
+        if app is not None:
+            mounted_routes = _mount_gateway_and_discovery_routers(app, self)
+            self._mounted_routes = mounted_routes
+
+        return {
+            "max_workers": self.job_manager.max_workers,
+            "reconciled_orphan_jobs": reconciled_jobs,
+            "plugins_discovered": report.total_discovered,
+            "plugins_enabled": report.enabled_count,
+            "slots_registered": len(plugin_mgr.discovery.slot_registry.list_slots()),
+            "mounted_routes": mounted_routes,
+        }
 
     def _cleanup_services(self) -> None:
         """Release plugins, job pool, resource watchdog, and sessions in reverse."""
@@ -753,94 +911,46 @@ class HostRuntime:
 
     async def _boot_stage_services(self) -> None:
         """Stage 5/7: SERVICES — Initialize Resource, Job, Session, and Discovery."""
-        self._active_stage = LifespanStage.SERVICES
+        self._active_stage = _LifespanStage.SERVICES
         self._acquired_stack.append(
             _AcquiredStage(
-                stage=LifespanStage.SERVICES,
-                check_key=STAGE_CHECK_KEYS[LifespanStage.SERVICES],
+                stage=_LifespanStage.SERVICES,
+                check_key=_STAGE_CHECK_KEYS[_LifespanStage.SERVICES],
                 cleanup=self._cleanup_services,
             )
         )
-        db_path = self.config.resolved_db_path
         logger.info(
             "%s: [5/7] Stage SERVICES (starting Resource, Job, Session, Discovery).",
             SERVICES_STAGE_FR,
             extra={"fr_id": SERVICES_STAGE_FR, "stage": "SERVICES"},
         )
 
-        # 5.1 SessionManager
-        if self.session_manager is None:
-            self.session_manager = SessionManager(
-                db_path=db_path,
-                host_instance_id=self.host_instance_id,
-            )
-
-        # 5.2 ResourceManager & MemoryWatchdog
-        if self.resource_manager is None:
-            self.resource_manager = ResourceManager(
-                min_available_ram_pct=self.config.min_available_ram_pct,
-                scratch_root=self.config.resolved_scratch_root,
-            )
-
-        # 5.3 JobManager & Startup Orphan Job Reconciliation (RUNNING -> INTERRUPTED)
-        if self.job_manager is None:
-            self.job_manager = JobManager(
-                db_path=db_path,
-                max_workers=self.config.max_workers,
-                resource_mgr=self.resource_manager,
-                min_available_ram_pct=self.config.min_available_ram_pct,
-                use_process_pool=self.config.use_process_pool,
-                reconcile_on_startup=False,
-            )
-        reconciled_jobs = self.job_manager.reconcile_orphan_jobs()
-
-        # 5.4 Dynamic Plugin Discovery Engine
-        plugin_mgr = self.init_discovery()
-        report = plugin_mgr.build_report()
-
-        # 5.5 TransportGatewayService
-        self.gateway_service = TransportGatewayService(
-            event_bus=self.event_bus,
-            session_mgr=self.session_manager,
-            resource_mgr=self.resource_manager,
-            job_mgr=self.job_manager,
-            password_hash=self.config.password_hash,
-            require_auth=self.config.require_auth,
-        )
-
-        # 5.6 DataManagerWorkspace (Stage 2B & 2C)
-        if self.data_manager is None:
-            self.data_manager = DataManagerWorkspace(
-                db_path=db_path,
-                data_dir=Path(self.config.data_dir),
-                event_bus=self.event_bus,
-                plugin_mgr=plugin_mgr,
-                broker_registry=self.broker_registry,
-                job_manager=self.job_manager,
-            )
-        self.data_manager.initialize_defaults()
+        svc_info = self.register_modules()
+        reconciled_jobs = svc_info["reconciled_orphan_jobs"]
+        max_workers = svc_info["max_workers"]
+        plugins_discovered = svc_info["plugins_discovered"]
 
         self._details["services"] = {
-            "max_workers": self.job_manager.max_workers,
+            "max_workers": max_workers,
             "reconciled_orphan_jobs": reconciled_jobs,
-            "plugins_discovered": report.total_discovered,
-            "plugins_enabled": report.enabled_count,
-            "slots_registered": len(plugin_mgr.discovery.slot_registry.list_slots()),
+            "plugins_discovered": plugins_discovered,
+            "plugins_enabled": svc_info["plugins_enabled"],
+            "slots_registered": svc_info["slots_registered"],
         }
         logger.info(
             "%s: Services initialized (workers=%d, reconciled_jobs=%d, plugins=%d).",
             SERVICES_STAGE_FR,
-            self.job_manager.max_workers,
+            max_workers,
             len(reconciled_jobs),
-            report.total_discovered,
+            plugins_discovered,
             extra={
                 "fr_id": SERVICES_STAGE_FR,
-                "workers": self.job_manager.max_workers,
+                "workers": max_workers,
                 "reconciled_jobs": len(reconciled_jobs),
             },
         )
         await self._advance_stage(
-            LifespanStage.SERVICES, cleanup=self._cleanup_services
+            _LifespanStage.SERVICES, cleanup=self._cleanup_services
         )
 
     async def _boot_stage_routes(self) -> None:
@@ -881,6 +991,9 @@ class HostRuntime:
                     "/ws",
                     "/discovery/plugins",
                     "/discovery/slots",
+                    "/connections",
+                    "/constants",
+                    "/specs",
                 ]
             logger.info(
                 "%s: [6/7] Stage ROUTES (verified %d FastAPI gateway routes).",
@@ -895,7 +1008,7 @@ class HostRuntime:
             "routes": list(self._mounted_routes),
         }
         await self._advance_stage(
-            LifespanStage.ROUTES,
+            _LifespanStage.ROUTES,
             cleanup=self._mounted_routes.clear,
         )
 
@@ -915,9 +1028,9 @@ class HostRuntime:
                 f"Cannot enter Stage READY; incomplete stage checks: {missing}"
             )
 
-        await self._advance_stage(LifespanStage.READY)
-        self._state = ReadinessState.READY
-        self.event_bus.publish(
+        await self._advance_stage(_LifespanStage.READY)
+        self._state = _ReadinessState.READY
+        self.broadcast_event(
             channel="system",
             event_type="host.ready",
             payload={
@@ -934,21 +1047,21 @@ class HostRuntime:
         )
 
     # ------------------------------------------------------------------------
-    # Public Lifecycle Methods (Async & Sync)
+    # Public Lifecycle, Context Manager, & FastAPI Composition Methods
     # ------------------------------------------------------------------------
 
-    async def start(self) -> ReadinessSnapshot:
+    async def startup(self) -> _ReadinessSnapshot:
         """Execute the progressive 7-stage startup sequence asynchronously."""
         async with self._lock:
-            if self._state == ReadinessState.READY:
+            if self._state == _ReadinessState.READY:
                 logger.info(
-                    "%s: HostRuntime is already in READY state.",
+                    "%s: AppHost is already in READY state.",
                     STAGE_PROGRESSION_FR,
                     extra={"fr_id": STAGE_PROGRESSION_FR},
                 )
                 return self.get_readiness()
 
-            self._state = ReadinessState.STARTING
+            self._state = _ReadinessState.STARTING
             self._start_time = time.monotonic()
             self._completed_stages.clear()
             self._teardown_stages.clear()
@@ -978,32 +1091,32 @@ class HostRuntime:
                     extra={"fr_id": STAGE_PROGRESSION_FR},
                 )
                 await self._rollback_stages()
-                self._state = ReadinessState.FAILED
+                self._state = _ReadinessState.FAILED
                 shutdown_logging()
                 raise
 
             return self.get_readiness()
 
-    async def stop(self) -> ReadinessSnapshot:
+    async def shutdown(self) -> _ReadinessSnapshot:
         """Execute reverse-order LIFO teardown of all acquired stages."""
         async with self._lock:
             if self._state in (
-                ReadinessState.STOPPED,
-                ReadinessState.UNINITIALIZED,
+                _ReadinessState.STOPPED,
+                _ReadinessState.UNINITIALIZED,
             ):
-                self._state = ReadinessState.STOPPED
+                self._state = _ReadinessState.STOPPED
                 return self.get_readiness()
 
-            self._state = ReadinessState.STOPPING
-            self.event_bus.publish(
+            self._state = _ReadinessState.STOPPING
+            self.broadcast_event(
                 channel="system",
                 event_type="host.stopping",
                 payload={"host_instance_id": self.host_instance_id},
             )
             await self._rollback_stages()
-            self._state = ReadinessState.STOPPED
+            self._state = _ReadinessState.STOPPED
             logger.info(
-                "%s: HostRuntime stopped cleanly (instance=%s).",
+                "%s: AppHost stopped cleanly (instance=%s).",
                 REVERSE_TEARDOWN_FR,
                 self.host_instance_id,
                 extra={"fr_id": REVERSE_TEARDOWN_FR},
@@ -1012,39 +1125,23 @@ class HostRuntime:
             shutdown_logging()
             return snapshot
 
-    def start_sync(self) -> ReadinessSnapshot:
+    def startup_sync(self) -> _ReadinessSnapshot:
         """Synchronous wrapper executing the 7-stage startup sequence."""
-        return asyncio.run(self.start())
+        return asyncio.run(self.startup())
 
-    def stop_sync(self) -> ReadinessSnapshot:
+    def shutdown_sync(self) -> _ReadinessSnapshot:
         """Synchronous wrapper executing reverse-order LIFO teardown."""
-        return asyncio.run(self.stop())
+        return asyncio.run(self.shutdown())
 
-
-# ============================================================================
-# Dual Sync/Async Bootstrap Context Manager & FastAPI Composition
-# ============================================================================
-
-
-class _BootstrapContextManager:
-    """Dual synchronous (`with`) and asynchronous (`async with`) context manager."""
-
-    def __init__(
-        self,
-        config: BootstrapConfig | None = None,
-        *,
-        runtime: HostRuntime | None = None,
-    ) -> None:
-        self.runtime = runtime if runtime is not None else HostRuntime(config=config)
-
-    def __enter__(self) -> HostRuntime:
+    def __enter__(self) -> Self:
+        """Enter synchronous 7-stage bootstrap context."""
         logger.info(
             "%s: Entering synchronous 7-stage bootstrap context.",
             LIFESPAN_CONTEXT_FR,
             extra={"fr_id": LIFESPAN_CONTEXT_FR},
         )
-        self.runtime.start_sync()
-        return self.runtime
+        self.startup_sync()
+        return self
 
     def __exit__(
         self,
@@ -1052,21 +1149,23 @@ class _BootstrapContextManager:
         exc_val: object,
         exc_tb: object,
     ) -> None:
+        """Exit synchronous 7-stage bootstrap context with LIFO teardown."""
         logger.info(
             "%s: Exiting synchronous 7-stage bootstrap context.",
             LIFESPAN_CONTEXT_FR,
             extra={"fr_id": LIFESPAN_CONTEXT_FR},
         )
-        self.runtime.stop_sync()
+        self.shutdown_sync()
 
-    async def __aenter__(self) -> HostRuntime:
+    async def __aenter__(self) -> Self:
+        """Enter asynchronous 7-stage bootstrap context."""
         logger.info(
             "%s: Entering asynchronous 7-stage bootstrap context.",
             LIFESPAN_CONTEXT_FR,
             extra={"fr_id": LIFESPAN_CONTEXT_FR},
         )
-        await self.runtime.start()
-        return self.runtime
+        await self.startup()
+        return self
 
     async def __aexit__(
         self,
@@ -1074,26 +1173,120 @@ class _BootstrapContextManager:
         exc_val: object,
         exc_tb: object,
     ) -> None:
+        """Exit asynchronous 7-stage bootstrap context with LIFO teardown."""
         logger.info(
             "%s: Exiting asynchronous 7-stage bootstrap context.",
             LIFESPAN_CONTEXT_FR,
             extra={"fr_id": LIFESPAN_CONTEXT_FR},
         )
-        await self.runtime.stop()
+        await self.shutdown()
 
+    def create_app(
+        self,
+        *,
+        extra_routers: list[APIRouter] | None = None,
+    ) -> FastAPI:
+        """Compose a FastAPI application bound to this AppHost's 7-stage lifespan."""
+        if extra_routers:
+            for router in extra_routers:
+                if router not in self._extra_routers:
+                    self._extra_routers.append(router)
 
-def bootstrap_context(
-    config: BootstrapConfig | None = None,
-    *,
-    runtime: HostRuntime | None = None,
-) -> _BootstrapContextManager:
-    """Return a dual sync/async context manager running the 7-stage bootstrap."""
-    return _BootstrapContextManager(config=config, runtime=runtime)
+        logger.info(
+            "%s: Composing FastAPI application with 7-stage AppHost lifespan.",
+            LIFESPAN_CONTEXT_FR,
+            extra={"fr_id": LIFESPAN_CONTEXT_FR},
+        )
+
+        @asynccontextmanager
+        async def _lifespan(app: FastAPI) -> AsyncGenerator[None]:
+            app.state.runtime = self
+            app.state.config = self.config
+            logger.info(
+                "%s: FastAPI lifespan starting 7-stage AppHost.",
+                LIFESPAN_CONTEXT_FR,
+                extra={"fr_id": LIFESPAN_CONTEXT_FR},
+            )
+            await self.startup()
+            try:
+                yield
+            finally:
+                logger.info(
+                    "%s: FastAPI lifespan stopping 7-stage AppHost.",
+                    LIFESPAN_CONTEXT_FR,
+                    extra={"fr_id": LIFESPAN_CONTEXT_FR},
+                )
+                await self.shutdown()
+
+        app = FastAPI(
+            title=self.config.title,
+            version=self.config.version,
+            lifespan=_lifespan,
+        )
+        app.state.runtime = self
+        app.state.config = self.config
+
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=[
+                "http://127.0.0.1:3000",
+                "http://localhost:3000",
+                "http://127.0.0.1:5173",
+                "http://localhost:5173",
+                f"http://{self.config.host}:{self.config.port}",
+            ],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+        app.add_middleware(TransportMiddleware)
+        register_transport_exception_handlers(app)
+
+        mounted = _mount_gateway_and_discovery_routers(app, self)
+        self._mounted_routes = mounted
+        return app
+
+    @staticmethod
+    def reconcile_database(db_path: Path) -> dict[str, Any]:
+        """Ensure SQLite WAL schema and reconcile orphan RUNNING jobs on ``db_path``."""
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        conn = get_connection(db_path)
+        try:
+            create_schema(conn)
+        finally:
+            conn.close()
+
+        table_count = count_database_tables(db_path)
+        job_mgr = JobManager(
+            db_path=db_path,
+            use_process_pool=False,
+            reconcile_on_startup=False,
+        )
+        try:
+            reconciled = job_mgr.reconcile_orphan_jobs()
+        finally:
+            job_mgr.shutdown(wait=True)
+
+        report = {
+            "status": "reconciled",
+            "db_path": str(db_path),
+            "table_count": table_count,
+            "reconciled_orphan_jobs": reconciled,
+        }
+        logger.info(
+            "%s: Reconciled database %s (tables=%d, orphan_jobs=%d).",
+            PERSISTENCE_STAGE_FR,
+            db_path.name,
+            table_count,
+            len(reconciled),
+            extra={"fr_id": PERSISTENCE_STAGE_FR},
+        )
+        return report
 
 
 def _mount_gateway_and_discovery_routers(
     app: FastAPI,
-    runtime: HostRuntime,
+    runtime: AppHost,
 ) -> list[str]:
     """Mount transport gateway, discovery, and extra routers onto ``app``."""
     gateway_svc = runtime.gateway_service or TransportGatewayService(
@@ -1147,114 +1340,6 @@ def _mount_gateway_and_discovery_routers(
     return [getattr(r, "path", "") for r in app.routes if getattr(r, "path", "")]
 
 
-def create_bootstrap_app(
-    config: BootstrapConfig | None = None,
-    *,
-    runtime: HostRuntime | None = None,
-    extra_routers: list[APIRouter] | None = None,
-) -> FastAPI:
-    """Compose a FastAPI application bound to the 7-stage HostRuntime lifespan."""
-    resolved_config = config or BootstrapConfig(headless=False)
-    resolved_runtime = runtime or HostRuntime(
-        config=resolved_config,
-        extra_routers=extra_routers,
-    )
-
-    logger.info(
-        "%s: Composing FastAPI application with 7-stage HostRuntime lifespan.",
-        LIFESPAN_CONTEXT_FR,
-        extra={"fr_id": LIFESPAN_CONTEXT_FR},
-    )
-
-    @asynccontextmanager
-    async def _lifespan(app: FastAPI) -> AsyncGenerator[None]:
-        app.state.runtime = resolved_runtime
-        app.state.config = resolved_config
-        logger.info(
-            "%s: FastAPI lifespan starting 7-stage HostRuntime.",
-            LIFESPAN_CONTEXT_FR,
-            extra={"fr_id": LIFESPAN_CONTEXT_FR},
-        )
-        await resolved_runtime.start()
-        try:
-            yield
-        finally:
-            logger.info(
-                "%s: FastAPI lifespan stopping 7-stage HostRuntime.",
-                LIFESPAN_CONTEXT_FR,
-                extra={"fr_id": LIFESPAN_CONTEXT_FR},
-            )
-            await resolved_runtime.stop()
-
-    app = FastAPI(
-        title=resolved_config.title,
-        version=resolved_config.version,
-        lifespan=_lifespan,
-    )
-    app.state.runtime = resolved_runtime
-    app.state.config = resolved_config
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            "http://127.0.0.1:3000",
-            "http://localhost:3000",
-            "http://127.0.0.1:5173",
-            "http://localhost:5173",
-            f"http://{resolved_config.host}:{resolved_config.port}",
-        ],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    app.add_middleware(TransportMiddleware)
-    register_transport_exception_handlers(app)
-
-    mounted = _mount_gateway_and_discovery_routers(app, resolved_runtime)
-    resolved_runtime._mounted_routes = mounted  # noqa: SLF001
-    return app
-
-
-create_host_app = create_bootstrap_app
-
-
-def reconcile_database(db_path: Path) -> dict[str, Any]:
-    """Ensure SQLite WAL schema and reconcile orphan RUNNING jobs on ``db_path``."""
-    db_path.parent.mkdir(parents=True, exist_ok=True)
-    conn = get_connection(db_path)
-    try:
-        create_schema(conn)
-    finally:
-        conn.close()
-
-    table_count = count_database_tables(db_path)
-    job_mgr = JobManager(
-        db_path=db_path,
-        use_process_pool=False,
-        reconcile_on_startup=False,
-    )
-    try:
-        reconciled = job_mgr.reconcile_orphan_jobs()
-    finally:
-        job_mgr.shutdown(wait=True)
-
-    report = {
-        "status": "reconciled",
-        "db_path": str(db_path),
-        "table_count": table_count,
-        "reconciled_orphan_jobs": reconciled,
-    }
-    logger.info(
-        "%s: Reconciled database %s (tables=%d, orphan_jobs=%d).",
-        PERSISTENCE_STAGE_FR,
-        db_path.name,
-        table_count,
-        len(reconciled),
-        extra={"fr_id": PERSISTENCE_STAGE_FR},
-    )
-    return report
-
-
 # ============================================================================
 # CLI Demonstration Entrypoint
 # ============================================================================
@@ -1280,16 +1365,15 @@ def main(argv: list[str] | None = None) -> int:
         prefix="hqai_boot_demo_",
         ignore_cleanup_errors=True,
     ) as tmp_str:
-        cfg = BootstrapConfig(
+        host = AppHost(
             data_dir=Path(tmp_str),
             headless=True,
             use_process_pool=False,
         )
-        runtime = HostRuntime(config=cfg)
-        snap_ready = runtime.start_sync()
+        snap_ready = host.startup_sync()
         stages_up = [s.value for s in snap_ready.completed_stages]
-        snap_stopped = runtime.stop_sync()
-        stages_down = [s.value for s in runtime.teardown_stages]
+        snap_stopped = host.shutdown_sync()
+        stages_down = [s.value for s in host.teardown_stages]
 
         print(f"Bootstrap State After Start: {snap_ready.state}")
         print(f"Completed 7 Stages: {' -> '.join(stages_up)}")

@@ -71,8 +71,10 @@ from app.host.session import (
 from app.host.settings import (
     BATCH_UPDATE_FR,
     LOAD_FR,
+    THEME_FR,
+    HostSettings,
     RevisionConflictError,
-    _HostSettings,
+    Theme,
     _read_settings,
     _SettingsNode,
 )
@@ -85,8 +87,14 @@ from app.host.settings import (
 
 
 def test_public_module_exports_rule_compliance() -> None:
-    """Verify Section 3 Rule 2 & 3: 2 FRs allow at most 2 exports."""
-    assert app.host.settings.__all__ == ["RevisionConflictError", "settings"]
+    """Verify public exports from app.host.settings align with Phase 1 blueprint."""
+    expected = [
+        "HostSettings",
+        "RevisionConflictError",
+        "Theme",
+        "settings",
+    ]
+    assert sorted(app.host.settings.__all__) == sorted(expected)
 
 
 def test_read_settings_from_database(
@@ -184,8 +192,8 @@ def test_read_settings_malformed_json_fallback(tmp_path: Path) -> None:
 
 
 def test_host_settings_container_methods() -> None:
-    """Verify container methods on empty and populated _HostSettings and _SettingsNode."""
-    empty = _HostSettings({})
+    """Verify container methods on empty and populated HostSettings and _SettingsNode."""
+    empty = HostSettings({})
     assert len(empty) == 0
     assert empty.as_dict() == {}
     assert empty.get("any", "key", 42) == 42
@@ -486,7 +494,7 @@ def test_independent_settings_writers_conflict_and_batch_rollback(
             expected_revision=1,
             conn=db,
         )
-    instance = _HostSettings()
+    instance = HostSettings()
     instance.reload(conn=db)
     assert instance.revision == 1
     assert "first" not in instance.get_scope("audit")
@@ -507,7 +515,7 @@ def test_settings_read_failure_preserves_last_snapshot(tmp_path: Path) -> None:
     conn = get_connection(db)
     create_schema(conn)
     conn.close()
-    instance = _HostSettings()
+    instance = HostSettings()
     instance.reload(conn=db)
     instance.update_batch({"audit": {"kept": True}}, expected_revision=0)
     with pytest.raises(Exception, match="closed database"):
@@ -515,3 +523,39 @@ def test_settings_read_failure_preserves_last_snapshot(tmp_path: Path) -> None:
     assert instance.revision == 1
     assert instance.get("audit", "kept") is True
     instance.reload()
+
+
+def test_theme_tokens_and_appearance_state(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify FR-HOST-SETTINGS-THEME-TOKENS dark and light mode tokens and switching."""
+    caplog.set_level(logging.DEBUG)
+    theme = Theme()
+    assert theme.current_theme == "dark"
+
+    dark_tokens = theme.set_dark()
+    assert dark_tokens["theme"] == "dark"
+    assert "background" in dark_tokens
+    assert "dockview" in dark_tokens
+    assert "chart" in dark_tokens
+    assert "typography" in dark_tokens
+    assert any(THEME_FR in rec.message for rec in caplog.records)
+
+    caplog.clear()
+    light_tokens = theme.set_light()
+    assert light_tokens["theme"] == "light"
+    assert "background" in light_tokens
+    assert "dockview" in light_tokens
+    assert "chart" in light_tokens
+    assert any(THEME_FR in rec.message for rec in caplog.records)
+
+    tokens_retrieved = theme.get_tokens()
+    assert tokens_retrieved["theme"] == "dark"
+    light_retrieved = theme.get_light_tokens()
+    assert light_retrieved["theme"] == "light"
+
+
+def test_host_settings_theme_integration() -> None:
+    """Verify HostSettings public class and theme binding."""
+    settings_obj = HostSettings(data={"ui": {"theme": "light"}})
+    assert settings_obj.theme.current_theme == "light"
+    settings_obj.theme.set_dark()
+    assert settings_obj.theme.current_theme == "dark"

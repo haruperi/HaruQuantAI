@@ -154,11 +154,11 @@ HaruQuantAI/
 - **Backend:** `app/host/bootstrap.py`
 - **Frontend:** `ui/app/host/HostConnectionModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] bootstrap FastAPI backend application with CORS, security headers, and Uvicorn server -> `AppHost.startup()`
-- [ ] initialize SQLite database with WAL mode and coordinated write locks -> `AppHost.initialize_db()`
-- [ ] register and initialize all domain feature modules and background worker processes -> `AppHost.register_modules()`
-- [ ] provide global in-memory event bus and WebSocket broadcast channel -> `AppHost.broadcast_event()`
-- [ ] manage application graceful shutdown, process termination, and resource cleanup -> `AppHost.shutdown()`
+- [x] bootstrap FastAPI backend application with CORS, security headers, and Uvicorn server -> `AppHost.startup()`
+- [x] initialize SQLite database with WAL mode and coordinated write locks -> `AppHost.initialize_db()`
+- [x] register and initialize all domain feature modules and background worker processes -> `AppHost.register_modules()`
+- [x] provide global in-memory event bus and WebSocket broadcast channel -> `AppHost.broadcast_event()`
+- [x] manage application graceful shutdown, process termination, and resource cleanup -> `AppHost.shutdown()`
 
 ### Phase 1.2: Platform & Broker Connectivity
 
@@ -168,9 +168,9 @@ HaruQuantAI/
 - **Backend:** `app/host/transport.py`
 - **Frontend:** `ui/app/host/HostConnectionModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] ping remote and local server endpoints to verify network connectivity -> `ConnectionTest.ping_endpoint()`
-- [ ] measure round-trip latency and report packet loss -> `ConnectionTest.check_latency()`
-- [ ] diagnose DNS resolution and socket connection failures -> `ConnectionTest.diagnose_network()`
+- [x] ping remote and local server endpoints to verify network connectivity -> `ConnectionTest.ping_endpoint()`
+- [x] measure round-trip latency and report packet loss -> `ConnectionTest.check_latency()`
+- [x] diagnose DNS resolution and socket connection failures -> `ConnectionTest.diagnose_network()`
 
 #### `ConnectionLiveTest`
 *Feature:* Live trading account authentication and latency verification
@@ -266,10 +266,10 @@ HaruQuantAI/
 - **Backend:** `app/host/transport.py`
 - **Frontend:** `ui/app/host/HostConnectionModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] list existing broker and exchange connections -> `ServletConnection.list_connections()`
-- [ ] save or update connection credentials in SQLite -> `ServletConnection.save_connection()`
-- [ ] delete connection configuration and cached tokens -> `ServletConnection.delete_connection()`
-- [ ] test connection credentials and report latency status to frontend -> `ServletConnection.test_connection()`
+- [x] list existing broker and exchange connections -> `ServletConnection.list_connections()`
+- [x] save or update connection credentials in SQLite -> `ServletConnection.save_connection()`
+- [x] delete connection configuration and cached tokens -> `ServletConnection.delete_connection()`
+- [x] test connection credentials and report latency status to frontend -> `ServletConnection.test_connection()`
 
 #### `ServletConstants`
 *Feature:* System constants, environment paths, and runtime metadata endpoints
@@ -277,8 +277,8 @@ HaruQuantAI/
 - **Backend:** `app/host/transport.py`
 - **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] expose application version, build timestamp, and runtime environment paths -> `ServletConstants.get_constants()`
-- [ ] serve system resource limits, hardware concurrency specs, and supported timeframes -> `ServletConstants.get_system_specs()`
+- [x] expose application version, build timestamp, and runtime environment paths -> `ServletConstants.get_constants()`
+- [x] serve system resource limits, hardware concurrency specs, and supported timeframes -> `ServletConstants.get_system_specs()`
 
 #### `ServletProject`
 *Feature:* FastAPI project manifest persistence router
@@ -336,8 +336,8 @@ HaruQuantAI/
 - **Backend:** `app/host/settings.py`
 - **Frontend:** `ui/app/components/ThemeToggle.tsx`
 *Functional Requirements & Implementation:*
-- [ ] apply dark theme class to root HTML element and style Dockview headers -> `Theme.set_dark()`
-- [ ] provide dark mode color variables, background shades, and typography tokens -> `Theme.get_tokens()`
+- [x] apply dark theme class to root HTML element and style Dockview headers -> `Theme.set_dark()`
+- [x] provide dark mode color variables, background shades, and typography tokens -> `Theme.get_tokens()`
 
 #### `SkinLight`
 *Feature:* Tailwind CSS light theme tokens and palette definitions
@@ -345,8 +345,8 @@ HaruQuantAI/
 - **Backend:** `app/host/settings.py`
 - **Frontend:** `ui/app/components/ThemeToggle.tsx`
 *Functional Requirements & Implementation:*
-- [ ] provide light mode color variables, clean white/gray surfaces, and contrast borders -> `Theme.set_light()`
-- [ ] apply light theme styling to Dockview panels, TanStack tables, and charts -> `Theme.get_light_tokens()`
+- [x] provide light mode color variables, clean white/gray surfaces, and contrast borders -> `Theme.set_light()`
+- [x] apply light theme styling to Dockview panels, TanStack tables, and charts -> `Theme.get_light_tokens()`
 
 ---
 

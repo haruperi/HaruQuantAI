@@ -61,10 +61,19 @@ Key Capabilities:
     - FR-HOST-TRANSPORT-GATEWAY-APP: Assemble the FastAPI host gateway app and
       shell status endpoints (``/status``, ``/readiness``, ``/app-loaded``,
       ``/about``) mounted across root, ``/api/v1``, and ``/api/v2``.
+    - FR-HOST-TRANSPORT-CONNECTION-TEST: Validate remote and local endpoint
+      connectivity, measure round-trip latency, and diagnose network/DNS failures.
+    - FR-HOST-TRANSPORT-SERVLET-CONNECTION: REST endpoint router and controller
+      for broker and exchange connection configurations and connectivity checks.
+    - FR-HOST-TRANSPORT-SERVLET-CONSTANTS: Expose system constants, runtime
+      environment paths, hardware specs, and supported timeframes.
 
 Python API Usage:
     from app.host.transport import (
+        ConnectionTest,
         EventBus,
+        ServletConnection,
+        ServletConstants,
         create_host_app,
     )
 
@@ -83,13 +92,17 @@ import asyncio
 import json
 import os
 import secrets
+import socket
 import sys
 import threading
 import time
+import urllib.parse
 from collections import deque
 from collections.abc import AsyncGenerator, Callable, Sequence
+from contextlib import suppress
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any, Final
 
 from app.host.logging import get_access_logger, get_logger, redact_secrets
@@ -125,9 +138,11 @@ from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 __all__ = [
-    "ApiResponse",
+    "ConnectionTest",
     "EventBus",
     "HostEvent",
+    "ServletConnection",
+    "ServletConstants",
     "SettingsBatchUpdatePayload",
     "TransportMiddleware",
     "create_host_app",
@@ -137,9 +152,6 @@ __all__ = [
 
 logger = get_logger(__name__)
 access_logger = get_access_logger()
-
-# Type alias aligning with ARCHITECTURE.md and ui/app/host/transport.ts
-ApiResponse = StandardResponse
 
 CORE_EVENT_CHANNELS: Final[tuple[str, ...]] = (
     "jobs",
@@ -552,9 +564,6 @@ def get_global_event_bus() -> EventBus:
     return _GLOBAL_STATE.event_bus
 
 
-get_event_bus = get_global_event_bus
-
-
 # ============================================================================
 # ASGI Middleware & Exception Envelopes
 # ============================================================================
@@ -586,6 +595,9 @@ class TransportMiddleware:
                 headers = MutableHeaders(scope=message)
                 headers["X-Request-Id"] = req_id
                 headers["X-Response-Time-Ms"] = f"{duration_ms:.2f}"
+                headers["X-Content-Type-Options"] = "nosniff"
+                headers["X-Frame-Options"] = "DENY"
+                headers["Referrer-Policy"] = "no-referrer"
             await send(message)
 
         try:
@@ -627,6 +639,9 @@ class TransportMiddleware:
                 headers={
                     "X-Request-Id": req_id,
                     "X-Response-Time-Ms": f"{duration_ms:.2f}",
+                    "X-Content-Type-Options": "nosniff",
+                    "X-Frame-Options": "DENY",
+                    "Referrer-Policy": "no-referrer",
                 },
             )
             await response(scope, receive, send)
@@ -841,6 +856,326 @@ def _resolve_since_cursor(
 
 
 # ============================================================================
+# Platform Connectivity & Infrastructure Servlets (Phase 1.2 / 1.4)
+# ============================================================================
+
+CONNECTION_TEST_FR: Final[str] = "FR-HOST-TRANSPORT-CONNECTION-TEST"
+SERVLET_CONNECTION_FR: Final[str] = "FR-HOST-TRANSPORT-SERVLET-CONNECTION"
+SERVLET_CONSTANTS_FR: Final[str] = "FR-HOST-TRANSPORT-SERVLET-CONSTANTS"
+
+SUPPORTED_TIMEFRAMES: Final[tuple[str, ...]] = (
+    "1m",
+    "5m",
+    "15m",
+    "30m",
+    "1h",
+    "4h",
+    "1d",
+    "1w",
+)
+
+
+class ConnectionTest:
+    """Network reachability, latency probe, and socket diagnostic utility."""
+
+    @staticmethod
+    def ping_endpoint(endpoint: str, timeout: float = 3.0) -> dict[str, Any]:
+        """Ping remote or local server endpoint to verify network connectivity."""
+        raw_endpoint = endpoint.strip()
+        parsed = urllib.parse.urlparse(
+            raw_endpoint if "://" in raw_endpoint else f"tcp://{raw_endpoint}"
+        )
+        host = parsed.hostname or raw_endpoint
+        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+
+        start = time.perf_counter()
+        try:
+            with socket.create_connection((host, port), timeout=timeout):
+                latency_ms = (time.perf_counter() - start) * 1000.0
+                logger.info(
+                    "%s: Endpoint %s is reachable (latency=%.2fms).",
+                    CONNECTION_TEST_FR,
+                    raw_endpoint,
+                    latency_ms,
+                    extra={"fr_id": CONNECTION_TEST_FR, "endpoint": raw_endpoint},
+                )
+                return {
+                    "endpoint": raw_endpoint,
+                    "host": host,
+                    "port": port,
+                    "reachable": True,
+                    "latency_ms": round(latency_ms, 2),
+                    "error": None,
+                }
+        except OSError as err:
+            latency_ms = (time.perf_counter() - start) * 1000.0
+            logger.warning(
+                "%s: Endpoint %s is unreachable: %s",
+                CONNECTION_TEST_FR,
+                raw_endpoint,
+                err,
+                extra={
+                    "fr_id": CONNECTION_TEST_FR,
+                    "endpoint": raw_endpoint,
+                    "error": str(err),
+                },
+            )
+            return {
+                "endpoint": raw_endpoint,
+                "host": host,
+                "port": port,
+                "reachable": False,
+                "latency_ms": round(latency_ms, 2),
+                "error": str(err),
+            }
+
+    @staticmethod
+    def check_latency(
+        endpoint: str, samples: int = 3, timeout: float = 3.0
+    ) -> dict[str, Any]:
+        """Measure round-trip latency across multiple samples and report packet loss."""
+        num_samples = max(1, min(samples, 10))
+        latencies: list[float] = []
+        failures = 0
+        for _ in range(num_samples):
+            res = ConnectionTest.ping_endpoint(endpoint, timeout=timeout)
+            if res["reachable"]:
+                latencies.append(float(res["latency_ms"]))
+            else:
+                failures += 1
+
+        packet_loss_pct = (failures / num_samples) * 100.0
+        avg_lat = sum(latencies) / len(latencies) if latencies else 0.0
+        min_lat = min(latencies) if latencies else 0.0
+        max_lat = max(latencies) if latencies else 0.0
+
+        logger.info(
+            "%s: Latency check on %s: avg=%.2fms loss=%.1f%%.",
+            CONNECTION_TEST_FR,
+            endpoint,
+            avg_lat,
+            packet_loss_pct,
+            extra={"fr_id": CONNECTION_TEST_FR, "endpoint": endpoint},
+        )
+        return {
+            "endpoint": endpoint,
+            "samples": num_samples,
+            "packet_loss_pct": round(packet_loss_pct, 2),
+            "avg_latency_ms": round(avg_lat, 2),
+            "min_latency_ms": round(min_lat, 2),
+            "max_latency_ms": round(max_lat, 2),
+            "successful_samples": len(latencies),
+        }
+
+    @staticmethod
+    def diagnose_network(host: str, port: int | None = None) -> dict[str, Any]:
+        """Diagnose DNS resolution and socket connection parameters."""
+        resolved_ips: list[str] = []
+        dns_ok = False
+        dns_error: str | None = None
+
+        try:
+            addr_info = socket.getaddrinfo(host, port or 80, proto=socket.IPPROTO_TCP)
+            for item in addr_info:
+                ip = item[4][0]
+                if str(ip) not in resolved_ips:
+                    resolved_ips.append(str(ip))
+            dns_ok = True
+        except (socket.gaierror, OSError) as err:
+            dns_error = str(err)
+
+        probe_port = port or 80
+        reachable = False
+        reach_err: str | None = None
+        if dns_ok and resolved_ips:
+            try:
+                with socket.create_connection(
+                    (resolved_ips[0], probe_port), timeout=2.0
+                ):
+                    reachable = True
+            except OSError as err:
+                reach_err = str(err)
+
+        logger.info(
+            "%s: Network diagnostic for host=%s: dns=%s reachable=%s.",
+            CONNECTION_TEST_FR,
+            host,
+            dns_ok,
+            reachable,
+            extra={"fr_id": CONNECTION_TEST_FR, "host": host},
+        )
+        return {
+            "host": host,
+            "port": probe_port,
+            "dns_resolved": dns_ok,
+            "ip_addresses": resolved_ips,
+            "reachable": reachable,
+            "dns_error": dns_error,
+            "connection_error": reach_err,
+        }
+
+
+class ServletConnection:
+    """REST endpoint handler for broker and exchange connection configurations."""
+
+    def __init__(self, host_settings: Any = None) -> None:
+        """Initialize ServletConnection with optional settings container."""
+        self.settings = host_settings or settings
+        self._in_memory_connections: dict[str, dict[str, Any]] = {}
+
+    def list_connections(self) -> list[dict[str, Any]]:
+        """List existing broker and exchange connections."""
+        conns: dict[str, Any] = {}
+        try:
+            scope_data = self.settings.get_scope("connections")
+            if isinstance(scope_data, dict):
+                conns.update(scope_data)
+        except AttributeError, KeyError, RuntimeError:
+            pass
+        conns.update(self._in_memory_connections)
+        records: list[dict[str, Any]] = []
+        for cid, cdata in conns.items():
+            if isinstance(cdata, dict):
+                item = dict(cdata)
+                item.setdefault("connection_id", cid)
+                records.append(redact_secrets(item))
+            else:
+                records.append({"connection_id": cid, "value": cdata})
+        logger.info(
+            "%s: Listed %d connections.",
+            SERVLET_CONNECTION_FR,
+            len(records),
+            extra={"fr_id": SERVLET_CONNECTION_FR, "count": len(records)},
+        )
+        return records
+
+    def save_connection(
+        self, connection_id: str, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Save or update connection credentials in host settings."""
+        record = dict(data)
+        record["connection_id"] = connection_id
+        record["updated_at_utc"] = _now_utc_iso()
+        try:
+            self.settings.update_batch({"connections": {connection_id: record}})
+        except RevisionConflictError, RuntimeError, ValueError:
+            if hasattr(self.settings, "set_in_memory"):
+                self.settings.set_in_memory("connections", connection_id, record)
+        self._in_memory_connections[connection_id] = record
+        logger.info(
+            "%s: Saved connection '%s'.",
+            SERVLET_CONNECTION_FR,
+            connection_id,
+            extra={"fr_id": SERVLET_CONNECTION_FR, "connection_id": connection_id},
+        )
+        redacted = redact_secrets(record)
+        return dict(redacted) if isinstance(redacted, dict) else record
+
+    def delete_connection(self, connection_id: str) -> bool:
+        """Delete connection configuration and cached tokens."""
+        existed = False
+        try:
+            scope = self.settings.get_scope("connections")
+            if connection_id in scope:
+                existed = True
+                self.settings.update_batch({"connections": {connection_id: {}}})
+        except RevisionConflictError, RuntimeError, ValueError:
+            pass
+        if connection_id in self._in_memory_connections:
+            existed = True
+            del self._in_memory_connections[connection_id]
+        logger.info(
+            "%s: Deleted connection '%s' (existed=%s).",
+            SERVLET_CONNECTION_FR,
+            connection_id,
+            existed,
+            extra={"fr_id": SERVLET_CONNECTION_FR, "connection_id": connection_id},
+        )
+        return existed
+
+    def test_connection(
+        self, connection_id: str | None = None, endpoint: str | None = None
+    ) -> dict[str, Any]:
+        """Test connection credentials and report latency status."""
+        target_endpoint = endpoint
+        if not target_endpoint and connection_id:
+            conns = self.list_connections()
+            for c in conns:
+                if c.get("connection_id") == connection_id:
+                    target_endpoint = c.get("endpoint") or c.get("host")
+                    break
+        if not target_endpoint:
+            target_endpoint = "127.0.0.1"
+
+        result = ConnectionTest.ping_endpoint(str(target_endpoint))
+        logger.info(
+            "%s: Tested connection (id=%s endpoint=%s reachable=%s).",
+            SERVLET_CONNECTION_FR,
+            connection_id,
+            target_endpoint,
+            result["reachable"],
+            extra={"fr_id": SERVLET_CONNECTION_FR, "connection_id": connection_id},
+        )
+        return {
+            "connection_id": connection_id,
+            "endpoint": target_endpoint,
+            "test_result": result,
+            "timestamp": _now_utc_iso(),
+        }
+
+
+class ServletConstants:
+    """System constants, environment paths, and runtime metadata endpoints."""
+
+    def __init__(
+        self,
+        session_mgr: SessionManager | None = None,
+        resource_mgr: Any | None = None,
+    ) -> None:
+        """Initialize ServletConstants with session and resource managers."""
+        self.session_mgr = session_mgr or session_manager
+        self.resource_mgr = resource_mgr
+
+    def get_constants(self) -> dict[str, Any]:
+        """Expose application version, build timestamp, and runtime paths."""
+        data = {
+            "application": "HaruQuantAI",
+            "version": "1.0.0",
+            "build_timestamp": "2026-10-18T00:00:00Z",
+            "runtime": f"CPython {sys.version.split()[0]} (FastAPI)",
+            "host_instance_id": self.session_mgr.host_instance_id,
+            "data_directory": str(Path.cwd() / "data"),
+            "core_channels": list(CORE_EVENT_CHANNELS),
+            "supported_timeframes": list(SUPPORTED_TIMEFRAMES),
+        }
+        logger.info(
+            "%s: Retrieved system constants.",
+            SERVLET_CONSTANTS_FR,
+            extra={"fr_id": SERVLET_CONSTANTS_FR},
+        )
+        return data
+
+    def get_system_specs(self) -> dict[str, Any]:
+        """Serve system resource limits, concurrency specs, and supported timeframes."""
+        cpu_count = max(1, os.cpu_count() or 1)
+        specs: dict[str, Any] = {
+            "cpu_cores": cpu_count,
+            "hardware_concurrency": cpu_count,
+            "supported_timeframes": list(SUPPORTED_TIMEFRAMES),
+            "memory_headroom": check_memory_headroom(),
+            "worker_capacity": get_worker_capacity(),
+            "system_health": get_system_health(),
+        }
+        logger.info(
+            "%s: Retrieved system specs (cores=%d).",
+            SERVLET_CONSTANTS_FR,
+            cpu_count,
+            extra={"fr_id": SERVLET_CONSTANTS_FR, "cpu_cores": cpu_count},
+        )
+        return specs
+
+
+# ============================================================================
 # Transport Service & FastAPI Router (FR-HOST-TRANSPORT-GATEWAY-APP)
 # ============================================================================
 
@@ -869,6 +1204,10 @@ class TransportGatewayService:
         self.heartbeat_sec = heartbeat_sec
         self.started_at = time.monotonic()
         self.app_loaded_acknowledged = False
+        self.connection_servlet = ServletConnection(host_settings=settings)
+        self.constants_servlet = ServletConstants(
+            session_mgr=self.session_mgr, resource_mgr=self.resource_mgr
+        )
 
     def verify_request_session(
         self, request: Request, query_token: str | None = None
@@ -1170,6 +1509,119 @@ class TransportGatewayService:
             side_effects=True,
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
+
+    async def handle_list_connections(self, request: Request) -> JSONResponse:
+        """List configured broker and exchange connections."""
+        req_id = request.headers.get("x-request-id")
+        denied = self._require_scope(request, "connections:read")
+        if denied is not None:
+            return denied
+        records = self.connection_servlet.list_connections()
+        resp = StandardResponse.success(
+            data={"connections": records, "count": len(records)},
+            message="Connections retrieved successfully.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    async def handle_save_connection(self, request: Request) -> JSONResponse:
+        """Save or update broker/exchange connection credentials."""
+        req_id = request.headers.get("x-request-id")
+        denied = self._require_scope(request, "connections:write")
+        if denied is not None:
+            return denied
+        raw_body: Any = None
+        with suppress(ValueError):
+            raw_body = await request.json()
+        body: dict[str, Any] = raw_body if isinstance(raw_body, dict) else {}
+        cid = str(body.get("connection_id") or f"conn-{secrets.token_hex(4)}")
+        saved = self.connection_servlet.save_connection(cid, body)
+        resp = StandardResponse.success(
+            data=saved,
+            message=f"Connection '{cid}' saved successfully.",
+            request_id=req_id,
+            side_effects=True,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    async def handle_delete_connection(
+        self, connection_id: str, request: Request
+    ) -> JSONResponse:
+        """Delete broker/exchange connection configuration."""
+        req_id = request.headers.get("x-request-id")
+        denied = self._require_scope(request, "connections:write")
+        if denied is not None:
+            return denied
+        deleted = self.connection_servlet.delete_connection(connection_id)
+        if not deleted:
+            err = StandardError(
+                code="NOT_FOUND",
+                message=f"Connection '{connection_id}' not found.",
+            )
+            fail_resp = StandardResponse.failure(
+                message="Connection deletion failed.",
+                error=err,
+                request_id=req_id,
+            )
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND, content=fail_resp.to_dict()
+            )
+        deleted_data: dict[str, Any] = {
+            "connection_id": connection_id,
+            "deleted": True,
+        }
+        ok_resp = StandardResponse.success(
+            data=deleted_data,
+            message=f"Connection '{connection_id}' deleted successfully.",
+            request_id=req_id,
+            side_effects=True,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
+
+    async def handle_test_connection(
+        self, request: Request, connection_id: str | None = None
+    ) -> JSONResponse:
+        """Test network reachability and latency for a connection or endpoint."""
+        req_id = request.headers.get("x-request-id")
+        denied = self._require_scope(request, "connections:read")
+        if denied is not None:
+            return denied
+        endpoint = None
+        with suppress(ValueError):
+            body = await request.json()
+            if isinstance(body, dict):
+                endpoint = body.get("endpoint")
+                if not connection_id:
+                    connection_id = body.get("connection_id")
+        res = self.connection_servlet.test_connection(connection_id, endpoint)
+        resp = StandardResponse.success(
+            data=res,
+            message="Connection reachability test completed.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    async def handle_get_constants(self, request: Request) -> JSONResponse:
+        """Expose application constants, version, and runtime paths."""
+        req_id = request.headers.get("x-request-id")
+        data = self.constants_servlet.get_constants()
+        resp = StandardResponse.success(
+            data=data,
+            message="Constants retrieved successfully.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+
+    async def handle_get_system_specs(self, request: Request) -> JSONResponse:
+        """Expose system resource limits, concurrency specs, and timeframes."""
+        req_id = request.headers.get("x-request-id")
+        data = self.constants_servlet.get_system_specs()
+        resp = StandardResponse.success(
+            data=data,
+            message="System specs retrieved successfully.",
+            request_id=req_id,
+        )
+        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
 
     def _resolve_resource_mgr(self, request: Request) -> Any | None:
         """Return configured ResourceManager or resolve from FastAPI app.state."""
@@ -1613,6 +2065,27 @@ def create_transport_router(
     router.add_api_route("/events/publish", service.handle_publish, methods=["POST"])
     router.add_api_route("/events/snapshot", service.handle_snapshot, methods=["GET"])
     router.add_api_route("/events/channels", service.handle_channels, methods=["GET"])
+    router.add_api_route(
+        "/connections", service.handle_list_connections, methods=["GET"]
+    )
+    router.add_api_route(
+        "/connections", service.handle_save_connection, methods=["POST"]
+    )
+    router.add_api_route(
+        "/connections/test", service.handle_test_connection, methods=["POST"]
+    )
+    router.add_api_route(
+        "/connections/{connection_id}",
+        service.handle_delete_connection,
+        methods=["DELETE"],
+    )
+    router.add_api_route(
+        "/connections/{connection_id}/test",
+        service.handle_test_connection,
+        methods=["POST"],
+    )
+    router.add_api_route("/constants", service.handle_get_constants, methods=["GET"])
+    router.add_api_route("/specs", service.handle_get_system_specs, methods=["GET"])
     router.add_api_websocket_route("/ws", service.handle_websocket)
 
     logger.info(
