@@ -319,9 +319,11 @@ class Timeframe(StrEnum):
         return self.to_seconds() // 60
 
     @classmethod
-    def from_string(cls, name: str) -> Timeframe:
+    def from_string(cls, name: str | Timeframe) -> Timeframe:
         """Parse timeframe from common string representations."""
-        cleaned = name.strip().upper()
+        if isinstance(name, cls):
+            return name
+        cleaned = str(name).strip().upper()
         mapping: dict[str, Timeframe] = {
             "M1": cls.PERIOD_M1,
             "1M": cls.PERIOD_M1,
@@ -378,3 +380,18 @@ class Timeframe(StrEnum):
         if cleaned in mapping:
             return mapping[cleaned]
         raise ValueError(f"Unknown timeframe identifier: {name!r}")
+
+    @classmethod
+    def resolve(
+        cls, val: str | Timeframe | None, default: Timeframe | None = None
+    ) -> Timeframe:
+        """Safely resolve a timeframe representation to a canonical Timeframe enum."""
+        target_default = default if default is not None else cls.PERIOD_M1
+        if val is None:
+            return target_default
+        if isinstance(val, cls):
+            return val
+        try:
+            return cls.from_string(val)
+        except ValueError, TypeError:
+            return target_default

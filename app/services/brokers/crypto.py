@@ -1,14 +1,15 @@
-"""Binance cryptocurrency market data and symbol metadata broker implementation.
+"""Binance and cryptocurrency exchange market data and symbol metadata broker.
 
 Description:
     Implements a cryptocurrency market data and symbol catalog broker connecting
-    directly to Binance public REST APIs (Spot, USDT-M, and Coin-M).
-    Conforms directly to the canonical `TradingBackend` protocol via `DataBrokerBackend`.
-    Provides normalized historical candlestick bars (`MarketData.Bars`), trade ticks
+    directly to Binance (Spot, USDT-M, and Coin-M) and supported exchange venues
+    (Bitfinex, Coinbase, and Poloniex). Conforms directly to the canonical
+    `TradingBackend` protocol via `DataBrokerBackend`. Provides normalized
+    historical candlestick bars (`MarketData.Bars`), trade ticks
     (`MarketData.Ticks`), and symbol specifications (`SymbolInfo`).
 
 Purpose:
-    FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE: Binance Exchange Integration.
+    FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE: Cryptocurrency exchange integrations.
 
 Key Capabilities:
     - FR-BROKER-BINANCE-SYMBOLS: Binance ExchangeInfo Symbol Resolution
@@ -19,12 +20,21 @@ Key Capabilities:
       Associated: `[BinanceBroker.fetch_bars()]`, `[BinanceBroker.fetch_ticks()]`
       Logging: Emits INFO log with bar counts retrieved from Binance API, and
       ERROR log on network or parsing failure.
+    - FR-BROKER-BITFINEX-CANDLES: Fetch and normalize historical candles from Bitfinex API v2.
+      Associated: `[BitfinexExchangeAdapter.fetch_bars()]`
+      Logging: Emits DEBUG when requesting candles and logging received record counts.
+    - FR-BROKER-COINBASE-CANDLES: Fetch and normalize historical candles from Coinbase API.
+      Associated: `[CoinbaseExchangeAdapter.fetch_bars()]`
+      Logging: Emits DEBUG when requesting candles and logging received record counts.
+    - FR-BROKER-POLONIEX-CANDLES: Fetch and normalize historical candles from Poloniex API.
+      Associated: `[PoloniexExchangeAdapter.fetch_bars()]`
+      Logging: Emits DEBUG when requesting candles and logging received record counts.
 
 Python API Usage:
     ```python
     from app.services.brokers.crypto import BinanceBroker
     from app.services.include.data import get_historical_bars, get_ticks
-    from app.workspace.data_manager import Timeframe
+    from app.services.include.enums import Timeframe
 
     broker = BinanceBroker()
     bars = await get_historical_bars(broker, "BTCUSDT", Timeframe.PERIOD_H1, count=5)
@@ -39,8 +49,10 @@ CLI Usage:
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import Any, override
 
+import requests
 from app.host.discovery import PluginHostContext
 from app.host.logging import get_logger
 from app.services.brokers._http import create_http_session, execute_bounded_get
@@ -56,7 +68,7 @@ from app.services.brokers.capabilities import (
 )
 from app.services.include.contracts import SymbolInfo
 from app.services.include.data import DataBrokerBackend
-from app.workspace.data_manager import Timeframe
+from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
 
@@ -70,41 +82,21 @@ BINANCE_SPOT_BASE_URL = SPOT_BASE_URL
 BINANCE_FUTURES_USDT_BASE_URL = FUTURES_USDT_BASE_URL
 BINANCE_FUTURES_COIN_BASE_URL = FUTURES_COIN_BASE_URL
 
-TIMEFRAME_MAP: dict[str, str] = {
-    "M1": "1m",
-    "1M": "1m",
-    Timeframe.PERIOD_M1.value: "1m",
-    "M3": "3m",
-    "3M": "3m",
-    Timeframe.PERIOD_M3.value: "3m",
-    "M5": "5m",
-    "5M": "5m",
-    Timeframe.PERIOD_M5.value: "5m",
-    "M15": "15m",
-    "15M": "15m",
-    Timeframe.PERIOD_M15.value: "15m",
-    "M30": "30m",
-    "30M": "30m",
-    Timeframe.PERIOD_M30.value: "30m",
-    "H1": "1h",
-    "1H": "1h",
-    Timeframe.PERIOD_H1.value: "1h",
-    "H2": "2h",
-    "2H": "2h",
-    Timeframe.PERIOD_H2.value: "2h",
-    "H4": "4h",
-    "4H": "4h",
-    Timeframe.PERIOD_H4.value: "4h",
-    "D1": "1d",
-    "1D": "1d",
-    Timeframe.PERIOD_D1.value: "1d",
-    "W1": "1w",
-    "1W": "1w",
-    Timeframe.PERIOD_W1.value: "1w",
-    "MN1": "1M",
-    "1MN": "1M",
-    Timeframe.PERIOD_MN1.value: "1M",
+BINANCE_TIMEFRAME_MAP: dict[Timeframe, str] = {
+    Timeframe.PERIOD_M1: "1m",
+    Timeframe.PERIOD_M3: "3m",
+    Timeframe.PERIOD_M5: "5m",
+    Timeframe.PERIOD_M15: "15m",
+    Timeframe.PERIOD_M30: "30m",
+    Timeframe.PERIOD_H1: "1h",
+    Timeframe.PERIOD_H2: "2h",
+    Timeframe.PERIOD_H4: "4h",
+    Timeframe.PERIOD_D1: "1d",
+    Timeframe.PERIOD_W1: "1w",
+    Timeframe.PERIOD_MN1: "1M",
 }
+
+TIMEFRAME_MAP = BINANCE_TIMEFRAME_MAP
 
 DEFAULT_CRYPTO_SYMBOLS = [
     "BTCUSDT",
@@ -129,14 +121,344 @@ __all__ = [
     "BINANCE_FUTURES_COIN_BASE_URL",
     "BINANCE_FUTURES_USDT_BASE_URL",
     "BINANCE_SPOT_BASE_URL",
+    "BINANCE_TIMEFRAME_MAP",
+    "BITFINEX_CANDLES_FR",
+    "BITFINEX_TIMEFRAME_MAP",
     "BinanceBroker",
+    "BitfinexExchangeAdapter",
+    "COINBASE_CANDLES_FR",
+    "COINBASE_GRANULARITY_MAP",
+    "COINBASE_SUPPORTED_GRANULARITIES",
+    "CoinbaseExchangeAdapter",
     "CryptoBroker",
     "PLUGIN_MANIFEST",
+    "POLONIEX_CANDLES_FR",
+    "POLONIEX_INTERVAL_MAP",
+    "PoloniexExchangeAdapter",
+    "TIMEFRAME_MAP",
     "_calc_digits",
     "_map_timeframe",
     "create_adapter",
     "main",
 ]
+
+BITFINEX_CANDLES_FR = "FR-BROKER-BITFINEX-CANDLES"
+COINBASE_CANDLES_FR = "FR-BROKER-COINBASE-CANDLES"
+POLONIEX_CANDLES_FR = "FR-BROKER-POLONIEX-CANDLES"
+
+BITFINEX_TIMEFRAME_MAP: dict[Timeframe, str] = {
+    Timeframe.PERIOD_M1: "1m",
+    Timeframe.PERIOD_M5: "5m",
+    Timeframe.PERIOD_M15: "15m",
+    Timeframe.PERIOD_M30: "30m",
+    Timeframe.PERIOD_H1: "1h",
+    Timeframe.PERIOD_H3: "3h",
+    Timeframe.PERIOD_H6: "6h",
+    Timeframe.PERIOD_H12: "12h",
+    Timeframe.PERIOD_D1: "1D",
+    Timeframe.PERIOD_W1: "1W",
+    Timeframe.PERIOD_MN1: "1M",
+}
+
+COINBASE_SUPPORTED_GRANULARITIES: frozenset[int] = frozenset(
+    {60, 300, 900, 3600, 21600, 86400}
+)
+
+COINBASE_GRANULARITY_MAP: dict[Timeframe, int] = {
+    Timeframe.PERIOD_M1: 60,
+    Timeframe.PERIOD_M5: 300,
+    Timeframe.PERIOD_M15: 900,
+    Timeframe.PERIOD_H1: 3600,
+    Timeframe.PERIOD_H6: 21600,
+    Timeframe.PERIOD_D1: 86400,
+}
+
+POLONIEX_INTERVAL_MAP: dict[Timeframe, str] = {
+    Timeframe.PERIOD_M1: "MINUTE_1",
+    Timeframe.PERIOD_M5: "MINUTE_5",
+    Timeframe.PERIOD_M15: "MINUTE_15",
+    Timeframe.PERIOD_M30: "MINUTE_30",
+    Timeframe.PERIOD_H1: "HOUR_1",
+    Timeframe.PERIOD_H2: "HOUR_2",
+    Timeframe.PERIOD_H4: "HOUR_4",
+    Timeframe.PERIOD_H6: "HOUR_6",
+    Timeframe.PERIOD_H12: "HOUR_12",
+    Timeframe.PERIOD_D1: "DAY_1",
+    Timeframe.PERIOD_W1: "WEEK_1",
+    Timeframe.PERIOD_MN1: "MONTH_1",
+}
+
+
+class BitfinexExchangeAdapter:
+    """Read-only market data adapter for Bitfinex exchange."""
+
+    BASE_URL = "https://api-pub.bitfinex.com"
+
+    def __init__(self, session: requests.Session | None = None) -> None:
+        self.session = session or create_http_session("HaruQuantAI-BitfinexAdapter/1.0")
+
+    def fetch_bars(
+        self,
+        *,
+        symbol: str,
+        timeframe: str,
+        start: int = 0,
+        end: int = 0,
+        count: int = 100,
+        limit: int = 1000,
+        token: CancellationToken | None = None,
+        **kwargs: Any,
+    ) -> list[dict[str, Any]]:
+        """Fetch historical candlestick bars from Bitfinex v2 candles endpoint."""
+        sym = symbol.strip().upper()
+        if not sym.startswith("T"):
+            sym = f"t{sym}"
+
+        parsed_tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
+        tf = BITFINEX_TIMEFRAME_MAP.get(parsed_tf, "1m")
+        url = f"{self.BASE_URL}/v2/candles/trade:{tf}:{sym}/hist"
+
+        target_limit = min(max(count, limit), 1000)
+        params: dict[str, Any] = {"limit": target_limit, "sort": 1}
+        if start and start > 0:
+            params["start"] = start * 1000 if start < 100_000_000_000 else start
+        if end and end > 0:
+            params["end"] = end * 1000 if end < 100_000_000_000 else end
+
+        resp = execute_bounded_get(
+            self.session,
+            url,
+            params=params,
+            token=token,
+            provider="crypto:bitfinex",
+        )
+        if resp.status_code != 200:
+            logger.warning(
+                "%s: Bitfinex returned status %d for %s",
+                BITFINEX_CANDLES_FR,
+                resp.status_code,
+                sym,
+            )
+            return []
+
+        payload = resp.json()
+        if not isinstance(payload, list):
+            return []
+
+        rows: list[dict[str, Any]] = []
+        for item in payload:
+            if not isinstance(item, list) or len(item) < 6:
+                continue
+            # Layout: [MTS, OPEN, CLOSE, HIGH, LOW, VOLUME]
+            mts, o, c, h, l, v = item[0], item[1], item[2], item[3], item[4], item[5]
+            rows.append(
+                {
+                    "time": int(mts // 1000),
+                    "open": float(o),
+                    "high": float(h),
+                    "low": float(l),
+                    "close": float(c),
+                    "tick_volume": int(v) if v else 1,
+                    "spread": 0,
+                    "real_volume": int(v) if v else 1,
+                }
+            )
+
+        rows.sort(key=lambda r: r["time"])
+        logger.debug(
+            "%s: Retrieved %d bars for %s", BITFINEX_CANDLES_FR, len(rows), sym
+        )
+        return rows
+
+
+class CoinbaseExchangeAdapter:
+    """Read-only market data adapter for Coinbase exchange."""
+
+    BASE_URL = "https://api.exchange.coinbase.com"
+
+    def __init__(self, session: requests.Session | None = None) -> None:
+        self.session = session or create_http_session("HaruQuantAI-CoinbaseAdapter/1.0")
+
+    def fetch_bars(
+        self,
+        *,
+        symbol: str,
+        timeframe: str,
+        start: int = 0,
+        end: int = 0,
+        count: int = 100,
+        limit: int = 300,
+        token: CancellationToken | None = None,
+        **kwargs: Any,
+    ) -> list[dict[str, Any]]:
+        """Fetch historical candlestick bars from Coinbase products candles endpoint."""
+        sym = symbol.strip().upper()
+        if "-" not in sym:
+            if sym.endswith("USDT"):
+                sym = f"{sym[:-4]}-USDT"
+            elif sym.endswith("USD"):
+                sym = f"{sym[:-3]}-USD"
+
+        parsed_tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
+        sec = parsed_tf.to_seconds()
+        gran = sec if sec in COINBASE_SUPPORTED_GRANULARITIES else 60
+        url = f"{self.BASE_URL}/products/{sym}/candles"
+
+        params: dict[str, Any] = {"granularity": gran}
+        if start and start > 0:
+            ts = start if start < 100_000_000_000 else start // 1000
+            params["start"] = datetime.fromtimestamp(ts, tz=UTC).isoformat()
+        if end and end > 0:
+            ts = end if end < 100_000_000_000 else end // 1000
+            params["end"] = datetime.fromtimestamp(ts, tz=UTC).isoformat()
+
+        resp = execute_bounded_get(
+            self.session,
+            url,
+            params=params,
+            token=token,
+            provider="crypto:coinbase",
+        )
+        if resp.status_code != 200:
+            logger.warning(
+                "%s: Coinbase returned status %d for %s",
+                COINBASE_CANDLES_FR,
+                resp.status_code,
+                sym,
+            )
+            return []
+
+        payload = resp.json()
+        if not isinstance(payload, list):
+            return []
+
+        rows: list[dict[str, Any]] = []
+        for item in payload:
+            if not isinstance(item, list) or len(item) < 6:
+                continue
+            # Layout: [time, low, high, open, close, volume]
+            t, low_val, high_val, open_val, close_val, vol = (
+                item[0],
+                item[1],
+                item[2],
+                item[3],
+                item[4],
+                item[5],
+            )
+            rows.append(
+                {
+                    "time": int(t),
+                    "open": float(open_val),
+                    "high": float(high_val),
+                    "low": float(low_val),
+                    "close": float(close_val),
+                    "tick_volume": int(vol) if vol else 1,
+                    "spread": 0,
+                    "real_volume": int(vol) if vol else 1,
+                }
+            )
+
+        rows.sort(key=lambda r: r["time"])
+        target_count = count if count > 0 else limit
+        if target_count and len(rows) > target_count:
+            rows = rows[-target_count:]
+
+        logger.debug(
+            "%s: Retrieved %d bars for %s", COINBASE_CANDLES_FR, len(rows), sym
+        )
+        return rows
+
+
+class PoloniexExchangeAdapter:
+    """Read-only market data adapter for Poloniex exchange."""
+
+    BASE_URL = "https://api.poloniex.com"
+
+    def __init__(self, session: requests.Session | None = None) -> None:
+        self.session = session or create_http_session("HaruQuantAI-PoloniexAdapter/1.0")
+
+    def fetch_bars(
+        self,
+        *,
+        symbol: str,
+        timeframe: str,
+        start: int = 0,
+        end: int = 0,
+        count: int = 100,
+        limit: int = 500,
+        token: CancellationToken | None = None,
+        **kwargs: Any,
+    ) -> list[dict[str, Any]]:
+        """Fetch historical candlestick bars from Poloniex markets candles endpoint."""
+        sym = symbol.strip().upper()
+        if "_" not in sym:
+            if sym.endswith("USDT"):
+                sym = f"{sym[:-4]}_USDT"
+            elif sym.endswith("USD"):
+                sym = f"{sym[:-3]}_USD"
+
+        parsed_tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
+        interval = POLONIEX_INTERVAL_MAP.get(parsed_tf, "MINUTE_1")
+        url = f"{self.BASE_URL}/markets/{sym}/candles"
+
+        target_limit = min(max(count, limit), 500)
+        params: dict[str, Any] = {"interval": interval, "limit": target_limit}
+        if start and start > 0:
+            params["startTime"] = start * 1000 if start < 100_000_000_000 else start
+        if end and end > 0:
+            params["endTime"] = end * 1000 if end < 100_000_000_000 else end
+
+        resp = execute_bounded_get(
+            self.session,
+            url,
+            params=params,
+            token=token,
+            provider="crypto:poloniex",
+        )
+        if resp.status_code != 200:
+            logger.warning(
+                "%s: Poloniex returned status %d for %s",
+                POLONIEX_CANDLES_FR,
+                resp.status_code,
+                sym,
+            )
+            return []
+
+        payload = resp.json()
+        if not isinstance(payload, list):
+            return []
+
+        rows: list[dict[str, Any]] = []
+        for item in payload:
+            if not isinstance(item, list) or len(item) < 13:
+                continue
+            # Layout: [low, high, open, close, amount, quantity, buyTakerAmount, buyTakerQuantity, tradeCount, ts, weightedAverage, interval, startTime, closeTime]
+            low_val, high_val, open_val, close_val, qty, start_ts = (
+                item[0],
+                item[1],
+                item[2],
+                item[3],
+                item[5],
+                item[12],
+            )
+            rows.append(
+                {
+                    "time": int(start_ts // 1000),
+                    "open": float(open_val),
+                    "high": float(high_val),
+                    "low": float(low_val),
+                    "close": float(close_val),
+                    "tick_volume": int(float(qty)) if qty else 1,
+                    "spread": 0,
+                    "real_volume": int(float(qty)) if qty else 1,
+                }
+            )
+
+        rows.sort(key=lambda r: r["time"])
+        logger.debug(
+            "%s: Retrieved %d bars for %s", POLONIEX_CANDLES_FR, len(rows), sym
+        )
+        return rows
 
 
 def _calc_digits(tick_size: float) -> int:
@@ -149,10 +471,10 @@ def _calc_digits(tick_size: float) -> int:
     return 0
 
 
-def _map_timeframe(timeframe: str) -> str:
+def _map_timeframe(timeframe: str | Timeframe) -> str:
     """Map timeframe to Binance interval string."""
-    tf_str = str(timeframe).upper().strip()
-    return TIMEFRAME_MAP.get(tf_str, "1m")
+    tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
+    return BINANCE_TIMEFRAME_MAP.get(tf, "1m")
 
 
 class BinanceBroker(DataBrokerBackend):
@@ -225,26 +547,14 @@ class BinanceBroker(DataBrokerBackend):
         """Resolve and cache sub-exchange adapters."""
         if exch not in self._exchange_adapters:
             if exch == "bitfinex":
-                from app.services.brokers.exchanges.bitfinex import (
-                    BitfinexExchangeAdapter,
-                )
-
                 self._exchange_adapters["bitfinex"] = BitfinexExchangeAdapter(
                     session=self.session
                 )
             elif exch == "coinbase":
-                from app.services.brokers.exchanges.coinbase import (
-                    CoinbaseExchangeAdapter,
-                )
-
                 self._exchange_adapters["coinbase"] = CoinbaseExchangeAdapter(
                     session=self.session
                 )
             elif exch == "poloniex":
-                from app.services.brokers.exchanges.poloniex import (
-                    PoloniexExchangeAdapter,
-                )
-
                 self._exchange_adapters["poloniex"] = PoloniexExchangeAdapter(
                     session=self.session
                 )
@@ -280,10 +590,10 @@ class BinanceBroker(DataBrokerBackend):
             sym = sym[:-5] + "USDT"
         return sym
 
-    def _map_timeframe(self, timeframe: str) -> str:
+    def _map_timeframe(self, timeframe: str | Timeframe) -> str:
         """Map timeframe to Binance interval string."""
-        tf_str = str(timeframe).upper().strip()
-        return TIMEFRAME_MAP.get(tf_str, "1h")
+        tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_H1)
+        return BINANCE_TIMEFRAME_MAP.get(tf, "1h")
 
     @override
     def symbol_info(self, symbol: str) -> SymbolInfo:

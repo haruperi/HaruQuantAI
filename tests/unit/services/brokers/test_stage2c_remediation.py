@@ -832,9 +832,11 @@ def test_http_transport_edge_cases() -> None:
 
 def test_crypto_exchange_adapters_read_bars() -> None:
     """Validate Bitfinex, Coinbase, and Poloniex exchange adapters."""
-    from app.services.brokers.exchanges.bitfinex import BitfinexExchangeAdapter
-    from app.services.brokers.exchanges.coinbase import CoinbaseExchangeAdapter
-    from app.services.brokers.exchanges.poloniex import PoloniexExchangeAdapter
+    from app.services.brokers.crypto import (
+        BitfinexExchangeAdapter,
+        CoinbaseExchangeAdapter,
+        PoloniexExchangeAdapter,
+    )
 
     session = requests.Session()
 
@@ -942,9 +944,11 @@ def test_additional_coverage_boost() -> None:
     )
     from app.services.brokers._http import create_http_session, execute_bounded_get
     from app.services.brokers._native_history import decode_fxt_bytes
-    from app.services.brokers.exchanges.bitfinex import BitfinexExchangeAdapter
-    from app.services.brokers.exchanges.coinbase import CoinbaseExchangeAdapter
-    from app.services.brokers.exchanges.poloniex import PoloniexExchangeAdapter
+    from app.services.brokers.crypto import (
+        BitfinexExchangeAdapter,
+        CoinbaseExchangeAdapter,
+        PoloniexExchangeAdapter,
+    )
 
     # _file_history branches
     assert parse_delimited_ticks("") == []
