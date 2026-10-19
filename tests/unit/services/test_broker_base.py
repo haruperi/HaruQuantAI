@@ -44,11 +44,11 @@ class TestBrokerClient:
         """Verify default base class methods and lifecycle hooks."""
         client = BrokerClient("base_client")
         assert client.name == "base_client"
-        assert not client.connected
+        assert bool(client.connected) is False
         client.connect()
-        assert client.connected
+        assert bool(client.connected) is True
         client.disconnect()
-        assert not client.connected
+        assert bool(client.connected) is False
 
         info = client.get_symbol_info("EURUSD")
         assert isinstance(info, SymbolInfo)
@@ -69,23 +69,23 @@ class TestTradingClient:
         """Verify default trading class methods and lifecycle hooks."""
         client = TradingClient("base_trading")
         assert client.name == "base_trading"
-        assert not client.is_armed
+        assert bool(client.is_armed) is False
         client.arm()
-        assert client.is_armed
+        assert bool(client.is_armed) is True
         client.disarm()
-        assert not client.is_armed
+        assert bool(client.is_armed) is False
 
         async def run_lifecycle() -> None:
             await client.start()
-            assert client.connected
+            assert bool(client.connected) is True
             await client.wait_connected()
-            assert client.connected
+            assert bool(client.connected) is True
             await client.close()
-            assert not client.connected
+            assert bool(client.connected) is False
 
             async with client as c:
                 assert c is client
-                assert client.connected
+                assert bool(client.connected) is True
 
             with pytest.raises(
                 NotImplementedError,
