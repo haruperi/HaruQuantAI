@@ -1,4 +1,3 @@
-# ruff: noqa: INP001
 """Update operations for operational database tables.
 
 Description:
@@ -12,10 +11,10 @@ Purpose:
     FEAT-HOST-PERSISTENCE: Host platform and workspace isolated SQLite persistence.
 
 Key Capabilities:
-    - FR-HOST-PERSISTENCE-UPDATE-BY-PK: Atomic record update targeting table PK.
-      Associated: `update_row_by_pk()`, `update_host_setting()`,
-      `update_host_session_status()`, `update_host_job()`, `update_datamgr_broker()`,
-      `update_datamgr_dataset()`, `update_datamgr_instrument()`
+    - FR-HOST-PERSISTENCE-UPDATE-BY-PK: Atomic record update targeting table PK
+      with optional optimistic revision compare-and-set.
+      Associated: `update_row_by_pk()`, `update_record()`, `update_entity()`,
+      and 25 domain-specific update helpers.
       Logging: DEBUG emitted on successful update with affected row count; WARNING
       when no rows matched; ERROR on constraint or execution failure.
     - FR-HOST-PERSISTENCE-BATCH-SETTINGS-REVISION: Atomic batch settings upsert
@@ -27,7 +26,12 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.host.persistence.create import get_connection
-    from app.host.persistence.update import update_host_setting, update_row_by_pk
+    from app.host.persistence.update import (
+        update_entity,
+        update_host_setting,
+        update_record,
+        update_row_by_pk,
+    )
 
     conn = get_connection("data/database/haruquantai.db")
     updated = update_host_setting(conn, "system", "theme", '{"theme": "dark"}')
@@ -55,6 +59,7 @@ from app.host.persistence.create import (
     TABLE_PRIMARY_KEYS,
     PersistenceError,
     current_utc_iso,
+    ensure_table_schema,
 )
 from app.host.persistence.read import resolve_connection
 
@@ -62,6 +67,7 @@ logger = get_logger(__name__)
 
 UPDATE_FR = "FR-HOST-PERSISTENCE-UPDATE-BY-PK"
 BATCH_SETTINGS_FR = "FR-HOST-PERSISTENCE-BATCH-SETTINGS-REVISION"
+BATCH_SETTINGS_REVISION_FR = BATCH_SETTINGS_FR
 
 
 class RevisionConflictError(PersistenceError):
@@ -75,12 +81,24 @@ class RevisionConflictError(PersistenceError):
             f"but current database revision is {current_revision}."
         )
 
+    @property
+    def expected(self) -> int:
+        """Alias for expected_revision."""
+        return self.expected_revision
+
+    @property
+    def current(self) -> int:
+        """Alias for current_revision."""
+        return self.current_revision
+
 
 def update_row_by_pk(
     conn: sqlite3.Connection,
     table: str,
     pk_values: Mapping[str, Any],
     updates: Mapping[str, Any],
+    *,
+    commit: bool = True,
 ) -> int:
     """Update a row identified by its primary key with given column updates.
 
@@ -89,6 +107,7 @@ def update_row_by_pk(
         table: Target table name.
         pk_values: Mapping of primary key column names to target values.
         updates: Mapping of column names to update values.
+        commit: Whether to commit the transaction immediately (default True).
 
     Returns:
         Number of rows updated (0 or 1).
@@ -145,7 +164,11 @@ def update_row_by_pk(
         extra={"fr_id": UPDATE_FR, "table": table},
     )
     try:
-        with conn:
+        if commit:
+            with conn:
+                cursor = conn.execute(sql, params)
+                affected = cursor.rowcount
+        else:
             cursor = conn.execute(sql, params)
             affected = cursor.rowcount
     except sqlite3.Error as err:
@@ -174,6 +197,83 @@ def update_row_by_pk(
             extra={"fr_id": UPDATE_FR, "table": table, "affected": affected},
         )
     return affected
+
+
+def update_record(
+    conn: sqlite3.Connection,
+    table: str,
+    pk_values: Mapping[str, Any],
+    updates: Mapping[str, Any],
+    *,
+    expected_revision: int | None = None,
+    revision_col: str = "revision",
+    commit: bool = True,
+) -> int:
+    """Update a row with optional optimistic revision verification.
+
+    Canonical HostPersistence update function.
+
+    Args:
+        conn: Open SQLite connection.
+        table: Target table name.
+        pk_values: Mapping of primary key columns to values.
+        updates: Mapping of column names to new values.
+        expected_revision: Optional expected revision integer for CAS check.
+        revision_col: Column name containing the revision (default 'revision').
+        commit: Whether to commit the transaction immediately (default True).
+
+    Returns:
+        Number of rows updated (0 or 1).
+
+    Raises:
+        RevisionConflictError: When expected_revision does not match current state.
+        PersistenceError: If table is unapproved or update fails.
+    """
+    if table not in TABLE_PRIMARY_KEYS:
+        raise PersistenceError(f"Table '{table}' is not in approved table catalogue.")
+    if not pk_values:
+        raise PersistenceError(
+            f"update_record requires non-empty pk_values for table '{table}'."
+        )
+    if not updates:
+        raise PersistenceError(
+            f"update_record requires non-empty update_values for table '{table}'."
+        )
+
+    if expected_revision is not None:
+        cursor = conn.execute(f'PRAGMA table_info("{table}")')
+        cols = {row[1] for row in cursor.fetchall()}
+        if revision_col not in cols:
+            raise PersistenceError(
+                f"Table '{table}' does not contain revision column '{revision_col}'."
+            )
+
+        from app.host.persistence.read import read_row_by_pk
+
+        current = read_row_by_pk(conn, table, pk_values)
+        if current is not None:
+            curr_rev = current.get(revision_col)
+            if curr_rev is not None and int(curr_rev) != expected_revision:
+                logger.warning(
+                    "%s: update_record revision conflict on %s "
+                    "(expected=%d, current=%d)",
+                    UPDATE_FR,
+                    table,
+                    expected_revision,
+                    int(curr_rev),
+                    extra={
+                        "fr_id": UPDATE_FR,
+                        "table": table,
+                        "expected_revision": expected_revision,
+                        "current_revision": int(curr_rev),
+                    },
+                )
+                raise RevisionConflictError(
+                    expected_revision=expected_revision,
+                    current_revision=int(curr_rev),
+                )
+
+    return update_row_by_pk(conn, table, pk_values, updates, commit=commit)
 
 
 def update_host_setting(
@@ -244,15 +344,7 @@ def batch_save_host_settings(
         if active_conn.in_transaction:
             logger.error("%s: caller transaction is already active", BATCH_SETTINGS_FR)
             raise PersistenceError("Settings batches require an idle connection.")
-        active_conn.execute(
-            'CREATE TABLE IF NOT EXISTS "host_settings" ('
-            "scope TEXT NOT NULL, "
-            "key TEXT NOT NULL, "
-            "value_json TEXT NOT NULL, "
-            "schema_version INTEGER NOT NULL DEFAULT 1, "
-            "updated_at_utc TEXT NOT NULL, "
-            "PRIMARY KEY (scope, key))"
-        )
+        ensure_table_schema(active_conn, "host_settings")
         try:
             with active_conn:
                 active_conn.execute("BEGIN IMMEDIATE")
@@ -322,17 +414,7 @@ def save_host_session(
 ) -> bool:
     """Save or upsert a host session record."""
     with resolve_connection(conn) as active_conn:
-        active_conn.execute(
-            "CREATE TABLE IF NOT EXISTS host_session ("
-            "session_id TEXT PRIMARY KEY, "
-            "token_hash TEXT NOT NULL UNIQUE, "
-            "username TEXT NOT NULL, "
-            "peer_id TEXT NOT NULL, "
-            "created_at_utc TEXT NOT NULL, "
-            "expires_at_utc TEXT NOT NULL, "
-            "revoked_at_utc TEXT, "
-            "status TEXT NOT NULL)"
-        )
+        ensure_table_schema(active_conn, "host_session")
         active_conn.execute(
             "INSERT INTO host_session "
             "(session_id, token_hash, username, peer_id, "
@@ -396,6 +478,9 @@ def update_host_session_status(
         return affected > 0
 
 
+update_host_session = update_host_session_status
+
+
 def save_host_job(
     job_id: str,
     *,
@@ -422,29 +507,7 @@ def save_host_job(
 ) -> bool:
     """Save or upsert a host job record."""
     with resolve_connection(conn) as active_conn:
-        active_conn.execute(
-            'CREATE TABLE IF NOT EXISTS "host_jobs" ('
-            "job_id TEXT PRIMARY KEY, "
-            "owner TEXT NOT NULL DEFAULT 'default', "
-            "kind TEXT NOT NULL DEFAULT 'compute', "
-            "status TEXT NOT NULL DEFAULT 'completed', "
-            "progress REAL NOT NULL DEFAULT 0.0, "
-            "accepted INTEGER NOT NULL DEFAULT 0, "
-            "rejected INTEGER NOT NULL DEFAULT 0, "
-            "message TEXT NOT NULL DEFAULT '', "
-            "attempt_id INTEGER NOT NULL DEFAULT 1, "
-            "max_retries INTEGER NOT NULL DEFAULT 0, "
-            "retry_count INTEGER NOT NULL DEFAULT 0, "
-            "dedup_key TEXT, "
-            "parent_job_id TEXT, "
-            "child_job_ids_json TEXT NOT NULL DEFAULT '[]', "
-            "budget_json TEXT NOT NULL DEFAULT '{}', "
-            "submitted_at_utc TEXT NOT NULL DEFAULT '', "
-            "started_at_utc TEXT, "
-            "finished_at_utc TEXT, "
-            "error_message TEXT, "
-            "error_location TEXT)"
-        )
+        ensure_table_schema(active_conn, "host_jobs")
         effective_submitted = submitted_at_utc or current_utc_iso()
         active_conn.execute(
             'INSERT INTO "host_jobs" ('
@@ -505,16 +568,7 @@ def record_host_job_event(
 ) -> bool:
     """Record a state transition event in host_job_events."""
     with resolve_connection(conn) as active_conn:
-        active_conn.execute(
-            'CREATE TABLE IF NOT EXISTS "host_job_events" ('
-            "event_id TEXT PRIMARY KEY, "
-            "job_id TEXT NOT NULL, "
-            "attempt_id TEXT, "
-            "from_state TEXT, "
-            "to_state TEXT NOT NULL, "
-            "details_json TEXT NOT NULL, "
-            "created_at_utc TEXT NOT NULL)"
-        )
+        ensure_table_schema(active_conn, "host_job_events")
         effective_created = created_at_utc or current_utc_iso()
         active_conn.execute(
             'INSERT OR REPLACE INTO "host_job_events" '
@@ -580,28 +634,106 @@ def update_host_job_attempt(
     return affected > 0
 
 
+def update_entity(
+    conn: sqlite3.Connection,
+    entity_id: str,
+    entity_type: str,
+    payload: str,
+    *,
+    revision: int | None = None,
+    expected_revision: int | None = None,
+    updated_at_utc: str | None = None,
+) -> bool:
+    """Update payload and revision of a host entity with optimistic CAS.
+
+    Canonical HostPersistence entity update function.
+
+    Args:
+        conn: Open SQLite connection.
+        entity_id: Target entity identifier.
+        entity_type: Target entity domain type.
+        payload: New payload text or JSON string.
+        revision: Explicit new revision integer, or None to auto-increment.
+        expected_revision: Optional expected revision to compare-and-set.
+        updated_at_utc: Optional update timestamp.
+
+    Returns:
+        True if the row was updated, False otherwise.
+
+    Raises:
+        RevisionConflictError: When expected_revision does not match current state.
+        PersistenceError: When update fails.
+    """
+    from app.host.persistence.read import read_row_by_pk
+
+    pk = {"entity_id": entity_id, "entity_type": entity_type}
+    current = read_row_by_pk(conn, "host_entities", pk)
+    if current is None:
+        logger.warning(
+            "%s: entity not found for update (%s, %s)",
+            UPDATE_FR,
+            entity_id,
+            entity_type,
+            extra={
+                "fr_id": UPDATE_FR,
+                "entity_id": entity_id,
+                "entity_type": entity_type,
+            },
+        )
+        return False
+
+    current_rev = int(current["revision"])
+    if expected_revision is not None and expected_revision != current_rev:
+        logger.warning(
+            "%s: entity revision conflict on (%s, %s) (expected=%d, current=%d)",
+            UPDATE_FR,
+            entity_id,
+            entity_type,
+            expected_revision,
+            current_rev,
+            extra={
+                "fr_id": UPDATE_FR,
+                "entity_id": entity_id,
+                "entity_type": entity_type,
+                "expected_revision": expected_revision,
+                "current_revision": current_rev,
+            },
+        )
+        raise RevisionConflictError(
+            expected_revision=expected_revision,
+            current_revision=current_rev,
+        )
+
+    next_rev = revision if revision is not None else (current_rev + 1)
+    updates = {
+        "payload": payload,
+        "revision": next_rev,
+        "updated_at_utc": updated_at_utc or current_utc_iso(),
+    }
+    affected = update_row_by_pk(conn, "host_entities", pk, updates)
+    return affected > 0
+
+
 def update_host_entity(
     conn: sqlite3.Connection,
     entity_id: str,
     entity_type: str,
     payload: str,
-    revision: int,
+    revision: int | None = None,
     *,
+    expected_revision: int | None = None,
     updated_at_utc: str | None = None,
 ) -> bool:
     """Update payload and revision of a host entity."""
-    updates = {
-        "payload": payload,
-        "revision": revision,
-        "updated_at_utc": updated_at_utc or current_utc_iso(),
-    }
-    affected = update_row_by_pk(
+    return update_entity(
         conn,
-        "host_entities",
-        {"entity_id": entity_id, "entity_type": entity_type},
-        updates,
+        entity_id,
+        entity_type,
+        payload,
+        revision=revision,
+        expected_revision=expected_revision,
+        updated_at_utc=updated_at_utc,
     )
-    return affected > 0
 
 
 def update_host_grid_node_heartbeat(
@@ -706,5 +838,171 @@ def update_mt5_command(
         updates["error_json"] = error_json
     affected = update_row_by_pk(
         conn, "mt5_commands", {"command_id": command_id}, updates
+    )
+    return affected > 0
+
+
+def update_datamgr_broker_stock(
+    conn: sqlite3.Connection,
+    stock_id: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a datamgr broker stock record."""
+    affected = update_row_by_pk(conn, "datamgr_broker_stock", {"ID": stock_id}, updates)
+    return affected > 0
+
+
+def update_datamgr_commodity(
+    conn: sqlite3.Connection,
+    commodity_id: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a commodity record."""
+    affected = update_row_by_pk(
+        conn, "datamgr_commodities", {"id": commodity_id}, updates
+    )
+    return affected > 0
+
+
+def update_datamgr_crypto_catalog(
+    conn: sqlite3.Connection,
+    exchange: str,
+    symbol: str,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a crypto catalog entry."""
+    affected = update_row_by_pk(
+        conn,
+        "datamgr_crypto_catalog",
+        {"exchange": exchange, "symbol": symbol},
+        updates,
+    )
+    return affected > 0
+
+
+def update_datamgr_log(
+    conn: sqlite3.Connection,
+    log_id: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a datamgr log record."""
+    affected = update_row_by_pk(conn, "datamgr_logs", {"id": log_id}, updates)
+    return affected > 0
+
+
+def update_datamgr_operation_log(
+    conn: sqlite3.Connection,
+    op_id: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a datamgr operation log record."""
+    affected = update_row_by_pk(conn, "datamgr_operation_log", {"id": op_id}, updates)
+    return affected > 0
+
+
+def update_datamgr_quality_report(
+    conn: sqlite3.Connection,
+    report_id: str,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a quality report."""
+    affected = update_row_by_pk(
+        conn, "datamgr_quality", {"report_id": report_id}, updates
+    )
+    return affected > 0
+
+
+def update_datamgr_stock(
+    conn: sqlite3.Connection,
+    stock_id: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a datamgr stock record."""
+    affected = update_row_by_pk(conn, "datamgr_stock", {"ID": stock_id}, updates)
+    return affected > 0
+
+
+def update_datamgr_stock_group(
+    conn: sqlite3.Connection,
+    group_id: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a datamgr stock group."""
+    affected = update_row_by_pk(conn, "datamgr_stock_group", {"ID": group_id}, updates)
+    return affected > 0
+
+
+def update_datamgr_ticker(
+    conn: sqlite3.Connection,
+    ticker_id: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a datamgr ticker."""
+    affected = update_row_by_pk(conn, "datamgr_tickers", {"id": ticker_id}, updates)
+    return affected > 0
+
+
+def update_host_grid_lease(
+    conn: sqlite3.Connection,
+    lease_id: str,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update fields of a grid lease."""
+    affected = update_row_by_pk(
+        conn, "host_grid_leases", {"lease_id": lease_id}, updates
+    )
+    return affected > 0
+
+
+def update_host_grid_node(
+    conn: sqlite3.Connection,
+    node_id: str,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update attributes of a grid node."""
+    affected = update_row_by_pk(conn, "host_grid_nodes", {"node_id": node_id}, updates)
+    return affected > 0
+
+
+def update_host_job_event(
+    conn: sqlite3.Connection,
+    event_id: str,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update attributes of a host job event."""
+    affected = update_row_by_pk(
+        conn, "host_job_events", {"event_id": event_id}, updates
+    )
+    return affected > 0
+
+
+def update_host_lease(
+    conn: sqlite3.Connection,
+    lease_key: str,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update attributes of a host lease."""
+    affected = update_row_by_pk(conn, "host_leases", {"lease_key": lease_key}, updates)
+    return affected > 0
+
+
+def update_mt5_event(
+    conn: sqlite3.Connection,
+    event_id: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update attributes of an MT5 event."""
+    affected = update_row_by_pk(conn, "mt5_events", {"event_id": event_id}, updates)
+    return affected > 0
+
+
+def update_schema_migration(
+    conn: sqlite3.Connection,
+    version: int,
+    updates: Mapping[str, Any],
+) -> bool:
+    """Update attributes of a schema migration."""
+    affected = update_row_by_pk(
+        conn, "schema_migrations", {"version": version}, updates
     )
     return affected > 0

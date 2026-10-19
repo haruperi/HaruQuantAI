@@ -1,4 +1,3 @@
-# ruff: noqa: INP001
 """Read and query operations for operational database tables.
 
 Description:
@@ -13,12 +12,13 @@ Purpose:
 
 Key Capabilities:
     - FR-HOST-PERSISTENCE-READ-BY-PK: Query single row by table primary key.
-      Associated: `read_row_by_pk()`, `get_host_setting()`, `get_host_session()`,
-      `get_host_job()`, `get_datamgr_broker()`, `get_datamgr_instrument()`
+      Associated: `read_row_by_pk()`, `read_entity()`, and 25 domain-specific
+      get helpers.
       Logging: DEBUG emitted on row lookup and match; WARNING when not found.
-    - FR-HOST-PERSISTENCE-LIST: Query records with filters, ordering, and limits.
-      Associated: `read_rows()`, `list_host_settings()`, `list_host_jobs()`,
-      `list_datamgr_instruments()`, `get_schema_migrations()`
+    - FR-HOST-PERSISTENCE-LIST: Query records with filters, ordering, and limits
+      or cursor pagination.
+      Associated: `read_rows()`, `read_records()`, and 25 domain-specific
+      list helpers.
       Logging: DEBUG emitted on query execution; INFO on non-empty results.
     - FR-HOST-PERSISTENCE-COUNT: Count rows matching optional filter criteria.
       Associated: `count_rows()`
@@ -27,11 +27,12 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.host.persistence.create import get_connection
-    from app.host.persistence.read import get_host_setting, read_rows
+    from app.host.persistence.read import get_host_setting, read_records, read_rows
 
     conn = get_connection("data/database/haruquantai.db")
     setting = get_host_setting(conn, "system", "theme")
     jobs = read_rows(conn, "host_jobs", where={"status": "completed"}, limit=10)
+    records = read_records(conn, "host_jobs", cursor_col="job_id", limit=10)
     ```
 
 CLI Usage:
@@ -225,6 +226,29 @@ def read_row_by_pk(
     return dict(row)
 
 
+read_record = read_row_by_pk
+
+
+def read_entity(
+    conn: sqlite3.Connection,
+    entity_id: str,
+    entity_type: str,
+) -> dict[str, Any] | None:
+    """Read a single host entity by composite key (canonical HostPersistence).
+
+    Args:
+        conn: Open SQLite connection.
+        entity_id: Target entity identifier.
+        entity_type: Target entity domain type.
+
+    Returns:
+        Entity row dictionary if found, None otherwise.
+    """
+    return read_row_by_pk(
+        conn, "host_entities", {"entity_id": entity_id, "entity_type": entity_type}
+    )
+
+
 def read_rows(
     conn: sqlite3.Connection,
     table: str,
@@ -286,6 +310,109 @@ def read_rows(
     result = [dict(row) for row in rows]
     logger.debug(
         "%s: returned %s rows from %s",
+        LIST_FR,
+        len(result),
+        table,
+        extra={"fr_id": LIST_FR, "table": table, "count": len(result)},
+    )
+    return result
+
+
+def read_records(
+    conn: sqlite3.Connection,
+    table: str,
+    *,
+    where: Mapping[str, Any] | None = None,
+    order_by: str | None = None,
+    limit: int | None = None,
+    offset: int | None = None,
+    cursor_col: str | None = None,
+    after_cursor: Any = None,
+) -> list[dict[str, Any]]:
+    """Query rows from an approved table with filtering and cursor pagination.
+
+    Canonical HostPersistence read query supporting cursor or offset pagination.
+
+    Args:
+        conn: Open SQLite connection.
+        table: Target table name in approved catalogue.
+        where: Optional dictionary of column names to equality filter values.
+        order_by: Optional order by clause (e.g. 'id ASC', 'timestamp_utc DESC').
+        limit: Optional maximum rows to return.
+        offset: Optional offset pagination count.
+        cursor_col: Optional column name for deterministic cursor pagination.
+        after_cursor: Optional cursor value to fetch strictly after.
+
+    Returns:
+        List of row dictionaries matching the query.
+
+    Raises:
+        PersistenceError: If table is unapproved or query fails.
+    """
+    if table not in TABLE_PRIMARY_KEYS:
+        logger.error(
+            "%s: rejected read_records for unapproved table %s",
+            LIST_FR,
+            table,
+            extra={"fr_id": LIST_FR, "table": table},
+        )
+        raise PersistenceError(f"Table '{table}' is not in approved table catalogue.")
+
+    effective_order = order_by
+    cursor_clause = ""
+    cursor_params: list[Any] = []
+    if cursor_col is not None:
+        clean_col = cursor_col.strip().strip('"')
+        if not clean_col.replace("_", "").isalnum():
+            raise PersistenceError(f"Invalid cursor column name: '{cursor_col}'")
+        col_cursor = conn.execute(f'PRAGMA table_info("{table}")')
+        valid_cols = {row[1] for row in col_cursor.fetchall()}
+        if clean_col not in valid_cols:
+            raise PersistenceError(
+                f"Invalid cursor column '{cursor_col}' for table '{table}'."
+            )
+        if after_cursor is not None:
+            cursor_clause = f'"{clean_col}" > ?'
+            cursor_params = [after_cursor]
+            if effective_order is None:
+                effective_order = f"{clean_col} ASC"
+
+    where_sql, params = _build_where_clause(where)
+    if cursor_clause:
+        if where_sql:
+            where_sql = f"{where_sql} AND {cursor_clause}"
+            params.extend(cursor_params)
+        else:
+            where_sql = f" WHERE {cursor_clause}"
+            params = cursor_params
+
+    order_sql = _build_order_clause(effective_order)
+    limit_sql = _build_limit_clause(limit, offset)
+
+    sql = f'SELECT * FROM "{table}"{where_sql}{order_sql}{limit_sql}'  # noqa: S608
+    logger.debug(
+        "%s: read_records from %s (filters=%s, cursor=%s)",
+        LIST_FR,
+        table,
+        where,
+        after_cursor,
+        extra={"fr_id": LIST_FR, "table": table},
+    )
+    try:
+        cursor = conn.execute(sql, params)
+        rows = cursor.fetchall()
+    except sqlite3.Error as err:
+        logger.exception(
+            "%s: read_records failed on %s",
+            LIST_FR,
+            table,
+            extra={"fr_id": LIST_FR, "table": table, "error": str(err)},
+        )
+        raise PersistenceError(f"Query on '{table}' failed: {err}") from err
+
+    result = [dict(row) for row in rows]
+    logger.debug(
+        "%s: read_records returned %s rows from %s",
         LIST_FR,
         len(result),
         table,
@@ -663,7 +790,7 @@ def get_datamgr_session(
             if by_id is not None:
                 return by_id
         rows = read_rows(
-            active_conn, "datamgr_sessions", where={"name": str(name_or_id)}, limit=1
+            active_conn, "datamgr_sessions", where={"name": name_or_id}, limit=1
         )
         return rows[0] if rows else None
 
@@ -727,3 +854,329 @@ def count_database_tables(
             "WHERE type='table' AND name NOT LIKE 'sqlite_%';"
         )
         return int(cursor.fetchone()[0])
+
+
+def list_datamgr_brokers(
+    conn: sqlite3.Connection | None = None,
+) -> list[dict[str, Any]]:
+    """List all datamgr brokers ordered by name."""
+    with resolve_connection(conn) as active_conn:
+        return read_rows(active_conn, "datamgr_broker", order_by="name ASC")
+
+
+def get_datamgr_broker_stock(
+    conn: sqlite3.Connection,
+    stock_id: int,
+) -> dict[str, Any] | None:
+    """Get datamgr broker stock mapping by ID."""
+    return read_row_by_pk(conn, "datamgr_broker_stock", {"ID": stock_id})
+
+
+def list_datamgr_broker_stocks(
+    conn: sqlite3.Connection,
+    *,
+    broker_id: int | None = None,
+) -> list[dict[str, Any]]:
+    """List datamgr broker stocks, optionally filtered by broker ID."""
+    where = {"BROKER_ID": broker_id} if broker_id is not None else None
+    return read_rows(conn, "datamgr_broker_stock", where=where, order_by="ID ASC")
+
+
+def get_datamgr_commodity(
+    conn: sqlite3.Connection,
+    commodity_id: int,
+) -> dict[str, Any] | None:
+    """Get commodity record by ID."""
+    return read_row_by_pk(conn, "datamgr_commodities", {"id": commodity_id})
+
+
+def list_datamgr_commodities(
+    conn: sqlite3.Connection,
+    *,
+    exchange: str | None = None,
+) -> list[dict[str, Any]]:
+    """List commodity records, optionally filtered by exchange."""
+    where = {"exchange": exchange} if exchange is not None else None
+    return read_rows(conn, "datamgr_commodities", where=where, order_by="code ASC")
+
+
+def get_datamgr_crypto_catalog(
+    conn: sqlite3.Connection,
+    exchange: str,
+    symbol: str,
+) -> dict[str, Any] | None:
+    """Get crypto catalog entry by exchange and symbol."""
+    return read_row_by_pk(
+        conn, "datamgr_crypto_catalog", {"exchange": exchange, "symbol": symbol}
+    )
+
+
+def list_datamgr_crypto_catalog(
+    conn: sqlite3.Connection,
+    *,
+    exchange: str | None = None,
+) -> list[dict[str, Any]]:
+    """List crypto catalog entries, optionally filtered by exchange."""
+    where = {"exchange": exchange} if exchange is not None else None
+    return read_rows(conn, "datamgr_crypto_catalog", where=where, order_by="symbol ASC")
+
+
+list_datamgr_crypto_catalogs = list_datamgr_crypto_catalog
+
+
+def list_datamgr_datasets(
+    conn: sqlite3.Connection,
+    *,
+    broker: str | None = None,
+) -> list[dict[str, Any]]:
+    """List datamgr datasets, optionally filtered by broker."""
+    where = {"broker": broker} if broker is not None else None
+    return read_rows(conn, "datamgr_datasets", where=where, order_by="id ASC")
+
+
+def get_datamgr_log(
+    conn: sqlite3.Connection,
+    log_id: int,
+) -> dict[str, Any] | None:
+    """Get datamgr log record by ID."""
+    return read_row_by_pk(conn, "datamgr_logs", {"id": log_id})
+
+
+def list_datamgr_logs(
+    conn: sqlite3.Connection,
+    *,
+    symbol: str | None = None,
+    limit: int = 100,
+) -> list[dict[str, Any]]:
+    """List datamgr logs ordered by ID descending."""
+    where = {"symbol": symbol} if symbol is not None else None
+    return read_rows(conn, "datamgr_logs", where=where, order_by="id DESC", limit=limit)
+
+
+def get_datamgr_operation_log(
+    conn: sqlite3.Connection,
+    op_id: int,
+) -> dict[str, Any] | None:
+    """Get datamgr operation log record by ID."""
+    return read_row_by_pk(conn, "datamgr_operation_log", {"id": op_id})
+
+
+def list_datamgr_operation_logs(
+    conn: sqlite3.Connection,
+    *,
+    symbol: str | None = None,
+    limit: int = 100,
+) -> list[dict[str, Any]]:
+    """List datamgr operation logs ordered by ID descending."""
+    where = {"symbol": symbol} if symbol is not None else None
+    return read_rows(
+        conn, "datamgr_operation_log", where=where, order_by="id DESC", limit=limit
+    )
+
+
+def list_datamgr_quality_reports(
+    conn: sqlite3.Connection,
+    *,
+    dataset_id: str | None = None,
+) -> list[dict[str, Any]]:
+    """List quality reports ordered by evaluation time descending."""
+    where = {"dataset_id": dataset_id} if dataset_id is not None else None
+    return read_rows(
+        conn, "datamgr_quality", where=where, order_by="evaluated_at_utc DESC"
+    )
+
+
+def get_datamgr_stock(
+    conn: sqlite3.Connection,
+    stock_id: int,
+) -> dict[str, Any] | None:
+    """Get datamgr stock by ID."""
+    return read_row_by_pk(conn, "datamgr_stock", {"ID": stock_id})
+
+
+def list_datamgr_stocks(
+    conn: sqlite3.Connection,
+    *,
+    basket_id: int | None = None,
+) -> list[dict[str, Any]]:
+    """List datamgr stocks, optionally filtered by basket ID."""
+    where = {"BASKET_ID": basket_id} if basket_id is not None else None
+    return read_rows(conn, "datamgr_stock", where=where, order_by="ID ASC")
+
+
+def get_datamgr_stock_group(
+    conn: sqlite3.Connection,
+    group_id: int,
+) -> dict[str, Any] | None:
+    """Get datamgr stock group by ID."""
+    return read_row_by_pk(conn, "datamgr_stock_group", {"ID": group_id})
+
+
+def list_datamgr_stock_groups(
+    conn: sqlite3.Connection,
+) -> list[dict[str, Any]]:
+    """List datamgr stock groups ordered by name."""
+    return read_rows(conn, "datamgr_stock_group", order_by="NAME ASC")
+
+
+def get_datamgr_ticker(
+    conn: sqlite3.Connection,
+    ticker_id: int,
+) -> dict[str, Any] | None:
+    """Get datamgr ticker by ID."""
+    return read_row_by_pk(conn, "datamgr_tickers", {"id": ticker_id})
+
+
+def list_datamgr_tickers(
+    conn: sqlite3.Connection,
+    *,
+    exchange: str | None = None,
+) -> list[dict[str, Any]]:
+    """List datamgr tickers, optionally filtered by exchange."""
+    where = {"exchange": exchange} if exchange is not None else None
+    return read_rows(conn, "datamgr_tickers", where=where, order_by="ticker ASC")
+
+
+def list_host_entities(
+    conn: sqlite3.Connection,
+    *,
+    entity_type: str | None = None,
+    scope: str | None = None,
+) -> list[dict[str, Any]]:
+    """List host entities, optionally filtered by entity_type or scope."""
+    where: dict[str, Any] = {}
+    if entity_type is not None:
+        where["entity_type"] = entity_type
+    if scope is not None:
+        where["scope"] = scope
+    return read_rows(
+        conn,
+        "host_entities",
+        where=where or None,
+        order_by="created_at_utc DESC",
+    )
+
+
+def get_host_grid_lease(
+    conn: sqlite3.Connection,
+    lease_id: str,
+) -> dict[str, Any] | None:
+    """Get grid lease by lease ID."""
+    return read_row_by_pk(conn, "host_grid_leases", {"lease_id": lease_id})
+
+
+def list_host_grid_leases(
+    conn: sqlite3.Connection,
+    *,
+    node_id: str | None = None,
+    state: str | None = None,
+) -> list[dict[str, Any]]:
+    """List grid leases, optionally filtered by node_id or state."""
+    where: dict[str, Any] = {}
+    if node_id is not None:
+        where["node_id"] = node_id
+    if state is not None:
+        where["state"] = state
+    return read_rows(
+        conn,
+        "host_grid_leases",
+        where=where or None,
+        order_by="leased_at_utc DESC",
+    )
+
+
+def list_host_grid_nodes(
+    conn: sqlite3.Connection,
+    *,
+    state: str | None = None,
+) -> list[dict[str, Any]]:
+    """List grid compute nodes, optionally filtered by state."""
+    where = {"state": state} if state is not None else None
+    return read_rows(conn, "host_grid_nodes", where=where, order_by="node_id ASC")
+
+
+def get_host_job_attempt(
+    conn: sqlite3.Connection,
+    attempt_id: str,
+) -> dict[str, Any] | None:
+    """Get host job attempt by attempt ID."""
+    return read_row_by_pk(conn, "host_job_attempts", {"attempt_id": attempt_id})
+
+
+list_host_job_attempts = get_host_job_attempts
+
+
+def get_host_job_event(
+    conn: sqlite3.Connection,
+    event_id: str,
+) -> dict[str, Any] | None:
+    """Get host job event by event ID."""
+    return read_row_by_pk(conn, "host_job_events", {"event_id": event_id})
+
+
+list_host_job_events = get_host_job_events
+
+
+def list_host_leases(
+    conn: sqlite3.Connection,
+    *,
+    scope: str | None = None,
+) -> list[dict[str, Any]]:
+    """List host leases, optionally filtered by scope."""
+    where = {"scope": scope} if scope is not None else None
+    return read_rows(conn, "host_leases", where=where, order_by="acquired_at_utc DESC")
+
+
+def list_host_sessions(
+    conn: sqlite3.Connection,
+    *,
+    status: str | None = None,
+) -> list[dict[str, Any]]:
+    """List host sessions, optionally filtered by status."""
+    where = {"status": status} if status is not None else None
+    return read_rows(conn, "host_session", where=where, order_by="created_at_utc DESC")
+
+
+def list_mt5_commands(
+    conn: sqlite3.Connection,
+    *,
+    status: str | None = None,
+    limit: int = 100,
+) -> list[dict[str, Any]]:
+    """List MT5 commands, optionally filtered by status."""
+    where = {"status": status} if status is not None else None
+    return read_rows(
+        conn, "mt5_commands", where=where, order_by="created_at DESC", limit=limit
+    )
+
+
+def get_mt5_event(
+    conn: sqlite3.Connection,
+    event_id: int,
+) -> dict[str, Any] | None:
+    """Get MT5 event by event ID."""
+    return read_row_by_pk(conn, "mt5_events", {"event_id": event_id})
+
+
+def list_mt5_events(
+    conn: sqlite3.Connection,
+    *,
+    command_id: str | None = None,
+    limit: int = 100,
+) -> list[dict[str, Any]]:
+    """List MT5 events, optionally filtered by command ID."""
+    where = {"command_id": command_id} if command_id is not None else None
+    return read_rows(
+        conn, "mt5_events", where=where, order_by="received_at DESC", limit=limit
+    )
+
+
+def get_schema_migration(
+    conn: sqlite3.Connection,
+    version: int,
+) -> dict[str, Any] | None:
+    """Get applied schema migration by version integer."""
+    return read_row_by_pk(conn, "schema_migrations", {"version": version})
+
+
+list_schema_migrations = get_schema_migrations

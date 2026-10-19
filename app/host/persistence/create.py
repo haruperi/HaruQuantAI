@@ -1,4 +1,3 @@
-# ruff: noqa: INP001
 """Database connection, table schema creation, and row insertion operations.
 
 Description:
@@ -16,18 +15,24 @@ Key Capabilities:
     - FR-HOST-PERSISTENCE-CONNECT: Initialize database connection in WAL mode.
       Associated: `get_connection()`
       Logging: DEBUG emitted on connection opening; ERROR on connection failure.
-    - FR-HOST-PERSISTENCE-CREATE-SCHEMA: Create all 25 operational database tables.
-      Associated: `create_schema()`
+    - FR-HOST-PERSISTENCE-CREATE-SCHEMA: Create all 25 operational database tables
+      or ensure individual table schemas idempotently.
+      Associated: `create_schema()`, `ensure_table_schema()`
       Logging: INFO emitted on schema creation completion; ERROR on DDL failure.
     - FR-HOST-PERSISTENCE-INSERT: Insert records into database tables.
-      Associated: `insert_row()`, `create_host_setting()`, `create_host_session()`,
-      `create_host_job()`, `create_datamgr_broker()`, `create_datamgr_dataset()`
+      Associated: `insert_row()`, `create_record()`, `create_entity()`,
+      and 25 domain-specific typed creation helpers.
       Logging: DEBUG emitted on successful insert; ERROR on constraint or validation
       failure.
 
 Python API Usage:
     ```python
-    from app.host.persistence.create import create_schema, get_connection, insert_row
+    from app.host.persistence.create import (
+        create_record,
+        create_schema,
+        get_connection,
+        insert_row,
+    )
 
     conn = get_connection("data/database/haruquantai.db")
     create_schema(conn)
@@ -88,8 +93,8 @@ TABLE_PRIMARY_KEYS: dict[str, tuple[str, ...]] = {
     "schema_migrations": ("version",),
 }
 
-SCHEMA_DDL: tuple[str, ...] = (
-    """CREATE TABLE IF NOT EXISTS "datamgr_broker" (
+TABLE_DDL_MAP: dict[str, str] = {
+    "datamgr_broker": """CREATE TABLE IF NOT EXISTS "datamgr_broker" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     is_system INTEGER NOT NULL DEFAULT 0,
@@ -104,13 +109,13 @@ SCHEMA_DDL: tuple[str, ...] = (
     clock_policy_json TEXT NOT NULL DEFAULT '{}',
     clock_policy_revision INTEGER NOT NULL DEFAULT 0
 )""",
-    """CREATE TABLE IF NOT EXISTS datamgr_broker_stock (
+    "datamgr_broker_stock": """CREATE TABLE IF NOT EXISTS datamgr_broker_stock (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     TICKER VARCHAR(50) NOT NULL,
     BROKER_ID INTEGER NOT NULL,
     FOREIGN KEY(BROKER_ID) REFERENCES datamgr_broker(id)
 )""",
-    """CREATE TABLE IF NOT EXISTS "datamgr_commodities" (
+    "datamgr_commodities": """CREATE TABLE IF NOT EXISTS "datamgr_commodities" (
     id INTEGER PRIMARY KEY,
     code TEXT NOT NULL UNIQUE,
     name TEXT,
@@ -121,7 +126,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     order_size_step REAL,
     exchange TEXT
 )""",
-    """CREATE TABLE IF NOT EXISTS "datamgr_crypto_catalog" (
+    "datamgr_crypto_catalog": """CREATE TABLE IF NOT EXISTS "datamgr_crypto_catalog" (
     exchange TEXT NOT NULL,
     symbol TEXT NOT NULL,
     point_value REAL NOT NULL DEFAULT 1.0,
@@ -135,7 +140,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     updated_at TEXT NOT NULL,
     PRIMARY KEY (exchange, symbol)
 )""",
-    """CREATE TABLE IF NOT EXISTS "datamgr_datasets" (
+    "datamgr_datasets": """CREATE TABLE IF NOT EXISTS "datamgr_datasets" (
     id TEXT PRIMARY KEY,
     source TEXT NOT NULL,
     symbol TEXT NOT NULL,
@@ -157,7 +162,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     lineage_json TEXT NOT NULL DEFAULT '{}',
     schema_version INTEGER NOT NULL DEFAULT 1
 )""",
-    """CREATE TABLE IF NOT EXISTS "datamgr_instruments" (
+    "datamgr_instruments": """CREATE TABLE IF NOT EXISTS "datamgr_instruments" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     symbol TEXT NOT NULL UNIQUE,
     connection TEXT DEFAULT '',
@@ -190,7 +195,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     order_size_step REAL NOT NULL DEFAULT 0.0,
     cot TEXT DEFAULT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS datamgr_logs (
+    "datamgr_logs": """CREATE TABLE IF NOT EXISTS datamgr_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp_utc TEXT NOT NULL,
     action TEXT NOT NULL,
@@ -199,7 +204,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     details TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now'))
 )""",
-    """CREATE TABLE IF NOT EXISTS datamgr_operation_log (
+    "datamgr_operation_log": """CREATE TABLE IF NOT EXISTS datamgr_operation_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp_utc TEXT NOT NULL,
     symbol TEXT NOT NULL,
@@ -207,7 +212,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     status TEXT NOT NULL,
     message TEXT NOT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS "datamgr_quality" (
+    "datamgr_quality": """CREATE TABLE IF NOT EXISTS "datamgr_quality" (
     report_id TEXT PRIMARY KEY,
     dataset_id TEXT NOT NULL,
     quality_score REAL NOT NULL,
@@ -216,7 +221,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     anomaly_counts_json TEXT NOT NULL DEFAULT '{}',
     evaluated_at_utc TEXT NOT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS "datamgr_sessions" (
+    "datamgr_sessions": """CREATE TABLE IF NOT EXISTS "datamgr_sessions" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     description TEXT DEFAULT '',
@@ -226,7 +231,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     is_default INTEGER NOT NULL DEFAULT 0,
     broker_id INTEGER NOT NULL DEFAULT -1
 )""",
-    """CREATE TABLE IF NOT EXISTS datamgr_stock (
+    "datamgr_stock": """CREATE TABLE IF NOT EXISTS datamgr_stock (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     TICKER VARCHAR(50) NOT NULL,
     BASKET_ID INTEGER NOT NULL,
@@ -234,14 +239,14 @@ SCHEMA_DDL: tuple[str, ...] = (
     DATE_TO LONG,
     FOREIGN KEY(BASKET_ID) REFERENCES datamgr_stock_group(ID)
 )""",
-    """CREATE TABLE IF NOT EXISTS datamgr_stock_group (
+    "datamgr_stock_group": """CREATE TABLE IF NOT EXISTS datamgr_stock_group (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
     NAME VARCHAR(50) NOT NULL,
     SYSTEM BOOLEAN NOT NULL,
     DESC VARCHAR(250),
     description TEXT DEFAULT ''
 )""",
-    """CREATE TABLE IF NOT EXISTS "datamgr_tickers" (
+    "datamgr_tickers": """CREATE TABLE IF NOT EXISTS "datamgr_tickers" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ticker TEXT NOT NULL,
     name TEXT,
@@ -251,7 +256,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     date_from TEXT,
     date_to TEXT
 )""",
-    """CREATE TABLE IF NOT EXISTS host_entities (
+    "host_entities": """CREATE TABLE IF NOT EXISTS host_entities (
     entity_id TEXT NOT NULL,
     entity_type TEXT NOT NULL,
     scope TEXT NOT NULL,
@@ -261,7 +266,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     updated_at_utc TEXT NOT NULL,
     PRIMARY KEY (entity_id, entity_type)
 )""",
-    """CREATE TABLE IF NOT EXISTS "host_grid_leases" (
+    "host_grid_leases": """CREATE TABLE IF NOT EXISTS "host_grid_leases" (
     lease_id TEXT PRIMARY KEY,
     node_id TEXT NOT NULL REFERENCES "host_grid_nodes"(node_id),
     job_id TEXT NOT NULL REFERENCES "host_jobs"(job_id),
@@ -269,7 +274,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     expires_at_utc TEXT NOT NULL,
     state TEXT NOT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS "host_grid_nodes" (
+    "host_grid_nodes": """CREATE TABLE IF NOT EXISTS "host_grid_nodes" (
     node_id TEXT PRIMARY KEY,
     host TEXT NOT NULL,
     port INTEGER NOT NULL,
@@ -278,7 +283,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     state TEXT NOT NULL,
     last_heartbeat_utc TEXT NOT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS "host_job_attempts" (
+    "host_job_attempts": """CREATE TABLE IF NOT EXISTS "host_job_attempts" (
     attempt_id TEXT PRIMARY KEY,
     job_id TEXT NOT NULL REFERENCES "host_jobs"(job_id),
     worker_id TEXT NOT NULL,
@@ -289,7 +294,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     created_at_utc TEXT NOT NULL,
     completed_at_utc TEXT
 )""",
-    """CREATE TABLE IF NOT EXISTS "host_job_events" (
+    "host_job_events": """CREATE TABLE IF NOT EXISTS "host_job_events" (
     event_id TEXT PRIMARY KEY,
     job_id TEXT NOT NULL,
     attempt_id TEXT,
@@ -298,7 +303,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     details_json TEXT NOT NULL,
     created_at_utc TEXT NOT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS "host_jobs" (
+    "host_jobs": """CREATE TABLE IF NOT EXISTS "host_jobs" (
     job_id TEXT PRIMARY KEY,
     owner TEXT NOT NULL DEFAULT 'default',
     kind TEXT NOT NULL DEFAULT 'compute',
@@ -320,7 +325,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     error_message TEXT,
     error_location TEXT
 )""",
-    """CREATE TABLE IF NOT EXISTS host_leases (
+    "host_leases": """CREATE TABLE IF NOT EXISTS host_leases (
     lease_key TEXT PRIMARY KEY,
     holder_id TEXT NOT NULL,
     scope TEXT NOT NULL,
@@ -328,7 +333,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     expires_at_utc TEXT NOT NULL,
     metadata TEXT NOT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS host_session (
+    "host_session": """CREATE TABLE IF NOT EXISTS host_session (
     session_id TEXT PRIMARY KEY,
     token_hash TEXT NOT NULL UNIQUE,
     username TEXT NOT NULL,
@@ -338,7 +343,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     revoked_at_utc TEXT,
     status TEXT NOT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS "host_settings" (
+    "host_settings": """CREATE TABLE IF NOT EXISTS "host_settings" (
     scope TEXT NOT NULL,
     key TEXT NOT NULL,
     value_json TEXT NOT NULL,
@@ -346,7 +351,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     updated_at_utc TEXT NOT NULL,
     PRIMARY KEY (scope, key)
 )""",
-    """CREATE TABLE IF NOT EXISTS mt5_commands (
+    "mt5_commands": """CREATE TABLE IF NOT EXISTS mt5_commands (
     command_id TEXT PRIMARY KEY,
     session_id TEXT,
     object_id TEXT NOT NULL,
@@ -364,7 +369,7 @@ SCHEMA_DDL: tuple[str, ...] = (
     meta_json TEXT,
     error_json TEXT
 )""",
-    """CREATE TABLE IF NOT EXISTS mt5_events (
+    "mt5_events": """CREATE TABLE IF NOT EXISTS mt5_events (
     event_id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id TEXT,
     command_id TEXT,
@@ -373,13 +378,16 @@ SCHEMA_DDL: tuple[str, ...] = (
     payload_json TEXT NOT NULL,
     received_at REAL NOT NULL
 )""",
-    """CREATE TABLE IF NOT EXISTS schema_migrations (
+    "schema_migrations": """CREATE TABLE IF NOT EXISTS schema_migrations (
     version INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     applied_at_utc TEXT NOT NULL,
     checksum TEXT NOT NULL
 )""",
-)
+}
+
+SCHEMA_DDL: tuple[str, ...] = tuple(TABLE_DDL_MAP.values())
+PERSISTENCE_TABLES: tuple[str, ...] = tuple(TABLE_DDL_MAP.keys())
 
 
 class PersistenceError(Exception):
@@ -436,6 +444,21 @@ def get_connection(db_path: Path | str | None = None) -> sqlite3.Connection:
     return conn
 
 
+TABLE_AUTOINCREMENT_PK_TABLES: set[str] = {
+    "datamgr_broker",
+    "datamgr_broker_stock",
+    "datamgr_commodities",
+    "datamgr_instruments",
+    "datamgr_logs",
+    "datamgr_operation_log",
+    "datamgr_sessions",
+    "datamgr_stock",
+    "datamgr_stock_group",
+    "datamgr_tickers",
+    "mt5_events",
+}
+
+
 def create_schema(conn: sqlite3.Connection) -> None:
     """Idempotently create all 25 operational database tables.
 
@@ -469,10 +492,45 @@ def create_schema(conn: sqlite3.Connection) -> None:
     )
 
 
+def ensure_table_schema(conn: sqlite3.Connection, table: str) -> None:
+    """Ensure a specific table exists by executing its canonical DDL statement.
+
+    Args:
+        conn: Open SQLite connection.
+        table: Target table name from TABLE_DDL_MAP.
+
+    Raises:
+        PersistenceError: When table is unapproved or DDL execution fails.
+    """
+    if table not in TABLE_DDL_MAP:
+        logger.error(
+            "%s: rejected schema creation for unapproved table %s",
+            CREATE_SCHEMA_FR,
+            table,
+            extra={"fr_id": CREATE_SCHEMA_FR, "table": table},
+        )
+        raise PersistenceError(
+            f"Table '{table}' is not an approved operational persistence table."
+        )
+
+    try:
+        conn.execute(TABLE_DDL_MAP[table])
+    except sqlite3.Error as err:
+        logger.exception(
+            "%s: failed ensuring table schema for %s",
+            CREATE_SCHEMA_FR,
+            table,
+            extra={"fr_id": CREATE_SCHEMA_FR, "table": table, "error": str(err)},
+        )
+        raise PersistenceError(f"Ensuring schema for '{table}' failed: {err}") from err
+
+
 def insert_row(
     conn: sqlite3.Connection,
     table: str,
     data: Mapping[str, Any],
+    *,
+    commit: bool = True,
 ) -> Any:
     """Insert a record into an allowed database table.
 
@@ -480,6 +538,7 @@ def insert_row(
         conn: Open SQLite connection.
         table: Target table name.
         data: Mapping of column names to values.
+        commit: Whether to commit the transaction immediately (default True).
 
     Returns:
         The lastrowid integer or the table primary key value from data.
@@ -519,7 +578,11 @@ def insert_row(
         extra={"fr_id": INSERT_FR, "table": table},
     )
     try:
-        with conn:
+        if commit:
+            with conn:
+                cursor = conn.execute(sql, values)
+                last_id = cursor.lastrowid
+        else:
             cursor = conn.execute(sql, values)
             last_id = cursor.lastrowid
     except sqlite3.Error as err:
@@ -544,6 +607,87 @@ def insert_row(
     if len(pk_cols) > 1 and all(k in data for k in pk_cols):
         return tuple(data[k] for k in pk_cols)
     return last_id
+
+
+def create_record(
+    conn: sqlite3.Connection,
+    table: str,
+    data: Mapping[str, Any],
+    *,
+    commit: bool = True,
+) -> Any:
+    """Insert a single record into an approved database table.
+
+    Args:
+        conn: Open SQLite connection.
+        table: Target table name.
+        data: Mapping of column names to values.
+        commit: Whether to commit the transaction immediately (default True).
+
+    Returns:
+        The table primary key value or lastrowid of the inserted record.
+
+    Raises:
+        PersistenceError: When validation or insertion fails.
+    """
+    if table not in TABLE_PRIMARY_KEYS:
+        raise PersistenceError(f"Table '{table}' is not in approved table catalogue.")
+
+    if table not in TABLE_AUTOINCREMENT_PK_TABLES:
+        missing_pks = [pk for pk in TABLE_PRIMARY_KEYS[table] if pk not in data]
+        if missing_pks:
+            raise PersistenceError(
+                f"Missing required primary key column(s) {missing_pks} "
+                f"for table '{table}'."
+            )
+
+    try:
+        return insert_row(conn, table, data, commit=commit)
+    except PersistenceError as err:
+        raise PersistenceError(f"Failed to create record in '{table}': {err}") from err
+
+
+def create_entity(
+    conn: sqlite3.Connection,
+    entity_id: str,
+    entity_type: str,
+    scope: str,
+    payload: str,
+    *,
+    revision: int = 1,
+    created_at_utc: str | None = None,
+    updated_at_utc: str | None = None,
+) -> tuple[str, str]:
+    """Insert a host entity record (canonical HostPersistence).
+
+    Args:
+        conn: Open SQLite connection.
+        entity_id: Unique entity ID.
+        entity_type: Entity classification.
+        scope: Entity visibility or domain scope.
+        payload: Entity payload JSON or text.
+        revision: Initial optimistic revision counter (default 1).
+        created_at_utc: Creation timestamp or current UTC.
+        updated_at_utc: Update timestamp or current UTC.
+
+    Returns:
+        Composite primary key (entity_id, entity_type).
+    """
+    now_iso = current_utc_iso()
+    data = {
+        "entity_id": entity_id,
+        "entity_type": entity_type,
+        "scope": scope,
+        "payload": payload,
+        "revision": revision,
+        "created_at_utc": created_at_utc or now_iso,
+        "updated_at_utc": updated_at_utc or now_iso,
+    }
+    insert_row(conn, "host_entities", data)
+    return (entity_id, entity_type)
+
+
+create_host_entity = create_entity
 
 
 def create_host_setting(
@@ -899,4 +1043,365 @@ def create_mt5_event(
         "received_at": received_at,
     }
     res = insert_row(conn, "mt5_events", data)
+    return int(res)
+
+
+def create_datamgr_broker_stock(
+    conn: sqlite3.Connection,
+    ticker: str,
+    broker_id: int,
+) -> int:
+    """Insert a datamgr_broker_stock record."""
+    data = {
+        "TICKER": ticker,
+        "BROKER_ID": broker_id,
+    }
+    res = insert_row(conn, "datamgr_broker_stock", data)
+    return int(res)
+
+
+def create_datamgr_commodity(
+    conn: sqlite3.Connection,
+    code: str,
+    *,
+    commodity_id: int | None = None,
+    name: str | None = None,
+    point_value: float | None = None,
+    tick_step: float | None = None,
+    tick_size: float | None = None,
+    order_size_multi: float | None = None,
+    order_size_step: float | None = None,
+    exchange: str | None = None,
+) -> int:
+    """Insert a datamgr_commodities record."""
+    data: dict[str, Any] = {"code": code}
+    if commodity_id is not None:
+        data["id"] = commodity_id
+    if name is not None:
+        data["name"] = name
+    if point_value is not None:
+        data["point_value"] = point_value
+    if tick_step is not None:
+        data["tick_step"] = tick_step
+    if tick_size is not None:
+        data["tick_size"] = tick_size
+    if order_size_multi is not None:
+        data["order_size_multi"] = order_size_multi
+    if order_size_step is not None:
+        data["order_size_step"] = order_size_step
+    if exchange is not None:
+        data["exchange"] = exchange
+    res = insert_row(conn, "datamgr_commodities", data)
+    return int(res)
+
+
+def create_datamgr_crypto_catalog(
+    conn: sqlite3.Connection,
+    exchange: str,
+    symbol: str,
+    *,
+    point_value: float = 1.0,
+    tick_size: float = 1e-8,
+    tick_step: float = 1e-8,
+    default_spread: float = 0.0,
+    default_slippage: float = 0.0,
+    date_from: str | None = None,
+    price_precision: int = 8,
+    name: str | None = None,
+    updated_at: str | None = None,
+) -> tuple[str, str]:
+    """Insert a datamgr_crypto_catalog record."""
+    data: dict[str, Any] = {
+        "exchange": exchange,
+        "symbol": symbol,
+        "point_value": point_value,
+        "tick_size": tick_size,
+        "tick_step": tick_step,
+        "default_spread": default_spread,
+        "default_slippage": default_slippage,
+        "date_from": date_from,
+        "price_precision": price_precision,
+        "name": name,
+        "updated_at": updated_at or current_utc_iso(),
+    }
+    insert_row(conn, "datamgr_crypto_catalog", data)
+    return (exchange, symbol)
+
+
+def create_datamgr_log(
+    conn: sqlite3.Connection,
+    timestamp_utc: str,
+    action: str,
+    message: str,
+    *,
+    symbol: str | None = None,
+    details: str = "{}",
+    created_at: str | None = None,
+) -> int:
+    """Insert a datamgr_logs record."""
+    data: dict[str, Any] = {
+        "timestamp_utc": timestamp_utc,
+        "action": action,
+        "message": message,
+        "symbol": symbol,
+        "details": details,
+    }
+    if created_at is not None:
+        data["created_at"] = created_at
+    res = insert_row(conn, "datamgr_logs", data)
+    return int(res)
+
+
+def create_datamgr_operation_log(
+    conn: sqlite3.Connection,
+    timestamp_utc: str,
+    symbol: str,
+    operation: str,
+    *,
+    status: str,
+    message: str,
+) -> int:
+    """Insert a datamgr_operation_log record."""
+    data = {
+        "timestamp_utc": timestamp_utc,
+        "symbol": symbol,
+        "operation": operation,
+        "status": status,
+        "message": message,
+    }
+    res = insert_row(conn, "datamgr_operation_log", data)
+    return int(res)
+
+
+def create_datamgr_quality_report(
+    conn: sqlite3.Connection,
+    report_id: str,
+    dataset_id: str,
+    quality_score: float,
+    total_records: int,
+    *,
+    anomalies_json: str = "[]",
+    anomaly_counts_json: str = "{}",
+    evaluated_at_utc: str | None = None,
+) -> str:
+    """Insert a datamgr_quality record."""
+    data = {
+        "report_id": report_id,
+        "dataset_id": dataset_id,
+        "quality_score": quality_score,
+        "total_records": total_records,
+        "anomalies_json": anomalies_json,
+        "anomaly_counts_json": anomaly_counts_json,
+        "evaluated_at_utc": evaluated_at_utc or current_utc_iso(),
+    }
+    insert_row(conn, "datamgr_quality", data)
+    return report_id
+
+
+def create_datamgr_stock(
+    conn: sqlite3.Connection,
+    ticker: str,
+    basket_id: int,
+    date_from: int,
+    *,
+    date_to: int | None = None,
+) -> int:
+    """Insert a datamgr_stock record."""
+    data: dict[str, Any] = {
+        "TICKER": ticker,
+        "BASKET_ID": basket_id,
+        "DATE_FROM": date_from,
+        "DATE_TO": date_to,
+    }
+    res = insert_row(conn, "datamgr_stock", data)
+    return int(res)
+
+
+def create_datamgr_stock_group(
+    conn: sqlite3.Connection,
+    name: str,
+    system: bool = False,
+    *,
+    desc: str | None = None,
+    description: str = "",
+) -> int:
+    """Insert a datamgr_stock_group record."""
+    data: dict[str, Any] = {
+        "NAME": name,
+        "SYSTEM": 1 if system else 0,
+        "DESC": desc,
+        "description": description,
+    }
+    res = insert_row(conn, "datamgr_stock_group", data)
+    return int(res)
+
+
+def create_datamgr_ticker(
+    conn: sqlite3.Connection,
+    ticker: str,
+    *,
+    name: str | None = None,
+    commodity_code: str | None = None,
+    exchange: str | None = None,
+    timeframe: str | None = None,
+    date_from: str | None = None,
+    date_to: str | None = None,
+) -> int:
+    """Insert a datamgr_tickers record."""
+    data: dict[str, Any] = {
+        "ticker": ticker,
+        "name": name,
+        "commodity_code": commodity_code,
+        "exchange": exchange,
+        "timeframe": timeframe,
+        "date_from": date_from,
+        "date_to": date_to,
+    }
+    res = insert_row(conn, "datamgr_tickers", data)
+    return int(res)
+
+
+def create_host_grid_lease(
+    conn: sqlite3.Connection,
+    lease_id: str,
+    node_id: str,
+    job_id: str,
+    *,
+    leased_at_utc: str | None = None,
+    expires_at_utc: str | None = None,
+    state: str = "active",
+) -> str:
+    """Insert a host_grid_leases record."""
+    now_iso = current_utc_iso()
+    data = {
+        "lease_id": lease_id,
+        "node_id": node_id,
+        "job_id": job_id,
+        "leased_at_utc": leased_at_utc or now_iso,
+        "expires_at_utc": expires_at_utc or now_iso,
+        "state": state,
+    }
+    insert_row(conn, "host_grid_leases", data)
+    return lease_id
+
+
+def create_host_grid_node(
+    conn: sqlite3.Connection,
+    node_id: str,
+    host: str,
+    port: int,
+    *,
+    cores: int,
+    memory_mb: int,
+    state: str = "online",
+    last_heartbeat_utc: str | None = None,
+) -> str:
+    """Insert a host_grid_nodes record."""
+    data = {
+        "node_id": node_id,
+        "host": host,
+        "port": port,
+        "cores": cores,
+        "memory_mb": memory_mb,
+        "state": state,
+        "last_heartbeat_utc": last_heartbeat_utc or current_utc_iso(),
+    }
+    insert_row(conn, "host_grid_nodes", data)
+    return node_id
+
+
+def create_host_job_attempt(
+    conn: sqlite3.Connection,
+    attempt_id: str,
+    job_id: str,
+    worker_id: str,
+    sequence: int,
+    *,
+    state: str = "running",
+    heartbeat_at_utc: str | None = None,
+    checkpoint_json: str | None = None,
+    created_at_utc: str | None = None,
+    completed_at_utc: str | None = None,
+) -> str:
+    """Insert a host_job_attempts record."""
+    data = {
+        "attempt_id": attempt_id,
+        "job_id": job_id,
+        "worker_id": worker_id,
+        "sequence": sequence,
+        "state": state,
+        "heartbeat_at_utc": heartbeat_at_utc,
+        "checkpoint_json": checkpoint_json,
+        "created_at_utc": created_at_utc or current_utc_iso(),
+        "completed_at_utc": completed_at_utc,
+    }
+    insert_row(conn, "host_job_attempts", data)
+    return attempt_id
+
+
+def create_host_job_event(
+    conn: sqlite3.Connection,
+    event_id: str,
+    job_id: str,
+    to_state: str,
+    *,
+    attempt_id: str | None = None,
+    from_state: str | None = None,
+    details_json: str = "{}",
+    created_at_utc: str | None = None,
+) -> str:
+    """Insert a host_job_events record."""
+    data = {
+        "event_id": event_id,
+        "job_id": job_id,
+        "attempt_id": attempt_id,
+        "from_state": from_state,
+        "to_state": to_state,
+        "details_json": details_json,
+        "created_at_utc": created_at_utc or current_utc_iso(),
+    }
+    insert_row(conn, "host_job_events", data)
+    return event_id
+
+
+def create_host_lease(
+    conn: sqlite3.Connection,
+    lease_key: str,
+    holder_id: str,
+    scope: str,
+    *,
+    acquired_at_utc: str | None = None,
+    expires_at_utc: str | None = None,
+    metadata: str = "{}",
+) -> str:
+    """Insert a host_leases record."""
+    now_iso = current_utc_iso()
+    data = {
+        "lease_key": lease_key,
+        "holder_id": holder_id,
+        "scope": scope,
+        "acquired_at_utc": acquired_at_utc or now_iso,
+        "expires_at_utc": expires_at_utc or now_iso,
+        "metadata": metadata,
+    }
+    insert_row(conn, "host_leases", data)
+    return lease_key
+
+
+def create_schema_migration(
+    conn: sqlite3.Connection,
+    version: int,
+    name: str,
+    *,
+    applied_at_utc: str | None = None,
+    checksum: str = "",
+) -> int:
+    """Insert a schema_migrations record."""
+    data = {
+        "version": version,
+        "name": name,
+        "applied_at_utc": applied_at_utc or current_utc_iso(),
+        "checksum": checksum,
+    }
+    res = insert_row(conn, "schema_migrations", data)
     return int(res)
