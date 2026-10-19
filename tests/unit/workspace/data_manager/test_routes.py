@@ -130,7 +130,10 @@ def test_routes_bootstrap_app_integration(tmp_path: Path) -> None:
         db_path=db_file,
         headless=False,
     )
-    app = host.create_app()
+    app = host.startup()
+    host.initialize_db()
+    host.register_modules(app)
+    host.broadcast_event("system", "host.ready")
 
     with TestClient(app) as client:
         res = client.get("/api/v1/data/home/overview")
@@ -143,6 +146,8 @@ def test_routes_bootstrap_app_integration(tmp_path: Path) -> None:
         res_datasets = client.get("/api/v1/data/home/datasets")
         assert res_datasets.status_code == 200
         assert isinstance(res_datasets.json()["data"], list)
+
+    host.shutdown()
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")

@@ -53,7 +53,8 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
-from collections.abc import Sequence
+from collections.abc import AsyncGenerator, Sequence
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -191,7 +192,7 @@ def create_app(
     *,
     runtime: AppHost | None = None,
 ) -> FastAPI:
-    """Create the FastAPI application bound to the 7-stage AppHost lifespan."""
+    """Create the FastAPI application orchestrated by the 5-method AppHost lifecycle."""
     if config is None:
         resolved_config, _ = resolve_main_config([])
     else:
@@ -205,7 +206,41 @@ def create_app(
         extra={"fr_id": APP_FACTORY_FR},
     )
     host = runtime or AppHost(config=resolved_config)
-    return host.create_app()
+    app = host.startup()
+
+    @asynccontextmanager
+    async def _lifespan(target_app: FastAPI) -> AsyncGenerator[None]:
+        runtime_host: AppHost = target_app.state.runtime
+        logger.info(
+            "%s: FastAPI lifespan orchestrating AppHost lifecycle.",
+            UVICORN_LIFECYCLE_FR,
+            extra={"fr_id": UVICORN_LIFECYCLE_FR},
+        )
+        runtime_host.startup()
+        runtime_host.initialize_db()
+        runtime_host.register_modules(target_app)
+        runtime_host.broadcast_event(
+            channel="system",
+            event_type="host.ready",
+            payload={
+                "host_instance_id": runtime_host.host_instance_id,
+                "state": runtime_host.state.value,
+            },
+        )
+        try:
+            yield
+        finally:
+            logger.info(
+                "%s: FastAPI lifespan shutting down AppHost.",
+                UVICORN_LIFECYCLE_FR,
+                extra={"fr_id": UVICORN_LIFECYCLE_FR},
+            )
+            runtime_host.shutdown()
+
+    app.router.lifespan_context = _lifespan
+    app.state.runtime = host
+    app.state.config = host.config
+    return app
 
 
 def run_server(
@@ -231,16 +266,27 @@ def run_server(
     try:
         if args.check_only:
             host = AppHost(config=config)
-            app = create_app(config=config, runtime=host)
-            with host:
-                snap = host.get_readiness()
+            app = host.startup()
+            try:
+                host.initialize_db()
+                host.register_modules(app)
+                host.broadcast_event(
+                    channel="system",
+                    event_type="host.ready",
+                    payload={
+                        "host_instance_id": host.host_instance_id,
+                        "state": host.state.value,
+                    },
+                )
                 logger.info(
                     "%s: Check-only verified %d stages and %d FastAPI routes.",
                     UVICORN_LIFECYCLE_FR,
-                    len(snap.completed_stages),
+                    len(host.completed_stages),
                     len(app.routes),
                     extra={"fr_id": UVICORN_LIFECYCLE_FR},
                 )
+            finally:
+                host.shutdown()
             return 0
 
         if args.reload:

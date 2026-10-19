@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import asyncio
 import json
+import sqlite3
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +35,7 @@ from app.main import (
 from app.main import (
     main as main_entrypoint,
 )
-from fastapi import APIRouter
+from fastapi import APIRouter, FastAPI
 from fastapi.testclient import TestClient
 
 
@@ -90,7 +90,7 @@ def test_bootstrapped_settings_http_writes_and_telemetry_shutdown(
     from app.host.persistence.read import list_host_settings
 
     runtime = AppHost(data_dir=tmp_path, use_process_pool=False)
-    app = runtime.create_app()
+    app = create_app(runtime=runtime)
     with TestClient(app) as client:
         telemetry.flush_logs()
         with client.websocket_connect("/api/v1/ws?channels=logs") as websocket:
@@ -161,9 +161,11 @@ def test_partial_service_initialization_releases_acquired_resources(
         monkeypatch.setattr(runtime.job_manager, "shutdown", stopped)
         raise RuntimeError("discovery initialization failed")
 
-    monkeypatch.setattr(runtime, "init_discovery", fail_discovery)
+    monkeypatch.setattr(runtime, "_init_discovery", fail_discovery)
+    runtime.startup()
+    runtime.initialize_db()
     with pytest.raises(RuntimeError, match="discovery initialization failed"):
-        runtime.startup_sync()
+        runtime.register_modules()
     stopped.assert_called_once_with(wait=True, cancel_futures=True)
     reset.assert_called_once()
     assert AppHost.Stage.SERVICES in runtime.teardown_stages
@@ -195,39 +197,41 @@ def test_seven_stage_progression_and_reverse_lifo_teardown(tmp_path: Path) -> No
     )
 
     # Pre-boot state
-    pre_snap = runtime.get_readiness()
-    assert pre_snap.state == AppHost.State.UNINITIALIZED
-    assert pre_snap.is_ready is False
-    assert runtime.shutdown_sync().state == AppHost.State.STOPPED
+    assert str(runtime.state) == AppHost.State.UNINITIALIZED.value
+    assert runtime._is_ready() is False
+    runtime.shutdown()
+    assert str(runtime.state) == AppHost.State.STOPPED.value
 
-    # Execute 7-stage startup
-    ready_snap = runtime.startup_sync()
-    assert ready_snap.state == AppHost.State.READY
-    assert ready_snap.is_ready is True
-    assert tuple(ready_snap.completed_stages) == AppHost.ORDERED_STAGES
+    # Execute 5-method workflow progression
+    app = runtime.startup()
+    assert isinstance(app, FastAPI)
+    conn = runtime.initialize_db()
+    assert isinstance(conn, sqlite3.Connection)
+    runtime.register_modules()
+    ev = runtime.broadcast_event("system", "host.ready")
+    assert ev.channel == "system"
+
+    assert str(runtime.state) == AppHost.State.READY.value
+    assert runtime._is_ready() is True
     assert tuple(runtime.completed_stages) == AppHost.ORDERED_STAGES
     assert runtime.active_stage == AppHost.Stage.READY
-    assert all(ready_snap.checks.values())
-
-    # Calling startup_sync() again while READY is idempotent
-    again_snap = runtime.startup_sync()
-    assert again_snap.host_instance_id == ready_snap.host_instance_id
 
     # Verify Stage 5 reconciled the orphan RUNNING job -> INTERRUPTED
     reconciled_row = get_host_job("job-orphan-01", conn=db_path)
     assert reconciled_row is not None
     assert reconciled_row["status"] == "INTERRUPTED"
-    assert "job-orphan-01" in ready_snap.details["services"]["reconciled_orphan_jobs"]
-    assert ready_snap.details["services"]["plugins_enabled"] >= 1
+    assert "job-orphan-01" in runtime._details["services"]["reconciled_orphan_jobs"]
+    assert runtime._details["services"]["plugins_enabled"] >= 1
 
     # Execute reverse-order LIFO teardown
-    stop_snap = runtime.shutdown_sync()
-    assert stop_snap.state == AppHost.State.STOPPED
-    assert stop_snap.is_ready is False
+    runtime.shutdown()
+    assert str(runtime.state) == AppHost.State.STOPPED.value
+    assert runtime._is_ready() is False
     assert tuple(runtime.teardown_stages) == tuple(reversed(AppHost.ORDERED_STAGES))
 
-    # Calling shutdown_sync() again while STOPPED is idempotent
-    assert runtime.shutdown_sync().state == AppHost.State.STOPPED
+    # Calling shutdown() again while STOPPED is idempotent
+    runtime.shutdown()
+    assert str(runtime.state) == AppHost.State.STOPPED.value
 
 
 def test_bootstrap_failure_triggers_reverse_rollback(tmp_path: Path) -> None:
@@ -235,16 +239,15 @@ def test_bootstrap_failure_triggers_reverse_rollback(tmp_path: Path) -> None:
     # 1. Invalid port fails in Stage 1 (CONFIGURING) before stage acquisition
     rt_bad = AppHost(data_dir=tmp_path / "bad_port", port=70000)
     with pytest.raises(ValueError, match="Invalid host port"):
-        rt_bad.startup_sync()
+        rt_bad.startup()
     assert rt_bad.state == AppHost.State.FAILED
     assert rt_bad.teardown_stages == []
 
     # 2. Failure injected via stage hook at Stage 5 (SERVICES) rolls back 5..1
     hook_order: list[str] = []
 
-    async def _fail_on_services(rt: AppHost) -> None:
+    def _fail_on_services(rt: AppHost) -> None:
         hook_order.append(f"hook:{rt.active_stage}")
-        # Register a custom cleanup that raises to verify exception isolation
         rt._acquired_stack.append(
             rt._acquired_stack[-1].__class__(
                 stage=AppHost.Stage.SERVICES,
@@ -260,43 +263,37 @@ def test_bootstrap_failure_triggers_reverse_rollback(tmp_path: Path) -> None:
         use_process_pool=False,
         stage_hooks={AppHost.Stage.SERVICES: _fail_on_services},
     )
+    rt_mid.startup()
+    rt_mid.initialize_db()
     with pytest.raises(RuntimeError, match="Simulated service initialization"):
-        rt_mid.startup_sync()
+        rt_mid.register_modules()
 
     assert rt_mid.state == AppHost.State.FAILED
-    # Stages 1..4 completed before Stage 5 failed; rollback released SERVICES..CONFIGURING
     assert AppHost.Stage.CONFIGURING in rt_mid.teardown_stages
     assert AppHost.Stage.PERSISTENCE in rt_mid.teardown_stages
     assert rt_mid.teardown_stages[-1] == AppHost.Stage.CONFIGURING
 
 
-def test_sync_and_async_bootstrap_context_and_reconcile(tmp_path: Path) -> None:
-    """Verify both sync and async AppHost context managers and CLI main."""
-    with AppHost(
-        data_dir=tmp_path / "ctx_test",
+def test_five_method_lifecycle_and_reconcile(tmp_path: Path) -> None:
+    """Verify 5-method AppHost lifecycle execution, database reconcile, and bootstrap main."""
+    rt = AppHost(
+        data_dir=tmp_path / "flow_test",
         headless=True,
         use_process_pool=False,
-    ) as rt_sync:
-        assert rt_sync.is_ready() is True
-    assert rt_sync.state == AppHost.State.STOPPED
-
-    async def _run_async_ctx() -> None:
-        async with AppHost(
-            data_dir=tmp_path / "ctx_test",
-            headless=True,
-            use_process_pool=False,
-        ) as rt_async:
-            assert rt_async.is_ready() is True
-            snap_dict = rt_async.get_readiness().to_dict()
-            assert snap_dict["state"] == "READY"
-        assert rt_async.state == AppHost.State.STOPPED
-
-    asyncio.run(_run_async_ctx())
+    )
+    rt.startup()
+    rt.initialize_db()
+    rt.register_modules()
+    rt.broadcast_event("system", "host.ready")
+    assert rt._is_ready() is True
+    assert str(rt.state) == AppHost.State.READY.value
+    rt.shutdown()
+    assert str(rt.state) == AppHost.State.STOPPED.value
 
     # Database reconciliation helper
     db_file = tmp_path / "reconcile_only" / "haruquantai.db"
     _seed_orphan_running_job(db_file, "job-rec-99")
-    rep = AppHost.reconcile_database(db_file)
+    rep = AppHost._reconcile_database(db_file)
     assert rep["status"] == "reconciled"
     assert "job-rec-99" in rep["reconciled_orphan_jobs"]
 
@@ -341,11 +338,11 @@ def test_main_ui_server_lifespan_and_uvicorn_modes(tmp_path: Path) -> None:
         return {"pong": True}
 
     runtime = AppHost(config=cfg, extra_routers=[extra])
-    app = runtime.create_app()
+    app = create_app(config=cfg, runtime=runtime)
 
-    # Entering TestClient context runs FastAPI lifespan -> 7-stage AppHost.startup()
+    # Entering TestClient context runs FastAPI lifespan -> 5-method orchestration
     with TestClient(app) as client:
-        assert runtime.is_ready() is True
+        assert runtime._is_ready() is True
         assert tuple(runtime.completed_stages) == AppHost.ORDERED_STAGES
 
         r_status = client.get("/api/v1/status")
@@ -410,6 +407,7 @@ def test_main_ui_server_lifespan_and_uvicorn_modes(tmp_path: Path) -> None:
     # Default create_app() and main(["--check-only"])
     default_app = create_app(config=cfg)
     assert default_app.title == cfg.title
+    default_app.state.runtime.shutdown()
     assert main_entrypoint(["--check-only"]) == 0
 
 
@@ -489,22 +487,42 @@ def test_headless_cli_commands_and_7_stage_bootstrap(
     err_json = json.loads(format_cli_output(None, as_json=True, error=err_obj))
     assert err_json["status"] == "error"
 
-    with AppHost(data_dir=data_dir, headless=True, use_process_pool=False) as rt:
+    rt = AppHost(data_dir=data_dir, headless=True, use_process_pool=False)
+    rt.startup()
+    rt.initialize_db()
+    rt.register_modules()
+    rt.broadcast_event("system", "host.ready")
+    try:
         runner = HeadlessCliRunner(rt)
         with pytest.raises(ValueError, match="Unsupported CLI command"):
             runner.execute("nonexistent-cmd")
+    finally:
+        rt.shutdown()
 
     # 8. CLI main() with and without --data-dir
     assert cli_main(["status", "--json"]) == 0
     assert cli_main(["status", "--json", *base_args]) == 0
 
-    # 8. Standalone cli.py main()
-    assert cli_main(["status", "--json"]) == 0
-
 
 def test_app_host_blueprint_methods_and_single_export(tmp_path: Path) -> None:
-    """Verify __all__ == ['AppHost'] and AppHost methods without aliases."""
+    """Verify __all__ == ['AppHost'] and AppHost exposes exactly five public methods."""
     assert app.host.bootstrap.__all__ == ["AppHost"]
+
+    # Assert that the ONLY public methods on AppHost are the five canonical methods
+    public_methods = [
+        name
+        for name in dir(AppHost)
+        if not name.startswith("_")
+        and callable(getattr(AppHost, name))
+        and not isinstance(getattr(AppHost, name), type)
+    ]
+    assert sorted(public_methods) == [
+        "broadcast_event",
+        "initialize_db",
+        "register_modules",
+        "shutdown",
+        "startup",
+    ]
 
     host = AppHost(
         data_dir=tmp_path,
@@ -512,23 +530,26 @@ def test_app_host_blueprint_methods_and_single_export(tmp_path: Path) -> None:
         use_process_pool=False,
     )
 
-    # 1. Test write_lock context manager
-    with host.write_lock():
+    # 1. Test private _write_lock context manager
+    with host._write_lock():
         locked = True
     assert locked is True
 
-    # 2. Test initialize_db
-    db_info = host.initialize_db()
-    assert Path(db_info["db_path"]).exists()
-    assert db_info["table_count"] >= 25
+    # 2. Test startup
+    app_instance = host.startup()
+    assert isinstance(app_instance, FastAPI)
 
-    # 3. Test register_modules
-    summary = host.register_modules()
-    assert summary["max_workers"] >= 1
-    assert "reconciled_orphan_jobs" in summary
-    assert "slots_registered" in summary
+    # 3. Test initialize_db
+    conn = host.initialize_db()
+    assert isinstance(conn, sqlite3.Connection)
+    assert host.db_connection is conn
 
-    # 4. Test broadcast_event
+    # 4. Test register_modules
+    host.register_modules()
+    assert host.job_manager is not None
+    assert host.job_manager.max_workers >= 1
+
+    # 5. Test broadcast_event
     ev = host.broadcast_event(
         channel="test-channel",
         event_type="test.event",
@@ -538,28 +559,29 @@ def test_app_host_blueprint_methods_and_single_export(tmp_path: Path) -> None:
     assert ev.event_type == "test.event"
     assert ev.payload == {"msg": "ping"}
 
-    # 5. Test async startup & shutdown
-    async def _run_lifecycle() -> None:
-        snap_up = await host.startup()
-        assert snap_up.is_ready is True
-        assert snap_up.state == AppHost.State.READY
-        assert len(snap_up.completed_stages) == 7
+    # Broadcast host.ready advances to READY
+    ev_ready = host.broadcast_event("system", "host.ready")
+    assert ev_ready.channel == "system"
+    assert str(host.state) == AppHost.State.READY.value
+    assert len(host.completed_stages) == 7
 
-        snap_down = await host.shutdown()
-        assert snap_down.state == AppHost.State.STOPPED
-        assert len(host.teardown_stages) == 7
-
-    asyncio.run(_run_lifecycle())
+    # 6. Test shutdown
+    host.shutdown()
+    assert str(host.state) == AppHost.State.STOPPED.value
+    assert len(host.teardown_stages) == 7
 
 
 def test_app_host_create_app_and_routes(tmp_path: Path) -> None:
-    """Verify AppHost.create_app mounts routes and returns security headers."""
+    """Verify AppHost 5-method workflow mounts routes and returns security headers."""
     host = AppHost(
         data_dir=tmp_path,
         headless=False,
         use_process_pool=False,
     )
-    app_instance = host.create_app()
+    app_instance = host.startup()
+    host.initialize_db()
+    host.register_modules(app_instance)
+    host.broadcast_event("system", "host.ready")
     assert app_instance.state.runtime is host
 
     with TestClient(app_instance) as client:
@@ -577,3 +599,216 @@ def test_app_host_create_app_and_routes(tmp_path: Path) -> None:
         resp_constants = client.get("/constants")
         assert resp_constants.status_code == 200
         assert resp_constants.json()["status"] == "success"
+
+    host.shutdown()
+
+
+class _DummyModel:
+    def to_dict(self) -> dict[str, Any]:
+        return {"id": "test"}
+
+
+class _DummyDataSub:
+    def list_datasets(self) -> list[Any]:
+        return [_DummyModel()]
+
+    def view(self) -> list[Any]:
+        return [{"symbol": "EURUSD"}]
+
+    def get_baskets_overview(self) -> list[Any]:
+        return [_DummyModel()]
+
+    def list_brokers(self) -> list[Any]:
+        return [_DummyModel()]
+
+    def list_providers(self) -> list[Any]:
+        return [_DummyModel()]
+
+    def list_logs(self, limit: int = 50) -> list[Any]:
+        return [_DummyModel()]
+
+
+class _DummyInstrumentsCLI:
+    @staticmethod
+    def format_instruments_table(items: Any) -> str:
+        return "table"
+
+    @staticmethod
+    def dispatch(args: Any, target: Any) -> dict[str, Any]:
+        return {"status": "dispatched", "args": args}
+
+
+class _DummySessionsCLI:
+    @staticmethod
+    def format_sessions_table(items: Any) -> str:
+        return "table"
+
+    @staticmethod
+    def dispatch(args: Any, target: Any) -> dict[str, Any]:
+        return {"status": "dispatched", "args": args}
+
+
+def test_headless_cli_data_and_workspace_commands(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Verify app/cli.py data manager commands, flags, and runner error handling."""
+    monkeypatch.chdir(tmp_path)
+    data_dir = tmp_path / "cli_data"
+    db_path = data_dir / "database" / "haruquantai.db"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = get_connection(db_path)
+    try:
+        create_schema(conn)
+    finally:
+        conn.close()
+    monkeypatch.setattr("app.host.persistence.create.DEFAULT_DB_PATH", db_path)
+
+    base_args = [
+        "--data-dir",
+        str(data_dir),
+        "--db-path",
+        str(db_path),
+    ]
+
+    # 1. Test live data home command
+    code_home, out_home = run_cli(["data", "--action", "home", "--json", *base_args])
+    assert code_home == 0
+    assert json.loads(out_home)["data"]["action"] == "home"
+
+    # 2. Test HeadlessCliRunner against mock DataManagerWorkspace sub-catalogs
+    host = AppHost(data_dir=data_dir, headless=True, use_process_pool=False)
+    host.startup()
+    host.initialize_db()
+    host.register_modules()
+    host.broadcast_event("system", "host.ready")
+    try:
+        assert host.data_manager is not None
+        host.data_manager.data = _DummyDataSub()  # type: ignore[attr-defined]
+        host.data_manager.instruments = _DummyDataSub()  # type: ignore[attr-defined]
+        host.data_manager.sessions = _DummyDataSub()  # type: ignore[attr-defined]
+        host.data_manager.baskets = _DummyDataSub()  # type: ignore[attr-defined]
+        host.data_manager.broker = _DummyDataSub()  # type: ignore[attr-defined]
+        host.data_manager.connections = _DummyDataSub()  # type: ignore[attr-defined]
+        host.data_manager.log = _DummyDataSub()  # type: ignore[attr-defined]
+
+        import app.workspace.data_manager as dm_pkg
+
+        monkeypatch.setattr(
+            dm_pkg, "InstrumentsCLI", _DummyInstrumentsCLI, raising=False
+        )
+        monkeypatch.setattr(dm_pkg, "SessionsCLI", _DummySessionsCLI, raising=False)
+
+        runner = HeadlessCliRunner(host)
+        for sub in (
+            "home",
+            "datasets",
+            "instruments",
+            "sessions",
+            "baskets",
+            "brokers",
+            "providers",
+            "logs",
+        ):
+            res = runner._cmd_data(sub)
+            assert res["command"] == "data"
+            assert res["action"] in (sub, "home")
+
+        with pytest.raises(ValueError, match="Unsupported data action"):
+            runner._cmd_data("invalid_action")
+
+        res_inst = runner._cmd_instrument("view")
+        assert res_inst["status"] == "dispatched"
+        res_inst2 = runner._cmd_instrument("view=1")
+        assert res_inst2["status"] == "dispatched"
+        res_inst_empty = runner._cmd_instrument("")
+        assert res_inst_empty["status"] == "dispatched"
+
+        res_sess = runner._cmd_sessions("view")
+        assert res_sess["status"] == "dispatched"
+        res_sess2 = runner._cmd_sessions("view=1")
+        assert res_sess2["status"] == "dispatched"
+        res_sess_empty = runner._cmd_sessions("")
+        assert res_sess_empty["status"] == "dispatched"
+    finally:
+        host.shutdown()
+
+    # 3. Test instrument and sessions without monkeypatched CLI classes (returns CLI_EXECUTION_ERROR)
+    monkeypatch.delattr(dm_pkg, "InstrumentsCLI", raising=False)
+    monkeypatch.delattr(dm_pkg, "SessionsCLI", raising=False)
+
+    code_inst, out_inst = run_cli(
+        ["instrument", "--action", "view", "--json", *base_args]
+    )
+    assert code_inst == 1
+    assert "InstrumentsCLI is not available" in out_inst
+
+    code_sess, out_sess = run_cli(
+        ["sessions", "--action", "view", "--json", *base_args]
+    )
+    assert code_sess == 1
+    assert "SessionsCLI is not available" in out_sess
+
+    # 4. Test format_cli_output rendered branch
+    assert (
+        format_cli_output(
+            {"command": "test", "rendered": "custom_render"}, as_json=False
+        )
+        == "custom_render"
+    )
+
+    # 5. Test invalid data action via run_cli (triggers run_cli error handling)
+    code_bad_data, out_bad_data = run_cli(
+        ["data", "--action", "invalid_sub", "--json", *base_args]
+    )
+    assert code_bad_data == 1
+    parsed_err = json.loads(out_bad_data)
+    assert parsed_err["status"] == "error"
+    assert parsed_err["error"]["code"] == "CLI_EXECUTION_ERROR"
+    assert "Unsupported data action" in parsed_err["error"]["message"]
+
+    # 7. Test cli main with data directory present
+    (tmp_path / "data").mkdir(parents=True, exist_ok=True)
+    assert cli_main(["status", "--json"]) == 0
+
+
+def test_headless_cli_runner_uninitialized_guards(tmp_path: Path) -> None:
+    """Verify HeadlessCliRunner raises RuntimeError if required subsystems are None."""
+    host = AppHost(data_dir=tmp_path, headless=True, use_process_pool=False)
+    runner = HeadlessCliRunner(host)
+
+    with pytest.raises(RuntimeError, match="ResourceManager is not initialized"):
+        runner._cmd_health()
+
+    with pytest.raises(RuntimeError, match="ResourceManager is not initialized"):
+        runner._cmd_resources()
+
+    with pytest.raises(RuntimeError, match="JobManager is not initialized"):
+        runner._cmd_jobs("list")
+
+    with pytest.raises(RuntimeError, match="PluginLifecycleManager is not initialized"):
+        runner._cmd_plugins("list")
+
+    with pytest.raises(RuntimeError, match="DataManagerWorkspace is not initialized"):
+        runner._cmd_data("home")
+
+    with pytest.raises(RuntimeError, match="DataManagerWorkspace is not initialized"):
+        runner._cmd_instrument("view")
+
+    with pytest.raises(RuntimeError, match="DataManagerWorkspace is not initialized"):
+        runner._cmd_sessions("view")
+
+
+def test_app_host_broadcast_event_ready_failure_rollback(tmp_path: Path) -> None:
+    """Verify broadcast_event('system', 'host.ready') catches failure and rolls back."""
+    host = AppHost(data_dir=tmp_path, headless=True, use_process_pool=False)
+    host.startup()
+    host.initialize_db()
+    # Deliberately skip host.register_modules(), so SERVICES and ROUTES are incomplete
+
+    with pytest.raises(
+        RuntimeError, match="Cannot enter Stage READY; incomplete stage checks"
+    ):
+        host.broadcast_event("system", "host.ready")
+
+    assert str(host.state) == AppHost.State.FAILED.value
+    assert len(host.teardown_stages) > 0

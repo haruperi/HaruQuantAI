@@ -17,7 +17,7 @@ Purpose:
 Key Capabilities:
     - FR-HOST-CLI-BOOTSTRAP-CONTEXT: Boot the headless AppHost through all
       7 stages (CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES ->
-      ROUTES -> READY) via `with AppHost(headless=True)` and guarantee
+      ROUTES -> READY) via explicit AppHost lifecycle methods and guarantee
       reverse-order LIFO teardown on exit.
       Associated: `HeadlessCliRunner`, `run_cli()`
       Logging: Emits INFO on headless 7-stage startup and LIFO teardown.
@@ -88,9 +88,7 @@ SUPPORTED_CLI_COMMANDS: tuple[str, ...] = (
     "reconcile",
     "data",
     "instrument",
-    "-instrument",
     "sessions",
-    "-sessions",
 )
 
 
@@ -106,18 +104,6 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         default="status",
         choices=SUPPORTED_CLI_COMMANDS,
         help="Headless command to execute after 7-stage bootstrap.",
-    )
-    parser.add_argument(
-        "-instrument",
-        dest="dash_instrument",
-        action="store_true",
-        help="Manage instruments in headless mode (alias for 'instrument').",
-    )
-    parser.add_argument(
-        "-sessions",
-        dest="dash_sessions",
-        action="store_true",
-        help="Manage sessions in headless mode (alias for 'sessions').",
     )
     parser.add_argument(
         "subcommand",
@@ -202,9 +188,7 @@ class HeadlessCliRunner:
             "reconcile": self._cmd_reconcile,
             "data": lambda: self._cmd_data(act),
             "instrument": lambda: self._cmd_instrument(act, extra_args),
-            "-instrument": lambda: self._cmd_instrument(act, extra_args),
             "sessions": lambda: self._cmd_sessions(act, extra_args),
-            "-sessions": lambda: self._cmd_sessions(act, extra_args),
         }
         handler = handlers.get(cmd)
         if handler is None:
@@ -212,7 +196,7 @@ class HeadlessCliRunner:
         return handler()
 
     def _cmd_status(self) -> dict[str, Any]:
-        snap = self.runtime.get_readiness()
+        snap = self.runtime._get_readiness()  # noqa: SLF001
         return {
             "command": "status",
             "readiness": snap.to_dict(),
@@ -304,7 +288,9 @@ class HeadlessCliRunner:
         }
 
     def _cmd_reconcile(self) -> dict[str, Any]:
-        rec_report = AppHost.reconcile_database(self.runtime.config.resolved_db_path)
+        rec_report = AppHost._reconcile_database(  # noqa: SLF001
+            self.runtime.config.resolved_db_path
+        )
         return {
             "command": "reconcile",
             **rec_report,
@@ -510,12 +496,7 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
         plugins_dir=args.plugins_dir,
         use_process_pool=False,
     )
-    if getattr(args, "dash_instrument", False):
-        cmd = "instrument"
-    elif getattr(args, "dash_sessions", False):
-        cmd = "sessions"
-    else:
-        cmd = args.command
+    cmd = args.command
     logger.info(
         "%s: Starting 7-stage headless CLI bootstrap (command=%s data_dir=%s).",
         CLI_BOOTSTRAP_FR,
@@ -528,10 +509,20 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
         effective_action = args.subcommand if args.subcommand is not None else "list"
 
     try:
-        with host as runtime:
-            runner = HeadlessCliRunner(runtime)
-            result = runner.execute(cmd, action=effective_action, extra_args=unknown)
-            result["stages_completed"] = len(runtime.completed_stages)
+        host.startup()
+        host.initialize_db()
+        host.register_modules()
+        host.broadcast_event(
+            channel="system",
+            event_type="host.ready",
+            payload={
+                "host_instance_id": host.host_instance_id,
+                "state": host.state.value,
+            },
+        )
+        runner = HeadlessCliRunner(host)
+        result = runner.execute(cmd, action=effective_action, extra_args=unknown)
+        result["stages_completed"] = len(host.completed_stages)
         output = format_cli_output(result, as_json=bool(args.json))
         return 0, output
     except Exception as exc:
@@ -547,6 +538,7 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
         )
         return 1, format_cli_output(None, as_json=bool(args.json), error=err)
     finally:
+        host.shutdown()
         logger.info(
             "%s: Headless CLI teardown complete; draining telemetry.",
             CLI_BOOTSTRAP_FR,
