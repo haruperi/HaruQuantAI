@@ -336,7 +336,7 @@ class SendEmailAction:
         )
         delivered = False
         if self.dispatcher is not None:
-            delivered = bool(self.dispatcher(self.email_subject, self.message))
+            delivered = self.dispatcher(self.email_subject, self.message)
         return ActionRecord(
             action_type="send_email",
             params={

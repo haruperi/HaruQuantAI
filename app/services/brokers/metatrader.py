@@ -814,8 +814,8 @@ class MetaTraderClient(TradingClient):
         return TerminalInfo(
             name=self.name,
             company=self.name,
-            connected=bool(self.bridge.connected),
-            trade_allowed=bool(self.bridge.armed),
+            connected=self.bridge.connected,
+            trade_allowed=self.bridge.armed,
         )
 
     @override
@@ -878,7 +878,7 @@ class MetaTraderClient(TradingClient):
             date_from, date_to, start_pos, count, limit, scale=1
         )
         clean_sym = symbol.strip().upper()
-        tf_str = timeframe.value if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_str = timeframe.value if isinstance(timeframe, Timeframe) else timeframe
         payload = await self.call(
             object_id="market-data",
             class_name="MarketData",
