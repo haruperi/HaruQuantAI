@@ -20,6 +20,7 @@ repos:
         stages: [pre-commit]
 
       - id: check-yaml
+        entry: python -m pre_commit_hooks.check_yaml
         stages: [pre-commit]
 
       - id: check-toml
@@ -57,6 +58,13 @@ repos:
         entry: uv run ruff format --check
         language: system
         types_or: [python, pyi]
+        stages: [pre-commit]
+
+      - id: architecture-check
+        name: Architecture gate
+        entry: uv run python scripts/check_architecture.py
+        language: system
+        pass_filenames: false
         stages: [pre-commit]
 
       - id: qualification-check

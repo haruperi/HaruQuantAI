@@ -50,10 +50,13 @@ from app.services.brokers.base import (
     utc_now,
 )
 from app.services.include.contracts import (
+    TIMEFRAME_SECONDS,
     AccountInfo,
     BookInfo,
     BridgeEvent,
     DealInfo,
+    MarketBar,
+    MarketTick,
     OrderInfo,
     PositionInfo,
     Receipt,
@@ -63,6 +66,7 @@ from app.services.include.contracts import (
     TradeRequest,
     TradeResult,
 )
+from app.services.include.data import validate_rows
 from app.services.include.enums import (
     BookType,
     DealEntry,
@@ -75,13 +79,9 @@ from app.services.include.enums import (
     PositionType,
     SymbolTradeExecution,
     SymbolTradeMode,
+    Timeframe,
     TradeAction,
     TradeRetcode,
-)
-from app.workspace.data_manager import (
-    MarketBar,
-    MarketTick,
-    Timeframe,
 )
 
 logger = get_logger(__name__)
@@ -1546,9 +1546,6 @@ class SimulatorClient(TradingClient):
         bars: Sequence[MarketBar],
     ) -> None:
         """Register an immutable chronological bar series without advancing time."""
-        from app.services.include.data import validate_rows
-        from app.workspace.data_manager import TIMEFRAME_SECONDS
-
         logger.debug("FR-SIMULATION-HISTORY: seeding bars")
         if symbol not in self._symbols or timeframe not in TIMEFRAME_SECONDS:
             raise BridgeError("invalid history series", code="BAD_REQUEST")
@@ -1558,8 +1555,6 @@ class SimulatorClient(TradingClient):
 
     def seed_tick_history(self, symbol: str, ticks: Sequence[MarketTick]) -> None:
         """Register immutable chronological ticks without replacing the live quote."""
-        from app.services.include.data import validate_rows
-
         logger.debug("FR-SIMULATION-HISTORY: seeding ticks")
         if symbol not in self._symbols:
             raise BridgeError("invalid history series", code="BAD_REQUEST")

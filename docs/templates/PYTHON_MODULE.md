@@ -90,7 +90,7 @@
 - **Characterize Before Refactoring:** Verify existing tests pass (or add missing characterization tests for outputs, errors, `HostPersistence` records, warm-up periods, `NaN` handling, and shift indexing) *before* restructuring any module.
 - **1:1 Test Mirroring:** Map every `app/<tier>/<domain>/<module>.py` to `tests/unit/<tier>/<domain>/test_<module>.py`.
 - **Test Public `FR-*` Contracts Only:** Unit tests must assert against public `FR-*` methods and persisted records—never private `_helper()` methods or private attributes.
-- **Automated AST/CI Enforcement:** Enforce physical line limits ($\le 1,000$ file, $\le 100$ docstring/facade), McCabe complexity ($\le 10$), `sqlite3` import isolation, top-level-only imports, and the allowed-import matrix via automated pytest architecture tests on every refactor slice.
+- **Automated AST/CI Enforcement:** Enforce physical line limits ($\le 1,000$ file, $\le 100$ docstring/facade), McCabe complexity ($\le 10$), `sqlite3` import isolation, top-level-only imports, and the allowed-import matrix via `scripts/check_architecture.py` (wired into `scripts/ci_check.py` and `.pre-commit-config.yaml`) on every refactor slice.
 
 ---
 

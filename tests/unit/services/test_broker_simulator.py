@@ -31,6 +31,7 @@ import pytest
 from app.services.brokers.simulator import SimulatorClient
 from app.services.include.contracts import (
     DealInfo,
+    MarketTick,
     OrderInfo,
     PositionInfo,
     SymbolInfo,
@@ -49,7 +50,6 @@ from app.services.include.enums import (
     TradeAction,
     TradeRetcode,
 )
-from app.workspace.data_manager import MarketTick
 
 
 @pytest.fixture

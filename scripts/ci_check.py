@@ -81,6 +81,7 @@ def main() -> int:
             "--explicit-package-bases",
             "scripts",
         ),
+        (sys.executable, "scripts/check_architecture.py"),
         (sys.executable, "-m", "ruff", "check", "tests"),
         (sys.executable, "-m", "ruff", "format", "--check", "tests"),
         (

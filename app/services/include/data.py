@@ -58,16 +58,15 @@ from typing import Any, Literal, Protocol
 
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
-from app.services.brokers.base import BridgeError
-
-from .contracts import (
+from app.services.include.contracts import (
     MAX_POSITION,
     MAX_RECORDS,
     TIMEFRAME_SECONDS,
+    BridgeError,
     MarketBar,
     MarketTick,
 )
-from .enums import Timeframe
+from app.services.include.enums import Timeframe
 
 __all__ = [
     "BAR_COLUMNS",

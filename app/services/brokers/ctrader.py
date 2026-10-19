@@ -74,6 +74,7 @@ from app.services.include.contracts import (
     BridgeEvent,
     DealInfo,
     MarketBar,
+    MarketTick,
     OrderInfo,
     PositionInfo,
     Receipt,
@@ -93,7 +94,6 @@ from app.services.include.enums import (
     TradeRetcode,
 )
 from app.services.include.trading import Trading
-from app.workspace.data_manager import MarketTick
 
 logger = get_logger(__name__)
 

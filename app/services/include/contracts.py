@@ -1,4 +1,32 @@
-"""Domain value objects and contracts for accounts, symbols, orders, and deals."""
+"""Domain value objects and contracts for accounts, symbols, orders, and deals.
+
+Description:
+    Defines canonical domain contracts across market data, broker bridges,
+    symbol specifications, order/deal lifecycles, and trading sessions.
+
+Purpose:
+    FEAT-INCLUDE-CONTRACTS: Core domain value objects, protocols, and bridge errors.
+
+Key Capabilities:
+    - FR-CONTRACTS-MARKET-DATA: Historical bar, tick, chart, and dataset metadata
+      contracts [`MarketBar`, `MarketTick`, `ChartDef`, `DataInfo`] (`DEBUG`).
+    - FR-CONTRACTS-TRADING-STATE: Account, terminal, symbol, position, order, deal,
+      and bridge contracts [`SymbolInfo`, `TradeRequest`, `BridgeError`] (`DEBUG`).
+    - FR-CONTRACTS-SESSION-CALENDAR: Trading session window and holiday evaluation
+      contracts [`SessionWindow`, `TradingHoliday`, `TradingSession`] (`DEBUG`).
+
+Python API Usage:
+    ```python
+    from app.services.include.contracts import MarketBar, SymbolInfo
+
+    bar = MarketBar(time=1700000000, open=1.10, high=1.12, low=1.09, close=1.11)
+    ```
+
+CLI Usage:
+    ```bash
+    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
+    ```
+"""
 
 from __future__ import annotations
 
@@ -9,7 +37,7 @@ from datetime import UTC, datetime
 from typing import Any, Protocol, runtime_checkable
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from .enums import (
+from app.services.include.enums import (
     AccountTradeMode,
     BookType,
     DealEntry,
@@ -30,137 +58,77 @@ from .enums import (
     TradeAction,
 )
 
+# fmt: off
 __all__ = [
-    "BOOK_TYPE_DESCRIPTIONS",
-    "DEAL_ENTRY_DESCRIPTIONS",
-    "DEAL_TYPE_DESCRIPTIONS",
-    "MAX_POSITION",
-    "MAX_RECORDS",
-    "ORDER_FILLING_DESCRIPTIONS",
-    "ORDER_STATE_DESCRIPTIONS",
-    "ORDER_TIME_DESCRIPTIONS",
-    "ORDER_TYPE_DESCRIPTIONS",
-    "POSITION_TYPE_DESCRIPTIONS",
-    "READ_TIMEOUT",
-    "SYMBOL_CALC_MODE_DESCRIPTIONS",
-    "SYMBOL_SWAP_MODE_DESCRIPTIONS",
-    "SYMBOL_TRADE_EXECUTION_DESCRIPTIONS",
-    "SYMBOL_TRADE_MODE_DESCRIPTIONS",
-    "TIMEFRAME_SECONDS",
-    "AccountInfo",
-    "BookInfo",
-    "BridgeEvent",
-    "ChartDef",
-    "DataInfo",
-    "DealInfo",
-    "MarketBar",
-    "MarketTick",
-    "OrderInfo",
-    "PositionInfo",
-    "PropertyValue",
-    "Receipt",
-    "SessionWindow",
-    "SymbolAliasRecord",
-    "SymbolInfo",
-    "TerminalInfo",
-    "TradeCheckResult",
-    "TradeRequest",
-    "TradeResult",
-    "TradingBackend",
-    "TradingHoliday",
-    "TradingSession",
+    "BOOK_TYPE_DESCRIPTIONS", "DEAL_ENTRY_DESCRIPTIONS", "DEAL_TYPE_DESCRIPTIONS",
+    "MAX_POSITION", "MAX_RECORDS", "ORDER_FILLING_DESCRIPTIONS",
+    "ORDER_STATE_DESCRIPTIONS", "ORDER_TIME_DESCRIPTIONS", "ORDER_TYPE_DESCRIPTIONS",
+    "POSITION_TYPE_DESCRIPTIONS", "READ_TIMEOUT", "SYMBOL_CALC_MODE_DESCRIPTIONS",
+    "SYMBOL_SWAP_MODE_DESCRIPTIONS", "SYMBOL_TRADE_EXECUTION_DESCRIPTIONS",
+    "SYMBOL_TRADE_MODE_DESCRIPTIONS", "TIMEFRAME_SECONDS", "AccountInfo", "BookInfo",
+    "BridgeError", "BridgeEvent", "ChartDef", "DataInfo", "DealInfo", "MarketBar",
+    "MarketTick", "OrderInfo", "PositionInfo", "PropertyValue", "Receipt",
+    "SessionWindow", "SymbolAliasRecord", "SymbolInfo", "TerminalInfo",
+    "TradeCheckResult", "TradeRequest", "TradeResult", "TradingBackend",
+    "TradingHoliday", "TradingSession",
 ]
 
 MAX_RECORDS: int = 1000
 MAX_POSITION: int = 2**31 - 1
 READ_TIMEOUT: float = 60.0
 
-ORDER_TYPE_DESCRIPTIONS: dict[OrderType, str] = {
-    OrderType.BUY: "Buy",
-    OrderType.SELL: "Sell",
-    OrderType.BUY_LIMIT: "Buy Limit",
-    OrderType.SELL_LIMIT: "Sell Limit",
-    OrderType.BUY_STOP: "Buy Stop",
-    OrderType.SELL_STOP: "Sell Stop",
-    OrderType.BUY_STOP_LIMIT: "Buy Stop Limit",
-    OrderType.SELL_STOP_LIMIT: "Sell Stop Limit",
-    OrderType.CLOSE_BY: "Close By",
-}
+def _enum_titles(enum_cls: Any) -> dict[Any, str]:
+    """Build title-cased description mapping for an enum class."""
+    return {item: item.name.replace("_", " ").title() for item in enum_cls}
 
+ORDER_TYPE_DESCRIPTIONS: dict[OrderType, str] = _enum_titles(OrderType)
+POSITION_TYPE_DESCRIPTIONS: dict[PositionType, str] = _enum_titles(PositionType)
+ORDER_STATE_DESCRIPTIONS: dict[OrderState, str] = _enum_titles(OrderState)
+DEAL_TYPE_DESCRIPTIONS: dict[DealType, str] = _enum_titles(DealType)
+DEAL_ENTRY_DESCRIPTIONS: dict[DealEntry, str] = _enum_titles(DealEntry)
+SYMBOL_TRADE_MODE_DESCRIPTIONS: dict[SymbolTradeMode, str] = (
+    _enum_titles(SymbolTradeMode)
+)
+SYMBOL_TRADE_EXECUTION_DESCRIPTIONS: dict[SymbolTradeExecution, str] = (
+    _enum_titles(SymbolTradeExecution)
+)
+SYMBOL_SWAP_MODE_DESCRIPTIONS: dict[SymbolSwapMode, str] = _enum_titles(SymbolSwapMode)
+SYMBOL_CALC_MODE_DESCRIPTIONS: dict[SymbolCalcMode, str] = _enum_titles(SymbolCalcMode)
 ORDER_FILLING_DESCRIPTIONS: dict[OrderFilling, str] = {
-    OrderFilling.FOK: "Fill or Kill",
-    OrderFilling.IOC: "Immediate or Cancel",
-    OrderFilling.RETURN: "Return",
-    OrderFilling.BOC: "Book or Cancel",
+    OrderFilling.FOK: "Fill or Kill", OrderFilling.IOC: "Immediate or Cancel",
+    OrderFilling.RETURN: "Return", OrderFilling.BOC: "Book or Cancel",
 }
-
 ORDER_TIME_DESCRIPTIONS: dict[OrderTime, str] = {
-    OrderTime.GTC: "Good Till Cancelled",
-    OrderTime.DAY: "Day",
-    OrderTime.SPECIFIED: "Specified",
-    OrderTime.SPECIFIED_DAY: "Specified Day",
+    OrderTime.GTC: "Good Till Cancelled", OrderTime.DAY: "Day",
+    OrderTime.SPECIFIED: "Specified", OrderTime.SPECIFIED_DAY: "Specified Day",
 }
-
 BOOK_TYPE_DESCRIPTIONS: dict[BookType, str] = {
-    BookType.BOOK_TYPE_SELL: "Sell",
-    BookType.BOOK_TYPE_BUY: "Buy",
+    BookType.BOOK_TYPE_SELL: "Sell", BookType.BOOK_TYPE_BUY: "Buy",
     BookType.BOOK_TYPE_SELL_MARKET: "Sell Market",
     BookType.BOOK_TYPE_BUY_MARKET: "Buy Market",
 }
-
-POSITION_TYPE_DESCRIPTIONS: dict[PositionType, str] = {
-    PositionType.BUY: "Buy",
-    PositionType.SELL: "Sell",
-}
-
-ORDER_STATE_DESCRIPTIONS: dict[OrderState, str] = {
-    item: item.name.replace("_", " ").title() for item in OrderState
-}
-
-DEAL_TYPE_DESCRIPTIONS: dict[DealType, str] = {
-    item: item.name.replace("_", " ").title() for item in DealType
-}
-
-DEAL_ENTRY_DESCRIPTIONS: dict[DealEntry, str] = {
-    item: item.name.replace("_", " ").title() for item in DealEntry
-}
-
-SYMBOL_TRADE_MODE_DESCRIPTIONS: dict[SymbolTradeMode, str] = {
-    item: item.name.replace("_", " ").title() for item in SymbolTradeMode
-}
-
-SYMBOL_TRADE_EXECUTION_DESCRIPTIONS: dict[SymbolTradeExecution, str] = {
-    item: item.name.replace("_", " ").title() for item in SymbolTradeExecution
-}
-
-SYMBOL_SWAP_MODE_DESCRIPTIONS: dict[SymbolSwapMode, str] = {
-    item: item.name.replace("_", " ").title() for item in SymbolSwapMode
-}
-
-SYMBOL_CALC_MODE_DESCRIPTIONS: dict[SymbolCalcMode, str] = {
-    item: item.name.replace("_", " ").title() for item in SymbolCalcMode
-}
-
 TIMEFRAME_SECONDS: dict[Timeframe, int] = {
-    frame: frame.to_seconds()
-    for frame in Timeframe
-    if frame != Timeframe.PERIOD_CURRENT
+    f: f.to_seconds() for f in Timeframe if f != Timeframe.PERIOD_CURRENT
 }
-
-
+class BridgeError(RuntimeError):
+    """Base runtime exception for broker and market data bridge operations."""
+    def __init__(
+        self, message: str, *, code: str = "BRIDGE_ERROR",
+        command_id: str | None = None, uncertain: bool = False,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.command_id = command_id
+        self.uncertain = uncertain
 @dataclass(frozen=True, slots=True)
 class PropertyValue:
     """Container for a typed scalar property query result or failure."""
-
     ok: bool
     value: Any = None
     error: str | None = None
-
-
 @dataclass(frozen=True, slots=True)
 class Receipt:
     """Immutable audit record tracking the lifecycle of an IPC command."""
-
     command_id: str
     object_id: str
     class_name: str
@@ -174,99 +142,55 @@ class Receipt:
     value: Any = None
     meta: Mapping[str, Any] = field(default_factory=dict)
     error: Mapping[str, Any] | None = None
-
-
 @dataclass(frozen=True, slots=True)
 class BridgeEvent:
     """Parsed asynchronous event dispatched from the trading bridge."""
-
     event_type: str
     payload: Mapping[str, Any]
     command_id: str | None = None
     request_id: int | None = None
-
-
 @runtime_checkable
 class TradingBackend(Protocol):
     """Async execution capability consumed by trading and market data APIs."""
-
     async def start(self) -> None:
         """Backend capability: start."""
-        ...
-
-    async def wait_connected(self, timeout: float | None = None) -> None:  # noqa: ASYNC109 -- backend deadline capability
+    async def wait_connected(self, timeout: float | None = None) -> None:  # noqa: ASYNC109
         """Backend capability: wait connected."""
-        ...
-
     async def close(self) -> None:
         """Backend capability: close."""
-        ...
-
     def arm(self) -> None:
         """Backend capability: arm."""
-        ...
-
     def disarm(self) -> None:
         """Backend capability: disarm."""
-        ...
-
     def last_command_id(self) -> str | None:
         """Backend capability: last command id."""
-        ...
-
     def receipt(self, command_id: str) -> Receipt | None:
         """Backend capability: receipt."""
-        ...
-
-    async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109 -- backend deadline capability
+    async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109
         """Backend capability: next event."""
-        ...
-
     async def await_request_event(
-        self,
-        request_id: int,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline capability
+        self, request_id: int, timeout: float | None = None,  # noqa: ASYNC109
     ) -> BridgeEvent:
         """Backend capability: await request event."""
-        ...
-
     async def call(
-        self,
-        *,
-        object_id: str,
-        class_name: str,
-        method_name: str,
-        args: list[Any],
-        requires_arm: bool = False,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline capability
+        self, *, object_id: str, class_name: str, method_name: str,
+        args: list[Any], requires_arm: bool = False,
+        timeout: float | None = None,  # noqa: ASYNC109
     ) -> Any:
         """Backend capability: call."""
-        ...
-
-
 @dataclass(frozen=True, slots=True)
 class BookInfo:
     """Market depth (DOM) book entry."""
-
     type: BookType
     price: float
     volume: int
     volume_real: float
-
     def _asdict(self) -> dict[str, Any]:
         """Convert entry to a dictionary."""
-        return {
-            "type": int(self.type),
-            "price": self.price,
-            "volume": self.volume,
-            "volume_real": self.volume_real,
-        }
-
-
+        return {**asdict(self), "type": int(self.type)}
 @dataclass(frozen=True, slots=True)
 class MarketBar:
     """Historical OHLC bar with its opening time in epoch seconds."""
-
     time: int
     open: float
     high: float
@@ -275,36 +199,27 @@ class MarketBar:
     tick_volume: int = 0
     spread: int = 0
     real_volume: int = 0
-
     def is_bullish(self) -> bool:
         """Check if candle closed higher than open."""
         return self.close > self.open
-
     def is_bearish(self) -> bool:
         """Check if candle closed lower than open."""
         return self.close < self.open
-
     def is_doji(self) -> bool:
         """Check if candle closed at open."""
         return self.close == self.open
-
     def range(self) -> float:
         """Calculate total bar price range (High - Low)."""
         return self.high - self.low
-
     def body(self) -> float:
         """Calculate candle body size abs(Close - Open)."""
         return abs(self.close - self.open)
-
     def volume(self) -> float:
         """Calculate primary volume (real_volume if present, else tick_volume)."""
         return float(self.real_volume or self.tick_volume)
-
-
 @dataclass(frozen=True, slots=True)
 class MarketTick:
     """Historical tick retaining epoch milliseconds and native flags."""
-
     time_msc: int
     bid: float
     ask: float
@@ -312,20 +227,15 @@ class MarketTick:
     volume: int = 0
     flags: int = 0
     volume_real: float = 0.0
-
     def spread(self) -> float:
         """Calculate instantaneous spread (Ask - Bid)."""
         return self.ask - self.bid
-
     def mid(self) -> float:
         """Calculate midpoint price."""
         return (self.ask + self.bid) / 2.0
-
-
 @dataclass(slots=True)
 class AccountInfo:
     """Atomic state of account balance, margin, leverage, and trading permissions."""
-
     login: int = 0
     trade_mode: AccountTradeMode = AccountTradeMode.DEMO
     leverage: int = 100
@@ -357,12 +267,9 @@ class AccountInfo:
     trade_mode_description: str = ""
     stopout_mode_description: str = ""
     margin_mode_description: str = ""
-
-
 @dataclass(slots=True)
 class TerminalInfo:
     """Atomic state of terminal connectivity, paths, and platform metadata."""
-
     build: int = 0
     connected: bool = True
     dlls_allowed: bool = False
@@ -393,23 +300,26 @@ class TerminalInfo:
     ping_last: int = 0
     community_balance: float = 0.0
     retransmission: float = 0.0
-
-
-_DEFAULT_DIGITS: int = 5
-_DEFAULT_TICK_SIZE: float = 0.00001
-_DEFAULT_CONTRACT_SIZE: float = 100_000.0
-_DEFAULT_TICK_VALUE: float = 1.0
-_DEFAULT_TICK_VALUE_IN_MONEY: float = 10.0
-_DEFAULT_VOLUME_MIN: float = 0.01
-_DEFAULT_VOLUME_MAX: float = 100.0
-_DEFAULT_VOLUME_STEP: float = 0.01
-_DEFAULT_SWAP_ROLLOVER_DAYS: int = 3
-
-
+def _sync_default_pair(
+    obj: Any, attr_a: str, attr_b: str, default_a: Any, default_b: Any | None = None
+) -> None:
+    """Synchronize two paired attributes when one diverges from its default."""
+    def_b = default_a if default_b is None else default_b
+    val_a, val_b = getattr(obj, attr_a), getattr(obj, attr_b)
+    if val_a != default_a and val_b == def_b:
+        setattr(obj, attr_b, val_a)
+    elif val_b != def_b and val_a == default_a:
+        setattr(obj, attr_a, val_b)
+_SYMBOL_DICT_KEYS = (
+    "id", "connection", "broker_id", "description", "tick_size", "decimals",
+    "tick_value_in_money", "point_value", "default_spread", "default_slippage",
+    "min_volume", "max_volume", "lot_step", "margin_rate", "swap_long", "cot",
+    "swap_short", "commissions", "alias", "exchange", "country", "sector",
+    "order_size_multiplier", "order_size_step", "created_at_utc", "updated_at_utc",
+)
 @dataclass(slots=True)
 class SymbolInfo:
     """Atomic state of symbol specification, execution modes, rates, and spreads."""
-
     name: str = ""
     symbol: str = ""
     id: int | None = None
@@ -545,252 +455,81 @@ class SymbolInfo:
     data_type: str = ""
     min_distance: float = 0.0
     swap_3day_day: int = 3
-
     def __post_init__(self) -> None:
         """Synchronize name/symbol and dual-named instrument attributes."""
-        self._sync_identifiers()
-        self._sync_digits_and_ticks()
-        self._sync_contracts_and_values()
-        self._sync_volumes_and_swaps()
-
-    def _sync_identifiers(self) -> None:
-        """Synchronize name/symbol and category/data_type."""
-        if not self.name and self.symbol:
-            self.name = self.symbol
-        elif not self.symbol and self.name:
-            self.symbol = self.name
-
-        if not self.category and self.data_type:
-            self.category = self.data_type
-        elif not self.data_type and self.category:
-            self.data_type = self.category
-
-    def _sync_digits_and_ticks(self) -> None:
-        """Synchronize digits, tick_size, and tick_step."""
-        if self.digits != _DEFAULT_DIGITS and self.decimals == _DEFAULT_DIGITS:
-            self.decimals = self.digits
-        elif self.decimals != _DEFAULT_DIGITS and self.digits == _DEFAULT_DIGITS:
-            self.digits = self.decimals
-
-        if (
-            self.trade_tick_size != _DEFAULT_TICK_SIZE
-            and self.tick_size == _DEFAULT_TICK_SIZE
-        ):
-            self.tick_size = self.trade_tick_size
-        elif (
-            self.tick_size != _DEFAULT_TICK_SIZE
-            and self.trade_tick_size == _DEFAULT_TICK_SIZE
-        ):
-            self.trade_tick_size = self.tick_size
-
-        if (
-            self.tick_step == _DEFAULT_TICK_SIZE
-            and self.tick_size != _DEFAULT_TICK_SIZE
-        ):
-            self.tick_step = self.tick_size
-        elif (
-            self.tick_size == _DEFAULT_TICK_SIZE
-            and self.tick_step != _DEFAULT_TICK_SIZE
-        ):
-            self.tick_size = self.tick_step
-
-    def _sync_contracts_and_values(self) -> None:
-        """Synchronize contract size and tick value."""
-        if (
-            self.trade_contract_size != _DEFAULT_CONTRACT_SIZE
-            and self.point_value == _DEFAULT_CONTRACT_SIZE
-        ):
-            self.point_value = self.trade_contract_size
-        elif (
-            self.point_value != _DEFAULT_CONTRACT_SIZE
-            and self.trade_contract_size == _DEFAULT_CONTRACT_SIZE
-        ):
-            self.trade_contract_size = self.point_value
-
-        if (
-            self.trade_tick_value != _DEFAULT_TICK_VALUE
-            and self.tick_value_in_money == _DEFAULT_TICK_VALUE_IN_MONEY
-        ):
-            self.tick_value_in_money = self.trade_tick_value
-        elif (
-            self.tick_value_in_money != _DEFAULT_TICK_VALUE_IN_MONEY
-            and self.trade_tick_value == _DEFAULT_TICK_VALUE
-        ):
-            self.trade_tick_value = self.tick_value_in_money
-
-    def _sync_volumes_and_swaps(self) -> None:
-        """Synchronize volume and swap parameters."""
-        if (
-            self.volume_min != _DEFAULT_VOLUME_MIN
-            and self.min_volume == _DEFAULT_VOLUME_MIN
-        ):
-            self.min_volume = self.volume_min
-        elif (
-            self.min_volume != _DEFAULT_VOLUME_MIN
-            and self.volume_min == _DEFAULT_VOLUME_MIN
-        ):
-            self.volume_min = self.min_volume
-
-        if (
-            self.volume_max != _DEFAULT_VOLUME_MAX
-            and self.max_volume == _DEFAULT_VOLUME_MAX
-        ):
-            self.max_volume = self.volume_max
-        elif (
-            self.max_volume != _DEFAULT_VOLUME_MAX
-            and self.volume_max == _DEFAULT_VOLUME_MAX
-        ):
-            self.volume_max = self.max_volume
-
-        if (
-            self.volume_step != _DEFAULT_VOLUME_STEP
-            and self.lot_step == _DEFAULT_VOLUME_STEP
-        ):
-            self.lot_step = self.volume_step
-        elif (
-            self.lot_step != _DEFAULT_VOLUME_STEP
-            and self.volume_step == _DEFAULT_VOLUME_STEP
-        ):
-            self.volume_step = self.lot_step
-
-        if (
-            self.swap_rollover3days != _DEFAULT_SWAP_ROLLOVER_DAYS
-            and self.swap_3day_day == _DEFAULT_SWAP_ROLLOVER_DAYS
-        ):
-            self.swap_3day_day = self.swap_rollover3days
-        elif (
-            self.swap_3day_day != _DEFAULT_SWAP_ROLLOVER_DAYS
-            and self.swap_rollover3days == _DEFAULT_SWAP_ROLLOVER_DAYS
-        ):
-            self.swap_rollover3days = self.swap_3day_day
-
+        _sync_default_pair(self, "name", "symbol", "")
+        _sync_default_pair(self, "category", "data_type", "")
+        _sync_default_pair(self, "digits", "decimals", 5)
+        _sync_default_pair(self, "trade_tick_size", "tick_size", 0.00001)
+        _sync_default_pair(self, "tick_size", "tick_step", 0.00001)
+        _sync_default_pair(self, "trade_contract_size", "point_value", 100_000.0)
+        _sync_default_pair(self, "trade_tick_value", "tick_value_in_money", 1.0, 10.0)
+        _sync_default_pair(self, "volume_min", "min_volume", 0.01)
+        _sync_default_pair(self, "volume_max", "max_volume", 100.0)
+        _sync_default_pair(self, "volume_step", "lot_step", 0.01)
+        _sync_default_pair(self, "swap_rollover3days", "swap_3day_day", 3)
     def round_to_tick_size(self, price: float) -> float:
         """Round a price to the symbol's minimum tick size."""
-        step = (
-            self.trade_tick_size
-            if self.trade_tick_size > 0.0
-            else (self.tick_size if self.tick_size > 0.0 else 0.00001)
-        )
-        digits = self.digits if self.digits > 0 else self.decimals
-        return round(round(price / step) * step, digits)
-
+        step = self.trade_tick_size or self.tick_size or 0.00001
+        return round(round(price / step) * step, self.digits or self.decimals)
     def to_dict(self) -> dict[str, Any]:
         """Convert specification to dictionary representation."""
-        return {
-            "id": self.id,
-            "symbol": self.symbol or self.name,
-            "connection": self.connection,
-            "broker_id": self.broker_id,
-            "description": self.description,
-            "tick_size": self.tick_size,
-            "tick_step": self.tick_step or self.tick_size,
-            "tick_value_in_money": self.tick_value_in_money,
-            "point_value": self.point_value,
-            "decimals": self.decimals,
-            "default_spread": self.default_spread,
-            "default_slippage": self.default_slippage,
-            "min_volume": self.min_volume,
-            "max_volume": self.max_volume,
-            "lot_step": self.lot_step,
-            "margin_rate": self.margin_rate,
-            "swap_long": self.swap_long,
-            "swap_short": self.swap_short,
-            "swap_3day_day": self.swap_3day_day or self.swap_rollover3days,
-            "commissions": self.commissions,
-            "data_type": self.data_type or self.category or "Forex",
-            "alias": self.alias,
-            "exchange": self.exchange,
-            "country": self.country,
-            "sector": self.sector,
-            "min_distance": self.min_distance or float(self.trade_stops_level),
-            "order_size_multiplier": self.order_size_multiplier,
-            "order_size_step": self.order_size_step,
-            "cot": self.cot,
-            "created_at_utc": self.created_at_utc,
-            "updated_at_utc": self.updated_at_utc,
-        }
-
+        res = {k: getattr(self, k) for k in _SYMBOL_DICT_KEYS}
+        res["symbol"] = self.symbol or self.name
+        res["tick_step"] = self.tick_step or self.tick_size
+        res["swap_3day_day"] = self.swap_3day_day or self.swap_rollover3days
+        res["data_type"] = self.data_type or self.category or "Forex"
+        res["min_distance"] = self.min_distance or float(self.trade_stops_level)
+        return res
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> SymbolInfo:
+    def from_dict(cls, d: Mapping[str, Any]) -> SymbolInfo:
         """Construct SymbolInfo from dictionary data."""
-        sym = str(data.get("symbol") or data.get("name") or "")
-        digits = int(data.get("decimals") or data.get("digits") or 5)
-        tick_sz = float(data.get("tick_size") or data.get("trade_tick_size") or 0.00001)
-        tick_st = float(data.get("tick_step") or tick_sz)
-        point_val = float(
-            data.get("point_value") or data.get("trade_contract_size") or 100000.0
-        )
-        tick_val = float(
-            data.get("tick_value_in_money") or data.get("trade_tick_value") or 10.0
-        )
-        v_min = float(data.get("min_volume") or data.get("volume_min") or 0.01)
-        v_max = float(data.get("max_volume") or data.get("volume_max") or 100.0)
-        v_step = float(data.get("lot_step") or data.get("volume_step") or 0.01)
-        m_rate = float(data.get("margin_rate") or data.get("margin_initial") or 0.05)
-        sw_long = float(data.get("swap_long") or 0.0)
-        sw_short = float(data.get("swap_short") or 0.0)
-        sw_3day = int(data.get("swap_3day_day") or data.get("swap_rollover3days") or 3)
-        cat = str(data.get("data_type") or data.get("category") or "Forex")
-        min_dist = float(
-            data.get("min_distance") or data.get("trade_stops_level") or 0.0
-        )
+        tsz = float(d.get("tick_size") or d.get("trade_tick_size") or 0.00001)
+        tval = float(d.get("tick_value_in_money") or d.get("trade_tick_value") or 10.0)
+        mrate = float(d.get("margin_rate") or d.get("margin_initial") or 0.05)
+        mdist = float(d.get("min_distance") or d.get("trade_stops_level") or 0.0)
         return cls(
-            id=data.get("id"),
-            name=sym,
-            symbol=sym,
-            digits=digits,
-            decimals=digits,
-            point=tick_sz,
-            trade_tick_size=tick_sz,
-            tick_size=tick_sz,
-            tick_step=tick_st,
-            trade_tick_value=tick_val,
-            tick_value_in_money=tick_val,
-            trade_contract_size=point_val,
-            point_value=point_val,
-            volume_min=v_min,
-            min_volume=v_min,
-            volume_max=v_max,
-            max_volume=v_max,
-            volume_step=v_step,
-            lot_step=v_step,
-            margin_initial=m_rate,
-            margin_rate=m_rate,
-            swap_long=sw_long,
-            swap_short=sw_short,
-            swap_rollover3days=sw_3day,
-            swap_3day_day=sw_3day,
-            trade_stops_level=int(min_dist),
-            min_distance=min_dist,
-            category=cat,
-            data_type=cat,
-            connection=str(data.get("connection", "")),
-            broker_id=int(data.get("broker_id", 0)),
-            description=str(data.get("description", "")),
-            default_spread=float(data.get("default_spread", 0.0)),
-            default_slippage=float(data.get("default_slippage", 0.0)),
-            commissions=str(data.get("commissions", "0.0")),
-            alias=str(data.get("alias", "")),
-            exchange=str(data.get("exchange", "")),
-            country=str(data.get("country", "")),
-            sector=str(data.get("sector", "")),
-            order_size_multiplier=float(data.get("order_size_multiplier", 1.0)),
-            order_size_step=float(data.get("order_size_step", 0.0)),
-            cot=str(data["cot"]) if data.get("cot") is not None else None,
-            created_at_utc=str(data.get("created_at_utc", "")),
-            updated_at_utc=str(data.get("updated_at_utc", "")),
+            id=d.get("id"), name=str(d.get("symbol") or d.get("name") or ""),
+            digits=int(d.get("decimals") or d.get("digits") or 5),
+            point=tsz, trade_tick_size=tsz, tick_size=tsz,
+            tick_step=float(d.get("tick_step") or tsz),
+            trade_tick_value=tval, tick_value_in_money=tval,
+            trade_contract_size=float(
+                d.get("point_value") or d.get("trade_contract_size") or 1e5
+            ),
+            volume_min=float(d.get("min_volume") or d.get("volume_min") or 0.01),
+            volume_max=float(d.get("max_volume") or d.get("volume_max") or 100.0),
+            volume_step=float(d.get("lot_step") or d.get("volume_step") or 0.01),
+            margin_initial=mrate, margin_rate=mrate,
+            swap_long=float(d.get("swap_long") or 0.0),
+            swap_short=float(d.get("swap_short") or 0.0),
+            swap_rollover3days=int(
+                d.get("swap_3day_day") or d.get("swap_rollover3days") or 3
+            ),
+            trade_stops_level=int(mdist), min_distance=mdist,
+            category=str(d.get("data_type") or d.get("category") or "Forex"),
+            connection=str(d.get("connection", "")),
+            broker_id=int(d.get("broker_id", 0)),
+            description=str(d.get("description", "")),
+            default_spread=float(d.get("default_spread", 0.0)),
+            default_slippage=float(d.get("default_slippage", 0.0)),
+            commissions=str(d.get("commissions", "0.0")),
+            alias=str(d.get("alias", "")), exchange=str(d.get("exchange", "")),
+            country=str(d.get("country", "")), sector=str(d.get("sector", "")),
+            order_size_multiplier=float(d.get("order_size_multiplier", 1.0)),
+            order_size_step=float(d.get("order_size_step", 0.0)),
+            cot=str(d["cot"]) if d.get("cot") is not None else None,
+            created_at_utc=str(d.get("created_at_utc", "")),
+            updated_at_utc=str(d.get("updated_at_utc", "")),
         )
-
     @classmethod
     def from_row(cls, row: Mapping[str, Any]) -> SymbolInfo:
         """Construct SymbolInfo from database row mapping."""
         return cls.from_dict(row)
 
-
 @dataclass(slots=True)
 class PositionInfo:
     """Atomic state of an open market position."""
-
     ticket: int = 0
     identifier: int = 0
     symbol: str = ""
@@ -810,12 +549,9 @@ class PositionInfo:
     time_msc: int = 0
     time_update: int = 0
     time_update_msc: int = 0
-
-
 @dataclass(slots=True)
 class OrderInfo:
     """Atomic state of an active or historical trade order."""
-
     ticket: int = 0
     symbol: str = ""
     order_type: int = 0
@@ -843,12 +579,9 @@ class OrderInfo:
     position_by_id: int = 0
     comment: str = ""
     reason: int = 0
-
-
 @dataclass(slots=True)
 class DealInfo:
     """Atomic state of an executed trade deal."""
-
     ticket: int = 0
     order: int = 0
     position_id: int = 0
@@ -870,12 +603,9 @@ class DealInfo:
     comment: str = ""
     time: int = 0
     time_msc: int = 0
-
-
 @dataclass(slots=True)
 class TradeRequest:
     """Strongly typed trading operation parameters."""
-
     action: TradeAction = TradeAction.DEAL
     magic: int = 0
     order: int = 0
@@ -893,12 +623,9 @@ class TradeRequest:
     comment: str = ""
     position: int = 0
     position_by: int = 0
-
-
 @dataclass(slots=True)
 class TradeResult:
     """Strongly typed result of a sent trade operation."""
-
     retcode: int = 0
     deal: int = 0
     order: int = 0
@@ -911,12 +638,9 @@ class TradeResult:
     retcode_external: int = 0
     retcode_description: str = ""
     raw: Any = None
-
-
 @dataclass(slots=True)
 class TradeCheckResult:
     """Strongly typed result of pre-trade checks."""
-
     retcode: int = 0
     balance: float = 0.0
     equity: float = 0.0
@@ -926,12 +650,9 @@ class TradeCheckResult:
     margin_level: float = 0.0
     comment: str = ""
     raw: Any = None
-
-
 @dataclass
 class ChartDef:
     """Market data request specification and resample compatibility abstraction."""
-
     symbol: str
     timeframe: str | Timeframe = "M1"
     instrument: str = "Forex"
@@ -950,7 +671,6 @@ class ChartDef:
     backload_type: int = 0
     backload_number: int = 0
     registered: bool = False
-
     def __post_init__(self) -> None:
         """Normalize timeframe string and initialize deterministic hashes."""
         if isinstance(self.timeframe, Timeframe):
@@ -959,7 +679,6 @@ class ChartDef:
             self.connection_hash = abs(hash(self.connection_name))
         if not self.symbol_hash and self.symbol:
             self.symbol_hash = abs(hash(self.symbol))
-
     def timeframe_seconds(self) -> int:
         """Timeframe duration in seconds."""
         if isinstance(self.timeframe, Timeframe):
@@ -970,98 +689,62 @@ class ChartDef:
         try:
             return Timeframe.from_string(tf_str).to_seconds()
         except ValueError:
-            pass
-        if tf_str.startswith("S") and tf_str[1:].isdigit():
-            return int(tf_str[1:])
-        return 0
-
+            is_s = tf_str.startswith("S") and tf_str[1:].isdigit()
+            return int(tf_str[1:]) if is_s else 0
     def is_symbol_recognized(self) -> bool:
         """Check if symbol is valid/recognized."""
-        return bool(self.symbol and len(self.symbol.strip()) > 0)
-
+        return bool(self.symbol and self.symbol.strip())
     def is_smaller_than(self, other: ChartDef) -> bool:
         """Evaluate if this chart's timeframe is strictly smaller than other's."""
         return self.timeframe_seconds() < other.timeframe_seconds()
-
     def can_be_computed_from(self, other: ChartDef) -> bool:
         """Evaluate if this chart can be resampled/computed from another chart."""
         if self.symbol.strip().upper() != other.symbol.strip().upper():
             return False
-
-        if (
-            self.session
-            and other.session
-            and self.session != "Default"
-            and other.session not in ("Default", self.session)
+        if self.session not in ("", "Default") and other.session not in (
+            "", "Default", self.session
         ):
             return False
-
-        other_sec = other.timeframe_seconds()
-        self_sec = self.timeframe_seconds()
-
-        if other_sec > self_sec:
+        o_sec, s_sec = other.timeframe_seconds(), self.timeframe_seconds()
+        if o_sec > s_sec or (o_sec > 0 and s_sec % o_sec != 0):
             return False
-
-        if other_sec > 0 and self_sec % other_sec != 0:
-            return False
-
-        has_from_mismatch = (
-            self.history_from > 0
-            and other.history_from > 0
-            and other.history_from > self.history_from
+        return not (
+            0 < self.history_from < other.history_from
+            or 0 < other.history_to < self.history_to
         )
-        has_to_mismatch = (
-            self.history_to > 0
-            and other.history_to > 0
-            and other.history_to < self.history_to
-        )
-        return not (has_from_mismatch or has_to_mismatch)
-
     def is_same_connection_symbol(self, other: ChartDef) -> bool:
         """Check if both charts share identical connection name and symbol."""
-        return (
-            self.symbol.strip().upper() == other.symbol.strip().upper()
-            and self.connection_name.strip().upper()
-            == other.connection_name.strip().upper()
-        )
-
+        s_sym, o_sym = self.symbol.strip().upper(), other.symbol.strip().upper()
+        s_con = self.connection_name.strip().upper()
+        o_con = other.connection_name.strip().upper()
+        return s_sym == o_sym and s_con == o_con
     def get_charts_hash(self) -> str:
         """Compute unique identifier hash string for chart."""
         return f"{self.connection_name}_{self.symbol}_{self.timeframe}_{self.session}"
-
     def clone(
-        self,
-        symbol: str | None = None,
-        history_from: int | None = None,
-        history_to: int | None = None,
+        self, symbol: str | None = None,
+        history_from: int | None = None, history_to: int | None = None,
     ) -> ChartDef:
         """Clone this ChartDef, optionally overriding symbol or date ranges."""
-        overrides: dict[str, Any] = {}
+        ov: dict[str, Any] = {}
         if symbol is not None:
-            overrides["symbol"] = symbol
-            overrides["symbol_hash"] = abs(hash(symbol))
+            ov.update(symbol=symbol, symbol_hash=abs(hash(symbol)))
         if history_from is not None:
-            overrides["history_from"] = history_from
+            ov["history_from"] = history_from
         if history_to is not None:
-            overrides["history_to"] = history_to
-        return replace(self, **overrides)
-
+            ov["history_to"] = history_to
+        return replace(self, **ov)
     def to_dict(self) -> dict[str, Any]:
         """Serialize ChartDef to a dictionary."""
         return asdict(self)
-
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> ChartDef:
         """Construct ChartDef from a dictionary."""
-        valid_keys = {f.name for f in fields(cls)}
-        filtered = {k: v for k, v in data.items() if k in valid_keys}
-        return cls(**filtered)
-
-
+        valid = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in data.items() if k in valid})
 @dataclass
 class DataInfo:
     """Historical market dataset catalog metadata record."""
-
     id: str | int = 0
     symbol: str = ""
     timeframe: str | Timeframe = "M1"
@@ -1100,101 +783,55 @@ class DataInfo:
     quality_score: float = 1.0
     total_records: int = 0
     data_type: str = ""
-
     def __post_init__(self) -> None:
         """Harmonize aliases, default fields, and normalized types."""
         if isinstance(self.timeframe, Timeframe):
             self.timeframe = self.timeframe.value
-        self._sync_paths_and_counts()
-        self._sync_dates()
-        self._sync_identifiers()
-
-    def _sync_paths_and_counts(self) -> None:
-        """Synchronize file paths and row counts."""
-        if not self.path and self.filename:
-            self.path = self.filename
-        elif not self.filename and self.path:
-            self.filename = self.path
-        if not self.bars and self.rows:
-            self.bars = self.rows
-        elif not self.rows and self.bars:
-            self.rows = self.bars
-        if not self.total_records and (self.bars or self.rows):
-            self.total_records = self.bars or self.rows
-        elif not self.bars and self.total_records:
-            self.bars = self.total_records
-            self.rows = self.total_records
-
-    def _sync_dates(self) -> None:
-        """Synchronize start and end dates."""
-        if not self.date_from_str and isinstance(self.date_from, str):
-            self.date_from_str = self.date_from
+        _sync_default_pair(self, "path", "filename", "")
+        _sync_default_pair(self, "bars", "rows", 0)
+        _sync_default_pair(self, "bars", "total_records", 0)
+        _sync_default_pair(self, "bars", "rows", 0)
+        _sync_default_pair(self, "broker_name", "broker", "Default")
+        _sync_default_pair(self, "data_type", "category", "", "Forex")
+        self.data_type = self.data_type or self.category
+        self.underlying = self.underlying or self.symbol
+        if isinstance(self.date_from, str):
+            _sync_default_pair(self, "date_from", "date_from_str", "")
         elif not self.date_from and self.date_from_str:
             self.date_from = self.date_from_str
-        if not self.date_to_str and isinstance(self.date_to, str):
-            self.date_to_str = self.date_to
+        if isinstance(self.date_to, str):
+            _sync_default_pair(self, "date_to", "date_to_str", "")
         elif not self.date_to and self.date_to_str:
             self.date_to = self.date_to_str
-
-    def _sync_identifiers(self) -> None:
-        """Synchronize source, broker, and underlying symbol identifiers."""
-        if not self.connection and isinstance(self.source, str) and self.source:
-            self.connection = self.source
-        elif (self.source == 0 or not self.source) and self.connection:
+        if isinstance(self.source, str):
+            _sync_default_pair(self, "connection", "source", "")
+        elif not self.source and self.connection:
             self.source = self.connection
-        if not self.underlying and self.symbol:
-            self.underlying = self.symbol
-        if not self.broker_name and self.broker:
-            self.broker_name = self.broker
-        elif not self.broker and self.broker_name:
-            self.broker = self.broker_name
-        if self.data_type and (not self.category or self.category == "Forex"):
-            self.category = self.data_type
-        elif self.category and not self.data_type:
-            self.data_type = self.category
-
     def clone(self) -> DataInfo:
         """Clone this DataInfo record."""
         return replace(self)
-
     def to_chart_def(self) -> ChartDef:
         """Convert catalog metadata record into an operational ChartDef."""
-        h_from = self.date_from if isinstance(self.date_from, int) else 0
-        h_to = self.date_to if isinstance(self.date_to, int) else 0
-        conn_name = str(self.connection or self.source or "")
         return ChartDef(
-            symbol=self.symbol,
-            timeframe=str(self.timeframe),
-            instrument=self.instrument,
-            connection_name=conn_name,
-            history_from=h_from,
-            history_to=h_to,
-            bar_time_type=self.bar_time_type,
+            symbol=self.symbol, timeframe=str(self.timeframe),
+            instrument=self.instrument, bar_time_type=self.bar_time_type,
+            connection_name=str(self.connection or self.source or ""),
+            history_from=self.date_from if isinstance(self.date_from, int) else 0,
+            history_to=self.date_to if isinstance(self.date_to, int) else 0,
         )
-
     def to_dict(self) -> dict[str, Any]:
         """Serialize DataInfo to a dictionary."""
         return asdict(self)
-
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> DataInfo:
         """Construct DataInfo from a dictionary."""
-        valid_keys = {f.name for f in fields(cls)}
-        filtered = {k: v for k, v in data.items() if k in valid_keys}
-        return cls(**filtered)
-
+        valid = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in data.items() if k in valid})
     @classmethod
     def from_row(cls, row: Mapping[str, Any]) -> DataInfo:
         """Construct DataInfo from database row or mapping."""
-        d_from = str(row.get("date_from", ""))
-        d_to = str(row.get("date_to", ""))
-        bar_count = int(row.get("bars", 0))
-        f_path = str(row.get("path", ""))
-        src = str(row.get("source", "file"))
-        cat = str(row.get("category", "Forex"))
         return cls(
-            id=str(row.get("id", "")),
-            source=src,
+            id=str(row.get("id", "")), source=str(row.get("source", "file")),
             symbol=str(row.get("symbol", "")),
             underlying=str(row.get("underlying", "")),
             instrument=str(row.get("instrument", "")),
@@ -1202,64 +839,33 @@ class DataInfo:
             broker=str(row.get("broker", "Default")),
             broker_name=str(row.get("broker_name", "Default")),
             timezone=str(row.get("timezone", "UTC")),
-            category=cat,
-            date_from=d_from,
-            date_to=d_to,
-            date_from_str=d_from,
-            date_to_str=d_to,
-            bars=bar_count,
-            rows=bar_count,
-            total_records=bar_count,
-            data_type=cat,
-            bar_type=str(row.get("bar_type", "start")),
+            category=str(row.get("category", "Forex")),
+            date_from=str(row.get("date_from", "")),
+            date_to=str(row.get("date_to", "")),
+            bars=int(row.get("bars", 0)), bar_type=str(row.get("bar_type", "start")),
             updated_at_utc=str(row.get("updated_at", row.get("updated_at_utc", ""))),
-            path=f_path,
-            filename=f_path,
-            data_kind=str(row.get("data_kind", "bars")),
+            path=str(row.get("path", "")), data_kind=str(row.get("data_kind", "bars")),
             quality_score=float(row.get("quality_score", 1.0)),
-            connection=src,
         )
-
-
 @dataclass(slots=True)
 class SymbolAliasRecord:
     """Represents a symbol alias mapping."""
-
     alias: str
     symbol: str
     description: str = ""
-
     def to_dict(self) -> dict[str, Any]:
         """Convert alias record to dictionary representation."""
-        return {
-            "alias": self.alias,
-            "symbol": self.symbol,
-            "description": self.description,
-        }
-
-
+        return asdict(self)
+_DAY_NAMES = (
+    "mon", "monday", "tue", "tuesday", "wed", "wednesday",
+    "thu", "thursday", "fri", "friday", "sat", "saturday", "sun", "sunday",
+)
 _DAY_NAME_TO_INT: dict[str, int] = {
-    "mon": 0,
-    "monday": 0,
-    "tue": 1,
-    "tuesday": 1,
-    "wed": 2,
-    "wednesday": 2,
-    "thu": 3,
-    "thursday": 3,
-    "fri": 4,
-    "friday": 4,
-    "sat": 5,
-    "saturday": 5,
-    "sun": 6,
-    "sunday": 6,
+    name: idx // 2 for idx, name in enumerate(_DAY_NAMES)
 }
-
-
 @dataclass(frozen=True)
 class SessionWindow:
     """Represents a continuous trading interval on specific days of week."""
-
     day_from: str = "Mon"
     day_to: str = "Mon"
     start_time: str = "00:00"
@@ -1267,35 +873,17 @@ class SessionWindow:
     eod: bool = False
     session_type: str = "Regular"
     day_of_week: int | None = None
-
     def to_dict(self) -> dict[str, Any]:
         """Convert session window to dictionary representation."""
-        return {
-            "day_from": self.day_from,
-            "day_to": self.day_to,
-            "start_time": self.start_time,
-            "end_time": self.end_time,
-            "eod": self.eod,
-            "session_type": self.session_type,
-            "day_of_week": self.day_of_week,
-        }
-
-
+        return asdict(self)
 @dataclass(frozen=True)
 class TradingHoliday:
     """Represents a date when markets are closed."""
-
     date_str: str
     description: str = ""
-
     def to_dict(self) -> dict[str, Any]:
         """Convert holiday to dictionary representation."""
-        return {
-            "date_str": self.date_str,
-            "description": self.description,
-        }
-
-
+        return asdict(self)
 def _window_intervals(w: SessionWindow) -> list[tuple[int, int]]:
     """Derive list of (start_minute, end_minute) weekly intervals for window."""
     try:
@@ -1303,15 +891,11 @@ def _window_intervals(w: SessionWindow) -> list[tuple[int, int]]:
         end_day = _DAY_NAME_TO_INT.get(w.day_to.lower(), start_day)
         sh, sm = (int(x) for x in w.start_time.split(":")[:2])
         eh, em = (int(x) for x in w.end_time.split(":")[:2])
-        s_min = sh * 60 + sm
-        e_min = eh * 60 + em
-
+        s_min, e_min = sh * 60 + sm, eh * 60 + em
         if (end_day - start_day) % 7 == 1 and s_min > e_min:
             return [(start_day * 1440 + s_min, end_day * 1440 + e_min)]
-
         if start_day == end_day and s_min > e_min:
             return [(start_day * 1440 + s_min, ((start_day + 1) % 7) * 1440 + e_min)]
-
         days: list[int] = []
         curr = start_day
         for _ in range(7):
@@ -1319,32 +903,33 @@ def _window_intervals(w: SessionWindow) -> list[tuple[int, int]]:
             if curr == end_day:
                 break
             curr = (curr + 1) % 7
-
-        intervals: list[tuple[int, int]] = []
-        for d in days:
-            if s_min <= e_min:
-                intervals.append((d * 1440 + s_min, d * 1440 + e_min))
-            else:
-                intervals.append((d * 1440 + s_min, ((d + 1) % 7) * 1440 + e_min))
-        return intervals
+        return [
+            (d * 1440 + s_min, (d if s_min <= e_min else (d + 1) % 7) * 1440 + e_min)
+            for d in days
+        ]
     except ValueError, TypeError, AttributeError:
         return []
-
-
 def _is_window_active(w: SessionWindow, minute_of_week: int) -> bool:
     """Check if session window covers the specified minute of week (0..10079)."""
-    for s, e in _window_intervals(w):
-        if s <= e and s <= minute_of_week <= e:
-            return True
-        if s > e and (minute_of_week >= s or minute_of_week <= e):
-            return True
-    return False
-
-
+    return any(
+        (s <= e and s <= minute_of_week <= e)
+        or (s > e and (minute_of_week >= s or minute_of_week <= e))
+        for s, e in _window_intervals(w)
+    )
+def _parse_json_list(raw: Any) -> list[Any]:
+    """Parse JSON list string or return list as-is."""
+    if isinstance(raw, list):
+        return raw
+    if isinstance(raw, str):
+        try:
+            res = json.loads(raw)
+            return res if isinstance(res, list) else []
+        except json.JSONDecodeError, TypeError:
+            return []
+    return []
 @dataclass
 class TradingSession:
     """Represents an authoritative trading session calendar."""
-
     id: int | None = None
     name: str = ""
     broker_id: int = -1
@@ -1354,99 +939,53 @@ class TradingSession:
     windows: list[SessionWindow] = field(default_factory=list)
     holidays: list[TradingHoliday] = field(default_factory=list)
     is_default: bool = False
-
     def is_within_session(self, dt: datetime) -> bool:
         """Evaluate if datetime falls within active trading schedule."""
         try:
             target_tz = ZoneInfo(self.timezone)
         except KeyError, ValueError, ZoneInfoNotFoundError:
             target_tz = ZoneInfo("UTC")
-
-        if dt.tzinfo is not None:
-            dt_tz = dt.astimezone(target_tz)
-        else:
-            dt_tz = dt.replace(tzinfo=UTC).astimezone(target_tz)
-
+        base_dt = dt if dt.tzinfo is not None else dt.replace(tzinfo=UTC)
+        dt_tz = base_dt.astimezone(target_tz)
         date_iso = dt_tz.strftime("%Y-%m-%d")
-        for h in self.holidays:
-            if h.date_str == date_iso:
-                return False
-
-        if not self.windows:
+        if any(h.date_str == date_iso for h in self.holidays) or not self.windows:
             return False
-
         minute_of_week = dt_tz.weekday() * 1440 + dt_tz.hour * 60 + dt_tz.minute
-
         return any(_is_window_active(w, minute_of_week) for w in self.windows)
-
     def to_dict(self) -> dict[str, Any]:
         """Convert trading session to dictionary representation."""
-        return {
-            "id": self.id,
-            "name": self.name,
-            "broker_id": self.broker_id,
-            "broker_name": self.broker_name,
-            "description": self.description,
-            "timezone": self.timezone,
-            "windows": [w.to_dict() for w in self.windows],
-            "holidays": [h.to_dict() for h in self.holidays],
-            "is_default": self.is_default,
-        }
-
+        return asdict(self)
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> TradingSession:
         """Construct TradingSession from dictionary or database row."""
-        raw_windows = data.get("windows_json", "[]")
-        windows: list[SessionWindow] = []
-        if isinstance(raw_windows, str):
-            try:
-                parsed_w = json.loads(raw_windows)
-                windows = [
-                    SessionWindow(
-                        day_from=str(w.get("day_from", "Mon")),
-                        day_to=str(w.get("day_to", "Mon")),
-                        start_time=str(w.get("start_time", "00:00")),
-                        end_time=str(w.get("end_time", "23:59")),
-                        eod=bool(w.get("eod", False)),
-                        session_type=str(w.get("session_type", "Regular")),
-                        day_of_week=w.get("day_of_week"),
-                    )
-                    for w in parsed_w
-                ]
-            except json.JSONDecodeError, TypeError, KeyError:
-                windows = []
-        elif isinstance(raw_windows, list):
-            windows = [
-                SessionWindow(**w) if isinstance(w, dict) else w for w in raw_windows
-            ]
-
-        raw_holidays = data.get("holidays_json", "[]")
-        holidays: list[TradingHoliday] = []
-        if isinstance(raw_holidays, str):
-            try:
-                parsed_h = json.loads(raw_holidays)
-                holidays = [
-                    TradingHoliday(
-                        date_str=str(h.get("date_str", "")),
-                        description=str(h.get("description", "")),
-                    )
-                    for h in parsed_h
-                ]
-            except json.JSONDecodeError, TypeError, KeyError:
-                holidays = []
-        elif isinstance(raw_holidays, list):
-            holidays = [
-                TradingHoliday(**h) if isinstance(h, dict) else h for h in raw_holidays
-            ]
-
+        windows = [
+            w if isinstance(w, SessionWindow) else SessionWindow(
+                day_from=str(w.get("day_from", "Mon")),
+                day_to=str(w.get("day_to", "Mon")),
+                start_time=str(w.get("start_time", "00:00")),
+                end_time=str(w.get("end_time", "23:59")),
+                eod=bool(w.get("eod", False)),
+                session_type=str(w.get("session_type", "Regular")),
+                day_of_week=w.get("day_of_week"),
+            )
+            for w in _parse_json_list(data.get("windows_json", "[]"))
+            if isinstance(w, SessionWindow | dict)
+        ]
+        holidays = [
+            h if isinstance(h, TradingHoliday) else TradingHoliday(
+                date_str=str(h.get("date_str", "")),
+                description=str(h.get("description", "")),
+            )
+            for h in _parse_json_list(data.get("holidays_json", "[]"))
+            if isinstance(h, TradingHoliday | dict)
+        ]
         return cls(
-            id=data.get("id"),
-            name=str(data.get("name", "")),
+            id=data.get("id"), name=str(data.get("name", "")),
             broker_id=int(data.get("broker_id", -1)),
             broker_name=str(data.get("broker_name", "Default")),
             description=str(data.get("description", "")),
             timezone=str(data.get("timezone", "UTC")),
-            windows=windows,
-            holidays=holidays,
+            windows=windows, holidays=holidays,
             is_default=bool(data.get("is_default", 0)),
         )
+# fmt: on

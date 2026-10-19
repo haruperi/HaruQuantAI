@@ -50,6 +50,8 @@ if TYPE_CHECKING:
         AccountInfo,
         BridgeEvent,
         DealInfo,
+        MarketBar,
+        MarketTick,
         OrderInfo,
         PositionInfo,
         Receipt,
@@ -62,12 +64,8 @@ if TYPE_CHECKING:
     )
     from app.services.include.enums import (
         ReceiptStatus,
-        TradeAction,
-    )
-    from app.workspace.data_manager import (
-        MarketBar,
-        MarketTick,
         Timeframe,
+        TradeAction,
     )
 
 _SINGLETONS: dict[str, Any] = {}
@@ -97,9 +95,9 @@ _MODULE_MAPPING: dict[str, tuple[str, str]] = {
         "TickDownloaderClient",
     ),
     # Contracts & Enums
-    "MarketBar": ("app.workspace.data_manager", "MarketBar"),
-    "MarketTick": ("app.workspace.data_manager", "MarketTick"),
-    "Timeframe": ("app.workspace.data_manager", "Timeframe"),
+    "MarketBar": ("app.services.include.contracts", "MarketBar"),
+    "MarketTick": ("app.services.include.contracts", "MarketTick"),
+    "Timeframe": ("app.services.include.enums", "Timeframe"),
     "AccountInfo": ("app.services.include.contracts", "AccountInfo"),
     "BridgeEvent": ("app.services.include.contracts", "BridgeEvent"),
     "DealInfo": ("app.services.include.contracts", "DealInfo"),

@@ -56,6 +56,7 @@ from app.host.logging import get_logger
 from app.services.include.contracts import (
     AccountInfo,
     BookInfo,
+    BridgeError,
     BridgeEvent,
     DealInfo,
     MarketBar,
@@ -112,23 +113,6 @@ def epoch_millis(value: datetime | float | None) -> int:
     if value.tzinfo is None:
         value = value.replace(tzinfo=UTC)
     return int(value.timestamp() * 1000)
-
-
-class BridgeError(RuntimeError):
-    """Base runtime exception for broker and market data bridge operations."""
-
-    def __init__(
-        self,
-        message: str,
-        *,
-        code: str = "BRIDGE_ERROR",
-        command_id: str | None = None,
-        uncertain: bool = False,
-    ) -> None:
-        super().__init__(message)
-        self.code = code
-        self.command_id = command_id
-        self.uncertain = uncertain
 
 
 class BrokerClient:
