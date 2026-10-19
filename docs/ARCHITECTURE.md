@@ -98,7 +98,7 @@ The host boot sequence executes sequentially through 7 ordered stages (`CONFIGUR
 1. **CONFIGURING:** Validates host bind address, port, debug flags, and runtime thresholds.
 2. **PATHS:** Creates and inspects workspace directories (`database`, `logs`, `scratch`, `plugins`, `resources`).
 3. **LOGGING:** Initializes asynchronous multi-sink telemetry (`app.log`, `access.log`, `errors.log`), SHA-256 secret redaction, and the 2000-record ring buffer.
-4. **PERSISTENCE:** Configures SQLite WAL mode (`busy_timeout=5000`), initializes all 25 operational tables via `app/host/persistence/create.py`, and reloads `settings`.
+4. **PERSISTENCE:** Configures SQLite WAL mode (`busy_timeout=5000`), initializes all 25 operational tables via `app/host/persistence.py`, and reloads `settings`.
 5. **SERVICES:** Starts `SessionManager`, `ResourceManager` (`MemoryWatchdog`), `JobManager` (reconciling orphan `RUNNING` jobs to `INTERRUPTED`), `PluginLifecycleManager` (scanning and attaching dynamic plugins), and `TransportGatewayService`.
 6. **ROUTES:** Mounts FastAPI gateway & discovery REST/SSE/WebSocket routers (or headless CLI command dispatchers).
 7. **READY & Reverse LIFO Teardown:** Transitions to `READY` and guarantees reverse-order (LIFO) teardown (`READY -> ROUTES -> SERVICES -> PERSISTENCE -> LOGGING -> PATHS -> CONFIGURING`) on stop or failure.
@@ -108,11 +108,11 @@ The host boot sequence executes sequentially through 7 ordered stages (`CONFIGUR
 * **Dynamic Import Isolation:** Loads plugin modules dynamically using `importlib.util.spec_from_file_location` without hard-coded package dependencies.
 * **Instance Registry:** Provides `get_instance(plugin_id)` and `get_instances_for_slot(slot_id)` with lazy instantiation and thread-safe caching.
 
-### 4.3 Persistence & Storage Custody (`app/host/persistence/`)
-* **SQLite Import Isolation:** Enforces strict isolation: `sqlite3` must NEVER be imported anywhere outside `app/host/persistence/`. Violations trigger immediate test failures.
+### 4.3 Persistence & Storage Custody (`app/host/persistence.py`)
+* **SQLite Import Isolation:** Enforces strict isolation: `sqlite3` must NEVER be imported anywhere outside `app/host/persistence.py`. Violations trigger immediate test failures.
 * **WAL Mode & Concurrency:** Configured with `journal_mode=WAL`, `synchronous=NORMAL`, and `busy_timeout=5000` for robust concurrent read/write operations.
-* **Single DDL Ownership & Functional CRUD Modules:** `app/host/persistence/create.py` is the sole owner of canonical table creation (`create_schema`) and connection configuration (`get_connection`), paired with typed functional CRUD operations in `read.py`, `update.py`, and `delete.py`.
-* **CRUD-only Boundary:** Functional CRUD helpers (`list_host_settings`, `batch_save_host_settings`, `save_host_session`, `get_host_session_by_token_hash`, `save_host_job`, `list_host_jobs`, `reconcile_running_host_jobs`) group related row operations without redundant `*Store` wrapper classes. No application module outside `app/host/persistence/` may execute SQL or borrow connections/cursors. Settings batches acquire `BEGIN IMMEDIATE` before reading the revision, then validate and mutate in one transaction. Empty batches retain their revision; caller connections with an active transaction are rejected without committing or rolling it back.
+* **Single DDL Ownership & Cohesive Class Design:** `app/host/persistence.py` (`HostPersistence`) is the sole owner of canonical table creation (`create_schema`), connection configuration (`get_connection`), canonical CRUD methods (`create_record`, `create_entity`, `read_records`, `read_entity`, `update_record`, `update_entity`, `delete_record`, `delete_entity`), and atomic batch transactions (`apply_batch`).
+* **CRUD-only Boundary:** All SQL and table mutations are encapsulated strictly within `HostPersistence`. No application module outside `app/host/persistence.py` may execute SQL or borrow connections/cursors. Settings batches acquire `BEGIN IMMEDIATE` before reading the revision, then validate and mutate in one transaction. Empty batches retain their revision; caller connections with an active transaction are rejected without committing or rolling it back.
 * **Business Owners:** `settings.py` owns configuration retrieval, revision tracking, and atomic batch updates; `jobs.py` owns job lifecycle and worker leases; `session.py` owns scope binding/authorization, password authentication, local credential provisioning, and ephemeral session invalidation; `bootstrap.py` sequences recovery; `resources.py` owns database/workspace path inspection, hardware/storage diagnostics, worker sizing, memory watchdogs, scratch sandboxing, and their HTTP/CLI access. Persistence remains CRUD and its required database infrastructure only.
 * **Regression Guard:** AST architecture tests enforce database-driver/SQL/handle isolation and prohibit service/transport dependencies in persistence.
 * **Default Ownership:** Workspace models/services supply business defaults, complete creation records, domain timestamps and dataset conflict-update columns. Persistence does not invent trading values, session definitions, dataset IDs or quality scores. Existing schema defaults, storage audit timestamps, serialization limits and revision checks remain database infrastructure.
@@ -216,7 +216,7 @@ All HaruQuantAI modules adhere to the strict quality baseline enforced by CI and
 * **Ruff Formatting & Linting:** 88-character line limit, Google-style docstrings, organized imports (I001), and PEP 604 modern typing syntax.
 * **Branch-Aware Coverage:** Focused, change-scoped pytest verification with a minimum of 80% branch coverage required for production releases.
 
-`_HostSettings` (`settings` in `app/host/settings.py`) directly composes `app/host/persistence/read.py` (`list_host_settings`) and `app/host/persistence/update.py` (`batch_save_host_settings`) for retrieval and revision-checked atomic batch updates. The global `settings` instance is lazy and bootstrap binds it to the database path rather than a borrowed connection; scoped dot access uses cached values, `update_batch()` serializes cache refresh, and `reload()` observes other writers. Read failures propagate and preserve the last successful snapshot. Filesystem probes belong in `resources.py`. Authenticated UI reads and writes use this `settings -> app/host/persistence/` path, and `transport.py` publishes `settings.changed` notifications to the `EventBus` after committed HTTP writes. Open dialogs submit against their opening revision; stale drafts are rejected (`RevisionConflictError` / HTTP 409), and failed saves retain drafts. Host settings are not stored in browser local storage. Remote/SMTP preferences do not activate their services or persist passwords.
+`_HostSettings` (`settings` in `app/host/settings.py`) directly composes `app/host/persistence.py` (`HostPersistence`) for retrieval and revision-checked atomic batch updates. The global `settings` instance is lazy and bootstrap binds it to the database path rather than a borrowed connection; scoped dot access uses cached values, `update_batch()` serializes cache refresh, and `reload()` observes other writers. Read failures propagate and preserve the last successful snapshot. Filesystem probes belong in `resources.py`. Authenticated UI reads and writes use this `settings -> app/host/persistence.py` path, and `transport.py` publishes `settings.changed` notifications to the `EventBus` after committed HTTP writes. Open dialogs submit against their opening revision; stale drafts are rejected (`RevisionConflictError` / HTTP 409), and failed saves retain drafts. Host settings are not stored in browser local storage. Remote/SMTP preferences do not activate their services or persist passwords.
 
 
 Browser host sessions retain their opaque token and server-issued 24-hour expiry
@@ -229,7 +229,7 @@ restart invalidates them. Browser storage failures are surfaced explicitly.
 
 The seven-tab Configuration UI follows SQX reference presentation while retaining
 HaruQuantAI settings storage contracts. `settings.py` validates preference types
-and modes; `app/host/persistence/update.py` owns all SQL and atomic row writes. The
+and modes; `app/host/persistence.py` owns all SQL and atomic row writes. The
 data-frame guard is a warn/stop/off preference; memory cleanup uses 0 minutes for
 never. Default databank sync uses null for never and 0 for immediately. CPU count
 is runtime status, not a database preference. Java/engine/browser execution
@@ -259,7 +259,7 @@ backed-up maintenance. The retained `host_session` table is not used to resurrec
 tokens; `SessionManager` remains the in-memory login authority.
 
 Host session issuance from UI or CLI/Python persists lifecycle metadata through
-`persistence.HostSessionStore` into the existing `host_session` table. Token hashing,
+`HostPersistence` into the existing `host_session` table. Token hashing,
 IDs, timestamps and lifecycle policy belong to `session.py`; SQL and transactions
 remain exclusive to `persistence.py`. Database records contain no bearer tokens,
 roles or elevated grants and cannot restore authority after restart. Revocation

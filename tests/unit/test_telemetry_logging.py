@@ -101,7 +101,7 @@ from app.host.logging import (
 from app.host.logging import (
     main as logging_main,
 )
-from app.host.persistence.create import create_schema, get_connection
+from app.host.persistence import HostPersistence
 from app.host.resources import (
     DIAGNOSTICS_FR,
     BenchmarkRunner,
@@ -349,21 +349,22 @@ def test_ring_buffer_behavior() -> None:
 
 def test_diagnostics_probes(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Verify database, storage, and hardware health probes."""
     caplog.set_level(logging.DEBUG)
 
-    missing_db = probe_database(tmp_path / "missing.db")
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", tmp_path / "missing.db")
+    missing_db = probe_database()
     assert missing_db.exists is False
     assert missing_db.error is not None
 
     real_db_path = tmp_path / "real.db"
-    conn = get_connection(real_db_path)
-    create_schema(conn)
-    conn.close()
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", real_db_path)
+    HostPersistence.read_records("host_settings")
 
-    db_probe = probe_database(real_db_path)
+    db_probe = probe_database()
     assert db_probe.exists is True
     assert db_probe.error is None
     assert db_probe.table_count == 25
@@ -382,7 +383,7 @@ def test_diagnostics_probes(
     assert hw_probe.ram_available_bytes > 0
     assert 0.0 <= hw_probe.ram_used_pct <= 100.0
 
-    health_healthy = get_system_health(db_path=real_db_path, root_path=tmp_path)
+    health_healthy = get_system_health(root_path=tmp_path)
     assert health_healthy.status == "HEALTHY"
     report_dict = health_healthy.to_dict()
     assert report_dict["status"] == "HEALTHY"
@@ -390,9 +391,8 @@ def test_diagnostics_probes(
     assert "storage" in report_dict
     assert "hardware" in report_dict
 
-    health_degraded = get_system_health(
-        db_path=tmp_path / "nonexistent.db", root_path=tmp_path
-    )
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", tmp_path / "nonexistent.db")
+    health_degraded = get_system_health(root_path=tmp_path)
     assert health_degraded.status == "DEGRADED"
 
     assert any(

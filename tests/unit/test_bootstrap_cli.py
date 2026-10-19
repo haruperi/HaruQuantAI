@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import sqlite3
 from pathlib import Path
 from typing import Any
 
@@ -23,9 +22,7 @@ from app.host.bootstrap import (
 from app.host.bootstrap import (
     main as bootstrap_main,
 )
-from app.host.persistence.create import create_schema, get_connection
-from app.host.persistence.read import get_host_job
-from app.host.persistence.update import save_host_job
+from app.host.persistence import HostPersistence
 from app.host.response import StandardError
 from app.main import (
     create_app,
@@ -39,26 +36,29 @@ from fastapi import APIRouter, FastAPI
 from fastapi.testclient import TestClient
 
 
-def _seed_orphan_running_job(db_path: Path, job_id: str = "job-orphan-boot") -> None:
-    """Insert a RUNNING job row directly via persistence to test boot recovery."""
-    db_path.parent.mkdir(parents=True, exist_ok=True)
-    conn = get_connection(db_path)
-    try:
-        create_schema(conn)
-    finally:
-        conn.close()
+@pytest.fixture(autouse=True)
+def _isolate_default_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Redirect HostPersistence.DEFAULT_DB_PATH to an isolated temporary SQLite file."""
+    db_file = tmp_path / "database" / "haruquantai.db"
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", db_file)
+    return db_file
 
-    save_host_job(
-        job_id,
-        owner="test",
-        kind="backtest",
-        status="RUNNING",
-        progress=42.0,
-        message="In flight before crash",
-        attempt_id=1,
-        submitted_at_utc="2026-10-14T10:00:00+00:00",
-        started_at_utc="2026-10-14T10:00:01+00:00",
-        conn=db_path,
+
+def _seed_orphan_running_job(job_id: str = "job-orphan-boot") -> None:
+    """Insert a RUNNING job row directly via persistence to test boot recovery."""
+    HostPersistence.create_record(
+        "host_jobs",
+        {
+            "job_id": job_id,
+            "owner": "test",
+            "kind": "backtest",
+            "status": "RUNNING",
+            "progress": 42.0,
+            "message": "In flight before crash",
+            "attempt_id": 1,
+            "submitted_at_utc": "2026-10-14T10:00:00+00:00",
+            "started_at_utc": "2026-10-14T10:00:01+00:00",
+        },
     )
 
 
@@ -87,7 +87,6 @@ def test_bootstrapped_settings_http_writes_and_telemetry_shutdown(
     tmp_path: Path,
 ) -> None:
     import app.host.logging as telemetry
-    from app.host.persistence.read import list_host_settings
 
     runtime = AppHost(data_dir=tmp_path, use_process_pool=False)
     app = create_app(runtime=runtime)
@@ -127,11 +126,10 @@ def test_bootstrapped_settings_http_writes_and_telemetry_shutdown(
             ).status_code
             == 409
         )
-        conn = get_connection(runtime.config.resolved_db_path)
-        try:
-            assert any(row["key"] == "theme" for row in list_host_settings(conn=conn))
-        finally:
-            conn.close()
+        assert any(
+            row["key"] == "theme"
+            for row in HostPersistence.read_records("host_settings")
+        )
         engine = telemetry._GLOBAL_ENGINE
         assert engine is not None
     assert telemetry._GLOBAL_ENGINE is None
@@ -181,15 +179,13 @@ def test_partial_service_initialization_releases_acquired_resources(
 def test_seven_stage_progression_and_reverse_lifo_teardown(tmp_path: Path) -> None:
     """Verify exact 7-stage startup progression, orphan recovery, and LIFO stop."""
     data_dir = tmp_path / "data"
-    db_path = data_dir / "database" / "haruquantai.db"
     plugins_dir = data_dir / "plugins"
 
-    _seed_orphan_running_job(db_path, "job-orphan-01")
+    _seed_orphan_running_job("job-orphan-01")
     _write_sample_plugin(plugins_dir)
 
     runtime = AppHost(
         data_dir=data_dir,
-        db_path=db_path,
         plugins_dir=plugins_dir,
         headless=True,
         debug=True,
@@ -205,8 +201,7 @@ def test_seven_stage_progression_and_reverse_lifo_teardown(tmp_path: Path) -> No
     # Execute 5-method workflow progression
     app = runtime.startup()
     assert isinstance(app, FastAPI)
-    conn = runtime.initialize_db()
-    assert isinstance(conn, sqlite3.Connection)
+    assert runtime.initialize_db() is True
     runtime.register_modules()
     ev = runtime.broadcast_event("system", "host.ready")
     assert ev.channel == "system"
@@ -217,9 +212,11 @@ def test_seven_stage_progression_and_reverse_lifo_teardown(tmp_path: Path) -> No
     assert runtime.active_stage == AppHost.Stage.READY
 
     # Verify Stage 5 reconciled the orphan RUNNING job -> INTERRUPTED
-    reconciled_row = get_host_job("job-orphan-01", conn=db_path)
-    assert reconciled_row is not None
-    assert reconciled_row["status"] == "INTERRUPTED"
+    reconciled_rows = HostPersistence.read_records(
+        "host_jobs", pk_values={"job_id": "job-orphan-01"}, limit=1
+    )
+    assert len(reconciled_rows) == 1
+    assert reconciled_rows[0]["status"] == "INTERRUPTED"
     assert "job-orphan-01" in runtime._details["services"]["reconciled_orphan_jobs"]
     assert runtime._details["services"]["plugins_enabled"] >= 1
 
@@ -291,9 +288,8 @@ def test_five_method_lifecycle_and_reconcile(tmp_path: Path) -> None:
     assert str(rt.state) == AppHost.State.STOPPED.value
 
     # Database reconciliation helper
-    db_file = tmp_path / "reconcile_only" / "haruquantai.db"
-    _seed_orphan_running_job(db_file, "job-rec-99")
-    rep = AppHost._reconcile_database(db_file)
+    _seed_orphan_running_job("job-rec-99")
+    rep = AppHost._reconcile_database()
     assert rep["status"] == "reconciled"
     assert "job-rec-99" in rep["reconciled_orphan_jobs"]
 
@@ -422,16 +418,13 @@ def test_headless_cli_commands_and_7_stage_bootstrap(
     """Verify app/cli.py executes 7-stage bootstrap and dispatches all commands."""
     monkeypatch.chdir(tmp_path)
     data_dir = tmp_path / "cli_data"
-    db_path = data_dir / "database" / "haruquantai.db"
     plugins_dir = data_dir / "plugins"
-    _seed_orphan_running_job(db_path, "job-cli-orphan")
+    _seed_orphan_running_job("job-cli-orphan")
     _write_sample_plugin(plugins_dir)
 
     base_args = [
         "--data-dir",
         str(data_dir),
-        "--db-path",
-        str(db_path),
         "--plugins-dir",
         str(plugins_dir),
     ]
@@ -540,9 +533,7 @@ def test_app_host_blueprint_methods_and_single_export(tmp_path: Path) -> None:
     assert isinstance(app_instance, FastAPI)
 
     # 3. Test initialize_db
-    conn = host.initialize_db()
-    assert isinstance(conn, sqlite3.Connection)
-    assert host.db_connection is conn
+    assert host.initialize_db() is True
 
     # 4. Test register_modules
     host.register_modules()
@@ -654,20 +645,10 @@ def test_headless_cli_data_and_workspace_commands(
     """Verify app/cli.py data manager commands, flags, and runner error handling."""
     monkeypatch.chdir(tmp_path)
     data_dir = tmp_path / "cli_data"
-    db_path = data_dir / "database" / "haruquantai.db"
-    db_path.parent.mkdir(parents=True, exist_ok=True)
-    conn = get_connection(db_path)
-    try:
-        create_schema(conn)
-    finally:
-        conn.close()
-    monkeypatch.setattr("app.host.persistence.create.DEFAULT_DB_PATH", db_path)
 
     base_args = [
         "--data-dir",
         str(data_dir),
-        "--db-path",
-        str(db_path),
     ]
 
     # 1. Test live data home command

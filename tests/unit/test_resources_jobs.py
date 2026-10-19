@@ -27,19 +27,7 @@ from app.host.jobs import (
     MemoryPressureError,
     run_sample_compute_task,
 )
-from app.host.persistence.create import create_schema, get_connection
-from app.host.persistence.delete import delete_host_job
-from app.host.persistence.read import (
-    get_host_job,
-    get_host_job_attempts,
-    get_host_job_events,
-    list_host_jobs,
-)
-from app.host.persistence.update import (
-    record_host_job_event,
-    save_host_job,
-    update_host_job,
-)
+from app.host.persistence import HostPersistence
 from app.host.resources import (
     MIN_AVAILABLE_RAM_PCT,
     BenchmarkRunner,
@@ -76,13 +64,12 @@ if TYPE_CHECKING:
     from _pytest.logging import LogCaptureFixture
 
 
-def _init_db(db_path: Path) -> None:
-    """Create schema on an isolated temporary SQLite database."""
-    conn = get_connection(db_path)
-    try:
-        create_schema(conn)
-    finally:
-        conn.close()
+@pytest.fixture(autouse=True)
+def isolated_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Redirect HostPersistence.DEFAULT_DB_PATH to an isolated temporary file."""
+    db_file = tmp_path / "test_resources_jobs.db"
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", db_file)
+    return db_file
 
 
 # ---------------------------------------------------------------------------
@@ -323,12 +310,11 @@ def test_probes_and_error_resilience(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Verify hardware/storage/DB probes and graceful error handling."""
-    db_file = tmp_path / "diag.db"
-    _init_db(db_file)
+    HostPersistence.read_records("host_settings")
     (tmp_path / "logs").mkdir(exist_ok=True)
     (tmp_path / "data" / "database").mkdir(parents=True, exist_ok=True)
 
-    health = get_system_health(db_path=db_file, root_path=tmp_path)
+    health = get_system_health(root_path=tmp_path)
     assert isinstance(health, HostHealthReport)
     assert health.database.exists is True
     assert health.database.table_count >= 25
@@ -354,7 +340,8 @@ def test_probes_and_error_resilience(
     monkeypatch.setattr(psutil, "Process", raise_os_error)
     assert probe_process().is_available is False
 
-    assert probe_database(tmp_path / "missing.db").exists is False
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", tmp_path / "missing.db")
+    assert probe_database().exists is False
     assert probe_storage(tmp_path).workspace_root != ""
     assert probe_hardware().cpu_count_logical >= 1
 
@@ -405,8 +392,7 @@ def test_affinity_gpu_benchmark_and_scratch_sandbox(tmp_path: Path) -> None:
 
 def test_resource_manager_facade(tmp_path: Path) -> None:
     """Verify ResourceManager integrates allocation, watchdog, and sandboxes."""
-    db_file = tmp_path / "rm.db"
-    _init_db(db_file)
+    HostPersistence.read_records("host_settings")
     rm = ResourceManager(
         min_available_ram_pct=15.0,
         watchdog_policy="reject",
@@ -415,7 +401,7 @@ def test_resource_manager_facade(tmp_path: Path) -> None:
     assert rm.scratch_root == tmp_path / "scratch"
     assert rm.get_worker_allocation(mode="reserve-two") >= 1
     assert rm.check_memory_headroom().threshold_pct == 15.0
-    assert rm.get_system_health(db_path=db_file, root_path=tmp_path).status in (
+    assert rm.get_system_health(root_path=tmp_path).status in (
         "HEALTHY",
         "DEGRADED",
     )
@@ -425,64 +411,82 @@ def test_resource_manager_facade(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Persistence Read/Update/Delete Helper Tests (conn=Path resolution)
+# Persistence Read/Update/Delete Helper Tests
 # ---------------------------------------------------------------------------
 
 
-def test_persistence_job_helpers_with_path_connection(tmp_path: Path) -> None:
-    """Verify persistence CRUD functions accept a database Path via conn."""
-    db_file = tmp_path / "jobs_crud.db"
-    _init_db(db_file)
-
-    save_host_job(
-        "crud-job-1",
-        owner="tester",
-        kind="unit",
-        status="RUNNING",
-        progress=25.0,
-        message="Running unit test",
-        attempt_id=1,
-        submitted_at_utc="2026-10-14T12:00:00+00:00",
-        started_at_utc="2026-10-14T12:00:01+00:00",
-        conn=db_file,
+def test_persistence_job_helpers() -> None:
+    """Verify HostPersistence CRUD methods on host_jobs and host_job_events."""
+    HostPersistence.update_record(
+        "host_jobs",
+        pk_values={"job_id": "crud-job-1"},
+        updates={
+            "owner": "tester",
+            "kind": "unit",
+            "status": "RUNNING",
+            "progress": 25.0,
+            "message": "Running unit test",
+            "attempt_id": 1,
+            "submitted_at_utc": "2026-10-14T12:00:00+00:00",
+            "started_at_utc": "2026-10-14T12:00:01+00:00",
+        },
+        upsert=True,
     )
-    record_host_job_event(
-        "evt-crud-1",
-        "crud-job-1",
-        "RUNNING",
-        from_state="QUEUED",
-        details_json='{"progress": 25.0}',
-        conn=db_file,
+    HostPersistence.create_record(
+        "host_job_events",
+        {
+            "event_id": "evt-crud-1",
+            "job_id": "crud-job-1",
+            "from_state": "QUEUED",
+            "to_state": "RUNNING",
+            "details_json": '{"progress": 25.0}',
+            "created_at_utc": "2026-10-14T12:00:01+00:00",
+        },
     )
 
-    fetched = get_host_job("crud-job-1", conn=db_file)
-    assert fetched is not None
-    assert fetched["status"] == "RUNNING"
+    fetched_rows = HostPersistence.read_records(
+        "host_jobs", pk_values={"job_id": "crud-job-1"}, limit=1
+    )
+    assert len(fetched_rows) == 1
+    assert fetched_rows[0]["status"] == "RUNNING"
 
-    running_jobs = list_host_jobs(conn=db_file, status="RUNNING")
+    running_jobs = HostPersistence.read_records(
+        "host_jobs", where={"status": "RUNNING"}
+    )
     assert len(running_jobs) == 1
 
-    attempts = get_host_job_attempts("crud-job-1", conn=db_file)
+    attempts = HostPersistence.read_records(
+        "host_job_attempts", where={"job_id": "crud-job-1"}
+    )
     assert isinstance(attempts, list)
 
-    events = get_host_job_events("crud-job-1", conn=db_file)
+    events = HostPersistence.read_records(
+        "host_job_events", where={"job_id": "crud-job-1"}
+    )
     assert len(events) == 1
 
-    updated = update_host_job(
-        "crud-job-1",
-        {
+    updated = HostPersistence.update_record(
+        "host_jobs",
+        pk_values={"job_id": "crud-job-1"},
+        updates={
             "status": "INTERRUPTED",
             "message": "Interrupted on boot",
             "finished_at_utc": "2026-10-14T12:05:00+00:00",
             "error_message": "Orphaned",
         },
-        conn=db_file,
     )
-    assert updated is True
+    assert updated == 1
 
-    deleted = delete_host_job("crud-job-1", conn=db_file)
-    assert deleted is True
-    assert get_host_job("crud-job-1", conn=db_file) is None
+    deleted = HostPersistence.delete_record(
+        "host_jobs",
+        pk_values={"job_id": "crud-job-1"},
+        check_references=False,
+    )
+    assert deleted == 1
+    assert (
+        HostPersistence.read_records("host_jobs", pk_values={"job_id": "crud-job-1"})
+        == []
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -492,12 +496,9 @@ def test_persistence_job_helpers_with_path_connection(tmp_path: Path) -> None:
 
 def test_job_manager_process_pool_execution(tmp_path: Path) -> None:
     """Verify JobManager executes CPU tasks in a separate OS worker process."""
-    db_file = tmp_path / "mp_jobs.db"
-    _init_db(db_file)
     rm = ResourceManager(scratch_root=tmp_path / "mp_scratch")
 
     manager = JobManager(
-        db_path=db_file,
         max_workers=2,
         resource_mgr=rm,
         use_process_pool=True,
@@ -540,13 +541,10 @@ def test_job_manager_cooperative_cancellation_in_process_pool(
     tmp_path: Path,
 ) -> None:
     """Verify cooperative cancellation via JobContext terminates a running process task."""
-    db_file = tmp_path / "cancel_jobs.db"
-    _init_db(db_file)
     scratch_root = tmp_path / "cancel_scratch"
     rm = ResourceManager(scratch_root=scratch_root)
 
     manager = JobManager(
-        db_path=db_file,
         max_workers=2,
         resource_mgr=rm,
         use_process_pool=True,
@@ -580,12 +578,9 @@ def test_job_manager_cooperative_cancellation_in_process_pool(
 
 def test_job_manager_task_failure_handling(tmp_path: Path) -> None:
     """Verify worker exceptions transition the job to FAILED and persist error details."""
-    db_file = tmp_path / "fail_jobs.db"
-    _init_db(db_file)
     rm = ResourceManager(scratch_root=tmp_path / "fail_scratch")
 
     manager = JobManager(
-        db_path=db_file,
         max_workers=1,
         resource_mgr=rm,
         use_process_pool=False,
@@ -606,8 +601,6 @@ def test_job_manager_task_failure_handling(tmp_path: Path) -> None:
 
 def test_job_manager_memory_watchdog_reject_and_pause(tmp_path: Path) -> None:
     """Verify JobManager rejects or pauses tasks when available RAM < 15%."""
-    db_file = tmp_path / "mem_jobs.db"
-    _init_db(db_file)
     simulated_ram = {"pct": 9.5}
 
     rm = ResourceManager(
@@ -619,7 +612,6 @@ def test_job_manager_memory_watchdog_reject_and_pause(tmp_path: Path) -> None:
 
     # 1. Policy = 'reject': raises MemoryPressureError when RAM < 15%
     reject_mgr = JobManager(
-        db_path=db_file,
         max_workers=1,
         resource_mgr=rm,
         memory_policy="reject",
@@ -647,7 +639,6 @@ def test_job_manager_memory_watchdog_reject_and_pause(tmp_path: Path) -> None:
         probe_memory_fn=lambda: _make_mem_obs(simulated_ram["pct"]),
     )
     pause_mgr = JobManager(
-        db_path=db_file,
         max_workers=1,
         resource_mgr=rm_pause,
         memory_policy="pause",
@@ -701,51 +692,54 @@ def test_job_manager_startup_orphan_reconciliation(
     caplog: LogCaptureFixture,
 ) -> None:
     """Verify orphan jobs left in RUNNING state are marked INTERRUPTED on boot."""
-    db_file = tmp_path / "reconcile.db"
-    _init_db(db_file)
     rm = ResourceManager(scratch_root=tmp_path / "reconcile_scratch")
 
     # Seed two orphan RUNNING jobs and one COMPLETED job
-    save_host_job(
-        "orphan-run-1",
-        owner="system",
-        kind="backtest",
-        status=str(JobState.RUNNING),
-        progress=33.0,
-        message="In flight before power loss",
-        attempt_id=1,
-        submitted_at_utc="2026-10-14T10:00:00+00:00",
-        started_at_utc="2026-10-14T10:00:02+00:00",
-        conn=db_file,
+    HostPersistence.create_record(
+        "host_jobs",
+        {
+            "job_id": "orphan-run-1",
+            "owner": "system",
+            "kind": "backtest",
+            "status": str(JobState.RUNNING),
+            "progress": 33.0,
+            "message": "In flight before power loss",
+            "attempt_id": 1,
+            "submitted_at_utc": "2026-10-14T10:00:00+00:00",
+            "started_at_utc": "2026-10-14T10:00:02+00:00",
+        },
     )
-    save_host_job(
-        "orphan-run-2",
-        owner="system",
-        kind="wfo",
-        status=str(JobState.RUNNING),
-        progress=75.0,
-        message="In flight WFO",
-        attempt_id=2,
-        submitted_at_utc="2026-10-14T10:01:00+00:00",
-        started_at_utc="2026-10-14T10:01:05+00:00",
-        conn=db_file,
+    HostPersistence.create_record(
+        "host_jobs",
+        {
+            "job_id": "orphan-run-2",
+            "owner": "system",
+            "kind": "wfo",
+            "status": str(JobState.RUNNING),
+            "progress": 75.0,
+            "message": "In flight WFO",
+            "attempt_id": 2,
+            "submitted_at_utc": "2026-10-14T10:01:00+00:00",
+            "started_at_utc": "2026-10-14T10:01:05+00:00",
+        },
     )
-    save_host_job(
-        "healthy-done-1",
-        owner="system",
-        kind="backtest",
-        status=str(JobState.COMPLETED),
-        progress=100.0,
-        message="Done",
-        attempt_id=1,
-        submitted_at_utc="2026-10-14T09:00:00+00:00",
-        started_at_utc="2026-10-14T09:00:01+00:00",
-        finished_at_utc="2026-10-14T09:01:00+00:00",
-        conn=db_file,
+    HostPersistence.create_record(
+        "host_jobs",
+        {
+            "job_id": "healthy-done-1",
+            "owner": "system",
+            "kind": "backtest",
+            "status": str(JobState.COMPLETED),
+            "progress": 100.0,
+            "message": "Done",
+            "attempt_id": 1,
+            "submitted_at_utc": "2026-10-14T09:00:00+00:00",
+            "started_at_utc": "2026-10-14T09:00:01+00:00",
+            "finished_at_utc": "2026-10-14T09:01:00+00:00",
+        },
     )
 
     manager = JobManager(
-        db_path=db_file,
         resource_mgr=rm,
         use_process_pool=False,
     )
@@ -829,9 +823,7 @@ def test_resources_and_jobs_cli_main_entrypoints(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Verify CLI main() entrypoints for both resources.py and jobs.py."""
-    cli_db = tmp_path / "cli_res.db"
-    _init_db(cli_db)
-    monkeypatch.setattr(resources_mod, "DEFAULT_DB_PATH", cli_db)
+    HostPersistence.read_records("host_settings")
     monkeypatch.setattr(
         resources_mod,
         "DEFAULT_SCRATCH_ROOT",
@@ -844,14 +836,11 @@ def test_resources_and_jobs_cli_main_entrypoints(
     )
     resources_mod.main()
 
-    cli_jobs_db = tmp_path / "cli_jobs.db"
-    _init_db(cli_jobs_db)
     orig_jm = jobs_mod.JobManager
     monkeypatch.setattr(
         jobs_mod,
         "JobManager",
         lambda **kw: orig_jm(
-            db_path=cli_jobs_db,
             resource_mgr=ResourceManager(scratch_root=tmp_path / "cli_jobs_scratch"),
             use_process_pool=False,
             **kw,

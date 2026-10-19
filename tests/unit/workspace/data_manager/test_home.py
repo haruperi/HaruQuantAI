@@ -7,8 +7,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from app.host.persistence.create import create_schema
-from app.host.persistence.read import resolve_connection
+from app.host.persistence import HostPersistence
 from app.services.include.contracts import DataInfo
 from app.workspace.data_manager import Home, HomeCLI
 from app.workspace.data_manager.home import (
@@ -20,13 +19,11 @@ from app.workspace.data_manager.home import (
 )
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def test_db_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Fixture providing initialized isolated SQLite database file path."""
     db_file = tmp_path / "test_datamgr_home.db"
-    with resolve_connection(db_file) as conn:
-        create_schema(conn)
-    monkeypatch.setattr("app.host.persistence.create.DEFAULT_DB_PATH", db_file)
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", db_file)
     return db_file
 
 
@@ -53,81 +50,92 @@ def test_config_dataclass_to_dict() -> None:
     assert data["parquet_files_count"] == 10
 
 
-def test_home_service_overview(test_db_path: Path) -> None:
+def test_home_service_overview() -> None:
     """Test Home.get_overview with populated SQLite tables and callback."""
     now_iso = datetime.now(UTC).isoformat()
-    with resolve_connection(test_db_path) as conn:
-        conn.execute(
-            "INSERT INTO datamgr_instruments (symbol, description, data_type, "
-            "tick_size, point_value, decimals, created_at_utc, updated_at_utc) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            ("EURUSD", "EURUSD Pair", "Forex", 0.00001, 100000.0, 5, now_iso, now_iso),
-        )
-        conn.execute(
-            "INSERT INTO datamgr_instruments (symbol, description, data_type, "
-            "tick_size, point_value, decimals, created_at_utc, updated_at_utc) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            ("AAPL", "Apple Inc.", "Stocks", 0.01, 1.0, 2, now_iso, now_iso),
-        )
-        conn.execute(
-            "INSERT INTO datamgr_sessions (name, timezone, description) "
-            "VALUES (?, ?, ?)",
-            ("Forex 24/5", "UTC", "Standard 24/5 trading session"),
-        )
-        conn.execute(
-            "INSERT INTO datamgr_stock_group (NAME, SYSTEM, DESC, description) "
-            "VALUES (?, ?, ?, ?)",
-            ("Tech Basket", 1, "Tech stocks", "Tech stocks"),
-        )
-        conn.execute(
-            "INSERT INTO datamgr_datasets ("
-            "id, source, symbol, underlying, instrument, timeframe, broker, "
-            "broker_name, timezone, category, date_from, date_to, bars, "
-            "created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                "ds:1",
-                "dukascopy",
-                "EURUSD",
-                "EURUSD",
-                "EURUSD",
-                "M1",
-                "dukascopy",
-                "Dukascopy Broker",
-                "UTC",
-                "Forex",
-                "2026-01-01",
-                "2026-01-02",
-                500,
-                now_iso,
-                now_iso,
-            ),
-        )
-        conn.execute(
-            "INSERT INTO datamgr_datasets ("
-            "id, source, symbol, underlying, instrument, timeframe, broker, "
-            "broker_name, timezone, category, date_from, date_to, bars, "
-            "created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                "ds:2",
-                "sq_equity",
-                "AAPL",
-                "AAPL",
-                "AAPL",
-                "D1",
-                "sq_equity",
-                "SQ Equity",
-                "UTC",
-                "Stocks",
-                "2026-01-01",
-                "2026-01-02",
-                250,
-                now_iso,
-                now_iso,
-            ),
-        )
-        conn.commit()
+    HostPersistence.create_record(
+        "datamgr_instruments",
+        {
+            "symbol": "EURUSD",
+            "description": "EURUSD Pair",
+            "data_type": "Forex",
+            "tick_size": 0.00001,
+            "point_value": 100000.0,
+            "decimals": 5,
+            "created_at_utc": now_iso,
+            "updated_at_utc": now_iso,
+        },
+    )
+    HostPersistence.create_record(
+        "datamgr_instruments",
+        {
+            "symbol": "AAPL",
+            "description": "Apple Inc.",
+            "data_type": "Stocks",
+            "tick_size": 0.01,
+            "point_value": 1.0,
+            "decimals": 2,
+            "created_at_utc": now_iso,
+            "updated_at_utc": now_iso,
+        },
+    )
+    HostPersistence.create_record(
+        "datamgr_sessions",
+        {
+            "name": "Forex 24/5",
+            "timezone": "UTC",
+            "description": "Standard 24/5 trading session",
+        },
+    )
+    HostPersistence.create_record(
+        "datamgr_stock_group",
+        {
+            "NAME": "Tech Basket",
+            "SYSTEM": 1,
+            "DESC": "Tech stocks",
+            "description": "Tech stocks",
+        },
+    )
+    HostPersistence.create_record(
+        "datamgr_datasets",
+        {
+            "id": "ds:1",
+            "source": "dukascopy",
+            "symbol": "EURUSD",
+            "underlying": "EURUSD",
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "broker": "dukascopy",
+            "broker_name": "Dukascopy Broker",
+            "timezone": "UTC",
+            "category": "Forex",
+            "date_from": "2026-01-01",
+            "date_to": "2026-01-02",
+            "bars": 500,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+        },
+    )
+    HostPersistence.create_record(
+        "datamgr_datasets",
+        {
+            "id": "ds:2",
+            "source": "sq_equity",
+            "symbol": "AAPL",
+            "underlying": "AAPL",
+            "instrument": "AAPL",
+            "timeframe": "D1",
+            "broker": "sq_equity",
+            "broker_name": "SQ Equity",
+            "timezone": "UTC",
+            "category": "Stocks",
+            "date_from": "2026-01-01",
+            "date_to": "2026-01-02",
+            "bars": 250,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+        },
+    )
 
     # Case 1: Custom active_providers_getter
     home_service = Home(active_providers_getter=lambda: 3)
@@ -147,86 +155,69 @@ def test_home_service_overview(test_db_path: Path) -> None:
     assert overview_default["active_providers_count"] == 0
 
 
-def test_home_service_saved_datasets(test_db_path: Path) -> None:
+def test_home_service_saved_datasets() -> None:
     """Test Home.get_saved_datasets across valid, invalid, and empty dates."""
     now_iso = datetime.now(UTC).isoformat()
-    with resolve_connection(test_db_path) as conn:
-        # Row 1: Valid date range with standard format
-        conn.execute(
-            "INSERT INTO datamgr_datasets ("
-            "id, source, symbol, underlying, instrument, timeframe, broker, "
-            "broker_name, timezone, category, date_from, date_to, bars, "
-            "created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                "ds:1",
-                "dukascopy",
-                "EURUSD",
-                "EUR/USD Spot",
-                "EURUSD",
-                "M1",
-                "dukascopy",
-                "Dukascopy Broker",
-                "UTC",
-                "Forex",
-                "2026-01-01",
-                "2026-01-11",
-                5000,
-                now_iso,
-                now_iso,
-            ),
-        )
-        # Row 2: Invalid date format triggering ValueError fallback
-        conn.execute(
-            "INSERT INTO datamgr_datasets ("
-            "id, source, symbol, underlying, instrument, timeframe, broker, "
-            "broker_name, timezone, category, date_from, date_to, bars, "
-            "created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                "ds:2",
-                "manual",
-                "INVALID_DATE",
-                "Underlying",
-                "INV",
-                "D1",
-                "custom",
-                "Custom Broker",
-                "UTC",
-                "Crypto",
-                "not-a-date",
-                "also-invalid",
-                100,
-                now_iso,
-                now_iso,
-            ),
-        )
-        # Row 3: Missing date_from and date_to
-        conn.execute(
-            "INSERT INTO datamgr_datasets ("
-            "id, source, symbol, underlying, instrument, timeframe, broker, "
-            "broker_name, timezone, category, date_from, date_to, bars, "
-            "created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                "ds:3",
-                "manual",
-                "NO_DATES",
-                "Underlying",
-                "ND",
-                "H1",
-                "custom",
-                "Custom Broker",
-                "UTC",
-                "Futures",
-                "",
-                "",
-                50,
-                now_iso,
-                now_iso,
-            ),
-        )
-        conn.commit()
+    HostPersistence.create_record(
+        "datamgr_datasets",
+        {
+            "id": "ds:1",
+            "source": "dukascopy",
+            "symbol": "EURUSD",
+            "underlying": "EUR/USD Spot",
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "broker": "dukascopy",
+            "broker_name": "Dukascopy Broker",
+            "timezone": "UTC",
+            "category": "Forex",
+            "date_from": "2026-01-01",
+            "date_to": "2026-01-11",
+            "bars": 5000,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+        },
+    )
+    HostPersistence.create_record(
+        "datamgr_datasets",
+        {
+            "id": "ds:2",
+            "source": "manual",
+            "symbol": "INVALID_DATE",
+            "underlying": "Underlying",
+            "instrument": "INV",
+            "timeframe": "D1",
+            "broker": "custom",
+            "broker_name": "Custom Broker",
+            "timezone": "UTC",
+            "category": "Crypto",
+            "date_from": "not-a-date",
+            "date_to": "also-invalid",
+            "bars": 100,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+        },
+    )
+    HostPersistence.create_record(
+        "datamgr_datasets",
+        {
+            "id": "ds:3",
+            "source": "manual",
+            "symbol": "NO_DATES",
+            "underlying": "Underlying",
+            "instrument": "ND",
+            "timeframe": "H1",
+            "broker": "custom",
+            "broker_name": "Custom Broker",
+            "timezone": "UTC",
+            "category": "Futures",
+            "date_from": "",
+            "date_to": "",
+            "bars": 50,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+        },
+    )
 
     home_service = Home()
     datasets = home_service.get_saved_datasets()
@@ -339,37 +330,29 @@ def test_home_cli_empty_table() -> None:
 
 
 @pytest.mark.filterwarnings("ignore::RuntimeWarning")
-def test_home_main_execution(
-    test_db_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
+def test_home_main_execution(capsys: pytest.CaptureFixture[str]) -> None:
     """Test running home.py standalone under __main__."""
     now_iso = datetime.now(UTC).isoformat()
-    with resolve_connection(test_db_path) as conn:
-        conn.execute(
-            "INSERT INTO datamgr_datasets ("
-            "id, source, symbol, underlying, instrument, timeframe, broker, "
-            "broker_name, timezone, category, date_from, date_to, bars, "
-            "created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                "ds:main",
-                "source_x",
-                "MAIN_TEST",
-                "MAIN_UND",
-                "MAIN_INST",
-                "M1",
-                "broker_main",
-                "Main Broker",
-                "UTC",
-                "Forex",
-                "2026-01-01",
-                "2026-01-02",
-                42,
-                now_iso,
-                now_iso,
-            ),
-        )
-        conn.commit()
+    HostPersistence.create_record(
+        "datamgr_datasets",
+        {
+            "id": "ds:main",
+            "source": "source_x",
+            "symbol": "MAIN_TEST",
+            "underlying": "MAIN_UND",
+            "instrument": "MAIN_INST",
+            "timeframe": "M1",
+            "broker": "broker_main",
+            "broker_name": "Main Broker",
+            "timezone": "UTC",
+            "category": "Forex",
+            "date_from": "2026-01-01",
+            "date_to": "2026-01-02",
+            "bars": 42,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+        },
+    )
 
     runpy.run_module("app.workspace.data_manager.home", run_name="__main__")
     captured = capsys.readouterr()

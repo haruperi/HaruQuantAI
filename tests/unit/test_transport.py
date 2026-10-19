@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from app.host.persistence.create import create_schema, get_connection
+from app.host.persistence import HostPersistence
 from app.host.response import (
     ResponseMetadata,
     StandardError,
@@ -34,15 +34,17 @@ from fastapi.testclient import TestClient
 from pydantic import BaseModel
 
 
-def _create_isolated_session_manager(tmp_path: Path) -> SessionManager:
-    """Create a SessionManager backed by an isolated temporary SQLite DB."""
+@pytest.fixture(autouse=True)
+def _isolate_default_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Redirect HostPersistence.DEFAULT_DB_PATH to an isolated temporary SQLite file."""
     db_file = tmp_path / "transport_test.db"
-    conn = get_connection(db_file)
-    try:
-        create_schema(conn)
-    finally:
-        conn.close()
-    return SessionManager(db_path=db_file, host_instance_id="test-host-01")
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", db_file)
+    return db_file
+
+
+def _create_isolated_session_manager(tmp_path: Path | None = None) -> SessionManager:
+    """Create a SessionManager backed by an isolated temporary SQLite DB."""
+    return SessionManager(host_instance_id="test-host-01")
 
 
 # ============================================================================
@@ -144,17 +146,12 @@ def test_sensitive_routes_require_session_and_scope(
 ) -> None:
     from unittest.mock import Mock
 
-    from app.host.persistence.create import create_schema, get_connection
     from app.host.settings import HostSettings
 
-    db = tmp_path / "protected.db"
-    conn = get_connection(db)
-    create_schema(conn)
-    conn.close()
     config = HostSettings()
-    config.reload(conn=db)
+    config.reload()
     monkeypatch.setattr("app.host.transport.settings", config)
-    sessions = SessionManager(db_path=db)
+    sessions = SessionManager()
     token, session = sessions.create_session("admin", "audit")
     headers = {"Authorization": f"Bearer {token}"}
     jobs = Mock()
@@ -539,18 +536,10 @@ def test_gateway_settings_diagnostics_and_jobs_routes(tmp_path: Path) -> None:
     from app.host.resources import ResourceManager
     from app.host.settings import settings as host_settings
 
-    db_file = tmp_path / "gateway_gov.db"
-    conn = get_connection(db_file)
-    try:
-        create_schema(conn)
-    finally:
-        conn.close()
-
-    host_settings.reload(conn=db_file)
-    sess_mgr = SessionManager(db_path=db_file, host_instance_id="gov-host-01")
+    host_settings.reload()
+    sess_mgr = SessionManager(host_instance_id="gov-host-01")
     res_mgr = ResourceManager(scratch_root=tmp_path / "scratch")
     job_mgr = JobManager(
-        db_path=db_file,
         resource_mgr=res_mgr,
         use_process_pool=False,
     )

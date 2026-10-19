@@ -60,10 +60,8 @@ from typing import Any, Self, override
 from app.host.logging import get_logger
 
 try:
-    from app.host.persistence.engine import DEFAULT_DATABASE_PATH  # type: ignore[import-not-found]
     from app.host.persistence.mt5bridge_journal import Journal  # type: ignore[import-not-found]
 except ImportError:
-    from app.host.persistence.create import DEFAULT_DB_PATH as DEFAULT_DATABASE_PATH
 
     class Journal:  # type: ignore[no-redef]
         """Fallback MT5 journal stub."""
@@ -205,7 +203,7 @@ class Bridge:
         host: str = "127.0.0.1",
         port: int = 8765,
         auth_token: str,
-        journal_path: str | Path = DEFAULT_DATABASE_PATH,
+        journal_path: str | Path | None = None,
         command_timeout: float = 10.0,
     ) -> None:
         if host not in {"127.0.0.1", "::1", "localhost"}:
@@ -664,7 +662,6 @@ class MetaTraderClient(TradingClient):
         auth_token: str = "",
         host: str = "127.0.0.1",
         port: int = 8765,
-        journal_path: str | Path = DEFAULT_DATABASE_PATH,
         command_timeout: float = 10.0,
         name: str = "MetaTrader",
         backend: MetaTraderClient | None = None,
@@ -683,7 +680,6 @@ class MetaTraderClient(TradingClient):
                 host=host,
                 port=port,
                 auth_token=token,
-                journal_path=journal_path,
                 command_timeout=command_timeout,
             )
         self._loop: asyncio.AbstractEventLoop | None = None

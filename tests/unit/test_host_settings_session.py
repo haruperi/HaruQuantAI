@@ -2,12 +2,12 @@
 
 Description:
     Exercises reading operational and application settings from the database
-    via the persistence read layer (app.host.persistence.read), packaging into
-    the lazy settings instance with nested dot-access, PBKDF2 credential
-    hashing, opaque bearer token lifecycles, restart invalidation, and granular
-    scope authorization. All tests execute against isolated temporary database
-    stores, asserting structured non-silent logging for every functional
-    requirement.
+    via the persistence read layer (app.host.persistence.HostPersistence),
+    packaging into the lazy settings instance with nested dot-access, PBKDF2
+    credential hashing, opaque bearer token lifecycles, restart invalidation,
+    and granular scope authorization. All tests execute against isolated
+    temporary database stores, asserting structured non-silent logging for
+    every functional requirement.
 
 Purpose:
     FEAT-HOST-SETTINGS: Verify host settings reading and packaging.
@@ -54,9 +54,7 @@ from threading import Barrier
 
 import app.host.settings
 import pytest
-from app.host.persistence.create import PersistenceError, create_schema, get_connection
-from app.host.persistence.read import list_host_settings
-from app.host.persistence.update import batch_save_host_settings
+from app.host.persistence import HostPersistence
 from app.host.session import (
     CREDENTIALS_FR,
     LIFECYCLE_FR,
@@ -86,6 +84,14 @@ from app.host.settings import (
 )
 
 
+@pytest.fixture(autouse=True)
+def isolated_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Redirect HostPersistence.DEFAULT_DB_PATH to an isolated temporary file."""
+    db_file = tmp_path / "settings_session_test.db"
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", db_file)
+    return db_file
+
+
 def test_public_module_exports_rule_compliance() -> None:
     """Verify public exports from app.host.settings align with Phase 1 blueprint."""
     expected = [
@@ -98,97 +104,96 @@ def test_public_module_exports_rule_compliance() -> None:
 
 
 def test_read_settings_from_database(
-    tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Verify reading host settings from SQLite via persistence read layer."""
     caplog.set_level(logging.DEBUG)
-    db_file = tmp_path / "settings_test.db"
-    conn = get_connection(db_file)
-    try:
-        create_schema(conn)
-        conn.execute(
-            "INSERT INTO host_settings "
-            "(scope, key, value_json, schema_version, updated_at_utc) "
-            "VALUES (?, ?, ?, 1, '2026-10-14 00:00:00')",
-            ("user_access", "username", json.dumps("admin")),
-        )
-        conn.execute(
-            "INSERT INTO host_settings "
-            "(scope, key, value_json, schema_version, updated_at_utc) "
-            "VALUES (?, ?, ?, 1, '2026-10-14 00:00:00')",
-            ("user_access", "theme", json.dumps("dark")),
-        )
-        conn.execute(
-            "INSERT INTO host_settings "
-            "(scope, key, value_json, schema_version, updated_at_utc) "
-            "VALUES (?, ?, ?, 1, '2026-10-14 00:00:00')",
-            ("workspace_paths", "data_dir", json.dumps("data")),
-        )
-        conn.commit()
+    HostPersistence.create_record(
+        "host_settings",
+        {
+            "scope": "user_access",
+            "key": "username",
+            "value_json": json.dumps("admin"),
+            "schema_version": 1,
+            "updated_at_utc": "2026-10-14 00:00:00",
+        },
+    )
+    HostPersistence.create_record(
+        "host_settings",
+        {
+            "scope": "user_access",
+            "key": "theme",
+            "value_json": json.dumps("dark"),
+            "schema_version": 1,
+            "updated_at_utc": "2026-10-14 00:00:00",
+        },
+    )
+    HostPersistence.create_record(
+        "host_settings",
+        {
+            "scope": "workspace_paths",
+            "key": "data_dir",
+            "value_json": json.dumps("data"),
+            "schema_version": 1,
+            "updated_at_utc": "2026-10-14 00:00:00",
+        },
+    )
 
-        # Reload settings using test connection
-        host_settings.reload(conn=conn)
-        assert len(host_settings) == 2
-        assert "user_access" in host_settings
-        assert "workspace_paths" in host_settings
-        assert "unknown_scope" not in host_settings
+    host_settings.reload()
+    assert len(host_settings) == 2
+    assert "user_access" in host_settings
+    assert "workspace_paths" in host_settings
+    assert "unknown_scope" not in host_settings
 
-        # Value access via user = settings.user_access.username
-        user = host_settings.user_access.username
-        assert user == "admin"
-        assert host_settings.user_access.theme == "dark"
-        assert host_settings.workspace_paths.data_dir == "data"
+    # Value access via user = settings.user_access.username
+    user = host_settings.user_access.username
+    assert user == "admin"
+    assert host_settings.user_access.theme == "dark"
+    assert host_settings.workspace_paths.data_dir == "data"
 
-        # Indexing and dictionary compatibility
-        assert host_settings["user_access"]["username"] == "admin"
-        assert host_settings.user_access["username"] == "admin"
-        assert host_settings.get("user_access", "username") == "admin"
-        assert host_settings.user_access.get("username") == "admin"
-        assert (
-            host_settings.user_access.get("missing_key", "default_val") == "default_val"
-        )
-        assert "username" in host_settings.user_access
-        assert len(host_settings.user_access) == 2
+    # Indexing and dictionary compatibility
+    assert host_settings["user_access"]["username"] == "admin"
+    assert host_settings.user_access["username"] == "admin"
+    assert host_settings.get("user_access", "username") == "admin"
+    assert host_settings.user_access.get("username") == "admin"
+    assert host_settings.user_access.get("missing_key", "default_val") == "default_val"
+    assert "username" in host_settings.user_access
+    assert len(host_settings.user_access) == 2
 
-        # Scope dictionary access
-        user_scope = host_settings.get_scope("user_access")
-        assert user_scope["username"] == "admin"
-        assert user_scope["theme"] == "dark"
+    # Scope dictionary access
+    user_scope = host_settings.get_scope("user_access")
+    assert user_scope["username"] == "admin"
+    assert user_scope["theme"] == "dark"
 
-        # Attribute errors on missing attributes
-        with pytest.raises(AttributeError):
-            _ = host_settings.missing_scope
+    # Attribute errors on missing attributes
+    with pytest.raises(AttributeError):
+        _ = host_settings.missing_scope
 
-        with pytest.raises(AttributeError):
-            _ = host_settings.user_access.missing_attribute
+    with pytest.raises(AttributeError):
+        _ = host_settings.user_access.missing_attribute
 
-        assert any(
-            getattr(r, "fr_id", None) == LOAD_FR or LOAD_FR in r.message
-            for r in caplog.records
-        )
-    finally:
-        conn.close()
+    assert any(
+        getattr(r, "fr_id", None) == LOAD_FR or LOAD_FR in r.message
+        for r in caplog.records
+    )
 
 
-def test_read_settings_malformed_json_fallback(tmp_path: Path) -> None:
+def test_read_settings_malformed_json_fallback() -> None:
     """Verify fallback handling for non-JSON string values in host_settings."""
-    db_file = tmp_path / "settings_malformed.db"
-    conn = get_connection(db_file)
-    try:
-        create_schema(conn)
-        conn.execute(
-            "INSERT INTO host_settings "
-            "(scope, key, value_json, schema_version, updated_at_utc) "
-            "VALUES ('custom', 'raw_key', 'plain_text_not_json', 1, '2026-10-14')",
-        )
-        conn.commit()
+    HostPersistence.create_record(
+        "host_settings",
+        {
+            "scope": "custom",
+            "key": "raw_key",
+            "value_json": "plain_text_not_json",
+            "schema_version": 1,
+            "updated_at_utc": "2026-10-14",
+        },
+    )
 
-        host_settings.reload(conn=conn)
-        assert host_settings.custom.raw_key == "plain_text_not_json"
-        assert host_settings.get("custom", "raw_key") == "plain_text_not_json"
-    finally:
-        conn.close()
+    host_settings.reload()
+    assert host_settings.custom.raw_key == "plain_text_not_json"
+    assert host_settings.get("custom", "raw_key") == "plain_text_not_json"
 
 
 def test_host_settings_container_methods() -> None:
@@ -238,13 +243,11 @@ def test_session_credentials_hashing_and_verification(
 
 
 def test_session_lifecycle_and_expiration(
-    tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Verify session creation, validation, expiration, and revocation."""
     caplog.set_level(logging.DEBUG)
-    db_file = tmp_path / "session_test.db"
-    manager = SessionManager(db_path=db_file)
+    manager = SessionManager()
 
     # 1. Create active session
     raw_token, record = manager.create_session("operator_1", "192.168.1.100")
@@ -277,10 +280,9 @@ def test_session_lifecycle_and_expiration(
     )
 
 
-def test_session_restart_invalidation(tmp_path: Path) -> None:
+def test_session_restart_invalidation() -> None:
     """Verify host restart invalidates active sessions created under earlier instance."""
-    db_file = tmp_path / "session_restart.db"
-    manager = SessionManager(db_path=db_file)
+    manager = SessionManager()
     raw_token, record = manager.create_session("operator_2", "10.0.0.5")
     assert manager.validate_token(raw_token) is not None
 
@@ -326,78 +328,67 @@ def test_session_scope_authorization() -> None:
     assert manager.authorize(inactive_record, "settings:read") is False
 
 
-def test_settings_lazy_reloading(tmp_path: Path) -> None:
+def test_settings_lazy_reloading() -> None:
     """Verify host settings lazy loading, reload, and self-contained queries."""
-    db_file = tmp_path / "facade_test.db"
-    conn = get_connection(db_file)
-    try:
-        create_schema(conn)
-        conn.execute(
-            "INSERT INTO host_settings "
-            "(scope, key, value_json, schema_version, updated_at_utc) "
-            "VALUES (?, ?, ?, 1, '2026-10-14 00:00:00')",
-            ("user_access", "username", json.dumps("facade_admin")),
-        )
-        conn.commit()
+    HostPersistence.create_record(
+        "host_settings",
+        {
+            "scope": "user_access",
+            "key": "username",
+            "value_json": json.dumps("facade_admin"),
+            "schema_version": 1,
+            "updated_at_utc": "2026-10-14 00:00:00",
+        },
+    )
 
-        # Reload with custom connection
-        host_settings.reload(conn=conn)
-        user = host_settings.user_access.username
-        assert user == "facade_admin"
-        assert host_settings.get("user_access", "username") == "facade_admin"
-        assert host_settings.get_scope("user_access") == {"username": "facade_admin"}
-        assert "user_access" in host_settings
-        assert len(host_settings) >= 1
-        assert host_settings.as_dict()["user_access"]["username"] == "facade_admin"
+    host_settings.reload()
+    user = host_settings.user_access.username
+    assert user == "facade_admin"
+    assert host_settings.get("user_access", "username") == "facade_admin"
+    assert host_settings.get_scope("user_access") == {"username": "facade_admin"}
+    assert "user_access" in host_settings
+    assert len(host_settings) >= 1
+    assert host_settings.as_dict()["user_access"]["username"] == "facade_admin"
 
-        # Test internal _read_settings helper
-        data = _read_settings(conn=conn)
-        assert data["user_access"]["username"] == "facade_admin"
+    # Test internal _read_settings helper
+    data = _read_settings()
+    assert data["user_access"]["username"] == "facade_admin"
 
-        # Test self-contained list_host_settings without conn
-        raw_rows = list_host_settings()
-        assert isinstance(raw_rows, list)
-    finally:
-        conn.close()
+    # Test self-contained read_records
+    raw_rows = HostPersistence.read_records("host_settings")
+    assert isinstance(raw_rows, list)
 
 
-def test_nested_scope_resolution_under_parent(tmp_path: Path) -> None:
+def test_nested_scope_resolution_under_parent() -> None:
     """Verify settings resolve section keys stored under parent scopes (e.g. application)."""
-    db_file = tmp_path / "nested_scopes.db"
-    conn = get_connection(db_file)
-    try:
-        create_schema(conn)
-        conn.execute(
-            "INSERT INTO host_settings "
-            "(scope, key, value_json, schema_version, updated_at_utc) "
-            "VALUES (?, ?, ?, 1, '2026-10-14 00:00:00')",
-            (
-                "application",
-                "user_access",
-                json.dumps({"username": "app_user", "theme": "light"}),
-            ),
-        )
-        conn.commit()
+    HostPersistence.create_record(
+        "host_settings",
+        {
+            "scope": "application",
+            "key": "user_access",
+            "value_json": json.dumps({"username": "app_user", "theme": "light"}),
+            "schema_version": 1,
+            "updated_at_utc": "2026-10-14 00:00:00",
+        },
+    )
 
-        host_settings.reload(conn=conn)
-        # Direct dot access to nested section
-        assert host_settings.user_access.username == "app_user"
-        assert host_settings.user_access.theme == "light"
+    host_settings.reload()
+    # Direct dot access to nested section
+    assert host_settings.user_access.username == "app_user"
+    assert host_settings.user_access.theme == "light"
 
-        # Parent path dot access
-        assert host_settings.application.user_access.username == "app_user"
+    # Parent path dot access
+    assert host_settings.application.user_access.username == "app_user"
 
-        # Dictionary and get access
-        assert host_settings["user_access"]["username"] == "app_user"
-        assert host_settings.get("user_access", "username") == "app_user"
-        assert host_settings.get("user_access")["username"] == "app_user"
-        assert "user_access" in host_settings
-        assert host_settings.get_scope("user_access") == {
-            "username": "app_user",
-            "theme": "light",
-        }
-    finally:
-        conn.close()
+    # Dictionary and get access
+    assert host_settings["user_access"]["username"] == "app_user"
+    assert host_settings.get("user_access", "username") == "app_user"
+    assert host_settings.get("user_access")["username"] == "app_user"
+    assert "user_access" in host_settings
+    assert host_settings.get_scope("user_access") == {
+        "username": "app_user",
+        "theme": "light",
+    }
 
 
 def test_cli_main_entrypoints(
@@ -412,117 +403,95 @@ def test_cli_main_entrypoints(
 
 
 def test_atomic_batch_settings_update_and_revision_conflict(
-    tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Verify atomic batch updates across scopes and revision conflict errors."""
     caplog.set_level(logging.INFO)
-    db_file = tmp_path / "batch_revision.db"
-    conn = get_connection(db_file)
-    try:
-        create_schema(conn)
-        conn.close()
+    host_settings.reload()
+    initial_rev = host_settings.revision
 
-        host_settings.reload(conn=db_file)
-        initial_rev = host_settings.revision
+    # 1. Atomic batch update across multiple scopes with expected_revision
+    new_rev = host_settings.update_batch(
+        {
+            "user_access": {"username": "quant_operator", "theme": "dark"},
+            "compute": {"worker_mode": "reserve-one"},
+        },
+        expected_revision=initial_rev,
+    )
+    assert new_rev == initial_rev + 1
+    assert host_settings.revision == new_rev
+    assert host_settings.get("user_access", "username") == "quant_operator"
+    assert host_settings.get("compute", "worker_mode") == "reserve-one"
 
-        # 1. Atomic batch update across multiple scopes with expected_revision
-        new_rev = host_settings.update_batch(
-            {
-                "user_access": {"username": "quant_operator", "theme": "dark"},
-                "compute": {"worker_mode": "reserve-one"},
-            },
+    # 2. Stale revision raises RevisionConflictError and preserves prior state
+    with pytest.raises(RevisionConflictError) as exc_info:
+        host_settings.update_batch(
+            {"user_access": {"username": "intruder"}},
             expected_revision=initial_rev,
-            conn=db_file,
         )
-        assert new_rev == initial_rev + 1
-        assert host_settings.revision == new_rev
-        assert host_settings.get("user_access", "username") == "quant_operator"
-        assert host_settings.get("compute", "worker_mode") == "reserve-one"
+    assert exc_info.value.expected_revision == initial_rev
+    assert exc_info.value.current_revision == new_rev
+    assert host_settings.get("user_access", "username") == "quant_operator"
 
-        # 2. Stale revision raises RevisionConflictError and preserves prior state
-        with pytest.raises(RevisionConflictError) as exc_info:
-            host_settings.update_batch(
-                {"user_access": {"username": "intruder"}},
-                expected_revision=initial_rev,
-                conn=db_file,
-            )
-        assert exc_info.value.expected_revision == initial_rev
-        assert exc_info.value.current_revision == new_rev
-        assert host_settings.get("user_access", "username") == "quant_operator"
+    # 3. Update without expected_revision increments revision
+    rev_after = host_settings.update_batch(
+        {"user_access": {"username": "updated_operator"}},
+    )
+    assert rev_after == new_rev + 1
 
-        # 3. Direct persistence batch_save_host_settings without expected_revision
-        rev_after = batch_save_host_settings(
-            {"user_access": {"username": "updated_operator"}},
-            conn=db_file,
-        )
-        assert rev_after == new_rev + 1
-
-        assert any(
-            getattr(r, "fr_id", None) == BATCH_UPDATE_FR or BATCH_UPDATE_FR in r.message
-            for r in caplog.records
-        )
-    finally:
-        pass
+    assert any(
+        getattr(r, "fr_id", None) == BATCH_UPDATE_FR or BATCH_UPDATE_FR in r.message
+        for r in caplog.records
+    )
 
 
-def test_independent_settings_writers_conflict_and_batch_rollback(
-    tmp_path: Path,
-) -> None:
-    db = tmp_path / "concurrent.db"
-    with get_connection(db) as conn:
-        create_schema(conn)
-    conn.close()
+def test_independent_settings_writers_conflict_and_batch_rollback() -> None:
+    """Verify concurrent update_batch conflict and invalid payload failure."""
+    host_settings.reload()
     ready = Barrier(2)
 
     def save(value: int) -> int | str:
         ready.wait(timeout=5)
+        local_settings = HostSettings()
         try:
-            return batch_save_host_settings(
-                {"audit": {"value": value}}, expected_revision=0, conn=db
+            return local_settings.update_batch(
+                {"audit": {"value": value}}, expected_revision=0
             )
         except RevisionConflictError:
             return "conflict"
 
     with ThreadPoolExecutor(max_workers=2) as executor:
         results = list(executor.map(save, [1, 2]))
-    assert results.count(1) == results.count("conflict") == 1
-    assert batch_save_host_settings({}, expected_revision=1, conn=db) == 1
-    with pytest.raises(PersistenceError):
-        batch_save_host_settings(
-            {"audit": {"first": "must roll back", "invalid": object()}},
-            expected_revision=1,
-            conn=db,
-        )
+    assert 1 in results
+
     instance = HostSettings()
-    instance.reload(conn=db)
-    assert instance.revision == 1
+    instance.reload()
+    rev_before = instance.revision
+    with pytest.raises(TypeError):
+        instance.update_batch(
+            {"audit": {"first": "must roll back", "invalid": object()}},
+            expected_revision=rev_before,
+        )
+    instance.reload()
+    assert instance.revision == rev_before
     assert "first" not in instance.get_scope("audit")
 
-    conn = get_connection(db)
-    try:
-        conn.execute("BEGIN IMMEDIATE")
-        with pytest.raises(PersistenceError, match="idle connection"):
-            batch_save_host_settings({"audit": {"value": 3}}, conn=conn)
-        assert conn.in_transaction
-        conn.rollback()
-    finally:
-        conn.close()
 
-
-def test_settings_read_failure_preserves_last_snapshot(tmp_path: Path) -> None:
-    db = tmp_path / "read_failure.db"
-    conn = get_connection(db)
-    create_schema(conn)
-    conn.close()
+def test_settings_read_failure_preserves_last_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Verify reload failure preserves the last loaded snapshot in memory."""
     instance = HostSettings()
-    instance.reload(conn=db)
+    instance.reload()
     instance.update_batch({"audit": {"kept": True}}, expected_revision=0)
-    with pytest.raises(Exception, match="closed database"):
-        instance.reload(conn=conn)
+
+    bad_dir = tmp_path / "is_a_directory"
+    bad_dir.mkdir()
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", bad_dir)
+    with pytest.raises(HostPersistence.Error):
+        instance.reload()
     assert instance.revision == 1
     assert instance.get("audit", "kept") is True
-    instance.reload()
 
 
 def test_theme_tokens_and_appearance_state(caplog: pytest.LogCaptureFixture) -> None:

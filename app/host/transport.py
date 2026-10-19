@@ -106,7 +106,7 @@ from pathlib import Path
 from typing import Any, Final
 
 from app.host.logging import get_access_logger, get_logger, redact_secrets
-from app.host.persistence.read import get_host_job, list_host_jobs
+from app.host.persistence import HostPersistence
 from app.host.resources import (
     check_memory_headroom,
     get_system_health,
@@ -1684,7 +1684,10 @@ class TransportGatewayService:
             records = jm.list_jobs(status=status_filter, limit=limit)
             jobs_list = [r.to_dict() for r in records]
         else:
-            jobs_list = list_host_jobs(status=status_filter, limit=limit)
+            where = {"status": status_filter} if status_filter else None
+            jobs_list = HostPersistence.read_records(
+                "host_jobs", where=where, limit=limit
+            )
 
         resp = StandardResponse.success(
             data={
@@ -1709,7 +1712,10 @@ class TransportGatewayService:
             if rec is not None:
                 job_data = rec.to_dict()
         else:
-            job_data = get_host_job(job_id)
+            job_rows = HostPersistence.read_records(
+                "host_jobs", pk_values={"job_id": job_id}, limit=1
+            )
+            job_data = job_rows[0] if job_rows else None
 
         if job_data is None:
             err = StandardError(

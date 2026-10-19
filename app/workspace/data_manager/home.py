@@ -46,7 +46,7 @@ from datetime import datetime
 from typing import Any
 
 from app.host.logging import get_logger
-from app.host.persistence.read import count_rows, read_rows, resolve_connection
+from app.host.persistence import HostPersistence
 from app.services.include.contracts import DataInfo
 
 __all__ = [
@@ -100,15 +100,12 @@ class Home:
 
     def get_overview(self) -> dict[str, Any]:
         """Compute aggregate counts across database catalogs."""
-        with resolve_connection() as conn:
-            datasets_count = count_rows(conn, "datamgr_datasets")
-            instruments_count = count_rows(conn, "datamgr_instruments")
-            sessions_count = count_rows(conn, "datamgr_sessions")
-            baskets_count = count_rows(conn, "datamgr_stock_group")
-
-            # Sum total bars across all datasets
-            dataset_rows = read_rows(conn, "datamgr_datasets")
-            total_bars = sum(int(r.get("bars", 0)) for r in dataset_rows)
+        dataset_rows = HostPersistence.read_records("datamgr_datasets")
+        datasets_count = len(dataset_rows)
+        instruments_count = len(HostPersistence.read_records("datamgr_instruments"))
+        sessions_count = len(HostPersistence.read_records("datamgr_sessions"))
+        baskets_count = len(HostPersistence.read_records("datamgr_stock_group"))
+        total_bars = sum(int(r.get("bars", 0)) for r in dataset_rows)
 
         active_providers = (
             self._providers_getter() if self._providers_getter is not None else 0
@@ -139,8 +136,7 @@ class Home:
 
     def get_saved_datasets(self) -> list[DataInfo]:
         """Retrieve saved dataset catalog items from the datamgr_datasets table."""
-        with resolve_connection() as conn:
-            rows = read_rows(conn, "datamgr_datasets")
+        rows = HostPersistence.read_records("datamgr_datasets")
 
         datasets: list[DataInfo] = []
         for r in rows:

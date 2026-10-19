@@ -59,12 +59,10 @@ import hmac
 import secrets
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
-from pathlib import Path
 from typing import Any
 
 from app.host.logging import get_logger
-from app.host.persistence.read import get_host_session_by_token_hash
-from app.host.persistence.update import save_host_session, update_host_session_status
+from app.host.persistence import HostPersistence
 
 __all__ = [
     "SessionManager",
@@ -207,17 +205,14 @@ class SessionManager:
 
     def __init__(
         self,
-        db_path: Path | str | None = None,
         *,
         host_instance_id: str | None = None,
     ) -> None:
         """Initialize SessionManager with isolated host instance identity.
 
         Args:
-            db_path: Optional path to SQLite database.
             host_instance_id: Optional unique host instance ID.
         """
-        self._db_path: Path | str | None = db_path
         self._host_instance_id: str = (
             host_instance_id if host_instance_id is not None else secrets.token_hex(8)
         )
@@ -227,15 +222,6 @@ class SessionManager:
     def host_instance_id(self) -> str:
         """Return unique running host process instance identifier."""
         return self._host_instance_id
-
-    @property
-    def db_path(self) -> Path:
-        """Return filesystem path to underlying SQLite database."""
-        return (
-            Path(self._db_path)
-            if self._db_path is not None
-            else Path("data/database/haruquantai.db")
-        )
 
     def create_session(
         self,
@@ -274,15 +260,19 @@ class SessionManager:
             status="ACTIVE",
         )
 
-        save_host_session(
-            session_id=session_id,
-            token_hash=token_hash,
-            username=username,
-            peer_id=peer_id,
-            created_at_utc=created_at,
-            expires_at_utc=expires_at,
-            status="ACTIVE",
-            conn=self._db_path,
+        HostPersistence.update_record(
+            "host_session",
+            pk_values={"session_id": session_id},
+            updates={
+                "session_id": session_id,
+                "token_hash": token_hash,
+                "username": username,
+                "peer_id": peer_id,
+                "created_at_utc": created_at,
+                "expires_at_utc": expires_at,
+                "status": "ACTIVE",
+            },
+            upsert=True,
         )
 
         self._active_sessions[token_hash] = record
@@ -319,12 +309,17 @@ class SessionManager:
         # Check in-memory active cache first
         record = self._active_sessions.get(token_hash)
         if record is None:
-            row = get_host_session_by_token_hash(token_hash, conn=self._db_path)
-            if not row:
+            rows = HostPersistence.read_records(
+                "host_session",
+                where={"token_hash": token_hash},
+                limit=1,
+            )
+            if not rows:
                 logger.warning(
                     "%s: token hash not found in session store", LIFECYCLE_FR
                 )
                 return None
+            row = rows[0]
             record = SessionRecord(
                 session_id=row["session_id"],
                 token_hash=row["token_hash"],
@@ -373,11 +368,13 @@ class SessionManager:
             True if revoked, False if session not found.
         """
         now_str = _now_utc_str()
-        updated = update_host_session_status(
-            session_id,
-            "REVOKED",
-            revoked_at_utc=now_str,
-            conn=self._db_path,
+        updated = (
+            HostPersistence.update_record(
+                "host_session",
+                pk_values={"session_id": session_id},
+                updates={"status": "REVOKED", "revoked_at_utc": now_str},
+            )
+            > 0
         )
 
         # Purge from memory
@@ -401,10 +398,10 @@ class SessionManager:
 
     def _update_status(self, session_id: str, new_status: str) -> None:
         """Update status of a session record in the persistence table."""
-        update_host_session_status(
-            session_id,
-            new_status,
-            conn=self._db_path,
+        HostPersistence.update_record(
+            "host_session",
+            pk_values={"session_id": session_id},
+            updates={"status": new_status},
         )
 
     def reset(self) -> None:

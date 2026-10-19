@@ -121,13 +121,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--data-dir",
         type=Path,
         default=None,
-        help="Root directory for database, logs, scratch, and plugins.",
-    )
-    parser.add_argument(
-        "--db-path",
-        type=Path,
-        default=None,
-        help="Explicit SQLite database file path override.",
+        help="Root directory for logs, scratch, and plugins.",
     )
     parser.add_argument(
         "--plugins-dir",
@@ -208,7 +202,6 @@ class HeadlessCliRunner:
         if res_mgr is None:
             raise RuntimeError("ResourceManager is not initialized.")
         report = res_mgr.get_system_health(
-            db_path=self.runtime.config.resolved_db_path,
             root_path=self.runtime.config.data_dir,
         )
         return {
@@ -278,7 +271,7 @@ class HeadlessCliRunner:
         }
 
     def _cmd_settings(self, action: str) -> dict[str, Any]:
-        host_settings.reload(conn=self.runtime.config.resolved_db_path)
+        host_settings.reload()
         snapshot = host_settings.as_dict()
         return {
             "command": "settings",
@@ -288,9 +281,7 @@ class HeadlessCliRunner:
         }
 
     def _cmd_reconcile(self) -> dict[str, Any]:
-        rec_report = AppHost._reconcile_database(  # noqa: SLF001
-            self.runtime.config.resolved_db_path
-        )
+        rec_report = AppHost._reconcile_database()  # noqa: SLF001
         return {
             "command": "reconcile",
             **rec_report,
@@ -492,7 +483,6 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
         headless=True,
         debug=bool(args.debug),
         data_dir=data_dir,
-        db_path=args.db_path,
         plugins_dir=args.plugins_dir,
         use_process_pool=False,
     )
@@ -553,7 +543,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     import tempfile
 
     effective_argv = list(argv) if argv is not None else sys.argv[1:]
-    if "--data-dir" not in effective_argv and "--db-path" not in effective_argv:
+    if "--data-dir" not in effective_argv:
         if Path("data").is_dir():
             code, rendered = run_cli(effective_argv)
             print(rendered)

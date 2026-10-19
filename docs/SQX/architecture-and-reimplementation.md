@@ -76,12 +76,7 @@ HaruQuantAI/
 │   ├── main.py                             # Uvicorn / desktop sidecar entrypoint
 │   ├── cli.py                              # Headless CLI runner (sqcli.config / SQConsoleStarter parity)
 │   ├── host/                               # Tier 1: Platform Host (Lifecycle, persistence, jobs, transports)
-│   │   ├── persistence/                    # SQLite WAL database CRUD & atomic batch transactions
-│   │   │   ├── create.py                   # Parameterized single-row & entity creation
-│   │   │   ├── read.py                     # Parameterized queries & pagination
-│   │   │   ├── update.py                   # Parameterized updates & revision checks
-│   │   │   ├── delete.py                   # Parameterized deletion & cascade guards
-│   │   │   └── transactions.py             # Atomic multi-row batch operations & compare-and-set
+│   │   ├── persistence.py                  # SQLite WAL database CRUD & atomic batch transactions (HostPersistence)
 │   │   ├── bootstrap.py                    # Multi-stage startup & LIFO teardown
 │   │   ├── discovery.py                    # Dynamic plugin scanner & manifest loader
 │   │   ├── jobs.py                         # Multiprocessing job coordinator & ProcessPoolExecutor
@@ -232,14 +227,14 @@ HaruQuantAI/
 #### `HostPersistence`
 *Feature:* SQLite WAL persistence layer, parameterized CRUD, and atomic batch transactions
 *Implementation Files:*
-- **Backend:** `app/host/persistence/create.py`, `app/host/persistence/read.py`, `app/host/persistence/update.py`, `app/host/persistence/delete.py`, `app/host/persistence/transactions.py`
+- **Backend:** `app/host/persistence.py`
 - **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 *Functional Requirements & Implementation:*
 - [x] execute parameterized single-row and entity creation in SQLite WAL -> `create_record()` / `create_entity()`
 - [x] execute parameterized queries, filtering, and cursor pagination -> `read_records()` / `read_entity()`
 - [x] execute parameterized updates and optimistic revision compare-and-set -> `update_record()` / `update_entity()`
 - [x] execute parameterized deletion with foreign-key reference guards -> `delete_record()` / `delete_entity()`
-- [ ] execute atomic multi-row batch writes with all-or-nothing rollback -> `apply_batch()`
+- [x] execute atomic multi-row batch writes with all-or-nothing rollback -> `apply_batch()`
 
 #### `HostFoundationServices`
 *Feature:* Plugin discovery, multiprocessing job ledger, telemetry logging, hardware watchdog, session auth, settings, response envelopes, and headless CLI (`sqcli.config` / `SQConsoleStarter`)

@@ -46,14 +46,13 @@ from __future__ import annotations
 import json
 import threading
 from collections.abc import Mapping
+from datetime import UTC, datetime
 from typing import Any, Final
 
 from app.host.logging import get_logger
-from app.host.persistence.read import list_host_settings
-from app.host.persistence.update import (
-    RevisionConflictError,
-    batch_save_host_settings,
-)
+from app.host.persistence import HostPersistence
+
+RevisionConflictError = HostPersistence.RevisionConflictError
 
 __all__ = [
     "HostSettings",
@@ -272,7 +271,6 @@ class HostSettings:
     def __init__(self, data: dict[str, dict[str, Any]] | None = None) -> None:
         self._revision: int = 0
         self._lock = threading.RLock()
-        self._default_conn: Any = None
         self.theme: Theme = Theme(self)
         if data is not None:
             self._data = data
@@ -291,14 +289,10 @@ class HostSettings:
         self._ensure_loaded()
         return self._revision
 
-    def reload(self, conn: Any = None) -> None:
+    def reload(self) -> None:
         """Reload settings and current revision from database."""
         with self._lock:
-            self._data, self._revision = _read_settings_with_revision(
-                conn=conn if conn is not None else self._default_conn
-            )
-            if conn is not None:
-                self._default_conn = conn
+            self._data, self._revision = _read_settings_with_revision()
             self._loaded = True
 
     def set_in_memory(self, scope: str, key: str, value: Any) -> None:
@@ -311,17 +305,73 @@ class HostSettings:
         updates: Mapping[str, Mapping[str, Any]],
         *,
         expected_revision: int | None = None,
-        conn: Any = None,
     ) -> int:
         """Atomically persist batch settings updates with revision conflict checking."""
         with self._lock:
-            target_conn = conn if conn is not None else self._default_conn
-            new_rev = batch_save_host_settings(
-                updates,
-                expected_revision=expected_revision,
-                conn=target_conn,
+            existing_rows = HostPersistence.read_records("host_settings")
+            current_rev = max(
+                (int(r.get("schema_version", 0) or 0) for r in existing_rows),
+                default=0,
             )
-            self.reload(conn=target_conn)
+            if expected_revision is not None and current_rev != expected_revision:
+                logger.warning(
+                    "%s: revision conflict updating host settings "
+                    "(expected=%d, current=%d)",
+                    BATCH_UPDATE_FR,
+                    expected_revision,
+                    current_rev,
+                    extra={
+                        "fr_id": BATCH_UPDATE_FR,
+                        "expected_revision": expected_revision,
+                        "current_revision": current_rev,
+                    },
+                )
+                raise RevisionConflictError(
+                    expected_revision=expected_revision,
+                    current_revision=current_rev,
+                )
+
+            new_rev = current_rev + 1
+            now_str = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")
+            ops: list[Any] = []
+            updated_keys: set[tuple[str, str]] = set()
+            for scope, scope_items in updates.items():
+                for key, val in scope_items.items():
+                    key_str = str(key)
+                    updated_keys.add((scope, key_str))
+                    val_json = val if isinstance(val, str) else json.dumps(val)
+                    ops.append(
+                        HostPersistence.BatchOperation(
+                            op_type="upsert",
+                            table="host_settings",
+                            pk_values={"scope": scope, "key": key_str},
+                            data={
+                                "scope": scope,
+                                "key": key_str,
+                                "value_json": val_json,
+                                "schema_version": new_rev,
+                                "updated_at_utc": now_str,
+                            },
+                        )
+                    )
+
+            for r in existing_rows:
+                r_key = (str(r["scope"]), str(r["key"]))
+                if r_key not in updated_keys:
+                    ops.append(
+                        HostPersistence.BatchOperation(
+                            op_type="update",
+                            table="host_settings",
+                            pk_values={"scope": r_key[0], "key": r_key[1]},
+                            data={"schema_version": new_rev},
+                        )
+                    )
+
+            if ops:
+                HostPersistence.apply_batch(ops)
+            self.reload()
+            if not ops:
+                self._revision = new_rev
         logger.info(
             "%s: refreshed host settings after atomic batch update (revision=%d)",
             BATCH_UPDATE_FR,
@@ -402,12 +452,10 @@ class HostSettings:
         return len(self._data)
 
 
-def _read_settings_with_revision(
-    conn: Any = None,
-) -> tuple[dict[str, dict[str, Any]], int]:
+def _read_settings_with_revision() -> tuple[dict[str, dict[str, Any]], int]:
     """Read all host settings and maximum revision from persistence read layer."""
     try:
-        rows = list_host_settings(conn=conn)
+        rows = HostPersistence.read_records("host_settings")
     except (RuntimeError, ValueError) as err:
         logger.warning(
             "%s: could not read host settings from database: %s",
@@ -441,9 +489,9 @@ def _read_settings_with_revision(
     return data, max_rev
 
 
-def _read_settings(conn: Any = None) -> dict[str, dict[str, Any]]:
+def _read_settings() -> dict[str, dict[str, Any]]:
     """Read all host settings from the database via persistence read layer."""
-    data, _ = _read_settings_with_revision(conn=conn)
+    data, _ = _read_settings_with_revision()
     return data
 
 

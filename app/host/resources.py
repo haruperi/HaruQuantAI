@@ -121,8 +121,7 @@ from typing import Any
 
 import psutil
 from app.host.logging import get_logger, normalize_path
-from app.host.persistence.create import DEFAULT_DB_PATH
-from app.host.persistence.read import count_database_tables
+from app.host.persistence import HostPersistence
 
 __all__ = [
     "MemoryWatchdog",
@@ -412,24 +411,18 @@ def inspect_workspace_directories(
 
 
 def probe_database(
-    db_path: Path | str | None = None,
     settings: Any = None,
 ) -> DatabaseProbe:
     """Perform read-only diagnostic inspection on active database.
 
     Args:
-        db_path: Path to database or None for default from host settings.
-        settings: Optional HostSettings instance for configured path resolution.
+        settings: Optional HostSettings instance.
 
     Returns:
         DatabaseProbe capturing persistence health.
     """
-    if db_path is not None:
-        target = Path(db_path)
-    elif settings is not None and settings.get("workspace_paths", "db_path"):
-        target = Path(settings.get("workspace_paths", "db_path"))
-    else:
-        target = DEFAULT_DB_PATH
+    _ = settings
+    target = Path(HostPersistence.DEFAULT_DB_PATH)
     path_str = normalize_path(str(target))
 
     if not target.exists():
@@ -457,7 +450,8 @@ def probe_database(
     table_count = 0
     err_msg: str | None = None
     try:
-        table_count = count_database_tables(target)
+        HostPersistence.read_records("host_settings", limit=1)
+        table_count = len(HostPersistence.PERSISTENCE_TABLES)
     except Exception as err:
         err_msg = str(err)
         logger.exception(
@@ -800,21 +794,19 @@ def probe_hardware() -> HardwareProbe:
 
 
 def get_system_health(
-    db_path: Path | str | None = None,
     root_path: Path | str | None = None,
     settings: Any = None,
 ) -> HostHealthReport:
     """Coordinate host probes and generate complete health snapshot.
 
     Args:
-        db_path: Path to database or None for default.
         root_path: Workspace root directory or None for cwd.
         settings: Optional HostSettings instance for configured path resolution.
 
     Returns:
         HostHealthReport summarizing workstation health.
     """
-    db_info = probe_database(db_path, settings=settings)
+    db_info = probe_database(settings=settings)
     storage_info = probe_storage(root_path, settings=settings)
     hw_info = probe_hardware()
 
@@ -1752,13 +1744,11 @@ class ResourceManager:
 
     def get_system_health(
         self,
-        db_path: Path | str | None = None,
         root_path: Path | str | None = None,
         settings: Any = None,
     ) -> HostHealthReport:
         """Return complete host health report."""
         return get_system_health(
-            db_path=db_path,
             root_path=root_path,
             settings=settings,
         )

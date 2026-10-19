@@ -55,7 +55,7 @@ Python API Usage:
 
     host = AppHost(data_dir=Path("data"), headless=True)
     host.startup()
-    conn = host.initialize_db()
+    host.initialize_db()
     host.register_modules()
     host.broadcast_event("system", "host.ready")
     assert host.state == AppHost.State.READY
@@ -75,12 +75,11 @@ from __future__ import annotations
 import argparse
 import asyncio
 import inspect
-import sqlite3
 import threading
 import time
 import uuid
 from collections.abc import Callable, Generator, Mapping, Sequence
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -104,13 +103,7 @@ from app.host.logging import (
     setup_logging,
     shutdown_logging,
 )
-from app.host.persistence.create import (
-    DEFAULT_DB_PATH,
-    TABLE_PRIMARY_KEYS,
-    create_schema,
-    get_connection,
-)
-from app.host.persistence.read import count_database_tables
+from app.host.persistence import HostPersistence
 from app.host.resources import (
     MIN_AVAILABLE_RAM_PCT,
     ResourceManager,
@@ -152,7 +145,7 @@ REVERSE_TEARDOWN_FR = "FR-HOST-BOOT-REVERSE-TEARDOWN"
 
 _MIN_PORT = 1
 _MAX_PORT = 65535
-_EXPECTED_TABLE_COUNT = len(TABLE_PRIMARY_KEYS)
+_EXPECTED_TABLE_COUNT = len(HostPersistence.TABLE_PRIMARY_KEYS)
 
 DEFAULT_SLOTS: tuple[SlotDefinition, ...] = (
     SlotDefinition(
@@ -240,7 +233,6 @@ class _BootstrapConfig:
     require_auth: bool = False
     password_hash: str | None = None
     data_dir: Path = field(default_factory=lambda: Path("data"))
-    db_path: Path | None = None
     log_dir: Path | None = None
     scratch_root: Path | None = None
     plugins_dir: Path | None = None
@@ -248,13 +240,6 @@ class _BootstrapConfig:
     use_process_pool: bool = True
     min_available_ram_pct: float = MIN_AVAILABLE_RAM_PCT
     timeout_graceful_shutdown: int = 10
-
-    @property
-    def resolved_db_path(self) -> Path:
-        """Return effective SQLite database file path."""
-        if self.db_path is not None:
-            return Path(self.db_path)
-        return Path(self.data_dir) / "database" / DEFAULT_DB_PATH.name
 
     @property
     def resolved_log_dir(self) -> Path:
@@ -353,7 +338,6 @@ class AppHost:
         require_auth: bool = False,
         password_hash: str | None = None,
         data_dir: Path | None = None,
-        db_path: Path | None = None,
         log_dir: Path | None = None,
         scratch_root: Path | None = None,
         plugins_dir: Path | None = None,
@@ -381,7 +365,6 @@ class AppHost:
             require_auth=require_auth,
             password_hash=password_hash,
             data_dir=data_dir if data_dir is not None else Path("data"),
-            db_path=db_path,
             log_dir=log_dir,
             scratch_root=scratch_root,
             plugins_dir=plugins_dir,
@@ -413,7 +396,6 @@ class AppHost:
         self._mounted_routes: list[str] = []
 
         self.app: FastAPI | None = None
-        self.db_connection: sqlite3.Connection | None = None
 
         # Managed service references populated during Stage 5 (SERVICES)
         self.event_bus: EventBus = (
@@ -514,20 +496,17 @@ class AppHost:
             shutdown_logging()
             raise
 
-    def initialize_db(self) -> sqlite3.Connection:
+    def initialize_db(self) -> bool:
         """Initialize SQLite WAL persistence, schema verification, and write locks.
 
         Executes the PERSISTENCE stage, verifies that all 25 operational
-        tables exist, reloads host settings, and registers connection teardown.
+        tables exist, and reloads host settings.
 
         Returns:
-            The active SQLite WAL database connection handle.
+            True when database initialization and schema verification complete.
         """
-        if (
-            _LifespanStage.PERSISTENCE in self._completed_stages
-            and self.db_connection is not None
-        ):
-            return self.db_connection
+        if _LifespanStage.PERSISTENCE in self._completed_stages:
+            return True
 
         if not (
             _LifespanStage.CONFIGURING in self._completed_stages
@@ -549,11 +528,7 @@ class AppHost:
             shutdown_logging()
             raise
 
-        if self.db_connection is None:
-            raise RuntimeError(
-                "Persistence stage did not initialize database connection."
-            )
-        return self.db_connection
+        return True
 
     def register_modules(self, app: FastAPI | None = None) -> None:
         """Register and initialize all domain services, recovery, and routing.
@@ -738,18 +713,11 @@ class AppHost:
             yield
 
     @staticmethod
-    def _reconcile_database(db_path: Path) -> dict[str, Any]:
-        """Ensure SQLite WAL schema and reconcile orphan RUNNING jobs on ``db_path``."""
-        db_path.parent.mkdir(parents=True, exist_ok=True)
-        conn = get_connection(db_path)
-        try:
-            create_schema(conn)
-        finally:
-            conn.close()
-
-        table_count = count_database_tables(db_path)
+    def _reconcile_database() -> dict[str, Any]:
+        """Ensure SQLite WAL schema and reconcile orphan RUNNING jobs."""
+        host_settings.reload()
+        table_count = len(HostPersistence.PERSISTENCE_TABLES)
         job_mgr = JobManager(
-            db_path=db_path,
             use_process_pool=False,
             reconcile_on_startup=False,
         )
@@ -760,14 +728,12 @@ class AppHost:
 
         report = {
             "status": "reconciled",
-            "db_path": str(db_path),
             "table_count": table_count,
             "reconciled_orphan_jobs": reconciled,
         }
         logger.info(
-            "%s: Reconciled database %s (tables=%d, orphan_jobs=%d).",
+            "%s: Reconciled database (tables=%d, orphan_jobs=%d).",
             PERSISTENCE_STAGE_FR,
-            db_path.name,
             table_count,
             len(reconciled),
             extra={"fr_id": PERSISTENCE_STAGE_FR},
@@ -918,7 +884,6 @@ class AppHost:
     def _boot_stage_paths(self) -> None:
         """Stage 2/7: PATHS — Create and verify workspace directory hierarchy."""
         base_dir = Path(self.config.data_dir)
-        db_dir = self.config.resolved_db_path.parent
         log_dir = self.config.resolved_log_dir
         scratch_dir = self.config.resolved_scratch_root
         plugins_dir = self.config.resolved_plugins_dir
@@ -932,7 +897,6 @@ class AppHost:
         )
         for directory in (
             base_dir,
-            db_dir,
             log_dir,
             scratch_dir,
             plugins_dir,
@@ -943,7 +907,6 @@ class AppHost:
         dir_report = inspect_workspace_directories()
         self._details["paths"] = {
             "data_dir": str(base_dir),
-            "db_path": str(self.config.resolved_db_path),
             "log_dir": str(log_dir),
             "scratch_root": str(scratch_dir),
             "plugins_dir": str(plugins_dir),
@@ -978,38 +941,20 @@ class AppHost:
 
     def _boot_stage_persistence(self) -> None:
         """Stage 4/7: PERSISTENCE — Initialize SQLite WAL schema and verify tables."""
-        db_path = self.config.resolved_db_path
         logger.info(
-            "%s: [4/7] Stage PERSISTENCE (initializing WAL schema at %s).",
+            "%s: [4/7] Stage PERSISTENCE (initializing WAL schema).",
             PERSISTENCE_STAGE_FR,
-            db_path.name,
             extra={"fr_id": PERSISTENCE_STAGE_FR, "stage": "PERSISTENCE"},
         )
-        schema_conn = get_connection(db_path)
-        try:
-            create_schema(schema_conn)
-        finally:
-            schema_conn.close()
-
-        host_settings.reload(conn=db_path)
-        table_count = count_database_tables(db_path)
+        host_settings.reload()
+        table_count = len(HostPersistence.PERSISTENCE_TABLES)
         if table_count < _EXPECTED_TABLE_COUNT:
             raise RuntimeError(
                 f"Database schema verification failed: expected >= "
                 f"{_EXPECTED_TABLE_COUNT} tables, found {table_count}."
             )
 
-        conn = get_connection(db_path)
-        self.db_connection = conn
-
-        def _cleanup_db() -> None:
-            if self.db_connection is not None:
-                with suppress(sqlite3.Error, OSError):
-                    self.db_connection.close()
-                self.db_connection = None
-
         self._details["persistence"] = {
-            "db_name": db_path.name,
             "table_count": table_count,
             "wal_mode": True,
         }
@@ -1019,7 +964,7 @@ class AppHost:
             table_count,
             extra={"fr_id": PERSISTENCE_STAGE_FR, "table_count": table_count},
         )
-        self._advance_stage(_LifespanStage.PERSISTENCE, cleanup=_cleanup_db)
+        self._advance_stage(_LifespanStage.PERSISTENCE)
 
     def _init_discovery(self) -> PluginLifecycleManager:
         """Initialize the dynamic plugin discovery and lifecycle manager."""
@@ -1130,12 +1075,9 @@ class AppHost:
             extra={"fr_id": MODULE_REGISTRATION_FR, "stage": "SERVICES"},
         )
 
-        db_path = self.config.resolved_db_path
-
         # 1. SessionManager
         if self.session_manager is None:
             self.session_manager = SessionManager(
-                db_path=db_path,
                 host_instance_id=self.host_instance_id,
             )
 
@@ -1149,7 +1091,6 @@ class AppHost:
         # 3. JobManager & Startup Orphan Job Reconciliation
         if self.job_manager is None:
             self.job_manager = JobManager(
-                db_path=db_path,
                 max_workers=self.config.max_workers,
                 resource_mgr=self.resource_manager,
                 min_available_ram_pct=self.config.min_available_ram_pct,
@@ -1176,7 +1117,6 @@ class AppHost:
         # 6. DataManagerWorkspace
         if self.data_manager is None:
             self.data_manager = DataManagerWorkspace(
-                db_path=db_path,
                 data_dir=Path(self.config.data_dir),
                 event_bus=self.event_bus,
                 plugin_mgr=plugin_mgr,
@@ -1353,7 +1293,6 @@ class AppHost:
         app.include_router(disc_router, prefix="/api/v2")
 
         dm_workspace = self.data_manager or DataManagerWorkspace(
-            db_path=self.config.resolved_db_path,
             data_dir=Path(self.config.data_dir),
             event_bus=self.event_bus,
             plugin_mgr=self.plugin_manager,
@@ -1399,26 +1338,31 @@ def main(argv: list[str] | None = None) -> int:
         prefix="hqai_boot_demo_",
         ignore_cleanup_errors=True,
     ) as tmp_str:
-        host = AppHost(
-            data_dir=Path(tmp_str),
-            headless=True,
-            use_process_pool=False,
-        )
-        host.startup()
-        host.initialize_db()
-        host.register_modules()
-        host.broadcast_event("system", "host.ready")
-        stages_up = [s.value for s in host.completed_stages]
-        state_up = host.state.value
+        orig_db = HostPersistence.DEFAULT_DB_PATH
+        HostPersistence.DEFAULT_DB_PATH = Path(tmp_str) / "database" / "haruquantai.db"
+        try:
+            host = AppHost(
+                data_dir=Path(tmp_str),
+                headless=True,
+                use_process_pool=False,
+            )
+            host.startup()
+            host.initialize_db()
+            host.register_modules()
+            host.broadcast_event("system", "host.ready")
+            stages_up = [s.value for s in host.completed_stages]
+            state_up = host.state.value
 
-        host.shutdown()
-        stages_down = [s.value for s in host.teardown_stages]
-        state_down = host.state.value
+            host.shutdown()
+            stages_down = [s.value for s in host.teardown_stages]
+            state_down = host.state.value
 
-        print(f"Bootstrap State After Start: {state_up}")
-        print(f"Completed 7 Stages: {' -> '.join(stages_up)}")
-        print(f"Bootstrap State After Stop: {state_down}")
-        print(f"Reverse Teardown Order: {' -> '.join(stages_down)}")
+            print(f"Bootstrap State After Start: {state_up}")
+            print(f"Completed 7 Stages: {' -> '.join(stages_up)}")
+            print(f"Bootstrap State After Stop: {state_down}")
+            print(f"Reverse Teardown Order: {' -> '.join(stages_down)}")
+        finally:
+            HostPersistence.DEFAULT_DB_PATH = orig_db
     return 0
 
 

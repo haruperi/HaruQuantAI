@@ -79,7 +79,7 @@ import os
 import threading
 import time
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
@@ -88,16 +88,7 @@ from pathlib import Path
 from typing import Any, override
 
 from app.host.logging import get_logger
-from app.host.persistence.read import (
-    get_host_job,
-    get_host_job_events,
-    list_host_jobs,
-)
-from app.host.persistence.update import (
-    record_host_job_event,
-    save_host_job,
-    update_host_job,
-)
+from app.host.persistence import HostPersistence
 from app.host.resources import (
     MIN_AVAILABLE_RAM_PCT,
     MemoryWatchdogStatus,
@@ -402,7 +393,6 @@ class JobManager:
 
     def __init__(
         self,
-        db_path: Path | str | None = None,
         *,
         max_workers: int | None = None,
         resource_mgr: ResourceManager | None = None,
@@ -415,7 +405,6 @@ class JobManager:
         """Initialize JobManager with ProcessPoolExecutor and ResourceManager.
 
         Args:
-            db_path: Optional SQLite database path for job persistence.
             max_workers: Optional worker limit override. If None, uses
                 workers = max(1, cpu_cores - 2).
             resource_mgr: Optional ResourceManager instance.
@@ -429,7 +418,6 @@ class JobManager:
             reconcile_on_startup: If True, immediately marks orphan RUNNING jobs
                 as INTERRUPTED on initialization.
         """
-        self._db_path = db_path
         self._min_available_ram_pct = float(min_available_ram_pct)
         self._memory_policy = memory_policy.strip().lower()
         self._use_process_pool = use_process_pool
@@ -526,6 +514,48 @@ class JobManager:
                 )
             return self._io_pool
 
+    def _save_job(self, job_id: str, **fields: Any) -> int:
+        """Persist or upsert a job record via HostPersistence."""
+        return HostPersistence.update_record(
+            "host_jobs",
+            pk_values={"job_id": job_id},
+            updates=fields,
+            upsert=True,
+        )
+
+    def _update_job(self, job_id: str, updates: Mapping[str, Any]) -> bool:
+        """Update an existing job record via HostPersistence."""
+        affected = HostPersistence.update_record(
+            "host_jobs",
+            pk_values={"job_id": job_id},
+            updates=updates,
+        )
+        return affected > 0
+
+    def _record_event(
+        self,
+        *,
+        event_id: str,
+        job_id: str,
+        to_state: str,
+        from_state: str | None = None,
+        attempt_id: str | None = None,
+        details_json: str = "{}",
+        created_at_utc: str | None = None,
+    ) -> str:
+        """Insert a job state transition event via HostPersistence."""
+        data = {
+            "event_id": event_id,
+            "job_id": job_id,
+            "attempt_id": attempt_id,
+            "from_state": from_state,
+            "to_state": to_state,
+            "details_json": details_json,
+            "created_at_utc": created_at_utc or datetime.now(UTC).isoformat(),
+        }
+        res = HostPersistence.create_record("host_job_events", data)
+        return str(res)
+
     def reconcile_orphan_jobs(self) -> list[str]:
         """Mark orphan jobs left in RUNNING state as INTERRUPTED on system boot.
 
@@ -534,7 +564,7 @@ class JobManager:
         """
         reconciled_ids: list[str] = []
         try:
-            all_jobs = list_host_jobs(conn=self._db_path, limit=1_000)
+            all_jobs = HostPersistence.read_records("host_jobs", limit=1_000)
         except Exception as exc:  # noqa: BLE001
             logger.warning(
                 "%s: could not query host_jobs during startup reconciliation: %s",
@@ -550,7 +580,7 @@ class JobManager:
             if raw_status == JobState.RUNNING:
                 jid = str(row["job_id"])
                 err_msg = "Orphan job left in RUNNING state marked INTERRUPTED on boot"
-                update_host_job(
+                self._update_job(
                     jid,
                     {
                         "status": str(JobState.INTERRUPTED),
@@ -558,16 +588,14 @@ class JobManager:
                         "message": "Interrupted by host restart",
                         "error_message": err_msg,
                     },
-                    conn=self._db_path,
                 )
-                record_host_job_event(
+                self._record_event(
                     event_id=f"evt-{uuid.uuid4().hex[:12]}",
                     job_id=jid,
                     from_state=str(JobState.RUNNING),
                     to_state=str(JobState.INTERRUPTED),
                     details_json=json.dumps({"reason": "startup_orphan_recovery"}),
                     created_at_utc=now_iso,
-                    conn=self._db_path,
                 )
                 self._resource_mgr.cleanup_scratch(jid)
                 reconciled_ids.append(jid)
@@ -672,7 +700,7 @@ class JobManager:
                 f"({watchdog_status.available_pct:.1f}%) is below "
                 f"{watchdog_status.threshold_pct:.1f}% minimum."
             )
-            save_host_job(
+            self._save_job(
                 jid,
                 owner=owner,
                 kind=kind,
@@ -682,9 +710,8 @@ class JobManager:
                 submitted_at_utc=submitted_at,
                 finished_at_utc=submitted_at,
                 error_message=err_text,
-                conn=self._db_path,
             )
-            record_host_job_event(
+            self._record_event(
                 event_id=f"evt-{uuid.uuid4().hex[:12]}",
                 job_id=jid,
                 from_state=None,
@@ -696,7 +723,6 @@ class JobManager:
                     }
                 ),
                 created_at_utc=submitted_at,
-                conn=self._db_path,
             )
             raise MemoryPressureError(err_text)
 
@@ -733,7 +759,7 @@ class JobManager:
                 submitted_at_utc=submitted_at,
                 scratch_dir=str(scratch_dir),
             )
-            save_host_job(
+            self._save_job(
                 jid,
                 owner=owner,
                 kind=kind,
@@ -741,9 +767,8 @@ class JobManager:
                 accepted=1,
                 message=paused_rec.message,
                 submitted_at_utc=submitted_at,
-                conn=self._db_path,
             )
-            record_host_job_event(
+            self._record_event(
                 event_id=f"evt-{uuid.uuid4().hex[:12]}",
                 job_id=jid,
                 from_state=str(JobState.QUEUED),
@@ -755,7 +780,6 @@ class JobManager:
                     }
                 ),
                 created_at_utc=submitted_at,
-                conn=self._db_path,
             )
             with self._lock:
                 self._jobs[jid] = paused_rec
@@ -827,7 +851,7 @@ class JobManager:
             scratch_dir=str(ctx.scratch_dir),
         )
 
-        save_host_job(
+        self._save_job(
             jid,
             owner=owner,
             kind=kind,
@@ -836,16 +860,14 @@ class JobManager:
             message="Running",
             submitted_at_utc=submitted_at,
             started_at_utc=started_at,
-            conn=self._db_path,
         )
-        record_host_job_event(
+        self._record_event(
             event_id=f"evt-{uuid.uuid4().hex[:12]}",
             job_id=jid,
             from_state=str(JobState.QUEUED),
             to_state=str(JobState.RUNNING),
             details_json=json.dumps({"owner": owner, "kind": kind}),
             created_at_utc=started_at,
-            conn=self._db_path,
         )
 
         if executor_kind == "thread":
@@ -925,7 +947,7 @@ class JobManager:
                 worker_pid=worker_pid,
                 scratch_dir=scratch_str,
             )
-            update_host_job(
+            self._update_job(
                 job_id,
                 {
                     "status": str(JobState.COMPLETED),
@@ -933,16 +955,14 @@ class JobManager:
                     "message": "Completed",
                     "finished_at_utc": finished_at,
                 },
-                conn=self._db_path,
             )
-            record_host_job_event(
+            self._record_event(
                 event_id=f"evt-{uuid.uuid4().hex[:12]}",
                 job_id=job_id,
                 from_state=str(JobState.RUNNING),
                 to_state=str(JobState.COMPLETED),
                 details_json=json.dumps({"worker_pid": worker_pid}),
                 created_at_utc=finished_at,
-                conn=self._db_path,
             )
             logger.info(
                 "%s: job %s completed on worker PID %s",
@@ -970,7 +990,7 @@ class JobManager:
                 error_message=str(exc),
                 scratch_dir=scratch_str,
             )
-            update_host_job(
+            self._update_job(
                 job_id,
                 {
                     "status": str(JobState.CANCELLED),
@@ -978,16 +998,14 @@ class JobManager:
                     "finished_at_utc": finished_at,
                     "error_message": str(exc),
                 },
-                conn=self._db_path,
             )
-            record_host_job_event(
+            self._record_event(
                 event_id=f"evt-{uuid.uuid4().hex[:12]}",
                 job_id=job_id,
                 from_state=str(JobState.RUNNING),
                 to_state=str(JobState.CANCELLED),
                 details_json=json.dumps({"reason": str(exc)}),
                 created_at_utc=finished_at,
-                conn=self._db_path,
             )
             logger.info(
                 "%s: job %s transitioned to CANCELLED",
@@ -1010,7 +1028,7 @@ class JobManager:
                 error_message=str(exc),
                 scratch_dir=scratch_str,
             )
-            update_host_job(
+            self._update_job(
                 job_id,
                 {
                     "status": str(JobState.FAILED),
@@ -1018,16 +1036,14 @@ class JobManager:
                     "finished_at_utc": finished_at,
                     "error_message": str(exc),
                 },
-                conn=self._db_path,
             )
-            record_host_job_event(
+            self._record_event(
                 event_id=f"evt-{uuid.uuid4().hex[:12]}",
                 job_id=job_id,
                 from_state=str(JobState.RUNNING),
                 to_state=str(JobState.FAILED),
                 details_json=json.dumps({"error": str(exc)}),
                 created_at_utc=finished_at,
-                conn=self._db_path,
             )
             logger.exception(
                 "%s: job %s failed during execution",
@@ -1079,7 +1095,7 @@ class JobManager:
                 error_message="Cancelled by user while paused",
                 scratch_dir=str(deferred.context.scratch_dir),
             )
-            update_host_job(
+            self._update_job(
                 job_id,
                 {
                     "status": str(JobState.CANCELLED),
@@ -1087,16 +1103,14 @@ class JobManager:
                     "finished_at_utc": now_iso,
                     "error_message": "Cancelled by user while paused",
                 },
-                conn=self._db_path,
             )
-            record_host_job_event(
+            self._record_event(
                 event_id=f"evt-{uuid.uuid4().hex[:12]}",
                 job_id=job_id,
                 from_state=str(JobState.PAUSED),
                 to_state=str(JobState.CANCELLED),
                 details_json=json.dumps({"reason": "user_cancelled_paused_job"}),
                 created_at_utc=now_iso,
-                conn=self._db_path,
             )
             if self._cleanup_scratch_on_exit:
                 self._resource_mgr.cleanup_scratch(job_id)
@@ -1136,10 +1150,9 @@ class JobManager:
         )
         with self._lock:
             self._jobs[job_id] = paused_rec
-        update_host_job(
+        self._update_job(
             job_id,
             {"status": str(JobState.PAUSED), "message": "Paused"},
-            conn=self._db_path,
         )
         return True
 
@@ -1183,10 +1196,9 @@ class JobManager:
             )
             with self._lock:
                 self._jobs[job_id] = resumed_rec
-            update_host_job(
+            self._update_job(
                 job_id,
                 {"status": str(JobState.RUNNING), "message": "Running"},
-                conn=self._db_path,
             )
             return True
 
@@ -1301,9 +1313,12 @@ class JobManager:
             )
             return mem_rec
 
-        row = get_host_job(job_id, conn=self._db_path)
-        if row is None:
+        rows = HostPersistence.read_records(
+            "host_jobs", pk_values={"job_id": job_id}, limit=1
+        )
+        if not rows:
             return None
+        row = rows[0]
 
         logger.debug(
             "%s: retrieved persisted job %s (status=%s)",
@@ -1333,7 +1348,8 @@ class JobManager:
         limit: int = 100,
     ) -> list[JobRecord]:
         """List persisted jobs from host_jobs table."""
-        rows = list_host_jobs(conn=self._db_path, status=status, limit=limit)
+        where = {"status": status} if status else None
+        rows = HostPersistence.read_records("host_jobs", where=where, limit=limit)
         logger.debug(
             "%s: listed %d persisted jobs (status=%s)",
             PERSISTENCE_FR,
@@ -1360,7 +1376,11 @@ class JobManager:
 
     def get_job_events(self, job_id: str) -> list[dict[str, Any]]:
         """Retrieve state transition events for a job from host_job_events."""
-        return get_host_job_events(job_id, conn=self._db_path)
+        return HostPersistence.read_records(
+            "host_job_events",
+            where={"job_id": job_id},
+            order_by="created_at_utc ASC",
+        )
 
     def shutdown(self, *, wait: bool = True, cancel_futures: bool = False) -> None:
         """Shut down the worker pool executor and stop background watchdogs."""

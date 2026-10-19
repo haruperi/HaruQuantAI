@@ -72,15 +72,13 @@ class DataManagerWorkspace:
     def __init__(
         self,
         *,
-        db_path: Path | str | None = None,
         data_dir: Path | str | None = None,
         event_bus: EventBus | None = None,
         plugin_mgr: PluginLifecycleManager | None = None,
         broker_registry: Any | None = None,
         job_manager: Any | None = None,
     ) -> None:
-        """Instantiate workspace with database path and event broker."""
-        self.db_path = Path(db_path) if db_path is not None else None
+        """Instantiate workspace with data directory and event broker."""
         self.data_dir = Path(data_dir) if data_dir is not None else Path("data")
         self.event_bus = event_bus
         self.plugin_mgr = plugin_mgr
@@ -91,9 +89,8 @@ class DataManagerWorkspace:
         self.home = Home()
 
         logger.info(
-            "%s: Initialized DataManagerWorkspace (db=%s, data_dir=%s)",
+            "%s: Initialized DataManagerWorkspace (data_dir=%s)",
             FACADE_FR,
-            self.db_path,
             self.data_dir,
             extra={"fr_id": FACADE_FR},
         )

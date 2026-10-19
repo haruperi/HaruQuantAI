@@ -8,8 +8,7 @@ from pathlib import Path
 
 import pytest
 from app.host.bootstrap import AppHost
-from app.host.persistence.create import create_schema
-from app.host.persistence.read import resolve_connection
+from app.host.persistence import HostPersistence
 from app.workspace.data_manager import (
     DataManagerWorkspace,
     create_data_manager_router,
@@ -19,13 +18,11 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def test_db_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Fixture providing initialized isolated SQLite database file path."""
     db_file = tmp_path / "test_datamgr_routes.db"
-    with resolve_connection(db_file) as conn:
-        create_schema(conn)
-    monkeypatch.setattr("app.host.persistence.create.DEFAULT_DB_PATH", db_file)
+    monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", db_file)
     return db_file
 
 
@@ -33,7 +30,6 @@ def test_workspace_initialization() -> None:
     """Test DataManagerWorkspace default instantiation and lifecycle methods."""
     ws = DataManagerWorkspace()
     assert isinstance(ws.home, Home)
-    assert ws.db_path is None
     assert ws.data_dir == Path("data")
     assert ws.event_bus is None
     assert ws.plugin_mgr is None
@@ -45,37 +41,31 @@ def test_workspace_initialization() -> None:
     assert counts.get("brokers") == 0
 
 
-def test_routes_direct_endpoints(test_db_path: Path) -> None:
+def test_routes_direct_endpoints() -> None:
     """Test /data/home/overview and /data/home/datasets via direct FastAPI test app."""
     now_iso = datetime.now(UTC).isoformat()
-    with resolve_connection(test_db_path) as conn:
-        conn.execute(
-            "INSERT INTO datamgr_datasets ("
-            "id, source, symbol, underlying, instrument, timeframe, broker, "
-            "broker_name, timezone, category, date_from, date_to, bars, "
-            "created_at, updated_at"
-            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            (
-                "ds:route_test",
-                "dukascopy",
-                "EURUSD",
-                "EUR/USD Spot",
-                "EURUSD",
-                "M1",
-                "dukascopy",
-                "Dukascopy Broker",
-                "UTC",
-                "Forex",
-                "2026-01-01",
-                "2026-01-05",
-                100,
-                now_iso,
-                now_iso,
-            ),
-        )
-        conn.commit()
+    HostPersistence.create_record(
+        "datamgr_datasets",
+        {
+            "id": "ds:route_test",
+            "source": "dukascopy",
+            "symbol": "EURUSD",
+            "underlying": "EUR/USD Spot",
+            "instrument": "EURUSD",
+            "timeframe": "M1",
+            "broker": "dukascopy",
+            "broker_name": "Dukascopy Broker",
+            "timezone": "UTC",
+            "category": "Forex",
+            "date_from": "2026-01-01",
+            "date_to": "2026-01-05",
+            "bars": 100,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+        },
+    )
 
-    workspace = DataManagerWorkspace(db_path=test_db_path)
+    workspace = DataManagerWorkspace()
     router = create_data_manager_router(workspace)
 
     app = FastAPI()
@@ -124,10 +114,8 @@ def test_routes_auth_enforcement() -> None:
 def test_routes_bootstrap_app_integration(tmp_path: Path) -> None:
     """Test full bootstrap app integration mounting Data Manager routes under /api/v1."""
     data_dir = tmp_path / "data"
-    db_file = data_dir / "haruquantai.db"
     host = AppHost(
         data_dir=data_dir,
-        db_path=db_file,
         headless=False,
     )
     app = host.startup()

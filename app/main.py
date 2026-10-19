@@ -111,13 +111,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--data-dir",
         type=Path,
         default=None,
-        help="Root directory for database, logs, scratch, and plugins.",
-    )
-    parser.add_argument(
-        "--db-path",
-        type=Path,
-        default=None,
-        help="Explicit SQLite database file path override.",
+        help="Root directory for logs, scratch, and plugins.",
     )
     parser.add_argument(
         "--plugins-dir",
@@ -167,7 +161,6 @@ def resolve_main_config(
         headless=False,
         require_auth=bool(args.require_auth),
         data_dir=data_dir,
-        db_path=args.db_path,
         plugins_dir=args.plugins_dir,
     )
     logger.info(
