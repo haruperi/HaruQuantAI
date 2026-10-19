@@ -69,7 +69,7 @@
     "runtime_parity": "unqualified"
   },
   "minimum_record_number": 1,
-  "allocation_high_water_mark": 5,
+  "allocation_high_water_mark": 6,
   "records": {
     "SQX145-EV-000001": {
       "topic": "architecture.process.two_process_topology",
@@ -228,7 +228,7 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "d2a59ff7695b07014f00b6b5a933fccfe2710536ba2272bc9b064ff2430c557c"
+            "value": "788acaefa63386058d1265df49e0a2a2b8c5f38c26b24c63847c8e41ea142aad"
           },
           "accessed_at": "2026-10-13"
         },
@@ -350,7 +350,7 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "d2a59ff7695b07014f00b6b5a933fccfe2710536ba2272bc9b064ff2430c557c"
+            "value": "788acaefa63386058d1265df49e0a2a2b8c5f38c26b24c63847c8e41ea142aad"
           },
           "accessed_at": "2026-10-13"
         }
@@ -451,7 +451,7 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "d2a59ff7695b07014f00b6b5a933fccfe2710536ba2272bc9b064ff2430c557c"
+            "value": "788acaefa63386058d1265df49e0a2a2b8c5f38c26b24c63847c8e41ea142aad"
           },
           "accessed_at": "2026-10-13"
         },
@@ -538,7 +538,7 @@
       "topic": "architecture.target.three_tier_spatial_ownership",
       "title": "HaruQuantAI normative 3-tier spatial architecture and Five Laws of Spatial Composability",
       "question": "How does HaruQuantAI structure its Python backend and React UI counterparts for clean-room reimplementation?",
-      "record_status": "active",
+      "record_status": "superseded",
       "reference_scope": {
         "build": "145-dev1",
         "application_areas": [
@@ -592,7 +592,7 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "371619cbe4ffb106a257cb539043c745d1fdc24c83db008a7606319cea673017"
+            "value": "ea674ff651159c01ab4700e3d63b0da49e22d0ce520f03b51561173e267c2fee"
           },
           "accessed_at": "2026-10-13"
         }
@@ -640,12 +640,12 @@
         ],
         "contradicts_records": [],
         "supersedes_records": [],
-        "superseded_by": null
+        "superseded_by": "SQX145-EV-000006"
       },
       "provenance": {
         "repository_commit": "cb39ca7",
         "created_at": "2026-10-13T21:55:00+03:00",
-        "updated_at": "2026-10-13T21:55:00+03:00",
+        "updated_at": "2026-10-19T08:14:00+03:00",
         "review_state": "reviewed"
       },
       "clean_room": {
@@ -659,6 +659,139 @@
         "architecture",
         "normative",
         "spatial-composability"
+      ]
+    },
+    "SQX145-EV-000006": {
+      "topic": "architecture.target.three_tier_spatial_ownership",
+      "title": "HaruQuantAI normative architecture and full SQX-145 clean-room workspace/engine/snippet blueprint",
+      "question": "How does HaruQuantAI map all SQX-145 workspaces, encrypted core libraries, extensible snippets, code exporters, and standalone web applications to its Python backend and React UI?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "architecture",
+          "spatial_composability",
+          "core_libraries",
+          "snippets",
+          "codegen"
+        ],
+        "conditions": [
+          "Ratified target architecture in docs/ARCHITECTURE.md, docs/PROJECT.md, and docs/SQX/architecture-and-reimplementation.md."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "HaruQuantAI maps all 182 SQX-145 JSPF plugins, 8 encrypted core libraries (SQLib, SQDataLib, SQTradingLib/SQAppLib, SQJobsLib, SQGridLib2), 1,049 extensible Java snippets across 24 categories, 12 XML block catalogs, 6 FreeMarker code exporters, and 3 standalone web apps (MTANALYZER, BACKTESTNODE, NODEUPDATER) into a clean-room Python backend (app/host/, app/services/{include,indicators,brokers,engine,snippets,codegen}/, app/workspace/) and React Dockview UI (ui/app/), governed by SC-01 through SC-05 and strict SQLite persistence isolation in app/host/persistence/.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Target architectural and module-mapping blueprint; runtime modules remain to be implemented under their respective stage plans."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "docs/ARCHITECTURE.md",
+          "location": {
+            "section": "2. Five Laws of Spatial Composability & 3. Spatial Ownership",
+            "symbol": null,
+            "line_range": "69-90",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Defines SC-01..SC-05 and tier ownership boundaries."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "45eaaaa82576e761e37dd386b185bdafe21a2157a5e0695c899a59d410eac619"
+          },
+          "accessed_at": "2026-10-19"
+        },
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "docs/SQX/architecture-and-reimplementation.md",
+          "location": {
+            "section": "Project & File Structure and Sections 1 through 17",
+            "symbol": null,
+            "line_range": "1-2446",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Comprehensive clean-room blueprint covering Sections 1, 1A, 1B, and 2 through 17."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ea674ff651159c01ab4700e3d63b0da49e22d0ce520f03b51561173e267c2fee"
+          },
+          "accessed_at": "2026-10-19"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-LEDGER-INTEGRITY",
+          "FR-HOST-EVIDENCE-OWNERSHIP-GATES"
+        ],
+        "decision_ids": [
+          "DEC-HOST-P00-AUTHORITY-RESTORATION",
+          "DEC-HOST-P00-REGISTRY-BOUNDARY",
+          "DEC-HOST-P00-CLOSURE-BOUNDARY"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "authority",
+        "procedure": "Verify SHA-256 fingerprints of docs/ARCHITECTURE.md and docs/SQX/architecture-and-reimplementation.md and validate registered IDs against app/host/README.md via tests.reference.validate.",
+        "expected_observation": "All mapped FEAT/FR/DEC identities resolve in app/host/README.md and authority hashes match.",
+        "actual_observation": "Verified registered identities in app/host/README.md and matching authority document fingerprints.",
+        "artifact_paths": [
+          "app/host/README.md",
+          "docs/ARCHITECTURE.md",
+          "docs/SQX/architecture-and-reimplementation.md"
+        ],
+        "executed_at": "2026-10-19T08:14:00+03:00"
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX145-EV-000001",
+          "SQX145-EV-000002",
+          "SQX145-EV-000003",
+          "SQX145-EV-000004"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [
+          "SQX145-EV-000005"
+        ],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "e084e14",
+        "created_at": "2026-10-19T08:14:00+03:00",
+        "updated_at": "2026-10-19T08:14:00+03:00",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": null
+      },
+      "tags": [
+        "architecture",
+        "normative",
+        "spatial-composability",
+        "blueprint"
       ]
     }
   }

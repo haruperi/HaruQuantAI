@@ -24,37 +24,39 @@ This document unites the **complete system architecture**, the **workspace-by-wo
 
 ```mermaid
 flowchart TD
-    subgraph S1["1. Foundation"]
-        Host["AppPlatform & AppHome<br/>(Host runtime & shell)"] --> DataMgr["AppDataManager<br/>(Market data engine)"]
+    subgraph S1["1. Foundation & Core Engines"]
+        Host["AppPlatform & AppHome<br/>(Host runtime, CLI & shell)"] --> Core["Core Libraries & Simulation Engine<br/>(HQTime, Indicators, 4-Precision Simulator, Snippets & Codegen)"]
+        Host --> DataMgr["AppDataManager<br/>(Market data engine & broker feeds)"]
+        Core --> DataMgr
     end
     subgraph S2["2. Strategy Authoring"]
         DataMgr --> CodeEd["AppCodeEditor<br/>(Snippets, indicators & extensions)"]
-        DataMgr --> Wiz["AppWizard<br/>(AlgoWizard manual visual editor)"]
+        DataMgr --> Wiz["AppWizard<br/>(AlgoWizard: Standard, Single-Asset & Stockpicker)"]
         DataMgr --> Bld["AppBuilder<br/>(Automated genetic strategy generator)"]
     end
     subgraph S3["3. Databanks & Results"]
-        CodeEd --> Res["AppResults<br/>(Databank store & performance metrics)"]
+        CodeEd --> Res["AppResults & MTAnalyzer<br/>(Databank store, Prop analytics & platform code export)"]
         Wiz --> Res
         Bld --> Res
     end
     subgraph S4["4. Robustness & Tuning"]
         Res --> Retest["AppRetester<br/>(Monte Carlo & cross-checks)"]
-        Res --> Opt["AppOptimizer<br/>(Walk-Forward parameter tuning)"]
+        Res --> Opt["AppOptimizer<br/>(Grid, Genetic & Walk-Forward Matrix)"]
         Res --> NN["AppNeuralNetwork<br/>(Machine learning signal models)"]
     end
     subgraph S5["5. Portfolio Modeling"]
         Res --> Port["AppPortfolioComposer & AppPortfolioMaster<br/>(Correlation analysis & portfolio assembly)"]
     end
     subgraph S6["6. Autonomous Pipeline Orchestration"]
-        DataMgr -.-> TM["AppTaskManager<br/>(Custom Projects: end-to-end multi-task workflows)"]
+        DataMgr -.-> TM["AppTaskManager<br/>(Custom Projects: 18 task workers & DAG flow)"]
         Bld -.-> TM
         Retest -.-> TM
         Opt -.-> TM
         Port -.-> TM
     end
-    subgraph S7["7. Scaling & Ecosystem"]
-        TM --> Grid["AppGridControl / AppGridTest<br/>(Distributed remote worker nodes)"]
-        Host --> Tools["AppMarketplace / AppBusiness / AppDebugConsole"]
+    subgraph S7["7. Scaling, AI & Ecosystem"]
+        TM --> Grid["AppGridControl / AppGridTest / BacktestNode<br/>(Distributed remote worker nodes)"]
+        Host --> Tools["AppMarketplace / AppBusiness / AppDebugConsole / SQAI"]
     end
 ```
 
@@ -63,50 +65,115 @@ flowchart TD
 ## HaruQuantAI Project & File Structure
 
 The reimplementation strictly follows the **3-Tier Spatial Architecture** defined in `HaruQuantAI`:
-1. **Tier 1: Host Platform (`app/host/` & `ui/app/host/`)** — Pure universal platform foundation (lifecycle, settings, SQLite WAL persistence, multi-sink logging, ProcessPool background jobs, transports, and dynamic plugin discovery). Zero domain or quantitative logic.
-2. **Tier 2: Domain Workspaces (`app/workspace/` & `ui/app/workspace/`)** — Autonomous operational centers encapsulating business logic, calculation pipelines, and FastAPI REST/WebSocket routers (Data Manager, Strategy Builder, Results/Databank, Retester, Optimizer, Portfolio Composer, Custom Projects).
-3. **Tier 3: Dynamic Plugins (`app/plugins/` & `ui/app/plugins/`)** — Decoupled add-on packages declaring typed extension slots (e.g. `data.provider`, `builder.candidate`), scanned and attached dynamically at runtime.
-4. **Domain Services & Primitives (`app/services/` & `ui/app/components/`)** — Mathematical routines, indicator libraries, broker/feed bridges, and reusable UI components.
+1. **Tier 1: Host Platform (`app/host/` & `ui/app/host/`)** — Pure universal platform foundation (lifecycle, settings, SQLite WAL persistence, atomic batch transactions, multi-sink logging, ProcessPool background jobs, response envelopes, transports, and dynamic plugin discovery). Zero domain or quantitative logic.
+2. **Tier 2: Domain Workspaces (`app/workspace/` & `ui/app/workspace/`)** — Autonomous operational centers encapsulating business logic, calculation pipelines, and FastAPI REST/WebSocket routers (Data Manager, Code Editor, AlgoWizard, Strategy Builder, Results/Databank, Retester, Optimizer, Neural Network, Portfolio Composer/Master, Custom Projects, Grid Control/Test, Marketplace, Business, Debug Console, Home, Chart, and MTAnalyzer).
+3. **Tier 3: Dynamic Plugins (`app/plugins/` & `ui/app/plugins/`)** — Decoupled add-on packages declaring typed extension slots (e.g. `data.provider`, `builder.candidate`, `results.plugin`, `ai.agent`), scanned and attached dynamically at runtime.
+4. **Domain Services & Primitives (`app/services/` & `ui/app/components/`)** — Core temporal/random/data primitives (`include/`), 69 mathematical indicators (`indicators/`), backtest simulation & order execution kernel (`engine/`), extensible snippet registries (`snippets/`), target-platform code generators (`codegen/`), unified broker/feed bridges (`brokers/`), and reusable UI components.
 
 ```
 HaruQuantAI/
 ├── app/                                    # Python Backend (FastAPI, Pydantic, SQLite WAL, NumPy/Numba)
+│   ├── main.py                             # Uvicorn / desktop sidecar entrypoint
+│   ├── cli.py                              # Headless CLI runner (sqcli.config / SQConsoleStarter parity)
 │   ├── host/                               # Tier 1: Platform Host (Lifecycle, persistence, jobs, transports)
-│   │   ├── persistence/                    # SQLite WAL database CRUD (create.py, read.py, update.py, delete.py)
+│   │   ├── persistence/                    # SQLite WAL database CRUD & atomic batch transactions
+│   │   │   ├── create.py                   # Parameterized single-row & entity creation
+│   │   │   ├── read.py                     # Parameterized queries & pagination
+│   │   │   ├── update.py                   # Parameterized updates & revision checks
+│   │   │   ├── delete.py                   # Parameterized deletion & cascade guards
+│   │   │   └── transactions.py             # Atomic multi-row batch operations & compare-and-set
 │   │   ├── bootstrap.py                    # Multi-stage startup & LIFO teardown
 │   │   ├── discovery.py                    # Dynamic plugin scanner & manifest loader
 │   │   ├── jobs.py                         # Multiprocessing job coordinator & ProcessPoolExecutor
-│   │   ├── logging.py                      # Multi-sink asynchronous telemetry & redaction
+│   │   ├── logging.py                      # Multi-sink asynchronous telemetry & secret redaction
 │   │   ├── resources.py                    # Hardware inspection & memory watchdog
+│   │   ├── response.py                     # Standardized API response & error envelopes
 │   │   ├── session.py                      # Ephemeral authentication & scope guards
 │   │   ├── settings.py                     # Central configuration & revision-tracked batch saves
 │   │   └── transport.py                    # FastAPI gateway, REST routes, WebSocket event bus
 │   ├── workspace/                          # Tier 2: Domain Workspaces (Cohesive business workflows)
 │   │   ├── data_manager/                   # Central market data catalog, instruments, sessions, baskets, broker profiles
 │   │   ├── code_editor/                    # Monaco-backed snippet and extension development
-│   │   ├── algo_wizard/                    # Visual rule authoring, logic trees, code generator
+│   │   ├── algo_wizard/                    # Visual rule authoring (Standard, Single-Asset, Stockpicker), Custom Blocks
 │   │   ├── builder/                        # Genetic strategy generation, candidate engines, ranking models
-│   │   ├── results/                        # Databank storage, strategy comparison, performance reports, equity curves
+│   │   ├── results/                        # Databank storage, strategy comparison, performance reports, equity charts
 │   │   ├── retesting/                      # Multi-market cross-checks, Monte Carlo, SPP, Walk-Forward
 │   │   ├── optimizer/                      # Grid/genetic parameter tuning, Walk-Forward Matrix, 3D surface charts
 │   │   ├── neural_network/                 # Feature extraction, PyTorch/Numba model training, signal classifiers
 │   │   ├── portfolio/                      # Portfolio Composer (interactive) & Portfolio Master (genetic search)
-│   │   ├── custom_projects/                # Automated task pipeline DAG engine (Custom Projects)
-│   │   ├── grid_control/                   # Distributed computing worker pool & cluster node coordinator
+│   │   ├── custom_projects/                # Automated 18-task pipeline DAG engine (Custom Projects)
+│   │   ├── grid_control/                   # Distributed computing worker pool, BacktestNode & NodeUpdater coordinator
 │   │   ├── grid_test/                      # Cluster benchmark test suite & latency probes
 │   │   ├── marketplace/                    # Community extension package repository client
 │   │   ├── business/                       # Multi-account licensing & institutional compliance reporting
 │   │   ├── debug_console/                  # Live system telemetry & memory diagnostics
 │   │   ├── home/                           # Landing dashboard & system overview
-│   │   └── chart/                          # Standalone charting engine & visual analytics
-│   ├── services/                           # Shared Domain Primitives & Adapters
-│   │   ├── brokers/                        # Data feeds & broker bridges (Dukascopy, Darwinex, MT5, Yahoo, etc.)
-│   │   │   └── exchanges/                  # Crypto exchange connectors (Binance Spot, USDT-M, Coin-M)
-│   │   ├── indicators/                     # Mathematical indicators (momentum, price_action, regime, trend, volatility, volume)
-│   │   ├── trading/                        # Order execution, position management, trade simulation
-│   │   └── utils/                          # Common math, comparisons, time utils, formatters
+│   │   ├── chart/                          # Standalone charting engine & visual analytics
+│   │   └── mt_analyzer/                    # Standalone MetaTrader report & portfolio analyzer (MTANALYZER)
+│   ├── services/                           # Shared Domain Primitives, Engines & Adapters
+│   │   ├── include/                        # Core time, RNG, bar series, contracts & signal building blocks (SQLib / SQDataLib)
+│   │   │   ├── time.py                     # HQTime calendar, timezone & session math
+│   │   │   ├── bar_time.py                 # Bar boundary alignment & timeframe intervals
+│   │   │   ├── generators.py               # Deterministic PRNG (RandomGenerator / XorShift / SplitMix)
+│   │   │   ├── contracts.py                # Shared immutable domain DTOs & value objects
+│   │   │   ├── enums.py                    # Order types, timeframes, precision modes, execution platforms
+│   │   │   ├── data.py                     # Columnar OHLCV/tick series kernel & history containers
+│   │   │   ├── trading.py                  # Core order, position, trade & execution records
+│   │   │   ├── actions.py                  # Side-effect action blocks, variable assignments & annotations
+│   │   │   ├── comparisons.py              # Fuzzy/epsilon comparisons, crossovers & trend conditions
+│   │   │   ├── functions.py                # Arithmetic/math operations, rolling ranks & pip conversions
+│   │   │   ├── price.py                    # BarPrice, QuotePrice, MTFPrice, SessionPrice, HeikenAshi
+│   │   │   └── types.py                    # Generic Variable container, typed variables & constants
+│   │   ├── brokers/                        # Unified BrokerClient / TradingClient data feeds & execution bridges
+│   │   │   ├── base.py                     # Abstract BrokerClient (data) & TradingClient (execution) contracts
+│   │   │   ├── _http.py                    # Bounded retry, rate-limiting & redacted HTTP transport
+│   │   │   ├── _file_history.py            # Local CSV/TXT/archive history loader
+│   │   │   ├── _native_history.py          # Binary tick/bar history decoder
+│   │   │   ├── ctrader.py                  # CTraderClient (cTrader Open API data & live trading adapter)
+│   │   │   ├── simulator.py                # SimulatorClient (deterministic paper/backtest broker execution)
+│   │   │   ├── metatrader.py               # MetaTrader 5 Python terminal adapter & FXT/HST exporter
+│   │   │   ├── dukascopy.py                # Dukascopy bi5 tick & minute CDN downloader
+│   │   │   ├── darwinex.py                 # Darwinex tick/minute data bridge
+│   │   │   ├── yahoo.py                    # Yahoo Finance historical OHLCV downloader
+│   │   │   ├── tick_downloader.py          # TickDownloader repository importer
+│   │   │   ├── sq_equity.py                # US Equities subscription historical data client
+│   │   │   ├── sq_futures.py               # Futures & Commodities subscription historical data client
+│   │   │   └── crypto.py                   # Consolidated crypto exchange clients (Binance Spot/CoinM/UsdtM, Bitfinex, CoinbasePro, Poloniex)
+│   │   ├── indicators/                     # 69 mathematical indicators (base + momentum, price_action, regime, trend, volatility, volume)
+│   │   ├── engine/                         # Core Backtest & Simulation Kernel (SQAppLib / SQTradingLib parity)
+│   │   │   ├── simulator.py                # Event-driven & vectorized bar/tick simulation engine
+│   │   │   ├── precision.py                # 4 precision modes (Selected TF, 1M Tick Sim, Real Tick Custom/Real Spread, Open Prices)
+│   │   │   ├── platforms.py                # 7 execution platform profiles (MT4, MT5 Hedged/Netted, TS, MC, NT, JForex, Stockpicker)
+│   │   │   ├── orders.py                   # Order state machine & intrabar SL/PT/Trailing/MoveSL2BE/ATM precedence
+│   │   │   ├── accounting.py               # Commission, swap rollover, margin & cross-currency conversion
+│   │   │   └── formats.py                  # .cfx project ZIP, .sqx/.sq4/.sq3 strategy archive, and .dat/Parquet codecs
+│   │   ├── snippets/                       # 24 Extensible Snippet Categories & 12 XML Catalogs (internal/extend/Snippets/SQ)
+│   │   │   ├── blocks.py                   # 569 strategy building blocks & internal/ctemplate/*.xml registries
+│   │   │   ├── money_management.py         # 12 position sizing algorithms (Fixed, Risk%, ATR, Martingale, Stocks, Crypto, Picker)
+│   │   │   ├── exit_methods.py             # 5 exit method snippets
+│   │   │   ├── trading_options.py          # 8 session/intraday/weekend/distance trading option constraints
+│   │   │   ├── monte_carlo.py              # 5 MC manipulation & 9 MC retest perturbation algorithms
+│   │   │   ├── what_if.py                  # 15 post-backtest trade filtering & equity control scenarios
+│   │   │   ├── columns.py                  # ~120 Databank columns, 30 Trade columns & 8 Walk-Forward columns
+│   │   │   ├── charts.py                   # 27 TradeAnalysis charts & 14 EngineCharts generators
+│   │   │   ├── correlation.py              # 6 CorrelationOf series extractors (Profit/Loss by Hour/Day/Week/Month, Drawdown, Open Trade)
+│   │   │   ├── fitness.py                  # 3 PortfolioMasterFitness functions & multi-objective weighting
+│   │   │   ├── formulas.py                 # 19 neural/ranking/statistical formula evaluators
+│   │   │   ├── negaters.py                 # 15 opposite-block signal negation mappings
+│   │   │   └── checkers_calculators.py     # 3 acceptance checkers, 7 statistical calculators, Alerts, PosSizing & AITool
+│   │   └── codegen/                        # Target-Platform Strategy Code Exporters (internal/extend/Code)
+│   │       ├── template_engine.py          # AST-to-target code generator & macro renderer
+│   │       ├── easylanguage.py             # TradeStation / MultiCharts EasyLanguage (.eld / .pla / .txt) exporter
+│   │       ├── jforex.py                   # Dukascopy JForex (.java) exporter
+│   │       ├── metatrader4.py              # MetaTrader 4 MQL4 (.mq4) exporter
+│   │       ├── metatrader5.py              # MetaTrader 5 MQL5 Hedged/Netted (.mq5) exporter
+│   │       ├── ninjatrader.py              # NinjaTrader 8 NinjaScript (.cs) exporter
+│   │       ├── pseudocode.py               # Human-readable PseudoCode (.txt) exporter
+│   │       └── custom_indicators.py        # Companion platform indicator packages (custom_indicators/, COT/, VolumeProfile/)
 │   └── plugins/                            # Tier 3: Dynamic Add-on Packages (Loaded dynamically via manifests)
-│       └── data_source/                    # Modular data provider extensions
+│       ├── data_source/                    # Modular data provider extensions
+│       ├── results_plugins/                # User results extensions (Prop analytics, Prop Monte Carlo)
+│       └── ai_plugins/                     # User AI agent & skill extensions (user/extend/AIPlugins)
 ├── ui/                                     # React Frontend (TypeScript, Vite, Tailwind CSS, Dockview)
 │   └── app/
 │       ├── host/                           # Platform UI (Connection modals, settings, top header, status bar)
@@ -119,21 +186,23 @@ HaruQuantAI/
 │       └── workspace/                      # Domain Workspace Views (Dockview panel views)
 │           ├── DataManager/                # Data catalog & symbol explorer
 │           ├── CodeEditor/                 # Code editor workspace & extension modals
-│           ├── AlgoWizard/                 # Drag-and-drop strategy rule canvas
+│           ├── AlgoWizard/                 # Drag-and-drop strategy rule canvas (Standard, Single-Asset, Stockpicker)
 │           ├── Builder/                    # Strategy builder dashboard, engine panel, settings tabs
-│           ├── Results/                    # Strategy databanks, trade analysis, equity charts
+│           ├── Results/                    # Strategy databanks, trade analysis, equity charts, Prop analytics
 │           ├── Retester/                   # Retesting workspace, cross-check modals, progress monitors
 │           ├── Optimizer/                  # Parameter optimization workspace & Walk-Forward Matrix view
 │           ├── NeuralNetwork/              # Model training curves & confusion matrix views
 │           ├── PortfolioComposer/          # Interactive portfolio allocation & correlation matrix
 │           ├── PortfolioMaster/            # Automated genetic portfolio search workbench
 │           ├── CustomProjects/             # Task pipeline orchestrator & task modals
-│           ├── GridControl/                # Worker node management panel
+│           ├── GridControl/                # Worker node management panel, BacktestNode & NodeUpdater
 │           ├── GridTest/                   # Cluster benchmark runner
 │           ├── Business/                   # Enterprise license management
 │           ├── DebugConsole/               # Live telemetry & log streaming console
 │           ├── Home/                       # Welcome screen & quick-action cards
 │           ├── Chart/                      # Advanced multi-timeframe interactive charting engine
+│           ├── MTAnalyzer/                 # Standalone MetaTrader trade-report & portfolio analyzer
+│           ├── AI/                         # Built-in Q AI assistant chat, MCP tool runner & agent selector
 │           └── Trading/                    # Live trade monitoring dashboard
 └── docs/                                   # Architectural specifications & guides
 ```
@@ -146,12 +215,12 @@ HaruQuantAI/
 - **Dependencies**: None (Root Host)
 - **Outputs / Downstream Role**: Core application container, event bus, database, and connection manager.
 
-### Phase 1.1: Core Application Container
+### Phase 1.1: Core Application Container & Stage 1 Host Foundation
 
 #### `AppPlatform`
 *Feature:* Host application lifecycle, dependency injection, and event bus runtime
 *Implementation Files:*
-- **Backend:** `app/host/bootstrap.py`
+- **Backend:** `app/host/bootstrap.py`, `app/main.py`
 - **Frontend:** `ui/app/host/HostConnectionModal.tsx`
 *Functional Requirements & Implementation:*
 - [x] bootstrap FastAPI backend application with CORS, security headers, and Uvicorn server -> `AppHost.startup()`
@@ -159,6 +228,33 @@ HaruQuantAI/
 - [x] register and initialize all domain feature modules and background worker processes -> `AppHost.register_modules()`
 - [x] provide global in-memory event bus and WebSocket broadcast channel -> `AppHost.broadcast_event()`
 - [x] manage application graceful shutdown, process termination, and resource cleanup -> `AppHost.shutdown()`
+
+#### `HostPersistence`
+*Feature:* SQLite WAL persistence layer, parameterized CRUD, and atomic batch transactions
+*Implementation Files:*
+- **Backend:** `app/host/persistence/create.py`, `app/host/persistence/read.py`, `app/host/persistence/update.py`, `app/host/persistence/delete.py`, `app/host/persistence/transactions.py`
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
+*Functional Requirements & Implementation:*
+- [x] execute parameterized single-row and entity creation in SQLite WAL -> `create_record()` / `create_entity()`
+- [x] execute parameterized queries, filtering, and cursor pagination -> `read_records()` / `read_entity()`
+- [x] execute parameterized updates and optimistic revision compare-and-set -> `update_record()` / `update_entity()`
+- [x] execute parameterized deletion with foreign-key reference guards -> `delete_record()` / `delete_entity()`
+- [ ] execute atomic multi-row batch writes with all-or-nothing rollback -> `apply_batch()`
+
+#### `HostFoundationServices`
+*Feature:* Plugin discovery, multiprocessing job ledger, telemetry logging, hardware watchdog, session auth, settings, response envelopes, and headless CLI (`sqcli.config` / `SQConsoleStarter`)
+*Implementation Files:*
+- **Backend:** `app/host/discovery.py`, `app/host/jobs.py`, `app/host/logging.py`, `app/host/resources.py`, `app/host/session.py`, `app/host/settings.py`, `app/host/response.py`, `app/cli.py`
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
+*Functional Requirements & Implementation:*
+- [x] scan and validate dynamic plugin manifests and extension slots at startup -> `PluginDiscovery.discover_plugins()`
+- [x] schedule, track, cancel, and persist background worker tasks in SQLite job ledger -> `JobManager.submit_job()` / `JobManager.cancel_job()`
+- [x] route structured logs across console/file/WebSocket sinks with secret redaction -> `TelemetryLogger.emit()`
+- [x] monitor CPU, RAM, disk quotas, and memory pressure thresholds -> `ResourceMonitor.inspect_resources()`
+- [x] issue ephemeral session tokens and enforce route scope authorization -> `SessionManager.verify_session()`
+- [x] persist revision-tracked application settings and workspace layouts -> `SettingsManager.save_settings()`
+- [x] wrap REST and WebSocket payloads in deterministic typed envelopes -> `ApiResponse.ok()` / `ApiResponse.error()`
+- [x] execute headless CLI workflows, project pipelines, and diagnostics (`sqcli.config` parity) -> `run_cli()`
 
 ### Phase 1.2: Platform & Broker Connectivity
 
@@ -188,11 +284,30 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/metatrader.py`
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python package -> `ConnectionMT5.initialize()`
-- [ ] query account balance, equity, leverage, server time, and broker specifications -> `ConnectionMT5.get_account_info()`
-- [ ] stream live tick and bar price feeds into memory queues -> `ConnectionMT5.stream_ticks()`
-- [ ] dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal -> `ConnectionMT5.send_order()`
-- [ ] terminate terminal connection session and release resources -> `ConnectionMT5.shutdown()`
+- [x] initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python package -> `ConnectionMT5.initialize()`
+- [x] query account balance, equity, leverage, server time, and broker specifications -> `ConnectionMT5.get_account_info()`
+- [x] stream live tick and bar price feeds into memory queues -> `ConnectionMT5.stream_ticks()`
+- [x] dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal -> `ConnectionMT5.send_order()`
+- [x] terminate terminal connection session and release resources -> `ConnectionMT5.shutdown()`
+
+#### `ConnectionCTrader`
+*Feature:* cTrader Open API historical data and live execution adapter (`CTraderClient`)
+*Implementation Files:*
+- **Backend:** `app/services/brokers/ctrader.py`
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
+*Functional Requirements & Implementation:*
+- [x] authenticate cTrader Open API session and resolve tradable symbol catalog -> `CTraderClient.connect()` / `CTraderClient.get_symbols()`
+- [x] download historical OHLCV bars and tick quotes from cTrader servers -> `CTraderClient.get_bars()` / `CTraderClient.get_ticks()`
+- [x] submit, modify, and close market/limit/stop orders via cTrader Open API -> `CTraderClient.place_order()` / `CTraderClient.close_position()`
+
+#### `ConnectionSimulator`
+*Feature:* Deterministic paper and backtest broker execution bridge (`SimulatorClient`)
+*Implementation Files:*
+- **Backend:** `app/services/brokers/simulator.py`
+- **Frontend:** `ui/app/workspace/Trading/TradingDashboard.tsx`
+*Functional Requirements & Implementation:*
+- [x] simulate broker account state, balances, open positions, and pending orders in memory -> `SimulatorClient.get_account_info()`
+- [x] execute deterministic market, limit, and stop orders against historical or replayed feeds -> `SimulatorClient.place_order()`
 
 ### Phase 1.3: Cryptocurrency Exchange Adapters
 
@@ -202,10 +317,10 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] fetch Binance spot exchange info, tradable symbols, and price filters -> `BinanceSpot.get_exchange_info()`
-- [ ] stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket -> `BinanceSpot.stream_klines()`
-- [ ] download historical Kline bar archives for backtesting -> `BinanceSpot.download_historical_bars()`
-- [ ] execute spot limit and market orders with HMAC SHA256 signature authentication -> `BinanceSpot.place_order()`
+- [x] fetch Binance spot exchange info, tradable symbols, and price filters -> `BinanceSpot.get_exchange_info()`
+- [x] stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket -> `BinanceSpot.stream_klines()`
+- [x] download historical Kline bar archives for backtesting -> `BinanceSpot.download_historical_bars()`
+- [x] execute spot limit and market orders with HMAC SHA256 signature authentication -> `BinanceSpot.place_order()`
 
 #### `CryptoExchangeBinanceCoinM`
 *Feature:* Binance Coin-Margined Delivery and Perpetual Futures adapter
@@ -213,10 +328,10 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] fetch Coin-M contract specifications and index prices -> `BinanceCoinM.get_contracts()`
-- [ ] fetch Coin-M funding rates and historical intervals -> `BinanceCoinM.get_funding_rate()`
-- [ ] stream real-time futures mark price and order book depth -> `BinanceCoinM.stream_mark_price()`
-- [ ] manage Coin-M positions, leverage brackets, and margin types -> `BinanceCoinM.set_leverage()`
+- [x] fetch Coin-M contract specifications and index prices -> `BinanceCoinM.get_contracts()`
+- [x] fetch Coin-M funding rates and historical intervals -> `BinanceCoinM.get_funding_rate()`
+- [x] stream real-time futures mark price and order book depth -> `BinanceCoinM.stream_mark_price()`
+- [x] manage Coin-M positions, leverage brackets, and margin types -> `BinanceCoinM.set_leverage()`
 
 #### `CryptoExchangeBinanceUsdtM`
 *Feature:* Binance USDT-Margined Perpetual Futures adapter
@@ -224,39 +339,39 @@ HaruQuantAI/
 - **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] fetch USDT-M contract rules, tick sizes, step sizes, and funding intervals -> `BinanceUsdtM.get_exchange_info()`
-- [ ] stream real-time USDT-M Kline bars and aggregated trade events -> `BinanceUsdtM.stream_trades()`
-- [ ] download historical USDT-M futures Kline bar archives -> `BinanceUsdtM.download_futures_klines()`
-- [ ] place and cancel futures limit, stop-market, and trailing stop orders -> `BinanceUsdtM.send_futures_order()`
+- [x] fetch USDT-M contract rules, tick sizes, step sizes, and funding intervals -> `BinanceUsdtM.get_exchange_info()`
+- [x] stream real-time USDT-M Kline bars and aggregated trade events -> `BinanceUsdtM.stream_trades()`
+- [x] download historical USDT-M futures Kline bar archives -> `BinanceUsdtM.download_futures_klines()`
+- [x] place and cancel futures limit, stop-market, and trailing stop orders -> `BinanceUsdtM.send_futures_order()`
 
 #### `CryptoExchangeBitfinex`
 *Feature:* Bitfinex exchange REST and WebSocket market data adapter
 *Implementation Files:*
-- **Backend:** `app/services/brokers/exchanges/bitfinex.py`
+- **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] fetch Bitfinex currency pairs, symbols, and minimum order sizes -> `Bitfinex.get_symbols()`
-- [ ] stream real-time raw book and candle feeds over WebSocket -> `Bitfinex.stream_candles()`
-- [ ] query historical candle archives for backtesting -> `Bitfinex.fetch_candles()`
+- [x] fetch Bitfinex currency pairs, symbols, and minimum order sizes -> `Bitfinex.get_symbols()`
+- [x] stream real-time raw book and candle feeds over WebSocket -> `Bitfinex.stream_candles()`
+- [x] query historical candle archives for backtesting -> `Bitfinex.fetch_candles()`
 
 #### `CryptoExchangeCoinbasePro`
 *Feature:* Coinbase Advanced Trade REST and WebSocket client
 *Implementation Files:*
-- **Backend:** `app/services/brokers/exchanges/coinbase.py`
+- **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] fetch Coinbase product catalog, base/quote currencies, and increments -> `Coinbase.get_products()`
-- [ ] stream live market trades and heartbeats via Coinbase WebSocket -> `Coinbase.stream_market_data()`
-- [ ] download historical candle data chunks and save to Parquet -> `Coinbase.download_candles()`
+- [x] fetch Coinbase product catalog, base/quote currencies, and increments -> `Coinbase.get_products()`
+- [x] stream live market trades and heartbeats via Coinbase WebSocket -> `Coinbase.stream_market_data()`
+- [x] download historical candle data chunks and save to Parquet -> `Coinbase.download_candles()`
 
 #### `CryptoExchangePoloniex`
 *Feature:* Poloniex exchange market data connector
 *Implementation Files:*
-- **Backend:** `app/services/brokers/exchanges/poloniex.py`
+- **Backend:** `app/services/brokers/crypto.py`
 - **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] query Poloniex market definitions and trading rules -> `Poloniex.get_markets()`
-- [ ] fetch historical candlestick records for crypto asset pairs -> `Poloniex.get_candles()`
+- [x] query Poloniex market definitions and trading rules -> `Poloniex.get_markets()`
+- [x] fetch historical candlestick records for crypto asset pairs -> `Poloniex.get_candles()`
 
 ### Phase 1.4: Core Infrastructure Servlets & Theming
 
@@ -321,14 +436,16 @@ HaruQuantAI/
 - [ ] download pre-built shared strategy templates and market data packages -> `ServletAlgoCloud.download_package()`
 
 #### `ServletAI`
-*Feature:* AI assistant chat streaming and context injection gateway
+*Feature:* AI assistant chat streaming, MCP tool execution, and custom agent/skill gateway (`internal/web/SQAI` & `user/extend/AIPlugins`)
 *Implementation Files:*
-- **Backend:** `app/workspace/neural_network/routes.py`
-- **Frontend:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
+- **Backend:** `app/workspace/neural_network/routes.py`, `app/services/snippets/checkers_calculators.py`
+- **Frontend:** `ui/app/workspace/AI/AIWorkspace.tsx`, `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
 *Functional Requirements & Implementation:*
 - [ ] accept natural language user queries regarding strategy development and codebase -> `ServletAI.send_message()`
 - [ ] stream AI assistant reasoning and code responses over Server-Sent Events (SSE) or WebSocket -> `ServletAI.stream_response()`
 - [ ] inject strategy rules, backtest statistics, and logs as context into LLM prompt -> `ServletAI.clear_history()`
+- [ ] discover and invoke extensible `AITool` snippets and user-defined MCP tools (`user/extend/AIPlugins/mcp.json`) -> `ServletAI.invoke_ai_tool()`
+- [ ] load custom AI agent personas and Markdown skill definitions (`user/extend/AIPlugins/agents/`, `skills/`) -> `ServletAI.load_agents_and_skills()`
 
 #### `SkinDark`
 *Feature:* Tailwind CSS dark theme tokens and appearance state management
@@ -347,6 +464,140 @@ HaruQuantAI/
 *Functional Requirements & Implementation:*
 - [x] provide light mode color variables, clean white/gray surfaces, and contrast borders -> `Theme.set_light()`
 - [x] apply light theme styling to Dockview panels, TanStack tables, and charts -> `Theme.get_light_tokens()`
+
+---
+
+## 1A. Core Libraries, Indicators & Backtest Simulation Engine (`internal/libs/` -> `app/services/`)
+
+- **Primary Role**: The foundational non-UI quantitative libraries corresponding to `SQLib.jar.enc` (151 classes), `SQDataLib.jar.enc` (191 classes), and `SQAppLib.jar.enc` / `SQTradingLib` (893 classes, 14,063 methods). Provides temporal math, deterministic RNG, columnar bar/tick series, 69 technical indicators, signal utilities, the 4-precision / 7-platform backtest simulation kernel, and binary/ZIP persistence codecs.
+- **Dependencies**: AppPlatform
+- **Outputs / Downstream Role**: Consumed by every domain workspace (`AppDataManager`, `AppCodeEditor`, `AppWizard`, `AppBuilder`, `AppResults`, `AppRetester`, `AppOptimizer`, `AppPortfolioComposer`, `AppPortfolioMaster`, `AppTaskManager`).
+
+### Phase 1A.1: Core Primitives, Data Contracts & Signal Building Blocks (`app/services/include/`)
+
+#### `CoreIncludePrimitives`
+*Feature:* Deterministic time (`HQTime`), bar boundary alignment, PRNG (`RandomGenerator`), and columnar data/trading structures (`SQLib` & `SQDataLib` parity)
+*Implementation Files:*
+- **Backend:** `app/services/include/time.py`, `app/services/include/bar_time.py`, `app/services/include/generators.py`, `app/services/include/contracts.py`, `app/services/include/enums.py`, `app/services/include/data.py`, `app/services/include/trading.py`
+*Functional Requirements & Implementation:*
+- [x] perform microsecond-exact timestamp arithmetic, timezone shifts, and session boundary checks -> `HQTime` (`time.py`)
+- [x] align intraday, daily, weekly, and monthly bar open/close boundaries -> `BarTime` (`bar_time.py`)
+- [x] generate reproducible pseudo-random streams (`XorShift` / `SplitMix`) for genetic evolution and Monte Carlo permutations -> `RandomGenerator` (`generators.py`)
+- [x] provide zero-copy NumPy/PyArrow columnar OHLCV bar series, derived series, and tick buffers -> `DataSeries` / `HistoryDataLoader` (`data.py`)
+- [x] define immutable order, fill, position, trade, and execution contracts -> `OrderRecord` / `TradeRecord` (`trading.py`, `contracts.py`, `enums.py`)
+
+#### `CoreSignalAndMathInclude`
+*Feature:* Strategy action helpers, fuzzy/epsilon comparisons, mathematical functions, price blocks, and typed variables
+*Implementation Files:*
+- **Backend:** `app/services/include/actions.py`, `app/services/include/comparisons.py`, `app/services/include/functions.py`, `app/services/include/price.py`, `app/services/include/types.py`
+*Functional Requirements & Implementation:*
+- [x] evaluate tick-size-aware equality, crossovers (`crosses_above`, `crosses_below`), and directional comparisons -> `comparisons.py`
+- [x] execute bar-window statistical aggregations, linear regression slopes, and safe division -> `functions.py`
+- [x] normalize prices and order sizes to instrument tick steps, pip sizes, and lot increments -> `price.py` / `actions.py`
+- [x] manage generic mutable variables, typed containers, and boolean formula evaluation -> `types.py`
+
+### Phase 1A.2: Technical Indicator Library (`app/services/indicators/`)
+
+#### `CoreIndicatorLibrary`
+*Feature:* 69 vectorized/Numba-compiled technical indicator modules across 6 categories (`SQTradingLib` indicator parity)
+*Implementation Files:*
+- **Backend:** `app/services/indicators/base.py`, `app/services/indicators/momentum/`, `app/services/indicators/price_action/`, `app/services/indicators/regime/`, `app/services/indicators/trend/`, `app/services/indicators/volatility/`, `app/services/indicators/volume/`
+*Functional Requirements & Implementation:*
+- [x] compute momentum oscillators (`RSI`, `CCI`, `Stochastic`, `Momentum`, `WilliamsR`, `MACD`, `DeMarker`, `ROC`, `Reflex`, `Trendflex`, `LaguerreRSI`, `QQE`, `BearsPower`, `BullsPower`, `AwesomeOscillator`, `AcceleratorOscillator`, `TSI`, `UltimateOscillator`) -> `app/services/indicators/momentum/`
+- [x] compute price-action & structural levels (`Fractals`, `HeikenAshi`, `Highest`, `Lowest`, `Pivots`, `FibPivots`, `CamarillaPivots`, `SessionOhlc`, `Ichimoku`, `ZigZag`, `PriceChannel`) -> `app/services/indicators/price_action/`
+- [x] compute market regime & directional filters (`ADX`, `ADXR`, `Aroon`, `ChopIndex`, `hurst`, `MarketFacilitationIndex`, `Vortex`, `GannHiLo`, `EfficiencyRatio`) -> `app/services/indicators/regime/`
+- [x] compute trend moving averages & envelopes (`SMA`, `EMA`, `SMMA`, `LWMA`, `TEMA`, `DEMA`, `HullMA`, `KAMA`, `ALMA`, `SuperTrend`, `ParabolicSAR`, `LinearRegression`, `Alligator`, `GatorOscillator`) -> `app/services/indicators/trend/`
+- [x] compute volatility bands & range measures (`ATR`, `TrueRange`, `BollingerBands`, `KeltnerChannel`, `DonchianChannel`, `StandardDeviation`, `UlcerIndex`, `BBWidthRatio`, `ChaikinVolatility`) -> `app/services/indicators/volatility/`
+- [x] compute volume & money-flow indicators (`OBV`, `MFI`, `ChaikinMoneyFlow`, `AccumulationDistribution`, `ForceIndex`, `EaseOfMovement`, `VolumeOscillator`, `VWAP`, `TickVolume`) -> `app/services/indicators/volume/`
+
+### Phase 1A.3: Backtest Simulation & Order Execution Kernel (`app/services/engine/`)
+
+#### `BacktestSimulationEngine`
+*Feature:* Multi-precision, multi-platform strategy backtesting and order state machine (`SQAppLib` / `SQTradingLib` parity)
+*Implementation Files:*
+- **Backend:** `app/services/engine/simulator.py`, `app/services/engine/precision.py`, `app/services/engine/platforms.py`, `app/services/engine/orders.py`, `app/services/engine/accounting.py`
+*Functional Requirements & Implementation:*
+- [ ] simulate strategy execution across all **4 Precision Modes + Open Prices**: (1) `Selected Timeframe (Main TF only)`, (2) `1-Minute Data Tick Simulation`, (3) `Real Tick — Custom Spread`, (4) `Real Tick — Real Spread`, and `Open Prices` (4-tick synthetic bar generator: Open -> High/Low -> Low/High -> Close) -> `PrecisionSynthesizer.generate_ticks()`
+- [ ] enforce target **7 Execution Platform Profiles** + `Stockpicker`: `MetaTrader 4`, `MetaTrader 5 Hedged`, `MetaTrader 5 Netted`, `TradeStation`, `MultiCharts`, `NinjaTrader`, `JForex`, and cross-sectional `Stockpicker` portfolio rebalance engine -> `PlatformExecutionProfile.validate_and_route()`
+- [ ] manage full **Order State Machine**: `Market`, `Stop`, `Limit`, `StopLimit` (MT5/NinjaTrader/JForex), `ReverseAtMarket`, `BarsValid` expiration, `ReplaceExisting`, `MagicNumber`, `AllowDuplicateTrades`, and min-stop-distance (`FreezeLevel` / `StopsLevel`) enforcement -> `OrderStateMachine.process_bar_or_tick()`
+- [ ] evaluate deterministic **Intrabar Exit Precedence**: `StopLoss`, `ProfitTarget`, `TrailingStop` (with activation threshold), `MoveSL2BE` (with offset pips), `ExitAfterBars`, and `AdvancedTradeManagement` (ATM partial scale-outs) with pessimistic/optimistic tie-breaking when both SL and PT are touched within the same bar -> `OrderStateMachine.evaluate_intrabar_exits()`
+- [ ] compute **Cost, Swap, Margin & Currency Accounting**: commission models (per-lot, percentage, per-trade), overnight swap rollover (including triple-swap weekday), initial/maintenance margin checks, point-value scaling, and cross-currency PnL conversion -> `AccountLedger.settle_trade()`
+
+#### `CorePersistenceFormats`
+*Feature:* Clean-room readers and writers for `.cfx`, `.sqx`, `.sq4`, `.sq3`, and `.dat` / Parquet archives
+*Implementation Files:*
+- **Backend:** `app/services/engine/formats.py`
+*Functional Requirements & Implementation:*
+- [ ] read and write `.cfx` Custom Project / Template ZIP archives (`config.xml` + `<TaskType>-Task<N>.xml` manifests) -> `ProjectArchiveCodec.load_cfx()` / `save_cfx()`
+- [ ] read and write `.sqx` Strategy ZIP archives (`strategy.xml` AST, `sourceCode.txt`, and compressed backtest trade/equity payloads), `.sq4` XML strategies, and `.sq3` legacy binary strategies -> `StrategyArchiveCodec.load_sqx()` / `save_sqx()`
+- [ ] transcode binary `.dat` tick/bar archives to and from Zstandard-compressed PyArrow Parquet datasets -> `MarketDataFormatCodec.transcode_dat_parquet()`
+
+---
+
+## 1B. Extensible Snippet System, XML Catalogs & Target-Platform Code Exporters (`internal/extend/` & `internal/ctemplate/` -> `app/services/snippets/` & `app/services/codegen/`)
+
+- **Primary Role**: Reimplements the 24 extensible snippet categories in `internal/extend/Snippets/SQ/` (1,049 Java classes), the 12 XML block/parameter catalogs in `internal/ctemplate/`, and the 6 FreeMarker target-platform code generation engines in `internal/extend/Code/`.
+- **Dependencies**: Core Libraries & Simulation Engine (`Section 1A`)
+- **Outputs / Downstream Role**: Supplies building blocks, position sizing, exit rules, Monte Carlo perturbations, What-If filters, databank/trade columns, fitness formulas, and platform source-code generators to `AppCodeEditor`, `AppWizard`, `AppBuilder`, `AppResults`, `AppRetester`, `AppOptimizer`, and `AppPortfolioMaster`.
+
+### Phase 1B.1: Strategy Building Blocks, Sizing & Execution Snippets (`app/services/snippets/`)
+
+#### `SnippetBuildingBlocksAndCatalogs`
+*Feature:* 569 strategy building blocks across 10 categories and 12 XML block/template registries (`Snippets/SQ/Blocks/*` & `internal/ctemplate/*.xml`)
+*Implementation Files:*
+- **Backend:** `app/services/snippets/blocks.py`
+*Functional Requirements & Implementation:*
+- [ ] register all 10 building block families: `Indicators` (52 indicator families, ~400 signal/value blocks), `Price` (30 OHLC/range/daily/session blocks), `BarAndTime` (37 hour/day/month/session blocks), `Comparisons` (27 cross/fuzzy/threshold blocks), `StrategyControl` (25 trade/position/profit inspection blocks), `Functions` (18 math/statistical blocks), `Order` & `OtherActions` (20 order entry/modification/close blocks), `CandlePatterns` (7 candlestick formations), and `Variables` (5 typed strategy variables) -> `BlockRegistry.load_all_blocks()`
+- [ ] parse and serve the 12 block/template catalogs (`config.xml`, `conditions.xml`, `values.xml`, `actions.xml`, `comparisons.xml`, `events.xml`, `talibs.xml`, `wizard.xml`, `moneyManagement.xml`, `parameterSets.xml`, `datasTimeframes.xml`, `advancedTypes.xml`) and build rule templates (`build/sq4/*`, `build/sq3/*`, `build/sp/*`) -> `CatalogTemplateLoader.load_catalogs()`
+
+#### `SnippetMoneyManagement`
+*Feature:* 12 position sizing and capital allocation schemes (`Snippets/SQ/MoneyManagement/*`)
+*Implementation Files:*
+- **Backend:** `app/services/snippets/money_management.py`
+*Functional Requirements & Implementation:*
+- [ ] compute trade order size for all 12 money management models: `FixedSize`, `FixedAmount`, `RiskFixedPctOfAccount`, `RiskFixedBalancePct`, `ATRRiskBasedSizing`, `SimpleMartingaleMM`, `StocksSizeByPrice`, `CryptoSizeByPrice`, `CryptoRiskFixedPctOfAccount`, `CryptoRiskFixedBalancePct`, `PickerFixedAmount`, and `PickerRiskFixedPctOfAccount` -> `MoneyManagementEngine.compute_lots()`
+
+#### `SnippetExitMethodsAndTradingOptions`
+*Feature:* 5 Exit Methods (`Snippets/SQ/ExitMethods/*`) and 8 Trading Options (`Snippets/SQ/TradingOptions/*`)
+*Implementation Files:*
+- **Backend:** `app/services/snippets/exit_methods.py`, `app/services/snippets/trading_options.py`
+*Functional Requirements & Implementation:*
+- [ ] evaluate modular exit methods (`StopLoss`, `ProfitTarget`, `TrailingStop`, `MoveSL2BE`, `ExitAfterBars`) per open trade -> `ExitMethodEvaluator.apply_exits()`
+- [ ] enforce the 8 session and risk trading options (`DontTradeOnWeekends`, `ExitAtEndOfDay`, `ExitOnFriday`, `LimitTimeRange`, `MaxDistanceFromMarket`, `MaxTradesPerDay`, `MinMaxSLPT`, `UseInitialSLPT`) -> `TradingOptionEnforcer.enforce_options()`
+
+### Phase 1B.2: Robustness, What-If, Databank Columns, Charts & Formulas (`app/services/snippets/`)
+
+#### `SnippetMonteCarloAndWhatIf`
+*Feature:* 14 Monte Carlo perturbation methods (`Snippets/SQ/MonteCarlo/*`) and 15 What-If trade filter scenarios (`Snippets/SQ/WhatIf/*`)
+*Implementation Files:*
+- **Backend:** `app/services/snippets/monte_carlo.py`, `app/services/snippets/what_if.py`
+*Functional Requirements & Implementation:*
+- [ ] execute the 5 fast trade-manipulation Monte Carlo methods (`RandomizeTradesOrder` [Exact & Resampling], `RandomizeSkipTrades`, `RandomizeStartDate`, `RandomizeHistoryData`, `RandomizeCommon`) -> `MonteCarloManipulator.run_simulation()`
+- [ ] execute the 9 full-retest Monte Carlo perturbation methods (`RandomizeStrategyParameters`, `RandomizeSlippage`, `RandomizeSpread`, `RandomizeMinDistance`, `RandomizeIndicatorParameters`, `RandomizeBacktestStart`, `RandomizeHistoryData` volatility/noise) -> `MonteCarloRetester.run_retest_simulation()`
+- [ ] apply all 15 post-backtest What-If trade filters and equity controls (`TakeOnlyLong`, `TakeOnlyShort`, `TradesByDays`, `TradesByHours`, `SkipTradesByDuration`, `MaxTradesPerDay`, `ExcludePercentBiggestProfitable`, `ExcludePercentBiggestLosing`, `SetFixedSpread`, `EquityPctControl`, `MovingAverageControl`, `LinearRegressionControl`, `DelayedRepeatingEntries`, `UseMoneyManagement`, `RecomputeUseAvailableMoney`) -> `WhatIfSimulator.apply_scenario()`
+
+#### `SnippetColumnsChartsAndFormulas`
+*Feature:* ~120 Databank columns, 30 Trade columns, 8 Walk-Forward columns, 27 TradeAnalysis charts, 14 EngineCharts, 6 CorrelationOf series, 3 PortfolioMasterFitness functions, 19 Formulas, 15 Negaters, 3 Checkers & 7 Calculators
+*Implementation Files:*
+- **Backend:** `app/services/snippets/columns.py`, `app/services/snippets/charts.py`, `app/services/snippets/correlation.py`, `app/services/snippets/fitness.py`, `app/services/snippets/formulas.py`, `app/services/snippets/negaters.py`, `app/services/snippets/checkers_calculators.py`
+*Functional Requirements & Implementation:*
+- [ ] compute all ~120 Databank performance metrics (`NetProfit`, `RetDD`, `SharpeRatio`, `SortinoRatio`, `SQN`, `ProfitFactor`, `Stability`, `Stagnation`, `UlcerPerformanceIndex`, `WinLossRatio`, `CAGR`, `RExpectancy`, `MaxDD`, `AvgWin`, `AvgLoss`, `Fitness`, etc.), 30 per-trade columns (`MAE`, `MFE`, `Efficiency`, `Duration`, `Commission`, `Swap`, etc.), and 8 Walk-Forward columns -> `ColumnRegistry.evaluate_columns()`
+- [ ] generate data series for all 27 TradeAnalysis charts and 14 live EngineCharts -> `ChartSnippetRegistry.build_chart_series()`
+- [ ] extract the 6 `CorrelationOf` time series (`ProfitLossByHour`, `ProfitLossByDay`, `ProfitLossByWeek`, `ProfitLossByMonth`, `Drawdown`, `OpenTrade`) and compute the 3 `PortfolioMasterFitness` scores (`NetProfit`, `PctStagnation`, `ReturnDD`) -> `CorrelationAndFitnessRegistry.evaluate()`
+- [ ] evaluate the 19 `Formulas` (ranking/neural/regression expressions), 15 `Negater` opposite-block mappings (for genetic rule inversion), 3 acceptance `Checkers`, and 7 statistical `Calculators` (`Duration`, `MAE/MFE`, `Money`, `Pips`, `Pct`, `Sqn`, `Stagnation`) -> `FormulaAndNegaterRegistry.apply()`
+
+### Phase 1B.3: Target-Platform Strategy Code Exporters (`internal/extend/Code/` -> `app/services/codegen/`)
+
+#### `PlatformCodeExporters`
+*Feature:* AST-to-platform source code generators for 6 target platforms plus companion custom indicators (`internal/extend/Code/*`, `custom_indicators/`, `COT/`, `VolumeProfile/`)
+*Implementation Files:*
+- **Backend:** `app/services/codegen/template_engine.py`, `app/services/codegen/easylanguage.py`, `app/services/codegen/jforex.py`, `app/services/codegen/metatrader4.py`, `app/services/codegen/metatrader5.py`, `app/services/codegen/ninjatrader.py`, `app/services/codegen/pseudocode.py`, `app/services/codegen/custom_indicators.py`
+*Functional Requirements & Implementation:*
+- [ ] render strategy ASTs into **MetaTrader 4 (`MQL4` `.mq4`)** and **MetaTrader 5 (`MQL5` `.mq5` Hedged & Netted)** expert advisors with full order management, custom indicator calls, and magic number handling -> `MetaTrader4Exporter.render()` / `MetaTrader5Exporter.render()`
+- [ ] render strategy ASTs into **TradeStation / MultiCharts (`EasyLanguage` `.txt` / `.eld` / `.pla`)** and **Stockpicker** multi-symbol scripts -> `EasyLanguageExporter.render()`
+- [ ] render strategy ASTs into **NinjaTrader 8 (`NinjaScript` `.cs`)** and **Dukascopy (`JForex` `.java`)** strategy classes -> `NinjaTraderExporter.render()` / `JForexExporter.render()`
+- [ ] render human-readable **PseudoCode (`.txt`)** descriptions of all strategy signals, blocks, stops, and money management -> `PseudoCodeExporter.render()`
+- [ ] package companion platform indicator source files (`custom_indicators/` for MT4/MT5/TS/NT8, `COT/`, and `VolumeProfile/`) alongside exported strategies -> `CustomIndicatorPackager.bundle_indicators()`
 
 ---
 
@@ -574,22 +825,22 @@ flowchart TD
 #### `DataSourceEquities`
 *Feature:* US Equities subscription historical data client
 *Implementation Files:*
-- **Backend:** `app/services/brokers/equities.py`
+- **Backend:** `app/services/brokers/sq_equity.py`
 - **Frontend:** `ui/app/plugins/data_source/Equities/EquitiesModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] add US equities data symbols to database -> `EquitiesData.add()`
-- [ ] display equities data usage terms and conditions -> `EquitiesData.data_usage_conditions()`
-- [ ] update existing equity historical data with latest trading sessions -> `EquitiesData.update()`
+- [x] add US equities data symbols to database -> `EquitiesData.add()`
+- [x] display equities data usage terms and conditions -> `EquitiesData.data_usage_conditions()`
+- [x] update existing equity historical data with latest trading sessions -> `EquitiesData.update()`
 
 #### `DataSourceFutures`
 *Feature:* Futures & Commodities subscription historical data client
 *Implementation Files:*
-- **Backend:** `app/services/brokers/futures.py`
+- **Backend:** `app/services/brokers/sq_futures.py`
 - **Frontend:** `ui/app/plugins/data_source/Futures/FuturesModal.tsx`
 *Functional Requirements & Implementation:*
-- [ ] add futures data symbols to database -> `FuturesData.add()`
-- [ ] display futures data usage conditions -> `FuturesData.data_usage_conditions()`
-- [ ] update existing futures historical data with latest session bars -> `FuturesData.update()`
+- [x] add futures data symbols to database -> `FuturesData.add()`
+- [x] display futures data usage conditions -> `FuturesData.data_usage_conditions()`
+- [x] update existing futures historical data with latest session bars -> `FuturesData.update()`
 
 ### Phase 3.5: Custom & Auxiliary Data Series
 
@@ -611,12 +862,13 @@ flowchart TD
 ### Phase 3.6: Post-Processing, Transformations & Exports
 
 #### `DataManagerActions`
-*Feature:* Historical data export, timezone transformation, and quality audit actions
+*Feature:* Historical data export, timezone transformation, timeframe resampling, batch feed updates, and quality audit actions
 *Implementation Files:*
-- **Backend:** `app/workspace/data_manager/actions/review/quality.py`
+- **Backend:** `app/workspace/data_manager/actions/review/quality.py`, `app/workspace/data_manager/actions/transform/transforms.py`
 - **Frontend:** `ui/app/plugins/data_source/Tools/DataToolsModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] clone price data to a specified timezone offset with bar timestamp shifts -> `Actions.clone_to_timezone()`
+- [ ] resample and aggregate lower-timeframe tick/minute series into higher OHLCV timeframes -> `Actions.resample_timeframe()`
 - [ ] export price data to CSV format with custom headers and delimiters -> `Actions.export_to_csv()`
 - [ ] create new CSV export format configurations -> `Actions.new_format()`
 - [ ] export price data to MetaTrader 4 FXT and HST files -> `Actions.export_to_mt4()`
@@ -625,6 +877,7 @@ flowchart TD
 - [ ] display interactive candlestick price chart in data review -> `Actions.review_chart()`
 - [ ] display raw bar table in data review -> `Actions.review_data()`
 - [ ] perform data quality audit and gap analysis across timeframes -> `Actions.quality()`
+- [ ] delete selected symbol datasets, load/save `.dat`/Parquet archives, and trigger batch `update_all()` / `update_selected()` / `br_data_update()` feed refreshes (`DataManagerActions/{delete,load,save,updateAll,updateSelected,brData,brDataUpdate}/module.js`) -> `Actions.batch_manage_data()`
 
 ### Phase 3.7: Monitoring, Shell & UI Support
 
@@ -748,14 +1001,16 @@ flowchart TD
 - [ ] manage active strategy manifest and synchronize with Results databank -> `AppWizard.load_strategy()`
 
 #### `ServletAlgoWizard`
-*Feature:* AlgoWizard visual rule builder canvas API
+*Feature:* AlgoWizard visual rule builder canvas API, 3 editor engines (`internal/web/AlgoWizard`), Custom Blocks (`user/extend/Blocks`), Random Groups, and strategy sharing widget (`internal/web/awShareWidget`)
 *Implementation Files:*
 - **Backend:** `app/workspace/algo_wizard/routes.py`
 - **Frontend:** `ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx`
 *Functional Requirements & Implementation:*
-- [ ] render visual drag-and-drop rule canvas for trading conditions and actions -> `AlgoWizard.render_canvas()`
+- [ ] render visual drag-and-drop rule canvas across all 3 editor modes: **Standard** (multi-tab signals & order routing), **Single-Asset** (streamlined single-chart editor), and **Stockpicker** (cross-sectional universe ranking & rebalance rules) -> `AlgoWizard.render_canvas()`
 - [ ] validate condition node connectivity, operator types, and signal logic -> `AlgoWizard.validate_rules()`
 - [ ] retrieve abstract syntax tree of trading rules for compilation -> `AlgoWizard.get_rule_tree()`
+- [ ] author, save, and reuse user **Custom Blocks** (`user/extend/Blocks`) and **Random Groups** (template placeholders for Builder generation) -> `AlgoWizard.manage_custom_blocks()`
+- [ ] transform legacy/versioned XML strategy rule trees via XSLT bridges and export read-only embeddable strategy rule views (`awShareWidget`) -> `AlgoWizard.export_share_widget()`
 
 #### `ServletBuilder`
 *Feature:* Visual condition tree compiler and strategy structure builder
@@ -918,6 +1173,8 @@ flowchart LR
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for strategy build task -> `BuildTask.simple_settings()`
 - [ ] calibrate indicator parameter ranges for strategy building based on target volatility -> `BuildTask.indicators_calibration()`
+- [ ] execute genetic programming & random strategy generation worker loop across multi-island populations (`population`, `crossover`, `mutation`, `elitism`, `fresh_blood`, `island_migration`, `restart_stagnant`) -> `BuildTask.execute_build()`
+- [ ] evaluate initial backtest, IS/OOS split, and sequential cross-check filter gates before depositing accepted candidates into target databank -> `BuildTask.evaluate_candidate_pipeline()`
 
 ---
 
@@ -972,7 +1229,7 @@ flowchart TD
 - [ ] manage databank column views and customized table layouts -> `DatabankViews.databank_views()`
 
 #### `ResultsDatabankActions`
-*Feature:* Databank command actions and strategy manipulation
+*Feature:* Databank command actions, portfolio routing, synchronization, and batch source-code export
 *Implementation Files:*
 - **Backend:** `app/workspace/results/reports/results_databank_actions.py`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsDatabankActionsView.tsx`
@@ -986,6 +1243,9 @@ flowchart TD
 - [ ] copy selected strategies to Retester workspace -> `DatabankActions.retest()`
 - [ ] run custom analysis script over databank strategies -> `DatabankActions.run_ca()`
 - [ ] set rich-text note for selected strategies -> `DatabankActions.set_note()`
+- [ ] merge Walk-Forward periods (`portfolio/mergeWF`), split portfolio into constituent strategies (`portfolio/split`), or route selected strategies to Portfolio Composer (`portfolio/moveToPC`) and Portfolio Master (`portfolio/moveToPM`) -> `DatabankActions.portfolio_actions()`
+- [ ] open selected strategy in AlgoWizard for visual rule editing (`tools/edit/editStrategy`), select passed/failed strategies (`tools/select/{passed,failed}`), refresh databank, and synchronize folder-backed databanks (`sync/DatabankSyncService.js`) -> `DatabankActions.sync_and_tools()`
+- [ ] batch export databank table to CSV (`save/exportCSV`), save `.sqx` archives (`save/saveToSQ4`), and batch export target-platform source code (`save/sourceCode/{jforex,mc,mt4,mt5,mt5br,ninjaTrader,pseudoCode,xmlStrategy}`) -> `DatabankActions.batch_export_source_code()`
 
 #### `DatabankRename`
 *Feature:* Bulk strategy renaming utility
@@ -1256,23 +1516,26 @@ flowchart TD
 ### Phase 7.7: Source Code Generation, Savers & Loaders
 
 #### `ResultsSourceCode`
-*Feature:* Multi-platform strategy trading code generator and export viewer
+*Feature:* Multi-platform strategy trading code generator, terminal compiler config, and export viewer
 *Implementation Files:*
 - **Backend:** `app/workspace/results/reports/source_code.py`
 - **Frontend:** `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`
 *Functional Requirements & Implementation:*
 - [ ] display generated strategy source code for selected platform -> `SourceCode.source_code()`
 - [ ] guide importing custom indicators to target trading platform -> `SourceCode.custom_indicators()`
+- [ ] configure local MetaTrader 4 / MetaTrader 5 / TradeStation terminal installation paths for direct compilation and deployment (`terminalConfigPopup.html`) -> `SourceCode.terminal_config_popup()`
 - [ ] copy generated source code to clipboard -> `SourceCode.copy_clipboard()`
 - [ ] save strategy code directly to disk (.mq4, .mq5, .cs, .py) -> `SourceCode.save_code()`
 
 #### `ResultsPlugins`
-*Feature:* Custom analysis plugin iframe sandbox
+*Feature:* Custom analysis plugin sandbox (`internal/web/RESULTS2`) and built-in Prop-Firm user plugins (`user/extend/ResultsPlugins`: `Prop analytics`, `Prop Monte Carlo`)
 *Implementation Files:*
-- **Backend:** `app/workspace/results/reports/results_plugins.py`
+- **Backend:** `app/workspace/results/reports/results_plugins.py`, `app/plugins/results_plugins/`
 - **Frontend:** `ui/app/workspace/Results/views/ResultsPluginsView.tsx`
 *Functional Requirements & Implementation:*
-- [ ] display external custom analysis plugin in sandboxed iframe -> `Plugins.plugin_iframe()`
+- [ ] display external custom analysis plugin in sandboxed iframe (`internal/web/RESULTS2`) -> `Plugins.plugin_iframe()`
+- [ ] evaluate prop-firm challenge rules (daily drawdown limit, max trailing/static drawdown, profit target, minimum trading days, consistency score) via `Prop analytics` (`user/extend/ResultsPlugins/Prop analytics`) -> `Plugins.run_prop_analytics()`
+- [ ] simulate prop-firm challenge pass/fail probabilities and payout expectancy across Monte Carlo trade permutations via `Prop Monte Carlo` (`user/extend/ResultsPlugins/Prop Monte Carlo`) -> `Plugins.run_prop_monte_carlo()`
 
 #### `SaverHTML`
 *Feature:* Interactive HTML report exporter with embedded charts and metrics
@@ -1504,6 +1767,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/Retester/retesterClient.ts`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for strategy retest task -> `RetestTask.simple_settings()`
+- [ ] execute primary backtest and ordered cross-check pipeline (What-If -> Higher Precision -> Additional Markets -> Monte Carlo Manipulation -> Monte Carlo Retest -> SPP -> Walk-Forward -> Walk-Forward Matrix -> Sequential Optimization) with early-exit on failed acceptance gate -> `RetestTask.execute_retest()`
 
 #### `TaskAutomaticRetest`
 *Feature:* Worker process for automatic background retesting
@@ -1512,6 +1776,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/Retester/RetesterSettings.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for automatic retest task -> `AutoRetestTask.simple_settings()`
+- [ ] execute automated multi-databank retest sweep with assigned market data and commission profiles -> `AutoRetestTask.execute_auto_retest()`
 
 ---
 
@@ -1562,6 +1827,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/Optimizer/optimizerClient.ts`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for strategy optimization task -> `OptimizeTask.simple_settings()`
+- [ ] execute brute-force Grid search, Genetic optimization, Walk-Forward Optimization (anchored & rolling IS/OOS windows), and Walk-Forward Matrix (`WFM`) 3D neighbourhood robustness evaluation -> `OptimizeTask.execute_optimization()`
 
 ---
 
@@ -1583,11 +1849,12 @@ flowchart TD
 - [ ] trigger neural network training and validation pipeline -> `AppNeuralNetwork.start_training()`
 
 #### `TaskNeuralNetworkTrainer`
-*Feature:* Feature matrix preparation, model training, and validation worker
+*Feature:* Feature matrix preparation, model training, and validation worker (`internal/plugins/TaskNeuralNetworkTrainer`)
 *Implementation Files:*
 - **Backend:** `app/workspace/neural_network/trainer.py`
 - **Frontend:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
 *Functional Requirements & Implementation:*
+- [ ] configure neural network architecture, feature inputs, epochs, and validation splits -> `NNTrainer.simple_settings()`
 - [ ] prepare feature matrix from historical prices and technical indicators -> `NNTrainer.prepare_features()`
 - [ ] train neural network model with PyTorch/Numba -> `NNTrainer.train_model()`
 - [ ] validate out-of-sample prediction accuracy and confusion matrix -> `NNTrainer.evaluate_accuracy()`
@@ -1641,6 +1908,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for portfolio creation task -> `CreatePortfolioTask.simple_settings()`
+- [ ] execute trade list merging, weight scaling, correlation matrix calculation, and blended portfolio equity curve synthesis -> `CreatePortfolioTask.execute_create_portfolio()`
 
 ### Phase 11.2: Automated Portfolio Combination Search (Portfolio Master)
 
@@ -1670,6 +1938,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/PortfolioMaster/portfolioMasterModel.ts`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for automatic portfolio builder task -> `AutoPortfolioTask.simple_settings()`
+- [ ] execute brute-force or genetic portfolio combination search enforcing `CorrelationOf` thresholds, sector/symbol diversification caps, and `PortfolioMasterFitness` ranking -> `AutoPortfolioTask.execute_portfolio_search()`
 
 ---
 
@@ -1769,6 +2038,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/GoToTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for task flow jump/goto task -> `GoToTask.simple_settings()`
+- [ ] evaluate branch conditions (`ProjectCondition*`) and mutate active DAG execution pointer with bounded loop counter -> `GoToTask.execute_goto()`
 
 #### `SettingsGoToTask`
 *Feature:* Conditional jump logic and target task configuration
@@ -1785,6 +2055,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/WaitTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for wait task -> `WaitForTask.simple_settings()`
+- [ ] suspend pipeline execution until timer elapses, scheduled clock time is reached, or target file condition is satisfied -> `WaitForTask.execute_wait()`
 
 #### `SettingsWaitFor`
 *Feature:* Delay time and file condition configuration
@@ -1801,6 +2072,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/StopStartTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for stopping and starting tasks -> `StopAndStartTask.simple_settings()`
+- [ ] stop or start designated project tasks and external processes with lifecycle verification -> `StopAndStartTask.execute_stop_start()`
 
 #### `SettingsStopAndStart`
 *Feature:* External task start/stop configuration
@@ -1817,6 +2089,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/NotifyTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for notification task -> `NotificationTask.simple_settings()`
+- [ ] dispatch email, sound, and UI alerts (`Snippets/SQ/Alerts/*`) and optionally pause project pipeline -> `NotificationTask.execute_notification()`
 
 #### `SettingsNotification`
 *Feature:* Notification alerts and execution pause configuration
@@ -1883,6 +2156,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DataUpdateTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for data updating task -> `UpdateDataTask.simple_settings()`
+- [ ] execute incremental historical bar/tick downloads across configured data providers and refresh Parquet symbol catalogs -> `UpdateDataTask.execute_update_data()`
 
 #### `SettingsUpdateData`
 *Feature:* Automated historical data update settings
@@ -1907,6 +2181,7 @@ flowchart TD
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for loading strategies task -> `LoadFromFilesTask.simple_settings()`
+- [ ] batch parse and import `.sqx`, `.sq4`, and `.sq3` strategy archives from disk into target databank -> `LoadFromFilesTask.execute_load_files()`
 
 #### `SettingsLoadFromFiles`
 *Feature:* File paths and filters for strategy loading settings
@@ -1923,6 +2198,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DatabankClearTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for clearing databanks task -> `ClearDatabanksTask.simple_settings()`
+- [ ] purge strategies from selected project databanks atomically -> `ClearDatabanksTask.execute_clear_databanks()`
 
 #### `SettingsClearDatabanks`
 *Feature:* Databank clearing selection settings
@@ -1939,6 +2215,7 @@ flowchart TD
 - **Frontend:** `ui/app/plugins/databank/DatabankViews.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for filtering task -> `FilteringTask.simple_settings()`
+- [ ] evaluate metric filter conditions, correlation thresholds, and top-N ranking caps to copy/move/delete strategies between databanks -> `FilteringTask.execute_filtering()`
 
 #### `SettingsFiltering`
 *Feature:* Databank filtering conditions and actions settings
@@ -1955,6 +2232,7 @@ flowchart TD
 - **Frontend:** `ui/app/plugins/databank/DatabankToolbar.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for logging databank statistics task -> `LogDatabankStatsTask.simple_settings()`
+- [ ] compute summary quantiles/means across databank columns and append structured records to project log / CSV -> `LogDatabankStatsTask.execute_log_stats()`
 
 #### `SettingsLogDatabankStats`
 *Feature:* Databank statistical logging conditions settings
@@ -1973,6 +2251,7 @@ flowchart TD
 - **Frontend:** `ui/app/plugins/databank/DatabankSaveExports.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for saving strategies task -> `SaveToFilesTask.simple_settings()`
+- [ ] batch export databank strategies to `.sqx` archives, target-platform source code (`.mq4`, `.mq5`, `.txt`, `.cs`, `.java`), and HTML/PDF/CSV reports -> `SaveToFilesTask.execute_save_files()`
 
 #### `SettingsSaveToFiles`
 *Feature:* Strategy file save destinations and formats settings
@@ -1989,6 +2268,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/DeleteFileTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for file deletion task -> `DeleteFileTask.simple_settings()`
+- [ ] delete matching temporary export or strategy files within authorized workspace directories -> `DeleteFileTask.execute_delete_file()`
 
 #### `SettingsDeleteFile`
 *Feature:* File deletion paths and patterns settings
@@ -2007,6 +2287,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/ExternalScriptTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for external script execution task -> `CallScriptTask.simple_settings()`
+- [ ] invoke external script/executable with bounded timeout, environment redaction, and exit-code verification -> `CallScriptTask.execute_external_script()`
 
 #### `SettingsCallExternalScript`
 *Feature:* External executable path and command-line arguments settings
@@ -2023,6 +2304,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for custom analysis task -> `CustomAnalysisTask.simple_settings()`
+- [ ] execute registered `CustomAnalysis` snippet (`Snippets/SQ/CustomAnalysis/*`) over target databank strategies and filter by returned pass/fail flag -> `CustomAnalysisTask.execute_custom_analysis()`
 
 #### `SettingsCustomAnalysis`
 *Feature:* Custom analysis script and databank targets settings
@@ -2039,6 +2321,7 @@ flowchart TD
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/MassConfigTaskModal.tsx`
 *Functional Requirements & Implementation:*
 - [ ] configure simple settings for mass configuration task -> `ApplyMassConfigTask.simple_settings()`
+- [ ] apply shared symbol, timeframe, date-range, spread, commission, or cross-check settings across multiple target tasks in the project -> `ApplyMassConfigTask.execute_mass_config()`
 
 #### `SettingsApplyMassConfig`
 *Feature:* Mass configuration parameters settings
@@ -2052,14 +2335,14 @@ flowchart TD
 
 ## 13. AppGridControl & AppGridTest — Distributed Grid Computing Workspaces
 
-- **Primary Role**: Distributed computation management. Connects local platform instances to remote grid worker nodes to scale heavy genetic builds, Walk-Forward optimizations, and Monte Carlo simulations across clusters of machines.
+- **Primary Role**: Distributed computation management. Connects local platform instances to remote grid worker nodes (`internal/web/BACKTESTNODE` & `internal/web/NODEUPDATER`) to scale heavy genetic builds, Walk-Forward optimizations, and Monte Carlo simulations across clusters of machines.
 - **Dependencies**: AppTaskManager, AppBuilder, AppOptimizer
 - **Outputs / Downstream Role**: Distributed computing cluster management and worker node validation.
 
-### Phase 13.1: Grid Controller & Worker Diagnostics
+### Phase 13.1: Grid Controller, BacktestNode Daemon & Worker Diagnostics
 
 #### `AppGridControl`
-*Feature:* Distributed worker node connection pool and job dispatch coordinator
+*Feature:* Distributed worker node connection pool, job dispatch coordinator, and remote `BacktestNode` / `NodeUpdater` management (`internal/web/BACKTESTNODE`, `internal/web/NODEUPDATER`)
 *Implementation Files:*
 - **Backend:** `app/workspace/grid_control/grid_control.py`
 - **Frontend:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
@@ -2068,6 +2351,7 @@ flowchart TD
 - [ ] partition and dispatch heavy backtest, optimization, and Monte Carlo batches across cluster -> `GridControl.dispatch_batch()`
 - [ ] aggregate remote worker result batches into local SQLite job ledger -> `GridControl.collect_results()`
 - [ ] monitor worker node CPU utilization, memory pressure, and heartbeat latency -> `GridControl.get_cluster_status()`
+- [ ] run standalone headless/UI `BacktestNode` worker daemon (`internal/web/BACKTESTNODE`) and synchronize node runtime/snippet versions via `NodeUpdater` (`internal/web/NODEUPDATER`) -> `GridControl.manage_backtest_node()`
 
 #### `AppGridTest`
 *Feature:* Grid worker node connectivity and throughput test suite
@@ -2136,5 +2420,27 @@ flowchart TD
 - [ ] display live CPU, RAM, and background worker thread telemetry -> `DebugConsole.get_telemetry()`
 - [ ] stream system warning and error logs over WebSocket to Dockview console -> `DebugConsole.stream_system_logs()`
 - [ ] trigger manual garbage collection and memory cache cleanup -> `DebugConsole.clear_caches()`
+
+---
+
+## 17. MTAnalyzer — Standalone MetaTrader Trade Report & Portfolio Analyzer (`internal/web/MTANALYZER`)
+
+- **Primary Role**: Standalone trade-report analysis, money management simulation, portfolio correlation, and Monte Carlo stress-testing application (`internal/web/MTANALYZER`) for external MetaTrader 4 / MetaTrader 5 HTML/CSV account statements and `.sqx` strategy results.
+- **Dependencies**: AppPlatform, Core Libraries & Snippet System (`Sections 1A & 1B`)
+- **Outputs / Downstream Role**: Post-trade account statement diagnostics, position-sizing what-if simulations, and multi-report portfolio blending.
+
+### Phase 17.1: Trade Report Ingestion, Money Management Simulation & Portfolio Analysis
+
+#### `MTAnalyzer`
+*Feature:* External MetaTrader 4 / MetaTrader 5 statement parser, equity/drawdown analytics, money management simulator, and Monte Carlo stress tester (`internal/web/MTANALYZER`)
+*Implementation Files:*
+- **Backend:** `app/workspace/mt_analyzer/analyzer.py`
+- **Frontend:** `ui/app/workspace/MTAnalyzer/MTAnalyzerWorkspace.tsx`
+*Functional Requirements & Implementation:*
+- [ ] import and parse MetaTrader 4 / MetaTrader 5 HTML and CSV account history reports into normalized `TradeRecord` tables -> `MTAnalyzer.import_mt_report()`
+- [ ] compute comprehensive performance overview, equity/underwater drawdown curves, monthly/hourly/weekday PnL heatmaps, and MAE/MFE scatter charts -> `MTAnalyzer.analyze_report()`
+- [ ] simulate alternative position-sizing models (Fixed Lot, Fixed Amount, % Equity Risk, Ryan Jones Fixed Ratio, Kelly Criterion) over imported trade histories -> `MTAnalyzer.simulate_money_management()`
+- [ ] run Monte Carlo trade-order/skip permutations and What-If time/day filters with confidence-level drawdown tables -> `MTAnalyzer.run_monte_carlo()`
+- [ ] combine multiple imported MT4/MT5 reports into a blended portfolio and compute return/drawdown correlation matrices -> `MTAnalyzer.compose_portfolio()`
 
 ---

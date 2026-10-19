@@ -1,7 +1,7 @@
 """Single-bar, Quote, Multi-timeframe, Session, and Heiken Ashi price blocks.
 
 Description:
-    Provides consolidated price building blocks matching StrategyQuant X:
+    Provides consolidated price building blocks for quantitative rules:
     - BarPrice: Single-bar OHLCV queries and vectorized IndicatorSeries.
     - QuotePrice: Bid, Ask, Spread (points), and SpreadInPips calculations.
     - MTFPrice: Multi-timeframe bar resampling (Daily, Weekly, Monthly OHLC).
@@ -46,7 +46,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.utils.price import (
+    from app.services.include.price import (
         BarPrice,
         HeikenAshiPrice,
         MTFPrice,
@@ -64,7 +64,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_price.py --no-cov
+    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
     ```
 """
 

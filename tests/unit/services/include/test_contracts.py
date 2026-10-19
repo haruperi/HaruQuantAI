@@ -499,3 +499,65 @@ def test_zero_shims_and_aliases_invariant() -> None:
         assert sh not in Timeframe.__members__, (
             f"Forbidden shorthand alias on Timeframe: {sh}"
         )
+
+
+def test_no_app_services_utils_module() -> None:
+    """Verify that app.services.utils package is completely removed without shims."""
+    import importlib
+
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.utils")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.utils.actions")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.utils.comparisons")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.utils.functions")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.utils.price")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.services.utils.types")
+
+
+def test_consolidated_include_utility_exports() -> None:
+    """Verify app.services.include exports consolidated utility primitives."""
+    from app.services import include
+
+    expected_symbols = [
+        "Actions",
+        "ActionRecord",
+        "Comparisons",
+        "MAType",
+        "Functions",
+        "BarPrice",
+        "QuotePrice",
+        "MTFPrice",
+        "SessionPrice",
+        "HeikenAshiPrice",
+        "Types",
+        "Variable",
+        "BooleanConstant",
+        "NumberConstant",
+        "is_greater",
+        "crosses_above",
+        "plus",
+        "convert_price_to_pips",
+    ]
+    for sym in expected_symbols:
+        assert hasattr(include, sym), f"Expected symbol {sym} in app.services.include"
+
+
+def test_services_lazy_exports_resolve_from_include() -> None:
+    """Verify app.services lazy exports resolve consolidated primitives."""
+    import app.services as s
+
+    assert s.BarPrice is not None
+    assert s.QuotePrice is not None
+    assert s.MTFPrice is not None
+    assert s.SessionPrice is not None
+    assert s.HeikenAshiPrice is not None
+    assert s.Actions is not None
+    assert s.Comparisons is not None
+    assert s.Functions is not None
+    assert s.Types is not None
+    assert s.Variable is not None

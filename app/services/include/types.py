@@ -1,7 +1,7 @@
-"""StrategyQuant X Other type and variable building blocks reimplementation.
+"""Quantitative type and variable building blocks implementation.
 
 Description:
-    Provides primitive type and variable representations for StrategyQuant X rule
+    Provides primitive type and variable representations for quantitative rule
     evaluation, genetic generation, and trading strategy execution. Implements
     boolean constants, double constants (Number), and strongly typed variable
     containers (BooleanVariable, DoubleVariable, IntVariable). Each building block
@@ -9,8 +9,7 @@ Description:
     1.0 (True) or 0.0 (False), and numeric types evaluate to floating point numbers.
 
 Purpose:
-    FEAT-SERVICES-TYPES: Reimplement primitive type and variable blocks conforming
-    to StrategyQuant X Snippets/SQ/Blocks/Other.
+    FEAT-SERVICES-TYPES: Primitive type and variable blocks for trading rules.
 
 Key Capabilities:
     - FR-SERVICES-TYPES-BOOLEAN: Boolean constant evaluation to 1.0 or 0.0.
@@ -30,7 +29,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.utils.types import (
+    from app.services.include.types import (
         BooleanConstant,
         NumberConstant,
         Types,
@@ -49,7 +48,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_types.py
+    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
     ```
 """
 
@@ -124,7 +123,7 @@ class Variable[T]:
 
 
 class BooleanConstant:
-    """Boolean constant building block matching SQX Boolean.java."""
+    """Boolean constant building block."""
 
     def __init__(self, value: bool = False) -> None:
         """Initialize boolean constant.
@@ -154,7 +153,7 @@ class BooleanConstant:
 
 
 class BooleanVariable:
-    """Boolean variable building block matching SQX BooleanVariable.java."""
+    """Boolean variable building block."""
 
     def __init__(self, variable: Variable[bool] | bool) -> None:
         """Initialize boolean variable block.
@@ -188,7 +187,7 @@ class BooleanVariable:
 
 
 class DoubleVariable:
-    """Double variable building block matching SQX DoubleVariable.java."""
+    """Double variable building block."""
 
     def __init__(self, variable: Variable[float] | float) -> None:
         """Initialize double variable block.
@@ -222,7 +221,7 @@ class DoubleVariable:
 
 
 class IntVariable:
-    """Integer variable building block matching SQX IntVariable.java."""
+    """Integer variable building block."""
 
     def __init__(self, variable: Variable[int] | int) -> None:
         """Initialize integer variable block.
@@ -256,7 +255,7 @@ class IntVariable:
 
 
 class NumberConstant:
-    """Number constant building block matching SQX Number.java."""
+    """Number constant building block."""
 
     def __init__(self, number: float = 0.0) -> None:
         """Initialize number constant block.
@@ -396,7 +395,7 @@ def number_constant(number: float, shift: int = 0) -> float:
 
 
 class Types:
-    """Centralized facade for StrategyQuant X primitive type and variable blocks."""
+    """Centralized facade for primitive type and variable blocks."""
 
     @staticmethod
     def boolean(value: bool = False, shift: int = 0) -> float:

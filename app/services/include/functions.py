@@ -1,7 +1,7 @@
 """Quantitative arithmetic, math, temporal, ranking, and pip conversion blocks.
 
 Description:
-    Provides consolidated function building blocks matching StrategyQuant X:
+    Provides consolidated function building blocks for quantitative rules:
     - Arithmetic operators: Plus, Minus, Multiplication, and Division with
       safe Double.MAX_VALUE ceiling on division by zero.
     - Mathematical primitives: Abs, Round, Exponential, Logarithm, SquareRoot,
@@ -49,7 +49,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.utils.functions import (
+    from app.services.include.functions import (
         convert_price_to_pips,
         get_date,
         get_time,
@@ -65,7 +65,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_functions.py --no-cov
+    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
     ```
 """
 
@@ -77,11 +77,11 @@ from collections.abc import Callable
 from typing import Any
 
 from app.host.logging import get_logger
-from app.services.utils.comparisons import resolve_shift_value
+from app.services.include.comparisons import resolve_shift_value
 
 logger = get_logger(__name__)
 
-SQX_MAX_VALUE: float = 1.7976931348623157e308
+FLOAT_MAX_VALUE: float = 1.7976931348623157e308
 DEFAULT_PIP_SIZE: float = 0.0001
 MIN_RANK_PERIOD: int = 2
 DATE_YEAR_MULTIPLIER: int = 10000
@@ -175,9 +175,9 @@ def multiplication(left: Any, right: Any, shift: int = 0) -> float:
 
 
 def division(left: Any, right: Any, shift: int = 0) -> float:
-    """Evaluate division of two operands matching StrategyQuant X Division.
+    """Evaluate division of two operands.
 
-    When the divisor is 0, returns safe SQX_MAX_VALUE (Double.MAX_VALUE).
+    When the divisor is 0, returns safe FLOAT_MAX_VALUE.
 
     Args:
         left: Dividend operand.
@@ -185,13 +185,13 @@ def division(left: Any, right: Any, shift: int = 0) -> float:
         shift: Historical bar offset.
 
     Returns:
-        Quotient as float, SQX_MAX_VALUE on division by zero, or NaN on invalid input.
+        Quotient as float, FLOAT_MAX_VALUE on division by zero, or NaN on invalid input.
     """
     v1 = resolve_shift_value(left, shift)
     v2 = resolve_shift_value(right, shift)
     if math.isnan(v1) or math.isnan(v2):
         return float("nan")
-    res = v1 / v2 if v2 != 0.0 else SQX_MAX_VALUE
+    res = v1 / v2 if v2 != 0.0 else FLOAT_MAX_VALUE
     logger.debug(
         "FR-SERVICES-FUNCTION-ARITHMETIC: div(shift=%d) %s / %s = %s",
         shift,
@@ -203,7 +203,7 @@ def division(left: Any, right: Any, shift: int = 0) -> float:
 
 
 def abs_val(val: Any, shift: int = 0) -> float:
-    """Calculate absolute value matching SQX Abs.
+    """Calculate absolute value for numeric operand.
 
     Args:
         val: Numeric operand.
@@ -221,7 +221,7 @@ def abs_val(val: Any, shift: int = 0) -> float:
 
 
 def round_to_decimals(val: Any, decimals: int = 5, shift: int = 0) -> float:
-    """Round operand to specified decimal places matching SQX Round.
+    """Round operand to specified decimal places.
 
     Args:
         val: Numeric operand.
@@ -245,7 +245,7 @@ def round_to_decimals(val: Any, decimals: int = 5, shift: int = 0) -> float:
 
 
 def exponential(val: Any, shift: int = 0) -> float:
-    """Calculate natural exponential (e^x) matching SQX Exponential.
+    """Calculate natural exponential (e^x).
 
     Args:
         val: Numeric exponent.
@@ -260,13 +260,13 @@ def exponential(val: Any, shift: int = 0) -> float:
     try:
         res = math.exp(v)
     except OverflowError:
-        res = SQX_MAX_VALUE
+        res = FLOAT_MAX_VALUE
     logger.debug("FR-SERVICES-FUNCTION-MATH: exp(%s) = %s", v, res)
     return res
 
 
 def logarithm(val: Any, shift: int = 0) -> float:
-    """Calculate natural logarithm ln(x) matching SQX Logarithm.
+    """Calculate natural logarithm ln(x).
 
     Args:
         val: Numeric operand (> 0).
@@ -284,7 +284,7 @@ def logarithm(val: Any, shift: int = 0) -> float:
 
 
 def square_root(val: Any, shift: int = 0) -> float:
-    """Calculate square root matching SQX SquareRoot.
+    """Calculate square root of numeric operand.
 
     Args:
         val: Numeric operand (>= 0).
@@ -302,7 +302,7 @@ def square_root(val: Any, shift: int = 0) -> float:
 
 
 def maximum(val1: Any, val2: Any, shift: int = 0) -> float:
-    """Calculate maximum of two operands matching SQX Maximum.
+    """Calculate maximum of two operands.
 
     Args:
         val1: First operand.
@@ -322,7 +322,7 @@ def maximum(val1: Any, val2: Any, shift: int = 0) -> float:
 
 
 def minimum(val1: Any, val2: Any, shift: int = 0) -> float:
-    """Calculate minimum of two operands matching SQX Minimum.
+    """Calculate minimum of two operands.
 
     Args:
         val1: First operand.
@@ -342,7 +342,7 @@ def minimum(val1: Any, val2: Any, shift: int = 0) -> float:
 
 
 def get_date(year: int = 2016, month: int = 1, day: int = 1) -> int:
-    """Encode date as integer YYYYMMDD matching SQX GetDate.
+    """Encode date as integer YYYYMMDD.
 
     Args:
         year: Full calendar year (e.g. 2024).
@@ -364,7 +364,7 @@ def get_date(year: int = 2016, month: int = 1, day: int = 1) -> int:
 
 
 def get_time(hour: int = 0, minute: int = 0, second: int = 0) -> int:
-    """Encode time as integer HHMMSS matching SQX GetTime.
+    """Encode time as integer HHMMSS.
 
     Args:
         hour: Hour number 0..23.
@@ -391,7 +391,7 @@ def indicator_highest(
     nth_value: int = 0,
     shift: int = 0,
 ) -> float:
-    """Extract Nth highest indicator value in a period matching SQX IndicatorHighest.
+    """Extract Nth highest indicator value in a rolling window.
 
     NthValue=0 means highest, 1 means second highest, etc.
 
@@ -439,7 +439,7 @@ def indicator_lowest(
     nth_value: int = 0,
     shift: int = 0,
 ) -> float:
-    """Extract Nth lowest indicator value in a period matching SQX IndicatorLowest.
+    """Extract Nth lowest indicator value in a rolling window.
 
     NthValue=0 means lowest, 1 means second lowest, etc.
 
@@ -524,7 +524,7 @@ def convert_price_to_pips(
     digits: int | None = None,
     pip_size: float | None = None,
 ) -> float:
-    """Convert price difference to pips matching SQX ConvertPriceToPips.
+    """Convert price difference to pips using point resolution.
 
     Example: converts 0.002 to 20 pips for 5-digit quote with point=0.00001.
 
@@ -557,7 +557,7 @@ def convert_pips_to_price(
     digits: int | None = None,
     pip_size: float | None = None,
 ) -> float:
-    """Convert pips to real price level matching SQX ConvertPipsToPrice.
+    """Convert pips to real price level using point resolution.
 
     Example: converts 20 pips to 0.002 for 5-digit quote with point=0.00001.
 
@@ -648,7 +648,7 @@ def custom_function(
     handler: Callable[..., Any] | None = None,
     **kwargs: Any,
 ) -> Any:
-    """Execute custom function matching StrategyQuant X CustomFunction.
+    """Execute registered custom function by identifier.
 
     Args:
         function_name: Identifier of function.
@@ -675,7 +675,7 @@ def custom_function(
 
 
 class Functions:
-    """Consolidated facade for StrategyQuant X functions building blocks."""
+    """Consolidated facade for function building blocks."""
 
     def __init__(
         self,

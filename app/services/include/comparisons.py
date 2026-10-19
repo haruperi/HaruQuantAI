@@ -2,7 +2,7 @@
 
 Description:
     Provides consolidated comparison and rule condition building blocks
-    matching StrategyQuant X:
+    for quantitative trading rules:
     - Arithmetic comparisons: IsGreater, IsLower, IsGreaterOrEqual,
       IsLowerOrEqual, Equals, NotEquals with 6-decimal precision rounding.
     - Crossover comparisons: CrossesAbove, CrossesBelow evaluating historical
@@ -62,7 +62,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.utils.comparisons import (
+    from app.services.include.comparisons import (
         MAType,
         crosses_above,
         is_greater,
@@ -79,7 +79,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_comparisons.py --no-cov
+    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
     ```
 """
 
@@ -102,7 +102,7 @@ MIN_TREND_BARS: int = 2
 
 
 class MAType(IntEnum):
-    """Moving average type selector matching StrategyQuant X."""
+    """Moving average type selector for quantitative indicators."""
 
     SMA = 1
     EMA = 2
@@ -357,7 +357,7 @@ def crosses_above(
 ) -> bool:
     """Evaluate whether left crossed above right between shift + 1 and shift.
 
-    Matches SQX CrossesAbove: Left(1) < Right(1) and Left(0) > Right(0).
+    Matches CrossesAbove: Left(1) < Right(1) and Left(0) > Right(0).
 
     Args:
         left: Left series or callable.
@@ -399,7 +399,7 @@ def crosses_below(
 ) -> bool:
     """Evaluate whether left crossed below right between shift + 1 and shift.
 
-    Matches SQX CrossesBelow: Left(1) > Right(1) and Left(0) < Right(0).
+    Matches CrossesBelow: Left(1) > Right(1) and Left(0) < Right(0).
 
     Args:
         left: Left series or callable.
@@ -442,7 +442,7 @@ def is_rising(
 ) -> bool:
     """Evaluate whether indicator is rising monotonically over a bar window.
 
-    Matches SQX IsRising: walks forward from oldest bar (bars + shift - 1)
+    Matches IsRising: walks forward from oldest bar (bars + shift - 1)
     to shift. Returns False if falling or if equal while not_strict is False.
     Requires at least one strictly rising step.
 
@@ -520,7 +520,7 @@ def is_falling(
 ) -> bool:
     """Evaluate whether indicator is falling monotonically over a bar window.
 
-    Matches SQX IsFalling: walks forward from oldest bar (bars + shift - 1)
+    Matches IsFalling: walks forward from oldest bar (bars + shift - 1)
     to shift. Returns False if rising or if equal while not_strict is False.
     Requires at least one strictly falling step.
 
@@ -600,7 +600,7 @@ def is_greater_count(
 ) -> bool:
     """Evaluate whether left > right remains true across a window of bars.
 
-    Matches SQX IsGreaterCount with 5-decimal rounding precision.
+    Matches IsGreaterCount with 5-decimal rounding precision.
 
     Args:
         left: Left series or callable.
@@ -669,7 +669,7 @@ def is_lower_count(
 ) -> bool:
     """Evaluate whether left < right remains true across a window of bars.
 
-    Matches SQX IsLowerCount with 5-decimal rounding precision.
+    Matches IsLowerCount with 5-decimal rounding precision.
 
     Args:
         left: Left series or callable.
@@ -736,7 +736,7 @@ def is_greater_percentile(
 ) -> bool:
     """Evaluate whether indicator value exceeds percentile rank over past bars.
 
-    Matches SQX IsGreaterPercentil:
+    Matches IsGreaterPercentile:
     count starts at 1, count incremented whenever currVal > prevVal(shift+i).
     percrank = (count / bars) * 100. Returns percrank > round(percentile, 5).
 
@@ -790,7 +790,7 @@ def is_lower_percentile(
 ) -> bool:
     """Evaluate whether indicator value falls below percentile rank over past bars.
 
-    Matches SQX IsLowerPercentil:
+    Matches IsLowerPercentile:
     count starts at 1, count incremented whenever currVal < prevVal(shift+i).
     percrank = (count / bars) * 100. Returns percrank > round(percentile, 5).
 
@@ -841,7 +841,7 @@ def calculate_wma(
     shift: int = 0,
     precision: int = DEFAULT_COMPARISON_PRECISION,
 ) -> float:
-    """Calculate Weighted Moving Average (WMA) matching SQX IndicatorMA.
+    """Calculate Weighted Moving Average (WMA) for indicator series.
 
     Formula: sum(round(Ind[shift+i], 6) * (period - i)) / sum(period - i).
 
@@ -925,7 +925,7 @@ def _calculate_hull(
     shift: int,
     precision: int,
 ) -> float:
-    """Compute Hull Moving Average matching SQX 2*WMA(n/2) - WMA(n)."""
+    """Compute Hull Moving Average via 2*WMA(n/2) - WMA(n)."""
     half_period = max(1, period // 2)
     half_wma = calculate_wma(indicator, half_period, shift, precision)
     full_wma = calculate_wma(indicator, period, shift, precision)
@@ -941,7 +941,7 @@ def calculate_ma(
     shift: int = 0,
     precision: int = DEFAULT_COMPARISON_PRECISION,
 ) -> float:
-    """Calculate Moving Average matching SQX IndicatorMAComparisonBlockAbstract.
+    """Calculate Moving Average for indicator comparison blocks.
 
     Supports:
     - 1: Simple MA (SMA)
@@ -1200,7 +1200,7 @@ def condition_not(condition: bool | float | Callable[[], Any] | Any) -> bool:
 
 
 class Comparisons:
-    """Consolidated facade for evaluating StrategyQuant X comparison blocks."""
+    """Consolidated facade for evaluating quantitative comparison blocks."""
 
     def __init__(
         self,

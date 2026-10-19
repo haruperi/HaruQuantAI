@@ -15,7 +15,7 @@
         "SQX145-EV-000002"
       ],
       "artifact": "docs/dev/evidence/p00-inventory.json",
-      "artifact_sha256": "d2a59ff7695b07014f00b6b5a933fccfe2710536ba2272bc9b064ff2430c557c",
+      "artifact_sha256": "788acaefa63386058d1265df49e0a2a2b8c5f38c26b24c63847c8e41ea142aad",
       "location": "/totals/encrypted_jars",
       "observation_kind": "static",
       "inspection_method": "archive_inventory",
@@ -45,7 +45,7 @@
         "SQX145-EV-000003"
       ],
       "artifact": "docs/dev/evidence/p00-inventory.json",
-      "artifact_sha256": "d2a59ff7695b07014f00b6b5a933fccfe2710536ba2272bc9b064ff2430c557c",
+      "artifact_sha256": "788acaefa63386058d1265df49e0a2a2b8c5f38c26b24c63847c8e41ea142aad",
       "location": "/totals/plugin_directories",
       "observation_kind": "static",
       "inspection_method": "archive_inventory",
@@ -75,7 +75,7 @@
         "SQX145-EV-000004"
       ],
       "artifact": "docs/dev/evidence/p00-inventory.json",
-      "artifact_sha256": "d2a59ff7695b07014f00b6b5a933fccfe2710536ba2272bc9b064ff2430c557c",
+      "artifact_sha256": "788acaefa63386058d1265df49e0a2a2b8c5f38c26b24c63847c8e41ea142aad",
       "location": "/totals/snippet_java_files",
       "observation_kind": "static",
       "inspection_method": "archive_inventory",

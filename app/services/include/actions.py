@@ -1,15 +1,14 @@
-"""StrategyQuant X OtherActions building blocks reimplementation.
+"""Trading rule and annotation action blocks implementation.
 
 Description:
-    Provides side-effect and annotation action blocks for StrategyQuant X rule
+    Provides side-effect and annotation action blocks for trading rule
     execution, backtesting, and live trading operations. Implements variable
     assignment with boolean formula coercion, chart drawing descriptors (down arrow,
     up arrow, vertical line), logging actions (journal and file sinks), and email
     notification dispatching.
 
 Purpose:
-    FEAT-SERVICES-ACTIONS: Reimplement action blocks conforming to StrategyQuant X
-    Snippets/SQ/Blocks/OtherActions.
+    FEAT-SERVICES-ACTIONS: Action blocks for trading rule execution and annotations.
 
 Key Capabilities:
     - FR-SERVICES-ACTION-ASSIGN: Assign variable with boolean coercion.
@@ -36,8 +35,8 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.utils.actions import Actions, assign_variable
-    from app.services.utils.types import Variable
+    from app.services.include.actions import Actions, assign_variable
+    from app.services.include.types import Variable
 
     var = Variable[float]("take_profit", "float", 1.2500)
     Actions.assign(var, 1.2550)
@@ -52,7 +51,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_actions.py
+    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
     ```
 """
 
@@ -65,11 +64,11 @@ from pathlib import Path
 from typing import Any
 
 from app.host.logging import get_logger
-from app.services.utils.types import Variable
+from app.services.include.types import Variable
 
 logger = get_logger(__name__)
 
-# Constants matching SQX Order.NOT_DEFINED
+# Constants matching undefined order status
 ORDER_NOT_DEFINED: float = -1.0
 
 
@@ -98,7 +97,7 @@ class AssignVariableAction:
         Args:
             variable: Target Variable state container.
             value: Value or callable returning a value.
-            is_boolean: Whether to coerce value to boolean per SQX rules.
+            is_boolean: Whether to coerce value to boolean.
         """
         self.variable = variable
         self.value = value
@@ -117,7 +116,7 @@ class AssignVariableAction:
         )
 
         if self.is_boolean:
-            # In SQX: val == 0 || val == Order.NOT_DEFINED (-1) ? false : true
+            # Truthiness: 0 or ORDER_NOT_DEFINED (-1) is False; otherwise True.
             if isinstance(resolved, (int, float)):
                 final_val: Any = resolved not in (0.0, ORDER_NOT_DEFINED)
             else:
@@ -485,7 +484,7 @@ def send_email(
 
 
 class Actions:
-    """Centralized facade for StrategyQuant X action building blocks."""
+    """Centralized facade for action building blocks."""
 
     @staticmethod
     def assign(

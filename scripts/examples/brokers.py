@@ -50,6 +50,7 @@ from app.services.brokers.base import BridgeError
 from app.services.brokers.ctrader import CTraderClient
 from app.services.brokers.metatrader import MetaTraderClient
 from app.services.brokers.simulator import SimulatorClient
+from app.services.include import format_timestamp
 from app.services.include.contracts import (
     SymbolInfo,
     TerminalInfo,
@@ -70,7 +71,6 @@ from app.services.include.trading import (
     Trading,
     TradingBackend,
 )
-from app.services.utils import format_timestamp
 from app.workspace.data_manager import (
     MarketBar,
     MarketTick,
