@@ -2,84 +2,37 @@
 """FastAPI gateway, uniform response middleware, and asynchronous EventBus.
 
 Description:
-    Implements the unified HTTP/REST gateway, ASGI request-correlation and
-    exception-envelope middleware, in-memory multi-channel asynchronous
-    ``EventBus``, Server-Sent Events (SSE) stream generator (``/events``), and
-    bidirectional WebSocket gateway (``/ws``) for the HaruQuantAI host platform.
-
-    Internal workflow:
-        1. ``TransportMiddleware`` intercepts incoming HTTP requests, assigns or
-           preserves ``X-Request-Id``, measures ``X-Response-Time-Ms``, and
-           catches unhandled exceptions into ``StandardResponse.failure(...)``
-           envelopes from ``app.host.response``.
-        2. ``register_transport_exception_handlers`` binds ``HTTPException`` and
-           ``RequestValidationError`` handlers that format all errors into
-           canonical ``StandardResponse`` / ``StandardError`` payloads with
-           structured ``ValidationIssue`` items.
-        3. ``EventBus`` sequences events across core host channels (``jobs``,
-           ``system``, ``logs``, ``databanks``, ``settings.changed``) using
-           monotonic cursors, a bounded ``collections.deque`` ring buffer for
-           cursor replay and gap detection, and bounded ``asyncio.Queue``
-           subscriber queues for slow-consumer isolation.
-        4. ``create_transport_router`` and ``create_host_app`` mount session
-           authentication (``/auth/login``, ``/sessions/me``), shell status
-           (``/status``, ``/readiness``, ``/app-loaded``, ``/about``), SSE
-           (``/events``), event publication/snapshots (``/events/publish``,
-           ``/events/snapshot``, ``/events/channels``), and WebSocket (``/ws``)
-           routes at root, ``/api/v1``, and ``/api/v2``.
-
-    External workflow:
-        - Browser shell components (``ui/app/host/transport.ts``,
-          ``HostConnection.tsx``, ``hostSettings.ts``) authenticate via
-          ``POST /api/v1/auth/login``, verify sessions via
-          ``GET /api/v1/sessions/me``, query ``GET /api/v1/status``, acknowledge
-          boot via ``POST /api/v1/app-loaded``, and subscribe to live updates over
-          ``GET /api/v1/events`` (SSE) or ``WS /api/v1/ws`` (WebSocket).
+    Implements the unified HTTP/REST gateway, request-correlation and exception
+    middleware, multi-channel asynchronous EventBus, Server-Sent Events (/events),
+    and WebSocket gateway (/ws) for the HaruQuantAI host platform.
 
 Purpose:
-    FEAT-HOST-TRANSPORT — Provide the FastAPI gateway, uniform envelope
-    middleware, and asynchronous multi-channel EventBus (SSE & WebSocket).
+    FEAT-HOST-TRANSPORT - FastAPI gateway, envelope middleware, and async EventBus.
 
 Key Capabilities:
-    - FR-HOST-TRANSPORT-MIDDLEWARE: Inject ``X-Request-Id`` correlation and
-      ``X-Response-Time-Ms`` headers and isolate unhandled server exceptions into
-      canonical 500 error envelopes.
-    - FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE: Transform ``HTTPException`` and
-      ``RequestValidationError`` into ``StandardResponse.failure`` envelopes with
-      field-level ``ValidationIssue`` diagnostics.
+    - FR-HOST-TRANSPORT-MIDDLEWARE: Inject X-Request-Id and X-Response-Time-Ms
+      headers and isolate unhandled server exceptions into 500 error envelopes.
+    - FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE: Transform HTTPException and
+      RequestValidationError into StandardResponse.failure envelopes.
     - FR-HOST-TRANSPORT-EVENT-BUS: Publish and subscribe to multi-channel host
-      events (``jobs``, ``system``, ``logs``, ``databanks``,
-      ``settings.changed``) with monotonic cursors, ring-buffer replay, and
-      slow-consumer queue isolation.
+      events with monotonic cursors, ring-buffer replay, and queue isolation.
     - FR-HOST-TRANSPORT-SSE-STREAMING: Stream real-time Server-Sent Events over
-      ``GET /events`` with cursor replay, gap notification, and heartbeats.
+      GET /events with cursor replay, gap notification, and heartbeats.
     - FR-HOST-TRANSPORT-WS-STREAMING: Stream bidirectional JSON events and
-      control frames over ``WebSocket /ws`` with dynamic channel subscriptions.
+      control frames over WebSocket /ws with dynamic channel subscriptions.
     - FR-HOST-TRANSPORT-SESSION-AUTH: Authenticate operator credentials on
-      ``POST /auth/login`` and validate bearer tokens on ``GET /sessions/me``
-      via ``app.host.session.SessionManager``.
+      POST /auth/login and validate bearer tokens on GET /sessions/me.
     - FR-HOST-TRANSPORT-GATEWAY-APP: Assemble the FastAPI host gateway app and
-      shell status endpoints (``/status``, ``/readiness``, ``/app-loaded``,
-      ``/about``) mounted across root, ``/api/v1``, and ``/api/v2``.
-    - FR-HOST-TRANSPORT-CONNECTION-TEST: Validate remote and local endpoint
-      connectivity, measure round-trip latency, and diagnose network/DNS failures.
-    - FR-HOST-TRANSPORT-SERVLET-CONNECTION: REST endpoint router and controller
-      for broker and exchange connection configurations and connectivity checks.
+      shell status endpoints across root, /api/v1, and /api/v2.
+    - FR-HOST-TRANSPORT-CONNECTION-TEST: Validate endpoint connectivity, measure
+      round-trip latency, and diagnose network/DNS failures.
+    - FR-HOST-TRANSPORT-SERVLET-CONNECTION: REST endpoint controller for broker
+      and exchange connection configurations and connectivity checks.
     - FR-HOST-TRANSPORT-SERVLET-CONSTANTS: Expose system constants, runtime
       environment paths, hardware specs, and supported timeframes.
 
 Python API Usage:
-    from app.host.transport import (
-        ConnectionTest,
-        EventBus,
-        ServletConnection,
-        ServletConstants,
-        create_host_app,
-    )
-
-    bus = EventBus()
-    app = create_host_app(event_bus=bus)
-    bus.publish("settings.changed", "update", {"revision": 2})
+    from app.host.transport import EventBus, create_host_app
 
 CLI Usage:
     uv run python -m app.host.transport --test-bus
@@ -98,44 +51,27 @@ import threading
 import time
 import urllib.parse
 from collections import deque
-from collections.abc import AsyncGenerator, Callable, Sequence
+from collections.abc import AsyncGenerator, Sequence
 from contextlib import suppress
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Final
 
+from app.host import resources as _res
+from app.host import session as _sess
 from app.host.logging import get_access_logger, get_logger, redact_secrets
 from app.host.persistence import HostPersistence
-from app.host.resources import (
-    check_memory_headroom,
-    get_system_health,
-    get_worker_capacity,
-    probe_hardware,
-)
 from app.host.response import StandardError, StandardResponse
-from app.host.session import (
-    SessionManager,
-    SessionRecord,
-    session_manager,
-    verify_password,
-)
 from app.host.settings import RevisionConflictError, settings
-from fastapi import (
-    APIRouter,
-    FastAPI,
-    HTTPException,
-    Request,
-    WebSocket,
-    WebSocketDisconnect,
-    status,
-)
+from fastapi import APIRouter, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
+from starlette.websockets import WebSocket, WebSocketDisconnect
 
 __all__ = [
     "ConnectionTest",
@@ -144,6 +80,7 @@ __all__ = [
     "ServletConnection",
     "ServletConstants",
     "SettingsBatchUpdatePayload",
+    "TransportGatewayService",
     "TransportMiddleware",
     "create_host_app",
     "create_transport_router",
@@ -153,176 +90,120 @@ __all__ = [
 logger = get_logger(__name__)
 access_logger = get_access_logger()
 
-CORE_EVENT_CHANNELS: Final[tuple[str, ...]] = (
-    "jobs",
-    "system",
-    "logs",
-    "databanks",
-    "settings.changed",
+type _Chans = Sequence[str] | set[str]
+type _Pld = dict[str, Any]
+type _Resp = JSONResponse
+CORE_EVENT_CHANNELS: Final = ("jobs", "system", "logs", "databanks", "settings.changed")
+SUPPORTED_TIMEFRAMES: Final = ("1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w")
+_P: Final = "FR-HOST-TRANSPORT-"
+FR_MW, FR_EX, FR_BUS = f"{_P}MIDDLEWARE", f"{_P}EXCEPTION-ENVELOPE", f"{_P}EVENT-BUS"
+FR_SSE, FR_WS, FR_AUTH = f"{_P}SSE-STREAMING", f"{_P}WS-STREAMING", f"{_P}SESSION-AUTH"
+FR_APP, CONNECTION_TEST_FR = f"{_P}GATEWAY-APP", f"{_P}CONNECTION-TEST"
+SERVLET_CONNECTION_FR, SERVLET_CONSTANTS_FR = (
+    f"{_P}SERVLET-CONNECTION",
+    f"{_P}SERVLET-CONSTANTS",
 )
-DEFAULT_RING_CAPACITY: Final[int] = 1024
-DEFAULT_MAX_QUEUE_SIZE: Final[int] = 256
-DEFAULT_HEARTBEAT_SEC: Final[float] = 15.0
+_SEC_HEADERS: Final = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+}
+
+
+def _dct(**kw: Any) -> _Pld:
+    return kw
+
+
+def _info(fr_id: str, msg: str) -> None:
+    logger.info("%s: %s", fr_id, msg, extra={"fr_id": fr_id})
+
+
+def _warn(fr_id: str, msg: str) -> None:
+    logger.warning("%s: %s", fr_id, msg, extra={"fr_id": fr_id})
 
 
 def _now_utc_iso() -> str:
-    """Return current UTC timestamp formatted as an ISO-8601 string."""
     return datetime.now(UTC).isoformat()
 
 
 def _format_iso_expiry(expires_at_utc: str) -> str:
-    """Convert ``YYYY-MM-DD HH:MM:SS`` session expiry to ISO-8601 UTC format."""
-    if "T" in expires_at_utc:
-        return expires_at_utc
-    try:
-        dt = datetime.strptime(expires_at_utc, "%Y-%m-%d %H:%M:%S").replace(tzinfo=UTC)
-        return dt.isoformat()
-    except ValueError:
-        return expires_at_utc
+    with suppress(ValueError):
+        if "T" not in expires_at_utc:
+            return (
+                datetime.fromisoformat(expires_at_utc).replace(tzinfo=UTC).isoformat()
+            )
+    return expires_at_utc
 
 
 def extract_bearer_token(
-    auth_header: str | None, query_token: str | None = None
+    auth: str | None, query_token: str | None = None
 ) -> str | None:
     """Extract a bearer token from an ``Authorization`` header or query string."""
-    if auth_header:
-        scheme, _, remainder = auth_header.strip().partition(" ")
+    if auth:
+        scheme, _, remainder = auth.strip().partition(" ")
         if scheme.lower() == "bearer" and remainder.strip():
             return remainder.strip()
-    if query_token and query_token.strip():
-        return query_token.strip()
-    return None
+    return query_token.strip() if query_token and query_token.strip() else None
 
 
-# ============================================================================
-# Transport Exceptions & Pydantic Models
-# ============================================================================
-
-
-class TransportError(Exception):
-    """Base exception for transport-layer failures."""
-
-
-class EventStreamError(TransportError):
-    """Raised when an SSE or WebSocket streaming failure occurs."""
-
-
-class SlowConsumerError(TransportError):
-    """Raised when a subscriber queue overflows."""
-
-
-class ValidationIssue(BaseModel):
-    """Structured field-level validation problem."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    path: str = Field(..., description="Field path that failed validation.")
-    code: str = Field(..., description="Machine-readable issue code.")
-    message: str = Field(..., description="Human-readable validation message.")
-
-
-class LoginRequestPayload(BaseModel):
-    """Credentials payload submitted to ``POST /auth/login``."""
-
-    model_config = ConfigDict(frozen=True, extra="ignore")
-
-    username: str | None = Field(
-        default=None, description="Optional operator username."
+def _ok(req: Request, data: Any, msg: str = "OK", *, fx: bool = False) -> JSONResponse:
+    rid = req.headers.get("x-request-id")
+    r = StandardResponse.success(
+        data=data, message=msg, request_id=rid, side_effects=fx
     )
-    password: str = Field(default="", description="Operator password.")
+    return JSONResponse(status_code=200, content=r.to_dict())
+
+
+def _err(req: Request, sc: int, code: str, msg: str, det: _Pld | None = None) -> _Resp:
+    rid, err = req.headers.get("x-request-id"), StandardError(code, msg, det)
+    r = StandardResponse.failure(msg, err, request_id=rid)
+    return JSONResponse(status_code=sc, content=r.to_dict())
+
+
+async def _jbody(req: Request) -> _Pld:
+    with suppress(ValueError):
+        if isinstance(raw := await req.json(), dict):
+            return raw
+    return {}
+
+
+def _qint(qp: Any, key: str, default: int | None = None) -> int | None:
+    v = qp.get(key)
+    return int(v) if v is not None and str(v).lstrip("-").isdigit() else default
 
 
 class SettingsBatchUpdatePayload(BaseModel):
     """Batch settings update payload submitted to ``PUT /settings``."""
 
-    model_config = ConfigDict(frozen=True, extra="ignore")
-
-    revision: int | None = Field(
-        default=None,
-        description="Expected settings revision for optimistic concurrency check.",
-    )
-    settings: dict[str, dict[str, Any]] = Field(
-        default_factory=dict,
-        description="Nested {scope: {key: value}} settings updates.",
-    )
+    revision: int | None = None
+    settings: dict[str, _Pld] = Field(default_factory=dict)
 
 
 class HostEvent(BaseModel):
     """Discrete, monotonically sequenced event broadcast on the host EventBus."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
-
-    cursor: int = Field(
-        ..., description="Monotonic sequence cursor assigned to this event."
-    )
-    channel: str = Field(
-        ...,
-        description="Target channel topic (e.g., 'jobs', 'settings.changed').",
-    )
-    event_type: str = Field(
-        default="update",
-        description="Event classification slug (e.g., 'update', 'progress').",
-    )
-    timestamp: str = Field(
-        default_factory=_now_utc_iso,
-        description="ISO-8601 UTC timestamp when the event was published.",
-    )
-    payload: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Structured JSON-serializable event payload.",
-    )
+    cursor: int
+    channel: str
+    event_type: str = "update"
+    timestamp: str = Field(default_factory=_now_utc_iso)
+    payload: _Pld = Field(default_factory=dict)
 
 
-class EventSnapshot(BaseModel):
-    """Historical snapshot of retained events for a channel."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    channel: str = Field(..., description="Channel name or '*' wildcard.")
-    newest_cursor: int = Field(
-        ..., description="Highest monotonic cursor published on the bus."
-    )
-    events: list[HostEvent] = Field(
-        default_factory=list, description="Retained events matching the query."
-    )
-    has_gap: bool = Field(
-        default=False,
-        description="True if older events were pruned before since_cursor.",
-    )
-
-
-class PublishEventRequest(BaseModel):
-    """Request payload for ``POST /events/publish``."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    channel: str = Field(..., min_length=1, description="Target channel topic.")
-    event_type: str = Field(
-        default="update", min_length=1, description="Event classification."
-    )
-    payload: dict[str, Any] = Field(
-        default_factory=dict, description="Event payload dictionary."
-    )
-
-
-# ============================================================================
-# Asynchronous Multi-Channel EventBus (FR-HOST-TRANSPORT-EVENT-BUS)
-# ============================================================================
+class _EventSnapshot(BaseModel):
+    channel: str
+    newest_cursor: int
+    events: list[HostEvent] = Field(default_factory=list)
+    has_gap: bool = False
 
 
 class EventBus:
     """In-memory multi-channel pub/sub event bus with monotonic cursors."""
 
-    def __init__(
-        self,
-        ring_capacity: int = DEFAULT_RING_CAPACITY,
-        max_queue_size: int = DEFAULT_MAX_QUEUE_SIZE,
-    ) -> None:
-        """Initialize the EventBus with bounded ring buffer and queue sizes."""
+    def __init__(self, ring_capacity: int = 1024, max_queue_size: int = 256) -> None:
         self.ring_capacity = max(1, ring_capacity)
         self.max_queue_size = max(1, max_queue_size)
-        self._lock = threading.RLock()
-        self._cursor_seq: int = 0
+        self._lock, self._cursor_seq = threading.RLock(), 0
         self._ring: deque[HostEvent] = deque(maxlen=self.ring_capacity)
         self._subscribers: dict[str, tuple[set[str], asyncio.Queue[HostEvent]]] = {}
         self._channels: set[str] = set(CORE_EVENT_CHANNELS)
@@ -345,57 +226,31 @@ class EventBus:
         self,
         channel: str,
         event_type: str = "update",
-        payload: dict[str, Any] | None = None,
+        payload: _Pld | None = None,
         timestamp: str | None = None,
     ) -> HostEvent:
         """Publish an event to matching subscribers and append to the ring buffer."""
         with self._lock:
             self._cursor_seq += 1
-            cursor = self._cursor_seq
-            self._channels.add(channel)
-            event = HostEvent(
-                cursor=cursor,
-                channel=channel,
-                event_type=event_type,
-                timestamp=timestamp or _now_utc_iso(),
-                payload=dict(payload) if payload else {},
-            )
-            self._ring.append(event)
-            active_subscribers = [
-                (sub_id, set(chans), queue)
-                for sub_id, (chans, queue) in self._subscribers.items()
-            ]
-            for sub_id, chans, queue in active_subscribers:
-                if "*" in chans or channel in chans:
-                    self._schedule_delivery(sub_id, queue, event)
-
-        logger.debug(
-            "FR-HOST-TRANSPORT-EVENT-BUS: Published cursor=%d channel='%s' "
-            "type='%s' (subscribers=%d).",
-            cursor,
-            channel,
-            event_type,
-            len(active_subscribers),
-            extra={"fr_id": "FR-HOST-TRANSPORT-EVENT-BUS"},
-        )
-
-        return event
+            c, ch, et = self._cursor_seq, channel, event_type
+            self._channels.add(ch)
+            ts, p = timestamp or _now_utc_iso(), dict(payload or {})
+            ev = HostEvent(cursor=c, channel=ch, event_type=et, timestamp=ts, payload=p)
+            self._ring.append(ev)
+            for sid, (chans, q) in list(self._subscribers.items()):
+                if "*" in chans or ch in chans:
+                    self._schedule_delivery(sid, q, ev)
+        logger.debug("%s: Published %s on %s", FR_BUS, c, ch, extra={"fr_id": FR_BUS})
+        return ev
 
     def _schedule_delivery(
         self, sub_id: str, queue: asyncio.Queue[HostEvent], event: HostEvent
     ) -> None:
-        """Bound pending callbacks and deliver on the subscriber's owning loop."""
         pending = self._pending_deliveries.get(sub_id, 0)
         if queue.qsize() + pending >= queue.maxsize:
-            logger.warning(
-                "FR-HOST-TRANSPORT-EVENT-BUS: Dropped cursor=%d for slow subscriber %s",
-                event.cursor,
-                sub_id,
-                extra={"fr_id": "FR-HOST-TRANSPORT-EVENT-BUS"},
-            )
+            _warn(FR_BUS, f"Dropped cursor={event.cursor} for slow {sub_id}")
             return
-        loop = self._subscriber_loops.get(sub_id)
-        if loop is None:
+        if (loop := self._subscriber_loops.get(sub_id)) is None:
             queue.put_nowait(event)
             return
         if loop.is_closed():
@@ -405,136 +260,80 @@ class EventBus:
             loop.call_soon_threadsafe(self._deliver_event, sub_id, queue, event)
         except RuntimeError:
             self._pending_deliveries[sub_id] -= 1
-            logger.warning(
-                "FR-HOST-TRANSPORT-EVENT-BUS: Subscriber loop closed during delivery",
-                extra={"fr_id": "FR-HOST-TRANSPORT-EVENT-BUS"},
-            )
+            _warn(FR_BUS, "Subscriber loop closed during delivery")
 
     def _deliver_event(
         self, sub_id: str, queue: asyncio.Queue[HostEvent], event: HostEvent
     ) -> None:
-        """Execute queue operations on the owning event loop only."""
         with self._lock:
-            if sub_id not in self._subscribers:
-                return
-            self._pending_deliveries[sub_id] -= 1
-            queue.put_nowait(event)
+            if sub_id in self._subscribers:
+                self._pending_deliveries[sub_id] -= 1
+                queue.put_nowait(event)
 
     def subscribe(
         self,
-        channels: Sequence[str] | set[str] | None = None,
+        channels: _Chans | None = None,
         since_cursor: int | None = None,
         max_queue_size: int | None = None,
     ) -> tuple[str, asyncio.Queue[HostEvent], list[HostEvent], bool]:
         """Subscribe to channels with optional replay from ``since_cursor``."""
-        chan_set = set(channels) if channels else {"*"}
-        queue_size = max_queue_size or self.max_queue_size
-        queue: asyncio.Queue[HostEvent] = asyncio.Queue(maxsize=queue_size)
-        sub_id = f"sub-{secrets.token_hex(8)}"
-
-        replay_events: list[HostEvent] = []
-        has_gap = False
-
-        with self._lock:
-            for ch in chan_set:
-                if ch != "*":
-                    self._channels.add(ch)
-
-            if since_cursor is not None and since_cursor >= 0 and self._ring:
-                oldest_cursor = self._ring[0].cursor
-                if since_cursor < oldest_cursor - 1:
-                    has_gap = True
-                replay_events.extend(
-                    ev
-                    for ev in self._ring
-                    if ev.cursor > since_cursor
-                    and ("*" in chan_set or ev.channel in chan_set)
-                )
-
-            self._subscribers[sub_id] = (chan_set, queue)
-            self._pending_deliveries[sub_id] = 0
-            try:
-                self._subscriber_loops[sub_id] = asyncio.get_running_loop()
-            except RuntimeError:
-                # Synchronous replay/test subscribers have no event-loop owner.
-                self._subscriber_loops.pop(sub_id, None)
-
-        logger.info(
-            "FR-HOST-TRANSPORT-EVENT-BUS: Registered subscriber '%s' "
-            "channels=%s replay=%d gap=%s.",
-            sub_id,
-            sorted(chan_set),
-            len(replay_events),
-            has_gap,
-            extra={"fr_id": "FR-HOST-TRANSPORT-EVENT-BUS"},
+        chans = set(channels) if channels else {"*"}
+        q: asyncio.Queue[HostEvent] = asyncio.Queue(
+            maxsize=max_queue_size or self.max_queue_size
         )
-        return sub_id, queue, replay_events, has_gap
+        sub_id, replay, gap = f"sub-{secrets.token_hex(8)}", [], False
+        with self._lock:
+            self._channels.update(ch for ch in chans if ch != "*")
+            if since_cursor is not None and since_cursor >= 0 and self._ring:
+                gap = since_cursor < self._ring[0].cursor - 1
+                replay = [
+                    e
+                    for e in self._ring
+                    if e.cursor > since_cursor and ("*" in chans or e.channel in chans)
+                ]
+            self._subscribers[sub_id] = (chans, q)
+            self._pending_deliveries[sub_id] = 0
+            with suppress(RuntimeError):
+                self._subscriber_loops[sub_id] = asyncio.get_running_loop()
+        _info(FR_BUS, f"Subscribed {sub_id} replay={len(replay)} gap={gap}.")
+        return sub_id, q, replay, gap
 
-    def update_subscription(
-        self, subscriber_id: str, channels: Sequence[str] | set[str]
-    ) -> bool:
+    def update_subscription(self, subscriber_id: str, channels: _Chans) -> bool:
         """Update the channel set for an active subscriber."""
         with self._lock:
-            entry = self._subscribers.get(subscriber_id)
-            if entry is None:
+            if (entry := self._subscribers.get(subscriber_id)) is None:
                 return False
-            _, queue = entry
-            new_chans = set(channels) if channels else {"*"}
-            for ch in new_chans:
-                if ch != "*":
-                    self._channels.add(ch)
-            self._subscribers[subscriber_id] = (new_chans, queue)
-        logger.info(
-            "FR-HOST-TRANSPORT-EVENT-BUS: Updated subscriber '%s' channels=%s.",
-            subscriber_id,
-            sorted(new_chans),
-            extra={"fr_id": "FR-HOST-TRANSPORT-EVENT-BUS"},
-        )
+            chans = set(channels) if channels else {"*"}
+            self._channels.update(ch for ch in chans if ch != "*")
+            self._subscribers[subscriber_id] = (chans, entry[1])
+        _info(FR_BUS, f"Updated subscriber '{subscriber_id}' channels={sorted(chans)}.")
         return True
 
     def unsubscribe(self, subscriber_id: str) -> None:
         """Remove a subscriber queue from the EventBus."""
         with self._lock:
-            removed = self._subscribers.pop(subscriber_id, None)
             self._subscriber_loops.pop(subscriber_id, None)
             self._pending_deliveries.pop(subscriber_id, None)
-        if removed is not None:
-            logger.info(
-                "FR-HOST-TRANSPORT-EVENT-BUS: Unsubscribed '%s'.",
-                subscriber_id,
-                extra={"fr_id": "FR-HOST-TRANSPORT-EVENT-BUS"},
-            )
+            if self._subscribers.pop(subscriber_id, None) is not None:
+                _info(FR_BUS, f"Unsubscribed '{subscriber_id}'.")
 
     def get_snapshot(
-        self,
-        channel: str = "*",
-        since_cursor: int | None = None,
-        limit: int = 100,
-    ) -> EventSnapshot:
+        self, channel: str = "*", since_cursor: int | None = None, limit: int = 100
+    ) -> _EventSnapshot:
         """Return retained historical events for ``channel``."""
-        bounded_limit = max(1, min(limit, self.ring_capacity))
+        cap = max(1, min(limit, self.ring_capacity))
         with self._lock:
-            newest = self._cursor_seq
-            events: list[HostEvent] = []
-            has_gap = False
-            if self._ring:
-                oldest = self._ring[0].cursor
-                if since_cursor is not None and since_cursor < oldest - 1:
-                    has_gap = True
-                events.extend(
-                    ev
-                    for ev in self._ring
-                    if channel in ("*", ev.channel)
-                    and (since_cursor is None or ev.cursor > since_cursor)
-                )
-            retained = (
-                events[-bounded_limit:] if len(events) > bounded_limit else events
-            )
-            return EventSnapshot(
-                channel=channel,
-                newest_cursor=newest,
-                events=retained,
-                has_gap=has_gap,
+            r0 = self._ring[0].cursor - 1 if self._ring else -1
+            gap = bool(self._ring and since_cursor is not None and since_cursor < r0)
+            evs = [
+                e
+                for e in self._ring
+                if channel in ("*", e.channel)
+                and (since_cursor is None or e.cursor > since_cursor)
+            ]
+            ret, nc = (evs[-cap:] if len(evs) > cap else evs), self._cursor_seq
+            return _EventSnapshot(
+                channel=channel, newest_cursor=nc, events=ret, has_gap=gap
             )
 
     def clear(self) -> None:
@@ -546,34 +345,22 @@ class EventBus:
             self._pending_deliveries.clear()
 
 
-@dataclass
-class _GlobalTransportState:
-    event_bus: EventBus | None = None
-
-
-_GLOBAL_STATE = _GlobalTransportState()
+_BUS_CACHE: list[EventBus] = []
 _GLOBAL_LOCK = threading.Lock()
 
 
 def get_global_event_bus() -> EventBus:
     """Return the lazily initialized global host ``EventBus``."""
-    if _GLOBAL_STATE.event_bus is None:
-        with _GLOBAL_LOCK:
-            if _GLOBAL_STATE.event_bus is None:
-                _GLOBAL_STATE.event_bus = EventBus()
-    return _GLOBAL_STATE.event_bus
-
-
-# ============================================================================
-# ASGI Middleware & Exception Envelopes
-# ============================================================================
+    with _GLOBAL_LOCK:
+        if not _BUS_CACHE:
+            _BUS_CACHE.append(EventBus())
+        return _BUS_CACHE[0]
 
 
 class TransportMiddleware:
     """ASGI middleware injecting ``X-Request-Id`` and ``X-Response-Time-Ms``."""
 
     def __init__(self, app: ASGIApp) -> None:
-        """Initialize the middleware around ``app``."""
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
@@ -581,437 +368,148 @@ class TransportMiddleware:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
-
-        request = Request(scope, receive=receive)
-        req_id = request.headers.get("x-request-id", "").strip()
-        if not req_id:
-            req_id = f"req-{int(time.time() * 1000)}-{secrets.token_hex(4)}"
-
-        start_time = time.perf_counter()
+        req, t0 = Request(scope, receive=receive), time.perf_counter()
+        rid = (
+            req.headers.get("x-request-id", "").strip()
+            or f"req-{int(time.time() * 1000)}-{secrets.token_hex(4)}"
+        )
 
         async def _send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":
-                duration_ms = (time.perf_counter() - start_time) * 1000.0
-                headers = MutableHeaders(scope=message)
-                headers["X-Request-Id"] = req_id
-                headers["X-Response-Time-Ms"] = f"{duration_ms:.2f}"
-                headers["X-Content-Type-Options"] = "nosniff"
-                headers["X-Frame-Options"] = "DENY"
-                headers["Referrer-Policy"] = "no-referrer"
+                dur = (time.perf_counter() - t0) * 1000.0
+                hdrs = MutableHeaders(scope=message)
+                hdrs["X-Request-Id"], hdrs["X-Response-Time-Ms"] = rid, f"{dur:.2f}"
+                for k, v in _SEC_HEADERS.items():
+                    hdrs[k] = v
             await send(message)
 
         try:
             await self.app(scope, receive, _send_wrapper)
-            duration_ms = (time.perf_counter() - start_time) * 1000.0
-            access_logger.info(
-                "FR-HOST-TRANSPORT-MIDDLEWARE: HTTP %s %s completed in %.2fms "
-                "(req_id=%s).",
-                request.method,
-                request.url.path,
-                duration_ms,
-                req_id,
-                extra={"fr_id": "FR-HOST-TRANSPORT-MIDDLEWARE"},
-            )
+            dur = (time.perf_counter() - t0) * 1000.0
+            m = f"{FR_MW}: HTTP {req.method} {req.url.path} in {dur:.2f}ms ({rid})."
+            access_logger.info(m, extra={"fr_id": FR_MW})
         except Exception as exc:
-            duration_ms = (time.perf_counter() - start_time) * 1000.0
-            logger.exception(
-                "FR-HOST-TRANSPORT-MIDDLEWARE: Unhandled exception on %s %s "
-                "(req_id=%s)",
-                request.method,
-                request.url.path,
-                req_id,
-                extra={"fr_id": "FR-HOST-TRANSPORT-MIDDLEWARE"},
+            dur = (time.perf_counter() - t0) * 1000.0
+            m = f"{FR_MW}: Unhandled exception on {req.method} {req.url.path}"
+            logger.exception(m, extra={"fr_id": FR_MW})
+            msg = str(exc) or "Internal server error occurred."
+            det = {"exception_type": type(exc).__name__}
+            err = StandardError(code="INTERNAL_SERVER_ERROR", message=msg, details=det)
+            r = StandardResponse.failure("Error.", err, request_id=rid, duration_ms=dur)
+            h = {
+                "X-Request-Id": rid,
+                "X-Response-Time-Ms": f"{dur:.2f}",
+                **_SEC_HEADERS,
+            }
+            await JSONResponse(status_code=500, content=r.to_dict(), headers=h)(
+                scope, receive, send
             )
-            err = StandardError(
-                code="INTERNAL_SERVER_ERROR",
-                message=str(exc) or "Internal server error occurred.",
-                details={"exception_type": type(exc).__name__},
-            )
-            resp = StandardResponse.failure(
-                message="Internal server error.",
-                error=err,
-                request_id=req_id,
-                duration_ms=duration_ms,
-            )
-            response = JSONResponse(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content=resp.to_dict(),
-                headers={
-                    "X-Request-Id": req_id,
-                    "X-Response-Time-Ms": f"{duration_ms:.2f}",
-                    "X-Content-Type-Options": "nosniff",
-                    "X-Frame-Options": "DENY",
-                    "Referrer-Policy": "no-referrer",
-                },
-            )
-            await response(scope, receive, send)
 
 
 def register_transport_exception_handlers(app: FastAPI) -> None:
     """Register ``HTTPException`` and ``RequestValidationError`` envelope handlers."""
-    logger.info(
-        "FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE: Registered transport exception "
-        "handlers on FastAPI app.",
-        extra={"fr_id": "FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE"},
-    )
+    _info(FR_EX, "Registered transport exception handlers on FastAPI app.")
 
     @app.exception_handler(HTTPException)
-    async def _http_exception_handler(
-        request: Request, exc: HTTPException
-    ) -> JSONResponse:
-        req_id = request.headers.get("x-request-id") or f"req-{int(time.time() * 1000)}"
-        raw_detail: Any = exc.detail
-        detail_msg = (
-            raw_detail if isinstance(raw_detail, str) else json.dumps(raw_detail)
-        )
-        detail_dict: dict[str, Any] | None = (
-            raw_detail if isinstance(raw_detail, dict) else None
-        )
-        err = StandardError(
-            code=f"HTTP_{exc.status_code}",
-            message=detail_msg or f"HTTP {exc.status_code}",
-            details=detail_dict,
-        )
-        resp = StandardResponse.failure(
-            message=err.message,
-            error=err,
-            request_id=req_id,
-        )
-        logger.warning(
-            "FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE: HTTPException %d on %s: %s",
-            exc.status_code,
-            request.url.path,
-            err.message,
-            extra={"fr_id": "FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE"},
-        )
-        return JSONResponse(status_code=exc.status_code, content=resp.to_dict())
+    async def _http_exc(request: Request, exc: HTTPException) -> JSONResponse:
+        raw: Any = exc.detail
+        sc, msg = exc.status_code, (raw if isinstance(raw, str) else json.dumps(raw))
+        det = raw if isinstance(raw, dict) else None
+        _warn(FR_EX, f"HTTPException {sc} on {request.url.path}")
+        return _err(request, sc, f"HTTP_{sc}", msg or f"HTTP {sc}", det)
 
     @app.exception_handler(RequestValidationError)
-    async def _validation_exception_handler(
-        request: Request, exc: RequestValidationError
-    ) -> JSONResponse:
-        req_id = request.headers.get("x-request-id") or f"req-{int(time.time() * 1000)}"
+    async def _val_exc(request: Request, exc: RequestValidationError) -> JSONResponse:
         issues = [
-            ValidationIssue(
-                path=".".join(str(p) for p in item.get("loc", [])),
-                code=str(item.get("type", "value_error")),
-                message=str(item.get("msg", "Validation error")),
-            ).model_dump()
-            for item in exc.errors()
-        ]
-        err = StandardError(
-            code="VALIDATION_ERROR",
-            message="Request validation failed.",
-            details={"issues": issues},
-        )
-        resp = StandardResponse.failure(
-            message="Request validation failed.",
-            error=err,
-            request_id=req_id,
-        )
-        payload = resp.to_dict()
-        if isinstance(payload.get("error"), dict):
-            payload["error"]["issues"] = issues
-        logger.warning(
-            "FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE: RequestValidationError on %s "
-            "(%d issues).",
-            request.url.path,
-            len(issues),
-            extra={"fr_id": "FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE"},
-        )
-        return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            content=payload,
-        )
-
-
-# ============================================================================
-# SSE & WebSocket Streaming Generators
-# ============================================================================
-
-
-def _format_sse_event(ev: HostEvent) -> str:
-    """Format a ``HostEvent`` into an SSE wire frame."""
-    return f"id: {ev.cursor}\nevent: {ev.channel}\ndata: {ev.model_dump_json()}\n\n"
-
-
-def _build_gap_sse_frame() -> str:
-    """Return a formatted SSE ``system.gap`` notification frame."""
-    gap_frame = {
-        "channel": "system",
-        "event_type": "gap",
-        "message": "Event history gap detected; resynchronize state.",
-    }
-    return f"event: system.gap\ndata: {json.dumps(gap_frame)}\n\n"
-
-
-async def sse_event_generator(
-    event_bus: EventBus,
-    channels: Sequence[str],
-    since_cursor: int | None,
-    request: Request,
-    *,
-    heartbeat_interval_sec: float = DEFAULT_HEARTBEAT_SEC,
-    limit: int | None = None,
-    session_valid: Callable[[], bool] | None = None,
-) -> AsyncGenerator[str]:
-    """Generate Server-Sent Events (SSE) frames for a connected client."""
-    sub_id, queue, replay_events, has_gap = event_bus.subscribe(
-        channels=channels,
-        since_cursor=since_cursor,
-    )
-    logger.info(
-        "FR-HOST-TRANSPORT-SSE-STREAMING: SSE client connected "
-        "(sub_id=%s channels=%s).",
-        sub_id,
-        list(channels),
-        extra={"fr_id": "FR-HOST-TRANSPORT-SSE-STREAMING"},
-    )
-
-    yielded = 0
-    try:
-        if has_gap:
-            yield _build_gap_sse_frame()
-
-        for ev in replay_events:
-            if not _is_session_ok(session_valid):
-                return
-            yield _format_sse_event(ev)
-            yielded += 1
-            if _limit_reached(yielded, limit):
-                return
-
-        while await _can_continue_sse(request, session_valid):
-            frame, did_yield = await _next_sse_frame(
-                queue, heartbeat_interval_sec, session_valid
+            _dct(
+                path=".".join(str(p) for p in i.get("loc", [])),
+                code=str(i.get("type", "value_error")),
+                message=str(i.get("msg", "Validation error")),
             )
-            if frame is None:
-                break
-            yield frame
-            yielded += 1 if did_yield else 0
-            if _limit_reached(yielded, limit):
-                break
-    except asyncio.CancelledError:
-        pass
-    finally:
-        event_bus.unsubscribe(sub_id)
-        logger.info(
-            "FR-HOST-TRANSPORT-SSE-STREAMING: SSE client disconnected (sub_id=%s).",
-            sub_id,
-            extra={"fr_id": "FR-HOST-TRANSPORT-SSE-STREAMING"},
+            for i in exc.errors()
+        ]
+        res = _err(
+            request, 422, "VALIDATION_ERROR", "Validation error.", {"issues": issues}
         )
-
-
-def _is_session_ok(session_valid: Callable[[], bool] | None) -> bool:
-    """Return True if no session callback is configured or it evaluates True."""
-    return session_valid is None or session_valid()
-
-
-def _limit_reached(yielded: int, limit: int | None) -> bool:
-    """Return True if an optional event stream limit has been reached."""
-    return limit is not None and yielded >= limit
-
-
-async def _can_continue_sse(
-    request: Request, session_valid: Callable[[], bool] | None
-) -> bool:
-    """Return True if SSE session remains valid and client is still connected."""
-    if session_valid is not None and not session_valid():
-        return False
-    return not await request.is_disconnected()
-
-
-async def _next_sse_frame(
-    queue: asyncio.Queue[HostEvent],
-    heartbeat_interval_sec: float,
-    session_valid: Callable[[], bool] | None,
-) -> tuple[str | None, bool]:
-    """Wait for the next ``HostEvent`` or emit an SSE heartbeat comment."""
-    try:
-        ev = await asyncio.wait_for(queue.get(), timeout=heartbeat_interval_sec)
-    except TimeoutError:
-        return ": heartbeat\n\n", False
-    if session_valid is not None and not session_valid():
-        return None, False
-    return _format_sse_event(ev), True
+        payload = json.loads(bytes(res.body).decode("utf-8"))
+        payload["error"]["issues"] = issues
+        _warn(FR_EX, f"ValidationError on {request.url.path} ({len(issues)} issues).")
+        return JSONResponse(status_code=422, content=payload)
 
 
 def _parse_channels_param(raw_channels: str | None) -> list[str]:
-    """Parse a comma-separated ``channels`` query parameter."""
     if not raw_channels or not raw_channels.strip():
         return ["*"]
-    parsed = [c.strip() for c in raw_channels.split(",") if c.strip()]
-    return parsed or ["*"]
+    return [c.strip() for c in raw_channels.split(",") if c.strip()] or ["*"]
 
 
-def _resolve_since_cursor(
-    since_cursor: int | None, last_event_id: str | None
-) -> int | None:
-    """Resolve ``since_cursor`` from query param or ``Last-Event-ID`` header."""
-    if since_cursor is not None:
-        return since_cursor
-    if last_event_id and last_event_id.strip().isdigit():
-        return int(last_event_id.strip())
-    return None
-
-
-# ============================================================================
-# Platform Connectivity & Infrastructure Servlets (Phase 1.2 / 1.4)
-# ============================================================================
-
-CONNECTION_TEST_FR: Final[str] = "FR-HOST-TRANSPORT-CONNECTION-TEST"
-SERVLET_CONNECTION_FR: Final[str] = "FR-HOST-TRANSPORT-SERVLET-CONNECTION"
-SERVLET_CONSTANTS_FR: Final[str] = "FR-HOST-TRANSPORT-SERVLET-CONSTANTS"
-
-SUPPORTED_TIMEFRAMES: Final[tuple[str, ...]] = (
-    "1m",
-    "5m",
-    "15m",
-    "30m",
-    "1h",
-    "4h",
-    "1d",
-    "1w",
-)
+def _resolve_since_cursor(cur: int | None, last_id: str | None) -> int | None:
+    if cur is not None:
+        return cur
+    return int(s) if last_id and (s := last_id.strip()).isdigit() else None
 
 
 class ConnectionTest:
     """Network reachability, latency probe, and socket diagnostic utility."""
 
     @staticmethod
-    def ping_endpoint(endpoint: str, timeout: float = 3.0) -> dict[str, Any]:
+    def ping_endpoint(endpoint: str, timeout: float = 3.0) -> _Pld:
         """Ping remote or local server endpoint to verify network connectivity."""
-        raw_endpoint = endpoint.strip()
-        parsed = urllib.parse.urlparse(
-            raw_endpoint if "://" in raw_endpoint else f"tcp://{raw_endpoint}"
-        )
-        host = parsed.hostname or raw_endpoint
-        port = parsed.port or (443 if parsed.scheme == "https" else 80)
-
-        start = time.perf_counter()
+        raw = endpoint.strip()
+        p = urllib.parse.urlparse(raw if "://" in raw else f"tcp://{raw}")
+        host, port = p.hostname or raw, p.port or (443 if p.scheme == "https" else 80)
+        t0, ok, err_str = time.perf_counter(), False, None
         try:
             with socket.create_connection((host, port), timeout=timeout):
-                latency_ms = (time.perf_counter() - start) * 1000.0
-                logger.info(
-                    "%s: Endpoint %s is reachable (latency=%.2fms).",
-                    CONNECTION_TEST_FR,
-                    raw_endpoint,
-                    latency_ms,
-                    extra={"fr_id": CONNECTION_TEST_FR, "endpoint": raw_endpoint},
-                )
-                return {
-                    "endpoint": raw_endpoint,
-                    "host": host,
-                    "port": port,
-                    "reachable": True,
-                    "latency_ms": round(latency_ms, 2),
-                    "error": None,
-                }
+                ok = True
         except OSError as err:
-            latency_ms = (time.perf_counter() - start) * 1000.0
-            logger.warning(
-                "%s: Endpoint %s is unreachable: %s",
-                CONNECTION_TEST_FR,
-                raw_endpoint,
-                err,
-                extra={
-                    "fr_id": CONNECTION_TEST_FR,
-                    "endpoint": raw_endpoint,
-                    "error": str(err),
-                },
-            )
-            return {
-                "endpoint": raw_endpoint,
-                "host": host,
-                "port": port,
-                "reachable": False,
-                "latency_ms": round(latency_ms, 2),
-                "error": str(err),
-            }
+            err_str = str(err)
+        lat = round((time.perf_counter() - t0) * 1000.0, 2)
+        if ok:
+            _info(CONNECTION_TEST_FR, f"Endpoint {raw} reachable ({lat:.2f}ms).")
+        else:
+            _warn(CONNECTION_TEST_FR, f"Endpoint {raw} unreachable: {err_str}")
+        d = _dct(endpoint=raw, host=host, port=port, reachable=ok)
+        return {**d, "latency_ms": lat, "error": err_str}
 
     @staticmethod
-    def check_latency(
-        endpoint: str, samples: int = 3, timeout: float = 3.0
-    ) -> dict[str, Any]:
+    def check_latency(endpoint: str, samples: int = 3, timeout: float = 3.0) -> _Pld:
         """Measure round-trip latency across multiple samples and report packet loss."""
-        num_samples = max(1, min(samples, 10))
-        latencies: list[float] = []
-        failures = 0
-        for _ in range(num_samples):
-            res = ConnectionTest.ping_endpoint(endpoint, timeout=timeout)
-            if res["reachable"]:
-                latencies.append(float(res["latency_ms"]))
-            else:
-                failures += 1
-
-        packet_loss_pct = (failures / num_samples) * 100.0
-        avg_lat = sum(latencies) / len(latencies) if latencies else 0.0
-        min_lat = min(latencies) if latencies else 0.0
-        max_lat = max(latencies) if latencies else 0.0
-
-        logger.info(
-            "%s: Latency check on %s: avg=%.2fms loss=%.1f%%.",
-            CONNECTION_TEST_FR,
-            endpoint,
-            avg_lat,
-            packet_loss_pct,
-            extra={"fr_id": CONNECTION_TEST_FR, "endpoint": endpoint},
-        )
-        return {
-            "endpoint": endpoint,
-            "samples": num_samples,
-            "packet_loss_pct": round(packet_loss_pct, 2),
-            "avg_latency_ms": round(avg_lat, 2),
-            "min_latency_ms": round(min_lat, 2),
-            "max_latency_ms": round(max_lat, 2),
-            "successful_samples": len(latencies),
-        }
+        num = max(1, min(samples, 10))
+        probes = [ConnectionTest.ping_endpoint(endpoint, timeout) for _ in range(num)]
+        lats = [float(r["latency_ms"]) for r in probes if r["reachable"]]
+        loss = round(((num - len(lats)) / num) * 100.0, 2)
+        avg = round(sum(lats) / len(lats), 2) if lats else 0.0
+        mn, mx = (round(min(lats), 2), round(max(lats), 2)) if lats else (0.0, 0.0)
+        _info(CONNECTION_TEST_FR, f"Latency {endpoint}: avg={avg:.2f}ms loss={loss}%.")
+        d = _dct(endpoint=endpoint, samples=num, packet_loss_pct=loss)
+        d |= _dct(avg_latency_ms=avg, min_latency_ms=mn, max_latency_ms=mx)
+        return {**d, "successful_samples": len(lats)}
 
     @staticmethod
-    def diagnose_network(host: str, port: int | None = None) -> dict[str, Any]:
+    def diagnose_network(host: str, port: int | None = None) -> _Pld:
         """Diagnose DNS resolution and socket connection parameters."""
-        resolved_ips: list[str] = []
-        dns_ok = False
-        dns_error: str | None = None
-
+        ips: list[str] = []
+        dns_ok, dns_err, p_port = False, None, port or 80
         try:
-            addr_info = socket.getaddrinfo(host, port or 80, proto=socket.IPPROTO_TCP)
-            for item in addr_info:
-                ip = item[4][0]
-                if str(ip) not in resolved_ips:
-                    resolved_ips.append(str(ip))
+            for item in socket.getaddrinfo(host, p_port, proto=socket.IPPROTO_TCP):
+                if (ip := str(item[4][0])) not in ips:
+                    ips.append(ip)
             dns_ok = True
         except (socket.gaierror, OSError) as err:
-            dns_error = str(err)
-
-        probe_port = port or 80
-        reachable = False
-        reach_err: str | None = None
-        if dns_ok and resolved_ips:
+            dns_err = str(err)
+        ok, r_err = False, None
+        if dns_ok and ips:
             try:
-                with socket.create_connection(
-                    (resolved_ips[0], probe_port), timeout=2.0
-                ):
-                    reachable = True
+                with socket.create_connection((ips[0], p_port), timeout=2.0):
+                    ok = True
             except OSError as err:
-                reach_err = str(err)
-
-        logger.info(
-            "%s: Network diagnostic for host=%s: dns=%s reachable=%s.",
-            CONNECTION_TEST_FR,
-            host,
-            dns_ok,
-            reachable,
-            extra={"fr_id": CONNECTION_TEST_FR, "host": host},
-        )
+                r_err = str(err)
+        _info(CONNECTION_TEST_FR, f"Diagnosed {host}: dns={dns_ok} reachable={ok}.")
+        d = _dct(host=host, port=p_port, dns_resolved=dns_ok, reachable=ok)
         return {
-            "host": host,
-            "port": probe_port,
-            "dns_resolved": dns_ok,
-            "ip_addresses": resolved_ips,
-            "reachable": reachable,
-            "dns_error": dns_error,
-            "connection_error": reach_err,
+            **d,
+            **_dct(ip_addresses=ips, dns_error=dns_err, connection_error=r_err),
         }
 
 
@@ -1019,1189 +517,480 @@ class ServletConnection:
     """REST endpoint handler for broker and exchange connection configurations."""
 
     def __init__(self, host_settings: Any = None) -> None:
-        """Initialize ServletConnection with optional settings container."""
         self.settings = host_settings or settings
-        self._in_memory_connections: dict[str, dict[str, Any]] = {}
+        self._in_memory_connections: dict[str, _Pld] = {}
 
-    def list_connections(self) -> list[dict[str, Any]]:
+    def list_connections(self) -> list[_Pld]:
         """List existing broker and exchange connections."""
-        conns: dict[str, Any] = {}
-        try:
-            scope_data = self.settings.get_scope("connections")
-            if isinstance(scope_data, dict):
-                conns.update(scope_data)
-        except AttributeError, KeyError, RuntimeError:
-            pass
+        conns: _Pld = {}
+        with suppress(AttributeError, KeyError, RuntimeError):
+            if isinstance(scope := self.settings.get_scope("connections"), dict):
+                conns.update(scope)
         conns.update(self._in_memory_connections)
-        records: list[dict[str, Any]] = []
-        for cid, cdata in conns.items():
-            if isinstance(cdata, dict):
-                item = dict(cdata)
-                item.setdefault("connection_id", cid)
-                records.append(redact_secrets(item))
-            else:
-                records.append({"connection_id": cid, "value": cdata})
-        logger.info(
-            "%s: Listed %d connections.",
-            SERVLET_CONNECTION_FR,
-            len(records),
-            extra={"fr_id": SERVLET_CONNECTION_FR, "count": len(records)},
-        )
-        return records
+        recs = [
+            redact_secrets({"connection_id": cid, **cd})
+            if isinstance(cd, dict)
+            else _dct(connection_id=cid, value=cd)
+            for cid, cd in conns.items()
+        ]
+        _info(SERVLET_CONNECTION_FR, f"Listed {len(recs)} connections.")
+        return recs
 
-    def save_connection(
-        self, connection_id: str, data: dict[str, Any]
-    ) -> dict[str, Any]:
+    def save_connection(self, connection_id: str, data: _Pld) -> _Pld:
         """Save or update connection credentials in host settings."""
-        record = dict(data)
-        record["connection_id"] = connection_id
-        record["updated_at_utc"] = _now_utc_iso()
+        rec = {**data, "connection_id": connection_id, "updated_at_utc": _now_utc_iso()}
         try:
-            self.settings.update_batch({"connections": {connection_id: record}})
+            self.settings.update_batch({"connections": {connection_id: rec}})
         except RevisionConflictError, RuntimeError, ValueError:
             if hasattr(self.settings, "set_in_memory"):
-                self.settings.set_in_memory("connections", connection_id, record)
-        self._in_memory_connections[connection_id] = record
-        logger.info(
-            "%s: Saved connection '%s'.",
-            SERVLET_CONNECTION_FR,
-            connection_id,
-            extra={"fr_id": SERVLET_CONNECTION_FR, "connection_id": connection_id},
-        )
-        redacted = redact_secrets(record)
-        return dict(redacted) if isinstance(redacted, dict) else record
+                self.settings.set_in_memory("connections", connection_id, rec)
+        self._in_memory_connections[connection_id] = rec
+        _info(SERVLET_CONNECTION_FR, f"Saved connection '{connection_id}'.")
+        redacted = redact_secrets(rec)
+        return dict(redacted) if isinstance(redacted, dict) else rec
 
     def delete_connection(self, connection_id: str) -> bool:
         """Delete connection configuration and cached tokens."""
         existed = False
-        try:
-            scope = self.settings.get_scope("connections")
-            if connection_id in scope:
+        with suppress(RevisionConflictError, RuntimeError, ValueError):
+            if connection_id in self.settings.get_scope("connections"):
                 existed = True
                 self.settings.update_batch({"connections": {connection_id: {}}})
-        except RevisionConflictError, RuntimeError, ValueError:
-            pass
         if connection_id in self._in_memory_connections:
             existed = True
             del self._in_memory_connections[connection_id]
-        logger.info(
-            "%s: Deleted connection '%s' (existed=%s).",
-            SERVLET_CONNECTION_FR,
-            connection_id,
-            existed,
-            extra={"fr_id": SERVLET_CONNECTION_FR, "connection_id": connection_id},
-        )
+        _info(SERVLET_CONNECTION_FR, f"Deleted '{connection_id}' (existed={existed}).")
         return existed
 
     def test_connection(
         self, connection_id: str | None = None, endpoint: str | None = None
-    ) -> dict[str, Any]:
+    ) -> _Pld:
         """Test connection credentials and report latency status."""
-        target_endpoint = endpoint
-        if not target_endpoint and connection_id:
-            conns = self.list_connections()
-            for c in conns:
+        if not endpoint and connection_id:
+            for c in self.list_connections():
                 if c.get("connection_id") == connection_id:
-                    target_endpoint = c.get("endpoint") or c.get("host")
+                    endpoint = c.get("endpoint") or c.get("host")
                     break
-        if not target_endpoint:
-            target_endpoint = "127.0.0.1"
-
-        result = ConnectionTest.ping_endpoint(str(target_endpoint))
-        logger.info(
-            "%s: Tested connection (id=%s endpoint=%s reachable=%s).",
-            SERVLET_CONNECTION_FR,
-            connection_id,
-            target_endpoint,
-            result["reachable"],
-            extra={"fr_id": SERVLET_CONNECTION_FR, "connection_id": connection_id},
-        )
-        return {
-            "connection_id": connection_id,
-            "endpoint": target_endpoint,
-            "test_result": result,
-            "timestamp": _now_utc_iso(),
-        }
+        target = str(endpoint or "127.0.0.1")
+        res = ConnectionTest.ping_endpoint(target)
+        _info(SERVLET_CONNECTION_FR, f"Tested connection '{connection_id}' ({target}).")
+        d = _dct(connection_id=connection_id, endpoint=target, test_result=res)
+        return {**d, "timestamp": _now_utc_iso()}
 
 
 class ServletConstants:
     """System constants, environment paths, and runtime metadata endpoints."""
 
-    def __init__(
-        self,
-        session_mgr: SessionManager | None = None,
-        resource_mgr: Any | None = None,
-    ) -> None:
-        """Initialize ServletConstants with session and resource managers."""
-        self.session_mgr = session_mgr or session_manager
+    def __init__(self, session_mgr: Any = None, resource_mgr: Any = None) -> None:
+        self.session_mgr = session_mgr or _sess.session_manager
         self.resource_mgr = resource_mgr
 
-    def get_constants(self) -> dict[str, Any]:
+    def get_constants(self) -> _Pld:
         """Expose application version, build timestamp, and runtime paths."""
-        data = {
-            "application": "HaruQuantAI",
-            "version": "1.0.0",
-            "build_timestamp": "2026-10-18T00:00:00Z",
-            "runtime": f"CPython {sys.version.split()[0]} (FastAPI)",
-            "host_instance_id": self.session_mgr.host_instance_id,
-            "data_directory": str(Path.cwd() / "data"),
-            "core_channels": list(CORE_EVENT_CHANNELS),
-            "supported_timeframes": list(SUPPORTED_TIMEFRAMES),
-        }
-        logger.info(
-            "%s: Retrieved system constants.",
-            SERVLET_CONSTANTS_FR,
-            extra={"fr_id": SERVLET_CONSTANTS_FR},
+        _info(SERVLET_CONSTANTS_FR, "Retrieved system constants.")
+        rt = f"CPython {sys.version.split()[0]} (FastAPI)"
+        hid = self.session_mgr.host_instance_id
+        d = _dct(application="HaruQuantAI", version="1.0.0", runtime=rt)
+        d |= _dct(host_instance_id=hid, build_timestamp="2026-10-18T00:00:00Z")
+        d |= _dct(
+            data_directory=str(Path.cwd() / "data"),
+            core_channels=list(CORE_EVENT_CHANNELS),
         )
-        return data
+        return {**d, "supported_timeframes": list(SUPPORTED_TIMEFRAMES)}
 
-    def get_system_specs(self) -> dict[str, Any]:
+    def get_system_specs(self) -> _Pld:
         """Serve system resource limits, concurrency specs, and supported timeframes."""
-        cpu_count = max(1, os.cpu_count() or 1)
-        specs: dict[str, Any] = {
-            "cpu_cores": cpu_count,
-            "hardware_concurrency": cpu_count,
-            "supported_timeframes": list(SUPPORTED_TIMEFRAMES),
-            "memory_headroom": check_memory_headroom(),
-            "worker_capacity": get_worker_capacity(),
-            "system_health": get_system_health(),
-        }
-        logger.info(
-            "%s: Retrieved system specs (cores=%d).",
-            SERVLET_CONSTANTS_FR,
-            cpu_count,
-            extra={"fr_id": SERVLET_CONSTANTS_FR, "cpu_cores": cpu_count},
-        )
-        return specs
-
-
-# ============================================================================
-# Transport Service & FastAPI Router (FR-HOST-TRANSPORT-GATEWAY-APP)
-# ============================================================================
+        cpus = max(1, os.cpu_count() or 1)
+        _info(SERVLET_CONSTANTS_FR, f"Retrieved system specs (cores={cpus}).")
+        d = _dct(cpu_cores=cpus, hardware_concurrency=cpus)
+        d["supported_timeframes"] = list(SUPPORTED_TIMEFRAMES)
+        d["memory_headroom"] = _res.check_memory_headroom()
+        d["worker_capacity"] = _res.get_worker_capacity()
+        d["system_health"] = _res.get_system_health()
+        return d
 
 
 class TransportGatewayService:
     """Coordinates session auth, shell status, SSE, and WebSocket endpoints."""
 
-    def __init__(
-        self,
-        *,
-        event_bus: EventBus | None = None,
-        session_mgr: SessionManager | None = None,
-        resource_mgr: Any | None = None,
-        job_mgr: Any | None = None,
-        password_hash: str | None = None,
-        require_auth: bool = False,
-        heartbeat_sec: float = DEFAULT_HEARTBEAT_SEC,
-    ) -> None:
-        """Initialize the transport gateway service."""
-        self.event_bus = event_bus if event_bus is not None else get_global_event_bus()
-        self.session_mgr = session_mgr if session_mgr is not None else session_manager
-        self.resource_mgr = resource_mgr
-        self.job_mgr = job_mgr
-        self.password_hash = password_hash
-        self.require_auth = require_auth
-        self.heartbeat_sec = heartbeat_sec
-        self.started_at = time.monotonic()
-        self.app_loaded_acknowledged = False
-        self.connection_servlet = ServletConnection(host_settings=settings)
-        self.constants_servlet = ServletConstants(
-            session_mgr=self.session_mgr, resource_mgr=self.resource_mgr
+    def __init__(self, **kw: Any) -> None:
+        self.event_bus: EventBus = kw.get("event_bus") or get_global_event_bus()
+        self.session_mgr: _sess.SessionManager = (
+            kw.get("session_mgr") or _sess.session_manager
         )
+        self.resource_mgr, self.job_mgr = kw.get("resource_mgr"), kw.get("job_mgr")
+        self.password_hash: str | None = kw.get("password_hash")
+        self.require_auth: bool = bool(kw.get("require_auth", False))
+        self.heartbeat_sec: float = float(kw.get("heartbeat_sec", 15.0))
+        self.started_at, self.app_loaded_acknowledged = time.monotonic(), False
+        self.connection_servlet = ServletConnection(host_settings=settings)
+        self.constants_servlet = ServletConstants(self.session_mgr, self.resource_mgr)
 
-    def verify_request_session(
-        self, request: Request, query_token: str | None = None
-    ) -> SessionRecord | None:
-        """Validate bearer token from request headers or query parameters."""
-        token = extract_bearer_token(request.headers.get("authorization"), query_token)
-        if token is None:
-            return None
-        return self.session_mgr.validate_token(token)
+    def _verify_session(self, req: Request, qtok: str | None = None) -> Any:
+        token = extract_bearer_token(req.headers.get("authorization"), qtok)
+        return self.session_mgr.validate_token(token) if token is not None else None
 
     def _check_password(self, candidate_password: str) -> bool:
-        """Verify ``candidate_password`` against configured or DB password hash."""
-        configured_hash = self.password_hash
-        if configured_hash is None:
+        cfg = self.password_hash
+        if cfg is None:
             db_hash = settings.get("user_access", "password_hash", None)
             if isinstance(db_hash, str) and "$" in db_hash:
-                configured_hash = db_hash
+                cfg = db_hash
+        return _sess.verify_password(candidate_password, cfg) if cfg else True
 
-        if configured_hash is not None:
-            return verify_password(candidate_password, configured_hash)
-        return True
+    async def _auth_route(self, request: Request) -> JSONResponse:
+        if request.method == "GET":
+            if (rec := self._verify_session(request)) is None:
+                _warn(FR_AUTH, "Unauthorized /sessions/me call.")
+                return _err(
+                    request, 401, "UNAUTHORIZED", "Valid session token required."
+                )
+            _info(FR_AUTH, f"Verified active session '{rec.session_id}'.")
+            d = {**rec.to_dict(), "expires_at": _format_iso_expiry(rec.expires_at_utc)}
+            return _ok(request, d, "Active session verified.")
+        body = await _jbody(request)
+        peer = request.client.host if request.client else "127.0.0.1"
+        if not self._check_password(str(body.get("password") or "")):
+            _warn(FR_AUTH, f"Rejected login attempt from {peer}.")
+            return _err(request, 401, "INVALID_CREDENTIALS", "Invalid host password.")
+        def_u = str(settings.get("user_access", "username", "haruquantai") or "admin")
+        u = str(body.get("username") or "").strip() or def_u
+        tok, rec = self.session_mgr.create_session(username=u, peer_id=peer)
+        _info(FR_AUTH, f"Issued session '{rec.session_id}' for '{rec.username}'.")
+        exp = _format_iso_expiry(rec.expires_at_utc)
+        d = _dct(token=tok, expires_at=exp, session_id=rec.session_id)
+        return _ok(request, {**d, "username": rec.username}, "Authenticated.", fx=True)
 
-    async def handle_login(
-        self, payload: LoginRequestPayload, request: Request
-    ) -> JSONResponse:
-        """Authenticate operator credentials and issue a 24h session token."""
-        req_id = request.headers.get("x-request-id")
-        if not self._check_password(payload.password):
-            logger.warning(
-                "FR-HOST-TRANSPORT-SESSION-AUTH: Rejected login attempt from %s.",
-                request.client.host if request.client else "unknown",
-                extra={"fr_id": "FR-HOST-TRANSPORT-SESSION-AUTH"},
+    async def _meta(self, request: Request) -> JSONResponse:
+        p, eb, hid = request.url.path, self.event_bus, self.session_mgr.host_instance_id
+        fx = False
+        if p.endswith("/app-loaded"):
+            if self.require_auth and self._verify_session(request) is None:
+                return _err(request, 401, "UNAUTHORIZED", "Active session required.")
+            self.app_loaded_acknowledged, fx = True, True
+            eb.publish("system", "app_loaded", {"host_instance_id": hid})
+            _info(FR_APP, f"Browser shell /app-loaded acknowledged (host={hid}).")
+            data: Any = _dct(acknowledged=True, host_instance_id=hid)
+        elif p.endswith("/publish"):
+            b, fx = await _jbody(request), True
+            ch, et = (
+                str(b.get("channel") or "system"),
+                str(b.get("event_type") or "update"),
             )
-            err = StandardError(
-                code="INVALID_CREDENTIALS",
-                message="Invalid host password.",
+            pld = b["payload"] if isinstance(b.get("payload"), dict) else {}
+            data = eb.publish(ch, et, pld).model_dump()
+        elif p.endswith(("/about", "/constants")):
+            data = self.constants_servlet.get_constants()
+        elif p.endswith("/specs"):
+            data = self.constants_servlet.get_system_specs()
+        elif p.endswith("/channels"):
+            d = _dct(
+                core_channels=list(CORE_EVENT_CHANNELS), active_channels=eb.channels
             )
-            resp = StandardResponse.failure(
-                message="Authentication failed.",
-                error=err,
-                request_id=req_id,
-            )
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content=resp.to_dict(),
-            )
-
-        default_user = str(
-            settings.get("user_access", "username", "haruquantai") or "haruquantai"
-        )
-        username = (
-            payload.username.strip()
-            if payload.username and payload.username.strip()
-            else default_user
-        )
-        peer_id = request.client.host if request.client else "127.0.0.1"
-        raw_token, record = self.session_mgr.create_session(
-            username=username, peer_id=peer_id
-        )
-        logger.info(
-            "FR-HOST-TRANSPORT-SESSION-AUTH: Issued session '%s' for user '%s'.",
-            record.session_id,
-            record.username,
-            extra={"fr_id": "FR-HOST-TRANSPORT-SESSION-AUTH"},
-        )
-        ok_resp = StandardResponse.success(
-            data={
-                "token": raw_token,
-                "expires_at": _format_iso_expiry(record.expires_at_utc),
-                "session_id": record.session_id,
-                "username": record.username,
-            },
-            message="Session authenticated.",
-            request_id=req_id,
-            side_effects=True,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
-
-    async def handle_session_me(self, request: Request) -> JSONResponse:
-        """Validate the caller's bearer token and return session metadata."""
-        req_id = request.headers.get("x-request-id")
-        record = self.verify_request_session(request)
-        if record is None:
-            logger.warning(
-                "FR-HOST-TRANSPORT-SESSION-AUTH: Unauthorized /sessions/me call.",
-                extra={"fr_id": "FR-HOST-TRANSPORT-SESSION-AUTH"},
-            )
-            err = StandardError(
-                code="UNAUTHORIZED",
-                message="A valid active host session token is required.",
-            )
-            resp = StandardResponse.failure(
-                message="Session validation failed.",
-                error=err,
-                request_id=req_id,
-            )
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content=resp.to_dict(),
-            )
-
-        logger.info(
-            "FR-HOST-TRANSPORT-SESSION-AUTH: Verified active session '%s'.",
-            record.session_id,
-            extra={"fr_id": "FR-HOST-TRANSPORT-SESSION-AUTH"},
-        )
-        data = record.to_dict()
-        data["expires_at"] = _format_iso_expiry(record.expires_at_utc)
-        ok_resp = StandardResponse.success(
-            data=data,
-            message="Active session verified.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
-
-    async def handle_status(self, request: Request) -> JSONResponse:
-        """Return host status, CPU core count, and runtime instance metadata."""
-        req_id = request.headers.get("x-request-id")
-        uptime = max(0.0, time.monotonic() - self.started_at)
-        resp = StandardResponse.success(
-            data={
-                "state": "READY",
-                "is_ready": True,
-                "host_instance_id": self.session_mgr.host_instance_id,
-                "cpu_count": max(1, os.cpu_count() or 1),
-                "uptime_seconds": round(uptime, 3),
-                "version": "1.0.0",
+            data = {**d, "current_cursor": eb.current_cursor}
+        elif p.endswith("/snapshot"):
+            qp = request.query_params
+            ch, cur = qp.get("channel", "*"), _qint(qp, "since_cursor")
+            data = eb.get_snapshot(ch, cur, _qint(qp, "limit", 100) or 100).model_dump()
+        else:
+            up = round(max(0.0, time.monotonic() - self.started_at), 3)
+            d = _dct(state="READY", is_ready=True, version="1.0.0", uptime_seconds=up)
+            d |= _dct(cpu_count=max(1, os.cpu_count() or 1), host_instance_id=hid)
+            data = {
+                **d,
                 "app_loaded": self.app_loaded_acknowledged,
-            },
-            message="Host status retrieved.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_readiness(self, request: Request) -> JSONResponse:
-        """Return host readiness probe assessment."""
-        req_id = request.headers.get("x-request-id")
-        uptime = max(0.0, time.monotonic() - self.started_at)
-        resp = StandardResponse.success(
-            data={
-                "state": "READY",
-                "is_ready": True,
-                "host_instance_id": self.session_mgr.host_instance_id,
-                "uptime_seconds": round(uptime, 3),
-                "channels": self.event_bus.channels,
-            },
-            message="Host is ready.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_app_loaded(self, request: Request) -> JSONResponse:
-        """Acknowledge browser shell startup completion."""
-        req_id = request.headers.get("x-request-id")
-        if self.require_auth and self.verify_request_session(request) is None:
-            err = StandardError(
-                code="UNAUTHORIZED",
-                message="Active session required for /app-loaded.",
-            )
-            resp = StandardResponse.failure(
-                message="Unauthorized.", error=err, request_id=req_id
-            )
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content=resp.to_dict(),
-            )
-
-        self.app_loaded_acknowledged = True
-        self.event_bus.publish(
-            channel="system",
-            event_type="app_loaded",
-            payload={"host_instance_id": self.session_mgr.host_instance_id},
-        )
-        logger.info(
-            "FR-HOST-TRANSPORT-GATEWAY-APP: Browser shell /app-loaded "
-            "acknowledged (host=%s).",
-            self.session_mgr.host_instance_id,
-            extra={"fr_id": "FR-HOST-TRANSPORT-GATEWAY-APP"},
-        )
-        ok_resp = StandardResponse.success(
-            data={
-                "acknowledged": True,
-                "host_instance_id": self.session_mgr.host_instance_id,
-            },
-            message="Application load acknowledged.",
-            request_id=req_id,
-            side_effects=True,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
-
-    async def handle_about(self, request: Request) -> JSONResponse:
-        """Return application identity and clean-room architecture metadata."""
-        req_id = request.headers.get("x-request-id")
-        resp = StandardResponse.success(
-            data={
-                "application": "HaruQuantAI",
-                "version": "1.0.0",
-                "runtime": f"CPython {sys.version.split()[0]} (FastAPI)",
-                "host_instance_id": self.session_mgr.host_instance_id,
-                "core_channels": list(CORE_EVENT_CHANNELS),
-            },
-            message="About metadata retrieved.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+                "channels": eb.channels,
+            }
+        return _ok(request, data, fx=fx)
 
     def _require_scope(self, request: Request, scope: str) -> JSONResponse | None:
-        """Enforce configured authentication and capability scope before access."""
         if not self.require_auth:
             return None
-        session = self.verify_request_session(request)
-        if session is not None and self.session_mgr.authorize(session, scope):
+        sess = self._verify_session(request)
+        if sess is not None and self.session_mgr.authorize(sess, scope):
             return None
-        code = "UNAUTHORIZED" if session is None else "FORBIDDEN"
-        response = StandardResponse.failure(
-            message="Access denied.",
-            error=StandardError(
-                code=code, message="Active authorized session required."
-            ),
-            request_id=request.headers.get("x-request-id"),
-        )
-        return JSONResponse(
-            status_code=401 if session is None else 403, content=response.to_dict()
-        )
+        sc, code = (401, "UNAUTHORIZED") if sess is None else (403, "FORBIDDEN")
+        return _err(request, sc, code, "Active authorized session required.")
 
-    async def handle_get_settings(self, request: Request) -> JSONResponse:
-        """Return redacted host settings snapshot and current revision."""
-        req_id = request.headers.get("x-request-id")
-        denied = self._require_scope(request, "settings:read")
-        if denied is not None:
+    async def _settings_route(self, request: Request) -> JSONResponse:
+        is_put = request.method == "PUT"
+        scope = "settings:write" if is_put else "settings:read"
+        if (denied := self._require_scope(request, scope)) is not None:
             return denied
-
-        redacted = redact_secrets(settings.as_dict())
-        ok_resp = StandardResponse.success(
-            data={
-                "revision": settings.revision,
-                "settings": redacted,
-            },
-            message="Host settings retrieved.",
-            request_id=req_id,
+        if is_put:
+            b = SettingsBatchUpdatePayload.model_validate(await _jbody(request))
+            try:
+                rev = settings.update_batch(b.settings, expected_revision=b.revision)
+            except RevisionConflictError as exc:
+                _warn(FR_APP, f"Settings revision conflict: {exc}")
+                det = _dct(
+                    expected_revision=exc.expected_revision,
+                    current_revision=exc.current_revision,
+                )
+                return _err(request, 409, "REVISION_CONFLICT", str(exc), det)
+            pld = _dct(revision=rev, scopes=sorted(b.settings.keys()))
+            self.event_bus.publish("settings.changed", "updated", pld)
+        s_dict = redact_secrets(settings.as_dict())
+        return _ok(
+            request, _dct(revision=settings.revision, settings=s_dict), fx=is_put
         )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
 
-    async def handle_put_settings(
-        self, payload: SettingsBatchUpdatePayload, request: Request
-    ) -> JSONResponse:
-        """Atomically update batch settings with revision conflict checking."""
-        req_id = request.headers.get("x-request-id")
-        denied = self._require_scope(request, "settings:write")
-        if denied is not None:
-            return denied
-
-        try:
-            new_rev = settings.update_batch(
-                payload.settings,
-                expected_revision=payload.revision,
-            )
-        except RevisionConflictError as exc:
-            logger.warning(
-                "FR-HOST-TRANSPORT-GATEWAY-APP: Settings revision conflict "
-                "(expected=%s current=%d).",
-                exc.expected_revision,
-                exc.current_revision,
-                extra={"fr_id": "FR-HOST-TRANSPORT-GATEWAY-APP"},
-            )
-            conflict_err = StandardError(
-                code="REVISION_CONFLICT",
-                message=str(exc),
-                details={
-                    "expected_revision": exc.expected_revision,
-                    "current_revision": exc.current_revision,
-                },
-            )
-            conflict_resp = StandardResponse.failure(
-                message="Settings revision conflict.",
-                error=conflict_err,
-                request_id=req_id,
-            )
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content=conflict_resp.to_dict(),
-            )
-
-        self.event_bus.publish(
-            channel="settings.changed",
-            event_type="updated",
-            payload={
-                "revision": new_rev,
-                "scopes": sorted(payload.settings.keys()),
-            },
-        )
-        ok_resp = StandardResponse.success(
-            data={
-                "revision": new_rev,
-                "settings": redact_secrets(settings.as_dict()),
-            },
-            message="Host settings updated.",
-            request_id=req_id,
-            side_effects=True,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
-
-    async def handle_list_connections(self, request: Request) -> JSONResponse:
-        """List configured broker and exchange connections."""
-        req_id = request.headers.get("x-request-id")
-        denied = self._require_scope(request, "connections:read")
-        if denied is not None:
-            return denied
-        records = self.connection_servlet.list_connections()
-        resp = StandardResponse.success(
-            data={"connections": records, "count": len(records)},
-            message="Connections retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_save_connection(self, request: Request) -> JSONResponse:
-        """Save or update broker/exchange connection credentials."""
-        req_id = request.headers.get("x-request-id")
-        denied = self._require_scope(request, "connections:write")
-        if denied is not None:
-            return denied
-        raw_body: Any = None
-        with suppress(ValueError):
-            raw_body = await request.json()
-        body: dict[str, Any] = raw_body if isinstance(raw_body, dict) else {}
-        cid = str(body.get("connection_id") or f"conn-{secrets.token_hex(4)}")
-        saved = self.connection_servlet.save_connection(cid, body)
-        resp = StandardResponse.success(
-            data=saved,
-            message=f"Connection '{cid}' saved successfully.",
-            request_id=req_id,
-            side_effects=True,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_delete_connection(
-        self, connection_id: str, request: Request
-    ) -> JSONResponse:
-        """Delete broker/exchange connection configuration."""
-        req_id = request.headers.get("x-request-id")
-        denied = self._require_scope(request, "connections:write")
-        if denied is not None:
-            return denied
-        deleted = self.connection_servlet.delete_connection(connection_id)
-        if not deleted:
-            err = StandardError(
-                code="NOT_FOUND",
-                message=f"Connection '{connection_id}' not found.",
-            )
-            fail_resp = StandardResponse.failure(
-                message="Connection deletion failed.",
-                error=err,
-                request_id=req_id,
-            )
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND, content=fail_resp.to_dict()
-            )
-        deleted_data: dict[str, Any] = {
-            "connection_id": connection_id,
-            "deleted": True,
-        }
-        ok_resp = StandardResponse.success(
-            data=deleted_data,
-            message=f"Connection '{connection_id}' deleted successfully.",
-            request_id=req_id,
-            side_effects=True,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
-
-    async def handle_test_connection(
+    async def _conn_route(
         self, request: Request, connection_id: str | None = None
     ) -> JSONResponse:
-        """Test network reachability and latency for a connection or endpoint."""
-        req_id = request.headers.get("x-request-id")
-        denied = self._require_scope(request, "connections:read")
-        if denied is not None:
+        is_rd = request.method == "GET" or request.url.path.endswith("/test")
+        scope = "connections:read" if is_rd else "connections:write"
+        if (denied := self._require_scope(request, scope)) is not None:
             return denied
-        endpoint = None
-        with suppress(ValueError):
-            body = await request.json()
-            if isinstance(body, dict):
-                endpoint = body.get("endpoint")
-                if not connection_id:
-                    connection_id = body.get("connection_id")
-        res = self.connection_servlet.test_connection(connection_id, endpoint)
-        resp = StandardResponse.success(
-            data=res,
-            message="Connection reachability test completed.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        cs = self.connection_servlet
+        if request.method == "GET":
+            recs = cs.list_connections()
+            return _ok(request, _dct(connections=recs, count=len(recs)))
+        if request.method == "DELETE":
+            if not cs.delete_connection(connection_id or ""):
+                return _err(request, 404, "NOT_FOUND", "Connection not found.")
+            return _ok(
+                request, _dct(connection_id=connection_id, deleted=True), fx=True
+            )
+        body = await _jbody(request)
+        if request.url.path.endswith("/test"):
+            cid = connection_id or body.get("connection_id")
+            return _ok(request, cs.test_connection(cid, body.get("endpoint")))
+        cid = str(body.get("connection_id") or f"conn-{secrets.token_hex(4)}")
+        return _ok(request, cs.save_connection(cid, body), fx=True)
 
-    async def handle_get_constants(self, request: Request) -> JSONResponse:
-        """Expose application constants, version, and runtime paths."""
-        req_id = request.headers.get("x-request-id")
-        data = self.constants_servlet.get_constants()
-        resp = StandardResponse.success(
-            data=data,
-            message="Constants retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+    def _resolve_mgr(self, request: Request, attr: str, fallback: Any) -> Any:
+        rt = getattr(request.app.state, "runtime", None)
+        return fallback or getattr(rt, attr, None)
 
-    async def handle_get_system_specs(self, request: Request) -> JSONResponse:
-        """Expose system resource limits, concurrency specs, and timeframes."""
-        req_id = request.headers.get("x-request-id")
-        data = self.constants_servlet.get_system_specs()
-        resp = StandardResponse.success(
-            data=data,
-            message="System specs retrieved successfully.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    def _resolve_resource_mgr(self, request: Request) -> Any | None:
-        """Return configured ResourceManager or resolve from FastAPI app.state."""
-        if self.resource_mgr is not None:
-            return self.resource_mgr
-        runtime = getattr(request.app.state, "runtime", None)
-        return getattr(runtime, "resource_manager", None)
-
-    def _resolve_job_mgr(self, request: Request) -> Any | None:
-        """Return configured JobManager or resolve from FastAPI app.state."""
-        if self.job_mgr is not None:
-            return self.job_mgr
-        runtime = getattr(request.app.state, "runtime", None)
-        return getattr(runtime, "job_manager", None)
-
-    async def handle_diagnostics(self, request: Request) -> JSONResponse:
-        """Return hardware probes, worker allocation, memory watchdog, and health."""
-        denied = self._require_scope(request, "diagnostics:read")
-        if denied is not None:
+    async def _diag(self, request: Request) -> JSONResponse:
+        if (denied := self._require_scope(request, "diagnostics:read")) is not None:
             return denied
-        req_id = request.headers.get("x-request-id")
-        res_mgr = self._resolve_resource_mgr(request)
-        hw = probe_hardware()
-        cap = get_worker_capacity()
-        wd = (
-            res_mgr.check_memory_headroom()
-            if res_mgr is not None
-            else check_memory_headroom()
-        )
-        health = (
-            res_mgr.get_system_health() if res_mgr is not None else get_system_health()
-        )
-        resp = StandardResponse.success(
-            data={
-                "status": health.status,
-                "hardware": asdict(hw),
-                "worker_capacity": asdict(cap),
-                "memory_watchdog": asdict(wd),
-                "database": asdict(health.database),
-                "storage": asdict(health.storage),
-            },
-            message="System diagnostics and resource governance retrieved.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        rm = self._resolve_mgr(request, "resource_manager", self.resource_mgr)
+        wd = rm.check_memory_headroom() if rm else _res.check_memory_headroom()
+        hlth = rm.get_system_health() if rm else _res.get_system_health()
+        d = _dct(status=hlth.status, hardware=asdict(_res.probe_hardware()))
+        d |= _dct(memory_watchdog=asdict(wd), database=asdict(hlth.database))
+        d |= _dct(worker_capacity=asdict(_res.get_worker_capacity()))
+        return _ok(request, {**d, "storage": asdict(hlth.storage)})
 
-    async def handle_list_jobs(
-        self,
-        request: Request,
-        status_filter: str | None = None,
-        limit: int = 50,
-    ) -> JSONResponse:
-        """List recent background jobs from JobManager or persistence."""
-        denied = self._require_scope(request, "jobs:read")
-        if denied is not None:
+    async def _jobs_route(self, req: Request, job_id: str | None = None) -> _Resp:
+        scope = "jobs:write" if req.method == "POST" else "jobs:read"
+        if (denied := self._require_scope(req, scope)) is not None:
             return denied
-        req_id = request.headers.get("x-request-id")
-        jm = self._resolve_job_mgr(request)
-        if jm is not None:
-            records = jm.list_jobs(status=status_filter, limit=limit)
-            jobs_list = [r.to_dict() for r in records]
-        else:
-            where = {"status": status_filter} if status_filter else None
-            jobs_list = HostPersistence.read_records(
-                "host_jobs", where=where, limit=limit
+        jm = self._resolve_mgr(req, "job_manager", self.job_mgr)
+        if req.method == "POST":
+            if not (bool(jm.cancel_job(job_id)) if jm and job_id else False):
+                return _err(req, 404, "JOB_NOT_CANCELLABLE", "Job not cancellable.")
+            self.event_bus.publish("jobs", "cancelled", {"job_id": job_id})
+            return _ok(req, _dct(job_id=job_id, cancelled=True), fx=True)
+        if job_id is not None:
+            pk = {"job_id": job_id}
+            db_r = (
+                []
+                if jm
+                else HostPersistence.read_records("host_jobs", pk_values=pk, limit=1)
             )
-
-        resp = StandardResponse.success(
-            data={
-                "count": len(jobs_list),
-                "jobs": jobs_list,
-            },
-            message="Host jobs listed.",
-            request_id=req_id,
+            row = (
+                r.to_dict()
+                if jm and (r := jm.get_job(job_id))
+                else (db_r[0] if db_r else None)
+            )
+            return (
+                _ok(req, row) if row else _err(req, 404, "JOB_NOT_FOUND", "Not found.")
+            )
+        sf = req.query_params.get("status_filter")
+        lim, w = (
+            _qint(req.query_params, "limit", 50) or 50,
+            ({"status": sf} if sf else None),
         )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_get_job(self, job_id: str, request: Request) -> JSONResponse:
-        """Retrieve a specific background job by ID."""
-        denied = self._require_scope(request, "jobs:read")
-        if denied is not None:
-            return denied
-        req_id = request.headers.get("x-request-id")
-        job_data: dict[str, Any] | None = None
-        jm = self._resolve_job_mgr(request)
-        if jm is not None:
-            rec = jm.get_job(job_id)
-            if rec is not None:
-                job_data = rec.to_dict()
-        else:
-            job_rows = HostPersistence.read_records(
-                "host_jobs", pk_values={"job_id": job_id}, limit=1
-            )
-            job_data = job_rows[0] if job_rows else None
-
-        if job_data is None:
-            err = StandardError(
-                code="JOB_NOT_FOUND",
-                message=f"Job '{job_id}' was not found.",
-            )
-            not_found = StandardResponse.failure(
-                message="Job not found.",
-                error=err,
-                request_id=req_id,
-            )
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content=not_found.to_dict(),
-            )
-
-        resp = StandardResponse.success(
-            data=job_data,
-            message="Host job retrieved.",
-            request_id=req_id,
+        jobs = (
+            [r.to_dict() for r in jm.list_jobs(status=sf, limit=lim)]
+            if jm
+            else HostPersistence.read_records("host_jobs", where=w, limit=lim)
         )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
+        return _ok(req, _dct(count=len(jobs), jobs=jobs))
 
-    async def handle_cancel_job(self, job_id: str, request: Request) -> JSONResponse:
-        """Signal cooperative cancellation for a running or queued job."""
-        denied = self._require_scope(request, "jobs:write")
-        if denied is not None:
-            return denied
-        req_id = request.headers.get("x-request-id")
-        cancelled = False
-        jm = self._resolve_job_mgr(request)
-        if jm is not None:
-            cancelled = bool(jm.cancel_job(job_id))
-
-        if not cancelled:
-            err = StandardError(
-                code="JOB_NOT_CANCELLABLE",
-                message=f"Job '{job_id}' could not be cancelled or does not exist.",
-            )
-            fail_resp = StandardResponse.failure(
-                message="Job cancellation failed.",
-                error=err,
-                request_id=req_id,
-            )
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content=fail_resp.to_dict(),
-            )
-
-        self.event_bus.publish(
-            channel="jobs",
-            event_type="cancelled",
-            payload={"job_id": job_id},
-        )
-        ok_resp = StandardResponse.success(
-            data={"job_id": job_id, "cancelled": True},
-            message=f"Signaled cancellation for job '{job_id}'.",
-            request_id=req_id,
-            side_effects=True,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=ok_resp.to_dict())
-
-    async def handle_events_stream(
-        self,
-        request: Request,
-        channels: str | None = None,
-        since_cursor: int | None = None,
-        limit: int | None = None,
-        token: str | None = None,
-    ) -> StreamingResponse | JSONResponse:
-        """Stream Server-Sent Events (SSE) for requested channels."""
-        auth_header = request.headers.get("authorization")
-        raw_token = extract_bearer_token(auth_header, token)
-        if (self.require_auth or raw_token is not None) and (
-            raw_token is None or self.session_mgr.validate_token(raw_token) is None
+    async def _sse(self, request: Request) -> StreamingResponse | JSONResponse:
+        qp, ah = request.query_params, request.headers.get("authorization")
+        tok = extract_bearer_token(ah, qp.get("token"))
+        if (self.require_auth or tok) and not (
+            tok and self.session_mgr.validate_token(tok)
         ):
-            req_id = request.headers.get("x-request-id")
-            err = StandardError(
-                code="UNAUTHORIZED",
-                message="Valid session token required for SSE stream.",
-            )
-            resp = StandardResponse.failure(
-                message="Unauthorized SSE request.",
-                error=err,
-                request_id=req_id,
-            )
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content=resp.to_dict(),
-            )
-
-        parsed_channels = _parse_channels_param(channels)
-        resolved_cursor = _resolve_since_cursor(
-            since_cursor, request.headers.get("last-event-id")
-        )
-        session_check: Callable[[], bool] | None = (
-            (lambda: self.session_mgr.validate_token(raw_token) is not None)
-            if raw_token is not None
-            else None
-        )
-
-        generator = sse_event_generator(
-            event_bus=self.event_bus,
-            channels=parsed_channels,
-            since_cursor=resolved_cursor,
-            request=request,
-            heartbeat_interval_sec=self.heartbeat_sec,
-            limit=limit,
-            session_valid=session_check,
-        )
+            return _err(request, 401, "UNAUTHORIZED", "Valid session token required.")
+        h = {"Cache-Control": "no-cache", "Connection": "keep-alive"}
+        h["X-Accel-Buffering"] = "no"
         return StreamingResponse(
-            generator,
-            media_type="text/event-stream",
-            headers={
-                "Cache-Control": "no-cache",
-                "Connection": "keep-alive",
-                "X-Accel-Buffering": "no",
-            },
+            self._sse_gen(request, tok), media_type="text/event-stream", headers=h
         )
 
-    async def handle_publish(
-        self, body: PublishEventRequest, request: Request
-    ) -> JSONResponse:
-        """Publish an event to the host EventBus via REST."""
-        req_id = request.headers.get("x-request-id")
-        ev = self.event_bus.publish(
-            channel=body.channel,
-            event_type=body.event_type,
-            payload=body.payload,
+    async def _sse_gen(self, req: Request, tok: str | None) -> AsyncGenerator[str]:
+        qp = req.query_params
+        cur = _resolve_since_cursor(
+            _qint(qp, "since_cursor"), req.headers.get("last-event-id")
         )
-        resp = StandardResponse.success(
-            data=ev.model_dump(),
-            message="Event published.",
-            request_id=req_id,
-            side_effects=True,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_snapshot(
-        self,
-        request: Request,
-        channel: str = "*",
-        since_cursor: int | None = None,
-        limit: int = 100,
-    ) -> JSONResponse:
-        """Return retained historical events for ``channel``."""
-        req_id = request.headers.get("x-request-id")
-        snapshot = self.event_bus.get_snapshot(
-            channel=channel, since_cursor=since_cursor, limit=limit
-        )
-        resp = StandardResponse.success(
-            data=snapshot.model_dump(),
-            message="Event snapshot retrieved.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_channels(self, request: Request) -> JSONResponse:
-        """Return registered EventBus channels and current cursor."""
-        req_id = request.headers.get("x-request-id")
-        resp = StandardResponse.success(
-            data={
-                "core_channels": list(CORE_EVENT_CHANNELS),
-                "active_channels": self.event_bus.channels,
-                "current_cursor": self.event_bus.current_cursor,
-            },
-            message="Event channels listed.",
-            request_id=req_id,
-        )
-        return JSONResponse(status_code=status.HTTP_200_OK, content=resp.to_dict())
-
-    async def handle_websocket(
-        self,
-        websocket: WebSocket,
-        channels: str | None = None,
-        since_cursor: int | None = None,
-        token: str | None = None,
-    ) -> None:
-        """Stream bidirectional JSON events and commands over ``WebSocket /ws``."""
-        raw_token = extract_bearer_token(websocket.headers.get("authorization"), token)
-        if self.require_auth and (
-            raw_token is None or self.session_mgr.validate_token(raw_token) is None
-        ):
-            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-            return
-
-        await websocket.accept()
-        parsed_channels = _parse_channels_param(channels)
-        sub_id, queue, replay_events, has_gap = self.event_bus.subscribe(
-            channels=parsed_channels,
-            since_cursor=since_cursor,
-        )
-        logger.info(
-            "FR-HOST-TRANSPORT-WS-STREAMING: WebSocket connected "
-            "(sub_id=%s channels=%s).",
-            sub_id,
-            parsed_channels,
-            extra={"fr_id": "FR-HOST-TRANSPORT-WS-STREAMING"},
-        )
-
+        chans, lim = _parse_channels_param(qp.get("channels")), _qint(qp, "limit")
+        sub_id, q, replay, gap = self.event_bus.subscribe(chans, since_cursor=cur)
+        _info(FR_SSE, f"SSE connected (sub_id={sub_id} channels={chans}).")
+        sent = 0
         try:
-            await _send_ws_initial_frames(websocket, replay_events, has_gap)
-            await self._run_ws_loop(websocket, sub_id, queue)
+            if gap:
+                g = json.dumps(_dct(channel="system", event_type="gap"))
+                yield f"event: system.gap\ndata: {g}\n\n"
+            while (lim is None or sent < lim) and not await req.is_disconnected():
+                if tok and self.session_mgr.validate_token(tok) is None:
+                    break
+                try:
+                    ev = (
+                        replay.pop(0)
+                        if replay
+                        else await asyncio.wait_for(q.get(), self.heartbeat_sec)
+                    )
+                    d_json = ev.model_dump_json()
+                    yield f"id: {ev.cursor}\nevent: {ev.channel}\ndata: {d_json}\n\n"
+                    sent += 1
+                except TimeoutError:
+                    yield ": heartbeat\n\n"
+        except asyncio.CancelledError:
+            pass
+        finally:
+            self.event_bus.unsubscribe(sub_id)
+            _info(FR_SSE, f"SSE disconnected (sub_id={sub_id}).")
+
+    async def _ws(self, ws: WebSocket) -> None:
+        qp = ws.query_params
+        tok = extract_bearer_token(ws.headers.get("authorization"), qp.get("token"))
+        if self.require_auth and not (tok and self.session_mgr.validate_token(tok)):
+            await ws.close(code=1008)
+            return
+        await ws.accept()
+        chans = _parse_channels_param(qp.get("channels"))
+        sub_id, q, replay, gap = self.event_bus.subscribe(
+            chans, _qint(qp, "since_cursor")
+        )
+        _info(FR_WS, f"WebSocket connected (sub_id={sub_id} channels={chans}).")
+        try:
+            if gap:
+                await ws.send_json(_sys_frame("gap", {"message": "Gap."}))
+            for ev in replay:
+                await ws.send_json(ev.model_dump())
+            while True:
+                rt, qt = (
+                    asyncio.create_task(ws.receive_json()),
+                    asyncio.create_task(q.get()),
+                )
+                done, pend = await asyncio.wait(
+                    {rt, qt}, return_when=asyncio.FIRST_COMPLETED
+                )
+                for t in pend:
+                    t.cancel()
+                await asyncio.gather(*pend, return_exceptions=True)
+                if qt in done:
+                    await ws.send_json(qt.result().model_dump())
+                if rt in done and not await self._on_ws_msg(ws, sub_id, rt.result()):
+                    break
         except WebSocketDisconnect:
             pass
         finally:
             self.event_bus.unsubscribe(sub_id)
-            logger.info(
-                "FR-HOST-TRANSPORT-WS-STREAMING: WebSocket disconnected (sub_id=%s).",
-                sub_id,
-                extra={"fr_id": "FR-HOST-TRANSPORT-WS-STREAMING"},
-            )
+            _info(FR_WS, f"WebSocket disconnected (sub_id={sub_id}).")
 
-    async def _run_ws_loop(
-        self,
-        websocket: WebSocket,
-        sub_id: str,
-        queue: asyncio.Queue[HostEvent],
-    ) -> None:
-        """Multiplex incoming WebSocket commands and outgoing EventBus events."""
-        while True:
-            recv_task = asyncio.create_task(websocket.receive_json())
-            queue_task = asyncio.create_task(queue.get())
-            done, pending = await asyncio.wait(
-                {recv_task, queue_task},
-                return_when=asyncio.FIRST_COMPLETED,
-            )
-            for task in pending:
-                task.cancel()
-            await asyncio.gather(*pending, return_exceptions=True)
-
-            if queue_task in done:
-                ev = queue_task.result()
-                await websocket.send_json(ev.model_dump())
-
-            if recv_task in done:
-                msg = recv_task.result()
-                if not await self._handle_ws_client_message(websocket, sub_id, msg):
-                    break
-
-    async def _handle_ws_client_message(
-        self,
-        websocket: WebSocket,
-        sub_id: str,
-        msg: Any,
-    ) -> bool:
-        """Process a client JSON control message on ``/ws``; return False to close."""
+    async def _on_ws_msg(self, ws: WebSocket, sub_id: str, msg: Any) -> bool:
         if not isinstance(msg, dict):
             return True
-
-        action = str(msg.get("action", "")).lower()
-        if action == "close":
+        act = str(msg.get("action", "")).lower()
+        if act == "close":
             return False
-        if action == "ping":
-            await websocket.send_json(
-                {
-                    "channel": "system",
-                    "event_type": "pong",
-                    "timestamp": _now_utc_iso(),
-                    "payload": {},
-                }
-            )
-        elif action == "subscribe":
-            raw_chans = msg.get("channels")
-            if isinstance(raw_chans, list):
-                chans = [str(c) for c in raw_chans if str(c).strip()]
-                self.event_bus.update_subscription(sub_id, chans or ["*"])
-                await websocket.send_json(
-                    {
-                        "channel": "system",
-                        "event_type": "subscribed",
-                        "timestamp": _now_utc_iso(),
-                        "payload": {"channels": chans or ["*"]},
-                    }
-                )
-        elif action == "publish":
-            channel = str(msg.get("channel", "system"))
-            event_type = str(msg.get("event_type", "update"))
-            payload = msg["payload"] if isinstance(msg.get("payload"), dict) else {}
-            self.event_bus.publish(
-                channel=channel, event_type=event_type, payload=payload
-            )
+        if act == "ping":
+            await ws.send_json(_sys_frame("pong", {}))
+        elif act == "subscribe" and isinstance(raw := msg.get("channels"), list):
+            chans = [str(c) for c in raw if str(c).strip()] or ["*"]
+            self.event_bus.update_subscription(sub_id, chans)
+            await ws.send_json(_sys_frame("subscribed", {"channels": chans}))
+        elif act == "publish":
+            pld = msg["payload"] if isinstance(msg.get("payload"), dict) else {}
+            ch = str(msg.get("channel", "system"))
+            et = str(msg.get("event_type", "update"))
+            self.event_bus.publish(ch, et, pld)
         return True
 
 
-async def _send_ws_initial_frames(
-    websocket: WebSocket,
-    replay_events: list[HostEvent],
-    has_gap: bool,
-) -> None:
-    """Send initial gap warning and replay events over an accepted WebSocket."""
-    if has_gap:
-        await websocket.send_json(
-            {
-                "channel": "system",
-                "event_type": "gap",
-                "timestamp": _now_utc_iso(),
-                "payload": {
-                    "message": "Event history gap detected; resynchronize state."
-                },
-            }
-        )
-    for ev in replay_events:
-        await websocket.send_json(ev.model_dump())
+def _sys_frame(et: str, pld: _Pld) -> _Pld:
+    return _dct(channel="system", event_type=et, timestamp=_now_utc_iso(), payload=pld)
 
 
-def create_transport_router(
-    *,
-    event_bus: EventBus | None = None,
-    session_mgr: SessionManager | None = None,
-    resource_mgr: Any | None = None,
-    job_mgr: Any | None = None,
-    password_hash: str | None = None,
-    require_auth: bool = False,
-    heartbeat_sec: float = DEFAULT_HEARTBEAT_SEC,
-    prefix: str = "",
-) -> APIRouter:
+_ROUTE_SPECS: Final[str] = (
+    "GET:/auth:_auth_route POST:/auth:_auth_route POST:/auth/login:_auth_route "
+    "GET:/sessions/me:_auth_route GET:/status:_meta GET:/readiness:_meta "
+    "POST:/app-loaded:_meta GET:/about:_meta GET:/constants:_meta GET:/specs:_meta "
+    "GET:/settings:_settings_route PUT:/settings:_settings_route "
+    "GET:/diagnostics:_diag GET:/resources:_diag GET:/jobs:_jobs_route "
+    "GET:/jobs/{job_id}:_jobs_route POST:/jobs/{job_id}/cancel:_jobs_route "
+    "POST:/events/publish:_meta GET:/events/snapshot:_meta "
+    "GET:/events/channels:_meta GET:/events:_sse GET:/connections:_conn_route "
+    "POST:/connections:_conn_route WS:/ws:_ws POST:/connections/test:_conn_route "
+    "DELETE:/connections/{connection_id}:_conn_route "
+    "POST:/connections/{connection_id}/test:_conn_route"
+)
+
+
+def create_transport_router(*, prefix: str = "", **kwargs: Any) -> APIRouter:
     """Create a FastAPI ``APIRouter`` exposing host auth, shell, SSE, and WS routes."""
-    service = TransportGatewayService(
-        event_bus=event_bus,
-        session_mgr=session_mgr,
-        resource_mgr=resource_mgr,
-        job_mgr=job_mgr,
-        password_hash=password_hash,
-        require_auth=require_auth,
-        heartbeat_sec=heartbeat_sec,
-    )
+    s = TransportGatewayService(**kwargs)
     router = APIRouter(prefix=prefix, tags=["host-transport"])
-
-    router.add_api_route("/auth", service.handle_session_me, methods=["GET"])
-    router.add_api_route("/auth", service.handle_login, methods=["POST"])
-    router.add_api_route("/auth/login", service.handle_login, methods=["POST"])
-    router.add_api_route("/sessions/me", service.handle_session_me, methods=["GET"])
-    router.add_api_route("/status", service.handle_status, methods=["GET"])
-    router.add_api_route("/readiness", service.handle_readiness, methods=["GET"])
-    router.add_api_route("/app-loaded", service.handle_app_loaded, methods=["POST"])
-    router.add_api_route("/about", service.handle_about, methods=["GET"])
-    router.add_api_route("/settings", service.handle_get_settings, methods=["GET"])
-    router.add_api_route("/settings", service.handle_put_settings, methods=["PUT"])
-    router.add_api_route("/diagnostics", service.handle_diagnostics, methods=["GET"])
-    router.add_api_route("/resources", service.handle_diagnostics, methods=["GET"])
-    router.add_api_route("/jobs", service.handle_list_jobs, methods=["GET"])
-    router.add_api_route("/jobs/{job_id}", service.handle_get_job, methods=["GET"])
-    router.add_api_route(
-        "/jobs/{job_id}/cancel", service.handle_cancel_job, methods=["POST"]
-    )
-    router.add_api_route(
-        "/events",
-        service.handle_events_stream,
-        methods=["GET"],
-        response_model=None,
-    )
-    router.add_api_route("/events/publish", service.handle_publish, methods=["POST"])
-    router.add_api_route("/events/snapshot", service.handle_snapshot, methods=["GET"])
-    router.add_api_route("/events/channels", service.handle_channels, methods=["GET"])
-    router.add_api_route(
-        "/connections", service.handle_list_connections, methods=["GET"]
-    )
-    router.add_api_route(
-        "/connections", service.handle_save_connection, methods=["POST"]
-    )
-    router.add_api_route(
-        "/connections/test", service.handle_test_connection, methods=["POST"]
-    )
-    router.add_api_route(
-        "/connections/{connection_id}",
-        service.handle_delete_connection,
-        methods=["DELETE"],
-    )
-    router.add_api_route(
-        "/connections/{connection_id}/test",
-        service.handle_test_connection,
-        methods=["POST"],
-    )
-    router.add_api_route("/constants", service.handle_get_constants, methods=["GET"])
-    router.add_api_route("/specs", service.handle_get_system_specs, methods=["GET"])
-    router.add_api_websocket_route("/ws", service.handle_websocket)
-
-    logger.info(
-        "FR-HOST-TRANSPORT-GATEWAY-APP: Created transport router (prefix='%s').",
-        prefix or "/",
-        extra={"fr_id": "FR-HOST-TRANSPORT-GATEWAY-APP"},
-    )
+    for spec in _ROUTE_SPECS.split():
+        method, path, attr = spec.split(":")
+        fn = getattr(s, attr)
+        if method == "WS":
+            router.add_api_websocket_route(path, fn)
+        else:
+            router.add_api_route(path, fn, methods=[method], response_model=None)
+    _info(FR_APP, f"Created transport router (prefix='{prefix or '/'}').")
     return router
 
 
 def create_host_app(
-    *,
-    event_bus: EventBus | None = None,
-    session_mgr: SessionManager | None = None,
-    resource_mgr: Any | None = None,
-    job_mgr: Any | None = None,
-    password_hash: str | None = None,
-    require_auth: bool = False,
-    heartbeat_sec: float = DEFAULT_HEARTBEAT_SEC,
-    extra_routers: Sequence[APIRouter] | None = None,
+    *, extra_routers: Sequence[APIRouter] | None = None, **kwargs: Any
 ) -> FastAPI:
     """Create the configured FastAPI host gateway application."""
-    bus = event_bus if event_bus is not None else get_global_event_bus()
-    sessions = session_mgr if session_mgr is not None else session_manager
-
-    app = FastAPI(
-        title="HaruQuantAI Host Platform Gateway",
-        version="1.0.0",
-    )
-    app.state.event_bus = bus
-    app.state.session_manager = sessions
-
+    bus = kwargs.get("event_bus") or get_global_event_bus()
+    sessions = kwargs.get("session_mgr") or _sess.session_manager
+    kwargs.update(event_bus=bus, session_mgr=sessions)
+    app = FastAPI(title="HaruQuantAI Host Platform Gateway", version="1.0.0")
+    app.state.event_bus, app.state.session_manager = bus, sessions
+    origins = [
+        f"http://{h}:{p}" for h in ("localhost", "127.0.0.1") for p in (3000, 8000)
+    ]
+    cors_kw: _Pld = _dct(allow_origins=origins, allow_credentials=True)
     app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "http://localhost:8000",
-            "http://127.0.0.1:8000",
-        ],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        CORSMiddleware, **cors_kw, allow_methods=["*"], allow_headers=["*"]
     )
     app.add_middleware(TransportMiddleware)
     register_transport_exception_handlers(app)
-
-    for route_prefix in ("", "/api/v1", "/api/v2"):
-        app.include_router(
-            create_transport_router(
-                event_bus=bus,
-                session_mgr=sessions,
-                resource_mgr=resource_mgr,
-                job_mgr=job_mgr,
-                password_hash=password_hash,
-                require_auth=require_auth,
-                heartbeat_sec=heartbeat_sec,
-                prefix=route_prefix,
-            )
-        )
-
-    if extra_routers:
-        for extra in extra_routers:
-            app.include_router(extra)
-
-    logger.info(
-        "FR-HOST-TRANSPORT-GATEWAY-APP: Initialized FastAPI host gateway "
-        "(instance=%s).",
-        sessions.host_instance_id,
-        extra={"fr_id": "FR-HOST-TRANSPORT-GATEWAY-APP"},
-    )
+    for pfx in ("", "/api/v1", "/api/v2"):
+        app.include_router(create_transport_router(prefix=pfx, **kwargs))
+    for extra in extra_routers or ():
+        app.include_router(extra)
+    _info(FR_APP, f"Initialized FastAPI host gateway ({sessions.host_instance_id}).")
     return app
-
-
-# ============================================================================
-# Standalone CLI Entrypoint
-# ============================================================================
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint for verifying the host EventBus and transport gateway."""
-    parser = argparse.ArgumentParser(
-        prog="app.host.transport",
-        description="HaruQuantAI Host Transport & EventBus CLI",
-    )
-    parser.add_argument(
-        "--test-bus",
-        action="store_true",
-        help="Publish a test event across core channels and print snapshot JSON.",
-    )
-    args = parser.parse_args(argv)
-
-    bus = EventBus()
+    p = argparse.ArgumentParser(prog="app.host.transport")
+    p.add_argument("--test-bus", action="store_true")
+    args, bus = p.parse_args(argv), EventBus()
     if args.test_bus:
         for ch in CORE_EVENT_CHANNELS:
             bus.publish(ch, "self_test", {"channel": ch, "ok": True})
-        snap = bus.get_snapshot("*")
-        print(json.dumps(snap.model_dump(), indent=2))
-        return 0
-
-    print(
-        json.dumps(
-            {
-                "core_channels": list(CORE_EVENT_CHANNELS),
-                "ring_capacity": bus.ring_capacity,
-                "max_queue_size": bus.max_queue_size,
-            },
-            indent=2,
+        out: Any = bus.get_snapshot("*").model_dump()
+    else:
+        out = _dct(
+            core_channels=list(CORE_EVENT_CHANNELS),
+            ring_capacity=bus.ring_capacity,
+            max_queue_size=bus.max_queue_size,
         )
-    )
+    sys.stdout.write(json.dumps(out, indent=2) + "\n")
     return 0
 
 

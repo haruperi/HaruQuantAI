@@ -2,64 +2,33 @@
 """Multiprocessing background job coordinator, cancellation context, and recovery.
 
 Description:
-    Coordinates CPU-bound and long-running background workloads for the
-    HaruQuantAI host platform using an OS multiprocessing worker pool
-    (concurrent.futures.ProcessPoolExecutor) to bypass Python's Global
-    Interpreter Lock (GIL). Works hand-in-hand with app/host/resources.py to
-    size worker concurrency via workers = max(1, cpu_cores - 2), provision
+    Coordinates CPU-bound and long-running background workloads for the HaruQuantAI
+    host platform using an OS multiprocessing worker pool (ProcessPoolExecutor) to
+    bypass Python's Global Interpreter Lock (GIL). Works with app/host/resources.py
+    to size worker concurrency via workers = max(1, cpu_cores - 2), provision
     isolated per-job scratch directories, and enforce the active Memory Watchdog
-    that rejects or pauses tasks when available system RAM drops below 15%.
-    Provides picklable cross-process JobContext cancellation tokens for
-    safe termination at cooperative checkpoints, persists job lifecycle transitions and
-    events via app/host/persistence/ without importing sqlite3, and reconciles
-    orphan jobs left in RUNNING state on startup by marking them INTERRUPTED.
+    (15% RAM floor). Provides picklable cross-process JobContext cancellation tokens,
+    persists job lifecycle events via HostPersistence, and reconciles orphan RUNNING
+    jobs on startup by marking them INTERRUPTED.
 
 Purpose:
     FEAT-HOST-JOBS: Host multiprocessing job pool, cooperative cancellation,
     memory-pressure gating, and startup orphan job reconciliation.
 
 Key Capabilities:
-    - FR-HOST-JOBS-POOL-LIFECYCLE: Manage ProcessPoolExecutor lifecycle sized by
-      workers = max(1, cpu_cores - 2).
-      Associated: `JobManager.__init__()`, `JobManager.ensure_pool()`,
-      `JobManager.shutdown()`
-      Logging: INFO on process pool initialization and graceful shutdown.
-    - FR-HOST-JOBS-SUBMISSION: Submit, execute, and track jobs across QUEUED,
-      RUNNING, PAUSED, COMPLETED, FAILED, CANCELLED, and INTERRUPTED states.
-      Associated: `JobManager.submit_job()`, `JobManager.wait_for_job()`,
-      `JobRecord`, `JobState`
-      Logging: INFO on job submission and completion; ERROR on task failure.
-    - FR-HOST-JOBS-WATCHDOG-GATE: Gate task admission and execution using the
-      15% available RAM watchdog, rejecting or pausing tasks on memory pressure.
-      Associated: `JobManager.check_admission()`, `JobManager.resume_paused_jobs()`,
-      `JobContext.check_memory_guard()`, `MemoryPressureError`
-      Logging: WARNING when jobs are paused or rejected due to RAM < 15%.
-    - FR-HOST-JOBS-CANCELLATION: Cooperative cancellation and progress reporting
-      across worker processes via JobContext tokens.
-      Associated: `JobContext`, `JobCancelledError`, `JobManager.cancel_job()`
-      Logging: INFO when cancellation is signaled and when a job terminates early.
-    - FR-HOST-JOBS-RECONCILIATION: Mark orphan jobs left in RUNNING state as
-      INTERRUPTED on system startup.
-      Associated: `JobManager.reconcile_orphan_jobs()`
-      Logging: INFO on reconciliation scan; WARNING for each RUNNING job marked
-      INTERRUPTED.
-    - FR-HOST-JOBS-PERSISTENCE: Persist job records and state transition events
-      through app/host/persistence/ with zero sqlite3 imports.
-      Associated: `JobManager.get_job()`, `JobManager.list_jobs()`
-      Logging: DEBUG on job persistence writes and queries.
+    - FR-HOST-JOBS-POOL-LIFECYCLE: Manage ProcessPoolExecutor (ensure_pool -> INFO).
+    - FR-HOST-JOBS-SUBMISSION: Submit and track jobs (submit_job -> INFO, ERROR).
+    - FR-HOST-JOBS-WATCHDOG-GATE: 15% RAM admission gate (check_admission -> WARNING).
+    - FR-HOST-JOBS-CANCELLATION: Cooperative JobContext tokens (cancel_job -> INFO).
+    - FR-HOST-JOBS-RECONCILIATION: Recover orphan jobs (reconcile_orphan_jobs -> INFO).
+    - FR-HOST-JOBS-PERSISTENCE: Persist job records and events (get_job -> DEBUG).
 
 Python API Usage:
     ```python
-    from app.host.jobs import JobContext, JobManager, run_sample_compute_task
+    from app.host.jobs import JobManager, run_sample_compute_task
 
     manager = JobManager()
-    reconciled = manager.reconcile_orphan_jobs()
-    record = manager.submit_job(
-        run_sample_compute_task,
-        5_000,
-        owner="researcher",
-        kind="backtest",
-    )
+    record = manager.submit_job(run_sample_compute_task, 5_000, owner="researcher")
     completed = manager.wait_for_job(record.job_id, timeout=10.0)
     manager.shutdown()
     ```
@@ -81,7 +50,7 @@ import time
 import uuid
 from collections.abc import Callable, Mapping
 from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, datetime
 from enum import StrEnum
 from pathlib import Path
@@ -119,6 +88,11 @@ PERSISTENCE_FR = "FR-HOST-JOBS-PERSISTENCE"
 CANCEL_MARKER_FILE = ".job_cancel"
 PAUSE_MARKER_FILE = ".job_pause"
 PROGRESS_MARKER_FILE = ".job_progress.json"
+
+
+def _log(level: str, fr_id: str, msg: str, **extra: Any) -> None:
+    """Emit structured FR log record with fr_id context."""
+    getattr(logger, level)("%s: %s", fr_id, msg, extra={"fr_id": fr_id, **extra})
 
 
 class JobState(StrEnum):
@@ -165,14 +139,30 @@ class JobRecord:
         return asdict(self)
 
 
-class JobContext:
-    """Picklable cooperative cancellation, pause, and progress context for jobs.
+def _row_to_record(r: Mapping[str, Any]) -> JobRecord:
+    """Convert a persisted host_jobs row dictionary into a JobRecord."""
+    own = str(r.get("owner", "default"))
+    knd, st = str(r.get("kind", "compute")), str(r.get("status", ""))
+    prg, msg = float(r.get("progress", 0.0)), str(r.get("message", ""))
+    att, sub = int(r.get("attempt_id", 1)), str(r.get("submitted_at_utc", ""))
+    sta, fin = r.get("started_at_utc"), r.get("finished_at_utc")
+    return JobRecord(
+        str(r["job_id"]),
+        own,
+        knd,
+        st,
+        prg,
+        msg,
+        att,
+        sub,
+        sta,
+        fin,
+        r.get("error_message"),
+    )
 
-    Supports both in-process threading events and cross-process filesystem marker
-    synchronization inside the job's isolated scratch sandbox so tasks running in
-    a ProcessPoolExecutor on Windows ('spawn') observe cancellation and pause
-    signals immediately without unpicklable lock objects.
-    """
+
+class JobContext:
+    """Picklable cooperative cancellation, pause, and progress context for jobs."""
 
     def __init__(
         self,
@@ -184,7 +174,6 @@ class JobContext:
         cancel_event: threading.Event | None = None,
         pause_event: threading.Event | None = None,
     ) -> None:
-        """Initialize JobContext with job identity and isolated scratch directory."""
         self.job_id: str = job_id
         self.attempt_id: int = attempt_id
         self.scratch_dir: Path = Path(scratch_dir).resolve()
@@ -234,12 +223,7 @@ class JobContext:
             self._cancel_marker.write_text("cancelled", encoding="utf-8")
         except OSError:
             pass
-        logger.info(
-            "%s: cancellation token signaled for job %s",
-            CANCELLATION_FR,
-            self.job_id,
-            extra={"fr_id": CANCELLATION_FR, "job_id": self.job_id},
-        )
+        _log("info", CANCELLATION_FR, f"cancellation signaled for job {self.job_id}")
 
     def set_paused(self, paused: bool) -> None:
         """Set or clear the cooperative pause signal for this job."""
@@ -272,19 +256,12 @@ class JobContext:
     def raise_if_cancelled(self) -> None:
         """Raise JobCancelledError immediately if cancellation was signaled."""
         if self.is_cancelled():
-            logger.info(
-                "%s: job %s observed cancellation token and is terminating safely",
-                CANCELLATION_FR,
-                self.job_id,
-                extra={"fr_id": CANCELLATION_FR, "job_id": self.job_id},
-            )
+            msg = f"job {self.job_id} observed cancellation token and is terminating"
+            _log("info", CANCELLATION_FR, msg, job_id=self.job_id)
             raise JobCancelledError(f"Job '{self.job_id}' was cancelled.")
 
     def wait_if_paused(
-        self,
-        *,
-        poll_interval: float = 0.02,
-        timeout: float | None = None,
+        self, *, poll_interval: float = 0.02, timeout: float | None = None
     ) -> None:
         """Block cooperatively while the job is paused, checking cancellation."""
         start = time.monotonic()
@@ -295,16 +272,9 @@ class JobContext:
             time.sleep(max(0.005, poll_interval))
         self.raise_if_cancelled()
 
-    def check_memory_guard(
-        self,
-        *,
-        policy: str = "reject",
-    ) -> MemoryWatchdogStatus:
+    def check_memory_guard(self, *, policy: str = "reject") -> MemoryWatchdogStatus:
         """Check system RAM headroom from inside a running task."""
-        status = check_memory_headroom(
-            self.min_available_ram_pct,
-            policy=policy,
-        )
+        status = check_memory_headroom(self.min_available_ram_pct, policy=policy)
         if status.is_pressured and status.recommended_action == "REJECT":
             raise MemoryPressureError(
                 f"Available RAM ({status.available_pct:.1f}%) dropped below "
@@ -321,10 +291,7 @@ class JobContext:
         payload = {"progress": clamped, "message": message}
         try:
             self.scratch_dir.mkdir(parents=True, exist_ok=True)
-            self._progress_marker.write_text(
-                json.dumps(payload),
-                encoding="utf-8",
-            )
+            self._progress_marker.write_text(json.dumps(payload), encoding="utf-8")
         except OSError:
             pass
 
@@ -363,10 +330,11 @@ def _callable_accepts_job_context(fn: Callable[..., Any]) -> bool:
         if not params:
             return False
         first = params[0]
-        if first.name in ("ctx", "context", "job_context"):
-            return True
-        ann = str(first.annotation)
-        return "JobContext" in ann
+        return first.name in (
+            "ctx",
+            "context",
+            "job_context",
+        ) or "JobContext" in str(first.annotation)
     except ValueError, TypeError:
         return False
 
@@ -402,22 +370,6 @@ class JobManager:
         cleanup_scratch_on_exit: bool = True,
         reconcile_on_startup: bool = False,
     ) -> None:
-        """Initialize JobManager with ProcessPoolExecutor and ResourceManager.
-
-        Args:
-            max_workers: Optional worker limit override. If None, uses
-                workers = max(1, cpu_cores - 2).
-            resource_mgr: Optional ResourceManager instance.
-            min_available_ram_pct: Minimum available system RAM percentage
-                before watchdog triggers (default: 15.0%).
-            memory_policy: Default watchdog enforcement policy ('reject' or 'pause').
-            use_process_pool: If True (default), uses ProcessPoolExecutor to
-                bypass the GIL; if False, uses ThreadPoolExecutor.
-            cleanup_scratch_on_exit: If True, removes per-job scratch directory
-                when the job finishes.
-            reconcile_on_startup: If True, immediately marks orphan RUNNING jobs
-                as INTERRUPTED on initialization.
-        """
         self._min_available_ram_pct = float(min_available_ram_pct)
         self._memory_policy = memory_policy.strip().lower()
         self._use_process_pool = use_process_pool
@@ -446,22 +398,8 @@ class JobManager:
             on_pressure=self._on_memory_pressure,
             on_recovery=self._on_memory_recovery,
         )
-
-        logger.info(
-            "%s: initialized JobManager (max_workers=%d, process_pool=%s, "
-            "ram_threshold=%.1f%%, policy=%s)",
-            POOL_LIFECYCLE_FR,
-            self._max_workers,
-            self._use_process_pool,
-            self._min_available_ram_pct,
-            self._memory_policy,
-            extra={
-                "fr_id": POOL_LIFECYCLE_FR,
-                "max_workers": self._max_workers,
-                "use_process_pool": self._use_process_pool,
-            },
-        )
-
+        det = f"workers={self._max_workers}, policy={self._memory_policy}"
+        _log("info", POOL_LIFECYCLE_FR, f"initialized JobManager ({det})")
         if reconcile_on_startup:
             self.reconcile_orphan_jobs()
 
@@ -479,175 +417,112 @@ class JobManager:
         """Lazily create and return the active worker pool executor."""
         with self._lock:
             if self._pool is None:
-                if self._use_process_pool:
-                    self._pool = ProcessPoolExecutor(max_workers=self._max_workers)
-                else:
-                    self._pool = ThreadPoolExecutor(max_workers=self._max_workers)
-                logger.info(
-                    "%s: started %s with %d workers",
-                    POOL_LIFECYCLE_FR,
-                    type(self._pool).__name__,
-                    self._max_workers,
-                    extra={
-                        "fr_id": POOL_LIFECYCLE_FR,
-                        "pool_type": type(self._pool).__name__,
-                        "max_workers": self._max_workers,
-                    },
+                cls = (
+                    ProcessPoolExecutor
+                    if self._use_process_pool
+                    else ThreadPoolExecutor
                 )
+                self._pool = cls(max_workers=self._max_workers)
+                msg = f"started {cls.__name__} with {self._max_workers} workers"
+                _log("info", POOL_LIFECYCLE_FR, msg, max_workers=self._max_workers)
             return self._pool
 
     def ensure_io_pool(self) -> ThreadPoolExecutor:
         """Lazily create and return the dedicated I/O thread pool executor."""
         with self._lock:
             if self._io_pool is None:
-                workers = min(4, self._max_workers)
-                self._io_pool = ThreadPoolExecutor(max_workers=workers)
-                logger.info(
-                    "%s: started I/O ThreadPoolExecutor with %d workers",
-                    POOL_LIFECYCLE_FR,
-                    workers,
-                    extra={
-                        "fr_id": POOL_LIFECYCLE_FR,
-                        "pool_type": "ThreadPoolExecutor",
-                        "max_workers": workers,
-                    },
-                )
+                w = min(4, self._max_workers)
+                self._io_pool = ThreadPoolExecutor(max_workers=w)
+                _log("info", POOL_LIFECYCLE_FR, f"started I/O pool with {w} workers")
             return self._io_pool
 
     def _save_job(self, job_id: str, **fields: Any) -> int:
         """Persist or upsert a job record via HostPersistence."""
         return HostPersistence.update_record(
-            "host_jobs",
-            pk_values={"job_id": job_id},
-            updates=fields,
-            upsert=True,
+            "host_jobs", pk_values={"job_id": job_id}, updates=fields, upsert=True
         )
 
     def _update_job(self, job_id: str, updates: Mapping[str, Any]) -> bool:
         """Update an existing job record via HostPersistence."""
-        affected = HostPersistence.update_record(
-            "host_jobs",
-            pk_values={"job_id": job_id},
-            updates=updates,
+        return (
+            HostPersistence.update_record(
+                "host_jobs", pk_values={"job_id": job_id}, updates=updates
+            )
+            > 0
         )
-        return affected > 0
 
     def _record_event(
         self,
-        *,
-        event_id: str,
         job_id: str,
+        from_state: str | None,
         to_state: str,
-        from_state: str | None = None,
-        attempt_id: str | None = None,
-        details_json: str = "{}",
+        details: Mapping[str, Any],
         created_at_utc: str | None = None,
     ) -> str:
         """Insert a job state transition event via HostPersistence."""
         data = {
-            "event_id": event_id,
+            "event_id": f"evt-{uuid.uuid4().hex[:12]}",
             "job_id": job_id,
-            "attempt_id": attempt_id,
+            "attempt_id": None,
             "from_state": from_state,
             "to_state": to_state,
-            "details_json": details_json,
+            "details_json": json.dumps(dict(details)),
             "created_at_utc": created_at_utc or datetime.now(UTC).isoformat(),
         }
-        res = HostPersistence.create_record("host_job_events", data)
-        return str(res)
+        return str(HostPersistence.create_record("host_job_events", data))
 
     def reconcile_orphan_jobs(self) -> list[str]:
-        """Mark orphan jobs left in RUNNING state as INTERRUPTED on system boot.
-
-        Returns:
-            List of job_ids transitioned from RUNNING to INTERRUPTED.
-        """
+        """Mark orphan jobs left in RUNNING state as INTERRUPTED on system boot."""
         reconciled_ids: list[str] = []
         try:
             all_jobs = HostPersistence.read_records("host_jobs", limit=1_000)
         except Exception as exc:  # noqa: BLE001
-            logger.warning(
-                "%s: could not query host_jobs during startup reconciliation: %s",
-                RECONCILIATION_FR,
-                exc,
-                extra={"fr_id": RECONCILIATION_FR, "error": str(exc)},
-            )
+            msg = f"could not query host_jobs during startup reconciliation: {exc}"
+            _log("warning", RECONCILIATION_FR, msg, error=str(exc))
             return reconciled_ids
 
         now_iso = datetime.now(UTC).isoformat()
         for row in all_jobs:
-            raw_status = str(row.get("status", "")).upper()
-            if raw_status == JobState.RUNNING:
+            if str(row.get("status", "")).upper() == JobState.RUNNING:
                 jid = str(row["job_id"])
                 err_msg = "Orphan job left in RUNNING state marked INTERRUPTED on boot"
-                self._update_job(
-                    jid,
-                    {
-                        "status": str(JobState.INTERRUPTED),
-                        "finished_at_utc": now_iso,
-                        "message": "Interrupted by host restart",
-                        "error_message": err_msg,
-                    },
-                )
+                upd = {
+                    "status": str(JobState.INTERRUPTED),
+                    "finished_at_utc": now_iso,
+                    "message": "Interrupted by host restart",
+                    "error_message": err_msg,
+                }
+                self._update_job(jid, upd)
                 self._record_event(
-                    event_id=f"evt-{uuid.uuid4().hex[:12]}",
-                    job_id=jid,
-                    from_state=str(JobState.RUNNING),
-                    to_state=str(JobState.INTERRUPTED),
-                    details_json=json.dumps({"reason": "startup_orphan_recovery"}),
-                    created_at_utc=now_iso,
+                    jid,
+                    str(JobState.RUNNING),
+                    str(JobState.INTERRUPTED),
+                    {"reason": "startup_orphan_recovery"},
+                    now_iso,
                 )
                 self._resource_mgr.cleanup_scratch(jid)
                 reconciled_ids.append(jid)
-                logger.warning(
-                    "%s: reconciled orphan RUNNING job %s -> INTERRUPTED",
-                    RECONCILIATION_FR,
-                    jid,
-                    extra={
-                        "fr_id": RECONCILIATION_FR,
-                        "job_id": jid,
-                        "to_state": str(JobState.INTERRUPTED),
-                    },
-                )
+                msg = f"reconciled orphan RUNNING job {jid} -> INTERRUPTED"
+                _log("warning", RECONCILIATION_FR, msg, job_id=jid)
 
-        logger.info(
-            "%s: startup orphan job reconciliation complete (reconciled=%d)",
-            RECONCILIATION_FR,
-            len(reconciled_ids),
-            extra={
-                "fr_id": RECONCILIATION_FR,
-                "reconciled_count": len(reconciled_ids),
-            },
-        )
+        cnt = len(reconciled_ids)
+        _log("info", RECONCILIATION_FR, f"orphan job reconciliation complete ({cnt})")
         return reconciled_ids
 
     def check_admission(
-        self,
-        *,
-        on_memory_pressure: str | None = None,
+        self, *, on_memory_pressure: str | None = None
     ) -> MemoryWatchdogStatus:
         """Evaluate the 15% available RAM watchdog before starting a task."""
-        policy = (
+        pol = (
             on_memory_pressure.strip().lower()
             if on_memory_pressure is not None
             else self._memory_policy
         )
-        status = self._resource_mgr.check_memory_headroom(policy=policy)
-        if status.is_pressured:
-            logger.warning(
-                "%s: memory watchdog triggered during job admission "
-                "(available=%.1f%% < %.1f%%, action=%s)",
-                WATCHDOG_GATE_FR,
-                status.available_pct,
-                status.threshold_pct,
-                status.recommended_action,
-                extra={
-                    "fr_id": WATCHDOG_GATE_FR,
-                    "available_pct": status.available_pct,
-                    "action": status.recommended_action,
-                },
-            )
-        return status
+        st = self._resource_mgr.check_memory_headroom(policy=pol)
+        if st.is_pressured:
+            det = f"avail={st.available_pct:.1f}%, action={st.recommended_action}"
+            _log("warning", WATCHDOG_GATE_FR, f"memory watchdog triggered ({det})")
+        return st
 
     def submit_job(
         self,
@@ -661,196 +536,97 @@ class JobManager:
         executor_kind: str | None = None,
         **kwargs: Any,
     ) -> JobRecord:
-        """Submit a task to the multiprocessing worker pool with watchdog gating.
-
-        Args:
-            fn: Top-level picklable callable to execute.
-            *args: Positional arguments forwarded to fn.
-            job_id: Optional explicit job identifier.
-            owner: Submitting component or user identifier.
-            kind: Job classification (e.g., 'compute', 'backtest', 'ingest').
-            pass_context: Whether to pass JobContext as the first argument to fn.
-                If None, auto-detected from fn's signature.
-            on_memory_pressure: Watchdog policy override ('reject' or 'pause').
-            executor_kind: Optional executor selection ('process' or 'thread').
-            **kwargs: Keyword arguments forwarded to fn.
-
-        Returns:
-            JobRecord representing the submitted (or paused) job.
-
-        Raises:
-            MemoryPressureError: If available system RAM is below 15% and policy
-                is 'reject'.
-        """
+        """Submit a task to the multiprocessing worker pool with watchdog gating."""
         jid = job_id or f"job-{uuid.uuid4().hex[:10]}"
-        submitted_at = datetime.now(UTC).isoformat()
-        effective_policy = (
+        sub_at = datetime.now(UTC).isoformat()
+        eff_pol = (
             on_memory_pressure.strip().lower()
             if on_memory_pressure is not None
             else self._memory_policy
         )
 
-        watchdog_status = self.check_admission(on_memory_pressure=effective_policy)
-        if (
-            watchdog_status.is_pressured
-            and watchdog_status.recommended_action == "REJECT"
-        ):
+        st = self.check_admission(on_memory_pressure=eff_pol)
+        if st.is_pressured and st.recommended_action == "REJECT":
             err_text = (
                 f"Task rejected by Memory Watchdog: available RAM "
-                f"({watchdog_status.available_pct:.1f}%) is below "
-                f"{watchdog_status.threshold_pct:.1f}% minimum."
+                f"({st.available_pct:.1f}%) is below {st.threshold_pct:.1f}% minimum."
             )
+            r_msg = "Rejected by Memory Watchdog (<15% available RAM)"
+            kw = {"submitted_at_utc": sub_at, "finished_at_utc": sub_at}
             self._save_job(
                 jid,
                 owner=owner,
                 kind=kind,
                 status=str(JobState.FAILED),
                 rejected=1,
-                message="Rejected by Memory Watchdog (<15% available RAM)",
-                submitted_at_utc=submitted_at,
-                finished_at_utc=submitted_at,
+                message=r_msg,
                 error_message=err_text,
+                **kw,
             )
-            self._record_event(
-                event_id=f"evt-{uuid.uuid4().hex[:12]}",
-                job_id=jid,
-                from_state=None,
-                to_state=str(JobState.FAILED),
-                details_json=json.dumps(
-                    {
-                        "reason": "memory_watchdog_reject",
-                        "available_pct": watchdog_status.available_pct,
-                    }
-                ),
-                created_at_utc=submitted_at,
-            )
+            det = {
+                "reason": "memory_watchdog_reject",
+                "available_pct": st.available_pct,
+            }
+            self._record_event(jid, None, str(JobState.FAILED), det, sub_at)
             raise MemoryPressureError(err_text)
 
-        scratch_dir = self._resource_mgr.allocate_scratch(jid)
-        cancel_evt = threading.Event()
-        pause_evt = threading.Event()
+        s_dir = self._resource_mgr.allocate_scratch(jid)
         ctx = JobContext(
             job_id=jid,
-            scratch_dir=scratch_dir,
+            scratch_dir=s_dir,
             min_available_ram_pct=self._min_available_ram_pct,
-            cancel_event=cancel_evt,
-            pause_event=pause_evt,
+            cancel_event=threading.Event(),
+            pause_event=threading.Event(),
         )
         done_evt = threading.Event()
-        effective_pass_ctx = (
+        p_ctx = (
             pass_context
             if pass_context is not None
             else _callable_accepts_job_context(fn)
         )
+        d1 = (jid, fn, args, kwargs, p_ctx, ctx)
+        d2 = (owner, kind, sub_at, done_evt, executor_kind)
+        deferred = _DeferredSubmission(*d1, *d2)
 
-        if (
-            watchdog_status.is_pressured
-            and watchdog_status.recommended_action == "PAUSE"
-        ):
+        if st.is_pressured and st.recommended_action == "PAUSE":
             ctx.set_paused(True)
-            paused_rec = JobRecord(
-                job_id=jid,
-                owner=owner,
-                kind=kind,
-                status=str(JobState.PAUSED),
-                progress=0.0,
-                message="Paused by Memory Watchdog (<15% available RAM)",
-                attempt_id=1,
-                submitted_at_utc=submitted_at,
-                scratch_dir=str(scratch_dir),
-            )
+            p_msg = "Paused by Memory Watchdog (<15% available RAM)"
+            a1 = (jid, owner, kind, str(JobState.PAUSED), 0.0, p_msg, 1, sub_at)
+            paused_rec = JobRecord(*a1, scratch_dir=str(s_dir))
             self._save_job(
                 jid,
                 owner=owner,
                 kind=kind,
                 status=str(JobState.PAUSED),
                 accepted=1,
-                message=paused_rec.message,
-                submitted_at_utc=submitted_at,
+                message=p_msg,
+                submitted_at_utc=sub_at,
             )
+            det = {"reason": "memory_watchdog_pause", "available_pct": st.available_pct}
             self._record_event(
-                event_id=f"evt-{uuid.uuid4().hex[:12]}",
-                job_id=jid,
-                from_state=str(JobState.QUEUED),
-                to_state=str(JobState.PAUSED),
-                details_json=json.dumps(
-                    {
-                        "reason": "memory_watchdog_pause",
-                        "available_pct": watchdog_status.available_pct,
-                    }
-                ),
-                created_at_utc=submitted_at,
+                jid, str(JobState.QUEUED), str(JobState.PAUSED), det, sub_at
             )
             with self._lock:
                 self._jobs[jid] = paused_rec
                 self._contexts[jid] = ctx
                 self._done_events[jid] = done_evt
-                self._paused_queue[jid] = _DeferredSubmission(
-                    job_id=jid,
-                    fn=fn,
-                    args=args,
-                    kwargs=kwargs,
-                    pass_context=effective_pass_ctx,
-                    context=ctx,
-                    owner=owner,
-                    kind=kind,
-                    submitted_at_utc=submitted_at,
-                    done_event=done_evt,
-                    executor_kind=executor_kind,
-                )
-            logger.warning(
-                "%s: job %s queued in PAUSED state due to low RAM (%.1f%%)",
-                WATCHDOG_GATE_FR,
-                jid,
-                watchdog_status.available_pct,
-                extra={"fr_id": WATCHDOG_GATE_FR, "job_id": jid},
-            )
+                self._paused_queue[jid] = deferred
+            _log("warning", WATCHDOG_GATE_FR, f"job {jid} queued in PAUSED state")
             return paused_rec
 
-        return self._dispatch_to_pool(
-            jid=jid,
-            fn=fn,
-            args=args,
-            kwargs=kwargs,
-            pass_context=effective_pass_ctx,
-            ctx=ctx,
-            owner=owner,
-            kind=kind,
-            submitted_at=submitted_at,
-            done_evt=done_evt,
-            executor_kind=executor_kind,
-        )
+        return self._dispatch_to_pool(deferred)
 
-    def _dispatch_to_pool(
-        self,
-        *,
-        jid: str,
-        fn: Callable[..., Any],
-        args: tuple[Any, ...],
-        kwargs: dict[str, Any],
-        pass_context: bool,
-        ctx: JobContext,
-        owner: str,
-        kind: str,
-        submitted_at: str,
-        done_evt: threading.Event,
-        executor_kind: str | None = None,
-    ) -> JobRecord:
+    def _dispatch_to_pool(self, sub: _DeferredSubmission) -> JobRecord:
         """Dispatch an admitted job to the worker pool executor."""
+        jid, owner, kind, ctx = sub.job_id, sub.owner, sub.kind, sub.context
         started_at = datetime.now(UTC).isoformat()
+        a1 = (jid, owner, kind, str(JobState.RUNNING), 0.0, "Running", 1)
         running_rec = JobRecord(
-            job_id=jid,
-            owner=owner,
-            kind=kind,
-            status=str(JobState.RUNNING),
-            progress=0.0,
-            message="Running",
-            attempt_id=1,
-            submitted_at_utc=submitted_at,
+            *a1,
+            sub.submitted_at_utc,
             started_at_utc=started_at,
             scratch_dir=str(ctx.scratch_dir),
         )
-
         self._save_job(
             jid,
             owner=owner,
@@ -858,350 +634,187 @@ class JobManager:
             status=str(JobState.RUNNING),
             accepted=1,
             message="Running",
-            submitted_at_utc=submitted_at,
+            submitted_at_utc=sub.submitted_at_utc,
             started_at_utc=started_at,
         )
         self._record_event(
-            event_id=f"evt-{uuid.uuid4().hex[:12]}",
-            job_id=jid,
-            from_state=str(JobState.QUEUED),
-            to_state=str(JobState.RUNNING),
-            details_json=json.dumps({"owner": owner, "kind": kind}),
-            created_at_utc=started_at,
+            jid,
+            str(JobState.QUEUED),
+            str(JobState.RUNNING),
+            {"owner": owner, "kind": kind},
+            started_at,
         )
-
-        if executor_kind == "thread":
-            pool: ProcessPoolExecutor | ThreadPoolExecutor = self.ensure_io_pool()
-        else:
-            pool = self.ensure_pool()
-
+        pool: ProcessPoolExecutor | ThreadPoolExecutor = (
+            self.ensure_io_pool()
+            if sub.executor_kind == "thread"
+            else self.ensure_pool()
+        )
         with self._lock:
             self._jobs[jid] = running_rec
             self._contexts[jid] = ctx
-            self._done_events[jid] = done_evt
-            future = pool.submit(
+            self._done_events[jid] = sub.done_event
+            fut = pool.submit(
                 _execute_worker_task,
-                fn,
+                sub.fn,
                 ctx,
-                pass_context,
-                args,
-                kwargs,
+                sub.pass_context,
+                sub.args,
+                sub.kwargs,
             )
-            self._futures[jid] = future
+            self._futures[jid] = fut
 
-        future.add_done_callback(functools.partial(self._on_future_done, jid))
-
-        logger.info(
-            "%s: submitted job %s (owner=%s, kind=%s)",
-            SUBMISSION_FR,
-            jid,
-            owner,
-            kind,
-            extra={"fr_id": SUBMISSION_FR, "job_id": jid, "kind": kind},
-        )
+        fut.add_done_callback(functools.partial(self._on_future_done, jid))
+        _log("info", SUBMISSION_FR, f"submitted job {jid} ({owner}/{kind})", job_id=jid)
         return running_rec
 
     @staticmethod
     def _extract_future_outcome(
-        job_id: str,
-        future: Future[tuple[int, Any]],
-        ctx: JobContext | None,
+        job_id: str, future: Future[tuple[int, Any]], ctx: JobContext | None
     ) -> tuple[int, Any]:
         """Extract worker PID and result or raise JobCancelledError."""
         if future.cancelled() or (ctx is not None and ctx.is_cancelled()):
             raise JobCancelledError(f"Job '{job_id}' cancelled.")
         return future.result()
 
-    def _on_future_done(
-        self,
-        job_id: str,
-        future: Future[tuple[int, Any]],
-    ) -> None:
+    def _on_future_done(self, job_id: str, future: Future[tuple[int, Any]]) -> None:
         """Handle completion, failure, or cancellation of a worker pool future."""
-        finished_at = datetime.now(UTC).isoformat()
+        fin_at = datetime.now(UTC).isoformat()
         with self._lock:
-            current = self._jobs.get(job_id)
+            cur = self._jobs.get(job_id)
             ctx = self._contexts.get(job_id)
             done_evt = self._done_events.get(job_id)
 
-        owner = current.owner if current else "default"
-        kind = current.kind if current else "compute"
-        submitted_at = current.submitted_at_utc if current else finished_at
-        started_at = current.started_at_utc if current else finished_at
-        scratch_str = current.scratch_dir if current else None
-
+        base = cur or JobRecord(
+            job_id, "default", "compute", str(JobState.RUNNING), 0.0, "", 1, fin_at
+        )
+        pid, res, err_s = None, None, None
+        prg = base.progress
         try:
-            worker_pid, result = self._extract_future_outcome(job_id, future, ctx)
-            final_rec = JobRecord(
-                job_id=job_id,
-                owner=owner,
-                kind=kind,
-                status=str(JobState.COMPLETED),
-                progress=100.0,
-                message="Completed",
-                attempt_id=1,
-                submitted_at_utc=submitted_at,
-                started_at_utc=started_at,
-                finished_at_utc=finished_at,
-                result=result,
-                worker_pid=worker_pid,
-                scratch_dir=scratch_str,
-            )
-            self._update_job(
-                job_id,
-                {
-                    "status": str(JobState.COMPLETED),
-                    "progress": 100.0,
-                    "message": "Completed",
-                    "finished_at_utc": finished_at,
-                },
-            )
-            self._record_event(
-                event_id=f"evt-{uuid.uuid4().hex[:12]}",
-                job_id=job_id,
-                from_state=str(JobState.RUNNING),
-                to_state=str(JobState.COMPLETED),
-                details_json=json.dumps({"worker_pid": worker_pid}),
-                created_at_utc=finished_at,
-            )
-            logger.info(
-                "%s: job %s completed on worker PID %s",
-                SUBMISSION_FR,
-                job_id,
-                worker_pid,
-                extra={
-                    "fr_id": SUBMISSION_FR,
-                    "job_id": job_id,
-                    "worker_pid": worker_pid,
-                },
-            )
+            pid, res = self._extract_future_outcome(job_id, future, ctx)
+            st_v, prg, msg_v = str(JobState.COMPLETED), 100.0, "Completed"
+            det: dict[str, Any] = {"worker_pid": pid}
+            _log("info", SUBMISSION_FR, f"job {job_id} completed on PID {pid}")
         except JobCancelledError as exc:
-            final_rec = JobRecord(
-                job_id=job_id,
-                owner=owner,
-                kind=kind,
-                status=str(JobState.CANCELLED),
-                progress=current.progress if current else 0.0,
-                message="Cancelled by user",
-                attempt_id=1,
-                submitted_at_utc=submitted_at,
-                started_at_utc=started_at,
-                finished_at_utc=finished_at,
-                error_message=str(exc),
-                scratch_dir=scratch_str,
-            )
-            self._update_job(
-                job_id,
-                {
-                    "status": str(JobState.CANCELLED),
-                    "message": "Cancelled by user",
-                    "finished_at_utc": finished_at,
-                    "error_message": str(exc),
-                },
-            )
-            self._record_event(
-                event_id=f"evt-{uuid.uuid4().hex[:12]}",
-                job_id=job_id,
-                from_state=str(JobState.RUNNING),
-                to_state=str(JobState.CANCELLED),
-                details_json=json.dumps({"reason": str(exc)}),
-                created_at_utc=finished_at,
-            )
-            logger.info(
-                "%s: job %s transitioned to CANCELLED",
-                CANCELLATION_FR,
-                job_id,
-                extra={"fr_id": CANCELLATION_FR, "job_id": job_id},
-            )
-        except Exception as exc:
-            final_rec = JobRecord(
-                job_id=job_id,
-                owner=owner,
-                kind=kind,
-                status=str(JobState.FAILED),
-                progress=current.progress if current else 0.0,
-                message="Failed",
-                attempt_id=1,
-                submitted_at_utc=submitted_at,
-                started_at_utc=started_at,
-                finished_at_utc=finished_at,
-                error_message=str(exc),
-                scratch_dir=scratch_str,
-            )
-            self._update_job(
-                job_id,
-                {
-                    "status": str(JobState.FAILED),
-                    "message": "Failed",
-                    "finished_at_utc": finished_at,
-                    "error_message": str(exc),
-                },
-            )
-            self._record_event(
-                event_id=f"evt-{uuid.uuid4().hex[:12]}",
-                job_id=job_id,
-                from_state=str(JobState.RUNNING),
-                to_state=str(JobState.FAILED),
-                details_json=json.dumps({"error": str(exc)}),
-                created_at_utc=finished_at,
-            )
-            logger.exception(
-                "%s: job %s failed during execution",
-                SUBMISSION_FR,
-                job_id,
-                extra={"fr_id": SUBMISSION_FR, "job_id": job_id, "error": str(exc)},
-            )
+            st_v, msg_v, err_s = str(JobState.CANCELLED), "Cancelled by user", str(exc)
+            det = {"reason": err_s}
+            _log("info", CANCELLATION_FR, f"job {job_id} transitioned to CANCELLED")
+        except Exception as exc:  # noqa: BLE001
+            st_v, msg_v, err_s = str(JobState.FAILED), "Failed", str(exc)
+            det = {"error": err_s}
+            _log("exception", SUBMISSION_FR, f"job {job_id} failed during execution")
 
+        final_rec = replace(
+            base,
+            status=st_v,
+            progress=prg,
+            message=msg_v,
+            finished_at_utc=fin_at,
+            error_message=err_s,
+            result=res,
+            worker_pid=pid,
+        )
+        upd: dict[str, Any] = {
+            "status": st_v,
+            "progress": prg,
+            "message": msg_v,
+            "finished_at_utc": fin_at,
+            "error_message": err_s,
+        }
+        self._update_job(job_id, upd)
+        self._record_event(job_id, str(JobState.RUNNING), final_rec.status, det, fin_at)
         if self._cleanup_scratch_on_exit:
             self._resource_mgr.cleanup_scratch(job_id)
-
         with self._lock:
             self._jobs[job_id] = final_rec
-
         if done_evt is not None:
             done_evt.set()
 
     def cancel_job(self, job_id: str) -> bool:
         """Signal cooperative cancellation for a queued, paused, or running job."""
         with self._lock:
-            ctx = self._contexts.get(job_id)
-            fut = self._futures.get(job_id)
+            ctx, fut = self._contexts.get(job_id), self._futures.get(job_id)
             deferred = self._paused_queue.pop(job_id, None)
-            current = self._jobs.get(job_id)
-            done_evt = self._done_events.get(job_id)
+            current, done_evt = self._jobs.get(job_id), self._done_events.get(job_id)
 
         if ctx is None and current is None:
             return False
-
         if ctx is not None:
             ctx.cancel()
             ctx.set_paused(False)
-
         if fut is not None:
             fut.cancel()
 
         if deferred is not None:
             now_iso = datetime.now(UTC).isoformat()
-            cancelled_rec = JobRecord(
-                job_id=job_id,
-                owner=deferred.owner,
-                kind=deferred.kind,
-                status=str(JobState.CANCELLED),
-                progress=0.0,
-                message="Cancelled while paused",
-                attempt_id=1,
-                submitted_at_utc=deferred.submitted_at_utc,
+            err = "Cancelled by user while paused"
+            a1 = (job_id, deferred.owner, deferred.kind, str(JobState.CANCELLED), 0.0)
+            a2 = ("Cancelled while paused", 1, deferred.submitted_at_utc)
+            c_rec = JobRecord(
+                *a1,
+                *a2,
                 finished_at_utc=now_iso,
-                error_message="Cancelled by user while paused",
+                error_message=err,
                 scratch_dir=str(deferred.context.scratch_dir),
             )
-            self._update_job(
-                job_id,
-                {
-                    "status": str(JobState.CANCELLED),
-                    "message": "Cancelled while paused",
-                    "finished_at_utc": now_iso,
-                    "error_message": "Cancelled by user while paused",
-                },
-            )
+            upd = {
+                "status": str(JobState.CANCELLED),
+                "message": c_rec.message,
+                "finished_at_utc": now_iso,
+                "error_message": err,
+            }
+            self._update_job(job_id, upd)
             self._record_event(
-                event_id=f"evt-{uuid.uuid4().hex[:12]}",
-                job_id=job_id,
-                from_state=str(JobState.PAUSED),
-                to_state=str(JobState.CANCELLED),
-                details_json=json.dumps({"reason": "user_cancelled_paused_job"}),
-                created_at_utc=now_iso,
+                job_id,
+                str(JobState.PAUSED),
+                str(JobState.CANCELLED),
+                {"reason": "user_cancelled_paused_job"},
+                now_iso,
             )
             if self._cleanup_scratch_on_exit:
                 self._resource_mgr.cleanup_scratch(job_id)
             with self._lock:
-                self._jobs[job_id] = cancelled_rec
+                self._jobs[job_id] = c_rec
             if done_evt is not None:
                 done_evt.set()
 
-        logger.info(
-            "%s: requested cancellation for job %s",
-            CANCELLATION_FR,
-            job_id,
-            extra={"fr_id": CANCELLATION_FR, "job_id": job_id},
-        )
+        _log("info", CANCELLATION_FR, f"requested cancellation for job {job_id}")
         return True
 
     def pause_job(self, job_id: str) -> bool:
         """Pause a running job cooperatively."""
         with self._lock:
-            ctx = self._contexts.get(job_id)
-            curr = self._jobs.get(job_id)
+            ctx, curr = self._contexts.get(job_id), self._jobs.get(job_id)
         if ctx is None or curr is None or curr.status != str(JobState.RUNNING):
             return False
-
         ctx.set_paused(True)
-        paused_rec = JobRecord(
-            job_id=curr.job_id,
-            owner=curr.owner,
-            kind=curr.kind,
-            status=str(JobState.PAUSED),
-            progress=curr.progress,
-            message="Paused",
-            attempt_id=curr.attempt_id,
-            submitted_at_utc=curr.submitted_at_utc,
-            started_at_utc=curr.started_at_utc,
-            scratch_dir=curr.scratch_dir,
-        )
         with self._lock:
-            self._jobs[job_id] = paused_rec
-        self._update_job(
-            job_id,
-            {"status": str(JobState.PAUSED), "message": "Paused"},
-        )
+            self._jobs[job_id] = replace(
+                curr, status=str(JobState.PAUSED), message="Paused"
+            )
+        self._update_job(job_id, {"status": str(JobState.PAUSED), "message": "Paused"})
         return True
 
     def resume_job(self, job_id: str) -> bool:
         """Resume a paused job when RAM headroom permits."""
         with self._lock:
             deferred = self._paused_queue.pop(job_id, None)
-            ctx = self._contexts.get(job_id)
-            curr = self._jobs.get(job_id)
+            ctx, curr = self._contexts.get(job_id), self._jobs.get(job_id)
 
         if deferred is not None:
             deferred.context.set_paused(False)
-            self._dispatch_to_pool(
-                jid=deferred.job_id,
-                fn=deferred.fn,
-                args=deferred.args,
-                kwargs=deferred.kwargs,
-                pass_context=deferred.pass_context,
-                ctx=deferred.context,
-                owner=deferred.owner,
-                kind=deferred.kind,
-                submitted_at=deferred.submitted_at_utc,
-                done_evt=deferred.done_event,
-                executor_kind=deferred.executor_kind,
-            )
+            self._dispatch_to_pool(deferred)
             return True
 
         if ctx is not None and curr is not None and curr.status == str(JobState.PAUSED):
             ctx.set_paused(False)
-            resumed_rec = JobRecord(
-                job_id=curr.job_id,
-                owner=curr.owner,
-                kind=curr.kind,
-                status=str(JobState.RUNNING),
-                progress=curr.progress,
-                message="Running",
-                attempt_id=curr.attempt_id,
-                submitted_at_utc=curr.submitted_at_utc,
-                started_at_utc=curr.started_at_utc,
-                scratch_dir=curr.scratch_dir,
-            )
             with self._lock:
-                self._jobs[job_id] = resumed_rec
+                self._jobs[job_id] = replace(
+                    curr, status=str(JobState.RUNNING), message="Running"
+                )
             self._update_job(
-                job_id,
-                {"status": str(JobState.RUNNING), "message": "Running"},
+                job_id, {"status": str(JobState.RUNNING), "message": "Running"}
             )
             return True
-
         return False
 
     def _resume_all_paused(self) -> list[str]:
@@ -1212,7 +825,6 @@ class JobManager:
                 for jid, rec in self._jobs.items()
                 if rec.status == str(JobState.PAUSED)
             ]
-
         return [jid for jid in paused_ids if self.resume_job(jid)]
 
     def resume_paused_jobs(self) -> list[str]:
@@ -1223,8 +835,7 @@ class JobManager:
                 for jid, rec in self._jobs.items()
                 if rec.status == str(JobState.PAUSED)
             ]
-        status = self._resource_mgr.check_memory_headroom(policy="pause")
-        if status.is_pressured:
+        if self._resource_mgr.check_memory_headroom(policy="pause").is_pressured:
             return []
 
         resumed: list[str] = []
@@ -1258,19 +869,12 @@ class JobManager:
         """Callback invoked when MemoryWatchdog observes RAM recovery >= 15%."""
         self._resume_all_paused()
 
-    def wait_for_job(
-        self,
-        job_id: str,
-        *,
-        timeout: float = 10.0,
-    ) -> JobRecord:
+    def wait_for_job(self, job_id: str, *, timeout: float = 10.0) -> JobRecord:
         """Wait for a submitted job to reach a terminal state and return its record."""
         with self._lock:
             done_evt = self._done_events.get(job_id)
-
         if done_evt is not None:
             done_evt.wait(timeout=timeout)
-
         rec = self.get_job(job_id)
         if rec is None:
             raise KeyError(f"Job '{job_id}' not found.")
@@ -1279,8 +883,7 @@ class JobManager:
     def get_job(self, job_id: str) -> JobRecord | None:
         """Retrieve current JobRecord from memory or persistence store."""
         with self._lock:
-            mem_rec = self._jobs.get(job_id)
-            ctx = self._contexts.get(job_id)
+            mem_rec, ctx = self._jobs.get(job_id), self._contexts.get(job_id)
 
         if (
             mem_rec is not None
@@ -1290,27 +893,11 @@ class JobManager:
             prog = ctx.read_progress()
             if prog is not None:
                 pct, msg = prog
-                mem_rec = JobRecord(
-                    job_id=mem_rec.job_id,
-                    owner=mem_rec.owner,
-                    kind=mem_rec.kind,
-                    status=mem_rec.status,
-                    progress=pct,
-                    message=msg or mem_rec.message,
-                    attempt_id=mem_rec.attempt_id,
-                    submitted_at_utc=mem_rec.submitted_at_utc,
-                    started_at_utc=mem_rec.started_at_utc,
-                    scratch_dir=mem_rec.scratch_dir,
-                )
+                mem_rec = replace(mem_rec, progress=pct, message=msg or mem_rec.message)
 
         if mem_rec is not None:
-            logger.debug(
-                "%s: retrieved in-memory job %s (status=%s)",
-                PERSISTENCE_FR,
-                job_id,
-                mem_rec.status,
-                extra={"fr_id": PERSISTENCE_FR, "job_id": job_id},
-            )
+            msg = f"retrieved in-memory job {job_id} (status={mem_rec.status})"
+            _log("debug", PERSISTENCE_FR, msg, job_id=job_id)
             return mem_rec
 
         rows = HostPersistence.read_records(
@@ -1319,111 +906,56 @@ class JobManager:
         if not rows:
             return None
         row = rows[0]
-
-        logger.debug(
-            "%s: retrieved persisted job %s (status=%s)",
-            PERSISTENCE_FR,
-            job_id,
-            row.get("status"),
-            extra={"fr_id": PERSISTENCE_FR, "job_id": job_id},
-        )
-        return JobRecord(
-            job_id=str(row["job_id"]),
-            owner=str(row.get("owner", "default")),
-            kind=str(row.get("kind", "compute")),
-            status=str(row.get("status", "")),
-            progress=float(row.get("progress", 0.0)),
-            message=str(row.get("message", "")),
-            attempt_id=int(row.get("attempt_id", 1)),
-            submitted_at_utc=str(row.get("submitted_at_utc", "")),
-            started_at_utc=row.get("started_at_utc"),
-            finished_at_utc=row.get("finished_at_utc"),
-            error_message=row.get("error_message"),
-        )
+        msg = f"retrieved persisted job {job_id} (status={row.get('status')})"
+        _log("debug", PERSISTENCE_FR, msg, job_id=job_id)
+        return _row_to_record(row)
 
     def list_jobs(
-        self,
-        *,
-        status: str | None = None,
-        limit: int = 100,
+        self, *, status: str | None = None, limit: int = 100
     ) -> list[JobRecord]:
         """List persisted jobs from host_jobs table."""
         where = {"status": status} if status else None
         rows = HostPersistence.read_records("host_jobs", where=where, limit=limit)
-        logger.debug(
-            "%s: listed %d persisted jobs (status=%s)",
-            PERSISTENCE_FR,
-            len(rows),
-            status,
-            extra={"fr_id": PERSISTENCE_FR, "count": len(rows)},
-        )
-        return [
-            JobRecord(
-                job_id=str(r["job_id"]),
-                owner=str(r.get("owner", "default")),
-                kind=str(r.get("kind", "compute")),
-                status=str(r.get("status", "")),
-                progress=float(r.get("progress", 0.0)),
-                message=str(r.get("message", "")),
-                attempt_id=int(r.get("attempt_id", 1)),
-                submitted_at_utc=str(r.get("submitted_at_utc", "")),
-                started_at_utc=r.get("started_at_utc"),
-                finished_at_utc=r.get("finished_at_utc"),
-                error_message=r.get("error_message"),
-            )
-            for r in rows
-        ]
+        msg = f"listed {len(rows)} persisted jobs (status={status})"
+        _log("debug", PERSISTENCE_FR, msg, count=len(rows))
+        return [_row_to_record(r) for r in rows]
 
     def get_job_events(self, job_id: str) -> list[dict[str, Any]]:
         """Retrieve state transition events for a job from host_job_events."""
         return HostPersistence.read_records(
-            "host_job_events",
-            where={"job_id": job_id},
-            order_by="created_at_utc ASC",
+            "host_job_events", where={"job_id": job_id}, order_by="created_at_utc ASC"
         )
 
     def shutdown(self, *, wait: bool = True, cancel_futures: bool = False) -> None:
         """Shut down the worker pool executor and stop background watchdogs."""
         self._resource_mgr.watchdog.stop()
         if cancel_futures:
+            active_states = {
+                str(JobState.QUEUED),
+                str(JobState.RUNNING),
+                str(JobState.PAUSED),
+            }
             with self._lock:
                 active_ids = [
                     jid
-                    for jid, record in self._jobs.items()
-                    if record.status
-                    in {
-                        str(JobState.QUEUED),
-                        str(JobState.RUNNING),
-                        str(JobState.PAUSED),
-                    }
+                    for jid, rec in self._jobs.items()
+                    if rec.status in active_states
                 ]
             for jid in active_ids:
                 self.cancel_job(jid)
         with self._lock:
-            pool = self._pool
-            self._pool = None
-            io_pool = self._io_pool
-            self._io_pool = None
+            pool, self._pool = self._pool, None
+            io_pool, self._io_pool = self._io_pool, None
         if pool is not None:
             pool.shutdown(wait=wait, cancel_futures=cancel_futures)
-            logger.info(
-                "%s: shut down worker pool executor",
-                POOL_LIFECYCLE_FR,
-                extra={"fr_id": POOL_LIFECYCLE_FR},
-            )
+            _log("info", POOL_LIFECYCLE_FR, "shut down worker pool executor")
         if io_pool is not None:
             io_pool.shutdown(wait=wait, cancel_futures=cancel_futures)
-            logger.info(
-                "%s: shut down I/O worker pool executor",
-                POOL_LIFECYCLE_FR,
-                extra={"fr_id": POOL_LIFECYCLE_FR},
-            )
+            _log("info", POOL_LIFECYCLE_FR, "shut down I/O worker pool executor")
 
 
 def run_sample_compute_task(
-    ctx: JobContext,
-    iterations: int = 5_000,
-    step_sleep_seconds: float = 0.0,
+    ctx: JobContext, iterations: int = 5_000, step_sleep_seconds: float = 0.0
 ) -> dict[str, Any]:
     """Top-level picklable task demonstrating multiprocessing and JobContext."""
     total = max(1, iterations)
@@ -1447,24 +979,13 @@ def run_sample_compute_task(
 
 def main() -> None:
     """Demonstrate multiprocessing JobManager, JobContext, and orphan reconciliation."""
-    print("=== 1. Startup Orphan Job Reconciliation ===")
     mgr = JobManager(max_workers=2)
     try:
-        reconciled = mgr.reconcile_orphan_jobs()
-        print(f"Reconciled orphan RUNNING jobs: {len(reconciled)}")
-
-        print("=== 2. Multiprocessing Task Submission (ProcessPoolExecutor) ===")
+        mgr.reconcile_orphan_jobs()
         submitted = mgr.submit_job(
-            run_sample_compute_task,
-            2_500,
-            owner="cli-demo",
-            kind="compute",
+            run_sample_compute_task, 2_500, owner="cli-demo", kind="compute"
         )
-        completed = mgr.wait_for_job(submitted.job_id, timeout=15.0)
-        print(
-            f"Job {completed.job_id} finished with status={completed.status} "
-            f"on worker_pid={completed.worker_pid} (host_pid={os.getpid()})",
-        )
+        mgr.wait_for_job(submitted.job_id, timeout=15.0)
     finally:
         mgr.shutdown()
 
