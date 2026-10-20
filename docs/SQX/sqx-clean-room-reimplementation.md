@@ -1,6 +1,7 @@
 # Quantitative Workstation — Greenfield Clean-Room Architecture & Reimplementation Blueprint
 
 This document is the **authoritative greenfield clean-room master blueprint** for reimplementing the quantitative trading workstation from scratch. It unites:
+
 1. **Section 0 — Greenfield Engineering Guardrails, Line-Count Budgets & DRY Rules** (`<= 100` line docstrings, `1,000` line hard file cutoff, zero backward-compatibility aliases, AI-tool-ready methods, and repository-wide DRY deduplication).
 2. **Complete 3-Tier Spatial Project & File Structure** (`app/host/`, `app/services/`, `app/workspace/`, `app/plugins/`, `ui/app/`).
 3. **Donor / Backend / Frontend Alignment Tables** mapping every component to its **SQX Donor** (`docs/SQX/`), **Legacy Code Donor** (`ARCHIVE/app/...` and `ARCHIVE/ui/...`), **Backend Target File**, **Frontend Target File**, and **DRY Shared Dependencies**.
@@ -8,7 +9,8 @@ This document is the **authoritative greenfield clean-room master blueprint** fo
 
 ---
 
-# TARGET STACK (the reimplementation must use this)
+## TARGET STACK (the reimplementation must use this)
+
 - **Frontend:** React + TypeScript + Vite + Tailwind CSS
 - **Workspace:** Dockview (dockable panels, tabs, resizable layouts)
 - **Tables/Charts:** TanStack Table + TanStack Virtual + Lightweight Charts
@@ -31,26 +33,30 @@ This document is the **authoritative greenfield clean-room master blueprint** fo
 Every file created in the greenfield reimplementation MUST obey the following four constitutional rules without exception.
 
 ### 0.1 Top-of-File Docstring Rule ($\le 100$ Lines Hard Maximum)
+
 - The top-of-file docstring (`Description:`, `Purpose:`, `Key Capabilities:`, `Python API Usage:`, `CLI Usage:`) must be **brief, dense, and compact** — the fewer lines the better.
 - **Hard Cutoff:** Strictly **$\le 100$ lines maximum** (target `25–50` lines).
 - Format each `FR-*` entry under `Key Capabilities:` as a single compact bullet containing the `FR-*` identifier, brief summary, associated `[ClassName.method_name()]`, and explicit log level (`INFO`, `WARNING`, `ERROR`, `DEBUG`).
 
 ### 0.2 File Line-Count Cutoff Rule (1,000 Lines Hard Maximum)
+
 No source file may exceed **1,000 lines**. Every module is evaluated against this rubric:
 
-| Line Count | Status | Engineering Guideline |
-|---|---|---|
-| `< 200` | 🟢 **Ideal** | Highly focused, easy to test, and perfectly readable. |
-| `200 – 500` | 🟡 **Sweet Spot** | Standard for modules with a few closely related classes or complex logic. |
-| `500 – 1,000` | 🟠 **Warning** | Starting to push boundaries. Evaluate if the file violates the Single Responsibility Principle. |
-| `1,000+` | 🔴 **Refactor** | Too large. Refactor internally; if you cannot internally refactor, extract shared logic to `<domain>/_common.py` or `app/services/include/`. |
+| Line Count    | Status            | Engineering Guideline                                                                                                                        |
+| ------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `< 200`       | 🟢 **Ideal**      | Highly focused, easy to test, and perfectly readable.                                                                                        |
+| `200 – 500`   | 🟡 **Sweet Spot** | Standard for modules with a few closely related classes or complex logic.                                                                    |
+| `500 – 1,000` | 🟠 **Warning**    | Starting to push boundaries. Evaluate if the file violates the Single Responsibility Principle.                                              |
+| `1,000+`      | 🔴 **Refactor**   | Too large. Refactor internally; if you cannot internally refactor, extract shared logic to `<domain>/_common.py` or `app/services/include/`. |
 
 **Exceptions to the 1,000-Line Rule:**
+
 1. **Generated Files** (auto-generated schemas, protocol buffers, or compiled artifacts).
 2. **Configuration & Assets** (modules containing large static dictionaries, catalog mappings, or SQL DDL lookup tables).
 3. **Monolithic GUI Logic** (complex UI layout components where splitting would cause fragmented, hard-to-follow event chains).
 
 ### 0.3 Upfront `FR-*` & Exact Method Signature Contract (AI-Tool Ready, Zero Aliases)
+
 1. **Strict 1:1 `FR-*` Mapping:** A file may have several functional requirements (`FR-*`). All `FR-*` identifiers and the **exact typed method signature (`ClassName.method_name(args: Type) -> ReturnType`)** that handles each `FR-*` are specified beforehand in this blueprint and in the task's `implementation-plan.md`.
 2. **No Invented Public Methods:** If a file declares $N$ functional requirements, its service class exposes **only those $N$ public methods**. Helper methods must be private (`_helper_name()`).
 3. **Zero Backward-Compatibility Shims or Aliases:** Never create alias methods, deprecated wrappers, or duplicate module-level functions that wrap class methods.
@@ -58,7 +64,9 @@ No source file may exceed **1,000 lines**. Every module is evaluated against thi
 5. **Non-Silent Logging:** Every `FR-*` method must emit a structured log entry via `logger = get_logger(__name__)` (`app/host/logging.py`).
 
 ### 0.4 Repository-Wide DRY Deduplication Hierarchy
+
 To eliminate the ~35,000 lines of duplication identified in `ARCHIVE/`:
+
 1. **Centralized Database Persistence (`HostPersistence` only):**
    - Only `app/host/persistence.py` (`HostPersistence`) may resolve database paths, open SQLite connections, or execute SQL/migrations.
    - All other files (`app/host/*`, `app/workspace/*`, `app/services/*`) are **strictly forbidden** from defining `resolved_db_path()`, `_get_connection()`, or calling `sqlite3.connect()`. They must exclusively call `HostPersistence.create_record()`, `read_records()`, `update_record()`, `delete_record()`, `create_entity()`, `read_entity()`, `update_entity()`, `delete_entity()`, or `apply_batch()`.
@@ -183,30 +191,31 @@ HaruQuantAI/
 
 ### Phase 1.1 – 1.4 Master Donor / Backend / Frontend Alignment Table (Bottom-Up Build Order)
 
-| Build Order & Component | SQX Donor (`docs/SQX/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| **1. `TelemetryLogger`** | `SQLog` / Logback Sinks | `ARCHIVE/app/host/logging.py` | `app/host/logging.py` (`🟡 200–350L`) | `ui/app/host/HostSettingsModal.tsx` | Zero `app.*` imports (Root dependency for all files) |
-| **2. `HostPersistence`** | `SQDataLib` / SQLite WAL Store | `ARCHIVE/app/host/persistence.py` | `app/host/persistence.py` (`🟠 700–900L`, DDL asset table) | `ui/app/host/HostSettingsModal.tsx` | `TelemetryLogger`; single source of truth for all SQLite CRUD |
-| **3. `ApiResponse`** | Servlet JSON Envelopes | `ARCHIVE/app/host/response.py` | `app/host/response.py` (`🟢 <150L`) | `ui/app/host/HostSettingsModal.tsx` | `TelemetryLogger`; standard REST/WS envelope |
-| **4. `ResourceMonitor`** | `MemoryMonitor` / Watchdog | `ARCHIVE/app/host/resources.py` | `app/host/resources.py` (`🟢 <200L`) | `ui/app/host/HostSettingsModal.tsx` | `TelemetryLogger` |
-| **5. `SettingsManager` & `SkinDark`/`SkinLight`** | `Settings` / `SkinDark` / `SkinLight` | `ARCHIVE/app/host/settings.py` | `app/host/settings.py` (`🟡 200–350L`) | `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx` | `TelemetryLogger`, `HostPersistence` (`settings` table) |
-| **6. `SessionManager`** | `SessionAuth` / Token Guard | `ARCHIVE/app/host/session.py` | `app/host/session.py` (`🟢 <200L`) | `ui/app/host/HostSettingsModal.tsx` | `TelemetryLogger`, `HostPersistence` (`sessions` table) |
-| **7. `PluginDiscovery`** | `PluginManager` (`internal/plugins/`) | `ARCHIVE/app/host/discovery.py` | `app/host/discovery.py` (`🟡 200–350L`) | `ui/app/host/HostSettingsModal.tsx` | `TelemetryLogger`, `HostPersistence` |
-| **8. `JobManager`** | `TaskManager` / Worker Pool | `ARCHIVE/app/host/jobs.py` | `app/host/jobs.py` (`🟡 250–400L`) | `ui/app/host/HostSettingsModal.tsx` | `TelemetryLogger`, `HostPersistence` (`jobs` table) |
-| **9. `AppPlatform` (`AppHost`)** | `SQApp` / Jetty Bootstrap (`onboard/`) | `ARCHIVE/app/host/bootstrap.py`, `ARCHIVE/app/main.py` | `app/host/bootstrap.py` (`🟡 250–450L`), `app/main.py` (`🟢 <150L`) | `ui/app/host/HostConnectionModal.tsx` | `TelemetryLogger`, `HostPersistence`, all Phase 1.1 services |
-| **10. `HeadlessCLI`** | `sqcli.config` / `SQConsoleStarter` (`cli/`) | `ARCHIVE/app/cli.py` | `app/cli.py` (`🟡 200–350L`) | N/A (Headless CLI) | `TelemetryLogger`, `AppHost`, `HostPersistence` |
-| **11. `ConnectionTest`, `ServletConnection`, `ServletConstants`** | `ConnectionTest`, `ServletConnection`, `ServletConstants` | `ARCHIVE/app/host/transport.py` | `app/host/transport.py` (`🟡 300–480L`) | `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx` | `TelemetryLogger`, `HostPersistence`, `ApiResponse` |
-| **12. `ConnectionLiveTest`** | `ConnectionLiveTest` | `ARCHIVE/app/services/brokers/registry.py` | `app/services/brokers/registry.py` (`🟢 <200L`) | `ui/app/workspace/Trading/TradingDashboard.tsx` | `BaseBrokerClient` |
-| **13. `ConnectionMT4` (`ConnectionMT5`)** | `ConnectionMT4` / MT5 Bridge | `ARCHIVE/app/services/brokers/metatrader.py` | `app/services/brokers/metatrader.py` (`🟡 250–400L`) | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_native_history.py` |
-| **14. `ConnectionCTrader`** | `ConnectionCTrader` | `ARCHIVE/app/services/brokers/ctrader.py` | `app/services/brokers/ctrader.py` (`🟡 250–400L`) | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_http.py` |
-| **15. `ConnectionSimulator`** | `ConnectionSimulator` | `ARCHIVE/app/services/brokers/simulator.py` | `app/services/brokers/simulator.py` (`🟡 200–350L`) | `ui/app/workspace/Trading/TradingDashboard.tsx` | `BaseBrokerClient` |
-| **16. `CryptoExchange*` (6 Exchanges)** | `CryptoExchangeBinance*`, `Bitfinex`, `CoinbasePro`, `Poloniex` | `ARCHIVE/app/services/brokers/crypto.py` | `app/services/brokers/crypto.py` (`🟡 350–500L`) | `ui/app/plugins/data_source/Crypto/CryptoModal.tsx` | `BaseBrokerClient`, `_http.py` |
+| Build Order & Component                                           | SQX Donor (`docs/SQX/`)                                         | Legacy Code Donor (`ARCHIVE/`)                         | Backend Target File (Line Budget)                                   | Frontend Target File                                                         | DRY Shared Dependencies                                       |
+| ----------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **1. `TelemetryLogger`**                                          | `SQLog` / Logback Sinks                                         | `ARCHIVE/app/host/logging.py`                          | `app/host/logging.py` (`🟡 200–350L`)                               | `ui/app/host/HostSettingsModal.tsx`                                          | Zero `app.*` imports (Root dependency for all files)          |
+| **2. `HostPersistence`**                                          | `SQDataLib` / SQLite WAL Store                                  | `ARCHIVE/app/host/persistence.py`                      | `app/host/persistence.py` (`🟠 700–900L`, DDL asset table)          | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`; single source of truth for all SQLite CRUD |
+| **3. `ApiResponse`**                                              | Servlet JSON Envelopes                                          | `ARCHIVE/app/host/response.py`                         | `app/host/response.py` (`🟢 <150L`)                                 | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`; standard REST/WS envelope                  |
+| **4. `ResourceMonitor`**                                          | `MemoryMonitor` / Watchdog                                      | `ARCHIVE/app/host/resources.py`                        | `app/host/resources.py` (`🟢 <200L`)                                | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`                                             |
+| **5. `SettingsManager` & `SkinDark`/`SkinLight`**                 | `Settings` / `SkinDark` / `SkinLight`                           | `ARCHIVE/app/host/settings.py`                         | `app/host/settings.py` (`🟡 200–350L`)                              | `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx`     | `TelemetryLogger`, `HostPersistence` (`settings` table)       |
+| **6. `SessionManager`**                                           | `SessionAuth` / Token Guard                                     | `ARCHIVE/app/host/session.py`                          | `app/host/session.py` (`🟢 <200L`)                                  | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence` (`sessions` table)       |
+| **7. `PluginDiscovery`**                                          | `PluginManager` (`internal/plugins/`)                           | `ARCHIVE/app/host/discovery.py`                        | `app/host/discovery.py` (`🟡 200–350L`)                             | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence`                          |
+| **8. `JobManager`**                                               | `TaskManager` / Worker Pool                                     | `ARCHIVE/app/host/jobs.py`                             | `app/host/jobs.py` (`🟡 250–400L`)                                  | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence` (`jobs` table)           |
+| **9. `AppPlatform` (`AppHost`)**                                  | `SQApp` / Jetty Bootstrap (`onboard/`)                          | `ARCHIVE/app/host/bootstrap.py`, `ARCHIVE/app/main.py` | `app/host/bootstrap.py` (`🟡 250–450L`), `app/main.py` (`🟢 <150L`) | `ui/app/host/HostConnectionModal.tsx`                                        | `TelemetryLogger`, `HostPersistence`, all Phase 1.1 services  |
+| **10. `HeadlessCLI`**                                             | `sqcli.config` / `SQConsoleStarter` (`cli/`)                    | `ARCHIVE/app/cli.py`                                   | `app/cli.py` (`🟡 200–350L`)                                        | N/A (Headless CLI)                                                           | `TelemetryLogger`, `AppHost`, `HostPersistence`               |
+| **11. `ConnectionTest`, `ServletConnection`, `ServletConstants`** | `ConnectionTest`, `ServletConnection`, `ServletConstants`       | `ARCHIVE/app/host/transport.py`                        | `app/host/transport.py` (`🟡 300–480L`)                             | `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`   | `TelemetryLogger`, `HostPersistence`, `ApiResponse`           |
+| **12. `ConnectionLiveTest`**                                      | `ConnectionLiveTest`                                            | `ARCHIVE/app/services/brokers/registry.py`             | `app/services/brokers/registry.py` (`🟢 <200L`)                     | `ui/app/workspace/Trading/TradingDashboard.tsx`                              | `BaseBrokerClient`                                            |
+| **13. `ConnectionMT4` (`ConnectionMT5`)**                         | `ConnectionMT4` / MT5 Bridge                                    | `ARCHIVE/app/services/brokers/metatrader.py`           | `app/services/brokers/metatrader.py` (`🟡 250–400L`)                | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_native_history.py`                      |
+| **14. `ConnectionCTrader`**                                       | `ConnectionCTrader`                                             | `ARCHIVE/app/services/brokers/ctrader.py`              | `app/services/brokers/ctrader.py` (`🟡 250–400L`)                   | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_http.py`                                |
+| **15. `ConnectionSimulator`**                                     | `ConnectionSimulator`                                           | `ARCHIVE/app/services/brokers/simulator.py`            | `app/services/brokers/simulator.py` (`🟡 200–350L`)                 | `ui/app/workspace/Trading/TradingDashboard.tsx`                              | `BaseBrokerClient`                                            |
+| **16. `CryptoExchange*` (6 Exchanges)**                           | `CryptoExchangeBinance*`, `Bitfinex`, `CoinbasePro`, `Poloniex` | `ARCHIVE/app/services/brokers/crypto.py`               | `app/services/brokers/crypto.py` (`🟡 350–500L`)                    | `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`                          | `BaseBrokerClient`, `_http.py`                                |
 
 ---
 
 ### Phase 1.1: Core Application Container & Stage 1 Host Foundation (Ordered Bottom-Up)
 
 #### 1. `app/host/logging.py` — `TelemetryLogger`, `BoundLogger`, `TelemetryEngine` & `LogRingBuffer` (`FEAT-HOST-LOGGING`)
+
 - **Donors:** SQX `SQLog` | Legacy `ARCHIVE/app/host/logging.py`
 - **Backend Target:** `app/host/logging.py` (`🟠 500–995L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
@@ -224,6 +233,7 @@ HaruQuantAI/
   - [x] `FR-HOST-LOGGING-EXPORTS`: Public factory exports (`get_logger`, `get_access_logger`, `get_ring_buffer`) and `TelemetryLoggerCLI` (`--verify`)
 
 #### 2. `app/host/persistence.py` — `HostPersistence` (`FEAT-HOST-PERSISTENCE`)
+
 - **Donors:** SQX `SQDataLib` Persistence | Legacy `ARCHIVE/app/host/persistence.py`
 - **Backend Target:** `app/host/persistence.py` (`🟠 500–900L`, Docstring `<=60L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
@@ -237,6 +247,7 @@ HaruQuantAI/
   - [x] `FR-HOST-PERSISTENCE-BATCH`: Execute atomic multi-row batch writes with all-or-nothing rollback $\rightarrow$ `HostPersistence.apply_batch(operations: Sequence[Mapping[str, Any]]) -> dict[str, Any]`
 
 #### 3. `app/host/response.py` — `StandardResponse`, `StandardError`, `ResponseMetadata` & `ApiResponse` (`FEAT-HOST-RESPONSE`)
+
 - **Donors:** SQX Servlet Response Envelopes | Legacy `ARCHIVE/app/host/response.py`
 - **Backend Target:** `app/host/response.py` (`🟡 200–495L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
@@ -247,6 +258,7 @@ HaruQuantAI/
   - [x] `FR-HOST-RESPONSE-SERIALIZATION`: Serialize `StandardResponse[T]` envelopes to JSON-compatible dictionaries $\rightarrow$ `StandardResponse.to_dict() -> dict[str, Any]`
 
 #### 4. `app/host/resources.py` — `ResourceMonitor` (`FEAT-HOST-RESOURCES`)
+
 - **Donors:** SQX `MemoryMonitor` | Legacy `ARCHIVE/app/host/resources.py`
 - **Backend Target:** `app/host/resources.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
@@ -255,6 +267,7 @@ HaruQuantAI/
   - [x] `FR-HOST-RESOURCES-INSPECT`: Monitor CPU cores, RAM utilization, disk quotas, and memory pressure thresholds $\rightarrow$ `ResourceMonitor.inspect_resources(workspace_path: Path | str | None = None) -> dict[str, Any]`
 
 #### 5. `app/host/settings.py` — `SettingsManager` & `Theme` (`FEAT-HOST-SETTINGS`)
+
 - **Donors:** SQX `Settings`, `SkinDark`, `SkinLight` | Legacy `ARCHIVE/app/host/settings.py`
 - **Backend Target:** `app/host/settings.py` (`🟡 200–350L`, Docstring `<=55L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx`
@@ -267,6 +280,7 @@ HaruQuantAI/
   - [x] `FR-HOST-THEME-LIGHT-TOKENS`: Provide light theme styling tokens for Dockview panels, tables, and charts $\rightarrow$ `Theme.get_light_tokens() -> dict[str, Any]`
 
 #### 6. `app/host/session.py` — `SessionManager` (`FEAT-HOST-SESSION`)
+
 - **Donors:** SQX Session Guard | Legacy `ARCHIVE/app/host/session.py`
 - **Backend Target:** `app/host/session.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
@@ -275,6 +289,7 @@ HaruQuantAI/
   - [x] `FR-HOST-SESSION-VERIFY`: Issue ephemeral session tokens and enforce route scope authorization against `HostPersistence` $\rightarrow$ `SessionManager.verify_session(token: str | None = None, *, required_scope: str = "read", issue_if_none: bool = False) -> dict[str, Any]`
 
 #### 7. `app/host/discovery.py` — `PluginDiscovery` (`FEAT-HOST-DISCOVERY`)
+
 - **Donors:** SQX `PluginManager` | Legacy `ARCHIVE/app/host/discovery.py`
 - **Backend Target:** `app/host/discovery.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
@@ -283,6 +298,7 @@ HaruQuantAI/
   - [x] `FR-HOST-DISCOVERY-SCAN`: Scan and validate dynamic plugin manifests and extension slots at startup and persist registry state via `HostPersistence` $\rightarrow$ `PluginDiscovery.discover_plugins(plugin_dirs: Sequence[Path | str] | None = None) -> dict[str, Any]`
 
 #### 8. `app/host/jobs.py` — `JobManager` (`FEAT-HOST-JOBS`)
+
 - **Donors:** SQX Background Worker Coordinator | Legacy `ARCHIVE/app/host/jobs.py`
 - **Backend Target:** `app/host/jobs.py` (`🟡 250–400L`, Docstring `<=50L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
@@ -292,6 +308,7 @@ HaruQuantAI/
   - [x] `FR-HOST-JOBS-CANCEL`: Cancel queued or running background worker tasks and record terminal state in SQLite $\rightarrow$ `JobManager.cancel_job(job_id: str, *, reason: str = "user_cancelled") -> dict[str, Any]`
 
 #### 9. `app/host/bootstrap.py` & `app/main.py` — `AppPlatform` (`FEAT-HOST-BOOTSTRAP`)
+
 - **Donors:** SQX `SQApp` / Jetty Host (`docs/SQX/overview/`) | Legacy `ARCHIVE/app/host/bootstrap.py`, `ARCHIVE/app/main.py`
 - **Backend Target:** `app/host/bootstrap.py` (`🟡 250–450L`, Docstring `<=50L`), `app/main.py` (`🟢 <150L`, Docstring `<=40L`)
 - **Frontend Target:** `ui/app/host/HostConnectionModal.tsx`
@@ -304,6 +321,7 @@ HaruQuantAI/
   - [x] `FR-HOST-BOOTSTRAP-SHUTDOWN`: Manage graceful LIFO shutdown, worker process termination, and resource cleanup $\rightarrow$ `AppHost.shutdown(reason: str = "normal") -> dict[str, Any]`
 
 #### 10. `app/cli.py` — Headless CLI Runner (`FEAT-HOST-CLI`)
+
 - **Donors:** SQX `sqcli.config` / `SQConsoleStarter` (`docs/SQX/cli/`) | Legacy `ARCHIVE/app/cli.py`
 - **Backend Target:** `app/cli.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Class / Function:** `HeadlessCLI` & `run_cli`
@@ -315,6 +333,7 @@ HaruQuantAI/
 ### Phase 1.2: Platform & Broker Connectivity
 
 #### 11. `app/host/transport.py` — `ConnectionTest`, `ServletConnection` & `ServletConstants` (`FEAT-HOST-TRANSPORT`)
+
 - **Donors:** SQX `ConnectionTest`, `ServletConnection`, `ServletConstants` | Legacy `ARCHIVE/app/host/transport.py`
 - **Backend Target:** `app/host/transport.py` (`🟡 300–480L`, Docstring `<=65L`)
 - **Frontend Target:** `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`
@@ -331,6 +350,7 @@ HaruQuantAI/
   - [ ] `FR-HOST-SERVLET-SPECS`: Serve system resource limits, hardware concurrency specs, and supported timeframes $\rightarrow$ `ServletConstants.get_system_specs() -> dict[str, Any]`
 
 #### 12. `app/services/brokers/registry.py` — `ConnectionLiveTest` (`FEAT-BROKER-LIVETEST`)
+
 - **Donors:** SQX `ConnectionLiveTest` | Legacy `ARCHIVE/app/services/brokers/registry.py`
 - **Backend Target:** `app/services/brokers/registry.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/workspace/Trading/TradingDashboard.tsx`
@@ -341,6 +361,7 @@ HaruQuantAI/
   - [ ] `FR-BROKER-LIVETEST-PERMISSIONS`: Verify account trading permissions and margin currency settings $\rightarrow$ `LiveTest.verify_trading_permissions(provider: str, account_id: str) -> dict[str, Any]`
 
 #### 13. `app/services/brokers/metatrader.py` — `ConnectionMT4` / `ConnectionMT5` & `DataSourceMt5Api` (`FEAT-BROKER-MT5`)
+
 - **Donors:** SQX `ConnectionMT4`, `DataSourceMt5Api` | Legacy `ARCHIVE/app/services/brokers/metatrader.py`
 - **Backend Target:** `app/services/brokers/metatrader.py` (`🟡 250–400L`, Docstring `<=55L`)
 - **Frontend Target:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`, `ui/app/plugins/data_source/MetaTrader/Mt5ImportModal.tsx`
@@ -354,6 +375,7 @@ HaruQuantAI/
   - [ ] `FR-DATASRC-MT5-IMPORT`: Import historical price data directly from MetaTrader 5 terminal via Python API into Parquet storage $\rightarrow$ `Mt5Api.import_data(symbol: str, timeframe: str, start_date: str, end_date: str) -> dict[str, Any]`
 
 #### 14. `app/services/brokers/ctrader.py` — `ConnectionCTrader` (`FEAT-BROKER-CTRADER`)
+
 - **Donors:** SQX `ConnectionCTrader` | Legacy `ARCHIVE/app/services/brokers/ctrader.py`
 - **Backend Target:** `app/services/brokers/ctrader.py` (`🟡 250–400L`, Docstring `<=55L`)
 - **Frontend Target:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
@@ -364,6 +386,7 @@ HaruQuantAI/
   - [ ] `FR-BROKER-CTRADER-TRADING`: Submit, modify, and close market/limit/stop orders via cTrader Open API $\rightarrow$ `CTraderClient.place_order(order_request: Mapping[str, Any]) -> dict[str, Any]` & `CTraderClient.close_position(position_id: str, volume: float | None = None) -> dict[str, Any]`
 
 #### 15. `app/services/brokers/simulator.py` — `ConnectionSimulator` (`FEAT-BROKER-SIMULATOR`)
+
 - **Donors:** SQX `ConnectionSimulator` | Legacy `ARCHIVE/app/services/brokers/simulator.py`
 - **Backend Target:** `app/services/brokers/simulator.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/workspace/Trading/TradingDashboard.tsx`
@@ -377,6 +400,7 @@ HaruQuantAI/
 ### Phase 1.3: Cryptocurrency Exchange Adapters
 
 #### 16. `app/services/brokers/crypto.py` — Consolidated Crypto Exchange Clients & `DataSourceCrypto` (`FEAT-BROKER-CRYPTO`)
+
 - **Donors:** SQX `CryptoExchangeBinance`, `CryptoExchangeBinanceCoinM`, `CryptoExchangeBinanceUsdtM`, `CryptoExchangeBitfinex`, `CryptoExchangeCoinbasePro`, `CryptoExchangePoloniex`, `DataSourceCrypto` | Legacy `ARCHIVE/app/services/brokers/crypto.py`
 - **Backend Target:** `app/services/brokers/crypto.py` (`🟡 350–500L`, Docstring `<=75L`)
 - **Frontend Target:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
@@ -416,23 +440,24 @@ HaruQuantAI/
 
 ### Phase 1A.1 – 1A.3 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/libs/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `HQTime` | `SQLib` `SQTime` | `ARCHIVE/app/services/include/time.py` | `app/services/include/time.py` (`🟡 200–350L`) | N/A | Microsecond UTC/timezone calendar |
-| `BarTime` | `SQDataLib` `BarTime` | `ARCHIVE/app/services/include/bar_time.py` | `app/services/include/bar_time.py` (`🟢 <200L`) | N/A | `HQTime` |
-| `RandomGenerator` | `SQLib` `RandomGenerator` | `ARCHIVE/app/services/include/generators.py` | `app/services/include/generators.py` (`🟢 <200L`) | N/A | Deterministic `SplitMix64` / `XorShift128+` |
-| `Contracts` & `Enums` | `SQTradingLib` DTOs & Enums | `ARCHIVE/app/services/include/contracts.py`, `enums.py`, `trading.py` | `app/services/include/contracts.py` (`🟢 <200L`), `enums.py` (`🟢 <200L`), `trading.py` (`🟡 200–350L`) | N/A | Immutable frozen dataclasses |
-| `DataSeries` | `SQDataLib` `DataSeries` / `HistoryDataLoader` | `ARCHIVE/app/services/include/data.py` | `app/services/include/data.py` (`🟡 250–400L`) | N/A | NumPy / PyArrow zero-copy buffers |
-| `SignalInclude` | `SQTradingLib` Actions, Comparisons, Functions, Price, Types | `ARCHIVE/app/services/include/{actions,comparisons,functions,price,types}.py` | `app/services/include/{actions,comparisons,functions,price,types}.py` (each `🟢 <200L` to `🟡 200–350L`) | N/A | Single class per module (zero duplicate top-level wrappers) |
-| `BaseIndicator` + 69 Indicators | `SQTradingLib` Indicators (69 classes) | `ARCHIVE/app/services/indicators/` (79 files) | `app/services/indicators/base.py` (`🟡 200–300L`) + 69 files (`🟢 <150L` each) | `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx` | All 8 condition methods (`is_rising`, `crosses_above`, etc.) live once on `BaseIndicator` |
-| `BacktestSimulationEngine` | `SQTradingLib` Simulator, Precision, Platforms, Orders, Accounting | `ARCHIVE/app/services/brokers/simulator.py`, `ARCHIVE/app/services/include/trading.py` | `app/services/engine/{simulator,precision,platforms,orders,accounting}.py` (each `🟡 200–400L`) | N/A | `DataSeries`, `OrderRecord`, `TradeRecord` |
-| `CorePersistenceFormats` | `.cfx`, `.sqx`, `.sq4`, `.sq3`, `.dat` Codecs (`custom-projects/`) | `ARCHIVE/app/services/brokers/_native_history.py` | `app/services/engine/formats.py` (`🟡 250–400L`) | N/A | PyArrow Parquet + `zipfile` XML AST codecs |
+| Component                       | SQX Donor (`docs/SQX/libs/`)                                       | Legacy Code Donor (`ARCHIVE/`)                                                         | Backend Target File (Line Budget)                                                                        | Frontend Target File                                   | DRY Shared Dependencies                                                                   |
+| ------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `HQTime`                        | `SQLib` `SQTime`                                                   | `ARCHIVE/app/services/include/time.py`                                                 | `app/services/include/time.py` (`🟡 200–350L`)                                                           | N/A                                                    | Microsecond UTC/timezone calendar                                                         |
+| `BarTime`                       | `SQDataLib` `BarTime`                                              | `ARCHIVE/app/services/include/bar_time.py`                                             | `app/services/include/bar_time.py` (`🟢 <200L`)                                                          | N/A                                                    | `HQTime`                                                                                  |
+| `RandomGenerator`               | `SQLib` `RandomGenerator`                                          | `ARCHIVE/app/services/include/generators.py`                                           | `app/services/include/generators.py` (`🟢 <200L`)                                                        | N/A                                                    | Deterministic `SplitMix64` / `XorShift128+`                                               |
+| `Contracts` & `Enums`           | `SQTradingLib` DTOs & Enums                                        | `ARCHIVE/app/services/include/contracts.py`, `enums.py`, `trading.py`                  | `app/services/include/contracts.py` (`🟢 <200L`), `enums.py` (`🟢 <200L`), `trading.py` (`🟡 200–350L`)  | N/A                                                    | Immutable frozen dataclasses                                                              |
+| `DataSeries`                    | `SQDataLib` `DataSeries` / `HistoryDataLoader`                     | `ARCHIVE/app/services/include/data.py`                                                 | `app/services/include/data.py` (`🟡 250–400L`)                                                           | N/A                                                    | NumPy / PyArrow zero-copy buffers                                                         |
+| `SignalInclude`                 | `SQTradingLib` Actions, Comparisons, Functions, Price, Types       | `ARCHIVE/app/services/include/{actions,comparisons,functions,price,types}.py`          | `app/services/include/{actions,comparisons,functions,price,types}.py` (each `🟢 <200L` to `🟡 200–350L`) | N/A                                                    | Single class per module (zero duplicate top-level wrappers)                               |
+| `BaseIndicator` + 69 Indicators | `SQTradingLib` Indicators (69 classes)                             | `ARCHIVE/app/services/indicators/` (79 files)                                          | `app/services/indicators/base.py` (`🟡 200–300L`) + 69 files (`🟢 <150L` each)                           | `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx` | All 8 condition methods (`is_rising`, `crosses_above`, etc.) live once on `BaseIndicator` |
+| `BacktestSimulationEngine`      | `SQTradingLib` Simulator, Precision, Platforms, Orders, Accounting | `ARCHIVE/app/services/brokers/simulator.py`, `ARCHIVE/app/services/include/trading.py` | `app/services/engine/{simulator,precision,platforms,orders,accounting}.py` (each `🟡 200–400L`)          | N/A                                                    | `DataSeries`, `OrderRecord`, `TradeRecord`                                                |
+| `CorePersistenceFormats`        | `.cfx`, `.sqx`, `.sq4`, `.sq3`, `.dat` Codecs (`custom-projects/`) | `ARCHIVE/app/services/brokers/_native_history.py`                                      | `app/services/engine/formats.py` (`🟡 250–400L`)                                                         | N/A                                                    | PyArrow Parquet + `zipfile` XML AST codecs                                                |
 
 ---
 
 ### Phase 1A.1: Core Primitives, Data Contracts & Signal Building Blocks (`app/services/include/`)
 
 #### 1. `app/services/include/time.py` — `HQTime` (`FEAT-INCLUDE-TIME`)
+
 - **Donors:** SQX `SQLib.SQTime` | Legacy `ARCHIVE/app/services/include/time.py`
 - **Backend Target:** `app/services/include/time.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Class:** `HQTime`
@@ -440,6 +465,7 @@ HaruQuantAI/
   - [ ] `FR-INCLUDE-TIME-ARITHMETIC`: Perform microsecond-exact timestamp arithmetic, timezone shifts, and session boundary checks $\rightarrow$ `HQTime.convert_timezone(timestamp_us: int, from_tz: str, to_tz: str) -> int`, `HQTime.add_interval(timestamp_us: int, unit: str, amount: int) -> int`, `HQTime.is_within_session(timestamp_us: int, session_open_min: int, session_close_min: int) -> bool`
 
 #### 2. `app/services/include/bar_time.py` — `BarTime` (`FEAT-INCLUDE-BARTIME`)
+
 - **Donors:** SQX `SQDataLib.BarTime` | Legacy `ARCHIVE/app/services/include/bar_time.py`
 - **Backend Target:** `app/services/include/bar_time.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Class:** `BarTime`
@@ -447,6 +473,7 @@ HaruQuantAI/
   - [ ] `FR-INCLUDE-BARTIME-ALIGN`: Align intraday, daily, weekly, and monthly bar open/close boundaries $\rightarrow$ `BarTime.floor_bar_time(timestamp_us: int, timeframe: str) -> int`, `BarTime.ceil_bar_time(timestamp_us: int, timeframe: str) -> int`, `BarTime.timeframe_seconds(timeframe: str) -> int`
 
 #### 3. `app/services/include/generators.py` — `RandomGenerator` (`FEAT-INCLUDE-RNG`)
+
 - **Donors:** SQX `SQLib.RandomGenerator` | Legacy `ARCHIVE/app/services/include/generators.py`
 - **Backend Target:** `app/services/include/generators.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Class:** `RandomGenerator`
@@ -454,6 +481,7 @@ HaruQuantAI/
   - [ ] `FR-INCLUDE-RNG-STREAM`: Generate reproducible pseudo-random streams (`XorShift128+` / `SplitMix64`) for genetic evolution and Monte Carlo permutations $\rightarrow$ `RandomGenerator.next_float(low: float = 0.0, high: float = 1.0) -> float`, `RandomGenerator.next_int(low: int, high: int) -> int`, `RandomGenerator.permutation(length: int) -> np.ndarray`
 
 #### 4. `app/services/include/data.py` — `DataSeries` & `HistoryDataLoader` (`FEAT-INCLUDE-DATA`)
+
 - **Donors:** SQX `SQDataLib.DataSeries`, `HistoryDataLoader` | Legacy `ARCHIVE/app/services/include/data.py`
 - **Backend Target:** `app/services/include/data.py` (`🟡 250–400L`, Docstring `<=50L`)
 - **Classes:** `DataSeries`, `HistoryDataLoader`
@@ -461,6 +489,7 @@ HaruQuantAI/
   - [ ] `FR-INCLUDE-DATA-SERIES`: Provide zero-copy NumPy/PyArrow columnar OHLCV bar series, reverse-indexed shift access, and tick buffers $\rightarrow$ `DataSeries.from_arrays(timestamps: np.ndarray, opens: np.ndarray, highs: np.ndarray, lows: np.ndarray, closes: np.ndarray, volumes: np.ndarray, *, symbol: str = "", timeframe: str = "H1") -> DataSeries` & `HistoryDataLoader.load_parquet(file_path: Path | str) -> DataSeries`
 
 #### 5. `app/services/include/contracts.py`, `enums.py`, `trading.py` — Domain Contracts (`FEAT-INCLUDE-TRADING`)
+
 - **Donors:** SQX `SQTradingLib` Order/Trade DTOs | Legacy `ARCHIVE/app/services/include/{contracts,enums,trading}.py`
 - **Backend Targets:** `contracts.py` (`🟢 <200L`), `enums.py` (`🟢 <200L`), `trading.py` (`🟡 200–350L`)
 - **Classes:** `OrderRecord`, `TradeRecord`, `PositionState`, `ExecutionReport`
@@ -468,6 +497,7 @@ HaruQuantAI/
   - [ ] `FR-INCLUDE-TRADING-CONTRACTS`: Construct and validate immutable order, fill, position, trade, and execution records $\rightarrow$ `OrderRecord.create(symbol: str, direction: str, order_type: str, lots: float, price: float, *, stop_loss: float = 0.0, profit_target: float = 0.0, magic_number: int = 0, comment: str = "") -> OrderRecord` & `TradeRecord.from_closed_order(order: OrderRecord, close_time_us: int, close_price: float, gross_pnl: float, commission: float, swap: float) -> TradeRecord`
 
 #### 6. `app/services/include/{comparisons,functions,price,actions,types}.py` — `CoreSignalAndMathInclude` (`FEAT-INCLUDE-SIGNAL`)
+
 - **Donors:** SQX `SQTradingLib` Signal & Math Blocks | Legacy `ARCHIVE/app/services/include/{comparisons,functions,price,actions,types}.py`
 - **Backend Targets:** Each file `🟢 <200L` to `🟡 200–350L` (zero module-level duplicate functions; single class per file)
 - **Classes:** `Comparisons`, `Functions`, `Price`, `Actions`, `Types`
@@ -483,6 +513,7 @@ HaruQuantAI/
 ### Phase 1A.2: Technical Indicator Library (`app/services/indicators/`)
 
 #### 7. `app/services/indicators/base.py` & 6 Category Packages — `CoreIndicatorLibrary` (`FEAT-INDICATORS`)
+
 - **Donors:** SQX `SQTradingLib` 69 Indicators (`docs/SQX/libs/`) | Legacy `ARCHIVE/app/services/indicators/` (79 files)
 - **Backend Targets:**
   - `app/services/indicators/base.py` (`🟡 200–300L`): `BaseIndicator`
@@ -507,6 +538,7 @@ HaruQuantAI/
 ### Phase 1A.3: Backtest Simulation & Order Execution Kernel (`app/services/engine/`)
 
 #### 8. `app/services/engine/{simulator,precision,platforms,orders,accounting}.py` — `BacktestSimulationEngine` (`FEAT-ENGINE-SIM`)
+
 - **Donors:** SQX `SQTradingLib` Backtest Kernel (`docs/SQX/libs/`, `docs/SQX/trading/`) | Legacy `ARCHIVE/app/services/brokers/simulator.py`, `ARCHIVE/app/services/include/trading.py`
 - **Backend Targets:**
   - `app/services/engine/precision.py` (`🟡 200–350L`): `PrecisionSynthesizer`
@@ -523,6 +555,7 @@ HaruQuantAI/
   - [ ] `FR-ENGINE-SIMULATOR-RUN`: Orchestrate end-to-end strategy backtest over historical data using precision synthesizer, platform profile, order state machine, and account ledger $\rightarrow$ `BacktestSimulator.run_backtest(strategy_spec: Mapping[str, Any], data: DataSeries, config: Mapping[str, Any]) -> dict[str, Any]`
 
 #### 9. `app/services/engine/formats.py` — `CorePersistenceFormats` (`FEAT-ENGINE-FORMATS`)
+
 - **Donors:** SQX `.cfx`, `.sqx`, `.sq4`, `.sq3`, `.dat` Codecs (`docs/SQX/custom-projects/`) | Legacy `ARCHIVE/app/services/brokers/_native_history.py`
 - **Backend Target:** `app/services/engine/formats.py` (`🟡 250–400L`, Docstring `<=55L`)
 - **Classes:** `ProjectArchiveCodec`, `StrategyArchiveCodec`, `MarketDataFormatCodec`
@@ -541,20 +574,21 @@ HaruQuantAI/
 
 ### Phase 1B.1 – 1B.3 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `SnippetBuildingBlocksAndCatalogs` | `Snippets/SQ/Blocks/*`, `internal/ctemplate/*.xml` | `ARCHIVE/app/workspace/builder/settings/blocks.py` | `app/services/snippets/blocks.py` (`🟡 300–450L`) | `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx` | `CoreIndicatorLibrary`, `CoreSignalAndMathInclude` |
-| `SnippetMoneyManagement` | `Snippets/SQ/MoneyManagement/*` (12 models) | `ARCHIVE/app/workspace/builder/settings/money_management.py` | `app/services/snippets/money_management.py` (`🟡 200–350L`) | `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx` | `Actions.normalize_lots` |
-| `SnippetExitMethodsAndTradingOptions` | `Snippets/SQ/ExitMethods/*` (5), `TradingOptions/*` (8) | `ARCHIVE/app/workspace/builder/settings/options.py` | `app/services/snippets/exit_methods.py` (`🟢 <200L`), `app/services/snippets/trading_options.py` (`🟡 200–300L`) | `ui/app/workspace/Builder/settings/TradingOptionsTab.tsx` | `OrderStateMachine`, `HQTime` |
-| `SnippetMonteCarloAndWhatIf` | `Snippets/SQ/MonteCarlo/*` (14), `WhatIf/*` (15) | `ARCHIVE/app/workspace/retester/cross_checks/` | `app/services/snippets/monte_carlo.py` (`🟡 250–400L`), `app/services/snippets/what_if.py` (`🟡 250–400L`) | `ui/app/workspace/Retester/views/WhatIfModal.tsx` | `RandomGenerator`, `BacktestSimulator` |
-| `SnippetColumnsChartsAndFormulas` | `Snippets/SQ/Columns/*` (~158), `Charts/*` (41), `CorrelationOf/*` (6), `Fitness/*` (3), `Formulas/*` (19), `Negaters/*` (15), `Checkers`/`Calculators` (10) | `ARCHIVE/app/workspace/results/reports/` | `app/services/snippets/{columns,charts,correlation,fitness,formulas,negaters,checkers_calculators}.py` (each `🟢 <200L` to `🟡 250–450L`) | `ui/app/workspace/Results/ResultsWorkspace.tsx` | NumPy vectorized metric calculators |
-| `PlatformCodeExporters` | `internal/extend/Code/*` (MQL4, MQL5, EasyLanguage, NinjaScript, JForex, PseudoCode, CustomIndicators) | `ARCHIVE/app/workspace/results/reports/source_code.py`, `scripts/mql5/` | `app/services/codegen/{template_engine,easylanguage,jforex,metatrader4,metatrader5,ninjatrader,pseudocode,custom_indicators}.py` (each `🟢 <200L` to `🟡 200–350L`) | `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx` | Shared AST walker in `template_engine.py` |
+| Component                             | SQX Donor (`docs/SQX/`)                                                                                                                                      | Legacy Code Donor (`ARCHIVE/`)                                          | Backend Target File (Line Budget)                                                                                                                                   | Frontend Target File                                       | DRY Shared Dependencies                            |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------- |
+| `SnippetBuildingBlocksAndCatalogs`    | `Snippets/SQ/Blocks/*`, `internal/ctemplate/*.xml`                                                                                                           | `ARCHIVE/app/workspace/builder/settings/blocks.py`                      | `app/services/snippets/blocks.py` (`🟡 300–450L`)                                                                                                                   | `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`  | `CoreIndicatorLibrary`, `CoreSignalAndMathInclude` |
+| `SnippetMoneyManagement`              | `Snippets/SQ/MoneyManagement/*` (12 models)                                                                                                                  | `ARCHIVE/app/workspace/builder/settings/money_management.py`            | `app/services/snippets/money_management.py` (`🟡 200–350L`)                                                                                                         | `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx` | `Actions.normalize_lots`                           |
+| `SnippetExitMethodsAndTradingOptions` | `Snippets/SQ/ExitMethods/*` (5), `TradingOptions/*` (8)                                                                                                      | `ARCHIVE/app/workspace/builder/settings/options.py`                     | `app/services/snippets/exit_methods.py` (`🟢 <200L`), `app/services/snippets/trading_options.py` (`🟡 200–300L`)                                                    | `ui/app/workspace/Builder/settings/TradingOptionsTab.tsx`  | `OrderStateMachine`, `HQTime`                      |
+| `SnippetMonteCarloAndWhatIf`          | `Snippets/SQ/MonteCarlo/*` (14), `WhatIf/*` (15)                                                                                                             | `ARCHIVE/app/workspace/retester/cross_checks/`                          | `app/services/snippets/monte_carlo.py` (`🟡 250–400L`), `app/services/snippets/what_if.py` (`🟡 250–400L`)                                                          | `ui/app/workspace/Retester/views/WhatIfModal.tsx`          | `RandomGenerator`, `BacktestSimulator`             |
+| `SnippetColumnsChartsAndFormulas`     | `Snippets/SQ/Columns/*` (~158), `Charts/*` (41), `CorrelationOf/*` (6), `Fitness/*` (3), `Formulas/*` (19), `Negaters/*` (15), `Checkers`/`Calculators` (10) | `ARCHIVE/app/workspace/results/reports/`                                | `app/services/snippets/{columns,charts,correlation,fitness,formulas,negaters,checkers_calculators}.py` (each `🟢 <200L` to `🟡 250–450L`)                           | `ui/app/workspace/Results/ResultsWorkspace.tsx`            | NumPy vectorized metric calculators                |
+| `PlatformCodeExporters`               | `internal/extend/Code/*` (MQL4, MQL5, EasyLanguage, NinjaScript, JForex, PseudoCode, CustomIndicators)                                                       | `ARCHIVE/app/workspace/results/reports/source_code.py`, `scripts/mql5/` | `app/services/codegen/{template_engine,easylanguage,jforex,metatrader4,metatrader5,ninjatrader,pseudocode,custom_indicators}.py` (each `🟢 <200L` to `🟡 200–350L`) | `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`  | Shared AST walker in `template_engine.py`          |
 
 ---
 
 ### Phase 1B.1: Strategy Building Blocks, Sizing & Execution Snippets (`app/services/snippets/`)
 
 #### 1. `app/services/snippets/blocks.py` — `SnippetBuildingBlocksAndCatalogs` (`FEAT-SNIPPETS-BLOCKS`)
+
 - **Backend Target:** `app/services/snippets/blocks.py` (`🟡 300–450L`, Docstring `<=50L`)
 - **Classes:** `BlockRegistry`, `CatalogTemplateLoader`
 - **Functional Requirements & Exact Method Signatures:**
@@ -562,12 +596,14 @@ HaruQuantAI/
   - [ ] `FR-SNIPPETS-BLOCKS-CATALOGS`: Parse and serve the 12 block/template catalogs (`config`, `conditions`, `values`, `actions`, `comparisons`, `events`, `talibs`, `wizard`, `moneyManagement`, `parameterSets`, `datasTimeframes`, `advancedTypes`) and build rule templates $\rightarrow$ `CatalogTemplateLoader.load_catalogs(catalog_name: str | None = None) -> dict[str, Any]`
 
 #### 2. `app/services/snippets/money_management.py` — `SnippetMoneyManagement` (`FEAT-SNIPPETS-MM`)
+
 - **Backend Target:** `app/services/snippets/money_management.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Class:** `MoneyManagementEngine`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-SNIPPETS-MM-COMPUTE`: Compute trade order size across all 12 money management models (`FixedSize`, `FixedAmount`, `RiskFixedPctOfAccount`, `RiskFixedBalancePct`, `ATRRiskBasedSizing`, `SimpleMartingaleMM`, `StocksSizeByPrice`, `CryptoSizeByPrice`, `CryptoRiskFixedPctOfAccount`, `CryptoRiskFixedBalancePct`, `PickerFixedAmount`, `PickerRiskFixedPctOfAccount`) $\rightarrow$ `MoneyManagementEngine.compute_lots(model: str, account_state: Mapping[str, float], trade_params: Mapping[str, float]) -> dict[str, Any]`
 
 #### 3. `app/services/snippets/exit_methods.py` & `trading_options.py` — `SnippetExitMethodsAndTradingOptions` (`FEAT-SNIPPETS-EXITS`)
+
 - **Backend Targets:** `exit_methods.py` (`🟢 <200L`), `trading_options.py` (`🟡 200–300L`)
 - **Classes:** `ExitMethodEvaluator`, `TradingOptionEnforcer`
 - **Functional Requirements & Exact Method Signatures:**
@@ -579,6 +615,7 @@ HaruQuantAI/
 ### Phase 1B.2: Robustness, What-If, Databank Columns, Charts & Formulas (`app/services/snippets/`)
 
 #### 4. `app/services/snippets/monte_carlo.py` & `what_if.py` — `SnippetMonteCarloAndWhatIf` (`FEAT-SNIPPETS-MC-WHATIF`)
+
 - **Backend Targets:** `monte_carlo.py` (`🟡 250–400L`), `what_if.py` (`🟡 250–400L`)
 - **Classes:** `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`
 - **Functional Requirements & Exact Method Signatures:**
@@ -587,6 +624,7 @@ HaruQuantAI/
   - [ ] `FR-SNIPPETS-WHATIF-APPLY`: Apply all 15 post-backtest What-If trade filters and equity controls $\rightarrow$ `WhatIfSimulator.apply_scenario(trades: Sequence[Mapping[str, Any]], scenario: str, params: Mapping[str, Any] | None = None) -> dict[str, Any]`
 
 #### 5. `app/services/snippets/{columns,charts,correlation,fitness,formulas,negaters,checkers_calculators}.py` — `SnippetColumnsChartsAndFormulas` (`FEAT-SNIPPETS-METRICS`)
+
 - **Backend Targets:** 7 focused modules (`🟢 <200L` to `🟡 250–450L` each)
 - **Classes:** `ColumnRegistry`, `ChartSnippetRegistry`, `CorrelationAndFitnessRegistry`, `FormulaAndNegaterRegistry`
 - **Functional Requirements & Exact Method Signatures:**
@@ -600,6 +638,7 @@ HaruQuantAI/
 ### Phase 1B.3: Target-Platform Strategy Code Exporters (`internal/extend/Code/` $\rightarrow$ `app/services/codegen/`)
 
 #### 6. `app/services/codegen/{template_engine,easylanguage,jforex,metatrader4,metatrader5,ninjatrader,pseudocode,custom_indicators}.py` — `PlatformCodeExporters` (`FEAT-CODEGEN`)
+
 - **Backend Targets:** 8 focused modules (`🟢 <200L` to `🟡 200–350L` each), sharing `CodegenTemplateEngine` in `template_engine.py`
 - **Classes:** `CodegenTemplateEngine`, `MetaTrader4Exporter`, `MetaTrader5Exporter`, `EasyLanguageExporter`, `NinjaTraderExporter`, `JForexExporter`, `PseudoCodeExporter`, `CustomIndicatorPackager`
 - **Functional Requirements & Exact Method Signatures:**
@@ -620,11 +659,12 @@ HaruQuantAI/
 
 ### Phase 2.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
+| Component               | SQX Donor (`docs/SQX/`)              | Legacy Code Donor (`ARCHIVE/`)         | Backend Target File (Line Budget)           | Frontend Target File                   | DRY Shared Dependencies                                  |
+| ----------------------- | ------------------------------------ | -------------------------------------- | ------------------------------------------- | -------------------------------------- | -------------------------------------------------------- |
 | `AppHome` & `HomeAbout` | `AppHome`, `HomeAbout` (`overview/`) | `ARCHIVE/app/workspace/home/routes.py` | `app/workspace/home/routes.py` (`🟢 <200L`) | `ui/app/workspace/Home/HomeScreen.tsx` | `HostPersistence`, `ResourceMonitor`, `ServletConstants` |
 
 #### 1. `app/workspace/home/routes.py` — `AppHome` & `HomeAbout` (`FEAT-HOME-DASHBOARD`)
+
 - **Donors:** SQX `AppHome`, `HomeAbout` | Legacy `ARCHIVE/app/workspace/home/routes.py`
 - **Backend Target:** `app/workspace/home/routes.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/workspace/Home/HomeScreen.tsx`
@@ -646,30 +686,31 @@ HaruQuantAI/
 
 ### Phase 3.1 – 3.7 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `DataManagerInstruments` | `DataManagerInstruments` | `ARCHIVE/app/workspace/data_manager/instruments.py` | `app/workspace/data_manager/instruments.py` (`🟡 200–350L`) | `ui/app/plugins/data_source/Catalogs/Instruments/InstrumentsModal.tsx` | `HostPersistence` (`instruments` entity), `data_manager/_common.py` |
-| `DataManagerSessions` | `DataManagerSessions` | `ARCHIVE/app/workspace/data_manager/sessions.py` | `app/workspace/data_manager/sessions.py` (`🟡 200–350L`) | `ui/app/plugins/data_source/Catalogs/Sessions/SessionsModal.tsx` | `HostPersistence` (`sessions_catalog` entity), `HQTime` |
-| `DataManagerConnections` | `DataManagerConnections` | `ARCHIVE/app/workspace/data_manager/connections.py` | `app/workspace/data_manager/connections.py` (`🟢 <200L`) | `ui/app/plugins/data_source/Common/DataSourceRibbon.tsx` | `ServletConnection`, `HostPersistence` |
-| `DataManagerBroker` | `DataManagerBroker` | `ARCHIVE/app/workspace/data_manager/broker.py` | `app/workspace/data_manager/broker.py` (`🟡 200–350L`) | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `HostPersistence` (`brokers` entity) |
-| `DataManagerBasket` | `DataManagerBasket` | `ARCHIVE/app/workspace/data_manager/baskets.py` | `app/workspace/data_manager/baskets.py` (`🟢 <200L`) | `ui/app/plugins/data_source/Catalogs/StockGroups/StockGroupsModal.tsx` | `HostPersistence` (`baskets` entity) |
-| `DataManagerData` | `DataManagerData` | `ARCHIVE/app/workspace/data_manager/data.py` | `app/workspace/data_manager/data.py` (`🟡 200–350L`) | `ui/app/workspace/DataManager/DataManager.tsx` | `HostPersistence` (`market_data` entity), `DataSeries` |
-| `DataSourceFiles` | `DataSourceFiles` | `ARCHIVE/app/services/brokers/files.py`, `_file_history.py` | `app/services/brokers/files.py` (`🟡 200–350L`) | `ui/app/plugins/data_source/FileImport/FileImportModal.tsx` | `app/services/brokers/_file_history.py`, `HostPersistence` |
-| `DataSourceYahoo` | `DataSourceYahoo` | `ARCHIVE/app/services/brokers/yahoo.py` | `app/services/brokers/yahoo.py` (`🟢 <200L`) | `ui/app/plugins/data_source/Yahoo/YahooModal.tsx` | `app/services/brokers/_http.py`, `HostPersistence` |
-| `DataSourceDukascopy` | `DataSourceDukascopy` | `ARCHIVE/app/services/brokers/dukascopy.py` | `app/services/brokers/dukascopy.py` (`🟡 200–350L`) | `ui/app/plugins/data_source/Dukascopy/DukascopyModal.tsx` | `_http.py`, `_native_history.py` (`.bi5` decoder) |
-| `DataSourceTD` | `DataSourceTD` | `ARCHIVE/app/services/brokers/tick_downloader.py` | `app/services/brokers/tick_downloader.py` (`🟢 <200L`) | `ui/app/plugins/data_source/TickDownloader/TickDownloaderModal.tsx` | `_file_history.py`, `HostPersistence` |
-| `DataSourceDarwinex` | `DataSourceDarwinex` | `ARCHIVE/app/services/brokers/darwinex.py` | `app/services/brokers/darwinex.py` (`🟡 200–350L`) | `ui/app/plugins/data_source/Darwinex/DarwinexModal.tsx` | `_http.py`, `_file_history.py` |
-| `DataSourceEquities` | `DataSourceEquities` | `ARCHIVE/app/services/brokers/sq_equity.py` | `app/services/brokers/sq_equity.py` (`🟢 <200L`) | `ui/app/plugins/data_source/Equities/EquitiesModal.tsx` | `_http.py`, `HostPersistence` |
-| `DataSourceFutures` | `DataSourceFutures` | `ARCHIVE/app/services/brokers/sq_futures.py` | `app/services/brokers/sq_futures.py` (`🟢 <200L`) | `ui/app/plugins/data_source/Futures/FuturesModal.tsx` | `_http.py`, `HostPersistence` |
-| `DataManagerCustomData` | `DataManagerCustomData` | `ARCHIVE/app/workspace/data_manager/custom_data.py` | `app/workspace/data_manager/custom_data.py` (`🟡 250–400L`) | `ui/app/plugins/data_source/Tools/CustomDataModal.tsx` | `HostPersistence` (`custom_data` entity), `_file_history.py` |
-| `DataManagerActions` | `DataManagerActions` | `ARCHIVE/app/workspace/data_manager/actions/review/quality.py`, `actions/transform/transforms.py` | `app/workspace/data_manager/actions/review/quality.py` (`🟡 200–350L`), `app/workspace/data_manager/actions/transform/transforms.py` (`🟡 250–400L`) | `ui/app/plugins/data_source/Tools/DataToolsModal.tsx` | `HQTime`, `BarTime`, `DataSeries`, `_native_history.py` |
-| `AppDataManager`, `DataManagerLog`, `DataManagerHome`, `DataManagerHelp` | `AppDataManager`, `DataManagerLog`, `DataManagerHome`, `DataManagerHelp` | `ARCHIVE/app/workspace/data_manager/{routes,log,home,help}.py` | `app/workspace/data_manager/{routes,log,home,help}.py` (each `🟢 <200L`) | `ui/app/workspace/DataManager/{DataManager,DataManagerHome}.tsx`, `ui/app/components/HelpTooltip.tsx` | `HostPersistence`, `TelemetryLogger` |
+| Component                                                                | SQX Donor (`docs/SQX/`)                                                  | Legacy Code Donor (`ARCHIVE/`)                                                                    | Backend Target File (Line Budget)                                                                                                                    | Frontend Target File                                                                                  | DRY Shared Dependencies                                             |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `DataManagerInstruments`                                                 | `DataManagerInstruments`                                                 | `ARCHIVE/app/workspace/data_manager/instruments.py`                                               | `app/workspace/data_manager/instruments.py` (`🟡 200–350L`)                                                                                          | `ui/app/plugins/data_source/Catalogs/Instruments/InstrumentsModal.tsx`                                | `HostPersistence` (`instruments` entity), `data_manager/_common.py` |
+| `DataManagerSessions`                                                    | `DataManagerSessions`                                                    | `ARCHIVE/app/workspace/data_manager/sessions.py`                                                  | `app/workspace/data_manager/sessions.py` (`🟡 200–350L`)                                                                                             | `ui/app/plugins/data_source/Catalogs/Sessions/SessionsModal.tsx`                                      | `HostPersistence` (`sessions_catalog` entity), `HQTime`             |
+| `DataManagerConnections`                                                 | `DataManagerConnections`                                                 | `ARCHIVE/app/workspace/data_manager/connections.py`                                               | `app/workspace/data_manager/connections.py` (`🟢 <200L`)                                                                                             | `ui/app/plugins/data_source/Common/DataSourceRibbon.tsx`                                              | `ServletConnection`, `HostPersistence`                              |
+| `DataManagerBroker`                                                      | `DataManagerBroker`                                                      | `ARCHIVE/app/workspace/data_manager/broker.py`                                                    | `app/workspace/data_manager/broker.py` (`🟡 200–350L`)                                                                                               | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`                          | `HostPersistence` (`brokers` entity)                                |
+| `DataManagerBasket`                                                      | `DataManagerBasket`                                                      | `ARCHIVE/app/workspace/data_manager/baskets.py`                                                   | `app/workspace/data_manager/baskets.py` (`🟢 <200L`)                                                                                                 | `ui/app/plugins/data_source/Catalogs/StockGroups/StockGroupsModal.tsx`                                | `HostPersistence` (`baskets` entity)                                |
+| `DataManagerData`                                                        | `DataManagerData`                                                        | `ARCHIVE/app/workspace/data_manager/data.py`                                                      | `app/workspace/data_manager/data.py` (`🟡 200–350L`)                                                                                                 | `ui/app/workspace/DataManager/DataManager.tsx`                                                        | `HostPersistence` (`market_data` entity), `DataSeries`              |
+| `DataSourceFiles`                                                        | `DataSourceFiles`                                                        | `ARCHIVE/app/services/brokers/files.py`, `_file_history.py`                                       | `app/services/brokers/files.py` (`🟡 200–350L`)                                                                                                      | `ui/app/plugins/data_source/FileImport/FileImportModal.tsx`                                           | `app/services/brokers/_file_history.py`, `HostPersistence`          |
+| `DataSourceYahoo`                                                        | `DataSourceYahoo`                                                        | `ARCHIVE/app/services/brokers/yahoo.py`                                                           | `app/services/brokers/yahoo.py` (`🟢 <200L`)                                                                                                         | `ui/app/plugins/data_source/Yahoo/YahooModal.tsx`                                                     | `app/services/brokers/_http.py`, `HostPersistence`                  |
+| `DataSourceDukascopy`                                                    | `DataSourceDukascopy`                                                    | `ARCHIVE/app/services/brokers/dukascopy.py`                                                       | `app/services/brokers/dukascopy.py` (`🟡 200–350L`)                                                                                                  | `ui/app/plugins/data_source/Dukascopy/DukascopyModal.tsx`                                             | `_http.py`, `_native_history.py` (`.bi5` decoder)                   |
+| `DataSourceTD`                                                           | `DataSourceTD`                                                           | `ARCHIVE/app/services/brokers/tick_downloader.py`                                                 | `app/services/brokers/tick_downloader.py` (`🟢 <200L`)                                                                                               | `ui/app/plugins/data_source/TickDownloader/TickDownloaderModal.tsx`                                   | `_file_history.py`, `HostPersistence`                               |
+| `DataSourceDarwinex`                                                     | `DataSourceDarwinex`                                                     | `ARCHIVE/app/services/brokers/darwinex.py`                                                        | `app/services/brokers/darwinex.py` (`🟡 200–350L`)                                                                                                   | `ui/app/plugins/data_source/Darwinex/DarwinexModal.tsx`                                               | `_http.py`, `_file_history.py`                                      |
+| `DataSourceEquities`                                                     | `DataSourceEquities`                                                     | `ARCHIVE/app/services/brokers/sq_equity.py`                                                       | `app/services/brokers/sq_equity.py` (`🟢 <200L`)                                                                                                     | `ui/app/plugins/data_source/Equities/EquitiesModal.tsx`                                               | `_http.py`, `HostPersistence`                                       |
+| `DataSourceFutures`                                                      | `DataSourceFutures`                                                      | `ARCHIVE/app/services/brokers/sq_futures.py`                                                      | `app/services/brokers/sq_futures.py` (`🟢 <200L`)                                                                                                    | `ui/app/plugins/data_source/Futures/FuturesModal.tsx`                                                 | `_http.py`, `HostPersistence`                                       |
+| `DataManagerCustomData`                                                  | `DataManagerCustomData`                                                  | `ARCHIVE/app/workspace/data_manager/custom_data.py`                                               | `app/workspace/data_manager/custom_data.py` (`🟡 250–400L`)                                                                                          | `ui/app/plugins/data_source/Tools/CustomDataModal.tsx`                                                | `HostPersistence` (`custom_data` entity), `_file_history.py`        |
+| `DataManagerActions`                                                     | `DataManagerActions`                                                     | `ARCHIVE/app/workspace/data_manager/actions/review/quality.py`, `actions/transform/transforms.py` | `app/workspace/data_manager/actions/review/quality.py` (`🟡 200–350L`), `app/workspace/data_manager/actions/transform/transforms.py` (`🟡 250–400L`) | `ui/app/plugins/data_source/Tools/DataToolsModal.tsx`                                                 | `HQTime`, `BarTime`, `DataSeries`, `_native_history.py`             |
+| `AppDataManager`, `DataManagerLog`, `DataManagerHome`, `DataManagerHelp` | `AppDataManager`, `DataManagerLog`, `DataManagerHome`, `DataManagerHelp` | `ARCHIVE/app/workspace/data_manager/{routes,log,home,help}.py`                                    | `app/workspace/data_manager/{routes,log,home,help}.py` (each `🟢 <200L`)                                                                             | `ui/app/workspace/DataManager/{DataManager,DataManagerHome}.tsx`, `ui/app/components/HelpTooltip.tsx` | `HostPersistence`, `TelemetryLogger`                                |
 
 ---
 
 ### Phase 3.1: Foundational Specifications
 
 #### 1. `app/workspace/data_manager/instruments.py` — `DataManagerInstruments` (`FEAT-DATAMGR-INSTRUMENTS`)
+
 - **Backend Target:** `app/workspace/data_manager/instruments.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Class:** `Instruments` (plus `InstrumentsCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -679,6 +720,7 @@ HaruQuantAI/
   - [ ] `FR-DATAMGR-INSTR-CLONE`: Clone an existing instrument to create a new specification $\rightarrow$ `Instruments.clone_instrument(source_id: str, new_symbol: str) -> dict[str, Any]`
 
 #### 2. `app/workspace/data_manager/sessions.py` — `DataManagerSessions` (`FEAT-DATAMGR-SESSIONS`)
+
 - **Backend Target:** `app/workspace/data_manager/sessions.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Class:** `Sessions` (plus `SessionsCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -688,6 +730,7 @@ HaruQuantAI/
   - [ ] `FR-DATAMGR-SESS-TEMPLATE`: Configure and save reusable session templates $\rightarrow$ `Sessions.session_template(template: Mapping[str, Any]) -> dict[str, Any]`
 
 #### 3. `app/workspace/data_manager/connections.py` — `DataManagerConnections` (`FEAT-DATAMGR-CONNECTIONS`)
+
 - **Backend Target:** `app/workspace/data_manager/connections.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Class:** `Connections` (plus `ConnectionsCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -700,6 +743,7 @@ HaruQuantAI/
 ### Phase 3.2: Profiles & Grouping Aggregators
 
 #### 4. `app/workspace/data_manager/broker.py` — `DataManagerBroker` (`FEAT-DATAMGR-BROKER`)
+
 - **Backend Target:** `app/workspace/data_manager/broker.py` (`🟡 200–350L`, Docstring `<=50L`)
 - **Class:** `Broker` (plus `BrokerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -710,6 +754,7 @@ HaruQuantAI/
   - [ ] `FR-DATAMGR-BROKER-IMPORT-SESS`: Import trading session definitions from external XML/JSON files $\rightarrow$ `Broker.import_sessions(broker_id: str, payload: Sequence[Mapping[str, Any]] | str) -> dict[str, Any]`
 
 #### 5. `app/workspace/data_manager/baskets.py` — `DataManagerBasket` (`FEAT-DATAMGR-BASKET`)
+
 - **Backend Target:** `app/workspace/data_manager/baskets.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Class:** `Basket` (plus `BasketCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -722,6 +767,7 @@ HaruQuantAI/
 ### Phase 3.3: Central Data Hub & Catalog Engine
 
 #### 6. `app/workspace/data_manager/data.py` — `DataManagerData` (`FEAT-DATAMGR-DATA`)
+
 - **Backend Target:** `app/workspace/data_manager/data.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Class:** `Data` (plus `DataCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -735,6 +781,7 @@ HaruQuantAI/
 ### Phase 3.4: Data Ingestion (Data Sources)
 
 #### 7. `app/services/brokers/files.py` — `DataSourceFiles` (`FEAT-DATASRC-FILES`)
+
 - **Backend Target:** `app/services/brokers/files.py` (`🟡 200–350L`, Docstring `<=50L`)
 - **Class:** `Files` (plus `FilesCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -745,6 +792,7 @@ HaruQuantAI/
   - [ ] `FR-DATASRC-FILES-MASS-IMPORT`: Perform bulk mass import of multiple data files across directories $\rightarrow$ `Files.mass_import(directory: Path | str, format_name: str = "standard_csv") -> dict[str, Any]`
 
 #### 8. `app/services/brokers/yahoo.py` — `DataSourceYahoo` (`FEAT-DATASRC-YAHOO`)
+
 - **Backend Target:** `app/services/brokers/yahoo.py` (`🟢 <200L`, Docstring `<=40L`)
 - **Class:** `Yahoo` (plus `YahooCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -752,6 +800,7 @@ HaruQuantAI/
   - [ ] `FR-DATASRC-YAHOO-DOWNLOAD`: Download historical OHLCV price bars from Yahoo Finance $\rightarrow$ `Yahoo.download(symbol: str, start_date: str, end_date: str, interval: str = "1d") -> dict[str, Any]`
 
 #### 9. `app/services/brokers/dukascopy.py` — `DataSourceDukascopy` (`FEAT-DATASRC-DUKASCOPY`)
+
 - **Backend Target:** `app/services/brokers/dukascopy.py` (`🟡 200–350L`, Docstring `<=50L`)
 - **Class:** `Dukascopy` (plus `DukascopyCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -762,12 +811,14 @@ HaruQuantAI/
   - [ ] `FR-DATASRC-DUKA-IMPORT`: Download and import Dukascopy tick and minute price data $\rightarrow$ `Dukascopy.import_data(symbol: str, start_date: str, end_date: str, timeframe: str = "M1") -> dict[str, Any]`
 
 #### 10. `app/services/brokers/tick_downloader.py` — `DataSourceTD` (`FEAT-DATASRC-TD`)
+
 - **Backend Target:** `app/services/brokers/tick_downloader.py` (`🟢 <200L`, Docstring `<=40L`)
 - **Class:** `TD` (plus `TDCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATASRC-TD-IMPORT`: Import historical tick and minute price data generated by TickDownloader $\rightarrow$ `TD.import_data(source_path: Path | str, symbols: Sequence[str] | None = None) -> dict[str, Any]`
 
 #### 11. `app/services/brokers/darwinex.py` — `DataSourceDarwinex` (`FEAT-DATASRC-DARWINEX`)
+
 - **Backend Target:** `app/services/brokers/darwinex.py` (`🟡 200–350L`, Docstring `<=50L`)
 - **Class:** `Darwinex` (plus `DarwinexCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -778,6 +829,7 @@ HaruQuantAI/
   - [ ] `FR-DATASRC-DARWINEX-SELECT`: Identify and select instruments for Darwinex data $\rightarrow$ `Darwinex.select_instruments() -> list[dict[str, Any]]`
 
 #### 12. `app/services/brokers/sq_equity.py` & `sq_futures.py` — `DataSourceEquities` & `DataSourceFutures` (`FEAT-DATASRC-SUB`)
+
 - **Backend Targets:** `sq_equity.py` (`🟢 <200L`), `sq_futures.py` (`🟢 <200L`)
 - **Classes:** `EquitiesData`, `FuturesData`
 - **Functional Requirements & Exact Method Signatures:**
@@ -793,6 +845,7 @@ HaruQuantAI/
 ### Phase 3.5: Custom & Auxiliary Data Series
 
 #### 13. `app/workspace/data_manager/custom_data.py` — `DataManagerCustomData` (`FEAT-DATAMGR-CUSTOMDATA`)
+
 - **Backend Target:** `app/workspace/data_manager/custom_data.py` (`🟡 250–400L`, Docstring `<=60L`)
 - **Class:** `CustomData` (plus `CustomDataCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -810,6 +863,7 @@ HaruQuantAI/
 ### Phase 3.6: Post-Processing, Transformations & Exports
 
 #### 14. `app/workspace/data_manager/actions/review/quality.py` & `actions/transform/transforms.py` — `DataManagerActions` (`FEAT-DATAMGR-ACTIONS`)
+
 - **Backend Targets:** `quality.py` (`🟡 200–350L`), `transforms.py` (`🟡 250–400L`)
 - **Class:** `Actions` (exposed cleanly across `quality.py` and `transforms.py`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -830,6 +884,7 @@ HaruQuantAI/
 ### Phase 3.7: Monitoring, Shell & UI Support
 
 #### 15. `app/workspace/data_manager/{routes,log,home,help}.py` — Shell, Log, Home & Help (`FEAT-DATAMGR-SHELL`)
+
 - **Backend Targets:** `routes.py` (`🟢 <200L`), `log.py` (`🟢 <150L`), `home.py` (`🟢 <150L`), `help.py` (`🟢 <150L`)
 - **Classes:** `AppDataManager` (`routes.py`), `DataLog` (`log.py`), `DMHome` (`home.py`), `DMHelp` (`help.py`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -851,14 +906,15 @@ HaruQuantAI/
 
 ### Phase 4.1 – 4.3 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppCodeEditor` | `AppCodeEditor` (`overview/`) | `ARCHIVE/app/workspace/code_editor/editor.py` | `app/workspace/code_editor/editor.py` (`🟢 <200L`) | `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx` | `HostPersistence` |
-| `ServletCodeEditor` | `ServletCodeEditor` (14 IDE actions) | `ARCHIVE/app/workspace/code_editor/routes.py` | `app/workspace/code_editor/routes.py` (`🟡 250–400L`) | `ui/app/workspace/CodeEditor/codeEditorClient.ts` | `HostPersistence`, `code_editor/_common.py` |
-| `CodeEditorImportExport` | `CodeEditorImportExport` | `ARCHIVE/app/workspace/code_editor/import_export.py` | `app/workspace/code_editor/import_export.py` (`🟢 <200L`) | `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx` | `zipfile`, `HostPersistence` |
-| `CodeEditorIndicatorTester` | `CodeEditorIndicatorTester` | `ARCHIVE/app/workspace/code_editor/indicator_tester.py` | `app/workspace/code_editor/indicator_tester.py` (`🟡 200–300L`) | `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx` | `CoreIndicatorLibrary`, `DataSeries` |
+| Component                   | SQX Donor (`docs/SQX/`)              | Legacy Code Donor (`ARCHIVE/`)                          | Backend Target File (Line Budget)                               | Frontend Target File                                   | DRY Shared Dependencies                     |
+| --------------------------- | ------------------------------------ | ------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- |
+| `AppCodeEditor`             | `AppCodeEditor` (`overview/`)        | `ARCHIVE/app/workspace/code_editor/editor.py`           | `app/workspace/code_editor/editor.py` (`🟢 <200L`)              | `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`  | `HostPersistence`                           |
+| `ServletCodeEditor`         | `ServletCodeEditor` (14 IDE actions) | `ARCHIVE/app/workspace/code_editor/routes.py`           | `app/workspace/code_editor/routes.py` (`🟡 250–400L`)           | `ui/app/workspace/CodeEditor/codeEditorClient.ts`      | `HostPersistence`, `code_editor/_common.py` |
+| `CodeEditorImportExport`    | `CodeEditorImportExport`             | `ARCHIVE/app/workspace/code_editor/import_export.py`    | `app/workspace/code_editor/import_export.py` (`🟢 <200L`)       | `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`  | `zipfile`, `HostPersistence`                |
+| `CodeEditorIndicatorTester` | `CodeEditorIndicatorTester`          | `ARCHIVE/app/workspace/code_editor/indicator_tester.py` | `app/workspace/code_editor/indicator_tester.py` (`🟡 200–300L`) | `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx` | `CoreIndicatorLibrary`, `DataSeries`        |
 
 #### 1. `app/workspace/code_editor/editor.py` — `AppCodeEditor` (`FEAT-CODEEDITOR-WORKSPACE`)
+
 - **Backend Target:** `app/workspace/code_editor/editor.py` (`🟢 <200L`, Docstring `<=40L`)
 - **Class:** `AppCodeEditor`
 - **Functional Requirements & Exact Method Signatures:**
@@ -866,6 +922,7 @@ HaruQuantAI/
   - [ ] `FR-CODEEDITOR-OPEN-TAB`: Manage active open code documents and syntax highlighting mode $\rightarrow$ `AppCodeEditor.open_file_tab(file_path: str, *, mode: str = "python") -> dict[str, Any]`
 
 #### 2. `app/workspace/code_editor/routes.py` — `ServletCodeEditor` (`FEAT-CODEEDITOR-SERVLET`)
+
 - **Backend Target:** `app/workspace/code_editor/routes.py` (`🟡 250–400L`, Docstring `<=70L`)
 - **Class:** `CodeEditor` (plus `CodeEditorCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -885,6 +942,7 @@ HaruQuantAI/
   - [ ] `FR-CODEEDITOR-FIND`: Search for text patterns across project files $\rightarrow$ `CodeEditor.find_in_files(query: str, *, case_sensitive: bool = False) -> list[dict[str, Any]]`
 
 #### 3. `app/workspace/code_editor/import_export.py` — `CodeEditorImportExport` (`FEAT-CODEEDITOR-IMPEXP`)
+
 - **Backend Target:** `app/workspace/code_editor/import_export.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Class:** `ImportExport`
 - **Functional Requirements & Exact Method Signatures:**
@@ -893,6 +951,7 @@ HaruQuantAI/
   - [ ] `FR-CODEEDITOR-OVERWRITE`: Confirm overwriting existing code files during import $\rightarrow$ `ImportExport.overwrite_confirm(file_paths: Sequence[str], *, confirm: bool = True) -> dict[str, Any]`
 
 #### 4. `app/workspace/code_editor/indicator_tester.py` — `CodeEditorIndicatorTester` (`FEAT-CODEEDITOR-INDTEST`)
+
 - **Backend Target:** `app/workspace/code_editor/indicator_tester.py` (`🟡 200–300L`, Docstring `<=45L`)
 - **Class:** `IndicatorTester`
 - **Functional Requirements & Exact Method Signatures:**
@@ -911,14 +970,15 @@ HaruQuantAI/
 
 ### Phase 5.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppWizard` | `AppWizard` (`overview/`) | `ARCHIVE/app/workspace/algo_wizard/wizard.py` | `app/workspace/algo_wizard/wizard.py` (`🟢 <200L`) | `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx` | `HostPersistence` |
-| `ServletAlgoWizard` | `ServletAlgoWizard`, `awShareWidget` (`algowizard-integration/`) | `ARCHIVE/app/workspace/algo_wizard/routes.py` | `app/workspace/algo_wizard/routes.py` (`🟡 250–400L`) | `ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx` | `BlockRegistry`, `HostPersistence` |
-| `ServletBuilder` | `ServletBuilder` | `ARCHIVE/app/workspace/builder/routes.py` | `app/workspace/builder/routes.py` (`🟢 <200L`) | `ui/app/workspace/Builder/builderClient.ts` | `CodegenTemplateEngine` |
-| `ServletStrategy` | `ServletStrategy` | `ARCHIVE/app/workspace/builder/strategy_servlet.py` | `app/workspace/builder/strategy_servlet.py` (`🟢 <200L`) | `ui/app/workspace/Builder/resultsModel.ts` | `StrategyArchiveCodec` (`formats.py`) |
+| Component           | SQX Donor (`docs/SQX/`)                                          | Legacy Code Donor (`ARCHIVE/`)                      | Backend Target File (Line Budget)                        | Frontend Target File                                  | DRY Shared Dependencies               |
+| ------------------- | ---------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------- |
+| `AppWizard`         | `AppWizard` (`overview/`)                                        | `ARCHIVE/app/workspace/algo_wizard/wizard.py`       | `app/workspace/algo_wizard/wizard.py` (`🟢 <200L`)       | `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx` | `HostPersistence`                     |
+| `ServletAlgoWizard` | `ServletAlgoWizard`, `awShareWidget` (`algowizard-integration/`) | `ARCHIVE/app/workspace/algo_wizard/routes.py`       | `app/workspace/algo_wizard/routes.py` (`🟡 250–400L`)    | `ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx`   | `BlockRegistry`, `HostPersistence`    |
+| `ServletBuilder`    | `ServletBuilder`                                                 | `ARCHIVE/app/workspace/builder/routes.py`           | `app/workspace/builder/routes.py` (`🟢 <200L`)           | `ui/app/workspace/Builder/builderClient.ts`           | `CodegenTemplateEngine`               |
+| `ServletStrategy`   | `ServletStrategy`                                                | `ARCHIVE/app/workspace/builder/strategy_servlet.py` | `app/workspace/builder/strategy_servlet.py` (`🟢 <200L`) | `ui/app/workspace/Builder/resultsModel.ts`            | `StrategyArchiveCodec` (`formats.py`) |
 
 #### 1. `app/workspace/algo_wizard/wizard.py` — `AppWizard` (`FEAT-WIZARD-WORKSPACE`)
+
 - **Backend Target:** `app/workspace/algo_wizard/wizard.py` (`🟢 <200L`, Docstring `<=40L`)
 - **Class:** `AppWizard`
 - **Functional Requirements & Exact Method Signatures:**
@@ -926,6 +986,7 @@ HaruQuantAI/
   - [ ] `FR-WIZARD-LOAD`: Manage active strategy manifest and synchronize with Results databank $\rightarrow$ `AppWizard.load_strategy(strategy_id: str) -> dict[str, Any]`
 
 #### 2. `app/workspace/algo_wizard/routes.py` — `ServletAlgoWizard` (`FEAT-WIZARD-SERVLET`)
+
 - **Backend Target:** `app/workspace/algo_wizard/routes.py` (`🟡 250–400L`, Docstring `<=50L`)
 - **Class:** `AlgoWizard`
 - **Functional Requirements & Exact Method Signatures:**
@@ -936,6 +997,7 @@ HaruQuantAI/
   - [ ] `FR-WIZARD-SHARE-WIDGET`: Transform versioned XML strategy rule trees and export read-only embeddable strategy rule views (`awShareWidget`) $\rightarrow$ `AlgoWizard.export_share_widget(strategy_id: str) -> dict[str, Any]`
 
 #### 3. `app/workspace/builder/routes.py` & `strategy_servlet.py` — `ServletBuilder` & `ServletStrategy` (`FEAT-WIZARD-COMPILER`)
+
 - **Backend Targets:** `routes.py` (`🟢 <200L`), `strategy_servlet.py` (`🟢 <200L`)
 - **Classes:** `BuilderServlet`, `StrategyServlet`
 - **Functional Requirements & Exact Method Signatures:**
@@ -954,21 +1016,22 @@ HaruQuantAI/
 
 ### Phase 6.1 – 6.7 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/settings/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `SettingsWhatToBuild` | `SettingsWhatToBuild` | `ARCHIVE/app/workspace/builder/settings/what_to_build.py` | `app/workspace/builder/settings/what_to_build.py` (`🟡 200–350L`) | `ui/app/workspace/Builder/settings/WhatToBuildTab.tsx` | `builder/_common.py`, `HostPersistence` |
-| `SettingsData` | `SettingsData` | `ARCHIVE/app/workspace/builder/settings/data_setup.py` | `app/workspace/builder/settings/data_setup.py` (`🟢 <200L`) | `ui/app/workspace/Builder/settings/DataTab.tsx` | `Data` (`data_manager/data.py`) |
-| `SettingsBlocks` | `SettingsBlocks` | `ARCHIVE/app/workspace/builder/settings/blocks.py` | `app/workspace/builder/settings/blocks.py` (`🟡 200–300L`) | `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx` | `BlockRegistry` (`snippets/blocks.py`) |
-| `SettingsGeneticOptions` & `SettingsPartsToImprove` | `SettingsGeneticOptions`, `SettingsPartsToImprove` | `ARCHIVE/app/workspace/builder/settings/{genetic_options,parts_to_improve}.py` | `app/workspace/builder/settings/genetic_options.py` (`🟢 <200L`), `parts_to_improve.py` (`🟢 <200L`) | `ui/app/workspace/Builder/settings/{GeneticOptionsTab,PartsToImproveTab}.tsx` | `builder/_common.py` |
-| `SettingsOptions`, `SettingsAdvancedTM`, `SettingsMoneyManagement` | `SettingsOptions`, `SettingsAdvancedTM`, `SettingsMoneyManagement` | `ARCHIVE/app/workspace/builder/settings/{options,advanced_tm,money_management}.py` | `app/workspace/builder/settings/{options,advanced_tm,money_management}.py` (each `🟢 <200L`) | `ui/app/workspace/Builder/settings/{TradingOptionsTab,MoneyManagementTab}.tsx` | `TradingOptionEnforcer`, `MoneyManagementEngine` |
-| `SettingsRankings` | `SettingsRankings` | `ARCHIVE/app/workspace/builder/settings/rankings.py` | `app/workspace/builder/settings/rankings.py` (`🟡 200–300L`) | `ui/app/workspace/Builder/settings/RankingTab.tsx` | `ColumnRegistry`, `CorrelationAndFitnessRegistry` |
-| `AppBuilder`, `SettingsPanel`, `TaskBuild` | `AppBuilder`, `SettingsPanel`, `TaskBuild` | `ARCHIVE/app/workspace/builder/{builder,settings/controls,engine/build_task}.py` | `app/workspace/builder/builder.py` (`🟢 <200L`), `settings/controls.py` (`🟢 <150L`), `engine/build_task.py` (`🟡 250–400L`) | `ui/app/workspace/Builder/{BuilderWorkspace,EnginePanel,settings/SettingsControls}.tsx` | `JobManager`, `BacktestSimulator`, `RandomGenerator` |
+| Component                                                          | SQX Donor (`docs/SQX/overview/settings/`)                          | Legacy Code Donor (`ARCHIVE/`)                                                     | Backend Target File (Line Budget)                                                                                            | Frontend Target File                                                                    | DRY Shared Dependencies                              |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `SettingsWhatToBuild`                                              | `SettingsWhatToBuild`                                              | `ARCHIVE/app/workspace/builder/settings/what_to_build.py`                          | `app/workspace/builder/settings/what_to_build.py` (`🟡 200–350L`)                                                            | `ui/app/workspace/Builder/settings/WhatToBuildTab.tsx`                                  | `builder/_common.py`, `HostPersistence`              |
+| `SettingsData`                                                     | `SettingsData`                                                     | `ARCHIVE/app/workspace/builder/settings/data_setup.py`                             | `app/workspace/builder/settings/data_setup.py` (`🟢 <200L`)                                                                  | `ui/app/workspace/Builder/settings/DataTab.tsx`                                         | `Data` (`data_manager/data.py`)                      |
+| `SettingsBlocks`                                                   | `SettingsBlocks`                                                   | `ARCHIVE/app/workspace/builder/settings/blocks.py`                                 | `app/workspace/builder/settings/blocks.py` (`🟡 200–300L`)                                                                   | `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`                               | `BlockRegistry` (`snippets/blocks.py`)               |
+| `SettingsGeneticOptions` & `SettingsPartsToImprove`                | `SettingsGeneticOptions`, `SettingsPartsToImprove`                 | `ARCHIVE/app/workspace/builder/settings/{genetic_options,parts_to_improve}.py`     | `app/workspace/builder/settings/genetic_options.py` (`🟢 <200L`), `parts_to_improve.py` (`🟢 <200L`)                         | `ui/app/workspace/Builder/settings/{GeneticOptionsTab,PartsToImproveTab}.tsx`           | `builder/_common.py`                                 |
+| `SettingsOptions`, `SettingsAdvancedTM`, `SettingsMoneyManagement` | `SettingsOptions`, `SettingsAdvancedTM`, `SettingsMoneyManagement` | `ARCHIVE/app/workspace/builder/settings/{options,advanced_tm,money_management}.py` | `app/workspace/builder/settings/{options,advanced_tm,money_management}.py` (each `🟢 <200L`)                                 | `ui/app/workspace/Builder/settings/{TradingOptionsTab,MoneyManagementTab}.tsx`          | `TradingOptionEnforcer`, `MoneyManagementEngine`     |
+| `SettingsRankings`                                                 | `SettingsRankings`                                                 | `ARCHIVE/app/workspace/builder/settings/rankings.py`                               | `app/workspace/builder/settings/rankings.py` (`🟡 200–300L`)                                                                 | `ui/app/workspace/Builder/settings/RankingTab.tsx`                                      | `ColumnRegistry`, `CorrelationAndFitnessRegistry`    |
+| `AppBuilder`, `SettingsPanel`, `TaskBuild`                         | `AppBuilder`, `SettingsPanel`, `TaskBuild`                         | `ARCHIVE/app/workspace/builder/{builder,settings/controls,engine/build_task}.py`   | `app/workspace/builder/builder.py` (`🟢 <200L`), `settings/controls.py` (`🟢 <150L`), `engine/build_task.py` (`🟡 250–400L`) | `ui/app/workspace/Builder/{BuilderWorkspace,EnginePanel,settings/SettingsControls}.tsx` | `JobManager`, `BacktestSimulator`, `RandomGenerator` |
 
 ---
 
 ### Phase 6.1 – 6.6: Strategy Builder Settings Modules (`app/workspace/builder/settings/`)
 
 #### 1. `app/workspace/builder/settings/what_to_build.py` — `SettingsWhatToBuild` (`FEAT-BUILDER-WHATTOBUILD`)
+
 - **Backend Target:** `app/workspace/builder/settings/what_to_build.py` (`🟡 200–350L`, Docstring `<=55L`)
 - **Class:** `WhatToBuild`
 - **Functional Requirements & Exact Method Signatures:**
@@ -982,6 +1045,7 @@ HaruQuantAI/
   - [ ] `FR-BUILDER-WTB-ADDITIONAL`: Configure additional strategy build settings and constraints $\rightarrow$ `WhatToBuild.additional_config(extra_config: Mapping[str, Any]) -> dict[str, Any]`
 
 #### 2. `app/workspace/builder/settings/{data_setup,blocks,genetic_options,parts_to_improve,options,advanced_tm,money_management,rankings}.py` (`FEAT-BUILDER-SETTINGS`)
+
 - **Backend Targets:** 8 focused settings modules (`🟢 <200L` to `🟡 200–300L` each)
 - **Classes:** `DataSettings` (`data_setup.py`), `Blocks` (`blocks.py`), `GeneticOptions` (`genetic_options.py`), `PartsToImprove` (`parts_to_improve.py`), `BuildOptions` (`options.py`), `AdvancedTM` (`advanced_tm.py`), `MoneyManagement` (`money_management.py`), `Rankings` (`rankings.py`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -1005,6 +1069,7 @@ HaruQuantAI/
 ### Phase 6.7: Builder Container & Task Execution
 
 #### 3. `app/workspace/builder/builder.py`, `settings/controls.py` & `engine/build_task.py` (`FEAT-BUILDER-ENGINE`)
+
 - **Backend Targets:** `builder.py` (`🟢 <200L`), `settings/controls.py` (`🟢 <150L`), `engine/build_task.py` (`🟡 250–400L`)
 - **Classes:** `AppBuilder` (`builder.py`), `SettingsPanel` (`settings/controls.py`), `BuildTask` (`engine/build_task.py`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -1027,24 +1092,25 @@ HaruQuantAI/
 
 ### Phase 7.1 – 7.7 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/results-tabs/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppResults`, `ProjectDatabanks`, `ProjectResults`, `DashboardPanel`, `DashboardResults` | `AppResults`, `ProjectDatabanks`, `ProjectResults`, `DashboardPanel`, `DashboardResults` | `ARCHIVE/app/workspace/results/results.py`, `ARCHIVE/app/workspace/builder/{project_databanks,project_results,dashboard_panel,dashboard_results}.py` | `app/workspace/results/results.py` (`🟢 <200L`), `app/workspace/builder/{project_databanks,project_results,dashboard_panel,dashboard_results}.py` (each `🟢 <200L`) | `ui/app/workspace/Results/ResultsWorkspace.tsx`, `ui/app/workspace/Builder/{ResultsColumn,ResultsView,ProgressDashboard}.tsx` | `HostPersistence` (`databanks`, `strategies` entities) |
-| `ResultsDatabankActions` & `ResultsDatabankViews` | `ResultsDatabankActions`, `ResultsDatabankViews` | `ARCHIVE/app/workspace/results/reports/{results_databank_actions,results_databank_views}.py` | `app/workspace/results/reports/results_databank_actions.py` (`🟡 300–450L`), `results_databank_views.py` (`🟢 <200L`) | `ui/app/workspace/Results/views/{ResultsDatabankActionsView,ResultsDatabankViewsView}.tsx` | `HostPersistence`, `PlatformCodeExporters`, `StrategyArchiveCodec` |
-| `DatabankRename`, `ServletRenameTool`, `DatabankFilterByCorrelation`, `CustomDatabankActions`, `CustomResultsPluginActions` | `DatabankRename`, `ServletRenameTool`, `DatabankFilterByCorrelation`, `Custom*Actions` | `ARCHIVE/app/workspace/results/databank/{rename,databank_rename,databank_filter_by_correlation,custom_databank_actions}.py`, `reports/custom_results_plugin_actions.py` | `app/workspace/results/databank/{rename,databank_rename,databank_filter_by_correlation,custom_databank_actions}.py` & `reports/custom_results_plugin_actions.py` (each `🟢 <180L`) | `ui/app/plugins/databank/{DatabankRenameController,DatabankRename,DatabankFilterByCorrelation,CustomDatabankActions}.tsx` | `HostPersistence`, `CorrelationAndFitnessRegistry` |
-| `ResultsOverview`, `ResultsReport`, `ResultsStrategyConfig` | `ResultsOverview`, `ResultsReport`, `ResultsStrategyConfig` | `ARCHIVE/app/workspace/results/reports/{overview,results_report,results_strategy_config}.py` | `app/workspace/results/reports/{overview,results_report,results_strategy_config}.py` (each `🟢 <200L`) | `ui/app/workspace/Builder/results/tabs/OverviewTab.tsx`, `ui/app/workspace/Results/views/{ResultsReportView,ResultsStrategyConfigView}.tsx` | `ColumnRegistry` (`snippets/columns.py`) |
-| `ResultsEquityChart`, `ResultsChart`, `ResultsProfileChart` & `EquityChart*` (5 Engines) | `ResultsEquityChart`, `ResultsChart`, `ResultsProfileChart`, `EquityChart*` | `ARCHIVE/app/workspace/results/reports/{equity_chart,results_chart,results_profile_chart}.py`, `charts/{benchmark,daily_chart,drawdown,volatility,volume}.py` | `app/workspace/results/reports/{equity_chart,results_chart,results_profile_chart}.py` & `charts/{benchmark,daily_chart,drawdown,volatility,volume}.py` (each `🟢 <180L`) | `ui/app/workspace/Results/EquityChart.tsx`, `ui/app/workspace/Results/views/{ResultsChartView,ResultsProfileChartView}.tsx` | `ChartSnippetRegistry` (`snippets/charts.py`) |
-| `ResultsTradeList`, `ResultsTradelistViews`, `ResultsTradeAnalysis` | `ResultsTradeList`, `ResultsTradelistViews`, `ResultsTradeAnalysis` | `ARCHIVE/app/workspace/results/reports/{trade_list,results_tradelist_views,trade_analysis}.py` | `app/workspace/results/reports/{trade_list,results_tradelist_views,trade_analysis}.py` (each `🟢 <200L`) | `ui/app/workspace/Builder/results/tabs/TradeListTab.tsx`, `ui/app/workspace/Results/views/{ResultsTradelistViewsView,TradeAnalysisView}.tsx` | `ColumnRegistry`, `ChartSnippetRegistry` |
-| `ResultsPortfolioCorrelation`, `ResultsPortfolioComposerChart`, `ResultsPortfolioComposerLog` | `ResultsPortfolioCorrelation`, `ResultsPortfolioComposer*` | `ARCHIVE/app/workspace/results/reports/{portfolio_correlation,results_portfolio_composer_chart,results_portfolio_composer_log}.py` | `app/workspace/results/reports/{portfolio_correlation,results_portfolio_composer_chart,results_portfolio_composer_log}.py` (each `🟢 <200L`) | `ui/app/workspace/Results/views/{PortfolioCorrelationView,ResultsPortfolioComposerChartView,ResultsPortfolioComposerLogView}.tsx` | `CorrelationAndFitnessRegistry` |
-| `ResultsExplore`, `ResultsSPOverview`, `ResultsStockpicker`, `FitnessMethod*` (3) | `ResultsExplore`, `ResultsSPOverview`, `ResultsStockpicker`, `FitnessMethod*` | `ARCHIVE/app/workspace/results/reports/{results_explore,results_sp_overview,results_stockpicker}.py`, `fitness/{existing_portfolio,strategy_result,wf_result}.py` | `app/workspace/results/reports/{results_explore,results_sp_overview,results_stockpicker}.py` & `fitness/{existing_portfolio,strategy_result,wf_result}.py` (each `🟢 <200L`) | `ui/app/workspace/Results/views/{ResultsExploreView,ResultsSPOverviewView,ResultsStockpickerView}.tsx`, `ui/app/workspace/Builder/FitnessEvolutionModal.tsx` | `ColumnRegistry`, `CorrelationAndFitnessRegistry` |
-| `ResultsSourceCode` & `ResultsPlugins` | `ResultsSourceCode`, `ResultsPlugins` (`RESULTS2`, `Prop analytics`, `Prop Monte Carlo`) | `ARCHIVE/app/workspace/results/reports/{source_code,results_plugins}.py` | `app/workspace/results/reports/source_code.py` (`🟡 200–300L`), `results_plugins.py` (`🟡 200–300L`) | `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`, `ui/app/workspace/Results/views/ResultsPluginsView.tsx` | `PlatformCodeExporters`, `MonteCarloManipulator` |
-| `Saver*` (4) & `Loader*` (2) | `SaverHTML`, `SaverPDF`, `SaverLegacyV3`, `SaverStrategyTrades`, `LoaderLegacyV3`, `LoaderLegacyV4` | `ARCHIVE/app/workspace/results/exporters/{saver_html,saver_pdf,saver_legacy_v3,saver_trades}.py`, `loaders/{loader_legacy_v3,loader_legacy_v4}.py` | `app/workspace/results/exporters/{saver_html,saver_pdf,saver_legacy_v3,saver_trades}.py` & `loaders/{loader_legacy_v3,loader_legacy_v4}.py` (each `🟢 <180L`) | `ui/app/plugins/databank/{DatabankSaveExports,DatabankToolbar}.tsx` | `StrategyArchiveCodec` (`formats.py`) |
+| Component                                                                                                                   | SQX Donor (`docs/SQX/overview/results-tabs/`)                                                       | Legacy Code Donor (`ARCHIVE/`)                                                                                                                                          | Backend Target File (Line Budget)                                                                                                                                                  | Frontend Target File                                                                                                                                         | DRY Shared Dependencies                                            |
+| --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `AppResults`, `ProjectDatabanks`, `ProjectResults`, `DashboardPanel`, `DashboardResults`                                    | `AppResults`, `ProjectDatabanks`, `ProjectResults`, `DashboardPanel`, `DashboardResults`            | `ARCHIVE/app/workspace/results/results.py`, `ARCHIVE/app/workspace/builder/{project_databanks,project_results,dashboard_panel,dashboard_results}.py`                    | `app/workspace/results/results.py` (`🟢 <200L`), `app/workspace/builder/{project_databanks,project_results,dashboard_panel,dashboard_results}.py` (each `🟢 <200L`)                | `ui/app/workspace/Results/ResultsWorkspace.tsx`, `ui/app/workspace/Builder/{ResultsColumn,ResultsView,ProgressDashboard}.tsx`                                | `HostPersistence` (`databanks`, `strategies` entities)             |
+| `ResultsDatabankActions` & `ResultsDatabankViews`                                                                           | `ResultsDatabankActions`, `ResultsDatabankViews`                                                    | `ARCHIVE/app/workspace/results/reports/{results_databank_actions,results_databank_views}.py`                                                                            | `app/workspace/results/reports/results_databank_actions.py` (`🟡 300–450L`), `results_databank_views.py` (`🟢 <200L`)                                                              | `ui/app/workspace/Results/views/{ResultsDatabankActionsView,ResultsDatabankViewsView}.tsx`                                                                   | `HostPersistence`, `PlatformCodeExporters`, `StrategyArchiveCodec` |
+| `DatabankRename`, `ServletRenameTool`, `DatabankFilterByCorrelation`, `CustomDatabankActions`, `CustomResultsPluginActions` | `DatabankRename`, `ServletRenameTool`, `DatabankFilterByCorrelation`, `Custom*Actions`              | `ARCHIVE/app/workspace/results/databank/{rename,databank_rename,databank_filter_by_correlation,custom_databank_actions}.py`, `reports/custom_results_plugin_actions.py` | `app/workspace/results/databank/{rename,databank_rename,databank_filter_by_correlation,custom_databank_actions}.py` & `reports/custom_results_plugin_actions.py` (each `🟢 <180L`) | `ui/app/plugins/databank/{DatabankRenameController,DatabankRename,DatabankFilterByCorrelation,CustomDatabankActions}.tsx`                                    | `HostPersistence`, `CorrelationAndFitnessRegistry`                 |
+| `ResultsOverview`, `ResultsReport`, `ResultsStrategyConfig`                                                                 | `ResultsOverview`, `ResultsReport`, `ResultsStrategyConfig`                                         | `ARCHIVE/app/workspace/results/reports/{overview,results_report,results_strategy_config}.py`                                                                            | `app/workspace/results/reports/{overview,results_report,results_strategy_config}.py` (each `🟢 <200L`)                                                                             | `ui/app/workspace/Builder/results/tabs/OverviewTab.tsx`, `ui/app/workspace/Results/views/{ResultsReportView,ResultsStrategyConfigView}.tsx`                  | `ColumnRegistry` (`snippets/columns.py`)                           |
+| `ResultsEquityChart`, `ResultsChart`, `ResultsProfileChart` & `EquityChart*` (5 Engines)                                    | `ResultsEquityChart`, `ResultsChart`, `ResultsProfileChart`, `EquityChart*`                         | `ARCHIVE/app/workspace/results/reports/{equity_chart,results_chart,results_profile_chart}.py`, `charts/{benchmark,daily_chart,drawdown,volatility,volume}.py`           | `app/workspace/results/reports/{equity_chart,results_chart,results_profile_chart}.py` & `charts/{benchmark,daily_chart,drawdown,volatility,volume}.py` (each `🟢 <180L`)           | `ui/app/workspace/Results/EquityChart.tsx`, `ui/app/workspace/Results/views/{ResultsChartView,ResultsProfileChartView}.tsx`                                  | `ChartSnippetRegistry` (`snippets/charts.py`)                      |
+| `ResultsTradeList`, `ResultsTradelistViews`, `ResultsTradeAnalysis`                                                         | `ResultsTradeList`, `ResultsTradelistViews`, `ResultsTradeAnalysis`                                 | `ARCHIVE/app/workspace/results/reports/{trade_list,results_tradelist_views,trade_analysis}.py`                                                                          | `app/workspace/results/reports/{trade_list,results_tradelist_views,trade_analysis}.py` (each `🟢 <200L`)                                                                           | `ui/app/workspace/Builder/results/tabs/TradeListTab.tsx`, `ui/app/workspace/Results/views/{ResultsTradelistViewsView,TradeAnalysisView}.tsx`                 | `ColumnRegistry`, `ChartSnippetRegistry`                           |
+| `ResultsPortfolioCorrelation`, `ResultsPortfolioComposerChart`, `ResultsPortfolioComposerLog`                               | `ResultsPortfolioCorrelation`, `ResultsPortfolioComposer*`                                          | `ARCHIVE/app/workspace/results/reports/{portfolio_correlation,results_portfolio_composer_chart,results_portfolio_composer_log}.py`                                      | `app/workspace/results/reports/{portfolio_correlation,results_portfolio_composer_chart,results_portfolio_composer_log}.py` (each `🟢 <200L`)                                       | `ui/app/workspace/Results/views/{PortfolioCorrelationView,ResultsPortfolioComposerChartView,ResultsPortfolioComposerLogView}.tsx`                            | `CorrelationAndFitnessRegistry`                                    |
+| `ResultsExplore`, `ResultsSPOverview`, `ResultsStockpicker`, `FitnessMethod*` (3)                                           | `ResultsExplore`, `ResultsSPOverview`, `ResultsStockpicker`, `FitnessMethod*`                       | `ARCHIVE/app/workspace/results/reports/{results_explore,results_sp_overview,results_stockpicker}.py`, `fitness/{existing_portfolio,strategy_result,wf_result}.py`       | `app/workspace/results/reports/{results_explore,results_sp_overview,results_stockpicker}.py` & `fitness/{existing_portfolio,strategy_result,wf_result}.py` (each `🟢 <200L`)       | `ui/app/workspace/Results/views/{ResultsExploreView,ResultsSPOverviewView,ResultsStockpickerView}.tsx`, `ui/app/workspace/Builder/FitnessEvolutionModal.tsx` | `ColumnRegistry`, `CorrelationAndFitnessRegistry`                  |
+| `ResultsSourceCode` & `ResultsPlugins`                                                                                      | `ResultsSourceCode`, `ResultsPlugins` (`RESULTS2`, `Prop analytics`, `Prop Monte Carlo`)            | `ARCHIVE/app/workspace/results/reports/{source_code,results_plugins}.py`                                                                                                | `app/workspace/results/reports/source_code.py` (`🟡 200–300L`), `results_plugins.py` (`🟡 200–300L`)                                                                               | `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`, `ui/app/workspace/Results/views/ResultsPluginsView.tsx`                                           | `PlatformCodeExporters`, `MonteCarloManipulator`                   |
+| `Saver*` (4) & `Loader*` (2)                                                                                                | `SaverHTML`, `SaverPDF`, `SaverLegacyV3`, `SaverStrategyTrades`, `LoaderLegacyV3`, `LoaderLegacyV4` | `ARCHIVE/app/workspace/results/exporters/{saver_html,saver_pdf,saver_legacy_v3,saver_trades}.py`, `loaders/{loader_legacy_v3,loader_legacy_v4}.py`                      | `app/workspace/results/exporters/{saver_html,saver_pdf,saver_legacy_v3,saver_trades}.py` & `loaders/{loader_legacy_v3,loader_legacy_v4}.py` (each `🟢 <180L`)                      | `ui/app/plugins/databank/{DatabankSaveExports,DatabankToolbar}.tsx`                                                                                          | `StrategyArchiveCodec` (`formats.py`)                              |
 
 ---
 
 ### Phase 7.1: Databank Storage & Strategy Management
 
 #### 1. `app/workspace/results/results.py` & `app/workspace/builder/project_databanks.py` (`FEAT-RESULTS-DATABANKS`)
+
 - **Backend Targets:** `results.py` (`🟢 <200L`), `project_databanks.py` (`🟢 <200L`)
 - **Classes:** `AppResults`, `Databanks`
 - **Functional Requirements & Exact Method Signatures:**
@@ -1054,6 +1120,7 @@ HaruQuantAI/
   - [ ] `FR-DATABANKS-GET`: Display single databank table with strategy candidates and metrics $\rightarrow$ `Databanks.databank(databank_id: str, *, limit: int = 100, offset: int = 0) -> dict[str, Any]`
 
 #### 2. `app/workspace/results/reports/results_databank_views.py` & `results_databank_actions.py` (`FEAT-RESULTS-DB-ACTIONS`)
+
 - **Backend Targets:** `results_databank_views.py` (`🟢 <200L`), `results_databank_actions.py` (`🟡 300–450L`)
 - **Classes:** `DatabankViews`, `DatabankActions`
 - **Functional Requirements & Exact Method Signatures:**
@@ -1072,6 +1139,7 @@ HaruQuantAI/
   - [ ] `FR-RESULTS-DB-BATCH-EXPORT`: Batch export databank table to CSV, save `.sqx` archives, and batch export target-platform source code $\rightarrow$ `DatabankActions.batch_export_source_code(databank_id: str, target_format: str, output_dir: str) -> dict[str, Any]`
 
 #### 3. `app/workspace/results/databank/{rename,databank_rename,databank_filter_by_correlation,custom_databank_actions}.py` & `reports/custom_results_plugin_actions.py` (`FEAT-RESULTS-DB-UTILS`)
+
 - **Backend Targets:** 5 focused modules (each `🟢 <180L`)
 - **Classes:** `ServletRenameTool` (`rename.py`), `DatabankRename` (`databank_rename.py`), `DatabankFilter` (`databank_filter_by_correlation.py`), `CustomDatabank` (`custom_databank_actions.py`), `CustomResults` (`custom_results_plugin_actions.py`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -1087,6 +1155,7 @@ HaruQuantAI/
 ### Phase 7.2 – 7.7: Strategy Reports, Charts, Trade Lists, Correlation, Stockpicker & Exporters
 
 #### 4. `app/workspace/builder/{project_results,dashboard_panel,dashboard_results}.py` & `app/workspace/results/reports/{overview,results_report,results_strategy_config}.py` (`FEAT-RESULTS-OVERVIEW`)
+
 - **Backend Targets:** 6 focused modules (each `🟢 <200L`)
 - **Classes:** `ProjectResults`, `Dashboard`, `DashboardResults`, `Overview`, `Report`, `StrategyConfig`
 - **Functional Requirements & Exact Method Signatures:**
@@ -1102,6 +1171,7 @@ HaruQuantAI/
   - [ ] `FR-RESULTS-DASHBOARD-RESULTS`: Display project results overview and individual result summary panel widget $\rightarrow$ `DashboardResults.dashboard_results(project_id: str | None = None) -> dict[str, Any]` & `DashboardResults.result_panel(strategy_id: str) -> dict[str, Any]`
 
 #### 5. `app/workspace/results/reports/{equity_chart,results_chart,results_profile_chart}.py` & `charts/{benchmark,daily_chart,drawdown,volatility,volume}.py` (`FEAT-RESULTS-CHARTS`)
+
 - **Backend Targets:** 8 focused modules (each `🟢 <180L`)
 - **Classes:** `EquityChart`, `Chart`, `ProfileChart`, `BenchmarkEngine`, `DailyChartEngine`, `DrawdownEngine`, `VolatilityEngine`, `VolumeEngine`
 - **Functional Requirements & Exact Method Signatures:**
@@ -1116,6 +1186,7 @@ HaruQuantAI/
   - [ ] `FR-RESULTS-VOLUME-DIST`: Analyze volume distribution per trade, instrument, and time session (`volume.py`) $\rightarrow$ `VolumeEngine.calculate_volume_distribution(trades: Sequence[Mapping[str, Any]]) -> dict[str, Any]`
 
 #### 6. `app/workspace/results/reports/{trade_list,results_tradelist_views,trade_analysis,portfolio_correlation,results_portfolio_composer_chart,results_portfolio_composer_log,results_explore,results_sp_overview,results_stockpicker}.py` & `fitness/{existing_portfolio,strategy_result,wf_result}.py` (`FEAT-RESULTS-ANALYSIS`)
+
 - **Backend Targets:** 12 focused modules (each `🟢 <200L`)
 - **Classes:** `TradeList`, `TradelistViews`, `TradeAnalysis`, `PortfolioCorrelation`, `PortfolioComposerChart`, `PortfolioComposerLog`, `Explore`, `SPOverview`, `Stockpicker`, `FitnessPortfolio`, `FitnessStrategy`, `FitnessWF`
 - **Functional Requirements & Exact Method Signatures:**
@@ -1130,6 +1201,7 @@ HaruQuantAI/
   - [ ] `FR-RESULTS-FITNESS-METHODS`: Configure fitness calculation against existing portfolio, strategy result, and Walk-Forward efficiency $\rightarrow$ `FitnessPortfolio.fitness_method_existing_portfolio(config: Mapping[str, Any]) -> dict[str, Any]`, `FitnessStrategy.fitness_method_strategy_result(config: Mapping[str, Any]) -> dict[str, Any]`, `FitnessWF.calculate_wf_fitness(wf_metrics: Mapping[str, Any]) -> dict[str, Any]`
 
 #### 7. `app/workspace/results/reports/{source_code,results_plugins}.py`, `exporters/{saver_html,saver_pdf,saver_legacy_v3,saver_trades}.py`, `loaders/{loader_legacy_v3,loader_legacy_v4}.py` (`FEAT-RESULTS-EXPORTERS`)
+
 - **Backend Targets:** 8 focused modules (`🟢 <200L` to `🟡 200–300L` each)
 - **Classes:** `SourceCode`, `Plugins`, `SaverHTML`, `SaverPDF`, `LegacySaver`, `SaverTrades`, `LegacyLoader`
 - **Functional Requirements & Exact Method Signatures:**
@@ -1148,14 +1220,15 @@ HaruQuantAI/
 
 ### Phase 8.1 – 8.5 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppRetester`, `SettingsWhatToRetest`, `SettingsAutomaticRetest`, `SettingsCrossChecks` | `AppRetester`, `SettingsWhatToRetest`, `SettingsAutomaticRetest`, `SettingsCrossChecks` | `ARCHIVE/app/workspace/retester/retester.py`, `settings/{what_to_retest,automatic_retest}.py`, `ARCHIVE/app/workspace/builder/settings/cross_checks.py` | `app/workspace/retester/retester.py` (`🟢 <200L`), `settings/{what_to_retest,automatic_retest}.py` (each `🟢 <150L`), `app/workspace/builder/settings/cross_checks.py` (`🟢 <200L`) | `ui/app/workspace/Retester/{RetesterWorkspace,RetesterSettings}.tsx`, `ui/app/workspace/Builder/settings/CrossChecksTab.tsx` | `HostPersistence`, `JobManager` |
-| `CrossCheck*` (9 Modules) | `CrossCheckMonteCarloManipulation`, `MonteCarloRetest`, `HigherPrecision`, `AdditionalMarkets`, `OptProfileSysParamPermutation`, `SequentialOptimization`, `WalkForwardMatrix`, `WalkForwardOptimization`, `WhatIf` | `ARCHIVE/app/workspace/retester/cross_checks/` (9 files) | `app/workspace/retester/cross_checks/` (9 files, each `🟢 <180L`) | `ui/app/workspace/Retester/views/*Modal.tsx` | `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`, `retester/_common.py` |
-| `ResultsRobustnessTests`, `ResultsSysParamPermutation`, `ResultsSequentialOptimization`, `ResultsWalkForward` | `ResultsRobustnessTests`, `ResultsSysParamPermutation`, `ResultsSequentialOptimization`, `ResultsWalkForward` | `ARCHIVE/app/workspace/results/reports/{results_robustness_tests,results_sys_param_permutation,results_sequential_optimization,results_walk_forward}.py` | `app/workspace/results/reports/{results_robustness_tests,results_sys_param_permutation,results_sequential_optimization,results_walk_forward}.py` (each `🟢 <200L`) | `ui/app/workspace/Results/views/{ResultsRobustnessTestsView,ResultsSysParamPermutationView,ResultsSequentialOptimizationView,ResultsWalkForwardView}.tsx` | `ColumnRegistry` |
-| `TaskRetest` & `TaskAutomaticRetest` | `TaskRetest`, `TaskAutomaticRetest` | `ARCHIVE/app/workspace/retester/engine/retest_task.py`, `ARCHIVE/app/workspace/custom_projects/tasks/auto_retest.py` | `app/workspace/retester/engine/retest_task.py` (`🟡 200–350L`), `app/workspace/custom_projects/tasks/auto_retest.py` (`🟢 <200L`) | `ui/app/workspace/Retester/{retesterClient.ts,RetesterSettings.tsx}` | `BacktestSimulator`, `MonteCarloManipulator`, `WhatIfSimulator` |
+| Component                                                                                                     | SQX Donor (`docs/SQX/overview/`)                                                                                                                                                                                    | Legacy Code Donor (`ARCHIVE/`)                                                                                                                           | Backend Target File (Line Budget)                                                                                                                                                   | Frontend Target File                                                                                                                                      | DRY Shared Dependencies                                                                 |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `AppRetester`, `SettingsWhatToRetest`, `SettingsAutomaticRetest`, `SettingsCrossChecks`                       | `AppRetester`, `SettingsWhatToRetest`, `SettingsAutomaticRetest`, `SettingsCrossChecks`                                                                                                                             | `ARCHIVE/app/workspace/retester/retester.py`, `settings/{what_to_retest,automatic_retest}.py`, `ARCHIVE/app/workspace/builder/settings/cross_checks.py`  | `app/workspace/retester/retester.py` (`🟢 <200L`), `settings/{what_to_retest,automatic_retest}.py` (each `🟢 <150L`), `app/workspace/builder/settings/cross_checks.py` (`🟢 <200L`) | `ui/app/workspace/Retester/{RetesterWorkspace,RetesterSettings}.tsx`, `ui/app/workspace/Builder/settings/CrossChecksTab.tsx`                              | `HostPersistence`, `JobManager`                                                         |
+| `CrossCheck*` (9 Modules)                                                                                     | `CrossCheckMonteCarloManipulation`, `MonteCarloRetest`, `HigherPrecision`, `AdditionalMarkets`, `OptProfileSysParamPermutation`, `SequentialOptimization`, `WalkForwardMatrix`, `WalkForwardOptimization`, `WhatIf` | `ARCHIVE/app/workspace/retester/cross_checks/` (9 files)                                                                                                 | `app/workspace/retester/cross_checks/` (9 files, each `🟢 <180L`)                                                                                                                   | `ui/app/workspace/Retester/views/*Modal.tsx`                                                                                                              | `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`, `retester/_common.py` |
+| `ResultsRobustnessTests`, `ResultsSysParamPermutation`, `ResultsSequentialOptimization`, `ResultsWalkForward` | `ResultsRobustnessTests`, `ResultsSysParamPermutation`, `ResultsSequentialOptimization`, `ResultsWalkForward`                                                                                                       | `ARCHIVE/app/workspace/results/reports/{results_robustness_tests,results_sys_param_permutation,results_sequential_optimization,results_walk_forward}.py` | `app/workspace/results/reports/{results_robustness_tests,results_sys_param_permutation,results_sequential_optimization,results_walk_forward}.py` (each `🟢 <200L`)                  | `ui/app/workspace/Results/views/{ResultsRobustnessTestsView,ResultsSysParamPermutationView,ResultsSequentialOptimizationView,ResultsWalkForwardView}.tsx` | `ColumnRegistry`                                                                        |
+| `TaskRetest` & `TaskAutomaticRetest`                                                                          | `TaskRetest`, `TaskAutomaticRetest`                                                                                                                                                                                 | `ARCHIVE/app/workspace/retester/engine/retest_task.py`, `ARCHIVE/app/workspace/custom_projects/tasks/auto_retest.py`                                     | `app/workspace/retester/engine/retest_task.py` (`🟡 200–350L`), `app/workspace/custom_projects/tasks/auto_retest.py` (`🟢 <200L`)                                                   | `ui/app/workspace/Retester/{retesterClient.ts,RetesterSettings.tsx}`                                                                                      | `BacktestSimulator`, `MonteCarloManipulator`, `WhatIfSimulator`                         |
 
 #### 1. Phase 8.1 – 8.5 Exact Classes & Method Signatures
+
 - **`app/workspace/retester/retester.py` (`AppRetester`):**
   - [ ] `FR-RETESTER-INIT` $\rightarrow$ `AppRetester.init_workspace() -> dict[str, Any]`
   - [ ] `FR-RETESTER-START` $\rightarrow$ `AppRetester.start_retest(config: Mapping[str, Any]) -> dict[str, Any]`
@@ -1192,14 +1265,15 @@ HaruQuantAI/
 
 ### Phase 9.1 – 9.3 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppOptimizer` | `AppOptimizer` | `ARCHIVE/app/workspace/optimizer/optimizer.py` | `app/workspace/optimizer/optimizer.py` (`🟢 <200L`) | `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx` | `JobManager`, `HostPersistence` |
-| `SettingsOptimization` | `SettingsOptimization` | `ARCHIVE/app/workspace/optimizer/settings/optimization_settings.py` | `app/workspace/optimizer/settings/optimization_settings.py` (`🟢 <200L`) | `ui/app/workspace/Optimizer/OptimizerSettings.tsx` | `optimizer/_common.py` |
-| `ResultsOptimizationProfile` | `ResultsOptimizationProfile` | `ARCHIVE/app/workspace/results/reports/results_optimization_profile.py` | `app/workspace/results/reports/results_optimization_profile.py` (`🟢 <200L`) | `ui/app/workspace/Results/views/ResultsOptimizationProfileView.tsx` | `ColumnRegistry` |
-| `TaskOptimize` | `TaskOptimize` | `ARCHIVE/app/workspace/optimizer/engine/optimize_task.py` | `app/workspace/optimizer/engine/optimize_task.py` (`🟡 250–400L`) | `ui/app/workspace/Optimizer/optimizerClient.ts` | `BacktestSimulator`, `RandomGenerator` |
+| Component                    | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`)                                          | Backend Target File (Line Budget)                                            | Frontend Target File                                                | DRY Shared Dependencies                |
+| ---------------------------- | -------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------- |
+| `AppOptimizer`               | `AppOptimizer`                   | `ARCHIVE/app/workspace/optimizer/optimizer.py`                          | `app/workspace/optimizer/optimizer.py` (`🟢 <200L`)                          | `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`                 | `JobManager`, `HostPersistence`        |
+| `SettingsOptimization`       | `SettingsOptimization`           | `ARCHIVE/app/workspace/optimizer/settings/optimization_settings.py`     | `app/workspace/optimizer/settings/optimization_settings.py` (`🟢 <200L`)     | `ui/app/workspace/Optimizer/OptimizerSettings.tsx`                  | `optimizer/_common.py`                 |
+| `ResultsOptimizationProfile` | `ResultsOptimizationProfile`     | `ARCHIVE/app/workspace/results/reports/results_optimization_profile.py` | `app/workspace/results/reports/results_optimization_profile.py` (`🟢 <200L`) | `ui/app/workspace/Results/views/ResultsOptimizationProfileView.tsx` | `ColumnRegistry`                       |
+| `TaskOptimize`               | `TaskOptimize`                   | `ARCHIVE/app/workspace/optimizer/engine/optimize_task.py`               | `app/workspace/optimizer/engine/optimize_task.py` (`🟡 250–400L`)            | `ui/app/workspace/Optimizer/optimizerClient.ts`                     | `BacktestSimulator`, `RandomGenerator` |
 
 #### 1. Phase 9.1 – 9.3 Exact Classes & Method Signatures
+
 - **`app/workspace/optimizer/optimizer.py` (`AppOptimizer`):**
   - [ ] `FR-OPTIMIZER-INIT` $\rightarrow$ `AppOptimizer.init_workspace() -> dict[str, Any]`
   - [ ] `FR-OPTIMIZER-START` $\rightarrow$ `AppOptimizer.start_optimization(config: Mapping[str, Any]) -> dict[str, Any]`
@@ -1224,13 +1298,14 @@ HaruQuantAI/
 
 ### Phase 10.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppNeuralNetwork` | `AppNeuralNetwork` | `ARCHIVE/app/workspace/neural_network/neural_net.py` | `app/workspace/neural_network/neural_net.py` (`🟢 <200L`) | `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx` | `JobManager`, `HostPersistence` |
-| `TaskNeuralNetworkTrainer` | `TaskNeuralNetworkTrainer` | `ARCHIVE/app/workspace/neural_network/trainer.py` | `app/workspace/neural_network/trainer.py` (`🟡 200–350L`) | `ui/app/workspace/NeuralNetwork/neuralNetStore.ts` | `CoreIndicatorLibrary`, `DataSeries` |
-| `ServletAI` | `ServletAI`, `SQAI`, `AIPlugins` | `ARCHIVE/app/workspace/neural_network/routes.py` | `app/workspace/neural_network/routes.py` (`🟡 200–350L`) | `ui/app/workspace/AI/AIWorkspace.tsx` | `HostPersistence`, `FormulaAndNegaterRegistry` |
+| Component                  | SQX Donor (`docs/SQX/`)          | Legacy Code Donor (`ARCHIVE/`)                       | Backend Target File (Line Budget)                         | Frontend Target File                                      | DRY Shared Dependencies                        |
+| -------------------------- | -------------------------------- | ---------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------- |
+| `AppNeuralNetwork`         | `AppNeuralNetwork`               | `ARCHIVE/app/workspace/neural_network/neural_net.py` | `app/workspace/neural_network/neural_net.py` (`🟢 <200L`) | `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx` | `JobManager`, `HostPersistence`                |
+| `TaskNeuralNetworkTrainer` | `TaskNeuralNetworkTrainer`       | `ARCHIVE/app/workspace/neural_network/trainer.py`    | `app/workspace/neural_network/trainer.py` (`🟡 200–350L`) | `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`        | `CoreIndicatorLibrary`, `DataSeries`           |
+| `ServletAI`                | `ServletAI`, `SQAI`, `AIPlugins` | `ARCHIVE/app/workspace/neural_network/routes.py`     | `app/workspace/neural_network/routes.py` (`🟡 200–350L`)  | `ui/app/workspace/AI/AIWorkspace.tsx`                     | `HostPersistence`, `FormulaAndNegaterRegistry` |
 
 #### 1. Phase 10.1 Exact Classes & Method Signatures
+
 - **`app/workspace/neural_network/neural_net.py` (`AppNeuralNetwork`):**
   - [ ] `FR-NN-WORKSPACE-INIT` $\rightarrow$ `AppNeuralNetwork.init_workspace() -> dict[str, Any]`
   - [ ] `FR-NN-WORKSPACE-START` $\rightarrow$ `AppNeuralNetwork.start_training(config: Mapping[str, Any]) -> dict[str, Any]`
@@ -1257,13 +1332,14 @@ HaruQuantAI/
 
 ### Phase 11.1 – 11.2 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppPortfolioComposer` & `PortfolioComposer` | `AppPortfolioComposer`, `PortfolioComposer` | `ARCHIVE/app/workspace/portfolio/composer.py` | `app/workspace/portfolio/composer.py` (`🟡 250–380L`) | `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx` | `CorrelationAndFitnessRegistry`, `ColumnRegistry` |
-| `SettingsCreatePortfolio` & `TaskCreatePortfolio` | `SettingsCreatePortfolio`, `TaskCreatePortfolio` | `ARCHIVE/app/workspace/portfolio/settings/create_portfolio.py`, `ARCHIVE/app/workspace/custom_projects/tasks/create_portfolio.py` | `app/workspace/portfolio/settings/create_portfolio.py` (`🟢 <150L`), `app/workspace/custom_projects/tasks/create_portfolio.py` (`🟢 <200L`) | `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx` | `CorrelationAndFitnessRegistry`, `HostPersistence` |
-| `AppPortfolioMaster`, `SettingsAutomaticPortfolioBuilder`, `TaskAutomaticPortfolioBuilder` | `AppPortfolioMaster`, `SettingsAutomaticPortfolioBuilder`, `TaskAutomaticPortfolioBuilder` | `ARCHIVE/app/workspace/portfolio/{master,settings/auto_builder,master_task}.py` | `app/workspace/portfolio/master.py` (`🟢 <200L`), `settings/auto_builder.py` (`🟢 <200L`), `master_task.py` (`🟡 200–350L`) | `ui/app/workspace/PortfolioMaster/{PortfolioMasterWorkspace,PortfolioMasterSettings,portfolioMasterModel}.tsx` | `CorrelationAndFitnessRegistry`, `RandomGenerator` |
+| Component                                                                                  | SQX Donor (`docs/SQX/overview/`)                                                           | Legacy Code Donor (`ARCHIVE/`)                                                                                                    | Backend Target File (Line Budget)                                                                                                           | Frontend Target File                                                                                           | DRY Shared Dependencies                            |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `AppPortfolioComposer` & `PortfolioComposer`                                               | `AppPortfolioComposer`, `PortfolioComposer`                                                | `ARCHIVE/app/workspace/portfolio/composer.py`                                                                                     | `app/workspace/portfolio/composer.py` (`🟡 250–380L`)                                                                                       | `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`                                            | `CorrelationAndFitnessRegistry`, `ColumnRegistry`  |
+| `SettingsCreatePortfolio` & `TaskCreatePortfolio`                                          | `SettingsCreatePortfolio`, `TaskCreatePortfolio`                                           | `ARCHIVE/app/workspace/portfolio/settings/create_portfolio.py`, `ARCHIVE/app/workspace/custom_projects/tasks/create_portfolio.py` | `app/workspace/portfolio/settings/create_portfolio.py` (`🟢 <150L`), `app/workspace/custom_projects/tasks/create_portfolio.py` (`🟢 <200L`) | `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx`                                                | `CorrelationAndFitnessRegistry`, `HostPersistence` |
+| `AppPortfolioMaster`, `SettingsAutomaticPortfolioBuilder`, `TaskAutomaticPortfolioBuilder` | `AppPortfolioMaster`, `SettingsAutomaticPortfolioBuilder`, `TaskAutomaticPortfolioBuilder` | `ARCHIVE/app/workspace/portfolio/{master,settings/auto_builder,master_task}.py`                                                   | `app/workspace/portfolio/master.py` (`🟢 <200L`), `settings/auto_builder.py` (`🟢 <200L`), `master_task.py` (`🟡 200–350L`)                 | `ui/app/workspace/PortfolioMaster/{PortfolioMasterWorkspace,PortfolioMasterSettings,portfolioMasterModel}.tsx` | `CorrelationAndFitnessRegistry`, `RandomGenerator` |
 
 #### 1. Phase 11.1 – 11.2 Exact Classes & Method Signatures
+
 - **`app/workspace/portfolio/composer.py` (`AppPortfolioComposer` & `Composer`):**
   - [ ] `FR-PORTFOLIO-COMP-INIT` $\rightarrow$ `AppPortfolioComposer.init_workspace() -> dict[str, Any]`
   - [ ] `FR-PORTFOLIO-COMP-COMPUTE` $\rightarrow$ `AppPortfolioComposer.compute_portfolio(strategy_ids: Sequence[str], weights: Mapping[str, float] | None = None) -> dict[str, Any]`
@@ -1292,18 +1368,19 @@ HaruQuantAI/
 
 ### Phase 12.1 – 12.4 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/custom-projects/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppTaskManager`, `ServletProject`, `TaskManagerProjects`, `TaskManagerTasks`, `ProjectResources`, `ProjectSettings`, `EnginePanel`, `SettingsNotes` | `AppTaskManager`, `ServletProject`, `TaskManager*`, `ProjectResources`, `ProjectSettings`, `EnginePanel`, `SettingsNotes` | `ARCHIVE/app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings,engine_panel}.py`, `ARCHIVE/app/workspace/builder/settings/notes.py` | `app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings}.py` (each `🟢 <200L`), `engine_panel.py` (`🟡 200–350L`), `app/workspace/builder/settings/notes.py` (`🟢 <150L`) | `ui/app/workspace/CustomProjects/{CustomProjectsWorkspace,projectClient}.tsx`, `ui/app/plugins/project/ProjectWorkbench.tsx`, `ui/app/workspace/Builder/EnginePanel.tsx` | `HostPersistence` (`projects` entity), `JobManager`, `ProjectArchiveCodec` (`.cfx`) |
-| `Task*` & `Settings*` Flow Control (`GoTo`, `WaitFor`, `StopAndStart`, `Notification`) + 5 `ProjectCondition*` Evaluators | `TaskGoToTask`, `TaskWaitFor`, `TaskStopAndStart`, `TaskNotification`, `ProjectCondition*` | `ARCHIVE/app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `tasks/settings/{goto,wait,stop_start,notification}.py`, `conditions/{cycles_count,goto_activated,goto_evaluated,results_count,run_time}.py` | `app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `tasks/settings/{goto,wait,stop_start,notification}.py`, `conditions/*.py` (each `🟢 <180L`) | `ui/app/workspace/CustomProjects/tasks/{GoTo,Wait,StopStart,Notify}TaskModal.tsx` | `custom_projects/_common.py`, `HostPersistence` |
-| `Task*` & `Settings*` Data & Databank Pipeline Steps (`UpdateData`, `AutoRetestData`, `LoadFromFiles`, `ClearDatabanks`, `Filtering`, `LogDatabankStats`, `SaveToFiles`, `DeleteFile`) | `TaskUpdateData`, `TaskLoadFromFiles`, `TaskClearDatabanks`, `TaskFiltering`, `TaskLogDatabankStats`, `TaskSaveToFiles`, `TaskDeleteFile` | `ARCHIVE/app/workspace/custom_projects/tasks/{data_update,load_files,databank_clear,filtering,log_stats,save_files,delete_file}.py`, `tasks/settings/*.py` | `app/workspace/custom_projects/tasks/{data_update,load_files,databank_clear,filtering,log_stats,save_files,delete_file}.py` & `tasks/settings/*.py` (each `🟢 <200L`) | `ui/app/workspace/CustomProjects/tasks/{DataUpdate,DatabankClear,DeleteFile}TaskModal.tsx`, `ui/app/plugins/databank/{DatabankToolbar,DatabankViews,DatabankSaveExports}.tsx` | `HostPersistence`, `StrategyArchiveCodec`, `PlatformCodeExporters` |
-| `Task*` & `Settings*` Integration & Batch Config (`CallExternalScript`, `CustomAnalysis`, `ApplyMassConfig`) | `TaskCallExternalScript`, `TaskCustomAnalysis`, `TaskApplyMassConfig` | `ARCHIVE/app/workspace/custom_projects/tasks/{external_script,custom_analysis,mass_config}.py`, `tasks/settings/{external_script,mass_config}.py`, `ARCHIVE/app/workspace/builder/settings/custom_analysis.py` | `app/workspace/custom_projects/tasks/{external_script,custom_analysis,mass_config}.py` & settings files (each `🟢 <180L`) | `ui/app/workspace/CustomProjects/tasks/{ExternalScript,MassConfig}TaskModal.tsx`, `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx` | `HostPersistence`, `FormulaAndNegaterRegistry` |
+| Component                                                                                                                                                                              | SQX Donor (`docs/SQX/custom-projects/`)                                                                                                   | Legacy Code Donor (`ARCHIVE/`)                                                                                                                                                                                               | Backend Target File (Line Budget)                                                                                                                                                                                                   | Frontend Target File                                                                                                                                                          | DRY Shared Dependencies                                                             |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `AppTaskManager`, `ServletProject`, `TaskManagerProjects`, `TaskManagerTasks`, `ProjectResources`, `ProjectSettings`, `EnginePanel`, `SettingsNotes`                                   | `AppTaskManager`, `ServletProject`, `TaskManager*`, `ProjectResources`, `ProjectSettings`, `EnginePanel`, `SettingsNotes`                 | `ARCHIVE/app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings,engine_panel}.py`, `ARCHIVE/app/workspace/builder/settings/notes.py`                               | `app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings}.py` (each `🟢 <200L`), `engine_panel.py` (`🟡 200–350L`), `app/workspace/builder/settings/notes.py` (`🟢 <150L`) | `ui/app/workspace/CustomProjects/{CustomProjectsWorkspace,projectClient}.tsx`, `ui/app/plugins/project/ProjectWorkbench.tsx`, `ui/app/workspace/Builder/EnginePanel.tsx`      | `HostPersistence` (`projects` entity), `JobManager`, `ProjectArchiveCodec` (`.cfx`) |
+| `Task*` & `Settings*` Flow Control (`GoTo`, `WaitFor`, `StopAndStart`, `Notification`) + 5 `ProjectCondition*` Evaluators                                                              | `TaskGoToTask`, `TaskWaitFor`, `TaskStopAndStart`, `TaskNotification`, `ProjectCondition*`                                                | `ARCHIVE/app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `tasks/settings/{goto,wait,stop_start,notification}.py`, `conditions/{cycles_count,goto_activated,goto_evaluated,results_count,run_time}.py` | `app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `tasks/settings/{goto,wait,stop_start,notification}.py`, `conditions/*.py` (each `🟢 <180L`)                                                                | `ui/app/workspace/CustomProjects/tasks/{GoTo,Wait,StopStart,Notify}TaskModal.tsx`                                                                                             | `custom_projects/_common.py`, `HostPersistence`                                     |
+| `Task*` & `Settings*` Data & Databank Pipeline Steps (`UpdateData`, `AutoRetestData`, `LoadFromFiles`, `ClearDatabanks`, `Filtering`, `LogDatabankStats`, `SaveToFiles`, `DeleteFile`) | `TaskUpdateData`, `TaskLoadFromFiles`, `TaskClearDatabanks`, `TaskFiltering`, `TaskLogDatabankStats`, `TaskSaveToFiles`, `TaskDeleteFile` | `ARCHIVE/app/workspace/custom_projects/tasks/{data_update,load_files,databank_clear,filtering,log_stats,save_files,delete_file}.py`, `tasks/settings/*.py`                                                                   | `app/workspace/custom_projects/tasks/{data_update,load_files,databank_clear,filtering,log_stats,save_files,delete_file}.py` & `tasks/settings/*.py` (each `🟢 <200L`)                                                               | `ui/app/workspace/CustomProjects/tasks/{DataUpdate,DatabankClear,DeleteFile}TaskModal.tsx`, `ui/app/plugins/databank/{DatabankToolbar,DatabankViews,DatabankSaveExports}.tsx` | `HostPersistence`, `StrategyArchiveCodec`, `PlatformCodeExporters`                  |
+| `Task*` & `Settings*` Integration & Batch Config (`CallExternalScript`, `CustomAnalysis`, `ApplyMassConfig`)                                                                           | `TaskCallExternalScript`, `TaskCustomAnalysis`, `TaskApplyMassConfig`                                                                     | `ARCHIVE/app/workspace/custom_projects/tasks/{external_script,custom_analysis,mass_config}.py`, `tasks/settings/{external_script,mass_config}.py`, `ARCHIVE/app/workspace/builder/settings/custom_analysis.py`               | `app/workspace/custom_projects/tasks/{external_script,custom_analysis,mass_config}.py` & settings files (each `🟢 <180L`)                                                                                                           | `ui/app/workspace/CustomProjects/tasks/{ExternalScript,MassConfig}TaskModal.tsx`, `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx`                                   | `HostPersistence`, `FormulaAndNegaterRegistry`                                      |
 
 ---
 
 ### Phase 12.1: Project & Task Hierarchy Management
 
 #### 1. `app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings,engine_panel}.py` & `app/workspace/builder/settings/notes.py` (`FEAT-PROJECTS-ORCHESTRATOR`)
+
 - **Backend Targets:** 8 focused modules (`🟢 <200L` each, `engine_panel.py` `🟡 200–350L`)
 - **Classes:** `AppTaskManager` (`projects.py`), `ServletProject` (`routes.py`), `TMProjects` (`projects_manager.py`), `TMTasks` (`tasks_manager.py`), `Resources` (`project_resources.py`), `PMSettings` (`project_settings.py`), `Engine` (`engine_panel.py`), `Notes` (`notes.py`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -1343,6 +1420,7 @@ HaruQuantAI/
 ### Phase 12.2 – 12.4: Custom Project Task Runners, Settings & DAG Condition Evaluators
 
 #### 2. Flow Control Tasks & Conditions (`app/workspace/custom_projects/tasks/` & `conditions/`)
+
 - [ ] `FR-PROJECTS-TASK-GOTO` (`goto.py` & `settings/goto.py`) $\rightarrow$ `GoToTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `GoToTask.execute_goto(dag_state: Mapping[str, Any], config: Mapping[str, Any]) -> dict[str, Any]`, `GoToSettings.settings_go_to_task(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
 - [ ] `FR-PROJECTS-TASK-WAIT` (`wait.py` & `settings/wait.py`) $\rightarrow$ `WaitForTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `WaitForTask.execute_wait(config: Mapping[str, Any]) -> dict[str, Any]`, `WaitForSettings.settings_wait_for(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
 - [ ] `FR-PROJECTS-TASK-STOP-START` (`stop_start.py` & `settings/stop_start.py`) $\rightarrow$ `StopAndStartTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `StopAndStartTask.execute_stop_start(config: Mapping[str, Any]) -> dict[str, Any]`, `StopAndStartSettings.settings_stop_and_start(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
@@ -1355,6 +1433,7 @@ HaruQuantAI/
   - [ ] `FR-PROJECTS-COND-RUN-TIME` $\rightarrow$ `RunTimeCondition.evaluate(context: Mapping[str, Any]) -> bool`
 
 #### 3. Data, Databank, Script & Mass-Config Tasks (`app/workspace/custom_projects/tasks/` & `settings/`)
+
 - **`data_update.py`, `settings/update_data.py`, `settings/auto_retest.py`:**
   - [ ] `FR-PROJECTS-TASK-UPDATE-DATA` $\rightarrow$ `UpdateDataTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `UpdateDataTask.execute_update_data(config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-PROJECTS-SETTINGS-UPDATE-DATA` $\rightarrow$ `UpdateDataSettings.settings_update_data(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
@@ -1397,13 +1476,14 @@ HaruQuantAI/
 
 ### Phase 13.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `ServletGridControl` | `ServletGridControl` | `ARCHIVE/app/workspace/grid_control/routes.py` | `app/workspace/grid_control/routes.py` (`🟢 <200L`) | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `HostPersistence`, `JobManager` |
-| `AppGridControl` | `AppGridControl`, `BACKTESTNODE`, `NODEUPDATER` | `ARCHIVE/app/workspace/grid_control/grid_control.py` | `app/workspace/grid_control/grid_control.py` (`🟡 200–350L`) | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `HostPersistence`, `JobManager` |
-| `AppGridTest` | `AppGridTest` | `ARCHIVE/app/workspace/grid_test/grid_test.py` | `app/workspace/grid_test/grid_test.py` (`🟢 <200L`) | `ui/app/workspace/GridTest/GridTestWorkspace.tsx` | `GridControl` |
+| Component            | SQX Donor (`docs/SQX/overview/`)                | Legacy Code Donor (`ARCHIVE/`)                       | Backend Target File (Line Budget)                            | Frontend Target File                                    | DRY Shared Dependencies         |
+| -------------------- | ----------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------- |
+| `ServletGridControl` | `ServletGridControl`                            | `ARCHIVE/app/workspace/grid_control/routes.py`       | `app/workspace/grid_control/routes.py` (`🟢 <200L`)          | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `HostPersistence`, `JobManager` |
+| `AppGridControl`     | `AppGridControl`, `BACKTESTNODE`, `NODEUPDATER` | `ARCHIVE/app/workspace/grid_control/grid_control.py` | `app/workspace/grid_control/grid_control.py` (`🟡 200–350L`) | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `HostPersistence`, `JobManager` |
+| `AppGridTest`        | `AppGridTest`                                   | `ARCHIVE/app/workspace/grid_test/grid_test.py`       | `app/workspace/grid_test/grid_test.py` (`🟢 <200L`)          | `ui/app/workspace/GridTest/GridTestWorkspace.tsx`       | `GridControl`                   |
 
 #### 1. Phase 13.1 Exact Classes & Method Signatures
+
 - **`app/workspace/grid_control/routes.py` (`ServletGridControl`):**
   - [ ] `FR-GRID-SERVLET-REGISTER`: Authenticate and accept remote worker node WebSocket connections $\rightarrow$ `ServletGridControl.register_worker(worker_info: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-GRID-SERVLET-STATUS`: Route calculation jobs to idle workers and stream worker status $\rightarrow$ `ServletGridControl.stream_worker_status(worker_id: str | None = None) -> dict[str, Any]`
@@ -1428,12 +1508,13 @@ HaruQuantAI/
 
 ### Phase 14.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/algocloud/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `ServletAlgoCloud` | `ServletAlgoCloud` | `ARCHIVE/app/workspace/marketplace/routes.py` | `app/workspace/marketplace/routes.py` (`🟢 <200L`) | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence` |
-| `AppMarketplace` | `AppMarketplace` | `ARCHIVE/app/workspace/marketplace/marketplace.py` | `app/workspace/marketplace/marketplace.py` (`🟢 <200L`) | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence` |
+| Component          | SQX Donor (`docs/SQX/algocloud/`) | Legacy Code Donor (`ARCHIVE/`)                     | Backend Target File (Line Budget)                       | Frontend Target File                                    | DRY Shared Dependencies |
+| ------------------ | --------------------------------- | -------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ----------------------- |
+| `ServletAlgoCloud` | `ServletAlgoCloud`                | `ARCHIVE/app/workspace/marketplace/routes.py`      | `app/workspace/marketplace/routes.py` (`🟢 <200L`)      | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence`       |
+| `AppMarketplace`   | `AppMarketplace`                  | `ARCHIVE/app/workspace/marketplace/marketplace.py` | `app/workspace/marketplace/marketplace.py` (`🟢 <200L`) | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence`       |
 
 #### 1. Phase 14.1 Exact Classes & Method Signatures
+
 - **`app/workspace/marketplace/routes.py` (`ServletAlgoCloud`):**
   - [ ] `FR-ALGOCLOUD-SYNC`: Synchronize strategies and databanks with cloud platform $\rightarrow$ `ServletAlgoCloud.sync_strategies(databank_id: str) -> dict[str, Any]`
   - [ ] `FR-ALGOCLOUD-PLAN`: Authenticate cloud user account and fetch plan quotas and subscription limits $\rightarrow$ `ServletAlgoCloud.get_user_plan(account_id: str | None = None) -> dict[str, Any]`
@@ -1453,11 +1534,12 @@ HaruQuantAI/
 
 ### Phase 15.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppBusiness` | `AppBusiness` | `ARCHIVE/app/workspace/business/business.py` | `app/workspace/business/business.py` (`🟢 <200L`) | `ui/app/workspace/Business/BusinessWorkspace.tsx` | `HostPersistence` |
+| Component     | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`)               | Backend Target File (Line Budget)                 | Frontend Target File                              | DRY Shared Dependencies |
+| ------------- | -------------------------------- | -------------------------------------------- | ------------------------------------------------- | ------------------------------------------------- | ----------------------- |
+| `AppBusiness` | `AppBusiness`                    | `ARCHIVE/app/workspace/business/business.py` | `app/workspace/business/business.py` (`🟢 <200L`) | `ui/app/workspace/Business/BusinessWorkspace.tsx` | `HostPersistence`       |
 
 #### 1. `app/workspace/business/business.py` — `AppBusiness` (`FEAT-BUSINESS-ENTERPRISE`)
+
 - **Backend Target:** `app/workspace/business/business.py` (`🟢 <200L`, Docstring `<=40L`)
 - **Class:** `Business`
 - **Functional Requirements & Exact Method Signatures:**
@@ -1474,11 +1556,12 @@ HaruQuantAI/
 
 ### Phase 16.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
-| `AppDebugConsole` | `AppDebugConsole` | `ARCHIVE/app/workspace/debug_console/debug_console.py` | `app/workspace/debug_console/debug_console.py` (`🟢 <200L`) | `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx` | `ResourceMonitor`, `TelemetryLogger` |
+| Component         | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`)                         | Backend Target File (Line Budget)                           | Frontend Target File                                      | DRY Shared Dependencies              |
+| ----------------- | -------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------ |
+| `AppDebugConsole` | `AppDebugConsole`                | `ARCHIVE/app/workspace/debug_console/debug_console.py` | `app/workspace/debug_console/debug_console.py` (`🟢 <200L`) | `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx` | `ResourceMonitor`, `TelemetryLogger` |
 
 #### 1. `app/workspace/debug_console/debug_console.py` — `AppDebugConsole` (`FEAT-DEBUG-CONSOLE`)
+
 - **Backend Target:** `app/workspace/debug_console/debug_console.py` (`🟢 <200L`, Docstring `<=40L`)
 - **Class:** `DebugConsole`
 - **Functional Requirements & Exact Method Signatures:**
@@ -1496,11 +1579,12 @@ HaruQuantAI/
 
 ### Phase 17.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component | SQX Donor (`docs/SQX/overview/`) | Legacy Code Donor (`ARCHIVE/`) | Backend Target File (Line Budget) | Frontend Target File | DRY Shared Dependencies |
-|---|---|---|---|---|---|
+| Component    | SQX Donor (`docs/SQX/overview/`)         | Legacy Code Donor (`ARCHIVE/`)                  | Backend Target File (Line Budget)                       | Frontend Target File                                  | DRY Shared Dependencies                                                                             |
+| ------------ | ---------------------------------------- | ----------------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `MTAnalyzer` | `MTANALYZER` (`internal/web/MTANALYZER`) | `ARCHIVE/app/workspace/mt_analyzer/analyzer.py` | `app/workspace/mt_analyzer/analyzer.py` (`🟡 250–400L`) | `ui/app/workspace/MTAnalyzer/MTAnalyzerWorkspace.tsx` | `ColumnRegistry`, `MoneyManagementEngine`, `MonteCarloManipulator`, `CorrelationAndFitnessRegistry` |
 
 #### 1. `app/workspace/mt_analyzer/analyzer.py` — `MTAnalyzer` (`FEAT-MTANALYZER`)
+
 - **Backend Target:** `app/workspace/mt_analyzer/analyzer.py` (`🟡 250–400L`, Docstring `<=50L`)
 - **Class:** `MTAnalyzer` (plus `MTAnalyzerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
