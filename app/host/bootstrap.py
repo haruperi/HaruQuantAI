@@ -897,6 +897,7 @@ class AppHost:
 
     def _mount_routers(self, app: FastAPI) -> list[str]:
         gw_kw = _dct(
+            host_settings=host_settings,
             event_bus=self.event_bus,
             session_mgr=self.session_manager,
             resource_mgr=self.resource_manager,

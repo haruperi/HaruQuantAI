@@ -248,7 +248,7 @@ test('benchmark, remote, MCP, SMTP and exit surfaces are functional', async ({ p
   await expect(page.locator('.home-screen .version')).toContainText('SQX145 reference');
   const open = async (name: string) => { await page.getByRole('button', { name: 'Settings', exact: true }).click(); await page.getByRole('menuitem', { name, exact: true }).click(); };
   await open('Benchmark...'); await page.getByRole('button', { name: 'Start benchmark' }).click(); await expect(page.getByRole('heading', { name: 'Benchmark finished' })).toBeVisible({ timeout: 5000 }); await page.getByRole('button', { name: 'Close', exact: true }).last().click();
-  await open('Remote access...'); const remote = page.getByRole('dialog', { name: 'Remote access' }); await remote.getByRole('checkbox', { name: 'Allow remote access to this application' }).check(); await remote.getByRole('checkbox', { name: 'Require a password' }).check(); await remote.getByRole('textbox', { name: 'Password', exact: true }).fill('ephemeral'); await remote.getByRole('button', { name: 'Save' }).click();
+  await open('Remote access...'); const remote = page.getByRole('dialog', { name: 'Remote access' }); await remote.getByRole('checkbox', { name: 'Allow remote access to this application' }).check(); await remote.getByRole('checkbox', { name: 'Require a password' }).check(); await expect(remote.getByRole('textbox', { name: 'Remote password unavailable', exact: true })).toBeDisabled(); await remote.getByRole('button', { name: 'Save' }).click();
   await open('MCP Server...'); await expect(page.getByLabel('Auth token', { exact: true })).toHaveValue(''); await page.getByRole('button', { name: 'Close', exact: true }).last().click();
   await open('SMTP server...'); const smtp = page.getByRole('dialog', { name: 'SMTP server' }); await expect(smtp.getByLabel('Use SSL', { exact: true })).toBeVisible(); await expect(smtp.getByLabel('Use TLS', { exact: true })).toBeVisible(); await expect(smtp.getByRole('button', { name: 'Send test email' })).toHaveCount(0); await smtp.getByRole('button', { name: 'Close', exact: true }).last().click();
   await open('Exit'); const exitDialog = page.getByRole('dialog', { name: 'Exit HaruQuantAI' }); await exitDialog.getByRole('button', { name: 'Exit' }).click(); await expect(exitDialog).toHaveCount(0);
@@ -267,4 +267,21 @@ test('a server revision conflict preserves the draft and does not claim a save',
   await dialog.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(dialog.getByRole('alert')).toContainText('settings changed in another session');
   await expect(dialog.getByRole('checkbox', { name: 'Turn off notification sounds' })).toBeChecked();
+});
+
+
+test('empty stored category explains its state and disables Save', async ({ page }) => {
+  await page.route('**/api/v1/settings/catalogue', route => route.fulfill({
+    status: 200, contentType: 'application/json',
+    body: JSON.stringify({ status: 'success', data: { revision: 0, fields: [], unknown: [] } }),
+  }));
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Notifications...', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Notifications', exact: true });
+  await expect(dialog.getByText('No settings are stored for this category.')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+  await dialog.getByRole('tab', { name: 'Email', exact: true }).click();
+  await expect(dialog.getByText('No settings are stored for this category.')).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+  await dialog.screenshot({ path: '../.agents/logs/20261020_141505_settings-database-verification/iteration3-empty-category.png' });
 });

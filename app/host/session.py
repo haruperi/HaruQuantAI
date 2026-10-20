@@ -310,7 +310,7 @@ class SessionManager:
         token_hash = hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
 
         # Check in-memory active cache first
-        record = self._active_sessions.get(token_hash)
+        record = None
         if record is None:
             rows = HostPersistence.read_records(
                 "host_session",
@@ -407,6 +407,15 @@ class SessionManager:
             "host_session",
             pk_values={"session_id": session_id},
             updates={"status": new_status},
+        )
+
+    def invalidate_sessions(self) -> None:
+        """Discard cached sessions after durable account revocation commits."""
+        self._active_sessions.clear()
+        logger.info(
+            "%s: invalidated cached account sessions",
+            LIFECYCLE_FR,
+            extra={"fr_id": LIFECYCLE_FR},
         )
 
     def reset(self) -> None:

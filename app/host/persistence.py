@@ -835,12 +835,33 @@ class HostPersistence:
             "Batch operations require an idle connection with no active transaction."
         )
 
+    @staticmethod
+    def _check_settings_revision(c: sqlite3.Connection, expected: int) -> None:
+        row = c.execute(
+            "SELECT COALESCE(MAX(schema_version), 0) FROM host_settings"
+        ).fetchone()
+        current = int(row[0])
+        if current != expected:
+            raise _RevisionConflictError(
+                expected_revision=expected, current_revision=current
+            )
+
     @classmethod
-    def apply_batch(cls, operations: Sequence[_BatchOperation]) -> _BatchResult:
+    def apply_batch(
+        cls,
+        operations: Sequence[_BatchOperation],
+        *,
+        expected_settings_revision: int | None = None,
+        revoke_active_sessions: bool = False,
+    ) -> _BatchResult:
         """Execute atomic batch writes with rollback (canonical)."""
         if getattr(cls._local, "conn", None) is not None:
             cls._reject_active_tx()
-        if not operations:
+        if (
+            not operations
+            and expected_settings_revision is None
+            and not revoke_active_sessions
+        ):
             return _BatchResult(total_operations=0, affected_rows=0, details=[])
 
         with cls._resolve_connection() as c:
@@ -859,10 +880,18 @@ class HostPersistence:
             cls._local.conn = c
             c.execute("BEGIN IMMEDIATE")
             try:
+                if expected_settings_revision is not None:
+                    cls._check_settings_revision(c, expected_settings_revision)
                 for idx, op in enumerate(operations):
                     aff, detail = cls._execute_batch_op(c, idx, op)
                     total_affected += aff
                     details.append(detail)
+                if revoke_active_sessions:
+                    c.execute(
+                        "UPDATE host_session SET status='REVOKED', revoked_at_utc=? "
+                        "WHERE status='ACTIVE'",
+                        (datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S"),),
+                    )
                 c.commit()
             except Exception as err:
                 c.rollback()

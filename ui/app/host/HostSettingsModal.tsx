@@ -43,8 +43,9 @@ export function HostSettingsModal({ section, onClose }: { section: Exclude<HostS
       .catch(() => { if (active) setError('Could not load host settings. Reopen to retry.'); });
     return () => { active = false; };
   }, []);
+  const canSave = catalogue?.fields.some(field => !field.readonly && config.tabs.some(([, name]) => name === field.group)) ?? false;
   const save = async () => {
-    if (!catalogue || saving) return;
+    if (!catalogue || !canSave || saving) return;
     setError(''); setSaving(true);
     try {
       const changes: Record<string, Record<string, unknown>> = {};
@@ -76,12 +77,14 @@ export function HostSettingsModal({ section, onClose }: { section: Exclude<HostS
     finally { setSaving(false); }
   };
   const fields = catalogue?.fields.filter(field => field.group === group) ?? [];
-  return <Modal title={config.title} width={720} onClose={onClose} footer={<><Button onClick={onClose}>Close</Button><Button className="primary" disabled={!catalogue || saving} onClick={() => { void save(); }}>Save</Button></>}>
+  return <Modal title={config.title} width={720} onClose={onClose} footer={<><Button onClick={onClose}>Close</Button><Button className="primary" disabled={!canSave || saving} onClick={() => { void save(); }}>Save</Button></>}>
+    <div style={{ maxHeight: 'calc(100vh / var(--app-zoom) - 180px)', overflowY: 'auto' }}>
     <div className="host-settings-tabs" role="tablist" aria-label={`${config.title} tabs`}>
       {config.tabs.map(([label, name]) => <button key={name} role="tab" aria-selected={name === group} onClick={() => setGroup(name)}>{label}</button>)}
     </div>
     <div className="host-settings-panel" role="tabpanel" aria-label={config.tabs.find(([, name]) => name === group)?.[0]}>
       {!catalogue && !error && <p role="status">Loading host settings…</p>}
+      {catalogue && !fields.length && <p role="status">No settings are stored for this category.</p>}
       {fields.map(field => {
         const id = fieldId(field); const label = labelFor(field);
         return <div className="host-setting-field" key={id}>
@@ -90,16 +93,17 @@ export function HostSettingsModal({ section, onClose }: { section: Exclude<HostS
             {field.secret ? <><input id={id} aria-label={label} type="password" autoComplete="new-password" value={String(draft[id] ?? '')} disabled={field.readonly || saving || cleared[id]} placeholder="Leave blank to keep existing value" onChange={event => setDraft({ ...draft, [id]: event.target.value })}/><span className="host-secret-state">{field.configured ? 'Configured' : 'Not configured'}</span>{!field.readonly && <label className="host-secret-clear"><input type="checkbox" checked={Boolean(cleared[id])} disabled={saving} onChange={event => setCleared({ ...cleared, [id]: event.target.checked })}/>Clear {label}</label>}</> :
             field.options?.length ? <select id={id} value={String(draft[id] ?? '')} disabled={field.readonly || saving} onChange={event => setDraft({ ...draft, [id]: event.target.value })}>{!field.options.includes(String(draft[id])) && <option value={String(draft[id])}>{String(draft[id])} (stored)</option>}{field.options.map(option => <option key={option} value={option}>{option || 'Plain text'}</option>)}</select> :
             field.kind === 'list' ? <textarea id={id} value={String(draft[id] ?? '')} readOnly={field.readonly} disabled={saving} onChange={event => setDraft({ ...draft, [id]: event.target.value })}/> :
-            <input id={id} type={field.kind === 'int' || field.kind === 'float' ? 'number' : 'text'} step={field.kind === 'float' ? 'any' : 1} value={String(draft[id] ?? '')} readOnly={field.readonly} disabled={saving} onChange={event => setDraft({ ...draft, [id]: event.target.value })}/>}</>}
+            <input id={id} type={field.kind === 'int' || field.kind === 'float' ? 'number' : 'text'} step={field.kind === 'float' ? 'any' : 1} min={field.minimum} max={field.maximum} value={String(draft[id] ?? '')} readOnly={field.readonly} disabled={saving} onChange={event => setDraft({ ...draft, [id]: event.target.value })}/>}</>}
           <small>{field.scope}.{field.key}{field.readonly ? ' · Read-only' : ''}</small>
         </div>;
       })}
       {group === 'runtime' && catalogue?.unknown.map(field => <p key={`${field.scope}/${field.key}`}>{field.scope}.{field.key} — {field.reason}</p>)}
     </div>
     <p className="dialog-note">Save updates the host database. Connection, delivery and engine actions are handled by their runtime capabilities. Secrets are replaced only when entered or explicitly cleared.</p>
-    {group === 'app_general' && <p className="dialog-note">Host, ports and GPU settings require restart. Language is retained as read-only compatibility data.</p>}
+    {group === 'app_general' && <p className="dialog-note">Host, ports and GPU settings require restart. Changes are persisted when saved.</p>}
     {group === 'workspace_paths' && <p className="dialog-note">Changing paths does not move or delete existing files.</p>}
     {error && <p role="alert" className="settings-error">{error}</p>}
+    </div>
   </Modal>;
 }
 
@@ -119,6 +123,7 @@ export function UserAccessPanel({ onClose }: { onClose: () => void }) {
     finally { setSaving(false); }
   };
   return <Modal title="User access" width={640} onClose={onClose} footer={<><Button onClick={onClose}>Close</Button><Button className="primary" disabled={!account || saving} onClick={() => { void save(); }}>Save</Button></>}>
+    <div style={{ maxHeight: 'calc(100vh / var(--app-zoom) - 180px)', overflowY: 'auto' }}>
     {account && <div className="host-settings-panel">
       <label>Username<input value={account.username} disabled={saving} onChange={event => setAccount({ ...account, username: event.target.value })}/></label>
       <label>Session duration (minutes)<input type="number" min={1440} max={43200} value={account.session_timeout_mins} disabled={saving} onChange={event => setAccount({ ...account, session_timeout_mins: Number(event.target.value) })}/></label>
@@ -129,5 +134,6 @@ export function UserAccessPanel({ onClose }: { onClose: () => void }) {
       <details><summary>Account metadata (read-only)</summary>{legacy.map(field => <p key={field.key}>{field.label}: {field.secret ? (field.configured ? 'Configured' : 'Not configured') : String(field.value)}<small> application.user_access.{field.key}</small></p>)}</details>
     </div>}
     {error && <p role="alert" className="settings-error">{error}</p>}
+    </div>
   </Modal>;
 }

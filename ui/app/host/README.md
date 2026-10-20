@@ -27,14 +27,18 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
   host architecture ratifies the mounting scheme.
 - The browser shell uses the same-origin `/api/v1` host in a built deployment;
   local Vite development on port 3000 targets the loopback host on port 8000.
-  Tokens are not persisted. A 401 returns the shell to its login flow.
+  Saved host sessions are validated on reconnect; host password drafts are never
+  stored. A 401 returns the shell to its login flow.
 - Global Settings menu preferences (Configuration tabs, Remote access flags,
   non-secret SMTP fields, language, skin, and zoom) are loaded from scoped
   records in the host database. Each edit updates its owning record fields;
   the host excludes credential fields from settings responses and events.
   Browser storage excludes these host-owned settings. Offline or conflicting
-  writes do not claim success. Passwords and license keys are transient.
-  Benchmark, MCP, mail delivery, licensing,
+  writes do not claim success. Secret drafts are transient; explicit credential
+  saves persist in the host database and read back only presence metadata.
+  Forms commit on Save; skin/zoom commit immediately. See the
+  [settings API contract](../../../docs/dev/settings-api.md).
+  Benchmark execution, MCP server activation, mail delivery, licensing,
   remote-server activation, and Exit still lack backend services.
 
 ## Connection rules (spatial composability)
@@ -58,3 +62,17 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
 ## SQX145 reference qualification
 
 Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.
+
+
+Settings snapshots and catalogue entries include only fields present in stored
+records. Missing fields are omitted; reads never seed defaults. Explicit edits
+from static UI controls may create known missing fields. False, zero, empty
+strings/lists and supported null values are preserved. Field types, validation,
+secret restrictions and write permissions remain backend policy rather than
+being inferred from mutable database values. Unknown stored fields remain read-only.
+
+Catalogue categories without stored fields display an empty-state message. Save
+is disabled when the dialog has no editable stored fields; populated tabs retain
+their drafts. Missing account identity or session duration returns HTTP 503 with
+`ACCOUNT_UNCONFIGURED`. Account creation/initialization is outside these routes.
+The UI owns theme tokens; the backend stores only the selected theme identifier.

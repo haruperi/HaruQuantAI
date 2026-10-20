@@ -12,6 +12,7 @@ export interface SettingsField {
   kind: 'str' | 'bool' | 'int' | 'float' | 'list';
   readonly: boolean; secret: boolean; configured?: boolean;
   value?: string | number | boolean | unknown[] | null; options?: string[]; effect?: string;
+  minimum?: number; maximum?: number;
 }
 export interface SettingsCatalogue {
   revision: number; fields: SettingsField[];
@@ -165,6 +166,7 @@ function parsePreferences(values: Record<string, unknown>): ShellPreferences {
     footerCustomText: stringField(global, 'footer_custom_text', ''),
     defaultResult,
     dataFrameGuard: mappedField(stringField(global, 'data_frame_guard', 'warn'), { warn: 'warn', stop: 'stop', off: 'off' }, 'data frame guard'),
+    totalCores: Math.max(defaults.configuration.totalCores, numberField(cpu, 'custom_cores', defaults.configuration.customCores)),
     coreUsage: mappedField(stringField(cpu, 'core_usage', 'all_except_one'), cpuModes, 'CPU mode'),
     customCores: numberField(cpu, 'custom_cores', defaults.configuration.customCores),
     highPriority: boolField(cpu, 'high_priority', false),
@@ -198,7 +200,7 @@ function parsePreferences(values: Record<string, unknown>): ShellPreferences {
     },
     smtp: {
       server: stringField(email, 'smtp_server', ''), port: String(port),
-      ssl: boolField(email, 'use_ssl', false) || boolField(email, 'use_tls', true),
+      ssl: boolField(email, 'use_ssl', false), tls: boolField(email, 'use_tls', true),
       username: stringField(email, 'username', ''),
       emailFrom: stringField(email, 'from_address', ''),
     },
@@ -270,9 +272,9 @@ export async function writeHostPreferences(
     put('notify.email', 'smtp_port', port);
   }
   if (preferences.smtp.ssl !== previous.smtp.ssl) {
-    put('notify.email', 'use_ssl', false);
-    put('notify.email', 'use_tls', preferences.smtp.ssl);
+    put('notify.email', 'use_ssl', preferences.smtp.ssl);
   }
+  changed('notify.email', 'use_tls', preferences.smtp.tls ?? true, previous.smtp.tls ?? true);
   changed('notify.email', 'username', preferences.smtp.username, previous.smtp.username);
   changed('notify.email', 'from_address', preferences.smtp.emailFrom, previous.smtp.emailFrom);
   if (Object.keys(changes).length === 0) return { revision: expectedRevision, preferences: previous, wrote: false };

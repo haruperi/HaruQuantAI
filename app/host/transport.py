@@ -50,7 +50,6 @@ import sys
 import threading
 import time
 import urllib.parse
-from collections import deque
 from collections.abc import AsyncGenerator, Sequence
 from contextlib import suppress
 from dataclasses import asdict
@@ -60,15 +59,16 @@ from typing import Any, Final
 
 from app.host import resources as _res
 from app.host import session as _sess
+from app.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
 from app.host.logging import get_access_logger, get_logger, redact_secrets
 from app.host.persistence import HostPersistence
 from app.host.response import ApiResponse, StandardError
-from app.host.settings import RevisionConflictError, settings
+from app.host.settings import RevisionConflictError, SettingsManager, settings
 from fastapi import APIRouter, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 from starlette.websockets import WebSocket, WebSocketDisconnect
@@ -90,13 +90,11 @@ __all__ = [
 logger = get_logger(__name__)
 access_logger = get_access_logger()
 
-type _Chans = Sequence[str] | set[str]
 type _Pld = dict[str, Any]
 type _Resp = JSONResponse
-CORE_EVENT_CHANNELS: Final = ("jobs", "system", "logs", "databanks", "settings.changed")
 SUPPORTED_TIMEFRAMES: Final = ("1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w")
 _P: Final = "FR-HOST-TRANSPORT-"
-FR_MW, FR_EX, FR_BUS = f"{_P}MIDDLEWARE", f"{_P}EXCEPTION-ENVELOPE", f"{_P}EVENT-BUS"
+FR_MW, FR_EX = f"{_P}MIDDLEWARE", f"{_P}EXCEPTION-ENVELOPE"
 FR_SSE, FR_WS, FR_AUTH = f"{_P}SSE-STREAMING", f"{_P}WS-STREAMING", f"{_P}SESSION-AUTH"
 FR_APP, CONNECTION_TEST_FR = f"{_P}GATEWAY-APP", f"{_P}CONNECTION-TEST"
 SERVLET_CONNECTION_FR = f"{_P}SERVLET-CONNECTION"
@@ -168,177 +166,20 @@ def _qint(qp: Any, key: str, default: int | None = None) -> int | None:
 
 
 class SettingsBatchUpdatePayload(BaseModel):
-    """Batch settings update payload submitted to ``PUT /settings``."""
+    """Strict logical-field patch with a mandatory optimistic revision."""
 
-    revision: int | None = None
-    settings: dict[str, _Pld] = Field(default_factory=dict)
-
-
-class HostEvent(BaseModel):
-    """Discrete, monotonically sequenced event broadcast on the host EventBus."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-    cursor: int
-    channel: str
-    event_type: str = "update"
-    timestamp: str = Field(default_factory=_now_utc_iso)
-    payload: _Pld = Field(default_factory=dict)
+    model_config = ConfigDict(extra="forbid", strict=True)
+    expected_revision: int = Field(ge=0)
+    changes: dict[str, dict[str, Any]]
 
 
-class _EventSnapshot(BaseModel):
-    channel: str
-    newest_cursor: int
-    events: list[HostEvent] = Field(default_factory=list)
-    has_gap: bool = False
-
-
-class EventBus:
-    """In-memory multi-channel pub/sub event bus with monotonic cursors."""
-
-    def __init__(self, ring_capacity: int = 1024, max_queue_size: int = 256) -> None:
-        self.ring_capacity = max(1, ring_capacity)
-        self.max_queue_size = max(1, max_queue_size)
-        self._lock, self._cursor_seq = threading.RLock(), 0
-        self._ring: deque[HostEvent] = deque(maxlen=self.ring_capacity)
-        self._subscribers: dict[str, tuple[set[str], asyncio.Queue[HostEvent]]] = {}
-        self._channels: set[str] = set(CORE_EVENT_CHANNELS)
-        self._subscriber_loops: dict[str, asyncio.AbstractEventLoop] = {}
-        self._pending_deliveries: dict[str, int] = {}
-
-    @property
-    def current_cursor(self) -> int:
-        """Return the highest monotonic cursor sequence value."""
-        with self._lock:
-            return self._cursor_seq
-
-    @property
-    def channels(self) -> list[str]:
-        """Return sorted list of known event channels."""
-        with self._lock:
-            return sorted(self._channels)
-
-    def publish(
-        self,
-        channel: str,
-        event_type: str = "update",
-        payload: _Pld | None = None,
-        timestamp: str | None = None,
-    ) -> HostEvent:
-        """Publish an event to matching subscribers and append to the ring buffer."""
-        with self._lock:
-            self._cursor_seq += 1
-            c, ch, et = self._cursor_seq, channel, event_type
-            self._channels.add(ch)
-            ts, p = timestamp or _now_utc_iso(), dict(payload or {})
-            ev = HostEvent(cursor=c, channel=ch, event_type=et, timestamp=ts, payload=p)
-            self._ring.append(ev)
-            for sid, (chans, q) in list(self._subscribers.items()):
-                if "*" in chans or ch in chans:
-                    self._schedule_delivery(sid, q, ev)
-        logger.debug("%s: Published %s on %s", FR_BUS, c, ch, extra={"fr_id": FR_BUS})
-        return ev
-
-    def _schedule_delivery(
-        self, sub_id: str, queue: asyncio.Queue[HostEvent], event: HostEvent
-    ) -> None:
-        pending = self._pending_deliveries.get(sub_id, 0)
-        if queue.qsize() + pending >= queue.maxsize:
-            _warn(FR_BUS, f"Dropped cursor={event.cursor} for slow {sub_id}")
-            return
-        if (loop := self._subscriber_loops.get(sub_id)) is None:
-            queue.put_nowait(event)
-            return
-        if loop.is_closed():
-            return
-        self._pending_deliveries[sub_id] = pending + 1
-        try:
-            loop.call_soon_threadsafe(self._deliver_event, sub_id, queue, event)
-        except RuntimeError:
-            self._pending_deliveries[sub_id] -= 1
-            _warn(FR_BUS, "Subscriber loop closed during delivery")
-
-    def _deliver_event(
-        self, sub_id: str, queue: asyncio.Queue[HostEvent], event: HostEvent
-    ) -> None:
-        with self._lock:
-            if sub_id in self._subscribers:
-                self._pending_deliveries[sub_id] -= 1
-                queue.put_nowait(event)
-
-    def subscribe(
-        self,
-        channels: _Chans | None = None,
-        since_cursor: int | None = None,
-        max_queue_size: int | None = None,
-    ) -> tuple[str, asyncio.Queue[HostEvent], list[HostEvent], bool]:
-        """Subscribe to channels with optional replay from ``since_cursor``."""
-        chans = set(channels) if channels else {"*"}
-        q: asyncio.Queue[HostEvent] = asyncio.Queue(
-            maxsize=max_queue_size or self.max_queue_size
-        )
-        sub_id, gap = f"sub-{secrets.token_hex(8)}", False
-        replay: list[HostEvent] = []
-        with self._lock:
-            self._channels.update(ch for ch in chans if ch != "*")
-            if since_cursor is not None and since_cursor >= 0 and self._ring:
-                gap = since_cursor < self._ring[0].cursor - 1
-                replay = [
-                    e
-                    for e in self._ring
-                    if e.cursor > since_cursor and ("*" in chans or e.channel in chans)
-                ]
-            self._subscribers[sub_id] = (chans, q)
-            self._pending_deliveries[sub_id] = 0
-            with suppress(RuntimeError):
-                self._subscriber_loops[sub_id] = asyncio.get_running_loop()
-        _info(FR_BUS, f"Subscribed {sub_id} replay={len(replay)} gap={gap}.")
-        return sub_id, q, replay, gap
-
-    def update_subscription(self, subscriber_id: str, channels: _Chans) -> bool:
-        """Update the channel set for an active subscriber."""
-        with self._lock:
-            if (entry := self._subscribers.get(subscriber_id)) is None:
-                return False
-            chans = set(channels) if channels else {"*"}
-            self._channels.update(ch for ch in chans if ch != "*")
-            self._subscribers[subscriber_id] = (chans, entry[1])
-        _info(FR_BUS, f"Updated subscriber '{subscriber_id}' channels={sorted(chans)}.")
-        return True
-
-    def unsubscribe(self, subscriber_id: str) -> None:
-        """Remove a subscriber queue from the EventBus."""
-        with self._lock:
-            self._subscriber_loops.pop(subscriber_id, None)
-            self._pending_deliveries.pop(subscriber_id, None)
-            if self._subscribers.pop(subscriber_id, None) is not None:
-                _info(FR_BUS, f"Unsubscribed '{subscriber_id}'.")
-
-    def get_snapshot(
-        self, channel: str = "*", since_cursor: int | None = None, limit: int = 100
-    ) -> _EventSnapshot:
-        """Return retained historical events for ``channel``."""
-        cap = max(1, min(limit, self.ring_capacity))
-        with self._lock:
-            r0 = self._ring[0].cursor - 1 if self._ring else -1
-            gap = bool(self._ring and since_cursor is not None and since_cursor < r0)
-            evs = [
-                e
-                for e in self._ring
-                if channel in ("*", e.channel)
-                and (since_cursor is None or e.cursor > since_cursor)
-            ]
-            ret, nc = (evs[-cap:] if len(evs) > cap else evs), self._cursor_seq
-            return _EventSnapshot(
-                channel=channel, newest_cursor=nc, events=ret, has_gap=gap
-            )
-
-    def clear(self) -> None:
-        """Clear all retained events and active subscribers."""
-        with self._lock:
-            self._ring.clear()
-            self._subscribers.clear()
-            self._subscriber_loops.clear()
-            self._pending_deliveries.clear()
+class _AccountPayload(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    expected_revision: int = Field(ge=0)
+    username: str = Field(min_length=1, max_length=128)
+    session_timeout_mins: int = Field(ge=1440, le=43200)
+    current_password: str = Field(min_length=1, max_length=1024)
+    new_password: str = Field(default="", max_length=1024)
 
 
 _BUS_CACHE: list[EventBus] = []
@@ -608,11 +449,14 @@ class TransportGatewayService:
         sm = kw.get("session_mgr") or _sess.session_manager
         self.session_mgr: _sess.SessionManager = sm
         self.resource_mgr, self.job_mgr = kw.get("resource_mgr"), kw.get("job_mgr")
+        self.settings: SettingsManager = (
+            settings if kw.get("host_settings") is None else kw["host_settings"]
+        )
         self.password_hash: str | None = kw.get("password_hash")
         self.require_auth: bool = bool(kw.get("require_auth", False))
         self.heartbeat_sec: float = float(kw.get("heartbeat_sec", 15.0))
         self.started_at, self.app_loaded_acknowledged = time.monotonic(), False
-        self.connection_servlet = ServletConnection(host_settings=settings)
+        self.connection_servlet = ServletConnection(host_settings=self.settings)
         self.constants_servlet = ServletConstants(self.session_mgr, self.resource_mgr)
 
     def _verify_session(self, req: Request, qtok: str | None = None) -> Any:
@@ -620,12 +464,14 @@ class TransportGatewayService:
         return self.session_mgr.verify_session(token) if token is not None else None
 
     def _check_password(self, candidate_password: str) -> bool:
-        cfg = self.password_hash
-        if cfg is None:
-            db_hash = settings.get("user_access", "password_hash", None)
-            if isinstance(db_hash, str) and "$" in db_hash:
-                cfg = db_hash
-        return _sess.verify_password(candidate_password, cfg) if cfg else True
+        self.settings.reload()
+        db_hash = self.settings.get("user_access", "password_hash", None)
+        cfg = db_hash if isinstance(db_hash, str) and db_hash else self.password_hash
+        return (
+            _sess.verify_password(candidate_password, cfg)
+            if cfg
+            else not self.require_auth
+        )
 
     async def _auth_route(self, request: Request) -> JSONResponse:
         if request.method == "GET":
@@ -641,9 +487,14 @@ class TransportGatewayService:
         if not self._check_password(str(body.get("password") or "")):
             _warn(FR_AUTH, f"Rejected login attempt from {peer}.")
             return _err(request, 401, "INVALID_CREDENTIALS", "Invalid host password.")
-        def_u = str(settings.get("user_access", "username", "haruquantai") or "admin")
+        def_u = str(
+            self.settings.get("user_access", "username", "haruquantai") or "admin"
+        )
         u = str(body.get("username") or "").strip() or def_u
-        tok, rec = self.session_mgr.create_session(username=u, peer_id=peer)
+        duration = int(self.settings.get("user_access", "session_timeout_mins", 1440))
+        tok, rec = self.session_mgr.create_session(
+            username=u, peer_id=peer, duration_mins=duration
+        )
         _info(FR_AUTH, f"Issued session '{rec.session_id}' for '{rec.username}'.")
         exp = _format_iso_expiry(rec.expires_at_utc)
         d = _dct(token=tok, expires_at=exp, session_id=rec.session_id)
@@ -699,20 +550,118 @@ class TransportGatewayService:
         scope = "settings:write" if is_put else "settings:read"
         if (denied := self._require_scope(request, scope)) is not None:
             return denied
-        if is_put:
-            b = SettingsBatchUpdatePayload.model_validate(await _jbody(request))
-            try:
-                rev = settings.save_settings(b.settings, expected_revision=b.revision)
-            except RevisionConflictError as exc:
-                _warn(FR_APP, f"Settings revision conflict: {exc}")
-                er, cr = exc.expected_revision, exc.current_revision
-                det = _dct(expected_revision=er, current_revision=cr)
-                return _err(request, 409, "REVISION_CONFLICT", str(exc), det)
-            pld = _dct(revision=rev, scopes=sorted(b.settings.keys()))
-            self.event_bus.publish("settings.changed", "updated", pld)
-        s_dict = redact_secrets(settings.as_dict())
-        d = _dct(revision=settings.revision, settings=s_dict)
-        return _ok(request, d, fx=is_put)
+        try:
+            if not is_put:
+                data = (
+                    self.settings.get_catalogue()
+                    if request.url.path.endswith("/catalogue")
+                    else self.settings.get_snapshot()
+                )
+                return _ok(request, data)
+            body = SettingsBatchUpdatePayload.model_validate(await _jbody(request))
+            data = self.settings.save_changes(
+                body.changes,
+                expected_revision=body.expected_revision,
+                include_secrets=request.url.path.endswith("/secrets"),
+            )
+            if data["wrote"]:
+                self.event_bus.publish(
+                    "settings.changed",
+                    "updated",
+                    {
+                        "revision": data["revision"],
+                        "scopes": sorted(body.changes),
+                    },
+                )
+            return _ok(request, data, fx=data["wrote"])
+        except RevisionConflictError as exc:
+            return _err(
+                request,
+                409,
+                "REVISION_CONFLICT",
+                "Settings changed; reload and retry.",
+                {
+                    "expected_revision": exc.expected_revision,
+                    "current_revision": exc.current_revision,
+                },
+            )
+        except ValidationError, ValueError:
+            _warn(FR_APP, "Rejected invalid settings patch.")
+            return _err(
+                request,
+                422,
+                "INVALID_SETTINGS",
+                "Invalid, unknown or protected settings field.",
+            )
+        except HostPersistence.Error:
+            _warn(FR_APP, "Settings persistence failed.")
+            return _err(
+                request,
+                503,
+                "SETTINGS_UNAVAILABLE",
+                "Settings database is unavailable; no success acknowledged.",
+            )
+
+    def _account_password(self, body: _AccountPayload) -> str:
+        if not self._check_password(body.current_password):
+            raise HTTPException(status_code=401, detail="Invalid current password")
+        current = (
+            self.settings.get("user_access", "password_hash", None)
+            or self.password_hash
+        )
+        result = (
+            _sess.hash_password(body.new_password) if body.new_password else current
+        )
+        if not isinstance(result, str) or not result:
+            raise ValueError("A configured account password is required")
+        return result
+
+    async def _account_route(self, request: Request) -> JSONResponse:
+        scope = "settings:read" if request.method == "GET" else "settings:write"
+        if (denied := self._require_scope(request, scope)) is not None:
+            return denied
+        try:
+            if request.method == "GET":
+                return _ok(request, self.settings.get_account())
+            body = _AccountPayload.model_validate(await _jbody(request))
+            new_hash = self._account_password(body)
+            revision = self.settings.save_account(
+                body.username,
+                body.session_timeout_mins,
+                new_hash,
+                expected_revision=body.expected_revision,
+            )
+            self.session_mgr.invalidate_sessions()
+            self.password_hash = None
+            self.event_bus.publish(
+                "settings.changed",
+                "updated",
+                {"revision": revision, "scopes": ["user.access"]},
+            )
+            return _ok(request, {"revision": revision, "reauthenticate": True}, fx=True)
+        except RevisionConflictError as exc:
+            return _err(
+                request,
+                409,
+                "REVISION_CONFLICT",
+                "Account changed; reload and retry.",
+                {"current_revision": exc.current_revision},
+            )
+        except (KeyError, ValidationError, ValueError) as exc:
+            _warn(FR_AUTH, "Rejected invalid account update.")
+            missing = isinstance(exc, KeyError)
+            return _err(
+                request,
+                503 if missing else 422,
+                "ACCOUNT_UNCONFIGURED" if missing else "INVALID_ACCOUNT",
+                "Account identity and session duration are not configured."
+                if missing
+                else "Invalid account update.",
+            )
+        except HostPersistence.Error:
+            return _err(
+                request, 503, "SETTINGS_UNAVAILABLE", "Account database unavailable."
+            )
 
     async def _conn_route(
         self, request: Request, connection_id: str | None = None
@@ -902,6 +851,8 @@ _ROUTE_SPECS: Final[str] = (
     "GET:/sessions/me:_auth_route GET:/status:_meta GET:/readiness:_meta "
     "POST:/app-loaded:_meta GET:/about:_meta GET:/constants:_meta GET:/specs:_meta "
     "GET:/settings:_settings_route PUT:/settings:_settings_route "
+    "GET:/settings/catalogue:_settings_route PUT:/settings/secrets:_settings_route "
+    "GET:/auth/account:_account_route PUT:/auth/account:_account_route "
     "GET:/diagnostics:_diag GET:/resources:_diag GET:/jobs:_jobs_route "
     "GET:/jobs/{job_id}:_jobs_route POST:/jobs/{job_id}/cancel:_jobs_route "
     "POST:/events/publish:_meta GET:/events/snapshot:_meta "

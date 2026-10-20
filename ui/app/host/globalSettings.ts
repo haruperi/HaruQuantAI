@@ -43,7 +43,7 @@ export function createInitialAppSettings(): AppSettings {
     theme: 'dark', language: 'English', autosave: true, workers: 8, memoryGb: 10,
     profile: 'Full', zoom: 1, configuration: createDefaultConfiguration(),
     remoteAccess: { allow: false, requirePassword: false },
-    smtp: { server: '', port: '587', ssl: true, username: '', emailFrom: '' },
+    smtp: { server: '', port: '587', ssl: false, tls: true, username: '', emailFrom: '' },
   };
 }
 
@@ -77,7 +77,7 @@ export function safeRemoteSettings(value: RemoteAccessSettings & { password?: st
 }
 
 export function safeSmtpSettings(value: SmtpSettings & { password?: string }): SmtpSettings {
-  return { server: value.server.trim(), port: value.port.trim(), ssl: value.ssl, username: value.username.trim(), emailFrom: value.emailFrom.trim() };
+  return { server: value.server.trim(), port: value.port.trim(), ssl: value.ssl, tls: value.tls ?? true, username: value.username.trim(), emailFrom: value.emailFrom.trim() };
 }
 
 export function isEmail(value: string): boolean {

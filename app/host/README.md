@@ -12,7 +12,7 @@ Host runtime services (`F01`) belong to Stage 1 (`1A`–`1G`) and are registered
 | --- | --- | --- |
 | `FEAT-HOST-EVIDENCE` | Host-governed reference manifests, fixtures, and clean-room ledger qualification in `tests/reference` | Implemented tooling (`Stage 0` / `P00`); static reference readiness verified; application runtime qualification belongs to owning Stage 1–7 features |
 | `FEAT-HOST-PERSISTENCE` | Isolated SQLite WAL persistence, 25-table CRUD operations, and atomic batch transactions | Implemented runtime persistence (`Stage 1` / `1A` — `app/host/persistence.py`); WAL mode, schema DDL, 25-table CRUD, canonical HostPersistence functions (`create_record`, `create_entity`, `read_records`, `read_entity`, `update_record`, `update_entity`, `delete_record`, `delete_entity`), and atomic batch transactions (`apply_batch`) |
-| `FEAT-HOST-SETTINGS` | Read and atomically update operational settings in database via persistence CRUD layer with revision conflict checks | Implemented host settings layer (`Stage 1` / `1B` & `1G`); self-contained persistence `list_host_settings()` & `batch_save_host_settings()`, single `settings` export with nested dot-access, revision tracking, and `app.settings` facade |
+| `FEAT-HOST-SETTINGS` | Read and atomically update operational settings through persistence with revision checks | `SettingsManager` safe snapshots/catalogue, validated field patches and canonical record mapping; `HostPersistence.apply_batch()` checks revisions in the write transaction; single `settings` export with nested access |
 | `FEAT-HOST-SESSION` | Operator session management, opaque token issuance, password hashing, and restart invalidation | Implemented host auth (`Stage 1` / `1B`); 24h opaque bearer tokens, PBKDF2-HMAC-SHA256 password hashing, restart invalidation, and scope authorization |
 | `FEAT-HOST-TELEMETRY` | Multi-sink logging in data/logs, recursive secret redaction with SHA-256 fingerprinting, and 2000-record live ring buffer | Implemented runtime telemetry (`Stage 1` / `1C` & `1G` — `app/host/logging.py`); multi-sink file logging (app.log/access.log/errors.log), secret scrubbing & SHA-256 fingerprinting, and `deque(maxlen=2000)` buffer |
 | `FEAT-HOST-RESOURCES` | System diagnostics, psutil hardware/storage/DB inspection, $\max(1, \text{cpu\_cores} - 2)$ worker allocation, $<15\%$ RAM memory watchdog, and per-job scratch sandboxing | Implemented resource governance (`Stage 1` / `1D` — `app/host/resources.py`); hardware/DB/workspace probes, worker sizing, memory watchdog, and scratch sandboxes |
@@ -42,7 +42,6 @@ Host runtime services (`F01`) belong to Stage 1 (`1A`–`1G`) and are registered
 | `FR-HOST-PERSISTENCE-BATCH` | Execute atomic multi-row batch writes (`create`, `update`, `upsert`, `delete`) and settings batches (`HostPersistence.apply_batch()`) inside a `BEGIN IMMEDIATE` transaction with all-or-nothing rollback. | INFO on committed atomic batch; WARNING on revision conflict; ERROR on rollback; structured `fr_id`. |
 | `FR-HOST-SETTINGS-LOAD` | Read host settings from SQLite database via persistence read layer and package for application. | INFO settings loaded with scope count; DEBUG on setting access; structured `fr_id`. |
 | `FR-HOST-SETTINGS-BATCH-UPDATE` | Atomically update multiple host settings scopes via `settings.update_batch()` with revision conflict checks (`RevisionConflictError`) and reload in-memory state. | INFO on batch settings update and revision increment; WARNING on revision conflict; structured `fr_id`. |
-| `FR-HOST-SETTINGS-THEME-TOKENS` | Manage UI theme state (dark/light) and retrieve SQX-compatible color tokens via `Theme` (`set_dark`, `get_tokens`, `set_light`, `get_light_tokens`). | INFO on theme mode change; DEBUG on token access; structured `fr_id`. |
 | `FR-HOST-SESSION-CREDENTIALS` | Secure PBKDF2-HMAC-SHA256 password hashing and constant-time verification. | INFO password hashing; WARNING on failed verification; structured `fr_id`. |
 | `FR-HOST-SESSION-LIFECYCLE` | Opaque 24-hour token issuance, SHA-256 token indexing, expiration, and revocation. | INFO session created and revoked; WARNING on invalid/expired token; structured `fr_id`. |
 | `FR-HOST-SESSION-RESTART-INVALIDATION` | Ephemeral host instance tracking invalidating memory sessions on host restart. | INFO session cache invalidation; structured `fr_id`. |
@@ -125,6 +124,28 @@ Host runtime services (`F01`) belong to Stage 1 (`1A`–`1G`) and are registered
 | `DEC-HOST-SQX145-REFERENCE` | Logical root `SQX_REFERENCE_ROOT` (accepting `SQX_145_REFERENCE_ROOT` as environment alias) identifies the read-only SQX-145 reference installation. Record IDs follow `SQX145-EV-NNNNNN` monotonically without reuse. |
 | `DEC-HOST-P00-CLOSURE-BOUNDARY` | Stage 0 (`P00`) qualifies reference infrastructure, donor artifact hashes, and clean-room ledger integrity. Stage 1–7 runtime implementation and numerical parity are gated by their respective stage plans. |
 
+### Application settings UI persistence
+
+The [settings API contract](../../docs/dev/settings-api.md) connects Application
+settings forms through transport -> SettingsManager -> HostPersistence ->
+`data/database/haruquantai.db`. The manager owns field definitions, mapping and
+validation. Only persistence executes SQL. Patches merge with existing group
+objects and retain unknown leaves and legacy records. Account changes and session
+revocation commit together. Secret reads expose presence metadata only; events
+contain revision/group metadata.
+
+Forms commit on Save; skin and zoom commit immediately. Failed/offline/stale saves
+never become committed UI state. Real HTTP/SSE tests use temporary databases and
+independent HostPersistence reads across UI reload and backend restart. Saving
+configuration does not activate mail, remote servers, MCP, brokers or trading.
+
 ### Host audit verification boundary (Iteration 3)
 
 Settings batch validation and writes share a `BEGIN IMMEDIATE` transaction. Empty batches keep their revision; already-active caller transactions are rejected without changing them. Bootstrap binds settings to a database path, and read failures preserve the last successful snapshot and propagate. All three file sinks use the asynchronous engine, and scrubbed fingerprinted log events reach the EventBus `logs` channel with bounded delivery on subscriber event loops. Broker diagnostics are excluded from forwarding to prevent recursion. Configured session/scope checks protect settings, diagnostics/resources, and job reads/cancellation. Service rollback also covers partial acquisition, continues after cleanup errors, and drains/stops telemetry after final lifecycle diagnostics. Job cancellation and shutdown remain cooperative at checkpoints; code that never checks its token can delay shutdown. UI rendering is outside this backend verification.
+
+Settings snapshots and catalogue values come only from stored records. Python retains validation and access policy; the UI owns theme appearance, while the selected theme identifier is persisted as an ordinary setting.
+
+
+Host event models, bounded replay and subscriber delivery are implemented in
+`app/host/events.py`. `transport.py` imports these classes directly for HTTP/SSE/WS
+and retains the existing lazy global bus wiring and event exports.

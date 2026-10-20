@@ -64,7 +64,7 @@ describe('global settings contracts', () => {
     expect(clampZoom(1.26)).toBe(1.3);
     expect(clampZoom(2.4)).toBe(1.8);
     expect(safeRemoteSettings({ allow: true, requirePassword: true, password: 'secret' })).toEqual({ allow: true, requirePassword: true }); // pragma: allowlist secret
-    expect(safeSmtpSettings({ server: ' smtp.test ', port: ' 587 ', ssl: true, username: ' me ', emailFrom: ' from@test.dev ', password: 'secret' })).toEqual({ server: 'smtp.test', port: '587', ssl: true, username: 'me', emailFrom: 'from@test.dev' }); // pragma: allowlist secret
+    expect(safeSmtpSettings({ server: ' smtp.test ', port: ' 587 ', ssl: true, username: ' me ', emailFrom: ' from@test.dev ', password: 'secret' })).toEqual({ server: 'smtp.test', port: '587', ssl: true, tls: true, username: 'me', emailFrom: 'from@test.dev' }); // pragma: allowlist secret
   });
 
   it('uses a bounded practical email check for the mock SMTP test', () => {

@@ -1,12 +1,33 @@
-"""Unit tests for Stage 1F FastAPI Gateway, Envelopes & Async EventBus."""
+"""Verify gateway contracts, authenticated settings persistence and event delivery.
+
+Description:
+    Exercise real FastAPI requests against isolated HostPersistence stores,
+    including typed settings patches, redaction, atomic account changes and errors.
+Purpose:
+    FEAT-HOST-TRANSPORT: Verify HTTP contracts and operation boundaries.
+Key Capabilities:
+    - FR-HOST-TRANSPORT-GATEWAY-APP: Test envelopes and settings transactions.
+      Associated: test_settings_ui_contract_and_secret_boundaries().
+      Logging: assert error boundaries and post-commit event metadata.
+    - FR-HOST-TRANSPORT-SESSION-AUTH: Test account rotation and durable revocation.
+      Associated: test_account_rotation_is_durable_and_revokes_other_gateway_cache().
+      Logging: session and persistence operations emit structured FR logs.
+Python API Usage:
+    pytest.main(["tests/unit/test_transport.py", "--no-cov"])
+CLI Usage:
+    uv run pytest tests/unit/test_transport.py --no-cov
+"""
 
 from __future__ import annotations
 
 import json
+import logging
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import pytest
+from app.host import events as host_events
 from app.host.persistence import HostPersistence
 from app.host.response import (
     ApiResponse,
@@ -14,10 +35,12 @@ from app.host.response import (
     StandardError,
 )
 from app.host.session import SessionManager, hash_password
+from app.host.settings import SettingsManager
 from app.host.transport import (
     CORE_EVENT_CHANNELS,
     ConnectionTest,
     EventBus,
+    HostEvent,
     ServletConnection,
     ServletConstants,
     TransportMiddleware,
@@ -147,8 +170,6 @@ def test_sensitive_routes_require_session_and_scope(
 ) -> None:
     from unittest.mock import Mock
 
-    from app.host.settings import SettingsManager
-
     config = SettingsManager()
     config.reload()
     monkeypatch.setattr("app.host.transport.settings", config)
@@ -164,7 +185,14 @@ def test_sensitive_routes_require_session_and_scope(
     )
     routes = [
         ("GET", "/settings", None),
-        ("PUT", "/settings", {"settings": {"audit": {"value": 1}}, "revision": 0}),
+        (
+            "PUT",
+            "/settings",
+            {
+                "changes": {"app.general": {"header_custom_text": "audit"}},
+                "expected_revision": 0,
+            },
+        ),
         ("GET", "/diagnostics", None),
         ("GET", "/resources", None),
         ("GET", "/jobs", None),
@@ -196,8 +224,19 @@ def test_sensitive_routes_require_session_and_scope(
     assert client.get("/api/v1/jobs", headers=headers).status_code == 401
 
 
-def test_event_bus_publish_subscribe_replay_gap_and_slow_consumer() -> None:
+def test_transport_event_exports_share_implementation_identity() -> None:
+    """Transport and event imports must share one class and channel definition."""
+    assert EventBus is host_events.EventBus
+    assert HostEvent is host_events.HostEvent
+    assert CORE_EVENT_CHANNELS is host_events.CORE_EVENT_CHANNELS
+    assert isinstance(get_global_event_bus(), host_events.EventBus)
+
+
+def test_event_bus_publish_subscribe_replay_gap_and_slow_consumer(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     """Verify EventBus monotonic cursors, ring buffer gap, and queue bounds."""
+    caplog.set_level(logging.DEBUG)
     bus = EventBus(ring_capacity=3, max_queue_size=2)
     assert set(CORE_EVENT_CHANNELS).issubset(set(bus.channels))
 
@@ -249,6 +288,12 @@ def test_event_bus_publish_subscribe_replay_gap_and_slow_consumer() -> None:
     # Global singleton check
     global_bus = get_global_event_bus()
     assert isinstance(global_bus, EventBus)
+    for level in (logging.DEBUG, logging.INFO, logging.WARNING):
+        assert any(
+            record.levelno == level
+            and getattr(record, "fr_id", None) == host_events.FR_BUS
+            for record in caplog.records
+        )
 
 
 def test_helper_parsers_and_token_extraction() -> None:
@@ -598,8 +643,8 @@ def test_gateway_settings_diagnostics_and_jobs_routes(tmp_path: Path) -> None:
         put_ok = client.put(
             "/api/v1/settings",
             json={
-                "revision": rev0,
-                "settings": {"user_access": {"username": "gateway_user"}},
+                "expected_revision": rev0,
+                "changes": {"app.general": {"header_custom_text": "gateway_user"}},
             },
         )
         assert put_ok.status_code == 200
@@ -609,8 +654,8 @@ def test_gateway_settings_diagnostics_and_jobs_routes(tmp_path: Path) -> None:
         put_conflict = client.put(
             "/api/v1/settings",
             json={
-                "revision": rev0,
-                "settings": {"user_access": {"username": "stale_write"}},
+                "expected_revision": rev0,
+                "changes": {"app.general": {"header_custom_text": "stale_write"}},
             },
         )
         assert put_conflict.status_code == 409
@@ -726,3 +771,230 @@ def test_servlet_constants_and_specs(tmp_path: Path) -> None:
         spec_data = spec_res.json()["data"]
         assert spec_data["cpu_cores"] >= 1
         assert "worker_capacity" in spec_data
+
+
+@pytest.mark.parametrize("prefix", ["", "/api/v1", "/api/v2"])
+def test_settings_ui_contract_and_secret_boundaries(prefix: str) -> None:
+    """Exercise real HTTP validation, merging, secret projection and events."""
+    manager = SettingsManager()
+    manager.save_settings(
+        {
+            "application": {
+                "app_general": {"unregistered": "keep"},
+                "notify_email": {"password": "synthetic-old"},
+            }
+        }
+    )
+    bus = EventBus()
+    client = TestClient(create_host_app(host_settings=manager, event_bus=bus))
+    snapshot = client.get(prefix + "/settings").json()["data"]
+    assert "values" in snapshot and "settings" not in snapshot
+    revision = snapshot["revision"]
+    patch = {
+        "expected_revision": revision,
+        "changes": {
+            "app.general": {"header_custom_text": "true"},
+            "connect.remote": {"allow": True},
+        },
+    }
+    response = client.put(prefix + "/settings", json=patch)
+    assert response.status_code == 200
+    assert (
+        response.json()["data"]["values"]["app.general"]["header_custom_text"] == "true"
+    )
+    revision += 1
+    independent = SettingsManager()
+    assert independent.get_scope("app_general") == {
+        "unregistered": "keep",
+        "header_custom_text": "true",
+        "remote_access": {"allow": True},
+    }
+    assert client.put(prefix + "/settings", json=patch).status_code == 409
+    count = bus.current_cursor
+    no_op = client.put(
+        prefix + "/settings",
+        json={
+            "expected_revision": revision,
+            "changes": {"app.general": {"header_custom_text": "true"}},
+        },
+    )
+    assert no_op.json()["data"]["revision"] == revision
+    assert bus.current_cursor == count
+    for bad in (
+        {},
+        {"revision": revision, "settings": {}},
+        {"expected_revision": True, "changes": {}},
+        {"expected_revision": revision, "changes": {}, "settings": {}},
+        {"expected_revision": revision, "changes": {"app.general": {"zoom": True}}},
+        {"expected_revision": revision, "changes": {"app.general": {"unknown": 1}}},
+        {
+            "expected_revision": revision,
+            "changes": {"user.access": {"username": "bypass"}},
+        },
+        {
+            "expected_revision": revision,
+            "changes": {"notify.email": {"password": "synthetic-leak"}},
+        },
+    ):
+        failed = client.put(prefix + "/settings", json=bad)
+        assert failed.status_code == 422
+        assert "synthetic-leak" not in failed.text
+    secret = client.put(
+        prefix + "/settings/secrets",
+        json={
+            "expected_revision": revision,
+            "changes": {"notify.email": {"password": "synthetic-new"}},
+        },
+    )
+    assert secret.status_code == 200
+    assert "synthetic-" not in secret.text
+    catalogue = client.get(prefix + "/settings/catalogue")
+    assert catalogue.status_code == 200
+    assert "synthetic-" not in catalogue.text
+    field = next(
+        f
+        for f in catalogue.json()["data"]["fields"]
+        if f["scope"] == "notify.email" and f["key"] == "password"
+    )
+    assert field["configured"] is True and "value" not in field
+    assert all(
+        row["scope"] == "application"
+        for row in HostPersistence.read_records("host_settings")
+    )
+
+
+def test_account_rotation_is_durable_and_revokes_other_gateway_cache() -> None:
+    """Account commit invalidates old passwords/tokens across gateway instances."""
+    manager = SettingsManager()
+    manager.save_settings(
+        {
+            "application": {
+                "user_access": {
+                    "username": "old",
+                    "session_timeout_mins": 1440,
+                    "password_hash": hash_password("synthetic-old-password"),
+                }
+            }
+        }
+    )
+    sessions = SessionManager()
+    client = TestClient(
+        create_host_app(
+            host_settings=manager,
+            session_mgr=sessions,
+            require_auth=True,
+            password_hash=hash_password("obsolete-override"),
+        )
+    )
+    token = client.post(
+        "/auth/login", json={"password": "synthetic-old-password"}
+    ).json()["data"]["token"]
+    auth = {"Authorization": "Bearer " + token}
+    other = SessionManager()
+    assert other.verify_session(token) is not None
+    account = client.get("/auth/account", headers=auth).json()["data"]
+    payload = {
+        "username": "new",
+        "expected_revision": account["revision"],
+        "session_timeout_mins": 2880,
+        "current_password": "wrong",
+        "new_password": "synthetic-new-password",
+    }
+    assert client.put("/auth/account", headers=auth, json=payload).status_code == 401
+    payload["current_password"] = "synthetic-old-password"
+    assert client.put("/auth/account", headers=auth, json=payload).status_code == 200
+    assert sessions.verify_session(token) is None
+    assert other.verify_session(token) is None
+    for password in ("synthetic-old-password", "obsolete-override"):
+        assert (
+            client.post("/auth/login", json={"password": password}).status_code == 401
+        )
+    new_login = client.post("/auth/login", json={"password": "synthetic-new-password"})
+    assert new_login.status_code == 200
+    assert new_login.json()["data"]["username"] == "new"
+    rows = HostPersistence.read_records("host_session", where={"status": "ACTIVE"})
+    assert len(rows) == 1
+    elapsed = datetime.fromisoformat(
+        rows[0]["expires_at_utc"]
+    ) - datetime.fromisoformat(rows[0]["created_at_utc"])
+    assert elapsed.total_seconds() == 2880 * 60
+
+
+def test_settings_database_failure_never_acknowledges_save(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Persistence failure returns a retryable boundary error without change events."""
+    manager = SettingsManager()
+    bus = EventBus()
+    client = TestClient(create_host_app(host_settings=manager, event_bus=bus))
+    client.get("/settings")
+
+    def fail(*args: Any, **kwargs: Any) -> None:
+        raise HostPersistence.Error("simulated store failure")
+
+    monkeypatch.setattr(HostPersistence, "apply_batch", fail)
+    response = client.put(
+        "/settings",
+        json={
+            "expected_revision": 0,
+            "changes": {"app.general": {"header_custom_text": "must not persist"}},
+        },
+    )
+    assert response.status_code == 503
+    assert bus.current_cursor == 0
+    assert SettingsManager().get_snapshot()["revision"] == 0
+
+
+def test_account_failure_rolls_back_settings_and_session_revocation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A failed account transaction leaves both credentials and sessions usable."""
+    manager = SettingsManager()
+    manager.save_settings(
+        {
+            "application": {
+                "user_access": {
+                    "username": "operator",
+                    "session_timeout_mins": 1440,
+                    "password_hash": hash_password("synthetic-current"),
+                }
+            }
+        }
+    )
+    sessions = SessionManager()
+    client = TestClient(
+        create_host_app(host_settings=manager, session_mgr=sessions, require_auth=True)
+    )
+    token = client.post("/auth/login", json={"password": "synthetic-current"}).json()[
+        "data"
+    ]["token"]
+    revision = manager.revision
+
+    def fail(*args: Any, **kwargs: Any) -> None:
+        raise HostPersistence.Error("simulated transaction failure")
+
+    monkeypatch.setattr(HostPersistence, "apply_batch", fail)
+    response = client.put(
+        "/auth/account",
+        headers={"Authorization": "Bearer " + token},
+        json={
+            "expected_revision": revision,
+            "username": "changed",
+            "session_timeout_mins": 1440,
+            "current_password": "synthetic-current",
+            "new_password": "synthetic-new",
+        },
+    )
+    assert response.status_code == 503
+    assert manager.get_account()["username"] == "operator"
+    assert sessions.verify_session(token) is not None
+
+
+def test_missing_account_reports_unconfigured_without_writing() -> None:
+    """An empty store cannot claim an invented account identity or duration."""
+    manager = SettingsManager()
+    client = TestClient(create_host_app(host_settings=manager))
+    response = client.get("/auth/account")
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "ACCOUNT_UNCONFIGURED"
+    assert HostPersistence.read_records("host_settings") == []

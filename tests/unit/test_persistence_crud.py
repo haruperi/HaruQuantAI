@@ -46,7 +46,9 @@ CLI Usage:
 from __future__ import annotations
 
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Barrier
 from typing import Any
 
 import app.host.persistence as persistence_mod
@@ -881,3 +883,34 @@ def test_class_contract_and_clean_room() -> None:
     assert HostPersistence.RevisionConflictError is RevisionConflictError
     assert HostPersistence.BatchOperation is BatchOperation
     assert HostPersistence.BatchResult is BatchResult
+
+
+def test_settings_batch_compare_and_set_is_inside_transaction() -> None:
+    """A stale batch cannot overwrite any record or session change."""
+    HostPersistence.read_records("host_settings")
+    barrier = Barrier(2)
+
+    def write(value: str) -> str:
+        operation = HostPersistence.BatchOperation(
+            op_type="upsert",
+            table="host_settings",
+            pk_values={"scope": "application", "key": "audit"},
+            data={
+                "scope": "application",
+                "key": "audit",
+                "value_json": value,
+                "schema_version": 1,
+                "updated_at_utc": "2026-10-20 00:00:00",
+            },
+        )
+        barrier.wait(timeout=5)
+        try:
+            HostPersistence.apply_batch([operation], expected_settings_revision=0)
+            return "committed"
+        except HostPersistence.RevisionConflictError:
+            return "conflict"
+
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        results = list(workers.map(write, ['"one"', '"two"']))
+    assert sorted(results) == ["committed", "conflict"]
+    assert len(HostPersistence.read_records("host_settings")) == 1

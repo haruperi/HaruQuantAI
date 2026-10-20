@@ -1,4 +1,22 @@
-"""Unit and lifecycle integration tests for Stage 1G Bootstrap, Main, and CLI."""
+"""Verify host bootstrap, lifecycle, settings wiring and CLI dispatch.
+
+Description:
+    Exercise startup, route registration, settings HTTP writes and shutdown using
+    isolated temporary databases, including rollback and telemetry draining.
+Purpose:
+    FEAT-HOST-BOOT: Verify application lifecycle and settings transport wiring.
+Key Capabilities:
+    - FR-HOST-BOOT-STAGE-PROGRESSION: Assert ordered initialization and teardown.
+      Associated: test_seven_stage_progression_and_reverse_lifo_teardown().
+      Logging: assert structured stage events and durable telemetry results.
+    - FR-HOST-BOOT-PERSISTENCE-STAGE: Verify real settings writes and conflicts.
+      Associated: test_bootstrapped_settings_http_writes_and_telemetry_shutdown().
+      Logging: verify telemetry sinks and post-shutdown engine state.
+Python API Usage:
+    pytest.main(["tests/unit/test_bootstrap_cli.py", "--no-cov"])
+CLI Usage:
+    uv run pytest tests/unit/test_bootstrap_cli.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -115,19 +133,25 @@ def test_bootstrapped_settings_http_writes_and_telemetry_shutdown(
         revision = client.get("/api/v1/settings").json()["data"]["revision"]
         saved = client.put(
             "/api/v1/settings",
-            json={"revision": revision, "settings": {"audit": {"theme": "dark"}}},
+            json={
+                "expected_revision": revision,
+                "changes": {"app.general": {"header_custom_text": "test"}},
+            },
         )
         assert saved.status_code == 200, saved.text
         assert saved.json()["data"]["revision"] == revision + 1
         assert (
             client.put(
                 "/api/v1/settings",
-                json={"revision": revision, "settings": {"audit": {"theme": "stale"}}},
+                json={
+                    "expected_revision": revision,
+                    "changes": {"app.general": {"header_custom_text": "stale"}},
+                },
             ).status_code
             == 409
         )
         assert any(
-            row["key"] == "theme"
+            row["key"] == "app_general"
             for row in HostPersistence.read_records("host_settings")
         )
         engine = telemetry._GLOBAL_ENGINE

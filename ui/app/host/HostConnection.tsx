@@ -71,10 +71,12 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
   }
 }
 
+type SettingsChange = Partial<ShellPreferences> | ((current: ShellPreferences) => Partial<ShellPreferences>);
+
 interface HostConnectionValue {
   status: HostStatus;
   settingsRevision: number | null;
-  saveSettings: (change: Partial<ShellPreferences>, openingRevision?: number | null) => Promise<SaveSettingsResult>;
+  saveSettings: (change: SettingsChange, openingRevision?: number | null) => Promise<SaveSettingsResult>;
 }
 
 const HostConnectionContext = createContext<HostConnectionValue | null>(null);
@@ -158,7 +160,7 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
-  const saveSettings = (change: Partial<ShellPreferences>, openingRevision?: number | null): Promise<SaveSettingsResult> => {
+  const saveSettings = (requested: SettingsChange, openingRevision?: number | null): Promise<SaveSettingsResult> => {
     const task = writeQueue.current.then(async (): Promise<SaveSettingsResult> => {
       const failure = (reason: string): SaveSettingsResult => {
         const message = `Settings were not saved: ${reason}`;
@@ -174,6 +176,7 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
       for (let attempt = 0; attempt < 2; attempt += 1) {
         try {
           const previous = preferencesRef.current!;
+          const change = typeof requested === 'function' ? requested(previous) : requested;
           const displayed = shellPreferences(useAppStore.getState().settings);
           const configuration = { ...previous.configuration };
           if (change.configuration) {

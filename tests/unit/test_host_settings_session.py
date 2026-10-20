@@ -51,6 +51,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Barrier
+from typing import Any
 
 import app.host.settings
 import pytest
@@ -69,10 +70,8 @@ from app.host.session import (
 from app.host.settings import (
     BATCH_UPDATE_FR,
     LOAD_FR,
-    THEME_FR,
     RevisionConflictError,
     SettingsManager,
-    Theme,
     _read_settings,
     _SettingsNode,
 )
@@ -97,7 +96,6 @@ def test_public_module_exports_rule_compliance() -> None:
     expected = [
         "SettingsManager",
         "RevisionConflictError",
-        "Theme",
         "settings",
     ]
     assert sorted(app.host.settings.__all__) == sorted(expected)
@@ -494,37 +492,300 @@ def test_settings_read_failure_preserves_last_snapshot(
     assert instance.get("audit", "kept") is True
 
 
-def test_theme_tokens_and_appearance_state(caplog: pytest.LogCaptureFixture) -> None:
-    """Verify FR-HOST-SETTINGS-THEME-TOKENS dark and light mode tokens and switching."""
-    caplog.set_level(logging.DEBUG)
-    theme = Theme()
-    assert theme.current_theme == "dark"
-
-    dark_tokens = theme.set_dark()
-    assert dark_tokens["theme"] == "dark"
-    assert "background" in dark_tokens
-    assert "dockview" in dark_tokens
-    assert "chart" in dark_tokens
-    assert "typography" in dark_tokens
-    assert any(THEME_FR in rec.message for rec in caplog.records)
-
-    caplog.clear()
-    light_tokens = theme.set_light()
-    assert light_tokens["theme"] == "light"
-    assert "background" in light_tokens
-    assert "dockview" in light_tokens
-    assert "chart" in light_tokens
-    assert any(THEME_FR in rec.message for rec in caplog.records)
-
-    tokens_retrieved = theme.get_tokens()
-    assert tokens_retrieved["theme"] == "dark"
-    light_retrieved = theme.get_light_tokens()
-    assert light_retrieved["theme"] == "light"
+def test_theme_identifier_roundtrip() -> None:
+    """Appearance belongs to the UI; only the stored identifier round-trips."""
+    instance = SettingsManager()
+    instance.save_changes({"app.general": {"theme": "light"}}, expected_revision=0)
+    assert SettingsManager().get_snapshot()["values"] == {
+        "app.general": {"theme": "light"}
+    }
+    assert not hasattr(instance, "theme")
 
 
-def test_host_settings_theme_integration() -> None:
-    """Verify SettingsManager public class and theme binding."""
-    settings_obj = SettingsManager(data={"ui": {"theme": "light"}})
-    assert settings_obj.theme.current_theme == "light"
-    settings_obj.theme.set_dark()
-    assert settings_obj.theme.current_theme == "dark"
+def test_empty_store_projects_no_defaults_or_writes() -> None:
+    """Reads cannot fabricate fields or initialize settings/account records."""
+    instance = SettingsManager()
+    assert instance.get_snapshot() == {"revision": 0, "values": {}}
+    assert instance.get_catalogue() == {"revision": 0, "fields": [], "unknown": []}
+    with pytest.raises(KeyError, match="not configured"):
+        instance.get_account()
+    with pytest.raises(KeyError, match="not configured"):
+        instance.save_account("new", 1440, "synthetic-hash", expected_revision=0)
+    assert HostPersistence.read_records("host_settings") == []
+
+
+def test_stored_empty_values_are_not_missing() -> None:
+    """False, zero, empty containers/text and an allowed null survive projection."""
+    instance = SettingsManager()
+    changes = {
+        "app.general": {"header_custom_text": "", "confirm_on_exit": False},
+        "notify.desktop": {"duration_seconds": 0},
+        "notify.email": {"recipient_addresses": []},
+        "config.databanks": {"databank_sync_interval_mins": None},
+        "calibration.indicators": {"QQE.RSIPeriod": []},
+    }
+    instance.save_changes(changes, expected_revision=0)
+    assert SettingsManager().get_snapshot()["values"] == changes
+    assert len(instance.get_catalogue()["fields"]) == 6
+
+
+@pytest.mark.parametrize(
+    "stored", [{"zoom": "1.2"}, {"remote_access": False}, {"theme": "unknown"}]
+)
+def test_invalid_stored_values_fail_closed(stored: dict[str, Any]) -> None:
+    """Malformed stored values cannot become editable inferred field types."""
+    instance = SettingsManager()
+    instance.save_settings({"application": {"app_general": stored}})
+    before = HostPersistence.read_records("host_settings")
+    for project in (instance.get_snapshot, instance.get_catalogue):
+        with pytest.raises(ValueError):
+            project()
+    assert HostPersistence.read_records("host_settings") == before
+
+
+_STORED_EXAMPLES: dict[str, Any] = {
+    "app_general": {
+        "theme": "dark",
+        "language": "en",
+        "zoom": 1.0,
+        "auto_save_interval_s": 120,
+        "header_custom_text": "",
+        "confirm_on_exit": True,
+        "host": "127.0.0.1",
+        "backend_port": 8000,
+        "frontend_port": 3000,
+        "gpu_accelerated": True,
+        "remote_access": {"allow": False, "require_password": False, "port": 8000},
+    },
+    "config_global": {
+        "sounds_off": False,
+        "advanced_file_chooser": True,
+        "show_control_orders": False,
+        "footer_custom_text": "",
+        "default_result_to_display": "Portfolio",
+        "data_frame_guard": "warn",
+    },
+    "config_cpu": {
+        "core_usage": "all_except_one",
+        "custom_cores": 7,
+        "high_priority": False,
+        "thread_affinity": False,
+    },
+    "config_performance": {
+        "compute_pips_metrics": False,
+        "compute_pcts_metrics": False,
+        "compute_separate_metrics": True,
+    },
+    "config_memory": {
+        "gc_type": "ParallelGC",
+        "automatic_memory": False,
+        "memory_limit_gb": 10,
+        "dont_store_pending_orders": True,
+        "memory_cleanup": False,
+        "cleanup_interval_mins": 15,
+    },
+    "config_databanks": {
+        "databank_sync_interval_mins": 15,
+        "sync_databanks_after_task_done": True,
+        "store_chart_data": False,
+    },
+    "config_optimizations": {"dont_store_op_3d_charts_data": True},
+    "config_troubleshooting": {
+        "gpu_accelerated": True,
+        "memory_protection": True,
+        "debug_level_active": False,
+    },
+    "connect_mcp": {
+        "enabled": False,
+        "host": "127.0.0.1",
+        "port": 8001,
+        "transport": "stdio",
+        "auth_token": "",
+        "allowed_tools": [],
+        "max_context_items": 100,
+    },
+    "notify_desktop": {
+        "enabled": True,
+        "duration_seconds": 5,
+        "min_priority": "info",
+        "sound_enabled": True,
+    },
+    "notify_email": {
+        "enabled": False,
+        "smtp_server": "",
+        "smtp_port": 587,
+        "use_ssl": False,
+        "use_tls": True,
+        "username": "",
+        "password": "",
+        "from_address": "",
+        "recipient_addresses": [],
+    },
+    "notify_telegram": {
+        "enabled": False,
+        "bot_token": "",
+        "chat_id": "",
+        "parse_mode": "",
+        "disable_notification": False,
+    },
+    "config_metatrader5": {
+        "enabled": False,
+        "terminal_path": "",
+        "account_id": 0,
+        "password": "",
+        "server": "",
+        "environment": "demo",
+        "timeout_ms": 60000,
+        "portable": False,
+        "use_ticks": False,
+    },
+    "config_ctrader": {
+        "enabled": False,
+        "account_id": "",
+        "client_id": "",
+        "client_secret": "",
+        "access_token": "",
+        "refresh_token": "",
+        "environment": "demo",
+        "gateway_host": "",
+        "gateway_port": 5035,
+        "redirect_url": "",
+    },
+    "config_agents": {
+        "active_provider": "openai",
+        "agent_timeout_seconds": 120,
+        "system_prompt_preset": "",
+        "openai": {
+            "api_key": "",
+            "model": "",
+            "base_url": "",
+            "temperature": 0.2,
+            "max_tokens": 8192,
+        },
+        "gemini": {
+            "api_key": "",
+            "model": "",
+            "base_url": "",
+            "use_vertex_ai": False,
+            "fast_model": "",
+            "premium_model": "",
+            "fallback_model": "",
+            "temperature": 0.2,
+            "max_tokens": 8192,
+        },
+        "ollama": {
+            "model": "",
+            "base_url": "",
+            "temperature": 0.2,
+            "timeout_seconds": 120,
+        },
+    },
+    "workspace_paths": {
+        "configs_dir": "configs",
+        "projects_dir": "projects",
+        "strategies_dir": "strategies",
+        "data_dir": "data",
+    },
+    "engine_backtest": {
+        "max_threads": 7,
+        "memory_limit_mb": 10240,
+        "enable_caching": True,
+        "precision_mode": "",
+        "benchmark_time_per_tick_ms": 0.0,
+        "dont_store_pending_orders": True,
+        "dont_store_op3d_charts": True,
+        "compute_separate_metrics": True,
+        "compute_pcts_metrics": False,
+        "compute_pips_metrics": False,
+        "source_code_constants_params": False,
+    },
+    "calibration_indicators": {"QQE.RSIPeriod": [14], "QQE.sF": [5], "QQE.Value1": ""},
+    "user_access": {
+        "username": "admin",
+        "password_hash": "",
+        "password_salt": "",
+        "session_timeout_mins": 1440,
+        "allow_remember_me": False,
+        "require_auth": False,
+    },
+}
+
+
+def test_registered_fields_roundtrip_preserves_unknown_data(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Every editable registered field maps to its canonical row without mirrors."""
+    caplog.set_level(logging.INFO)
+    instance = SettingsManager()
+    instance.save_settings(
+        {
+            "application": _STORED_EXAMPLES
+            | {
+                "config_agents": _STORED_EXAMPLES["config_agents"]
+                | {"unregistered": {"keep": True}}
+            }
+        }
+    )
+    catalogue = instance.get_catalogue()
+    assert len(catalogue["fields"]) == 128
+    changes: dict[str, dict[str, Any]] = {}
+    for field in catalogue["fields"]:
+        if field["readonly"]:
+            continue
+        value = "synthetic-secret" if field["secret"] else field["value"]
+        if field["kind"] == "bool":
+            value = not value
+        elif (
+            field["kind"] == "str" and not field.get("options") and not field["secret"]
+        ):
+            value = "test-value"
+        changes.setdefault(field["scope"], {})[field["key"]] = value
+    saved = instance.save_changes(
+        changes, expected_revision=catalogue["revision"], include_secrets=True
+    )
+    independent = SettingsManager()
+    assert independent.get_snapshot() == {
+        k: v for k, v in saved.items() if k != "wrote"
+    }
+    assert independent.get_scope("config_agents")["unregistered"] == {"keep": True}
+    assert all(
+        r["scope"] == "application"
+        for r in HostPersistence.read_records("host_settings")
+    )
+    for field in independent.get_catalogue()["fields"]:
+        if field["readonly"]:
+            continue
+        if field["secret"]:
+            assert field["configured"] is True and "value" not in field
+        else:
+            assert field["value"] == changes[field["scope"]][field["key"]]
+    assert any(getattr(r, "fr_id", None) == BATCH_UPDATE_FR for r in caplog.records)
+
+
+@pytest.mark.parametrize("text", ["true", "123", "null", "false", "[1]", ""])
+def test_string_values_remain_strings(text: str) -> None:
+    """JSON encoding preserves strings that resemble other JSON types."""
+    instance = SettingsManager()
+    instance.save_changes(
+        {"app.general": {"header_custom_text": text}}, expected_revision=0
+    )
+    assert (
+        SettingsManager().get_snapshot()["values"]["app.general"]["header_custom_text"]
+        == text
+    )
+
+
+def test_canonical_account_precedes_preserved_legacy_rows() -> None:
+    """Legacy rows are retained without overriding the authoritative account group."""
+    instance = SettingsManager()
+    instance.save_settings(
+        {
+            "user_access": {"username": "legacy"},
+            "application": {"user_access": {"username": "current"}},
+        }
+    )
+    assert instance.get("user_access", "username") == "current"
+    assert instance.user_access.username == "current"
+    assert instance["user_access"].username == "current"
+    assert instance.get("user_access").username == "current"
+    assert instance.as_dict()["user_access"]["username"] == "legacy"

@@ -284,6 +284,7 @@ export interface SmtpSettings {
   server: string;
   port: string;
   ssl: boolean;
+  tls?: boolean;
   username: string;
   emailFrom: string;
 }

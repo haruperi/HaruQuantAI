@@ -55,6 +55,15 @@ describe('host shell preferences', () => {
     expect(parseHostPreferences({ revision: 1, values: { 'config.databanks': { databank_sync_interval_mins: 10 } } }).preferences.configuration.databankSyncInterval).toBe('Every 10 minutes');
   });
 
+  it('preserves separate TLS flags and loads core counts before runtime discovery', async () => {
+    const parsed = parseHostPreferences({ revision: 4, values: { 'notify.email': { use_ssl: true, use_tls: false }, 'config.cpu': { custom_cores: 16 } } });
+    expect(parsed.preferences.smtp).toMatchObject({ ssl: true, tls: false });
+    expect(parsed.preferences.configuration.customCores).toBe(16);
+    const fetchFn = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ status: 'success', data: { revision: 5, values: {} } }) });
+    await writeHostPreferences({ ...parsed.preferences, smtp: { ...parsed.preferences.smtp, server: 'changed.test' } }, parsed.preferences, 4, { fetchFn: asFetch(fetchFn) });
+    expect(JSON.parse(fetchFn.mock.calls[0][1].body).changes).toEqual({ 'notify.email': { smtp_server: 'changed.test' } });
+  });
+
   it('reads and writes the host settings envelope', async () => {
     const fetchFn = vi.fn().mockResolvedValue({
       ok: true, status: 200,
