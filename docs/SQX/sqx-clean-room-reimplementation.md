@@ -4,7 +4,7 @@ This document is the **authoritative greenfield clean-room master blueprint** fo
 
 1. **Section 0 — Greenfield Engineering Guardrails, Line-Count Budgets & DRY Rules** (`<= 100` line docstrings, `1,000` line hard file cutoff, zero backward-compatibility aliases, AI-tool-ready methods, and repository-wide DRY deduplication).
 2. **Complete 3-Tier Spatial Project & File Structure** (`app/host/`, `app/services/`, `app/workspace/`, `app/plugins/`, `ui/app/`).
-3. **Donor / Backend / Frontend Alignment Tables** mapping every component to its **Donor Path** (`docs/SQX/...`), **Backend Target File**, **Frontend Target File**, and **DRY Shared Dependencies**.
+3. **Per-Feature Task Specifications** mapping every feature task directly to its **Dry Rule**, **Donor** (`C:\SQX-145\...`), **Backend**, **Frontend**, **Class**, and **Functional Requirements & Exact Method Signatures**.
 4. **Upfront `FR-*` & Exact Method Signatures Per File** (`ClassName.method_name(args: Type) -> ReturnType`) so agents never invent unapproved functions, aliases, or spaghetti logic.
 
 ---
@@ -188,38 +188,17 @@ HaruQuantAI/
 - **Dependencies:** None (Root Host)
 - **Outputs / Downstream Role:** Core application container, `get_logger()` telemetry API, centralized `HostPersistence` database API, event bus, and broker connection adapters.
 
-### Phase 1.1 – 1.4 Master Donor / Backend / Frontend Alignment Table (Bottom-Up Build Order)
-
-| Build Order & Component                                           | Donor Path (`docs/SQX/...`)                                                                                                                                      | Backend Target File (Line Budget)                                   | Frontend Target File                                                         | DRY Shared Dependencies                                       |
-| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| **1. `TelemetryLogger`**                                          | [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`SQLog`)                                                           | `app/host/logging.py` (`🟡 200–350L`)                               | `ui/app/host/HostSettingsModal.tsx`                                          | Zero `app.*` imports (Root dependency for all files)          |
-| **2. `HostPersistence`**                                          | [`docs/SQX/libs/SQDataLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQDataLib.md) (`SQDataLib` WAL)                                           | `app/host/persistence.py` (`🟠 700–900L`, DDL asset table)          | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`; single source of truth for all SQLite CRUD |
-| **3. `ApiResponse`**                                              | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (Servlet Envelopes)                           | `app/host/response.py` (`🟢 <150L`)                                 | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`; standard REST/WS envelope                  |
-| **4. `ResourceMonitor`**                                          | [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`MemoryMonitor`)                                                   | `app/host/resources.py` (`🟢 <200L`)                                | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`                                             |
-| **5. `SettingsManager` & `SkinDark`/`SkinLight`**                 | [`docs/SQX/overview/settings/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/settings/README.md) (`Settings`)                            | `app/host/settings.py` (`🟡 200–350L`)                              | `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx`     | `TelemetryLogger`, `HostPersistence` (`settings` table)       |
-| **6. `SessionManager`**                                           | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`SessionAuth`)                               | `app/host/session.py` (`🟢 <200L`)                                  | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence` (`sessions` table)       |
-| **7. `PluginDiscovery`**                                          | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`PluginManager`)                             | `app/host/discovery.py` (`🟡 200–350L`)                             | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence`                          |
-| **8. `JobManager`**                                               | [`docs/SQX/overview/custom-projects.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/custom-projects.md) (`TaskManager`)                         | `app/host/jobs.py` (`🟡 250–400L`)                                  | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence` (`jobs` table)           |
-| **9. `AppPlatform` (`AppHost`)**                                  | [`docs/SQX/overview/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/README.md) (`SQApp`)                                                 | `app/host/bootstrap.py` (`🟡 250–450L`), `app/main.py` (`🟢 <150L`) | `ui/app/host/HostConnectionModal.tsx`                                        | `TelemetryLogger`, `HostPersistence`, all Phase 1.1 services  |
-| **10. `HeadlessCLI`**                                             | [`docs/SQX/cli/sqcli.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/cli/sqcli.md) (`sqcli.config`)                                                      | `app/cli.py` (`🟡 200–350L`)                                        | N/A (Headless CLI)                                                           | `TelemetryLogger`, `AppHost`, `HostPersistence`               |
-| **11. `ConnectionTest`, `ServletConnection`, `ServletConstants`** | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`Connection*`)                               | `app/host/transport.py` (`🟡 300–480L`)                             | `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`   | `TelemetryLogger`, `HostPersistence`, `ApiResponse`           |
-| **12. `ConnectionLiveTest`**                                      | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`ConnectionLiveTest`)                        | `app/services/brokers/registry.py` (`🟢 <200L`)                     | `ui/app/workspace/Trading/TradingDashboard.tsx`                              | `BaseBrokerClient`                                            |
-| **13. `ConnectionMT4` (`ConnectionMT5`)**                         | [`docs/SQX/overview/data-sources/mt5-import.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/mt5-import.md) (`ConnectionMT4`/MT5)   | `app/services/brokers/metatrader.py` (`🟡 250–400L`)                | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_native_history.py`                      |
-| **14. `ConnectionCTrader`**                                       | [`docs/SQX/overview/data-sources/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/README.md) (`ConnectionCTrader`)           | `app/services/brokers/ctrader.py` (`🟡 250–400L`)                   | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_http.py`                                |
-| **15. `ConnectionSimulator`**                                     | [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) (`ConnectionSimulator`)                               | `app/services/brokers/simulator.py` (`🟡 200–350L`)                 | `ui/app/workspace/Trading/TradingDashboard.tsx`                              | `BaseBrokerClient`                                            |
-| **16. `CryptoExchange*` (6 Exchanges)**                           | [`docs/SQX/overview/data-sources/crypto-exchanges.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/crypto-exchanges.md) (`Crypto*`) | `app/services/brokers/crypto.py` (`🟡 350–500L`)                    | `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`                          | `BaseBrokerClient`, `_http.py`                                |
-
 ---
 
 ### Phase 1.1: Core Application Container & Stage 1 Host Foundation (Ordered Bottom-Up)
 
 #### 1. `app/host/logging.py` — `TelemetryLogger`, `BoundLogger`, `TelemetryEngine` & `LogRingBuffer` (`FEAT-HOST-LOGGING`)
 
-- **Donor Path:** [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`SQLog` / Logback Sinks)
-- **Backend Target:** `app/host/logging.py` (`🟠 500–995L`, Docstring `<=45L`)
-- **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
-- **Classes:** `TelemetryLogger` (`BoundLogger` alias), `TelemetryEngine`, `LogRingBuffer`, `WindowsSafeRotatingFileHandler`, `LogEventFormatter` (plus `get_logger`, `get_access_logger`, `setup_logging`, `flush_logs`, `shutdown_logging`, `TelemetryLoggerCLI`)
-- **DRY Rule:** Zero internal `app.*` imports. Every other file in the repository imports `from app.host.logging import get_logger`.
+- **Dry Rule:** Zero internal `app.*` imports. Every other file in the repository imports `from app.host.logging import get_logger`.
+- **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.L`, `SQLog`), `C:\SQX-145\internal\libs\logback-core-1.4.14.jar`, `C:\SQX-145\internal\libs\logback-classic-1.4.14.jar`
+- **Backend:** `app/host/logging.py` (`🟠 500–995L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
+- **Class:** `TelemetryLogger` (`BoundLogger` alias), `TelemetryEngine`, `LogRingBuffer`, `WindowsSafeRotatingFileHandler`, `LogEventFormatter` (plus `get_logger`, `get_access_logger`, `setup_logging`, `flush_logs`, `shutdown_logging`, `TelemetryLoggerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-LOGGING-WORKER`: Asynchronous non-blocking `QueueHandler`/`QueueListener` engine (`TelemetryEngine`), `setup_logging()`, `flush_logs()`, and `shutdown_logging()`
   - [x] `FR-HOST-LOGGING-REDACTION`: Deterministic SHA-256 secret fingerprinting (`fingerprint_secret`), workspace/home path normalization (`normalize_path`), `redact_value`, `redact_mapping`, and `TelemetryLogger.redact_secrets()`
@@ -233,11 +212,11 @@ HaruQuantAI/
 
 #### 2. `app/host/persistence.py` — `HostPersistence` (`FEAT-HOST-PERSISTENCE`)
 
-- **Donor Path:** [`docs/SQX/libs/SQDataLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQDataLib.md) (`SQDataLib` SQLite WAL Persistence)
-- **Backend Target:** `app/host/persistence.py` (`🟠 500–900L`, Docstring `<=60L`)
-- **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
+- **Dry Rule:** Depends only on `app/host/logging.py`. All SQLite path resolution, connection pooling, schema bootstrapping, and parameterized SQL live exclusively inside `HostPersistence`. No other module may import `sqlite3` or resolve DB paths.
+- **Donor:** `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.*`), `C:\SQX-145\internal\libs\sqlite-jdbc-3.51.2.0.jar`, `C:\SQX-145\internal\libs\h2-1.3.149.jar`
+- **Backend:** `app/host/persistence.py` (`🟠 500–900L`, Docstring `<=60L`)
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `HostPersistence` (plus `HostPersistenceCLI`)
-- **DRY Rule:** Depends only on `app/host/logging.py`. All SQLite path resolution, connection pooling, schema bootstrapping, and parameterized SQL live exclusively inside `HostPersistence`. No other module may import `sqlite3` or resolve DB paths.
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-PERSISTENCE-CREATE`: Execute parameterized single-row and domain-entity creation in SQLite WAL $\rightarrow$ `HostPersistence.create_record(table: str, values: Mapping[str, Any]) -> dict[str, Any]` & `HostPersistence.create_entity(entity: str, values: Mapping[str, Any]) -> dict[str, Any]`
   - [x] `FR-HOST-PERSISTENCE-READ`: Execute parameterized queries, filtering, and cursor pagination $\rightarrow$ `HostPersistence.read_records(table: str, filters: Mapping[str, Any] | None = None, *, limit: int = 100, offset: int = 0, order_by: str | None = None) -> list[dict[str, Any]]` & `HostPersistence.read_entity(entity: str, entity_id: str | None = None, filters: Mapping[str, Any] | None = None, *, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]`
@@ -247,10 +226,11 @@ HaruQuantAI/
 
 #### 3. `app/host/response.py` — `StandardResponse`, `StandardError`, `ResponseMetadata` & `ApiResponse` (`FEAT-HOST-RESPONSE`)
 
-- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (Servlet JSON Response Envelopes)
-- **Backend Target:** `app/host/response.py` (`🟡 200–495L`, Docstring `<=45L`)
-- **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
-- **Classes:** `StandardResponse[T]`, `StandardError`, `ResponseMetadata`, `ApiResponse` (plus `ApiResponseCLI`)
+- **Dry Rule:** Depends on `TelemetryLogger`; provides the single standard REST/WebSocket/CLI response and error envelope across the repository.
+- **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.webguilib.servlet.*`), `C:\SQX-145\internal\libs\StrategyQuant.jar.enc`
+- **Backend:** `app/host/response.py` (`🟡 200–495L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
+- **Class:** `StandardResponse[T]`, `StandardError`, `ResponseMetadata`, `ApiResponse` (plus `ApiResponseCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-RESPONSE-SUCCESS-ENVELOPE`: Construct validated immutable success envelopes and HTTP/CLI dicts $\rightarrow$ `StandardResponse.success(...) -> StandardResponse[V]` & `ApiResponse.ok(data: Any = None, *, meta: Mapping[str, Any] | None = None, request_id: str | None = None) -> dict[str, Any]`
   - [x] `FR-HOST-RESPONSE-ERROR-ENVELOPE`: Construct validated `StandardError` taxonomy and error envelopes with `unwrap()` / `__bool__()` $\rightarrow$ `StandardResponse.failure(...) -> StandardResponse[V]` & `ApiResponse.error(code: str, message: str, *, details: Mapping[str, Any] | None = None, status_code: int = 400, request_id: str | None = None) -> dict[str, Any]`
@@ -258,19 +238,21 @@ HaruQuantAI/
 
 #### 4. `app/host/resources.py` — `ResourceMonitor` (`FEAT-HOST-RESOURCES`)
 
-- **Donor Path:** [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`com.strategyquant.lib.memory.MemoryMonitor`)
-- **Backend Target:** `app/host/resources.py` (`🟢 <200L`, Docstring `<=45L`)
-- **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
+- **Dry Rule:** Depends on `TelemetryLogger`; centralizes CPU, RAM, and disk pressure inspection for all host and workspace services.
+- **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.memory.MemoryMonitor`, `com.strategyquant.lib.utils.OSUtils`)
+- **Backend:** `app/host/resources.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `ResourceMonitor` (plus `ResourceMonitorCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-RESOURCES-INSPECT`: Monitor CPU cores, RAM utilization, disk quotas, and memory pressure thresholds $\rightarrow$ `ResourceMonitor.inspect_resources(workspace_path: Path | str | None = None) -> dict[str, Any]`
 
 #### 5. `app/host/settings.py` — `SettingsManager` & `Theme` (`FEAT-HOST-SETTINGS`)
 
-- **Donor Path:** [`docs/SQX/overview/settings/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/settings/README.md) (`Settings`, `SkinDark`, `SkinLight`)
-- **Backend Target:** `app/host/settings.py` (`🟡 200–350L`, Docstring `<=55L`)
-- **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx`
-- **Classes:** `SettingsManager`, `Theme` (plus `SettingsManagerCLI`)
+- **Dry Rule:** Depends on `TelemetryLogger` and `HostPersistence` (`settings` table); centralizes configuration and theme token persistence.
+- **Donor:** `C:\SQX-145\user\settings\settings.xml`, `C:\SQX-145\internal\AppSettings.txt`, `C:\SQX-145\internal\plugins\SkinDark\`, `C:\SQX-145\internal\plugins\SkinLight\`, `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.SettingsMap`)
+- **Backend:** `app/host/settings.py` (`🟡 200–350L`, Docstring `<=55L`)
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx`
+- **Class:** `SettingsManager`, `Theme` (plus `SettingsManagerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-SETTINGS-SAVE`: Persist revision-tracked application settings and workspace layouts via `HostPersistence` $\rightarrow$ `SettingsManager.save_settings(settings: Mapping[str, Any], *, namespace: str = "global") -> dict[str, Any]`
   - [x] `FR-HOST-THEME-SET-DARK`: Apply dark theme configuration and persist active theme state $\rightarrow$ `Theme.set_dark() -> dict[str, Any]`
@@ -280,27 +262,30 @@ HaruQuantAI/
 
 #### 6. `app/host/session.py` — `SessionManager` (`FEAT-HOST-SESSION`)
 
-- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`SessionAuth` / Token Guard)
-- **Backend Target:** `app/host/session.py` (`🟢 <200L`, Docstring `<=45L`)
-- **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
+- **Dry Rule:** Depends on `TelemetryLogger` and `HostPersistence` (`sessions` table); single authority for token verification and scope enforcement.
+- **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.webguilib.servlet.*`), `C:\SQX-145\internal\libs\StrategyQuant.jar.enc` (`SessionAuth`)
+- **Backend:** `app/host/session.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `SessionManager` (plus `SessionManagerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-SESSION-VERIFY`: Issue ephemeral session tokens and enforce route scope authorization against `HostPersistence` $\rightarrow$ `SessionManager.verify_session(token: str | None = None, *, required_scope: str = "read", issue_if_none: bool = False) -> dict[str, Any]`
 
 #### 7. `app/host/discovery.py` — `PluginDiscovery` (`FEAT-HOST-DISCOVERY`)
 
-- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`internal/plugins/PluginManager`)
-- **Backend Target:** `app/host/discovery.py` (`🟡 200–350L`, Docstring `<=45L`)
-- **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
+- **Dry Rule:** Depends on `TelemetryLogger` and `HostPersistence`; scans plugin manifests once at bootstrap and persists registry state.
+- **Donor:** `C:\SQX-145\internal\libs\SQPluginLib.jar.enc` (`com.strategyquant.pluginlib.*`), `C:\SQX-145\internal\plugins\`
+- **Backend:** `app/host/discovery.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `PluginDiscovery` (plus `PluginDiscoveryCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-DISCOVERY-SCAN`: Scan and validate dynamic plugin manifests and extension slots at startup and persist registry state via `HostPersistence` $\rightarrow$ `PluginDiscovery.discover_plugins(plugin_dirs: Sequence[Path | str] | None = None) -> dict[str, Any]`
 
 #### 8. `app/host/jobs.py` — `JobManager` (`FEAT-HOST-JOBS`)
 
-- **Donor Path:** [`docs/SQX/overview/custom-projects.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/custom-projects.md) (`TaskManager` / Worker Pool)
-- **Backend Target:** `app/host/jobs.py` (`🟡 250–400L`, Docstring `<=50L`)
-- **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
+- **Dry Rule:** Depends on `TelemetryLogger` and `HostPersistence` (`jobs` table); provides shared multiprocessing task scheduling and cancellation for all workspaces.
+- **Donor:** `C:\SQX-145\internal\libs\SQJobsLib.jar.enc` (`com.strategyquant.jobslib.*`), `C:\SQX-145\internal\plugins\AppTaskManager\AppTaskManager.jar`
+- **Backend:** `app/host/jobs.py` (`🟡 250–400L`, Docstring `<=50L`)
+- **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `JobManager` (plus `JobManagerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-JOBS-SUBMIT`: Schedule, track, and persist background worker tasks in the SQLite job ledger via `HostPersistence` $\rightarrow$ `JobManager.submit_job(job_type: str, payload: Mapping[str, Any], *, priority: int = 0) -> dict[str, Any]`
@@ -308,9 +293,10 @@ HaruQuantAI/
 
 #### 9. `app/host/bootstrap.py` & `app/main.py` — `AppPlatform` (`FEAT-HOST-BOOTSTRAP`)
 
-- **Donor Path:** [`docs/SQX/overview/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/README.md) (`SQApp` / Embedded Jetty Bootstrap)
-- **Backend Target:** `app/host/bootstrap.py` (`🟡 250–450L`, Docstring `<=50L`), `app/main.py` (`🟢 <150L`, Docstring `<=40L`)
-- **Frontend Target:** `ui/app/host/HostConnectionModal.tsx`
+- **Dry Rule:** Orchestrates `TelemetryLogger`, `HostPersistence`, and all Phase 1.1 host services in deterministic startup and LIFO teardown order.
+- **Donor:** `C:\SQX-145\StrategyQuantX.config`, `C:\SQX-145\internal\libs\StrategyQuant.jar.enc` (`com.strategyquant.strategyquant.SQStarter`), `C:\SQX-145\internal\plugins\AppStrategyQuant\AppStrategyQuant.jar`, `C:\SQX-145\internal\electron\`
+- **Backend:** `app/host/bootstrap.py` (`🟡 250–450L`, Docstring `<=50L`), `app/main.py` (`🟢 <150L`, Docstring `<=40L`)
+- **Frontend:** `ui/app/host/HostConnectionModal.tsx`
 - **Class:** `AppHost` (plus `AppHostCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-BOOTSTRAP-STARTUP`: Bootstrap FastAPI backend application with CORS, security headers, and Uvicorn runtime state $\rightarrow$ `AppHost.startup(host: str = "127.0.0.1", port: int = 8000) -> dict[str, Any]`
@@ -321,9 +307,11 @@ HaruQuantAI/
 
 #### 10. `app/cli.py` — Headless CLI Runner (`FEAT-HOST-CLI`)
 
-- **Donor Path:** [`docs/SQX/cli/sqcli.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/cli/sqcli.md) (`sqcli.config` / `SQConsoleStarter`)
-- **Backend Target:** `app/cli.py` (`🟡 200–350L`, Docstring `<=45L`)
-- **Class / Function:** `HeadlessCLI` & `run_cli`
+- **Dry Rule:** Reuses `TelemetryLogger`, `AppHost`, and `HostPersistence` without duplicating host configuration or service logic.
+- **Donor:** `C:\SQX-145\sqcli.config`, `C:\SQX-145\sqcli.exe`, `C:\SQX-145\internal\libs\StrategyQuant.jar.enc` (`com.strategyquant.strategyquant.SQConsoleStarter`)
+- **Backend:** `app/cli.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Frontend:** N/A (Headless CLI)
+- **Class:** `HeadlessCLI` & `run_cli`
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-CLI-RUN`: Execute headless CLI workflows, project pipelines, and system diagnostics (`sqcli.config` parity) $\rightarrow$ `run_cli(argv: Sequence[str] | None = None) -> dict[str, Any]`
 
@@ -333,10 +321,11 @@ HaruQuantAI/
 
 #### 11. `app/host/transport.py` — `ConnectionTest`, `ServletConnection` & `ServletConstants` (`FEAT-HOST-TRANSPORT`)
 
-- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`ConnectionTest`, `ServletConnection`, `ServletConstants`)
-- **Backend Target:** `app/host/transport.py` (`🟡 300–480L`, Docstring `<=65L`)
-- **Frontend Target:** `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`
-- **Classes:** `ConnectionTest`, `ServletConnection`, `ServletConstants` (plus `TransportCLI`)
+- **Dry Rule:** Depends on `TelemetryLogger`, `HostPersistence`, and `ApiResponse`; consolidates network diagnostics, connection CRUD, and system constants.
+- **Donor:** `C:\SQX-145\internal\plugins\ConnectionTest\ConnectionTest.jar`, `C:\SQX-145\internal\plugins\ServletConnection\ServletConnection.jar`, `C:\SQX-145\internal\plugins\ServletConstants\ServletConstants.jar`
+- **Backend:** `app/host/transport.py` (`🟡 300–480L`, Docstring `<=65L`)
+- **Frontend:** `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`
+- **Class:** `ConnectionTest`, `ServletConnection`, `ServletConstants` (plus `TransportCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-HOST-TRANSPORT-PING`: Ping remote and local server endpoints to verify network connectivity $\rightarrow$ `ConnectionTest.ping_endpoint(url: str, *, timeout_seconds: float = 5.0) -> dict[str, Any]`
   - [ ] `FR-HOST-TRANSPORT-LATENCY`: Measure round-trip latency and report packet loss across probes $\rightarrow$ `ConnectionTest.check_latency(host: str, *, port: int = 443, samples: int = 3) -> dict[str, Any]`
@@ -350,9 +339,10 @@ HaruQuantAI/
 
 #### 12. `app/services/brokers/registry.py` — `ConnectionLiveTest` (`FEAT-BROKER-LIVETEST`)
 
-- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`ConnectionLiveTest`)
-- **Backend Target:** `app/services/brokers/registry.py` (`🟢 <200L`, Docstring `<=45L`)
-- **Frontend Target:** `ui/app/workspace/Trading/TradingDashboard.tsx`
+- **Dry Rule:** Inherits shared transport and lifecycle contracts from `BaseBrokerClient` in `app/services/brokers/base.py`.
+- **Donor:** `C:\SQX-145\internal\plugins\ConnectionLiveTest\ConnectionLiveTest.jar`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.connection.*`)
+- **Backend:** `app/services/brokers/registry.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/workspace/Trading/TradingDashboard.tsx`
 - **Class:** `LiveTest` (plus `LiveTestCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BROKER-LIVETEST-CREDENTIALS`: Validate live broker credentials and API tokens against broker gateways $\rightarrow$ `LiveTest.validate_credentials(provider: str, credentials: Mapping[str, Any]) -> dict[str, Any]`
@@ -361,10 +351,11 @@ HaruQuantAI/
 
 #### 13. `app/services/brokers/metatrader.py` — `ConnectionMT4` / `ConnectionMT5` & `DataSourceMt5Api` (`FEAT-BROKER-MT5`)
 
-- **Donor Path:** [`docs/SQX/overview/data-sources/mt5-import.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/mt5-import.md) (`ConnectionMT4`, `DataSourceMt5Api`)
-- **Backend Target:** `app/services/brokers/metatrader.py` (`🟡 250–400L`, Docstring `<=55L`)
-- **Frontend Target:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`, `ui/app/plugins/data_source/MetaTrader/Mt5ImportModal.tsx`
-- **Classes:** `ConnectionMT5`, `Mt5Api` (inheriting shared transport from `BaseBrokerClient` in `base.py`)
+- **Dry Rule:** Inherits shared transport from `BaseBrokerClient` (`base.py`) and binary history decoding from `_native_history.py`.
+- **Donor:** `C:\SQX-145\internal\plugins\ConnectionMT4\ConnectionMT4.jar`, `C:\SQX-145\internal\plugins\DataSourceMt5Api\DataSourceMt5Api.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.metatrader4.*`)
+- **Backend:** `app/services/brokers/metatrader.py` (`🟡 250–400L`, Docstring `<=55L`)
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`, `ui/app/plugins/data_source/MetaTrader/Mt5ImportModal.tsx`
+- **Class:** `ConnectionMT5`, `Mt5Api`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BROKER-MT5-INIT`: Initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python adapter $\rightarrow$ `ConnectionMT5.initialize(terminal_path: str | None = None, login: int | None = None, server: str | None = None) -> dict[str, Any]`
   - [ ] `FR-BROKER-MT5-ACCOUNT`: Query account balance, equity, leverage, server time, and broker specifications $\rightarrow$ `ConnectionMT5.get_account_info() -> dict[str, Any]`
@@ -375,9 +366,10 @@ HaruQuantAI/
 
 #### 14. `app/services/brokers/ctrader.py` — `ConnectionCTrader` (`FEAT-BROKER-CTRADER`)
 
-- **Donor Path:** [`docs/SQX/overview/data-sources/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/README.md) (`ConnectionCTrader`)
-- **Backend Target:** `app/services/brokers/ctrader.py` (`🟡 250–400L`, Docstring `<=55L`)
-- **Frontend Target:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
+- **Dry Rule:** Inherits shared transport and HTTP retry/rate-limiting from `BaseBrokerClient` and `app/services/brokers/_http.py`.
+- **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.connection.*`), `C:\SQX-145\internal\plugins\ServletConnection\ServletConnection.jar`
+- **Backend:** `app/services/brokers/ctrader.py` (`🟡 250–400L`, Docstring `<=55L`)
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
 - **Class:** `CTraderClient` (plus `CTraderClientCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BROKER-CTRADER-CONNECT`: Authenticate cTrader Open API session and resolve tradable symbol catalog $\rightarrow$ `CTraderClient.connect(credentials: Mapping[str, Any]) -> dict[str, Any]` & `CTraderClient.get_symbols() -> list[dict[str, Any]]`
@@ -386,9 +378,10 @@ HaruQuantAI/
 
 #### 15. `app/services/brokers/simulator.py` — `ConnectionSimulator` (`FEAT-BROKER-SIMULATOR`)
 
-- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) (`ConnectionSimulator`)
-- **Backend Target:** `app/services/brokers/simulator.py` (`🟡 200–350L`, Docstring `<=45L`)
-- **Frontend Target:** `ui/app/workspace/Trading/TradingDashboard.tsx`
+- **Dry Rule:** Inherits shared account/order contracts from `BaseBrokerClient` in `app/services/brokers/base.py`.
+- **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.connection.*`, `com.strategyquant.tradinglib.execution.*`)
+- **Backend:** `app/services/brokers/simulator.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/workspace/Trading/TradingDashboard.tsx`
 - **Class:** `SimulatorClient` (plus `SimulatorClientCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BROKER-SIM-ACCOUNT`: Simulate broker account state, balances, open positions, and pending orders in memory $\rightarrow$ `SimulatorClient.get_account_info() -> dict[str, Any]`
@@ -400,11 +393,11 @@ HaruQuantAI/
 
 #### 16. `app/services/brokers/crypto.py` — Consolidated Crypto Exchange Clients & `DataSourceCrypto` (`FEAT-BROKER-CRYPTO`)
 
-- **Donor Path:** [`docs/SQX/overview/data-sources/crypto-exchanges.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/crypto-exchanges.md) (`CryptoExchangeBinance*`, `Bitfinex`, `CoinbasePro`, `Poloniex`, `DataSourceCrypto`)
-- **Backend Target:** `app/services/brokers/crypto.py` (`🟡 350–500L`, Docstring `<=75L`)
-- **Frontend Target:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
-- **DRY Rule:** All 6 exchange classes inherit shared REST pagination, rate-limiting, and Parquet persistence from `_CryptoBaseClient` + `app/services/brokers/_http.py`.
-- **Classes:** `BinanceSpot`, `BinanceCoinM`, `BinanceUsdtM`, `Bitfinex`, `Coinbase`, `Poloniex`, `Crypto` (plus `CryptoCLI`)
+- **Dry Rule:** All 6 exchange classes inherit shared REST pagination, rate-limiting, and Parquet persistence from `_CryptoBaseClient` + `app/services/brokers/_http.py`.
+- **Donor:** `C:\SQX-145\internal\plugins\CryptoExchangeBinance\CryptoExchangeBinance.jar`, `C:\SQX-145\internal\plugins\CryptoExchangeBinanceCoinM\CryptoExchangeBinanceCoinM.jar`, `C:\SQX-145\internal\plugins\CryptoExchangeBinanceUsdtM\CryptoExchangeBinanceUsdtM.jar`, `C:\SQX-145\internal\plugins\CryptoExchangeBitfinex\CryptoExchangeBitfinex.jar`, `C:\SQX-145\internal\plugins\CryptoExchangeCoinbasePro\CryptoExchangeCoinbasePro.jar`, `C:\SQX-145\internal\plugins\CryptoExchangePoloniex\CryptoExchangePoloniex.jar`, `C:\SQX-145\internal\plugins\DataSourceCrypto\DataSourceCrypto.jar`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.crypto.*`, `com.strategyquant.tradinglib.exchange.*`)
+- **Backend:** `app/services/brokers/crypto.py` (`🟡 350–500L`, Docstring `<=75L`)
+- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
+- **Class:** `BinanceSpot`, `BinanceCoinM`, `BinanceUsdtM`, `Bitfinex`, `Coinbase`, `Poloniex`, `Crypto` (plus `CryptoCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-CRYPTO-BINANCE-INFO`: Fetch Binance spot exchange info, tradable symbols, and price filters $\rightarrow$ `BinanceSpot.get_exchange_info() -> dict[str, Any]`
   - [ ] `FR-CRYPTO-BINANCE-STREAM`: Stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket $\rightarrow$ `BinanceSpot.stream_klines(symbol: str, interval: str = "1m") -> dict[str, Any]`
@@ -437,69 +430,67 @@ HaruQuantAI/
 - **Dependencies:** `AppPlatform` (`Section 1`)
 - **Outputs / Downstream Role:** Consumed by every domain workspace (`Sections 2–17`).
 
-### Phase 1A.1 – 1A.3 Master Donor / Backend / Frontend Alignment Table
-
-| Component                       | Donor Path (`docs/SQX/...`)                                        | Backend Target File (Line Budget)                                                                        | Frontend Target File                                   | DRY Shared Dependencies                                                                   |
-| ------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| `HQTime`                        | `SQLib` `SQTime`                                                   | `app/services/include/time.py` (`🟡 200–350L`)                                                           | N/A                                                    | Microsecond UTC/timezone calendar                                                         |
-| `BarTime`                       | `SQDataLib` `BarTime`                                              | `app/services/include/bar_time.py` (`🟢 <200L`)                                                          | N/A                                                    | `HQTime`                                                                                  |
-| `RandomGenerator`               | `SQLib` `RandomGenerator`                                          | `app/services/include/generators.py` (`🟢 <200L`)                                                        | N/A                                                    | Deterministic `SplitMix64` / `XorShift128+`                                               |
-| `Contracts` & `Enums`           | `SQTradingLib` DTOs & Enums                                        | `app/services/include/contracts.py` (`🟢 <200L`), `enums.py` (`🟢 <200L`), `trading.py` (`🟡 200–350L`)  | N/A                                                    | Immutable frozen dataclasses                                                              |
-| `DataSeries`                    | `SQDataLib` `DataSeries` / `HistoryDataLoader`                     | `app/services/include/data.py` (`🟡 250–400L`)                                                           | N/A                                                    | NumPy / PyArrow zero-copy buffers                                                         |
-| `SignalInclude`                 | `SQTradingLib` Actions, Comparisons, Functions, Price, Types       | `app/services/include/{actions,comparisons,functions,price,types}.py` (each `🟢 <200L` to `🟡 200–350L`) | N/A                                                    | Single class per module (zero duplicate top-level wrappers)                               |
-| `BaseIndicator` + 69 Indicators | `SQTradingLib` Indicators (69 classes)                             | `app/services/indicators/base.py` (`🟡 200–300L`) + 69 files (`🟢 <150L` each)                           | `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx` | All 8 condition methods (`is_rising`, `crosses_above`, etc.) live once on `BaseIndicator` |
-| `BacktestSimulationEngine`      | `SQTradingLib` Simulator, Precision, Platforms, Orders, Accounting | `app/services/engine/{simulator,precision,platforms,orders,accounting}.py` (each `🟡 200–400L`)          | N/A                                                    | `DataSeries`, `OrderRecord`, `TradeRecord`                                                |
-| `CorePersistenceFormats`        | `.cfx`, `.sqx`, `.sq4`, `.sq3`, `.dat` Codecs (`custom-projects/`) | `app/services/engine/formats.py` (`🟡 250–400L`)                                                         | N/A                                                    | PyArrow Parquet + `zipfile` XML AST codecs                                                |
-
 ---
 
 ### Phase 1A.1: Core Primitives, Data Contracts & Signal Building Blocks (`app/services/include/`)
 
 #### 1. `app/services/include/time.py` — `HQTime` (`FEAT-INCLUDE-TIME`)
 
-- **Donor Path:** [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`com.strategyquant.lib.SQTime`)
-- **Backend Target:** `app/services/include/time.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Dry Rule:** Single source of truth for microsecond UTC/timezone calendar arithmetic across all services and workspaces.
+- **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.SQTime`), `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.timezone.*`, `com.strategyquant.datalib.session.*`)
+- **Backend:** `app/services/include/time.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Frontend:** N/A (Core backend primitive)
 - **Class:** `HQTime`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-INCLUDE-TIME-ARITHMETIC`: Perform microsecond-exact timestamp arithmetic, timezone shifts, and session boundary checks $\rightarrow$ `HQTime.convert_timezone(timestamp_us: int, from_tz: str, to_tz: str) -> int`, `HQTime.add_interval(timestamp_us: int, unit: str, amount: int) -> int`, `HQTime.is_within_session(timestamp_us: int, session_open_min: int, session_close_min: int) -> bool`
 
 #### 2. `app/services/include/bar_time.py` — `BarTime` (`FEAT-INCLUDE-BARTIME`)
 
-- **Donor Path:** [`docs/SQX/libs/SQDataLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQDataLib.md) (`com.strategyquant.datalib.BarTime`)
-- **Backend Target:** `app/services/include/bar_time.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Dry Rule:** Depends on `HQTime`; centralizes bar open/close boundary alignment across all timeframes.
+- **Donor:** `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.timeframe.*`, `com.strategyquant.datalib.bartype.*`)
+- **Backend:** `app/services/include/bar_time.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** N/A (Core backend primitive)
 - **Class:** `BarTime`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-INCLUDE-BARTIME-ALIGN`: Align intraday, daily, weekly, and monthly bar open/close boundaries $\rightarrow$ `BarTime.floor_bar_time(timestamp_us: int, timeframe: str) -> int`, `BarTime.ceil_bar_time(timestamp_us: int, timeframe: str) -> int`, `BarTime.timeframe_seconds(timeframe: str) -> int`
 
 #### 3. `app/services/include/generators.py` — `RandomGenerator` (`FEAT-INCLUDE-RNG`)
 
-- **Donor Path:** [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`com.strategyquant.lib.RandomGenerator`)
-- **Backend Target:** `app/services/include/generators.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Dry Rule:** Deterministic `SplitMix64` / `XorShift128+` PRNG shared by genetic evolution, Monte Carlo, and SPP engines.
+- **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.IRandomGenerator`, `com.strategyquant.lib.RandomGenerator`)
+- **Backend:** `app/services/include/generators.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** N/A (Core backend primitive)
 - **Class:** `RandomGenerator`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-INCLUDE-RNG-STREAM`: Generate reproducible pseudo-random streams (`XorShift128+` / `SplitMix64`) for genetic evolution and Monte Carlo permutations $\rightarrow$ `RandomGenerator.next_float(low: float = 0.0, high: float = 1.0) -> float`, `RandomGenerator.next_int(low: int, high: int) -> int`, `RandomGenerator.permutation(length: int) -> np.ndarray`
 
 #### 4. `app/services/include/data.py` — `DataSeries` & `HistoryDataLoader` (`FEAT-INCLUDE-DATA`)
 
-- **Donor Path:** [`docs/SQX/libs/SQDataLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQDataLib.md) (`com.strategyquant.datalib.DataSeries`, `HistoryDataLoader`)
-- **Backend Target:** `app/services/include/data.py` (`🟡 250–400L`, Docstring `<=50L`)
-- **Classes:** `DataSeries`, `HistoryDataLoader`
+- **Dry Rule:** Shared NumPy/PyArrow zero-copy columnar OHLCV bar series and Parquet history loader for all indicators and engines.
+- **Donor:** `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.DataSeries`, `com.strategyquant.datalib.dataseries.*`, `com.strategyquant.datalib.historyData.*`)
+- **Backend:** `app/services/include/data.py` (`🟡 250–400L`, Docstring `<=50L`)
+- **Frontend:** N/A (Core backend primitive)
+- **Class:** `DataSeries`, `HistoryDataLoader`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-INCLUDE-DATA-SERIES`: Provide zero-copy NumPy/PyArrow columnar OHLCV bar series, reverse-indexed shift access, and tick buffers $\rightarrow$ `DataSeries.from_arrays(timestamps: np.ndarray, opens: np.ndarray, highs: np.ndarray, lows: np.ndarray, closes: np.ndarray, volumes: np.ndarray, *, symbol: str = "", timeframe: str = "H1") -> DataSeries` & `HistoryDataLoader.load_parquet(file_path: Path | str) -> DataSeries`
 
 #### 5. `app/services/include/contracts.py`, `enums.py`, `trading.py` — Domain Contracts (`FEAT-INCLUDE-TRADING`)
 
-- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) (`SQTradingLib` Order/Trade DTOs and Enums)
-- **Backend Targets:** `contracts.py` (`🟢 <200L`), `enums.py` (`🟢 <200L`), `trading.py` (`🟡 200–350L`)
-- **Classes:** `OrderRecord`, `TradeRecord`, `PositionState`, `ExecutionReport`
+- **Dry Rule:** Immutable frozen dataclasses and canonical trading enums shared across simulation, brokers, and results analysis.
+- **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.Order`, `com.strategyquant.tradinglib.OrdersList`, `com.strategyquant.tradinglib.Trader`, `com.strategyquant.tradinglib.consts.*`)
+- **Backend:** `app/services/include/contracts.py` (`🟢 <200L`), `app/services/include/enums.py` (`🟢 <200L`), `app/services/include/trading.py` (`🟡 200–350L`)
+- **Frontend:** N/A (Core backend contracts)
+- **Class:** `OrderRecord`, `TradeRecord`, `PositionState`, `ExecutionReport`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-INCLUDE-TRADING-CONTRACTS`: Construct and validate immutable order, fill, position, trade, and execution records $\rightarrow$ `OrderRecord.create(symbol: str, direction: str, order_type: str, lots: float, price: float, *, stop_loss: float = 0.0, profit_target: float = 0.0, magic_number: int = 0, comment: str = "") -> OrderRecord` & `TradeRecord.from_closed_order(order: OrderRecord, close_time_us: int, close_price: float, gross_pnl: float, commission: float, swap: float) -> TradeRecord`
 
 #### 6. `app/services/include/{comparisons,functions,price,actions,types}.py` — `CoreSignalAndMathInclude` (`FEAT-INCLUDE-SIGNAL`)
 
-- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) (`SQTradingLib` Actions, Comparisons, Functions, Price, Types)
-- **Backend Targets:** Each file `🟢 <200L` to `🟡 200–350L` (zero module-level duplicate functions; single class per file)
-- **Classes:** `Comparisons`, `Functions`, `Price`, `Actions`, `Types`
+- **Dry Rule:** Single class per module with zero duplicate module-level wrapper functions; shared across snippets, indicators, and rule compilers.
+- **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\Comparisons\`, `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\Functions\`, `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\Price\`, `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\OtherActions\`, `C:\SQX-145\internal\extend\Snippets\SQ\Functions\`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.blocks.*`, `com.strategyquant.tradinglib.Variable.*`)
+- **Backend:** `app/services/include/{comparisons,functions,price,actions,types}.py` (each `🟢 <200L` to `🟡 200–350L`)
+- **Frontend:** N/A (Core backend signal primitives)
+- **Class:** `Comparisons`, `Functions`, `Price`, `Actions`, `Types`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-INCLUDE-COMPARISONS`: Evaluate tick-size-aware equality, crossovers, and directional conditions (`comparisons.py`) $\rightarrow$ `Comparisons.crosses_above(series_a: np.ndarray, series_b: np.ndarray | float, shift: int = 0) -> bool`, `Comparisons.crosses_below(series_a: np.ndarray, series_b: np.ndarray | float, shift: int = 0) -> bool`, `Comparisons.is_equal_fuzzy(val_a: float, val_b: float, tick_size: float = 1e-5) -> bool`
   - [ ] `FR-INCLUDE-FUNCTIONS`: Execute bar-window statistical aggregations, linear regression slopes, and safe division (`functions.py`) $\rightarrow$ `Functions.highest_in_range(series: np.ndarray, period: int, shift: int = 0) -> float`, `Functions.lowest_in_range(series: np.ndarray, period: int, shift: int = 0) -> float`, `Functions.linreg_slope(series: np.ndarray, period: int, shift: int = 0) -> float`, `Functions.safe_divide(numerator: float, denominator: float, fallback: float = 0.0) -> float`
@@ -513,16 +504,11 @@ HaruQuantAI/
 
 #### 7. `app/services/indicators/base.py` & 6 Category Packages — `CoreIndicatorLibrary` (`FEAT-INDICATORS`)
 
-- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) & [`docs/SQX/overview/snippets/building-blocks/indicators.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/snippets/building-blocks/indicators.md) (69 Indicators)
-- **Backend Targets:**
-  - `app/services/indicators/base.py` (`🟡 200–300L`): `BaseIndicator`
-  - `app/services/indicators/momentum/` (18 files, each `🟢 <150L`): `RSI`, `CCI`, `Stochastic`, `Momentum`, `WilliamsR`, `MACD`, `DeMarker`, `ROC`, `Reflex`, `Trendflex`, `LaguerreRSI`, `QQE`, `BearsPower`, `BullsPower`, `AwesomeOscillator`, `AcceleratorOscillator`, `TSI`, `UltimateOscillator`
-  - `app/services/indicators/price_action/` (11 files, each `🟢 <150L`): `Fractals`, `HeikenAshi`, `Highest`, `Lowest`, `Pivots`, `FibPivots`, `CamarillaPivots`, `SessionOhlc`, `Ichimoku`, `ZigZag`, `PriceChannel`
-  - `app/services/indicators/regime/` (9 files, each `🟢 <150L`): `ADX`, `ADXR`, `Aroon`, `ChopIndex`, `Hurst`, `MarketFacilitationIndex`, `Vortex`, `GannHiLo`, `EfficiencyRatio`
-  - `app/services/indicators/trend/` (14 files, each `🟢 <150L`): `SMA`, `EMA`, `SMMA`, `LWMA`, `TEMA`, `DEMA`, `HullMA`, `KAMA`, `ALMA`, `SuperTrend`, `ParabolicSAR`, `LinearRegression`, `Alligator`, `GatorOscillator`
-  - `app/services/indicators/volatility/` (9 files, each `🟢 <150L`): `ATR`, `TrueRange`, `BollingerBands`, `KeltnerChannel`, `DonchianChannel`, `StandardDeviation`, `UlcerIndex`, `BBWidthRatio`, `ChaikinVolatility`
-  - `app/services/indicators/volume/` (9 files, each `🟢 <150L`): `OBV`, `MFI`, `ChaikinMoneyFlow`, `AccumulationDistribution`, `ForceIndex`, `EaseOfMovement`, `VolumeOscillator`, `VWAP`, `TickVolume`
-- **DRY Rule:** `BaseIndicator` implements the 8 shared signal condition methods (`is_rising`, `is_falling`, `crosses_above`, `crosses_below`, `is_higher`, `is_lower`, `changes_up`, `changes_down`) once. Concrete indicator classes implement `calculate(cls, data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]` and inherit the 8 condition methods automatically.
+- **Dry Rule:** `BaseIndicator` implements the 8 shared signal condition methods (`is_rising`, `is_falling`, `crosses_above`, `crosses_below`, `is_higher`, `is_lower`, `changes_up`, `changes_down`) once. Concrete indicator classes implement `calculate(cls, data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]` and inherit the 8 condition methods automatically.
+- **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\Indicators\`, `C:\SQX-145\internal\extend\Snippets\SQ\TALibIndicators\`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.indicators.*`), `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.indicators.*`)
+- **Backend:** `app/services/indicators/base.py` (`🟡 200–300L`), `app/services/indicators/momentum/` (18 files, each `🟢 <150L`), `app/services/indicators/price_action/` (11 files, each `🟢 <150L`), `app/services/indicators/regime/` (9 files, each `🟢 <150L`), `app/services/indicators/trend/` (14 files, each `🟢 <150L`), `app/services/indicators/volatility/` (9 files, each `🟢 <150L`), `app/services/indicators/volume/` (9 files, each `🟢 <150L`)
+- **Frontend:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
+- **Class:** `BaseIndicator`; Momentum (`RSI`, `CCI`, `Stochastic`, `Momentum`, `WilliamsR`, `MACD`, `DeMarker`, `ROC`, `Reflex`, `Trendflex`, `LaguerreRSI`, `QQE`, `BearsPower`, `BullsPower`, `AwesomeOscillator`, `AcceleratorOscillator`, `TSI`, `UltimateOscillator`); Price Action (`Fractals`, `HeikenAshi`, `Highest`, `Lowest`, `Pivots`, `FibPivots`, `CamarillaPivots`, `SessionOhlc`, `Ichimoku`, `ZigZag`, `PriceChannel`); Regime (`ADX`, `ADXR`, `Aroon`, `ChopIndex`, `Hurst`, `MarketFacilitationIndex`, `Vortex`, `GannHiLo`, `EfficiencyRatio`); Trend (`SMA`, `EMA`, `SMMA`, `LWMA`, `TEMA`, `DEMA`, `HullMA`, `KAMA`, `ALMA`, `SuperTrend`, `ParabolicSAR`, `LinearRegression`, `Alligator`, `GatorOscillator`); Volatility (`ATR`, `TrueRange`, `BollingerBands`, `KeltnerChannel`, `DonchianChannel`, `StandardDeviation`, `UlcerIndex`, `BBWidthRatio`, `ChaikinVolatility`); Volume (`OBV`, `MFI`, `ChaikinMoneyFlow`, `AccumulationDistribution`, `ForceIndex`, `EaseOfMovement`, `VolumeOscillator`, `VWAP`, `TickVolume`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-IND-BASE-CONDITIONS`: Evaluate universal indicator signal conditions on any calculated indicator buffer $\rightarrow$ `BaseIndicator.is_rising(buffer: np.ndarray, shift: int = 0, bars: int = 1) -> bool`, `BaseIndicator.is_falling(buffer: np.ndarray, shift: int = 0, bars: int = 1) -> bool`, `BaseIndicator.crosses_above(buffer: np.ndarray, target: np.ndarray | float, shift: int = 0) -> bool`, `BaseIndicator.crosses_below(buffer: np.ndarray, target: np.ndarray | float, shift: int = 0) -> bool`, `BaseIndicator.is_higher(buffer: np.ndarray, target: np.ndarray | float, shift: int = 0) -> bool`, `BaseIndicator.is_lower(buffer: np.ndarray, target: np.ndarray | float, shift: int = 0) -> bool`, `BaseIndicator.changes_up(buffer: np.ndarray, shift: int = 0) -> bool`, `BaseIndicator.changes_down(buffer: np.ndarray, shift: int = 0) -> bool`
   - [ ] `FR-IND-MOMENTUM`: Compute all 18 momentum oscillators $\rightarrow$ `<IndicatorClass>.calculate(data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]`
@@ -538,13 +524,11 @@ HaruQuantAI/
 
 #### 8. `app/services/engine/{simulator,precision,platforms,orders,accounting}.py` — `BacktestSimulationEngine` (`FEAT-ENGINE-SIM`)
 
-- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) & [`docs/SQX/trading/workflow.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/trading/workflow.md) (Backtest Simulation Kernel)
-- **Backend Targets:**
-  - `app/services/engine/precision.py` (`🟡 200–350L`): `PrecisionSynthesizer`
-  - `app/services/engine/platforms.py` (`🟡 200–350L`): `PlatformExecutionProfile`
-  - `app/services/engine/orders.py` (`🟡 250–400L`): `OrderStateMachine`
-  - `app/services/engine/accounting.py` (`🟡 200–350L`): `AccountLedger`
-  - `app/services/engine/simulator.py` (`🟡 250–400L`): `BacktestSimulator`
+- **Dry Rule:** Reuses `DataSeries`, `OrderRecord`, and `TradeRecord` from `app/services/include/`; single backtest execution kernel for Builder, Retester, Optimizer, and Portfolio workspaces.
+- **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.engine.*`, `com.strategyquant.tradinglib.backtest.*`, `com.strategyquant.tradinglib.backtestrunner.*`, `com.strategyquant.tradinglib.execution.*`, `com.strategyquant.tradinglib.commissions.*`, `com.strategyquant.tradinglib.atm.*`), `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.ticksimulator.*`), `C:\SQX-145\internal\extend\Snippets\SQ\Trading\`
+- **Backend:** `app/services/engine/precision.py` (`🟡 200–350L`), `app/services/engine/platforms.py` (`🟡 200–350L`), `app/services/engine/orders.py` (`🟡 250–400L`), `app/services/engine/accounting.py` (`🟡 200–350L`), `app/services/engine/simulator.py` (`🟡 250–400L`)
+- **Frontend:** N/A (Core simulation kernel)
+- **Class:** `PrecisionSynthesizer`, `PlatformExecutionProfile`, `OrderStateMachine`, `AccountLedger`, `BacktestSimulator`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-ENGINE-PRECISION-TICKS`: Generate synthetic or real tick sequences across all 4 Precision Modes + Open Prices (`Selected TF`, `1M Data Tick Sim`, `Real Tick Custom Spread`, `Real Tick Real Spread`, `Open Prices`) $\rightarrow$ `PrecisionSynthesizer.generate_ticks(bars: DataSeries, mode: str, *, custom_spread_pips: float = 1.0, minute_bars: DataSeries | None = None, real_ticks: DataSeries | None = None) -> dict[str, np.ndarray]`
   - [ ] `FR-ENGINE-PLATFORMS-ROUTE`: Validate and route orders under all 7 Execution Platform Profiles (`MT4`, `MT5_HEDGED`, `MT5_NETTED`, `TRADESTATION`, `MULTICHARTS`, `NINJATRADER`, `JFOREX`) + `STOCKPICKER` $\rightarrow$ `PlatformExecutionProfile.validate_and_route(order: OrderRecord, platform: str, open_positions: Sequence[OrderRecord], *, stops_level_pips: float = 0.0, freeze_level_pips: float = 0.0) -> dict[str, Any]`
@@ -555,9 +539,11 @@ HaruQuantAI/
 
 #### 9. `app/services/engine/formats.py` — `CorePersistenceFormats` (`FEAT-ENGINE-FORMATS`)
 
-- **Donor Path:** [`docs/SQX/custom-projects/cfx-format.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/custom-projects/cfx-format.md) & [`docs/SQX/overview/data-sources/export-formats.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/export-formats.md) (`.cfx`, `.sqx`, `.sq4`, `.sq3`, `.dat` Codecs)
-- **Backend Target:** `app/services/engine/formats.py` (`🟡 250–400L`, Docstring `<=55L`)
-- **Classes:** `ProjectArchiveCodec`, `StrategyArchiveCodec`, `MarketDataFormatCodec`
+- **Dry Rule:** Centralizes PyArrow Parquet + `zipfile` XML AST codecs for `.cfx`, `.sqx`, `.sq4`, `.sq3`, and `.dat` archives across all workspaces.
+- **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.project.*`, `com.strategyquant.tradinglib.StrategyBase.*`), `C:\SQX-145\internal\plugins\LoaderSQ3\LoaderSQ3.jar`, `C:\SQX-145\internal\plugins\LoaderSQ4\LoaderSQ4.jar`, `C:\SQX-145\internal\plugins\SaverSQ3\SaverSQ3.jar`, `C:\SQX-145\user\projects\`, `C:\SQX-145\user\strategies\`, `C:\SQX-145\user\data\`
+- **Backend:** `app/services/engine/formats.py` (`🟡 250–400L`, Docstring `<=55L`)
+- **Frontend:** N/A (Core persistence codec service)
+- **Class:** `ProjectArchiveCodec`, `StrategyArchiveCodec`, `MarketDataFormatCodec`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-ENGINE-FORMATS-CFX`: Read and write `.cfx` Custom Project / Template ZIP archives (`config.xml` + `<TaskType>-Task<N>.xml` manifests) $\rightarrow$ `ProjectArchiveCodec.load_cfx(file_path: Path | str) -> dict[str, Any]` & `ProjectArchiveCodec.save_cfx(file_path: Path | str, project_manifest: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-ENGINE-FORMATS-SQX`: Read and write `.sqx` Strategy ZIP archives (`strategy.xml`, `sourceCode.txt`, backtest payloads), `.sq4` XML strategies, and `.sq3` legacy binary strategies $\rightarrow$ `StrategyArchiveCodec.load_sqx(file_path: Path | str) -> dict[str, Any]` & `StrategyArchiveCodec.save_sqx(file_path: Path | str, strategy_payload: Mapping[str, Any]) -> dict[str, Any]`
@@ -571,40 +557,38 @@ HaruQuantAI/
 - **Dependencies:** Core Libraries & Simulation Engine (`Section 1A`)
 - **Outputs / Downstream Role:** Supplies building blocks, position sizing, exit rules, Monte Carlo perturbations, What-If filters, databank/trade columns, fitness formulas, and platform source-code generators to all workspaces.
 
-### Phase 1B.1 – 1B.3 Master Donor / Backend / Frontend Alignment Table
-
-| Component                             | Donor Path (`docs/SQX/...`)                                                                                                                                  | Backend Target File (Line Budget)                                                                                                                                   | Frontend Target File                                       | DRY Shared Dependencies                            |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------- |
-| `SnippetBuildingBlocksAndCatalogs`    | `Snippets/SQ/Blocks/*`, `internal/ctemplate/*.xml`                                                                                                           | `app/services/snippets/blocks.py` (`🟡 300–450L`)                                                                                                                   | `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`  | `CoreIndicatorLibrary`, `CoreSignalAndMathInclude` |
-| `SnippetMoneyManagement`              | `Snippets/SQ/MoneyManagement/*` (12 models)                                                                                                                  | `app/services/snippets/money_management.py` (`🟡 200–350L`)                                                                                                         | `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx` | `Actions.normalize_lots`                           |
-| `SnippetExitMethodsAndTradingOptions` | `Snippets/SQ/ExitMethods/*` (5), `TradingOptions/*` (8)                                                                                                      | `app/services/snippets/exit_methods.py` (`🟢 <200L`), `app/services/snippets/trading_options.py` (`🟡 200–300L`)                                                    | `ui/app/workspace/Builder/settings/TradingOptionsTab.tsx`  | `OrderStateMachine`, `HQTime`                      |
-| `SnippetMonteCarloAndWhatIf`          | `Snippets/SQ/MonteCarlo/*` (14), `WhatIf/*` (15)                                                                                                             | `app/services/snippets/monte_carlo.py` (`🟡 250–400L`), `app/services/snippets/what_if.py` (`🟡 250–400L`)                                                          | `ui/app/workspace/Retester/views/WhatIfModal.tsx`          | `RandomGenerator`, `BacktestSimulator`             |
-| `SnippetColumnsChartsAndFormulas`     | `Snippets/SQ/Columns/*` (~158), `Charts/*` (41), `CorrelationOf/*` (6), `Fitness/*` (3), `Formulas/*` (19), `Negaters/*` (15), `Checkers`/`Calculators` (10) | `app/services/snippets/{columns,charts,correlation,fitness,formulas,negaters,checkers_calculators}.py` (each `🟢 <200L` to `🟡 250–450L`)                           | `ui/app/workspace/Results/ResultsWorkspace.tsx`            | NumPy vectorized metric calculators                |
-| `PlatformCodeExporters`               | `internal/extend/Code/*` (MQL4, MQL5, EasyLanguage, NinjaScript, JForex, PseudoCode, CustomIndicators)                                                       | `app/services/codegen/{template_engine,easylanguage,jforex,metatrader4,metatrader5,ninjatrader,pseudocode,custom_indicators}.py` (each `🟢 <200L` to `🟡 200–350L`) | `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`  | Shared AST walker in `template_engine.py`          |
-
 ---
 
 ### Phase 1B.1: Strategy Building Blocks, Sizing & Execution Snippets (`app/services/snippets/`)
 
 #### 1. `app/services/snippets/blocks.py` — `SnippetBuildingBlocksAndCatalogs` (`FEAT-SNIPPETS-BLOCKS`)
 
-- **Backend Target:** `app/services/snippets/blocks.py` (`🟡 300–450L`, Docstring `<=50L`)
-- **Classes:** `BlockRegistry`, `CatalogTemplateLoader`
+- **Dry Rule:** Reuses `CoreIndicatorLibrary` (`app/services/indicators/`) and `CoreSignalAndMathInclude` (`app/services/include/`); serves all block definitions and XML templates to AlgoWizard and Builder.
+- **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\` (`BarAndTime\`, `CandlePatterns\`, `Comparisons\`, `Functions\`, `Indicators\`, `Order\`, `Other\`, `OtherActions\`, `Price\`, `StrategyControl\`), `C:\SQX-145\internal\ctemplate\` (`actions.xml`, `advancedTypes.xml`, `colors.xml`, `comparisons.xml`, `conditions.xml`, `config.xml`, `datasTimeframes.xml`, `events.xml`, `moneyManagement.xml`, `parameterSets.xml`, `talibs.xml`, `values.xml`, `wizard.xml`)
+- **Backend:** `app/services/snippets/blocks.py` (`🟡 300–450L`, Docstring `<=50L`)
+- **Frontend:** `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`
+- **Class:** `BlockRegistry`, `CatalogTemplateLoader`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-SNIPPETS-BLOCKS-REGISTER`: Register all 10 building block families (`Indicators`, `Price`, `BarAndTime`, `Comparisons`, `StrategyControl`, `Functions`, `Order`, `OtherActions`, `CandlePatterns`, `Variables`) $\rightarrow$ `BlockRegistry.load_all_blocks(category: str | None = None) -> dict[str, Any]`
   - [ ] `FR-SNIPPETS-BLOCKS-CATALOGS`: Parse and serve the 12 block/template catalogs (`config`, `conditions`, `values`, `actions`, `comparisons`, `events`, `talibs`, `wizard`, `moneyManagement`, `parameterSets`, `datasTimeframes`, `advancedTypes`) and build rule templates $\rightarrow$ `CatalogTemplateLoader.load_catalogs(catalog_name: str | None = None) -> dict[str, Any]`
 
 #### 2. `app/services/snippets/money_management.py` — `SnippetMoneyManagement` (`FEAT-SNIPPETS-MM`)
 
-- **Backend Target:** `app/services/snippets/money_management.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Dry Rule:** Delegates lot rounding and step clamping to `Actions.normalize_lots` (`app/services/include/actions.py`).
+- **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\MoneyManagement\`, `C:\SQX-145\internal\ctemplate\moneyManagement.xml`
+- **Backend:** `app/services/snippets/money_management.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx`
 - **Class:** `MoneyManagementEngine`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-SNIPPETS-MM-COMPUTE`: Compute trade order size across all 12 money management models (`FixedSize`, `FixedAmount`, `RiskFixedPctOfAccount`, `RiskFixedBalancePct`, `ATRRiskBasedSizing`, `SimpleMartingaleMM`, `StocksSizeByPrice`, `CryptoSizeByPrice`, `CryptoRiskFixedPctOfAccount`, `CryptoRiskFixedBalancePct`, `PickerFixedAmount`, `PickerRiskFixedPctOfAccount`) $\rightarrow$ `MoneyManagementEngine.compute_lots(model: str, account_state: Mapping[str, float], trade_params: Mapping[str, float]) -> dict[str, Any]`
 
 #### 3. `app/services/snippets/exit_methods.py` & `trading_options.py` — `SnippetExitMethodsAndTradingOptions` (`FEAT-SNIPPETS-EXITS`)
 
-- **Backend Targets:** `exit_methods.py` (`🟢 <200L`), `trading_options.py` (`🟡 200–300L`)
-- **Classes:** `ExitMethodEvaluator`, `TradingOptionEnforcer`
+- **Dry Rule:** Integrates with `OrderStateMachine` (`app/services/engine/orders.py`) and `HQTime` (`app/services/include/time.py`) for intrabar exits and session enforcement.
+- **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\ExitMethods\`, `C:\SQX-145\internal\extend\Snippets\SQ\TradingOptions\`, `C:\SQX-145\internal\extend\Snippets\SQ\RiskManagement\`
+- **Backend:** `app/services/snippets/exit_methods.py` (`🟢 <200L`), `app/services/snippets/trading_options.py` (`🟡 200–300L`)
+- **Frontend:** `ui/app/workspace/Builder/settings/TradingOptionsTab.tsx`
+- **Class:** `ExitMethodEvaluator`, `TradingOptionEnforcer`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-SNIPPETS-EXITS-APPLY`: Evaluate modular exit methods (`StopLoss`, `ProfitTarget`, `TrailingStop`, `MoveSL2BE`, `ExitAfterBars`) per open trade $\rightarrow$ `ExitMethodEvaluator.apply_exits(open_trade: Mapping[str, Any], bar: Mapping[str, float], exit_config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-SNIPPETS-OPTIONS-ENFORCE`: Enforce the 8 session and risk trading options (`DontTradeOnWeekends`, `ExitAtEndOfDay`, `ExitOnFriday`, `LimitTimeRange`, `MaxDistanceFromMarket`, `MaxTradesPerDay`, `MinMaxSLPT`, `UseInitialSLPT`) $\rightarrow$ `TradingOptionEnforcer.enforce_options(timestamp_us: int, open_trades: Sequence[Mapping[str, Any]], candidate_order: Mapping[str, Any] | None, options_config: Mapping[str, Any]) -> dict[str, Any]`
@@ -615,8 +599,11 @@ HaruQuantAI/
 
 #### 4. `app/services/snippets/monte_carlo.py` & `what_if.py` — `SnippetMonteCarloAndWhatIf` (`FEAT-SNIPPETS-MC-WHATIF`)
 
-- **Backend Targets:** `monte_carlo.py` (`🟡 250–400L`), `what_if.py` (`🟡 250–400L`)
-- **Classes:** `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`
+- **Dry Rule:** Reuses `RandomGenerator` (`app/services/include/generators.py`) and `BacktestSimulator` (`app/services/engine/simulator.py`); consumed by Retester, Results plugins, and MTAnalyzer.
+- **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\MonteCarlo\`, `C:\SQX-145\internal\extend\Snippets\SQ\WhatIf\`
+- **Backend:** `app/services/snippets/monte_carlo.py` (`🟡 250–400L`), `app/services/snippets/what_if.py` (`🟡 250–400L`)
+- **Frontend:** `ui/app/workspace/Retester/views/WhatIfModal.tsx`
+- **Class:** `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-SNIPPETS-MC-MANIPULATE`: Execute the 5 fast trade-manipulation Monte Carlo methods (`RandomizeTradesOrder`, `RandomizeSkipTrades`, `RandomizeStartDate`, `RandomizeHistoryData`, `RandomizeCommon`) $\rightarrow$ `MonteCarloManipulator.run_simulation(trades: Sequence[Mapping[str, Any]], method: str, iterations: int = 100, *, seed: int = 42, params: Mapping[str, Any] | None = None) -> dict[str, Any]`
   - [ ] `FR-SNIPPETS-MC-RETEST`: Execute the 9 full-retest Monte Carlo perturbation methods (`RandomizeStrategyParameters`, `RandomizeSlippage`, `RandomizeSpread`, `RandomizeMinDistance`, `RandomizeIndicatorParameters`, `RandomizeBacktestStart`, `RandomizeHistoryData` volatility/noise) $\rightarrow$ `MonteCarloRetester.run_retest_simulation(strategy_spec: Mapping[str, Any], bars: DataSeries, method: str, iterations: int = 50, *, seed: int = 42, params: Mapping[str, Any] | None = None) -> dict[str, Any]`
@@ -624,8 +611,11 @@ HaruQuantAI/
 
 #### 5. `app/services/snippets/{columns,charts,correlation,fitness,formulas,negaters,checkers_calculators}.py` — `SnippetColumnsChartsAndFormulas` (`FEAT-SNIPPETS-METRICS`)
 
-- **Backend Targets:** 7 focused modules (`🟢 <200L` to `🟡 250–450L` each)
-- **Classes:** `ColumnRegistry`, `ChartSnippetRegistry`, `CorrelationAndFitnessRegistry`, `FormulaAndNegaterRegistry`
+- **Dry Rule:** Vectorized NumPy metric and chart series calculators shared across Results, Builder rankings, Retester, Optimizer, Portfolio, and MTAnalyzer.
+- **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\Columns\`, `C:\SQX-145\internal\extend\Snippets\SQ\TradeAnalysis\`, `C:\SQX-145\internal\extend\Snippets\SQ\EngineCharts\`, `C:\SQX-145\internal\extend\Snippets\SQ\CorrelationOf\`, `C:\SQX-145\internal\extend\Snippets\SQ\PortfolioMasterFitness\`, `C:\SQX-145\internal\extend\Snippets\SQ\Formulas\`, `C:\SQX-145\internal\extend\Snippets\SQ\Negater\`, `C:\SQX-145\internal\extend\Snippets\SQ\Checker\`, `C:\SQX-145\internal\extend\Snippets\SQ\Calculators\`, `C:\SQX-145\internal\extend\Snippets\SQ\Stats\`
+- **Backend:** `app/services/snippets/{columns,charts,correlation,fitness,formulas,negaters,checkers_calculators}.py` (each `🟢 <200L` to `🟡 250–450L`)
+- **Frontend:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+- **Class:** `ColumnRegistry`, `ChartSnippetRegistry`, `CorrelationAndFitnessRegistry`, `FormulaAndNegaterRegistry`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-SNIPPETS-COLUMNS-EVAL`: Compute all ~120 Databank performance metrics, 30 per-trade columns, and 8 Walk-Forward columns (`columns.py`) $\rightarrow$ `ColumnRegistry.evaluate_columns(trades: Sequence[Mapping[str, Any]], *, initial_capital: float = 10000.0, columns: Sequence[str] | None = None) -> dict[str, Any]`
   - [ ] `FR-SNIPPETS-CHARTS-SERIES`: Generate data series for all 27 TradeAnalysis charts and 14 live EngineCharts (`charts.py`) $\rightarrow$ `ChartSnippetRegistry.build_chart_series(trades: Sequence[Mapping[str, Any]], chart_type: str = "equity") -> dict[str, Any]`
@@ -638,8 +628,11 @@ HaruQuantAI/
 
 #### 6. `app/services/codegen/{template_engine,easylanguage,jforex,metatrader4,metatrader5,ninjatrader,pseudocode,custom_indicators}.py` — `PlatformCodeExporters` (`FEAT-CODEGEN`)
 
-- **Backend Targets:** 8 focused modules (`🟢 <200L` to `🟡 200–350L` each), sharing `CodegenTemplateEngine` in `template_engine.py`
-- **Classes:** `CodegenTemplateEngine`, `MetaTrader4Exporter`, `MetaTrader5Exporter`, `EasyLanguageExporter`, `NinjaTraderExporter`, `JForexExporter`, `PseudoCodeExporter`, `CustomIndicatorPackager`
+- **Dry Rule:** All 6 platform exporters share the canonical AST normalizer and walker in `CodegenTemplateEngine` (`app/services/codegen/template_engine.py`).
+- **Donor:** `C:\SQX-145\internal\extend\Code\` (`global\`, `EasyLanguage\`, `JForex\`, `MetaTrader4\`, `MetaTrader5\`, `NinjaTrader\`, `PseudoCode\`), `C:\SQX-145\custom_indicators\`, `C:\SQX-145\COT\`, `C:\SQX-145\VolumeProfile\`
+- **Backend:** `app/services/codegen/{template_engine,easylanguage,jforex,metatrader4,metatrader5,ninjatrader,pseudocode,custom_indicators}.py` (each `🟢 <200L` to `🟡 200–350L`)
+- **Frontend:** `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`
+- **Class:** `CodegenTemplateEngine`, `MetaTrader4Exporter`, `MetaTrader5Exporter`, `EasyLanguageExporter`, `NinjaTraderExporter`, `JForexExporter`, `PseudoCodeExporter`, `CustomIndicatorPackager`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-CODEGEN-TEMPLATE`: Normalize strategy AST into canonical intermediate representation for target platform rendering (`template_engine.py`) $\rightarrow$ `CodegenTemplateEngine.render_ast(strategy_ast: Mapping[str, Any], target_platform: str) -> dict[str, Any]`
   - [ ] `FR-CODEGEN-MT4-MT5`: Render strategy ASTs into MetaTrader 4 (`MQL4` `.mq4`) and MetaTrader 5 (`MQL5` `.mq5` Hedged & Netted) expert advisors (`metatrader4.py`, `metatrader5.py`) $\rightarrow$ `MetaTrader4Exporter.render(strategy_ast: Mapping[str, Any]) -> dict[str, Any]` & `MetaTrader5Exporter.render(strategy_ast: Mapping[str, Any], *, account_mode: str = "hedged") -> dict[str, Any]`
@@ -656,18 +649,13 @@ HaruQuantAI/
 - **Dependencies:** `AppPlatform` (`Section 1`)
 - **Outputs / Downstream Role:** User onboarding, navigation entry points, and version inspection.
 
-### Phase 2.1 Master Donor / Backend / Frontend Alignment Table
-
-| Component               | Donor Path (`docs/SQX/...`)          | Backend Target File (Line Budget)           | Frontend Target File                   | DRY Shared Dependencies                                  |
-| ----------------------- | ------------------------------------ | ------------------------------------------- | -------------------------------------- | -------------------------------------------------------- |
-| `AppHome` & `HomeAbout` | `AppHome`, `HomeAbout` (`overview/`) | `app/workspace/home/routes.py` (`🟢 <200L`) | `ui/app/workspace/Home/HomeScreen.tsx` | `HostPersistence`, `ResourceMonitor`, `ServletConstants` |
-
 #### 1. `app/workspace/home/routes.py` — `AppHome` & `HomeAbout` (`FEAT-HOME-DASHBOARD`)
 
-- **Donor Path:** [`docs/SQX/overview/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/README.md) (`AppHome`, `HomeAbout`)
-- **Backend Target:** `app/workspace/home/routes.py` (`🟢 <200L`, Docstring `<=45L`)
-- **Frontend Target:** `ui/app/workspace/Home/HomeScreen.tsx`
-- **Classes:** `Home`, `About` (plus `HomeCLI`)
+- **Dry Rule:** Reuses `HostPersistence`, `ResourceMonitor`, and `ServletConstants` without duplicating version or system diagnostic queries.
+- **Donor:** `C:\SQX-145\internal\plugins\AppSQXHome\AppSQXHome.jar`, `C:\SQX-145\internal\plugins\HomeAbout\HomeAbout.jar`, `C:\SQX-145\internal\web\SQXHOME\`, `C:\SQX-145\internal\web\HOME\`
+- **Backend:** `app/workspace/home/routes.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`
+- **Class:** `Home`, `About` (plus `HomeCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-HOME-INDEX`: Display welcome home view with quick-start action shortcuts $\rightarrow$ `Home.index() -> dict[str, Any]`
   - [ ] `FR-HOME-RECENT`: Render offline onboarding flow, tutorial cards, and recent projects from `HostPersistence` $\rightarrow$ `Home.get_recent_projects(limit: int = 10) -> list[dict[str, Any]]`
@@ -683,34 +671,16 @@ HaruQuantAI/
 - **Dependencies:** `AppPlatform` (`Section 1`), `CoreIncludePrimitives` (`Section 1A.1`)
 - **Outputs / Downstream Role:** Historical price bars, instrument specifications, and trading sessions for backtesting.
 
-### Phase 3.1 – 3.7 Master Donor / Backend / Frontend Alignment Table
-
-| Component                                                                | Donor Path (`docs/SQX/...`)                                              | Backend Target File (Line Budget)                                                                                                                    | Frontend Target File                                                                                  | DRY Shared Dependencies                                             |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `DataManagerInstruments`                                                 | `DataManagerInstruments`                                                 | `app/workspace/data_manager/instruments.py` (`🟡 200–350L`)                                                                                          | `ui/app/plugins/data_source/Catalogs/Instruments/InstrumentsModal.tsx`                                | `HostPersistence` (`instruments` entity), `data_manager/_common.py` |
-| `DataManagerSessions`                                                    | `DataManagerSessions`                                                    | `app/workspace/data_manager/sessions.py` (`🟡 200–350L`)                                                                                             | `ui/app/plugins/data_source/Catalogs/Sessions/SessionsModal.tsx`                                      | `HostPersistence` (`sessions_catalog` entity), `HQTime`             |
-| `DataManagerConnections`                                                 | `DataManagerConnections`                                                 | `app/workspace/data_manager/connections.py` (`🟢 <200L`)                                                                                             | `ui/app/plugins/data_source/Common/DataSourceRibbon.tsx`                                              | `ServletConnection`, `HostPersistence`                              |
-| `DataManagerBroker`                                                      | `DataManagerBroker`                                                      | `app/workspace/data_manager/broker.py` (`🟡 200–350L`)                                                                                               | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`                          | `HostPersistence` (`brokers` entity)                                |
-| `DataManagerBasket`                                                      | `DataManagerBasket`                                                      | `app/workspace/data_manager/baskets.py` (`🟢 <200L`)                                                                                                 | `ui/app/plugins/data_source/Catalogs/StockGroups/StockGroupsModal.tsx`                                | `HostPersistence` (`baskets` entity)                                |
-| `DataManagerData`                                                        | `DataManagerData`                                                        | `app/workspace/data_manager/data.py` (`🟡 200–350L`)                                                                                                 | `ui/app/workspace/DataManager/DataManager.tsx`                                                        | `HostPersistence` (`market_data` entity), `DataSeries`              |
-| `DataSourceFiles`                                                        | `DataSourceFiles`                                                        | `app/services/brokers/files.py` (`🟡 200–350L`)                                                                                                      | `ui/app/plugins/data_source/FileImport/FileImportModal.tsx`                                           | `app/services/brokers/_file_history.py`, `HostPersistence`          |
-| `DataSourceYahoo`                                                        | `DataSourceYahoo`                                                        | `app/services/brokers/yahoo.py` (`🟢 <200L`)                                                                                                         | `ui/app/plugins/data_source/Yahoo/YahooModal.tsx`                                                     | `app/services/brokers/_http.py`, `HostPersistence`                  |
-| `DataSourceDukascopy`                                                    | `DataSourceDukascopy`                                                    | `app/services/brokers/dukascopy.py` (`🟡 200–350L`)                                                                                                  | `ui/app/plugins/data_source/Dukascopy/DukascopyModal.tsx`                                             | `_http.py`, `_native_history.py` (`.bi5` decoder)                   |
-| `DataSourceTD`                                                           | `DataSourceTD`                                                           | `app/services/brokers/tick_downloader.py` (`🟢 <200L`)                                                                                               | `ui/app/plugins/data_source/TickDownloader/TickDownloaderModal.tsx`                                   | `_file_history.py`, `HostPersistence`                               |
-| `DataSourceDarwinex`                                                     | `DataSourceDarwinex`                                                     | `app/services/brokers/darwinex.py` (`🟡 200–350L`)                                                                                                   | `ui/app/plugins/data_source/Darwinex/DarwinexModal.tsx`                                               | `_http.py`, `_file_history.py`                                      |
-| `DataSourceEquities`                                                     | `DataSourceEquities`                                                     | `app/services/brokers/sq_equity.py` (`🟢 <200L`)                                                                                                     | `ui/app/plugins/data_source/Equities/EquitiesModal.tsx`                                               | `_http.py`, `HostPersistence`                                       |
-| `DataSourceFutures`                                                      | `DataSourceFutures`                                                      | `app/services/brokers/sq_futures.py` (`🟢 <200L`)                                                                                                    | `ui/app/plugins/data_source/Futures/FuturesModal.tsx`                                                 | `_http.py`, `HostPersistence`                                       |
-| `DataManagerCustomData`                                                  | `DataManagerCustomData`                                                  | `app/workspace/data_manager/custom_data.py` (`🟡 250–400L`)                                                                                          | `ui/app/plugins/data_source/Tools/CustomDataModal.tsx`                                                | `HostPersistence` (`custom_data` entity), `_file_history.py`        |
-| `DataManagerActions`                                                     | `DataManagerActions`                                                     | `app/workspace/data_manager/actions/review/quality.py` (`🟡 200–350L`), `app/workspace/data_manager/actions/transform/transforms.py` (`🟡 250–400L`) | `ui/app/plugins/data_source/Tools/DataToolsModal.tsx`                                                 | `HQTime`, `BarTime`, `DataSeries`, `_native_history.py`             |
-| `AppDataManager`, `DataManagerLog`, `DataManagerHome`, `DataManagerHelp` | `AppDataManager`, `DataManagerLog`, `DataManagerHome`, `DataManagerHelp` | `app/workspace/data_manager/{routes,log,home,help}.py` (each `🟢 <200L`)                                                                             | `ui/app/workspace/DataManager/{DataManager,DataManagerHome}.tsx`, `ui/app/components/HelpTooltip.tsx` | `HostPersistence`, `TelemetryLogger`                                |
-
 ---
 
 ### Phase 3.1: Foundational Specifications
 
 #### 1. `app/workspace/data_manager/instruments.py` — `DataManagerInstruments` (`FEAT-DATAMGR-INSTRUMENTS`)
 
-- **Backend Target:** `app/workspace/data_manager/instruments.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Dry Rule:** Persists all instrument records through `HostPersistence` (`instruments` entity) and shares validation helpers via `app/workspace/data_manager/_common.py`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataManagerInstruments\DataManagerInstruments.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.instrument.*`), `C:\SQX-145\user\settings\DataConfig\`
+- **Backend:** `app/workspace/data_manager/instruments.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/Instruments/InstrumentsModal.tsx`
 - **Class:** `Instruments` (plus `InstrumentsCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-INSTR-LIST`: List all configured instruments with point/pip sizes, contract sizes, and margins $\rightarrow$ `Instruments.instruments(filters: Mapping[str, Any] | None = None) -> list[dict[str, Any]]`
@@ -720,7 +690,10 @@ HaruQuantAI/
 
 #### 2. `app/workspace/data_manager/sessions.py` — `DataManagerSessions` (`FEAT-DATAMGR-SESSIONS`)
 
-- **Backend Target:** `app/workspace/data_manager/sessions.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Dry Rule:** Persists session definitions via `HostPersistence` (`sessions_catalog` entity) and delegates timezone/session boundary math to `HQTime` (`app/services/include/time.py`).
+- **Donor:** `C:\SQX-145\internal\plugins\DataManagerSessions\DataManagerSessions.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.session.*`), `C:\SQX-145\user\settings\DataConfig\`
+- **Backend:** `app/workspace/data_manager/sessions.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/Sessions/SessionsModal.tsx`
 - **Class:** `Sessions` (plus `SessionsCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-SESS-LIST`: List all trading session profiles and holiday calendars $\rightarrow$ `Sessions.sessions(filters: Mapping[str, Any] | None = None) -> list[dict[str, Any]]`
@@ -730,7 +703,10 @@ HaruQuantAI/
 
 #### 3. `app/workspace/data_manager/connections.py` — `DataManagerConnections` (`FEAT-DATAMGR-CONNECTIONS`)
 
-- **Backend Target:** `app/workspace/data_manager/connections.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Dry Rule:** Delegates connection storage and connectivity probing to `ServletConnection` (`app/host/transport.py`) and `HostPersistence`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataManagerConnections\DataManagerConnections.jar`, `C:\SQX-145\internal\plugins\ServletConnection\ServletConnection.jar`
+- **Backend:** `app/workspace/data_manager/connections.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/plugins/data_source/Common/DataSourceRibbon.tsx`
 - **Class:** `Connections` (plus `ConnectionsCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-CONN-LIST`: List all external market data provider connections $\rightarrow$ `Connections.list_connections() -> list[dict[str, Any]]`
@@ -743,7 +719,10 @@ HaruQuantAI/
 
 #### 4. `app/workspace/data_manager/broker.py` — `DataManagerBroker` (`FEAT-DATAMGR-BROKER`)
 
-- **Backend Target:** `app/workspace/data_manager/broker.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Dry Rule:** Persists broker profiles via `HostPersistence` (`brokers` entity) and reuses instrument/session import schemas from `instruments.py` and `sessions.py`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataManagerBroker\DataManagerBroker.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.broker.*`)
+- **Backend:** `app/workspace/data_manager/broker.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
 - **Class:** `Broker` (plus `BrokerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-BROKER-LIST`: List all broker profiles configured in the system $\rightarrow$ `Broker.brokers() -> list[dict[str, Any]]`
@@ -754,7 +733,10 @@ HaruQuantAI/
 
 #### 5. `app/workspace/data_manager/baskets.py` — `DataManagerBasket` (`FEAT-DATAMGR-BASKET`)
 
-- **Backend Target:** `app/workspace/data_manager/baskets.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Dry Rule:** Persists symbol baskets via `HostPersistence` (`baskets` entity); shared by Stockpicker and Multi-Market cross-checks.
+- **Donor:** `C:\SQX-145\internal\plugins\DataManagerBasket\DataManagerBasket.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.basket.*`)
+- **Backend:** `app/workspace/data_manager/baskets.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/StockGroups/StockGroupsModal.tsx`
 - **Class:** `Basket` (plus `BasketCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-BASKET-LIST`: List all stock baskets and symbol groupings $\rightarrow$ `Basket.baskets() -> list[dict[str, Any]]`
@@ -767,7 +749,10 @@ HaruQuantAI/
 
 #### 6. `app/workspace/data_manager/data.py` — `DataManagerData` (`FEAT-DATAMGR-DATA`)
 
-- **Backend Target:** `app/workspace/data_manager/data.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Dry Rule:** Uses `HostPersistence` (`market_data` entity) for symbol catalog metadata and `DataSeries` (`app/services/include/data.py`) for Parquet bar series access.
+- **Donor:** `C:\SQX-145\internal\plugins\DataManagerData\DataManagerData.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.data.*`), `C:\SQX-145\user\data\`
+- **Backend:** `app/workspace/data_manager/data.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/workspace/DataManager/DataManager.tsx`
 - **Class:** `Data` (plus `DataCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-DATA-LIST`: List all imported price data symbols with timeframes, date ranges, and bar counts $\rightarrow$ `Data.data(filters: Mapping[str, Any] | None = None) -> list[dict[str, Any]]`
@@ -781,7 +766,10 @@ HaruQuantAI/
 
 #### 7. `app/services/brokers/files.py` — `DataSourceFiles` (`FEAT-DATASRC-FILES`)
 
-- **Backend Target:** `app/services/brokers/files.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Dry Rule:** Reuses shared CSV/TXT/archive history parsing in `app/services/brokers/_file_history.py` and persists symbol metadata via `HostPersistence`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataSourceFiles\DataSourceFiles.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.data.*`)
+- **Backend:** `app/services/brokers/files.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Frontend:** `ui/app/plugins/data_source/FileImport/FileImportModal.tsx`
 - **Class:** `Files` (plus `FilesCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATASRC-FILES-ADD`: Add new symbol definition from local historical data file $\rightarrow$ `Files.add(symbol_config: Mapping[str, Any]) -> dict[str, Any]`
@@ -792,7 +780,10 @@ HaruQuantAI/
 
 #### 8. `app/services/brokers/yahoo.py` — `DataSourceYahoo` (`FEAT-DATASRC-YAHOO`)
 
-- **Backend Target:** `app/services/brokers/yahoo.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Dry Rule:** Reuses shared HTTP transport (`app/services/brokers/_http.py`) and `HostPersistence`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataSourceYahoo\DataSourceYahoo.jar`
+- **Backend:** `app/services/brokers/yahoo.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Frontend:** `ui/app/plugins/data_source/Yahoo/YahooModal.tsx`
 - **Class:** `Yahoo` (plus `YahooCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATASRC-YAHOO-ADD`: Add Yahoo Finance data symbols to the database $\rightarrow$ `Yahoo.add(symbol_config: Mapping[str, Any]) -> dict[str, Any]`
@@ -800,7 +791,10 @@ HaruQuantAI/
 
 #### 9. `app/services/brokers/dukascopy.py` — `DataSourceDukascopy` (`FEAT-DATASRC-DUKASCOPY`)
 
-- **Backend Target:** `app/services/brokers/dukascopy.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Dry Rule:** Reuses shared HTTP retry/rate-limiting (`_http.py`), `.bi5` binary tick decoding (`_native_history.py`), and `HostPersistence`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataSourceDukascopy\DataSourceDukascopy.jar`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.dukascopy.*`)
+- **Backend:** `app/services/brokers/dukascopy.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Frontend:** `ui/app/plugins/data_source/Dukascopy/DukascopyModal.tsx`
 - **Class:** `Dukascopy` (plus `DukascopyCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATASRC-DUKA-ADD`: Add Dukascopy data symbols to the database $\rightarrow$ `Dukascopy.add(symbol_config: Mapping[str, Any]) -> dict[str, Any]`
@@ -811,14 +805,20 @@ HaruQuantAI/
 
 #### 10. `app/services/brokers/tick_downloader.py` — `DataSourceTD` (`FEAT-DATASRC-TD`)
 
-- **Backend Target:** `app/services/brokers/tick_downloader.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Dry Rule:** Reuses shared file history parsing (`_file_history.py`) and `HostPersistence`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataSourceTD\DataSourceTD.jar`
+- **Backend:** `app/services/brokers/tick_downloader.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Frontend:** `ui/app/plugins/data_source/TickDownloader/TickDownloaderModal.tsx`
 - **Class:** `TD` (plus `TDCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATASRC-TD-IMPORT`: Import historical tick and minute price data generated by TickDownloader $\rightarrow$ `TD.import_data(source_path: Path | str, symbols: Sequence[str] | None = None) -> dict[str, Any]`
 
 #### 11. `app/services/brokers/darwinex.py` — `DataSourceDarwinex` (`FEAT-DATASRC-DARWINEX`)
 
-- **Backend Target:** `app/services/brokers/darwinex.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Dry Rule:** Reuses shared HTTP transport (`_http.py`), archive history parsing (`_file_history.py`), and `HostPersistence`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataSourceDarwinex\DataSourceDarwinex.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.darwinex.*`), `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.darwinex.*`)
+- **Backend:** `app/services/brokers/darwinex.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Frontend:** `ui/app/plugins/data_source/Darwinex/DarwinexModal.tsx`
 - **Class:** `Darwinex` (plus `DarwinexCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATASRC-DARWINEX-ADD`: Add Darwinex data symbols to the database $\rightarrow$ `Darwinex.add(symbol_config: Mapping[str, Any]) -> dict[str, Any]`
@@ -829,8 +829,11 @@ HaruQuantAI/
 
 #### 12. `app/services/brokers/sq_equity.py` & `sq_futures.py` — `DataSourceEquities` & `DataSourceFutures` (`FEAT-DATASRC-SUB`)
 
-- **Backend Targets:** `sq_equity.py` (`🟢 <200L`), `sq_futures.py` (`🟢 <200L`)
-- **Classes:** `EquitiesData`, `FuturesData`
+- **Dry Rule:** Reuses shared HTTP transport (`_http.py`) and `HostPersistence` across subscription equity and futures feeds.
+- **Donor:** `C:\SQX-145\internal\plugins\DataSourceSQEquityData\DataSourceSQEquityData.jar`, `C:\SQX-145\internal\plugins\DataSourceSQFuturesData\DataSourceSQFuturesData.jar`
+- **Backend:** `app/services/brokers/sq_equity.py` (`🟢 <200L`), `app/services/brokers/sq_futures.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/plugins/data_source/Equities/EquitiesModal.tsx`, `ui/app/plugins/data_source/Futures/FuturesModal.tsx`
+- **Class:** `EquitiesData`, `FuturesData`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATASRC-EQUITIES-ADD`: Add US equities data symbols to database $\rightarrow$ `EquitiesData.add(symbol_config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-DATASRC-EQUITIES-TERMS`: Display equities data usage terms and conditions $\rightarrow$ `EquitiesData.data_usage_conditions() -> dict[str, Any]`
@@ -845,7 +848,10 @@ HaruQuantAI/
 
 #### 13. `app/workspace/data_manager/custom_data.py` — `DataManagerCustomData` (`FEAT-DATAMGR-CUSTOMDATA`)
 
-- **Backend Target:** `app/workspace/data_manager/custom_data.py` (`🟡 250–400L`, Docstring `<=60L`)
+- **Dry Rule:** Persists custom data metadata via `HostPersistence` (`custom_data` entity) and reuses delimiter/column recognition from `app/services/brokers/_file_history.py`.
+- **Donor:** `C:\SQX-145\internal\plugins\DataManagerCustomData\DataManagerCustomData.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.customData.*`), `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.cot.*`), `C:\SQX-145\user\customdata\`, `C:\SQX-145\user\settings\customDataIndys.xml`, `C:\SQX-145\COT\`
+- **Backend:** `app/workspace/data_manager/custom_data.py` (`🟡 250–400L`, Docstring `<=60L`)
+- **Frontend:** `ui/app/plugins/data_source/Tools/CustomDataModal.tsx`
 - **Class:** `CustomData` (plus `CustomDataCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-CUSTOM-LIST`: List all custom and external data series $\rightarrow$ `CustomData.custom_data() -> list[dict[str, Any]]`
@@ -863,7 +869,10 @@ HaruQuantAI/
 
 #### 14. `app/workspace/data_manager/actions/review/quality.py` & `actions/transform/transforms.py` — `DataManagerActions` (`FEAT-DATAMGR-ACTIONS`)
 
-- **Backend Targets:** `quality.py` (`🟡 200–350L`), `transforms.py` (`🟡 250–400L`)
+- **Dry Rule:** Reuses `HQTime`, `BarTime`, `DataSeries`, and `_native_history.py` (`.fxt`/`.hst` encoders) across data review and transformation pipelines.
+- **Donor:** `C:\SQX-145\internal\plugins\DataManagerActions\`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.validation.*`, `com.strategyquant.datalib.metatrader4.*`)
+- **Backend:** `app/workspace/data_manager/actions/review/quality.py` (`🟡 200–350L`), `app/workspace/data_manager/actions/transform/transforms.py` (`🟡 250–400L`)
+- **Frontend:** `ui/app/plugins/data_source/Tools/DataToolsModal.tsx`
 - **Class:** `Actions` (exposed cleanly across `quality.py` and `transforms.py`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-ACT-CLONE-TZ`: Clone price data to a specified timezone offset with bar timestamp shifts (`transforms.py`) $\rightarrow$ `Actions.clone_to_timezone(symbol_id: str, target_timezone: str, new_symbol: str | None = None) -> dict[str, Any]`
@@ -884,8 +893,11 @@ HaruQuantAI/
 
 #### 15. `app/workspace/data_manager/{routes,log,home,help}.py` — Shell, Log, Home & Help (`FEAT-DATAMGR-SHELL`)
 
-- **Backend Targets:** `routes.py` (`🟢 <200L`), `log.py` (`🟢 <150L`), `home.py` (`🟢 <150L`), `help.py` (`🟢 <150L`)
-- **Classes:** `AppDataManager` (`routes.py`), `DataLog` (`log.py`), `DMHome` (`home.py`), `DMHelp` (`help.py`)
+- **Dry Rule:** Reuses `HostPersistence` and `TelemetryLogger` (`LogRingBuffer`) for workspace state, storage metrics, and live operation logs.
+- **Donor:** `C:\SQX-145\internal\plugins\AppDataManager\AppDataManager.jar`, `C:\SQX-145\internal\plugins\DataManagerLog\`, `C:\SQX-145\internal\plugins\DataManagerHome\DataManagerHome.jar`, `C:\SQX-145\internal\plugins\DataManagerHelp\`, `C:\SQX-145\internal\web\SQMANAGER\`
+- **Backend:** `app/workspace/data_manager/routes.py` (`🟢 <200L`), `app/workspace/data_manager/log.py` (`🟢 <150L`), `app/workspace/data_manager/home.py` (`🟢 <150L`), `app/workspace/data_manager/help.py` (`🟢 <150L`)
+- **Frontend:** `ui/app/workspace/DataManager/{DataManager,DataManagerHome}.tsx`, `ui/app/components/HelpTooltip.tsx`
+- **Class:** `AppDataManager` (`routes.py`), `DataLog` (`log.py`), `DMHome` (`home.py`), `DMHelp` (`help.py`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DATAMGR-SHELL-INIT`: Host dockable tabs for Instruments, Sessions, Brokers, Data, and Custom Data $\rightarrow$ `AppDataManager.init_workspace() -> dict[str, Any]`
   - [ ] `FR-DATAMGR-SHELL-TAB`: Coordinate active symbol selections and synchronize data tables with charts $\rightarrow$ `AppDataManager.open_tab(tab_id: str, context: Mapping[str, Any] | None = None) -> dict[str, Any]`
@@ -903,18 +915,12 @@ HaruQuantAI/
 - **Dependencies:** `AppDataManager` (`Section 3`), `CoreIndicatorLibrary` (`Section 1A.2`)
 - **Outputs / Downstream Role:** Custom indicators, trading rules, and snippet extensions consumed by `AppWizard`, `AppBuilder`, and `AppResults`.
 
-### Phase 4.1 – 4.3 Master Donor / Backend / Frontend Alignment Table
-
-| Component                   | Donor Path (`docs/SQX/...`)          | Backend Target File (Line Budget)                               | Frontend Target File                                   | DRY Shared Dependencies                     |
-| --------------------------- | ------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- |
-| `AppCodeEditor`             | `AppCodeEditor` (`overview/`)        | `app/workspace/code_editor/editor.py` (`🟢 <200L`)              | `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`  | `HostPersistence`                           |
-| `ServletCodeEditor`         | `ServletCodeEditor` (14 IDE actions) | `app/workspace/code_editor/routes.py` (`🟡 250–400L`)           | `ui/app/workspace/CodeEditor/codeEditorClient.ts`      | `HostPersistence`, `code_editor/_common.py` |
-| `CodeEditorImportExport`    | `CodeEditorImportExport`             | `app/workspace/code_editor/import_export.py` (`🟢 <200L`)       | `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`  | `zipfile`, `HostPersistence`                |
-| `CodeEditorIndicatorTester` | `CodeEditorIndicatorTester`          | `app/workspace/code_editor/indicator_tester.py` (`🟡 200–300L`) | `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx` | `CoreIndicatorLibrary`, `DataSeries`        |
-
 #### 1. `app/workspace/code_editor/editor.py` — `AppCodeEditor` (`FEAT-CODEEDITOR-WORKSPACE`)
 
-- **Backend Target:** `app/workspace/code_editor/editor.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Dry Rule:** Persists open editor tabs and workspace state through `HostPersistence`.
+- **Donor:** `C:\SQX-145\CodeEditor.config`, `C:\SQX-145\internal\libs\CodeEditor.jar.enc`, `C:\SQX-145\internal\plugins\AppCodeEditor\AppCodeEditor.jar`, `C:\SQX-145\internal\web\SQEDITOR\`
+- **Backend:** `app/workspace/code_editor/editor.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Frontend:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
 - **Class:** `AppCodeEditor`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-CODEEDITOR-INIT`: Host dockable editor panels, file navigators, and bottom log panes $\rightarrow$ `AppCodeEditor.init_workspace() -> dict[str, Any]`
@@ -922,7 +928,10 @@ HaruQuantAI/
 
 #### 2. `app/workspace/code_editor/routes.py` — `ServletCodeEditor` (`FEAT-CODEEDITOR-SERVLET`)
 
-- **Backend Target:** `app/workspace/code_editor/routes.py` (`🟡 250–400L`, Docstring `<=70L`)
+- **Dry Rule:** Shares workspace path sandboxing and file helpers in `app/workspace/code_editor/_common.py` and state persistence in `HostPersistence`.
+- **Donor:** `C:\SQX-145\internal\plugins\ServletCodeEditor\ServletCodeEditor.jar`, `C:\SQX-145\internal\libs\CodeEditor.jar.enc`, `C:\SQX-145\internal\autocomplete\`, `C:\SQX-145\Extending_SQX.pdf`
+- **Backend:** `app/workspace/code_editor/routes.py` (`🟡 250–400L`, Docstring `<=70L`)
+- **Frontend:** `ui/app/workspace/CodeEditor/codeEditorClient.ts`
 - **Class:** `CodeEditor` (plus `CodeEditorCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-CODEEDITOR-MENU`: Display code editor main menu, toolbar, and build actions $\rightarrow$ `CodeEditor.menu() -> dict[str, Any]`
@@ -942,7 +951,10 @@ HaruQuantAI/
 
 #### 3. `app/workspace/code_editor/import_export.py` — `CodeEditorImportExport` (`FEAT-CODEEDITOR-IMPEXP`)
 
-- **Backend Target:** `app/workspace/code_editor/import_export.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Dry Rule:** Uses standard `zipfile` packaging and `HostPersistence` for extension manifest registration.
+- **Donor:** `C:\SQX-145\internal\plugins\CodeEditorImportExport\CodeEditorImportExport.jar`, `C:\SQX-145\user\extend\`
+- **Backend:** `app/workspace/code_editor/import_export.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
 - **Class:** `ImportExport`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-CODEEDITOR-EXPORT`: Export code editor extensions, indicators, or snippets to zip packages $\rightarrow$ `ImportExport.export(file_paths: Sequence[str], archive_path: Path | str) -> dict[str, Any]`
@@ -951,7 +963,10 @@ HaruQuantAI/
 
 #### 4. `app/workspace/code_editor/indicator_tester.py` — `CodeEditorIndicatorTester` (`FEAT-CODEEDITOR-INDTEST`)
 
-- **Backend Target:** `app/workspace/code_editor/indicator_tester.py` (`🟡 200–300L`, Docstring `<=45L`)
+- **Dry Rule:** Executes indicators directly through `CoreIndicatorLibrary` (`app/services/indicators/`) over `DataSeries` (`app/services/include/data.py`).
+- **Donor:** `C:\SQX-145\internal\plugins\CodeEditorIndicatorTester\CodeEditorIndicatorTester.jar`, `C:\SQX-145\user\settings\IndicatorTesterConfigs\`
+- **Backend:** `app/workspace/code_editor/indicator_tester.py` (`🟡 200–300L`, Docstring `<=45L`)
+- **Frontend:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
 - **Class:** `IndicatorTester`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-CODEEDITOR-INDTEST-RUN`: Open indicator tester and execute indicator logic over market data $\rightarrow$ `IndicatorTester.indicator_tester(indicator_name: str, symbol: str = "EURUSD", timeframe: str = "H1", params: Mapping[str, Any] | None = None) -> dict[str, Any]`
@@ -967,18 +982,12 @@ HaruQuantAI/
 - **Dependencies:** `AppDataManager`, `AppCodeEditor`, `SnippetBuildingBlocksAndCatalogs` (`Section 1B.1`)
 - **Outputs / Downstream Role:** Concrete strategy ASTs and `.sqx` manifests ready for backtesting or code export.
 
-### Phase 5.1 Master Donor / Backend / Frontend Alignment Table
-
-| Component           | Donor Path (`docs/SQX/...`)                                      | Backend Target File (Line Budget)                        | Frontend Target File                                  | DRY Shared Dependencies               |
-| ------------------- | ---------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------- |
-| `AppWizard`         | `AppWizard` (`overview/`)                                        | `app/workspace/algo_wizard/wizard.py` (`🟢 <200L`)       | `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx` | `HostPersistence`                     |
-| `ServletAlgoWizard` | `ServletAlgoWizard`, `awShareWidget` (`algowizard-integration/`) | `app/workspace/algo_wizard/routes.py` (`🟡 250–400L`)    | `ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx`   | `BlockRegistry`, `HostPersistence`    |
-| `ServletBuilder`    | `ServletBuilder`                                                 | `app/workspace/builder/routes.py` (`🟢 <200L`)           | `ui/app/workspace/Builder/builderClient.ts`           | `CodegenTemplateEngine`               |
-| `ServletStrategy`   | `ServletStrategy`                                                | `app/workspace/builder/strategy_servlet.py` (`🟢 <200L`) | `ui/app/workspace/Builder/resultsModel.ts`            | `StrategyArchiveCodec` (`formats.py`) |
-
 #### 1. `app/workspace/algo_wizard/wizard.py` — `AppWizard` (`FEAT-WIZARD-WORKSPACE`)
 
-- **Backend Target:** `app/workspace/algo_wizard/wizard.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Dry Rule:** Persists active visual editor sessions and strategy drafts through `HostPersistence`.
+- **Donor:** `C:\SQX-145\internal\plugins\AppWizard\AppWizard.jar`, `C:\SQX-145\internal\web\AlgoWizard\`, `C:\SQX-145\internal\web\SQWIZARD\`, `C:\SQX-145\internal\web\wizard\`, `C:\SQX-145\user\settings\AlgoWizardRecentFiles.xml`, `C:\SQX-145\user\settings\wizard.txt`
+- **Backend:** `app/workspace/algo_wizard/wizard.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Frontend:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
 - **Class:** `AppWizard`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-WIZARD-INIT`: Host dockable canvas panels for visual rule-based strategy editing $\rightarrow$ `AppWizard.init_workspace(editor_mode: str = "standard") -> dict[str, Any]`
@@ -986,7 +995,10 @@ HaruQuantAI/
 
 #### 2. `app/workspace/algo_wizard/routes.py` — `ServletAlgoWizard` (`FEAT-WIZARD-SERVLET`)
 
-- **Backend Target:** `app/workspace/algo_wizard/routes.py` (`🟡 250–400L`, Docstring `<=50L`)
+- **Dry Rule:** Reuses `BlockRegistry` (`app/services/snippets/blocks.py`) and `HostPersistence` for block catalogs, Custom Blocks, and rule AST validation.
+- **Donor:** `C:\SQX-145\internal\plugins\ServletAlgoWizard\ServletAlgoWizard.jar`, `C:\SQX-145\internal\ctemplate\wizard.xml`, `C:\SQX-145\internal\web\awShareWidget\`, `C:\SQX-145\user\extend\`
+- **Backend:** `app/workspace/algo_wizard/routes.py` (`🟡 250–400L`, Docstring `<=50L`)
+- **Frontend:** `ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx`
 - **Class:** `AlgoWizard`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-WIZARD-CANVAS`: Render visual drag-and-drop rule canvas across all 3 editor modes (`standard`, `single_asset`, `stockpicker`) $\rightarrow$ `AlgoWizard.render_canvas(mode: str = "standard", strategy_id: str | None = None) -> dict[str, Any]`
@@ -997,8 +1009,11 @@ HaruQuantAI/
 
 #### 3. `app/workspace/builder/routes.py` & `strategy_servlet.py` — `ServletBuilder` & `ServletStrategy` (`FEAT-WIZARD-COMPILER`)
 
-- **Backend Targets:** `routes.py` (`🟢 <200L`), `strategy_servlet.py` (`🟢 <200L`)
-- **Classes:** `BuilderServlet`, `StrategyServlet`
+- **Dry Rule:** Delegates AST rendering to `CodegenTemplateEngine` (`app/services/codegen/template_engine.py`) and archive serialization to `StrategyArchiveCodec` (`app/services/engine/formats.py`).
+- **Donor:** `C:\SQX-145\internal\plugins\ServletBuilder\ServletBuilder.jar`, `C:\SQX-145\internal\plugins\ServletStrategy\ServletStrategy.jar`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.StrategyBase.*`)
+- **Backend:** `app/workspace/builder/routes.py` (`🟢 <200L`), `app/workspace/builder/strategy_servlet.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Builder/builderClient.ts`, `ui/app/workspace/Builder/resultsModel.ts`
+- **Class:** `BuilderServlet`, `StrategyServlet`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BUILDER-SERVLET-COMPILE`: Compile visual rule trees into executable Python/Numba strategy functions $\rightarrow$ `BuilderServlet.compile_rules(rule_tree: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-BUILDER-SERVLET-CODEGEN`: Generate entry, exit, stop loss, and trailing stop logic structures $\rightarrow$ `BuilderServlet.generate_code(rule_tree: Mapping[str, Any], target_platform: str = "pseudocode") -> dict[str, Any]`
@@ -1013,25 +1028,14 @@ HaruQuantAI/
 - **Dependencies:** `AppDataManager`, `CoreIndicatorLibrary`, `BacktestSimulationEngine`, `SnippetBuildingBlocksAndCatalogs`
 - **Outputs / Downstream Role:** Accepted candidate strategies deposited into `AppResults` databanks.
 
-### Phase 6.1 – 6.7 Master Donor / Backend / Frontend Alignment Table
-
-| Component                                                          | Donor Path (`docs/SQX/...`)                                        | Backend Target File (Line Budget)                                                                                            | Frontend Target File                                                                    | DRY Shared Dependencies                              |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `SettingsWhatToBuild`                                              | `SettingsWhatToBuild`                                              | `app/workspace/builder/settings/what_to_build.py` (`🟡 200–350L`)                                                            | `ui/app/workspace/Builder/settings/WhatToBuildTab.tsx`                                  | `builder/_common.py`, `HostPersistence`              |
-| `SettingsData`                                                     | `SettingsData`                                                     | `app/workspace/builder/settings/data_setup.py` (`🟢 <200L`)                                                                  | `ui/app/workspace/Builder/settings/DataTab.tsx`                                         | `Data` (`data_manager/data.py`)                      |
-| `SettingsBlocks`                                                   | `SettingsBlocks`                                                   | `app/workspace/builder/settings/blocks.py` (`🟡 200–300L`)                                                                   | `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`                               | `BlockRegistry` (`snippets/blocks.py`)               |
-| `SettingsGeneticOptions` & `SettingsPartsToImprove`                | `SettingsGeneticOptions`, `SettingsPartsToImprove`                 | `app/workspace/builder/settings/genetic_options.py` (`🟢 <200L`), `parts_to_improve.py` (`🟢 <200L`)                         | `ui/app/workspace/Builder/settings/{GeneticOptionsTab,PartsToImproveTab}.tsx`           | `builder/_common.py`                                 |
-| `SettingsOptions`, `SettingsAdvancedTM`, `SettingsMoneyManagement` | `SettingsOptions`, `SettingsAdvancedTM`, `SettingsMoneyManagement` | `app/workspace/builder/settings/{options,advanced_tm,money_management}.py` (each `🟢 <200L`)                                 | `ui/app/workspace/Builder/settings/{TradingOptionsTab,MoneyManagementTab}.tsx`          | `TradingOptionEnforcer`, `MoneyManagementEngine`     |
-| `SettingsRankings`                                                 | `SettingsRankings`                                                 | `app/workspace/builder/settings/rankings.py` (`🟡 200–300L`)                                                                 | `ui/app/workspace/Builder/settings/RankingTab.tsx`                                      | `ColumnRegistry`, `CorrelationAndFitnessRegistry`    |
-| `AppBuilder`, `SettingsPanel`, `TaskBuild`                         | `AppBuilder`, `SettingsPanel`, `TaskBuild`                         | `app/workspace/builder/builder.py` (`🟢 <200L`), `settings/controls.py` (`🟢 <150L`), `engine/build_task.py` (`🟡 250–400L`) | `ui/app/workspace/Builder/{BuilderWorkspace,EnginePanel,settings/SettingsControls}.tsx` | `JobManager`, `BacktestSimulator`, `RandomGenerator` |
-
----
-
 ### Phase 6.1 – 6.6: Strategy Builder Settings Modules (`app/workspace/builder/settings/`)
 
 #### 1. `app/workspace/builder/settings/what_to_build.py` — `SettingsWhatToBuild` (`FEAT-BUILDER-WHATTOBUILD`)
 
-- **Backend Target:** `app/workspace/builder/settings/what_to_build.py` (`🟡 200–350L`, Docstring `<=55L`)
+- **Dry Rule:** Reuse `builder/_common.py` and `HostPersistence` for strategy build settings validation and persistence.
+- **Donor:** `C:\SQX-145\internal\plugins\SettingsWhatToBuild\SettingsWhatToBuild.jar`, `C:\SQX-145\internal\ctemplate\build\`, `C:\SQX-145\internal\web\BUILDER\`
+- **Backend:** `app/workspace/builder/settings/what_to_build.py` (`🟡 200–350L`, Docstring `<=55L`)
+- **Frontend:** `ui/app/workspace/Builder/settings/WhatToBuildTab.tsx`
 - **Class:** `WhatToBuild`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BUILDER-WTB-OVERVIEW`: Display strategy architecture and build requirements overview $\rightarrow$ `WhatToBuild.what_to_build() -> dict[str, Any]`
@@ -1045,8 +1049,11 @@ HaruQuantAI/
 
 #### 2. `app/workspace/builder/settings/{data_setup,blocks,genetic_options,parts_to_improve,options,advanced_tm,money_management,rankings}.py` (`FEAT-BUILDER-SETTINGS`)
 
-- **Backend Targets:** 8 focused settings modules (`🟢 <200L` to `🟡 200–300L` each)
-- **Classes:** `DataSettings` (`data_setup.py`), `Blocks` (`blocks.py`), `GeneticOptions` (`genetic_options.py`), `PartsToImprove` (`parts_to_improve.py`), `BuildOptions` (`options.py`), `AdvancedTM` (`advanced_tm.py`), `MoneyManagement` (`money_management.py`), `Rankings` (`rankings.py`)
+- **Dry Rule:** Delegate data configuration to `Data` (`data_manager/data.py`), block metadata to `BlockRegistry` (`snippets/blocks.py`), trading constraints to `TradingOptionEnforcer`, position sizing to `MoneyManagementEngine`, and fitness/correlation criteria to `ColumnRegistry` and `CorrelationAndFitnessRegistry`.
+- **Donor:** `C:\SQX-145\internal\plugins\SettingsData\SettingsData.jar`, `C:\SQX-145\internal\plugins\SettingsBlocks\SettingsBlocks.jar`, `C:\SQX-145\internal\plugins\SettingsGeneticOptions\`, `C:\SQX-145\internal\plugins\SettingsPartsToImprove\SettingsPartsToImprove.jar`, `C:\SQX-145\internal\plugins\SettingsOptions\SettingsOptions.jar`, `C:\SQX-145\internal\plugins\SettingsAdvancedTM\SettingsAdvancedTM.jar`, `C:\SQX-145\internal\plugins\SettingsMoneyManagement\SettingsMoneyManagement.jar`, `C:\SQX-145\internal\plugins\SettingsRankings\SettingsRankings.jar`, `C:\SQX-145\internal\web\BUILDER\`
+- **Backend:** `app/workspace/builder/settings/{data_setup,blocks,genetic_options,parts_to_improve,options,advanced_tm,money_management,rankings}.py` (8 focused settings modules, `🟢 <200L` to `🟡 200–300L` each)
+- **Frontend:** `ui/app/workspace/Builder/settings/{DataTab,BuildingBlocksTab,GeneticOptionsTab,PartsToImproveTab,TradingOptionsTab,MoneyManagementTab,RankingTab}.tsx`
+- **Class:** `DataSettings` (`data_setup.py`), `Blocks` (`blocks.py`), `GeneticOptions` (`genetic_options.py`), `PartsToImprove` (`parts_to_improve.py`), `BuildOptions` (`options.py`), `AdvancedTM` (`advanced_tm.py`), `MoneyManagement` (`money_management.py`), `Rankings` (`rankings.py`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BUILDER-DATA-SETUP`: Configure backtest symbols, primary/secondary timeframes, and date ranges (`data_setup.py`) $\rightarrow$ `DataSettings.data(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
   - [ ] `FR-BUILDER-BLOCKS-LIST`: Configure allowable building blocks (`blocks.py`) $\rightarrow$ `Blocks.blocks(selected_blocks: Sequence[str] | None = None) -> dict[str, Any]`
@@ -1069,8 +1076,11 @@ HaruQuantAI/
 
 #### 3. `app/workspace/builder/builder.py`, `settings/controls.py` & `engine/build_task.py` (`FEAT-BUILDER-ENGINE`)
 
-- **Backend Targets:** `builder.py` (`🟢 <200L`), `settings/controls.py` (`🟢 <150L`), `engine/build_task.py` (`🟡 250–400L`)
-- **Classes:** `AppBuilder` (`builder.py`), `SettingsPanel` (`settings/controls.py`), `BuildTask` (`engine/build_task.py`)
+- **Dry Rule:** Reuse `JobManager`, `BacktestSimulator`, and `RandomGenerator` for multi-island genetic strategy generation and evaluation pipelines.
+- **Donor:** `C:\SQX-145\internal\plugins\AppBuilder\AppBuilder.jar`, `C:\SQX-145\internal\plugins\SettingsPanel\`, `C:\SQX-145\internal\plugins\TaskBuild\TaskBuild.jar`, `C:\SQX-145\user\settings\calibrationSettings.txt`, `C:\SQX-145\internal\web\BUILDER\`
+- **Backend:** `app/workspace/builder/builder.py` (`🟢 <200L`), `app/workspace/builder/settings/controls.py` (`🟢 <150L`), `app/workspace/builder/engine/build_task.py` (`🟡 250–400L`)
+- **Frontend:** `ui/app/workspace/Builder/{BuilderWorkspace,EnginePanel,settings/SettingsControls}.tsx`
+- **Class:** `AppBuilder` (`builder.py`), `SettingsPanel` (`settings/controls.py`), `BuildTask` (`engine/build_task.py`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BUILDER-WORKSPACE-INIT`: Host dockable builder tabs, execution progress bars, and live generation statistics $\rightarrow$ `AppBuilder.init_workspace() -> dict[str, Any]`
   - [ ] `FR-BUILDER-WORKSPACE-START`: Trigger autonomous genetic strategy generation pipeline via `JobManager` $\rightarrow$ `AppBuilder.start_generation(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
@@ -1089,29 +1099,15 @@ HaruQuantAI/
 - **Dependencies:** `AppBuilder`, `AppWizard`, `SnippetColumnsChartsAndFormulas`, `PlatformCodeExporters`
 - **Outputs / Downstream Role:** Strategy evaluation, portfolio candidates, HTML/PDF/CSV/Parquet reports, and compiled platform code.
 
-### Phase 7.1 – 7.7 Master Donor / Backend / Frontend Alignment Table
-
-| Component                                                                                                                   | Donor Path (`docs/SQX/...`)                                                                         | Backend Target File (Line Budget)                                                                                                                                                  | Frontend Target File                                                                                                                                         | DRY Shared Dependencies                                            |
-| --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `AppResults`, `ProjectDatabanks`, `ProjectResults`, `DashboardPanel`, `DashboardResults`                                    | `AppResults`, `ProjectDatabanks`, `ProjectResults`, `DashboardPanel`, `DashboardResults`            | `app/workspace/results/results.py` (`🟢 <200L`), `app/workspace/builder/{project_databanks,project_results,dashboard_panel,dashboard_results}.py` (each `🟢 <200L`)                | `ui/app/workspace/Results/ResultsWorkspace.tsx`, `ui/app/workspace/Builder/{ResultsColumn,ResultsView,ProgressDashboard}.tsx`                                | `HostPersistence` (`databanks`, `strategies` entities)             |
-| `ResultsDatabankActions` & `ResultsDatabankViews`                                                                           | `ResultsDatabankActions`, `ResultsDatabankViews`                                                    | `app/workspace/results/reports/results_databank_actions.py` (`🟡 300–450L`), `results_databank_views.py` (`🟢 <200L`)                                                              | `ui/app/workspace/Results/views/{ResultsDatabankActionsView,ResultsDatabankViewsView}.tsx`                                                                   | `HostPersistence`, `PlatformCodeExporters`, `StrategyArchiveCodec` |
-| `DatabankRename`, `ServletRenameTool`, `DatabankFilterByCorrelation`, `CustomDatabankActions`, `CustomResultsPluginActions` | `DatabankRename`, `ServletRenameTool`, `DatabankFilterByCorrelation`, `Custom*Actions`              | `app/workspace/results/databank/{rename,databank_rename,databank_filter_by_correlation,custom_databank_actions}.py` & `reports/custom_results_plugin_actions.py` (each `🟢 <180L`) | `ui/app/plugins/databank/{DatabankRenameController,DatabankRename,DatabankFilterByCorrelation,CustomDatabankActions}.tsx`                                    | `HostPersistence`, `CorrelationAndFitnessRegistry`                 |
-| `ResultsOverview`, `ResultsReport`, `ResultsStrategyConfig`                                                                 | `ResultsOverview`, `ResultsReport`, `ResultsStrategyConfig`                                         | `app/workspace/results/reports/{overview,results_report,results_strategy_config}.py` (each `🟢 <200L`)                                                                             | `ui/app/workspace/Builder/results/tabs/OverviewTab.tsx`, `ui/app/workspace/Results/views/{ResultsReportView,ResultsStrategyConfigView}.tsx`                  | `ColumnRegistry` (`snippets/columns.py`)                           |
-| `ResultsEquityChart`, `ResultsChart`, `ResultsProfileChart` & `EquityChart*` (5 Engines)                                    | `ResultsEquityChart`, `ResultsChart`, `ResultsProfileChart`, `EquityChart*`                         | `app/workspace/results/reports/{equity_chart,results_chart,results_profile_chart}.py` & `charts/{benchmark,daily_chart,drawdown,volatility,volume}.py` (each `🟢 <180L`)           | `ui/app/workspace/Results/EquityChart.tsx`, `ui/app/workspace/Results/views/{ResultsChartView,ResultsProfileChartView}.tsx`                                  | `ChartSnippetRegistry` (`snippets/charts.py`)                      |
-| `ResultsTradeList`, `ResultsTradelistViews`, `ResultsTradeAnalysis`                                                         | `ResultsTradeList`, `ResultsTradelistViews`, `ResultsTradeAnalysis`                                 | `app/workspace/results/reports/{trade_list,results_tradelist_views,trade_analysis}.py` (each `🟢 <200L`)                                                                           | `ui/app/workspace/Builder/results/tabs/TradeListTab.tsx`, `ui/app/workspace/Results/views/{ResultsTradelistViewsView,TradeAnalysisView}.tsx`                 | `ColumnRegistry`, `ChartSnippetRegistry`                           |
-| `ResultsPortfolioCorrelation`, `ResultsPortfolioComposerChart`, `ResultsPortfolioComposerLog`                               | `ResultsPortfolioCorrelation`, `ResultsPortfolioComposer*`                                          | `app/workspace/results/reports/{portfolio_correlation,results_portfolio_composer_chart,results_portfolio_composer_log}.py` (each `🟢 <200L`)                                       | `ui/app/workspace/Results/views/{PortfolioCorrelationView,ResultsPortfolioComposerChartView,ResultsPortfolioComposerLogView}.tsx`                            | `CorrelationAndFitnessRegistry`                                    |
-| `ResultsExplore`, `ResultsSPOverview`, `ResultsStockpicker`, `FitnessMethod*` (3)                                           | `ResultsExplore`, `ResultsSPOverview`, `ResultsStockpicker`, `FitnessMethod*`                       | `app/workspace/results/reports/{results_explore,results_sp_overview,results_stockpicker}.py` & `fitness/{existing_portfolio,strategy_result,wf_result}.py` (each `🟢 <200L`)       | `ui/app/workspace/Results/views/{ResultsExploreView,ResultsSPOverviewView,ResultsStockpickerView}.tsx`, `ui/app/workspace/Builder/FitnessEvolutionModal.tsx` | `ColumnRegistry`, `CorrelationAndFitnessRegistry`                  |
-| `ResultsSourceCode` & `ResultsPlugins`                                                                                      | `ResultsSourceCode`, `ResultsPlugins` (`RESULTS2`, `Prop analytics`, `Prop Monte Carlo`)            | `app/workspace/results/reports/source_code.py` (`🟡 200–300L`), `results_plugins.py` (`🟡 200–300L`)                                                                               | `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`, `ui/app/workspace/Results/views/ResultsPluginsView.tsx`                                           | `PlatformCodeExporters`, `MonteCarloManipulator`                   |
-| `Saver*` (4) & `Loader*` (2)                                                                                                | `SaverHTML`, `SaverPDF`, `SaverLegacyV3`, `SaverStrategyTrades`, `LoaderLegacyV3`, `LoaderLegacyV4` | `app/workspace/results/exporters/{saver_html,saver_pdf,saver_legacy_v3,saver_trades}.py` & `loaders/{loader_legacy_v3,loader_legacy_v4}.py` (each `🟢 <180L`)                      | `ui/app/plugins/databank/{DatabankSaveExports,DatabankToolbar}.tsx`                                                                                          | `StrategyArchiveCodec` (`formats.py`)                              |
-
----
-
 ### Phase 7.1: Databank Storage & Strategy Management
 
 #### 1. `app/workspace/results/results.py` & `app/workspace/builder/project_databanks.py` (`FEAT-RESULTS-DATABANKS`)
 
-- **Backend Targets:** `results.py` (`🟢 <200L`), `project_databanks.py` (`🟢 <200L`)
-- **Classes:** `AppResults`, `Databanks`
+- **Dry Rule:** Reuse `HostPersistence` (`databanks` and `strategies` entities) for all strategy storage, selection, and pagination queries.
+- **Donor:** `C:\SQX-145\internal\plugins\AppResults\AppResults.jar`, `C:\SQX-145\internal\plugins\ProjectDatabanks\`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.databank.*`), `C:\SQX-145\internal\web\RESULTS\`
+- **Backend:** `app/workspace/results/results.py` (`🟢 <200L`), `app/workspace/builder/project_databanks.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Results/ResultsWorkspace.tsx`, `ui/app/workspace/Builder/ResultsColumn.tsx`
+- **Class:** `AppResults`, `Databanks`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-RESULTS-INIT`: Host dockable databank tables, performance overview, equity charts, and trade logs $\rightarrow$ `AppResults.init_workspace() -> dict[str, Any]`
   - [ ] `FR-RESULTS-SELECT`: Select active strategy and load comprehensive performance metrics $\rightarrow$ `AppResults.select_strategy(strategy_id: str) -> dict[str, Any]`
@@ -1120,8 +1116,11 @@ HaruQuantAI/
 
 #### 2. `app/workspace/results/reports/results_databank_views.py` & `results_databank_actions.py` (`FEAT-RESULTS-DB-ACTIONS`)
 
-- **Backend Targets:** `results_databank_views.py` (`🟢 <200L`), `results_databank_actions.py` (`🟡 300–450L`)
-- **Classes:** `DatabankViews`, `DatabankActions`
+- **Dry Rule:** Reuse `HostPersistence`, `PlatformCodeExporters`, and `StrategyArchiveCodec` for databank views, strategy archive I/O, and batch source code generation.
+- **Donor:** `C:\SQX-145\internal\plugins\ResultsDatabankViews\ResultsDatabankViews.jar`, `C:\SQX-145\internal\plugins\ResultsDatabankActions\ResultsDatabankActions.jar`, `C:\SQX-145\user\settings\views\`, `C:\SQX-145\internal\web\RESULTS\`
+- **Backend:** `app/workspace/results/reports/results_databank_views.py` (`🟢 <200L`), `app/workspace/results/reports/results_databank_actions.py` (`🟡 300–450L`)
+- **Frontend:** `ui/app/workspace/Results/views/{ResultsDatabankActionsView,ResultsDatabankViewsView}.tsx`
+- **Class:** `DatabankViews`, `DatabankActions`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-RESULTS-DB-VIEWS`: Manage databank column views and customized table layouts $\rightarrow$ `DatabankViews.databank_views(view_config: Mapping[str, Any] | None = None) -> dict[str, Any]`
   - [ ] `FR-RESULTS-DB-NEW`: Create a new databank in SQLite via `HostPersistence` $\rightarrow$ `DatabankActions.new_databank(name: str, capacity: int = 1000) -> dict[str, Any]`
@@ -1139,8 +1138,11 @@ HaruQuantAI/
 
 #### 3. `app/workspace/results/databank/{rename,databank_rename,databank_filter_by_correlation,custom_databank_actions}.py` & `reports/custom_results_plugin_actions.py` (`FEAT-RESULTS-DB-UTILS`)
 
-- **Backend Targets:** 5 focused modules (each `🟢 <180L`)
-- **Classes:** `ServletRenameTool` (`rename.py`), `DatabankRename` (`databank_rename.py`), `DatabankFilter` (`databank_filter_by_correlation.py`), `CustomDatabank` (`custom_databank_actions.py`), `CustomResults` (`custom_results_plugin_actions.py`)
+- **Dry Rule:** Reuse `HostPersistence` and `CorrelationAndFitnessRegistry` for databank entity renaming and correlation-based strategy filtering.
+- **Donor:** `C:\SQX-145\internal\plugins\ServletRenameTool\ServletRenameTool.jar`, `C:\SQX-145\internal\plugins\DatabankRename\DatabankRename.jar`, `C:\SQX-145\internal\plugins\DatabankFilterByCorrelation\DatabankFilterByCorrelation.jar`, `C:\SQX-145\internal\plugins\CustomDatabankActions\`, `C:\SQX-145\internal\plugins\CustomResultsPluginActions\`
+- **Backend:** `app/workspace/results/databank/{rename,databank_rename,databank_filter_by_correlation,custom_databank_actions}.py` & `app/workspace/results/reports/custom_results_plugin_actions.py` (5 focused modules, each `🟢 <180L`)
+- **Frontend:** `ui/app/plugins/databank/{DatabankRenameController,DatabankRename,DatabankFilterByCorrelation,CustomDatabankActions}.tsx`
+- **Class:** `ServletRenameTool` (`rename.py`), `DatabankRename` (`databank_rename.py`), `DatabankFilter` (`databank_filter_by_correlation.py`), `CustomDatabank` (`custom_databank_actions.py`), `CustomResults` (`custom_results_plugin_actions.py`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-RESULTS-SERVLET-RENAME-BATCH`: Apply regex and template pattern replacements across symbol, databank, and strategy names (`rename.py`) $\rightarrow$ `ServletRenameTool.batch_rename(items: Sequence[str], pattern: str, replacement: str) -> dict[str, Any]`
   - [ ] `FR-RESULTS-SERVLET-RENAME-VALIDATE`: Validate proposed renamed entities for naming collisions and illegal characters (`rename.py`) $\rightarrow$ `ServletRenameTool.validate_names(names: Sequence[str]) -> dict[str, Any]`
@@ -1155,8 +1157,11 @@ HaruQuantAI/
 
 #### 4. `app/workspace/builder/{project_results,dashboard_panel,dashboard_results}.py` & `app/workspace/results/reports/{overview,results_report,results_strategy_config}.py` (`FEAT-RESULTS-OVERVIEW`)
 
-- **Backend Targets:** 6 focused modules (each `🟢 <200L`)
-- **Classes:** `ProjectResults`, `Dashboard`, `DashboardResults`, `Overview`, `Report`, `StrategyConfig`
+- **Dry Rule:** Reuse `ColumnRegistry` (`snippets/columns.py`) and `HostPersistence` for strategy performance summaries, report metrics, and dashboard panels.
+- **Donor:** `C:\SQX-145\internal\plugins\ProjectResults\`, `C:\SQX-145\internal\plugins\DashboardPanel\`, `C:\SQX-145\internal\plugins\DashboardResults\DashboardResults.jar`, `C:\SQX-145\internal\plugins\ResultsOverview\ResultsOverview.jar`, `C:\SQX-145\internal\plugins\ResultsReport\`, `C:\SQX-145\internal\plugins\ResultsStrategyConfig\ResultsStrategyConfig.jar`, `C:\SQX-145\user\settings\ResultsDashboard\`, `C:\SQX-145\internal\web\RESULTS\`
+- **Backend:** `app/workspace/builder/{project_results,dashboard_panel,dashboard_results}.py` & `app/workspace/results/reports/{overview,results_report,results_strategy_config}.py` (6 focused modules, each `🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Builder/{ResultsView,ProgressDashboard,results/tabs/OverviewTab}.tsx`, `ui/app/workspace/Results/views/{ResultsReportView,ResultsStrategyConfigView}.tsx`
+- **Class:** `ProjectResults`, `Dashboard`, `DashboardResults`, `Overview`, `Report`, `StrategyConfig`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-RESULTS-PROJ-TABS`: Display strategy test results and analysis tabs $\rightarrow$ `ProjectResults.results(strategy_id: str | None = None) -> dict[str, Any]`
   - [ ] `FR-RESULTS-PROJ-NEW-PLUGIN`: Create a new custom result analysis plugin $\rightarrow$ `ProjectResults.new_custom_plugin(name: str, template: str = "default") -> dict[str, Any]`
@@ -1171,8 +1176,11 @@ HaruQuantAI/
 
 #### 5. `app/workspace/results/reports/{equity_chart,results_chart,results_profile_chart}.py` & `charts/{benchmark,daily_chart,drawdown,volatility,volume}.py` (`FEAT-RESULTS-CHARTS`)
 
-- **Backend Targets:** 8 focused modules (each `🟢 <180L`)
-- **Classes:** `EquityChart`, `Chart`, `ProfileChart`, `BenchmarkEngine`, `DailyChartEngine`, `DrawdownEngine`, `VolatilityEngine`, `VolumeEngine`
+- **Dry Rule:** Reuse `ChartSnippetRegistry` (`snippets/charts.py`) for equity curves, underwater drawdowns, benchmark overlays, and volatility/volume distributions.
+- **Donor:** `C:\SQX-145\internal\plugins\ResultsEquityChart\ResultsEquityChart.jar`, `C:\SQX-145\internal\plugins\ResultsChart\ResultsChart.jar`, `C:\SQX-145\internal\plugins\ResultsProfileChart\ResultsProfileChart.jar`, `C:\SQX-145\internal\plugins\EquityChartBenchmark\EquityChartBenchmark.jar`, `C:\SQX-145\internal\plugins\EquityChartDailyChart\EquityChartDailyChart.jar`, `C:\SQX-145\internal\plugins\EquityChartDrawdown\EquityChartDrawdown.jar`, `C:\SQX-145\internal\plugins\EquityChartVolatility\EquityChartVolatility.jar`, `C:\SQX-145\internal\plugins\EquityChartVolume\EquityChartVolume.jar`, `C:\SQX-145\internal\web\RESULTS\`
+- **Backend:** `app/workspace/results/reports/{equity_chart,results_chart,results_profile_chart}.py` & `app/workspace/results/charts/{benchmark,daily_chart,drawdown,volatility,volume}.py` (8 focused modules, each `🟢 <180L`)
+- **Frontend:** `ui/app/workspace/Results/EquityChart.tsx`, `ui/app/workspace/Results/views/{ResultsChartView,ResultsProfileChartView}.tsx`
+- **Class:** `EquityChart`, `Chart`, `ProfileChart`, `BenchmarkEngine`, `DailyChartEngine`, `DrawdownEngine`, `VolatilityEngine`, `VolumeEngine`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-RESULTS-EQ-CHART`: Display equity curve and drawdown chart series $\rightarrow$ `EquityChart.equity_chart(strategy_id: str) -> dict[str, Any]`
   - [ ] `FR-RESULTS-EQ-BENCHMARK`: Configure and display benchmark equity overlay on chart $\rightarrow$ `EquityChart.benchmark(strategy_id: str, benchmark_symbol: str = "SPY") -> dict[str, Any]`
@@ -1186,8 +1194,11 @@ HaruQuantAI/
 
 #### 6. `app/workspace/results/reports/{trade_list,results_tradelist_views,trade_analysis,portfolio_correlation,results_portfolio_composer_chart,results_portfolio_composer_log,results_explore,results_sp_overview,results_stockpicker}.py` & `fitness/{existing_portfolio,strategy_result,wf_result}.py` (`FEAT-RESULTS-ANALYSIS`)
 
-- **Backend Targets:** 12 focused modules (each `🟢 <200L`)
-- **Classes:** `TradeList`, `TradelistViews`, `TradeAnalysis`, `PortfolioCorrelation`, `PortfolioComposerChart`, `PortfolioComposerLog`, `Explore`, `SPOverview`, `Stockpicker`, `FitnessPortfolio`, `FitnessStrategy`, `FitnessWF`
+- **Dry Rule:** Reuse `ColumnRegistry`, `ChartSnippetRegistry`, and `CorrelationAndFitnessRegistry` across trade list views, trade analysis panels, portfolio correlation matrices, stockpicker analytics, and fitness evaluators.
+- **Donor:** `C:\SQX-145\internal\plugins\ResultsTradeList\ResultsTradeList.jar`, `C:\SQX-145\internal\plugins\ResultsTradelistViews\ResultsTradelistViews.jar`, `C:\SQX-145\internal\plugins\ResultsTradeAnalysis\ResultsTradeAnalysis.jar`, `C:\SQX-145\internal\plugins\ResultsPortfolioCorrelation\ResultsPortfolioCorrelation.jar`, `C:\SQX-145\internal\plugins\ResultsPortfolioComposerChart\ResultsPortfolioComposerChart.jar`, `C:\SQX-145\internal\plugins\ResultsPortfolioComposerLog\ResultsPortfolioComposerLog.jar`, `C:\SQX-145\internal\plugins\ResultsExplore\ResultsExplore.jar`, `C:\SQX-145\internal\plugins\ResultsSPOverview\ResultsSPOverview.jar`, `C:\SQX-145\internal\plugins\ResultsStockpicker\ResultsStockpicker.jar`, `C:\SQX-145\internal\plugins\FitnessMethodExistingPortfolio\FitnessMethodExistingPortfolio.jar`, `C:\SQX-145\internal\plugins\FitnessMethodStrategyResult\FitnessMethodStrategyResult.jar`, `C:\SQX-145\internal\plugins\FitnessMethodWFResult\FitnessMethodWFResult.jar`, `C:\SQX-145\internal\web\RESULTS\`
+- **Backend:** `app/workspace/results/reports/{trade_list,results_tradelist_views,trade_analysis,portfolio_correlation,results_portfolio_composer_chart,results_portfolio_composer_log,results_explore,results_sp_overview,results_stockpicker}.py` & `app/workspace/results/fitness/{existing_portfolio,strategy_result,wf_result}.py` (12 focused modules, each `🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Builder/results/tabs/TradeListTab.tsx`, `ui/app/workspace/Results/views/{ResultsTradelistViewsView,TradeAnalysisView,PortfolioCorrelationView,ResultsPortfolioComposerChartView,ResultsPortfolioComposerLogView,ResultsExploreView,ResultsSPOverviewView,ResultsStockpickerView}.tsx`, `ui/app/workspace/Builder/FitnessEvolutionModal.tsx`
+- **Class:** `TradeList`, `TradelistViews`, `TradeAnalysis`, `PortfolioCorrelation`, `PortfolioComposerChart`, `PortfolioComposerLog`, `Explore`, `SPOverview`, `Stockpicker`, `FitnessPortfolio`, `FitnessStrategy`, `FitnessWF`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-RESULTS-TRADELIST`: List all trades executed by strategy with entry/exit times, prices, and profits $\rightarrow$ `TradeList.trade_list(strategy_id: str, *, limit: int = 500, offset: int = 0) -> list[dict[str, Any]]`
   - [ ] `FR-RESULTS-TRADELIST-VIEWS`: Manage custom column views and filtering presets for trade list $\rightarrow$ `TradelistViews.tradelist_views(view_config: Mapping[str, Any] | None = None) -> dict[str, Any]`
@@ -1201,8 +1212,11 @@ HaruQuantAI/
 
 #### 7. `app/workspace/results/reports/{source_code,results_plugins}.py`, `exporters/{saver_html,saver_pdf,saver_legacy_v3,saver_trades}.py`, `loaders/{loader_legacy_v3,loader_legacy_v4}.py` (`FEAT-RESULTS-EXPORTERS`)
 
-- **Backend Targets:** 8 focused modules (`🟢 <200L` to `🟡 200–300L` each)
-- **Classes:** `SourceCode`, `Plugins`, `SaverHTML`, `SaverPDF`, `LegacySaver`, `SaverTrades`, `LegacyLoader`
+- **Dry Rule:** Reuse `PlatformCodeExporters`, `MonteCarloManipulator`, and `StrategyArchiveCodec` (`formats.py`) for strategy code viewing, prop-firm analytics/simulations, report savers, and legacy strategy loaders.
+- **Donor:** `C:\SQX-145\internal\plugins\ResultsSourceCode\ResultsSourceCode.jar`, `C:\SQX-145\internal\plugins\ResultsPlugins\ResultsPlugins.jar`, `C:\SQX-145\internal\plugins\SaverHTML\SaverHTML.jar`, `C:\SQX-145\internal\plugins\SaverPDF\SaverPDF.jar`, `C:\SQX-145\internal\plugins\SaverSQ3\SaverSQ3.jar`, `C:\SQX-145\internal\plugins\SaverStrategyTrades\SaverStrategyTrades.jar`, `C:\SQX-145\internal\plugins\LoaderSQ3\LoaderSQ3.jar`, `C:\SQX-145\internal\plugins\LoaderSQ4\LoaderSQ4.jar`, `C:\SQX-145\internal\web\RESULTS2\`
+- **Backend:** `app/workspace/results/reports/{source_code,results_plugins}.py`, `app/workspace/results/exporters/{saver_html,saver_pdf,saver_legacy_v3,saver_trades}.py`, `app/workspace/results/loaders/{loader_legacy_v3,loader_legacy_v4}.py` (8 focused modules, `🟢 <200L` to `🟡 200–300L` each)
+- **Frontend:** `ui/app/workspace/Builder/results/tabs/SourceCodeTab.tsx`, `ui/app/workspace/Results/views/ResultsPluginsView.tsx`, `ui/app/plugins/databank/{DatabankSaveExports,DatabankToolbar}.tsx`
+- **Class:** `SourceCode`, `Plugins`, `SaverHTML`, `SaverPDF`, `LegacySaver`, `SaverTrades`, `LegacyLoader`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-RESULTS-SRCCODE`: Display generated strategy source code, custom indicator guide, terminal compiler popup, clipboard copy, and disk save (`source_code.py`) $\rightarrow$ `SourceCode.source_code(strategy_id: str, platform: str = "mt5") -> dict[str, Any]`, `SourceCode.custom_indicators(platform: str = "mt5") -> dict[str, Any]`, `SourceCode.terminal_config_popup(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `SourceCode.copy_clipboard(strategy_id: str, platform: str = "mt5") -> dict[str, Any]`, `SourceCode.save_code(strategy_id: str, platform: str, output_path: Path | str) -> dict[str, Any]`
   - [ ] `FR-RESULTS-PLUGINS`: Render sandboxed plugin iframe, run Prop Analytics, and run Prop Monte Carlo simulations (`results_plugins.py`) $\rightarrow$ `Plugins.plugin_iframe(plugin_id: str) -> dict[str, Any]`, `Plugins.run_prop_analytics(trades: Sequence[Mapping[str, Any]], rules: Mapping[str, Any]) -> dict[str, Any]`, `Plugins.run_prop_monte_carlo(trades: Sequence[Mapping[str, Any]], rules: Mapping[str, Any], iterations: int = 500) -> dict[str, Any]`
@@ -1217,25 +1231,30 @@ HaruQuantAI/
 - **Dependencies:** `AppDataManager`, `AppResults`, `SnippetMonteCarloAndWhatIf`, `BacktestSimulationEngine`
 - **Outputs / Downstream Role:** Verified robust strategies filtered and ranked for optimization or portfolio assembly.
 
-### Phase 8.1 – 8.5 Master Donor / Backend / Frontend Alignment Table
+### Phase 8.1 – 8.5: Retester Workspace, Cross-Checks, Robustness Reports & Execution Engine
 
-| Component                                                                                                     | Donor Path (`docs/SQX/...`)                                                                                                                                                                                         | Backend Target File (Line Budget)                                                                                                                                                   | Frontend Target File                                                                                                                                      | DRY Shared Dependencies                                                                 |
-| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `AppRetester`, `SettingsWhatToRetest`, `SettingsAutomaticRetest`, `SettingsCrossChecks`                       | `AppRetester`, `SettingsWhatToRetest`, `SettingsAutomaticRetest`, `SettingsCrossChecks`                                                                                                                             | `app/workspace/retester/retester.py` (`🟢 <200L`), `settings/{what_to_retest,automatic_retest}.py` (each `🟢 <150L`), `app/workspace/builder/settings/cross_checks.py` (`🟢 <200L`) | `ui/app/workspace/Retester/{RetesterWorkspace,RetesterSettings}.tsx`, `ui/app/workspace/Builder/settings/CrossChecksTab.tsx`                              | `HostPersistence`, `JobManager`                                                         |
-| `CrossCheck*` (9 Modules)                                                                                     | `CrossCheckMonteCarloManipulation`, `MonteCarloRetest`, `HigherPrecision`, `AdditionalMarkets`, `OptProfileSysParamPermutation`, `SequentialOptimization`, `WalkForwardMatrix`, `WalkForwardOptimization`, `WhatIf` | `app/workspace/retester/cross_checks/` (9 files, each `🟢 <180L`)                                                                                                                   | `ui/app/workspace/Retester/views/*Modal.tsx`                                                                                                              | `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`, `retester/_common.py` |
-| `ResultsRobustnessTests`, `ResultsSysParamPermutation`, `ResultsSequentialOptimization`, `ResultsWalkForward` | `ResultsRobustnessTests`, `ResultsSysParamPermutation`, `ResultsSequentialOptimization`, `ResultsWalkForward`                                                                                                       | `app/workspace/results/reports/{results_robustness_tests,results_sys_param_permutation,results_sequential_optimization,results_walk_forward}.py` (each `🟢 <200L`)                  | `ui/app/workspace/Results/views/{ResultsRobustnessTestsView,ResultsSysParamPermutationView,ResultsSequentialOptimizationView,ResultsWalkForwardView}.tsx` | `ColumnRegistry`                                                                        |
-| `TaskRetest` & `TaskAutomaticRetest`                                                                          | `TaskRetest`, `TaskAutomaticRetest`                                                                                                                                                                                 | `app/workspace/retester/engine/retest_task.py` (`🟡 200–350L`), `app/workspace/custom_projects/tasks/auto_retest.py` (`🟢 <200L`)                                                   | `ui/app/workspace/Retester/{retesterClient.ts,RetesterSettings.tsx}`                                                                                      | `BacktestSimulator`, `MonteCarloManipulator`, `WhatIfSimulator`                         |
+#### 1. `app/workspace/retester/retester.py`, `settings/{what_to_retest,automatic_retest}.py` & `app/workspace/builder/settings/cross_checks.py` (`FEAT-RETESTER-SETTINGS`)
 
-#### 1. Phase 8.1 – 8.5 Exact Classes & Method Signatures
+- **Dry Rule:** Reuse `HostPersistence` and `JobManager` for retester workspace orchestration, automatic retest pipelines, and cross-check pipeline configuration.
+- **Donor:** `C:\SQX-145\internal\plugins\AppRetester\AppRetester.jar`, `C:\SQX-145\internal\plugins\SettingsWhatToRetest\SettingsWhatToRetest.jar`, `C:\SQX-145\internal\plugins\SettingsAutomaticRetest\`, `C:\SQX-145\internal\plugins\SettingsCrossChecks\SettingsCrossChecks.jar`, `C:\SQX-145\internal\web\RETESTER\`
+- **Backend:** `app/workspace/retester/retester.py` (`🟢 <200L`), `app/workspace/retester/settings/{what_to_retest,automatic_retest}.py` (each `🟢 <150L`), `app/workspace/builder/settings/cross_checks.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Retester/{RetesterWorkspace,RetesterSettings}.tsx`, `ui/app/workspace/Builder/settings/CrossChecksTab.tsx`
+- **Class:** `AppRetester` (`retester.py`), `WhatToRetest` (`what_to_retest.py`), `AutomaticRetest` (`automatic_retest.py`), `CrossChecks` (`cross_checks.py`)
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-RETESTER-INIT`: Initialize Retester workspace and load active retest configuration $\rightarrow$ `AppRetester.init_workspace() -> dict[str, Any]`
+  - [ ] `FR-RETESTER-START`: Trigger strategy retest execution pipeline via `JobManager` $\rightarrow$ `AppRetester.start_retest(config: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-RETESTER-WHAT`: Configure source/target databanks and retest scope $\rightarrow$ `WhatToRetest.what_to_retest(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-RETESTER-AUTO`: Configure automatic strategy retest pipeline triggers $\rightarrow$ `AutomaticRetest.automatic_retest(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-RETESTER-CROSSCHECKS`: List, inspect, and configure sequential robustness cross-check gates and acceptance criteria $\rightarrow$ `CrossChecks.cross_checks() -> list[dict[str, Any]]`, `CrossChecks.cross_check(check_id: str) -> dict[str, Any]`, `CrossChecks.cross_check_acceptance_settings(check_id: str, criteria: Mapping[str, Any]) -> dict[str, Any]`, `CrossChecks.cross_check_settings(check_id: str, settings: Mapping[str, Any]) -> dict[str, Any]`
 
-- **`app/workspace/retester/retester.py` (`AppRetester`):**
-  - [ ] `FR-RETESTER-INIT` $\rightarrow$ `AppRetester.init_workspace() -> dict[str, Any]`
-  - [ ] `FR-RETESTER-START` $\rightarrow$ `AppRetester.start_retest(config: Mapping[str, Any]) -> dict[str, Any]`
-- **`app/workspace/retester/settings/{what_to_retest,automatic_retest}.py` & `app/workspace/builder/settings/cross_checks.py`:**
-  - [ ] `FR-RETESTER-WHAT` $\rightarrow$ `WhatToRetest.what_to_retest(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-RETESTER-AUTO` $\rightarrow$ `AutomaticRetest.automatic_retest(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-RETESTER-CROSSCHECKS` $\rightarrow$ `CrossChecks.cross_checks() -> list[dict[str, Any]]`, `CrossChecks.cross_check(check_id: str) -> dict[str, Any]`, `CrossChecks.cross_check_acceptance_settings(check_id: str, criteria: Mapping[str, Any]) -> dict[str, Any]`, `CrossChecks.cross_check_settings(check_id: str, settings: Mapping[str, Any]) -> dict[str, Any]`
-- **`app/workspace/retester/cross_checks/` (9 Modules):**
+#### 2. `app/workspace/retester/cross_checks/` — 9 Robustness Cross-Check Modules (`FEAT-RETESTER-CROSSCHECKS`)
+
+- **Dry Rule:** Reuse `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`, and `retester/_common.py` for all robustness stress-test configurations and filtering rules.
+- **Donor:** `C:\SQX-145\internal\plugins\CrossCheckMonteCarloManipulation\CrossCheckMonteCarloManipulation.jar`, `C:\SQX-145\internal\plugins\CrossCheckMonteCarloRetest\CrossCheckMonteCarloRetest.jar`, `C:\SQX-145\internal\plugins\CrossCheckRetestWithHigherPrecision\CrossCheckRetestWithHigherPrecision.jar`, `C:\SQX-145\internal\plugins\CrossCheckRetestOnAdditionalMarkets\CrossCheckRetestOnAdditionalMarkets.jar`, `C:\SQX-145\internal\plugins\CrossCheckOptProfileSysParamPermutation\CrossCheckOptProfileSysParamPermutation.jar`, `C:\SQX-145\internal\plugins\CrossCheckSequentialOptimization\CrossCheckSequentialOptimization.jar`, `C:\SQX-145\internal\plugins\CrossCheckWalkForwardMatrix\CrossCheckWalkForwardMatrix.jar`, `C:\SQX-145\internal\plugins\CrossCheckWalkForwardOptimization\CrossCheckWalkForwardOptimization.jar`, `C:\SQX-145\internal\plugins\CrossCheckWhatIf\CrossCheckWhatIf.jar`
+- **Backend:** `app/workspace/retester/cross_checks/` (9 files, each `🟢 <180L`)
+- **Frontend:** `ui/app/workspace/Retester/views/*Modal.tsx`
+- **Class:** `MonteCarloManipulation`, `MonteCarloRetest`, `HigherPrecision`, `AdditionalMarkets`, `SPPCheck`, `SequentialOptCheck`, `WFMatrixCheck`, `WFOptCheck`, `WhatIf`
+- **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-RETESTER-CC-MC-MANIP` (`cross_check_monte_carlo_manipulation.py`) $\rightarrow$ `MonteCarloManipulation.settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `MonteCarloManipulation.mc_manipulation_fitness(config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-RETESTER-CC-MC-RETEST` (`cross_check_monte_carlo_retest.py`) $\rightarrow$ `MonteCarloRetest.settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `MonteCarloRetest.mc_retest_fitness(config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-RETESTER-CC-HIGHER-PREC` (`cross_check_retest_with_higher_precision.py`) $\rightarrow$ `HigherPrecision.settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `HigherPrecision.cc_higher_precision(config: Mapping[str, Any]) -> dict[str, Any]`
@@ -1245,14 +1264,30 @@ HaruQuantAI/
   - [ ] `FR-RETESTER-CC-WFM` (`cross_check_walk_forward_matrix.py`) $\rightarrow$ `WFMatrixCheck.settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `WFMatrixCheck.filtering(rules: Sequence[Mapping[str, Any]]) -> dict[str, Any]`
   - [ ] `FR-RETESTER-CC-WFO` (`cross_check_walk_forward_optimization.py`) $\rightarrow$ `WFOptCheck.settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `WFOptCheck.filtering(rules: Sequence[Mapping[str, Any]]) -> dict[str, Any]`
   - [ ] `FR-RETESTER-CC-WHATIF` (`what_if.py`) $\rightarrow$ `WhatIf.settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`app/workspace/results/reports/{results_robustness_tests,results_sys_param_permutation,results_sequential_optimization,results_walk_forward}.py`:**
-  - [ ] `FR-RETESTER-RES-ROBUSTNESS` $\rightarrow$ `RobustnessTests.robustness_tests(strategy_id: str) -> dict[str, Any]`, `RobustnessTests.manageviews(view_config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `RobustnessTests.robustness_analysis(strategy_id: str) -> dict[str, Any]`
-  - [ ] `FR-RETESTER-RES-SPP` $\rightarrow$ `SysParamPermutation.sys_param_permutation(strategy_id: str) -> dict[str, Any]`, `SysParamPermutation.spp_panel(strategy_id: str) -> dict[str, Any]`
-  - [ ] `FR-RETESTER-RES-SEQ-OPT` $\rightarrow$ `SequentialOptimization.sequential_optimization(strategy_id: str) -> dict[str, Any]`, `SequentialOptimization.sequential_param_chart(strategy_id: str) -> dict[str, Any]`
-  - [ ] `FR-RETESTER-RES-WF` $\rightarrow$ `WalkForward.wfresults(strategy_id: str) -> dict[str, Any]`, `WalkForward.manageviews(view_config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`app/workspace/retester/engine/retest_task.py` & `app/workspace/custom_projects/tasks/auto_retest.py`:**
-  - [ ] `FR-RETESTER-TASK-EXECUTE` $\rightarrow$ `RetestTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `RetestTask.execute_retest(strategy_ids: Sequence[str], pipeline_config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-RETESTER-AUTOTASK-EXECUTE` $\rightarrow$ `AutoRetestTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `AutoRetestTask.execute_auto_retest(databank_ids: Sequence[str], retest_config: Mapping[str, Any]) -> dict[str, Any]`
+
+#### 3. `app/workspace/results/reports/{results_robustness_tests,results_sys_param_permutation,results_sequential_optimization,results_walk_forward}.py` (`FEAT-RETESTER-REPORTS`)
+
+- **Dry Rule:** Reuse `ColumnRegistry` (`snippets/columns.py`) for robustness percentile tables, System Parameter Permutation (`SPP`) distributions, sequential optimization charts, and Walk-Forward results.
+- **Donor:** `C:\SQX-145\internal\plugins\ResultsRobustnessTests\ResultsRobustnessTests.jar`, `C:\SQX-145\internal\plugins\ResultsSysParamPermutation\ResultsSysParamPermutation.jar`, `C:\SQX-145\internal\plugins\ResultsSequentialOptimization\ResultsSequentialOptimization.jar`, `C:\SQX-145\internal\plugins\ResultsWalkForward\ResultsWalkForward.jar`
+- **Backend:** `app/workspace/results/reports/{results_robustness_tests,results_sys_param_permutation,results_sequential_optimization,results_walk_forward}.py` (each `🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Results/views/{ResultsRobustnessTestsView,ResultsSysParamPermutationView,ResultsSequentialOptimizationView,ResultsWalkForwardView}.tsx`
+- **Class:** `RobustnessTests`, `SysParamPermutation`, `SequentialOptimization`, `WalkForward`
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-RETESTER-RES-ROBUSTNESS`: Render Monte Carlo robustness confidence tables and fan charts $\rightarrow$ `RobustnessTests.robustness_tests(strategy_id: str) -> dict[str, Any]`, `RobustnessTests.manageviews(view_config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `RobustnessTests.robustness_analysis(strategy_id: str) -> dict[str, Any]`
+  - [ ] `FR-RETESTER-RES-SPP`: Render System Parameter Permutation (`SPP`) median/percentile distribution analysis $\rightarrow$ `SysParamPermutation.sys_param_permutation(strategy_id: str) -> dict[str, Any]`, `SysParamPermutation.spp_panel(strategy_id: str) -> dict[str, Any]`
+  - [ ] `FR-RETESTER-RES-SEQ-OPT`: Render Sequential Optimization parameter stability reports and charts $\rightarrow$ `SequentialOptimization.sequential_optimization(strategy_id: str) -> dict[str, Any]`, `SequentialOptimization.sequential_param_chart(strategy_id: str) -> dict[str, Any]`
+  - [ ] `FR-RETESTER-RES-WF`: Render Walk-Forward Optimization and Walk-Forward Matrix (`WFM`) stability results $\rightarrow$ `WalkForward.wfresults(strategy_id: str) -> dict[str, Any]`, `WalkForward.manageviews(view_config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+
+#### 4. `app/workspace/retester/engine/retest_task.py` & `app/workspace/custom_projects/tasks/auto_retest.py` (`FEAT-RETESTER-ENGINE`)
+
+- **Dry Rule:** Reuse `BacktestSimulator`, `MonteCarloManipulator`, and `WhatIfSimulator` for batch retest and automatic retest execution tasks.
+- **Donor:** `C:\SQX-145\internal\plugins\TaskRetest\TaskRetest.jar`, `C:\SQX-145\internal\plugins\TaskAutomaticRetest\TaskAutomaticRetest.jar`, `C:\SQX-145\internal\web\RETESTER\`
+- **Backend:** `app/workspace/retester/engine/retest_task.py` (`🟡 200–350L`), `app/workspace/custom_projects/tasks/auto_retest.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Retester/{retesterClient.ts,RetesterSettings.tsx}`
+- **Class:** `RetestTask`, `AutoRetestTask`
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-RETESTER-TASK-EXECUTE`: Configure and execute strategy retest and cross-check evaluation pipeline $\rightarrow$ `RetestTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `RetestTask.execute_retest(strategy_ids: Sequence[str], pipeline_config: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-RETESTER-AUTOTASK-EXECUTE`: Configure and execute automated multi-databank retest task $\rightarrow$ `AutoRetestTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `AutoRetestTask.execute_auto_retest(databank_ids: Sequence[str], retest_config: Mapping[str, Any]) -> dict[str, Any]`
 
 ---
 
@@ -1262,30 +1297,34 @@ HaruQuantAI/
 - **Dependencies:** `AppDataManager`, `AppResults`, `BacktestSimulationEngine`
 - **Outputs / Downstream Role:** Optimized strategy parameters and Walk-Forward stability matrices.
 
-### Phase 9.1 – 9.3 Master Donor / Backend / Frontend Alignment Table
+### Phase 9.1 – 9.3: Optimizer Workspace, Settings, Profile Reports & Execution Engine
 
-| Component                    | Donor Path (`docs/SQX/...`)  | Backend Target File (Line Budget)                                            | Frontend Target File                                                | DRY Shared Dependencies                |
-| ---------------------------- | ---------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------- |
-| `AppOptimizer`               | `AppOptimizer`               | `app/workspace/optimizer/optimizer.py` (`🟢 <200L`)                          | `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`                 | `JobManager`, `HostPersistence`        |
-| `SettingsOptimization`       | `SettingsOptimization`       | `app/workspace/optimizer/settings/optimization_settings.py` (`🟢 <200L`)     | `ui/app/workspace/Optimizer/OptimizerSettings.tsx`                  | `optimizer/_common.py`                 |
-| `ResultsOptimizationProfile` | `ResultsOptimizationProfile` | `app/workspace/results/reports/results_optimization_profile.py` (`🟢 <200L`) | `ui/app/workspace/Results/views/ResultsOptimizationProfileView.tsx` | `ColumnRegistry`                       |
-| `TaskOptimize`               | `TaskOptimize`               | `app/workspace/optimizer/engine/optimize_task.py` (`🟡 250–400L`)            | `ui/app/workspace/Optimizer/optimizerClient.ts`                     | `BacktestSimulator`, `RandomGenerator` |
+#### 1. `app/workspace/optimizer/optimizer.py` & `app/workspace/optimizer/settings/optimization_settings.py` (`FEAT-OPTIMIZER-WORKSPACE`)
 
-#### 1. Phase 9.1 – 9.3 Exact Classes & Method Signatures
+- **Dry Rule:** Reuse `JobManager`, `HostPersistence`, and `optimizer/_common.py` for optimization workspace state and parameter range presets.
+- **Donor:** `C:\SQX-145\internal\plugins\AppOptimizer\AppOptimizer.jar`, `C:\SQX-145\internal\plugins\SettingsOptimization\SettingsOptimization.jar`, `C:\SQX-145\internal\web\OPTIMIZER\`
+- **Backend:** `app/workspace/optimizer/optimizer.py` (`🟢 <200L`), `app/workspace/optimizer/settings/optimization_settings.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Optimizer/{OptimizerWorkspace,OptimizerSettings}.tsx`
+- **Class:** `AppOptimizer` (`optimizer.py`), `Optimization` (`optimization_settings.py`)
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-OPTIMIZER-INIT`: Initialize Optimizer workspace and load optimization configuration $\rightarrow$ `AppOptimizer.init_workspace() -> dict[str, Any]`
+  - [ ] `FR-OPTIMIZER-START`: Start parameter optimization or Walk-Forward job via `JobManager` $\rightarrow$ `AppOptimizer.start_optimization(config: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-OPTIMIZER-SETTINGS`: Configure optimization method (`grid`, `genetic`, `wfo`, `wfm`), parameter steps, and constraints $\rightarrow$ `Optimization.optimization(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-OPTIMIZER-AUTOPRESET`: Automatically populate parameter ranges and step increments from strategy definition $\rightarrow$ `Optimization.auto_preset(strategy_id: str) -> dict[str, Any]`
 
-- **`app/workspace/optimizer/optimizer.py` (`AppOptimizer`):**
-  - [ ] `FR-OPTIMIZER-INIT` $\rightarrow$ `AppOptimizer.init_workspace() -> dict[str, Any]`
-  - [ ] `FR-OPTIMIZER-START` $\rightarrow$ `AppOptimizer.start_optimization(config: Mapping[str, Any]) -> dict[str, Any]`
-- **`app/workspace/optimizer/settings/optimization_settings.py` (`Optimization`):**
-  - [ ] `FR-OPTIMIZER-SETTINGS` $\rightarrow$ `Optimization.optimization(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-OPTIMIZER-AUTOPRESET` $\rightarrow$ `Optimization.auto_preset(strategy_id: str) -> dict[str, Any]`
-- **`app/workspace/results/reports/results_optimization_profile.py` (`OptimizationProfile`):**
-  - [ ] `FR-OPTIMIZER-PROFILE-VIEW` $\rightarrow$ `OptimizationProfile.optimization_profile(strategy_id: str) -> dict[str, Any]`
-  - [ ] `FR-OPTIMIZER-PROFILE-LEVELS` $\rightarrow$ `OptimizationProfile.optim_profile_levels(levels_config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-OPTIMIZER-PROFILE-MANAGE` $\rightarrow$ `OptimizationProfile.manageviews(view_config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`app/workspace/optimizer/engine/optimize_task.py` (`OptimizeTask`):**
-  - [ ] `FR-OPTIMIZER-TASK-SIMPLE` $\rightarrow$ `OptimizeTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-OPTIMIZER-TASK-EXECUTE` $\rightarrow$ `OptimizeTask.execute_optimization(strategy_spec: Mapping[str, Any], opt_config: Mapping[str, Any]) -> dict[str, Any]`
+#### 2. `app/workspace/results/reports/results_optimization_profile.py` & `app/workspace/optimizer/engine/optimize_task.py` (`FEAT-OPTIMIZER-ENGINE`)
+
+- **Dry Rule:** Reuse `ColumnRegistry`, `BacktestSimulator`, and `RandomGenerator` for parameter space evaluation, 3D optimization profile heatmaps, and Walk-Forward Matrix (`WFM`) neighbourhood scoring.
+- **Donor:** `C:\SQX-145\internal\plugins\ResultsOptimizationProfile\ResultsOptimizationProfile.jar`, `C:\SQX-145\internal\plugins\TaskOptimize\TaskOptimize.jar`, `C:\SQX-145\internal\web\OPTIMIZER\`
+- **Backend:** `app/workspace/results/reports/results_optimization_profile.py` (`🟢 <200L`), `app/workspace/optimizer/engine/optimize_task.py` (`🟡 250–400L`)
+- **Frontend:** `ui/app/workspace/Results/views/ResultsOptimizationProfileView.tsx`, `ui/app/workspace/Optimizer/optimizerClient.ts`
+- **Class:** `OptimizationProfile` (`results_optimization_profile.py`), `OptimizeTask` (`optimize_task.py`)
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-OPTIMIZER-PROFILE-VIEW`: Render optimization profile summary and 2D/3D parameter landscape $\rightarrow$ `OptimizationProfile.optimization_profile(strategy_id: str) -> dict[str, Any]`
+  - [ ] `FR-OPTIMIZER-PROFILE-LEVELS`: Configure threshold levels for optimization profile stability scoring $\rightarrow$ `OptimizationProfile.optim_profile_levels(levels_config: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-OPTIMIZER-PROFILE-MANAGE`: Manage custom column views for optimization profile tables $\rightarrow$ `OptimizationProfile.manageviews(view_config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-OPTIMIZER-TASK-SIMPLE`: Configure simple settings for parameter optimization task $\rightarrow$ `OptimizeTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-OPTIMIZER-TASK-EXECUTE`: Execute Grid Search, Genetic Optimization, Walk-Forward Optimization (`WFO`), or Walk-Forward Matrix (`WFM`) evaluation $\rightarrow$ `OptimizeTask.execute_optimization(strategy_spec: Mapping[str, Any], opt_config: Mapping[str, Any]) -> dict[str, Any]`
 
 ---
 
@@ -1295,31 +1334,37 @@ HaruQuantAI/
 - **Dependencies:** `AppDataManager`, `AppResults`, `CoreIndicatorLibrary`
 - **Outputs / Downstream Role:** Trained neural network models embedded into strategy rules and interactive AI copilot actions.
 
-### Phase 10.1 Master Donor / Backend / Frontend Alignment Table
+### Phase 10.1: Neural Network Trainer & Built-in AI (`ServletAI`)
 
-| Component                  | Donor Path (`docs/SQX/...`)      | Backend Target File (Line Budget)                         | Frontend Target File                                      | DRY Shared Dependencies                        |
-| -------------------------- | -------------------------------- | --------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------- |
-| `AppNeuralNetwork`         | `AppNeuralNetwork`               | `app/workspace/neural_network/neural_net.py` (`🟢 <200L`) | `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx` | `JobManager`, `HostPersistence`                |
-| `TaskNeuralNetworkTrainer` | `TaskNeuralNetworkTrainer`       | `app/workspace/neural_network/trainer.py` (`🟡 200–350L`) | `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`        | `CoreIndicatorLibrary`, `DataSeries`           |
-| `ServletAI`                | `ServletAI`, `SQAI`, `AIPlugins` | `app/workspace/neural_network/routes.py` (`🟡 200–350L`)  | `ui/app/workspace/AI/AIWorkspace.tsx`                     | `HostPersistence`, `FormulaAndNegaterRegistry` |
+#### 1. `app/workspace/neural_network/neural_net.py` & `app/workspace/neural_network/trainer.py` (`FEAT-NN-TRAINER`)
 
-#### 1. Phase 10.1 Exact Classes & Method Signatures
+- **Dry Rule:** Reuse `JobManager`, `HostPersistence`, `CoreIndicatorLibrary`, and `DataSeries` for feature matrix construction and model persistence.
+- **Donor:** `C:\SQX-145\internal\plugins\AppNeuralNetwork\AppNeuralNetwork.jar`, `C:\SQX-145\internal\plugins\TaskNeuralNetworkTrainer\TaskNeuralNetworkTrainer.jar`, `C:\SQX-145\internal\web\NEURALNETWORK\`
+- **Backend:** `app/workspace/neural_network/neural_net.py` (`🟢 <200L`), `app/workspace/neural_network/trainer.py` (`🟡 200–350L`)
+- **Frontend:** `ui/app/workspace/NeuralNetwork/{NeuralNetworkTrainer.tsx,neuralNetStore.ts}`
+- **Class:** `AppNeuralNetwork` (`neural_net.py`), `NNTrainer` (`trainer.py`)
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-NN-WORKSPACE-INIT`: Initialize Neural Network Trainer workspace $\rightarrow$ `AppNeuralNetwork.init_workspace() -> dict[str, Any]`
+  - [ ] `FR-NN-WORKSPACE-START`: Dispatch neural network training run via `JobManager` $\rightarrow$ `AppNeuralNetwork.start_training(config: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-NN-TRAINER-SIMPLE`: Configure simple settings for neural network training task $\rightarrow$ `NNTrainer.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-NN-TRAINER-FEATURES`: Compute normalized indicator feature matrices for training and validation splits $\rightarrow$ `NNTrainer.prepare_features(symbol: str, timeframe: str, indicators: Sequence[str]) -> dict[str, Any]`
+  - [ ] `FR-NN-TRAINER-TRAIN`: Train neural network classifier over prepared feature matrices $\rightarrow$ `NNTrainer.train_model(feature_matrix: Mapping[str, Any], hyperparams: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-NN-TRAINER-EVAL`: Evaluate model classification accuracy, precision, and confusion matrix on out-of-sample data $\rightarrow$ `NNTrainer.evaluate_accuracy(model_id: str, validation_data: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-NN-TRAINER-EXPORT`: Serialize and export trained neural network weights for strategy execution $\rightarrow$ `NNTrainer.export_model(model_id: str, output_path: Path | str | None = None) -> dict[str, Any]`
 
-- **`app/workspace/neural_network/neural_net.py` (`AppNeuralNetwork`):**
-  - [ ] `FR-NN-WORKSPACE-INIT` $\rightarrow$ `AppNeuralNetwork.init_workspace() -> dict[str, Any]`
-  - [ ] `FR-NN-WORKSPACE-START` $\rightarrow$ `AppNeuralNetwork.start_training(config: Mapping[str, Any]) -> dict[str, Any]`
-- **`app/workspace/neural_network/trainer.py` (`NNTrainer`):**
-  - [ ] `FR-NN-TRAINER-SIMPLE` $\rightarrow$ `NNTrainer.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-NN-TRAINER-FEATURES` $\rightarrow$ `NNTrainer.prepare_features(symbol: str, timeframe: str, indicators: Sequence[str]) -> dict[str, Any]`
-  - [ ] `FR-NN-TRAINER-TRAIN` $\rightarrow$ `NNTrainer.train_model(feature_matrix: Mapping[str, Any], hyperparams: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-NN-TRAINER-EVAL` $\rightarrow$ `NNTrainer.evaluate_accuracy(model_id: str, validation_data: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-NN-TRAINER-EXPORT` $\rightarrow$ `NNTrainer.export_model(model_id: str, output_path: Path | str | None = None) -> dict[str, Any]`
-- **`app/workspace/neural_network/routes.py` (`ServletAI`):**
-  - [ ] `FR-AI-SEND-MSG` $\rightarrow$ `ServletAI.send_message(prompt: str, *, session_id: str = "default", context: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-AI-STREAM-RESP` $\rightarrow$ `ServletAI.stream_response(session_id: str = "default") -> dict[str, Any]`
-  - [ ] `FR-AI-CLEAR-HIST` $\rightarrow$ `ServletAI.clear_history(session_id: str = "default") -> dict[str, Any]`
-  - [ ] `FR-AI-INVOKE-TOOL` $\rightarrow$ `ServletAI.invoke_ai_tool(tool_name: str, arguments: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-AI-LOAD-AGENTS` $\rightarrow$ `ServletAI.load_agents_and_skills(plugin_dir: Path | str | None = None) -> dict[str, Any]`
+#### 2. `app/workspace/neural_network/routes.py` — `ServletAI` (`FEAT-AI-COPILOT`)
+
+- **Dry Rule:** Reuse `HostPersistence` and `FormulaAndNegaterRegistry` for AI conversation history, agent skill loading, and workspace tool invocation.
+- **Donor:** `C:\SQX-145\internal\plugins\ServletSQAI\ServletSQAI.jar`, `C:\SQX-145\internal\web\SQAI\`, `C:\SQX-145\internal\libs\agentscope-core-2.0.3.jar`, `C:\SQX-145\internal\libs\agentscope-harness-2.0.3.jar`, `C:\SQX-145\plugin_functions.md`
+- **Backend:** `app/workspace/neural_network/routes.py` (`🟡 200–350L`)
+- **Frontend:** `ui/app/workspace/AI/AIWorkspace.tsx`
+- **Class:** `ServletAI`
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-AI-SEND-MSG`: Send user prompt and active workspace context to AI assistant session $\rightarrow$ `ServletAI.send_message(prompt: str, *, session_id: str = "default", context: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-AI-STREAM-RESP`: Stream incremental AI assistant token responses over SSE/WebSocket $\rightarrow$ `ServletAI.stream_response(session_id: str = "default") -> dict[str, Any]`
+  - [ ] `FR-AI-CLEAR-HIST`: Clear conversation history for an AI assistant session $\rightarrow$ `ServletAI.clear_history(session_id: str = "default") -> dict[str, Any]`
+  - [ ] `FR-AI-INVOKE-TOOL`: Execute registered MCP / workspace function tools requested by the AI agent $\rightarrow$ `ServletAI.invoke_ai_tool(tool_name: str, arguments: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-AI-LOAD-AGENTS`: Discover and load custom AI agent personas and skills from plugin directories $\rightarrow$ `ServletAI.load_agents_and_skills(plugin_dir: Path | str | None = None) -> dict[str, Any]`
 
 ---
 
@@ -1329,33 +1374,39 @@ HaruQuantAI/
 - **Dependencies:** `AppResults`, `SnippetColumnsChartsAndFormulas` (`CorrelationAndFitnessRegistry`)
 - **Outputs / Downstream Role:** Diversified multi-strategy portfolios ready for live deployment or code export.
 
-### Phase 11.1 – 11.2 Master Donor / Backend / Frontend Alignment Table
+### Phase 11.1 – 11.2: Portfolio Composer & Automatic Portfolio Master
 
-| Component                                                                                  | Donor Path (`docs/SQX/...`)                                                                | Backend Target File (Line Budget)                                                                                                           | Frontend Target File                                                                                           | DRY Shared Dependencies                            |
-| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `AppPortfolioComposer` & `PortfolioComposer`                                               | `AppPortfolioComposer`, `PortfolioComposer`                                                | `app/workspace/portfolio/composer.py` (`🟡 250–380L`)                                                                                       | `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`                                            | `CorrelationAndFitnessRegistry`, `ColumnRegistry`  |
-| `SettingsCreatePortfolio` & `TaskCreatePortfolio`                                          | `SettingsCreatePortfolio`, `TaskCreatePortfolio`                                           | `app/workspace/portfolio/settings/create_portfolio.py` (`🟢 <150L`), `app/workspace/custom_projects/tasks/create_portfolio.py` (`🟢 <200L`) | `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx`                                                | `CorrelationAndFitnessRegistry`, `HostPersistence` |
-| `AppPortfolioMaster`, `SettingsAutomaticPortfolioBuilder`, `TaskAutomaticPortfolioBuilder` | `AppPortfolioMaster`, `SettingsAutomaticPortfolioBuilder`, `TaskAutomaticPortfolioBuilder` | `app/workspace/portfolio/master.py` (`🟢 <200L`), `settings/auto_builder.py` (`🟢 <200L`), `master_task.py` (`🟡 200–350L`)                 | `ui/app/workspace/PortfolioMaster/{PortfolioMasterWorkspace,PortfolioMasterSettings,portfolioMasterModel}.tsx` | `CorrelationAndFitnessRegistry`, `RandomGenerator` |
+#### 1. `app/workspace/portfolio/composer.py`, `settings/create_portfolio.py` & `app/workspace/custom_projects/tasks/create_portfolio.py` (`FEAT-PORTFOLIO-COMPOSER`)
 
-#### 1. Phase 11.1 – 11.2 Exact Classes & Method Signatures
+- **Dry Rule:** Reuse `CorrelationAndFitnessRegistry`, `ColumnRegistry`, and `HostPersistence` for portfolio equity curve blending, correlation matrices, and portfolio persistence.
+- **Donor:** `C:\SQX-145\internal\plugins\AppPortfolioComposer\AppPortfolioComposer.jar`, `C:\SQX-145\internal\plugins\PortfolioComposer\PortfolioComposer.jar`, `C:\SQX-145\internal\plugins\SettingsCreatePortfolio\SettingsCreatePortfolio.jar`, `C:\SQX-145\internal\plugins\TaskCreatePortfolio\TaskCreatePortfolio.jar`, `C:\SQX-145\internal\web\PORTFOLIOCOMPOSER\`
+- **Backend:** `app/workspace/portfolio/composer.py` (`🟡 250–380L`), `app/workspace/portfolio/settings/create_portfolio.py` (`🟢 <150L`), `app/workspace/custom_projects/tasks/create_portfolio.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/workspace/PortfolioComposer/{PortfolioComposerWorkspace,PortfolioConfiguration}.tsx`
+- **Class:** `AppPortfolioComposer` & `Composer` (`composer.py`), `CreatePortfolio` (`settings/create_portfolio.py`), `CreatePortfolioTask` (`tasks/create_portfolio.py`)
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-PORTFOLIO-COMP-INIT`: Initialize Portfolio Composer workspace $\rightarrow$ `AppPortfolioComposer.init_workspace() -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-COMP-COMPUTE`: Compute combined portfolio equity curve, drawdown, and correlation metrics for weighted constituent strategies $\rightarrow$ `AppPortfolioComposer.compute_portfolio(strategy_ids: Sequence[str], weights: Mapping[str, float] | None = None) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-COMP-VIEW`: Load Portfolio Composer state and constituent strategy table $\rightarrow$ `Composer.portfolio_composer(portfolio_id: str | None = None) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-COMP-RESULTS`: Retrieve computed portfolio performance report and equity series $\rightarrow$ `Composer.results(portfolio_id: str) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-COMP-SETTINGS`: Configure Portfolio Composer date ranges and capital settings $\rightarrow$ `Composer.settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-COMP-AUTOCOMP`: Toggle automatic portfolio recomputation on constituent changes $\rightarrow$ `Composer.autocomputation(enabled: bool = True) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-COMP-WEIGHTS`: Update constituent strategy weights and lot multipliers $\rightarrow$ `Composer.composition(weights: Mapping[str, float]) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-COMP-CONFIG`: Update portfolio simulation configuration parameters $\rightarrow$ `Composer.configuration(params: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-COMP-BUYHOLD`: Add a buy-and-hold benchmark strategy for a symbol and timeframe $\rightarrow$ `Composer.add_buy_hold_str(symbol: str, timeframe: str = "D1") -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-CREATE-SETTINGS`: Configure portfolio creation settings for custom project pipelines $\rightarrow$ `CreatePortfolio.settings_create_portfolio(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-CREATE-TASK`: Execute automated portfolio assembly task from databank candidates $\rightarrow$ `CreatePortfolioTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `CreatePortfolioTask.execute_create_portfolio(strategy_ids: Sequence[str], weights: Mapping[str, float] | None = None) -> dict[str, Any]`
 
-- **`app/workspace/portfolio/composer.py` (`AppPortfolioComposer` & `Composer`):**
-  - [ ] `FR-PORTFOLIO-COMP-INIT` $\rightarrow$ `AppPortfolioComposer.init_workspace() -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-COMP-COMPUTE` $\rightarrow$ `AppPortfolioComposer.compute_portfolio(strategy_ids: Sequence[str], weights: Mapping[str, float] | None = None) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-COMP-VIEW` $\rightarrow$ `Composer.portfolio_composer(portfolio_id: str | None = None) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-COMP-RESULTS` $\rightarrow$ `Composer.results(portfolio_id: str) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-COMP-SETTINGS` $\rightarrow$ `Composer.settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-COMP-AUTOCOMP` $\rightarrow$ `Composer.autocomputation(enabled: bool = True) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-COMP-WEIGHTS` $\rightarrow$ `Composer.composition(weights: Mapping[str, float]) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-COMP-CONFIG` $\rightarrow$ `Composer.configuration(params: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-COMP-BUYHOLD` $\rightarrow$ `Composer.add_buy_hold_str(symbol: str, timeframe: str = "D1") -> dict[str, Any]`
-- **`app/workspace/portfolio/settings/create_portfolio.py` & `app/workspace/custom_projects/tasks/create_portfolio.py`:**
-  - [ ] `FR-PORTFOLIO-CREATE-SETTINGS` $\rightarrow$ `CreatePortfolio.settings_create_portfolio(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-CREATE-TASK` $\rightarrow$ `CreatePortfolioTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `CreatePortfolioTask.execute_create_portfolio(strategy_ids: Sequence[str], weights: Mapping[str, float] | None = None) -> dict[str, Any]`
-- **`app/workspace/portfolio/{master,settings/auto_builder,master_task}.py`:**
-  - [ ] `FR-PORTFOLIO-MASTER-INIT` $\rightarrow$ `AppPortfolioMaster.init_workspace() -> dict[str, Any]` & `AppPortfolioMaster.start_search(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-AUTO-SETTINGS` $\rightarrow$ `AutoPortfolioBuilder.automatic_portfolio_builder(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `AutoPortfolioBuilder.correlation_settings(config: Mapping[str, Any]) -> dict[str, Any]`, `AutoPortfolioBuilder.genetic_settings(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PORTFOLIO-AUTO-TASK` $\rightarrow$ `AutoPortfolioTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `AutoPortfolioTask.execute_portfolio_search(databank_id: str, search_config: Mapping[str, Any]) -> dict[str, Any]`
+#### 2. `app/workspace/portfolio/{master,settings/auto_builder,master_task}.py` (`FEAT-PORTFOLIO-MASTER`)
+
+- **Dry Rule:** Reuse `CorrelationAndFitnessRegistry` and `RandomGenerator` for genetic/brute-force search over uncorrelated strategy combinations.
+- **Donor:** `C:\SQX-145\internal\plugins\AppPortfolioMaster\AppPortfolioMaster.jar`, `C:\SQX-145\internal\plugins\SettingsAutomaticPortfolioBuilder\SettingsAutomaticPortfolioBuilder.jar`, `C:\SQX-145\internal\plugins\TaskAutomaticPortfolioBuilder\TaskAutomaticPortfolioBuilder.jar`, `C:\SQX-145\internal\web\PORTFOLIOMASTER\`
+- **Backend:** `app/workspace/portfolio/master.py` (`🟢 <200L`), `app/workspace/portfolio/settings/auto_builder.py` (`🟢 <200L`), `app/workspace/portfolio/master_task.py` (`🟡 200–350L`)
+- **Frontend:** `ui/app/workspace/PortfolioMaster/{PortfolioMasterWorkspace,PortfolioMasterSettings,portfolioMasterModel}.tsx`
+- **Class:** `AppPortfolioMaster` (`master.py`), `AutoPortfolioBuilder` (`settings/auto_builder.py`), `AutoPortfolioTask` (`master_task.py`)
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-PORTFOLIO-MASTER-INIT`: Initialize Portfolio Master workspace and trigger automated portfolio search $\rightarrow$ `AppPortfolioMaster.init_workspace() -> dict[str, Any]` & `AppPortfolioMaster.start_search(config: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-AUTO-SETTINGS`: Configure portfolio size, sector/symbol quotas, correlation limits, and genetic search parameters $\rightarrow$ `AutoPortfolioBuilder.automatic_portfolio_builder(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `AutoPortfolioBuilder.correlation_settings(config: Mapping[str, Any]) -> dict[str, Any]`, `AutoPortfolioBuilder.genetic_settings(config: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-PORTFOLIO-AUTO-TASK`: Execute combinatorial or genetic portfolio search over candidate databanks $\rightarrow$ `AutoPortfolioTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `AutoPortfolioTask.execute_portfolio_search(databank_id: str, search_config: Mapping[str, Any]) -> dict[str, Any]`
 
 ---
 
@@ -1365,23 +1416,15 @@ HaruQuantAI/
 - **Dependencies:** Workspaces 3–11 (`AppDataManager`, `AppBuilder`, `AppRetester`, `AppOptimizer`, `AppPortfolioComposer`)
 - **Outputs / Downstream Role:** Autonomous quantitative research pipelines running end-to-end without manual intervention.
 
-### Phase 12.1 – 12.4 Master Donor / Backend / Frontend Alignment Table
-
-| Component                                                                                                                                                                              | Donor Path (`docs/SQX/...`)                                                                                                               | Backend Target File (Line Budget)                                                                                                                                                                                                   | Frontend Target File                                                                                                                                                          | DRY Shared Dependencies                                                             |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `AppTaskManager`, `ServletProject`, `TaskManagerProjects`, `TaskManagerTasks`, `ProjectResources`, `ProjectSettings`, `EnginePanel`, `SettingsNotes`                                   | `AppTaskManager`, `ServletProject`, `TaskManager*`, `ProjectResources`, `ProjectSettings`, `EnginePanel`, `SettingsNotes`                 | `app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings}.py` (each `🟢 <200L`), `engine_panel.py` (`🟡 200–350L`), `app/workspace/builder/settings/notes.py` (`🟢 <150L`) | `ui/app/workspace/CustomProjects/{CustomProjectsWorkspace,projectClient}.tsx`, `ui/app/plugins/project/ProjectWorkbench.tsx`, `ui/app/workspace/Builder/EnginePanel.tsx`      | `HostPersistence` (`projects` entity), `JobManager`, `ProjectArchiveCodec` (`.cfx`) |
-| `Task*` & `Settings*` Flow Control (`GoTo`, `WaitFor`, `StopAndStart`, `Notification`) + 5 `ProjectCondition*` Evaluators                                                              | `TaskGoToTask`, `TaskWaitFor`, `TaskStopAndStart`, `TaskNotification`, `ProjectCondition*`                                                | `app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `tasks/settings/{goto,wait,stop_start,notification}.py`, `conditions/*.py` (each `🟢 <180L`)                                                                | `ui/app/workspace/CustomProjects/tasks/{GoTo,Wait,StopStart,Notify}TaskModal.tsx`                                                                                             | `custom_projects/_common.py`, `HostPersistence`                                     |
-| `Task*` & `Settings*` Data & Databank Pipeline Steps (`UpdateData`, `AutoRetestData`, `LoadFromFiles`, `ClearDatabanks`, `Filtering`, `LogDatabankStats`, `SaveToFiles`, `DeleteFile`) | `TaskUpdateData`, `TaskLoadFromFiles`, `TaskClearDatabanks`, `TaskFiltering`, `TaskLogDatabankStats`, `TaskSaveToFiles`, `TaskDeleteFile` | `app/workspace/custom_projects/tasks/{data_update,load_files,databank_clear,filtering,log_stats,save_files,delete_file}.py` & `tasks/settings/*.py` (each `🟢 <200L`)                                                               | `ui/app/workspace/CustomProjects/tasks/{DataUpdate,DatabankClear,DeleteFile}TaskModal.tsx`, `ui/app/plugins/databank/{DatabankToolbar,DatabankViews,DatabankSaveExports}.tsx` | `HostPersistence`, `StrategyArchiveCodec`, `PlatformCodeExporters`                  |
-| `Task*` & `Settings*` Integration & Batch Config (`CallExternalScript`, `CustomAnalysis`, `ApplyMassConfig`)                                                                           | `TaskCallExternalScript`, `TaskCustomAnalysis`, `TaskApplyMassConfig`                                                                     | `app/workspace/custom_projects/tasks/{external_script,custom_analysis,mass_config}.py` & settings files (each `🟢 <180L`)                                                                                                           | `ui/app/workspace/CustomProjects/tasks/{ExternalScript,MassConfig}TaskModal.tsx`, `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx`                                   | `HostPersistence`, `FormulaAndNegaterRegistry`                                      |
-
----
-
 ### Phase 12.1: Project & Task Hierarchy Management
 
 #### 1. `app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings,engine_panel}.py` & `app/workspace/builder/settings/notes.py` (`FEAT-PROJECTS-ORCHESTRATOR`)
 
-- **Backend Targets:** 8 focused modules (`🟢 <200L` each, `engine_panel.py` `🟡 200–350L`)
-- **Classes:** `AppTaskManager` (`projects.py`), `ServletProject` (`routes.py`), `TMProjects` (`projects_manager.py`), `TMTasks` (`tasks_manager.py`), `Resources` (`project_resources.py`), `PMSettings` (`project_settings.py`), `Engine` (`engine_panel.py`), `Notes` (`notes.py`)
+- **Dry Rule:** Reuse `HostPersistence` (`projects` entity), `JobManager`, and `ProjectArchiveCodec` (`.cfx` archives) for Custom Project DAG storage, execution scheduling, and live telemetry panels.
+- **Donor:** `C:\SQX-145\internal\plugins\AppTaskManager\AppTaskManager.jar`, `C:\SQX-145\internal\plugins\ServletProject\ServletProject.jar`, `C:\SQX-145\internal\plugins\TaskManagerProjects\TaskManagerProjects.jar`, `C:\SQX-145\internal\plugins\TaskManagerTasks\`, `C:\SQX-145\internal\plugins\ProjectResources\`, `C:\SQX-145\internal\plugins\ProjectSettings\`, `C:\SQX-145\internal\plugins\EnginePanel\EnginePanel.jar`, `C:\SQX-145\internal\plugins\SettingsNotes\SettingsNotes.jar`, `C:\SQX-145\internal\web\TASKMANAGER\`, `C:\SQX-145\user\projects\`
+- **Backend:** `app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings}.py` (each `🟢 <200L`), `app/workspace/custom_projects/engine_panel.py` (`🟡 200–350L`), `app/workspace/builder/settings/notes.py` (`🟢 <150L`)
+- **Frontend:** `ui/app/workspace/CustomProjects/{CustomProjectsWorkspace,projectClient}.tsx`, `ui/app/plugins/project/ProjectWorkbench.tsx`, `ui/app/workspace/Builder/EnginePanel.tsx`
+- **Class:** `AppTaskManager` (`projects.py`), `ServletProject` (`routes.py`), `TMProjects` (`projects_manager.py`), `TMTasks` (`tasks_manager.py`), `Resources` (`project_resources.py`), `PMSettings` (`project_settings.py`), `Engine` (`engine_panel.py`), `Notes` (`notes.py`)
 - **Functional Requirements & Exact Method Signatures:**
   - **`AppTaskManager` (`projects.py`):**
     - [ ] `FR-PROJECTS-INIT` $\rightarrow$ `AppTaskManager.init_workspace() -> dict[str, Any]`
@@ -1418,52 +1461,64 @@ HaruQuantAI/
 
 ### Phase 12.2 – 12.4: Custom Project Task Runners, Settings & DAG Condition Evaluators
 
-#### 2. Flow Control Tasks & Conditions (`app/workspace/custom_projects/tasks/` & `conditions/`)
+#### 2. `app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `tasks/settings/*.py` & `conditions/*.py` — Flow Control Tasks & Conditions (`FEAT-PROJECTS-FLOW-CONTROL`)
 
-- [ ] `FR-PROJECTS-TASK-GOTO` (`goto.py` & `settings/goto.py`) $\rightarrow$ `GoToTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `GoToTask.execute_goto(dag_state: Mapping[str, Any], config: Mapping[str, Any]) -> dict[str, Any]`, `GoToSettings.settings_go_to_task(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- [ ] `FR-PROJECTS-TASK-WAIT` (`wait.py` & `settings/wait.py`) $\rightarrow$ `WaitForTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `WaitForTask.execute_wait(config: Mapping[str, Any]) -> dict[str, Any]`, `WaitForSettings.settings_wait_for(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- [ ] `FR-PROJECTS-TASK-STOP-START` (`stop_start.py` & `settings/stop_start.py`) $\rightarrow$ `StopAndStartTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `StopAndStartTask.execute_stop_start(config: Mapping[str, Any]) -> dict[str, Any]`, `StopAndStartSettings.settings_stop_and_start(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- [ ] `FR-PROJECTS-TASK-NOTIFY` (`notify.py` & `settings/notification.py`) $\rightarrow$ `NotificationTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `NotificationTask.execute_notification(config: Mapping[str, Any]) -> dict[str, Any]`, `NotificationSettings.settings_notification(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **5 Condition Evaluators (`conditions/{cycles_count,goto_activated,goto_evaluated,results_count,run_time}.py`):**
-  - [ ] `FR-PROJECTS-COND-CYCLES` $\rightarrow$ `CyclesCondition.evaluate(context: Mapping[str, Any]) -> bool`
-  - [ ] `FR-PROJECTS-COND-GOTO-ACTIVATED` $\rightarrow$ `GoToActivatedCondition.evaluate(context: Mapping[str, Any]) -> bool`
-  - [ ] `FR-PROJECTS-COND-GOTO-EVALUATED` $\rightarrow$ `GoToEvaluatedCondition.evaluate(context: Mapping[str, Any]) -> bool`
-  - [ ] `FR-PROJECTS-COND-RESULTS-COUNT` $\rightarrow$ `ResultsCountCondition.evaluate(context: Mapping[str, Any]) -> bool`
-  - [ ] `FR-PROJECTS-COND-RUN-TIME` $\rightarrow$ `RunTimeCondition.evaluate(context: Mapping[str, Any]) -> bool`
+- **Dry Rule:** Reuse `custom_projects/_common.py` and `HostPersistence` for DAG loop control, conditional branching, and notification dispatch.
+- **Donor:** `C:\SQX-145\internal\plugins\TaskGoToTask\TaskGoToTask.jar`, `C:\SQX-145\internal\plugins\SettingsGoToTask\SettingsGoToTask.jar`, `C:\SQX-145\internal\plugins\TaskWaitFor\TaskWaitFor.jar`, `C:\SQX-145\internal\plugins\SettingsWaitFor\SettingsWaitFor.jar`, `C:\SQX-145\internal\plugins\TaskStopAndStart\TaskStopAndStart.jar`, `C:\SQX-145\internal\plugins\SettingsStopAndStart\SettingsStopAndStart.jar`, `C:\SQX-145\internal\plugins\TaskNotification\TaskNotification.jar`, `C:\SQX-145\internal\plugins\SettingsNotification\SettingsNotification.jar`, `C:\SQX-145\internal\plugins\ProjectConditionCyclesCount\ProjectConditionCyclesCount.jar`, `C:\SQX-145\internal\plugins\ProjectConditionGoToActivated\ProjectConditionGoToActivated.jar`, `C:\SQX-145\internal\plugins\ProjectConditionGoToEvaluated\ProjectConditionGoToEvaluated.jar`, `C:\SQX-145\internal\plugins\ProjectConditionResultsCount\ProjectConditionResultsCount.jar`, `C:\SQX-145\internal\plugins\ProjectConditionRunTime\ProjectConditionRunTime.jar`
+- **Backend:** `app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `app/workspace/custom_projects/tasks/settings/{goto,wait,stop_start,notification}.py`, `app/workspace/custom_projects/conditions/{cycles_count,goto_activated,goto_evaluated,results_count,run_time}.py` (each `🟢 <180L`)
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/{GoTo,Wait,StopStart,Notify}TaskModal.tsx`
+- **Class:** `GoToTask`, `GoToSettings`, `WaitForTask`, `WaitForSettings`, `StopAndStartTask`, `StopAndStartSettings`, `NotificationTask`, `NotificationSettings`, `CyclesCondition`, `GoToActivatedCondition`, `GoToEvaluatedCondition`, `ResultsCountCondition`, `RunTimeCondition`
+- **Functional Requirements & Exact Method Signatures:**
+  - [ ] `FR-PROJECTS-TASK-GOTO` (`goto.py` & `settings/goto.py`) $\rightarrow$ `GoToTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `GoToTask.execute_goto(dag_state: Mapping[str, Any], config: Mapping[str, Any]) -> dict[str, Any]`, `GoToSettings.settings_go_to_task(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-PROJECTS-TASK-WAIT` (`wait.py` & `settings/wait.py`) $\rightarrow$ `WaitForTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `WaitForTask.execute_wait(config: Mapping[str, Any]) -> dict[str, Any]`, `WaitForSettings.settings_wait_for(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-PROJECTS-TASK-STOP-START` (`stop_start.py` & `settings/stop_start.py`) $\rightarrow$ `StopAndStartTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `StopAndStartTask.execute_stop_start(config: Mapping[str, Any]) -> dict[str, Any]`, `StopAndStartSettings.settings_stop_and_start(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-PROJECTS-TASK-NOTIFY` (`notify.py` & `settings/notification.py`) $\rightarrow$ `NotificationTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `NotificationTask.execute_notification(config: Mapping[str, Any]) -> dict[str, Any]`, `NotificationSettings.settings_notification(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **5 Condition Evaluators (`conditions/{cycles_count,goto_activated,goto_evaluated,results_count,run_time}.py`):**
+    - [ ] `FR-PROJECTS-COND-CYCLES` $\rightarrow$ `CyclesCondition.evaluate(context: Mapping[str, Any]) -> bool`
+    - [ ] `FR-PROJECTS-COND-GOTO-ACTIVATED` $\rightarrow$ `GoToActivatedCondition.evaluate(context: Mapping[str, Any]) -> bool`
+    - [ ] `FR-PROJECTS-COND-GOTO-EVALUATED` $\rightarrow$ `GoToEvaluatedCondition.evaluate(context: Mapping[str, Any]) -> bool`
+    - [ ] `FR-PROJECTS-COND-RESULTS-COUNT` $\rightarrow$ `ResultsCountCondition.evaluate(context: Mapping[str, Any]) -> bool`
+    - [ ] `FR-PROJECTS-COND-RUN-TIME` $\rightarrow$ `RunTimeCondition.evaluate(context: Mapping[str, Any]) -> bool`
 
-#### 3. Data, Databank, Script & Mass-Config Tasks (`app/workspace/custom_projects/tasks/` & `settings/`)
+#### 3. `app/workspace/custom_projects/tasks/` & `settings/` — Data, Databank, Script & Mass-Config Tasks (`FEAT-PROJECTS-PIPELINE-TASKS`)
 
-- **`data_update.py`, `settings/update_data.py`, `settings/auto_retest.py`:**
-  - [ ] `FR-PROJECTS-TASK-UPDATE-DATA` $\rightarrow$ `UpdateDataTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `UpdateDataTask.execute_update_data(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-UPDATE-DATA` $\rightarrow$ `UpdateDataSettings.settings_update_data(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-AUTO-RETEST` $\rightarrow$ `AutoRetestData.auto_retest_data(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`load_files.py` & `settings/load_files.py`:**
-  - [ ] `FR-PROJECTS-TASK-LOAD-FILES` $\rightarrow$ `LoadFromFilesTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `LoadFromFilesTask.execute_load_files(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-LOAD-FILES` $\rightarrow$ `LoadFromFilesSettings.settings_load_from_files(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`databank_clear.py` & `settings/clear_databanks.py`:**
-  - [ ] `FR-PROJECTS-TASK-CLEAR-DB` $\rightarrow$ `ClearDatabanksTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `ClearDatabanksTask.execute_clear_databanks(databank_ids: Sequence[str]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-CLEAR-DB` $\rightarrow$ `ClearDatabanksSettings.clear_databanks(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`filtering.py` & `settings/filtering.py`:**
-  - [ ] `FR-PROJECTS-TASK-FILTERING` $\rightarrow$ `FilteringTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `FilteringTask.execute_filtering(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-FILTERING` $\rightarrow$ `FilteringSettings.settings_filtering(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`log_stats.py` & `settings/log_stats.py`:**
-  - [ ] `FR-PROJECTS-TASK-LOG-STATS` $\rightarrow$ `LogDatabankStatsTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `LogDatabankStatsTask.execute_log_stats(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-LOG-STATS` $\rightarrow$ `LogStatsSettings.log_databank_stats(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `LogStatsSettings.new_log_databank_stats(rule: Mapping[str, Any]) -> dict[str, Any]`, `LogStatsSettings.log_databank_stats_type(stat_type: str) -> dict[str, Any]`
-- **`save_files.py` & `settings/save_files.py`:**
-  - [ ] `FR-PROJECTS-TASK-SAVE-FILES` $\rightarrow$ `SaveToFilesTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `SaveToFilesTask.execute_save_files(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-SAVE-FILES` $\rightarrow$ `SaveToFilesSettings.settings_save_to_files(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`delete_file.py` & `settings/delete_file.py`:**
-  - [ ] `FR-PROJECTS-TASK-DELETE-FILE` $\rightarrow$ `DeleteFileTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `DeleteFileTask.execute_delete_file(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-DELETE-FILE` $\rightarrow$ `DeleteFileSettings.settings_delete_file(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`external_script.py` & `settings/external_script.py`:**
-  - [ ] `FR-PROJECTS-TASK-EXT-SCRIPT` $\rightarrow$ `CallScriptTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `CallScriptTask.execute_external_script(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-EXT-SCRIPT` $\rightarrow$ `CallScriptSettings.settings_call_external_script(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`custom_analysis.py` & `app/workspace/builder/settings/custom_analysis.py`:**
-  - [ ] `FR-PROJECTS-TASK-CUSTOM-ANALYSIS` $\rightarrow$ `CustomAnalysisTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `CustomAnalysisTask.execute_custom_analysis(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-CUSTOM-ANALYSIS` $\rightarrow$ `CustomAnalysisSettings.settings_custom_analysis(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`mass_config.py` & `settings/mass_config.py`:**
-  - [ ] `FR-PROJECTS-TASK-MASS-CONFIG` $\rightarrow$ `ApplyMassConfigTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `ApplyMassConfigTask.execute_mass_config(config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-PROJECTS-SETTINGS-MASS-CONFIG` $\rightarrow$ `ApplyMassConfigSettings.apply_mass_config(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+- **Dry Rule:** Reuse `HostPersistence`, `StrategyArchiveCodec`, `PlatformCodeExporters`, and `FormulaAndNegaterRegistry` across data updates, databank filtering/archiving, custom analysis scripts, and mass configuration steps.
+- **Donor:** `C:\SQX-145\internal\plugins\TaskUpdateData\TaskUpdateData.jar`, `C:\SQX-145\internal\plugins\SettingsUpdateData\SettingsUpdateData.jar`, `C:\SQX-145\internal\plugins\SettingsAutoRetestData\SettingsAutoRetestData.jar`, `C:\SQX-145\internal\plugins\TaskLoadFromFiles\TaskLoadFromFiles.jar`, `C:\SQX-145\internal\plugins\SettingsLoadFromFiles\SettingsLoadFromFiles.jar`, `C:\SQX-145\internal\plugins\TaskClearDatabanks\TaskClearDatabanks.jar`, `C:\SQX-145\internal\plugins\SettingsClearDatabanks\SettingsClearDatabanks.jar`, `C:\SQX-145\internal\plugins\TaskFiltering\TaskFiltering.jar`, `C:\SQX-145\internal\plugins\SettingsFiltering\SettingsFiltering.jar`, `C:\SQX-145\internal\plugins\TaskLogDatabankStats\TaskLogDatabankStats.jar`, `C:\SQX-145\internal\plugins\SettingsLogDatabankStats\SettingsLogDatabankStats.jar`, `C:\SQX-145\internal\plugins\TaskSaveToFiles\TaskSaveToFiles.jar`, `C:\SQX-145\internal\plugins\SettingsSaveToFiles\SettingsSaveToFiles.jar`, `C:\SQX-145\internal\plugins\TaskDeleteFile\TaskDeleteFile.jar`, `C:\SQX-145\internal\plugins\SettingsDeleteFile\SettingsDeleteFile.jar`, `C:\SQX-145\internal\plugins\TaskCallExternalScript\TaskCallExternalScript.jar`, `C:\SQX-145\internal\plugins\SettingsCallExternalScript\SettingsCallExternalScript.jar`, `C:\SQX-145\internal\plugins\TaskCustomAnalysis\TaskCustomAnalysis.jar`, `C:\SQX-145\internal\plugins\SettingsCustomAnalysis\SettingsCustomAnalysis.jar`, `C:\SQX-145\internal\plugins\TaskApplyMassConfig\TaskApplyMassConfig.jar`, `C:\SQX-145\internal\plugins\SettingsApplyMassConfig\SettingsApplyMassConfig.jar`, `C:\SQX-145\internal\extend\Snippets\SQ\CustomAnalysis\`
+- **Backend:** `app/workspace/custom_projects/tasks/{data_update,load_files,databank_clear,filtering,log_stats,save_files,delete_file,external_script,custom_analysis,mass_config}.py`, `app/workspace/custom_projects/tasks/settings/*.py`, `app/workspace/builder/settings/custom_analysis.py` (each `🟢 <200L`)
+- **Frontend:** `ui/app/workspace/CustomProjects/tasks/{DataUpdate,DatabankClear,DeleteFile,ExternalScript,MassConfig}TaskModal.tsx`, `ui/app/plugins/databank/{DatabankToolbar,DatabankViews,DatabankSaveExports}.tsx`, `ui/app/workspace/Builder/settings/CustomAnalysisTab.tsx`
+- **Class:** `UpdateDataTask`, `UpdateDataSettings`, `AutoRetestData`, `LoadFromFilesTask`, `LoadFromFilesSettings`, `ClearDatabanksTask`, `ClearDatabanksSettings`, `FilteringTask`, `FilteringSettings`, `LogDatabankStatsTask`, `LogStatsSettings`, `SaveToFilesTask`, `SaveToFilesSettings`, `DeleteFileTask`, `DeleteFileSettings`, `CallScriptTask`, `CallScriptSettings`, `CustomAnalysisTask`, `CustomAnalysisSettings`, `ApplyMassConfigTask`, `ApplyMassConfigSettings`
+- **Functional Requirements & Exact Method Signatures:**
+  - **`data_update.py`, `settings/update_data.py`, `settings/auto_retest.py`:**
+    - [ ] `FR-PROJECTS-TASK-UPDATE-DATA` $\rightarrow$ `UpdateDataTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `UpdateDataTask.execute_update_data(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-UPDATE-DATA` $\rightarrow$ `UpdateDataSettings.settings_update_data(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-AUTO-RETEST` $\rightarrow$ `AutoRetestData.auto_retest_data(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`load_files.py` & `settings/load_files.py`:**
+    - [ ] `FR-PROJECTS-TASK-LOAD-FILES` $\rightarrow$ `LoadFromFilesTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `LoadFromFilesTask.execute_load_files(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-LOAD-FILES` $\rightarrow$ `LoadFromFilesSettings.settings_load_from_files(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`databank_clear.py` & `settings/clear_databanks.py`:**
+    - [ ] `FR-PROJECTS-TASK-CLEAR-DB` $\rightarrow$ `ClearDatabanksTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `ClearDatabanksTask.execute_clear_databanks(databank_ids: Sequence[str]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-CLEAR-DB` $\rightarrow$ `ClearDatabanksSettings.clear_databanks(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`filtering.py` & `settings/filtering.py`:**
+    - [ ] `FR-PROJECTS-TASK-FILTERING` $\rightarrow$ `FilteringTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `FilteringTask.execute_filtering(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-FILTERING` $\rightarrow$ `FilteringSettings.settings_filtering(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`log_stats.py` & `settings/log_stats.py`:**
+    - [ ] `FR-PROJECTS-TASK-LOG-STATS` $\rightarrow$ `LogDatabankStatsTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `LogDatabankStatsTask.execute_log_stats(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-LOG-STATS` $\rightarrow$ `LogStatsSettings.log_databank_stats(config: Mapping[str, Any] | None = None) -> dict[str, Any]`, `LogStatsSettings.new_log_databank_stats(rule: Mapping[str, Any]) -> dict[str, Any]`, `LogStatsSettings.log_databank_stats_type(stat_type: str) -> dict[str, Any]`
+  - **`save_files.py` & `settings/save_files.py`:**
+    - [ ] `FR-PROJECTS-TASK-SAVE-FILES` $\rightarrow$ `SaveToFilesTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `SaveToFilesTask.execute_save_files(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-SAVE-FILES` $\rightarrow$ `SaveToFilesSettings.settings_save_to_files(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`delete_file.py` & `settings/delete_file.py`:**
+    - [ ] `FR-PROJECTS-TASK-DELETE-FILE` $\rightarrow$ `DeleteFileTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `DeleteFileTask.execute_delete_file(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-DELETE-FILE` $\rightarrow$ `DeleteFileSettings.settings_delete_file(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`external_script.py` & `settings/external_script.py`:**
+    - [ ] `FR-PROJECTS-TASK-EXT-SCRIPT` $\rightarrow$ `CallScriptTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `CallScriptTask.execute_external_script(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-EXT-SCRIPT` $\rightarrow$ `CallScriptSettings.settings_call_external_script(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`custom_analysis.py` & `app/workspace/builder/settings/custom_analysis.py`:**
+    - [ ] `FR-PROJECTS-TASK-CUSTOM-ANALYSIS` $\rightarrow$ `CustomAnalysisTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `CustomAnalysisTask.execute_custom_analysis(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-CUSTOM-ANALYSIS` $\rightarrow$ `CustomAnalysisSettings.settings_custom_analysis(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`mass_config.py` & `settings/mass_config.py`:**
+    - [ ] `FR-PROJECTS-TASK-MASS-CONFIG` $\rightarrow$ `ApplyMassConfigTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `ApplyMassConfigTask.execute_mass_config(config: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-PROJECTS-SETTINGS-MASS-CONFIG` $\rightarrow$ `ApplyMassConfigSettings.apply_mass_config(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
 
 ---
 
@@ -1473,29 +1528,29 @@ HaruQuantAI/
 - **Dependencies:** `AppTaskManager`, `AppBuilder`, `AppOptimizer`, `JobManager`
 - **Outputs / Downstream Role:** Distributed computing cluster management and worker node validation.
 
-### Phase 13.1 Master Donor / Backend / Frontend Alignment Table
+### Phase 13.1: Distributed Grid Control, BacktestNode & GridTest
 
-| Component            | Donor Path (`docs/SQX/...`)                     | Backend Target File (Line Budget)                            | Frontend Target File                                    | DRY Shared Dependencies         |
-| -------------------- | ----------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------- |
-| `ServletGridControl` | `ServletGridControl`                            | `app/workspace/grid_control/routes.py` (`🟢 <200L`)          | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `HostPersistence`, `JobManager` |
-| `AppGridControl`     | `AppGridControl`, `BACKTESTNODE`, `NODEUPDATER` | `app/workspace/grid_control/grid_control.py` (`🟡 200–350L`) | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `HostPersistence`, `JobManager` |
-| `AppGridTest`        | `AppGridTest`                                   | `app/workspace/grid_test/grid_test.py` (`🟢 <200L`)          | `ui/app/workspace/GridTest/GridTestWorkspace.tsx`       | `GridControl`                   |
+#### 1. `app/workspace/grid_control/{routes,grid_control}.py` & `app/workspace/grid_test/grid_test.py` (`FEAT-GRID-CLUSTER`)
 
-#### 1. Phase 13.1 Exact Classes & Method Signatures
-
-- **`app/workspace/grid_control/routes.py` (`ServletGridControl`):**
-  - [ ] `FR-GRID-SERVLET-REGISTER`: Authenticate and accept remote worker node WebSocket connections $\rightarrow$ `ServletGridControl.register_worker(worker_info: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-GRID-SERVLET-STATUS`: Route calculation jobs to idle workers and stream worker status $\rightarrow$ `ServletGridControl.stream_worker_status(worker_id: str | None = None) -> dict[str, Any]`
-  - [ ] `FR-GRID-SERVLET-CANCEL`: Cancel remote task and stream health metrics $\rightarrow$ `ServletGridControl.cancel_task(task_id: str) -> dict[str, Any]`
-- **`app/workspace/grid_control/grid_control.py` (`GridControl`):**
-  - [ ] `FR-GRID-CONNECT`: Maintain connection pool to remote Python worker nodes over WebSocket / local IPC $\rightarrow$ `GridControl.connect_worker(endpoint: str, credentials: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-GRID-DISPATCH`: Partition and dispatch heavy backtest, optimization, and Monte Carlo batches across cluster $\rightarrow$ `GridControl.dispatch_batch(job_type: str, batch_payload: Sequence[Mapping[str, Any]]) -> dict[str, Any]`
-  - [ ] `FR-GRID-COLLECT`: Aggregate remote worker result batches into local SQLite job ledger via `HostPersistence` $\rightarrow$ `GridControl.collect_results(batch_id: str) -> dict[str, Any]`
-  - [ ] `FR-GRID-STATUS`: Monitor worker node CPU utilization, memory pressure, and heartbeat latency $\rightarrow$ `GridControl.get_cluster_status() -> dict[str, Any]`
-  - [ ] `FR-GRID-NODE`: Run standalone headless/UI `BacktestNode` worker daemon and synchronize node runtime/snippet versions via `NodeUpdater` $\rightarrow$ `GridControl.manage_backtest_node(action: str, node_config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-- **`app/workspace/grid_test/grid_test.py` (`GridTest`):**
-  - [ ] `FR-GRIDTEST-BENCHMARK`: Send benchmark calculation jobs to remote workers and verify throughput $\rightarrow$ `GridTest.run_benchmark(worker_id: str, iterations: int = 100) -> dict[str, Any]`
-  - [ ] `FR-GRIDTEST-VERIFY`: Measure round-trip latency and report worker node execution errors $\rightarrow$ `GridTest.verify_worker(worker_id: str) -> dict[str, Any]`
+- **Dry Rule:** Reuse `HostPersistence` and `JobManager` for remote worker registration, batch partitioning, result collection, and throughput benchmarking.
+- **Donor:** `C:\SQX-145\internal\libs\SQGridLib2.jar.enc`, `C:\SQX-145\internal\plugins\ServletGridControl\ServletGridControl.jar`, `C:\SQX-145\internal\plugins\AppGridControl\AppGridControl.jar`, `C:\SQX-145\internal\plugins\AppGridTest\AppGridTest.jar`, `C:\SQX-145\internal\web\GRIDCONTROL\`, `C:\SQX-145\internal\web\GRIDTEST\`, `C:\SQX-145\internal\web\BACKTESTNODE\`, `C:\SQX-145\internal\web\NODEUPDATER\`
+- **Backend:** `app/workspace/grid_control/routes.py` (`🟢 <200L`), `app/workspace/grid_control/grid_control.py` (`🟡 200–350L`), `app/workspace/grid_test/grid_test.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`, `ui/app/workspace/GridTest/GridTestWorkspace.tsx`
+- **Class:** `ServletGridControl` (`routes.py`), `GridControl` (`grid_control.py`), `GridTest` (`grid_test.py`)
+- **Functional Requirements & Exact Method Signatures:**
+  - **`app/workspace/grid_control/routes.py` (`ServletGridControl`):**
+    - [ ] `FR-GRID-SERVLET-REGISTER`: Authenticate and accept remote worker node WebSocket connections $\rightarrow$ `ServletGridControl.register_worker(worker_info: Mapping[str, Any]) -> dict[str, Any]`
+    - [ ] `FR-GRID-SERVLET-STATUS`: Route calculation jobs to idle workers and stream worker status $\rightarrow$ `ServletGridControl.stream_worker_status(worker_id: str | None = None) -> dict[str, Any]`
+    - [ ] `FR-GRID-SERVLET-CANCEL`: Cancel remote task and stream health metrics $\rightarrow$ `ServletGridControl.cancel_task(task_id: str) -> dict[str, Any]`
+  - **`app/workspace/grid_control/grid_control.py` (`GridControl`):**
+    - [ ] `FR-GRID-CONNECT`: Maintain connection pool to remote Python worker nodes over WebSocket / local IPC $\rightarrow$ `GridControl.connect_worker(endpoint: str, credentials: Mapping[str, Any] | None = None) -> dict[str, Any]`
+    - [ ] `FR-GRID-DISPATCH`: Partition and dispatch heavy backtest, optimization, and Monte Carlo batches across cluster $\rightarrow$ `GridControl.dispatch_batch(job_type: str, batch_payload: Sequence[Mapping[str, Any]]) -> dict[str, Any]`
+    - [ ] `FR-GRID-COLLECT`: Aggregate remote worker result batches into local SQLite job ledger via `HostPersistence` $\rightarrow$ `GridControl.collect_results(batch_id: str) -> dict[str, Any]`
+    - [ ] `FR-GRID-STATUS`: Monitor worker node CPU utilization, memory pressure, and heartbeat latency $\rightarrow$ `GridControl.get_cluster_status() -> dict[str, Any]`
+    - [ ] `FR-GRID-NODE`: Run standalone headless/UI `BacktestNode` worker daemon and synchronize node runtime/snippet versions via `NodeUpdater` $\rightarrow$ `GridControl.manage_backtest_node(action: str, node_config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - **`app/workspace/grid_test/grid_test.py` (`GridTest`):**
+    - [ ] `FR-GRIDTEST-BENCHMARK`: Send benchmark calculation jobs to remote workers and verify throughput $\rightarrow$ `GridTest.run_benchmark(worker_id: str, iterations: int = 100) -> dict[str, Any]`
+    - [ ] `FR-GRIDTEST-VERIFY`: Measure round-trip latency and report worker node execution errors $\rightarrow$ `GridTest.verify_worker(worker_id: str) -> dict[str, Any]`
 
 ---
 
@@ -1505,23 +1560,24 @@ HaruQuantAI/
 - **Dependencies:** `AppCodeEditor`, `AppPlatform`
 - **Outputs / Downstream Role:** Installed community extensions, presets, and synchronized cloud packages.
 
-### Phase 14.1 Master Donor / Backend / Frontend Alignment Table
+### Phase 14.1: Marketplace & AlgoCloud Synchronization
 
-| Component          | Donor Path (`docs/SQX/...`) | Backend Target File (Line Budget)                       | Frontend Target File                                    | DRY Shared Dependencies |
-| ------------------ | --------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ----------------------- |
-| `ServletAlgoCloud` | `ServletAlgoCloud`          | `app/workspace/marketplace/routes.py` (`🟢 <200L`)      | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence`       |
-| `AppMarketplace`   | `AppMarketplace`            | `app/workspace/marketplace/marketplace.py` (`🟢 <200L`) | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence`       |
+#### 1. `app/workspace/marketplace/{routes,marketplace}.py` (`FEAT-MARKETPLACE-ALGOCLOUD`)
 
-#### 1. Phase 14.1 Exact Classes & Method Signatures
-
-- **`app/workspace/marketplace/routes.py` (`ServletAlgoCloud`):**
-  - [ ] `FR-ALGOCLOUD-SYNC`: Synchronize strategies and databanks with cloud platform $\rightarrow$ `ServletAlgoCloud.sync_strategies(databank_id: str) -> dict[str, Any]`
-  - [ ] `FR-ALGOCLOUD-PLAN`: Authenticate cloud user account and fetch plan quotas and subscription limits $\rightarrow$ `ServletAlgoCloud.get_user_plan(account_id: str | None = None) -> dict[str, Any]`
-  - [ ] `FR-ALGOCLOUD-DOWNLOAD`: Download pre-built shared strategy templates and market data packages $\rightarrow$ `ServletAlgoCloud.download_package(package_id: str) -> dict[str, Any]`
-- **`app/workspace/marketplace/marketplace.py` (`Marketplace`):**
-  - [ ] `FR-MARKETPLACE-BROWSE`: Browse and search marketplace catalog for community indicators and snippets $\rightarrow$ `Marketplace.browse_catalog(query: str = "", category: str | None = None) -> list[dict[str, Any]]`
-  - [ ] `FR-MARKETPLACE-INSTALL`: Download and install verified extension packages into local workspace $\rightarrow$ `Marketplace.install_package(package_id: str) -> dict[str, Any]`
-  - [ ] `FR-MARKETPLACE-PUBLISH`: Publish custom user indicators or strategy presets to marketplace $\rightarrow$ `Marketplace.publish_item(item_manifest: Mapping[str, Any]) -> dict[str, Any]`
+- **Dry Rule:** Reuse `HostPersistence` for local extension package tracking, cloud synchronization metadata, and user subscription state.
+- **Donor:** `C:\SQX-145\internal\plugins\ServletAlgoCloud\ServletAlgoCloud.jar`, `C:\SQX-145\internal\plugins\AppMarketplace\AppMarketplace.jar`, `C:\SQX-145\internal\web\MARKETPLACE\`
+- **Backend:** `app/workspace/marketplace/routes.py` (`🟢 <200L`), `app/workspace/marketplace/marketplace.py` (`🟢 <200L`)
+- **Frontend:** `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx`
+- **Class:** `ServletAlgoCloud` (`routes.py`), `Marketplace` (`marketplace.py`)
+- **Functional Requirements & Exact Method Signatures:**
+  - **`app/workspace/marketplace/routes.py` (`ServletAlgoCloud`):**
+    - [ ] `FR-ALGOCLOUD-SYNC`: Synchronize strategies and databanks with cloud platform $\rightarrow$ `ServletAlgoCloud.sync_strategies(databank_id: str) -> dict[str, Any]`
+    - [ ] `FR-ALGOCLOUD-PLAN`: Authenticate cloud user account and fetch plan quotas and subscription limits $\rightarrow$ `ServletAlgoCloud.get_user_plan(account_id: str | None = None) -> dict[str, Any]`
+    - [ ] `FR-ALGOCLOUD-DOWNLOAD`: Download pre-built shared strategy templates and market data packages $\rightarrow$ `ServletAlgoCloud.download_package(package_id: str) -> dict[str, Any]`
+  - **`app/workspace/marketplace/marketplace.py` (`Marketplace`):**
+    - [ ] `FR-MARKETPLACE-BROWSE`: Browse and search marketplace catalog for community indicators and snippets $\rightarrow$ `Marketplace.browse_catalog(query: str = "", category: str | None = None) -> list[dict[str, Any]]`
+    - [ ] `FR-MARKETPLACE-INSTALL`: Download and install verified extension packages into local workspace $\rightarrow$ `Marketplace.install_package(package_id: str) -> dict[str, Any]`
+    - [ ] `FR-MARKETPLACE-PUBLISH`: Publish custom user indicators or strategy presets to marketplace $\rightarrow$ `Marketplace.publish_item(item_manifest: Mapping[str, Any]) -> dict[str, Any]`
 
 ---
 
@@ -1531,15 +1587,14 @@ HaruQuantAI/
 - **Dependencies:** `AppPlatform`
 - **Outputs / Downstream Role:** Enterprise license management and institutional audit tear-sheets.
 
-### Phase 15.1 Master Donor / Backend / Frontend Alignment Table
-
-| Component     | Donor Path (`docs/SQX/...`) | Backend Target File (Line Budget)                 | Frontend Target File                              | DRY Shared Dependencies |
-| ------------- | --------------------------- | ------------------------------------------------- | ------------------------------------------------- | ----------------------- |
-| `AppBusiness` | `AppBusiness`               | `app/workspace/business/business.py` (`🟢 <200L`) | `ui/app/workspace/Business/BusinessWorkspace.tsx` | `HostPersistence`       |
+### Phase 15.1: Enterprise Licensing & Institutional Audit Reports
 
 #### 1. `app/workspace/business/business.py` — `AppBusiness` (`FEAT-BUSINESS-ENTERPRISE`)
 
-- **Backend Target:** `app/workspace/business/business.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Dry Rule:** Reuse `HostPersistence` for enterprise license records, multi-account permissions, and white-label audit report templates.
+- **Donor:** `C:\SQX-145\internal\plugins\AppSQXBusiness\AppSQXBusiness.jar`, `C:\SQX-145\internal\web\SQXBUSINESS\`
+- **Backend:** `app/workspace/business/business.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Frontend:** `ui/app/workspace/Business/BusinessWorkspace.tsx`
 - **Class:** `Business`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BUSINESS-LICENSES`: Manage institutional enterprise licenses and multi-account permissions $\rightarrow$ `Business.manage_licenses(action: str = "list", license_payload: Mapping[str, Any] | None = None) -> dict[str, Any]`
@@ -1553,15 +1608,14 @@ HaruQuantAI/
 - **Dependencies:** `AppPlatform` (`ResourceMonitor`, `TelemetryLogger`)
 - **Outputs / Downstream Role:** System health metrics and debugging telemetry.
 
-### Phase 16.1 Master Donor / Backend / Frontend Alignment Table
-
-| Component         | Donor Path (`docs/SQX/...`) | Backend Target File (Line Budget)                           | Frontend Target File                                      | DRY Shared Dependencies              |
-| ----------------- | --------------------------- | ----------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------ |
-| `AppDebugConsole` | `AppDebugConsole`           | `app/workspace/debug_console/debug_console.py` (`🟢 <200L`) | `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx` | `ResourceMonitor`, `TelemetryLogger` |
+### Phase 16.1: Diagnostic Logging & Resource Telemetry Console
 
 #### 1. `app/workspace/debug_console/debug_console.py` — `AppDebugConsole` (`FEAT-DEBUG-CONSOLE`)
 
-- **Backend Target:** `app/workspace/debug_console/debug_console.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Dry Rule:** Delegate all hardware telemetry and structured log streaming to `ResourceMonitor` and `TelemetryLogger` (`app/include/libs/system/`).
+- **Donor:** `C:\SQX-145\internal\plugins\AppDebugConsole\AppDebugConsole.jar`, `C:\SQX-145\internal\web\DEBUGCONSOLE\`
+- **Backend:** `app/workspace/debug_console/debug_console.py` (`🟢 <200L`, Docstring `<=40L`)
+- **Frontend:** `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx`
 - **Class:** `DebugConsole`
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-DEBUG-TELEMETRY`: Display live CPU, RAM, and background worker thread telemetry via `ResourceMonitor` $\rightarrow$ `DebugConsole.get_telemetry() -> dict[str, Any]`
@@ -1576,15 +1630,14 @@ HaruQuantAI/
 - **Dependencies:** `AppPlatform`, `CoreIncludePrimitives` (`Section 1A`), `ExtensibleSnippetSystem` (`Section 1B`)
 - **Outputs / Downstream Role:** Post-trade account statement diagnostics, position-sizing what-if simulations, and multi-report portfolio blending.
 
-### Phase 17.1 Master Donor / Backend / Frontend Alignment Table
-
-| Component    | Donor Path (`docs/SQX/...`)              | Backend Target File (Line Budget)                       | Frontend Target File                                  | DRY Shared Dependencies                                                                             |
-| ------------ | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `MTAnalyzer` | `MTANALYZER` (`internal/web/MTANALYZER`) | `app/workspace/mt_analyzer/analyzer.py` (`🟡 250–400L`) | `ui/app/workspace/MTAnalyzer/MTAnalyzerWorkspace.tsx` | `ColumnRegistry`, `MoneyManagementEngine`, `MonteCarloManipulator`, `CorrelationAndFitnessRegistry` |
+### Phase 17.1: Standalone MetaTrader Report & Portfolio Analyzer
 
 #### 1. `app/workspace/mt_analyzer/analyzer.py` — `MTAnalyzer` (`FEAT-MTANALYZER`)
 
-- **Backend Target:** `app/workspace/mt_analyzer/analyzer.py` (`🟡 250–400L`, Docstring `<=50L`)
+- **Dry Rule:** Reuse `ColumnRegistry`, `MoneyManagementEngine`, `MonteCarloManipulator`, and `CorrelationAndFitnessRegistry` for post-trade MT4/MT5 statement analysis, position-sizing simulations, and portfolio blending.
+- **Donor:** `C:\SQX-145\internal\web\MTANALYZER\`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.results.*`, `com.strategyquant.tradinglib.correlation.*`)
+- **Backend:** `app/workspace/mt_analyzer/analyzer.py` (`🟡 250–400L`, Docstring `<=50L`)
+- **Frontend:** `ui/app/workspace/MTAnalyzer/MTAnalyzerWorkspace.tsx`
 - **Class:** `MTAnalyzer` (plus `MTAnalyzerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-MTANALYZER-IMPORT`: Import and parse MetaTrader 4 / MetaTrader 5 HTML and CSV account history reports into normalized `TradeRecord` tables $\rightarrow$ `MTAnalyzer.import_mt_report(file_path: Path | str, *, format_type: str = "auto") -> dict[str, Any]`
