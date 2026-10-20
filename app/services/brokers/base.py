@@ -539,7 +539,7 @@ class TradingClient(BrokerClient):
         if class_name == "SymbolInfo":
             if method_name in ("SymbolInfo", "info"):
                 sym = (
-                    str(args[0])
+                    args[0]
                     if args and isinstance(args[0], str)
                     else getattr(self, "_current_symbol", "EURUSD")
                 )
@@ -580,14 +580,14 @@ class TradingClient(BrokerClient):
                 return all_syms
             if method_name == "SymbolInfoTick":
                 sym = (
-                    str(args[0])
+                    args[0]
                     if args and isinstance(args[0], str)
                     else getattr(self, "_current_symbol", "EURUSD")
                 )
                 return self.get_tick(sym)
             if method_name == "SymbolSelect":
                 sym = (
-                    str(args[0])
+                    args[0]
                     if args and isinstance(args[0], str)
                     else getattr(self, "_current_symbol", "EURUSD")
                 )
@@ -595,21 +595,21 @@ class TradingClient(BrokerClient):
                 return self.select_symbol(sym, sel)
             if method_name in ("MarketBookAdd", "subscribe_book"):
                 sym = (
-                    str(args[0])
+                    args[0]
                     if args and isinstance(args[0], str)
                     else getattr(self, "_current_symbol", "EURUSD")
                 )
                 return self.subscribe_book(sym)
             if method_name in ("MarketBookRelease", "release_book"):
                 sym = (
-                    str(args[0])
+                    args[0]
                     if args and isinstance(args[0], str)
                     else getattr(self, "_current_symbol", "EURUSD")
                 )
                 return self.release_book(sym)
             if method_name in ("MarketBookGet", "get_book"):
                 sym = (
-                    str(args[0])
+                    args[0]
                     if args and isinstance(args[0], str)
                     else getattr(self, "_current_symbol", "EURUSD")
                 )

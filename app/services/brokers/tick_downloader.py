@@ -103,7 +103,7 @@ class TickDownloaderClient(BrokerClient):
     ) -> list[MarketBar]:
         """Fetch historical bars from local archives or delegate to Dukascopy."""
         del start_pos
-        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         tf_clean = tf_name.upper().strip()
         if tf_clean not in ("TICK", "M1", "PERIOD_M1"):
             raise BridgeError(

@@ -281,7 +281,8 @@ class EventBus:
         q: asyncio.Queue[HostEvent] = asyncio.Queue(
             maxsize=max_queue_size or self.max_queue_size
         )
-        sub_id, replay, gap = f"sub-{secrets.token_hex(8)}", [], False
+        sub_id, gap = f"sub-{secrets.token_hex(8)}", False
+        replay: list[HostEvent] = []
         with self._lock:
             self._channels.update(ch for ch in chans if ch != "*")
             if since_cursor is not None and since_cursor >= 0 and self._ring:
@@ -786,7 +787,7 @@ class TransportGatewayService:
             return _ok(req, _dct(job_id=job_id, cancelled=True), fx=True)
         if job_id is not None:
             pk = {"job_id": job_id}
-            db_r = (
+            db_r: list[_Pld] = (
                 []
                 if jm
                 else HostPersistence.read_records("host_jobs", pk_values=pk, limit=1)

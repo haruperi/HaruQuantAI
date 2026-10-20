@@ -195,7 +195,7 @@ class SQFuturesClient(SQEquityClient):
     ) -> list[MarketBar]:
         """Validate M1/D1 cadence and retrieve continuous futures bars."""
         del start_pos
-        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         if tf_name.upper() not in (
             "M1",
             "PERIOD_M1",

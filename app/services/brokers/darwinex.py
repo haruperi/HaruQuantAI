@@ -185,7 +185,7 @@ class DarwinexClient(BrokerClient):
         decimals = snap.digits
         target_count = count or limit or 100
 
-        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         tf_norm = tf_name.strip().upper()
         if tf_norm in ("D1", "PERIOD_D1"):
             clean_tf = "D1"

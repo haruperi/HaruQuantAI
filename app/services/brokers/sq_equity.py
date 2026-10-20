@@ -314,7 +314,7 @@ class SQEquityClient(BrokerClient):
             datetime.fromtimestamp(end_sec, tz=UTC) if 0 < end_sec < 2**40 else None
         )
 
-        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         if tf_name.upper() not in ("D1", "1D", "PERIOD_D1", "DAY"):
             raise BridgeError(
                 f"StrategyQuant US Equities only supports D1 daily timeframe, got '{timeframe}'",

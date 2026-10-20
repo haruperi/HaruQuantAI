@@ -281,7 +281,7 @@ class DukascopyClient(BrokerClient):
         decimals = snap.digits
         target_count = count or limit or 100
 
-        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         tf_norm = tf_name.strip().upper()
         if tf_norm not in ("M1", "PERIOD_M1", "TICK"):
             raise BridgeError(

@@ -155,7 +155,7 @@ class YahooClient(BrokerClient):
         """Fetch historical candlestick bars directly from Yahoo Finance."""
         del start_pos
         clean_sym = symbol.strip().upper()
-        tf_str = timeframe.value if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_str = timeframe.value if isinstance(timeframe, Timeframe) else timeframe
         interval = self._resolve_interval(tf_str)
 
         start = int(date_from.timestamp()) if date_from else 0

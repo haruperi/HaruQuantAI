@@ -186,7 +186,7 @@ class FilesClient(BrokerClient):
     ) -> list[MarketBar]:
         """Retrieve historical candlestick bars from local files."""
         del start_pos
-        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         files = find_matching_partitions(self.data_dir, symbol, tf_name)
         if not files:
             files = self._find_symbol_files(symbol, timeframe=tf_name)

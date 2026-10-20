@@ -323,7 +323,7 @@ class Timeframe(StrEnum):
         """Parse timeframe from common string representations."""
         if isinstance(name, cls):
             return name
-        cleaned = str(name).strip().upper()
+        cleaned = name.strip().upper()
         mapping: dict[str, Timeframe] = {
             "M1": cls.PERIOD_M1,
             "1M": cls.PERIOD_M1,

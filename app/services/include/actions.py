@@ -57,9 +57,9 @@ CLI Usage:
 
 from __future__ import annotations
 
-import datetime
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -78,9 +78,7 @@ class ActionRecord:
 
     action_type: str
     params: dict[str, Any]
-    timestamp: str = field(
-        default_factory=lambda: datetime.datetime.now(datetime.UTC).isoformat()
-    )
+    timestamp: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
 
 
 class AssignVariableAction:

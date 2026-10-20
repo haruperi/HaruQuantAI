@@ -924,7 +924,7 @@ def _parse_json_list(raw: Any) -> list[Any]:
         try:
             res = json.loads(raw)
             return res if isinstance(res, list) else []
-        except json.JSONDecodeError, TypeError:
+        except (json.JSONDecodeError, TypeError):
             return []
     return []
 @dataclass
@@ -943,7 +943,7 @@ class TradingSession:
         """Evaluate if datetime falls within active trading schedule."""
         try:
             target_tz = ZoneInfo(self.timezone)
-        except KeyError, ValueError, ZoneInfoNotFoundError:
+        except (ZoneInfoNotFoundError, ValueError):
             target_tz = ZoneInfo("UTC")
         base_dt = dt if dt.tzinfo is not None else dt.replace(tzinfo=UTC)
         dt_tz = base_dt.astimezone(target_tz)
@@ -969,7 +969,7 @@ class TradingSession:
                 day_of_week=w.get("day_of_week"),
             )
             for w in _parse_json_list(data.get("windows_json", "[]"))
-            if isinstance(w, SessionWindow | dict)
+            if isinstance(w, (SessionWindow, dict))
         ]
         holidays = [
             h if isinstance(h, TradingHoliday) else TradingHoliday(
@@ -977,7 +977,7 @@ class TradingSession:
                 description=str(h.get("description", "")),
             )
             for h in _parse_json_list(data.get("holidays_json", "[]"))
-            if isinstance(h, TradingHoliday | dict)
+            if isinstance(h, (TradingHoliday, dict))
         ]
         return cls(
             id=data.get("id"), name=str(data.get("name", "")),
