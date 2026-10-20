@@ -3,9 +3,8 @@
 Description:
     Market data client for tick and high-precision trade data.
     Under the workspace Strict Real-Data Policy, if local tick archives are
-    absent, the client cleanly queries Dukascopy data feeds or local archives
-    rather than synthesizing artificial mock records. Conforms directly to the
-    uniform `BrokerClient` interface.
+    absent, the client cleanly queries local archives rather than synthesizing
+    artificial mock records. Conforms directly to the uniform `BrokerClient` interface.
 
 Purpose:
     FEAT-DATA-SOURCE-TICKDOWNLOADER: Tick market data client implementation.
@@ -38,17 +37,17 @@ from pathlib import Path
 from typing import Any, override
 
 from app.host.logging import get_logger
-from app.services.brokers._file_history import (
-    find_matching_partitions,
-    parse_delimited_bars,
-    parse_delimited_ticks,
-    read_parquet_bars,
-)
 from app.services.brokers.base import (
     BridgeError,
     BrokerClient,
     epoch_millis,
     epoch_seconds,
+)
+from app.services.brokers.files import (
+    find_matching_partitions,
+    parse_delimited_bars,
+    parse_delimited_ticks,
+    read_parquet_bars,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
 from app.services.include.enums import Timeframe
@@ -101,7 +100,7 @@ class TickDownloaderClient(BrokerClient):
         count: int | None = None,
         limit: int = 1000,
     ) -> list[MarketBar]:
-        """Fetch historical bars from local archives or delegate to Dukascopy."""
+        """Fetch historical bars from local archives."""
         del start_pos
         tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         tf_clean = tf_name.upper().strip()
@@ -116,7 +115,6 @@ class TickDownloaderClient(BrokerClient):
         start_sec = epoch_seconds(s)
         end_sec = epoch_seconds(e)
 
-        # Check local partition files
         matches = find_matching_partitions(self.data_dir, symbol, tf_name)
         if matches:
             target = matches[-1]

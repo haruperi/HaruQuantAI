@@ -53,12 +53,13 @@ from typing import Any, override
 
 import requests
 from app.host.logging import get_logger
-from app.services.brokers._http import create_http_session, execute_bounded_get
 from app.services.brokers.base import (
     BridgeError,
     BrokerClient,
+    create_http_session,
     epoch_millis,
     epoch_seconds,
+    execute_bounded_get,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
 from app.services.include.enums import Timeframe

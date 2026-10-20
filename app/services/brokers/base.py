@@ -1,13 +1,13 @@
-"""Base broker client architecture, trading client protocol, and bridge exceptions.
+"""Base broker client architecture, HTTP transport, and provider registry.
 
 Description:
-    Provides the foundational BrokerClient base class for all market data providers
-    and TradingClient for execution-capable brokers, replacing string-based RPC
-    dispatch with direct, strongly-typed async client methods, lifecycle management,
-    receipt tracking, and canonical provider exceptions.
+    Provides the foundational BrokerClient base class for all market data providers,
+    TradingClient for execution-capable brokers, bounded HTTP session pooling with
+    retry backoff, rate limiting, and credential redaction, plus lazy provider
+    registry resolution.
 
 Purpose:
-    FEAT-BROKER-BASE: Foundational broker client abstractions and base exceptions.
+    FEAT-BROKER-BASE: Foundational broker client abstractions, HTTP transport, and registry.
 
 Key Capabilities:
     - FR-BROKER-BASE-CLIENT: Uniform market data retrieval and symbol metadata queries.
@@ -22,20 +22,26 @@ Key Capabilities:
       Associated: `BrokerClient.connect()`, `BrokerClient.disconnect()`,
         `TradingClient.arm()`, `TradingClient.disarm()`, `TradingClient.receipt()`.
       Logging: DEBUG connection and arming status changes.
+    - FR-BROKER-HTTP-SESSION: Connection pooling and exponential retry backoff.
+      Associated: `create_http_session()`.
+      Logging: DEBUG session creation with retry policy metadata.
+    - FR-BROKER-HTTP-EXECUTE: Bounded GET execution with timeout, size, and redaction.
+      Associated: `execute_bounded_get()`, `RateLimiter.acquire()`, `redact_url_or_message()`.
+      Logging: DEBUG request latency and response code metrics.
 
 Python API Usage:
     ```python
-    from app.services.brokers.base import BrokerClient, TradingClient
-
-
-    class CustomDataClient(BrokerClient):
-        def __init__(self) -> None:
-            super().__init__("custom_client")
+    from app.services.brokers.base import (
+        BrokerClient,
+        TradingClient,
+        create_http_session,
+        execute_bounded_get,
+    )
     ```
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_broker_base.py --no-cov
+    uv run pytest tests/unit/services/brokers/ --no-cov
     ```
 """
 
@@ -43,15 +49,22 @@ from __future__ import annotations
 
 import contextlib
 import contextvars
+import fnmatch
+import importlib
 import inspect
+import re
+import threading
 import time
 import uuid
 from collections.abc import Awaitable
 from dataclasses import asdict, is_dataclass, replace
 from datetime import UTC, datetime
 from types import TracebackType
-from typing import Any, Self
+from typing import Any, ClassVar, Self
 
+import app.services.include.contracts as _contracts
+import app.services.include.enums as _enums
+import requests
 from app.host.logging import get_logger
 from app.services.include.contracts import (
     AccountInfo,
@@ -71,21 +84,45 @@ from app.services.include.contracts import (
     TradeResult,
 )
 from app.services.include.enums import (
+    OrderFilling,
+    OrderTime,
     OrderType,
     ReceiptStatus,
     Timeframe,
+    TradeAction,
 )
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 logger = get_logger(__name__)
+
+SESSION_FR = "FR-BROKER-HTTP-SESSION"
+EXECUTE_FR = "FR-BROKER-HTTP-EXECUTE"
+REDACTION_FR = "FR-BROKER-HTTP-REDACTION"
+
+MAX_RESPONSE_BYTES = 50 * 1024 * 1024  # 50 MB
 
 __all__ = [
     "BridgeError",
     "BrokerClient",
+    "MAX_RESPONSE_BYTES",
+    "RateLimiter",
     "TradingClient",
+    "create_http_session",
     "epoch_millis",
     "epoch_seconds",
+    "execute_bounded_get",
+    "get_broker",
+    "normalize_broker_name",
+    "normalize_provider_id",
+    "redact_url_or_message",
     "utc_now",
 ]
+
+_SECRET_PATTERN = re.compile(
+    r"(?i)(api[_-]?key|secret|token|password|auth)=([^& \t\r\n]+)"
+)
+_USERINFO_PATTERN = re.compile(r"://([^:/@]+):([^@]+)@")
 
 
 def utc_now() -> datetime:
@@ -113,6 +150,154 @@ def epoch_millis(value: datetime | float | None) -> int:
     if value.tzinfo is None:
         value = value.replace(tzinfo=UTC)
     return int(value.timestamp() * 1000)
+
+
+def redact_url_or_message(text: str) -> str:
+    """Redact sensitive query parameters, credentials, and tokens from URLs and errors."""
+    if not text:
+        return ""
+    return _USERINFO_PATTERN.sub(
+        r"://***:***@", _SECRET_PATTERN.sub(r"\1=REDACTED", text)
+    )
+
+
+class RateLimiter:
+    """Thread-safe rate limiter pacing outbound HTTP requests."""
+
+    def __init__(self, rps: float = 5.0) -> None:
+        self.rps = max(0.1, rps)
+        self.interval = 1.0 / self.rps
+        self._last_call: float = 0.0
+        self._lock = threading.Lock()
+
+    def acquire(self) -> None:
+        """Block until pacing interval is met."""
+        with self._lock:
+            elapsed = time.monotonic() - self._last_call
+            if elapsed < self.interval:
+                time.sleep(self.interval - elapsed)
+            self._last_call = time.monotonic()
+
+
+def create_http_session(
+    user_agent: str,
+    *,
+    retries: int = 3,
+    backoff: float = 0.3,
+    status_forcelist: tuple[int, ...] = (429, 500, 502, 503, 504),
+    pool_size: int = 10,
+) -> requests.Session:
+    """Create a hardened requests.Session configured with standard retries and timeouts."""
+    session = requests.Session()
+    session.headers.update(
+        {"User-Agent": user_agent, "Accept-Encoding": "gzip, deflate", "Accept": "*/*"}
+    )
+    retry_strategy = Retry(
+        total=retries,
+        backoff_factor=backoff,
+        status_forcelist=status_forcelist,
+        allowed_methods=["GET", "HEAD"],
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(
+        max_retries=retry_strategy, pool_connections=pool_size, pool_maxsize=pool_size
+    )
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    logger.debug(
+        "%s: Created requests.Session (retries=%d, backoff=%.2f, pool=%d)",
+        SESSION_FR,
+        retries,
+        backoff,
+        pool_size,
+        extra={"fr_id": SESSION_FR, "retries": retries},
+    )
+    return session
+
+
+def execute_bounded_get(
+    session: requests.Session,
+    url: str,
+    *,
+    params: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
+    timeout: float | tuple[float, float] = (5.0, 20.0),
+    deadline_seconds: float | None = None,
+    provider: str = "",
+    max_bytes: int = MAX_RESPONSE_BYTES,
+) -> requests.Response:
+    """Execute an HTTP GET request with deadline, size limit, and redacted errors."""
+    del provider
+    safe_url = redact_url_or_message(url)
+    t0 = time.perf_counter()
+    deadline_start = time.monotonic()
+
+    try:
+        if deadline_seconds is not None:
+            time_left = deadline_seconds - (time.monotonic() - deadline_start)
+            if time_left <= 0:
+                msg = f"Overall deadline of {deadline_seconds:.1f}s exceeded before dispatch for {safe_url}"
+                raise BridgeError(msg, code="TIMEOUT")
+            timeout = (
+                (min(timeout[0], time_left), min(timeout[1], time_left))
+                if isinstance(timeout, tuple)
+                else min(timeout, time_left)
+            )
+
+        resp = session.get(url, params=params, headers=headers, timeout=timeout)
+        elapsed_ms = (time.perf_counter() - t0) * 1000.0
+
+        if (
+            deadline_seconds is not None
+            and (time.monotonic() - deadline_start) > deadline_seconds
+        ):
+            msg = f"Overall deadline of {deadline_seconds:.1f}s exceeded after request to {safe_url}"
+            raise BridgeError(msg, code="TIMEOUT")
+
+        cl_header = resp.headers.get("Content-Length")
+        if cl_header and cl_header.isdigit() and int(cl_header) > max_bytes:
+            msg = f"HTTP response Content-Length exceeds budget: {cl_header} > {max_bytes} for {safe_url}"
+            raise BridgeError(msg, code="DATA_LIMIT_EXCEEDED")
+        if len(resp.content) > max_bytes:
+            msg = f"HTTP response body size exceeds budget: {len(resp.content)} > {max_bytes} for {safe_url}"
+            raise BridgeError(msg, code="DATA_LIMIT_EXCEEDED")
+        if resp.status_code == 429:
+            raise BridgeError(f"Rate limit exceeded on {safe_url}", code="RATE_LIMIT")
+        if resp.status_code in (401, 403):
+            msg = f"Upstream authentication rejected by {safe_url} (HTTP {resp.status_code})"
+            raise BridgeError(msg, code="AUTHENTICATION")
+
+        logger.debug(
+            "%s: GET %s -> %d in %.1f ms",
+            EXECUTE_FR,
+            safe_url,
+            resp.status_code,
+            elapsed_ms,
+            extra={
+                "fr_id": EXECUTE_FR,
+                "url": safe_url,
+                "status_code": resp.status_code,
+                "latency_ms": elapsed_ms,
+            },
+        )
+        return resp
+    except requests.exceptions.Timeout as exc:
+        safe_exc = redact_url_or_message(str(exc))
+        raise BridgeError(
+            f"HTTP request timed out for {safe_url}: {safe_exc}", code="TIMEOUT"
+        ) from exc
+    except requests.exceptions.RequestException as exc:
+        safe_msg = redact_url_or_message(str(exc))
+        raise BridgeError(
+            f"HTTP network error for {safe_url}: {safe_msg}", code="TIMEOUT"
+        ) from exc
+    except BridgeError:
+        raise
+    except Exception as exc:
+        safe_msg = redact_url_or_message(str(exc))
+        raise BridgeError(
+            f"HTTP error for {safe_url}: {safe_msg}", code="BRIDGE_ERROR"
+        ) from exc
 
 
 class BrokerClient:
@@ -165,10 +350,7 @@ class BrokerClient:
         """Start or initialize provider connection session."""
         self.connect()
 
-    async def wait_connected(
-        self,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline
-    ) -> None:
+    async def wait_connected(self, timeout: float | None = None) -> None:  # noqa: ASYNC109
         """Confirm provider readiness."""
         del timeout
         if not self._connected:
@@ -204,8 +386,7 @@ class BrokerClient:
         """Fetch historical market ticks. Subclasses implement directly."""
         del symbol, date_from, date_to, count, limit
         raise BridgeError(
-            f"{self.name} does not support tick history",
-            code="UNSUPPORTED_OPERATION",
+            f"{self.name} does not support tick history", code="UNSUPPORTED_OPERATION"
         )
 
     async def stream(
@@ -218,8 +399,7 @@ class BrokerClient:
         """Establish async streaming feed."""
         del symbol, kind, timeframe
         raise BridgeError(
-            f"{self.name} does not support streaming",
-            code="UNSUPPORTED_OPERATION",
+            f"{self.name} does not support streaming", code="UNSUPPORTED_OPERATION"
         )
 
     def get_symbol_info(self, symbol: str) -> SymbolInfo | None:
@@ -241,10 +421,7 @@ class BrokerClient:
     def get_terminal_info(self) -> TerminalInfo:
         """Retrieve the current terminal state info."""
         return TerminalInfo(
-            name=self.name,
-            company=self.name,
-            connected=True,
-            trade_allowed=False,
+            name=self.name, company=self.name, connected=True, trade_allowed=False
         )
 
     async def __aenter__(self) -> Self:
@@ -263,8 +440,55 @@ class BrokerClient:
         self.disconnect()
 
 
+_TRADE_NOOP_METHODS = frozenset(
+    "SetExpertMagicNumber SetDeviationInPoints SetTypeFilling SetTypeFillingBySymbol "
+    "SetAsyncMode SetMarginMode LogLevel PrintRequest PrintResult".split()
+)
+
+
 class TradingClient(BrokerClient):
     """Trading-capable broker client supporting account, order, and position operations."""
+
+    _COLLECTION_SPECS: ClassVar[
+        dict[str, tuple[str, str, type[Any], str, tuple[str, ...], tuple[str, ...]]]
+    ] = {
+        "PositionInfo": (
+            "get_positions",
+            "_selected_position",
+            PositionInfo,
+            "PositionsTotal",
+            ("PositionsGet", "positions"),
+            ("PositionGetTicket", "PositionSelectByTicket", "SelectByTicket"),
+        ),
+        "OrderInfo": (
+            "get_orders",
+            "_selected_order",
+            OrderInfo,
+            "OrdersTotal",
+            ("OrdersGet", "orders"),
+            ("OrderGetTicket", "OrderSelect", "Select", "SelectByTicket"),
+        ),
+        "HistoryOrderInfo": (
+            "get_history_orders",
+            "_selected_history_order",
+            OrderInfo,
+            "HistoryOrdersTotal",
+            ("HistoryOrdersGet", "orders"),
+            tuple(
+                "HistoryOrderGetTicket HistoryOrderSelect Select SelectByTicket Ticket".split()
+            ),
+        ),
+        "DealInfo": (
+            "get_deals",
+            "_selected_deal",
+            DealInfo,
+            "HistoryDealsTotal",
+            ("HistoryDealsGet", "deals"),
+            tuple(
+                "HistoryDealGetTicket HistoryDealSelect Select SelectByTicket Ticket".split()
+            ),
+        ),
+    }
 
     def __init__(self, name: str) -> None:
         super().__init__(name)
@@ -304,63 +528,47 @@ class TradingClient(BrokerClient):
         return self._receipts.get(command_id)
 
     def _record_receipt(
-        self,
-        object_id: str,
-        class_name: str,
-        method_name: str,
+        self, object_id: str, class_name: str, method_name: str
     ) -> tuple[str, Receipt]:
         """Create and store an initial command receipt."""
         cmd_id = f"cmd-{uuid.uuid4().hex[:12]}"
         self._last_cmd_id = cmd_id
         self._last_cmd.set(cmd_id)
-        now = time.time()
         rec = Receipt(
-            command_id=cmd_id,
-            object_id=object_id,
-            class_name=class_name,
-            method_name=method_name,
-            status=ReceiptStatus.CREATED,
-            created_at=now,
+            cmd_id,
+            object_id,
+            class_name,
+            method_name,
+            ReceiptStatus.CREATED,
+            time.time(),
         )
         self._receipts[cmd_id] = rec
         return cmd_id, rec
 
-    def _resolve_receipt(
-        self,
-        cmd_id: str,
-        rec: Receipt,
-        val: Any,
-    ) -> None:
+    def _resolve_receipt(self, cmd_id: str, rec: Receipt, val: Any) -> None:
         """Mark receipt as resolved."""
-        now = time.time()
-        val_serialized = (
-            asdict(val) if is_dataclass(val) and not isinstance(val, type) else val
-        )
+        t = time.time()
+        v = asdict(val) if is_dataclass(val) and not isinstance(val, type) else val
         self._receipts[cmd_id] = replace(
             rec,
             status=ReceiptStatus.RESOLVED,
-            sent_at=now,
-            acknowledged_at=now,
-            resolved_at=now,
-            value=val_serialized,
+            sent_at=t,
+            acknowledged_at=t,
+            resolved_at=t,
+            value=v,
         )
 
-    def _reject_receipt(
-        self,
-        cmd_id: str,
-        rec: Receipt,
-        exc: Exception,
-    ) -> None:
+    def _reject_receipt(self, cmd_id: str, rec: Receipt, exc: Exception) -> None:
         """Mark receipt as rejected."""
-        now = time.time()
-        code = getattr(exc, "code", "BROKER_ERROR")
+        t = time.time()
+        err = {"code": str(getattr(exc, "code", "BROKER_ERROR")), "message": str(exc)}
         self._receipts[cmd_id] = replace(
             rec,
             status=ReceiptStatus.REJECTED,
-            sent_at=now,
-            acknowledged_at=now,
-            resolved_at=now,
-            error={"code": str(code), "message": str(exc)},
+            sent_at=t,
+            acknowledged_at=t,
+            resolved_at=t,
+            error=err,
         )
 
     def get_account_info(self) -> AccountInfo | Awaitable[AccountInfo]:
@@ -424,11 +632,7 @@ class TradingClient(BrokerClient):
         return TradeCheckResult()
 
     def calc_margin(
-        self,
-        order_type: OrderType,
-        symbol: str,
-        volume: float,
-        price: float,
+        self, order_type: OrderType, symbol: str, volume: float, price: float
     ) -> float | Awaitable[float]:
         """Calculate required margin for an order."""
         del order_type, symbol, volume, price
@@ -446,10 +650,7 @@ class TradingClient(BrokerClient):
         del order_type, symbol, volume, price_open, price_close
         return 0.0
 
-    async def next_event(
-        self,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline
-    ) -> BridgeEvent:
+    async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109
         """Default event poll stub."""
         del timeout
         raise NotImplementedError(
@@ -459,7 +660,7 @@ class TradingClient(BrokerClient):
     async def await_request_event(
         self,
         request_id: int,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline
+        timeout: float | None = None,  # noqa: ASYNC109
     ) -> BridgeEvent:
         """Default event correlation stub."""
         del request_id, timeout
@@ -475,7 +676,7 @@ class TradingClient(BrokerClient):
         method_name: str,
         args: list[Any],
         requires_arm: bool = False,
-        timeout: float | None = None,  # noqa: ASYNC109 -- backend deadline
+        timeout: float | None = None,  # noqa: ASYNC109
     ) -> Any:
         """Execute a broker command over backend transport with receipt auditing."""
         del requires_arm, timeout
@@ -490,355 +691,193 @@ class TradingClient(BrokerClient):
             self._reject_receipt(cmd_id, rec, exc)
             raise
 
+    @staticmethod
+    def _lookup_case_insensitive_attr(
+        obj: Any, method_name: str, default: Any = None
+    ) -> Any:
+        """Resolve an attribute on `obj` case-insensitively."""
+        target = method_name.lower()
+        for attr in dir(obj):
+            if attr.lower() == target and not attr.startswith("_"):
+                return getattr(obj, attr)
+        return getattr(obj, method_name, default)
+
+    def _dispatch_collection(
+        self, class_name: str, method_name: str, args: list[Any]
+    ) -> Any:
+        """Dispatch collection queries and cursor selections for positions, orders, and deals."""
+        getter_name, sel_attr, default_cls, total_m, list_ms, ticket_ms = (
+            self._COLLECTION_SPECS[class_name]
+        )
+        raw = getattr(self, getter_name)()
+        items = raw if isinstance(raw, list) else []
+
+        if method_name == total_m:
+            return len(items)
+        if method_name in list_ms:
+            if (
+                class_name == "PositionInfo"
+                and args
+                and isinstance(args[0], str)
+                and args[0]
+            ):
+                return [p for p in items if getattr(p, "symbol", "") == args[0]]
+            return items
+        if method_name in (class_name, "info"):
+            selected = getattr(self, sel_attr)
+            return (
+                selected
+                if selected is not None
+                else (items[0] if items else default_cls())
+            )
+        if method_name == "SelectByIndex":
+            idx = int(args[0]) if args else 0
+            if 0 <= idx < len(items):
+                setattr(self, sel_attr, items[idx])
+                return True
+            return False
+        if method_name in ticket_ms:
+            ticket = int(args[0]) if args else 0
+            hit = next((i for i in items if getattr(i, "ticket", 0) == ticket), None)
+            if hit is not None:
+                setattr(self, sel_attr, hit)
+                return True
+            return False
+        if class_name == "PositionInfo" and method_name in ("Select", "SelectByMagic"):
+            sym = str(args[0]) if args else ""
+            magic = int(args[1]) if len(args) > 1 else 0
+            hit = next(
+                (
+                    p
+                    for p in items
+                    if getattr(p, "symbol", "") == sym
+                    and (method_name == "Select" or getattr(p, "magic", 0) == magic)
+                ),
+                None,
+            )
+            if hit is not None:
+                self._selected_position = hit
+                return True
+            return False
+        if class_name in ("PositionInfo", "OrderInfo") and method_name in (
+            "StoreState",
+            "CheckState",
+        ):
+            return True
+        raise BridgeError(
+            f"{self.name} does not support {class_name}.{method_name}",
+            code="UNSUPPORTED_OPERATION",
+        )
+
     def _dispatch(self, class_name: str, method_name: str, args: list[Any]) -> Any:
         """Route generic calls directly to TradingClient typed methods."""
         if class_name == "TerminalInfo":
             t = self.get_terminal_info()
             if method_name in ("TerminalInfo", "info"):
                 return t
-            target = method_name.lower()
-            for attr in dir(t):
-                if attr.lower() == target and not attr.startswith("_"):
-                    return getattr(t, attr)
-            return t
+            return self._lookup_case_insensitive_attr(t, method_name, default=t)
 
         if class_name == "AccountInfo":
             acc = self.get_account_info()
             if method_name in ("AccountInfo", "info"):
                 return acc
-            if method_name == "OrderProfitCheck":
+            if method_name in ("OrderProfitCheck", "MarginCheck"):
                 sym = str(args[0]) if len(args) > 0 else "EURUSD"
                 otype = OrderType(int(args[1])) if len(args) > 1 else OrderType.BUY
                 vol = float(args[2]) if len(args) > 2 else 1.0
-                popen = float(args[3]) if len(args) > 3 else 0.0
-                pclose = float(args[4]) if len(args) > 4 else 0.0
-                return self.calc_profit(otype, sym, vol, popen, pclose)
-            if method_name == "MarginCheck":
-                sym = str(args[0]) if len(args) > 0 else "EURUSD"
-                otype = OrderType(int(args[1])) if len(args) > 1 else OrderType.BUY
-                vol = float(args[2]) if len(args) > 2 else 1.0
-                price = float(args[3]) if len(args) > 3 else 0.0
-                return self.calc_margin(otype, sym, vol, price)
+                p1 = float(args[3]) if len(args) > 3 else 0.0
+                if method_name == "MarginCheck":
+                    return self.calc_margin(otype, sym, vol, p1)
+                p2 = float(args[4]) if len(args) > 4 else 0.0
+                return self.calc_profit(otype, sym, vol, p1, p2)
             if method_name == "FreeMarginCheck":
                 if inspect.isawaitable(acc):
 
                     async def _free(awaitable: Any) -> float:
-                        res = await awaitable
-                        return float(getattr(res, "margin_free", 0.0))
+                        return float(getattr(await awaitable, "margin_free", 0.0))
 
                     return _free(acc)
                 return float(getattr(acc, "margin_free", 0.0))
             if method_name == "MaxLotCheck":
                 return 100.0
-            target = method_name.lower()
-            for attr in dir(acc):
-                if attr.lower() == target and not attr.startswith("_"):
-                    return getattr(acc, attr)
-            return getattr(acc, method_name, None)
+            return self._lookup_case_insensitive_attr(acc, method_name)
 
         if class_name == "SymbolInfo":
+            sym = (
+                args[0]
+                if args and isinstance(args[0], str)
+                else getattr(self, "_current_symbol", "EURUSD")
+            )
             if method_name in ("SymbolInfo", "info"):
-                sym = (
-                    args[0]
-                    if args and isinstance(args[0], str)
-                    else getattr(self, "_current_symbol", "EURUSD")
-                )
                 return self.get_symbol_info(sym)
             if method_name == "SymbolsTotal":
                 return len(self.get_symbols())
             if method_name in ("SymbolsGet", "symbols"):
                 all_syms = self.get_symbols()
                 if args and isinstance(args[0], str) and args[0]:
-                    import fnmatch
-
-                    pat = args[0]
-                    inc_pats = [
-                        p.strip()
-                        for p in pat.split(",")
-                        if not p.strip().startswith("!")
+                    tokens = [p.strip() for p in args[0].split(",") if p.strip()]
+                    inc = [p for p in tokens if not p.startswith("!")]
+                    exc = [p[1:] for p in tokens if p.startswith("!")]
+                    return [
+                        s
+                        for s in all_syms
+                        if (not inc or any(fnmatch.fnmatch(s, p) for p in inc))
+                        and not any(fnmatch.fnmatch(s, p) for p in exc)
                     ]
-                    exc_pats = [
-                        p.strip()[1:]
-                        for p in pat.split(",")
-                        if p.strip().startswith("!")
-                    ]
-                    filtered = []
-                    for s in all_syms:
-                        inc = (
-                            any(fnmatch.fnmatch(s, p) for p in inc_pats)
-                            if inc_pats
-                            else True
-                        )
-                        exc = (
-                            any(fnmatch.fnmatch(s, p) for p in exc_pats)
-                            if exc_pats
-                            else False
-                        )
-                        if inc and not exc:
-                            filtered.append(s)
-                    return filtered
                 return all_syms
             if method_name == "SymbolInfoTick":
-                sym = (
-                    args[0]
-                    if args and isinstance(args[0], str)
-                    else getattr(self, "_current_symbol", "EURUSD")
-                )
                 return self.get_tick(sym)
             if method_name == "SymbolSelect":
-                sym = (
-                    args[0]
-                    if args and isinstance(args[0], str)
-                    else getattr(self, "_current_symbol", "EURUSD")
-                )
-                sel = bool(args[1]) if len(args) > 1 else True
-                return self.select_symbol(sym, sel)
+                return self.select_symbol(sym, bool(args[1]) if len(args) > 1 else True)
             if method_name in ("MarketBookAdd", "subscribe_book"):
-                sym = (
-                    args[0]
-                    if args and isinstance(args[0], str)
-                    else getattr(self, "_current_symbol", "EURUSD")
-                )
                 return self.subscribe_book(sym)
             if method_name in ("MarketBookRelease", "release_book"):
-                sym = (
-                    args[0]
-                    if args and isinstance(args[0], str)
-                    else getattr(self, "_current_symbol", "EURUSD")
-                )
                 return self.release_book(sym)
             if method_name in ("MarketBookGet", "get_book"):
-                sym = (
-                    args[0]
-                    if args and isinstance(args[0], str)
-                    else getattr(self, "_current_symbol", "EURUSD")
-                )
                 return self.get_book(sym)
             if method_name in ("Refresh", "RefreshRates", "IsSynchronized"):
                 return True
             if method_name == "NormalizePrice":
-                price = float(args[0]) if args else 0.0
-                digits = int(args[1]) if len(args) > 1 else 5
-                return round(price, digits)
-            if method_name == "Name":
+                return round(
+                    float(args[0]) if args else 0.0,
+                    int(args[1]) if len(args) > 1 else 5,
+                )
+            if method_name in ("Name", "Select"):
                 if args and isinstance(args[0], str):
                     self._current_symbol = args[0]
                     return self.get_symbol_info(args[0]) is not None
-                return getattr(self, "_current_symbol", "EURUSD")
-            if method_name == "Select":
-                if args and isinstance(args[0], str):
-                    self._current_symbol = args[0]
-                    return self.get_symbol_info(args[0]) is not None
-                return True
-            sym = getattr(self, "_current_symbol", "EURUSD")
-            if args and isinstance(args[0], str):
-                sym = args[0]
-            info = self.get_symbol_info(sym)
-            target_field = method_name.lower()
-            for attr in dir(info):
-                if attr.lower() == target_field and not attr.startswith("_"):
-                    return getattr(info, attr)
-            return getattr(info, method_name, None)
+                return (
+                    getattr(self, "_current_symbol", "EURUSD")
+                    if method_name == "Name"
+                    else True
+                )
+            return self._lookup_case_insensitive_attr(
+                self.get_symbol_info(sym), method_name
+            )
 
-        if class_name == "PositionInfo":
-            pos_raw = self.get_positions()
-            positions = pos_raw if isinstance(pos_raw, list) else []
-            if method_name == "PositionsTotal":
-                return len(positions)
-            if method_name in ("PositionsGet", "positions"):
-                if args and isinstance(args[0], str) and args[0]:
-                    target_sym = args[0]
-                    return [
-                        p for p in positions if getattr(p, "symbol", "") == target_sym
-                    ]
-                return positions
-            if method_name in ("PositionInfo", "info"):
-                if self._selected_position is not None:
-                    return self._selected_position
-                if positions:
-                    return positions[0]
-                from app.services.include.contracts import PositionInfo
-
-                return PositionInfo()
-            if method_name == "Select":
-                target = str(args[0]) if args else ""
-                for p in positions:
-                    if getattr(p, "symbol", "") == target:
-                        self._selected_position = p
-                        return True
-                return False
-            if method_name == "SelectByIndex":
-                idx = int(args[0]) if args else 0
-                if 0 <= idx < len(positions):
-                    self._selected_position = positions[idx]
-                    return True
-                return False
-            if method_name in (
-                "PositionGetTicket",
-                "PositionSelectByTicket",
-                "SelectByTicket",
-            ):
-                ticket = int(args[0]) if args else 0
-                for p in positions:
-                    if getattr(p, "ticket", 0) == ticket:
-                        self._selected_position = p
-                        return True
-                return False
-            if method_name == "SelectByMagic":
-                target_sym = str(args[0]) if args else ""
-                magic = int(args[1]) if len(args) > 1 else 0
-                for p in positions:
-                    if (
-                        getattr(p, "symbol", "") == target_sym
-                        and getattr(p, "magic", 0) == magic
-                    ):
-                        self._selected_position = p
-                        return True
-                return False
-            if method_name in ("StoreState", "CheckState"):
-                return True
-
-        if class_name == "OrderInfo":
-            ord_raw = self.get_orders()
-            orders = ord_raw if isinstance(ord_raw, list) else []
-            if method_name == "OrdersTotal":
-                return len(orders)
-            if method_name in ("OrdersGet", "orders"):
-                return orders
-            if method_name in ("OrderInfo", "info"):
-                if self._selected_order is not None:
-                    return self._selected_order
-                if orders:
-                    return orders[0]
-                from app.services.include.contracts import OrderInfo
-
-                return OrderInfo()
-            if method_name in (
-                "OrderGetTicket",
-                "OrderSelect",
-                "Select",
-                "SelectByTicket",
-            ):
-                ticket = int(args[0]) if args else 0
-                for o in orders:
-                    if getattr(o, "ticket", 0) == ticket:
-                        self._selected_order = o
-                        return True
-                return False
-            if method_name == "SelectByIndex":
-                idx = int(args[0]) if args else 0
-                if 0 <= idx < len(orders):
-                    self._selected_order = orders[idx]
-                    return True
-                return False
-            if method_name in ("StoreState", "CheckState"):
-                return True
-
-        if class_name == "HistoryOrderInfo":
-            h_raw = self.get_history_orders()
-            h_orders = h_raw if isinstance(h_raw, list) else []
-            if method_name == "HistoryOrdersTotal":
-                return len(h_orders)
-            if method_name in ("HistoryOrdersGet", "orders"):
-                return h_orders
-            if method_name in ("HistoryOrderInfo", "info"):
-                if self._selected_history_order is not None:
-                    return self._selected_history_order
-                if h_orders:
-                    return h_orders[0]
-                from app.services.include.contracts import OrderInfo
-
-                return OrderInfo()
-            if method_name in (
-                "HistoryOrderGetTicket",
-                "HistoryOrderSelect",
-                "Select",
-                "SelectByTicket",
-                "Ticket",
-            ):
-                ticket = int(args[0]) if args else 0
-                for o in h_orders:
-                    if getattr(o, "ticket", 0) == ticket:
-                        self._selected_history_order = o
-                        return True
-                return False
-            if method_name == "SelectByIndex":
-                idx = int(args[0]) if args else 0
-                if 0 <= idx < len(h_orders):
-                    self._selected_history_order = h_orders[idx]
-                    return True
-                return False
-
-        if class_name == "DealInfo":
-            d_raw = self.get_deals()
-            deals = d_raw if isinstance(d_raw, list) else []
-            if method_name == "HistoryDealsTotal":
-                return len(deals)
-            if method_name in ("HistoryDealsGet", "deals"):
-                return deals
-            if method_name in ("DealInfo", "info"):
-                if self._selected_deal is not None:
-                    return self._selected_deal
-                if deals:
-                    return deals[0]
-                from app.services.include.contracts import DealInfo
-
-                return DealInfo()
-            if method_name in (
-                "HistoryDealGetTicket",
-                "HistoryDealSelect",
-                "Select",
-                "SelectByTicket",
-                "Ticket",
-            ):
-                ticket = int(args[0]) if args else 0
-                for d in deals:
-                    if getattr(d, "ticket", 0) == ticket:
-                        self._selected_deal = d
-                        return True
-                return False
-            if method_name == "SelectByIndex":
-                idx = int(args[0]) if args else 0
-                if 0 <= idx < len(deals):
-                    self._selected_deal = deals[idx]
-                    return True
-                return False
+        if class_name in self._COLLECTION_SPECS:
+            return self._dispatch_collection(class_name, method_name, args)
 
         if class_name == "Trade":
             if method_name == "OrderSend":
-                raw_req = args[0] if args else None
-                req = self._coerce_trade_request(raw_req)
-                return self.order_send(req)
+                return self.order_send(
+                    self._coerce_trade_request(args[0] if args else None)
+                )
             if method_name == "OrderCheck":
-                raw_req = args[0] if args else None
-                req = self._coerce_trade_request(raw_req)
-                return self.order_check(req)
-            if method_name in (
-                "SetExpertMagicNumber",
-                "SetDeviationInPoints",
-                "SetTypeFilling",
-                "SetTypeFillingBySymbol",
-                "SetAsyncMode",
-                "SetMarginMode",
-                "LogLevel",
-                "PrintRequest",
-                "PrintResult",
-            ):
+                return self.order_check(
+                    self._coerce_trade_request(args[0] if args else None)
+                )
+            if method_name in _TRADE_NOOP_METHODS:
                 return True
             if method_name in ("FormatRequest", "FormatRequestResult"):
                 return ""
-            if method_name == "Request":
-                from app.services.include.contracts import TradeRequest
-
-                return TradeRequest()
-            if method_name == "Result":
-                from app.services.include.contracts import TradeResult
-
-                return TradeResult()
-            if method_name == "CheckResult":
-                from app.services.include.contracts import TradeCheckResult
-
-                return TradeCheckResult()
+            defaults = {
+                "Request": TradeRequest,
+                "Result": TradeResult,
+                "CheckResult": TradeCheckResult,
+            }
+            if method_name in defaults:
+                return defaults[method_name]()
 
         if class_name in ("MarketDepth", "Book"):
             sym = str(args[0]) if args else getattr(self, "_current_symbol", "EURUSD")
@@ -856,32 +895,14 @@ class TradingClient(BrokerClient):
 
     def _coerce_trade_request(self, req: Any) -> Any:
         if req is None:
-            from app.services.include.contracts import TradeRequest
-
             return TradeRequest()
         if isinstance(req, dict):
-            from app.services.include.contracts import TradeRequest
-            from app.services.include.enums import (
-                OrderFilling,
-                OrderTime,
-                OrderType,
-                TradeAction,
-            )
-
-            action = req.get("action", TradeAction.DEAL)
-            if isinstance(action, int):
-                action = TradeAction(action)
-            order_type = req.get("order_type", OrderType.BUY)
-            if isinstance(order_type, int):
-                order_type = OrderType(order_type)
-            type_filling = req.get("type_filling", OrderFilling.FOK)
-            if isinstance(type_filling, int):
-                type_filling = OrderFilling(type_filling)
-            type_time = req.get("type_time", OrderTime.GTC)
-            if isinstance(type_time, int):
-                type_time = OrderTime(type_time)
+            act = req.get("action", TradeAction.DEAL)
+            otype = req.get("order_type", OrderType.BUY)
+            fill = req.get("type_filling", OrderFilling.FOK)
+            ttime = req.get("type_time", OrderTime.GTC)
             return TradeRequest(
-                action=action,
+                action=TradeAction(act) if isinstance(act, int) else act,
                 magic=int(req.get("magic", 0)),
                 order=int(req.get("order", 0)),
                 symbol=str(req.get("symbol", "")),
@@ -891,12 +912,88 @@ class TradingClient(BrokerClient):
                 sl=float(req.get("sl", 0.0)),
                 tp=float(req.get("tp", 0.0)),
                 deviation=int(req.get("deviation", 0)),
-                order_type=order_type,
-                type_filling=type_filling,
-                type_time=type_time,
+                order_type=OrderType(otype) if isinstance(otype, int) else otype,
+                type_filling=OrderFilling(fill) if isinstance(fill, int) else fill,
+                type_time=OrderTime(ttime) if isinstance(ttime, int) else ttime,
                 expiration=req.get("expiration"),
                 comment=str(req.get("comment", "")),
                 position=int(req.get("position", 0)),
                 position_by=int(req.get("position_by", 0)),
             )
         return req
+
+
+_SINGLETONS: dict[str, Any] = {}
+_SINGLETON_FACTORIES: dict[str, tuple[str, str]] = {
+    "yahoo": ("yahoo", "YahooClient"),
+    "dukascopy": ("dukascopy", "DukascopyClient"),
+    "darwinex": ("darwinex", "DarwinexClient"),
+    "sq_equity": ("sq_equity", "SQEquityClient"),
+    "sq_futures": ("sq_futures", "SQFuturesClient"),
+    "crypto": ("crypto", "CryptoClient"),
+    "binance": ("crypto", "BinanceClient"),
+    "files": ("files", "FilesClient"),
+    "tick_downloader": ("tick_downloader", "TickDownloaderClient"),
+    "metatrader": ("metatrader", "MetaTraderClient"),
+    "ctrader": ("ctrader", "CTraderClient"),
+    "simulator": ("simulator", "SimulatorClient"),
+}
+_CLASS_TO_MODULE: dict[str, str] = {
+    cls_name: mod for mod, cls_name in _SINGLETON_FACTORIES.values()
+} | {
+    "BrokerClient": "base",
+    "TradingClient": "base",
+    "BridgeError": "base",
+    "BitfinexClient": "crypto",
+    "CoinbaseClient": "crypto",
+    "PoloniexClient": "crypto",
+}
+_PROVIDER_ALIASES = {
+    "strategyquant_equity": "sq_equity",
+    "strategyquant_futures": "sq_futures",
+    "csv": "files",
+    "parquet": "files",
+    "local": "files",
+    "yahoo_finance": "yahoo",
+    "yfinance": "yahoo",
+    "mt5": "metatrader",
+}
+
+
+def normalize_provider_id(name: str) -> str:
+    """Normalize broker name or alias to canonical identifier."""
+    cleaned = name.lower().strip().replace("-", "_").replace(" ", "_")
+    for suffix in ("_broker", "_backend", "_client"):
+        cleaned = cleaned.removesuffix(suffix)
+    return _PROVIDER_ALIASES.get(cleaned, cleaned)
+
+
+def normalize_broker_name(name: str) -> str:
+    """Backward-compatible alias for normalize_provider_id."""
+    return normalize_provider_id(name)
+
+
+def get_broker(name: str, registry: Any = None) -> Any:
+    """Resolve a broker singleton by name or alias."""
+    del registry
+    target = normalize_provider_id(name)
+    if target not in _SINGLETON_FACTORIES:
+        raise KeyError(f"Unknown broker: {name}")
+    if target not in _SINGLETONS:
+        mod_name, cls_name = _SINGLETON_FACTORIES[target]
+        mod = importlib.import_module(f"app.services.brokers.{mod_name}")
+        _SINGLETONS[target] = getattr(mod, cls_name)()
+    return _SINGLETONS[target]
+
+
+def _resolve_broker_export(name: str) -> Any:
+    """Lazily import broker classes, contracts, and singletons on demand."""
+    if name in _SINGLETON_FACTORIES:
+        return get_broker(name)
+    if name in _CLASS_TO_MODULE:
+        mod = importlib.import_module(f"app.services.brokers.{_CLASS_TO_MODULE[name]}")
+        return getattr(mod, name)
+    for source in (_contracts, _enums):
+        if hasattr(source, name):
+            return getattr(source, name)
+    raise AttributeError(f"module 'app.services.brokers' has no attribute {name!r}")

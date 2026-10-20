@@ -21,6 +21,9 @@ Key Capabilities:
       Associated: `[SQEquityClient.get_bars()]`
       Logging: Emits INFO log upon successfully parsing native SQ 4.2 dat,
       Parquet partitions, or remote StrategyQuant CDN stream.
+    - FR-BROKER-CODECS-SQDAT: Decode StrategyQuant 4.2 binary compressed bar streams.
+      Associated: `decode_sq_dat_bytes()`
+      Logging: Emits DEBUG on locating magic sync markers and parsing delta blocks.
 
 Python API Usage:
     ```python
@@ -42,31 +45,185 @@ from __future__ import annotations
 import csv
 import io
 import os
+import struct
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
 from app.host.logging import get_logger
-from app.services.brokers._file_history import load_local_partition_bars
-from app.services.brokers._http import create_http_session, execute_bounded_get
-from app.services.brokers._native_history import decode_sq_dat_bytes
 from app.services.brokers.base import (
     BridgeError,
     BrokerClient,
+    create_http_session,
     epoch_seconds,
+    execute_bounded_get,
 )
+from app.services.brokers.files import load_local_partition_bars
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
+
+SQDAT_FR = "FR-BROKER-CODECS-SQDAT"
+SQ_MAGIC_HEADER_V42 = b"\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb\xbb"
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market" / "sq_equity"
 DEFAULT_CATALOG_PATH = DEFAULT_DATA_DIR / "sq_equity.csv"
 CDN_BASE_URL = "https://cdn.strategyquantcdn.com/data/barchart_test/eod"
 USER_AGENT = "HaruQuantAI-SQEquityConnector/1.0"
 
-__all__ = ["SQEquityClient"]
+__all__ = ["SQEquityClient", "SQ_MAGIC_HEADER_V42", "decode_sq_dat_bytes"]
+
+
+def decode_sq_dat_bytes(
+    buf: bytes,
+    count: int | None = None,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+) -> list[dict[str, Any]]:
+    """Parse StrategyQuant 4.2 binary compressed bar streams with block delta decoding."""
+    if len(buf) < 15:
+        return []
+
+    blocks: list[int] = []
+    idx = 0
+    while idx < len(buf):
+        pos = buf.find(b"\xbb\xbb\xbb", idx)
+        if pos == -1:
+            break
+        blocks.append(pos)
+        end_pos = pos + 3
+        while end_pos < len(buf) and buf[end_pos] == 0xBB:
+            end_pos += 1
+        idx = end_pos
+
+    if not blocks:
+        return []
+
+    rows: list[dict[str, Any]] = []
+
+    for b_idx_rel, b_off in enumerate(blocks):
+        next_b_off = blocks[b_idx_rel + 1] if b_idx_rel + 1 < len(blocks) else len(buf)
+        curr = b_off + 3
+        while curr < next_b_off and buf[curr] == 0xBB:
+            curr += 1
+
+        anchor_off = None
+        for offset in range(curr, min(curr + 16, next_b_off - 48 + 1)):
+            val = struct.unpack_from(">Q", buf, offset)[0]
+            if 500_000_000_000 <= val <= 5_000_000_000_000:
+                anchor_off = offset
+                break
+
+        if anchor_off is None:
+            continue
+
+        curr = anchor_off
+        ts_ms = struct.unpack_from(">Q", buf, curr)[0]
+        o_raw, h_raw, l_raw, c_raw, v_raw = struct.unpack_from(">5q", buf, curr + 8)
+        curr += 48
+
+        dt = datetime.fromtimestamp(ts_ms / 1000.0, tz=UTC)
+        include = True
+        if date_from and dt < date_from:
+            include = False
+        if date_to and dt > date_to:
+            include = False
+
+        o_val = o_raw / 1_000_000.0
+        h_val = h_raw / 1_000_000.0
+        l_val = l_raw / 1_000_000.0
+        c_val = c_raw / 1_000_000.0
+
+        if (
+            include
+            and l_val > 0
+            and l_val <= min(o_val, c_val) <= max(o_val, c_val) <= h_val
+        ):
+            rows.append(
+                {
+                    "time": int(ts_ms / 1000.0),
+                    "open": o_val,
+                    "high": h_val,
+                    "low": l_val,
+                    "close": c_val,
+                    "tick_volume": max(0, int(v_raw // 100_000)),
+                    "spread": 0,
+                    "real_volume": max(0, int(v_raw // 100_000)),
+                }
+            )
+
+        while curr < next_b_off:
+            if curr + 3 > next_b_off:
+                break
+            flag_bytes = buf[curr : curr + 3]
+            curr += 3
+            b0, b1, b2 = flag_bytes[0], flag_bytes[1], flag_bytes[2]
+            nybbles = (
+                (b0 >> 4) & 0xF,
+                b0 & 0xF,
+                (b1 >> 4) & 0xF,
+                b1 & 0xF,
+                (b2 >> 4) & 0xF,
+                b2 & 0xF,
+            )
+            deltas: list[int] = []
+            for nyb in nybbles:
+                field_len = 1 << (nyb & 0x03)
+                if curr + field_len > next_b_off:
+                    break
+                sign = 1 if (nyb & 0x04) else -1
+                raw_val = int.from_bytes(buf[curr : curr + field_len], "big")
+                curr += field_len
+                deltas.append(sign * raw_val)
+
+            if len(deltas) < 6:
+                break
+
+            ts_ms += deltas[0]
+            o_raw += deltas[1]
+            h_raw += deltas[2]
+            l_raw += deltas[3]
+            c_raw += deltas[4]
+            v_raw += deltas[5]
+
+            bar_dt = datetime.fromtimestamp(ts_ms / 1000.0, tz=UTC)
+            if date_from and bar_dt < date_from:
+                continue
+            if date_to and bar_dt > date_to:
+                continue
+
+            o_val = o_raw / 1_000_000.0
+            h_val = h_raw / 1_000_000.0
+            l_val = l_raw / 1_000_000.0
+            c_val = c_raw / 1_000_000.0
+
+            if l_val > 0 and l_val <= min(o_val, c_val) <= max(o_val, c_val) <= h_val:
+                rows.append(
+                    {
+                        "time": int(ts_ms / 1000.0),
+                        "open": o_val,
+                        "high": h_val,
+                        "low": l_val,
+                        "close": c_val,
+                        "tick_volume": max(0, int(v_raw // 100_000)),
+                        "spread": 0,
+                        "real_volume": max(0, int(v_raw // 100_000)),
+                    }
+                )
+
+    rows.sort(key=lambda r: r["time"])
+    if count is not None and count > 0 and len(rows) > count:
+        rows = rows[-count:]
+
+    logger.debug(
+        "%s: Decoded %d SQ .dat bars",
+        SQDAT_FR,
+        len(rows),
+        extra={"fr_id": SQDAT_FR, "count": len(rows)},
+    )
+    return rows
 
 
 def _clean_symbol(sym: str) -> str:
@@ -194,6 +351,13 @@ class SQEquityClient(BrokerClient):
             self.session, url, timeout=(5.0, 15.0), provider=self._provider_id
         )
 
+    def _validate_timeframe(self, timeframe: Timeframe | str, tf_name: str) -> None:
+        if tf_name.upper() not in ("D1", "1D", "PERIOD_D1", "DAY"):
+            raise BridgeError(
+                f"StrategyQuant US Equities only supports D1 daily timeframe, got '{timeframe}'",
+                code="UNSUPPORTED_TIMEFRAME",
+            )
+
     def _ensure_catalog(self) -> None:
         """Load and cache the StrategyQuant instrument catalog."""
         if self._catalog:
@@ -286,6 +450,22 @@ class SQEquityClient(BrokerClient):
             all_bars = all_bars[-count:]
         return all_bars
 
+    @staticmethod
+    def _rows_to_market_bars(rows: list[dict[str, Any]]) -> list[MarketBar]:
+        return [
+            MarketBar(
+                time=int(r["time"]),
+                open=float(r["open"]),
+                high=float(r["high"]),
+                low=float(r["low"]),
+                close=float(r["close"]),
+                tick_volume=int(r.get("tick_volume", 0)),
+                spread=int(r.get("spread", 0)),
+                real_volume=int(r.get("real_volume", 0)),
+            )
+            for r in rows
+        ]
+
     @override
     def get_bars(
         self,
@@ -307,19 +487,14 @@ class SQEquityClient(BrokerClient):
         e = date_to if date_to is not None else end
         start_sec = epoch_seconds(s)
         end_sec = epoch_seconds(e)
-        date_from = (
+        dt_from = (
             datetime.fromtimestamp(start_sec, tz=UTC) if 0 < start_sec < 2**40 else None
         )
-        date_to = (
-            datetime.fromtimestamp(end_sec, tz=UTC) if 0 < end_sec < 2**40 else None
-        )
+        dt_to = datetime.fromtimestamp(end_sec, tz=UTC) if 0 < end_sec < 2**40 else None
 
         tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
-        if tf_name.upper() not in ("D1", "1D", "PERIOD_D1", "DAY"):
-            raise BridgeError(
-                f"StrategyQuant US Equities only supports D1 daily timeframe, got '{timeframe}'",
-                code="UNSUPPORTED_TIMEFRAME",
-            )
+        self._validate_timeframe(timeframe, tf_name)
+
         parquet_files = self._find_parquet(self.data_dir, symbol, tf_name)
         if not parquet_files and self.sqx_history_dir:
             parquet_files = self._find_parquet(self.sqx_history_dir, symbol, tf_name)
@@ -333,19 +508,7 @@ class SQEquityClient(BrokerClient):
                 count=target_count,
             )
             if parquet_bars:
-                return [
-                    MarketBar(
-                        time=int(r["time"]),
-                        open=float(r["open"]),
-                        high=float(r["high"]),
-                        low=float(r["low"]),
-                        close=float(r["close"]),
-                        tick_volume=int(r.get("tick_volume", 0)),
-                        spread=int(r.get("spread", 0)),
-                        real_volume=int(r.get("real_volume", 0)),
-                    )
-                    for r in parquet_bars
-                ]
+                return self._rows_to_market_bars(parquet_bars)
 
         dat_file = self._find_dat(self.data_dir, symbol, tf_name)
         if not dat_file and self.sqx_history_dir:
@@ -354,42 +517,18 @@ class SQEquityClient(BrokerClient):
             rows = decode_sq_dat_bytes(
                 dat_file.read_bytes(),
                 count=target_count,
-                date_from=date_from,
-                date_to=date_to,
+                date_from=dt_from,
+                date_to=dt_to,
             )
             if rows:
-                return [
-                    MarketBar(
-                        time=int(r["time"]),
-                        open=float(r["open"]),
-                        high=float(r["high"]),
-                        low=float(r["low"]),
-                        close=float(r["close"]),
-                        tick_volume=int(r.get("tick_volume", 0)),
-                        spread=int(r.get("spread", 0)),
-                        real_volume=int(r.get("real_volume", 0)),
-                    )
-                    for r in rows
-                ]
+                return self._rows_to_market_bars(rows)
 
         if self.enable_cdn_download and tf_name.upper() in ("D1", "1D", "PERIOD_D1"):
             cdn_bars = self._fetch_cdn_bars(
-                symbol, count=target_count, date_from=date_from, date_to=date_to
+                symbol, count=target_count, date_from=dt_from, date_to=dt_to
             )
             if cdn_bars:
-                return [
-                    MarketBar(
-                        time=int(r["time"]),
-                        open=float(r["open"]),
-                        high=float(r["high"]),
-                        low=float(r["low"]),
-                        close=float(r["close"]),
-                        tick_volume=int(r.get("tick_volume", 0)),
-                        spread=int(r.get("spread", 0)),
-                        real_volume=int(r.get("real_volume", 0)),
-                    )
-                    for r in cdn_bars
-                ]
+                return self._rows_to_market_bars(cdn_bars)
 
         raise BridgeError(
             f"No {self._asset_label} data found for symbol '{symbol}' ({tf_name})",
@@ -407,7 +546,7 @@ class SQEquityClient(BrokerClient):
         limit: int = 1000,
     ) -> list[MarketTick]:
         """Historical ticks are unsupported for StrategyQuant US Equities."""
-        del date_from, date_to, count, limit
+        del symbol, date_from, date_to, count, limit
         raise BridgeError(
             "StrategyQuant US Equities does not support tick history",
             code="UNSUPPORTED_OPERATION",

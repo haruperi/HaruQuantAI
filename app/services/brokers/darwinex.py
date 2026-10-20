@@ -4,16 +4,17 @@ Description:
     Implements an unauthenticated market data and symbol metadata client
     for Darwinex conforming to the uniform `BrokerClient` interface.
     Fetches historical candlestick bars and ticks in memory from StrategyQuant CDN
-    or local archives, and dynamically resolves instrument specifications from the
-    authoritative catalog CSV (`data/market/darwinex/darwinex.csv`) returning canonical
-    `SymbolInfo`.
+    or local archives, decodes Darwinex `.dat` tick streams, and dynamically resolves
+    instrument specifications from the authoritative catalog CSV
+    (`data/market/darwinex/darwinex.csv`) returning canonical `SymbolInfo`.
 
 Purpose:
     FEAT-BROKER-DARWINEX: Darwinex Market Data and Symbol Catalog Provider.
 
 Key Capabilities:
     - FR-BROKER-DARWINEX-MARKET-DATA: Historical Candlestick Bars and Ticks
-      Associated: `[DarwinexClient.get_bars()]`, `[DarwinexClient.get_ticks()]`
+      Associated: `[DarwinexClient.get_bars()]`, `[DarwinexClient.get_ticks()]`,
+        `decode_darwinex_dat()`
       Logging: Emits INFO log upon successfully downloading and parsing bars with
       extracted count, and WARNING log on network failure.
     - FR-BROKER-DARWINEX-SYMBOLS: Authoritative Symbol Catalog Resolution
@@ -38,6 +39,7 @@ CLI Usage:
 from __future__ import annotations
 
 import io
+import struct
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -45,23 +47,25 @@ from typing import Any, override
 
 import requests
 from app.host.logging import get_logger
-from app.services.brokers._file_history import (
-    find_matching_partitions,
-    parse_delimited_bars,
-    read_parquet_bars,
-)
-from app.services.brokers._http import create_http_session, execute_bounded_get
-from app.services.brokers._native_history import decode_darwinex_dat
 from app.services.brokers.base import (
     BridgeError,
     BrokerClient,
+    create_http_session,
     epoch_millis,
     epoch_seconds,
+    execute_bounded_get,
+)
+from app.services.brokers.files import (
+    find_matching_partitions,
+    parse_delimited_bars,
+    read_parquet_bars,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
+
+assert struct.calcsize(">qqq") == 24, "Darwinex record must be 24 bytes"
 
 DEFAULT_CATALOG_PATH = (
     Path(__file__).resolve().parents[3]
@@ -77,7 +81,117 @@ USER_AGENT = (
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
 
-__all__ = ["DarwinexClient"]
+__all__ = ["DarwinexClient", "decode_darwinex_dat"]
+
+
+def decode_darwinex_dat(
+    buf: bytes, digits: int = 5, count: int | None = None
+) -> list[dict[str, Any]]:
+    """Decode Darwinex .dat tick archive binary payload."""
+    idx = buf.find(b"\xbb\xbb")
+    if idx == -1:
+        return []
+    scale = 10.0**digits
+    rows: list[dict[str, Any]] = []
+
+    if buf.startswith(b"\x00\x034.2"):
+        seq = bytes(range(15))
+        block_offsets: list[tuple[int, int]] = []
+        idx_seq = 0
+        while True:
+            pos = buf.find(seq, idx_seq)
+            if pos == -1:
+                break
+            bb_pos = buf.find(b"\xbb\xbb", pos)
+            if bb_pos == -1:
+                break
+            block_offsets.append((pos, bb_pos))
+            idx_seq = bb_pos + 2
+
+        if not block_offsets:
+            bb_pos = buf.find(b"\xbb\xbb")
+            if bb_pos != -1:
+                block_offsets.append((0, bb_pos))
+
+        for b_i, (_, bb_pos) in enumerate(block_offsets):
+            next_b_start = (
+                block_offsets[b_i + 1][0] if b_i + 1 < len(block_offsets) else len(buf)
+            )
+            curr = bb_pos + 2
+            if curr + 32 > len(buf):
+                continue
+            ts_ms, ask_raw, bid_raw, vol_raw = struct.unpack_from(">4q", buf, curr)
+            curr += 32
+            rows.append(
+                {
+                    "time_msc": int(ts_ms),
+                    "bid": bid_raw / 1_000_000.0,
+                    "ask": ask_raw / 1_000_000.0,
+                    "last": (ask_raw + bid_raw) / 2_000_000.0,
+                    "volume": max(1, int(vol_raw // 100_000_000_000)),
+                    "flags": 0,
+                    "volume_real": max(1.0, float(vol_raw / 100_000_000_000.0)),
+                }
+            )
+            while curr < next_b_start:
+                if curr + 2 > next_b_start:
+                    break
+                b0, b1 = buf[curr], buf[curr + 1]
+                curr += 2
+                nybbles = ((b0 >> 4) & 0xF, b0 & 0xF, (b1 >> 4) & 0xF, b1 & 0xF)
+                deltas: list[int] = []
+                for nyb in nybbles:
+                    field_len = 1 << (nyb & 0x03)
+                    if curr + field_len > next_b_start:
+                        break
+                    sign = 1 if (nyb & 0x04) else -1
+                    raw_val = int.from_bytes(buf[curr : curr + field_len], "big")
+                    curr += field_len
+                    deltas.append(sign * raw_val)
+                if len(deltas) < 4:
+                    break
+                ts_ms += deltas[0]
+                ask_raw += deltas[1]
+                bid_raw += deltas[2]
+                vol_raw += deltas[3]
+                rows.append(
+                    {
+                        "time_msc": int(ts_ms),
+                        "bid": bid_raw / 1_000_000.0,
+                        "ask": ask_raw / 1_000_000.0,
+                        "last": (ask_raw + bid_raw) / 2_000_000.0,
+                        "volume": max(1, int(vol_raw // 100_000_000_000)),
+                        "flags": 0,
+                        "volume_real": max(1.0, float(vol_raw / 100_000_000_000.0)),
+                    }
+                )
+    else:
+        offset = idx + 2
+        rec_size = 24
+        num_recs = (len(buf) - offset) // rec_size
+        max_recs = min(num_recs, count) if count is not None and count > 0 else num_recs
+
+        for i in range(max_recs):
+            ts_ms, ask_raw, bid_raw = struct.unpack_from(
+                ">qqq", buf, offset + i * rec_size
+            )
+            ask = ask_raw / scale
+            bid = bid_raw / scale
+            rows.append(
+                {
+                    "time_msc": int(ts_ms),
+                    "bid": bid,
+                    "ask": ask,
+                    "last": (ask + bid) / 2.0,
+                    "volume": 1,
+                    "flags": 0,
+                    "volume_real": 1.0,
+                }
+            )
+
+    if count is not None and count > 0 and len(rows) > count:
+        rows = rows[-count:]
+    return rows
 
 
 class DarwinexClient(BrokerClient):

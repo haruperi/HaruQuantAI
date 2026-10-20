@@ -39,7 +39,18 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
-from app.services.brokers._file_history import (
+from app.services.brokers.base import BridgeError
+from app.services.brokers.darwinex import decode_darwinex_dat
+from app.services.brokers.dukascopy import (
+    decode_bi5_bars,
+    decode_bi5_ticks,
+    decompress_bi5,
+)
+from app.services.brokers.files import (
+    decode_fxt_bytes,
+    decode_hst_bytes,
+    encode_fxt_bytes,
+    encode_hst_bytes,
     export_bars_to_csv,
     export_bars_to_parquet,
     find_matching_partitions,
@@ -47,18 +58,7 @@ from app.services.brokers._file_history import (
     parse_delimited_ticks,
     read_parquet_bars,
 )
-from app.services.brokers._native_history import (
-    decode_bi5_bars,
-    decode_bi5_ticks,
-    decode_darwinex_dat,
-    decode_fxt_bytes,
-    decode_hst_bytes,
-    decode_sq_dat_bytes,
-    decompress_bi5,
-    encode_fxt_bytes,
-    encode_hst_bytes,
-)
-from app.services.brokers.base import BridgeError
+from app.services.brokers.sq_equity import decode_sq_dat_bytes
 
 FIXTURES_DIR = Path(__file__).resolve().parents[3] / "fixtures" / "brokers" / "stage2c"
 

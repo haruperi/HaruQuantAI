@@ -27,12 +27,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 import requests
-from app.services.brokers._http import (
+from app.services.brokers.base import (
+    BridgeError,
     create_http_session,
     execute_bounded_get,
     redact_url_or_message,
 )
-from app.services.brokers.base import BridgeError
 from app.services.brokers.crypto import BinanceClient, CryptoClient
 from app.services.brokers.dukascopy import DukascopyClient
 from app.services.brokers.sq_equity import SQEquityClient
@@ -358,10 +358,13 @@ def test_binance_bars_and_ticks_integer_validation() -> None:
         "app.services.brokers.exchanges.bitfinex",
         "app.services.brokers.exchanges.coinbase",
         "app.services.brokers.exchanges.poloniex",
+        "app.services.brokers._http",
+        "app.services.brokers._file_history",
+        "app.services.brokers._native_history",
     ],
 )
 def test_legacy_exchanges_package_removed(legacy_mod: str) -> None:
-    """Verify legacy exchanges package and submodules are removed with zero shims."""
+    """Verify legacy exchanges package and private helper modules are removed with zero shims."""
     with pytest.raises(ModuleNotFoundError):
         importlib.import_module(legacy_mod)
 

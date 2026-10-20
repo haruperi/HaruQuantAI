@@ -56,9 +56,9 @@
   - Keep shared array conversion and parameter validation once on `BaseIndicator` in `app/services/indicators/base.py`.
   - Subclass `BaseIndicator` in `app/services/indicators/<category>/<name>.py`, implementing only `calculate()` (and multi-buffer accessors where needed), targeting `< 150` lines (`🟢 Ideal`).
 - **Broker Transport & History Parsers (`app/services/brokers/`):**
-  - Isolate shared HTTP retry, rate-limiting, and secret redaction in `app/services/brokers/_http.py`.
-  - Isolate shared CSV/TXT/archive history parsing in `app/services/brokers/_file_history.py`.
-  - Isolate shared binary tick/bar decoding (`.bi5`, `.fxt`, `.hst`, `.dat`) in `app/services/brokers/_native_history.py`.
+  - Consolidate shared HTTP retry, rate-limiting, credential redaction, and provider registry helpers in `app/services/brokers/base.py`.
+  - Consolidate shared CSV/TXT/Parquet/partition history parsing and MetaTrader `.hst`/`.fxt` binary codecs in `app/services/brokers/files.py`.
+  - Co-locate vendor-specific binary codecs (`.bi5`, Darwinex `.dat`, StrategyQuant `.dat`) in their owning broker modules (`dukascopy.py`, `darwinex.py`, `sq_equity.py`).
 - **Semantic DRY & Cohesive Shared Modules:**
   - Extract shared logic only when 2+ modules share the **same semantic responsibility and reason to change** (no multi-flag "God helpers").
   - Same-domain shared contracts/helpers $\rightarrow$ `<domain>/_common.py` (or descriptive `<domain>/_<topic>.py`).

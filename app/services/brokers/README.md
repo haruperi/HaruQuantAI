@@ -14,20 +14,17 @@ app/services/include/
   enums.py             # Canonical trading enumerations
 
 app/services/brokers/
-  base.py              # BrokerClient, TradingClient, BridgeError, Provider*Error, CancellationToken
-  _http.py             # Bounded HTTP transport, retries, redacted logging, connection pooling
-  _file_history.py     # Partition matching, delimited text parsing, local parquet/bar loaders
-  _native_history.py   # HST, FXT, StrategyQuant DAT binary codecs and bi5 decompression
+  base.py              # BrokerClient, TradingClient, BridgeError, HTTP transport, provider registry
   metatrader.py        # MetaTraderClient(TradingClient) - Native Bridge and MT5 trading client
   simulator.py         # SimulatorClient(TradingClient) - Local model and async execution client
   ctrader.py           # CTraderClient(TradingClient) - Spotware cTrader Open API Protobuf/TLS trading client
-  dukascopy.py         # DukascopyClient(BrokerClient) - Dukascopy CDN market data client
-  darwinex.py          # DarwinexClient(BrokerClient) - Darwinex tick & bar market data client
+  dukascopy.py         # DukascopyClient(BrokerClient) - Dukascopy CDN market data client & BI5 codecs
+  darwinex.py          # DarwinexClient(BrokerClient) - Darwinex tick & bar market data client & .dat codec
   crypto.py            # CryptoClient / BinanceClient(BrokerClient) - Cryptocurrency market data client
-  files.py             # FilesClient(BrokerClient) - Local filesystem market data client (CSV, Parquet, HST, FXT)
+  files.py             # FilesClient(BrokerClient) - Local filesystem market data client & CSV/Parquet/HST/FXT codecs
   yahoo.py             # YahooClient(BrokerClient) - Yahoo Finance market data client
   tick_downloader.py   # TickDownloaderClient(BrokerClient) - Historical tick downloader client
-  sq_equity.py         # SQEquityClient(BrokerClient) - StrategyQuant US Equities daily bundled client
+  sq_equity.py         # SQEquityClient(BrokerClient) - StrategyQuant US Equities daily bundled client & .dat codec
   sq_futures.py        # SQFuturesClient(BrokerClient) - StrategyQuant Continuous Futures minute/daily bundled client
 
 app/host/persistence/
@@ -40,13 +37,14 @@ scripts/
 ```
 
 The brokers package provides unified broker abstractions across execution backends and
-market data providers. Shared foundation modules (`base.py`, `_http.py`, `_file_history.py`,
-`_native_history.py`) eliminate boilerplate across provider adapters:
-- `BrokerClient` is the base class for all market data clients, offering uniform async
-  `get_bars()`, `get_ticks()`, `get_symbol_info()`, `get_symbols()`, and `get_terminal_info()` methods.
+market data providers. Shared foundation modules (`base.py`, `files.py`) and co-located
+vendor codecs eliminate boilerplate across provider adapters:
+- `BrokerClient` is the base class for all market data clients, offering uniform
+  `get_bars()`, `get_ticks()`, `get_symbol_info()`, `get_symbols()`, and `get_terminal_info()` methods,
+  while `base.py` also provides bounded HTTP session pooling, rate limiting, and credential redaction.
 - `TradingClient(BrokerClient)` extends data capabilities with unified trading operations:
-  `get_account_info()`, `order_send()`, `order_check()`, `account_info()`, `terminal_info()`, etc.
-- `_file_history.load_local_partition_bars` and `load_local_partition_ticks` unify
+  `get_account_info()`, `order_send()`, `order_check()`, `calc_margin()`, `calc_profit()`, etc.
+- `files.load_local_partition_bars` and `load_local_partition_ticks` unify
   multi-partition file discovery, decoding, date filtering, and deduplication across file-based
   providers (`files.py`, `sq_equity.py`, `sq_futures.py`).
 - Direct method invocation (`client.get_bars(...)`, `client.get_ticks(...)`) replaces legacy
@@ -188,8 +186,8 @@ capabilities or authorize trading.
 ## Focused verification
 
 ```powershell
-uv run pytest tests/unit/services/test_trading_api.py tests/unit/services/test_trading_backend_parity.py tests/unit/services/test_trading_simulator.py tests/unit/services/test_metatrader_bridge_protocol.py tests/unit/services/test_broker_contracts.py tests/unit/services/test_mt5bridge_journal.py --no-cov
-uv run mypy --strict --follow-imports=silent app/services/include app/services/brokers/base.py app/services/brokers/metatrader.py app/services/brokers/simulator.py app/services/brokers/_simulation_api.py
+uv run pytest tests/unit/services/brokers/ tests/unit/services/test_trading_api.py tests/unit/services/test_trading_backend_parity.py tests/unit/services/test_trading_simulator.py tests/unit/services/test_metatrader_bridge_protocol.py tests/unit/services/test_broker_contracts.py --no-cov
+uv run mypy --strict --follow-imports=silent app/services/include app/services/brokers
 ```
 
 Checks use isolated stores and local/native-fixture execution. Compile and validate
@@ -323,5 +321,5 @@ The broker architecture organizes all brokers into standard Python classes inher
 
 - **Direct Method Dispatch**: Callers use `client.get_bars(...)`, `client.get_ticks(...)`, `client.get_symbol_info(...)` directly.
 - **Cancellation**: Cooperative, thread-safe cancellation via `CancellationToken`.
-- **Strict Real-Data Policy**: Production download paths never synthesize synthetic mock records. Unavailable history fails explicitly with typed `ProviderError` subtypes (`ProviderNotFoundError`, `ProviderValidationError`, `ProviderUnsupportedError`, `ProviderRateLimitError`, `ProviderTimeoutError`).
-- **Resource Management**: Safe idempotent lifecycle release (`close_sync` / `close` / `aclose`).
+- **Strict Real-Data Policy**: Production download paths never synthesize synthetic mock records. Unavailable history fails explicitly with typed `BridgeError` exceptions.
+- **Resource Management**: Safe idempotent lifecycle release (`close_sync` / `close` / `disconnect`).

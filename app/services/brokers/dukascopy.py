@@ -4,9 +4,9 @@ Description:
     Implements an unauthenticated market data and symbol metadata client
     for Dukascopy Bank SA conforming to the uniform `BrokerClient` interface.
     Fetches historical candlestick bars and ticks over HTTP in memory or from local
-    data directories, and dynamically resolves instrument specifications from the
-    authoritative catalog CSV (`data/market/dukascopy/dukascopy.csv`) returning canonical
-    `SymbolInfo` objects.
+    data directories, decodes native LZMA `.bi5` streams, and dynamically resolves
+    instrument specifications from the authoritative catalog CSV
+    (`data/market/dukascopy/dukascopy.csv`) returning canonical `SymbolInfo` objects.
 
 Purpose:
     FEAT-BROKER-DUKASCOPY: Dukascopy Market Data and Symbol Catalog Provider.
@@ -20,6 +20,9 @@ Key Capabilities:
       Associated: `[DukascopyClient.get_symbol_info()]`, `[DukascopyClient.get_symbols()]`
       Logging: Emits INFO log upon successfully loading or querying catalog items,
       and WARNING log if symbol is not found in the CSV catalog.
+    - FR-BROKER-CODECS-BI5: Decompress and decode Dukascopy LZMA tick/bar streams.
+      Associated: `decompress_bi5()`, `decode_bi5_ticks()`, `decode_bi5_bars()`
+      Logging: Emits DEBUG on parsing compressed payload and reporting decoded count.
 
 Python API Usage:
     ```python
@@ -38,32 +41,36 @@ CLI Usage:
 
 from __future__ import annotations
 
+import lzma
+import struct
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, override
 
 from app.host.logging import get_logger
-from app.services.brokers._file_history import (
-    find_matching_partitions,
-    parse_delimited_bars,
-    read_parquet_bars,
-)
-from app.services.brokers._http import create_http_session, execute_bounded_get
-from app.services.brokers._native_history import (
-    decode_bi5_bars,
-    decode_bi5_ticks,
-    decompress_bi5,
-)
 from app.services.brokers.base import (
     BridgeError,
     BrokerClient,
+    create_http_session,
     epoch_millis,
     epoch_seconds,
+    execute_bounded_get,
+)
+from app.services.brokers.files import (
+    find_matching_partitions,
+    parse_delimited_bars,
+    read_parquet_bars,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
+
+BI5_FR = "FR-BROKER-CODECS-BI5"
+MAX_DECOMPRESSED_BYTES = 50 * 1024 * 1024  # 50 MB safety budget
+
+assert struct.calcsize(">IIIff") == 20, "Dukascopy BI5 tick record must be 20 bytes"
+assert struct.calcsize(">IIIIIf") == 24, "Dukascopy BI5 M1 bar record must be 24 bytes"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -73,7 +80,138 @@ USER_AGENT = (
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market" / "dukascopy"
 DEFAULT_CATALOG_PATH = DEFAULT_DATA_DIR / "dukascopy.csv"
 
-__all__ = ["DukascopyClient"]
+__all__ = [
+    "DukascopyClient",
+    "decode_bi5_bars",
+    "decode_bi5_ticks",
+    "decompress_bi5",
+]
+
+
+def decompress_bi5(data: bytes, max_bytes: int = MAX_DECOMPRESSED_BYTES) -> bytes:
+    """Decompress Dukascopy .bi5 binary payload with LZMA header recovery and size limits."""
+    if not data or len(data) < 5:
+        return b""
+    try:
+        decomp = lzma.decompress(data, format=lzma.FORMAT_ALONE)
+        if len(decomp) > max_bytes:
+            raise BridgeError(
+                f"Decompressed BI5 payload exceeds limit ({len(decomp)} > {max_bytes})"
+            )
+        return decomp
+    except BridgeError:
+        raise
+    except Exception:
+        pass
+    try:
+        props = data[:5]
+        payload = data[5:]
+        alone_header = props + struct.pack("<Q", 2**64 - 1)
+        decomp = lzma.decompress(alone_header + payload, format=lzma.FORMAT_ALONE)
+        if len(decomp) > max_bytes:
+            raise BridgeError(
+                f"Decompressed BI5 payload exceeds limit ({len(decomp)} > {max_bytes})"
+            )
+        return decomp
+    except BridgeError:
+        raise
+    except Exception:
+        pass
+    try:
+        decomp = lzma.decompress(data, format=lzma.FORMAT_RAW)
+        if len(decomp) > max_bytes:
+            raise BridgeError(
+                f"Decompressed BI5 payload exceeds limit ({len(decomp)} > {max_bytes})"
+            )
+        return decomp
+    except BridgeError:
+        raise
+    except Exception:
+        return b""
+
+
+def decode_bi5_ticks(
+    decomp: bytes,
+    base_dt: datetime,
+    digits: int = 5,
+    count: int | None = None,
+) -> list[dict[str, Any]]:
+    """Decode uncompressed Dukascopy BI5 tick records."""
+    if not decomp:
+        return []
+    rec_count = len(decomp) // 20
+    target_count = (
+        min(rec_count, count) if count is not None and count > 0 else rec_count
+    )
+    scale = 10.0**digits
+    rows: list[dict[str, Any]] = []
+
+    for i in range(target_count):
+        offset_ms, ask_int, bid_int, ask_v, bid_v = struct.unpack_from(
+            ">IIIff", decomp, i * 20
+        )
+        ask = ask_int / scale
+        bid = bid_int / scale
+        tick_dt = base_dt + timedelta(milliseconds=offset_ms)
+        rows.append(
+            {
+                "time_msc": int(tick_dt.timestamp() * 1000),
+                "bid": bid,
+                "ask": ask,
+                "last": (ask + bid) / 2.0,
+                "volume": int(ask_v + bid_v),
+                "flags": 0,
+                "volume_real": float(ask_v + bid_v),
+            }
+        )
+    logger.debug(
+        "%s: Decoded %d BI5 ticks",
+        BI5_FR,
+        len(rows),
+        extra={"fr_id": BI5_FR, "count": len(rows)},
+    )
+    return rows
+
+
+def decode_bi5_bars(
+    decomp: bytes,
+    base_dt: datetime,
+    digits: int = 5,
+    count: int | None = None,
+) -> list[dict[str, Any]]:
+    """Decode uncompressed Dukascopy BI5 M1 candle records."""
+    if not decomp:
+        return []
+    rec_count = len(decomp) // 24
+    target_count = (
+        min(rec_count, count) if count is not None and count > 0 else rec_count
+    )
+    scale = 10.0**digits
+    rows: list[dict[str, Any]] = []
+
+    for i in range(target_count):
+        offset_sec, o, c, l, h, v = struct.unpack_from(">IIIIIf", decomp, i * 24)
+        bar_dt = base_dt + timedelta(seconds=offset_sec)
+        rows.append(
+            {
+                "time": int(bar_dt.timestamp()),
+                "open": o / scale,
+                "high": h / scale,
+                "low": l / scale,
+                "close": c / scale,
+                "tick_volume": int(v),
+                "spread": 0,
+                "real_volume": int(v),
+            }
+        )
+    logger.debug(
+        "%s: Decoded %d BI5 M1 bars",
+        BI5_FR,
+        len(rows),
+        extra={"fr_id": BI5_FR, "count": len(rows)},
+    )
+    return rows
+
 
 # Compatibility alias
 _decompress_bi5 = decompress_bi5

@@ -39,20 +39,15 @@ CLI Usage:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
 from app.host.logging import get_logger
-from app.services.brokers._file_history import load_local_partition_bars
-from app.services.brokers._http import execute_bounded_get
-from app.services.brokers._native_history import decode_sq_dat_bytes
 from app.services.brokers.base import (
     BridgeError,
-    epoch_seconds,
+    execute_bounded_get,
 )
 from app.services.brokers.sq_equity import SQEquityClient
-from app.services.include.contracts import MarketBar
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
@@ -180,22 +175,7 @@ class SQFuturesClient(SQEquityClient):
         )
 
     @override
-    def get_bars(
-        self,
-        symbol: str,
-        timeframe: Timeframe | str = Timeframe.PERIOD_D1,
-        date_from: datetime | int | None = None,
-        date_to: datetime | int | None = None,
-        *,
-        start: datetime | int | None = None,
-        end: datetime | int | None = None,
-        start_pos: int | None = None,
-        count: int | None = None,
-        limit: int = 1000,
-    ) -> list[MarketBar]:
-        """Validate M1/D1 cadence and retrieve continuous futures bars."""
-        del start_pos
-        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
+    def _validate_timeframe(self, timeframe: Timeframe | str, tf_name: str) -> None:
         if tf_name.upper() not in (
             "M1",
             "PERIOD_M1",
@@ -209,93 +189,6 @@ class SQFuturesClient(SQEquityClient):
                 f"StrategyQuant Continuous Futures only supports M1 and D1 timeframes, got '{timeframe}'",
                 code="UNSUPPORTED_TIMEFRAME",
             )
-        target_count = count or limit or 100
-        s = date_from if date_from is not None else start
-        e = date_to if date_to is not None else end
-        start_sec = epoch_seconds(s)
-        end_sec = epoch_seconds(e)
-        date_from = (
-            datetime.fromtimestamp(start_sec, tz=UTC) if 0 < start_sec < 2**40 else None
-        )
-        date_to = (
-            datetime.fromtimestamp(end_sec, tz=UTC) if 0 < end_sec < 2**40 else None
-        )
-
-        parquet_files = self._find_parquet(self.data_dir, symbol, tf_name)
-        if not parquet_files and self.sqx_history_dir:
-            parquet_files = self._find_parquet(self.sqx_history_dir, symbol, tf_name)
-        if parquet_files:
-            parquet_bars = load_local_partition_bars(
-                parquet_files,
-                symbol=symbol,
-                timeframe=tf_name,
-                start=start_sec,
-                end=end_sec,
-                count=target_count,
-            )
-            if parquet_bars:
-                return [
-                    MarketBar(
-                        time=int(r["time"]),
-                        open=float(r["open"]),
-                        high=float(r["high"]),
-                        low=float(r["low"]),
-                        close=float(r["close"]),
-                        tick_volume=int(r.get("tick_volume", 0)),
-                        spread=int(r.get("spread", 0)),
-                        real_volume=int(r.get("real_volume", 0)),
-                    )
-                    for r in parquet_bars
-                ]
-
-        dat_file = self._find_dat(self.data_dir, symbol, tf_name)
-        if not dat_file and self.sqx_history_dir:
-            dat_file = self._find_dat(self.sqx_history_dir, symbol, tf_name)
-        if dat_file:
-            rows = decode_sq_dat_bytes(
-                dat_file.read_bytes(),
-                count=target_count,
-                date_from=date_from,
-                date_to=date_to,
-            )
-            if rows:
-                return [
-                    MarketBar(
-                        time=int(r["time"]),
-                        open=float(r["open"]),
-                        high=float(r["high"]),
-                        low=float(r["low"]),
-                        close=float(r["close"]),
-                        tick_volume=int(r.get("tick_volume", 0)),
-                        spread=int(r.get("spread", 0)),
-                        real_volume=int(r.get("real_volume", 0)),
-                    )
-                    for r in rows
-                ]
-
-        if self.enable_cdn_download and tf_name.upper() in ("D1", "1D", "PERIOD_D1"):
-            cdn_bars = self._fetch_cdn_bars(
-                symbol, count=target_count, date_from=date_from, date_to=date_to
-            )
-            if cdn_bars:
-                return [
-                    MarketBar(
-                        time=int(r["time"]),
-                        open=float(r["open"]),
-                        high=float(r["high"]),
-                        low=float(r["low"]),
-                        close=float(r["close"]),
-                        tick_volume=int(r.get("tick_volume", 0)),
-                        spread=int(r.get("spread", 0)),
-                        real_volume=int(r.get("real_volume", 0)),
-                    )
-                    for r in cdn_bars
-                ]
-
-        raise BridgeError(
-            f"No {self._asset_label} data found for symbol '{symbol}' ({tf_name})",
-            code="NO_DATA",
-        )
 
 
 def main() -> None:
