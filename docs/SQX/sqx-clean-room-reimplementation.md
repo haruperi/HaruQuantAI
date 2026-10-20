@@ -4,7 +4,7 @@ This document is the **authoritative greenfield clean-room master blueprint** fo
 
 1. **Section 0 — Greenfield Engineering Guardrails, Line-Count Budgets & DRY Rules** (`<= 100` line docstrings, `1,000` line hard file cutoff, zero backward-compatibility aliases, AI-tool-ready methods, and repository-wide DRY deduplication).
 2. **Complete 3-Tier Spatial Project & File Structure** (`app/host/`, `app/services/`, `app/workspace/`, `app/plugins/`, `ui/app/`).
-3. **Donor / Backend / Frontend Alignment Tables** mapping every component to its **SQX Donor** (docs/SQX/), **Backend Target File**, **Frontend Target File**, and **DRY Shared Dependencies**.
+3. **Donor / Backend / Frontend Alignment Tables** mapping every component to its **Donor Path** (`docs/SQX/...`), **Backend Target File**, **Frontend Target File**, and **DRY Shared Dependencies**.
 4. **Upfront `FR-*` & Exact Method Signatures Per File** (`ClassName.method_name(args: Type) -> ReturnType`) so agents never invent unapproved functions, aliases, or spaghetti logic.
 
 ---
@@ -190,24 +190,24 @@ HaruQuantAI/
 
 ### Phase 1.1 – 1.4 Master Donor / Backend / Frontend Alignment Table (Bottom-Up Build Order)
 
-| Build Order & Component                                           | SQX Donor (`docs/SQX/`)                                         | Backend Target File (Line Budget)                                   | Frontend Target File                                                         | DRY Shared Dependencies                                       |
-| ----------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| **1. `TelemetryLogger`**                                          | `SQLog` / Logback Sinks                                         | `app/host/logging.py` (`🟡 200–350L`)                               | `ui/app/host/HostSettingsModal.tsx`                                          | Zero `app.*` imports (Root dependency for all files)          |
-| **2. `HostPersistence`**                                          | `SQDataLib` / SQLite WAL Store                                  | `app/host/persistence.py` (`🟠 700–900L`, DDL asset table)          | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`; single source of truth for all SQLite CRUD |
-| **3. `ApiResponse`**                                              | Servlet JSON Envelopes                                          | `app/host/response.py` (`🟢 <150L`)                                 | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`; standard REST/WS envelope                  |
-| **4. `ResourceMonitor`**                                          | `MemoryMonitor` / Watchdog                                      | `app/host/resources.py` (`🟢 <200L`)                                | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`                                             |
-| **5. `SettingsManager` & `SkinDark`/`SkinLight`**                 | `Settings` / `SkinDark` / `SkinLight`                           | `app/host/settings.py` (`🟡 200–350L`)                              | `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx`     | `TelemetryLogger`, `HostPersistence` (`settings` table)       |
-| **6. `SessionManager`**                                           | `SessionAuth` / Token Guard                                     | `app/host/session.py` (`🟢 <200L`)                                  | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence` (`sessions` table)       |
-| **7. `PluginDiscovery`**                                          | `PluginManager` (`internal/plugins/`)                           | `app/host/discovery.py` (`🟡 200–350L`)                             | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence`                          |
-| **8. `JobManager`**                                               | `TaskManager` / Worker Pool                                     | `app/host/jobs.py` (`🟡 250–400L`)                                  | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence` (`jobs` table)           |
-| **9. `AppPlatform` (`AppHost`)**                                  | `SQApp` / Jetty Bootstrap (`onboard/`)                          | `app/host/bootstrap.py` (`🟡 250–450L`), `app/main.py` (`🟢 <150L`) | `ui/app/host/HostConnectionModal.tsx`                                        | `TelemetryLogger`, `HostPersistence`, all Phase 1.1 services  |
-| **10. `HeadlessCLI`**                                             | `sqcli.config` / `SQConsoleStarter` (`cli/`)                    | `app/cli.py` (`🟡 200–350L`)                                        | N/A (Headless CLI)                                                           | `TelemetryLogger`, `AppHost`, `HostPersistence`               |
-| **11. `ConnectionTest`, `ServletConnection`, `ServletConstants`** | `ConnectionTest`, `ServletConnection`, `ServletConstants`       | `app/host/transport.py` (`🟡 300–480L`)                             | `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`   | `TelemetryLogger`, `HostPersistence`, `ApiResponse`           |
-| **12. `ConnectionLiveTest`**                                      | `ConnectionLiveTest`                                            | `app/services/brokers/registry.py` (`🟢 <200L`)                     | `ui/app/workspace/Trading/TradingDashboard.tsx`                              | `BaseBrokerClient`                                            |
-| **13. `ConnectionMT4` (`ConnectionMT5`)**                         | `ConnectionMT4` / MT5 Bridge                                    | `app/services/brokers/metatrader.py` (`🟡 250–400L`)                | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_native_history.py`                      |
-| **14. `ConnectionCTrader`**                                       | `ConnectionCTrader`                                             | `app/services/brokers/ctrader.py` (`🟡 250–400L`)                   | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_http.py`                                |
-| **15. `ConnectionSimulator`**                                     | `ConnectionSimulator`                                           | `app/services/brokers/simulator.py` (`🟡 200–350L`)                 | `ui/app/workspace/Trading/TradingDashboard.tsx`                              | `BaseBrokerClient`                                            |
-| **16. `CryptoExchange*` (6 Exchanges)**                           | `CryptoExchangeBinance*`, `Bitfinex`, `CoinbasePro`, `Poloniex` | `app/services/brokers/crypto.py` (`🟡 350–500L`)                    | `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`                          | `BaseBrokerClient`, `_http.py`                                |
+| Build Order & Component                                           | Donor Path (`docs/SQX/...`)                                                                                                                                      | Backend Target File (Line Budget)                                   | Frontend Target File                                                         | DRY Shared Dependencies                                       |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **1. `TelemetryLogger`**                                          | [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`SQLog`)                                                           | `app/host/logging.py` (`🟡 200–350L`)                               | `ui/app/host/HostSettingsModal.tsx`                                          | Zero `app.*` imports (Root dependency for all files)          |
+| **2. `HostPersistence`**                                          | [`docs/SQX/libs/SQDataLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQDataLib.md) (`SQDataLib` WAL)                                           | `app/host/persistence.py` (`🟠 700–900L`, DDL asset table)          | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`; single source of truth for all SQLite CRUD |
+| **3. `ApiResponse`**                                              | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (Servlet Envelopes)                           | `app/host/response.py` (`🟢 <150L`)                                 | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`; standard REST/WS envelope                  |
+| **4. `ResourceMonitor`**                                          | [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`MemoryMonitor`)                                                   | `app/host/resources.py` (`🟢 <200L`)                                | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`                                             |
+| **5. `SettingsManager` & `SkinDark`/`SkinLight`**                 | [`docs/SQX/overview/settings/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/settings/README.md) (`Settings`)                            | `app/host/settings.py` (`🟡 200–350L`)                              | `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx`     | `TelemetryLogger`, `HostPersistence` (`settings` table)       |
+| **6. `SessionManager`**                                           | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`SessionAuth`)                               | `app/host/session.py` (`🟢 <200L`)                                  | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence` (`sessions` table)       |
+| **7. `PluginDiscovery`**                                          | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`PluginManager`)                             | `app/host/discovery.py` (`🟡 200–350L`)                             | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence`                          |
+| **8. `JobManager`**                                               | [`docs/SQX/overview/custom-projects.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/custom-projects.md) (`TaskManager`)                         | `app/host/jobs.py` (`🟡 250–400L`)                                  | `ui/app/host/HostSettingsModal.tsx`                                          | `TelemetryLogger`, `HostPersistence` (`jobs` table)           |
+| **9. `AppPlatform` (`AppHost`)**                                  | [`docs/SQX/overview/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/README.md) (`SQApp`)                                                 | `app/host/bootstrap.py` (`🟡 250–450L`), `app/main.py` (`🟢 <150L`) | `ui/app/host/HostConnectionModal.tsx`                                        | `TelemetryLogger`, `HostPersistence`, all Phase 1.1 services  |
+| **10. `HeadlessCLI`**                                             | [`docs/SQX/cli/sqcli.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/cli/sqcli.md) (`sqcli.config`)                                                      | `app/cli.py` (`🟡 200–350L`)                                        | N/A (Headless CLI)                                                           | `TelemetryLogger`, `AppHost`, `HostPersistence`               |
+| **11. `ConnectionTest`, `ServletConnection`, `ServletConstants`** | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`Connection*`)                               | `app/host/transport.py` (`🟡 300–480L`)                             | `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`   | `TelemetryLogger`, `HostPersistence`, `ApiResponse`           |
+| **12. `ConnectionLiveTest`**                                      | [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`ConnectionLiveTest`)                        | `app/services/brokers/registry.py` (`🟢 <200L`)                     | `ui/app/workspace/Trading/TradingDashboard.tsx`                              | `BaseBrokerClient`                                            |
+| **13. `ConnectionMT4` (`ConnectionMT5`)**                         | [`docs/SQX/overview/data-sources/mt5-import.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/mt5-import.md) (`ConnectionMT4`/MT5)   | `app/services/brokers/metatrader.py` (`🟡 250–400L`)                | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_native_history.py`                      |
+| **14. `ConnectionCTrader`**                                       | [`docs/SQX/overview/data-sources/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/README.md) (`ConnectionCTrader`)           | `app/services/brokers/ctrader.py` (`🟡 250–400L`)                   | `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx` | `BaseBrokerClient`, `_http.py`                                |
+| **15. `ConnectionSimulator`**                                     | [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) (`ConnectionSimulator`)                               | `app/services/brokers/simulator.py` (`🟡 200–350L`)                 | `ui/app/workspace/Trading/TradingDashboard.tsx`                              | `BaseBrokerClient`                                            |
+| **16. `CryptoExchange*` (6 Exchanges)**                           | [`docs/SQX/overview/data-sources/crypto-exchanges.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/crypto-exchanges.md) (`Crypto*`) | `app/services/brokers/crypto.py` (`🟡 350–500L`)                    | `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`                          | `BaseBrokerClient`, `_http.py`                                |
 
 ---
 
@@ -215,7 +215,7 @@ HaruQuantAI/
 
 #### 1. `app/host/logging.py` — `TelemetryLogger`, `BoundLogger`, `TelemetryEngine` & `LogRingBuffer` (`FEAT-HOST-LOGGING`)
 
-- **Donors:** SQX `SQLog`
+- **Donor Path:** [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`SQLog` / Logback Sinks)
 - **Backend Target:** `app/host/logging.py` (`🟠 500–995L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
 - **Classes:** `TelemetryLogger` (`BoundLogger` alias), `TelemetryEngine`, `LogRingBuffer`, `WindowsSafeRotatingFileHandler`, `LogEventFormatter` (plus `get_logger`, `get_access_logger`, `setup_logging`, `flush_logs`, `shutdown_logging`, `TelemetryLoggerCLI`)
@@ -233,7 +233,7 @@ HaruQuantAI/
 
 #### 2. `app/host/persistence.py` — `HostPersistence` (`FEAT-HOST-PERSISTENCE`)
 
-- **Donors:** SQX `SQDataLib` Persistence
+- **Donor Path:** [`docs/SQX/libs/SQDataLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQDataLib.md) (`SQDataLib` SQLite WAL Persistence)
 - **Backend Target:** `app/host/persistence.py` (`🟠 500–900L`, Docstring `<=60L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `HostPersistence` (plus `HostPersistenceCLI`)
@@ -247,7 +247,7 @@ HaruQuantAI/
 
 #### 3. `app/host/response.py` — `StandardResponse`, `StandardError`, `ResponseMetadata` & `ApiResponse` (`FEAT-HOST-RESPONSE`)
 
-- **Donors:** SQX Servlet Response Envelopes
+- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (Servlet JSON Response Envelopes)
 - **Backend Target:** `app/host/response.py` (`🟡 200–495L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
 - **Classes:** `StandardResponse[T]`, `StandardError`, `ResponseMetadata`, `ApiResponse` (plus `ApiResponseCLI`)
@@ -258,7 +258,7 @@ HaruQuantAI/
 
 #### 4. `app/host/resources.py` — `ResourceMonitor` (`FEAT-HOST-RESOURCES`)
 
-- **Donors:** SQX `MemoryMonitor`
+- **Donor Path:** [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`com.strategyquant.lib.memory.MemoryMonitor`)
 - **Backend Target:** `app/host/resources.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `ResourceMonitor` (plus `ResourceMonitorCLI`)
@@ -267,7 +267,7 @@ HaruQuantAI/
 
 #### 5. `app/host/settings.py` — `SettingsManager` & `Theme` (`FEAT-HOST-SETTINGS`)
 
-- **Donors:** SQX `Settings`, `SkinDark`, `SkinLight`
+- **Donor Path:** [`docs/SQX/overview/settings/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/settings/README.md) (`Settings`, `SkinDark`, `SkinLight`)
 - **Backend Target:** `app/host/settings.py` (`🟡 200–350L`, Docstring `<=55L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`, `ui/app/components/ThemeToggle.tsx`
 - **Classes:** `SettingsManager`, `Theme` (plus `SettingsManagerCLI`)
@@ -280,7 +280,7 @@ HaruQuantAI/
 
 #### 6. `app/host/session.py` — `SessionManager` (`FEAT-HOST-SESSION`)
 
-- **Donors:** SQX Session Guard
+- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`SessionAuth` / Token Guard)
 - **Backend Target:** `app/host/session.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `SessionManager` (plus `SessionManagerCLI`)
@@ -289,7 +289,7 @@ HaruQuantAI/
 
 #### 7. `app/host/discovery.py` — `PluginDiscovery` (`FEAT-HOST-DISCOVERY`)
 
-- **Donors:** SQX `PluginManager`
+- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`internal/plugins/PluginManager`)
 - **Backend Target:** `app/host/discovery.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `PluginDiscovery` (plus `PluginDiscoveryCLI`)
@@ -298,7 +298,7 @@ HaruQuantAI/
 
 #### 8. `app/host/jobs.py` — `JobManager` (`FEAT-HOST-JOBS`)
 
-- **Donors:** SQX Background Worker Coordinator
+- **Donor Path:** [`docs/SQX/overview/custom-projects.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/custom-projects.md) (`TaskManager` / Worker Pool)
 - **Backend Target:** `app/host/jobs.py` (`🟡 250–400L`, Docstring `<=50L`)
 - **Frontend Target:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `JobManager` (plus `JobManagerCLI`)
@@ -308,7 +308,7 @@ HaruQuantAI/
 
 #### 9. `app/host/bootstrap.py` & `app/main.py` — `AppPlatform` (`FEAT-HOST-BOOTSTRAP`)
 
-- **Donors:** SQX `SQApp` / Jetty Host (`docs/SQX/overview/`)
+- **Donor Path:** [`docs/SQX/overview/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/README.md) (`SQApp` / Embedded Jetty Bootstrap)
 - **Backend Target:** `app/host/bootstrap.py` (`🟡 250–450L`, Docstring `<=50L`), `app/main.py` (`🟢 <150L`, Docstring `<=40L`)
 - **Frontend Target:** `ui/app/host/HostConnectionModal.tsx`
 - **Class:** `AppHost` (plus `AppHostCLI`)
@@ -321,7 +321,7 @@ HaruQuantAI/
 
 #### 10. `app/cli.py` — Headless CLI Runner (`FEAT-HOST-CLI`)
 
-- **Donors:** SQX `sqcli.config` / `SQConsoleStarter` (`docs/SQX/cli/`)
+- **Donor Path:** [`docs/SQX/cli/sqcli.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/cli/sqcli.md) (`sqcli.config` / `SQConsoleStarter`)
 - **Backend Target:** `app/cli.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Class / Function:** `HeadlessCLI` & `run_cli`
 - **Functional Requirements & Exact Method Signatures:**
@@ -333,7 +333,7 @@ HaruQuantAI/
 
 #### 11. `app/host/transport.py` — `ConnectionTest`, `ServletConnection` & `ServletConstants` (`FEAT-HOST-TRANSPORT`)
 
-- **Donors:** SQX `ConnectionTest`, `ServletConnection`, `ServletConstants`
+- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`ConnectionTest`, `ServletConnection`, `ServletConstants`)
 - **Backend Target:** `app/host/transport.py` (`🟡 300–480L`, Docstring `<=65L`)
 - **Frontend Target:** `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`
 - **Classes:** `ConnectionTest`, `ServletConnection`, `ServletConstants` (plus `TransportCLI`)
@@ -350,7 +350,7 @@ HaruQuantAI/
 
 #### 12. `app/services/brokers/registry.py` — `ConnectionLiveTest` (`FEAT-BROKER-LIVETEST`)
 
-- **Donors:** SQX `ConnectionLiveTest`
+- **Donor Path:** [`docs/SQX/overview/object-model.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/object-model.md) (`ConnectionLiveTest`)
 - **Backend Target:** `app/services/brokers/registry.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/workspace/Trading/TradingDashboard.tsx`
 - **Class:** `LiveTest` (plus `LiveTestCLI`)
@@ -361,7 +361,7 @@ HaruQuantAI/
 
 #### 13. `app/services/brokers/metatrader.py` — `ConnectionMT4` / `ConnectionMT5` & `DataSourceMt5Api` (`FEAT-BROKER-MT5`)
 
-- **Donors:** SQX `ConnectionMT4`, `DataSourceMt5Api`
+- **Donor Path:** [`docs/SQX/overview/data-sources/mt5-import.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/mt5-import.md) (`ConnectionMT4`, `DataSourceMt5Api`)
 - **Backend Target:** `app/services/brokers/metatrader.py` (`🟡 250–400L`, Docstring `<=55L`)
 - **Frontend Target:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`, `ui/app/plugins/data_source/MetaTrader/Mt5ImportModal.tsx`
 - **Classes:** `ConnectionMT5`, `Mt5Api` (inheriting shared transport from `BaseBrokerClient` in `base.py`)
@@ -375,7 +375,7 @@ HaruQuantAI/
 
 #### 14. `app/services/brokers/ctrader.py` — `ConnectionCTrader` (`FEAT-BROKER-CTRADER`)
 
-- **Donors:** SQX `ConnectionCTrader`
+- **Donor Path:** [`docs/SQX/overview/data-sources/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/README.md) (`ConnectionCTrader`)
 - **Backend Target:** `app/services/brokers/ctrader.py` (`🟡 250–400L`, Docstring `<=55L`)
 - **Frontend Target:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
 - **Class:** `CTraderClient` (plus `CTraderClientCLI`)
@@ -386,7 +386,7 @@ HaruQuantAI/
 
 #### 15. `app/services/brokers/simulator.py` — `ConnectionSimulator` (`FEAT-BROKER-SIMULATOR`)
 
-- **Donors:** SQX `ConnectionSimulator`
+- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) (`ConnectionSimulator`)
 - **Backend Target:** `app/services/brokers/simulator.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/workspace/Trading/TradingDashboard.tsx`
 - **Class:** `SimulatorClient` (plus `SimulatorClientCLI`)
@@ -400,7 +400,7 @@ HaruQuantAI/
 
 #### 16. `app/services/brokers/crypto.py` — Consolidated Crypto Exchange Clients & `DataSourceCrypto` (`FEAT-BROKER-CRYPTO`)
 
-- **Donors:** SQX `CryptoExchangeBinance`, `CryptoExchangeBinanceCoinM`, `CryptoExchangeBinanceUsdtM`, `CryptoExchangeBitfinex`, `CryptoExchangeCoinbasePro`, `CryptoExchangePoloniex`, `DataSourceCrypto`
+- **Donor Path:** [`docs/SQX/overview/data-sources/crypto-exchanges.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/crypto-exchanges.md) (`CryptoExchangeBinance*`, `Bitfinex`, `CoinbasePro`, `Poloniex`, `DataSourceCrypto`)
 - **Backend Target:** `app/services/brokers/crypto.py` (`🟡 350–500L`, Docstring `<=75L`)
 - **Frontend Target:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
 - **DRY Rule:** All 6 exchange classes inherit shared REST pagination, rate-limiting, and Parquet persistence from `_CryptoBaseClient` + `app/services/brokers/_http.py`.
@@ -439,7 +439,7 @@ HaruQuantAI/
 
 ### Phase 1A.1 – 1A.3 Master Donor / Backend / Frontend Alignment Table
 
-| Component                       | SQX Donor (`docs/SQX/libs/`)                                       | Backend Target File (Line Budget)                                                                        | Frontend Target File                                   | DRY Shared Dependencies                                                                   |
+| Component                       | Donor Path (`docs/SQX/...`)                                        | Backend Target File (Line Budget)                                                                        | Frontend Target File                                   | DRY Shared Dependencies                                                                   |
 | ------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | `HQTime`                        | `SQLib` `SQTime`                                                   | `app/services/include/time.py` (`🟡 200–350L`)                                                           | N/A                                                    | Microsecond UTC/timezone calendar                                                         |
 | `BarTime`                       | `SQDataLib` `BarTime`                                              | `app/services/include/bar_time.py` (`🟢 <200L`)                                                          | N/A                                                    | `HQTime`                                                                                  |
@@ -457,7 +457,7 @@ HaruQuantAI/
 
 #### 1. `app/services/include/time.py` — `HQTime` (`FEAT-INCLUDE-TIME`)
 
-- **Donors:** SQX `SQLib.SQTime`
+- **Donor Path:** [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`com.strategyquant.lib.SQTime`)
 - **Backend Target:** `app/services/include/time.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Class:** `HQTime`
 - **Functional Requirements & Exact Method Signatures:**
@@ -465,7 +465,7 @@ HaruQuantAI/
 
 #### 2. `app/services/include/bar_time.py` — `BarTime` (`FEAT-INCLUDE-BARTIME`)
 
-- **Donors:** SQX `SQDataLib.BarTime`
+- **Donor Path:** [`docs/SQX/libs/SQDataLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQDataLib.md) (`com.strategyquant.datalib.BarTime`)
 - **Backend Target:** `app/services/include/bar_time.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Class:** `BarTime`
 - **Functional Requirements & Exact Method Signatures:**
@@ -473,7 +473,7 @@ HaruQuantAI/
 
 #### 3. `app/services/include/generators.py` — `RandomGenerator` (`FEAT-INCLUDE-RNG`)
 
-- **Donors:** SQX `SQLib.RandomGenerator`
+- **Donor Path:** [`docs/SQX/libs/SQLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQLib.md) (`com.strategyquant.lib.RandomGenerator`)
 - **Backend Target:** `app/services/include/generators.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Class:** `RandomGenerator`
 - **Functional Requirements & Exact Method Signatures:**
@@ -481,7 +481,7 @@ HaruQuantAI/
 
 #### 4. `app/services/include/data.py` — `DataSeries` & `HistoryDataLoader` (`FEAT-INCLUDE-DATA`)
 
-- **Donors:** SQX `SQDataLib.DataSeries`, `HistoryDataLoader`
+- **Donor Path:** [`docs/SQX/libs/SQDataLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQDataLib.md) (`com.strategyquant.datalib.DataSeries`, `HistoryDataLoader`)
 - **Backend Target:** `app/services/include/data.py` (`🟡 250–400L`, Docstring `<=50L`)
 - **Classes:** `DataSeries`, `HistoryDataLoader`
 - **Functional Requirements & Exact Method Signatures:**
@@ -489,7 +489,7 @@ HaruQuantAI/
 
 #### 5. `app/services/include/contracts.py`, `enums.py`, `trading.py` — Domain Contracts (`FEAT-INCLUDE-TRADING`)
 
-- **Donors:** SQX `SQTradingLib` Order/Trade DTOs
+- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) (`SQTradingLib` Order/Trade DTOs and Enums)
 - **Backend Targets:** `contracts.py` (`🟢 <200L`), `enums.py` (`🟢 <200L`), `trading.py` (`🟡 200–350L`)
 - **Classes:** `OrderRecord`, `TradeRecord`, `PositionState`, `ExecutionReport`
 - **Functional Requirements & Exact Method Signatures:**
@@ -497,7 +497,7 @@ HaruQuantAI/
 
 #### 6. `app/services/include/{comparisons,functions,price,actions,types}.py` — `CoreSignalAndMathInclude` (`FEAT-INCLUDE-SIGNAL`)
 
-- **Donors:** SQX `SQTradingLib` Signal & Math Blocks
+- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) (`SQTradingLib` Actions, Comparisons, Functions, Price, Types)
 - **Backend Targets:** Each file `🟢 <200L` to `🟡 200–350L` (zero module-level duplicate functions; single class per file)
 - **Classes:** `Comparisons`, `Functions`, `Price`, `Actions`, `Types`
 - **Functional Requirements & Exact Method Signatures:**
@@ -513,7 +513,7 @@ HaruQuantAI/
 
 #### 7. `app/services/indicators/base.py` & 6 Category Packages — `CoreIndicatorLibrary` (`FEAT-INDICATORS`)
 
-- **Donors:** SQX `SQTradingLib` 69 Indicators (`docs/SQX/libs/`)
+- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) & [`docs/SQX/overview/snippets/building-blocks/indicators.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/snippets/building-blocks/indicators.md) (69 Indicators)
 - **Backend Targets:**
   - `app/services/indicators/base.py` (`🟡 200–300L`): `BaseIndicator`
   - `app/services/indicators/momentum/` (18 files, each `🟢 <150L`): `RSI`, `CCI`, `Stochastic`, `Momentum`, `WilliamsR`, `MACD`, `DeMarker`, `ROC`, `Reflex`, `Trendflex`, `LaguerreRSI`, `QQE`, `BearsPower`, `BullsPower`, `AwesomeOscillator`, `AcceleratorOscillator`, `TSI`, `UltimateOscillator`
@@ -538,7 +538,7 @@ HaruQuantAI/
 
 #### 8. `app/services/engine/{simulator,precision,platforms,orders,accounting}.py` — `BacktestSimulationEngine` (`FEAT-ENGINE-SIM`)
 
-- **Donors:** SQX `SQTradingLib` Backtest Kernel (`docs/SQX/libs/`, `docs/SQX/trading/`)
+- **Donor Path:** [`docs/SQX/libs/SQTradingLib.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/libs/SQTradingLib.md) & [`docs/SQX/trading/workflow.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/trading/workflow.md) (Backtest Simulation Kernel)
 - **Backend Targets:**
   - `app/services/engine/precision.py` (`🟡 200–350L`): `PrecisionSynthesizer`
   - `app/services/engine/platforms.py` (`🟡 200–350L`): `PlatformExecutionProfile`
@@ -555,7 +555,7 @@ HaruQuantAI/
 
 #### 9. `app/services/engine/formats.py` — `CorePersistenceFormats` (`FEAT-ENGINE-FORMATS`)
 
-- **Donors:** SQX `.cfx`, `.sqx`, `.sq4`, `.sq3`, `.dat` Codecs (`docs/SQX/custom-projects/`)
+- **Donor Path:** [`docs/SQX/custom-projects/cfx-format.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/custom-projects/cfx-format.md) & [`docs/SQX/overview/data-sources/export-formats.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/data-sources/export-formats.md) (`.cfx`, `.sqx`, `.sq4`, `.sq3`, `.dat` Codecs)
 - **Backend Target:** `app/services/engine/formats.py` (`🟡 250–400L`, Docstring `<=55L`)
 - **Classes:** `ProjectArchiveCodec`, `StrategyArchiveCodec`, `MarketDataFormatCodec`
 - **Functional Requirements & Exact Method Signatures:**
@@ -573,7 +573,7 @@ HaruQuantAI/
 
 ### Phase 1B.1 – 1B.3 Master Donor / Backend / Frontend Alignment Table
 
-| Component                             | SQX Donor (`docs/SQX/`)                                                                                                                                      | Backend Target File (Line Budget)                                                                                                                                   | Frontend Target File                                       | DRY Shared Dependencies                            |
+| Component                             | Donor Path (`docs/SQX/...`)                                                                                                                                  | Backend Target File (Line Budget)                                                                                                                                   | Frontend Target File                                       | DRY Shared Dependencies                            |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------- |
 | `SnippetBuildingBlocksAndCatalogs`    | `Snippets/SQ/Blocks/*`, `internal/ctemplate/*.xml`                                                                                                           | `app/services/snippets/blocks.py` (`🟡 300–450L`)                                                                                                                   | `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`  | `CoreIndicatorLibrary`, `CoreSignalAndMathInclude` |
 | `SnippetMoneyManagement`              | `Snippets/SQ/MoneyManagement/*` (12 models)                                                                                                                  | `app/services/snippets/money_management.py` (`🟡 200–350L`)                                                                                                         | `ui/app/workspace/Builder/settings/MoneyManagementTab.tsx` | `Actions.normalize_lots`                           |
@@ -658,13 +658,13 @@ HaruQuantAI/
 
 ### Phase 2.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component               | SQX Donor (`docs/SQX/`)              | Backend Target File (Line Budget)           | Frontend Target File                   | DRY Shared Dependencies                                  |
+| Component               | Donor Path (`docs/SQX/...`)          | Backend Target File (Line Budget)           | Frontend Target File                   | DRY Shared Dependencies                                  |
 | ----------------------- | ------------------------------------ | ------------------------------------------- | -------------------------------------- | -------------------------------------------------------- |
 | `AppHome` & `HomeAbout` | `AppHome`, `HomeAbout` (`overview/`) | `app/workspace/home/routes.py` (`🟢 <200L`) | `ui/app/workspace/Home/HomeScreen.tsx` | `HostPersistence`, `ResourceMonitor`, `ServletConstants` |
 
 #### 1. `app/workspace/home/routes.py` — `AppHome` & `HomeAbout` (`FEAT-HOME-DASHBOARD`)
 
-- **Donors:** SQX `AppHome`, `HomeAbout`
+- **Donor Path:** [`docs/SQX/overview/README.md`](file:///c:/Users/rharu/AppDev/HaruQuantAI/docs/SQX/overview/README.md) (`AppHome`, `HomeAbout`)
 - **Backend Target:** `app/workspace/home/routes.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend Target:** `ui/app/workspace/Home/HomeScreen.tsx`
 - **Classes:** `Home`, `About` (plus `HomeCLI`)
@@ -685,7 +685,7 @@ HaruQuantAI/
 
 ### Phase 3.1 – 3.7 Master Donor / Backend / Frontend Alignment Table
 
-| Component                                                                | SQX Donor (`docs/SQX/`)                                                  | Backend Target File (Line Budget)                                                                                                                    | Frontend Target File                                                                                  | DRY Shared Dependencies                                             |
+| Component                                                                | Donor Path (`docs/SQX/...`)                                              | Backend Target File (Line Budget)                                                                                                                    | Frontend Target File                                                                                  | DRY Shared Dependencies                                             |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `DataManagerInstruments`                                                 | `DataManagerInstruments`                                                 | `app/workspace/data_manager/instruments.py` (`🟡 200–350L`)                                                                                          | `ui/app/plugins/data_source/Catalogs/Instruments/InstrumentsModal.tsx`                                | `HostPersistence` (`instruments` entity), `data_manager/_common.py` |
 | `DataManagerSessions`                                                    | `DataManagerSessions`                                                    | `app/workspace/data_manager/sessions.py` (`🟡 200–350L`)                                                                                             | `ui/app/plugins/data_source/Catalogs/Sessions/SessionsModal.tsx`                                      | `HostPersistence` (`sessions_catalog` entity), `HQTime`             |
@@ -905,7 +905,7 @@ HaruQuantAI/
 
 ### Phase 4.1 – 4.3 Master Donor / Backend / Frontend Alignment Table
 
-| Component                   | SQX Donor (`docs/SQX/`)              | Backend Target File (Line Budget)                               | Frontend Target File                                   | DRY Shared Dependencies                     |
+| Component                   | Donor Path (`docs/SQX/...`)          | Backend Target File (Line Budget)                               | Frontend Target File                                   | DRY Shared Dependencies                     |
 | --------------------------- | ------------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- |
 | `AppCodeEditor`             | `AppCodeEditor` (`overview/`)        | `app/workspace/code_editor/editor.py` (`🟢 <200L`)              | `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`  | `HostPersistence`                           |
 | `ServletCodeEditor`         | `ServletCodeEditor` (14 IDE actions) | `app/workspace/code_editor/routes.py` (`🟡 250–400L`)           | `ui/app/workspace/CodeEditor/codeEditorClient.ts`      | `HostPersistence`, `code_editor/_common.py` |
@@ -969,7 +969,7 @@ HaruQuantAI/
 
 ### Phase 5.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component           | SQX Donor (`docs/SQX/`)                                          | Backend Target File (Line Budget)                        | Frontend Target File                                  | DRY Shared Dependencies               |
+| Component           | Donor Path (`docs/SQX/...`)                                      | Backend Target File (Line Budget)                        | Frontend Target File                                  | DRY Shared Dependencies               |
 | ------------------- | ---------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------- |
 | `AppWizard`         | `AppWizard` (`overview/`)                                        | `app/workspace/algo_wizard/wizard.py` (`🟢 <200L`)       | `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx` | `HostPersistence`                     |
 | `ServletAlgoWizard` | `ServletAlgoWizard`, `awShareWidget` (`algowizard-integration/`) | `app/workspace/algo_wizard/routes.py` (`🟡 250–400L`)    | `ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx`   | `BlockRegistry`, `HostPersistence`    |
@@ -1015,7 +1015,7 @@ HaruQuantAI/
 
 ### Phase 6.1 – 6.7 Master Donor / Backend / Frontend Alignment Table
 
-| Component                                                          | SQX Donor (`docs/SQX/overview/settings/`)                          | Backend Target File (Line Budget)                                                                                            | Frontend Target File                                                                    | DRY Shared Dependencies                              |
+| Component                                                          | Donor Path (`docs/SQX/...`)                                        | Backend Target File (Line Budget)                                                                                            | Frontend Target File                                                                    | DRY Shared Dependencies                              |
 | ------------------------------------------------------------------ | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | `SettingsWhatToBuild`                                              | `SettingsWhatToBuild`                                              | `app/workspace/builder/settings/what_to_build.py` (`🟡 200–350L`)                                                            | `ui/app/workspace/Builder/settings/WhatToBuildTab.tsx`                                  | `builder/_common.py`, `HostPersistence`              |
 | `SettingsData`                                                     | `SettingsData`                                                     | `app/workspace/builder/settings/data_setup.py` (`🟢 <200L`)                                                                  | `ui/app/workspace/Builder/settings/DataTab.tsx`                                         | `Data` (`data_manager/data.py`)                      |
@@ -1091,7 +1091,7 @@ HaruQuantAI/
 
 ### Phase 7.1 – 7.7 Master Donor / Backend / Frontend Alignment Table
 
-| Component                                                                                                                   | SQX Donor (`docs/SQX/overview/results-tabs/`)                                                       | Backend Target File (Line Budget)                                                                                                                                                  | Frontend Target File                                                                                                                                         | DRY Shared Dependencies                                            |
+| Component                                                                                                                   | Donor Path (`docs/SQX/...`)                                                                         | Backend Target File (Line Budget)                                                                                                                                                  | Frontend Target File                                                                                                                                         | DRY Shared Dependencies                                            |
 | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
 | `AppResults`, `ProjectDatabanks`, `ProjectResults`, `DashboardPanel`, `DashboardResults`                                    | `AppResults`, `ProjectDatabanks`, `ProjectResults`, `DashboardPanel`, `DashboardResults`            | `app/workspace/results/results.py` (`🟢 <200L`), `app/workspace/builder/{project_databanks,project_results,dashboard_panel,dashboard_results}.py` (each `🟢 <200L`)                | `ui/app/workspace/Results/ResultsWorkspace.tsx`, `ui/app/workspace/Builder/{ResultsColumn,ResultsView,ProgressDashboard}.tsx`                                | `HostPersistence` (`databanks`, `strategies` entities)             |
 | `ResultsDatabankActions` & `ResultsDatabankViews`                                                                           | `ResultsDatabankActions`, `ResultsDatabankViews`                                                    | `app/workspace/results/reports/results_databank_actions.py` (`🟡 300–450L`), `results_databank_views.py` (`🟢 <200L`)                                                              | `ui/app/workspace/Results/views/{ResultsDatabankActionsView,ResultsDatabankViewsView}.tsx`                                                                   | `HostPersistence`, `PlatformCodeExporters`, `StrategyArchiveCodec` |
@@ -1219,7 +1219,7 @@ HaruQuantAI/
 
 ### Phase 8.1 – 8.5 Master Donor / Backend / Frontend Alignment Table
 
-| Component                                                                                                     | SQX Donor (`docs/SQX/overview/`)                                                                                                                                                                                    | Backend Target File (Line Budget)                                                                                                                                                   | Frontend Target File                                                                                                                                      | DRY Shared Dependencies                                                                 |
+| Component                                                                                                     | Donor Path (`docs/SQX/...`)                                                                                                                                                                                         | Backend Target File (Line Budget)                                                                                                                                                   | Frontend Target File                                                                                                                                      | DRY Shared Dependencies                                                                 |
 | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `AppRetester`, `SettingsWhatToRetest`, `SettingsAutomaticRetest`, `SettingsCrossChecks`                       | `AppRetester`, `SettingsWhatToRetest`, `SettingsAutomaticRetest`, `SettingsCrossChecks`                                                                                                                             | `app/workspace/retester/retester.py` (`🟢 <200L`), `settings/{what_to_retest,automatic_retest}.py` (each `🟢 <150L`), `app/workspace/builder/settings/cross_checks.py` (`🟢 <200L`) | `ui/app/workspace/Retester/{RetesterWorkspace,RetesterSettings}.tsx`, `ui/app/workspace/Builder/settings/CrossChecksTab.tsx`                              | `HostPersistence`, `JobManager`                                                         |
 | `CrossCheck*` (9 Modules)                                                                                     | `CrossCheckMonteCarloManipulation`, `MonteCarloRetest`, `HigherPrecision`, `AdditionalMarkets`, `OptProfileSysParamPermutation`, `SequentialOptimization`, `WalkForwardMatrix`, `WalkForwardOptimization`, `WhatIf` | `app/workspace/retester/cross_checks/` (9 files, each `🟢 <180L`)                                                                                                                   | `ui/app/workspace/Retester/views/*Modal.tsx`                                                                                                              | `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`, `retester/_common.py` |
@@ -1264,12 +1264,12 @@ HaruQuantAI/
 
 ### Phase 9.1 – 9.3 Master Donor / Backend / Frontend Alignment Table
 
-| Component                    | SQX Donor (`docs/SQX/overview/`) | Backend Target File (Line Budget)                                            | Frontend Target File                                                | DRY Shared Dependencies                |
-| ---------------------------- | -------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------- |
-| `AppOptimizer`               | `AppOptimizer`                   | `app/workspace/optimizer/optimizer.py` (`🟢 <200L`)                          | `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`                 | `JobManager`, `HostPersistence`        |
-| `SettingsOptimization`       | `SettingsOptimization`           | `app/workspace/optimizer/settings/optimization_settings.py` (`🟢 <200L`)     | `ui/app/workspace/Optimizer/OptimizerSettings.tsx`                  | `optimizer/_common.py`                 |
-| `ResultsOptimizationProfile` | `ResultsOptimizationProfile`     | `app/workspace/results/reports/results_optimization_profile.py` (`🟢 <200L`) | `ui/app/workspace/Results/views/ResultsOptimizationProfileView.tsx` | `ColumnRegistry`                       |
-| `TaskOptimize`               | `TaskOptimize`                   | `app/workspace/optimizer/engine/optimize_task.py` (`🟡 250–400L`)            | `ui/app/workspace/Optimizer/optimizerClient.ts`                     | `BacktestSimulator`, `RandomGenerator` |
+| Component                    | Donor Path (`docs/SQX/...`)  | Backend Target File (Line Budget)                                            | Frontend Target File                                                | DRY Shared Dependencies                |
+| ---------------------------- | ---------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------- |
+| `AppOptimizer`               | `AppOptimizer`               | `app/workspace/optimizer/optimizer.py` (`🟢 <200L`)                          | `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`                 | `JobManager`, `HostPersistence`        |
+| `SettingsOptimization`       | `SettingsOptimization`       | `app/workspace/optimizer/settings/optimization_settings.py` (`🟢 <200L`)     | `ui/app/workspace/Optimizer/OptimizerSettings.tsx`                  | `optimizer/_common.py`                 |
+| `ResultsOptimizationProfile` | `ResultsOptimizationProfile` | `app/workspace/results/reports/results_optimization_profile.py` (`🟢 <200L`) | `ui/app/workspace/Results/views/ResultsOptimizationProfileView.tsx` | `ColumnRegistry`                       |
+| `TaskOptimize`               | `TaskOptimize`               | `app/workspace/optimizer/engine/optimize_task.py` (`🟡 250–400L`)            | `ui/app/workspace/Optimizer/optimizerClient.ts`                     | `BacktestSimulator`, `RandomGenerator` |
 
 #### 1. Phase 9.1 – 9.3 Exact Classes & Method Signatures
 
@@ -1297,7 +1297,7 @@ HaruQuantAI/
 
 ### Phase 10.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component                  | SQX Donor (`docs/SQX/`)          | Backend Target File (Line Budget)                         | Frontend Target File                                      | DRY Shared Dependencies                        |
+| Component                  | Donor Path (`docs/SQX/...`)      | Backend Target File (Line Budget)                         | Frontend Target File                                      | DRY Shared Dependencies                        |
 | -------------------------- | -------------------------------- | --------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------- |
 | `AppNeuralNetwork`         | `AppNeuralNetwork`               | `app/workspace/neural_network/neural_net.py` (`🟢 <200L`) | `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx` | `JobManager`, `HostPersistence`                |
 | `TaskNeuralNetworkTrainer` | `TaskNeuralNetworkTrainer`       | `app/workspace/neural_network/trainer.py` (`🟡 200–350L`) | `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`        | `CoreIndicatorLibrary`, `DataSeries`           |
@@ -1331,7 +1331,7 @@ HaruQuantAI/
 
 ### Phase 11.1 – 11.2 Master Donor / Backend / Frontend Alignment Table
 
-| Component                                                                                  | SQX Donor (`docs/SQX/overview/`)                                                           | Backend Target File (Line Budget)                                                                                                           | Frontend Target File                                                                                           | DRY Shared Dependencies                            |
+| Component                                                                                  | Donor Path (`docs/SQX/...`)                                                                | Backend Target File (Line Budget)                                                                                                           | Frontend Target File                                                                                           | DRY Shared Dependencies                            |
 | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | `AppPortfolioComposer` & `PortfolioComposer`                                               | `AppPortfolioComposer`, `PortfolioComposer`                                                | `app/workspace/portfolio/composer.py` (`🟡 250–380L`)                                                                                       | `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`                                            | `CorrelationAndFitnessRegistry`, `ColumnRegistry`  |
 | `SettingsCreatePortfolio` & `TaskCreatePortfolio`                                          | `SettingsCreatePortfolio`, `TaskCreatePortfolio`                                           | `app/workspace/portfolio/settings/create_portfolio.py` (`🟢 <150L`), `app/workspace/custom_projects/tasks/create_portfolio.py` (`🟢 <200L`) | `ui/app/workspace/PortfolioComposer/PortfolioConfiguration.tsx`                                                | `CorrelationAndFitnessRegistry`, `HostPersistence` |
@@ -1367,7 +1367,7 @@ HaruQuantAI/
 
 ### Phase 12.1 – 12.4 Master Donor / Backend / Frontend Alignment Table
 
-| Component                                                                                                                                                                              | SQX Donor (`docs/SQX/custom-projects/`)                                                                                                   | Backend Target File (Line Budget)                                                                                                                                                                                                   | Frontend Target File                                                                                                                                                          | DRY Shared Dependencies                                                             |
+| Component                                                                                                                                                                              | Donor Path (`docs/SQX/...`)                                                                                                               | Backend Target File (Line Budget)                                                                                                                                                                                                   | Frontend Target File                                                                                                                                                          | DRY Shared Dependencies                                                             |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | `AppTaskManager`, `ServletProject`, `TaskManagerProjects`, `TaskManagerTasks`, `ProjectResources`, `ProjectSettings`, `EnginePanel`, `SettingsNotes`                                   | `AppTaskManager`, `ServletProject`, `TaskManager*`, `ProjectResources`, `ProjectSettings`, `EnginePanel`, `SettingsNotes`                 | `app/workspace/custom_projects/{projects,routes,projects_manager,tasks_manager,project_resources,project_settings}.py` (each `🟢 <200L`), `engine_panel.py` (`🟡 200–350L`), `app/workspace/builder/settings/notes.py` (`🟢 <150L`) | `ui/app/workspace/CustomProjects/{CustomProjectsWorkspace,projectClient}.tsx`, `ui/app/plugins/project/ProjectWorkbench.tsx`, `ui/app/workspace/Builder/EnginePanel.tsx`      | `HostPersistence` (`projects` entity), `JobManager`, `ProjectArchiveCodec` (`.cfx`) |
 | `Task*` & `Settings*` Flow Control (`GoTo`, `WaitFor`, `StopAndStart`, `Notification`) + 5 `ProjectCondition*` Evaluators                                                              | `TaskGoToTask`, `TaskWaitFor`, `TaskStopAndStart`, `TaskNotification`, `ProjectCondition*`                                                | `app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `tasks/settings/{goto,wait,stop_start,notification}.py`, `conditions/*.py` (each `🟢 <180L`)                                                                | `ui/app/workspace/CustomProjects/tasks/{GoTo,Wait,StopStart,Notify}TaskModal.tsx`                                                                                             | `custom_projects/_common.py`, `HostPersistence`                                     |
@@ -1475,7 +1475,7 @@ HaruQuantAI/
 
 ### Phase 13.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component            | SQX Donor (`docs/SQX/overview/`)                | Backend Target File (Line Budget)                            | Frontend Target File                                    | DRY Shared Dependencies         |
+| Component            | Donor Path (`docs/SQX/...`)                     | Backend Target File (Line Budget)                            | Frontend Target File                                    | DRY Shared Dependencies         |
 | -------------------- | ----------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------- |
 | `ServletGridControl` | `ServletGridControl`                            | `app/workspace/grid_control/routes.py` (`🟢 <200L`)          | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `HostPersistence`, `JobManager` |
 | `AppGridControl`     | `AppGridControl`, `BACKTESTNODE`, `NODEUPDATER` | `app/workspace/grid_control/grid_control.py` (`🟡 200–350L`) | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `HostPersistence`, `JobManager` |
@@ -1507,10 +1507,10 @@ HaruQuantAI/
 
 ### Phase 14.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component          | SQX Donor (`docs/SQX/algocloud/`) | Backend Target File (Line Budget)                       | Frontend Target File                                    | DRY Shared Dependencies |
-| ------------------ | --------------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ----------------------- |
-| `ServletAlgoCloud` | `ServletAlgoCloud`                | `app/workspace/marketplace/routes.py` (`🟢 <200L`)      | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence`       |
-| `AppMarketplace`   | `AppMarketplace`                  | `app/workspace/marketplace/marketplace.py` (`🟢 <200L`) | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence`       |
+| Component          | Donor Path (`docs/SQX/...`) | Backend Target File (Line Budget)                       | Frontend Target File                                    | DRY Shared Dependencies |
+| ------------------ | --------------------------- | ------------------------------------------------------- | ------------------------------------------------------- | ----------------------- |
+| `ServletAlgoCloud` | `ServletAlgoCloud`          | `app/workspace/marketplace/routes.py` (`🟢 <200L`)      | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence`       |
+| `AppMarketplace`   | `AppMarketplace`            | `app/workspace/marketplace/marketplace.py` (`🟢 <200L`) | `ui/app/workspace/Marketplace/MarketplaceWorkspace.tsx` | `HostPersistence`       |
 
 #### 1. Phase 14.1 Exact Classes & Method Signatures
 
@@ -1533,9 +1533,9 @@ HaruQuantAI/
 
 ### Phase 15.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component     | SQX Donor (`docs/SQX/overview/`) | Backend Target File (Line Budget)                 | Frontend Target File                              | DRY Shared Dependencies |
-| ------------- | -------------------------------- | ------------------------------------------------- | ------------------------------------------------- | ----------------------- |
-| `AppBusiness` | `AppBusiness`                    | `app/workspace/business/business.py` (`🟢 <200L`) | `ui/app/workspace/Business/BusinessWorkspace.tsx` | `HostPersistence`       |
+| Component     | Donor Path (`docs/SQX/...`) | Backend Target File (Line Budget)                 | Frontend Target File                              | DRY Shared Dependencies |
+| ------------- | --------------------------- | ------------------------------------------------- | ------------------------------------------------- | ----------------------- |
+| `AppBusiness` | `AppBusiness`               | `app/workspace/business/business.py` (`🟢 <200L`) | `ui/app/workspace/Business/BusinessWorkspace.tsx` | `HostPersistence`       |
 
 #### 1. `app/workspace/business/business.py` — `AppBusiness` (`FEAT-BUSINESS-ENTERPRISE`)
 
@@ -1555,9 +1555,9 @@ HaruQuantAI/
 
 ### Phase 16.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component         | SQX Donor (`docs/SQX/overview/`) | Backend Target File (Line Budget)                           | Frontend Target File                                      | DRY Shared Dependencies              |
-| ----------------- | -------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------ |
-| `AppDebugConsole` | `AppDebugConsole`                | `app/workspace/debug_console/debug_console.py` (`🟢 <200L`) | `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx` | `ResourceMonitor`, `TelemetryLogger` |
+| Component         | Donor Path (`docs/SQX/...`) | Backend Target File (Line Budget)                           | Frontend Target File                                      | DRY Shared Dependencies              |
+| ----------------- | --------------------------- | ----------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------ |
+| `AppDebugConsole` | `AppDebugConsole`           | `app/workspace/debug_console/debug_console.py` (`🟢 <200L`) | `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx` | `ResourceMonitor`, `TelemetryLogger` |
 
 #### 1. `app/workspace/debug_console/debug_console.py` — `AppDebugConsole` (`FEAT-DEBUG-CONSOLE`)
 
@@ -1578,7 +1578,7 @@ HaruQuantAI/
 
 ### Phase 17.1 Master Donor / Backend / Frontend Alignment Table
 
-| Component    | SQX Donor (`docs/SQX/overview/`)         | Backend Target File (Line Budget)                       | Frontend Target File                                  | DRY Shared Dependencies                                                                             |
+| Component    | Donor Path (`docs/SQX/...`)              | Backend Target File (Line Budget)                       | Frontend Target File                                  | DRY Shared Dependencies                                                                             |
 | ------------ | ---------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | `MTAnalyzer` | `MTANALYZER` (`internal/web/MTANALYZER`) | `app/workspace/mt_analyzer/analyzer.py` (`🟡 250–400L`) | `ui/app/workspace/MTAnalyzer/MTAnalyzerWorkspace.tsx` | `ColumnRegistry`, `MoneyManagementEngine`, `MonteCarloManipulator`, `CorrelationAndFitnessRegistry` |
 
