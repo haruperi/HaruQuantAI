@@ -9,27 +9,13 @@ Purpose:
     FEAT-INCLUDE-DATA: Historical market data retrieval, validation, and conversion.
 
 Key Capabilities:
-    - FR-INCLUDE-DATA-BAR-COLUMNS: Canonical bar column tuple specification.
-      Associated: `BAR_COLUMNS`.
-      Logging: Constant schema tuple with zero side effects.
-    - FR-INCLUDE-DATA-TICK-COLUMNS: Canonical tick column tuple specification.
-      Associated: `TICK_COLUMNS`.
-      Logging: Constant schema tuple with zero side effects.
-    - FR-INCLUDE-DATA-BACKEND-PROTOCOL: Execution protocol for market data readers.
-      Associated: `DataBackend`.
-      Logging: Protocol definition with zero side effects.
-    - FR-INCLUDE-DATA-BARS-TO-DATAFRAME: Convert historical bars to pandas DataFrame.
-      Associated: `bars_to_dataframe()`, `bars_to_df()`.
-      Logging: In-memory vectorized DataFrame construction.
-    - FR-INCLUDE-DATA-HISTORICAL-READS: Fetch historical bars and ticks from backends.
-      Associated: `get_historical_bars()`, `get_ticks()`.
-      Logging: DEBUG on historical bar and tick query bounds.
-    - FR-INCLUDE-DATA-TICKS-TO-DATAFRAME: Convert historical ticks to DataFrame.
-      Associated: `ticks_to_dataframe()`, `ticks_to_df()`.
-      Logging: In-memory vectorized DataFrame construction.
-    - FR-INCLUDE-DATA-VALIDATION: Validate request bounds and row data.
-      Associated: `validate_request()`, `validate_rows()`.
-      Logging: DEBUG on validation failure or bounded checks.
+    - FR-INCLUDE-DATA-BAR-COLUMNS: Canonical bar column list (BAR_COLUMNS -> constant).
+    - FR-INCLUDE-DATA-TICK-COLUMNS: Tick column schema list (TICK_COLUMNS -> constant).
+    - FR-INCLUDE-DATA-BACKEND-PROTOCOL: Reader protocol (DataBackend -> protocol).
+    - FR-INCLUDE-DATA-BARS-TO-DATAFRAME: Bar DataFrame (bars_to_dataframe() -> DEBUG).
+    - FR-INCLUDE-DATA-HISTORICAL-READS: Read history (get_historical_bars() -> DEBUG).
+    - FR-INCLUDE-DATA-TICKS-TO-DATAFRAME: Tick frame (ticks_to_dataframe() -> DEBUG).
+    - FR-INCLUDE-DATA-VALIDATION: Validate bounds/rows (validate_request() -> DEBUG).
 
 Python API Usage:
     ```python
