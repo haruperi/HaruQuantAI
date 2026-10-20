@@ -28,7 +28,7 @@ Key Capabilities:
       Logging: Emits INFO on command dispatch and WARNING/ERROR on invalid
       command arguments.
     - FR-HOST-CLI-OUTPUT-FORMATTING: Emit structured human-readable or --json
-      output envelopes (StandardResponse) and return deterministic POSIX exit
+      output envelopes (ApiResponse) and return deterministic POSIX exit
       codes (0 on success, non-zero on failure).
       Associated: `format_cli_output()`, `main()`
       Logging: Emits DEBUG when serializing CLI command results.
@@ -63,14 +63,8 @@ from typing import Any
 from app.host.bootstrap import AppHost
 from app.host.logging import get_logger, shutdown_logging
 from app.host.resources import get_worker_capacity, probe_hardware
-from app.host.response import StandardError, StandardResponse
+from app.host.response import ApiResponse, StandardError
 from app.host.settings import settings as host_settings
-
-__all__ = [
-    "HeadlessCliRunner",
-    "format_cli_output",
-    "run_cli",
-]
 
 logger = get_logger(__name__)
 
@@ -139,7 +133,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--json",
         action="store_true",
         default=False,
-        help="Format command output as a StandardResponse JSON envelope.",
+        help="Format command output as a ApiResponse JSON envelope.",
     )
     return parser
 
@@ -200,8 +194,8 @@ class HeadlessCliRunner:
     def _cmd_health(self) -> dict[str, Any]:
         res_mgr = self.runtime.resource_manager
         if res_mgr is None:
-            raise RuntimeError("ResourceManager is not initialized.")
-        report = res_mgr.get_system_health(
+            raise RuntimeError("ResourceMonitor is not initialized.")
+        report = res_mgr.inspect_resources(
             root_path=self.runtime.config.data_dir,
         )
         return {
@@ -214,7 +208,7 @@ class HeadlessCliRunner:
     def _cmd_resources(self) -> dict[str, Any]:
         res_mgr = self.runtime.resource_manager
         if res_mgr is None:
-            raise RuntimeError("ResourceManager is not initialized.")
+            raise RuntimeError("ResourceMonitor is not initialized.")
         hw = probe_hardware()
         cap = get_worker_capacity()
         wd = res_mgr.check_memory_headroom()
@@ -446,7 +440,7 @@ def format_cli_output(
         extra={"fr_id": CLI_OUTPUT_FR},
     )
     if error is not None:
-        err_resp = StandardResponse.failure(
+        err_resp = ApiResponse.error(
             message=error.message,
             error=error,
         )
@@ -458,7 +452,7 @@ def format_cli_output(
     if not as_json and "rendered" in payload:
         return str(payload["rendered"])
 
-    ok_resp = StandardResponse.success(
+    ok_resp = ApiResponse.ok(
         data=payload,
         message=f"Executed CLI command '{payload.get('command', 'unknown')}'.",
     )

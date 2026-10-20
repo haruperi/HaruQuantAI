@@ -13,7 +13,7 @@ Purpose:
 Key Capabilities:
     - FR-HOST-DISC-SLOT-REGISTRY: Extension slot registry (register_slot -> INFO).
     - FR-HOST-DISC-MANIFEST-SCHEMA: Validate manifests (_check_pat -> ERROR).
-    - FR-HOST-DISC-FILESYSTEM-SCANNER: Scan plugin dirs (discover -> INFO).
+    - FR-HOST-DISC-FILESYSTEM-SCANNER: Scan plugin dirs (discover_plugins -> INFO).
     - FR-HOST-DISC-CONTAINMENT-GUARD: Path containment (verify_containment -> DEBUG).
     - FR-HOST-DISC-DEPENDENCY-RESOLVER: Dependency DAG (resolve_dependencies -> INFO).
     - FR-HOST-DISC-LIFECYCLE-MANAGER: Lazy load plugins (attach_plugin -> INFO).
@@ -22,10 +22,10 @@ Key Capabilities:
 Python API Usage:
     ```python
     from pathlib import Path
-    from app.host.discovery import PluginDiscoveryEngine
+    from app.host.discovery import PluginDiscovery
 
-    engine = PluginDiscoveryEngine(search_dirs=[Path("app/plugins")])
-    engine.discover()
+    engine = PluginDiscovery(search_dirs=[Path("app/plugins")])
+    engine.discover_plugins()
     ```
 
 CLI Usage:
@@ -62,7 +62,7 @@ from pydantic import (
 )
 
 __all__ = [
-    "PluginDiscoveryEngine",
+    "PluginDiscovery",
     "PluginHostContext",
     "PluginLifecycleManager",
     "PluginManifest",
@@ -367,7 +367,7 @@ class PluginHostContext:
         self.job_handlers[job_type] = handler
 
 
-class PluginDiscoveryEngine:
+class PluginDiscovery:
     """Scans plugin directories, validates manifests, and resolves dependencies."""
 
     def __init__(
@@ -410,7 +410,7 @@ class PluginDiscoveryEngine:
                 self.diag(None, p, err_c, str(exc))
             return None
 
-    def discover(self) -> dict[str, PluginRecord]:
+    def discover_plugins(self) -> dict[str, PluginRecord]:
         """Scan configured ``search_dirs`` and populate the plugin registry."""
         self.registry.clear()
         self.diagnostics.clear()
@@ -659,7 +659,7 @@ class PluginLifecycleManager:
 
     def __init__(
         self,
-        discovery_engine: PluginDiscoveryEngine,
+        discovery_engine: PluginDiscovery,
         data_root: Path,
         plugin_settings: dict[str, dict[str, Any]] | None = None,
         instance_factory_hook: _FactoryHook | None = None,
@@ -982,8 +982,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--scan-dir", action="append", default=[])
     args = parser.parse_args(argv)
     paths = [Path(p) for p in args.scan_dir] if args.scan_dir else [Path("app/plugins")]
-    engine = PluginDiscoveryEngine(search_dirs=paths)
-    engine.discover()
+    engine = PluginDiscovery(search_dirs=paths)
+    engine.discover_plugins()
     engine.resolve_dependencies()
     lifecycle = PluginLifecycleManager(engine, data_root=Path("data/plugins"))
     report = lifecycle.build_report()

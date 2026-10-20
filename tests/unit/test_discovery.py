@@ -12,7 +12,7 @@ import pytest
 from app.host.discovery import (
     MAX_MANIFEST_BYTES,
     PluginDependency,
-    PluginDiscoveryEngine,
+    PluginDiscovery,
     PluginLifecycleManager,
     PluginManifest,
     PluginState,
@@ -259,8 +259,8 @@ def test_discover_1_level_2_level_and_single_file_plugins(
     (plugins_root / ".hidden").mkdir()
     (plugins_root / "__pycache__").mkdir()
 
-    engine = PluginDiscoveryEngine(search_dirs=[plugins_root])
-    records = engine.discover()
+    engine = PluginDiscovery(search_dirs=[plugins_root])
+    records = engine.discover_plugins()
     order = engine.resolve_dependencies()
 
     assert set(records.keys()) == {
@@ -384,10 +384,10 @@ def test_discover_malformed_and_edge_case_diagnostics(tmp_path: Path) -> None:
     )
     (plugins_root / "no_manifest_var.py").write_text("X = 42\n", encoding="utf-8")
 
-    engine = PluginDiscoveryEngine(
+    engine = PluginDiscovery(
         search_dirs=[tmp_path / "does_not_exist", not_a_dir, plugins_root]
     )
-    engine.discover()
+    engine.discover_plugins()
 
     codes = {d.code for d in engine.diagnostics}
     assert "SEARCH_PATH_NOT_DIR" in codes
@@ -556,8 +556,8 @@ def test_dependency_resolution_dag_and_quarantines(tmp_path: Path) -> None:
         },
     )
 
-    engine = PluginDiscoveryEngine(search_dirs=[plugins_root], slot_registry=slots)
-    engine.discover()
+    engine = PluginDiscovery(search_dirs=[plugins_root], slot_registry=slots)
+    engine.discover_plugins()
     order = engine.resolve_dependencies()
 
     assert order == ["core.alpha", "core.beta"]
@@ -626,8 +626,8 @@ def test_lazy_thread_safe_get_instance_and_slot_queries(tmp_path: Path) -> None:
     )
     (yahoo_dir / "__init__.py").write_text("# package init\n", encoding="utf-8")
 
-    engine = PluginDiscoveryEngine(search_dirs=[plugins_root])
-    engine.discover()
+    engine = PluginDiscovery(search_dirs=[plugins_root])
+    engine.discover_plugins()
     # Notice we do NOT call load_and_attach_all() upfront; we test lazy loading!
 
     def _fetch_duka(_: int) -> Any:
@@ -665,8 +665,8 @@ def test_sc02_plugin_orthogonality_zero_host_edits(tmp_path: Path) -> None:
         },
     )
 
-    engine = PluginDiscoveryEngine(search_dirs=[plugins_root])
-    engine.discover()
+    engine = PluginDiscovery(search_dirs=[plugins_root])
+    engine.discover_plugins()
     assert [p.plugin_id for p in engine.get_instances_for_slot("diagnostic.probe")] == [
         "probe.one"
     ]
@@ -683,7 +683,7 @@ def test_sc02_plugin_orthogonality_zero_host_edits(tmp_path: Path) -> None:
             "entry_point": "adapter:Adapter",
         },
     )
-    engine.discover()
+    engine.discover_plugins()
     assert [p.plugin_id for p in engine.get_instances_for_slot("diagnostic.probe")] == [
         "probe.one",
         "probe.two",
@@ -692,7 +692,7 @@ def test_sc02_plugin_orthogonality_zero_host_edits(tmp_path: Path) -> None:
     # Remove p_one from disk and re-discover
     shutil.rmtree(plugins_root / "p_one")
 
-    engine.discover()
+    engine.discover_plugins()
     assert [p.plugin_id for p in engine.get_instances_for_slot("diagnostic.probe")] == [
         "probe.two"
     ]
@@ -769,8 +769,8 @@ def test_lifecycle_enable_disable_cascade_reload_and_uninstall(
         code="def boom():\n    raise RuntimeError('init failure')\n",
     )
 
-    engine = PluginDiscoveryEngine(search_dirs=[plugins_root])
-    engine.discover()
+    engine = PluginDiscovery(search_dirs=[plugins_root])
+    engine.discover_plugins()
     engine.resolve_dependencies()
 
     lifecycle = PluginLifecycleManager(
@@ -826,8 +826,8 @@ def test_discovery_fastapi_router_endpoints(tmp_path: Path) -> None:
         },
     )
 
-    engine = PluginDiscoveryEngine(search_dirs=[plugins_root])
-    engine.discover()
+    engine = PluginDiscovery(search_dirs=[plugins_root])
+    engine.discover_plugins()
     engine.resolve_dependencies()
     lifecycle = PluginLifecycleManager(
         discovery_engine=engine, data_root=tmp_path / "data"

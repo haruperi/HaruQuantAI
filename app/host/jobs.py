@@ -61,7 +61,7 @@ from app.host.persistence import HostPersistence
 from app.host.resources import (
     MIN_AVAILABLE_RAM_PCT,
     MemoryWatchdogStatus,
-    ResourceManager,
+    ResourceMonitor,
     calculate_worker_allocation,
     check_memory_headroom,
     probe_cpu,
@@ -363,7 +363,7 @@ class JobManager:
         self,
         *,
         max_workers: int | None = None,
-        resource_mgr: ResourceManager | None = None,
+        resource_mgr: ResourceMonitor | None = None,
         min_available_ram_pct: float = MIN_AVAILABLE_RAM_PCT,
         memory_policy: str = "reject",
         use_process_pool: bool = True,
@@ -375,7 +375,7 @@ class JobManager:
         self._use_process_pool = use_process_pool
         self._cleanup_scratch_on_exit = cleanup_scratch_on_exit
 
-        self._resource_mgr = resource_mgr or ResourceManager(
+        self._resource_mgr = resource_mgr or ResourceMonitor(
             min_available_ram_pct=self._min_available_ram_pct,
             watchdog_policy=self._memory_policy,
         )
@@ -409,8 +409,8 @@ class JobManager:
         return self._max_workers
 
     @property
-    def resource_manager(self) -> ResourceManager:
-        """Return associated ResourceManager custodian."""
+    def resource_manager(self) -> ResourceMonitor:
+        """Return associated ResourceMonitor custodian."""
         return self._resource_mgr
 
     def ensure_pool(self) -> ProcessPoolExecutor | ThreadPoolExecutor:

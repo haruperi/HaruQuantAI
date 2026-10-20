@@ -38,14 +38,13 @@ Python API Usage:
     ```python
     from app.main import create_app, resolve_main_config
 
-    cfg, _ = resolve_main_config(["--port", "8080", "--data-dir", "data"])
+    cfg, _ = resolve_main_config(["--reload"])
     app = create_app(config=cfg)
     ```
 
 CLI Usage:
     ```bash
-    uv run python -m app.main --check-only
-    uv run python -m app.main --host 127.0.0.1 --port 8000
+    uv run python -m app.main
     uv run python -m app.main --reload
     ```
 """
@@ -64,12 +63,6 @@ from app.host.logging import get_logger, setup_logging, shutdown_logging
 from app.host.settings import settings as default_host_settings
 from fastapi import FastAPI
 
-__all__ = [
-    "create_app",
-    "resolve_main_config",
-    "run_server",
-]
-
 logger = get_logger(__name__)
 
 CONFIG_RESOLUTION_FR = "FR-HOST-MAIN-CONFIG-RESOLUTION"
@@ -84,52 +77,10 @@ def _build_parser() -> argparse.ArgumentParser:
         description="HaruQuantAI UI & FastAPI/Uvicorn Host Server",
     )
     parser.add_argument(
-        "--host",
-        type=str,
-        default=None,
-        help="Bind IP address (defaults to settings app_general.host or 127.0.0.1).",
-    )
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=None,
-        help="Bind port (defaults to settings app_general.backend_port or 8000).",
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        default=None,
-        help="Enable debug logging and diagnostics.",
-    )
-    parser.add_argument(
         "--reload",
         action="store_true",
         default=False,
         help="Enable Uvicorn hot-reload mode for development.",
-    )
-    parser.add_argument(
-        "--data-dir",
-        type=Path,
-        default=None,
-        help="Root directory for logs, scratch, and plugins.",
-    )
-    parser.add_argument(
-        "--plugins-dir",
-        type=Path,
-        default=None,
-        help="Explicit dynamic plugins directory override.",
-    )
-    parser.add_argument(
-        "--require-auth",
-        action="store_true",
-        default=False,
-        help="Require bearer session authentication on protected routes.",
-    )
-    parser.add_argument(
-        "--check-only",
-        action="store_true",
-        default=False,
-        help="Execute all 7 bootstrap stages + FastAPI route check and exit cleanly.",
     )
     return parser
 
@@ -144,24 +95,24 @@ def resolve_main_config(
     args = parser.parse_args(list(argv) if argv is not None else [])
     cfg_src = settings_source if settings_source is not None else default_host_settings
 
-    db_host = str(cfg_src.get("app_general", "host", "127.0.0.1") or "127.0.0.1")
+    host = str(cfg_src.get("app_general", "host", "127.0.0.1") or "127.0.0.1")
     raw_port = cfg_src.get("app_general", "backend_port", 8000)
-    db_port = int(raw_port) if isinstance(raw_port, (int, str)) else 8000
-    db_debug = bool(cfg_src.get("config_troubleshooting", "debug_level_active", False))
-
-    host = str(args.host) if args.host is not None else db_host
-    port = int(args.port) if args.port is not None else db_port
-    debug = bool(args.debug) if args.debug is not None else db_debug
-    data_dir = Path(args.data_dir) if args.data_dir is not None else Path("data")
+    port = int(raw_port) if isinstance(raw_port, (int, str)) else 8000
+    debug = bool(cfg_src.get("config_troubleshooting", "debug_level_active", False))
+    data_dir_raw = cfg_src.get("app_general", "data_dir", None)
+    data_dir = Path(data_dir_raw) if data_dir_raw is not None else Path("data")
+    plugins_dir_raw = cfg_src.get("app_general", "plugins_dir", None)
+    plugins_dir = Path(plugins_dir_raw) if plugins_dir_raw is not None else None
+    require_auth = bool(cfg_src.get("app_security", "require_auth", False))
 
     config = AppHost.Config(
         host=host,
         port=port,
         debug=debug,
         headless=False,
-        require_auth=bool(args.require_auth),
+        require_auth=require_auth,
         data_dir=data_dir,
-        plugins_dir=args.plugins_dir,
+        plugins_dir=plugins_dir,
     )
     logger.info(
         "%s: Resolved UI server config (host=%s port=%d debug=%s data_dir=%s).",
@@ -240,9 +191,10 @@ def run_server(
     argv: Sequence[str] | None = None,
     *,
     uvicorn_runner: Any | None = None,
+    settings_source: Any | None = None,
 ) -> int:
     """Execute the 7-stage bootstrap and start the FastAPI/Uvicorn server."""
-    config, args = resolve_main_config(argv)
+    config, args = resolve_main_config(argv, settings_source=settings_source)
     setup_logging(
         log_dir=config.resolved_log_dir,
         level=10 if config.debug else 20,
@@ -250,38 +202,12 @@ def run_server(
     runner = uvicorn_runner if uvicorn_runner is not None else uvicorn.run
 
     logger.info(
-        "%s: Starting HaruQuantAI UI/API server lifecycle (check_only=%s reload=%s).",
+        "%s: Starting HaruQuantAI UI/API server lifecycle (reload=%s).",
         UVICORN_LIFECYCLE_FR,
-        args.check_only,
         args.reload,
         extra={"fr_id": UVICORN_LIFECYCLE_FR},
     )
     try:
-        if args.check_only:
-            host = AppHost(config=config)
-            app = host.startup()
-            try:
-                host.initialize_db()
-                host.register_modules(app)
-                host.broadcast_event(
-                    channel="system",
-                    event_type="host.ready",
-                    payload={
-                        "host_instance_id": host.host_instance_id,
-                        "state": host.state.value,
-                    },
-                )
-                logger.info(
-                    "%s: Check-only verified %d stages and %d FastAPI routes.",
-                    UVICORN_LIFECYCLE_FR,
-                    len(host.completed_stages),
-                    len(app.routes),
-                    extra={"fr_id": UVICORN_LIFECYCLE_FR},
-                )
-            finally:
-                host.shutdown()
-            return 0
-
         if args.reload:
             runner(
                 "app.main:create_app",
@@ -317,26 +243,7 @@ def run_server(
 
 def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint for `uv run python -m app.main`."""
-    import tempfile
-
-    effective_argv = list(argv) if argv is not None else None
-    if effective_argv is None:
-        import sys
-
-        effective_argv = sys.argv[1:]
-
-    if "--check-only" in effective_argv and "--data-dir" not in effective_argv:
-        with tempfile.TemporaryDirectory(
-            prefix="hqai_main_check_",
-            ignore_cleanup_errors=True,
-        ) as tmp_dir:
-            code = run_server([*effective_argv, "--data-dir", tmp_dir])
-            print(
-                "HaruQuantAI UI Server (--check-only): 7-stage bootstrap + FastAPI OK"
-            )
-            return code
-
-    return run_server(effective_argv)
+    return run_server(argv)
 
 
 if __name__ == "__main__":

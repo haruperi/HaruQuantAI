@@ -13,7 +13,7 @@ Key Capabilities:
     - FR-HOST-TRANSPORT-MIDDLEWARE: Inject X-Request-Id and X-Response-Time-Ms
       headers and isolate unhandled server exceptions into 500 error envelopes.
     - FR-HOST-TRANSPORT-EXCEPTION-ENVELOPE: Transform HTTPException and
-      RequestValidationError into StandardResponse.failure envelopes.
+      RequestValidationError into ApiResponse.error envelopes.
     - FR-HOST-TRANSPORT-EVENT-BUS: Publish and subscribe to multi-channel host
       events with monotonic cursors, ring-buffer replay, and queue isolation.
     - FR-HOST-TRANSPORT-SSE-STREAMING: Stream real-time Server-Sent Events over
@@ -62,7 +62,7 @@ from app.host import resources as _res
 from app.host import session as _sess
 from app.host.logging import get_access_logger, get_logger, redact_secrets
 from app.host.persistence import HostPersistence
-from app.host.response import StandardError, StandardResponse
+from app.host.response import ApiResponse, StandardError
 from app.host.settings import RevisionConflictError, settings
 from fastapi import APIRouter, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -145,15 +145,13 @@ def extract_bearer_token(
 
 def _ok(req: Request, data: Any, msg: str = "OK", *, fx: bool = False) -> JSONResponse:
     rid = req.headers.get("x-request-id")
-    r = StandardResponse.success(
-        data=data, message=msg, request_id=rid, side_effects=fx
-    )
+    r = ApiResponse.ok(data=data, message=msg, request_id=rid, side_effects=fx)
     return JSONResponse(status_code=200, content=r.to_dict())
 
 
 def _err(req: Request, sc: int, code: str, msg: str, det: _Pld | None = None) -> _Resp:
     rid, err = req.headers.get("x-request-id"), StandardError(code, msg, det)
-    r = StandardResponse.failure(msg, err, request_id=rid)
+    r = ApiResponse.error(msg, err, request_id=rid)
     return JSONResponse(status_code=sc, content=r.to_dict())
 
 
@@ -393,7 +391,7 @@ class TransportMiddleware:
             msg = str(exc) or "Internal server error occurred."
             det = {"exception_type": type(exc).__name__}
             err = StandardError(code="INTERNAL_SERVER_ERROR", message=msg, details=det)
-            r = StandardResponse.failure("Error.", err, request_id=rid, duration_ms=dur)
+            r = ApiResponse.error("Error.", err, request_id=rid, duration_ms=dur)
             h = {
                 "X-Request-Id": rid,
                 "X-Response-Time-Ms": f"{dur:.2f}",
@@ -534,7 +532,7 @@ class ServletConnection:
         """Save or update connection credentials in host settings."""
         rec = {**data, "connection_id": connection_id, "updated_at_utc": _now_utc_iso()}
         try:
-            self.settings.update_batch({"connections": {connection_id: rec}})
+            self.settings.save_settings({"connections": {connection_id: rec}})
         except RevisionConflictError, RuntimeError, ValueError:
             if hasattr(self.settings, "set_in_memory"):
                 self.settings.set_in_memory("connections", connection_id, rec)
@@ -549,7 +547,7 @@ class ServletConnection:
         with suppress(RevisionConflictError, RuntimeError, ValueError):
             if connection_id in self.settings.get_scope("connections"):
                 existed = True
-                self.settings.update_batch({"connections": {connection_id: {}}})
+                self.settings.save_settings({"connections": {connection_id: {}}})
         if connection_id in self._in_memory_connections:
             existed = True
             del self._in_memory_connections[connection_id]
@@ -598,7 +596,7 @@ class ServletConstants:
         d["supported_timeframes"] = list(SUPPORTED_TIMEFRAMES)
         d["memory_headroom"] = _res.check_memory_headroom()
         d["worker_capacity"] = _res.get_worker_capacity()
-        d["system_health"] = _res.get_system_health()
+        d["system_health"] = _res.inspect_resources()
         return d
 
 
@@ -619,7 +617,7 @@ class TransportGatewayService:
 
     def _verify_session(self, req: Request, qtok: str | None = None) -> Any:
         token = extract_bearer_token(req.headers.get("authorization"), qtok)
-        return self.session_mgr.validate_token(token) if token is not None else None
+        return self.session_mgr.verify_session(token) if token is not None else None
 
     def _check_password(self, candidate_password: str) -> bool:
         cfg = self.password_hash
@@ -704,7 +702,7 @@ class TransportGatewayService:
         if is_put:
             b = SettingsBatchUpdatePayload.model_validate(await _jbody(request))
             try:
-                rev = settings.update_batch(b.settings, expected_revision=b.revision)
+                rev = settings.save_settings(b.settings, expected_revision=b.revision)
             except RevisionConflictError as exc:
                 _warn(FR_APP, f"Settings revision conflict: {exc}")
                 er, cr = exc.expected_revision, exc.current_revision
@@ -748,7 +746,7 @@ class TransportGatewayService:
             return denied
         rm = self._resolve_mgr(request, "resource_manager", self.resource_mgr)
         wd = rm.check_memory_headroom() if rm else _res.check_memory_headroom()
-        hlth = rm.get_system_health() if rm else _res.get_system_health()
+        hlth = rm.inspect_resources() if rm else _res.inspect_resources()
         d = _dct(status=hlth.status, hardware=asdict(_res.probe_hardware()))
         d |= _dct(memory_watchdog=asdict(wd), database=asdict(hlth.database))
         d |= _dct(worker_capacity=asdict(_res.get_worker_capacity()))
@@ -795,7 +793,7 @@ class TransportGatewayService:
         qp, ah = request.query_params, request.headers.get("authorization")
         tok = extract_bearer_token(ah, qp.get("token"))
         if (self.require_auth or tok) and not (
-            tok and self.session_mgr.validate_token(tok)
+            tok and self.session_mgr.verify_session(tok)
         ):
             return _err(request, 401, "UNAUTHORIZED", "Valid session token required.")
         h = {"Cache-Control": "no-cache", "Connection": "keep-alive"}
@@ -818,7 +816,7 @@ class TransportGatewayService:
                 g = json.dumps(_dct(channel="system", event_type="gap"))
                 yield f"event: system.gap\ndata: {g}\n\n"
             while (lim is None or sent < lim) and not await req.is_disconnected():
-                if tok and self.session_mgr.validate_token(tok) is None:
+                if tok and self.session_mgr.verify_session(tok) is None:
                     break
                 try:
                     ev = (
@@ -840,7 +838,7 @@ class TransportGatewayService:
     async def _ws(self, ws: WebSocket) -> None:
         qp = ws.query_params
         tok = extract_bearer_token(ws.headers.get("authorization"), qp.get("token"))
-        if self.require_auth and not (tok and self.session_mgr.validate_token(tok)):
+        if self.require_auth and not (tok and self.session_mgr.verify_session(tok)):
             await ws.close(code=1008)
             return
         await ws.accept()

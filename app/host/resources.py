@@ -22,7 +22,7 @@ Key Capabilities:
     - FR-HOST-RESOURCES-PROBE-PROCESS: Probe process health (probe_process -> DEBUG).
     - FR-HOST-RESOURCES-PROBE-STORAGE: Storage writability (probe_storage -> DEBUG).
     - FR-HOST-RESOURCES-PROBE-HARDWARE: Hardware telemetry (probe_hardware -> DEBUG).
-    - FR-HOST-RESOURCES-PROBE-HEALTH: Health snapshot (get_system_health -> INFO).
+    - FR-HOST-RESOURCES-PROBE-HEALTH: Health snapshot (inspect_resources -> INFO).
     - FR-HOST-RESOURCES-WORKER-ALLOCATION: Pool (calculate_worker_allocation -> INFO).
     - FR-HOST-RESOURCES-CORE-AFFINITY: CPU core affinity (apply_cpu_affinity -> INFO).
     - FR-HOST-RESOURCES-GPU-ACCELERATION: GPU (inspect_gpu_qualification -> DEBUG).
@@ -68,15 +68,15 @@ from app.host.settings import settings as host_settings
 
 __all__ = [
     "MemoryWatchdog",
-    "ResourceManager",
+    "ResourceMonitor",
     "allocate_job_scratch",
     "apply_cpu_affinity",
     "calculate_worker_allocation",
     "check_memory_headroom",
     "cleanup_job_scratch",
     "evaluate_dataframe_guard",
-    "get_system_health",
     "get_worker_capacity",
+    "inspect_resources",
     "inspect_workspace_directories",
     "job_scratch_sandbox",
     "probe_hardware",
@@ -453,7 +453,7 @@ def probe_hardware() -> HardwareProbe:
     return HardwareProbe(*a1, *a2)
 
 
-def get_system_health(
+def inspect_resources(
     root_path: PathLike = None, settings: Any = None
 ) -> HostHealthReport:
     """Coordinate host probes and generate complete health snapshot."""
@@ -898,7 +898,7 @@ class BenchmarkRunner:
             return False
 
 
-class ResourceManager:
+class ResourceMonitor:
     """Unified custodian for diagnostics, worker sizing, watchdog, and sandboxes."""
 
     def __init__(
@@ -928,11 +928,11 @@ class ResourceManager:
         """Return configured root directory for per-job scratch sandboxes."""
         return self._scratch_root
 
-    def get_system_health(
+    def inspect_resources(
         self, root_path: PathLike = None, settings: Any = None
     ) -> HostHealthReport:
         """Return complete host health report."""
-        return get_system_health(root_path=root_path, settings=settings)
+        return inspect_resources(root_path=root_path, settings=settings)
 
     def get_worker_allocation(
         self, mode: str = "reserve-two", custom_cores: int = 1
@@ -963,7 +963,7 @@ class ResourceManager:
             yield path
 
 
-resource_manager = ResourceManager()
+resource_manager = ResourceMonitor()
 
 
 def main() -> None:
@@ -979,7 +979,7 @@ def main() -> None:
         (sandbox_dir / "task.txt").write_text("sandbox active", encoding="utf-8")
     run_memory_cleanup()
     run_cpu_benchmark(iterations=2_000)
-    get_system_health()
+    inspect_resources()
 
 
 if __name__ == "__main__":

@@ -14,11 +14,11 @@ Purpose:
 
 Key Capabilities:
     - FR-HOST-SETTINGS-LOAD: Read settings from database and package for app.
-      Associated: `HostSettings`, `settings`
+      Associated: `SettingsManager`, `settings`
       Logging: INFO on settings load with scope count; DEBUG on setting access.
     - FR-HOST-SETTINGS-BATCH-UPDATE: Persist atomic multi-scope settings updates
       with optimistic revision conflict verification and cache refresh.
-      Associated: `HostSettings.update_batch()`, `RevisionConflictError`
+      Associated: `SettingsManager.save_settings()`, `RevisionConflictError`
       Logging: INFO emitted on committed batch settings update; WARNING emitted
       on revision conflict.
     - FR-HOST-SETTINGS-THEME-TOKENS: Provide Tailwind CSS and Dockview theme tokens
@@ -29,7 +29,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.host.settings import HostSettings, Theme, settings
+    from app.host.settings import SettingsManager, Theme, settings
 
     user = settings.user_access.username
     tokens = settings.theme.set_dark()
@@ -55,8 +55,8 @@ from app.host.persistence import HostPersistence
 RevisionConflictError = HostPersistence.RevisionConflictError
 
 __all__ = [
-    "HostSettings",
     "RevisionConflictError",
+    "SettingsManager",
     "Theme",
     "settings",
 ]
@@ -149,7 +149,7 @@ LIGHT_THEME_TOKENS: Final[dict[str, Any]] = {
 class Theme:
     """Tailwind CSS and Dockview appearance state and design token manager."""
 
-    def __init__(self, host_settings: HostSettings | None = None) -> None:
+    def __init__(self, host_settings: SettingsManager | None = None) -> None:
         """Initialize Theme manager with an optional host settings container."""
         self._settings = host_settings
 
@@ -174,7 +174,7 @@ class Theme:
         """Apply dark theme state and return dark theme tokens."""
         if self._settings is not None:
             try:
-                self._settings.update_batch({"ui": {"theme": "dark"}})
+                self._settings.save_settings({"ui": {"theme": "dark"}})
             except (RuntimeError, ValueError) as err:
                 logger.warning(
                     "%s: Persisting dark theme failed, caching in memory: %s",
@@ -203,7 +203,7 @@ class Theme:
         """Apply light theme state and return light theme tokens."""
         if self._settings is not None:
             try:
-                self._settings.update_batch({"ui": {"theme": "light"}})
+                self._settings.save_settings({"ui": {"theme": "light"}})
             except (RuntimeError, ValueError) as err:
                 logger.warning(
                     "%s: Persisting light theme failed, caching in memory: %s",
@@ -265,7 +265,7 @@ class _SettingsNode:
         return len(self._data)
 
 
-class HostSettings:
+class SettingsManager:
     """Lazy settings container with dot-access, atomic updates, and theming."""
 
     def __init__(self, data: dict[str, dict[str, Any]] | None = None) -> None:
@@ -300,7 +300,7 @@ class HostSettings:
         with self._lock:
             self._data.setdefault(scope, {})[key] = value
 
-    def update_batch(
+    def save_settings(
         self,
         updates: Mapping[str, Mapping[str, Any]],
         *,
@@ -495,7 +495,7 @@ def _read_settings() -> dict[str, dict[str, Any]]:
     return data
 
 
-settings = HostSettings()
+settings = SettingsManager()
 
 
 def main() -> None:

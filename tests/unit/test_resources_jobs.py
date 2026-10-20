@@ -35,7 +35,7 @@ from app.host.resources import (
     MemoryObservation,
     MemoryWatchdog,
     MemoryWatchdogStatus,
-    ResourceManager,
+    ResourceMonitor,
     WorkerCapacity,
     allocate_job_scratch,
     apply_cpu_affinity,
@@ -43,10 +43,10 @@ from app.host.resources import (
     check_memory_headroom,
     cleanup_job_scratch,
     evaluate_dataframe_guard,
-    get_system_health,
     get_worker_capacity,
     inspect_cpu_affinity,
     inspect_gpu_qualification,
+    inspect_resources,
     inspect_workspace_directories,
     job_scratch_sandbox,
     probe_cpu,
@@ -314,7 +314,7 @@ def test_probes_and_error_resilience(
     (tmp_path / "logs").mkdir(exist_ok=True)
     (tmp_path / "data" / "database").mkdir(parents=True, exist_ok=True)
 
-    health = get_system_health(root_path=tmp_path)
+    health = inspect_resources(root_path=tmp_path)
     assert isinstance(health, HostHealthReport)
     assert health.database.exists is True
     assert health.database.table_count >= 25
@@ -391,9 +391,9 @@ def test_affinity_gpu_benchmark_and_scratch_sandbox(tmp_path: Path) -> None:
 
 
 def test_resource_manager_facade(tmp_path: Path) -> None:
-    """Verify ResourceManager integrates allocation, watchdog, and sandboxes."""
+    """Verify ResourceMonitor integrates allocation, watchdog, and sandboxes."""
     HostPersistence.read_records("host_settings")
-    rm = ResourceManager(
+    rm = ResourceMonitor(
         min_available_ram_pct=15.0,
         watchdog_policy="reject",
         scratch_root=tmp_path / "scratch",
@@ -401,7 +401,7 @@ def test_resource_manager_facade(tmp_path: Path) -> None:
     assert rm.scratch_root == tmp_path / "scratch"
     assert rm.get_worker_allocation(mode="reserve-two") >= 1
     assert rm.check_memory_headroom().threshold_pct == 15.0
-    assert rm.get_system_health(root_path=tmp_path).status in (
+    assert rm.inspect_resources(root_path=tmp_path).status in (
         "HEALTHY",
         "DEGRADED",
     )
@@ -496,7 +496,7 @@ def test_persistence_job_helpers() -> None:
 
 def test_job_manager_process_pool_execution(tmp_path: Path) -> None:
     """Verify JobManager executes CPU tasks in a separate OS worker process."""
-    rm = ResourceManager(scratch_root=tmp_path / "mp_scratch")
+    rm = ResourceMonitor(scratch_root=tmp_path / "mp_scratch")
 
     manager = JobManager(
         max_workers=2,
@@ -542,7 +542,7 @@ def test_job_manager_cooperative_cancellation_in_process_pool(
 ) -> None:
     """Verify cooperative cancellation via JobContext terminates a running process task."""
     scratch_root = tmp_path / "cancel_scratch"
-    rm = ResourceManager(scratch_root=scratch_root)
+    rm = ResourceMonitor(scratch_root=scratch_root)
 
     manager = JobManager(
         max_workers=2,
@@ -578,7 +578,7 @@ def test_job_manager_cooperative_cancellation_in_process_pool(
 
 def test_job_manager_task_failure_handling(tmp_path: Path) -> None:
     """Verify worker exceptions transition the job to FAILED and persist error details."""
-    rm = ResourceManager(scratch_root=tmp_path / "fail_scratch")
+    rm = ResourceMonitor(scratch_root=tmp_path / "fail_scratch")
 
     manager = JobManager(
         max_workers=1,
@@ -603,7 +603,7 @@ def test_job_manager_memory_watchdog_reject_and_pause(tmp_path: Path) -> None:
     """Verify JobManager rejects or pauses tasks when available RAM < 15%."""
     simulated_ram = {"pct": 9.5}
 
-    rm = ResourceManager(
+    rm = ResourceMonitor(
         min_available_ram_pct=15.0,
         watchdog_policy="reject",
         scratch_root=tmp_path / "mem_scratch",
@@ -632,7 +632,7 @@ def test_job_manager_memory_watchdog_reject_and_pause(tmp_path: Path) -> None:
 
     # 2. Policy = 'pause': queues job in PAUSED state until RAM recovers >= 15%
     simulated_ram["pct"] = 12.0
-    rm_pause = ResourceManager(
+    rm_pause = ResourceMonitor(
         min_available_ram_pct=15.0,
         watchdog_policy="pause",
         scratch_root=tmp_path / "pause_scratch",
@@ -692,7 +692,7 @@ def test_job_manager_startup_orphan_reconciliation(
     caplog: LogCaptureFixture,
 ) -> None:
     """Verify orphan jobs left in RUNNING state are marked INTERRUPTED on boot."""
-    rm = ResourceManager(scratch_root=tmp_path / "reconcile_scratch")
+    rm = ResourceMonitor(scratch_root=tmp_path / "reconcile_scratch")
 
     # Seed two orphan RUNNING jobs and one COMPLETED job
     HostPersistence.create_record(
@@ -832,7 +832,7 @@ def test_resources_and_jobs_cli_main_entrypoints(
     monkeypatch.setattr(
         resources_mod,
         "resource_manager",
-        ResourceManager(scratch_root=tmp_path / "cli_res_scratch"),
+        ResourceMonitor(scratch_root=tmp_path / "cli_res_scratch"),
     )
     resources_mod.main()
 
@@ -841,7 +841,7 @@ def test_resources_and_jobs_cli_main_entrypoints(
         jobs_mod,
         "JobManager",
         lambda **kw: orig_jm(
-            resource_mgr=ResourceManager(scratch_root=tmp_path / "cli_jobs_scratch"),
+            resource_mgr=ResourceMonitor(scratch_root=tmp_path / "cli_jobs_scratch"),
             use_process_pool=False,
             **kw,
         ),

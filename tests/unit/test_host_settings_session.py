@@ -70,8 +70,8 @@ from app.host.settings import (
     BATCH_UPDATE_FR,
     LOAD_FR,
     THEME_FR,
-    HostSettings,
     RevisionConflictError,
+    SettingsManager,
     Theme,
     _read_settings,
     _SettingsNode,
@@ -95,7 +95,7 @@ def isolated_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
 def test_public_module_exports_rule_compliance() -> None:
     """Verify public exports from app.host.settings align with Phase 1 blueprint."""
     expected = [
-        "HostSettings",
+        "SettingsManager",
         "RevisionConflictError",
         "Theme",
         "settings",
@@ -197,8 +197,8 @@ def test_read_settings_malformed_json_fallback() -> None:
 
 
 def test_host_settings_container_methods() -> None:
-    """Verify container methods on empty and populated HostSettings and _SettingsNode."""
-    empty = HostSettings({})
+    """Verify container methods on empty and populated SettingsManager and _SettingsNode."""
+    empty = SettingsManager({})
     assert len(empty) == 0
     assert empty.as_dict() == {}
     assert empty.get("any", "key", 42) == 42
@@ -257,22 +257,22 @@ def test_session_lifecycle_and_expiration(
     assert record.status == "ACTIVE"
 
     # 2. Validate token
-    validated = manager.validate_token(raw_token)
+    validated = manager.verify_session(raw_token)
     assert validated is not None
     assert validated.session_id == record.session_id
 
     # 3. Revoke session
     assert manager.revoke_session(record.session_id) is True
-    assert manager.validate_token(raw_token) is None
+    assert manager.verify_session(raw_token) is None
     assert manager.revoke_session("non_existent_id") is False
 
     # 4. Expiration check with zero/negative duration
     expired_token, _ = manager.create_session("admin", "127.0.0.1", duration_mins=-5)
-    assert manager.validate_token(expired_token) is None
+    assert manager.verify_session(expired_token) is None
 
     # 5. Invalid token format
-    assert manager.validate_token("short_token") is None
-    assert manager.validate_token("a" * 63) is None
+    assert manager.verify_session("short_token") is None
+    assert manager.verify_session("a" * 63) is None
 
     assert any(
         getattr(r, "fr_id", None) == LIFECYCLE_FR or LIFECYCLE_FR in r.message
@@ -284,14 +284,14 @@ def test_session_restart_invalidation() -> None:
     """Verify host restart invalidates active sessions created under earlier instance."""
     manager = SessionManager()
     raw_token, record = manager.create_session("operator_2", "10.0.0.5")
-    assert manager.validate_token(raw_token) is not None
+    assert manager.verify_session(raw_token) is not None
 
     # Simulate host platform restart
     manager.reset()
     # In-memory sessions are cleared; token validation from DB succeeds if status is ACTIVE
-    assert manager.validate_token(raw_token) is not None
+    assert manager.verify_session(raw_token) is not None
     assert manager.revoke_session(record.session_id) is True
-    assert manager.validate_token(raw_token) is None
+    assert manager.verify_session(raw_token) is None
 
 
 def test_session_scope_authorization() -> None:
@@ -411,7 +411,7 @@ def test_atomic_batch_settings_update_and_revision_conflict(
     initial_rev = host_settings.revision
 
     # 1. Atomic batch update across multiple scopes with expected_revision
-    new_rev = host_settings.update_batch(
+    new_rev = host_settings.save_settings(
         {
             "user_access": {"username": "quant_operator", "theme": "dark"},
             "compute": {"worker_mode": "reserve-one"},
@@ -425,7 +425,7 @@ def test_atomic_batch_settings_update_and_revision_conflict(
 
     # 2. Stale revision raises RevisionConflictError and preserves prior state
     with pytest.raises(RevisionConflictError) as exc_info:
-        host_settings.update_batch(
+        host_settings.save_settings(
             {"user_access": {"username": "intruder"}},
             expected_revision=initial_rev,
         )
@@ -434,7 +434,7 @@ def test_atomic_batch_settings_update_and_revision_conflict(
     assert host_settings.get("user_access", "username") == "quant_operator"
 
     # 3. Update without expected_revision increments revision
-    rev_after = host_settings.update_batch(
+    rev_after = host_settings.save_settings(
         {"user_access": {"username": "updated_operator"}},
     )
     assert rev_after == new_rev + 1
@@ -446,15 +446,15 @@ def test_atomic_batch_settings_update_and_revision_conflict(
 
 
 def test_independent_settings_writers_conflict_and_batch_rollback() -> None:
-    """Verify concurrent update_batch conflict and invalid payload failure."""
+    """Verify concurrent save_settings conflict and invalid payload failure."""
     host_settings.reload()
     ready = Barrier(2)
 
     def save(value: int) -> int | str:
         ready.wait(timeout=5)
-        local_settings = HostSettings()
+        local_settings = SettingsManager()
         try:
-            return local_settings.update_batch(
+            return local_settings.save_settings(
                 {"audit": {"value": value}}, expected_revision=0
             )
         except RevisionConflictError:
@@ -464,11 +464,11 @@ def test_independent_settings_writers_conflict_and_batch_rollback() -> None:
         results = list(executor.map(save, [1, 2]))
     assert 1 in results
 
-    instance = HostSettings()
+    instance = SettingsManager()
     instance.reload()
     rev_before = instance.revision
     with pytest.raises(TypeError):
-        instance.update_batch(
+        instance.save_settings(
             {"audit": {"first": "must roll back", "invalid": object()}},
             expected_revision=rev_before,
         )
@@ -481,9 +481,9 @@ def test_settings_read_failure_preserves_last_snapshot(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Verify reload failure preserves the last loaded snapshot in memory."""
-    instance = HostSettings()
+    instance = SettingsManager()
     instance.reload()
-    instance.update_batch({"audit": {"kept": True}}, expected_revision=0)
+    instance.save_settings({"audit": {"kept": True}}, expected_revision=0)
 
     bad_dir = tmp_path / "is_a_directory"
     bad_dir.mkdir()
@@ -523,8 +523,8 @@ def test_theme_tokens_and_appearance_state(caplog: pytest.LogCaptureFixture) -> 
 
 
 def test_host_settings_theme_integration() -> None:
-    """Verify HostSettings public class and theme binding."""
-    settings_obj = HostSettings(data={"ui": {"theme": "light"}})
+    """Verify SettingsManager public class and theme binding."""
+    settings_obj = SettingsManager(data={"ui": {"theme": "light"}})
     assert settings_obj.theme.current_theme == "light"
     settings_obj.theme.set_dark()
     assert settings_obj.theme.current_theme == "dark"

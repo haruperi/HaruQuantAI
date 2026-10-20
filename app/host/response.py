@@ -8,11 +8,11 @@ Description:
     return values, unhandled exceptions, and inconsistent response schemas lead to
     silent failures, difficult debugging, and fragile API boundaries. This module
     eliminates those failure modes by enforcing a canonical envelope structure
-    (`StandardResponse[T]`) paired with structured error classifications
+    (`ApiResponse[T]`) paired with structured error classifications
     (`StandardError`) and execution metadata (`ResponseMetadata`). Externally,
     this envelope serves as the standard boundary contract across host lifecycle
     services, RPC handlers, CLI orchestration, and workspace domain clients.
-    Internally, the factory constructors (`success()` and `failure()`) enforce
+    Internally, the factory constructors (`ok()` and `error()`) enforce
     structural invariants, automate UTC timestamp generation, and guarantee
     observable, structured telemetry logging for all operations.
 
@@ -23,23 +23,23 @@ Purpose:
 
 Key Capabilities:
     - FR-HOST-RESPONSE-SUCCESS-ENVELOPE: Success Envelope Instantiation
-      Associated: `[StandardResponse.success()]`
+      Associated: `[ApiResponse.ok()]`
       Logging: Emits INFO log with operation summary, duration, and request
       correlation ID upon successful envelope creation.
     - FR-HOST-RESPONSE-ERROR-ENVELOPE: Error Envelope Instantiation
-      Associated: `[StandardResponse.failure()]`
+      Associated: `[ApiResponse.error()]`
       Logging: Emits WARNING log with machine-readable error code, message,
       and correlation ID upon failure envelope creation.
     - FR-HOST-RESPONSE-SERIALIZATION: Dictionary & JSON Transformation
-      Associated: `[StandardResponse.to_dict()]`
+      Associated: `[ApiResponse.to_dict()]`
       Logging: Emits DEBUG log with status when serializing envelope to dict.
 
 Python API Usage:
     ```python
-    from app.host.response import ResponseMetadata, StandardError, StandardResponse
+    from app.host.response import ApiResponse, ResponseMetadata, StandardError
 
     # Create a successful response with payload and execution duration
-    success_resp = StandardResponse.success(
+    success_resp = ApiResponse.ok(
         data={"symbol": "EURUSD", "ask": 1.0850, "bid": 1.0848},
         message="Market tick retrieved successfully.",
         duration_ms=4.2,
@@ -55,7 +55,7 @@ Python API Usage:
         details={"reconnect_attempts": 3},
         retryable=True,
     )
-    error_resp = StandardResponse.failure(
+    error_resp = ApiResponse.error(
         message="Failed to retrieve market tick.",
         error=err,
         request_id="req-12346",
@@ -66,22 +66,22 @@ Python API Usage:
 CLI Usage:
     Validate response envelope integrity and functional tests via pytest:
     ```bash
-    uv run pytest tests/unit/v2/phase_01/test_response.py --no-cov
+    uv run pytest tests/unit/test_transport.py --no-cov
     ```
 """
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, is_dataclass
 from datetime import UTC, datetime
-from typing import Any, Literal
+from typing import Any, Literal, Protocol, overload, override
 
 from app.host.logging import get_logger
 
 __all__ = [
+    "ApiResponse",
     "ResponseMetadata",
     "StandardError",
-    "StandardResponse",
 ]
 
 logger = get_logger(__name__)
@@ -90,6 +90,17 @@ logger = get_logger(__name__)
 def _now_utc_iso() -> str:
     """Return the current UTC timestamp formatted as an ISO 8601 string."""
     return datetime.now(UTC).isoformat()
+
+
+def _serialize_payload(val: Any) -> Any:
+    """Recursively convert dataclass instances in payloads to dictionaries."""
+    if is_dataclass(val) and not isinstance(val, type):
+        return asdict(val)
+    if isinstance(val, dict):
+        return {k: _serialize_payload(v) for k, v in val.items()}
+    if isinstance(val, (list, tuple)):
+        return [_serialize_payload(item) for item in val]
+    return val
 
 
 @dataclass(frozen=True, slots=True)
@@ -150,8 +161,50 @@ class ResponseMetadata:
             raise ValueError(f"duration_ms cannot be negative, got {self.duration_ms}.")
 
 
-@dataclass(frozen=True, slots=True)
-class StandardResponse[T]:
+class _ErrorFactory(Protocol):
+    """Callable protocol for ApiResponse.error(...) class factory."""
+
+    def __call__[V = None](
+        self,
+        message: str,
+        error: StandardError,
+        *,
+        data: V | None = None,
+        request_id: str | None = None,
+        duration_ms: float | None = None,
+        side_effects: bool = False,
+        extensions: dict[str, Any] | None = None,
+        timestamp_utc: str | None = None,
+    ) -> ApiResponse[V]: ...
+
+
+class _ErrorDescriptor:
+    """Descriptor exposing `ApiResponse.error(...)` and `instance.error`."""
+
+    @overload
+    def __get__(
+        self, instance: None, owner: type[ApiResponse[Any]]
+    ) -> _ErrorFactory: ...
+
+    @overload
+    def __get__(
+        self,
+        instance: ApiResponse[Any],
+        owner: type[ApiResponse[Any]] | None = None,
+    ) -> StandardError | None: ...
+
+    def __get__(
+        self,
+        instance: ApiResponse[Any] | None,
+        owner: type[ApiResponse[Any]] | None = None,
+    ) -> _ErrorFactory | StandardError | None:
+        if instance is None:
+            cls = owner or ApiResponse
+            return cls._build_error
+        return instance._error  # noqa: SLF001
+
+
+class ApiResponse[T]:
     """Canonical result of one bounded public operation.
 
     The successful raw payload is stored directly in ``data``.
@@ -164,14 +217,70 @@ class StandardResponse[T]:
         metadata: Required execution, side-effect, and extension metadata.
     """
 
+    __slots__ = ("_error", "_frozen", "data", "message", "metadata", "status")
+
     status: Literal["success", "error"]
     message: str
     data: T | None
-    error: StandardError | None
+    _error: StandardError | None
     metadata: ResponseMetadata
+    _frozen: bool
+
+    error: _ErrorDescriptor = _ErrorDescriptor()
+
+    def __init__(
+        self,
+        status: Literal["success", "error"],
+        message: str,
+        data: T | None,
+        error: StandardError | None,
+        metadata: ResponseMetadata,
+    ) -> None:
+        """Initialize and validate structural invariants of the response envelope."""
+        object.__setattr__(self, "_frozen", False)
+        object.__setattr__(self, "status", status)
+        object.__setattr__(self, "message", message)
+        object.__setattr__(self, "data", data)
+        object.__setattr__(self, "_error", error)
+        object.__setattr__(self, "metadata", metadata)
+        self.__post_init__()
+        object.__setattr__(self, "_frozen", True)
+
+    @override
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Prevent mutation after initialization."""
+        if getattr(self, "_frozen", False):
+            raise AttributeError(f"Cannot modify frozen ApiResponse attribute '{name}'")
+        object.__setattr__(self, name, value)
+
+    @override
+    def __eq__(self, other: object) -> bool:
+        """Check structural equality with another ApiResponse."""
+        if not isinstance(other, ApiResponse):
+            return NotImplemented
+        return (
+            self.status == other.status
+            and self.message == other.message
+            and self.data == other.data
+            and self._error == other._error
+            and self.metadata == other.metadata
+        )
+
+    @override
+    def __hash__(self) -> int:
+        """Compute hash for immutable response fields."""
+        return hash((self.status, self.message, self._error, self.metadata))
+
+    @override
+    def __repr__(self) -> str:
+        """Return unambiguous string representation of ApiResponse."""
+        return (
+            f"ApiResponse(status={self.status!r}, message={self.message!r}, "
+            f"data={self.data!r}, error={self._error!r}, metadata={self.metadata!r})"
+        )
 
     def __post_init__(self) -> None:
-        """Validate structural invariants of the standard response envelope.
+        """Validate structural invariants of the response envelope.
 
         Raises:
             ValueError: If status is unrecognized, or if status conflicts with
@@ -184,17 +293,17 @@ class StandardResponse[T]:
                 f"Invalid status '{self.status}'; must be 'success' or 'error'."
             )
         if self.status == "success":
-            if self.error is not None:
+            if self._error is not None:
                 raise ValueError("Success response must not contain an error.")
         else:
-            if self.error is None:
+            if self._error is None:
                 raise ValueError(
                     "Error response must contain a StandardError instance."
                 )
-            if not isinstance(self.error, StandardError):
+            if not isinstance(self._error, StandardError):
                 raise TypeError(
                     "Error must be an instance of StandardError, got "
-                    f"{type(self.error).__name__}."
+                    f"{type(self._error).__name__}."
                 )
 
     @property
@@ -214,15 +323,15 @@ class StandardResponse[T]:
     def unwrap(self) -> T:
         """Return data if successful, otherwise raise RuntimeError."""
         if not self.is_success:
-            err_msg = self.error.message if self.error else self.message
-            err_code = self.error.code if self.error else "UNKNOWN_ERROR"
+            err_msg = self._error.message if self._error else self.message
+            err_code = self._error.code if self._error else "UNKNOWN_ERROR"
             raise RuntimeError(f"Operation failed [{err_code}]: {err_msg}")
         return self.data  # type: ignore[return-value]
 
     @property
     def error_code(self) -> str | None:
         """Return the error code if an error is attached, else None."""
-        return self.error.code if self.error is not None else None
+        return self._error.code if self._error is not None else None
 
     @property
     def request_id(self) -> str | None:
@@ -230,7 +339,7 @@ class StandardResponse[T]:
         return self.metadata.request_id
 
     @classmethod
-    def success[V](
+    def ok[V](
         cls,
         data: V | None = None,
         message: str = "Operation completed successfully.",
@@ -240,8 +349,8 @@ class StandardResponse[T]:
         side_effects: bool = False,
         extensions: dict[str, Any] | None = None,
         timestamp_utc: str | None = None,
-    ) -> StandardResponse[V]:
-        """Construct a successful standard response envelope.
+    ) -> ApiResponse[V]:
+        """Construct a successful response envelope.
 
         Args:
             data: Raw successful function result payload.
@@ -253,7 +362,7 @@ class StandardResponse[T]:
             timestamp_utc: Optional ISO 8601 UTC timestamp; defaults to current time.
 
         Returns:
-            A frozen StandardResponse instance with status 'success'.
+            A frozen ApiResponse instance with status 'success'.
         """
         resolved_ts = timestamp_utc if timestamp_utc is not None else _now_utc_iso()
         resolved_ext = dict(extensions) if extensions is not None else {}
@@ -265,13 +374,13 @@ class StandardResponse[T]:
             extensions=resolved_ext,
         )
         logger.info(
-            "StandardResponse.success emitted: message=%s duration_ms=%s request_id=%s",
+            "ApiResponse.ok emitted: message=%s duration_ms=%s request_id=%s",
             message,
             duration_ms,
             request_id,
             extra={"requirement": "FR-HOST-RESPONSE-SUCCESS-ENVELOPE"},
         )
-        return StandardResponse(
+        return ApiResponse(
             status="success",
             message=message,
             data=data,
@@ -280,7 +389,7 @@ class StandardResponse[T]:
         )
 
     @classmethod
-    def failure[V = None](
+    def _build_error[V = None](
         cls,
         message: str,
         error: StandardError,
@@ -291,22 +400,8 @@ class StandardResponse[T]:
         side_effects: bool = False,
         extensions: dict[str, Any] | None = None,
         timestamp_utc: str | None = None,
-    ) -> StandardResponse[V]:
-        """Construct an error standard response envelope.
-
-        Args:
-            message: Bounded human-readable failure summary.
-            error: Structured StandardError operation failure details.
-            data: Optional degraded or partial result payload.
-            request_id: Optional correlation or request identifier.
-            duration_ms: Optional execution duration in milliseconds.
-            side_effects: Whether this operation caused state mutations before failing.
-            extensions: Optional dictionary of auxiliary metadata.
-            timestamp_utc: Optional ISO 8601 UTC timestamp; defaults to current time.
-
-        Returns:
-            A frozen StandardResponse instance with status 'error'.
-        """
+    ) -> ApiResponse[V]:
+        """Construct an error response envelope."""
         resolved_ts = timestamp_utc if timestamp_utc is not None else _now_utc_iso()
         resolved_ext = dict(extensions) if extensions is not None else {}
         metadata = ResponseMetadata(
@@ -317,13 +412,13 @@ class StandardResponse[T]:
             extensions=resolved_ext,
         )
         logger.warning(
-            "StandardResponse.failure emitted: code=%s message=%s request_id=%s",
+            "ApiResponse.error emitted: code=%s message=%s request_id=%s",
             error.code,
             message,
             request_id,
             extra={"requirement": "FR-HOST-RESPONSE-ERROR-ENVELOPE"},
         )
-        return StandardResponse(
+        return ApiResponse(
             status="error",
             message=message,
             data=data,
@@ -332,17 +427,23 @@ class StandardResponse[T]:
         )
 
     def to_dict(self) -> dict[str, Any]:
-        """Serialize the standard response envelope to a dictionary.
+        """Serialize the response envelope to a dictionary.
 
         Returns:
             A plain dictionary representation suitable for JSON encoding.
         """
         logger.debug(
-            "StandardResponse.to_dict serialized: status=%s",
+            "ApiResponse.to_dict serialized: status=%s",
             self.status,
             extra={"requirement": "FR-HOST-RESPONSE-SERIALIZATION"},
         )
-        result = asdict(self)
+        result: dict[str, Any] = {
+            "status": self.status,
+            "message": self.message,
+            "data": _serialize_payload(self.data),
+            "error": asdict(self._error) if self._error is not None else None,
+            "metadata": asdict(self.metadata),
+        }
         if self.metadata.request_id is not None:
             result["request_id"] = self.metadata.request_id
         return result

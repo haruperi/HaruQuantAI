@@ -25,7 +25,7 @@ and multi-format export.
   is performed safely using `defusedxml.ElementTree.fromstring` to prevent
   XXE and XML entity expansion attacks (`S314` compliant).
 - `DEC-DATAMGR-ENVELOPE-PARITY`: Every HTTP endpoint in `routes.py` returns a
-  standardized `StandardResponse` JSON envelope (`{"status": "success", "data": ...}`)
+  standardized `ApiResponse` JSON envelope (`{"status": "success", "data": ...}`)
   matching the UI transport layer (`createDomainClient('/data')`).
 
 ### 1.2 Feature and Functional Requirements

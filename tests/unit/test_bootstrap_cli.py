@@ -302,25 +302,27 @@ def test_five_method_lifecycle_and_reconcile(tmp_path: Path) -> None:
 # ============================================================================
 
 
-def test_main_ui_server_lifespan_and_uvicorn_modes(tmp_path: Path) -> None:
+def test_main_ui_server_lifespan_and_uvicorn_modes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Verify app/main.py config resolution, FastAPI 7-stage lifespan, and Uvicorn."""
     data_dir = tmp_path / "main_ui_data"
     plugins_dir = data_dir / "plugins"
     _write_sample_plugin(plugins_dir)
 
-    cfg, args = resolve_main_config(
-        [
-            "--host",
-            "127.0.0.1",
-            "--port",
-            "8123",
-            "--debug",
-            "--data-dir",
-            str(data_dir),
-            "--plugins-dir",
-            str(plugins_dir),
-        ]
-    )
+    class _MockSettings:
+        def get(self, section: str, key: str, default: Any = None) -> Any:
+            mapping = {
+                ("app_general", "host"): "127.0.0.1",
+                ("app_general", "backend_port"): 8123,
+                ("config_troubleshooting", "debug_level_active"): True,
+                ("app_general", "data_dir"): str(data_dir),
+                ("app_general", "plugins_dir"): str(plugins_dir),
+                ("app_security", "require_auth"): False,
+            }
+            return mapping.get((section, key), default)
+
+    cfg, args = resolve_main_config([], settings_source=_MockSettings())
     assert cfg.host == "127.0.0.1"
     assert cfg.port == 8123
     assert cfg.debug is True
@@ -375,23 +377,17 @@ def test_main_ui_server_lifespan_and_uvicorn_modes(tmp_path: Path) -> None:
         calls.append({"target": target, **kwargs})
 
     rc_prod = run_server(
-        ["--host", "127.0.0.1", "--port", "8010", "--data-dir", str(data_dir)],
+        [],
+        settings_source=_MockSettings(),
         uvicorn_runner=_fake_uvicorn_run,
     )
     assert rc_prod == 0
     assert len(calls) == 1
-    assert calls[0]["port"] == 8010
+    assert calls[0]["port"] == 8123
 
     rc_reload = run_server(
-        [
-            "--host",
-            "127.0.0.1",
-            "--port",
-            "8011",
-            "--reload",
-            "--data-dir",
-            str(data_dir),
-        ],
+        ["--reload"],
+        settings_source=_MockSettings(),
         uvicorn_runner=_fake_uvicorn_run,
     )
     assert rc_reload == 0
@@ -400,11 +396,15 @@ def test_main_ui_server_lifespan_and_uvicorn_modes(tmp_path: Path) -> None:
     assert calls[1]["reload"] is True
     assert calls[1]["factory"] is True
 
-    # Default create_app() and main(["--check-only"])
+    # Default create_app() and main entrypoint
     default_app = create_app(config=cfg)
     assert default_app.title == cfg.title
     default_app.state.runtime.shutdown()
-    assert main_entrypoint(["--check-only"]) == 0
+
+    monkeypatch.setattr("uvicorn.run", _fake_uvicorn_run)
+    assert main_entrypoint(["--reload"]) == 0
+    assert len(calls) == 3
+    assert calls[2]["reload"] is True
 
 
 # ============================================================================
@@ -757,10 +757,10 @@ def test_headless_cli_runner_uninitialized_guards(tmp_path: Path) -> None:
     host = AppHost(data_dir=tmp_path, headless=True, use_process_pool=False)
     runner = HeadlessCliRunner(host)
 
-    with pytest.raises(RuntimeError, match="ResourceManager is not initialized"):
+    with pytest.raises(RuntimeError, match="ResourceMonitor is not initialized"):
         runner._cmd_health()
 
-    with pytest.raises(RuntimeError, match="ResourceManager is not initialized"):
+    with pytest.raises(RuntimeError, match="ResourceMonitor is not initialized"):
         runner._cmd_resources()
 
     with pytest.raises(RuntimeError, match="JobManager is not initialized"):

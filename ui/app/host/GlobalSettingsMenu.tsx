@@ -4,7 +4,7 @@ import { Button, Checkbox, Field, Modal, ProgressBar, Select, TextInput } from '
 import { useAppStore } from './store';
 import type { ConfigurationSettings, RemoteAccessSettings } from './types';
 import { applicationSkins, benchmarkResults, clampZoom, configurationTabs, safeRemoteSettings, validateConfiguration } from './globalSettings';
-import { HostSettingsPanel, UserAccessPanel } from './HostSettingsPanels';
+import { HostSettingsModal, UserAccessPanel } from './HostSettingsModal';
 import { useHostConnection } from './HostConnection';
 
 type DialogName = 'configuration' | 'benchmark' | 'remote' | 'mcp' | 'smtp' | 'notifications' | 'credentials' | 'advanced' | 'account' | 'exit' | null;
@@ -147,6 +147,6 @@ export function GlobalSettingsMenu() {
       <div className="settings-menu-group zoom-menu-row"><span><MonitorCog/>Zoom</span><button aria-label="Zoom out" onClick={() => { void saveSettings({ zoom: clampZoom(settings.zoom - .1) }); }}><Minus/></button><output>{Math.round(settings.zoom * 100)}%</output><button aria-label="Zoom in" onClick={() => { void saveSettings({ zoom: clampZoom(settings.zoom + .1) }); }}><Plus/></button><button aria-label="Toggle fullscreen" onClick={fullscreen}><Expand/></button></div>
       <div className="settings-menu-group">{item('Reload UI', <RefreshCw/>, () => window.location.reload())}{item('Exit', <LogOut/>, () => launch('exit'))}</div>
     </div>}
-    {dialog === 'configuration' && <ConfigurationDialog onClose={() => setDialog(null)}/>} {dialog === 'benchmark' && <BenchmarkDialog onClose={() => setDialog(null)}/>} {dialog === 'remote' && <RemoteDialog onClose={() => setDialog(null)}/>} {(dialog === 'mcp' || dialog === 'smtp' || dialog === 'notifications' || dialog === 'credentials' || dialog === 'advanced') && <HostSettingsPanel section={dialog} onClose={() => setDialog(null)}/>} {dialog === 'account' && <UserAccessPanel onClose={() => setDialog(null)}/>} {dialog === 'exit' && <ExitDialog onClose={() => setDialog(null)}/>}
+    {dialog === 'configuration' && <ConfigurationDialog onClose={() => setDialog(null)}/>} {dialog === 'benchmark' && <BenchmarkDialog onClose={() => setDialog(null)}/>} {dialog === 'remote' && <RemoteDialog onClose={() => setDialog(null)}/>} {(dialog === 'mcp' || dialog === 'smtp' || dialog === 'notifications' || dialog === 'credentials' || dialog === 'advanced') && <HostSettingsModal section={dialog} onClose={() => setDialog(null)}/>} {dialog === 'account' && <UserAccessPanel onClose={() => setDialog(null)}/>} {dialog === 'exit' && <ExitDialog onClose={() => setDialog(null)}/>}
   </div>;
 }

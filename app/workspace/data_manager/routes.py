@@ -37,7 +37,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from app.host.logging import get_logger
-from app.host.response import StandardResponse
+from app.host.response import ApiResponse
 from app.host.session import SessionManager, session_manager
 from app.host.transport import extract_bearer_token
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
@@ -107,9 +107,7 @@ class DataManagerWorkspace:
 
 
 def _success(data: Any, message: str = "Success") -> JSONResponse:
-    return JSONResponse(
-        content=StandardResponse.success(data=data, message=message).to_dict()
-    )
+    return JSONResponse(content=ApiResponse.ok(data=data, message=message).to_dict())
 
 
 def _register_home_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:
@@ -151,7 +149,7 @@ def create_data_manager_router(
             mgr: SessionManager = (
                 getattr(runtime, "session_manager", None) or effective_session_mgr
             )
-            if mgr.validate_token(token) is None:
+            if mgr.verify_session(token) is None:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid or expired session token.",

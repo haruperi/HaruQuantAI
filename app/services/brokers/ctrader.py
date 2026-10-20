@@ -390,7 +390,7 @@ class CTraderClient(TradingClient):
                     "access_token": self.access_token,
                     "refresh_token": self.refresh_token,
                 }
-                settings.update_batch(
+                settings.save_settings(
                     {"config_ctrader": patch}, expected_revision=expected_revision
                 )
             except Exception:

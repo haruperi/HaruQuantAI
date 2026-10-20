@@ -21,11 +21,11 @@ from pathlib import Path
 sys.path.insert(0, sys.argv[1])
 from app.host import persistence
 persistence.DEFAULT_DATABASE_PATH = Path(sys.argv[2])
-from app.host.settings import HostSettings, settings_catalogue, _set_field
+from app.host.settings import SettingsManager, settings_catalogue, _set_field
 from app.host.session import hash_password
 from app.host.bootstrap import create_host_app, HostRuntime
 import uvicorn
-target = HostSettings(sys.argv[2], data_dir=Path(sys.argv[2]).parent / 'data')
+target = SettingsManager(sys.argv[2], data_dir=Path(sys.argv[2]).parent / 'data')
 seed = {}
 for field in settings_catalogue(target.get_snapshot())['fields']:
     if field['group'] == 'connect_remote':

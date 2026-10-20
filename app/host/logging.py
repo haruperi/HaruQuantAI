@@ -10,7 +10,7 @@ Description:
     error boundary preventing logging failures from impacting callers, exact
     millisecond-precision log event formatting with console ANSI colorization,
     automatic SHA-256 secret fingerprints and a bounded log callback for SSE/WS,
-    an in-memory live ring buffer projected to the DebugConsole, BoundLogger with
+    an in-memory live ring buffer projected to the DebugConsole, TelemetryLogger with
     context accumulation, request correlation context, and lazy bootstrapping
     with zero import-time side-effects.
 
@@ -37,7 +37,7 @@ Key Capabilities:
       Associated: `LogRingBuffer`, `RingBufferHandler`, `get_ring_buffer()`
       Logging: DEBUG on ring buffer query and capacity truncation.
     - FR-HOST-TELEMETRY-BOUND-LOGGER: Bound Logger & Facade.
-      Associated: `BoundLogger`, `get_logger()`, `get_access_logger()`
+      Associated: `TelemetryLogger`, `get_logger()`, `get_access_logger()`
       Logging: DEBUG on dynamic context binding.
     - FR-HOST-TELEMETRY-CORRELATION: Request Correlation Context.
       Associated: `set_correlation_id()`, `get_correlation_id()`
@@ -92,6 +92,7 @@ from typing import Any, override
 
 __all__ = [
     "DEFAULT_RING_BUFFER_CAPACITY",
+    "TelemetryLogger",
     "fingerprint_secret",
     "flush_logs",
     "get_access_logger",
@@ -567,7 +568,7 @@ def get_ring_buffer() -> LogRingBuffer:
 # ============================================================================
 
 
-class BoundLogger(logging.LoggerAdapter[logging.Logger]):
+class TelemetryLogger(logging.LoggerAdapter[logging.Logger]):
     """Logger adapter providing dynamic context binding and structured tags."""
 
     def __init__(
@@ -575,7 +576,7 @@ class BoundLogger(logging.LoggerAdapter[logging.Logger]):
         logger: logging.Logger,
         extra: Mapping[str, Any] | None = None,
     ) -> None:
-        """Initialize BoundLogger with underlying logger and contextual extra dict."""
+        """Initialize TelemetryLogger with logger and contextual extra dict."""
         super().__init__(logger, dict(extra) if extra is not None else {})
 
     @property
@@ -583,10 +584,19 @@ class BoundLogger(logging.LoggerAdapter[logging.Logger]):
         """Return a copy of the bound context attributes."""
         return dict(self.extra) if self.extra is not None else {}
 
-    def bind(self, **kwargs: Any) -> BoundLogger:
-        """Return a new BoundLogger instance with merged contextual attributes."""
+    def bind(self, **kwargs: Any) -> TelemetryLogger:
+        """Return a new TelemetryLogger instance with merged contextual attributes."""
         merged: dict[str, Any] = {**self.context, **kwargs}
-        return BoundLogger(self.logger, merged)
+        return TelemetryLogger(self.logger, merged)
+
+    def emit(self, level: int | str, msg: Any, *args: Any, **kwargs: Any) -> None:
+        """Route structured log event across sinks with secret redaction."""
+        lvl = (
+            getattr(logging, level.upper(), logging.INFO)
+            if isinstance(level, str)
+            else level
+        )
+        self.log(lvl, msg, *args, **kwargs)
 
     @override
     def process(
@@ -608,14 +618,14 @@ class BoundLogger(logging.LoggerAdapter[logging.Logger]):
         return msg, kwargs
 
 
-def get_logger(name: str) -> BoundLogger:
-    """Return standard BoundLogger for module with dynamic context binding support."""
+def get_logger(name: str) -> TelemetryLogger:
+    """Return standard TelemetryLogger with dynamic context binding support."""
     _ensure_bootstrapped()
-    return BoundLogger(logging.getLogger(name))
+    return TelemetryLogger(logging.getLogger(name))
 
 
-def get_access_logger() -> BoundLogger:
-    """Return specialized BoundLogger routing events to data/logs/access.log."""
+def get_access_logger() -> TelemetryLogger:
+    """Return specialized TelemetryLogger routing events to data/logs/access.log."""
     _ensure_bootstrapped()
     return get_logger("haruquantai.access")
 

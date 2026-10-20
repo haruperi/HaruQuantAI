@@ -5,7 +5,7 @@ Description:
     asynchronous telemetry engine worker, Windows-safe 10MB rotation, recursive
     secret redaction across composite structures, machine path normalization,
     safe error boundary, millisecond-precision log event formatting with ANSI
-    colorization, thread-safe in-memory ring buffer operations, BoundLogger
+    colorization, thread-safe in-memory ring buffer operations, TelemetryLogger
     context accumulation, request correlation context, and system health
     diagnostic probes (database, storage, and hardware via psutil).
 
@@ -81,9 +81,9 @@ from app.host.logging import (
     LOG_BACKUP_COUNT,
     MAX_LOG_FILE_BYTES,
     SINKS_FR,
-    BoundLogger,
     LogEventFormatter,
     LogRingBuffer,
+    TelemetryLogger,
     WindowsSafeRotatingFileHandler,
     fingerprint_secret,
     flush_logs,
@@ -107,10 +107,10 @@ from app.host.resources import (
     BenchmarkRunner,
     apply_cpu_affinity,
     calculate_worker_allocation,
-    get_system_health,
     get_worker_capacity,
     inspect_cpu_affinity,
     inspect_gpu_qualification,
+    inspect_resources,
     inspect_workspace_directories,
     probe_cpu,
     probe_database,
@@ -383,7 +383,7 @@ def test_diagnostics_probes(
     assert hw_probe.ram_available_bytes > 0
     assert 0.0 <= hw_probe.ram_used_pct <= 100.0
 
-    health_healthy = get_system_health(root_path=tmp_path)
+    health_healthy = inspect_resources(root_path=tmp_path)
     assert health_healthy.status == "HEALTHY"
     report_dict = health_healthy.to_dict()
     assert report_dict["status"] == "HEALTHY"
@@ -392,7 +392,7 @@ def test_diagnostics_probes(
     assert "hardware" in report_dict
 
     monkeypatch.setattr(HostPersistence, "DEFAULT_DB_PATH", tmp_path / "nonexistent.db")
-    health_degraded = get_system_health(root_path=tmp_path)
+    health_degraded = inspect_resources(root_path=tmp_path)
     assert health_degraded.status == "DEGRADED"
 
     assert any(
@@ -407,10 +407,10 @@ def test_bound_logger_dynamic_context(tmp_path: Path) -> None:
     setup_logging(logs_dir, level=logging.DEBUG, async_engine=False)
 
     base_logger = get_logger("haruquantai.bound_test")
-    assert isinstance(base_logger, BoundLogger)
+    assert isinstance(base_logger, TelemetryLogger)
 
     session_logger = base_logger.bind(session_id="sess-001", user="trader1")
-    assert isinstance(session_logger, BoundLogger)
+    assert isinstance(session_logger, TelemetryLogger)
     assert session_logger.context["session_id"] == "sess-001"
     assert session_logger.context["user"] == "trader1"
 
@@ -420,6 +420,8 @@ def test_bound_logger_dynamic_context(tmp_path: Path) -> None:
     assert trade_logger.context["order_id"] == "ord-99"
 
     trade_logger.info("Order executed successfully")
+    trade_logger.emit("INFO", "Emitted structured telemetry")
+    trade_logger.emit(logging.INFO, "Emitted int level telemetry")
     flush_logs()
 
     app_log = logs_dir / "app.log"

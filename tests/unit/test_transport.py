@@ -9,9 +9,9 @@ from typing import Any
 import pytest
 from app.host.persistence import HostPersistence
 from app.host.response import (
+    ApiResponse,
     ResponseMetadata,
     StandardError,
-    StandardResponse,
 )
 from app.host.session import SessionManager, hash_password
 from app.host.transport import (
@@ -54,8 +54,8 @@ def _create_isolated_session_manager(tmp_path: Path | None = None) -> SessionMan
 
 
 def test_standard_response_and_error_invariants() -> None:
-    """Verify StandardResponse success, failure, unwrap, and errors."""
-    ok = StandardResponse.success(
+    """Verify ApiResponse success, failure, unwrap, and errors."""
+    ok = ApiResponse.ok(
         data={"symbol": "EURUSD"},
         message="Fetched",
         request_id="req-100",
@@ -79,7 +79,7 @@ def test_standard_response_and_error_invariants() -> None:
         details={"retry_in": 5},
         retryable=True,
     )
-    fail: StandardResponse[dict[str, Any]] = StandardResponse.failure(
+    fail: ApiResponse[dict[str, Any]] = ApiResponse.error(
         message="Operation failed",
         error=err,
         request_id="req-101",
@@ -104,7 +104,7 @@ def test_standard_response_and_error_invariants() -> None:
 
     meta = ResponseMetadata(timestamp_utc="2026-01-01T00:00:00Z")
     with pytest.raises(ValueError, match="Invalid status"):
-        StandardResponse(
+        ApiResponse(
             status="invalid",  # type: ignore[arg-type]
             message="m",
             data=None,
@@ -112,7 +112,7 @@ def test_standard_response_and_error_invariants() -> None:
             metadata=meta,
         )
     with pytest.raises(ValueError, match="must not contain an error"):
-        StandardResponse(
+        ApiResponse(
             status="success",
             message="m",
             data=None,
@@ -120,7 +120,7 @@ def test_standard_response_and_error_invariants() -> None:
             metadata=meta,
         )
     with pytest.raises(ValueError, match="must contain a StandardError"):
-        StandardResponse(
+        ApiResponse(
             status="error",
             message="m",
             data=None,
@@ -128,7 +128,7 @@ def test_standard_response_and_error_invariants() -> None:
             metadata=meta,
         )
     with pytest.raises(TypeError, match="instance of StandardError"):
-        StandardResponse(
+        ApiResponse(
             status="error",
             message="m",
             data=None,
@@ -147,9 +147,9 @@ def test_sensitive_routes_require_session_and_scope(
 ) -> None:
     from unittest.mock import Mock
 
-    from app.host.settings import HostSettings
+    from app.host.settings import SettingsManager
 
-    config = HostSettings()
+    config = SettingsManager()
     config.reload()
     monkeypatch.setattr("app.host.transport.settings", config)
     sessions = SessionManager()
@@ -542,12 +542,12 @@ def test_transport_cli_main(capsys: pytest.CaptureFixture[str]) -> None:
 def test_gateway_settings_diagnostics_and_jobs_routes(tmp_path: Path) -> None:
     """Verify /api/v1/auth, /api/v1/settings, /api/v1/diagnostics, and /api/v1/jobs."""
     from app.host.jobs import JobManager
-    from app.host.resources import ResourceManager
+    from app.host.resources import ResourceMonitor
     from app.host.settings import settings as host_settings
 
     host_settings.reload()
     sess_mgr = SessionManager(host_instance_id="gov-host-01")
-    res_mgr = ResourceManager(scratch_root=tmp_path / "scratch")
+    res_mgr = ResourceMonitor(scratch_root=tmp_path / "scratch")
     job_mgr = JobManager(
         resource_mgr=res_mgr,
         use_process_pool=False,

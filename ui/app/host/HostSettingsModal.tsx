@@ -29,7 +29,7 @@ function initialDraft(catalogue: SettingsCatalogue): Record<string, string | boo
     field.kind === 'bool' ? Boolean(field.value) : field.kind === 'list' ? JSON.stringify(field.value) : String(field.value ?? '')]));
 }
 
-export function HostSettingsPanel({ section, onClose }: { section: Exclude<HostSettingsSection, 'account'>; onClose: () => void }) {
+export function HostSettingsModal({ section, onClose }: { section: Exclude<HostSettingsSection, 'account'>; onClose: () => void }) {
   const config = sections[section];
   const [group, setGroup] = useState(config.tabs[0][1]);
   const [catalogue, setCatalogue] = useState<SettingsCatalogue | null>(null);

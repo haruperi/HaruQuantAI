@@ -18,7 +18,7 @@ Key Capabilities:
       Associated: `hash_password()`, `verify_password()`
       Logging: INFO on verification success; WARNING on invalid credentials.
     - FR-HOST-SESSION-LIFECYCLE: Create, validate, expire, and revoke opaque tokens.
-      Associated: `SessionManager.create_session()`, `SessionManager.validate_token()`,
+      Associated: `SessionManager.create_session()`, `SessionManager.verify_session()`,
       `SessionManager.revoke_session()`
       Logging: INFO on session creation and revocation; WARNING on expired tokens.
     - FR-HOST-SESSION-PERSISTENCE: Store session digests in host_session SQLite table.
@@ -41,7 +41,7 @@ Python API Usage:
 
     # Session lifecycle
     token, session = session_manager.create_session("admin", "peer-1")
-    validated = session_manager.validate_token(token)
+    validated = session_manager.verify_session(token)
     assert validated is not None
     session_manager.revoke_session(session.session_id)
     ```
@@ -291,11 +291,14 @@ class SessionManager:
         )
         return raw_token, record
 
-    def validate_token(self, raw_token: str) -> SessionRecord | None:
+    def verify_session(
+        self, raw_token: str, *, required_scope: str | None = None
+    ) -> SessionRecord | None:
         """Validate raw opaque token, verifying expiration and active status.
 
         Args:
             raw_token: 64-character bearer token supplied by caller.
+            required_scope: Optional permission scope to authorize.
 
         Returns:
             Active SessionRecord if valid, None if expired, revoked, or unknown.
@@ -356,6 +359,8 @@ class SessionManager:
             return None
 
         self._active_sessions[token_hash] = record
+        if required_scope is not None and not self.authorize(record, required_scope):
+            return None
         return record
 
     def revoke_session(self, session_id: str) -> bool:
@@ -489,7 +494,7 @@ def main() -> None:
     )
 
     print("4. Validating opaque token...")
-    validated = mgr.validate_token(token)
+    validated = mgr.verify_session(token)
     if validated is None:
         raise RuntimeError("Token validation unexpectedly returned None.")
     print(
@@ -505,7 +510,7 @@ def main() -> None:
     print("6. Revoking session...")
     revoked = mgr.revoke_session(record.session_id)
     print(f"   Session revoked: {revoked}")
-    if mgr.validate_token(token) is not None:
+    if mgr.verify_session(token) is not None:
         raise RuntimeError("Revoked token unexpectedly validated.")
     print("   Validated post-revocation token returns None as expected.")
 

@@ -459,9 +459,9 @@ class HostPersistence:
         if limit is None:
             return ""
         return (
-            f" LIMIT {int(limit)} OFFSET {int(offset)}"
+            f" LIMIT {limit} OFFSET {offset}"
             if offset is not None
-            else f" LIMIT {int(limit)}"
+            else f" LIMIT {limit}"
         )
 
     @classmethod

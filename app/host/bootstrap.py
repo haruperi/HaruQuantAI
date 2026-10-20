@@ -16,7 +16,7 @@ Key Capabilities:
       inspect workspace directory paths, initialize telemetry, and build FastAPI.
     - FR-HOST-BOOT-PERSISTENCE-STAGE: Initialize SQLite WAL persistence, verify
       all 25 operational database tables, and reload host settings.
-    - FR-HOST-BOOT-MODULE-REGISTRATION: Register SessionManager, ResourceManager,
+    - FR-HOST-BOOT-MODULE-REGISTRATION: Register SessionManager, ResourceMonitor,
       JobManager with orphan recovery, PluginLifecycleManager, and routes.
     - FR-HOST-BOOT-EVENT-BROADCAST: Broadcast events across the EventBus and
       transition the host to READY when publishing system/host.ready.
@@ -300,7 +300,7 @@ class AppHost:
         self.app: FastAPI | None = None
         self.event_bus: _tr.EventBus = kw.get("event_bus") or _tr.get_global_event_bus()
         self.session_manager: SessionManager | None = kw.get("session_mgr")
-        self.resource_manager: _res.ResourceManager | None = kw.get("resource_mgr")
+        self.resource_manager: _res.ResourceMonitor | None = kw.get("resource_mgr")
         self.job_manager: JobManager | None = kw.get("job_mgr")
         self.plugin_manager: _disc.PluginLifecycleManager | None = kw.get("plugin_mgr")
         self.broker_registry: Any | None = kw.get("broker_registry")
@@ -698,10 +698,8 @@ class AppHost:
         brokers_dir = Path(__file__).resolve().parents[1] / "services" / "brokers"
         if brokers_dir.exists():
             search_dirs.append(brokers_dir)
-        engine = _disc.PluginDiscoveryEngine(
-            search_dirs=search_dirs, slot_registry=slot_reg
-        )
-        engine.discover()
+        engine = _disc.PluginDiscovery(search_dirs=search_dirs, slot_registry=slot_reg)
+        engine.discover_plugins()
 
         def _broker_factory(plugin_id: str, record: Any, ctx: Any) -> Any:
             del ctx
@@ -782,7 +780,7 @@ class AppHost:
                 host_instance_id=self.host_instance_id
             )
         if self.resource_manager is None:
-            self.resource_manager = _res.ResourceManager(
+            self.resource_manager = _res.ResourceMonitor(
                 min_available_ram_pct=self.config.min_available_ram_pct,
                 scratch_root=self.config.resolved_scratch_root,
             )
