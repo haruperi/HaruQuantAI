@@ -99,10 +99,8 @@ _P: Final = "FR-HOST-TRANSPORT-"
 FR_MW, FR_EX, FR_BUS = f"{_P}MIDDLEWARE", f"{_P}EXCEPTION-ENVELOPE", f"{_P}EVENT-BUS"
 FR_SSE, FR_WS, FR_AUTH = f"{_P}SSE-STREAMING", f"{_P}WS-STREAMING", f"{_P}SESSION-AUTH"
 FR_APP, CONNECTION_TEST_FR = f"{_P}GATEWAY-APP", f"{_P}CONNECTION-TEST"
-SERVLET_CONNECTION_FR, SERVLET_CONSTANTS_FR = (
-    f"{_P}SERVLET-CONNECTION",
-    f"{_P}SERVLET-CONSTANTS",
-)
+SERVLET_CONNECTION_FR = f"{_P}SERVLET-CONNECTION"
+SERVLET_CONSTANTS_FR = f"{_P}SERVLET-CONSTANTS"
 _SEC_HEADERS: Final = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -129,9 +127,8 @@ def _now_utc_iso() -> str:
 def _format_iso_expiry(expires_at_utc: str) -> str:
     with suppress(ValueError):
         if "T" not in expires_at_utc:
-            return (
-                datetime.fromisoformat(expires_at_utc).replace(tzinfo=UTC).isoformat()
-            )
+            dt = datetime.fromisoformat(expires_at_utc)
+            return dt.replace(tzinfo=UTC).isoformat()
     return expires_at_utc
 
 
@@ -402,9 +399,8 @@ class TransportMiddleware:
                 "X-Response-Time-Ms": f"{dur:.2f}",
                 **_SEC_HEADERS,
             }
-            await JSONResponse(status_code=500, content=r.to_dict(), headers=h)(
-                scope, receive, send
-            )
+            res = JSONResponse(status_code=500, content=r.to_dict(), headers=h)
+            await res(scope, receive, send)
 
 
 def register_transport_exception_handlers(app: FastAPI) -> None:
@@ -429,9 +425,8 @@ def register_transport_exception_handlers(app: FastAPI) -> None:
             )
             for i in exc.errors()
         ]
-        res = _err(
-            request, 422, "VALIDATION_ERROR", "Validation error.", {"issues": issues}
-        )
+        det = {"issues": issues}
+        res = _err(request, 422, "VALIDATION_ERROR", "Validation error.", det)
         payload = json.loads(bytes(res.body).decode("utf-8"))
         payload["error"]["issues"] = issues
         _warn(FR_EX, f"ValidationError on {request.url.path} ({len(issues)} issues).")
@@ -508,10 +503,8 @@ class ConnectionTest:
                 r_err = str(err)
         _info(CONNECTION_TEST_FR, f"Diagnosed {host}: dns={dns_ok} reachable={ok}.")
         d = _dct(host=host, port=p_port, dns_resolved=dns_ok, reachable=ok)
-        return {
-            **d,
-            **_dct(ip_addresses=ips, dns_error=dns_err, connection_error=r_err),
-        }
+        d |= _dct(ip_addresses=ips, dns_error=dns_err, connection_error=r_err)
+        return d
 
 
 class ServletConnection:
@@ -593,10 +586,8 @@ class ServletConstants:
         hid = self.session_mgr.host_instance_id
         d = _dct(application="HaruQuantAI", version="1.0.0", runtime=rt)
         d |= _dct(host_instance_id=hid, build_timestamp="2026-10-18T00:00:00Z")
-        d |= _dct(
-            data_directory=str(Path.cwd() / "data"),
-            core_channels=list(CORE_EVENT_CHANNELS),
-        )
+        d |= _dct(data_directory=str(Path.cwd() / "data"))
+        d |= _dct(core_channels=list(CORE_EVENT_CHANNELS))
         return {**d, "supported_timeframes": list(SUPPORTED_TIMEFRAMES)}
 
     def get_system_specs(self) -> _Pld:
@@ -616,9 +607,8 @@ class TransportGatewayService:
 
     def __init__(self, **kw: Any) -> None:
         self.event_bus: EventBus = kw.get("event_bus") or get_global_event_bus()
-        self.session_mgr: _sess.SessionManager = (
-            kw.get("session_mgr") or _sess.session_manager
-        )
+        sm = kw.get("session_mgr") or _sess.session_manager
+        self.session_mgr: _sess.SessionManager = sm
         self.resource_mgr, self.job_mgr = kw.get("resource_mgr"), kw.get("job_mgr")
         self.password_hash: str | None = kw.get("password_hash")
         self.require_auth: bool = bool(kw.get("require_auth", False))
@@ -643,9 +633,8 @@ class TransportGatewayService:
         if request.method == "GET":
             if (rec := self._verify_session(request)) is None:
                 _warn(FR_AUTH, "Unauthorized /sessions/me call.")
-                return _err(
-                    request, 401, "UNAUTHORIZED", "Valid session token required."
-                )
+                msg = "Valid session token required."
+                return _err(request, 401, "UNAUTHORIZED", msg)
             _info(FR_AUTH, f"Verified active session '{rec.session_id}'.")
             d = {**rec.to_dict(), "expires_at": _format_iso_expiry(rec.expires_at_utc)}
             return _ok(request, d, "Active session verified.")
@@ -674,10 +663,8 @@ class TransportGatewayService:
             data: Any = _dct(acknowledged=True, host_instance_id=hid)
         elif p.endswith("/publish"):
             b, fx = await _jbody(request), True
-            ch, et = (
-                str(b.get("channel") or "system"),
-                str(b.get("event_type") or "update"),
-            )
+            ch = str(b.get("channel") or "system")
+            et = str(b.get("event_type") or "update")
             pld = b["payload"] if isinstance(b.get("payload"), dict) else {}
             data = eb.publish(ch, et, pld).model_dump()
         elif p.endswith(("/about", "/constants")):
@@ -685,9 +672,8 @@ class TransportGatewayService:
         elif p.endswith("/specs"):
             data = self.constants_servlet.get_system_specs()
         elif p.endswith("/channels"):
-            d = _dct(
-                core_channels=list(CORE_EVENT_CHANNELS), active_channels=eb.channels
-            )
+            cc = list(CORE_EVENT_CHANNELS)
+            d = _dct(core_channels=cc, active_channels=eb.channels)
             data = {**d, "current_cursor": eb.current_cursor}
         elif p.endswith("/snapshot"):
             qp = request.query_params
@@ -697,11 +683,8 @@ class TransportGatewayService:
             up = round(max(0.0, time.monotonic() - self.started_at), 3)
             d = _dct(state="READY", is_ready=True, version="1.0.0", uptime_seconds=up)
             d |= _dct(cpu_count=max(1, os.cpu_count() or 1), host_instance_id=hid)
-            data = {
-                **d,
-                "app_loaded": self.app_loaded_acknowledged,
-                "channels": eb.channels,
-            }
+            d |= _dct(app_loaded=self.app_loaded_acknowledged, channels=eb.channels)
+            data = d
         return _ok(request, data, fx=fx)
 
     def _require_scope(self, request: Request, scope: str) -> JSONResponse | None:
@@ -724,17 +707,14 @@ class TransportGatewayService:
                 rev = settings.update_batch(b.settings, expected_revision=b.revision)
             except RevisionConflictError as exc:
                 _warn(FR_APP, f"Settings revision conflict: {exc}")
-                det = _dct(
-                    expected_revision=exc.expected_revision,
-                    current_revision=exc.current_revision,
-                )
+                er, cr = exc.expected_revision, exc.current_revision
+                det = _dct(expected_revision=er, current_revision=cr)
                 return _err(request, 409, "REVISION_CONFLICT", str(exc), det)
             pld = _dct(revision=rev, scopes=sorted(b.settings.keys()))
             self.event_bus.publish("settings.changed", "updated", pld)
         s_dict = redact_secrets(settings.as_dict())
-        return _ok(
-            request, _dct(revision=settings.revision, settings=s_dict), fx=is_put
-        )
+        d = _dct(revision=settings.revision, settings=s_dict)
+        return _ok(request, d, fx=is_put)
 
     async def _conn_route(
         self, request: Request, connection_id: str | None = None
@@ -750,9 +730,8 @@ class TransportGatewayService:
         if request.method == "DELETE":
             if not cs.delete_connection(connection_id or ""):
                 return _err(request, 404, "NOT_FOUND", "Connection not found.")
-            return _ok(
-                request, _dct(connection_id=connection_id, deleted=True), fx=True
-            )
+            d = _dct(connection_id=connection_id, deleted=True)
+            return _ok(request, d, fx=True)
         body = await _jbody(request)
         if request.url.path.endswith("/test"):
             cid = connection_id or body.get("connection_id")
@@ -977,7 +956,7 @@ def create_host_app(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """CLI entrypoint for verifying the host EventBus and transport gateway."""
+    """CLI entrypoint for verifying EventBus and ConnectionTest diagnostics."""
     p = argparse.ArgumentParser(prog="app.host.transport")
     p.add_argument("--test-bus", action="store_true")
     args, bus = p.parse_args(argv), EventBus()
@@ -986,10 +965,23 @@ def main(argv: Sequence[str] | None = None) -> int:
             bus.publish(ch, "self_test", {"channel": ch, "ok": True})
         out: Any = bus.get_snapshot("*").model_dump()
     else:
+        with socket.create_server(("127.0.0.1", 0)) as srv:
+            port = int(srv.getsockname()[1])
+            loc = f"127.0.0.1:{port}"
+            ct = _dct(
+                ping_local=ConnectionTest.ping_endpoint(loc, timeout=0.5),
+                ping_remote=ConnectionTest.ping_endpoint("https://1.1.1.1", 0.5),
+                latency=ConnectionTest.check_latency(loc, samples=3, timeout=0.5),
+                diagnostics=ConnectionTest.diagnose_network("127.0.0.1", port),
+                diagnostics_failure=ConnectionTest.diagnose_network(
+                    "invalid.haruquantai.local", 80
+                ),
+            )
         out = _dct(
             core_channels=list(CORE_EVENT_CHANNELS),
             ring_capacity=bus.ring_capacity,
             max_queue_size=bus.max_queue_size,
+            connection_test=ct,
         )
     sys.stdout.write(json.dumps(out, indent=2) + "\n")
     return 0

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -520,14 +521,22 @@ def test_websocket_streaming_and_commands(tmp_path: Path) -> None:
 
 
 def test_transport_cli_main(capsys: pytest.CaptureFixture[str]) -> None:
-    """Verify standalone CLI main() execution."""
+    """Verify standalone CLI main() execution including ConnectionTest checks."""
     assert main(["--test-bus"]) == 0
     out_test = capsys.readouterr().out
     assert "settings.changed" in out_test
 
     assert main([]) == 0
-    out_default = capsys.readouterr().out
+    out_default = json.loads(capsys.readouterr().out)
     assert "core_channels" in out_default
+    conn_test = out_default["connection_test"]
+    assert conn_test["ping_local"]["reachable"] is True
+    assert "reachable" in conn_test["ping_remote"]
+    assert conn_test["latency"]["samples"] == 3
+    assert conn_test["latency"]["packet_loss_pct"] == 0.0
+    assert conn_test["diagnostics"]["dns_resolved"] is True
+    assert conn_test["diagnostics"]["reachable"] is True
+    assert conn_test["diagnostics_failure"]["dns_resolved"] is False
 
 
 def test_gateway_settings_diagnostics_and_jobs_routes(tmp_path: Path) -> None:
