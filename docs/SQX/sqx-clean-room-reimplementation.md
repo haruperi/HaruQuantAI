@@ -1,6 +1,6 @@
 # Quantitative Workstation — Greenfield Clean-Room Architecture & Reimplementation Blueprint
 
-This document is the **authoritative greenfield clean-room master blueprint** for reimplementing the quantitative trading workstation from scratch. It unites:
+This document is the **greenfield clean-room implementation blueprint** for the quantitative research workstation. Repository authority remains with [AGENTS.md](../../AGENTS.md), [PROJECT.md](../PROJECT.md), [ARCHITECTURE.md](../ARCHITECTURE.md), and owning capability contracts. The REA reconciliation supplies missing behavioral requirements and evidence limits; it does not register implementations or replace approved runtime APIs. It unites:
 
 1. **Section 0 — Greenfield Engineering Guardrails, Line-Count Budgets & DRY Rules** (`<= 100` line docstrings, `1,000` line hard file cutoff, zero backward-compatibility aliases, AI-tool-ready methods, and repository-wide DRY deduplication).
 2. **Complete 3-Tier Spatial Project & File Structure** (`app/host/`, `app/services/`, `app/workspace/`, `app/plugins/`, `ui/app/`).
@@ -27,6 +27,8 @@ This document is the **authoritative greenfield clean-room master blueprint** fo
 - **Platform:** Windows first
 
 ---
+
+<a id="sqx-section-0"></a>
 
 ## 0. Greenfield Clean-Room Engineering Guardrails & DRY Architecture Rules
 
@@ -83,19 +85,316 @@ To eliminate duplication and maintain strict modular boundaries across the codeb
 
 ---
 
+<a id="sqx-evidence"></a>
+
+### 0.5 Evidence, authority and implementation status
+
+Reconciliation date: **20 October 2026**. Sources are the retained REA reports
+and registries in [the source register](#sqx-sources), not newly observed product
+runs. Installed-product claims retain their source tags (`DOC`, `UI`, `CONFIG`,
+`BINARY`, `LOG`, `INFERRED`) and High/Med/Low confidence. Static source,
+configuration and metadata inspection is not a live UI observation. A path or
+class name establishes presence/reference only; ownership inside the eight opaque
+`.jar.enc` files, active loading, licensing and numerical behavior remain unknown.
+[R00], [R01], [R02]
+
+Every contract imported from REA Stage 4/5 below is **proposed target design
+[INFERRED] Med**, unless explicitly described as an observed artifact fact.
+Approving this documentation update does not approve a runtime API/schema change,
+register a capability, adopt a dependency, or certify original-system parity.
+Repository authority and future owning implementation plans govern adoption.
+The 82 detailed task blocks and their six metadata fields remain the work catalog.
+Their 454 FR checkboxes (33 checked, 421 unchecked at this audit) retain historical
+state; this review does not requalify those completions. Estimated line budgets
+are design goals, not measurements of existing files.
+
+`Donor:` paths under `C:\SQX-145\` remain provenance locators as requested.
+Parenthesized package names beside opaque archives are reference hints, not
+verified class ownership. Implementation uses the approved neutral specification;
+it must not copy donor algorithms, original templates, source bodies, branding,
+icons or UI prose. The original installation and retained investigation workspace
+remain read-only. No runtime Java ABI or arbitrary original HTML/Java extension
+is loaded into the product. [R02], [R10]
+
+The logical `domain.*` names in the REA design describe responsibilities, not a
+new package tree to introduce here. Map them to framework-independent
+`app/services/` and workspace coordinators within the existing three tiers;
+FastAPI/Pydantic, Arrow, SQLite and broker SDKs remain at adapters. SQL, schema,
+transactions and retention remain under `HostPersistence`; no worker/plugin gains
+ad-hoc SQL authority. `PROJECT.md` retains wider optional remote compute, neural,
+AI, marketplace/business and authorized execution scope. REA MVP exclusions are
+reference-profile decisions, not deletion of that product scope. [R07], [R09]
+
+<a id="sqx-host-contracts"></a>
+
+### 0.6 Durable work, ownership and cancellation contracts
+
+Owners: [host jobs/persistence](#sqx-section-1), with domain work in services and
+workflow coordination in [Custom Projects](#sqx-section-12). Current local code
+has seven uppercase job states (`QUEUED`, `RUNNING`, `PAUSED`, `COMPLETED`,
+`FAILED`, `CANCELLED`, `INTERRUPTED`); `app/host/events.py` provides bounded
+in-memory replay. The following twelve-state model and transactional event store
+are proposed gaps to implement under a separate approved feature plan, not
+existing guarantees. Existing `JobManager.submit_job` accepts a callable and
+returns `JobRecord`, unlike the retained blueprint signature. Preserve working
+APIs until explicitly reconciled; do not add compatibility aliases. [R07], [R08]
+
+| Contract | Proposed required behavior |
+| --- | --- |
+| Durable acceptance | Validate capability, frozen inputs/settings, dependencies and idempotency; acknowledge only after job/command/event transaction commits. Full bounded admission returns retryable failure before acceptance. |
+| Single workspace owner | Exclusive OS ownership lock, one scheduler epoch, one coordinated SQLite writer; bounded reads off the async event loop. Spawn import-safe workers on Windows; no live connection/SDK handle crosses process boundaries. |
+| Attempts and fencing | Immutable job specification; append-only attempts with unique fence token, epoch, heartbeat and lease. Reject stale worker progress/checkpoints/results. Verify process identity/quiescence before releasing exclusive resources; historical PID alone is insufficient. |
+| Scheduling | Dependency-cycle validation, finite budgets, priority plus project fairness/aging, CPU/memory/I/O reservations and adapter exclusivity. Coordinator workflows/waits consume no numerical worker slot. Internal Numba/BLAS/Arrow threads count toward admission. |
+| State model | `queued`, `blocked`, `retry_wait`, `running`, `waiting`, `pause_requested`, `paused`, `cancel_requested`, `succeeded`, `failed`, `cancelled`, `interrupted`; last four terminal. Persist state version and previous scheduling/wait context. |
+| Command outcome | `pause`, `resume`, `cancel`, `continue`, `retry` carry expected version and idempotency key; persist accepted/acknowledged/failed/superseded outcome. Request acknowledgment is distinct from paused/cancelled completion. |
+| Pause/resume | Running work reaches a safe, compatible checkpoint and verified quiescence before `paused`; resume starts a new fenced attempt with the same logical experiment seeds. Pause timeout fails the command and restores running unless superseded. |
+| Cancel/complete race | Writer transaction decides order: completion committed first conflicts with cancel; cancel committed first fences later outputs. Check ancestor cancellation during descendant publication in that same transaction. |
+| Recovery/retry | Preserve accepted child outputs and partial counts. Interrupted attempts never imply success; checkpoint/model/data/settings mismatch rejects resume. Retry transient pure work within policy; unknown external outcomes require reconciliation, not automatic replay. |
+| Workflows | Freeze graph/settings/bindings, stable task IDs and activation ordinals. Commit next activation with cursor advancement; explicit loop budget and handler policy. User continuation differs from resume; file waits retain grant and freshness baseline across restart. |
+
+Proposed ledger families are `scheduler_sessions`, `jobs`, `job_dependencies`,
+`job_attempts`, `job_commands`, `idempotency_keys`, `job_work_units`,
+`job_checkpoints`, `job_outputs`, `job_resolved_inputs`, `resource_leases`,
+`workflow_runs`, `workflow_waits`, `events`, and `log_indexes`. Unique logical
+output/work-unit/activation keys prevent duplicate accepted completion; epochs and
+fences guard writes. These are design entities from [R07], not executed DDL or
+permission to replace the current host schema. Host transactions must not span
+worker execution, awaited network access or file I/O. [R07], [R08]
+
+<a id="sqx-replay"></a>
+
+### 0.7 Committed events, snapshots and bounded queries
+
+Commit visible entity changes and their events together. The durable ledger is
+authoritative; sockets are delivery mechanisms. Obtain a consistent snapshot and
+high-water mark, replay events after that cursor, then stream live committed
+events. Filtered subscriptions use scanned-through watermarks; deduplicate by
+sequence/event ID. Expired cursor requires a fresh snapshot; future cursor fails.
+Slow-consumer overflow closes with resync guidance rather than silently losing
+state. Command outcomes remain queryable after reconnect. [R07], [R08]
+
+Bind query cursors to query hash, projection, sort, unique tie key, revisions and
+snapshot. Invalidate expired snapshots; avoid holding a SQLite transaction while
+a user scrolls. Charts request bounded display reduction; statistical formulas
+always use qualified full data. Lightweight Charts, TanStack Table/Virtual and
+Dockview remain presentation tools, not calculation authorities. [R07], [R08]
+
+| Initial proposed bound | Value; qualification |
+| --- | --- |
+| Writer queue / IPC message | 256 commands and 16 MiB total; 1 MiB IPC message. Bulk payloads pass by manifest reference. |
+| Progress / heartbeat / lease | Coalesce progress to at most once per job/second plus boundaries; 2 s heartbeat, 15 s lease; lease expiry suspects loss, not proof that external work stopped. |
+| Control grace / pure-work retry | 30 s pause/cancel grace; at most three pure-work attempts, bounded backoff. Uncertain side effects are not retried automatically. |
+| Query page / decoded batch | 200 default, 2,000 maximum rows; candidate Arrow batch/row group 65,536 rows subject to byte budget. |
+| Event retention / client queue | Seven days or one million events, whichever bounds first; 256 frames/1 MiB per client and 64 KiB per frame; retain required audit state separately. |
+| Memory / cache | Candidate admission budget 60% physical RAM; cache min(512 MiB, 10% of that budget), decoded buffers separately bounded. Existing 15% RAM-floor watchdog remains current until separately revised. |
+
+These are unmeasured reference defaults [INFERRED] Med. They do not replace
+current resource policy, establish supported capacity, or promise pause latency.
+Windows spawn, file locking, owned-child cleanup, memory and cancellation timing
+require measurement and fault tests. [R06], [R07], [R08]
+
+<a id="sqx-storage"></a>
+
+### 0.8 Immutable data, result lineage and publication
+
+Separate instruments, provider symbol mappings, sessions and source connections
+from datasets and immutable dataset revisions. Strategies/settings have immutable
+revisions independent of optional result runs. A databank entry may hold only a
+strategy definition; result variants/metrics retain market, sample, direction,
+P/L representation, formula/version and units. Exact semantic hashes use a
+versioned canonical neutral model; unavailable similarity matching is not silently
+replaced with an equivalent-sounding algorithm. [R05], [R07], [R09]
+
+| Store / grain | Required distinction |
+| --- | --- |
+| SQLite metadata | Catalogs, project/task bindings, revisions, collection membership/views, metric definitions/qualified values, capabilities, manifests, ledger and events; all through HostPersistence. |
+| Bars / ticks | UTC microsecond event time and sequence, explicit bar-open/close semantics, source precision/units and quality flags; tick bid/ask/last availability is explicit. |
+| Custom values | Typed field identity/value status plus effective event time and separate availability/publication time; no future weekly value carried into earlier decisions. |
+| Orders / fills / trades | Append-only order events and fills with order/position identities, quantity/tick grids, signed costs and currency; partial exits retain parent position and fill references. |
+| Equity / experiments | Realized balance versus synchronized marked equity, calendar/sample kind and cashflows; trial/window/perturbation/seed IDs with failed or partial outcomes, not only successful scores. |
+| Files | Immutable Arrow/Parquet/Zstandard manifests with schema/layout/software versions, workspace-relative paths, content digests, row/byte counts and coverage/quality. Neutral bundles keep definitions/results separable. |
+
+Freeze selected source bytes into a validated immutable artifact and record its
+resolved input digest before numerical work. A file grant authorizes access; it
+does not freeze content. Changed source fingerprint fails `source_changed`.
+Validate timezone/DST, duplicate/order/overlap, finite price and required-column
+policies; preserve incomplete coverage as incomplete, never a successful full
+import. `[from,to)` intervals and UTC microseconds are proposed neutral policies,
+not inferred original binary timestamp units. [R05], [R07], [R08]
+
+Publication sequence: worker writes and closes attempt-owned staging files;
+coordinator validates ownership, ancestor state, schema, paths, hashes and counts;
+move to unique same-volume final paths; publish manifest/references/output keys
+and events in one short writer transaction. Files become query-visible only
+through committed manifests. SQLite and filesystem changes are not one atomic
+transaction: reconcile unreferenced files after crash; missing/corrupt committed
+files raise `artifact_integrity`. Never replace a Windows file under active read.
+Qualify flush/rename/power-loss behavior independently. [R07]
+
+Membership deletion, revision deletion and artifact retention/GC are separate
+operations. Restrict deletion of referenced revisions, preserve retained evidence,
+and use an explicit grace/retention policy. Back up an active WAL store with a
+supported consistent SQLite backup plus immutable manifests; copying only the
+main database is insufficient. No migration, reset or live database modification
+is authorized by this blueprint update. [R05], [R07]
+
+<a id="sqx-numerics"></a>
+
+### 0.9 Causal simulation, search, ranking and experiment policies
+
+Proposed baseline `bar_next_open_conservative.v1`: decisions use completed bars;
+orders fill no earlier than the next eligible open; adverse stop/target outcome
+wins when OHLC cannot resolve order, with ambiguity recorded. Tick bid/ask
+execution, synthetic ticks, hedging/netting, advanced sizing/partial exits and
+platform profiles are separate capabilities. A template/export target does not
+establish backtest parity. Reject unsupported combinations before work. [R07]
+
+Validate decimal price/quantity inputs against instrument grids, convert to
+bounded int64 units, use explicit overflow and posting-rounding rules; float64
+research arithmetic records currency, precision and tolerances. Initial-risk,
+margin, session, warmup, end-of-range, gaps, spread/slippage/commission/swap and
+negative-price rules must be explicit for each accepted policy. Record gross
+price P/L and signed cost components once; never double-subtract fees. No
+`available_time` later than a decision may influence that decision. [R04], [R07]
+
+A root seed, algorithm/version and stable logical work-unit key determine random
+streams before dispatch. Attempt number and worker completion order must not
+change those streams. Fixed completed-unit sets permit deterministic candidate
+identity and stable reductions; elapsed-time budgets/cancellation may yield
+different completed sets and must report them. `fastmath=False`, declared reduction
+order, single-threaded reference kernels and tested NumPy-versus-Numba vectors
+are qualification requirements, not a current cross-machine bitwise guarantee.
+The repository currently declares Python `>=3.14` and no Numba dependency; a
+compatible Windows numerical stack must be selected/tested in an owning plan.
+No dependency installation or change is implied here. [R07], [R10]
+
+Ranking distinguishes scoring from acceptance, uses explicit higher/lower-is-better
+metadata, rejects malformed predicates and keeps null/unsupported metrics
+from passing numeric filters. Bounded top-N and exact canonical duplicates have
+stable ties by semantic hash then entry ID. Strategy GP and portfolio genetics
+are separate algorithms; Watchmaker inheritance supports only the inspected
+portfolio family. Indicator calibration estimates output thresholds from declared
+history, parameter instances, warmup/sampling and rounding policies; it is not
+period-range optimization. Conflicting original presets/defaults retain source
+context instead of becoming a universal preset. [R02], [R03], [R07], [R09]
+
+Keep trade permutation, with-replacement bootstrap and omission distinct from
+full input-retest perturbations. Proposed `close_slot.v1` assigns eligible outcomes
+to ordered source close slots and retains sampled source/slot IDs. Permutation
+preserves final net outcome; bootstrap/omission generally do not. These scenarios
+produce research outcome/equity paths, not executable altered fills. Perturbation
+distributions, joint/independent sampling, bounds and rounding need explicit
+versioned contracts. Empirical quantiles/threshold-breach fractions do not prove
+future coverage or an analytical risk-of-ruin formula. [R03], [R09], [R10]
+
+Walk-forward requires explicit train/OOS windows, warmup/position carryover,
+required/valid/failed window counts and selection rules; never fabricate an
+opaque source score. Portfolio subset search differs from account composition
+and weight optimization: define aligned-return correlation, missing periods,
+weight units, currencies, costs, margin and synchronized account marks. A
+heuristic result does not claim a global optimum. IS/OOS intervals and any OOS
+ranking exposure remain recorded; a label alone does not establish holdout
+isolation. [R03], [R04], [R07], [R09], [R10]
+
+<a id="sqx-wire"></a>
+
+### 0.10 API, file access and adapter authority
+
+The reference protocol uses `/api/v1`, strict discriminated DTOs, unknown-field
+rejection, finite values and separate schema/model/formula/layout versions.
+Timezone-aware inputs normalize to RFC3339 UTC `Z`; naive dates fail. Event
+sequences, byte/row totals and seeds use decimal strings with field-specific
+signed/unsigned 64-bit bounds; small counts reject booleans. Decimal grids/money
+configuration use canonical decimal strings. These are proposed wire rules;
+current transport routes/models require explicit reconciliation before adoption.
+[R08]
+
+Mutating entity operations require ETag/`If-Match` (428 missing, 412 stale).
+Commands require expected state version (409 stale); POST mutations/jobs require
+scoped UUID idempotency keys, checking replay before stale-version rejection.
+Same key/body replays the original reference/status; changed body conflicts.
+Read-only query POSTs are exempt from mutation idempotency. Durable acceptance
+is 202, never completion; typed errors distinguish validation/unsupported (422),
+expired replay/query (410), throttling (429), and unaccepted admission failure
+(503). GET does not start work or mutate domain state. [R08]
+
+| Reference registry | Coverage and existing owner |
+| --- | --- |
+| R01-R09, R48, R51 | Capabilities, consistent snapshot/events, jobs, commands/outcomes/logs and single-use stream tickets; host transport/jobs/events. |
+| R10-R18, R49 | Project/task/run/settings, databanks/views/commands and atomic template application; workspace coordinators plus host transactions. |
+| R19-R26 | Strategy/revisions/validation, blocks, formula definitions and qualified result/series queries; services, Wizard and Results. |
+| R27-R28 | Versioned portfolio CRUD; Portfolio workspace. |
+| R29-R31, R44-R45 | Connection configuration/status/actions and authorization flow; host adapter boundary, not implicit connect-on-create. |
+| R32-R40, R46-R47 | Typed catalogs/datasets/imports/artifacts, staged uploads and purpose-scoped file grants; Data Manager with host custody. |
+| R41-R43, R50 | Layout/preferences, sanitized diagnostic exports and trusted extension descriptors; host/workspace shell. |
+
+The complete [contract registry][C4] defines **51 route groups / 68 HTTP+WS
+operations, nine topic prefixes, 21 panel types, 35 job kinds, nine kernel
+families, twelve job states**; [R08] supplies payload/error/invariant details.
+These are specified counts, not implemented endpoints or a new naming mandate.
+Panels retain selected project/task/run/sample/direction context. Jobs are
+capability-validated tagged specifications, never arbitrary ignored dictionaries;
+reserved neural/cloud kinds fail unavailable until separately designed. [C4], [V4]
+
+Bind loopback by default; validate Host/Origin and session/scope. Use short-lived
+single-use WS tickets with no credential leakage in URLs/logs/layouts. Workspace
+artifact IDs cannot name arbitrary paths; external access requires purpose-scoped
+trusted file grants and containment checks. Trusted extension installation
+is separate from opening a strategy; model text never grants code/OS authority.
+Store secrets in an OS vault, with references/public metadata in SQLite. [R07], [R08]
+
+The REA baseline includes readonly MT5/cTrader symbol/history/account/position
+operations with owned adapter sessions, bounded timeouts/retries/rates, provider
+coverage checks and sanitized errors. Serialize MT5 access by terminal identity;
+separate cTrader demo/live authorization, one-use state, refresh and heartbeat.
+Current MetaTrader bridge and SDK design must be reconciled explicitly; cTrader
+is a target addition, not established by a generic donor connection archive.
+Missing SDK/terminal/account is unavailable, not mock-connected. [R08], [R09]
+
+Existing live-order/latency tasks below remain broader product scope, disabled
+by default and outside this readonly profile. Placing/modifying/closing orders,
+notifications, scripts, publishing and deletions require their own typed authority,
+validation, lifecycle and reconciliation rules. Documentation approval grants no
+external-action or trading authority; unknown external outcomes are not replayed
+automatically. [R08], [R09], [R10]
+
+<a id="sqx-formats"></a>
+
+### 0.11 Format, exporter and extension qualification boundaries
+
+| Surface | Evidence and supported-contract boundary |
+| --- | --- |
+| `.cfx` | Observed Project-root config plus separately referenced Settings members differs from a Task-root single-entry template. Validate kind, task references/types and versions before conversion; no suffix-only root assumption. [R00], [R05] |
+| `.sqx` | Observed ZIP/XML definitions can omit results. Member names vary; no required `sourceCode.txt` or universal `strategy.xml` layout is established. Orders/equity binaries remain opaque without an independent codec. [R00], [R05] |
+| `.sq4` / `.sqw` / legacy | Five `.sq4` samples are ZIP/XML carriers; the sampled `.sqw` is plain XML. `.sq3` loader presence does not establish its format/compatibility. Unknown fields/versions fail or remain explicitly opaque. [R00], [R05] |
+| History/result/H2 | Original `.dat` record encodings, `.bin` order/equity payloads and H2 schemas are unresolved. No blanket transcode/lossless round trip or direct original DB attachment is promised. [R00], [R05], [R09] |
+| Neutral persistence | Independently versioned JSON/manifests/Parquet bundles preserve supported definitions/results/provenance; arbitrary original extension payloads are not executable or automatically convertible. [R07], [R10] |
+| Export targets | Six installed template families indicate intended source targets; source export, backtest policy and successful target compilation are distinct. Independently author templates/indicator companions; qualify target/version/block/option matrix and reject unsupported nodes. [R02], [R09], [R10] |
+| COT / volume profile | Publication/effective time, staleness, scale, session/DST/lookback and repeated block IDs need independent definitions. Candle-volume delta is a proxy, not measured bid/ask transaction delta. Manuals/research examples are not verified trading performance. [R01], [R03] |
+| NN / cloud / grid / ecosystem | Availability, algorithm, entitlement and protocol gaps remain explicit. Preserve target ambitions, but installed/hidden/menu names alone cannot establish a working capability. [R01], [R02], [R09] |
+
+Source/compiled equivalence, licensing/activation, runtime loading, numerical
+throughput and capacity were not established by the retained investigation.
+Historical logs are bounded observations of those sessions. Source validation
+JSON checks documentation/registries/identities; it is not product test evidence.
+Qualification requires actual independent normal, boundary and failure fixtures
+for each supported behavior. [R02], [R06], [V4], [V5]
+
+---
+
 ## High-Level System Architecture & Strategy Lifecycle
 
 ```mermaid
 flowchart TD
     subgraph S1["1. Foundation & Core Engines"]
-        Host["AppPlatform & AppHome<br/>(Host runtime, CLI & shell)"] --> Core["Core Libraries & Simulation Engine<br/>(HQTime, Indicators, 4-Precision Simulator, Snippets & Codegen)"]
+        Host["AppPlatform & AppHome<br/>(Host runtime, CLI & shell)"] --> Core["Core Libraries & Simulation Engine<br/>(Time, Indicators, Qualified Simulator Policies & Exporters)"]
         Host --> DataMgr["AppDataManager<br/>(Market data engine & broker feeds)"]
         Core --> DataMgr
     end
     subgraph S2["2. Strategy Authoring"]
         DataMgr --> CodeEd["AppCodeEditor<br/>(Snippets, indicators & extensions)"]
         DataMgr --> Wiz["AppWizard<br/>(AlgoWizard: Standard, Single-Asset & Stockpicker)"]
-        DataMgr --> Bld["AppBuilder<br/>(Automated genetic strategy generator)"]
+        DataMgr --> Bld["AppBuilder<br/>(Bounded Random Builder; Genetic Extension)"]
     end
     subgraph S3["3. Databanks & Results"]
         CodeEd --> Res["AppResults & MTAnalyzer<br/>(Databank store, Prop analytics & platform code export)"]
@@ -105,21 +404,21 @@ flowchart TD
     subgraph S4["4. Robustness & Tuning"]
         Res --> Retest["AppRetester<br/>(Monte Carlo & cross-checks)"]
         Res --> Opt["AppOptimizer<br/>(Grid, Genetic & Walk-Forward Matrix)"]
-        Res --> NN["AppNeuralNetwork<br/>(Machine learning signal models)"]
+        Res --> NN["AppNeuralNetwork<br/>(Planned Neural Models; Donor Availability Unverified)"]
     end
     subgraph S5["5. Portfolio Modeling"]
         Res --> Port["AppPortfolioComposer & AppPortfolioMaster<br/>(Correlation analysis & portfolio assembly)"]
     end
     subgraph S6["6. Autonomous Pipeline Orchestration"]
-        DataMgr -.-> TM["AppTaskManager<br/>(Custom Projects: 18 task workers & DAG flow)"]
+        DataMgr -.-> TM["AppTaskManager<br/>(Frozen Workflows, Explicit Loops & Coordinator Waits)"]
         Bld -.-> TM
         Retest -.-> TM
         Opt -.-> TM
         Port -.-> TM
     end
     subgraph S7["7. Scaling, AI & Ecosystem"]
-        TM --> Grid["AppGridControl / AppGridTest / BacktestNode<br/>(Distributed remote worker nodes)"]
-        Host --> Tools["AppMarketplace / AppBusiness / AppDebugConsole / SQAI"]
+        TM --> Grid["AppGridControl / AppGridTest / BacktestNode<br/>(Optional Remote Compute; Separate Qualification)"]
+        Host --> Tools["Target Ecosystem / Business / Diagnostics / AI Capabilities"]
     end
 ```
 
@@ -148,14 +447,14 @@ HaruQuantAI/
 │   │   ├── data_manager/                   # Central market data catalog, instruments, sessions, baskets, broker profiles
 │   │   ├── code_editor/                    # Monaco-backed snippet and extension development
 │   │   ├── algo_wizard/                    # Visual rule authoring (Standard, Single-Asset, Stockpicker), Custom Blocks
-│   │   ├── builder/                        # Genetic strategy generation, candidate engines, ranking models
+│   │   ├── builder/                        # Random/genetic search with explicit budgets, seeds and ranking contracts
 │   │   ├── results/                        # Databank storage, strategy comparison, performance reports, equity charts
 │   │   ├── retester/                       # Multi-market cross-checks, Monte Carlo, SPP, Walk-Forward
 │   │   ├── optimizer/                      # Grid/genetic parameter tuning, Walk-Forward Matrix, 3D surface charts
-│   │   ├── neural_network/                 # Feature extraction, PyTorch/Numba model training, signal classifiers
+│   │   ├── neural_network/                 # Planned neural models; algorithms/dependencies require qualification
 │   │   ├── portfolio/                      # Portfolio Composer (interactive) & Portfolio Master (genetic search)
 │   │   ├── custom_projects/                # Automated 18-task pipeline DAG engine (Custom Projects)
-│   │   ├── grid_control/                   # Distributed computing worker pool, BacktestNode & NodeUpdater coordinator
+│   │   ├── grid_control/                   # Optional remote compute; protocol/auth/ownership require qualification
 │   │   ├── grid_test/                      # Cluster benchmark test suite & latency probes
 │   │   ├── marketplace/                    # Community extension package repository client
 │   │   ├── business/                       # Multi-account licensing & institutional compliance reporting
@@ -181,6 +480,8 @@ HaruQuantAI/
 ```
 
 ---
+
+<a id="sqx-section-1"></a>
 
 ## 1. AppPlatform — Host Application Runtime & Shared Services
 
@@ -331,8 +632,8 @@ HaruQuantAI/
   - [ ] `FR-HOST-TRANSPORT-LATENCY`: Measure round-trip latency and report packet loss across probes $\rightarrow$ `ConnectionTest.check_latency(host: str, *, port: int = 443, samples: int = 3) -> dict[str, Any]`
   - [ ] `FR-HOST-TRANSPORT-DIAGNOSE`: Diagnose DNS resolution and socket connection failures $\rightarrow$ `ConnectionTest.diagnose_network(target: str) -> dict[str, Any]`
   - [ ] `FR-HOST-SERVLET-CONN-LIST`: List existing broker and exchange connections from `HostPersistence` $\rightarrow$ `ServletConnection.list_connections(provider: str | None = None) -> list[dict[str, Any]]`
-  - [ ] `FR-HOST-SERVLET-CONN-SAVE`: Save or update connection credentials in SQLite via `HostPersistence` $\rightarrow$ `ServletConnection.save_connection(connection: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-HOST-SERVLET-CONN-DELETE`: Delete connection configuration and cached tokens via `HostPersistence` $\rightarrow$ `ServletConnection.delete_connection(connection_id: str) -> dict[str, Any]`
+  - [ ] `FR-HOST-SERVLET-CONN-SAVE`: Save or update public connection metadata and secret-vault references via `HostPersistence`; plaintext credentials stay outside SQLite $\rightarrow$ `ServletConnection.save_connection(connection: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-HOST-SERVLET-CONN-DELETE`: Delete authorized connection metadata via `HostPersistence` and revoke associated vault references under adapter lifecycle control $\rightarrow$ `ServletConnection.delete_connection(connection_id: str) -> dict[str, Any]`
   - [ ] `FR-HOST-SERVLET-CONN-TEST`: Test saved or inline connection credentials and report latency status $\rightarrow$ `ServletConnection.test_connection(connection_id_or_config: str | Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-HOST-SERVLET-CONSTANTS`: Expose application version, build timestamp, and runtime environment paths $\rightarrow$ `ServletConstants.get_constants() -> dict[str, Any]`
   - [ ] `FR-HOST-SERVLET-SPECS`: Serve system resource limits, hardware concurrency specs, and supported timeframes $\rightarrow$ `ServletConstants.get_system_specs() -> dict[str, Any]`
@@ -346,7 +647,7 @@ HaruQuantAI/
 - **Class:** `LiveTest` (plus `LiveTestCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BROKER-LIVETEST-CREDENTIALS`: Validate live broker credentials and API tokens against broker gateways $\rightarrow$ `LiveTest.validate_credentials(provider: str, credentials: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-BROKER-LIVETEST-LATENCY`: Measure order placement and quote streaming round-trip latency $\rightarrow$ `LiveTest.measure_trading_latency(provider: str, symbol: str = "EURUSD") -> dict[str, Any]`
+  - [ ] `FR-BROKER-LIVETEST-LATENCY`: Separately authorized execution capability, disabled in the readonly research profile: Measure order placement and quote streaming round-trip latency $\rightarrow$ `LiveTest.measure_trading_latency(provider: str, symbol: str = "EURUSD") -> dict[str, Any]`
   - [ ] `FR-BROKER-LIVETEST-PERMISSIONS`: Verify account trading permissions and margin currency settings $\rightarrow$ `LiveTest.verify_trading_permissions(provider: str, account_id: str) -> dict[str, Any]`
 
 #### 13. `app/services/brokers/metatrader.py` — `ConnectionMT4` / `ConnectionMT5` & `DataSourceMt5Api` (`FEAT-BROKER-MT5`)
@@ -360,7 +661,7 @@ HaruQuantAI/
   - [ ] `FR-BROKER-MT5-INIT`: Initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python adapter $\rightarrow$ `ConnectionMT5.initialize(terminal_path: str | None = None, login: int | None = None, server: str | None = None) -> dict[str, Any]`
   - [ ] `FR-BROKER-MT5-ACCOUNT`: Query account balance, equity, leverage, server time, and broker specifications $\rightarrow$ `ConnectionMT5.get_account_info() -> dict[str, Any]`
   - [ ] `FR-BROKER-MT5-STREAM`: Stream live tick and bar price feeds into bounded memory queues $\rightarrow$ `ConnectionMT5.stream_ticks(symbol: str, *, max_ticks: int = 100) -> dict[str, Any]`
-  - [ ] `FR-BROKER-MT5-ORDER`: Dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal $\rightarrow$ `ConnectionMT5.send_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-BROKER-MT5-ORDER`: Separately authorized execution capability, disabled in the readonly research profile: Dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal $\rightarrow$ `ConnectionMT5.send_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-BROKER-MT5-SHUTDOWN`: Terminate terminal connection session and release resources $\rightarrow$ `ConnectionMT5.shutdown() -> dict[str, Any]`
   - [ ] `FR-DATASRC-MT5-IMPORT`: Import historical price data directly from MetaTrader 5 terminal via Python API into Parquet storage $\rightarrow$ `Mt5Api.import_data(symbol: str, timeframe: str, start_date: str, end_date: str) -> dict[str, Any]`
 
@@ -374,7 +675,7 @@ HaruQuantAI/
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BROKER-CTRADER-CONNECT`: Authenticate cTrader Open API session and resolve tradable symbol catalog $\rightarrow$ `CTraderClient.connect(credentials: Mapping[str, Any]) -> dict[str, Any]` & `CTraderClient.get_symbols() -> list[dict[str, Any]]`
   - [ ] `FR-BROKER-CTRADER-HISTORY`: Download historical OHLCV bars and tick quotes from cTrader servers $\rightarrow$ `CTraderClient.get_bars(symbol: str, timeframe: str, start_ts: int, end_ts: int) -> dict[str, Any]` & `CTraderClient.get_ticks(symbol: str, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-BROKER-CTRADER-TRADING`: Submit, modify, and close market/limit/stop orders via cTrader Open API $\rightarrow$ `CTraderClient.place_order(order_request: Mapping[str, Any]) -> dict[str, Any]` & `CTraderClient.close_position(position_id: str, volume: float | None = None) -> dict[str, Any]`
+  - [ ] `FR-BROKER-CTRADER-TRADING`: Separately authorized execution capability, disabled in the readonly research profile: Submit, modify, and close market/limit/stop orders via cTrader Open API $\rightarrow$ `CTraderClient.place_order(order_request: Mapping[str, Any]) -> dict[str, Any]` & `CTraderClient.close_position(position_id: str, volume: float | None = None) -> dict[str, Any]`
 
 #### 15. `app/services/brokers/simulator.py` — `ConnectionSimulator` (`FEAT-BROKER-SIMULATOR`)
 
@@ -402,7 +703,7 @@ HaruQuantAI/
   - [ ] `FR-CRYPTO-BINANCE-INFO`: Fetch Binance spot exchange info, tradable symbols, and price filters $\rightarrow$ `BinanceSpot.get_exchange_info() -> dict[str, Any]`
   - [ ] `FR-CRYPTO-BINANCE-STREAM`: Stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket $\rightarrow$ `BinanceSpot.stream_klines(symbol: str, interval: str = "1m") -> dict[str, Any]`
   - [ ] `FR-CRYPTO-BINANCE-HISTORY`: Download historical Kline bar archives for backtesting $\rightarrow$ `BinanceSpot.download_historical_bars(symbol: str, interval: str, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-BINANCE-ORDER`: Execute spot limit and market orders with HMAC SHA256 signature authentication $\rightarrow$ `BinanceSpot.place_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-CRYPTO-BINANCE-ORDER`: Separately authorized execution capability, disabled in the readonly research profile: Execute spot limit and market orders with HMAC SHA256 signature authentication $\rightarrow$ `BinanceSpot.place_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-CRYPTO-COINM-CONTRACTS`: Fetch Coin-M contract specifications and index prices $\rightarrow$ `BinanceCoinM.get_contracts() -> dict[str, Any]`
   - [ ] `FR-CRYPTO-COINM-FUNDING`: Fetch Coin-M funding rates and historical intervals $\rightarrow$ `BinanceCoinM.get_funding_rate(symbol: str) -> dict[str, Any]`
   - [ ] `FR-CRYPTO-COINM-STREAM`: Stream real-time futures mark price and order book depth $\rightarrow$ `BinanceCoinM.stream_mark_price(symbol: str) -> dict[str, Any]`
@@ -410,7 +711,7 @@ HaruQuantAI/
   - [ ] `FR-CRYPTO-USDTM-INFO`: Fetch USDT-M contract rules, tick sizes, step sizes, and funding intervals $\rightarrow$ `BinanceUsdtM.get_exchange_info() -> dict[str, Any]`
   - [ ] `FR-CRYPTO-USDTM-STREAM`: Stream real-time USDT-M Kline bars and aggregated trade events $\rightarrow$ `BinanceUsdtM.stream_trades(symbol: str) -> dict[str, Any]`
   - [ ] `FR-CRYPTO-USDTM-HISTORY`: Download historical USDT-M futures Kline bar archives $\rightarrow$ `BinanceUsdtM.download_futures_klines(symbol: str, interval: str, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-USDTM-ORDER`: Place and cancel futures limit, stop-market, and trailing stop orders $\rightarrow$ `BinanceUsdtM.send_futures_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-CRYPTO-USDTM-ORDER`: Separately authorized execution capability, disabled in the readonly research profile: Place and cancel futures limit, stop-market, and trailing stop orders $\rightarrow$ `BinanceUsdtM.send_futures_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-CRYPTO-BITFINEX-SYMBOLS`: Fetch Bitfinex currency pairs, symbols, and minimum order sizes $\rightarrow$ `Bitfinex.get_symbols() -> dict[str, Any]`
   - [ ] `FR-CRYPTO-BITFINEX-STREAM`: Stream real-time raw book and candle feeds over WebSocket $\rightarrow$ `Bitfinex.stream_candles(symbol: str, timeframe: str = "1m") -> dict[str, Any]`
   - [ ] `FR-CRYPTO-BITFINEX-HISTORY`: Query historical candle archives for backtesting $\rightarrow$ `Bitfinex.fetch_candles(symbol: str, timeframe: str, start_ts: int, end_ts: int) -> dict[str, Any]`
@@ -424,9 +725,11 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-1a"></a>
+
 ## 1A. Core Libraries, Indicators & Backtest Simulation Engine (`internal/libs/` $\rightarrow$ `app/services/`)
 
-- **Primary Role:** Foundational non-UI quantitative libraries corresponding to `SQLib.jar.enc`, `SQDataLib.jar.enc`, and `SQAppLib.jar.enc` / `SQTradingLib`. Provides temporal math, deterministic RNG, columnar bar/tick series, 69 technical indicators, signal utilities, the 4-precision / 7-platform backtest simulation kernel, and `.cfx`/`.sqx`/Parquet persistence codecs.
+- **Primary Role:** Target-owned non-UI quantitative services for time, RNG, data, indicators, signal evaluation, simulation and supported formats. Encrypted donor libraries identify unresolved reference boundaries; indicator counts and precision/platform lists below are scope inventories, not recovered algorithms or verified parity.
 - **Dependencies:** `AppPlatform` (`Section 1`)
 - **Outputs / Downstream Role:** Consumed by every domain workspace (`Sections 2–17`).
 
@@ -466,7 +769,7 @@ HaruQuantAI/
 
 #### 4. `app/services/include/data.py` — `DataSeries` & `HistoryDataLoader` (`FEAT-INCLUDE-DATA`)
 
-- **Dry Rule:** Shared NumPy/PyArrow zero-copy columnar OHLCV bar series and Parquet history loader for all indicators and engines.
+- **Dry Rule:** Shared columnar OHLCV/tick access and bounded Parquet decoding for indicators and engines. Zero-copy conversion is conditional on compatible buffers; compressed Parquet decoding may allocate.
 - **Donor:** `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.DataSeries`, `com.strategyquant.datalib.dataseries.*`, `com.strategyquant.datalib.historyData.*`)
 - **Backend:** `app/services/include/data.py` (`🟡 250–400L`, Docstring `<=50L`)
 - **Frontend:** N/A (Core backend primitive)
@@ -539,21 +842,23 @@ HaruQuantAI/
 
 #### 9. `app/services/engine/formats.py` — `CorePersistenceFormats` (`FEAT-ENGINE-FORMATS`)
 
-- **Dry Rule:** Centralizes PyArrow Parquet + `zipfile` XML AST codecs for `.cfx`, `.sqx`, `.sq4`, `.sq3`, and `.dat` archives across all workspaces.
+- **Dry Rule:** Centralizes neutral Parquet/bundle codecs and supported carrier classification across workspaces. Unknown proprietary binary payloads are retained opaque; the filename suffix is not a decoder contract (see [format gates](#sqx-formats)).
 - **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.project.*`, `com.strategyquant.tradinglib.StrategyBase.*`), `C:\SQX-145\internal\plugins\LoaderSQ3\LoaderSQ3.jar`, `C:\SQX-145\internal\plugins\LoaderSQ4\LoaderSQ4.jar`, `C:\SQX-145\internal\plugins\SaverSQ3\SaverSQ3.jar`, `C:\SQX-145\user\projects\`, `C:\SQX-145\user\strategies\`, `C:\SQX-145\user\data\`
 - **Backend:** `app/services/engine/formats.py` (`🟡 250–400L`, Docstring `<=55L`)
 - **Frontend:** N/A (Core persistence codec service)
 - **Class:** `ProjectArchiveCodec`, `StrategyArchiveCodec`, `MarketDataFormatCodec`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-ENGINE-FORMATS-CFX`: Read and write `.cfx` Custom Project / Template ZIP archives (`config.xml` + `<TaskType>-Task<N>.xml` manifests) $\rightarrow$ `ProjectArchiveCodec.load_cfx(file_path: Path | str) -> dict[str, Any]` & `ProjectArchiveCodec.save_cfx(file_path: Path | str, project_manifest: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-ENGINE-FORMATS-SQX`: Read and write `.sqx` Strategy ZIP archives (`strategy.xml`, `sourceCode.txt`, backtest payloads), `.sq4` XML strategies, and `.sq3` legacy binary strategies $\rightarrow$ `StrategyArchiveCodec.load_sqx(file_path: Path | str) -> dict[str, Any]` & `StrategyArchiveCodec.save_sqx(file_path: Path | str, strategy_payload: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-ENGINE-FORMATS-DAT`: Transcode binary `.dat` tick/bar archives to and from Zstandard-compressed PyArrow Parquet datasets $\rightarrow$ `MarketDataFormatCodec.transcode_dat_parquet(source_path: Path | str, target_path: Path | str, *, direction: str = "dat_to_parquet") -> dict[str, Any]`
+  - [ ] `FR-ENGINE-FORMATS-CFX`: Distinguish Project-root `.cfx` ZIPs with referenced task settings from Task-root single-entry templates; read/write only validated supported shapes $\rightarrow$ `ProjectArchiveCodec.load_cfx(file_path: Path | str) -> dict[str, Any]` & `ProjectArchiveCodec.save_cfx(file_path: Path | str, project_manifest: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-ENGINE-FORMATS-SQX`: Classify `.sqx` ZIP/XML definitions with optional result members and observed `.sq4` ZIP/XML carriers; read/write only independently specified supported content, with legacy `.sq3` compatibility unverified $\rightarrow$ `StrategyArchiveCodec.load_sqx(file_path: Path | str) -> dict[str, Any]` & `StrategyArchiveCodec.save_sqx(file_path: Path | str, strategy_payload: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-ENGINE-FORMATS-DAT`: Transcode only independently specified and qualified `.dat` formats to/from Zstandard-compressed Parquet; unknown proprietary history/result records remain opaque and unavailable $\rightarrow$ `MarketDataFormatCodec.transcode_dat_parquet(source_path: Path | str, target_path: Path | str, *, direction: str = "dat_to_parquet") -> dict[str, Any]`
 
 ---
 
+<a id="sqx-section-1b"></a>
+
 ## 1B. Extensible Snippet System, XML Catalogs & Target-Platform Code Exporters (`internal/extend/` & `internal/ctemplate/` $\rightarrow$ `app/services/snippets/` & `app/services/codegen/`)
 
-- **Primary Role:** Reimplements the 24 extensible snippet categories (`1,049` Java classes), the 12 XML block/parameter catalogs in `internal/ctemplate/`, and the 6 target-platform code generation engines in `internal/extend/Code/`.
+- **Primary Role:** Independently specifies typed blocks, sizing, exits, statistics and exporters from behavioral contracts. Stage 2 inspected 1,049 snippet source files and six platform template families; these counts do not establish source/compiled parity or a required one-class-per-source implementation. Reauthor neutral catalogs/templates without copying original code or assets.
 - **Dependencies:** Core Libraries & Simulation Engine (`Section 1A`)
 - **Outputs / Downstream Role:** Supplies building blocks, position sizing, exit rules, Monte Carlo perturbations, What-If filters, databank/trade columns, fitness formulas, and platform source-code generators to all workspaces.
 
@@ -605,8 +910,8 @@ HaruQuantAI/
 - **Frontend:** `ui/app/workspace/Retester/views/WhatIfModal.tsx`
 - **Class:** `MonteCarloManipulator`, `MonteCarloRetester`, `WhatIfSimulator`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-SNIPPETS-MC-MANIPULATE`: Execute the 5 fast trade-manipulation Monte Carlo methods (`RandomizeTradesOrder`, `RandomizeSkipTrades`, `RandomizeStartDate`, `RandomizeHistoryData`, `RandomizeCommon`) $\rightarrow$ `MonteCarloManipulator.run_simulation(trades: Sequence[Mapping[str, Any]], method: str, iterations: int = 100, *, seed: int = 42, params: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-SNIPPETS-MC-RETEST`: Execute the 9 full-retest Monte Carlo perturbation methods (`RandomizeStrategyParameters`, `RandomizeSlippage`, `RandomizeSpread`, `RandomizeMinDistance`, `RandomizeIndicatorParameters`, `RandomizeBacktestStart`, `RandomizeHistoryData` volatility/noise) $\rightarrow$ `MonteCarloRetester.run_retest_simulation(strategy_spec: Mapping[str, Any], bars: DataSeries, method: str, iterations: int = 50, *, seed: int = 42, params: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-SNIPPETS-MC-MANIPULATE`: Run separately specified exact permutation, bootstrap or omission on existing eligible trade outcomes; history/start/parameter perturbations belong to full retests $\rightarrow$ `MonteCarloManipulator.run_simulation(trades: Sequence[Mapping[str, Any]], method: str, iterations: int = 100, *, seed: int = 42, params: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-SNIPPETS-MC-RETEST`: Run qualified full-backtest input perturbations with explicit parameter/history/start/cost distributions, bounds, rounding and seed policy; installed method names do not establish nine verified behaviors $\rightarrow$ `MonteCarloRetester.run_retest_simulation(strategy_spec: Mapping[str, Any], bars: DataSeries, method: str, iterations: int = 50, *, seed: int = 42, params: Mapping[str, Any] | None = None) -> dict[str, Any]`
   - [ ] `FR-SNIPPETS-WHATIF-APPLY`: Apply all 15 post-backtest What-If trade filters and equity controls $\rightarrow$ `WhatIfSimulator.apply_scenario(trades: Sequence[Mapping[str, Any]], scenario: str, params: Mapping[str, Any] | None = None) -> dict[str, Any]`
 
 #### 5. `app/services/snippets/{columns,charts,correlation,fitness,formulas,negaters,checkers_calculators}.py` — `SnippetColumnsChartsAndFormulas` (`FEAT-SNIPPETS-METRICS`)
@@ -617,7 +922,7 @@ HaruQuantAI/
 - **Frontend:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
 - **Class:** `ColumnRegistry`, `ChartSnippetRegistry`, `CorrelationAndFitnessRegistry`, `FormulaAndNegaterRegistry`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-SNIPPETS-COLUMNS-EVAL`: Compute all ~120 Databank performance metrics, 30 per-trade columns, and 8 Walk-Forward columns (`columns.py`) $\rightarrow$ `ColumnRegistry.evaluate_columns(trades: Sequence[Mapping[str, Any]], *, initial_capital: float = 10000.0, columns: Sequence[str] | None = None) -> dict[str, Any]`
+  - [ ] `FR-SNIPPETS-COLUMNS-EVAL`: Compute only qualified formula/version/population/unit combinations; catalog counts are inventory targets and unsupported metrics return explicit status (`columns.py`) $\rightarrow$ `ColumnRegistry.evaluate_columns(trades: Sequence[Mapping[str, Any]], *, initial_capital: float = 10000.0, columns: Sequence[str] | None = None) -> dict[str, Any]`
   - [ ] `FR-SNIPPETS-CHARTS-SERIES`: Generate data series for all 27 TradeAnalysis charts and 14 live EngineCharts (`charts.py`) $\rightarrow$ `ChartSnippetRegistry.build_chart_series(trades: Sequence[Mapping[str, Any]], chart_type: str = "equity") -> dict[str, Any]`
   - [ ] `FR-SNIPPETS-CORR-FITNESS`: Extract the 6 `CorrelationOf` time series and compute the 3 `PortfolioMasterFitness` scores (`correlation.py`, `fitness.py`) $\rightarrow$ `CorrelationAndFitnessRegistry.evaluate(strategy_trades_map: Mapping[str, Sequence[Mapping[str, Any]]], *, mode: str = "ProfitLossByDay", fitness_type: str = "ReturnDD") -> dict[str, Any]`
   - [ ] `FR-SNIPPETS-FORMULAS-NEGATERS`: Evaluate the 19 `Formulas`, 15 `Negater` opposite-block mappings, 3 acceptance `Checkers`, and 7 statistical `Calculators` (`formulas.py`, `negaters.py`, `checkers_calculators.py`) $\rightarrow$ `FormulaAndNegaterRegistry.apply(operation: str, payload: Mapping[str, Any]) -> dict[str, Any]`
@@ -639,15 +944,19 @@ HaruQuantAI/
   - [ ] `FR-CODEGEN-EASYLANGUAGE`: Render strategy ASTs into TradeStation / MultiCharts (`EasyLanguage` `.txt` / `.eld` / `.pla`) and Stockpicker multi-symbol scripts (`easylanguage.py`) $\rightarrow$ `EasyLanguageExporter.render(strategy_ast: Mapping[str, Any], *, target: str = "tradestation") -> dict[str, Any]`
   - [ ] `FR-CODEGEN-NINJA-JFOREX`: Render strategy ASTs into NinjaTrader 8 (`NinjaScript` `.cs`) and Dukascopy (`JForex` `.java`) strategy classes (`ninjatrader.py`, `jforex.py`) $\rightarrow$ `NinjaTraderExporter.render(strategy_ast: Mapping[str, Any]) -> dict[str, Any]` & `JForexExporter.render(strategy_ast: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-CODEGEN-PSEUDOCODE`: Render human-readable PseudoCode (`.txt`) descriptions of all strategy signals, blocks, stops, and money management (`pseudocode.py`) $\rightarrow$ `PseudoCodeExporter.render(strategy_ast: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-CODEGEN-CUSTOM-IND`: Package companion platform indicator source files (`custom_indicators/` for MT4/MT5/TS/NT8, `COT/`, `VolumeProfile/`) alongside exported strategies (`custom_indicators.py`) $\rightarrow$ `CustomIndicatorPackager.bundle_indicators(indicators: Sequence[str], target_platform: str) -> dict[str, Any]`
+  - [ ] `FR-CODEGEN-CUSTOM-IND`: Package independently authored and qualified companion indicators for the supported platform/block subset; retained original indicator sources are provenance, not distributable implementation input (`custom_indicators.py`) $\rightarrow$ `CustomIndicatorPackager.bundle_indicators(indicators: Sequence[str], target_platform: str) -> dict[str, Any]`
 
 ---
+
+<a id="sqx-section-2"></a>
 
 ## 2. AppHome — Getting Started & Shell Landing
 
 - **Primary Role:** Default welcome landing workspace providing onboarding tutorials, recent project shortcuts, release version metadata, and offline documentation fallback.
 - **Dependencies:** `AppPlatform` (`Section 1`)
 - **Outputs / Downstream Role:** User onboarding, navigation entry points, and version inspection.
+
+### Phase 2.1: Welcome & Landing Workspace
 
 #### 1. `app/workspace/home/routes.py` — `AppHome` & `HomeAbout` (`FEAT-HOME-DASHBOARD`)
 
@@ -664,6 +973,8 @@ HaruQuantAI/
   - [ ] `FR-HOME-DIAGNOSTICS`: Show active system directory paths, database status, and memory stats via `ResourceMonitor` $\rightarrow$ `About.diagnostics() -> dict[str, Any]`
 
 ---
+
+<a id="sqx-section-3"></a>
 
 ## 3. AppDataManager — Market Data Engine
 
@@ -909,11 +1220,15 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-4"></a>
+
 ## 4. AppCodeEditor — Code IDE & Extension Development Workspace
 
 - **Primary Role:** Embedded code development environment for authoring custom building blocks, technical indicators, money management algorithms, and custom databank analysis snippets.
 - **Dependencies:** `AppDataManager` (`Section 3`), `CoreIndicatorLibrary` (`Section 1A.2`)
 - **Outputs / Downstream Role:** Custom indicators, trading rules, and snippet extensions consumed by `AppWizard`, `AppBuilder`, and `AppResults`.
+
+### Phase 4.1: Code IDE & Extension Development Workspace
 
 #### 1. `app/workspace/code_editor/editor.py` — `AppCodeEditor` (`FEAT-CODEEDITOR-WORKSPACE`)
 
@@ -976,11 +1291,15 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-5"></a>
+
 ## 5. AppWizard — AlgoWizard Visual Strategy Authoring Workspace
 
 - **Primary Role:** Visual rule-based strategy editor across 3 editor modes (`Standard`, `Single-Asset`, `Stockpicker`), supporting Custom Blocks, Random Groups, and embeddable share widgets.
 - **Dependencies:** `AppDataManager`, `AppCodeEditor`, `SnippetBuildingBlocksAndCatalogs` (`Section 1B.1`)
 - **Outputs / Downstream Role:** Concrete strategy ASTs and `.sqx` manifests ready for backtesting or code export.
+
+### Phase 5.1: Visual Strategy Authoring Workspace
 
 #### 1. `app/workspace/algo_wizard/wizard.py` — `AppWizard` (`FEAT-WIZARD-WORKSPACE`)
 
@@ -1022,6 +1341,8 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-6"></a>
+
 ## 6. AppBuilder — Strategy Generation & Genetic Builder Workspace
 
 - **Primary Role:** Automated strategy generation engine using genetic programming and random search across multi-island populations to construct, filter, and backtest candidate strategies.
@@ -1040,7 +1361,7 @@ HaruQuantAI/
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BUILDER-WTB-OVERVIEW`: Display strategy architecture and build requirements overview $\rightarrow$ `WhatToBuild.what_to_build() -> dict[str, Any]`
   - [ ] `FR-BUILDER-WTB-MODE`: Configure strategy generation mode (`genetic`, `random`) $\rightarrow$ `WhatToBuild.build_mode(mode_config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-BUILDER-WTB-ARCH`: Configure strategy style and architecture (`momentum`, `mean_reversion`, `breakout`) $\rightarrow$ `WhatToBuild.strategy_architecture(arch_config: Mapping[str, Any]) -> dict[str, Any]`
+  - [ ] `FR-BUILDER-WTB-ARCH`: Configure rule architecture separately from trading intent; momentum, mean reversion and breakout are intent presets, not verified donor architecture switches $\rightarrow$ `WhatToBuild.strategy_architecture(arch_config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-BUILDER-WTB-CONDITIONS`: Configure trading conditions and timeframe periods $\rightarrow$ `WhatToBuild.conditions_and_periods(config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-BUILDER-WTB-PT`: Configure profit target rules and allowable ranges $\rightarrow$ `WhatToBuild.profit_target(pt_config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-BUILDER-WTB-SL`: Configure stop loss rules and allowable ranges $\rightarrow$ `WhatToBuild.stop_loss(sl_config: Mapping[str, Any]) -> dict[str, Any]`
@@ -1076,22 +1397,24 @@ HaruQuantAI/
 
 #### 3. `app/workspace/builder/builder.py`, `settings/controls.py` & `engine/build_task.py` (`FEAT-BUILDER-ENGINE`)
 
-- **Dry Rule:** Reuse `JobManager`, `BacktestSimulator`, and `RandomGenerator` for multi-island genetic strategy generation and evaluation pipelines.
+- **Dry Rule:** Reuse `JobManager`, `BacktestSimulator`, and `RandomGenerator` for bounded random generation and independently specified genetic evolution. The donor strategy GP core remains opaque; portfolio Watchmaker declarations do not recover its operators.
 - **Donor:** `C:\SQX-145\internal\plugins\AppBuilder\AppBuilder.jar`, `C:\SQX-145\internal\plugins\SettingsPanel\`, `C:\SQX-145\internal\plugins\TaskBuild\TaskBuild.jar`, `C:\SQX-145\user\settings\calibrationSettings.txt`, `C:\SQX-145\internal\web\BUILDER\`
 - **Backend:** `app/workspace/builder/builder.py` (`🟢 <200L`), `app/workspace/builder/settings/controls.py` (`🟢 <150L`), `app/workspace/builder/engine/build_task.py` (`🟡 250–400L`)
 - **Frontend:** `ui/app/workspace/Builder/{BuilderWorkspace,EnginePanel,settings/SettingsControls}.tsx`
 - **Class:** `AppBuilder` (`builder.py`), `SettingsPanel` (`settings/controls.py`), `BuildTask` (`engine/build_task.py`)
 - **Functional Requirements & Exact Method Signatures:**
   - [ ] `FR-BUILDER-WORKSPACE-INIT`: Host dockable builder tabs, execution progress bars, and live generation statistics $\rightarrow$ `AppBuilder.init_workspace() -> dict[str, Any]`
-  - [ ] `FR-BUILDER-WORKSPACE-START`: Trigger autonomous genetic strategy generation pipeline via `JobManager` $\rightarrow$ `AppBuilder.start_generation(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
+  - [ ] `FR-BUILDER-WORKSPACE-START`: Trigger explicitly selected, seeded and budgeted random or independently defined genetic generation via `JobManager` $\rightarrow$ `AppBuilder.start_generation(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
   - [ ] `FR-BUILDER-WORKSPACE-STOP`: Abort or pause active genetic generation run $\rightarrow$ `AppBuilder.stop_generation(job_id: str | None = None) -> dict[str, Any]`
   - [ ] `FR-BUILDER-SETTINGS-PANEL`: Display container panel for strategy builder and retester settings $\rightarrow$ `SettingsPanel.settings(mode: str = "builder") -> dict[str, Any]`
   - [ ] `FR-BUILDER-TASK-SIMPLE`: Configure simple settings for strategy build task $\rightarrow$ `BuildTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]`
-  - [ ] `FR-BUILDER-TASK-CALIBRATE`: Calibrate indicator parameter ranges for strategy building based on target volatility $\rightarrow$ `BuildTask.indicators_calibration(symbol: str, timeframe: str) -> dict[str, Any]`
+  - [ ] `FR-BUILDER-TASK-CALIBRATE`: Calibrate indicator output-value thresholds from explicitly selected history and sampling policy; period ranges and volatility tuning are separate $\rightarrow$ `BuildTask.indicators_calibration(symbol: str, timeframe: str) -> dict[str, Any]`
   - [ ] `FR-BUILDER-TASK-EXECUTE`: Execute genetic programming & random strategy generation worker loop across multi-island populations $\rightarrow$ `BuildTask.execute_build(build_config: Mapping[str, Any]) -> dict[str, Any]`
   - [ ] `FR-BUILDER-TASK-EVALUATE`: Evaluate initial backtest, IS/OOS split, and sequential cross-check filter gates before depositing accepted candidates into target databank $\rightarrow$ `BuildTask.evaluate_candidate_pipeline(candidate: Mapping[str, Any], pipeline_config: Mapping[str, Any]) -> dict[str, Any]`
 
 ---
+
+<a id="sqx-section-7"></a>
 
 ## 7. AppResults — Strategy Databanks & Results Analysis Workspace
 
@@ -1225,6 +1548,8 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-8"></a>
+
 ## 8. AppRetester — Robustness Verification & Stress-Testing Workspace
 
 - **Primary Role:** Strategy robustness testing workspace. Stress-tests candidate strategies from databanks against curve-fitting using Monte Carlo permutations, higher precision data, additional markets, SPP, Walk-Forward, and What-If scenarios.
@@ -1291,6 +1616,8 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-9"></a>
+
 ## 9. AppOptimizer — Parameter Optimization & Walk-Forward Workspace
 
 - **Primary Role:** Strategy parameter optimization engine discovering optimal parameter plateaus via Grid Search, Genetic Optimization, Walk-Forward Optimization, and Walk-Forward Matrix (`WFM`) 3D neighbourhood evaluation.
@@ -1328,11 +1655,13 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-10"></a>
+
 ## 10. AppNeuralNetwork — Neural Network Trainer Workspace & Built-in AI (`ServletAI`)
 
-- **Primary Role:** Machine learning modeling environment and built-in AI assistant gateway (`ServletAI` / `SQAI`). Trains neural network classifiers to filter strategy signals and exposes MCP/AI tools and custom agent personas.
+- **Primary Role:** Planned target neural-model and AI-assistant capabilities. The retained NN documentation conflicts on shipped availability; training algorithms, model artifacts and performance remain unverified. AI orchestration is broader HaruQuantAI target scope, not proven by a donor filename.
 - **Dependencies:** `AppDataManager`, `AppResults`, `CoreIndicatorLibrary`
-- **Outputs / Downstream Role:** Trained neural network models embedded into strategy rules and interactive AI copilot actions.
+- **Outputs / Downstream Role:** Qualified target model artifacts and authorized AI actions only after their owning contracts/tests; unavailable capabilities expose a reason.
 
 ### Phase 10.1: Neural Network Trainer & Built-in AI (`ServletAI`)
 
@@ -1368,11 +1697,13 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-11"></a>
+
 ## 11. AppPortfolioComposer & AppPortfolioMaster — Portfolio Assembly Workspaces
 
 - **Primary Role:** Multi-strategy portfolio modeling workspaces. `AppPortfolioComposer` enables interactive strategy weighting, correlation auditing, and equity curve blending. `AppPortfolioMaster` automates the genetic/brute-force search for optimal uncorrelated strategy combinations.
 - **Dependencies:** `AppResults`, `SnippetColumnsChartsAndFormulas` (`CorrelationAndFitnessRegistry`)
-- **Outputs / Downstream Role:** Diversified multi-strategy portfolios ready for live deployment or code export.
+- **Outputs / Downstream Role:** Versioned multi-strategy research portfolios with explicit weights, account assumptions and measured results; execution and source-export qualification are separate gates.
 
 ### Phase 11.1 – 11.2: Portfolio Composer & Automatic Portfolio Master
 
@@ -1409,6 +1740,8 @@ HaruQuantAI/
   - [ ] `FR-PORTFOLIO-AUTO-TASK`: Execute combinatorial or genetic portfolio search over candidate databanks $\rightarrow$ `AutoPortfolioTask.simple_settings(config: Mapping[str, Any] | None = None) -> dict[str, Any]` & `AutoPortfolioTask.execute_portfolio_search(databank_id: str, search_config: Mapping[str, Any]) -> dict[str, Any]`
 
 ---
+
+<a id="sqx-section-12"></a>
 
 ## 12. AppTaskManager — Custom Projects Workflow Orchestration Workspace
 
@@ -1463,7 +1796,7 @@ HaruQuantAI/
 
 #### 2. `app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `tasks/settings/*.py` & `conditions/*.py` — Flow Control Tasks & Conditions (`FEAT-PROJECTS-FLOW-CONTROL`)
 
-- **Dry Rule:** Reuse `custom_projects/_common.py` and `HostPersistence` for DAG loop control, conditional branching, and notification dispatch.
+- **Dry Rule:** Reuse `custom_projects/_common.py` and `HostPersistence` for frozen workflow graphs, explicit bounded loop transitions and conditional branches. Validate the job dependency DAG separately; notifications require scoped external-action authority.
 - **Donor:** `C:\SQX-145\internal\plugins\TaskGoToTask\TaskGoToTask.jar`, `C:\SQX-145\internal\plugins\SettingsGoToTask\SettingsGoToTask.jar`, `C:\SQX-145\internal\plugins\TaskWaitFor\TaskWaitFor.jar`, `C:\SQX-145\internal\plugins\SettingsWaitFor\SettingsWaitFor.jar`, `C:\SQX-145\internal\plugins\TaskStopAndStart\TaskStopAndStart.jar`, `C:\SQX-145\internal\plugins\SettingsStopAndStart\SettingsStopAndStart.jar`, `C:\SQX-145\internal\plugins\TaskNotification\TaskNotification.jar`, `C:\SQX-145\internal\plugins\SettingsNotification\SettingsNotification.jar`, `C:\SQX-145\internal\plugins\ProjectConditionCyclesCount\ProjectConditionCyclesCount.jar`, `C:\SQX-145\internal\plugins\ProjectConditionGoToActivated\ProjectConditionGoToActivated.jar`, `C:\SQX-145\internal\plugins\ProjectConditionGoToEvaluated\ProjectConditionGoToEvaluated.jar`, `C:\SQX-145\internal\plugins\ProjectConditionResultsCount\ProjectConditionResultsCount.jar`, `C:\SQX-145\internal\plugins\ProjectConditionRunTime\ProjectConditionRunTime.jar`
 - **Backend:** `app/workspace/custom_projects/tasks/{goto,wait,stop_start,notify}.py`, `app/workspace/custom_projects/tasks/settings/{goto,wait,stop_start,notification}.py`, `app/workspace/custom_projects/conditions/{cycles_count,goto_activated,goto_evaluated,results_count,run_time}.py` (each `🟢 <180L`)
 - **Frontend:** `ui/app/workspace/CustomProjects/tasks/{GoTo,Wait,StopStart,Notify}TaskModal.tsx`
@@ -1522,9 +1855,11 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-13"></a>
+
 ## 13. AppGridControl & AppGridTest — Distributed Grid Computing Workspaces
 
-- **Primary Role:** Distributed computation management connecting local platform instances to remote grid worker nodes (`BacktestNode` & `NodeUpdater`) to scale genetic builds, Walk-Forward optimizations, and Monte Carlo simulations across clusters.
+- **Primary Role:** Optional target remote-compute extension. Static grid/job symbols and installed surfaces do not establish a recovered distributed protocol, scheduler or scaling guarantee. The REA reference profile is single-machine; preserve this broader scope behind a separately qualified host/auth/storage design.
 - **Dependencies:** `AppTaskManager`, `AppBuilder`, `AppOptimizer`, `JobManager`
 - **Outputs / Downstream Role:** Distributed computing cluster management and worker node validation.
 
@@ -1554,9 +1889,11 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-14"></a>
+
 ## 14. AppMarketplace — Community Extensions & Marketplace Workspace (`ServletAlgoCloud` & `AppMarketplace`)
 
-- **Primary Role:** Ecosystem repository client for discovering, downloading, and sharing custom indicators, building blocks, presets, strategy templates, and cloud synchronization (`ServletAlgoCloud`).
+- **Primary Role:** Planned target ecosystem client for approved packages and cloud integrations. Installed names do not establish a working marketplace, account entitlement or synchronization contract; remote operations require actual supported services and explicit authority.
 - **Dependencies:** `AppCodeEditor`, `AppPlatform`
 - **Outputs / Downstream Role:** Installed community extensions, presets, and synchronized cloud packages.
 
@@ -1581,9 +1918,11 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-15"></a>
+
 ## 15. AppBusiness — Enterprise & Institutional Features Workspace
 
-- **Primary Role:** Commercial and B2B workspace offering white-labeling, institutional analytics, and enterprise multi-account licensing management.
+- **Primary Role:** Planned target enterprise workspace. The retained evidence does not verify white-label, institutional analytics or licensing behavior from the Business surface name; preserve proposed scope without implying an entitlement emulator or working vendor service.
 - **Dependencies:** `AppPlatform`
 - **Outputs / Downstream Role:** Enterprise license management and institutional audit tear-sheets.
 
@@ -1601,6 +1940,8 @@ HaruQuantAI/
   - [ ] `FR-BUSINESS-AUDIT-REPORT`: Export white-label executive strategy fact-sheets and compliance reports $\rightarrow$ `Business.generate_audit_report(strategy_id: str, branding: Mapping[str, Any] | None = None) -> dict[str, Any]`
 
 ---
+
+<a id="sqx-section-16"></a>
 
 ## 16. AppDebugConsole — Diagnostic Logging & Memory Monitor Workspace
 
@@ -1624,6 +1965,8 @@ HaruQuantAI/
 
 ---
 
+<a id="sqx-section-17"></a>
+
 ## 17. MTAnalyzer — Standalone MetaTrader Trade Report & Portfolio Analyzer (`internal/web/MTANALYZER`)
 
 - **Primary Role:** Standalone trade-report analysis, money management simulation, portfolio correlation, and Monte Carlo stress-testing application (`MTANALYZER`) for external MetaTrader 4 / MetaTrader 5 HTML/CSV account statements and `.sqx` strategy results.
@@ -1645,3 +1988,333 @@ HaruQuantAI/
   - [ ] `FR-MTANALYZER-SIMULATE-MM`: Simulate alternative position-sizing models (`FixedSize`, `FixedAmount`, `RiskFixedPctOfAccount`, `FixedRatio`, `KellyCriterion`) over imported trade histories $\rightarrow$ `MTAnalyzer.simulate_money_management(trades: Sequence[Mapping[str, Any]], model: str, params: Mapping[str, float]) -> dict[str, Any]`
   - [ ] `FR-MTANALYZER-MONTE-CARLO`: Run Monte Carlo trade-order/skip permutations and What-If time/day filters with confidence-level drawdown tables $\rightarrow$ `MTAnalyzer.run_monte_carlo(trades: Sequence[Mapping[str, Any]], *, iterations: int = 200, method: str = "RandomizeTradesOrder") -> dict[str, Any]`
   - [ ] `FR-MTANALYZER-PORTFOLIO`: Combine multiple imported MT4/MT5 reports into a blended portfolio and compute return/drawdown correlation matrices $\rightarrow$ `MTAnalyzer.compose_portfolio(report_trades_map: Mapping[str, Sequence[Mapping[str, Any]]], *, weights: Mapping[str, float] | None = None) -> dict[str, Any]`
+
+---
+
+<a id="sqx-metric-policies"></a>
+
+## 18. Qualified metric policies
+
+Owners: [shared statistics](#sqx-section-1b) and [Results](#sqx-section-7),
+reused by ranking, robustness, optimization and portfolios. Each value binds
+formula/version, eligible population, units/currency, sample, direction, costs,
+calendar and provenance. Return `finite` with a finite value, or null with
+`undefined`, `unavailable` or `unsupported` and a reason. Missing values are not
+zero; unknown formulas do not pass numeric filters. [R04], [R05], [R08]
+
+The table summarizes the **proposed neutral policies [INFERRED] Med** from [R09].
+It does not reproduce all original metrics. Source-specific safe-division helpers,
+PctPL, date helpers, sentinel 5/10/99999, opaque similarity and WF producers remain
+qualified gaps; source and neutral outputs can differ on identical trades.
+Mathematical identities sharing arithmetic are not permission for API aliases or
+compatibility wrappers. The source formulas/edge cases remain in [R04].
+
+| Family | Proposed formula / eligible input | Divergence or qualification gate |
+| --- | --- | --- |
+| MET-01 | `net_profit.v1`: sum net realized P/L over selected eligible trade legs | Excludes account cashflows; original helper/cost composition not assumed |
+| MET-02 | `gross_wins.v1` / `gross_losses.v1`: positive net outcomes and absolute negative net outcomes in the same selected currency population | Classification and summed quantity use the same representation; no hidden money-sign/percent mix |
+| MET-03 | `sum_trade_return.v1` and separately `capital_return.v1=N/C` | Stored source PctPL denominator unresolved; neither key is silently called source percentage profit |
+| MET-04 | `closed_trade_leg_count.v1` | Filled partial-exit legs count according to the neutral ledger, not unresolved original predicates |
+| MET-05 | `profit_factor.v1=G+/G−` | No loss: undefined with `zero_loss`; empty sample: undefined `insufficient_data`; no finite sentinel 5 |
+| MET-06 | `drawdown_realized.v1`: maximum decline from running peak of realized balance including initial capital point | No float per-order intermediate or implicit trade-weighted average; sample/time scope explicit |
+| MET-07 | `drawdown_relative.v1`: maximum peak-relative decline, returned as fraction | Nonpositive reference peak undefined; UI converts to percent; not percent of initial capital |
+| MET-08 | `drawdown_marked.v1`: drawdown from synchronized marked account equity | Unavailable without adequate marks; no per-order MAE approximation presented as portfolio equity |
+| MET-09 | `return_to_drawdown.v1=N/D` | Zero D undefined, no sentinel 10 |
+| MET-10 | `recovery_factor_money.v1` explicit alias of neutral money Return/DD | Source percentage recovery ratio is not reproduced or treated equivalent |
+| MET-11 | `mean_trade_pnl.v1=N/n` / `expectancy_pnl.v1` explicit alias | Empty population undefined; same eligibility for numerator/denominator |
+| MET-12 | `mean_initial_risk_multiple.v1=mean(pnl_i/initial_risk_i)` | Requires positive known initial risks; differs from source average-loss-normalized ratio; unavailable otherwise |
+| MET-13 | `periodic_sharpe.v1=sqrt(P)*mean(excess)/sd(excess,ddof=1)` | Return fractions from declared cashflow-adjusted sampled account series; P/calendar explicit, effective riskfree per period `(1+r_annual)^(1/P)-1`; default annual riskfree 0; n<2 or zero deviation undefined |
+| MET-14 | `cagr_elapsed.v1=(ending/starting)^(365.2425/elapsed_days)-1` | Positive capital, positive duration and no external flows required; no integer-year clamp. Arithmetic annual return is a separately named mean-periodic-return×P quantity |
+| MET-15 | `daily_account_series.v1` over explicitly requested calendar/range | No three-element padding or inferred original date helper; no-close dates carry only under declared calendar policy |
+| MET-16 | `source.stability` unsupported | Opaque similarity not replaced by a similarly labeled score; neutral R² is a distinct MET-17 key |
+| MET-17 | `equity_trend_r2.v1`: OLS of sampled cumulative P/L on elapsed time with intercept; 1−SSE/SST | Constant/insufficient samples undefined. No source reference-line denominator convention or signed score alias |
+| MET-18 | `source.legacy_stability` unsupported | Proprietary specialized score deferred; no approximation labeled equivalent |
+| MET-19 | `stagnation_duration.v1`: longest interval without strictly exceeding adjusted realized high | Full selected range, elapsed seconds, incomplete interval censored at configured end; no hidden integer-day truncation |
+| MET-20 | `drawdown_duration.v1`: longest peak-to-recovery interval, recovery ≥ previous peak | Unrecovered tail reported with censored flag; distinct from strict-new-high stagnation |
+| MET-21 | `wf_run_summary.v1`: max DD and minimum trade count over explicitly valid OOS windows, with required/valid counts | Missing first period does not fabricate zero; requested full-window summary unavailable if required windows failed |
+| MET-22 | `wf_profitable_fraction.v1`: positive-net OOS windows / all required completed valid OOS windows | All required windows must be complete for a full metric; no arbitrary exclusion of last period |
+| MET-23 | `wf_acceptance_fraction.v1`: passed explicit criteria / required valid windows | Source WF score and parameter-stability producer remain unsupported; no inferred formula from precomputed fields |
+| MET-24 | `mc_empirical_quantile.v1`: nearest-rank Q(q), index max(0,ceil(q*n)−1), q in [0,1]; adverse q=1−c for beneficial, c for risk | Independent explicit convention; require declared scenario eligibility and expose failed counts. `mc_threshold_breach_fraction.v1` requires a threshold/horizon and complete paths; it is an empirical scenario fraction, not guaranteed ruin probability |
+| MET-25 | `commission_swap.v1`: sum signed recorded commission+swap, debits negative, credits positive | Net P/L already includes these components; never subtract twice; adapter sign/unit mappings explicit |
+
+Units are stored as currency, fraction, seconds, ratio or count; percent/day
+formatting is presentation only. R-based metrics require positive known initial
+risk, marked drawdown requires synchronized marks, and Sharpe/CAGR require the
+specified return/cashflow/calendar population. Never substitute a trade-only
+approximation while claiming marked-account or source-metric equivalence. [R09]
+
+<a id="sqx-feature-crosswalk"></a>
+
+## 19. Complete REA feature crosswalk
+
+This table covers exactly **79 families**: 25 engine, 12 data, 17 workflow and
+25 metric families. Parent W17 is background evidence already covered by E22/E23,
+not an extra family. Source identities/statuses come from [T3]; [M4] supplies the
+reference design disposition, and [P5] supplies reference priority and scope.
+These are links to representative existing FR owners, not a claim that their
+current signatures/checkboxes implement every family contract. The shared gaps
+in sections 0.5-0.11 and 18 apply to every row. The full route/topic/domain/kernel/
+job/SQLite/Parquet/panel mapping is retained in [M4] rather than inferred from a
+workspace name. Original-source confidence is scoped to the cited observation;
+all reference design/priority decisions are [INFERRED] Med. [R03], [R04], [R07]
+
+Must/Should/Could/Won't below describe the **QuantX reference profile only**;
+its 43/20/11/5 family counts do not reduce the wider HaruQuantAI scope. Primary
+slices show partial-family MVP scope, not full parity; follow-ups and optional
+C01-C08 packages remain visible. Deferral/unsupported entries are explicit gaps,
+not silent deletion of a feature task. [R09], [R10]
+
+| REA family | Existing section / representative FR | Source observation status | Reference disposition / priority | Primary / follow-ups | Scoped delivery or remaining gap |
+| --- | --- | --- | --- | --- | --- |
+| E01 · Random strategy generation | [§6](#sqx-section-6) / `FR-BUILDER-TASK-EXECUTE` | documentary/static; unexecuted | retain / Must | S08 | Bounded seeded random generation over the MVP grammar. |
+| E02 · Genetic strategy evolution | [§6](#sqx-section-6) / `FR-BUILDER-GENETIC-OPTS` | documentary/static; unexecuted | replace / Should | S15 | No genetic generation in MVP; independent operators/islands after baseline. |
+| E03 · Strategy skeleton, direction and complexity | [§6](#sqx-section-6) / `FR-BUILDER-WTB-ARCH` | documentary/static; unexecuted | retain / Must | S04, then S15, S22 | Single-chart simple skeleton/direction/complexity only. |
+| E04 · Building-block pool and parameter generation | [§1B](#sqx-section-1b) / `FR-SNIPPETS-BLOCKS-REGISTER` | documentary/static; unexecuted | replace / Must | S04, then C01 | Typed minimal block catalog and validated ranges; more blocks/calibration later. |
+| E05 · Indicator output calibration | [§6](#sqx-section-6) / `FR-BUILDER-TASK-CALIBRATE` | documentary/static; unexecuted | retain / Could | C01 | Indicator-output calibration requires a complete neutral sampling/rounding policy. |
+| E06 · Historical backtest setup and precision | [§1A](#sqx-section-1a) / `FR-ENGINE-SIMULATOR-RUN` | documentary/static; unexecuted | replace / Must | S05, then C02 | Conservative bar backtest; no tick/synthesized-tick equivalence. |
+| E07 · Trading constraints and position sizing | [§1B](#sqx-section-1b) / `FR-SNIPPETS-MM-COMPUTE` | documentary/static; unexecuted | replace / Must | S05, then S22 | Fixed size, supported sessions/costs and initial SL/PT; advanced risk sizing later. |
+| E08 · Retest existing strategies | [§8](#sqx-section-8) / `FR-RETESTER-TASK-EXECUTE` | documentary/static; unexecuted | retain / Must | S07, then S14 | Selected neutral-strategy retests; automatic data-first pipelines later. |
+| E09 · Additional-market and precision cross-checks | [§8](#sqx-section-8) / `FR-RETESTER-CC-ADD-MARKETS` | documentary/static; unexecuted | retain / Should | S17, then C02 | Additional-market and supported bar retests; higher tick precision remains C02. |
+| E10 · Simple parameter optimization | [§9](#sqx-section-9) / `FR-OPTIMIZER-TASK-EXECUTE` | documentary/static; unexecuted | retain / Must | S09 | Finite decimal-safe grid trials with explicit ranking and budgets. |
+| E11 · Walk-forward optimization and matrix | [§8](#sqx-section-8) / `FR-RETESTER-CC-WFO` | documentary/static; unexecuted | replace / Should | S18 | WF/windows/matrix after grid and retest contracts. |
+| E12 · Sequential parameter optimization | [§8](#sqx-section-8) / `FR-RETESTER-CC-SEQ-OPT` | documentary/static; unexecuted | retain / Could | C03 | Sequential parameter tuning requires independent region-selection/tie policy. |
+| E13 · Monte Carlo trade manipulation | [§1B](#sqx-section-1b) / `FR-SNIPPETS-MC-MANIPULATE` | documentary/static; unexecuted | replace / Must | S10 | Permutation/bootstrap/skip scenarios under close_slot.v1. |
+| E14 · Monte Carlo input retesting | [§1B](#sqx-section-1b) / `FR-SNIPPETS-MC-RETEST` | documentary/static; unexecuted | retain / Should | S17 | Full perturbed-input backtests; no undocumented distributions. |
+| E15 · Portfolio subset search | [§11](#sqx-section-11) / `FR-PORTFOLIO-AUTO-TASK` | documentary/static; unexecuted | retain / Should | S20 | Subset search after account composition/reference subsets. |
+| E16 · Weighted portfolio composition | [§11](#sqx-section-11) / `FR-PORTFOLIO-COMP-COMPUTE` | documentary/static; unexecuted | replace / Should | S19 | Weighted synchronized account simulation with supported units/currencies. |
+| E17 · Automatic portfolio weight search | [§11](#sqx-section-11) / `FR-PORTFOLIO-COMP-CONFIG` | documentary/static; unexecuted | replace / Could | C03 | Alternative weight solvers need independent objective/solver definitions. |
+| E18 · Platform source export | [§1B](#sqx-section-1b) / `FR-CODEGEN-PSEUDOCODE` | documentary/static; unexecuted | replace / Must | S11, then S21, C04 | Native bundle and pseudocode only; EA source not claimed in MVP. |
+| E19 · Manual visual strategy authoring | [§5](#sqx-section-5) / `FR-WIZARD-CANVAS` | documentary/static; unexecuted | replace / Must | S04, then S22 | Simple form-based typed rule authoring; advanced editor/actions later. |
+| E20 · Fixed and generated scale-out exits | [§6](#sqx-section-6) / `FR-BUILDER-ATM-CONFIG` | documentary/static; unexecuted | retain / Should | S22 | Risk-sized/multipart exits after reference order/fill accounting. |
+| E21 · Custom analysis hooks | [§12](#sqx-section-12) / `FR-PROJECTS-TASK-CUSTOM-ANALYSIS` | documentary/static; unexecuted | simplify / Could | C01 | Trusted typed custom analysis only; original Java ABI excluded. |
+| E22 · Conditional neural-network extension | [§10](#sqx-section-10) / `FR-NN-TRAINER-TRAIN` | conditional/unverified | defer / Won't | Outside reference release | NN architecture/training behavior unresolved; explicit unavailable capability. |
+| E23 · Conditional cloud-engine strategy behavior | [§14](#sqx-section-14) / `FR-ALGOCLOUD-SYNC` | conditional/unverified | defer / Won't | Outside reference release | Cloud packaging/execution remains separate and unavailable. |
+| E24 · What-if trade-list scenarios | [§1B](#sqx-section-1b) / `FR-SNIPPETS-WHATIF-APPLY` | documentary/static; unexecuted | retain / Could | C03 | Additional what-if transforms require explicit timing/eligibility assumptions. |
+| E25 · In-sample/out-of-sample result ratios | [§8](#sqx-section-8) / `FR-RETESTER-CROSSCHECKS` | documentary/static; unexecuted | replace / Must | S10 | Qualified IS/OOS comparison with denominator and selection-exposure status. |
+| D01 · Register, update and clear provider histories | [§3](#sqx-section-3) / `FR-DATAMGR-DATA-ADD-BR` | documentary/static; unexecuted | retain / Must | S02, then S12, S13, C05 | Registration/local history lifecycle, then two mandated provider adapters. |
+| D02 · Preview and import mapped CSV/text bars or ticks | [§3](#sqx-section-3) / `FR-DATASRC-FILES-IMPORT` | documentary/static; unexecuted | retain / Must | S02, then C02, C05 | Single-file mapped OHLC CSV, preview/quality and immutable revision. |
+| D03 · Bulk import historical files | [§3](#sqx-section-3) / `FR-DATASRC-FILES-MASS-IMPORT` | documentary/static; unexecuted | simplify / Could | C05 | Folder/mixed-file mass import is not required for first research loop. |
+| D04 · Discover symbols and import history from local MT5 | [§1](#sqx-section-1) / `FR-DATASRC-MT5-IMPORT` | documentary/static; unexecuted | replace / Must | S12 | MT5 readonly session/symbol/account/history adapter; missing terminal handled truthfully. |
+| D05 · Clone history to a timezone and optionally remove weekends | [§3](#sqx-section-3) / `FR-DATAMGR-ACT-CLONE-TZ` | documentary/static; unexecuted | replace / Could | C05 | Derived timezone/history transforms after explicit DST/reaggregation policy. |
+| D06 · Maintain instruments, brokers, sessions and stock groups | [§3](#sqx-section-3) / `FR-DATAMGR-INSTR-ADD` | documentary/static; unexecuted | retain / Must | S01, then S12, S13, C05 | Minimum instrument/session/mapping economics; adapter metadata later, full catalogs optional. |
+| D07 · Import timestamped custom value series | [§3](#sqx-section-3) / `FR-DATAMGR-CUSTOM-IMPORT` | documentary/static; unexecuted | retain / Could | C05 | Custom timestamped series need availability/staleness/value-type specification. |
+| D08 · Export stored market history | [§3](#sqx-section-3) / `FR-DATAMGR-ACT-EXPORT-CSV` | documentary/static; unexecuted | replace / Must | S11, then C04 | CSV market data output; proprietary terminal binary formats optional. |
+| D09 · Classify and validate project versus task archives | [§1A](#sqx-section-1a) / `FR-ENGINE-FORMATS-CFX` | documentary/static; unexecuted | simplify / Could | C06 | Original project/task carrier classification/conversion beyond neutral bundles. |
+| D10 · Load strategy definitions separately from optional results | [§1A](#sqx-section-1a) / `FR-ENGINE-FORMATS-SQX` | documentary/static; unexecuted | simplify / Must | S11, then C06 | Neutral definition/result separation and round-trip; original .sqx payload decoding excluded. |
+| D11 · Persist databank membership and qualified views | [§7](#sqx-section-7) / `FR-RESULTS-DB-VIEWS` | documentary/static; unexecuted | replace / Must | S07 | Transactional membership, qualified views and explicit role bindings. |
+| D12 · Distinguish archive, model and result versions | [§1A](#sqx-section-1a) / `FR-ENGINE-FORMATS-CFX` | proposal plus source rules | replace / Must | S01, then S11, C06 | Independent schema/model/layout/formula versions and unsupported diagnostics. |
+| W01 · Project and task identity | [§12](#sqx-section-12) / `FR-PROJECTS-TASKS-NEW` | documentary/static; unexecuted | retain / Must | S01, then S14 | Basic project/task context; ordered multi-step custom graphs later. |
+| W02 · Start, pause, resume and stop | [§1](#sqx-section-1) / `FR-HOST-JOBS-CANCEL` | documentary/static; unexecuted | replace / Must | S03 | Durable request/ack state machine and pause/resume/cancel semantics. |
+| W03 · Progress subscriptions and errors | [§1](#sqx-section-1) / `FR-HOST-BOOTSTRAP-BROADCAST` | documentary/static; unexecuted | replace / Must | S03 | Committed progress/errors plus snapshot/replay/deduplication. |
+| W04 · Task configuration snapshots and application | [§12](#sqx-section-12) / `FR-PROJECTS-TASK-MASS-CONFIG` | documentary/static; unexecuted | replace / Must | S04, then S14 | Immutable task/strategy settings revisions; stopped multi-target apply later. |
+| W05 · Workflow conditions and looping | [§12](#sqx-section-12) / `FR-PROJECTS-TASK-GOTO` | documentary/static; unexecuted | replace / Should | S14 | Explicit graph conditions/jumps/loop ceiling and restart cursor. |
+| W06 · Wait for user or file | [§12](#sqx-section-12) / `FR-PROJECTS-TASK-WAIT` | documentary/static; unexecuted | replace / Should | S14 | Persisted user/fresh-file waits, no worker slot consumed. |
+| W07 · External task actions | [§12](#sqx-section-12) / `FR-PROJECTS-TASK-EXT-SCRIPT` | documentary/static; unexecuted | simplify / Could | C07 | Registered external side effects are separate from offline research. |
+| W08 · Conditional databank processing | [§12](#sqx-section-12) / `FR-PROJECTS-TASK-FILTERING` | documentary/static; unexecuted | replace / Must | S07, then S14 | Strict basic predicates, membership mutation and simple aggregates; pipeline use later. |
+| W09 · Workflow load/save operations | [§12](#sqx-section-12) / `FR-PROJECTS-TASK-SAVE-FILES` | documentary/static; unexecuted | simplify / Must | S11, then S23, C04, C06, C07 | Neutral file load/save and CSV export; richer formats/side effects optional. |
+| W10 · Command-line automation | [§1](#sqx-section-1) / `FR-HOST-CLI-RUN` | documentary/static; unexecuted | replace / Should | S23 | Thin new CLI after workflow and artifact APIs; no original syntax promise. |
+| W11 · Detailed result inspection | [§7](#sqx-section-7) / `FR-RESULTS-REPORT-VIEW` | documentary/static; unexecuted | retain / Must | S06, then S16, S18, S19 | Context-bound result metrics/charts/virtualized detail; specialized tabs later. |
+| W12 · Live best-result panels and extension tabs | [§7](#sqx-section-7) / `FR-RESULTS-DASHBOARD-RESULTS` | documentary/static; unexecuted | simplify / Could | C01 | Rich live best-result panels/trusted custom views; no arbitrary original iframe ABI. |
+| W13 · Resource and retention controls | [§1](#sqx-section-1) / `FR-HOST-RESOURCES-INSPECT` | documentary/static; unexecuted | replace / Must | S03, then C01 | Operative CPU/memory/query/queue bounds and diagnostics; advanced retention knobs optional. |
+| W14 · Periodic and completion synchronization | [§7](#sqx-section-7) / `FR-RESULTS-DB-SYNC-TOOLS` | documentary/static; unexecuted | replace / Must | S02, then S03, S11 | Committed metadata plus immutable manifests; original periodic-save-only semantics replaced. |
+| W15 · Shell preferences and diagnostics | [§1](#sqx-section-1) / `FR-HOST-SETTINGS-SAVE` | documentary/static; unexecuted | replace / Must | S01, then C08 | Layout/basic appearance and diagnostics; extra localization/native desktop optional. |
+| W16 · COT and volume-profile extension families | [§1A](#sqx-section-1a) / `FR-IND-VOLUME` | extension/manual scope | defer / Won't | Outside reference release | COT/VP ambiguous or unqualified extensions require new neutral definitions, not original research examples. |
+| W18 · Ranking, acceptance filters and stopping | [§6](#sqx-section-6) / `FR-BUILDER-RANK-FITNESS` | documentary/static; unexecuted | replace / Must | S07 | One qualified fitness metric, strict filters/top-N/exact duplicates/stable ties; no similarity parity. |
+| MET-01 · Net profit | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-02 · Gross profit and gross loss | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-03 · Net profit in percent | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-04 · Trade count | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-05 · Profit factor | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-06 · Maximum drawdown in money | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-07 · Maximum relative drawdown | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-08 · Open drawdown | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S16 | Explicit independent advanced formula, input availability and boundary fixtures. |
+| MET-09 · Return / drawdown ratio | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-10 · Recovery factor | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-11 · Expectancy and average trade | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-12 · R expectancy | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S16 | Explicit independent advanced formula, input availability and boundary fixtures. |
+| MET-13 · Sharpe ratio | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S16 | Explicit independent advanced formula, input availability and boundary fixtures. |
+| MET-14 · CAGR and annual percentage return | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S16 | Explicit independent advanced formula, input availability and boundary fixtures. |
+| MET-15 · Daily equity sampling used by consistency metrics | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+| MET-16 · Current stability | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | defer / Won't | Outside reference release | Opaque/specialized source formula unsupported; no substitute score using its name. |
+| MET-17 · R-squared consistency | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S16 | Explicit independent advanced formula, input availability and boundary fixtures. |
+| MET-18 · Legacy stability | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | algorithm-class-only; unexecuted | defer / Won't | Outside reference release | Opaque/specialized source formula unsupported; no substitute score using its name. |
+| MET-19 · Stagnation | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S16 | Explicit independent advanced formula, input availability and boundary fixtures. |
+| MET-20 · Maximum drawdown duration | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S16 | Explicit independent advanced formula, input availability and boundary fixtures. |
+| MET-21 · Walk-forward run summaries | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S18 | Neutral required-window/WF aggregates only; source score/parameter-stability producers remain unsupported. |
+| MET-22 · Percentage of profitable walk-forward runs | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Should | S18 | Neutral required-window/WF aggregates only; source score/parameter-stability producers remain unsupported. |
+| MET-23 · Walk-forward score and parameter stability | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | upstream-formula-unresolved; unexecuted | replace / Should | S18 | Neutral required-window/WF aggregates only; source score/parameter-stability producers remain unsupported. |
+| MET-24 · Monte Carlo confidence tables and ruin risk | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | documented-only; unexecuted | replace / Must | S10, then C03 | Empirical nearest-rank quantiles; threshold-breach/advanced scenario summaries require complete explicit paths. |
+| MET-25 · Commission and swap total | [§1B](#sqx-section-1b) / `FR-SNIPPETS-COLUMNS-EVAL` | partial; unexecuted | replace / Must | S06 | The independently named 09 baseline formula and typed undefined/eligibility/unit behavior; no original numeric parity. |
+
+<a id="sqx-delivery"></a>
+
+## 20. Reference delivery sequence and release gates
+
+Preserve the existing numbered feature phases as the structural work catalog.
+The source roadmap is a dependency-based **reference delivery profile**, not a
+replacement for repository V2 milestones or owning implementation plans. Deliver
+useful vertical behavior before broad optional infrastructure. The 13 Must and
+10 Should slices below are planned, not completed; no time estimate is inferred
+from their relative effort labels. Full scope/tests/failure demonstrations are
+available in [S5] and [R10].
+
+| Slice | Reference priority | Direct dependencies | Independently useful outcome |
+| --- | --- | --- | --- |
+| S01 · Portable workspace, catalogs and capability shell | Must | None | An installable local app that creates a workspace, manages basic instrument/dataset registrations and restores its layout. |
+| S02 · Single-file bar import and immutable history storage | Must | S01 | Preview a mapped CSV and import validated OHLC bars to an immutable Parquet revision with visible quality/progress. |
+| S03 · Durable job controls, event replay and resource bounds | Must | S02 | Pause/resume/cancel imports safely, inspect command outcomes and reconnect to authoritative job progress. |
+| S04 · Typed strategy model and simple rule authoring | Must | S01 | Create, validate, revise and reopen a simple strategy through forms using a small typed block catalog. |
+| S05 · Deterministic single-symbol bar backtest | Must | S02, S03, S04 | Run the authored strategy on imported bars and obtain a reproducible orders/fills/trades/equity result manifest. |
+| S06 · Single-run results, core metrics and virtualized views | Must | S05 | Inspect a selected run with qualified core metrics, equity/price charts and virtualized order/fill/trade tables. |
+| S07 · Databanks, ranking and selected-strategy retesting | Must | S06 | Keep, sort/filter, copy/move/delete and retest selected strategy revisions with explicit input/output collections. |
+| S08 · Finite-budget random strategy builder | Must | S07 | Generate valid strategies from the supported grammar, test them and retain ranked accepted candidates. |
+| S09 · Grid parameter optimization | Must | S07 | Tune explicit parameter axes for a saved strategy and inspect ranked trial outcomes. |
+| S10 · Trade-list Monte Carlo and held-out sample reports | Must | S07 | Run explicit permutation/bootstrap/omission scenarios and inspect empirical outcome summaries alongside IS/OOS report contexts. |
+| S11 · Portable neutral bundles, CSV and pseudocode export | Must | S07 | Save/reload supported neutral strategies/results and export reproducible CSV data/trades/tables and readable pseudocode. |
+| S12 · Read-only MT5 Python adapter | Must | S02, S03 | Configure a local MT5 adapter, inspect symbols/account state and acquire supported M1 history into neutral revisions. |
+| S13 · Read-only cTrader Open API adapter | Must | S02, S03 | Configure cTrader authorization, inspect supported readonly account/symbol data and acquire supported M1 history. |
+| S14 · Ordered custom workflows and basic waits | Should | S03, S07, S11 | Compose retest/filter/save tasks into a persistent workflow with explicit bindings, loops and user/file waits. |
+| S15 · Independent genetic strategy evolution | Should | S08 | Evolve valid candidate populations with explicitly versioned genetic operators and seeded island/checkpoint behavior. |
+| S16 · Advanced neutral metrics and marked-account analysis | Should | S06 | Add explicit marked drawdown, initial-risk multiples, periodic Sharpe, elapsed CAGR, neutral trend R² and duration metrics. |
+| S17 · Additional-market and input-perturbation retests | Should | S07, S10 | Batch independent market setups and supported parameter/history/cost perturbation backtests with acceptance reports. |
+| S18 · Walk-forward windows, matrix and neutral summaries | Should | S09, S17 | Optimize training windows, evaluate following OOS windows and display a matrix with independently defined summaries. |
+| S19 · Weighted portfolio account composition | Should | S07, S16 | Combine selected strategy revisions using declared weights and a synchronized supported account model. |
+| S20 · Portfolio subset search | Should | S19 | Search strategy subsets under explicit cardinality/correlation/sector/budget constraints. |
+| S21 · Independent MT5 source generator | Should | S11, S05 | Export the supported neutral strategy subset to independently authored MT5 source with a version/block support matrix. |
+| S22 · Advanced authoring, sizing and partial exits | Should | S04, S05, S16 | Extend the editor/engine with specifically defined multievent/order/risk-size/scale-out behavior. |
+| S23 · Thin CLI and repeatable batch automation | Should | S11, S14 | Automate the same validated project/job/artifact operations without a separate computation engine. |
+
+In S05 the initial supported subset is one symbol/account currency/position,
+long/short market entry/exit, fixed size, initial stop/target, supported sessions,
+fixed spread/slippage/flat commission and no swap. S04 begins with simple typed
+forms and a minimal price/lag/constant/parameter/comparison/boolean/SMA grammar.
+S07 bounds atomic selected membership mutation to 5,000 entries; larger requests
+need a separate batch contract. Broader task signatures do not override these
+reference subset limits or establish their implementation. [R10]
+
+| Optional package | Reference scope; entry condition |
+| --- | --- |
+| C01 | Output-threshold calibration, richer blocks/analyses/custom panels; independent typed unit/warmup/permission contracts. |
+| C02 | Tick/bid-ask/high-precision simulation/import; qualified event/fill/calendar model, real versus synthetic provenance. |
+| C03 | Sequential optimization, weight solvers and extra scenarios; explicit objective/algorithm/budget/ties/missing-result rules. |
+| C04 | Other platform generators and report/binary exports; separate format/compiler/version/block qualification per target. |
+| C05 | Folder imports, timezone clones, custom values/full catalogs/providers; explicit availability/DST/duplicates/quality fixtures. |
+| C06 | Original carrier conversion; independent format specification, version support and loss diagnostics; unknown binary payloads stay opaque. |
+| C07 | Extended file utilities/scripts/notifications/deletions; typed grants and side-effect/reconciliation contract, no automatic external authority. |
+| C08 | Optional Tauri/Python packaging; working browser build plus Windows spawn, shutdown, install/upgrade qualification. |
+
+The reference release excludes E22/E23/W16/MET-16/MET-18; its baseline also omits
+live orders, distributed scheduling, network-file SQLite, original runtime/plugin
+loading and copied assets/templates. Those exclusions do not cancel broader
+repository-owned future capabilities; keep them explicitly unavailable until
+separately specified, authorized and qualified. [R09], [R10]
+
+| Milestone | Evidence required before naming the release |
+| --- | --- |
+| S06 research preview | Catalog → import → author → backtest → inspect works against independent figures; no builder/optimizer/provider implication. |
+| S11 offline research | All Must slices through S11 pass supported generation/grid/scenario, neutral bundle round-trip, restart/control/replay gates. |
+| S13 reference adapter MVP | Both readonly adapters pass offline/Windows tests; real terminal/account/demo qualification reported separately. Missing setup remains unavailable, not connected. |
+| S21 EA export | Independent generator compiles with declared MetaEditor version and passes supported semantic cases; no compiler means unqualified, not a compiled EA. |
+
+### Independent acceptance fixtures
+
+These references are constructed arithmetic/behavior fixtures, not copied donor
+outputs or tests executed by this documentation task. They must be independently
+implemented with explicit tolerances in the owning feature plan. [R10]
+
+| Fixture | Expected reference / failure boundary |
+| --- | --- |
+| F01 | Net outcomes +10, −4, +6 with initial 100: net 12, gross wins 16, gross losses 4, mean 4, PF 4, realized DD 4, relative DD 4/110, Return/DD 3; no cashflow or cost ambiguity. |
+| F02 | Submit after A closes; B open 103/high 104/low 100/close 102; long quantity 1, point value 1, zero costs, SL 100/PT 104. Next-open entry 103 and adverse same-bar exit 100 yield −3; no fill on A. |
+| F03 | SMA(3) over 1,2,3,4 is invalid for two points then 2,3; changing future inputs cannot change an earlier decision. |
+| F04 | Decimal grid 1..5 step 2 is 1,3,5; nonpositive step or inverted range fails, and an off-grid stop is not appended. |
+| F05 | F01 permutation preserves net 12; bootstrap [10,10,6] gives 26; zero/all omission has explicit eligibility/undefined handling. |
+| F06 | Empty/zero-denominator ratios return null with reason; absent/unsupported differs from zero; no source sentinel fallback. |
+| F07 | Same immutable inputs/root seed and completed logical units produce stable candidate/trial IDs and aggregates across worker counts/retries; record differing completed sets for time budgets/cancel. |
+| F08 | An observation cannot affect a decision before its available time; DST ambiguity/duplicate rejection cannot publish a silently complete revision. |
+
+### Definition of done and current qualification limits
+
+Each slice needs independent domain/numeric/storage/API/worker tests as applicable,
+FR log assertions, typed client/schema agreement, meaningful frontend tests and
+a real-browser smoke of its delivered journey. Include stale-attempt fencing,
+control/completion races, checkpoint mismatch, crash-before-manifest publication,
+replay expiry/overflow, unavailable dependencies/providers, file locks/full disk,
+retention/removal and bounded memory/query/DOM behavior. A mocked call is not
+external connectivity; measured workload/hardware/version data is required for
+capacity claims. Run scoped pytest with `--no-cov` during iteration and the
+repository-required release checks/coverage when the owning plan requires them.
+[R06], [R07], [R08], [R10]
+
+Pin compatible backend/frontend/runtime dependencies and lockfiles in an owning
+implementation plan, with Windows setup/reopen/upgrade tests. A browser build
+must work without optional broker SDKs; no Redis, proprietary runtime or external
+service is introduced to bypass an incomplete slice. Preserve source versions,
+policy settings, seed/work units and partial outputs in each build note. Approval
+of this document does not migrate active databases or authorize external probes.
+[R10]
+
+The remaining evidence gaps include original simulation/GP internals, several
+metric helpers, proprietary codecs, source/compiled/loading parity, current
+entitlements, provider/compiler connectivity and measured performance. Adopt
+explicit neutral behavior through the owner workflow when appropriate; otherwise
+keep the capability unavailable. The retained validation results are document
+checks, not numerical/runtime certification. [R02], [R04], [R06], [V4], [V5]
+
+<a id="sqx-sources"></a>
+
+## 21. REA source register and audit provenance
+
+The source workspace is a separate sibling project. Links below resolve from
+`docs/SQX/` to `../../../QuantX/SQX-REA-WORKSPACE/`; portable product packages must
+not depend on that investigation tree or ship it. The root reports paraphrase
+behavior/evidence; their links to copied code are provenance, not implementation
+permission. This reconciliation changes this blueprint only; it does not rewrite
+the source evidence, repository evidence ledger or approved implementation status.
+
+| Ref | Authored source / exact scope |
+| --- | --- |
+| R00 | [Reconnaissance][R00], especially scope and section 6: sampled carriers, binary/SQLite boundaries and unknowns. |
+| R01 | [Documentation findings][R01], sections 5-7: manuals, extension ambiguities and conflicting availability claims. |
+| R02 | [Architecture map][R02], sections 3/7/8: static ownership, GP/portfolio distinction and unresolved boundaries. |
+| R03 | [Feature inventory][R03], E01-E25/D01-D12/W01-W16/W18/MET-01-MET-25: inputs, parameters, defaults and limits. |
+| R04 | [Functional requirements][R04], sections 2-5: unexecuted Given/When/Then, metric formulas and blockers. |
+| R05 | [Data model][R05], sections 3-7: observed formats versus proposed entities/layouts. |
+| R06 | [Nonfunctional profile][R06], sections 1-6: bounded historical/static observations, unmeasured guarantees and test gaps. |
+| R07 | [Target architecture][R07], sections 2-8/10: proposed numerical policies, storage/ledger/ownership, replay and complete mapping. |
+| R08 | [API contracts][R08], sections 1-7: proposed wire/route/DTO/job/event/adapter schemas and validation. |
+| R09 | [Gap analysis][R09], sections 1-4: compatibility decisions, 25 neutral policies and per-family disposition. |
+| R10 | [Roadmap][R10], sections 1-10: reference priorities, S01-S23/C01-C08, F01-F08 and clean-room handoff. |
+| RG | [Glossary][RG]: source-scoped terminology; later metric/source qualifications above take precedence over shorthand definitions. |
+| T3 / M4 / C4 | [79-family traceability][T3], [complete feature-to-stack mapping][M4], [contract registry][C4]; machine-readable design coverage. |
+| P5 / S5 | [Priorities][P5] and [slice dependencies/acceptance][S5]; reference planning data, not release status. |
+| V4 / V5 | [Stage 4 validation][V4] and [Stage 5 validation][V5]; document/reference/integrity checks, explicitly excluding runtime qualification. |
+
+Current-repository observations in section 0.6 come from
+[host jobs](../../app/host/jobs.py), [events](../../app/host/events.py),
+[persistence](../../app/host/persistence.py), [transport](../../app/host/transport.py),
+[host registry](../../app/host/README.md), [MetaTrader adapter](../../app/services/brokers/metatrader.py),
+[cTrader adapter](../../app/services/brokers/ctrader.py) and
+[dependency declarations](../../pyproject.toml), inspected at HEAD
+`9c85d785a9496f9410da0e18eaa4cb43e83c306a`. Current status belongs to those owners;
+this documentation review does not run or certify them.
+
+[R00]: ../../../QuantX/SQX-REA-WORKSPACE/00_recon.md
+[R01]: ../../../QuantX/SQX-REA-WORKSPACE/01_docs_findings.md
+[R02]: ../../../QuantX/SQX-REA-WORKSPACE/02_architecture_map.md
+[R03]: ../../../QuantX/SQX-REA-WORKSPACE/03_feature_inventory.md
+[R04]: ../../../QuantX/SQX-REA-WORKSPACE/04_functional_requirements.md
+[R05]: ../../../QuantX/SQX-REA-WORKSPACE/05_data_model.md
+[R06]: ../../../QuantX/SQX-REA-WORKSPACE/06_nonfunctional_profile.md
+[R07]: ../../../QuantX/SQX-REA-WORKSPACE/07_target_architecture.md
+[R08]: ../../../QuantX/SQX-REA-WORKSPACE/08_api_contracts.md
+[R09]: ../../../QuantX/SQX-REA-WORKSPACE/09_gap_analysis.md
+[R10]: ../../../QuantX/SQX-REA-WORKSPACE/10_roadmap.md
+[RG]: ../../../QuantX/SQX-REA-WORKSPACE/glossary.md
+[T3]: ../../../QuantX/SQX-REA-WORKSPACE/evidence/stage3/traceability.json
+[M4]: ../../../QuantX/SQX-REA-WORKSPACE/evidence/stage4/feature_mapping.json
+[C4]: ../../../QuantX/SQX-REA-WORKSPACE/evidence/stage4/contract_registry.json
+[P5]: ../../../QuantX/SQX-REA-WORKSPACE/evidence/stage5/priority_plan.json
+[S5]: ../../../QuantX/SQX-REA-WORKSPACE/evidence/stage5/slice_plan.json
+[V4]: ../../../QuantX/SQX-REA-WORKSPACE/evidence/stage4/stage4_validation.json
+[V5]: ../../../QuantX/SQX-REA-WORKSPACE/evidence/stage5/stage5_validation.json
