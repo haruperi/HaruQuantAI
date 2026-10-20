@@ -10,14 +10,8 @@ Purpose:
     FEAT-DATAMGR-ROUTES: Data Manager REST API routes and workspace coordinator.
 
 Key Capabilities:
-    - FR-DATAMGR-ROUTES-WORKSPACE-FACADE: Coordinate Data Manager workspace
-      lifecycle and domain services.
-      Associated: `DataManagerWorkspace`, `DataManagerWorkspace.initialize_defaults()`
-      Logging: Emits INFO on workspace initialization and default seeding.
-    - FR-DATAMGR-ROUTES-FASTAPI-GATEWAY: Expose authoritative REST endpoints
-      under /data.
-      Associated: `create_data_manager_router()`
-      Logging: Emits INFO on route registration and request dispatch.
+    - FR-DATAMGR-ROUTES-WORKSPACE-FACADE: Facade (DataManagerWorkspace -> INFO).
+    - FR-DATAMGR-ROUTES-FASTAPI-GATEWAY: Routes (create_data_manager_router -> INFO).
 
 Python API Usage:
     ```python
@@ -43,7 +37,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from app.host.logging import get_logger
-from app.host.response import StandardError, StandardResponse
+from app.host.response import StandardResponse
+from app.host.session import SessionManager, session_manager
 from app.host.transport import extract_bearer_token
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import JSONResponse
@@ -52,7 +47,6 @@ from .home import Home
 
 if TYPE_CHECKING:
     from app.host.discovery import PluginLifecycleManager
-    from app.host.session import SessionManager
     from app.host.transport import EventBus
 
 __all__ = [
@@ -118,15 +112,6 @@ def _success(data: Any, message: str = "Success") -> JSONResponse:
     )
 
 
-def _error(code: str, message: str, status_code: int = 400) -> JSONResponse:
-    return JSONResponse(
-        content=StandardResponse.failure(
-            message=message, error=StandardError(code=code, message=message)
-        ).to_dict(),
-        status_code=status_code,
-    )
-
-
 def _register_home_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:
     @router.get("/home/overview")
     def get_home_overview() -> JSONResponse:
@@ -146,6 +131,7 @@ def create_data_manager_router(
 ) -> APIRouter:
     """Create and configure the FastAPI APIRouter for Data Manager endpoints."""
     ws = workspace or DataManagerWorkspace()
+    effective_session_mgr = session_mgr or session_manager
     dependencies: list[Any] = []
     if require_auth:
 
@@ -161,16 +147,10 @@ def create_data_manager_router(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Active session required for Data Manager access.",
                 )
-            mgr: SessionManager | None = None
-            if hasattr(request.app.state, "runtime") and request.app.state.runtime:
-                mgr = getattr(request.app.state.runtime, "session_manager", None)
-            if mgr is None:
-                mgr = session_mgr
-            if mgr is None:
-                from app.host.session import session_manager as global_session_mgr
-
-                mgr = global_session_mgr
-
+            runtime = getattr(request.app.state, "runtime", None)
+            mgr: SessionManager = (
+                getattr(runtime, "session_manager", None) or effective_session_mgr
+            )
             if mgr.validate_token(token) is None:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,

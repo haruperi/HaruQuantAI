@@ -12,12 +12,8 @@ Purpose:
     FEAT-DATAMGR-HOME: Data Manager dashboard overview and catalog presentation.
 
 Key Capabilities:
-    - FR-DATAMGR-HOME-OVERVIEW: Compute aggregate counts across database catalogs.
-      Associated: `Home.get_overview()`
-      Logging: Emits INFO on overview computation with summary numbers.
-    - FR-DATAMGR-HOME-DATASETS-CATALOG: Retrieve saved datasets catalog for display.
-      Associated: `Home.get_saved_datasets()`
-      Logging: Emits DEBUG when listing saved dataset catalog entries.
+    - FR-DATAMGR-HOME-OVERVIEW: Catalog overview metrics (Home.get_overview -> INFO).
+    - FR-DATAMGR-HOME-DATASETS-CATALOG: Datasets (Home.get_saved_datasets -> DEBUG).
 
 Python API Usage:
     ```python
