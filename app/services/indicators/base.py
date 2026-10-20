@@ -4,18 +4,16 @@ Description:
     Provides the core IndicatorSeries abstraction wrapping 1D numerical
     arrays with bar shift indexing, vectorization, and universal condition
     evaluation (rising, falling, crosses above, crosses below, higher, lower).
-    Serves as the base framework for all 53 StrategyQuant X indicator families.
+    Serves as the base framework for all quantitative indicator families.
 
 Purpose:
     FEAT-SERVICES-INDICATOR-FOUNDATION: Universal indicator data and conditions.
 
 Key Capabilities:
-    - FR-SERVICES-INDICATOR-SERIES-STORAGE: Typed array storage with shift indexing.
-      Associated: `IndicatorSeries.get()`, `IndicatorSeries.values`
-      Logging: DEBUG on series instantiation and out-of-bounds access.
-    - FR-SERVICES-SERIES-CONDITION-EVALUATOR: Universal rule condition evaluations.
-      Associated: `IndicatorSeries.is_rising()`, `IndicatorSeries.crosses_above()`
-      Logging: DEBUG on condition evaluation outcomes.
+    - FR-SERVICES-INDICATOR-SERIES-STORAGE: Typed array storage with shift indexing
+      [`IndicatorSeries.get()`, `IndicatorSeries.values`] (`DEBUG`).
+    - FR-SERVICES-SERIES-CONDITION-EVALUATOR: Universal rule condition evaluations
+      [`IndicatorSeries.is_rising()`, `IndicatorSeries.crosses_above()`] (`NONE`).
 
 Python API Usage:
     ```python
@@ -92,11 +90,6 @@ class IndicatorSeries:
             Float value at the given shift, or NaN if outside range.
         """
         if shift < 0 or shift >= len(self._values):
-            logger.debug(
-                "FR-SERVICES-INDICATOR-SERIES-STORAGE: Shift %d out of bounds (len=%d)",
-                shift,
-                len(self._values),
-            )
             return float("nan")
         return float(self._values[-(1 + shift)])
 
@@ -111,13 +104,7 @@ class IndicatorSeries:
         """
         val0 = self.get(shift)
         val1 = self.get(shift + 1)
-        res = not (np.isnan(val0) or np.isnan(val1)) and val0 > val1
-        logger.debug(
-            "FR-SERVICES-SERIES-CONDITION-EVALUATOR: is_rising(shift=%d) = %s",
-            shift,
-            res,
-        )
-        return res
+        return not (np.isnan(val0) or np.isnan(val1)) and val0 > val1
 
     def is_falling(self, shift: int = 0) -> bool:
         """Check if indicator value at shift is strictly lower than shift + 1.
@@ -130,13 +117,7 @@ class IndicatorSeries:
         """
         val0 = self.get(shift)
         val1 = self.get(shift + 1)
-        res = not (np.isnan(val0) or np.isnan(val1)) and val0 < val1
-        logger.debug(
-            "FR-SERVICES-SERIES-CONDITION-EVALUATOR: is_falling(shift=%d) = %s",
-            shift,
-            res,
-        )
-        return res
+        return not (np.isnan(val0) or np.isnan(val1)) and val0 < val1
 
     def crosses_above(self, level: float | IndicatorSeries, shift: int = 0) -> bool:
         """Check if series crossed above a level/series between shift+1 and shift.
@@ -160,14 +141,7 @@ class IndicatorSeries:
         )
         if nan_check:
             return False
-
-        res = prev_val <= prev_lvl and curr_val > curr_lvl
-        logger.debug(
-            "FR-SERVICES-SERIES-CONDITION-EVALUATOR: crosses_above(shift=%d) = %s",
-            shift,
-            res,
-        )
-        return res
+        return prev_val <= prev_lvl and curr_val > curr_lvl
 
     def crosses_below(self, level: float | IndicatorSeries, shift: int = 0) -> bool:
         """Check if series crossed below a level/series between shift+1 and shift.
@@ -192,14 +166,7 @@ class IndicatorSeries:
         )
         if nan_check:
             return False
-
-        res = prev_val >= prev_lvl and curr_val < curr_lvl
-        logger.debug(
-            "FR-SERVICES-SERIES-CONDITION-EVALUATOR: crosses_below(shift=%d) = %s",
-            shift,
-            res,
-        )
-        return res
+        return prev_val >= prev_lvl and curr_val < curr_lvl
 
     def is_greater(self, other: float | IndicatorSeries, shift: int = 0) -> bool:
         """Check if series value at shift is greater than another level or series.
@@ -294,8 +261,6 @@ class BaseIndicator(ABC):
         if isinstance(val, IndicatorSeries):
             return val.values
         return np.asarray(val, dtype=np.float64)
-
-    _to_numpy = to_numpy
 
     @classmethod
     @abstractmethod

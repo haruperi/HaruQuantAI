@@ -52,10 +52,7 @@ DOCSTRING_RATCHET_ALLOWLIST: dict[str, int] = {}
 FILE_SIZE_EXEMPT_PATHS = frozenset({"app/host/_schema.py"})
 
 # Ratchet allowlist for pre-existing >1,000-line files scheduled for future slices.
-RATCHET_ALLOWLIST: dict[str, int] = {
-    "app/services/brokers/simulator.py": 1660,
-    "app/services/brokers/ctrader.py": 1260,
-}
+RATCHET_ALLOWLIST: dict[str, int] = {}
 
 
 def _iter_app_python_files() -> list[tuple[str, Path]]:

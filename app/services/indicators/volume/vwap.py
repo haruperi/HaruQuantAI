@@ -74,10 +74,10 @@ class VWAP(BaseIndicator):
         Returns:
             IndicatorSeries containing the rolling VWAP line.
         """
-        h_arr = cls._to_numpy(high)
-        l_arr = cls._to_numpy(low)
-        c_arr = cls._to_numpy(close)
-        v_arr = cls._to_numpy(volume)
+        h_arr = cls.to_numpy(high)
+        l_arr = cls.to_numpy(low)
+        c_arr = cls.to_numpy(close)
+        v_arr = cls.to_numpy(volume)
         n = len(c_arr)
 
         if period < 1:
@@ -99,7 +99,7 @@ class VWAP(BaseIndicator):
 
         # Determine price representation: 4-price average if open provided, else typical
         if open_prices is not None:
-            o_arr = cls._to_numpy(open_prices)
+            o_arr = cls.to_numpy(open_prices)
             price_arr = (o_arr + h_arr + l_arr + c_arr) / 4.0
         else:
             price_arr = (h_arr + l_arr + c_arr) / 3.0

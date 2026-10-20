@@ -59,7 +59,7 @@ class AvgVolume(BaseIndicator):
         Returns:
             IndicatorSeries containing the rolling average volume values.
         """
-        vol_arr = cls._to_numpy(volume)
+        vol_arr = cls.to_numpy(volume)
         n = len(vol_arr)
 
         if period < 1:

@@ -67,10 +67,10 @@ class HeikenAshi(BaseIndicator):
         Returns:
             Dictionary containing 'open', 'high', 'low', and 'close' IndicatorSeries.
         """
-        o_arr = cls._to_numpy(open_prices)
-        h_arr = cls._to_numpy(high)
-        l_arr = cls._to_numpy(low)
-        c_arr = cls._to_numpy(close)
+        o_arr = cls.to_numpy(open_prices)
+        h_arr = cls.to_numpy(high)
+        l_arr = cls.to_numpy(low)
+        c_arr = cls.to_numpy(close)
 
         n = len(c_arr)
         if n == 0:

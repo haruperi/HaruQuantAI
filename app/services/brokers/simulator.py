@@ -9,12 +9,8 @@ Purpose:
     FEAT-BROKER-SIMULATION: Local broker semantics for strategy verification.
 
 Key Capabilities:
-    - FR-SIMULATION-DISPATCH: Execute native-shaped operations with receipts.
-      Associated: `SimulatorClient.call()`
-      Logging: DEBUG every dispatch with class/method metadata, never arguments.
-    - FR-SIMULATION-HISTORY: Seed and query historical bars and ticks.
-      Associated: `seed_bar_history()`, `seed_tick_history()`, `_market_data()`
-      Logging: DEBUG each seeding/read attempt, without row contents.
+    - FR-SIMULATION-DISPATCH: Local dispatch with receipts [`SimulatorClient.call()`] (`DEBUG`).
+    - FR-SIMULATION-HISTORY: Seed and query bars/ticks [`SimulatorClient.get_bars()`] (`DEBUG`).
 
 Python API Usage:
     ```python
@@ -34,201 +30,115 @@ CLI Usage:
 from __future__ import annotations
 
 import asyncio
-import contextvars
 import os
 from collections.abc import Sequence
 from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from itertools import count
-from typing import Any, override
+from typing import Any, TypeVar, override
 
 from app.host.logging import get_logger
-from app.services.brokers.base import (
-    BridgeError,
-    TradingClient,
-    epoch_seconds,
-    utc_now,
-)
-from app.services.include.contracts import (
-    TIMEFRAME_SECONDS,
-    AccountInfo,
-    BookInfo,
-    BridgeEvent,
-    DealInfo,
-    MarketBar,
-    MarketTick,
-    OrderInfo,
-    PositionInfo,
-    Receipt,
-    SymbolInfo,
-    TerminalInfo,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
-)
+from app.services.brokers.base import BridgeError, TradingClient, epoch_seconds, utc_now
+from app.services.include import contracts as _c
+from app.services.include import enums as _e
 from app.services.include.data import validate_rows
-from app.services.include.enums import (
-    BookType,
-    DealEntry,
-    DealType,
-    MarginMode,
-    OrderFilling,
-    OrderState,
-    OrderTime,
-    OrderType,
-    PositionType,
-    SymbolTradeExecution,
-    SymbolTradeMode,
-    Timeframe,
-    TradeAction,
-    TradeRetcode,
-)
+from app.services.include.trading import Trading
 
 logger = get_logger(__name__)
+_T = TypeVar("_T", _c.MarketBar, _c.MarketTick)
+
+_A, _R, _OT, _OS = _e.TradeAction, _e.TradeRetcode, _e.OrderType, _e.OrderState
+_OF, _OTM, _PT = _e.OrderFilling, _e.OrderTime, _e.PositionType
+_DT, _DE = _e.DealType, _e.DealEntry
+_STM, _STE = _e.SymbolTradeMode, _e.SymbolTradeExecution
+_BUY_TYPES = {_OT.BUY, _OT.BUY_LIMIT, _OT.BUY_STOP, _OT.BUY_STOP_LIMIT}
+_SELL_TYPES = {_OT.SELL, _OT.SELL_LIMIT, _OT.SELL_STOP, _OT.SELL_STOP_LIMIT}
+_PENDING_BUY_TYPES = {_OT.BUY_LIMIT, _OT.BUY_STOP, _OT.BUY_STOP_LIMIT}
+
+
+def _label(member: Any) -> str:
+    return str(member.name).replace("_", " ").title()
+
+
+def _res(code: _e.TradeRetcode | int, comment: str = "", **kw: Any) -> _c.TradeResult:
+    return _c.TradeResult(retcode=int(code), comment=comment, **kw)
 
 
 class SimulatorClient(TradingClient):
-    """Deterministic in-memory broker simulator with MT5-oriented execution semantics."""
+    """Deterministic in-memory broker simulator with MQL5-oriented execution semantics."""
 
-    def __init__(
-        self,
-        *,
-        initial_balance: float = 10_000.0,
-        leverage: int = 100,
-        margin_mode: MarginMode = MarginMode.RETAIL_HEDGING,
-        currency: str = "USD",
-        commission_per_lot: float = 0.0,
-        name: str = "Simulator",
-        backend: SimulatorClient | None = None,
-        **kwargs: Any,
-    ) -> None:
+    def __init__(self, *, name: str = "Simulator", **kwargs: Any) -> None:
         super().__init__(name=name)
-        self._initial_balance: float
-        self._leverage: int
-        self._margin_mode: MarginMode
-        self._currency: str
-        self._commission_per_lot: float
-        if backend is not None:
-            self._initial_balance = backend._initial_balance
-            self._leverage = backend._leverage
-            self._margin_mode = backend._margin_mode
-            self._currency = backend._currency
-            self._commission_per_lot = backend._commission_per_lot
-        else:
-            self._initial_balance = float(initial_balance)
-            self._leverage = max(1, int(leverage))
-            self._margin_mode = margin_mode
-            self._currency = str(currency).upper()
-            self._commission_per_lot = float(commission_per_lot)
-
-        self._receipts: dict[str, Receipt] = {}
-        self._last_command: contextvars.ContextVar[str | None] = contextvars.ContextVar(
-            "simulation_last_command", default=None
+        b: Any = kwargs.get("backend")
+        g = kwargs.get
+        bal = float(b._initial_balance if b else g("initial_balance", 10_000.0))
+        lev = int(b._leverage if b else max(1, int(g("leverage", 100))))
+        mm: _e.MarginMode = (
+            b._margin_mode if b else g("margin_mode", _e.MarginMode.RETAIL_HEDGING)
         )
-        self._armed = False
-        self._event_queue: asyncio.Queue[BridgeEvent] = asyncio.Queue()
-        self._connected = True
-        self._clock = utc_now()
-        self._symbols: dict[str, SymbolInfo] = {}
-        self._ticks: dict[str, MarketTick] = {}
-        self._bar_history: dict[tuple[str, Timeframe], tuple[MarketBar, ...]] = {}
-        self._tick_history: dict[str, tuple[MarketTick, ...]] = {}
-        self._orders: dict[int, OrderInfo] = {}
-        self._history_orders: list[OrderInfo] = []
-        self._positions: dict[int, PositionInfo] = {}
-        self._deals: list[DealInfo] = []
-        self._order_ids = count(1)
-        self._deal_ids = count(1_000_001)
+        cur = str(b._currency if b else g("currency", "USD")).upper()
+        comm = float(b._commission_per_lot if b else g("commission_per_lot", 0.0))
+        self._initial_balance, self._leverage, self._margin_mode = bal, lev, mm
+        self._currency, self._commission_per_lot = cur, comm
+        self._armed, self._connected, self._clock = False, True, utc_now()
+        self._event_queue: asyncio.Queue[_c.BridgeEvent] = asyncio.Queue()
+        self._symbols: dict[str, _c.SymbolInfo] = {}
+        self._ticks: dict[str, _c.MarketTick] = {}
+        self._bar_history: dict[tuple[str, _e.Timeframe], tuple[_c.MarketBar, ...]] = {}
+        self._tick_history: dict[str, tuple[_c.MarketTick, ...]] = {}
+        self._orders: dict[int, _c.OrderInfo] = {}
+        self._history_orders: list[_c.OrderInfo] = []
+        self._positions: dict[int, _c.PositionInfo] = {}
+        self._deals: list[_c.DealInfo] = []
+        self._order_ids, self._deal_ids = count(1), count(1_000_001)
         self._position_ids = count(10_000_001)
         self._stats: dict[str, dict[str, float]] = {}
-        self._selected_symbol: str = "EURUSD"
-        self._selected_position_ticket: int = 0
-        self._selected_order_ticket: int = 0
-        self._selected_history_order_ticket: int = 0
-        self._selected_deal_ticket: int = 0
-        self._last_request = TradeRequest(action=TradeAction.DEAL)
-        self._last_result = TradeResult()
-        self._last_check = TradeCheckResult()
-        self._account = AccountInfo(
-            leverage=self._leverage,
-            margin_mode=self._margin_mode,
-            balance=float(self._initial_balance),
-            equity=float(self._initial_balance),
-            free_margin=float(self._initial_balance),
-            currency=self._currency,
+        acc = _c.AccountInfo(leverage=lev, margin_mode=mm, currency=cur)
+        acc.balance = acc.equity = acc.free_margin = bal
+        self._account = acc
+        self._terminal = _c.TerminalInfo(
+            connected=True, trade_allowed=True, cpu_cores=os.cpu_count() or 1
         )
-        self._terminal = TerminalInfo(
-            connected=True,
-            trade_allowed=True,
-            cpu_cores=os.cpu_count() or 1,
-        )
+        t = Trading(self)
+        self.trading = t
+        self.account_proxy, self.terminal_proxy = t.account, t.terminal
+        self.symbol_proxy, self.trade_proxy = t.symbol, t.trade
+        self.position_proxy, self.order_proxy = t.position, t.order
+        self.history_order_proxy, self.deal_proxy = t.history_order, t.deal
 
-        from app.services.include.trading import Trading
+    def _clock_stamp(self) -> tuple[int, int]:
+        ts = self._clock.timestamp()
+        return int(ts), int(ts * 1000)
 
-        self.trading = Trading(self)
-        self.account_proxy = self.trading.account
-        self.terminal_proxy = self.trading.terminal
-        self.symbol_proxy = self.trading.symbol
-        self.trade_proxy = self.trading.trade
-        self.position_proxy = self.trading.position
-        self.order_proxy = self.trading.order
-        self.history_order_proxy = self.trading.history_order
-        self.deal_proxy = self.trading.deal
-
-    # ------------------------------------------------------------------
-    # Configuration / market feed
-    # ------------------------------------------------------------------
-
-    def add_symbol(self, spec: SymbolInfo) -> None:
+    def add_symbol(self, spec: _c.SymbolInfo) -> None:
         """Register a symbol specification with the simulator."""
         self._symbols[spec.name] = replace(spec)
         self._stats.setdefault(spec.name, {})
 
     def feed_tick(
-        self,
-        symbol: str,
-        *,
-        bid: float,
-        ask: float,
-        time: datetime | None = None,
-        last: float | None = None,
-        volume: float = 0.0,
-    ) -> MarketTick:
+        self, symbol: str, *, bid: float, ask: float, **kw: Any
+    ) -> _c.MarketTick:
         """Advance simulator time and update pricing with a new tick."""
         if symbol not in self._symbols:
             raise KeyError(f"Symbol {symbol!r} has not been registered")
         if ask < bid:
             raise ValueError("ask must be >= bid")
-        now = time or self._clock
-        if now.tzinfo is None:
-            now = now.replace(tzinfo=UTC)
-        self._clock = now
-        last_price = float(last if last is not None else (bid + ask) / 2.0)
-        tick = MarketTick(
-            time_msc=int(now.timestamp() * 1000),
-            bid=float(bid),
-            ask=float(ask),
-            last=last_price,
-            volume=int(volume),
-            volume_real=float(volume),
-        )
+        now: datetime = kw.get("time") or self._clock
+        self._clock = now.replace(tzinfo=UTC) if now.tzinfo is None else now
+        last_in, vol = kw.get("last"), float(kw.get("volume", 0.0))
+        last_p = float(last_in if last_in is not None else (bid + ask) / 2.0)
+        ms = int(self._clock.timestamp() * 1000)
+        tick = _c.MarketTick(ms, float(bid), float(ask), last_p, int(vol), 0, vol)
         self._ticks[symbol] = tick
         stats = self._stats.setdefault(symbol, {})
-        for key, value in (
-            ("bid", bid),
-            ("ask", ask),
-            ("last", tick.last),
-            ("volume", volume),
-        ):
-            high_key, low_key = f"{key}_high", f"{key}_low"
-            stats[high_key] = max(float(value), stats.get(high_key, float(value)))
-            stats[low_key] = min(float(value), stats.get(low_key, float(value)))
-
+        for k, v in (("bid", bid), ("ask", ask), ("last", last_p), ("volume", vol)):
+            hk, lk = f"{k}_high", f"{k}_low"
+            stats[hk] = max(float(v), stats.get(hk, float(v)))
+            stats[lk] = min(float(v), stats.get(lk, float(v)))
         spec = self._symbols[symbol]
         if spec.session_open == 0.0:
             spec.session_open = tick.last
         spec.session_close = tick.last
-
         self._expire_orders()
         self._trigger_pending(symbol, tick)
         self._trigger_stops(symbol, tick)
@@ -237,286 +147,195 @@ class SimulatorClient(TradingClient):
 
     def set_clock(self, now: datetime) -> None:
         """Advance simulated engine clock and process order expirations."""
-        if now.tzinfo is None:
-            now = now.replace(tzinfo=UTC)
-        self._clock = now
+        self._clock = now.replace(tzinfo=UTC) if now.tzinfo is None else now
         self._expire_orders()
         self._mark_to_market()
 
-    # ------------------------------------------------------------------
-    # BrokerBackend
-    # ------------------------------------------------------------------
-
     @override
     def connect(self) -> bool:
-        self._connected = True
-        self._terminal.connected = True
+        self._connected = self._terminal.connected = True
         return True
 
     @override
     def disconnect(self) -> None:
-        self._connected = False
-        self._terminal.connected = False
+        self._connected = self._terminal.connected = False
 
-    def terminal(self) -> TerminalInfo:
+    def terminal(self) -> _c.TerminalInfo:
         """Return simulated terminal snapshot."""
         return replace(self._terminal)
 
-    def account(self) -> AccountInfo:
+    def account(self) -> _c.AccountInfo:
         """Return simulated account snapshot."""
         self._mark_to_market()
         return replace(self._account)
 
-    def symbol(self, name: str) -> SymbolInfo | None:
+    def symbol(self, name: str) -> _c.SymbolInfo | None:
         """Return simulated symbol specifications."""
-        spec = self._symbols.get(name)
+        spec, t = self._symbols.get(name), self._ticks.get(name)
         if spec is None:
             return None
-        t = self._ticks.get(name)
-        if t is not None:
-            return replace(spec, bid=t.bid, ask=t.ask, last=t.last)
-        return replace(spec)
+        return replace(spec, bid=t.bid, ask=t.ask, last=t.last) if t else replace(spec)
 
-    def symbols(self) -> list[SymbolInfo]:
+    def symbols(self) -> list[_c.SymbolInfo]:
         """Return all simulated symbol specifications."""
-        res: list[SymbolInfo] = []
-        for name, spec in self._symbols.items():
-            t = self._ticks.get(name)
-            if t is not None:
-                res.append(replace(spec, bid=t.bid, ask=t.ask, last=t.last))
-            else:
-                res.append(replace(spec))
-        return res
+        return [s for name in self._symbols if (s := self.symbol(name)) is not None]
 
     @override
     def select_symbol(self, name: str, selected: bool) -> bool:
-        """Set symbol market watch selection state."""
         spec = self._symbols.get(name)
         if spec is None:
             return False
         spec.select = selected
         return True
 
-    def tick(self, name: str) -> MarketTick | None:
+    def tick(self, name: str) -> _c.MarketTick | None:
         """Return latest cached market tick for symbol."""
-        value = self._ticks.get(name)
-        return replace(value) if value is not None else None
+        val = self._ticks.get(name)
+        return replace(val) if val is not None else None
 
-    def orders(self) -> list[OrderInfo]:
+    def orders(self) -> list[_c.OrderInfo]:
         """Return active simulated orders."""
         return [replace(v) for _, v in sorted(self._orders.items())]
 
-    def history_orders(self) -> list[OrderInfo]:
+    def history_orders(self) -> list[_c.OrderInfo]:
         """Return historical executed/cancelled orders."""
         return [replace(v) for v in self._history_orders]
 
-    def positions(self) -> list[PositionInfo]:
+    def positions(self) -> list[_c.PositionInfo]:
         """Return open positions after mark-to-market revaluation."""
         self._mark_to_market()
         return [replace(v) for _, v in sorted(self._positions.items())]
 
-    def deals(self) -> list[DealInfo]:
+    def deals(self) -> list[_c.DealInfo]:
         """Return executed historical deals."""
         return [replace(v) for v in self._deals]
 
     @override
-    def get_terminal_info(self) -> TerminalInfo:
-        """Retrieve current simulated terminal state."""
+    def get_terminal_info(self) -> _c.TerminalInfo:
         return self.terminal()
 
     @override
-    def get_account_info(self) -> AccountInfo:
-        """Retrieve current simulated account snapshot."""
+    def get_account_info(self) -> _c.AccountInfo:
         return self.account()
 
     @override
-    def get_symbol_info(self, symbol: str) -> SymbolInfo | None:
-        """Retrieve symbol metadata specification."""
+    def get_symbol_info(self, symbol: str) -> _c.SymbolInfo | None:
         return self.symbol(symbol)
 
     @override
     def get_symbols(self) -> list[str]:
-        """List available symbol names."""
         return [s.name for s in self.symbols()]
 
     @override
-    def get_positions(self) -> list[PositionInfo]:
-        """Retrieve open simulated positions."""
+    def get_positions(self) -> list[_c.PositionInfo]:
         return self.positions()
 
     @override
-    def get_orders(self) -> list[OrderInfo]:
-        """Retrieve working simulated orders."""
+    def get_orders(self) -> list[_c.OrderInfo]:
         return self.orders()
 
     @override
-    def get_history_orders(self) -> list[OrderInfo]:
-        """Retrieve completed or cancelled simulated orders."""
+    def get_history_orders(self) -> list[_c.OrderInfo]:
         return self.history_orders()
 
     @override
-    def get_deals(self) -> list[DealInfo]:
-        """Retrieve simulated transaction deals."""
+    def get_deals(self) -> list[_c.DealInfo]:
         return self.deals()
 
     @override
-    def get_tick(self, name: str) -> MarketTick | None:
-        """Retrieve the latest market tick for symbol."""
+    def get_tick(self, name: str) -> _c.MarketTick | None:
         return self.tick(name)
 
     @override
     def subscribe_book(self, name: str) -> bool:
-        """Subscribe to simulated market depth."""
         del name
         return True
 
     @override
-    def release_book(self, name: str) -> bool:
-        """Release simulated market depth."""
-        del name
-        return True
-
-    @override
-    def get_book(self, name: str) -> tuple[BookInfo, ...]:
-        """Retrieve simulated order book."""
+    def get_book(self, name: str) -> tuple[_c.BookInfo, ...]:
         t = self.get_tick(name)
         if t is None:
             return ()
-        return (
-            BookInfo(
-                type=BookType.BOOK_TYPE_SELL,
-                price=t.ask,
-                volume=10,
-                volume_real=10.0,
-            ),
-            BookInfo(
-                type=BookType.BOOK_TYPE_BUY,
-                price=t.bid,
-                volume=10,
-                volume_real=10.0,
-            ),
-        )
+        b_sell = _c.BookInfo(_e.BookType.BOOK_TYPE_SELL, t.ask, 10, 10.0)
+        b_buy = _c.BookInfo(_e.BookType.BOOK_TYPE_BUY, t.bid, 10, 10.0)
+        return (b_sell, b_buy)
 
     @override
-    def order_check(self, request: TradeRequest) -> TradeCheckResult:
+    def order_check(self, request: _c.TradeRequest) -> _c.TradeCheckResult:
         self._mark_to_market()
-        retcode, comment = self._validate_request(request)
-        margin = 0.0
-        if (
-            retcode == TradeRetcode.DONE
-            and request.action in {TradeAction.DEAL, TradeAction.PENDING}
-            and request.symbol
-            and request.volume > 0
-        ):
-            price = request.price
-            tick = self._ticks.get(request.symbol)
-            if price <= 0 and tick is not None:
-                price = (
-                    tick.ask
-                    if request.order_type
-                    in {
-                        OrderType.BUY,
-                        OrderType.BUY_LIMIT,
-                        OrderType.BUY_STOP,
-                        OrderType.BUY_STOP_LIMIT,
-                    }
-                    else tick.bid
-                )
+        ret, comment = self._validate_request(request)
+        margin, acc = 0.0, self._account
+        is_open = request.action in {_A.DEAL, _A.PENDING}
+        if ret == _R.DONE and is_open and request.symbol and request.volume > 0:
+            p, t = request.price, self._ticks.get(request.symbol)
+            if p <= 0 and t is not None:
+                p = t.ask if request.order_type in _BUY_TYPES else t.bid
             margin = self.order_calc_margin(
-                request.order_type, request.symbol, request.volume, price
+                request.order_type, request.symbol, request.volume, p
             )
-            if margin > self._account.free_margin:
-                retcode = TradeRetcode.NO_MONEY
-                comment = "Not enough money"
-
-        return TradeCheckResult(
-            retcode=int(retcode),
-            balance=self._account.balance,
-            equity=self._account.equity,
-            profit=self._account.profit,
-            margin=margin,
-            margin_free=max(0.0, self._account.free_margin - margin),
-            margin_level=self._account.margin_level,
-            comment=comment,
+            if margin > acc.free_margin:
+                ret, comment = _R.NO_MONEY, "Not enough money"
+        res = _c.TradeCheckResult(retcode=int(ret), margin=margin, comment=comment)
+        res.balance, res.equity, res.profit = acc.balance, acc.equity, acc.profit
+        res.margin_free, res.margin_level = (
+            max(0.0, acc.free_margin - margin),
+            acc.margin_level,
         )
+        return res
 
     @override
-    def order_send(self, request: TradeRequest) -> TradeResult:
+    def order_send(self, request: _c.TradeRequest) -> _c.TradeResult:
         check = self.order_check(request)
-        if check.retcode != int(TradeRetcode.DONE):
-            return TradeResult(retcode=check.retcode, comment=check.comment)
-
-        if request.action == TradeAction.DEAL:
+        if check.retcode != int(_R.DONE):
+            return _res(check.retcode, check.comment)
+        act = request.action
+        if act == _A.DEAL:
             if request.position:
-                return self._close_position(
-                    request.position,
-                    request.volume,
-                    comment=request.comment or "close",
-                )
+                c = request.comment or "close"
+                return self._close_position(request.position, request.volume, comment=c)
             return self._market_open(request)
-        if request.action == TradeAction.PENDING:
+        if act == _A.PENDING:
             return self._place_pending(request)
-        if request.action == TradeAction.REMOVE:
+        if act == _A.REMOVE:
             return self._remove_order(request.order)
-        if request.action == TradeAction.MODIFY:
+        if act == _A.MODIFY:
             return self._modify_order(request)
-        if request.action == TradeAction.SLTP:
+        if act == _A.SLTP:
             return self._modify_position(request)
-        if request.action == TradeAction.CLOSE_BY:
+        if act == _A.CLOSE_BY:
             return self._close_by(request.position, request.position_by)
-        # Raw external action IDs can be outside the statically exhaustive enum.
-        return TradeResult(  # type: ignore[unreachable]
-            retcode=int(TradeRetcode.INVALID),
-            comment=f"Unsupported action {request.action}",
-        )
+        return _res(_R.INVALID, f"Unsupported action {act}")  # type: ignore[unreachable]
 
     def order_calc_profit(
-        self,
-        order_type: OrderType,
-        symbol: str,
-        volume: float,
-        price_open: float,
-        price_close: float,
+        self, ot: _e.OrderType, sym: str, vol: float, p_open: float, p_close: float
     ) -> float:
         """Calculate projected trade profit for given order parameters."""
-        spec = self._symbols.get(symbol)
+        spec = self._symbols.get(sym)
         if spec is None:
             return 0.0
-        direction = 1.0 if order_type == OrderType.BUY else -1.0
-        return (
-            (float(price_close) - float(price_open))
-            * direction
-            * float(volume)
-            * spec.trade_contract_size
-        )
+        dp = (float(p_close) - float(p_open)) * (1.0 if ot == _OT.BUY else -1.0)
+        return dp * float(vol) * spec.trade_contract_size
 
     def order_calc_margin(
-        self,
-        order_type: OrderType,
-        symbol: str,
-        volume: float,
-        price: float,
+        self, ot: _e.OrderType, sym: str, vol: float, price: float
     ) -> float:
         """Calculate required margin for given order parameters."""
-        del order_type
-        spec = self._symbols.get(symbol)
-        if spec is None or volume <= 0:
+        del ot
+        spec = self._symbols.get(sym)
+        if spec is None or vol <= 0:
             return 0.0
         if spec.margin_initial > 0:
-            return spec.margin_initial * volume
-        leverage = max(1, self._account.leverage)
-        return spec.trade_contract_size * volume * max(price, spec.point) / leverage
+            return spec.margin_initial * vol
+        lev = max(1, self._account.leverage)
+        return spec.trade_contract_size * vol * max(price, spec.point) / lev
 
     def info_value(
-        self,
-        scope: str,
-        property_id: int | str,
-        selector: str | int | None = None,
+        self, scope: str, prop_id: int | str, selector: str | int | None = None
     ) -> Any:
         """Retrieve property value from account, terminal, or symbol scope."""
-        if not isinstance(property_id, str):
+        if not isinstance(prop_id, str):
             return None
-        key = property_id.strip().lower()
+        key = prop_id.strip().lower()
         if scope == "account":
             return asdict(self._account).get(key)
         if scope == "terminal":
@@ -526,964 +345,521 @@ class SimulatorClient(TradingClient):
                 return self._stats[selector][key]
             spec = self._symbols.get(selector)
             return asdict(spec).get(key) if spec is not None else None
-        collections: dict[str, list[Any]] = {
-            "order": list(self._orders.values()),
+        pools: dict[str, Sequence[Any]] = {
+            "order": tuple(self._orders.values()),
             "history_order": self._history_orders,
-            "position": list(self._positions.values()),
+            "position": tuple(self._positions.values()),
             "deal": self._deals,
         }
-        values = collections.get(scope, [])
-        for value in values:
-            ticket = getattr(value, "ticket", None)
-            symbol = getattr(value, "symbol", None)
-            if selector in {ticket, symbol}:
-                return asdict(value).get(key)
+        for val in pools.get(scope, ()):
+            if selector in {getattr(val, "ticket", None), getattr(val, "symbol", None)}:
+                return asdict(val).get(key)
         return None
 
-    # ------------------------------------------------------------------
-    # Validation
-    # ------------------------------------------------------------------
-
-    def _validate_request(self, request: TradeRequest) -> tuple[TradeRetcode, str]:
+    def _validate_request(self, req: _c.TradeRequest) -> tuple[_e.TradeRetcode, str]:
         if not self._connected:
-            return TradeRetcode.CONNECTION, "No connection"
+            return _R.CONNECTION, "No connection"
         if not self._terminal.trade_allowed or not self._account.trade_allowed:
-            return TradeRetcode.TRADE_DISABLED, "Trading is disabled"
-
-        if request.action == TradeAction.REMOVE:
-            if request.order not in self._orders:
-                return TradeRetcode.INVALID_ORDER, "Order not found"
-            return TradeRetcode.DONE, "Done"
-
-        if request.action == TradeAction.MODIFY:
-            order = self._orders.get(request.order)
-            if order is None:
-                return TradeRetcode.INVALID_ORDER, "Order not found"
-            spec = self._symbols.get(order.symbol)
-            if spec is None:
-                return TradeRetcode.INVALID_ORDER, "Unknown symbol"
-            candidate = replace(
-                request,
-                symbol=order.symbol,
-                volume=order.volume_current,
-                order_type=OrderType(order.order_type),
-                price=request.price or order.price_open,
-                stoplimit=request.stoplimit or order.price_stop_limit,
-            )
-            if not self._pending_price_valid(candidate, spec):
-                return TradeRetcode.INVALID_PRICE, "Invalid pending order price"
-            if not self._stops_valid(candidate, spec):
-                return TradeRetcode.INVALID_STOPS, "Invalid stops"
-            return TradeRetcode.DONE, "Done"
-
-        if request.action == TradeAction.SLTP:
-            position = self._positions.get(request.position)
-            if position is None:
-                return TradeRetcode.POSITION_CLOSED, "Position not found"
-            spec = self._symbols.get(position.symbol)
-            tick = self._ticks.get(position.symbol)
+            return _R.TRADE_DISABLED, "Trading is disabled"
+        act = req.action
+        if act == _A.REMOVE:
+            if req.order not in self._orders:
+                return _R.INVALID_ORDER, "Order not found"
+            return _R.DONE, "Done"
+        if act == _A.MODIFY:
+            o = self._orders.get(req.order)
+            spec = self._symbols.get(o.symbol) if o else None
+            if o is None or spec is None:
+                return (
+                    _R.INVALID_ORDER,
+                    "Order not found" if not o else "Unknown symbol",
+                )
+            cand = replace(req, symbol=o.symbol, volume=o.volume_current)
+            cand.order_type, cand.price = _OT(o.order_type), req.price or o.price_open
+            cand.stoplimit = req.stoplimit or o.price_stop_limit
+            if not self._pending_price_valid(cand, spec):
+                return _R.INVALID_PRICE, "Invalid pending order price"
+            if not self._stops_valid(cand, spec):
+                return _R.INVALID_STOPS, "Invalid stops"
+            return _R.DONE, "Done"
+        if act == _A.SLTP:
+            pos = self._positions.get(req.position)
+            if pos is None:
+                return _R.POSITION_CLOSED, "Position not found"
+            spec, tick = self._symbols.get(pos.symbol), self._ticks.get(pos.symbol)
             if spec is not None and tick is not None:
-                minimum = spec.trade_stops_level * spec.point
-                if position.position_type == int(PositionType.BUY):
-                    if request.sl and tick.bid - request.sl < minimum - 1e-12:
-                        return TradeRetcode.INVALID_STOPS, "Invalid stop loss"
-                    if request.tp and request.tp - tick.bid < minimum - 1e-12:
-                        return TradeRetcode.INVALID_STOPS, "Invalid take profit"
-                else:
-                    if request.sl and request.sl - tick.ask < minimum - 1e-12:
-                        return TradeRetcode.INVALID_STOPS, "Invalid stop loss"
-                    if request.tp and tick.ask - request.tp < minimum - 1e-12:
-                        return TradeRetcode.INVALID_STOPS, "Invalid take profit"
-            return TradeRetcode.DONE, "Done"
-
-        if request.action == TradeAction.CLOSE_BY:
-            p1 = self._positions.get(request.position)
-            p2 = self._positions.get(request.position_by)
+                m, is_b = (
+                    spec.trade_stops_level * spec.point,
+                    pos.position_type == int(_PT.BUY),
+                )
+                ref = tick.bid if is_b else tick.ask
+                if req.sl and ((ref - req.sl) if is_b else (req.sl - ref)) < m - 1e-12:
+                    return _R.INVALID_STOPS, "Invalid stop loss"
+                if req.tp and ((req.tp - ref) if is_b else (ref - req.tp)) < m - 1e-12:
+                    return _R.INVALID_STOPS, "Invalid take profit"
+            return _R.DONE, "Done"
+        if act == _A.CLOSE_BY:
+            p1, p2 = (
+                self._positions.get(req.position),
+                self._positions.get(req.position_by),
+            )
             if p1 is None or p2 is None:
-                return TradeRetcode.POSITION_CLOSED, "Position not found"
+                return _R.POSITION_CLOSED, "Position not found"
             if p1.symbol != p2.symbol or p1.position_type == p2.position_type:
                 return (
-                    TradeRetcode.INVALID_ORDER,
+                    _R.INVALID_ORDER,
                     "Close By requires opposite positions on same symbol",
                 )
-            return TradeRetcode.DONE, "Done"
+            return _R.DONE, "Done"
+        if act == _A.DEAL and req.position:
+            pos = self._positions.get(req.position)
+            if pos is None:
+                return _R.POSITION_CLOSED, "Position not found"
+            if req.volume <= 0 or req.volume > pos.volume + 1e-12:
+                return _R.INVALID_CLOSE_VOLUME, "Invalid close volume"
+            return _R.DONE, "Done"
 
-        if request.action == TradeAction.DEAL and request.position:
-            position = self._positions.get(request.position)
-            if position is None:
-                return TradeRetcode.POSITION_CLOSED, "Position not found"
-            if request.volume <= 0 or request.volume > position.volume + 1e-12:
-                return TradeRetcode.INVALID_CLOSE_VOLUME, "Invalid close volume"
-            return TradeRetcode.DONE, "Done"
-
-        spec = self._symbols.get(request.symbol)
+        spec = self._symbols.get(req.symbol)
         if spec is None:
-            return TradeRetcode.INVALID_ORDER, "Unknown symbol"
-        if spec.trade_mode == SymbolTradeMode.DISABLED:
-            return TradeRetcode.TRADE_DISABLED, "Symbol trading is disabled"
-        if spec.trade_mode == SymbolTradeMode.CLOSEONLY and not request.position:
-            return TradeRetcode.CLOSE_ONLY, "Symbol is close-only"
-        if spec.trade_mode == SymbolTradeMode.LONGONLY and request.order_type in {
-            OrderType.SELL,
-            OrderType.SELL_LIMIT,
-            OrderType.SELL_STOP,
-            OrderType.SELL_STOP_LIMIT,
-        }:
-            return TradeRetcode.LONG_ONLY, "Only long positions are allowed"
-        if spec.trade_mode == SymbolTradeMode.SHORTONLY and request.order_type in {
-            OrderType.BUY,
-            OrderType.BUY_LIMIT,
-            OrderType.BUY_STOP,
-            OrderType.BUY_STOP_LIMIT,
-        }:
-            return TradeRetcode.SHORT_ONLY, "Only short positions are allowed"
-
-        if request.volume <= 0 or not self._volume_valid(spec, request.volume):
-            return TradeRetcode.INVALID_VOLUME, "Invalid volume"
-
-        if request.action == TradeAction.DEAL and spec.trade_exemode == int(
-            SymbolTradeExecution.MARKET
-        ):
-            flags = spec.trade_fill_flags
-            if request.type_filling == OrderFilling.FOK and not (flags & 1):
-                return TradeRetcode.INVALID_FILL, "FOK filling is not supported"
-            if request.type_filling == OrderFilling.IOC and not (flags & 2):
-                return TradeRetcode.INVALID_FILL, "IOC filling is not supported"
-            if request.type_filling == OrderFilling.RETURN:
-                return (
-                    TradeRetcode.INVALID_FILL,
-                    "RETURN is not valid for Market Execution",
-                )
-
-        if request.action == TradeAction.DEAL and request.symbol not in self._ticks:
-            return TradeRetcode.PRICE_OFF, "No market price"
-
-        if request.action == TradeAction.PENDING:
-            if request.price <= 0:
-                return (
-                    TradeRetcode.INVALID_PRICE,
-                    "Pending order requires a positive price",
-                )
-            if request.symbol not in self._ticks:
-                return TradeRetcode.PRICE_OFF, "No market price"
-            if (
-                self._account.limit_orders > 0
-                and len(self._orders) >= self._account.limit_orders
-            ):
-                return TradeRetcode.LIMIT_ORDERS, "Pending-order limit reached"
-            if request.type_time in {OrderTime.SPECIFIED, OrderTime.SPECIFIED_DAY}:
-                if request.expiration is None or request.expiration <= self._clock:
-                    return TradeRetcode.INVALID_EXPIRATION, "Invalid expiration"
-            if not self._pending_price_valid(request, spec):
-                return TradeRetcode.INVALID_PRICE, "Invalid pending order price"
-
-        if not self._stops_valid(request, spec):
-            return TradeRetcode.INVALID_STOPS, "Invalid stops"
-
+            return _R.INVALID_ORDER, "Unknown symbol"
+        tm, ot = spec.trade_mode, req.order_type
+        tf, fl = req.type_filling, spec.trade_fill_flags
+        if tm == _STM.DISABLED:
+            return _R.TRADE_DISABLED, "Symbol trading is disabled"
+        if tm == _STM.CLOSEONLY and not req.position:
+            return _R.CLOSE_ONLY, "Symbol is close-only"
+        if tm == _STM.LONGONLY and ot in _SELL_TYPES:
+            return _R.LONG_ONLY, "Only long positions are allowed"
+        if tm == _STM.SHORTONLY and ot in _BUY_TYPES:
+            return _R.SHORT_ONLY, "Only short positions are allowed"
+        if req.volume <= 0 or not self._volume_valid(spec, req.volume):
+            return _R.INVALID_VOLUME, "Invalid volume"
+        if act == _A.DEAL and spec.trade_exemode == int(_STE.MARKET):
+            if tf == _OF.FOK and not (fl & 1):
+                return _R.INVALID_FILL, "FOK filling is not supported"
+            if tf == _OF.IOC and not (fl & 2):
+                return _R.INVALID_FILL, "IOC filling is not supported"
+            if tf == _OF.RETURN:
+                return _R.INVALID_FILL, "RETURN is not valid for Market Execution"
+        if act == _A.DEAL and req.symbol not in self._ticks:
+            return _R.PRICE_OFF, "No market price"
+        if act == _A.PENDING:
+            if req.price <= 0:
+                return _R.INVALID_PRICE, "Pending order requires a positive price"
+            if req.symbol not in self._ticks:
+                return _R.PRICE_OFF, "No market price"
+            if 0 < self._account.limit_orders <= len(self._orders):
+                return _R.LIMIT_ORDERS, "Pending-order limit reached"
+            exp_bad = req.expiration is None or req.expiration <= self._clock
+            if req.type_time in {_OTM.SPECIFIED, _OTM.SPECIFIED_DAY} and exp_bad:
+                return _R.INVALID_EXPIRATION, "Invalid expiration"
+            if not self._pending_price_valid(req, spec):
+                return _R.INVALID_PRICE, "Invalid pending order price"
+        if not self._stops_valid(req, spec):
+            return _R.INVALID_STOPS, "Invalid stops"
         if spec.volume_limit > 0:
-            buy_types = {
-                OrderType.BUY,
-                OrderType.BUY_LIMIT,
-                OrderType.BUY_STOP,
-                OrderType.BUY_STOP_LIMIT,
-            }
-            same_side = request.order_type in buy_types
-            used = sum(
-                p.volume
-                for p in self._positions.values()
-                if p.symbol == request.symbol
-                and ((p.position_type == int(PositionType.BUY)) == same_side)
-            ) + sum(
-                o.volume_current
-                for o in self._orders.values()
-                if o.symbol == request.symbol
-                and ((o.order_type in buy_types) == same_side)
-            )
-            if used + request.volume > spec.volume_limit + 1e-12:
-                return TradeRetcode.LIMIT_VOLUME, "Symbol volume limit reached"
+            s, sym, b_pt = ot in _BUY_TYPES, req.symbol, int(_PT.BUY)
+            ps = (p for p in self._positions.values() if p.symbol == sym)
+            os_ = (o for o in self._orders.values() if o.symbol == sym)
+            pv = sum(p.volume for p in ps if (p.position_type == b_pt) == s)
+            ov = sum(o.volume_current for o in os_ if (o.order_type in _BUY_TYPES) == s)
+            if pv + ov + req.volume > spec.volume_limit + 1e-12:
+                return _R.LIMIT_VOLUME, "Symbol volume limit reached"
+        return _R.DONE, "Done"
 
-        return TradeRetcode.DONE, "Done"
-
-    def _pending_price_valid(self, request: TradeRequest, spec: SymbolInfo) -> bool:
-        if request.action not in {TradeAction.PENDING, TradeAction.MODIFY}:
+    def _pending_price_valid(self, req: _c.TradeRequest, spec: _c.SymbolInfo) -> bool:
+        if req.action not in {_A.PENDING, _A.MODIFY}:
             return True
-        tick = self._ticks.get(request.symbol)
+        tick = self._ticks.get(req.symbol)
         if tick is None:
             return False
-        minimum = spec.trade_stops_level * spec.point
-        price = request.price
-        if request.order_type == OrderType.BUY_LIMIT:
-            return price <= tick.ask - minimum + 1e-12
-        if request.order_type == OrderType.SELL_LIMIT:
-            return price >= tick.bid + minimum - 1e-12
-        if request.order_type == OrderType.BUY_STOP:
-            return price >= tick.ask + minimum - 1e-12
-        if request.order_type == OrderType.SELL_STOP:
-            return price <= tick.bid - minimum + 1e-12
-        if request.order_type == OrderType.BUY_STOP_LIMIT:
-            return (
-                price >= tick.ask + minimum - 1e-12
-                and request.stoplimit > 0
-                and request.stoplimit <= price + 1e-12
-            )
-        if request.order_type == OrderType.SELL_STOP_LIMIT:
-            return (
-                price <= tick.bid - minimum + 1e-12
-                and request.stoplimit > 0
-                and request.stoplimit >= price - 1e-12
-            )
+        m, p, ot = spec.trade_stops_level * spec.point, req.price, req.order_type
+        if ot == _OT.BUY_LIMIT:
+            return p <= tick.ask - m + 1e-12
+        if ot == _OT.SELL_LIMIT:
+            return p >= tick.bid + m - 1e-12
+        if ot == _OT.BUY_STOP:
+            return p >= tick.ask + m - 1e-12
+        if ot == _OT.SELL_STOP:
+            return p <= tick.bid - m + 1e-12
+        if ot == _OT.BUY_STOP_LIMIT:
+            return p >= tick.ask + m - 1e-12 and 0 < req.stoplimit <= p + 1e-12
+        if ot == _OT.SELL_STOP_LIMIT:
+            return p <= tick.bid - m + 1e-12 and req.stoplimit >= max(1e-12, p - 1e-12)
         return False
 
     @staticmethod
-    def _volume_valid(spec: SymbolInfo, volume: float) -> bool:
+    def _volume_valid(spec: _c.SymbolInfo, volume: float) -> bool:
         if volume < spec.volume_min - 1e-12 or volume > spec.volume_max + 1e-12:
             return False
-        step = max(spec.volume_step, 1e-12)
-        n = (volume - spec.volume_min) / step
+        n = (volume - spec.volume_min) / max(spec.volume_step, 1e-12)
         return abs(n - round(n)) <= 1e-7
 
-    def _stops_valid(self, request: TradeRequest, spec: SymbolInfo) -> bool:
-        minimum = spec.trade_stops_level * spec.point
-        if minimum <= 0:
+    def _stops_valid(self, req: _c.TradeRequest, spec: _c.SymbolInfo) -> bool:
+        m, tick = spec.trade_stops_level * spec.point, self._ticks.get(req.symbol)
+        if m <= 0 or tick is None:
             return True
-        tick = self._ticks.get(request.symbol)
-        if tick is None:
-            return True
-        buy_types = {
-            OrderType.BUY,
-            OrderType.BUY_LIMIT,
-            OrderType.BUY_STOP,
-            OrderType.BUY_STOP_LIMIT,
-        }
-        sell_types = {
-            OrderType.SELL,
-            OrderType.SELL_LIMIT,
-            OrderType.SELL_STOP,
-            OrderType.SELL_STOP_LIMIT,
-        }
-        if request.action == TradeAction.DEAL:
-            entry = tick.ask if request.order_type == OrderType.BUY else tick.bid
-        elif request.action in {TradeAction.PENDING, TradeAction.MODIFY}:
-            entry = request.price
+        if req.action == _A.DEAL:
+            entry = tick.ask if req.order_type == _OT.BUY else tick.bid
+        elif req.action in {_A.PENDING, _A.MODIFY}:
+            entry = req.price
         else:
             return True
-        if request.order_type in buy_types:
-            if request.sl and entry - request.sl < minimum - 1e-12:
-                return False
-            if request.tp and request.tp - entry < minimum - 1e-12:
-                return False
-        elif request.order_type in sell_types:
-            if request.sl and request.sl - entry < minimum - 1e-12:
-                return False
-            if request.tp and entry - request.tp < minimum - 1e-12:
-                return False
-        return True
+        if req.order_type not in _BUY_TYPES | _SELL_TYPES:
+            return True
+        is_b = req.order_type in _BUY_TYPES
+        d_sl = (entry - req.sl) if is_b else (req.sl - entry)
+        d_tp = (req.tp - entry) if is_b else (entry - req.tp)
+        return not ((req.sl and d_sl < m - 1e-12) or (req.tp and d_tp < m - 1e-12))
 
-    # ------------------------------------------------------------------
-    # Order operations
-    # ------------------------------------------------------------------
-
-    def _place_pending(self, request: TradeRequest) -> TradeResult:
-        ticket = next(self._order_ids)
-        tick = self._ticks.get(request.symbol)
-        current = 0.0
-        if tick is not None:
-            current = (
-                tick.ask
-                if request.order_type
-                in {OrderType.BUY_LIMIT, OrderType.BUY_STOP, OrderType.BUY_STOP_LIMIT}
-                else tick.bid
-            )
-        now_sec = int(self._clock.timestamp())
-        now_msc = int(self._clock.timestamp() * 1000)
-        exp_sec = epoch_seconds(request.expiration)
-        record = OrderInfo(
-            ticket=ticket,
-            symbol=request.symbol,
-            order_type=int(request.order_type),
-            type_description=request.order_type.name.replace("_", " ").title(),
-            state=int(OrderState.PLACED),
-            state_description=OrderState.PLACED.name.replace("_", " ").title(),
-            volume_initial=request.volume,
-            volume_current=request.volume,
-            price_open=request.price,
-            sl=request.sl,
-            tp=request.tp,
-            price_current=current,
-            price_stop_limit=request.stoplimit,
-            time_setup=now_sec,
-            time_setup_msc=now_msc,
-            time_expiration=exp_sec,
-            type_filling=int(request.type_filling),
-            type_filling_description=request.type_filling.name.replace(
-                "_", " "
-            ).title(),
-            type_time=int(request.type_time),
-            type_time_description=request.type_time.name.replace("_", " ").title(),
-            magic=request.magic,
-            comment=request.comment,
+    def _build_order(
+        self, req: _c.TradeRequest, ticket: int, state: _e.OrderState, **kw: Any
+    ) -> _c.OrderInfo:
+        now_sec, now_msc = self._clock_stamp()
+        o = _c.OrderInfo(
+            ticket=ticket, symbol=req.symbol, magic=req.magic, comment=req.comment
         )
-        self._orders[ticket] = record
-        spec = self._symbols[request.symbol]
-        if request.order_type in {
-            OrderType.BUY_LIMIT,
-            OrderType.BUY_STOP,
-            OrderType.BUY_STOP_LIMIT,
-        }:
+        o.order_type, o.type_description = int(req.order_type), _label(req.order_type)
+        o.state, o.state_description = int(state), _label(state)
+        o.volume_initial, o.volume_current = req.volume, kw.get("vol_cur", 0.0)
+        o.price_open, o.price_current = kw["p_open"], kw["p_cur"]
+        o.sl, o.tp, o.price_stop_limit = req.sl, req.tp, req.stoplimit
+        o.time_setup, o.time_setup_msc = now_sec, now_msc
+        if kw.get("done"):
+            o.time_done, o.time_done_msc = now_sec, now_msc
+        o.time_expiration = epoch_seconds(req.expiration)
+        o.type_filling = int(req.type_filling)
+        o.type_filling_description = _label(req.type_filling)
+        o.type_time, o.type_time_description = int(req.type_time), _label(req.type_time)
+        o.position_id = kw.get("pos_id", 0)
+        return o
+
+    def _record_deal(
+        self, pos: _c.PositionInfo, order: int, entry: _e.DealEntry, **kw: Any
+    ) -> _c.DealInfo:
+        deal_ticket = next(self._deal_ids)
+        now_sec, now_msc = self._clock_stamp()
+        is_b = (pos.position_type == int(_PT.BUY)) == (entry == _DE.IN)
+        dtype = _DT.BUY if is_b else _DT.SELL
+        pos_id = pos.ticket if entry == _DE.IN else pos.identifier
+        d = _c.DealInfo(ticket=deal_ticket, order=order, position_id=pos_id)
+        d.symbol = pos.symbol
+        d.deal_type, d.type_description = int(dtype), _label(dtype)
+        d.entry, d.entry_description = int(entry), _label(entry)
+        d.volume, d.price = kw["vol"], kw["price"]
+        d.commission = -float(kw["comm"])
+        d.time, d.time_msc = now_sec, now_msc
+        d.magic, d.comment = pos.magic, pos.comment
+        self._deals.append(d)
+        return d
+
+    @staticmethod
+    def _done(
+        deal: int, order: int, vol: float, price: float, t: _c.MarketTick
+    ) -> _c.TradeResult:
+        r = _res(_R.DONE, "Done", deal=deal, order=order, volume=vol, price=price)
+        r.bid, r.ask = t.bid, t.ask
+        return r
+
+    def _place_pending(self, req: _c.TradeRequest) -> _c.TradeResult:
+        ticket, tick = next(self._order_ids), self._ticks.get(req.symbol)
+        is_b = req.order_type in _PENDING_BUY_TYPES
+        cur = (tick.ask if is_b else tick.bid) if tick else 0.0
+        self._orders[ticket] = self._build_order(
+            req, ticket, _OS.PLACED, vol_cur=req.volume, p_open=req.price, p_cur=cur
+        )
+        spec = self._symbols[req.symbol]
+        if is_b:
             spec.session_buy_orders += 1
-            spec.session_buy_orders_volume += request.volume
+            spec.session_buy_orders_volume += req.volume
         else:
             spec.session_sell_orders += 1
-            spec.session_sell_orders_volume += request.volume
-        return TradeResult(
-            retcode=int(TradeRetcode.PLACED),
-            order=ticket,
-            volume=request.volume,
-            price=request.price,
-            bid=tick.bid if tick else 0.0,
-            ask=tick.ask if tick else 0.0,
-            comment="Order placed",
+            spec.session_sell_orders_volume += req.volume
+        r = _res(
+            _R.PLACED, "Order placed", order=ticket, volume=req.volume, price=req.price
         )
+        if tick:
+            r.bid, r.ask = tick.bid, tick.ask
+        return r
 
-    def _remove_order(self, ticket: int) -> TradeResult:
+    def _remove_order(self, ticket: int) -> _c.TradeResult:
         order = self._orders.pop(ticket, None)
         if order is None:
-            return TradeResult(
-                retcode=int(TradeRetcode.INVALID_ORDER), comment="Order not found"
-            )
-        order.state = int(OrderState.CANCELED)
-        order.state_description = OrderState.CANCELED.name.replace("_", " ").title()
-        now_sec = int(self._clock.timestamp())
-        now_msc = int(self._clock.timestamp() * 1000)
-        order.time_done = now_sec
-        order.time_done_msc = now_msc
+            return _res(_R.INVALID_ORDER, "Order not found")
+        order.state, order.state_description = int(_OS.CANCELED), _label(_OS.CANCELED)
+        order.time_done, order.time_done_msc = self._clock_stamp()
         self._history_orders.append(replace(order))
-        return TradeResult(
-            retcode=int(TradeRetcode.DONE), order=ticket, comment="Order canceled"
-        )
+        return _res(_R.DONE, "Order canceled", order=ticket)
 
-    def _modify_order(self, request: TradeRequest) -> TradeResult:
+    def _modify_order(self, request: _c.TradeRequest) -> _c.TradeResult:
         order = self._orders.get(request.order)
         if order is None:
-            return TradeResult(
-                retcode=int(TradeRetcode.INVALID_ORDER), comment="Order not found"
-            )
-        changed = False
-        updates: list[tuple[str, Any]] = [
+            return _res(_R.INVALID_ORDER, "Order not found")
+        changed, tt = False, request.type_time
+        u: list[tuple[str, Any]] = [
             ("price_open", request.price),
             ("sl", request.sl),
             ("tp", request.tp),
             ("price_stop_limit", request.stoplimit),
+            ("type_time", int(tt)),
+            ("type_time_description", _label(tt)),
         ]
         if request.expiration is not None:
-            updates.append(("time_expiration", epoch_seconds(request.expiration)))
-        updates.append(("type_time", int(request.type_time)))
-        updates.append(
-            (
-                "type_time_description",
-                request.type_time.name.replace("_", " ").title(),
-            )
-        )
-        for name, value in updates:
+            u.append(("time_expiration", epoch_seconds(request.expiration)))
+        for name, value in u:
             if value is not None and getattr(order, name) != value:
                 setattr(order, name, value)
                 changed = True
         if not changed:
-            return TradeResult(
-                retcode=int(TradeRetcode.NO_CHANGES),
-                order=order.ticket,
-                comment="No changes",
-            )
-        return TradeResult(
-            retcode=int(TradeRetcode.DONE),
-            order=order.ticket,
-            comment="Order modified",
-        )
+            return _res(_R.NO_CHANGES, "No changes", order=order.ticket)
+        return _res(_R.DONE, "Order modified", order=order.ticket)
 
-    def _modify_position(self, request: TradeRequest) -> TradeResult:
+    def _modify_position(self, request: _c.TradeRequest) -> _c.TradeResult:
         position = self._positions.get(request.position)
         if position is None:
-            return TradeResult(
-                retcode=int(TradeRetcode.POSITION_CLOSED), comment="Position not found"
-            )
+            return _res(_R.POSITION_CLOSED, "Position not found")
         if position.sl == request.sl and position.tp == request.tp:
-            return TradeResult(
-                retcode=int(TradeRetcode.NO_CHANGES),
-                order=position.ticket,
-                comment="No changes",
-            )
-        position.sl = request.sl
-        position.tp = request.tp
-        now_sec = int(self._clock.timestamp())
-        position.time_update = now_sec
-        position.time_update_msc = int(self._clock.timestamp() * 1000)
-        return TradeResult(
-            retcode=int(TradeRetcode.DONE),
-            order=position.ticket,
-            comment="Position modified",
-        )
+            return _res(_R.NO_CHANGES, "No changes", order=position.ticket)
+        position.sl, position.tp = request.sl, request.tp
+        position.time_update, position.time_update_msc = self._clock_stamp()
+        return _res(_R.DONE, "Position modified", order=position.ticket)
 
-    # ------------------------------------------------------------------
-    # Market execution
-    # ------------------------------------------------------------------
-
-    def _market_open(self, request: TradeRequest) -> TradeResult:
+    def _market_open(self, request: _c.TradeRequest) -> _c.TradeResult:
         tick = self._ticks[request.symbol]
-        price = tick.ask if request.order_type == OrderType.BUY else tick.bid
-
-        if self._account.margin_mode != MarginMode.RETAIL_HEDGING:
-            existing = next(
-                (p for p in self._positions.values() if p.symbol == request.symbol),
-                None,
-            )
+        price = tick.ask if request.order_type == _OT.BUY else tick.bid
+        if self._account.margin_mode != _e.MarginMode.RETAIL_HEDGING:
+            ps = (p for p in self._positions.values() if p.symbol == request.symbol)
+            existing = next(ps, None)
             if existing is not None:
-                requested_side = (
-                    PositionType.BUY
-                    if request.order_type == OrderType.BUY
-                    else PositionType.SELL
-                )
-                if existing.position_type == int(requested_side):
-                    return self._netting_add(existing, request, price, tick)
-                return self._netting_offset(existing, request, price, tick)
-
-        return self._open_new_position(request, price, tick)
+                req_side = _PT.BUY if request.order_type == _OT.BUY else _PT.SELL
+                if existing.position_type == int(req_side):
+                    return self._netting_add(existing, request, price)
+                return self._netting_offset(existing, request, price)
+        return self._open_new_position(request, price)
 
     def _open_new_position(
-        self,
-        request: TradeRequest,
-        price: float,
-        tick: MarketTick,
-        *,
-        order_ticket: int | None = None,
-    ) -> TradeResult:
-        order_ticket = order_ticket or next(self._order_ids)
-        position_ticket = next(self._position_ids)
-        deal_ticket = next(self._deal_ids)
-        side = (
-            PositionType.BUY
-            if request.order_type == OrderType.BUY
-            else PositionType.SELL
+        self, req: _c.TradeRequest, price: float, ot: int = 0
+    ) -> _c.TradeResult:
+        tick, order_ticket = self._ticks[req.symbol], ot or next(self._order_ids)
+        pos_ticket = next(self._position_ids)
+        side = _PT.BUY if req.order_type == _OT.BUY else _PT.SELL
+        comm = abs(req.volume) * self._commission_per_lot
+        now_sec, now_msc = self._clock_stamp()
+        pos = _c.PositionInfo(
+            ticket=pos_ticket, identifier=pos_ticket, symbol=req.symbol
         )
-        commission = abs(request.volume) * self._commission_per_lot
-        now_sec = int(self._clock.timestamp())
-        now_msc = int(self._clock.timestamp() * 1000)
-
-        position = PositionInfo(
-            ticket=position_ticket,
-            identifier=position_ticket,
-            symbol=request.symbol,
-            position_type=int(side),
-            type_description=side.name.replace("_", " ").title(),
-            volume=request.volume,
-            price_open=price,
-            price_current=price,
-            sl=request.sl,
-            tp=request.tp,
-            commission=commission,
-            time=now_sec,
-            time_msc=now_msc,
-            time_update=now_sec,
-            time_update_msc=now_msc,
-            magic=request.magic,
-            comment=request.comment,
+        pos.position_type, pos.type_description = int(side), _label(side)
+        pos.volume, pos.price_open, pos.price_current = req.volume, price, price
+        pos.sl, pos.tp, pos.commission = req.sl, req.tp, comm
+        pos.time = pos.time_update = now_sec
+        pos.time_msc = pos.time_update_msc = now_msc
+        pos.magic, pos.comment = req.magic, req.comment
+        self._positions[pos_ticket] = pos
+        self._account.balance -= comm
+        deal = self._record_deal(
+            pos, order_ticket, _DE.IN, vol=req.volume, price=price, comm=comm
         )
-        self._positions[position_ticket] = position
-        self._account.balance -= commission
-
-        deal_type = DealType.BUY if side == PositionType.BUY else DealType.SELL
-        deal = DealInfo(
-            ticket=deal_ticket,
-            order=order_ticket,
-            position_id=position_ticket,
-            symbol=request.symbol,
-            deal_type=int(deal_type),
-            type_description=deal_type.name.replace("_", " ").title(),
-            entry=int(DealEntry.IN),
-            entry_description=DealEntry.IN.name.replace("_", " ").title(),
-            volume=request.volume,
-            price=price,
-            commission=-commission,
-            time=now_sec,
-            time_msc=now_msc,
-            magic=request.magic,
-            comment=request.comment,
-        )
-        self._deals.append(deal)
-        self._append_filled_order(request, order_ticket, position_ticket, price)
-        spec = self._symbols[request.symbol]
+        self._append_filled(req, order_ticket, pos_ticket, price)
+        spec = self._symbols[req.symbol]
         spec.session_deals += 1
-        spec.session_turnover += abs(price * request.volume * spec.trade_contract_size)
+        spec.session_turnover += abs(price * req.volume * spec.trade_contract_size)
         self._mark_to_market()
-        return TradeResult(
-            retcode=int(TradeRetcode.DONE),
-            deal=deal_ticket,
-            order=order_ticket,
-            volume=request.volume,
-            price=price,
-            bid=tick.bid,
-            ask=tick.ask,
-            comment="Done",
-        )
+        return self._done(deal.ticket, order_ticket, req.volume, price, tick)
 
     def _netting_add(
-        self,
-        existing: PositionInfo,
-        request: TradeRequest,
-        price: float,
-        tick: MarketTick,
-    ) -> TradeResult:
-        order_ticket = next(self._order_ids)
-        deal_ticket = next(self._deal_ids)
-        old_volume = existing.volume
-        new_volume = old_volume + request.volume
-        existing.price_open = (
-            existing.price_open * old_volume + price * request.volume
-        ) / new_volume
-        existing.volume = new_volume
-        existing.price_current = price
-        now_sec = int(self._clock.timestamp())
-        now_msc = int(self._clock.timestamp() * 1000)
-        existing.time_update = now_sec
-        existing.time_update_msc = now_msc
-        if request.sl:
-            existing.sl = request.sl
-        if request.tp:
-            existing.tp = request.tp
-        commission = request.volume * self._commission_per_lot
-        existing.commission += commission
-        self._account.balance -= commission
-
-        side = PositionType(existing.position_type)
-        deal_type = DealType.BUY if side == PositionType.BUY else DealType.SELL
-        self._deals.append(
-            DealInfo(
-                ticket=deal_ticket,
-                order=order_ticket,
-                position_id=existing.ticket,
-                symbol=existing.symbol,
-                deal_type=int(deal_type),
-                type_description=deal_type.name.replace("_", " ").title(),
-                entry=int(DealEntry.IN),
-                entry_description=DealEntry.IN.name.replace("_", " ").title(),
-                volume=request.volume,
-                price=price,
-                commission=-commission,
-                time=now_sec,
-                time_msc=now_msc,
-                magic=request.magic,
-                comment=request.comment,
-            )
+        self, existing: _c.PositionInfo, req: _c.TradeRequest, price: float
+    ) -> _c.TradeResult:
+        tick, order_ticket = self._ticks[req.symbol], next(self._order_ids)
+        old_v, new_v = existing.volume, existing.volume + req.volume
+        existing.price_open = (existing.price_open * old_v + price * req.volume) / new_v
+        existing.volume, existing.price_current = new_v, price
+        existing.time_update, existing.time_update_msc = self._clock_stamp()
+        if req.sl:
+            existing.sl = req.sl
+        if req.tp:
+            existing.tp = req.tp
+        comm = req.volume * self._commission_per_lot
+        existing.commission += comm
+        self._account.balance -= comm
+        deal = self._record_deal(
+            existing, order_ticket, _DE.IN, vol=req.volume, price=price, comm=comm
         )
-        self._append_filled_order(request, order_ticket, existing.ticket, price)
+        deal.magic, deal.comment = req.magic, req.comment
+        self._append_filled(req, order_ticket, existing.ticket, price)
         self._mark_to_market()
-        return TradeResult(
-            retcode=int(TradeRetcode.DONE),
-            deal=deal_ticket,
-            order=order_ticket,
-            volume=request.volume,
-            price=price,
-            bid=tick.bid,
-            ask=tick.ask,
-            comment="Done",
-        )
+        return self._done(deal.ticket, order_ticket, req.volume, price, tick)
 
     def _netting_offset(
-        self,
-        existing: PositionInfo,
-        request: TradeRequest,
-        price: float,
-        tick: MarketTick,
-    ) -> TradeResult:
-        close_volume = min(existing.volume, request.volume)
-        result = self._close_position(
-            existing.ticket,
-            close_volume,
-            comment=request.comment or "netting offset",
-        )
-        remainder = request.volume - close_volume
-        if remainder > 1e-12:
-            reverse_request = replace(request, volume=remainder, position=0)
-            return self._open_new_position(reverse_request, price, tick)
-        return result
+        self, existing: _c.PositionInfo, req: _c.TradeRequest, price: float
+    ) -> _c.TradeResult:
+        close_vol, c = min(existing.volume, req.volume), req.comment or "netting offset"
+        res = self._close_position(existing.ticket, close_vol, comment=c)
+        rem = req.volume - close_vol
+        if rem > 1e-12:
+            return self._open_new_position(replace(req, volume=rem, position=0), price)
+        return res
 
-    def _close_position(
-        self,
-        ticket: int,
-        volume: float,
-        *,
-        comment: str,
-        close_price: float | None = None,
-    ) -> TradeResult:
-        position = self._positions.get(ticket)
-        if position is None:
-            return TradeResult(
-                retcode=int(TradeRetcode.POSITION_CLOSED), comment="Position not found"
-            )
-        if volume <= 0 or volume > position.volume + 1e-12:
-            return TradeResult(
-                retcode=int(TradeRetcode.INVALID_CLOSE_VOLUME),
-                comment="Invalid close volume",
-            )
-        tick = self._ticks.get(position.symbol)
+    def _close_position(self, ticket: int, volume: float, **kw: Any) -> _c.TradeResult:
+        comment, cp_in = kw.get("comment", "close"), kw.get("close_price")
+        pos = self._positions.get(ticket)
+        if pos is None:
+            return _res(_R.POSITION_CLOSED, "Position not found")
+        if volume <= 0 or volume > pos.volume + 1e-12:
+            return _res(_R.INVALID_CLOSE_VOLUME, "Invalid close volume")
+        tick = self._ticks.get(pos.symbol)
         if tick is None:
-            return TradeResult(
-                retcode=int(TradeRetcode.PRICE_OFF), comment="No market price"
-            )
-        if close_price is None:
-            close_price = (
-                tick.bid
-                if position.position_type == int(PositionType.BUY)
-                else tick.ask
-            )
-        original_order_type = (
-            OrderType.BUY
-            if position.position_type == int(PositionType.BUY)
-            else OrderType.SELL
-        )
+            return _res(_R.PRICE_OFF, "No market price")
+        is_b = pos.position_type == int(_PT.BUY)
+        cp = (tick.bid if is_b else tick.ask) if cp_in is None else float(cp_in)
         profit = self.order_calc_profit(
-            original_order_type,
-            position.symbol,
-            volume,
-            position.price_open,
-            close_price,
+            _OT.BUY if is_b else _OT.SELL, pos.symbol, volume, pos.price_open, cp
         )
-        commission = volume * self._commission_per_lot
-        allocated_swap = (
-            position.swap * (volume / position.volume) if position.volume > 0 else 0.0
-        )
-        self._account.balance += profit + allocated_swap - commission
-
+        comm = volume * self._commission_per_lot
+        swap = pos.swap * (volume / pos.volume) if pos.volume > 0 else 0.0
+        self._account.balance += profit + swap - comm
         order_ticket = next(self._order_ids)
-        deal_ticket = next(self._deal_ids)
-        close_order_type = (
-            OrderType.SELL
-            if position.position_type == int(PositionType.BUY)
-            else OrderType.BUY
+        c_req = _c.TradeRequest(
+            action=_A.DEAL, symbol=pos.symbol, volume=volume, comment=comment
         )
-        close_request = TradeRequest(
-            action=TradeAction.DEAL,
-            symbol=position.symbol,
-            volume=volume,
-            order_type=close_order_type,
-            magic=position.magic,
-            position=position.ticket,
-            comment=comment,
+        c_req.order_type = _OT.SELL if is_b else _OT.BUY
+        c_req.magic, c_req.position = pos.magic, pos.ticket
+        self._append_filled(c_req, order_ticket, pos.ticket, cp)
+        deal = self._record_deal(
+            pos, order_ticket, _DE.OUT, vol=volume, price=cp, comm=comm
         )
-        self._append_filled_order(
-            close_request, order_ticket, position.ticket, close_price
-        )
-        now_sec = int(self._clock.timestamp())
-        now_msc = int(self._clock.timestamp() * 1000)
-        deal_type = (
-            DealType.SELL
-            if position.position_type == int(PositionType.BUY)
-            else DealType.BUY
-        )
-        self._deals.append(
-            DealInfo(
-                ticket=deal_ticket,
-                order=order_ticket,
-                position_id=position.identifier,
-                symbol=position.symbol,
-                deal_type=int(deal_type),
-                type_description=deal_type.name.replace("_", " ").title(),
-                entry=int(DealEntry.OUT),
-                entry_description=DealEntry.OUT.name.replace("_", " ").title(),
-                volume=volume,
-                price=close_price,
-                commission=-commission,
-                swap=allocated_swap,
-                profit=profit,
-                time=now_sec,
-                time_msc=now_msc,
-                magic=position.magic,
-                comment=comment,
-            )
-        )
-
-        position.volume -= volume
-        position.swap -= allocated_swap
-        position.time_update = now_sec
-        position.time_update_msc = now_msc
-        if position.volume <= 1e-12:
+        deal.comment, deal.swap, deal.profit = comment, swap, profit
+        pos.volume -= volume
+        pos.swap -= swap
+        pos.time_update, pos.time_update_msc = self._clock_stamp()
+        if pos.volume <= 1e-12:
             del self._positions[ticket]
         else:
-            position.price_current = close_price
-
-        self._symbols[position.symbol].session_deals += 1
+            pos.price_current = cp
+        self._symbols[pos.symbol].session_deals += 1
         self._mark_to_market()
-        return TradeResult(
-            retcode=int(TradeRetcode.DONE),
-            deal=deal_ticket,
-            order=order_ticket,
-            volume=volume,
-            price=close_price,
-            bid=tick.bid,
-            ask=tick.ask,
-            comment="Done",
-        )
+        return self._done(deal.ticket, order_ticket, volume, cp, tick)
 
-    def _close_by(self, ticket: int, ticket_by: int) -> TradeResult:
-        p1 = self._positions.get(ticket)
-        p2 = self._positions.get(ticket_by)
+    def _close_by(self, ticket: int, ticket_by: int) -> _c.TradeResult:
+        p1, p2 = self._positions.get(ticket), self._positions.get(ticket_by)
         if p1 is None or p2 is None:
-            return TradeResult(
-                retcode=int(TradeRetcode.POSITION_CLOSED), comment="Position not found"
-            )
+            return _res(_R.POSITION_CLOSED, "Position not found")
         if p1.symbol != p2.symbol or p1.position_type == p2.position_type:
-            return TradeResult(
-                retcode=int(TradeRetcode.INVALID_ORDER),
-                comment="Close By requires opposite positions on same symbol",
-            )
+            msg = "Close By requires opposite positions on same symbol"
+            return _res(_R.INVALID_ORDER, msg)
         tick = self._ticks.get(p1.symbol)
         if tick is None:
-            return TradeResult(
-                retcode=int(TradeRetcode.PRICE_OFF), comment="No market price"
-            )
-        # Close By is modelled at the midpoint to avoid charging another spread.
-        midpoint = (tick.bid + tick.ask) / 2.0
-        volume = min(p1.volume, p2.volume)
-        first = self._close_position(
-            ticket, volume, comment="close by", close_price=midpoint
-        )
+            return _res(_R.PRICE_OFF, "No market price")
+        mid, vol = (tick.bid + tick.ask) / 2.0, min(p1.volume, p2.volume)
+        first = self._close_position(ticket, vol, comment="close by", close_price=mid)
         second = self._close_position(
-            ticket_by, volume, comment="close by", close_price=midpoint
+            ticket_by, vol, comment="close by", close_price=mid
         )
-        if second.retcode != int(TradeRetcode.DONE):
-            return second
-        return first
+        return second if second.retcode != int(_R.DONE) else first
 
-    def _append_filled_order(
-        self,
-        request: TradeRequest,
-        ticket: int,
-        position_id: int,
-        price: float,
+    def _append_filled(
+        self, req: _c.TradeRequest, tkt: int, pid: int, p: float
     ) -> None:
-        now_sec = int(self._clock.timestamp())
-        now_msc = int(self._clock.timestamp() * 1000)
-        exp_sec = epoch_seconds(request.expiration)
-        self._history_orders.append(
-            OrderInfo(
-                ticket=ticket,
-                symbol=request.symbol,
-                order_type=int(request.order_type),
-                type_description=request.order_type.name.replace("_", " ").title(),
-                state=int(OrderState.FILLED),
-                state_description=OrderState.FILLED.name.replace("_", " ").title(),
-                volume_initial=request.volume,
-                volume_current=0.0,
-                price_open=price,
-                sl=request.sl,
-                tp=request.tp,
-                price_current=price,
-                price_stop_limit=request.stoplimit,
-                time_setup=now_sec,
-                time_setup_msc=now_msc,
-                time_done=now_sec,
-                time_done_msc=now_msc,
-                time_expiration=exp_sec,
-                type_filling=int(request.type_filling),
-                type_filling_description=request.type_filling.name.replace(
-                    "_", " "
-                ).title(),
-                type_time=int(request.type_time),
-                type_time_description=request.type_time.name.replace("_", " ").title(),
-                magic=request.magic,
-                position_id=position_id,
-                comment=request.comment,
-            )
-        )
-
-    # ------------------------------------------------------------------
-    # Tick processing
-    # ------------------------------------------------------------------
+        kw = {"vol_cur": 0.0, "p_open": p, "p_cur": p, "pos_id": pid, "done": True}
+        self._history_orders.append(self._build_order(req, tkt, _OS.FILLED, **kw))
 
     def _expire_orders(self) -> None:
-        now_sec = int(self._clock.timestamp())
-        now_msc = int(self._clock.timestamp() * 1000)
-        expired = [
-            ticket
-            for ticket, order in self._orders.items()
-            if order.type_time
-            in {int(OrderTime.SPECIFIED), int(OrderTime.SPECIFIED_DAY)}
-            and order.time_expiration > 0
-            and now_sec >= order.time_expiration
-        ]
-        for ticket in expired:
+        now_sec, now_msc = self._clock_stamp()
+        spec_times = {int(_OTM.SPECIFIED), int(_OTM.SPECIFIED_DAY)}
+        for ticket in [
+            t
+            for t, o in self._orders.items()
+            if o.type_time in spec_times and 0 < o.time_expiration <= now_sec
+        ]:
             order = self._orders.pop(ticket)
-            order.state = int(OrderState.EXPIRED)
-            order.state_description = OrderState.EXPIRED.name.replace("_", " ").title()
-            order.time_done = now_sec
-            order.time_done_msc = now_msc
+            order.state, order.state_description = int(_OS.EXPIRED), _label(_OS.EXPIRED)
+            order.time_done, order.time_done_msc = now_sec, now_msc
             self._history_orders.append(replace(order))
 
-    def _trigger_pending(self, symbol: str, tick: MarketTick) -> None:
+    def _trigger_pending(self, symbol: str, tick: _c.MarketTick) -> None:
         for ticket, order in list(self._orders.items()):
             if order.symbol != symbol:
                 continue
-
-            triggered = False
-            fill_price = order.price_open
-            if (
-                order.order_type == int(OrderType.BUY_LIMIT)
-                and tick.ask <= order.price_open
-            ):
-                triggered = True
-                fill_price = min(order.price_open, tick.ask)
-            elif (
-                order.order_type == int(OrderType.SELL_LIMIT)
-                and tick.bid >= order.price_open
-            ):
-                triggered = True
-                fill_price = max(order.price_open, tick.bid)
-            elif (
-                order.order_type == int(OrderType.BUY_STOP)
-                and tick.ask >= order.price_open
-            ):
-                triggered = True
-                fill_price = tick.ask
-            elif (
-                order.order_type == int(OrderType.SELL_STOP)
-                and tick.bid <= order.price_open
-            ):
-                triggered = True
-                fill_price = tick.bid
-            elif (
-                order.order_type == int(OrderType.BUY_STOP_LIMIT)
-                and tick.ask >= order.price_open
-            ):
-                order.order_type = int(OrderType.BUY_LIMIT)
-                order.type_description = OrderType.BUY_LIMIT.name.replace(
-                    "_", " "
-                ).title()
-                order.price_open = order.price_stop_limit or order.price_open
-                order.price_stop_limit = 0.0
+            trig, fp, ot = False, order.price_open, order.order_type
+            if ot == int(_OT.BUY_LIMIT) and tick.ask <= fp:
+                trig, fp = True, min(fp, tick.ask)
+            elif ot == int(_OT.SELL_LIMIT) and tick.bid >= fp:
+                trig, fp = True, max(fp, tick.bid)
+            elif ot == int(_OT.BUY_STOP) and tick.ask >= fp:
+                trig, fp = True, tick.ask
+            elif ot == int(_OT.SELL_STOP) and tick.bid <= fp:
+                trig, fp = True, tick.bid
+            elif ot in {int(_OT.BUY_STOP_LIMIT), int(_OT.SELL_STOP_LIMIT)}:
+                is_bsl = ot == int(_OT.BUY_STOP_LIMIT)
+                if (is_bsl and tick.ask >= fp) or (not is_bsl and tick.bid <= fp):
+                    new_ot = _OT.BUY_LIMIT if is_bsl else _OT.SELL_LIMIT
+                    order.order_type = int(new_ot)
+                    order.type_description = _label(new_ot)
+                    order.price_open = order.price_stop_limit or fp
+                    order.price_stop_limit = 0.0
                 continue
-            elif (
-                order.order_type == int(OrderType.SELL_STOP_LIMIT)
-                and tick.bid <= order.price_open
-            ):
-                order.order_type = int(OrderType.SELL_LIMIT)
-                order.type_description = OrderType.SELL_LIMIT.name.replace(
-                    "_", " "
-                ).title()
-                order.price_open = order.price_stop_limit or order.price_open
-                order.price_stop_limit = 0.0
-                continue
-
-            if not triggered:
+            if not trig:
                 continue
 
             del self._orders[ticket]
-            now_sec = int(self._clock.timestamp())
-            now_msc = int(self._clock.timestamp() * 1000)
-            order.state = int(OrderState.FILLED)
-            order.state_description = OrderState.FILLED.name.replace("_", " ").title()
-            order.time_done = now_sec
-            order.time_done_msc = now_msc
-            order.volume_current = 0.0
-            order.price_current = fill_price
+            order.state, order.state_description = int(_OS.FILLED), _label(_OS.FILLED)
+            order.time_done, order.time_done_msc = self._clock_stamp()
+            order.volume_current, order.price_current = 0.0, fp
             self._history_orders.append(replace(order))
-
-            request = TradeRequest(
-                action=TradeAction.DEAL,
-                symbol=order.symbol,
-                volume=order.volume_initial,
-                order_type=OrderType.BUY
-                if order.order_type
-                in {int(OrderType.BUY_LIMIT), int(OrderType.BUY_STOP)}
-                else OrderType.SELL,
-                price=fill_price,
-                sl=order.sl,
-                tp=order.tp,
-                magic=order.magic,
-                type_filling=OrderFilling(order.type_filling)
-                if order.type_filling in OrderFilling._value2member_map_
-                else OrderFilling.FOK,
-                type_time=OrderTime(order.type_time)
-                if order.type_time in OrderTime._value2member_map_
-                else OrderTime.GTC,
-                expiration=(
-                    datetime.fromtimestamp(order.time_expiration, tz=UTC)
-                    if order.time_expiration
-                    else None
-                ),
-                comment=order.comment,
+            is_b = order.order_type in {int(_OT.BUY_LIMIT), int(_OT.BUY_STOP)}
+            tf_m, tt_m = _OF._value2member_map_, _OTM._value2member_map_
+            f_in, t_in = order.type_filling, order.type_time
+            req = _c.TradeRequest(
+                action=_A.DEAL, symbol=order.symbol, volume=order.volume_initial
             )
-            if self._account.margin_mode == MarginMode.RETAIL_HEDGING:
-                self._open_new_position(request, fill_price, tick, order_ticket=ticket)
+            req.order_type = _OT.BUY if is_b else _OT.SELL
+            req.price, req.sl, req.tp = fp, order.sl, order.tp
+            req.magic, req.comment = order.magic, order.comment
+            req.type_filling = _OF(f_in) if f_in in tf_m else _OF.FOK
+            req.type_time = _OTM(t_in) if t_in in tt_m else _OTM.GTC
+            t_exp = order.time_expiration
+            req.expiration = datetime.fromtimestamp(t_exp, tz=UTC) if t_exp else None
+            if self._account.margin_mode == _e.MarginMode.RETAIL_HEDGING:
+                self._open_new_position(req, fp, ticket)
             else:
-                # Netting may generate its own history order; remove the duplicate
-                # entry added above only for the common open-new case.
-                self._market_open(replace(request, price=fill_price))
+                self._market_open(replace(req, price=fp))
 
-    def _trigger_stops(self, symbol: str, tick: MarketTick) -> None:
-        for position in list(self._positions.values()):
-            if position.symbol != symbol:
+    def _trigger_stops(self, symbol: str, tick: _c.MarketTick) -> None:
+        for pos in list(self._positions.values()):
+            if pos.symbol != symbol:
                 continue
-            reason = ""
-            if position.position_type == int(PositionType.BUY):
-                if position.sl > 0 and tick.bid <= position.sl:
-                    reason = "stop loss"
-                elif position.tp > 0 and tick.bid >= position.tp:
-                    reason = "take profit"
-            elif position.sl > 0 and tick.ask >= position.sl:
-                reason = "stop loss"
-            elif position.tp > 0 and tick.ask <= position.tp:
-                reason = "take profit"
-            if reason:
-                self._close_position(position.ticket, position.volume, comment=reason)
+            is_b = pos.position_type == int(_PT.BUY)
+            sl_hit = pos.sl > 0 and (tick.bid <= pos.sl if is_b else tick.ask >= pos.sl)
+            tp_hit = pos.tp > 0 and (tick.bid >= pos.tp if is_b else tick.ask <= pos.tp)
+            if sl_hit or tp_hit:
+                c = "stop loss" if sl_hit else "take profit"
+                self._close_position(pos.ticket, pos.volume, comment=c)
 
     def _mark_to_market(self) -> None:
-        floating = 0.0
-        margin = 0.0
-        for position in self._positions.values():
-            tick = self._ticks.get(position.symbol)
+        floating = margin = 0.0
+        for pos in self._positions.values():
+            tick = self._ticks.get(pos.symbol)
             if tick is None:
                 continue
-            current = (
-                tick.bid
-                if position.position_type == int(PositionType.BUY)
-                else tick.ask
-            )
-            position.price_current = current
-            order_type = (
-                OrderType.BUY
-                if position.position_type == int(PositionType.BUY)
-                else OrderType.SELL
-            )
-            position.profit = self.order_calc_profit(
-                order_type,
-                position.symbol,
-                position.volume,
-                position.price_open,
-                current,
-            )
-            floating += position.profit + position.swap
-            margin += self.order_calc_margin(
-                order_type,
-                position.symbol,
-                position.volume,
-                position.price_open,
-            )
-        self._account.profit = floating
-        self._account.margin = margin
-        self._account.equity = self._account.balance + floating + self._account.credit
-        self._account.free_margin = self._account.equity - margin
-        self._account.margin_level = (
-            (self._account.equity / margin) * 100.0 if margin > 0 else 0.0
-        )
+            is_buy = pos.position_type == int(_PT.BUY)
+            cur, ot = (tick.bid, _OT.BUY) if is_buy else (tick.ask, _OT.SELL)
+            pos.price_current = cur
+            sym, vol, po = pos.symbol, pos.volume, pos.price_open
+            pos.profit = self.order_calc_profit(ot, sym, vol, po, cur)
+            floating += pos.profit + pos.swap
+            margin += self.order_calc_margin(ot, sym, vol, po)
+        acc = self._account
+        acc.profit, acc.margin = floating, margin
+        acc.equity = acc.balance + floating + acc.credit
+        acc.free_margin = acc.equity - margin
+        acc.margin_level = (acc.equity / margin) * 100.0 if margin > 0 else 0.0
 
     @override
     async def start(self) -> None:
-        """Start the local backend without advancing simulated time."""
         logger.debug("FR-SIMULATION-DISPATCH: starting backend")
         self.connect()
 
     @override
     async def wait_connected(self, timeout: float | None = None) -> None:
-        """Check readiness without I/O or clock advancement."""
         del timeout
         logger.debug("FR-SIMULATION-DISPATCH: checking readiness")
         if not self._connected:
@@ -1491,14 +867,12 @@ class SimulatorClient(TradingClient):
 
     @override
     async def close(self) -> None:
-        """Disconnect local execution and revoke mutation permission."""
         logger.debug("FR-SIMULATION-DISPATCH: closing backend")
         self.disarm()
         self.disconnect()
 
     @override
     def arm(self) -> None:
-        """Permit local simulated mutations; grants no live authority."""
         logger.debug("FR-SIMULATION-DISPATCH: arming local execution")
         if not self._connected:
             raise BridgeError("simulator disconnected", code="NOT_CONNECTED")
@@ -1506,54 +880,34 @@ class SimulatorClient(TradingClient):
 
     @override
     def disarm(self) -> None:
-        """Revoke local mutation permission."""
         logger.debug("FR-SIMULATION-DISPATCH: disarming local execution")
         self._armed = False
 
     @override
-    def last_command_id(self) -> str | None:
-        """Return the current async task's last simulated command ID."""
-        return super().last_command_id()
-
-    @override
-    def receipt(self, command_id: str) -> Receipt | None:
-        """Read an immutable in-memory command receipt."""
-        return super().receipt(command_id)
-
-    @override
-    async def next_event(self, timeout: float | None = None) -> BridgeEvent:
-        """Wait for locally emitted transaction events."""
+    async def next_event(self, timeout: float | None = None) -> _c.BridgeEvent:
         async with asyncio.timeout(timeout):
             return await self._event_queue.get()
 
     @override
     async def await_request_event(
-        self,
-        request_id: int,
-        timeout: float | None = None,
-    ) -> BridgeEvent:
-        """Reject unsupported native-request correlation explicitly."""
-        del request_id, timeout
-        raise BridgeError(
-            "simulator has no native request event correlation",
-            code="UNSUPPORTED_OPERATION",
-        )
+        self, req_id: int, timeout: float | None = None
+    ) -> _c.BridgeEvent:
+        del req_id, timeout
+        msg = "simulator has no native request event correlation"
+        raise BridgeError(msg, code="UNSUPPORTED_OPERATION")
 
     def seed_bar_history(
-        self,
-        symbol: str,
-        timeframe: Timeframe,
-        bars: Sequence[MarketBar],
+        self, sym: str, tf: _e.Timeframe, bars: Sequence[_c.MarketBar]
     ) -> None:
         """Register an immutable chronological bar series without advancing time."""
         logger.debug("FR-SIMULATION-HISTORY: seeding bars")
-        if symbol not in self._symbols or timeframe not in TIMEFRAME_SECONDS:
+        if sym not in self._symbols or tf not in _c.TIMEFRAME_SECONDS:
             raise BridgeError("invalid history series", code="BAD_REQUEST")
         rows = [asdict(bar) for bar in bars]
         validate_rows(rows, "bars", 0, 2**63 - 1, len(rows))
-        self._bar_history[symbol, timeframe] = tuple(bars)
+        self._bar_history[sym, tf] = tuple(bars)
 
-    def seed_tick_history(self, symbol: str, ticks: Sequence[MarketTick]) -> None:
+    def seed_tick_history(self, symbol: str, ticks: Sequence[_c.MarketTick]) -> None:
         """Register immutable chronological ticks without replacing the live quote."""
         logger.debug("FR-SIMULATION-HISTORY: seeding ticks")
         if symbol not in self._symbols:
@@ -1564,58 +918,46 @@ class SimulatorClient(TradingClient):
 
     @override
     def calc_margin(
-        self,
-        order_type: OrderType,
-        symbol: str,
-        volume: float,
-        price: float,
+        self, ot: _e.OrderType, sym: str, vol: float, price: float
     ) -> float:
-        """Calculate required margin for an order."""
-        return self.order_calc_margin(order_type, symbol, volume, price)
+        return self.order_calc_margin(ot, sym, vol, price)
 
     @override
     def calc_profit(
-        self,
-        order_type: OrderType,
-        symbol: str,
-        volume: float,
-        price_open: float,
-        price_close: float,
+        self, ot: _e.OrderType, sym: str, vol: float, p_open: float, p_close: float
     ) -> float:
-        """Calculate hypothetical floating or realized profit for an order."""
-        return self.order_calc_profit(
-            order_type, symbol, volume, price_open, price_close
-        )
+        return self.order_calc_profit(ot, sym, vol, p_open, p_close)
+
+    def _slice_history(
+        self, items: Sequence[_T], ms: bool = False, **kw: Any
+    ) -> list[_T]:
+        scale, key = (1000, "time_msc") if ms else (1, "time")
+        now_v = int(self._clock.timestamp() * scale)
+        out = [x for x in items if getattr(x, key) <= now_v]
+        d_from, d_to = kw.get("date_from"), kw.get("date_to")
+        if d_from or d_to:
+            lo = int(d_from.timestamp() * scale) if d_from else 0
+            hi = int(d_to.timestamp() * scale) if d_to else now_v
+            out = [x for x in out if lo <= getattr(x, key) <= hi]
+        cnt, limit = kw.get("count"), int(kw.get("limit", 1000))
+        n = cnt if cnt is not None and cnt > 0 else limit
+        return list(out[-n:] if n and len(out) > n else out)
 
     @override
     def get_bars(
         self,
         symbol: str,
-        timeframe: Timeframe | str = Timeframe.PERIOD_H1,
+        timeframe: _e.Timeframe | str = _e.Timeframe.PERIOD_H1,
         date_from: datetime | None = None,
         date_to: datetime | None = None,
-        *,
-        start_pos: int | None = None,
-        count: int | None = None,
-        limit: int = 1000,
-    ) -> list[MarketBar]:
-        """Fetch historical candlestick bars directly from seeded history."""
-        del start_pos
-        tf = (
-            timeframe if isinstance(timeframe, Timeframe) else Timeframe(str(timeframe))
-        )
+        **kw: Any,
+    ) -> list[_c.MarketBar]:
+        tf = _e.Timeframe(str(timeframe))
         if (symbol, tf) not in self._bar_history:
             raise BridgeError("history is not seeded", code="DATA_NOT_READY")
-        now_ts = int(self._clock.timestamp())
-        bars = [b for b in self._bar_history[symbol, tf] if b.time <= now_ts]
-        start_s = int(date_from.timestamp()) if date_from else 0
-        end_s = int(date_to.timestamp()) if date_to else now_ts
-        if date_from or date_to:
-            bars = [b for b in bars if start_s <= b.time <= end_s]
-        target_count = count if count is not None and count > 0 else limit
-        if target_count and len(bars) > target_count:
-            bars = bars[-target_count:]
-        return list(bars)
+        return self._slice_history(
+            self._bar_history[symbol, tf], date_from=date_from, date_to=date_to, **kw
+        )
 
     @override
     def get_ticks(
@@ -1623,25 +965,13 @@ class SimulatorClient(TradingClient):
         symbol: str,
         date_from: datetime | None = None,
         date_to: datetime | None = None,
-        *,
-        count: int | None = None,
-        limit: int = 1000,
-    ) -> list[MarketTick]:
-        """Fetch historical market ticks directly from seeded history."""
+        **kw: Any,
+    ) -> list[_c.MarketTick]:
         if symbol not in self._tick_history:
             raise BridgeError("history is not seeded", code="DATA_NOT_READY")
-        now_ms = int(self._clock.timestamp() * 1000)
-        ticks = [t for t in self._tick_history[symbol] if t.time_msc <= now_ms]
-        start_ms = int(date_from.timestamp() * 1000) if date_from else 0
-        end_ms = int(date_to.timestamp() * 1000) if date_to else now_ms
-        if date_from or date_to:
-            ticks = [t for t in ticks if start_ms <= t.time_msc <= end_ms]
-        target_count = count if count is not None and count > 0 else limit
-        if target_count and len(ticks) > target_count:
-            ticks = ticks[-target_count:]
-        return list(ticks)
+        return self._slice_history(
+            self._tick_history[symbol], True, date_from=date_from, date_to=date_to, **kw
+        )
 
 
-__all__ = [
-    "SimulatorClient",
-]
+__all__ = ["SimulatorClient"]

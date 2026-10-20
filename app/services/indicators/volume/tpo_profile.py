@@ -82,9 +82,9 @@ class TPOProfile(BaseIndicator):
         Returns:
             Dictionary containing 'poc', 'vah', 'val', 'ib_high', and 'ib_low'.
         """
-        h_arr = cls._to_numpy(high)
-        l_arr = cls._to_numpy(low)
-        c_arr = cls._to_numpy(close)
+        h_arr = cls.to_numpy(high)
+        l_arr = cls.to_numpy(low)
+        c_arr = cls.to_numpy(close)
         n = len(c_arr)
 
         poc_out = np.full(n, np.nan, dtype=np.float64)

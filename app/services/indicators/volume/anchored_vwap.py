@@ -87,10 +87,10 @@ class AnchoredVWAP(BaseIndicator):
         Returns:
             Dictionary containing 'vwap', 'upper', and 'lower' IndicatorSeries.
         """
-        h_arr = cls._to_numpy(high)
-        l_arr = cls._to_numpy(low)
-        c_arr = cls._to_numpy(close)
-        v_arr = cls._to_numpy(volume)
+        h_arr = cls.to_numpy(high)
+        l_arr = cls.to_numpy(low)
+        c_arr = cls.to_numpy(close)
+        v_arr = cls.to_numpy(volume)
         n = len(c_arr)
 
         vwap_out = np.full(n, np.nan, dtype=np.float64)

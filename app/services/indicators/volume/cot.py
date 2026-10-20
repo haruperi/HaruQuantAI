@@ -80,8 +80,8 @@ class COT(BaseIndicator):
             Dictionary containing 'composite_score', 'cpi_hedger', 'cpi_speculator',
             and 'hedger_spec_spread' IndicatorSeries.
         """
-        c_arr = cls._to_numpy(commercial_net)
-        s_arr = cls._to_numpy(speculator_net)
+        c_arr = cls.to_numpy(commercial_net)
+        s_arr = cls.to_numpy(speculator_net)
         n = min(len(c_arr), len(s_arr))
 
         if period_fast > period_slow:
