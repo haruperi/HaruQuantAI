@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { connectHost } from '../../../app/host/HostConnection';
+import {
+  connectHost,
+  deleteHostConnection,
+  listHostConnections,
+  saveHostConnection,
+  testHostConnection,
+} from '../../../app/host/HostConnection';
 import { getAuthToken, setAuthToken } from '../../../app/host/transport';
 import { createInitialAppSettings } from '../../../app/host/globalSettings';
 import { shellPreferences } from '../../../app/host/hostSettings';
@@ -133,4 +139,55 @@ it('discards a saved session rejected by the host and requires a password', asyn
   expect(status).toHaveBeenCalledWith('locked');
   expect(getAuthToken()).toBeNull();
   expect(fetchFn).toHaveBeenCalledTimes(1);
+});
+
+describe('host connection CRUD and connectivity tests', () => {
+  it('lists, saves, tests, and deletes host connections via ServletConnection endpoints', async () => {
+    const fetchFn = vi.fn().mockImplementation(async (url: string, init?: RequestInit) => {
+      if (url.endsWith('/connections') && (!init?.method || init.method === 'GET')) {
+        return {
+          ok: true, status: 200,
+          json: async () => ({ status: 'success', data: { connections: [{ connection_id: 'conn-1', name: 'Local Broker', endpoint: '127.0.0.1:8000' }], count: 1 } }),
+        };
+      }
+      if (url.endsWith('/connections') && init?.method === 'POST') {
+        const body = JSON.parse(init.body as string);
+        return {
+          ok: true, status: 200,
+          json: async () => ({ status: 'success', data: { ...body, connection_id: 'conn-1' } }),
+        };
+      }
+      if (url.endsWith('/connections/conn-1/test') && init?.method === 'POST') {
+        return {
+          ok: true, status: 200,
+          json: async () => ({
+            status: 'success',
+            data: {
+              connection_id: 'conn-1',
+              endpoint: '127.0.0.1:8000',
+              test_result: { endpoint: '127.0.0.1:8000', host: '127.0.0.1', port: 8000, reachable: true, latency_ms: 0.42, error: null },
+              timestamp: '2026-10-20T00:00:00Z',
+            },
+          }),
+        };
+      }
+      if (url.endsWith('/connections/conn-1') && init?.method === 'DELETE') {
+        return {
+          ok: true, status: 200,
+          json: async () => ({ status: 'success', data: { connection_id: 'conn-1', deleted: true } }),
+        };
+      }
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    const config = { fetchFn: asFetch(fetchFn), baseUrl: '/api/v1' };
+    const saved = await saveHostConnection({ name: 'Local Broker', endpoint: '127.0.0.1:8000' }, config);
+    expect(saved.connection_id).toBe('conn-1');
+    const listed = await listHostConnections(config);
+    expect(listed).toHaveLength(1);
+    const tested = await testHostConnection({ connectionId: 'conn-1' }, config);
+    expect(tested.test_result.reachable).toBe(true);
+    expect(tested.test_result.latency_ms).toBe(0.42);
+    const deleted = await deleteHostConnection('conn-1', config);
+    expect(deleted.deleted).toBe(true);
+  });
 });

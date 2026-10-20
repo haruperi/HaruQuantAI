@@ -1,5 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parseHostPreferences, parseSettingsCatalogue, readHostPreferences, shellPreferences, watchSettingsChanges, writeHostPreferences } from '../../../app/host/hostSettings';
+import {
+  parseHostPreferences,
+  parseSettingsCatalogue,
+  readHostConstants,
+  readHostPreferences,
+  readHostSystemSpecs,
+  shellPreferences,
+  watchSettingsChanges,
+  writeHostPreferences,
+} from '../../../app/host/hostSettings';
 import { createInitialAppSettings } from '../../../app/host/globalSettings';
 import { setAuthToken } from '../../../app/host/transport';
 
@@ -159,5 +168,46 @@ describe('catalogue secret boundaries', () => {
       expect(() => parseSettingsCatalogue({ revision: 3, fields: [field], unknown: [] })).toThrow();
     }
     expect(() => parseSettingsCatalogue({ revision: 3, fields: [{ ...secret, key: 'timeout_ms', secret: false, kind: 'int', value: '60' }], unknown: [] })).toThrow();
+  });
+
+  it('reads system constants and hardware specs from ServletConstants endpoints', async () => {
+    const fetchFn = vi.fn().mockImplementation(async (url: string) => {
+      if (url.endsWith('/constants')) {
+        return {
+          ok: true, status: 200,
+          json: async () => ({
+            status: 'success',
+            data: {
+              application: 'HaruQuantAI',
+              version: '1.0.0',
+              runtime: 'CPython 3.14 (FastAPI)',
+              host_instance_id: 'host-1',
+              build_timestamp: '2026-10-18T00:00:00Z',
+              data_directory: '/data',
+              core_channels: ['jobs', 'system'],
+              supported_timeframes: ['1m', '5m', '1h', '1d'],
+            },
+          }),
+        };
+      }
+      return {
+        ok: true, status: 200,
+        json: async () => ({
+          status: 'success',
+          data: {
+            cpu_cores: 8,
+            hardware_concurrency: 8,
+            supported_timeframes: ['1m', '5m', '1h', '1d'],
+          },
+        }),
+      };
+    });
+    const config = { fetchFn: asFetch(fetchFn), baseUrl: '/api/v1' };
+    const constants = await readHostConstants(config);
+    expect(constants.application).toBe('HaruQuantAI');
+    expect(constants.supported_timeframes).toContain('1m');
+    const specs = await readHostSystemSpecs(config);
+    expect(specs.cpu_cores).toBe(8);
+    expect(specs.hardware_concurrency).toBe(8);
   });
 });

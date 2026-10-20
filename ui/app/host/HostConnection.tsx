@@ -1,10 +1,31 @@
 /** Browser-shell connection to the host session, readiness, and settings services. */
 
 import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { Button, Field, Modal, TextInput } from '../components/ui';
+import { Button } from '../components/ui';
 import { useAppStore } from './store';
+import {
+  HostConnectionModal,
+  deleteHostConnection,
+  listHostConnections,
+  saveHostConnection,
+  testHostConnection,
+  type ConnectionPingResult,
+  type ConnectionTestResult,
+  type HostConnectionRecord,
+} from './HostConnectionModal';
 import { readHostPreferences, shellPreferences, watchSettingsChanges, writeHostPreferences, type HostSettingsSnapshot, type ShellPreferences } from './hostSettings';
 import { ApiClientError, createDomainClient, getAuthToken, getSessionPersistenceWarning, login, restoreSavedSession, setAuthToken, subscribeAuthExpired } from './transport';
+
+export {
+  HostConnectionModal,
+  deleteHostConnection,
+  listHostConnections,
+  saveHostConnection,
+  testHostConnection,
+  type ConnectionPingResult,
+  type ConnectionTestResult,
+  type HostConnectionRecord,
+};
 
 export type HostStatus = 'connecting' | 'online' | 'locked' | 'offline';
 export type SaveSettingsResult = { ok: true } | { ok: false; message: string };
@@ -229,12 +250,14 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
   return <HostConnectionContext.Provider value={{ status, settingsRevision, saveSettings }}>
     {children}
     {status === 'online' && message && <div role="status">{message}</div>}
-    {loginVisible && status !== 'offline' && <Modal title="Connect to HaruQuantAI host" onClose={() => { connectionRef.current?.abort(); setAuthToken(null); updateStatus('offline'); setLoginVisible(false); }} footer={<Button form="host-login" type="submit" className="primary" disabled={status === 'connecting'}>{status === 'connecting' ? 'Connecting...' : 'Connect'}</Button>}>
-      <form id="host-login" onSubmit={submitPassword}>
-        <p role="alert">{message || 'Enter the host password to connect.'}</p>
-        <Field label="Host password"><TextInput type="password" required maxLength={1024} disabled={status === 'connecting'} autoComplete="current-password" value={password} onChange={event => setPassword(event.target.value)} /></Field>
-      </form>
-    </Modal>}
+    {loginVisible && status !== 'offline' && <HostConnectionModal
+      connecting={status === 'connecting'}
+      message={message}
+      password={password}
+      onPasswordChange={setPassword}
+      onSubmit={submitPassword}
+      onClose={() => { connectionRef.current?.abort(); setAuthToken(null); updateStatus('offline'); setLoginVisible(false); }}
+    />}
     {status === 'offline' && <div role="status">Host offline. Settings cannot be saved. {message} <Button onClick={() => retry()}>Retry connection</Button></div>}
   </HostConnectionContext.Provider>;
 }

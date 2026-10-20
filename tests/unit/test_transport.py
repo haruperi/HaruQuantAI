@@ -582,6 +582,14 @@ def test_transport_cli_main(capsys: pytest.CaptureFixture[str]) -> None:
     assert conn_test["diagnostics"]["dns_resolved"] is True
     assert conn_test["diagnostics"]["reachable"] is True
     assert conn_test["diagnostics_failure"]["dns_resolved"] is False
+    s_conn = out_default["servlet_connection"]
+    assert s_conn["saved"]["connection_id"] == "demo-conn"
+    assert len(s_conn["listed"]) == 1
+    assert s_conn["tested"]["test_result"]["reachable"] is True
+    assert s_conn["deleted"] is True
+    s_const = out_default["servlet_constants"]
+    assert s_const["constants"]["application"] == "HaruQuantAI"
+    assert s_const["system_specs"]["cpu_cores"] >= 1
 
 
 def test_gateway_settings_diagnostics_and_jobs_routes(tmp_path: Path) -> None:

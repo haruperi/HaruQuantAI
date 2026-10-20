@@ -2,8 +2,10 @@
 import { useEffect, useState } from 'react';
 import { Button, Modal } from '../components/ui';
 import {
-  changeHostAccount, readHostAccount, readSettingsCatalogue, saveCatalogueFields,
-  type HostAccount, type SettingsCatalogue, type SettingsField,
+  changeHostAccount, readHostAccount, readHostConstants, readHostSystemSpecs,
+  readSettingsCatalogue, saveCatalogueFields,
+  type HostAccount, type HostConstants, type HostSystemSpecs,
+  type SettingsCatalogue, type SettingsField,
 } from './hostSettings';
 import { setAuthToken } from './transport';
 import type { HostSettingsSection } from './types';
@@ -33,6 +35,8 @@ export function HostSettingsModal({ section, onClose }: { section: Exclude<HostS
   const config = sections[section];
   const [group, setGroup] = useState(config.tabs[0][1]);
   const [catalogue, setCatalogue] = useState<SettingsCatalogue | null>(null);
+  const [constants, setConstants] = useState<HostConstants | null>(null);
+  const [specs, setSpecs] = useState<HostSystemSpecs | null>(null);
   const [draft, setDraft] = useState<Record<string, string | boolean>>({});
   const [cleared, setCleared] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
@@ -41,6 +45,8 @@ export function HostSettingsModal({ section, onClose }: { section: Exclude<HostS
     let active = true;
     readSettingsCatalogue().then(value => { if (active) { setCatalogue(value); setDraft(initialDraft(value)); } })
       .catch(() => { if (active) setError('Could not load host settings. Reopen to retry.'); });
+    readHostConstants().then(value => { if (active && value?.application) setConstants(value); }).catch(() => undefined);
+    readHostSystemSpecs().then(value => { if (active && typeof value?.cpu_cores === 'number') setSpecs(value); }).catch(() => undefined);
     return () => { active = false; };
   }, []);
   const canSave = catalogue?.fields.some(field => !field.readonly && config.tabs.some(([, name]) => name === field.group)) ?? false;
@@ -97,6 +103,7 @@ export function HostSettingsModal({ section, onClose }: { section: Exclude<HostS
           <small>{field.scope}.{field.key}{field.readonly ? ' · Read-only' : ''}</small>
         </div>;
       })}
+      {group === 'runtime' && (constants || specs) && <details className="host-runtime-specs"><summary>System constants and specs (read-only)</summary>{constants && <><p>Application: {constants.application} {constants.version} ({constants.runtime})</p><p>Build timestamp: {constants.build_timestamp}</p><p>Data directory: {constants.data_directory}</p></>}{specs && <><p>CPU cores: {specs.cpu_cores} (concurrency: {specs.hardware_concurrency})</p>{Array.isArray(specs.supported_timeframes) && <p>Supported timeframes: {specs.supported_timeframes.join(', ')}</p>}</>}</details>}
       {group === 'runtime' && catalogue?.unknown.map(field => <p key={`${field.scope}/${field.key}`}>{field.scope}.{field.key} — {field.reason}</p>)}
     </div>
     <p className="dialog-note">Save updates the host database. Connection, delivery and engine actions are handled by their runtime capabilities. Secrets are replaced only when entered or explicitly cleared.</p>

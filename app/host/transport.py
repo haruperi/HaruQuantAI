@@ -74,6 +74,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 __all__ = [
+    "CORE_EVENT_CHANNELS",
     "ConnectionTest",
     "EventBus",
     "HostEvent",
@@ -349,22 +350,26 @@ class ConnectionTest:
 class ServletConnection:
     """REST endpoint handler for broker and exchange connection configurations."""
 
-    def __init__(self, host_settings: Any = None) -> None:
-        self.settings = host_settings or settings
+    def __init__(
+        self, host_settings: Any = None, *, in_memory_only: bool = False
+    ) -> None:
+        self.settings = None if in_memory_only else (host_settings or settings)
         self._in_memory_connections: dict[str, _Pld] = {}
 
     def list_connections(self) -> list[_Pld]:
         """List existing broker and exchange connections."""
         conns: _Pld = {}
-        with suppress(AttributeError, KeyError, RuntimeError):
-            if isinstance(scope := self.settings.get_scope("connections"), dict):
-                conns.update(scope)
+        if self.settings is not None:
+            with suppress(AttributeError, KeyError, RuntimeError):
+                if isinstance(scope := self.settings.get_scope("connections"), dict):
+                    conns.update(scope)
         conns.update(self._in_memory_connections)
         recs = [
             redact_secrets({"connection_id": cid, **cd})
             if isinstance(cd, dict)
             else _dct(connection_id=cid, value=cd)
             for cid, cd in conns.items()
+            if cd != {} and cd is not None
         ]
         _info(SERVLET_CONNECTION_FR, f"Listed {len(recs)} connections.")
         return recs
@@ -372,11 +377,12 @@ class ServletConnection:
     def save_connection(self, connection_id: str, data: _Pld) -> _Pld:
         """Save or update connection credentials in host settings."""
         rec = {**data, "connection_id": connection_id, "updated_at_utc": _now_utc_iso()}
-        try:
-            self.settings.save_settings({"connections": {connection_id: rec}})
-        except RevisionConflictError, RuntimeError, ValueError:
-            if hasattr(self.settings, "set_in_memory"):
-                self.settings.set_in_memory("connections", connection_id, rec)
+        if self.settings is not None:
+            try:
+                self.settings.save_settings({"connections": {connection_id: rec}})
+            except RevisionConflictError, RuntimeError, ValueError:
+                if hasattr(self.settings, "set_in_memory"):
+                    self.settings.set_in_memory("connections", connection_id, rec)
         self._in_memory_connections[connection_id] = rec
         _info(SERVLET_CONNECTION_FR, f"Saved connection '{connection_id}'.")
         redacted = redact_secrets(rec)
@@ -385,10 +391,11 @@ class ServletConnection:
     def delete_connection(self, connection_id: str) -> bool:
         """Delete connection configuration and cached tokens."""
         existed = False
-        with suppress(RevisionConflictError, RuntimeError, ValueError):
-            if connection_id in self.settings.get_scope("connections"):
-                existed = True
-                self.settings.save_settings({"connections": {connection_id: {}}})
+        if self.settings is not None:
+            with suppress(RevisionConflictError, RuntimeError, ValueError):
+                if self.settings.get_scope("connections").get(connection_id):
+                    existed = True
+                    self.settings.save_settings({"connections": {connection_id: {}}})
         if connection_id in self._in_memory_connections:
             existed = True
             del self._in_memory_connections[connection_id]
@@ -435,9 +442,9 @@ class ServletConstants:
         _info(SERVLET_CONSTANTS_FR, f"Retrieved system specs (cores={cpus}).")
         d = _dct(cpu_cores=cpus, hardware_concurrency=cpus)
         d["supported_timeframes"] = list(SUPPORTED_TIMEFRAMES)
-        d["memory_headroom"] = _res.check_memory_headroom()
-        d["worker_capacity"] = _res.get_worker_capacity()
-        d["system_health"] = _res.inspect_resources()
+        d["memory_headroom"] = asdict(_res.check_memory_headroom())
+        d["worker_capacity"] = asdict(_res.get_worker_capacity())
+        d["system_health"] = asdict(_res.inspect_resources())
         return d
 
 
@@ -926,11 +933,26 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "invalid.haruquantai.local", 80
                 ),
             )
+            sc = ServletConnection(in_memory_only=True)
+            saved = sc.save_connection("demo-conn", {"name": "Local", "endpoint": loc})
+            s_conn = _dct(
+                saved=saved,
+                listed=sc.list_connections(),
+                tested=sc.test_connection("demo-conn"),
+                deleted=sc.delete_connection("demo-conn"),
+            )
+        consts = ServletConstants()
+        s_const = _dct(
+            constants=consts.get_constants(),
+            system_specs=consts.get_system_specs(),
+        )
         out = _dct(
             core_channels=list(CORE_EVENT_CHANNELS),
             ring_capacity=bus.ring_capacity,
             max_queue_size=bus.max_queue_size,
             connection_test=ct,
+            servlet_connection=s_conn,
+            servlet_constants=s_const,
         )
     sys.stdout.write(json.dumps(out, indent=2) + "\n")
     return 0

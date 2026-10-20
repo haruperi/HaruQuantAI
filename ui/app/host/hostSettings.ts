@@ -73,6 +73,34 @@ export async function changeHostAccount(
   });
 }
 
+export interface HostConstants {
+  application: string;
+  version: string;
+  runtime: string;
+  host_instance_id: string;
+  build_timestamp: string;
+  data_directory: string;
+  core_channels: string[];
+  supported_timeframes: string[];
+}
+
+export interface HostSystemSpecs {
+  cpu_cores: number;
+  hardware_concurrency: number;
+  supported_timeframes: string[];
+  memory_headroom?: Record<string, unknown>;
+  worker_capacity?: Record<string, unknown>;
+  system_health?: Record<string, unknown>;
+}
+
+export function readHostConstants(config: TransportConfig = {}): Promise<HostConstants> {
+  return createDomainClient('', config).get<HostConstants>('/constants');
+}
+
+export function readHostSystemSpecs(config: TransportConfig = {}): Promise<HostSystemSpecs> {
+  return createDomainClient('', config).get<HostSystemSpecs>('/specs');
+}
+
 export function shellPreferences(settings: AppSettings): ShellPreferences {
   const { theme, language, zoom, configuration, remoteAccess, smtp } = settings;
   return { theme, language, zoom, configuration, remoteAccess, smtp };
