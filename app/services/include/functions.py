@@ -65,7 +65,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
+    uv run pytest tests/unit/services/include/test_functions.py --no-cov
     ```
 """
 
@@ -80,6 +80,35 @@ from app.host.logging import get_logger
 from app.services.include.comparisons import resolve_shift_value
 
 logger = get_logger(__name__)
+
+__all__ = [
+    "DEFAULT_PIP_SIZE",
+    "FLOAT_MAX_VALUE",
+    "MIN_RANK_PERIOD",
+    "Functions",
+    "abs_val",
+    "convert_pips_to_price",
+    "convert_pips_to_price_symbol",
+    "convert_price_to_pips",
+    "convert_price_to_pips_symbol",
+    "custom_function",
+    "division",
+    "exponential",
+    "get_date",
+    "get_time",
+    "indicator_highest",
+    "indicator_lowest",
+    "logarithm",
+    "maximum",
+    "minimum",
+    "minus",
+    "multiplication",
+    "plus",
+    "register_custom_function",
+    "resolve_pip_size",
+    "round_to_decimals",
+    "square_root",
+]
 
 FLOAT_MAX_VALUE: float = 1.7976931348623157e308
 DEFAULT_PIP_SIZE: float = 0.0001
@@ -518,7 +547,8 @@ def resolve_pip_size(
 
 
 def convert_price_to_pips(
-    price_diff: float,
+    price_diff: Any,
+    shift: int = 0,
     *,
     point: float | None = None,
     digits: int | None = None,
@@ -529,21 +559,23 @@ def convert_price_to_pips(
     Example: converts 0.002 to 20 pips for 5-digit quote with point=0.00001.
 
     Args:
-        price_diff: Raw price difference (e.g. 0.0020).
+        price_diff: Raw price difference operand (scalar, series, array, or callable).
+        shift: Historical bar offset when price_diff is shift-indexed.
         point: Instrument point (e.g. from MT5 symbol.Point()).
         digits: Instrument digits.
         pip_size: Explicit pip size override.
 
     Returns:
-        Pip value as float, or NaN on invalid pip sizing.
+        Pip value as float, or NaN on invalid pip sizing or operand.
     """
+    val = resolve_shift_value(price_diff, shift)
     eff_pip = resolve_pip_size(point=point, digits=digits, pip_size=pip_size)
-    if eff_pip <= 0.0 or math.isnan(price_diff):
+    if eff_pip <= 0.0 or math.isnan(val):
         return float("nan")
-    res = float(price_diff / eff_pip)
+    res = float(val / eff_pip)
     logger.debug(
         "FR-SERVICES-FUNCTION-PIPS: convert_price_to_pips(%f, pip=%f) = %f",
-        price_diff,
+        val,
         eff_pip,
         res,
     )
@@ -551,7 +583,8 @@ def convert_price_to_pips(
 
 
 def convert_pips_to_price(
-    pips: float,
+    pips: Any,
+    shift: int = 0,
     *,
     point: float | None = None,
     digits: int | None = None,
@@ -562,36 +595,38 @@ def convert_pips_to_price(
     Example: converts 20 pips to 0.002 for 5-digit quote with point=0.00001.
 
     Args:
-        pips: Number of pips (e.g. 20.0).
+        pips: Number of pips operand (scalar, series, array, or callable).
+        shift: Historical bar offset when pips is shift-indexed.
         point: Instrument point (e.g. from MT5 symbol.Point()).
         digits: Instrument digits.
         pip_size: Explicit pip size override.
 
     Returns:
-        Price offset as float, or NaN on invalid pip sizing.
+        Price offset as float, or NaN on invalid pip sizing or operand.
     """
+    val = resolve_shift_value(pips, shift)
     eff_pip = resolve_pip_size(point=point, digits=digits, pip_size=pip_size)
-    if eff_pip <= 0.0 or math.isnan(pips):
+    if eff_pip <= 0.0 or math.isnan(val):
         return float("nan")
-    res = float(pips * eff_pip)
+    res = float(val * eff_pip)
     logger.debug(
         "FR-SERVICES-FUNCTION-PIPS: convert_pips_to_price(%f, pip=%f) = %f",
-        pips,
+        val,
         eff_pip,
         res,
     )
     return res
 
 
-async def convert_price_to_pips_symbol(price_diff: float, symbol: Any) -> float:
+async def convert_price_to_pips_symbol(
+    price_diff: Any, symbol: Any, shift: int = 0
+) -> float:
     """Convert price difference to pips querying real MT5 broker symbol properties.
 
-    Uses `await symbol.Point()` and `await symbol.Digits()` matching
-    `example_04_symbol()` in `scripts/examples/brokers.py`.
-
     Args:
-        price_diff: Raw price difference.
+        price_diff: Raw price difference operand (scalar, series, array, or callable).
         symbol: MT5 SymbolInfo proxy or mock.
+        shift: Historical bar offset when price_diff is shift-indexed.
 
     Returns:
         Converted pips as float.
@@ -603,19 +638,20 @@ async def convert_price_to_pips_symbol(price_diff: float, symbol: Any) -> float:
     dig = await dig_call if inspect.isawaitable(dig_call) else dig_call
 
     return convert_price_to_pips(
-        price_diff, point=float(pt), digits=int(dig) if dig is not None else None
+        price_diff,
+        shift=shift,
+        point=float(pt),
+        digits=int(dig) if dig is not None else None,
     )
 
 
-async def convert_pips_to_price_symbol(pips: float, symbol: Any) -> float:
+async def convert_pips_to_price_symbol(pips: Any, symbol: Any, shift: int = 0) -> float:
     """Convert pips to real price querying real MT5 broker symbol properties.
 
-    Uses `await symbol.Point()` and `await symbol.Digits()` matching
-    `example_04_symbol()` in `scripts/examples/brokers.py`.
-
     Args:
-        pips: Pip count.
+        pips: Pip count operand (scalar, series, array, or callable).
         symbol: MT5 SymbolInfo proxy or mock.
+        shift: Historical bar offset when pips is shift-indexed.
 
     Returns:
         Converted price offset as float.
@@ -627,7 +663,10 @@ async def convert_pips_to_price_symbol(pips: float, symbol: Any) -> float:
     dig = await dig_call if inspect.isawaitable(dig_call) else dig_call
 
     return convert_pips_to_price(
-        pips, point=float(pt), digits=int(dig) if dig is not None else None
+        pips,
+        shift=shift,
+        point=float(pt),
+        digits=int(dig) if dig is not None else None,
     )
 
 
@@ -772,9 +811,22 @@ class Functions:
             indicator, period=period, nth_value=nth_value, shift=shift
         )
 
+    def resolve_pip_size(
+        self,
+        *,
+        point: float | None = None,
+        digits: int | None = None,
+        pip_size: float | None = None,
+    ) -> float:
+        """Resolve effective pip size using instance defaults if omitted."""
+        pt = self._point if point is None else point
+        dig = self._digits if digits is None else digits
+        return resolve_pip_size(point=pt, digits=dig, pip_size=pip_size)
+
     def to_pips(
         self,
-        price_diff: float,
+        price_diff: Any,
+        shift: int = 0,
         *,
         point: float | None = None,
         digits: int | None = None,
@@ -784,12 +836,13 @@ class Functions:
         pt = self._point if point is None else point
         dig = self._digits if digits is None else digits
         return convert_price_to_pips(
-            price_diff, point=pt, digits=dig, pip_size=pip_size
+            price_diff, shift=shift, point=pt, digits=dig, pip_size=pip_size
         )
 
     def to_price(
         self,
-        pips: float,
+        pips: Any,
+        shift: int = 0,
         *,
         point: float | None = None,
         digits: int | None = None,
@@ -798,4 +851,31 @@ class Functions:
         """Convert pips to real price level using instance defaults if omitted."""
         pt = self._point if point is None else point
         dig = self._digits if digits is None else digits
-        return convert_pips_to_price(pips, point=pt, digits=dig, pip_size=pip_size)
+        return convert_pips_to_price(
+            pips, shift=shift, point=pt, digits=dig, pip_size=pip_size
+        )
+
+    @staticmethod
+    async def to_pips_symbol(price_diff: Any, symbol: Any, shift: int = 0) -> float:
+        """Convert price difference to pips querying broker symbol properties."""
+        return await convert_price_to_pips_symbol(price_diff, symbol, shift=shift)
+
+    @staticmethod
+    async def to_price_symbol(pips: Any, symbol: Any, shift: int = 0) -> float:
+        """Convert pips to real price querying broker symbol properties."""
+        return await convert_pips_to_price_symbol(pips, symbol, shift=shift)
+
+    @staticmethod
+    def register_custom_function(name: str, handler: Callable[..., Any]) -> None:
+        """Register custom function handler."""
+        register_custom_function(name, handler)
+
+    @staticmethod
+    def custom_function(
+        function_name: str,
+        *args: Any,
+        handler: Callable[..., Any] | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        """Execute registered custom function by identifier."""
+        return custom_function(function_name, *args, handler=handler, **kwargs)
