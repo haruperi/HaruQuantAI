@@ -5,7 +5,7 @@ from __future__ import annotations
 from app.services.include.actions import ActionRecord, Actions
 from app.services.include.bar_time import (
     BarTime,
-    DateTimeSeries,
+    DateTime,
     TimeConditions,
     format_timestamp,
     normalize_timestamps,
@@ -45,7 +45,6 @@ from app.services.include.price import (
     QuotePrice,
     SessionPrice,
 )
-from app.services.include.time import HQTime
 from app.services.include.trading import (
     AccountProxy,
     BaseTradingClass,
@@ -64,8 +63,8 @@ from app.services.include.types import BooleanConstant, NumberConstant, Types, V
 __all__ = [
     "BAR_COLUMNS", "TICK_COLUMNS", "TIMEFRAME_SECONDS", "AccountProxy", "ActionRecord",
     "Actions", "BarPrice", "BarTime", "BaseTradingClass", "BooleanConstant",
-    "BridgeError", "Comparisons", "DataBackend", "DateTimeSeries", "DealProxy",
-    "Functions", "HQTime", "HeikenAshiPrice", "HistoryOrderProxy", "MAType",
+    "BridgeError", "Comparisons", "DataBackend", "DateTime", "DealProxy",
+    "Functions", "HeikenAshiPrice", "HistoryOrderProxy", "MAType",
     "MTFPrice", "MarketBar", "MarketTick", "NumberConstant", "OrderProxy",
     "PositionProxy", "QuotePrice", "RandomGenerator", "SessionPrice", "SymbolProxy",
     "TerminalProxy", "TimeConditions", "Timeframe", "Trade", "Trading", "TradingClass",

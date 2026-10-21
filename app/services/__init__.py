@@ -36,7 +36,7 @@ __all__ = [
     "BarTime",
     "BaseIndicator",
     "Comparisons",
-    "DateTimeSeries",
+    "DateTime",
     "Functions",
     "HeikenAshiPrice",
     "IndicatorSeries",
@@ -59,7 +59,7 @@ def __getattr__(name: str) -> Any:
         return BaseIndicator if name == "BaseIndicator" else IndicatorSeries
     if name in (
         "BarTime",
-        "DateTimeSeries",
+        "DateTime",
         "TimeConditions",
         "format_timestamp",
         "normalize_timestamps",

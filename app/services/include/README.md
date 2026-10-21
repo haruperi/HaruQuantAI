@@ -1,8 +1,7 @@
 # Core Helper Modules (`app/services/include`)
 
 This package provides foundational utility modules for temporal features, market data contracts, trading proxies, and rule execution building blocks:
-- `app.services.include.time`: Defines `HQTime` for high-precision timestamp handling, calendar sessions, and timezone conversion.
-- `app.services.include.bar_time`: Provides `BarTime`, `DateTimeSeries`, and `TimeConditions` for bar/tick temporal alignment.
+- `app.services.include.bar_time`: Provides `DateTime`, `BarTime`, and `TimeConditions` for high-precision epoch-millisecond calendar/session arithmetic, shift-indexed timestamp series, and bar/tick temporal rule predicates.
 - `app.services.include.generators`: Provides `RandomGenerator` for reproducible simulation series (`XorShift`, `SplitMix`).
 - `app.services.include.contracts`: Provides foundational data contracts, order records, and domain value objects.
 - `app.services.include.enums`: Provides canonical trading enumerations, execution modes, and statuses.

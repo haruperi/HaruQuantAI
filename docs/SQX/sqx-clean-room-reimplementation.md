@@ -737,24 +737,15 @@ HaruQuantAI/
 
 ### Phase 1A.1: Core Primitives, Data Contracts & Signal Building Blocks (`app/services/include/`)
 
-#### 1. `app/services/include/time.py` — `HQTime` (`FEAT-INCLUDE-TIME`)
+#### 1. `app/services/include/bar_time.py` — `DateTime`, `BarTime` & `TimeConditions` (`FEAT-INCLUDE-BARTIME`)
 
-- **Dry Rule:** Single source of truth for epoch-millisecond UTC/timezone calendar arithmetic across all services and workspaces.
-- **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.SQTime`), `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.timezone.*`, `com.strategyquant.datalib.session.*`)
-- **Backend:** `app/services/include/time.py` (`HQTime`)
+- **Dry Rule:** Single source of truth for epoch-millisecond UTC/timezone calendar arithmetic (`DateTime`), shift-indexed bar timestamp series, and temporal rule predicates (`BarTime`, `TimeConditions`) across all services and workspaces.
+- **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.SQTime`), `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.timezone.*`, `com.strategyquant.datalib.session.*`, `com.strategyquant.datalib.timeframe.*`, `com.strategyquant.datalib.bartype.*`), `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\BarAndTime\`
+- **Backend:** `app/services/include/bar_time.py` (`DateTime`, `BarTime`, `TimeConditions`, `format_timestamp`, `normalize_timestamps`)
 - **Frontend:** N/A (Core backend primitive)
-- **Class:** `HQTime`
+- **Class:** `DateTime`, `BarTime`, `TimeConditions`
 - **Functional Requirements & Exact Method Signatures:**
-  - [x] `FR-INCLUDE-TIME-ARITHMETIC`: Perform epoch-millisecond timestamp arithmetic, calendar component extraction, formatting/parsing, and session boundary checks $\rightarrow$ `HQTime.to_long(year: int, month: int, day: int, hour: int = 0, minute: int = 0, second: int = 0) -> int`, `HQTime.add_days(time_ms: int, days: int) -> int`, `HQTime.add_hours(time_ms: int, hours: float) -> int`, `HQTime.set_hhmm(time_ms: int, hhmm: int) -> int`, `HQTime.get_ymd(time_ms: int) -> int`, `HQTime.get_hhmm(time_ms: int) -> int`, `HQTime.correct_day_start(time_ms: int) -> int`, `HQTime.correct_day_end_mt(time_ms: int) -> int`
-
-#### 2. `app/services/include/bar_time.py` — `BarTime`, `DateTimeSeries` & `TimeConditions` (`FEAT-INCLUDE-BARTIME`)
-
-- **Dry Rule:** Depends on `HQTime` and `IndicatorSeries`; centralizes shift-indexed bar timestamp extraction and temporal rule predicates across all timeframes.
-- **Donor:** `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.timeframe.*`, `com.strategyquant.datalib.bartype.*`)
-- **Backend:** `app/services/include/bar_time.py` (`BarTime`, `DateTimeSeries`, `TimeConditions`, `format_timestamp`, `normalize_timestamps`)
-- **Frontend:** N/A (Core backend primitive)
-- **Class:** `BarTime`, `DateTimeSeries`, `TimeConditions`
-- **Functional Requirements & Exact Method Signatures:**
+  - [x] `FR-INCLUDE-TIME-ARITHMETIC`: Perform epoch-millisecond timestamp arithmetic, calendar component extraction, formatting/parsing, and session boundary checks $\rightarrow$ `DateTime.to_long(year: int, month: int, day: int, hour: int = 0, minute: int = 0, second: int = 0) -> int`, `DateTime.add_days(time_ms: int, days: int) -> int`, `DateTime.add_hours(time_ms: int, hours: int) -> int`, `DateTime.set_hhmm(time_ms: int, hhmm: int) -> int`, `DateTime.get_ymd(arg0: int, arg1: int | None = None, arg2: int | None = None) -> int`, `DateTime.get_hhmm(arg0: int | str) -> int`, `DateTime.correct_day_start(time_ms: int) -> int`, `DateTime.correct_day_end_mt(time_ms: int) -> int`
   - [x] `FR-INCLUDE-BARTIME-ALIGN`: Extract shift-indexed bar calendar/clock components and evaluate temporal rule predicates $\rightarrow$ `BarTime.bar_hour(shift: int = 0) -> int`, `BarTime.bar_minute(shift: int = 0) -> int`, `BarTime.bar_day_of_week(shift: int = 0) -> int`, `BarTime.bar_day_of_month(shift: int = 0) -> int`, `BarTime.bar_month(shift: int = 0) -> int`, `BarTime.bar_date(shift: int = 0) -> int`, `BarTime.bar_time(shift: int = 0) -> int`, `TimeConditions.bar_hour_is(...) -> bool`, `TimeConditions.bar_day_of_week_is(...) -> bool`, `normalize_timestamps(timestamps: Any) -> np.ndarray`
 
 #### 3. `app/services/include/generators.py` — `RandomGenerator` (`FEAT-INCLUDE-RNG`)
@@ -889,7 +880,7 @@ HaruQuantAI/
 
 #### 3. `app/services/snippets/exit_methods.py` & `trading_options.py` — `SnippetExitMethodsAndTradingOptions` (`FEAT-SNIPPETS-EXITS`)
 
-- **Dry Rule:** Integrates with `OrderStateMachine` (`app/services/engine/orders.py`) and `HQTime` (`app/services/include/time.py`) for intrabar exits and session enforcement.
+- **Dry Rule:** Integrates with `OrderStateMachine` (`app/services/engine/orders.py`) and `DateTime` (`app/services/include/bar_time.py`) for intrabar exits and session enforcement.
 - **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\ExitMethods\`, `C:\SQX-145\internal\extend\Snippets\SQ\TradingOptions\`, `C:\SQX-145\internal\extend\Snippets\SQ\RiskManagement\`
 - **Backend:** `app/services/snippets/exit_methods.py` (`🟢 <200L`), `app/services/snippets/trading_options.py` (`🟡 200–300L`)
 - **Frontend:** `ui/app/workspace/Builder/settings/TradingOptionsTab.tsx`
@@ -1008,7 +999,7 @@ HaruQuantAI/
 
 #### 2. `app/workspace/data_manager/sessions.py` — `DataManagerSessions` (`FEAT-DATAMGR-SESSIONS`)
 
-- **Dry Rule:** Persists session definitions via `HostPersistence` (`sessions_catalog` entity) and delegates timezone/session boundary math to `HQTime` (`app/services/include/time.py`).
+- **Dry Rule:** Persists session definitions via `HostPersistence` (`sessions_catalog` entity) and delegates timezone/session boundary math to `DateTime` (`app/services/include/bar_time.py`).
 - **Donor:** `C:\SQX-145\internal\plugins\DataManagerSessions\DataManagerSessions.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.session.*`), `C:\SQX-145\user\settings\DataConfig\`
 - **Backend:** `app/workspace/data_manager/sessions.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/Sessions/SessionsModal.tsx`
@@ -1187,7 +1178,7 @@ HaruQuantAI/
 
 #### 14. `app/workspace/data_manager/actions/review/quality.py` & `actions/transform/transforms.py` — `DataManagerActions` (`FEAT-DATAMGR-ACTIONS`)
 
-- **Dry Rule:** Reuses `HQTime`, `BarTime`, `DataSeries`, and `_native_history.py` (`.fxt`/`.hst` encoders) across data review and transformation pipelines.
+- **Dry Rule:** Reuses `DateTime`, `BarTime`, `DataSeries`, and `_native_history.py` (`.fxt`/`.hst` encoders) across data review and transformation pipelines.
 - **Donor:** `C:\SQX-145\internal\plugins\DataManagerActions\`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.validation.*`, `com.strategyquant.datalib.metatrader4.*`)
 - **Backend:** `app/workspace/data_manager/actions/review/quality.py` (`🟡 200–350L`), `app/workspace/data_manager/actions/transform/transforms.py` (`🟡 250–400L`)
 - **Frontend:** `ui/app/plugins/data_source/Tools/DataToolsModal.tsx`
