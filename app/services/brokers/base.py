@@ -136,9 +136,8 @@ def epoch_seconds(value: datetime | float | None) -> int:
         return 0
     if isinstance(value, (int, float)):
         return int(value) if value < 100_000_000_000 else int(value // 1000)
-    if value.tzinfo is None:
-        value = value.replace(tzinfo=UTC)
-    return int(value.timestamp())
+    dt = value.replace(tzinfo=UTC) if value.tzinfo is None else value
+    return int(dt.timestamp())
 
 
 def epoch_millis(value: datetime | float | None) -> int:
@@ -147,9 +146,8 @@ def epoch_millis(value: datetime | float | None) -> int:
         return 0
     if isinstance(value, (int, float)):
         return int(value * 1000) if value < 100_000_000_000 else int(value)
-    if value.tzinfo is None:
-        value = value.replace(tzinfo=UTC)
-    return int(value.timestamp() * 1000)
+    dt = value.replace(tzinfo=UTC) if value.tzinfo is None else value
+    return int(dt.timestamp() * 1000)
 
 
 def redact_url_or_message(text: str) -> str:
@@ -937,6 +935,7 @@ _SINGLETON_FACTORIES: dict[str, tuple[str, str]] = {
     "metatrader": ("metatrader", "MetaTraderClient"),
     "ctrader": ("ctrader", "CTraderClient"),
     "simulator": ("simulator", "SimulatorClient"),
+    "live_test": ("registry", "LiveTest"),
 }
 _CLASS_TO_MODULE: dict[str, str] = {
     cls_name: mod for mod, cls_name in _SINGLETON_FACTORIES.values()
@@ -947,6 +946,7 @@ _CLASS_TO_MODULE: dict[str, str] = {
     "BitfinexClient": "crypto",
     "CoinbaseClient": "crypto",
     "PoloniexClient": "crypto",
+    "LiveTestCLI": "registry",
 }
 _PROVIDER_ALIASES = {
     "strategyquant_equity": "sq_equity",

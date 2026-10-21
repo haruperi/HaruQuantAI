@@ -640,15 +640,15 @@ HaruQuantAI/
 
 #### 12. `app/services/brokers/registry.py` — `ConnectionLiveTest` (`FEAT-BROKER-LIVETEST`)
 
-- **Dry Rule:** Inherits shared transport and lifecycle contracts from `BaseBrokerClient` in `app/services/brokers/base.py`.
+- **Dry Rule:** Inherits shared transport and lifecycle contracts from `BrokerClient` in `app/services/brokers/base.py`.
 - **Donor:** `C:\SQX-145\internal\plugins\ConnectionLiveTest\ConnectionLiveTest.jar`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.connection.*`)
 - **Backend:** `app/services/brokers/registry.py` (`🟢 <200L`, Docstring `<=45L`)
 - **Frontend:** `ui/app/workspace/Trading/TradingDashboard.tsx`
 - **Class:** `LiveTest` (plus `LiveTestCLI`)
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-BROKER-LIVETEST-CREDENTIALS`: Validate live broker credentials and API tokens against broker gateways $\rightarrow$ `LiveTest.validate_credentials(provider: str, credentials: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-BROKER-LIVETEST-LATENCY`: Separately authorized execution capability, disabled in the readonly research profile: Measure order placement and quote streaming round-trip latency $\rightarrow$ `LiveTest.measure_trading_latency(provider: str, symbol: str = "EURUSD") -> dict[str, Any]`
-  - [ ] `FR-BROKER-LIVETEST-PERMISSIONS`: Verify account trading permissions and margin currency settings $\rightarrow$ `LiveTest.verify_trading_permissions(provider: str, account_id: str) -> dict[str, Any]`
+  - [x] `FR-BROKER-LIVETEST-CREDENTIALS`: Validate live broker credentials and API tokens against broker gateways $\rightarrow$ `LiveTest.validate_credentials(provider: str, credentials: Mapping[str, Any]) -> dict[str, Any]`
+  - [x] `FR-BROKER-LIVETEST-LATENCY`: Separately authorized execution capability, disabled in the readonly research profile: Measure order placement and quote streaming round-trip latency $\rightarrow$ `LiveTest.measure_trading_latency(provider: str, symbol: str = "EURUSD") -> dict[str, Any]`
+  - [x] `FR-BROKER-LIVETEST-PERMISSIONS`: Verify account trading permissions and margin currency settings $\rightarrow$ `LiveTest.verify_trading_permissions(provider: str, account_id: str) -> dict[str, Any]`
 
 #### 13. `app/services/brokers/metatrader.py` — `ConnectionMT4` / `ConnectionMT5` & `DataSourceMt5Api` (`FEAT-BROKER-MT5`)
 

@@ -15,6 +15,7 @@ app/services/include/
 
 app/services/brokers/
   base.py              # BrokerClient, TradingClient, BridgeError, HTTP transport, provider registry
+  registry.py          # LiveTest(BrokerClient), LiveTestCLI - Credential validation, latency probes, and trading permissions (FEAT-BROKER-LIVETEST)
   metatrader.py        # MetaTraderClient(TradingClient) - Native Bridge and MT5 trading client
   simulator.py         # SimulatorClient(TradingClient) - Local model and async execution client
   ctrader.py           # CTraderClient(TradingClient) - Spotware cTrader Open API Protobuf/TLS trading client

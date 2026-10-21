@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from app.services.brokers.dukascopy import DukascopyClient
     from app.services.brokers.files import FilesClient
     from app.services.brokers.metatrader import MetaTraderClient
+    from app.services.brokers.registry import LiveTest, LiveTestCLI
     from app.services.brokers.simulator import SimulatorClient
     from app.services.brokers.sq_equity import SQEquityClient
     from app.services.brokers.sq_futures import SQFuturesClient
@@ -51,6 +52,8 @@ __all__ = [
     "DarwinexClient",
     "DukascopyClient",
     "FilesClient",
+    "LiveTest",
+    "LiveTestCLI",
     "MetaTraderClient",
     "PoloniexClient",
     "SQEquityClient",
