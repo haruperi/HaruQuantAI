@@ -50,6 +50,7 @@ from app.services.include.contracts import DataInfo
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
+from .help import DMHelp
 from .home import Home
 from .log import DataLog
 
@@ -131,9 +132,10 @@ class AppDataManager:
         self.broker_registry = broker_registry
         self.job_manager = job_manager
 
-        # Initialize retained Home and Log services
+        # Initialize retained Home, Log, and Help services
         self.home = Home()
         self.log = DataLog(event_bus=event_bus)
+        self.help = DMHelp()
 
         logger.info(
             "%s: Initialized AppDataManager",
@@ -290,6 +292,15 @@ def _register_log_routes(router: APIRouter, ws: AppDataManager) -> None:
         return _success(ws.log.clear_log())
 
 
+def _register_help_routes(router: APIRouter, ws: AppDataManager) -> None:
+    @router.get("/help")
+    def get_data_help(topic: str = "overview") -> JSONResponse:
+        try:
+            return _success(ws.help.help(topic=topic))
+        except ValueError as error:
+            return _workspace_error(str(error), 422)
+
+
 def _workspace_error(message: str, code: int) -> JSONResponse:
     logger.warning("%s: Rejected workspace request", TAB_FR, extra={"fr_id": TAB_FR})
     return JSONResponse(
@@ -346,6 +357,7 @@ def create_data_manager_router(
     _register_home_routes(router, ws)
     _register_workspace_routes(router, ws)
     _register_log_routes(router, ws)
+    _register_help_routes(router, ws)
 
     logger.info(
         "%s: Registered Data Manager router with %d route rules",

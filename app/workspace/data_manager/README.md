@@ -112,9 +112,8 @@ and multi-format export.
 - `FR-DATAMGR-LOG-CLEAR`: `DataLog.clear_log() -> dict[str, Any]`; clears persisted operation/audit logs in `datamgr_logs` and `datamgr_operation_log`, resets operation progress/cancellation state, and broadcasts `"datamgr.log.cleared"` (`POST /data/logs/clear`).
 
 #### Module 10: Help & FAQ Catalog (`help.py`)
-- `FEAT-DATAMGR-HELP`: Contextual workflow guides and searchable FAQ items.
-- `FR-DATAMGR-HELP-TOPICS`: Structured help topics for every Data Manager view.
-- `FR-DATAMGR-HELP-FAQ-SEARCH`: Full-text and tag search across Data Manager FAQs.
+- `FEAT-DATAMGR-HELP`: Built-in contextual documentation and interactive tutorial guides for Data Manager operations.
+- `FR-DATAMGR-HELP-GUIDE`: `DMHelp.help(topic: str = "overview") -> dict[str, Any]`; returns deterministic contextual documentation summaries, supported topic catalog, and step-by-step data management tutorials (`GET /data/help`).
 
 #### Module 11A: Data Quality Inspection (`actions/review/quality.py`)
 - `FEAT-DATAMGR-QUALITY`: Gap detection, weekend checks, OHLC envelope verification, and quality reports.

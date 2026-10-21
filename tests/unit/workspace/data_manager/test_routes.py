@@ -426,3 +426,26 @@ def test_data_manager_log_routes() -> None:
             "progress": 0,
         }
         assert client.get("/data/logs").json()["data"] == []
+
+
+def test_data_manager_help_routes(tmp_path: Path) -> None:
+    """Verify GET /data/help endpoint for valid and invalid topics."""
+    ws = AppDataManager(data_dir=tmp_path)
+    router = create_data_manager_router(workspace=ws, require_auth=False)
+    app = FastAPI()
+    app.include_router(router)
+
+    with TestClient(app) as client:
+        res_default = client.get("/data/help")
+        assert res_default.status_code == 200
+        payload = res_default.json()["data"]
+        assert payload["topic"] == "overview"
+        assert payload["title"] == "Data Manager Overview"
+        assert len(payload["tutorials"]) == 3
+
+        res_topic = client.get("/data/help?topic=export")
+        assert res_topic.status_code == 200
+        assert res_topic.json()["data"]["topic"] == "export"
+
+        res_bad = client.get("/data/help?topic=unsupported-topic")
+        assert res_bad.status_code == 422
