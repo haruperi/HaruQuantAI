@@ -60,7 +60,7 @@ from typing import Any, Final
 from app.host import resources as _res
 from app.host import session as _sess
 from app.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
-from app.host.logging import get_access_logger, get_logger, redact_secrets
+from app.host.logging import TelemetryLogger, get_access_logger, get_logger
 from app.host.persistence import HostPersistence
 from app.host.response import ApiResponse, StandardError
 from app.host.settings import RevisionConflictError, SettingsManager, settings
@@ -365,7 +365,7 @@ class ServletConnection:
                     conns.update(scope)
         conns.update(self._in_memory_connections)
         recs = [
-            redact_secrets({"connection_id": cid, **cd})
+            TelemetryLogger.redact_secrets({"connection_id": cid, **cd})
             if isinstance(cd, dict)
             else _dct(connection_id=cid, value=cd)
             for cid, cd in conns.items()
@@ -385,7 +385,7 @@ class ServletConnection:
                     self.settings.set_in_memory("connections", connection_id, rec)
         self._in_memory_connections[connection_id] = rec
         _info(SERVLET_CONNECTION_FR, f"Saved connection '{connection_id}'.")
-        redacted = redact_secrets(rec)
+        redacted = TelemetryLogger.redact_secrets(rec)
         return dict(redacted) if isinstance(redacted, dict) else rec
 
     def delete_connection(self, connection_id: str) -> bool:

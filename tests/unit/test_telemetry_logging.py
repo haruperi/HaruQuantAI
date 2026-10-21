@@ -6,43 +6,22 @@ Description:
     secret redaction across composite structures, machine path normalization,
     safe error boundary, millisecond-precision log event formatting with ANSI
     colorization, thread-safe in-memory ring buffer operations, TelemetryLogger
-    context accumulation, request correlation context, and system health
-    diagnostic probes (database, storage, and hardware via psutil).
+    context accumulation, request correlation context, WebSocket sinks,
+    TelemetryLoggerCLI (--verify), and system health diagnostic probes.
 
 Purpose:
-    FEAT-HOST-TELEMETRY: Verify telemetry, redacted logging and diagnostics.
+    FEAT-HOST-LOGGING: Verify telemetry, redacted logging and diagnostics.
 
 Key Capabilities:
-    - FR-HOST-TELEMETRY-ENGINE: Verify telemetry engine and asynchronous flush.
-      Associated: `test_setup_logging_multi_sink()`, `test_async_telemetry_engine()`
-      Logging: caplog asserts `FR-HOST-TELEMETRY-ENGINE` events.
-    - FR-HOST-TELEMETRY-REDACTION: Verify secret scrubbing and path normalization.
-      Associated: `test_secret_redaction()`, `test_path_normalization()`
-      Logging: caplog asserts `FR-HOST-TELEMETRY-REDACTION` events.
-    - FR-HOST-TELEMETRY-ERROR-BOUNDARY: Verify error boundary prevents crashes.
-      Associated: `test_safe_error_boundary()`
-      Logging: asserts fallback error boundary emission.
-    - FR-HOST-TELEMETRY-FORMATTING: Verify exact millisecond timestamp & ANSI codes.
-      Associated: `test_log_event_formatting_exact_pattern()`
-      Logging: verifies millisecond timestamp and ANSI color sequences.
-    - FR-HOST-TELEMETRY-SINKS: Verify Windows-safe rotation and multi-sink writes.
-      Associated: `test_windows_safe_rotation()`, `test_specialized_access_routing()`
-      Logging: verifies 10MB limit and 30-backup rollover.
-    - FR-HOST-TELEMETRY-RINGBUFFER: Verify ring buffer storage and live streaming.
-      Associated: `test_ring_buffer_behavior()`
-      Logging: caplog asserts `FR-HOST-TELEMETRY-RINGBUFFER` events.
-    - FR-HOST-TELEMETRY-BOUND-LOGGER: Verify context binding and facade methods.
-      Associated: `test_bound_logger_dynamic_context()`
-      Logging: asserts bound contextual key-values.
-    - FR-HOST-TELEMETRY-CORRELATION: Verify request correlation context propagation.
-      Associated: `test_correlation_context()`
-      Logging: asserts correlation ID propagation into records.
-    - FR-HOST-TELEMETRY-LAZY-BOOTSTRAP: Verify zero import side-effects.
-      Associated: `test_lazy_bootstrap_no_import_side_effects()`
-      Logging: asserts lazy engine activation.
-    - FR-HOST-TELEMETRY-DIAGNOSTICS: Verify database, storage, and hardware probes.
-      Associated: `test_diagnostics_probes()`
-      Logging: caplog asserts `FR-HOST-TELEMETRY-DIAGNOSTICS` events.
+    - FR-HOST-LOGGING-WORKER: Verify telemetry engine and asynchronous flush.
+    - FR-HOST-LOGGING-REDACTION: Verify secret scrubbing and path normalization.
+    - FR-HOST-LOGGING-ERROR-BOUNDARY: Verify error boundary prevents crashes.
+    - FR-HOST-LOGGING-FORMATTING: Verify millisecond timestamp & ANSI codes.
+    - FR-HOST-LOGGING-SINKS: Verify Windows-safe rotation and multi-sink writes.
+    - FR-HOST-LOGGING-RING-BUFFER: Verify ring buffer query and WebSocket sinks.
+    - FR-HOST-LOGGING-BOUND-LOGGER: Verify context binding and facade methods.
+    - FR-HOST-LOGGING-CORRELATION: Verify request correlation context propagation.
+    - FR-HOST-LOGGING-EXPORTS: Verify public exports and TelemetryLoggerCLI.
 
 Python API Usage:
     ```python
@@ -72,18 +51,23 @@ from typing import Any
 import pytest
 from app.host.logging import (
     ANSI_RESET,
+    BOUND_LOGGER_FR,
     CORRELATION_FR,
     DEFAULT_RING_BUFFER_CAPACITY,
-    ENGINE_FR,
     ERROR_BOUNDARY_FR,
+    EXPORTS_FR,
     FORMATTING_FR,
-    LAZY_BOOTSTRAP_FR,
     LOG_BACKUP_COUNT,
     MAX_LOG_FILE_BYTES,
+    REDACTION_FR,
+    RING_BUFFER_FR,
     SINKS_FR,
+    WORKER_FR,
     LogEventFormatter,
     LogRingBuffer,
+    TelemetryEngine,
     TelemetryLogger,
+    TelemetryLoggerCLI,
     WindowsSafeRotatingFileHandler,
     fingerprint_secret,
     flush_logs,
@@ -92,14 +76,12 @@ from app.host.logging import (
     get_logger,
     get_ring_buffer,
     normalize_path,
-    redact_secrets,
+    redact_mapping,
+    redact_value,
     reset_correlation_id,
     set_correlation_id,
     setup_logging,
     shutdown_logging,
-)
-from app.host.logging import (
-    main as logging_main,
 )
 from app.host.persistence import HostPersistence
 from app.host.resources import (
@@ -251,20 +233,21 @@ def test_setup_logging_multi_sink(
     assert "Info message payload" not in errors_content
 
     assert any(
-        getattr(r, "fr_id", None) == ENGINE_FR or ENGINE_FR in r.message
+        getattr(r, "fr_id", None) == WORKER_FR or WORKER_FR in r.message
         for r in caplog.records
     )
 
 
 def test_secret_redaction() -> None:
     """Verify recursive masking of sensitive tokens, passwords, and keys."""
-    # 1. String redaction
+    # 1. String redaction via redact_value and TelemetryLogger.redact_secrets
     raw_text = "Connecting with token: 'secret_token_12345' and Bearer abc.xyz"
-    redacted_text = redact_secrets(raw_text)
+    redacted_text = redact_value(raw_text)
     assert "secret_token_12345" not in str(redacted_text)
     assert "***REDACTED***" in str(redacted_text)
+    assert TelemetryLogger.redact_secrets(raw_text) == redacted_text
 
-    # 2. Dictionary redaction
+    # 2. Dictionary redaction via redact_mapping and TelemetryLogger.redact_secrets
     sensitive_dict = {
         "username": "trader1",
         "password": "super_secret_password",
@@ -274,16 +257,17 @@ def test_secret_redaction() -> None:
             "safe_param": 42,
         },
     }
-    scrubbed = redact_secrets(sensitive_dict)
+    scrubbed = redact_mapping(sensitive_dict)
     assert scrubbed["username"] == "trader1"
     assert scrubbed["password"] == "***REDACTED***"
     assert scrubbed["api_key"] == "***REDACTED***"
     assert scrubbed["nested"]["token"] == "***REDACTED***"
     assert scrubbed["nested"]["safe_param"] == 42
+    assert TelemetryLogger.redact_secrets(sensitive_dict) == scrubbed
 
     # 3. Sequences redaction
     seq = ["plain", {"secret": "hide_me"}, ("bearer 123", 100)]
-    scrubbed_seq = redact_secrets(seq)
+    scrubbed_seq = TelemetryLogger.redact_secrets(seq)
     assert scrubbed_seq[0] == "plain"
     assert scrubbed_seq[1]["secret"] == "***REDACTED***"
     assert scrubbed_seq[2][0] == "***REDACTED***"
@@ -313,8 +297,8 @@ def test_path_normalization(tmp_path: Path) -> None:
     assert "[WORKSPACE]/data/database/haruquantai.db" == normalized
 
 
-def test_ring_buffer_behavior() -> None:
-    """Verify capacity bounds, filtering, and retrieval on LogRingBuffer."""
+def test_ring_buffer_behavior(tmp_path: Path) -> None:
+    """Verify capacity bounds, query filtering, clear, and WS sink registration."""
     buffer = LogRingBuffer(maxlen=5)
 
     for i in range(10):
@@ -328,15 +312,15 @@ def test_ring_buffer_behavior() -> None:
 
     assert len(buffer) == 5
 
-    all_recs = buffer.get_records()
+    all_recs = buffer.query()
     assert len(all_recs) == 5
     assert all_recs[0]["message"] == "msg-5"
     assert all_recs[-1]["message"] == "msg-9"
 
-    error_recs = buffer.get_records(min_level="ERROR")
+    error_recs = buffer.query(min_level="ERROR")
     assert all(r["level"] == "ERROR" for r in error_recs)
 
-    limited = buffer.get_records(limit=2)
+    limited = buffer.query(limit=2)
     assert len(limited) == 2
     assert limited[-1]["message"] == "msg-9"
 
@@ -345,6 +329,13 @@ def test_ring_buffer_behavior() -> None:
 
     global_buffer = get_ring_buffer()
     assert isinstance(global_buffer, LogRingBuffer)
+
+    ws_received: list[dict[str, Any]] = []
+    setup_logging(tmp_path / "logs", level=logging.INFO, async_engine=False)
+    TelemetryLogger.register_ws_sink(ws_received.append)
+    get_logger("haruquantai.ws_test").info("WS broadcast test")
+    flush_logs()
+    assert any("WS broadcast test" in e["message"] for e in ws_received)
 
 
 def test_diagnostics_probes(
@@ -468,7 +459,6 @@ def test_log_event_formatting_exact_pattern() -> None:
     )
 
     plain_output = plain_formatter.format(record)
-    # Pattern: YYYY-MM-DD HH:MM:SS.mmm | LEVEL | module:function:line - message
     pattern = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \| INFO  \| app\.test_module:test_func:42 - Test event notification$"
     assert re.match(pattern, plain_output) is not None
 
@@ -481,14 +471,13 @@ def test_safe_error_boundary() -> None:
     """Verify safe error boundary prevents crashes on malformed format records."""
     formatter = LogEventFormatter(colorize=False)
 
-    # Intentionally malformed record with mismatched format argument
     record = logging.LogRecord(
         name="app.error_boundary",
         level=logging.ERROR,
         pathname="",
         lineno=10,
         msg="Value format: %d %d",
-        args=("not_a_number",),  # Only 1 arg supplied for 2 %d specifiers
+        args=("not_a_number",),
         exc_info=None,
     )
 
@@ -510,7 +499,7 @@ def test_correlation_context(tmp_path: Path) -> None:
         logger.info("Tracking transaction request")
         flush_logs()
 
-        records = buffer.get_records()
+        records = buffer.query()
         matching = [
             r for r in records if r.get("message") and "Tracking" in r["message"]
         ]
@@ -527,7 +516,7 @@ def test_windows_safe_rotation(tmp_path: Path) -> None:
     target_file = tmp_path / "rotation.log"
     handler = WindowsSafeRotatingFileHandler(
         target_file,
-        maxBytes=100,  # Small threshold to force rollover in test
+        maxBytes=100,
         backupCount=3,
         delay=False,
     )
@@ -539,7 +528,6 @@ def test_windows_safe_rotation(tmp_path: Path) -> None:
     test_logger.setLevel(logging.INFO)
 
     try:
-        # Write enough records to trigger rotation multiple times
         for i in range(10):
             test_logger.info("Log line payload number %d with extra data", i)
 
@@ -578,27 +566,27 @@ def test_lazy_bootstrap_no_import_side_effects() -> None:
     """Verify constants and limits match requirement specifications."""
     assert MAX_LOG_FILE_BYTES == 10 * 1024 * 1024
     assert LOG_BACKUP_COUNT == 30
-    assert ENGINE_FR == "FR-HOST-TELEMETRY-ENGINE"
-    assert ERROR_BOUNDARY_FR == "FR-HOST-TELEMETRY-ERROR-BOUNDARY"
-    assert FORMATTING_FR == "FR-HOST-TELEMETRY-FORMATTING"
-    assert SINKS_FR == "FR-HOST-TELEMETRY-SINKS"
-    assert CORRELATION_FR == "FR-HOST-TELEMETRY-CORRELATION"
-    assert LAZY_BOOTSTRAP_FR == "FR-HOST-TELEMETRY-LAZY-BOOTSTRAP"
+    assert WORKER_FR == "FR-HOST-LOGGING-WORKER"
+    assert REDACTION_FR == "FR-HOST-LOGGING-REDACTION"
+    assert ERROR_BOUNDARY_FR == "FR-HOST-LOGGING-ERROR-BOUNDARY"
+    assert FORMATTING_FR == "FR-HOST-LOGGING-FORMATTING"
+    assert SINKS_FR == "FR-HOST-LOGGING-SINKS"
+    assert RING_BUFFER_FR == "FR-HOST-LOGGING-RING-BUFFER"
+    assert BOUND_LOGGER_FR == "FR-HOST-LOGGING-BOUND-LOGGER"
+    assert CORRELATION_FR == "FR-HOST-LOGGING-CORRELATION"
+    assert EXPORTS_FR == "FR-HOST-LOGGING-EXPORTS"
+    assert TelemetryEngine.__name__ == "TelemetryEngine"
 
 
 def test_logging_cli_main_entrypoint(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Verify execution of logging main() demonstration entrypoint."""
-    monkeypatch.setattr("app.host.logging.DEFAULT_LOG_DIR", tmp_path / "logs")
-    logging_main()
-    flush_logs()
-
-    assert (tmp_path / "logs" / "app.log").exists()
-    assert (tmp_path / "logs" / "access.log").exists()
-    assert (tmp_path / "logs" / "errors.log").exists()
-    shutdown_logging()
+    """Verify execution of TelemetryLoggerCLI.run_cli(['--verify'])."""
+    exit_code = TelemetryLoggerCLI.run_cli(["--verify"])
+    captured = capsys.readouterr().out
+    assert exit_code == 0
+    assert "verified: True" in captured
+    assert "sinks_created: True" in captured
 
 
 def test_diagnostics_cli_main_entrypoint(
@@ -742,7 +730,6 @@ def test_ring_buffer_capacity_2000_and_sha256_secret_fingerprinting() -> None:
     assert ring.maxlen == 2000
     assert get_ring_buffer().maxlen == 2000
 
-    # Verify deterministic 8-hex SHA-256 secret fingerprinting
     fp1 = fingerprint_secret("super-secret-api-key")
     fp2 = fingerprint_secret("super-secret-api-key")
     fp_other = fingerprint_secret("different-secret")
@@ -756,7 +743,7 @@ def test_ring_buffer_capacity_2000_and_sha256_secret_fingerprinting() -> None:
         "api_key": "super-secret-api-key",
         "nested": {"password": "my-password-123"},
     }
-    redacted_fp = redact_secrets(nested, fingerprint=True)
+    redacted_fp = TelemetryLogger.redact_secrets(nested, fingerprint=True)
     assert redacted_fp["username"] == "operator"
     assert redacted_fp["api_key"] == fp1
     assert redacted_fp["nested"]["password"] == fingerprint_secret("my-password-123")

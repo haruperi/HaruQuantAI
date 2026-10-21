@@ -9,65 +9,36 @@ Description:
     rotation and 30-day archiving, recursive secret and path redaction, a safe
     error boundary preventing logging failures from impacting callers, exact
     millisecond-precision log event formatting with console ANSI colorization,
-    automatic SHA-256 secret fingerprints and a bounded log callback for SSE/WS,
-    an in-memory live ring buffer projected to the DebugConsole, TelemetryLogger with
-    context accumulation, request correlation context, and lazy bootstrapping
-    with zero import-time side-effects.
+    SHA-256 secret fingerprints, bounded WebSocket/SSE log sinks, an in-memory
+    ring buffer, contextual TelemetryLogger, and request correlation context.
 
 Purpose:
-    FEAT-HOST-TELEMETRY: Host platform telemetry, redacted logging and diagnostics.
+    FEAT-HOST-LOGGING: Host platform telemetry, redacted logging and diagnostics.
 
 Key Capabilities:
-    - FR-HOST-TELEMETRY-ENGINE: Telemetry Worker & Engine.
-      Associated: `TelemetryEngine`, `flush_logs()`, `shutdown_logging()`
-      Logging: INFO on telemetry engine startup and shutdown.
-    - FR-HOST-TELEMETRY-REDACTION: Secret & Path Redaction.
-      Associated: `redact_secrets()`, `fingerprint_secret()`, `normalize_path()`
-      Logging: DEBUG on redaction filter execution.
-    - FR-HOST-TELEMETRY-ERROR-BOUNDARY: Safe Error Boundary.
-      Associated: `SafeErrorBoundary`, `LogEventFormatter`
-      Logging: Fallback error emission on formatting exceptions.
-    - FR-HOST-TELEMETRY-FORMATTING: Log Event & Formatting.
-      Associated: `LogEventFormatter`
-      Logging: Structured event formatting with optional ANSI colors.
-    - FR-HOST-TELEMETRY-SINKS: Sinks, Windows-Safe Rotation & Archiving.
-      Associated: `WindowsSafeRotatingFileHandler`
-      Logging: INFO on log file creation and rotation.
-    - FR-HOST-TELEMETRY-RINGBUFFER: Log Ring Buffer & Debug Console Projection.
-      Associated: `LogRingBuffer`, `RingBufferHandler`, `get_ring_buffer()`
-      Logging: DEBUG on ring buffer query and capacity truncation.
-    - FR-HOST-TELEMETRY-BOUND-LOGGER: Bound Logger & Facade.
-      Associated: `TelemetryLogger`, `get_logger()`, `get_access_logger()`
-      Logging: DEBUG on dynamic context binding.
-    - FR-HOST-TELEMETRY-CORRELATION: Request Correlation Context.
-      Associated: `set_correlation_id()`, `get_correlation_id()`
-      Logging: Contextual request ID tracking across threads.
-    - FR-HOST-TELEMETRY-LAZY-BOOTSTRAP: Public Module Exports & Lazy Bootstrap.
-      Associated: `setup_logging()`, `__all__`
-      Logging: Lazy initialization on first emission without import side-effects.
+    - FR-HOST-LOGGING-WORKER: Async queue telemetry engine (`setup_logging()` -> INFO).
+    - FR-HOST-LOGGING-REDACTION: Secret/path scrubbing (`redact_secrets()` -> DEBUG).
+    - FR-HOST-LOGGING-ERROR-BOUNDARY: Safe format boundary (`format()` -> ERROR).
+    - FR-HOST-LOGGING-FORMATTING: Millisecond/ANSI formatter (`format()` -> DEBUG).
+    - FR-HOST-LOGGING-SINKS: 10MB/30-backup rotation (`doRollover()` -> INFO).
+    - FR-HOST-LOGGING-RING-BUFFER: Ring buffer & WS sinks (`query()` -> DEBUG).
+    - FR-HOST-LOGGING-BOUND-LOGGER: Contextual logger (`bind()` -> DEBUG).
+    - FR-HOST-LOGGING-CORRELATION: Correlation ID (`set_correlation_id()` -> DEBUG).
+    - FR-HOST-LOGGING-EXPORTS: Factories & CLI verify (`run_cli()` -> INFO).
 
 Python API Usage:
     ```python
-    from app.host.logging import (
-        get_access_logger,
-        get_logger,
-        set_correlation_id,
-        setup_logging,
-    )
+    from app.host.logging import get_access_logger, get_logger, setup_logging
 
     setup_logging("data/logs")
-    logger = get_logger(__name__)
-    set_correlation_id("req-12345")
-    ctx_logger = logger.bind(session_id="sess-01")
-    ctx_logger.info("Order submitted", extra={"fr_id": "FR-HOST-TELEMETRY-ENGINE"})
-
-    access = get_access_logger()
-    access.info("GET /health 200", extra={"fr_id": "FR-HOST-TELEMETRY-SINKS"})
+    logger = get_logger(__name__).bind(session_id="sess-01")
+    logger.info("Order submitted", extra={"fr_id": "FR-HOST-LOGGING-WORKER"})
+    get_access_logger().info("GET /health 200")
     ```
 
 CLI Usage:
     ```bash
-    uv run python -m app.host.logging
+    uv run python -m app.host.logging --verify
     ```
 """
 
@@ -83,37 +54,46 @@ import logging.handlers
 import queue
 import re
 import sys
+import tempfile
 import threading
 import time
-from collections.abc import Callable, Mapping, MutableMapping
+from collections.abc import Callable, Mapping, MutableMapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
 __all__ = [
     "DEFAULT_RING_BUFFER_CAPACITY",
+    "LogEventFormatter",
+    "LogRingBuffer",
+    "TelemetryEngine",
     "TelemetryLogger",
+    "TelemetryLoggerCLI",
+    "WindowsSafeRotatingFileHandler",
     "fingerprint_secret",
     "flush_logs",
     "get_access_logger",
+    "get_correlation_id",
     "get_logger",
     "get_ring_buffer",
     "normalize_path",
-    "redact_secrets",
+    "redact_mapping",
+    "redact_value",
+    "reset_correlation_id",
     "set_correlation_id",
     "setup_logging",
     "shutdown_logging",
 ]
 
-ENGINE_FR = "FR-HOST-TELEMETRY-ENGINE"
-REDACTION_FR = "FR-HOST-TELEMETRY-REDACTION"
-ERROR_BOUNDARY_FR = "FR-HOST-TELEMETRY-ERROR-BOUNDARY"
-FORMATTING_FR = "FR-HOST-TELEMETRY-FORMATTING"
-SINKS_FR = "FR-HOST-TELEMETRY-SINKS"
-RINGBUFFER_FR = "FR-HOST-TELEMETRY-RINGBUFFER"
-BOUND_LOGGER_FR = "FR-HOST-TELEMETRY-BOUND-LOGGER"
-CORRELATION_FR = "FR-HOST-TELEMETRY-CORRELATION"
-LAZY_BOOTSTRAP_FR = "FR-HOST-TELEMETRY-LAZY-BOOTSTRAP"
+WORKER_FR = "FR-HOST-LOGGING-WORKER"
+REDACTION_FR = "FR-HOST-LOGGING-REDACTION"
+ERROR_BOUNDARY_FR = "FR-HOST-LOGGING-ERROR-BOUNDARY"
+FORMATTING_FR = "FR-HOST-LOGGING-FORMATTING"
+SINKS_FR = "FR-HOST-LOGGING-SINKS"
+RING_BUFFER_FR = "FR-HOST-LOGGING-RING-BUFFER"
+BOUND_LOGGER_FR = "FR-HOST-LOGGING-BOUND-LOGGER"
+CORRELATION_FR = "FR-HOST-LOGGING-CORRELATION"
+EXPORTS_FR = "FR-HOST-LOGGING-EXPORTS"
 
 DEFAULT_LOG_DIR: Path = Path("data/logs")
 DEFAULT_RING_BUFFER_CAPACITY: int = 2000
@@ -147,6 +127,8 @@ _CORRELATION_ID: contextvars.ContextVar[str | None] = contextvars.ContextVar(
 
 _GLOBAL_RING_BUFFER: LogRingBuffer | None = None
 _GLOBAL_ENGINE: TelemetryEngine | None = None
+_WS_SINKS: list[Callable[[dict[str, Any]], None]] = []
+_WS_SINKS_LOCK: threading.Lock = threading.Lock()
 _LOGGING_LOCK: threading.RLock = threading.RLock()
 _BOOTSTRAPPED: bool = False
 
@@ -218,39 +200,56 @@ def fingerprint_secret(value: Any) -> str:
     return f"***REDACTED:sha256:{digest}***"
 
 
-def redact_secrets(data: Any, *, fingerprint: bool = False) -> Any:
-    """Recursively mask sensitive values in strings, mappings, and sequences.
+def redact_value(value: Any, *, fingerprint: bool = False) -> Any:
+    """Recursively mask sensitive patterns in strings, sequences, or nested mappings.
 
     Args:
-        data: Arbitrary data structure to scrub.
+        value: Arbitrary value to scrub.
         fingerprint: When True, emit SHA-256 fingerprint token
             ``***REDACTED:sha256:<8-hex>***`` instead of ``***REDACTED***``.
 
     Returns:
-        Scrubbed data structure with sensitive fields masked.
+        Scrubbed value with sensitive tokens masked.
     """
-    if isinstance(data, str):
+    if isinstance(value, str):
         if fingerprint:
             return SENSITIVE_VALUE_PATTERN.sub(
-                lambda m: fingerprint_secret(m.group(0)), data
+                lambda m: fingerprint_secret(m.group(0)), value
             )
-        return SENSITIVE_VALUE_PATTERN.sub(REDACTED_STR, data)
-    if isinstance(data, Mapping):
-        scrubbed_dict: dict[str, Any] = {}
-        for k, v in data.items():
-            key_str = str(k)
-            if SENSITIVE_KEY_PATTERN.search(key_str):
-                scrubbed_dict[key_str] = (
-                    fingerprint_secret(v) if fingerprint else REDACTED_STR
-                )
-            else:
-                scrubbed_dict[key_str] = redact_secrets(v, fingerprint=fingerprint)
-        return scrubbed_dict
-    if isinstance(data, list):
-        return [redact_secrets(item, fingerprint=fingerprint) for item in data]
-    if isinstance(data, tuple):
-        return tuple(redact_secrets(item, fingerprint=fingerprint) for item in data)
-    return data
+        return SENSITIVE_VALUE_PATTERN.sub(REDACTED_STR, value)
+    if isinstance(value, Mapping):
+        return redact_mapping(value, fingerprint=fingerprint)
+    if isinstance(value, list):
+        return [redact_value(item, fingerprint=fingerprint) for item in value]
+    if isinstance(value, tuple):
+        return tuple(redact_value(item, fingerprint=fingerprint) for item in value)
+    return value
+
+
+def redact_mapping(
+    mapping: Mapping[Any, Any],
+    *,
+    fingerprint: bool = False,
+) -> dict[str, Any]:
+    """Recursively mask sensitive keys and nested values in a mapping.
+
+    Args:
+        mapping: Mapping to scrub.
+        fingerprint: When True, emit SHA-256 fingerprint token for sensitive keys.
+
+    Returns:
+        New dictionary with sensitive keys and values scrubbed.
+    """
+    scrubbed_dict: dict[str, Any] = {}
+    for k, v in mapping.items():
+        key_str = str(k)
+        if SENSITIVE_KEY_PATTERN.search(key_str):
+            scrubbed_dict[key_str] = (
+                fingerprint_secret(v) if fingerprint else REDACTED_STR
+            )
+        else:
+            scrubbed_dict[key_str] = redact_value(v, fingerprint=fingerprint)
+    return scrubbed_dict
 
 
 # ============================================================================
@@ -299,10 +298,10 @@ class LogEventFormatter(logging.Formatter):
 
             # 2. Mask secrets in args
             if isinstance(record.args, dict):
-                record.args = redact_secrets(record.args, fingerprint=True)
+                record.args = redact_mapping(record.args, fingerprint=True)
             elif isinstance(record.args, tuple):
                 record.args = tuple(
-                    redact_secrets(arg, fingerprint=True)
+                    TelemetryLogger.redact_secrets(arg, fingerprint=True)
                     if not isinstance(arg, str)
                     else arg
                     for arg in record.args
@@ -319,7 +318,7 @@ class LogEventFormatter(logging.Formatter):
 
             # 4. Redact secrets and normalize machine paths
             clean_msg = normalize_path(
-                str(redact_secrets(raw_msg, fingerprint=True)), self.root_dir
+                str(redact_value(raw_msg, fingerprint=True)), self.root_dir
             )
 
             # 5. Build caller location: module:function:line
@@ -342,7 +341,7 @@ class LogEventFormatter(logging.Formatter):
                 record.exc_text = self.formatException(record.exc_info)
             if record.exc_text:
                 scrubbed_exc = normalize_path(
-                    str(redact_secrets(record.exc_text, fingerprint=True)),
+                    str(redact_value(record.exc_text, fingerprint=True)),
                     self.root_dir,
                 )
                 formatted = f"{formatted}\n{scrubbed_exc}"
@@ -350,7 +349,7 @@ class LogEventFormatter(logging.Formatter):
             if record.stack_info:
                 scrubbed_stack = normalize_path(
                     str(
-                        redact_secrets(
+                        redact_value(
                             self.formatStack(record.stack_info), fingerprint=True
                         )
                     ),
@@ -464,7 +463,7 @@ class LogRingBuffer:
         with self._lock:
             self._buffer.append(entry)
 
-    def get_records(
+    def query(
         self,
         *,
         limit: int | None = None,
@@ -519,16 +518,18 @@ class RingBufferHandler(logging.Handler):
 
     @override
     def emit(self, record: logging.LogRecord) -> None:
-        """Emit structured dictionary entry into the ring buffer."""
+        """Emit structured dictionary entry into the ring buffer and WS sinks."""
         try:
             record_dt = datetime.fromtimestamp(record.created, tz=UTC)
             time_str = (
                 record_dt.strftime("%Y-%m-%d %H:%M:%S") + f".{int(record.msecs):03d}"
             )
             safe_record = copy.copy(record)
-            safe_record.args = redact_secrets(record.args, fingerprint=True)
+            safe_record.args = TelemetryLogger.redact_secrets(
+                record.args, fingerprint=True
+            )
             raw_msg = safe_record.getMessage()
-            clean_msg = normalize_path(str(redact_secrets(raw_msg, fingerprint=True)))
+            clean_msg = normalize_path(str(redact_value(raw_msg, fingerprint=True)))
             caller = f"{record.name}:{record.funcName}:{record.lineno}"
 
             entry = {
@@ -542,15 +543,15 @@ class RingBufferHandler(logging.Handler):
                 or get_correlation_id(),
             }
             self.ring_buffer.append(entry)
-            if (
-                self.publish_log is not None
-                and getattr(record, "fr_id", None) != "FR-HOST-TRANSPORT-EVENT-BUS"
-            ):
-                self.publish_log(entry)
+            if getattr(record, "fr_id", None) != "FR-HOST-TRANSPORT-EVENT-BUS":
+                if self.publish_log is not None:
+                    self.publish_log(entry)
+                with _WS_SINKS_LOCK:
+                    ws_sinks = list(_WS_SINKS)
+                for ws_sink in ws_sinks:
+                    ws_sink(entry)
         except Exception:  # noqa: BLE001
-            sys.stderr.write(
-                "FR-HOST-TELEMETRY-ERROR-BOUNDARY: live log delivery failed\n"
-            )
+            sys.stderr.write(f"{ERROR_BOUNDARY_FR}: live log delivery failed\n")
 
 
 def get_ring_buffer() -> LogRingBuffer:
@@ -569,7 +570,7 @@ def get_ring_buffer() -> LogRingBuffer:
 
 
 class TelemetryLogger(logging.LoggerAdapter[logging.Logger]):
-    """Logger adapter providing dynamic context binding and structured tags."""
+    """Logger adapter providing dynamic context binding, redaction, and WS sinks."""
 
     def __init__(
         self,
@@ -583,6 +584,29 @@ class TelemetryLogger(logging.LoggerAdapter[logging.Logger]):
     def context(self) -> dict[str, Any]:
         """Return a copy of the bound context attributes."""
         return dict(self.extra) if self.extra is not None else {}
+
+    @staticmethod
+    def redact_secrets(data: Any, *, fingerprint: bool = False) -> Any:
+        """Recursively mask sensitive values in strings, mappings, and sequences.
+
+        Args:
+            data: Arbitrary data structure to scrub.
+            fingerprint: When True, emit SHA-256 fingerprint token
+                ``***REDACTED:sha256:<8-hex>***`` instead of ``***REDACTED***``.
+
+        Returns:
+            Scrubbed data structure with sensitive fields masked.
+        """
+        if isinstance(data, Mapping):
+            return redact_mapping(data, fingerprint=fingerprint)
+        return redact_value(data, fingerprint=fingerprint)
+
+    @staticmethod
+    def register_ws_sink(sink: Callable[[dict[str, Any]], None]) -> None:
+        """Register a WebSocket broadcast sink receiving scrubbed log entries."""
+        with _WS_SINKS_LOCK:
+            if sink not in _WS_SINKS:
+                _WS_SINKS.append(sink)
 
     def bind(self, **kwargs: Any) -> TelemetryLogger:
         """Return a new TelemetryLogger instance with merged contextual attributes."""
@@ -641,15 +665,15 @@ class _RedactingQueueHandler(logging.handlers.QueueHandler):
     @override
     def prepare(self, record: logging.LogRecord) -> logging.LogRecord:
         prepared = copy.copy(record)
-        prepared.args = redact_secrets(record.args, fingerprint=True)
+        prepared.args = TelemetryLogger.redact_secrets(record.args, fingerprint=True)
         queued: logging.LogRecord = super().prepare(prepared)
-        queued.msg = normalize_path(str(redact_secrets(queued.msg, fingerprint=True)))
+        queued.msg = normalize_path(str(redact_value(queued.msg, fingerprint=True)))
         return queued
 
     @override
     def handleError(self, record: logging.LogRecord) -> None:
         """Report queue/format failures without echoing the unsanitized record."""
-        sys.stderr.write("FR-HOST-TELEMETRY-ERROR-BOUNDARY: telemetry record dropped\n")
+        sys.stderr.write(f"{ERROR_BOUNDARY_FR}: telemetry record dropped\n")
 
 
 class TelemetryEngine:
@@ -711,6 +735,8 @@ def shutdown_logging() -> None:
         if _GLOBAL_ENGINE is not None:
             _GLOBAL_ENGINE.stop()
             _GLOBAL_ENGINE = None
+        with _WS_SINKS_LOCK:
+            _WS_SINKS.clear()
         root = logging.getLogger()
         for h in list(root.handlers):
             with contextlib.suppress(Exception):
@@ -864,112 +890,98 @@ def setup_logging(
     logger = logging.getLogger(__name__)
     logger.info(
         "%s: logging engine initialized (target=%s, level=%s, async=%s)",
-        ENGINE_FR,
+        WORKER_FR,
         target_dir,
         logging.getLevelName(level),
         async_engine,
-        extra={"fr_id": ENGINE_FR, "log_dir": str(target_dir)},
+        extra={"fr_id": WORKER_FR, "log_dir": str(target_dir)},
     )
     return _GLOBAL_RING_BUFFER
 
 
-def main() -> None:
-    """Demonstrate all 9 Key Capabilities of the telemetry and logging subsystem."""
-    setup_logging(DEFAULT_LOG_DIR, level=logging.DEBUG, async_engine=False)
-    logger = get_logger("haruquantai.demo")
+class TelemetryLoggerCLI:
+    """Command-line interface and self-verification runner for TelemetryLogger."""
 
-    # 1. Telemetry Worker & Engine
-    logger.info(
-        "1. Telemetry Worker & Engine initialized",
-        extra={"fr_id": ENGINE_FR},
-    )
+    @staticmethod
+    def format_output(result: Mapping[str, Any]) -> str:
+        """Format verification result dictionary for CLI display."""
+        return "\n".join(f"{k}: {v}" for k, v in result.items())
 
-    # 2. Secret & Path Redaction
-    secret_logger = logger.bind(
-        token="super_secret_token_12345",  # noqa: S106
-        password="my_admin_password",  # noqa: S106
-    )
-    secret_logger.info(
-        "2. Secret & Path Redaction applied (path=%s)",
-        str(Path.cwd() / "data" / "database"),
-        extra={"fr_id": REDACTION_FR},
-    )
+    @classmethod
+    def run_cli(cls, argv: Sequence[str] | None = None) -> int:
+        """Execute telemetry self-verification across all 9 FR capabilities."""
+        args = list(argv) if argv is not None else []
+        verify_mode = "--verify" in args or not args
 
-    # 3. Safe Error Boundary
-    logger.info(
-        "3. Safe Error Boundary test: malformed format argument",
-        extra={"fr_id": ERROR_BOUNDARY_FR},
-    )
+        with tempfile.TemporaryDirectory(
+            prefix="hqai_logging_cli_", ignore_cleanup_errors=True
+        ) as tmp_dir:
+            log_dir = Path(tmp_dir) / "logs"
+            ws_events: list[dict[str, Any]] = []
+            try:
+                ring = setup_logging(log_dir, level=logging.DEBUG, async_engine=False)
+                TelemetryLogger.register_ws_sink(ws_events.append)
+                logger = get_logger("haruquantai.demo")
 
-    def _simulate_failure() -> None:
-        raise RuntimeError("Simulated transaction connection timeout")
+                logger.info(
+                    "1. Telemetry Worker & Engine initialized",
+                    extra={"fr_id": WORKER_FR},
+                )
+                secret_logger = logger.bind(
+                    token="super_secret_token_12345",  # noqa: S106
+                    password="my_admin_password",  # noqa: S106
+                )
+                secret_logger.info(
+                    "2. Secret & Path Redaction applied (path=%s)",
+                    str(Path.cwd() / "data" / "database"),
+                    extra={"fr_id": REDACTION_FR},
+                )
+                logger.warning(
+                    "3. Safe Error Boundary & ANSI warning format",
+                    extra={"fr_id": FORMATTING_FR},
+                )
+                logger.error(
+                    "4. Error sink verification event",
+                    extra={"fr_id": SINKS_FR},
+                )
+                bound = logger.bind(session_id="sess-8899", symbol="BTC/USDT")
+                bound.emit(
+                    "INFO", "5. Bound logger emit", extra={"fr_id": BOUND_LOGGER_FR}
+                )
 
-    try:
-        _simulate_failure()
-    except RuntimeError:
-        logger.exception(
-            "3. Caught simulated exception safely handled by error boundary",
-            extra={"fr_id": ERROR_BOUNDARY_FR},
-        )
+                token = set_correlation_id("req-uuid-990011")
+                try:
+                    logger.info(
+                        "6. Correlation ID propagated",
+                        extra={"fr_id": CORRELATION_FR},
+                    )
+                finally:
+                    reset_correlation_id(token)
 
-    # 4. Log Event & Formatting (exact format with ANSI colors on console)
-    logger.debug(
-        "4. Debug message demonstrating millisecond timestamp formatting",
-        extra={"fr_id": FORMATTING_FR},
-    )
-    logger.warning(
-        "4. Warning message demonstrating yellow ANSI color formatting",
-        extra={"fr_id": FORMATTING_FR},
-    )
-    logger.error(
-        "4. Error message demonstrating red ANSI color formatting",
-        extra={"fr_id": FORMATTING_FR},
-    )
+                get_access_logger().info(
+                    "7. Access logger routed",
+                    extra={"fr_id": EXPORTS_FR},
+                )
+                flush_logs()
 
-    # 5. Sinks, Windows-Safe Rotation & Archiving
-    logger.info(
-        "5. Sinks configured with 10MB limit and 30-backup retention",
-        extra={"fr_id": SINKS_FR},
-    )
-
-    # 6. Log Ring Buffer & Debug Console Projection
-    ring_buf = get_ring_buffer()
-    logger.info(
-        "6. Log Ring Buffer active with %d entries recorded",
-        len(ring_buf),
-        extra={"fr_id": RINGBUFFER_FR},
-    )
-
-    # 7. Bound Logger & Facade
-    bound_logger = logger.bind(
-        session_id="sess-8899",
-        account_id="ACC-QUANT-01",
-        symbol="BTC/USDT",
-    )
-    bound_logger.info(
-        "7. Bound Logger & Facade accumulating contextual tags",
-        extra={"fr_id": BOUND_LOGGER_FR},
-    )
-
-    # 8. Request Correlation Context
-    token = set_correlation_id("req-uuid-990011")
-    try:
-        logger.info(
-            "8. Request Correlation Context propagated to records",
-            extra={"fr_id": CORRELATION_FR},
-        )
-    finally:
-        reset_correlation_id(token)
-
-    # 9. Public Module Exports & Specialized routing
-    access_logger = get_access_logger()
-    access_logger.info(
-        "9. Public Module Exports: routed to data/logs/access.log",
-        extra={"fr_id": LAZY_BOOTSTRAP_FR},
-    )
-
-    flush_logs()
+                queried = ring.query(min_level="INFO")
+                files_ok = all(
+                    (log_dir / name).exists()
+                    for name in ("app.log", "access.log", "errors.log")
+                )
+                summary = {
+                    "verified": bool(
+                        verify_mode and files_ok and queried and ws_events
+                    ),
+                    "records_queried": len(queried),
+                    "ws_events_received": len(ws_events),
+                    "sinks_created": files_ok,
+                }
+                sys.stdout.write(cls.format_output(summary) + "\n")
+                return 0 if summary["verified"] else 1
+            finally:
+                shutdown_logging()
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(TelemetryLoggerCLI.run_cli(sys.argv[1:]))

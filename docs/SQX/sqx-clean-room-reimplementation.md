@@ -493,13 +493,13 @@ HaruQuantAI/
 
 ### Phase 1.1: Core Application Container & Stage 1 Host Foundation (Ordered Bottom-Up)
 
-#### 1. `app/host/logging.py` — `TelemetryLogger`, `BoundLogger`, `TelemetryEngine` & `LogRingBuffer` (`FEAT-HOST-LOGGING`)
+#### 1. `app/host/logging.py` — `TelemetryLogger`, `TelemetryEngine` & `LogRingBuffer` (`FEAT-HOST-LOGGING`)
 
 - **Dry Rule:** Zero internal `app.*` imports. Every other file in the repository imports `from app.host.logging import get_logger`.
 - **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.L`, `SQLog`), `C:\SQX-145\internal\libs\logback-core-1.4.14.jar`, `C:\SQX-145\internal\libs\logback-classic-1.4.14.jar`
 - **Backend:** `app/host/logging.py` (`🟠 500–995L`, Docstring `<=45L`)
 - **Frontend:** `ui/app/host/HostSettingsModal.tsx`
-- **Class:** `TelemetryLogger` (`BoundLogger` alias), `TelemetryEngine`, `LogRingBuffer`, `WindowsSafeRotatingFileHandler`, `LogEventFormatter` (plus `get_logger`, `get_access_logger`, `setup_logging`, `flush_logs`, `shutdown_logging`, `TelemetryLoggerCLI`)
+- **Class:** `TelemetryLogger`, `TelemetryEngine`, `LogRingBuffer`, `WindowsSafeRotatingFileHandler`, `LogEventFormatter` (plus `get_logger`, `get_access_logger`, `setup_logging`, `flush_logs`, `shutdown_logging`, `TelemetryLoggerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
   - [x] `FR-HOST-LOGGING-WORKER`: Asynchronous non-blocking `QueueHandler`/`QueueListener` engine (`TelemetryEngine`), `setup_logging()`, `flush_logs()`, and `shutdown_logging()`
   - [x] `FR-HOST-LOGGING-REDACTION`: Deterministic SHA-256 secret fingerprinting (`fingerprint_secret`), workspace/home path normalization (`normalize_path`), `redact_value`, `redact_mapping`, and `TelemetryLogger.redact_secrets()`
@@ -507,7 +507,7 @@ HaruQuantAI/
   - [x] `FR-HOST-LOGGING-FORMATTING`: `LogEventFormatter` with millisecond timestamps (`YYYY-MM-DD HH:MM:SS.mmm | LEVEL | module:func:line - msg`), ANSI console colors, and scrubbed tracebacks
   - [x] `FR-HOST-LOGGING-SINKS`: `WindowsSafeRotatingFileHandler` (10 MB / 30 backups with Windows lock retry) across 3 split files (`app.log`, `errors.log` at `WARNING+`, `access.log` via `get_access_logger()`)
   - [x] `FR-HOST-LOGGING-RING-BUFFER`: Bounded thread-safe `LogRingBuffer` (`append`, `query`, `clear`, `get_ring_buffer()`) + WebSocket broadcast sinks (`TelemetryLogger.register_ws_sink`)
-  - [x] `FR-HOST-LOGGING-BOUND-LOGGER`: Contextual `BoundLogger` / `TelemetryLogger` (`bind(**kwargs)`, `emit`, `info`, `warning`, `error`, `critical`, `exception`, `debug`, `log`)
+  - [x] `FR-HOST-LOGGING-BOUND-LOGGER`: Contextual `TelemetryLogger` (`bind(**kwargs)`, `emit`, `info`, `warning`, `error`, `critical`, `exception`, `debug`, `log`)
   - [x] `FR-HOST-LOGGING-CORRELATION`: `contextvars.ContextVar` request correlation propagation (`get_correlation_id`, `set_correlation_id`, `reset_correlation_id`)
   - [x] `FR-HOST-LOGGING-EXPORTS`: Public factory exports (`get_logger`, `get_access_logger`, `get_ring_buffer`) and `TelemetryLoggerCLI` (`--verify`)
 
