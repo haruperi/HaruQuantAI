@@ -1,0 +1,20 @@
+{
+  "title": "Your research starts here",
+  "description": "Prepare market data, develop an idea, and review the evidence before taking the next step.",
+  "actions": [
+    { "id": "datamanager", "label": "Prepare market data" },
+    { "id": "algowizard", "label": "Author a strategy" },
+    { "id": "builder", "label": "Explore Builder" },
+    { "id": "projects", "label": "Open Projects" }
+  ],
+  "tutorials": [
+    { "id": "prepare", "title": "1. Prepare your inputs", "summary": "Start with a clearly defined market and timeframe.", "body": "Open Data Manager to inspect available datasets and their date ranges. Review gaps, timezones and instrument specifications before using data in research. An empty catalog needs data preparation first.", "workspace": "datamanager" },
+    { "id": "develop", "title": "2. Describe your idea", "summary": "Make entry, exit and sizing rules explicit.", "body": "Use AlgoWizard to describe a strategy. Record the assumptions behind each rule and the dataset it needs. A workspace preview does not establish that a strategy has been executed or tested.", "workspace": "algowizard" },
+    { "id": "review", "title": "3. Review the evidence", "summary": "Separate a promising idea from a verified result.", "body": "Before accepting results, check the input data, costs, test period and any excluded observations. Compare performance across independent periods. Only treat an operation as complete when its owning workspace reports a real result.", "workspace": "retester" }
+  ],
+  "help": [
+    { "id": "offline", "title": "Working offline", "body": "These text guides are bundled with the application and remain readable while the host is disconnected. Recent projects, About and diagnostics require a host connection. Videos and an online documentation service are not required to read these guides." },
+    { "id": "projects", "title": "Where are my recent projects?", "body": "Home lists project summaries stored by the host. Browser demonstration projects are not imported into this list. Project cards open the owning workspace; reopening a specific saved project requires support from that workspace." },
+    { "id": "updates", "title": "Release information", "body": "Choose Check for updates to query the configured application release feed. An unconfigured or unreachable provider is shown explicitly. Checking release notes never installs or downloads an update." }
+  ]
+}

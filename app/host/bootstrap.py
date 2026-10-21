@@ -63,6 +63,8 @@ from app.host.session import SessionManager
 from app.host.settings import settings as host_settings
 from app.services.brokers import get_broker
 from app.workspace.data_manager import DataManagerWorkspace, create_data_manager_router
+from app.workspace.home import About, Home, create_home_router
+from app.workspace.home._releases import ReleaseFeed
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -79,7 +81,10 @@ REVERSE_TEARDOWN_FR: Final[str] = "FR-HOST-BOOT-REVERSE-TEARDOWN"
 _MIN_PORT: Final[int] = 1
 _MAX_PORT: Final[int] = 65535
 _EXPECTED_TABLE_COUNT: Final[int] = len(HostPersistence.TABLE_PRIMARY_KEYS)
-_CLI_ROUTES: Final[str] = "status health resources jobs plugins settings reconcile data"
+_CLI_ROUTES: Final[str] = (
+    "status health resources jobs plugins settings reconcile data "
+    "home about diagnostics updates"
+)
 _UI_ROUTES: Final[str] = (
     "/auth /auth/login /sessions/me /status /readiness /app-loaded /about /settings "
     "/diagnostics /resources /jobs /events /ws /discovery/plugins /discovery/slots "
@@ -174,6 +179,7 @@ class _BootstrapConfig:
     use_process_pool: bool = True
     min_available_ram_pct: float = _res.MIN_AVAILABLE_RAM_PCT
     timeout_graceful_shutdown: int = 10
+    home_release_feed_url: str | None = None
 
     @property
     def resolved_log_dir(self) -> Path:
@@ -280,6 +286,7 @@ class AppHost:
                 kw.get("min_available_ram_pct", _res.MIN_AVAILABLE_RAM_PCT)
             ),
             timeout_graceful_shutdown=int(kw.get("timeout_graceful_shutdown", 10)),
+            home_release_feed_url=kw.get("home_release_feed_url"),
         )
         self.host_instance_id = f"host-{uuid.uuid4().hex[:12]}"
         self._write_lock_obj = threading.RLock()
@@ -306,6 +313,8 @@ class AppHost:
         self.broker_registry: Any | None = kw.get("broker_registry")
         self.gateway_service: _tr.TransportGatewayService | None = None
         self.data_manager: DataManagerWorkspace | None = None
+        self.home: Home | None = None
+        self.home_about: About | None = None
 
     @property
     def state(self) -> _ReadinessState:
@@ -804,6 +813,13 @@ class AppHost:
                 password_hash=self.config.password_hash,
                 require_auth=self.config.require_auth,
             )
+        constants = self.gateway_service.constants_servlet
+        self.home = self.home or Home(
+            constants, ReleaseFeed(self.config.home_release_feed_url)
+        )
+        self.home_about = self.home_about or About(
+            constants, self.resource_manager, host_settings
+        )
         if self.data_manager is None:
             self.data_manager = DataManagerWorkspace(
                 data_dir=Path(self.config.data_dir),
@@ -919,10 +935,19 @@ class AppHost:
             session_mgr=self.session_manager,
             require_auth=self.config.require_auth,
         )
+        if self.home is None or self.home_about is None or self.session_manager is None:
+            raise RuntimeError("Home requires initialized host services.")
+        home_router = create_home_router(
+            self.home,
+            self.home_about,
+            session_mgr=self.session_manager,
+            require_auth=self.config.require_auth,
+        )
         for pfx in ("", "/api/v1", "/api/v2"):
             app.include_router(_tr.create_transport_router(prefix=pfx, **gw_kw))
             app.include_router(disc_router, prefix=pfx)
             app.include_router(dm_router, prefix=pfx)
+            app.include_router(home_router, prefix=pfx)
         for extra in self._extra_routers:
             app.include_router(extra)
         return [getattr(r, "path", "") for r in app.routes if getattr(r, "path", "")]

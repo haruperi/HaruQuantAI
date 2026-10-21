@@ -52,6 +52,7 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
+import os
 from collections.abc import AsyncGenerator, Sequence
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -113,6 +114,7 @@ def resolve_main_config(
         require_auth=require_auth,
         data_dir=data_dir,
         plugins_dir=plugins_dir,
+        home_release_feed_url=os.environ.get("HARUQUANTAI_RELEASE_FEED_URL"),
     )
     logger.info(
         "%s: Resolved UI server config (host=%s port=%d debug=%s data_dir=%s).",

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-10-21T13:10:48.144573+00:00",
+  "reference_cohort": "145-dev1",
+  "installed_build": null,
+  "activation_status": "unverified",
+  "donor_artifacts": [
+    {
+      "locator": "internal/plugins/AppSQXHome/module.js",
+      "sha256": "fdf50d0a8df3ef880150b3a8e2d13a5a429fe0633297766068580d83034fc5a6",
+      "family": "web_resource",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-HOME-DASHBOARD"
+    },
+    {
+      "locator": "internal/web/SQXHOME/layout/SQXHomeService.js",
+      "sha256": "db83262a793dec441e5a038dc9b9f50e9ec0883df95adc053f836e396d166617",
+      "family": "web_resource",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-HOME-DASHBOARD"
+    },
+    {
+      "locator": "internal/web/SQXHOME/layout/LayoutCtrl.js",
+      "sha256": "6216c25d1c6915d166d2444aef87f4b230417a225710823a0ed765ed1af0ed82",
+      "family": "web_resource",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-HOME-DASHBOARD"
+    },
+    {
+      "locator": "internal/plugins/AppSQXHome/offline/_astro/OfflineOnboardingFlow.b4Wrp7kD.js",
+      "sha256": "811b80cffbe92a7356c470b0c6f105b69bd269019249352441d2ad0bd3a68b3c",
+      "family": "web_resource",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-HOME-DASHBOARD"
+    },
+    {
+      "locator": "internal/plugins/HomeAbout/services/AboutService.js",
+      "sha256": "a3a01e169324c1082daf4b35d4b722b7e56097df372ee1156472ac5e4ae5896a",
+      "family": "web_resource",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-HOME-DASHBOARD"
+    },
+    {
+      "locator": "internal/plugins/HomeAbout/views/about.html",
+      "sha256": "f032a77d5a14eee745dc41667f2678e4ffeb982fa222eecedf6908673a9f40a2",
+      "family": "web_resource",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-HOME-DASHBOARD"
+    },
+    {
+      "locator": "internal/plugins/AppSQXHome/AppSQXHome.jar",
+      "sha256": "5bedd8ddbf4c457a5f9512d721092fa1f79cb16ac9d302cec46a055fb6339f52",
+      "family": "library",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-HOME-DASHBOARD"
+    },
+    {
+      "locator": "internal/plugins/HomeAbout/HomeAbout.jar",
+      "sha256": "950092f1f3abff3ca23295d9fccd464a05d3d4605d8b9d1c1162d03e8ad1b5bd",
+      "family": "library",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-HOME-DASHBOARD"
+    }
+  ],
+  "repository_sources": [
+    {
+      "locator": "app/workspace/home/README.md",
+      "sha256": "8408ac287cd54f55126ef33a80a0b692484d449efa590607672767442ff116aa"
+    }
+  ],
+  "totals": {
+    "donor_artifacts": 8,
+    "encrypted_jars": 0,
+    "xml_templates": 0,
+    "plugin_directories": 182,
+    "snippet_java_files": 1049
+  }
+}

@@ -37,8 +37,10 @@ CLI Usage:
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -46,6 +48,187 @@ import pytest
 
 from tests.reference import validate
 from tests.reference.manifest import EvidenceError
+
+
+def _home_repository(tmp_path: Path, foreign: bool = False) -> Path:
+    """Build a bounded synthetic Home owner and a single pending ledger record."""
+    source = Path(__file__).resolve().parents[2]
+    directory = tmp_path / "docs/dev/evidence"
+    directory.mkdir(parents=True)
+    for name in ("reimplementation.schema.json", "p00-inventory.json"):
+        (directory / name).write_bytes(
+            (source / "docs/dev/evidence" / name).read_bytes()
+        )
+    owner = tmp_path / "app/workspace/home/README.md"
+    owner.parent.mkdir(parents=True)
+    owner.write_text(
+        "`FEAT-HOME-DASHBOARD` `FR-HOME-INDEX` `DEC-HOME-HOST-REUSE`", encoding="utf-8"
+    )
+    host = tmp_path / "app/host/README.md"
+    host.parent.mkdir(parents=True)
+    host.write_text("`FR-HOST-UNRELATED`", encoding="utf-8")
+    ledger = json.loads(
+        (source / "docs/dev/evidence/reimplementation.json").read_text()
+    )
+    record = deepcopy(ledger["records"]["SQX145-EV-000001"])
+    record["target_mapping"].update(
+        domain="workspace",
+        feature_ids=["FEAT-HOME-DASHBOARD"],
+        requirement_ids=["FR-HOST-UNRELATED" if foreign else "FR-HOME-INDEX"],
+        decision_ids=["DEC-HOME-HOST-REUSE"],
+    )
+    reference = deepcopy(record["sources"][0])
+    reference.update(
+        catalog_id="E-R01",
+        artifact_locator="app/workspace/home/README.md",
+        fingerprint={
+            "algorithm": "sha256",
+            "value": hashlib.sha256(owner.read_bytes()).hexdigest(),
+        },
+    )
+    record["sources"] = [reference]
+    record["validation"].update(
+        state="pending", artifact_paths=[], executed_at=None, actual_observation=None
+    )
+    locators = ledger["source_catalog"]["E-R01"]["locators"]
+    if "app/workspace/home" not in locators:
+        locators.append("app/workspace/home")
+    ledger["records"] = {"SQX145-EV-000001": record}
+    ledger["allocation_high_water_mark"] = 1
+    (directory / "reimplementation.json").write_text(
+        json.dumps(ledger), encoding="utf-8"
+    )
+    return tmp_path
+
+
+@pytest.mark.parametrize("foreign", [False, True])
+def test_home_registry_resolves_only_its_own_ids(tmp_path: Path, foreign: bool) -> None:
+    """Validate a Home record against its real owner rather than host tokens."""
+    repository = _home_repository(tmp_path, foreign)
+    assert [issue.code for issue in validate.validate_evidence(repository)] == (
+        ["REGISTRY_ID"] if foreign else []
+    )
+
+
+def _add_home_inventory(repository: Path) -> tuple[Path, dict[str, Any]]:
+    """Attach a single independent Home donor binding to a synthetic ledger."""
+    directory = repository / "docs/dev/evidence"
+    baseline = json.loads((directory / "p00-inventory.json").read_text())
+    artifact = {
+        "locator": "internal/plugins/AppHome/module.js",
+        "sha256": "a" * 64,
+        "family": "web_resource",
+        "stage": "Stage 2",
+        "proposed_feature_id": "FEAT-HOME-DASHBOARD",
+    }
+    owner = repository / "app/workspace/home/README.md"
+    source = {
+        "locator": "app/workspace/home/README.md",
+        "sha256": hashlib.sha256(owner.read_bytes()).hexdigest(),
+    }
+    home = {
+        **baseline,
+        "donor_artifacts": [artifact],
+        "repository_sources": [source],
+        "totals": {
+            **baseline["totals"],
+            "donor_artifacts": 1,
+            "encrypted_jars": 0,
+            "xml_templates": 0,
+        },
+    }
+    path = directory / "home-inventory.json"
+    path.write_text(json.dumps(home), encoding="utf-8")
+    ledger_path = directory / "reimplementation.json"
+    ledger = json.loads(ledger_path.read_text())
+    record = ledger["records"]["SQX145-EV-000001"]
+    record["sources"][0].update(
+        catalog_id="E-L01",
+        artifact_locator=artifact["locator"],
+        fingerprint={"algorithm": "sha256", "value": artifact["sha256"]},
+    )
+    ledger_path.write_text(json.dumps(ledger), encoding="utf-8")
+    return path, home
+
+
+@pytest.mark.parametrize("mutation", ["none", "missing", "changed", "invalid"])
+def test_home_inventory_donor_binding(tmp_path: Path, mutation: str) -> None:
+    """Require a strict, independent Home inventory for new donor references."""
+    repository = _home_repository(tmp_path)
+    path, inventory = _add_home_inventory(repository)
+    if mutation == "missing":
+        path.unlink()
+    elif mutation == "changed":
+        inventory["donor_artifacts"][0]["sha256"] = "b" * 64
+        path.write_text(json.dumps(inventory), encoding="utf-8")
+    elif mutation == "invalid":
+        inventory["totals"]["donor_artifacts"] = 2
+        path.write_text(json.dumps(inventory), encoding="utf-8")
+        with pytest.raises(EvidenceError, match="MANIFEST_TOTALS"):
+            validate.validate_evidence(repository)
+        return
+    codes = [issue.code for issue in validate.validate_evidence(repository)]
+    assert codes == ([] if mutation == "none" else ["SOURCE_DONOR_BINDING"])
+
+
+@pytest.mark.parametrize("kind", ["donor", "repository", "cohort"])
+def test_home_inventory_conflicts_fail_closed(tmp_path: Path, kind: str) -> None:
+    """Reject ambiguous identities or cohort counts rather than picking a pin."""
+    repository = _home_repository(tmp_path)
+    path, home = _add_home_inventory(repository)
+    baseline = json.loads((path.parent / "p00-inventory.json").read_text())
+    if kind == "donor":
+        home["donor_artifacts"] = [deepcopy(baseline["donor_artifacts"][0])]
+        home["donor_artifacts"][0]["sha256"] = "b" * 64
+    elif kind == "repository":
+        home["repository_sources"] = [deepcopy(baseline["repository_sources"][0])]
+        home["repository_sources"][0]["sha256"] = "b" * 64
+    else:
+        home["totals"]["plugin_directories"] += 1
+    path.write_text(json.dumps(home), encoding="utf-8")
+    with pytest.raises(EvidenceError, match=r"INVENTORY_.*CONFLICT"):
+        validate.validate_evidence(repository)
+
+
+def test_home_inventory_repository_source_is_checked(tmp_path: Path) -> None:
+    """Include Home owner fingerprints in public ownership qualification."""
+    repository = _home_repository(tmp_path)
+    path, home = _add_home_inventory(repository)
+    baseline_path = path.parent / "p00-inventory.json"
+    baseline = json.loads(baseline_path.read_text())
+    baseline["repository_sources"] = home["repository_sources"]
+    baseline_path.write_text(json.dumps(baseline), encoding="utf-8")
+    assert validate.validate_ownership(repository) == []
+    (repository / "app/workspace/home/README.md").write_text(
+        "Changed", encoding="utf-8"
+    )
+    assert [issue.code for issue in validate.validate_ownership(repository)] == [
+        "SOURCE_HASH"
+    ]
+
+
+def test_home_inventory_is_included_in_donor_cli(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Inspect the combined manifest passed to the CLI reconciliation boundary."""
+    repository = _home_repository(tmp_path)
+    _add_home_inventory(repository)
+    received = []
+    monkeypatch.setattr(
+        validate, "__file__", str(repository / "tests/reference/validate.py")
+    )
+    monkeypatch.setattr(validate, "validate_ownership", lambda root: [])
+    monkeypatch.setattr(validate, "_fixture_checks", lambda root, ledger: [])
+    monkeypatch.setattr(validate, "resolve_roots", lambda root: root)
+    monkeypatch.setattr(
+        validate, "verify_inventory", lambda manifest, roots: received.append(manifest)
+    )
+    assert validate.main(["--check-donor"]) == 0
+    assert any(
+        item.locator == "internal/plugins/AppHome/module.js"
+        for item in received[0].donor_artifacts
+    )
+    assert received[0].totals["encrypted_jars"] == 8
 
 
 @pytest.fixture

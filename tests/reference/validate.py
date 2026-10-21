@@ -56,6 +56,8 @@ from jsonschema import Draft202012Validator
 from tests.reference.fixtures import load_fixtures
 from tests.reference.manifest import (
     EvidenceError,
+    Manifest,
+    ResourceFile,
     fingerprint,
     load_manifest,
     read_json,
@@ -103,6 +105,60 @@ def _matches_catalog_locator(locator: str, allowed: list[str]) -> bool:
     return any(
         locator == prefix or locator.startswith(f"{prefix}/") for prefix in allowed
     )
+
+
+def _merge_sources[T: ResourceFile](first: list[T], second: list[T]) -> list[T]:
+    """Merge explicit source lists, rejecting changed identities at one locator."""
+    merged = {item.locator: item for item in first}
+    for item in second:
+        previous = merged.get(item.locator)
+        if previous is not None and previous.sha256 != item.sha256:
+            _issue("INVENTORY_BINDING_CONFLICT")
+            raise EvidenceError("INVENTORY_BINDING_CONFLICT")
+        merged.setdefault(item.locator, item)
+    return list(merged.values())
+
+
+def _inventory(repository: Path) -> Manifest:
+    """Combine strict P00/Home inventories without changing either artifact."""
+    directory = resolve_locator(repository, EVIDENCE_DIRECTORY)
+    baseline = load_manifest(directory / "p00-inventory.json")
+    home_path = directory / "home-inventory.json"
+    if not home_path.exists():
+        return baseline
+    home = load_manifest(home_path)
+    for key in ("plugin_directories", "snippet_java_files"):
+        if baseline.totals[key] != home.totals[key]:
+            _issue("INVENTORY_COHORT_CONFLICT")
+            raise EvidenceError("INVENTORY_COHORT_CONFLICT")
+    artifacts = _merge_sources(baseline.donor_artifacts, home.donor_artifacts)
+    sources = _merge_sources(baseline.repository_sources, home.repository_sources)
+    totals = {
+        **baseline.totals,
+        "donor_artifacts": len(artifacts),
+        "encrypted_jars": sum(a.family == "encrypted_jar" for a in artifacts),
+        "xml_templates": sum(a.family == "xml_template" for a in artifacts),
+    }
+    return Manifest.model_validate(
+        {
+            **baseline.model_dump(),
+            "donor_artifacts": artifacts,
+            "repository_sources": sources,
+            "totals": totals,
+        }
+    )
+
+
+def _mapping_registry(repository: Path, mapping: dict[str, Any]) -> set[str]:
+    """Resolve each registered mapping only against its permitted owning README."""
+    if mapping["domain"] == "host":
+        return _registry_ids(resolve_locator(repository, "app/host/README.md"))
+    if mapping["domain"] == "workspace" and mapping["feature_ids"] == [
+        "FEAT-HOME-DASHBOARD"
+    ]:
+        owner = resolve_locator(repository, "app/workspace/home/README.md")
+        return _registry_ids(owner) if owner.is_file() else set()
+    return set()
 
 
 def _check_allocation(ledger: dict[str, Any]) -> list[ValidationIssue]:
@@ -261,12 +317,12 @@ def validate_evidence(repository: Path) -> list[ValidationIssue]:
     if list(validator.iter_errors(ledger)):
         return [_issue("LEDGER_SCHEMA")]
     issues = _check_allocation(ledger)
-    manifest = load_manifest(directory / "p00-inventory.json")
+    manifest = _inventory(repository)
     donor_hashes = {item.locator: item.sha256 for item in manifest.donor_artifacts}
-    registered = _registry_ids(resolve_locator(repository, "app/host/README.md"))
     catalogs = cast("dict[str, Any]", ledger["source_catalog"])
     records = cast("dict[str, Any]", ledger["records"])
     for identity, record in records.items():
+        registered = _mapping_registry(repository, record["target_mapping"])
         for source in record["sources"]:
             issues.extend(
                 _check_source(repository, identity, source, catalogs, donor_hashes)
@@ -287,8 +343,7 @@ def validate_ownership(
 ) -> list[ValidationIssue]:
     """Validate manifest repository sources and refuse premature runtime parity."""
     logger.debug("%s: begin", OWNER_FR, extra={"fr_id": OWNER_FR})
-    directory = resolve_locator(repository, EVIDENCE_DIRECTORY)
-    manifest = load_manifest(directory / "p00-inventory.json")
+    manifest = _inventory(repository)
     issues: list[ValidationIssue] = []
     for source in manifest.repository_sources:
         try:
@@ -355,9 +410,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         issues.extend(_fixture_checks(repository, ledger))
         if arguments.check_donor:
-            manifest = load_manifest(
-                repository / EVIDENCE_DIRECTORY / "p00-inventory.json"
-            )
+            manifest = _inventory(repository)
             verify_inventory(manifest, resolve_roots(repository))
     except EvidenceError, OSError, KeyError, TypeError, ValueError:
         logger.error("%s: invalid evidence", CLI_FR, extra={"fr_id": CLI_FR})

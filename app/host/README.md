@@ -1,5 +1,11 @@
 # Host Platform Registry (`app/host`)
 
+AppHost composes the [Home workspace](../workspace/home/README.md) with its
+existing constants, resources, session and settings services. The optional
+`home_release_feed_url` config is supplied by `HARUQUANTAI_RELEASE_FEED_URL`
+at UI/CLI entrypoints; unset means unavailable. Home contracts and status belong
+to its owning README.
+
 Status: Stage 0 (`P00`) reference qualification and evidence infrastructure active.
 Host runtime services (`F01`) belong to Stage 1 (`1A`–`1G`) and are registered when their approved implementation plans execute.
 

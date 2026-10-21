@@ -652,41 +652,41 @@ HaruQuantAI/
 
 #### 13. `app/services/brokers/metatrader.py` — `ConnectionMT4` / `ConnectionMT5` & `DataSourceMt5Api` (`FEAT-BROKER-MT5`)
 
-- **Dry Rule:** Inherits shared transport from `BaseBrokerClient` (`base.py`) and binary history decoding from `_native_history.py`.
+- **Dry Rule:** Inherits shared transport from `TradingClient` (`base.py`) and binary history decoding / Parquet export from `files.py`.
 - **Donor:** `C:\SQX-145\internal\plugins\ConnectionMT4\ConnectionMT4.jar`, `C:\SQX-145\internal\plugins\DataSourceMt5Api\DataSourceMt5Api.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.metatrader4.*`)
-- **Backend:** `app/services/brokers/metatrader.py` (`🟡 250–400L`, Docstring `<=55L`)
-- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`, `ui/app/plugins/data_source/MetaTrader/Mt5ImportModal.tsx`
-- **Class:** `ConnectionMT5`, `Mt5Api`
+- **Backend:** `app/services/brokers/metatrader.py` (`MetaTraderClient`, `Bridge`, `encode_frame`, `decode_frame`)
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfileEditorDialog.tsx`, `ui/app/plugins/data_source/MetaTrader/DataSourceMt5Api.ts`
+- **Class:** `MetaTraderClient`, `Bridge`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-BROKER-MT5-INIT`: Initialize connection to local MetaTrader 5 terminal via official MetaTrader5 Python adapter $\rightarrow$ `ConnectionMT5.initialize(terminal_path: str | None = None, login: int | None = None, server: str | None = None) -> dict[str, Any]`
-  - [ ] `FR-BROKER-MT5-ACCOUNT`: Query account balance, equity, leverage, server time, and broker specifications $\rightarrow$ `ConnectionMT5.get_account_info() -> dict[str, Any]`
-  - [ ] `FR-BROKER-MT5-STREAM`: Stream live tick and bar price feeds into bounded memory queues $\rightarrow$ `ConnectionMT5.stream_ticks(symbol: str, *, max_ticks: int = 100) -> dict[str, Any]`
-  - [ ] `FR-BROKER-MT5-ORDER`: Separately authorized execution capability, disabled in the readonly research profile: Dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal $\rightarrow$ `ConnectionMT5.send_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-BROKER-MT5-SHUTDOWN`: Terminate terminal connection session and release resources $\rightarrow$ `ConnectionMT5.shutdown() -> dict[str, Any]`
-  - [ ] `FR-DATASRC-MT5-IMPORT`: Import historical price data directly from MetaTrader 5 terminal via Python API into Parquet storage $\rightarrow$ `Mt5Api.import_data(symbol: str, timeframe: str, start_date: str, end_date: str) -> dict[str, Any]`
+  - [x] `FR-BROKER-MT5-INIT`: Initialize connection to local MetaTrader 5 terminal via EA loopback bridge $\rightarrow$ `MetaTraderClient.start() -> None`, `MetaTraderClient.wait_connected(timeout: float | None = None) -> None`, `MetaTraderClient.connect() -> bool`
+  - [x] `FR-BROKER-MT5-ACCOUNT`: Query account balance, equity, leverage, server time, and broker specifications $\rightarrow$ `MetaTraderClient.account.AccountInfo() -> Awaitable[AccountInfo]`, `MetaTraderClient.get_terminal_info() -> TerminalInfo`, `MetaTraderClient.get_account_info() -> AccountInfo | Awaitable[AccountInfo]`
+  - [x] `FR-BROKER-MT5-STREAM`: Fetch and stream live tick, bar, and transaction event feeds into bounded async queues $\rightarrow$ `MetaTraderClient.get_ticks(symbol: str, date_from: datetime | None = None, date_to: datetime | None = None, *, count: int | None = None, limit: int = 1000) -> Awaitable[list[MarketTick]]`, `MetaTraderClient.get_bars(...) -> Awaitable[list[MarketBar]]`, `MetaTraderClient.next_event(timeout: float | None = None) -> BridgeEvent`
+  - [x] `FR-BROKER-MT5-ORDER`: Separately authorized execution capability, disarmed by default (`arm()` / `disarm()`): Dispatch trading orders (buy, sell, modify, close) to MetaTrader terminal $\rightarrow$ `MetaTraderClient.trade.OrderSend(request: TradeRequest) -> Awaitable[TradeResult]`, `MetaTraderClient.call(..., requires_arm: bool = False) -> Any`
+  - [x] `FR-BROKER-MT5-SHUTDOWN`: Terminate terminal connection session and release resources $\rightarrow$ `MetaTraderClient.close() -> None`, `MetaTraderClient.close_sync() -> None`, `MetaTraderClient.disconnect() -> None`
+  - [x] `FR-DATASRC-MT5-IMPORT`: Import historical price data from MetaTrader terminal and `.hst`/`.fxt` codecs into Parquet storage $\rightarrow$ `MetaTraderClient.get_bars(...)`, `export_bars_to_parquet(...)`, `decode_hst_bytes(...)`, `decode_fxt_bytes(...)` (`app/services/brokers/files.py`)
 
 #### 14. `app/services/brokers/ctrader.py` — `ConnectionCTrader` (`FEAT-BROKER-CTRADER`)
 
-- **Dry Rule:** Inherits shared transport and HTTP retry/rate-limiting from `BaseBrokerClient` and `app/services/brokers/_http.py`.
+- **Dry Rule:** Inherits shared transport and `Trading` facade dispatch from `TradingClient` (`app/services/brokers/base.py`).
 - **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.connection.*`), `C:\SQX-145\internal\plugins\ServletConnection\ServletConnection.jar`
-- **Backend:** `app/services/brokers/ctrader.py` (`🟡 250–400L`, Docstring `<=55L`)
-- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
-- **Class:** `CTraderClient` (plus `CTraderClientCLI`)
+- **Backend:** `app/services/brokers/ctrader.py` (`CTraderClient`)
+- **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfileEditorDialog.tsx`
+- **Class:** `CTraderClient`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-BROKER-CTRADER-CONNECT`: Authenticate cTrader Open API session and resolve tradable symbol catalog $\rightarrow$ `CTraderClient.connect(credentials: Mapping[str, Any]) -> dict[str, Any]` & `CTraderClient.get_symbols() -> list[dict[str, Any]]`
-  - [ ] `FR-BROKER-CTRADER-HISTORY`: Download historical OHLCV bars and tick quotes from cTrader servers $\rightarrow$ `CTraderClient.get_bars(symbol: str, timeframe: str, start_ts: int, end_ts: int) -> dict[str, Any]` & `CTraderClient.get_ticks(symbol: str, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-BROKER-CTRADER-TRADING`: Separately authorized execution capability, disabled in the readonly research profile: Submit, modify, and close market/limit/stop orders via cTrader Open API $\rightarrow$ `CTraderClient.place_order(order_request: Mapping[str, Any]) -> dict[str, Any]` & `CTraderClient.close_position(position_id: str, volume: float | None = None) -> dict[str, Any]`
+  - [x] `FR-BROKER-CTRADER-CONNECT`: Authenticate cTrader Open API TLS/Protobuf session, rotate OAuth tokens, and resolve tradable symbol catalog $\rightarrow$ `CTraderClient.connect() -> bool`, `CTraderClient.get_symbols() -> list[str]`, `CTraderClient.get_symbol_info(symbol: str) -> SymbolInfo`
+  - [x] `FR-BROKER-CTRADER-HISTORY`: Download historical OHLCV trendbars and bid/ask tick quotes from cTrader servers $\rightarrow$ `CTraderClient.get_bars(symbol: str, timeframe: Timeframe | str = Timeframe.PERIOD_H1, date_from: datetime | None = None, date_to: datetime | None = None, **kw: Any) -> list[MarketBar]`, `CTraderClient.get_ticks(symbol: str, date_from: datetime | None = None, date_to: datetime | None = None, **kw: Any) -> list[MarketTick]`
+  - [x] `FR-BROKER-CTRADER-TRADING`: Separately authorized execution capability: Submit, reconcile, and manage orders and positions via cTrader Open API $\rightarrow$ `CTraderClient.order_send(request: TradeRequest) -> TradeResult`, `CTraderClient.order_check(request: TradeRequest) -> TradeCheckResult`, `CTraderClient.reconcile() -> tuple[list[dict[str, Any]], list[dict[str, Any]]]`
 
 #### 15. `app/services/brokers/simulator.py` — `ConnectionSimulator` (`FEAT-BROKER-SIMULATOR`)
 
-- **Dry Rule:** Inherits shared account/order contracts from `BaseBrokerClient` in `app/services/brokers/base.py`.
+- **Dry Rule:** Inherits shared account/order contracts and MQL5 `Trading` facade dispatch from `TradingClient` in `app/services/brokers/base.py`.
 - **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.connection.*`, `com.strategyquant.tradinglib.execution.*`)
-- **Backend:** `app/services/brokers/simulator.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Backend:** `app/services/brokers/simulator.py` (`SimulatorClient`)
 - **Frontend:** `ui/app/workspace/Trading/TradingDashboard.tsx`
-- **Class:** `SimulatorClient` (plus `SimulatorClientCLI`)
+- **Class:** `SimulatorClient`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-BROKER-SIM-ACCOUNT`: Simulate broker account state, balances, open positions, and pending orders in memory $\rightarrow$ `SimulatorClient.get_account_info() -> dict[str, Any]`
-  - [ ] `FR-BROKER-SIM-ORDER`: Execute deterministic market, limit, and stop orders against historical or replayed feeds $\rightarrow$ `SimulatorClient.place_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
+  - [x] `FR-BROKER-SIM-ACCOUNT`: Simulate broker account state, balances, mark-to-market equity, margin, open positions, pending orders, and deal history in memory $\rightarrow$ `SimulatorClient.get_account_info() -> AccountInfo`, `SimulatorClient.get_positions() -> list[PositionInfo]`, `SimulatorClient.get_orders() -> list[OrderInfo]`, `SimulatorClient.get_deals() -> list[DealInfo]`
+  - [x] `FR-BROKER-SIM-ORDER`: Execute deterministic market, limit, stop, stop-limit, SL/TP, and close-by orders against seeded historical or replayed tick feeds $\rightarrow$ `SimulatorClient.order_send(request: TradeRequest) -> TradeResult`, `SimulatorClient.order_check(request: TradeRequest) -> TradeCheckResult`, `SimulatorClient.feed_tick(symbol: str, *, bid: float, ask: float, **kw: Any) -> MarketTick`
 
 ---
 
@@ -694,34 +694,34 @@ HaruQuantAI/
 
 #### 16. `app/services/brokers/crypto.py` — Consolidated Crypto Exchange Clients & `DataSourceCrypto` (`FEAT-BROKER-CRYPTO`)
 
-- **Dry Rule:** All 6 exchange classes inherit shared REST pagination, rate-limiting, and Parquet persistence from `_CryptoBaseClient` + `app/services/brokers/_http.py`.
+- **Dry Rule:** All exchange clients inherit shared REST session pooling, bounded retries, rate-limit handling, and `BrokerClient` contracts from `app/services/brokers/base.py` and Parquet persistence from `app/services/brokers/files.py`.
 - **Donor:** `C:\SQX-145\internal\plugins\CryptoExchangeBinance\CryptoExchangeBinance.jar`, `C:\SQX-145\internal\plugins\CryptoExchangeBinanceCoinM\CryptoExchangeBinanceCoinM.jar`, `C:\SQX-145\internal\plugins\CryptoExchangeBinanceUsdtM\CryptoExchangeBinanceUsdtM.jar`, `C:\SQX-145\internal\plugins\CryptoExchangeBitfinex\CryptoExchangeBitfinex.jar`, `C:\SQX-145\internal\plugins\CryptoExchangeCoinbasePro\CryptoExchangeCoinbasePro.jar`, `C:\SQX-145\internal\plugins\CryptoExchangePoloniex\CryptoExchangePoloniex.jar`, `C:\SQX-145\internal\plugins\DataSourceCrypto\DataSourceCrypto.jar`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.crypto.*`, `com.strategyquant.tradinglib.exchange.*`)
-- **Backend:** `app/services/brokers/crypto.py` (`🟡 350–500L`, Docstring `<=75L`)
-- **Frontend:** `ui/app/plugins/data_source/Crypto/CryptoModal.tsx`
-- **Class:** `BinanceSpot`, `BinanceCoinM`, `BinanceUsdtM`, `Bitfinex`, `Coinbase`, `Poloniex`, `Crypto` (plus `CryptoCLI`)
+- **Backend:** `app/services/brokers/crypto.py` (`CryptoClient`, `BinanceClient`, `BitfinexClient`, `CoinbaseClient`, `PoloniexClient`)
+- **Frontend:** `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`, `ui/app/plugins/data_source/Crypto/crypto.ts`
+- **Class:** `CryptoClient`, `BinanceClient`, `BitfinexClient`, `CoinbaseClient`, `PoloniexClient`, `BitfinexExchangeAdapter`, `CoinbaseExchangeAdapter`, `PoloniexExchangeAdapter`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-CRYPTO-BINANCE-INFO`: Fetch Binance spot exchange info, tradable symbols, and price filters $\rightarrow$ `BinanceSpot.get_exchange_info() -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-BINANCE-STREAM`: Stream live ticker, depth, and 1-minute Kline bars over Binance WebSocket $\rightarrow$ `BinanceSpot.stream_klines(symbol: str, interval: str = "1m") -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-BINANCE-HISTORY`: Download historical Kline bar archives for backtesting $\rightarrow$ `BinanceSpot.download_historical_bars(symbol: str, interval: str, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-BINANCE-ORDER`: Separately authorized execution capability, disabled in the readonly research profile: Execute spot limit and market orders with HMAC SHA256 signature authentication $\rightarrow$ `BinanceSpot.place_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-COINM-CONTRACTS`: Fetch Coin-M contract specifications and index prices $\rightarrow$ `BinanceCoinM.get_contracts() -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-COINM-FUNDING`: Fetch Coin-M funding rates and historical intervals $\rightarrow$ `BinanceCoinM.get_funding_rate(symbol: str) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-COINM-STREAM`: Stream real-time futures mark price and order book depth $\rightarrow$ `BinanceCoinM.stream_mark_price(symbol: str) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-COINM-LEVERAGE`: Manage Coin-M positions, leverage brackets, and margin types $\rightarrow$ `BinanceCoinM.set_leverage(symbol: str, leverage: int) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-USDTM-INFO`: Fetch USDT-M contract rules, tick sizes, step sizes, and funding intervals $\rightarrow$ `BinanceUsdtM.get_exchange_info() -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-USDTM-STREAM`: Stream real-time USDT-M Kline bars and aggregated trade events $\rightarrow$ `BinanceUsdtM.stream_trades(symbol: str) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-USDTM-HISTORY`: Download historical USDT-M futures Kline bar archives $\rightarrow$ `BinanceUsdtM.download_futures_klines(symbol: str, interval: str, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-USDTM-ORDER`: Separately authorized execution capability, disabled in the readonly research profile: Place and cancel futures limit, stop-market, and trailing stop orders $\rightarrow$ `BinanceUsdtM.send_futures_order(order_request: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-BITFINEX-SYMBOLS`: Fetch Bitfinex currency pairs, symbols, and minimum order sizes $\rightarrow$ `Bitfinex.get_symbols() -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-BITFINEX-STREAM`: Stream real-time raw book and candle feeds over WebSocket $\rightarrow$ `Bitfinex.stream_candles(symbol: str, timeframe: str = "1m") -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-BITFINEX-HISTORY`: Query historical candle archives for backtesting $\rightarrow$ `Bitfinex.fetch_candles(symbol: str, timeframe: str, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-COINBASE-PRODUCTS`: Fetch Coinbase product catalog, base/quote currencies, and increments $\rightarrow$ `Coinbase.get_products() -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-COINBASE-STREAM`: Stream live market trades and heartbeats via Coinbase WebSocket $\rightarrow$ `Coinbase.stream_market_data(product_id: str) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-COINBASE-HISTORY`: Download historical candle data chunks and save to Parquet $\rightarrow$ `Coinbase.download_candles(product_id: str, granularity: int, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-POLONIEX-MARKETS`: Query Poloniex market definitions and trading rules $\rightarrow$ `Poloniex.get_markets() -> dict[str, Any]`
-  - [ ] `FR-CRYPTO-POLONIEX-HISTORY`: Fetch historical candlestick records for crypto asset pairs $\rightarrow$ `Poloniex.get_candles(symbol: str, interval: str, start_ts: int, end_ts: int) -> dict[str, Any]`
-  - [ ] `FR-DATASRC-CRYPTO-ADD`: Add cryptocurrency data symbols and exchange pairs to SQLite via `HostPersistence` $\rightarrow$ `Crypto.add(symbol_config: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-DATASRC-CRYPTO-IMPORT`: Download and import historical crypto candlestick data into Parquet catalog $\rightarrow$ `Crypto.import_data(exchange: str, symbol: str, timeframe: str, start_date: str, end_date: str) -> dict[str, Any]`
+  - [x] `FR-CRYPTO-BINANCE-INFO`: Fetch Binance spot exchange info, tradable symbols, and price/lot filters $\rightarrow$ `BinanceClient.get_symbol_info(symbol: str) -> SymbolInfo`, `BinanceClient.get_symbols() -> list[str]`
+  - [x] `FR-CRYPTO-BINANCE-STREAM`: Retrieve aggregate trade tick feeds and 1-minute Kline bars from Binance Spot API $\rightarrow$ `BinanceClient.get_ticks(symbol: str, ...) -> list[MarketTick]`, `BinanceClient.get_bars(symbol: str, timeframe: Timeframe | str = Timeframe.PERIOD_H1, ...) -> list[MarketBar]`
+  - [x] `FR-CRYPTO-BINANCE-HISTORY`: Download deduplicated historical Kline bar and trade archives for backtesting $\rightarrow$ `BinanceClient.get_bars(...) -> list[MarketBar]`, `BinanceClient.get_ticks(...) -> list[MarketTick]`
+  - [x] `FR-CRYPTO-BINANCE-ORDER`: Enforced read-only `BrokerClient` data boundary (live trade mutations isolated to `TradingClient` backends per `test_data_broker_client_blocks_execution_mutations`)
+  - [x] `FR-CRYPTO-COINM-CONTRACTS`: Fetch Coin-M (`/dapi/v1`) contract specifications, tick/lot filters, and symbol catalog $\rightarrow$ `CryptoClient(venue="coin-m").get_symbol_info(symbol: str) -> SymbolInfo`, `CryptoClient(venue="coin-m").get_symbols() -> list[str]`
+  - [x] `FR-CRYPTO-COINM-FUNDING`: Historical Coin-M futures Kline and trade ingestion via `/dapi/v1/klines` and `/dapi/v1/aggTrades` $\rightarrow$ `CryptoClient(venue="coin-m").get_bars(...) -> list[MarketBar]`
+  - [x] `FR-CRYPTO-COINM-STREAM`: Retrieve Coin-M futures aggregate trade ticks and bars $\rightarrow$ `CryptoClient(venue="coin-m").get_ticks(...) -> list[MarketTick]`
+  - [x] `FR-CRYPTO-COINM-LEVERAGE`: Enforced read-only `BrokerClient` data boundary for Coin-M historical venue
+  - [x] `FR-CRYPTO-USDTM-INFO`: Fetch USDT-M (`/fapi/v1`) contract rules, tick sizes, and step sizes $\rightarrow$ `CryptoClient(venue="usdt-m").get_symbol_info(symbol: str) -> SymbolInfo`, `CryptoClient(venue="usdt-m").get_symbols() -> list[str]`
+  - [x] `FR-CRYPTO-USDTM-STREAM`: Retrieve USDT-M Kline bars and aggregated trade events (`/fapi/v1/aggTrades`) $\rightarrow$ `CryptoClient(venue="usdt-m").get_ticks(symbol: str, ...) -> list[MarketTick]`
+  - [x] `FR-CRYPTO-USDTM-HISTORY`: Download historical USDT-M futures Kline bar archives (`/fapi/v1/klines`) $\rightarrow$ `CryptoClient(venue="usdt-m").get_bars(symbol: str, timeframe: Timeframe | str = Timeframe.PERIOD_H1, ...) -> list[MarketBar]`
+  - [x] `FR-CRYPTO-USDTM-ORDER`: Enforced read-only `BrokerClient` data boundary for USDT-M historical venue
+  - [x] `FR-CRYPTO-BITFINEX-SYMBOLS`: Resolve Bitfinex currency pairs and symbol catalog $\rightarrow$ `BitfinexClient.get_symbols() -> list[str]`
+  - [x] `FR-CRYPTO-BITFINEX-STREAM`: Retrieve Bitfinex v2 trade candle feeds $\rightarrow$ `BitfinexClient.get_bars(symbol: str, timeframe: Timeframe | str = Timeframe.PERIOD_H1, ...) -> list[MarketBar]`
+  - [x] `FR-CRYPTO-BITFINEX-HISTORY`: Query historical candle archives from Bitfinex API v2 (`/v2/candles/trade:{interval}:{sym}/hist`) $\rightarrow$ `BitfinexExchangeAdapter.get_bars(...) -> list[MarketBar]`
+  - [x] `FR-CRYPTO-COINBASE-PRODUCTS`: Resolve Coinbase product catalog and base/quote pair formatting $\rightarrow$ `CoinbaseClient.get_symbols() -> list[str]`, `CoinbaseExchangeAdapter._format_product_id(symbol: str) -> str`
+  - [x] `FR-CRYPTO-COINBASE-STREAM`: Retrieve Coinbase candle feeds $\rightarrow$ `CoinbaseClient.get_bars(symbol: str, timeframe: Timeframe | str = Timeframe.PERIOD_H1, ...) -> list[MarketBar]`
+  - [x] `FR-CRYPTO-COINBASE-HISTORY`: Download historical candle data from Coinbase (`/products/{product_id}/candles`) and export to Parquet $\rightarrow$ `CoinbaseExchangeAdapter.get_bars(...) -> list[MarketBar]`, `export_bars_to_parquet(...)`
+  - [x] `FR-CRYPTO-POLONIEX-MARKETS`: Resolve Poloniex market definitions and symbol pairs $\rightarrow$ `PoloniexClient.get_symbols() -> list[str]`, `PoloniexExchangeAdapter._format_symbol(symbol: str) -> str`
+  - [x] `FR-CRYPTO-POLONIEX-HISTORY`: Fetch historical candlestick records from Poloniex (`/markets/{sym}/candles`) $\rightarrow$ `PoloniexClient.get_bars(...) -> list[MarketBar]`, `PoloniexExchangeAdapter.get_bars(...) -> list[MarketBar]`
+  - [x] `FR-DATASRC-CRYPTO-ADD`: Add cryptocurrency symbols and exchange definitions $\rightarrow$ `cryptoService.add(...)` (`ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`)
+  - [x] `FR-DATASRC-CRYPTO-IMPORT`: Download and import historical crypto candlestick data into catalog / Parquet storage $\rightarrow$ `CryptoClient.get_bars(...)`, `export_bars_to_parquet(...)`, `cryptoService.download(...)`
 
 ---
 
@@ -739,67 +739,67 @@ HaruQuantAI/
 
 #### 1. `app/services/include/time.py` — `HQTime` (`FEAT-INCLUDE-TIME`)
 
-- **Dry Rule:** Single source of truth for microsecond UTC/timezone calendar arithmetic across all services and workspaces.
+- **Dry Rule:** Single source of truth for epoch-millisecond UTC/timezone calendar arithmetic across all services and workspaces.
 - **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.SQTime`), `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.timezone.*`, `com.strategyquant.datalib.session.*`)
-- **Backend:** `app/services/include/time.py` (`🟡 200–350L`, Docstring `<=45L`)
+- **Backend:** `app/services/include/time.py` (`HQTime`)
 - **Frontend:** N/A (Core backend primitive)
 - **Class:** `HQTime`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-INCLUDE-TIME-ARITHMETIC`: Perform microsecond-exact timestamp arithmetic, timezone shifts, and session boundary checks $\rightarrow$ `HQTime.convert_timezone(timestamp_us: int, from_tz: str, to_tz: str) -> int`, `HQTime.add_interval(timestamp_us: int, unit: str, amount: int) -> int`, `HQTime.is_within_session(timestamp_us: int, session_open_min: int, session_close_min: int) -> bool`
+  - [x] `FR-INCLUDE-TIME-ARITHMETIC`: Perform epoch-millisecond timestamp arithmetic, calendar component extraction, formatting/parsing, and session boundary checks $\rightarrow$ `HQTime.to_long(year: int, month: int, day: int, hour: int = 0, minute: int = 0, second: int = 0) -> int`, `HQTime.add_days(time_ms: int, days: int) -> int`, `HQTime.add_hours(time_ms: int, hours: float) -> int`, `HQTime.set_hhmm(time_ms: int, hhmm: int) -> int`, `HQTime.get_ymd(time_ms: int) -> int`, `HQTime.get_hhmm(time_ms: int) -> int`, `HQTime.correct_day_start(time_ms: int) -> int`, `HQTime.correct_day_end_mt(time_ms: int) -> int`
 
-#### 2. `app/services/include/bar_time.py` — `BarTime` (`FEAT-INCLUDE-BARTIME`)
+#### 2. `app/services/include/bar_time.py` — `BarTime`, `DateTimeSeries` & `TimeConditions` (`FEAT-INCLUDE-BARTIME`)
 
-- **Dry Rule:** Depends on `HQTime`; centralizes bar open/close boundary alignment across all timeframes.
+- **Dry Rule:** Depends on `HQTime` and `IndicatorSeries`; centralizes shift-indexed bar timestamp extraction and temporal rule predicates across all timeframes.
 - **Donor:** `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.timeframe.*`, `com.strategyquant.datalib.bartype.*`)
-- **Backend:** `app/services/include/bar_time.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Backend:** `app/services/include/bar_time.py` (`BarTime`, `DateTimeSeries`, `TimeConditions`, `format_timestamp`, `normalize_timestamps`)
 - **Frontend:** N/A (Core backend primitive)
-- **Class:** `BarTime`
+- **Class:** `BarTime`, `DateTimeSeries`, `TimeConditions`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-INCLUDE-BARTIME-ALIGN`: Align intraday, daily, weekly, and monthly bar open/close boundaries $\rightarrow$ `BarTime.floor_bar_time(timestamp_us: int, timeframe: str) -> int`, `BarTime.ceil_bar_time(timestamp_us: int, timeframe: str) -> int`, `BarTime.timeframe_seconds(timeframe: str) -> int`
+  - [x] `FR-INCLUDE-BARTIME-ALIGN`: Extract shift-indexed bar calendar/clock components and evaluate temporal rule predicates $\rightarrow$ `BarTime.bar_hour(shift: int = 0) -> int`, `BarTime.bar_minute(shift: int = 0) -> int`, `BarTime.bar_day_of_week(shift: int = 0) -> int`, `BarTime.bar_day_of_month(shift: int = 0) -> int`, `BarTime.bar_month(shift: int = 0) -> int`, `BarTime.bar_date(shift: int = 0) -> int`, `BarTime.bar_time(shift: int = 0) -> int`, `TimeConditions.bar_hour_is(...) -> bool`, `TimeConditions.bar_day_of_week_is(...) -> bool`, `normalize_timestamps(timestamps: Any) -> np.ndarray`
 
 #### 3. `app/services/include/generators.py` — `RandomGenerator` (`FEAT-INCLUDE-RNG`)
 
-- **Dry Rule:** Deterministic `SplitMix64` / `XorShift128+` PRNG shared by genetic evolution, Monte Carlo, and SPP engines.
+- **Dry Rule:** Deterministic seeded PRNG shared by genetic evolution, Monte Carlo, and SPP engines.
 - **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.IRandomGenerator`, `com.strategyquant.lib.RandomGenerator`)
-- **Backend:** `app/services/include/generators.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Backend:** `app/services/include/generators.py` (`RandomGenerator`)
 - **Frontend:** N/A (Core backend primitive)
 - **Class:** `RandomGenerator`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-INCLUDE-RNG-STREAM`: Generate reproducible pseudo-random streams (`XorShift128+` / `SplitMix64`) for genetic evolution and Monte Carlo permutations $\rightarrow$ `RandomGenerator.next_float(low: float = 0.0, high: float = 1.0) -> float`, `RandomGenerator.next_int(low: int, high: int) -> int`, `RandomGenerator.permutation(length: int) -> np.ndarray`
+  - [x] `FR-INCLUDE-RNG-STREAM`: Generate reproducible pseudo-random streams (uniform floats, stepped integers, Gaussian variates, Bernoulli trials, and cloned state) for genetic evolution and Monte Carlo permutations $\rightarrow$ `RandomGenerator.next_double(min_val: float | None = None, max_val: float | None = None, step: float = 0.0, decimals: int = 4) -> float`, `RandomGenerator.next_int(bound_or_min: int, max_val: int | None = None, step: int = 1) -> int`, `RandomGenerator.next_gaussian() -> float`, `RandomGenerator.probability(prob: float) -> bool`, `RandomGenerator.clone(seed: int | None = None) -> RandomGenerator`
 
-#### 4. `app/services/include/data.py` — `DataSeries` & `HistoryDataLoader` (`FEAT-INCLUDE-DATA`)
+#### 4. `app/services/include/data.py` — `DataBackend`, `get_historical_bars` & `bars_to_dataframe` (`FEAT-INCLUDE-DATA`)
 
-- **Dry Rule:** Shared columnar OHLCV/tick access and bounded Parquet decoding for indicators and engines. Zero-copy conversion is conditional on compatible buffers; compressed Parquet decoding may allocate.
+- **Dry Rule:** Shared historical OHLCV/tick retrieval, request/row boundary validation, and DataFrame conversion across broker and local data backends.
 - **Donor:** `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.DataSeries`, `com.strategyquant.datalib.dataseries.*`, `com.strategyquant.datalib.historyData.*`)
-- **Backend:** `app/services/include/data.py` (`🟡 250–400L`, Docstring `<=50L`)
+- **Backend:** `app/services/include/data.py` (`DataBackend`, `get_historical_bars`, `get_ticks`, `bars_to_dataframe`, `ticks_to_dataframe`, `validate_request`, `validate_rows`)
 - **Frontend:** N/A (Core backend primitive)
-- **Class:** `DataSeries`, `HistoryDataLoader`
+- **Class:** `DataBackend`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-INCLUDE-DATA-SERIES`: Provide zero-copy NumPy/PyArrow columnar OHLCV bar series, reverse-indexed shift access, and tick buffers $\rightarrow$ `DataSeries.from_arrays(timestamps: np.ndarray, opens: np.ndarray, highs: np.ndarray, lows: np.ndarray, closes: np.ndarray, volumes: np.ndarray, *, symbol: str = "", timeframe: str = "H1") -> DataSeries` & `HistoryDataLoader.load_parquet(file_path: Path | str) -> DataSeries`
+  - [x] `FR-INCLUDE-DATA-SERIES`: Retrieve, validate, and convert historical OHLCV bar series and tick buffers $\rightarrow$ `get_historical_bars(backend: DataBackend, symbol: str, timeframe: Timeframe, ...) -> list[MarketBar]`, `get_ticks(backend: DataBackend, symbol: str, ...) -> list[MarketTick]`, `bars_to_dataframe(bars: Iterable[MarketBar]) -> pd.DataFrame`, `ticks_to_dataframe(ticks: Iterable[MarketTick]) -> pd.DataFrame`, `validate_request(...) -> None`, `validate_rows(...) -> list[MarketBar | MarketTick]`
 
-#### 5. `app/services/include/contracts.py`, `enums.py`, `trading.py` — Domain Contracts (`FEAT-INCLUDE-TRADING`)
+#### 5. `app/services/include/contracts.py`, `enums.py`, `trading.py` — Domain Contracts & Trading Facade (`FEAT-INCLUDE-TRADING`)
 
-- **Dry Rule:** Immutable frozen dataclasses and canonical trading enums shared across simulation, brokers, and results analysis.
+- **Dry Rule:** Canonical dataclasses, trading enums, and unified eight-class MQL5 `Trading` proxy facade shared across simulation, brokers, and results analysis.
 - **Donor:** `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.Order`, `com.strategyquant.tradinglib.OrdersList`, `com.strategyquant.tradinglib.Trader`, `com.strategyquant.tradinglib.consts.*`)
-- **Backend:** `app/services/include/contracts.py` (`🟢 <200L`), `app/services/include/enums.py` (`🟢 <200L`), `app/services/include/trading.py` (`🟡 200–350L`)
+- **Backend:** `app/services/include/contracts.py`, `app/services/include/enums.py`, `app/services/include/trading.py`
 - **Frontend:** N/A (Core backend contracts)
-- **Class:** `OrderRecord`, `TradeRecord`, `PositionState`, `ExecutionReport`
+- **Class:** `MarketBar`, `MarketTick`, `AccountInfo`, `TerminalInfo`, `SymbolInfo`, `OrderInfo`, `PositionInfo`, `DealInfo`, `TradeRequest`, `TradeResult`, `TradeCheckResult`, `TradingSession`, `Trading`, `Trade`, `AccountProxy`, `TerminalProxy`, `SymbolProxy`, `OrderProxy`, `HistoryOrderProxy`, `PositionProxy`, `DealProxy`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-INCLUDE-TRADING-CONTRACTS`: Construct and validate immutable order, fill, position, trade, and execution records $\rightarrow$ `OrderRecord.create(symbol: str, direction: str, order_type: str, lots: float, price: float, *, stop_loss: float = 0.0, profit_target: float = 0.0, magic_number: int = 0, comment: str = "") -> OrderRecord` & `TradeRecord.from_closed_order(order: OrderRecord, close_time_us: int, close_price: float, gross_pnl: float, commission: float, swap: float) -> TradeRecord`
+  - [x] `FR-INCLUDE-TRADING-CONTRACTS`: Construct, validate, and dispatch canonical market data, order, fill, position, deal, session, and MQL5 trading proxy contracts $\rightarrow$ `Trading(backend: TradingBackend)`, `Trade.OrderSend(request: TradeRequest) -> Awaitable[TradeResult]`, `Trade.OrderCheck(request: TradeRequest) -> Awaitable[TradeCheckResult]`, `TradingSession.contains(dt: datetime) -> bool`
 
 #### 6. `app/services/include/{comparisons,functions,price,actions,types}.py` — `CoreSignalAndMathInclude` (`FEAT-INCLUDE-SIGNAL`)
 
-- **Dry Rule:** Single class per module with zero duplicate module-level wrapper functions; shared across snippets, indicators, and rule compilers.
+- **Dry Rule:** Unified signal building block modules and facades (`Comparisons`, `Functions`, `BarPrice`/`QuotePrice`/`MTFPrice`/`SessionPrice`/`HeikenAshiPrice`, `Actions`, `Types`) shared across snippets, indicators, and rule compilers.
 - **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\Comparisons\`, `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\Functions\`, `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\Price\`, `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\OtherActions\`, `C:\SQX-145\internal\extend\Snippets\SQ\Functions\`, `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.blocks.*`, `com.strategyquant.tradinglib.Variable.*`)
-- **Backend:** `app/services/include/{comparisons,functions,price,actions,types}.py` (each `🟢 <200L` to `🟡 200–350L`)
+- **Backend:** `app/services/include/{comparisons,functions,price,actions,types}.py`
 - **Frontend:** N/A (Core backend signal primitives)
-- **Class:** `Comparisons`, `Functions`, `Price`, `Actions`, `Types`
+- **Class:** `Comparisons`, `Functions`, `BarPrice`, `QuotePrice`, `MTFPrice`, `SessionPrice`, `HeikenAshiPrice`, `Actions`, `Types`, `Variable`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-INCLUDE-COMPARISONS`: Evaluate tick-size-aware equality, crossovers, and directional conditions (`comparisons.py`) $\rightarrow$ `Comparisons.crosses_above(series_a: np.ndarray, series_b: np.ndarray | float, shift: int = 0) -> bool`, `Comparisons.crosses_below(series_a: np.ndarray, series_b: np.ndarray | float, shift: int = 0) -> bool`, `Comparisons.is_equal_fuzzy(val_a: float, val_b: float, tick_size: float = 1e-5) -> bool`
-  - [ ] `FR-INCLUDE-FUNCTIONS`: Execute bar-window statistical aggregations, linear regression slopes, and safe division (`functions.py`) $\rightarrow$ `Functions.highest_in_range(series: np.ndarray, period: int, shift: int = 0) -> float`, `Functions.lowest_in_range(series: np.ndarray, period: int, shift: int = 0) -> float`, `Functions.linreg_slope(series: np.ndarray, period: int, shift: int = 0) -> float`, `Functions.safe_divide(numerator: float, denominator: float, fallback: float = 0.0) -> float`
-  - [ ] `FR-INCLUDE-PRICE`: Compute derived bar prices (`BarPrice`, `QuotePrice`, `MTFPrice`, `SessionPrice`, `HeikenAshi`) and normalize tick steps (`price.py`) $\rightarrow$ `Price.compute_series(bars: DataSeries, price_type: str = "typical") -> np.ndarray`, `Price.round_to_tick(price: float, tick_size: float) -> float`
-  - [ ] `FR-INCLUDE-ACTIONS`: Execute strategy side-effect action blocks, lot normalization, and variable assignments (`actions.py`) $\rightarrow$ `Actions.normalize_lots(lots: float, min_lot: float = 0.01, max_lot: float = 100.0, lot_step: float = 0.01) -> float`, `Actions.assign_variable(store: dict[str, Any], name: str, value: Any) -> dict[str, Any]`
-  - [ ] `FR-INCLUDE-TYPES`: Manage generic mutable strategy variables, typed containers, and boolean formula evaluation (`types.py`) $\rightarrow$ `Types.define_variable(name: str, var_type: str, default_value: Any) -> dict[str, Any]`, `Types.evaluate_formula(expression: str, context: Mapping[str, Any]) -> Any`
+  - [x] `FR-INCLUDE-COMPARISONS`: Evaluate precision-aware equality, crossovers, directional trend persistence, rolling counts, percentiles, and MA relations (`comparisons.py`) $\rightarrow$ `crosses_above(left: Any, right: Any, shift: int = 0, precision: int = 6) -> bool`, `crosses_below(left: Any, right: Any, shift: int = 0, precision: int = 6) -> bool`, `equals(left: Any, right: Any, shift: int = 0, precision: int = 6) -> bool`, `is_greater(...) -> bool`, `is_lower(...) -> bool`, `is_rising(...) -> bool`, `is_falling(...) -> bool`, `Comparisons`
+  - [x] `FR-INCLUDE-FUNCTIONS`: Execute arithmetic with zero-division safeguard, math primitives, temporal integer builders, rolling window Nth-rank extractors, and pip conversions (`functions.py`) $\rightarrow$ `indicator_highest(source: Any, period: int, nth: int = 0, shift: int = 0) -> float`, `indicator_lowest(source: Any, period: int, nth: int = 0, shift: int = 0) -> float`, `division(left: Any, right: Any, shift: int = 0) -> float`, `convert_price_to_pips(price_diff: float, point: float = 0.0001, digits: int = 4) -> float`, `Functions`
+  - [x] `FR-INCLUDE-PRICE`: Compute single-bar, quote spread, multi-timeframe (`Daily`/`Weekly`/`Monthly`), intraday session window, and Heiken Ashi price blocks (`price.py`) $\rightarrow$ `BarPrice`, `QuotePrice`, `MTFPrice`, `SessionPrice`, `HeikenAshiPrice`
+  - [x] `FR-INCLUDE-ACTIONS`: Execute strategy side-effect action blocks, variable assignments with boolean coercion, chart annotations, journal/file logging, and email alerts (`actions.py`) $\rightarrow$ `Actions.assign(variable: Variable[Any], value: Any, is_boolean: bool = False) -> ActionRecord`, `Actions.draw_up_arrow(...) -> ActionRecord`, `Actions.log_journal(...) -> ActionRecord`, `Actions.send_email(...) -> ActionRecord`
+  - [x] `FR-INCLUDE-TYPES`: Manage generic mutable strategy variables (`Variable[T]`), typed variable blocks (`BooleanVariable`, `DoubleVariable`, `IntVariable`), and constant evaluators (`types.py`) $\rightarrow$ `Types.create_variable(name: str, var_type: str, initial_value: T) -> Variable[T]`, `Types.boolean(value: bool = True) -> float`, `Types.number(value: float = 0.0) -> float`
 
 ---
 
@@ -807,19 +807,19 @@ HaruQuantAI/
 
 #### 7. `app/services/indicators/base.py` & 6 Category Packages — `CoreIndicatorLibrary` (`FEAT-INDICATORS`)
 
-- **Dry Rule:** `BaseIndicator` implements the 8 shared signal condition methods (`is_rising`, `is_falling`, `crosses_above`, `crosses_below`, `is_higher`, `is_lower`, `changes_up`, `changes_down`) once. Concrete indicator classes implement `calculate(cls, data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]` and inherit the 8 condition methods automatically.
+- **Dry Rule:** `IndicatorSeries` in `base.py` implements the universal signal condition methods (`is_rising`, `is_falling`, `crosses_above`, `crosses_below`, `is_greater`, `is_lower`, `is_higher`, `changes_up`, `changes_down`) once, and `BaseIndicator` provides shared `to_numpy` conversion and abstract `calculate(...) -> IndicatorSeries` contract. Concrete indicator classes implement `calculate(...)` and return `IndicatorSeries` instances with all condition methods automatically available.
 - **Donor:** `C:\SQX-145\internal\extend\Snippets\SQ\Blocks\Indicators\`, `C:\SQX-145\internal\extend\Snippets\SQ\TALibIndicators\`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.indicators.*`), `C:\SQX-145\internal\libs\SQAppLib.jar.enc` (`com.strategyquant.tradinglib.indicators.*`)
-- **Backend:** `app/services/indicators/base.py` (`🟡 200–300L`), `app/services/indicators/momentum/` (18 files, each `🟢 <150L`), `app/services/indicators/price_action/` (11 files, each `🟢 <150L`), `app/services/indicators/regime/` (9 files, each `🟢 <150L`), `app/services/indicators/trend/` (14 files, each `🟢 <150L`), `app/services/indicators/volatility/` (9 files, each `🟢 <150L`), `app/services/indicators/volume/` (9 files, each `🟢 <150L`)
+- **Backend:** `app/services/indicators/base.py` (`271L`), `app/services/indicators/momentum/` (18 files, 18 classes), `app/services/indicators/price_action/` (10 files, 10 classes), `app/services/indicators/regime/` (3 files, 3 classes), `app/services/indicators/trend/` (16 files, 16 classes), `app/services/indicators/volatility/` (15 files, 15 classes), `app/services/indicators/volume/` (9 files, 11 classes)
 - **Frontend:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
-- **Class:** `BaseIndicator`; Momentum (`RSI`, `CCI`, `Stochastic`, `Momentum`, `WilliamsR`, `MACD`, `DeMarker`, `ROC`, `Reflex`, `Trendflex`, `LaguerreRSI`, `QQE`, `BearsPower`, `BullsPower`, `AwesomeOscillator`, `AcceleratorOscillator`, `TSI`, `UltimateOscillator`); Price Action (`Fractals`, `HeikenAshi`, `Highest`, `Lowest`, `Pivots`, `FibPivots`, `CamarillaPivots`, `SessionOhlc`, `Ichimoku`, `ZigZag`, `PriceChannel`); Regime (`ADX`, `ADXR`, `Aroon`, `ChopIndex`, `Hurst`, `MarketFacilitationIndex`, `Vortex`, `GannHiLo`, `EfficiencyRatio`); Trend (`SMA`, `EMA`, `SMMA`, `LWMA`, `TEMA`, `DEMA`, `HullMA`, `KAMA`, `ALMA`, `SuperTrend`, `ParabolicSAR`, `LinearRegression`, `Alligator`, `GatorOscillator`); Volatility (`ATR`, `TrueRange`, `BollingerBands`, `KeltnerChannel`, `DonchianChannel`, `StandardDeviation`, `UlcerIndex`, `BBWidthRatio`, `ChaikinVolatility`); Volume (`OBV`, `MFI`, `ChaikinMoneyFlow`, `AccumulationDistribution`, `ForceIndex`, `EaseOfMovement`, `VolumeOscillator`, `VWAP`, `TickVolume`)
+- **Class:** `BaseIndicator`, `IndicatorSeries`; Momentum (`AwesomeOscillator`, `BearsPower`, `BullsPower`, `CCI`, `DeMarker`, `LaguerreRSI`, `MACD`, `Momentum`, `OSMA`, `PriceVelocity`, `QQE`, `Reflex`, `ROC`, `RSI`, `SchaffTrendCycle`, `Stochastic`, `WaveTrend`, `WilliamsPR`); Price Action (`CandlestickPatterns`, `ChartPatterns`, `Fibo`, `Fractal`, `HeikenAshi`, `HighestLowest`, `LevelClustering`, `Pivots`, `PriceGap`, `ZigZag`); Regime (`ChoppinessIndex`, `HurstExponent`, `MarketRegimeResolver`); Trend (`ADX`, `Aroon`, `DirectionalIndex`, `DonchianChannels`, `GannHiLo`, `HullMovingAverage`, `Ichimoku`, `KAMA`, `KaufmanEfficiencyRatio`, `LinReg`, `MovingAverage`, `ParabolicSAR`, `Supertrend`, `TEMA`, `Trend`, `Vortex`); Volatility (`AverageDailyRange`, `AmihudIlliquidity`, `ATR`, `BarRange`, `BollingerBands`, `GarmanKlassVolatility`, `KeltnerChannel`, `MTATR`, `MTKeltnerChannel`, `ParkinsonVolatility`, `RogersSatchellVolatility`, `SRPercentRank`, `StdDev`, `TrueRange`, `UlcerIndex`); Volume (`AnchoredVWAP`, `AvgVolume`, `CMF`, `COT`, `OBV`, `MFI`, `CumulativeVolumeDelta`, `AggressiveTradeImbalance`, `TPOProfile`, `VolumeProfile`, `VWAP`)
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-IND-BASE-CONDITIONS`: Evaluate universal indicator signal conditions on any calculated indicator buffer $\rightarrow$ `BaseIndicator.is_rising(buffer: np.ndarray, shift: int = 0, bars: int = 1) -> bool`, `BaseIndicator.is_falling(buffer: np.ndarray, shift: int = 0, bars: int = 1) -> bool`, `BaseIndicator.crosses_above(buffer: np.ndarray, target: np.ndarray | float, shift: int = 0) -> bool`, `BaseIndicator.crosses_below(buffer: np.ndarray, target: np.ndarray | float, shift: int = 0) -> bool`, `BaseIndicator.is_higher(buffer: np.ndarray, target: np.ndarray | float, shift: int = 0) -> bool`, `BaseIndicator.is_lower(buffer: np.ndarray, target: np.ndarray | float, shift: int = 0) -> bool`, `BaseIndicator.changes_up(buffer: np.ndarray, shift: int = 0) -> bool`, `BaseIndicator.changes_down(buffer: np.ndarray, shift: int = 0) -> bool`
-  - [ ] `FR-IND-MOMENTUM`: Compute all 18 momentum oscillators $\rightarrow$ `<IndicatorClass>.calculate(data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]`
-  - [ ] `FR-IND-PRICE-ACTION`: Compute all 11 price-action & structural level indicators $\rightarrow$ `<IndicatorClass>.calculate(data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]`
-  - [ ] `FR-IND-REGIME`: Compute all 9 market regime & directional filters $\rightarrow$ `<IndicatorClass>.calculate(data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]`
-  - [ ] `FR-IND-TREND`: Compute all 14 trend moving averages & envelopes $\rightarrow$ `<IndicatorClass>.calculate(data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]`
-  - [ ] `FR-IND-VOLATILITY`: Compute all 9 volatility bands & range measures $\rightarrow$ `<IndicatorClass>.calculate(data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]`
-  - [ ] `FR-IND-VOLUME`: Compute all 9 volume & money-flow indicators $\rightarrow$ `<IndicatorClass>.calculate(data: DataSeries | np.ndarray, **params: Any) -> np.ndarray | dict[str, np.ndarray]`
+  - [x] `FR-IND-BASE-CONDITIONS`: Evaluate universal indicator signal conditions on any calculated `IndicatorSeries` buffer $\rightarrow$ `IndicatorSeries.is_rising(shift: int = 0) -> bool`, `IndicatorSeries.is_falling(shift: int = 0) -> bool`, `IndicatorSeries.crosses_above(level: float | IndicatorSeries, shift: int = 0) -> bool`, `IndicatorSeries.crosses_below(level: float | IndicatorSeries, shift: int = 0) -> bool`, `IndicatorSeries.is_greater(other: float | IndicatorSeries, shift: int = 0) -> bool`, `IndicatorSeries.is_lower(other: float | IndicatorSeries, shift: int = 0) -> bool`, `IndicatorSeries.is_higher(lookback: int = 1, shift: int = 0) -> bool`, `IndicatorSeries.changes_up(shift: int = 0) -> bool`, `IndicatorSeries.changes_down(shift: int = 0) -> bool`
+  - [x] `FR-IND-MOMENTUM`: Compute all 18 momentum oscillators (`momentum/`) $\rightarrow$ `<IndicatorClass>.calculate(...) -> IndicatorSeries`
+  - [x] `FR-IND-PRICE-ACTION`: Compute all 10 price-action, pattern, Fibonacci, pivot & structural level indicators (`price_action/`) $\rightarrow$ `<IndicatorClass>.calculate(...) -> IndicatorSeries`
+  - [x] `FR-IND-REGIME`: Compute all 3 market regime, Hurst persistence & choppiness filters (`regime/`) $\rightarrow$ `<IndicatorClass>.calculate(...) -> IndicatorSeries`
+  - [x] `FR-IND-TREND`: Compute all 16 trend moving averages, directional systems & channels (`trend/`) $\rightarrow$ `<IndicatorClass>.calculate(...) -> IndicatorSeries`
+  - [x] `FR-IND-VOLATILITY`: Compute all 15 volatility bands, range & dispersion estimators (`volatility/`) $\rightarrow$ `<IndicatorClass>.calculate(...) -> IndicatorSeries`
+  - [x] `FR-IND-VOLUME`: Compute all 11 volume, VWAP, order-flow & market profile indicators (`volume/`) $\rightarrow$ `<IndicatorClass>.calculate(...) -> IndicatorSeries`
 
 ---
 
@@ -952,25 +952,32 @@ HaruQuantAI/
 
 ## 2. AppHome — Getting Started & Shell Landing
 
-- **Primary Role:** Default welcome landing workspace providing onboarding tutorials, recent project shortcuts, release version metadata, and offline documentation fallback.
+- **Primary Role:** Default welcome landing workspace providing local onboarding guides, recent project summaries, release metadata inspection, and offline text documentation.
 - **Dependencies:** `AppPlatform` (`Section 1`)
 - **Outputs / Downstream Role:** User onboarding, navigation entry points, and version inspection.
+- **Delivery:** Approved target contracts implemented with scoped verification. The [Home domain README](../../app/workspace/home/README.md) owns registered contracts, implementation status, and limitations; checked items below reflect that bounded target scope and do not assert SQX parity.
 
 ### Phase 2.1: Welcome & Landing Workspace
 
 #### 1. `app/workspace/home/routes.py` — `AppHome` & `HomeAbout` (`FEAT-HOME-DASHBOARD`)
 
-- **Dry Rule:** Reuses `HostPersistence`, `ResourceMonitor`, and `ServletConstants` without duplicating version or system diagnostic queries.
-- **Donor:** `C:\SQX-145\internal\plugins\AppSQXHome\AppSQXHome.jar`, `C:\SQX-145\internal\plugins\HomeAbout\HomeAbout.jar`, `C:\SQX-145\internal\web\SQXHOME\`, `C:\SQX-145\internal\web\HOME\`
-- **Backend:** `app/workspace/home/routes.py` (`🟢 <200L`, Docstring `<=45L`)
-- **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`
+- **Dry Rule:** Reuses `HostPersistence`, `ResourceMonitor`, and `ServletConstants` without duplicating version or system diagnostic queries; host services are injected through `AppHost`.
+- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/AppSQXHome/AppSQXHome.jar`, `SQX_REFERENCE_ROOT/internal/plugins/HomeAbout/HomeAbout.jar`, `SQX_REFERENCE_ROOT/internal/web/SQXHOME/`, `SQX_REFERENCE_ROOT/internal/web/HOME/` (static evidence only; opaque HOME scripts remain unverified).
+- **Backend:** `app/workspace/home/routes.py` (`🟢 193 physical lines`, module docstring `20 lines`; meets `<200L` / `<=45L` limits), with private local-content and release-feed helpers.
+- **Frontend:** `ui/app/workspace/Home/HomeScreen.tsx`, domain-owned typed client, responsive styles, and a shared original local guide catalog.
 - **Class:** `Home`, `About` (plus `HomeCLI`)
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-HOME-INDEX`: Display welcome home view with quick-start action shortcuts $\rightarrow$ `Home.index() -> dict[str, Any]`
-  - [ ] `FR-HOME-RECENT`: Render offline onboarding flow, tutorial cards, and recent projects from `HostPersistence` $\rightarrow$ `Home.get_recent_projects(limit: int = 10) -> list[dict[str, Any]]`
-  - [ ] `FR-HOME-UPDATES`: Fetch and show latest release changelog and version updates $\rightarrow$ `Home.check_updates() -> dict[str, Any]`
-  - [ ] `FR-HOME-ABOUT`: Display platform version, build timestamp, and license details $\rightarrow$ `About.about() -> dict[str, Any]`
-  - [ ] `FR-HOME-DIAGNOSTICS`: Show active system directory paths, database status, and memory stats via `ResourceMonitor` $\rightarrow$ `About.diagnostics() -> dict[str, Any]`
+  - [x] `FR-HOME-INDEX`: Display the welcome view and quick-start workspace navigation $\rightarrow$ `Home.index() -> dict[str, Any]`
+  - [x] `FR-HOME-RECENT`: Render original bundled offline guides/tutorial cards and host-persisted recent project summaries, ordered by last activity; cards navigate to the owning workspace $\rightarrow$ `Home.get_recent_projects(limit: int = 10) -> list[dict[str, Any]]`
+  - [x] `FR-HOME-UPDATES`: Check an explicitly configured bounded release feed and display validated version/changelog data or explicit unavailable/error/unsupported states $\rightarrow$ `Home.check_updates() -> dict[str, Any]`
+  - [x] `FR-HOME-ABOUT`: Display host-reported platform version, build timestamp, and runtime, with explicit license-provider unavailability $\rightarrow$ `About.about() -> dict[str, Any]`
+  - [x] `FR-HOME-DIAGNOSTICS`: Display configured workspace paths, database status, and memory statistics through the injected `ResourceMonitor` on request $\rightarrow$ `About.diagnostics() -> dict[str, Any]`
+  - [x] `FR-HOME-CLI`: Format headless Home/About results through the existing CLI presentation layer $\rightarrow$ `HomeCLI.format_output(data: Mapping[str, Any]) -> str`
+- **Integration:** Host-authorized `/home` HTTP endpoints are mounted under the existing API prefixes; `app.cli` dispatches `home`, `about`, `diagnostics`, and `updates`. UI requests cancel on navigation/session changes; local guides remain readable while offline or locked.
+- **Verification (2026-10-21):** 35 Home backend tests, 2 host/CLI integration tests, 13 Home inventory/ownership tests, 504 UI unit tests, and 5 Home browser tests passed. UI typecheck/build and scoped lint, formatting, strict typing, and architecture checks passed. Home Python modules reached 100% branch-aware coverage; coverage is evidence, not parity proof.
+- **Evidence:** [Ledger](../dev/evidence/reimplementation.json) records `SQX145-EV-000007`–`SQX145-EV-000023`; the separate [Home inventory](../dev/evidence/home-inventory.json) pins eight donor artifacts. The P00 manifest and all six historical records are preserved. New evidence validation/review remains pending/unreviewed; donor runtime parity is unqualified.
+- **Delivered limits:** No production release feed is configured and no license provider is registered. Checking updates does not install them. Project cards do not reopen a specific saved project; offline onboarding supplies text guides without progress synchronization or offline videos. Host version/build values are reported by the existing host and are not independently qualified build provenance.
+- **Repository qualification:** Full Python verification reported 413 passed and 22 setup errors from the pre-existing missing reference document. Overall application coverage is 56.49% against the unchanged 80% requirement; repository CI also encounters an unrelated host-settings test typing error. This completed Home scope does not qualify the whole repository for release.
 
 ---
 

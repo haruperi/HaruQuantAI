@@ -55,6 +55,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from collections.abc import Callable, Sequence
 from dataclasses import asdict
 from pathlib import Path
@@ -65,6 +66,7 @@ from app.host.logging import get_logger, shutdown_logging
 from app.host.resources import get_worker_capacity, probe_hardware
 from app.host.response import ApiResponse, StandardError
 from app.host.settings import settings as host_settings
+from app.workspace.home import HomeCLI as LandingCLI
 
 logger = get_logger(__name__)
 
@@ -83,6 +85,10 @@ SUPPORTED_CLI_COMMANDS: tuple[str, ...] = (
     "data",
     "instrument",
     "sessions",
+    "home",
+    "about",
+    "diagnostics",
+    "updates",
 )
 
 
@@ -177,11 +183,33 @@ class HeadlessCliRunner:
             "data": lambda: self._cmd_data(act),
             "instrument": lambda: self._cmd_instrument(act, extra_args),
             "sessions": lambda: self._cmd_sessions(act, extra_args),
+            "home": lambda: self._cmd_home("home"),
+            "about": lambda: self._cmd_home("about"),
+            "diagnostics": lambda: self._cmd_home("diagnostics"),
+            "updates": lambda: self._cmd_home("updates"),
         }
         handler = handlers.get(cmd)
         if handler is None:
             raise ValueError(f"Unsupported CLI command: '{command}'")
         return handler()
+
+    def _cmd_home(self, command: str) -> dict[str, Any]:
+        """Dispatch against the Home instances composed by this host."""
+        home, about = self.runtime.home, self.runtime.home_about
+        if home is None or about is None:
+            raise RuntimeError("Home workspace is not initialized.")
+        operations = {
+            "home": home.index,
+            "about": about.about,
+            "diagnostics": about.diagnostics,
+            "updates": home.check_updates,
+        }
+        result = operations[command]()
+        return {
+            "command": command,
+            **result,
+            "rendered": LandingCLI.format_output(result),
+        }
 
     def _cmd_status(self) -> dict[str, Any]:
         snap = self.runtime._get_readiness()  # noqa: SLF001
@@ -482,6 +510,7 @@ def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
         data_dir=data_dir,
         plugins_dir=args.plugins_dir,
         use_process_pool=False,
+        home_release_feed_url=os.environ.get("HARUQUANTAI_RELEASE_FEED_URL"),
     )
     cmd = args.command
     logger.info(

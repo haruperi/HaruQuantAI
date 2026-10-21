@@ -32,7 +32,8 @@
         "internal/libs",
         "internal/plugins",
         "internal/extend",
-        "internal/ctemplate"
+        "internal/ctemplate",
+        "internal/web"
       ],
       "scope": "Read-only static inspection of launcher configs, encrypted/unencrypted JARs, JSPF plugin bundles, XML block templates, and Java snippets.",
       "confidence": "confirmed",
@@ -54,7 +55,9 @@
         "docs/SQX/libs/SQLib.md",
         "docs/SQX/libs/SQDataLib.md",
         "docs/SQX/libs/SQTradingLib.md",
-        "docs/dev/evidence/p00-inventory.json"
+        "docs/dev/evidence/p00-inventory.json",
+        "app/workspace/home",
+        "ui/app/workspace/Home"
       ],
       "scope": "Target architectural authorities, clean-room decompiled class/method catalogs, and SHA-256 inventory captures.",
       "confidence": "confirmed",
@@ -69,7 +72,7 @@
     "runtime_parity": "unqualified"
   },
   "minimum_record_number": 1,
-  "allocation_high_water_mark": 6,
+  "allocation_high_water_mark": 23,
   "records": {
     "SQX145-EV-000001": {
       "topic": "architecture.process.two_process_topology",
@@ -792,6 +795,1604 @@
         "normative",
         "spatial-composability",
         "blueprint"
+      ]
+    },
+    "SQX145-EV-000007": {
+      "topic": "home.navigation.getting_started",
+      "title": "The packaged getting-started navigation selects the SQXHOME application.",
+      "question": "What is established about home.navigation.getting_started?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The packaged getting-started navigation selects the SQXHOME application.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/AppSQXHome/module.js",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "NavigationPlugin configuration",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "fdf50d0a8df3ef880150b3a8e2d13a5a429fe0633297766068580d83034fc5a6"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-INDEX"
+        ],
+        "decision_ids": [
+          "DEC-HOME-OFFLINE-CONTENT"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The packaged getting-started navigation selects the SQXHOME application.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000008": {
+      "topic": "home.offline.homepage_fallback",
+      "title": "The packaged Home link request supplies a bundled offline page as fallback.",
+      "question": "What is established about home.offline.homepage_fallback?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The packaged Home link request supplies a bundled offline page as fallback.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/web/SQXHOME/layout/SQXHomeService.js",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "link()",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "db83262a793dec441e5a038dc9b9f50e9ec0883df95adc053f836e396d166617"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-INDEX"
+        ],
+        "decision_ids": [
+          "DEC-HOME-OFFLINE-CONTENT"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The packaged Home link request supplies a bundled offline page as fallback.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000009": {
+      "topic": "home.updates.shared_backend",
+      "title": "The packaged Home service requests version information from the shared main backend.",
+      "question": "What is established about home.updates.shared_backend?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The packaged Home service requests version information from the shared main backend.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/web/SQXHOME/layout/SQXHomeService.js",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "versions()",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "db83262a793dec441e5a038dc9b9f50e9ec0883df95adc053f836e396d166617"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-UPDATES"
+        ],
+        "decision_ids": [
+          "DEC-HOME-RELEASE-FEED"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The packaged Home service requests version information from the shared main backend.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000010": {
+      "topic": "home.updates.parent_message",
+      "title": "The parent Home controller sends the version collection and current/newer version availability fields to the child page.",
+      "question": "What is established about home.updates.parent_message?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The parent Home controller sends the version collection and current/newer version availability fields to the child page.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/web/SQXHOME/layout/LayoutCtrl.js",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "sendVersionsToIframe()",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "6216c25d1c6915d166d2444aef87f4b230417a225710823a0ed765ed1af0ed82"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-UPDATES"
+        ],
+        "decision_ids": [
+          "DEC-HOME-RELEASE-FEED"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The parent Home controller sends the version collection and current/newer version availability fields to the child page.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000011": {
+      "topic": "home.offline.progress_projection",
+      "title": "The offline onboarding component derives a completed-step count from stored progress.",
+      "question": "What is established about home.offline.progress_projection?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The offline onboarding component derives a completed-step count from stored progress.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/AppSQXHome/offline/_astro/OfflineOnboardingFlow.b4Wrp7kD.js",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "OfflineOnboardingFlow setup",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "811b80cffbe92a7356c470b0c6f105b69bd269019249352441d2ad0bd3a68b3c"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-RECENT"
+        ],
+        "decision_ids": [
+          "DEC-HOME-OFFLINE-CONTENT"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The offline onboarding component derives a completed-step count from stored progress.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000012": {
+      "topic": "home.offline.video_availability",
+      "title": "Offline tutorial cards identify video access as available online only.",
+      "question": "What is established about home.offline.video_availability?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Offline tutorial cards identify video access as available online only.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/AppSQXHome/offline/_astro/OfflineOnboardingFlow.b4Wrp7kD.js",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "OfflineStepCard rendering",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "811b80cffbe92a7356c470b0c6f105b69bd269019249352441d2ad0bd3a68b3c"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-RECENT"
+        ],
+        "decision_ids": [
+          "DEC-HOME-OFFLINE-CONTENT"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "Offline tutorial cards identify video access as available online only.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000013": {
+      "topic": "home.about.license_endpoint",
+      "title": "The About service requests license information through its own license endpoint.",
+      "question": "What is established about home.about.license_endpoint?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The About service requests license information through its own license endpoint.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/HomeAbout/services/AboutService.js",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "license()",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a3a01e169324c1082daf4b35d4b722b7e56097df372ee1156472ac5e4ae5896a"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-ABOUT"
+        ],
+        "decision_ids": [
+          "DEC-HOME-ABOUT-PROVENANCE"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The About service requests license information through its own license endpoint.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000014": {
+      "topic": "home.about.version_projection",
+      "title": "The About template renders the version field supplied by its license response.",
+      "question": "What is established about home.about.version_projection?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The About template renders the version field supplied by its license response.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/HomeAbout/views/about.html",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "about-text version binding",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f032a77d5a14eee745dc41667f2678e4ffeb982fa222eecedf6908673a9f40a2"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-ABOUT"
+        ],
+        "decision_ids": [
+          "DEC-HOME-ABOUT-PROVENANCE"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The About template renders the version field supplied by its license response.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000015": {
+      "topic": "home.about.path_projection",
+      "title": "The About template renders an installation path in its footer.",
+      "question": "What is established about home.about.path_projection?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The About template renders an installation path in its footer.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/HomeAbout/views/about.html",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "about-licence-path binding",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "config_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f032a77d5a14eee745dc41667f2678e4ffeb982fa222eecedf6908673a9f40a2"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-ABOUT"
+        ],
+        "decision_ids": [
+          "DEC-HOME-ABOUT-PROVENANCE"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The About template renders an installation path in its footer.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000016": {
+      "topic": "home.servlet.command_rejection",
+      "title": "The packaged Home servlet has no handled command branch and rejects dispatched commands as unknown.",
+      "question": "What is established about home.servlet.command_rejection?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The packaged Home servlet has no handled command branch and rejects dispatched commands as unknown.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/AppSQXHome/AppSQXHome.jar",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "com.strategyquant.plugin.App.impl.SQXHome.SQXHomeServlet.execute, bytecode offsets 12-44",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "5bedd8ddbf4c457a5f9512d721092fa1f79cb16ac9d302cec46a055fb6339f52"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-INDEX"
+        ],
+        "decision_ids": [
+          "DEC-HOME-OFFLINE-CONTENT"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The packaged Home servlet has no handled command branch and rejects dispatched commands as unknown.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000017": {
+      "topic": "home.about.core_metadata",
+      "title": "The About servlet obtains license metadata through the shared core application capability.",
+      "question": "What is established about home.about.core_metadata?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The About servlet obtains license metadata through the shared core application capability.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifact behavior only; the donor runtime was not executed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/HomeAbout/HomeAbout.jar",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "com.strategyquant.plugin.Home.impl.About.AboutServlet.getLicenseInfo",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "950092f1f3abff3ca23295d9fccd464a05d3d4605d8b9d1c1162d03e8ad1b5bd"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-ABOUT"
+        ],
+        "decision_ids": [
+          "DEC-HOME-ABOUT-PROVENANCE"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "runtime",
+        "procedure": "In an authorized isolated donor environment, exercise this exact Home/About workflow and retain observations without personal/license data.",
+        "expected_observation": "The About servlet obtains license metadata through the shared core application capability.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T12:53:08.767296+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "static-inspection"
+      ]
+    },
+    "SQX145-EV-000018": {
+      "topic": "home.target.host_reuse",
+      "title": "HaruQuantAI Home consumes host-owned constants, resource diagnostics and persistence capabilities through explicit composition.",
+      "question": "What is established about home.target.host_reuse?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "HaruQuantAI Home consumes host-owned constants, resource diagnostics and persistence capabilities through explicit composition.",
+        "confidence": "high",
+        "limitations": [
+          "Target decision, not an observed donor behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/workspace/home/README.md",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "DEC-HOME-HOST-REUSE",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8408ac287cd54f55126ef33a80a0b692484d449efa590607672767442ff116aa"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-DIAGNOSTICS"
+        ],
+        "decision_ids": [
+          "DEC-HOME-HOST-REUSE"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "authority",
+        "procedure": "Review the referenced owner decision and execute the matching public Home contract tests on an isolated temporary store.",
+        "expected_observation": "HaruQuantAI Home consumes host-owned constants, resource diagnostics and persistence capabilities through explicit composition.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T13:17:17.701429+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "target-decision"
+      ]
+    },
+    "SQX145-EV-000019": {
+      "topic": "home.target.recent_projection",
+      "title": "HaruQuantAI recent projects are read-only summaries of project entities ordered by host-recorded last activity.",
+      "question": "What is established about home.target.recent_projection?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "HaruQuantAI recent projects are read-only summaries of project entities ordered by host-recorded last activity.",
+        "confidence": "high",
+        "limitations": [
+          "Target decision, not an observed donor behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/workspace/home/README.md",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "DEC-HOME-RECENT-PROJECTION",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8408ac287cd54f55126ef33a80a0b692484d449efa590607672767442ff116aa"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-RECENT"
+        ],
+        "decision_ids": [
+          "DEC-HOME-RECENT-PROJECTION"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "authority",
+        "procedure": "Review the referenced owner decision and execute the matching public Home contract tests on an isolated temporary store.",
+        "expected_observation": "HaruQuantAI recent projects are read-only summaries of project entities ordered by host-recorded last activity.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T13:17:17.701429+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "target-decision"
+      ]
+    },
+    "SQX145-EV-000020": {
+      "topic": "home.target.offline_content",
+      "title": "HaruQuantAI provides original bundled text guides that do not depend on a host connection.",
+      "question": "What is established about home.target.offline_content?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "HaruQuantAI provides original bundled text guides that do not depend on a host connection.",
+        "confidence": "high",
+        "limitations": [
+          "Target decision, not an observed donor behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/workspace/home/README.md",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "DEC-HOME-OFFLINE-CONTENT",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8408ac287cd54f55126ef33a80a0b692484d449efa590607672767442ff116aa"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-INDEX"
+        ],
+        "decision_ids": [
+          "DEC-HOME-OFFLINE-CONTENT"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "authority",
+        "procedure": "Review the referenced owner decision and execute the matching public Home contract tests on an isolated temporary store.",
+        "expected_observation": "HaruQuantAI provides original bundled text guides that do not depend on a host connection.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T13:17:17.701429+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "target-decision"
+      ]
+    },
+    "SQX145-EV-000021": {
+      "topic": "home.target.release_feed",
+      "title": "HaruQuantAI release inspection uses an explicitly configured bounded read-only feed and reports missing providers as unavailable.",
+      "question": "What is established about home.target.release_feed?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "HaruQuantAI release inspection uses an explicitly configured bounded read-only feed and reports missing providers as unavailable.",
+        "confidence": "high",
+        "limitations": [
+          "Target decision, not an observed donor behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/workspace/home/README.md",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "DEC-HOME-RELEASE-FEED",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8408ac287cd54f55126ef33a80a0b692484d449efa590607672767442ff116aa"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-UPDATES"
+        ],
+        "decision_ids": [
+          "DEC-HOME-RELEASE-FEED"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "authority",
+        "procedure": "Review the referenced owner decision and execute the matching public Home contract tests on an isolated temporary store.",
+        "expected_observation": "HaruQuantAI release inspection uses an explicitly configured bounded read-only feed and reports missing providers as unavailable.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T13:17:17.701429+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "target-decision"
+      ]
+    },
+    "SQX145-EV-000022": {
+      "topic": "home.target.about_provenance",
+      "title": "HaruQuantAI About labels host metadata provenance and reports license details as unavailable without a registered provider.",
+      "question": "What is established about home.target.about_provenance?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "HaruQuantAI About labels host metadata provenance and reports license details as unavailable without a registered provider.",
+        "confidence": "high",
+        "limitations": [
+          "Target decision, not an observed donor behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/workspace/home/README.md",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "DEC-HOME-ABOUT-PROVENANCE",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8408ac287cd54f55126ef33a80a0b692484d449efa590607672767442ff116aa"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-ABOUT"
+        ],
+        "decision_ids": [
+          "DEC-HOME-ABOUT-PROVENANCE"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "authority",
+        "procedure": "Review the referenced owner decision and execute the matching public Home contract tests on an isolated temporary store.",
+        "expected_observation": "HaruQuantAI About labels host metadata provenance and reports license details as unavailable without a registered provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T13:17:17.701429+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "target-decision"
+      ]
+    },
+    "SQX145-EV-000023": {
+      "topic": "home.target.http_authority",
+      "title": "HaruQuantAI Home HTTP reads enforce host session scopes before calling their owning operations.",
+      "question": "What is established about home.target.http_authority?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "home_workspace"
+        ],
+        "conditions": [
+          "Bounded static artifact/repository inspection; installed product activation and runtime parity remain unqualified."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "HaruQuantAI Home HTTP reads enforce host session scopes before calling their owning operations.",
+        "confidence": "high",
+        "limitations": [
+          "Target decision, not an observed donor behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/workspace/home/README.md",
+          "location": {
+            "section": "Home workspace",
+            "symbol": "DEC-HOME-HTTP-BOUNDARY",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Static inspection only; no target execution."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8408ac287cd54f55126ef33a80a0b692484d449efa590607672767442ff116aa"
+          },
+          "accessed_at": "2026-10-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-HOME-DASHBOARD"
+        ],
+        "requirement_ids": [
+          "FR-HOME-INDEX"
+        ],
+        "decision_ids": [
+          "DEC-HOME-HTTP-BOUNDARY"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong exclusively to app/workspace/home/README.md."
+      },
+      "validation": {
+        "state": "pending",
+        "kind": "authority",
+        "procedure": "Review the referenced owner decision and execute the matching public Home contract tests on an isolated temporary store.",
+        "expected_observation": "HaruQuantAI Home HTTP reads enforce host session scopes before calling their owning operations.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f9a8258847f7c229c76b8be452ab49ff12fd680",
+        "created_at": "2026-10-21T12:53:08.767296+00:00",
+        "updated_at": "2026-10-21T13:17:17.701429+00:00",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavior paraphrase and logical artifact locators only."
+      },
+      "tags": [
+        "home",
+        "target-decision"
       ]
     }
   }

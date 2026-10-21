@@ -817,3 +817,48 @@ def test_app_host_broadcast_event_ready_failure_rollback(tmp_path: Path) -> None
 
     assert str(host.state) == AppHost.State.FAILED.value
     assert len(host.teardown_stages) > 0
+
+
+def test_home_composition_http_and_cli(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Use the same Home objects for CLI and mounted host routes."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv("HARUQUANTAI_RELEASE_FEED_URL", raising=False)
+    host = AppHost(data_dir=tmp_path / "data", use_process_pool=False)
+    try:
+        host.startup()
+        host.initialize_db()
+        host.register_modules()
+        assert host.home is not None and host.home_about is not None
+        runner = HeadlessCliRunner(host)
+        for command in ("home", "about", "updates", "diagnostics"):
+            result = runner.execute(command)
+            assert result["command"] == command
+            assert json.loads(result["rendered"])
+        assert host.app is not None
+        with TestClient(host.app) as client:
+            assert client.get("/api/v1/home").json()["data"]["recent_projects"] == []
+            assert (
+                client.get("/api/v2/home/about").json()["data"]["license"]["state"]
+                == "unavailable"
+            )
+            assert client.get("/home/updates").json()["data"]["state"] == "unavailable"
+    finally:
+        host.shutdown()
+
+
+def test_home_release_environment_configuration(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Compose the explicit release URL without making a network request."""
+    monkeypatch.setenv(
+        "HARUQUANTAI_RELEASE_FEED_URL", "https://example.invalid/releases"
+    )
+    config, _ = resolve_main_config(
+        [],
+        settings_source=type(
+            "Source", (), {"get": lambda self, scope, key, default=None: default}
+        )(),
+    )
+    assert config.home_release_feed_url == "https://example.invalid/releases"

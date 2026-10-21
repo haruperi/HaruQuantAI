@@ -228,6 +228,41 @@ def _create_synthetic_tree(tmp_path: Path) -> tuple[Path, Path, Path]:
     return repo, donor, manifest_path
 
 
+def test_web_resource_family_uses_exact_donor_fingerprint(tmp_path: Path) -> None:
+    """Bind a JavaScript resource without classifying it as an executable JAR."""
+    repo, donor, manifest_path = _create_synthetic_tree(tmp_path)
+    resource = donor / "internal/plugins/PluginA/module.js"
+    resource.write_bytes(b"// synthetic original fixture\n")
+    data = json.loads(manifest_path.read_text())
+    data["donor_artifacts"].append(
+        {
+            "locator": "internal/plugins/PluginA/module.js",
+            "sha256": _sha256_bytes(resource.read_bytes()),
+            "family": "web_resource",
+            "stage": "Stage 2",
+            "proposed_feature_id": "FEAT-HOME-DASHBOARD",
+        }
+    )
+    data["totals"]["donor_artifacts"] += 1
+    manifest_path.write_text(json.dumps(data), encoding="utf-8")
+    manifest = load_manifest(manifest_path)
+    assert manifest.donor_artifacts[-1].family == "web_resource"
+
+
+def test_home_inventory_preserves_strict_manifest_contract() -> None:
+    """Qualify the separate bounded Home inventory through the canonical model."""
+    root = Path(__file__).resolve().parents[2]
+    manifest = load_manifest(root / "docs/dev/evidence/home-inventory.json")
+    assert len(manifest.donor_artifacts) == 8
+    assert manifest.totals["encrypted_jars"] == 0
+    assert manifest.totals["plugin_directories"] == 182
+    assert manifest.totals["snippet_java_files"] == 1049
+    assert all(
+        item.proposed_feature_id == "FEAT-HOME-DASHBOARD"
+        for item in manifest.donor_artifacts
+    )
+
+
 def test_load_manifest_and_verify_inventory(
     tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:

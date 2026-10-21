@@ -75,7 +75,12 @@ MANIFEST_FR = "FR-HOST-EVIDENCE-MANIFEST-VALIDATION"
 INVENTORY_FR = "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
 ReferenceCohort = Literal["145-dev1"]
 ArtifactFamily = Literal[
-    "config", "documentation", "encrypted_jar", "library", "xml_template"
+    "config",
+    "documentation",
+    "encrypted_jar",
+    "library",
+    "xml_template",
+    "web_resource",
 ]
 
 
