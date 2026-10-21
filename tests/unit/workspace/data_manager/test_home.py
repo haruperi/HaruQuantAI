@@ -371,7 +371,7 @@ def test_data_manager_package_facade_exports() -> None:
     import app.workspace.data_manager as dm
 
     assert dm.__all__ == [
-        "DataManagerWorkspace",
+        "AppDataManager",
         "Home",
         "HomeCLI",
         "create_data_manager_router",

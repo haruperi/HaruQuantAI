@@ -313,7 +313,7 @@ class HeadlessCliRunner:
         """Dispatch headless data manager workspace operations."""
         dm: Any = self.runtime.data_manager
         if dm is None:
-            raise RuntimeError("DataManagerWorkspace is not initialized.")
+            raise RuntimeError("AppDataManager is not initialized.")
 
         import app.workspace.data_manager as dm_pkg
         from app.workspace.data_manager import HomeCLI
@@ -412,7 +412,7 @@ class HeadlessCliRunner:
         """Dispatch headless instrument operations."""
         dm: Any = self.runtime.data_manager
         if dm is None:
-            raise RuntimeError("DataManagerWorkspace is not initialized.")
+            raise RuntimeError("AppDataManager is not initialized.")
 
         import app.workspace.data_manager as dm_pkg
 
@@ -435,7 +435,7 @@ class HeadlessCliRunner:
         """Dispatch headless session operations."""
         dm: Any = self.runtime.data_manager
         if dm is None:
-            raise RuntimeError("DataManagerWorkspace is not initialized.")
+            raise RuntimeError("AppDataManager is not initialized.")
 
         import app.workspace.data_manager as dm_pkg
 

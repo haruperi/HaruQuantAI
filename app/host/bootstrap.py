@@ -62,7 +62,7 @@ from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
 from app.host.settings import settings as host_settings
 from app.services.brokers import get_broker
-from app.workspace.data_manager import DataManagerWorkspace, create_data_manager_router
+from app.workspace.data_manager import AppDataManager, create_data_manager_router
 from app.workspace.home import About, Home, create_home_router
 from app.workspace.home._releases import ReleaseFeed
 from fastapi import APIRouter, FastAPI
@@ -312,7 +312,7 @@ class AppHost:
         self.plugin_manager: _disc.PluginLifecycleManager | None = kw.get("plugin_mgr")
         self.broker_registry: Any | None = kw.get("broker_registry")
         self.gateway_service: _tr.TransportGatewayService | None = None
-        self.data_manager: DataManagerWorkspace | None = None
+        self.data_manager: AppDataManager | None = None
         self.home: Home | None = None
         self.home_about: About | None = None
 
@@ -821,14 +821,14 @@ class AppHost:
             constants, self.resource_manager, host_settings
         )
         if self.data_manager is None:
-            self.data_manager = DataManagerWorkspace(
+            self.data_manager = AppDataManager(
                 data_dir=Path(self.config.data_dir),
                 event_bus=self.event_bus,
                 plugin_mgr=plugin_mgr,
                 broker_registry=self.broker_registry,
                 job_manager=self.job_manager,
             )
-        self.data_manager.initialize_defaults()
+        self.data_manager.init_workspace()
         mw = self.job_manager.max_workers
         slots = len(plugin_mgr.discovery.slot_registry.list_slots())
         self._details["services"] = _dct(
@@ -925,7 +925,7 @@ class AppHost:
             **gw_kw
         )
         disc_router = _disc.create_discovery_router(self._init_discovery())
-        self.data_manager = self.data_manager or DataManagerWorkspace(
+        self.data_manager = self.data_manager or AppDataManager(
             data_dir=Path(self.config.data_dir),
             event_bus=self.event_bus,
             plugin_mgr=self.plugin_manager,

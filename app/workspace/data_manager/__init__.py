@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from .home import Home, HomeCLI
-from .routes import DataManagerWorkspace, create_data_manager_router
+from .routes import AppDataManager, create_data_manager_router
 
 __all__ = [
-    "DataManagerWorkspace",
+    "AppDataManager",
     "Home",
     "HomeCLI",
     "create_data_manager_router",

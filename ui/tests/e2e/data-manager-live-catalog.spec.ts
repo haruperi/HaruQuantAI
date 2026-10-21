@@ -34,7 +34,13 @@ async function openCatalog(page: Page, catalog: () => object | Promise<object>) 
       await route.fulfill({ json: result });
       return;
     }
-    const data = path.endsWith('/auth/login') ? { token: 'catalog-test-session' }
+    const data = path === '/api/v1/data/workspace' ? {
+      tabs: ['data', 'instruments', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'].map((id, index) => ({ id, title: ['Data', 'Instruments', 'Sessions', 'Brokers', 'Custom Data', 'Chart', 'Home', 'Stock groups', 'Log'][index], core: index < 5 })),
+      active_tab: 'data', layout: { core_group: 'catalogs', chart_position: 'right' },
+    } : path.startsWith('/api/v1/data/workspace/tabs/') ? {
+      active_tab: path.split('/').at(-1), selection: null,
+      preview: { state: 'unavailable', reason: 'Select a saved dataset.', rows: [], limit: 500 },
+    } : path.endsWith('/auth/login') ? { token: 'catalog-test-session' }
       : path.endsWith('/settings') ? { revision: 1, values: {} }
       : path.endsWith('/status') ? { cpu_count: 4 }
       : path === '/api/v1/home' ? { recent_projects: [] }

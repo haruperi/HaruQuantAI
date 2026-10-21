@@ -1,3 +1,8 @@
+import { useHostConnection } from '../../host/HostConnection';
+import { DataManagerDock, type WorkspaceArrangeRequest, type WorkspaceArrangement } from './DataManagerDock';
+import { DataManagerChart } from './DataManagerChart';
+import { fetchWorkspace, openWorkspaceTab, type WorkspaceLayout, type WorkspaceSnapshot, type WorkspaceTabId } from './dataManagerWorkspaceClient';
+import { BrokerProfilesTable, StockGroupsTable, ExternalIndicatorsTable, SessionTable, InstrumentTable, DatasetTable, getBrokerDisplayName } from './DataManagerPanels';
 import { AddPopup as DarwinexAddDialog } from '../../plugins/data_source/Darwinex/add/module';
 import { ImportPopup as DarwinexImportDialog } from '../../plugins/data_source/Darwinex/import/module';
 import { DownloadPopup as DarwinexDownloadDialog } from '../../plugins/data_source/Darwinex/download/module';
@@ -95,7 +100,9 @@ import {
 import yahooIconUrl from '../../assets/dm-yahoo.png';
 import mt5IconUrl from '../../assets/metatrader5.png';
 
-const tabs = ['Home', 'Data sources', 'Export', 'Tools', 'Instruments', 'Sessions', 'External indicators', 'Stock groups', 'Broker profiles', 'Log'];
+const tabs = ['Home', 'Data sources', 'Export', 'Tools', 'Instruments', 'Sessions', 'External indicators', 'Stock groups', 'Broker profiles', 'Log', 'Chart'];
+const panelForTab: Record<string, WorkspaceTabId> = { Home: 'home', 'Data sources': 'data', Export: 'data', Tools: 'data', Instruments: 'instruments', Sessions: 'sessions', 'External indicators': 'custom-data', 'Stock groups': 'stock-groups', 'Broker profiles': 'brokers', Log: 'log', Chart: 'chart' };
+const labelForPanel: Record<WorkspaceTabId, string> = { home: 'Home', data: 'Data sources', instruments: 'Instruments', sessions: 'Sessions', 'custom-data': 'External indicators', 'stock-groups': 'Stock groups', brokers: 'Broker profiles', log: 'Log', chart: 'Chart' };
 type OperationState = 'idle' | 'running' | 'paused' | 'completed' | 'cancelled';
 interface DialogState { id: DataSourceDialogId; exchange?: string; targetIds?: string[] }
 type InstrumentDialogState =
@@ -305,228 +312,6 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
   return <Modal title={titles[state.id]} onClose={onClose} width={wide ? 820 : 650} footer={<><Button onClick={onClose}>{informationOnly ? 'Close' : 'Cancel'}</Button>{!informationOnly && <Button className={state.id === 'dependency-warning' ? 'danger' : 'primary'} disabled={agreementRequired && !agreed} onClick={primaryAction}>{primaryLabel}</Button>}</>}>{content}</Modal>;
 }
 
-function BrokerProfilesTable({profiles,selected,instruments,sessions,onSelect,onEdit}:{profiles:BrokerProfile[];selected:string[];instruments:FileInstrument[];sessions:SessionDefinition[];onSelect:(ids:string[])=>void;onEdit:(profile:BrokerProfile)=>void}) {
-  const allSelected=profiles.length>0&&profiles.every(row=>selected.includes(row.id));
-  return <main className="full dataset-workspace" aria-label="Broker profiles">
-    <div className="dataset-grid broker-profiles-grid"><table className="plain-table" aria-label="Broker profiles">
-      <colgroup><col style={{ width:26 }}/><col style={{ width:250 }}/><col/><col style={{ width:100 }}/><col style={{ width:100 }}/><col style={{ width:130 }}/><col style={{ width:150 }}/><col style={{ width:140 }}/></colgroup>
-      <thead><tr><th><input type="checkbox" aria-label="Select all broker profiles" checked={allSelected} disabled={!profiles.length} onChange={()=>onSelect(allSelected?[]:profiles.map(row=>row.id))}/></th>
-        {['Name', 'Description', 'Postfix', 'Timezone', 'Customized stocks', 'Customized instruments', 'Customized sessions'].map(column => <th key={column}>{column}</th>)}
-      </tr></thead><tbody>{profiles.map(profile=>{const count=brokerCounts(profile,instruments,sessions);return <tr key={profile.id} className={selected.includes(profile.id)?'selected':''} onDoubleClick={()=>onEdit(profile)}><td><input type="checkbox" aria-label={`Select broker ${profile.name}`} checked={selected.includes(profile.id)} onChange={()=>onSelect(selected.includes(profile.id)?selected.filter(id=>id!==profile.id):[...selected,profile.id])}/></td><td>{profile.name}</td><td>{profile.desc}</td><td>{profile.postfix}</td><td>{profile.timezone}</td><td>{count.stocks}</td><td>{count.instruments}</td><td>{count.sessions}</td></tr>;})}{!profiles.length&&<tr><td colSpan={8} className="dataset-empty">No brokers are defined.</td></tr>}</tbody>
-    </table></div>
-  </main>;
-}
-
-function StockGroupsTable({ groups, selected, datasets: available, onSelect, onEdit, onUpdate }: { groups: StockGroupDefinition[]; selected: string[]; datasets: { symbol:string; from?:string; to?:string; bars?:number }[]; onSelect:(ids:string[])=>void; onEdit:(group:StockGroupDefinition)=>void; onUpdate:(group:StockGroupDefinition)=>void }) {
-  const allSelected = groups.length > 0 && groups.every(group => selected.includes(group.id));
-  return <main className="full dataset-workspace" aria-label="Stock groups">
-    <div className="stock-groups-banner">
-      Stock groups are - as name suggests - groups of stocks. It can be indexes like S&P500, which consists of 500 stocks, or you can define your own custom group of symbols. They support also complete history of index composition changes, which prevents survivorship bias. Default unmodifiable stock groups are enclosed in double braces [[ ]]. Stock groups must be fully downloaded and updated before they will be available to use.
-    </div>
-    <div className="dataset-grid stock-groups-grid"><table className="plain-table stock-group-table" aria-label="Stock groups">
-      <colgroup><col style={{ width:26 }}/><col style={{ width:250 }}/><col style={{ width:100 }}/><col/><col style={{ width:130 }}/><col style={{ width:130 }}/><col style={{ width:110 }}/><col style={{ width:100 }}/><col style={{ width:100 }}/></colgroup>
-      <thead><tr><th><input type="checkbox" aria-label="Select all stock groups" checked={allSelected} disabled={!groups.length} onChange={() => onSelect(allSelected ? [] : groups.map(group => group.id))}/></th>
-        {['Name', 'Count', 'Description', 'Number of symbols', 'Downloaded', 'Ready to use?', 'Data from', 'Data to'].map(column => <th key={column}>{column}</th>)}
-      </tr></thead><tbody>{groups.map(group => { const summary = summarizeGroup(group, available); return <tr key={group.id} className={selected.includes(group.id) ? 'selected' : ''} onDoubleClick={() => onEdit(group)}><td><input type="checkbox" aria-label={`Select stock group ${group.name}`} checked={selected.includes(group.id)} onChange={() => onSelect(selected.includes(group.id) ? selected.filter(id => id !== group.id) : [...selected, group.id])}/></td><td>{group.name}</td><td>{summary.active} / {summary.total}</td><td>{group.description}</td><td>{summary.numberOfSymbols}</td><td>{summary.downloaded} / {summary.total}</td><td>{summary.ready ? 'Yes' : <button className="stock-group-ready-link" title="Stock group is not ready for use, not all its symbols are downloaded" onClick={() => onUpdate(group)}>No, Update data</button>}</td><td>{summary.from || '-'}</td><td>{summary.to || '-'}</td></tr>; })}{!groups.length && <tr><td colSpan={9} className="dataset-empty">No groups of stocks are defined.</td></tr>}</tbody>
-    </table></div>
-  </main>;
-}
-
-function ExternalIndicatorsTable({ rows: allRows, selected, job, onSelect, onEdit, onDelete }: { rows: ExternalIndicatorDefinition[]; selected: string[]; job: ReturnType<typeof useExternalIndicators.getState>['job']; onSelect: (names: string[]) => void; onEdit: (item: ExternalIndicatorDefinition) => void; onDelete: (item: ExternalIndicatorDefinition) => void }) {
-  const [query, setQuery] = useState(''); const [dataType, setDataType] = useState('');
-  const rows = allRows.filter(item => (!dataType || String(item.type) === dataType) && item.name.toLowerCase().includes(query.toLowerCase())).sort((a, b) => a.name.localeCompare(b.name));
-  const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.name));
-  return <main className="full dataset-workspace" aria-label="External indicators">
-    <div className="dataset-filters">
-      <input className="text-input" aria-label="Filter external indicators" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
-      <select className="text-input" aria-label="External indicator data type" value={dataType} onChange={event => setDataType(event.target.value)}><option value="">All data types</option>{externalIndicatorTypes.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>
-      <span role="status">Records: {rows.length}</span>
-    </div>
-    <div className="dataset-grid external-indicators-grid"><table className="plain-table" aria-label="External indicators">
-      <colgroup><col style={{ width:26 }}/><col style={{ width:145 }}/><col style={{ width:100 }}/><col style={{ width:225 }}/><col style={{ width:90 }}/><col style={{ width:108 }}/><col style={{ width:108 }}/><col style={{ width:90 }}/><col style={{ width:108 }}/><col/><col style={{ width:26 }}/></colgroup>
-      <thead><tr><th><input type="checkbox" aria-label="Select all external indicators" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(name => !rows.some(item => item.name === name)) : [...new Set([...selected, ...rows.map(item => item.name)])])}/></th>
-        {['Name', 'Values', 'Data type', 'Timeframe', 'Date from', 'Date to', 'Total Days', 'Total Records'].map(column => <th key={column}>{column}</th>)}<th aria-label="Status"/><th aria-label="Row actions"/>
-      </tr></thead>
-      <tbody>{rows.map(item => <tr key={item.name} className={selected.includes(item.name) ? 'selected' : ''} onDoubleClick={() => onEdit(item)}><td><input type="checkbox" aria-label={`Select indicator ${item.name}`} checked={selected.includes(item.name)} onChange={() => onSelect(selected.includes(item.name) ? selected.filter(name => name !== item.name) : [...selected, item.name])}/></td><td>{item.name}</td><td>{activeExternalLines(item).length}</td><td>{externalTypeLabel(item.type)}</td><td>{item.timeframe || '—'}</td><td>{item.dateFrom || '—'}</td><td>{item.dateTo || '—'}</td><td>{item.totalDays}</td><td>{item.records.length.toLocaleString()}</td><td className="indicator-status" aria-label={`Status for ${item.name}`}>{job?.indicator === item.name ? job.state === 'completed' ? 'Completed' : `${job.state} ${job.progress}%` : ''}</td><td><button className="instrument-remove" aria-label={`Delete indicator ${item.name}`} onClick={() => onDelete(item)}>×</button></td></tr>)}{!rows.length && <tr><td colSpan={11} className="dataset-empty">No External indicators defined.</td></tr>}</tbody>
-    </table></div>
-  </main>;
-}
-
-function SessionTable({ rows:allRows, selected, onSelect, onEdit, onDelete, brokers }:{rows:SessionDefinition[];selected:string[];onSelect:(names:string[])=>void;onEdit:(item:SessionDefinition)=>void;onDelete:(item:SessionDefinition)=>void;brokers:SessionBroker[]}) {
-  const [query, setQuery] = useState('');
-  const [broker,setBroker]=useState('');
-  const rows=allRows.filter(item=>(!broker||item.broker===broker)&&(item.name+' '+item.brokerName).toLowerCase().includes(query.toLowerCase())).sort((a,b)=>a.name.localeCompare(b.name));
-  const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.name));
-  return <main className="full dataset-workspace" aria-label="Sessions">
-    <div className="dataset-filters">
-      <input className="text-input" aria-label="Filter sessions" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
-      <select className="text-input" aria-label="Session broker profile" value={broker} onChange={event=>setBroker(event.target.value)}><option value="">All broker profiles</option>{brokers.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select>
-    </div>
-    <div className="dataset-grid session-grid"><table className="plain-table session-table" aria-label="Sessions">
-      <colgroup><col style={{ width: 26 }}/><col style={{ width: 500 }}/><col style={{ width: 150 }}/><col/><col style={{ width: 26 }}/></colgroup>
-      <thead><tr>
-        <th><input type="checkbox" aria-label="Select all visible sessions" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(name => !rows.some(item=>item.name===name)) : [...new Set([...selected, ...rows.map(item=>item.name)])])}/></th>
-        <th>Session Name</th><th>Broker profile</th><th aria-label="Unused space"/><th aria-label="Row actions"/>
-      </tr></thead>
-      <tbody>{rows.map(item => <tr key={item.name} className={selected.includes(item.name) ? 'selected' : ''} onDoubleClick={()=>onEdit(item)}>
-        <td><input type="checkbox" aria-label={`Select session ${item.name}`} checked={selected.includes(item.name)} onChange={() => onSelect(selected.includes(item.name) ? selected.filter(name=>name!==item.name) : [...selected,item.name])}/></td>
-        <td>{item.name}</td><td>{item.brokerName||'—'}</td><td/>
-        <td><button className="instrument-remove" aria-label={`Delete session ${item.name}`} onClick={()=>onDelete(item)}>×</button></td>
-      </tr>)}{!rows.length && <tr><td colSpan={5} className="dataset-empty">No matching sessions.</td></tr>}</tbody>
-    </table></div>
-  </main>;
-}
-
-function InstrumentTable({ selected, onSelect, onEdit, onDelete }: {
-  selected: string[]; onSelect: (symbols: string[]) => void;
-  onEdit: (item: FileInstrument) => void; onDelete: (item: FileInstrument) => void;
-}) {
-  const instState = useInstruments();
-  const fileState = useFileSymbols();
-  const instruments = instState.instruments.length > 0
-    ? instState.instruments
-    : effectiveInstruments(fileState.instruments, fileState.overrides, fileState.removed);
-  const [query, setQuery] = useState('');
-  const [dataType, setDataType] = useState('');
-  const [broker, setBroker] = useState('');
-  const [descending, setDescending] = useState(false);
-  const rows = instruments.filter(item => (!dataType || item.type === dataType)
-    && (!broker || item.broker === broker)
-    && (item.symbol + ' ' + item.name).toLowerCase().includes(query.toLowerCase()))
-    .sort((a, b) => a.symbol.localeCompare(b.symbol) * (descending ? -1 : 1));
-  const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.symbol));
-  const columns = ['Description', 'Broker profile', 'Point value', 'Pip/Tick size', 'Pip/Tick step',
-    'Default spread', 'Default slippage', 'Commissions', 'Swap', 'Data type', 'Order size mult.', 'Order size step'];
-  return <main className="full dataset-workspace" aria-label="Instruments">
-    <div className="dataset-filters">
-      <input className="text-input" aria-label="Filter instruments" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
-      <select className="text-input" aria-label="Instrument data type" value={dataType} onChange={event => setDataType(event.target.value)}>
-        <option value="">All data types</option>{[...new Set(instruments.map(item => item.type))].map(type => <option key={type}>{type}</option>)}
-      </select>
-      <select className="text-input" aria-label="Instrument broker profile" value={broker} onChange={event => setBroker(event.target.value)}><option value="">All broker profiles</option>{[...new Map(instruments.map(item => [item.broker, item.brokerName])).entries()].map(([id, name]) => <option value={id} key={id}>{name}</option>)}</select>
-    </div>
-    <div className="dataset-grid"><table className="plain-table instrument-table" aria-label="Instruments">
-      <thead><tr>
-        <th><input type="checkbox" aria-label="Select all visible instruments" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(symbol => !rows.some(item => item.symbol === symbol)) : [...new Set([...selected, ...rows.map(item => item.symbol)])])}/></th>
-        <th aria-sort={descending ? 'descending' : 'ascending'}><button className="dataset-sort" onClick={() => setDescending(value => !value)}>Instrument <span aria-hidden="true">{descending ? '▾' : '▴'}</span></button></th>
-        {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Row actions"/>
-      </tr></thead>
-      <tbody>{rows.map(item => <tr key={item.symbol} className={selected.includes(item.symbol) ? 'selected' : ''} onDoubleClick={() => onEdit(item)}>
-        <td><input type="checkbox" aria-label={`Select instrument ${item.symbol}`} checked={selected.includes(item.symbol)} onChange={() => onSelect(selected.includes(item.symbol) ? selected.filter(symbol => symbol !== item.symbol) : [...selected, item.symbol])}/></td>
-        <td><strong>{item.symbol}</strong></td><td title={item.name}>{item.name}</td><td>{item.brokerName}</td>
-        <td>{item.pointValue.toLocaleString()}</td><td>{item.tickSize}</td><td>{item.tickStep}</td><td>{item.spread}</td>
-        <td>{item.slippage}</td><td>{item.commission.model}</td><td>{item.swap.use ? item.swap.type : "None"}</td><td>{item.type}</td><td>{item.multiplier}</td><td>{item.sizeStep}</td>
-        <td><button className="instrument-remove" aria-label={`Delete instrument ${item.symbol}`} title="Delete instrument" onClick={event => { event.stopPropagation(); onDelete(item); }}>×</button></td>
-      </tr>)}{!rows.length && <tr><td colSpan={15} className="dataset-empty">No matching instruments.</td></tr>}</tbody>
-    </table></div>
-  </main>;
-}
-
-function getBrokerDisplayName(brokerName: string | undefined, brokerId: string | undefined, brokers: BrokerProfile[]): string {
-  const raw = (brokerName || '').trim();
-  if (!raw || raw === '-1' || brokerId === '-1') return 'Default';
-  if (raw.startsWith('[[') && raw.endsWith(']]')) return raw.slice(2, -2).trim();
-  const match = brokers.find(b => b.id === raw || b.id === brokerId);
-  if (match) return match.name.replace(/^\[\[/, '').replace(/\]\]$/, '').trim();
-  return raw;
-}
-
-function formatDateOnly(value: string | undefined): string {
-  if (!value) return '—';
-  const match = value.match(/^\d{4}-\d{2}-\d{2}/);
-  return match ? match[0] : value.split(/[T ]/)[0] || '—';
-}
-
-function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
-  selectedIds: string[]; onToggle: (id: string) => void; onSelect: (ids: string[]) => void;
-  onDeleteRow?: (id: string) => void;
-}) {
-  const td = useTickDownloader();
-  const savedDatasets = useDataManagerStore(state => state.savedDatasets);
-  const catalogLoading = useDataManagerStore(state => state.catalogLoading);
-  const catalogError = useDataManagerStore(state => state.catalogError);
-  const downloadJob = useDukascopyDownloads(state => state.job);
-  const imports = useFileImports();
-  const sq = useSQData();
-  const darwinex = useDarwinex();
-  const crypto = useCrypto();
-  const yahoo = useYahoo();
-  const mt5 = useMt5Import();
-  const exports = useDataExports();
-  const tools = useDataTools();
-  const stockGroups = useStockGroups();
-  const [stockGroup, setStockGroup] = useState('');
-  const allDatasets = savedDatasets ?? [];
-  const [query, setQuery] = useState('');
-  const [source, setSource] = useState('');
-  const [dataType, setDataType] = useState('');
-  const [brokerFilter,setBrokerFilter]=useState('');
-  const [descending, setDescending] = useState(false);
-  const rows = allDatasets.filter(row => (!source || row.source === source)
-    && (!stockGroup || stockGroups.groups.find(group => group.id === stockGroup)?.members.some(member => member.ticker === row.symbol))
-    && (!dataType || row.category === dataType)
-    && (!brokerFilter || row.brokerName === brokerFilter)
-    && (row.symbol + ' ' + row.source).toLowerCase().includes(query.toLowerCase()))
-    .sort((a, b) => a.symbol.localeCompare(b.symbol) * (descending ? -1 : 1));
-  const allSelected = rows.length > 0 && rows.every(row => selectedIds.includes(row.id));
-  const columns = ['Instrument', 'Broker profile', 'Underlying Symbol', 'Timeframe', 'Timezone',
-    'Date from', 'Date to', 'Total Days', 'Total Records', 'Source', 'Bar type', 'Data type', 'Path'];
-  return <main className="full dataset-workspace" aria-label="Historical data" aria-busy={catalogLoading}>
-    <div className="dataset-filters">
-      <input className="text-input" aria-label="Filter items" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
-      <select className="text-input" aria-label="Data source" value={source} onChange={event => setSource(event.target.value)}>
-        <option value="">All data sources</option>{[...new Set(allDatasets.map(row => row.source))].map(value => <option key={value}>{value}</option>)}
-      </select>
-      <select className="text-input" aria-label="Data type" value={dataType} onChange={event => setDataType(event.target.value)}>
-        <option value="">All data types</option>{[...new Set(allDatasets.map(item => item.category))].map(value => <option key={value}>{value}</option>)}
-      </select>
-      <select className="text-input" aria-label="Stock group" value={stockGroup} onChange={event => setStockGroup(event.target.value)}><option value="">By stock group - none</option>{stockGroups.groups.map(group => <option value={group.id} key={group.id}>{group.name}</option>)}</select>
-      <select className="text-input" aria-label="Broker profile" value={brokerFilter} onChange={event=>setBrokerFilter(event.target.value)}><option value="">All broker profiles</option>{[...new Set(allDatasets.map(row=>row.brokerName).filter(name=>name&&name!=='—'))].map(name=><option key={name}>{name}</option>)}</select>
-      <span role="status">Records: {rows.length}</span>
-      <Button disabled={catalogLoading} onClick={() => { void useDataManagerStore.getState().syncRemoteDatasets(); }}>
-        {catalogLoading ? 'Loading dataset catalog…' : catalogError ? 'Retry dataset catalog' : 'Refresh dataset catalog'}
-      </Button>
-    </div>
-    {catalogError && <div role="alert" className="callout">Unable to load saved dataset catalog: {catalogError}{savedDatasets !== null && ' Showing the last successful catalog; it may be out of date.'}</div>}
-    <div className="dataset-grid"><table className="plain-table" aria-label="Historical data">
-      <thead><tr>
-        <th><input type="checkbox" aria-label="Select all visible datasets" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selectedIds.filter(id => !rows.some(row => row.id === id)) : [...new Set([...selectedIds, ...rows.map(row => row.id)])])}/></th>
-        <th aria-sort={descending ? 'descending' : 'ascending'}><button className="dataset-sort" onClick={() => setDescending(value => !value)}>Symbol Name <span aria-hidden="true">{descending ? '▾' : '▴'}</span></button></th>
-        {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Status" style={{ minWidth: 120 }}/><th aria-label="Row actions" style={{ width: 36 }}/>
-      </tr></thead>
-      <tbody>{rows.map(row => {
-        const days = row.totalDays ?? 0;
-        const darwinexIndex = darwinex.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
-        const darwinexStatus = darwinexIndex >= 0 ? darwinexIndex < darwinex.job!.completed ? 'Completed' : `${darwinex.job!.state} ${darwinex.job!.progress}%` : darwinex.definitions.some(item => item.id === row.id) ? 'Completed' : '';
-        const cryptoIndex = crypto.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
-        const cryptoStatus = cryptoIndex >= 0 ? cryptoIndex < crypto.job!.completed ? 'Completed' : `${crypto.job!.state} ${crypto.job!.progress}%` : crypto.definitions.some(item => item.id === row.id) ? 'Completed' : '';
-        const yahooIndex = yahoo.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
-        const yahooStatus = yahooIndex >= 0 ? yahooIndex < yahoo.job!.completed ? 'Completed' : `${yahoo.job!.state} ${yahoo.job!.progress}%` : yahoo.definitions.some(item => item.id === row.id) ? 'Completed' : '';
-        const mt5Index = mt5.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
-        const mt5Status = mt5Index >= 0 ? mt5Index < mt5.job!.completed ? 'Completed' : `${mt5.job!.state} ${mt5.job!.progress}%` : mt5.definitions.some(item => item.id === row.id) ? 'Completed' : '';
-        const sqTaskIndex = sq.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
-        const sqStatus = sqTaskIndex >= 0 ? sqTaskIndex < sq.job!.completed ? 'Completed' : `${sq.job!.state} ${sq.job!.progress}%` : sq.definitions.some(item => item.id === row.id) ? 'Completed' : '';
-        const fileTaskIndex = imports.job?.tasks.findIndex(task => task.record.id === row.id) ?? -1;
-        const exportIndex = exports.job?.targetIds.indexOf(row.id) ?? -1;
-        const exportStatus = exportIndex >= 0 && exports.job ? exports.job.state === 'completed' ? 'Completed' : `${exports.job.state.charAt(0).toUpperCase()}${exports.job.state.slice(1)} ${exports.job.progress}%` : '';
-        const cloneIndex = tools.job?.tasks.findIndex(task => task.source.id === row.id || task.definition.id === row.id) ?? -1;
-        const cloneStatus = cloneIndex >= 0 && tools.job ? cloneIndex < tools.job.completed || tools.job.state === 'completed' ? 'Completed' : `${tools.job.state.charAt(0).toUpperCase()}${tools.job.state.slice(1)} ${tools.job.progress}%` : tools.definitions.some(item => item.id === row.id) ? 'Completed' : '';
-        const rowJob = row.id.startsWith('td:') && td.job?.request.symbols.some(symbol => `td:${symbol + td.job!.request.postfix}` === row.id) ? td.job : downloadJob?.request.targets.some(target => target.id === row.id) ? downloadJob : null;
-        const rowPath = 'path' in row && typeof row.path === 'string' ? normalizeRelativePath(row.path) : '';
-        return <tr key={row.id} className={selectedIds.includes(row.id) ? 'selected' : ''}>
-          <td><input type="checkbox" aria-label={`Select ${row.symbol}`} checked={selectedIds.includes(row.id)} onChange={() => onToggle(row.id)}/></td>
-          <td><strong>{row.symbol}</strong></td><td>{row.instrument}</td><td>{row.brokerName}</td><td>{row.underlying}</td>
-          <td>{row.timeframe}</td><td>{row.timezone}</td><td>{formatDateOnly(row.from)}</td><td>{formatDateOnly(row.to)}</td><td>{days.toLocaleString()}</td>
-          <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row && (row.barType === "end" || row.barType === "End of bar") ? "End of bar" : "Start of bar"}</td><td>{row.category}</td>
-          <td title={rowPath || '—'}>{rowPath || '—'}</td>
-          <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : ''}</td>
-          <td style={{ textAlign: 'center' }}><button className="instrument-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
-        </tr>;
-      })}{!rows.length && <tr><td colSpan={17} className="dataset-empty">{catalogLoading ? 'Loading saved dataset catalog…' : catalogError ? 'Saved dataset catalog unavailable.' : allDatasets.length ? 'No matching data.' : 'No saved datasets found in catalog.'}</td></tr>}</tbody>
-    </table></div>
-  </main>;
-}
-
 export function DataManager() {
   const definitions = useDataManagerStore(state => state.definitions);
   const savedDatasets = useDataManagerStore(state => state.savedDatasets);
@@ -588,6 +373,52 @@ export function DataManager() {
     return () => window.clearInterval(timer);
   }, [download.job?.state]);
   const [tab, setTab] = useState('Data sources');
+  const { status: hostStatus } = useHostConnection();
+  const [workspace, setWorkspace] = useState<WorkspaceLayout | null>(null);
+  const [workspaceError, setWorkspaceError] = useState('');
+  const [workspaceRetry, retryWorkspace] = useState(0);
+  const [dockActivation, setDockActivation] = useState(0);
+  const [arrangeOpen, setArrangeOpen] = useState(false);
+  const [arrangeRequest, setArrangeRequest] = useState<WorkspaceArrangeRequest | null>(null);
+  const arrangeRef = useRef<HTMLDivElement>(null);
+  const [activeDatasetId, setActiveDatasetId] = useState<string | null>(null);
+  const [selectedBarTime, setSelectedBarTime] = useState<number | null>(null);
+  const [chartRequest, setChartRequest] = useState(0);
+  const [linkedSnapshot, setLinkedSnapshot] = useState<WorkspaceSnapshot | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState('');
+  const [previewRetry, retryPreview] = useState(0);
+  const previewRequest = useRef({ datasetId: null as string | null, retry: 0 });
+  useEffect(() => {
+    setWorkspace(null); setWorkspaceError(''); setLinkedSnapshot(null);
+    if (hostStatus !== 'online') { setActiveDatasetId(null); setSelectedBarTime(null); setChartRequest(0); useDataManagerStore.setState({ savedDatasets: null }); return; }
+    const controller = new AbortController();
+    fetchWorkspace({ signal: controller.signal }).then(setWorkspace).catch(cause => {
+      if (!controller.signal.aborted) setWorkspaceError(cause instanceof Error ? cause.message : 'Unable to initialize workspace.');
+    });
+    return () => controller.abort();
+  }, [hostStatus, workspaceRetry]);
+  useEffect(() => {
+    if (!workspace || hostStatus !== 'online') return;
+    const controller = new AbortController();
+    const reload = !linkedSnapshot || previewRequest.current.datasetId !== activeDatasetId || previewRequest.current.retry !== previewRetry;
+    previewRequest.current = { datasetId: activeDatasetId, retry: previewRetry };
+    if (reload) { setLinkedSnapshot(null); setPreviewLoading(true); }
+    setPreviewError('');
+    openWorkspaceTab(panelForTab[tab], activeDatasetId, { signal: controller.signal }).then(snapshot => {
+      if (!controller.signal.aborted) setLinkedSnapshot(current => current?.selection?.id === snapshot.selection?.id && JSON.stringify(current?.preview) === JSON.stringify(snapshot.preview) ? { ...snapshot, preview: current!.preview } : snapshot);
+    }).catch(cause => {
+      if (!controller.signal.aborted) setPreviewError(cause instanceof Error ? cause.message : 'Unable to open workspace tab.');
+    }).finally(() => { if (!controller.signal.aborted) setPreviewLoading(false); });
+    return () => controller.abort();
+  }, [workspace, hostStatus, tab, activeDatasetId, previewRetry]);
+  useEffect(() => {
+    if (activeDatasetId && savedDatasets !== null && !savedDatasets.some(row => row.id === activeDatasetId)) {
+      setActiveDatasetId(null); setSelectedBarTime(null); setLinkedSnapshot(null);
+    }
+  }, [savedDatasets, activeDatasetId]);
+  const activateDataset = (id: string) => { if (id !== activeDatasetId) setSelectedBarTime(null); setActiveDatasetId(id); setChartRequest(value => value + 1); };
+
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [instrumentDialog, setInstrumentDialog] = useState<InstrumentDialogState | null>(null);
   const [selectedInstrumentIds, setSelectedInstrumentIds] = useState<string[]>([]);
@@ -687,16 +518,16 @@ export function DataManager() {
   }, [notify, operationLabel, operationState]);
 
   useEffect(() => {
-    const closeMenus = (event: MouseEvent) => { if (!ribbonRef.current?.contains(event.target as Node)) { setOpenMenu(null); setNestedOpen(false); } };
-    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setOpenMenu(null); setNestedOpen(false); } };
+    const closeMenus = (event: MouseEvent) => { if (!ribbonRef.current?.contains(event.target as Node)) { setOpenMenu(null); setNestedOpen(false); } if (!arrangeRef.current?.contains(event.target as Node)) setArrangeOpen(false); };
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') { setOpenMenu(null); setNestedOpen(false); setArrangeOpen(false); } };
     document.addEventListener('mousedown', closeMenus);
     document.addEventListener('keydown', closeOnEscape);
     return () => { document.removeEventListener('mousedown', closeMenus); document.removeEventListener('keydown', closeOnEscape); };
   }, []);
 
   useEffect(() => {
-    if (['Data sources', 'Export', 'Tools'].includes(tab)) void useDataManagerStore.getState().syncRemoteDatasets();
-  }, [tab]);
+    if (hostStatus === 'online' && ['Data sources', 'Export', 'Tools'].includes(tab)) void useDataManagerStore.getState().syncRemoteDatasets();
+  }, [tab, hostStatus]);
   useEffect(() => { void useDataManagerStore.getState().syncBrokers(); }, []);
   useEffect(() => {
     if (providerJob?.state === 'completed') void useDataManagerStore.getState().syncRemoteDatasets();
@@ -834,7 +665,22 @@ export function DataManager() {
     setDialog({ id: 'mass-delete', targetIds: [id] });
   };
 
-  return <div className={`data-manager ${tab === 'Log' ? 'show-log' : ''} ${tab === 'Home' ? 'show-home' : ''}`}><div className="dm-title">Data Manager</div><div className="ribbon-tabs">{tabs.map(item => <button key={item} className={tab === item ? 'active' : ''} onClick={() => setTab(item)}>{item}</button>)}</div><div className="ribbon" ref={ribbonRef}>
+  const renderPanel = (id: WorkspaceTabId) => {
+    switch (id) {
+      case 'chart': return <DataManagerChart snapshot={linkedSnapshot} loading={previewLoading} error={previewError} selectedTime={selectedBarTime} onSelectTime={setSelectedBarTime} onRetry={() => retryPreview(value => value + 1)} />;
+      case 'home': return <DataManagerHome onNavigateTab={setTab} onOpenImport={() => { setTab('Data sources'); setDialog({ id: 'file-import' }); }} onOpenDownload={() => { setTab('Data sources'); setDialog({ id: 'dukascopy-download' }); }} />;
+      case 'data': return <DatasetTable onActivate={activateDataset} activeDatasetId={activeDatasetId} selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} onDeleteRow={handleDeleteDatasetRow}/>;
+      case 'brokers': return <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/>;
+      case 'stock-groups': return <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/>;
+      case 'custom-data': return <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/>;
+      case 'instruments': return <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/>;
+      case 'sessions': return <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/>;
+      case 'log': return <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></div></main>;
+    }
+  };
+  const triggerArrange = (action: WorkspaceArrangement) => { setArrangeOpen(false); setArrangeRequest(current => ({ seq: (current?.seq ?? 0) + 1, action, targetId: panelForTab[tab] })); };
+  return <div className="data-manager"><div className="dm-title">Data Manager</div><div className="ribbon-tabs" role="navigation" aria-label="Data Manager workspace navigation">{tabs.map(item => <button key={item} className={tab === item ? 'active' : ''} onClick={() => { setArrangeOpen(false); setTab(item); setDockActivation(value => value + 1); }}>{item}</button>)}<div className="dm-arrange-menu" ref={arrangeRef}><button type="button" className={arrangeOpen ? 'active' : ''} aria-haspopup="menu" aria-expanded={arrangeOpen} onClick={() => setArrangeOpen(value => !value)}>Arrange</button>{arrangeOpen && <div className="dm-arrange-dropdown" role="menu" aria-label="Arrange workspace panel"><button type="button" role="menuitem" onClick={() => triggerArrange('right')}>Move panel right</button><button type="button" role="menuitem" onClick={() => triggerArrange('bottom')}>Move panel below</button><button type="button" role="menuitem" onClick={() => triggerArrange('main')}>Return to main group</button><button type="button" role="menuitem" onClick={() => triggerArrange('close')}>Close panel</button></div>}</div></div><div className="ribbon" ref={ribbonRef}>
+    {['Home', 'Log', 'Chart'].includes(tab) && <p className="dm-context-note">{tab === 'Chart' ? 'Select a saved dataset to view its recorded history. Use Arrange to dock or close panels.' : tab === 'Home' ? 'Data Manager overview' : 'Data Manager operation log'}</p>}
     {tab === 'Data sources' && <div className="data-source-ribbon" aria-label="Data source operations"><div className="provider-actions">{dataSourceProviders.map(provider => <ProviderMenu key={provider.id} provider={provider} isOpen={openMenu === provider.id} nestedOpen={nestedOpen && openMenu === provider.id} onToggle={() => { setOpenMenu(current => current === provider.id ? null : provider.id); setNestedOpen(false); }} onToggleNested={() => setNestedOpen(current => !current)} onSelect={command => { setLastControlId(provider.id); selectCommand(command); }}/>)}</div><div className="context-actions">{dataSourceContextActions.map(action => { const Icon = contextIcons[action.id] ?? Database; return <button className={`data-source-button ${action.id === 'mass-delete' ? 'destructive' : ''}`} data-control-id={action.id} key={action.id} title={action.label} onClick={() => { setLastControlId(action.id); if (action.requiresSelection && selectedDatasetIds.length === 0) { setSelectionMessage('Select at least one dataset first'); return; } if (action.action) runDirectAction(action.action); if (action.dialog) setDialog({ id: action.dialog }); }}><Icon size={27}/><span>{action.label}</span></button>; })}</div></div>}
     {tab === 'Export' && <div className="export-actions" aria-label="Data export operations"><Button data-control-id="export-csv" className="export-csv" onClick={() => { setLastControlId('export-csv'); openExport('csv'); }}><FileSpreadsheet size={24} aria-hidden="true"/>Export to CSV</Button><Button data-control-id="export-mt4" className="export-mt4" title="Export to MetaTrader 4 (FXT & HST)" onClick={() => { setLastControlId('export-mt4'); openExport('mt4'); }}><MonitorDown size={24} aria-hidden="true"/>Export MT4 (FXT &amp; HST)</Button><Button data-control-id="export-mt5" className="export-mt5" title="Export to MetaTrader 5 data (99% test)" onClick={() => { setLastControlId('export-mt5'); openExport('mt5'); }}><ChartCandlestick size={24} aria-hidden="true"/>Export to MT5 data (99% test)</Button></div>}
     {tab === 'Tools' && <div className="data-tool-actions" aria-label="Data tools"><Button data-control-id="tool-timezone" className="tool-timezone" onClick={() => { setLastControlId('tool-timezone'); openClone(); }}><span className="timezone-tool-icon" aria-hidden="true"><Globe2 size={26}/><Clock size={13}/></span>Clone to timezone</Button><Button data-control-id="tool-analyze" className="tool-analyze" onClick={() => { setLastControlId('tool-analyze'); openReview(); }}><ChartCandlestick size={26} aria-hidden="true"/>View &amp; Analyze</Button></div>}
@@ -900,7 +746,7 @@ export function DataManager() {
       <Button className="action-load" onClick={()=>setBrokerDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
   </div><div className="dm-progress" role="status" aria-label="Data Manager progress"><strong>Progress</strong><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (['running', 'paused'].includes(providerJob?.state ?? '')) providerAction(providerJob?.state === 'paused' ? 'resume' : 'pause'); else setOperationState(current => current === 'paused' ? 'running' : 'paused'); }}>{operationState === 'paused' || providerJob?.state === 'paused' ? 'Resume all' : 'Pause all'}</Button><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (providerJob && ['running', 'paused'].includes(providerJob.state)) { providerAction('stop'); return; } setOperationState('cancelled'); notify(`${operationLabel} cancelled`); }}>Stop all</Button></div>
-  <div className="dm-body">{tab === 'Home' ? <DataManagerHome onNavigateTab={setTab} onOpenImport={() => { setTab('Data sources'); setDialog({ id: 'file-import' }); }} onOpenDownload={() => { setTab('Data sources'); setDialog({ id: 'dukascopy-download' }); }} /> : tab === 'Log' ? <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} onDeleteRow={handleDeleteDatasetRow}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/> : <div className="dm-config"><Section title={tab}><div className="cards-list">{Array.from({ length: 6 }, (_, index) => <button key={index}><Database size={22}/><strong>{tab.replace(/s$/, '')} {index + 1}</strong><span>{index % 2 ? 'Configured · mock adapter' : 'Ready for configuration'}</span></button>)}</div></Section></div>}</div>
+  <div className="dm-body">{workspace ? <DataManagerDock layout={workspace} activeId={panelForTab[tab]} activation={dockActivation} chartRequest={chartRequest} arrangeRequest={arrangeRequest} renderPanel={renderPanel} onActivate={id => setTab(current => id === 'data' && ['Export', 'Tools'].includes(current) ? current : labelForPanel[id])} /> : <div className="dm-workspace-feedback">{workspaceError ? <><p role="alert">{workspaceError}</p><Button onClick={() => retryWorkspace(value => value + 1)}>Retry workspace</Button></> : <p role="status">{hostStatus === 'online' ? 'Loading Data Manager workspace…' : 'Connect to the host to open Data Manager.'}</p>}</div>}</div>
   {dialog?.id === 'dukascopy-information' && <DisclaimerPopup onClose={closeDialog}/>}
   <AddPopup open={dialog?.id === 'dukascopy-add'} onClose={closeDialog} onComplete={message => { notify(message); closeDialog(); }}/>{dialog?.id === 'dukascopy-download' && <ImportPopup targets={downloadTargets} onClose={closeDialog} onStarted={() => { setProgressOwner('download'); setOperationState('idle'); notify('Dukascopy download started (simulation)'); }}/>}
   {dialog?.id === 'darwinex-add' && <DarwinexAddDialog onClose={closeDialog} onStarted={() => { setProgressOwner('darwinex'); setOperationState('idle'); setSelectionMessage(''); }}/> }

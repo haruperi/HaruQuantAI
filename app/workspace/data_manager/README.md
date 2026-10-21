@@ -10,6 +10,22 @@ and multi-format export.
 ## 1. Domain Registry (`FEAT-DATAMGR-*`, `FR-DATAMGR-*`, `DEC-DATAMGR-*`)
 
 ### 1.1 Architectural Decisions
+- `DEC-DATAMGR-DOCKABLE-SHELL`: AppDataManager supplies stable panel IDs and
+  Dockview hosts the five core catalog panels with group headers hidden so the
+  existing top tabs serve as the single navigation row; top-bar Arrange actions
+  move, split, return or close panels programmatically and top tabs reopen them
+  with retained ID identity. Browser-only layout state is not persisted in this slice.
+
+- `DEC-DATAMGR-SELECTION-CONTEXT`: Dataset IDs resolve selection through Home's
+  authoritative catalog. Backend methods return independent snapshots; no global
+  active-user selection or broadcast. The browser cancels superseded requests
+  and clears linked selection when the host session or catalog identity changes.
+- `DEC-DATAMGR-RECORDED-PREVIEW`: Linked charts and raw-bar tables share one
+  recorded OHLCV array and selected UTC timestamp. Preview is read-only, at most
+  500 rows from a catalog-supplied Parquet path inside the configured data root,
+  with a 32 MiB source-file limit. No generated bars, path guessing or downloads.
+  Ticks, absent paths and missing files are explicitly unavailable; invalid files
+  report an error. The existing decoder reads eligible files before trimming.
 - `DEC-DATAMGR-SQLITE-ISOLATION`: All Data Manager modules and routes interact
   with relational persistence strictly via `app.host.persistence` helper functions
   and `resolve_connection(db_path)`. Direct `sqlite3` imports outside
@@ -114,8 +130,23 @@ and multi-format export.
 - `FR-DATAMGR-TRANSFORMS-SESSION-ALIGNMENT`: Calendar-based session schedule filtering.
 
 #### Unified Workspace Router (`routes.py`)
+- `FEAT-DATAMGR-SHELL`: Data Manager workspace Dockview container. Implemented
+  scope: core dockable Instruments, Sessions, Brokers, Data and Custom Data
+  panels, auxiliary Home/Stock groups/Log/Chart panels, and linked recorded preview.
+- `FR-DATAMGR-SHELL-INIT`: `AppDataManager.init_workspace() -> dict[str, Any]`;
+  returns deterministic panel descriptors and default layout through GET
+  `/data/workspace`. Core panels open in one group, with Chart available as a split.
+- `FR-DATAMGR-SHELL-TAB`: `AppDataManager.open_tab(tab_id: str, context: Mapping[str, Any] | None = None) -> dict[str, Any]`;
+  validates tab/context, resolves an optional `dataset_id`, and returns selection
+  plus bounded recorded preview through POST `/data/workspace/tabs/{tab_id}`.
+  Unsupported context is 422; unknown dataset is 404. Existing authentication
+  applies. The frontend synchronizes dataset identity and chart/table cursors.
+- Remaining scope: layout persistence/popouts, tick preview, history reconciliation,
+  missing backend domain CRUD/provider services and replacement of existing
+  simulated provider flows. Shell integration does not establish those behaviors.
 - `FEAT-DATAMGR-ROUTES`: Workspace coordination and unified FastAPI gateway endpoints.
-- `FR-DATAMGR-ROUTES-WORKSPACE-FACADE`: Domain service coordinator binding all 11 modules.
+- `FR-DATAMGR-ROUTES-WORKSPACE-FACADE`: Host composition of AppDataManager and the
+  retained Home catalog service; no claim that absent domain services are bound.
 - `FR-DATAMGR-ROUTES-FASTAPI-GATEWAY`: REST router exposing endpoints under `/data`.
 
 ---

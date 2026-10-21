@@ -7,21 +7,23 @@ Description:
     with zero silent execution.
 
 Purpose:
-    FEAT-DATAMGR-ROUTES: Data Manager REST API routes and workspace coordinator.
+    FEAT-DATAMGR-SHELL: Dockable workspace and linked recorded-data selection.
+    FEAT-DATAMGR-ROUTES: Authenticated Data Manager HTTP gateway.
 
 Key Capabilities:
-    - FR-DATAMGR-ROUTES-WORKSPACE-FACADE: Facade (DataManagerWorkspace -> INFO).
+    - FR-DATAMGR-SHELL-INIT: Panels [AppDataManager.init_workspace()] -> INFO.
+    - FR-DATAMGR-SHELL-TAB: Selection [AppDataManager.open_tab()] -> INFO/WARNING.
     - FR-DATAMGR-ROUTES-FASTAPI-GATEWAY: Routes (create_data_manager_router -> INFO).
 
 Python API Usage:
     ```python
     from app.workspace.data_manager.routes import (
-        DataManagerWorkspace,
+        AppDataManager,
         create_data_manager_router,
     )
 
-    workspace = DataManagerWorkspace()
-    workspace.initialize_defaults()
+    workspace = AppDataManager()
+    layout = workspace.init_workspace()
     router = create_data_manager_router(workspace)
     ```
 
@@ -33,6 +35,9 @@ CLI Usage:
 
 from __future__ import annotations
 
+import math
+from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -40,6 +45,8 @@ from app.host.logging import get_logger
 from app.host.response import ApiResponse
 from app.host.session import SessionManager, session_manager
 from app.host.transport import extract_bearer_token
+from app.services.brokers.files import read_parquet_bars
+from app.services.include.contracts import DataInfo
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
@@ -50,7 +57,7 @@ if TYPE_CHECKING:
     from app.host.transport import EventBus
 
 __all__ = [
-    "DataManagerWorkspace",
+    "AppDataManager",
     "create_data_manager_router",
 ]
 
@@ -58,9 +65,53 @@ logger = get_logger(__name__)
 
 FACADE_FR = "FR-DATAMGR-ROUTES-WORKSPACE-FACADE"
 GATEWAY_FR = "FR-DATAMGR-ROUTES-FASTAPI-GATEWAY"
+INIT_FR = "FR-DATAMGR-SHELL-INIT"
+TAB_FR = "FR-DATAMGR-SHELL-TAB"
+_CORE_TABS = frozenset({"data", "instruments", "sessions", "brokers", "custom-data"})
+_TABS = (
+    ("data", "Data"),
+    ("instruments", "Instruments"),
+    ("sessions", "Sessions"),
+    ("brokers", "Brokers"),
+    ("custom-data", "Custom Data"),
+    ("chart", "Chart"),
+    ("home", "Home"),
+    ("stock-groups", "Stock groups"),
+    ("log", "Log"),
+)
 
 
-class DataManagerWorkspace:
+@dataclass(frozen=True)
+class _Config:
+    preview_rows: int = 500
+    preview_bytes: int = 32 * 1024 * 1024
+
+
+def _preview_state(state: str, reason: str) -> dict[str, Any]:
+    return {"state": state, "reason": reason, "rows": [], "limit": 500}
+
+
+def _normalized_bars(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Validate and normalize one shared table/chart array of recorded bars."""
+    by_time: dict[int, dict[str, Any]] = {}
+    for row in rows:
+        time = float(row["time"])
+        prices = {key: float(row[key]) for key in ("open", "high", "low", "close")}
+        volume = float(row.get("tick_volume", row.get("volume", 0)))
+        if not all(math.isfinite(value) for value in (time, volume, *prices.values())):
+            raise ValueError("Nonfinite historical bar.")
+        if time < 0 or time != int(time) or volume < 0:
+            raise ValueError("Invalid historical timestamp or volume.")
+        if prices["low"] > min(prices.values()) or prices["high"] < max(
+            prices.values()
+        ):
+            raise ValueError("Invalid historical price envelope.")
+        stamp = int(time)
+        by_time[stamp] = {"time": stamp, **prices, "volume": volume}
+    return [by_time[stamp] for stamp in sorted(by_time)]
+
+
+class AppDataManager:
     """Authoritative workspace facade coordinating Data Manager domain services."""
 
     def __init__(
@@ -83,34 +134,113 @@ class DataManagerWorkspace:
         self.home = Home()
 
         logger.info(
-            "%s: Initialized DataManagerWorkspace (data_dir=%s)",
+            "%s: Initialized AppDataManager",
             FACADE_FR,
-            self.data_dir,
             extra={"fr_id": FACADE_FR},
         )
 
-    def initialize_defaults(self) -> dict[str, int]:
-        """Seed default canonical catalogs."""
-        counts = {
-            "brokers": 0,
-            "instruments": 0,
-            "sessions": 0,
-            "baskets": 0,
-        }
+    def init_workspace(self) -> dict[str, Any]:
+        """Return the deterministic Dockview panel catalog without saving state."""
         logger.info(
-            "%s: Seeded default catalogs: %s",
-            FACADE_FR,
-            counts,
-            extra={"fr_id": FACADE_FR, "seeded": counts},
+            "%s: Initialized dockable workspace", INIT_FR, extra={"fr_id": INIT_FR}
         )
-        return counts
+        return {
+            "tabs": [
+                {"id": tab_id, "title": title, "core": tab_id in _CORE_TABS}
+                for tab_id, title in _TABS
+            ],
+            "active_tab": "data",
+            "layout": {"core_group": "catalogs", "chart_position": "right"},
+        }
+
+    def open_tab(
+        self, tab_id: str, context: Mapping[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Resolve a tab and dataset snapshot; selection is never shared globally."""
+        try:
+            return self._open_tab(tab_id, context)
+        except ValueError, LookupError:
+            logger.warning(
+                "%s: Rejected workspace context", TAB_FR, extra={"fr_id": TAB_FR}
+            )
+            raise
+
+    def _open_tab(
+        self, tab_id: str, context: Mapping[str, Any] | None
+    ) -> dict[str, Any]:
+        if tab_id not in dict(_TABS):
+            raise ValueError("Unsupported Data Manager tab.")
+        if context is not None and (
+            not isinstance(context, Mapping) or set(context) - {"dataset_id"}
+        ):
+            raise ValueError("Context accepts only dataset_id.")
+        selection = None
+        preview = _preview_state("unavailable", "Select a saved dataset.")
+        if context:
+            dataset_id = context.get("dataset_id")
+            if not isinstance(dataset_id, str) or not dataset_id.strip():
+                raise ValueError("dataset_id must be a nonempty string.")
+            dataset = next(
+                (row for row in self.home.get_saved_datasets() if row.id == dataset_id),
+                None,
+            )
+            if dataset is None:
+                raise LookupError("Selected dataset is no longer in the catalog.")
+            selection = dataset.to_dict()
+            preview = self._preview(dataset)
+        logger.info(
+            "%s: Opened workspace tab %s", TAB_FR, tab_id, extra={"fr_id": TAB_FR}
+        )
+        return {"active_tab": tab_id, "selection": selection, "preview": preview}
+
+    def _preview(self, dataset: DataInfo) -> dict[str, Any]:
+        if str(dataset.timeframe).upper() == "TICK":
+            return _preview_state("unavailable", "Tick preview is not supported.")
+        if not dataset.path:
+            return _preview_state("unavailable", "No recorded history path in catalog.")
+        try:
+            path = self._preview_path(dataset.path)
+            if not path.is_file():
+                return _preview_state(
+                    "unavailable", "Recorded history file is missing."
+                )
+            if path.stat().st_size > _Config().preview_bytes:
+                return _preview_state(
+                    "unavailable", "History exceeds the 32 MiB preview limit."
+                )
+            rows = _normalized_bars(
+                read_parquet_bars(path, count=_Config().preview_rows)
+            )
+            return (
+                {"state": "ready", "reason": "", "rows": rows, "limit": 500}
+                if rows
+                else _preview_state("unavailable", "No recorded bars available.")
+            )
+        except OSError, ValueError, KeyError, TypeError, OverflowError:
+            logger.warning(
+                "%s: Recorded preview unavailable", TAB_FR, extra={"fr_id": TAB_FR}
+            )
+            return _preview_state("error", "Recorded history cannot be previewed.")
+
+    def _preview_path(self, stored_path: str) -> Path:
+        root = self.data_dir.resolve()
+        candidate = Path(stored_path.replace("\\", "/"))
+        if not candidate.is_absolute():
+            parts = candidate.parts
+            if parts and parts[0] == root.name:
+                candidate = Path(*parts[1:])
+            candidate = root / candidate
+        resolved = candidate.resolve()
+        if not resolved.is_relative_to(root) or resolved.suffix.lower() != ".parquet":
+            raise ValueError("History path is outside preview policy.")
+        return resolved
 
 
 def _success(data: Any, message: str = "Success") -> JSONResponse:
     return JSONResponse(content=ApiResponse.ok(data=data, meta={"message": message}))
 
 
-def _register_home_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:
+def _register_home_routes(router: APIRouter, ws: AppDataManager) -> None:
     @router.get("/home/overview")
     def get_home_overview() -> JSONResponse:
         data = ws.home.get_overview()
@@ -122,13 +252,41 @@ def _register_home_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:
         return _success(datasets)
 
 
+def _register_workspace_routes(router: APIRouter, ws: AppDataManager) -> None:
+    @router.get("/workspace")
+    def init_workspace() -> JSONResponse:
+        return _success(ws.init_workspace())
+
+    @router.post("/workspace/tabs/{tab_id}")
+    def open_tab(tab_id: str, payload: dict[str, Any]) -> JSONResponse:
+        if set(payload) - {"context"}:
+            return _workspace_error("Request accepts only context.", 422)
+        try:
+            return _success(ws.open_tab(tab_id, payload.get("context")))
+        except (ValueError, LookupError) as error:
+            code = 404 if isinstance(error, LookupError) else 422
+            return _workspace_error(str(error), code)
+
+
+def _workspace_error(message: str, code: int) -> JSONResponse:
+    logger.warning("%s: Rejected workspace request", TAB_FR, extra={"fr_id": TAB_FR})
+    return JSONResponse(
+        status_code=code,
+        content=ApiResponse.error(
+            "WORKSPACE_CONTEXT",
+            message,
+            status_code=code,
+        ),
+    )
+
+
 def create_data_manager_router(
-    workspace: DataManagerWorkspace | None = None,
+    workspace: AppDataManager | None = None,
     session_mgr: SessionManager | None = None,
     require_auth: bool = False,
 ) -> APIRouter:
     """Create and configure the FastAPI APIRouter for Data Manager endpoints."""
-    ws = workspace or DataManagerWorkspace()
+    ws = workspace or AppDataManager()
     effective_session_mgr = session_mgr or session_manager
     dependencies: list[Any] = []
     if require_auth:
@@ -164,6 +322,7 @@ def create_data_manager_router(
     )
 
     _register_home_routes(router, ws)
+    _register_workspace_routes(router, ws)
 
     logger.info(
         "%s: Registered Data Manager router with %d route rules",
@@ -175,16 +334,11 @@ def create_data_manager_router(
 
 
 def main() -> None:
-    """Execute real-usage demonstration of DataManagerWorkspace and router."""
-    workspace = DataManagerWorkspace()
-    seeded = workspace.initialize_defaults()
-    print(f"Initialized defaults: {seeded}")
-
+    """Execute real-usage demonstration of AppDataManager and router."""
+    workspace = AppDataManager()
+    workspace.init_workspace()
     router = create_data_manager_router(workspace)
-    print(f"Created Data Manager router with {len(router.routes)} endpoints")
-
-    overview = workspace.home.get_overview()
-    print(f"Workspace overview: {overview}")
+    logger.info("Created Data Manager router with %d endpoints", len(router.routes))
 
 
 if __name__ == "__main__":

@@ -680,7 +680,7 @@ def test_headless_cli_data_and_workspace_commands(
     assert code_home == 0
     assert json.loads(out_home)["data"]["action"] == "home"
 
-    # 2. Test HeadlessCliRunner against mock DataManagerWorkspace sub-catalogs
+    # 2. Test HeadlessCliRunner against mock AppDataManager sub-catalogs
     host = AppHost(data_dir=data_dir, headless=True, use_process_pool=False)
     host.startup()
     host.initialize_db()
@@ -793,13 +793,13 @@ def test_headless_cli_runner_uninitialized_guards(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="PluginLifecycleManager is not initialized"):
         runner._cmd_plugins("list")
 
-    with pytest.raises(RuntimeError, match="DataManagerWorkspace is not initialized"):
+    with pytest.raises(RuntimeError, match="AppDataManager is not initialized"):
         runner._cmd_data("home")
 
-    with pytest.raises(RuntimeError, match="DataManagerWorkspace is not initialized"):
+    with pytest.raises(RuntimeError, match="AppDataManager is not initialized"):
         runner._cmd_instrument("view")
 
-    with pytest.raises(RuntimeError, match="DataManagerWorkspace is not initialized"):
+    with pytest.raises(RuntimeError, match="AppDataManager is not initialized"):
         runner._cmd_sessions("view")
 
 
