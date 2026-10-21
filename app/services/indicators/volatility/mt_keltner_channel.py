@@ -24,7 +24,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.mt_keltner_channel import MTKeltnerChannel
+    from app.services.indicators.volatility.mt_keltner_channel import MTKeltnerChannel
 
     high = np.array([10.5, 11.0, 11.5, 12.0, 12.5])
     low = np.array([9.5, 10.0, 10.5, 11.0, 11.5])
@@ -35,7 +35,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.mt_keltner_channel
+    uv run python -m app.services.indicators.volatility.mt_keltner_channel
     ```
 """
 
@@ -46,6 +46,12 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.moving_average import MovingAverage
 
@@ -121,7 +127,7 @@ class MTKeltnerChannel(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Close bar at shift is higher than Upper band."""
-        return close_series.is_greater(kc_dict["upper"], shift)
+        return is_greater(close_series, kc_dict["upper"], shift=shift)
 
     @classmethod
     def bar_closes_below_upper(
@@ -131,7 +137,7 @@ class MTKeltnerChannel(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Close bar at shift is lower than Upper band."""
-        return close_series.is_lower(kc_dict["upper"], shift)
+        return is_lower(close_series, kc_dict["upper"], shift=shift)
 
     @classmethod
     def bar_closes_above_lower(
@@ -141,7 +147,7 @@ class MTKeltnerChannel(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Close bar at shift is higher than Lower band."""
-        return close_series.is_greater(kc_dict["lower"], shift)
+        return is_greater(close_series, kc_dict["lower"], shift=shift)
 
     @classmethod
     def bar_closes_below_lower(
@@ -151,32 +157,32 @@ class MTKeltnerChannel(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Close bar at shift is lower than Lower band."""
-        return close_series.is_lower(kc_dict["lower"], shift)
+        return is_lower(close_series, kc_dict["lower"], shift=shift)
 
     @classmethod
     def upper_is_rising(
         cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if Upper band is rising."""
-        return kc_dict["upper"].is_rising(shift)
+        return is_rising(kc_dict["upper"], shift=shift)
 
     @classmethod
     def upper_is_falling(
         cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if Upper band is falling."""
-        return kc_dict["upper"].is_falling(shift)
+        return is_falling(kc_dict["upper"], shift=shift)
 
     @classmethod
     def lower_is_rising(
         cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if Lower band is rising."""
-        return kc_dict["lower"].is_rising(shift)
+        return is_rising(kc_dict["lower"], shift=shift)
 
     @classmethod
     def lower_is_falling(
         cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if Lower band is falling."""
-        return kc_dict["lower"].is_falling(shift)
+        return is_falling(kc_dict["lower"], shift=shift)

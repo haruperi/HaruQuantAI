@@ -50,6 +50,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -390,14 +398,14 @@ class VolumeProfile(BaseIndicator):
         cls, close: IndicatorSeries, poc: IndicatorSeries, shift: int = 0
     ) -> bool:
         """Evaluate VPPriceAbovePOC (`close[shift] > poc[shift]`)."""
-        return close.is_greater(poc, shift=shift)
+        return is_greater(close, poc, shift1=shift, shift2=shift)
 
     @classmethod
     def price_below_poc(
         cls, close: IndicatorSeries, poc: IndicatorSeries, shift: int = 0
     ) -> bool:
         """Evaluate VPPriceBelowPOC (`close[shift] < poc[shift]`)."""
-        return close.is_lower(poc, shift=shift)
+        return is_lower(close, poc, shift1=shift, shift2=shift)
 
     @classmethod
     def price_inside_va(
@@ -430,32 +438,32 @@ class VolumeProfile(BaseIndicator):
     @classmethod
     def poc_is_rising(cls, poc: IndicatorSeries, shift: int = 0) -> bool:
         """Check if POC is rising at shift compared to shift+1."""
-        return poc.is_rising(shift=shift)
+        return is_rising(poc, shift=shift)
 
     @classmethod
     def poc_is_falling(cls, poc: IndicatorSeries, shift: int = 0) -> bool:
         """Check if POC is falling at shift compared to shift+1."""
-        return poc.is_falling(shift=shift)
+        return is_falling(poc, shift=shift)
 
     @classmethod
     def vah_is_rising(cls, vah: IndicatorSeries, shift: int = 0) -> bool:
         """Check if VAH is rising at shift compared to shift+1."""
-        return vah.is_rising(shift=shift)
+        return is_rising(vah, shift=shift)
 
     @classmethod
     def vah_is_falling(cls, vah: IndicatorSeries, shift: int = 0) -> bool:
         """Check if VAH is falling at shift compared to shift+1."""
-        return vah.is_falling(shift=shift)
+        return is_falling(vah, shift=shift)
 
     @classmethod
     def val_is_rising(cls, val: IndicatorSeries, shift: int = 0) -> bool:
         """Check if VAL is rising at shift compared to shift+1."""
-        return val.is_rising(shift=shift)
+        return is_rising(val, shift=shift)
 
     @classmethod
     def val_is_falling(cls, val: IndicatorSeries, shift: int = 0) -> bool:
         """Check if VAL is falling at shift compared to shift+1."""
-        return val.is_falling(shift=shift)
+        return is_falling(val, shift=shift)
 
     @classmethod
     def is_narrow_value_area(
@@ -491,14 +499,14 @@ class VolumeProfile(BaseIndicator):
         cls, bull_poc: IndicatorSeries, bear_poc: IndicatorSeries, shift: int = 0
     ) -> bool:
         """Evaluate VPBullAboveBear (`bull_poc[shift] > bear_poc[shift]`)."""
-        return bull_poc.is_greater(bear_poc, shift=shift)
+        return is_greater(bull_poc, bear_poc, shift1=shift, shift2=shift)
 
     @classmethod
     def bear_above_bull(
         cls, bull_poc: IndicatorSeries, bear_poc: IndicatorSeries, shift: int = 0
     ) -> bool:
         """Evaluate VPBearAboveBull (`bear_poc[shift] > bull_poc[shift]`)."""
-        return bear_poc.is_greater(bull_poc, shift=shift)
+        return is_greater(bear_poc, bull_poc, shift1=shift, shift2=shift)
 
     @classmethod
     def bottom_heavy_poc(
@@ -527,14 +535,14 @@ class VolumeProfile(BaseIndicator):
         cls, delta: IndicatorSeries, min_delta: float = 100.0, shift: int = 0
     ) -> bool:
         """Evaluate VPHighDelta (`delta[shift] > min_delta`)."""
-        return delta.is_greater(min_delta, shift=shift)
+        return is_greater(delta, min_delta, shift1=shift)
 
     @classmethod
     def high_neg_delta(
         cls, delta: IndicatorSeries, min_delta: float = 100.0, shift: int = 0
     ) -> bool:
         """Evaluate VPHighNegDelta (`delta[shift] < -min_delta`)."""
-        return delta.is_lower(-min_delta, shift=shift)
+        return is_lower(delta, -min_delta, shift1=shift)
 
     @classmethod
     def ib_breakout_up(
@@ -897,11 +905,11 @@ class VolumeProfile(BaseIndicator):
         cls, close: IndicatorSeries, vwap: IndicatorSeries, shift: int = 0
     ) -> bool:
         """Evaluate VPVWAPCrossUp (`close` crosses above `vwap`)."""
-        return close.crosses_above(vwap, shift=shift)
+        return crosses_above(close, vwap, shift=shift)
 
     @classmethod
     def vwap_cross_down(
         cls, close: IndicatorSeries, vwap: IndicatorSeries, shift: int = 0
     ) -> bool:
         """Evaluate VPVWAPCrossDown (`close` crosses below `vwap`)."""
-        return close.crosses_below(vwap, shift=shift)
+        return crosses_below(close, vwap, shift=shift)

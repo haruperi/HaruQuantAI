@@ -14,7 +14,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.heiken_ashi import HeikenAshi
+    from app.services.indicators.price_action.heiken_ashi import HeikenAshi
 
     ha = HeikenAshi.calculate(open_p, high, low, close)
     ha_open = ha["open"]
@@ -33,6 +33,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import is_greater, is_lower
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -122,7 +123,9 @@ class HeikenAshi(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if Heiken Ashi candle is bullish (Close > Open)."""
-        return ha["close"].is_greater(ha["open"], shift=shift)
+        return is_greater(
+            ha["close"], ha["open"], shift1=shift, shift2=shift, round_digits=8
+        )
 
     @classmethod
     def is_bearish(
@@ -131,7 +134,9 @@ class HeikenAshi(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if Heiken Ashi candle is bearish (Close < Open)."""
-        return ha["close"].is_lower(ha["open"], shift=shift)
+        return is_lower(
+            ha["close"], ha["open"], shift1=shift, shift2=shift, round_digits=8
+        )
 
     @classmethod
     def turns_bullish(
@@ -140,8 +145,16 @@ class HeikenAshi(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if candle turned bullish on current bar from bearish on prior bar."""
-        curr_bull = ha["close"].is_greater(ha["open"], shift=shift)
-        prev_bear = ha["close"].is_lower(ha["open"], shift=shift + 1)
+        curr_bull = is_greater(
+            ha["close"], ha["open"], shift1=shift, shift2=shift, round_digits=8
+        )
+        prev_bear = is_lower(
+            ha["close"],
+            ha["open"],
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        )
         return curr_bull and prev_bear
 
     @classmethod
@@ -151,6 +164,14 @@ class HeikenAshi(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if candle turned bearish on current bar from bullish on prior bar."""
-        curr_bear = ha["close"].is_lower(ha["open"], shift=shift)
-        prev_bull = ha["close"].is_greater(ha["open"], shift=shift + 1)
+        curr_bear = is_lower(
+            ha["close"], ha["open"], shift1=shift, shift2=shift, round_digits=8
+        )
+        prev_bull = is_greater(
+            ha["close"],
+            ha["open"],
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        )
         return curr_bear and prev_bull

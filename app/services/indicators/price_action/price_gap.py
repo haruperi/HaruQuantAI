@@ -38,6 +38,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import is_greater, is_lower
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -140,8 +141,7 @@ class PriceGap(BaseIndicator):
             min_size,
             shift,
         )
-        val = gap_series.get(shift)
-        return not np.isnan(val) and val > min_size
+        return is_greater(gap_series, min_size, shift1=shift, round_digits=8)
 
     @classmethod
     def is_gap_down(
@@ -156,8 +156,7 @@ class PriceGap(BaseIndicator):
             min_size,
             shift,
         )
-        val = gap_series.get(shift)
-        return not np.isnan(val) and val < -min_size
+        return is_lower(gap_series, -min_size, shift1=shift, round_digits=8)
 
     @classmethod
     def is_gap_filled(cls, gap_filled_series: IndicatorSeries, shift: int = 0) -> bool:
@@ -166,5 +165,6 @@ class PriceGap(BaseIndicator):
             "Evaluating PriceGap.is_gap_filled: shift=%d",
             shift,
         )
-        val = gap_filled_series.get(shift)
-        return not np.isnan(val) and val > DEFAULT_GAP_THRESHOLD
+        return is_greater(
+            gap_filled_series, DEFAULT_GAP_THRESHOLD, shift1=shift, round_digits=8
+        )

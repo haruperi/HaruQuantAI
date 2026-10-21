@@ -21,17 +21,16 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.rsi import RSI
+    from app.services.indicators.momentum.rsi import RSI
 
     close = np.array([10.0, 10.5, 11.0, 10.8, 11.2, 11.5, 11.1, 11.8])
     rsi_series = RSI.calculate(close, period=14)
     current_rsi = rsi_series.get(0)
-    is_oversold = rsi_series.get(0) < 30.0
     ```
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_indicators.py -k "test_rsi" --no-cov
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py --no-cov
     ```
 """
 
@@ -42,6 +41,16 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -86,7 +95,6 @@ class RSI(BaseIndicator):
         if n < min_price_bars:
             return IndicatorSeries(rsi_vals, name="RSI")
 
-        # Price changes
         deltas = np.diff(c)
         ups = np.maximum(deltas, 0.0)
         downs = np.maximum(-deltas, 0.0)
@@ -94,7 +102,6 @@ class RSI(BaseIndicator):
         if n <= period:
             return IndicatorSeries(rsi_vals, name="RSI")
 
-        # Initial SMA averages over period
         cur_avg_up = float(np.mean(ups[:period]))
         cur_avg_down = float(np.mean(downs[:period]))
 
@@ -105,7 +112,6 @@ class RSI(BaseIndicator):
         else:
             rsi_vals[period] = 50.0
 
-        # Wilder's smoothing for subsequent bars
         for i in range(period + 1, n):
             up = ups[i - 1]
             down = downs[i - 1]
@@ -131,51 +137,47 @@ class RSI(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate RSIRising condition."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate RSIFalling condition."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def crosses_above(
         cls, series: IndicatorSeries, level: float, shift: int = 0
     ) -> bool:
         """Evaluate RSICrossUp condition."""
-        return series.crosses_above(level, shift)
+        return crosses_above(series, level, shift=shift)
 
     @classmethod
     def crosses_below(
         cls, series: IndicatorSeries, level: float, shift: int = 0
     ) -> bool:
         """Evaluate RSICrossDown condition."""
-        return series.crosses_below(level, shift)
+        return crosses_below(series, level, shift=shift)
 
     @classmethod
     def is_higher(
         cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate RSIHigher condition."""
-        return series.is_higher(lookback, shift)
+        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def is_lower(
         cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate RSILower condition."""
-        val0 = series.get(shift)
-        val_past = series.get(shift + lookback)
-        if np.isnan(val0) or np.isnan(val_past):
-            return False
-        return val0 < val_past
+        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate RSIChangesUp condition."""
-        return series.changes_up(shift)
+        return changes_up(series, shift=shift)
 
     @classmethod
     def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate RSIChangesDown condition."""
-        return series.changes_down(shift)
+        return changes_down(series, shift=shift)

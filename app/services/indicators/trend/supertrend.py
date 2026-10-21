@@ -24,7 +24,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.supertrend import SuperTrend
+    from app.services.indicators.trend.supertrend import SuperTrend
 
     high = np.linspace(10.0, 20.0, 30)
     low = np.linspace(8.0, 18.0, 30)
@@ -37,7 +37,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.supertrend
+    uv run python -m app.services.indicators.trend.supertrend
     ```
 """
 
@@ -48,6 +48,13 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    equals,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.volatility.atr import ATR
 from app.services.indicators.volatility.mt_atr import MTATR
@@ -175,13 +182,10 @@ class SuperTrend(BaseIndicator):
     @classmethod
     def is_uptrend(cls, st_dict: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Evaluate if SuperTrend is in uptrend (rising line)."""
-        curr = st_dict["main"].get(shift)
-        prev = st_dict["main"].get(shift + 1)
-        res = bool(curr > prev)
+        res = is_rising(st_dict["main"], shift=shift, round_digits=8)
         logger.debug(
-            "FR-SERVICES-SUPERTREND-CONDITIONS is_uptrend curr=%.4f prev=%.4f res=%s",
-            curr,
-            prev,
+            "FR-SERVICES-SUPERTREND-CONDITIONS is_uptrend shift=%d res=%s",
+            shift,
             res,
         )
         return res
@@ -189,13 +193,10 @@ class SuperTrend(BaseIndicator):
     @classmethod
     def is_downtrend(cls, st_dict: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Evaluate if SuperTrend is in downtrend (falling line)."""
-        curr = st_dict["main"].get(shift)
-        prev = st_dict["main"].get(shift + 1)
-        res = bool(curr < prev)
+        res = is_falling(st_dict["main"], shift=shift, round_digits=8)
         logger.debug(
-            "FR-SERVICES-SUPERTREND-CONDITIONS is_downtrend curr=%.4f prev=%.4f res=%s",
-            curr,
-            prev,
+            "FR-SERVICES-SUPERTREND-CONDITIONS is_downtrend shift=%d res=%s",
+            shift,
             res,
         )
         return res
@@ -203,13 +204,16 @@ class SuperTrend(BaseIndicator):
     @classmethod
     def is_in_range(cls, st_dict: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Evaluate if SuperTrend is in range (flat line)."""
-        curr = round(st_dict["main"].get(shift), 5)
-        prev = round(st_dict["main"].get(shift + 1), 5)
-        res = bool(curr == prev)
+        res = equals(
+            st_dict["main"],
+            st_dict["main"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=5,
+        )
         logger.debug(
-            "FR-SERVICES-SUPERTREND-CONDITIONS is_in_range curr=%.5f prev=%.5f res=%s",
-            curr,
-            prev,
+            "FR-SERVICES-SUPERTREND-CONDITIONS is_in_range shift=%d res=%s",
+            shift,
             res,
         )
         return res
@@ -222,12 +226,7 @@ class SuperTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Close bar at shift is above SuperTrend."""
-        close_series = (
-            close
-            if isinstance(close, IndicatorSeries)
-            else IndicatorSeries(close, name="Close")
-        )
-        return close_series.is_greater(st_dict["main"], shift)
+        return is_greater(close, st_dict["main"], shift=shift)
 
     @classmethod
     def bar_closes_below(
@@ -237,12 +236,7 @@ class SuperTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Close bar at shift is below SuperTrend."""
-        close_series = (
-            close
-            if isinstance(close, IndicatorSeries)
-            else IndicatorSeries(close, name="Close")
-        )
-        return close_series.is_lower(st_dict["main"], shift)
+        return is_lower(close, st_dict["main"], shift=shift)
 
 
 Supertrend = SuperTrend

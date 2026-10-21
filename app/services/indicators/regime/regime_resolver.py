@@ -34,6 +34,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import equals
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.regime.choppiness import ChoppinessIndex
 from app.services.indicators.trend.adx import ADX
@@ -222,26 +223,30 @@ class MarketRegimeResolver(BaseIndicator):
     def is_uptrend(cls, regime: IndicatorSeries, shift: int = 0) -> bool:
         """True if market is in uptrend or upward breakout."""
         logger.info("Evaluating MarketRegimeResolver is_uptrend at shift=%d", shift)
-        val = regime.get(shift)
-        return not np.isnan(val) and val in (REGIME_TREND_UP, REGIME_BREAKOUT_UP)
+        return equals(regime, REGIME_TREND_UP, shift1=shift) or equals(
+            regime, REGIME_BREAKOUT_UP, shift1=shift
+        )
 
     @classmethod
     def is_downtrend(cls, regime: IndicatorSeries, shift: int = 0) -> bool:
         """True if market is in downtrend or downward breakout."""
         logger.info("Evaluating MarketRegimeResolver is_downtrend at shift=%d", shift)
-        val = regime.get(shift)
-        return not np.isnan(val) and val in (REGIME_TREND_DOWN, REGIME_BREAKOUT_DOWN)
+        return equals(regime, REGIME_TREND_DOWN, shift1=shift) or equals(
+            regime, REGIME_BREAKOUT_DOWN, shift1=shift
+        )
 
     @classmethod
     def is_ranging(cls, regime: IndicatorSeries, shift: int = 0) -> bool:
         """True if market is ranging or in choppy consolidation."""
         logger.info("Evaluating MarketRegimeResolver is_ranging at shift=%d", shift)
-        val = regime.get(shift)
-        return not np.isnan(val) and val in (REGIME_RANGE, REGIME_CHOPPY_RANGE)
+        return equals(regime, REGIME_RANGE, shift1=shift) or equals(
+            regime, REGIME_CHOPPY_RANGE, shift1=shift
+        )
 
     @classmethod
     def is_breakout(cls, regime: IndicatorSeries, shift: int = 0) -> bool:
         """True if market is breaking out above or below channels."""
         logger.info("Evaluating MarketRegimeResolver is_breakout at shift=%d", shift)
-        val = regime.get(shift)
-        return not np.isnan(val) and val in (REGIME_BREAKOUT_UP, REGIME_BREAKOUT_DOWN)
+        return equals(regime, REGIME_BREAKOUT_UP, shift1=shift) or equals(
+            regime, REGIME_BREAKOUT_DOWN, shift1=shift
+        )

@@ -35,6 +35,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -145,8 +153,7 @@ class RogersSatchellVolatility(BaseIndicator):
             threshold,
             shift,
         )
-        val = vol.get(shift)
-        return not np.isnan(val) and val > threshold
+        return is_greater(vol, threshold, shift1=shift)
 
     @classmethod
     def is_subdued(
@@ -161,8 +168,7 @@ class RogersSatchellVolatility(BaseIndicator):
             threshold,
             shift,
         )
-        val = vol.get(shift)
-        return not np.isnan(val) and val < threshold
+        return is_lower(vol, threshold, shift1=shift)
 
     @classmethod
     def crosses_above(
@@ -177,11 +183,7 @@ class RogersSatchellVolatility(BaseIndicator):
             threshold,
             shift,
         )
-        curr = vol.get(shift)
-        prev = vol.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= threshold and curr > threshold)
+        return crosses_above(vol, threshold, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -196,24 +198,16 @@ class RogersSatchellVolatility(BaseIndicator):
             threshold,
             shift,
         )
-        curr = vol.get(shift)
-        prev = vol.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= threshold and curr < threshold)
+        return crosses_below(vol, threshold, shift=shift)
 
     @classmethod
     def is_rising(cls, vol: IndicatorSeries, shift: int = 0) -> bool:
         """True if volatility is rising between shift+1 and shift."""
         logger.info("Evaluating RogersSatchell is_rising at shift=%d", shift)
-        curr = vol.get(shift)
-        prev = vol.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(vol, shift=shift)
 
     @classmethod
     def is_falling(cls, vol: IndicatorSeries, shift: int = 0) -> bool:
         """True if volatility is falling between shift+1 and shift."""
         logger.info("Evaluating RogersSatchell is_falling at shift=%d", shift)
-        curr = vol.get(shift)
-        prev = vol.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(vol, shift=shift)

@@ -15,7 +15,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.schaff_trend_cycle import SchaffTrendCycle
+    from app.services.indicators.momentum.schaff_trend_cycle import SchaffTrendCycle
 
     stc = SchaffTrendCycle.calculate(
         close, stoch_period=10, fast_period=20, slow_period=50
@@ -34,6 +34,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -58,21 +66,7 @@ class SchaffTrendCycle(BaseIndicator):
         slow_period: int = DEFAULT_SLOW_PERIOD,
         factor: float = DEFAULT_FACTOR,
     ) -> IndicatorSeries:
-        """Compute Schaff Trend Cycle across price series.
-
-        Args:
-            price: Input price series (typically Close).
-            stoch_period: Lookback window for stochastic cycles (must be >= 2).
-            fast_period: Fast EMA lookback for MACD (must be >= 2).
-            slow_period: Slow EMA lookback for MACD (must be > fast_period).
-            factor: Smoothing factor (default 0.5).
-
-        Returns:
-            IndicatorSeries bounded in [0.0, 100.0].
-
-        Raises:
-            ValueError: If periods are invalid or series is empty.
-        """
+        """Compute Schaff Trend Cycle across price series."""
         logger.info(
             "STC calculation initiated: stoch=%d, fast=%d, slow=%d",
             stoch_period,
@@ -184,11 +178,7 @@ class SchaffTrendCycle(BaseIndicator):
     ) -> bool:
         """Check if STC is strictly above level."""
         logger.info("Evaluating STC is_above_level at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        idx = len(s) - 1 - shift
-        if idx < 0 or idx >= len(s) or np.isnan(s[idx]):
-            return False
-        return bool(s[idx] > level)
+        return is_greater(series, level, shift=shift)
 
     @staticmethod
     def is_below_level(
@@ -198,11 +188,7 @@ class SchaffTrendCycle(BaseIndicator):
     ) -> bool:
         """Check if STC is strictly below level."""
         logger.info("Evaluating STC is_below_level at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        idx = len(s) - 1 - shift
-        if idx < 0 or idx >= len(s) or np.isnan(s[idx]):
-            return False
-        return bool(s[idx] < level)
+        return is_lower(series, level, shift=shift)
 
     @staticmethod
     def crosses_above(
@@ -212,12 +198,7 @@ class SchaffTrendCycle(BaseIndicator):
     ) -> bool:
         """Check if STC crossed above a threshold level."""
         logger.info("Evaluating STC crosses_above at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[prev] <= level and s[curr] > level)
+        return crosses_above(series, level, shift=shift)
 
     @staticmethod
     def crosses_below(
@@ -227,12 +208,7 @@ class SchaffTrendCycle(BaseIndicator):
     ) -> bool:
         """Check if STC crossed below a threshold level."""
         logger.info("Evaluating STC crosses_below at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[prev] >= level and s[curr] < level)
+        return crosses_below(series, level, shift=shift)
 
     @staticmethod
     def is_rising(
@@ -241,12 +217,7 @@ class SchaffTrendCycle(BaseIndicator):
     ) -> bool:
         """Check if STC is rising."""
         logger.info("Evaluating STC is_rising at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[curr] > s[prev])
+        return is_rising(series, shift=shift)
 
     @staticmethod
     def is_falling(
@@ -255,9 +226,4 @@ class SchaffTrendCycle(BaseIndicator):
     ) -> bool:
         """Check if STC is falling."""
         logger.info("Evaluating STC is_falling at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[curr] < s[prev])
+        return is_falling(series, shift=shift)

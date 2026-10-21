@@ -43,6 +43,14 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.moving_average import MovingAverage
 
@@ -143,12 +151,6 @@ class BollingerBands(BaseIndicator):
         )
         return IndicatorSeries(out, name="BB.WidthRatio")
 
-    @staticmethod
-    def _as_series(
-        s: IndicatorSeries | Sequence[float] | np.ndarray,
-    ) -> IndicatorSeries:
-        return s if isinstance(s, IndicatorSeries) else IndicatorSeries(s)
-
     # Unified condition helpers
     @classmethod
     def price_crosses_above_upper(
@@ -158,7 +160,7 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate Price crosses above Upper band condition."""
-        return price_series.crosses_above(bands["upper"], shift)
+        return crosses_above(price_series, bands["upper"], shift=shift)
 
     @classmethod
     def price_crosses_below_lower(
@@ -168,7 +170,7 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate Price crosses below Lower band condition."""
-        return price_series.crosses_below(bands["lower"], shift)
+        return crosses_below(price_series, bands["lower"], shift=shift)
 
     @classmethod
     def price_higher_upper(
@@ -178,7 +180,7 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate Price is higher than Upper band."""
-        return price_series.is_greater(bands["upper"], shift)
+        return is_greater(price_series, bands["upper"], shift=shift)
 
     @classmethod
     def price_lower_lower(
@@ -188,31 +190,31 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate Price is lower than Lower band."""
-        return price_series.is_lower(bands["lower"], shift)
+        return is_lower(price_series, bands["lower"], shift=shift)
 
     @classmethod
     def upper_is_rising(cls, bands: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Evaluate BBUpperRising (`Upper[shift + 1] < Upper[shift]`)."""
-        return bands["upper"].is_rising(shift)
+        return is_rising(bands["upper"], shift=shift)
 
     @classmethod
     def upper_is_falling(
         cls, bands: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate BBUpperFalling (`Upper[shift + 1] > Upper[shift]`)."""
-        return bands["upper"].is_falling(shift)
+        return is_falling(bands["upper"], shift=shift)
 
     @classmethod
     def lower_is_rising(cls, bands: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Evaluate BBLowerRising (`Lower[shift + 1] < Lower[shift]`)."""
-        return bands["lower"].is_rising(shift)
+        return is_rising(bands["lower"], shift=shift)
 
     @classmethod
     def lower_is_falling(
         cls, bands: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate BBLowerFalling (`Lower[shift + 1] > Lower[shift]`)."""
-        return bands["lower"].is_falling(shift)
+        return is_falling(bands["lower"], shift=shift)
 
     @classmethod
     def bar_closes_above_upper(
@@ -222,7 +224,7 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarClosesAboveUp (`Close[shift] > Upper[shift]`)."""
-        return cls._as_series(close_series).is_greater(bands["upper"], shift)
+        return is_greater(close_series, bands["upper"], shift=shift)
 
     @classmethod
     def bar_closes_below_upper(
@@ -232,7 +234,7 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarClosesBelowUp (`Close[shift] < Upper[shift]`)."""
-        return cls._as_series(close_series).is_lower(bands["upper"], shift)
+        return is_lower(close_series, bands["upper"], shift=shift)
 
     @classmethod
     def bar_closes_above_lower(
@@ -242,7 +244,7 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarClosesAboveDown (`Close[shift] > Lower[shift]`)."""
-        return cls._as_series(close_series).is_greater(bands["lower"], shift)
+        return is_greater(close_series, bands["lower"], shift=shift)
 
     @classmethod
     def bar_closes_below_lower(
@@ -252,7 +254,7 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarClosesBelowDown (`Close[shift] < Lower[shift]`)."""
-        return cls._as_series(close_series).is_lower(bands["lower"], shift)
+        return is_lower(close_series, bands["lower"], shift=shift)
 
     @classmethod
     def bar_opens_above_upper(
@@ -262,9 +264,13 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarOpensAboveUp (`Open[shift] > Upper[shift + 1]`)."""
-        o = cls._as_series(open_series).get(shift)
-        u = bands["upper"].get(shift + 1)
-        return not (np.isnan(o) or np.isnan(u)) and (o > u)
+        return is_greater(
+            open_series,
+            bands["upper"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @classmethod
     def bar_opens_below_upper(
@@ -274,9 +280,13 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarOpensBelowUp (`Open[shift] < Upper[shift + 1]`)."""
-        o = cls._as_series(open_series).get(shift)
-        u = bands["upper"].get(shift + 1)
-        return not (np.isnan(o) or np.isnan(u)) and (o < u)
+        return is_lower(
+            open_series,
+            bands["upper"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @classmethod
     def bar_opens_above_lower(
@@ -286,9 +296,13 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarOpensAboveDown (`Open[shift] > Lower[shift + 1]`)."""
-        o = cls._as_series(open_series).get(shift)
-        lo = bands["lower"].get(shift + 1)
-        return not (np.isnan(o) or np.isnan(lo)) and (o > lo)
+        return is_greater(
+            open_series,
+            bands["lower"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @classmethod
     def bar_opens_below_lower(
@@ -298,9 +312,13 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarOpensBelowDown (`Open[shift] < Lower[shift + 1]`)."""
-        o = cls._as_series(open_series).get(shift)
-        lo = bands["lower"].get(shift + 1)
-        return not (np.isnan(o) or np.isnan(lo)) and (o < lo)
+        return is_lower(
+            open_series,
+            bands["lower"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @classmethod
     def bar_opens_above_upper_after_open_below(
@@ -310,10 +328,18 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarOpensAboveUpAfterOpenBelow (`Open[s+1] < Upper[s+1]`)."""
-        os = cls._as_series(open_series)
-        o0, o1, u1 = os.get(shift), os.get(shift + 1), bands["upper"].get(shift + 1)
-        return not (np.isnan(o0) or np.isnan(o1) or np.isnan(u1)) and (
-            o1 < u1 and o0 > u1
+        return is_lower(
+            open_series,
+            bands["upper"],
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_greater(
+            open_series,
+            bands["upper"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
         )
 
     @classmethod
@@ -324,10 +350,18 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarOpensBelowUpAfterOpenAbove (`Open[s+1] > Upper[s+1]`)."""
-        os = cls._as_series(open_series)
-        o0, o1, u1 = os.get(shift), os.get(shift + 1), bands["upper"].get(shift + 1)
-        return not (np.isnan(o0) or np.isnan(o1) or np.isnan(u1)) and (
-            o1 > u1 and o0 < u1
+        return is_greater(
+            open_series,
+            bands["upper"],
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_lower(
+            open_series,
+            bands["upper"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
         )
 
     @classmethod
@@ -338,10 +372,18 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarOpensAboveDownAfterOpenBelow (`Open[s+1] < Lower[s+1]`)."""
-        os = cls._as_series(open_series)
-        o0, o1, l1 = os.get(shift), os.get(shift + 1), bands["lower"].get(shift + 1)
-        return not (np.isnan(o0) or np.isnan(o1) or np.isnan(l1)) and (
-            o1 < l1 and o0 > l1
+        return is_lower(
+            open_series,
+            bands["lower"],
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_greater(
+            open_series,
+            bands["lower"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
         )
 
     @classmethod
@@ -352,8 +394,16 @@ class BollingerBands(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate BBBarOpensBelowDownAfterOpenAbove (`Open[s+1] > Lower[s+1]`)."""
-        os = cls._as_series(open_series)
-        o0, o1, l1 = os.get(shift), os.get(shift + 1), bands["lower"].get(shift + 1)
-        return not (np.isnan(o0) or np.isnan(o1) or np.isnan(l1)) and (
-            o1 > l1 and o0 < l1
+        return is_greater(
+            open_series,
+            bands["lower"],
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_lower(
+            open_series,
+            bands["lower"],
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
         )

@@ -38,6 +38,16 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -182,14 +192,6 @@ class QQE(BaseIndicator):
         return val2
 
     @staticmethod
-    def _as_series(s: IndicatorSeries | np.ndarray[Any, Any]) -> IndicatorSeries:
-        return (
-            s
-            if isinstance(s, IndicatorSeries)
-            else IndicatorSeries(BaseIndicator.to_numpy(s))
-        )
-
-    @staticmethod
     def value1_crosses_above_value2(
         value1: IndicatorSeries | np.ndarray[Any, Any],
         value2: IndicatorSeries | np.ndarray[Any, Any],
@@ -197,7 +199,7 @@ class QQE(BaseIndicator):
     ) -> bool:
         """Evaluate QQEValue1CrossAboveValue2."""
         logger.info("Evaluating QQE value1_crosses_above_value2 at shift=%d", shift)
-        return QQE._as_series(value1).crosses_above(QQE._as_series(value2), shift)
+        return crosses_above(value1, value2, shift=shift)
 
     @staticmethod
     def value1_crosses_below_value2(
@@ -207,7 +209,7 @@ class QQE(BaseIndicator):
     ) -> bool:
         """Evaluate QQEValue1CrossBelowValue2."""
         logger.info("Evaluating QQE value1_crosses_below_value2 at shift=%d", shift)
-        return QQE._as_series(value1).crosses_below(QQE._as_series(value2), shift)
+        return crosses_below(value1, value2, shift=shift)
 
     @staticmethod
     def value1_higher_value2(
@@ -217,7 +219,7 @@ class QQE(BaseIndicator):
     ) -> bool:
         """Evaluate QQEValue1HigherValue2."""
         logger.info("Evaluating QQE value1_higher_value2 at shift=%d", shift)
-        return QQE._as_series(value1).is_greater(QQE._as_series(value2), shift)
+        return is_greater(value1, value2, shift=shift)
 
     @staticmethod
     def value1_lower_value2(
@@ -227,7 +229,7 @@ class QQE(BaseIndicator):
     ) -> bool:
         """Evaluate QQEValue1LowerValue2."""
         logger.info("Evaluating QQE value1_lower_value2 at shift=%d", shift)
-        return QQE._as_series(value1).is_lower(QQE._as_series(value2), shift)
+        return is_lower(value1, value2, shift=shift)
 
     @staticmethod
     def value1_is_rising(
@@ -236,7 +238,7 @@ class QQE(BaseIndicator):
     ) -> bool:
         """Evaluate QQEValue1Rising."""
         logger.info("Evaluating QQE value1_is_rising at shift=%d", shift)
-        return QQE._as_series(value1).is_rising(shift)
+        return is_rising(value1, shift=shift)
 
     @staticmethod
     def value1_is_falling(
@@ -245,7 +247,7 @@ class QQE(BaseIndicator):
     ) -> bool:
         """Evaluate QQEValue1Falling."""
         logger.info("Evaluating QQE value1_is_falling at shift=%d", shift)
-        return QQE._as_series(value1).is_falling(shift)
+        return is_falling(value1, shift=shift)
 
     @staticmethod
     def value1_changes_up(
@@ -253,7 +255,7 @@ class QQE(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate QQEValue1ChangesUp."""
-        return QQE._as_series(value1).changes_up(shift)
+        return changes_up(value1, shift=shift)
 
     @staticmethod
     def value1_changes_down(
@@ -261,7 +263,7 @@ class QQE(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate QQEValue1ChangesDown."""
-        return QQE._as_series(value1).changes_down(shift)
+        return changes_down(value1, shift=shift)
 
     @staticmethod
     def value1_crosses_above(
@@ -270,7 +272,7 @@ class QQE(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate QQEValue1CrossAbove level."""
-        return QQE._as_series(value1).crosses_above(level, shift)
+        return crosses_above(value1, level, shift=shift)
 
     @staticmethod
     def value1_crosses_below(
@@ -279,7 +281,7 @@ class QQE(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate QQEValue1CrossBelow level."""
-        return QQE._as_series(value1).crosses_below(level, shift)
+        return crosses_below(value1, level, shift=shift)
 
     @staticmethod
     def value1_is_higher(
@@ -288,7 +290,7 @@ class QQE(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate QQEValue1Higher than level."""
-        return QQE._as_series(value1).is_greater(level, shift)
+        return is_greater(value1, level, shift=shift)
 
     @staticmethod
     def value1_is_lower(
@@ -297,7 +299,7 @@ class QQE(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate QQEValue1Lower than level."""
-        return QQE._as_series(value1).is_lower(level, shift)
+        return is_lower(value1, level, shift=shift)
 
     @staticmethod
     def value2_is_rising(
@@ -305,7 +307,7 @@ class QQE(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate QQEValue2Rising."""
-        return QQE._as_series(value2).is_rising(shift)
+        return is_rising(value2, shift=shift)
 
     @staticmethod
     def value2_is_falling(
@@ -313,4 +315,4 @@ class QQE(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate QQEValue2Falling."""
-        return QQE._as_series(value2).is_falling(shift)
+        return is_falling(value2, shift=shift)

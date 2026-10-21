@@ -22,7 +22,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.kama import KAMA
+    from app.services.indicators.trend.kama import KAMA
 
     close = np.linspace(10.0, 30.0, 50)
     kama = KAMA.calculate(close, er_period=10, fast_period=2, slow_period=30)
@@ -31,7 +31,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.kama
+    uv run python -m app.services.indicators.trend.kama
     ```
 """
 
@@ -42,6 +42,12 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.kaufman_efficiency_ratio import (
     KaufmanEfficiencyRatio,
@@ -128,12 +134,12 @@ class KAMA(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if KAMA is rising."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if KAMA is falling."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def bar_closes_above(
@@ -143,12 +149,7 @@ class KAMA(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Close bar at shift is above KAMA."""
-        close_series = (
-            close
-            if isinstance(close, IndicatorSeries)
-            else IndicatorSeries(close, name="Close")
-        )
-        return close_series.is_greater(kama_series, shift)
+        return is_greater(close, kama_series, shift=shift)
 
     @classmethod
     def bar_closes_below(
@@ -158,12 +159,7 @@ class KAMA(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Close bar at shift is below KAMA."""
-        close_series = (
-            close
-            if isinstance(close, IndicatorSeries)
-            else IndicatorSeries(close, name="Close")
-        )
-        return close_series.is_lower(kama_series, shift)
+        return is_lower(close, kama_series, shift=shift)
 
     @classmethod
     def fast_above_slow(
@@ -173,7 +169,7 @@ class KAMA(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Fast KAMA is above Slow KAMA."""
-        return fast_kama.is_greater(slow_kama, shift)
+        return is_greater(fast_kama, slow_kama, shift=shift)
 
     @classmethod
     def fast_below_slow(
@@ -183,4 +179,4 @@ class KAMA(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Fast KAMA is below Slow KAMA."""
-        return fast_kama.is_lower(slow_kama, shift)
+        return is_lower(fast_kama, slow_kama, shift=shift)

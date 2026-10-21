@@ -904,3 +904,39 @@ def test_volume_profile_custom_hours_and_all_36_conditions() -> None:
         )
         is True
     )
+
+
+def test_williams_pr_and_series_data_only() -> None:
+    """Verify WilliamsPR conditions and that IndicatorSeries has no comparison methods."""
+    from app.services.indicators.momentum.williams_pr import WilliamsPR
+
+    high = np.array([12.0, 13.0, 14.0, 13.5, 15.0])
+    low = np.array([10.0, 11.0, 12.0, 11.5, 13.0])
+    close = np.array([11.5, 12.5, 13.5, 12.0, 14.5])
+    wpr = WilliamsPR.calculate(high, low, close, period=3)
+    assert len(wpr) == 5
+
+    for attr in (
+        "is_rising",
+        "is_falling",
+        "crosses_above",
+        "crosses_below",
+        "is_greater",
+        "is_lower",
+        "is_higher",
+        "changes_up",
+        "changes_down",
+    ):
+        assert not hasattr(wpr, attr)
+
+    s = IndicatorSeries([-60.0, -75.0, -40.0])
+    assert WilliamsPR.is_rising(s, shift=0) is True
+    assert WilliamsPR.is_falling(s, shift=1) is True
+    assert WilliamsPR.crosses_above(s, level=-50.0, shift=0) is True
+    assert WilliamsPR.crosses_below(s, level=-65.0, shift=1) is True
+    assert WilliamsPR.is_higher(s, lookback=1, shift=0) is True
+    assert WilliamsPR.is_lower(s, lookback=1, shift=1) is True
+    assert WilliamsPR.changes_up(s, shift=0) is True
+    assert (
+        WilliamsPR.changes_down(IndicatorSeries([-75.0, -40.0, -55.0]), shift=0) is True
+    )

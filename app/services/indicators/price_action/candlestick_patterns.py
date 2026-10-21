@@ -56,6 +56,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import is_greater, is_lower
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -96,10 +97,9 @@ def _check_cond(
     """Evaluate pattern threshold on an IndicatorSeries or pattern mapping."""
     logger.info("Evaluating CandlestickPatterns.%s: shift=%d", key, shift)
     series = source[key] if isinstance(source, Mapping) else source
-    val = series.get(shift)
-    if np.isnan(val):
-        return False
-    return val < -PATTERN_THRESHOLD if negative else val > PATTERN_THRESHOLD
+    if negative:
+        return is_lower(series, -PATTERN_THRESHOLD, shift1=shift, round_digits=8)
+    return is_greater(series, PATTERN_THRESHOLD, shift1=shift, round_digits=8)
 
 
 class CandlestickPatterns(BaseIndicator):

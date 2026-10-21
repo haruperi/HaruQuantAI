@@ -23,7 +23,9 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.kaufman_efficiency_ratio import KaufmanEfficiencyRatio
+    from app.services.indicators.trend.kaufman_efficiency_ratio import (
+        KaufmanEfficiencyRatio,
+    )
 
     close = np.array([10.0, 10.5, 11.0, 11.2, 11.8, 12.5, 13.0])
     ker = KaufmanEfficiencyRatio.calculate(close, period=5)
@@ -32,7 +34,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.kaufman_efficiency_ratio
+    uv run python -m app.services.indicators.trend.kaufman_efficiency_ratio
     ```
 """
 
@@ -43,6 +45,12 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -112,21 +120,21 @@ class KaufmanEfficiencyRatio(BaseIndicator):
         cls, series: IndicatorSeries, level: float = 0.5, shift: int = 0
     ) -> bool:
         """Evaluate if KER at shift is above level threshold."""
-        return series.is_greater(level, shift)
+        return is_greater(series, level, shift=shift)
 
     @classmethod
     def is_below_level(
         cls, series: IndicatorSeries, level: float = 0.5, shift: int = 0
     ) -> bool:
         """Evaluate if KER at shift is below level threshold."""
-        return series.is_lower(level, shift)
+        return is_lower(series, level, shift=shift)
 
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if KER is rising."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if KER is falling."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)

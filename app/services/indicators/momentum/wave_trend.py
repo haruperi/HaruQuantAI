@@ -37,6 +37,16 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -168,14 +178,6 @@ class WaveTrend(BaseIndicator):
         return wt1, wt2
 
     @staticmethod
-    def _as_series(s: IndicatorSeries | np.ndarray[Any, Any]) -> IndicatorSeries:
-        return (
-            s
-            if isinstance(s, IndicatorSeries)
-            else IndicatorSeries(BaseIndicator.to_numpy(s))
-        )
-
-    @staticmethod
     def wt1_crosses_above_wt2(
         wt1: IndicatorSeries | np.ndarray[Any, Any],
         wt2: IndicatorSeries | np.ndarray[Any, Any],
@@ -183,7 +185,7 @@ class WaveTrend(BaseIndicator):
     ) -> bool:
         """Evaluate WaveTrendMainCrossAboveSignal."""
         logger.info("Evaluating WaveTrend wt1_crosses_above_wt2 at shift=%d", shift)
-        return WaveTrend._as_series(wt1).crosses_above(WaveTrend._as_series(wt2), shift)
+        return crosses_above(wt1, wt2, shift=shift)
 
     @staticmethod
     def wt1_crosses_below_wt2(
@@ -193,7 +195,7 @@ class WaveTrend(BaseIndicator):
     ) -> bool:
         """Evaluate WaveTrendMainCrossBelowSignal."""
         logger.info("Evaluating WaveTrend wt1_crosses_below_wt2 at shift=%d", shift)
-        return WaveTrend._as_series(wt1).crosses_below(WaveTrend._as_series(wt2), shift)
+        return crosses_below(wt1, wt2, shift=shift)
 
     @staticmethod
     def wt1_crosses_above_zero(
@@ -202,7 +204,7 @@ class WaveTrend(BaseIndicator):
     ) -> bool:
         """Evaluate WaveTrendMainCrossAboveZero."""
         logger.info("Evaluating WaveTrend wt1_crosses_above_zero at shift=%d", shift)
-        return WaveTrend._as_series(wt1).crosses_above(0.0, shift)
+        return crosses_above(wt1, 0.0, shift=shift)
 
     @staticmethod
     def wt1_crosses_below_zero(
@@ -211,7 +213,7 @@ class WaveTrend(BaseIndicator):
     ) -> bool:
         """Evaluate WaveTrendMainCrossBelowZero."""
         logger.info("Evaluating WaveTrend wt1_crosses_below_zero at shift=%d", shift)
-        return WaveTrend._as_series(wt1).crosses_below(0.0, shift)
+        return crosses_below(wt1, 0.0, shift=shift)
 
     @staticmethod
     def wt1_is_rising(
@@ -220,7 +222,7 @@ class WaveTrend(BaseIndicator):
     ) -> bool:
         """Evaluate WaveTrendMainRising."""
         logger.info("Evaluating WaveTrend wt1_is_rising at shift=%d", shift)
-        return WaveTrend._as_series(wt1).is_rising(shift)
+        return is_rising(wt1, shift=shift)
 
     @staticmethod
     def wt1_is_falling(
@@ -229,7 +231,7 @@ class WaveTrend(BaseIndicator):
     ) -> bool:
         """Evaluate WaveTrendMainFalling."""
         logger.info("Evaluating WaveTrend wt1_is_falling at shift=%d", shift)
-        return WaveTrend._as_series(wt1).is_falling(shift)
+        return is_falling(wt1, shift=shift)
 
     @staticmethod
     def wt1_changes_up(
@@ -237,7 +239,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainChangesUp."""
-        return WaveTrend._as_series(wt1).changes_up(shift)
+        return changes_up(wt1, shift=shift)
 
     @staticmethod
     def wt1_changes_down(
@@ -245,7 +247,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainChangesDown."""
-        return WaveTrend._as_series(wt1).changes_down(shift)
+        return changes_down(wt1, shift=shift)
 
     @staticmethod
     def wt1_crosses_above(
@@ -254,7 +256,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainCrossAbove level."""
-        return WaveTrend._as_series(wt1).crosses_above(level, shift)
+        return crosses_above(wt1, level, shift=shift)
 
     @staticmethod
     def wt1_crosses_below(
@@ -263,7 +265,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainCrossBelow level."""
-        return WaveTrend._as_series(wt1).crosses_below(level, shift)
+        return crosses_below(wt1, level, shift=shift)
 
     @staticmethod
     def wt1_is_higher(
@@ -272,7 +274,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainHigher than level."""
-        return WaveTrend._as_series(wt1).is_greater(level, shift)
+        return is_greater(wt1, level, shift=shift)
 
     @staticmethod
     def wt1_is_lower(
@@ -281,7 +283,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainLower than level."""
-        return WaveTrend._as_series(wt1).is_lower(level, shift)
+        return is_lower(wt1, level, shift=shift)
 
     @staticmethod
     def wt1_higher_wt2(
@@ -290,7 +292,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainHigherSignal (`WT1[shift] > WT2[shift]`)."""
-        return WaveTrend._as_series(wt1).is_greater(WaveTrend._as_series(wt2), shift)
+        return is_greater(wt1, wt2, shift=shift)
 
     @staticmethod
     def wt1_lower_wt2(
@@ -299,7 +301,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainLowerSignal (`WT1[shift] < WT2[shift]`)."""
-        return WaveTrend._as_series(wt1).is_lower(WaveTrend._as_series(wt2), shift)
+        return is_lower(wt1, wt2, shift=shift)
 
     @staticmethod
     def wt1_higher_zero(
@@ -307,7 +309,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainHigherZero (`WT1[shift] > 0`)."""
-        return WaveTrend._as_series(wt1).is_greater(0.0, shift)
+        return is_greater(wt1, 0.0, shift=shift)
 
     @staticmethod
     def wt1_lower_zero(
@@ -315,7 +317,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendMainLowerZero (`WT1[shift] < 0`)."""
-        return WaveTrend._as_series(wt1).is_lower(0.0, shift)
+        return is_lower(wt1, 0.0, shift=shift)
 
     @staticmethod
     def wt2_is_rising(
@@ -323,7 +325,7 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendSignalRising (`WT2[shift+1] < WT2[shift]`)."""
-        return WaveTrend._as_series(wt2).is_rising(shift)
+        return is_rising(wt2, shift=shift)
 
     @staticmethod
     def wt2_is_falling(
@@ -331,4 +333,4 @@ class WaveTrend(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate WaveTrendSignalFalling (`WT2[shift+1] > WT2[shift]`)."""
-        return WaveTrend._as_series(wt2).is_falling(shift)
+        return is_falling(wt2, shift=shift)

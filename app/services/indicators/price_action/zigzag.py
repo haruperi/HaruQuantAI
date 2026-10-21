@@ -35,6 +35,12 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -256,22 +262,21 @@ class ZigZag(BaseIndicator):
     def is_peak(cls, swing_type: IndicatorSeries, shift: int = 0) -> bool:
         """True if bar at shift is a confirmed swing peak."""
         logger.info("Evaluating ZigZag is_peak at shift=%d", shift)
-        val = swing_type.get(shift)
-        return not np.isnan(val) and val > SWING_THRESHOLD
+        return is_greater(swing_type, SWING_THRESHOLD, shift1=shift, round_digits=8)
 
     @classmethod
     def is_trough(cls, swing_type: IndicatorSeries, shift: int = 0) -> bool:
         """True if bar at shift is a confirmed swing trough."""
         logger.info("Evaluating ZigZag is_trough at shift=%d", shift)
-        val = swing_type.get(shift)
-        return not np.isnan(val) and val < -SWING_THRESHOLD
+        return is_lower(swing_type, -SWING_THRESHOLD, shift1=shift, round_digits=8)
 
     @classmethod
     def is_swing(cls, swing_type: IndicatorSeries, shift: int = 0) -> bool:
         """True if bar at shift is any confirmed swing point."""
         logger.info("Evaluating ZigZag is_swing at shift=%d", shift)
-        val = swing_type.get(shift)
-        return not np.isnan(val) and abs(val) > SWING_THRESHOLD
+        return is_greater(
+            swing_type, SWING_THRESHOLD, shift1=shift, round_digits=8
+        ) or is_lower(swing_type, -SWING_THRESHOLD, shift1=shift, round_digits=8)
 
     @classmethod
     def last_swing_direction(cls, swing_type: IndicatorSeries, shift: int = 0) -> int:
@@ -279,26 +284,20 @@ class ZigZag(BaseIndicator):
         logger.info("Evaluating ZigZag last_swing_direction at shift=%d", shift)
         n = len(swing_type)
         for s in range(shift, n):
-            val = swing_type.get(s)
-            if not np.isnan(val):
-                if val > SWING_THRESHOLD:
-                    return 1
-                if val < -SWING_THRESHOLD:
-                    return -1
+            if is_greater(swing_type, SWING_THRESHOLD, shift1=s, round_digits=8):
+                return 1
+            if is_lower(swing_type, -SWING_THRESHOLD, shift1=s, round_digits=8):
+                return -1
         return 0
 
     @classmethod
     def is_rising(cls, zigzag: IndicatorSeries, shift: int = 0) -> bool:
         """True if zigzag line is rising between shift+1 and shift."""
         logger.info("Evaluating ZigZag is_rising at shift=%d", shift)
-        curr = zigzag.get(shift)
-        prev = zigzag.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(zigzag, shift=shift)
 
     @classmethod
     def is_falling(cls, zigzag: IndicatorSeries, shift: int = 0) -> bool:
         """True if zigzag line is falling between shift+1 and shift."""
         logger.info("Evaluating ZigZag is_falling at shift=%d", shift)
-        curr = zigzag.get(shift)
-        prev = zigzag.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(zigzag, shift=shift)

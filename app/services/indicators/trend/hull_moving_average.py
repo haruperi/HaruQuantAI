@@ -21,7 +21,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.hull_moving_average import HullMovingAverage
+    from app.services.indicators.trend.hull_moving_average import HullMovingAverage
 
     close = np.linspace(10.0, 30.0, 40)
     hma = HullMovingAverage.calculate(close, period=16)
@@ -30,7 +30,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.hull_moving_average
+    uv run python -m app.services.indicators.trend.hull_moving_average
     ```
 """
 
@@ -42,6 +42,14 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.moving_average import MovingAverage
 
@@ -100,22 +108,22 @@ class HullMovingAverage(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if HMA is rising."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if HMA is falling."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if HMA turned upward."""
-        return series.changes_up(shift)
+        return changes_up(series, shift=shift)
 
     @classmethod
     def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if HMA turned downward."""
-        return series.changes_down(shift)
+        return changes_down(series, shift=shift)
 
     @classmethod
     def faster_above_slower(
@@ -125,7 +133,7 @@ class HullMovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Faster HMA is above Slower HMA."""
-        return faster_hma.is_greater(slower_hma, shift)
+        return is_greater(faster_hma, slower_hma, shift=shift)
 
     @classmethod
     def faster_below_slower(
@@ -135,4 +143,4 @@ class HullMovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if Faster HMA is below Slower HMA."""
-        return faster_hma.is_lower(slower_hma, shift)
+        return is_lower(faster_hma, slower_hma, shift=shift)

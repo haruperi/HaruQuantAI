@@ -42,6 +42,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import is_greater
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -239,8 +240,9 @@ class LevelClustering(BaseIndicator):
     def has_cluster(cls, found_series: IndicatorSeries, shift: int = 0) -> bool:
         """True if a valid cluster exists at shift."""
         logger.info("Evaluating LevelClustering.has_cluster: shift=%d", shift)
-        val = found_series.get(shift)
-        return not np.isnan(val) and val > CLUSTER_FOUND_THRESHOLD
+        return is_greater(
+            found_series, CLUSTER_FOUND_THRESHOLD, shift1=shift, round_digits=8
+        )
 
     @classmethod
     def is_near_cluster(

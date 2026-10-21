@@ -15,7 +15,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.highest_lowest import HighestLowest
+    from app.services.indicators.price_action.highest_lowest import HighestLowest
 
     hl = HighestLowest.calculate(high, low, period=14)
     highest = hl["highest"]
@@ -36,6 +36,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import is_greater, is_lower
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -143,16 +144,19 @@ class HighestLowest(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        o = BaseIndicator.to_numpy(open_prices)
-        h = BaseIndicator.to_numpy(highest)
-
-        curr_bar = len(o) - 1 - shift
-        prev_bar = curr_bar - 1
-
-        if prev_bar < 0 or curr_bar >= len(o) or prev_bar >= len(h):
-            return False
-
-        return bool(o[prev_bar] < h[prev_bar] and o[curr_bar] > h[prev_bar])
+        return is_lower(
+            open_prices,
+            highest,
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_greater(
+            open_prices,
+            highest,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @staticmethod
     def bar_opens_below_lowest(
@@ -170,16 +174,19 @@ class HighestLowest(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        o = BaseIndicator.to_numpy(open_prices)
-        low_arr = BaseIndicator.to_numpy(lowest)
-
-        curr_bar = len(o) - 1 - shift
-        prev_bar = curr_bar - 1
-
-        if prev_bar < 0 or curr_bar >= len(o) or prev_bar >= len(low_arr):
-            return False
-
-        return bool(o[prev_bar] > low_arr[prev_bar] and o[curr_bar] < low_arr[prev_bar])
+        return is_greater(
+            open_prices,
+            lowest,
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_lower(
+            open_prices,
+            lowest,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @staticmethod
     def bar_opens_below_highest(
@@ -197,16 +204,19 @@ class HighestLowest(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        o = BaseIndicator.to_numpy(open_prices)
-        h = BaseIndicator.to_numpy(highest)
-
-        curr_bar = len(o) - 1 - shift
-        prev_bar = curr_bar - 1
-
-        if prev_bar < 0 or curr_bar >= len(o) or prev_bar >= len(h):
-            return False
-
-        return bool(o[prev_bar] > h[prev_bar] and o[curr_bar] < h[prev_bar])
+        return is_greater(
+            open_prices,
+            highest,
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_lower(
+            open_prices,
+            highest,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @staticmethod
     def bar_opens_above_lowest(
@@ -224,16 +234,19 @@ class HighestLowest(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        o = BaseIndicator.to_numpy(open_prices)
-        low_arr = BaseIndicator.to_numpy(lowest)
-
-        curr_bar = len(o) - 1 - shift
-        prev_bar = curr_bar - 1
-
-        if prev_bar < 0 or curr_bar >= len(o) or prev_bar >= len(low_arr):
-            return False
-
-        return bool(o[prev_bar] < low_arr[prev_bar] and o[curr_bar] > low_arr[prev_bar])
+        return is_lower(
+            open_prices,
+            lowest,
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_greater(
+            open_prices,
+            lowest,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @staticmethod
     def cot_emergency_exit_long(
@@ -265,8 +278,8 @@ class HighestLowest(BaseIndicator):
         if start_bar >= end_bar:
             return False
 
-        month_low = np.min(l_arr[start_bar:end_bar])
-        return bool(c[curr_bar] < month_low)
+        month_low = float(np.min(l_arr[start_bar:end_bar]))
+        return is_lower(c, month_low, shift1=shift, round_digits=8)
 
     @staticmethod
     def cot_emergency_exit_short(
@@ -298,5 +311,5 @@ class HighestLowest(BaseIndicator):
         if start_bar >= end_bar:
             return False
 
-        month_high = np.max(h_arr[start_bar:end_bar])
-        return bool(c[curr_bar] > month_high)
+        month_high = float(np.max(h_arr[start_bar:end_bar]))
+        return is_greater(c, month_high, shift1=shift, round_digits=8)

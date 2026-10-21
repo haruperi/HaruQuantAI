@@ -34,6 +34,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -56,18 +64,7 @@ class PriceVelocity(BaseIndicator):
         period: int = DEFAULT_VELOCITY_PERIOD,
         smooth_period: int = DEFAULT_SMOOTH_PERIOD,
     ) -> dict[str, IndicatorSeries]:
-        """Compute raw and normalized price velocity per bar.
-
-        Args:
-            price: Input price series (e.g. Close).
-            period: Lookback displacement window (>= 1).
-            smooth_period: Smoothing SMA period (>= 1).
-
-        Returns:
-            Dictionary containing:
-                - 'velocity': Raw price change per bar.
-                - 'normalized': Percentage price change per bar.
-        """
+        """Compute raw and normalized price velocity per bar."""
         logger.info(
             "PriceVelocity initiated: period=%d, smooth=%d",
             period,
@@ -141,9 +138,9 @@ class PriceVelocity(BaseIndicator):
     ) -> bool:
         """True if velocity is positive and rising (upward acceleration)."""
         logger.info("Evaluating PriceVelocity is_accelerating_up at shift=%d", shift)
-        curr = velocity.get(shift)
-        prev = velocity.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > 0.0 and curr > prev
+        return is_greater(velocity, 0.0, shift=shift) and is_rising(
+            velocity, bars=2, shift=shift
+        )
 
     @classmethod
     def is_accelerating_down(
@@ -153,9 +150,9 @@ class PriceVelocity(BaseIndicator):
     ) -> bool:
         """True if velocity is negative and falling (downward acceleration)."""
         logger.info("Evaluating PriceVelocity is_accelerating_down at shift=%d", shift)
-        curr = velocity.get(shift)
-        prev = velocity.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < 0.0 and curr < prev
+        return is_lower(velocity, 0.0, shift=shift) and is_falling(
+            velocity, bars=2, shift=shift
+        )
 
     @classmethod
     def crosses_above_zero(
@@ -165,11 +162,7 @@ class PriceVelocity(BaseIndicator):
     ) -> bool:
         """True if velocity crosses above zero at shift."""
         logger.info("Evaluating PriceVelocity crosses_above_zero at shift=%d", shift)
-        curr = velocity.get(shift)
-        prev = velocity.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= 0.0 and curr > 0.0)
+        return crosses_above(velocity, 0.0, shift=shift)
 
     @classmethod
     def crosses_below_zero(
@@ -179,24 +172,16 @@ class PriceVelocity(BaseIndicator):
     ) -> bool:
         """True if velocity crosses below zero at shift."""
         logger.info("Evaluating PriceVelocity crosses_below_zero at shift=%d", shift)
-        curr = velocity.get(shift)
-        prev = velocity.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= 0.0 and curr < 0.0)
+        return crosses_below(velocity, 0.0, shift=shift)
 
     @classmethod
     def is_rising(cls, velocity: IndicatorSeries, shift: int = 0) -> bool:
         """True if velocity is rising between shift+1 and shift."""
         logger.info("Evaluating PriceVelocity is_rising at shift=%d", shift)
-        curr = velocity.get(shift)
-        prev = velocity.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(velocity, shift=shift)
 
     @classmethod
     def is_falling(cls, velocity: IndicatorSeries, shift: int = 0) -> bool:
         """True if velocity is falling between shift+1 and shift."""
         logger.info("Evaluating PriceVelocity is_falling at shift=%d", shift)
-        curr = velocity.get(shift)
-        prev = velocity.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(velocity, shift=shift)

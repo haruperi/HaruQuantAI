@@ -15,7 +15,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.avg_volume import AvgVolume
+    from app.services.indicators.volume.avg_volume import AvgVolume
 
     # Calculate 14-period Average Volume
     avg_vol = AvgVolume.calculate(volume_series, period=14)
@@ -33,6 +33,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -94,12 +102,12 @@ class AvgVolume(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Check if average volume is rising at shift compared to shift+1."""
-        return series.is_rising(shift=shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Check if average volume is falling at shift compared to shift+1."""
-        return series.is_falling(shift=shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def crosses_above(
@@ -109,7 +117,7 @@ class AvgVolume(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if series1 crosses above series2."""
-        return series1.crosses_above(series2, shift=shift)
+        return crosses_above(series1, series2, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -119,7 +127,7 @@ class AvgVolume(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if series1 crosses below series2."""
-        return series1.crosses_below(series2, shift=shift)
+        return crosses_below(series1, series2, shift=shift)
 
     @classmethod
     def is_higher(
@@ -129,7 +137,7 @@ class AvgVolume(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if series1 is higher than series2."""
-        return series1.is_greater(series2, shift=shift)
+        return is_greater(series1, series2, shift=shift)
 
     @classmethod
     def is_lower(
@@ -139,17 +147,17 @@ class AvgVolume(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if series1 is lower than series2."""
-        return series1.is_lower(series2, shift=shift)
+        return is_lower(series1, series2, shift=shift)
 
     @classmethod
     def volume_is_rising(cls, volume: IndicatorSeries, shift: int = 0) -> bool:
         """Check if raw bar volume is rising at shift compared to shift+1."""
-        return volume.is_rising(shift=shift)
+        return is_rising(volume, shift=shift)
 
     @classmethod
     def volume_is_falling(cls, volume: IndicatorSeries, shift: int = 0) -> bool:
         """Check if raw bar volume is falling at shift compared to shift+1."""
-        return volume.is_falling(shift=shift)
+        return is_falling(volume, shift=shift)
 
     @classmethod
     def volume_above_average(
@@ -159,4 +167,4 @@ class AvgVolume(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if raw bar volume is greater than average volume at shift."""
-        return volume.is_greater(avg_volume, shift=shift)
+        return is_greater(volume, avg_volume, shift=shift)

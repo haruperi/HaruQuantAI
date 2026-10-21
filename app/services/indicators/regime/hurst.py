@@ -35,6 +35,12 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_greater,
+    is_greater_or_equal,
+    is_lower,
+    is_lower_or_equal,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -230,8 +236,7 @@ class HurstExponent(BaseIndicator):
     ) -> bool:
         """True if series shows persistent trending memory."""
         logger.info("Evaluating Hurst is_persistent at shift=%d", shift)
-        val = hurst.get(shift)
-        return not np.isnan(val) and val > upper_threshold
+        return is_greater(hurst, upper_threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def is_anti_persistent(
@@ -242,8 +247,7 @@ class HurstExponent(BaseIndicator):
     ) -> bool:
         """True if series shows anti-persistent mean-reverting memory."""
         logger.info("Evaluating Hurst is_anti_persistent at shift=%d", shift)
-        val = hurst.get(shift)
-        return not np.isnan(val) and val < lower_threshold
+        return is_lower(hurst, lower_threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def is_random_walk(
@@ -255,5 +259,6 @@ class HurstExponent(BaseIndicator):
     ) -> bool:
         """True if series is consistent with a random walk."""
         logger.info("Evaluating Hurst is_random_walk at shift=%d", shift)
-        val = hurst.get(shift)
-        return not np.isnan(val) and (lower_threshold <= val <= upper_threshold)
+        return is_greater_or_equal(
+            hurst, lower_threshold, shift1=shift, round_digits=8
+        ) and is_lower_or_equal(hurst, upper_threshold, shift1=shift, round_digits=8)

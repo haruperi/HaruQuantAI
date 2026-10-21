@@ -1,19 +1,18 @@
-"""Foundational data structures and condition evaluators for indicators.
+"""Foundational data structures for quantitative indicators.
 
 Description:
     Provides the core IndicatorSeries abstraction wrapping 1D numerical
-    arrays with bar shift indexing, vectorization, and universal condition
-    evaluation (rising, falling, crosses above, crosses below, higher, lower).
-    Serves as the base framework for all quantitative indicator families.
+    arrays with bar shift indexing and vectorization, along with BaseIndicator
+    serving as the abstract base class for all quantitative indicator families.
+    Comparison and rule condition evaluations are handled by
+    app.services.include.comparisons.
 
 Purpose:
-    FEAT-SERVICES-INDICATOR-FOUNDATION: Universal indicator data and conditions.
+    FEAT-SERVICES-INDICATOR-FOUNDATION: Universal indicator data container.
 
 Key Capabilities:
     - FR-SERVICES-INDICATOR-SERIES-STORAGE: Typed array storage with shift indexing
       [`IndicatorSeries.get()`, `IndicatorSeries.values`] (`DEBUG`).
-    - FR-SERVICES-SERIES-CONDITION-EVALUATOR: Universal rule condition evaluations
-      [`IndicatorSeries.is_rising()`, `IndicatorSeries.crosses_above()`] (`NONE`).
 
 Python API Usage:
     ```python
@@ -23,12 +22,11 @@ Python API Usage:
     series = IndicatorSeries(np.array([10.0, 12.0, 11.5, 13.0]))
     current_val = series.get(0)  # 13.0
     prev_val = series.get(1)  # 11.5
-    is_rising = series.is_rising(shift=0)  # True
     ```
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_indicators.py --no-cov
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py --no-cov
     ```
 """
 
@@ -92,161 +90,6 @@ class IndicatorSeries:
         if shift < 0 or shift >= len(self._values):
             return float("nan")
         return float(self._values[-(1 + shift)])
-
-    def is_rising(self, shift: int = 0) -> bool:
-        """Check if indicator value at shift is strictly greater than shift + 1.
-
-        Args:
-            shift: Bar shift to evaluate.
-
-        Returns:
-            True if rising, False otherwise.
-        """
-        val0 = self.get(shift)
-        val1 = self.get(shift + 1)
-        return not (np.isnan(val0) or np.isnan(val1)) and val0 > val1
-
-    def is_falling(self, shift: int = 0) -> bool:
-        """Check if indicator value at shift is strictly lower than shift + 1.
-
-        Args:
-            shift: Bar shift to evaluate.
-
-        Returns:
-            True if falling, False otherwise.
-        """
-        val0 = self.get(shift)
-        val1 = self.get(shift + 1)
-        return not (np.isnan(val0) or np.isnan(val1)) and val0 < val1
-
-    def crosses_above(self, level: float | IndicatorSeries, shift: int = 0) -> bool:
-        """Check if series crossed above a level/series between shift+1 and shift.
-
-        Args:
-            level: Constant float threshold or another IndicatorSeries.
-            shift: Bar shift to evaluate.
-
-        Returns:
-            True if crossing upwards occurred.
-        """
-        curr_val = self.get(shift)
-        prev_val = self.get(shift + 1)
-        curr_lvl = level.get(shift) if isinstance(level, IndicatorSeries) else level
-        prev_lvl = level.get(shift + 1) if isinstance(level, IndicatorSeries) else level
-        nan_check = (
-            np.isnan(curr_val)
-            or np.isnan(prev_val)
-            or np.isnan(curr_lvl)
-            or np.isnan(prev_lvl)
-        )
-        if nan_check:
-            return False
-        return prev_val <= prev_lvl and curr_val > curr_lvl
-
-    def crosses_below(self, level: float | IndicatorSeries, shift: int = 0) -> bool:
-        """Check if series crossed below a level/series between shift+1 and shift.
-
-        Args:
-            level: Constant float threshold or another IndicatorSeries.
-            shift: Bar shift to evaluate.
-
-        Returns:
-            True if crossing downwards occurred.
-        """
-        curr_val = self.get(shift)
-        prev_val = self.get(shift + 1)
-        curr_lvl = level.get(shift) if isinstance(level, IndicatorSeries) else level
-        prev_lvl = level.get(shift + 1) if isinstance(level, IndicatorSeries) else level
-
-        nan_check = (
-            np.isnan(curr_val)
-            or np.isnan(prev_val)
-            or np.isnan(curr_lvl)
-            or np.isnan(prev_lvl)
-        )
-        if nan_check:
-            return False
-        return prev_val >= prev_lvl and curr_val < curr_lvl
-
-    def is_greater(self, other: float | IndicatorSeries, shift: int = 0) -> bool:
-        """Check if series value at shift is greater than another level or series.
-
-        Args:
-            other: Constant float threshold or another IndicatorSeries.
-            shift: Bar shift to evaluate.
-
-        Returns:
-            True if strictly greater.
-        """
-        val = self.get(shift)
-        other_val = other.get(shift) if isinstance(other, IndicatorSeries) else other
-        if np.isnan(val) or np.isnan(other_val):
-            return False
-        return val > other_val
-
-    def is_lower(self, other: float | IndicatorSeries, shift: int = 0) -> bool:
-        """Check if series value at shift is lower than another level or series.
-
-        Args:
-            other: Constant float threshold or another IndicatorSeries.
-            shift: Bar shift to evaluate.
-
-        Returns:
-            True if strictly lower.
-        """
-        val = self.get(shift)
-        other_val = other.get(shift) if isinstance(other, IndicatorSeries) else other
-        if np.isnan(val) or np.isnan(other_val):
-            return False
-        return val < other_val
-
-    def is_higher(self, lookback: int = 1, shift: int = 0) -> bool:
-        """Check if series value at shift is higher than shift + lookback.
-
-        Args:
-            lookback: Historical bar distance to compare against.
-            shift: Reference bar shift.
-
-        Returns:
-            True if value is higher than lookback bars ago.
-        """
-        val0 = self.get(shift)
-        val_past = self.get(shift + lookback)
-        if np.isnan(val0) or np.isnan(val_past):
-            return False
-        return val0 > val_past
-
-    def changes_up(self, shift: int = 0) -> bool:
-        """Check if indicator turned upwards (was flat/falling, now rising).
-
-        Args:
-            shift: Bar shift to evaluate.
-
-        Returns:
-            True if momentum turned upward.
-        """
-        v0 = self.get(shift)
-        v1 = self.get(shift + 1)
-        v2 = self.get(shift + 2)
-        if np.isnan(v0) or np.isnan(v1) or np.isnan(v2):
-            return False
-        return v0 > v1 and v1 <= v2
-
-    def changes_down(self, shift: int = 0) -> bool:
-        """Check if indicator turned downwards (was flat/rising, now falling).
-
-        Args:
-            shift: Bar shift to evaluate.
-
-        Returns:
-            True if momentum turned downward.
-        """
-        v0 = self.get(shift)
-        v1 = self.get(shift + 1)
-        v2 = self.get(shift + 2)
-        if np.isnan(v0) or np.isnan(v1) or np.isnan(v2):
-            return False
-        return v0 < v1 and v1 >= v2
 
 
 class BaseIndicator(ABC):

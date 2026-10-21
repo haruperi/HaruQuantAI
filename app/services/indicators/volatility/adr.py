@@ -35,6 +35,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -120,8 +128,7 @@ class AverageDailyRange(BaseIndicator):
             threshold,
             shift,
         )
-        val = stretch.get(shift)
-        return not np.isnan(val) and val > threshold
+        return is_greater(stretch, threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def is_compressed(
@@ -136,8 +143,7 @@ class AverageDailyRange(BaseIndicator):
             threshold,
             shift,
         )
-        val = stretch.get(shift)
-        return not np.isnan(val) and val < threshold
+        return is_lower(stretch, threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def crosses_above(
@@ -148,11 +154,7 @@ class AverageDailyRange(BaseIndicator):
     ) -> bool:
         """True if ADR crosses above level at shift."""
         logger.info("Evaluating ADR crosses_above: level=%.4f, shift=%d", level, shift)
-        curr = adr.get(shift)
-        prev = adr.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= level and curr > level)
+        return crosses_above(adr, level, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -163,24 +165,16 @@ class AverageDailyRange(BaseIndicator):
     ) -> bool:
         """True if ADR crosses below level at shift."""
         logger.info("Evaluating ADR crosses_below: level=%.4f, shift=%d", level, shift)
-        curr = adr.get(shift)
-        prev = adr.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= level and curr < level)
+        return crosses_below(adr, level, shift=shift)
 
     @classmethod
     def is_rising(cls, adr: IndicatorSeries, shift: int = 0) -> bool:
         """True if ADR is rising between shift+1 and shift."""
         logger.info("Evaluating ADR is_rising at shift=%d", shift)
-        curr = adr.get(shift)
-        prev = adr.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(adr, shift=shift)
 
     @classmethod
     def is_falling(cls, adr: IndicatorSeries, shift: int = 0) -> bool:
         """True if ADR is falling between shift+1 and shift."""
         logger.info("Evaluating ADR is_falling at shift=%d", shift)
-        curr = adr.get(shift)
-        prev = adr.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(adr, shift=shift)

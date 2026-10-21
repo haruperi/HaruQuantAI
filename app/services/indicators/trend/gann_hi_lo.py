@@ -16,7 +16,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.gann_hi_lo import GannHiLo
+    from app.services.indicators.trend.gann_hi_lo import GannHiLo
 
     gh = GannHiLo.calculate(high, low, close, period=10)
     gha = gh["gha"]
@@ -35,6 +35,12 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_greater,
+    is_lower,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -152,14 +158,7 @@ class GannHiLo(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        c = BaseIndicator.to_numpy(close_prices)
-        g = BaseIndicator.to_numpy(gha)
-
-        idx = len(c) - 1 - shift
-        if idx < 0 or idx >= len(c) or idx >= len(g) or np.isnan(g[idx]):
-            return False
-
-        return bool(c[idx] > g[idx])
+        return is_greater(close_prices, gha, shift1=shift, shift2=shift, round_digits=8)
 
     @staticmethod
     def is_downtrend(
@@ -177,14 +176,7 @@ class GannHiLo(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        c = BaseIndicator.to_numpy(close_prices)
-        g = BaseIndicator.to_numpy(gha)
-
-        idx = len(c) - 1 - shift
-        if idx < 0 or idx >= len(c) or idx >= len(g) or np.isnan(g[idx]):
-            return False
-
-        return bool(c[idx] < g[idx])
+        return is_lower(close_prices, gha, shift1=shift, shift2=shift, round_digits=8)
 
     @staticmethod
     def turns_uptrend(
@@ -198,18 +190,7 @@ class GannHiLo(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        c = BaseIndicator.to_numpy(close_prices)
-        g = BaseIndicator.to_numpy(gha)
-
-        curr_idx = len(c) - 1 - shift
-        prev_idx = curr_idx - 1
-
-        if prev_idx < 0 or curr_idx >= len(c) or curr_idx >= len(g):
-            return False
-        if np.isnan(g[curr_idx]) or np.isnan(g[prev_idx]):
-            return False
-
-        return bool(c[prev_idx] <= g[prev_idx] and c[curr_idx] > g[curr_idx])
+        return crosses_above(close_prices, gha, shift=shift, round_digits=8)
 
     @staticmethod
     def turns_downtrend(
@@ -223,15 +204,4 @@ class GannHiLo(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        c = BaseIndicator.to_numpy(close_prices)
-        g = BaseIndicator.to_numpy(gha)
-
-        curr_idx = len(c) - 1 - shift
-        prev_idx = curr_idx - 1
-
-        if prev_idx < 0 or curr_idx >= len(c) or curr_idx >= len(g):
-            return False
-        if np.isnan(g[curr_idx]) or np.isnan(g[prev_idx]):
-            return False
-
-        return bool(c[prev_idx] >= g[prev_idx] and c[curr_idx] < g[curr_idx])
+        return crosses_below(close_prices, gha, shift=shift, round_digits=8)

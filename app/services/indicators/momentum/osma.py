@@ -22,7 +22,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.osma import OSMA
+    from app.services.indicators.momentum.osma import OSMA
 
     close = np.linspace(10.0, 30.0, 50)
     osma = OSMA.calculate(close, fast_ema=12, slow_ema=26, signal_period=9)
@@ -31,7 +31,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.osma
+    uv run python -m app.services.indicators.momentum.osma
     ```
 """
 
@@ -42,6 +42,16 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.moving_average import MovingAverage
 
@@ -109,54 +119,54 @@ class OSMA(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate OSMARising condition."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate OSMAFalling condition."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def crosses_above(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate OSMACrossZeroUp / crosses above level condition."""
-        return series.crosses_above(level, shift)
+        return crosses_above(series, level, shift=shift)
 
     @classmethod
     def crosses_below(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate OSMACrossZeroDown / crosses below level condition."""
-        return series.crosses_below(level, shift)
+        return crosses_below(series, level, shift=shift)
 
     @classmethod
     def is_greater(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate OSMAHigherZero / greater than level condition."""
-        return series.is_greater(level, shift)
+        return is_greater(series, level, shift=shift)
 
     @classmethod
     def is_lower(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate OSMALowerZero / lower than level condition."""
-        return series.is_lower(level, shift)
+        return is_lower(series, level, shift=shift)
 
     @classmethod
     def is_higher(
         cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate OSMA is higher than past value."""
-        return series.is_higher(lookback, shift)
+        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate OSMAChangesUp turn condition."""
-        return series.changes_up(shift)
+        return changes_up(series, shift=shift)
 
     @classmethod
     def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate OSMAChangesDown turn condition."""
-        return series.changes_down(shift)
+        return changes_down(series, shift=shift)

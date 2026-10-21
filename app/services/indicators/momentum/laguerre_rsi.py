@@ -15,7 +15,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.laguerre_rsi import LaguerreRSI
+    from app.services.indicators.momentum.laguerre_rsi import LaguerreRSI
 
     lrsi = LaguerreRSI.calculate(close, gamma=0.5)
 
@@ -32,6 +32,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -50,27 +58,7 @@ class LaguerreRSI(BaseIndicator):
         price: IndicatorSeries | np.ndarray[Any, Any],
         gamma: float = DEFAULT_GAMMA,
     ) -> IndicatorSeries:
-        """Compute Laguerre RSI across price series.
-
-        Formulas:
-            L0[i] = (1 - gamma) * price[i] + gamma * L0[i-1]
-            L1[i] = -gamma * L0[i] + L0[i-1] + gamma * L1[i-1]
-            L2[i] = -gamma * L1[i] + L1[i-1] + gamma * L2[i-1]
-            L3[i] = -gamma * L2[i] + L2[i-1] + gamma * L3[i-1]
-            CU = sum of max(0, L_k - L_{k+1}) for k in 0..2
-            CD = sum of max(0, L_{k+1} - L_k) for k in 0..2
-            LRSI = CU / (CU + CD) if CU + CD != 0 else 0.0
-
-        Args:
-            price: Input price series (typically Close).
-            gamma: Damping factor between 0.0 and 1.0 (default 0.5).
-
-        Returns:
-            IndicatorSeries bounded in [0.0, 1.0].
-
-        Raises:
-            ValueError: If gamma is outside [0.0, 1.0] or series is empty.
-        """
+        """Compute Laguerre RSI across price series."""
         logger.info(
             "LaguerreRSI calculation initiated with gamma=%.3f",
             gamma,
@@ -152,12 +140,7 @@ class LaguerreRSI(BaseIndicator):
     ) -> bool:
         """Check if Laguerre RSI is rising."""
         logger.info("Evaluating LaguerreRSI is_rising at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[curr] > s[prev])
+        return is_rising(series, shift=shift)
 
     @staticmethod
     def is_falling(
@@ -166,12 +149,7 @@ class LaguerreRSI(BaseIndicator):
     ) -> bool:
         """Check if Laguerre RSI is falling."""
         logger.info("Evaluating LaguerreRSI is_falling at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[curr] < s[prev])
+        return is_falling(series, shift=shift)
 
     @staticmethod
     def crosses_above(
@@ -181,12 +159,7 @@ class LaguerreRSI(BaseIndicator):
     ) -> bool:
         """Check if Laguerre RSI crossed above a threshold level."""
         logger.info("Evaluating LaguerreRSI crosses_above at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[prev] <= level and s[curr] > level)
+        return crosses_above(series, level, shift=shift)
 
     @staticmethod
     def crosses_below(
@@ -196,12 +169,7 @@ class LaguerreRSI(BaseIndicator):
     ) -> bool:
         """Check if Laguerre RSI crossed below a threshold level."""
         logger.info("Evaluating LaguerreRSI crosses_below at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[prev] >= level and s[curr] < level)
+        return crosses_below(series, level, shift=shift)
 
     @staticmethod
     def changes_up(
@@ -210,15 +178,7 @@ class LaguerreRSI(BaseIndicator):
     ) -> bool:
         """Check if Laguerre RSI turned upward (v0 > v1 and v1 <= v2)."""
         logger.info("Evaluating LaguerreRSI changes_up at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        i0 = len(s) - 1 - shift
-        i1 = i0 - 1
-        i2 = i0 - 2
-        if i2 < 0 or i0 >= len(s):
-            return False
-        if np.isnan(s[i0]) or np.isnan(s[i1]) or np.isnan(s[i2]):
-            return False
-        return bool(s[i0] > s[i1] and s[i1] <= s[i2])
+        return changes_up(series, shift=shift)
 
     @staticmethod
     def changes_down(
@@ -227,12 +187,4 @@ class LaguerreRSI(BaseIndicator):
     ) -> bool:
         """Check if Laguerre RSI turned downward (v0 < v1 and v1 >= v2)."""
         logger.info("Evaluating LaguerreRSI changes_down at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        i0 = len(s) - 1 - shift
-        i1 = i0 - 1
-        i2 = i0 - 2
-        if i2 < 0 or i0 >= len(s):
-            return False
-        if np.isnan(s[i0]) or np.isnan(s[i1]) or np.isnan(s[i2]):
-            return False
-        return bool(s[i0] < s[i1] and s[i1] >= s[i2])
+        return changes_down(series, shift=shift)

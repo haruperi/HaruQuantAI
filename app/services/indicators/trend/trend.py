@@ -14,7 +14,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.trend import Trend
+    from app.services.indicators.trend.trend import Trend
 
     res = Trend.calculate(close, period=200, method="sma")
     trend = res["trend"]
@@ -34,6 +34,12 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_greater,
+    is_lower,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -164,12 +170,7 @@ class Trend(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        b = BaseIndicator.to_numpy(baseline)
-        idx = len(p) - 1 - shift
-        if idx < 0 or idx >= len(p) or idx >= len(b) or np.isnan(b[idx]):
-            return False
-        return bool(p[idx] > b[idx])
+        return is_greater(price, baseline, shift1=shift, shift2=shift, round_digits=8)
 
     @staticmethod
     def is_downtrend(
@@ -187,12 +188,7 @@ class Trend(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        b = BaseIndicator.to_numpy(baseline)
-        idx = len(p) - 1 - shift
-        if idx < 0 or idx >= len(p) or idx >= len(b) or np.isnan(b[idx]):
-            return False
-        return bool(p[idx] < b[idx])
+        return is_lower(price, baseline, shift1=shift, shift2=shift, round_digits=8)
 
     @staticmethod
     def turns_uptrend(
@@ -206,15 +202,7 @@ class Trend(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        b = BaseIndicator.to_numpy(baseline)
-        curr = len(p) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(p) or curr >= len(b):
-            return False
-        if np.isnan(b[curr]) or np.isnan(b[prev]):
-            return False
-        return bool(p[prev] <= b[prev] and p[curr] > b[curr])
+        return crosses_above(price, baseline, shift=shift, round_digits=8)
 
     @staticmethod
     def turns_downtrend(
@@ -228,12 +216,4 @@ class Trend(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        b = BaseIndicator.to_numpy(baseline)
-        curr = len(p) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(p) or curr >= len(b):
-            return False
-        if np.isnan(b[curr]) or np.isnan(b[prev]):
-            return False
-        return bool(p[prev] >= b[prev] and p[curr] < b[curr])
+        return crosses_below(price, baseline, shift=shift, round_digits=8)

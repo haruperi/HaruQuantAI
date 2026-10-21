@@ -25,7 +25,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.sr_percent_rank import SRPercentRank
+    from app.services.indicators.volatility.sr_percent_rank import SRPercentRank
 
     high = np.array([10.5, 10.8, 11.0, 10.9, 11.2, 11.5])
     low = np.array([9.5, 9.8, 10.0, 9.9, 10.2, 10.5])
@@ -37,7 +37,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.sr_percent_rank
+    uv run python -m app.services.indicators.volatility.sr_percent_rank
     ```
 """
 
@@ -48,6 +48,12 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.volatility.mt_atr import MTATR
 
@@ -146,12 +152,11 @@ class SRPercentRank(BaseIndicator):
         cls, series: IndicatorSeries, level: float, shift: int = 0
     ) -> bool:
         """Check if SRPercentRank is above level."""
-        val = series.get(shift)
-        res = bool(val > level)
+        res = is_greater(series, level, shift=shift)
         logger.debug(
-            "FR-SERVICES-SRPERCENT-CONDITIONS is_above val=%.4f level=%.4f res=%s",
-            val,
+            "FR-SERVICES-SRPERCENT-CONDITIONS is_above level=%.4f shift=%d res=%s",
             level,
+            shift,
             res,
         )
         return res
@@ -161,12 +166,11 @@ class SRPercentRank(BaseIndicator):
         cls, series: IndicatorSeries, level: float, shift: int = 0
     ) -> bool:
         """Check if SRPercentRank is below level."""
-        val = series.get(shift)
-        res = bool(val < level)
+        res = is_lower(series, level, shift=shift)
         logger.debug(
-            "FR-SERVICES-SRPERCENT-CONDITIONS is_below val=%.4f level=%.4f res=%s",
-            val,
+            "FR-SERVICES-SRPERCENT-CONDITIONS is_below level=%.4f shift=%d res=%s",
             level,
+            shift,
             res,
         )
         return res
@@ -178,17 +182,13 @@ class SRPercentRank(BaseIndicator):
         """Check if SRPercentRank is above level for X consecutive bars."""
         at_least_once = False
         for i in range(bars):
-            val = series.get(shift + i)
-            if val < level:
+            if is_lower(series, level, shift1=shift + i):
                 logger.debug(
-                    "FR-SERVICES-SRPERCENT-CONDITIONS above failed at bar %d "
-                    "(val=%.4f < %.4f)",
+                    "FR-SERVICES-SRPERCENT-CONDITIONS above failed at bar %d",
                     i,
-                    val,
-                    level,
                 )
                 return False
-            if val > level:
+            if is_greater(series, level, shift1=shift + i):
                 at_least_once = True
         return at_least_once
 
@@ -199,30 +199,23 @@ class SRPercentRank(BaseIndicator):
         """Check if SRPercentRank is below level for X consecutive bars."""
         at_least_once = False
         for i in range(bars):
-            val = series.get(shift + i)
-            if val > level:
+            if is_greater(series, level, shift1=shift + i):
                 logger.debug(
-                    "FR-SERVICES-SRPERCENT-CONDITIONS below failed at bar %d "
-                    "(val=%.4f > %.4f)",
+                    "FR-SERVICES-SRPERCENT-CONDITIONS below failed at bar %d",
                     i,
-                    val,
-                    level,
                 )
                 return False
-            if val < level:
+            if is_lower(series, level, shift1=shift + i):
                 at_least_once = True
         return at_least_once
 
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Check if SRPercentRank is rising."""
-        curr = series.get(shift)
-        prev = series.get(shift + 1)
-        res = bool(curr > prev)
+        res = is_rising(series, shift=shift)
         logger.debug(
-            "FR-SERVICES-SRPERCENT-CONDITIONS is_rising curr=%.4f prev=%.4f res=%s",
-            curr,
-            prev,
+            "FR-SERVICES-SRPERCENT-CONDITIONS is_rising shift=%d res=%s",
+            shift,
             res,
         )
         return res
@@ -230,13 +223,10 @@ class SRPercentRank(BaseIndicator):
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Check if SRPercentRank is falling."""
-        curr = series.get(shift)
-        prev = series.get(shift + 1)
-        res = bool(curr < prev)
+        res = is_falling(series, shift=shift)
         logger.debug(
-            "FR-SERVICES-SRPERCENT-CONDITIONS is_falling curr=%.4f prev=%.4f res=%s",
-            curr,
-            prev,
+            "FR-SERVICES-SRPERCENT-CONDITIONS is_falling shift=%d res=%s",
+            shift,
             res,
         )
         return res

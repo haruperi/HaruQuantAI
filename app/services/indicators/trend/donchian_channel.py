@@ -36,6 +36,13 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_greater,
+    is_lower,
+    is_lower_or_equal,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -145,9 +152,7 @@ class DonchianChannels(BaseIndicator):
     ) -> bool:
         """True if price is greater than upper channel band."""
         logger.info("Evaluating Donchian is_above_upper at shift=%d", shift)
-        p_val = price.get(shift)
-        u_val = upper.get(shift)
-        return not np.isnan(p_val) and not np.isnan(u_val) and p_val > u_val
+        return is_greater(price, upper, shift=shift)
 
     @classmethod
     def is_below_lower(
@@ -158,9 +163,7 @@ class DonchianChannels(BaseIndicator):
     ) -> bool:
         """True if price is less than lower channel band."""
         logger.info("Evaluating Donchian is_below_lower at shift=%d", shift)
-        p_val = price.get(shift)
-        l_val = lower.get(shift)
-        return not np.isnan(p_val) and not np.isnan(l_val) and p_val < l_val
+        return is_lower(price, lower, shift=shift)
 
     @classmethod
     def crosses_above_upper(
@@ -171,13 +174,7 @@ class DonchianChannels(BaseIndicator):
     ) -> bool:
         """True if price crosses above upper band."""
         logger.info("Evaluating Donchian crosses_above_upper at shift=%d", shift)
-        p_curr = price.get(shift)
-        p_prev = price.get(shift + 1)
-        u_curr = upper.get(shift)
-        u_prev = upper.get(shift + 1)
-        if np.isnan(p_curr) or np.isnan(p_prev) or np.isnan(u_curr) or np.isnan(u_prev):
-            return False
-        return bool(p_prev <= u_prev and p_curr > u_curr)
+        return crosses_above(price, upper, shift=shift)
 
     @classmethod
     def crosses_below_lower(
@@ -188,13 +185,7 @@ class DonchianChannels(BaseIndicator):
     ) -> bool:
         """True if price crosses below lower band."""
         logger.info("Evaluating Donchian crosses_below_lower at shift=%d", shift)
-        p_curr = price.get(shift)
-        p_prev = price.get(shift + 1)
-        l_curr = lower.get(shift)
-        l_prev = lower.get(shift + 1)
-        if np.isnan(p_curr) or np.isnan(p_prev) or np.isnan(l_curr) or np.isnan(l_prev):
-            return False
-        return bool(p_prev >= l_prev and p_curr < l_curr)
+        return crosses_below(price, lower, shift=shift)
 
     @classmethod
     def crosses_above_middle(
@@ -205,13 +196,7 @@ class DonchianChannels(BaseIndicator):
     ) -> bool:
         """True if price crosses above middle band."""
         logger.info("Evaluating Donchian crosses_above_middle at shift=%d", shift)
-        p_curr = price.get(shift)
-        p_prev = price.get(shift + 1)
-        m_curr = middle.get(shift)
-        m_prev = middle.get(shift + 1)
-        if np.isnan(p_curr) or np.isnan(p_prev) or np.isnan(m_curr) or np.isnan(m_prev):
-            return False
-        return bool(p_prev <= m_prev and p_curr > m_curr)
+        return crosses_above(price, middle, shift=shift)
 
     @classmethod
     def crosses_below_middle(
@@ -222,13 +207,7 @@ class DonchianChannels(BaseIndicator):
     ) -> bool:
         """True if price crosses below middle band."""
         logger.info("Evaluating Donchian crosses_below_middle at shift=%d", shift)
-        p_curr = price.get(shift)
-        p_prev = price.get(shift + 1)
-        m_curr = middle.get(shift)
-        m_prev = middle.get(shift + 1)
-        if np.isnan(p_curr) or np.isnan(p_prev) or np.isnan(m_curr) or np.isnan(m_prev):
-            return False
-        return bool(p_prev >= m_prev and p_curr < m_curr)
+        return crosses_below(price, middle, shift=shift)
 
     @classmethod
     def is_squeezed(
@@ -237,7 +216,6 @@ class DonchianChannels(BaseIndicator):
         threshold: float,
         shift: int = 0,
     ) -> bool:
-        """True if channel width is less than specified threshold."""
+        """True if channel width is less than or equal to specified threshold."""
         logger.info("Evaluating Donchian is_squeezed at shift=%d", shift)
-        w_val = width.get(shift)
-        return not np.isnan(w_val) and w_val <= threshold
+        return is_lower_or_equal(width, threshold, shift1=shift, round_digits=8)

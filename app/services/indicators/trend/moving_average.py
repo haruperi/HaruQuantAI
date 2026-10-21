@@ -28,7 +28,7 @@ Python API Usage:
     close = np.array([10.0, 10.5, 11.0, 10.8, 11.2, 11.5, 12.0])
     sma20 = MovingAverage.calculate(close, period=5, method=MovingAverage.SMA)
     ema20 = MovingAverage.calculate(close, period=5, method=MovingAverage.EMA)
-    is_bullish = ema20.is_greater(sma20)
+    is_bullish = MovingAverage.is_greater(ema20, sma20)
     ```
 
 CLI Usage:
@@ -44,6 +44,14 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -180,22 +188,16 @@ class MovingAverage(BaseIndicator):
         )
         return IndicatorSeries(res, name=f"MA({m_name},{period})")
 
-    @staticmethod
-    def _as_series(
-        s: IndicatorSeries | Sequence[float] | np.ndarray,
-    ) -> IndicatorSeries:
-        return s if isinstance(s, IndicatorSeries) else IndicatorSeries(s)
-
     # Unified condition helpers
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate MARising condition (`MA[shift] > MA[shift + 1]`)."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate MAFalling condition (`MA[shift] < MA[shift + 1]`)."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def crosses_above(
@@ -205,7 +207,7 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MA crosses above another MA or level."""
-        return series.crosses_above(other, shift)
+        return crosses_above(series, other, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -215,7 +217,7 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MA crosses below another MA or level."""
-        return series.crosses_below(other, shift)
+        return crosses_below(series, other, shift=shift)
 
     @classmethod
     def is_greater(
@@ -225,7 +227,7 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MA is greater than another MA or level."""
-        return series.is_greater(other, shift)
+        return is_greater(series, other, shift=shift)
 
     @classmethod
     def is_lower(
@@ -235,7 +237,7 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MA is lower than another MA or level."""
-        return series.is_lower(other, shift)
+        return is_lower(series, other, shift=shift)
 
     @classmethod
     def bar_closes_above(
@@ -245,7 +247,7 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MABarClosesAbove (`Close[shift] > MA[shift]`)."""
-        return cls._as_series(close_series).is_greater(cls._as_series(ma_series), shift)
+        return is_greater(close_series, ma_series, shift=shift)
 
     @classmethod
     def bar_closes_below(
@@ -255,7 +257,7 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MABarClosesBelow (`Close[shift] < MA[shift]`)."""
-        return cls._as_series(close_series).is_lower(cls._as_series(ma_series), shift)
+        return is_lower(close_series, ma_series, shift=shift)
 
     @classmethod
     def bar_opens_above(
@@ -265,11 +267,13 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MABarOpensAbove (`Open[shift] > MA[shift + 1]`)."""
-        o = cls._as_series(open_series).get(shift)
-        m = cls._as_series(ma_series).get(shift + 1)
-        if np.isnan(o) or np.isnan(m):
-            return False
-        return o > m
+        return is_greater(
+            open_series,
+            ma_series,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @classmethod
     def bar_opens_below(
@@ -279,11 +283,13 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MABarOpensBelow (`Open[shift] < MA[shift + 1]`)."""
-        o = cls._as_series(open_series).get(shift)
-        m = cls._as_series(ma_series).get(shift + 1)
-        if np.isnan(o) or np.isnan(m):
-            return False
-        return o < m
+        return is_lower(
+            open_series,
+            ma_series,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @classmethod
     def bar_opens_above_after_open_below(
@@ -293,13 +299,19 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MABarOpensAboveAfterOpenBelow (`Open[s+1] < MA[s+1] < Open[s]`)."""
-        os = cls._as_series(open_series)
-        o0 = os.get(shift)
-        o1 = os.get(shift + 1)
-        m1 = cls._as_series(ma_series).get(shift + 1)
-        if np.isnan(o0) or np.isnan(o1) or np.isnan(m1):
-            return False
-        return o1 < m1 and o0 > m1
+        return is_lower(
+            open_series,
+            ma_series,
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_greater(
+            open_series,
+            ma_series,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @classmethod
     def bar_opens_below_after_open_above(
@@ -309,10 +321,16 @@ class MovingAverage(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate MABarOpensBelowAfterOpenAbove (`Open[s+1] > MA[s+1] > Open[s]`)."""
-        os = cls._as_series(open_series)
-        o0 = os.get(shift)
-        o1 = os.get(shift + 1)
-        m1 = cls._as_series(ma_series).get(shift + 1)
-        if np.isnan(o0) or np.isnan(o1) or np.isnan(m1):
-            return False
-        return o1 > m1 and o0 < m1
+        return is_greater(
+            open_series,
+            ma_series,
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_lower(
+            open_series,
+            ma_series,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )

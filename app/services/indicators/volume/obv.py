@@ -34,6 +34,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -96,37 +104,25 @@ class OBV(BaseIndicator):
     def is_rising(cls, obv: IndicatorSeries, shift: int = 0) -> bool:
         """True if OBV is rising between bar shift+1 and bar shift."""
         logger.info("Evaluating OBV is_rising at shift=%d", shift)
-        curr = obv.get(shift)
-        prev = obv.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(obv, shift=shift)
 
     @classmethod
     def is_falling(cls, obv: IndicatorSeries, shift: int = 0) -> bool:
         """True if OBV is falling between bar shift+1 and bar shift."""
         logger.info("Evaluating OBV is_falling at shift=%d", shift)
-        curr = obv.get(shift)
-        prev = obv.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(obv, shift=shift)
 
     @classmethod
     def crosses_above(cls, obv: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """True if OBV crosses above specified level."""
         logger.info("Evaluating OBV crosses_above level=%.2f at shift=%d", level, shift)
-        curr = obv.get(shift)
-        prev = obv.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= level and curr > level)
+        return crosses_above(obv, level, shift=shift)
 
     @classmethod
     def crosses_below(cls, obv: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """True if OBV crosses below specified level."""
         logger.info("Evaluating OBV crosses_below level=%.2f at shift=%d", level, shift)
-        curr = obv.get(shift)
-        prev = obv.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= level and curr < level)
+        return crosses_below(obv, level, shift=shift)
 
     @classmethod
     def is_above_level(
@@ -134,8 +130,7 @@ class OBV(BaseIndicator):
     ) -> bool:
         """True if OBV is above specified level."""
         logger.info("Evaluating OBV is_above_level=%.2f at shift=%d", level, shift)
-        val = obv.get(shift)
-        return not np.isnan(val) and val > level
+        return is_greater(obv, level, shift1=shift)
 
     @classmethod
     def is_below_level(
@@ -143,8 +138,7 @@ class OBV(BaseIndicator):
     ) -> bool:
         """True if OBV is below specified level."""
         logger.info("Evaluating OBV is_below_level=%.2f at shift=%d", level, shift)
-        val = obv.get(shift)
-        return not np.isnan(val) and val < level
+        return is_lower(obv, level, shift1=shift)
 
 
 class MFI(BaseIndicator):
@@ -231,8 +225,7 @@ class MFI(BaseIndicator):
     ) -> bool:
         """True if MFI is above specified level (overbought)."""
         logger.info("Evaluating MFI is_above_level=%.2f at shift=%d", level, shift)
-        val = mfi.get(shift)
-        return not np.isnan(val) and val > level
+        return is_greater(mfi, level, shift1=shift)
 
     @classmethod
     def is_below_level(
@@ -240,8 +233,7 @@ class MFI(BaseIndicator):
     ) -> bool:
         """True if MFI is below specified level (oversold)."""
         logger.info("Evaluating MFI is_below_level=%.2f at shift=%d", level, shift)
-        val = mfi.get(shift)
-        return not np.isnan(val) and val < level
+        return is_lower(mfi, level, shift1=shift)
 
     @classmethod
     def is_overbought(
@@ -273,34 +265,22 @@ class MFI(BaseIndicator):
     def crosses_above(cls, mfi: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """True if MFI crosses above level."""
         logger.info("Evaluating MFI crosses_above level=%.2f at shift=%d", level, shift)
-        curr = mfi.get(shift)
-        prev = mfi.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= level and curr > level)
+        return crosses_above(mfi, level, shift=shift)
 
     @classmethod
     def crosses_below(cls, mfi: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """True if MFI crosses below level."""
         logger.info("Evaluating MFI crosses_below level=%.2f at shift=%d", level, shift)
-        curr = mfi.get(shift)
-        prev = mfi.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= level and curr < level)
+        return crosses_below(mfi, level, shift=shift)
 
     @classmethod
     def is_rising(cls, mfi: IndicatorSeries, shift: int = 0) -> bool:
         """True if MFI is rising between bar shift+1 and bar shift."""
         logger.info("Evaluating MFI is_rising at shift=%d", shift)
-        curr = mfi.get(shift)
-        prev = mfi.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(mfi, shift=shift)
 
     @classmethod
     def is_falling(cls, mfi: IndicatorSeries, shift: int = 0) -> bool:
         """True if MFI is falling between bar shift+1 and bar shift."""
         logger.info("Evaluating MFI is_falling at shift=%d", shift)
-        curr = mfi.get(shift)
-        prev = mfi.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(mfi, shift=shift)

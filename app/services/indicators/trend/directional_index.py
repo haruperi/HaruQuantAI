@@ -22,7 +22,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.directional_index import DirectionalIndex
+    from app.services.indicators.trend.directional_index import DirectionalIndex
 
     high = np.linspace(10.0, 20.0, 30)
     low = np.linspace(8.0, 18.0, 30)
@@ -36,7 +36,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.directional_index
+    uv run python -m app.services.indicators.trend.directional_index
     ```
 """
 
@@ -47,6 +47,16 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.adx import ADX
 
@@ -108,85 +118,95 @@ class DirectionalIndex(BaseIndicator):
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Check if DI+ crosses above DI-."""
-        return di_dict["di_plus"].crosses_above(di_dict["di_minus"], shift)
+        return crosses_above(
+            di_dict["di_plus"], di_dict["di_minus"], shift=shift, round_digits=8
+        )
 
     @classmethod
     def di_crosses_below(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Check if DI+ crosses below DI-."""
-        return di_dict["di_plus"].crosses_below(di_dict["di_minus"], shift)
+        return crosses_below(
+            di_dict["di_plus"], di_dict["di_minus"], shift=shift, round_digits=8
+        )
 
     @classmethod
     def di_plus_rising(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if DI+ is rising."""
-        return di_dict["di_plus"].is_rising(shift)
+        return is_rising(di_dict["di_plus"], shift=shift)
 
     @classmethod
     def di_plus_falling(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if DI+ is falling."""
-        return di_dict["di_plus"].is_falling(shift)
+        return is_falling(di_dict["di_plus"], shift=shift)
 
     @classmethod
     def di_plus_higher(
         cls, di_dict: dict[str, IndicatorSeries], lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate if DI+ is higher than lookback bars ago."""
-        return di_dict["di_plus"].is_higher(lookback, shift)
+        return is_greater(
+            di_dict["di_plus"],
+            di_dict["di_plus"],
+            shift1=shift,
+            shift2=shift + lookback,
+        )
 
     @classmethod
     def di_plus_lower(
         cls, di_dict: dict[str, IndicatorSeries], lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate if DI+ is lower than lookback bars ago."""
-        val0 = di_dict["di_plus"].get(shift)
-        val_past = di_dict["di_plus"].get(shift + lookback)
-        if np.isnan(val0) or np.isnan(val_past):
-            return False
-        return val0 < val_past
+        return is_lower(
+            di_dict["di_plus"],
+            di_dict["di_plus"],
+            shift1=shift,
+            shift2=shift + lookback,
+        )
 
     @classmethod
     def di_plus_changes_up(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if DI+ turned upward."""
-        return di_dict["di_plus"].changes_up(shift)
+        return changes_up(di_dict["di_plus"], shift=shift)
 
     @classmethod
     def di_plus_changes_down(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if DI+ turned downward."""
-        return di_dict["di_plus"].changes_down(shift)
+        return changes_down(di_dict["di_plus"], shift=shift)
 
     @classmethod
     def di_minus_rising(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if DI- is rising."""
-        return di_dict["di_minus"].is_rising(shift)
+        return is_rising(di_dict["di_minus"], shift=shift)
 
     @classmethod
     def di_minus_falling(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if DI- is falling."""
-        return di_dict["di_minus"].is_falling(shift)
+        return is_falling(di_dict["di_minus"], shift=shift)
 
     @classmethod
     def di_minus_changes_up(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if DI- turned upward."""
-        return di_dict["di_minus"].changes_up(shift)
+        return changes_up(di_dict["di_minus"], shift=shift)
 
     @classmethod
     def di_minus_changes_down(
         cls, di_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if DI- turned downward."""
-        return di_dict["di_minus"].changes_down(shift)
+        return changes_down(di_dict["di_minus"], shift=shift)

@@ -22,7 +22,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.parabolic_sar import ParabolicSAR
+    from app.services.indicators.trend.parabolic_sar import ParabolicSAR
 
     high = np.linspace(10.0, 30.0, 40)
     low = np.linspace(8.0, 28.0, 40)
@@ -32,7 +32,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.parabolic_sar
+    uv run python -m app.services.indicators.trend.parabolic_sar
     ```
 """
 
@@ -43,6 +43,12 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -197,12 +203,7 @@ class ParabolicSAR(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if price at shift is higher than SAR (uptrend position)."""
-        p_series = (
-            price
-            if isinstance(price, IndicatorSeries)
-            else IndicatorSeries(price, name="Price")
-        )
-        return p_series.is_greater(sar_series, shift)
+        return is_greater(price, sar_series, shift=shift)
 
     @classmethod
     def is_bar_lower(
@@ -212,19 +213,14 @@ class ParabolicSAR(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if price at shift is lower than SAR (downtrend position)."""
-        p_series = (
-            price
-            if isinstance(price, IndicatorSeries)
-            else IndicatorSeries(price, name="Price")
-        )
-        return p_series.is_lower(sar_series, shift)
+        return is_lower(price, sar_series, shift=shift)
 
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if PSAR is rising."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate if PSAR is falling."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)

@@ -7,7 +7,7 @@ Description:
     Provides condition helpers for crossovers, trends, and turns.
 
 Purpose:
-    FEAT-SERVICES-INDICATOR-BULLS: Bulls Power indicator calculation and conditions.
+    FEAT-SERVICES-INDICATOR-BULLS: Bulls Power calculation and conditions.
 
 Key Capabilities:
     - FR-SERVICES-BULLS-CALCULATE: Vectorized calculation of Bulls Power values.
@@ -20,7 +20,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.bulls_power import BullsPower
+    from app.services.indicators.momentum.bulls_power import BullsPower
 
     high = np.array([10.0, 11.0, 12.0, 13.0, 14.0])
     close = np.array([9.5, 10.5, 11.0, 12.5, 13.5])
@@ -30,7 +30,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.bulls_power
+    uv run python -m app.services.indicators.momentum.bulls_power
     ```
 """
 
@@ -41,6 +41,16 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.moving_average import MovingAverage
 
@@ -96,51 +106,47 @@ class BullsPower(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate BUPRising condition."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate BUPFalling condition."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def crosses_above(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate BUPCrossUp condition (crosses above level/zero)."""
-        return series.crosses_above(level, shift)
+        return crosses_above(series, level, shift=shift)
 
     @classmethod
     def crosses_below(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate BUPCrossDown condition (crosses below level/zero)."""
-        return series.crosses_below(level, shift)
+        return crosses_below(series, level, shift=shift)
 
     @classmethod
     def is_higher(
         cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate BUPHigher condition."""
-        return series.is_higher(lookback, shift)
+        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def is_lower(
         cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate BUPLower condition."""
-        val0 = series.get(shift)
-        val_past = series.get(shift + lookback)
-        if np.isnan(val0) or np.isnan(val_past):
-            return False
-        return val0 < val_past
+        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate BUPChangesUp turn condition."""
-        return series.changes_up(shift)
+        return changes_up(series, shift=shift)
 
     @classmethod
     def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate BUPChangesDown turn condition."""
-        return series.changes_down(shift)
+        return changes_down(series, shift=shift)

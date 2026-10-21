@@ -14,13 +14,12 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.reflex import Reflex
+    from app.services.indicators.momentum.reflex import Reflex
 
     reflex_res = Reflex.calculate(close, period=20, slow_period=40)
     fast = reflex_res["fast"]
     slow = reflex_res["slow"]
 
-    # Condition checks
     cross_up = Reflex.fast_crosses_above_slow(fast, slow, shift=0)
     is_up = Reflex.changes_direction_up(fast, shift=0)
     ```
@@ -34,6 +33,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -56,19 +63,7 @@ class Reflex(BaseIndicator):
         period: int = DEFAULT_FAST_PERIOD,
         slow_period: int | None = None,
     ) -> dict[str, IndicatorSeries]:
-        """Compute Reflex indicator line(s).
-
-        Args:
-            price: Input price series (typically Close).
-            period: Primary (or fast) cycle period (must be >= 2).
-            slow_period: Optional secondary (slow) cycle period.
-
-        Returns:
-            Dictionary containing 'reflex' (or 'fast') and optionally 'slow'.
-
-        Raises:
-            ValueError: If period < 2, slow_period < 2, or series is empty.
-        """
+        """Compute Reflex indicator line(s)."""
         logger.info(
             "Reflex calculation initiated: period=%d, slow_period=%s",
             period,
@@ -117,7 +112,6 @@ class Reflex(BaseIndicator):
         filt = np.zeros(n, dtype=np.float64)
         ms = np.zeros(n, dtype=np.float64)
 
-        # 2-pole SuperSmoother filter constants
         arg = (1.414 * math.pi) / (0.5 * period)
         a1 = math.exp(-arg)
         b1 = 2.0 * a1 * math.cos(arg)
@@ -156,15 +150,7 @@ class Reflex(BaseIndicator):
     ) -> bool:
         """Check if Fast Reflex crossed above Slow Reflex."""
         logger.info("Evaluating Reflex fast_crosses_above_slow at shift=%d", shift)
-        f = BaseIndicator.to_numpy(fast)
-        s = BaseIndicator.to_numpy(slow)
-        curr = len(f) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(f) or curr >= len(s):
-            return False
-        if np.isnan(f[curr]) or np.isnan(s[curr]) or np.isnan(f[prev]):
-            return False
-        return bool(f[prev] <= s[prev] and f[curr] > s[curr])
+        return crosses_above(fast, slow, shift=shift)
 
     @staticmethod
     def fast_crosses_below_slow(
@@ -174,15 +160,7 @@ class Reflex(BaseIndicator):
     ) -> bool:
         """Check if Fast Reflex crossed below Slow Reflex."""
         logger.info("Evaluating Reflex fast_crosses_below_slow at shift=%d", shift)
-        f = BaseIndicator.to_numpy(fast)
-        s = BaseIndicator.to_numpy(slow)
-        curr = len(f) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(f) or curr >= len(s):
-            return False
-        if np.isnan(f[curr]) or np.isnan(s[curr]) or np.isnan(f[prev]):
-            return False
-        return bool(f[prev] >= s[prev] and f[curr] < s[curr])
+        return crosses_below(fast, slow, shift=shift)
 
     @staticmethod
     def is_rising(
@@ -191,12 +169,7 @@ class Reflex(BaseIndicator):
     ) -> bool:
         """Check if Reflex is rising."""
         logger.info("Evaluating Reflex is_rising at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[curr] > s[prev])
+        return is_rising(series, shift=shift)
 
     @staticmethod
     def is_falling(
@@ -205,12 +178,7 @@ class Reflex(BaseIndicator):
     ) -> bool:
         """Check if Reflex is falling."""
         logger.info("Evaluating Reflex is_falling at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        curr = len(s) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(s) or np.isnan(s[curr]) or np.isnan(s[prev]):
-            return False
-        return bool(s[curr] < s[prev])
+        return is_falling(series, shift=shift)
 
     @staticmethod
     def changes_direction_up(
@@ -219,15 +187,7 @@ class Reflex(BaseIndicator):
     ) -> bool:
         """Check if Reflex turned upward (v0 > v1 and v1 <= v2)."""
         logger.info("Evaluating Reflex changes_direction_up at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        i0 = len(s) - 1 - shift
-        i1 = i0 - 1
-        i2 = i0 - 2
-        if i2 < 0 or i0 >= len(s):
-            return False
-        if np.isnan(s[i0]) or np.isnan(s[i1]) or np.isnan(s[i2]):
-            return False
-        return bool(s[i0] > s[i1] and s[i1] <= s[i2])
+        return changes_up(series, shift=shift)
 
     @staticmethod
     def changes_direction_down(
@@ -236,12 +196,4 @@ class Reflex(BaseIndicator):
     ) -> bool:
         """Check if Reflex turned downward (v0 < v1 and v1 >= v2)."""
         logger.info("Evaluating Reflex changes_direction_down at shift=%d", shift)
-        s = BaseIndicator.to_numpy(series)
-        i0 = len(s) - 1 - shift
-        i1 = i0 - 1
-        i2 = i0 - 2
-        if i2 < 0 or i0 >= len(s):
-            return False
-        if np.isnan(s[i0]) or np.isnan(s[i1]) or np.isnan(s[i2]):
-            return False
-        return bool(s[i0] < s[i1] and s[i1] >= s[i2])
+        return changes_down(series, shift=shift)

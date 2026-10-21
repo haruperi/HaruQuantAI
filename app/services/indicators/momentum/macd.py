@@ -42,6 +42,16 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.moving_average import MovingAverage
 
@@ -106,123 +116,123 @@ class MACD(BaseIndicator):
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainCrossAboveSignal."""
-        return macd_dict["main"].crosses_above(macd_dict["signal"], shift)
+        return crosses_above(macd_dict["main"], macd_dict["signal"], shift=shift)
 
     @classmethod
     def main_crosses_below_signal(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainCrossBelowSignal."""
-        return macd_dict["main"].crosses_below(macd_dict["signal"], shift)
+        return crosses_below(macd_dict["main"], macd_dict["signal"], shift=shift)
 
     @classmethod
     def main_higher_signal(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainHigherSignal."""
-        return macd_dict["main"].is_greater(macd_dict["signal"], shift)
+        return is_greater(macd_dict["main"], macd_dict["signal"], shift=shift)
 
     @classmethod
     def main_lower_signal(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainLowerSignal."""
-        return macd_dict["main"].is_lower(macd_dict["signal"], shift)
+        return is_lower(macd_dict["main"], macd_dict["signal"], shift=shift)
 
     @classmethod
     def main_crosses_above_zero(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainCrossAboveZero."""
-        return macd_dict["main"].crosses_above(0.0, shift)
+        return crosses_above(macd_dict["main"], 0.0, shift=shift)
 
     @classmethod
     def main_crosses_below_zero(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainCrossBelowZero."""
-        return macd_dict["main"].crosses_below(0.0, shift)
+        return crosses_below(macd_dict["main"], 0.0, shift=shift)
 
     @classmethod
     def main_changes_up(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainChangesUp (`Main[s+2] > Main[s+1] < Main[s]`)."""
-        return macd_dict["main"].changes_up(shift)
+        return changes_up(macd_dict["main"], shift=shift)
 
     @classmethod
     def main_changes_down(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainChangesDown (`Main[s+2] < Main[s+1] > Main[s]`)."""
-        return macd_dict["main"].changes_down(shift)
+        return changes_down(macd_dict["main"], shift=shift)
 
     @classmethod
     def main_crosses_above(
         cls, macd_dict: dict[str, IndicatorSeries], level: float, shift: int = 0
     ) -> bool:
         """Evaluate MACDMainCrossAbove level."""
-        return macd_dict["main"].crosses_above(level, shift)
+        return crosses_above(macd_dict["main"], level, shift=shift)
 
     @classmethod
     def main_crosses_below(
         cls, macd_dict: dict[str, IndicatorSeries], level: float, shift: int = 0
     ) -> bool:
         """Evaluate MACDMainCrossBelow level."""
-        return macd_dict["main"].crosses_below(level, shift)
+        return crosses_below(macd_dict["main"], level, shift=shift)
 
     @classmethod
     def main_is_rising(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainRising."""
-        return macd_dict["main"].is_rising(shift)
+        return is_rising(macd_dict["main"], shift=shift)
 
     @classmethod
     def main_is_falling(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainFalling."""
-        return macd_dict["main"].is_falling(shift)
+        return is_falling(macd_dict["main"], shift=shift)
 
     @classmethod
     def main_is_higher(
         cls, macd_dict: dict[str, IndicatorSeries], level: float, shift: int = 0
     ) -> bool:
         """Evaluate MACDMainHigher than level."""
-        return macd_dict["main"].is_greater(level, shift)
+        return is_greater(macd_dict["main"], level, shift=shift)
 
     @classmethod
     def main_is_lower(
         cls, macd_dict: dict[str, IndicatorSeries], level: float, shift: int = 0
     ) -> bool:
         """Evaluate MACDMainLower than level."""
-        return macd_dict["main"].is_lower(level, shift)
+        return is_lower(macd_dict["main"], level, shift=shift)
 
     @classmethod
     def main_higher_zero(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainHigherZero (`Main[shift] > 0`)."""
-        return macd_dict["main"].is_greater(0.0, shift)
+        return is_greater(macd_dict["main"], 0.0, shift=shift)
 
     @classmethod
     def main_lower_zero(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDMainLowerZero (`Main[shift] < 0`)."""
-        return macd_dict["main"].is_lower(0.0, shift)
+        return is_lower(macd_dict["main"], 0.0, shift=shift)
 
     @classmethod
     def signal_is_rising(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDSignalRising."""
-        return macd_dict["signal"].is_rising(shift)
+        return is_rising(macd_dict["signal"], shift=shift)
 
     @classmethod
     def signal_is_falling(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate MACDSignalFalling."""
-        return macd_dict["signal"].is_falling(shift)
+        return is_falling(macd_dict["signal"], shift=shift)

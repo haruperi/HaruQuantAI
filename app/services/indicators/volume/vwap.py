@@ -15,7 +15,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.vwap import VWAP
+    from app.services.indicators.volume.vwap import VWAP
 
     # Calculate 10-period rolling VWAP
     vwap_series = VWAP.calculate(
@@ -35,6 +35,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -144,7 +152,7 @@ class VWAP(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if bar close is above VWAP at specified shift."""
-        return close.is_greater(vwap, shift=shift)
+        return is_greater(close, vwap, shift=shift)
 
     @classmethod
     def bar_closes_below(
@@ -154,17 +162,17 @@ class VWAP(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if bar close is below VWAP at specified shift."""
-        return close.is_lower(vwap, shift=shift)
+        return is_lower(close, vwap, shift=shift)
 
     @classmethod
     def is_rising(cls, vwap: IndicatorSeries, shift: int = 0) -> bool:
         """Check if VWAP is rising at shift compared to shift+1."""
-        return vwap.is_rising(shift=shift)
+        return is_rising(vwap, shift=shift)
 
     @classmethod
     def is_falling(cls, vwap: IndicatorSeries, shift: int = 0) -> bool:
         """Check if VWAP is falling at shift compared to shift+1."""
-        return vwap.is_falling(shift=shift)
+        return is_falling(vwap, shift=shift)
 
     @classmethod
     def fast_above_slow(
@@ -174,7 +182,7 @@ class VWAP(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if fast VWAP is above slow VWAP at shift."""
-        return fast_vwap.is_greater(slow_vwap, shift=shift)
+        return is_greater(fast_vwap, slow_vwap, shift=shift)
 
     @classmethod
     def fast_below_slow(
@@ -184,7 +192,7 @@ class VWAP(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if fast VWAP is below slow VWAP at shift."""
-        return fast_vwap.is_lower(slow_vwap, shift=shift)
+        return is_lower(fast_vwap, slow_vwap, shift=shift)
 
     @classmethod
     def crosses_above(
@@ -194,7 +202,7 @@ class VWAP(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if series1 crosses above series2."""
-        return series1.crosses_above(series2, shift=shift)
+        return crosses_above(series1, series2, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -204,4 +212,4 @@ class VWAP(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if series1 crosses below series2."""
-        return series1.crosses_below(series2, shift=shift)
+        return crosses_below(series1, series2, shift=shift)

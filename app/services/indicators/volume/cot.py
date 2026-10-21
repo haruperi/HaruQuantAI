@@ -45,6 +45,16 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -231,7 +241,7 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if score is above bullish extreme threshold (default 0.60)."""
-        return score.is_greater(threshold, shift=shift)
+        return is_greater(score, threshold, shift1=shift)
 
     @classmethod
     def is_bearish_extreme(
@@ -241,71 +251,71 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if score is below bearish extreme threshold (default -0.60)."""
-        return score.is_lower(threshold, shift=shift)
+        return is_lower(score, threshold, shift1=shift)
 
     @classmethod
     def is_bullish_regime(cls, score: IndicatorSeries, shift: int = 0) -> bool:
         """Check if composite score is in positive/bullish regime (> 0.0)."""
-        return score.is_greater(0.0, shift=shift)
+        return is_greater(score, 0.0, shift1=shift)
 
     @classmethod
     def is_bearish_regime(cls, score: IndicatorSeries, shift: int = 0) -> bool:
         """Check if composite score is in negative/bearish regime (< 0.0)."""
-        return score.is_lower(0.0, shift=shift)
+        return is_lower(score, 0.0, shift1=shift)
 
     @classmethod
     def score_crosses_above_zero(cls, score: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate COTScoreZeroCrossUp (`score` crosses above `0.0`)."""
-        return score.crosses_above(0.0, shift=shift)
+        return crosses_above(score, 0.0, shift=shift)
 
     @classmethod
     def score_crosses_below_zero(cls, score: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate COTScoreZeroCrossDown (`score` crosses below `0.0`)."""
-        return score.crosses_below(0.0, shift=shift)
+        return crosses_below(score, 0.0, shift=shift)
 
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Check if series is rising at shift compared to shift+1."""
-        return series.is_rising(shift=shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Check if series is falling at shift compared to shift+1."""
-        return series.is_falling(shift=shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Check if series turns upward at shift."""
-        return series.changes_up(shift=shift)
+        return changes_up(series, shift=shift)
 
     @classmethod
     def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Check if series turns downward at shift."""
-        return series.changes_down(shift=shift)
+        return changes_down(series, shift=shift)
 
     @classmethod
     def crosses_above(
         cls, series: IndicatorSeries, level: float, shift: int = 0
     ) -> bool:
         """Check if series crosses above level at shift."""
-        return series.crosses_above(level, shift=shift)
+        return crosses_above(series, level, shift=shift)
 
     @classmethod
     def crosses_below(
         cls, series: IndicatorSeries, level: float, shift: int = 0
     ) -> bool:
         """Check if series crosses below level at shift."""
-        return series.crosses_below(level, shift=shift)
+        return crosses_below(series, level, shift=shift)
 
     @classmethod
     def is_higher(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """Check if series is higher than level at shift."""
-        return series.is_greater(level, shift=shift)
+        return is_greater(series, level, shift1=shift)
 
     @classmethod
     def is_lower(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """Check if series is lower than level at shift."""
-        return series.is_lower(level, shift=shift)
+        return is_lower(series, level, shift1=shift)
 
     # Specialized COT block conditions
     @classmethod
@@ -350,7 +360,7 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTAccumulationBullish (hedgers up and speculators down)."""
         return min_weeks > 0 and all(
-            hedg52.is_rising(shift + i) and spec52.is_falling(shift + i)
+            is_rising(hedg52, shift=shift + i) and is_falling(spec52, shift=shift + i)
             for i in range(min_weeks)
         )
 
@@ -364,7 +374,7 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTAccumulationBearish (hedgers down and speculators up)."""
         return min_weeks > 0 and all(
-            hedg52.is_falling(shift + i) and spec52.is_rising(shift + i)
+            is_falling(hedg52, shift=shift + i) and is_rising(spec52, shift=shift + i)
             for i in range(min_weeks)
         )
 
@@ -384,13 +394,13 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTBullishExtreme across 52w and optional 156w CPI."""
         if not (
-            hedg52.is_greater(hedger_threshold, shift)
-            and spec52.is_lower(spec_threshold, shift)
+            is_greater(hedg52, hedger_threshold, shift1=shift)
+            and is_lower(spec52, spec_threshold, shift1=shift)
         ):
             return False
         if hedg156 is not None and spec156 is not None:
-            return hedg156.is_greater(hedger156_threshold, shift) and spec156.is_lower(
-                spec156_threshold, shift
+            return is_greater(hedg156, hedger156_threshold, shift1=shift) and is_lower(
+                spec156, spec156_threshold, shift1=shift
             )
         return True
 
@@ -410,13 +420,13 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTBearishExtreme across 52w and optional 156w CPI."""
         if not (
-            hedg52.is_lower(hedger_threshold, shift)
-            and spec52.is_greater(spec_threshold, shift)
+            is_lower(hedg52, hedger_threshold, shift1=shift)
+            and is_greater(spec52, spec_threshold, shift1=shift)
         ):
             return False
         if hedg156 is not None and spec156 is not None:
-            return hedg156.is_lower(hedger156_threshold, shift) and spec156.is_greater(
-                spec156_threshold, shift
+            return is_lower(hedg156, hedger156_threshold, shift1=shift) and is_greater(
+                spec156, spec156_threshold, shift1=shift
             )
         return True
 
@@ -460,8 +470,8 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate COTExtremeExitBullish."""
-        return hedg52.is_lower(exit_threshold, shift) and any(
-            hedg52.is_greater(extreme_threshold, shift + i)
+        return is_lower(hedg52, exit_threshold, shift1=shift) and any(
+            is_greater(hedg52, extreme_threshold, shift1=shift + i)
             for i in range(1, lookback_weeks + 1)
         )
 
@@ -475,8 +485,8 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate COTExtremeExitBearish."""
-        return spec52.is_lower(exit_threshold, shift) and any(
-            spec52.is_greater(extreme_threshold, shift + i)
+        return is_lower(spec52, exit_threshold, shift1=shift) and any(
+            is_greater(spec52, extreme_threshold, shift1=shift + i)
             for i in range(1, lookback_weeks + 1)
         )
 
@@ -505,10 +515,10 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTExtremeUnwindBullish."""
         return (
-            spec52.is_lower(normalize_threshold, shift)
-            and spec52.is_falling(shift)
+            is_lower(spec52, normalize_threshold, shift1=shift)
+            and is_falling(spec52, shift=shift)
             and any(
-                spec52.is_greater(crowded_threshold, shift + i)
+                is_greater(spec52, crowded_threshold, shift1=shift + i)
                 for i in range(1, lookback_weeks + 1)
             )
         )
@@ -524,10 +534,10 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTExtremeUnwindBearish."""
         return (
-            hedg52.is_lower(normalize_threshold, shift)
-            and hedg52.is_falling(shift)
+            is_lower(hedg52, normalize_threshold, shift1=shift)
+            and is_falling(hedg52, shift=shift)
             and any(
-                hedg52.is_greater(crowded_threshold, shift + i)
+                is_greater(hedg52, crowded_threshold, shift1=shift + i)
                 for i in range(1, lookback_weeks + 1)
             )
         )
@@ -606,9 +616,9 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTHedgerDivConfBullish."""
         return (
-            hedg52.is_greater(hedger_threshold, shift)
-            and spec52.is_lower(spec_threshold, shift)
-            and hedg52.is_higher(mom_lookback, shift)
+            is_greater(hedg52, hedger_threshold, shift1=shift)
+            and is_lower(spec52, spec_threshold, shift1=shift)
+            and is_greater(hedg52, hedg52, shift1=shift, shift2=shift + mom_lookback)
         )
 
     @classmethod
@@ -622,12 +632,10 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate COTHedgerDivConfBearish."""
-        h0, hp = hedg52.get(shift), hedg52.get(shift + mom_lookback)
         return (
-            not (np.isnan(h0) or np.isnan(hp))
-            and h0 < hedger_threshold
-            and spec52.is_greater(spec_threshold, shift)
-            and h0 < hp
+            is_lower(hedg52, hedger_threshold, shift1=shift)
+            and is_greater(spec52, spec_threshold, shift1=shift)
+            and is_lower(hedg52, hedg52, shift1=shift, shift2=shift + mom_lookback)
         )
 
     @classmethod
@@ -807,14 +815,14 @@ class COT(BaseIndicator):
         cls, score: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate COTScoreAbove (`score[shift] > level`)."""
-        return score.is_greater(level, shift=shift)
+        return is_greater(score, level, shift1=shift)
 
     @classmethod
     def score_below(
         cls, score: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate COTScoreBelow (`score[shift] < level`)."""
-        return score.is_lower(level, shift=shift)
+        return is_lower(score, level, shift1=shift)
 
     @classmethod
     def score_accel_bullish(
@@ -852,7 +860,7 @@ class COT(BaseIndicator):
         """Evaluate COTScoreMomentumAbove."""
         return cls.roc_bullish(
             score, momentum_lookback, momentum_threshold, shift
-        ) and score.is_greater(level_threshold, shift)
+        ) and is_greater(score, level_threshold, shift1=shift)
 
     @classmethod
     def score_momentum_below(
@@ -866,7 +874,7 @@ class COT(BaseIndicator):
         """Evaluate COTScoreMomentumBelow."""
         return cls.roc_bearish(
             score, momentum_lookback, momentum_threshold, shift
-        ) and score.is_lower(level_threshold, shift)
+        ) and is_lower(score, level_threshold, shift1=shift)
 
     @classmethod
     def seasonal_bullish(
@@ -907,14 +915,14 @@ class COT(BaseIndicator):
         cls, small52: IndicatorSeries, small_threshold: float = 0.20, shift: int = 0
     ) -> bool:
         """Evaluate COTSmallFadeBullish (`small52[shift] < small_threshold`)."""
-        return small52.is_lower(small_threshold, shift=shift)
+        return is_lower(small52, small_threshold, shift1=shift)
 
     @classmethod
     def small_fade_bearish(
         cls, small52: IndicatorSeries, small_threshold: float = 0.80, shift: int = 0
     ) -> bool:
         """Evaluate COTSmallFadeBearish (`small52[shift] > small_threshold`)."""
-        return small52.is_greater(small_threshold, shift=shift)
+        return is_greater(small52, small_threshold, shift1=shift)
 
     @classmethod
     def smart_dumb_bullish(
@@ -926,8 +934,8 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate COTSmartDumbBullish (`hedg52 > hedger_thr and small52 < thr`)."""
-        return hedg52.is_greater(hedger_threshold, shift) and small52.is_lower(
-            small_threshold, shift
+        return is_greater(hedg52, hedger_threshold, shift1=shift) and is_lower(
+            small52, small_threshold, shift1=shift
         )
 
     @classmethod
@@ -940,8 +948,8 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate COTSmartDumbBearish (`hedg52 < hedger_thr and small52 > thr`)."""
-        return hedg52.is_lower(hedger_threshold, shift) and small52.is_greater(
-            small_threshold, shift
+        return is_lower(hedg52, hedger_threshold, shift1=shift) and is_greater(
+            small52, small_threshold, shift1=shift
         )
 
     @classmethod
@@ -956,10 +964,10 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTSpecExhaustionLong."""
         return (
-            spec52.is_rising(shift)
-            and hedg52.is_greater(hedger_threshold, shift)
+            is_rising(spec52, shift=shift)
+            and is_greater(hedg52, hedger_threshold, shift1=shift)
             and any(
-                spec52.is_lower(1.0 - spec_extreme, shift + i)
+                is_lower(spec52, 1.0 - spec_extreme, shift1=shift + i)
                 for i in range(1, lookback_weeks + 1)
             )
         )
@@ -976,10 +984,10 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTSpecExhaustionShort."""
         return (
-            spec52.is_falling(shift)
-            and hedg52.is_lower(hedger_threshold, shift)
+            is_falling(spec52, shift=shift)
+            and is_lower(hedg52, hedger_threshold, shift1=shift)
             and any(
-                spec52.is_greater(spec_extreme, shift + i)
+                is_greater(spec52, spec_extreme, shift1=shift + i)
                 for i in range(1, lookback_weeks + 1)
             )
         )
@@ -1000,8 +1008,8 @@ class COT(BaseIndicator):
         return (
             not np.isnan(s0)
             and spec_min < s0 < spec_max
-            and spec156.is_greater(spec156_threshold, shift)
-            and spec52.is_higher(lookback, shift)
+            and is_greater(spec156, spec156_threshold, shift1=shift)
+            and is_greater(spec52, spec52, shift1=shift, shift2=shift + lookback)
         )
 
     @classmethod
@@ -1016,12 +1024,12 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate COTSpecTrendShort."""
-        s0, sp = spec52.get(shift), spec52.get(shift + lookback)
+        s0 = spec52.get(shift)
         return (
-            not (np.isnan(s0) or np.isnan(sp))
+            not np.isnan(s0)
             and spec_min < s0 < spec_max
-            and spec156.is_lower(spec156_threshold, shift)
-            and s0 < sp
+            and is_lower(spec156, spec156_threshold, shift1=shift)
+            and is_lower(spec52, spec52, shift1=shift, shift2=shift + lookback)
         )
 
     @staticmethod
@@ -1076,9 +1084,9 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTTripleDivBullish."""
         return (
-            hedg52.is_greater(hedger_threshold, shift)
-            and spec52.is_lower(spec_threshold, shift)
-            and small52.is_lower(small_threshold, shift)
+            is_greater(hedg52, hedger_threshold, shift1=shift)
+            and is_lower(spec52, spec_threshold, shift1=shift)
+            and is_lower(small52, small_threshold, shift1=shift)
         )
 
     @classmethod
@@ -1094,9 +1102,9 @@ class COT(BaseIndicator):
     ) -> bool:
         """Evaluate COTTripleDivBearish."""
         return (
-            hedg52.is_lower(hedger_threshold, shift)
-            and spec52.is_greater(spec_threshold, shift)
-            and small52.is_greater(small_threshold, shift)
+            is_lower(hedg52, hedger_threshold, shift1=shift)
+            and is_greater(spec52, spec_threshold, shift1=shift)
+            and is_greater(small52, small_threshold, shift1=shift)
         )
 
     @classmethod
@@ -1109,8 +1117,8 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate COTVixProxyBullish (`hedg > hedger_thr and spec < spec_thr`)."""
-        return hedg.is_greater(hedger_threshold, shift) and spec.is_lower(
-            spec_threshold, shift
+        return is_greater(hedg, hedger_threshold, shift1=shift) and is_lower(
+            spec, spec_threshold, shift1=shift
         )
 
     @classmethod
@@ -1123,6 +1131,6 @@ class COT(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate COTVixProxyBearish (`hedg < hedger_thr and spec > spec_thr`)."""
-        return hedg.is_lower(hedger_threshold, shift) and spec.is_greater(
-            spec_threshold, shift
+        return is_lower(hedg, hedger_threshold, shift1=shift) and is_greater(
+            spec, spec_threshold, shift1=shift
         )

@@ -31,6 +31,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -115,15 +123,13 @@ class CMF(BaseIndicator):
     def is_above_zero(cls, cmf: IndicatorSeries, shift: int = 0) -> bool:
         """True if CMF is above zero (buying pressure)."""
         logger.info("Evaluating CMF is_above_zero at shift=%d", shift)
-        val = cmf.get(shift)
-        return not np.isnan(val) and val > 0.0
+        return is_greater(cmf, 0.0, shift1=shift)
 
     @classmethod
     def is_below_zero(cls, cmf: IndicatorSeries, shift: int = 0) -> bool:
         """True if CMF is below zero (selling pressure)."""
         logger.info("Evaluating CMF is_below_zero at shift=%d", shift)
-        val = cmf.get(shift)
-        return not np.isnan(val) and val < 0.0
+        return is_lower(cmf, 0.0, shift1=shift)
 
     @classmethod
     def crosses_above(
@@ -131,11 +137,7 @@ class CMF(BaseIndicator):
     ) -> bool:
         """True if CMF crosses above specified level."""
         logger.info("Evaluating CMF crosses_above level=%.2f at shift=%d", level, shift)
-        curr = cmf.get(shift)
-        prev = cmf.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= level and curr > level)
+        return crosses_above(cmf, level, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -143,24 +145,16 @@ class CMF(BaseIndicator):
     ) -> bool:
         """True if CMF crosses below specified level."""
         logger.info("Evaluating CMF crosses_below level=%.2f at shift=%d", level, shift)
-        curr = cmf.get(shift)
-        prev = cmf.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= level and curr < level)
+        return crosses_below(cmf, level, shift=shift)
 
     @classmethod
     def is_rising(cls, cmf: IndicatorSeries, shift: int = 0) -> bool:
         """True if CMF is rising between bar shift+1 and bar shift."""
         logger.info("Evaluating CMF is_rising at shift=%d", shift)
-        curr = cmf.get(shift)
-        prev = cmf.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(cmf, shift=shift)
 
     @classmethod
     def is_falling(cls, cmf: IndicatorSeries, shift: int = 0) -> bool:
         """True if CMF is falling between bar shift+1 and bar shift."""
         logger.info("Evaluating CMF is_falling at shift=%d", shift)
-        curr = cmf.get(shift)
-        prev = cmf.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(cmf, shift=shift)

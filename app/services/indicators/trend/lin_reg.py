@@ -14,7 +14,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.lin_reg import LinReg
+    from app.services.indicators.trend.lin_reg import LinReg
 
     lr = LinReg.calculate(close, period=14)
     line = lr["lin_reg"]
@@ -22,7 +22,7 @@ Python API Usage:
 
     # Condition checks
     closes_above = LinReg.bar_closes_above(close, line, shift=0)
-    is_rising = LinReg.is_rising(line, shift=0)
+    rising = LinReg.is_rising(line, shift=0)
     ```
 
 CLI Usage:
@@ -33,6 +33,12 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -129,12 +135,7 @@ class LinReg(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        c = BaseIndicator.to_numpy(close_prices)
-        lr = BaseIndicator.to_numpy(lin_reg)
-        idx = len(c) - 1 - shift
-        if idx < 0 or idx >= len(c) or idx >= len(lr) or np.isnan(lr[idx]):
-            return False
-        return bool(c[idx] > lr[idx])
+        return is_greater(close_prices, lin_reg, shift=shift)
 
     @staticmethod
     def bar_closes_below(
@@ -148,12 +149,7 @@ class LinReg(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        c = BaseIndicator.to_numpy(close_prices)
-        lr = BaseIndicator.to_numpy(lin_reg)
-        idx = len(c) - 1 - shift
-        if idx < 0 or idx >= len(c) or idx >= len(lr) or np.isnan(lr[idx]):
-            return False
-        return bool(c[idx] < lr[idx])
+        return is_lower(close_prices, lin_reg, shift=shift)
 
     @staticmethod
     def bar_opens_above(
@@ -167,12 +163,7 @@ class LinReg(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        o = BaseIndicator.to_numpy(open_prices)
-        lr = BaseIndicator.to_numpy(lin_reg)
-        idx = len(o) - 1 - shift
-        if idx < 0 or idx >= len(o) or idx >= len(lr) or np.isnan(lr[idx]):
-            return False
-        return bool(o[idx] > lr[idx])
+        return is_greater(open_prices, lin_reg, shift=shift)
 
     @staticmethod
     def bar_opens_below(
@@ -186,12 +177,7 @@ class LinReg(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        o = BaseIndicator.to_numpy(open_prices)
-        lr = BaseIndicator.to_numpy(lin_reg)
-        idx = len(o) - 1 - shift
-        if idx < 0 or idx >= len(o) or idx >= len(lr) or np.isnan(lr[idx]):
-            return False
-        return bool(o[idx] < lr[idx])
+        return is_lower(open_prices, lin_reg, shift=shift)
 
     @staticmethod
     def bar_opens_above_after_open_below(
@@ -205,13 +191,19 @@ class LinReg(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        o = BaseIndicator.to_numpy(open_prices)
-        lr = BaseIndicator.to_numpy(lin_reg)
-        curr = len(o) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(o) or prev >= len(lr) or np.isnan(lr[prev]):
-            return False
-        return bool(o[prev] < lr[prev] and o[curr] > lr[prev])
+        return is_lower(
+            open_prices,
+            lin_reg,
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_greater(
+            open_prices,
+            lin_reg,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @staticmethod
     def bar_opens_below_after_open_above(
@@ -225,13 +217,19 @@ class LinReg(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        o = BaseIndicator.to_numpy(open_prices)
-        lr = BaseIndicator.to_numpy(lin_reg)
-        curr = len(o) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(o) or prev >= len(lr) or np.isnan(lr[prev]):
-            return False
-        return bool(o[prev] > lr[prev] and o[curr] < lr[prev])
+        return is_greater(
+            open_prices,
+            lin_reg,
+            shift1=shift + 1,
+            shift2=shift + 1,
+            round_digits=8,
+        ) and is_lower(
+            open_prices,
+            lin_reg,
+            shift1=shift,
+            shift2=shift + 1,
+            round_digits=8,
+        )
 
     @staticmethod
     def is_rising(
@@ -244,12 +242,7 @@ class LinReg(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        lr = BaseIndicator.to_numpy(lin_reg)
-        curr = len(lr) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(lr) or np.isnan(lr[curr]) or np.isnan(lr[prev]):
-            return False
-        return bool(lr[curr] > lr[prev])
+        return is_rising(lin_reg, shift=shift)
 
     @staticmethod
     def is_falling(
@@ -262,9 +255,4 @@ class LinReg(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        lr = BaseIndicator.to_numpy(lin_reg)
-        curr = len(lr) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(lr) or np.isnan(lr[curr]) or np.isnan(lr[prev]):
-            return False
-        return bool(lr[curr] < lr[prev])
+        return is_falling(lin_reg, shift=shift)

@@ -15,7 +15,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.fibo import Fibo
+    from app.services.indicators.price_action.fibo import Fibo
 
     fibo = Fibo.calculate(high, low, close, open_prices=open_p, period=20)
     level_38 = fibo["level_38_2"]
@@ -34,6 +34,12 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_greater,
+    is_lower,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -155,12 +161,9 @@ class Fibo(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        lvl = BaseIndicator.to_numpy(level)
-        idx = len(p) - 1 - shift
-        if idx < 0 or idx >= len(p) or idx >= len(lvl) or np.isnan(lvl[idx]):
+        if len(price) - 1 - shift >= len(level):
             return False
-        return bool(p[idx] > lvl[idx])
+        return is_greater(price, level, shift=shift)
 
     @staticmethod
     def is_below_level(
@@ -174,12 +177,9 @@ class Fibo(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        lvl = BaseIndicator.to_numpy(level)
-        idx = len(p) - 1 - shift
-        if idx < 0 or idx >= len(p) or idx >= len(lvl) or np.isnan(lvl[idx]):
+        if len(price) - 1 - shift >= len(level):
             return False
-        return bool(p[idx] < lvl[idx])
+        return is_lower(price, level, shift=shift)
 
     @staticmethod
     def crosses_above(
@@ -193,15 +193,9 @@ class Fibo(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        lvl = BaseIndicator.to_numpy(level)
-        curr = len(p) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(p) or curr >= len(lvl):
+        if len(price) - 1 - shift >= len(level):
             return False
-        if np.isnan(lvl[curr]) or np.isnan(lvl[prev]):
-            return False
-        return bool(p[prev] <= lvl[prev] and p[curr] > lvl[curr])
+        return crosses_above(price, level, shift=shift)
 
     @staticmethod
     def crosses_below(
@@ -215,12 +209,6 @@ class Fibo(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        lvl = BaseIndicator.to_numpy(level)
-        curr = len(p) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(p) or curr >= len(lvl):
+        if len(price) - 1 - shift >= len(level):
             return False
-        if np.isnan(lvl[curr]) or np.isnan(lvl[prev]):
-            return False
-        return bool(p[prev] >= lvl[prev] and p[curr] < lvl[curr])
+        return crosses_below(price, level, shift=shift)

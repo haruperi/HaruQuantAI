@@ -35,6 +35,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_greater,
+    is_greater_or_equal,
+    is_lower,
+    is_lower_or_equal,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -181,8 +189,7 @@ class ChoppinessIndex(BaseIndicator):
     ) -> bool:
         """True if market is in a strong directional trend."""
         logger.info("Evaluating Choppiness is_trending at shift=%d", shift)
-        val = chop.get(shift)
-        return not np.isnan(val) and val <= lower_threshold
+        return is_lower_or_equal(chop, lower_threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def is_choppy(
@@ -193,8 +200,7 @@ class ChoppinessIndex(BaseIndicator):
     ) -> bool:
         """True if market is choppy / consolidating."""
         logger.info("Evaluating Choppiness is_choppy at shift=%d", shift)
-        val = chop.get(shift)
-        return not np.isnan(val) and val >= upper_threshold
+        return is_greater_or_equal(chop, upper_threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def is_in_transition(
@@ -206,8 +212,9 @@ class ChoppinessIndex(BaseIndicator):
     ) -> bool:
         """True if market is in transition between trend and consolidation."""
         logger.info("Evaluating Choppiness is_in_transition at shift=%d", shift)
-        val = chop.get(shift)
-        return not np.isnan(val) and (lower_threshold < val < upper_threshold)
+        return is_greater(
+            chop, lower_threshold, shift1=shift, round_digits=8
+        ) and is_lower(chop, upper_threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def crosses_above(cls, chop: IndicatorSeries, level: float, shift: int = 0) -> bool:
@@ -215,11 +222,7 @@ class ChoppinessIndex(BaseIndicator):
         logger.info(
             "Evaluating CHOP crosses_above level=%.2f at shift=%d", level, shift
         )
-        curr = chop.get(shift)
-        prev = chop.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= level and curr > level)
+        return crosses_above(chop, level, shift=shift)
 
     @classmethod
     def crosses_below(cls, chop: IndicatorSeries, level: float, shift: int = 0) -> bool:
@@ -227,8 +230,4 @@ class ChoppinessIndex(BaseIndicator):
         logger.info(
             "Evaluating CHOP crosses_below level=%.2f at shift=%d", level, shift
         )
-        curr = chop.get(shift)
-        prev = chop.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= level and curr < level)
+        return crosses_below(chop, level, shift=shift)

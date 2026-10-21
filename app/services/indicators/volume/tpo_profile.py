@@ -15,7 +15,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.tpo_profile import TPOProfile
+    from app.services.indicators.volume.tpo_profile import TPOProfile
 
     profile = TPOProfile.calculate(
         high,
@@ -42,6 +42,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import is_greater, is_lower
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -207,7 +208,7 @@ class TPOProfile(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if price close has broken above Initial Balance High."""
-        return close.is_greater(ib_high, shift=shift)
+        return is_greater(close, ib_high, shift=shift)
 
     @classmethod
     def ib_breakout_down(
@@ -217,7 +218,7 @@ class TPOProfile(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if price close has broken below Initial Balance Low."""
-        return close.is_lower(ib_low, shift=shift)
+        return is_lower(close, ib_low, shift=shift)
 
     @classmethod
     def price_above_poc(
@@ -227,7 +228,7 @@ class TPOProfile(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if price close is above TPO POC at specified shift."""
-        return close.is_greater(poc, shift=shift)
+        return is_greater(close, poc, shift=shift)
 
     @classmethod
     def price_below_poc(
@@ -237,7 +238,7 @@ class TPOProfile(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Check if price close is below TPO POC at specified shift."""
-        return close.is_lower(poc, shift=shift)
+        return is_lower(close, poc, shift=shift)
 
     @classmethod
     def price_inside_va(

@@ -24,7 +24,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.vortex import Vortex
+    from app.services.indicators.trend.vortex import Vortex
 
     high = np.linspace(10.0, 30.0, 40)
     low = np.linspace(8.0, 28.0, 40)
@@ -37,7 +37,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.vortex
+    uv run python -m app.services.indicators.trend.vortex
     ```
 """
 
@@ -48,6 +48,14 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.volatility.atr import ATR
 
@@ -147,37 +155,53 @@ class Vortex(BaseIndicator):
     @classmethod
     def is_uptrend(cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Evaluate if Vortex is in uptrend (VI+ > VI-)."""
-        return vx_dict["vi_plus"].is_greater(vx_dict["vi_minus"], shift)
+        return is_greater(
+            vx_dict["vi_plus"],
+            vx_dict["vi_minus"],
+            shift1=shift,
+            shift2=shift,
+            round_digits=8,
+        )
 
     @classmethod
     def is_downtrend(cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Evaluate if Vortex is in downtrend (VI+ < VI-)."""
-        return vx_dict["vi_plus"].is_lower(vx_dict["vi_minus"], shift)
+        return is_lower(
+            vx_dict["vi_plus"],
+            vx_dict["vi_minus"],
+            shift1=shift,
+            shift2=shift,
+            round_digits=8,
+        )
 
     @classmethod
     def changes_trend_up(
         cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if VI+ crosses above VI- (bullish reversal)."""
-        return vx_dict["vi_plus"].crosses_above(vx_dict["vi_minus"], shift)
+        return crosses_above(
+            vx_dict["vi_plus"], vx_dict["vi_minus"], shift=shift, round_digits=8
+        )
 
     @classmethod
     def changes_trend_down(
         cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if VI+ crosses below VI- (bearish reversal)."""
-        return vx_dict["vi_plus"].crosses_below(vx_dict["vi_minus"], shift)
+        return crosses_below(
+            vx_dict["vi_plus"], vx_dict["vi_minus"], shift=shift, round_digits=8
+        )
 
     @classmethod
     def vi_plus_rising(
         cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if VI+ is rising."""
-        return vx_dict["vi_plus"].is_rising(shift)
+        return is_rising(vx_dict["vi_plus"], shift=shift)
 
     @classmethod
     def vi_plus_falling(
         cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if VI+ is falling."""
-        return vx_dict["vi_plus"].is_falling(shift)
+        return is_falling(vx_dict["vi_plus"], shift=shift)

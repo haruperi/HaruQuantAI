@@ -22,7 +22,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.aroon import Aroon
+    from app.services.indicators.trend.aroon import Aroon
 
     high = np.array([10.0, 11.0, 12.0, 11.5, 13.0, 12.5])
     low = np.array([9.0, 9.5, 10.0, 10.2, 11.0, 11.2])
@@ -35,7 +35,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.aroon
+    uv run python -m app.services.indicators.trend.aroon
     ```
 """
 
@@ -46,6 +46,14 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -131,34 +139,32 @@ class Aroon(BaseIndicator):
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Check if Aroon Up crosses above Aroon Down."""
-        return aroon_dict["up"].crosses_above(aroon_dict["down"], shift)
+        return crosses_above(
+            aroon_dict["up"], aroon_dict["down"], shift=shift, round_digits=8
+        )
 
     @classmethod
     def crosses_below(
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Check if Aroon Up crosses below Aroon Down."""
-        return aroon_dict["up"].crosses_below(aroon_dict["down"], shift)
+        return crosses_below(
+            aroon_dict["up"], aroon_dict["down"], shift=shift, round_digits=8
+        )
 
     @classmethod
     def up_rises_from_bottom(
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate Aroon Up rises from bottom condition."""
-        up0 = aroon_dict["up"].get(shift)
-        up1 = aroon_dict["up"].get(shift + 1)
-        down0 = aroon_dict["down"].get(shift)
-        res = bool(
-            up1 <= cls.BOTTOM_LEVEL
-            and up0 > cls.BOTTOM_LEVEL
-            and down0 > cls.MID_LOW_LEVEL
+        res = crosses_above(
+            aroon_dict["up"], cls.BOTTOM_LEVEL, shift=shift, round_digits=8
+        ) and is_greater(
+            aroon_dict["down"], cls.MID_LOW_LEVEL, shift1=shift, round_digits=8
         )
         logger.debug(
-            "FR-SERVICES-AROON-CONDITIONS up_rises_from_bottom up1=%.2f up0=%.2f "
-            "down0=%.2f res=%s",
-            up1,
-            up0,
-            down0,
+            "FR-SERVICES-AROON-CONDITIONS up_rises_from_bottom shift=%d res=%s",
+            shift,
             res,
         )
         return res
@@ -168,20 +174,14 @@ class Aroon(BaseIndicator):
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate Aroon Down falls from top condition."""
-        down0 = aroon_dict["down"].get(shift)
-        down1 = aroon_dict["down"].get(shift + 1)
-        up0 = aroon_dict["up"].get(shift)
-        res = bool(
-            down1 >= cls.TOP_LEVEL
-            and down0 < cls.TOP_LEVEL
-            and up0 < cls.MID_HIGH_LEVEL
+        res = crosses_below(
+            aroon_dict["down"], cls.TOP_LEVEL, shift=shift, round_digits=8
+        ) and is_lower(
+            aroon_dict["up"], cls.MID_HIGH_LEVEL, shift1=shift, round_digits=8
         )
         logger.debug(
-            "FR-SERVICES-AROON-CONDITIONS down_falls_from_top down1=%.2f down0=%.2f "
-            "up0=%.2f res=%s",
-            down1,
-            down0,
-            up0,
+            "FR-SERVICES-AROON-CONDITIONS down_falls_from_top shift=%d res=%s",
+            shift,
             res,
         )
         return res
@@ -191,20 +191,14 @@ class Aroon(BaseIndicator):
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate Aroon Down rises from bottom condition."""
-        down0 = aroon_dict["down"].get(shift)
-        down1 = aroon_dict["down"].get(shift + 1)
-        up0 = aroon_dict["up"].get(shift)
-        res = bool(
-            down1 <= cls.BOTTOM_LEVEL
-            and down0 > cls.BOTTOM_LEVEL
-            and up0 > cls.MID_LOW_LEVEL
+        res = crosses_above(
+            aroon_dict["down"], cls.BOTTOM_LEVEL, shift=shift, round_digits=8
+        ) and is_greater(
+            aroon_dict["up"], cls.MID_LOW_LEVEL, shift1=shift, round_digits=8
         )
         logger.debug(
-            "FR-SERVICES-AROON-CONDITIONS down_rises_from_bottom down1=%.2f down0=%.2f "
-            "up0=%.2f res=%s",
-            down1,
-            down0,
-            up0,
+            "FR-SERVICES-AROON-CONDITIONS down_rises_from_bottom shift=%d res=%s",
+            shift,
             res,
         )
         return res
@@ -214,18 +208,14 @@ class Aroon(BaseIndicator):
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate Aroon Up falls from top condition."""
-        up0 = aroon_dict["up"].get(shift)
-        up1 = aroon_dict["up"].get(shift + 1)
-        down0 = aroon_dict["down"].get(shift)
-        res = bool(
-            up1 >= cls.TOP_LEVEL and up0 < cls.TOP_LEVEL and down0 < cls.MID_HIGH_LEVEL
+        res = crosses_below(
+            aroon_dict["up"], cls.TOP_LEVEL, shift=shift, round_digits=8
+        ) and is_lower(
+            aroon_dict["down"], cls.MID_HIGH_LEVEL, shift1=shift, round_digits=8
         )
         logger.debug(
-            "FR-SERVICES-AROON-CONDITIONS up_falls_from_top up1=%.2f up0=%.2f "
-            "down0=%.2f res=%s",
-            up1,
-            up0,
-            down0,
+            "FR-SERVICES-AROON-CONDITIONS up_falls_from_top shift=%d res=%s",
+            shift,
             res,
         )
         return res
@@ -235,25 +225,25 @@ class Aroon(BaseIndicator):
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if Aroon Up is rising."""
-        return aroon_dict["up"].is_rising(shift)
+        return is_rising(aroon_dict["up"], shift=shift)
 
     @classmethod
     def up_is_falling(
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if Aroon Up is falling."""
-        return aroon_dict["up"].is_falling(shift)
+        return is_falling(aroon_dict["up"], shift=shift)
 
     @classmethod
     def down_is_rising(
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if Aroon Down is rising."""
-        return aroon_dict["down"].is_rising(shift)
+        return is_rising(aroon_dict["down"], shift=shift)
 
     @classmethod
     def down_is_falling(
         cls, aroon_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
         """Evaluate if Aroon Down is falling."""
-        return aroon_dict["down"].is_falling(shift)
+        return is_falling(aroon_dict["down"], shift=shift)

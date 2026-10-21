@@ -50,6 +50,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -155,51 +163,37 @@ class CumulativeVolumeDelta(BaseIndicator):
     def is_positive(cls, cvd: IndicatorSeries, shift: int = 0) -> bool:
         """True if CVD value is positive at shift."""
         logger.info("Evaluating CVD is_positive at shift=%d", shift)
-        val = cvd.get(shift)
-        return not np.isnan(val) and val > 0.0
+        return is_greater(cvd, 0.0, shift1=shift)
 
     @classmethod
     def is_negative(cls, cvd: IndicatorSeries, shift: int = 0) -> bool:
         """True if CVD value is negative at shift."""
         logger.info("Evaluating CVD is_negative at shift=%d", shift)
-        val = cvd.get(shift)
-        return not np.isnan(val) and val < 0.0
+        return is_lower(cvd, 0.0, shift1=shift)
 
     @classmethod
     def crosses_above_zero(cls, cvd: IndicatorSeries, shift: int = 0) -> bool:
         """True if CVD crosses above zero at shift."""
         logger.info("Evaluating CVD crosses_above_zero at shift=%d", shift)
-        curr = cvd.get(shift)
-        prev = cvd.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= 0.0 and curr > 0.0)
+        return crosses_above(cvd, 0.0, shift=shift)
 
     @classmethod
     def crosses_below_zero(cls, cvd: IndicatorSeries, shift: int = 0) -> bool:
         """True if CVD crosses below zero at shift."""
         logger.info("Evaluating CVD crosses_below_zero at shift=%d", shift)
-        curr = cvd.get(shift)
-        prev = cvd.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= 0.0 and curr < 0.0)
+        return crosses_below(cvd, 0.0, shift=shift)
 
     @classmethod
     def is_rising(cls, cvd: IndicatorSeries, shift: int = 0) -> bool:
         """True if CVD is rising between bar shift+1 and bar shift."""
         logger.info("Evaluating CVD is_rising at shift=%d", shift)
-        curr = cvd.get(shift)
-        prev = cvd.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(cvd, shift=shift)
 
     @classmethod
     def is_falling(cls, cvd: IndicatorSeries, shift: int = 0) -> bool:
         """True if CVD is falling between bar shift+1 and bar shift."""
         logger.info("Evaluating CVD is_falling at shift=%d", shift)
-        curr = cvd.get(shift)
-        prev = cvd.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(cvd, shift=shift)
 
 
 class AggressiveTradeImbalance(BaseIndicator):
@@ -306,8 +300,7 @@ class AggressiveTradeImbalance(BaseIndicator):
             threshold,
             shift,
         )
-        val = ati.get(shift)
-        return not np.isnan(val) and val > threshold
+        return is_greater(ati, threshold, shift1=shift)
 
     @classmethod
     def is_seller_dominated(
@@ -322,8 +315,7 @@ class AggressiveTradeImbalance(BaseIndicator):
             threshold,
             shift,
         )
-        val = ati.get(shift)
-        return not np.isnan(val) and val < threshold
+        return is_lower(ati, threshold, shift1=shift)
 
     @classmethod
     def crosses_above(
@@ -331,11 +323,7 @@ class AggressiveTradeImbalance(BaseIndicator):
     ) -> bool:
         """True if ATI crosses above level at shift."""
         logger.info("Evaluating ATI crosses_above level=%.2f at shift=%d", level, shift)
-        curr = ati.get(shift)
-        prev = ati.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= level and curr > level)
+        return crosses_above(ati, level, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -343,24 +331,16 @@ class AggressiveTradeImbalance(BaseIndicator):
     ) -> bool:
         """True if ATI crosses below level at shift."""
         logger.info("Evaluating ATI crosses_below level=%.2f at shift=%d", level, shift)
-        curr = ati.get(shift)
-        prev = ati.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= level and curr < level)
+        return crosses_below(ati, level, shift=shift)
 
     @classmethod
     def is_rising(cls, ati: IndicatorSeries, shift: int = 0) -> bool:
         """True if ATI is rising between bar shift+1 and bar shift."""
         logger.info("Evaluating ATI is_rising at shift=%d", shift)
-        curr = ati.get(shift)
-        prev = ati.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(ati, shift=shift)
 
     @classmethod
     def is_falling(cls, ati: IndicatorSeries, shift: int = 0) -> bool:
         """True if ATI is falling between bar shift+1 and bar shift."""
         logger.info("Evaluating ATI is_falling at shift=%d", shift)
-        curr = ati.get(shift)
-        prev = ati.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(ati, shift=shift)

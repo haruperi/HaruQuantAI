@@ -14,7 +14,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.fractal import Fractal
+    from app.services.indicators.price_action.fractal import Fractal
 
     fractals = Fractal.calculate(high, low, fractal_bars=5)
     up_fractals = fractals["up"]
@@ -33,6 +33,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import is_greater
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -154,9 +155,7 @@ class Fractal(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        down_series = fractals["down"]
-        val = down_series.get(shift)
-        return bool(not np.isnan(val) and val > 0.0)
+        return is_greater(fractals["down"], 0.0, shift1=shift, round_digits=8)
 
     @staticmethod
     def is_bearish_fractal(
@@ -173,6 +172,4 @@ class Fractal(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        up_series = fractals["up"]
-        val = up_series.get(shift)
-        return bool(not np.isnan(val) and val > 0.0)
+        return is_greater(fractals["up"], 0.0, shift1=shift, round_digits=8)

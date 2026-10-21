@@ -14,7 +14,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.services.indicators.pivots import Pivots
+    from app.services.indicators.price_action.pivots import Pivots
 
     pivots = Pivots.calculate(high, low, close, period=1)
     pp = pivots["pp"]
@@ -34,6 +34,12 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_greater,
+    is_lower,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -227,12 +233,9 @@ class Pivots(BaseIndicator):
     ) -> bool:
         """Check if price is strictly above the central Pivot Point (PP)."""
         logger.info("Evaluating is_above_pp at shift=%d", shift, extra={"shift": shift})
-        p = BaseIndicator.to_numpy(price)
-        pivot = BaseIndicator.to_numpy(pp)
-        idx = len(p) - 1 - shift
-        if idx < 0 or idx >= len(p) or idx >= len(pivot) or np.isnan(pivot[idx]):
+        if len(price) - 1 - shift >= len(pp):
             return False
-        return bool(p[idx] > pivot[idx])
+        return is_greater(price, pp, shift=shift)
 
     @staticmethod
     def is_below_pp(
@@ -242,12 +245,9 @@ class Pivots(BaseIndicator):
     ) -> bool:
         """Check if price is strictly below the central Pivot Point (PP)."""
         logger.info("Evaluating is_below_pp at shift=%d", shift, extra={"shift": shift})
-        p = BaseIndicator.to_numpy(price)
-        pivot = BaseIndicator.to_numpy(pp)
-        idx = len(p) - 1 - shift
-        if idx < 0 or idx >= len(p) or idx >= len(pivot) or np.isnan(pivot[idx]):
+        if len(price) - 1 - shift >= len(pp):
             return False
-        return bool(p[idx] < pivot[idx])
+        return is_lower(price, pp, shift=shift)
 
     @staticmethod
     def crosses_above(
@@ -261,15 +261,9 @@ class Pivots(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        lvl = BaseIndicator.to_numpy(level)
-        curr = len(p) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(p) or curr >= len(lvl):
+        if len(price) - 1 - shift >= len(level):
             return False
-        if np.isnan(lvl[curr]) or np.isnan(lvl[prev]):
-            return False
-        return bool(p[prev] <= lvl[prev] and p[curr] > lvl[curr])
+        return crosses_above(price, level, shift=shift)
 
     @staticmethod
     def crosses_below(
@@ -283,12 +277,6 @@ class Pivots(BaseIndicator):
             shift,
             extra={"shift": shift},
         )
-        p = BaseIndicator.to_numpy(price)
-        lvl = BaseIndicator.to_numpy(level)
-        curr = len(p) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(p) or curr >= len(lvl):
+        if len(price) - 1 - shift >= len(level):
             return False
-        if np.isnan(lvl[curr]) or np.isnan(lvl[prev]):
-            return False
-        return bool(p[prev] >= lvl[prev] and p[curr] < lvl[curr])
+        return crosses_below(price, level, shift=shift)

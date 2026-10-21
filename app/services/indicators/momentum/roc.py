@@ -9,7 +9,7 @@ Description:
     threshold comparisons, and trend direction.
 
 Purpose:
-    FEAT-SERVICES-INDICATOR-ROC: Rate of Change indicator calculation and conditions.
+    FEAT-SERVICES-INDICATOR-ROC: Rate of Change calculation and conditions.
 
 Key Capabilities:
     - FR-SERVICES-ROC-CALCULATE: Vectorized calculation of ROC percentage values.
@@ -22,7 +22,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.roc import ROC
+    from app.services.indicators.momentum.roc import ROC
 
     close = np.array([10.0, 11.0, 12.0, 13.0, 14.0])
     roc = ROC.calculate(close, period=5)
@@ -31,7 +31,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.roc
+    uv run python -m app.services.indicators.momentum.roc
     ```
 """
 
@@ -42,6 +42,14 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -98,37 +106,37 @@ class ROC(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate ROCRising condition."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate ROCFalling condition."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def crosses_above(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate ROCCrossesAboveLevel condition."""
-        return series.crosses_above(level, shift)
+        return crosses_above(series, level, shift=shift)
 
     @classmethod
     def crosses_below(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate ROCCrossesBelowLevel condition."""
-        return series.crosses_below(level, shift)
+        return crosses_below(series, level, shift=shift)
 
     @classmethod
     def is_greater(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate ROCAboveLevel condition."""
-        return series.is_greater(level, shift)
+        return is_greater(series, level, shift=shift)
 
     @classmethod
     def is_lower(
         cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
     ) -> bool:
         """Evaluate ROCBelowLevel condition."""
-        return series.is_lower(level, shift)
+        return is_lower(series, level, shift=shift)

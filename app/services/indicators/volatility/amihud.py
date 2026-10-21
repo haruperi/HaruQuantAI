@@ -33,6 +33,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -127,8 +135,7 @@ class AmihudIlliquidity(BaseIndicator):
             threshold,
             shift,
         )
-        val = amihud.get(shift)
-        return not np.isnan(val) and val > threshold
+        return is_greater(amihud, threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def is_liquid(
@@ -143,8 +150,7 @@ class AmihudIlliquidity(BaseIndicator):
             threshold,
             shift,
         )
-        val = amihud.get(shift)
-        return not np.isnan(val) and val < threshold
+        return is_lower(amihud, threshold, shift1=shift, round_digits=8)
 
     @classmethod
     def crosses_above(
@@ -159,11 +165,7 @@ class AmihudIlliquidity(BaseIndicator):
             level,
             shift,
         )
-        curr = amihud.get(shift)
-        prev = amihud.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev <= level and curr > level)
+        return crosses_above(amihud, level, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -178,24 +180,16 @@ class AmihudIlliquidity(BaseIndicator):
             level,
             shift,
         )
-        curr = amihud.get(shift)
-        prev = amihud.get(shift + 1)
-        if np.isnan(curr) or np.isnan(prev):
-            return False
-        return bool(prev >= level and curr < level)
+        return crosses_below(amihud, level, shift=shift)
 
     @classmethod
     def is_rising(cls, amihud: IndicatorSeries, shift: int = 0) -> bool:
         """True if Amihud ratio is rising between shift+1 and shift."""
         logger.info("Evaluating Amihud is_rising at shift=%d", shift)
-        curr = amihud.get(shift)
-        prev = amihud.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(amihud, shift=shift)
 
     @classmethod
     def is_falling(cls, amihud: IndicatorSeries, shift: int = 0) -> bool:
         """True if Amihud ratio is falling between shift+1 and shift."""
         logger.info("Evaluating Amihud is_falling at shift=%d", shift)
-        curr = amihud.get(shift)
-        prev = amihud.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(amihud, shift=shift)

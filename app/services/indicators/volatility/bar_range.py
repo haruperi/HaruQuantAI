@@ -44,6 +44,12 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -228,14 +234,12 @@ class BarRange(BaseIndicator):
         """Evaluate if range at shift is the highest among past period bars."""
         if lookback is not None:
             period = lookback
-        val = series.get(shift)
-        if np.isnan(val) or period <= 1:
+        if period <= 1:
             return False
-        for s in range(shift + 1, shift + period):
-            other = series.get(s)
-            if np.isnan(other) or val <= other:
-                return False
-        return True
+        return all(
+            is_greater(series, series, shift1=shift, shift2=s, round_digits=8)
+            for s in range(shift + 1, shift + period)
+        )
 
     @classmethod
     def is_smallest_range(
@@ -248,14 +252,12 @@ class BarRange(BaseIndicator):
         """Evaluate if range at shift is the lowest among past period bars."""
         if lookback is not None:
             period = lookback
-        val = series.get(shift)
-        if np.isnan(val) or period <= 1:
+        if period <= 1:
             return False
-        for s in range(shift + 1, shift + period):
-            other = series.get(s)
-            if np.isnan(other) or val >= other:
-                return False
-        return True
+        return all(
+            is_lower(series, series, shift1=shift, shift2=s, round_digits=8)
+            for s in range(shift + 1, shift + period)
+        )
 
     @classmethod
     def is_highest_in_range(
@@ -265,9 +267,7 @@ class BarRange(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if range at shift is higher than range lookback bars ago."""
-        if not isinstance(series, IndicatorSeries):
-            series = IndicatorSeries(series, name="Series")
-        return series.is_higher(lookback, shift)
+        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def is_lowest_in_range(
@@ -277,13 +277,7 @@ class BarRange(BaseIndicator):
         shift: int = 0,
     ) -> bool:
         """Evaluate if range at shift is lower than range lookback bars ago."""
-        if not isinstance(series, IndicatorSeries):
-            series = IndicatorSeries(series, name="Series")
-        val0 = series.get(shift)
-        val_past = series.get(shift + lookback)
-        if np.isnan(val0) or np.isnan(val_past):
-            return False
-        return val0 < val_past
+        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def in_range_pips(
@@ -304,19 +298,19 @@ class BarRange(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate range is rising condition."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate range is falling condition."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def is_greater(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """Evaluate range is greater than level condition."""
-        return series.is_greater(level, shift)
+        return is_greater(series, level, shift=shift)
 
     @classmethod
     def is_lower(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """Evaluate range is lower than level condition."""
-        return series.is_lower(level, shift)
+        return is_lower(series, level, shift=shift)

@@ -8,7 +8,7 @@ Description:
     oversold crossovers and trend changes.
 
 Purpose:
-    FEAT-SERVICES-INDICATOR-DEMARKER: DeMarker oscillator calculation and conditions.
+    FEAT-SERVICES-INDICATOR-DEMARKER: DeMarker calculation and conditions.
 
 Key Capabilities:
     - FR-SERVICES-DEMARKER-CALCULATE: Vectorized calculation of DeMarker values.
@@ -21,7 +21,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.demarker import DeMarker
+    from app.services.indicators.momentum.demarker import DeMarker
 
     high = np.array([10.0, 11.0, 12.0, 12.5, 13.0])
     low = np.array([9.0, 9.5, 10.5, 11.0, 11.5])
@@ -31,7 +31,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.demarker
+    uv run python -m app.services.indicators.momentum.demarker
     ```
 """
 
@@ -42,6 +42,16 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.trend.moving_average import MovingAverage
 
@@ -111,51 +121,47 @@ class DeMarker(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate DEMRising condition."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate DEMFalling condition."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def crosses_above(
         cls, series: IndicatorSeries, level: float = 0.5, shift: int = 0
     ) -> bool:
         """Evaluate DEMCrossUp condition (crosses above level)."""
-        return series.crosses_above(level, shift)
+        return crosses_above(series, level, shift=shift)
 
     @classmethod
     def crosses_below(
         cls, series: IndicatorSeries, level: float = 0.5, shift: int = 0
     ) -> bool:
         """Evaluate DEMCrossDown condition (crosses below level)."""
-        return series.crosses_below(level, shift)
+        return crosses_below(series, level, shift=shift)
 
     @classmethod
     def is_higher(
         cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate DEMHigher condition."""
-        return series.is_higher(lookback, shift)
+        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def is_lower(
         cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate DEMLower condition."""
-        val0 = series.get(shift)
-        val_past = series.get(shift + lookback)
-        if np.isnan(val0) or np.isnan(val_past):
-            return False
-        return val0 < val_past
+        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate DEMChangesUp turn condition."""
-        return series.changes_up(shift)
+        return changes_up(series, shift=shift)
 
     @classmethod
     def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate DEMChangesDown turn condition."""
-        return series.changes_down(shift)
+        return changes_down(series, shift=shift)

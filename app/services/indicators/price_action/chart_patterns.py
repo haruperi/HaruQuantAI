@@ -38,6 +38,7 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import is_greater, is_lower
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -166,15 +167,15 @@ class ChartPatterns(BaseIndicator):
     def is_double_top(cls, double_series: IndicatorSeries, shift: int = 0) -> bool:
         """True if double top pattern formed at shift."""
         logger.info("Evaluating ChartPatterns.is_double_top: shift=%d", shift)
-        val = double_series.get(shift)
-        return not np.isnan(val) and val < -PATTERN_THRESHOLD
+        return is_lower(double_series, -PATTERN_THRESHOLD, shift1=shift, round_digits=8)
 
     @classmethod
     def is_double_bottom(cls, double_series: IndicatorSeries, shift: int = 0) -> bool:
         """True if double bottom pattern formed at shift."""
         logger.info("Evaluating ChartPatterns.is_double_bottom: shift=%d", shift)
-        val = double_series.get(shift)
-        return not np.isnan(val) and val > PATTERN_THRESHOLD
+        return is_greater(
+            double_series, PATTERN_THRESHOLD, shift1=shift, round_digits=8
+        )
 
     @classmethod
     def is_bullish_breakout(
@@ -182,8 +183,9 @@ class ChartPatterns(BaseIndicator):
     ) -> bool:
         """True if bullish breakout and retest occurred at shift."""
         logger.info("Evaluating ChartPatterns.is_bullish_breakout: shift=%d", shift)
-        val = breakout_series.get(shift)
-        return not np.isnan(val) and val > PATTERN_THRESHOLD
+        return is_greater(
+            breakout_series, PATTERN_THRESHOLD, shift1=shift, round_digits=8
+        )
 
     @classmethod
     def is_bearish_breakout(
@@ -191,5 +193,6 @@ class ChartPatterns(BaseIndicator):
     ) -> bool:
         """True if bearish breakdown and retest occurred at shift."""
         logger.info("Evaluating ChartPatterns.is_bearish_breakout: shift=%d", shift)
-        val = breakout_series.get(shift)
-        return not np.isnan(val) and val < -PATTERN_THRESHOLD
+        return is_lower(
+            breakout_series, -PATTERN_THRESHOLD, shift1=shift, round_digits=8
+        )

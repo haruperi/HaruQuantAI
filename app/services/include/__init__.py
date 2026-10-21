@@ -13,6 +13,8 @@ from app.services.include.bar_time import (
 from app.services.include.comparisons import (
     Comparisons,
     MAType,
+    changes_down,
+    changes_up,
     crosses_above,
     is_greater,
 )
@@ -68,7 +70,8 @@ __all__ = [
     "MTFPrice", "MarketBar", "MarketTick", "NumberConstant", "OrderProxy",
     "PositionProxy", "QuotePrice", "RandomGenerator", "SessionPrice", "SymbolProxy",
     "TerminalProxy", "TimeConditions", "Timeframe", "Trade", "Trading", "TradingClass",
-    "Types", "Variable", "bars_to_dataframe", "bars_to_df", "convert_price_to_pips",
+    "Types", "Variable", "bars_to_dataframe", "bars_to_df", "changes_down",
+    "changes_up", "convert_price_to_pips",
     "crosses_above", "format_timestamp", "get_historical_bars", "get_ticks",
     "is_greater", "normalize_timestamps", "plus", "ticks_to_dataframe", "ticks_to_df",
     "validate_request", "validate_rows",

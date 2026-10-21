@@ -20,7 +20,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.true_range import TrueRange
+    from app.services.indicators.volatility.true_range import TrueRange
 
     high = np.array([10.0, 11.0, 12.0, 11.5, 12.5])
     low = np.array([9.0, 9.5, 10.5, 10.0, 11.0])
@@ -31,7 +31,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.true_range
+    uv run python -m app.services.indicators.volatility.true_range
     ```
 """
 
@@ -42,6 +42,16 @@ from typing import override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 from app.services.indicators.volatility.atr import ATR
 
@@ -89,31 +99,31 @@ class TrueRange(BaseIndicator):
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate True Range is rising condition."""
-        return series.is_rising(shift)
+        return is_rising(series, shift=shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate True Range is falling condition."""
-        return series.is_falling(shift)
+        return is_falling(series, shift=shift)
 
     @classmethod
     def crosses_above(
         cls, series: IndicatorSeries, level: float, shift: int = 0
     ) -> bool:
         """Evaluate True Range crosses above level."""
-        return series.crosses_above(level, shift)
+        return crosses_above(series, level, shift=shift)
 
     @classmethod
     def crosses_below(
         cls, series: IndicatorSeries, level: float, shift: int = 0
     ) -> bool:
         """Evaluate True Range crosses below level."""
-        return series.crosses_below(level, shift)
+        return crosses_below(series, level, shift=shift)
 
     @classmethod
     def is_greater(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
         """Evaluate True Range is greater than level."""
-        return series.is_greater(level, shift)
+        return is_greater(series, level, shift=shift)
 
     @classmethod
     def is_lower(
@@ -125,26 +135,22 @@ class TrueRange(BaseIndicator):
     ) -> bool:
         """Evaluate True Range is lower than past value (or level)."""
         if level is not None:
-            return series.is_lower(level, shift)
-        val0 = series.get(shift)
-        val_past = series.get(shift + lookback)
-        if np.isnan(val0) or np.isnan(val_past):
-            return False
-        return val0 < val_past
+            return is_lower(series, level, shift=shift)
+        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def is_higher(
         cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
     ) -> bool:
         """Evaluate True Range is higher than past value."""
-        return series.is_higher(lookback, shift)
+        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
 
     @classmethod
     def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate True Range changes up condition."""
-        return series.changes_up(shift)
+        return changes_up(series, shift=shift)
 
     @classmethod
     def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
         """Evaluate True Range changes down condition."""
-        return series.changes_down(shift)
+        return changes_down(series, shift=shift)

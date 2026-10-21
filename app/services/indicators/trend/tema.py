@@ -34,6 +34,14 @@ from typing import Any, override
 
 import numpy as np
 from app.host.logging import get_logger
+from app.services.include.comparisons import (
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_greater,
+    is_lower,
+    is_rising,
+)
 from app.services.indicators.base import BaseIndicator, IndicatorSeries
 
 logger = get_logger(__name__)
@@ -110,9 +118,7 @@ class TEMA(BaseIndicator):
     ) -> bool:
         """True if TEMA is above price at shift."""
         logger.info("Evaluating TEMA is_above_price at shift=%d", shift)
-        t_val = tema.get(shift)
-        p_val = price.get(shift)
-        return not np.isnan(t_val) and not np.isnan(p_val) and t_val > p_val
+        return is_greater(tema, price, shift=shift)
 
     @classmethod
     def is_below_price(
@@ -123,9 +129,7 @@ class TEMA(BaseIndicator):
     ) -> bool:
         """True if TEMA is below price at shift."""
         logger.info("Evaluating TEMA is_below_price at shift=%d", shift)
-        t_val = tema.get(shift)
-        p_val = price.get(shift)
-        return not np.isnan(t_val) and not np.isnan(p_val) and t_val < p_val
+        return is_lower(tema, price, shift=shift)
 
     @classmethod
     def crosses_above(
@@ -136,13 +140,7 @@ class TEMA(BaseIndicator):
     ) -> bool:
         """True if price crosses above TEMA at shift."""
         logger.info("Evaluating price crosses_above TEMA at shift=%d", shift)
-        p_curr = price.get(shift)
-        p_prev = price.get(shift + 1)
-        t_curr = tema.get(shift)
-        t_prev = tema.get(shift + 1)
-        if np.isnan(p_curr) or np.isnan(p_prev) or np.isnan(t_curr) or np.isnan(t_prev):
-            return False
-        return bool(p_prev <= t_prev and p_curr > t_curr)
+        return crosses_above(price, tema, shift=shift)
 
     @classmethod
     def crosses_below(
@@ -153,26 +151,16 @@ class TEMA(BaseIndicator):
     ) -> bool:
         """True if price crosses below TEMA at shift."""
         logger.info("Evaluating price crosses_below TEMA at shift=%d", shift)
-        p_curr = price.get(shift)
-        p_prev = price.get(shift + 1)
-        t_curr = tema.get(shift)
-        t_prev = tema.get(shift + 1)
-        if np.isnan(p_curr) or np.isnan(p_prev) or np.isnan(t_curr) or np.isnan(t_prev):
-            return False
-        return bool(p_prev >= t_prev and p_curr < t_curr)
+        return crosses_below(price, tema, shift=shift)
 
     @classmethod
     def is_rising(cls, tema: IndicatorSeries, shift: int = 0) -> bool:
         """True if TEMA is rising between shift+1 and shift."""
         logger.info("Evaluating TEMA is_rising at shift=%d", shift)
-        curr = tema.get(shift)
-        prev = tema.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr > prev
+        return is_rising(tema, shift=shift)
 
     @classmethod
     def is_falling(cls, tema: IndicatorSeries, shift: int = 0) -> bool:
         """True if TEMA is falling between shift+1 and shift."""
         logger.info("Evaluating TEMA is_falling at shift=%d", shift)
-        curr = tema.get(shift)
-        prev = tema.get(shift + 1)
-        return not np.isnan(curr) and not np.isnan(prev) and curr < prev
+        return is_falling(tema, shift=shift)
