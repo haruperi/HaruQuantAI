@@ -45,14 +45,11 @@ from app.host.transport import (
     HostEvent,
     ServletConnection,
     ServletConstants,
+    TransportCLI,
     TransportMiddleware,
-    _format_iso_expiry,
-    _parse_channels_param,
-    _resolve_since_cursor,
     create_host_app,
     extract_bearer_token,
     get_global_event_bus,
-    main,
     register_transport_exception_handlers,
 )
 from fastapi import APIRouter, FastAPI, HTTPException
@@ -329,29 +326,13 @@ def test_event_bus_publish_subscribe_replay_gap_and_slow_consumer(
 
 
 def test_helper_parsers_and_token_extraction() -> None:
-    """Verify helper functions for bearer tokens, channels, cursors, and dates."""
+    """Verify helper functions for bearer tokens and TransportCLI formatting."""
     assert extract_bearer_token("Bearer abc123") == "abc123"
     assert extract_bearer_token(None, "query_tok") == "query_tok"
     assert extract_bearer_token("Basic xyz", None) is None
     assert extract_bearer_token("Bearer   ", None) is None
-
-    assert _parse_channels_param(None) == ["*"]
-    assert _parse_channels_param("  ") == ["*"]
-    assert _parse_channels_param("jobs, settings.changed ") == [
-        "jobs",
-        "settings.changed",
-    ]
-
-    assert _resolve_since_cursor(5, "10") == 5
-    assert _resolve_since_cursor(None, "12") == 12
-    assert _resolve_since_cursor(None, "not-a-num") is None
-
-    iso = _format_iso_expiry("2026-10-15 12:00:00")
-    assert "2026-10-15T12:00:00" in iso
-    assert _format_iso_expiry("2026-10-15T12:00:00+00:00") == (
-        "2026-10-15T12:00:00+00:00"
-    )
-    assert _format_iso_expiry("invalid-date") == "invalid-date"
+    formatted = TransportCLI.format_output({"ok": True})
+    assert json.loads(formatted) == {"ok": True}
 
 
 # ============================================================================
@@ -598,12 +579,12 @@ def test_websocket_streaming_and_commands(tmp_path: Path) -> None:
 
 
 def test_transport_cli_main(capsys: pytest.CaptureFixture[str]) -> None:
-    """Verify standalone CLI main() execution including ConnectionTest checks."""
-    assert main(["--test-bus"]) == 0
+    """Verify standalone CLI TransportCLI.run() execution including diagnostics."""
+    assert TransportCLI.run(["--test-bus"]) == 0
     out_test = capsys.readouterr().out
     assert "settings.changed" in out_test
 
-    assert main([]) == 0
+    assert TransportCLI.run([]) == 0
     out_default = json.loads(capsys.readouterr().out)
     assert "core_channels" in out_default
     conn_test = out_default["connection_test"]
@@ -618,7 +599,7 @@ def test_transport_cli_main(capsys: pytest.CaptureFixture[str]) -> None:
     assert s_conn["saved"]["connection_id"] == "demo-conn"
     assert len(s_conn["listed"]) == 1
     assert s_conn["tested"]["test_result"]["reachable"] is True
-    assert s_conn["deleted"] is True
+    assert s_conn["deleted"]["deleted"] is True
     s_const = out_default["servlet_constants"]
     assert s_const["constants"]["application"] == "HaruQuantAI"
     assert s_const["system_specs"]["cpu_cores"] >= 1
@@ -731,27 +712,74 @@ def test_security_headers_injected_on_responses() -> None:
         assert "x-response-time-ms" in resp.headers
 
 
-def test_connection_test_utility() -> None:
-    """Verify FR-HOST-TRANSPORT-CONNECTION-TEST reachability, latency, and diagnostics."""
-    ping_res = ConnectionTest.ping_endpoint("127.0.0.1")
+def test_connection_test_utility(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify FR-HOST-TRANSPORT-PING, FR-HOST-TRANSPORT-LATENCY, and FR-HOST-TRANSPORT-DIAGNOSE."""
+    caplog.set_level(logging.INFO)
+    ping_res = ConnectionTest.ping_endpoint("127.0.0.1", timeout_seconds=1.0)
     assert "reachable" in ping_res
     assert "latency_ms" in ping_res
     assert ping_res["host"] == "127.0.0.1"
+    assert ping_res["url"] == "127.0.0.1"
 
-    latency_res = ConnectionTest.check_latency("127.0.0.1", samples=2)
+    latency_res = ConnectionTest.check_latency("127.0.0.1", port=443, samples=2)
     assert latency_res["samples"] == 2
+    assert latency_res["port"] == 443
     assert "avg_latency_ms" in latency_res
     assert "packet_loss_pct" in latency_res
 
-    diag_res = ConnectionTest.diagnose_network("127.0.0.1", port=80)
+    diag_res = ConnectionTest.diagnose_network("127.0.0.1:80")
     assert diag_res["dns_resolved"] is True
+    assert diag_res["port"] == 80
     assert "127.0.0.1" in diag_res["ip_addresses"]
 
+    for fr_id in (
+        "FR-HOST-TRANSPORT-PING",
+        "FR-HOST-TRANSPORT-LATENCY",
+        "FR-HOST-TRANSPORT-DIAGNOSE",
+    ):
+        assert any(getattr(r, "fr_id", None) == fr_id for r in caplog.records)
 
-def test_servlet_connection_crud_and_routes(tmp_path: Path) -> None:
-    """Verify FR-HOST-TRANSPORT-SERVLET-CONNECTION endpoints and in-memory fallback."""
+
+def test_servlet_connection_crud_and_routes(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Verify FR-HOST-SERVLET-CONN-LIST/SAVE/DELETE/TEST and HostPersistence vault isolation."""
+    caplog.set_level(logging.INFO)
     servlet = ServletConnection()
-    assert isinstance(servlet.list_connections(), list)
+    assert servlet.list_connections() == []
+
+    saved = servlet.save_connection(
+        {
+            "connection_id": "conn-direct-1",
+            "provider": "binance",
+            "name": "Direct Spot",
+            "endpoint": "127.0.0.1",
+            "api_secret": "raw_plaintext_secret_value",
+        }
+    )
+    assert saved["connection_id"] == "conn-direct-1"
+    assert saved["provider"] == "binance"
+    assert saved["api_secret"] != "raw_plaintext_secret_value"
+    assert (
+        saved["vault_refs"]["api_secret"]
+        == "vault://connections/conn-direct-1/api_secret"
+    )
+
+    # Verify SQLite host_entities never stores plaintext credentials
+    entity_rows = HostPersistence.read_entity("connection", "conn-direct-1")
+    assert len(entity_rows) == 1
+    assert "raw_plaintext_secret_value" not in str(entity_rows[0]["payload"])
+
+    assert len(servlet.list_connections(provider="binance")) == 1
+    assert servlet.list_connections(provider="other") == []
+
+    inline_test = servlet.test_connection({"endpoint": "127.0.0.1"})
+    assert inline_test["endpoint"] == "127.0.0.1"
+    assert "test_result" in inline_test
+
+    del_direct = servlet.delete_connection("conn-direct-1")
+    assert del_direct["deleted"] is True
+    assert del_direct["revoked_vault_refs"] == 1
 
     sessions = _create_isolated_session_manager(tmp_path)
     app = create_host_app(session_mgr=sessions)
@@ -759,11 +787,12 @@ def test_servlet_connection_crud_and_routes(tmp_path: Path) -> None:
         # 1. List initially empty
         res = client.get("/api/v1/connections")
         assert res.status_code == 200
-        assert "connections" in res.json()["data"]
+        assert res.json()["data"]["connections"] == []
 
         # 2. Save connection
         payload = {
             "name": "Binance Spot Test",
+            "provider": "binance",
             "endpoint": "127.0.0.1",
             "api_key": "test_key",
             "api_secret": "super_secret_token",
@@ -789,9 +818,20 @@ def test_servlet_connection_crud_and_routes(tmp_path: Path) -> None:
         del_404 = client.delete("/api/v1/connections/nonexistent-conn-999")
         assert del_404.status_code == 404
 
+    for fr_id in (
+        "FR-HOST-SERVLET-CONN-LIST",
+        "FR-HOST-SERVLET-CONN-SAVE",
+        "FR-HOST-SERVLET-CONN-DELETE",
+        "FR-HOST-SERVLET-CONN-TEST",
+    ):
+        assert any(getattr(r, "fr_id", None) == fr_id for r in caplog.records)
 
-def test_servlet_constants_and_specs(tmp_path: Path) -> None:
-    """Verify FR-HOST-TRANSPORT-SERVLET-CONSTANTS constants and hardware specs."""
+
+def test_servlet_constants_and_specs(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Verify FR-HOST-SERVLET-CONSTANTS and FR-HOST-SERVLET-SPECS."""
+    caplog.set_level(logging.INFO)
     sessions = _create_isolated_session_manager(tmp_path)
     constants_servlet = ServletConstants(session_mgr=sessions)
     assert constants_servlet.get_constants()["application"] == "HaruQuantAI"
@@ -811,6 +851,9 @@ def test_servlet_constants_and_specs(tmp_path: Path) -> None:
         spec_data = spec_res.json()["data"]
         assert spec_data["cpu_cores"] >= 1
         assert "worker_capacity" in spec_data
+
+    for fr_id in ("FR-HOST-SERVLET-CONSTANTS", "FR-HOST-SERVLET-SPECS"):
+        assert any(getattr(r, "fr_id", None) == fr_id for r in caplog.records)
 
 
 @pytest.mark.parametrize("prefix", ["", "/api/v1", "/api/v2"])

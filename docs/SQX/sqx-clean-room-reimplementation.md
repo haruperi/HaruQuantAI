@@ -628,15 +628,15 @@ HaruQuantAI/
 - **Frontend:** `ui/app/host/HostConnectionModal.tsx`, `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `ConnectionTest`, `ServletConnection`, `ServletConstants` (plus `TransportCLI`)
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-HOST-TRANSPORT-PING`: Ping remote and local server endpoints to verify network connectivity $\rightarrow$ `ConnectionTest.ping_endpoint(url: str, *, timeout_seconds: float = 5.0) -> dict[str, Any]`
-  - [ ] `FR-HOST-TRANSPORT-LATENCY`: Measure round-trip latency and report packet loss across probes $\rightarrow$ `ConnectionTest.check_latency(host: str, *, port: int = 443, samples: int = 3) -> dict[str, Any]`
-  - [ ] `FR-HOST-TRANSPORT-DIAGNOSE`: Diagnose DNS resolution and socket connection failures $\rightarrow$ `ConnectionTest.diagnose_network(target: str) -> dict[str, Any]`
-  - [ ] `FR-HOST-SERVLET-CONN-LIST`: List existing broker and exchange connections from `HostPersistence` $\rightarrow$ `ServletConnection.list_connections(provider: str | None = None) -> list[dict[str, Any]]`
-  - [ ] `FR-HOST-SERVLET-CONN-SAVE`: Save or update public connection metadata and secret-vault references via `HostPersistence`; plaintext credentials stay outside SQLite $\rightarrow$ `ServletConnection.save_connection(connection: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-HOST-SERVLET-CONN-DELETE`: Delete authorized connection metadata via `HostPersistence` and revoke associated vault references under adapter lifecycle control $\rightarrow$ `ServletConnection.delete_connection(connection_id: str) -> dict[str, Any]`
-  - [ ] `FR-HOST-SERVLET-CONN-TEST`: Test saved or inline connection credentials and report latency status $\rightarrow$ `ServletConnection.test_connection(connection_id_or_config: str | Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-HOST-SERVLET-CONSTANTS`: Expose application version, build timestamp, and runtime environment paths $\rightarrow$ `ServletConstants.get_constants() -> dict[str, Any]`
-  - [ ] `FR-HOST-SERVLET-SPECS`: Serve system resource limits, hardware concurrency specs, and supported timeframes $\rightarrow$ `ServletConstants.get_system_specs() -> dict[str, Any]`
+  - [x] `FR-HOST-TRANSPORT-PING`: Ping remote and local server endpoints to verify network connectivity $\rightarrow$ `ConnectionTest.ping_endpoint(url: str, *, timeout_seconds: float = 5.0) -> dict[str, Any]`
+  - [x] `FR-HOST-TRANSPORT-LATENCY`: Measure round-trip latency and report packet loss across probes $\rightarrow$ `ConnectionTest.check_latency(host: str, *, port: int = 443, samples: int = 3) -> dict[str, Any]`
+  - [x] `FR-HOST-TRANSPORT-DIAGNOSE`: Diagnose DNS resolution and socket connection failures $\rightarrow$ `ConnectionTest.diagnose_network(target: str) -> dict[str, Any]`
+  - [x] `FR-HOST-SERVLET-CONN-LIST`: List existing broker and exchange connections from `HostPersistence` $\rightarrow$ `ServletConnection.list_connections(provider: str | None = None) -> list[dict[str, Any]]`
+  - [x] `FR-HOST-SERVLET-CONN-SAVE`: Save or update public connection metadata and secret-vault references via `HostPersistence`; plaintext credentials stay outside SQLite $\rightarrow$ `ServletConnection.save_connection(connection: Mapping[str, Any]) -> dict[str, Any]`
+  - [x] `FR-HOST-SERVLET-CONN-DELETE`: Delete authorized connection metadata via `HostPersistence` and revoke associated vault references under adapter lifecycle control $\rightarrow$ `ServletConnection.delete_connection(connection_id: str) -> dict[str, Any]`
+  - [x] `FR-HOST-SERVLET-CONN-TEST`: Test saved or inline connection credentials and report latency status $\rightarrow$ `ServletConnection.test_connection(connection_id_or_config: str | Mapping[str, Any]) -> dict[str, Any]`
+  - [x] `FR-HOST-SERVLET-CONSTANTS`: Expose application version, build timestamp, and runtime environment paths $\rightarrow$ `ServletConstants.get_constants() -> dict[str, Any]`
+  - [x] `FR-HOST-SERVLET-SPECS`: Serve system resource limits, hardware concurrency specs, and supported timeframes $\rightarrow$ `ServletConstants.get_system_specs() -> dict[str, Any]`
 
 #### 12. `app/services/brokers/registry.py` — `ConnectionLiveTest` (`FEAT-BROKER-LIVETEST`)
 
