@@ -237,7 +237,7 @@ def test_seven_stage_progression_and_reverse_lifo_teardown(tmp_path: Path) -> No
 
     # Verify Stage 5 reconciled the orphan RUNNING job -> INTERRUPTED
     reconciled_rows = HostPersistence.read_records(
-        "host_jobs", pk_values={"job_id": "job-orphan-01"}, limit=1
+        "host_jobs", {"job_id": "job-orphan-01"}, limit=1
     )
     assert len(reconciled_rows) == 1
     assert reconciled_rows[0]["status"] == "INTERRUPTED"

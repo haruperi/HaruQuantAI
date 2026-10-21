@@ -262,7 +262,7 @@ class SessionManager:
 
         HostPersistence.update_record(
             "host_session",
-            pk_values={"session_id": session_id},
+            key_columns={"session_id": session_id},
             updates={
                 "session_id": session_id,
                 "token_hash": token_hash,
@@ -314,7 +314,7 @@ class SessionManager:
         if record is None:
             rows = HostPersistence.read_records(
                 "host_session",
-                where={"token_hash": token_hash},
+                {"token_hash": token_hash},
                 limit=1,
             )
             if not rows:
@@ -373,14 +373,12 @@ class SessionManager:
             True if revoked, False if session not found.
         """
         now_str = _now_utc_str()
-        updated = (
-            HostPersistence.update_record(
-                "host_session",
-                pk_values={"session_id": session_id},
-                updates={"status": "REVOKED", "revoked_at_utc": now_str},
-            )
-            > 0
+        res = HostPersistence.update_record(
+            "host_session",
+            key_columns={"session_id": session_id},
+            updates={"status": "REVOKED", "revoked_at_utc": now_str},
         )
+        updated = int(res["affected"]) > 0
 
         # Purge from memory
         to_purge = [
@@ -405,7 +403,7 @@ class SessionManager:
         """Update status of a session record in the persistence table."""
         HostPersistence.update_record(
             "host_session",
-            pk_values={"session_id": session_id},
+            key_columns={"session_id": session_id},
             updates={"status": new_status},
         )
 

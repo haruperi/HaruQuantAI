@@ -45,6 +45,7 @@ CLI Usage:
 
 from __future__ import annotations
 
+import inspect
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -63,8 +64,6 @@ from app.host.persistence import (
     HostPersistenceCLI,
 )
 
-BatchOperation = HostPersistence.BatchOperation
-BatchResult = HostPersistence.BatchResult
 PersistenceError = HostPersistence.Error
 RevisionConflictError = HostPersistence.RevisionConflictError
 
@@ -129,23 +128,26 @@ def test_canonical_crud_operations(
     caplog.set_level(logging.DEBUG)
 
     # 1. Canonical create_record (FR-HOST-PERSISTENCE-CREATE)
-    pk = HostPersistence.create_record(
+    created = HostPersistence.create_record(
         "host_settings",
-        {
+        values={
             "scope": "canon",
             "key": "k1",
             "value_json": '{"v": 1}',
             "updated_at_utc": "2026-10-19T00:00:00Z",
         },
     )
-    assert pk == ("canon", "k1")
+    assert isinstance(created, dict)
+    assert created["created"] is True
+    assert created["key"] == ("canon", "k1")
+    assert created["pk"] == {"scope": "canon", "key": "k1"}
     assert any(
         CREATE_FR in record.message and getattr(record, "fr_id", None) == CREATE_FR
         for record in caplog.records
     )
 
     # 2. Canonical read_records (FR-HOST-PERSISTENCE-READ)
-    records = HostPersistence.read_records("host_settings", where={"scope": "canon"})
+    records = HostPersistence.read_records("host_settings", filters={"scope": "canon"})
     assert len(records) == 1
     assert records[0]["key"] == "k1"
     assert any(
@@ -154,14 +156,16 @@ def test_canonical_crud_operations(
     )
 
     # 3. Canonical update_record (FR-HOST-PERSISTENCE-UPDATE)
-    aff = HostPersistence.update_record(
+    upd = HostPersistence.update_record(
         "host_settings",
-        {"scope": "canon", "key": "k1"},
-        {"value_json": '{"v": 100}'},
+        key_columns={"scope": "canon", "key": "k1"},
+        updates={"value_json": '{"v": 100}'},
     )
-    assert aff == 1
+    assert isinstance(upd, dict)
+    assert upd["updated"] == 1
+    assert upd["affected"] == 1
     updated_rec = HostPersistence.read_records(
-        "host_settings", pk_values={"scope": "canon", "key": "k1"}
+        "host_settings", {"scope": "canon", "key": "k1"}
     )
     assert len(updated_rec) == 1 and updated_rec[0]["value_json"] == '{"v": 100}'
     assert any(
@@ -170,10 +174,10 @@ def test_canonical_crud_operations(
     )
 
     # Upsert via update_record
-    aff_upsert = HostPersistence.update_record(
+    upd_upsert = HostPersistence.update_record(
         "host_settings",
-        {"scope": "canon", "key": "k2"},
-        {
+        key_columns={"scope": "canon", "key": "k2"},
+        updates={
             "scope": "canon",
             "key": "k2",
             "value_json": '{"v": 200}',
@@ -181,38 +185,39 @@ def test_canonical_crud_operations(
         },
         upsert=True,
     )
-    assert aff_upsert >= 1
+    assert upd_upsert["upserted"] is True
+    assert upd_upsert["affected"] == 1
 
     # Optimistic revision CAS on update_record
-    aff_cas = HostPersistence.update_record(
+    upd_cas = HostPersistence.update_record(
         "host_settings",
-        {"scope": "canon", "key": "k1"},
-        {"value_json": '{"v": 101}', "schema_version": 2},
+        key_columns={"scope": "canon", "key": "k1"},
+        updates={"value_json": '{"v": 101}', "schema_version": 2},
         expected_revision=1,
         revision_col="schema_version",
     )
-    assert aff_cas == 1
+    assert upd_cas["updated"] == 1
 
     with pytest.raises(RevisionConflictError):
         HostPersistence.update_record(
             "host_settings",
-            {"scope": "canon", "key": "k1"},
-            {"value_json": '{"v": 102}'},
+            key_columns={"scope": "canon", "key": "k1"},
+            updates={"value_json": '{"v": 102}'},
             expected_revision=1,
             revision_col="schema_version",
         )
 
     # 4. Canonical delete_record (FR-HOST-PERSISTENCE-DELETE)
-    del_count = HostPersistence.delete_record(
-        "host_settings", pk_values={"scope": "canon", "key": "k1"}
+    del_res = HostPersistence.delete_record(
+        "host_settings", key_columns={"scope": "canon", "key": "k1"}
     )
-    assert del_count == 1
-    del_where = HostPersistence.delete_record("host_settings", where={"scope": "canon"})
-    assert del_where == 1
-    assert (
-        len(HostPersistence.read_records("host_settings", where={"scope": "canon"}))
-        == 0
+    assert isinstance(del_res, dict)
+    assert del_res["deleted"] == 1
+    del_where = HostPersistence.delete_record(
+        "host_settings", key_columns={"scope": "canon"}
     )
+    assert del_where["deleted"] == 1
+    assert len(HostPersistence.read_records("host_settings", {"scope": "canon"})) == 0
     assert any(
         DELETE_FR in record.message and getattr(record, "fr_id", None) == DELETE_FR
         for record in caplog.records
@@ -226,74 +231,85 @@ def test_entity_lifecycle_and_optimistic_cas(
     caplog.set_level(logging.DEBUG)
 
     # Create entity
-    pk = HostPersistence.create_entity(
-        "agent-01",
+    created_ent = HostPersistence.create_entity(
         "agent_spec",
-        "workspaces",
-        '{"model": "test-v1"}',
-        revision=1,
+        values={
+            "entity_id": "agent-01",
+            "scope": "workspaces",
+            "payload": '{"model": "test-v1"}',
+            "revision": 1,
+        },
     )
-    assert pk == ("agent-01", "agent_spec")
+    assert isinstance(created_ent, dict)
+    assert created_ent["entity"] == "agent_spec"
+    assert created_ent["entity_id"] == "agent-01"
+    assert created_ent["created"] is True
 
     # Read entity
-    entity = HostPersistence.read_entity("agent-01", "agent_spec")
-    assert entity is not None
+    entities = HostPersistence.read_entity("agent_spec", "agent-01")
+    assert isinstance(entities, list)
+    assert len(entities) == 1
+    entity = entities[0]
     assert entity["entity_id"] == "agent-01"
     assert entity["revision"] == 1
     assert entity["payload"] == '{"model": "test-v1"}'
 
     # Update entity with matching revision
-    ok = HostPersistence.update_entity(
-        "agent-01",
+    upd_ok = HostPersistence.update_entity(
         "agent_spec",
-        '{"model": "test-v2"}',
-        revision=2,
+        "agent-01",
+        updates={"payload": '{"model": "test-v2"}', "revision": 2},
         expected_revision=1,
     )
-    assert ok == 1
-    updated = HostPersistence.read_entity("agent-01", "agent_spec")
-    assert updated is not None and updated["revision"] == 2
+    assert isinstance(upd_ok, dict)
+    assert upd_ok["updated"] == 1
+    assert upd_ok["revision"] == 2
+    updated = HostPersistence.read_entity("agent_spec", "agent-01")
+    assert len(updated) == 1 and updated[0]["revision"] == 2
 
     # Update entity without expected_revision auto-increments revision
-    ok_auto = HostPersistence.update_entity(
-        "agent-01",
+    upd_auto = HostPersistence.update_entity(
         "agent_spec",
-        '{"model": "test-v3"}',
+        "agent-01",
+        updates={"payload": '{"model": "test-v3"}', "scope": "global"},
     )
-    assert ok_auto == 1
-    updated_auto = HostPersistence.read_entity("agent-01", "agent_spec")
-    assert updated_auto is not None and updated_auto["revision"] == 3
+    assert upd_auto["updated"] == 1
+    assert upd_auto["revision"] == 3
+    updated_auto = HostPersistence.read_entity("agent_spec", "agent-01")
+    assert len(updated_auto) == 1 and updated_auto[0]["revision"] == 3
 
     # Update entity with stale revision raises RevisionConflictError
     with pytest.raises(RevisionConflictError) as exc_info:
         HostPersistence.update_entity(
-            "agent-01",
             "agent_spec",
-            '{"model": "conflict"}',
+            "agent-01",
+            updates={"payload": '{"model": "conflict"}'},
             expected_revision=1,
         )
     assert exc_info.value.expected_revision == 1
     assert exc_info.value.current_revision == 3
 
-    # Update non-existent entity returns 0
-    assert HostPersistence.update_entity("missing-id", "agent_spec", "{}") == 0
-
-    # Update non-existent record returns 0
-    assert (
-        HostPersistence.update_record(
-            "host_entities",
-            {"entity_id": "missing-id", "entity_type": "agent_spec"},
-            {"payload": "{}"},
-            expected_revision=1,
-        )
-        == 0
+    # Update non-existent entity returns updated=0
+    missing_ent = HostPersistence.update_entity(
+        "agent_spec", "missing-id", {"payload": "{}"}
     )
+    assert missing_ent["updated"] == 0
+
+    # Update non-existent record returns updated=0
+    missing_rec = HostPersistence.update_record(
+        "host_entities",
+        {"entity_id": "missing-id", "entity_type": "agent_spec"},
+        {"payload": "{}"},
+        expected_revision=1,
+    )
+    assert missing_rec["updated"] == 0
 
     # Delete entity
-    del_ok = HostPersistence.delete_entity("agent-01", "agent_spec")
-    assert del_ok is True
-    assert HostPersistence.read_entity("agent-01", "agent_spec") is None
-    assert HostPersistence.delete_entity("agent-01", "agent_spec") is False
+    del_ok = HostPersistence.delete_entity("agent_spec", "agent-01")
+    assert isinstance(del_ok, dict)
+    assert del_ok["deleted"] == 1
+    assert HostPersistence.read_entity("agent_spec", "agent-01") == []
+    assert HostPersistence.delete_entity("agent_spec", "agent-01")["deleted"] == 0
 
 
 def test_read_records_pagination_and_cursor() -> None:
@@ -342,7 +358,7 @@ def test_read_records_pagination_and_cursor() -> None:
 
 def test_foreign_key_guards_on_delete() -> None:
     """Verify delete_record blocks cascade violations when parent is referenced."""
-    bid = HostPersistence.create_record(
+    b_res = HostPersistence.create_record(
         "datamgr_broker",
         {
             "name": "INTERACTIVE_BROKERS",
@@ -350,6 +366,7 @@ def test_foreign_key_guards_on_delete() -> None:
             "updated_at_utc": "2026-10-19T00:00:00Z",
         },
     )
+    bid = b_res["key"]
     HostPersistence.create_record(
         "datamgr_broker_stock",
         {"TICKER": "SPY", "BROKER_ID": bid},
@@ -359,7 +376,7 @@ def test_foreign_key_guards_on_delete() -> None:
     with pytest.raises(PersistenceError) as exc_info:
         HostPersistence.delete_record(
             "datamgr_broker",
-            pk_values={"id": bid},
+            key_columns={"id": bid},
             check_references=True,
         )
     assert "dependent row(s) exist" in str(exc_info.value)
@@ -367,9 +384,14 @@ def test_foreign_key_guards_on_delete() -> None:
     # Deleting child row first allows parent deletion
     HostPersistence.delete_record(
         "datamgr_broker_stock",
-        pk_values={"ID": 1},
+        key_columns={"ID": 1},
     )
-    assert HostPersistence.delete_record("datamgr_broker", pk_values={"id": bid}) == 1
+    assert (
+        HostPersistence.delete_record("datamgr_broker", key_columns={"id": bid})[
+            "deleted"
+        ]
+        == 1
+    )
 
 
 def test_batch_transactions_operations(
@@ -380,71 +402,70 @@ def test_batch_transactions_operations(
 
     # Empty batch returns 0 operations
     empty_res = HostPersistence.apply_batch([])
-    assert empty_res.total_operations == 0
-    assert empty_res.affected_rows == 0
+    assert empty_res["total_operations"] == 0
+    assert empty_res["affected_rows"] == 0
 
-    ops = [
-        BatchOperation(
-            op_type="create",
-            table="host_settings",
-            data={
+    ops: list[dict[str, Any]] = [
+        {
+            "op_type": "create",
+            "table": "host_settings",
+            "values": {
                 "scope": "batch",
                 "key": "b1",
                 "value_json": '{"v": 1}',
                 "updated_at_utc": "2026-10-19T00:00:00Z",
             },
-        ),
-        BatchOperation(
-            op_type="create",
-            table="host_settings",
-            data={
+        },
+        {
+            "op_type": "create",
+            "table": "host_settings",
+            "values": {
                 "scope": "batch",
                 "key": "b2",
                 "value_json": '{"v": 2}',
                 "updated_at_utc": "2026-10-19T00:00:00Z",
             },
-        ),
-        BatchOperation(
-            op_type="update",
-            table="host_settings",
-            pk_values={"scope": "batch", "key": "b1"},
-            data={"value_json": '{"v": 10}'},
-        ),
-        BatchOperation(
-            op_type="upsert",
-            table="host_settings",
-            pk_values={"scope": "batch", "key": "b3"},
-            data={
+        },
+        {
+            "op_type": "update",
+            "table": "host_settings",
+            "key_columns": {"scope": "batch", "key": "b1"},
+            "values": {"value_json": '{"v": 10}'},
+        },
+        {
+            "op_type": "upsert",
+            "table": "host_settings",
+            "key_columns": {"scope": "batch", "key": "b3"},
+            "values": {
                 "scope": "batch",
                 "key": "b3",
                 "value_json": '{"v": 30}',
                 "updated_at_utc": "2026-10-19T00:00:00Z",
             },
-        ),
-        BatchOperation(
-            op_type="delete",
-            table="host_settings",
-            pk_values={"scope": "batch", "key": "b2"},
-        ),
+        },
+        {
+            "op_type": "delete",
+            "table": "host_settings",
+            "key_columns": {"scope": "batch", "key": "b2"},
+        },
     ]
 
     result = HostPersistence.apply_batch(ops)
-    assert isinstance(result, BatchResult)
-    assert result.total_operations == 5
-    assert result.affected_rows >= 4
-    assert result.to_dict()["total_operations"] == 5
+    assert isinstance(result, dict)
+    assert result["total_operations"] == 5
+    assert result["affected_rows"] >= 4
 
     # Verify final DB state
     assert (
-        HostPersistence.read_records(
-            "host_settings", pk_values={"scope": "batch", "key": "b1"}
-        )[0]["value_json"]
+        HostPersistence.read_records("host_settings", {"scope": "batch", "key": "b1"})[
+            0
+        ]["value_json"]
         == '{"v": 10}'
     )
     assert (
         len(
             HostPersistence.read_records(
-                "host_settings", pk_values={"scope": "batch", "key": "b2"}
+                "host_settings", {"scope": "batch", "key": "b2"}
             )
         )
         == 0
@@ -452,7 +473,7 @@ def test_batch_transactions_operations(
     assert (
         len(
             HostPersistence.read_records(
-                "host_settings", pk_values={"scope": "batch", "key": "b3"}
+                "host_settings", {"scope": "batch", "key": "b3"}
             )
         )
         == 1
@@ -476,18 +497,18 @@ def test_batch_transactions_rollback() -> None:
         },
     )
 
-    failing_ops = [
-        BatchOperation(
-            op_type="update",
-            table="host_settings",
-            pk_values={"scope": "rb", "key": "target"},
-            data={"value_json": '{"orig": false}'},
-        ),
-        BatchOperation(
-            op_type="create",
-            table="unapproved_table_xyz",
-            data={"foo": "bar"},
-        ),
+    failing_ops: list[dict[str, Any]] = [
+        {
+            "op_type": "update",
+            "table": "host_settings",
+            "key_columns": {"scope": "rb", "key": "target"},
+            "values": {"value_json": '{"orig": false}'},
+        },
+        {
+            "op_type": "create",
+            "table": "unapproved_table_xyz",
+            "values": {"foo": "bar"},
+        },
     ]
 
     with pytest.raises(PersistenceError):
@@ -495,7 +516,7 @@ def test_batch_transactions_rollback() -> None:
 
     # Prior state preserved: update was rolled back
     row = HostPersistence.read_records(
-        "host_settings", pk_values={"scope": "rb", "key": "target"}
+        "host_settings", {"scope": "rb", "key": "target"}
     )[0]
     assert row["value_json"] == '{"orig": true}'
 
@@ -758,19 +779,13 @@ def test_all_25_tables_crud_coverage() -> None:
         pk_cols = HostPersistence.TABLE_PRIMARY_KEYS[table]
 
         # 1. Create
-        pk_res = HostPersistence.create_record(table, sample)
-        assert pk_res is not None
-
-        if len(pk_cols) == 1:
-            pk_dict = {
-                pk_cols[0]: pk_res if pk_cols[0] not in sample else sample[pk_cols[0]]
-            }
-        else:
-            pk_dict = {col: sample[col] for col in pk_cols}
+        created_res = HostPersistence.create_record(table, sample)
+        assert created_res["created"] is True
+        pk_dict = created_res["pk"]
         pk_dicts[table] = pk_dict
 
         # 2. Read
-        read_res = HostPersistence.read_records(table, pk_values=pk_dict)
+        read_res = HostPersistence.read_records(table, pk_dict)
         assert len(read_res) == 1
 
         # 3. Update
@@ -784,15 +799,15 @@ def test_all_25_tables_crud_coverage() -> None:
             upd_col = non_pk_cols[0]
             curr_val = sample[upd_col]
             new_val = f"{curr_val}_upd" if isinstance(curr_val, str) else curr_val
-            aff = HostPersistence.update_record(table, pk_dict, {upd_col: new_val})
-            assert aff == 1
+            upd_res = HostPersistence.update_record(table, pk_dict, {upd_col: new_val})
+            assert upd_res["updated"] == 1
 
     # 4. Delete in reverse order (children before parents)
     for table, _ in reversed(ordered_tables_and_samples):
         deleted = HostPersistence.delete_record(
             table, pk_dicts[table], check_references=True
         )
-        assert deleted == 1
+        assert deleted["deleted"] == 1
 
 
 def test_validation_and_unapproved_table_errors() -> None:
@@ -812,7 +827,7 @@ def test_validation_and_unapproved_table_errors() -> None:
     with pytest.raises(PersistenceError):
         HostPersistence.delete_record(unapproved, {"id": 1})
 
-    # Empty data mapping on create_record
+    # Empty values mapping on create_record
     with pytest.raises(PersistenceError):
         HostPersistence.create_record("host_settings", {})
 
@@ -828,7 +843,7 @@ def test_validation_and_unapproved_table_errors() -> None:
 
     # Empty delete criteria
     with pytest.raises(PersistenceError):
-        HostPersistence.delete_record("host_settings")
+        HostPersistence.delete_record("host_settings", {})
 
 
 def test_host_persistence_cli(capsys: pytest.CaptureFixture[str]) -> None:
@@ -850,7 +865,7 @@ def test_host_persistence_cli(capsys: pytest.CaptureFixture[str]) -> None:
 
 
 def test_class_contract_and_clean_room() -> None:
-    """Verify HostPersistence contract and absence of legacy helper sprawl."""
+    """Verify HostPersistence contract and exact checklist method signatures."""
     assert persistence_mod.__all__ == ["HostPersistence", "HostPersistenceCLI"]
 
     public_methods = [
@@ -878,11 +893,58 @@ def test_class_contract_and_clean_room() -> None:
         f"{set(public_methods) - expected_canonical_methods}"
     )
 
-    # Verify error and batch classes are accessible on HostPersistence
+    # Verify exact parameter names match blueprint specification
+    assert list(inspect.signature(HostPersistence.create_record).parameters)[:2] == [
+        "table",
+        "values",
+    ]
+    assert list(inspect.signature(HostPersistence.create_entity).parameters)[:2] == [
+        "entity",
+        "values",
+    ]
+    assert list(inspect.signature(HostPersistence.read_records).parameters)[:5] == [
+        "table",
+        "filters",
+        "limit",
+        "offset",
+        "order_by",
+    ]
+    assert list(inspect.signature(HostPersistence.read_entity).parameters)[:5] == [
+        "entity",
+        "entity_id",
+        "filters",
+        "limit",
+        "offset",
+    ]
+    assert list(inspect.signature(HostPersistence.update_record).parameters)[:4] == [
+        "table",
+        "key_columns",
+        "updates",
+        "expected_revision",
+    ]
+    assert list(inspect.signature(HostPersistence.update_entity).parameters)[:4] == [
+        "entity",
+        "entity_id",
+        "updates",
+        "expected_revision",
+    ]
+    assert list(inspect.signature(HostPersistence.delete_record).parameters)[:2] == [
+        "table",
+        "key_columns",
+    ]
+    assert list(inspect.signature(HostPersistence.delete_entity).parameters)[:2] == [
+        "entity",
+        "entity_id",
+    ]
+    assert list(inspect.signature(HostPersistence.apply_batch).parameters)[:1] == [
+        "operations"
+    ]
+
+    # Verify error classes are accessible and legacy BatchOperation/BatchResult shims are absent
     assert HostPersistence.Error is PersistenceError
     assert HostPersistence.RevisionConflictError is RevisionConflictError
-    assert HostPersistence.BatchOperation is BatchOperation
-    assert HostPersistence.BatchResult is BatchResult
+    assert not hasattr(HostPersistence, "BatchOperation")
+    assert not hasattr(HostPersistence, "BatchResult")
 
 
 def test_settings_batch_compare_and_set_is_inside_transaction() -> None:
@@ -891,18 +953,18 @@ def test_settings_batch_compare_and_set_is_inside_transaction() -> None:
     barrier = Barrier(2)
 
     def write(value: str) -> str:
-        operation = HostPersistence.BatchOperation(
-            op_type="upsert",
-            table="host_settings",
-            pk_values={"scope": "application", "key": "audit"},
-            data={
+        operation = {
+            "op_type": "upsert",
+            "table": "host_settings",
+            "key_columns": {"scope": "application", "key": "audit"},
+            "values": {
                 "scope": "application",
                 "key": "audit",
                 "value_json": value,
                 "schema_version": 1,
                 "updated_at_utc": "2026-10-20 00:00:00",
             },
-        )
+        }
         barrier.wait(timeout=5)
         try:
             HostPersistence.apply_batch([operation], expected_settings_revision=0)

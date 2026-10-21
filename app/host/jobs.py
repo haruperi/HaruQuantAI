@@ -438,18 +438,17 @@ class JobManager:
 
     def _save_job(self, job_id: str, **fields: Any) -> int:
         """Persist or upsert a job record via HostPersistence."""
-        return HostPersistence.update_record(
-            "host_jobs", pk_values={"job_id": job_id}, updates=fields, upsert=True
+        res = HostPersistence.update_record(
+            "host_jobs", key_columns={"job_id": job_id}, updates=fields, upsert=True
         )
+        return int(res["affected"])
 
     def _update_job(self, job_id: str, updates: Mapping[str, Any]) -> bool:
         """Update an existing job record via HostPersistence."""
-        return (
-            HostPersistence.update_record(
-                "host_jobs", pk_values={"job_id": job_id}, updates=updates
-            )
-            > 0
+        res = HostPersistence.update_record(
+            "host_jobs", key_columns={"job_id": job_id}, updates=updates
         )
+        return int(res["affected"]) > 0
 
     def _record_event(
         self,
@@ -469,7 +468,8 @@ class JobManager:
             "details_json": json.dumps(dict(details)),
             "created_at_utc": created_at_utc or datetime.now(UTC).isoformat(),
         }
-        return str(HostPersistence.create_record("host_job_events", data))
+        res = HostPersistence.create_record("host_job_events", data)
+        return str(res["key"])
 
     def reconcile_orphan_jobs(self) -> list[str]:
         """Mark orphan jobs left in RUNNING state as INTERRUPTED on system boot."""
@@ -900,9 +900,7 @@ class JobManager:
             _log("debug", PERSISTENCE_FR, msg, job_id=job_id)
             return mem_rec
 
-        rows = HostPersistence.read_records(
-            "host_jobs", pk_values={"job_id": job_id}, limit=1
-        )
+        rows = HostPersistence.read_records("host_jobs", {"job_id": job_id}, limit=1)
         if not rows:
             return None
         row = rows[0]
@@ -915,7 +913,7 @@ class JobManager:
     ) -> list[JobRecord]:
         """List persisted jobs from host_jobs table."""
         where = {"status": status} if status else None
-        rows = HostPersistence.read_records("host_jobs", where=where, limit=limit)
+        rows = HostPersistence.read_records("host_jobs", where, limit=limit)
         msg = f"listed {len(rows)} persisted jobs (status={status})"
         _log("debug", PERSISTENCE_FR, msg, count=len(rows))
         return [_row_to_record(r) for r in rows]
@@ -923,7 +921,7 @@ class JobManager:
     def get_job_events(self, job_id: str) -> list[dict[str, Any]]:
         """Retrieve state transition events for a job from host_job_events."""
         return HostPersistence.read_records(
-            "host_job_events", where={"job_id": job_id}, order_by="created_at_utc ASC"
+            "host_job_events", {"job_id": job_id}, order_by="created_at_utc ASC"
         )
 
     def shutdown(self, *, wait: bool = True, cancel_futures: bool = False) -> None:

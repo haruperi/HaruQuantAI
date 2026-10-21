@@ -419,7 +419,7 @@ def test_persistence_job_helpers() -> None:
     """Verify HostPersistence CRUD methods on host_jobs and host_job_events."""
     HostPersistence.update_record(
         "host_jobs",
-        pk_values={"job_id": "crud-job-1"},
+        key_columns={"job_id": "crud-job-1"},
         updates={
             "owner": "tester",
             "kind": "unit",
@@ -445,29 +445,25 @@ def test_persistence_job_helpers() -> None:
     )
 
     fetched_rows = HostPersistence.read_records(
-        "host_jobs", pk_values={"job_id": "crud-job-1"}, limit=1
+        "host_jobs", {"job_id": "crud-job-1"}, limit=1
     )
     assert len(fetched_rows) == 1
     assert fetched_rows[0]["status"] == "RUNNING"
 
-    running_jobs = HostPersistence.read_records(
-        "host_jobs", where={"status": "RUNNING"}
-    )
+    running_jobs = HostPersistence.read_records("host_jobs", {"status": "RUNNING"})
     assert len(running_jobs) == 1
 
     attempts = HostPersistence.read_records(
-        "host_job_attempts", where={"job_id": "crud-job-1"}
+        "host_job_attempts", {"job_id": "crud-job-1"}
     )
     assert isinstance(attempts, list)
 
-    events = HostPersistence.read_records(
-        "host_job_events", where={"job_id": "crud-job-1"}
-    )
+    events = HostPersistence.read_records("host_job_events", {"job_id": "crud-job-1"})
     assert len(events) == 1
 
     updated = HostPersistence.update_record(
         "host_jobs",
-        pk_values={"job_id": "crud-job-1"},
+        key_columns={"job_id": "crud-job-1"},
         updates={
             "status": "INTERRUPTED",
             "message": "Interrupted on boot",
@@ -475,18 +471,15 @@ def test_persistence_job_helpers() -> None:
             "error_message": "Orphaned",
         },
     )
-    assert updated == 1
+    assert updated["affected"] == 1
 
     deleted = HostPersistence.delete_record(
         "host_jobs",
-        pk_values={"job_id": "crud-job-1"},
+        key_columns={"job_id": "crud-job-1"},
         check_references=False,
     )
-    assert deleted == 1
-    assert (
-        HostPersistence.read_records("host_jobs", pk_values={"job_id": "crud-job-1"})
-        == []
-    )
+    assert deleted["deleted"] == 1
+    assert HostPersistence.read_records("host_jobs", {"job_id": "crud-job-1"}) == []
 
 
 # ---------------------------------------------------------------------------

@@ -920,7 +920,7 @@ def test_account_rotation_is_durable_and_revokes_other_gateway_cache() -> None:
     new_login = client.post("/auth/login", json={"password": "synthetic-new-password"})
     assert new_login.status_code == 200
     assert new_login.json()["data"]["username"] == "new"
-    rows = HostPersistence.read_records("host_session", where={"status": "ACTIVE"})
+    rows = HostPersistence.read_records("host_session", {"status": "ACTIVE"})
     assert len(rows) == 1
     elapsed = datetime.fromisoformat(
         rows[0]["expires_at_utc"]

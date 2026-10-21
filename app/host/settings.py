@@ -547,22 +547,22 @@ class SettingsManager:
             }
             changed = {scope: items for scope, items in changed.items() if items}
             now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")
-            ops: list[Any] = []
+            ops: list[Mapping[str, Any]] = []
             for scope, items in changed.items():
                 for key, val in items.items():
                     ops.append(
-                        HostPersistence.BatchOperation(
-                            op_type="upsert",
-                            table="host_settings",
-                            pk_values={"scope": scope, "key": key},
-                            data={
+                        {
+                            "op_type": "upsert",
+                            "table": "host_settings",
+                            "key_columns": {"scope": scope, "key": key},
+                            "values": {
                                 "scope": scope,
                                 "key": key,
                                 "value_json": json.dumps(val, allow_nan=False),
                                 "schema_version": current + 1,
                                 "updated_at_utc": now,
                             },
-                        )
+                        }
                     )
             HostPersistence.apply_batch(
                 ops,

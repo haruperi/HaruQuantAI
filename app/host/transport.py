@@ -721,9 +721,7 @@ class TransportGatewayService:
         if job_id is not None:
             pk = {"job_id": job_id}
             db_r: list[_Pld] = (
-                []
-                if jm
-                else HostPersistence.read_records("host_jobs", pk_values=pk, limit=1)
+                [] if jm else HostPersistence.read_records("host_jobs", pk, limit=1)
             )
             row = (
                 r.to_dict()
@@ -741,7 +739,7 @@ class TransportGatewayService:
         jobs = (
             [r.to_dict() for r in jm.list_jobs(status=sf, limit=lim)]
             if jm
-            else HostPersistence.read_records("host_jobs", where=w, limit=lim)
+            else HostPersistence.read_records("host_jobs", w, limit=lim)
         )
         return _ok(req, _dct(count=len(jobs), jobs=jobs))
 
