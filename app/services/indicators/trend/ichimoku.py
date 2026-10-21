@@ -4,18 +4,20 @@ Description:
     Implements the complete Ichimoku Kinko Hyo indicator system, comprising
     Tenkan-sen (Conversion Line), Kijun-sen (Base Line), Senkou Span A (Leading
     Span A), Senkou Span B (Leading Span B), and Chikou Span (Lagging Span).
-    Provides condition evaluators for Tenkan/Kijun crosses and Kumo breakouts.
+    Provides condition evaluators for Tenkan/Kijun crosses, Kijun-sen price
+    crosses, Senkou Span crosses, and Kumo breakouts.
 
 Purpose:
-    FEAT-SERVICES-INDICATOR-ICHIMOKU
+    FEAT-SERVICES-INDICATOR-ICHIMOKU: Ichimoku cloud calculation and conditions.
 
 Key Capabilities:
     - FR-SERVICES-ICHIMOKU-CALCULATE: Computes all 5 Ichimoku lines and Kumo cloud.
-    - FR-SERVICES-ICHIMOKU-CONDITIONS: Evaluates TK crosses and Kumo breakouts.
+    - FR-SERVICES-ICHIMOKU-CONDITIONS: Evaluates TK crosses, Kijun crosses, Senkou
+      crosses, and Kumo breakouts.
 
 Python API Usage:
     ```python
-    from app.services.indicators.ichimoku import Ichimoku
+    from app.services.indicators.trend.ichimoku import Ichimoku
 
     ichi = Ichimoku.calculate(high, low, close, tenkan=9, kijun=26, senkou=52)
     ts = ichi["tenkan_sen"]
@@ -23,14 +25,17 @@ Python API Usage:
     sa = ichi["senkou_span_a"]
     sb = ichi["senkou_span_b"]
 
-    # Condition checks
     tk_bull = Ichimoku.tenkan_kijun_cross_bullish(ts, ks, shift=0)
     kumo_break = Ichimoku.kumo_breakout_bullish(close, sa, sb, shift=0)
     ```
 
 CLI Usage:
-    N/A (Analytical block module invoked by strategy authoring and engine runners).
+    ```bash
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py -k "ichimoku"
+    ```
 """
+
+from __future__ import annotations
 
 from typing import Any, override
 
@@ -43,6 +48,7 @@ logger = get_logger(__name__)
 DEFAULT_TENKAN: int = 9
 DEFAULT_KIJUN: int = 26
 DEFAULT_SENKOU: int = 52
+STRONG_SIGNAL_LEVEL: int = 2
 
 
 class Ichimoku(BaseIndicator):
@@ -59,27 +65,7 @@ class Ichimoku(BaseIndicator):
         kijun: int = DEFAULT_KIJUN,
         senkou: int = DEFAULT_SENKOU,
     ) -> dict[str, IndicatorSeries]:
-        """Compute the 5 Ichimoku lines and Kumo cloud bounds.
-
-        Args:
-            high: High price series.
-            low: Low price series.
-            close: Close price series.
-            tenkan: Conversion line lookback (default 9).
-            kijun: Base line lookback (default 26).
-            senkou: Leading Span B lookback (default 52).
-
-        Returns:
-            Dictionary containing:
-                - 'tenkan_sen': Conversion line.
-                - 'kijun_sen': Base line.
-                - 'senkou_span_a': Leading Span A.
-                - 'senkou_span_b': Leading Span B.
-                - 'chikou_span': Lagging Span.
-
-        Raises:
-            ValueError: If periods are < 1 or array lengths mismatch.
-        """
+        """Compute the 5 Ichimoku lines and Kumo cloud bounds."""
         logger.info(
             "Ichimoku calculation initiated: tenkan=%d, kijun=%d, senkou=%d",
             tenkan,
@@ -167,7 +153,6 @@ class Ichimoku(BaseIndicator):
             else:
                 sum_b[i] = (h_arr[i] + l_arr[i]) / 2.0
 
-        # Current bar value is projected from kijun bars ago
         for i in range(kijun, n):
             sa[i] = sum_a[i - kijun]
             sb[i] = sum_b[i - kijun]
@@ -186,10 +171,126 @@ class Ichimoku(BaseIndicator):
         return cs
 
     @staticmethod
+    def _check_strength_bullish(
+        ref_val: float,
+        sa: np.ndarray[Any, Any] | None,
+        sb: np.ndarray[Any, Any] | None,
+        curr: int,
+        signal_strength: int,
+    ) -> bool:
+        if sa is None or sb is None or signal_strength <= 0:
+            return True
+        if (
+            curr >= len(sa)
+            or curr >= len(sb)
+            or np.isnan(sa[curr])
+            or np.isnan(sb[curr])
+        ):
+            return False
+        kumo_top = float(max(sa[curr], sb[curr]))
+        kumo_bottom = float(min(sa[curr], sb[curr]))
+        if signal_strength >= STRONG_SIGNAL_LEVEL:
+            return ref_val > kumo_top
+        return ref_val > kumo_bottom
+
+    @staticmethod
+    def _check_strength_bearish(
+        ref_val: float,
+        sa: np.ndarray[Any, Any] | None,
+        sb: np.ndarray[Any, Any] | None,
+        curr: int,
+        signal_strength: int,
+    ) -> bool:
+        if sa is None or sb is None or signal_strength <= 0:
+            return True
+        if (
+            curr >= len(sa)
+            or curr >= len(sb)
+            or np.isnan(sa[curr])
+            or np.isnan(sb[curr])
+        ):
+            return False
+        kumo_top = float(max(sa[curr], sb[curr]))
+        kumo_bottom = float(min(sa[curr], sb[curr]))
+        if signal_strength >= STRONG_SIGNAL_LEVEL:
+            return ref_val < kumo_bottom
+        return ref_val < kumo_top
+
+    @staticmethod
+    def kijun_sen_cross_bullish(  # noqa: PLR0917
+        open_prices: IndicatorSeries | np.ndarray[Any, Any],
+        close_prices: IndicatorSeries | np.ndarray[Any, Any],
+        kijun_sen: IndicatorSeries | np.ndarray[Any, Any],
+        senkou_span_a: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        senkou_span_b: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        signal_strength: int = 0,
+        shift: int = 0,
+    ) -> bool:
+        """Check if bar crossed bullishly across Kijun-sen (`Open < Kijun < Close`)."""
+        logger.info("Evaluating Ichimoku kijun_sen_cross_bullish at shift=%d", shift)
+        o = BaseIndicator.to_numpy(open_prices)
+        c = BaseIndicator.to_numpy(close_prices)
+        ks = BaseIndicator.to_numpy(kijun_sen)
+        curr = len(c) - 1 - shift
+        if curr < 0 or curr >= len(o) or curr >= len(c) or curr >= len(ks):
+            return False
+        if np.isnan(o[curr]) or np.isnan(c[curr]) or np.isnan(ks[curr]):
+            return False
+        signal = bool(o[curr] < ks[curr] and c[curr] > ks[curr])
+        if not signal:
+            return False
+        sa = (
+            BaseIndicator.to_numpy(senkou_span_a) if senkou_span_a is not None else None
+        )
+        sb = (
+            BaseIndicator.to_numpy(senkou_span_b) if senkou_span_b is not None else None
+        )
+        return Ichimoku._check_strength_bullish(
+            float(ks[curr]), sa, sb, curr, signal_strength
+        )
+
+    @staticmethod
+    def kijun_sen_cross_bearish(  # noqa: PLR0917
+        open_prices: IndicatorSeries | np.ndarray[Any, Any],
+        close_prices: IndicatorSeries | np.ndarray[Any, Any],
+        kijun_sen: IndicatorSeries | np.ndarray[Any, Any],
+        senkou_span_a: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        senkou_span_b: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        signal_strength: int = 0,
+        shift: int = 0,
+    ) -> bool:
+        """Check if bar crossed bearishly across Kijun-sen (`Open > Kijun > Close`)."""
+        logger.info("Evaluating Ichimoku kijun_sen_cross_bearish at shift=%d", shift)
+        o = BaseIndicator.to_numpy(open_prices)
+        c = BaseIndicator.to_numpy(close_prices)
+        ks = BaseIndicator.to_numpy(kijun_sen)
+        curr = len(c) - 1 - shift
+        if curr < 0 or curr >= len(o) or curr >= len(c) or curr >= len(ks):
+            return False
+        if np.isnan(o[curr]) or np.isnan(c[curr]) or np.isnan(ks[curr]):
+            return False
+        signal = bool(o[curr] > ks[curr] and c[curr] < ks[curr])
+        if not signal:
+            return False
+        sa = (
+            BaseIndicator.to_numpy(senkou_span_a) if senkou_span_a is not None else None
+        )
+        sb = (
+            BaseIndicator.to_numpy(senkou_span_b) if senkou_span_b is not None else None
+        )
+        return Ichimoku._check_strength_bearish(
+            float(ks[curr]), sa, sb, curr, signal_strength
+        )
+
+    @staticmethod
     def tenkan_kijun_cross_bullish(
         tenkan_sen: IndicatorSeries | np.ndarray[Any, Any],
         kijun_sen: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
+        *,
+        senkou_span_a: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        senkou_span_b: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        signal_strength: int = 0,
     ) -> bool:
         """Check if Tenkan-sen crossed above Kijun-sen."""
         logger.info("Evaluating Ichimoku tenkan_kijun_cross_bullish at shift=%d", shift)
@@ -201,13 +302,27 @@ class Ichimoku(BaseIndicator):
             return False
         if np.isnan(ts[curr]) or np.isnan(ks[curr]) or np.isnan(ts[prev]):
             return False
-        return bool(ts[prev] <= ks[prev] and ts[curr] > ks[curr])
+        if not (ts[prev] <= ks[prev] and ts[curr] > ks[curr]):
+            return False
+        sa = (
+            BaseIndicator.to_numpy(senkou_span_a) if senkou_span_a is not None else None
+        )
+        sb = (
+            BaseIndicator.to_numpy(senkou_span_b) if senkou_span_b is not None else None
+        )
+        return Ichimoku._check_strength_bullish(
+            float(ks[curr]), sa, sb, curr, signal_strength
+        )
 
     @staticmethod
     def tenkan_kijun_cross_bearish(
         tenkan_sen: IndicatorSeries | np.ndarray[Any, Any],
         kijun_sen: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
+        *,
+        senkou_span_a: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        senkou_span_b: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        signal_strength: int = 0,
     ) -> bool:
         """Check if Tenkan-sen crossed below Kijun-sen."""
         logger.info("Evaluating Ichimoku tenkan_kijun_cross_bearish at shift=%d", shift)
@@ -219,7 +334,17 @@ class Ichimoku(BaseIndicator):
             return False
         if np.isnan(ts[curr]) or np.isnan(ks[curr]) or np.isnan(ts[prev]):
             return False
-        return bool(ts[prev] >= ks[prev] and ts[curr] < ks[curr])
+        if not (ts[prev] >= ks[prev] and ts[curr] < ks[curr]):
+            return False
+        sa = (
+            BaseIndicator.to_numpy(senkou_span_a) if senkou_span_a is not None else None
+        )
+        sb = (
+            BaseIndicator.to_numpy(senkou_span_b) if senkou_span_b is not None else None
+        )
+        return Ichimoku._check_strength_bearish(
+            float(ks[curr]), sa, sb, curr, signal_strength
+        )
 
     @staticmethod
     def kumo_breakout_bullish(
@@ -227,20 +352,30 @@ class Ichimoku(BaseIndicator):
         senkou_span_a: IndicatorSeries | np.ndarray[Any, Any],
         senkou_span_b: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
+        *,
+        open_prices: IndicatorSeries | np.ndarray[Any, Any] | None = None,
     ) -> bool:
-        """Check if Close broke above Kumo cloud (above max(SpanA, SpanB))."""
+        """Check if price broke above Kumo cloud (above max(SpanA, SpanB))."""
         logger.info("Evaluating Ichimoku kumo_breakout_bullish at shift=%d", shift)
         c = BaseIndicator.to_numpy(close_prices)
         sa = BaseIndicator.to_numpy(senkou_span_a)
         sb = BaseIndicator.to_numpy(senkou_span_b)
         curr = len(c) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(c) or curr >= len(sa) or curr >= len(sb):
+        if curr < 0 or curr >= len(c) or curr >= len(sa) or curr >= len(sb):
             return False
-        if np.isnan(sa[curr]) or np.isnan(sb[curr]):
+        if np.isnan(sa[curr]) or np.isnan(sb[curr]) or np.isnan(c[curr]):
             return False
 
         cloud_top_curr = max(sa[curr], sb[curr])
+        if open_prices is not None:
+            o = BaseIndicator.to_numpy(open_prices)
+            if curr >= len(o) or np.isnan(o[curr]):
+                return False
+            return bool(o[curr] < cloud_top_curr and c[curr] > cloud_top_curr)
+
+        prev = curr - 1
+        if prev < 0 or np.isnan(sa[prev]) or np.isnan(sb[prev]):
+            return False
         cloud_top_prev = max(sa[prev], sb[prev])
         return bool(c[prev] <= cloud_top_prev and c[curr] > cloud_top_curr)
 
@@ -250,20 +385,30 @@ class Ichimoku(BaseIndicator):
         senkou_span_a: IndicatorSeries | np.ndarray[Any, Any],
         senkou_span_b: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
+        *,
+        open_prices: IndicatorSeries | np.ndarray[Any, Any] | None = None,
     ) -> bool:
-        """Check if Close broke below Kumo cloud (below min(SpanA, SpanB))."""
+        """Check if price broke below Kumo cloud (below min(SpanA, SpanB))."""
         logger.info("Evaluating Ichimoku kumo_breakout_bearish at shift=%d", shift)
         c = BaseIndicator.to_numpy(close_prices)
         sa = BaseIndicator.to_numpy(senkou_span_a)
         sb = BaseIndicator.to_numpy(senkou_span_b)
         curr = len(c) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(c) or curr >= len(sa) or curr >= len(sb):
+        if curr < 0 or curr >= len(c) or curr >= len(sa) or curr >= len(sb):
             return False
-        if np.isnan(sa[curr]) or np.isnan(sb[curr]):
+        if np.isnan(sa[curr]) or np.isnan(sb[curr]) or np.isnan(c[curr]):
             return False
 
         cloud_bottom_curr = min(sa[curr], sb[curr])
+        if open_prices is not None:
+            o = BaseIndicator.to_numpy(open_prices)
+            if curr >= len(o) or np.isnan(o[curr]):
+                return False
+            return bool(o[curr] > cloud_bottom_curr and c[curr] < cloud_bottom_curr)
+
+        prev = curr - 1
+        if prev < 0 or np.isnan(sa[prev]) or np.isnan(sb[prev]):
+            return False
         cloud_bottom_prev = min(sa[prev], sb[prev])
         return bool(c[prev] >= cloud_bottom_prev and c[curr] < cloud_bottom_curr)
 
@@ -272,6 +417,9 @@ class Ichimoku(BaseIndicator):
         senkou_span_a: IndicatorSeries | np.ndarray[Any, Any],
         senkou_span_b: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
+        *,
+        close_prices: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        signal_strength: int = 0,
     ) -> bool:
         """Check if Senkou Span A crossed above Senkou Span B."""
         logger.info("Evaluating Ichimoku senkou_span_cross_bullish at shift=%d", shift)
@@ -283,13 +431,25 @@ class Ichimoku(BaseIndicator):
             return False
         if np.isnan(sa[curr]) or np.isnan(sb[curr]) or np.isnan(sa[prev]):
             return False
-        return bool(sa[prev] <= sb[prev] and sa[curr] > sb[curr])
+        if not (sa[prev] <= sb[prev] and sa[curr] > sb[curr]):
+            return False
+        if close_prices is not None and signal_strength > 0:
+            c = BaseIndicator.to_numpy(close_prices)
+            if curr >= len(c) or np.isnan(c[curr]):
+                return False
+            return Ichimoku._check_strength_bullish(
+                float(c[curr]), sa, sb, curr, signal_strength
+            )
+        return True
 
     @staticmethod
     def senkou_span_cross_bearish(
         senkou_span_a: IndicatorSeries | np.ndarray[Any, Any],
         senkou_span_b: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
+        *,
+        close_prices: IndicatorSeries | np.ndarray[Any, Any] | None = None,
+        signal_strength: int = 0,
     ) -> bool:
         """Check if Senkou Span A crossed below Senkou Span B."""
         logger.info("Evaluating Ichimoku senkou_span_cross_bearish at shift=%d", shift)
@@ -301,4 +461,13 @@ class Ichimoku(BaseIndicator):
             return False
         if np.isnan(sa[curr]) or np.isnan(sb[curr]) or np.isnan(sa[prev]):
             return False
-        return bool(sa[prev] >= sb[prev] and sa[curr] < sb[curr])
+        if not (sa[prev] >= sb[prev] and sa[curr] < sb[curr]):
+            return False
+        if close_prices is not None and signal_strength > 0:
+            c = BaseIndicator.to_numpy(close_prices)
+            if curr >= len(c) or np.isnan(c[curr]):
+                return False
+            return Ichimoku._check_strength_bearish(
+                float(c[curr]), sa, sb, curr, signal_strength
+            )
+        return True

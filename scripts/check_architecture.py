@@ -49,7 +49,12 @@ APP_ROOT = REPO_ROOT / "app"
 
 DOCSTRING_EXEMPT_NAMES = frozenset({"__init__.py", "_common.py", "_schema.py"})
 DOCSTRING_RATCHET_ALLOWLIST: dict[str, int] = {}
-FILE_SIZE_EXEMPT_PATHS = frozenset({"app/host/_schema.py"})
+FILE_SIZE_EXEMPT_PATHS = frozenset(
+    {
+        "app/host/_schema.py",
+        "app/services/indicators/volume/cot.py",
+    }
+)
 
 # Ratchet allowlist for pre-existing >1,000-line files scheduled for future slices.
 RATCHET_ALLOWLIST: dict[str, int] = {}

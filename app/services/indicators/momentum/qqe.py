@@ -3,32 +3,36 @@
 Description:
     Implements the Quantitative Qualitative Estimation (QQE) indicator,
     combining a smoothed Relative Strength Index (Value1) with a dynamic
-    trailing volatility stop line (Value2) derived from Wilders double-smoothed
-    ATR of RSI. Provides condition evaluators for signal crossovers and trends.
+    trailing volatility stop line (Value2) derived from Wilder's double-smoothed
+    ATR of RSI. Provides condition evaluators for signal crossovers, level
+    thresholds, direction changes, and slopes.
 
 Purpose:
-    FEAT-SERVICES-INDICATOR-QQE
+    FEAT-SERVICES-INDICATOR-QQE: QQE calculation and condition evaluators.
 
 Key Capabilities:
     - FR-SERVICES-QQE-CALCULATE: Computes QQE Value1 (Fast) and Value2 (Slow).
-    - FR-SERVICES-QQE-CONDITIONS: Evaluates line crossovers, relative values, slopes.
+    - FR-SERVICES-QQE-CONDITIONS: Evaluates crossovers, levels, and slopes.
 
 Python API Usage:
     ```python
-    from app.services.indicators.qqe import QQE
+    from app.services.indicators.momentum.qqe import QQE
 
     qqe_res = QQE.calculate(close, rsi_period=14, sf=5, wf=4.236)
     val1 = qqe_res["value1"]
     val2 = qqe_res["value2"]
 
-    # Condition checks
     cross_up = QQE.value1_crosses_above_value2(val1, val2, shift=0)
     is_rising = QQE.value1_is_rising(val1, shift=0)
     ```
 
 CLI Usage:
-    N/A (Analytical block module invoked by strategy authoring and engine runners).
+    ```bash
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py -k "qqe"
+    ```
 """
+
+from __future__ import annotations
 
 from typing import Any, override
 
@@ -56,20 +60,7 @@ class QQE(BaseIndicator):
         sf: int = DEFAULT_SF,
         wf: float = DEFAULT_WF,
     ) -> dict[str, IndicatorSeries]:
-        """Compute QQE Value1 (Fast smoothed RSI) and Value2 (Slow trailing stop).
-
-        Args:
-            price: Input price series (typically Close).
-            rsi_period: Lookback period for raw RSI (must be >= 2).
-            sf: Smoothing period for RSI to generate Value1 (must be >= 1).
-            wf: Multiplier factor for volatility ATR band (default 4.236).
-
-        Returns:
-            Dictionary containing 'value1' and 'value2' IndicatorSeries.
-
-        Raises:
-            ValueError: If rsi_period < 2, sf < 1, wf <= 0, or series is empty.
-        """
+        """Compute QQE Value1 (Fast smoothed RSI) and Value2 (Slow trailing stop)."""
         logger.info(
             "QQE calculation initiated: rsi_period=%d, sf=%d, wf=%.3f",
             rsi_period,
@@ -191,22 +182,22 @@ class QQE(BaseIndicator):
         return val2
 
     @staticmethod
+    def _as_series(s: IndicatorSeries | np.ndarray[Any, Any]) -> IndicatorSeries:
+        return (
+            s
+            if isinstance(s, IndicatorSeries)
+            else IndicatorSeries(BaseIndicator.to_numpy(s))
+        )
+
+    @staticmethod
     def value1_crosses_above_value2(
         value1: IndicatorSeries | np.ndarray[Any, Any],
         value2: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if Value1 crossed above Value2."""
+        """Evaluate QQEValue1CrossAboveValue2."""
         logger.info("Evaluating QQE value1_crosses_above_value2 at shift=%d", shift)
-        v1 = BaseIndicator.to_numpy(value1)
-        v2 = BaseIndicator.to_numpy(value2)
-        curr = len(v1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(v1) or curr >= len(v2):
-            return False
-        if np.isnan(v1[curr]) or np.isnan(v2[curr]) or np.isnan(v1[prev]):
-            return False
-        return bool(v1[prev] <= v2[prev] and v1[curr] > v2[curr])
+        return QQE._as_series(value1).crosses_above(QQE._as_series(value2), shift)
 
     @staticmethod
     def value1_crosses_below_value2(
@@ -214,17 +205,9 @@ class QQE(BaseIndicator):
         value2: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if Value1 crossed below Value2."""
+        """Evaluate QQEValue1CrossBelowValue2."""
         logger.info("Evaluating QQE value1_crosses_below_value2 at shift=%d", shift)
-        v1 = BaseIndicator.to_numpy(value1)
-        v2 = BaseIndicator.to_numpy(value2)
-        curr = len(v1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(v1) or curr >= len(v2):
-            return False
-        if np.isnan(v1[curr]) or np.isnan(v2[curr]) or np.isnan(v1[prev]):
-            return False
-        return bool(v1[prev] >= v2[prev] and v1[curr] < v2[curr])
+        return QQE._as_series(value1).crosses_below(QQE._as_series(value2), shift)
 
     @staticmethod
     def value1_higher_value2(
@@ -232,16 +215,9 @@ class QQE(BaseIndicator):
         value2: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if Value1 is strictly greater than Value2."""
+        """Evaluate QQEValue1HigherValue2."""
         logger.info("Evaluating QQE value1_higher_value2 at shift=%d", shift)
-        v1 = BaseIndicator.to_numpy(value1)
-        v2 = BaseIndicator.to_numpy(value2)
-        idx = len(v1) - 1 - shift
-        if idx < 0 or idx >= len(v1) or idx >= len(v2):
-            return False
-        if np.isnan(v1[idx]) or np.isnan(v2[idx]):
-            return False
-        return bool(v1[idx] > v2[idx])
+        return QQE._as_series(value1).is_greater(QQE._as_series(value2), shift)
 
     @staticmethod
     def value1_lower_value2(
@@ -249,41 +225,92 @@ class QQE(BaseIndicator):
         value2: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if Value1 is strictly lower than Value2."""
+        """Evaluate QQEValue1LowerValue2."""
         logger.info("Evaluating QQE value1_lower_value2 at shift=%d", shift)
-        v1 = BaseIndicator.to_numpy(value1)
-        v2 = BaseIndicator.to_numpy(value2)
-        idx = len(v1) - 1 - shift
-        if idx < 0 or idx >= len(v1) or idx >= len(v2):
-            return False
-        if np.isnan(v1[idx]) or np.isnan(v2[idx]):
-            return False
-        return bool(v1[idx] < v2[idx])
+        return QQE._as_series(value1).is_lower(QQE._as_series(value2), shift)
 
     @staticmethod
     def value1_is_rising(
         value1: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if Value1 is rising."""
+        """Evaluate QQEValue1Rising."""
         logger.info("Evaluating QQE value1_is_rising at shift=%d", shift)
-        v1 = BaseIndicator.to_numpy(value1)
-        curr = len(v1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(v1) or np.isnan(v1[curr]) or np.isnan(v1[prev]):
-            return False
-        return bool(v1[curr] > v1[prev])
+        return QQE._as_series(value1).is_rising(shift)
 
     @staticmethod
     def value1_is_falling(
         value1: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if Value1 is falling."""
+        """Evaluate QQEValue1Falling."""
         logger.info("Evaluating QQE value1_is_falling at shift=%d", shift)
-        v1 = BaseIndicator.to_numpy(value1)
-        curr = len(v1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(v1) or np.isnan(v1[curr]) or np.isnan(v1[prev]):
-            return False
-        return bool(v1[curr] < v1[prev])
+        return QQE._as_series(value1).is_falling(shift)
+
+    @staticmethod
+    def value1_changes_up(
+        value1: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate QQEValue1ChangesUp."""
+        return QQE._as_series(value1).changes_up(shift)
+
+    @staticmethod
+    def value1_changes_down(
+        value1: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate QQEValue1ChangesDown."""
+        return QQE._as_series(value1).changes_down(shift)
+
+    @staticmethod
+    def value1_crosses_above(
+        value1: IndicatorSeries | np.ndarray[Any, Any],
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate QQEValue1CrossAbove level."""
+        return QQE._as_series(value1).crosses_above(level, shift)
+
+    @staticmethod
+    def value1_crosses_below(
+        value1: IndicatorSeries | np.ndarray[Any, Any],
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate QQEValue1CrossBelow level."""
+        return QQE._as_series(value1).crosses_below(level, shift)
+
+    @staticmethod
+    def value1_is_higher(
+        value1: IndicatorSeries | np.ndarray[Any, Any],
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate QQEValue1Higher than level."""
+        return QQE._as_series(value1).is_greater(level, shift)
+
+    @staticmethod
+    def value1_is_lower(
+        value1: IndicatorSeries | np.ndarray[Any, Any],
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate QQEValue1Lower than level."""
+        return QQE._as_series(value1).is_lower(level, shift)
+
+    @staticmethod
+    def value2_is_rising(
+        value2: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate QQEValue2Rising."""
+        return QQE._as_series(value2).is_rising(shift)
+
+    @staticmethod
+    def value2_is_falling(
+        value2: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate QQEValue2Falling."""
+        return QQE._as_series(value2).is_falling(shift)

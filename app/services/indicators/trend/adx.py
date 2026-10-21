@@ -1,10 +1,9 @@
 """Average Directional Movement Index (ADX) indicator family.
 
 Description:
-    Computes ADX (Main ADX, +DI, and -DI) according to StrategyQuant X
-    specification using Wilder's directional movement smoothing. Consolidates
-    calculations and all directional trend strength and DI cross conditions
-    into a unified Python module.
+    Computes ADX (Main ADX, +DI, and -DI) using Wilder's directional movement
+    smoothing. Consolidates calculations and all directional trend strength,
+    slope, level, and DI crossover conditions into a unified Python module.
 
 Purpose:
     FEAT-SERVICES-INDICATOR-ADX: Average Directional Movement Index and conditions.
@@ -13,14 +12,16 @@ Key Capabilities:
     - FR-SERVICES-ADX-CALCULATE: Compute +DI, -DI, DX, and smoothed ADX series.
       Associated: `ADX.calculate()`
       Logging: INFO when calculation completes; WARNING on invalid inputs.
-    - FR-SERVICES-ADX-CONDITIONS: Evaluate trend strength thresholds and DI crossovers.
-      Associated: `ADX.di_plus_crosses_above_di_minus()`, `ADX.is_trending()`
+    - FR-SERVICES-ADX-CONDITIONS: Evaluate trend strength thresholds, slopes, and
+      DI crossovers.
+      Associated: `ADX.di_plus_crosses_above_di_minus()`, `ADX.is_trending()`,
+      `ADX.is_rising()`
       Logging: DEBUG on evaluation of ADX conditions.
 
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.adx import ADX
+    from app.services.indicators.trend.adx import ADX
 
     high = np.array([12.0, 12.5, 12.8, 12.2, 13.0, 12.9, 13.2])
     low = np.array([11.2, 11.5, 12.0, 11.8, 12.1, 12.0, 12.5])
@@ -28,13 +29,11 @@ Python API Usage:
 
     adx_dict = ADX.calculate(high, low, close, period=14)
     adx_line = adx_dict["main"]
-    di_plus = adx_dict["di_plus"]
-    di_minus = adx_dict["di_minus"]
     ```
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_indicators.py -k "test_adx" --no-cov
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py -k "adx"
     ```
 """
 
@@ -97,17 +96,7 @@ class ADX(BaseIndicator):
         close: np.ndarray | Sequence[float],
         period: int = 14,
     ) -> dict[str, IndicatorSeries]:
-        """Compute the ADX Main, +DI, and -DI series.
-
-        Args:
-            high: High prices array.
-            low: Low prices array.
-            close: Close prices array.
-            period: Smoothing period (default 14).
-
-        Returns:
-            Dictionary with 'main', 'di_plus', and 'di_minus' series (0 to 100).
-        """
+        """Compute the ADX Main, +DI, and -DI series."""
         high_arr = np.asarray(high, dtype=np.float64)
         low_arr = np.asarray(low, dtype=np.float64)
         close_arr = np.asarray(close, dtype=np.float64)
@@ -167,7 +156,82 @@ class ADX(BaseIndicator):
             "di_minus": IndicatorSeries(di_minus_arr, name="ADX.DIMinus"),
         }
 
+    @staticmethod
+    def _extract_main(
+        adx: dict[str, IndicatorSeries] | IndicatorSeries,
+    ) -> IndicatorSeries:
+        """Resolve ADX Main series from dictionary or direct IndicatorSeries."""
+        return adx["main"] if isinstance(adx, dict) else adx
+
     # Unified condition helpers
+    @classmethod
+    def is_rising(
+        cls, adx: dict[str, IndicatorSeries] | IndicatorSeries, shift: int = 0
+    ) -> bool:
+        """Evaluate ADXRising condition (`Main[shift + 1] < Main[shift]`)."""
+        return cls._extract_main(adx).is_rising(shift)
+
+    @classmethod
+    def is_falling(
+        cls, adx: dict[str, IndicatorSeries] | IndicatorSeries, shift: int = 0
+    ) -> bool:
+        """Evaluate ADXFalling condition (`Main[shift + 1] > Main[shift]`)."""
+        return cls._extract_main(adx).is_falling(shift)
+
+    @classmethod
+    def is_higher(
+        cls,
+        adx: dict[str, IndicatorSeries] | IndicatorSeries,
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate ADXHigher condition (`Main[shift] > level`)."""
+        return cls._extract_main(adx).is_greater(level, shift)
+
+    @classmethod
+    def is_lower(
+        cls,
+        adx: dict[str, IndicatorSeries] | IndicatorSeries,
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate ADXLower condition (`Main[shift] < level`)."""
+        return cls._extract_main(adx).is_lower(level, shift)
+
+    @classmethod
+    def crosses_above(
+        cls,
+        adx: dict[str, IndicatorSeries] | IndicatorSeries,
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate ADXCrossUp condition (`Main` crosses above `level`)."""
+        return cls._extract_main(adx).crosses_above(level, shift)
+
+    @classmethod
+    def crosses_below(
+        cls,
+        adx: dict[str, IndicatorSeries] | IndicatorSeries,
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate ADXCrossDown condition (`Main` crosses below `level`)."""
+        return cls._extract_main(adx).crosses_below(level, shift)
+
+    @classmethod
+    def changes_up(
+        cls, adx: dict[str, IndicatorSeries] | IndicatorSeries, shift: int = 0
+    ) -> bool:
+        """Evaluate ADXChangesUp condition (`Main[s+2] > Main[s+1] < Main[s]`)."""
+        return cls._extract_main(adx).changes_up(shift)
+
+    @classmethod
+    def changes_down(
+        cls, adx: dict[str, IndicatorSeries] | IndicatorSeries, shift: int = 0
+    ) -> bool:
+        """Evaluate ADXChangesDown condition (`Main[s+2] < Main[s+1] > Main[s]`)."""
+        return cls._extract_main(adx).changes_down(shift)
+
     @classmethod
     def di_plus_crosses_above_di_minus(
         cls, adx_dict: dict[str, IndicatorSeries], shift: int = 0

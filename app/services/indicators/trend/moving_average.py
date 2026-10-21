@@ -2,26 +2,28 @@
 
 Description:
     Computes Moving Averages across standard methods (Simple, Exponential,
-    Smoothed/Wilder, and Linear Weighted) according to StrategyQuant X
-    MovingAverage specification. Consolidates calculations and all trend/cross
-    conditions into a unified Python module.
+    Smoothed/Wilder, Linear Weighted, and Triple Exponential). Consolidates
+    calculations and all trend, crossover, and bar open/close vs. MA conditions
+    into a unified Python module.
 
 Purpose:
     FEAT-SERVICES-INDICATOR-MA: Moving average trend smoothing and conditions.
 
 Key Capabilities:
-    - FR-SERVICES-MA-CALCULATE: Compute SMA, EMA, SMMA, and LWMA series.
+    - FR-SERVICES-MA-CALCULATE: Compute SMA, EMA, SMMA, LWMA, and TEMA series.
       Associated: `MovingAverage.calculate()`, `MovingAverage.sma()`,
-      `MovingAverage.ema()`
+      `MovingAverage.ema()`, `MovingAverage.tema()`
       Logging: INFO when calculation completes; WARNING on invalid inputs.
-    - FR-SERVICES-MA-CONDITIONS: Evaluate trend directions and crossovers.
-      Associated: `MovingAverage.crosses_above()`, `MovingAverage.is_rising()`
+    - FR-SERVICES-MA-CONDITIONS: Evaluate trend directions, crossovers, and bar
+      opens/closes.
+      Associated: `MovingAverage.crosses_above()`, `MovingAverage.is_rising()`,
+      `MovingAverage.bar_closes_above()`, `MovingAverage.bar_opens_above()`
       Logging: DEBUG on evaluation of MA conditions.
 
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.moving_average import MovingAverage
+    from app.services.indicators.trend.moving_average import MovingAverage
 
     close = np.array([10.0, 10.5, 11.0, 10.8, 11.2, 11.5, 12.0])
     sma20 = MovingAverage.calculate(close, period=5, method=MovingAverage.SMA)
@@ -31,7 +33,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_indicators.py -k moving_average --no-cov
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py -k "ma"
     ```
 """
 
@@ -48,7 +50,7 @@ logger = get_logger(__name__)
 
 
 class MovingAverage(BaseIndicator):
-    """Moving Average family supporting SMA, EMA, SMMA, and LWMA methods."""
+    """Moving Average family supporting SMA, EMA, SMMA, LWMA, and TEMA methods."""
 
     name = "(MA) Moving Average"
     category = "Indicators"
@@ -57,6 +59,7 @@ class MovingAverage(BaseIndicator):
     EMA = 1
     SMMA = 2
     LWMA = 3
+    TEMA = 4
 
     @classmethod
     def sma(cls, data: np.ndarray, period: int) -> np.ndarray:
@@ -114,6 +117,31 @@ class MovingAverage(BaseIndicator):
         return out
 
     @classmethod
+    def tema(cls, data: np.ndarray, period: int) -> np.ndarray:
+        """Calculate Triple Exponential Moving Average (`3*EMA1 - 3*EMA2 + EMA3`)."""
+        n = len(data)
+        out = np.full(n, np.nan, dtype=np.float64)
+        if n < period:
+            return out
+
+        ema1 = cls.ema(data, period)
+        valid1 = np.where(~np.isnan(ema1))[0]
+        if len(valid1) < period:
+            return out
+        ema2 = np.full(n, np.nan, dtype=np.float64)
+        ema2[valid1[0] :] = cls.ema(ema1[valid1[0] :], period)
+
+        valid2 = np.where(~np.isnan(ema2))[0]
+        if len(valid2) < period:
+            return out
+        ema3 = np.full(n, np.nan, dtype=np.float64)
+        ema3[valid2[0] :] = cls.ema(ema2[valid2[0] :], period)
+
+        valid3 = ~np.isnan(ema3)
+        out[valid3] = 3.0 * ema1[valid3] - 3.0 * ema2[valid3] + ema3[valid3]
+        return out
+
+    @classmethod
     @override
     def calculate(
         cls,
@@ -121,16 +149,7 @@ class MovingAverage(BaseIndicator):
         period: int = 14,
         method: int = 0,
     ) -> IndicatorSeries:
-        """Compute the Moving Average series.
-
-        Args:
-            data: Input price series.
-            period: Smoothing period (default 14).
-            method: 0=SMA, 1=EMA, 2=SMMA, 3=LWMA.
-
-        Returns:
-            IndicatorSeries containing the smoothed moving average.
-        """
+        """Compute the Moving Average series."""
         arr = np.asarray(data, dtype=np.float64)
         if period <= 0:
             logger.warning(
@@ -139,7 +158,7 @@ class MovingAverage(BaseIndicator):
             )
             period = 14
 
-        method_names = {0: "SMA", 1: "EMA", 2: "SMMA", 3: "LWMA"}
+        method_names = {0: "SMA", 1: "EMA", 2: "SMMA", 3: "LWMA", 4: "TEMA"}
         m_name = method_names.get(method, "SMA")
 
         if method == cls.EMA:
@@ -148,6 +167,8 @@ class MovingAverage(BaseIndicator):
             res = cls.smma(arr, period)
         elif method == cls.LWMA:
             res = cls.lwma(arr, period)
+        elif method == cls.TEMA:
+            res = cls.tema(arr, period)
         else:
             res = cls.sma(arr, period)
 
@@ -159,15 +180,21 @@ class MovingAverage(BaseIndicator):
         )
         return IndicatorSeries(res, name=f"MA({m_name},{period})")
 
+    @staticmethod
+    def _as_series(
+        s: IndicatorSeries | Sequence[float] | np.ndarray,
+    ) -> IndicatorSeries:
+        return s if isinstance(s, IndicatorSeries) else IndicatorSeries(s)
+
     # Unified condition helpers
     @classmethod
     def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate MA is rising condition."""
+        """Evaluate MARising condition (`MA[shift] > MA[shift + 1]`)."""
         return series.is_rising(shift)
 
     @classmethod
     def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate MA is falling condition."""
+        """Evaluate MAFalling condition (`MA[shift] < MA[shift + 1]`)."""
         return series.is_falling(shift)
 
     @classmethod
@@ -209,3 +236,83 @@ class MovingAverage(BaseIndicator):
     ) -> bool:
         """Evaluate MA is lower than another MA or level."""
         return series.is_lower(other, shift)
+
+    @classmethod
+    def bar_closes_above(
+        cls,
+        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        ma_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate MABarClosesAbove (`Close[shift] > MA[shift]`)."""
+        return cls._as_series(close_series).is_greater(cls._as_series(ma_series), shift)
+
+    @classmethod
+    def bar_closes_below(
+        cls,
+        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        ma_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate MABarClosesBelow (`Close[shift] < MA[shift]`)."""
+        return cls._as_series(close_series).is_lower(cls._as_series(ma_series), shift)
+
+    @classmethod
+    def bar_opens_above(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        ma_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate MABarOpensAbove (`Open[shift] > MA[shift + 1]`)."""
+        o = cls._as_series(open_series).get(shift)
+        m = cls._as_series(ma_series).get(shift + 1)
+        if np.isnan(o) or np.isnan(m):
+            return False
+        return o > m
+
+    @classmethod
+    def bar_opens_below(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        ma_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate MABarOpensBelow (`Open[shift] < MA[shift + 1]`)."""
+        o = cls._as_series(open_series).get(shift)
+        m = cls._as_series(ma_series).get(shift + 1)
+        if np.isnan(o) or np.isnan(m):
+            return False
+        return o < m
+
+    @classmethod
+    def bar_opens_above_after_open_below(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        ma_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate MABarOpensAboveAfterOpenBelow (`Open[s+1] < MA[s+1] < Open[s]`)."""
+        os = cls._as_series(open_series)
+        o0 = os.get(shift)
+        o1 = os.get(shift + 1)
+        m1 = cls._as_series(ma_series).get(shift + 1)
+        if np.isnan(o0) or np.isnan(o1) or np.isnan(m1):
+            return False
+        return o1 < m1 and o0 > m1
+
+    @classmethod
+    def bar_opens_below_after_open_above(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        ma_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate MABarOpensBelowAfterOpenAbove (`Open[s+1] > MA[s+1] > Open[s]`)."""
+        os = cls._as_series(open_series)
+        o0 = os.get(shift)
+        o1 = os.get(shift + 1)
+        m1 = cls._as_series(ma_series).get(shift + 1)
+        if np.isnan(o0) or np.isnan(o1) or np.isnan(m1):
+            return False
+        return o1 > m1 and o0 < m1

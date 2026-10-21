@@ -1,9 +1,9 @@
 """Stochastic Oscillator (STOCH) indicator family.
 
 Description:
-    Computes Stochastic Oscillator (%K, Slow %K, and Slow %D) according to
-    StrategyQuant X specification. Consolidates calculations and all %K/%D line
-    crossovers, overbought, and oversold conditions into a unified Python module.
+    Computes Stochastic Oscillator (%K, Slow %K, and Slow %D) and consolidates
+    all %K/%D line crossovers, level crosses, Slow %D slopes, thresholds, and
+    direction changes into a unified Python module.
 
 Purpose:
     FEAT-SERVICES-INDICATOR-STOCH: Stochastic momentum oscillator and conditions.
@@ -12,15 +12,16 @@ Key Capabilities:
     - FR-SERVICES-STOCH-CALCULATE: Compute %K and %D series.
       Associated: `Stochastic.calculate()`
       Logging: INFO when calculation completes; WARNING on invalid inputs.
-    - FR-SERVICES-STOCH-CONDITIONS: Evaluate %K/%D crossovers and overbought levels.
-      Associated: `Stochastic.k_crosses_above_d()`,
-      `Stochastic.k_crosses_below_d()`
+    - FR-SERVICES-STOCH-CONDITIONS: Evaluate %K/%D crossovers, Slow %D slopes,
+      and levels.
+      Associated: `Stochastic.k_crosses_above_d()`, `Stochastic.d_is_rising()`,
+      `Stochastic.d_crosses_above()`
       Logging: DEBUG on evaluation of Stochastic conditions.
 
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.stochastic import Stochastic
+    from app.services.indicators.momentum.stochastic import Stochastic
 
     high = np.array([12.0, 12.5, 12.8, 12.2, 13.0, 12.9, 13.2])
     low = np.array([11.2, 11.5, 12.0, 11.8, 12.1, 12.0, 12.5])
@@ -33,7 +34,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_indicators.py -k "test_stochastic" --no-cov
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py -k "stochastic"
     ```
 """
 
@@ -68,19 +69,7 @@ class Stochastic(BaseIndicator):
         d_period: int = 3,
         slowing: int = 3,
     ) -> dict[str, IndicatorSeries]:
-        """Compute the Stochastic %K and %D series.
-
-        Args:
-            high: High prices array.
-            low: Low prices array.
-            close: Close prices array.
-            k_period: Lookback period for highest high/lowest low (default 14).
-            d_period: %D smoothing period (default 3).
-            slowing: %K slowing smoothing period (default 3).
-
-        Returns:
-            Dictionary with 'k' and 'd' series (0 to 100).
-        """
+        """Compute the Stochastic %K and %D series."""
         high_arr = np.asarray(high, dtype=np.float64)
         low_arr = np.asarray(low, dtype=np.float64)
         close_arr = np.asarray(close, dtype=np.float64)
@@ -109,7 +98,6 @@ class Stochastic(BaseIndicator):
             else:
                 raw_k[i] = 50.0
 
-        # Slow %K
         valid_k_idx = np.where(~np.isnan(raw_k))[0]
         slow_k = np.full(n, np.nan, dtype=np.float64)
         if len(valid_k_idx) >= slowing:
@@ -117,7 +105,6 @@ class Stochastic(BaseIndicator):
             valid_slice = raw_k[first_idx:]
             slow_k[first_idx:] = MovingAverage.sma(valid_slice, slowing)
 
-        # Slow %D
         valid_d_idx = np.where(~np.isnan(slow_k))[0]
         slow_d = np.full(n, np.nan, dtype=np.float64)
         if len(valid_d_idx) >= d_period:
@@ -155,10 +142,72 @@ class Stochastic(BaseIndicator):
 
     @classmethod
     def k_higher_d(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate %K is higher than %D."""
+        """Evaluate StochFastKUp (`%K[shift] > %D[shift]`)."""
         return stoch["k"].is_greater(stoch["d"], shift)
 
     @classmethod
     def k_lower_d(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate %K is lower than %D."""
+        """Evaluate StochFastKDown (`%K[shift] < %D[shift]`)."""
         return stoch["k"].is_lower(stoch["d"], shift)
+
+    @classmethod
+    def k_crosses_above(
+        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate StochFastKCrossUp (`%K` crosses above `level`)."""
+        return stoch["k"].crosses_above(level, shift)
+
+    @classmethod
+    def k_crosses_below(
+        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate StochFastKCrossDown (`%K` crosses below `level`)."""
+        return stoch["k"].crosses_below(level, shift)
+
+    @classmethod
+    def d_changes_up(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
+        """Evaluate StochSlowDChangesUp (`%D[s+2] > %D[s+1] < %D[s]`)."""
+        return stoch["d"].changes_up(shift)
+
+    @classmethod
+    def d_changes_down(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
+        """Evaluate StochSlowDChangesDown (`%D[s+2] < %D[s+1] > %D[s]`)."""
+        return stoch["d"].changes_down(shift)
+
+    @classmethod
+    def d_crosses_above(
+        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate StochSlowDCrossUp (`%D` crosses above `level`)."""
+        return stoch["d"].crosses_above(level, shift)
+
+    @classmethod
+    def d_crosses_below(
+        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate StochSlowDCrossDown (`%D` crosses below `level`)."""
+        return stoch["d"].crosses_below(level, shift)
+
+    @classmethod
+    def d_is_rising(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
+        """Evaluate StochSlowDRising (`%D[shift+1] < %D[shift]`)."""
+        return stoch["d"].is_rising(shift)
+
+    @classmethod
+    def d_is_falling(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
+        """Evaluate StochSlowDFalling (`%D[shift+1] > %D[shift]`)."""
+        return stoch["d"].is_falling(shift)
+
+    @classmethod
+    def d_is_higher(
+        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate StochSlowDHigher (`%D[shift] > level`)."""
+        return stoch["d"].is_greater(level, shift)
+
+    @classmethod
+    def d_is_lower(
+        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate StochSlowDLower (`%D[shift] < level`)."""
+        return stoch["d"].is_lower(level, shift)

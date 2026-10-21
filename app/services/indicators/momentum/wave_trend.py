@@ -3,31 +3,35 @@
 Description:
     Computes the WaveTrend oscillator (WT1 and WT2), an adaptation of the
     Commodity Channel Index smoothed with dual exponential moving averages.
-    Detects cycle extremes, zero-line transitions, and signal line crossovers.
+    Detects cycle extremes, zero-line transitions, signal line crossovers,
+    direction changes, and signal slopes.
 
 Purpose:
-    FEAT-SERVICES-INDICATOR-WAVETREND
+    FEAT-SERVICES-INDICATOR-WAVETREND: WaveTrend calculation and conditions.
 
 Key Capabilities:
     - FR-SERVICES-WAVETREND-CALCULATE: Computes WaveTrend WT1 (Main) and WT2 (Signal).
-    - FR-SERVICES-WAVETREND-CONDITIONS: Evaluates signal/zero crosses, levels, slopes.
+    - FR-SERVICES-WAVETREND-CONDITIONS: Evaluates crosses, levels, and slopes.
 
 Python API Usage:
     ```python
-    from app.services.indicators.wave_trend import WaveTrend
+    from app.services.indicators.momentum.wave_trend import WaveTrend
 
     wt = WaveTrend.calculate(high, low, close, channel_length=10, average_length=21)
     wt1 = wt["wt1"]
     wt2 = wt["wt2"]
 
-    # Condition checks
     cross_up = WaveTrend.wt1_crosses_above_wt2(wt1, wt2, shift=0)
     is_rising = WaveTrend.wt1_is_rising(wt1, shift=0)
     ```
 
 CLI Usage:
-    N/A (Analytical block module invoked by strategy authoring and engine runners).
+    ```bash
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py -k "wave_trend"
+    ```
 """
+
+from __future__ import annotations
 
 from typing import Any, override
 
@@ -59,22 +63,7 @@ class WaveTrend(BaseIndicator):
         average_length: int = DEFAULT_AVERAGE_LENGTH,
         signal_length: int = DEFAULT_SIGNAL_LENGTH,
     ) -> dict[str, IndicatorSeries]:
-        """Compute WaveTrend WT1 and WT2 series.
-
-        Args:
-            high: High prices or input typical price series.
-            low: Optional Low prices (if None, high is treated as typical price).
-            close: Optional Close prices (if None, high is treated as typical price).
-            channel_length: Smoothing period for ESA and absolute deviation.
-            average_length: Smoothing period for Channel Index (Main line WT1).
-            signal_length: Smoothing period for Signal line WT2 (default 4).
-
-        Returns:
-            Dictionary containing 'wt1' and 'wt2' IndicatorSeries.
-
-        Raises:
-            ValueError: If periods are < 2 or series lengths mismatch.
-        """
+        """Compute WaveTrend WT1 and WT2 series."""
         logger.info(
             "WaveTrend calculation initiated: ch=%d, avg=%d, sig=%d",
             channel_length,
@@ -179,22 +168,22 @@ class WaveTrend(BaseIndicator):
         return wt1, wt2
 
     @staticmethod
+    def _as_series(s: IndicatorSeries | np.ndarray[Any, Any]) -> IndicatorSeries:
+        return (
+            s
+            if isinstance(s, IndicatorSeries)
+            else IndicatorSeries(BaseIndicator.to_numpy(s))
+        )
+
+    @staticmethod
     def wt1_crosses_above_wt2(
         wt1: IndicatorSeries | np.ndarray[Any, Any],
         wt2: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if WT1 crossed above WT2."""
+        """Evaluate WaveTrendMainCrossAboveSignal."""
         logger.info("Evaluating WaveTrend wt1_crosses_above_wt2 at shift=%d", shift)
-        w1 = BaseIndicator.to_numpy(wt1)
-        w2 = BaseIndicator.to_numpy(wt2)
-        curr = len(w1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(w1) or curr >= len(w2):
-            return False
-        if np.isnan(w1[curr]) or np.isnan(w2[curr]) or np.isnan(w1[prev]):
-            return False
-        return bool(w1[prev] <= w2[prev] and w1[curr] > w2[curr])
+        return WaveTrend._as_series(wt1).crosses_above(WaveTrend._as_series(wt2), shift)
 
     @staticmethod
     def wt1_crosses_below_wt2(
@@ -202,70 +191,144 @@ class WaveTrend(BaseIndicator):
         wt2: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if WT1 crossed below WT2."""
+        """Evaluate WaveTrendMainCrossBelowSignal."""
         logger.info("Evaluating WaveTrend wt1_crosses_below_wt2 at shift=%d", shift)
-        w1 = BaseIndicator.to_numpy(wt1)
-        w2 = BaseIndicator.to_numpy(wt2)
-        curr = len(w1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(w1) or curr >= len(w2):
-            return False
-        if np.isnan(w1[curr]) or np.isnan(w2[curr]) or np.isnan(w1[prev]):
-            return False
-        return bool(w1[prev] >= w2[prev] and w1[curr] < w2[curr])
+        return WaveTrend._as_series(wt1).crosses_below(WaveTrend._as_series(wt2), shift)
 
     @staticmethod
     def wt1_crosses_above_zero(
         wt1: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if WT1 crossed above zero."""
+        """Evaluate WaveTrendMainCrossAboveZero."""
         logger.info("Evaluating WaveTrend wt1_crosses_above_zero at shift=%d", shift)
-        w1 = BaseIndicator.to_numpy(wt1)
-        curr = len(w1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(w1) or np.isnan(w1[curr]) or np.isnan(w1[prev]):
-            return False
-        return bool(w1[prev] <= 0.0 and w1[curr] > 0.0)
+        return WaveTrend._as_series(wt1).crosses_above(0.0, shift)
 
     @staticmethod
     def wt1_crosses_below_zero(
         wt1: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if WT1 crossed below zero."""
+        """Evaluate WaveTrendMainCrossBelowZero."""
         logger.info("Evaluating WaveTrend wt1_crosses_below_zero at shift=%d", shift)
-        w1 = BaseIndicator.to_numpy(wt1)
-        curr = len(w1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(w1) or np.isnan(w1[curr]) or np.isnan(w1[prev]):
-            return False
-        return bool(w1[prev] >= 0.0 and w1[curr] < 0.0)
+        return WaveTrend._as_series(wt1).crosses_below(0.0, shift)
 
     @staticmethod
     def wt1_is_rising(
         wt1: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if WT1 is rising."""
+        """Evaluate WaveTrendMainRising."""
         logger.info("Evaluating WaveTrend wt1_is_rising at shift=%d", shift)
-        w1 = BaseIndicator.to_numpy(wt1)
-        curr = len(w1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(w1) or np.isnan(w1[curr]) or np.isnan(w1[prev]):
-            return False
-        return bool(w1[curr] > w1[prev])
+        return WaveTrend._as_series(wt1).is_rising(shift)
 
     @staticmethod
     def wt1_is_falling(
         wt1: IndicatorSeries | np.ndarray[Any, Any],
         shift: int = 0,
     ) -> bool:
-        """Check if WT1 is falling."""
+        """Evaluate WaveTrendMainFalling."""
         logger.info("Evaluating WaveTrend wt1_is_falling at shift=%d", shift)
-        w1 = BaseIndicator.to_numpy(wt1)
-        curr = len(w1) - 1 - shift
-        prev = curr - 1
-        if prev < 0 or curr >= len(w1) or np.isnan(w1[curr]) or np.isnan(w1[prev]):
-            return False
-        return bool(w1[curr] < w1[prev])
+        return WaveTrend._as_series(wt1).is_falling(shift)
+
+    @staticmethod
+    def wt1_changes_up(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainChangesUp."""
+        return WaveTrend._as_series(wt1).changes_up(shift)
+
+    @staticmethod
+    def wt1_changes_down(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainChangesDown."""
+        return WaveTrend._as_series(wt1).changes_down(shift)
+
+    @staticmethod
+    def wt1_crosses_above(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainCrossAbove level."""
+        return WaveTrend._as_series(wt1).crosses_above(level, shift)
+
+    @staticmethod
+    def wt1_crosses_below(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainCrossBelow level."""
+        return WaveTrend._as_series(wt1).crosses_below(level, shift)
+
+    @staticmethod
+    def wt1_is_higher(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainHigher than level."""
+        return WaveTrend._as_series(wt1).is_greater(level, shift)
+
+    @staticmethod
+    def wt1_is_lower(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        level: float,
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainLower than level."""
+        return WaveTrend._as_series(wt1).is_lower(level, shift)
+
+    @staticmethod
+    def wt1_higher_wt2(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        wt2: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainHigherSignal (`WT1[shift] > WT2[shift]`)."""
+        return WaveTrend._as_series(wt1).is_greater(WaveTrend._as_series(wt2), shift)
+
+    @staticmethod
+    def wt1_lower_wt2(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        wt2: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainLowerSignal (`WT1[shift] < WT2[shift]`)."""
+        return WaveTrend._as_series(wt1).is_lower(WaveTrend._as_series(wt2), shift)
+
+    @staticmethod
+    def wt1_higher_zero(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainHigherZero (`WT1[shift] > 0`)."""
+        return WaveTrend._as_series(wt1).is_greater(0.0, shift)
+
+    @staticmethod
+    def wt1_lower_zero(
+        wt1: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendMainLowerZero (`WT1[shift] < 0`)."""
+        return WaveTrend._as_series(wt1).is_lower(0.0, shift)
+
+    @staticmethod
+    def wt2_is_rising(
+        wt2: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendSignalRising (`WT2[shift+1] < WT2[shift]`)."""
+        return WaveTrend._as_series(wt2).is_rising(shift)
+
+    @staticmethod
+    def wt2_is_falling(
+        wt2: IndicatorSeries | np.ndarray[Any, Any],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate WaveTrendSignalFalling (`WT2[shift+1] > WT2[shift]`)."""
+        return WaveTrend._as_series(wt2).is_falling(shift)

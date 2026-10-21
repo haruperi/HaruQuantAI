@@ -1,9 +1,9 @@
 """Moving Average Convergence Divergence (MACD) indicator family.
 
 Description:
-    Computes MACD (Main, Signal, and Histogram) according to StrategyQuant X
-    specification. Consolidates calculations and all line crossovers, zero-line
-    crosses, and histogram momentum conditions into a unified Python module.
+    Computes MACD (Main, Signal, and Histogram) and consolidates all line
+    crossovers, zero-line crosses, threshold comparisons, direction changes, and
+    signal slope conditions into a unified Python module.
 
 Purpose:
     FEAT-SERVICES-INDICATOR-MACD: MACD momentum oscillator and conditions.
@@ -12,14 +12,15 @@ Key Capabilities:
     - FR-SERVICES-MACD-CALCULATE: Compute Main line, Signal line, and Histogram.
       Associated: `MACD.calculate()`
       Logging: INFO when calculation completes; WARNING on invalid inputs.
-    - FR-SERVICES-MACD-CONDITIONS: Evaluate signal line and zero-line crossovers.
-      Associated: `MACD.main_crosses_above_signal()`, `MACD.main_crosses_below_signal()`
+    - FR-SERVICES-MACD-CONDITIONS: Evaluate signal, zero-line, and level conditions.
+      Associated: `MACD.main_crosses_above_signal()`, `MACD.main_changes_up()`,
+      `MACD.signal_is_rising()`
       Logging: DEBUG on evaluation of MACD conditions.
 
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.macd import MACD
+    from app.services.indicators.momentum.macd import MACD
 
     close = np.array([10.0, 10.5, 11.0, 10.8, 11.2, 11.5, 12.0, 12.2, 12.1])
     macd_dict = MACD.calculate(close, fast=12, slow=26, smooth=9)
@@ -30,7 +31,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/test_indicators.py -k "test_macd" --no-cov
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py -k "macd"
     ```
 """
 
@@ -62,17 +63,7 @@ class MACD(BaseIndicator):
         slow: int = 26,
         smooth: int = 9,
     ) -> dict[str, IndicatorSeries]:
-        """Compute the MACD Main, Signal, and Histogram series.
-
-        Args:
-            data: Input price series.
-            fast: Fast EMA period (default 12).
-            slow: Slow EMA period (default 26).
-            smooth: Signal smoothing period (default 9).
-
-        Returns:
-            Dictionary with 'main', 'signal', and 'histogram' series.
-        """
+        """Compute the MACD Main, Signal, and Histogram series."""
         arr = np.asarray(data, dtype=np.float64)
         n = len(arr)
 
@@ -114,40 +105,124 @@ class MACD(BaseIndicator):
     def main_crosses_above_signal(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
-        """Evaluate MACD Main crosses above Signal line."""
+        """Evaluate MACDMainCrossAboveSignal."""
         return macd_dict["main"].crosses_above(macd_dict["signal"], shift)
 
     @classmethod
     def main_crosses_below_signal(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
-        """Evaluate MACD Main crosses below Signal line."""
+        """Evaluate MACDMainCrossBelowSignal."""
         return macd_dict["main"].crosses_below(macd_dict["signal"], shift)
 
     @classmethod
     def main_higher_signal(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
-        """Evaluate MACD Main is higher than Signal line."""
+        """Evaluate MACDMainHigherSignal."""
         return macd_dict["main"].is_greater(macd_dict["signal"], shift)
 
     @classmethod
     def main_lower_signal(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
-        """Evaluate MACD Main is lower than Signal line."""
+        """Evaluate MACDMainLowerSignal."""
         return macd_dict["main"].is_lower(macd_dict["signal"], shift)
 
     @classmethod
     def main_crosses_above_zero(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
-        """Evaluate MACD Main crosses above zero line."""
+        """Evaluate MACDMainCrossAboveZero."""
         return macd_dict["main"].crosses_above(0.0, shift)
 
     @classmethod
     def main_crosses_below_zero(
         cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
     ) -> bool:
-        """Evaluate MACD Main crosses below zero line."""
+        """Evaluate MACDMainCrossBelowZero."""
         return macd_dict["main"].crosses_below(0.0, shift)
+
+    @classmethod
+    def main_changes_up(
+        cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainChangesUp (`Main[s+2] > Main[s+1] < Main[s]`)."""
+        return macd_dict["main"].changes_up(shift)
+
+    @classmethod
+    def main_changes_down(
+        cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainChangesDown (`Main[s+2] < Main[s+1] > Main[s]`)."""
+        return macd_dict["main"].changes_down(shift)
+
+    @classmethod
+    def main_crosses_above(
+        cls, macd_dict: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainCrossAbove level."""
+        return macd_dict["main"].crosses_above(level, shift)
+
+    @classmethod
+    def main_crosses_below(
+        cls, macd_dict: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainCrossBelow level."""
+        return macd_dict["main"].crosses_below(level, shift)
+
+    @classmethod
+    def main_is_rising(
+        cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainRising."""
+        return macd_dict["main"].is_rising(shift)
+
+    @classmethod
+    def main_is_falling(
+        cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainFalling."""
+        return macd_dict["main"].is_falling(shift)
+
+    @classmethod
+    def main_is_higher(
+        cls, macd_dict: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainHigher than level."""
+        return macd_dict["main"].is_greater(level, shift)
+
+    @classmethod
+    def main_is_lower(
+        cls, macd_dict: dict[str, IndicatorSeries], level: float, shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainLower than level."""
+        return macd_dict["main"].is_lower(level, shift)
+
+    @classmethod
+    def main_higher_zero(
+        cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainHigherZero (`Main[shift] > 0`)."""
+        return macd_dict["main"].is_greater(0.0, shift)
+
+    @classmethod
+    def main_lower_zero(
+        cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
+    ) -> bool:
+        """Evaluate MACDMainLowerZero (`Main[shift] < 0`)."""
+        return macd_dict["main"].is_lower(0.0, shift)
+
+    @classmethod
+    def signal_is_rising(
+        cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
+    ) -> bool:
+        """Evaluate MACDSignalRising."""
+        return macd_dict["signal"].is_rising(shift)
+
+    @classmethod
+    def signal_is_falling(
+        cls, macd_dict: dict[str, IndicatorSeries], shift: int = 0
+    ) -> bool:
+        """Evaluate MACDSignalFalling."""
+        return macd_dict["signal"].is_falling(shift)

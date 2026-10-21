@@ -7,7 +7,8 @@ Description:
     Offset = SMA(High - Low, Period) * Deviation.
     Upper = Middle + Offset.
     Lower = Middle - Offset.
-    Provides condition helpers for band touches, breakouts, and band slope direction.
+    Provides condition helpers for band closes, band opens, breakouts, and band
+    slope direction.
 
 Purpose:
     FEAT-SERVICES-INDICATOR-KELTNER: Keltner Channel calculation and conditions.
@@ -16,15 +17,16 @@ Key Capabilities:
     - FR-SERVICES-KELTNER-CALCULATE: Vectorized Upper, Middle, Lower band calculation.
       Associated: `KeltnerChannel.calculate()`
       Logging: INFO level logs on calculation completion.
-    - FR-SERVICES-KELTNER-CONDITIONS: Condition checks (crosses, above, below, slopes).
+    - FR-SERVICES-KELTNER-CONDITIONS: Condition checks (closes, opens, slopes).
       Associated: `KeltnerChannel.bar_closes_above_upper()`,
+                  `KeltnerChannel.bar_opens_above_upper()`,
                   `KeltnerChannel.upper_is_rising()`
       Logging: DEBUG level logs on condition evaluation.
 
 Python API Usage:
     ```python
     import numpy as np
-    from app.services.indicators.keltner_channel import KeltnerChannel
+    from app.services.indicators.volatility.keltner_channel import KeltnerChannel
 
     high = np.array([10.5, 11.0, 11.5, 12.0, 12.5])
     low = np.array([9.5, 10.0, 10.5, 11.0, 11.5])
@@ -35,7 +37,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.services.indicators.keltner_channel
+    uv run pytest tests/unit/services/indicators/test_indicator_gaps.py -k "keltner"
     ```
 """
 
@@ -68,18 +70,7 @@ class KeltnerChannel(BaseIndicator):
         period: int = 20,
         deviation: float = 1.5,
     ) -> dict[str, IndicatorSeries]:
-        """Compute Upper, Middle, and Lower Keltner Channel series.
-
-        Args:
-            high: High prices array.
-            low: Low prices array.
-            close: Close prices array.
-            period: Lookback period for SMA (default 20).
-            deviation: Multiplier for range offset (default 1.5).
-
-        Returns:
-            Dictionary with 'upper', 'middle', and 'lower' IndicatorSeries.
-        """
+        """Compute Upper, Middle, and Lower Keltner Channel series."""
         high_arr = np.asarray(high, dtype=np.float64)
         low_arr = np.asarray(low, dtype=np.float64)
         close_arr = np.asarray(close, dtype=np.float64)
@@ -113,46 +104,156 @@ class KeltnerChannel(BaseIndicator):
             "lower": IndicatorSeries(lower, name="KC.Lower"),
         }
 
+    @staticmethod
+    def _as_series(
+        s: IndicatorSeries | Sequence[float] | np.ndarray,
+    ) -> IndicatorSeries:
+        return s if isinstance(s, IndicatorSeries) else IndicatorSeries(s)
+
     # Unified condition helpers
     @classmethod
     def bar_closes_above_upper(
         cls,
-        close_series: IndicatorSeries,
+        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
         kc_dict: dict[str, IndicatorSeries],
         shift: int = 0,
     ) -> bool:
-        """Evaluate if Close bar at shift is higher than Upper band."""
-        return close_series.is_greater(kc_dict["upper"], shift)
+        """Evaluate KCBarClosesAboveUpper (`Close[shift] > Upper[shift]`)."""
+        return cls._as_series(close_series).is_greater(kc_dict["upper"], shift)
 
     @classmethod
     def bar_closes_below_upper(
         cls,
-        close_series: IndicatorSeries,
+        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
         kc_dict: dict[str, IndicatorSeries],
         shift: int = 0,
     ) -> bool:
-        """Evaluate if Close bar at shift is lower than Upper band."""
-        return close_series.is_lower(kc_dict["upper"], shift)
+        """Evaluate KCBarClosesBelowUpper (`Close[shift] < Upper[shift]`)."""
+        return cls._as_series(close_series).is_lower(kc_dict["upper"], shift)
 
     @classmethod
     def bar_closes_above_lower(
         cls,
-        close_series: IndicatorSeries,
+        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
         kc_dict: dict[str, IndicatorSeries],
         shift: int = 0,
     ) -> bool:
-        """Evaluate if Close bar at shift is higher than Lower band."""
-        return close_series.is_greater(kc_dict["lower"], shift)
+        """Evaluate KCBarClosesAboveLower (`Close[shift] > Lower[shift]`)."""
+        return cls._as_series(close_series).is_greater(kc_dict["lower"], shift)
 
     @classmethod
     def bar_closes_below_lower(
         cls,
-        close_series: IndicatorSeries,
+        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
         kc_dict: dict[str, IndicatorSeries],
         shift: int = 0,
     ) -> bool:
-        """Evaluate if Close bar at shift is lower than Lower band."""
-        return close_series.is_lower(kc_dict["lower"], shift)
+        """Evaluate KCBarClosesBelowLower (`Close[shift] < Lower[shift]`)."""
+        return cls._as_series(close_series).is_lower(kc_dict["lower"], shift)
+
+    @classmethod
+    def bar_opens_above_upper(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        kc_dict: dict[str, IndicatorSeries],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate KCBarOpensAboveUpper (`Open[shift] > Upper[shift + 1]`)."""
+        o = cls._as_series(open_series).get(shift)
+        u = kc_dict["upper"].get(shift + 1)
+        return not (np.isnan(o) or np.isnan(u)) and o > u
+
+    @classmethod
+    def bar_opens_below_upper(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        kc_dict: dict[str, IndicatorSeries],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate KCBarOpensBelowUpper (`Open[shift] < Upper[shift + 1]`)."""
+        o = cls._as_series(open_series).get(shift)
+        u = kc_dict["upper"].get(shift + 1)
+        return not (np.isnan(o) or np.isnan(u)) and (o < u)
+
+    @classmethod
+    def bar_opens_above_lower(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        kc_dict: dict[str, IndicatorSeries],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate KCBarOpensAboveLower (`Open[shift] > Lower[shift + 1]`)."""
+        o = cls._as_series(open_series).get(shift)
+        lo = kc_dict["lower"].get(shift + 1)
+        return not (np.isnan(o) or np.isnan(lo)) and (o > lo)
+
+    @classmethod
+    def bar_opens_below_lower(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        kc_dict: dict[str, IndicatorSeries],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate KCBarOpensBelowLower (`Open[shift] < Lower[shift + 1]`)."""
+        o = cls._as_series(open_series).get(shift)
+        lo = kc_dict["lower"].get(shift + 1)
+        return not (np.isnan(o) or np.isnan(lo)) and (o < lo)
+
+    @classmethod
+    def bar_opens_above_upper_after_open_below(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        kc_dict: dict[str, IndicatorSeries],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate KCBarOpensAboveUpperAfterOpenBelow (`Open[s+1] < Upper[s+1]`)."""
+        os = cls._as_series(open_series)
+        o0, o1, u1 = os.get(shift), os.get(shift + 1), kc_dict["upper"].get(shift + 1)
+        return not (np.isnan(o0) or np.isnan(o1) or np.isnan(u1)) and (
+            o1 < u1 and o0 > u1
+        )
+
+    @classmethod
+    def bar_opens_below_upper_after_open_above(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        kc_dict: dict[str, IndicatorSeries],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate KCBarOpensBelowUpperAfterOpenAbove (`Open[s+1] > Upper[s+1]`)."""
+        os = cls._as_series(open_series)
+        o0, o1, u1 = os.get(shift), os.get(shift + 1), kc_dict["upper"].get(shift + 1)
+        return not (np.isnan(o0) or np.isnan(o1) or np.isnan(u1)) and (
+            o1 > u1 and o0 < u1
+        )
+
+    @classmethod
+    def bar_opens_above_lower_after_open_below(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        kc_dict: dict[str, IndicatorSeries],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate KCBarOpensAboveLowerAfterOpenBelow (`Open[s+1] < Lower[s+1]`)."""
+        os = cls._as_series(open_series)
+        o0, o1, l1 = os.get(shift), os.get(shift + 1), kc_dict["lower"].get(shift + 1)
+        return not (np.isnan(o0) or np.isnan(o1) or np.isnan(l1)) and (
+            o1 < l1 and o0 > l1
+        )
+
+    @classmethod
+    def bar_opens_below_lower_after_open_above(
+        cls,
+        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
+        kc_dict: dict[str, IndicatorSeries],
+        shift: int = 0,
+    ) -> bool:
+        """Evaluate KCBarOpensBelowLowerAfterOpenAbove (`Open[s+1] > Lower[s+1]`)."""
+        os = cls._as_series(open_series)
+        o0, o1, l1 = os.get(shift), os.get(shift + 1), kc_dict["lower"].get(shift + 1)
+        return not (np.isnan(o0) or np.isnan(o1) or np.isnan(l1)) and (
+            o1 > l1 and o0 < l1
+        )
 
     @classmethod
     def upper_is_rising(
