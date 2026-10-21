@@ -31,8 +31,10 @@ from app.host import events as host_events
 from app.host.persistence import HostPersistence
 from app.host.response import (
     ApiResponse,
+    ApiResponseCLI,
     ResponseMetadata,
     StandardError,
+    StandardResponse,
 )
 from app.host.session import SessionManager, hash_password
 from app.host.settings import SettingsManager
@@ -76,9 +78,11 @@ def _create_isolated_session_manager(tmp_path: Path | None = None) -> SessionMan
 # ============================================================================
 
 
-def test_standard_response_and_error_invariants() -> None:
-    """Verify ApiResponse success, failure, unwrap, and errors."""
-    ok = ApiResponse.ok(
+def test_standard_response_and_error_invariants(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Verify StandardResponse, ApiResponse, ApiResponseCLI, and invariants."""
+    ok = StandardResponse.success(
         data={"symbol": "EURUSD"},
         message="Fetched",
         request_id="req-100",
@@ -96,13 +100,23 @@ def test_standard_response_and_error_invariants() -> None:
     assert ok_dict["status"] == "success"
     assert ok_dict["request_id"] == "req-100"
 
+    api_ok = ApiResponse.ok(
+        data={"symbol": "EURUSD"},
+        meta={"message": "Fetched", "duration_ms": 1.5, "source": "cache"},
+        request_id="req-100",
+    )
+    assert api_ok["status"] == "success"
+    assert api_ok["data"] == {"symbol": "EURUSD"}
+    assert api_ok["request_id"] == "req-100"
+    assert api_ok["metadata"]["extensions"] == {"source": "cache"}
+
     err = StandardError(
         code="FEED_DOWN",
         message="Feed offline",
         details={"retry_in": 5},
         retryable=True,
     )
-    fail: ApiResponse[dict[str, Any]] = ApiResponse.error(
+    fail: StandardResponse[dict[str, Any]] = StandardResponse.failure(
         message="Operation failed",
         error=err,
         request_id="req-101",
@@ -114,6 +128,24 @@ def test_standard_response_and_error_invariants() -> None:
     assert fail.error_code == "FEED_DOWN"
     with pytest.raises(RuntimeError, match="FEED_DOWN"):
         fail.unwrap()
+
+    api_err = ApiResponse.error(
+        code="FEED_DOWN",
+        message="Feed offline",
+        details={"retry_in": 5},
+        status_code=503,
+        request_id="req-101",
+    )
+    assert api_err["status"] == "error"
+    assert api_err["status_code"] == 503
+    assert api_err["error"]["code"] == "FEED_DOWN"
+    assert api_err["error"]["retryable"] is True
+    with pytest.raises(ValueError, match="status_code"):
+        ApiResponse.error("BAD_STATUS", "Invalid status", status_code=99)
+
+    assert ApiResponseCLI.run(["--verify", "--json"]) == 0
+    cli_out = json.loads(capsys.readouterr().out)
+    assert cli_out["status"] == "verified"
 
     # Invariant checks
     with pytest.raises(ValueError, match="Error code"):
@@ -127,7 +159,7 @@ def test_standard_response_and_error_invariants() -> None:
 
     meta = ResponseMetadata(timestamp_utc="2026-01-01T00:00:00Z")
     with pytest.raises(ValueError, match="Invalid status"):
-        ApiResponse(
+        StandardResponse(
             status="invalid",  # type: ignore[arg-type]
             message="m",
             data=None,
@@ -135,7 +167,7 @@ def test_standard_response_and_error_invariants() -> None:
             metadata=meta,
         )
     with pytest.raises(ValueError, match="must not contain an error"):
-        ApiResponse(
+        StandardResponse(
             status="success",
             message="m",
             data=None,
@@ -143,7 +175,7 @@ def test_standard_response_and_error_invariants() -> None:
             metadata=meta,
         )
     with pytest.raises(ValueError, match="must contain a StandardError"):
-        ApiResponse(
+        StandardResponse(
             status="error",
             message="m",
             data=None,
@@ -151,7 +183,7 @@ def test_standard_response_and_error_invariants() -> None:
             metadata=meta,
         )
     with pytest.raises(TypeError, match="instance of StandardError"):
-        ApiResponse(
+        StandardResponse(
             status="error",
             message="m",
             data=None,

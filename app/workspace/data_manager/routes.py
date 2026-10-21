@@ -107,7 +107,7 @@ class DataManagerWorkspace:
 
 
 def _success(data: Any, message: str = "Success") -> JSONResponse:
-    return JSONResponse(content=ApiResponse.ok(data=data, message=message).to_dict())
+    return JSONResponse(content=ApiResponse.ok(data=data, meta={"message": message}))
 
 
 def _register_home_routes(router: APIRouter, ws: DataManagerWorkspace) -> None:

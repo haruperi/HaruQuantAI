@@ -62,7 +62,7 @@ from app.host import session as _sess
 from app.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
 from app.host.logging import TelemetryLogger, get_access_logger, get_logger
 from app.host.persistence import HostPersistence
-from app.host.response import ApiResponse, StandardError
+from app.host.response import ApiResponse
 from app.host.settings import RevisionConflictError, SettingsManager, settings
 from fastapi import APIRouter, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -144,14 +144,16 @@ def extract_bearer_token(
 
 def _ok(req: Request, data: Any, msg: str = "OK", *, fx: bool = False) -> JSONResponse:
     rid = req.headers.get("x-request-id")
-    r = ApiResponse.ok(data=data, message=msg, request_id=rid, side_effects=fx)
-    return JSONResponse(status_code=200, content=r.to_dict())
+    r = ApiResponse.ok(
+        data=data, meta={"message": msg, "side_effects": fx}, request_id=rid
+    )
+    return JSONResponse(status_code=200, content=r)
 
 
 def _err(req: Request, sc: int, code: str, msg: str, det: _Pld | None = None) -> _Resp:
-    rid, err = req.headers.get("x-request-id"), StandardError(code, msg, det)
-    r = ApiResponse.error(msg, err, request_id=rid)
-    return JSONResponse(status_code=sc, content=r.to_dict())
+    rid = req.headers.get("x-request-id")
+    r = ApiResponse.error(code, msg, details=det, status_code=sc, request_id=rid)
+    return JSONResponse(status_code=sc, content=r)
 
 
 async def _jbody(req: Request) -> _Pld:
@@ -232,14 +234,19 @@ class TransportMiddleware:
             logger.exception(m, extra={"fr_id": FR_MW})
             msg = str(exc) or "Internal server error occurred."
             det = {"exception_type": type(exc).__name__}
-            err = StandardError(code="INTERNAL_SERVER_ERROR", message=msg, details=det)
-            r = ApiResponse.error("Error.", err, request_id=rid, duration_ms=dur)
+            r = ApiResponse.error(
+                "INTERNAL_SERVER_ERROR",
+                msg,
+                details=det,
+                status_code=500,
+                request_id=rid,
+            )
             h = {
                 "X-Request-Id": rid,
                 "X-Response-Time-Ms": f"{dur:.2f}",
                 **_SEC_HEADERS,
             }
-            res = JSONResponse(status_code=500, content=r.to_dict(), headers=h)
+            res = JSONResponse(status_code=500, content=r, headers=h)
             await res(scope, receive, send)
 
 

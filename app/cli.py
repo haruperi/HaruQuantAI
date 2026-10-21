@@ -441,11 +441,12 @@ def format_cli_output(
     )
     if error is not None:
         err_resp = ApiResponse.error(
+            code=error.code,
             message=error.message,
-            error=error,
+            details=error.details,
         )
         if as_json:
-            return json.dumps(err_resp.to_dict(), indent=2)
+            return json.dumps(err_resp, indent=2)
         return f"ERROR [{error.code}]: {error.message}"
 
     payload = data or {}
@@ -454,10 +455,12 @@ def format_cli_output(
 
     ok_resp = ApiResponse.ok(
         data=payload,
-        message=f"Executed CLI command '{payload.get('command', 'unknown')}'.",
+        meta={
+            "message": f"Executed CLI command '{payload.get('command', 'unknown')}'."
+        },
     )
     if as_json:
-        return json.dumps(ok_resp.to_dict(), indent=2)
+        return json.dumps(ok_resp, indent=2)
 
     lines = [f"Command: {payload.get('command', 'unknown')}"]
     for key, val in payload.items():
