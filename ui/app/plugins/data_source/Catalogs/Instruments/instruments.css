@@ -14,3 +14,6 @@
 .instrument-help{line-height:1.65;display:flex;flex-direction:column;gap:12px}.instrument-help p{margin:0}
 .instrument-conflict-count{color:var(--muted)}
 @media(max-width:650px){.instrument-fields.two{grid-template-columns:1fr}}
+
+.instruments-flow .instrument-form-body { border: 0; padding: 0; margin: 0; min-width: 0; }
+.instruments-flow .instrument-form-body:disabled { opacity: .8; }

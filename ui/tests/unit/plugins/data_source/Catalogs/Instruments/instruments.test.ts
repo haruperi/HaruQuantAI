@@ -55,17 +55,10 @@ describe('instrument management rules', () => {
     expect(() => parseInstrumentsJson(duplicateJson, brokers)).toThrow('already exists');
   });
 
-  it('manages instruments in useInstruments store', async () => {
+  it('starts the authoritative store without browser fixtures', async () => {
     const { useInstruments } = await import('../../../../../../app/plugins/data_source/Catalogs/Instruments/instrumentsStore');
-    const store = useInstruments.getState();
-    const item = { ...newInstrument('Forex'), symbol: 'TEST_SYMBOL', name: 'Test Symbol' };
-    await store.addInstrument(item, ['-1']);
-    expect(useInstruments.getState().instruments.some(row => row.symbol === 'TEST_SYMBOL')).toBe(true);
-
-    await store.editInstrument('TEST_SYMBOL', { ...item, spread: 3.5 }, ['-1']);
-    expect(useInstruments.getState().instruments.find(row => row.symbol === 'TEST_SYMBOL')?.spread).toBe(3.5);
-
-    await store.removeInstruments(['TEST_SYMBOL']);
-    expect(useInstruments.getState().instruments.some(row => row.symbol === 'TEST_SYMBOL')).toBe(false);
+    useInstruments.getState().reset();
+    expect(useInstruments.getState().instruments).toEqual([]);
+    expect(useInstruments.getState().loaded).toBe(false);
   });
 });

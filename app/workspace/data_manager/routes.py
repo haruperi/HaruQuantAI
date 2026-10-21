@@ -52,6 +52,7 @@ from fastapi.responses import JSONResponse
 
 from .help import DMHelp
 from .home import Home
+from .instruments import Instruments
 from .log import DataLog
 
 if TYPE_CHECKING:
@@ -134,6 +135,7 @@ class AppDataManager:
 
         # Initialize retained Home, Log, and Help services
         self.home = Home()
+        self.instruments = Instruments()
         self.log = DataLog(event_bus=event_bus)
         self.help = DMHelp()
 
@@ -272,6 +274,85 @@ def _register_workspace_routes(router: APIRouter, ws: AppDataManager) -> None:
             return _workspace_error(str(error), code)
 
 
+def _instrument_response(operation: Any, *args: Any, code: int = 200) -> JSONResponse:
+    try:
+        data = operation(*args)
+        return JSONResponse(status_code=code, content=ApiResponse.ok(data=data))
+    except (ValueError, LookupError, FileExistsError) as error:
+        error_code = (
+            409
+            if isinstance(error, FileExistsError)
+            else 404
+            if isinstance(error, LookupError)
+            else 422
+        )
+        return JSONResponse(
+            status_code=error_code,
+            content=ApiResponse.error(
+                "INSTRUMENT_REQUEST", str(error), status_code=error_code
+            ),
+        )
+    except RuntimeError:
+        logger.error("Instrument storage unavailable", extra={"fr_id": GATEWAY_FR})  # noqa: TRY400 - sanitized boundary
+        return JSONResponse(
+            status_code=503,
+            content=ApiResponse.error(
+                "INSTRUMENT_STORAGE",
+                "Instrument storage is unavailable. Retry the operation.",
+                status_code=503,
+            ),
+        )
+
+
+def _register_instrument_routes(router: APIRouter, ws: AppDataManager) -> None:
+    @router.get("/instruments")
+    def list_instruments(request: Request) -> JSONResponse:
+        return _instrument_response(
+            ws.instruments.instruments, dict(request.query_params)
+        )
+
+    @router.post("/instruments")
+    def add_instrument(payload: dict[str, Any]) -> JSONResponse:
+        return _instrument_response(ws.instruments.add_instrument, payload, code=201)
+
+    @router.post("/instruments/mass-edit")
+    def mass_edit_instruments(payload: dict[str, Any]) -> JSONResponse:
+        if set(payload) != {"instrument_ids", "updates"} or not isinstance(
+            payload["instrument_ids"], list
+        ):
+            return JSONResponse(
+                status_code=422,
+                content=ApiResponse.error(
+                    "INSTRUMENT_REQUEST",
+                    "Expected instrument_ids array and updates.",
+                    status_code=422,
+                ),
+            )
+        return _instrument_response(
+            ws.instruments.mass_edit_instruments,
+            payload["instrument_ids"],
+            payload["updates"],
+        )
+
+    @router.post("/instruments/clone")
+    def clone_instrument(payload: dict[str, Any]) -> JSONResponse:
+        if set(payload) != {"source_id", "new_symbol"}:
+            return JSONResponse(
+                status_code=422,
+                content=ApiResponse.error(
+                    "INSTRUMENT_REQUEST",
+                    "Expected source_id and new_symbol.",
+                    status_code=422,
+                ),
+            )
+        return _instrument_response(
+            ws.instruments.clone_instrument,
+            payload["source_id"],
+            payload["new_symbol"],
+            code=201,
+        )
+
+
 def _register_log_routes(router: APIRouter, ws: AppDataManager) -> None:
     @router.get("/logs")
     def get_data_logs(limit: int = 100) -> JSONResponse:
@@ -356,6 +437,7 @@ def create_data_manager_router(
 
     _register_home_routes(router, ws)
     _register_workspace_routes(router, ws)
+    _register_instrument_routes(router, ws)
     _register_log_routes(router, ws)
     _register_help_routes(router, ws)
 

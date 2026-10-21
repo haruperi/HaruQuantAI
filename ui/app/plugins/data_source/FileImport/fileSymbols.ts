@@ -5,6 +5,8 @@ export type CommissionModel = typeof commissionModels[number];
 export interface Swap { use: boolean; type: 'money' | 'points' | 'percent'; long: number; short: number; tripleSwapOn: string; rolloutHour: string }
 export interface Commission { model: CommissionModel; value: number; unit: string; min: number; minUnit: string; max: number; maxUnit: string }
 export interface FileInstrument {
+  id?: string; contractSize?: number | null; pipSize?: number | null; pointSize?: number; marginRate?: number; decimals?: number;
+  minVolume?: number; maxVolume?: number; lotStep?: number; tickValue?: number;
   symbol: string; name: string; type: string; broker: string; brokerName: string;
   pointValue: number; tickSize: number; tickStep: number; spread: number; slippage: number;
   minDistance: number; multiplier: number; sizeStep: number; timezone: string;
@@ -16,7 +18,7 @@ export interface FileDefinition {
   from: string; to: string; bars: number; barType: 'start' | 'end'; connection: 'History';
 }
 export interface InstrumentBroker { id: string; name: string; postfix: string; timezone: string }
-export interface InstrumentMassPatch { fields: Partial<Record<'type'|'pointValue'|'tickSize'|'tickStep'|'spread'|'slippage'|'minDistance'|'multiplier'|'sizeStep'|'commission'|'swap', boolean>>; value: FileInstrument }
+export interface InstrumentMassPatch { fields: Partial<Record<'name'|'contractSize'|'pipSize'|'marginRate'|'decimals'|'minVolume'|'maxVolume'|'lotStep'|'tickValue'|'type'|'pointValue'|'tickSize'|'tickStep'|'spread'|'slippage'|'minDistance'|'multiplier'|'sizeStep'|'commission'|'swap', boolean>>; value: FileInstrument }
 export const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 export function defaultCommission(model: CommissionModel = 'None'): Commission {
   return { model, value: model === 'Stockpicker' ? 0.0035 : 0, unit: 'share', min: 0.35, minUnit: 'money', max: 1, maxUnit: 'equity' };
@@ -53,7 +55,7 @@ export function validateInstrument(item: FileInstrument, existing: string[], bro
   if (typeof swap.use !== 'boolean' || !['money','points','percent'].includes(swap.type) || !Number.isFinite(swap.long) || !Number.isFinite(swap.short) || !days.includes(swap.tripleSwapOn) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(swap.rolloutHour)) throw new Error('Invalid swap settings.');
 }
 export function canonicalInstrument(item: FileInstrument): FileInstrument {
-  return { symbol:item.symbol,name:item.name,type:item.type,broker:item.broker,brokerName:item.brokerName,
+  return { ...Object.fromEntries(['contractSize','pipSize','pointSize','marginRate','decimals','minVolume','maxVolume','lotStep','tickValue'].filter(key => key in item).map(key => [key, item[key as keyof FileInstrument]])), symbol:item.symbol,name:item.name,type:item.type,broker:item.broker,brokerName:item.brokerName,
     pointValue:item.pointValue,tickSize:item.tickSize,tickStep:item.tickStep,spread:item.spread,slippage:item.slippage,
     minDistance:item.minDistance,multiplier:item.multiplier,sizeStep:item.sizeStep,timezone:item.timezone,
     commission:{...item.commission},swap:{...item.swap} };

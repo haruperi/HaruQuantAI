@@ -1,15 +1,24 @@
 # HaruQuantAI Authoritative Data Manager Workspace (Stage 2B)
 
 Authoritative backend domain registry, catalog governance, and REST endpoints
-for the Data Manager workspace (`app/workspace/data_manager/`), implementing
-StrategyQuant X parity for market data acquisition, inspection, transformation,
-and multi-format export.
+for the Data Manager workspace (`app/workspace/data_manager/`), covering target
+market data acquisition, inspection, transformation and multi-format export.
+Registered target scope does not establish independently verified donor parity.
 
 ---
 
 ## 1. Domain Registry (`FEAT-DATAMGR-*`, `FR-DATAMGR-*`, `DEC-DATAMGR-*`)
 
 ### 1.1 Architectural Decisions
+- `DEC-DATAMGR-INSTR-SPEC-EXTENSIONS`: Instrument columns remain authoritative in
+  `datamgr_instruments`. Version-1 `host_entities` payloads of type
+  `datamgr_instrument_specs`, keyed by immutable symbol, hold independent
+  `contract_size`, `pip_size` and full `swap_settings`; all associated writes use
+  `HostPersistence.apply_batch()`. Legacy absent values return null. Monetary
+  `point_value` never establishes contract size; computed `point_size` is only
+  the decimal price quantum `10 ** (-decimals)`. Commission settings use versioned
+  JSON in the existing TEXT column, preserving legacy numeric strings on unrelated
+  edits. No schema migration or automatic browser catalog import is performed.
 - `DEC-DATAMGR-DOCKABLE-SHELL`: AppDataManager supplies stable panel IDs and
   Dockview hosts the five core catalog panels with group headers hidden so the
   existing top tabs serve as the single navigation row; top-bar Arrange actions
@@ -69,6 +78,28 @@ and multi-format export.
 
 #### Module 3: Instruments Catalog (`instruments.py`)
 - `FEAT-DATAMGR-INSTRUMENTS`: InstrumentInfo specifications, trading costs, aliases, and SQX XML.
+- `FR-DATAMGR-INSTR-LIST`: `Instruments.instruments(filters: Mapping[str, Any] | None = None) -> list[dict[str, Any]]`;
+  lists all saved instruments via GET `/data/instruments`, with optional search,
+  broker_id, connection and data_type filters. The Instruments top tab renders
+  only this server catalog, with loading, empty, stale/error and retry states.
+- `FR-DATAMGR-INSTR-ADD`: `Instruments.add_instrument(instrument: Mapping[str, Any]) -> dict[str, Any]`;
+  POST `/data/instruments` creates a unique symbol, requiring independent positive
+  contract/pip sizes, validating specifications and returning the created record.
+- `FR-DATAMGR-INSTR-MASS-EDIT`: `Instruments.mass_edit_instruments(instrument_ids: Sequence[str], updates: Mapping[str, Any]) -> dict[str, Any]`;
+  POST `/data/instruments/mass-edit` validates selected string IDs and changed
+  fields, then atomically patches only supplied mutable fields. Single-record
+  edit uses the same operation. Returns updated_count and instruments.
+- `FR-DATAMGR-INSTR-CLONE`: `Instruments.clone_instrument(source_id: str, new_symbol: str) -> dict[str, Any]`;
+  POST `/data/instruments/clone` copies the saved specification and extension,
+  retaining broker/cost metadata with fresh identity and UTC timestamps.
+- These four operations are implemented. `InstrumentsModal.tsx` awaits confirmed
+  writes and preserves failed forms; no optimistic browser-only success.
+  Add/clone return 201, duplicates 409, missing IDs 404, invalid input 422, and
+  unavailable storage 503 through authenticated ApiResponse envelopes.
+  Legacy missing contract/pip/swap settings remain explicitly unconfigured.
+  Delete, import/XML, aliases, broker retargeting during clone and cross-client
+  version conflict detection remain outside this slice. Unsupported Load/Delete
+  workspace actions are disabled; existing JSON export is read-only.
 - `FR-DATAMGR-INSTRUMENTS-MODEL`: Specification model with tick rounding and SymbolSpec conversion.
 - `FR-DATAMGR-INSTRUMENTS-CATALOG-CRUD`: Instrument catalog management in `datamgr_instruments`.
 - `FR-DATAMGR-INSTRUMENTS-XML-AND-ALIASES`: SQX XML import/export and symbol alias mapping.

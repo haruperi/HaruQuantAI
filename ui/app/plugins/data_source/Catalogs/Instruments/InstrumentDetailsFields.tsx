@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Button, Checkbox, Field, Modal, TextInput } from '../../../../components/ui';
-import { commissionModels, dataTypes, days, defaultCommission, newInstrument, type CommissionModel, type FileInstrument, type InstrumentBroker, type InstrumentMassPatch, type Swap } from '../../FileImport/fileSymbols';
+import { commissionModels, dataTypes, days, defaultCommission, type CommissionModel, type FileInstrument, type InstrumentBroker, type InstrumentMassPatch, type Swap } from '../../FileImport/fileSymbols';
 import './instruments.css';
 
 const numeric = [
-  ['pointValue','Point value in $',0], ['tickSize','Pip/Tick size',0], ['tickStep','Pip/Tick step',0],
+  ['pointValue','Point value',0], ['tickSize','Tick size',0], ['tickStep','Minimum price step',0],
   ['spread','Default spread * pips',0], ['slippage','Default slippage * pips',0], ['minDistance','Min distance',0],
   ['multiplier','Order size multiplier',1], ['sizeStep','Order size step',0],
+  ['contractSize','Contract size',0], ['pipSize','Pip size',0], ['marginRate','Margin rate (fraction)',0],
+  ['decimals','Price decimals',0], ['minVolume','Minimum volume',0], ['maxVolume','Maximum volume',0],
+  ['lotStep','Volume step',0], ['tickValue','Tick value in money',0],
 ] as const;
 
 function SwapEditor({ value, disabled, onChange, onHelp }: { value: Swap; disabled?: boolean; onChange: (value: Swap) => void; onHelp: () => void }) {
@@ -38,14 +41,14 @@ export function InstrumentDetailsFields({ value, onChange, brokers, identityLock
   }, [help]);
   const enabled = (key: keyof InstrumentMassPatch['fields']) => !mass || Boolean(massFlags?.[key]);
   const flag = (key: keyof InstrumentMassPatch['fields'], label: string) => mass && <Checkbox label={`Change ${label}`} checked={Boolean(massFlags?.[key])} onChange={checked => onMassFlags?.({ ...massFlags, [key]:checked })}/>;
-  function changeType(type: string): void { const defaults = newInstrument(type); onChange({ ...value, type, pointValue:defaults.pointValue, tickSize:defaults.tickSize, tickStep:defaults.tickStep, spread:defaults.spread, slippage:defaults.slippage, commission:defaults.commission }); }
+  function changeType(type: string): void { onChange({ ...value, type }); }
   return <div className="instrument-details-flow">
     <fieldset><legend>Instrument details</legend><div className="instrument-fields two">
       {!mass && <><Field label="Broker profile *"><select disabled={identityLocked} value={value.broker} onChange={event => onChange({ ...value, broker:event.target.value, brokerName:brokers.find(row => row.id === event.target.value)?.name ?? '' })}>{brokers.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select></Field>
       <Field label="Instrument *"><TextInput aria-label="Instrument" disabled={identityLocked} maxLength={128} value={value.symbol} onChange={event => onChange({ ...value, symbol:event.target.value })}/><small>{brokers.find(row => row.id === value.broker)?.postfix}</small></Field>
       <Field label="Description"><TextInput value={value.name} onChange={event => onChange({ ...value, name:event.target.value })}/></Field></>}
-      <div className="instrument-option">{flag('type','Data type')}<Field label="Data type *"><select disabled={!enabled('type')} value={value.type} onChange={event => changeType(event.target.value)}>{dataTypes.map(type => <option key={type}>{type}</option>)}</select></Field></div>
-      {numeric.map(([key,label,min]) => <div className="instrument-option" key={key}>{flag(key,label)}<Field label={label}><TextInput disabled={!enabled(key)} type="number" min={min} step={key === 'tickSize' ? value.type === 'Stock' ? .01 : value.type === 'Futures' ? .1 : .0001 : key === 'tickStep' ? value.type === 'Stock' ? .01 : value.type === 'Futures' ? .1 : .00001 : 1} value={value[key]} onChange={event => onChange({ ...value, [key]:event.target.valueAsNumber })}/></Field></div>)}
+      <div className="instrument-option">{flag('type','Data type')}<Field label="Data type *"><select disabled={!enabled('type')} value={value.type} onChange={event => changeType(event.target.value)}>{[...new Set([...dataTypes, value.type])].map(type => <option key={type}>{type}</option>)}</select></Field></div>
+      {numeric.map(([key,label,min]) => <div className="instrument-option" key={key}>{flag(key,label)}<Field label={label}><TextInput disabled={!enabled(key)} type="number" min={min} step={key === 'decimals' ? 1 : 'any'} value={value[key] ?? ''} onChange={event => onChange({ ...value, [key]:event.target.valueAsNumber })}/></Field></div>)}
     </div></fieldset>
     <div className="instrument-option">{flag('commission','default commission model')}<fieldset disabled={!enabled('commission')}><legend>Default commissions model</legend>
       <Field label="Commission model"><select value={value.commission.model} onChange={event => onChange({ ...value, commission:defaultCommission(event.target.value as CommissionModel) })}>{commissionModels.map(model => <option key={model}>{model}</option>)}</select></Field>

@@ -27,12 +27,12 @@ import { ImportPopup as FileImportDialog } from '../../plugins/data_source/FileI
 import { MassImportPopup as FileMassImportDialog } from '../../plugins/data_source/FileImport/massImport/module';
 import { activeImport, useFileImports } from '../../plugins/data_source/FileImport/fileImportStore';
 import { emptyFileRecord } from '../../plugins/data_source/FileImport/fileImport';
-import { effectiveInstruments, seedInstruments, type FileDefinition, type FileInstrument, type InstrumentBroker } from '../../plugins/data_source/FileImport/fileSymbols';
+import { seedInstruments, type FileDefinition, type InstrumentBroker } from '../../plugins/data_source/FileImport/fileSymbols';
 import { AddPopup as FileSymbolDialog } from '../../plugins/data_source/FileImport/add/module';
 import { useFileSymbols } from '../../plugins/data_source/FileImport/fileSymbolsStore';
 import { useInstruments } from '../../plugins/data_source/Catalogs/Instruments/instrumentsStore';
-import { InstrumentEditorDialog } from '../../plugins/data_source/Catalogs/Instruments/InstrumentEditorDialog';
-import { CloneInstrumentDialog } from '../../plugins/data_source/Catalogs/Instruments/CloneInstrumentDialog';
+import { InstrumentsModal } from '../../plugins/data_source/Catalogs/Instruments/InstrumentsModal';
+import type { CatalogInstrument } from '../../plugins/data_source/Catalogs/Instruments/instrumentsApiClient';
 import { InstrumentTransferDialog } from '../../plugins/data_source/Catalogs/Instruments/InstrumentTransferDialog';
 import { SessionTemplateDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionTemplateDialog';
 import { CloneSessionDialog } from '../../plugins/data_source/Catalogs/Sessions/CloneSessionDialog';
@@ -122,10 +122,9 @@ const labelForPanel: Record<WorkspaceTabId, string> = { home: 'Home', data: 'Dat
 type OperationState = 'idle' | 'running' | 'paused' | 'completed' | 'cancelled';
 interface DialogState { id: DataSourceDialogId; exchange?: string; targetIds?: string[] }
 type InstrumentDialogState =
-  | { kind: 'editor'; mode: 'add' | 'edit' | 'mass'; selected: FileInstrument[] }
-  | { kind: 'clone'; source: FileInstrument }
-  | { kind: 'delete'; selected: FileInstrument[] }
-  | { kind: 'transfer'; mode: 'save' | 'load'; selected: FileInstrument[] };
+  | { kind: 'editor'; mode: 'add' | 'edit' | 'mass'; selected: CatalogInstrument[] }
+  | { kind: 'clone'; source: CatalogInstrument }
+  | { kind: 'transfer'; mode: 'save' | 'load'; selected: CatalogInstrument[] };
 type SessionDialogState =
   | { kind:'editor'; mode:'add'|'edit'; source?:SessionDefinition }
   | { kind:'clone'; source:SessionDefinition }
@@ -343,9 +342,6 @@ export function DataManager() {
   const mt5 = useMt5Import();
   const liveInstruments = useInstruments(state => state.instruments);
   const fileDefinitions = useFileSymbols(state => state.definitions);
-  const fileInstruments = useFileSymbols(state => state.instruments);
-  const instrumentOverrides = useFileSymbols(state => state.overrides);
-  const removedInstruments = useFileSymbols(state => state.removed);
   const customSessions = useSessions(state => state.sessions);
   const sessionOverrides = useSessions(state => state.overrides);
   const removedSessions = useSessions(state => state.removed);
@@ -354,7 +350,6 @@ export function DataManager() {
   const externalIndicators = useExternalIndicators();
   const stockGroups = useStockGroups();
   useEffect(() => {
-    void useInstruments.getState().refreshFromServer();
     void useSessions.getState().refreshFromServer();
   }, []);
   useEffect(() => { void useStockGroups.getState().syncRemote(); }, []);
@@ -438,7 +433,15 @@ export function DataManager() {
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [instrumentDialog, setInstrumentDialog] = useState<InstrumentDialogState | null>(null);
   const [selectedInstrumentIds, setSelectedInstrumentIds] = useState<string[]>([]);
-  const [instrumentError, setInstrumentError] = useState('');
+  useEffect(() => {
+    if (hostStatus !== 'online') { useInstruments.getState().reset(); setInstrumentDialog(null); setSelectedInstrumentIds([]); return; }
+    void useInstruments.getState().refreshFromServer();
+    return () => { useInstruments.getState().reset(); };
+  }, [hostStatus]);
+  useEffect(() => {
+    if (hostStatus === 'online' && tab === 'Instruments') void useInstruments.getState().refreshFromServer();
+  }, [tab, hostStatus]);
+  useEffect(() => { setSelectedInstrumentIds(current => current.filter(id => liveInstruments.some(row => row.id === id))); }, [liveInstruments]);
   const [sessionDialog,setSessionDialog]=useState<SessionDialogState|null>(null);
   const [selectedSessionIds,setSelectedSessionIds]=useState<string[]>([]);
   const [sessionError,setSessionError]=useState('');
@@ -658,9 +661,7 @@ export function DataManager() {
     sourceDataId: 'sourceDataId' in row && typeof (row as any).sourceDataId === 'string' ? (row as any).sourceDataId : undefined,
   }));
   const exportRows: ExportTarget[] = toolRows;
-  const instrumentRows = liveInstruments.length > 0
-    ? liveInstruments
-    : effectiveInstruments(fileInstruments, instrumentOverrides, removedInstruments);
+  const instrumentRows = liveInstruments;
   const instrumentBrokers: InstrumentBroker[] = [
     { id: '-1', name: 'Default', postfix: '', timezone: 'UTC' },
     ...brokerProfiles.filter(profile => profile.mtUse).map(profile => ({ id: profile.id, name: profile.name, postfix: profile.postfix, timezone: profile.timezone })),
@@ -684,30 +685,15 @@ export function DataManager() {
   const requireStockGroups = (): StockGroupDefinition[] | null => { if (selectedStockGroups.length) { setSelectionMessage(''); return selectedStockGroups; } setSelectionMessage('You have to select some group.'); return null; };
   const openStockGroupEdit = (group: StockGroupDefinition) => { setSelectedStockGroupIds([group.id]); if (group.system) { setSelectionMessage("This group can't be edited."); return; } setStockGroupDialog({ kind: 'editor', mode: 'edit', source: group }); };
   const updateStockGroups = (items: StockGroupDefinition[]) => { try { useStockGroups.getState().start(items.map(item => item.id), toolRows.map(row => row.symbol), anyDataActive); setProgressOwner('stock-groups'); setOperationState('idle'); setSelectionMessage(''); notify('Data update started, please check Log tab for more information.'); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to update stock group.'); } };
-  const selectedInstruments = instrumentRows.filter(item => selectedInstrumentIds.includes(item.symbol));
-  const requireInstruments = (): FileInstrument[] | null => {
+  const selectedInstruments = instrumentRows.filter(item => selectedInstrumentIds.includes(item.id));
+  const requireInstruments = (): CatalogInstrument[] | null => {
     if (selectedInstruments.length) { setSelectionMessage(''); return selectedInstruments; }
     setSelectionMessage('You have to select some record.');
     return null;
   };
-  const openInstrumentEdit = (item: FileInstrument) => {
-    setSelectedInstrumentIds([item.symbol]); setInstrumentError('');
+  const openInstrumentEdit = (item: CatalogInstrument) => {
+    setSelectedInstrumentIds([item.id]);
     setInstrumentDialog({ kind: 'editor', mode: 'edit', selected: [item] });
-  };
-  const openInstrumentDelete = (items: FileInstrument[]) => {
-    setSelectedInstrumentIds(items.map(item => item.symbol)); setInstrumentError('');
-    setInstrumentDialog({ kind: 'delete', selected: items });
-  };
-  const removeSelectedInstruments = () => {
-    if (instrumentDialog?.kind !== 'delete') return;
-    try {
-      const names = instrumentDialog.selected.map(item => item.symbol);
-      void useInstruments.getState().removeInstruments(names);
-      useFileSymbols.getState().removeInstruments(names, toolRows.map(row => row.instrument));
-      setSelectedInstrumentIds(current => current.filter(name => !names.includes(name)));
-      notify(`${names.length} instrument${names.length === 1 ? '' : 's'} removed.`);
-      setInstrumentDialog(null); setInstrumentError('');
-    } catch (cause) { setInstrumentError(cause instanceof Error ? cause.message : 'Unable to remove instruments.'); }
   };
   const otherProviderActive = activeImport(operationState) || [td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, stockGroups.job?.state,brokerJob?.state].some(activeImport);
   const externalActive = otherProviderActive || externalJobActive(externalIndicators.job?.state);
@@ -731,7 +717,7 @@ export function DataManager() {
       case 'brokers': return <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/>;
       case 'stock-groups': return <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/>;
       case 'custom-data': return <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/>;
-      case 'instruments': return <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/>;
+      case 'instruments': return <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} />;
       case 'sessions': return <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/>;
       case 'log': return <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-log-cancel-btn" className="cancel-log log-cancel-button" disabled={!canCancelLogOperation} onClick={handleCancelLogOperation}>Cancel operation</button><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="dm-log-progress" data-testid="dm-log-progress"><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/></div><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => { const isError = isErrorLogRecord(entry); return <div key={index} className={isError ? 'dm-log-entry log-entry-error' : 'dm-log-entry'} data-error={isError ? 'true' : 'false'}>{entry}</div>; })}</div></div></main>;
     }
@@ -743,12 +729,12 @@ export function DataManager() {
     {tab === 'Export' && <div className="export-actions" aria-label="Data export operations"><Button data-control-id="export-csv" className="export-csv" onClick={() => { setLastControlId('export-csv'); openExport('csv'); }}><FileSpreadsheet size={24} aria-hidden="true"/>Export to CSV</Button><Button data-control-id="export-mt4" className="export-mt4" title="Export to MetaTrader 4 (FXT & HST)" onClick={() => { setLastControlId('export-mt4'); openExport('mt4'); }}><MonitorDown size={24} aria-hidden="true"/>Export MT4 (FXT &amp; HST)</Button><Button data-control-id="export-mt5" className="export-mt5" title="Export to MetaTrader 5 data (99% test)" onClick={() => { setLastControlId('export-mt5'); openExport('mt5'); }}><ChartCandlestick size={24} aria-hidden="true"/>Export to MT5 data (99% test)</Button></div>}
     {tab === 'Tools' && <div className="data-tool-actions" aria-label="Data tools"><Button data-control-id="tool-timezone" className="tool-timezone" onClick={() => { setLastControlId('tool-timezone'); openClone(); }}><span className="timezone-tool-icon" aria-hidden="true"><Globe2 size={26}/><Clock size={13}/></span>Clone to timezone</Button><Button data-control-id="tool-analyze" className="tool-analyze" onClick={() => { setLastControlId('tool-analyze'); openReview(); }}><ChartCandlestick size={26} aria-hidden="true"/>View &amp; Analyze</Button></div>}
     {tab === 'Instruments' && <div className="management-actions" aria-label="Instrument operations">
-      <Button id="datamanager-instruments-add" className="action-add" onClick={() => { setInstrumentError(''); setInstrumentDialog({ kind: 'editor', mode: 'add', selected: [] }); }}><CirclePlus size={26} aria-hidden="true"/>Add Instrument</Button>
+      <Button id="datamanager-instruments-add" className="action-add" onClick={() => { setInstrumentDialog({ kind: 'editor', mode: 'add', selected: [] }); }}><CirclePlus size={26} aria-hidden="true"/>Add Instrument</Button>
       <Button id="datamanager-instruments-clone" className="action-clone" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'clone', source: rows[0] }); }}><CopyPlus size={26} aria-hidden="true"/>Clone Instrument</Button>
       <Button id="datamanager-instruments-edit" className="action-edit" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'editor', mode: rows.length === 1 ? 'edit' : 'mass', selected: rows }); }}><Settings2 size={26} aria-hidden="true"/>Mass Edit Instrument</Button>
-      <Button id="datamanager-instruments-delete" className="action-delete" onClick={() => { const rows = requireInstruments(); if (rows) openInstrumentDelete(rows); }}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
+      <Button id="datamanager-instruments-delete" className="action-delete" disabled title="Instrument deletion is not implemented"><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
       <Button id="datamanager-instruments-save" className="action-save" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'transfer', mode: 'save', selected: rows }); }}><Save size={26} aria-hidden="true"/>Save</Button>
-      <Button id="datamanager-instruments-load" className="action-load" onClick={() => setInstrumentDialog({ kind: 'transfer', mode: 'load', selected: [] })}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
+      <Button id="datamanager-instruments-load" className="action-load" disabled title="Instrument import is not implemented"><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
     {tab === 'Sessions' && <div className="management-actions" aria-label="Session operations">
       <Button className="action-add" onClick={()=>{setSessionError('');setSessionDialog({kind:'editor',mode:'add'});}}><CalendarPlus size={26} aria-hidden="true"/>Add Session</Button>
@@ -839,18 +825,14 @@ export function DataManager() {
     <ViewAnalyzeDialog target={reviewTarget} externalActive={otherDataActive || toolsActive(tools.job?.state)} onClose={() => setReviewTarget(null)}/>
   )}
   {instrumentDialog?.kind === 'editor' && (
-    <InstrumentEditorDialog mode={instrumentDialog.mode} selected={instrumentDialog.selected} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
+    <InstrumentsModal mode={instrumentDialog.mode} selected={instrumentDialog.selected} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
   )}
   {instrumentDialog?.kind === 'clone' && (
-    <CloneInstrumentDialog source={instrumentDialog.source} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
+    <InstrumentsModal mode="clone" selected={[instrumentDialog.source]} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
   )}
   {instrumentDialog?.kind === 'transfer' && (
     <InstrumentTransferDialog mode={instrumentDialog.mode} selected={instrumentDialog.selected} all={instrumentRows} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
   )}
-  {instrumentDialog?.kind === 'delete' && <div className="instruments-flow"><Modal title={instrumentDialog.selected.length === 1 ? 'Remove instrument' : 'Remove instruments'} width={520} onClose={() => { setInstrumentDialog(null); setInstrumentError(''); }} footer={<><Button onClick={() => { setInstrumentDialog(null); setInstrumentError(''); }}>No</Button><Button className="primary" onClick={removeSelectedInstruments}>Yes</Button></>}>
-    {instrumentError && <p role="alert" className="instrument-error">{instrumentError}</p>}
-    <p>{instrumentDialog.selected.length === 1 ? `Do you really want to delete instrument '${instrumentDialog.selected[0].symbol}'?` : `Do you really want to delete ${instrumentDialog.selected.length} selected instruments?`}</p>
-  </Modal></div>}
   {sessionDialog?.kind==='editor'&&<SessionTemplateDialog mode={sessionDialog.mode} source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
   {sessionDialog?.kind==='clone'&&<CloneSessionDialog source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
   {sessionDialog?.kind==='transfer'&&<SessionTransferDialog mode={sessionDialog.mode} selected={sessionDialog.selected} all={sessionRows} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}

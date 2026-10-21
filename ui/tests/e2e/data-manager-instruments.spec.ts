@@ -1,133 +1,151 @@
 import { expect, test, type Page } from '@playwright/test';
-import { selectLightSkin } from './shellTestUtils';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
-async function launch(page: Page) {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
-  await page.getByRole('button', { name: 'Instruments', exact: true }).click();
+function record(id: string, symbol: string) {
+  return { id, symbol, description: symbol + ' saved', broker_id: -1, data_type: 'Forex',
+    point_value: Number(id) * 12, point_size: .00001, tick_size: .0001, tick_step: .00001,
+    contract_size: 250, pip_size: .0001, margin_rate: Number(id) * .1, decimals: 5,
+    tick_value_in_money: 7, min_volume: .01, max_volume: 100, lot_step: .01,
+    default_spread: Number(id), default_slippage: 0, min_distance: 0, order_size_multiplier: 1, order_size_step: 0,
+    commissions: '4.75', swap_long: -2, swap_short: 1, swap_3day_day: 0, swap_settings: null,
+    connection: 'saved', created_at_utc: '2020-01-01', updated_at_utc: '2020-01-01' };
 }
-function instrumentRow(page: Page, symbol: string) {
-  return page.getByRole('table', { name: 'Instruments', exact: true }).getByRole('row')
-    .filter({ has: page.getByRole('checkbox', { name: `Select instrument ${symbol}`, exact: true }) });
+async function connect(page: Page, initial = [record('1', 'RECORDED_A'), record('2', 'RECORDED_B')]) {
+  let rows: Record<string, any>[] = structuredClone(initial);
+  const state = { failRead: false, failWrite: false, delayWrite: false, writes: [] as { path: string; body: any }[] };
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  page.on('close', () => expect(errors).toEqual([]));
+  await page.addInitScript(() => {
+    localStorage.setItem('sqx-instruments-catalog-v1', JSON.stringify({ instruments: [{ symbol: 'CACHED_FAKE' }] }));
+    const original = window.fetch.bind(window);
+    window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => String(input).includes('/api/v1/events?')
+      ? Promise.resolve(new Response(new ReadableStream<Uint8Array>({ start() {} }), { headers: { 'Content-Type': 'text/event-stream' } })) : original(input, init)) as typeof fetch;
+  });
+  await page.route('**/api/v1/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    let data: unknown = [];
+    if (path.endsWith('/auth/login')) data = { token: 'instrument-session', expires_at: '2099-01-01T00:00:00Z' };
+    else if (path.endsWith('/settings')) data = { revision: 1, values: {} };
+    else if (path.endsWith('/status')) data = { cpu_count: 4 };
+    else if (path === '/api/v1/home') data = { recent_projects: [] };
+    else if (path.endsWith('/data/workspace')) data = {
+      tabs: ['data','instruments','sessions','brokers','custom-data','chart','home','stock-groups','log'].map((id, index) => ({ id, title: id, core: index < 5 })),
+      active_tab: 'data', layout: { core_group: 'catalogs', chart_position: 'right' },
+    };
+    else if (path.includes('/workspace/tabs/')) data = { active_tab: path.split('/').at(-1), selection: null, preview: { state: 'unavailable', reason: 'Select a saved dataset.', rows: [], limit: 500 } };
+    else if (path === '/api/v1/data/instruments' && route.request().method() === 'GET') {
+      if (state.failRead) { await route.fulfill({ status: 503, json: { status: 'error', error: { code: 'UNAVAILABLE', message: 'Catalog unavailable' } } }); return; }
+      data = rows;
+    } else if (path.startsWith('/api/v1/data/instruments') && route.request().method() === 'POST') {
+      const body = route.request().postDataJSON();
+      state.writes.push({ path, body });
+      if (state.delayWrite) await new Promise(resolve => setTimeout(resolve, 600));
+      if (state.failWrite) { await route.fulfill({ status: 409, json: { status: 'error', error: { code: 'CONFLICT', message: 'Instrument was not saved: conflict' } } }); return; }
+      if (path.endsWith('/mass-edit')) {
+        rows = rows.map(row => body.instrument_ids.includes(row.id) ? { ...row, ...body.updates } : row);
+        data = { updated_count: body.instrument_ids.length, instruments: rows.filter(row => body.instrument_ids.includes(row.id)) };
+      } else {
+        const id = String(rows.length + 1);
+        const created = path.endsWith('/clone') ? { ...rows.find(row => row.id === body.source_id), id, symbol: body.new_symbol } : { ...record(id, body.symbol), ...body, id };
+        rows.push(created); data = created;
+      }
+    }
+    await route.fulfill({ json: { status: 'success', data } });
+  });
+  await page.goto('/');
+  const login = page.getByRole('dialog', { name: 'Connect to HaruQuantAI host' });
+  await login.getByLabel('Host password').fill('fixture-password');
+  await login.getByRole('button', { name: 'Connect', exact: true }).click();
+  await expect(login).toHaveCount(0);
+  await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Data Manager workspace navigation' }).getByRole('button', { name: 'Instruments', exact: true }).click();
+  await expect(page.getByRole('table', { name: 'Instruments', exact: true })).toBeVisible();
+  return { state, rows: () => rows };
 }
+const table = (page: Page) => page.getByRole('table', { name: 'Instruments', exact: true });
+const operations = (page: Page) => page.getByLabel('Instrument operations', { exact: true });
 
-test('add, edit, clone, mass edit, delete, help, and reload instruments', async ({ page }) => {
-  await launch(page);
-  const actions = page.getByLabel('Instrument operations');
-  await actions.getByRole('button', { name: 'Add Instrument', exact: true }).click();
-  let dialog = page.getByRole('dialog', { name: 'Add instrument', exact: true });
-  await dialog.getByLabel('Instrument', { exact: true }).fill('TEST_INST');
-  await dialog.getByLabel('Description', { exact: true }).fill('Original description');
-  await dialog.getByRole('combobox', { name: 'Commission model', exact: true }).selectOption('Stockpicker');
-  await dialog.getByRole('button', { name: 'Help', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Commission & Swap Explanation' })).toContainText('overnight');
-  await page.keyboard.press('Escape');
-  await page.screenshot({ path: 'test-results/instruments-add-dark.png' });
+test('lists server specifications, awaits add confirmation, and retains records on reload', async ({ page }) => {
+  const { state } = await connect(page);
+  await expect(table(page)).toContainText('RECORDED_A');
+  await expect(table(page)).not.toContainText('CACHED_FAKE');
+  await expect(table(page)).not.toContainText('EURUSD');
+  await expect(table(page).getByRole('columnheader', { name: 'Contract size', exact: true })).toBeVisible();
+  await expect(operations(page).getByRole('button', { name: 'Mass Delete', exact: true })).toBeDisabled();
+  await expect(operations(page).getByRole('button', { name: 'Load', exact: true })).toBeDisabled();
+  await operations(page).getByRole('button', { name: 'Add Instrument', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Add instrument', exact: true });
+  await dialog.getByLabel('Instrument', { exact: true }).fill('NEW_SPEC');
+  await dialog.getByLabel('Contract size', { exact: true }).fill('75');
+  await dialog.getByLabel('Pip size', { exact: true }).fill('0.001');
+  await dialog.getByLabel('Margin rate (fraction)', { exact: true }).fill('0');
+  state.delayWrite = true;
   await dialog.getByRole('button', { name: 'Save', exact: true }).click();
-
-  const table = page.getByRole('table', { name: 'Instruments', exact: true });
-  let sourceRow = instrumentRow(page, 'TEST_INST');
-  await expect(sourceRow).toContainText('Original description');
-  await sourceRow.dblclick();
-  dialog = page.getByRole('dialog', { name: 'Edit instrument', exact: true });
-  await expect(dialog.getByLabel('Instrument', { exact: true })).toBeDisabled();
-  await dialog.getByLabel('Description', { exact: true }).fill('Edited description');
-  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
-  sourceRow = instrumentRow(page, 'TEST_INST');
-  await expect(sourceRow).toContainText('Edited description');
-
-  await sourceRow.getByRole('checkbox', { name: 'Select instrument TEST_INST' }).check();
-  await actions.getByRole('button', { name: 'Clone Instrument', exact: true }).click();
-  dialog = page.getByRole('dialog', { name: "Clone instrument 'TEST_INST'", exact: true });
-  await expect(dialog.getByLabel('New instrument name')).toHaveValue('TEST_INSTClone');
-  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
-  const cloneRow = instrumentRow(page, 'TEST_INSTClone');
-  await expect(cloneRow).toContainText('Edited description');
-
-  await cloneRow.getByRole('checkbox', { name: 'Select instrument TEST_INSTClone' }).check();
-  await actions.getByRole('button', { name: 'Mass Edit Instrument', exact: true }).click();
-  dialog = page.getByRole('dialog', { name: 'Mass-Edit instrument', exact: true });
-  await dialog.getByRole('checkbox', { name: 'Change Default spread * pips', exact: true }).check();
-  await dialog.getByLabel('Default spread * pips', { exact: true }).fill('7');
-  await page.screenshot({ path: 'test-results/instruments-mass-edit-dark.png' });
-  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(instrumentRow(page, 'TEST_INST').getByRole('cell').filter({ hasText: /^7$/ })).toHaveCount(1);
-  await expect(instrumentRow(page, 'TEST_INSTClone').getByRole('cell').filter({ hasText: /^7$/ })).toHaveCount(1);
-
-  await cloneRow.getByRole('button', { name: 'Delete instrument TEST_INSTClone' }).click();
-  dialog = page.getByRole('dialog', { name: 'Remove instrument', exact: true });
-  await expect(dialog).toContainText("delete instrument 'TEST_INSTClone'");
-  await dialog.getByRole('button', { name: 'Yes', exact: true }).click();
-  await expect(table.getByText('TEST_INSTClone', { exact: true })).toHaveCount(0);
-  await page.reload();
-  await page.getByRole('button', { name: 'Instruments', exact: true }).click();
-  await expect(instrumentRow(page, 'TEST_INST')).toContainText('Edited description');
-});
-
-test('selection rules, JSON save/load conflicts, and referenced deletion are explicit', async ({ page }) => {
-  await launch(page);
-  const actions = page.getByLabel('Instrument operations');
-  await actions.getByRole('button', { name: 'Clone Instrument', exact: true }).click();
-  await expect(page.getByLabel('Data Manager progress')).toContainText('select some record');
-
-  const table = page.getByRole('table', { name: 'Instruments', exact: true });
-  const firstRow = table.getByRole('row').nth(1);
-  const firstName = (await firstRow.getByRole('cell').nth(1).innerText()).trim();
-  await firstRow.getByRole('checkbox').check();
-  await selectLightSkin(page);
-  const downloadPromise = page.waitForEvent('download');
-  await actions.getByRole('button', { name: 'Save', exact: true }).click();
-  let dialog = page.getByRole('dialog', { name: 'Save instruments', exact: true });
-  await page.screenshot({ path: 'test-results/instruments-save-light.png' });
-  await dialog.getByRole('button', { name: 'Download JSON', exact: true }).click();
-  const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe('Instruments.json');
-
-  await actions.getByRole('button', { name: 'Load', exact: true }).click();
-  dialog = page.getByRole('dialog', { name: 'Load instruments', exact: true });
-  const json = JSON.stringify({version:1,kind:'instruments',brokers:[],instruments:[{symbol:firstName,name:'Imported description',broker:'-1',brokerName:'Default',type:'Forex',pointValue:100000,tickSize:.0001,tickStep:.00001,spread:3,slippage:0,minDistance:0,multiplier:1,sizeStep:1,timezone:'UTC',commission:{model:'None',value:0,unit:'share',min:.35,minUnit:'money',max:1,maxUnit:'equity'},swap:{use:false,type:'money',long:0,short:0,tripleSwapOn:'WEDNESDAY',rolloutHour:'23:00'}}]});
-  await dialog.getByLabel('Instrument JSON file').setInputFiles({ name: 'Instruments.json', mimeType: 'application/json', buffer: Buffer.from(json) });
-  await dialog.getByRole('button', { name: 'Validate and load', exact: true }).click();
-  dialog = page.getByRole('dialog', { name: 'Overwrite confirm', exact: true });
-  await expect(dialog).toContainText(`Instrument '${firstName}' already exists`);
-  await dialog.getByRole('button', { name: 'Overwrite all', exact: true }).click();
-  await expect(table.getByRole('row').filter({ hasText: firstName })).toContainText('Imported description');
-
-  const importedRow = table.getByRole('row').filter({ hasText: firstName });
-  await importedRow.getByRole('button', { name: `Delete instrument ${firstName}` }).click();
-  await page.getByRole('dialog', { name: 'Remove instrument', exact: true }).getByRole('button', { name: 'Yes', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Remove instrument', exact: true }).getByRole('alert')).toContainText('used by existing data');
-});
-
-test('version 1 custom instruments migrate without data loss', async ({ page }) => {
-  await page.goto('/');
-  await page.evaluate(() => localStorage.setItem('sqx-file-symbols-v1', JSON.stringify({
-    version: 1,
-    definitions: [],
-    instruments: [{
-      symbol: 'V1_CUSTOM', name: 'Version one instrument', type: 'Forex', broker: '-1', brokerName: 'Default',
-      pointValue: 100000, tickSize: 0.0001, tickStep: 0.00001, spread: 2, slippage: 0,
-      minDistance: 0, multiplier: 1, sizeStep: 1, timezone: 'UTC',
-      commission: { model: 'None', value: 0, unit: 'share', min: 0.35, minUnit: 'money', max: 1, maxUnit: 'equity' },
-      swap: { use: false, type: 'money', long: 0, short: 0, tripleSwapOn: 'WEDNESDAY', rolloutHour: '23:00' },
-    }],
-  })));
+  await expect(dialog.getByRole('button', { name: 'Saving…', exact: true })).toBeDisabled();
+  await expect(table(page)).not.toContainText('NEW_SPEC');
+  await expect(dialog).toHaveCount(0);
+  await expect(table(page)).toContainText('NEW_SPEC');
+  expect(state.writes.at(-1)?.body).toMatchObject({ contract_size: 75, pip_size: .001, margin_rate: 0 });
   await page.reload();
   await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
-  await page.getByRole('button', { name: 'Instruments', exact: true }).click();
-  await expect(instrumentRow(page, 'V1_CUSTOM')).toContainText('Version one instrument');
-  await instrumentRow(page, 'V1_CUSTOM').dblclick();
-  await page.getByRole('dialog', { name: 'Edit instrument', exact: true }).getByLabel('Description').fill('Migrated instrument');
-  await page.getByRole('dialog', { name: 'Edit instrument', exact: true }).getByRole('button', { name: 'Save', exact: true }).click();
-  const migrated=await page.evaluate(() => JSON.parse(localStorage.getItem('sqx-file-symbols-v1')!));expect(migrated.version).toBe(3);expect(Object.keys(migrated.instruments[0]).sort()).toEqual(['broker','brokerName','commission','minDistance','multiplier','name','pointValue','sizeStep','slippage','spread','swap','symbol','tickSize','tickStep','timezone','type'].sort());
+  await page.getByRole('navigation', { name: 'Data Manager workspace navigation' }).getByRole('button', { name: 'Instruments', exact: true }).click();
+  await expect(table(page)).toContainText('NEW_SPEC');
 });
 
-test('corrupt saved instrument data fails closed', async ({ page }) => {
-  await page.goto('/');
-  await page.evaluate(() => localStorage.setItem('sqx-file-symbols-v1', '{not-json'));
-  await page.reload();
-  await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
-  await page.getByRole('button', { name: 'Instruments', exact: true }).click();
-  await page.getByLabel('Instrument operations').getByRole('button', { name: 'Add Instrument', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: 'Add instrument', exact: true }).getByRole('alert')).toContainText('could not be read');
+test('bulk edit changes checked fields only; clone retains complete stored metadata', async ({ page }) => {
+  const { state, rows } = await connect(page);
+  await table(page).getByLabel('Select instrument RECORDED_A', { exact: true }).check();
+  await table(page).getByLabel('Select instrument RECORDED_B', { exact: true }).check();
+  await operations(page).getByRole('button', { name: 'Mass Edit Instrument', exact: true }).click();
+  let dialog = page.getByRole('dialog', { name: 'Mass-Edit instrument', exact: true });
+  await dialog.getByLabel('Change Margin rate (fraction)', { exact: true }).check();
+  await dialog.getByLabel('Margin rate (fraction)', { exact: true }).fill('0');
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  expect(state.writes.at(-1)?.body).toEqual({ instrument_ids: ['1','2'], updates: { margin_rate: 0 } });
+  expect(rows().map(row => row.point_value)).toEqual([12,24]);
+  expect(rows().map(row => row.commissions)).toEqual(['4.75','4.75']);
+  await table(page).getByLabel('Select instrument RECORDED_B', { exact: true }).uncheck();
+  await operations(page).getByRole('button', { name: 'Clone Instrument', exact: true }).click();
+  dialog = page.getByRole('dialog', { name: 'Clone instrument', exact: true });
+  await dialog.getByLabel('New instrument name').fill('CLONED_SPEC');
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(table(page)).toContainText('CLONED_SPEC');
+  expect(state.writes.at(-1)?.body).toEqual({ source_id: '1', new_symbol: 'CLONED_SPEC' });
+  expect(rows().at(-1)).toMatchObject({ point_value: 12, margin_rate: 0, commissions: '4.75', contract_size: 250, swap_long: -2 });
+  await page.screenshot({ path: join(tmpdir(), 'haru-instruments-authoritative.png'), fullPage: true });
+});
+
+test('failed edits and clones remain open and never create local success rows', async ({ page }) => {
+  const { state } = await connect(page);
+  state.failWrite = true;
+  await table(page).getByRole('row').filter({ hasText: 'RECORDED_A' }).dblclick();
+  let dialog = page.getByRole('dialog', { name: 'Edit instrument', exact: true });
+  await dialog.getByLabel('Description', { exact: true }).fill('UNSAVED_DESCRIPTION');
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(dialog.getByRole('alert')).toContainText('conflict');
+  await expect(table(page)).not.toContainText('UNSAVED_DESCRIPTION');
+  await dialog.getByRole('button', { name: 'Close', exact: true }).last().click();
+  await operations(page).getByRole('button', { name: 'Clone Instrument', exact: true }).click();
+  dialog = page.getByRole('dialog', { name: 'Clone instrument', exact: true });
+  await dialog.getByLabel('New instrument name').fill('FAILED_CLONE');
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(dialog.getByRole('alert')).toContainText('conflict');
+  await expect(table(page)).not.toContainText('FAILED_CLONE');
+});
+
+test('empty reads clear rows and failures have visible stale/retry state', async ({ page }) => {
+  const { state, rows } = await connect(page);
+  await expect(table(page)).toContainText('RECORDED_A');
+  state.failRead = true;
+  await page.getByRole('button', { name: 'Refresh instruments', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('Showing the last server snapshot');
+  state.failRead = false;
+  rows().splice(0);
+  await page.getByRole('button', { name: 'Refresh instruments', exact: true }).click();
+  await expect(table(page)).not.toContainText('RECORDED_A');
+  await expect(table(page)).toContainText('No matching instruments.');
 });

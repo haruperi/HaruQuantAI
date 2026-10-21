@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Button } from '../../components/ui';
 import { brokerCounts, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
-import { effectiveInstruments, type FileInstrument } from '../../plugins/data_source/FileImport/fileSymbols';
+import { type FileInstrument } from '../../plugins/data_source/FileImport/fileSymbols';
 import { type SessionDefinition, type SessionBroker } from '../../plugins/data_source/Catalogs/Sessions/sessions';
 import { summarizeGroup, type StockGroupDefinition } from '../../plugins/data_source/Catalogs/StockGroups/stockGroups';
 import { activeExternalLines, externalTypeLabel, externalIndicatorTypes, type ExternalIndicatorDefinition } from '../../plugins/data_source/Indicators/externalIndicators';
 import { useExternalIndicators } from '../../plugins/data_source/Indicators/externalIndicatorsStore';
 import { normalizeRelativePath, useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../../plugins/data_source/Common/dataManagerStore';
 import { useFileSymbols } from '../../plugins/data_source/FileImport/fileSymbolsStore';
+import type { CatalogInstrument } from '../../plugins/data_source/Catalogs/Instruments/instrumentsApiClient';
 import { useInstruments } from '../../plugins/data_source/Catalogs/Instruments/instrumentsStore';
 import { useFileImports } from '../../plugins/data_source/FileImport/fileImportStore';
 import { useSQData } from '../../plugins/data_source/SQData/sqDataStore';
@@ -91,15 +92,12 @@ export function SessionTable({ rows:allRows, selected, onSelect, onEdit, onDelet
   </main>;
 }
 
-export function InstrumentTable({ selected, onSelect, onEdit, onDelete }: {
+export function InstrumentTable({ selected, onSelect, onEdit }: {
   selected: string[]; onSelect: (symbols: string[]) => void;
-  onEdit: (item: FileInstrument) => void; onDelete: (item: FileInstrument) => void;
+  onEdit: (item: CatalogInstrument) => void;
 }) {
   const instState = useInstruments();
-  const fileState = useFileSymbols();
-  const instruments = instState.instruments.length > 0
-    ? instState.instruments
-    : effectiveInstruments(fileState.instruments, fileState.overrides, fileState.removed);
+  const instruments = instState.instruments;
   const [query, setQuery] = useState('');
   const [dataType, setDataType] = useState('');
   const [broker, setBroker] = useState('');
@@ -108,30 +106,33 @@ export function InstrumentTable({ selected, onSelect, onEdit, onDelete }: {
     && (!broker || item.broker === broker)
     && (item.symbol + ' ' + item.name).toLowerCase().includes(query.toLowerCase()))
     .sort((a, b) => a.symbol.localeCompare(b.symbol) * (descending ? -1 : 1));
-  const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.symbol));
-  const columns = ['Description', 'Broker profile', 'Point value', 'Pip/Tick size', 'Pip/Tick step',
-    'Default spread', 'Default slippage', 'Commissions', 'Swap', 'Data type', 'Order size mult.', 'Order size step'];
+  const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.id));
+  const columns = ['Description', 'Broker profile', 'Point value', 'Tick size', 'Minimum price step',
+    'Price point size', 'Pip size', 'Contract size', 'Margin rate', 'Default spread', 'Default slippage', 'Commissions', 'Swap', 'Data type', 'Order size mult.', 'Order size step'];
   return <main className="full dataset-workspace" aria-label="Instruments">
+    {instState.error && <p role="alert">{instState.loaded ? 'Showing the last server snapshot. ' : ''}{instState.error}</p>}
+    {instState.isSyncing && <p role="status">Loading instrument catalog…</p>}
     <div className="dataset-filters">
       <input className="text-input" aria-label="Filter instruments" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
       <select className="text-input" aria-label="Instrument data type" value={dataType} onChange={event => setDataType(event.target.value)}>
         <option value="">All data types</option>{[...new Set(instruments.map(item => item.type))].map(type => <option key={type}>{type}</option>)}
       </select>
       <select className="text-input" aria-label="Instrument broker profile" value={broker} onChange={event => setBroker(event.target.value)}><option value="">All broker profiles</option>{[...new Map(instruments.map(item => [item.broker, item.brokerName])).entries()].map(([id, name]) => <option value={id} key={id}>{name}</option>)}</select>
+      <Button disabled={instState.isSyncing} onClick={() => void instState.refreshFromServer()}>Refresh instruments</Button>
     </div>
     <div className="dataset-grid"><table className="plain-table instrument-table" aria-label="Instruments">
       <thead><tr>
-        <th><input type="checkbox" aria-label="Select all visible instruments" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(symbol => !rows.some(item => item.symbol === symbol)) : [...new Set([...selected, ...rows.map(item => item.symbol)])])}/></th>
+        <th><input type="checkbox" aria-label="Select all visible instruments" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(symbol => !rows.some(item => item.id === symbol)) : [...new Set([...selected, ...rows.map(item => item.id)])])}/></th>
         <th aria-sort={descending ? 'descending' : 'ascending'}><button className="dataset-sort" onClick={() => setDescending(value => !value)}>Instrument <span aria-hidden="true">{descending ? '▾' : '▴'}</span></button></th>
         {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Row actions"/>
       </tr></thead>
-      <tbody>{rows.map(item => <tr key={item.symbol} className={selected.includes(item.symbol) ? 'selected' : ''} onDoubleClick={() => onEdit(item)}>
-        <td><input type="checkbox" aria-label={`Select instrument ${item.symbol}`} checked={selected.includes(item.symbol)} onChange={() => onSelect(selected.includes(item.symbol) ? selected.filter(symbol => symbol !== item.symbol) : [...selected, item.symbol])}/></td>
+      <tbody>{rows.map(item => <tr key={item.symbol} className={selected.includes(item.id) ? 'selected' : ''} onDoubleClick={() => onEdit(item)}>
+        <td><input type="checkbox" aria-label={`Select instrument ${item.symbol}`} checked={selected.includes(item.id)} onChange={() => onSelect(selected.includes(item.id) ? selected.filter(symbol => symbol !== item.id) : [...selected, item.id])}/></td>
         <td><strong>{item.symbol}</strong></td><td title={item.name}>{item.name}</td><td>{item.brokerName}</td>
-        <td>{item.pointValue.toLocaleString()}</td><td>{item.tickSize}</td><td>{item.tickStep}</td><td>{item.spread}</td>
-        <td>{item.slippage}</td><td>{item.commission.model}</td><td>{item.swap.use ? item.swap.type : "None"}</td><td>{item.type}</td><td>{item.multiplier}</td><td>{item.sizeStep}</td>
-        <td><button className="instrument-remove" aria-label={`Delete instrument ${item.symbol}`} title="Delete instrument" onClick={event => { event.stopPropagation(); onDelete(item); }}>×</button></td>
-      </tr>)}{!rows.length && <tr><td colSpan={15} className="dataset-empty">No matching instruments.</td></tr>}</tbody>
+        <td>{item.pointValue.toLocaleString()}</td><td>{item.tickSize}</td><td>{item.tickStep}</td><td>{item.pointSize}</td><td>{item.pipSize ?? "Not configured"}</td><td>{item.contractSize ?? "Not configured"}</td><td>{item.marginRate}</td><td>{item.spread}</td>
+        <td>{item.slippage}</td><td>{item.record.commissions.startsWith("{") ? item.commission.model : `Legacy value: ${item.record.commissions}`}</td><td>{item.record.swap_settings === null ? "Not configured" : item.swap.use ? item.swap.type : "None"}</td><td>{item.type}</td><td>{item.multiplier}</td><td>{item.sizeStep}</td>
+        <td><button disabled title="Instrument deletion is not implemented" aria-label={`Delete instrument ${item.symbol}`}>×</button></td>
+      </tr>)}{!rows.length && <tr><td colSpan={19} className="dataset-empty">No matching instruments.</td></tr>}</tbody>
     </table></div>
   </main>;
 }

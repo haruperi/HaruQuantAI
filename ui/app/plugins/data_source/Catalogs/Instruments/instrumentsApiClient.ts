@@ -1,243 +1,108 @@
-/**
- * REST API client for HaruQuantAI Instruments.
- *
- * Communicates with backend endpoints (/data/instruments, /api/v1/data/instruments)
- * to provide full SQX-parity instrument lifecycle operations:
- * - Instrument CRUD (list, get, save, delete)
- * - Instrument cloning with broker profile postfixes
- * - Batch (mass) deletion
- * - Mass editing with change flags
- * - Native StrategyQuant X Instruments.xml import and export
- * - Broker symbol alias resolution & management
- */
-
+/** Authoritative instrument catalog transport. */
 import { createDomainClient, type DomainClient } from '../../../../host/transport';
-import type { FileInstrument, InstrumentBroker, InstrumentMassPatch } from '../../FileImport/fileSymbols';
+import { days, defaultCommission, type FileInstrument, type InstrumentBroker, type InstrumentMassPatch, type Swap } from '../../FileImport/fileSymbols';
 
 export interface RemoteInstrumentDefinition {
-  id?: number;
-  symbol: string;
-  connection?: string;
-  broker_id: number;
-  description: string;
-  tick_size: number;
-  tick_step: number;
-  tick_value_in_money: number;
-  point_value: number;
-  decimals: number;
-  default_spread: number;
-  default_slippage: number;
-  min_volume: number;
-  max_volume: number;
-  lot_step: number;
-  margin_rate: number;
-  swap_long: number;
-  swap_short: number;
-  swap_3day_day: number;
-  commissions: string;
-  data_type: string;
-  alias: string;
-  exchange: string;
-  country: string;
-  sector: string;
-  min_distance: number;
-  order_size_multiplier: number;
-  order_size_step: number;
-  cot: string | null;
-  created_at_utc?: string;
-  updated_at_utc?: string;
+  id: string; symbol: string; broker_id: number; description: string;
+  point_value: number; point_size: number; tick_size: number; tick_step: number;
+  contract_size: number | null; pip_size: number | null; margin_rate: number;
+  decimals: number; tick_value_in_money: number; min_volume: number; max_volume: number; lot_step: number;
+  default_spread: number; default_slippage: number; min_distance: number;
+  order_size_multiplier: number; order_size_step: number; data_type: string;
+  commissions: string; swap_long: number; swap_short: number; swap_3day_day: number;
+  swap_settings: Swap | null;
+  [key: string]: unknown;
 }
-
-export interface AliasRecord {
-  alias: string;
-  instrument: string;
-  description: string;
-}
-
+export interface CatalogInstrument extends FileInstrument { id: string; record: RemoteInstrumentDefinition }
 let client: DomainClient = createDomainClient('/data');
+export function setInstrumentApiClient(value: DomainClient): void { client = value; }
 
-export function setInstrumentApiClient(customClient: DomainClient): void {
-  client = customClient;
-}
-
-export function toFileInstrument(
-  record: RemoteInstrumentDefinition,
-  brokers: InstrumentBroker[] = [],
-): FileInstrument {
-  const brokerProfile = brokers.find((b) => Number(b.id) === record.broker_id);
-  const tripleSwapDay = record.swap_3day_day === 5 ? 'FRIDAY' : 'WEDNESDAY';
-  const hasSwap = record.swap_long !== 0 || record.swap_short !== 0;
-
-  return {
-    symbol: record.symbol,
-    name: record.description || record.symbol,
-    type: record.data_type || 'Forex',
-    broker: String(record.broker_id ?? -1),
-    brokerName: brokerProfile?.name || (record.broker_id === -1 ? 'Default' : `Broker ${record.broker_id}`),
-    timezone: brokerProfile?.timezone || 'UTC',
-    pointValue: record.point_value,
-    tickSize: record.tick_size,
-    tickStep: record.tick_step,
-    spread: record.default_spread,
-    slippage: record.default_slippage,
-    minDistance: record.min_distance,
-    multiplier: record.order_size_multiplier,
-    sizeStep: record.order_size_step,
-    commission: {
-      model: 'None',
-      value: 0,
-      unit: 'share',
-      min: 0,
-      minUnit: 'money',
-      max: 0,
-      maxUnit: 'equity',
-    },
-    swap: {
-      use: hasSwap,
-      type: 'points',
-      long: record.swap_long,
-      short: record.swap_short,
-      tripleSwapOn: tripleSwapDay,
-      rolloutHour: '23:00',
-    },
-  };
-}
-
-export function fromFileInstrument(item: FileInstrument): RemoteInstrumentDefinition {
-  const tripleDayNum = item.swap.tripleSwapOn === 'FRIDAY' ? 5 : 3;
-  return {
-    symbol: item.symbol,
-    description: item.name || item.symbol,
-    broker_id: parseInt(item.broker, 10) || -1,
-    data_type: item.type,
-    point_value: item.pointValue,
-    tick_size: item.tickSize,
-    tick_step: item.tickStep,
-    tick_value_in_money: 10.0,
-    decimals: item.tickSize < 0.0001 ? 5 : item.tickSize < 0.01 ? 4 : item.tickSize < 0.1 ? 2 : 0,
-    default_spread: item.spread,
-    default_slippage: item.slippage,
-    min_distance: item.minDistance,
-    order_size_multiplier: item.multiplier,
-    order_size_step: item.sizeStep,
-    min_volume: 0.01,
-    max_volume: 100.0,
-    lot_step: 0.01,
-    margin_rate: 0.05,
-    swap_long: item.swap.long,
-    swap_short: item.swap.short,
-    swap_3day_day: tripleDayNum,
-    commissions: '0.0',
-    alias: '',
-    exchange: '',
-    country: '',
-    sector: '',
-    cot: null,
-  };
-}
-
-export async function fetchRemoteInstruments(params?: {
-  connection?: string;
-  data_type?: string;
-  broker_id?: number;
-  search?: string;
-}): Promise<RemoteInstrumentDefinition[]> {
-  const query = new URLSearchParams();
-  if (params?.connection) query.set('connection', params.connection);
-  if (params?.data_type) query.set('data_type', params.data_type);
-  if (params?.broker_id !== undefined && params.broker_id !== null) {
-    query.set('broker_id', String(params.broker_id));
+function checked(value: RemoteInstrumentDefinition): RemoteInstrumentDefinition {
+  if (!value || typeof value.id !== 'string' || !/^[1-9]\d*$/.test(value.id) || typeof value.symbol !== 'string' || !value.symbol ||
+    ['point_value','point_size','tick_size','tick_step','margin_rate','decimals','tick_value_in_money','min_volume','max_volume','lot_step','default_spread','default_slippage','min_distance','order_size_multiplier','order_size_step','swap_long','swap_short','swap_3day_day','broker_id'].some(key => typeof value[key] !== 'number' || !Number.isFinite(value[key])) ||
+    ['description','data_type','commissions'].some(key => typeof value[key] !== 'string') ||
+    ['contract_size','pip_size'].some(key => value[key] !== null && (typeof value[key] !== 'number' || !Number.isFinite(value[key]) || Number(value[key]) <= 0))) {
+    throw new Error('The host returned an invalid instrument specification.');
   }
-  if (params?.search) query.set('search', params.search);
-  const qStr = query.toString();
-  const path = qStr ? `/instruments?${qStr}` : '/instruments';
-  const records = await client.get<RemoteInstrumentDefinition[]>(path);
-  return records || [];
+  if (value.swap_settings !== null) {
+    const swap = value.swap_settings;
+    if (!swap || typeof swap.use !== 'boolean' || !['money','points','percent'].includes(swap.type) ||
+      !Number.isFinite(swap.long) || !Number.isFinite(swap.short) || !days.includes(swap.tripleSwapOn) ||
+      !/^([01]\d|2[0-3]):[0-5]\d$/.test(swap.rolloutHour)) throw new Error('Invalid stored swap specification.');
+  }
+  return value;
 }
 
-export async function saveRemoteInstrument(item: FileInstrument): Promise<void> {
-  const payload = fromFileInstrument(item);
-  await client.post('/instruments', payload);
+export function toFileInstrument(value: RemoteInstrumentDefinition, brokers: InstrumentBroker[] = []): CatalogInstrument {
+  const record = checked(value);
+  const broker = brokers.find(item => Number(item.id) === record.broker_id);
+  // Legacy numeric commissions remain unchanged in record; their model is unspecified.
+  const parsed: unknown = JSON.parse(record.commissions);
+  const structured = typeof parsed === 'object' && parsed !== null && 'version' in parsed && parsed.version === 1 && 'settings' in parsed;
+  const commission = structured ? (parsed as { settings: FileInstrument['commission'] }).settings : defaultCommission();
+  if (!commission || typeof commission.model !== 'string' || !Number.isFinite(commission.value)) throw new Error('Invalid stored commission specification.');
+  return {
+    id: record.id, record, symbol: record.symbol, name: record.description, type: record.data_type,
+    broker: String(record.broker_id), brokerName: broker?.name ?? ([-1,0].includes(record.broker_id) ? 'Default' : 'Broker ' + record.broker_id), timezone: broker?.timezone ?? 'UTC',
+    pointValue: record.point_value, pointSize: record.point_size, tickSize: record.tick_size, tickStep: record.tick_step,
+    contractSize: record.contract_size, pipSize: record.pip_size, marginRate: record.margin_rate, decimals: record.decimals,
+    tickValue: record.tick_value_in_money, minVolume: record.min_volume, maxVolume: record.max_volume, lotStep: record.lot_step,
+    spread: record.default_spread, slippage: record.default_slippage, minDistance: record.min_distance,
+    multiplier: record.order_size_multiplier, sizeStep: record.order_size_step, commission,
+    swap: record.swap_settings ?? { use: record.swap_long !== 0 || record.swap_short !== 0, type: 'points', long: record.swap_long,
+      short: record.swap_short, tripleSwapOn: days[record.swap_3day_day], rolloutHour: '23:00' },
+  };
 }
-
-export async function updateRemoteInstrument(
-  symbol: string,
-  updates: Partial<RemoteInstrumentDefinition>,
-): Promise<void> {
-  await client.put(`/instruments/${encodeURIComponent(symbol)}`, updates);
+export const specificationFields = {
+  contractSize: 'contract_size', pipSize: 'pip_size', marginRate: 'margin_rate', decimals: 'decimals',
+  minVolume: 'min_volume', maxVolume: 'max_volume', lotStep: 'lot_step', tickValue: 'tick_value_in_money',
+};
+export function fromFileInstrument(item: FileInstrument): Record<string, unknown> {
+  if (!/^-?\d+$/.test(item.broker)) throw new Error('Choose a configured numeric broker ID.');
+  const values: Record<string, unknown> = {
+    symbol: item.symbol, description: item.name, broker_id: Number(item.broker), data_type: item.type,
+    point_value: item.pointValue, tick_size: item.tickSize, tick_step: item.tickStep,
+    default_spread: item.spread, default_slippage: item.slippage, min_distance: item.minDistance,
+    order_size_multiplier: item.multiplier, order_size_step: item.sizeStep,
+    commissions: JSON.stringify({ version: 1, settings: item.commission }), swap_settings: item.swap,
+  };
+  for (const [local, remote] of Object.entries(specificationFields)) {
+    const value = item[local as keyof FileInstrument];
+    if (value !== undefined) values[remote] = value;
+  }
+  return values;
 }
-
-export async function deleteRemoteInstrument(symbol: string): Promise<boolean> {
-  const res = await client.delete<{ deleted: boolean }>(`/instruments/${encodeURIComponent(symbol)}`);
-  return Boolean(res?.deleted);
+const patchFields: Record<string, string> = { ...specificationFields, name: 'description', type: 'data_type', pointValue: 'point_value', tickSize: 'tick_size', tickStep: 'tick_step', spread: 'default_spread', slippage: 'default_slippage', minDistance: 'min_distance', multiplier: 'order_size_multiplier', sizeStep: 'order_size_step', commission: 'commissions', swap: 'swap_settings' };
+export function instrumentPatch(item: FileInstrument, fields: InstrumentMassPatch['fields']): Record<string, unknown> {
+  const complete = fromFileInstrument(item);
+  return Object.fromEntries(Object.entries(fields).filter(([, enabled]) => enabled).map(([key]) => {
+    const remote = patchFields[key];
+    if (!remote || complete[remote] === undefined || (typeof complete[remote] === 'number' && !Number.isFinite(complete[remote]))) throw new Error('Select a valid instrument field and value.');
+    return [remote, complete[remote]];
+  }));
 }
-
-export async function cloneRemoteInstrument(
-  symbol: string,
-  cloneName: string,
-  brokerId = -1,
-  brokerPostfix = '',
-): Promise<RemoteInstrumentDefinition> {
-  return await client.post<RemoteInstrumentDefinition>('/instruments/clone', {
-    symbol,
-    clone_name: cloneName,
-    broker_id: brokerId,
-    broker_postfix: brokerPostfix,
-  });
+export async function fetchRemoteInstruments(params?: Record<string, string | number>): Promise<RemoteInstrumentDefinition[]> {
+  const query = new URLSearchParams(Object.entries(params ?? {}).map(([key, value]) => [key, String(value)]));
+  const rows = await client.get<RemoteInstrumentDefinition[]>('/instruments' + (query.size ? '?' + query : ''));
+  if (!Array.isArray(rows)) throw new Error('The host returned an invalid instrument catalog.');
+  const result = rows.map(checked);
+  if (new Set(result.map(row => row.id)).size !== result.length || new Set(result.map(row => row.symbol)).size !== result.length) throw new Error('The host returned duplicate instrument identities.');
+  return result;
 }
-
-export async function massEditRemoteInstruments(
-  symbols: string[],
-  updates: Record<string, unknown>,
-  changeFlags?: InstrumentMassPatch['fields'],
-): Promise<number> {
-  const res = await client.post<{ updated_count: number }>('/instruments/mass-edit', {
-    symbols,
-    updates,
-    change_flags: changeFlags,
-  });
-  return res?.updated_count ?? 0;
+export async function saveRemoteInstrument(item: FileInstrument): Promise<RemoteInstrumentDefinition> {
+  const record = checked(await client.post('/instruments', fromFileInstrument(item)));
+  if (record.symbol !== item.symbol) throw new Error('The host returned a different instrument symbol.');
+  return record;
 }
-
-export async function massDeleteRemoteInstruments(
-  symbols: string[],
-): Promise<{ deleted_count: number; is_async: boolean }> {
-  return await client.post<{ deleted_count: number; is_async: boolean }>('/instruments/mass-delete', {
-    symbols,
-  });
+export async function cloneRemoteInstrument(sourceId: string, newSymbol: string): Promise<RemoteInstrumentDefinition> {
+  const record = checked(await client.post('/instruments/clone', { source_id: sourceId, new_symbol: newSymbol }));
+  if (record.symbol !== newSymbol || record.id === sourceId) throw new Error('The host did not confirm a new clone identity.');
+  return record;
 }
-
-export async function exportInstrumentsXmlRemote(symbols?: string[]): Promise<string> {
-  const res = await client.post<{ xml: string }>('/instruments/save', { symbols: symbols || [] });
-  return res?.xml ?? '';
-}
-
-export async function importInstrumentsXmlRemote(
-  xmlContent: string,
-  conflictPolicy = 'overwrite_all',
-): Promise<{ imported: number; overwritten: number; skipped: number; symbols: string[] }> {
-  return await client.post<{
-    imported: number;
-    overwritten: number;
-    skipped: number;
-    symbols: string[];
-  }>('/instruments/load', { xml_content: xmlContent, conflict_policy: conflictPolicy });
-}
-
-export async function listAliasesRemote(): Promise<AliasRecord[]> {
-  const res = await client.get<AliasRecord[]>('/instruments/aliases');
-  return res || [];
-}
-
-export async function addAliasRemote(alias: string, instrument: string, description = ''): Promise<void> {
-  await client.post('/instruments/aliases', { alias, instrument, description });
-}
-
-export async function editAliasRemote(alias: string, instrument: string, description = ''): Promise<void> {
-  await client.put(`/instruments/aliases/${encodeURIComponent(alias)}`, { alias, instrument, description });
-}
-
-export async function deleteAliasRemote(alias: string): Promise<boolean> {
-  const res = await client.delete<{ removed: boolean }>(`/instruments/aliases/${encodeURIComponent(alias)}`);
-  return Boolean(res?.removed);
+export async function massEditRemoteInstruments(instrumentIds: string[], updates: Record<string, unknown>): Promise<RemoteInstrumentDefinition[]> {
+  const response = await client.post<{ updated_count: number; instruments: RemoteInstrumentDefinition[] }>('/instruments/mass-edit', { instrument_ids: instrumentIds, updates });
+  if (!response || !Array.isArray(response.instruments) || response.updated_count !== new Set(instrumentIds).size || response.instruments.length !== response.updated_count) throw new Error('The host did not confirm all instrument changes.');
+  const records = response.instruments.map(checked);
+  if (new Set(records.map(row => row.id)).size !== records.length || records.some(row => !instrumentIds.includes(row.id))) throw new Error('The host returned different instrument identities.');
+  return records;
 }
