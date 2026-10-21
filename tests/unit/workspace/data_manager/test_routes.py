@@ -60,6 +60,7 @@ def test_routes_direct_endpoints() -> None:
             "date_from": "2026-01-01",
             "date_to": "2026-01-05",
             "bars": 100,
+            "path": "data/history/dukascopy/EURUSD/M1.parquet",
             "created_at": now_iso,
             "updated_at": now_iso,
         },
@@ -88,6 +89,24 @@ def test_routes_direct_endpoints() -> None:
         assert len(body["data"]) == 1
         assert body["data"][0]["symbol"] == "EURUSD"
         assert body["data"][0]["total_days"] == 4
+        assert body["data"] == [
+            item.to_dict() for item in workspace.home.get_saved_datasets()
+        ]
+        assert body["data"][0]["total_records"] == 100
+        assert body["data"][0]["broker_name"] == "Dukascopy Broker"
+        assert body["data"][0]["underlying"] == "EUR/USD Spot"
+        assert body["data"][0]["path"] == "data/history/dukascopy/EURUSD/M1.parquet"
+        assert body["data"][0]["bar_type"] == "start"
+
+
+def test_empty_catalog_response() -> None:
+    """An empty database produces a successful empty catalog, not fallback rows."""
+    app = FastAPI()
+    app.include_router(create_data_manager_router(DataManagerWorkspace()))
+    with TestClient(app) as client:
+        response = client.get("/data/home/datasets")
+    assert response.status_code == 200
+    assert response.json()["data"] == []
 
 
 def test_routes_auth_enforcement() -> None:

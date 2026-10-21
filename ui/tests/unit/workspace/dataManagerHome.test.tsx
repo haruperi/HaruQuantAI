@@ -22,6 +22,7 @@ describe('DataManagerHome component and store wiring', () => {
     vi.restoreAllMocks();
     memory.clear();
     vi.stubGlobal('localStorage', storage);
+    useDataManagerStore.setState({ definitions: [], savedDatasets: null, catalogLoading: false, catalogError: '', brokers: [], brokerJob: null, storageError: '' });
   });
 
   afterEach(() => {
@@ -93,6 +94,13 @@ describe('DataManagerHome component and store wiring', () => {
           date_from: '2025-01-01',
           date_to: '2025-04-01',
           category: 'Forex',
+          total_days: 90,
+          total_records: 125000,
+          broker_name: 'Dukascopy Broker',
+          underlying: 'EUR/USD Spot',
+          instrument: 'EURUSD.fx',
+          path: 'data/history/dukascopy/EURUSD/M1.parquet',
+          bar_type: 'end',
         },
       ],
     };
@@ -119,7 +127,17 @@ describe('DataManagerHome component and store wiring', () => {
       from: '2025-01-01',
       to: '2025-04-01',
       category: 'Forex',
+      totalDays: 90,
+      brokerName: 'Dukascopy Broker',
+      underlying: 'EUR/USD Spot',
+      instrument: 'EURUSD.fx',
+      path: 'data/history/dukascopy/EURUSD/M1.parquet',
+      barType: 'end',
     });
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost/api/v1/data/home/datasets',
+      expect.objectContaining({ method: 'GET' }),
+    );
   });
 
   it('syncs remote datasets into store and updates existing bar counts', async () => {
@@ -197,6 +215,58 @@ describe('DataManagerHome component and store wiring', () => {
     // Appended new
     expect(state.definitions[1].id).toBe('ds_dukascopy_GBPUSD_M1');
     expect(state.definitions[1].bars).toBe(80000);
+    expect(state.savedDatasets).toEqual(state.definitions);
+    expect(state.savedDatasets?.[0]).not.toBe(state.definitions[0]);
+    expect(state.catalogLoading).toBe(false);
+    expect(state.catalogError).toBe('');
+  });
+
+  it('clears both old server rows and cached definitions after an empty success', async () => {
+    const row = { id: 'old', symbol: 'OLD' } as MockDefinition;
+    useDataManagerStore.setState({ definitions: [row], savedDatasets: [row] });
+    setDataClient(createDomainClient('/data', { fetchFn: vi.fn().mockResolvedValue(new Response(JSON.stringify({ status: 'success', data: [] }))) }));
+    await useDataManagerStore.getState().syncRemoteDatasets();
+    expect(useDataManagerStore.getState()).toMatchObject({ definitions: [], savedDatasets: [], catalogError: '', catalogLoading: false });
+  });
+
+  it('surfaces initial failures without promoting cached definitions to the catalog', async () => {
+    useDataManagerStore.setState({ definitions: [{ id: 'cached' } as MockDefinition] });
+    setDataClient(createDomainClient('/data', { fetchFn: vi.fn().mockRejectedValue(new Error('Host unavailable')) }));
+    await useDataManagerStore.getState().syncRemoteDatasets();
+    expect(useDataManagerStore.getState()).toMatchObject({ savedDatasets: null, catalogError: 'Host unavailable', catalogLoading: false });
+  });
+
+  it('retains only the last server snapshot on malformed refresh and recovers on retry', async () => {
+    const row = { id: 'server' } as MockDefinition;
+    useDataManagerStore.setState({ savedDatasets: [row] });
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 'success', data: {} })))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 'success', data: [] })));
+    setDataClient(createDomainClient('/data', { fetchFn }));
+    await useDataManagerStore.getState().syncRemoteDatasets();
+    expect(useDataManagerStore.getState()).toMatchObject({ savedDatasets: [row], catalogError: 'Invalid saved dataset catalog response.' });
+    await useDataManagerStore.getState().syncRemoteDatasets();
+    expect(useDataManagerStore.getState()).toMatchObject({ savedDatasets: [], catalogError: '' });
+  });
+
+  it('ignores responses from superseded catalog requests', async () => {
+    let finishOld: (response: Response) => void = () => { throw new Error('Request not started'); };
+    const fetchFn = vi.fn()
+      .mockImplementationOnce(() => new Promise<Response>(resolve => { finishOld = resolve; }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 'success', data: [] })));
+    setDataClient(createDomainClient('/data', { fetchFn }));
+    const oldRequest = useDataManagerStore.getState().syncRemoteDatasets();
+    expect(useDataManagerStore.getState().catalogLoading).toBe(true);
+    await useDataManagerStore.getState().syncRemoteDatasets();
+    finishOld(new Response(JSON.stringify({ status: 'success', data: [{ id: 'old', symbol: 'OLD', timeframe: 'M1' }] })));
+    await oldRequest;
+    expect(useDataManagerStore.getState()).toMatchObject({ savedDatasets: [], catalogError: '', catalogLoading: false });
+  });
+
+  it.each([[{}], [null], [{ id: 'invalid', symbol: 'INVALID', timeframe: 'M1', total_records: -1 }]])('rejects malformed catalog rows without publishing them: %j', async item => {
+    setDataClient(createDomainClient('/data', { fetchFn: vi.fn().mockResolvedValue(new Response(JSON.stringify({ status: 'success', data: [item] }))) }));
+    await useDataManagerStore.getState().syncRemoteDatasets();
+    expect(useDataManagerStore.getState()).toMatchObject({ savedDatasets: null, catalogError: 'Invalid saved dataset catalog response.', catalogLoading: false });
   });
 
   it('performs dataset edit, clear, and remove actions against backend API', async () => {
@@ -223,11 +293,15 @@ describe('DataManagerHome component and store wiring', () => {
       storageError: '',
     });
 
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ status: 'success', data: { ok: true } }),
-    } as Response);
+    const serverRow = { ...testDef, date_from: testDef.from, date_to: testDef.to, timezone: 'Europe/Prague', total_days: 30 };
+    const response = (data: unknown) => new Response(JSON.stringify({ status: 'success', data }));
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce(response({ ok: true }))
+      .mockResolvedValueOnce(response([serverRow]))
+      .mockResolvedValueOnce(response({ ok: true }))
+      .mockResolvedValueOnce(response([{ ...serverRow, bars: 0, date_from: '', date_to: '', total_days: 0 }]))
+      .mockResolvedValueOnce(response({ ok: true }))
+      .mockResolvedValueOnce(response([]));
 
     setDataClient(createDomainClient('/data', {
       baseUrl: 'http://localhost/api/v1',
@@ -241,6 +315,7 @@ describe('DataManagerHome component and store wiring', () => {
       expect.objectContaining({ method: 'PUT' }),
     );
     expect(useDataManagerStore.getState().definitions[0].timezone).toBe('Europe/Prague');
+    expect(useDataManagerStore.getState().savedDatasets?.[0].timezone).toBe('Europe/Prague');
 
     // Clear
     await useDataManagerStore.getState().clearDataset('ds_test_1');
@@ -249,6 +324,7 @@ describe('DataManagerHome component and store wiring', () => {
       expect.objectContaining({ method: 'POST' }),
     );
     expect(useDataManagerStore.getState().definitions[0].bars).toBe(0);
+    expect(useDataManagerStore.getState().savedDatasets?.[0].totalDays).toBe(0);
 
     // Remove
     await useDataManagerStore.getState().removeDataset('ds_test_1');
@@ -257,6 +333,8 @@ describe('DataManagerHome component and store wiring', () => {
       expect.objectContaining({ method: 'POST' }),
     );
     expect(useDataManagerStore.getState().definitions).toHaveLength(0);
+    expect(useDataManagerStore.getState().savedDatasets).toEqual([]);
+    expect(useDataManagerStore.getState().catalogError).toBe('');
   });
 
   it('replaces stale or synthetic local datasets with authoritative backend datasets', async () => {

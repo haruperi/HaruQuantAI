@@ -21,6 +21,7 @@ import {
 import { createDomainClient, type DomainClient } from '../../../host/transport';
 
 let dataClient = createDomainClient('/data');
+let catalogRequest = 0;
 
 export function setDataClient(client: DomainClient): void {
   dataClient = client;
@@ -48,6 +49,8 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
     bars?: number;
     bar_count?: number;
     bars_count?: number;
+    total_records?: number;
+    total_days?: number;
     date_from?: string;
     date_to?: string;
     category?: string;
@@ -55,7 +58,13 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
     instrument?: string;
     path?: string;
     bar_type?: string;
-  }>>('/datasets');
+  }>>('/home/datasets');
+  if (!Array.isArray(list) || list.some(item => !item ||
+      typeof item.id !== 'string' || typeof item.symbol !== 'string' || typeof item.timeframe !== 'string' ||
+      [item.total_days, item.total_records, item.bars, item.bar_count, item.bars_count]
+        .some(value => value !== undefined && (typeof value !== 'number' || !Number.isFinite(value) || value < 0)))) {
+    throw new Error('Invalid saved dataset catalog response.');
+  }
   return list.map(item => {
     let bName = (item.broker_name || item.broker || 'Default').trim();
     if (bName === '-1') bName = 'Default';
@@ -73,7 +82,8 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
       category: item.category || 'Forex',
       from: (item.date_from || '').split(/[T ]/)[0],
       to: (item.date_to || '').split(/[T ]/)[0],
-      bars: item.bars ?? item.bar_count ?? item.bars_count ?? 0,
+      bars: item.total_records ?? item.bars ?? item.bar_count ?? item.bars_count ?? 0,
+      totalDays: item.total_days ?? 0,
       path: normalizeRelativePath(item.path),
       barType: item.bar_type || 'Start of bar',
     };
@@ -86,9 +96,13 @@ export interface MockDefinition {
   category: string; from: string; to: string; bars: number;
   path?: string;
   barType?: string;
+  totalDays?: number;
 }
 const storageKey = 'sqx-data-manager-v1';
 interface DataState { definitions: MockDefinition[]; brokers: BrokerProfile[]; brokerJob:BrokerUpdateJob|null; storageError: string; addData: (request: AddDukasRequest) => Promise<void>;
+  savedDatasets: MockDefinition[] | null;
+  catalogLoading: boolean;
+  catalogError: string;
   saveBroker:(profile:BrokerProfile)=>Promise<void>; saveBrokerStocks:(id:string,stocks:string[])=>Promise<void>; removeBrokers:(ids:string[])=>Promise<void>; importBrokers:(profiles:Omit<BrokerProfile,'id'>[],overwrite:string[])=>Promise<number>;
   startBrokerUpdate:(ids:string[],existing:string[])=>void; advanceBrokerUpdate:()=>void; brokerAction:(action:'pause'|'resume'|'stop')=>void;
   syncRemoteDatasets: () => Promise<void>;
@@ -118,6 +132,9 @@ function readState(): Pick<DataState, 'definitions' | 'brokers' | 'brokerJob' | 
 }
 export const useDataManagerStore = create<DataState>((set, get) => ({
   ...readState(),
+  savedDatasets: null,
+  catalogLoading: false,
+  catalogError: '',
   saveBroker: async profile => {
     const state = get();
     if (state.storageError) throw new Error(state.storageError);
@@ -340,15 +357,17 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     }
   },
   syncRemoteDatasets: async () => {
-    get().syncBrokers().catch(() => {});
+    const request = ++catalogRequest;
+    set({ catalogLoading: true, catalogError: '' });
     try {
       const remote = await fetchRemoteDatasets();
-      if (!remote || !remote.length) return;
-      const state = get();
-      try { persistData(state, state.brokers, remote, state.brokerJob); } catch { /* ignore */ }
-      set({ definitions: remote });
-    } catch {
-      // Non-blocking sync
+      if (request !== catalogRequest) return;
+      set({ savedDatasets: remote, definitions: remote.map(row => ({ ...row })) });
+    } catch (cause) {
+      if (request !== catalogRequest) return;
+      set({ catalogError: cause instanceof Error ? cause.message : 'Unable to load saved dataset catalog.' });
+    } finally {
+      if (request === catalogRequest) set({ catalogLoading: false });
     }
   },
   syncBrokers: async () => {
@@ -383,6 +402,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     const definitions = state.definitions.map(d => (d.id === id ? { ...d, ...updates } : d));
     try { persistData(state, state.brokers, definitions, state.brokerJob); } catch { /* ignore */ }
     set({ definitions });
+    await get().syncRemoteDatasets();
   },
   clearDataset: async (id: string) => {
     const state = get();
@@ -390,6 +410,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     const definitions = state.definitions.map(d => (d.id === id ? { ...d, bars: 0, from: '', to: '' } : d));
     try { persistData(state, state.brokers, definitions, state.brokerJob); } catch { /* ignore */ }
     set({ definitions });
+    await get().syncRemoteDatasets();
   },
   removeDataset: async (id: string) => {
     const state = get();
@@ -397,6 +418,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     const definitions = state.definitions.filter(d => d.id !== id);
     try { persistData(state, state.brokers, definitions, state.brokerJob); } catch { /* ignore */ }
     set({ definitions });
+    await get().syncRemoteDatasets();
   },
   fetchChartBars: async (datasetId: string, limit = 500, offset = 0) => {
     const resp = await dataClient.post<{ bars: Array<{ datetime: string; open: number; high: number; low: number; close: number; volume: number }> }>('/datasets/review-chart', {

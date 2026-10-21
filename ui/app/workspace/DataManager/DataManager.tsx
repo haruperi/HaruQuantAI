@@ -442,11 +442,10 @@ function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
   onDeleteRow?: (id: string) => void;
 }) {
   const td = useTickDownloader();
-  const definitions = useDataManagerStore(state => state.definitions);
-  const brokerProfiles = useDataManagerStore(state => state.brokers);
-  const downloadRanges = useDukascopyDownloads(state => state.ranges);
+  const savedDatasets = useDataManagerStore(state => state.savedDatasets);
+  const catalogLoading = useDataManagerStore(state => state.catalogLoading);
+  const catalogError = useDataManagerStore(state => state.catalogError);
   const downloadJob = useDukascopyDownloads(state => state.job);
-  const fileDefinitions = useFileSymbols(state => state.definitions);
   const imports = useFileImports();
   const sq = useSQData();
   const darwinex = useDarwinex();
@@ -457,11 +456,7 @@ function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
   const tools = useDataTools();
   const stockGroups = useStockGroups();
   const [stockGroup, setStockGroup] = useState('');
-  const committed = definitions.map(row => ({
-    ...row,
-    brokerName: getBrokerDisplayName(row.brokerName, row.broker, brokerProfiles),
-  }));
-  const allDatasets = [...committed, ...((activeImport(imports.job?.state) ? imports.job?.tasks : [])?.filter(task => !committed.some(row => row.id === task.record.id)).map(task => ({ ...task.record, brokerName: getBrokerDisplayName(task.record.brokerName, task.record.broker, brokerProfiles), from: '', to: '', bars: 0, path: '' })) ?? [])];
+  const allDatasets = savedDatasets ?? [];
   const [query, setQuery] = useState('');
   const [source, setSource] = useState('');
   const [dataType, setDataType] = useState('');
@@ -476,7 +471,7 @@ function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
   const allSelected = rows.length > 0 && rows.every(row => selectedIds.includes(row.id));
   const columns = ['Instrument', 'Broker profile', 'Underlying Symbol', 'Timeframe', 'Timezone',
     'Date from', 'Date to', 'Total Days', 'Total Records', 'Source', 'Bar type', 'Data type', 'Path'];
-  return <main className="full dataset-workspace" aria-label="Historical data">
+  return <main className="full dataset-workspace" aria-label="Historical data" aria-busy={catalogLoading}>
     <div className="dataset-filters">
       <input className="text-input" aria-label="Filter items" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
       <select className="text-input" aria-label="Data source" value={source} onChange={event => setSource(event.target.value)}>
@@ -488,7 +483,11 @@ function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
       <select className="text-input" aria-label="Stock group" value={stockGroup} onChange={event => setStockGroup(event.target.value)}><option value="">By stock group - none</option>{stockGroups.groups.map(group => <option value={group.id} key={group.id}>{group.name}</option>)}</select>
       <select className="text-input" aria-label="Broker profile" value={brokerFilter} onChange={event=>setBrokerFilter(event.target.value)}><option value="">All broker profiles</option>{[...new Set(allDatasets.map(row=>row.brokerName).filter(name=>name&&name!=='—'))].map(name=><option key={name}>{name}</option>)}</select>
       <span role="status">Records: {rows.length}</span>
+      <Button disabled={catalogLoading} onClick={() => { void useDataManagerStore.getState().syncRemoteDatasets(); }}>
+        {catalogLoading ? 'Loading dataset catalog…' : catalogError ? 'Retry dataset catalog' : 'Refresh dataset catalog'}
+      </Button>
     </div>
+    {catalogError && <div role="alert" className="callout">Unable to load saved dataset catalog: {catalogError}{savedDatasets !== null && ' Showing the last successful catalog; it may be out of date.'}</div>}
     <div className="dataset-grid"><table className="plain-table" aria-label="Historical data">
       <thead><tr>
         <th><input type="checkbox" aria-label="Select all visible datasets" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selectedIds.filter(id => !rows.some(row => row.id === id)) : [...new Set([...selectedIds, ...rows.map(row => row.id)])])}/></th>
@@ -496,7 +495,7 @@ function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
         {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Status" style={{ minWidth: 120 }}/><th aria-label="Row actions" style={{ width: 36 }}/>
       </tr></thead>
       <tbody>{rows.map(row => {
-        const days = row.from && row.to ? Math.floor((Date.parse(row.to) - Date.parse(row.from)) / 86400000) + 1 : 0;
+        const days = row.totalDays ?? 0;
         const darwinexIndex = darwinex.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
         const darwinexStatus = darwinexIndex >= 0 ? darwinexIndex < darwinex.job!.completed ? 'Completed' : `${darwinex.job!.state} ${darwinex.job!.progress}%` : darwinex.definitions.some(item => item.id === row.id) ? 'Completed' : '';
         const cryptoIndex = crypto.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
@@ -523,13 +522,14 @@ function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
           <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : ''}</td>
           <td style={{ textAlign: 'center' }}><button className="instrument-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
         </tr>;
-      })}{!rows.length && <tr><td colSpan={17} className="dataset-empty">{allDatasets.length ? 'No matching data.' : 'No data defined.'}</td></tr>}</tbody>
+      })}{!rows.length && <tr><td colSpan={17} className="dataset-empty">{catalogLoading ? 'Loading saved dataset catalog…' : catalogError ? 'Saved dataset catalog unavailable.' : allDatasets.length ? 'No matching data.' : 'No saved datasets found in catalog.'}</td></tr>}</tbody>
     </table></div>
   </main>;
 }
 
 export function DataManager() {
   const definitions = useDataManagerStore(state => state.definitions);
+  const savedDatasets = useDataManagerStore(state => state.savedDatasets);
   const brokerProfiles = useDataManagerStore(state => state.brokers);
   const brokerJob = useDataManagerStore(state => state.brokerJob);
   const download = useDukascopyDownloads();
@@ -609,6 +609,9 @@ export function DataManager() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [nestedOpen, setNestedOpen] = useState(false);
   const [selectedDatasetIds, setSelectedDatasetIds] = useState<string[]>([]);
+  useEffect(() => {
+    if (savedDatasets !== null) setSelectedDatasetIds(current => current.filter(id => savedDatasets.some(row => row.id === id)));
+  }, [savedDatasets]);
   const [progress, setProgress] = useState(0);
   const [operationState, setOperationState] = useState<OperationState>('idle');
   const [operationLabel, setOperationLabel] = useState('No active operations');
@@ -692,8 +695,12 @@ export function DataManager() {
   }, []);
 
   useEffect(() => {
-    useDataManagerStore.getState().syncRemoteDatasets?.();
-  }, []);
+    if (['Data sources', 'Export', 'Tools'].includes(tab)) void useDataManagerStore.getState().syncRemoteDatasets();
+  }, [tab]);
+  useEffect(() => { void useDataManagerStore.getState().syncBrokers(); }, []);
+  useEffect(() => {
+    if (providerJob?.state === 'completed') void useDataManagerStore.getState().syncRemoteDatasets();
+  }, [providerJob?.state]);
 
   const startOperation = (label: string) => { if ([td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(state => state === 'running' || state === 'paused')) { setSelectionMessage('Finish or stop the active data operation first.'); return; } setSelectionMessage(''); setOpenMenu(null); setNestedOpen(false); setOperationLabel(label); setProgress(4); setOperationState('running'); notify(`${label} started`); };
   const runDirectAction = (action: DirectDataSourceAction) => {

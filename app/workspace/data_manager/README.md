@@ -33,6 +33,14 @@ and multi-format export.
 #### Module 1: Home Dashboard (`home.py`)
 - `FEAT-DATAMGR-HOME`: Dashboard metrics, storage health, entity counts, and doc links.
 - `FR-DATAMGR-HOME-OVERVIEW`: Aggregate dataset, instrument, session, and provider metrics.
+- `FR-DATAMGR-HOME-DATASETS-CATALOG`: Read-only saved dataset projection from
+  `datamgr_datasets` through `Home.get_saved_datasets()`, shared by CLI and GET
+  `/data/home/datasets`. Historical data displays this server snapshot, including
+  elapsed `total_days` and stored path. Bar type uses DataInfo's `start` default
+  when absent (the current dataset schema has no bar-type column). Successful
+  empty results clear stale rows; loading and errors are explicit, with retry. Browser definitions
+  and simulated jobs do not establish saved catalog membership. A failed refresh
+  may retain the previous server snapshot only with a visible stale-data warning.
 - `FR-DATAMGR-HOME-DOC-LINKS`: Curated documentation links for the Data Manager workspace.
 - `FR-DATAMGR-HOME-STORAGE-AUDIT`: Parquet storage footprint and file audit.
 

@@ -177,6 +177,8 @@ class Home:
                     connection=source,
                     data_type=data_type,
                     category=data_type,
+                    path=str(r.get("path", "")),
+                    bar_type=str(r.get("bar_type", "start")),
                 )
             )
 

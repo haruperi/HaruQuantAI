@@ -174,6 +174,7 @@ def test_home_service_saved_datasets() -> None:
             "date_from": "2026-01-01",
             "date_to": "2026-01-11",
             "bars": 5000,
+            "path": "data/history/dukascopy/EURUSD/M1.parquet",
             "created_at": now_iso,
             "updated_at": now_iso,
         },
@@ -244,6 +245,8 @@ def test_home_service_saved_datasets() -> None:
     assert ds1.connection == "dukascopy"
     assert ds1.data_type == "Forex"
     assert ds1.category == "Forex"
+    assert ds1.path == "data/history/dukascopy/EURUSD/M1.parquet"
+    assert ds1.bar_type == "start"
 
     # Validate Row 2 (invalid dates -> total_days == 0)
     ds2 = datasets[1]
@@ -254,6 +257,8 @@ def test_home_service_saved_datasets() -> None:
     ds3 = datasets[2]
     assert ds3.symbol == "NO_DATES"
     assert ds3.total_days == 0
+    assert ds3.path == ""
+    assert ds3.bar_type == "start"
 
 
 def test_home_cli_formatting() -> None:
