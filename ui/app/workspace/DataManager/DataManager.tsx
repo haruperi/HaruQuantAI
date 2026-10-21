@@ -79,7 +79,7 @@ import { CloneTimezoneDialog } from '../../plugins/data_source/Tools/CloneTimezo
 import { ViewAnalyzeDialog } from '../../plugins/data_source/Tools/ViewAnalyzeDialog';
 import { selectCloneTargets, selectReviewTarget, type ToolTarget } from '../../plugins/data_source/Tools/dataTools';
 import { toolsActive, useDataTools } from '../../plugins/data_source/Tools/dataToolsStore';
-import { clearLogs, fetchLogs, formatSqxLogLine } from './dataManagerLogClient';
+import { cancelLogOperation, clearLogs, fetchLogs, formatDataLogLine, isErrorLogRecord, subscribeDataLogStream } from './dataManagerLogClient';
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import {
   Bitcoin, ChartCandlestick, ChevronDown, ChevronRight, CircleDollarSign,
@@ -476,7 +476,7 @@ export function DataManager() {
       fetchLogs()
         .then(records => {
           if (records && records.length > 0) {
-            const formatted = records.map(formatSqxLogLine);
+            const formatted = records.map(formatDataLogLine);
             setLogEntries(formatted);
           }
         })
@@ -486,15 +486,57 @@ export function DataManager() {
     }
   }, [tab]);
 
+  useEffect(() => {
+    if (hostStatus !== 'online') return;
+    return subscribeDataLogStream({
+      onEntry: record => {
+        setLogEntries(current => [...current, formatDataLogLine(record)].slice(-500));
+      },
+      onSnapshot: records => {
+        if (records.length > 0) setLogEntries(records.map(formatDataLogLine).slice(-500));
+      },
+      onCleared: () => {
+        setLogEntries([]);
+        setProgress(0);
+      },
+      onProgress: state => {
+        if (state.status === 'running' || state.status === 'paused') {
+          setProgress(state.progress);
+          setOperationLabel(state.label);
+        }
+      },
+    });
+  }, [hostStatus]);
+
+  const canCancelLogOperation =
+    operationState === 'running' ||
+    operationState === 'paused' ||
+    ['running', 'paused'].includes(providerJob?.state ?? '');
+
+  const handleCancelLogOperation = () => {
+    setSelectionMessage('');
+    if (providerJob && ['running', 'paused'].includes(providerJob.state)) {
+      providerAction('stop');
+    } else if (operationState === 'running' || operationState === 'paused') {
+      setOperationState('cancelled');
+    }
+    void cancelLogOperation('', operationLabel).catch(() => undefined);
+    notify(`${operationLabel} cancelled`);
+  };
+
   const handleClearLog = async () => {
     try {
       await clearLogs();
-      setLogEntries([]);
-      notify('Logs cleared.');
     } catch {
-      setLogEntries([]);
-      notify('Logs cleared.');
+      // reset local log and completed/cancelled progress even when offline
     }
+    setLogEntries([]);
+    setProgress(0);
+    if (operationState === 'completed' || operationState === 'cancelled') {
+      setOperationState('idle');
+      setOperationLabel('No active operations');
+    }
+    notify('Logs cleared.');
   };
   const [lastControlId, setLastControlId] = useState<string | null>(null);
   const ribbonRef = useRef<HTMLDivElement>(null);
@@ -675,7 +717,7 @@ export function DataManager() {
       case 'custom-data': return <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/>;
       case 'instruments': return <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/>;
       case 'sessions': return <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/>;
-      case 'log': return <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></div></main>;
+      case 'log': return <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-log-cancel-btn" className="cancel-log log-cancel-button" disabled={!canCancelLogOperation} onClick={handleCancelLogOperation}>Cancel operation</button><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="dm-log-progress" data-testid="dm-log-progress"><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/></div><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => { const isError = isErrorLogRecord(entry); return <div key={index} className={isError ? 'dm-log-entry log-entry-error' : 'dm-log-entry'} data-error={isError ? 'true' : 'false'}>{entry}</div>; })}</div></div></main>;
     }
   };
   const triggerArrange = (action: WorkspaceArrangement) => { setArrangeOpen(false); setArrangeRequest(current => ({ seq: (current?.seq ?? 0) + 1, action, targetId: panelForTab[tab] })); };

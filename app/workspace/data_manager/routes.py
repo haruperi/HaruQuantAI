@@ -51,6 +51,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
 from .home import Home
+from .log import DataLog
 
 if TYPE_CHECKING:
     from app.host.discovery import PluginLifecycleManager
@@ -130,8 +131,9 @@ class AppDataManager:
         self.broker_registry = broker_registry
         self.job_manager = job_manager
 
-        # Initialize retained Home service
+        # Initialize retained Home and Log services
         self.home = Home()
+        self.log = DataLog(event_bus=event_bus)
 
         logger.info(
             "%s: Initialized AppDataManager",
@@ -268,6 +270,26 @@ def _register_workspace_routes(router: APIRouter, ws: AppDataManager) -> None:
             return _workspace_error(str(error), code)
 
 
+def _register_log_routes(router: APIRouter, ws: AppDataManager) -> None:
+    @router.get("/logs")
+    def get_data_logs(limit: int = 100) -> JSONResponse:
+        try:
+            return _success(ws.log.data_log(limit=limit))
+        except ValueError as error:
+            return _workspace_error(str(error), 422)
+
+    @router.post("/logs")
+    def create_data_log(payload: dict[str, Any]) -> JSONResponse:
+        try:
+            return _success(ws.log.data_log(entry=payload)[0])
+        except ValueError as error:
+            return _workspace_error(str(error), 422)
+
+    @router.post("/logs/clear")
+    def clear_data_logs() -> JSONResponse:
+        return _success(ws.log.clear_log())
+
+
 def _workspace_error(message: str, code: int) -> JSONResponse:
     logger.warning("%s: Rejected workspace request", TAB_FR, extra={"fr_id": TAB_FR})
     return JSONResponse(
@@ -323,6 +345,7 @@ def create_data_manager_router(
 
     _register_home_routes(router, ws)
     _register_workspace_routes(router, ws)
+    _register_log_routes(router, ws)
 
     logger.info(
         "%s: Registered Data Manager router with %d route rules",

@@ -107,10 +107,9 @@ and multi-format export.
 - `FR-DATAMGR-CUSTOM-DATA-MQ4-RECOGNIZER`: MetaTrader 4 .mq4 buffer recognition.
 
 #### Module 9: Audit & Operation Logging (`log.py`)
-- `FEAT-DATAMGR-LOG`: Audit trail and operation logging with SQX log line formatting.
-- `FR-DATAMGR-LOG-AUDIT-ENTRIES`: Append, filter, and format audit records in `datamgr_logs`.
-- `FR-DATAMGR-LOG-CLEAR`: Global and symbol-filtered log clearing.
-- `FR-DATAMGR-LOG-OPERATION-TRACKING`: Structured operation tracking in `datamgr_operation_log`.
+- `FEAT-DATAMGR-LOG`: Real-time WebSocket log viewer and operation progress/cancellation controls for Data Manager data operations.
+- `FR-DATAMGR-LOG-STREAM`: `DataLog.data_log(limit: int = 100) -> list[dict[str, Any]]`; reads and normalizes persisted download, import, and export records from `datamgr_logs` and `datamgr_operation_log`, and streams live log/progress payloads over the host `EventBus` `"logs"` channel (`GET /data/logs`, `POST /data/logs`, `/api/v1/ws?channels=logs,jobs`).
+- `FR-DATAMGR-LOG-CLEAR`: `DataLog.clear_log() -> dict[str, Any]`; clears persisted operation/audit logs in `datamgr_logs` and `datamgr_operation_log`, resets operation progress/cancellation state, and broadcasts `"datamgr.log.cleared"` (`POST /data/logs/clear`).
 
 #### Module 10: Help & FAQ Catalog (`help.py`)
 - `FEAT-DATAMGR-HELP`: Contextual workflow guides and searchable FAQ items.

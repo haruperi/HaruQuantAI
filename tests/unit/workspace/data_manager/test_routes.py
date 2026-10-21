@@ -379,3 +379,50 @@ def test_shell_rejects_invalid_recorded_prices(tmp_path: Path) -> None:
     )["preview"]
     assert preview["state"] == "error"
     assert preview["rows"] == []
+
+
+def test_data_manager_log_routes() -> None:
+    """Test GET /data/logs, POST /data/logs, and POST /data/logs/clear routes."""
+    workspace = AppDataManager()
+    app = FastAPI()
+    app.include_router(create_data_manager_router(workspace))
+
+    with TestClient(app) as client:
+        res_empty = client.get("/data/logs")
+        assert res_empty.status_code == 200
+        assert res_empty.json()["data"] == []
+
+        res_create = client.post(
+            "/data/logs",
+            json={
+                "action": "DOWNLOAD",
+                "symbol": "GBPUSD",
+                "status": "running",
+                "progress": 60,
+                "message": "Downloading GBPUSD history",
+            },
+        )
+        assert res_create.status_code == 200
+        created = res_create.json()["data"]
+        assert created["symbol"] == "GBPUSD"
+        assert created["progress"] == 60
+        assert created["cancellable"] is True
+
+        res_bad_post = client.post("/data/logs", json={"action": "", "message": ""})
+        assert res_bad_post.status_code == 422
+
+        res_bad_limit = client.get("/data/logs?limit=0")
+        assert res_bad_limit.status_code == 422
+
+        res_list = client.get("/data/logs?limit=10")
+        assert res_list.status_code == 200
+        assert len(res_list.json()["data"]) == 1
+
+        res_clear = client.post("/data/logs/clear", json={})
+        assert res_clear.status_code == 200
+        assert res_clear.json()["data"] == {
+            "cleared": 2,
+            "status": "idle",
+            "progress": 0,
+        }
+        assert client.get("/data/logs").json()["data"] == []

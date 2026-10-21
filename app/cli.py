@@ -395,12 +395,19 @@ class HeadlessCliRunner:
                 "providers": [p.to_dict() for p in providers],
             }
         elif act in ("logs", "log"):
-            logs = dm.log.list_logs(limit=50)
+            logs = (
+                dm.log.data_log(limit=50)
+                if hasattr(dm.log, "data_log")
+                else dm.log.list_logs(limit=50)
+            )
             res = {
                 "command": "data",
                 "action": "logs",
                 "count": len(logs),
-                "logs": [entry.to_dict() for entry in logs],
+                "logs": [
+                    entry if isinstance(entry, dict) else entry.to_dict()
+                    for entry in logs
+                ],
             }
         else:
             raise ValueError(f"Unsupported data action: '{action}'")
