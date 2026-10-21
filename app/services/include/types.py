@@ -48,7 +48,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
+    uv run pytest tests/unit/services/include/test_types_actions.py --no-cov
     ```
 """
 
@@ -59,6 +59,21 @@ from typing import override
 from app.host.logging import get_logger
 
 logger = get_logger(__name__)
+
+__all__ = [
+    "BooleanConstant",
+    "BooleanVariable",
+    "DoubleVariable",
+    "IntVariable",
+    "NumberConstant",
+    "Types",
+    "Variable",
+    "boolean_constant",
+    "boolean_variable",
+    "double_variable",
+    "int_variable",
+    "number_constant",
+]
 
 
 class Variable[T]:
@@ -289,11 +304,11 @@ class NumberConstant:
 # ---------------------------------------------------------------------------
 
 
-def boolean_constant(value: bool, shift: int = 0) -> float:
+def boolean_constant(value: bool = False, shift: int = 0) -> float:
     """Evaluate boolean constant to 1.0 or 0.0.
 
     Args:
-        value: Boolean constant flag.
+        value: Boolean constant flag (default: False).
         shift: Relative bar shift (default: 0).
 
     Returns:
@@ -369,11 +384,11 @@ def int_variable(variable: Variable[int] | int, shift: int = 0) -> float:
     return res
 
 
-def number_constant(number: float, shift: int = 0) -> float:
+def number_constant(number: float = 0.0, shift: int = 0) -> float:
     """Evaluate number constant to float.
 
     Args:
-        number: Float or numeric constant.
+        number: Float or numeric constant (default: 0.0).
         shift: Relative bar shift (default: 0).
 
     Returns:

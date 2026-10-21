@@ -51,7 +51,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run pytest tests/unit/services/include/test_contracts.py --no-cov
+    uv run pytest tests/unit/services/include/test_types_actions.py --no-cov
     ```
 """
 
@@ -70,6 +70,28 @@ logger = get_logger(__name__)
 
 # Constants matching undefined order status
 ORDER_NOT_DEFINED: float = -1.0
+
+__all__ = [
+    "ORDER_NOT_DEFINED",
+    "ActionRecord",
+    "Actions",
+    "AssignVariableAction",
+    "CustomAction",
+    "DrawDownArrowAction",
+    "DrawUpArrowAction",
+    "DrawVerticalLineAction",
+    "LogToFileAction",
+    "LogToJournalAction",
+    "SendEmailAction",
+    "assign_variable",
+    "custom_action",
+    "draw_down_arrow",
+    "draw_up_arrow",
+    "draw_vertical_line",
+    "log_to_file",
+    "log_to_journal",
+    "send_email",
+]
 
 
 @dataclass(frozen=True)
@@ -370,13 +392,13 @@ def assign_variable(
 
 
 def custom_action(
-    command: str,
+    command: str = "",
     handler: Callable[[str], Any] | None = None,
 ) -> ActionRecord:
     """Execute a custom action command.
 
     Args:
-        command: Command string.
+        command: Command string (default: "").
         handler: Optional callable handler.
 
     Returns:
@@ -508,13 +530,13 @@ class Actions:
 
     @staticmethod
     def custom(
-        command: str,
+        command: str = "",
         handler: Callable[[str], Any] | None = None,
     ) -> ActionRecord:
         """Trigger a custom action.
 
         Args:
-            command: Command string.
+            command: Command string (default: "").
             handler: Optional callable.
 
         Returns:
