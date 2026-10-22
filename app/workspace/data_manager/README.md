@@ -88,6 +88,15 @@ Registered target scope does not establish independently verified donor parity.
 - `FEAT-DATAMGR-DATA`: Dataset catalog CRUD, Parquet bar I/O, chart review, and export.
 - `FR-DATAMGR-DATA-EDIT`: `Data.edit(dataset_id: str, updates: Mapping[str, Any] | None = None, **kwargs: Any) -> dict[str, Any]`;
   updates editable columns in `datamgr_datasets` with strict type validation, UTC timestamp tracking, and structured requirement logging.
+- `FR-DATAMGR-DATA-ADD`: `Data.add(source: str, symbol: str, timeframe: str = "M1", ...) -> dict[str, Any]`;
+  registers a new data symbol record into the `datamgr_datasets` table with default or custom specifications and duplicate guards.
+- `FR-DATAMGR-DATA-IMPORT`: `Data.import_data(source: str, symbol: str, timeframe: str = "M1", *, mode: str = "overwrite", ...) -> dict[str, Any]`;
+  downloads bars/ticks via `get_broker(source)`, formats integer tick prices, writes ZSTD-6 partitioned Parquet files, and synchronizes the catalog. Aliased as `import_` and `import`.
+- `FR-DATAMGR-DATA-STORAGE`: Canonical historical storage using partitioned Parquet with Zstandard level 6 compression and integer tick unit prices (`int64`).
+  Tick partitions: `{source}/ticks/{symbol}/{year}/{month:02d}-{month_abbr}.parquet`.
+  M1 partitions: `{source}/{timeframe}/{symbol}/{year}.parquet`.
+  Download modes: `overwrite` (replace partition data) and `missing` (skip present timestamps and append only missing data).
+- `FR-DATAMGR-DATA-READ`: `Data.read_polars()` provides Polars lazy scans, and `Data.query_duckdb()` provides direct SQL analytical querying over Parquet files.
 - `FR-DATAMGR-DATA-CATALOG-CRUD`: Dataset catalog management in `datamgr_datasets`.
 - `FR-DATAMGR-DATA-PARQUET-IO`: OHLCV and tick Parquet read/write operations.
 - `FR-DATAMGR-DATA-REVIEW-AND-EDIT`: Chart slice inspection, row review, and manual bar editing.

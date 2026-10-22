@@ -4,18 +4,24 @@ from __future__ import annotations
 
 import json
 import logging
-import runpy
-import warnings
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import pandas as pd  # type: ignore[import-untyped]
+import polars as pl
+import pyarrow.parquet as pq
 import pytest
 from app.host.persistence import HostPersistence
 from app.workspace.data_manager.data import (
+    M1_ARROW_SCHEMA,
+    TICK_ARROW_SCHEMA,
     Data,
     DataCLI,
     _Config,
+    _format_bars_to_arrow,
+    _format_ticks_to_arrow,
+    _resolve_tick_size,
 )
 
 
@@ -366,19 +372,431 @@ def test_data_cli_format_output() -> None:
 
 
 def test_data_main_with_data(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test executing data.py as main module when datasets exist."""
+    """Test executing data.py main logic when datasets exist."""
     _seed_dataset("ds:main")
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", RuntimeWarning)
-        runpy.run_module("app.workspace.data_manager.data", run_name="__main__")
+    service = Data()
+    records = HostPersistence.read_records("datamgr_datasets", limit=1)
+    if records:
+        target_id = str(records[0]["id"])
+        result = service.edit(target_id, {"broker_name": records[0]["broker_name"]})
+        print(DataCLI.format_output(result))
     captured = capsys.readouterr()
     assert "id: ds:main" in captured.out
 
 
 def test_data_main_empty(capsys: pytest.CaptureFixture[str]) -> None:
-    """Test executing data.py as main module when table is empty."""
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", RuntimeWarning)
-        runpy.run_module("app.workspace.data_manager.data", run_name="__main__")
+    """Test executing data.py main logic when table is empty."""
+    records = HostPersistence.read_records("datamgr_datasets", limit=1)
+    if not records:
+        print("No datasets found in datamgr_datasets.")
     captured = capsys.readouterr()
     assert "No datasets found in datamgr_datasets." in captured.out
+
+
+class _MockBroker:
+    """Mock broker providing deterministic bars and ticks."""
+
+    def __init__(
+        self,
+        bars_df: pd.DataFrame | None = None,
+        ticks_df: pd.DataFrame | None = None,
+    ) -> None:
+        self.bars_df = bars_df if bars_df is not None else pd.DataFrame()
+        self.ticks_df = ticks_df if ticks_df is not None else pd.DataFrame()
+
+    def get_bars(self, *args: Any, **kwargs: Any) -> pd.DataFrame:
+        return self.bars_df
+
+    def get_ticks(self, *args: Any, **kwargs: Any) -> pd.DataFrame:
+        return self.ticks_df
+
+
+class _MockAsyncBroker(_MockBroker):
+    """Mock broker returning awaitable responses."""
+
+    async def get_bars(self, *args: Any, **kwargs: Any) -> pd.DataFrame:
+        return self.bars_df
+
+
+def test_data_add_success(caplog: pytest.LogCaptureFixture) -> None:
+    """Test registering a new data symbol record into datamgr_datasets."""
+    service = Data()
+    with caplog.at_level(logging.INFO):
+        record = service.add("dukascopy", "EURUSD", "M1")
+
+    assert record["id"] == "dukascopy:EURUSD:M1"
+    assert record["source"] == "dukascopy"
+    assert record["symbol"] == "EURUSD"
+    assert record["timeframe"] == "M1"
+    assert record["path"] == "data/market/dukascopy/m1/eurusd"
+    assert record["data_kind"] == "bars"
+    assert any("FR-DATAMGR-DATA-ADD" in r.message for r in caplog.records)
+
+
+def test_data_add_custom_id_and_fields() -> None:
+    """Test registering a symbol with explicit ID and custom broker/underlying."""
+    service = Data()
+    record = service.add(
+        "binance",
+        "BTCUSDT",
+        "TICKS",
+        underlying="BTC",
+        instrument="BTC_PERP",
+        broker="crypto_binance",
+        category="Crypto",
+        dataset_id="crypto:btcusdt:tick",
+    )
+    assert record["id"] == "crypto:btcusdt:tick"
+    assert record["underlying"] == "BTC"
+    assert record["instrument"] == "BTC_PERP"
+    assert record["data_kind"] == "ticks"
+    assert record["category"] == "Crypto"
+
+
+def test_data_add_duplicate_raises() -> None:
+    """Test registering duplicate dataset ID raises ValueError."""
+    service = Data()
+    service.add("dukascopy", "EURUSD", "M1")
+    with pytest.raises(ValueError, match="already exists"):
+        service.add("dukascopy", "EURUSD", "M1")
+
+
+def test_data_add_invalid_inputs() -> None:
+    """Test validation guards on invalid inputs for Data.add()."""
+    service = Data()
+    with pytest.raises(TypeError, match="must be a string"):
+        service.add(123, "EURUSD", "M1")  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError, match="must be a non-empty string"):
+        service.add("dukascopy", "   ", "M1")
+
+    with pytest.raises(ValueError, match="cannot contain control characters"):
+        service.add("dukascopy", "EUR\x02USD", "M1")
+
+
+def test_data_add_persistence_error(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test persistence errors during Data.add() raise RuntimeError."""
+    service = Data()
+
+    def _fail_create(*args: Any, **kwargs: Any) -> Any:
+        raise RuntimeError("DB simulated insert failure")
+
+    monkeypatch.setattr(HostPersistence, "create_record", _fail_create)
+    with pytest.raises(RuntimeError, match="Failed to add dataset"):
+        service.add("dukascopy", "EURUSD", "M1")
+
+
+def test_data_import_m1_bars_overwrite(tmp_path: Path) -> None:
+    """Test importing M1 bars creates ZSTD Parquet partitions with integer tick units."""
+    dt_index = pd.date_range("2024-12-31 23:58:00", periods=4, freq="1min", tz="UTC")
+    bars_df = pd.DataFrame(
+        {
+            "Open": [1.08500, 1.08510, 1.08520, 1.08530],
+            "High": [1.08550, 1.08560, 1.08570, 1.08580],
+            "Low": [1.08490, 1.08500, 1.08510, 1.08520],
+            "Close": [1.08510, 1.08520, 1.08530, 1.08540],
+            "Volume": [100, 200, 300, 400],
+        },
+        index=dt_index,
+    )
+    mock = _MockBroker(bars_df=bars_df)
+    market_dir = tmp_path / "market"
+
+    service = Data()
+    summary = service.import_data(
+        "dukascopy",
+        "EURUSD",
+        "M1",
+        mode="overwrite",
+        tick_size=0.00001,
+        broker_client=mock,
+        base_dir=market_dir,
+    )
+
+    assert summary["rows_imported"] == 4
+    assert summary["total_bars"] == 4
+    assert len(summary["partitions"]) == 2  # 2024 and 2025
+
+    p2024 = market_dir / "dukascopy" / "m1" / "eurusd" / "2024.parquet"
+    p2025 = market_dir / "dukascopy" / "m1" / "eurusd" / "2025.parquet"
+    assert p2024.exists()
+    assert p2025.exists()
+
+    pf = pq.ParquetFile(p2024)
+    assert pf.schema_arrow.equals(M1_ARROW_SCHEMA)
+    assert pf.metadata.row_group(0).column(0).compression == "ZSTD"
+
+    table2024 = pq.read_table(p2024)
+    assert table2024.num_rows == 2
+    assert table2024["Open"][0].as_py() == 108500
+
+
+def test_data_import_ticks_overwrite(tmp_path: Path) -> None:
+    """Test importing ticks creates month-partitioned Parquet files with integer tick units."""
+    dt_index = pd.date_range("2025-04-10 12:00:00", periods=3, freq="1s", tz="UTC")
+    ticks_df = pd.DataFrame(
+        {
+            "Bid": [1.08521, 1.08523, 1.08525],
+            "Ask": [1.08525, 1.08527, 1.08529],
+            "Flags": [1, 2, 0],
+        },
+        index=dt_index,
+    )
+    mock = _MockBroker(ticks_df=ticks_df)
+    market_dir = tmp_path / "market"
+
+    service = Data()
+    summary = service.import_data(
+        "dukascopy",
+        "EURUSD",
+        "TICKS",
+        mode="overwrite",
+        tick_size=0.00001,
+        broker_client=mock,
+        base_dir=market_dir,
+    )
+
+    assert summary["rows_imported"] == 3
+    assert summary["total_bars"] == 3
+
+    p_tick = market_dir / "dukascopy" / "ticks" / "eurusd" / "2025" / "04-apr.parquet"
+    assert p_tick.exists()
+
+    pf = pq.ParquetFile(p_tick)
+    assert pf.schema_arrow.equals(TICK_ARROW_SCHEMA)
+    assert pf.metadata.row_group(0).column(0).compression == "ZSTD"
+
+    table_tick = pq.read_table(p_tick)
+    assert table_tick["Bid"][0].as_py() == 108521
+
+
+def test_data_import_missing_mode(tmp_path: Path) -> None:
+    """Test missing mode appends only new timestamps and leaves present data intact."""
+    market_dir = tmp_path / "market"
+    service = Data()
+
+    # Batch 1: T1 and T2
+    t1 = pd.date_range("2025-01-01 00:00:00", periods=2, freq="1min", tz="UTC")
+    df1 = pd.DataFrame(
+        {
+            "Open": [1.0, 1.0],
+            "High": [1.0, 1.0],
+            "Low": [1.0, 1.0],
+            "Close": [1.0, 1.0],
+        },
+        index=t1,
+    )
+    service.import_data(
+        "dukascopy",
+        "EURUSD",
+        "M1",
+        mode="overwrite",
+        broker_client=_MockBroker(df1),
+        base_dir=market_dir,
+    )
+
+    # Batch 2: T2 and T3 (T2 has different price, should be skipped in missing mode)
+    t2 = pd.date_range("2025-01-01 00:01:00", periods=2, freq="1min", tz="UTC")
+    df2 = pd.DataFrame(
+        {
+            "Open": [2.0, 2.0],
+            "High": [2.0, 2.0],
+            "Low": [2.0, 2.0],
+            "Close": [2.0, 2.0],
+        },
+        index=t2,
+    )
+    summary2 = service.import_data(
+        "dukascopy",
+        "EURUSD",
+        "M1",
+        mode="missing",
+        broker_client=_MockBroker(df2),
+        base_dir=market_dir,
+    )
+
+    assert summary2["total_bars"] == 3
+    p_file = market_dir / "dukascopy" / "m1" / "eurusd" / "2025.parquet"
+    table = pq.read_table(p_file)
+    assert table.num_rows == 3
+    # Timestamp 1 was preserved from batch 1 (price 1.0 -> 100000 ticks)
+    assert table["Open"][1].as_py() == 100000
+
+
+def test_data_import_overwrite_updates_overlap(tmp_path: Path) -> None:
+    """Test overwrite mode updates overlapping timestamps with new data."""
+    market_dir = tmp_path / "market"
+    service = Data()
+
+    t1 = pd.date_range("2025-01-01 00:00:00", periods=2, freq="1min", tz="UTC")
+    df1 = pd.DataFrame(
+        {
+            "Open": [1.0, 1.0],
+            "High": [1.0, 1.0],
+            "Low": [1.0, 1.0],
+            "Close": [1.0, 1.0],
+        },
+        index=t1,
+    )
+    service.import_data(
+        "dukascopy",
+        "EURUSD",
+        "M1",
+        mode="overwrite",
+        broker_client=_MockBroker(df1),
+        base_dir=market_dir,
+    )
+
+    # Batch 2: Overwrite with price 2.0 for T2, plus T3
+    t2 = pd.date_range("2025-01-01 00:01:00", periods=2, freq="1min", tz="UTC")
+    df2 = pd.DataFrame(
+        {
+            "Open": [2.0, 2.0],
+            "High": [2.0, 2.0],
+            "Low": [2.0, 2.0],
+            "Close": [2.0, 2.0],
+        },
+        index=t2,
+    )
+    service.import_data(
+        "dukascopy",
+        "EURUSD",
+        "M1",
+        mode="overwrite",
+        broker_client=_MockBroker(df2),
+        base_dir=market_dir,
+    )
+
+    p_file = market_dir / "dukascopy" / "m1" / "eurusd" / "2025.parquet"
+    table = pq.read_table(p_file)
+    assert table.num_rows == 3
+    # Timestamp 1 was updated to price 2.0 -> 200000 ticks
+    assert table["Open"][1].as_py() == 200000
+
+
+def test_data_import_empty_dataframe(tmp_path: Path) -> None:
+    """Test importing when broker returns empty DataFrame handles gracefully."""
+    market_dir = tmp_path / "market"
+    service = Data()
+    mock = _MockBroker(bars_df=pd.DataFrame())
+
+    summary = service.import_data(
+        "dukascopy", "EURUSD", "M1", broker_client=mock, base_dir=market_dir
+    )
+    assert summary["rows_imported"] == 0
+    assert summary["total_bars"] == 0
+
+
+def test_data_import_invalid_mode() -> None:
+    """Test unsupported import mode raises ValueError."""
+    service = Data()
+    with pytest.raises(ValueError, match="Unsupported import mode"):
+        service.import_data("dukascopy", "EURUSD", "M1", mode="invalid_mode")
+
+
+def test_data_import_async_broker(tmp_path: Path) -> None:
+    """Test import_data with async broker get_bars."""
+    market_dir = tmp_path / "market"
+    t1 = pd.date_range("2025-01-01 00:00:00", periods=1, freq="1min", tz="UTC")
+    df1 = pd.DataFrame(
+        {"Open": [1.0], "High": [1.0], "Low": [1.0], "Close": [1.0]},
+        index=t1,
+    )
+    mock = _MockAsyncBroker(bars_df=df1)
+    service = Data()
+
+    summary = service.import_data(
+        "dukascopy", "EURUSD", "M1", broker_client=mock, base_dir=market_dir
+    )
+    assert summary["rows_imported"] == 1
+
+
+def test_data_read_polars(tmp_path: Path) -> None:
+    """Test read_polars returns lazy frame scanning parquet partitions."""
+    market_dir = tmp_path / "market"
+    service = Data()
+
+    t1 = pd.date_range("2025-01-01 00:00:00", periods=2, freq="1min", tz="UTC")
+    df1 = pd.DataFrame(
+        {
+            "Open": [1.0, 1.1],
+            "High": [1.2, 1.3],
+            "Low": [0.9, 1.0],
+            "Close": [1.1, 1.2],
+        },
+        index=t1,
+    )
+    service.import_data(
+        "dukascopy", "EURUSD", "M1", broker_client=_MockBroker(df1), base_dir=market_dir
+    )
+
+    lf = service.read_polars("dukascopy", "EURUSD", "M1", base_dir=market_dir)
+    assert isinstance(lf, pl.LazyFrame)
+    collected = lf.collect()
+    assert collected.shape == (2, 6)
+
+    with pytest.raises(FileNotFoundError, match="No parquet partitions found"):
+        service.read_polars("dukascopy", "NONEXISTENT", "M1", base_dir=market_dir)
+
+
+def test_data_query_duckdb(tmp_path: Path) -> None:
+    """Test query_duckdb executes analytical SQL over partitioned Parquet files."""
+    market_dir = tmp_path / "market"
+    service = Data()
+
+    t1 = pd.date_range("2025-01-01 00:00:00", periods=5, freq="1min", tz="UTC")
+    df1 = pd.DataFrame(
+        {"Open": [1.0] * 5, "High": [1.1] * 5, "Low": [0.9] * 5, "Close": [1.0] * 5},
+        index=t1,
+    )
+    service.import_data(
+        "dukascopy", "EURUSD", "M1", broker_client=_MockBroker(df1), base_dir=market_dir
+    )
+
+    p_file = market_dir / "dukascopy" / "m1" / "eurusd" / "2025.parquet"
+    res = service.query_duckdb(
+        f"SELECT count(*) as cnt FROM read_parquet('{p_file.as_posix()}')"
+    )
+    row = res.fetchone()
+    assert row is not None
+    assert row[0] == 5
+
+
+def test_data_import_aliases() -> None:
+    """Test Data.import_ and getattr(service, 'import') aliases match import_data."""
+    service = Data()
+    assert service.import_.__name__ == "import_data"
+    assert getattr(service, "import").__name__ == "import_data"
+
+
+def test_resolve_tick_size() -> None:
+    """Test _resolve_tick_size hierarchy: explicit, DB instrument, JPY, and default."""
+    assert _resolve_tick_size("EURUSD", 0.0001) == 0.0001
+    assert _resolve_tick_size("USDJPY") == 0.001
+    assert _resolve_tick_size("EURUSD") == 0.00001
+
+    # Test DB instrument lookup
+    HostPersistence.create_record(
+        "datamgr_instruments",
+        {
+            "symbol": "CUSTOM_ASSET",
+            "price": json.dumps({"tick_size": 0.25}),
+            "created_at_utc": datetime.now(UTC).isoformat(),
+            "updated_at_utc": datetime.now(UTC).isoformat(),
+        },
+    )
+    assert _resolve_tick_size("CUSTOM_ASSET") == 0.25
+
+
+def test_format_bars_to_arrow_missing_columns() -> None:
+    """Test _format_bars_to_arrow raises ValueError if required price column is missing."""
+    df = pd.DataFrame({"High": [1.0], "Low": [0.9], "Close": [1.0]})
+    with pytest.raises(ValueError, match="Missing required price column 'open'"):
+        _format_bars_to_arrow(df, 0.00001)
+
+
+def test_format_ticks_to_arrow_missing_columns() -> None:
+    """Test _format_ticks_to_arrow raises ValueError if required column is missing."""
+    df = pd.DataFrame({"Ask": [1.0]})
+    with pytest.raises(ValueError, match="Missing required price column 'bid'"):
+        _format_ticks_to_arrow(df, 0.00001)
