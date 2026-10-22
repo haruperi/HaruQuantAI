@@ -110,7 +110,7 @@ class WindowsSafeRotatingFileHandler(logging.handlers.RotatingFileHandler):
             try:
                 Path(source).rename(destination)
                 return
-            except (PermissionError, FileExistsError):
+            except PermissionError, FileExistsError:
                 if attempt < _MAX_RENAME_RETRIES - 1:
                     time.sleep(_RENAME_RETRY_DELAY_SEC)
                 else:
@@ -202,9 +202,7 @@ class RingBufferHandler(logging.Handler):
                 record_dt.strftime("%Y-%m-%d %H:%M:%S") + f".{int(record.msecs):03d}"
             )
             safe_record = copy.copy(record)
-            safe_record.args = redact_value(
-                record.args, fingerprint=True
-            )
+            safe_record.args = redact_value(record.args, fingerprint=True)
             raw_msg = safe_record.getMessage()
             clean_msg = normalize_path(str(redact_value(raw_msg, fingerprint=True)))
             caller = f"{record.name}:{record.funcName}:{record.lineno}"
@@ -312,5 +310,3 @@ class _AccessFilter(logging.Filter):
     @override
     def filter(self, record: logging.LogRecord) -> bool:
         return record.name == "haruquantai.access"
-
-

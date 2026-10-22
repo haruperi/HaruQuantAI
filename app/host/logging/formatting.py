@@ -124,5 +124,3 @@ class LogEventFormatter(logging.Formatter):
         finally:
             record.msg = original_msg
             record.args = original_args
-
-

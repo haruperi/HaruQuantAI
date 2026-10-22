@@ -111,5 +111,3 @@ def _boundary_diagnostic() -> None:
     """Report failure without recursive logging or sensitive payloads."""
     with contextlib.suppress(Exception):
         sys.stderr.write("[LOGGING-ERROR-BOUNDARY] telemetry record dropped\n")
-
-

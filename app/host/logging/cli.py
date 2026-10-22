@@ -110,5 +110,3 @@ class TelemetryLoggerCLI:
                 return 0 if summary["verified"] else 1
             finally:
                 shutdown_logging()
-
-

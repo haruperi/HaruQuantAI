@@ -347,5 +347,3 @@ def setup_logging(
         extra={"fr_id": WORKER_FR, "log_dir": str(target_dir)},
     )
     return _GLOBAL_RING_BUFFER
-
-

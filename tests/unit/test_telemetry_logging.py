@@ -788,8 +788,6 @@ def test_factory_is_inert_and_first_emission_is_async(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Factory calls preserve handlers and defer I/O until first emission."""
-
-
     shutdown_logging()
     monkeypatch.setattr(telemetry, "DEFAULT_LOG_DIR", tmp_path / "lazy")
     handlers = list(logging.getLogger().handlers)
@@ -804,8 +802,6 @@ def test_factory_is_inert_and_first_emission_is_async(
 
 def test_listener_survives_handler_failure(tmp_path: Path) -> None:
     """A failed sink cannot kill queue delivery or strand pending tasks."""
-
-
     class BrokenHandler(logging.Handler):
         def emit(self, record: logging.LogRecord) -> None:
             raise ValueError("synthetic-sensitive-marker")
@@ -866,6 +862,7 @@ def test_home_path_variants() -> None:
 def test_tooling_import_and_direct_cli_smoke(tmp_path: Path) -> None:
     """Tool imports stay inert and direct qualification entrypoint is bounded."""
     import subprocess
+
     root = Path(__file__).resolve().parents[2]
     imports = (
         "import logging; before = list(logging.getLogger().handlers); "
@@ -944,7 +941,9 @@ def test_context_secret_redacted_before_external_handler(tmp_path: Path) -> None
     root = logging.getLogger()
     root.addHandler(handler)
     try:
-        get_logger("audit.context").bind(api_key="private-credential").info("safe event")
+        get_logger("audit.context").bind(api_key="private-credential").info(
+            "safe event"
+        )
         assert captured
         assert "private-credential" not in captured[-1].getMessage()
         assert "private-credential" not in str(captured[-1].__dict__)
@@ -975,7 +974,13 @@ def test_failed_rotation_is_not_silently_accepted(
 def test_formatter_does_not_mutate_uncensored_exception_cache() -> None:
     """An independent formatter must not inject raw traceback data onto shared records."""
     record = logging.LogRecord(
-        "audit", logging.ERROR, __file__, 1, "error", (), None,
+        "audit",
+        logging.ERROR,
+        __file__,
+        1,
+        "error",
+        (),
+        None,
     )
     record.exc_text = "password: sensitive synthetic exception"
     LogEventFormatter().format(record)
