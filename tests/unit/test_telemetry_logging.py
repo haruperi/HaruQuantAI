@@ -50,19 +50,7 @@ from typing import Any
 
 import pytest
 from app.host.logging import (
-    ANSI_RESET,
-    BOUND_LOGGER_FR,
-    CORRELATION_FR,
     DEFAULT_RING_BUFFER_CAPACITY,
-    ERROR_BOUNDARY_FR,
-    EXPORTS_FR,
-    FORMATTING_FR,
-    LOG_BACKUP_COUNT,
-    MAX_LOG_FILE_BYTES,
-    REDACTION_FR,
-    RING_BUFFER_FR,
-    SINKS_FR,
-    WORKER_FR,
     LogEventFormatter,
     LogRingBuffer,
     TelemetryEngine,
@@ -82,6 +70,20 @@ from app.host.logging import (
     set_correlation_id,
     setup_logging,
     shutdown_logging,
+)
+from app.host.logging.formatting import ANSI_RESET, ERROR_BOUNDARY_FR, FORMATTING_FR
+from app.host.logging.runtime import (
+    BOUND_LOGGER_FR,
+    CORRELATION_FR,
+    EXPORTS_FR,
+    WORKER_FR,
+)
+from app.host.logging.security import REDACTION_FR
+from app.host.logging.sinks import (
+    LOG_BACKUP_COUNT,
+    MAX_LOG_FILE_BYTES,
+    RING_BUFFER_FR,
+    SINKS_FR,
 )
 from app.host.persistence import HostPersistence
 from app.host.resources import (
@@ -183,7 +185,7 @@ def test_queue_overflow_diagnostics_do_not_echo_secrets(
 ) -> None:
     import queue
 
-    from app.host.logging import _RedactingQueueHandler
+    from app.host.logging.runtime import _RedactingQueueHandler
 
     records: queue.Queue[logging.LogRecord | None] = queue.Queue(maxsize=1)
     handler = _RedactingQueueHandler(records)
@@ -784,6 +786,7 @@ def test_factory_is_inert_and_first_emission_is_async(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Factory calls preserve handlers and defer I/O until first emission."""
+
     from app.host.logging import runtime as telemetry
 
     shutdown_logging()
@@ -800,6 +803,7 @@ def test_factory_is_inert_and_first_emission_is_async(
 
 def test_listener_survives_handler_failure(tmp_path: Path) -> None:
     """A failed sink cannot kill queue delivery or strand pending tasks."""
+
     from app.host.logging import runtime as telemetry
 
     class BrokenHandler(logging.Handler):
@@ -830,6 +834,7 @@ def test_handler_and_stderr_failures_are_contained(
 ) -> None:
     """Safe boundaries hold even when the fallback diagnostic sink fails."""
     import sys
+
 
     from app.host.logging import runtime as telemetry
 

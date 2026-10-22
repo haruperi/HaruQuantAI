@@ -23,7 +23,7 @@
 
 ## Public API
 
-Use `from app.host.logging import get_logger, setup_logging, flush_logs, shutdown_logging`. All former public exports remain available through `__init__.py`. Run `uv run python -m app.host.logging --verify` for the CLI smoke test.
+Use `from app.host.logging import get_logger, setup_logging, flush_logs, shutdown_logging`. Only the feature's documented public API is exported from `__init__.py`. Internal constants and handler classes are imported from their owning modules by tests; no legacy aliases are retained. Run `uv run python -m app.host.logging --verify` for the CLI smoke test.
 
 ## Validation
 
