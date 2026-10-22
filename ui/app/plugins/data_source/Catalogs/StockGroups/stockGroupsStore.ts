@@ -1,313 +1,67 @@
-import { normalizeLegacyBranding } from '../../../../host/branding';
 import { create } from 'zustand';
-import {
-  makeGeneratedDataset,
-  normalizeGroupName,
-  validateGroup,
-  type StockGroupDataset,
-  type StockGroupDefinition,
-  type StockGroupUpdateJob,
-  type StockMembership,
-} from './stockGroups';
-import {
-  deleteStockGroup,
-  fetchStockGroups,
-  saveStockGroup,
-  updateStockGroupsData,
-} from './stockGroupApiClient';
+import { normalizeGroupName, validateGroup, type StockGroupDefinition, type StockGroupDataset, type StockGroupUpdateJob, type StockMembership } from './stockGroups';
+import { deleteStockGroups, fetchStockGroups, saveStockGroup, saveStockGroupMembers } from './stockGroupApiClient';
 
-interface Saved {
+interface Store {
   groups: StockGroupDefinition[];
-  generated: StockGroupDataset[];
-  job: StockGroupUpdateJob | null;
-}
-
-interface Store extends Saved {
-  storageError: string;
+  loading: boolean; storageError: string;
+  generated: StockGroupDataset[]; job: StockGroupUpdateJob|null;
   syncRemote: () => Promise<void>;
-  saveGroup: (name: string, description: string, source?: StockGroupDefinition) => StockGroupDefinition;
-  replaceMembers: (id: string, members: StockMembership[]) => void;
-  remove: (ids: string[]) => void;
-  syncImports: (groups: { name: string; symbols: string[] }[]) => void;
-  start: (ids: string[], existingSymbols: string[], externalActive: boolean) => void;
-  advance: () => void;
-  action: (action: 'pause' | 'resume' | 'stop') => void;
-  applyImported: (items: StockGroupDefinition[], decisions: Record<string, 'skip' | 'overwrite'>) => void;
+  saveGroup: (name:string,description:string,source?:StockGroupDefinition) => Promise<StockGroupDefinition>;
+  replaceMembers: (id:string,members:StockMembership[]) => Promise<void>;
+  applyImported: (items:StockGroupDefinition[],decisions:Record<string,'skip'|'overwrite'>) => Promise<number>;
+  remove: (ids:string[]) => Promise<void>;
+  start: (ids:string[],existing:string[],active:boolean) => never;
+  action: (action:'pause'|'resume'|'stop') => never;
 }
-
-const key = 'sqx-stock-groups-v1';
-export const stockGroupJobActive = (state?: string) => state === 'running' || state === 'paused';
-const fingerprint = (symbols: string[]) => [...symbols].sort().join('\u001f');
-
-function validateSaved(value: Saved): void {
-  if (
-    !Array.isArray(value.groups) ||
-    value.groups.length > 1_000 ||
-    !Array.isArray(value.generated) ||
-    value.generated.length > 10_000
-  ) {
-    throw new Error('Invalid saved stock groups.');
-  }
-  value.groups.forEach(group => validateGroup(group, value.groups));
-  if (
-    new Set(value.groups.map(group => group.id)).size !== value.groups.length ||
-    new Set(value.generated.map(row => row.id)).size !== value.generated.length
-  ) {
-    throw new Error('Duplicate saved stock-group entries.');
-  }
-  value.generated.forEach(row => {
-    if (!row.id.startsWith('stock-group:') || !row.symbol || row.bars < 0 || !row.from || !row.to) {
-      throw new Error('Invalid generated stock-group data.');
-    }
-  });
-  if (
-    value.job &&
-    (!Array.isArray(value.job.groupIds) ||
-      !Array.isArray(value.job.tickers) ||
-      !['running', 'paused', 'completed', 'failed', 'cancelled'].includes(value.job.state) ||
-      !Number.isInteger(value.job.progress) ||
-      value.job.progress < 0 ||
-      value.job.progress > 100 ||
-      !Number.isInteger(value.job.completed) ||
-      value.job.completed < 0 ||
-      value.job.completed > value.job.tickers.length)
-  ) {
-    throw new Error('Invalid stock-group job.');
-  }
-}
-
-export const useStockGroups = create<Store>((set, get) => {
-  let initial: Saved = { groups: [], generated: [], job: null };
-  let storageError = '';
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw) {
-      const value = normalizeLegacyBranding(JSON.parse(raw));
-      if (value.version !== 1) throw new Error('Version');
-      validateSaved(value);
-      initial = value;
-      if (initial.job?.state === 'running') initial.job.state = 'paused';
-    }
-  } catch {
-    storageError = 'Saved stock groups could not be read. Existing storage is preserved.';
-  }
-
-  const persist = (patch: Partial<Saved>) => {
-    if (get().storageError) throw new Error(get().storageError);
-    const saved = { groups: get().groups, generated: get().generated, job: get().job, ...patch };
-    validateSaved(saved);
-    try {
-      localStorage.setItem(key, JSON.stringify({ version: 1, ...saved }));
-    } catch (err) {
-      console.warn('Unable to save stock groups in browser storage; state kept in memory:', err);
-    }
-    set(patch);
+export const stockGroupJobActive=(state?:string)=>state==='running'||state==='paused';
+let request=0;
+const unavailable=():never=>{throw new Error('Automatic stock group data updates are unavailable.');};
+export const useStockGroups=create<Store>((set,get)=>{
+  const confirmed=(saved:StockGroupDefinition)=>{
+    ++request;
+    set(current=>({loading:false,storageError:'',groups:current.groups.some(row=>row.id===saved.id)
+      ? current.groups.map(row=>row.id===saved.id?saved:row):[...current.groups,saved]}));
   };
-
   return {
-    ...initial,
-    storageError,
-    syncRemote: async () => {
+    groups:[],loading:false,storageError:'',generated:[],job:null,
+    syncRemote:async()=>{
+      const active=++request;set({loading:true,storageError:''});
+      try {const groups=await fetchStockGroups();if(active===request)set({groups});}
+      catch(cause){if(active===request)set({storageError:cause instanceof Error?cause.message:'Unable to load stock groups.'});}
+      finally{if(active===request)set({loading:false});}
+    },
+    saveGroup:async(name,description,source)=>{
+      if(source?.system)throw new Error('System stock groups cannot be edited.');
+      const draft:StockGroupDefinition={id:source?.id??'',name:normalizeGroupName(name),description:description.trim(),system:false,members:source?.members??[]};
+      validateGroup({...draft,id:draft.id||'new'},get().groups);
+      const saved=await saveStockGroup(draft);confirmed(saved);return saved;
+    },
+    replaceMembers:async(id,members)=>{
+      const source=get().groups.find(row=>row.id===id);
+      if(!source||source.system)throw new Error('Choose an editable stock group.');
+      validateGroup({...source,members},get().groups);
+      confirmed(await saveStockGroupMembers(id,members));
+    },
+    applyImported:async(items,decisions)=>{
+      let count=0;
       try {
-        const remote = await fetchStockGroups();
-        if (!remote || !remote.length) return;
-        const currentGroups = get().groups;
-        const localMap = new Map(currentGroups.map(g => [g.name.toLowerCase(), g]));
-        const merged: StockGroupDefinition[] = remote.map(rem => {
-          const local = localMap.get(rem.name.toLowerCase());
-          return {
-            ...rem,
-            members: rem.members?.length
-              ? rem.members
-              : local?.members?.length
-                ? local.members
-                : [],
-          };
-        });
-        for (const local of currentGroups) {
-          if (!remote.some(r => r.name.toLowerCase() === local.name.toLowerCase())) {
-            merged.push(local);
-          }
+        for(const item of items){
+          const previous=get().groups.find(row=>row.name.toLowerCase()===item.name.toLowerCase());
+          if(previous && decisions[item.name]!=='overwrite')continue;
+          const saved=await get().saveGroup(item.name,item.description,previous);
+          await get().replaceMembers(saved.id,item.members);count++;
         }
-        persist({ groups: merged });
-      } catch (err) {
-        console.error('Failed to sync stock groups from remote backend:', err);
-      }
+      } catch(cause){throw new Error(`${count} groups fully loaded. Earlier confirmed changes remain saved; ${cause instanceof Error?cause.message:'group load failed.'}`);}
+      return count;
     },
-    saveGroup: (name, description, source) => {
-      if (source?.system) throw new Error("This group can't be edited.");
-      const normalized = normalizeGroupName(name);
-      const item: StockGroupDefinition = source
-        ? {
-            ...source,
-            name: normalized,
-            description: description.trim(),
-            origin: undefined,
-            originName: undefined,
-            originFingerprint: undefined,
-          }
-        : {
-            id: `group:${Date.now()}:${Math.random().toString(36).slice(2)}`,
-            name: normalized,
-            description: description.trim(),
-            system: false,
-            members: [],
-          };
-      validateGroup(item, get().groups);
-      persist({
-        groups: source
-          ? get().groups.map(group => (group.id === source.id ? item : group))
-          : [...get().groups, item],
-      });
-      void saveStockGroup(item).catch(() => {});
-      return item;
+    remove:async ids=>{
+      const selected=ids.map(id=>get().groups.find(group=>group.id===id));
+      if(selected.some(group=>!group||group.system))throw new Error('Choose saved custom stock groups.');
+      const deleted=await deleteStockGroups(ids);
+      ++request;
+      set(current=>({loading:false,storageError:'',groups:current.groups.filter(group=>!deleted.includes(group.id))}));
     },
-    replaceMembers: (id, members) => {
-      const source = get().groups.find(group => group.id === id);
-      if (!source) throw new Error('Stockgroup was not found.');
-      if (source.system) throw new Error("This group can't be edited.");
-      const item = {
-        ...source,
-        members,
-        origin: undefined,
-        originName: undefined,
-        originFingerprint: undefined,
-      } as StockGroupDefinition;
-      validateGroup(item, get().groups);
-      persist({ groups: get().groups.map(group => (group.id === id ? item : group)) });
-      void saveStockGroup(item).catch(() => {});
-    },
-    remove: ids => {
-      const deletable = get().groups.filter(group => ids.includes(group.id) && !group.system);
-      if (!deletable.length) throw new Error('You have to select some non default group.');
-      persist({
-        groups: get().groups.filter(group => !deletable.some(item => item.id === group.id)),
-      });
-      for (const group of deletable) {
-        void deleteStockGroup(group.name).catch(() => {});
-      }
-    },
-    syncImports: imported => {
-      let changed = false;
-      const groups = [...get().groups];
-      for (const source of imported) {
-        const originFingerprint = fingerprint(source.symbols);
-        const existing = groups.find(
-          group => group.origin === 'file-import' && group.originName === source.name
-        );
-        if (existing) {
-          if (existing.originFingerprint !== originFingerprint) {
-            existing.members = source.symbols.map(ticker => ({ ticker }));
-            existing.originFingerprint = originFingerprint;
-            changed = true;
-          }
-          continue;
-        }
-        const name = normalizeGroupName(source.name);
-        if (groups.some(group => group.name.toLowerCase() === name.toLowerCase())) continue;
-        groups.push({
-          id: `file-group:${source.name}`,
-          name,
-          description: 'Imported from folder',
-          system: false,
-          members: source.symbols.map(ticker => ({ ticker })),
-          origin: 'file-import',
-          originName: source.name,
-          originFingerprint,
-        });
-        changed = true;
-      }
-      if (changed) persist({ groups });
-    },
-    start: (ids, existingSymbols, externalActive) => {
-      if (externalActive || stockGroupJobActive(get().job?.state)) {
-        throw new Error('Finish or stop the active data operation first.');
-      }
-      const selected = get().groups.filter(group => ids.includes(group.id));
-      if (!selected.length) throw new Error('You have to select some group.');
-      if (selected.some(group => group.name === '[[S&P 100 limited]]')) {
-        throw new Error('Group S&P 100 limited cannot be updated, it is only in clean installation.');
-      }
-      const tickers = [
-        ...new Set(selected.flatMap(group => group.members.map(member => member.ticker))),
-      ];
-      if (!tickers.length) throw new Error('Nothing to update. Group is without any stocks.');
-
-      // Trigger backend data update for group(s)
-      void updateStockGroupsData(selected.map(g => g.name)).catch(() => {});
-
-      const missing = tickers.filter(
-        ticker => !existingSymbols.some(symbol => symbol.toUpperCase() === ticker.toUpperCase())
-      );
-      persist({
-        job: { groupIds: ids, tickers: missing, state: 'running', progress: 0, completed: 0 },
-      });
-    },
-    advance: () => {
-      const job = get().job;
-      if (!job || job.state !== 'running') return;
-      const progress = Math.min(100, job.progress + 5);
-      const completed = Math.floor((progress * job.tickers.length) / 100);
-      const additions = job.tickers.slice(0, completed).map(makeGeneratedDataset);
-      const generated = [
-        ...new Map([...get().generated, ...additions].map(row => [row.id, row])).values(),
-      ];
-      try {
-        persist({
-          generated,
-          job: {
-            ...job,
-            progress,
-            completed,
-            state: progress === 100 ? 'completed' : 'running',
-          },
-        });
-      } catch (cause) {
-        set({
-          job: {
-            ...job,
-            state: 'failed',
-            error: cause instanceof Error ? cause.message : 'Unable to persist stock-group update.',
-          },
-        });
-      }
-    },
-    action: action => {
-      const job = get().job;
-      if (!job || !stockGroupJobActive(job.state)) return;
-      persist({
-        job: {
-          ...job,
-          state: action === 'pause' ? 'paused' : action === 'resume' ? 'running' : 'cancelled',
-        },
-      });
-    },
-    applyImported: (items, decisions) => {
-      const groups = [...get().groups];
-      const applied: StockGroupDefinition[] = [];
-      for (const source of items) {
-        const index = groups.findIndex(
-          group => group.name.toLowerCase() === source.name.toLowerCase()
-        );
-        if (index >= 0) {
-          if (decisions[source.name] !== 'overwrite') continue;
-          if (groups[index].system) throw new Error("This group can't be edited.");
-          groups[index] = { ...source, id: groups[index].id };
-          applied.push(groups[index]);
-        } else {
-          const newGroup = {
-            ...source,
-            id: `group:${Date.now()}:${Math.random().toString(36).slice(2)}`,
-          };
-          groups.push(newGroup);
-          applied.push(newGroup);
-        }
-      }
-      groups.forEach(group => validateGroup(group, groups));
-      persist({ groups });
-      for (const group of applied) {
-        void saveStockGroup(group).catch(() => {});
-      }
-    },
+    start:unavailable,action:unavailable,
   };
 });

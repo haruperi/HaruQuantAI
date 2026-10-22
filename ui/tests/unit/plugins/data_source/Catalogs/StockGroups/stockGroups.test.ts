@@ -7,13 +7,19 @@ describe('stock groups', () => {
   it('normalizes and validates HaruQuantAI group names', () => {
     expect(normalizeGroupName('  Index  ')).toBe('[Index]');
     expect(normalizeGroupName('Index', true)).toBe('[[Index]]');
+    expect(normalizeGroupName('[[Index]]')).toBe('[Index]');
+    expect(formatStockLines([{ticker:'OLD',to:'2020-01-01'}])).toBe('OLD;;01.01.2020');
     expect(() => normalizeGroupName('')).toThrow("Group's name must be set");
     expect(() => normalizeGroupName('X'.repeat(60))).toThrow('50 characters');
   });
 
   it('parses both compiled date formats and preserves history periods', () => {
-    const rows = parseStockLines('AAPL\nMSFT;01.12.2020\nOLD;2007.04.15;30.05.2015\nBAD;not-a-date');
-    expect(rows).toEqual([{ticker:'AAPL'},{ticker:'MSFT',from:'2020-12-01'},{ticker:'OLD',from:'2007-04-15',to:'2015-05-30'},{ticker:'BAD'}]);
+    const rows = parseStockLines('AAPL\nMSFT;01.12.2020\nOLD;2007.04.15;30.05.2015');
+    expect(rows).toEqual([{ticker:'AAPL'},{ticker:'MSFT',from:'2020-12-01'},{ticker:'OLD',from:'2007-04-15',to:'2015-05-30'}]);
+    expect(()=>parseStockLines('BAD;not-a-date')).toThrow('Invalid membership date');
+    expect(()=>parseStockLines('BAD;31.02.2020')).toThrow();
+    expect(()=>parseStockLines('BAD;01.01.2025;01.01.2020')).toThrow();
+    expect(parseStockLines('')).toEqual([]);
     expect(formatStockLines(rows)).toContain('OLD;15.04.2007;30.05.2015');
     expect(formatStockLines(rows, true)).toContain('AAPL;');
     expect(activeMemberships(group, '2026-01-01').map(row => row.ticker)).toEqual(['AAPL','MSFT']);

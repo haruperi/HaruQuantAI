@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .baskets import Basket
 from .broker import Broker
 from .home import Home, HomeCLI
 from .instruments import Instruments, InstrumentsCLI
@@ -10,6 +11,7 @@ from .sessions import Sessions
 
 __all__ = [
     "AppDataManager",
+    "Basket",
     "Broker",
     "Home",
     "HomeCLI",

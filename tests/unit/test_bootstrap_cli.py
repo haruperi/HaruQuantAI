@@ -633,8 +633,8 @@ class _DummyDataSub:
     def view(self) -> list[Any]:
         return [{"symbol": "EURUSD"}]
 
-    def get_baskets_overview(self) -> list[Any]:
-        return [_DummyModel()]
+    def baskets(self) -> list[dict[str, Any]]:
+        return [{"id": "1", "name": "[Tech]", "items": []}]
 
     def brokers(self) -> list[Any]:
         return [_DummyModel()]
@@ -720,6 +720,8 @@ def test_headless_cli_data_and_workspace_commands(
             res = runner._cmd_data(sub)
             assert res["command"] == "data"
             assert res["action"] in (sub, "home")
+            if sub == "baskets":
+                assert res["baskets"] == [{"id": "1", "name": "[Tech]", "items": []}]
 
         with pytest.raises(ValueError, match="Unsupported data action"):
             runner._cmd_data("invalid_action")

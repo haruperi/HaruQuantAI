@@ -52,6 +52,7 @@ from app.services.include.contracts import DataInfo
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
+from .baskets import Basket
 from .broker import Broker
 from .help import DMHelp
 from .home import Home
@@ -154,6 +155,7 @@ class AppDataManager:
         # Initialize retained Home, Log, and Help services
         self.home = Home()
         self.broker = Broker()
+        self.baskets = Basket()
         self.instruments = Instruments()
         self.sessions = Sessions()
         self.log = DataLog(event_bus=event_bus)
@@ -327,6 +329,32 @@ def _catalog_response(
                 f"{domain} storage is unavailable. Retry the operation.",
                 status_code=503,
             ),
+        )
+
+
+def _register_basket_routes(router: APIRouter, ws: AppDataManager) -> None:
+    @router.get("/baskets")
+    def list_baskets() -> JSONResponse:
+        return _catalog_response(ws.baskets.baskets, domain="Basket")
+
+    @router.post("/baskets")
+    def save_basket(payload: dict[str, Any]) -> JSONResponse:
+        return _catalog_response(ws.baskets.add_basket, payload, domain="Basket")
+
+    @router.post("/baskets/delete")
+    def delete_baskets(payload: dict[str, Any]) -> JSONResponse:
+        if set(payload) != {"ids"}:
+            return _workspace_error("Supply only the selected basket IDs.", 422)
+        return _catalog_response(
+            ws.baskets.delete_basket, payload["ids"], domain="Basket"
+        )
+
+    @router.put("/baskets/{basket_id}/stocks")
+    def save_basket_stocks(basket_id: str, payload: dict[str, Any]) -> JSONResponse:
+        if set(payload) != {"symbols"}:
+            return _workspace_error("Supply only the complete membership strings.", 422)
+        return _catalog_response(
+            ws.baskets.edit_stocks, basket_id, payload["symbols"], domain="Basket"
         )
 
 
@@ -645,6 +673,7 @@ def create_data_manager_router(
 
     _register_home_routes(router, ws)
     _register_workspace_routes(router, ws)
+    _register_basket_routes(router, ws)
     _register_broker_read_routes(router, ws)
     _register_broker_write_routes(router, ws)
     _register_instrument_routes(router, ws)

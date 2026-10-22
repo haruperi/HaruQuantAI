@@ -1,158 +1,55 @@
-/**
- * REST API client for HaruQuantAI Stock Groups (Baskets).
- *
- * Communicates with backend endpoints (/data/baskets, /data/baskets/overview, /data/baskets/update-data,
- * /basketOfStocks/list, etc.) to provide full SQX-parity stock group lifecycle operations:
- * - Group overview inspection (8 SQX table columns)
- * - Group CRUD and stock constituent management
- * - CSV import and export for constituents (Ticker;From;To)
- * - StrategyQuant X XML import and export (<Groups><Group name="...">...)
- * - Automatic data update trigger for group constituents
- * - 100% data readiness evaluation
- */
-
+/** Confirmed host transport for stock baskets and dated memberships. */
 import { createDomainClient, type DomainClient } from '../../../../host/transport';
-import type { StockGroupDefinition } from './stockGroups';
-
-export interface RemoteBasketItem {
-  symbol: string;
-  weight?: number;
-  date_from?: string | null;
-  date_to?: string | null;
-}
+import { validateGroup, type StockGroupDefinition, type StockMembership } from './stockGroups';
 
 export interface RemoteBasketRecord {
-  id?: number;
-  name: string;
-  description: string;
-  system: boolean;
-  items: RemoteBasketItem[];
+  id: string; name: string; description: string; system: boolean;
+  items: Array<{symbol: string; date_from: string|null; date_to: string|null}>;
 }
-
-export interface StockGroupOverviewItem {
-  id: number;
-  name: string;
-  description: string;
-  system: boolean;
-  active_count: number;
-  total_count: number;
-  symbols_count: number;
-  downloaded_count: number;
-  is_ready: boolean;
-  missing_symbols: string[];
-  data_from: string;
-  data_to: string;
-  data_from_sqx: string;
-  data_to_sqx: string;
-}
-
-export interface StockGroupDataUpdateResponse {
-  group_id: string | number;
-  group_name: string;
-  status: string;
-  message: string;
-  total_stocks: number;
-  distinct_symbols: number;
-  symbols: string[];
-}
-
 let client: DomainClient = createDomainClient('/data');
-
-export function setStockGroupApiClient(customClient: DomainClient): void {
-  client = customClient;
+export function setStockGroupApiClient(value: DomainClient): void { client = value; }
+function id(value: string): string {
+  if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value) || !Number.isSafeInteger(Number(value))) throw new Error('Choose a saved stock group.');
+  return value;
 }
-
 export function toStockGroupDefinition(record: RemoteBasketRecord): StockGroupDefinition {
-  return {
-    id: String(record.id ?? record.name),
-    name: record.name,
-    description: record.description || '',
-    system: Boolean(record.system),
-    members: (record.items || []).map(item => ({
-      ticker: item.symbol,
-      from: item.date_from || undefined,
-      to: item.date_to || undefined,
-    })),
-  };
+  if (!record || id(record.id) !== record.id || typeof record.name !== 'string' || typeof record.description !== 'string' ||
+    typeof record.system !== 'boolean' || !Array.isArray(record.items) || record.items.some(item => !item || typeof item.symbol !== 'string' ||
+      !(item.date_from === null || typeof item.date_from === 'string') || !(item.date_to === null || typeof item.date_to === 'string'))) throw new Error('Invalid host stock group.');
+  const group: StockGroupDefinition = {id:record.id,name:record.name,description:record.description,system:record.system,
+    members:record.items.map(item=>({ticker:item.symbol,from:item.date_from??undefined,to:item.date_to??undefined}))};
+  validateGroup(group);return group;
 }
-
-export function toRemoteBasketPayload(group: StockGroupDefinition): RemoteBasketRecord {
-  const isNumeric = /^\d+$/.test(group.id);
-  return {
-    id: isNumeric ? parseInt(group.id, 10) : undefined,
-    name: group.name,
-    description: group.description,
-    system: group.system,
-    items: group.members.map(member => ({
-      symbol: member.ticker,
-      weight: 1.0,
-      date_from: member.from || null,
-      date_to: member.to || null,
-    })),
-  };
-}
-
 export async function fetchStockGroups(): Promise<StockGroupDefinition[]> {
-  const records = await client.get<RemoteBasketRecord[]>('/baskets');
-  return records.map(rec => toStockGroupDefinition(rec));
+  const rows = await client.get<RemoteBasketRecord[]>('/baskets');
+  if (!Array.isArray(rows)) throw new Error('Invalid host stock group catalog.');
+  const groups=rows.map(toStockGroupDefinition);
+  if(new Set(groups.map(row=>row.id)).size!==groups.length || new Set(groups.map(row=>row.name.toLowerCase())).size!==groups.length) throw new Error('Duplicate stock group identities.');
+  return groups;
+}
+export async function saveStockGroup(group: StockGroupDefinition): Promise<StockGroupDefinition> {
+  validateGroup({...group,id:group.id||'new'});
+  const saved=toStockGroupDefinition(await client.post<RemoteBasketRecord>('/baskets',{
+    ...(group.id ? {id:id(group.id)}:{}),name:group.name,description:group.description,
+  }));
+  if(saved.name!==group.name || (group.id && saved.id!==group.id)) throw new Error('The host did not confirm this group.');
+  return saved;
+}
+export async function saveStockGroupMembers(groupId: string, members: StockMembership[]): Promise<StockGroupDefinition> {
+  const symbols=members.map(member=>`${member.ticker};${member.from??''};${member.to??''}`);
+  const saved=toStockGroupDefinition(await client.put<RemoteBasketRecord>(`/baskets/${id(groupId)}/stocks`,{symbols}));
+  if(saved.id!==groupId) throw new Error('The host returned a different stock group.');
+  return saved;
 }
 
-export async function fetchStockGroupsOverview(): Promise<StockGroupOverviewItem[]> {
-  return client.get<StockGroupOverviewItem[]>('/baskets/overview');
-}
-
-export async function getStockGroup(name: string): Promise<StockGroupDefinition> {
-  const record = await client.get<RemoteBasketRecord>(`/baskets/${encodeURIComponent(name)}`);
-  return toStockGroupDefinition(record);
-}
-
-export async function saveStockGroup(group: StockGroupDefinition): Promise<void> {
-  const payload = toRemoteBasketPayload(group);
-  await client.post('/baskets', payload);
-}
-
-export async function deleteStockGroup(name: string): Promise<void> {
-  await client.delete(`/baskets/${encodeURIComponent(name)}`);
-}
-
-export async function updateStockGroupsData(
-  groupIds: Array<string | number>
-): Promise<StockGroupDataUpdateResponse[]> {
-  return client.post<StockGroupDataUpdateResponse[]>('/baskets/update-data', {
-    basket_ids: groupIds,
-  });
-}
-
-export async function exportStockGroupsXml(basketNames?: string[]): Promise<string> {
-  const resp = await client.post<{ xml_content: string }>('/baskets/export-xml', {
-    basket_names: basketNames ?? [],
-  });
-  return resp.xml_content;
-}
-
-export async function importStockGroupsXml(
-  xmlContent: string,
-  overwrite = false
-): Promise<Array<{ id: number; name: string; items: number }>> {
-  return client.post<Array<{ id: number; name: string; items: number }>>('/baskets/import-xml', {
-    xml_content: xmlContent,
-    overwrite,
-  });
-}
-
-export async function importStockGroupCsv(
-  basketName: string,
-  csvText: string
-): Promise<RemoteBasketRecord> {
-  return client.post<RemoteBasketRecord>('/baskets/import-csv', {
-    basket_name: basketName,
-    csv_text: csvText,
-  });
-}
-
-export async function exportStockGroupCsv(basketName: string): Promise<string> {
-  const resp = await client.get<{ basket_name: string; content: string }>(
-    `/baskets/${encodeURIComponent(basketName)}/export-csv`
-  );
-  return resp.content;
+export async function deleteStockGroups(values: string[]): Promise<string[]> {
+  if (!Array.isArray(values) || !values.length || values.length > 1000) throw new Error('Select between 1 and 1000 stock groups.');
+  const ids=[...new Set(values.map(id))];
+  const result=await client.post<{deleted_ids:string[];deleted_count:number}>('/baskets/delete',{ids});
+  if(!result || !Array.isArray(result.deleted_ids) || result.deleted_count!==ids.length ||
+    result.deleted_ids.length!==ids.length || new Set(result.deleted_ids).size!==ids.length ||
+    result.deleted_ids.some(value=>typeof value!=='string'||!ids.includes(value))) {
+    throw new Error('The host did not confirm the selected stock group deletions. Refresh before retrying.');
+  }
+  return result.deleted_ids;
 }

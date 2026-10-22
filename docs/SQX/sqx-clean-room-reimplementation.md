@@ -1051,15 +1051,18 @@ HaruQuantAI/
 
 #### 5. `app/workspace/data_manager/baskets.py` — `DataManagerBasket` (`FEAT-DATAMGR-BASKET`)
 
-- **Dry Rule:** Persists symbol baskets via `HostPersistence` (`baskets` entity); shared by Stockpicker and Multi-Market cross-checks.
+- **Dry Rule:** Persists symbol baskets via `HostPersistence` (existing `datamgr_stock_group` and `datamgr_stock` tables); shared by Stockpicker and Multi-Market cross-checks.
 - **Donor:** `C:\SQX-145\internal\plugins\DataManagerBasket\DataManagerBasket.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.basket.*`)
-- **Backend:** `app/workspace/data_manager/baskets.py` (`🟢 <200L`, Docstring `<=45L`)
+- **Backend:** `app/workspace/data_manager/baskets.py` (`🟡 200–350L`, Docstring `<=45L`)
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/StockGroups/StockGroupsModal.tsx`
-- **Class:** `Basket` (plus `BasketCLI`)
+- **Class:** `Basket`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-DATAMGR-BASKET-LIST`: List all stock baskets and symbol groupings $\rightarrow$ `Basket.baskets() -> list[dict[str, Any]]`
-  - [ ] `FR-DATAMGR-BASKET-ADD`: Create new stock basket groups (e.g., S&P 500, Tech, Forex Majors) $\rightarrow$ `Basket.add_basket(basket: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-DATAMGR-BASKET-EDIT`: Edit and maintain symbol membership in selected baskets $\rightarrow$ `Basket.edit_stocks(basket_id: str, symbols: Sequence[str]) -> dict[str, Any]`
+  - [x] `FR-DATAMGR-BASKET-LIST`: List all stock baskets and symbol groupings $\rightarrow$ `Basket.baskets() -> list[dict[str, Any]]`
+  - [x] `FR-DATAMGR-BASKET-ADD`: Create new stock basket groups (e.g., S&P 500, Tech, Forex Majors) $\rightarrow$ `Basket.add_basket(basket: Mapping[str, Any]) -> dict[str, Any]`
+  - [x] `FR-DATAMGR-BASKET-EDIT`: Edit and maintain symbol membership in selected baskets $\rightarrow$ `Basket.edit_stocks(basket_id: str, symbols: Sequence[str]) -> dict[str, Any]`
+  - [x] `FR-DATAMGR-BASKET-DELETE`: Delete selected custom baskets and membership history atomically $\rightarrow$ `Basket.delete_basket(basket_ids: Sequence[str]) -> dict[str, Any]`
+
+- **Persistence:** Host-owned numeric group IDs and historical membership dates (UTC epoch milliseconds; -1 means unspecified). Membership replacement is atomic; metadata edits retain members. System groups are read-only. UI saves wait for confirmed host responses; local browser groups are not automatically promoted. Parsed group-file loads may partially complete and report confirmed progress. Custom basket deletion requires confirmation and removes its full membership history atomically; system groups remain protected and downloaded data stays intact. Automatic market-data updates remain unavailable.
 
 ---
 

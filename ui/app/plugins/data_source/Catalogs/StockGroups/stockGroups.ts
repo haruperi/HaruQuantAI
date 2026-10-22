@@ -29,8 +29,8 @@ export function normalizeGroupName(value: string, system = false): string {
     name = name.replace(/^\[+|\]+$/g, '');
     name = `[[${name}]]`;
   } else {
-    if (!name.startsWith('[')) name = `[${name}`;
-    if (!name.endsWith(']')) name = `${name}]`;
+    name = `[${name.replace(/^[\[\]]+|[\[\]]+$/g, '')}]`;
+    if(!name.slice(1,-1).trim())throw new Error("Group's name must be set");
   }
   if (name.length > 50) throw new Error('Group name must be 50 characters or fewer.');
   return name;
@@ -53,23 +53,25 @@ function validIso(value: string | undefined): boolean {
 }
 
 export function validateMember(member: StockMembership): void {
-  if (!member.ticker.trim() || member.ticker.length > 50 || /[;\r\n]/.test(member.ticker)) throw new Error('Ticker must contain 1–50 characters and cannot contain semicolons.');
+  if (!member.ticker.trim() || member.ticker.length > 50 || /[;\u0000-\u001f\u007f]/.test(member.ticker)) throw new Error('Ticker must contain 1–50 characters and cannot contain semicolons.');
   if (!validIso(member.from) || !validIso(member.to)) throw new Error('Invalid membership date.');
+  if(member.from && member.to && member.from>member.to)throw new Error('Membership end must not precede its start.');
 }
 
 function parseStockDate(value: string | undefined): string | undefined {
   const raw = value?.trim();
   if (!raw) return undefined;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){if(!validIso(raw))throw new Error('Invalid membership date.');return raw;}
   let year: number, month: number, day: number;
   let match = raw.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
   if (match) [, day, month, year] = match.map(Number);
   else {
     match = raw.match(/^(\d{4})\.(\d{2})\.(\d{2})$/);
-    if (!match) return undefined;
+    if (!match) throw new Error('Invalid membership date.');
     [, year, month, day] = match.map(Number);
   }
-  const date = new Date(Date.UTC(year, month - 1, day));
-  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return undefined;
+  const date = new Date(0);date.setUTCFullYear(year,month-1,day);date.setUTCHours(0,0,0,0);
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) throw new Error('Invalid membership date.');
   return date.toISOString().slice(0, 10);
 }
 
@@ -77,6 +79,7 @@ export function parseStockLines(text: string): StockMembership[] {
   if (new Blob([text]).size > stockGroupLimits.csv) throw new Error('Stock list exceeds the 20 MiB limit.');
   const members = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
     const cells = line.split(';');
+    if(cells.length>3)throw new Error('Membership has too many fields.');
     const member: StockMembership = { ticker: cells[0].trim() };
     const from = parseStockDate(cells[1]), to = parseStockDate(cells[2]);
     if (from) member.from = from;
@@ -84,7 +87,6 @@ export function parseStockLines(text: string): StockMembership[] {
     validateMember(member);
     return member;
   });
-  if (!members.length) throw new Error('No stocks recognized.');
   if (members.length > stockGroupLimits.members) throw new Error('Stock group exceeds the 50,000-member limit.');
   return members;
 }
@@ -98,7 +100,7 @@ function displayDate(value: string | undefined): string {
 export function formatStockLines(members: StockMembership[], exportMode = false): string {
   return members.map(member => {
     if (exportMode) return `${member.ticker};${displayDate(member.from)}${member.to ? `;${displayDate(member.to)}` : ''}`;
-    return `${member.ticker}${member.from ? `;${displayDate(member.from)}` : ''}${member.to ? `;${displayDate(member.to)}` : ''}`;
+    return `${member.ticker}${member.from || member.to ? `;${displayDate(member.from)}` : ''}${member.to ? `;${displayDate(member.to)}` : ''}`;
   }).join('\n');
 }
 

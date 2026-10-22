@@ -371,12 +371,12 @@ class HeadlessCliRunner:
                 "sessions": sessions,
             }
         elif act in ("baskets", "basket", "stock_groups"):
-            overview_items = dm.baskets.get_baskets_overview()
+            overview_items = dm.baskets.baskets()
             res = {
                 "command": "data",
                 "action": "baskets",
                 "count": len(overview_items),
-                "baskets": [b.to_dict() for b in overview_items],
+                "baskets": overview_items,
             }
         elif act in ("brokers", "broker"):
             brokers = dm.broker.brokers()

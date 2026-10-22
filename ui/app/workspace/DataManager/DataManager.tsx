@@ -47,7 +47,7 @@ import { ExternalIndicatorDeleteDialog } from '../../plugins/data_source/Indicat
 import { ExternalIndicatorTransferDialog } from '../../plugins/data_source/Indicators/ExternalIndicatorTransferDialog';
 import { activeExternalLines, externalIndicatorTypes, externalTypeLabel, type ExternalIndicatorDefinition } from '../../plugins/data_source/Indicators/externalIndicators';
 import { externalJobActive, useExternalIndicators } from '../../plugins/data_source/Indicators/externalIndicatorsStore';
-import { StockGroupEditorDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupEditorDialog';
+import { StockGroupsModal } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupsModal';
 import { StockGroupStocksDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupStocksDialog';
 import { StockGroupTransferDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupTransferDialog';
 import { serializeStockGroupsJson, serializeStockGroupsXml, summarizeGroup, type StockGroupDefinition } from '../../plugins/data_source/Catalogs/StockGroups/stockGroups';
@@ -348,9 +348,6 @@ export function DataManager() {
   const tools = useDataTools();
   const externalIndicators = useExternalIndicators();
   const stockGroups = useStockGroups();
-  useEffect(() => { void useStockGroups.getState().syncRemote(); }, []);
-  useEffect(() => { try { useStockGroups.getState().syncImports(imports.groups); } catch { /* surfaced by the store and later actions */ } }, [imports.groups]);
-  useEffect(() => { if (stockGroups.job?.state !== 'running') return; const timer = window.setInterval(() => useStockGroups.getState().advance(), 220); return () => window.clearInterval(timer); }, [stockGroups.job?.state]);
   useEffect(() => { if (brokerJob?.state !== 'running') return; const timer = window.setInterval(() => useDataManagerStore.getState().advanceBrokerUpdate(), 220); return () => window.clearInterval(timer); }, [brokerJob?.state]);
   useEffect(() => { if (externalIndicators.job?.state !== 'running') return; const timer = window.setInterval(() => useExternalIndicators.getState().advance(), 220); return () => window.clearInterval(timer); }, [externalIndicators.job?.state]);
   useEffect(() => { if (tools.job?.state !== 'running') return; const timer = window.setInterval(() => useDataTools.getState().advance(), 180); return () => window.clearInterval(timer); }, [tools.job?.state]);
@@ -382,6 +379,8 @@ export function DataManager() {
   }, [download.job?.state]);
   const [tab, setTab] = useState('Data sources');
   const { status: hostStatus } = useHostConnection();
+  useEffect(() => { if(hostStatus==='online')void useStockGroups.getState().syncRemote(); }, [hostStatus]);
+
   const [workspace, setWorkspace] = useState<WorkspaceLayout | null>(null);
   const [workspaceError, setWorkspaceError] = useState('');
   const [workspaceRetry, retryWorkspace] = useState(0);
@@ -456,6 +455,7 @@ export function DataManager() {
   const [stockGroupDialog, setStockGroupDialog] = useState<StockGroupDialogState | null>(null);
   const [selectedStockGroupIds, setSelectedStockGroupIds] = useState<string[]>([]);
   const [stockGroupError, setStockGroupError] = useState('');
+  const [stockGroupDeleting,setStockGroupDeleting]=useState(false);
   const [brokerDialog,setBrokerDialog]=useState<BrokerDialogState|null>(null);
   const [selectedBrokerIds,setSelectedBrokerIds]=useState<string[]>([]);
   const [brokerError,setBrokerError]=useState('');
@@ -798,9 +798,9 @@ export function DataManager() {
     </div>}
     {tab === 'Stock groups' && <div className="management-actions" aria-label="Stock group operations">
       <Button className="action-add" onClick={() => setStockGroupDialog({ kind:'editor', mode:'add' })}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>
-      <Button className="action-clone" onClick={() => { const rows=requireStockGroups(); if(rows) updateStockGroups(rows); }}><RefreshCw size={26} aria-hidden="true"/>Update data in group (automatic)</Button>
+      <Button className="action-clone" disabled title="Automatic stock group data updates are unavailable"><RefreshCw size={26} aria-hidden="true"/>Update data in group (automatic)</Button>
       <Button className="action-edit" onClick={() => { const rows=requireStockGroups(); if(!rows)return; if(rows[0].system){setSelectionMessage("This group can't be edited.");return;} setStockGroupDialog({kind:'stocks',source:rows[0]}); }}><ListPlus size={26} aria-hidden="true"/>Edit stocks</Button>
-      <Button className="action-delete" onClick={() => { const rows=requireStockGroups(); if(rows){const deletable=rows.filter(row=>!row.system);if(!deletable.length){setSelectionMessage('You have to select some non default group.');return;}setStockGroupDialog({kind:'delete',selected:deletable});} }}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
+      <Button className="action-delete" disabled={stockGroupDeleting} onClick={()=>{const groups=requireStockGroups();if(!groups)return;if(groups.some(group=>group.system)){setSelectionMessage('System stock groups cannot be deleted.');return;}setStockGroupError('');setStockGroupDialog({kind:'delete',selected:groups});}}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
       <Button className="action-save" onClick={() => { const rows=requireStockGroups(); if(rows){downloadTextFile('Groups.xml',serializeStockGroupsXml(rows));notify('Groups saved.');} }}><Save size={26} aria-hidden="true"/>Save</Button>
       <Button className="action-load" onClick={() => setStockGroupDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
@@ -879,10 +879,10 @@ export function DataManager() {
   {externalDialog?.kind === 'view' && <ExternalIndicatorViewDialog item={externalDialog.source} onClose={() => setExternalDialog(null)}/>}
   {externalDialog?.kind === 'delete' && <ExternalIndicatorDeleteDialog names={externalDialog.selected.map(item => item.name)} onClose={() => setExternalDialog(null)} onSaved={message => { setSelectedExternalNames([]); notify(message); }}/>}
   {externalDialog?.kind === 'transfer' && <ExternalIndicatorTransferDialog mode={externalDialog.mode} selected={externalDialog.selected} all={externalIndicators.definitions} onClose={() => setExternalDialog(null)} onSaved={message => notify(message)}/>}
-  {stockGroupDialog?.kind === 'editor' && <StockGroupEditorDialog mode={stockGroupDialog.mode} source={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={(message,item) => { setSelectedStockGroupIds([item.id]); notify(message); }}/>}
+  {stockGroupDialog?.kind === 'editor' && <StockGroupsModal mode={stockGroupDialog.mode} source={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={(message,item) => { setSelectedStockGroupIds([item.id]); notify(message); }}/>}
   {stockGroupDialog?.kind === 'stocks' && <StockGroupStocksDialog group={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={message => notify(message)}/>}
   {stockGroupDialog?.kind === 'load' && <StockGroupTransferDialog onClose={() => setStockGroupDialog(null)} onSaved={message => notify(message)}/>}
-  {stockGroupDialog?.kind === 'delete' && <div className="stock-groups-flow"><Modal title={stockGroupDialog.selected.length === 1 ? 'Remove group' : 'Remove groups'} width={520} onClose={() => { setStockGroupDialog(null); setStockGroupError(''); }} footer={<><Button onClick={() => { setStockGroupDialog(null); setStockGroupError(''); }}>No</Button><Button className="primary" onClick={() => { try { const ids=stockGroupDialog.selected.map(item=>item.id);useStockGroups.getState().remove(ids);setSelectedStockGroupIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Group removed':'Groups removed');setStockGroupDialog(null);setStockGroupError(''); } catch(cause){setStockGroupError(cause instanceof Error?cause.message:'Unable to remove groups.');} }}>Yes</Button></>}>{stockGroupError&&<p role="alert" className="stock-group-error">{stockGroupError}</p>}<p>Are you sure you want to remove selected groups ({stockGroupDialog.selected.length})?</p></Modal></div>}
+  {stockGroupDialog?.kind === 'delete' && <div className="stock-groups-flow"><Modal title={stockGroupDialog.selected.length === 1 ? 'Remove group' : 'Remove groups'} width={520} onClose={() => { if(!stockGroupDeleting){setStockGroupDialog(null); setStockGroupError('');} }} footer={<><Button disabled={stockGroupDeleting} onClick={() => { setStockGroupDialog(null); setStockGroupError(''); }}>No</Button><Button className="primary" disabled={stockGroupDeleting} onClick={async () => { if(stockGroupDeleting)return;setStockGroupDeleting(true);setStockGroupError('');try { const ids=stockGroupDialog.selected.map(item=>item.id);await useStockGroups.getState().remove(ids);setSelectedStockGroupIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Group removed':'Groups removed');setStockGroupDialog(null);setStockGroupError(''); } catch(cause){setStockGroupError(cause instanceof Error?cause.message:'Unable to remove groups.');}finally{setStockGroupDeleting(false);} }}>Yes</Button></>}>{stockGroupError&&<p role="alert" className="stock-group-error">{stockGroupError}</p>}<p>Are you sure you want to remove selected groups ({stockGroupDialog.selected.length})? Their full membership history will also be removed. Downloaded data will be kept.</p></Modal></div>}
   {brokerDialog?.kind==='editor'&&<BrokerProfilesModal mode={brokerDialog.mode} source={brokerDialog.source} canSetStockPicker={!brokerDialog.source?.stocks.length} canSetMt={!brokerDialog.source||(!instrumentRows.some(row=>row.broker===brokerDialog.source!.id)&&!sessionRows.some(row=>row.broker===brokerDialog.source!.id))} canSetTimezone={!brokerDialog.source||(!definitions.some(row=>row.broker===brokerDialog.source!.id)&&!fileDefinitions.some(row=>row.broker===brokerDialog.source!.id))} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='stocks'&&<BrokerStocksDialog profile={brokerDialog.source} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='import'&&<BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
