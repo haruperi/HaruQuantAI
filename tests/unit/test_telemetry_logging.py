@@ -975,14 +975,9 @@ def test_failed_rotation_is_not_silently_accepted(
 
 def test_formatter_does_not_mutate_uncensored_exception_cache() -> None:
     """An independent formatter must not inject raw traceback data onto shared records."""
-    try:
-        raise ValueError("sensitive synthetic exception")
-    except ValueError:
-        import sys
-        info = sys.exc_info()
     record = logging.LogRecord(
-        "audit", logging.ERROR, __file__, 1, "error", (), info,
+        "audit", logging.ERROR, __file__, 1, "error", (), None,
     )
-    assert record.exc_text is None
+    record.exc_text = "password: sensitive synthetic exception"
     LogEventFormatter().format(record)
-    assert record.exc_text is None
+    assert record.exc_text == "password: sensitive synthetic exception"

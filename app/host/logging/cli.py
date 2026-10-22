@@ -12,6 +12,7 @@ from .runtime import (
     setup_logging, shutdown_logging, TelemetryLogger,
 )
 from .formatting import FORMATTING_FR
+from .security import REDACTION_FR
 from .sinks import SINKS_FR
 
 class TelemetryLoggerCLI:
