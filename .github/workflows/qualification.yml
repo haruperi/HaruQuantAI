@@ -12,7 +12,7 @@ jobs:
       - run: uv sync --locked
       - run: uv run --frozen ruff check app/host/logging tests/unit/test_telemetry_logging.py
       - run: uv run --frozen ruff format --check app/host/logging tests/unit/test_telemetry_logging.py
-      - run: uv run --frozen mypy app/host/logging
+      - run: uv run --frozen mypy --explicit-package-bases app/host/logging
       - run: uv run --frozen pytest tests/unit/test_telemetry_logging.py --no-cov
       - run: uv run --frozen python -m app.host.logging --verify
       - uses: actions/setup-node@v4
