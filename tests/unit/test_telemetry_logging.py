@@ -784,7 +784,7 @@ def test_factory_is_inert_and_first_emission_is_async(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Factory calls preserve handlers and defer I/O until first emission."""
-    from app.host import logging as telemetry
+    from app.host.logging import runtime as telemetry
 
     shutdown_logging()
     monkeypatch.setattr(telemetry, "DEFAULT_LOG_DIR", tmp_path / "lazy")
@@ -800,7 +800,7 @@ def test_factory_is_inert_and_first_emission_is_async(
 
 def test_listener_survives_handler_failure(tmp_path: Path) -> None:
     """A failed sink cannot kill queue delivery or strand pending tasks."""
-    from app.host import logging as telemetry
+    from app.host.logging import runtime as telemetry
 
     class BrokenHandler(logging.Handler):
         def emit(self, record: logging.LogRecord) -> None:
@@ -831,7 +831,7 @@ def test_handler_and_stderr_failures_are_contained(
     """Safe boundaries hold even when the fallback diagnostic sink fails."""
     import sys
 
-    from app.host import logging as telemetry
+    from app.host.logging import runtime as telemetry
 
     class BrokenStream:
         def write(self, value: str) -> int:
@@ -902,3 +902,87 @@ def test_tooling_import_and_direct_cli_smoke(tmp_path: Path) -> None:
     assert result.returncode == 1, result.stderr
     assert "npm launcher not found" in result.stderr
     assert "ModuleNotFoundError" not in result.stderr
+
+
+def test_external_root_handler_survives_logging_lifecycle(tmp_path: Path) -> None:
+    """Our lifecycle must not close or remove a handler owned by another application."""
+    root = logging.getLogger()
+    external = logging.NullHandler()
+    root.addHandler(external)
+    try:
+        setup_logging(tmp_path, async_engine=False)
+        assert external in root.handlers
+        shutdown_logging()
+        assert external in root.handlers
+    finally:
+        root.removeHandler(external)
+
+
+def test_faulty_live_subscriber_does_not_starve_others(tmp_path: Path) -> None:
+    """Live-log subscriber faults cannot prevent delivery to subsequent subscribers."""
+    setup_logging(tmp_path, async_engine=False)
+    seen: list[dict[str, Any]] = []
+
+    def broken(entry: dict[str, Any]) -> None:
+        raise RuntimeError("synthetic subscriber failure")
+
+    TelemetryLogger.register_ws_sink(broken)
+    TelemetryLogger.register_ws_sink(seen.append)
+    get_logger("audit.delivery").warning("fan-out continues")
+    assert any("fan-out continues" in item["message"] for item in seen)
+
+
+def test_context_secret_redacted_before_external_handler(tmp_path: Path) -> None:
+    """Neither message nor structured extras may expose a bound credential."""
+    setup_logging(tmp_path, async_engine=False)
+    captured: list[logging.LogRecord] = []
+
+    class Capture(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            captured.append(record)
+
+    handler = Capture()
+    root = logging.getLogger()
+    root.addHandler(handler)
+    try:
+        get_logger("audit.context").bind(api_key="private-credential").info("safe event")
+        assert captured
+        assert "private-credential" not in captured[-1].getMessage()
+        assert "private-credential" not in str(captured[-1].__dict__)
+    finally:
+        root.removeHandler(handler)
+
+
+def test_failed_rotation_is_not_silently_accepted(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """After exhausting retries, the rotation handler must report a failure."""
+    handler = WindowsSafeRotatingFileHandler(tmp_path / "test.log")
+    from app.host.logging import sinks as log_sinks
+
+    monkeypatch.setattr(log_sinks, "_MAX_RENAME_RETRIES", 1)
+
+    def blocked_rename(self: Path, destination: str) -> None:
+        raise PermissionError("synthetic Windows lock")
+
+    monkeypatch.setattr(Path, "rename", blocked_rename)
+    try:
+        with pytest.raises(PermissionError):
+            handler._safe_rename("source.log", "destination.log")
+    finally:
+        handler.close()
+
+
+def test_formatter_does_not_mutate_uncensored_exception_cache() -> None:
+    """An independent formatter must not inject raw traceback data onto shared records."""
+    try:
+        raise ValueError("sensitive synthetic exception")
+    except ValueError:
+        import sys
+        info = sys.exc_info()
+    record = logging.LogRecord(
+        "audit", logging.ERROR, __file__, 1, "error", (), info,
+    )
+    assert record.exc_text is None
+    LogEventFormatter().format(record)
+    assert record.exc_text is None

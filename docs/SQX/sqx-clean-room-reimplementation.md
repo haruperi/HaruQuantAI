@@ -63,7 +63,7 @@ No source file may exceed **1,000 lines**. Every module is evaluated against thi
 2. **No Invented Public Methods:** If a file declares $N$ functional requirements, its service class exposes **only those $N$ public methods**. Helper methods must be private (`_helper_name()`).
 3. **Zero Backward-Compatibility Shims or Aliases:** Never create alias methods, deprecated wrappers, or duplicate module-level functions that wrap class methods.
 4. **AI-Agent Tool Readiness:** Every public `FR-*` method accepts explicit, typed parameters (primitives, `Mapping[str, Any]`, or typed dataclasses) and returns a deterministic `dict[str, Any]` or typed contract so it can be registered directly as an AI Agent / MCP tool without wrapper glue.
-5. **Non-Silent Logging:** Every `FR-*` method must emit a structured log entry via `logger = get_logger(__name__)` (`app/host/logging.py`).
+5. **Non-Silent Logging:** Every `FR-*` method must emit a structured log entry via `logger = get_logger(__name__)` (`app/host/logging/`).
 
 ### 0.4 Repository-Wide DRY Deduplication Hierarchy
 
@@ -493,11 +493,11 @@ HaruQuantAI/
 
 ### Phase 1.1: Core Application Container & Stage 1 Host Foundation (Ordered Bottom-Up)
 
-#### 1. `app/host/logging.py` — `TelemetryLogger`, `TelemetryEngine` & `LogRingBuffer` (`FEAT-HOST-LOGGING`)
+#### 1. `app/host/logging/` — `TelemetryLogger`, `TelemetryEngine` & `LogRingBuffer` (`FEAT-HOST-LOGGING`)
 
 - **Dry Rule:** Zero internal `app.*` imports. Every other file in the repository imports `from app.host.logging import get_logger`.
 - **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.L`, `SQLog`), `C:\SQX-145\internal\libs\logback-core-1.4.14.jar`, `C:\SQX-145\internal\libs\logback-classic-1.4.14.jar`
-- **Backend:** `app/host/logging.py` (`🟠 500–995L`, Docstring `<=45L`)
+- **Backend:** `app/host/logging/` (`🟠 500–995L`, Docstring `<=45L`)
 - **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `TelemetryLogger`, `TelemetryEngine`, `LogRingBuffer`, `WindowsSafeRotatingFileHandler`, `LogEventFormatter` (plus `get_logger`, `get_access_logger`, `setup_logging`, `flush_logs`, `shutdown_logging`, `TelemetryLoggerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
@@ -513,7 +513,7 @@ HaruQuantAI/
 
 #### 2. `app/host/persistence.py` — `HostPersistence` (`FEAT-HOST-PERSISTENCE`)
 
-- **Dry Rule:** Depends only on `app/host/logging.py`. All SQLite path resolution, connection pooling, schema bootstrapping, and parameterized SQL live exclusively inside `HostPersistence`. No other module may import `sqlite3` or resolve DB paths.
+- **Dry Rule:** Depends only on `app/host/logging/`. All SQLite path resolution, connection pooling, schema bootstrapping, and parameterized SQL live exclusively inside `HostPersistence`. No other module may import `sqlite3` or resolve DB paths.
 - **Donor:** `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.*`), `C:\SQX-145\internal\libs\sqlite-jdbc-3.51.2.0.jar`, `C:\SQX-145\internal\libs\h2-1.3.149.jar`
 - **Backend:** `app/host/persistence.py` (`🟠 500–900L`, Docstring `<=60L`)
 - **Frontend:** `ui/app/host/HostSettingsModal.tsx`
