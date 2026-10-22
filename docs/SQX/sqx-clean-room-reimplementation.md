@@ -497,7 +497,7 @@ HaruQuantAI/
 
 - **Dry Rule:** Zero internal `app.*` imports. Every other file in the repository imports `from app.host.logging import get_logger`.
 - **Donor:** `C:\SQX-145\internal\libs\SQLib.jar.enc` (`com.strategyquant.lib.L`, `SQLog`), `C:\SQX-145\internal\libs\logback-core-1.4.14.jar`, `C:\SQX-145\internal\libs\logback-classic-1.4.14.jar`
-- **Backend:** `app/host/logging/` (`🟠 500–995L`, Docstring `<=45L`)
+- **Backend:** `app/host/logging/` (focused `security.py`, `formatting.py`, `sinks.py`, `runtime.py`, `cli.py`; module docstrings `<=45L`); public API in `__init__.py`, CLI entry point in `__main__.py`, ownership table in `README.md`
 - **Frontend:** `ui/app/host/HostSettingsModal.tsx`
 - **Class:** `TelemetryLogger`, `TelemetryEngine`, `LogRingBuffer`, `WindowsSafeRotatingFileHandler`, `LogEventFormatter` (plus `get_logger`, `get_access_logger`, `setup_logging`, `flush_logs`, `shutdown_logging`, `TelemetryLoggerCLI`)
 - **Functional Requirements & Exact Method Signatures:**
