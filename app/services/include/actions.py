@@ -68,8 +68,8 @@ from app.services.include.types import Variable
 
 logger = get_logger(__name__)
 
-# Constants matching undefined order status
-ORDER_NOT_DEFINED: float = -1.0
+# Constant matching SQX undefined order/level status (Order.NOT_DEFINED = -9.9999999E7)
+ORDER_NOT_DEFINED: float = -99_999_999.0
 
 __all__ = [
     "ORDER_NOT_DEFINED",
@@ -136,7 +136,7 @@ class AssignVariableAction:
         )
 
         if self.is_boolean:
-            # Truthiness: 0 or ORDER_NOT_DEFINED (-1) is False; otherwise True.
+            # Truthiness: 0 or ORDER_NOT_DEFINED (-99999999.0) is False; otherwise True.
             if isinstance(resolved, (int, float)):
                 final_val: Any = resolved not in (0.0, ORDER_NOT_DEFINED)
             else:
@@ -382,7 +382,7 @@ def assign_variable(
     Args:
         variable: Target variable container.
         value: New value or callable.
-        is_boolean: Coerce to boolean (0 and -1 map to False).
+        is_boolean: Coerce to boolean (0 and ORDER_NOT_DEFINED map to False).
 
     Returns:
         ActionRecord summarizing the operation.

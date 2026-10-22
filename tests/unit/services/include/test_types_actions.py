@@ -128,10 +128,18 @@ def test_action_blocks_and_facade(tmp_path: Path) -> None:
     """Verify all 8 OtherActions blocks, standalone helpers, and Actions facade."""
     v_bool = Variable[bool]("flag", "bool", True)
 
-    # AssignVariable with numeric ORDER_NOT_DEFINED (-1.0) and 0.0 -> False
+    # AssignVariable with numeric ORDER_NOT_DEFINED (-99999999.0) and 0.0 -> False
+    assert ORDER_NOT_DEFINED == pytest.approx(-99_999_999.0)
     rec1 = AssignVariableAction(v_bool, ORDER_NOT_DEFINED, is_boolean=True).execute()
     assert bool(v_bool.value) is False
     assert rec1.action_type == "assign_variable"
+
+    AssignVariableAction(v_bool, 0.0, is_boolean=True).execute()
+    assert bool(v_bool.value) is False
+
+    # Strictly verify NO BACKWARD COMPATIBILITY / shim: -1.0 must evaluate to True
+    AssignVariableAction(v_bool, -1.0, is_boolean=True).execute()
+    assert bool(v_bool.value) is True
 
     # AssignVariable with evaluate()-bearing block object -> True
     AssignVariableAction(v_bool, NumberConstant(5.0), is_boolean=True).execute()

@@ -72,7 +72,7 @@
     "runtime_parity": "unqualified"
   },
   "minimum_record_number": 1,
-  "allocation_high_water_mark": 23,
+  "allocation_high_water_mark": 24,
   "records": {
     "SQX145-EV-000001": {
       "topic": "architecture.process.two_process_topology",
@@ -2393,6 +2393,102 @@
       "tags": [
         "home",
         "target-decision"
+      ]
+    },
+    "SQX145-EV-000024": {
+      "topic": "services.actions.order_not_defined_sentinel",
+      "title": "SQX AssignVariable coerces Order.NOT_DEFINED (-99999999.0) and 0.0 to false",
+      "question": "What sentinel value represents undefined order/level in SQX and how does AssignVariable coerce truthiness?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "rule_actions",
+          "variable_assignment"
+        ],
+        "conditions": [
+          "Decompiled JVM bytecode inspection of SQ.Blocks.OtherActions.AssignVariable.class from Snippets.jar."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX AssignVariable evaluates formula results and coerces truthiness to false when val is 0.0 or Order.NOT_DEFINED (-99999999.0, compiled as -9.9999999E7d), and true otherwise.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Direct bytecode observation via javap on compiled snippets distribution."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/libs/Snippets.jar",
+          "location": {
+            "section": "SQ.Blocks.OtherActions.AssignVariable",
+            "symbol": "OnAction",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Bytecode instruction 46: ldc2_w -9.9999999E7d; compare with 0.0 and Order.NOT_DEFINED."
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "6815d5acd6e411d078a423f80b605940e2778736d901cade987ea3f421d52924"
+          },
+          "accessed_at": "2026-10-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "kernel",
+        "registration_status": "proposed",
+        "feature_ids": [],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "proposed_owner": "app/services/include/README.md",
+        "proposed_feature_id": "FEAT-SERVICES-ACTIONS",
+        "proposed_requirement_ids": [
+          "FR-SERVICES-ACTION-ASSIGN"
+        ],
+        "proposed_decision_ids": [],
+        "notes": "Owner and implementation status belong to app/services/include/README.md."
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "runtime",
+        "procedure": "Execute tests/unit/services/include/test_types_actions.py testing ORDER_NOT_DEFINED (-99999999.0) and -1.0 coercion.",
+        "expected_observation": "AssignVariableAction coerces -99999999.0 and 0.0 to False, while -1.0 coerces to True.",
+        "actual_observation": "test_types_actions.py passed asserting ORDER_NOT_DEFINED == -99999999.0 and AssignVariableAction boolean coercion.",
+        "artifact_paths": [
+          "tests/unit/services/include/test_types_actions.py"
+        ],
+        "executed_at": "2026-10-22T08:30:20+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "e9812f9bc30743af9f0b1bc097866420e4dd221e",
+        "created_at": "2026-10-22T08:30:20+00:00",
+        "updated_at": "2026-10-22T08:30:20+00:00",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased decompiled constant and boolean branching logic only."
+      },
+      "tags": [
+        "services",
+        "actions",
+        "types",
+        "order-not-defined",
+        "clean-room-parity"
       ]
     }
   }

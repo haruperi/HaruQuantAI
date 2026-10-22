@@ -7,7 +7,7 @@ Parent: [CLI overview](README.md)
 
 ## Launch & entry point
 
-```
+```bash
 launchers/qdmcli                                 # interactive prompt
 launchers/qdmcli --args="-symbol action=list"    # one-shot command
 ```
@@ -33,10 +33,11 @@ All commands below are confirmed in `ConsoleImpl`. Each `-command` takes an `act
 operation (there are also single-letter aliases that map directly to the same handlers).
 
 ### `-symbol` — manage symbols
+
 > Source: `ConsoleImpl.symbol()` → `addSymbol()` / `editSymbol()` / `deleteSymbol()` / `clearSymbolData()` / `listSymbols()`
 
 | action | Key params | What it does |
-|--------|-----------|--------------|
+| --- | --- | --- |
 | `list` | `csv` (optional) | List symbols. |
 | `add` | `symbols`, `datasource` (default `dukascopy`), `datatype`, `bartype`, `postfix`, `broker`, plus source-specific params | Create/download symbols. Data sources handled in code: `dukascopy`, `file`, `darwinex`, `crypto` (`exchange`, `timeframe`), `yahoo`, `SQEquityData`, `mt5api` (`path` required, `datefrom`, `dateto` — see [MT5 import](#importing-from-metatrader-5) below). |
 | `edit` | `symbol`, `name`, `instrument`, `barType` | Rename / re-tag a symbol. |
@@ -48,6 +49,7 @@ operation (there are also single-letter aliases that map directly to the same ha
 Single-letter aliases: `-a` add, `-e` edit, `-d` delete, `-c` clear, `-l` list.
 
 #### Importing from MetaTrader 5
+
 > Source: `ConsoleImpl.addSymbol()` (`mt5api` branch) / `listMt5Symbols()` →
 > `Program.get("DataSourceMt5Api")` (`DataSourceMt5ApiServlet`) → `Mt5ApiDownloaderJob` +
 > `Mt5ApiManager` (drives `internal/python/scripts/mt5api.py` via the official `MetaTrader5`
@@ -57,7 +59,7 @@ The same import the Data manager's **Get data from MetaTrader 5** dialog runs �
 symbols (instrument created from the terminal's specification: tick size, point value, spread)
 and downloading their history through a local MT5 terminal:
 
-```
+```bash
 qdmcli.exe -symbol action=mt5symbols path=C:/MT5
 qdmcli.exe -symbol action=add symbols=EURUSD,GBPUSD datasource=mt5api path=C:/MT5 datefrom=2020.01.01 dateto=2024.12.31
 ```
@@ -73,10 +75,11 @@ qdmcli.exe -symbol action=add symbols=EURUSD,GBPUSD datasource=mt5api path=C:/MT
   range instead.
 
 ### `-instrument` — manage instruments
+
 > Source: `ConsoleImpl.instrument()` → `addInstrument()` / `editInstrument()` / `deleteInstrument()` / `listInstruments()`
 
 | action | Key params | What it does |
-|--------|-----------|--------------|
+| --- | --- | --- |
 | `list` | `csv` (optional) | List instruments. |
 | `add` | `instrument`, plus `description`, `pointvalue`, `ticksize`, `tickstep`, `defaultspread`, `defaultslippage`, `datatype`, `broker`, `minDistance`, `orderSizeMultiplier`, `orderSizeStep`, `swap` (all optional, with defaults) | Add an instrument. |
 | `edit` | `instrument` + any of the above to change | Edit an instrument's properties. |
@@ -85,10 +88,11 @@ qdmcli.exe -symbol action=add symbols=EURUSD,GBPUSD datasource=mt5api path=C:/MT
 Single-letter aliases: `-ia` add, `-ie` edit, `-id` delete, `-il` list.
 
 ### `-data` — manage price data
+
 > Source: `ConsoleImpl.data()`
 
 | action | Key params | What it does |
-|--------|-----------|--------------|
+| --- | --- | --- |
 | `update` | `symbols` (optional; omit = update all), `datefrom`+`dateto` (`yyyy.MM.dd`), `overwrite` | Update downloaded data. **Without dates** the source decides the range — for a freshly added symbol that is its *entire* history (Dukascopy ticks ≈ 20 years). **With `datefrom`/`dateto`** exactly that window is downloaded (Dukascopy symbols only, see below). |
 | `import` | `symbol`, `filepath`, `format`, `instrument`, `bartype`, `timeframe`, `timezone`, `errorhandling` | Import price data from a file (creates the symbol if missing). |
 | `export` | `symbols`, `timeframe`, `outputdir`, `prefix`, `format`, `datefrom`, `dateto` (+ `cHeader`/`cFormat`/`cIncludeHeader` for `format=Custom`) | Export data to CSV. |
@@ -106,7 +110,7 @@ Aliases: `-u` update, `-di` import, `-de` export, `-dc` clone, `-tz` timezones.
 > with an explicit range, so only that window is fetched. Bars vs ticks follow the symbol's registered
 > timeframe (`-symbol action=add … datatype=TICK|M1`), not the update command.
 >
-> ```
+> ```bash
 > qdmcli.exe -symbol action=add symbols=EURUSD datasource=dukascopy datatype=TICK
 > qdmcli.exe -data action=update symbols=EURUSD datefrom=2024.10.01 dateto=2024.11.01
 > ```
@@ -114,10 +118,11 @@ Aliases: `-u` update, `-di` import, `-de` export, `-dc` clone, `-tz` timezones.
 > Currently implemented for **Dukascopy** symbols; other sources report that the range is unsupported.
 
 ### `-brokerprofile` — manage broker profiles
+
 > Source: `ConsoleImpl.brokerProfile()`
 
 | action | Key params | What it does |
-|--------|-----------|--------------|
+| --- | --- | --- |
 | `list` | — | List broker profiles. |
 | `update` | `id` | Update data for one broker profile. |
 | `updateAll` | — | Update data for all broker profiles. |
@@ -127,18 +132,20 @@ Aliases: `-u` update, `-di` import, `-de` export, `-dc` clone, `-tz` timezones.
 | `export` | `id`, `filepath` | Export a broker-profile definition (XML). |
 
 ### `-license` — licensing
+
 > Source: `ConsoleImpl.license()`
 
 | action | Params | What it does |
-|--------|--------|--------------|
+| --- | --- | --- |
 | `info` | — | Print license info (edition, type, licensee). |
 | `update` | `code` | Verify/activate a license code. |
 
 ### Scripting & control
+
 > Source: `ConsoleImpl` (`run()`, `execute()`, `waitFor()`, `deleteFile()`, `-gui` case)
 
 | command | Params | What it does |
-|---------|--------|--------------|
+| --- | --- | --- |
 | `-run` | `file` | Execute a text file of commands line-by-line (`#` lines are comments). |
 | `-execute` | `file` | Run an external script/executable and wait for it to finish. |
 | `-waitfor` | `action=user` or `action=file file=…` | Pause until the user presses ENTER, or until a file appears. |
@@ -146,10 +153,11 @@ Aliases: `-u` update, `-di` import, `-de` export, `-dc` clone, `-tz` timezones.
 | `-gui` | — | Start the CLI web server so the GUI can be accessed remotely; disables other CLI commands while active. |
 
 ### Help & exit
+
 > Source: `ConsoleImpl.help()`, `ConsoleImpl.exit()`
 
 | command | What it does |
-|---------|--------------|
+| --- | --- |
 | `-h` / `-help` / `help` | Print help (from `internal/web/<product>/help.txt`, with timeframe/format/exchange placeholders filled in). |
 | `-exit` / `exit` / `quit` | Print "Bye", close output, exit the JVM. |
 | `> path` | (parsed inside any command) redirect output to a file. |
