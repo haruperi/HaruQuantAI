@@ -56,6 +56,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 from collections.abc import Callable, Sequence
 from dataclasses import asdict
 from pathlib import Path
@@ -85,11 +86,64 @@ SUPPORTED_CLI_COMMANDS: tuple[str, ...] = (
     "data",
     "instrument",
     "sessions",
+    "symbol",
+    "brokerprofile",
     "home",
     "about",
     "diagnostics",
     "updates",
 )
+
+_SHORT_ALIASES: dict[str, list[str]] = {
+    "-l": ["symbol", "action=list"],
+    "-a": ["symbol", "action=add"],
+    "-e": ["symbol", "action=edit"],
+    "-d": ["symbol", "action=delete"],
+    "-c": ["symbol", "action=clear"],
+    "-il": ["instrument", "action=list"],
+    "-ia": ["instrument", "action=add"],
+    "-ie": ["instrument", "action=edit"],
+    "-id": ["instrument", "action=delete"],
+    "-ir": ["instrument", "action=refresh"],
+    "-u": ["data", "action=update"],
+    "-di": ["data", "action=import"],
+    "-tz": ["data", "action=timezones"],
+}
+
+_FLAG_COMMANDS: dict[str, str] = {
+    "-symbol": "symbol",
+    "-instrument": "instrument",
+    "-data": "data",
+    "-brokerprofile": "brokerprofile",
+    "-sessions": "sessions",
+}
+
+
+def _normalize_cli_args(argv: Sequence[str]) -> list[str]:
+    raw_tokens: list[str] = []
+    i = 0
+    token_list = list(argv)
+    while i < len(token_list):
+        arg_item = token_list[i]
+        if arg_item.startswith("--args="):
+            _, val = arg_item.split("=", 1)
+            raw_tokens.extend(shlex.split(val))
+        elif arg_item == "--args" and i + 1 < len(token_list):
+            i += 1
+            raw_tokens.extend(shlex.split(token_list[i]))
+        else:
+            raw_tokens.append(arg_item)
+        i += 1
+
+    normalized: list[str] = []
+    for arg_item in raw_tokens:
+        if arg_item in _SHORT_ALIASES:
+            normalized.extend(_SHORT_ALIASES[arg_item])
+        elif arg_item in _FLAG_COMMANDS:
+            normalized.append(_FLAG_COMMANDS[arg_item])
+        else:
+            normalized.append(arg_item)
+    return normalized
 
 
 def _build_cli_parser() -> argparse.ArgumentParser:
@@ -180,9 +234,11 @@ class HeadlessCliRunner:
             "plugins": lambda: self._cmd_plugins(act),
             "settings": lambda: self._cmd_settings(act),
             "reconcile": self._cmd_reconcile,
-            "data": lambda: self._cmd_data(act),
+            "data": lambda: self._cmd_data(act, extra_args),
             "instrument": lambda: self._cmd_instrument(act, extra_args),
             "sessions": lambda: self._cmd_sessions(act, extra_args),
+            "symbol": lambda: self._cmd_symbol(act, extra_args),
+            "brokerprofile": lambda: self._cmd_brokerprofile(act, extra_args),
             "home": lambda: self._cmd_home("home"),
             "about": lambda: self._cmd_home("about"),
             "diagnostics": lambda: self._cmd_home("diagnostics"),
@@ -309,109 +365,140 @@ class HeadlessCliRunner:
             **rec_report,
         }
 
-    def _cmd_data(self, action: str) -> dict[str, Any]:
-        """Dispatch headless data manager workspace operations."""
-        dm: Any = self.runtime.data_manager
-        if dm is None:
-            raise RuntimeError("AppDataManager is not initialized.")
-
+    def _dispatch_legacy_data(self, dm: Any, act: str, action: str) -> dict[str, Any]:
+        """Dispatch legacy sub-actions for data workspace command."""
         import app.workspace.data_manager as dm_pkg
         from app.workspace.data_manager import HomeCLI
 
         instruments_cli: Any = getattr(dm_pkg, "InstrumentsCLI", None)
         sessions_cli: Any = getattr(dm_pkg, "SessionsCLI", None)
 
-        act = action.strip().lower()
-        res: dict[str, Any]
-        if act in ("home", "overview", "dashboard", "list", "status"):
-            overview = dm.home.get_overview()
-            saved_datasets = dm.home.get_saved_datasets()
-            rendered = HomeCLI.format_home_dashboard(overview, saved_datasets)
-            res = {
-                "command": "data",
-                "action": "home",
-                "rendered": rendered,
-                "overview": overview,
-                "saved_datasets": [ds.to_dict() for ds in saved_datasets],
-            }
-        elif act in ("datasets", "dataset"):
-            datasets = dm.data.list_datasets()
-            res = {
-                "command": "data",
-                "action": "datasets",
-                "count": len(datasets),
-                "datasets": [d.to_dict() for d in datasets],
-            }
-        elif act in ("instruments", "instrument"):
-            instruments = dm.instruments.instruments()
-            rendered = (
-                instruments_cli.format_instruments_table(instruments)
-                if instruments_cli is not None
-                else str(instruments)
-            )
-            res = {
-                "command": "data",
-                "action": "instruments",
-                "rendered": rendered,
-                "count": len(instruments),
-                "instruments": instruments,
-            }
-        elif act in ("sessions", "session"):
-            sessions = dm.sessions.view()
-            rendered = (
-                sessions_cli.format_sessions_table(sessions)
-                if sessions_cli is not None
-                else str(sessions)
-            )
-            res = {
-                "command": "data",
-                "action": "sessions",
-                "rendered": rendered,
-                "count": len(sessions),
-                "sessions": sessions,
-            }
-        elif act in ("baskets", "basket", "stock_groups"):
-            overview_items = dm.baskets.baskets()
-            res = {
-                "command": "data",
-                "action": "baskets",
-                "count": len(overview_items),
-                "baskets": overview_items,
-            }
-        elif act in ("brokers", "broker"):
-            brokers = dm.broker.brokers()
-            res = {
-                "command": "data",
-                "action": "brokers",
-                "count": len(brokers),
-                "brokers": brokers,
-            }
-        elif act in ("providers", "provider"):
-            providers = dm.connections.list_providers()
-            res = {
-                "command": "data",
-                "action": "providers",
-                "count": len(providers),
-                "providers": [p.to_dict() for p in providers],
-            }
-        elif act in ("logs", "log"):
-            logs = (
+        def _handle_logs() -> dict[str, Any]:
+            entries = (
                 dm.log.data_log(limit=50)
                 if hasattr(dm.log, "data_log")
                 else dm.log.list_logs(limit=50)
             )
-            res = {
+            return {
                 "command": "data",
                 "action": "logs",
-                "count": len(logs),
-                "logs": [
-                    entry if isinstance(entry, dict) else entry.to_dict()
-                    for entry in logs
-                ],
+                "count": len(entries),
+                "logs": [e if isinstance(e, dict) else e.to_dict() for e in entries],
             }
-        else:
+
+        dispatch_map: dict[str, Callable[[], dict[str, Any]]] = {
+            "home": lambda: {
+                "command": "data",
+                "action": "home",
+                "rendered": HomeCLI.format_home_dashboard(
+                    dm.home.get_overview(), dm.home.get_saved_datasets()
+                ),
+                "overview": dm.home.get_overview(),
+                "saved_datasets": [ds.to_dict() for ds in dm.home.get_saved_datasets()],
+            },
+            "datasets": lambda: {
+                "command": "data",
+                "action": "datasets",
+                "count": len(dm.data.list_datasets()),
+                "datasets": [d.to_dict() for d in dm.data.list_datasets()],
+            },
+            "instruments": lambda: {
+                "command": "data",
+                "action": "instruments",
+                "rendered": (
+                    instruments_cli.format_instruments_table(
+                        dm.instruments.instruments()
+                    )
+                    if instruments_cli is not None
+                    else str(dm.instruments.instruments())
+                ),
+                "count": len(dm.instruments.instruments()),
+                "instruments": dm.instruments.instruments(),
+            },
+            "sessions": lambda: {
+                "command": "data",
+                "action": "sessions",
+                "rendered": (
+                    sessions_cli.format_sessions_table(dm.sessions.view())
+                    if sessions_cli is not None
+                    else str(dm.sessions.view())
+                ),
+                "count": len(dm.sessions.view()),
+                "sessions": dm.sessions.view(),
+            },
+            "baskets": lambda: {
+                "command": "data",
+                "action": "baskets",
+                "count": len(dm.baskets.baskets()),
+                "baskets": dm.baskets.baskets(),
+            },
+            "brokers": lambda: {
+                "command": "data",
+                "action": "brokers",
+                "count": len(dm.broker.brokers()),
+                "brokers": dm.broker.brokers(),
+            },
+            "providers": lambda: {
+                "command": "data",
+                "action": "providers",
+                "count": len(dm.connections.list_providers()),
+                "providers": [p.to_dict() for p in dm.connections.list_providers()],
+            },
+            "logs": _handle_logs,
+        }
+        alias_map = {
+            "overview": "home",
+            "dashboard": "home",
+            "list": "home",
+            "status": "home",
+            "dataset": "datasets",
+            "instrument": "instruments",
+            "session": "sessions",
+            "basket": "baskets",
+            "stock_groups": "baskets",
+            "broker": "brokers",
+            "provider": "providers",
+            "log": "logs",
+        }
+        target = alias_map.get(act, act)
+        handler = dispatch_map.get(target)
+        if handler is None:
             raise ValueError(f"Unsupported data action: '{action}'")
-        return res
+        return handler()
+
+    def _cmd_data(
+        self, action: str, extra_args: Sequence[str] | None = None
+    ) -> dict[str, Any]:
+        """Dispatch headless data manager workspace operations."""
+        dm: Any = self.runtime.data_manager
+        if dm is None:
+            raise RuntimeError("AppDataManager is not initialized.")
+
+        import app.workspace.data_manager as dm_pkg
+
+        all_args = list(extra_args or [])
+        clean_act = action.strip()
+        if clean_act:
+            if "=" in clean_act:
+                all_args.append(clean_act)
+            else:
+                all_args.insert(0, f"action={clean_act}")
+
+        params = dict(a.split("=", 1) for a in all_args if "=" in a)
+        data_act = params.get("action", clean_act).lower()
+        if data_act in ("update", "import", "timezones") or (
+            data_act == "list"
+            and any(
+                k in params
+                for k in ("symbols", "symbol", "datasource", "source", "csv")
+            )
+        ):
+            data_cli: Any = getattr(dm_pkg, "DataCLI", None)
+            if data_cli is not None:
+                return dict(data_cli.dispatch_data(all_args, dm.data))
+
+        act = action.strip().lower()
+        return self._dispatch_legacy_data(dm, act, action)
 
     def _cmd_instrument(
         self, action: str, extra_args: Sequence[str] | None = None
@@ -467,6 +554,52 @@ class HeadlessCliRunner:
                 all_args.insert(0, f"action={clean_act}")
         return dict(sessions_cli.dispatch(all_args, dm.sessions))
 
+    def _cmd_symbol(
+        self, action: str, extra_args: Sequence[str] | None = None
+    ) -> dict[str, Any]:
+        """Dispatch headless symbol operations."""
+        dm: Any = self.runtime.data_manager
+        if dm is None:
+            raise RuntimeError("AppDataManager is not initialized.")
+
+        import app.workspace.data_manager as dm_pkg
+
+        data_cli: Any = getattr(dm_pkg, "DataCLI", None)
+        if data_cli is None:
+            raise RuntimeError("DataCLI is not available.")
+
+        all_args = list(extra_args or [])
+        clean_act = action.strip()
+        if clean_act:
+            if "=" in clean_act:
+                all_args.append(clean_act)
+            else:
+                all_args.insert(0, f"action={clean_act}")
+        return dict(data_cli.dispatch_symbol(all_args, dm.data))
+
+    def _cmd_brokerprofile(
+        self, action: str, extra_args: Sequence[str] | None = None
+    ) -> dict[str, Any]:
+        """Dispatch headless broker profile operations."""
+        dm: Any = self.runtime.data_manager
+        if dm is None:
+            raise RuntimeError("AppDataManager is not initialized.")
+
+        import app.workspace.data_manager as dm_pkg
+
+        broker_cli: Any = getattr(dm_pkg, "BrokerCLI", None)
+        if broker_cli is None:
+            raise RuntimeError("BrokerCLI is not available.")
+
+        all_args = list(extra_args or [])
+        clean_act = action.strip()
+        if clean_act:
+            if "=" in clean_act:
+                all_args.append(clean_act)
+            else:
+                all_args.insert(0, f"action={clean_act}")
+        return dict(broker_cli.dispatch(all_args, dm.broker))
+
 
 def format_cli_output(
     data: dict[str, Any] | None,
@@ -515,8 +648,9 @@ def format_cli_output(
 
 def run_cli(argv: Sequence[str] | None = None) -> tuple[int, str]:
     """Run the 7-stage headless bootstrap, execute command, and tear down."""
+    normalized_argv = _normalize_cli_args(list(argv) if argv is not None else [])
     parser = _build_cli_parser()
-    args, unknown = parser.parse_known_args(list(argv) if argv is not None else [])
+    args, unknown = parser.parse_known_args(normalized_argv)
     data_dir = Path(args.data_dir) if args.data_dir is not None else Path("data")
 
     host = AppHost(

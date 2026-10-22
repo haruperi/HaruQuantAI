@@ -272,3 +272,38 @@ High-frequency bars and ticks are stored as Apache Parquet files:
 - Datasets: `{data_dir}/history/{source}/{symbol}/{timeframe}.parquet`
 - Custom Data: `{data_dir}/custom_data/{name}.parquet`
 - Parquet columns: `timestamp` (UTC ISO string or int ms), `open`, `high`, `low`, `close`, `volume`, `spread`.
+
+---
+
+## 4. Headless CLI Interface (QDM Parity)
+
+The Data Manager workspace exposes a headless CLI matching `docs/SQX/cli/qdmcli.md`:
+
+### 4.1 Symbol Management (`-symbol`)
+- List symbols: `python -m app.cli -symbol action=list` or `python -m app.cli -l [csv=true]`
+- Add symbols: `python -m app.cli -symbol action=add datasource=dukascopy symbols=EURUSD,GBPUSD [instrument=EURUSD]` or `-a`
+- Edit symbol: `python -m app.cli -symbol action=edit symbol=EURUSD [underlying=EUR] [category=Forex]` or `-e`
+- Delete symbols: `python -m app.cli -symbol action=delete symbols=EURUSD` or `-d`
+- Clear symbol data: `python -m app.cli -symbol action=clear symbols=EURUSD` or `-c`
+- Darwinex / MT5 symbols: `python -m app.cli -symbol action=darwinexsymbols [csv=true]`
+
+### 4.2 Financial Instruments (`-instrument`)
+- List instruments: `python -m app.cli -instrument action=list` or `python -m app.cli -il [csv=true]`
+- Add instrument: `python -m app.cli -instrument action=add instrument=EURUSD pointsize=0.00001 pipsize=0.0001` or `-ia`
+- Edit instrument: `python -m app.cli -instrument action=edit instrument=EURUSD defaultspread=0.5` or `-ie`
+- Delete instruments: `python -m app.cli -instrument action=delete instruments=EURUSD,GBPUSD` or `-id`
+- Refresh specifications: `python -m app.cli -instrument action=refresh [symbols=EURUSD]` or `-ir`
+
+### 4.3 Price Data Management (`-data`)
+- Update / download data: `python -m app.cli -data action=update symbols=EURUSD datasource=dukascopy timeframe=1m [from=YYYY-MM-DD] [to=YYYY-MM-DD]` or `-u`
+- Import data file: `python -m app.cli -data action=import symbol=EURUSD file=/path/to/data.csv timeframe=1m` or `-di`
+- Supported timezones: `python -m app.cli -data action=timezones` or `-tz`
+- List datasets: `python -m app.cli -data action=list [symbols=EURUSD] [csv=true]`
+
+### 4.4 Broker Profiles (`-brokerprofile`)
+- List profiles: `python -m app.cli -brokerprofile action=list [csv=true]`
+- Add profile: `python -m app.cli -brokerprofile action=add broker=DemoBroker [timezone=UTC]`
+- Delete profile: `python -m app.cli -brokerprofile action=delete broker=DemoBroker`
+- Import stocks: `python -m app.cli -brokerprofile action=importstocks broker=DemoBroker file=stocks.txt`
+- Export stocks: `python -m app.cli -brokerprofile action=exportstocks broker=DemoBroker file=exported.txt`
+- Update profiles: `python -m app.cli -brokerprofile action=update broker=DemoBroker` or `action=updateall`

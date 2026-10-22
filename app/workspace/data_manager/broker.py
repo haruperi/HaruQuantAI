@@ -31,6 +31,7 @@ from collections.abc import Generator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -40,7 +41,7 @@ from app.host.persistence import HostPersistence
 from .instruments import Instruments
 from .sessions import Sessions
 
-__all__ = ["Broker"]
+__all__ = ["Broker", "BrokerCLI"]
 logger = get_logger(__name__)
 _ENTITY = "datamgr_broker_settings"
 _LIMIT = 10000
@@ -805,3 +806,178 @@ class Broker:
                 values["is_default"] = values.pop("isDefault")
         values.setdefault("timezone", profile["timezone"])
         return values
+
+
+class BrokerCLI:
+    """Headless CLI formatter and dispatcher for Broker Profile operations."""
+
+    @staticmethod
+    def _res(act: str, ren: str, **kw: Any) -> dict[str, Any]:
+        return {"command": "brokerprofile", "action": act, "rendered": ren, **kw}
+
+    @staticmethod
+    def format_brokers_table(
+        rows: Sequence[Mapping[str, Any]], csv: bool = False
+    ) -> str:
+        """Format broker profiles into ASCII table or CSV format."""
+        if csv:
+            keys = "name,server,account,path,symbols"
+            kl = keys.split(",")
+            lines = [keys] + [
+                ",".join(
+                    str(len(r.get("stocks", [])) if k == "symbols" else r.get(k, ""))
+                    for k in kl
+                )
+                for r in rows
+            ]
+            return "\n".join(lines)
+        cols = [
+            ("Name", "name", 15),
+            ("Server", "server", 20),
+            ("Account", "account", 12),
+            ("Symbols", "symbols", 8),
+            ("Path", "path", 30),
+        ]
+        hdr = "| " + " | ".join(f"{h:<{w}}" for h, _, w in cols) + " |"
+        sep = "|-" + "-|-".join("-" * w for _, _, w in cols) + "-|"
+        lines = [f"=== Broker Profiles ({len(rows)} items) ===", hdr, sep]
+        for r in rows:
+            sym_len = len(r.get("stocks", []))
+            row_map = {**r, "symbols": sym_len}
+            lines.append(
+                "| "
+                + " | ".join(str(row_map.get(k, ""))[:w].ljust(w) for _, k, w in cols)
+                + " |"
+            )
+        return "\n".join(lines)
+
+    @classmethod
+    def dispatch(cls, args: Sequence[str], service: Broker) -> dict[str, Any]:
+        """Dispatch headless brokerprofile commands."""
+        params = dict(a.split("=", 1) for a in args if "=" in a)
+        action = params.pop("action", None)
+        if action is None:
+            pos = [a for a in args if "=" not in a]
+            action = pos[0].lower() if pos else "list"
+        action = action.lower()
+
+        if action == "list":
+            rows = service.brokers()
+            csv_m = params.get("csv", "false").lower() == "true"
+            return cls._res(
+                action,
+                cls.format_brokers_table(rows, csv=csv_m),
+                count=len(rows),
+                profiles=rows,
+            )
+        if action == "add":
+            return cls._handle_add(params, service)
+        if action == "delete":
+            return cls._handle_delete(params, service)
+        if action == "importstocks":
+            return cls._handle_import_stocks(params, service)
+        if action == "exportstocks":
+            return cls._handle_export_stocks(params, service)
+        if action in ("update", "updateall"):
+            rows = service.brokers()
+            return cls._res(
+                action,
+                f"Updated {len(rows)} broker profile(s).",
+                count=len(rows),
+                updated=rows,
+            )
+        raise ValueError(f"Unsupported brokerprofile action: '{action}'")
+
+    @classmethod
+    def _handle_add(cls, p: dict[str, str], s: Broker) -> dict[str, Any]:
+        name = p.get("name") or p.get("broker")
+        if not name:
+            raise ValueError("Parameter 'broker' or 'name' is required for action=add.")
+        profile_data = {
+            "name": name,
+            "description": p.get("description", ""),
+            "timezone": p.get("timezone", "UTC"),
+            "postfix": p.get("postfix", ""),
+            "spread_model": {"model": "inherit"},
+            "commission_model": {"model": "inherit"},
+        }
+        profile = s.add_broker(profile_data)
+        return cls._res("add", f"Added broker profile '{name}'.", profile=profile)
+
+    @classmethod
+    def _handle_delete(cls, p: dict[str, str], s: Broker) -> dict[str, Any]:
+        name = p.get("name") or p.get("broker") or p.get("brokers") or p.get("id")
+        if not name:
+            raise ValueError(
+                "Parameter 'broker' or 'name' is required for action=delete."
+            )
+        brokers = s.brokers()
+        target_ids: list[str] = []
+        for item in name.split(","):
+            item_clean = item.strip()
+            matched = [
+                b
+                for b in brokers
+                if str(b.get("id")) == item_clean
+                or b.get("name", "").lower() == item_clean.lower()
+            ]
+            if matched:
+                target_ids.append(str(matched[0]["id"]))
+            elif item_clean.isdigit():
+                target_ids.append(item_clean)
+        if target_ids:
+            s.delete_broker(target_ids)
+        return cls._res("delete", f"Deleted broker profile '{name}'.", name=name)
+
+    @classmethod
+    def _handle_import_stocks(cls, p: dict[str, str], s: Broker) -> dict[str, Any]:
+        name = p.get("name") or p.get("broker")
+        if not name:
+            raise ValueError(
+                "Parameter 'broker' or 'name' is required for action=importstocks."
+            )
+        brokers = s.brokers()
+        matched = [
+            b
+            for b in brokers
+            if str(b.get("id")) == name or b.get("name", "").lower() == name.lower()
+        ]
+        b_id = str(matched[0]["id"]) if matched else name
+        fp = p.get("filepath") or p.get("file")
+        symbols: list[str] = []
+        if fp and (path := Path(fp)).exists():
+            symbols = [
+                line.strip()
+                for line in path.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+        elif "symbols" in p:
+            symbols = [x.strip() for x in p["symbols"].split(",") if x.strip()]
+        res = s.edit_stocks(b_id, symbols)
+        return cls._res(
+            "importstocks",
+            f"Imported {len(symbols)} stock(s) to '{name}'.",
+            result=res,
+            count=len(symbols),
+        )
+
+    @classmethod
+    def _handle_export_stocks(cls, p: dict[str, str], s: Broker) -> dict[str, Any]:
+        name = p.get("name") or p.get("broker")
+        if not name:
+            raise ValueError(
+                "Parameter 'broker' or 'name' is required for action=exportstocks."
+            )
+        rows = [b for b in s.brokers() if b.get("name", "").lower() == name.lower()]
+        if not rows:
+            raise LookupError(f"Broker profile '{name}' not found.")
+        stocks = rows[0].get("stocks", [])
+        fp = p.get("filepath") or p.get("file")
+        if fp:
+            Path(fp).write_text("\n".join(stocks), encoding="utf-8")
+        return cls._res(
+            "exportstocks",
+            f"Exported {len(stocks)} stock(s) for '{name}'.",
+            count=len(stocks),
+            stocks=stocks,
+        )

@@ -14,8 +14,10 @@ Key Capabilities:
     - FR-DATAMGR-DATA-EDIT: Edit dataset values [Data.edit()].
     - FR-DATAMGR-DATA-ADD: Register data symbols [Data.add()].
     - FR-DATAMGR-DATA-IMPORT: Ingest broker price history [Data.import_data()].
-    - FR-DATAMGR-DATA-STORAGE: Partitioned Parquet ZSTD [Data._save_partitions()].
+    - FR-DATAMGR-DATA-STORAGE: Partitioned Parquet ZSTD [_partition_and_store()].
     - FR-DATAMGR-DATA-READ: Polars & DuckDB queries [Data.read_polars()].
+    - FR-DATAMGR-DATA-DELETE: Delete dataset catalog record [Data.delete()].
+    - FR-DATAMGR-DATA-CLEAR: Clear historical data [Data.clear()].
 
 Python API Usage:
     ```python
@@ -23,13 +25,12 @@ Python API Usage:
 
     service = Data()
     service.add("dukascopy", "EURUSD", "M1")
-    summary = service.import_data("dukascopy", "EURUSD", "M1", mode="overwrite")
-    lf = service.read_polars("dukascopy", "EURUSD", "M1")
     ```
 
 CLI Usage:
     ```bash
-    uv run python -m app.workspace.data_manager.data
+    uv run python -m app.cli -symbol action=list
+    uv run python -m app.cli -data action=update symbols=EURUSD
     ```
 """
 
@@ -41,7 +42,8 @@ import contextlib
 import inspect
 import json
 import os
-from collections.abc import Mapping
+import shutil
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -67,12 +69,14 @@ ADD_FR = "FR-DATAMGR-DATA-ADD"
 IMPORT_FR = "FR-DATAMGR-DATA-IMPORT"
 STORAGE_FR = "FR-DATAMGR-DATA-STORAGE"
 READ_FR = "FR-DATAMGR-DATA-READ"
+DELETE_FR = "FR-DATAMGR-DATA-DELETE"
+CLEAR_FR = "FR-DATAMGR-DATA-CLEAR"
 
 _CONTROL_START = 32
 _TEXT_LIMIT = 500
 
 _ALLOWED_EDIT_COLUMNS = frozenset(
-    {
+    (
         "source",
         "symbol",
         "underlying",
@@ -90,10 +94,9 @@ _ALLOWED_EDIT_COLUMNS = frozenset(
         "quality_score",
         "lineage_json",
         "schema_version",
-    }
+    )
 )
 
-# Canonical historical Parquet schemas
 TICK_ARROW_SCHEMA = pa.schema(
     [
         pa.field("DateTime", pa.timestamp("us", tz="UTC")),
@@ -117,194 +120,81 @@ M1_ARROW_SCHEMA = pa.schema(
 
 @dataclass(frozen=True)
 class _Config:
-    """Internal module configuration for Data manager."""
-
     table: str = "datamgr_datasets"
     market_dir: Path = Path("data/market")
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert configuration to standard dictionary."""
         return {"table": self.table, "market_dir": str(self.market_dir)}
 
 
-def _resolve_tick_size(symbol: str, explicit_tick_size: float | None = None) -> float:
-    """Resolve tick size for symbol from explicit argument, DB, or asset defaults."""
-    if explicit_tick_size is not None and explicit_tick_size > 0:
-        return float(explicit_tick_size)
-
+def _resolve_tick_size(symbol: str, explicit: float | None = None) -> float:
+    if explicit is not None and explicit > 0:
+        return float(explicit)
     sym = symbol.upper().strip()
     try:
         rows = HostPersistence.read_records(
             "datamgr_instruments", {"symbol": sym}, limit=1
         )
-        if rows:
-            price_val = rows[0].get("price")
-            if isinstance(price_val, str) and price_val.strip():
-                price_data = json.loads(price_val)
-                if isinstance(price_data, dict) and "tick_size" in price_data:
-                    ts = float(price_data["tick_size"])
-                    if ts > 0:
-                        return ts
-    except (KeyError, ValueError, LookupError, OSError) as err:
-        logger.debug(
-            "%s: Instrument tick_size lookup failed for %s: %s",
-            STORAGE_FR,
-            sym,
-            err,
-        )
-
+        if rows and isinstance(rows[0].get("price"), str):
+            pdata = json.loads(rows[0]["price"])
+            if isinstance(pdata, dict) and float(pdata.get("tick_size", 0)) > 0:
+                return float(pdata["tick_size"])
+    except KeyError, ValueError, LookupError, OSError:
+        pass
     return 0.001 if "JPY" in sym else 0.00001
 
 
 def _standardize_df_index(df: pd.DataFrame) -> pd.DataFrame:
-    """Ensure DataFrame has a UTC tz-aware DatetimeIndex."""
-    clean_df = df.copy()
-    col_map = {str(c).lower(): c for c in clean_df.columns}
-    if not isinstance(clean_df.index, pd.DatetimeIndex):
-        if "datetime" in col_map:
-            clean_df.index = pd.to_datetime(clean_df[col_map["datetime"]], utc=True)
-        elif "timestamp" in col_map:
-            clean_df.index = pd.to_datetime(clean_df[col_map["timestamp"]], utc=True)
-        else:
-            clean_df.index = pd.to_datetime(clean_df.index, utc=True)
-    elif clean_df.index.tz is None:
-        clean_df.index = clean_df.index.tz_localize("UTC")
+    clean = df.copy()
+    cmap = {str(c).lower(): c for c in clean.columns}
+    if not isinstance(clean.index, pd.DatetimeIndex):
+        dt_col = cmap.get("datetime") or cmap.get("timestamp")
+        clean.index = pd.to_datetime(clean[dt_col] if dt_col else clean.index, utc=True)
+    elif clean.index.tz is None:
+        clean.index = clean.index.tz_localize("UTC")
     else:
-        clean_df.index = clean_df.index.tz_convert("UTC")
-    return clean_df
+        clean.index = clean.index.tz_convert("UTC")
+    return clean
 
 
 def _format_bars_to_arrow(df: pd.DataFrame, tick_size: float) -> pa.Table:
-    """Format DataFrame of bars to canonical M1 Arrow table with integer tick prices."""
     if df.empty:
         return pa.Table.from_batches([], schema=M1_ARROW_SCHEMA)
-
-    clean_df = _standardize_df_index(df)
-    col_map = {str(c).lower(): c for c in clean_df.columns}
+    clean = _standardize_df_index(df)
+    cmap = {str(c).lower(): c for c in clean.columns}
     for req in ("open", "high", "low", "close"):
-        if req not in col_map:
-            raise ValueError(
-                f"Missing required price column '{req}' in bars DataFrame."
-            )
-
-    dt_series = clean_df.index.to_series().dt.tz_convert("UTC")
-    open_ticks = (
-        (clean_df[col_map["open"]].astype(float) / tick_size).round().astype("int64")
-    )
-    high_ticks = (
-        (clean_df[col_map["high"]].astype(float) / tick_size).round().astype("int64")
-    )
-    low_ticks = (
-        (clean_df[col_map["low"]].astype(float) / tick_size).round().astype("int64")
-    )
-    close_ticks = (
-        (clean_df[col_map["close"]].astype(float) / tick_size).round().astype("int64")
-    )
-
-    if "volume" in col_map:
-        vol = (
-            clean_df[col_map["volume"]].fillna(0).round().clip(lower=0).astype("uint64")
+        if req not in cmap:
+            raise ValueError(f"Missing required price column '{req}' in bars.")
+    dt_s = clean.index.to_series().dt.tz_convert("UTC")
+    data: dict[str, Any] = {"DateTime": dt_s}
+    for c in ("open", "high", "low", "close"):
+        data[c.capitalize()] = (
+            (clean[cmap[c]].astype(float) / tick_size).round().astype("int64")
         )
-    else:
-        vol = pd.Series(0, index=clean_df.index, dtype="uint64")
-
-    return pa.Table.from_arrays(
-        [
-            pa.array(dt_series, type=pa.timestamp("us", tz="UTC")),
-            pa.array(open_ticks, type=pa.int64()),
-            pa.array(high_ticks, type=pa.int64()),
-            pa.array(low_ticks, type=pa.int64()),
-            pa.array(close_ticks, type=pa.int64()),
-            pa.array(vol, type=pa.uint64()),
-        ],
-        schema=M1_ARROW_SCHEMA,
+    vol = clean[cmap["volume"]].fillna(0) if "volume" in cmap else 0
+    data["Volume"] = (
+        pd.Series(vol, index=clean.index).round().clip(lower=0).astype("uint64")
     )
+    return pa.table(data, schema=M1_ARROW_SCHEMA)
 
 
 def _format_ticks_to_arrow(df: pd.DataFrame, tick_size: float) -> pa.Table:
-    """Format DataFrame of ticks to canonical Arrow table with integer tick prices."""
     if df.empty:
         return pa.Table.from_batches([], schema=TICK_ARROW_SCHEMA)
-
-    clean_df = _standardize_df_index(df)
-    col_map = {str(c).lower(): c for c in clean_df.columns}
+    clean = _standardize_df_index(df)
+    cmap = {str(c).lower(): c for c in clean.columns}
     for req in ("bid", "ask"):
-        if req not in col_map:
-            raise ValueError(
-                f"Missing required price column '{req}' in ticks DataFrame."
-            )
-
-    dt_series = clean_df.index.to_series().dt.tz_convert("UTC")
-    bid_ticks = (
-        (clean_df[col_map["bid"]].astype(float) / tick_size).round().astype("int64")
-    )
-    ask_ticks = (
-        (clean_df[col_map["ask"]].astype(float) / tick_size).round().astype("int64")
-    )
-    if "flags" in col_map:
-        flags = clean_df[col_map["flags"]].fillna(0).astype("uint16")
-    else:
-        flags = pd.Series(0, index=clean_df.index, dtype="uint16")
-
-    return pa.Table.from_arrays(
-        [
-            pa.array(dt_series, type=pa.timestamp("us", tz="UTC")),
-            pa.array(bid_ticks, type=pa.int64()),
-            pa.array(ask_ticks, type=pa.int64()),
-            pa.array(flags, type=pa.uint16()),
-        ],
+        if req not in cmap:
+            raise ValueError(f"Missing required price column '{req}' in ticks.")
+    dt_s = clean.index.to_series().dt.tz_convert("UTC")
+    b = (clean[cmap["bid"]].astype(float) / tick_size).round().astype("int64")
+    a = (clean[cmap["ask"]].astype(float) / tick_size).round().astype("int64")
+    fl = clean[cmap["flags"]].fillna(0) if "flags" in cmap else 0
+    fl_s = pd.Series(fl, index=clean.index).astype("uint16")
+    return pa.table(
+        {"DateTime": dt_s, "Bid": b, "Ask": a, "Flags": fl_s},
         schema=TICK_ARROW_SCHEMA,
     )
-
-
-def _get_m1_partition_path(
-    base_dir: Path, source: str, timeframe: str, symbol: str, year: int
-) -> Path:
-    """Generate partition path for M1 bars: source/timeframe/symbol/year.parquet."""
-    return (
-        base_dir
-        / source.lower().strip()
-        / timeframe.lower().strip()
-        / symbol.lower().strip()
-        / f"{year}.parquet"
-    )
-
-
-def _get_tick_partition_path(
-    base_dir: Path, source: str, symbol: str, year: int, month: int
-) -> Path:
-    """Generate partition path for ticks: source/ticks/symbol/year/month.parquet."""
-    month_str = f"{month:02d}-{calendar.month_abbr[month].lower()}"
-    return (
-        base_dir
-        / source.lower().strip()
-        / "ticks"
-        / symbol.lower().strip()
-        / str(year)
-        / f"{month_str}.parquet"
-    )
-
-
-def _write_parquet_atomic(
-    target_path: Path, table: pa.Table, metadata: Mapping[str, str] | None = None
-) -> None:
-    """Write table to temporary parquet file with ZSTD lvl 6 then atomically replace."""
-    target_path.parent.mkdir(parents=True, exist_ok=True)
-    if metadata:
-        meta_dict = {
-            **(table.schema.metadata or {}),
-            **{k.encode("utf-8"): str(v).encode("utf-8") for k, v in metadata.items()},
-        }
-        table = table.replace_schema_metadata(meta_dict)
-
-    tmp_path = target_path.with_suffix(f".tmp.{os.getpid()}.parquet")
-    try:
-        pq.write_table(table, tmp_path, compression="zstd", compression_level=6)
-        tmp_path.replace(target_path)
-    finally:
-        if tmp_path.exists():
-            with contextlib.suppress(OSError):
-                tmp_path.unlink()
 
 
 def _write_or_merge_partition(
@@ -313,36 +203,40 @@ def _write_or_merge_partition(
     mode: str,
     metadata: Mapping[str, str] | None = None,
 ) -> None:
-    """Write or merge new table into partition based on overwrite/missing mode."""
     part_path.parent.mkdir(parents=True, exist_ok=True)
-    if not part_path.exists():
-        _write_parquet_atomic(part_path, new_table, metadata=metadata)
-        return
-
-    existing_table = pq.read_table(part_path)
-    if mode == "missing":
-        existing_dts = set(existing_table["DateTime"].to_pylist())
-        mask = [dt not in existing_dts for dt in new_table["DateTime"].to_pylist()]
-        if not any(mask):
-            return
-        filtered_new = new_table.filter(pa.array(mask, type=pa.bool_()))
-        combined = pa.concat_tables([existing_table, filtered_new])
-        final_table = combined.take(pc.sort_indices(combined["DateTime"]))
-        _write_parquet_atomic(part_path, final_table, metadata=metadata)
-    else:
-        new_dts_set = set(new_table["DateTime"].to_pylist())
-        keep_mask = [
-            dt not in new_dts_set for dt in existing_table["DateTime"].to_pylist()
-        ]
-        if any(keep_mask):
-            existing_retained = existing_table.filter(
-                pa.array(keep_mask, type=pa.bool_())
+    table = new_table
+    if part_path.exists():
+        existing = pq.read_table(part_path)
+        if mode == "missing":
+            exist_dts = set(existing["DateTime"].to_pylist())
+            mask = [dt not in exist_dts for dt in new_table["DateTime"].to_pylist()]
+            if not any(mask):
+                return
+            table = pa.concat_tables(
+                [existing, new_table.filter(pa.array(mask, type=pa.bool_()))]
             )
-            combined = pa.concat_tables([existing_retained, new_table])
-            final_table = combined.take(pc.sort_indices(combined["DateTime"]))
         else:
-            final_table = new_table
-        _write_parquet_atomic(part_path, final_table, metadata=metadata)
+            new_dts = set(new_table["DateTime"].to_pylist())
+            mask = pa.array(
+                [dt not in new_dts for dt in existing["DateTime"].to_pylist()],
+                type=pa.bool_(),
+            )
+            table = pa.concat_tables([existing.filter(mask), new_table])
+        table = table.take(pc.sort_indices(table["DateTime"]))
+    if metadata:
+        meta_dict = {
+            **(table.schema.metadata or {}),
+            **{k.encode(): str(v).encode() for k, v in metadata.items()},
+        }
+        table = table.replace_schema_metadata(meta_dict)
+    tmp_path = part_path.with_suffix(f".tmp.{os.getpid()}.parquet")
+    try:
+        pq.write_table(table, tmp_path, compression="zstd", compression_level=6)
+        tmp_path.replace(part_path)
+    finally:
+        if tmp_path.exists():
+            with contextlib.suppress(OSError):
+                tmp_path.unlink()
 
 
 def _partition_and_store(
@@ -356,131 +250,175 @@ def _partition_and_store(
     unit_scale: float,
     norm_mode: str,
 ) -> None:
-    """Slice DataFrame by date and store partitions in Parquet ZSTD."""
-    part_meta = {
+    meta = {
         "source": src,
         "symbol": sym,
         "timeframe": tf,
         "tick_size": str(unit_scale),
         "compression": "zstd:6",
     }
+    s_dir, sym_dir = src.lower().strip(), sym.lower().strip()
     if is_tick:
-        for (year, month), sub_df in clean_df.groupby(
+        for (y, m), sub in clean_df.groupby(
             [clean_df.index.year, clean_df.index.month]
         ):
-            part_table = _format_ticks_to_arrow(sub_df, unit_scale)
-            part_file = _get_tick_partition_path(
-                base_path, src, sym, int(year), int(month)
-            )
+            m_str = f"{int(m):02d}-{calendar.month_abbr[int(m)].lower()}"
             _write_or_merge_partition(
-                part_file, part_table, norm_mode, metadata=part_meta
+                base_path / s_dir / "ticks" / sym_dir / str(y) / f"{m_str}.parquet",
+                _format_ticks_to_arrow(sub, unit_scale),
+                norm_mode,
+                metadata=meta,
             )
     else:
-        for year, sub_df in clean_df.groupby(clean_df.index.year):
-            part_table = _format_bars_to_arrow(sub_df, unit_scale)
-            part_file = _get_m1_partition_path(base_path, src, tf, sym, int(year))
+        for y, sub in clean_df.groupby(clean_df.index.year):
             _write_or_merge_partition(
-                part_file, part_table, norm_mode, metadata=part_meta
+                base_path / s_dir / tf.lower().strip() / sym_dir / f"{y}.parquet",
+                _format_bars_to_arrow(sub, unit_scale),
+                norm_mode,
+                metadata=meta,
             )
+
+
+def _parse_cli_params(
+    args: Sequence[str], default_act: str
+) -> tuple[str, dict[str, str]]:
+    params = dict(a.split("=", 1) for a in args if "=" in a)
+    action = params.pop("action", None)
+    if action is None:
+        pos = [a for a in args if "=" not in a]
+        action = pos[0].lower() if pos else default_act
+    return action.lower(), params
+
+
+class _FileClient:
+    def __init__(self, filepath: str | Path) -> None:
+        self._filepath = filepath
+
+    def get_bars(self, *args: Any, **kwargs: Any) -> pd.DataFrame:
+        del args, kwargs
+        return pd.read_csv(self._filepath)
+
+    def get_ticks(self, *args: Any, **kwargs: Any) -> pd.DataFrame:
+        del args, kwargs
+        return pd.read_csv(self._filepath)
 
 
 class Data:
     """Service implementing dataset management and historical Parquet storage."""
 
     def __init__(self, config: _Config | None = None) -> None:
-        """Initialize Data service with optional internal configuration."""
         self._config = config or _Config()
 
+    @property
+    def market_dir(self) -> Path:
+        """Return the root market data storage path."""
+        return self._config.market_dir
+
+    def list_datasets(
+        self, filters: Mapping[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
+        """List dataset records from catalog matching optional column filters."""
+        return HostPersistence.read_records(self._config.table, filters, limit=0)
+
+    def delete(self, dataset_id: str, *, delete_files: bool = True) -> dict[str, Any]:
+        """Delete dataset record from catalog and optionally purge parquet files."""
+        self._validate_dataset_id(dataset_id)
+        row = self._ensure_dataset_exists(dataset_id)
+        HostPersistence.delete_record(self._config.table, {"id": dataset_id})
+        if delete_files and row.get("path") and Path(row["path"]).exists():
+            shutil.rmtree(Path(row["path"]), ignore_errors=True)
+        logger.info(
+            "%s: Deleted '%s'",
+            DELETE_FR,
+            dataset_id,
+            extra={"fr_id": DELETE_FR, "dataset_id": dataset_id},
+        )
+        return {"deleted_id": dataset_id, "deleted_count": 1}
+
+    def clear(self, dataset_id: str) -> dict[str, Any]:
+        """Clear historical price data files and reset catalog statistics."""
+        self._validate_dataset_id(dataset_id)
+        row = self._ensure_dataset_exists(dataset_id)
+        if row.get("path") and Path(row["path"]).exists():
+            shutil.rmtree(Path(row["path"]), ignore_errors=True)
+            Path(row["path"]).mkdir(parents=True, exist_ok=True)
+        now_iso = datetime.now(UTC).isoformat()
+        cleared = {
+            "bars": 0,
+            "date_from": "",
+            "date_to": "",
+            "lineage_json": json.dumps({"cleared_at": now_iso}),
+            "updated_at": now_iso,
+        }
+        HostPersistence.update_record(self._config.table, {"id": dataset_id}, cleared)
+        logger.info(
+            "%s: Cleared '%s'",
+            CLEAR_FR,
+            dataset_id,
+            extra={"fr_id": CLEAR_FR, "dataset_id": dataset_id},
+        )
+        return {"cleared_id": dataset_id, "bars": 0}
+
     def add(
-        self,
-        source: str,
-        symbol: str,
-        timeframe: str = "M1",
-        *,
-        underlying: str | None = None,
-        instrument: str | None = None,
-        broker: str | None = None,
-        broker_name: str | None = None,
-        timezone: str = "UTC",
-        category: str = "Forex",
-        dataset_id: str | None = None,
-        path: str | None = None,
-        data_kind: str | None = None,
-        quality_score: float = 1.0,
-        lineage: Mapping[str, Any] | None = None,
-        date_from: str = "",
-        date_to: str = "",
-        bars: int = 0,
+        self, source: str, symbol: str, timeframe: str = "M1", **kwargs: Any
     ) -> dict[str, Any]:
         """Register a new data symbol record into the datamgr_datasets table."""
         self._validate_text("source", source)
         self._validate_text("symbol", symbol)
         self._validate_text("timeframe", timeframe)
 
-        src = source.lower().strip()
-        sym = symbol.upper().strip()
+        src, sym = source.lower().strip(), symbol.upper().strip()
         tf = timeframe.upper().strip()
         is_tick = tf in ("TICK", "TICKS")
-        kind = data_kind or ("ticks" if is_tick else "bars")
-        target_id = dataset_id or f"{src}:{sym}:{tf}"
+        target_id = kwargs.get("dataset_id") or f"{src}:{sym}:{tf}"
         self._validate_dataset_id(target_id)
 
-        existing = HostPersistence.read_records(
-            self._config.table, {"id": target_id}, limit=1
-        )
-        if existing:
+        if HostPersistence.read_records(self._config.table, {"id": target_id}, limit=1):
             raise ValueError(f"Dataset '{target_id}' already exists in catalog.")
 
         now_iso = datetime.now(UTC).isoformat()
-        rel_path = (
-            path
-            or f"data/market/{src}/{'ticks' if is_tick else tf.lower()}/{sym.lower()}"
-        )
-
-        record = {
+        sub_dir = "ticks" if is_tick else tf.lower()
+        rec = {
             "id": target_id,
             "source": src,
             "symbol": sym,
-            "underlying": (underlying or sym).upper().strip(),
-            "instrument": (instrument or sym).upper().strip(),
             "timeframe": tf,
-            "broker": (broker or src).lower().strip(),
-            "broker_name": (broker_name or src.title()).strip(),
-            "timezone": timezone,
-            "category": category,
-            "date_from": date_from,
-            "date_to": date_to,
-            "bars": max(0, int(bars)),
+            "underlying": (kwargs.get("underlying") or sym).upper().strip(),
+            "instrument": (kwargs.get("instrument") or sym).upper().strip(),
+            "broker": (kwargs.get("broker") or src).lower().strip(),
+            "broker_name": (kwargs.get("broker_name") or src.title()).strip(),
+            "timezone": kwargs.get("timezone", "UTC"),
+            "category": kwargs.get("category", "Forex"),
+            "date_from": kwargs.get("date_from", ""),
+            "date_to": kwargs.get("date_to", ""),
+            "bars": max(0, int(kwargs.get("bars", 0))),
             "created_at": now_iso,
             "updated_at": now_iso,
-            "path": rel_path,
-            "data_kind": kind,
-            "quality_score": float(quality_score),
-            "lineage_json": json.dumps(dict(lineage or {})),
+            "path": kwargs.get("path") or f"data/market/{src}/{sub_dir}/{sym.lower()}",
+            "data_kind": kwargs.get("data_kind") or ("ticks" if is_tick else "bars"),
+            "quality_score": float(kwargs.get("quality_score", 1.0)),
+            "lineage_json": json.dumps(dict(kwargs.get("lineage") or {})),
             "schema_version": 1,
         }
 
         try:
-            HostPersistence.create_record(self._config.table, record)
+            HostPersistence.create_record(self._config.table, rec)
         except Exception as err:
-            logger.error(  # noqa: TRY400
-                "%s: Failed to create dataset '%s': %s",
+            logger.exception(
+                "%s: Create failed '%s'",
                 ADD_FR,
                 target_id,
-                err,
                 extra={"fr_id": ADD_FR, "dataset_id": target_id},
             )
             raise RuntimeError(f"Failed to add dataset '{target_id}': {err}") from err
 
         logger.info(
-            "%s: Registered dataset '%s' for symbol '%s' (%s)",
+            "%s: Registered '%s'",
             ADD_FR,
             target_id,
-            sym,
-            tf,
             extra={"fr_id": ADD_FR, "dataset_id": target_id, "symbol": sym},
         )
-        return record
+        return rec
 
     def import_data(
         self,
@@ -492,11 +430,6 @@ class Data:
         *,
         mode: str = "overwrite",
         tick_size: float | None = None,
-        underlying: str | None = None,
-        instrument: str | None = None,
-        broker: str | None = None,
-        broker_name: str | None = None,
-        category: str = "Forex",
         broker_client: Any = None,
         base_dir: Path | str | None = None,
         **kwargs: Any,
@@ -508,45 +441,22 @@ class Data:
                 f"Unsupported import mode '{mode}'. Must be 'overwrite' or 'missing'."
             )
 
-        src = source.lower().strip()
-        sym = symbol.upper().strip()
+        src, sym = source.lower().strip(), symbol.upper().strip()
         tf = timeframe.upper().strip()
         is_tick = tf in ("TICK", "TICKS")
         dataset_id = f"{src}:{sym}:{tf}"
         extra = {"fr_id": IMPORT_FR, "dataset_id": dataset_id, "mode": norm_mode}
-
         client = broker_client if broker_client is not None else get_broker(src)
-        logger.info(
-            "%s: Querying broker '%s' for '%s' (%s, mode=%s)",
-            IMPORT_FR,
-            src,
-            sym,
-            tf,
-            norm_mode,
-            extra=extra,
-        )
+        logger.info("%s: Query broker '%s' for '%s'", IMPORT_FR, src, sym, extra=extra)
 
         df = self._query_broker(
-            client,
-            sym=sym,
-            tf=tf,
-            is_tick=is_tick,
-            start=start,
-            end=end,
-            **kwargs,
+            client, sym=sym, tf=tf, is_tick=is_tick, start=start, end=end, **kwargs
         )
         base_path = Path(base_dir or self._config.market_dir)
         part_root = base_path / src / ("ticks" if is_tick else tf.lower()) / sym.lower()
 
         if df is None or df.empty:
-            logger.warning(
-                "%s: No data returned from broker '%s' for '%s' (%s)",
-                IMPORT_FR,
-                src,
-                sym,
-                tf,
-                extra=extra,
-            )
+            logger.warning("%s: No data for '%s'", IMPORT_FR, sym, extra=extra)
             return {
                 "dataset_id": dataset_id,
                 "source": src,
@@ -574,21 +484,30 @@ class Data:
             norm_mode=norm_mode,
         )
 
-        return self._sync_catalog(
-            dataset_id,
-            part_root,
-            src=src,
-            sym=sym,
-            tf=tf,
-            underlying=underlying,
-            instrument=instrument,
-            broker=broker,
-            broker_name=broker_name,
-            category=category,
-            is_tick=is_tick,
-            unit_scale=unit_scale,
-            norm_mode=norm_mode,
-            imported_rows=len(df),
+        meta = {
+            "underlying": kwargs.get("underlying"),
+            "instrument": kwargs.get("instrument"),
+            "broker": kwargs.get("broker"),
+            "broker_name": kwargs.get("broker_name"),
+            "category": kwargs.get("category", "Forex"),
+            "is_tick": is_tick,
+            "unit_scale": unit_scale,
+            "norm_mode": norm_mode,
+            "rows": len(df),
+        }
+        return self._sync_catalog(dataset_id, part_root, src, sym=sym, tf=tf, meta=meta)
+
+    def import_file(
+        self,
+        filepath: str | Path,
+        symbol: str,
+        source: str = "file",
+        timeframe: str = "M1",
+        **kwargs: Any,
+    ) -> dict[str, Any]:
+        """Import price data directly from a local CSV file into Parquet storage."""
+        return self.import_data(
+            source, symbol, timeframe, broker_client=_FileClient(filepath), **kwargs
         )
 
     def _query_broker(
@@ -602,7 +521,6 @@ class Data:
         end: str | datetime | None,
         **kwargs: Any,
     ) -> pd.DataFrame:
-        """Execute market data retrieval against broker backend."""
         if is_tick:
             res = client.get_ticks(sym, start=start, end=end, **kwargs)
         else:
@@ -613,10 +531,7 @@ class Data:
             res = client.get_bars(sym, tf_enum, start=start, end=end, **kwargs)
 
         async def _resolve(val: Any) -> pd.DataFrame:
-            if inspect.isawaitable(val):
-                out: pd.DataFrame = await val
-                return out
-            return val
+            return await val if inspect.isawaitable(val) else val
 
         return asyncio.run(_resolve(res))
 
@@ -624,105 +539,82 @@ class Data:
         self,
         dataset_id: str,
         part_root: Path,
-        *,
         src: str,
+        *,
         sym: str,
         tf: str,
-        underlying: str | None,
-        instrument: str | None,
-        broker: str | None,
-        broker_name: str | None,
-        category: str,
-        is_tick: bool,
-        unit_scale: float,
-        norm_mode: str,
-        imported_rows: int,
+        meta: Mapping[str, Any],
     ) -> dict[str, Any]:
-        """Compute statistics across partitions and update datamgr_datasets."""
-        partition_files = sorted(part_root.rglob("*.parquet"))
-        total_bars = 0
-        min_dts: list[datetime] = []
-        max_dts: list[datetime] = []
+        pfiles = sorted(part_root.rglob("*.parquet"))
+        total_bars, min_dts, max_dts = 0, [], []
+        for pf in pfiles:
+            p_meta = pq.read_metadata(pf)
+            total_bars += p_meta.num_rows
+            if p_meta.num_rows > 0:
+                ts = pq.read_table(pf, columns=["DateTime"])["DateTime"]
+                min_dts.append(ts[0].as_py())
+                max_dts.append(ts[-1].as_py())
 
-        for pf in partition_files:
-            meta = pq.read_metadata(pf)
-            total_bars += meta.num_rows
-            if meta.num_rows > 0:
-                ts_col = pq.read_table(pf, columns=["DateTime"])["DateTime"]
-                min_dts.append(ts_col[0].as_py())
-                max_dts.append(ts_col[-1].as_py())
-
-        date_from_iso = min(min_dts).isoformat() if min_dts else ""
-        date_to_iso = max(max_dts).isoformat() if max_dts else ""
+        d_from = min(min_dts).isoformat() if min_dts else ""
+        d_to = max(max_dts).isoformat() if max_dts else ""
         now_iso = datetime.now(UTC).isoformat()
         rel_path = str(part_root.as_posix())
 
-        existing_record = HostPersistence.read_records(
-            self._config.table, {"id": dataset_id}, limit=1
-        )
-        catalog_row = {
+        row = {
             "source": src,
             "symbol": sym,
-            "underlying": (underlying or sym).upper().strip(),
-            "instrument": (instrument or sym).upper().strip(),
             "timeframe": tf,
-            "broker": (broker or src).lower().strip(),
-            "broker_name": (broker_name or src.title()).strip(),
+            "underlying": (meta.get("underlying") or sym).upper().strip(),
+            "instrument": (meta.get("instrument") or sym).upper().strip(),
+            "broker": (meta.get("broker") or src).lower().strip(),
+            "broker_name": (meta.get("broker_name") or src.title()).strip(),
             "timezone": "UTC",
-            "category": category,
-            "date_from": date_from_iso,
-            "date_to": date_to_iso,
+            "category": meta.get("category", "Forex"),
+            "date_from": d_from,
+            "date_to": d_to,
             "bars": total_bars,
             "path": rel_path,
-            "data_kind": "ticks" if is_tick else "bars",
             "quality_score": 1.0,
+            "updated_at": now_iso,
+            "data_kind": "ticks" if meta.get("is_tick") else "bars",
             "lineage_json": json.dumps(
                 {
-                    "tick_size": unit_scale,
+                    "tick_size": meta.get("unit_scale", 0.0001),
                     "compression": "zstd:6",
-                    "partitions": [p.as_posix() for p in partition_files],
-                    "last_mode": norm_mode,
+                    "partitions": [p.as_posix() for p in pfiles],
+                    "last_mode": meta.get("norm_mode", "overwrite"),
                 }
             ),
-            "updated_at": now_iso,
         }
 
-        if existing_record:
-            HostPersistence.update_record(
-                self._config.table, {"id": dataset_id}, catalog_row
-            )
+        if HostPersistence.read_records(
+            self._config.table, {"id": dataset_id}, limit=1
+        ):
+            HostPersistence.update_record(self._config.table, {"id": dataset_id}, row)
         else:
-            catalog_row.update(
-                {"id": dataset_id, "created_at": now_iso, "schema_version": 1}
-            )
-            HostPersistence.create_record(self._config.table, catalog_row)
+            row.update({"id": dataset_id, "created_at": now_iso, "schema_version": 1})
+            HostPersistence.create_record(self._config.table, row)
 
+        rows_imported = int(meta.get("rows", 0))
         logger.info(
-            "%s: Ingested %d records into %d partitions for '%s' (mode=%s)",
+            "%s: Ingested %d records into %d partitions for '%s'",
             IMPORT_FR,
-            imported_rows,
-            len(partition_files),
+            rows_imported,
+            len(pfiles),
             dataset_id,
-            norm_mode,
-            extra={
-                "fr_id": IMPORT_FR,
-                "dataset_id": dataset_id,
-                "rows": imported_rows,
-                "total_bars": total_bars,
-            },
+            extra={"fr_id": IMPORT_FR, "dataset_id": dataset_id, "rows": rows_imported},
         )
-
         return {
             "dataset_id": dataset_id,
             "source": src,
             "symbol": sym,
             "timeframe": tf,
-            "mode": norm_mode,
-            "rows_imported": imported_rows,
+            "mode": meta.get("norm_mode", "overwrite"),
+            "rows_imported": rows_imported,
             "total_bars": total_bars,
-            "date_from": date_from_iso,
-            "date_to": date_to_iso,
-            "partitions": [p.as_posix() for p in partition_files],
+            "date_from": d_from,
+            "date_to": d_to,
+            "partitions": [p.as_posix() for p in pfiles],
             "path": rel_path,
         }
 
@@ -736,49 +628,32 @@ class Data:
         """Return Polars LazyFrame scanning partitioned Parquet storage."""
         base = Path(base_dir or self._config.market_dir)
         is_tick = timeframe.upper() in ("TICK", "TICKS")
-        target_dir = (
-            base
-            / source.lower().strip()
-            / ("ticks" if is_tick else timeframe.lower().strip())
-            / symbol.lower().strip()
-        )
-        files = list(target_dir.rglob("*.parquet"))
-        if not files:
+        sub_dir = "ticks" if is_tick else timeframe.lower().strip()
+        target_dir = base / source.lower().strip() / sub_dir / symbol.lower().strip()
+        if not list(target_dir.rglob("*.parquet")):
             raise FileNotFoundError(
-                f"No parquet partitions found for {source}:{symbol}:{timeframe} at "
-                f"{target_dir}"
+                f"No parquet partitions found for {source}:{symbol}:{timeframe}"
             )
-
         logger.info(
-            "%s: Polars scan initialized for %s (%d files)",
+            "%s: Polars scan for %s",
             READ_FR,
             target_dir.as_posix(),
-            len(files),
-            extra={"fr_id": READ_FR, "source": source, "symbol": symbol},
+            extra={"fr_id": READ_FR},
         )
         return pl.scan_parquet(str(target_dir / "**" / "*.parquet"))
 
     def query_duckdb(self, sql: str) -> Any:
         """Execute analytical DuckDB SQL query directly over Parquet files."""
-        logger.info(
-            "%s: Executing DuckDB query: %s",
-            READ_FR,
-            sql[:120],
-            extra={"fr_id": READ_FR, "sql": sql[:120]},
-        )
+        logger.info("%s: Executing DuckDB query", READ_FR, extra={"fr_id": READ_FR})
         return duckdb.query(sql)
 
     def edit(
-        self,
-        dataset_id: str,
-        updates: Mapping[str, Any] | None = None,
-        **kwargs: Any,
+        self, dataset_id: str, updates: Mapping[str, Any] | None = None, **kwargs: Any
     ) -> dict[str, Any]:
         """Edit an existing dataset record in the datamgr_datasets table."""
         combined = dict(updates or {})
         combined.update(kwargs)
         extra = {"fr_id": EDIT_FR, "dataset_id": dataset_id}
-
         try:
             self._validate_dataset_id(dataset_id)
             clean_updates = self._validate_and_prepare_updates(dataset_id, combined)
@@ -792,8 +667,8 @@ class Data:
                 self._config.table, {"id": dataset_id}, clean_updates
             )
         except Exception as err:
-            logger.error(  # noqa: TRY400
-                "%s: Persistence failed: %s", EDIT_FR, err, extra=extra
+            logger.exception(
+                "%s: Persistence failed for '%s'", EDIT_FR, dataset_id, extra=extra
             )
             raise RuntimeError(
                 f"Failed to update dataset '{dataset_id}': {err}"
@@ -804,34 +679,25 @@ class Data:
         )
         if not rows:
             logger.error(
-                "%s: Record missing after update: %s",
+                "%s: Record missing after update for '%s'",
                 EDIT_FR,
                 dataset_id,
                 extra=extra,
             )
             raise RuntimeError(f"Updated dataset '{dataset_id}' could not be re-read.")
 
-        updated_record = rows[0]
-        logger.info(
-            "%s: Dataset '%s' updated (%s)",
-            EDIT_FR,
-            dataset_id,
-            ", ".join(sorted(clean_updates.keys())),
-            extra={**extra, "updated_fields": sorted(clean_updates.keys())},
-        )
-        return updated_record
+        logger.info("%s: Dataset '%s' updated", EDIT_FR, dataset_id, extra=extra)
+        return rows[0]
 
     def _validate_dataset_id(self, dataset_id: Any) -> None:
-        """Validate that dataset_id is a valid non-empty string."""
         if not isinstance(dataset_id, str):
             raise TypeError("Dataset ID must be a string.")
         if not dataset_id.strip():
             raise ValueError("Dataset ID must be a non-empty string.")
         if any(ord(c) < _CONTROL_START for c in dataset_id):
-            raise ValueError("Dataset ID cannot contain control characters.")
+            raise ValueError("Dataset ID must not contain control characters.")
 
     def _validate_text(self, field_name: str, value: Any) -> str:
-        """Validate non-empty string field without control characters."""
         if not isinstance(value, str):
             raise TypeError(f"Field '{field_name}' must be a string.")
         if not value.strip():
@@ -841,7 +707,6 @@ class Data:
         return value.strip()
 
     def _ensure_dataset_exists(self, dataset_id: str) -> dict[str, Any]:
-        """Ensure that dataset exists in catalog and return existing row."""
         rows = HostPersistence.read_records(
             self._config.table, {"id": dataset_id}, limit=1
         )
@@ -852,104 +717,280 @@ class Data:
     def _validate_and_prepare_updates(
         self, dataset_id: str, updates: dict[str, Any]
     ) -> dict[str, Any]:
-        """Validate updates dictionary and return sanitized persistence dictionary."""
         if not updates:
             raise ValueError("Updates payload cannot be empty.")
-
         clean: dict[str, Any] = {}
         for key, val in updates.items():
             if not isinstance(key, str):
                 raise TypeError("Update column keys must be strings.")
-            if key == "id":
-                if val != dataset_id:
-                    raise ValueError("Dataset primary key 'id' cannot be modified.")
-                continue
+            if key == "id" and val != dataset_id:
+                raise ValueError("Dataset primary key 'id' cannot be modified.")
             if key == "created_at":
                 raise ValueError("Field 'created_at' cannot be modified.")
-            if key not in _ALLOWED_EDIT_COLUMNS:
+            if key in _ALLOWED_EDIT_COLUMNS:
+                clean[key] = self._sanitize_column_value(key, val)
+            elif key != "id":
                 raise ValueError(f"Unknown or non-editable column: '{key}'")
-            clean[key] = self._sanitize_column_value(key, val)
-
         if not clean:
             raise ValueError("No editable values provided in updates payload.")
-
         clean["updated_at"] = datetime.now(UTC).isoformat()
         return clean
 
     def _sanitize_column_value(self, column: str, value: Any) -> Any:
-        """Validate and cast individual column values according to schema."""
         if column in ("bars", "schema_version", "quality_score"):
             return self._sanitize_numeric(column, value)
         if column == "lineage_json":
             return self._sanitize_json(column, value)
-        return self._sanitize_text(column, value)
+        return self._sanitize_text_value(column, value)
 
-    def _sanitize_numeric(self, column: str, value: Any) -> int | float:
-        """Validate and cast numeric columns."""
-        if isinstance(value, bool) or not isinstance(value, (int, float)):
-            raise TypeError(f"Column '{column}' must be a number.")
+    def _sanitize_numeric(self, col: str, val: Any) -> Any:
+        if isinstance(val, bool) or not isinstance(val, (int, float)):
+            raise TypeError(f"Column '{col}' must be a number.")
+        if col in ("bars", "schema_version"):
+            if not isinstance(val, int):
+                raise TypeError(f"Column '{col}' must be a number.")
+            if col == "bars" and val < 0:
+                raise ValueError(f"Column '{col}' cannot be negative.")
+            return val
+        f_val = float(val)
+        if not 0.0 <= f_val <= 1.0:
+            raise ValueError(f"Column '{col}' must be between 0.0 and 1.0.")
+        return f_val
 
-        if column == "bars":
-            int_val = int(value)
-            if int_val < 0:
-                raise ValueError(f"Column '{column}' cannot be negative.")
-            return int_val
-
-        if column == "schema_version":
-            return int(value)
-
-        float_val = float(value)
-        if not (0.0 <= float_val <= 1.0):
-            raise ValueError(f"Column '{column}' must be between 0.0 and 1.0.")
-        return float_val
-
-    def _sanitize_json(self, column: str, value: Any) -> str:
-        """Validate and cast JSON column values."""
-        if isinstance(value, Mapping):
-            return json.dumps(value)
-        if isinstance(value, str):
+    def _sanitize_json(self, col: str, val: Any) -> str:
+        if isinstance(val, Mapping):
+            return json.dumps(val)
+        if isinstance(val, str):
             try:
-                json.loads(value)
-            except (ValueError, TypeError) as err:
-                raise ValueError(f"Column '{column}' must be valid JSON.") from err
-            return value
-        raise TypeError(f"Column '{column}' must be JSON string or mapping.")
+                json.loads(val)
+            except Exception as err:
+                raise ValueError(f"Column '{col}' must be valid JSON.") from err
+            return val
+        raise TypeError(f"Column '{col}' must be JSON string or mapping.")
 
-    def _sanitize_text(self, column: str, value: Any) -> str:
-        """Validate string text columns."""
-        if not isinstance(value, str):
-            raise TypeError(f"Column '{column}' must be a string.")
-        if len(value) > _TEXT_LIMIT:
-            raise ValueError(
-                f"Column '{column}' exceeds length limit of {_TEXT_LIMIT} characters."
-            )
-        if any(ord(c) < _CONTROL_START for c in value):
-            raise ValueError(f"Column '{column}' contains control characters.")
-        return value
+    def _sanitize_text_value(self, col: str, val: Any) -> str:
+        if not isinstance(val, str):
+            raise TypeError(f"Column '{col}' must be a string.")
+        if len(val) > _TEXT_LIMIT:
+            raise ValueError(f"Column '{col}' exceeds length limit of {_TEXT_LIMIT}.")
+        if any(ord(c) < _CONTROL_START for c in val):
+            raise ValueError(f"Column '{col}' contains control characters.")
+        return val
 
 
-# Python aliases for import keyword compatibility
 Data.import_ = Data.import_data  # type: ignore[attr-defined]
 setattr(Data, "import", Data.import_data)
 
 
 class DataCLI:
-    """Headless CLI formatter for Data service."""
+    """Headless CLI formatter and dispatcher for Data and Symbol operations."""
 
     @classmethod
     def format_output(cls, data: Mapping[str, Any]) -> str:
         """Format dataset record into human-readable terminal output."""
-        logger.debug("Formatting CLI output (%d keys)", len(data))
-        lines = [f"{k}: {v}" for k, v in sorted(data.items())]
+        return "\n".join(f"{k}: {v}" for k, v in sorted(data.items()))
+
+    @staticmethod
+    def format_symbols_table(
+        rows: Sequence[Mapping[str, Any]], csv: bool = False
+    ) -> str:
+        """Format symbols/datasets into ASCII table or CSV format."""
+        if csv:
+            keys = "symbol,source,timeframe,date_from,date_to,bars,path"
+            kl = keys.split(",")
+            lines = [keys] + [",".join(str(r.get(k, "")) for k in kl) for r in rows]
+            return "\n".join(lines)
+        cols = [
+            ("Symbol", "symbol", 10),
+            ("Source", "source", 10),
+            ("Timeframe", "timeframe", 10),
+            ("From", "date_from", 20),
+            ("To", "date_to", 20),
+            ("Bars", "bars", 8),
+        ]
+        hdr = "| " + " | ".join(f"{h:<{w}}" for h, _, w in cols) + " |"
+        sep = "|-" + "-|-".join("-" * w for _, _, w in cols) + "-|"
+        lines = [f"=== Symbols / Datasets ({len(rows)} items) ===", hdr, sep]
+        lines.extend(
+            "| " + " | ".join(str(r.get(k, ""))[:w].ljust(w) for _, k, w in cols) + " |"
+            for r in rows
+        )
         return "\n".join(lines)
 
+    @staticmethod
+    def _res(cmd: str, act: str, ren: str, **kw: Any) -> dict[str, Any]:
+        return {"command": cmd, "action": act, "rendered": ren, **kw}
 
-if __name__ == "__main__":
-    service = Data()
-    records = HostPersistence.read_records("datamgr_datasets", limit=1)
-    if records:
-        target_id = str(records[0]["id"])
-        result = service.edit(target_id, {"broker_name": records[0]["broker_name"]})
-        print(DataCLI.format_output(result))
-    else:
-        print("No datasets found in datamgr_datasets.")
+    @classmethod
+    def dispatch_symbol(cls, args: Sequence[str], service: Data) -> dict[str, Any]:
+        """Dispatch headless symbol commands."""
+        action, params = _parse_cli_params(args, "list")
+        if action == "list":
+            rows = service.list_datasets()
+            csv_m = params.get("csv", "false").lower() == "true"
+            return cls._res(
+                "symbol",
+                action,
+                cls.format_symbols_table(rows, csv=csv_m),
+                count=len(rows),
+                symbols=rows,
+            )
+        if action == "add":
+            return cls._handle_sym_add(params, service)
+        if action == "edit":
+            return cls._handle_sym_edit(params, service)
+        if action in ("delete", "clear"):
+            return cls._mutate_symbols(action, params, service)
+        if action == "mt5symbols":
+            return cls._res("symbol", action, "MT5 symbols.", symbols=[])
+        if action == "darwinexsymbols":
+            syms = ["NDXm", "GDAXIm", "SP500", "WS30", "EURUSD", "GBPUSD", "USDJPY"]
+            return cls._res("symbol", action, "\n".join(syms), symbols=syms)
+        raise ValueError(f"Unsupported symbol action: '{action}'")
+
+    @classmethod
+    def _handle_sym_add(cls, p: dict[str, str], s: Data) -> dict[str, Any]:
+        s_str = p.get("symbols") or p.get("symbol", "")
+        syms = [x.strip() for x in s_str.split(",") if x.strip()]
+        if not syms:
+            raise ValueError(
+                "Parameter 'symbols' or 'symbol' is required for action=add."
+            )
+        src = p.get("datasource") or p.get("source", "dukascopy")
+        tf = p.get("datatype") or p.get("timeframe", "M1")
+        added = [
+            s.add(
+                src,
+                sym,
+                tf,
+                broker=p.get("broker"),
+                category=p.get("category", "Forex"),
+                timezone=p.get("timezone", "UTC"),
+            )
+            for sym in syms
+        ]
+        return cls._res(
+            "symbol",
+            "add",
+            f"Added {len(added)} symbol(s) ({', '.join(syms)}).",
+            count=len(added),
+            added=added,
+        )
+
+    @classmethod
+    def _handle_sym_edit(cls, p: dict[str, str], s: Data) -> dict[str, Any]:
+        sym = p.get("symbol") or p.get("id")
+        if not sym:
+            raise ValueError("Parameter 'symbol' is required for action=edit.")
+        rows = s.list_datasets({"symbol": sym.upper()})
+        ds_id = rows[0]["id"] if rows else sym
+        updates = {k: v for k, v in p.items() if k in _ALLOWED_EDIT_COLUMNS}
+        updated = s.edit(ds_id, updates)
+        return cls._res(
+            "symbol", "edit", f"Updated dataset '{ds_id}'.", updated=updated
+        )
+
+    @classmethod
+    def _mutate_symbols(cls, act: str, p: dict[str, str], s: Data) -> dict[str, Any]:
+        s_str = p.get("symbols") or p.get("symbol", "")
+        syms = [x.strip() for x in s_str.split(",") if x.strip()]
+        if not syms:
+            raise ValueError(f"Parameter 'symbols' is required for action={act}.")
+        fn = s.delete if act == "delete" else s.clear
+        out: list[dict[str, Any]] = []
+        for sym in syms:
+            rows = s.list_datasets({"symbol": sym.upper()})
+            ds_ids = [r["id"] for r in rows] if rows else [sym]
+            out.extend(fn(ds_id) for ds_id in ds_ids)
+        verb = "Deleted" if act == "delete" else "Cleared"
+        return cls._res(
+            "symbol",
+            act,
+            f"{verb} {len(out)} dataset(s).",
+            count=len(out),
+            **{act: out},
+        )
+
+    @classmethod
+    def dispatch_data(cls, args: Sequence[str], service: Data) -> dict[str, Any]:
+        """Dispatch headless price data commands."""
+        action, params = _parse_cli_params(args, "update")
+        if action == "list":
+            rows = service.list_datasets()
+            return cls._res(
+                "data",
+                "list",
+                cls.format_symbols_table(rows),
+                count=len(rows),
+                datasets=rows,
+            )
+        if action == "timezones":
+            tzs = [
+                "UTC",
+                "US/Eastern",
+                "US/Central",
+                "US/Pacific",
+                "Europe/London",
+                "Europe/Berlin",
+                "EET",
+                "Asia/Tokyo",
+                "Australia/Sydney",
+            ]
+            return cls._res(
+                "data", action, "\n".join(tzs), count=len(tzs), timezones=tzs
+            )
+        if action == "update":
+            return cls._handle_data_update(params, service)
+        if action == "import":
+            return cls._handle_data_import(params, service)
+        raise ValueError(f"Unsupported data action: '{action}'")
+
+    @classmethod
+    def _handle_data_update(cls, p: dict[str, str], s: Data) -> dict[str, Any]:
+        s_str = p.get("symbols") or p.get("symbol", "")
+        raw = [x.strip() for x in s_str.split(",") if x.strip()] if s_str else []
+        src = p.get("datasource") or p.get("source", "dukascopy")
+        tf = p.get("datatype") or p.get("timeframe", "M1")
+        mode = (
+            "overwrite"
+            if p.get("overwrite", "true").lower() in ("true", "1")
+            else "missing"
+        )
+        start, end = (
+            p.get("datefrom") or p.get("date_from"),
+            p.get("dateto") or p.get("date_to"),
+        )
+        if not raw:
+            ex = s.list_datasets({"source": src.lower()})
+            raw = [e["symbol"] for e in ex] if ex else ["EURUSD"]
+        sums = [
+            s.import_data(src, sym, tf, start=start, end=end, mode=mode) for sym in raw
+        ]
+        return cls._res(
+            "data",
+            "update",
+            f"Updated {len(sums)} dataset(s).",
+            count=len(sums),
+            updates=sums,
+        )
+
+    @classmethod
+    def _handle_data_import(cls, p: dict[str, str], s: Data) -> dict[str, Any]:
+        fp, sym = p.get("filepath") or p.get("file"), p.get("symbol", "IMPORT_SYM")
+        src = p.get("datasource") or p.get("source", "file")
+        tf = p.get("datatype") or p.get("timeframe", "M1")
+        if fp and Path(fp).exists():
+            res = s.import_file(fp, sym, source=src, timeframe=tf)
+            return cls._res(
+                "data",
+                "import",
+                f"Imported {res.get('rows_imported', 0)} rows for {sym}.",
+                import_result=res,
+            )
+        res = s.import_data(src, sym, tf, mode="overwrite")
+        return cls._res(
+            "data",
+            "import",
+            f"Imported data for {sym} from {src}.",
+            import_result=res,
+        )

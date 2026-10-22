@@ -54,6 +54,7 @@ from fastapi.responses import JSONResponse
 
 from .baskets import Basket
 from .broker import Broker
+from .data import Data
 from .help import DMHelp
 from .home import Home
 from .instruments import Instruments
@@ -158,6 +159,7 @@ class AppDataManager:
         self.baskets = Basket()
         self.instruments = Instruments()
         self.sessions = Sessions()
+        self.data = Data()
         self.log = DataLog(event_bus=event_bus)
         self.help = DMHelp()
 
