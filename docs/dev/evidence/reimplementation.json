@@ -15,7 +15,7 @@
       "docs/PROJECT.md",
       "docs/ARCHITECTURE.md",
       "app/host/README.md",
-      "docs/SQX/architecture-and-reimplementation.md"
+      "docs/SQX/sqx-clean-room-reimplementation.md"
     ]
   },
   "source_catalog": {
@@ -51,10 +51,7 @@
         "docs/ARCHITECTURE.md",
         "app/host/README.md",
         "docs/SQX/README.md",
-        "docs/SQX/architecture-and-reimplementation.md",
-        "docs/SQX/libs/SQLib.md",
-        "docs/SQX/libs/SQDataLib.md",
-        "docs/SQX/libs/SQTradingLib.md",
+        "docs/SQX/sqx-clean-room-reimplementation.md",
         "docs/dev/evidence/p00-inventory.json",
         "app/workspace/home",
         "ui/app/workspace/Home"
@@ -231,28 +228,28 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "b50d1cf4208e05f0ea4edc305d558d99602fad3512919584b13940514a7a9430"
+            "value": "bf93a5e282b6bb4ff55e03e3bb746c1ce4e4a98bd3ec8adff31ccd650f6d0ce8"
           },
           "accessed_at": "2026-10-13"
         },
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "docs/SQX/libs/SQTradingLib.md",
+          "artifact_locator": "docs/SQX/sqx-clean-room-reimplementation.md",
           "location": {
-            "section": "Overview",
-            "symbol": "com.strategyquant.tradinglib",
-            "line_range": "1-35",
+            "section": "1. Donor Codebase Inventory & Decompilation Catalog",
+            "symbol": "Donor Core Libraries",
+            "line_range": "1-60",
             "json_pointer": null,
             "xpath": null,
-            "notes": "Documents 2,213 classes across 88 subpackages extracted from SQAppLib.jar.enc."
+            "notes": "Documents donor core archives and clean-room reimplementation mapping."
           },
           "inspection_method": "documentation_review",
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "825a94f15a6709f0ae858fbd72f332afd268ae250b28f143be5aab9a19afa78c"
+            "value": "2224c646f1cfe2bfd88293a56868d4749ab81886259c607ba6b121d36c0c9965"
           },
-          "accessed_at": "2026-10-13"
+          "accessed_at": "2026-10-22"
         }
       ],
       "target_mapping": {
@@ -353,7 +350,7 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "b50d1cf4208e05f0ea4edc305d558d99602fad3512919584b13940514a7a9430"
+            "value": "bf93a5e282b6bb4ff55e03e3bb746c1ce4e4a98bd3ec8adff31ccd650f6d0ce8"
           },
           "accessed_at": "2026-10-13"
         }
@@ -454,7 +451,7 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "b50d1cf4208e05f0ea4edc305d558d99602fad3512919584b13940514a7a9430"
+            "value": "bf93a5e282b6bb4ff55e03e3bb746c1ce4e4a98bd3ec8adff31ccd650f6d0ce8"
           },
           "accessed_at": "2026-10-13"
         },
@@ -582,11 +579,11 @@
         },
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "docs/SQX/architecture-and-reimplementation.md",
+          "artifact_locator": "docs/SQX/sqx-clean-room-reimplementation.md",
           "location": {
-            "section": "3. Clean-Room Python Reimplementation Blueprint",
+            "section": "Clean-Room Reimplementation Blueprint",
             "symbol": null,
-            "line_range": "238-559",
+            "line_range": "1-100",
             "json_pointer": null,
             "xpath": null,
             "notes": "Maps Donor Tiers 1-4 to HaruQuantAI Stages 0-7."
@@ -595,9 +592,9 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "ffc71cca2e46d0e6f7282159a99c66f5062ee60b5c72a6a1966636907fc8ce29"
+            "value": "2224c646f1cfe2bfd88293a56868d4749ab81886259c607ba6b121d36c0c9965"
           },
-          "accessed_at": "2026-10-13"
+          "accessed_at": "2026-10-22"
         }
       ],
       "target_mapping": {
@@ -624,13 +621,13 @@
       "validation": {
         "state": "passed",
         "kind": "authority",
-        "procedure": "Verify SHA-256 fingerprints of docs/ARCHITECTURE.md and docs/SQX/architecture-and-reimplementation.md and validate registered IDs against app/host/README.md.",
+        "procedure": "Verify SHA-256 fingerprints of docs/ARCHITECTURE.md and docs/SQX/sqx-clean-room-reimplementation.md and validate registered IDs against app/host/README.md.",
         "expected_observation": "All mapped FEAT/FR/DEC identities resolve in app/host/README.md and authority hashes match.",
         "actual_observation": "Verified registered identities in app/host/README.md and matching authority document fingerprints.",
         "artifact_paths": [
           "app/host/README.md",
           "docs/ARCHITECTURE.md",
-          "docs/SQX/architecture-and-reimplementation.md"
+          "docs/SQX/sqx-clean-room-reimplementation.md"
         ],
         "executed_at": "2026-10-13T21:55:00+03:00"
       },
@@ -712,7 +709,7 @@
         },
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "docs/SQX/architecture-and-reimplementation.md",
+          "artifact_locator": "docs/SQX/sqx-clean-room-reimplementation.md",
           "location": {
             "section": "Project & File Structure and Sections 1 through 17",
             "symbol": null,
@@ -725,9 +722,9 @@
           "relation": "supports",
           "fingerprint": {
             "algorithm": "sha256",
-            "value": "ffc71cca2e46d0e6f7282159a99c66f5062ee60b5c72a6a1966636907fc8ce29"
+            "value": "2224c646f1cfe2bfd88293a56868d4749ab81886259c607ba6b121d36c0c9965"
           },
-          "accessed_at": "2026-10-19"
+          "accessed_at": "2026-10-22"
         }
       ],
       "target_mapping": {
@@ -754,13 +751,13 @@
       "validation": {
         "state": "passed",
         "kind": "authority",
-        "procedure": "Verify SHA-256 fingerprints of docs/ARCHITECTURE.md and docs/SQX/architecture-and-reimplementation.md and validate registered IDs against app/host/README.md via tests.reference.validate.",
+        "procedure": "Verify SHA-256 fingerprints of docs/ARCHITECTURE.md and docs/SQX/sqx-clean-room-reimplementation.md and validate registered IDs against app/host/README.md via tests.reference.validate.",
         "expected_observation": "All mapped FEAT/FR/DEC identities resolve in app/host/README.md and authority hashes match.",
         "actual_observation": "Verified registered identities in app/host/README.md and matching authority document fingerprints.",
         "artifact_paths": [
           "app/host/README.md",
           "docs/ARCHITECTURE.md",
-          "docs/SQX/architecture-and-reimplementation.md"
+          "docs/SQX/sqx-clean-room-reimplementation.md"
         ],
         "executed_at": "2026-10-19T08:14:00+03:00"
       },
@@ -2455,7 +2452,7 @@
       },
       "validation": {
         "state": "passed",
-        "kind": "runtime",
+        "kind": "static",
         "procedure": "Execute tests/unit/services/include/test_types_actions.py testing ORDER_NOT_DEFINED (-99999999.0) and -1.0 coercion.",
         "expected_observation": "AssignVariableAction coerces -99999999.0 and 0.0 to False, while -1.0 coerces to True.",
         "actual_observation": "test_types_actions.py passed asserting ORDER_NOT_DEFINED == -99999999.0 and AssignVariableAction boolean coercion.",
@@ -2585,7 +2582,7 @@
       },
       "validation": {
         "state": "passed",
-        "kind": "runtime",
+        "kind": "static",
         "procedure": "Execute tests/unit/workspace/data_manager/test_action.py testing all 11 action operations.",
         "expected_observation": "All 11 action methods pass asserting timestamp shifting, multi-format export, quality checks, review, and updates.",
         "actual_observation": "test_action.py executed successfully covering clone_to_timezone, delete, export_to_csv, new_format, export_to_mt4, export_to_mt5, review, review_data, quality, update, and update_all.",

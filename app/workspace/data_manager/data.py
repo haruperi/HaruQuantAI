@@ -510,6 +510,8 @@ class Data:
             source, symbol, timeframe, broker_client=_FileClient(filepath), **kwargs
         )
 
+    import_ = import_data
+
     def _query_broker(
         self,
         client: Any,
@@ -780,7 +782,6 @@ class Data:
         return val
 
 
-Data.import_ = Data.import_data  # type: ignore[attr-defined]
 setattr(Data, "import", Data.import_data)
 
 

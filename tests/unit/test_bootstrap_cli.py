@@ -691,13 +691,13 @@ def test_headless_cli_data_and_workspace_commands(
     host.broadcast_event("system", "host.ready")
     try:
         assert host.data_manager is not None
-        host.data_manager.data = _DummyDataSub()  # type: ignore[attr-defined]
-        host.data_manager.instruments = _DummyDataSub()  # type: ignore[attr-defined]
-        host.data_manager.sessions = _DummyDataSub()  # type: ignore[attr-defined]
-        host.data_manager.baskets = _DummyDataSub()  # type: ignore[attr-defined]
-        host.data_manager.broker = _DummyDataSub()  # type: ignore[attr-defined]
+        host.data_manager.data = _DummyDataSub()  # type: ignore[assignment]
+        host.data_manager.instruments = _DummyDataSub()  # type: ignore[assignment]
+        host.data_manager.sessions = _DummyDataSub()  # type: ignore[assignment]
+        host.data_manager.baskets = _DummyDataSub()  # type: ignore[assignment]
+        host.data_manager.broker = _DummyDataSub()  # type: ignore[assignment]
         host.data_manager.connections = _DummyDataSub()  # type: ignore[attr-defined]
-        host.data_manager.log = _DummyDataSub()  # type: ignore[attr-defined]
+        host.data_manager.log = _DummyDataSub()  # type: ignore[assignment]
 
         import app.workspace.data_manager as dm_pkg
 

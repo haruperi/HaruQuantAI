@@ -48,6 +48,7 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Barrier
@@ -517,7 +518,7 @@ def test_empty_store_projects_no_defaults_or_writes() -> None:
 def test_stored_empty_values_are_not_missing() -> None:
     """False, zero, empty containers/text and an allowed null survive projection."""
     instance = SettingsManager()
-    changes = {
+    changes: dict[str, Mapping[str, Any]] = {
         "app.general": {"header_custom_text": "", "confirm_on_exit": False},
         "notify.desktop": {"duration_seconds": 0},
         "notify.email": {"recipient_addresses": []},

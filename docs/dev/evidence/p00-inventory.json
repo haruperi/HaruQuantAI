@@ -175,23 +175,11 @@
     },
     {
       "locator": "docs/SQX/README.md",
-      "sha256": "09816af4f357112d1aa965b75ea3bb9b766b5b85a3ff0bd3668458754bc2ed45"
+      "sha256": "631638e19125a2ce5e60604ea950d558cb0fff557086ae57a5702071cf2f1dd6"
     },
     {
-      "locator": "docs/SQX/architecture-and-reimplementation.md",
-      "sha256": "ffc71cca2e46d0e6f7282159a99c66f5062ee60b5c72a6a1966636907fc8ce29"
-    },
-    {
-      "locator": "docs/SQX/libs/SQLib.md",
-      "sha256": "8d993cc1643819de044587561339d50a8bb2bf512fe62c5ea3da6fb00789dd3d"
-    },
-    {
-      "locator": "docs/SQX/libs/SQDataLib.md",
-      "sha256": "650a73e94f7d9b32820dedb10ceef0161956b1fb77bd4e0f2f65f40982836c64"
-    },
-    {
-      "locator": "docs/SQX/libs/SQTradingLib.md",
-      "sha256": "825a94f15a6709f0ae858fbd72f332afd268ae250b28f143be5aab9a19afa78c"
+      "locator": "docs/SQX/sqx-clean-room-reimplementation.md",
+      "sha256": "2224c646f1cfe2bfd88293a56868d4749ab81886259c607ba6b121d36c0c9965"
     }
   ],
   "totals": {

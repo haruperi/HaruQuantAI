@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 from unittest.mock import patch
@@ -344,11 +345,12 @@ def test_system_invalid_settings_and_missing_profiles() -> None:
     HostPersistence.update_record(
         "datamgr_broker", {"id": int(row["id"])}, {"is_system": 1}
     )
-    for action in (
+    actions: tuple[Callable[[], Any], ...] = (
         lambda: service.add_broker({"id": row["id"]}),
         lambda: service.edit_stocks(row["id"], []),
         lambda: service.import_sessions(row["id"], [schedule()]),
-    ):
+    )
+    for action in actions:
         with pytest.raises(ValueError):
             action()
     with pytest.raises(LookupError):
@@ -652,7 +654,12 @@ def test_delete_route_validation_authority_and_storage_errors() -> None:
     app.include_router(create_data_manager_router(AppDataManager()))
     with TestClient(app) as client:
         row = client.post("/data/brokers", json=profile()).json()["data"]
-        for body in ({}, {"ids": []}, {"ids": [row["id"]], "extra": True}):
+        bodies: tuple[dict[str, Any], ...] = (
+            {},
+            {"ids": []},
+            {"ids": [row["id"]], "extra": True},
+        )
+        for body in bodies:
             assert client.post("/data/brokers/delete", json=body).status_code == 422
         assert (
             client.post("/data/brokers/delete", json={"ids": ["999"]}).status_code

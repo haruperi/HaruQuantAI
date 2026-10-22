@@ -246,12 +246,13 @@ def repository(tmp_path: Path) -> Path:
         "docs/PROJECT.md",
         "docs/ARCHITECTURE.md",
         "app/host/README.md",
+        "app/workspace/home/README.md",
+        "app/workspace/data_manager/README.md",
         "docs/SQX/README.md",
-        "docs/SQX/architecture-and-reimplementation.md",
-        "docs/SQX/libs/SQLib.md",
-        "docs/SQX/libs/SQDataLib.md",
-        "docs/SQX/libs/SQTradingLib.md",
+        "docs/SQX/sqx-clean-room-reimplementation.md",
         "tests/reference/p00-fixtures.json",
+        "tests/unit/services/include/test_types_actions.py",
+        "tests/unit/workspace/data_manager/test_action.py",
     ):
         target = root / locator
         target.parent.mkdir(parents=True, exist_ok=True)

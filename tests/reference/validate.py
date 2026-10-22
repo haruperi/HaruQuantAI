@@ -119,19 +119,21 @@ def _merge_sources[T: ResourceFile](first: list[T], second: list[T]) -> list[T]:
 
 
 def _inventory(repository: Path) -> Manifest:
-    """Combine strict P00/Home inventories without changing either artifact."""
+    """Combine strict P00 and domain inventories without changing either artifact."""
     directory = resolve_locator(repository, EVIDENCE_DIRECTORY)
     baseline = load_manifest(directory / "p00-inventory.json")
-    home_path = directory / "home-inventory.json"
-    if not home_path.exists():
-        return baseline
-    home = load_manifest(home_path)
-    for key in ("plugin_directories", "snippet_java_files"):
-        if baseline.totals[key] != home.totals[key]:
-            _issue("INVENTORY_COHORT_CONFLICT")
-            raise EvidenceError("INVENTORY_COHORT_CONFLICT")
-    artifacts = _merge_sources(baseline.donor_artifacts, home.donor_artifacts)
-    sources = _merge_sources(baseline.repository_sources, home.repository_sources)
+    artifacts = list(baseline.donor_artifacts)
+    sources = list(baseline.repository_sources)
+    for extra_path in sorted(directory.glob("*-inventory.json")):
+        if extra_path.name == "p00-inventory.json":
+            continue
+        extra = load_manifest(extra_path)
+        for key in ("plugin_directories", "snippet_java_files"):
+            if baseline.totals[key] != extra.totals[key]:
+                _issue("INVENTORY_COHORT_CONFLICT")
+                raise EvidenceError("INVENTORY_COHORT_CONFLICT")
+        artifacts = _merge_sources(artifacts, extra.donor_artifacts)
+        sources = _merge_sources(sources, extra.repository_sources)
     totals = {
         **baseline.totals,
         "donor_artifacts": len(artifacts),
@@ -152,11 +154,13 @@ def _mapping_registry(repository: Path, mapping: dict[str, Any]) -> set[str]:
     """Resolve each registered mapping only against its permitted owning README."""
     if mapping["domain"] == "host":
         return _registry_ids(resolve_locator(repository, "app/host/README.md"))
-    if mapping["domain"] == "workspace" and mapping["feature_ids"] == [
-        "FEAT-HOME-DASHBOARD"
-    ]:
-        owner = resolve_locator(repository, "app/workspace/home/README.md")
-        return _registry_ids(owner) if owner.is_file() else set()
+    if mapping["domain"] == "workspace":
+        if mapping["feature_ids"] == ["FEAT-HOME-DASHBOARD"]:
+            owner = resolve_locator(repository, "app/workspace/home/README.md")
+            return _registry_ids(owner) if owner.is_file() else set()
+        if any(f.startswith("FEAT-DATAMGR-") for f in mapping.get("feature_ids", [])):
+            owner = resolve_locator(repository, "app/workspace/data_manager/README.md")
+            return _registry_ids(owner) if owner.is_file() else set()
     return set()
 
 

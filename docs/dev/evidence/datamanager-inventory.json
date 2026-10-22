@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-10-22T20:06:36+00:00",
+  "reference_cohort": "145-dev1",
+  "installed_build": null,
+  "activation_status": "unverified",
+  "donor_artifacts": [
+    {
+      "locator": "internal/plugins/DataManagerActions/cloneToTimezone/CloneToTimezoneCtrl.js",
+      "sha256": "31dbe99015c712d0bbd46bff1400cc73636f63aba00efe69250656b6f92fe391",
+      "family": "web_resource",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-DATAMGR-ACTIONS"
+    },
+    {
+      "locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+      "sha256": "4970124bec1bc7aead64d019b242d6895686981f9c338b4bee1d832aef28bcd5",
+      "family": "library",
+      "stage": "Stage 2",
+      "proposed_feature_id": "FEAT-DATAMGR-ACTIONS"
+    }
+  ],
+  "repository_sources": [
+    {
+      "locator": "app/workspace/data_manager/README.md",
+      "sha256": "9af2cef09a31576a742229bfcadc35e108ab8d390ed7fe6d8a73f259d985e4f5"
+    }
+  ],
+  "totals": {
+    "donor_artifacts": 2,
+    "encrypted_jars": 0,
+    "xml_templates": 0,
+    "plugin_directories": 182,
+    "snippet_java_files": 1049
+  }
+}

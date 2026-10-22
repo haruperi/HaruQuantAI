@@ -370,7 +370,12 @@ def test_delete_routes_validation_authority_and_errors() -> None:
     app.include_router(create_data_manager_router(AppDataManager()))
     with TestClient(app) as client:
         row = client.post("/data/baskets", json={"name": "Tech"}).json()["data"]
-        for payload in ({}, {"ids": []}, {"ids": [row["id"]], "extra": True}):
+        payloads: tuple[dict[str, Any], ...] = (
+            {},
+            {"ids": []},
+            {"ids": [row["id"]], "extra": True},
+        )
+        for payload in payloads:
             assert client.post("/data/baskets/delete", json=payload).status_code == 422
         assert (
             client.post("/data/baskets/delete", json={"ids": ["999"]}).status_code
