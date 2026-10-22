@@ -54,11 +54,10 @@ import math
 import os
 from dataclasses import dataclass
 from datetime import datetime
-from logging import Logger
-from logging import getLogger as get_logger  # noqa: N813 - approved adapter name
 from pathlib import Path
 from typing import Literal, Never, cast
 
+from app.host.logging import TelemetryLogger, get_logger
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -88,7 +87,7 @@ class EvidenceError(ValueError):
     """A stable diagnostic code without sensitive input or physical paths."""
 
 
-def fail(fr: str, code: str, *, event_logger: Logger | None = None) -> Never:
+def fail(fr: str, code: str, *, event_logger: TelemetryLogger | None = None) -> Never:
     """Emit the owning FR failure and raise a stable diagnostic."""
     target = logger if event_logger is None else event_logger
     target.error("%s: %s", fr, code, extra={"fr_id": fr, "code": code})

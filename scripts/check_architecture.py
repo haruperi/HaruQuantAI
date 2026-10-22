@@ -23,11 +23,14 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    import logging
+    from app.host.logging import setup_logging, shutdown_logging
     from scripts.check_architecture import main
 
-    logging.basicConfig(level=logging.INFO)
-    exit_code = main()
+    setup_logging()
+    try:
+        exit_code = main()
+    finally:
+        shutdown_logging()
     ```
 
 CLI Usage:
@@ -39,10 +42,15 @@ CLI Usage:
 from __future__ import annotations
 
 import ast
-import logging
+import sys
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from app.host.logging import get_logger, setup_logging, shutdown_logging
+
+logger = get_logger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 APP_ROOT = REPO_ROOT / "app"
@@ -211,5 +219,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    raise SystemExit(main())
+    setup_logging()
+    try:
+        raise SystemExit(main())
+    finally:
+        shutdown_logging()

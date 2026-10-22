@@ -747,3 +747,158 @@ def test_ring_buffer_capacity_2000_and_sha256_secret_fingerprinting() -> None:
     assert redacted_fp["username"] == "operator"
     assert redacted_fp["api_key"] == fp1
     assert redacted_fp["nested"]["password"] == fingerprint_secret("my-password-123")
+
+
+@pytest.mark.parametrize("path_style", ["native", "forward", "upper"])
+def test_windows_path_variants_and_boundaries(path_style: str) -> None:
+    """Scrub equivalent Windows paths without masking sibling components."""
+    root = str(Path.cwd())
+    candidate = root + "/audit"
+    if path_style == "native":
+        candidate = candidate.replace("/", "\\")
+    elif path_style == "upper":
+        candidate = candidate.upper()
+    expected = "[WORKSPACE]/AUDIT" if path_style == "upper" else "[WORKSPACE]/audit"
+    assert normalize_path(candidate) == expected
+    assert "[WORKSPACE]" not in normalize_path(root + "-sibling/audit")
+
+
+def test_facade_boundary_and_fallback_safety(tmp_path: Path) -> None:
+    """Bad context and string conversion cannot escape or leak diagnostics."""
+    setup_logging(tmp_path, async_engine=False)
+    logger = get_logger("audit.boundary")
+    logger.bind(name="reserved").info("reserved context")
+
+    class BadString:
+        def __str__(self) -> str:
+            raise ValueError("synthetic-sensitive-marker")
+
+    logger.bind(value=BadString()).info("bad context")
+    record = logging.LogRecord("audit", logging.INFO, "", 1, BadString(), (), None)
+    result = LogEventFormatter().format(record)
+    assert "[LOGGING-ERROR-BOUNDARY]" in result
+    assert "synthetic-sensitive-marker" not in result
+
+
+def test_factory_is_inert_and_first_emission_is_async(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Factory calls preserve handlers and defer I/O until first emission."""
+    from app.host import logging as telemetry
+
+    shutdown_logging()
+    monkeypatch.setattr(telemetry, "DEFAULT_LOG_DIR", tmp_path / "lazy")
+    handlers = list(logging.getLogger().handlers)
+    logger = get_logger("audit.lazy")
+    assert logging.getLogger().handlers == handlers
+    assert not (tmp_path / "lazy").exists()
+    logger.info("first emission")
+    assert telemetry._GLOBAL_ENGINE is not None
+    flush_logs()
+    assert "first emission" in (tmp_path / "lazy" / "app.log").read_text()
+
+
+def test_listener_survives_handler_failure(tmp_path: Path) -> None:
+    """A failed sink cannot kill queue delivery or strand pending tasks."""
+    from app.host import logging as telemetry
+
+    class BrokenHandler(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            raise ValueError("synthetic-sensitive-marker")
+
+    ring = setup_logging(tmp_path)
+    engine = telemetry._GLOBAL_ENGINE
+    assert engine is not None
+    engine.downstream_handlers.insert(0, BrokenHandler())
+    engine._listener.handlers = tuple(engine.downstream_handlers)
+    get_logger("audit.worker").info("surviving event")
+    # Bound the wait so a regression reports failure instead of hanging pytest.
+    worker = engine._listener._thread
+    assert worker is not None
+    worker.join(timeout=0.05)
+    deadline = time.monotonic() + 2
+    while engine._queue.unfinished_tasks and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert engine._queue.unfinished_tasks == 0
+    assert any(r["message"] == "surviving event" for r in ring.query())
+    flush_logs()
+
+
+@pytest.mark.parametrize("async_engine", [False, True])
+def test_handler_and_stderr_failures_are_contained(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, async_engine: bool
+) -> None:
+    """Safe boundaries hold even when the fallback diagnostic sink fails."""
+    import sys
+
+    from app.host import logging as telemetry
+
+    class BrokenStream:
+        def write(self, value: str) -> int:
+            raise OSError("synthetic-sensitive-marker")
+
+    class BrokenHandler(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            raise ValueError("synthetic-sensitive-marker")
+
+    setup_logging(tmp_path, async_engine=async_engine)
+    monkeypatch.setattr(sys, "stderr", BrokenStream())
+    if async_engine:
+        engine = telemetry._GLOBAL_ENGINE
+        assert engine is not None
+        engine._listener.handlers = (BrokenHandler(),)
+    else:
+        logging.getLogger().addHandler(BrokenHandler())
+    logger = get_logger("audit.failed-sinks")
+    logger.info("handler probe")
+    logger.bind(value=BrokenStream()).info("context probe")
+    flush_logs()
+
+
+def test_home_path_variants() -> None:
+    """Home normalization accepts both Windows separators and case variants."""
+    path = str(Path.home()) + "/audit"
+    assert normalize_path(path.replace("/", "\\")) == "~/audit"
+    assert normalize_path(path.upper()) == "~/AUDIT"
+
+
+def test_tooling_import_and_direct_cli_smoke(tmp_path: Path) -> None:
+    """Tool imports stay inert and direct qualification entrypoint is bounded."""
+    import subprocess
+    import sys
+
+    root = Path(__file__).resolve().parents[2]
+    imports = (
+        "import logging; before = list(logging.getLogger().handlers); "
+        "import scripts.ci_check, scripts.check_architecture; "
+        "import tests.reference.fixtures, tests.reference.validate; "
+        "assert logging.getLogger().handlers == before"
+    )
+    environment = dict(os.environ, PYTHONPATH=str(root))
+    result = subprocess.run(
+        [sys.executable, "-c", imports],
+        cwd=tmp_path,
+        env=environment,
+        capture_output=True,
+        text=True,
+        timeout=10,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert not (tmp_path / "data").exists()
+    smoke = (
+        "import runpy; from unittest.mock import patch; "
+        "patch('shutil.which', return_value=None).start(); "
+        f"runpy.run_path({str(root / 'scripts/ci_check.py')!r}, run_name='__main__')"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", smoke],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=10,
+        check=False,
+    )
+    assert result.returncode == 1, result.stderr
+    assert "npm launcher not found" in result.stderr
+    assert "ModuleNotFoundError" not in result.stderr

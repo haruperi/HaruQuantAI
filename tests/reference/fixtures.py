@@ -33,10 +33,10 @@ CLI Usage:
 
 from __future__ import annotations
 
-from logging import getLogger as get_logger  # noqa: N813 - approved adapter name
 from pathlib import Path
 from typing import Literal
 
+from app.host.logging import get_logger
 from pydantic import (
     BaseModel,
     ConfigDict,

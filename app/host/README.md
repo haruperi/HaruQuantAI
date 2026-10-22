@@ -128,7 +128,7 @@ Host runtime services (`F01`) belong to Stage 1 (`1A`–`1G`) and are registered
 | `DEC-HOST-P00-AUTHORITY-RESTORATION` | `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, and owning `README.md` files define target authority; retained React UI surfaces do not establish backend availability or parity. |
 | `DEC-HOST-P00-SCHEMA-EVOLUTION` | Strict schema version 4 binds `SQX_REFERENCE_ROOT` (`145-dev1`) and `HARUQUANTAI_ROOT`; atomic claims, classifications, limitations, source locations/hashes, target mappings, clean-room flags, and truthful validation states are mandatory. |
 | `DEC-HOST-P00-REGISTRY-BOUNDARY` | Only `FEAT-HOST-EVIDENCE` is registered in `Stage 0`. Application features (`F01`–`F13`) remain `proposed` until their owning stage implementation plans ratify them in domain `README.md` files. |
-| `DEC-HOST-P00-LOGGING-ADAPTER` | Reference tooling uses standard-library named loggers (`get_logger(__name__)`), structured `fr_id` extras, and stable redacted error codes without import-time I/O or handler mutation. |
+| `DEC-HOST-P00-LOGGING-ADAPTER` | Reference tooling uses the central telemetry facade (`get_logger(__name__)`), structured `fr_id` extras, and stable redacted error codes without import-time I/O or handler mutation. |
 | `DEC-HOST-P00-VALIDATION-DEPENDENCY` | Draft 2020-12 JSON Schema validation uses the locked `jsonschema` development dependency with format checking enabled. |
 | `DEC-HOST-P00-BOUNDED-FIXTURES` | UTF-8 JSON reads reject duplicate keys, nonfinite numbers (`NaN`, `Infinity`), and payloads exceeding `4 MiB`. Relative forward-slash locators reject traversal (`..`), drive letters, UNC paths, and symlink escapes. |
 | `DEC-HOST-P00-RELEASE-GATES` | Static SHA-256 hashes and directory/file counts require zero tolerance (`tolerance = 0`). Static qualification never establishes runtime execution or numerical parity. |
@@ -161,3 +161,8 @@ Settings snapshots and catalogue values come only from stored records. Python re
 Host event models, bounded replay and subscriber delivery are implemented in
 `app/host/events.py`. `transport.py` imports these classes directly for HTTP/SSE/WS
 and retains the existing lazy global bus wiring and event exports.
+
+Logging factories do not configure handlers or perform I/O. Explicit CLI/host
+startup owns asynchronous logging; standalone facade emissions lazily initialize
+asynchronous sinks when no explicit setup exists. Boundary diagnostics contain
+no caller payload or raw exception text.

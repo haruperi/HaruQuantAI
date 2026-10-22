@@ -133,11 +133,6 @@ _LOGGING_LOCK: threading.RLock = threading.RLock()
 _BOOTSTRAPPED: bool = False
 
 
-# ============================================================================
-# Capability 8: Request Correlation Context
-# ============================================================================
-
-
 def set_correlation_id(correlation_id: str) -> contextvars.Token[str | None]:
     """Set current request correlation ID in task context.
 
@@ -168,11 +163,6 @@ def get_correlation_id() -> str | None:
     return _CORRELATION_ID.get()
 
 
-# ============================================================================
-# Capability 2: Secret & Path Redaction
-# ============================================================================
-
-
 def normalize_path(path_str: str, root_dir: Path | None = None) -> str:
     """Normalize absolute paths to relative tokens to prevent environment leaks.
 
@@ -183,15 +173,20 @@ def normalize_path(path_str: str, root_dir: Path | None = None) -> str:
     Returns:
         Path string with repository or home directory prefixes masked.
     """
-    root = (root_dir or Path.cwd()).resolve()
-    resolved_str = str(root)
-    normalized = path_str.replace(resolved_str, "[WORKSPACE]")
-    try:
-        home_str = str(Path.home().resolve())
-        normalized = normalized.replace(home_str, "~")
-    except RuntimeError:
-        pass
-    return normalized.replace("\\", "/")
+    normalized = path_str.replace("\\", "/")
+    roots = [(str((root_dir or Path.cwd()).resolve()), "[WORKSPACE]")]
+    with contextlib.suppress(RuntimeError):
+        roots.append((str(Path.home().resolve()), "~"))
+    for root_prefix, replacement in roots:
+        prefix = root_prefix.replace("\\", "/").rstrip("/")
+        flags = re.IGNORECASE if sys.platform == "win32" else 0
+        normalized = re.sub(
+            r"(?<![\w/])" + re.escape(prefix) + r"(?=$|[/\s\"'\),;\]])",
+            replacement,
+            normalized,
+            flags=flags,
+        )
+    return normalized
 
 
 def fingerprint_secret(value: Any) -> str:
@@ -252,11 +247,6 @@ def redact_mapping(
     return scrubbed_dict
 
 
-# ============================================================================
-# Capability 4: Log Event & Formatting & Capability 3: Safe Error Boundary
-# ============================================================================
-
-
 class LogEventFormatter(logging.Formatter):
     """Structured formatter with timestamp, ANSI styling, and safe error boundary."""
 
@@ -290,13 +280,11 @@ class LogEventFormatter(logging.Formatter):
         original_args = record.args
 
         try:
-            # 1. Exact millisecond-precision timestamp
             record_dt = datetime.fromtimestamp(record.created, tz=UTC)
             time_str = (
                 record_dt.strftime("%Y-%m-%d %H:%M:%S") + f".{int(record.msecs):03d}"
             )
 
-            # 2. Mask secrets in args
             if isinstance(record.args, dict):
                 record.args = redact_mapping(record.args, fingerprint=True)
             elif isinstance(record.args, tuple):
@@ -307,24 +295,20 @@ class LogEventFormatter(logging.Formatter):
                     for arg in record.args
                 )
 
-            # 3. Safe formatting boundary
             try:
                 raw_msg = record.getMessage()
-            except Exception as format_exc:  # noqa: BLE001
+            except Exception:  # noqa: BLE001
                 raw_msg = (
                     f"[LOGGING-ERROR-BOUNDARY] Failed to format message "
-                    f"({type(format_exc).__name__}: {format_exc}) | Raw: {record.msg}"
+                    f"| Raw: {record.msg}"
                 )
 
-            # 4. Redact secrets and normalize machine paths
             clean_msg = normalize_path(
                 str(redact_value(raw_msg, fingerprint=True)), self.root_dir
             )
 
-            # 5. Build caller location: module:function:line
             caller = f"{record.name}:{record.funcName}:{record.lineno}"
 
-            # 6. Apply ANSI colors if requested
             level_name = record.levelname
             if (self.colorize and sys.stderr.isatty()) or self.colorize:
                 color = ANSI_LEVEL_COLORS.get(level_name, "")
@@ -336,7 +320,6 @@ class LogEventFormatter(logging.Formatter):
 
             formatted = f"{time_str} | {formatted_level} | {caller} - {formatted_msg}"
 
-            # 7. Append scrubbed exception traceback if present
             if record.exc_info and not record.exc_text:
                 record.exc_text = self.formatException(record.exc_info)
             if record.exc_text:
@@ -359,20 +342,19 @@ class LogEventFormatter(logging.Formatter):
 
             return formatted
 
-        except Exception as boundary_exc:  # noqa: BLE001
-            # Fallback error boundary to ensure application never crashes
-            return (
-                f"[LOGGING-ERROR-BOUNDARY-CRITICAL] {type(boundary_exc).__name__}: "
-                f"{boundary_exc} | Record: {getattr(record, 'name', 'unknown')}"
-            )
+        except Exception:  # noqa: BLE001
+            return "[LOGGING-ERROR-BOUNDARY] Unable to format telemetry record"
         finally:
             record.msg = original_msg
             record.args = original_args
 
 
-# ============================================================================
-# Capability 5: Sinks, Windows-Safe Rotation & Archiving
-# ============================================================================
+class _SafeStreamHandler(logging.StreamHandler[Any]):
+    """Keep console failures from echoing unsanitized records."""
+
+    @override
+    def handleError(self, record: logging.LogRecord) -> None:
+        _boundary_diagnostic()
 
 
 class WindowsSafeRotatingFileHandler(logging.handlers.RotatingFileHandler):
@@ -399,6 +381,11 @@ class WindowsSafeRotatingFileHandler(logging.handlers.RotatingFileHandler):
             delay=delay,
             errors=errors,
         )
+
+    @override
+    def handleError(self, record: logging.LogRecord) -> None:
+        """Report sink failure without echoing unsanitized records."""
+        _boundary_diagnostic()
 
     @override
     def doRollover(self) -> None:
@@ -436,11 +423,6 @@ class WindowsSafeRotatingFileHandler(logging.handlers.RotatingFileHandler):
                     time.sleep(_RENAME_RETRY_DELAY_SEC)
                 else:
                     break
-
-
-# ============================================================================
-# Capability 6: Log Ring Buffer & Debug Console Projection
-# ============================================================================
 
 
 class LogRingBuffer:
@@ -551,7 +533,7 @@ class RingBufferHandler(logging.Handler):
                 for ws_sink in ws_sinks:
                     ws_sink(entry)
         except Exception:  # noqa: BLE001
-            sys.stderr.write(f"{ERROR_BOUNDARY_FR}: live log delivery failed\n")
+            _boundary_diagnostic()
 
 
 def get_ring_buffer() -> LogRingBuffer:
@@ -562,11 +544,6 @@ def get_ring_buffer() -> LogRingBuffer:
             if _GLOBAL_RING_BUFFER is None:
                 _GLOBAL_RING_BUFFER = LogRingBuffer()
     return _GLOBAL_RING_BUFFER
-
-
-# ============================================================================
-# Capability 7: Bound Logger & Facade
-# ============================================================================
 
 
 class TelemetryLogger(logging.LoggerAdapter[logging.Logger]):
@@ -623,6 +600,16 @@ class TelemetryLogger(logging.LoggerAdapter[logging.Logger]):
         self.log(lvl, msg, *args, **kwargs)
 
     @override
+    def log(self, level: int, msg: Any, *args: Any, **kwargs: Any) -> None:
+        """Emit safely, initializing async sinks only on the first emission."""
+        try:
+            _ensure_bootstrapped()
+            kwargs["stacklevel"] = kwargs.get("stacklevel", 1) + 1
+            super().log(level, msg, *args, **kwargs)
+        except Exception:  # noqa: BLE001
+            _boundary_diagnostic()
+
+    @override
     def process(
         self, msg: Any, kwargs: MutableMapping[str, Any]
     ) -> tuple[Any, MutableMapping[str, Any]]:
@@ -635,7 +622,8 @@ class TelemetryLogger(logging.LoggerAdapter[logging.Logger]):
         if cid is not None and "correlation_id" not in extra_dict:
             extra_dict["correlation_id"] = cid
 
-        kwargs["extra"] = extra_dict
+        reserved = logging.makeLogRecord({}).__dict__.keys() | {"message", "asctime"}
+        kwargs["extra"] = {k: v for k, v in extra_dict.items() if k not in reserved}
         if extra_dict:
             context_str = " ".join(f"{k}={v}" for k, v in extra_dict.items())
             msg = f"{msg} [{context_str}]"
@@ -644,19 +632,12 @@ class TelemetryLogger(logging.LoggerAdapter[logging.Logger]):
 
 def get_logger(name: str) -> TelemetryLogger:
     """Return standard TelemetryLogger with dynamic context binding support."""
-    _ensure_bootstrapped()
     return TelemetryLogger(logging.getLogger(name))
 
 
 def get_access_logger() -> TelemetryLogger:
     """Return specialized TelemetryLogger routing events to data/logs/access.log."""
-    _ensure_bootstrapped()
     return get_logger("haruquantai.access")
-
-
-# ============================================================================
-# Capability 1: Telemetry Worker & Engine & Capability 9: Lazy Bootstrap
-# ============================================================================
 
 
 class _RedactingQueueHandler(logging.handlers.QueueHandler):
@@ -673,7 +654,26 @@ class _RedactingQueueHandler(logging.handlers.QueueHandler):
     @override
     def handleError(self, record: logging.LogRecord) -> None:
         """Report queue/format failures without echoing the unsanitized record."""
-        sys.stderr.write(f"{ERROR_BOUNDARY_FR}: telemetry record dropped\n")
+        _boundary_diagnostic()
+
+
+def _boundary_diagnostic() -> None:
+    """Report failure without recursive logging or sensitive payloads."""
+    with contextlib.suppress(Exception):
+        sys.stderr.write("[LOGGING-ERROR-BOUNDARY] telemetry record dropped\n")
+
+
+class _SafeQueueListener(logging.handlers.QueueListener):
+    """Keep a failing sink from terminating delivery and stranding queue tasks."""
+
+    @override
+    def handle(self, record: logging.LogRecord) -> None:
+        for handler in self.handlers:
+            try:
+                if not self.respect_handler_level or record.levelno >= handler.level:
+                    handler.handle(record)
+            except Exception:  # noqa: BLE001
+                _boundary_diagnostic()
 
 
 class TelemetryEngine:
@@ -690,7 +690,7 @@ class TelemetryEngine:
         )
         self.downstream_handlers = downstream_handlers
         self._queue_handler = _RedactingQueueHandler(self._queue)
-        self._listener = logging.handlers.QueueListener(
+        self._listener = _SafeQueueListener(
             self._queue,
             *self.downstream_handlers,
             respect_handler_level=True,
@@ -755,7 +755,7 @@ def _ensure_bootstrapped() -> None:
     if not _BOOTSTRAPPED:
         with _LOGGING_LOCK:
             if not _BOOTSTRAPPED:
-                setup_logging(DEFAULT_LOG_DIR, async_engine=False)
+                setup_logging(DEFAULT_LOG_DIR, async_engine=True)
 
 
 def _build_sinks(
@@ -768,7 +768,7 @@ def _build_sinks(
     console_formatter = LogEventFormatter(colorize=True)
     file_formatter = LogEventFormatter(colorize=False)
 
-    console_handler = logging.StreamHandler()
+    console_handler = _SafeStreamHandler()
     console_handler.setLevel(level)
     console_handler.setFormatter(console_formatter)
 

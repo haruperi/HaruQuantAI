@@ -44,13 +44,12 @@ CLI Usage:
 from __future__ import annotations
 
 import argparse
-import logging
 import re
 from dataclasses import dataclass
-from logging import getLogger as get_logger  # noqa: N813 - approved adapter name
 from pathlib import Path
 from typing import Any, cast
 
+from app.host.logging import get_logger, setup_logging, shutdown_logging
 from jsonschema import Draft202012Validator
 
 from tests.reference.fixtures import load_fixtures
@@ -427,5 +426,8 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    raise SystemExit(main())
+    setup_logging()
+    try:
+        raise SystemExit(main())
+    finally:
+        shutdown_logging()
