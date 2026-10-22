@@ -1,5 +1,7 @@
-"""File, console and live-record sinks (FR-HOST-LOGGING-SINKS/RING-BUFFER)."""
+"""Console, rotating-file, and in-memory telemetry sinks."""
+
 from __future__ import annotations
+
 import collections
 import contextlib
 import copy
@@ -11,6 +13,7 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
+
 from .formatting import LogEventFormatter
 from .security import _boundary_diagnostic, normalize_path, redact_value
 
@@ -104,7 +107,7 @@ class WindowsSafeRotatingFileHandler(logging.handlers.RotatingFileHandler):
             try:
                 Path(source).rename(destination)
                 return
-            except PermissionError, FileExistsError:
+            except (PermissionError, FileExistsError):
                 if attempt < _MAX_RENAME_RETRIES - 1:
                     time.sleep(_RENAME_RETRY_DELAY_SEC)
                 else:
@@ -211,7 +214,11 @@ class RingBufferHandler(logging.Handler):
                 "message": clean_msg,
                 "fr_id": getattr(record, "fr_id", None),
                 "correlation_id": getattr(record, "correlation_id", None)
-                or (self._correlation_id_getter() if self._correlation_id_getter is not None else None),
+                or (
+                    self._correlation_id_getter()
+                    if self._correlation_id_getter is not None
+                    else None
+                ),
             }
             self.ring_buffer.append(entry)
             if getattr(record, "fr_id", None) != "FR-HOST-TRANSPORT-EVENT-BUS":
@@ -266,7 +273,11 @@ def _build_sinks(
     errors_file_handler.setLevel(logging.WARNING)
     errors_file_handler.setFormatter(file_formatter)
 
-    ring_handler = RingBufferHandler(ring_buffer, publish_log, correlation_id_getter=correlation_id_getter)
+    ring_handler = RingBufferHandler(
+        ring_buffer,
+        publish_log,
+        correlation_id_getter=correlation_id_getter,
+    )
     ring_handler.setLevel(level)
 
     return [console_handler, app_file_handler, errors_file_handler, ring_handler]

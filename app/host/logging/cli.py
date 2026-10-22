@@ -1,19 +1,32 @@
 """Command-line verification of the host logging feature."""
+
 from __future__ import annotations
+
 import logging
 import sys
 import tempfile
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
-from .runtime import (
-    WORKER_FR, BOUND_LOGGER_FR, CORRELATION_FR, EXPORTS_FR,
-    flush_logs, get_access_logger, get_logger, set_correlation_id, reset_correlation_id,
-    setup_logging, shutdown_logging, TelemetryLogger,
-)
+
 from .formatting import FORMATTING_FR
+from .runtime import (
+    BOUND_LOGGER_FR,
+    CORRELATION_FR,
+    EXPORTS_FR,
+    WORKER_FR,
+    TelemetryLogger,
+    flush_logs,
+    get_access_logger,
+    get_logger,
+    reset_correlation_id,
+    set_correlation_id,
+    setup_logging,
+    shutdown_logging,
+)
 from .security import REDACTION_FR
 from .sinks import SINKS_FR
+
 
 class TelemetryLoggerCLI:
     """Command-line interface and self-verification runner for TelemetryLogger."""

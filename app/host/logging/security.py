@@ -1,5 +1,7 @@
-"""Secret and machine-path sanitization for host telemetry (FR-HOST-LOGGING-REDACTION)."""
+"""Secret redaction and machine-path normalization for host telemetry."""
+
 from __future__ import annotations
+
 import contextlib
 import hashlib
 import re
@@ -11,7 +13,8 @@ from typing import Any
 REDACTION_FR = "FR-HOST-LOGGING-REDACTION"
 REDACTED_STR = "***REDACTED***"
 SENSITIVE_KEY_PATTERN: re.Pattern[str] = re.compile(
-    r"(?i)(?:^|[_-])(?:password|passwd|token|secret|key|api_?key|auth|authorization|credential|hash|bearer)(?:$|[_-])"
+    r"(?i)(?:^|[_-])(?:password|passwd|token|secret|key|api_?key|"
+    r"auth|authorization|credential|hash|bearer)(?:$|[_-])"
 )
 SENSITIVE_VALUE_PATTERN: re.Pattern[str] = re.compile(
     r"(?i)(bearer\s+[^\s,'\";]+)|"

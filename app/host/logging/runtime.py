@@ -1,5 +1,7 @@
-"""Logger facade, async worker and application-owned lifecycle (FEAT-HOST-LOGGING)."""
+"""Central logging facade, async worker, and lifecycle."""
+
 from __future__ import annotations
+
 import contextlib
 import contextvars
 import copy
@@ -10,10 +12,15 @@ import threading
 from collections.abc import Callable, Mapping, MutableMapping
 from pathlib import Path
 from typing import Any, override
+
 from .security import _boundary_diagnostic, normalize_path, redact_mapping, redact_value
 from .sinks import (
-    DEFAULT_RING_BUFFER_CAPACITY, LogRingBuffer, _build_sinks, _setup_access_logger,
-    clear_ws_sinks, register_ws_sink,
+    DEFAULT_RING_BUFFER_CAPACITY,
+    LogRingBuffer,
+    _build_sinks,
+    _setup_access_logger,
+    clear_ws_sinks,
+    register_ws_sink,
 )
 
 WORKER_FR = "FR-HOST-LOGGING-WORKER"
@@ -21,13 +28,18 @@ BOUND_LOGGER_FR = "FR-HOST-LOGGING-BOUND-LOGGER"
 CORRELATION_FR = "FR-HOST-LOGGING-CORRELATION"
 EXPORTS_FR = "FR-HOST-LOGGING-EXPORTS"
 DEFAULT_LOG_DIR: Path = Path("data/logs")
-_CORRELATION_ID: contextvars.ContextVar[str | None] = contextvars.ContextVar("correlation_id", default=None)
+_CORRELATION_ID: contextvars.ContextVar[str | None] = contextvars.ContextVar(
+    "correlation_id", default=None
+)
 _GLOBAL_RING_BUFFER: LogRingBuffer | None = None
 _GLOBAL_ENGINE: TelemetryEngine | None = None
 _LOGGING_LOCK: threading.RLock = threading.RLock()
 _BOOTSTRAPPED: bool = False
 _OWNED_ROOT_HANDLERS: list[logging.Handler] = []
-_RESERVED_RECORD_KEYS = logging.makeLogRecord({}).__dict__.keys() | {"message", "asctime"}
+_RESERVED_RECORD_KEYS = logging.makeLogRecord({}).__dict__.keys() | {
+    "message",
+    "asctime",
+}
 
 def set_correlation_id(correlation_id: str) -> contextvars.Token[str | None]:
     """Set current request correlation ID in task context.

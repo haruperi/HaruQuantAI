@@ -1,10 +1,13 @@
-"""Redacted console/file event formatting (FR-HOST-LOGGING-FORMATTING)."""
+"""Redacted formatting for console and file telemetry."""
+
 from __future__ import annotations
+
 import copy
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import override
+
 from .security import normalize_path, redact_mapping, redact_value
 
 ERROR_BOUNDARY_FR = "FR-HOST-LOGGING-ERROR-BOUNDARY"
@@ -47,7 +50,8 @@ class LogEventFormatter(logging.Formatter):
         Returns:
             Formatted log event string.
         """
-        record = copy.copy(record)  # Never cache raw exception text on another handler's record.
+        # Never cache unsanitized exception text on another handler's record.
+        record = copy.copy(record)
         original_msg = record.msg
         original_args = record.args
 
