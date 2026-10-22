@@ -42,6 +42,7 @@ import asyncio
 import logging
 import os
 import re
+import sys
 import threading
 import time
 from collections.abc import Generator
@@ -71,6 +72,7 @@ from app.host.logging import (
     setup_logging,
     shutdown_logging,
 )
+from app.host.logging import runtime as telemetry
 from app.host.logging.formatting import ANSI_RESET, ERROR_BOUNDARY_FR, FORMATTING_FR
 from app.host.logging.runtime import (
     BOUND_LOGGER_FR,
@@ -787,7 +789,6 @@ def test_factory_is_inert_and_first_emission_is_async(
 ) -> None:
     """Factory calls preserve handlers and defer I/O until first emission."""
 
-    from app.host.logging import runtime as telemetry
 
     shutdown_logging()
     monkeypatch.setattr(telemetry, "DEFAULT_LOG_DIR", tmp_path / "lazy")
@@ -804,7 +805,6 @@ def test_factory_is_inert_and_first_emission_is_async(
 def test_listener_survives_handler_failure(tmp_path: Path) -> None:
     """A failed sink cannot kill queue delivery or strand pending tasks."""
 
-    from app.host.logging import runtime as telemetry
 
     class BrokenHandler(logging.Handler):
         def emit(self, record: logging.LogRecord) -> None:
@@ -833,10 +833,6 @@ def test_handler_and_stderr_failures_are_contained(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, async_engine: bool
 ) -> None:
     """Safe boundaries hold even when the fallback diagnostic sink fails."""
-    import sys
-
-
-    from app.host.logging import runtime as telemetry
 
     class BrokenStream:
         def write(self, value: str) -> int:
@@ -870,8 +866,6 @@ def test_home_path_variants() -> None:
 def test_tooling_import_and_direct_cli_smoke(tmp_path: Path) -> None:
     """Tool imports stay inert and direct qualification entrypoint is bounded."""
     import subprocess
-    import sys
-
     root = Path(__file__).resolve().parents[2]
     imports = (
         "import logging; before = list(logging.getLogger().handlers); "
