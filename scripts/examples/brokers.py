@@ -52,6 +52,8 @@ from app.services.brokers.metatrader import MetaTraderClient
 from app.services.brokers.simulator import SimulatorClient
 from app.services.include import format_timestamp
 from app.services.include.contracts import (
+    MarketBar,
+    MarketTick,
     SymbolInfo,
     TerminalInfo,
     TradeRequest,
@@ -62,6 +64,7 @@ from app.services.include.data import (
     get_ticks,
     ticks_to_dataframe,
 )
+from app.services.include.enums import Timeframe
 from app.services.include.trading import (
     MarginMode,
     OrderFilling,
@@ -70,11 +73,6 @@ from app.services.include.trading import (
     TradeAction,
     Trading,
     TradingBackend,
-)
-from app.workspace.data_manager import (
-    MarketBar,
-    MarketTick,
-    Timeframe,
 )
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = os.getenv("BROKER", "mt5")  # type: ignore[assignment]
