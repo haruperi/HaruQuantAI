@@ -802,6 +802,7 @@ def test_factory_is_inert_and_first_emission_is_async(
 
 def test_listener_survives_handler_failure(tmp_path: Path) -> None:
     """A failed sink cannot kill queue delivery or strand pending tasks."""
+
     class BrokenHandler(logging.Handler):
         def emit(self, record: logging.LogRecord) -> None:
             raise ValueError("synthetic-sensitive-marker")
