@@ -9,19 +9,18 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: '3.14'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: ui/package-lock.json
       - run: uv sync --locked
-      - run: npm --prefix ui ci
-      - run: node ui/node_modules/@playwright/test/cli.js install chrome
       - run: uv run --frozen ruff check app/host/logging tests/unit/test_telemetry_logging.py
       - run: uv run --frozen ruff format --check app/host/logging tests/unit/test_telemetry_logging.py
       - run: uv run --frozen mypy app/host/logging
       - run: uv run --frozen pytest tests/unit/test_telemetry_logging.py --no-cov
       - run: uv run --frozen python -m app.host.logging --verify
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - run: npm --prefix ui ci
       - run: uv run --frozen python scripts/ci_check.py
       - uses: actions/upload-artifact@v4
         if: always()
