@@ -40,6 +40,7 @@ from app.host.bootstrap import (
 from app.host.bootstrap import (
     main as bootstrap_main,
 )
+from app.host.logging import runtime as logging_runtime
 from app.host.persistence import HostPersistence
 from app.host.response import StandardError
 from app.main import (
@@ -154,10 +155,10 @@ def test_bootstrapped_settings_http_writes_and_telemetry_shutdown(
             row["key"] == "app_general"
             for row in HostPersistence.read_records("host_settings")
         )
-        engine = telemetry._GLOBAL_ENGINE
+        engine = logging_runtime._GLOBAL_ENGINE
         assert engine is not None
-    assert telemetry._GLOBAL_ENGINE is None
-    assert not telemetry._BOOTSTRAPPED
+    assert logging_runtime._GLOBAL_ENGINE is None
+    assert not logging_runtime._BOOTSTRAPPED
     assert all(
         handler.stream is None
         for handler in engine.downstream_handlers
@@ -169,8 +170,6 @@ def test_partial_service_initialization_releases_acquired_resources(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from unittest.mock import Mock
-
-    import app.host.logging as telemetry
 
     runtime = AppHost(data_dir=tmp_path, use_process_pool=False)
     reset = Mock()
@@ -192,7 +191,7 @@ def test_partial_service_initialization_releases_acquired_resources(
     reset.assert_called_once()
     assert AppHost.Stage.SERVICES in runtime.teardown_stages
     assert runtime.state == AppHost.State.FAILED
-    assert not telemetry._BOOTSTRAPPED
+    assert not logging_runtime._BOOTSTRAPPED
 
 
 # ============================================================================
