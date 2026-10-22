@@ -41,6 +41,7 @@ _RESERVED_RECORD_KEYS = logging.makeLogRecord({}).__dict__.keys() | {
     "asctime",
 }
 
+
 def set_correlation_id(correlation_id: str) -> contextvars.Token[str | None]:
     """Set current request correlation ID in task context.
 
@@ -69,7 +70,6 @@ def get_correlation_id() -> str | None:
         Active correlation ID string or None.
     """
     return _CORRELATION_ID.get()
-
 
 
 def get_ring_buffer() -> LogRingBuffer:
@@ -191,7 +191,6 @@ class _RedactingQueueHandler(logging.handlers.QueueHandler):
     def handleError(self, record: logging.LogRecord) -> None:
         """Report queue/format failures without echoing the unsanitized record."""
         _boundary_diagnostic()
-
 
 
 class _SafeQueueListener(logging.handlers.QueueListener):

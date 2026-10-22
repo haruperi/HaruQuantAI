@@ -27,16 +27,19 @@ _RENAME_RETRY_DELAY_SEC = 0.05
 _WS_SINKS: list[Callable[[dict[str, Any]], None]] = []
 _WS_SINKS_LOCK = threading.Lock()
 
+
 def register_ws_sink(sink: Callable[[dict[str, Any]], None]) -> None:
     """Register a live log receiver without duplicates."""
     with _WS_SINKS_LOCK:
         if sink not in _WS_SINKS:
             _WS_SINKS.append(sink)
 
+
 def clear_ws_sinks() -> None:
     """Release subscriptions at host shutdown."""
     with _WS_SINKS_LOCK:
         _WS_SINKS.clear()
+
 
 class _SafeStreamHandler(logging.StreamHandler[Any]):
     """Keep console failures from echoing unsanitized records."""

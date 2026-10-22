@@ -22,6 +22,7 @@ SENSITIVE_VALUE_PATTERN: re.Pattern[str] = re.compile(
     r"(?:\"[^\"]*\"|'[^']*'|[^\s,;}\]]+))"
 )
 
+
 def normalize_path(path_str: str, root_dir: Path | None = None) -> str:
     """Normalize absolute paths to relative tokens to prevent environment leaks.
 

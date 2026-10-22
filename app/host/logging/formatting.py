@@ -21,6 +21,7 @@ ANSI_LEVEL_COLORS: dict[str, str] = {
     "CRITICAL": "\033[1;35m",  # Bold Magenta
 }
 
+
 class LogEventFormatter(logging.Formatter):
     """Structured formatter with timestamp, ANSI styling, and safe error boundary."""
 
