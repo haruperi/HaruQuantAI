@@ -64,6 +64,7 @@ from app.services.brokers.base import (
     epoch_seconds,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
@@ -240,17 +241,10 @@ def parse_delimited_bars(
         vol_val = float(row[v_idx]) if 0 <= v_idx < len(row) else 1.0
         spread_val = float(row[spread_idx]) if 0 <= spread_idx < len(row) else 0.0
         v_clean = int(vol_val) if vol_val >= 1.0 else (1 if vol_val > 0 else 0)
+        t_sec = int(dt.timestamp())
+        sp_int = int(spread_val)
         rows.append(
-            _bar_row(
-                int(dt.timestamp()),
-                o_val,
-                h_val,
-                l_val,
-                c_val,
-                v_clean,
-                int(spread_val),
-                v_clean,
-            )
+            _bar_row(t_sec, o_val, h_val, l_val, c_val, v_clean, sp_int, v_clean)
         )
 
     logger.debug(
@@ -646,11 +640,9 @@ def _dedup_and_trim(
         if last_t is None or r[key] > last_t:
             deduped.append(r)
             last_t = r[key]
-    return (
-        deduped[-target_count:]
-        if target_count and len(deduped) > target_count
-        else deduped
-    )
+    if target_count and len(deduped) > target_count:
+        return deduped[-target_count:]
+    return deduped
 
 
 def load_local_partition_bars(
@@ -865,7 +857,7 @@ class FilesClient(BrokerClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Retrieve historical candlestick bars from local files."""
         del start_pos
         tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
@@ -901,19 +893,21 @@ class FilesClient(BrokerClient):
                 len(files),
                 extra={"fr_id": PARSING_FR, "count": len(deduped), "symbol": symbol},
             )
-            return [
-                MarketBar(
-                    int(r["time"]),
-                    float(r["open"]),
-                    float(r["high"]),
-                    float(r["low"]),
-                    float(r["close"]),
-                    int(r.get("tick_volume", 0)),
-                    int(r.get("spread", 0)),
-                    int(r.get("real_volume", 0)),
-                )
-                for r in deduped
-            ]
+            return bars_to_dataframe(
+                [
+                    MarketBar(
+                        int(r["time"]),
+                        float(r["open"]),
+                        float(r["high"]),
+                        float(r["low"]),
+                        float(r["close"]),
+                        int(r.get("tick_volume", 0)),
+                        int(r.get("spread", 0)),
+                        int(r.get("real_volume", 0)),
+                    )
+                    for r in deduped
+                ]
+            )
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise
@@ -932,7 +926,7 @@ class FilesClient(BrokerClient):
         end: datetime | int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketTick]:
+    ) -> pd.DataFrame:
         """Retrieve historical ticks from local files."""
         files = (
             find_matching_partitions(self.data_dir, symbol, "tick")
@@ -958,18 +952,20 @@ class FilesClient(BrokerClient):
                 len(files),
                 extra={"fr_id": PARSING_FR, "count": len(deduped), "symbol": symbol},
             )
-            return [
-                MarketTick(
-                    int(t["time_msc"]),
-                    float(t["bid"]),
-                    float(t["ask"]),
-                    float(t.get("last", t["bid"])),
-                    int(t.get("volume", 1)),
-                    int(t.get("flags", 0)),
-                    float(t.get("volume_real", 1.0)),
-                )
-                for t in deduped
-            ]
+            return ticks_to_dataframe(
+                [
+                    MarketTick(
+                        int(t["time_msc"]),
+                        float(t["bid"]),
+                        float(t["ask"]),
+                        float(t.get("last", t["bid"])),
+                        int(t.get("volume", 1)),
+                        int(t.get("flags", 0)),
+                        float(t.get("volume_real", 1.0)),
+                    )
+                    for t in deduped
+                ]
+            )
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise
@@ -985,14 +981,13 @@ def main() -> None:
         csv_file = tmp_path / "EURUSD_M1.csv"
         csv_file.write_text(
             "timestamp,open,high,low,close,volume\n"
-            "2026-01-01 00:00:00,1.1000,1.1010,1.0990,1.1005,100\n"
-            "2026-01-01 00:01:00,1.1005,1.1015,1.1000,1.1010,120\n",
+            "2026-01-01 00:00:00,1.1000,1.1010,1.0990,1.1005,100\n",
             encoding="utf-8",
         )
         client = FilesClient(data_dir=tmp_path)
         bars = client.get_bars("EURUSD", "M1", count=10)
-        assert isinstance(bars, list)
-        logger.info("Read %d bars successfully from %s", len(bars), csv_file.name)
+        assert isinstance(bars, pd.DataFrame)
+        logger.info("Read %d bars from %s", len(bars), csv_file.name)
         client.disconnect()
 
 

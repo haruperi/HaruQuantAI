@@ -48,11 +48,13 @@ import time
 from datetime import datetime
 from typing import Any, override
 
+import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.host.settings import settings
 from app.services.brokers.base import BridgeError, TradingClient
 from app.services.include import contracts as _c
 from app.services.include import enums as _e
+from app.services.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.services.include.trading import Trading
 
 logger = get_logger(__name__)
@@ -823,7 +825,8 @@ class CTraderClient(TradingClient):
             rec_res = oamsg.ProtoOAReconcileRes()
             rec_res.ParseFromString(resp[1])
             smap = self._symbol_id_map
-            positions, orders = [], []
+            positions: list[dict[str, Any]] = []
+            orders: list[dict[str, Any]] = []
             for p in rec_res.position:
                 td, pr = p.tradeData, float(p.price) / 1e5
                 sym = smap.get(td.symbolId, str(td.symbolId))
@@ -892,7 +895,7 @@ class CTraderClient(TradingClient):
         date_from: datetime | None = None,
         date_to: datetime | None = None,
         **kw: Any,
-    ) -> list[_c.MarketBar]:
+    ) -> pd.DataFrame:
         """Fetch historical candlestick bars directly via trendbars."""
         s1 = int(date_from.timestamp()) if date_from else 0
         s2 = int(date_to.timestamp()) if date_to else int(time.time())
@@ -906,7 +909,7 @@ class CTraderClient(TradingClient):
             out.append(
                 _c.MarketBar(int(r["time"]), *p, tv, sp, int(r.get("real_volume", 0)))
             )
-        return out
+        return bars_to_dataframe(out)
 
     @override
     def get_ticks(
@@ -915,7 +918,7 @@ class CTraderClient(TradingClient):
         date_from: datetime | None = None,
         date_to: datetime | None = None,
         **kw: Any,
-    ) -> list[_c.MarketTick]:
+    ) -> pd.DataFrame:
         """Fetch historical market ticks directly via historical_ticks."""
         s1 = int(date_from.timestamp() * 1000) if date_from else 0
         s2 = int(date_to.timestamp() * 1000) if date_to else int(time.time() * 1000)
@@ -930,7 +933,7 @@ class CTraderClient(TradingClient):
                     int(t["time_msc"]), *p, vol, fl, float(t.get("volume_real", 0.0))
                 )
             )
-        return out
+        return ticks_to_dataframe(out)
 
     @override
     def order_check(self, request: _c.TradeRequest) -> _c.TradeCheckResult:

@@ -36,6 +36,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, override
 
+import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.services.brokers.base import (
     BridgeError,
@@ -50,6 +51,7 @@ from app.services.brokers.files import (
     read_parquet_bars,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.services.include.enums import Timeframe
 
 ADAPTERS_FR = "FR-DATA-PROVIDERS-ADAPTERS"
@@ -99,7 +101,7 @@ class TickDownloaderClient(BrokerClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Fetch historical bars from local archives."""
         del start_pos
         tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
@@ -134,7 +136,7 @@ class TickDownloaderClient(BrokerClient):
                 if count and len(filtered) > count:
                     filtered = filtered[-count:]
                 if filtered:
-                    return [
+                    bars = [
                         MarketBar(
                             time=int(r["time"]),
                             open=float(r["open"]),
@@ -147,6 +149,7 @@ class TickDownloaderClient(BrokerClient):
                         )
                         for r in filtered
                     ]
+                    return bars_to_dataframe(bars)
 
         raise BridgeError(
             f"No local TickDownloader bars found for '{symbol}' ({tf_name}) in {self.data_dir}",
@@ -164,7 +167,7 @@ class TickDownloaderClient(BrokerClient):
         end: datetime | int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketTick]:
+    ) -> pd.DataFrame:
         """Retrieve tick data strictly from local tick archive."""
         del limit
         s = date_from if date_from is not None else start
@@ -189,7 +192,7 @@ class TickDownloaderClient(BrokerClient):
                     if target_count and len(filtered) > target_count:
                         filtered = filtered[-target_count:]
                     if filtered:
-                        return [
+                        parsed_ticks = [
                             MarketTick(
                                 time_msc=int(t["time_msc"]),
                                 bid=float(t["bid"]),
@@ -201,6 +204,7 @@ class TickDownloaderClient(BrokerClient):
                             )
                             for t in filtered
                         ]
+                        return ticks_to_dataframe(parsed_ticks)
 
         raise BridgeError(
             f"No local TickDownloader ticks found for '{symbol}' in {self.data_dir}",

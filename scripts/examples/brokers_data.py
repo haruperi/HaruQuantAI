@@ -38,9 +38,8 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-from collections.abc import Sequence
-from datetime import UTC, datetime
 
+import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.services.brokers import (
     BinanceClient,
@@ -54,7 +53,6 @@ from app.services.brokers import (
 )
 from app.services.include.contracts import (
     MarketBar,
-    MarketTick,
     SymbolInfo,
 )
 from app.services.include.data import (
@@ -66,8 +64,8 @@ from app.services.include.enums import Timeframe
 logger = get_logger(__name__)
 
 
-def _print_bars_table(name: str, symbol: str, bars: Sequence[MarketBar]) -> None:
-    """Print formatted summary table of retrieved MarketBar records."""
+def _print_bars_table(name: str, symbol: str, bars: pd.DataFrame) -> None:
+    """Print formatted summary table of retrieved DataFrame bar records."""
     sep = "=" * 80
     print(f"\n{sep}")
     print(f"  BROKER: {name:20s} | SYMBOL: {symbol:10s} | BARS: {len(bars)}")
@@ -77,17 +75,22 @@ def _print_bars_table(name: str, symbol: str, bars: Sequence[MarketBar]) -> None
         f"{'CLOSE':>12s} {'VOLUME':>12s}"
     )
     print("-" * 80)
-    for b in bars:
-        dt_str = datetime.fromtimestamp(b.time, tz=UTC).strftime("%Y-%m-%d %H:%M:%S")
+    for ts, row in bars.iterrows():
+        dt_str = str(ts)
+        o_val = float(row["Open"])
+        h_val = float(row["High"])
+        l_val = float(row["Low"])
+        c_val = float(row["Close"])
+        v = int(row.get("Volume", 0))
         print(
-            f"{dt_str:22s} {b.open:12.4f} {b.high:12.4f} {b.low:12.4f} "
-            f"{b.close:12.4f} {b.real_volume or b.tick_volume:12d}"
+            f"{dt_str:22s} {o_val:12.4f} {h_val:12.4f} {l_val:12.4f} "
+            f"{c_val:12.4f} {v:12d}"
         )
     print(sep)
 
 
-def _print_ticks_table(name: str, symbol: str, ticks: Sequence[MarketTick]) -> None:
-    """Print formatted summary table of retrieved MarketTick records."""
+def _print_ticks_table(name: str, symbol: str, ticks: pd.DataFrame) -> None:
+    """Print formatted summary table of retrieved DataFrame tick records."""
     sep = "=" * 80
     print(f"\n{sep}")
     print(f"  BROKER: {name:20s} | SYMBOL: {symbol:10s} | TICKS: {len(ticks)}")
@@ -97,18 +100,17 @@ def _print_ticks_table(name: str, symbol: str, ticks: Sequence[MarketTick]) -> N
         f"{'VOLUME':>12s}"
     )
     print("-" * 80)
-    for t in ticks:
-        dt_str = datetime.fromtimestamp(t.time_msc / 1000.0, tz=UTC).strftime(
-            "%Y-%m-%d %H:%M:%S.%f"
-        )[:-3]
-        print(
-            f"{dt_str:24s} {t.bid:12.4f} {t.ask:12.4f} {t.last:12.4f} "
-            f"{t.volume_real:12.2f}"
-        )
+    for ts, row in ticks.iterrows():
+        dt_str = str(ts)
+        b = float(row["Bid"])
+        a = float(row["Ask"])
+        last = float(row.get("Last", 0.0))
+        v = float(row.get("Volume", 0.0))
+        print(f"{dt_str:24s} {b:12.4f} {a:12.4f} {last:12.4f} {v:12.2f}")
     print(sep)
 
 
-async def demo_yahoo(count: int = 5) -> list[MarketBar]:
+async def demo_yahoo(count: int = 5) -> pd.DataFrame:
     """Download historical Daily bars for AAPL from Yahoo Finance."""
     broker = YahooClient()
     symbol = "AAPL"
@@ -118,7 +120,7 @@ async def demo_yahoo(count: int = 5) -> list[MarketBar]:
     return bars
 
 
-async def demo_binance(count: int = 5) -> tuple[list[MarketBar], list[MarketTick]]:
+async def demo_binance(count: int = 5) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Download historical 1H klines and live ticks for BTCUSDT from Binance."""
     broker = BinanceClient()
     symbol = "BTCUSDT"
@@ -132,7 +134,7 @@ async def demo_binance(count: int = 5) -> tuple[list[MarketBar], list[MarketTick
     return bars, ticks
 
 
-async def demo_dukascopy(count: int = 5) -> list[MarketBar]:
+async def demo_dukascopy(count: int = 5) -> pd.DataFrame:
     """Download historical M1 bars for EURUSD from Dukascopy CDN."""
     broker = DukascopyClient()
     symbol = "EURUSD"
@@ -142,7 +144,7 @@ async def demo_dukascopy(count: int = 5) -> list[MarketBar]:
     return bars
 
 
-async def demo_darwinex(count: int = 5) -> list[MarketBar]:
+async def demo_darwinex(count: int = 5) -> pd.DataFrame:
     """Download historical Daily bars for EURUSD from Darwinex CDN."""
     broker = DarwinexClient()
     symbol = "EURUSD"
@@ -152,7 +154,7 @@ async def demo_darwinex(count: int = 5) -> list[MarketBar]:
     return bars
 
 
-async def demo_sq_equity(count: int = 5) -> list[MarketBar]:
+async def demo_sq_equity(count: int = 5) -> pd.DataFrame:
     """Download historical Daily bars for AAPL from StrategyQuant US Equities."""
     broker = SQEquityClient()
     symbol = "AAPL"
@@ -162,7 +164,7 @@ async def demo_sq_equity(count: int = 5) -> list[MarketBar]:
     return bars
 
 
-async def demo_sq_futures(count: int = 5) -> list[MarketBar]:
+async def demo_sq_futures(count: int = 5) -> pd.DataFrame:
     """Download historical Daily bars for @ES from StrategyQuant Continuous Futures."""
     broker = SQFuturesClient()
     symbol = "@ES"
@@ -172,7 +174,7 @@ async def demo_sq_futures(count: int = 5) -> list[MarketBar]:
     return bars
 
 
-async def demo_files(count: int = 5) -> list[MarketBar]:
+async def demo_files(count: int = 5) -> pd.DataFrame:
     """Download historical M1 bars for EURUSD from local filesystem Parquet archives."""
     broker = FilesClient(data_dir="data/market/dukascopy/m1")
     symbol = "EURUSD"
@@ -182,7 +184,7 @@ async def demo_files(count: int = 5) -> list[MarketBar]:
     return bars
 
 
-async def demo_simulator(count: int = 5) -> list[MarketBar]:
+async def demo_simulator(count: int = 5) -> pd.DataFrame:
     """Download seeded historical M1 bars for EURUSD from SimulationBackend."""
     sim = SimulatorClient()
     symbol = "EURUSD"

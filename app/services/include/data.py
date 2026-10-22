@@ -234,7 +234,7 @@ async def get_historical_bars(
     start_pos: int | None = None,
     count: int | None = None,
     limit: int = MAX_RECORDS,
-) -> list[MarketBar]:
+) -> pd.DataFrame:
     """Read bars by date range, forward date/count or native index/count."""
     logger.debug("FR-DATA-HISTORICAL-READS: requesting bars")
     mode, start, end, number = _route(
@@ -248,7 +248,7 @@ async def get_historical_bars(
         timeframe,
     )
     if mode == "range" and start > end:
-        return []
+        return bars_to_dataframe([])
 
     if not hasattr(backend, "get_bars"):
         raise BridgeError(
@@ -266,10 +266,12 @@ async def get_historical_bars(
     )
     if inspect.isawaitable(payload):
         payload = await payload
+    if isinstance(payload, pd.DataFrame):
+        return payload
     rows = validate_rows(
         payload, "bars", 0 if mode == "position" else start, end, number or limit
     )
-    return [row for row in rows if isinstance(row, MarketBar)]
+    return bars_to_dataframe([row for row in rows if isinstance(row, MarketBar)])
 
 
 async def get_ticks(
@@ -280,7 +282,7 @@ async def get_ticks(
     *,
     count: int | None = None,
     limit: int = MAX_RECORDS,
-) -> list[MarketTick]:
+) -> pd.DataFrame:
     """Read ticks by date range, forward date/count or latest count."""
     logger.debug("FR-DATA-HISTORICAL-READS: requesting ticks")
     mode, start, end, number = _route(
@@ -293,7 +295,7 @@ async def get_ticks(
         limit,
     )
     if mode == "range" and start > end:
-        return []
+        return ticks_to_dataframe([])
 
     if not hasattr(backend, "get_ticks"):
         raise BridgeError(
@@ -309,8 +311,10 @@ async def get_ticks(
     )
     if inspect.isawaitable(payload):
         payload = await payload
+    if isinstance(payload, pd.DataFrame):
+        return payload
     rows = validate_rows(payload, "ticks", start, end, number or limit)
-    return [row for row in rows if isinstance(row, MarketTick)]
+    return ticks_to_dataframe([row for row in rows if isinstance(row, MarketTick)])
 
 
 BAR_COLUMNS: list[str] = ["Open", "High", "Low", "Close", "Volume", "Spread"]

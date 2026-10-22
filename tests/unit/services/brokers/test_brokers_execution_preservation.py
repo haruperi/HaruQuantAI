@@ -30,6 +30,7 @@ CLI Usage:
     ```
 """
 
+import pandas as pd  # type: ignore[import-untyped]
 import pytest
 from app.services.brokers.base import BrokerClient, TradingClient
 from app.services.brokers.metatrader import (
@@ -116,9 +117,9 @@ def test_metatrader_client_terminal_bars_awaitable() -> None:
         coro = client.get_bars("EURUSD", "M1", count=1)
         assert inspect.isawaitable(coro)
         bars = await coro
+        assert isinstance(bars, pd.DataFrame)
         assert len(bars) == 1
-        assert bars[0].time == 1700000000
-        assert bars[0].open == 1.1
+        assert bars.iloc[0]["Open"] == 1.1
 
         mock_tick = {
             "time_msc": 1700000000000,
@@ -133,8 +134,9 @@ def test_metatrader_client_terminal_bars_awaitable() -> None:
         tick_coro = client.get_ticks("EURUSD", count=1)
         assert inspect.isawaitable(tick_coro)
         ticks = await tick_coro
+        assert isinstance(ticks, pd.DataFrame)
         assert len(ticks) == 1
-        assert ticks[0].time_msc == 1700000000000
+        assert ticks.iloc[0]["Bid"] == 1.1
 
     asyncio.run(_test())
 

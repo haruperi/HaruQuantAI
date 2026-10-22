@@ -51,6 +51,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any, override
 
+import pandas as pd  # type: ignore[import-untyped]
 import requests
 from app.host.logging import get_logger
 from app.services.brokers.base import (
@@ -62,6 +63,7 @@ from app.services.brokers.base import (
     execute_bounded_get,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
@@ -173,7 +175,7 @@ class BitfinexExchangeAdapter:
         end: int = 0,
         count: int = 0,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Fetch historical candlestick bars from Bitfinex API v2."""
         tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_H1)
         interval = BITFINEX_TIMEFRAME_MAP.get(tf, "1h")
@@ -234,7 +236,7 @@ class BitfinexExchangeAdapter:
         logger.debug(
             "%s: Retrieved %d bars for %s", BITFINEX_CANDLES_FR, len(bars), sym
         )
-        return bars
+        return bars_to_dataframe(bars)
 
 
 class CoinbaseExchangeAdapter:
@@ -263,7 +265,7 @@ class CoinbaseExchangeAdapter:
         end: int = 0,
         count: int = 0,
         limit: int = 300,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Fetch historical candles from Coinbase API."""
         tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_M1)
         granularity = COINBASE_GRANULARITY_MAP.get(tf, 60)
@@ -325,7 +327,7 @@ class CoinbaseExchangeAdapter:
         logger.debug(
             "%s: Retrieved %d bars for %s", COINBASE_CANDLES_FR, len(bars), product_id
         )
-        return bars
+        return bars_to_dataframe(bars)
 
 
 class PoloniexExchangeAdapter:
@@ -354,7 +356,7 @@ class PoloniexExchangeAdapter:
         end: int = 0,
         count: int = 0,
         limit: int = 500,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Fetch historical candlestick bars from Poloniex API."""
         tf = Timeframe.resolve(timeframe, default=Timeframe.PERIOD_H1)
         interval = POLONIEX_INTERVAL_MAP.get(tf, "HOUR_1")
@@ -414,7 +416,7 @@ class PoloniexExchangeAdapter:
         logger.debug(
             "%s: Retrieved %d bars for %s", POLONIEX_CANDLES_FR, len(bars), sym
         )
-        return bars
+        return bars_to_dataframe(bars)
 
 
 def _calc_digits(tick_size: float) -> int:
@@ -576,7 +578,7 @@ class CryptoClient(BrokerClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Retrieve real historical candlestick bars from configured crypto exchange."""
         del start_pos
         s = date_from if date_from is not None else start
@@ -586,7 +588,7 @@ class CryptoClient(BrokerClient):
 
         if self.exchange in ("bitfinex", "coinbase", "poloniex"):
             adapter = self._get_exchange_adapter(self.exchange)
-            exchange_bars: list[MarketBar] = adapter.get_bars(
+            return adapter.get_bars(
                 symbol=symbol,
                 timeframe=timeframe,
                 start=start_sec,
@@ -594,7 +596,6 @@ class CryptoClient(BrokerClient):
                 count=count or 0,
                 limit=limit,
             )
-            return exchange_bars
 
         sym_clean = self._normalize_symbol(symbol)
         interval = self._map_timeframe(timeframe)
@@ -659,7 +660,7 @@ class CryptoClient(BrokerClient):
 
             if count and len(deduped) > count:
                 deduped = deduped[-count:]
-            return deduped
+            return bars_to_dataframe(deduped)
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise
@@ -679,7 +680,7 @@ class CryptoClient(BrokerClient):
         end: datetime | int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketTick]:
+    ) -> pd.DataFrame:
         """Retrieve historical aggregate trades from Binance REST API."""
         if self.exchange in ("bitfinex", "coinbase", "poloniex"):
             raise BridgeError(
@@ -736,7 +737,7 @@ class CryptoClient(BrokerClient):
             ticks.sort(key=lambda item: item.time_msc)
             if count and len(ticks) > count:
                 ticks = ticks[-count:]
-            return ticks
+            return ticks_to_dataframe(ticks)
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise

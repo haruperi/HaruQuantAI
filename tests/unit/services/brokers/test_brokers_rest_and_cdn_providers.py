@@ -25,6 +25,7 @@ import importlib
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pandas as pd  # type: ignore[import-untyped]
 import pytest
 import requests
 from app.services.brokers.base import (
@@ -39,7 +40,6 @@ from app.services.brokers.sq_equity import SQEquityClient
 from app.services.brokers.sq_futures import SQFuturesClient
 from app.services.brokers.tick_downloader import TickDownloaderClient
 from app.services.brokers.yahoo import YahooClient
-from app.services.include.contracts import MarketBar, MarketTick
 from app.services.include.enums import Timeframe
 
 # ============================================================================
@@ -166,12 +166,12 @@ def test_crypto_multiexchange_routing() -> None:
         mock_get.return_value = resp
 
         bars = client_bfx.get_bars("BTCUSD", Timeframe.PERIOD_M1, count=1)
+        assert isinstance(bars, pd.DataFrame)
         assert len(bars) == 1
-        assert isinstance(bars[0], MarketBar)
-        assert bars[0].open == 50000.0
-        assert bars[0].high == 50800.0
-        assert bars[0].low == 49800.0
-        assert bars[0].close == 50500.0
+        assert bars.iloc[0]["Open"] == 50000.0
+        assert bars.iloc[0]["High"] == 50800.0
+        assert bars.iloc[0]["Low"] == 49800.0
+        assert bars.iloc[0]["Close"] == 50500.0
 
     # 2. Coinbase routing & decoding
     client_cb = CryptoClient(exchange="coinbase")
@@ -185,10 +185,10 @@ def test_crypto_multiexchange_routing() -> None:
         mock_get.return_value = resp
 
         bars_cb = client_cb.get_bars("BTC-USD", Timeframe.PERIOD_M1, count=1)
+        assert isinstance(bars_cb, pd.DataFrame)
         assert len(bars_cb) == 1
-        assert isinstance(bars_cb[0], MarketBar)
-        assert bars_cb[0].open == 50000.0
-        assert bars_cb[0].close == 50500.0
+        assert bars_cb.iloc[0]["Open"] == 50000.0
+        assert bars_cb.iloc[0]["Close"] == 50500.0
 
     # 3. Poloniex routing & decoding
     client_polo = CryptoClient(exchange="poloniex")
@@ -217,9 +217,9 @@ def test_crypto_multiexchange_routing() -> None:
         mock_get.return_value = resp
 
         bars_polo = client_polo.get_bars("BTC_USDT", Timeframe.PERIOD_M1, count=1)
+        assert isinstance(bars_polo, pd.DataFrame)
         assert len(bars_polo) == 1
-        assert isinstance(bars_polo[0], MarketBar)
-        assert bars_polo[0].open == 50000.0
+        assert bars_polo.iloc[0]["Open"] == 50000.0
 
 
 # ============================================================================
@@ -263,10 +263,10 @@ def test_yahoo_provider_contracts() -> None:
         mock_get.return_value = resp
 
         bars = client.get_bars("SPY", Timeframe.PERIOD_D1, count=1)
+        assert isinstance(bars, pd.DataFrame)
         assert len(bars) == 1
-        assert isinstance(bars[0], MarketBar)
-        assert bars[0].open == 500.0
-        assert bars[0].close == 502.0
+        assert bars.iloc[0]["Open"] == 500.0
+        assert bars.iloc[0]["Close"] == 502.0
 
 
 # ============================================================================
@@ -318,9 +318,9 @@ def test_binance_bars_and_ticks_integer_validation() -> None:
             end=1700000060,
             count=1,
         )
+        assert isinstance(bars, pd.DataFrame)
         assert len(bars) == 1
-        assert isinstance(bars[0], MarketBar)
-        assert bars[0].real_volume == 12
+        assert bars.iloc[0]["Volume"] == 150
 
     # 2. Ticks validation
     with patch("app.services.brokers.crypto.execute_bounded_get") as mock_get:
@@ -345,10 +345,9 @@ def test_binance_bars_and_ticks_integer_validation() -> None:
             end=1700000010000,
             count=1,
         )
+        assert isinstance(ticks, pd.DataFrame)
         assert len(ticks) == 1
-        assert isinstance(ticks[0], MarketTick)
-        assert ticks[0].volume == 1
-        assert ticks[0].volume_real == 0.125
+        assert ticks.iloc[0]["Bid"] == 50000.0
 
 
 @pytest.mark.parametrize(

@@ -57,6 +57,7 @@ from pathlib import Path
 from types import TracebackType
 from typing import Any, Self, override
 
+import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 
 try:
@@ -835,7 +836,7 @@ class MetaTraderClient(TradingClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> Awaitable[list[MarketBar]]:
+    ) -> Awaitable[pd.DataFrame]:
         """Fetch historical candlestick bars directly from the connected MT5 terminal bridge."""
         if not self.bridge.connected:
             raise BridgeError(
@@ -862,13 +863,13 @@ class MetaTraderClient(TradingClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Asynchronously retrieve and validate historical bars from MT5 terminal bridge."""
         logger.debug(
             "FR-MT5-MARKET-DATA: requesting bars via terminal bridge",
             extra={"symbol": symbol},
         )
-        from app.services.include.data import _route, validate_rows
+        from app.services.include.data import _route, bars_to_dataframe, validate_rows
 
         mode, start, end, number = _route(
             date_from, date_to, start_pos, count, limit, scale=1
@@ -885,7 +886,8 @@ class MetaTraderClient(TradingClient):
         rows = validate_rows(
             payload, "bars", 0 if mode == "position" else start, end, number or limit
         )
-        return [row for row in rows if isinstance(row, MarketBar)]
+        bars = [row for row in rows if isinstance(row, MarketBar)]
+        return bars_to_dataframe(bars)
 
     @override
     def get_ticks(
@@ -896,7 +898,7 @@ class MetaTraderClient(TradingClient):
         *,
         count: int | None = None,
         limit: int = 1000,
-    ) -> Awaitable[list[MarketTick]]:
+    ) -> Awaitable[pd.DataFrame]:
         """Fetch historical market ticks directly from the connected MT5 terminal bridge."""
         if not self.bridge.connected:
             raise BridgeError(
@@ -919,13 +921,13 @@ class MetaTraderClient(TradingClient):
         *,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketTick]:
+    ) -> pd.DataFrame:
         """Asynchronously retrieve and validate historical ticks from MT5 terminal bridge."""
         logger.debug(
             "FR-MT5-MARKET-DATA: requesting ticks via terminal bridge",
             extra={"symbol": symbol},
         )
-        from app.services.include.data import _route, validate_rows
+        from app.services.include.data import _route, ticks_to_dataframe, validate_rows
 
         mode, start, end, number = _route(
             date_from, date_to, None, count, limit, scale=1000
@@ -941,7 +943,8 @@ class MetaTraderClient(TradingClient):
         rows = validate_rows(
             payload, "ticks", 0 if mode == "latest" else start, end, number or limit
         )
-        return [row for row in rows if isinstance(row, MarketTick)]
+        ticks = [row for row in rows if isinstance(row, MarketTick)]
+        return ticks_to_dataframe(ticks)
 
 
 def main() -> None:

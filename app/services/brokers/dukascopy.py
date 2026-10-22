@@ -47,6 +47,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, override
 
+import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.services.brokers.base import (
     BridgeError,
@@ -62,6 +63,7 @@ from app.services.brokers.files import (
     read_parquet_bars,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
@@ -411,7 +413,7 @@ class DukascopyClient(BrokerClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Download candlestick bars from local storage or Dukascopy datafeed."""
         del start_pos
         sym_clean = self._clean_symbol(symbol)
@@ -471,7 +473,7 @@ class DukascopyClient(BrokerClient):
                 ]
                 if filtered:
                     selected = filtered[-target_count:] if target_count else filtered
-                    return [
+                    bars = [
                         MarketBar(
                             time=int(r["time"]),
                             open=float(r["open"]),
@@ -484,6 +486,7 @@ class DukascopyClient(BrokerClient):
                         )
                         for r in selected
                     ]
+                    return bars_to_dataframe(bars)
 
         feed_dt = date_to or (
             date_from + timedelta(days=1)
@@ -509,7 +512,7 @@ class DukascopyClient(BrokerClient):
                 code="NO_DATA",
             )
         selected = filtered[-target_count:] if target_count else filtered
-        return [
+        bars = [
             MarketBar(
                 time=int(r["time"]),
                 open=float(r["open"]),
@@ -522,6 +525,7 @@ class DukascopyClient(BrokerClient):
             )
             for r in selected
         ]
+        return bars_to_dataframe(bars)
 
     @override
     def get_ticks(
@@ -534,7 +538,7 @@ class DukascopyClient(BrokerClient):
         end: datetime | int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketTick]:
+    ) -> pd.DataFrame:
         """Download tick data from local archives or Dukascopy direct datafeed."""
         sym_clean = self._clean_symbol(symbol)
         snap = self.get_symbol_info(sym_clean)
@@ -572,7 +576,7 @@ class DukascopyClient(BrokerClient):
                 ]
                 if filtered:
                     selected = filtered[-target_count:] if target_count else filtered
-                    return [
+                    local_ticks = [
                         MarketTick(
                             time_msc=int(t["time_msc"]),
                             bid=float(t["bid"]),
@@ -584,6 +588,7 @@ class DukascopyClient(BrokerClient):
                         )
                         for t in selected
                     ]
+                    return ticks_to_dataframe(local_ticks)
 
         target_dt = (
             datetime.fromtimestamp(start_ms / 1000.0, tz=UTC)
@@ -606,7 +611,7 @@ class DukascopyClient(BrokerClient):
             )
         if target_count and len(ticks) > target_count:
             ticks = ticks[-target_count:]
-        return [
+        parsed_ticks = [
             MarketTick(
                 time_msc=int(t["time_msc"]),
                 bid=float(t["bid"]),
@@ -618,6 +623,7 @@ class DukascopyClient(BrokerClient):
             )
             for t in ticks
         ]
+        return ticks_to_dataframe(parsed_ticks)
 
 
 def main() -> None:

@@ -37,11 +37,16 @@ from datetime import UTC, datetime
 from itertools import count
 from typing import Any, TypeVar, override
 
+import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.services.brokers.base import BridgeError, TradingClient, epoch_seconds, utc_now
 from app.services.include import contracts as _c
 from app.services.include import enums as _e
-from app.services.include.data import validate_rows
+from app.services.include.data import (
+    bars_to_dataframe,
+    ticks_to_dataframe,
+    validate_rows,
+)
 from app.services.include.trading import Trading
 
 logger = get_logger(__name__)
@@ -951,13 +956,14 @@ class SimulatorClient(TradingClient):
         date_from: datetime | None = None,
         date_to: datetime | None = None,
         **kw: Any,
-    ) -> list[_c.MarketBar]:
+    ) -> pd.DataFrame:
         tf = _e.Timeframe(str(timeframe))
         if (symbol, tf) not in self._bar_history:
             raise BridgeError("history is not seeded", code="DATA_NOT_READY")
-        return self._slice_history(
+        bars = self._slice_history(
             self._bar_history[symbol, tf], date_from=date_from, date_to=date_to, **kw
         )
+        return bars_to_dataframe(bars)
 
     @override
     def get_ticks(
@@ -966,12 +972,13 @@ class SimulatorClient(TradingClient):
         date_from: datetime | None = None,
         date_to: datetime | None = None,
         **kw: Any,
-    ) -> list[_c.MarketTick]:
+    ) -> pd.DataFrame:
         if symbol not in self._tick_history:
             raise BridgeError("history is not seeded", code="DATA_NOT_READY")
-        return self._slice_history(
+        ticks = self._slice_history(
             self._tick_history[symbol], True, date_from=date_from, date_to=date_to, **kw
         )
+        return ticks_to_dataframe(ticks)
 
 
 __all__ = ["SimulatorClient"]

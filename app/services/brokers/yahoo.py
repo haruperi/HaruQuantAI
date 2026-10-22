@@ -41,6 +41,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
+import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.services.brokers.base import (
     BridgeError,
@@ -49,6 +50,7 @@ from app.services.brokers.base import (
     execute_bounded_get,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.data import bars_to_dataframe
 from app.services.include.enums import Timeframe
 
 MARKET_DATA_FR = "FR-BROKER-YAHOO-MARKET-DATA"
@@ -152,7 +154,7 @@ class YahooClient(BrokerClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Fetch historical candlestick bars directly from Yahoo Finance."""
         del start_pos
         clean_sym = symbol.strip().upper()
@@ -302,7 +304,7 @@ class YahooClient(BrokerClient):
                     "symbol": clean_sym,
                 },
             )
-            return deduped
+            return bars_to_dataframe(deduped)
         except Exception as exc:
             if isinstance(exc, BridgeError):
                 raise

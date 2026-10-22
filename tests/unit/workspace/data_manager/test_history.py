@@ -35,6 +35,7 @@ import importlib
 from datetime import UTC, datetime
 from typing import Any
 
+import pandas as pd  # type: ignore[import-untyped]
 import pytest
 from app.services.brokers.base import BridgeError, BrokerClient
 from app.services.include.contracts import (
@@ -582,8 +583,9 @@ class TestAsyncHistoricalRetrieval:
         bars = asyncio.run(
             get_historical_bars(backend, "EURUSD", Timeframe.PERIOD_M1, start, end)
         )
+        assert isinstance(bars, pd.DataFrame)
         assert len(bars) == 1
-        assert bars[0].close == 1.15
+        assert bars.iloc[0]["Close"] == 1.15
 
     def test_get_ticks_latest(self) -> None:
         """Verify get_ticks with count limit."""
@@ -612,8 +614,9 @@ class TestAsyncHistoricalRetrieval:
 
         backend = MockBackend()
         ticks = asyncio.run(get_ticks(backend, "EURUSD", count=5))
+        assert isinstance(ticks, pd.DataFrame)
         assert len(ticks) == 1
-        assert ticks[0].bid == 1.100
+        assert ticks.iloc[0]["Bid"] == 1.100
 
 
 class TestMainDemo:

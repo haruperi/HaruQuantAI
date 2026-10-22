@@ -51,6 +51,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
+import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.services.brokers.base import (
     BridgeError,
@@ -60,7 +61,8 @@ from app.services.brokers.base import (
     execute_bounded_get,
 )
 from app.services.brokers.files import load_local_partition_bars
-from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.contracts import MarketBar, SymbolInfo
+from app.services.include.data import bars_to_dataframe
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
@@ -451,8 +453,8 @@ class SQEquityClient(BrokerClient):
         return all_bars
 
     @staticmethod
-    def _rows_to_market_bars(rows: list[dict[str, Any]]) -> list[MarketBar]:
-        return [
+    def _rows_to_market_bars(rows: list[dict[str, Any]]) -> pd.DataFrame:
+        bars = [
             MarketBar(
                 time=int(r["time"]),
                 open=float(r["open"]),
@@ -465,6 +467,7 @@ class SQEquityClient(BrokerClient):
             )
             for r in rows
         ]
+        return bars_to_dataframe(bars)
 
     @override
     def get_bars(
@@ -479,7 +482,7 @@ class SQEquityClient(BrokerClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Retrieve historical candlestick bars from local storage or StrategyQuant CDN."""
         del start_pos
         target_count = count or limit or 100
@@ -544,7 +547,7 @@ class SQEquityClient(BrokerClient):
         *,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketTick]:
+    ) -> pd.DataFrame:
         """Historical ticks are unsupported for StrategyQuant US Equities."""
         del symbol, date_from, date_to, count, limit
         raise BridgeError(

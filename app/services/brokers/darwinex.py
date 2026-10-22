@@ -45,6 +45,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, override
 
+import pandas as pd  # type: ignore[import-untyped]
 import requests
 from app.host.logging import get_logger
 from app.services.brokers.base import (
@@ -61,6 +62,7 @@ from app.services.brokers.files import (
     read_parquet_bars,
 )
 from app.services.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.services.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
@@ -290,7 +292,7 @@ class DarwinexClient(BrokerClient):
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar]:
+    ) -> pd.DataFrame:
         """Download candlestick bars from local archives or Darwinex CDN."""
         del start_pos
         self._ensure_catalog()
@@ -349,7 +351,7 @@ class DarwinexClient(BrokerClient):
                 ]
                 if filtered:
                     selected = filtered[-target_count:] if target_count else filtered
-                    return [
+                    bars = [
                         MarketBar(
                             time=int(r["time"]),
                             open=float(r["open"]),
@@ -362,6 +364,7 @@ class DarwinexClient(BrokerClient):
                         )
                         for r in selected
                     ]
+                    return bars_to_dataframe(bars)
 
         start_year = date_from.year if date_from else 2023
         end_year = date_to.year if date_to else start_year
@@ -457,7 +460,7 @@ class DarwinexClient(BrokerClient):
         rows = [buckets[k] for k in sorted(buckets.keys())]
         if target_count and len(rows) > target_count:
             rows = rows[-target_count:]
-        return [
+        bars = [
             MarketBar(
                 time=int(r["time"]),
                 open=float(r["open"]),
@@ -470,6 +473,7 @@ class DarwinexClient(BrokerClient):
             )
             for r in rows
         ]
+        return bars_to_dataframe(bars)
 
     @override
     def get_ticks(
@@ -482,7 +486,7 @@ class DarwinexClient(BrokerClient):
         end: datetime | int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketTick]:
+    ) -> pd.DataFrame:
         """Download tick data from local archives or Darwinex CDN."""
         self._ensure_catalog()
         sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
@@ -542,7 +546,7 @@ class DarwinexClient(BrokerClient):
         all_ticks.sort(key=lambda r: r["time_msc"])
         if target_count and len(all_ticks) > target_count:
             all_ticks = all_ticks[-target_count:]
-        return [
+        parsed_ticks = [
             MarketTick(
                 time_msc=int(t["time_msc"]),
                 bid=float(t["bid"]),
@@ -554,6 +558,7 @@ class DarwinexClient(BrokerClient):
             )
             for t in all_ticks
         ]
+        return ticks_to_dataframe(parsed_ticks)
 
 
 def main() -> None:

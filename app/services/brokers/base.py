@@ -60,7 +60,10 @@ from collections.abc import Awaitable
 from dataclasses import asdict, is_dataclass, replace
 from datetime import UTC, datetime
 from types import TracebackType
-from typing import Any, ClassVar, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Self
+
+if TYPE_CHECKING:
+    import pandas as pd  # type: ignore[import-untyped]
 
 import app.services.include.contracts as _contracts
 import app.services.include.enums as _enums
@@ -72,7 +75,6 @@ from app.services.include.contracts import (
     BridgeError,
     BridgeEvent,
     DealInfo,
-    MarketBar,
     MarketTick,
     OrderInfo,
     PositionInfo,
@@ -364,7 +366,7 @@ class BrokerClient:
         start_pos: int | None = None,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketBar] | Awaitable[list[MarketBar]]:
+    ) -> pd.DataFrame | Awaitable[pd.DataFrame]:
         """Fetch historical candlestick bars. Subclasses implement directly."""
         del symbol, timeframe, date_from, date_to, start_pos, count, limit
         raise BridgeError(
@@ -380,7 +382,7 @@ class BrokerClient:
         *,
         count: int | None = None,
         limit: int = 1000,
-    ) -> list[MarketTick] | Awaitable[list[MarketTick]]:
+    ) -> pd.DataFrame | Awaitable[pd.DataFrame]:
         """Fetch historical market ticks. Subclasses implement directly."""
         del symbol, date_from, date_to, count, limit
         raise BridgeError(
@@ -968,9 +970,7 @@ def normalize_provider_id(name: str) -> str:
     return _PROVIDER_ALIASES.get(cleaned, cleaned)
 
 
-def normalize_broker_name(name: str) -> str:
-    """Backward-compatible alias for normalize_provider_id."""
-    return normalize_provider_id(name)
+normalize_broker_name = normalize_provider_id
 
 
 def get_broker(name: str, registry: Any = None) -> Any:
