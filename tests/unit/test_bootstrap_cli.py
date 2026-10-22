@@ -171,8 +171,6 @@ def test_partial_service_initialization_releases_acquired_resources(
 ) -> None:
     from unittest.mock import Mock
 
-    import app.host.logging as telemetry
-
     runtime = AppHost(data_dir=tmp_path, use_process_pool=False)
     reset = Mock()
     stopped = Mock(side_effect=RuntimeError("one cleanup failed"))
