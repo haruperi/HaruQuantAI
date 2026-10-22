@@ -10,6 +10,7 @@ Registered target scope does not establish independently verified donor parity.
 ## 1. Domain Registry (`FEAT-DATAMGR-*`, `FR-DATAMGR-*`, `DEC-DATAMGR-*`)
 
 ### 1.1 Architectural Decisions
+
 - `DEC-DATAMGR-SESS-PROFILE-TEMPLATES`: Saved `datamgr_sessions` rows are
   reusable profiles/templates; no duplicate browser or entity catalog. Explicit
   IDs update existing profiles; an absent ID creates one. Intervals and holidays
@@ -71,6 +72,7 @@ Registered target scope does not establish independently verified donor parity.
 ### 1.2 Feature and Functional Requirements
 
 #### Module 1: Home Dashboard (`home.py`)
+
 - `FEAT-DATAMGR-HOME`: Dashboard metrics, storage health, entity counts, and doc links.
 - `FR-DATAMGR-HOME-OVERVIEW`: Aggregate dataset, instrument, session, and provider metrics.
 - `FR-DATAMGR-HOME-DATASETS-CATALOG`: Read-only saved dataset projection from
@@ -85,6 +87,7 @@ Registered target scope does not establish independently verified donor parity.
 - `FR-DATAMGR-HOME-STORAGE-AUDIT`: Parquet storage footprint and file audit.
 
 #### Module 2: Datasets & Parquet Storage (`data.py`)
+
 - `FEAT-DATAMGR-DATA`: Dataset catalog CRUD, Parquet bar I/O, chart review, and export.
 - `FR-DATAMGR-DATA-EDIT`: `Data.edit(dataset_id: str, updates: Mapping[str, Any] | None = None, **kwargs: Any) -> dict[str, Any]`;
   updates editable columns in `datamgr_datasets` with strict type validation, UTC timestamp tracking, and structured requirement logging.
@@ -103,6 +106,7 @@ Registered target scope does not establish independently verified donor parity.
 - `FR-DATAMGR-DATA-EXPORT-ENGINE`: CSV, MetaTrader 4, and MetaTrader 5 multi-format export.
 
 #### Module 3: Instruments Catalog (`instruments.py`)
+
 - `FEAT-DATAMGR-INSTRUMENTS`: InstrumentInfo specifications, trading costs, aliases, and SQX XML.
 - `FR-DATAMGR-INSTR-LIST`: `Instruments.instruments(filters: Mapping[str, Any] | None = None) -> list[dict[str, Any]]`;
   lists all saved instruments via GET `/data/instruments`, with optional search,
@@ -131,6 +135,7 @@ Registered target scope does not establish independently verified donor parity.
 - `FR-DATAMGR-INSTRUMENTS-XML-AND-ALIASES`: SQX XML import/export and symbol alias mapping.
 
 #### Module 4: Trading Sessions & Calendars (`sessions.py`)
+
 - `FEAT-DATAMGR-SESSIONS`: TradingSession calendar engine, schedules, holidays, and NT8 import.
 - `FR-DATAMGR-SESS-LIST`: `Sessions.sessions(filters: Mapping[str, Any] | None = None) -> list[dict[str, Any]]`;
   GET `/data/sessions` lists every saved profile, including timezone, complete
@@ -175,6 +180,7 @@ Registered target scope does not establish independently verified donor parity.
 - `FR-DATAMGR-SESSIONS-NT8-IMPORT`: NinjaTrader 8 TradingHours template discovery and XML import.
 
 #### Module 5: Stock Groups & Baskets (`baskets.py`)
+
 - `FEAT-DATAMGR-BASKETS`: Stock groups, survivorship-bias-free membership, and readiness evaluation.
 - `FR-DATAMGR-BASKETS-CRUD`: Stock group and constituent management in `datamgr_stock_group` / `datamgr_stock`.
 - `FR-DATAMGR-BASKETS-OVERVIEW-READINESS`: 8-column overview with downloaded dataset readiness cross-referencing.
@@ -182,12 +188,14 @@ Registered target scope does not establish independently verified donor parity.
 - `FR-DATAMGR-BASKETS-DATA-UPDATE`: Batch dataset provisioning for basket constituents.
 
 #### Module 6: Broker Profiles (`broker.py`)
+
 - `FEAT-DATAMGR-BROKER`: Broker profiles, stock ticker lists, and selective instrument/session import.
 - `FR-DATAMGR-BROKER-PROFILE-CRUD`: Broker profile governance in `datamgr_broker`.
 - `FR-DATAMGR-BROKER-STOCKS-MANAGEMENT`: Broker stock ticker lists in `datamgr_broker_stock`.
 - `FR-DATAMGR-BROKER-XML-TRANSFER`: SQX Broker XML transfer and selective component import.
 
 #### Module 7: Data Provider Connections (`connections.py`)
+
 - `FEAT-DATAMGR-CONNECTIONS`: BaseDataProvider protocol, connection health, and download jobs.
 - `FR-DATAMGR-CONNECTIONS-PROVIDER-PROTOCOL`: BaseDataProvider plugin protocol for data sources.
 - `FR-DATAMGR-CONNECTIONS-HEALTH-CHECK`: Connection probing and status reporting.
@@ -195,33 +203,40 @@ Registered target scope does not establish independently verified donor parity.
 - `FR-DATAMGR-CONNECTIONS-EVENT-BROADCAST`: EventBus publication for dataset updates.
 
 #### Module 8: Custom Data & External Indicators (`custom_data.py`)
+
 - `FEAT-DATAMGR-CUSTOM-DATA`: External indicators, macroeconomic series, and .mq4 recognition.
 - `FR-DATAMGR-CUSTOM-DATA-CRUD`: Custom indicator definitions in `host_entities`.
 - `FR-DATAMGR-CUSTOM-DATA-CSV-IMPORT`: Time-series CSV parsing and timeframe inference.
 - `FR-DATAMGR-CUSTOM-DATA-MQ4-RECOGNIZER`: MetaTrader 4 .mq4 buffer recognition.
 
 #### Module 9: Audit & Operation Logging (`log.py`)
+
 - `FEAT-DATAMGR-LOG`: Real-time WebSocket log viewer and operation progress/cancellation controls for Data Manager data operations.
 - `FR-DATAMGR-LOG-STREAM`: `DataLog.data_log(limit: int = 100) -> list[dict[str, Any]]`; reads and normalizes persisted download, import, and export records from `datamgr_logs` and `datamgr_operation_log`, and streams live log/progress payloads over the host `EventBus` `"logs"` channel (`GET /data/logs`, `POST /data/logs`, `/api/v1/ws?channels=logs,jobs`).
 - `FR-DATAMGR-LOG-CLEAR`: `DataLog.clear_log() -> dict[str, Any]`; clears persisted operation/audit logs in `datamgr_logs` and `datamgr_operation_log`, resets operation progress/cancellation state, and broadcasts `"datamgr.log.cleared"` (`POST /data/logs/clear`).
 
 #### Module 10: Help & FAQ Catalog (`help.py`)
+
 - `FEAT-DATAMGR-HELP`: Built-in contextual documentation and interactive tutorial guides for Data Manager operations.
 - `FR-DATAMGR-HELP-GUIDE`: `DMHelp.help(topic: str = "overview") -> dict[str, Any]`; returns deterministic contextual documentation summaries, supported topic catalog, and step-by-step data management tutorials (`GET /data/help`).
 
-#### Module 11A: Data Quality Inspection (`actions/review/quality.py`)
-- `FEAT-DATAMGR-QUALITY`: Gap detection, weekend checks, OHLC envelope verification, and quality reports.
-- `FR-DATAMGR-QUALITY-INSPECTION`: Anomaly scanning for gaps, spikes, envelopes, and weekends.
-- `FR-DATAMGR-QUALITY-SCORE-AND-PERSISTENCE`: Deterministic quality scoring and `datamgr_quality` persistence.
-- `FR-DATAMGR-QUALITY-SUMMARY-AND-DETAILS`: Summary metrics and paginated anomaly inspection.
+#### Module 11: Data Manager Actions & Transforms (`action.py`)
 
-#### Module 11B: Series Transforms (`actions/transform/transforms.py`)
-- `FEAT-DATAMGR-TRANSFORMS`: Timeframe resampling, timezone cloning, and session filtering.
-- `FR-DATAMGR-TRANSFORMS-RESAMPLE`: Bar and tick resampling into higher timeframe series.
-- `FR-DATAMGR-TRANSFORMS-TIMEZONE-CLONE`: Timezone shifting and weekend bar removal.
-- `FR-DATAMGR-TRANSFORMS-SESSION-ALIGNMENT`: Calendar-based session schedule filtering.
+- `FEAT-DATAMGR-ACTIONS`: High-level data transformation, multi-format export, quality audits, review, and batch operations.
+- `FR-DATAMGR-ACT-CLONE-TZ`: `Actions.clone_to_timezone(dataset_id: str, target_timezone: str, *, new_symbol: str | None = None, shift_hours: int | None = None, remove_weekends: bool = False) -> dict[str, Any]`; clones price data with bar timestamp shifting and weekend removal.
+- `FR-DATAMGR-ACT-DELETE`: `Actions.delete(dataset_ids: Sequence[str] | str, *, delete_files: bool = True) -> dict[str, Any]`; deletes one or more dataset catalog entries and optional underlying Parquet storage.
+- `FR-DATAMGR-ACT-EXPORT-CSV`: `Actions.export_to_csv(dataset_id: str, output_path: Path | str, *, format_name: str | None = None, custom_format: Mapping[str, Any] | None = None, date_from: str | None = None, date_to: str | None = None, session: str | None = None) -> dict[str, Any]`; exports price data to CSV format with custom headers, columns, and delimiters.
+- `FR-DATAMGR-ACT-NEW-FORMAT`: `Actions.new_format(format_spec: Mapping[str, Any]) -> dict[str, Any]`; registers and persists reusable CSV export format definitions in `host_entities`.
+- `FR-DATAMGR-ACT-EXPORT-MT4`: `Actions.export_to_mt4(dataset_id: str, output_dir: Path | str, *, mode: str = "all", symbol_alias: str | None = None, period: int = 1, digits: int = 5) -> dict[str, Any]`; exports price data into MetaTrader 4 FXT (v405) and HST (v401) binary files.
+- `FR-DATAMGR-ACT-EXPORT-MT5`: `Actions.export_to_mt5(dataset_id: str, output_dir: Path | str, *, symbol_alias: str | None = None, date_from: str | None = None, date_to: str | None = None, spread_type: str = "real", fixed_spread: int = 10) -> dict[str, Any]`; exports price data into MetaTrader 5 delimited bar/tick import format.
+- `FR-DATAMGR-ACT-REVIEW`: `Actions.review(dataset_id: str) -> dict[str, Any]`; computes dataset summary metrics, record counts, date boundaries, and completeness stats.
+- `FR-DATAMGR-ACT-REVIEW-DATA`: `Actions.review_data(dataset_id: str, *, offset: int = 0, limit: int = 100, date_from: str | None = None, date_to: str | None = None) -> dict[str, Any]`; extracts paginated raw bar records for tabular review.
+- `FR-DATAMGR-ACT-QUALITY`: `Actions.quality(dataset_id: str, *, max_gap_minutes: int = 60, check_envelope: bool = True, check_spikes: bool = True) -> dict[str, Any]`; executes data quality audit detecting gaps, weekend bars, negative values, and OHLC envelope violations.
+- `FR-DATAMGR-ACT-UPDATE`: `Actions.update(dataset_ids: Sequence[str] | str, *, mode: str = "missing") -> dict[str, Any]`; triggers historical market data downloads for selected datasets.
+- `FR-DATAMGR-ACT-UPDATE-ALL`: `Actions.update_all(*, mode: str = "missing") -> dict[str, Any]`; triggers historical market data downloads for all registered datasets.
 
 #### Unified Workspace Router (`routes.py`)
+
 - `FEAT-DATAMGR-SHELL`: Data Manager workspace Dockview container. Implemented
   scope: core dockable Instruments, Sessions, Brokers, Data and Custom Data
   panels, auxiliary Home/Stock groups/Log/Chart panels, and linked recorded preview.
@@ -258,7 +273,7 @@ All tables reside in the SQLite database and are accessed via `app.host.persiste
 | `datamgr_logs` | Audit Logs | `(id,)` | `timestamp_utc`, `action`, `message`, `symbol`, `details` |
 | `datamgr_operation_log` | Operation Logs | `(id,)` | `timestamp_utc`, `symbol`, `operation`, `status`, `message` |
 | `datamgr_quality` | Quality Reports | `(report_id,)` | `dataset_id`, `quality_score`, `total_records`, `anomalies_json` |
-| `datamgr_sessions` | Trading Sessions| `(id,)` | `name`, `timezone`, `windows_json`, `holidays_json`, `is_default` |
+| `datamgr_sessions` | Trading Sessions | `(id,)` | `name`, `timezone`, `windows_json`, `holidays_json`, `is_default` |
 | `datamgr_stock` | Basket Stocks | `(ID,)` | `TICKER`, `BASKET_ID`, `DATE_FROM`, `DATE_TO` |
 | `datamgr_stock_group` | Basket Groups | `(ID,)` | `NAME`, `SYSTEM`, `DESC`, `description` |
 | `datamgr_tickers` | Tickers | `(id,)` | `ticker`, `name`, `exchange`, `timeframe` |
@@ -269,6 +284,7 @@ All tables reside in the SQLite database and are accessed via `app.host.persiste
 ## 3. Partitioned Parquet Storage Layout
 
 High-frequency bars and ticks are stored as Apache Parquet files:
+
 - Datasets: `{data_dir}/history/{source}/{symbol}/{timeframe}.parquet`
 - Custom Data: `{data_dir}/custom_data/{name}.parquet`
 - Parquet columns: `timestamp` (UTC ISO string or int ms), `open`, `high`, `low`, `close`, `volume`, `spread`.
@@ -280,6 +296,7 @@ High-frequency bars and ticks are stored as Apache Parquet files:
 The Data Manager workspace exposes a headless CLI matching `docs/SQX/cli/qdmcli.md`:
 
 ### 4.1 Symbol Management (`-symbol`)
+
 - List symbols: `python -m app.cli -symbol action=list` or `python -m app.cli -l [csv=true]`
 - Add symbols: `python -m app.cli -symbol action=add datasource=dukascopy symbols=EURUSD,GBPUSD [instrument=EURUSD]` or `-a`
 - Edit symbol: `python -m app.cli -symbol action=edit symbol=EURUSD [underlying=EUR] [category=Forex]` or `-e`
@@ -288,6 +305,7 @@ The Data Manager workspace exposes a headless CLI matching `docs/SQX/cli/qdmcli.
 - Darwinex / MT5 symbols: `python -m app.cli -symbol action=darwinexsymbols [csv=true]`
 
 ### 4.2 Financial Instruments (`-instrument`)
+
 - List instruments: `python -m app.cli -instrument action=list` or `python -m app.cli -il [csv=true]`
 - Add instrument: `python -m app.cli -instrument action=add instrument=EURUSD pointsize=0.00001 pipsize=0.0001` or `-ia`
 - Edit instrument: `python -m app.cli -instrument action=edit instrument=EURUSD defaultspread=0.5` or `-ie`
@@ -295,12 +313,14 @@ The Data Manager workspace exposes a headless CLI matching `docs/SQX/cli/qdmcli.
 - Refresh specifications: `python -m app.cli -instrument action=refresh [symbols=EURUSD]` or `-ir`
 
 ### 4.3 Price Data Management (`-data`)
+
 - Update / download data: `python -m app.cli -data action=update symbols=EURUSD datasource=dukascopy timeframe=1m [from=YYYY-MM-DD] [to=YYYY-MM-DD]` or `-u`
 - Import data file: `python -m app.cli -data action=import symbol=EURUSD file=/path/to/data.csv timeframe=1m` or `-di`
 - Supported timezones: `python -m app.cli -data action=timezones` or `-tz`
 - List datasets: `python -m app.cli -data action=list [symbols=EURUSD] [csv=true]`
 
 ### 4.4 Broker Profiles (`-brokerprofile`)
+
 - List profiles: `python -m app.cli -brokerprofile action=list [csv=true]`
 - Add profile: `python -m app.cli -brokerprofile action=add broker=DemoBroker [timezone=UTC]`
 - Delete profile: `python -m app.cli -brokerprofile action=delete broker=DemoBroker`

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .action import Actions, ActionsCLI
 from .baskets import Basket
 from .broker import Broker, BrokerCLI
 from .data import Data, DataCLI
@@ -11,6 +12,8 @@ from .routes import AppDataManager, create_data_manager_router
 from .sessions import Sessions
 
 __all__ = [
+    "Actions",
+    "ActionsCLI",
     "AppDataManager",
     "Basket",
     "Broker",

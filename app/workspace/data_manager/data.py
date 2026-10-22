@@ -226,7 +226,7 @@ def _write_or_merge_partition(
     if metadata:
         meta_dict = {
             **(table.schema.metadata or {}),
-            **{k.encode(): str(v).encode() for k, v in metadata.items()},
+            **{k.encode(): v.encode() for k, v in metadata.items()},
         }
         table = table.replace_schema_metadata(meta_dict)
     tmp_path = part_path.with_suffix(f".tmp.{os.getpid()}.parquet")
@@ -468,7 +468,7 @@ class Data:
                 "date_from": "",
                 "date_to": "",
                 "partitions": [],
-                "path": str(part_root.as_posix()),
+                "path": part_root.as_posix(),
             }
 
         unit_scale = _resolve_tick_size(sym, tick_size)
@@ -546,7 +546,9 @@ class Data:
         meta: Mapping[str, Any],
     ) -> dict[str, Any]:
         pfiles = sorted(part_root.rglob("*.parquet"))
-        total_bars, min_dts, max_dts = 0, [], []
+        total_bars: int = 0
+        min_dts: list[datetime] = []
+        max_dts: list[datetime] = []
         for pf in pfiles:
             p_meta = pq.read_metadata(pf)
             total_bars += p_meta.num_rows
@@ -558,7 +560,7 @@ class Data:
         d_from = min(min_dts).isoformat() if min_dts else ""
         d_to = max(max_dts).isoformat() if max_dts else ""
         now_iso = datetime.now(UTC).isoformat()
-        rel_path = str(part_root.as_posix())
+        rel_path = part_root.as_posix()
 
         row = {
             "source": src,

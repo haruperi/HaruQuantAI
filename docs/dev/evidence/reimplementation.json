@@ -72,7 +72,7 @@
     "runtime_parity": "unqualified"
   },
   "minimum_record_number": 1,
-  "allocation_high_water_mark": 24,
+  "allocation_high_water_mark": 25,
   "records": {
     "SQX145-EV-000001": {
       "topic": "architecture.process.two_process_topology",
@@ -2488,6 +2488,138 @@
         "actions",
         "types",
         "order-not-defined",
+        "clean-room-parity"
+      ]
+    },
+    "SQX145-EV-000025": {
+      "topic": "datamanager.actions.data_operations",
+      "title": "SQX DataManagerActions UI operations and backend servlet endpoints",
+      "question": "How does SQX handle data cloning, deletion, multi-format export, review, quality audit, and updates?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "data_manager",
+          "actions"
+        ],
+        "conditions": [
+          "Static inspection of DataManagerActions plugin modules and DataManagerData.jar servlet endpoints."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX DataManagerActions delegates data mutations, reviews, and exports to /data/* servlet endpoints: cloneToTimezone shifts bar timestamps with weekend filtering, exportToCsv/MT4/MT5 generate delimited and binary files, review/reviewData/checkQuality compute summaries and anomaly tables, and update/updateAll invoke provider fetchers.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Static decompiled and source code inspection of frontend JS controllers and backend Java servlets."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataManagerActions/cloneToTimezone/CloneToTimezoneCtrl.js",
+          "location": {
+            "section": "CloneToTimezoneCtrl",
+            "symbol": "onCloneToTimezone",
+            "line_range": "1-125",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Controller declaring timezone cloning, shift parameters, and weekend removal options."
+          },
+          "inspection_method": "decrypted_source_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "31dbe99015c712d0bbd46bff1400cc73636f63aba00efe69250656b6f92fe391"
+          },
+          "accessed_at": "2026-10-22"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataManagerData/DataManagerData.jar",
+          "location": {
+            "section": "com.strategyquant.plugin.DataManager.impl.Data.DataServlet",
+            "symbol": "DataServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Servlet dispatcher handling cloneToTimezone, export, reviewData, checkQualitySummary, and updateAll."
+          },
+          "inspection_method": "bytecode_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4970124bec1bc7aead64d019b242d6895686981f9c338b4bee1d832aef28bcd5"
+          },
+          "accessed_at": "2026-10-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "registration_status": "registered",
+        "feature_ids": [
+          "FEAT-DATAMGR-ACTIONS"
+        ],
+        "requirement_ids": [
+          "FR-DATAMGR-ACT-CLONE-TZ",
+          "FR-DATAMGR-ACT-DELETE",
+          "FR-DATAMGR-ACT-EXPORT-CSV",
+          "FR-DATAMGR-ACT-NEW-FORMAT",
+          "FR-DATAMGR-ACT-EXPORT-MT4",
+          "FR-DATAMGR-ACT-EXPORT-MT5",
+          "FR-DATAMGR-ACT-REVIEW",
+          "FR-DATAMGR-ACT-REVIEW-DATA",
+          "FR-DATAMGR-ACT-QUALITY",
+          "FR-DATAMGR-ACT-UPDATE",
+          "FR-DATAMGR-ACT-UPDATE-ALL"
+        ],
+        "decision_ids": [
+          "DEC-DATAMGR-DUAL-STORAGE",
+          "DEC-DATAMGR-SQLITE-ISOLATION"
+        ],
+        "proposed_owner": null,
+        "proposed_feature_id": null,
+        "proposed_requirement_ids": [],
+        "proposed_decision_ids": [],
+        "notes": "Registered under FEAT-DATAMGR-ACTIONS in app/workspace/data_manager/README.md."
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "runtime",
+        "procedure": "Execute tests/unit/workspace/data_manager/test_action.py testing all 11 action operations.",
+        "expected_observation": "All 11 action methods pass asserting timestamp shifting, multi-format export, quality checks, review, and updates.",
+        "actual_observation": "test_action.py executed successfully covering clone_to_timezone, delete, export_to_csv, new_format, export_to_mt4, export_to_mt5, review, review_data, quality, update, and update_all.",
+        "artifact_paths": [
+          "tests/unit/workspace/data_manager/test_action.py"
+        ],
+        "executed_at": "2026-10-22T19:44:00+00:00"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "0d9fc8c",
+        "created_at": "2026-10-22T19:44:00+00:00",
+        "updated_at": "2026-10-22T19:44:00+00:00",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased servlet endpoints and controller action parameters only."
+      },
+      "tags": [
+        "datamanager",
+        "actions",
+        "csv-export",
+        "mt4-export",
+        "mt5-export",
+        "quality",
         "clean-room-parity"
       ]
     }
