@@ -375,5 +375,6 @@ def test_data_manager_package_facade_exports() -> None:
         "Home",
         "HomeCLI",
         "Instruments",
+        "Sessions",
         "create_data_manager_router",
     ]

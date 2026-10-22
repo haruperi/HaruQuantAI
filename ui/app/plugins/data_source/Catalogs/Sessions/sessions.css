@@ -7,3 +7,14 @@
 .session-elements-grid tbody tr{cursor:pointer}.session-element-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.session-element-actions span{margin-left:auto;color:var(--muted);font-size:10px}
 .session-error{color:var(--bad);border-left:3px solid var(--bad);background:#351d23;padding:9px;margin:0}.session-note{color:var(--muted);margin:0}
 @media(max-width:560px){.session-template-fields,.session-element-fields{grid-template-columns:1fr}.session-element-actions span{width:100%;margin-left:0}}
+
+.sessions-flow .session-form-body { border: 0; padding: 0; margin: 0; min-width: 0; }
+.sessions-flow .session-holiday-fields { display: grid; grid-template-columns: 160px 1fr auto; gap: 8px; align-items: end; margin-bottom: 8px; }
+.sessions-flow .session-elements-grid { max-height: 230px; overflow: auto; }
+
+@media(max-width:560px) { .sessions-flow .session-holiday-fields { grid-template-columns: 1fr; } }
+
+.data-manager .session-grid .session-table { table-layout: auto; min-width: 1100px; }
+.data-manager .session-table th:first-child, .data-manager .session-table td:first-child { width: 26px; }
+.data-manager .session-table td:nth-child(5), .data-manager .session-table td:nth-child(6), .data-manager .session-table td:nth-child(7) { white-space: normal; overflow-wrap: anywhere; min-width: 170px; max-width: 330px; padding-top: 6px; padding-bottom: 6px; }
+.data-manager .session-calendar-line { display: block; margin: 2px 0; }

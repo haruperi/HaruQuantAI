@@ -8,10 +8,8 @@ import {
 } from '../../FileImport/fileSymbols';
 import { parseSessionsJson, type SessionDefinition } from '../Sessions/sessions';
 import { effectiveInstruments } from '../../FileImport/fileSymbols';
-import { effectiveSessions } from '../Sessions/sessions';
 import { useFileSymbols } from '../../FileImport/fileSymbolsStore';
-import { useSessions } from '../Sessions/sessionStore';
-import { projectBrokerInstruments, projectBrokerSessions, type BrokerProfile } from './brokerProfiles';
+import { projectBrokerInstruments, type BrokerProfile } from './brokerProfiles';
 import { inspectXmlOverview, importXmlRecords } from './brokerApiClient';
 import './brokerProfiles.css';
 
@@ -27,7 +25,6 @@ export function BrokerRecordImportDialog({
   onSaved: (message: string) => void;
 }) {
   const instruments = useFileSymbols();
-  const sessions = useSessions();
   const [fileName, setFileName] = useState('');
   const [rows, setRows] = useState<(FileInstrument | SessionDefinition)[]>([]);
   const [rawContent, setRawContent] = useState('');
@@ -111,16 +108,7 @@ export function BrokerRecordImportDialog({
         }
         instruments.importInstruments(projected, conflicts, brokerChoices.map(row => row.id));
       } else {
-        const projected = projectBrokerSessions(rows as SessionDefinition[], selected, broker, postfix);
-        const current = effectiveSessions(sessions.sessions, sessions.overrides, sessions.removed);
-        const conflicts = projected
-          .map(row => current.find(item => item.name.toLowerCase() === row.name.toLowerCase())?.name)
-          .filter((v): v is string => Boolean(v));
-        if (conflicts.length && !force) {
-          setConfirm(conflicts);
-          return;
-        }
-        sessions.importForBroker(projected, conflicts);
+        throw new Error('Broker session import is not implemented. Configure profiles in Sessions.');
       }
       onSaved(`File with ${kind === 'instrument' ? 'instruments' : 'sessions'} was imported`);
       onClose();

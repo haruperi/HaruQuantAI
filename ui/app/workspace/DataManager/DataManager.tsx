@@ -34,11 +34,10 @@ import { useInstruments } from '../../plugins/data_source/Catalogs/Instruments/i
 import { InstrumentsModal } from '../../plugins/data_source/Catalogs/Instruments/InstrumentsModal';
 import type { CatalogInstrument } from '../../plugins/data_source/Catalogs/Instruments/instrumentsApiClient';
 import { InstrumentTransferDialog } from '../../plugins/data_source/Catalogs/Instruments/InstrumentTransferDialog';
-import { SessionTemplateDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionTemplateDialog';
-import { CloneSessionDialog } from '../../plugins/data_source/Catalogs/Sessions/CloneSessionDialog';
+import { SessionsModal } from '../../plugins/data_source/Catalogs/Sessions/SessionsModal';
 import { SessionTransferDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionTransferDialog';
 import { SessionNtImportDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionNtImportDialog';
-import { effectiveSessions, type SessionBroker, type SessionDefinition } from '../../plugins/data_source/Catalogs/Sessions/sessions';
+import { type SessionBroker, type CatalogSession } from '../../plugins/data_source/Catalogs/Sessions/sessions';
 import { useSessions } from '../../plugins/data_source/Catalogs/Sessions/sessionStore';
 import { ExternalIndicatorEditorDialog } from '../../plugins/data_source/Indicators/ExternalIndicatorEditorDialog';
 import { ExternalIndicatorImportDialog } from '../../plugins/data_source/Indicators/ExternalIndicatorImportDialog';
@@ -126,10 +125,10 @@ type InstrumentDialogState =
   | { kind: 'clone'; source: CatalogInstrument }
   | { kind: 'transfer'; mode: 'save' | 'load'; selected: CatalogInstrument[] };
 type SessionDialogState =
-  | { kind:'editor'; mode:'add'|'edit'; source?:SessionDefinition }
-  | { kind:'clone'; source:SessionDefinition }
-  | { kind:'delete'; selected:SessionDefinition[] }
-  | { kind:'transfer'; mode:'save'|'load'; selected:SessionDefinition[] }
+  | { kind:'editor'; mode:'add'|'edit'; source?:CatalogSession }
+  | { kind:'clone'; source:CatalogSession }
+  | { kind:'delete'; selected:CatalogSession[] }
+  | { kind:'transfer'; mode:'save'|'load'; selected:CatalogSession[] }
   | { kind:'import-nt' };
 type ExternalIndicatorDialogState =
   | { kind: 'editor'; mode: 'add' | 'edit'; source?: ExternalIndicatorDefinition }
@@ -343,15 +342,10 @@ export function DataManager() {
   const liveInstruments = useInstruments(state => state.instruments);
   const fileDefinitions = useFileSymbols(state => state.definitions);
   const customSessions = useSessions(state => state.sessions);
-  const sessionOverrides = useSessions(state => state.overrides);
-  const removedSessions = useSessions(state => state.removed);
   const exports = useDataExports();
   const tools = useDataTools();
   const externalIndicators = useExternalIndicators();
   const stockGroups = useStockGroups();
-  useEffect(() => {
-    void useSessions.getState().refreshFromServer();
-  }, []);
   useEffect(() => { void useStockGroups.getState().syncRemote(); }, []);
   useEffect(() => { try { useStockGroups.getState().syncImports(imports.groups); } catch { /* surfaced by the store and later actions */ } }, [imports.groups]);
   useEffect(() => { if (stockGroups.job?.state !== 'running') return; const timer = window.setInterval(() => useStockGroups.getState().advance(), 220); return () => window.clearInterval(timer); }, [stockGroups.job?.state]);
@@ -445,6 +439,15 @@ export function DataManager() {
   const [sessionDialog,setSessionDialog]=useState<SessionDialogState|null>(null);
   const [selectedSessionIds,setSelectedSessionIds]=useState<string[]>([]);
   const [sessionError,setSessionError]=useState('');
+  const [sessionDeleting,setSessionDeleting]=useState(false);
+  const sessionDeleteBusy=useRef(false);
+  useEffect(()=>{
+    if(hostStatus!=='online'){useSessions.getState().reset();setSessionDialog(null);setSelectedSessionIds([]);return;}
+    void useSessions.getState().refreshFromServer();
+    return()=>useSessions.getState().reset();
+  },[hostStatus]);
+  useEffect(()=>{if(hostStatus==='online'&&tab==='Sessions')void useSessions.getState().refreshFromServer();},[hostStatus,tab]);
+  useEffect(()=>{setSelectedSessionIds(current=>current.filter(id=>customSessions.some(row=>row.id===id)));},[customSessions]);
   const [externalDialog, setExternalDialog] = useState<ExternalIndicatorDialogState | null>(null);
   const [selectedExternalNames, setSelectedExternalNames] = useState<string[]>([]);
   const [stockGroupDialog, setStockGroupDialog] = useState<StockGroupDialogState | null>(null);
@@ -667,16 +670,30 @@ export function DataManager() {
     ...brokerProfiles.filter(profile => profile.mtUse).map(profile => ({ id: profile.id, name: profile.name, postfix: profile.postfix, timezone: profile.timezone })),
   ];
   const sessionBrokers:SessionBroker[]=[{id:'-1',name:'Default',postfix:''},...brokerProfiles.filter(profile=>profile.mtUse).map(profile=>({id:profile.id,name:profile.name,postfix:profile.postfix}))];
-  const sessionRows=effectiveSessions(customSessions,sessionOverrides,removedSessions);
+  const sessionRows=customSessions;
   const selectedBrokers=brokerProfiles.filter(item=>selectedBrokerIds.includes(item.id));
   const requireBrokers=():BrokerProfile[]|null=>{if(selectedBrokers.length){setSelectionMessage('');return selectedBrokers;}setSelectionMessage('You have to select some broker.');return null;};
   const openBrokerEdit=(profile:BrokerProfile)=>{setSelectedBrokerIds([profile.id]);if(profile.system){setSelectionMessage("This broker can't be edited.");return;}setBrokerDialog({kind:'editor',mode:'edit',source:profile});};
   const updateBrokers=(items:BrokerProfile[])=>{try{if(anyDataActive)throw new Error('Finish or stop the active data operation first.');if(!items[0].stockPickerUse)throw new Error('This function is for stockpicking broker profile only.');useDataManagerStore.getState().startBrokerUpdate(items.map(row=>row.id),toolRows.map(row=>row.symbol));setProgressOwner('broker');setOperationState('idle');setSelectionMessage('');notify('Data update started, please check Log tab for more information.');}catch(cause){setSelectionMessage(cause instanceof Error?cause.message:'Unable to update broker data.');}};
-  const selectedSessions=sessionRows.filter(item=>selectedSessionIds.includes(item.name));
-  const requireSessions=():SessionDefinition[]|null=>{if(selectedSessions.length){setSelectionMessage('');return selectedSessions;}setSelectionMessage('You have to select some session.');return null;};
-  const openSessionEdit=(item:SessionDefinition)=>{setSelectedSessionIds([item.name]);setSessionError('');setSessionDialog({kind:'editor',mode:'edit',source:item});};
-  const openSessionDelete=(items:SessionDefinition[])=>{setSelectedSessionIds(items.map(item=>item.name));setSessionError('');setSessionDialog({kind:'delete',selected:items});};
-  const removeSelectedSessions=()=>{if(sessionDialog?.kind!=='delete')return;try{const names=sessionDialog.selected.map(item=>item.name);useSessions.getState().remove(names,instrumentRows.map(item=>(item as {session?:string}).session??''));setSelectedSessionIds(current=>current.filter(name=>!names.includes(name)));notify(`${names.length} session${names.length===1?'':'s'} removed.`);setSessionDialog(null);setSessionError('');}catch(cause){setSessionError(cause instanceof Error?cause.message:'Unable to remove sessions.');}};
+  const selectedSessions=sessionRows.filter(item=>selectedSessionIds.includes(item.id));
+  const requireSessions=():CatalogSession[]|null=>{if(selectedSessions.length){setSelectionMessage('');return selectedSessions;}setSelectionMessage('You have to select some session.');return null;};
+  const openSessionEdit=(item:CatalogSession)=>{setSelectedSessionIds([item.id]);setSessionError('');setSessionDialog({kind:'editor',mode:'edit',source:item});};
+  const openSessionDelete=(items:CatalogSession[])=>{setSelectedSessionIds(items.map(item=>item.id));setSessionError('');setSessionDialog({kind:'delete',selected:items});};
+  const removeSelectedSessions=async()=>{
+    if(sessionDialog?.kind!=='delete'||sessionDeleteBusy.current)return;
+    sessionDeleteBusy.current=true;setSessionDeleting(true);setSessionError('');
+    const epoch=useSessions.getState().epoch;
+    try{
+      const result=await useSessions.getState().remove(sessionDialog.selected.map(row=>row.id));
+      if(epoch!==useSessions.getState().epoch)return;
+      setSelectedSessionIds(current=>current.filter(id=>!result.deleted.includes(id)));
+      if(result.failed.length){
+        setSessionDialog({kind:'delete',selected:sessionDialog.selected.filter(row=>result.failed.includes(row.id))});
+        setSessionError(`${result.deleted.length} deleted; ${result.failed.length} could not be deleted. Retry the remaining sessions.`);
+      }else{notify(`${result.deleted.length} sessions deleted.`);setSessionDialog(null);}
+    }catch(cause){if(epoch===useSessions.getState().epoch)setSessionError(cause instanceof Error?cause.message:'Unable to delete sessions.');}
+    finally{sessionDeleteBusy.current=false;setSessionDeleting(false);}
+  };
   const selectedExternal = externalIndicators.definitions.filter(item => selectedExternalNames.includes(item.name));
   const requireExternal = (): ExternalIndicatorDefinition[] | null => { if (selectedExternal.length) { setSelectionMessage(''); return selectedExternal; } setSelectionMessage('You have to select at least one indicator.'); return null; };
   const openExternalEdit = (item: ExternalIndicatorDefinition) => { setSelectedExternalNames([item.name]); setSelectionMessage(''); setExternalDialog({ kind: 'editor', mode: 'edit', source: item }); };
@@ -741,8 +758,8 @@ export function DataManager() {
       <Button className="action-clone" onClick={()=>{const rows=requireSessions();if(rows)setSessionDialog({kind:'clone',source:rows[0]});}}><CopyPlus size={26} aria-hidden="true"/>Clone Session</Button>
       <Button className="action-delete" onClick={()=>{const rows=requireSessions();if(rows)openSessionDelete(rows);}}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
       <Button className="action-save" onClick={()=>{const rows=requireSessions();if(rows)setSessionDialog({kind:'transfer',mode:'save',selected:rows});}}><Save size={26} aria-hidden="true"/>Save</Button>
-      <Button className="action-load" onClick={()=>setSessionDialog({kind:'transfer',mode:'load',selected:[]})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
-      <Button id="datamanager-session-import-ninja-trader" className="action-import-nt" onClick={()=>setSessionDialog({kind:'import-nt'})}><Download size={26} aria-hidden="true"/>Import NinjaTrader sessions</Button>
+      <Button className="action-load" disabled title="Session import is not implemented"><FolderOpen size={26} aria-hidden="true"/>Load</Button>
+      <Button id="datamanager-session-import-ninja-trader" className="action-import-nt" disabled title="Session import is not implemented"><Download size={26} aria-hidden="true"/>Import NinjaTrader sessions</Button>
     </div>}
     {tab === 'External indicators' && <div className="management-actions" aria-label="External indicator operations">
       <Button className="action-add" onClick={() => setExternalDialog({ kind: 'editor', mode: 'add' })}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>
@@ -765,7 +782,7 @@ export function DataManager() {
       <Button className="action-add" onClick={()=>setBrokerDialog({kind:'editor',mode:'add'})}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>
       <Button className="action-clone" onClick={()=>{const rows=requireBrokers();if(rows)updateBrokers(rows);}}><RefreshCw size={26} aria-hidden="true"/>Update data for broker (automatic)</Button>
       <Button className="action-edit" onClick={()=>setBrokerDialog({kind:'import',recordType:'instrument'})}><FileInput size={26} aria-hidden="true"/>Import broker instruments from MT4/MT5</Button>
-      <Button className="action-load" onClick={()=>setBrokerDialog({kind:'import',recordType:'session'})}><CalendarPlus size={26} aria-hidden="true"/>Import broker sessions from MT4/MT5</Button>
+      <Button className="action-load" disabled title="Broker session import is not implemented"><CalendarPlus size={26} aria-hidden="true"/>Import broker sessions from MT4/MT5</Button>
       <Button className="action-edit" onClick={()=>{const rows=requireBrokers();if(!rows)return;const row=rows[0];if(!row.stockPickerUse){setSelectionMessage("This broker profile can't hold any stocks.");return;}setBrokerDialog({kind:'stocks',source:row});}}><ListPlus size={26} aria-hidden="true"/>Edit stocks</Button>
       <Button className="action-delete" onClick={()=>{const rows=requireBrokers();if(!rows)return;if(rows.some(row=>instrumentRows.some(item=>item.broker===row.id)||sessionRows.some(item=>item.broker===row.id))){setSelectionMessage('You have to select broker which is not used by any instrument or session.');return;}const deletable=rows.filter(row=>!row.system);if(!deletable.length){setSelectionMessage('You have to select some non default broker.');return;}setBrokerDialog({kind:'delete',selected:deletable});}}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
       <Button className="action-save" onClick={async ()=>{
@@ -833,10 +850,10 @@ export function DataManager() {
   {instrumentDialog?.kind === 'transfer' && (
     <InstrumentTransferDialog mode={instrumentDialog.mode} selected={instrumentDialog.selected} all={instrumentRows} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
   )}
-  {sessionDialog?.kind==='editor'&&<SessionTemplateDialog mode={sessionDialog.mode} source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
-  {sessionDialog?.kind==='clone'&&<CloneSessionDialog source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
+  {sessionDialog?.kind==='editor'&&<SessionsModal mode={sessionDialog.mode} source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
+  {sessionDialog?.kind==='clone'&&<SessionsModal mode="clone" source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
   {sessionDialog?.kind==='transfer'&&<SessionTransferDialog mode={sessionDialog.mode} selected={sessionDialog.selected} all={sessionRows} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
-  {sessionDialog?.kind==='delete'&&<div className="sessions-flow"><Modal title="Removing sessions" width={520} onClose={()=>{setSessionDialog(null);setSessionError('');}} footer={<><Button onClick={()=>{setSessionDialog(null);setSessionError('');}}>No</Button><Button className="primary" onClick={removeSelectedSessions}>Yes</Button></>}>{sessionError&&<p role="alert" className="session-error">{sessionError}</p>}<p>Are you sure you want to remove selected sessions ({sessionDialog.selected.length})?</p></Modal></div>}
+  {sessionDialog?.kind==='delete'&&<div className="sessions-flow"><Modal title="Removing sessions" width={520} onClose={()=>{if(!sessionDeleteBusy.current){setSessionDialog(null);setSessionError('');}}} footer={<><Button disabled={sessionDeleting} onClick={()=>{setSessionDialog(null);setSessionError('');}}>No</Button><Button disabled={sessionDeleting} className="primary" onClick={()=>void removeSelectedSessions()}>{sessionDeleting?'Deleting…':'Yes'}</Button></>}>{sessionError&&<p role="alert" className="session-error">{sessionError}</p>}<p>Are you sure you want to remove selected sessions ({sessionDialog.selected.length})?</p></Modal></div>}
   {sessionDialog?.kind==='import-nt'&&<SessionNtImportDialog onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
   {externalDialog?.kind === 'editor' && <ExternalIndicatorEditorDialog mode={externalDialog.mode} source={externalDialog.source} onClose={() => setExternalDialog(null)} onSaved={message => notify(message)}/>}
   {externalDialog?.kind === 'import' && <ExternalIndicatorImportDialog item={externalDialog.source} externalActive={otherProviderActive} onClose={() => setExternalDialog(null)} onStarted={() => { setProgressOwner('external'); setOperationState('idle'); setSelectionMessage(''); notify('Importing indicator data.'); }}/>}

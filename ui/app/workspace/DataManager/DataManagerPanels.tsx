@@ -1,8 +1,9 @@
+import { useSessions } from '../../plugins/data_source/Catalogs/Sessions/sessionStore';
 import { useState } from 'react';
 import { Button } from '../../components/ui';
 import { brokerCounts, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
 import { type FileInstrument } from '../../plugins/data_source/FileImport/fileSymbols';
-import { type SessionDefinition, type SessionBroker } from '../../plugins/data_source/Catalogs/Sessions/sessions';
+import { type SessionDefinition, type CatalogSession, type SessionBroker } from '../../plugins/data_source/Catalogs/Sessions/sessions';
 import { summarizeGroup, type StockGroupDefinition } from '../../plugins/data_source/Catalogs/StockGroups/stockGroups';
 import { activeExternalLines, externalTypeLabel, externalIndicatorTypes, type ExternalIndicatorDefinition } from '../../plugins/data_source/Indicators/externalIndicators';
 import { useExternalIndicators } from '../../plugins/data_source/Indicators/externalIndicatorsStore';
@@ -67,27 +68,33 @@ export function ExternalIndicatorsTable({ rows: allRows, selected, job, onSelect
   </main>;
 }
 
-export function SessionTable({ rows:allRows, selected, onSelect, onEdit, onDelete, brokers }:{rows:SessionDefinition[];selected:string[];onSelect:(names:string[])=>void;onEdit:(item:SessionDefinition)=>void;onDelete:(item:SessionDefinition)=>void;brokers:SessionBroker[]}) {
+export function SessionTable({ rows:allRows, selected, onSelect, onEdit, onDelete, brokers }:{rows:CatalogSession[];selected:string[];onSelect:(names:string[])=>void;onEdit:(item:CatalogSession)=>void;onDelete:(item:CatalogSession)=>void;brokers:SessionBroker[]}) {
+  const sessionState=useSessions();
   const [query, setQuery] = useState('');
   const [broker,setBroker]=useState('');
   const rows=allRows.filter(item=>(!broker||item.broker===broker)&&(item.name+' '+item.brokerName).toLowerCase().includes(query.toLowerCase())).sort((a,b)=>a.name.localeCompare(b.name));
-  const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.name));
+  const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.id));
   return <main className="full dataset-workspace" aria-label="Sessions">
+    {sessionState.error&&<p role="alert">{sessionState.loaded?'Showing the last server snapshot. ':''}{sessionState.error}</p>}
+    {sessionState.isSyncing&&<p role="status">Loading session profiles…</p>}
     <div className="dataset-filters">
       <input className="text-input" aria-label="Filter sessions" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
       <select className="text-input" aria-label="Session broker profile" value={broker} onChange={event=>setBroker(event.target.value)}><option value="">All broker profiles</option>{brokers.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select>
+      <Button disabled={sessionState.isSyncing} onClick={()=>void sessionState.refreshFromServer()}>Refresh sessions</Button>
     </div>
     <div className="dataset-grid session-grid"><table className="plain-table session-table" aria-label="Sessions">
-      <colgroup><col style={{ width: 26 }}/><col style={{ width: 500 }}/><col style={{ width: 150 }}/><col/><col style={{ width: 26 }}/></colgroup>
+
       <thead><tr>
-        <th><input type="checkbox" aria-label="Select all visible sessions" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(name => !rows.some(item=>item.name===name)) : [...new Set([...selected, ...rows.map(item=>item.name)])])}/></th>
-        <th>Session Name</th><th>Broker profile</th><th aria-label="Unused space"/><th aria-label="Row actions"/>
+        <th><input type="checkbox" aria-label="Select all visible sessions" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(name => !rows.some(item=>item.id===name)) : [...new Set([...selected, ...rows.map(item=>item.id)])])}/></th>
+        <th>Session Name</th><th>Description</th><th>Timezone</th><th>Intervals</th><th>Holidays</th><th aria-label="Row actions"/>
       </tr></thead>
-      <tbody>{rows.map(item => <tr key={item.name} className={selected.includes(item.name) ? 'selected' : ''} onDoubleClick={()=>onEdit(item)}>
-        <td><input type="checkbox" aria-label={`Select session ${item.name}`} checked={selected.includes(item.name)} onChange={() => onSelect(selected.includes(item.name) ? selected.filter(name=>name!==item.name) : [...selected,item.name])}/></td>
-        <td>{item.name}</td><td>{item.brokerName||'—'}</td><td/>
+      <tbody>{rows.map(item => <tr key={item.name} className={selected.includes(item.id) ? 'selected' : ''} onDoubleClick={()=>onEdit(item)}>
+        <td><input type="checkbox" aria-label={`Select session ${item.name}`} checked={selected.includes(item.id)} onChange={() => onSelect(selected.includes(item.id) ? selected.filter(name=>name!==item.id) : [...selected,item.id])}/></td>
+        <td>{item.name}</td><td>{item.description}</td><td>{item.timezone}</td>
+        <td>{item.elements.map((el,index)=><span className="session-calendar-line" key={index}>{el.dayFrom} {el.timeFrom}–{el.dayTo} {el.timeTo}</span>)}</td>
+        <td>{item.holidays.map(day=><span className="session-calendar-line" key={day.date_str}>{day.date_str} {day.description}</span>)}</td>
         <td><button className="instrument-remove" aria-label={`Delete session ${item.name}`} onClick={()=>onDelete(item)}>×</button></td>
-      </tr>)}{!rows.length && <tr><td colSpan={5} className="dataset-empty">No matching sessions.</td></tr>}</tbody>
+      </tr>)}{!rows.length && <tr><td colSpan={7} className="dataset-empty">{sessionState.isSyncing ? 'Loading session profiles...' : sessionState.error ? 'Session profiles could not be loaded.' : sessionState.loaded ? 'No matching sessions.' : 'Session profiles have not been loaded.'}</td></tr>}</tbody>
     </table></div>
   </main>;
 }

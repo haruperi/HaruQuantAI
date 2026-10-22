@@ -10,6 +10,21 @@ Registered target scope does not establish independently verified donor parity.
 ## 1. Domain Registry (`FEAT-DATAMGR-*`, `FR-DATAMGR-*`, `DEC-DATAMGR-*`)
 
 ### 1.1 Architectural Decisions
+- `DEC-DATAMGR-SESS-PROFILE-TEMPLATES`: Saved `datamgr_sessions` rows are
+  reusable profiles/templates; no duplicate browser or entity catalog. Explicit
+  IDs update existing profiles; an absent ID creates one. Intervals and holidays
+  commit atomically through HostPersistence. Missing IDs never become inserts.
+- `DEC-DATAMGR-SESS-WALL-CLOCK-SHIFT`: Clone offsets are integer minutes within
+  +/-1440, shifting both interval endpoints with weekday/week rollover while
+  preserving seconds, duration, EOD/type, broker and timezone. Holiday civil
+  dates stay unchanged. This is a deliberate local-schedule adjustment, not an
+  instant-preserving zone conversion or automatic DST correction.
+- `DEC-DATAMGR-SESS-INTERVALS`: Each configured window is one continuous weekly
+  interval with explicit start/end weekdays and HH:MM or HH:MM:SS times. Profile
+  validation uses half-open intervals, permits adjacency and lunch gaps, and
+  rejects overlap/zero duration. Empty profiles are unconfigured/closed. Full-day
+  holidays use real unique ISO dates in the profile timezone. These configuration
+  rules do not certify or change the shared TradingSession runtime evaluator.
 - `DEC-DATAMGR-INSTR-SPEC-EXTENSIONS`: Instrument columns remain authoritative in
   `datamgr_instruments`. Version-1 `host_entities` payloads of type
   `datamgr_instrument_specs`, keyed by immutable symbol, hold independent
@@ -106,6 +121,43 @@ Registered target scope does not establish independently verified donor parity.
 
 #### Module 4: Trading Sessions & Calendars (`sessions.py`)
 - `FEAT-DATAMGR-SESSIONS`: TradingSession calendar engine, schedules, holidays, and NT8 import.
+- `FR-DATAMGR-SESS-LIST`: `Sessions.sessions(filters: Mapping[str, Any] | None = None) -> list[dict[str, Any]]`;
+  GET `/data/sessions` lists every saved profile, including timezone, complete
+  windows, holiday calendar, description, default flag and broker identity.
+  Optional search/broker_id/timezone filters do not use browser seeds or caches.
+- Stored-window compatibility: reads accept `day_of_week` with either
+  `open_time`/`close_time` or `start_time`/`end_time`. Numeric days use the historical
+  zero-based contract (0 Monday, 6 Sunday); missing EOD uses the historical target
+  default False. `normalization_warnings` reports applied aliases/defaults to the
+  edit form; absent EOD is not an explicitly stored False. Reads never rewrite
+  rows. Explicit saves may materialize canonical fields. New API writes remain
+  canonical and strict; conflicting aliases and malformed schedules fail visibly.
+- `FR-DATAMGR-SESS-CLONE`: `Sessions.clone_session(session_id: str, new_name: str, *, timezone_offset: int = 0, delete: bool = False) -> dict[str, Any]`;
+  POST `/data/sessions/clone` copies a saved profile to a new ID/name with an
+  explicit minute shift and is_default=False. An explicitly empty source ID
+  creates a UTC unconfigured draft with zero shift; an unknown nonempty ID fails.
+  DELETE `/data/sessions/{id}` invokes delete=True with empty name/zero offset.
+- `FR-DATAMGR-SESS-ELEMENT`: `Sessions.session_element(session_id: str, element: Mapping[str, Any]) -> dict[str, Any]`;
+  POST `/data/sessions/{id}/elements` accepts add/update/remove commands, an
+  optional index and window as required, and validates the full resulting
+  schedule before saving. Removing all intervals leaves an explicitly closed profile.
+- `FR-DATAMGR-SESS-TEMPLATE`: `Sessions.session_template(template: Mapping[str, Any]) -> dict[str, Any]`;
+  POST `/data/sessions` creates or edits complete reusable profiles, including
+  interval and holiday arrays, with immutable name/ID on edit. Rejects invalid
+  zones/dates, unknown fields, nonconfigured broker IDs and duplicate names.
+- These four methods and SessionsModal.tsx are implemented. Forms wait for
+  confirmation and retain errors; existing-profile interval commands save
+  immediately, with this behavior stated in the form. New profiles remain drafts
+  until Save. Multi-selection deletion reports confirmed and failed IDs separately;
+  it does not claim batch atomicity. Read-only JSON exports preserve all metadata.
+- HTTP creation/clone returns 201; edits/delete 200, invalid input 422, missing
+  IDs 404, conflicts 409 and sanitized unavailable-storage failures 503, with
+  authenticated ApiResponse envelopes. Malformed stored calendars fail explicitly.
+- Remaining scope: shared runtime evaluator integration/certification, automatic
+  timezone conversion, partial holidays, conflict resolution across concurrent
+  editors, XML/NT8/broker-session imports and instrument-session foreign keys.
+  Unsupported import entry points are disabled. No schema migration or live
+  exchange-calendar synchronization is part of this slice.
 - `FR-DATAMGR-SESSIONS-CALENDAR-MODEL`: Day-of-week windows, RTH/ETH schedules, and holiday evaluation.
 - `FR-DATAMGR-SESSIONS-CATALOG-CRUD`: Session calendar management in `datamgr_sessions`.
 - `FR-DATAMGR-SESSIONS-SQX-XML`: Native SQX Sessions XML serialization and deserialization.
