@@ -6,24 +6,19 @@ Description:
     structured error taxonomy (`StandardError`), execution metadata
     (`ResponseMetadata`), and HTTP/CLI dictionary builder (`ApiResponse`) across
     the HaruQuantAI host subsystem. Enforces structural invariants, automatic UTC
-    timestamps, and structured telemetry logging for every public operation.
+    timestamps, nested snapshots, strict JSON exports, and structured telemetry.
 
 Purpose:
     FEAT-HOST-RESPONSE: Canonical REST, WebSocket, and CLI response and error
     envelope across the repository.
 
 Key Capabilities:
-    - FR-HOST-RESPONSE-SUCCESS-ENVELOPE: Success envelopes (StandardResponse, ok).
-    - FR-HOST-RESPONSE-ERROR-ENVELOPE: Error taxonomy & envelopes (failure, error).
-    - FR-HOST-RESPONSE-SERIALIZATION: Serialize envelopes to dicts (to_dict).
+    - FR-HOST-RESPONSE-SUCCESS-ENVELOPE: success()/ok() envelopes -> INFO.
+    - FR-HOST-RESPONSE-ERROR-ENVELOPE: failure()/error() envelopes -> WARNING.
+    - FR-HOST-RESPONSE-SERIALIZATION: to_dict() JSON export -> DEBUG.
 
 Python API Usage:
-    from app.host.response import (
-        ApiResponse,
-        ResponseMetadata,
-        StandardError,
-        StandardResponse,
-    )
+    from app.host.response import ApiResponse, StandardResponse
 
     resp = StandardResponse.success(data={"symbol": "EURUSD"}, request_id="req-1")
     payload = ApiResponse.ok(data={"symbol": "EURUSD"}, request_id="req-1")
@@ -36,11 +31,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from collections.abc import Mapping, Sequence
-from dataclasses import asdict, dataclass, field, is_dataclass
-from datetime import UTC, datetime
-from typing import Any, Final, Literal
+from dataclasses import dataclass, field, fields, is_dataclass
+from datetime import UTC, date, datetime
+from pathlib import Path
+from types import MappingProxyType
+from typing import Any, Final, Literal, cast
 
 from app.host.logging import get_logger
 
@@ -67,86 +65,134 @@ def _now_utc_iso() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def _serialize_payload(val: Any) -> Any:
-    """Recursively convert dataclass instances in payloads to dictionaries."""
-    if is_dataclass(val) and not isinstance(val, type):
-        return asdict(val)
-    if isinstance(val, dict):
-        return {k: _serialize_payload(v) for k, v in val.items()}
-    if isinstance(val, (list, tuple)):
-        return [_serialize_payload(item) for item in val]
-    return val
+def _json_scalar(value: Any) -> Any:
+    """Normalize supported scalar values without inspecting unknown objects."""
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("Response numbers must be finite.")
+        return value
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, Path):
+        return str(value)
+    raise TypeError("Unsupported response payload type.")
+
+
+def _snapshot(value: Any, active: frozenset[int] = frozenset()) -> Any:
+    """Freeze a detached JSON-shaped snapshot, rejecting ancestor cycles."""
+    if id(value) in active:
+        raise ValueError("Cyclic response payload is not supported.")
+    nested = active | {id(value)}
+    if is_dataclass(value) and not isinstance(value, type):
+        return _snapshot(
+            {f.name: getattr(value, f.name) for f in fields(value)}, nested
+        )
+    if isinstance(value, Mapping):
+        if any(not isinstance(key, str) for key in value):
+            raise TypeError("Response mapping keys must be strings.")
+        return MappingProxyType({k: _snapshot(v, nested) for k, v in value.items()})
+    if isinstance(value, (list, tuple, set, frozenset)):
+        items = tuple(_snapshot(item, nested) for item in value)
+        if isinstance(value, (set, frozenset)):
+            items = tuple(
+                sorted(
+                    items,
+                    key=lambda v: json.dumps(_serialize_payload(v), sort_keys=True),
+                )
+            )
+        return items
+    return _json_scalar(value)
+
+
+def _serialize_payload(value: Any) -> Any:
+    """Thaw immutable snapshots into independent JSON containers."""
+    if is_dataclass(value) and not isinstance(value, type):
+        return {
+            f.name: _serialize_payload(getattr(value, f.name)) for f in fields(value)
+        }
+    if isinstance(value, Mapping):
+        return {k: _serialize_payload(v) for k, v in value.items()}
+    if isinstance(value, tuple):
+        return [_serialize_payload(item) for item in value]
+    return _json_scalar(value)
+
+
+def _duration(value: Any) -> float | None:
+    """Validate finite nonnegative duration without coercing bool or text."""
+    if value is None:
+        return None
+    message = "duration_ms cannot be negative or nonfinite; expected a number."
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(message)
+    try:
+        duration = float(value)
+    except OverflowError:
+        raise ValueError(message) from None
+    if not math.isfinite(duration) or duration < 0:
+        raise ValueError(message)
+    return duration
 
 
 @dataclass(frozen=True, slots=True)
 class StandardError:
-    """Structured operation failure representation.
-
-    Attributes:
-        code: Machine-readable error code identifier.
-        message: Bounded human-readable error summary.
-        details: Optional structured dictionary containing error context.
-        retryable: Indicates whether the failed operation may be retried safely.
-    """
+    """Structured operation failure representation."""
 
     code: str
     message: str
-    details: dict[str, Any] | None = None
+    details: Mapping[str, Any] | None = None
     retryable: bool = False
 
     def __post_init__(self) -> None:
-        """Validate error field invariants.
-
-        Raises:
-            ValueError: If code or message is empty or whitespace-only.
-        """
-        if not self.code or not self.code.strip():
+        """Validate error field invariants."""
+        if not isinstance(self.code, str) or not self.code.strip():
             raise ValueError("Error code must be a non-empty string.")
-        if not self.message or not self.message.strip():
+        if not isinstance(self.message, str) or not self.message.strip():
             raise ValueError("Error message must be a non-empty string.")
+        if not isinstance(self.retryable, bool):
+            raise TypeError("retryable must be a boolean.")
+        if self.details is not None and not isinstance(self.details, Mapping):
+            raise TypeError("Error details must be a mapping.")
+        object.__setattr__(self, "details", _snapshot(self.details))
 
 
 @dataclass(frozen=True, slots=True)
 class ResponseMetadata:
-    """Required execution, side-effect, and extension metadata.
-
-    Attributes:
-        timestamp_utc: ISO 8601 UTC timestamp of response creation.
-        duration_ms: Elapsed execution time in milliseconds, if measured.
-        request_id: Optional correlation or request identifier.
-        side_effects: Indicates whether the operation induced state mutations.
-        extensions: Arbitrary structured auxiliary metadata mapping.
-    """
+    """Required execution, side-effect, and extension metadata."""
 
     timestamp_utc: str
     duration_ms: float | None = None
     request_id: str | None = None
     side_effects: bool = False
-    extensions: dict[str, Any] = field(default_factory=dict)
+    extensions: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        """Validate metadata invariants.
-
-        Raises:
-            ValueError: If duration_ms is negative or timestamp_utc is empty.
-        """
-        if not self.timestamp_utc or not self.timestamp_utc.strip():
+        """Validate metadata invariants."""
+        if not isinstance(self.timestamp_utc, str) or not self.timestamp_utc.strip():
             raise ValueError("timestamp_utc must be a non-empty string.")
-        if self.duration_ms is not None and self.duration_ms < 0:
-            raise ValueError(f"duration_ms cannot be negative, got {self.duration_ms}.")
+        try:
+            timestamp = datetime.fromisoformat(self.timestamp_utc)
+        except ValueError:
+            raise ValueError(
+                "timestamp_utc must be a timezone-aware ISO timestamp."
+            ) from None
+        if timestamp.utcoffset() is None:
+            raise ValueError("timestamp_utc must be a timezone-aware ISO timestamp.")
+        if not isinstance(self.extensions, Mapping):
+            raise TypeError("Metadata extensions must be a mapping.")
+        if self.request_id is not None and not isinstance(self.request_id, str):
+            raise TypeError("request_id must be a string or None.")
+        if not isinstance(self.side_effects, bool):
+            raise TypeError("side_effects must be a boolean.")
+        object.__setattr__(self, "timestamp_utc", timestamp.astimezone(UTC).isoformat())
+        object.__setattr__(self, "duration_ms", _duration(self.duration_ms))
+        object.__setattr__(self, "extensions", _snapshot(self.extensions))
 
 
 @dataclass(frozen=True, slots=True)
 class StandardResponse[T]:
-    """Canonical immutable result envelope of one bounded public operation.
-
-    Attributes:
-        status: Function-level completion status ('success' or 'error').
-        message: Bounded human-readable summary.
-        data: Raw successful function result payload.
-        error: Structured operation failure when status is 'error'.
-        metadata: Execution, side-effect, and extension metadata.
-    """
+    """Canonical immutable result envelope of one bounded public operation."""
 
     status: Literal["success", "error"]
     message: str
@@ -155,12 +201,7 @@ class StandardResponse[T]:
     metadata: ResponseMetadata
 
     def __post_init__(self) -> None:
-        """Validate structural invariants of the response envelope.
-
-        Raises:
-            ValueError: If status is unrecognized or conflicts with error presence.
-            TypeError: If error is not a StandardError instance when status is error.
-        """
+        """Validate structural invariants of the response envelope."""
         if self.status not in ("success", "error"):
             raise ValueError(
                 f"Invalid status '{self.status}'; must be 'success' or 'error'."
@@ -179,6 +220,12 @@ class StandardResponse[T]:
                     f"{type(self.error).__name__}."
                 )
 
+        if not isinstance(self.message, str):
+            raise TypeError("Response message must be a string.")
+        if not isinstance(self.metadata, ResponseMetadata):
+            raise TypeError("Response metadata must be ResponseMetadata.")
+        object.__setattr__(self, "data", _snapshot(self.data))
+
     @property
     def is_success(self) -> bool:
         """Return True if the operation completed successfully."""
@@ -194,12 +241,12 @@ class StandardResponse[T]:
         return self.is_success
 
     def unwrap(self) -> T:
-        """Return data if successful, otherwise raise RuntimeError."""
+        """Return detached JSON-shaped data, or raise RuntimeError on failure."""
         if not self.is_success:
             err_msg = self.error.message if self.error else self.message
             err_code = self.error.code if self.error else "UNKNOWN_ERROR"
             raise RuntimeError(f"Operation failed [{err_code}]: {err_msg}")
-        return self.data  # type: ignore[return-value]
+        return cast("T", _serialize_payload(self.data))
 
     @property
     def error_code(self) -> str | None:
@@ -225,15 +272,19 @@ class StandardResponse[T]:
     ) -> StandardResponse[V]:
         """Construct a validated immutable success response envelope."""
         resolved_ts = timestamp_utc if timestamp_utc is not None else _now_utc_iso()
-        resolved_ext: dict[str, Any] = (
-            dict(extensions) if extensions is not None else {}
-        )
         metadata = ResponseMetadata(
             timestamp_utc=resolved_ts,
             duration_ms=duration_ms,
             request_id=request_id,
             side_effects=side_effects,
-            extensions=resolved_ext,
+            extensions=extensions if extensions is not None else {},
+        )
+        envelope: StandardResponse[V] = StandardResponse(
+            status="success",
+            message=message,
+            data=data,
+            error=None,
+            metadata=metadata,
         )
         logger.info(
             "%s: StandardResponse.success emitted (msg=%s duration_ms=%s req_id=%s)",
@@ -241,18 +292,9 @@ class StandardResponse[T]:
             message,
             duration_ms,
             request_id,
-            extra={
-                "fr_id": FR_SUCCESS_ENVELOPE,
-                "requirement": FR_SUCCESS_ENVELOPE,
-            },
+            extra={"fr_id": FR_SUCCESS_ENVELOPE, "requirement": FR_SUCCESS_ENVELOPE},
         )
-        return StandardResponse(
-            status="success",
-            message=message,
-            data=data,
-            error=None,
-            metadata=metadata,
-        )
+        return envelope
 
     @classmethod
     def failure[V = None](
@@ -269,15 +311,19 @@ class StandardResponse[T]:
     ) -> StandardResponse[V]:
         """Construct a validated immutable failure response envelope."""
         resolved_ts = timestamp_utc if timestamp_utc is not None else _now_utc_iso()
-        resolved_ext: dict[str, Any] = (
-            dict(extensions) if extensions is not None else {}
-        )
         metadata = ResponseMetadata(
             timestamp_utc=resolved_ts,
             duration_ms=duration_ms,
             request_id=request_id,
             side_effects=side_effects,
-            extensions=resolved_ext,
+            extensions=extensions if extensions is not None else {},
+        )
+        envelope: StandardResponse[V] = StandardResponse(
+            status="error",
+            message=message,
+            data=data,
+            error=error,
+            metadata=metadata,
         )
         logger.warning(
             "%s: StandardResponse.failure emitted (code=%s message=%s request_id=%s)",
@@ -285,18 +331,9 @@ class StandardResponse[T]:
             error.code,
             message,
             request_id,
-            extra={
-                "fr_id": FR_ERROR_ENVELOPE,
-                "requirement": FR_ERROR_ENVELOPE,
-            },
+            extra={"fr_id": FR_ERROR_ENVELOPE, "requirement": FR_ERROR_ENVELOPE},
         )
-        return StandardResponse(
-            status="error",
-            message=message,
-            data=data,
-            error=error,
-            metadata=metadata,
-        )
+        return envelope
 
     def to_dict(self) -> dict[str, Any]:
         """Serialize the response envelope to a JSON-compatible dictionary."""
@@ -304,18 +341,9 @@ class StandardResponse[T]:
             "%s: StandardResponse.to_dict serialized (status=%s)",
             FR_SERIALIZATION,
             self.status,
-            extra={
-                "fr_id": FR_SERIALIZATION,
-                "requirement": FR_SERIALIZATION,
-            },
+            extra={"fr_id": FR_SERIALIZATION, "requirement": FR_SERIALIZATION},
         )
-        result: dict[str, Any] = {
-            "status": self.status,
-            "message": self.message,
-            "data": _serialize_payload(self.data),
-            "error": asdict(self.error) if self.error is not None else None,
-            "metadata": asdict(self.metadata),
-        }
+        result: dict[str, Any] = _serialize_payload(self)
         if self.metadata.request_id is not None:
             result["request_id"] = self.metadata.request_id
         return result
@@ -339,7 +367,7 @@ class ApiResponse:
             or "Operation completed successfully."
         )
         raw_dur = meta_dict.pop("duration_ms", None)
-        duration_ms = float(raw_dur) if raw_dur is not None else None
+        duration_ms = _duration(raw_dur)
         side_effects = bool(meta_dict.pop("side_effects", False))
         raw_ts = meta_dict.pop("timestamp_utc", None)
         timestamp_utc = str(raw_ts) if raw_ts is not None else None
@@ -374,13 +402,10 @@ class ApiResponse:
             raise ValueError(
                 f"Invalid HTTP status_code {status_code}; must be in 100..599."
             )
-        details_dict: dict[str, Any] | None = (
-            dict(details) if details is not None else None
-        )
         std_err = StandardError(
             code=code,
             message=message,
-            details=details_dict,
+            details=details,
             retryable=status_code in _RETRYABLE_STATUS_CODES,
         )
         envelope: StandardResponse[None] = StandardResponse.failure(
@@ -409,11 +434,7 @@ class ApiResponseCLI:
             action="store_true",
             help="Run self-verification of StandardResponse and ApiResponse.",
         )
-        parser.add_argument(
-            "--json",
-            action="store_true",
-            help="Emit verification report as formatted JSON.",
-        )
+        parser.add_argument("--json", action="store_true", help="Emit JSON report.")
         return parser
 
     @classmethod
@@ -443,8 +464,16 @@ class ApiResponseCLI:
             status_code=422,
             request_id="req-cli-verify",
         )
+        source = {"nested": [1]}
+        snapshot = StandardResponse.success(source)
+        source["nested"].append(2)
+        isolated = snapshot.unwrap() == {"nested": [1]}
+        json.dumps([ok_dict, err_dict, snapshot.to_dict()], allow_nan=False)
+        verified = isolated and ok_env.is_success and err_env.is_error
         report: dict[str, Any] = {
-            "status": "verified",
+            "json_safe": True,
+            "snapshot_isolated": isolated,
+            "status": "verified" if verified else "failed",
             "ok_envelope_status": ok_dict["status"],
             "error_envelope_status": err_dict["status"],
             "error_status_code": err_dict["status_code"],
@@ -453,7 +482,7 @@ class ApiResponseCLI:
         sys.stdout.write(
             (json.dumps(report, indent=2) if args.json else str(report)) + "\n"
         )
-        return 0
+        return 0 if verified else 1
 
 
 def main(argv: Sequence[str] | None = None) -> int:

@@ -166,3 +166,13 @@ Logging factories do not configure handlers or perform I/O. Explicit CLI/host
 startup owns asynchronous logging; standalone facade emissions lazily initialize
 asynchronous sinks when no explicit setup exists. Boundary diagnostics contain
 no caller payload or raw exception text.
+
+Response envelopes snapshot nested payloads into read-only mappings and tuples.
+`to_dict()` and successful `unwrap()` return detached JSON-shaped values. Supported
+payloads include JSON scalars, string-keyed mappings, lists/tuples, dataclasses,
+dates/times (ISO strings), pathlib paths (strings), and sets/frozensets (arrays in
+canonical JSON order). Unsupported objects, cyclic graphs, non-string keys, and
+nonfinite floats fail during construction with stable TypeError/ValueError messages.
+Payload object identity and arbitrary Python type round trips are not preserved.
+Metadata requires timezone-aware ISO timestamps (normalized to UTC) and finite,
+nonnegative numeric durations; booleans and numeric strings are rejected.
