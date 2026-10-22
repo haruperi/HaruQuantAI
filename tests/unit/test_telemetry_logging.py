@@ -841,16 +841,21 @@ def test_handler_and_stderr_failures_are_contained(
 
     setup_logging(tmp_path, async_engine=async_engine)
     monkeypatch.setattr(sys, "stderr", BrokenStream())
+    broken = BrokenHandler()
     if async_engine:
         engine = telemetry._GLOBAL_ENGINE
         assert engine is not None
-        engine._listener.handlers = (BrokenHandler(),)
+        engine._listener.handlers = (broken,)
     else:
-        logging.getLogger().addHandler(BrokenHandler())
-    logger = get_logger("audit.failed-sinks")
-    logger.info("handler probe")
-    logger.bind(value=BrokenStream()).info("context probe")
-    flush_logs()
+        logging.getLogger().addHandler(broken)
+    try:
+        logger = get_logger("audit.failed-sinks")
+        logger.info("handler probe")
+        logger.bind(value=BrokenStream()).info("context probe")
+        flush_logs()
+    finally:
+        logging.getLogger().removeHandler(broken)
+        broken.close()
 
 
 def test_home_path_variants() -> None:

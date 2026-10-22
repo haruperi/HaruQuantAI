@@ -337,7 +337,7 @@ def setup_logging(
 
         _BOOTSTRAPPED = True
 
-    logger = logging.getLogger(__name__)
+    logger = get_logger(__name__)
     logger.info(
         "%s: logging engine initialized (target=%s, level=%s, async=%s)",
         WORKER_FR,
