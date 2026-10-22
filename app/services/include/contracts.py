@@ -58,6 +58,10 @@ from app.services.include.enums import (
     TradeAction,
 )
 
+_COMMISSION_NOT_RETRIEVED = (
+    '{"version":2,"source":"unknown","status":"not_retrieved","rules":null}'
+)
+
 # fmt: off
 __all__ = [
     "BOOK_TYPE_DESCRIPTIONS", "DEAL_ENTRY_DESCRIPTIONS", "DEAL_TYPE_DESCRIPTIONS",
@@ -434,7 +438,7 @@ class SymbolInfo:
     path: str = ""
     default_spread: float = 0.0
     default_slippage: float = 0.0
-    commissions: str = "0.0"
+    commissions: str = _COMMISSION_NOT_RETRIEVED
     alias: str = ""
     country: str = ""
     sector: str = ""
@@ -513,7 +517,7 @@ class SymbolInfo:
             description=str(d.get("description", "")),
             default_spread=float(d.get("default_spread", 0.0)),
             default_slippage=float(d.get("default_slippage", 0.0)),
-            commissions=str(d.get("commissions", "0.0")),
+            commissions=str(d.get("commissions", _COMMISSION_NOT_RETRIEVED)),
             alias=str(d.get("alias", "")), exchange=str(d.get("exchange", "")),
             country=str(d.get("country", "")), sector=str(d.get("sector", "")),
             order_size_multiplier=float(d.get("order_size_multiplier", 1.0)),

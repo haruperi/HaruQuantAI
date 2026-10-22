@@ -627,6 +627,9 @@ class _DummyDataSub:
     def list_datasets(self) -> list[Any]:
         return [_DummyModel()]
 
+    def instruments(self) -> list[Any]:
+        return [{"symbol": "EURUSD"}]
+
     def view(self) -> list[Any]:
         return [{"symbol": "EURUSD"}]
 
@@ -649,7 +652,7 @@ class _DummyInstrumentsCLI:
         return "table"
 
     @staticmethod
-    def dispatch(args: Any, target: Any) -> dict[str, Any]:
+    def dispatch(args: Any, target: Any, **kwargs: Any) -> dict[str, Any]:
         return {"status": "dispatched", "args": args}
 
 

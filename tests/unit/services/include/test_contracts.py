@@ -561,3 +561,17 @@ def test_services_lazy_exports_resolve_from_include() -> None:
     assert s.Functions is not None
     assert s.Types is not None
     assert s.Variable is not None
+
+
+def test_symbol_commissions_default_is_explicitly_not_retrieved() -> None:
+    import json
+
+    for symbol in (
+        contracts.SymbolInfo(name="EURUSD"),
+        contracts.SymbolInfo.from_dict({"symbol": "EURUSD"}),
+    ):
+        assert isinstance(symbol.commissions, str)
+        document = json.loads(symbol.commissions)
+        assert document["status"] == "not_retrieved"
+        assert document["source"] == "unknown"
+        assert document["rules"] is None

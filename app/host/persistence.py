@@ -164,6 +164,15 @@ class HostPersistence:
             )
         try:
             conn.execute(cls.TABLE_DDL_MAP[table])
+            if table == "datamgr_instruments":
+                present = {
+                    str(row[1])
+                    for row in conn.execute('PRAGMA table_info("datamgr_instruments")')
+                }
+                if "specification_meta" not in present:
+                    raise _PersistenceError(
+                        "Unsupported legacy instrument schema; grouped schema required."
+                    )
         except sqlite3.Error as err:
             _log("exception", CREATE_FR, f"failed schema for {table}")
             raise _PersistenceError(

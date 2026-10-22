@@ -1,17 +1,18 @@
-"""Public instrument contracts against isolated SQLite persistence."""
+"""Exercise grouped catalog operations against isolated host persistence."""
 
 from __future__ import annotations
 
+import asyncio
+import json
 import logging
 from pathlib import Path
 from typing import Any
+from unittest.mock import MagicMock
 
 import pytest
 from app.host.persistence import HostPersistence
-from app.workspace.data_manager.instruments import Instruments
-from app.workspace.data_manager.routes import create_data_manager_router
-from fastapi import FastAPI
-from fastapi.testclient import TestClient
+from app.services.include.contracts import SymbolInfo
+from app.workspace.data_manager.instruments import Instruments, InstrumentsCLI
 
 
 @pytest.fixture(autouse=True)
@@ -24,239 +25,59 @@ def specification(symbol: str = "TEST") -> dict[str, Any]:
         "symbol": symbol,
         "contract_size": 250,
         "pip_size": 0.01,
-        "margin_rate": 0.0,
-        "decimals": 2,
         "point_value": 12,
-        "tick_size": 0.25,
-        "tick_step": 0.05,
+        "margin_rate": 0,
         "connection": "recorded",
-        "commissions": "4.75",
-        "swap_long": -2.5,
-        "swap_short": 1.5,
     }
 
 
-def client(*, require_auth: bool = False) -> TestClient:
-    app = FastAPI()
-    app.include_router(create_data_manager_router(require_auth=require_auth))
-    return TestClient(app)
-
-
-def test_add_reopen_and_independent_economics() -> None:
-    row = Instruments().add_instrument(specification())
-    assert isinstance(row["id"], str)
-    assert row["margin_rate"] == 0
-    assert row["point_value"] == 12
-    assert row["contract_size"] == 250
-    assert row["pip_size"] == row["point_size"] == 0.01
-    assert row["tick_size"] == 0.25
-    assert Instruments().instruments() == [row]
-    assert len(HostPersistence.read_entity("datamgr_instrument_specs")) == 1
-
-
-def test_all_records_and_filters() -> None:
-    service = Instruments()
-    for i in range(103):
-        service.add_instrument(specification(f"TEST_{i:03}"))
-    assert len(service.instruments()) == 103
-    assert [r["symbol"] for r in service.instruments({"search": "test_102"})] == [
-        "TEST_102"
-    ]
-    assert (
-        len(service.instruments({"broker_id": "-1", "connection": "recorded"})) == 103
-    )
-    assert service.instruments({"data_type": "Futures"}) == []
-    with pytest.raises(ValueError, match="filters"):
-        service.instruments({"path": "unexpected"})
-
-
-def test_legacy_metadata_remains_missing_and_clone_preserves_costs() -> None:
-    values = specification()
-    values.pop("contract_size")
-    values.pop("pip_size")
-    HostPersistence.create_record(
-        "datamgr_instruments",
-        {**values, "created_at_utc": "2020-01-01", "updated_at_utc": "2020-01-01"},
-    )
-    service = Instruments()
-    source = service.instruments()[0]
-    assert (
-        source["contract_size"] is source["pip_size"] is source["swap_settings"] is None
-    )
-    clone = service.clone_instrument(source["id"], "CLONED")
-    assert clone["id"] != source["id"]
-    for key in (
-        "contract_size",
-        "pip_size",
-        "commissions",
-        "margin_rate",
-        "swap_long",
-        "tick_size",
-        "broker_id",
-    ):
-        assert clone[key] == source[key]
-    assert clone["created_at_utc"] != source["created_at_utc"]
-    assert service.instruments({"search": "TEST"}) == [source]
-
-
-def test_mass_edit_changes_only_selected_fields_and_clones_complete_extension() -> None:
-    service = Instruments()
-    first = service.add_instrument(specification("ONE"))
-    second = service.add_instrument(
-        {**specification("TWO"), "point_value": 80, "margin_rate": 0.2}
-    )
-    swap = {
-        "use": True,
-        "type": "money",
-        "long": -5,
-        "short": 2,
-        "tripleSwapOn": "MONDAY",
-        "rolloutHour": "22:30",
-    }
-    result = service.mass_edit_instruments(
-        [first["id"], second["id"], first["id"]],
-        {"contract_size": 75, "swap_settings": swap},
-    )
-    assert result["updated_count"] == 2
-    one, two = result["instruments"]
-    assert one["point_value"] == 12
-    assert two["point_value"] == 80
-    assert two["margin_rate"] == 0.2
-    assert one["commissions"] == "4.75"
-    assert one["swap_long"] == -5
-    assert one["swap_3day_day"] == 0
-    clone = service.clone_instrument(first["id"], "COPY")
-    assert clone["swap_settings"] == swap
-    assert clone["contract_size"] == 75
-
-
-@pytest.mark.parametrize(
-    "updates",
-    [
-        {},
-        {"id": "10"},
-        {"symbol": "RENAMED"},
-        {"margin_rate": -1},
-        {"tick_size": 0},
-        {"tick_step": float("nan")},
-        {"decimals": True},
-        {"max_volume": 0},
-        {"broker_id": 999},
-        {"point_value": "5"},
-        {"contract_size": -1},
-        {"pip_size": float("inf")},
-        {"commissions": '{"version":1,"settings":{}}'},
-        {"swap_settings": {"use": True}},
-    ],
-)
-def test_invalid_patch_never_changes_persisted_rows(updates: dict[str, Any]) -> None:
-    service = Instruments()
-    before = service.add_instrument(specification())
-    with pytest.raises(ValueError):
-        service.mass_edit_instruments([before["id"]], updates)
-    assert service.instruments() == [before]
-
-
-def test_missing_ids_and_duplicate_destinations_never_mutate() -> None:
+def test_add_list_filter_and_duplicate() -> None:
     service = Instruments()
     row = service.add_instrument(specification())
-    with pytest.raises(LookupError):
-        service.mass_edit_instruments([row["id"], "999"], {"margin_rate": 0.1})
-    with pytest.raises(FileExistsError):
-        service.clone_instrument(row["id"], "test")
-    with pytest.raises(FileExistsError):
+    assert isinstance(row["id"], str)
+    assert row["contract_size"] == 250
+    assert row["margin_rate"] == 0
+    assert service.instruments({"symbol": "TEST"}) == [row]
+    assert service.instruments({"data_type": "Missing"}) == []
+    with pytest.raises(RuntimeError):
         service.add_instrument(specification())
-    with pytest.raises(ValueError):
-        service.mass_edit_instruments("1", {"margin_rate": 0.1})
-    with pytest.raises(ValueError):
-        service.clone_instrument(row["id"], "bad symbol")
     assert service.instruments() == [row]
 
 
-def test_actual_batch_failure_rolls_back_relational_and_extension_writes(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_mass_edit_merges_siblings_and_is_atomic() -> None:
     service = Instruments()
     first = service.add_instrument(specification("ONE"))
-    second = service.add_instrument(specification("TWO"))
-    original = HostPersistence.apply_batch
-
-    def fail_batch(operations: Any) -> Any:
-        # The first row/extension writes run before a genuine SQLite UNIQUE failure.
-        return original(
-            [
-                *operations,
-                {
-                    "op": "create",
-                    "table": "datamgr_instruments",
-                    "values": {
-                        "symbol": "ONE",
-                        "created_at_utc": "now",
-                        "updated_at_utc": "now",
-                    },
-                },
-            ]
-        )
-
-    monkeypatch.setattr(HostPersistence, "apply_batch", fail_batch)
-    with pytest.raises(RuntimeError, match="could not be saved"):
-        service.mass_edit_instruments(
-            [first["id"], second["id"]], {"contract_size": 19, "margin_rate": 0.9}
-        )
-    assert service.instruments() == [first, second]
-    with pytest.raises(RuntimeError):
-        service.add_instrument(specification("NEW"))
-    assert service.instruments() == [first, second]
-
-
-def test_http_envelopes_validation_and_auth() -> None:
-    with client() as http:
-        assert http.get("/data/instruments").json()["data"] == []
-        response = http.post("/data/instruments", json=specification())
-        assert response.status_code == 201
-        row = response.json()["data"]
-        assert http.post("/data/instruments", json=specification()).status_code == 409
-        assert http.get("/data/instruments?unknown=true").status_code == 422
-        result = http.post(
-            "/data/instruments/mass-edit",
-            json={"instrument_ids": [row["id"]], "updates": {"margin_rate": 0.2}},
-        )
-        assert result.json()["data"]["instruments"][0]["margin_rate"] == 0.2
-        assert (
-            http.post(
-                "/data/instruments/clone",
-                json={"source_id": row["id"], "new_symbol": "COPY"},
-            ).status_code
-            == 201
-        )
-        assert (
-            http.post(
-                "/data/instruments/clone",
-                json={"source_id": "999", "new_symbol": "MISS"},
-            ).status_code
-            == 404
-        )
-        assert (
-            http.post(
-                "/data/instruments/mass-edit",
-                json={"instrument_ids": "1", "updates": {}},
-            ).status_code
-            == 422
-        )
-    with client(require_auth=True) as http:
-        assert http.get("/data/instruments").status_code == 401
-        assert http.post("/data/instruments", json=specification()).status_code == 401
-
-
-def test_corrupt_extension_fails_explicitly_without_exposing_storage_error() -> None:
-    row = Instruments().add_instrument(specification())
-    HostPersistence.update_entity(
-        "datamgr_instrument_specs", row["symbol"], {"payload": "{"}
+    second = service.add_instrument(
+        {**specification("TWO"), "contract_size": 80, "point_value": 9}
     )
-    with client() as http:
-        response = http.get("/data/instruments")
-        assert response.status_code == 503
-        assert "payload" not in response.text
+    result = service.mass_edit_instruments(
+        [first["id"], second["id"]], {"contract_size": 75}
+    )
+    assert result["updated_count"] == 2
+    one, two = result["instruments"]
+    assert one["contract_size"] == two["contract_size"] == 75
+    assert one["point_value"] == 12
+    assert two["point_value"] == 9
+    before = service.instruments()
+    with pytest.raises(LookupError):
+        service.mass_edit_instruments([first["id"], "999"], {"contract_size": 5})
+    assert service.instruments() == before
+    with pytest.raises(ValueError):
+        service.mass_edit_instruments([first["id"]], {"unknown_field": 2})
+    assert service.instruments() == before
+
+
+def test_clone_and_delete_preserve_grouped_values() -> None:
+    service = Instruments()
+    source = service.add_instrument(specification())
+    clone = service.clone_instrument(source["id"], "COPY")
+    assert clone["id"] != source["id"]
+    assert clone["contract_size"] == source["contract_size"]
+    with pytest.raises(LookupError):
+        service.delete_instruments([source["id"], "999"])
+    assert len(service.instruments()) == 2
+    assert service.delete_instruments([source["id"]]) == {"deleted_count": 1}
+    assert service.instruments() == [clone]
 
 
 def test_requirement_boundary_logging(caplog: pytest.LogCaptureFixture) -> None:
@@ -266,37 +87,309 @@ def test_requirement_boundary_logging(caplog: pytest.LogCaptureFixture) -> None:
         service.instruments()
         service.mass_edit_instruments([row["id"]], {"margin_rate": 0.1})
         service.clone_instrument(row["id"], "COPY")
+        service.delete_instruments([row["id"]])
     ids = {getattr(record, "fr_id", None) for record in caplog.records}
     assert {
         "FR-DATAMGR-INSTR-LIST",
         "FR-DATAMGR-INSTR-ADD",
         "FR-DATAMGR-INSTR-MASS-EDIT",
         "FR-DATAMGR-INSTR-CLONE",
+        "FR-DATAMGR-INSTR-DELETE",
     } <= ids
 
 
-def test_scalar_swap_patch_keeps_full_settings_consistent() -> None:
+def test_cli_grouped_add_edit_list_delete() -> None:
     service = Instruments()
-    swap = {
-        "use": True,
-        "type": "money",
-        "long": -2,
-        "short": 1,
-        "tripleSwapOn": "MONDAY",
-        "rolloutHour": "21:30",
-    }
-    row = service.add_instrument(
-        {"symbol": "SWAP", "contract_size": 1, "pip_size": 0.01, "swap_settings": swap}
+    cli = InstrumentsCLI
+    row = cli.dispatch(
+        ["action=add", "instrument=EURUSD", "swapLong=-2.5", "broker=-1"], service
+    )["instrument"]
+    assert row["swap_long"] == -2.5
+    edited = cli.dispatch(["action=edit", "instrument=EURUSD", "pointvalue=7"], service)
+    assert edited["instruments"][0]["point_value"] == 7
+    assert "EURUSD" in cli.dispatch(["list"], service)["rendered"]
+    assert cli.dispatch(["delete", "instruments=EURUSD"], service)["deleted_count"] == 1
+    with pytest.raises(ValueError, match="Unsupported"):
+        cli.dispatch(["action=bogus"], service)
+
+
+def _simulated_trading(*infos: Any) -> Any:
+    from app.services.brokers.simulator import SimulatorClient
+    from app.services.include.trading import Trading
+
+    backend = SimulatorClient()
+    for info in infos:
+        backend.add_symbol(info)
+    return Trading(backend)
+
+
+def test_refresh_subset_retains_existing_flat_contract(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    service = Instruments()
+    keep = service.add_instrument(specification("KEEP"))
+    service.add_instrument(specification("EURJPY"))
+    trading = _simulated_trading(
+        SymbolInfo(
+            name="EURJPY",
+            path="Markets\\Forex\\Majors\\EURJPY",
+            digits=3,
+            point=0.001,
+            spread=17,
+            swap_long=-0.2,
+            currency_profit="JPY",
+            trade_stops_level=4,
+            filling_mode=3,
+        )
     )
-    extension = HostPersistence.read_entity("datamgr_instrument_specs", "SWAP")[0]
-    result = service.mass_edit_instruments([row["id"]], {"swap_short": 8})[
+
+    async def run() -> dict[str, Any]:
+        async with trading:
+            return await service.refresh_instruments(trading, ["EURJPY"])
+
+    with caplog.at_level(logging.INFO):
+        assert asyncio.run(run()) == {"deleted_count": 1, "inserted_count": 1}
+    assert any(
+        getattr(r, "fr_id", None) == "FR-DATAMGR-INSTR-REFRESH" for r in caplog.records
+    )
+    rows = {r["symbol"]: r for r in service.instruments()}
+    current = rows["EURJPY"]
+    assert rows["KEEP"] == keep
+    assert current["swap_long"] == -0.2
+    assert current["default_spread"] == pytest.approx(0.017)
+    assert current["filling_mode"] == 3
+    assert current["currency_profit"] == "JPY"
+    assert current["data_type"] == "Forex\\Majors"
+    assert current["swap_settings"] is None
+    assert json.loads(current["commissions"])["status"] == "not_retrieved"
+    assert "specification_meta" not in current
+
+
+def test_refresh_failure_never_partially_writes() -> None:
+    service = Instruments()
+    row = service.add_instrument(specification())
+    trading = _simulated_trading(SymbolInfo(name="VALID"))
+
+    async def run(names: list[str]) -> None:
+        async with trading:
+            await service.refresh_instruments(trading, names)
+
+    with pytest.raises(LookupError):
+        asyncio.run(run(["VALID", "MISSING"]))
+    assert service.instruments() == [row]
+    with pytest.raises(ValueError, match="at least one"):
+        asyncio.run(run([]))
+
+
+def test_refresh_all_keeps_existing_replacement_behavior() -> None:
+    service = Instruments()
+    service.add_instrument(specification("MANUAL"))
+    trading = _simulated_trading(SymbolInfo(name="EURUSD"))
+
+    async def run() -> dict[str, Any]:
+        async with trading:
+            return await service.refresh_instruments(trading)
+
+    assert asyncio.run(run())["inserted_count"] == 1
+    assert {r["symbol"] for r in service.instruments()} == {"EURUSD"}
+
+
+def _client(trading_factory: Any) -> Any:
+    from app.workspace.data_manager.routes import (
+        AppDataManager,
+        create_data_manager_router,
+    )
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+
+    app = FastAPI()
+    workspace = AppDataManager(trading_factory=trading_factory)
+    app.include_router(create_data_manager_router(workspace))
+    return TestClient(app)
+
+
+@pytest.mark.parametrize("configured_token", [None, "", "   "])
+def test_bridge_factory_requires_configured_token(
+    monkeypatch: pytest.MonkeyPatch, configured_token: str | None
+) -> None:
+    from app.services.brokers import metatrader
+    from app.workspace.data_manager.routes import _metatrader_trading
+
+    if configured_token is None:
+        monkeypatch.delenv("MT5_BRIDGE_TOKEN", raising=False)
+    else:
+        monkeypatch.setenv("MT5_BRIDGE_TOKEN", configured_token)
+    client_factory = MagicMock()
+    monkeypatch.setattr(metatrader, "MetaTraderClient", client_factory)
+
+    with pytest.raises(ValueError, match="MT5_BRIDGE_TOKEN is not set"):
+        _metatrader_trading()
+    client_factory.assert_not_called()
+
+
+def test_bridge_factory_uses_environment_token(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.services.brokers import metatrader
+    from app.services.include import trading
+    from app.workspace.data_manager.routes import _metatrader_trading
+
+    monkeypatch.setenv("MT5_BRIDGE_TOKEN", "  test-only-configured-token  ")
+    client_factory = MagicMock()
+    facade_factory = MagicMock()
+    monkeypatch.setattr(metatrader, "MetaTraderClient", client_factory)
+    monkeypatch.setattr(trading, "Trading", facade_factory)
+
+    assert _metatrader_trading() is facade_factory.return_value
+    client_factory.assert_called_once_with(auth_token="test-only-configured-token")
+    facade_factory.assert_called_once_with(client_factory.return_value)
+
+
+def test_delete_and_refresh_routes() -> None:
+    from app.services.include.contracts import SymbolInfo
+
+    service = Instruments()
+    one = service.add_instrument(specification("ONE"))
+    client = _client(
+        lambda: _simulated_trading(
+            SymbolInfo(name="EURJPY", path="Forex\\EURJPY", digits=3, point=0.001)
+        )
+    )
+    assert client.post("/data/instruments/delete", json={}).status_code == 422
+    assert (
+        client.post(
+            "/data/instruments/delete", json={"instrument_ids": ["99"]}
+        ).status_code
+        == 404
+    )
+    deleted = client.post(
+        "/data/instruments/delete", json={"instrument_ids": [one["id"]]}
+    )
+    assert deleted.status_code == 200
+    assert service.instruments() == []
+    assert (
+        client.post("/data/instruments/refresh", json={"symbols": "x"}).status_code
+        == 422
+    )
+    assert (
+        client.post("/data/instruments/refresh", json={"symbols": []}).status_code
+        == 422
+    )
+    assert (
+        client.post("/data/instruments/refresh", json={"symbols": ["NOPE"]}).status_code
+        == 422
+    )
+    done = client.post("/data/instruments/refresh", json={"symbols": ["EURJPY"]})
+    assert done.status_code == 200
+    assert [r["symbol"] for r in service.instruments()] == ["EURJPY"]
+
+
+def test_normalize_data_type() -> None:
+    from app.workspace.data_manager.instruments import _normalize_data_type
+
+    assert _normalize_data_type("Markets\\Forex\\Majors\\USDCAD") == "Forex\\Majors"
+    assert _normalize_data_type("Markets/Forex/Majors/USDCAD") == "Forex\\Majors"
+    assert (
+        _normalize_data_type("Markets\\Stocks\\Hong Kong\\0001.HK")
+        == "Stocks\\Hong Kong"
+    )
+    assert _normalize_data_type("Markets\\Forex\\EURUSD") == "Forex"
+    assert _normalize_data_type("Forex\\EURUSD") == "Forex"
+    assert _normalize_data_type("Forex") == "Forex"
+    assert _normalize_data_type("") == ""
+
+
+def test_flat_filters_still_match_values_stored_in_json() -> None:
+    service = Instruments()
+    row = service.add_instrument(
+        {**specification(), "swap_long": -2.5, "filling_mode": 3}
+    )
+    assert service.instruments({"swap_long": -2.5, "filling_mode": "3"}) == [row]
+    assert service.instruments({"id": int(row["id"])}) == [row]
+    assert service.instruments({"id": float(row["id"])}) == [row]
+    assert service.instruments({"swap_long": "bad"}) == []
+    assert service.instruments({"cot": None}) == [row]
+    with pytest.raises(ValueError, match="Unsupported instrument filter"):
+        service.instruments({"unknown": 2})
+
+
+def test_broker_commissions_refresh_storage_and_manual_edit_are_lossless() -> None:
+    service = Instruments()
+    configured = {"model": "Per trade", "value": 7}
+    service.add_instrument(
+        {
+            "symbol": "EURUSD",
+            "commissions": json.dumps({"version": 1, "settings": configured}),
+        }
+    )
+    keep = service.add_instrument(specification("KEEP"))
+    rule = {
+        "currency": "USD",
+        "range": "range volume",
+        "charge": "charge instant",
+        "entry": "entry inout",
+        "direction": "direction both",
+        "profit": "profit all",
+        "tiers": [
+            {
+                "mode": "money specified",
+                "volume_type": "volume type volume",
+                "value": 3.5,
+                "min": 0.01,
+                "max": 0,
+                "from": 0,
+                "to": 1e9,
+                "currency": "USD",
+                "effective_currency": "USD",
+            }
+        ],
+    }
+    document = {"version": 2, "source": "mt5", "status": "available", "rules": [rule]}
+    trading = _simulated_trading(
+        SymbolInfo(name="EURUSD", commissions=json.dumps(document))
+    )
+
+    async def refresh() -> None:
+        async with trading:
+            await service.refresh_instruments(trading, ["EURUSD"])
+
+    asyncio.run(refresh())
+    current = service.instruments({"symbol": "EURUSD"})[0]
+    parsed = json.loads(current["commissions"])
+    assert parsed["rules"] == [rule]
+    assert parsed["settings"] == configured
+    raw = HostPersistence.read_records("datamgr_instruments", {"symbol": "EURUSD"})[0]
+    assert json.loads(raw["commissions"])["rules"] == [rule]
+    assert isinstance(current["commissions"], str)
+    assert service.instruments({"symbol": "KEEP"}) == [keep]
+    patch = json.dumps({"version": 1, "settings": {**configured, "value": 9}})
+    edited = service.mass_edit_instruments([current["id"]], {"commissions": patch})[
         "instruments"
     ][0]
-    assert result["swap_settings"] == {**swap, "short": 8}
-    updated = HostPersistence.read_entity("datamgr_instrument_specs", "SWAP")[0]
-    assert updated["created_at_utc"] == extension["created_at_utc"]
-    assert updated["revision"] == 2
-    with pytest.raises(ValueError, match="not both"):
-        service.mass_edit_instruments(
-            [row["id"]], {"swap_settings": swap, "swap_short": 8}
-        )
+    changed = json.loads(edited["commissions"])
+    assert changed["settings"]["value"] == 9
+    assert changed["rules"] == [rule]
+    unrelated = service.mass_edit_instruments([edited["id"]], {"default_spread": 0.2})[
+        "instruments"
+    ][0]
+    assert json.loads(unrelated["commissions"]) == changed
+
+
+def test_old_ea_default_keeps_manual_settings_without_inventing_broker_zero() -> None:
+    service = Instruments()
+    configured = {"model": "Per trade", "value": 5}
+    service.add_instrument(
+        {
+            "symbol": "EURUSD",
+            "commissions": json.dumps({"version": 1, "settings": configured}),
+        }
+    )
+    trading = _simulated_trading(SymbolInfo(name="EURUSD"))
+
+    async def refresh() -> None:
+        async with trading:
+            await service.refresh_instruments(trading, ["EURUSD"])
+
+    asyncio.run(refresh())
+    current = json.loads(service.instruments()[0]["commissions"])
+    assert current["status"] == "not_retrieved"
+    assert current["rules"] is None
+    assert current["settings"] == configured

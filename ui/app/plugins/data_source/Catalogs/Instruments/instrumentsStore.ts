@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { FileInstrument, InstrumentBroker, InstrumentMassPatch } from '../../FileImport/fileSymbols';
-import { cloneRemoteInstrument, fetchRemoteInstruments, instrumentPatch, massEditRemoteInstruments, saveRemoteInstrument, toFileInstrument, type CatalogInstrument, type RemoteInstrumentDefinition } from './instrumentsApiClient';
+import { cloneRemoteInstrument, deleteRemoteInstruments, fetchRemoteInstruments, refreshRemoteInstruments, instrumentPatch, massEditRemoteInstruments, saveRemoteInstrument, toFileInstrument, type CatalogInstrument, type RemoteInstrumentDefinition } from './instrumentsApiClient';
 
 export interface InstrumentsState {
   instruments: CatalogInstrument[];
@@ -11,6 +11,8 @@ export interface InstrumentsState {
   editInstrument: (original: CatalogInstrument, item: FileInstrument) => Promise<void>;
   cloneInstrument: (source: CatalogInstrument, name: string) => Promise<void>;
   massEditInstruments: (ids: string[], patch: InstrumentMassPatch) => Promise<void>;
+  refreshInstruments: (symbols?: string[]) => Promise<number>;
+  removeInstruments: (ids: string[]) => Promise<number>;
 }
 export const useInstruments = create<InstrumentsState>((set, get) => {
   function accept(records: RemoteInstrumentDefinition[], generation: number): void {
@@ -54,6 +56,17 @@ export const useInstruments = create<InstrumentsState>((set, get) => {
       if (!ids.length || !Object.keys(updates).length) throw new Error('Select instruments and at least one field for change.');
       const generation = get().generation;
       accept(await massEditRemoteInstruments(ids, updates), generation);
+    },
+    refreshInstruments: async symbols => {
+      const result = await refreshRemoteInstruments(symbols);
+      await get().refreshFromServer();
+      if (get().error) throw new Error(get().error);
+      return result.inserted_count;
+    },
+    removeInstruments: async ids => {
+      const count = await deleteRemoteInstruments(ids);
+      set(state => ({ requestVersion: state.requestVersion + 1, instruments: state.instruments.filter(row => !ids.includes(row.id)) }));
+      return count;
     },
   };
 });

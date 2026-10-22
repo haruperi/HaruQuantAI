@@ -36,7 +36,8 @@ CLI Usage:
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
+import os
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -59,6 +60,7 @@ from .sessions import Sessions
 if TYPE_CHECKING:
     from app.host.discovery import PluginLifecycleManager
     from app.host.transport import EventBus
+    from app.services.include.trading import Trading
 
 __all__ = [
     "AppDataManager",
@@ -115,6 +117,17 @@ def _normalized_bars(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [by_time[stamp] for stamp in sorted(by_time)]
 
 
+def _metatrader_trading() -> Trading:
+    """Build a MetaTrader 5 trading facade from the bridge token env var."""
+    from app.services.brokers.metatrader import MetaTraderClient
+    from app.services.include.trading import Trading
+
+    token = os.environ.get("MT5_BRIDGE_TOKEN", "").strip()
+    if not token:
+        raise ValueError("MT5_BRIDGE_TOKEN is not set.")
+    return Trading(MetaTraderClient(auth_token=token))
+
+
 class AppDataManager:
     """Authoritative workspace facade coordinating Data Manager domain services."""
 
@@ -126,6 +139,7 @@ class AppDataManager:
         plugin_mgr: PluginLifecycleManager | None = None,
         broker_registry: Any | None = None,
         job_manager: Any | None = None,
+        trading_factory: Callable[[], Trading] | None = None,
     ) -> None:
         """Instantiate workspace with data directory and event broker."""
         self.data_dir = Path(data_dir) if data_dir is not None else Path("data")
@@ -133,6 +147,7 @@ class AppDataManager:
         self.plugin_mgr = plugin_mgr
         self.broker_registry = broker_registry
         self.job_manager = job_manager
+        self.trading_factory = trading_factory or _metatrader_trading
 
         # Initialize retained Home, Log, and Help services
         self.home = Home()
@@ -359,6 +374,70 @@ def _register_instrument_routes(router: APIRouter, ws: AppDataManager) -> None:
         )
 
 
+def _register_instrument_job_routes(router: APIRouter, ws: AppDataManager) -> None:
+    @router.post("/instruments/delete")
+    def delete_instruments(payload: dict[str, Any]) -> JSONResponse:
+        if set(payload) != {"instrument_ids"} or not isinstance(
+            payload["instrument_ids"], list
+        ):
+            return JSONResponse(
+                status_code=422,
+                content=ApiResponse.error(
+                    "INSTRUMENT_REQUEST",
+                    "Expected instrument_ids array.",
+                    status_code=422,
+                ),
+            )
+        return _catalog_response(
+            ws.instruments.delete_instruments, payload["instrument_ids"]
+        )
+
+    @router.post("/instruments/refresh")
+    async def refresh_instruments(payload: dict[str, Any]) -> JSONResponse:
+        symbols = payload.get("symbols")
+        if set(payload) - {"symbols"} or not (
+            symbols is None or isinstance(symbols, list)
+        ):
+            return JSONResponse(
+                status_code=422,
+                content=ApiResponse.error(
+                    "INSTRUMENT_REQUEST",
+                    "Expected optional symbols array.",
+                    status_code=422,
+                ),
+            )
+        try:
+            trading = ws.trading_factory()
+            await trading.start()
+            try:
+                await trading.wait_connected(timeout=30.0)
+                data = await ws.instruments.refresh_instruments(trading, symbols)
+            finally:
+                await trading.close()
+        except (ValueError, LookupError) as error:
+            return JSONResponse(
+                status_code=422,
+                content=ApiResponse.error(
+                    "INSTRUMENT_REQUEST", str(error), status_code=422
+                ),
+            )
+        except (RuntimeError, OSError) as error:
+            logger.error(  # noqa: TRY400 - sanitized boundary
+                "Instrument refresh failed: %s",
+                type(error).__name__,
+                extra={"fr_id": GATEWAY_FR},
+            )
+            return JSONResponse(
+                status_code=503,
+                content=ApiResponse.error(
+                    "INSTRUMENT_REFRESH",
+                    "MetaTrader 5 is unavailable. Check the bridge and retry.",
+                    status_code=503,
+                ),
+            )
+        return JSONResponse(content=ApiResponse.ok(data=data))
+
+
 def _register_session_routes(router: APIRouter, ws: AppDataManager) -> None:
     @router.get("/sessions")
     def list_sessions(request: Request) -> JSONResponse:
@@ -501,6 +580,7 @@ def create_data_manager_router(
     _register_home_routes(router, ws)
     _register_workspace_routes(router, ws)
     _register_instrument_routes(router, ws)
+    _register_instrument_job_routes(router, ws)
     _register_session_routes(router, ws)
     _register_log_routes(router, ws)
     _register_help_routes(router, ws)

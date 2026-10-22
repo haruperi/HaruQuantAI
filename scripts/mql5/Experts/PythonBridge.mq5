@@ -18,7 +18,7 @@
 
 input string InpBridgeHost       = "127.0.0.1";
 input uint   InpBridgePort       = 8765;
-input string InpAuthToken        = "P8H5yPraTVSz4vkuaMVgWN8qcfeXUswuxIV70QES0Co";
+input string InpAuthToken        = "";
 input uint   InpConnectTimeoutMs = 2000;
 input uint   InpReconnectMs      = 1000;
 input bool   InpVerboseReconnectLogs = false;
@@ -1207,6 +1207,79 @@ void DispatchAccount(const string command_id,const string object_id,const string
    RespondError(command_id,"METHOD_NOT_IMPLEMENTED","unknown CAccountInfo method: "+method);
   }
 
+// FR-TRADING-SYMBOL-SNAPSHOT: read-only broker commission specification.
+string CommissionUnavailable(const string reason,const int error_code=0)
+  {
+   return "{\"version\":2,\"source\":\"mt5\",\"status\":\"unavailable\",\"rules\":null,\"error\":"
+      +JsonQuote(reason)+",\"error_code\":"+JsonLong(error_code)+"}";
+  }
+
+string CommissionLabel(string label)
+  {
+   if(StringFind(label,"SYMBOL_COMMISSION_")!=0) return "Unknown";
+   StringReplace(label,"SYMBOL_COMMISSION_","");
+   StringReplace(label,"_"," ");
+   StringToLower(label);
+   return label;
+  }
+
+string CommissionCurrency(const string sym,const MqlCommissionTier &tier,const string rule_currency)
+  {
+   switch(tier.mode)
+     {
+      case SYMBOL_COMMISSION_MONEY_DEPOSIT: return AccountInfoString(ACCOUNT_CURRENCY);
+      case SYMBOL_COMMISSION_MONEY_SYMBOL_BASE: return SymbolInfoString(sym,SYMBOL_CURRENCY_BASE);
+      case SYMBOL_COMMISSION_MONEY_SYMBOL_PROFIT: return SymbolInfoString(sym,SYMBOL_CURRENCY_PROFIT);
+      case SYMBOL_COMMISSION_MONEY_SYMBOL_MARGIN: return SymbolInfoString(sym,SYMBOL_CURRENCY_MARGIN);
+     }
+   return tier.currency!="" ? tier.currency : rule_currency;
+  }
+
+string SymbolCommissionsJson(const string sym)
+  {
+   MqlCommission rules[];
+   ResetLastError();
+   int count=SymbolInfoCommissions(sym,rules);
+   if(count<0) return CommissionUnavailable("Broker query failed",GetLastError());
+   if(count>256) return CommissionUnavailable("Rule count limit");
+   string result="{\"version\":2,\"source\":\"mt5\",\"status\":\"available\",\"rules\":[";
+   int total_tiers=0;
+   for(int i=0;i<count;i++)
+     {
+      total_tiers+=ArraySize(rules[i].tiers);
+      if(total_tiers>1024) return CommissionUnavailable("Tier count limit");
+      if(i>0) result+=",";
+      result+="{\"currency\":"+JsonQuote(rules[i].currency);
+      result+=",\"range\":"+JsonQuote(CommissionLabel(EnumToString(rules[i].mode_range)));
+      result+=",\"charge\":"+JsonQuote(CommissionLabel(EnumToString(rules[i].mode_charge)));
+      result+=",\"entry\":"+JsonQuote(CommissionLabel(EnumToString(rules[i].mode_entry)));
+      result+=",\"direction\":"+JsonQuote(CommissionLabel(EnumToString(rules[i].mode_direction)));
+      result+=",\"profit\":"+JsonQuote(CommissionLabel(EnumToString(rules[i].mode_profit)));
+      result+=",\"tiers\":[";
+      for(int t=0;t<ArraySize(rules[i].tiers);t++)
+        {
+         if(!MathIsValidNumber(rules[i].tiers[t].value) || !MathIsValidNumber(rules[i].tiers[t].min_value)
+            || !MathIsValidNumber(rules[i].tiers[t].max_value) || !MathIsValidNumber(rules[i].tiers[t].range_from)
+            || !MathIsValidNumber(rules[i].tiers[t].range_to)) return CommissionUnavailable("Invalid numeric rule");
+         if(t>0) result+=",";
+         result+="{\"mode\":"+JsonQuote(CommissionLabel(EnumToString(rules[i].tiers[t].mode)));
+         result+=",\"volume_type\":"+JsonQuote(CommissionLabel(EnumToString(rules[i].tiers[t].volume_type)));
+         result+=",\"value\":"+JsonDouble(rules[i].tiers[t].value);
+         result+=",\"min\":"+JsonDouble(rules[i].tiers[t].min_value);
+         result+=",\"max\":"+JsonDouble(rules[i].tiers[t].max_value);
+         result+=",\"from\":"+JsonDouble(rules[i].tiers[t].range_from);
+         result+=",\"to\":"+JsonDouble(rules[i].tiers[t].range_to);
+         result+=",\"currency\":"+JsonQuote(rules[i].tiers[t].currency);
+         result+=",\"effective_currency\":"+JsonQuote(CommissionCurrency(sym,rules[i].tiers[t],rules[i].currency))+"}";
+         if(StringLen(result)>60000) return CommissionUnavailable("Rule payload limit");
+        }
+      result+="]}";
+      if(StringLen(result)>60000) return CommissionUnavailable("Rule payload limit");
+     }
+   if(StringFind(result,"\"Unknown\"")>=0) return CommissionUnavailable("Unknown rule meaning");
+   return result+"]}";
+  }
+
 string SymbolInfoJson(CSymbolInfo *obj, const string explicit_symbol = "")
   {
    if(explicit_symbol != "" && explicit_symbol != obj.Name())
@@ -1322,6 +1395,7 @@ string SymbolInfoJson(CSymbolInfo *obj, const string explicit_symbol = "")
    j += "\"formula\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_FORMULA)) + ",";
    j += "\"isin\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_ISIN)) + ",";
    j += "\"page\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_PAGE)) + ",";
+   j += "\"commissions\":" + JsonQuote(SymbolCommissionsJson(sym)) + ",";
    j += "\"path\":" + JsonQuote(SymbolInfoString(sym, SYMBOL_PATH)) + "}";
    return j;
   }

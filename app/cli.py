@@ -343,7 +343,7 @@ class HeadlessCliRunner:
                 "datasets": [d.to_dict() for d in datasets],
             }
         elif act in ("instruments", "instrument"):
-            instruments = dm.instruments.view()
+            instruments = dm.instruments.instruments()
             rendered = (
                 instruments_cli.format_instruments_table(instruments)
                 if instruments_cli is not None
@@ -434,7 +434,15 @@ class HeadlessCliRunner:
                 all_args.append(clean_act)
             else:
                 all_args.insert(0, f"action={clean_act}")
-        return dict(instruments_cli.dispatch(all_args, dm.instruments))
+        trading_factory = getattr(dm, "trading_factory", None)
+        try:
+            return dict(
+                instruments_cli.dispatch(
+                    all_args, dm.instruments, trading_factory=trading_factory
+                )
+            )
+        except TypeError:
+            return dict(instruments_cli.dispatch(all_args, dm.instruments))
 
     def _cmd_sessions(
         self, action: str, extra_args: Sequence[str] | None = None

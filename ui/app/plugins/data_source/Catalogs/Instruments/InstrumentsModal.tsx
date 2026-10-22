@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Button, Field, Modal, TextInput } from '../../../../components/ui';
 import { newInstrument, type FileInstrument, type InstrumentBroker, type InstrumentMassPatch } from '../../FileImport/fileSymbols';
-import type { CatalogInstrument } from './instrumentsApiClient';
+import { commissionInfo, type CatalogInstrument } from './instrumentsApiClient';
 import { useInstruments } from './instrumentsStore';
 import { InstrumentDetailsFields } from './InstrumentDetailsFields';
 import './instruments.css';
@@ -35,6 +35,7 @@ export function InstrumentsModal({ mode, selected, brokers, onClose, onSaved }: 
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save instrument.'); }
     finally { submitting.current = false; setPending(false); }
   }
+  const commission = selected[0] ? commissionInfo(selected[0].record.commissions) : null;
   const choices = [...brokers];
   if (!choices.some(row => row.id === draft.broker)) choices.push({ id: draft.broker, name: draft.brokerName, timezone: draft.timezone, postfix: '' });
   return <div className="instruments-flow"><Modal title={title} width={720} onClose={close} footer={<><Button disabled={pending} onClick={close}>Close</Button><Button disabled={pending} className="primary" onClick={() => void save()}>{pending ? 'Saving…' : 'Save'}</Button></>}>
@@ -43,7 +44,7 @@ export function InstrumentsModal({ mode, selected, brokers, onClose, onSaved }: 
     <fieldset className="instrument-form-body" disabled={pending}>
       {mode === 'clone' ? <><p>Copy the complete saved specification for {selected[0].symbol}, retaining its broker profile.</p><Field label="New instrument name"><TextInput value={name} maxLength={128} onChange={event => setName(event.target.value)}/></Field></> : <>
         {selected[0]?.record.swap_settings === null && <p>Legacy swap type and rollover time are unspecified. Editing swap settings explicitly configures them.</p>}
-        {selected[0] && !selected[0].record.commissions.startsWith('{') && <p>Legacy commission value: {selected[0].record.commissions}. Its model is unspecified; other edits preserve it.</p>}
+        {commission && <p title={commission.details}>{commission.summary}. Other edits preserve commission settings.</p>}
         <InstrumentDetailsFields value={draft} onChange={setDraft} brokers={choices} identityLocked={mode === 'edit'} massFlags={mode === 'mass' ? flags : undefined} onMassFlags={setFlags}/>
       </>}
     </fieldset>

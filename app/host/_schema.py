@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 __all__ = [
+    "INSTRUMENT_COLUMNS",
     "PERSISTENCE_TABLES",
     "SCHEMA_DDL",
     "TABLE_AUTOINCREMENT_PK_TABLES",
@@ -11,6 +12,30 @@ __all__ = [
     "TABLE_FOREIGN_KEY_GUARDS",
     "TABLE_PRIMARY_KEYS",
 ]
+
+# Canonical grouped specification columns; JSON stored as SQLite TEXT.
+INSTRUMENT_COLUMNS: tuple[tuple[str, str, str], ...] = tuple(
+    (name, "TEXT", "'{}'")
+    for name in (
+        "swap",
+        "margin",
+        "volume",
+        "spread",
+        "trade",
+        "price",
+        "contract",
+        "option",
+        "sessions",
+        "commissions",
+        "order_size",
+        "symbol_state",
+        "specification_meta",
+    )
+)
+_INSTRUMENT_DDL = "".join(
+    f',\n    "{name}" {kind} NOT NULL DEFAULT {default}'
+    for name, kind, default in INSTRUMENT_COLUMNS
+)
 
 PERSISTENCE_TABLES: tuple[str, ...] = (
     "datamgr_broker",
@@ -161,27 +186,12 @@ TABLE_DDL_MAP: dict[str, str] = {
     lineage_json TEXT NOT NULL DEFAULT '{}',
     schema_version INTEGER NOT NULL DEFAULT 1
 )""",
-    "datamgr_instruments": """CREATE TABLE IF NOT EXISTS "datamgr_instruments" (
+    "datamgr_instruments": f"""CREATE TABLE IF NOT EXISTS "datamgr_instruments" (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     symbol TEXT NOT NULL UNIQUE,
     connection TEXT DEFAULT '',
     broker_id INTEGER DEFAULT 0,
     description TEXT DEFAULT '',
-    tick_size REAL NOT NULL DEFAULT 0.00001,
-    tick_step REAL NOT NULL DEFAULT 0.00001,
-    tick_value_in_money REAL NOT NULL DEFAULT 10.0,
-    point_value REAL NOT NULL DEFAULT 100000.0,
-    decimals INTEGER NOT NULL DEFAULT 5,
-    default_spread REAL NOT NULL DEFAULT 0.0001,
-    default_slippage REAL NOT NULL DEFAULT 0.0,
-    min_volume REAL NOT NULL DEFAULT 0.01,
-    max_volume REAL NOT NULL DEFAULT 100.0,
-    lot_step REAL NOT NULL DEFAULT 0.01,
-    margin_rate REAL NOT NULL DEFAULT 0.05,
-    swap_long REAL NOT NULL DEFAULT 0.0,
-    swap_short REAL NOT NULL DEFAULT 0.0,
-    swap_3day_day INTEGER NOT NULL DEFAULT 3,
-    commissions TEXT DEFAULT '0.0',
     data_type TEXT DEFAULT 'Forex',
     alias TEXT DEFAULT '',
     exchange TEXT DEFAULT '',
@@ -189,10 +199,7 @@ TABLE_DDL_MAP: dict[str, str] = {
     sector TEXT DEFAULT '',
     created_at_utc TEXT NOT NULL,
     updated_at_utc TEXT NOT NULL,
-    min_distance REAL NOT NULL DEFAULT 0.0,
-    order_size_multiplier REAL NOT NULL DEFAULT 1.0,
-    order_size_step REAL NOT NULL DEFAULT 0.0,
-    cot TEXT DEFAULT NULL
+    cot TEXT DEFAULT NULL{_INSTRUMENT_DDL}
 )""",
     "datamgr_logs": """CREATE TABLE IF NOT EXISTS datamgr_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
