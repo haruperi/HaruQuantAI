@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { DukascopyRegistrationError } from '../../Common/dataManagerStore';
 import { filterCatalogue } from '../dukascopy';
 import { useDukascopyAddService } from '../DukascopyService';
 
@@ -19,10 +20,16 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
   const [postfix, setPostfix] = useState('');
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const saveLock = useRef(false);
   const [warning, setWarning] = useState(false);
   const [mapping, setMapping] = useState<Record<string, string> | null>(null);
-  const { brokers, storageError, addData } = useDukascopyAddService();
+  const { brokers, brokerLoading, brokerError, reloadBrokers, addData } = useDukascopyAddService();
   const activeBroker = brokers.find((item) => item.id === broker);
+  const brokerInvalid = broker !== '-1' && !activeBroker?.mtUse;
+  useEffect(() => {
+    if (open) void reloadBrokers();
+  }, [open, reloadBrokers]);
   const rows = useMemo(() => filterCatalogue(query, category), [query, category]);
   const groups = useMemo(
     () =>
@@ -61,7 +68,12 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
         : [...new Set([...current, ...symbols])],
     );
   const save = async () => {
+    if (saveLock.current) return;
     setError('');
+    if (brokerLoading || brokerError || brokerInvalid) {
+      setError(brokerError || (brokerLoading ? 'Wait for broker profiles to load.' : 'Choose an available broker profile.'));
+      return;
+    }
     if (!selected.length) {
       setError('No symbols selected');
       return;
@@ -79,6 +91,8 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
       }
       return '-1';
     });
+    saveLock.current = true;
+    setSaving(true);
     try {
       await addData({
         symbols: selected,
@@ -88,13 +102,24 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
         instruments: resolvedInstruments,
       });
       onComplete(
-        `${selected.length} Dukascopy mock dataset definition${selected.length === 1 ? '' : 's'} added`,
+        `${selected.length} Dukascopy dataset definition${selected.length === 1 ? '' : 's'} added`,
       );
     } catch (cause) {
+      if (cause instanceof DukascopyRegistrationError) {
+        setSelected(current => current.filter(symbol => !cause.confirmedSymbols.includes(symbol)));
+      }
       setError(cause instanceof Error ? cause.message : 'Unable to add symbols');
+    } finally {
+      saveLock.current = false;
+      setSaving(false);
     }
   };
   return {
+    saving,
+    brokerLoading,
+    brokerError,
+    brokerInvalid,
+    reloadBrokers,
     query,
     category,
     selected,
@@ -106,7 +131,6 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
     warning,
     mapping,
     brokers,
-    storageError,
     activeBroker,
     rows,
     groups,

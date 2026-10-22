@@ -3,8 +3,8 @@
 Description:
     Exposes RESTful endpoints for the Data Manager workspace, mounting
     authoritative routes under /data. Coordinates workspace lifecycle and
-    delegates dashboard requests directly to Home. Emits structured telemetry
-    with zero silent execution.
+    delegates dashboard requests to Home and symbol registration to Data.add().
+    Emits structured telemetry with zero silent execution.
 
 Purpose:
     FEAT-DATAMGR-SHELL: Dockable workspace and linked recorded-data selection.
@@ -35,9 +35,11 @@ CLI Usage:
 
 from __future__ import annotations
 
+import csv
 import json
 import math
 import os
+import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -77,6 +79,8 @@ FACADE_FR = "FR-DATAMGR-ROUTES-WORKSPACE-FACADE"
 GATEWAY_FR = "FR-DATAMGR-ROUTES-FASTAPI-GATEWAY"
 INIT_FR = "FR-DATAMGR-SHELL-INIT"
 TAB_FR = "FR-DATAMGR-SHELL-TAB"
+_DATASET_TEXT_LIMIT = 100
+_CATALOGUE_COLUMNS = 12
 _CORE_TABS = frozenset({"data", "instruments", "sessions", "brokers", "custom-data"})
 _TABS = (
     ("data", "Data"),
@@ -298,6 +302,90 @@ def _register_workspace_routes(router: APIRouter, ws: AppDataManager) -> None:
             return _workspace_error(str(error), code)
 
 
+def _dataset_values(ws: AppDataManager, payload: dict[str, Any]) -> dict[str, Any]:
+    """Resolve a bounded Dukascopy registration using authoritative metadata."""
+    fields = {"source", "symbol", "underlying", "timeframe", "broker", "instrument"}
+    if set(payload) != fields or any(
+        not isinstance(value, str) or not value or len(value) > _DATASET_TEXT_LIMIT
+        for value in payload.values()
+    ):
+        raise ValueError(
+            "Supply source, symbol, underlying, timeframe, broker and instrument."
+        )
+    if payload["source"] != "dukascopy" or payload["timeframe"] not in {"TICK", "M1"}:
+        raise ValueError("Choose Dukascopy TICK or M1 data.")
+    underlying, symbol = payload["underlying"], payload["symbol"]
+    if not re.fullmatch(r"[A-Z0-9_.-]+", symbol) or not symbol.startswith(underlying):
+        raise ValueError("Use a catalogue symbol and a safe alphanumeric postfix.")
+    catalogue = (
+        Path(__file__).resolve().parents[3] / "data/market/dukascopy/dukascopy.csv"
+    )
+    with catalogue.open(encoding="utf-8", newline="") as stream:
+        entry = next(
+            (
+                row
+                for row in csv.reader(stream, delimiter=";")
+                if row and row[0] == underlying
+            ),
+            None,
+        )
+    if entry is None or len(entry) != _CATALOGUE_COLUMNS:
+        raise ValueError("Unknown Dukascopy catalogue symbol.")
+    profile = _dataset_broker(ws, payload["broker"], payload["instrument"], underlying)
+    folder = "ticks" if payload["timeframe"] == "TICK" else "m1"
+    return {
+        **payload,
+        **profile,
+        "category": entry[2],
+        "path": f"data/market/dukascopy/{folder}/{underlying.lower()}",
+    }
+
+
+def _dataset_broker(
+    ws: AppDataManager, broker: str, instrument: str, underlying: str
+) -> dict[str, str]:
+    """Resolve profile defaults and validate any explicit instrument mapping."""
+    if broker == "-1":
+        if instrument != "-1":
+            raise ValueError("Default broker does not accept an instrument mapping.")
+        return {
+            "broker": "default",
+            "broker_name": "Default",
+            "timezone": "UTC",
+            "instrument": underlying,
+        }
+    profile = next((row for row in ws.broker.brokers() if row["id"] == broker), None)
+    if profile is None or not profile["mt_use"]:
+        raise ValueError("Choose a saved broker profile enabled for data management.")
+    if instrument != "-1" and not any(
+        row["symbol"] == instrument
+        for row in ws.instruments.instruments({"broker_id": int(broker)})
+    ):
+        raise ValueError("Instrument mapping is not assigned to this broker.")
+    return {
+        "broker": broker,
+        "broker_name": profile["name"],
+        "timezone": profile["timezone"],
+        "instrument": underlying if instrument == "-1" else instrument,
+    }
+
+
+def _register_dataset_routes(router: APIRouter, ws: AppDataManager) -> None:
+    @router.post("/datasets")
+    def add_dataset(payload: dict[str, Any]) -> JSONResponse:
+        def register() -> dict[str, Any]:
+            values = _dataset_values(ws, payload)
+            dataset_id = f"dukascopy:{values['symbol']}:{values['timeframe']}"
+            if ws.data.list_datasets({"id": dataset_id}):
+                raise FileExistsError(
+                    "This dataset already exists. Refresh the catalog."
+                )
+            return ws.data.add(**values)
+
+        logger.info("Dataset registration requested", extra={"fr_id": GATEWAY_FR})
+        return _catalog_response(register, domain="Dataset", code=201)
+
+
 def _catalog_response(
     operation: Any,
     *args: Any,
@@ -309,6 +397,7 @@ def _catalog_response(
         data = operation(*args, **options)
         return JSONResponse(status_code=code, content=ApiResponse.ok(data=data))
     except (ValueError, LookupError, FileExistsError) as error:
+        logger.warning("%s request rejected", domain, extra={"fr_id": GATEWAY_FR})
         error_code = (
             409
             if isinstance(error, FileExistsError)
@@ -322,7 +411,7 @@ def _catalog_response(
                 f"{domain.upper()}_REQUEST", str(error), status_code=error_code
             ),
         )
-    except RuntimeError:
+    except RuntimeError, OSError:
         logger.error("%s storage unavailable", domain, extra={"fr_id": GATEWAY_FR})  # noqa: TRY400 - sanitized boundary
         return JSONResponse(
             status_code=503,
@@ -675,6 +764,7 @@ def create_data_manager_router(
 
     _register_home_routes(router, ws)
     _register_workspace_routes(router, ws)
+    _register_dataset_routes(router, ws)
     _register_basket_routes(router, ws)
     _register_broker_read_routes(router, ws)
     _register_broker_write_routes(router, ws)

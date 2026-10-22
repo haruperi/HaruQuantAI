@@ -596,7 +596,7 @@ export function DataManager() {
   useEffect(() => {
     if (hostStatus === 'online' && ['Data sources', 'Export', 'Tools'].includes(tab)) void useDataManagerStore.getState().syncRemoteDatasets();
   }, [tab, hostStatus]);
-  useEffect(() => { void useDataManagerStore.getState().syncBrokers(); }, []);
+  useEffect(() => { if (hostStatus === 'online') void useDataManagerStore.getState().syncBrokers(); }, [hostStatus]);
   useEffect(() => {
     if (providerJob?.state === 'completed') void useDataManagerStore.getState().syncRemoteDatasets();
   }, [providerJob?.state]);

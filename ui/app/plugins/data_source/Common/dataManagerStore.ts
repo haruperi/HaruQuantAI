@@ -22,6 +22,22 @@ import { createDomainClient, type DomainClient } from '../../../host/transport';
 let dataClient = createDomainClient('/data');
 let catalogRequest = 0;
 let brokerRequest = 0;
+let registeringDukascopy = false;
+
+async function registrationRequest<T>(operation: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => reject(new Error('Registration request timed out. Refresh before retrying; the last request may still complete.')), 30000);
+  });
+  try { return await Promise.race([operation, deadline]); }
+  finally { clearTimeout(timer); }
+}
+
+export class DukascopyRegistrationError extends Error {
+  constructor(message: string, public readonly confirmedSymbols: string[]) {
+    super(message);
+  }
+}
 
 export function setDataClient(client: DomainClient): void {
   dataClient = client;
@@ -243,68 +259,76 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
   },
   brokerAction:action=>{const state=get();if(!state.brokerJob||!['running','paused'].includes(state.brokerJob.state))return;const brokerJob={...state.brokerJob,state:action==='pause'?'paused' as const:action==='resume'?'running' as const:'cancelled' as const};persistData(state,state.brokers,state.definitions,brokerJob);set({brokerJob});},
   addData: async request => {
-    const state = get();
-    if (useFileSymbols.getState().storageError) throw new Error(useFileSymbols.getState().storageError);
-      if (useFileImports.getState().storageError) throw new Error(useFileImports.getState().storageError);
-    if (state.storageError) throw new Error(state.storageError);
+    if (registeringDukascopy) throw new Error('A symbol registration is already running.');
     if (!request.symbols.length) throw new Error('No symbols selected');
     if (!['TICK', 'M1'].includes(request.dataType)) throw new Error('Invalid data type');
-    const broker = state.brokers.find(item => item.id === request.broker && item.mtUse);
-    if (request.broker !== '-1' && !broker) throw new Error('Choose a valid broker profile');
-    const existingNames = new Set([...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedSQDefinitions(), ...reservedMt5(), ...state.definitions, ...useTickDownloader.getState().definitions, ...useFileSymbols.getState().definitions, ...useFileImports.getState().records, ...(activeImport(useFileImports.getState().job?.state) ? useFileImports.getState().job?.tasks.map(task => task.record) ?? [] : [])].map(row => row.symbol));
-    const additions = request.symbols.map((symbol, index): MockDefinition => {
+    const postfix = request.postfix.toUpperCase();
+    if (!/^[A-Z0-9_.-]*$/.test(postfix)) throw new Error('Use a safe alphanumeric postfix.');
+    const items = request.symbols.map(symbol => {
       const item = catalogue.find(row => row.symbol === symbol);
       if (!item) throw new Error('Unknown catalogue symbol');
-      const name = symbol + request.postfix;
-      if (existingNames.has(name)) throw new Error(`Data symbol ${name} already exists. Choose a different postfix.`);
-      existingNames.add(name);
-      const mapping = request.instruments[index] ?? '-1';
-      const resolvedInstrument = (broker && mapping !== '-1' && broker.instruments.includes(mapping))
-        ? mapping
-        : symbol;
-      const folderKind = request.dataType === 'TICK' ? 'ticks' : 'm1';
-      return {
-        id: `ds_dukascopy_${name.toLowerCase()}_${request.dataType.toLowerCase()}`,
-        source: 'Dukascopy',
-        symbol: name,
-        underlying: symbol,
-        instrument: resolvedInstrument,
-        timeframe: request.dataType,
-        broker: request.broker,
-        brokerName: broker?.name ?? 'Default',
-        timezone: broker?.timezone ?? 'UTC',
-        category: item.category,
-        from: '',
-        to: '',
-        bars: 0,
-        path: `data\\market\\dukascopy\\${folderKind}\\${symbol.toLowerCase()}`,
-        barType: 'Start of bar',
-      };
+      return item;
     });
-    const definitions = [...state.definitions, ...additions];
-    if (definitions.length > 10000) throw new Error('Mock dataset limit reached');
-    try { persistData(state,state.brokers,definitions,state.brokerJob); }
-    catch { throw new Error('Unable to save mock definitions in browser storage. No symbols were added.'); }
-    set({ definitions });
+    if (new Set(request.symbols).size !== items.length) throw new Error('Duplicate symbol selection.');
+    registeringDukascopy = true;
+    const confirmed = new Set<string>();
+    const baseline = new Set<string>();
+    let attempted = false;
+    const reconcile = async () => {
+      const remote = await registrationRequest(fetchRemoteDatasets());
+      ++catalogRequest;
+      set({ savedDatasets: remote, definitions: remote.map(row => ({ ...row })), catalogError: '', catalogLoading: false });
+      return remote;
+    };
     try {
-      for (const def of additions) {
-        await dataClient.post('/datasets', {
-          id: def.id,
-          symbol: def.symbol,
-          source: def.source,
-          timeframe: def.timeframe,
-          underlying: def.underlying,
-          instrument: def.instrument,
-          broker: def.broker,
-          broker_name: def.brokerName,
-          timezone: def.timezone,
-          category: def.category,
-          path: def.path,
-          bar_type: def.barType,
-        });
+      const before = await reconcile();
+      before.forEach(row => baseline.add(row.id));
+      for (const item of items) {
+        const symbol = item.symbol + postfix;
+        if (symbol.length > 100) throw new Error('Data symbol exceeds 100 characters.');
+        const id = `dukascopy:${symbol}:${request.dataType}`;
+        if (baseline.has(id)) throw new Error(`Data symbol ${symbol} already exists. Choose a different postfix.`);
       }
-    } catch {
-      // Offline / headless mock test fallback
+      for (const [index, item] of items.entries()) {
+        attempted = true;
+        const symbol = item.symbol + postfix;
+        const id = `dukascopy:${symbol}:${request.dataType}`;
+        const saved = await registrationRequest(dataClient.post<Record<string, unknown>>('/datasets', {
+          source: 'dukascopy', symbol, underlying: item.symbol, timeframe: request.dataType,
+          broker: request.broker, instrument: request.instruments[index] ?? '-1',
+        }));
+        if (!saved || saved.id !== id || saved.symbol !== symbol || saved.underlying !== item.symbol ||
+            saved.timeframe !== request.dataType || saved.source !== 'dukascopy' ||
+            ['broker', 'broker_name', 'timezone', 'instrument', 'path', 'category'].some(key => typeof saved[key] !== 'string') || saved.bars !== 0) {
+          throw new Error('The host did not confirm the requested dataset. Refresh before retrying.');
+        }
+        confirmed.add(item.symbol);
+      }
+      const after = await reconcile();
+      if (items.some(item => !after.some(row => row.id === `dukascopy:${item.symbol + postfix}:${request.dataType}` && row.underlying === item.symbol))) {
+        throw new Error('Registered symbols are missing from the saved catalog. Refresh before retrying.');
+      }
+    } catch (cause) {
+      let refreshFailed = false;
+      if (attempted) {
+        try {
+          const remote = await reconcile();
+          for (const item of items) {
+            if (remote.some(row => row.id === `dukascopy:${item.symbol + postfix}:${request.dataType}` &&
+                !baseline.has(row.id) && row.underlying === item.symbol && row.timeframe === request.dataType)) confirmed.add(item.symbol);
+          }
+        } catch {
+          refreshFailed = true;
+          set({ catalogError: 'Unable to reconcile registrations. Refresh the saved catalog before retrying.' });
+        }
+      }
+      const detail = cause instanceof Error ? cause.message : 'Unable to register symbols.';
+      throw new DukascopyRegistrationError(
+        `${confirmed.size} of ${items.length} symbols confirmed. ${detail}${refreshFailed ? ' Refresh the catalog before retrying; the last request may have succeeded.' : ''}`,
+        [...confirmed],
+      );
+    } finally {
+      registeringDukascopy = false;
     }
   },
   syncRemoteDatasets: async () => {

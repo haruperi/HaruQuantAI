@@ -449,3 +449,147 @@ def test_data_manager_help_routes(tmp_path: Path) -> None:
 
         res_bad = client.get("/data/help?topic=unsupported-topic")
         assert res_bad.status_code == 422
+
+
+@pytest.mark.parametrize("timeframe", ["TICK", "M1"])
+def test_dataset_registration_persists_and_reloads(
+    timeframe: str, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Register through Data.add and expose only persisted catalog records."""
+    import logging
+    from unittest.mock import patch
+
+    workspace = AppDataManager()
+    app = FastAPI()
+    app.include_router(create_data_manager_router(workspace))
+    payload = {
+        "source": "dukascopy",
+        "symbol": "EURUSD_TEST",
+        "underlying": "EURUSD",
+        "timeframe": timeframe,
+        "broker": "-1",
+        "instrument": "-1",
+    }
+    with (
+        TestClient(app) as client,
+        caplog.at_level(logging.INFO),
+        patch.object(workspace.data, "add", wraps=workspace.data.add) as add,
+    ):
+        response = client.post("/data/datasets", json=payload)
+        assert response.status_code == 201
+        add.assert_called_once()
+        record = response.json()["data"]
+        assert record["id"] == f"dukascopy:EURUSD_TEST:{timeframe}"
+        assert record["broker_name"] == "Default"
+        assert record["timezone"] == "UTC"
+        assert record["underlying"] == record["instrument"] == "EURUSD"
+        assert record["bars"] == 0
+        folder = "ticks" if timeframe == "TICK" else "m1"
+        assert record["path"] == f"data/market/dukascopy/{folder}/eurusd"
+        assert client.get("/data/home/datasets").json()["data"][0]["id"] == record["id"]
+        assert client.post("/data/datasets", json=payload).status_code == 409
+        assert len(workspace.data.list_datasets()) == 1
+    assert any(
+        getattr(row, "fr_id", None) == "FR-DATAMGR-DATA-ADD" for row in caplog.records
+    )
+    assert any(
+        row.levelname == "WARNING"
+        and getattr(row, "fr_id", None) == "FR-DATAMGR-ROUTES-FASTAPI-GATEWAY"
+        for row in caplog.records
+    )
+
+
+@pytest.mark.parametrize(
+    "updates",
+    [
+        {"source": "other"},
+        {"timeframe": "D1"},
+        {"symbol": "EURUSD/../../bad"},
+        {"symbol": "GBPUSD"},
+        {"underlying": "UNKNOWN"},
+        {"symbol": 123},
+        {"broker": "999999"},
+        {"instrument": "FAKE"},
+        {"path": "unsafe"},
+        {"broker_name": "Spoof"},
+        {"timezone": "Spoof"},
+        {"symbol": "EURUSD" + "A" * 100},
+    ],
+)
+def test_dataset_registration_rejects_invalid_fields(updates: dict[str, Any]) -> None:
+    """Reject untrusted fields and identity data before any persistence."""
+    workspace = AppDataManager()
+    app = FastAPI()
+    app.include_router(create_data_manager_router(workspace))
+    payload = {
+        "source": "dukascopy",
+        "symbol": "EURUSD",
+        "underlying": "EURUSD",
+        "timeframe": "M1",
+        "broker": "-1",
+        "instrument": "-1",
+        **updates,
+    }
+    with TestClient(app) as client:
+        assert client.post("/data/datasets", json=payload).status_code == 422
+    assert workspace.data.list_datasets() == []
+
+
+def test_dataset_registration_broker_mapping() -> None:
+    """Resolve saved profile defaults and reject another broker's instrument."""
+    workspace = AppDataManager()
+    broker = workspace.broker.add_broker(
+        {"name": "Research", "timezone": "Europe/London"}
+    )
+    workspace.instruments.add_instrument(
+        {"symbol": "EURUSD.FX", "broker_id": int(broker["id"])}
+    )
+    app = FastAPI()
+    app.include_router(create_data_manager_router(workspace))
+    payload = {
+        "source": "dukascopy",
+        "symbol": "EURUSD_B",
+        "underlying": "EURUSD",
+        "timeframe": "M1",
+        "broker": broker["id"],
+        "instrument": "EURUSD.FX",
+    }
+    with TestClient(app) as client:
+        response = client.post("/data/datasets", json=payload)
+        assert response.status_code == 201
+        assert response.json()["data"]["broker_name"] == "Research"
+        assert response.json()["data"]["timezone"] == "Europe/London"
+        assert response.json()["data"]["instrument"] == "EURUSD.FX"
+        payload.update(symbol="EURUSD_BAD", instrument="UNASSIGNED")
+        assert client.post("/data/datasets", json=payload).status_code == 422
+
+
+def test_dataset_registration_auth_and_sanitized_storage(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Require session authority and hide internal persistence diagnostics."""
+    workspace = AppDataManager()
+    app = FastAPI()
+    app.include_router(create_data_manager_router(workspace, require_auth=True))
+    payload = {
+        "source": "dukascopy",
+        "symbol": "EURUSD",
+        "underlying": "EURUSD",
+        "timeframe": "M1",
+        "broker": "-1",
+        "instrument": "-1",
+    }
+    with TestClient(app) as client:
+        assert client.post("/data/datasets", json=payload).status_code == 401
+    app = FastAPI()
+    app.include_router(create_data_manager_router(workspace))
+
+    def fail(**_values: Any) -> dict[str, Any]:
+        raise RuntimeError("private diagnostic")
+
+    monkeypatch.setattr(workspace.data, "add", fail)
+    with TestClient(app) as client:
+        response = client.post("/data/datasets", json=payload)
+        assert response.status_code == 503
+        assert "private diagnostic" not in response.text
+    assert workspace.data.list_datasets() == []

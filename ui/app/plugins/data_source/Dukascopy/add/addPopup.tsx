@@ -8,6 +8,11 @@ export function AddPopup(props: AddPopupProps) {
   const { open, onClose } = props;
   const controller = useAddPopupController(props);
   const {
+    saving,
+    brokerLoading,
+    brokerError,
+    brokerInvalid,
+    reloadBrokers,
     query,
     category,
     selected,
@@ -19,7 +24,6 @@ export function AddPopup(props: AddPopupProps) {
     warning,
     mapping,
     brokers,
-    storageError,
     rows,
     groups,
     root,
@@ -44,10 +48,12 @@ export function AddPopup(props: AddPopupProps) {
         className="dukas-dialog"
         role="dialog"
         aria-modal="true"
+        aria-busy={saving}
         aria-labelledby="dukas-title"
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.stopPropagation();
+            if (saving) return;
             onClose();
           }
           if (event.key === 'Tab') {
@@ -71,11 +77,11 @@ export function AddPopup(props: AddPopupProps) {
       >
         <header>
           <h2 id="dukas-title">Add Dukascopy data</h2>
-          <button aria-label="Close" onClick={onClose}>
+          <button disabled={saving} aria-label="Close" onClick={onClose}>
             Ã—
           </button>
         </header>
-        <div className="dukas-body">
+        <div className="dukas-body" inert={saving}>
           <section className="dukas-panel">
               <strong>Choose from available data</strong>
               <div className="dukas-filters">
@@ -164,22 +170,27 @@ export function AddPopup(props: AddPopupProps) {
                   <strong>Broker profile *</strong>
                   <select
                     aria-label="Broker profile *"
+                    aria-describedby="dukas-broker-status"
+                    aria-busy={brokerLoading}
+                    disabled={brokerLoading || !!brokerError}
                     value={broker}
                     onChange={(event) => {
                       const id = event.target.value;
                       setBroker(id);
                       setPostfix(brokers.find((item) => item.id === id)?.postfix ?? '');
-                      if (id !== '-1') setWarning(true);
+                      setWarning(id !== '-1');
+                      setError('');
                     }}
                   >
                     <option value="-1">Default</option>
-                    {brokers
-                      .filter((item) => item.mtUse)
-                      .map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      ))}
+                    {brokerInvalid && !brokers.some(item => item.id === broker) && (
+                      <option value={broker} disabled>Previously selected broker is unavailable</option>
+                    )}
+                    {brokers.map(item => (
+                      <option key={item.id} value={item.id} disabled={!item.mtUse}>
+                        {item.name.startsWith('[[') && item.name.endsWith(']]') ? item.name.slice(2, -2).trim() : item.name}{item.mtUse ? '' : ' (disabled for data management)'}
+                      </option>
+                    ))}
                   </select>
                 </label>
                 <label>
@@ -190,7 +201,16 @@ export function AddPopup(props: AddPopupProps) {
                   </span>
                 </label>
               </div>
-              {warning && (
+              <div id="dukas-broker-status">
+                {brokerLoading ? <p role="status">Loading broker profiles...</p>
+                  : brokerError ? <p className="dukas-error" role="alert">{brokerError}{' '}
+                    <button className="sq-button" onClick={() => { setError(''); void reloadBrokers(); }}>Retry broker profiles</button>
+                  </p>
+                  : brokerInvalid ? <p className="dukas-error" role="alert">The selected broker is no longer available for data management. Choose another profile.</p>
+                  : !brokers.length ? <p role="status">No saved broker profiles. Default is available.</p> : null}
+              </div>
+              {warning && !brokerInvalid && (
+
                 <p className="dukas-warning" role="status">
                   You have selected a non-default broker. Data will be automatically adjusted to the
                   broker's time zone during download.
@@ -201,6 +221,7 @@ export function AddPopup(props: AddPopupProps) {
         <footer>
           <label className="dukas-consent">
             <input
+              disabled={saving}
               role="switch"
               type="checkbox"
               checked={confirmed}
@@ -208,17 +229,17 @@ export function AddPopup(props: AddPopupProps) {
             />
             <span>{disclaimer}</span>
           </label>
-          {(error || storageError) && (
+          {error && (
             <p className="dukas-error" role="alert">
-              {error || storageError}
+              {error}
             </p>
           )}
           <div className="dukas-actions">
-            <button className="dukas-link sq-button" onClick={onClose}>
+            <button className="dukas-link sq-button" disabled={saving} onClick={onClose}>
               Close
             </button>
-            <button className="dukas-save sq-button primary" onClick={save}>
-              Save
+            <button className="dukas-save sq-button primary" disabled={saving || brokerLoading || !!brokerError || brokerInvalid} onClick={save}>
+              {saving ? 'Saving…' : 'Save'}
             </button>
           </div>
         </footer>

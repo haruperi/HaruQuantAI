@@ -2,12 +2,14 @@ import { useDataManagerStore, useDukascopyDownloads } from '../Common/dataManage
 import type { AddDukasRequest } from './dukascopy';
 import type { DownloadRequest } from './dukascopyDownload';
 
-/** Typed adapters to the retained local mock stores; no live provider calls. */
+/** Shared host-backed registration/catalog adapters and simulated downloads. */
 export function useDukascopyAddService() {
   const brokers = useDataManagerStore((state) => state.brokers);
-  const storageError = useDataManagerStore((state) => state.storageError);
+  const brokerLoading = useDataManagerStore((state) => state.brokerLoading);
+  const brokerError = useDataManagerStore((state) => state.brokerError);
+  const reloadBrokers = useDataManagerStore((state) => state.syncBrokers);
   const add = useDataManagerStore((state) => state.addData);
-  return { brokers, storageError, addData: (request: AddDukasRequest): Promise<void> => add(request) };
+  return { brokers, brokerLoading, brokerError, reloadBrokers, addData: (request: AddDukasRequest): Promise<void> => add(request) };
 }
 
 export function useDukascopyDownloadService() {

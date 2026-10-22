@@ -53,8 +53,15 @@ pilot composition remains documented in its original task walkthrough.
   the retained shared CDN content and is also mounted in downloads.
 - `dukascopy.ts` and `dukascopyDownload.ts` retain shared utility APIs used by
   sibling providers. Their filenames are explicitly target-only exceptions.
-- `DukascopyService.ts` delegates to current Common mock stores. Real provider
-  downloads, CDN operation and backend behavior remain unimplemented.
+- `DukascopyService.ts` delegates registration to the Common store, which calls
+  the authenticated dataset endpoint backed by `Data.add()` and reloads the saved
+  catalog. Host failures remain visible; partial registrations are reconciled
+  before retry. Registration does not depend on browser mock storage. Provider
+  downloads and CDN operation remain simulated.
+- The add popup reloads the same saved broker catalog used by the Brokers table
+  whenever it opens. It shows loading/errors with retry and keeps disabled
+  profiles visible with an eligibility label. Default remains available for an
+  empty successful catalog; stale or ineligible selections cannot be saved.
 - Existing catalogue data remains outside this UI subtree. The donor JAR, CSV and
   icon are excluded from UI counterpart counts; no donor binary is copied.
 
