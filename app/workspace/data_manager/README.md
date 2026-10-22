@@ -86,6 +86,8 @@ Registered target scope does not establish independently verified donor parity.
 
 #### Module 2: Datasets & Parquet Storage (`data.py`)
 - `FEAT-DATAMGR-DATA`: Dataset catalog CRUD, Parquet bar I/O, chart review, and export.
+- `FR-DATAMGR-DATA-EDIT`: `Data.edit(dataset_id: str, updates: Mapping[str, Any] | None = None, **kwargs: Any) -> dict[str, Any]`;
+  updates editable columns in `datamgr_datasets` with strict type validation, UTC timestamp tracking, and structured requirement logging.
 - `FR-DATAMGR-DATA-CATALOG-CRUD`: Dataset catalog management in `datamgr_datasets`.
 - `FR-DATAMGR-DATA-PARQUET-IO`: OHLCV and tick Parquet read/write operations.
 - `FR-DATAMGR-DATA-REVIEW-AND-EDIT`: Chart slice inspection, row review, and manual bar editing.

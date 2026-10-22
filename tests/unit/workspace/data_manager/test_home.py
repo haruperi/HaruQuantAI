@@ -368,6 +368,7 @@ def test_data_manager_package_facade_exports() -> None:
         "AppDataManager",
         "Basket",
         "Broker",
+        "Data",
         "Home",
         "HomeCLI",
         "Instruments",
