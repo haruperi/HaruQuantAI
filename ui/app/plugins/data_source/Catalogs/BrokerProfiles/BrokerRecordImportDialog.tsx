@@ -1,254 +1,79 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Field, Modal, TextInput } from '../../../../components/ui';
-import {
-  newInstrument,
-  parseInstrumentsJson,
-  type FileInstrument,
-  type InstrumentBroker,
-} from '../../FileImport/fileSymbols';
+import { parseInstrumentsJson, type FileInstrument } from '../../FileImport/fileSymbols';
 import { parseSessionsJson, type SessionDefinition } from '../Sessions/sessions';
-import { effectiveInstruments } from '../../FileImport/fileSymbols';
-import { useFileSymbols } from '../../FileImport/fileSymbolsStore';
-import { projectBrokerInstruments, type BrokerProfile } from './brokerProfiles';
-import { inspectXmlOverview, importXmlRecords } from './brokerApiClient';
+import { fromFileInstrument } from '../Instruments/instrumentsApiClient';
+import { fromSessionDefinition } from '../Sessions/sessionApiClient';
+import { useInstruments } from '../Instruments/instrumentsStore';
+import { useSessions } from '../Sessions/sessionStore';
+import { useDataManagerStore } from '../../Common/dataManagerStore';
+import { importBrokerRecords, type BrokerImportResult } from './brokerApiClient';
+import type { BrokerProfile } from './brokerProfiles';
 import './brokerProfiles.css';
 
-export function BrokerRecordImportDialog({
-  kind,
-  brokers,
-  onClose,
-  onSaved,
-}: {
-  kind: 'instrument' | 'session';
-  brokers: BrokerProfile[];
-  onClose: () => void;
-  onSaved: (message: string) => void;
-}) {
-  const instruments = useFileSymbols();
-  const [fileName, setFileName] = useState('');
-  const [rows, setRows] = useState<(FileInstrument | SessionDefinition)[]>([]);
-  const [rawContent, setRawContent] = useState('');
-  const [isXml, setIsXml] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [brokerId, setBrokerId] = useState('-1');
-  const [postfix, setPostfix] = useState('');
-  const [error, setError] = useState('');
-  const [confirm, setConfirm] = useState<string[] | null>(null);
-  const broker = brokers.find(row => row.id === brokerId);
-  const names = rows.map(row => ('symbol' in row ? row.symbol : row.name));
-  const brokerChoices: InstrumentBroker[] = [
-    { id: '-1', name: 'Default', postfix: '', timezone: 'UTC' },
-    ...brokers.filter(row => row.mtUse),
-  ];
-
+export function BrokerRecordImportDialog({kind,brokers,onClose,onSaved}:{kind:'instrument'|'session';brokers:BrokerProfile[];onClose:()=>void;onSaved:(message:string)=>void}) {
+  const [fileName,setFileName] = useState('');
+  const [rows,setRows] = useState<Array<FileInstrument | SessionDefinition>>([]);
+  const [selected,setSelected] = useState<string[]>([]);
+  const [brokerId,setBrokerId] = useState('-1');
+  const [postfix,setPostfix] = useState('');
+  const [overwrite,setOverwrite] = useState(false);
+  const [useCosts,setUseCosts] = useState(false);
+  const [pending,setPending] = useState(false);
+  const [error,setError] = useState('');
+  const [result,setResult] = useState<BrokerImportResult | null>(null);
+  const busy = useRef(false);
+  const browseVersion = useRef(0);
+  const names = rows.map(row => 'symbol' in row ? row.symbol : row.name);
+  const choices = [{id:'-1',name:'Default',postfix:'',timezone:'UTC'},...brokers.filter(row => row.mtUse && !row.system)];
+  function close() { if (!busy.current) { browseVersion.current++; onClose(); } }
   async function browse(file: File | undefined) {
+    const version = ++browseVersion.current;
+    setRows([]);setSelected([]);setResult(null);setError('');setFileName('');setOverwrite(false);
     if (!file) return;
     try {
-      if (file.size > 5_000_000) throw new Error('Cannot load content: file too large.');
+      if (file.size > 2_000_000) throw new Error('JSON file exceeds 2 MB.');
       const text = await file.text();
-      setRawContent(text);
-      const isXmlFile = file.name.toLowerCase().endsWith('.xml') || text.trim().startsWith('<');
-      setIsXml(isXmlFile);
-
-      if (isXmlFile) {
-        const overview = await inspectXmlOverview(text, kind);
-        if (!overview.length) throw new Error(`No ${kind} records found in XML file.`);
-        if (kind === 'instrument') {
-          const mapped: FileInstrument[] = overview.map(item => ({
-            ...newInstrument('Forex'),
-            symbol: item.name,
-            name: item.description || item.name,
-            broker: brokerId,
-            brokerName: broker?.name ?? 'Default',
-            timezone: broker?.timezone || 'UTC',
-          }));
-          setRows(mapped);
-        } else {
-          const mapped: SessionDefinition[] = overview.map(item => ({
-            name: item.name,
-            broker: brokerId,
-            brokerName: broker?.name ?? 'Default',
-            elements: [],
-          }));
-          setRows(mapped);
-        }
-      } else {
-        const parsed = kind === 'instrument' ? parseInstrumentsJson(text, brokerChoices) : parseSessionsJson(text);
-        setRows(parsed);
-      }
-      setSelected([]);
-      setFileName(file.name);
-      setError('');
-    } catch (cause) {
-      setRows([]);
-      setSelected([]);
-      setIsXml(false);
-      setError(`File overview error: ${cause instanceof Error ? cause.message : 'Cannot load file content.'}`);
-    }
+      const parsed = kind === 'instrument' ? parseInstrumentsJson(text,choices) : parseSessionsJson(text);
+      if (!parsed.length) throw new Error('No records found in JSON file.');
+      if (version !== browseVersion.current) return;
+      setRows(parsed);setFileName(file.name);
+    } catch (cause) { if (version === browseVersion.current) setError(cause instanceof Error ? cause.message : 'Cannot read JSON file.'); }
   }
-
-  async function start(force = false) {
+  async function start() {
+    if (busy.current) return;
+    setError('');setResult(null);
+    if (!selected.length) {setError('Select at least one record to import.');return;}
+    busy.current = true;setPending(true);
     try {
-      if (!selected.length) throw new Error('You have to select at least one record from grid below');
-      if (isXml) {
-        const count = await importXmlRecords(rawContent, kind, brokerId, postfix, selected);
-        onSaved(`${kind === 'instrument' ? 'Instruments' : 'Sessions'} (${count}) imported from XML.`);
-        onClose();
-        return;
+      const records = rows.map(row => kind === 'instrument'
+        ? fromFileInstrument({...row as FileInstrument,broker:brokerId})
+        : fromSessionDefinition({...row as SessionDefinition,id:undefined,broker:brokerId}));
+      const saved = await importBrokerRecords(kind,brokerId,records,{selected_names:selected,postfix,conflict_policy:overwrite?'overwrite':'error',use_profile_costs:useCosts});
+      setResult(saved);
+      const refresh = kind === 'instrument' ? useInstruments.getState().refreshFromServer() : useSessions.getState().refreshFromServer();
+      await Promise.all([refresh,useDataManagerStore.getState().syncBrokers()]);
+      const refreshError = kind === 'instrument' ? useInstruments.getState().error : useSessions.getState().error;
+      const brokerError = useDataManagerStore.getState().brokerError;
+      if (refreshError || brokerError) throw new Error(`Import result saved below; catalog refresh failed: ${refreshError || brokerError}`);
+      const savedNames = new Set(saved.records.map(row => String(row[kind === 'instrument' ? 'symbol' : 'name'])));
+      setSelected(current => current.filter(name => !savedNames.has(name+postfix)));
+      if (!saved.failed.length && !saved.unattempted.length) {
+        onSaved(`${saved.imported_count} ${kind} records imported.`);onClose();
       }
-      if (kind === 'instrument') {
-        const projected = projectBrokerInstruments(rows as FileInstrument[], selected, broker, postfix);
-        const current = effectiveInstruments(instruments.instruments, instruments.overrides, instruments.removed);
-        const conflicts = projected
-          .map(row => current.find(item => item.symbol.toLowerCase() === row.symbol.toLowerCase())?.symbol)
-          .filter((v): v is string => Boolean(v));
-        if (conflicts.length && !force) {
-          setConfirm(conflicts);
-          return;
-        }
-        instruments.importInstruments(projected, conflicts, brokerChoices.map(row => row.id));
-      } else {
-        throw new Error('Broker session import is not implemented. Configure profiles in Sessions.');
-      }
-      onSaved(`File with ${kind === 'instrument' ? 'instruments' : 'sessions'} was imported`);
-      onClose();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Cannot import file.');
-    }
+    } catch (cause) {setError(cause instanceof Error ? cause.message : 'Import could not be confirmed. Refresh catalogs before retrying.');}
+    finally {busy.current=false;setPending(false);}
   }
-
-  if (confirm) {
-    return (
-      <div className="broker-flow">
-        <Modal
-          title={kind === 'instrument' ? 'Import instruments' : 'Import sessions'}
-          width={570}
-          onClose={() => setConfirm(null)}
-          footer={
-            <>
-              <Button onClick={() => setConfirm(null)}>Cancel</Button>
-              <Button className="primary" onClick={() => void start(true)}>
-                OK
-              </Button>
-            </>
-          }
-        >
-          <p>Records with the same name already exists in HaruQuantAI. Do you want to override them?</p>
-        </Modal>
-      </div>
-    );
-  }
-
-  return (
-    <div className="broker-flow">
-      <Modal
-        title={kind === 'instrument' ? 'Instruments import' : 'Session import'}
-        width={730}
-        onClose={onClose}
-        footer={
-          <>
-            <Button onClick={onClose}>Close</Button>
-            <Button className="primary" onClick={() => void start()}>
-              Start Import
-            </Button>
-          </>
-        }
-      >
-        {error && (
-          <p className="broker-error" role="alert">
-            {error}
-          </p>
-        )}
-        <fieldset>
-          <legend>Choose file</legend>
-          <Field label="Data file">
-            <div className="broker-file">
-              <TextInput readOnly value={fileName} />
-              <label className="button">
-                Browse
-                <input
-                  aria-label={`${kind} data file`}
-                  hidden
-                  type="file"
-                  accept=".json,.xml,application/json,text/xml,application/xml"
-                  onChange={event => void browse(event.target.files?.[0])}
-                />
-              </label>
-            </div>
-          </Field>
-          <Field label="Broker profile">
-            <select
-              aria-label="Import broker profile"
-              value={brokerId}
-              onChange={event => {
-                const id = event.target.value;
-                setBrokerId(id);
-                setPostfix(brokers.find(row => row.id === id)?.postfix ?? '');
-              }}
-            >
-              {brokerChoices.map(row => (
-                <option key={row.id} value={row.id}>
-                  {row.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Postfix">
-            <TextInput value={postfix} onChange={event => setPostfix(event.target.value)} />
-          </Field>
-        </fieldset>
-        <fieldset>
-          <legend>Select {kind === 'instrument' ? 'instruments' : 'sessions'} to import</legend>
-          <div className="broker-overview">
-            <table className="plain-table">
-              <thead>
-                <tr>
-                  <th>
-                    <input
-                      aria-label="Select all import records"
-                      type="checkbox"
-                      checked={names.length > 0 && selected.length === names.length}
-                      onChange={() => setSelected(selected.length === names.length ? [] : names)}
-                    />
-                  </th>
-                  <th>Name</th>
-                  {kind === 'instrument' && <th>Description</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map(row => {
-                  const name = 'symbol' in row ? row.symbol : row.name;
-                  return (
-                    <tr key={name}>
-                      <td>
-                        <input
-                          aria-label={`Select ${name}`}
-                          type="checkbox"
-                          checked={selected.includes(name)}
-                          onChange={() =>
-                            setSelected(
-                              selected.includes(name) ? selected.filter(v => v !== name) : [...selected, name]
-                            )
-                          }
-                        />
-                      </td>
-                      <td>{name}</td>
-                      {kind === 'instrument' && <td>{(row as FileInstrument).name}</td>}
-                    </tr>
-                  );
-                })}
-                {!rows.length && (
-                  <tr>
-                    <td colSpan={kind === 'instrument' ? 3 : 2} className="dataset-empty">
-                      No data available.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </fieldset>
-      </Modal>
-    </div>
-  );
+  return <div className="broker-flow"><Modal title={kind === 'instrument' ? 'Instruments import from JSON' : 'Session import from JSON'} width={730} onClose={close} footer={<><Button disabled={pending} onClick={close}>Close</Button><Button disabled={pending || !rows.length} className="primary" onClick={() => void start()}>{pending ? 'Importingâ€¦' : 'Start Import'}</Button></>}>
+    {error && <p className="broker-error" role="alert">{error}</p>}
+    {result && <div role="status"><p>{result.imported_count} saved; {result.failed.length} failed; {result.unattempted.length} not attempted.</p>{result.failed.map(row => <p key={row.name}>{row.name}: {row.reason}</p>)}{result.unattempted.length > 0 && <p>Not attempted: {result.unattempted.join(', ')}</p>}</div>}
+    <fieldset disabled={pending}><legend>Choose JSON file</legend><Field label="Data file"><div className="broker-file"><TextInput readOnly value={fileName}/><label className="button">Browse<input aria-label={`${kind} JSON file`} hidden type="file" accept=".json,application/json" onChange={e => void browse(e.target.files?.[0])}/></label></div></Field>
+      <Field label="Broker profile"><select aria-label="Import broker profile" value={brokerId} onChange={e => {setBrokerId(e.target.value);setPostfix(choices.find(row => row.id === e.target.value)?.postfix ?? '');setOverwrite(false);setResult(null);}}>{choices.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}</select></Field>
+      <Field label="Postfix"><TextInput aria-label="Import postfix" maxLength={100} value={postfix} onChange={e => {setPostfix(e.target.value);setOverwrite(false);}}/></Field>
+      <label className="broker-check"><input aria-label="Overwrite existing records" type="checkbox" checked={overwrite} onChange={e => setOverwrite(e.target.checked)}/>Overwrite matching records belonging to this broker</label>
+      {kind === 'instrument' && <label className="broker-check"><input aria-label="Use broker cost defaults" type="checkbox" checked={useCosts} onChange={e => setUseCosts(e.target.checked)}/>Use configured broker spread and commission defaults</label>}
+      <p className="broker-note">Each record saves separately. Any failed records stay visible for correction. A postfix is appended once to the file name.</p>
+      <div className="broker-overview"><table className="plain-table"><thead><tr><th><input aria-label="Select all import records" type="checkbox" checked={names.length>0 && selected.length===names.length} onChange={() => setSelected(selected.length===names.length?[]:names)}/></th><th>Name</th><th>Target</th></tr></thead><tbody>{names.map(name => <tr key={name}><td><input aria-label={`Select ${name}`} type="checkbox" checked={selected.includes(name)} onChange={() => setSelected(selected.includes(name)?selected.filter(item => item!==name):[...selected,name])}/></td><td>{name}</td><td>{name+postfix}</td></tr>)}</tbody></table></div>
+    </fieldset>
+  </Modal></div>;
 }

@@ -636,7 +636,7 @@ class _DummyDataSub:
     def get_baskets_overview(self) -> list[Any]:
         return [_DummyModel()]
 
-    def list_brokers(self) -> list[Any]:
+    def brokers(self) -> list[Any]:
         return [_DummyModel()]
 
     def list_providers(self) -> list[Any]:

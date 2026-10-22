@@ -366,6 +366,7 @@ def test_data_manager_package_facade_exports() -> None:
 
     assert dm.__all__ == [
         "AppDataManager",
+        "Broker",
         "Home",
         "HomeCLI",
         "Instruments",

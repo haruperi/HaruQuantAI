@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .broker import Broker
 from .home import Home, HomeCLI
 from .instruments import Instruments, InstrumentsCLI
 from .routes import AppDataManager, create_data_manager_router
@@ -9,6 +10,7 @@ from .sessions import Sessions
 
 __all__ = [
     "AppDataManager",
+    "Broker",
     "Home",
     "HomeCLI",
     "Instruments",

@@ -52,12 +52,11 @@ import { StockGroupStocksDialog } from '../../plugins/data_source/Catalogs/Stock
 import { StockGroupTransferDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupTransferDialog';
 import { serializeStockGroupsJson, serializeStockGroupsXml, summarizeGroup, type StockGroupDefinition } from '../../plugins/data_source/Catalogs/StockGroups/stockGroups';
 import { stockGroupJobActive, useStockGroups } from '../../plugins/data_source/Catalogs/StockGroups/stockGroupsStore';
-import { BrokerProfileEditorDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerProfileEditorDialog';
+import { BrokerProfilesModal } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal';
 import { BrokerStocksDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerStocksDialog';
 import { BrokerRecordImportDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerRecordImportDialog';
 import { BrokerTransferDialog } from '../../plugins/data_source/Catalogs/BrokerProfiles/BrokerTransferDialog';
 import { brokerCounts, serializeBrokersJson, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
-import { fetchBrokerStocks } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerApiClient';
 import { TickDownloaderImportDialog } from '../../plugins/data_source/TickDownloader/module';
 import { ImportPopup } from '../../plugins/data_source/Dukascopy/import/module';
 import { DisclaimerPopup } from '../../plugins/data_source/Dukascopy/disclaimer/module';
@@ -331,6 +330,8 @@ export function DataManager() {
   const definitions = useDataManagerStore(state => state.definitions);
   const savedDatasets = useDataManagerStore(state => state.savedDatasets);
   const brokerProfiles = useDataManagerStore(state => state.brokers);
+  const brokerLoading = useDataManagerStore(state => state.brokerLoading);
+  const brokerLoadError = useDataManagerStore(state => state.brokerError);
   const brokerJob = useDataManagerStore(state => state.brokerJob);
   const download = useDukascopyDownloads();
   const td = useTickDownloader();
@@ -458,6 +459,7 @@ export function DataManager() {
   const [brokerDialog,setBrokerDialog]=useState<BrokerDialogState|null>(null);
   const [selectedBrokerIds,setSelectedBrokerIds]=useState<string[]>([]);
   const [brokerError,setBrokerError]=useState('');
+  const [brokerDeleting,setBrokerDeleting]=useState(false);
   const [exportDialog, setExportDialog] = useState<{ kind: ExportKind; targets: ExportTarget[] } | null>(null);
   const [cloneTargets, setCloneTargets] = useState<ToolTarget[] | null>(null);
   const [reviewTarget, setReviewTarget] = useState<ToolTarget | null>(null);
@@ -676,7 +678,7 @@ export function DataManager() {
   const selectedBrokers=brokerProfiles.filter(item=>selectedBrokerIds.includes(item.id));
   const requireBrokers=():BrokerProfile[]|null=>{if(selectedBrokers.length){setSelectionMessage('');return selectedBrokers;}setSelectionMessage('You have to select some broker.');return null;};
   const openBrokerEdit=(profile:BrokerProfile)=>{setSelectedBrokerIds([profile.id]);if(profile.system){setSelectionMessage("This broker can't be edited.");return;}setBrokerDialog({kind:'editor',mode:'edit',source:profile});};
-  const updateBrokers=(items:BrokerProfile[])=>{try{if(anyDataActive)throw new Error('Finish or stop the active data operation first.');if(!items[0].stockPickerUse)throw new Error('This function is for stockpicking broker profile only.');useDataManagerStore.getState().startBrokerUpdate(items.map(row=>row.id),toolRows.map(row=>row.symbol));setProgressOwner('broker');setOperationState('idle');setSelectionMessage('');notify('Data update started, please check Log tab for more information.');}catch(cause){setSelectionMessage(cause instanceof Error?cause.message:'Unable to update broker data.');}};
+
   const selectedSessions=sessionRows.filter(item=>selectedSessionIds.includes(item.id));
   const requireSessions=():CatalogSession[]|null=>{if(selectedSessions.length){setSelectionMessage('');return selectedSessions;}setSelectionMessage('You have to select some session.');return null;};
   const openSessionEdit=(item:CatalogSession)=>{setSelectedSessionIds([item.id]);setSessionError('');setSessionDialog({kind:'editor',mode:'edit',source:item});};
@@ -755,7 +757,7 @@ export function DataManager() {
       case 'chart': return <DataManagerChart snapshot={linkedSnapshot} loading={previewLoading} error={previewError} selectedTime={selectedBarTime} onSelectTime={setSelectedBarTime} onRetry={() => retryPreview(value => value + 1)} />;
       case 'home': return <DataManagerHome onNavigateTab={setTab} onOpenImport={() => { setTab('Data sources'); setDialog({ id: 'file-import' }); }} onOpenDownload={() => { setTab('Data sources'); setDialog({ id: 'dukascopy-download' }); }} />;
       case 'data': return <DatasetTable onActivate={activateDataset} activeDatasetId={activeDatasetId} selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} onDeleteRow={handleDeleteDatasetRow}/>;
-      case 'brokers': return <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/>;
+      case 'brokers': return <BrokerProfilesTable loading={brokerLoading} error={brokerLoadError} profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/>;
       case 'stock-groups': return <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/>;
       case 'custom-data': return <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/>;
       case 'instruments': return <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onRefresh={refreshSelectedInstruments} onDelete={item => setInstrumentDialog({ kind: 'delete', selected: [item] })} busy={instrumentJob?.state === 'running'} />;
@@ -804,28 +806,15 @@ export function DataManager() {
     </div>}
     {tab === 'Broker profiles' && <div className="management-actions broker-actions" aria-label="Broker profile operations">
       <Button className="action-add" onClick={()=>setBrokerDialog({kind:'editor',mode:'add'})}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>
-      <Button className="action-clone" onClick={()=>{const rows=requireBrokers();if(rows)updateBrokers(rows);}}><RefreshCw size={26} aria-hidden="true"/>Update data for broker (automatic)</Button>
-      <Button className="action-edit" onClick={()=>setBrokerDialog({kind:'import',recordType:'instrument'})}><FileInput size={26} aria-hidden="true"/>Import broker instruments from MT4/MT5</Button>
-      <Button className="action-load" disabled title="Broker session import is not implemented"><CalendarPlus size={26} aria-hidden="true"/>Import broker sessions from MT4/MT5</Button>
+      <Button className="action-clone" disabled title="Automatic broker updates are not implemented"><RefreshCw size={26} aria-hidden="true"/>Update data for broker (automatic)</Button>
+      <Button className="action-edit" onClick={()=>setBrokerDialog({kind:'import',recordType:'instrument'})}><FileInput size={26} aria-hidden="true"/>Import broker instruments from JSON</Button>
+      <Button className="action-load" onClick={()=>setBrokerDialog({kind:'import',recordType:'session'})}><CalendarPlus size={26} aria-hidden="true"/>Import broker sessions from JSON</Button>
       <Button className="action-edit" onClick={()=>{const rows=requireBrokers();if(!rows)return;const row=rows[0];if(!row.stockPickerUse){setSelectionMessage("This broker profile can't hold any stocks.");return;}setBrokerDialog({kind:'stocks',source:row});}}><ListPlus size={26} aria-hidden="true"/>Edit stocks</Button>
-      <Button className="action-delete" onClick={()=>{const rows=requireBrokers();if(!rows)return;if(rows.some(row=>instrumentRows.some(item=>item.broker===row.id)||sessionRows.some(item=>item.broker===row.id))){setSelectionMessage('You have to select broker which is not used by any instrument or session.');return;}const deletable=rows.filter(row=>!row.system);if(!deletable.length){setSelectionMessage('You have to select some non default broker.');return;}setBrokerDialog({kind:'delete',selected:deletable});}}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
+      <Button className="action-delete" disabled={brokerDeleting} onClick={()=>{const rows=requireBrokers();if(!rows)return;if(rows.some(row=>row.system)){setSelectionMessage('System broker profiles cannot be deleted.');return;}setBrokerError('');setBrokerDialog({kind:'delete',selected:rows});}}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
       <Button className="action-save" onClick={async ()=>{
         const rows=requireBrokers();
         if(!rows)return;
-        const rowsWithStocks = await Promise.all(
-          rows.map(async (row) => {
-            if (row.stockPickerUse && (!row.stocks || row.stocks.length === 0)) {
-              try {
-                const fetched = await fetchBrokerStocks(row.id);
-                return { ...row, stocks: fetched };
-              } catch {
-                return row;
-              }
-            }
-            return row;
-          })
-        );
-        downloadTextFile('Brokers.json',serializeBrokersJson(rowsWithStocks));
+        downloadTextFile('Brokers.json',serializeBrokersJson(rows));
         notify('Brokers saved.');
       }}><Save size={26} aria-hidden="true"/>Save</Button>
       <Button className="action-load" onClick={()=>setBrokerDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
@@ -894,10 +883,10 @@ export function DataManager() {
   {stockGroupDialog?.kind === 'stocks' && <StockGroupStocksDialog group={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={message => notify(message)}/>}
   {stockGroupDialog?.kind === 'load' && <StockGroupTransferDialog onClose={() => setStockGroupDialog(null)} onSaved={message => notify(message)}/>}
   {stockGroupDialog?.kind === 'delete' && <div className="stock-groups-flow"><Modal title={stockGroupDialog.selected.length === 1 ? 'Remove group' : 'Remove groups'} width={520} onClose={() => { setStockGroupDialog(null); setStockGroupError(''); }} footer={<><Button onClick={() => { setStockGroupDialog(null); setStockGroupError(''); }}>No</Button><Button className="primary" onClick={() => { try { const ids=stockGroupDialog.selected.map(item=>item.id);useStockGroups.getState().remove(ids);setSelectedStockGroupIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Group removed':'Groups removed');setStockGroupDialog(null);setStockGroupError(''); } catch(cause){setStockGroupError(cause instanceof Error?cause.message:'Unable to remove groups.');} }}>Yes</Button></>}>{stockGroupError&&<p role="alert" className="stock-group-error">{stockGroupError}</p>}<p>Are you sure you want to remove selected groups ({stockGroupDialog.selected.length})?</p></Modal></div>}
-  {brokerDialog?.kind==='editor'&&<BrokerProfileEditorDialog mode={brokerDialog.mode} source={brokerDialog.source} canSetStockPicker={!brokerDialog.source?.stocks.length} canSetMt={!brokerDialog.source||(!instrumentRows.some(row=>row.broker===brokerDialog.source!.id)&&!sessionRows.some(row=>row.broker===brokerDialog.source!.id))} canSetTimezone={!brokerDialog.source||(!definitions.some(row=>row.broker===brokerDialog.source!.id)&&!fileDefinitions.some(row=>row.broker===brokerDialog.source!.id))} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
+  {brokerDialog?.kind==='editor'&&<BrokerProfilesModal mode={brokerDialog.mode} source={brokerDialog.source} canSetStockPicker={!brokerDialog.source?.stocks.length} canSetMt={!brokerDialog.source||(!instrumentRows.some(row=>row.broker===brokerDialog.source!.id)&&!sessionRows.some(row=>row.broker===brokerDialog.source!.id))} canSetTimezone={!brokerDialog.source||(!definitions.some(row=>row.broker===brokerDialog.source!.id)&&!fileDefinitions.some(row=>row.broker===brokerDialog.source!.id))} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='stocks'&&<BrokerStocksDialog profile={brokerDialog.source} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='import'&&<BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='load'&&<BrokerTransferDialog onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
-  {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{setBrokerDialog(null);setBrokerError('');}} footer={<><Button onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" onClick={async ()=>{try{const ids=brokerDialog.selected.map(row=>row.id);await useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);setBrokerError('');}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})?</p></Modal></div>}
+  {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{if(!brokerDeleting){setBrokerDialog(null);setBrokerError('');}}} footer={<><Button disabled={brokerDeleting} onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" disabled={brokerDeleting} onClick={async ()=>{if(brokerDeleting)return;setBrokerDeleting(true);setBrokerError('');try{const ids=brokerDialog.selected.map(row=>row.id);await useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);setBrokerError('');}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}finally{setBrokerDeleting(false);}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})? Their stock memberships and cost settings will also be removed. Profiles used by instruments, sessions or saved datasets cannot be removed.</p></Modal></div>}
   {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'tickdownloader-import' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={dialog.targetIds ? dialog.targetIds.length : selectedDatasetIds.length} selectedIds={dialog.targetIds ?? selectedDatasetIds} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
 }

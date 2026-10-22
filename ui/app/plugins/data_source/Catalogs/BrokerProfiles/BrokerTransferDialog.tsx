@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button, Field, Modal } from '../../../../components/ui';
 import { parseBrokersJson, type BrokerProfile } from './brokerProfiles';
-import { importBrokersXml } from './brokerApiClient';
 import { useDataManagerStore } from '../../Common/dataManagerStore';
 import './brokerProfiles.css';
 
@@ -13,6 +12,9 @@ export function BrokerTransferDialog({
   onSaved: (message: string) => void;
 }) {
   const store = useDataManagerStore();
+  const busy = useRef(false);
+  const [pendingSave,setPendingSave] = useState(false);
+  function close() {if (!busy.current) onClose();}
   const [file, setFile] = useState<File | null>(null);
   const [pending, setPending] = useState<Omit<BrokerProfile, 'id'>[]>([]);
   const [conflicts, setConflicts] = useState<string[]>([]);
@@ -22,6 +24,7 @@ export function BrokerTransferDialog({
   const [error, setError] = useState('');
 
   async function commit(items = pending, overwrites = overwrite, skips = skipped) {
+    if (busy.current) return;busy.current=true;setPendingSave(true);
     try {
       const count = await store.importBrokers(
         items.filter(row => !skips.includes(row.name)),
@@ -31,7 +34,7 @@ export function BrokerTransferDialog({
       onClose();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Cannot load brokers.');
-    }
+    } finally {busy.current=false;setPendingSave(false);}
   }
 
   function decide(action: 'skip' | 'overwrite' | 'overwrite-all') {
@@ -53,22 +56,14 @@ export function BrokerTransferDialog({
   }
 
   async function load() {
+    if (busy.current) return;busy.current=true;setPendingSave(true);
     try {
-      if (!file) throw new Error('Select a Brokers JSON or XML file.');
+      if (!file) throw new Error('Select a Brokers JSON file.');
       if (file.size > 5_000_000) throw new Error('Cannot load brokers: file too large.');
       const text = await file.text();
       let items: Omit<BrokerProfile, 'id'>[];
 
-      if (file.name.toLowerCase().endsWith('.xml') || text.trim().startsWith('<')) {
-        const imported = await importBrokersXml(text);
-        if (!imported.length) throw new Error('No Brokers found in XML file.');
-        await store.syncBrokers();
-        onSaved(`Brokers (${imported.length}) loaded from XML.`);
-        onClose();
-        return;
-      } else {
-        items = parseBrokersJson(text);
-      }
+      items = parseBrokersJson(text);
 
       const duplicates = items
         .map(
@@ -81,10 +76,10 @@ export function BrokerTransferDialog({
       setIndex(0);
       setOverwrite([]);
       setSkipped([]);
-      if (!duplicates.length) void commit(items, [], []);
+      if (!duplicates.length) {busy.current=false;await commit(items, [], []);}
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Cannot load brokers.');
-    }
+    } finally {busy.current=false;setPendingSave(false);}
   }
 
   if (conflicts.length)
@@ -93,18 +88,19 @@ export function BrokerTransferDialog({
         <Modal
           title="Overwrite confirm"
           width={590}
-          onClose={onClose}
+          onClose={close}
           footer={
             <>
-              <Button onClick={onClose}>Cancel</Button>
-              <Button onClick={() => decide('skip')}>Skip</Button>
-              <Button onClick={() => decide('overwrite')}>Overwrite</Button>
-              <Button className="primary" onClick={() => decide('overwrite-all')}>
+              <Button disabled={pendingSave} onClick={close}>Cancel</Button>
+              <Button disabled={pendingSave} onClick={() => decide('skip')}>Skip</Button>
+              <Button disabled={pendingSave} onClick={() => decide('overwrite')}>Overwrite</Button>
+              <Button disabled={pendingSave} className="primary" onClick={() => decide('overwrite-all')}>
                 Overwrite all
               </Button>
             </>
           }
         >
+          {error && <p role="alert" className="broker-error">{error}</p>}
           <p>
             Broker '{conflicts[index]}' already exists, do you want to overwrite it with the
             imported one?
@@ -121,11 +117,11 @@ export function BrokerTransferDialog({
       <Modal
         title="Load brokers"
         width={560}
-        onClose={onClose}
+        onClose={close}
         footer={
           <>
-            <Button onClick={onClose}>Close</Button>
-            <Button className="primary" onClick={() => void load()}>
+            <Button disabled={pendingSave} onClick={close}>Close</Button>
+            <Button disabled={pendingSave} className="primary" onClick={() => void load()}>
               Validate and load
             </Button>
           </>
@@ -136,12 +132,13 @@ export function BrokerTransferDialog({
             {error}
           </p>
         )}
-        <Field label="Brokers file (JSON or XML)">
+        <Field label="Brokers file (JSON)">
           <input
             aria-label="Brokers file"
             className="file-input compact"
             type="file"
-            accept=".json,.xml,application/json,text/xml,application/xml"
+            disabled={pendingSave}
+            accept=".json,application/json"
             onChange={event => {
               setFile(event.target.files?.[0] ?? null);
               setError('');
@@ -149,7 +146,7 @@ export function BrokerTransferDialog({
           />
         </Field>
         <p className="broker-note">
-          The complete file is validated before any broker profile is updated.
+          Profiles save separately. Completed changes remain saved if a later profile fails.
         </p>
       </Modal>
     </div>

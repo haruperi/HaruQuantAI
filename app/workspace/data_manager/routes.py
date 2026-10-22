@@ -35,6 +35,7 @@ CLI Usage:
 
 from __future__ import annotations
 
+import json
 import math
 import os
 from collections.abc import Callable, Mapping
@@ -51,6 +52,7 @@ from app.services.include.contracts import DataInfo
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
+from .broker import Broker
 from .help import DMHelp
 from .home import Home
 from .instruments import Instruments
@@ -151,6 +153,7 @@ class AppDataManager:
 
         # Initialize retained Home, Log, and Help services
         self.home = Home()
+        self.broker = Broker()
         self.instruments = Instruments()
         self.sessions = Sessions()
         self.log = DataLog(event_bus=event_bus)
@@ -324,6 +327,69 @@ def _catalog_response(
                 f"{domain} storage is unavailable. Retry the operation.",
                 status_code=503,
             ),
+        )
+
+
+def _register_broker_read_routes(router: APIRouter, ws: AppDataManager) -> None:
+    def profile(broker_id: str) -> dict[str, Any]:
+        if not broker_id.isascii() or not broker_id.isdigit() or int(broker_id) <= 0:
+            raise ValueError("Choose a positive numeric broker ID.")
+        for row in ws.broker.brokers():
+            if row["id"] == broker_id:
+                return row
+        raise LookupError("Broker is no longer in the catalog.")
+
+    @router.get("/brokers")
+    def list_brokers() -> JSONResponse:
+        return _catalog_response(ws.broker.brokers, domain="Broker")
+
+    @router.get("/brokers/{broker_id}")
+    def get_broker(broker_id: str) -> JSONResponse:
+        return _catalog_response(profile, broker_id, domain="Broker")
+
+    @router.get("/brokers/{broker_id}/stocks")
+    def get_stocks(broker_id: str) -> JSONResponse:
+        def stocks() -> dict[str, Any]:
+            row = profile(broker_id)
+            return {"broker_id": row["id"], "stocks": row["stocks"]}
+
+        return _catalog_response(stocks, domain="Broker")
+
+
+def _register_broker_write_routes(router: APIRouter, ws: AppDataManager) -> None:
+    @router.post("/brokers")
+    def save_broker(payload: dict[str, Any]) -> JSONResponse:
+        return _catalog_response(ws.broker.add_broker, payload, domain="Broker")
+
+    @router.post("/brokers/delete")
+    def delete_brokers(payload: dict[str, Any]) -> JSONResponse:
+        if set(payload) != {"ids"}:
+            return _workspace_error("Supply only the selected broker IDs.", 422)
+        return _catalog_response(
+            ws.broker.delete_broker, payload["ids"], domain="Broker"
+        )
+
+    @router.put("/brokers/{broker_id}/stocks")
+    def save_stocks(broker_id: str, payload: dict[str, Any]) -> JSONResponse:
+        if set(payload) != {"stocks"}:
+            return _workspace_error("Supply only the complete stocks list.", 422)
+        return _catalog_response(
+            ws.broker.edit_stocks, broker_id, payload["stocks"], domain="Broker"
+        )
+
+    @router.post("/brokers/{broker_id}/import-instruments")
+    def import_instruments(broker_id: str, payload: dict[str, Any]) -> JSONResponse:
+        return _catalog_response(
+            ws.broker.import_instruments,
+            broker_id,
+            json.dumps(payload),
+            domain="Broker",
+        )
+
+    @router.post("/brokers/{broker_id}/import-sessions")
+    def import_sessions(broker_id: str, payload: dict[str, Any]) -> JSONResponse:
+        return _catalog_response(
+            ws.broker.import_sessions, broker_id, json.dumps(payload), domain="Broker"
         )
 
 
@@ -579,6 +645,8 @@ def create_data_manager_router(
 
     _register_home_routes(router, ws)
     _register_workspace_routes(router, ws)
+    _register_broker_read_routes(router, ws)
+    _register_broker_write_routes(router, ws)
     _register_instrument_routes(router, ws)
     _register_instrument_job_routes(router, ws)
     _register_session_routes(router, ws)

@@ -1034,17 +1034,20 @@ HaruQuantAI/
 
 #### 4. `app/workspace/data_manager/broker.py` — `DataManagerBroker` (`FEAT-DATAMGR-BROKER`)
 
-- **Dry Rule:** Persists broker profiles via `HostPersistence` (`brokers` entity) and reuses instrument/session import schemas from `instruments.py` and `sessions.py`.
+- **Dry Rule:** Persists broker profiles via `HostPersistence` (existing broker/stock tables plus `datamgr_broker_settings` JSON entities) and reuses instrument/session import schemas from `instruments.py` and `sessions.py`.
 - **Donor:** `C:\SQX-145\internal\plugins\DataManagerBroker\DataManagerBroker.jar`, `C:\SQX-145\internal\libs\SQDataLib.jar.enc` (`com.strategyquant.datalib.broker.*`)
-- **Backend:** `app/workspace/data_manager/broker.py` (`🟡 200–350L`, Docstring `<=50L`)
+- **Backend:** `app/workspace/data_manager/broker.py` (`🟡 500–850L`, Docstring `<=50L`)
 - **Frontend:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfilesModal.tsx`
-- **Class:** `Broker` (plus `BrokerCLI`)
+- **Class:** `Broker`
 - **Functional Requirements & Exact Method Signatures:**
-  - [ ] `FR-DATAMGR-BROKER-LIST`: List all broker profiles configured in the system $\rightarrow$ `Broker.brokers() -> list[dict[str, Any]]`
-  - [ ] `FR-DATAMGR-BROKER-ADD`: Add or edit broker profiles with custom spread and commission models $\rightarrow$ `Broker.add_broker(profile: Mapping[str, Any]) -> dict[str, Any]`
-  - [ ] `FR-DATAMGR-BROKER-STOCKS`: Edit stock symbols assigned to a broker profile $\rightarrow$ `Broker.edit_stocks(broker_id: str, symbols: Sequence[str]) -> dict[str, Any]`
-  - [ ] `FR-DATAMGR-BROKER-IMPORT-INSTR`: Import instrument definitions from external XML/JSON files $\rightarrow$ `Broker.import_instruments(broker_id: str, payload: Sequence[Mapping[str, Any]] | str) -> dict[str, Any]`
-  - [ ] `FR-DATAMGR-BROKER-IMPORT-SESS`: Import trading session definitions from external XML/JSON files $\rightarrow$ `Broker.import_sessions(broker_id: str, payload: Sequence[Mapping[str, Any]] | str) -> dict[str, Any]`
+  - [x] `FR-DATAMGR-BROKER-LIST`: List all broker profiles configured in the system $\rightarrow$ `Broker.brokers() -> list[dict[str, Any]]`
+  - [x] `FR-DATAMGR-BROKER-ADD`: Add or edit broker profiles with custom spread and commission models $\rightarrow$ `Broker.add_broker(profile: Mapping[str, Any]) -> dict[str, Any]`
+  - [x] `FR-DATAMGR-BROKER-DELETE`: Delete selected unused custom broker profiles and owned settings atomically $\rightarrow$ `Broker.delete_broker(broker_ids: Sequence[str]) -> dict[str, Any]`
+  - [x] `FR-DATAMGR-BROKER-STOCKS`: Edit stock symbols assigned to a broker profile $\rightarrow$ `Broker.edit_stocks(broker_id: str, symbols: Sequence[str]) -> dict[str, Any]`
+  - [x] `FR-DATAMGR-BROKER-IMPORT-INSTR`: Import instrument definitions from external JSON files $\rightarrow$ `Broker.import_instruments(broker_id: str, payload: Sequence[Mapping[str, Any]] | str) -> dict[str, Any]`
+  - [x] `FR-DATAMGR-BROKER-IMPORT-SESS`: Import trading session definitions from external JSON files $\rightarrow$ `Broker.import_sessions(broker_id: str, payload: Sequence[Mapping[str, Any]] | str) -> dict[str, Any]`
+
+- **Persistence and imports:** Profile identity/stocks use host tables; spread and commission defaults use versioned host JSON settings, moved atomically on profile rename. Existing instrument grouped specifications and session calendars remain owned by their services. JSON imports report per-record saved/failed/unattempted outcomes; they are not an all-or-nothing batch. Profile defaults apply only when explicitly selected for import. Unused custom broker profiles can be deleted with confirmation; stock memberships and cost settings are removed atomically. System profiles and profiles referenced by instruments, sessions or saved datasets are protected. XML and automatic broker data updates remain unsupported and visibly disabled.
 
 #### 5. `app/workspace/data_manager/baskets.py` — `DataManagerBasket` (`FEAT-DATAMGR-BASKET`)
 

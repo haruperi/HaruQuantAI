@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from '../../../../components/ui';
 import { parseBrokerStocks, type BrokerProfile } from './brokerProfiles';
 import { fetchBrokerStocks } from './brokerApiClient';
@@ -24,9 +24,12 @@ export function BrokerStocksDialog({
   onSaved: (message: string) => void;
 }) {
   const [text, setText] = useState(() => profile.stocks.join('\n'));
+  const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const store = useDataManagerStore();
+  const submitting = useRef(false);
+  function close() {if (!submitting.current) onClose();}
 
   useEffect(() => {
     let mounted = true;
@@ -34,7 +37,7 @@ export function BrokerStocksDialog({
       setLoading(true);
       fetchBrokerStocks(profile.id)
         .then(stocks => {
-          if (mounted && stocks.length > 0) {
+          if (mounted) {
             setText(stocks.join('\n'));
           }
         })
@@ -53,26 +56,26 @@ export function BrokerStocksDialog({
   }, [profile.id]);
 
   async function load(file: File | undefined) {
-    if (!file) return;
-    if (profile.system) {
-      setError("This broker can't be edited.");
-      return;
-    }
+    if (!file || submitting.current || loading || profile.system) return;
+    submitting.current=true;setSaving(true);setError('');
     try {
       if (file.size > 2_000_000) throw new Error('Stock file is too large.');
       const parsed = parseBrokerStocks(await file.text());
       await store.saveBrokerStocks(profile.id, parsed);
-      onSaved(`Stocks (${parsed.length}) were imported`);
+      onSaved(`Stocks (${useDataManagerStore.getState().brokers.find(row=>row.id===profile.id)?.stocks.length??0}) were imported`);
       onClose();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Cannot import stocks.');
-    }
+    } finally {submitting.current=false;setSaving(false);}
   }
 
   async function save() {
+    if (submitting.current || loading || error) return;
+    submitting.current=true;
+    setSaving(true);
     if (profile.system) {
       setError("This broker can't be edited.");
-      return;
+      submitting.current=false;setSaving(false); return;
     }
     try {
       const parsed = parseBrokerStocks(text);
@@ -81,7 +84,7 @@ export function BrokerStocksDialog({
       onClose();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Cannot save stocks.');
-    }
+    } finally { submitting.current=false;setSaving(false); }
   }
 
   return (
@@ -89,16 +92,17 @@ export function BrokerStocksDialog({
       <Modal
         title={`Edit stocks ${profile.name}`}
         width={700}
-        onClose={onClose}
+        onClose={close}
         footer={
           <>
-            <Button onClick={onClose}>Close</Button>
-            <Button className="primary" onClick={save}>
+            <Button disabled={saving} onClick={close}>Close</Button>
+            <Button disabled={saving || loading || Boolean(error) || profile.system} className="primary" onClick={save}>
               Save
             </Button>
           </>
         }
       >
+        {loading && <p role="status">Loading saved stocks…</p>}
         {error && (
           <p className="broker-error" role="alert">
             {error}
@@ -119,7 +123,7 @@ AAPL{'\n'}TSLA{'\n'}AMZN
               hidden
               type="file"
               accept=".csv,text/csv,text/plain"
-              disabled={profile.system}
+              disabled={profile.system || loading || saving}
               onChange={event => void load(event.target.files?.[0])}
             />
           </label>
@@ -141,7 +145,8 @@ AAPL{'\n'}TSLA{'\n'}AMZN
           aria-label="Broker stocks"
           value={text}
           placeholder={loading ? 'Loading constituent stocks...' : ''}
-          onChange={event => setText(event.target.value)}
+          disabled={saving || loading || profile.system}
+          onChange={event => {setText(event.target.value);setError('');}}
         />
       </Modal>
     </div>

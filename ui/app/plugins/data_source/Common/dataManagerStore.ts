@@ -13,15 +13,15 @@ import { catalogue, type AddDukasRequest } from '../Dukascopy/dukascopy';
 import { normalizeBrokerName, validateBroker, type BrokerProfile, type BrokerUpdateJob } from '../Catalogs/BrokerProfiles/brokerProfiles';
 import {
   fetchBrokers,
+  deleteBrokers,
   saveBroker as saveBrokerApi,
-  deleteBrokers as deleteBrokersApi,
   saveBrokerStocks as saveBrokerStocksApi,
-  triggerBrokerDataUpdate,
 } from '../Catalogs/BrokerProfiles/brokerApiClient';
 import { createDomainClient, type DomainClient } from '../../../host/transport';
 
 let dataClient = createDomainClient('/data');
 let catalogRequest = 0;
+let brokerRequest = 0;
 
 export function setDataClient(client: DomainClient): void {
   dataClient = client;
@@ -106,6 +106,7 @@ interface DataState { definitions: MockDefinition[]; brokers: BrokerProfile[]; b
   saveBroker:(profile:BrokerProfile)=>Promise<void>; saveBrokerStocks:(id:string,stocks:string[])=>Promise<void>; removeBrokers:(ids:string[])=>Promise<void>; importBrokers:(profiles:Omit<BrokerProfile,'id'>[],overwrite:string[])=>Promise<number>;
   startBrokerUpdate:(ids:string[],existing:string[])=>void; advanceBrokerUpdate:()=>void; brokerAction:(action:'pause'|'resume'|'stop')=>void;
   syncRemoteDatasets: () => Promise<void>;
+  brokerLoading: boolean; brokerError: string;
   syncBrokers: () => Promise<void>;
   editDataset: (id: string, updates: Partial<MockDefinition>) => Promise<void>;
   clearDataset: (id: string) => Promise<void>;
@@ -132,58 +133,40 @@ function readState(): Pick<DataState, 'definitions' | 'brokers' | 'brokerJob' | 
 }
 export const useDataManagerStore = create<DataState>((set, get) => ({
   ...readState(),
+  brokers: [], brokerJob: null,
   savedDatasets: null,
+  brokerLoading: false, brokerError: '',
   catalogLoading: false,
   catalogError: '',
   saveBroker: async profile => {
     const state = get();
-    if (state.storageError) throw new Error(state.storageError);
     const clean = validateBroker(profile, state.brokers, profile.id || undefined);
     const saved = await saveBrokerApi(clean);
-    const targetId = saved.id;
-    const finalProfile = { ...structuredClone(clean), id: targetId };
-    const stateAfter = get();
-    const found = stateAfter.brokers.findIndex(
-      row => row.id === profile.id || (profile.id && row.id === targetId)
-    );
-    const brokers = [...stateAfter.brokers];
-    if (found >= 0) brokers[found] = finalProfile;
-    else brokers.push(finalProfile);
-    persistData(stateAfter, brokers, stateAfter.definitions, stateAfter.brokerJob);
-    set({ brokers });
+    ++brokerRequest;
+    set(current => ({brokerLoading:false,brokers: current.brokers.some(row => row.id === saved.id)
+      ? current.brokers.map(row => row.id === saved.id ? saved : row) : [...current.brokers,saved]}));
   },
   saveBrokerStocks: async (id, stocks) => {
     const state = get();
     const index = state.brokers.findIndex(row => row.id === id);
     if (index < 0) throw new Error("Broker doesn't exist.");
     if (state.brokers[index].system) throw new Error("This broker can't be edited.");
-    if (/^\d+$/.test(id)) {
-      await saveBrokerStocksApi(id, stocks);
-    }
-    const stateAfter = get();
-    const brokers = [...stateAfter.brokers];
-    const idx = brokers.findIndex(row => row.id === id);
-    if (idx >= 0) {
-      brokers[idx] = { ...brokers[idx], stocks: [...stocks] };
-      persistData(stateAfter, brokers, stateAfter.definitions, stateAfter.brokerJob);
-      set({ brokers });
-    }
+    const confirmed = await saveBrokerStocksApi(id, stocks);
+    ++brokerRequest;
+    set(current => ({brokerLoading:false,brokers: current.brokers.map(row => row.id === id ? {...row,stocks:confirmed} : row)}));
   },
   removeBrokers: async ids => {
-    const numericIds = ids.filter(id => /^\d+$/.test(id));
-    if (numericIds.length > 0) {
-      await deleteBrokersApi(numericIds);
-    }
-    const stateAfter = get();
-    const selected = new Set(ids);
-    const brokers = stateAfter.brokers.filter(row => !selected.has(row.id));
-    persistData(stateAfter, brokers, stateAfter.definitions, stateAfter.brokerJob);
-    set({ brokers });
+    const selected = ids.map(id => get().brokers.find(row => row.id === id));
+    if (selected.some(row => !row || row.system)) throw new Error('Choose saved custom broker profiles.');
+    const deleted = await deleteBrokers(ids);
+    ++brokerRequest;
+    set(current => ({brokerLoading:false,brokerError:'',brokers:current.brokers.filter(row => !deleted.includes(row.id))}));
   },
   importBrokers: async (profiles, overwrite) => {
     const state = get();
     const replace = new Set(overwrite.map(name => normalizeBrokerName(name).toLowerCase()));
     let count = 0;
+    try {
     for (const raw of profiles) {
       const name = normalizeBrokerName(raw.name);
       const existing = state.brokers.find(row => row.name.toLowerCase() === name.toLowerCase());
@@ -199,9 +182,9 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
           stockPickerUse: raw.stockPickerUse,
           system: false,
           stocks: raw.stocks,
-          instruments: [],
+          instruments: [], spreadModel: raw.spreadModel, commissionModel: raw.commissionModel,
         });
-        if (raw.stockPickerUse && raw.stocks.length) {
+        if (raw.stockPickerUse) {
           await saveBrokerStocksApi(updated.id, raw.stocks);
         }
         count++;
@@ -216,55 +199,23 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
           stockPickerUse: raw.stockPickerUse,
           system: false,
           stocks: raw.stocks,
-          instruments: [],
+          instruments: [], spreadModel: raw.spreadModel, commissionModel: raw.commissionModel,
         });
-        if (raw.stockPickerUse && raw.stocks.length) {
+        if (raw.stockPickerUse) {
           await saveBrokerStocksApi(created.id, raw.stocks);
         }
         count++;
       }
     }
+    } catch (cause) {
+      await get().syncBrokers();
+      throw new Error(`${count} broker profiles fully saved; loading stopped. ${cause instanceof Error ? cause.message : 'Unable to save profile or stocks.'}`);
+    }
     await get().syncBrokers();
+    if (get().brokerError) throw new Error(`${count} profiles saved; refresh failed: ${get().brokerError}`);
     return count;
   },
-  startBrokerUpdate: (ids, existing) => {
-    const state = get();
-    if (state.brokerJob && ['running', 'paused'].includes(state.brokerJob.state))
-      throw new Error('Please wait couple of seconds and try again.');
-    const rows = ids
-      .map(id => state.brokers.find(row => row.id === id))
-      .filter((row): row is BrokerProfile => Boolean(row));
-    if (!rows.length) throw new Error('You have to select some broker.');
-    const seen = new Set(existing);
-    const targets = rows
-      .flatMap(row =>
-        row.stocks.map(ticker => ({
-          brokerId: row.id,
-          ticker,
-          symbol: ticker + row.postfix,
-        }))
-      )
-      .filter(target => {
-        if (seen.has(target.symbol)) return false;
-        seen.add(target.symbol);
-        return true;
-      });
-    if (!rows.some(row => row.stocks.length))
-      throw new Error('Nothing to update. Broker is without any stocks.');
-    const brokerJob: BrokerUpdateJob = {
-      brokerIds: ids,
-      state: 'running',
-      progress: 0,
-      targets,
-    };
-    persistData(state, state.brokers, state.definitions, brokerJob);
-    set({ brokerJob });
-    ids.forEach(id => {
-      if (/^\d+$/.test(id)) {
-        triggerBrokerDataUpdate(id).catch(() => {});
-      }
-    });
-  },
+  startBrokerUpdate: () => { throw new Error('Automatic broker data updates are not implemented.'); },
   advanceBrokerUpdate: () => {
     const state = get();
     if (state.brokerJob?.state !== 'running') return;
@@ -371,24 +322,14 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     }
   },
   syncBrokers: async () => {
+    const request = ++brokerRequest;
+    set({brokerLoading:true,brokerError:''});
     try {
       const remote = await fetchBrokers();
-      if (!remote || !remote.length) return;
-      const state = get();
-      const localMap = new Map(state.brokers.map(b => [b.name.toLowerCase(), b]));
-      const merged = remote.map(rem => {
-        const local = localMap.get(rem.name.toLowerCase());
-        return {
-          ...rem,
-          stocks: rem.stocks?.length ? rem.stocks : (local?.stocks?.length ? local.stocks : []),
-          instruments: local?.instruments?.length ? local.instruments : rem.instruments,
-        };
-      });
-      try { persistData(state, merged, state.definitions, state.brokerJob); } catch { /* ignore */ }
-      set({ brokers: merged });
-    } catch {
-      // Non-blocking sync
-    }
+      if (request === brokerRequest) set({brokers:remote});
+    } catch (cause) {
+      if (request === brokerRequest) set({brokers:[],brokerError:cause instanceof Error ? cause.message : 'Unable to load broker profiles.'});
+    } finally { if (request === brokerRequest) set({brokerLoading:false}); }
   },
   editDataset: async (id: string, updates: Partial<MockDefinition>) => {
     const state = get();
