@@ -41,7 +41,16 @@ import asyncio
 
 import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
-from app.services.brokers import (
+from app.include.contracts import (
+    MarketBar,
+    SymbolInfo,
+)
+from app.include.data import (
+    get_historical_bars,
+    get_ticks,
+)
+from app.include.enums import Timeframe
+from app.workspace.brokers import (
     BinanceClient,
     DarwinexClient,
     DukascopyClient,
@@ -51,15 +60,6 @@ from app.services.brokers import (
     SQFuturesClient,
     YahooClient,
 )
-from app.services.include.contracts import (
-    MarketBar,
-    SymbolInfo,
-)
-from app.services.include.data import (
-    get_historical_bars,
-    get_ticks,
-)
-from app.services.include.enums import Timeframe
 
 logger = get_logger(__name__)
 
