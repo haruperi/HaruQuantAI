@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
-from app.host.persistance import (
+from app.host.persistence import (
     HostPersistence,
     PersistenceTransactionError,
     RecordFilter,
@@ -314,6 +314,8 @@ def test_grouped_commit_rollback_and_closed_scope(gateway):
 
 
 def test_thread_safe_gateway_and_busy_failure(gateway):
+    # Establish WAL before concurrent CRUD; changing journal mode is exclusive.
+    records(gateway.read_records("items"))
     with ThreadPoolExecutor(max_workers=4) as pool:
         responses = list(
             pool.map(
@@ -354,7 +356,7 @@ def test_new_tables_discovered_without_recreating_gateway(gateway):
 def test_database_imports_stay_in_gateway():
     root = Path(__file__).resolve().parents[2] / "app"
     for path in root.rglob("*.py"):
-        if path == root / "host" / "persistance.py":
+        if path == root / "host" / "persistence.py":
             continue
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             if isinstance(node, ast.Import):
@@ -367,7 +369,7 @@ def test_database_imports_stay_in_gateway():
 
 def test_operation_logs_omit_record_values(gateway, caplog):
     secret = "private-value-not-for-logs"
-    with caplog.at_level(logging.DEBUG, logger="app.host.persistance"):
+    with caplog.at_level(logging.DEBUG, logger="app.host.persistence"):
         records(gateway.create_records("items", {"name": secret}))
         error_code(gateway.create_records("items", {"name": secret}), "conflict")
     assert "operation=create_records completed" in caplog.text
@@ -377,7 +379,7 @@ def test_operation_logs_omit_record_values(gateway, caplog):
 
 
 def test_grouped_transaction_logs_commit_and_rollback(gateway, caplog):
-    with caplog.at_level(logging.DEBUG, logger="app.host.persistance"):
+    with caplog.at_level(logging.DEBUG, logger="app.host.persistence"):
         with gateway.transaction() as tx:
             records(tx.create_records("items", {"name": "committed"}))
         with pytest.raises(PersistenceTransactionError):
