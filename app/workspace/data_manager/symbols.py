@@ -173,10 +173,37 @@ def _update_direct_columns(fields: Mapping[str, Any], updates: dict[str, Any]) -
             if col == "data_type" and isinstance(val, str) and "\\" in val:
                 val = val.split("\\", maxsplit=1)[0]
             updates[col] = val
-
     if "commission" in fields or "commission_value" in fields:
         raw_comm = fields.get("commission", fields.get("commission_value"))
         updates["commission"] = float(raw_comm or 0.0)
+
+
+def _apply_shortcuts(
+    comps: dict[str, dict[str, Any]], fields: Mapping[str, Any]
+) -> None:
+    """Keep scalar service edits and optional browser settings consistent."""
+    for field_key, comp, prop, conv in _SHORTCUTS:
+        if field_key in fields:
+            comps[comp][prop] = conv(fields[field_key])
+    for key in ("point_value", "pip_size"):
+        if key in fields:
+            comps["price"][key] = float(fields[key])
+    if ("commission" in fields or "commission_value" in fields) and not (
+        isinstance(fields.get("trade"), Mapping)
+        and "commission_settings" in fields["trade"]
+    ):
+        comps["trade"]["commission_settings"] = None
+    if any(
+        key in fields
+        for key in (
+            "swap_long",
+            "swap_short",
+            "triple_swap_on",
+            "swap_type",
+            "swap_mode",
+        )
+    ):
+        comps["swap"]["settings"] = None
 
 
 def _apply_field_updates(
@@ -185,7 +212,6 @@ def _apply_field_updates(
     """Calculate database column updates for an instrument record."""
     updates: dict[str, Any] = {"updated_at_utc": now_utc}
     _update_direct_columns(fields, updates)
-
     comps = {
         col: _parse_json_dict(existing.get(col))
         for col in ("spread", "margin", "volume", "trade", "price", "swap", "state")
@@ -194,25 +220,18 @@ def _apply_field_updates(
         val = fields.get(comp_name)
         if isinstance(val, Mapping):
             comp_d.update(val)
-
-    for field_key, comp, prop, conv in _SHORTCUTS:
-        if field_key in fields:
-            comps[comp][prop] = conv(fields[field_key])
-
+    _apply_shortcuts(comps, fields)
     if "triple_swap_on" in fields:
         comps["swap"]["rollover3days"] = str(fields["triple_swap_on"]).capitalize()
     if "swap_type" in fields or "swap_mode" in fields:
         comps["swap"]["mode"] = str(fields.get("swap_mode") or fields.get("swap_type"))
-
     for col, d in comps.items():
         updates[col] = json.dumps(d)
-
     if "session" in fields:
         sess = fields["session"]
         updates["session"] = (
             json.dumps(sess) if isinstance(sess, (list, tuple)) else str(sess)
         )
-
     return updates
 
 
@@ -235,13 +254,11 @@ def _parse_csv_row(row: Mapping[str, str]) -> tuple[str, str, dict[str, Any]]:
     name = (row.get("name") or row.get("symbol") or "").strip()
     if not name:
         raise ValueError("Missing instrument name in CSV row")
-
     ds = (row.get("datasource") or "").strip()
     if not ds:
         raw_name, raw_ds = name.rsplit("_", 1) if "_" in name else (name, "SQ default")
     else:
         raw_name, raw_ds = name.removesuffix(f"_{ds}"), ds
-
     comm_raw = row.get("commission", row.get("commission_value"))
     add_args: dict[str, Any] = {
         "name": raw_name,
@@ -265,14 +282,13 @@ def _parse_csv_row(row: Mapping[str, str]) -> tuple[str, str, dict[str, Any]]:
     return raw_name, raw_ds, add_args
 
 
-def _read_symbols() -> list[dict[str, Any]]:
+def _read_symbols(gateway: HostPersistence | None = None) -> list[dict[str, Any]]:
     """Read all symbol records from datamgr_symbols table."""
+    gateway = gateway if gateway is not None else persistence
     rows: list[dict[str, Any]] = []
     offset: int | None = 0
     while offset is not None:
-        response = persistence.read_records(
-            "datamgr_symbols", limit=1000, offset=offset
-        )
+        response = gateway.read_records("datamgr_symbols", limit=1000, offset=offset)
         if not response["success"]:
             err = response.get("error") or {}
             msg = (
@@ -316,6 +332,10 @@ def _build_price_dict(
     pip_step: float | None,
 ) -> dict[str, Any]:
     d = dict(price or {})
+    if point_value is not None:
+        d["point_value"] = float(point_value)
+    if pip_size is not None:
+        d["pip_size"] = float(pip_size)
     d["tick_size"] = (
         float(pip_size) if pip_size is not None else d.get("tick_size", 0.0001)
     )
@@ -355,14 +375,12 @@ def _build_row_dict(inst_name: str, now_utc: str, **kwargs: Any) -> dict[str, An
     """Construct full dictionary ready for database insertion."""
     dt = kwargs.get("data_type") or "Forex"
     clean_dt = dt.split("\\", maxsplit=1)[0] if "\\" in dt else dt
-
     spread_d = dict(kwargs.get("spread") or {})
     def_spread = kwargs.get("default_spread")
     if def_spread is not None:
         spread_d["default"] = float(def_spread)
     elif "default" not in spread_d:
         spread_d["default"] = 1.0
-
     vol_d = dict(kwargs.get("volume") or {})
     vol_min = kwargs.get("order_size_multiplier", kwargs.get("min_volume"))
     if vol_min is not None:
@@ -370,12 +388,10 @@ def _build_row_dict(inst_name: str, now_utc: str, **kwargs: Any) -> dict[str, An
     vol_step = kwargs.get("order_size_step", kwargs.get("lot_step"))
     if vol_step is not None:
         vol_d["step"] = float(vol_step)
-
     trade_d = dict(kwargs.get("trade") or {})
     if kwargs.get("min_distance") is not None:
         trade_d["min_distance"] = float(kwargs["min_distance"])
     trade_d["calculation"] = clean_dt
-
     price_d = _build_price_dict(
         kwargs.get("price"),
         kwargs.get("pip_size"),
@@ -389,7 +405,6 @@ def _build_row_dict(inst_name: str, now_utc: str, **kwargs: Any) -> dict[str, An
         kwargs.get("triple_swap_on"),
         kwargs.get("swap_type"),
     )
-
     comm = kwargs.get("commission", kwargs.get("commission_value", 0.0))
     session = kwargs.get("session")
     sess_val = (
@@ -397,7 +412,6 @@ def _build_row_dict(inst_name: str, now_utc: str, **kwargs: Any) -> dict[str, An
         if session is not None
         else [asdict(w) for w in default_session_windows()]
     )
-
     info = SymbolInfo(
         name=inst_name,
         description=str(kwargs.get("description") or ""),
@@ -428,7 +442,12 @@ def _build_row_dict(inst_name: str, now_utc: str, **kwargs: Any) -> dict[str, An
 class Symbols:
     """Service providing symbols catalog presentation and mutations."""
 
-    _read_symbols = staticmethod(_read_symbols)
+    def __init__(self, gateway: HostPersistence | None = None) -> None:
+        self.gateway = gateway if gateway is not None else persistence
+
+    def _read_symbols(self) -> list[dict[str, Any]]:
+        return _read_symbols(self.gateway)
+
     _build_row_dict = staticmethod(_build_row_dict)
 
     def list(self) -> dict[str, Any]:
@@ -461,7 +480,7 @@ class Symbols:
                 "symbols.get", start, "Symbol name is required", ErrorCode.VALIDATION
             )
         try:
-            resp = persistence.read_records(
+            resp = self.gateway.read_records(
                 "datamgr_symbols", filters={"name": sym}, limit=1
             )
             if not resp["success"]:
@@ -499,7 +518,6 @@ class Symbols:
         start = time.perf_counter()
         inst_name = name.strip() or str(kwargs.get("symbol") or "").strip()
         broker_profile = datasource.strip()
-
         if not inst_name:
             return _fail(
                 "symbols.add",
@@ -514,14 +532,12 @@ class Symbols:
                 "Broker profile ('datasource') is required",
                 ErrorCode.VALIDATION,
             )
-
         suffix = f"_{broker_profile}"
         symbol_key = (
             inst_name if inst_name.endswith(suffix) else f"{inst_name}_{broker_profile}"
         )
-
         try:
-            existing_check = persistence.read_records(
+            existing_check = self.gateway.read_records(
                 "datamgr_symbols", filters={"name": symbol_key}, limit=1
             )
             records = (existing_check.get("data") or {}).get("records")
@@ -532,11 +548,9 @@ class Symbols:
                     f"Symbol '{symbol_key}' already exists",
                     ErrorCode.CONFLICT,
                 )
-
             now_utc = datetime.now(UTC).isoformat()
             row_data = self._build_row_dict(symbol_key, now_utc, **kwargs)
-
-            create_resp = persistence.create_records("datamgr_symbols", row_data)
+            create_resp = self.gateway.create_records("datamgr_symbols", row_data)
             if not create_resp["success"]:
                 err = create_resp.get("error") or {}
                 return _fail(
@@ -546,7 +560,6 @@ class Symbols:
                     or f"Failed to add symbol '{symbol_key}'",
                     ErrorCode(err.get("code", "internal")),
                 )
-
             records = (create_resp.get("data") or {}).get("records") or []
             created_info = (
                 _row_to_symbol_info(records[0])
@@ -588,7 +601,6 @@ class Symbols:
                 "At least one symbol must be specified to edit",
                 ErrorCode.VALIDATION,
             )
-
         fields = dict(updates or {})
         fields.update(kwargs)
         if not fields:
@@ -602,7 +614,7 @@ class Symbols:
         try:
             found: dict[str, dict[str, Any]] = {}
             for s in sym_list:
-                r = persistence.read_records(
+                r = self.gateway.read_records(
                     "datamgr_symbols", filters={"name": s}, limit=1
                 )
                 if r.get("success") and (r.get("data") or {}).get("records"):
@@ -618,7 +630,7 @@ class Symbols:
 
             updated: list[SymbolInfo] = []
             now_utc = datetime.now(UTC).isoformat()
-            with persistence.transaction() as tx:
+            with self.gateway.transaction() as tx:
                 for sym, row in found.items():
                     upds = _apply_field_updates(row, fields, now_utc)
                     res = tx.update_record(
@@ -670,7 +682,7 @@ class Symbols:
                 if len(sym_list) > 1
                 else {"name": sym_list[0]}
             )
-            resp = persistence.delete_record(
+            resp = self.gateway.delete_record(
                 "datamgr_symbols",
                 filters=[filter_val]
                 if isinstance(filter_val, RecordFilter)
@@ -728,7 +740,7 @@ class Symbols:
             )
 
         try:
-            resp = persistence.read_records(
+            resp = self.gateway.read_records(
                 "datamgr_symbols", filters={"name": src_sym}, limit=1
             )
             records = (resp.get("data") or {}).get("records") or []
@@ -929,17 +941,19 @@ class Symbols:
             file_path = Path(path).resolve()
             file_path.parent.mkdir(parents=True, exist_ok=True)
 
-            f = (
-                RecordFilter("name", "in", sym_names)
-                if len(sym_names) > 1
-                else {"name": sym_names[0]}
-            )
-            resp = persistence.read_records(
-                "datamgr_symbols",
-                filters=[f] if isinstance(f, RecordFilter) else f,
-                limit=1000,
-            )
-            records = (resp.get("data") or {}).get("records") or []
+            sym_names = list(dict.fromkeys(sym_names))
+            records: list[dict[str, Any]] = []
+            for start in range(0, len(sym_names), 1000):
+                batch = sym_names[start : start + 1000]
+                resp = self.gateway.read_records(
+                    "datamgr_symbols",
+                    filters=[RecordFilter("name", "in", batch)],
+                    limit=1000,
+                )
+                if not resp["success"]:
+                    return resp
+                data = resp.get("data") or {}
+                records.extend(data.get("records") or [])
             if not records:
                 return _fail(
                     "symbols.save",

@@ -734,9 +734,7 @@ export function DataManager() {
     }
   };
   const refreshSelectedSymbols = () => {
-    if (symbolRows.length && !selectedSymbols.length) { setSelectionMessage('You have to select at least one symbol.'); return; }
-    const symbols = !symbolRows.length || selectedSymbols.length === symbolRows.length ? undefined : selectedSymbols.map(item => item.symbol);
-    void runSymbolJob(symbols ? `Refreshing ${symbols.length} symbol${symbols.length === 1 ? '' : 's'}` : 'Refreshing all symbols', async () => `Refreshed ${await useSymbols.getState().refreshSymbols(symbols)} symbols from MetaTrader 5.`);
+    void useSymbols.getState().refreshFromServer();
   };
   const removeSymbolRows = (rows: CatalogSymbol[]) => void runSymbolJob(`Deleting ${rows.length} symbol${rows.length === 1 ? '' : 's'}`, async () => { const count = await useSymbols.getState().removeSymbols(rows.map(item => item.id)); setSelectedSymbolIds(current => current.filter(id => !rows.some(item => item.id === id))); return `Deleted ${count} symbol${count === 1 ? '' : 's'}.`; });
   const otherProviderActive = activeImport(operationState) || [symbolJob?.state, td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, stockGroups.job?.state,brokerJob?.state].some(activeImport);
@@ -774,11 +772,11 @@ export function DataManager() {
     {tab === 'Tools' && <div className="data-tool-actions" aria-label="Data tools"><Button data-control-id="tool-timezone" className="tool-timezone" onClick={() => { setLastControlId('tool-timezone'); openClone(); }}><span className="timezone-tool-icon" aria-hidden="true"><Globe2 size={26}/><Clock size={13}/></span>Clone to timezone</Button><Button data-control-id="tool-analyze" className="tool-analyze" onClick={() => { setLastControlId('tool-analyze'); openReview(); }}><ChartCandlestick size={26} aria-hidden="true"/>View &amp; Analyze</Button></div>}
     {tab === 'Symbols' && <div className="management-actions" aria-label="Symbol operations">
       <Button id="datamanager-symbols-add" className="action-add" onClick={() => { setSymbolDialog({ kind: 'editor', mode: 'add', selected: [] }); }}><CirclePlus size={26} aria-hidden="true"/>Add Symbol</Button>
-      <Button id="datamanager-symbols-clone" className="action-clone" onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'clone', source: rows[0] }); }}><CopyPlus size={26} aria-hidden="true"/>Clone Symbol</Button>
+      <Button id="datamanager-symbols-clone" className="action-clone" onClick={() => { const rows = requireSymbols(); if (rows?.length === 1) setSymbolDialog({ kind: 'clone', source: rows[0] }); else if (rows) setSelectionMessage('Select exactly one symbol to clone.'); }}><CopyPlus size={26} aria-hidden="true"/>Clone Symbol</Button>
       <Button id="datamanager-symbols-edit" className="action-edit" onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'editor', mode: rows.length === 1 ? 'edit' : 'mass', selected: rows }); }}><Settings2 size={26} aria-hidden="true"/>Mass Edit Symbol</Button>
       <Button id="datamanager-symbols-delete" className="action-delete" disabled={symbolJob?.state === 'running'} onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'delete', selected: rows }); }}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
-      <Button id="datamanager-symbols-save" className="action-save" onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'transfer', mode: 'save', selected: rows }); }}><Save size={26} aria-hidden="true"/>Save</Button>
-      <Button id="datamanager-symbols-load" className="action-load" disabled title="Symbol import is not implemented"><FolderOpen size={26} aria-hidden="true"/>Load</Button>
+      <Button id="datamanager-symbols-save" className="action-save" onClick={() => { setSymbolDialog({ kind: 'transfer', mode: 'save', selected: symbolRows.filter(row => selectedSymbolIds.includes(row.id)) }); }}><Save size={26} aria-hidden="true"/>Save</Button>
+      <Button id="datamanager-symbols-load" className="action-load" onClick={() => setSymbolDialog({ kind: 'transfer', mode: 'load', selected: [] })}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
     {tab === 'Sessions' && <div className="management-actions" aria-label="Session operations">
       <Button className="action-add" onClick={()=>{setSessionError('');setSessionDialog({kind:'editor',mode:'add'});}}><CalendarPlus size={26} aria-hidden="true"/>Add Session</Button>

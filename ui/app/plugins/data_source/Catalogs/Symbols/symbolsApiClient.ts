@@ -153,14 +153,14 @@ export async function fetchRemoteSymbols(params?: Record<string, string | number
   if (new Set(result.map(row => row.id)).size !== result.length || new Set(result.map(row => row.symbol)).size !== result.length) throw new Error('The host returned duplicate symbol identities.');
   return result;
 }
-export async function saveRemoteSymbol(item: FileSymbol): Promise<RemoteSymbolDefinition> {
-  const record = checked(await client.post('/symbols', fromFileSymbol(item)));
-  if (record.symbol !== item.symbol) throw new Error('The host returned a different symbol.');
+export async function saveRemoteSymbol(item: FileSymbol, datasource = 'SQ default'): Promise<RemoteSymbolDefinition> {
+  const record = checked(await client.post('/symbols', { ...fromFileSymbol(item), datasource }));
+  if (record.symbol !== item.symbol && record.symbol !== `${item.symbol}_${datasource}`) throw new Error('The host returned a different symbol.');
   return record;
 }
 export async function cloneRemoteSymbol(sourceId: string, newSymbol: string): Promise<RemoteSymbolDefinition> {
   const record = checked(await client.post('/symbols/clone', { source_id: sourceId, new_symbol: newSymbol }));
-  if (record.symbol !== newSymbol || record.id === sourceId) throw new Error('The host did not confirm a new clone identity.');
+  if (!(record.symbol === newSymbol || record.symbol.startsWith(newSymbol + '_')) || record.id === sourceId) throw new Error('The host did not confirm a new clone identity.');
   return record;
 }
 export async function refreshRemoteSymbols(symbols?: string[]): Promise<{ deleted_count: number; inserted_count: number }> {
@@ -179,4 +179,12 @@ export async function massEditRemoteSymbols(symbolIds: string[], updates: Record
   const records = response.symbols.map(checked);
   if (new Set(records.map(row => row.id)).size !== records.length || records.some(row => !symbolIds.includes(row.id))) throw new Error('The host returned different symbol identities.');
   return records;
+}
+
+export async function loadSymbolCsv(content: string): Promise<{ loaded_count: number; total: number; errors: { row: number; error: string }[] }> {
+  return client.post('/symbols/load', { content });
+}
+
+export async function saveSymbolCsv(symbolIds: string[]): Promise<{ content: string; count: number }> {
+  return client.post('/symbols/save', { symbol_ids: symbolIds });
 }

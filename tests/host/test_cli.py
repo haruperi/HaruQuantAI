@@ -11,6 +11,23 @@ from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
 
 
+def test_main_routes_registered_domain_handler(monkeypatch, capsys):
+    from app.workspace.data_manager import cli as domain_cli
+
+    handler = Mock(return_value=7)
+
+    def register(commands):
+        commands.add_parser("example-domain").set_defaults(handler=handler)
+
+    monkeypatch.setattr(domain_cli, "register_commands", register)
+    shutdown = Mock()
+    monkeypatch.setattr(cli, "shutdown_logging", shutdown)
+    assert cli.main(["example-domain"]) == 7
+    assert handler.call_args.args[0].command == "example-domain"
+    assert capsys.readouterr().out == ""
+    shutdown.assert_called_once_with()
+
+
 def test_health_checks_services_without_exposing_rows(monkeypatch):
     gateway = Mock()
     gateway.read_records.return_value = {
@@ -57,7 +74,16 @@ def test_command_json_and_exit_status(monkeypatch, capsys, success):
     shutdown.assert_called_once_with()
 
 
-@pytest.mark.parametrize("arguments", [[], ["unknown"]])
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        [],
+        ["unknown"],
+        ["data-manager"],
+        ["data-manager", "symbol"],
+        ["data-manager", "symbol", "unknown"],
+    ],
+)
 def test_invalid_commands_do_not_run_health(monkeypatch, arguments):
     health = Mock()
     monkeypatch.setattr(cli, "health", health)
@@ -66,6 +92,88 @@ def test_invalid_commands_do_not_run_health(monkeypatch, arguments):
         cli.main(arguments)
     assert error.value.code == 2
     health.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "result",
+    [
+        {"success": True, "data": [{"name": "EURUSD"}]},
+        {"success": True, "data": []},
+        {"success": False, "error": {"code": "internal"}},
+    ],
+)
+def test_symbol_list_command(monkeypatch, capsys, result):
+    from app.workspace.data_manager.cli import SymbolsCLI
+    from app.workspace.data_manager.symbols import Symbols
+
+    list_symbols = Mock(return_value=result)
+    monkeypatch.setattr(Symbols, "list", list_symbols)
+    health = Mock()
+    monkeypatch.setattr(cli, "health", health)
+    shutdown = Mock()
+    monkeypatch.setattr(cli, "shutdown_logging", shutdown)
+
+    assert cli.main(["data-manager", "symbol", "list"]) == (
+        0 if result["success"] else 1
+    )
+    output = capsys.readouterr().out
+    if result["success"]:
+        assert "Page 1 of 1" in output
+        assert SymbolsCLI.format_symbol_table(result, limit=None) + "\n" in output
+    else:
+        assert json.loads(output) == result
+    list_symbols.assert_called_once_with()
+    health.assert_not_called()
+    shutdown.assert_called_once_with()
+
+
+@pytest.mark.parametrize(
+    "page,size,first,last",
+    [(1, 50, 0, 49), (2, 50, 50, 99), (3, 50, 100, 104), (2, 10, 10, 19)],
+)
+def test_symbol_list_pagination(monkeypatch, capsys, *, page, size, first, last):
+    from app.workspace.data_manager.symbols import Symbols
+
+    symbols = [{"name": f"TEST{i:03d}"} for i in range(105)]
+    monkeypatch.setattr(
+        Symbols, "list", Mock(return_value={"success": True, "data": symbols})
+    )
+    monkeypatch.setattr(cli, "shutdown_logging", Mock())
+    assert (
+        cli.main(
+            [
+                "data-manager",
+                "symbol",
+                "list",
+                "--page",
+                str(page),
+                "--page-size",
+                str(size),
+            ]
+        )
+        == 0
+    )
+    output = capsys.readouterr().out
+    assert f"Symbols {first + 1}-{last + 1} of 105" in output
+    for index in range(105):
+        assert (f"TEST{index:03d}" in output) == (first <= index <= last)
+
+
+@pytest.mark.parametrize(
+    "option,value",
+    [("--page", "0"), ("--page-size", "-1"), ("--page", "abc"), ("--page", "2")],
+)
+def test_symbol_list_invalid_page(monkeypatch, capsys, option, value):
+    from app.workspace.data_manager.symbols import Symbols
+
+    monkeypatch.setattr(
+        Symbols, "list", Mock(return_value={"success": True, "data": []})
+    )
+    monkeypatch.setattr(cli, "shutdown_logging", Mock())
+    with pytest.raises(SystemExit) as error:
+        cli.main(["data-manager", "symbol", "list", option, value])
+    assert error.value.code == 2
+    assert capsys.readouterr().out == ""
 
 
 @pytest.fixture

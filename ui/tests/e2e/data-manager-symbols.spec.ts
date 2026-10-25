@@ -45,7 +45,15 @@ async function connect(page: Page, initial = [record('1', 'RECORDED_A'), record(
       state.writes.push({ path, body });
       if (state.delayWrite) await new Promise(resolve => setTimeout(resolve, 600));
       if (state.failWrite) { await route.fulfill({ status: 409, json: { status: 'error', error: { code: 'CONFLICT', message: 'Symbol was not saved: conflict' } } }); return; }
-      if (path.endsWith('/refresh')) {
+      if (path.endsWith('/save')) {
+        data = { count: rows.length, content: 'name,description\n' + rows.map(row => `${row.symbol},${row.description}`).join('\n') };
+      } else if (path.endsWith('/load')) {
+        rows.push(record(String(rows.length + 1), 'CSV_IMPORTED'));
+        data = { loaded_count: 1, total: 2, errors: [{ row: 2, error: 'Duplicate symbol' }] };
+      } else if (path.endsWith('/delete')) {
+        rows = rows.filter(row => !body.symbol_ids.includes(row.id));
+        data = { deleted_count: body.symbol_ids.length };
+      } else if (path.endsWith('/refresh')) {
         data = { deleted_count: 0, inserted_count: rows.length };
       } else if (path.endsWith('/mass-edit')) {
         rows = rows.map(row => body.symbol_ids.includes(row.id) ? { ...row, ...body.updates } : row);
@@ -78,7 +86,7 @@ test('lists server specifications, awaits add confirmation, and retains records 
   await expect(table(page)).not.toContainText('EURUSD');
   await expect(table(page).getByRole('columnheader', { name: 'Point value', exact: true })).toBeVisible();
   await expect(operations(page).getByRole('button', { name: 'Mass Delete', exact: true })).toBeEnabled();
-  await expect(operations(page).getByRole('button', { name: 'Load', exact: true })).toBeDisabled();
+  await expect(operations(page).getByRole('button', { name: 'Load', exact: true })).toBeEnabled();
   await operations(page).getByRole('button', { name: 'Add Symbol', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Add symbol', exact: true });
   await dialog.getByLabel('Symbol', { exact: true }).fill('NEW_SPEC');
@@ -153,4 +161,44 @@ test('empty reads clear rows and failures have visible stale/retry state', async
   await page.getByRole('button', { name: 'Refresh symbols', exact: true }).click();
   await expect(table(page)).not.toContainText('RECORDED_A');
   await expect(table(page)).toContainText('No matching symbols.');
+});
+
+test('pages and filters the catalog while retaining selections across pages', async ({ page }) => {
+  await connect(page, Array.from({ length: 120 }, (_, index) => record(String(index + 1), `PAGE_${String(index).padStart(3, '0')}`)));
+  await expect(page.getByLabel('Symbol pagination')).toContainText('Page 1 of 3');
+  await table(page).getByLabel('Select symbol PAGE_000', { exact: true }).check();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await expect(page.getByLabel('Symbol pagination')).toContainText('Symbols 51-100 of 120');
+  await expect(table(page)).toContainText('PAGE_050');
+  await expect(table(page)).not.toContainText('PAGE_000');
+  await page.getByLabel('Filter symbols', { exact: true }).fill('PAGE_119');
+  await expect(page.getByLabel('Symbol pagination')).toContainText('Page 1 of 1');
+  await expect(table(page)).toContainText('PAGE_119');
+  await expect(page.getByLabel('Symbol pagination')).toContainText('1 selected');
+});
+
+test('downloads CSV, imports with a skipped row report, and deletes multiple symbols', async ({ page }) => {
+  const { rows } = await connect(page);
+  await operations(page).getByRole('button', { name: 'Save', exact: true }).click();
+  const save = page.getByRole('dialog', { name: 'Save symbols', exact: true });
+  const downloadPromise = page.waitForEvent('download');
+  await save.getByRole('button', { name: 'Download CSV', exact: true }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('Symbols.csv');
+  await expect(save).toHaveCount(0);
+  await operations(page).getByRole('button', { name: 'Load', exact: true }).click();
+  const load = page.getByRole('dialog', { name: 'Load symbols', exact: true });
+  await load.getByLabel('CSV file', { exact: true }).setInputFiles({ name: 'symbols.csv', mimeType: 'text/csv', buffer: Buffer.from('name\nCSV_IMPORTED\nRECORDED_A') });
+  await load.getByRole('button', { name: 'Load CSV', exact: true }).click();
+  await expect(load.getByRole('status')).toContainText('Loaded 1 of 2 symbols.');
+  await expect(load.getByRole('status')).toContainText('Skipped row 2: Duplicate symbol');
+  await load.getByRole('button', { name: 'Close', exact: true }).last().click();
+  await expect(table(page)).toContainText('CSV_IMPORTED');
+  await table(page).getByLabel('Select symbol RECORDED_A', { exact: true }).check();
+  await table(page).getByLabel('Select symbol RECORDED_B', { exact: true }).check();
+  await operations(page).getByRole('button', { name: 'Mass Delete', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Removing symbols', exact: true }).getByRole('button', { name: 'Yes', exact: true }).click();
+  await expect(table(page)).not.toContainText('RECORDED_A');
+  await expect(table(page)).not.toContainText('RECORDED_B');
+  expect(rows().map(row => row.symbol)).toEqual(['CSV_IMPORTED']);
 });

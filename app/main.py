@@ -68,6 +68,9 @@ def create_app(
     application.state.vault = vault
     application.state.connection_testers = dict(connection_testers or {})
     install_transport(application)
+    from app.workspace.data_manager.http import create_router
+
+    application.include_router(create_router())
 
     @application.get("/health", tags=["host"])
     async def health() -> dict[str, str]:

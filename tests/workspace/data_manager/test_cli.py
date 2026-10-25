@@ -1,3 +1,6 @@
+import argparse
+from unittest.mock import Mock
+
 from app.host.response import ResponseMetadata, StandardResponse
 from app.include.contracts import DataInfo
 from app.workspace.data_manager.cli import (
@@ -13,6 +16,21 @@ from app.workspace.data_manager.cli import (
     format_session_table,
     format_symbol_table,
 )
+
+
+def test_domain_registers_and_executes_without_app_entry(monkeypatch, capsys):
+    from app.workspace.data_manager import cli as domain_cli
+    from app.workspace.data_manager.symbols import Symbols
+
+    parser = argparse.ArgumentParser()
+    commands = parser.add_subparsers(dest="command", required=True)
+    domain_cli.register_commands(commands)
+    arguments = parser.parse_args(["data-manager", "symbol", "list"])
+    monkeypatch.setattr(
+        Symbols, "list", Mock(return_value={"success": True, "data": []})
+    )
+    assert arguments.handler(arguments) == 0
+    assert "Page 1 of 1" in capsys.readouterr().out
 
 
 def test_format_dataset_table_and_dashboard() -> None:

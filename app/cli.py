@@ -17,7 +17,7 @@ import getpass
 import json
 import os
 import time
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from typing import Any
 
 from app.host.logging import get_logger, shutdown_logging
@@ -167,6 +167,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         login_parser = commands.add_parser("login", help="Authenticate a CLI session")
         login_parser.add_argument("--username", required=True)
         commands.add_parser("logout", help="Revoke the current CLI session")
+        from app.workspace.data_manager.cli import register_commands
+
+        register_commands(commands)
         arguments = parser.parse_args(argv)
         token = os.environ.get(_TOKEN_ENV)
         if arguments.command == "login":
@@ -178,6 +181,9 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = login(arguments.username, password)
         elif arguments.command == "logout":
             result = logout(token)
+        elif hasattr(arguments, "handler"):
+            handler: Callable[[argparse.Namespace], int] = arguments.handler
+            return handler(arguments)
         else:
             result = health(token=token) if token is not None else health()
         print(json.dumps(result, allow_nan=False))

@@ -273,6 +273,7 @@ class SymbolSpread:
 
     floating: bool = True
     default: float = 0.0
+    slippage: float = 0.0
 
 
 @dataclass(slots=True)
@@ -286,6 +287,7 @@ class SymbolMargin:
     maintenance: float = 0.0
     hedged: float = 0.0
     hedged_use_leg: bool = False
+    rate: float = 0.0
 
 
 @dataclass(slots=True)
@@ -311,6 +313,7 @@ class SymbolTrade:
     stops_level: int = 0
     freeze_level: int = 0
     min_distance: float = 0.0
+    commission_settings: str | None = None
     mode: str = "Full access"
     execution: str = "Market"
     calculation: str = "Forex"
@@ -346,6 +349,8 @@ class SymbolPrice:
     tick_step: float = 0.00001
     tick_value: float = 1.0
     contract_size: float = 100_000.0
+    point_value: float | None = None
+    pip_size: float | None = None
     bid: float = 0.0
     ask: float = 0.0
     chart_mode: str = "Bid"
@@ -359,6 +364,7 @@ class SymbolSwap:
     long: float = 0.0
     short: float = 0.0
     rollover3days: str = "Wednesday"
+    settings: dict[str, Any] | None = None
 
 
 @dataclass(slots=True)

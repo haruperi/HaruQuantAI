@@ -113,22 +113,34 @@ export function SymbolTable({ selected, onSelect, onEdit, onRefresh, onDelete, b
   const [dataType, setDataType] = useState('');
   const [broker, setBroker] = useState('');
   const [descending, setDescending] = useState(false);
-  const rows = symbols.filter(item => (!dataType || item.type === dataType)
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+  const filteredRows = symbols.filter(item => (!dataType || item.type === dataType)
     && (!broker || item.broker === broker)
     && (item.symbol + ' ' + item.name).toLowerCase().includes(query.toLowerCase()))
     .sort((a, b) => a.symbol.localeCompare(b.symbol) * (descending ? -1 : 1));
+  const pages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const currentPage = Math.min(page, pages);
+  const start = (currentPage - 1) * pageSize;
+  const rows = filteredRows.slice(start, start + pageSize);
   const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.id));
   const columns = ['Description', 'Broker profile', 'Point value', 'Pip/Tick size', 'Pip/Tick step', 'Default spread', 'Default slippage', 'Commissions', 'Swap', 'Data type', 'Order size mult.', 'Order size step'];
   return <main className="full dataset-workspace" aria-label="Symbols">
     {instState.error && <p role="alert">{instState.loaded ? 'Showing the last server snapshot. ' : ''}{instState.error}</p>}
     {instState.isSyncing && <p role="status">Loading symbol catalog…</p>}
     <div className="dataset-filters">
-      <input className="text-input" aria-label="Filter symbols" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
-      <select className="text-input" aria-label="Symbol data type" value={dataType} onChange={event => setDataType(event.target.value)}>
+      <input className="text-input" aria-label="Filter symbols" placeholder="Filter items" value={query} onChange={event => { setQuery(event.target.value); setPage(1); }}/>
+      <select className="text-input" aria-label="Symbol data type" value={dataType} onChange={event => { setDataType(event.target.value); setPage(1); }}>
         <option value="">All data types</option>{[...new Set(symbols.map(item => item.type))].map(type => <option key={type}>{type}</option>)}
       </select>
-      <select className="text-input" aria-label="Symbol broker profile" value={broker} onChange={event => setBroker(event.target.value)}><option value="">All broker profiles</option>{[...new Map(symbols.map(item => [item.broker, item.brokerName])).entries()].map(([id, name]) => <option value={id} key={id}>{name}</option>)}</select>
+      <select className="text-input" aria-label="Symbol broker profile" value={broker} onChange={event => { setBroker(event.target.value); setPage(1); }}><option value="">All broker profiles</option>{[...new Map(symbols.map(item => [item.broker, item.brokerName])).entries()].map(([id, name]) => <option value={id} key={id}>{name}</option>)}</select>
       <Button disabled={instState.isSyncing || busy} onClick={onRefresh}>Refresh symbols</Button>
+    </div>
+    <div className="dataset-filters" aria-label="Symbol pagination">
+      <Button disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>Previous</Button>
+      <span role="status">Page {currentPage} of {pages} | Symbols {filteredRows.length ? start + 1 : 0}-{Math.min(start + pageSize, filteredRows.length)} of {filteredRows.length} | {selected.length} selected</span>
+      <Button disabled={currentPage === pages} onClick={() => setPage(currentPage + 1)}>Next</Button>
+      <label>Rows per page <select aria-label="Symbols per page" className="text-input" value={pageSize} onChange={event => { setPageSize(Number(event.target.value)); setPage(1); }}>{[25,50,100].map(size => <option key={size} value={size}>{size}</option>)}</select></label>
     </div>
     <div className="dataset-grid"><table className="plain-table symbol-table" aria-label="Symbols">
       <thead><tr>

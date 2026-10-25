@@ -7,7 +7,7 @@ export interface SymbolsState {
   error: string; isSyncing: boolean; loaded: boolean; generation: number; requestVersion: number;
   reset: () => void;
   refreshFromServer: (brokers?: SymbolBroker[]) => Promise<void>;
-  addSymbolDefinition: (item: FileSymbol) => Promise<void>;
+  addSymbolDefinition: (item: FileSymbol, datasource?: string) => Promise<void>;
   editSymbol: (original: CatalogSymbol, item: FileSymbol) => Promise<void>;
   cloneSymbol: (source: CatalogSymbol, name: string) => Promise<void>;
   massEditSymbols: (ids: string[], patch: SymbolMassPatch) => Promise<void>;
@@ -34,9 +34,9 @@ export const useSymbols = create<SymbolsState>((set, get) => {
         if (generation === get().generation && requestVersion === get().requestVersion) set({ error: cause instanceof Error ? cause.message : 'Unable to load symbols.' });
       } finally { if (generation === get().generation && requestVersion === get().requestVersion) set({ isSyncing: false }); }
     },
-    addSymbolDefinition: async item => {
+    addSymbolDefinition: async (item, datasource) => {
       const generation = get().generation;
-      accept([await saveRemoteSymbol(item)], generation);
+      accept([await saveRemoteSymbol(item, datasource)], generation);
     },
     editSymbol: async (original, item) => {
       if (item.symbol !== original.symbol || item.broker !== original.broker) throw new Error('Symbol identity cannot be changed while editing.');
