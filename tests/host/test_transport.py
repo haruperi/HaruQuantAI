@@ -340,3 +340,51 @@ def test_account_password_change_requires_current_password(client):
         client.post("/api/v1/auth/login", json={"password": "replacement"}).status_code
         == 200
     )
+
+
+def test_diagnostics_and_resources_endpoints(client):
+    sign_in(client)
+    for path in ("diagnostics", "resources"):
+        response = client.get(f"/api/v1/{path}")
+        assert response.status_code == 200
+        data = response.json()["data"]
+        assert "status" in data
+        assert "hardware" in data
+        assert "memory_watchdog" in data
+
+
+def test_events_and_sse_endpoints(client):
+    sign_in(client)
+    resp = client.get("/api/v1/events/channels")
+    assert resp.status_code == 200
+    assert "core_channels" in resp.json()["data"]
+
+    pub = client.post(
+        "/api/v1/events/publish",
+        json={"channel": "system", "event_type": "notice", "payload": {"k": "v"}},
+    )
+    assert pub.status_code == 200
+
+    snap = client.get("/api/v1/events/snapshot?channel=system")
+    assert snap.status_code == 200
+
+    with client.stream(
+        "GET", "/api/v1/events?channels=system&since_cursor=0&limit=1"
+    ) as sse:
+        assert sse.status_code == 200
+        assert "text/event-stream" in sse.headers.get("content-type", "")
+
+
+def test_connection_test_and_constants_classes():
+    from app.host.transport import ConnectionTest, ServletConstants, TransportCLI
+
+    parsed = ConnectionTest._parse("https://example.com:8443/path")
+    assert parsed[1] == "example.com"
+    assert parsed[2] == 8443
+
+    consts = ServletConstants().get_constants()
+    assert consts["application"] == "HaruQuantAI"
+    specs = ServletConstants().get_system_specs()
+    assert "cpu_cores" in specs
+
+    assert TransportCLI.run(["--test-bus"]) == 0
