@@ -44,7 +44,13 @@ from typing import Any, override
 import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
-from app.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.include.contracts import (
+    MarketBar,
+    MarketTick,
+    SymbolInfo,
+    SymbolMargin,
+    SymbolPrice,
+)
 from app.include.data import bars_to_dataframe
 from app.include.enums import Timeframe
 
@@ -365,13 +371,15 @@ class YahooClient(BrokerClient):
 
         return SymbolInfo(
             name=clean_sym,
-            digits=digits,
-            point=point,
-            trade_contract_size=contract_size,
-            currency_base=currency_base,
-            currency_profit=currency_profit,
-            currency_margin=currency_margin,
             description=f"Yahoo Finance: {clean_sym}",
+            price=SymbolPrice(
+                digits=digits, tick_size=point, contract_size=contract_size
+            ),
+            margin=SymbolMargin(
+                currency_base=currency_base,
+                currency_profit=currency_profit,
+                currency_margin=currency_margin,
+            ),
         )
 
     @override
@@ -392,7 +400,9 @@ def main() -> None:
     symbols = client.get_symbols()
     logger.info("Supported symbols: %s...", symbols[:3])
     info = client.get_symbol_info("AAPL")
-    logger.info("AAPL info: digits=%s point=%s", info.digits, info.point)
+    logger.info(
+        "AAPL info: digits=%s point=%s", info.price.digits, info.price.tick_size
+    )
     client.disconnect()
 
 

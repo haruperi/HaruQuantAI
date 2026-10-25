@@ -94,6 +94,7 @@ from app.include.contracts import (
     MarketTick,
     Receipt,
     SymbolInfo,
+    SymbolPrice,
     TerminalInfo,
 )
 from app.include.enums import (
@@ -820,7 +821,9 @@ class MetaTraderClient(TradingClient):
     @override
     def get_symbol_info(self, symbol: str) -> SymbolInfo:
         """Resolve symbol metadata as canonical SymbolInfo."""
-        return SymbolInfo(name=symbol.upper(), digits=5, point=0.00001)
+        return SymbolInfo(
+            name=symbol.upper(), price=SymbolPrice(digits=5, tick_size=0.00001)
+        )
 
     @override
     def get_symbols(self) -> list[str]:

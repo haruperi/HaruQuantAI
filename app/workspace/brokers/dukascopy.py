@@ -50,7 +50,13 @@ from typing import Any, override
 import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
-from app.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.include.contracts import (
+    MarketBar,
+    MarketTick,
+    SymbolInfo,
+    SymbolPrice,
+    SymbolSpread,
+)
 from app.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.include.enums import Timeframe
 
@@ -279,10 +285,10 @@ class DukascopyClient(BrokerClient):
 
                     catalog[sym] = SymbolInfo(
                         name=sym,
-                        digits=dec,
-                        point=point_sz,
-                        spread=int(spread),
-                        trade_contract_size=contract_sz,
+                        price=SymbolPrice(
+                            digits=dec, tick_size=point_sz, contract_size=contract_sz
+                        ),
+                        spread=SymbolSpread(default=int(spread)),
                     )
             self._catalog = catalog
             self.logger.info(
@@ -420,7 +426,7 @@ class DukascopyClient(BrokerClient):
         del start_pos
         sym_clean = self._clean_symbol(symbol)
         snap = self.get_symbol_info(sym_clean)
-        decimals = snap.digits
+        decimals = snap.price.digits
         target_count = count or limit or 100
 
         tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
@@ -544,7 +550,7 @@ class DukascopyClient(BrokerClient):
         """Download tick data from local archives or Dukascopy direct datafeed."""
         sym_clean = self._clean_symbol(symbol)
         snap = self.get_symbol_info(sym_clean)
-        decimals = snap.digits
+        decimals = snap.price.digits
         target_count = count or limit or 100
         s = date_from if date_from is not None else start
         e = date_to if date_to is not None else end

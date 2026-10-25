@@ -4,14 +4,11 @@ Description:
     Own in-memory orders, fills, positions, deals, margin and account state.
     External tick feeding advances model time; historical read requests only
     filter immutable seeded records and use the async command/receipt lifecycle.
-
 Purpose:
     FEAT-BROKER-SIMULATION: Local broker semantics for strategy verification.
-
 Key Capabilities:
     - FR-SIMULATION-DISPATCH: Local dispatch with receipts [`SimulatorClient.call()`] (`DEBUG`).
     - FR-SIMULATION-HISTORY: Seed and query bars/ticks [`SimulatorClient.get_bars()`] (`DEBUG`).
-
 Python API Usage:
     ```python
     from app.workspace.brokers.simulator import SimulatorClient
@@ -20,7 +17,6 @@ Python API Usage:
     client.connect()
     account = client.get_account_info()
     ```
-
 CLI Usage:
     ```bash
     uv run pytest tests/unit/services/test_broker_simulator.py --no-cov
@@ -32,6 +28,7 @@ from __future__ import annotations
 import asyncio
 import os
 from collections.abc import Sequence
+from copy import deepcopy
 from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from itertools import count
@@ -57,7 +54,7 @@ _T = TypeVar("_T", _c.MarketBar, _c.MarketTick)
 _A, _R, _OT, _OS = _e.TradeAction, _e.TradeRetcode, _e.OrderType, _e.OrderState
 _OF, _OTM, _PT = _e.OrderFilling, _e.OrderTime, _e.PositionType
 _DT, _DE = _e.DealType, _e.DealEntry
-_STM, _STE = _e.SymbolTradeMode, _e.SymbolTradeExecution
+_STM = _e.SymbolTradeMode
 _BUY_TYPES = {_OT.BUY, _OT.BUY_LIMIT, _OT.BUY_STOP, _OT.BUY_STOP_LIMIT}
 _SELL_TYPES = {_OT.SELL, _OT.SELL_LIMIT, _OT.SELL_STOP, _OT.SELL_STOP_LIMIT}
 _PENDING_BUY_TYPES = {_OT.BUY_LIMIT, _OT.BUY_STOP, _OT.BUY_STOP_LIMIT}
@@ -119,7 +116,7 @@ class SimulatorClient(TradingClient):
 
     def add_symbol(self, spec: _c.SymbolInfo) -> None:
         """Register a symbol specification with the simulator."""
-        self._symbols[spec.name] = replace(spec)
+        self._symbols[spec.name] = deepcopy(spec)
         self._stats.setdefault(spec.name, {})
 
     def feed_tick(
@@ -142,10 +139,8 @@ class SimulatorClient(TradingClient):
             hk, lk = f"{k}_high", f"{k}_low"
             stats[hk] = max(float(v), stats.get(hk, float(v)))
             stats[lk] = min(float(v), stats.get(lk, float(v)))
-        spec = self._symbols[symbol]
-        if spec.session_open == 0.0:
-            spec.session_open = tick.last
-        spec.session_close = tick.last
+        stats.setdefault("session_open", tick.last)
+        stats["session_close"] = tick.last
         self._expire_orders()
         self._trigger_pending(symbol, tick)
         self._trigger_stops(symbol, tick)
@@ -181,7 +176,10 @@ class SimulatorClient(TradingClient):
         spec, t = self._symbols.get(name), self._ticks.get(name)
         if spec is None:
             return None
-        return replace(spec, bid=t.bid, ask=t.ask, last=t.last) if t else replace(spec)
+        snapshot = deepcopy(spec)
+        if t:
+            snapshot.price.bid, snapshot.price.ask = t.bid, t.ask
+        return snapshot
 
     def symbols(self) -> list[_c.SymbolInfo]:
         """Return all simulated symbol specifications."""
@@ -192,7 +190,7 @@ class SimulatorClient(TradingClient):
         spec = self._symbols.get(name)
         if spec is None:
             return False
-        spec.select = selected
+        spec.state.selected = selected
         return True
 
     def tick(self, name: str) -> _c.MarketTick | None:
@@ -321,7 +319,7 @@ class SimulatorClient(TradingClient):
         if spec is None:
             return 0.0
         dp = (float(p_close) - float(p_open)) * (1.0 if ot == _OT.BUY else -1.0)
-        return dp * float(vol) * spec.trade_contract_size
+        return dp * float(vol) * spec.price.contract_size
 
     def order_calc_margin(
         self, ot: _e.OrderType, sym: str, vol: float, price: float
@@ -331,10 +329,10 @@ class SimulatorClient(TradingClient):
         spec = self._symbols.get(sym)
         if spec is None or vol <= 0:
             return 0.0
-        if spec.margin_initial > 0:
-            return spec.margin_initial * vol
+        if spec.margin.initial > 0:
+            return spec.margin.initial * vol
         lev = max(1, self._account.leverage)
-        return spec.trade_contract_size * vol * max(price, spec.point) / lev
+        return spec.price.contract_size * vol * max(price, spec.price.tick_size) / lev
 
     def info_value(
         self, scope: str, prop_id: int | str, selector: str | int | None = None
@@ -396,7 +394,7 @@ class SimulatorClient(TradingClient):
             spec, tick = self._symbols.get(pos.symbol), self._ticks.get(pos.symbol)
             if spec is not None and tick is not None:
                 m, is_b = (
-                    spec.trade_stops_level * spec.point,
+                    spec.trade.stops_level * spec.price.tick_size,
                     pos.position_type == int(_PT.BUY),
                 )
                 ref = tick.bid if is_b else tick.ask
@@ -425,12 +423,18 @@ class SimulatorClient(TradingClient):
             if req.volume <= 0 or req.volume > pos.volume + 1e-12:
                 return _R.INVALID_CLOSE_VOLUME, "Invalid close volume"
             return _R.DONE, "Done"
-
         spec = self._symbols.get(req.symbol)
         if spec is None:
             return _R.INVALID_ORDER, "Unknown symbol"
-        tm, ot = spec.trade_mode, req.order_type
-        tf, fl = req.type_filling, spec.trade_fill_flags
+        tm = {
+            "Disabled": _STM.DISABLED,
+            "Long only": _STM.LONGONLY,
+            "Short only": _STM.SHORTONLY,
+            "Close only": _STM.CLOSEONLY,
+            "Full access": _STM.FULL,
+        }[spec.trade.mode]
+        ot = req.order_type
+        tf, filling = req.type_filling, spec.trade.filling
         if tm == _STM.DISABLED:
             return _R.TRADE_DISABLED, "Symbol trading is disabled"
         if tm == _STM.CLOSEONLY and not req.position:
@@ -441,10 +445,10 @@ class SimulatorClient(TradingClient):
             return _R.SHORT_ONLY, "Only short positions are allowed"
         if req.volume <= 0 or not self._volume_valid(spec, req.volume):
             return _R.INVALID_VOLUME, "Invalid volume"
-        if act == _A.DEAL and spec.trade_exemode == int(_STE.MARKET):
-            if tf == _OF.FOK and not (fl & 1):
+        if act == _A.DEAL and spec.trade.execution == "Market":
+            if tf == _OF.FOK and "Fill or Kill" not in filling:
                 return _R.INVALID_FILL, "FOK filling is not supported"
-            if tf == _OF.IOC and not (fl & 2):
+            if tf == _OF.IOC and "Immediate or Cancel" not in filling:
                 return _R.INVALID_FILL, "IOC filling is not supported"
             if tf == _OF.RETURN:
                 return _R.INVALID_FILL, "RETURN is not valid for Market Execution"
@@ -464,13 +468,13 @@ class SimulatorClient(TradingClient):
                 return _R.INVALID_PRICE, "Invalid pending order price"
         if not self._stops_valid(req, spec):
             return _R.INVALID_STOPS, "Invalid stops"
-        if spec.volume_limit > 0:
+        if spec.volume.limit > 0:
             s, sym, b_pt = ot in _BUY_TYPES, req.symbol, int(_PT.BUY)
             ps = (p for p in self._positions.values() if p.symbol == sym)
             os_ = (o for o in self._orders.values() if o.symbol == sym)
             pv = sum(p.volume for p in ps if (p.position_type == b_pt) == s)
             ov = sum(o.volume_current for o in os_ if (o.order_type in _BUY_TYPES) == s)
-            if pv + ov + req.volume > spec.volume_limit + 1e-12:
+            if pv + ov + req.volume > spec.volume.limit + 1e-12:
                 return _R.LIMIT_VOLUME, "Symbol volume limit reached"
         return _R.DONE, "Done"
 
@@ -480,7 +484,11 @@ class SimulatorClient(TradingClient):
         tick = self._ticks.get(req.symbol)
         if tick is None:
             return False
-        m, p, ot = spec.trade_stops_level * spec.point, req.price, req.order_type
+        m, p, ot = (
+            spec.trade.stops_level * spec.price.tick_size,
+            req.price,
+            req.order_type,
+        )
         if ot == _OT.BUY_LIMIT:
             return p <= tick.ask - m + 1e-12
         if ot == _OT.SELL_LIMIT:
@@ -497,13 +505,16 @@ class SimulatorClient(TradingClient):
 
     @staticmethod
     def _volume_valid(spec: _c.SymbolInfo, volume: float) -> bool:
-        if volume < spec.volume_min - 1e-12 or volume > spec.volume_max + 1e-12:
+        if volume < spec.volume.min - 1e-12 or volume > spec.volume.max + 1e-12:
             return False
-        n = (volume - spec.volume_min) / max(spec.volume_step, 1e-12)
+        n = (volume - spec.volume.min) / max(spec.volume.step, 1e-12)
         return abs(n - round(n)) <= 1e-7
 
     def _stops_valid(self, req: _c.TradeRequest, spec: _c.SymbolInfo) -> bool:
-        m, tick = spec.trade_stops_level * spec.point, self._ticks.get(req.symbol)
+        m, tick = (
+            spec.trade.stops_level * spec.price.tick_size,
+            self._ticks.get(req.symbol),
+        )
         if m <= 0 or tick is None:
             return True
         if req.action == _A.DEAL:
@@ -575,13 +586,11 @@ class SimulatorClient(TradingClient):
         self._orders[ticket] = self._build_order(
             req, ticket, _OS.PLACED, vol_cur=req.volume, p_open=req.price, p_cur=cur
         )
-        spec = self._symbols[req.symbol]
-        if is_b:
-            spec.session_buy_orders += 1
-            spec.session_buy_orders_volume += req.volume
-        else:
-            spec.session_sell_orders += 1
-            spec.session_sell_orders_volume += req.volume
+        stats = self._stats.setdefault(req.symbol, {})
+        side = "buy" if is_b else "sell"
+        key = f"session_{side}_orders"
+        stats[key] = stats.get(key, 0) + 1
+        stats[key + "_volume"] = stats.get(key + "_volume", 0) + req.volume
         r = _res(
             _R.PLACED, "Order placed", order=ticket, volume=req.volume, price=req.price
         )
@@ -668,8 +677,11 @@ class SimulatorClient(TradingClient):
         )
         self._append_filled(req, order_ticket, pos_ticket, price)
         spec = self._symbols[req.symbol]
-        spec.session_deals += 1
-        spec.session_turnover += abs(price * req.volume * spec.trade_contract_size)
+        stats = self._stats.setdefault(req.symbol, {})
+        stats["session_deals"] = stats.get("session_deals", 0) + 1
+        stats["session_turnover"] = stats.get("session_turnover", 0) + abs(
+            price * req.volume * spec.price.contract_size
+        )
         self._mark_to_market()
         return self._done(deal.ticket, order_ticket, req.volume, price, tick)
 
@@ -742,7 +754,8 @@ class SimulatorClient(TradingClient):
             del self._positions[ticket]
         else:
             pos.price_current = cp
-        self._symbols[pos.symbol].session_deals += 1
+        stats = self._stats.setdefault(pos.symbol, {})
+        stats["session_deals"] = stats.get("session_deals", 0) + 1
         self._mark_to_market()
         return self._done(deal.ticket, order_ticket, volume, cp, tick)
 
@@ -806,7 +819,6 @@ class SimulatorClient(TradingClient):
                 continue
             if not trig:
                 continue
-
             del self._orders[ticket]
             order.state, order.state_description = int(_OS.FILLED), _label(_OS.FILLED)
             order.time_done, order.time_done_msc = self._clock_stamp()

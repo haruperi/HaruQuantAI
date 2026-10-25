@@ -591,12 +591,18 @@ class CTraderClient(TradingClient):
         point = 1.0 / (10**digits)
         bid = 1.1 if sym.startswith("EUR") else 1.0
         cb, cp = (sym[:3], sym[3:6]) if len(sym) >= MIN_SYMBOL_CHARS else ("USD", "USD")
-        snap = _c.SymbolInfo(name=sym, digits=digits, point=point, bid=bid)
-        snap.ask, snap.spread = bid + 20 * point, 20
-        snap.currency_base, snap.currency_profit, snap.currency_margin = cb, cp, cb
-        snap.select = snap.visible = True
-        snap.volume_min, snap.volume_max, snap.volume_step = 0.01, 100.0, 0.01
-        snap.trade_contract_size = 100_000.0
+        snap = _c.SymbolInfo(
+            name=sym, price=_c.SymbolPrice(digits=digits, tick_size=point, bid=bid)
+        )
+        snap.price.ask, snap.spread.default = bid + 20 * point, 20
+        (
+            snap.margin.currency_base,
+            snap.margin.currency_profit,
+            snap.margin.currency_margin,
+        ) = cb, cp, cb
+        snap.state.selected = snap.state.visible = True
+        snap.volume.min, snap.volume.max, snap.volume.step = 0.01, 100.0, 0.01
+        snap.price.contract_size = 100_000.0
         self._symbol_cache[sym] = snap
         return snap
 

@@ -5,10 +5,8 @@ Description:
     (`FilesClient`) along with shared delimited (CSV, TSV, semicolon-separated),
     columnar (Parquet), and MetaTrader 4 binary (`HST` v400/v401, `FXT` v405)
     parsers, exporters, and deterministic partition discovery helpers.
-
 Purpose:
     FEAT-DATA-SOURCE-FILES: Local Filesystem Historical Market Data Ingestion and Codecs.
-
 Key Capabilities:
     - FR-BROKER-FILES-PARSING: CSV, Parquet, HST, and FXT Bar and Tick Ingestion
       Associated: `[FilesClient.get_bars()]`, `[FilesClient.get_ticks()]`,
@@ -24,7 +22,6 @@ Key Capabilities:
     - FR-BROKER-CODECS-FXT: Decode and encode MT4 FXT tick model files (version 405).
       Associated: `decode_fxt_bytes()`, `encode_fxt_bytes()`
       Logging: Emits DEBUG on parsing FXT header and model records.
-
 Python API Usage:
     ```python
     from app.workspace.brokers.files import FilesClient, parse_delimited_bars
@@ -33,11 +30,6 @@ Python API Usage:
     client = FilesClient(data_dir="data/market")
     bars = client.get_bars("EURUSD", Timeframe.PERIOD_M1, count=5)
     client.disconnect()
-    ```
-
-CLI Usage:
-    ```bash
-    uv run python -m app.workspace.brokers.files
     ```
 """
 
@@ -58,7 +50,13 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from app.host.logging import get_logger
-from app.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.include.contracts import (
+    MarketBar,
+    MarketTick,
+    SymbolInfo,
+    SymbolPrice,
+    SymbolState,
+)
 from app.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.include.enums import Timeframe
 
@@ -831,7 +829,9 @@ class FilesClient(BrokerClient):
             extra={"fr_id": SYMBOLS_FR, "symbol": sym_upper},
         )
         return SymbolInfo(
-            name=sym_upper, custom=True, digits=2, point=0.01, trade_contract_size=1.0
+            name=sym_upper,
+            state=SymbolState(custom=True),
+            price=SymbolPrice(digits=2, tick_size=0.01, contract_size=1.0),
         )
 
     @override

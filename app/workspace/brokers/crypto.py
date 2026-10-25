@@ -55,7 +55,14 @@ import pandas as pd  # type: ignore[import-untyped]
 import requests
 
 from app.host.logging import get_logger
-from app.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.include.contracts import (
+    MarketBar,
+    MarketTick,
+    SymbolInfo,
+    SymbolMargin,
+    SymbolPrice,
+    SymbolState,
+)
 from app.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.include.enums import Timeframe
 
@@ -548,14 +555,18 @@ class CryptoClient(BrokerClient):
         dec = _calc_digits(tick_size)
         snap = SymbolInfo(
             name=sym_clean,
-            custom=False,
-            digits=dec,
-            point=tick_size,
-            currency_base=s_data.get("baseAsset", ""),
-            currency_profit=s_data.get("quoteAsset", ""),
-            trade_contract_size=step_size,
-            trade_tick_size=tick_size,
-            trade_tick_value=tick_size,
+            state=SymbolState(custom=False),
+            price=SymbolPrice(
+                digits=dec,
+                tick_size=tick_size,
+                contract_size=step_size,
+                tick_step=tick_size,
+                tick_value=tick_size,
+            ),
+            margin=SymbolMargin(
+                currency_base=s_data.get("baseAsset", ""),
+                currency_profit=s_data.get("quoteAsset", ""),
+            ),
         )
         self._symbols_cache[sym_clean] = snap
         return snap

@@ -39,7 +39,7 @@ from typing import Any, override
 import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
-from app.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.include.contracts import MarketBar, MarketTick, SymbolInfo, SymbolPrice
 from app.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.include.enums import Timeframe
 
@@ -83,7 +83,9 @@ class TickDownloaderClient(BrokerClient):
     @override
     def get_symbol_info(self, symbol: str) -> SymbolInfo:
         """Resolve symbol metadata as canonical SymbolInfo."""
-        return SymbolInfo(name=symbol.upper(), digits=5, point=0.00001)
+        return SymbolInfo(
+            name=symbol.upper(), price=SymbolPrice(digits=5, tick_size=0.00001)
+        )
 
     @override
     def get_symbols(self) -> list[str]:

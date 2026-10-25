@@ -49,7 +49,13 @@ import pandas as pd  # type: ignore[import-untyped]
 import requests
 
 from app.host.logging import get_logger
-from app.include.contracts import MarketBar, MarketTick, SymbolInfo
+from app.include.contracts import (
+    MarketBar,
+    MarketTick,
+    SymbolInfo,
+    SymbolPrice,
+    SymbolSpread,
+)
 from app.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.include.enums import Timeframe
 
@@ -253,10 +259,10 @@ class DarwinexClient(BrokerClient):
 
                 self._catalog[sym] = SymbolInfo(
                     name=sym,
-                    digits=dec,
-                    point=point_sz,
-                    spread=int(spread),
-                    trade_contract_size=contract_sz,
+                    price=SymbolPrice(
+                        digits=dec, tick_size=point_sz, contract_size=contract_sz
+                    ),
+                    spread=SymbolSpread(default=int(spread)),
                 )
         self.logger.info(
             "FR-BROKER-DARWINEX-SYMBOLS: Loaded %d symbols", len(self._catalog)
@@ -300,7 +306,7 @@ class DarwinexClient(BrokerClient):
         self._ensure_catalog()
         sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
         snap = self.get_symbol_info(sym_clean)
-        decimals = snap.digits
+        decimals = snap.price.digits
         target_count = count or limit or 100
 
         tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
@@ -493,7 +499,7 @@ class DarwinexClient(BrokerClient):
         self._ensure_catalog()
         sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
         snap = self.get_symbol_info(sym_clean)
-        decimals = snap.digits
+        decimals = snap.price.digits
         target_count = count or limit or 100
         s = date_from if date_from is not None else start
         e = date_to if date_to is not None else end

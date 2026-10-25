@@ -54,7 +54,7 @@ from typing import Any, override
 import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
-from app.include.contracts import MarketBar, SymbolInfo
+from app.include.contracts import MarketBar, SymbolInfo, SymbolPrice, SymbolSpread
 from app.include.data import bars_to_dataframe
 from app.include.enums import Timeframe
 
@@ -392,10 +392,8 @@ class SQEquityClient(BrokerClient):
                     ) from exc
                 self._catalog[clean_sym] = SymbolInfo(
                     name=clean_sym,
-                    digits=dec,
-                    point=pt,
-                    spread=spread,
-                    trade_contract_size=c_size,
+                    price=SymbolPrice(digits=dec, tick_size=pt, contract_size=c_size),
+                    spread=SymbolSpread(default=spread),
                 )
 
     @override
