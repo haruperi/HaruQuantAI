@@ -169,7 +169,7 @@ export function createDomainClient(routeBase: string, config: TransportConfig = 
       }
     }
 
-    const response = await fetchFn(url, { ...options, headers, signal: config.signal ?? options.signal });
+    const response = await fetchFn(url, { credentials: 'include', ...options, headers, signal: config.signal ?? options.signal });
 
     if (config.signal?.aborted) throw new DOMException('Request canceled', 'AbortError');
     if (response.status === 401 && routeBase !== '/auth') {
