@@ -15,9 +15,9 @@ describe('Darwinex source rules', () => {
     expect(() => discoverDarwinex(['Root/../a.log.gz'])).toThrow('Invalid');
   });
   it('validates names and mappings and skips only explicit skipped symbols', () => {
-    const broker = { id:'b', name:'Broker', postfix:'_B', timezone:'Europe/Prague', mtUse:true, instruments:['AUDUSD.b'] };
-    expect(() => darwinexDefinitions(['AUDUSD'],'',[],broker,{})).toThrow('instrument');
-    expect(darwinexDefinitions(['AUDUSD','AUDCAD'],'_B',[],broker,{ AUDUSD:'AUDUSD.b', AUDCAD:'-1000' })[0]).toMatchObject({ symbol:'AUDUSD_B', instrument:'AUDUSD.b', timezone:'Europe/Prague', bars:0 });
+    const broker = { id:'b', name:'Broker', postfix:'_B', timezone:'Europe/Prague', mtUse:true, symbols:['AUDUSD.b'] };
+    expect(() => darwinexDefinitions(['AUDUSD'],'',[],broker,{})).toThrow('symbol');
+    expect(darwinexDefinitions(['AUDUSD','AUDCAD'],'_B',[],broker,{ AUDUSD:'AUDUSD.b', AUDCAD:'-1000' })[0]).toMatchObject({ symbol:'AUDUSD_B', symbolDefinition:'AUDUSD.b', timezone:'Europe/Prague', bars:0 });
     expect(() => darwinexDefinitions(['AUDUSD'],'',['AUDUSD'])).toThrow('exists');
   });
   it('uses per-target last dates, rejects clones and validates dates', () => {

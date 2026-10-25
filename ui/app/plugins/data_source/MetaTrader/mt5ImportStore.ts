@@ -1,3 +1,4 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { mergeRanges, validDate, type Interval } from '../Dukascopy/dukascopyDownload';
@@ -27,7 +28,7 @@ function validateDefinition(row: Mt5Definition): void {
   if (!row || row.id !== `mt5:${row.symbol}` || row.source !== 'MT5' || row.timeframe !== 'M1'
     || row.barType !== 'start' || !['Forex', 'Metals', 'Indices', 'Stocks', 'Crypto'].includes(row.category)
     || row.bars !== 0 || row.from !== '' || row.to !== ''
-    || ['symbol', 'underlying', 'instrument', 'broker', 'brokerName', 'timezone', 'path', 'description']
+    || ['symbol', 'underlying', 'symbolDefinition', 'broker', 'brokerName', 'timezone', 'path', 'description']
       .some(key => typeof row[key as keyof Mt5Definition] !== 'string')) throw new Error('Invalid saved MT5 definition.');
 }
 
@@ -59,7 +60,7 @@ export const useMt5Import = create<Store>((set, get) => {
   try {
     const raw = localStorage.getItem(mt5ImportKey);
     if (raw) {
-      const saved = normalizeLegacyBranding(JSON.parse(raw));
+      const saved = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw)));
       if (saved.version !== 1) throw new Error('Version');
       validateSaved(saved);
       initial = saved;

@@ -1,3 +1,4 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { cryptoDownloadRanges, validateCryptoName, type CryptoDefinition, type CryptoDownload } from './crypto';
@@ -10,7 +11,7 @@ interface Saved { definitions: CryptoDefinition[]; ranges: Record<string, Interv
 interface Store extends Saved { storageError: string; startAdd: (definitions: CryptoDefinition[], externalActive: boolean) => void; startDownload: (request: CryptoDownload, externalActive: boolean) => void; advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void }
 
 function validateDefinition(row: CryptoDefinition) {
-  if (!row || row.id !== `crypto:${row.exchange}:${row.symbol}` || row.source !== 'Crypto' || row.category !== 'Crypto' || row.barType !== 'start' || row.broker !== '-1' || row.brokerName !== '—' || row.timezone !== 'UTC' || row.bars !== 0 || row.from !== '' || row.to !== '' || ['symbol','underlying','instrument','timeframe'].some(key => typeof row[key as keyof CryptoDefinition] !== 'string')) throw new Error('Invalid saved Crypto definition.');
+  if (!row || row.id !== `crypto:${row.exchange}:${row.symbol}` || row.source !== 'Crypto' || row.category !== 'Crypto' || row.barType !== 'start' || row.broker !== '-1' || row.brokerName !== '—' || row.timezone !== 'UTC' || row.bars !== 0 || row.from !== '' || row.to !== '' || ['symbol','underlying','symbolDefinition','timeframe'].some(key => typeof row[key as keyof CryptoDefinition] !== 'string')) throw new Error('Invalid saved Crypto definition.');
 }
 function validateSaved(value: Saved) {
   if (!Array.isArray(value.definitions) || value.definitions.length > 10000 || !value.ranges || typeof value.ranges !== 'object' || Array.isArray(value.ranges)) throw new Error('Invalid saved Crypto state.');
@@ -24,7 +25,7 @@ function validateSaved(value: Saved) {
 
 export const useCrypto = create<Store>((set, get) => {
   let initial: Saved = { definitions: [], ranges: {}, job: null }; let storageError = '';
-  try { const raw = localStorage.getItem(cryptoKey); if (raw) { const saved = normalizeLegacyBranding(JSON.parse(raw)); if (saved.version !== 1) throw new Error('Version'); validateSaved(saved); initial = saved; if (initial.job?.state === 'running') initial.job.state = 'paused'; } } catch { storageError = 'Saved Crypto data could not be read. Existing storage is preserved.'; }
+  try { const raw = localStorage.getItem(cryptoKey); if (raw) { const saved = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw))); if (saved.version !== 1) throw new Error('Version'); validateSaved(saved); initial = saved; if (initial.job?.state === 'running') initial.job.state = 'paused'; } } catch { storageError = 'Saved Crypto data could not be read. Existing storage is preserved.'; }
   function persist(patch: Partial<Saved>) { if (get().storageError) throw new Error(get().storageError); const { definitions, ranges, job } = { ...get(), ...patch }; const saved = { definitions, ranges, job }; validateSaved(saved); try { localStorage.setItem(cryptoKey, JSON.stringify({ version: 1, ...saved })); } catch { throw new Error('Unable to save Crypto data in browser storage. No changes were applied.'); } set(patch); }
   function guard(external: boolean) { if (external || cryptoActive(get().job?.state)) throw new Error('Finish or stop the active data operation first.'); }
   return { ...initial, storageError,

@@ -1,7 +1,7 @@
 export type ToolJobState = 'running' | 'paused' | 'cancelled' | 'completed' | 'failed';
 
 export interface ToolTarget {
-  id: string; symbol: string; instrument: string; source: string; timeframe: string;
+  id: string; symbol: string; symbolDefinition: string; source: string; timeframe: string;
   timezone: string; from: string; to: string; bars: number; category: string;
   brokerName?: string; underlying?: string; barType?: string; sourceDataId?: string;
 }
@@ -108,7 +108,7 @@ export function createCloneDefinitions(targets: ToolTarget[], settings: CloneSet
     const symbol = cloneSymbol(target, settings, used);
     const timezone = settings.timezoneType === 'zone' ? settings.timezone
       : `${target.timezone && target.timezone !== '—' ? target.timezone : 'UTC'} ${settings.shiftHours >= 0 ? '+' : ''}${settings.shiftHours}h`;
-    return { ...target, id: `clone:${target.id}:${symbol}`, symbol, instrument: symbol,
+    return { ...target, id: `clone:${target.id}:${symbol}`, symbol, symbolDefinition: symbol,
       underlying: target.underlying || target.symbol, timezone, source: 'Cloned data', sourceDataId: target.id,
       sourceSymbol: target.symbol, cloneSettings: { ...settings }, quality: 100, status: 'Ready' };
   });

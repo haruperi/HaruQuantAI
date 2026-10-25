@@ -3,7 +3,7 @@
 
 - Selecting the right market is crucial for strategy success. Each market has unique characteristics that favor certain strategies while making others difficult or impossible to trade profitably.
 - A comprehensive market evaluation framework helps identify the best opportunities.
-- There is no such thing as the best market to trade, as each instrument has its own advantages and disadvantages.
+- There is no such thing as the best market to trade, as each symbol has its own advantages and disadvantages.
 - Trade the market that suits your capital, broker, timeframe, geography, tax account, developed portfolio, etc.
 - Don't follow fads. For example, crypto is still in its infancy; you will have plenty of time to trade this asset class.
 
@@ -100,7 +100,7 @@ Liquidity determines execution quality. Low liquidity causes wide spreads, high 
 
 ## Capital Requirements
 
-Each instrument has minimum capital needs for proper risk management and position sizing.
+Each symbol has minimum capital needs for proper risk management and position sizing.
 
 **Minimum Account Sizes:**
 - **Futures (Full Size)**: $25,000-50,000 per contract. ES requires ~$15k margin but needs $30k+ for proper 2% risk per trade
@@ -118,7 +118,7 @@ Each instrument has minimum capital needs for proper risk management and positio
 
 ## Tax Implications
 
-Tax treatment varies significantly by instrument and holding period. Consult tax professional for specific situation.
+Tax treatment varies significantly by symbol and holding period. Consult tax professional for specific situation.
 
 **US Tax Treatment Example:**
 - **Futures (Section 1256)**: 60% long-term (20% max rate), 40% short-term (ordinary income) regardless of holding period. Mark-to-market on Dec 31. Generally most favorable
@@ -145,7 +145,7 @@ Not all brokers offer all markets. Platform capabilities vary.
 
 **Broker Selection Criteria:**
 - **Regulation**: Must be properly regulated. US: NFA/CFTC (futures), SEC (stocks). EU: FCA, BaFin, ESMA members
-- **Market Access**: Offers instruments you want to trade
+- **Market Access**: Offers symbols you want to trade
 - **API Access**: For automated trading. Check documentation quality and reliability
 - **Commission Structure**: Transparent, competitive pricing
 - **Data Quality**: Clean, accurate historical data for backtesting

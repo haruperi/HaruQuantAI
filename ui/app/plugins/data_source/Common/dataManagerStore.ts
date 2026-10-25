@@ -1,3 +1,5 @@
+import { normalizeSymbolContract } from './symbolContract';
+import { createSymbolDataClient } from './symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { reservedDarwinex, useDarwinex } from '../Darwinex/darwinexStore';
 import { cryptoActive, reservedCrypto, useCrypto } from '../Crypto/cryptoStore';
@@ -17,9 +19,9 @@ import {
   saveBroker as saveBrokerApi,
   saveBrokerStocks as saveBrokerStocksApi,
 } from '../Catalogs/BrokerProfiles/brokerApiClient';
-import { createDomainClient, type DomainClient } from '../../../host/transport';
+import {type DomainClient } from '../../../host/transport';
 
-let dataClient = createDomainClient('/data');
+let dataClient = createSymbolDataClient('/data');
 let catalogRequest = 0;
 let brokerRequest = 0;
 let registeringDukascopy = false;
@@ -71,7 +73,7 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
     date_to?: string;
     category?: string;
     underlying?: string;
-    instrument?: string;
+    symbolDefinition?: string;
     path?: string;
     bar_type?: string;
   }>>('/home/datasets');
@@ -90,7 +92,7 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
       source: item.source || 'Server',
       symbol: item.symbol,
       underlying: item.underlying || item.symbol,
-      instrument: item.instrument || item.symbol,
+      symbolDefinition: item.symbolDefinition || item.symbol,
       timeframe: item.timeframe,
       broker: item.broker || 'default',
       brokerName: bName,
@@ -107,7 +109,7 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
 }
 
 export interface MockDefinition {
-  id: string; source: string; symbol: string; underlying: string; instrument: string;
+  id: string; source: string; symbol: string; underlying: string; symbolDefinition: string;
   timeframe: string; broker: string; brokerName: string; timezone: string;
   category: string; from: string; to: string; bars: number;
   path?: string;
@@ -129,16 +131,16 @@ interface DataState { definitions: MockDefinition[]; brokers: BrokerProfile[]; b
   removeDataset: (id: string) => Promise<void>;
   fetchChartBars: (datasetId: string, limit?: number, offset?: number) => Promise<Array<{ datetime: string; open: number; high: number; low: number; close: number; volume: number }>>;
 }
-function completeBroker(value:Partial<BrokerProfile>&Pick<BrokerProfile,'id'|'name'|'postfix'|'timezone'|'mtUse'>):BrokerProfile{return {desc:'',stockPickerUse:false,system:false,stocks:[],instruments:[],...value};}
+function completeBroker(value:Partial<BrokerProfile>&Pick<BrokerProfile,'id'|'name'|'postfix'|'timezone'|'mtUse'>):BrokerProfile{return {desc:'',stockPickerUse:false,system:false,stocks:[],symbols:[],...value};}
 function readState(): Pick<DataState, 'definitions' | 'brokers' | 'brokerJob' | 'storageError'> {
   try {
     const raw = localStorage.getItem(storageKey);
     if (!raw) return { definitions: [], brokers: [], brokerJob:null, storageError: '' };
-    const value = normalizeLegacyBranding(JSON.parse(raw));
+    const value = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw)));
     if (![1,2].includes(value.version) || !Array.isArray(value.definitions) || value.definitions.length > 10000
       || !Array.isArray(value.brokers) || value.brokers.length > 100
-      || value.definitions.some((row: MockDefinition) => !row || ['id', 'source', 'symbol', 'underlying', 'instrument', 'timeframe', 'broker', 'brokerName', 'timezone', 'category', 'from', 'to'].some(key => typeof (row as unknown as Record<string, unknown>)[key] !== 'string') || typeof row.bars !== 'number')
-      || value.brokers.some((broker: BrokerProfile) => !broker || ['id', 'name', 'postfix', 'timezone'].some(key => typeof (broker as unknown as Record<string, unknown>)[key] !== 'string') || typeof broker.mtUse !== 'boolean' || !Array.isArray(broker.instruments) || broker.instruments.some(item => typeof item !== 'string')))
+      || value.definitions.some((row: MockDefinition) => !row || ['id', 'source', 'symbol', 'underlying', 'symbolDefinition', 'timeframe', 'broker', 'brokerName', 'timezone', 'category', 'from', 'to'].some(key => typeof (row as unknown as Record<string, unknown>)[key] !== 'string') || typeof row.bars !== 'number')
+      || value.brokers.some((broker: BrokerProfile) => !broker || ['id', 'name', 'postfix', 'timezone'].some(key => typeof (broker as unknown as Record<string, unknown>)[key] !== 'string') || typeof broker.mtUse !== 'boolean' || !Array.isArray(broker.symbols) || broker.symbols.some(item => typeof item !== 'string')))
       throw new Error('Invalid saved definitions');
     const brokers=(value.brokers as BrokerProfile[]).map(completeBroker);const brokerJob=value.version===2&&value.brokerJob?value.brokerJob as BrokerUpdateJob:null;if(brokerJob){if(!['running','paused','cancelled','completed','failed'].includes(brokerJob.state)||!Number.isFinite(brokerJob.progress)||!Array.isArray(brokerJob.targets))throw new Error('Invalid broker job');if(brokerJob.state==='running')brokerJob.state='paused';}
     const cleanDefinitions = (value.definitions as MockDefinition[]).filter(
@@ -198,7 +200,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
           stockPickerUse: raw.stockPickerUse,
           system: false,
           stocks: raw.stocks,
-          instruments: [], spreadModel: raw.spreadModel, commissionModel: raw.commissionModel,
+          symbols: [], spreadModel: raw.spreadModel, commissionModel: raw.commissionModel,
         });
         if (raw.stockPickerUse) {
           await saveBrokerStocksApi(updated.id, raw.stocks);
@@ -215,7 +217,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
           stockPickerUse: raw.stockPickerUse,
           system: false,
           stocks: raw.stocks,
-          instruments: [], spreadModel: raw.spreadModel, commissionModel: raw.commissionModel,
+          symbols: [], spreadModel: raw.spreadModel, commissionModel: raw.commissionModel,
         });
         if (raw.stockPickerUse) {
           await saveBrokerStocksApi(created.id, raw.stocks);
@@ -295,11 +297,11 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
         const id = `dukascopy:${symbol}:${request.dataType}`;
         const saved = await registrationRequest(dataClient.post<Record<string, unknown>>('/datasets', {
           source: 'dukascopy', symbol, underlying: item.symbol, timeframe: request.dataType,
-          broker: request.broker, instrument: request.instruments[index] ?? '-1',
+          broker: request.broker, symbolDefinition: request.symbolDefinitions[index] ?? '-1',
         }));
         if (!saved || saved.id !== id || saved.symbol !== symbol || saved.underlying !== item.symbol ||
             saved.timeframe !== request.dataType || saved.source !== 'dukascopy' ||
-            ['broker', 'broker_name', 'timezone', 'instrument', 'path', 'category'].some(key => typeof saved[key] !== 'string') || saved.bars !== 0) {
+            ['broker', 'broker_name', 'timezone', 'symbolDefinition', 'path', 'category'].some(key => typeof saved[key] !== 'string') || saved.bars !== 0) {
           throw new Error('The host did not confirm the requested dataset. Refresh before retrying.');
         }
         confirmed.add(item.symbol);
@@ -362,7 +364,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
       broker: updates.broker,
       timezone: updates.timezone,
       category: updates.category,
-      instrument: updates.instrument,
+      symbolDefinition: updates.symbolDefinition,
     });
     const definitions = state.definitions.map(d => (d.id === id ? { ...d, ...updates } : d));
     try { persistData(state, state.brokers, definitions, state.brokerJob); } catch { /* ignore */ }
@@ -402,7 +404,7 @@ const downloadKey = 'sqx-data-download-v1';
 function readDownloads(): DownloadState {
   const raw = localStorage.getItem(downloadKey);
   if (!raw) return { ...emptyDownload, ranges: {} };
-  const saved = normalizeLegacyBranding(JSON.parse(raw));
+  const saved = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw)));
   if (saved.version !== 1 || !saved.ranges || typeof saved.ranges !== 'object' || Array.isArray(saved.ranges)
     || Object.keys(saved.ranges).length > 10000 || ![null, 'standard', 'cdn', 'cdn-cn'].includes(saved.preferred)) throw new Error('Invalid saved downloads');
   for (const ranges of Object.values(saved.ranges) as Interval[][]) {
@@ -461,7 +463,7 @@ export const useDukascopyDownloads = create<DownloadStore>((set, get) => {
               await dataClient.post<{ job_id?: string; status?: string }>('/providers/download', {
                 provider: 'dukascopy',
                 symbol: target.symbol,
-                underlying: target.underlying || target.instrument,
+                underlying: target.underlying || target.symbolDefinition,
                 timeframe: target.timeframe || 'M1',
                 date_from: request.dateFrom,
                 date_to: request.dateTo,
@@ -511,9 +513,9 @@ export const useTickDownloader = create<TDState>((set, get) => {
   try {
     const raw = localStorage.getItem(tdKey);
     if (raw) {
-      const saved = normalizeLegacyBranding(JSON.parse(raw));
+      const saved = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw)));
       if (saved.version !== 1 || !Array.isArray(saved.definitions) || saved.definitions.length > 10000 || typeof saved.folder !== 'string' || typeof saved.postfix !== 'string'
-        || saved.definitions.some((row: MockDefinition) => !row || ['id','source','symbol','underlying','instrument','timeframe','broker','brokerName','timezone','category','from','to'].some(key => typeof (row as unknown as Record<string, unknown>)[key] !== 'string') || row.bars !== 0)) throw new Error('Invalid saved import');
+        || saved.definitions.some((row: MockDefinition) => !row || ['id','source','symbol','underlying','symbolDefinition','timeframe','broker','brokerName','timezone','category','from','to'].some(key => typeof (row as unknown as Record<string, unknown>)[key] !== 'string') || row.bars !== 0)) throw new Error('Invalid saved import');
       if (saved.job) {
         if (!['running','paused','completed','cancelled','failed'].includes(saved.job.state) || !Number.isFinite(saved.job.progress) || saved.job.progress < 0 || saved.job.progress > 100) throw new Error('Invalid import job');
         validateTD(saved.job.request, saved.job.request.symbols, []);
@@ -541,7 +543,7 @@ export const useTickDownloader = create<TDState>((set, get) => {
       if (useFileImports.getState().storageError) throw new Error(useFileImports.getState().storageError);
       validateTD(request, available, [...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedSQDefinitions(), ...reservedMt5(), ...useDataManagerStore.getState().definitions, ...get().definitions, ...useFileSymbols.getState().definitions, ...useFileImports.getState().records, ...(activeImport(useFileImports.getState().job?.state) ? useFileImports.getState().job?.tasks.map(task => task.record) ?? [] : [])].map(row => row.symbol));
       if (get().definitions.length + request.symbols.length > 10000) throw new Error('Mock dataset limit reached.');
-      const additions: MockDefinition[] = request.symbols.map(symbol => ({ id: `td:${symbol + request.postfix}`, symbol: symbol + request.postfix, underlying: symbol, instrument: symbol, source: 'TickDownloader', timeframe: 'TICK', broker: '-1', brokerName: 'Default', timezone: 'UTC', category: catalogue.find(row => row.symbol === symbol)?.category ?? '—', from: '', to: '', bars: 0 }));
+      const additions: MockDefinition[] = request.symbols.map(symbol => ({ id: `td:${symbol + request.postfix}`, symbol: symbol + request.postfix, underlying: symbol, symbolDefinition: symbol, source: 'TickDownloader', timeframe: 'TICK', broker: '-1', brokerName: 'Default', timezone: 'UTC', category: catalogue.find(row => row.symbol === symbol)?.category ?? '—', from: '', to: '', bars: 0 }));
       try { persist({ folder: request.folder, postfix: request.postfix, definitions: [...get().definitions, ...additions], job: { request: structuredClone(request), state: 'running', progress: 0 } }); }
       catch { throw new Error(get().storageError || 'Unable to save mock import. No import was started.'); }
     },

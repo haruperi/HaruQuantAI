@@ -1,3 +1,4 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { builtInExternalFormats, externalLimits, summarizeExternal, validateExternalDefinition, validateExternalFormat, type ExternalImportFormat, type ExternalImportJob, type ExternalIndicatorDefinition, type ExternalIndicatorRecord } from './externalIndicators';
@@ -25,7 +26,7 @@ function validateSaved(value: Saved): void {
 }
 export const useExternalIndicators = create<ExternalIndicatorsState>((set, get) => {
   let initial: Saved = { definitions: [], formats: [], job: null }; let storageError = '';
-  try { const raw = localStorage.getItem(key); if (raw) { const value = normalizeLegacyBranding(JSON.parse(raw)); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
+  try { const raw = localStorage.getItem(key); if (raw) { const value = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw))); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
   catch { storageError = 'Saved external indicators could not be read. Existing browser storage has been preserved.'; }
   function persist(patch: Partial<Saved>): void {
     if (get().storageError) throw new Error(get().storageError); const saved = { definitions: get().definitions, formats: get().formats, job: get().job, ...patch }; validateSaved(saved);

@@ -1,8 +1,9 @@
-/** Authoritative instrument catalog transport. */
-import { createDomainClient, type DomainClient } from '../../../../host/transport';
-import { days, defaultCommission, type FileInstrument, type InstrumentBroker, type InstrumentMassPatch, type Swap } from '../../FileImport/fileSymbols';
+import { createSymbolDataClient } from '../../Common/symbolContract';
+/** Authoritative symbol catalog transport. */
+import {type DomainClient } from '../../../../host/transport';
+import { days, defaultCommission, type FileSymbol, type SymbolBroker, type SymbolMassPatch, type Swap } from '../../FileImport/fileSymbols';
 
-export interface RemoteInstrumentDefinition {
+export interface RemoteSymbolDefinition {
   id: string; symbol: string; broker_id: number; description: string;
   point_value: number; tick_size: number; tick_step: number;
   contract_size: number | null; pip_size: number | null; margin_rate: number;
@@ -13,16 +14,16 @@ export interface RemoteInstrumentDefinition {
   swap_settings: Swap | null;
   [key: string]: unknown;
 }
-export interface CatalogInstrument extends FileInstrument { id: string; record: RemoteInstrumentDefinition }
-let client: DomainClient = createDomainClient('/data');
-export function setInstrumentApiClient(value: DomainClient): void { client = value; }
+export interface CatalogSymbol extends FileSymbol { id: string; record: RemoteSymbolDefinition }
+let client: DomainClient = createSymbolDataClient('/data');
+export function setSymbolApiClient(value: DomainClient): void { client = value; }
 
-function checked(value: RemoteInstrumentDefinition): RemoteInstrumentDefinition {
+function checked(value: RemoteSymbolDefinition): RemoteSymbolDefinition {
   if (!value || typeof value.id !== 'string' || !/^[1-9]\d*$/.test(value.id) || typeof value.symbol !== 'string' || !value.symbol ||
     ['point_value','tick_size','tick_step','margin_rate','decimals','tick_value_in_money','min_volume','max_volume','lot_step','default_spread','default_slippage','min_distance','order_size_multiplier','order_size_step','swap_long','swap_short','swap_3day_day','broker_id'].some(key => typeof value[key] !== 'number' || !Number.isFinite(value[key])) ||
     ['description','data_type','commissions'].some(key => typeof value[key] !== 'string') ||
     ['contract_size','pip_size'].some(key => value[key] !== null && (typeof value[key] !== 'number' || !Number.isFinite(value[key]) || Number(value[key]) <= 0))) {
-    throw new Error('The host returned an invalid instrument specification.');
+    throw new Error('The host returned an invalid symbol specification.');
   }
   if (value.swap_settings !== null) {
     const swap = value.swap_settings;
@@ -45,11 +46,11 @@ function commissionObject(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid commission specification.');
   return value as Record<string, unknown>;
 }
-function commissionSettings(value: unknown): FileInstrument['commission'] | null {
+function commissionSettings(value: unknown): FileSymbol['commission'] | null {
   if (value === undefined || value === null) return null;
   const settings = commissionObject(value);
   if (typeof settings.model !== 'string' || !Number.isFinite(settings.value)) throw new Error('Invalid configured commission.');
-  return settings as unknown as FileInstrument['commission'];
+  return settings as unknown as FileSymbol['commission'];
 }
 function commissionRules(value: unknown): CommissionRule[] {
   if (!Array.isArray(value) || value.length > 256) throw new Error('Invalid broker commission rules.');
@@ -75,7 +76,7 @@ function commissionFee(tier: CommissionTier, rule: CommissionRule): string {
   const value = `${tier.value}${unit.startsWith('%') ? '' : ' '}${unit}`;
   return `${value} ${basis}`;
 }
-export function commissionInfo(raw: string): { summary: string; details: string; settings: FileInstrument['commission'] | null } {
+export function commissionInfo(raw: string): { summary: string; details: string; settings: FileSymbol['commission'] | null } {
   const parsed: unknown = JSON.parse(raw);
   if (typeof parsed === 'number' && Number.isFinite(parsed)) {
     return { summary: parsed === 0 ? 'Not retrieved' : `Legacy value: ${raw}`, details: 'This stored value is not a verified broker commission rule.', settings: null };
@@ -87,20 +88,20 @@ export function commissionInfo(raw: string): { summary: string; details: string;
   const configured = settings ? ` Configured model: ${settings.model} (${settings.value}).` : '';
   if (doc.status !== 'available') {
     if (doc.rules !== null) throw new Error('Unavailable commission cannot contain rules.');
-    return { summary: doc.status === 'not_retrieved' ? 'Not retrieved' : 'Unavailable', details: (doc.status === 'not_retrieved' ? 'Broker commissions have not been retrieved. For MT5, update the bridge EA and refresh instruments.' : 'MT5 could not return commission rules.') + configured, settings };
+    return { summary: doc.status === 'not_retrieved' ? 'Not retrieved' : 'Unavailable', details: (doc.status === 'not_retrieved' ? 'Broker commissions have not been retrieved. For MT5, update the bridge EA and refresh symbols.' : 'MT5 could not return commission rules.') + configured, settings };
   }
   const rules = commissionRules(doc.rules);
   if (!rules.length) return { summary: 'No rules reported', details: 'MT5 returned no commission rules. This does not establish a fixed zero fee.' + configured, settings };
   const entry = (rule: CommissionRule) => ({ 'entry inout': 'entry and exit', 'entry in': 'entry', 'entry out': 'exit' }[rule.entry] ?? rule.entry);
   const lines = rules.flatMap(rule => rule.tiers.length ? rule.tiers.map(tier =>
-    `${commissionFee(tier, rule)}; ${entry(rule)}; ${rule.charge}; ${rule.direction}; ${rule.profit}; ${rule.range} ${tier.from}–${tier.to}; min ${tier.min}, max ${tier.max}`) : ['Broker rule without tiers.']);
+    `${commissionFee(tier, rule)}; ${entry(rule)}; ${rule.charge}; ${rule.direction}; ${rule.profit}; ${rule.range} ${tier.from}ï¿½${tier.to}; min ${tier.min}, max ${tier.max}`) : ['Broker rule without tiers.']);
   const summary = rules.length === 1 && rules[0].tiers.length === 1
-    ? `${commissionFee(rules[0].tiers[0], rules[0])} · ${entry(rules[0])}`
+    ? `${commissionFee(rules[0].tiers[0], rules[0])} ï¿½ ${entry(rules[0])}`
     : `${rules.length} broker rule(s), ${rules.reduce((n, rule) => n + rule.tiers.length, 0)} tier(s)`;
   return { summary, details: lines.join('\n') + configured, settings };
 }
 
-export function toFileInstrument(value: RemoteInstrumentDefinition, brokers: InstrumentBroker[] = []): CatalogInstrument {
+export function toFileSymbol(value: RemoteSymbolDefinition, brokers: SymbolBroker[] = []): CatalogSymbol {
   const record = checked(value);
   const broker = brokers.find(item => Number(item.id) === record.broker_id);
   const commission = commissionInfo(record.commissions).settings ?? defaultCommission();
@@ -120,7 +121,7 @@ export const specificationFields = {
   contractSize: 'contract_size', pipSize: 'pip_size', marginRate: 'margin_rate', decimals: 'decimals',
   minVolume: 'min_volume', maxVolume: 'max_volume', lotStep: 'lot_step', tickValue: 'tick_value_in_money',
 };
-export function fromFileInstrument(item: FileInstrument): Record<string, unknown> {
+export function fromFileSymbol(item: FileSymbol): Record<string, unknown> {
   if (!/^-?\d+$/.test(item.broker)) throw new Error('Choose a configured numeric broker ID.');
   const values: Record<string, unknown> = {
     symbol: item.symbol, description: item.name, broker_id: Number(item.broker), data_type: item.type,
@@ -130,52 +131,52 @@ export function fromFileInstrument(item: FileInstrument): Record<string, unknown
     commissions: JSON.stringify({ version: 1, settings: item.commission }), swap_settings: item.swap,
   };
   for (const [local, remote] of Object.entries(specificationFields)) {
-    const value = item[local as keyof FileInstrument];
+    const value = item[local as keyof FileSymbol];
     if (value !== undefined) values[remote] = value;
   }
   return values;
 }
 const patchFields: Record<string, string> = { ...specificationFields, name: 'description', type: 'data_type', pointValue: 'point_value', tickSize: 'tick_size', tickStep: 'tick_step', spread: 'default_spread', slippage: 'default_slippage', minDistance: 'min_distance', multiplier: 'order_size_multiplier', sizeStep: 'order_size_step', commission: 'commissions', swap: 'swap_settings' };
-export function instrumentPatch(item: FileInstrument, fields: InstrumentMassPatch['fields']): Record<string, unknown> {
-  const complete = fromFileInstrument(item);
+export function symbolPatch(item: FileSymbol, fields: SymbolMassPatch['fields']): Record<string, unknown> {
+  const complete = fromFileSymbol(item);
   return Object.fromEntries(Object.entries(fields).filter(([, enabled]) => enabled).map(([key]) => {
     const remote = patchFields[key];
-    if (!remote || complete[remote] === undefined || (typeof complete[remote] === 'number' && !Number.isFinite(complete[remote]))) throw new Error('Select a valid instrument field and value.');
+    if (!remote || complete[remote] === undefined || (typeof complete[remote] === 'number' && !Number.isFinite(complete[remote]))) throw new Error('Select a valid symbol field and value.');
     return [remote, complete[remote]];
   }));
 }
-export async function fetchRemoteInstruments(params?: Record<string, string | number>): Promise<RemoteInstrumentDefinition[]> {
+export async function fetchRemoteSymbols(params?: Record<string, string | number>): Promise<RemoteSymbolDefinition[]> {
   const query = new URLSearchParams(Object.entries(params ?? {}).map(([key, value]) => [key, String(value)]));
-  const rows = await client.get<RemoteInstrumentDefinition[]>('/instruments' + (query.size ? '?' + query : ''));
-  if (!Array.isArray(rows)) throw new Error('The host returned an invalid instrument catalog.');
+  const rows = await client.get<RemoteSymbolDefinition[]>('/symbols' + (query.size ? '?' + query : ''));
+  if (!Array.isArray(rows)) throw new Error('The host returned an invalid symbol catalog.');
   const result = rows.map(checked);
-  if (new Set(result.map(row => row.id)).size !== result.length || new Set(result.map(row => row.symbol)).size !== result.length) throw new Error('The host returned duplicate instrument identities.');
+  if (new Set(result.map(row => row.id)).size !== result.length || new Set(result.map(row => row.symbol)).size !== result.length) throw new Error('The host returned duplicate symbol identities.');
   return result;
 }
-export async function saveRemoteInstrument(item: FileInstrument): Promise<RemoteInstrumentDefinition> {
-  const record = checked(await client.post('/instruments', fromFileInstrument(item)));
-  if (record.symbol !== item.symbol) throw new Error('The host returned a different instrument symbol.');
+export async function saveRemoteSymbol(item: FileSymbol): Promise<RemoteSymbolDefinition> {
+  const record = checked(await client.post('/symbols', fromFileSymbol(item)));
+  if (record.symbol !== item.symbol) throw new Error('The host returned a different symbol.');
   return record;
 }
-export async function cloneRemoteInstrument(sourceId: string, newSymbol: string): Promise<RemoteInstrumentDefinition> {
-  const record = checked(await client.post('/instruments/clone', { source_id: sourceId, new_symbol: newSymbol }));
+export async function cloneRemoteSymbol(sourceId: string, newSymbol: string): Promise<RemoteSymbolDefinition> {
+  const record = checked(await client.post('/symbols/clone', { source_id: sourceId, new_symbol: newSymbol }));
   if (record.symbol !== newSymbol || record.id === sourceId) throw new Error('The host did not confirm a new clone identity.');
   return record;
 }
-export async function refreshRemoteInstruments(symbols?: string[]): Promise<{ deleted_count: number; inserted_count: number }> {
-  const response = await client.post<{ deleted_count: number; inserted_count: number }>('/instruments/refresh', symbols ? { symbols } : {});
-  if (!response || !Number.isInteger(response.inserted_count)) throw new Error('The host did not confirm the instrument refresh.');
+export async function refreshRemoteSymbols(symbols?: string[]): Promise<{ deleted_count: number; inserted_count: number }> {
+  const response = await client.post<{ deleted_count: number; inserted_count: number }>('/symbols/refresh', symbols ? { symbols } : {});
+  if (!response || !Number.isInteger(response.inserted_count)) throw new Error('The host did not confirm the symbol refresh.');
   return response;
 }
-export async function deleteRemoteInstruments(instrumentIds: string[]): Promise<number> {
-  const response = await client.post<{ deleted_count: number }>('/instruments/delete', { instrument_ids: instrumentIds });
-  if (!response || response.deleted_count !== new Set(instrumentIds).size) throw new Error('The host did not confirm all instrument deletions.');
+export async function deleteRemoteSymbols(symbolIds: string[]): Promise<number> {
+  const response = await client.post<{ deleted_count: number }>('/symbols/delete', { symbol_ids: symbolIds });
+  if (!response || response.deleted_count !== new Set(symbolIds).size) throw new Error('The host did not confirm all symbol deletions.');
   return response.deleted_count;
 }
-export async function massEditRemoteInstruments(instrumentIds: string[], updates: Record<string, unknown>): Promise<RemoteInstrumentDefinition[]> {
-  const response = await client.post<{ updated_count: number; instruments: RemoteInstrumentDefinition[] }>('/instruments/mass-edit', { instrument_ids: instrumentIds, updates });
-  if (!response || !Array.isArray(response.instruments) || response.updated_count !== new Set(instrumentIds).size || response.instruments.length !== response.updated_count) throw new Error('The host did not confirm all instrument changes.');
-  const records = response.instruments.map(checked);
-  if (new Set(records.map(row => row.id)).size !== records.length || records.some(row => !instrumentIds.includes(row.id))) throw new Error('The host returned different instrument identities.');
+export async function massEditRemoteSymbols(symbolIds: string[], updates: Record<string, unknown>): Promise<RemoteSymbolDefinition[]> {
+  const response = await client.post<{ updated_count: number; symbols: RemoteSymbolDefinition[] }>('/symbols/mass-edit', { symbol_ids: symbolIds, updates });
+  if (!response || !Array.isArray(response.symbols) || response.updated_count !== new Set(symbolIds).size || response.symbols.length !== response.updated_count) throw new Error('The host did not confirm all symbol changes.');
+  const records = response.symbols.map(checked);
+  if (new Set(records.map(row => row.id)).size !== records.length || records.some(row => !symbolIds.includes(row.id))) throw new Error('The host returned different symbol identities.');
   return records;
 }

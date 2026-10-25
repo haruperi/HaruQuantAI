@@ -1,10 +1,11 @@
+import { normalizeSymbolContract } from '../../app/plugins/data_source/Common/symbolContract';
 import {expect,test,type Page} from '@playwright/test';
-import {newInstrument} from '../../app/plugins/data_source/FileImport/fileSymbols';
+import {newSymbol} from '../../app/plugins/data_source/FileImport/fileSymbols';
 import type {RemoteBrokerRecord} from '../../app/plugins/data_source/Catalogs/BrokerProfiles/brokerApiClient';
 
-const initial:RemoteBrokerRecord={id:'1',name:'Demo',description:'Saved profile',timezone:'UTC',postfix:'_d',stockpicker_use:true,mt_use:true,is_system:false,stocks:['OLD'],customized_stocks:1,total_instruments:0,total_sessions:0,spread_model:{model:'inherit'},commission_model:{model:'inherit'}};
+const initial:RemoteBrokerRecord={id:'1',name:'Demo',description:'Saved profile',timezone:'UTC',postfix:'_d',stockpicker_use:true,mt_use:true,is_system:false,stocks:['OLD'],customized_stocks:1,total_symbols:0,total_sessions:0,spread_model:{model:'inherit'},commission_model:{model:'inherit'}};
 async function launch(page:Page){
-  const state={profiles:[structuredClone(initial)],instruments:[] as any[],sessions:[] as any[],writes:[] as any[],failRead:false,failSave:false,failDelete:false,deleteGate:null as Promise<void>|null,partial:false};
+  const state={profiles:[structuredClone(initial)],symbols:[] as any[],sessions:[] as any[],writes:[] as any[],failRead:false,failSave:false,failDelete:false,deleteGate:null as Promise<void>|null,partial:false};
   await page.addInitScript(()=>{
     const original=window.fetch.bind(window);
     window.fetch=((input:RequestInfo|URL,init?:RequestInit)=>String(input).includes('/api/v1/events?')?Promise.resolve(new Response(new ReadableStream<Uint8Array>({start(){}}),{headers:{'Content-Type':'text/event-stream'}})):original(input,init)) as typeof fetch;
@@ -16,22 +17,22 @@ async function launch(page:Page){
     else if(path.endsWith('/settings'))data={revision:1,values:{}};
     else if(path.endsWith('/status'))data={cpu_count:4};
     else if(path==='/api/v1/home')data={recent_projects:[]};
-    else if(path.endsWith('/data/workspace'))data={tabs:['data','instruments','sessions','brokers','custom-data','chart','home','stock-groups','log'].map((id,index)=>({id,title:id,core:index<5})),active_tab:'data',layout:{core_group:'catalogs',chart_position:'right'}};
+    else if(path.endsWith('/data/workspace'))data={tabs:['data','symbols','sessions','brokers','custom-data','chart','home','stock-groups','log'].map((id,index)=>({id,title:id,core:index<5})),active_tab:'data',layout:{core_group:'catalogs',chart_position:'right'}};
     else if(path.includes('/workspace/tabs/'))data={active_tab:path.split('/').at(-1),selection:null,preview:{state:'unavailable',reason:'Select a saved dataset.',rows:[],limit:500}};
-    else if(path==='/api/v1/data/instruments')data=state.instruments;
+    else if(path==='/api/v1/data/symbols')data=state.symbols;
     else if(path==='/api/v1/data/sessions')data=state.sessions;
     else if(path==='/api/v1/data/brokers'&&method==='GET'){
       if(state.failRead){await route.fulfill({status:503,json:{status:'error',error:{code:'OFFLINE',message:'Broker storage unavailable'}}});return;}
       data=state.profiles;
     }else if(path==='/api/v1/data/brokers'&&method==='POST'){
-      const body=route.request().postDataJSON();state.writes.push({path,body});
+      const body=normalizeSymbolContract(route.request().postDataJSON());state.writes.push({path,body});
       if(state.failSave){await route.fulfill({status:503,json:{status:'error',error:{code:'FAILED',message:'Broker not saved'}}});return;}
       const existing=state.profiles.find(row=>row.id===body.id);
       const saved={...(existing??{...initial,id:String(state.profiles.length+1),stocks:[],customized_stocks:0}),...body};
       if(existing)state.profiles=state.profiles.map(row=>row.id===saved.id?saved:row);else state.profiles.push(saved);
       data=saved;
     }else if(path==='/api/v1/data/brokers/delete'&&method==='POST'){
-      const body=route.request().postDataJSON();state.writes.push({path,body});
+      const body=normalizeSymbolContract(route.request().postDataJSON());state.writes.push({path,body});
       await state.deleteGate;
       if(state.failDelete){await route.fulfill({status:422,json:{status:'error',error:{code:'IN_USE',message:'Broker is used by saved datasets.'}}});return;}
       state.profiles=state.profiles.filter(row=>!body.ids.includes(row.id));
@@ -39,23 +40,23 @@ async function launch(page:Page){
     }else if(/\/brokers\/\d+\/stocks$/.test(path)){
       const profile=state.profiles.find(row=>row.id===path.split('/').at(-2))!;
       if(method==='PUT'){
-        const body=route.request().postDataJSON();state.writes.push({path,body});
+        const body=normalizeSymbolContract(route.request().postDataJSON());state.writes.push({path,body});
         profile.stocks=[...new Set<string>(body.stocks.map((s:string)=>s.trim()))];profile.customized_stocks=profile.stocks.length;
       }
       data={broker_id:profile.id,stocks:profile.stocks,count:profile.stocks.length};
-    }else if(path.includes('/import-instruments')||path.includes('/import-sessions')){
-      const body=route.request().postDataJSON();state.writes.push({path,body});
-      const kind=body.kind as 'instruments'|'sessions',field=kind==='instruments'?'symbol':'name';
+    }else if(path.includes('/import-symbols')||path.includes('/import-sessions')){
+      const body=normalizeSymbolContract(route.request().postDataJSON());state.writes.push({path,body});
+      const kind=body.kind as 'symbols'|'sessions',field=kind==='symbols'?'symbol':'name';
       const brokerId=path.split('/').at(-2)!;
       const selected=body[kind].filter((row:any)=>body.options.selected_names.includes(row[field]));
       const failed=state.partial?selected.splice(1).map((row:any)=>({name:row[field]+body.options.postfix,reason:'Record validation failed.'})):[];
       const records=selected.map((source:any)=>{
         const saved={...source,id:String(state[kind].length+1),[field]:source[field]+body.options.postfix,broker_id:Number(brokerId)};
-        if(kind==='instruments')Object.assign(saved,{contract_size:100000,pip_size:.0001,margin_rate:.05,decimals:5,tick_value_in_money:10,min_volume:.01,max_volume:100,lot_step:.01,swap_long:0,swap_short:0,swap_3day_day:3});
+        if(kind==='symbols')Object.assign(saved,{contract_size:100000,pip_size:.0001,margin_rate:.05,decimals:5,tick_value_in_money:10,min_volume:.01,max_volume:100,lot_step:.01,swap_long:0,swap_short:0,swap_3day_day:3});
         state[kind].push(saved);return saved;
       });
       const profile=state.profiles.find(row=>row.id===brokerId);
-      if(profile){profile.total_instruments=state.instruments.length;profile.total_sessions=state.sessions.length;}
+      if(profile){profile.total_symbols=state.symbols.length;profile.total_sessions=state.sessions.length;}
       data={broker_id:brokerId,imported_count:records.length,created_count:records.length,updated_count:0,records,failed,unattempted:[]};
     }
     await route.fulfill({json:{status:'success',data}});
@@ -70,11 +71,11 @@ async function launch(page:Page){
 }
 const actions=(page:Page)=>page.getByLabel('Broker profile operations',{exact:true});
 const table=(page:Page)=>page.getByRole('table',{name:'Broker profiles',exact:true});
-async function browse(page:Page,kind:'instrument'|'session',records:unknown[]){
-  await actions(page).getByRole('button',{name:`Import broker ${kind==='instrument'?'instruments':'sessions'} from JSON`,exact:true}).click();
-  const dialog=page.getByRole('dialog',{name:kind==='instrument'?'Instruments import from JSON':'Session import from JSON',exact:true});
-  const plural=kind==='instrument'?'instruments':'sessions';
-  await dialog.getByLabel(`${kind} JSON file`).setInputFiles({name:'Catalog.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:1,kind:plural,[plural]:records,...(kind==='instrument'?{brokers:[]}:{} )}))});
+async function browse(page:Page,kind:'symbolDefinition'|'session',records:unknown[]){
+  await actions(page).getByRole('button',{name:`Import broker ${kind==='symbolDefinition'?'symbols':'sessions'} from JSON`,exact:true}).click();
+  const dialog=page.getByRole('dialog',{name:kind==='symbolDefinition'?'Symbols import from JSON':'Session import from JSON',exact:true});
+  const plural=kind==='symbolDefinition'?'symbols':'sessions';
+  await dialog.getByLabel(`${kind} JSON file`).setInputFiles({name:'Catalog.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:1,kind:plural,[plural]:records,...(kind==='symbolDefinition'?{brokers:[]}:{} )}))});
   await dialog.getByLabel('Import broker profile').selectOption('1');
   return dialog;
 }
@@ -95,11 +96,11 @@ test('saves configured costs, reloads confirmed profiles and replaces stocks wit
   await expect(actions(page).getByRole('button',{name:'Update data for broker (automatic)',exact:true})).toBeDisabled();
 });
 
-test('imports only selected instruments and sessions and refreshes saved counts',async({page})=>{
+test('imports only selected symbols and sessions and refreshes saved counts',async({page})=>{
   const state=await launch(page);
-  let dialog=await browse(page,'instrument',[{...newInstrument(),symbol:'ONE',name:'First'},{...newInstrument(),symbol:'TWO',name:'Second'}]);
+  let dialog=await browse(page,'symbolDefinition',[{...newSymbol(),symbol:'ONE',name:'First'},{...newSymbol(),symbol:'TWO',name:'Second'}]);
   await dialog.getByLabel('Select ONE',{exact:true}).check();await dialog.getByLabel('Use broker cost defaults').check();await dialog.getByRole('button',{name:'Start Import',exact:true}).click();await expect(dialog).toHaveCount(0);
-  expect(state.instruments.map(row=>row.symbol)).toEqual(['ONE_d']);expect(state.writes[0].body.options.use_profile_costs).toBe(true);
+  expect(state.symbols.map(row=>row.symbol)).toEqual(['ONE_d']);expect(state.writes[0].body.options.use_profile_costs).toBe(true);
   dialog=await browse(page,'session',[{name:'Week',broker:'-1',brokerName:'Default',elements:[{dayFrom:'Mon',timeFrom:'09:00',dayTo:'Mon',timeTo:'16:00',eod:true}],holidays:[{date_str:'2026-12-25',description:'Holiday'}]}]);
   await dialog.getByLabel('Select Week',{exact:true}).check();await dialog.getByRole('button',{name:'Start Import',exact:true}).click();await expect(dialog).toHaveCount(0);
   expect(state.sessions[0].name).toBe('Week_d');expect(state.sessions[0].holidays).toHaveLength(1);
@@ -108,10 +109,10 @@ test('imports only selected instruments and sessions and refreshes saved counts'
 
 test('keeps partial import results visible and clears stale previews for invalid files',async({page})=>{
   const state=await launch(page);state.partial=true;
-  const dialog=await browse(page,'instrument',[{...newInstrument(),symbol:'GOOD',name:'Good'},{...newInstrument(),symbol:'BAD',name:'Bad'}]);
+  const dialog=await browse(page,'symbolDefinition',[{...newSymbol(),symbol:'GOOD',name:'Good'},{...newSymbol(),symbol:'BAD',name:'Bad'}]);
   await dialog.getByLabel('Select all import records').check();await dialog.getByRole('button',{name:'Start Import',exact:true}).click();
   await expect(dialog.getByRole('status')).toContainText('1 saved; 1 failed');await expect(dialog.getByLabel('Select GOOD',{exact:true})).not.toBeChecked();await expect(dialog.getByLabel('Select BAD',{exact:true})).toBeChecked();
-  await dialog.getByLabel('instrument JSON file').setInputFiles({name:'Invalid.json',mimeType:'application/json',buffer:Buffer.from('{bad')});
+  await dialog.getByLabel('symbol JSON file').setInputFiles({name:'Invalid.json',mimeType:'application/json',buffer:Buffer.from('{bad')});
   await expect(dialog.getByLabel('Select GOOD',{exact:true})).toHaveCount(0);await expect(dialog.getByRole('button',{name:'Start Import',exact:true})).toBeDisabled();await expect(dialog.getByRole('alert')).toBeVisible();
 });
 

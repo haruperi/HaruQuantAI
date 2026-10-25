@@ -12,7 +12,7 @@ export interface StockGroupDefinition {
   originFingerprint?: string;
 }
 export interface StockGroupDataset {
-  id: string; source: string; symbol: string; instrument: string; underlying: string;
+  id: string; source: string; symbol: string; symbolDefinition: string; underlying: string;
   broker: string; brokerName: string; timeframe: string; timezone: string;
   category: string; from: string; to: string; bars: number; barType: 'start';
 }
@@ -238,7 +238,7 @@ export function serializeStockMembersJson(members:StockMembership[]):string{retu
 
 export function makeGeneratedDataset(ticker: string): StockGroupDataset {
   let hash = 0; for (const char of ticker) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return { id: `stock-group:${ticker}`, source: 'Equity', symbol: ticker, instrument: ticker, underlying: ticker,
+  return { id: `stock-group:${ticker}`, source: 'Equity', symbol: ticker, symbolDefinition: ticker, underlying: ticker,
     broker: '-1', brokerName: 'Default', timeframe: 'D1', timezone: 'UTC', category: 'Stocks', from: `${2000 + hash % 12}-01-03`,
     to: new Date().toISOString().slice(0, 10), bars: 2_500 + hash % 4_500, barType: 'start' };
 }

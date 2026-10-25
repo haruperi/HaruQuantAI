@@ -5,12 +5,12 @@ export interface DukasSymbol {
   symbol: string; name: string; category: string; subcategory: string;
   fullCategory: string; dateFrom: string; dateFromM1: string;
   decimals: number; tickValue: number; defaultSpread: number;
-  tickSize: number; tickStep: number; instrumentType: number;
+  tickSize: number; tickStep: number; symbolType: number;
 }
-export interface BrokerProfile { id:string;name:string;postfix:string;timezone:string;mtUse:boolean;instruments:string[] }
+export interface BrokerProfile { id:string;name:string;postfix:string;timezone:string;mtUse:boolean;symbols:string[] }
 export interface AddDukasRequest {
   symbols: string[]; dataType: 'TICK' | 'M1'; broker: string;
-  postfix: string; instruments: string[];
+  postfix: string; symbolDefinitions: string[];
 }
 function date(value: string): string {
   const match = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(value);
@@ -31,9 +31,9 @@ export function parseCatalogue(raw: string): DukasSymbol[] {
     seen.add(symbol);
     const numbers = fields.slice(6).map(Number);
     if (numbers.some(value => !Number.isFinite(value))) throw new Error('Invalid catalogue metadata');
-    const [decimals, tickValue, defaultSpread, tickSize, tickStep, instrumentType] = numbers;
+    const [decimals, tickValue, defaultSpread, tickSize, tickStep, symbolType] = numbers;
     return { symbol, name, category, subcategory, fullCategory: `${category} - ${subcategory}`,
-      dateFrom: date(tick), dateFromM1: date(minute), decimals, tickValue, defaultSpread, tickSize, tickStep, instrumentType };
+      dateFrom: date(tick), dateFromM1: date(minute), decimals, tickValue, defaultSpread, tickSize, tickStep, symbolType };
   });
 }
 export const catalogue = parseCatalogue(rawCatalogue);

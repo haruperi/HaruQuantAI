@@ -24,7 +24,7 @@ import { DukascopyRegistrationError, setDataClient, useDataManagerStore } from '
 import type { AddDukasRequest } from '../../../../../app/plugins/data_source/Dukascopy/dukascopy';
 
 describe('Dukascopy host registration', () => {
-  const request: AddDukasRequest = { symbols: ['EURUSD'], dataType: 'M1', broker: '-1', postfix: '_TEST', instruments: ['-1'] };
+  const request: AddDukasRequest = { symbols: ['EURUSD'], dataType: 'M1', broker: '-1', postfix: '_TEST', symbolDefinitions: ['-1'] };
   let rows: Array<Record<string, unknown>>;
   let failSymbol = '';
   let loseResponse = false;
@@ -37,7 +37,7 @@ describe('Dukascopy host registration', () => {
         const body = JSON.parse(String(init.body));
         posts.push(body);
         if (body.symbol === failSymbol) return new Response(JSON.stringify({status: 'error', error: {code: 'STORAGE', message: 'Storage unavailable'}}), {status: 503});
-        const row = { ...body, id: `dukascopy:${body.symbol}:${body.timeframe}`, broker: 'default', broker_name: 'Default', timezone: 'UTC', instrument: body.underlying, bars: 0, category: 'Forex', path: 'data/market/dukascopy/m1/eurusd' };
+        const row = { ...body, id: `dukascopy:${body.symbol}:${body.timeframe}`, broker: 'default', broker_name: 'Default', timezone: 'UTC', symbolDefinition: body.underlying, bars: 0, category: 'Forex', path: 'data/market/dukascopy/m1/eurusd' };
         rows.push(row);
         if (loseResponse) throw new Error('Response lost');
         return new Response(JSON.stringify({status: 'success', data: malformed ? {...row, id: 'wrong'} : row}), {status: 201});
@@ -56,7 +56,7 @@ describe('Dukascopy host registration', () => {
   afterEach(() => { vi.useRealTimers(); setDataClient(createDomainClient('/data')); });
   it('persists canonical requests and reloads the authoritative catalog without browser writes', async () => {
     await useDataManagerStore.getState().addData(request);
-    expect(posts).toEqual([{source: 'dukascopy', symbol: 'EURUSD_TEST', underlying: 'EURUSD', timeframe: 'M1', broker: '-1', instrument: '-1'}]);
+    expect(posts).toEqual([{source: 'dukascopy', symbol: 'EURUSD_TEST', underlying: 'EURUSD', timeframe: 'M1', broker: '-1', symbolDefinition: '-1'}]);
     expect(useDataManagerStore.getState().savedDatasets?.[0]).toMatchObject({id: 'dukascopy:EURUSD_TEST:M1', symbol: 'EURUSD_TEST', bars: 0});
     await expect(useDataManagerStore.getState().addData(request)).rejects.toThrow('already exists');
     expect(posts).toHaveLength(1);
@@ -69,7 +69,7 @@ describe('Dukascopy host registration', () => {
   });
   it('reports partial completion and supports retrying only outstanding symbols', async () => {
     failSymbol = 'GBPUSD_TEST';
-    const multi = {...request, symbols: ['EURUSD', 'GBPUSD'], instruments: ['-1', '-1']};
+    const multi = {...request, symbols: ['EURUSD', 'GBPUSD'], symbolDefinitions: ['-1', '-1']};
     let error: DukascopyRegistrationError | undefined;
     try { await useDataManagerStore.getState().addData(multi); } catch (cause) { error = cause as DukascopyRegistrationError; }
     expect(error?.confirmedSymbols).toEqual(['EURUSD']);
@@ -133,8 +133,8 @@ describe('Dukascopy saved broker presentation', () => {
   afterEach(() => {vi.restoreAllMocks(); useDataManagerStore.setState({brokers: [], brokerLoading: false, brokerError: ''});});
   it('shows eligible and disabled saved brokers from the shared table store', () => {
     useDataManagerStore.setState({brokerLoading: false, brokerError: '', brokers: [
-      {id: '2', name: '[[Saved broker]]', postfix: '_S', timezone: 'UTC', mtUse: true, desc: '', stockPickerUse: false, system: false, stocks: [], instruments: []},
-      {id: '3', name: 'Disabled broker', postfix: '', timezone: 'UTC', mtUse: false, desc: '', stockPickerUse: false, system: false, stocks: [], instruments: []},
+      {id: '2', name: '[[Saved broker]]', postfix: '_S', timezone: 'UTC', mtUse: true, desc: '', stockPickerUse: false, system: false, stocks: [], symbols: []},
+      {id: '3', name: 'Disabled broker', postfix: '', timezone: 'UTC', mtUse: false, desc: '', stockPickerUse: false, system: false, stocks: [], symbols: []},
     ]});
     const html = render();
     expect(html).toContain('>Saved broker</option>');

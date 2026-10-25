@@ -19,7 +19,7 @@ Donor informs; specification owns. All implementation is independently written t
 ## Decision: DEC-UI-DARWINEX-TRACEABILITY
 
 Map HTML to TSX, JS to TS and CSS to CSS. Add view/controller own catalogue/form;
-`add/selectInstrumentsPopup.tsx` owns broker identification presentation. Import
+`add/selectSymbolsPopup.tsx` owns broker identification presentation. Import
 view/controller own picker/discovery; download view/controller own range/profile
 presentation. `DarwinexService.ts` adapts existing context checks, rules and mock
 stores. Modules contribute existing commands to Common ribbon; Data Manager

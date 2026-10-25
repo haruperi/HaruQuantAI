@@ -8,7 +8,7 @@ import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '.
 import { activeImport, useFileImports } from './fileImportStore';
 import { useFileSymbols } from './fileSymbolsStore';
 import { readImportFile, type ImportTask, type ImportRecord, type ImportFormat } from './fileImport';
-import type { FileInstrument, FileDefinition } from './fileSymbols';
+import type { FileSymbol, FileDefinition } from './fileSymbols';
 
 export const filesService = {
   read: readImportFile,
@@ -21,11 +21,11 @@ export const filesService = {
   start(tasks: ImportTask[], timezone: string, group: string, skipped: number): void {
     useFileImports.getState().start(tasks, timezone, group, skipped, [useYahoo.getState().job?.state, useCrypto.getState().job?.state, useDarwinex.getState().job?.state, useSQData.getState().job?.state, useMt5Import.getState().job?.state, useDukascopyDownloads.getState().job?.state, useTickDownloader.getState().job?.state].some(activeImport));
   },
-  addInstrument(value: FileInstrument, brokerIds: string[]): void {
-    useFileSymbols.getState().addInstrument(value, brokerIds);
+  addSymbolDefinition(value: FileSymbol, brokerIds: string[]): void {
+    useFileSymbols.getState().addSymbolDefinition(value, brokerIds);
   },
-  addSymbol(symbol: string, instrument: FileInstrument, barType: 'start' | 'end', existing: string[]): void {
-    useFileSymbols.getState().addSymbol(symbol, instrument, barType, existing);
+  addSymbol(symbol: string, symbolDefinition: FileSymbol, barType: 'start' | 'end', existing: string[]): void {
+    useFileSymbols.getState().addSymbol(symbol, symbolDefinition, barType, existing);
   },
   saveFormat(format: ImportFormat, replace?: boolean): void {
     useFileImports.getState().saveFormat(format, replace);

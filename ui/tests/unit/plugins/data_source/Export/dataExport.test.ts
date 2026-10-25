@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { builtInCsvFormats, csvArtifacts, exportPreset, exportRange, mt4Manifest, mt5Artifact, parseMt4Properties, renderCsvLine, safeFilename, selectExportTargets, type ExportTarget } from '../../../../../app/plugins/data_source/Export/dataExport';
 
-const tick: ExportTarget = { id: 'd3', symbol: 'NQ', instrument: 'NQ', source: 'Futures', timeframe: 'Tick → D1', timezone: 'America/Chicago', from: '2024-01-02', to: '2026-08-31', bars: 1000, category: 'Futures' };
-const bar: ExportTarget = { id: 'd1', symbol: 'EURUSD', instrument: 'EURUSD', source: 'Dukascopy', timeframe: 'M1 → H1', timezone: 'UTC', from: '2025-01-01', to: '2025-12-31', bars: 500, category: 'Forex' };
+const tick: ExportTarget = { id: 'd3', symbol: 'NQ', symbolDefinition: 'NQ', source: 'Futures', timeframe: 'Tick → D1', timezone: 'America/Chicago', from: '2024-01-02', to: '2026-08-31', bars: 1000, category: 'Futures' };
+const bar: ExportTarget = { id: 'd1', symbol: 'EURUSD', symbolDefinition: 'EURUSD', source: 'Dukascopy', timeframe: 'M1 → H1', timezone: 'UTC', from: '2025-01-01', to: '2025-12-31', bars: 500, category: 'Forex' };
 
 describe('Data export contracts', () => {
   it('enforces per-export selection and data eligibility', () => {

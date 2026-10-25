@@ -3,7 +3,7 @@ import {createDomainClient} from '../../../../../../app/host/transport';
 import {deleteBrokers,fetchBrokers,fetchBrokerStocks,saveBroker,saveBrokerStocks,importBrokerRecords,setBrokerApiClient,toBrokerProfile,type RemoteBrokerRecord} from '../../../../../../app/plugins/data_source/Catalogs/BrokerProfiles/brokerApiClient';
 import {useDataManagerStore} from '../../../../../../app/plugins/data_source/Common/dataManagerStore';
 
-const row:RemoteBrokerRecord={id:'1',name:'Demo',description:'Saved',timezone:'UTC',postfix:'_d',stockpicker_use:true,mt_use:true,is_system:false,stocks:[],customized_stocks:0,total_instruments:0,total_sessions:0,spread_model:{model:'inherit'},commission_model:{model:'inherit'}};
+const row:RemoteBrokerRecord={id:'1',name:'Demo',description:'Saved',timezone:'UTC',postfix:'_d',stockpicker_use:true,mt_use:true,is_system:false,stocks:[],customized_stocks:0,total_symbols:0,total_sessions:0,spread_model:{model:'inherit'},commission_model:{model:'inherit'}};
 const response=(data:unknown)=>new Response(JSON.stringify({status:'success',data}));
 function setup(){const fetchFn=vi.fn();setBrokerApiClient(createDomainClient('/data',{fetchFn,baseUrl:'/api/v1'}));return fetchFn;}
 beforeEach(()=>useDataManagerStore.setState({brokers:[],brokerLoading:false,brokerError:''}));
@@ -60,10 +60,10 @@ describe('confirmed broker transport and state',()=>{
     const fetchFn=setup();const options={selected_names:['ONE','TWO'],postfix:'_d',conflict_policy:'error' as const,use_profile_costs:false};
     const result={broker_id:'1',imported_count:1,created_count:1,updated_count:0,records:[{id:'1',symbol:'ONE_d',broker_id:1}],failed:[{name:'TWO_d',reason:'Invalid record'}],unattempted:[]};
     fetchFn.mockResolvedValueOnce(response(result));
-    expect(await importBrokerRecords('instrument','1',[{symbol:'ONE'},{symbol:'TWO'}],options)).toEqual(result);
-    expect(JSON.parse(String(fetchFn.mock.calls[0][1].body))).toMatchObject({version:1,kind:'instruments',options});
+    expect(await importBrokerRecords('symbolDefinition','1',[{symbol:'ONE'},{symbol:'TWO'}],options)).toEqual(result);
+    expect(JSON.parse(String(fetchFn.mock.calls[0][1].body))).toMatchObject({version:1,kind:'symbols',options});
     fetchFn.mockResolvedValueOnce(response({...result,imported_count:2}));
-    await expect(importBrokerRecords('instrument','1',[],options)).rejects.toThrow('invalid import result');
+    await expect(importBrokerRecords('symbolDefinition','1',[],options)).rejects.toThrow('invalid import result');
   });
 });
 

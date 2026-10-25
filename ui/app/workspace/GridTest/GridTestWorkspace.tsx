@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Select } from '../../components/ui';
 
-export interface GridTestRow { row: number; instrument: string; session: string; bid: number; ask: number; spread: number; tick: number; status: 'Live' | 'Delayed' | 'Closed'; }
+export interface GridTestRow { row: number; symbolDefinition: string; session: string; bid: number; ask: number; spread: number; tick: number; status: 'Live' | 'Delayed' | 'Closed'; }
 
-export const GRID_TEST_COLUMNS = ['Row', 'Instrument', 'Session', 'Bid', 'Ask', 'Spread', 'Tick #', 'Status'] as const;
+export const GRID_TEST_COLUMNS = ['Row', 'Symbol', 'Session', 'Bid', 'Ask', 'Spread', 'Tick #', 'Status'] as const;
 
-const INSTRUMENTS = ['EURUSD', 'GBPUSD', 'USDJPY', 'XAUUSD', 'NQ100', 'ES500'] as const;
+const SYMBOLS = ['EURUSD', 'GBPUSD', 'USDJPY', 'XAUUSD', 'NQ100', 'ES500'] as const;
 const SESSIONS = ['London', 'New York', 'Tokyo', 'Sydney'] as const;
 const STATUSES: GridTestRow['status'][] = ['Live', 'Delayed', 'Closed'];
 const ROW_COUNT_OPTIONS = [10, 100, 500, 1000] as const;
@@ -29,7 +29,7 @@ export function buildGridTestRows(count: number, seed: number = GRID_TEST_DEFAUL
     const tick = 1000 + index * 7 + (state % 13);
     state = nextRandom(state);
     const status = STATUSES[(index + state) % 3];
-    rows.push({ row: index + 1, instrument: INSTRUMENTS[index % INSTRUMENTS.length], session: SESSIONS[index % SESSIONS.length], bid, ask, spread: ask - bid, tick, status });
+    rows.push({ row: index + 1, symbolDefinition: SYMBOLS[index % SYMBOLS.length], session: SESSIONS[index % SESSIONS.length], bid, ask, spread: ask - bid, tick, status });
   }
   return rows;
 }
@@ -43,6 +43,6 @@ export function GridTestWorkspace() {
       <label>Rows<Select value={String(count)} onChange={value => setCount(Number(value))}>{ROW_COUNT_OPTIONS.map(option => <option key={option} value={String(option)}>{option}</option>)}</Select></label>
       <span className="grid-records">Records: {rows.length}</span>
     </div>
-    <div className="plain-table-wrap"><table className="plain-table"><thead><tr>{GRID_TEST_COLUMNS.map(column => <th key={column}>{column}</th>)}</tr></thead><tbody>{rows.map(row => <tr key={row.row}><td>{row.row}</td><td>{row.instrument}</td><td>{row.session}</td><td>{row.bid.toFixed(5)}</td><td>{row.ask.toFixed(5)}</td><td>{row.spread.toFixed(5)}</td><td>{row.tick}</td><td>{row.status}</td></tr>)}</tbody></table></div>
+    <div className="plain-table-wrap"><table className="plain-table"><thead><tr>{GRID_TEST_COLUMNS.map(column => <th key={column}>{column}</th>)}</tr></thead><tbody>{rows.map(row => <tr key={row.row}><td>{row.row}</td><td>{row.symbolDefinition}</td><td>{row.session}</td><td>{row.bid.toFixed(5)}</td><td>{row.ask.toFixed(5)}</td><td>{row.spread.toFixed(5)}</td><td>{row.tick}</td><td>{row.status}</td></tr>)}</tbody></table></div>
   </section>;
 }

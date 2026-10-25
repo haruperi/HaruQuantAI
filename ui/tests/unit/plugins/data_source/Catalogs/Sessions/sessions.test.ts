@@ -46,7 +46,7 @@ describe('session rules',()=>{
   it('round trips the versioned Sessions JSON shape',()=>{
     const value={name:'US_Index',broker:'-1',brokerName:'Default',elements:[monday]};const json=serializeSessionsJson([value]);
     expect(JSON.parse(json)).toMatchObject({version:1,kind:'sessions',sessions:[{name:'US_Index'}]});expect(parseSessionsJson(json)).toEqual([value]);
-    expect(()=>parseSessionsJson('{"version":1,"kind":"instruments","sessions":[]}')).toThrow('valid Sessions JSON');
+    expect(()=>parseSessionsJson('{"version":1,"kind":"symbols","sessions":[]}')).toThrow('valid Sessions JSON');
   });
   it('serializes native SQX Sessions.xml template', () => {
     const value: SessionDefinition = {

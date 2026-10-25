@@ -12,7 +12,7 @@ StrategyQuant X (SQX) offers powerful automation, but raw brute force creates no
    - Predefine structures such as “MA crossover + momentum confirmation” for trend following or mean reversion.
    - Let SQX optimize parameters inside your structure so domain expertise guides the search.
 3. **Multi-market strategy search**
-   - Generate candidates that must work across multiple symbols to filter for universal patterns instead of instrument quirks.
+   - Generate candidates that must work across multiple symbols to filter for universal patterns instead of symbol quirks.
    - Expect fewer passing strategies, but those that do are more robust.
 4. **Asymmetric long/short rules**
    - Build separate logic for longs versus shorts. Longs often thrive on trend rules, while shorts may prefer mean reversion or exhaustion signals.

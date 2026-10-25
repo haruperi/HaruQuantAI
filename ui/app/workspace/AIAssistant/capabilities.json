@@ -305,7 +305,7 @@
     "icon": "/SQAI/algocloud.png",
     "title": "AlgoCloud",
     "shortDescription": "Stockpicker & single-asset strategies.",
-    "description": "Work with AlgoCloud strategies right in the chat: create stockpicker strategies that rank a stock group, or single-asset strategies for one instrument — then backtest the saved .sqx files on their own settings and read the results.",
+    "description": "Work with AlgoCloud strategies right in the chat: create stockpicker strategies that rank a stock group, or single-asset strategies for one symbol — then backtest the saved .sqx files on their own settings and read the results.",
     "backend": "sqai",
     "inputPlaceholder": "Describe the stockpicker or single-asset strategy you want…",
     "starters": [

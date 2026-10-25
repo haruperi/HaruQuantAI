@@ -1,12 +1,13 @@
+import { createSymbolDataClient } from '../../Common/symbolContract';
 /** Confirmed host transport for stock baskets and dated memberships. */
-import { createDomainClient, type DomainClient } from '../../../../host/transport';
+import {type DomainClient } from '../../../../host/transport';
 import { validateGroup, type StockGroupDefinition, type StockMembership } from './stockGroups';
 
 export interface RemoteBasketRecord {
   id: string; name: string; description: string; system: boolean;
   items: Array<{symbol: string; date_from: string|null; date_to: string|null}>;
 }
-let client: DomainClient = createDomainClient('/data');
+let client: DomainClient = createSymbolDataClient('/data');
 export function setStockGroupApiClient(value: DomainClient): void { client = value; }
 function id(value: string): string {
   if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value) || !Number.isSafeInteger(Number(value))) throw new Error('Choose a saved stock group.');

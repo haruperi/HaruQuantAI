@@ -1,7 +1,7 @@
 
-# Financial Instruments
+# Financial Symbols
 
-Each instrument type has unique characteristics affecting strategy selection, capital requirements, and risk management.
+Each symbol type has unique characteristics affecting strategy selection, capital requirements, and risk management.
 
 ## Futures
 
@@ -32,7 +32,7 @@ Equity shares in companies or exchange-traded funds.
 - **Tax Treatment (US):** Short-term gains (&lt;1 year) = ordinary income. Long-term gains (&gt;1 year) = preferential rates (0%, 15%, 20%).
 
 **ETF Advantages:**
-- Diversification in a single instrument
+- Diversification in a single symbol
 - Lower risk than individual stocks
 - Sector/theme exposure (SPY, QQQ, XLE, IWM)
 - Leverage ETFs available (TQQQ 3x, UPRO 3x)
@@ -93,4 +93,4 @@ Derivatives providing right (not obligation) to buy/sell.
 - Complex pricing - requires options knowledge
 - Can be used for hedging existing positions
 
-**Warning:** Options are complex instruments. Most retail options traders lose money. Requires substantial education before trading. Not recommended for beginners. If using options, start with simple strategies (covered calls, cash-secured puts) before complex multi-leg strategies.
+**Warning:** Options are complex symbols. Most retail options traders lose money. Requires substantial education before trading. Not recommended for beginners. If using options, start with simple strategies (covered calls, cash-secured puts) before complex multi-leg strategies.

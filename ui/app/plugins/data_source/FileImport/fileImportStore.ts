@@ -1,5 +1,7 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
+import { createSymbolDataClient } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
-import { createDomainClient } from '../../../host/transport';
+
 import { datasets } from '../Common/fixtures';
 import { validateName } from './fileSymbols';
 import { create } from 'zustand';
@@ -15,7 +17,7 @@ function validateSaved(value: Saved) {
   const records = [...value.records, ...(value.job?.tasks?.map(task => task.record) ?? [])];
   let count = 0;
   for (const record of records) {
-    if (!record || record.source !== 'File import' || ['id', 'symbol', 'instrument', 'underlying', 'timeframe', 'broker', 'brokerName', 'timezone', 'category', 'from', 'to'].some(field => typeof (record as unknown as Record<string, unknown>)[field] !== 'string') || !['start', 'end'].includes(record.barType) || !Array.isArray(record.timestamps) || record.timestamps.length > limits.timestamps || !Number.isInteger(record.unknownBars) || record.unknownBars < 0 || record.bars !== record.timestamps.length + record.unknownBars || record.timestamps.some((stamp, i) => !Number.isFinite(stamp) || !Number.isFinite(new Date(stamp).getTime()) || (i > 0 && stamp <= record.timestamps[i - 1]))) throw new Error('Invalid saved records.');
+    if (!record || record.source !== 'File import' || ['id', 'symbol', 'symbolDefinition', 'underlying', 'timeframe', 'broker', 'brokerName', 'timezone', 'category', 'from', 'to'].some(field => typeof (record as unknown as Record<string, unknown>)[field] !== 'string') || !['start', 'end'].includes(record.barType) || !Array.isArray(record.timestamps) || record.timestamps.length > limits.timestamps || !Number.isInteger(record.unknownBars) || record.unknownBars < 0 || record.bars !== record.timestamps.length + record.unknownBars || record.timestamps.some((stamp, i) => !Number.isFinite(stamp) || !Number.isFinite(new Date(stamp).getTime()) || (i > 0 && stamp <= record.timestamps[i - 1]))) throw new Error('Invalid saved records.');
     validateName(record.symbol, []);
     if (record.id !== `file:${record.symbol}` && !datasets.some(row => row.source === 'File import' && row.id === record.id && row.symbol === record.symbol)) throw new Error('Invalid imported record identity.');
     if ((record.from || record.to) && (!/^\d{4}-\d{2}-\d{2}$/.test(record.from) || !/^\d{4}-\d{2}-\d{2}$/.test(record.to) || record.from > record.to)) throw new Error('Invalid imported range.');
@@ -27,7 +29,7 @@ function validateSaved(value: Saved) {
 }
 export const useFileImports = create<Store>((set, get) => {
   let initial: Saved = { formats: [], records: [], groups: [], timezone: 'EETUS', job: null }; let storageError = '';
-  try { const raw = localStorage.getItem(key); if (raw) { const value = normalizeLegacyBranding(JSON.parse(raw)); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
+  try { const raw = localStorage.getItem(key); if (raw) { const value = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw))); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
   catch { storageError = 'Saved file imports could not be read. Existing storage is preserved.'; }
   function persist(patch: Partial<Saved>) {
     if (get().storageError) throw new Error(get().storageError);
@@ -56,7 +58,7 @@ export const useFileImports = create<Store>((set, get) => {
       persist({ timezone, job: { tasks, state: 'running', progress: 0, completed: 0, skipped, group: name } });
       (async () => {
         try {
-          const client = createDomainClient('/data');
+          const client = createSymbolDataClient('/data');
           for (const task of tasks) {
             if (task.error) continue;
             await client.post('/datasets/import', {

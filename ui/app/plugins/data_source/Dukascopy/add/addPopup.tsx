@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { categories, filterCatalogue } from '../dukascopy';
-import { SelectInstrumentsPopup } from './selectInstrumentsPopup';
+import { SelectSymbolsPopup } from './selectSymbolsPopup';
 import { disclaimer, useAddPopupController, type AddPopupProps } from './addPopupCtrl';
 import './styles.css';
 
@@ -239,7 +239,7 @@ export function AddPopup(props: AddPopupProps) {
               Close
             </button>
             <button className="dukas-save sq-button primary" disabled={saving || brokerLoading || !!brokerError || brokerInvalid} onClick={save}>
-              {saving ? 'Saving…' : 'Save'}
+              {saving ? 'Savingï¿½' : 'Save'}
             </button>
           </div>
         </footer>

@@ -168,7 +168,7 @@ owns presentation, LoadPopupCtrl.ts owns state/completion, LoadService.ts owns
 the simulated interval and cleanup, and styles.css owns exclusive progress rules.
 Shared modal/theme and pane completion notification remain existing authorities.
 Dismissal still invokes completion; fixture contents remain unchanged. No file
-picker, Ctrl+O, real progress request/channel, instrument aliases or backend
+picker, Ctrl+O, real progress request/channel, symbol aliases or backend
 loading/cancellation is implemented. Root/JAR/sibling artifacts remain outside
 this bounded inventory. Structural matching establishes no runtime parity.
 

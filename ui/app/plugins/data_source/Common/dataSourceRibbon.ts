@@ -9,7 +9,7 @@ import { cryptoProvider } from '../Crypto/module';
 import { dukascopyProvider } from '../Dukascopy/module';
 
 export type DataSourceDialogId =
-  | 'new-instrument'
+  | 'new-symbol'
   | 'dukascopy-add'
   | 'dukascopy-download'
   | 'dukascopy-information'
@@ -30,7 +30,7 @@ export type DataSourceDialogId =
   | 'mass-delete'
   | 'save-definitions'
   | 'load-definitions'
-  | 'instrument-identification'
+  | 'symbol-identification'
   | 'data-format-name'
   | 'data-usage-conditions'
   | 'dependency-warning';

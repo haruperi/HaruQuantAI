@@ -96,7 +96,7 @@
       "relation": "independently written target counterpart",
       "access_date": "2026-10-06",
       "sha256": "ca2e2980f0661bddf741a95cd4c2f20cd20d27893c6d02cd5d0660086f17c17b",
-      "target": "add/selectInstrumentsPopup.tsx",
+      "target": "add/selectSymbolsPopup.tsx",
       "classification": "counterpart",
       "limitation": "Structural mapping is not behavioral parity; disclaimer reuses target consent only, standalone reachability unverified; backend outside scope. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
       "reinspection": {

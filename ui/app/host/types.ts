@@ -96,7 +96,7 @@ export interface Dataset {
   status: 'Ready' | 'Updating' | 'Error';
 }
 
-export interface Instrument {
+export interface SymbolDefinition {
   symbol: string;
   name: string;
   type: string;

@@ -27,7 +27,7 @@
 ## PERFORMANCE REVIEW
 
 ### Net Profit
-- You want as big as possible relative to the instrument, number of trades, capital required and drawdown
+- You want as big as possible relative to the symbol, number of trades, capital required and drawdown
 - Small number is still ok if you have other good metrics.
     - You can always increase by position sizing.
     - Less exposure in the market will leave space for capital to be used in other strategies.

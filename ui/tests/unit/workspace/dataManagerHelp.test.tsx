@@ -96,7 +96,7 @@ describe('HelpTooltip & DataManagerHelp', () => {
     expect(helpTopicForTab['Home']).toBe('overview');
     expect(helpTopicForTab['Data sources']).toBe('data');
     expect(helpTopicForTab['Export']).toBe('export');
-    expect(helpTopicForTab['Instruments']).toBe('instruments');
+    expect(helpTopicForTab['Symbols']).toBe('symbols');
     expect(helpTopicForTab['Sessions']).toBe('sessions');
     expect(helpTopicForTab['External indicators']).toBe('custom-data');
     expect(helpTopicForTab['Stock groups']).toBe('stock-groups');

@@ -50,7 +50,7 @@ export function filterMt5Symbols(query: string, category: string): Mt5Symbol[] {
 }
 
 export interface Mt5Definition {
-  id: string; symbol: string; underlying: string; instrument: string; source: 'MT5'; timeframe: 'M1';
+  id: string; symbol: string; underlying: string; symbolDefinition: string; source: 'MT5'; timeframe: 'M1';
   broker: string; brokerName: string; timezone: string; category: Mt5Symbol['category']; barType: 'start';
   from: string; to: string; bars: number; path: string; description: string;
 }
@@ -82,7 +82,7 @@ export function mt5Definitions(request: Mt5ImportRequest, existing: string[]): M
     const name = nextMt5Name(source.name + request.postfix, names);
     names.push(name);
     if (name.length > 128) throw new Error('Generated MT5 data name is too long.');
-    return { id: `mt5:${name}`, symbol: name, underlying: source.name, instrument: source.name,
+    return { id: `mt5:${name}`, symbol: name, underlying: source.name, symbolDefinition: source.name,
       source: 'MT5', timeframe: 'M1', broker: request.broker, brokerName: request.brokerName,
       timezone: request.timezone, category: source.category, barType: 'start', from: '', to: '', bars: 0,
       path: source.path, description: source.description };

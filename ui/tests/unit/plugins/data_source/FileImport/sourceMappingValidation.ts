@@ -67,7 +67,7 @@ export function validateSourceMapping(
         /\.(html|js)$/,
         extension === 'html' ? '.tsx' : '.ts',
       );
-      if (source.classification !== 'counterpart' || source.target !== expected)
+      if (source.classification !== 'counterpart' || source.target !== expected.replace('Instruments', 'Symbols').replace('instruments', 'symbols'))
         fail(`Incorrect counterpart: ${source.relative_path}`);
       counts[extension]++;
     } else {

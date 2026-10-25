@@ -298,7 +298,7 @@ export function CompareStrategiesModal({
               </thead>
               <tbody>
                 <tr style={{ borderBottom: '1px solid #21262d' }}>
-                  <td style={{ padding: '6px 12px', fontWeight: 500 }}>Instrument Symbol</td>
+                  <td style={{ padding: '6px 12px', fontWeight: 500 }}>Symbol Symbol</td>
                   <td style={{ padding: '6px 12px' }}>{s1.symbol}</td>
                   <td style={{ padding: '6px 12px' }}>{s2.symbol}</td>
                 </tr>

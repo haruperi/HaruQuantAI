@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const dataset = {
-  id: 'server:EURUSD', symbol: 'EURUSD_REAL', instrument: 'EURUSD.fx',
+  id: 'server:EURUSD', symbol: 'EURUSD_REAL', symbolDefinition: 'EURUSD.fx',
   broker: 'broker-1', broker_name: 'Research Broker', underlying: 'EUR/USD Spot',
   timeframe: 'M1', timezone: 'UTC', date_from: '2026-01-01T00:00:00',
   date_to: '2026-01-05T00:00:00', total_days: 4, total_records: 12345,
@@ -17,7 +17,7 @@ async function openCatalog(page: Page, catalog: () => object | Promise<object>) 
     localStorage.setItem('sqx-data-manager-v1', JSON.stringify({
       version: 1, brokers: [], definitions: [{
         id: 'cached:fake', symbol: 'CACHED_FAKE', source: 'Yahoo', underlying: 'CACHED_FAKE',
-        instrument: 'CACHED_FAKE', timeframe: 'D1', broker: 'default', brokerName: 'Default',
+        symbolDefinition: 'CACHED_FAKE', timeframe: 'D1', broker: 'default', brokerName: 'Default',
         timezone: 'UTC', category: 'Stock', from: '', to: '', bars: 999,
       }],
     }));
@@ -27,7 +27,7 @@ async function openCatalog(page: Page, catalog: () => object | Promise<object>) 
       : original(input, init)) as typeof fetch;
   });
   await page.route('**/api/v1/**', async route => {
-    const path = new URL(route.request().url()).pathname;
+    const path = new URL(route.request().url()).pathname.replace(/\/instruments(?=\/|$)/g, '/symbols').replace('/import-instruments', '/import-symbols');
     paths.push(path);
     if (path === '/api/v1/data/home/datasets') {
       const result = await catalog();
@@ -35,7 +35,7 @@ async function openCatalog(page: Page, catalog: () => object | Promise<object>) 
       return;
     }
     const data = path === '/api/v1/data/workspace' ? {
-      tabs: ['data', 'instruments', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'].map((id, index) => ({ id, title: ['Data', 'Instruments', 'Sessions', 'Brokers', 'Custom Data', 'Chart', 'Home', 'Stock groups', 'Log'][index], core: index < 5 })),
+      tabs: ['data', 'symbols', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'].map((id, index) => ({ id, title: ['Data', 'Symbols', 'Sessions', 'Brokers', 'Custom Data', 'Chart', 'Home', 'Stock groups', 'Log'][index], core: index < 5 })),
       active_tab: 'data', layout: { core_group: 'catalogs', chart_position: 'right' },
     } : path.startsWith('/api/v1/data/workspace/tabs/') ? {
       active_tab: path.split('/').at(-1), selection: null,

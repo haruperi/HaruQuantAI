@@ -4,7 +4,7 @@ This test is easy. We can run the backtest using the last data sample because th
 
 ### General Guidelines
 
-- For all type of strategies, start from 2010 till 2019, as it contains multiple market regimes for most instruments. Leave 2020 till 2024 for robustness testing.
+- For all type of strategies, start from 2010 till 2019, as it contains multiple market regimes for most symbols. Leave 2020 till 2024 for robustness testing.
 - When testing for robustness then include all data 2010-current date (exclude last year - 2025)
 - For Seasonal/Bias intraday strategies, and manual simple strategies with manual robustness, include all data 2010-current date (exclude last year).
 - Last excluded year should contain > 25 trades to derive dependable metrics readings.

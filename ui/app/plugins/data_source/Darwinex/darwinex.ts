@@ -13,7 +13,7 @@ export function parseDarwinex(text: string): DarwinexSymbol[] {
   });
 }
 export const darwinexCatalogue = parseDarwinex(raw);
-export interface DarwinexDefinition { id: string; symbol: string; underlying: string; instrument: string; source: 'Darwinex'; timeframe: 'TICK'; broker: string; brokerName: string; timezone: string; category: string; from: string; to: string; bars: number; sourceDataId?: string }
+export interface DarwinexDefinition { id: string; symbol: string; underlying: string; symbolDefinition: string; source: 'Darwinex'; timeframe: 'TICK'; broker: string; brokerName: string; timezone: string; category: string; from: string; to: string; bars: number; sourceDataId?: string }
 export interface DarwinexManifest { folder: string; symbols: string[]; fileCount: number }
 export function discoverDarwinex(paths: string[]): DarwinexManifest {
   if (!paths.length || paths.length > 20000) throw new Error('Select a folder containing at most 20,000 files.');
@@ -32,9 +32,9 @@ export function darwinexDefinitions(symbols: string[], postfix: string, existing
     if (requireCatalogue && !darwinexCatalogue.some(row => row.symbol === symbol)) throw new Error('Unknown Darwinex symbol.');
     const mapping = broker ? mappings[symbol] : '-1';
     if (mapping === '-1000') return [];
-    if (broker && mapping !== '-1' && (!mapping || mapping.startsWith('[') || !broker.instruments.includes(mapping))) throw new Error('Select proper instrument or skip the symbol');
+    if (broker && mapping !== '-1' && (!mapping || mapping.startsWith('[') || !broker.symbols.includes(mapping))) throw new Error('Select proper symbol or skip the symbol');
     const name = symbol + postfix; validateName(name, names); names.push(name);
-    return [{ id: `darwinex:${name}`, symbol: name, underlying: symbol, instrument: mapping === '-1' ? symbol : mapping, source: 'Darwinex' as const, timeframe: 'TICK' as const, broker: broker?.id ?? '-1', brokerName: broker?.name ?? 'Default', timezone: broker?.timezone ?? 'UTC', category: 'Tick data', from: '', to: '', bars: 0 }];
+    return [{ id: `darwinex:${name}`, symbol: name, underlying: symbol, symbolDefinition: mapping === '-1' ? symbol : mapping, source: 'Darwinex' as const, timeframe: 'TICK' as const, broker: broker?.id ?? '-1', brokerName: broker?.name ?? 'Default', timezone: broker?.timezone ?? 'UTC', category: 'Tick data', from: '', to: '', bars: 0 }];
   });
 }
 export interface DarwinexDownload { targets: DarwinexDefinition[]; dateFrom: string; dateTo: string; dateType: Preset; overwrite: boolean }

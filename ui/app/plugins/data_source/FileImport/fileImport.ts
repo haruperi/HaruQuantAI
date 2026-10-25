@@ -1,4 +1,4 @@
-import type { FileDefinition, FileInstrument } from './fileSymbols';
+import type { FileDefinition, FileSymbol } from './fileSymbols';
 import { validateName } from './fileSymbols';
 
 export const columnTypes = ['', 'Date', 'Time', 'Date & Time', 'Ask', 'Bid', 'Open', 'High', 'Low', 'Close', 'Volume', 'Unused'] as const;
@@ -573,6 +573,6 @@ export function massSymbol(stem: string, postfix: string, existing: { symbol: st
   let suffix = 2; while (existing.some(row => row.symbol === symbol + suffix)) suffix++;
   symbol += suffix; validateName(symbol, []); return symbol;
 }
-export function emptyFileRecord(symbol: string, instrument: FileInstrument, barType: 'start' | 'end'): FileDefinition {
-  return { id: `file:${symbol}`, symbol, instrument: instrument.symbol, underlying: instrument.symbol, source: 'File import', connection: 'History', barType, timeframe: 'â€”', broker: instrument.broker, brokerName: instrument.brokerName, timezone: instrument.timezone, category: instrument.type, from: '', to: '', bars: 0 };
+export function emptyFileRecord(symbol: string, symbolDefinition: FileSymbol, barType: 'start' | 'end'): FileDefinition {
+  return { id: `file:${symbol}`, symbol, symbolDefinition: symbolDefinition.symbol, underlying: symbolDefinition.symbol, source: 'File import', connection: 'History', barType, timeframe: 'â€”', broker: symbolDefinition.broker, brokerName: symbolDefinition.brokerName, timezone: symbolDefinition.timezone, category: symbolDefinition.type, from: '', to: '', bars: 0 };
 }

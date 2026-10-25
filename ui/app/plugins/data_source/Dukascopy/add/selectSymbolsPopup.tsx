@@ -1,16 +1,16 @@
 import type { AddPopupController } from './addPopupCtrl';
 
-export function SelectInstrumentsPopup({ controller }: { controller: AddPopupController }) {
+export function SelectSymbolsPopup({ controller }: { controller: AddPopupController }) {
   const { activeBroker, mapping, selected, setMapping } = controller;
   if (!mapping) return null;
   return (
     <section className="dukas-panel dukas-mapping">
       <strong>You have chosen broker profile {activeBroker?.name}</strong>
       <p>Downloaded data will be recomputed to this broker timezone.</p>
-      <strong>Please select corresponding instrument for added data</strong>
+      <strong>Please select corresponding symbol for added data</strong>
       <p>
-        Select a corresponding broker profile instrument for every symbol. If one is not defined,
-        skip the symbol or use the Default instrument.
+        Select a corresponding broker profile symbol for every symbol. If one is not defined,
+        skip the symbol or use the Default symbol.
       </p>
       <p>Mass action</p>
       <div>
@@ -27,7 +27,7 @@ export function SelectInstrumentsPopup({ controller }: { controller: AddPopupCon
             )
           }
         >
-          Default instrument
+          Default symbol
         </button>{' '}
         <button
           onClick={() =>
@@ -45,11 +45,11 @@ export function SelectInstrumentsPopup({ controller }: { controller: AddPopupCon
         </button>
       </div>
       <div className="dukas-grid">
-        <table aria-label="Instrument mappings">
+        <table aria-label="Symbol mappings">
           <thead>
             <tr>
               <th>Symbol</th>
-              <th>Instrument</th>
+              <th>Symbol</th>
             </tr>
           </thead>
           <tbody>
@@ -58,12 +58,12 @@ export function SelectInstrumentsPopup({ controller }: { controller: AddPopupCon
                 <td>{symbol}</td>
                 <td>
                   <select
-                    aria-label={`Instrument for ${symbol}`}
+                    aria-label={`Symbol for ${symbol}`}
                     value={mapping[symbol]}
                     onChange={(event) => setMapping({ ...mapping, [symbol]: event.target.value })}
                   >
-                    <option value="-1001">choose instrument</option>
-                    {activeBroker?.instruments
+                    <option value="-1001">choose symbol</option>
+                    {activeBroker?.symbols
                       .filter((item) => !item.startsWith('['))
                       .map((item) => (
                         <option key={item}>{item}</option>

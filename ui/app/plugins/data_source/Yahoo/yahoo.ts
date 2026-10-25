@@ -31,7 +31,7 @@ export function validateYahooName(name: string, existing: string[]): void {
 }
 
 export interface YahooDefinition {
-  id: string; symbol: string; underlying: string; instrument: string; name: string; exchange: string;
+  id: string; symbol: string; underlying: string; symbolDefinition: string; name: string; exchange: string;
   source: 'Yahoo'; timeframe: 'D1'; broker: '-1'; brokerName: '—'; timezone: 'UTC';
   category: YahooTicker['category']; barType: 'start'; from: string; to: string; bars: number; sourceDataId?: string;
 }
@@ -43,7 +43,7 @@ export function yahooDefinitions(value: string, postfix: string, existing: strin
     const ticker = yahooTickers.find(item => item.ticker === symbol);
     if (!ticker) throw new Error(`Symbol '${symbol}' not found in the offline Yahoo catalog.`);
     const finalName = ticker.ticker + postfix; validateYahooName(finalName, names); names.push(finalName);
-    return { id: `yahoo:${finalName}`, symbol: finalName, underlying: ticker.ticker, instrument: ticker.ticker,
+    return { id: `yahoo:${finalName}`, symbol: finalName, underlying: ticker.ticker, symbolDefinition: ticker.ticker,
       name: ticker.name, exchange: ticker.exchange, source: 'Yahoo', timeframe: 'D1', broker: '-1', brokerName: '—',
       timezone: 'UTC', category: ticker.category, barType: 'start', from: '', to: '', bars: 0 };
   });

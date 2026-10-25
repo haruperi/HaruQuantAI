@@ -30,11 +30,11 @@ test('Data sources exposes every provider workflow and remains mock-only', async
   await openDataManager(page);
   await page.getByRole('button', { name: 'Broker profiles', exact: true }).click();
   await expect(page.getByLabel('Broker profile operations').getByRole('button')).toHaveText([
-    'Add new', 'Update data for broker (automatic)', 'Import broker instruments from JSON',
+    'Add new', 'Update data for broker (automatic)', 'Import broker symbols from JSON',
     'Import broker sessions from JSON', 'Edit stocks', 'Mass delete', 'Save', 'Load',
   ]);
   await expect(page.getByRole('table', { name: 'Broker profiles', exact: true }).getByRole('columnheader')).toHaveText([
-    '', 'Name', 'Description', 'Postfix', 'Timezone', 'Customized stocks', 'Customized instruments', 'Customized sessions',
+    '', 'Name', 'Description', 'Postfix', 'Timezone', 'Customized stocks', 'Customized symbols', 'Customized sessions',
   ]);
     await expect(page.getByText('No brokers are defined.', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Stock groups', exact: true }).click();
@@ -54,18 +54,18 @@ test('Data sources exposes every provider workflow and remains mock-only', async
   ]);
   await expect(page.getByText('No External indicators defined.', { exact: true })).toBeVisible();
   await expect(page.getByText('Records: 0', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Instruments', exact: true }).click();
-  await expect(page.getByLabel('Instrument operations').getByRole('button')).toHaveText([
-    'Add Instrument', 'Clone Instrument', 'Mass Edit Instrument', 'Mass Delete', 'Save', 'Load',
+  await page.getByRole('button', { name: 'Symbols', exact: true }).click();
+  await expect(page.getByLabel('Symbol operations').getByRole('button')).toHaveText([
+    'Add Symbol', 'Clone Symbol', 'Mass Edit Symbol', 'Mass Delete', 'Save', 'Load',
   ]);
-  await expect(page.getByRole('table', { name: 'Instruments', exact: true }).getByRole('columnheader')).toHaveText([
-    '', 'Instrument ▴', 'Description', 'Broker profile', 'Point value', 'Pip/Tick size', 'Pip/Tick step',
+  await expect(page.getByRole('table', { name: 'Symbols', exact: true }).getByRole('columnheader')).toHaveText([
+    '', 'Symbol ▴', 'Description', 'Broker profile', 'Point value', 'Pip/Tick size', 'Pip/Tick step',
     'Default spread', 'Default slippage', 'Commissions', 'Swap', 'Data type', 'Order size mult.', 'Order size step', '',
   ]);
-  await page.getByRole('textbox', { name: 'Filter instruments' }).fill('Euro');
-  await expect(page.getByRole('table', { name: 'Instruments', exact: true }).getByRole('row')).toHaveCount(2);
-  await page.getByRole('checkbox', { name: 'Select all visible instruments' }).check();
-  await expect(page.getByRole('checkbox', { name: 'Select instrument EURUSD', exact: true })).toBeChecked();
+  await page.getByRole('textbox', { name: 'Filter symbols' }).fill('Euro');
+  await expect(page.getByRole('table', { name: 'Symbols', exact: true }).getByRole('row')).toHaveCount(2);
+  await page.getByRole('checkbox', { name: 'Select all visible symbols' }).check();
+  await expect(page.getByRole('checkbox', { name: 'Select symbol EURUSD', exact: true })).toBeChecked();
   await page.getByRole('button', { name: 'Sessions', exact: true }).click();
   await expect(page.getByLabel('Session operations').getByRole('button')).toHaveText([
     'Add Session', 'Clone Session', 'Mass Delete', 'Save', 'Load',
@@ -88,7 +88,7 @@ test('Data sources exposes every provider workflow and remains mock-only', async
 
   await expect(page.locator('.source-tree')).toHaveCount(0);
   await expect(page.getByRole('table', { name: 'Historical data' }).getByRole('columnheader')).toHaveText([
-    '', 'Symbol Name ▴', 'Instrument', 'Broker profile', 'Underlying Symbol', 'Timeframe',
+    '', 'Symbol Name ▴', 'Symbol', 'Broker profile', 'Underlying Symbol', 'Timeframe',
     'Timezone', 'Date from', 'Date to', 'Total Days', 'Total Records', 'Source', 'Bar type', 'Data type', 'Path', '', '',
   ]);
   await page.getByRole('textbox', { name: 'Filter items' }).fill('EURUSD');

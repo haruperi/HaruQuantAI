@@ -73,7 +73,7 @@ describe('Data Manager shell contracts', () => {
         activeId="data"
         activation={0}
         chartRequest={0}
-        arrangeRequest={{ seq: 1, action: 'right', targetId: 'instruments' }}
+        arrangeRequest={{ seq: 1, action: 'right', targetId: 'symbols' }}
         onActivate={() => {}}
         renderPanel={() => null}
       />,

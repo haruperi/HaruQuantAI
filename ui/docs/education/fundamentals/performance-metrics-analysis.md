@@ -70,7 +70,7 @@ Determine if results are due to edge or luck.
 ## Benchmark Comparison
 Compare strategy performance to passive alternatives.
 
-- Buy-and-Hold: Compare to simply buying and holding the instrument. Your strategy must beat this or it's not worth the effort. Include dividends in comparison
+- Buy-and-Hold: Compare to simply buying and holding the symbol. Your strategy must beat this or it's not worth the effort. Include dividends in comparison
 - Index Comparison: ES strategies vs SPY buy-hold. Forex strategies vs currency ETF. Must outperform on risk-adjusted basis
 - Alpha: Excess return above benchmark adjusted for risk. Positive alpha = outperformance
 - Beta: Correlation to benchmark. Beta = 1 means move with market. Beta &lt; 1 = less volatile. Beta &gt; 1 = more volatile. Low beta desirable for diversification

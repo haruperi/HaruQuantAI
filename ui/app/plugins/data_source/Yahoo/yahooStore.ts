@@ -1,3 +1,4 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { yahooDownloadRanges, validateYahooName, type YahooDefinition, type YahooDownload } from './yahoo';
@@ -10,7 +11,7 @@ interface Saved { definitions: YahooDefinition[]; ranges: Record<string, Interva
 interface Store extends Saved { storageError: string; startAdd: (definitions: YahooDefinition[], externalActive: boolean) => void; startDownload: (request: YahooDownload, externalActive: boolean) => void; advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void }
 
 function validateDefinition(row: YahooDefinition) {
-  if (!row || row.id !== `yahoo:${row.symbol}` || row.source !== 'Yahoo' || row.timeframe !== 'D1' || row.barType !== 'start' || row.broker !== '-1' || row.brokerName !== '—' || row.timezone !== 'UTC' || row.bars !== 0 || row.from !== '' || row.to !== '' || !['Stocks','ETF','Index','Forex','Crypto'].includes(row.category) || ['symbol','underlying','instrument','name','exchange'].some(key => typeof row[key as keyof YahooDefinition] !== 'string')) throw new Error('Invalid saved Yahoo definition.');
+  if (!row || row.id !== `yahoo:${row.symbol}` || row.source !== 'Yahoo' || row.timeframe !== 'D1' || row.barType !== 'start' || row.broker !== '-1' || row.brokerName !== '—' || row.timezone !== 'UTC' || row.bars !== 0 || row.from !== '' || row.to !== '' || !['Stocks','ETF','Index','Forex','Crypto'].includes(row.category) || ['symbol','underlying','symbolDefinition','name','exchange'].some(key => typeof row[key as keyof YahooDefinition] !== 'string')) throw new Error('Invalid saved Yahoo definition.');
 }
 function validateSaved(value: Saved) {
   if (!Array.isArray(value.definitions) || value.definitions.length > 10000 || !value.ranges || typeof value.ranges !== 'object' || Array.isArray(value.ranges)) throw new Error('Invalid saved Yahoo state.');
@@ -24,7 +25,7 @@ function validateSaved(value: Saved) {
 
 export const useYahoo = create<Store>((set, get) => {
   let initial: Saved = { definitions: [], ranges: {}, job: null }; let storageError = '';
-  try { const raw = localStorage.getItem(yahooKey); if (raw) { const saved = normalizeLegacyBranding(JSON.parse(raw)); if (saved.version !== 1) throw new Error('Version'); validateSaved(saved); initial = saved; if (initial.job?.state === 'running') initial.job.state = 'paused'; } } catch { storageError = 'Saved Yahoo data could not be read. Existing storage is preserved.'; }
+  try { const raw = localStorage.getItem(yahooKey); if (raw) { const saved = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw))); if (saved.version !== 1) throw new Error('Version'); validateSaved(saved); initial = saved; if (initial.job?.state === 'running') initial.job.state = 'paused'; } } catch { storageError = 'Saved Yahoo data could not be read. Existing storage is preserved.'; }
   function persist(patch: Partial<Saved>) { if (get().storageError) throw new Error(get().storageError); const { definitions, ranges, job } = { ...get(), ...patch }; const saved = { definitions, ranges, job }; validateSaved(saved); try { localStorage.setItem(yahooKey, JSON.stringify({ version: 1, ...saved })); } catch { throw new Error('Unable to save Yahoo data in browser storage. No changes were applied.'); } set(patch); }
   function guard(external: boolean) { if (external || yahooActive(get().job?.state)) throw new Error('Finish or stop the active data operation first.'); }
   return { ...initial, storageError,

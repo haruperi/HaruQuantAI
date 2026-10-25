@@ -1,3 +1,4 @@
+import { createSymbolDataClient } from '../../plugins/data_source/Common/symbolContract';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Clock,
@@ -9,14 +10,14 @@ import {
   Radio,
   RefreshCw,
 } from 'lucide-react';
-import { createDomainClient } from '../../host/transport';
 
-const dataClient = createDomainClient('/data');
+
+const dataClient = createSymbolDataClient('/data');
 
 export interface DataHomeSummary {
   workspace_name?: string;
   datasets_count: number;
-  instruments_count: number;
+  symbols_count: number;
   sessions_count: number;
   baskets_count: number;
   active_providers_count: number;
@@ -27,7 +28,7 @@ export interface DataHomeSummary {
 
 export interface DataHomeDashboard {
   symbol: string;
-  instrument: string;
+  symbolDefinition: string;
   broker_profile: string;
   underlying_symbol: string;
   timeframe: string;
@@ -49,7 +50,7 @@ interface DataManagerHomeProps {
 export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }: DataManagerHomeProps) {
   const [overview, setOverview] = useState<DataHomeSummary>({
     datasets_count: 0,
-    instruments_count: 0,
+    symbols_count: 0,
     sessions_count: 0,
     baskets_count: 0,
     active_providers_count: 0,
@@ -154,10 +155,10 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
             <HardDrive size={22} />
           </div>
           <div className="dm-metric-info">
-            <span className="dm-metric-num" data-testid="metric-instruments-count">
-              {overview.instruments_count.toLocaleString()}
+            <span className="dm-metric-num" data-testid="metric-symbols-count">
+              {overview.symbols_count.toLocaleString()}
             </span>
-            <span className="dm-metric-label">Instruments</span>
+            <span className="dm-metric-label">Symbols</span>
           </div>
         </div>
 
@@ -224,11 +225,11 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
           </button>
           <button
             className="dm-action-card"
-            onClick={() => onNavigateTab?.('Instruments')}
+            onClick={() => onNavigateTab?.('Symbols')}
           >
             <HardDrive size={18} />
             <div className="dm-action-text">
-              <strong>Configure Instruments</strong>
+              <strong>Configure Symbols</strong>
               <span>Manage pip sizes, spreads, commissions, and multipliers</span>
             </div>
           </button>
@@ -256,7 +257,7 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
             <thead>
               <tr>
                 <th>Symbol Name</th>
-                <th>Instrument</th>
+                <th>Symbol</th>
                 <th>Broker profile</th>
                 <th>Underlying Symbol</th>
                 <th>Timeframe</th>
@@ -280,7 +281,7 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
                 datasets.map((ds, idx) => (
                   <tr key={`${ds.symbol}-${ds.broker_profile}-${ds.timeframe}-${idx}`}>
                     <td className="dm-cell-bold">{ds.symbol}</td>
-                    <td>{ds.instrument}</td>
+                    <td>{ds.symbolDefinition}</td>
                     <td>{ds.broker_profile}</td>
                     <td>{ds.underlying_symbol}</td>
                     <td><span className="dm-badge-tf">{ds.timeframe}</span></td>

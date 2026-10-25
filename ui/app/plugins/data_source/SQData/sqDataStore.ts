@@ -1,3 +1,4 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { defaultSQConfig, planSQAdd, sqCatalogues, sourceLabel, validateSQConfig, type SQConfig, type SQDefinition, type SQProfile, type SQProvider } from './sqData';
@@ -15,14 +16,14 @@ function validateSaved(value: Saved) {
     const names: string[] = [];
     for (const row of rows) {
       validateName(row.symbol, names); names.push(row.symbol);
-      if (!['equity', 'futures'].includes(row.provider) || row.id !== `sq:${row.provider}:${row.symbol}` || row.source !== sourceLabel(row.provider) || !sqCatalogues[row.provider].some(item => item.ticker === row.underlying) || row.instrument !== row.underlying || row.bars !== 0 || row.from !== '' || row.to !== '' || row.timeframe !== '—' || !['start', 'end'].includes(row.barType) || ![0, 1, 2].includes(row.timezoneType) || !Number.isInteger(row.timezoneShift) || Math.abs(row.timezoneShift) > 23 || !Array.isArray(row.availableTimeframes) || !row.availableTimeframes.length || row.availableTimeframes.some(tf => !['M1', 'D1'].includes(tf)) || ['timezone', 'broker', 'brokerName', 'category', 'availableFrom'].some(key => typeof row[key as keyof SQDefinition] !== 'string')) throw new Error('Invalid saved market-data definition.');
+      if (!['equity', 'futures'].includes(row.provider) || row.id !== `sq:${row.provider}:${row.symbol}` || row.source !== sourceLabel(row.provider) || !sqCatalogues[row.provider].some(item => item.ticker === row.underlying) || row.symbolDefinition !== row.underlying || row.bars !== 0 || row.from !== '' || row.to !== '' || row.timeframe !== '—' || !['start', 'end'].includes(row.barType) || ![0, 1, 2].includes(row.timezoneType) || !Number.isInteger(row.timezoneShift) || Math.abs(row.timezoneShift) > 23 || !Array.isArray(row.availableTimeframes) || !row.availableTimeframes.length || row.availableTimeframes.some(tf => !['M1', 'D1'].includes(tf)) || ['timezone', 'broker', 'brokerName', 'category', 'availableFrom'].some(key => typeof row[key as keyof SQDefinition] !== 'string')) throw new Error('Invalid saved market-data definition.');
     }
   }
   if (value.job?.definitions.some(row => row.provider !== value.job!.provider)) throw new Error('Invalid job provider.');
 }
 export const useSQData = create<Store>((set, get) => {
   let initial: Saved = { definitions: [], preferred: { equity: defaultSQConfig(), futures: defaultSQConfig() }, job: null }; let storageError = '';
-  try { const raw = localStorage.getItem(sqStorageKey); if (raw) { const value = normalizeLegacyBranding(JSON.parse(raw)); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
+  try { const raw = localStorage.getItem(sqStorageKey); if (raw) { const value = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw))); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
   catch { storageError = 'Saved market data could not be read. Existing storage is preserved.'; }
   function persist(patch: Partial<Saved>) {
     if (get().storageError) throw new Error(get().storageError);

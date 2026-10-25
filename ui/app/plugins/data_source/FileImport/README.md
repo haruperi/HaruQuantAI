@@ -13,7 +13,7 @@ Outer names intentionally differ. Donor informs; specification owns.
 | Requirement | Target contract |
 | --- | --- |
 | FR-UI-FILEIMPORT-source-mapping | Exact relative names/casing; complete donor/target classification including scoped UI exclusions. |
-| FR-UI-FILEIMPORT-workflow-preservation | Preserve nested instruments/help, format CRUD, parser options, async cancellation, naming policies, errors, focus/Escape, persistence and simulation. |
+| FR-UI-FILEIMPORT-workflow-preservation | Preserve nested symbols/help, format CRUD, parser options, async cancellation, naming policies, errors, focus/Escape, persistence and simulation. |
 | FR-UI-FILEIMPORT-clean-room | Logical-root locators/fingerprints; no proprietary source, sensitive or personal data. |
 
 ## Decision: DEC-UI-FILEIMPORT-TRACEABILITY
@@ -21,7 +21,7 @@ Outer names intentionally differ. Donor informs; specification owns.
 Map HTML to TSX, JS to TS, CSS to CSS. Add, import and massImport modules own
 existing screens/commands; root module contributes the same File import provider.
 DataSourceFiles-prefixed controller hooks own state/navigation/submission.
-Add view retains local commission/swap/instrument/help helpers and optional mass
+Add view retains local commission/swap/symbol/help helpers and optional mass
 composition contract. Import view composes separately mapped new-format fields;
 delete-format confirmation remains local. Mass view reuses mapped add form.
 DataSourceFilesService adapts existing stores, file reads and cross-provider

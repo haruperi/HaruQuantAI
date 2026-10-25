@@ -1,3 +1,4 @@
+import { normalizeSymbolContract } from '../../app/plugins/data_source/Common/symbolContract';
 import { expect, test, type Page } from '@playwright/test';
 
 async function host(page: Page, options: {direct?: boolean; brokerFailure?: boolean} = {}) {
@@ -5,7 +6,7 @@ async function host(page: Page, options: {direct?: boolean; brokerFailure?: bool
   const posts: Array<Record<string, unknown>> = [];
   const state = {failSymbol: '', hold: null as Promise<void> | null,
     brokerFailure: options.brokerFailure ?? false, brokerHold: null as Promise<void> | null, brokerReads: 0,
-    brokers: [{id: '1', name: 'Test broker', description: '', timezone: 'Europe/London', postfix: '_B', stockpicker_use: false, mt_use: true, is_system: false, stocks: [] as string[], customized_stocks: 0, total_instruments: 0, total_sessions: 0, spread_model: {model: 'inherit'}, commission_model: {model: 'inherit'}}],
+    brokers: [{id: '1', name: 'Test broker', description: '', timezone: 'Europe/London', postfix: '_B', stockpicker_use: false, mt_use: true, is_system: false, stocks: [] as string[], customized_stocks: 0, total_symbols: 0, total_sessions: 0, spread_model: {model: 'inherit'}, commission_model: {model: 'inherit'}}],
   };
   await page.addInitScript(() => {
     const original = window.fetch.bind(window);
@@ -14,7 +15,7 @@ async function host(page: Page, options: {direct?: boolean; brokerFailure?: bool
       : original(input, init)) as typeof fetch;
   });
   await page.route('**/api/v1/**', async route => {
-    const path = new URL(route.request().url()).pathname;
+    const path = new URL(route.request().url()).pathname.replace(/\/instruments(?=\/|$)/g, '/symbols').replace('/import-instruments', '/import-symbols');
     if (path === '/api/v1/data/brokers') {
       state.brokerReads++;
       if (state.brokerHold) await state.brokerHold;
@@ -24,7 +25,7 @@ async function host(page: Page, options: {direct?: boolean; brokerFailure?: bool
       return;
     }
     if (path === '/api/v1/data/datasets' && route.request().method() === 'POST') {
-      const body = route.request().postDataJSON();
+      const body = normalizeSymbolContract(route.request().postDataJSON());
       posts.push(body);
       if (state.hold) await state.hold;
       if (body.symbol === state.failSymbol) {
@@ -38,15 +39,15 @@ async function host(page: Page, options: {direct?: boolean; brokerFailure?: bool
       }
       const row = {...body, id, broker: body.broker === '-1' ? 'default' : body.broker,
         broker_name: body.broker === '-1' ? 'Default' : 'Test broker', timezone: body.broker === '-1' ? 'UTC' : 'Europe/London',
-        instrument: body.instrument === '-1' ? body.underlying : body.instrument,
+        symbolDefinition: body.symbolDefinition === '-1' ? body.underlying : body.symbolDefinition,
         category: 'Forex', bars: 0, date_from: '', date_to: '', path: `data/market/dukascopy/${body.timeframe === 'TICK' ? 'ticks' : 'm1'}/${body.underlying.toLowerCase()}`};
       rows.push(row);
       await route.fulfill({status: 201, json: {status: 'success', data: row}});
       return;
     }
-    const ids = ['data', 'instruments', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'];
+    const ids = ['data', 'symbols', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'];
     const data = path === '/api/v1/data/home/datasets' ? rows
-      : path === '/api/v1/data/workspace' ? {tabs: ids.map((id, index) => ({id, title: ['Data', 'Instruments', 'Sessions', 'Brokers', 'Custom Data', 'Chart', 'Home', 'Stock groups', 'Log'][index], core: index < 5})), active_tab: 'data', layout: {core_group: 'catalogs', chart_position: 'right'}}
+      : path === '/api/v1/data/workspace' ? {tabs: ids.map((id, index) => ({id, title: ['Data', 'Symbols', 'Sessions', 'Brokers', 'Custom Data', 'Chart', 'Home', 'Stock groups', 'Log'][index], core: index < 5})), active_tab: 'data', layout: {core_group: 'catalogs', chart_position: 'right'}}
       : path.startsWith('/api/v1/data/workspace/tabs/') ? {active_tab: path.split('/').at(-1), selection: null, preview: {state: 'unavailable', reason: 'Select a saved dataset.', rows: [], limit: 500}}
       : path.endsWith('/auth/login') ? {token: 'dukascopy-test-session', expires_at: '2099-01-01T00:00:00.000Z'}
       : path.endsWith('/settings') ? {revision: 1, values: {}}
@@ -99,7 +100,7 @@ test('catalogue validation, host registration and reload', async ({page}) => {
   await dialog.getByLabel('Data postfix').fill('_TEST');
   await dialog.getByRole('button', {name: 'Save', exact: true}).click();
   await expect(dialog).toHaveCount(0);
-  expect(api.posts).toEqual([{source: 'dukascopy', symbol: 'AUDUSD_TEST', underlying: 'AUDUSD', timeframe: 'M1', broker: '-1', instrument: '-1'}]);
+  expect(api.posts).toEqual([{source: 'dukascopy', symbol: 'AUDUSD_TEST', underlying: 'AUDUSD', timeframe: 'M1', broker: '-1', symbolDefinition: '-1'}]);
   const row = page.getByRole('table', {name: 'Historical data'}).getByRole('row').filter({hasText: 'AUDUSD_TEST'});
   await expect(row).toContainText('Default');
   await expect(row).toContainText('M1');
@@ -151,7 +152,7 @@ test('pending registration disables submission and closure', async ({page}) => {
   const dialog = await select(page);
   await dialog.getByRole('button', {name: 'Save', exact: true}).click();
   await expect(dialog).toHaveAttribute('aria-busy', 'true');
-  await expect(dialog.getByRole('button', {name: 'Saving…', exact: true})).toBeDisabled();
+  await expect(dialog.getByRole('button', {name: 'Savingï¿½', exact: true})).toBeDisabled();
   await expect(dialog.getByRole('button', {name: 'Close', exact: true}).first()).toBeDisabled();
   await page.keyboard.press('Escape');
   await expect(dialog).toBeVisible();

@@ -1,3 +1,4 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { darwinexDownloadRanges, type DarwinexDefinition, type DarwinexDownload } from './darwinex';
@@ -16,7 +17,7 @@ function validateSaved(value: Saved) {
     const names: string[] = [];
     for (const row of rows) {
       validateName(row.symbol, names); names.push(row.symbol);
-      if (row.id !== `darwinex:${row.symbol}` || row.source !== 'Darwinex' || row.timeframe !== 'TICK' || row.bars !== 0 || row.from !== '' || row.to !== '' || ['underlying','instrument','broker','brokerName','timezone','category'].some(key => typeof row[key as keyof DarwinexDefinition] !== 'string')) throw new Error('Invalid saved definition.');
+      if (row.id !== `darwinex:${row.symbol}` || row.source !== 'Darwinex' || row.timeframe !== 'TICK' || row.bars !== 0 || row.from !== '' || row.to !== '' || ['underlying','symbolDefinition','broker','brokerName','timezone','category'].some(key => typeof row[key as keyof DarwinexDefinition] !== 'string')) throw new Error('Invalid saved definition.');
     }
   }
   if (Object.keys(value.ranges).length > 10000) throw new Error('Too many saved ranges.');
@@ -25,7 +26,7 @@ function validateSaved(value: Saved) {
 }
 export const useDarwinex = create<Store>((set, get) => {
   let initial: Saved = { definitions: [], ranges: {}, job: null, folder: '', postfix: '' }; let storageError = '';
-  try { const raw = localStorage.getItem(darwinexKey); if (raw) { const saved = normalizeLegacyBranding(JSON.parse(raw)); if (saved.version !== 1) throw new Error('Version'); validateSaved(saved); initial = saved; if (initial.job?.state === 'running') initial.job.state = 'paused'; } } catch { storageError = 'Saved Darwinex data could not be read. Existing storage is preserved.'; }
+  try { const raw = localStorage.getItem(darwinexKey); if (raw) { const saved = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw))); if (saved.version !== 1) throw new Error('Version'); validateSaved(saved); initial = saved; if (initial.job?.state === 'running') initial.job.state = 'paused'; } } catch { storageError = 'Saved Darwinex data could not be read. Existing storage is preserved.'; }
   function persist(patch: Partial<Saved>) {
     if (get().storageError) throw new Error(get().storageError);
     const { definitions, ranges, job, folder, postfix } = { ...get(), ...patch }; const saved = { definitions, ranges, job, folder, postfix }; validateSaved(saved);

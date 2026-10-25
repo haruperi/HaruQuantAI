@@ -1,8 +1,9 @@
+import { createSymbolDataClient } from '../../plugins/data_source/Common/symbolContract';
 import { useHostConnection } from '../../host/HostConnection';
 import { DataManagerDock, type WorkspaceArrangeRequest, type WorkspaceArrangement } from './DataManagerDock';
 import { DataManagerChart } from './DataManagerChart';
 import { fetchWorkspace, openWorkspaceTab, type WorkspaceLayout, type WorkspaceSnapshot, type WorkspaceTabId } from './dataManagerWorkspaceClient';
-import { BrokerProfilesTable, StockGroupsTable, ExternalIndicatorsTable, SessionTable, InstrumentTable, DatasetTable, getBrokerDisplayName } from './DataManagerPanels';
+import { BrokerProfilesTable, StockGroupsTable, ExternalIndicatorsTable, SessionTable, SymbolTable, DatasetTable, getBrokerDisplayName } from './DataManagerPanels';
 import { AddPopup as DarwinexAddDialog } from '../../plugins/data_source/Darwinex/add/module';
 import { ImportPopup as DarwinexImportDialog } from '../../plugins/data_source/Darwinex/import/module';
 import { DownloadPopup as DarwinexDownloadDialog } from '../../plugins/data_source/Darwinex/download/module';
@@ -27,13 +28,13 @@ import { ImportPopup as FileImportDialog } from '../../plugins/data_source/FileI
 import { MassImportPopup as FileMassImportDialog } from '../../plugins/data_source/FileImport/massImport/module';
 import { activeImport, useFileImports } from '../../plugins/data_source/FileImport/fileImportStore';
 import { emptyFileRecord } from '../../plugins/data_source/FileImport/fileImport';
-import { seedInstruments, type FileDefinition, type InstrumentBroker } from '../../plugins/data_source/FileImport/fileSymbols';
+import { seedSymbols, type FileDefinition, type SymbolBroker } from '../../plugins/data_source/FileImport/fileSymbols';
 import { AddPopup as FileSymbolDialog } from '../../plugins/data_source/FileImport/add/module';
 import { useFileSymbols } from '../../plugins/data_source/FileImport/fileSymbolsStore';
-import { useInstruments } from '../../plugins/data_source/Catalogs/Instruments/instrumentsStore';
-import { InstrumentsModal } from '../../plugins/data_source/Catalogs/Instruments/InstrumentsModal';
-import type { CatalogInstrument } from '../../plugins/data_source/Catalogs/Instruments/instrumentsApiClient';
-import { InstrumentTransferDialog } from '../../plugins/data_source/Catalogs/Instruments/InstrumentTransferDialog';
+import { useSymbols } from '../../plugins/data_source/Catalogs/Symbols/symbolsStore';
+import { SymbolsModal } from '../../plugins/data_source/Catalogs/Symbols/SymbolsModal';
+import type { CatalogSymbol } from '../../plugins/data_source/Catalogs/Symbols/symbolsApiClient';
+import { SymbolTransferDialog } from '../../plugins/data_source/Catalogs/Symbols/SymbolTransferDialog';
 import { SessionsModal } from '../../plugins/data_source/Catalogs/Sessions/SessionsModal';
 import { SessionTransferDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionTransferDialog';
 import { SessionNtImportDialog } from '../../plugins/data_source/Catalogs/Sessions/SessionNtImportDialog';
@@ -88,7 +89,7 @@ import {
 } from 'lucide-react';
 
 import { useAppStore } from '../../host/store';
-import { createDomainClient } from '../../host/transport';
+
 import { HelpTooltip, type HelpGuidePayload, type HelpTutorialItem } from '../../components/HelpTooltip';
 import { Button, Checkbox, Field, Modal, ProgressBar, Section, Select, TextInput } from '../../components/ui';
 import { DataManagerHome } from './DataManagerHome';
@@ -100,30 +101,30 @@ import {
 import yahooIconUrl from '../../assets/dm-yahoo.png';
 import mt5IconUrl from '../../assets/metatrader5.png';
 
-export const helpTopicForTab: Record<string, string> = { Home: 'overview', 'Data sources': 'data', Export: 'export', Tools: 'data', Instruments: 'instruments', Sessions: 'sessions', 'External indicators': 'custom-data', 'Stock groups': 'stock-groups', 'Broker profiles': 'brokers', Log: 'log', Chart: 'chart' };
+export const helpTopicForTab: Record<string, string> = { Home: 'overview', 'Data sources': 'data', Export: 'export', Tools: 'data', Symbols: 'symbols', Sessions: 'sessions', 'External indicators': 'custom-data', 'Stock groups': 'stock-groups', 'Broker profiles': 'brokers', Log: 'log', Chart: 'chart' };
 export const DEFAULT_DM_TUTORIALS: HelpTutorialItem[] = [
-  { id: 'tick-precision-testing', test_id: 'dm-help-openlink-btn', title: 'Test strategies with tick precision', summary: 'Configure tick-level datasets and verify instrument spread rules.', steps: ['Select a tick or M1 dataset in Data sources.', 'Verify point value, tick size, and decimals in Instruments.', 'Export or link the dataset for high-precision evaluation.'] },
+  { id: 'tick-precision-testing', test_id: 'dm-help-openlink-btn', title: 'Test strategies with tick precision', summary: 'Configure tick-level datasets and verify symbol spread rules.', steps: ['Select a tick or M1 dataset in Data sources.', 'Verify point value, tick size, and decimals in Symbols.', 'Export or link the dataset for high-precision evaluation.'] },
   { id: 'platform-data-export', test_id: 'dm-help-openlink-btn-2', title: 'Export data from Data Manager to external trading platforms', summary: 'Generate formatted bar and tick archives for external terminals.', steps: ['Select one or more saved datasets in the Data table.', 'Open the Export ribbon tab and select the target format.', 'Confirm date boundaries and download the exported artifacts.'] },
-  { id: 'historical-data-import', test_id: 'dm-help-openlink-btn-3', title: 'Import historical bar and tick data from files', summary: 'Create a file symbol record and parse custom OHLCV CSV files.', steps: ['Add a symbol definition mapped to an existing Instrument.', 'Choose Import data file and verify column and date formatting.', 'Inspect the imported record count and preview bars in Chart.'] },
+  { id: 'historical-data-import', test_id: 'dm-help-openlink-btn-3', title: 'Import historical bar and tick data from files', summary: 'Create a file symbol record and parse custom OHLCV CSV files.', steps: ['Add a symbol definition mapped to an existing Symbol.', 'Choose Import data file and verify column and date formatting.', 'Inspect the imported record count and preview bars in Chart.'] },
 ];
 export const fetchDataManagerHelp = async (
   requestedTopic = 'overview',
-  options?: Parameters<typeof createDomainClient>[1],
+  options?: Parameters<typeof createSymbolDataClient>[1],
 ): Promise<HelpGuidePayload> => {
-  const client = createDomainClient('/data', options);
+  const client = createSymbolDataClient('/data', options);
   return client.get<HelpGuidePayload>(`/help?topic=${encodeURIComponent(requestedTopic)}`);
 };
 
-const tabs = ['Home', 'Data sources', 'Export', 'Tools', 'Instruments', 'Sessions', 'External indicators', 'Stock groups', 'Broker profiles', 'Log', 'Chart'];
-const panelForTab: Record<string, WorkspaceTabId> = { Home: 'home', 'Data sources': 'data', Export: 'data', Tools: 'data', Instruments: 'instruments', Sessions: 'sessions', 'External indicators': 'custom-data', 'Stock groups': 'stock-groups', 'Broker profiles': 'brokers', Log: 'log', Chart: 'chart' };
-const labelForPanel: Record<WorkspaceTabId, string> = { home: 'Home', data: 'Data sources', instruments: 'Instruments', sessions: 'Sessions', 'custom-data': 'External indicators', 'stock-groups': 'Stock groups', brokers: 'Broker profiles', log: 'Log', chart: 'Chart' };
+const tabs = ['Home', 'Data sources', 'Export', 'Tools', 'Symbols', 'Sessions', 'External indicators', 'Stock groups', 'Broker profiles', 'Log', 'Chart'];
+const panelForTab: Record<string, WorkspaceTabId> = { Home: 'home', 'Data sources': 'data', Export: 'data', Tools: 'data', Symbols: 'symbols', Sessions: 'sessions', 'External indicators': 'custom-data', 'Stock groups': 'stock-groups', 'Broker profiles': 'brokers', Log: 'log', Chart: 'chart' };
+const labelForPanel: Record<WorkspaceTabId, string> = { home: 'Home', data: 'Data sources', symbols: 'Symbols', sessions: 'Sessions', 'custom-data': 'External indicators', 'stock-groups': 'Stock groups', brokers: 'Broker profiles', log: 'Log', chart: 'Chart' };
 type OperationState = 'idle' | 'running' | 'paused' | 'completed' | 'cancelled';
 interface DialogState { id: DataSourceDialogId; exchange?: string; targetIds?: string[] }
-type InstrumentDialogState =
-  | { kind: 'editor'; mode: 'add' | 'edit' | 'mass'; selected: CatalogInstrument[] }
-  | { kind: 'clone'; source: CatalogInstrument }
-  | { kind: 'transfer'; mode: 'save' | 'load'; selected: CatalogInstrument[] }
-  | { kind: 'delete'; selected: CatalogInstrument[] };
+type SymbolDialogState =
+  | { kind: 'editor'; mode: 'add' | 'edit' | 'mass'; selected: CatalogSymbol[] }
+  | { kind: 'clone'; source: CatalogSymbol }
+  | { kind: 'transfer'; mode: 'save' | 'load'; selected: CatalogSymbol[] }
+  | { kind: 'delete'; selected: CatalogSymbol[] };
 type SessionDialogState =
   | { kind:'editor'; mode:'add'|'edit'; source?:CatalogSession }
   | { kind:'clone'; source:CatalogSession }
@@ -145,7 +146,7 @@ type StockGroupDialogState =
 type BrokerDialogState =
   | {kind:'editor';mode:'add'|'edit';source?:BrokerProfile}
   | {kind:'stocks';source:BrokerProfile}
-  | {kind:'import';recordType:'instrument'|'session'}
+  | {kind:'import';recordType:'symbolDefinition'|'session'}
   | {kind:'delete';selected:BrokerProfile[]}
   | {kind:'load'};
 
@@ -218,7 +219,7 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
 }) {
   const [agreed, setAgreed] = useState(false);
   const titles: Record<DataSourceDialogId, string> = {
-    'new-instrument': 'Add instrument',
+    'new-symbol': 'Add symbol',
     'dukascopy-add': 'Add Dukascopy data', 'dukascopy-download': 'Download Dukascopy data',
     'dukascopy-information': 'Dukascopy data disclaimer', 'tickdownloader-import': 'Import data from TickDownloader',
     'file-add': 'Add symbol', 'file-import': 'Import one data file', 'file-mass-import': 'Import multiple data files',
@@ -228,7 +229,7 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
     'crypto-add': `Add ${state.exchange ?? 'crypto'} symbols`, 'crypto-download': 'Download Crypto data',
     'yahoo-add': 'Add Yahoo data', 'yahoo-download': 'Download Yahoo data', 'mt5-import': 'Import data from MT5',
     'mass-delete': 'Delete data', 'save-definitions': 'Save selected dataset definitions',
-    'load-definitions': 'Load dataset definitions', 'instrument-identification': 'Identify instruments for imported symbols',
+    'load-definitions': 'Load dataset definitions', 'symbol-identification': 'Identify symbols for imported symbols',
     'data-format-name': 'Save data format', 'data-usage-conditions': 'Data usage conditions',
     'dependency-warning': 'Dependent dataset warning',
   };
@@ -273,8 +274,8 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
 
   let content;
   switch (state.id) {
-    case 'new-instrument':
-      content = <div className="form-grid two"><Field label="Instrument symbol"><TextInput placeholder="EURUSD"/></Field><Field label="Instrument type"><Select value="forex" onChange={() => {}}><option value="forex">Forex</option><option value="futures">Futures</option><option value="stocks">Stocks</option><option value="crypto">Crypto</option></Select></Field><Field label="Base currency"><TextInput placeholder="EUR"/></Field><Field label="Quote currency"><TextInput placeholder="USD"/></Field></div>;
+    case 'new-symbol':
+      content = <div className="form-grid two"><Field label="Symbol symbol"><TextInput placeholder="EURUSD"/></Field><Field label="Symbol type"><Select value="forex" onChange={() => {}}><option value="forex">Forex</option><option value="futures">Futures</option><option value="stocks">Stocks</option><option value="crypto">Crypto</option></Select></Field><Field label="Base currency"><TextInput placeholder="EUR"/></Field><Field label="Quote currency"><TextInput placeholder="USD"/></Field></div>;
       break;
     case 'crypto-download':
     case 'yahoo-download':
@@ -292,8 +293,8 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
     case 'load-definitions':
       content = <><Field label="Dataset definition file"><input className="file-input compact" type="file" accept=".json,application/json"/></Field><p className="callout">The JSON file will be validated for supported schema, contained values, and conflicting identities before definitions are applied.</p><MockBoundaryNote/></>;
       break;
-    case 'instrument-identification':
-      content = <><p>Map each provider symbol to an existing instrument or skip it. Automatic guessing is never silently accepted.</p><div className="form-grid two"><Field label="Provider symbol"><TextInput value="EURUSD" readOnly/></Field><Field label="Target instrument"><Select value="EURUSD" onChange={() => {}}><option>EURUSD</option><option>Default instrument</option><option>Skip this symbol</option></Select></Field></div></>;
+    case 'symbol-identification':
+      content = <><p>Map each provider symbol to an existing symbol or skip it. Automatic guessing is never silently accepted.</p><div className="form-grid two"><Field label="Provider symbol"><TextInput value="EURUSD" readOnly/></Field><Field label="Target symbol"><Select value="EURUSD" onChange={() => {}}><option>EURUSD</option><option>Default symbol</option><option>Skip this symbol</option></Select></Field></div></>;
       break;
     case 'data-format-name':
       content = <Field label="Format name"><TextInput placeholder="My broker OHLCV format"/></Field>;
@@ -341,7 +342,7 @@ export function DataManager() {
   const crypto = useCrypto();
   const yahoo = useYahoo();
   const mt5 = useMt5Import();
-  const liveInstruments = useInstruments(state => state.instruments);
+  const liveSymbols = useSymbols(state => state.symbols);
   const fileDefinitions = useFileSymbols(state => state.definitions);
   const customSessions = useSessions(state => state.sessions);
   const exports = useDataExports();
@@ -360,11 +361,11 @@ export function DataManager() {
   const [darwinexDownloadTargets, setDarwinexDownloadTargets] = useState<DarwinexDefinition[]>([]);
   useEffect(() => { if (darwinex.job?.state !== 'running') return; const timer = window.setInterval(() => useDarwinex.getState().advance(), 250); return () => window.clearInterval(timer); }, [darwinex.job?.state]);
   const [fileTarget, setFileTarget] = useState<FileDefinition | null>(null);
-  const [instrumentJob, setInstrumentJob] = useState<{ label: string; state: 'running' | 'completed' | 'failed'; progress: number; error?: string } | null>(null);
-  const [progressOwner, setProgressOwner] = useState<'instruments' | 'download' | 'td' | 'file' | 'sq' | 'darwinex' | 'crypto' | 'yahoo' | 'mt5' | 'export' | 'tools' | 'external' | 'stock-groups' | 'broker'>(() => ['running','paused'].includes(brokerJob?.state??'')?'broker':stockGroupJobActive(stockGroups.job?.state) ? 'stock-groups' : externalJobActive(externalIndicators.job?.state) ? 'external' : toolsActive(tools.job?.state) ? 'tools' : exportActive(exports.job?.state) ? 'export' : mt5Active(mt5.job?.state) ? 'mt5' : yahooActive(yahoo.job?.state) ? 'yahoo' : cryptoActive(crypto.job?.state) ? 'crypto' : darwinexActive(darwinex.job?.state) ? 'darwinex' : sqActive(sq.job?.state) ? 'sq' : activeImport(imports.job?.state) ? 'file' : ['running', 'paused'].includes(download.job?.state ?? '') ? 'download' : activeImport(td.job?.state) ? 'td' : brokerJob?'broker':stockGroups.job ? 'stock-groups' : externalIndicators.job ? 'external' : tools.job ? 'tools' : exports.job ? 'export' : mt5.job ? 'mt5' : yahoo.job ? 'yahoo' : crypto.job ? 'crypto' : darwinex.job ? 'darwinex' : sq.job ? 'sq' : imports.job ? 'file' : td.job ? 'td' : 'download');
-  const providerJob = progressOwner === 'instruments' ? instrumentJob : progressOwner === 'broker'?brokerJob:progressOwner === 'stock-groups' ? stockGroups.job : progressOwner === 'external' ? externalIndicators.job : progressOwner === 'tools' ? tools.job : progressOwner === 'export' ? exports.job : progressOwner === 'mt5' ? mt5.job : progressOwner === 'yahoo' ? yahoo.job : progressOwner === 'crypto' ? crypto.job : progressOwner === 'darwinex' ? darwinex.job : progressOwner === 'sq' ? sq.job : progressOwner === 'file' ? imports.job : progressOwner === 'td' ? td.job : download.job;
+  const [symbolJob, setSymbolJob] = useState<{ label: string; state: 'running' | 'completed' | 'failed'; progress: number; error?: string } | null>(null);
+  const [progressOwner, setProgressOwner] = useState<'symbols' | 'download' | 'td' | 'file' | 'sq' | 'darwinex' | 'crypto' | 'yahoo' | 'mt5' | 'export' | 'tools' | 'external' | 'stock-groups' | 'broker'>(() => ['running','paused'].includes(brokerJob?.state??'')?'broker':stockGroupJobActive(stockGroups.job?.state) ? 'stock-groups' : externalJobActive(externalIndicators.job?.state) ? 'external' : toolsActive(tools.job?.state) ? 'tools' : exportActive(exports.job?.state) ? 'export' : mt5Active(mt5.job?.state) ? 'mt5' : yahooActive(yahoo.job?.state) ? 'yahoo' : cryptoActive(crypto.job?.state) ? 'crypto' : darwinexActive(darwinex.job?.state) ? 'darwinex' : sqActive(sq.job?.state) ? 'sq' : activeImport(imports.job?.state) ? 'file' : ['running', 'paused'].includes(download.job?.state ?? '') ? 'download' : activeImport(td.job?.state) ? 'td' : brokerJob?'broker':stockGroups.job ? 'stock-groups' : externalIndicators.job ? 'external' : tools.job ? 'tools' : exports.job ? 'export' : mt5.job ? 'mt5' : yahoo.job ? 'yahoo' : crypto.job ? 'crypto' : darwinex.job ? 'darwinex' : sq.job ? 'sq' : imports.job ? 'file' : td.job ? 'td' : 'download');
+  const providerJob = progressOwner === 'symbols' ? symbolJob : progressOwner === 'broker'?brokerJob:progressOwner === 'stock-groups' ? stockGroups.job : progressOwner === 'external' ? externalIndicators.job : progressOwner === 'tools' ? tools.job : progressOwner === 'export' ? exports.job : progressOwner === 'mt5' ? mt5.job : progressOwner === 'yahoo' ? yahoo.job : progressOwner === 'crypto' ? crypto.job : progressOwner === 'darwinex' ? darwinex.job : progressOwner === 'sq' ? sq.job : progressOwner === 'file' ? imports.job : progressOwner === 'td' ? td.job : download.job;
   useEffect(() => { if (sq.job?.state !== 'running') return; const timer = window.setInterval(() => useSQData.getState().advance(), 250); return () => window.clearInterval(timer); }, [sq.job?.state]);
-  const providerAction = progressOwner === 'instruments' ? (() => undefined) : progressOwner === 'broker'?useDataManagerStore.getState().brokerAction:progressOwner === 'stock-groups' ? stockGroups.action : progressOwner === 'external' ? externalIndicators.action : progressOwner === 'tools' ? tools.action : progressOwner === 'export' ? exports.action : progressOwner === 'mt5' ? mt5.action : progressOwner === 'yahoo' ? yahoo.action : progressOwner === 'crypto' ? crypto.action : progressOwner === 'darwinex' ? darwinex.action : progressOwner === 'sq' ? sq.action : progressOwner === 'file' ? imports.action : progressOwner === 'td' ? td.action : download.action;
+  const providerAction = progressOwner === 'symbols' ? (() => undefined) : progressOwner === 'broker'?useDataManagerStore.getState().brokerAction:progressOwner === 'stock-groups' ? stockGroups.action : progressOwner === 'external' ? externalIndicators.action : progressOwner === 'tools' ? tools.action : progressOwner === 'export' ? exports.action : progressOwner === 'mt5' ? mt5.action : progressOwner === 'yahoo' ? yahoo.action : progressOwner === 'crypto' ? crypto.action : progressOwner === 'darwinex' ? darwinex.action : progressOwner === 'sq' ? sq.action : progressOwner === 'file' ? imports.action : progressOwner === 'td' ? td.action : download.action;
   useEffect(() => {
     if (td.job?.state !== 'running') return;
     const timer = window.setInterval(() => useTickDownloader.getState().advance(), 250);
@@ -427,17 +428,17 @@ export function DataManager() {
   const activateDataset = (id: string) => { if (id !== activeDatasetId) setSelectedBarTime(null); setActiveDatasetId(id); setChartRequest(value => value + 1); };
 
   const [dialog, setDialog] = useState<DialogState | null>(null);
-  const [instrumentDialog, setInstrumentDialog] = useState<InstrumentDialogState | null>(null);
-  const [selectedInstrumentIds, setSelectedInstrumentIds] = useState<string[]>([]);
+  const [symbolDialog, setSymbolDialog] = useState<SymbolDialogState | null>(null);
+  const [selectedSymbolIds, setSelectedSymbolIds] = useState<string[]>([]);
   useEffect(() => {
-    if (hostStatus !== 'online') { useInstruments.getState().reset(); setInstrumentDialog(null); setSelectedInstrumentIds([]); return; }
-    void useInstruments.getState().refreshFromServer();
-    return () => { useInstruments.getState().reset(); };
+    if (hostStatus !== 'online') { useSymbols.getState().reset(); setSymbolDialog(null); setSelectedSymbolIds([]); return; }
+    void useSymbols.getState().refreshFromServer();
+    return () => { useSymbols.getState().reset(); };
   }, [hostStatus]);
   useEffect(() => {
-    if (hostStatus === 'online' && tab === 'Instruments') void useInstruments.getState().refreshFromServer();
+    if (hostStatus === 'online' && tab === 'Symbols') void useSymbols.getState().refreshFromServer();
   }, [tab, hostStatus]);
-  useEffect(() => { setSelectedInstrumentIds(current => current.filter(id => liveInstruments.some(row => row.id === id))); }, [liveInstruments]);
+  useEffect(() => { setSelectedSymbolIds(current => current.filter(id => liveSymbols.some(row => row.id === id))); }, [liveSymbols]);
   const [sessionDialog,setSessionDialog]=useState<SessionDialogState|null>(null);
   const [selectedSessionIds,setSelectedSessionIds]=useState<string[]>([]);
   const [sessionError,setSessionError]=useState('');
@@ -633,9 +634,9 @@ export function DataManager() {
       const row = rows[0];
       if (!row) { setSelectionMessage('You must select at least one File record.'); return; }
       if ('cloned' in row && row.cloned) { setSelectionMessage('Cannot import into cloned data.'); return; }
-      const instrument = seedInstruments.find(item => item.symbol === row.symbol) ?? seedInstruments[0];
+      const symbolDefinition = seedSymbols.find(item => item.symbol === row.symbol) ?? seedSymbols[0];
       const targetBarType: 'start' | 'end' = row.barType === 'end' ? 'end' : 'start';
-      setFileTarget({ ...emptyFileRecord(row.symbol, instrument, targetBarType), ...row, barType: targetBarType }); setSelectionMessage(''); setDialog({ id: 'file-import' }); return;
+      setFileTarget({ ...emptyFileRecord(row.symbol, symbolDefinition, targetBarType), ...row, barType: targetBarType }); setSelectionMessage(''); setDialog({ id: 'file-import' }); return;
     }
     if (command.dialog === 'dukascopy-download') {
       setOpenMenu(null); setNestedOpen(false);
@@ -657,7 +658,7 @@ export function DataManager() {
   const toolRows: ToolTarget[] = definitions.map(row => ({
     id: row.id,
     symbol: row.symbol,
-    instrument: row.instrument || row.symbol,
+    symbolDefinition: row.symbolDefinition || row.symbol,
     source: row.source,
     timeframe: row.timeframe,
     timezone: row.timezone || '—',
@@ -668,8 +669,8 @@ export function DataManager() {
     sourceDataId: 'sourceDataId' in row && typeof (row as any).sourceDataId === 'string' ? (row as any).sourceDataId : undefined,
   }));
   const exportRows: ExportTarget[] = toolRows;
-  const instrumentRows = liveInstruments;
-  const instrumentBrokers: InstrumentBroker[] = [
+  const symbolRows = liveSymbols;
+  const symbolBrokers: SymbolBroker[] = [
     { id: '-1', name: 'Default', postfix: '', timezone: 'UTC' },
     ...brokerProfiles.filter(profile => profile.mtUse).map(profile => ({ id: profile.id, name: profile.name, postfix: profile.postfix, timezone: profile.timezone })),
   ];
@@ -706,46 +707,46 @@ export function DataManager() {
   const requireStockGroups = (): StockGroupDefinition[] | null => { if (selectedStockGroups.length) { setSelectionMessage(''); return selectedStockGroups; } setSelectionMessage('You have to select some group.'); return null; };
   const openStockGroupEdit = (group: StockGroupDefinition) => { setSelectedStockGroupIds([group.id]); if (group.system) { setSelectionMessage("This group can't be edited."); return; } setStockGroupDialog({ kind: 'editor', mode: 'edit', source: group }); };
   const updateStockGroups = (items: StockGroupDefinition[]) => { try { useStockGroups.getState().start(items.map(item => item.id), toolRows.map(row => row.symbol), anyDataActive); setProgressOwner('stock-groups'); setOperationState('idle'); setSelectionMessage(''); notify('Data update started, please check Log tab for more information.'); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to update stock group.'); } };
-  const selectedInstruments = instrumentRows.filter(item => selectedInstrumentIds.includes(item.id));
-  const requireInstruments = (): CatalogInstrument[] | null => {
-    if (selectedInstruments.length) { setSelectionMessage(''); return selectedInstruments; }
+  const selectedSymbols = symbolRows.filter(item => selectedSymbolIds.includes(item.id));
+  const requireSymbols = (): CatalogSymbol[] | null => {
+    if (selectedSymbols.length) { setSelectionMessage(''); return selectedSymbols; }
     setSelectionMessage('You have to select some record.');
     return null;
   };
-  const openInstrumentEdit = (item: CatalogInstrument) => {
-    setSelectedInstrumentIds([item.id]);
-    setInstrumentDialog({ kind: 'editor', mode: 'edit', selected: [item] });
+  const openSymbolEdit = (item: CatalogSymbol) => {
+    setSelectedSymbolIds([item.id]);
+    setSymbolDialog({ kind: 'editor', mode: 'edit', selected: [item] });
   };
   useEffect(() => {
-    if (instrumentJob?.state !== 'running') return;
-    const timer = window.setInterval(() => setInstrumentJob(job => job && job.state === 'running' ? { ...job, progress: Math.min(90, job.progress + 5) } : job), 250);
+    if (symbolJob?.state !== 'running') return;
+    const timer = window.setInterval(() => setSymbolJob(job => job && job.state === 'running' ? { ...job, progress: Math.min(90, job.progress + 5) } : job), 250);
     return () => window.clearInterval(timer);
-  }, [instrumentJob?.state]);
-  const runInstrumentJob = async (label: string, work: () => Promise<string>) => {
-    if (instrumentJob?.state === 'running') return;
-    setSelectionMessage(''); setProgressOwner('instruments'); setInstrumentJob({ label, state: 'running', progress: 5 });
+  }, [symbolJob?.state]);
+  const runSymbolJob = async (label: string, work: () => Promise<string>) => {
+    if (symbolJob?.state === 'running') return;
+    setSelectionMessage(''); setProgressOwner('symbols'); setSymbolJob({ label, state: 'running', progress: 5 });
     try {
       const message = await work();
-      setInstrumentJob({ label, state: 'completed', progress: 100 }); notify(message);
+      setSymbolJob({ label, state: 'completed', progress: 100 }); notify(message);
     } catch (cause) {
-      const error = cause instanceof Error ? cause.message : 'Instrument operation failed.';
-      setInstrumentJob({ label, state: 'failed', progress: 100, error }); setSelectionMessage(error);
+      const error = cause instanceof Error ? cause.message : 'Symbol operation failed.';
+      setSymbolJob({ label, state: 'failed', progress: 100, error }); setSelectionMessage(error);
     }
   };
-  const refreshSelectedInstruments = () => {
-    if (instrumentRows.length && !selectedInstruments.length) { setSelectionMessage('You have to select at least one instrument.'); return; }
-    const symbols = !instrumentRows.length || selectedInstruments.length === instrumentRows.length ? undefined : selectedInstruments.map(item => item.symbol);
-    void runInstrumentJob(symbols ? `Refreshing ${symbols.length} instrument${symbols.length === 1 ? '' : 's'}` : 'Refreshing all instruments', async () => `Refreshed ${await useInstruments.getState().refreshInstruments(symbols)} instruments from MetaTrader 5.`);
+  const refreshSelectedSymbols = () => {
+    if (symbolRows.length && !selectedSymbols.length) { setSelectionMessage('You have to select at least one symbol.'); return; }
+    const symbols = !symbolRows.length || selectedSymbols.length === symbolRows.length ? undefined : selectedSymbols.map(item => item.symbol);
+    void runSymbolJob(symbols ? `Refreshing ${symbols.length} symbol${symbols.length === 1 ? '' : 's'}` : 'Refreshing all symbols', async () => `Refreshed ${await useSymbols.getState().refreshSymbols(symbols)} symbols from MetaTrader 5.`);
   };
-  const removeInstrumentRows = (rows: CatalogInstrument[]) => void runInstrumentJob(`Deleting ${rows.length} instrument${rows.length === 1 ? '' : 's'}`, async () => { const count = await useInstruments.getState().removeInstruments(rows.map(item => item.id)); setSelectedInstrumentIds(current => current.filter(id => !rows.some(item => item.id === id))); return `Deleted ${count} instrument${count === 1 ? '' : 's'}.`; });
-  const otherProviderActive = activeImport(operationState) || [instrumentJob?.state, td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, stockGroups.job?.state,brokerJob?.state].some(activeImport);
+  const removeSymbolRows = (rows: CatalogSymbol[]) => void runSymbolJob(`Deleting ${rows.length} symbol${rows.length === 1 ? '' : 's'}`, async () => { const count = await useSymbols.getState().removeSymbols(rows.map(item => item.id)); setSelectedSymbolIds(current => current.filter(id => !rows.some(item => item.id === id))); return `Deleted ${count} symbol${count === 1 ? '' : 's'}.`; });
+  const otherProviderActive = activeImport(operationState) || [symbolJob?.state, td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, stockGroups.job?.state,brokerJob?.state].some(activeImport);
   const externalActive = otherProviderActive || externalJobActive(externalIndicators.job?.state);
   const otherDataActive = externalActive || exportActive(exports.job?.state);
   const anyDataActive = otherDataActive || toolsActive(tools.job?.state);
   const openExport = (kind: ExportKind) => { try { if (anyDataActive) throw new Error('Finish or stop the active data operation first.'); const targets = selectExportTargets(exportRows, selectedDatasetIds, kind); setExportDialog({ kind, targets }); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to select data for export.'); } };
   const openClone = () => { try { if (anyDataActive) throw new Error('Finish or stop the active data operation first.'); const targets = selectCloneTargets(toolRows, selectedDatasetIds); setCloneTargets(targets); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to select data to clone.'); } };
   const openReview = () => { try { if (anyDataActive) throw new Error('Cannot view data while an operation is in progress.'); const target = selectReviewTarget(toolRows, selectedDatasetIds); setReviewTarget(target); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to view data.'); } };
-  const progressText = selectionMessage || (operationState === 'idle' ? (providerJob ? `${progressOwner === 'instruments' ? instrumentJob?.label : progressOwner === 'broker'?'Broker data update':progressOwner === 'stock-groups' ? 'Stock group data update' : progressOwner === 'external' ? `Custom data import for '${externalIndicators.job?.indicator}'` : progressOwner === 'tools' ? 'Clone to timezone' : progressOwner === 'export' ? exports.job?.label : progressOwner === 'mt5' ? 'MT5 mock import' : progressOwner === 'yahoo' ? `Yahoo mock ${yahoo.job?.kind}` : progressOwner === 'crypto' ? `Crypto mock ${crypto.job?.kind}` : progressOwner === 'darwinex' ? `Darwinex mock ${darwinex.job?.kind}` : progressOwner === 'sq' && sq.job ? providerLabel(sq.job.provider) : progressOwner === 'file' ? 'File import' : progressOwner === 'td' ? 'TickDownloader mock import' : 'Dukascopy mock download'} ${providerJob.state} ${providerJob.progress}%${providerJob.error ? `: ${providerJob.error}` : progressOwner === 'external' && externalIndicators.job?.state === 'completed' && externalIndicators.job.ignored ? ` — ${externalIndicators.job.ignored} invalid rows ignored` : progressOwner === 'file' && imports.job?.state === 'completed' ? ` — ${imports.job.completed} imported, ${imports.job.skipped} skipped, ${imports.job.tasks.reduce((n, task) => n + task.ignored, 0)} invalid rows ignored` : ''}` : 'No active operations') : operationState === 'paused' ? `${operationLabel} paused at ${progress}%` : operationState === 'cancelled' ? `${operationLabel} cancelled` : operationState === 'completed' ? `${operationLabel} complete` : `${operationLabel}… ${progress}%`);
+  const progressText = selectionMessage || (operationState === 'idle' ? (providerJob ? `${progressOwner === 'symbols' ? symbolJob?.label : progressOwner === 'broker'?'Broker data update':progressOwner === 'stock-groups' ? 'Stock group data update' : progressOwner === 'external' ? `Custom data import for '${externalIndicators.job?.indicator}'` : progressOwner === 'tools' ? 'Clone to timezone' : progressOwner === 'export' ? exports.job?.label : progressOwner === 'mt5' ? 'MT5 mock import' : progressOwner === 'yahoo' ? `Yahoo mock ${yahoo.job?.kind}` : progressOwner === 'crypto' ? `Crypto mock ${crypto.job?.kind}` : progressOwner === 'darwinex' ? `Darwinex mock ${darwinex.job?.kind}` : progressOwner === 'sq' && sq.job ? providerLabel(sq.job.provider) : progressOwner === 'file' ? 'File import' : progressOwner === 'td' ? 'TickDownloader mock import' : 'Dukascopy mock download'} ${providerJob.state} ${providerJob.progress}%${providerJob.error ? `: ${providerJob.error}` : progressOwner === 'external' && externalIndicators.job?.state === 'completed' && externalIndicators.job.ignored ? ` — ${externalIndicators.job.ignored} invalid rows ignored` : progressOwner === 'file' && imports.job?.state === 'completed' ? ` — ${imports.job.completed} imported, ${imports.job.skipped} skipped, ${imports.job.tasks.reduce((n, task) => n + task.ignored, 0)} invalid rows ignored` : ''}` : 'No active operations') : operationState === 'paused' ? `${operationLabel} paused at ${progress}%` : operationState === 'cancelled' ? `${operationLabel} cancelled` : operationState === 'completed' ? `${operationLabel} complete` : `${operationLabel}… ${progress}%`);
 
   const handleDeleteDatasetRow = (id: string) => {
     setSelectedDatasetIds([id]);
@@ -757,27 +758,27 @@ export function DataManager() {
       case 'chart': return <DataManagerChart snapshot={linkedSnapshot} loading={previewLoading} error={previewError} selectedTime={selectedBarTime} onSelectTime={setSelectedBarTime} onRetry={() => retryPreview(value => value + 1)} />;
       case 'home': return <DataManagerHome onNavigateTab={setTab} onOpenImport={() => { setTab('Data sources'); setDialog({ id: 'file-import' }); }} onOpenDownload={() => { setTab('Data sources'); setDialog({ id: 'dukascopy-download' }); }} />;
       case 'data': return <DatasetTable onActivate={activateDataset} activeDatasetId={activeDatasetId} selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} onDeleteRow={handleDeleteDatasetRow}/>;
-      case 'brokers': return <BrokerProfilesTable loading={brokerLoading} error={brokerLoadError} profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/>;
+      case 'brokers': return <BrokerProfilesTable loading={brokerLoading} error={brokerLoadError} profiles={brokerProfiles} selected={selectedBrokerIds} symbols={symbolRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/>;
       case 'stock-groups': return <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/>;
       case 'custom-data': return <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/>;
-      case 'instruments': return <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onRefresh={refreshSelectedInstruments} onDelete={item => setInstrumentDialog({ kind: 'delete', selected: [item] })} busy={instrumentJob?.state === 'running'} />;
+      case 'symbols': return <SymbolTable selected={selectedSymbolIds} onSelect={setSelectedSymbolIds} onEdit={openSymbolEdit} onRefresh={refreshSelectedSymbols} onDelete={item => setSymbolDialog({ kind: 'delete', selected: [item] })} busy={symbolJob?.state === 'running'} />;
       case 'sessions': return <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/>;
       case 'log': return <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-log-cancel-btn" className="cancel-log log-cancel-button" disabled={!canCancelLogOperation} onClick={handleCancelLogOperation}>Cancel operation</button><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="dm-log-progress" data-testid="dm-log-progress"><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/></div><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => { const isError = isErrorLogRecord(entry); return <div key={index} className={isError ? 'dm-log-entry log-entry-error' : 'dm-log-entry'} data-error={isError ? 'true' : 'false'}>{entry}</div>; })}</div></div></main>;
     }
   };
   const triggerArrange = (action: WorkspaceArrangement) => { setArrangeOpen(false); setArrangeRequest(current => ({ seq: (current?.seq ?? 0) + 1, action, targetId: panelForTab[tab] })); };
-  return <div className="data-manager"><div className="dm-title">Data Manager</div><div className="ribbon-tabs" role="navigation" aria-label="Data Manager workspace navigation">{tabs.map(item => <button key={item} className={tab === item ? 'active' : ''} onClick={() => { setArrangeOpen(false); setTab(item); setDockActivation(value => value + 1); }}>{item}</button>)}<div className="dm-arrange-menu" ref={arrangeRef}><button type="button" className={arrangeOpen ? 'active' : ''} aria-haspopup="menu" aria-expanded={arrangeOpen} onClick={() => setArrangeOpen(value => !value)}>Arrange</button>{arrangeOpen && <div className="dm-arrange-dropdown" role="menu" aria-label="Arrange workspace panel"><button type="button" role="menuitem" onClick={() => triggerArrange('right')}>Move panel right</button><button type="button" role="menuitem" onClick={() => triggerArrange('bottom')}>Move panel below</button><button type="button" role="menuitem" onClick={() => triggerArrange('main')}>Return to main group</button><button type="button" role="menuitem" onClick={() => triggerArrange('close')}>Close panel</button></div>}</div><HelpTooltip title="Data Manager Help" summary="Download, import, and export market data." topic={helpTopicForTab[tab] ?? 'overview'} availableTopics={['overview', 'data', 'import', 'export', 'instruments', 'sessions', 'brokers', 'custom-data', 'stock-groups', 'log', 'chart']} tutorials={DEFAULT_DM_TUTORIALS} loadGuide={fetchDataManagerHelp}/></div><div className="ribbon" ref={ribbonRef}>
+  return <div className="data-manager"><div className="dm-title">Data Manager</div><div className="ribbon-tabs" role="navigation" aria-label="Data Manager workspace navigation">{tabs.map(item => <button key={item} className={tab === item ? 'active' : ''} onClick={() => { setArrangeOpen(false); setTab(item); setDockActivation(value => value + 1); }}>{item}</button>)}<div className="dm-arrange-menu" ref={arrangeRef}><button type="button" className={arrangeOpen ? 'active' : ''} aria-haspopup="menu" aria-expanded={arrangeOpen} onClick={() => setArrangeOpen(value => !value)}>Arrange</button>{arrangeOpen && <div className="dm-arrange-dropdown" role="menu" aria-label="Arrange workspace panel"><button type="button" role="menuitem" onClick={() => triggerArrange('right')}>Move panel right</button><button type="button" role="menuitem" onClick={() => triggerArrange('bottom')}>Move panel below</button><button type="button" role="menuitem" onClick={() => triggerArrange('main')}>Return to main group</button><button type="button" role="menuitem" onClick={() => triggerArrange('close')}>Close panel</button></div>}</div><HelpTooltip title="Data Manager Help" summary="Download, import, and export market data." topic={helpTopicForTab[tab] ?? 'overview'} availableTopics={['overview', 'data', 'import', 'export', 'symbols', 'sessions', 'brokers', 'custom-data', 'stock-groups', 'log', 'chart']} tutorials={DEFAULT_DM_TUTORIALS} loadGuide={fetchDataManagerHelp}/></div><div className="ribbon" ref={ribbonRef}>
     {['Home', 'Log', 'Chart'].includes(tab) && <p className="dm-context-note">{tab === 'Chart' ? 'Select a saved dataset to view its recorded history. Use Arrange to dock or close panels.' : tab === 'Home' ? 'Data Manager overview' : 'Data Manager operation log'}</p>}
     {tab === 'Data sources' && <div className="data-source-ribbon" aria-label="Data source operations"><div className="provider-actions">{dataSourceProviders.map(provider => <ProviderMenu key={provider.id} provider={provider} isOpen={openMenu === provider.id} nestedOpen={nestedOpen && openMenu === provider.id} onToggle={() => { setOpenMenu(current => current === provider.id ? null : provider.id); setNestedOpen(false); }} onToggleNested={() => setNestedOpen(current => !current)} onSelect={command => { setLastControlId(provider.id); selectCommand(command); }}/>)}</div><div className="context-actions">{dataSourceContextActions.map(action => { const Icon = contextIcons[action.id] ?? Database; return <button className={`data-source-button ${action.id === 'mass-delete' ? 'destructive' : ''}`} data-control-id={action.id} key={action.id} title={action.label} onClick={() => { setLastControlId(action.id); if (action.requiresSelection && selectedDatasetIds.length === 0) { setSelectionMessage('Select at least one dataset first'); return; } if (action.action) runDirectAction(action.action); if (action.dialog) setDialog({ id: action.dialog }); }}><Icon size={27}/><span>{action.label}</span></button>; })}</div></div>}
     {tab === 'Export' && <div className="export-actions" aria-label="Data export operations"><Button data-control-id="export-csv" className="export-csv" onClick={() => { setLastControlId('export-csv'); openExport('csv'); }}><FileSpreadsheet size={24} aria-hidden="true"/>Export to CSV</Button><Button data-control-id="export-mt4" className="export-mt4" title="Export to MetaTrader 4 (FXT & HST)" onClick={() => { setLastControlId('export-mt4'); openExport('mt4'); }}><MonitorDown size={24} aria-hidden="true"/>Export MT4 (FXT &amp; HST)</Button><Button data-control-id="export-mt5" className="export-mt5" title="Export to MetaTrader 5 data (99% test)" onClick={() => { setLastControlId('export-mt5'); openExport('mt5'); }}><ChartCandlestick size={24} aria-hidden="true"/>Export to MT5 data (99% test)</Button></div>}
     {tab === 'Tools' && <div className="data-tool-actions" aria-label="Data tools"><Button data-control-id="tool-timezone" className="tool-timezone" onClick={() => { setLastControlId('tool-timezone'); openClone(); }}><span className="timezone-tool-icon" aria-hidden="true"><Globe2 size={26}/><Clock size={13}/></span>Clone to timezone</Button><Button data-control-id="tool-analyze" className="tool-analyze" onClick={() => { setLastControlId('tool-analyze'); openReview(); }}><ChartCandlestick size={26} aria-hidden="true"/>View &amp; Analyze</Button></div>}
-    {tab === 'Instruments' && <div className="management-actions" aria-label="Instrument operations">
-      <Button id="datamanager-instruments-add" className="action-add" onClick={() => { setInstrumentDialog({ kind: 'editor', mode: 'add', selected: [] }); }}><CirclePlus size={26} aria-hidden="true"/>Add Instrument</Button>
-      <Button id="datamanager-instruments-clone" className="action-clone" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'clone', source: rows[0] }); }}><CopyPlus size={26} aria-hidden="true"/>Clone Instrument</Button>
-      <Button id="datamanager-instruments-edit" className="action-edit" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'editor', mode: rows.length === 1 ? 'edit' : 'mass', selected: rows }); }}><Settings2 size={26} aria-hidden="true"/>Mass Edit Instrument</Button>
-      <Button id="datamanager-instruments-delete" className="action-delete" disabled={instrumentJob?.state === 'running'} onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'delete', selected: rows }); }}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
-      <Button id="datamanager-instruments-save" className="action-save" onClick={() => { const rows = requireInstruments(); if (rows) setInstrumentDialog({ kind: 'transfer', mode: 'save', selected: rows }); }}><Save size={26} aria-hidden="true"/>Save</Button>
-      <Button id="datamanager-instruments-load" className="action-load" disabled title="Instrument import is not implemented"><FolderOpen size={26} aria-hidden="true"/>Load</Button>
+    {tab === 'Symbols' && <div className="management-actions" aria-label="Symbol operations">
+      <Button id="datamanager-symbols-add" className="action-add" onClick={() => { setSymbolDialog({ kind: 'editor', mode: 'add', selected: [] }); }}><CirclePlus size={26} aria-hidden="true"/>Add Symbol</Button>
+      <Button id="datamanager-symbols-clone" className="action-clone" onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'clone', source: rows[0] }); }}><CopyPlus size={26} aria-hidden="true"/>Clone Symbol</Button>
+      <Button id="datamanager-symbols-edit" className="action-edit" onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'editor', mode: rows.length === 1 ? 'edit' : 'mass', selected: rows }); }}><Settings2 size={26} aria-hidden="true"/>Mass Edit Symbol</Button>
+      <Button id="datamanager-symbols-delete" className="action-delete" disabled={symbolJob?.state === 'running'} onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'delete', selected: rows }); }}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
+      <Button id="datamanager-symbols-save" className="action-save" onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'transfer', mode: 'save', selected: rows }); }}><Save size={26} aria-hidden="true"/>Save</Button>
+      <Button id="datamanager-symbols-load" className="action-load" disabled title="Symbol import is not implemented"><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
     {tab === 'Sessions' && <div className="management-actions" aria-label="Session operations">
       <Button className="action-add" onClick={()=>{setSessionError('');setSessionDialog({kind:'editor',mode:'add'});}}><CalendarPlus size={26} aria-hidden="true"/>Add Session</Button>
@@ -807,7 +808,7 @@ export function DataManager() {
     {tab === 'Broker profiles' && <div className="management-actions broker-actions" aria-label="Broker profile operations">
       <Button className="action-add" onClick={()=>setBrokerDialog({kind:'editor',mode:'add'})}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>
       <Button className="action-clone" disabled title="Automatic broker updates are not implemented"><RefreshCw size={26} aria-hidden="true"/>Update data for broker (automatic)</Button>
-      <Button className="action-edit" onClick={()=>setBrokerDialog({kind:'import',recordType:'instrument'})}><FileInput size={26} aria-hidden="true"/>Import broker instruments from JSON</Button>
+      <Button className="action-edit" onClick={()=>setBrokerDialog({kind:'import',recordType:'symbolDefinition'})}><FileInput size={26} aria-hidden="true"/>Import broker symbols from JSON</Button>
       <Button className="action-load" onClick={()=>setBrokerDialog({kind:'import',recordType:'session'})}><CalendarPlus size={26} aria-hidden="true"/>Import broker sessions from JSON</Button>
       <Button className="action-edit" onClick={()=>{const rows=requireBrokers();if(!rows)return;const row=rows[0];if(!row.stockPickerUse){setSelectionMessage("This broker profile can't hold any stocks.");return;}setBrokerDialog({kind:'stocks',source:row});}}><ListPlus size={26} aria-hidden="true"/>Edit stocks</Button>
       <Button className="action-delete" disabled={brokerDeleting} onClick={()=>{const rows=requireBrokers();if(!rows)return;if(rows.some(row=>row.system)){setSelectionMessage('System broker profiles cannot be deleted.');return;}setBrokerError('');setBrokerDialog({kind:'delete',selected:rows});}}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
@@ -854,19 +855,19 @@ export function DataManager() {
   {reviewTarget && (
     <ViewAnalyzeDialog target={reviewTarget} externalActive={otherDataActive || toolsActive(tools.job?.state)} onClose={() => setReviewTarget(null)}/>
   )}
-  {instrumentDialog?.kind === 'editor' && (
-    <InstrumentsModal mode={instrumentDialog.mode} selected={instrumentDialog.selected} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
+  {symbolDialog?.kind === 'editor' && (
+    <SymbolsModal mode={symbolDialog.mode} selected={symbolDialog.selected} brokers={symbolBrokers} onClose={() => setSymbolDialog(null)} onSaved={message => notify(message)}/>
   )}
-  {instrumentDialog?.kind === 'clone' && (
-    <InstrumentsModal mode="clone" selected={[instrumentDialog.source]} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
+  {symbolDialog?.kind === 'clone' && (
+    <SymbolsModal mode="clone" selected={[symbolDialog.source]} brokers={symbolBrokers} onClose={() => setSymbolDialog(null)} onSaved={message => notify(message)}/>
   )}
-  {instrumentDialog?.kind === 'delete' && (
-    <Modal title="Removing instruments" width={520} onClose={() => setInstrumentDialog(null)} footer={<><Button onClick={() => setInstrumentDialog(null)}>No</Button><Button className="primary" onClick={() => { const rows = instrumentDialog.selected; setInstrumentDialog(null); removeInstrumentRows(rows); }}>Yes</Button></>}>
-      <p>Are you sure you want to remove the selected instruments ({instrumentDialog.selected.length})?</p><p>{instrumentDialog.selected.slice(0, 10).map(item => item.symbol).join(', ')}{instrumentDialog.selected.length > 10 ? '…' : ''}</p>
+  {symbolDialog?.kind === 'delete' && (
+    <Modal title="Removing symbols" width={520} onClose={() => setSymbolDialog(null)} footer={<><Button onClick={() => setSymbolDialog(null)}>No</Button><Button className="primary" onClick={() => { const rows = symbolDialog.selected; setSymbolDialog(null); removeSymbolRows(rows); }}>Yes</Button></>}>
+      <p>Are you sure you want to remove the selected symbols ({symbolDialog.selected.length})?</p><p>{symbolDialog.selected.slice(0, 10).map(item => item.symbol).join(', ')}{symbolDialog.selected.length > 10 ? '…' : ''}</p>
     </Modal>
   )}
-  {instrumentDialog?.kind === 'transfer' && (
-    <InstrumentTransferDialog mode={instrumentDialog.mode} selected={instrumentDialog.selected} all={instrumentRows} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
+  {symbolDialog?.kind === 'transfer' && (
+    <SymbolTransferDialog mode={symbolDialog.mode} selected={symbolDialog.selected} all={symbolRows} brokers={symbolBrokers} onClose={() => setSymbolDialog(null)} onSaved={message => notify(message)}/>
   )}
   {sessionDialog?.kind==='editor'&&<SessionsModal mode={sessionDialog.mode} source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
   {sessionDialog?.kind==='clone'&&<SessionsModal mode="clone" source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
@@ -883,10 +884,10 @@ export function DataManager() {
   {stockGroupDialog?.kind === 'stocks' && <StockGroupStocksDialog group={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={message => notify(message)}/>}
   {stockGroupDialog?.kind === 'load' && <StockGroupTransferDialog onClose={() => setStockGroupDialog(null)} onSaved={message => notify(message)}/>}
   {stockGroupDialog?.kind === 'delete' && <div className="stock-groups-flow"><Modal title={stockGroupDialog.selected.length === 1 ? 'Remove group' : 'Remove groups'} width={520} onClose={() => { if(!stockGroupDeleting){setStockGroupDialog(null); setStockGroupError('');} }} footer={<><Button disabled={stockGroupDeleting} onClick={() => { setStockGroupDialog(null); setStockGroupError(''); }}>No</Button><Button className="primary" disabled={stockGroupDeleting} onClick={async () => { if(stockGroupDeleting)return;setStockGroupDeleting(true);setStockGroupError('');try { const ids=stockGroupDialog.selected.map(item=>item.id);await useStockGroups.getState().remove(ids);setSelectedStockGroupIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Group removed':'Groups removed');setStockGroupDialog(null);setStockGroupError(''); } catch(cause){setStockGroupError(cause instanceof Error?cause.message:'Unable to remove groups.');}finally{setStockGroupDeleting(false);} }}>Yes</Button></>}>{stockGroupError&&<p role="alert" className="stock-group-error">{stockGroupError}</p>}<p>Are you sure you want to remove selected groups ({stockGroupDialog.selected.length})? Their full membership history will also be removed. Downloaded data will be kept.</p></Modal></div>}
-  {brokerDialog?.kind==='editor'&&<BrokerProfilesModal mode={brokerDialog.mode} source={brokerDialog.source} canSetStockPicker={!brokerDialog.source?.stocks.length} canSetMt={!brokerDialog.source||(!instrumentRows.some(row=>row.broker===brokerDialog.source!.id)&&!sessionRows.some(row=>row.broker===brokerDialog.source!.id))} canSetTimezone={!brokerDialog.source||(!definitions.some(row=>row.broker===brokerDialog.source!.id)&&!fileDefinitions.some(row=>row.broker===brokerDialog.source!.id))} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
+  {brokerDialog?.kind==='editor'&&<BrokerProfilesModal mode={brokerDialog.mode} source={brokerDialog.source} canSetStockPicker={!brokerDialog.source?.stocks.length} canSetMt={!brokerDialog.source||(!symbolRows.some(row=>row.broker===brokerDialog.source!.id)&&!sessionRows.some(row=>row.broker===brokerDialog.source!.id))} canSetTimezone={!brokerDialog.source||(!definitions.some(row=>row.broker===brokerDialog.source!.id)&&!fileDefinitions.some(row=>row.broker===brokerDialog.source!.id))} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='stocks'&&<BrokerStocksDialog profile={brokerDialog.source} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='import'&&<BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='load'&&<BrokerTransferDialog onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
-  {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{if(!brokerDeleting){setBrokerDialog(null);setBrokerError('');}}} footer={<><Button disabled={brokerDeleting} onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" disabled={brokerDeleting} onClick={async ()=>{if(brokerDeleting)return;setBrokerDeleting(true);setBrokerError('');try{const ids=brokerDialog.selected.map(row=>row.id);await useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);setBrokerError('');}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}finally{setBrokerDeleting(false);}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})? Their stock memberships and cost settings will also be removed. Profiles used by instruments, sessions or saved datasets cannot be removed.</p></Modal></div>}
+  {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{if(!brokerDeleting){setBrokerDialog(null);setBrokerError('');}}} footer={<><Button disabled={brokerDeleting} onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" disabled={brokerDeleting} onClick={async ()=>{if(brokerDeleting)return;setBrokerDeleting(true);setBrokerError('');try{const ids=brokerDialog.selected.map(row=>row.id);await useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);setBrokerError('');}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}finally{setBrokerDeleting(false);}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})? Their stock memberships and cost settings will also be removed. Profiles used by symbols, sessions or saved datasets cannot be removed.</p></Modal></div>}
   {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'tickdownloader-import' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={dialog.targetIds ? dialog.targetIds.length : selectedDatasetIds.length} selectedIds={dialog.targetIds ?? selectedDatasetIds} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
 }

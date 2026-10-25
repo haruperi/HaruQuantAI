@@ -20,14 +20,14 @@ export function DisclaimerPopup({ onClose }: { onClose: () => void }) {
           result of original and unique methods and technology of information gathering,
           compilation, analysis and statistical evaluation developed by Dukascopy Bank SA.
           Therefore, such data reflect the current fair value of the respective financial
-          instruments as independently assessed by Dukascopy Bank SA and NOT the actual values at a
+          symbols as independently assessed by Dukascopy Bank SA and NOT the actual values at a
           given point in time. If you are looking to obtain actual quotes please contact the
           respective entities that provide this information.
         </p>
         <p>
           The Dukascopy Trading Tools data and/or any other data available as free product from
           Dukascopy Bank's website shall not constitute a forecast of the market value of any
-          instruments at any future point either, and is not an investment advice or recommendation
+          symbols at any future point either, and is not an investment advice or recommendation
           in any form.
         </p>
         <p>

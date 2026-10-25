@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { builtInFormats, detectFormat, emptyFileRecord, importedRecord, massSymbol, parseDate, parseImport, previewRows, splitRows, validateFormat } from '../../../../../app/plugins/data_source/FileImport/fileImport';
-import { newInstrument } from '../../../../../app/plugins/data_source/FileImport/fileSymbols';
+import { newSymbol } from '../../../../../app/plugins/data_source/FileImport/fileSymbols';
 const csv = 'Date,Open,High,Low,Close,Volume\n2026-09-18,1,3,0,2,4\n2026-09-19,2,4,1,3,5';
 describe('file import rules', () => {
   it('detects headers and delimiters; handles quoted fields, CRLF and malformed quotes', () => {
@@ -35,7 +35,7 @@ describe('file import rules', () => {
     expect(parseImport('2026-09-20 12:00:00,1,2,4', builtInFormats[2], 'TICK', false).error).toContain('Inconsistent');
   });
   it('merges known timestamps without inventing seeded history and honors overwrite', () => {
-    const base = { ...emptyFileRecord('TEST', { ...newInstrument(), symbol: 'EURUSD' }, 'end'), bars: 100, from: '2020-01-01', to: '2020-12-31' };
+    const base = { ...emptyFileRecord('TEST', { ...newSymbol(), symbol: 'EURUSD' }, 'end'), bars: 100, from: '2020-01-01', to: '2020-12-31' };
     const parsed = parseImport(csv, detectFormat(csv), 'D1', false);
     const once = importedRecord(base, parsed, 'UTC');
     expect(once.bars).toBe(102); expect(importedRecord(base, parsed, 'UTC', once).bars).toBe(102);
@@ -59,7 +59,7 @@ describe('file import persistence and lifecycle', () => {
     vi.stubGlobal('localStorage', storage);
     const store = (await import('../../../../../app/plugins/data_source/FileImport/fileImportStore')).useFileImports;
     const result = parseImport(csv, detectFormat(csv), 'D1', false);
-    const task = (symbol: string) => ({ filename: symbol + '.csv', ignored: 0, record: importedRecord(emptyFileRecord(symbol, { ...newInstrument(), symbol: 'EURUSD' }, 'start'), result, 'UTC') });
+    const task = (symbol: string) => ({ filename: symbol + '.csv', ignored: 0, record: importedRecord(emptyFileRecord(symbol, { ...newSymbol(), symbol: 'EURUSD' }, 'start'), result, 'UTC') });
     return { store, memory, storage, task, vi };
   }
   it('commits each file atomically, stops without applying the unfinished task, persists groups', async () => {

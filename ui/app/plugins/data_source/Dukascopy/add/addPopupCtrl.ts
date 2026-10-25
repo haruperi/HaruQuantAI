@@ -82,9 +82,9 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
       setError(disclaimer);
       return;
     }
-    const resolvedInstruments = selected.map((symbol) => {
+    const resolvedSymbols = selected.map((symbol) => {
       if (activeBroker) {
-        const found = activeBroker.instruments.find(
+        const found = activeBroker.symbols.find(
           (item) => item === symbol || (!item.startsWith('[') && item.startsWith(symbol)),
         );
         if (found) return found;
@@ -99,7 +99,7 @@ export function useAddPopupController({ open, onComplete }: AddPopupProps) {
         dataType,
         broker,
         postfix,
-        instruments: resolvedInstruments,
+        symbolDefinitions: resolvedSymbols,
       });
       onComplete(
         `${selected.length} Dukascopy dataset definition${selected.length === 1 ? '' : 's'} added`,

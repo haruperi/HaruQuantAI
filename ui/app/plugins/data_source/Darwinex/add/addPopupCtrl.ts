@@ -16,7 +16,7 @@ export function useAddPopup(onClose: () => void, onStarted: () => void) {
       if (!selected.length) throw new Error('No symbols selected');
       if (!agreed) throw new Error('Please confirm that you understand the free data disclaimer.');
       if (brokerId !== '-1' && !broker) throw new Error('Choose a valid broker profile.');
-      if (broker && !mapping) { setMappings(Object.fromEntries(selected.map(symbol => [symbol, broker.instruments.find(item => !item.startsWith('[') && item.startsWith(symbol)) ?? '-1001']))); setMapping(true); setError(''); return; }
+      if (broker && !mapping) { setMappings(Object.fromEntries(selected.map(symbol => [symbol, broker.symbols.find(item => !item.startsWith('[') && item.startsWith(symbol)) ?? '-1001']))); setMapping(true); setError(''); return; }
       const context = darwinexService.context(); const definitions = darwinexService.definitions(selected, postfix, context.existing, broker, mappings);
       if (!definitions.length) throw new Error('No symbols selected');
       darwinexService.start('add', definitions, context.active, undefined, postfix); onStarted(); onClose();

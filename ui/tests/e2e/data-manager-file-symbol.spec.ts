@@ -9,7 +9,7 @@ async function launch(page: Page) { await page.goto('/'); await page.getByRole('
 test('file symbol validation, both bar conventions, cancellation and persistence', async ({ page }) => {
   await launch(page);
   let dialog = await open(page);
-  await expect(dialog.getByLabel('Instrument name', { exact: true })).toBeDisabled();
+  await expect(dialog.getByLabel('Symbol name', { exact: true })).toBeDisabled();
   await dialog.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(dialog.getByRole('alert')).toContainText('required');
   await dialog.getByLabel('Data symbol name', { exact: true }).pressSequentially('EURUSD');
@@ -37,17 +37,17 @@ test('file symbol validation, both bar conventions, cancellation and persistence
   await page.keyboard.press('Escape');
   await expect(page.getByRole('checkbox', { name: 'Select CANCELLED', exact: true })).toHaveCount(0);
 });
-test('nested instrument, broker filtering, commissions, swaps and reload', async ({ page }) => {
+test('nested symbol, broker filtering, commissions, swaps and reload', async ({ page }) => {
   await launch(page);
-  await page.evaluate(() => localStorage.setItem('sqx-data-manager-v1', JSON.stringify({ version: 1, definitions: [], brokers: [{ id: 'demo', name: 'Demo broker', postfix: '_demo', timezone: 'UTC', mtUse: true, instruments: [] }] })));
+  await page.evaluate(() => localStorage.setItem('sqx-data-manager-v1', JSON.stringify({ version: 1, definitions: [], brokers: [{ id: 'demo', name: 'Demo broker', postfix: '_demo', timezone: 'UTC', mtUse: true, symbols: [] }] })));
   await page.reload();
   const parent = await open(page);
-  await parent.getByLabel('Data symbol name', { exact: true }).fill('WITH_INSTRUMENT');
+  await parent.getByLabel('Data symbol name', { exact: true }).fill('WITH_SYMBOL');
   await parent.getByLabel('Broker profile filter').selectOption('demo');
-  await expect(parent.getByLabel('Instrument', { exact: true })).toContainText('No instruments');
-  await parent.getByRole('button', { name: /Add new instrument/ }).click();
-  const nested = page.getByRole('dialog', { name: 'Add instrument', exact: true });
-  await nested.getByLabel('Instrument name', { exact: true }).pressSequentially('CUSTOM');
+  await expect(parent.getByLabel('Symbol', { exact: true })).toContainText('No symbols');
+  await parent.getByRole('button', { name: /Add new symbol/ }).click();
+  const nested = page.getByRole('dialog', { name: 'Add symbol', exact: true });
+  await nested.getByLabel('Symbol name', { exact: true }).pressSequentially('CUSTOM');
   await nested.getByLabel('Broker profile', { exact: true }).selectOption('demo');
   for (const model of ['Per trade','Size based','Percentage based','Stockpicker','None','Stockpicker']) {
     await nested.getByLabel('Commission model', { exact: true }).selectOption(model);
@@ -57,18 +57,18 @@ test('nested instrument, broker filtering, commissions, swaps and reload', async
   await nested.getByRole('checkbox', { name: 'Use', exact: true }).check();
   await nested.getByLabel('Long', { exact: true }).fill('-2');
   await nested.getByLabel('Short', { exact: true }).fill('1');
-  await page.screenshot({ path: 'test-results/file-instrument-settings.png' });
+  await page.screenshot({ path: 'test-results/file-symbol-settings.png' });
   await nested.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(parent.getByLabel('Instrument', { exact: true })).toHaveValue('CUSTOM_demo');
-  await expect(parent.getByLabel('Data symbol name', { exact: true })).toHaveValue('WITH_INSTRUMENT');
+  await expect(parent.getByLabel('Symbol', { exact: true })).toHaveValue('CUSTOM_demo');
+  await expect(parent.getByLabel('Data symbol name', { exact: true })).toHaveValue('WITH_SYMBOL');
   await parent.getByRole('button', { name: 'Save', exact: true }).click();
   await page.reload();
-  await expect(page.getByRole('row').filter({ hasText: 'WITH_INSTRUMENT' })).toContainText('CUSTOM_demo');
-  await page.getByRole('button', { name: 'Instruments', exact: true }).click();
-  await expect(page.getByRole('table', { name: 'Instruments', exact: true }).getByRole('row').filter({ hasText: 'CUSTOM_demo' })).toContainText('Stockpicker');
+  await expect(page.getByRole('row').filter({ hasText: 'WITH_SYMBOL' })).toContainText('CUSTOM_demo');
+  await page.getByRole('button', { name: 'Symbols', exact: true }).click();
+  await expect(page.getByRole('table', { name: 'Symbols', exact: true }).getByRole('row').filter({ hasText: 'CUSTOM_demo' })).toContainText('Stockpicker');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('sqx-file-symbols-v1')!));
-  expect(saved.instruments[0].swap.long).toBe(-2);
-  expect(saved.instruments[0].commission.model).toBe('Stockpicker');
+  expect(saved.symbols[0].swap.long).toBe(-2);
+  expect(saved.symbols[0].commission.model).toBe('Stockpicker');
 });
 test('light narrow layout, nested cancellation and storage failure preserve draft', async ({ page }) => {
   await launch(page);
@@ -76,7 +76,7 @@ test('light narrow layout, nested cancellation and storage failure preserve draf
   await page.setViewportSize({ width: 600, height: 700 });
   const dialog = await open(page);
   await dialog.getByLabel('Data symbol name', { exact: true }).fill('RETRY_FILE');
-  await dialog.getByRole('button', { name: /Add new instrument/ }).click();
+  await dialog.getByRole('button', { name: /Add new symbol/ }).click();
   await page.keyboard.press('Escape');
   await expect(dialog.getByLabel('Data symbol name', { exact: true })).toHaveValue('RETRY_FILE');
   await expect(dialog.getByRole('button', { name: 'Save', exact: true })).toBeInViewport();
@@ -87,17 +87,17 @@ test('light narrow layout, nested cancellation and storage failure preserve draf
   await expect(dialog.getByLabel('Data symbol name', { exact: true })).toHaveValue('RETRY_FILE');
 });
 
-test('saved nested instrument survives parent cancellation and file names block other providers', async ({ page }) => {
+test('saved nested symbol survives parent cancellation and file names block other providers', async ({ page }) => {
   await launch(page);
   let dialog = await open(page);
-  await dialog.getByRole('button', { name: /Add new instrument/ }).click();
-  const nested = page.getByRole('dialog', { name: 'Add instrument', exact: true });
-  await nested.getByLabel('Instrument name', { exact: true }).fill('INDEPENDENT');
+  await dialog.getByRole('button', { name: /Add new symbol/ }).click();
+  const nested = page.getByRole('dialog', { name: 'Add symbol', exact: true });
+  await nested.getByLabel('Symbol name', { exact: true }).fill('INDEPENDENT');
   await nested.getByRole('button', { name: 'Save', exact: true }).click();
   await dialog.getByRole('button', { name: 'Close', exact: true }).last().click();
   await page.reload();
   dialog = await open(page);
-  await dialog.getByLabel('Instrument', { exact: true }).selectOption('INDEPENDENT');
+  await dialog.getByLabel('Symbol', { exact: true }).selectOption('INDEPENDENT');
   await dialog.getByLabel('Data symbol name', { exact: true }).fill('AUDUSD');
   await dialog.getByRole('button', { name: 'Save', exact: true }).click();
   await page.getByRole('button', { name: 'Dukascopy data', exact: true }).click();

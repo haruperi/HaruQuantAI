@@ -41,7 +41,7 @@ pilot composition remains documented in its original task walkthrough.
 - `module.ts` contributes existing provider commands to the Common ribbon.
   Child modules export commands and screens consumed by Data Manager.
 - `add/addPopup.tsx` composes the catalogue view and
-  `add/selectInstrumentsPopup.tsx`; `add/addPopupCtrl.ts` owns their shared state.
+  `add/selectSymbolsPopup.tsx`; `add/addPopupCtrl.ts` owns their shared state.
 - `import/importPopup.tsx` composes the form, import-local CDN presentation and
   a file-local fast-download confirmation; `import/importPopupCtrl.ts` owns
   form/navigation state.

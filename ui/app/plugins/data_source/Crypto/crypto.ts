@@ -45,7 +45,7 @@ export function validateCryptoName(name: string, existing: string[]): void {
 }
 
 export interface CryptoDefinition {
-  id: string; symbol: string; underlying: string; instrument: string; source: 'Crypto';
+  id: string; symbol: string; underlying: string; symbolDefinition: string; source: 'Crypto';
   exchange: CryptoExchangeId; timeframe: string; broker: '-1'; brokerName: '—'; timezone: 'UTC';
   category: 'Crypto'; barType: 'start'; from: string; to: string; bars: number; sourceDataId?: string;
 }
@@ -59,7 +59,7 @@ export function cryptoDefinitions(exchangeId: CryptoExchangeId, symbols: string[
   return symbols.map(symbol => {
     if (!exchange.symbols.some(item => item.symbol === symbol)) throw new Error('Unknown Crypto symbol.');
     const name = symbol + postfix; validateCryptoName(name, names); names.push(name);
-    return { id: `crypto:${exchangeId}:${name}`, symbol: name, underlying: symbol, instrument: symbol,
+    return { id: `crypto:${exchangeId}:${name}`, symbol: name, underlying: symbol, symbolDefinition: symbol,
       source: 'Crypto', exchange: exchangeId, timeframe, broker: '-1', brokerName: '—', timezone: 'UTC',
       category: 'Crypto', barType: 'start', from: '', to: '', bars: 0 };
   });

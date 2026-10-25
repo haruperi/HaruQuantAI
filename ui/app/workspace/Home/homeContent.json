@@ -8,7 +8,7 @@
     { "id": "projects", "label": "Open Projects" }
   ],
   "tutorials": [
-    { "id": "prepare", "title": "1. Prepare your inputs", "summary": "Start with a clearly defined market and timeframe.", "body": "Open Data Manager to inspect available datasets and their date ranges. Review gaps, timezones and instrument specifications before using data in research. An empty catalog needs data preparation first.", "workspace": "datamanager" },
+    { "id": "prepare", "title": "1. Prepare your inputs", "summary": "Start with a clearly defined market and timeframe.", "body": "Open Data Manager to inspect available datasets and their date ranges. Review gaps, timezones and symbol specifications before using data in research. An empty catalog needs data preparation first.", "workspace": "datamanager" },
     { "id": "develop", "title": "2. Describe your idea", "summary": "Make entry, exit and sizing rules explicit.", "body": "Use AlgoWizard to describe a strategy. Record the assumptions behind each rule and the dataset it needs. A workspace preview does not establish that a strategy has been executed or tested.", "workspace": "algowizard" },
     { "id": "review", "title": "3. Review the evidence", "summary": "Separate a promising idea from a verified result.", "body": "Before accepting results, check the input data, costs, test period and any excluded observations. Compare performance across independent periods. Only treat an operation as complete when its owning workspace reports a real result.", "workspace": "retester" }
   ],

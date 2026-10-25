@@ -1,11 +1,12 @@
+import { createSymbolDataClient } from '../../Common/symbolContract';
 /** Confirmed host transport for broker profiles, stocks and JSON catalog imports. */
-import { createDomainClient, type DomainClient } from '../../../../host/transport';
+import {type DomainClient } from '../../../../host/transport';
 import { validateBroker, type BrokerProfile } from './brokerProfiles';
 
 export interface RemoteBrokerRecord {
   id: string; name: string; description: string; timezone: string; postfix: string;
   stockpicker_use: boolean; mt_use: boolean; is_system: boolean; stocks: string[];
-  customized_stocks: number; total_instruments: number; total_sessions: number;
+  customized_stocks: number; total_symbols: number; total_sessions: number;
   spread_model: NonNullable<BrokerProfile['spreadModel']>;
   commission_model: NonNullable<BrokerProfile['commissionModel']>;
 }
@@ -13,7 +14,7 @@ export interface BrokerImportResult {
   broker_id: string; imported_count: number; created_count: number; updated_count: number;
   records: Array<Record<string, unknown>>; failed: Array<{name: string; reason: string}>; unattempted: string[];
 }
-let client: DomainClient = createDomainClient('/data');
+let client: DomainClient = createSymbolDataClient('/data');
 export function setBrokerApiClient(value: DomainClient): void { client = value; }
 function id(value: string | number): string {
   const text = String(value);
@@ -25,14 +26,14 @@ export function toBrokerProfile(record: RemoteBrokerRecord): BrokerProfile {
     typeof record.name !== 'string' || typeof record.description !== 'string' || typeof record.timezone !== 'string' ||
     typeof record.postfix !== 'string' || [record.stockpicker_use, record.mt_use, record.is_system].some(value => typeof value !== 'boolean') ||
     !Array.isArray(record.stocks) || record.stocks.some(stock => typeof stock !== 'string' || !stock.trim()) ||
-    [record.customized_stocks, record.total_instruments, record.total_sessions].some(value => !Number.isSafeInteger(value) || value < 0) ||
+    [record.customized_stocks, record.total_symbols, record.total_sessions].some(value => !Number.isSafeInteger(value) || value < 0) ||
     record.customized_stocks !== record.stocks.length || !record.spread_model || !record.commission_model) {
     throw new Error('The host returned an invalid broker profile.');
   }
   return validateBroker({id: record.id, name: record.name, desc: record.description, timezone: record.timezone,
     postfix: record.postfix, mtUse: record.mt_use, stockPickerUse: record.stockpicker_use, system: record.is_system,
-    stocks: [...record.stocks], instruments: [], spreadModel: record.spread_model, commissionModel: record.commission_model,
-    instrumentCount: record.total_instruments, sessionCount: record.total_sessions}, []);
+    stocks: [...record.stocks], symbols: [], spreadModel: record.spread_model, commissionModel: record.commission_model,
+    symbolCount: record.total_symbols, sessionCount: record.total_sessions}, []);
 }
 export async function fetchBrokers(): Promise<BrokerProfile[]> {
   const records = await client.get<RemoteBrokerRecord[]>('/brokers');
@@ -69,18 +70,18 @@ export async function saveBrokerStocks(value: string | number, stocks: string[])
   return result.stocks;
 }
 export async function importBrokerRecords(
-  kind: 'instrument' | 'session', brokerId: string, records: Array<Record<string, unknown>>,
+  kind: 'symbolDefinition' | 'session', brokerId: string, records: Array<Record<string, unknown>>,
   options: {selected_names: string[]; postfix: string; conflict_policy: 'error' | 'overwrite'; use_profile_costs: boolean},
 ): Promise<BrokerImportResult> {
   const target = ['-1','0'].includes(brokerId) ? '-1' : id(brokerId);
-  const plural = kind === 'instrument' ? 'instruments' : 'sessions';
+  const plural = kind === 'symbolDefinition' ? 'symbols' : 'sessions';
   const result = await client.post<BrokerImportResult>(`/brokers/${target}/import-${plural}`, {version: 1, kind: plural, [plural]: records, options});
   if (!result || result.broker_id !== target || !Array.isArray(result.records) || !Array.isArray(result.failed) || !Array.isArray(result.unattempted) ||
     [result.imported_count, result.created_count, result.updated_count].some(value => !Number.isSafeInteger(value) || value < 0) ||
     result.imported_count !== result.records.length || result.imported_count !== result.created_count + result.updated_count ||
     result.imported_count + result.failed.length + result.unattempted.length !== options.selected_names.length ||
     result.failed.some(row => !row || typeof row.name !== 'string' || typeof row.reason !== 'string') || result.unattempted.some(name => typeof name !== 'string')) throw new Error('The host returned an invalid import result. Refresh catalogs before retrying.');
-  const field = kind === 'instrument' ? 'symbol' : 'name';
+  const field = kind === 'symbolDefinition' ? 'symbol' : 'name';
   const expected = new Set(options.selected_names.map(name => name + options.postfix));
   const reported = [...result.records.map(row => row?.[field]),...result.failed.map(row => row.name),...result.unattempted];
   if (result.records.some(row => !row || typeof row.id !== 'string' || !/^[1-9]\d*$/.test(row.id) || String(row.broker_id) !== target) ||

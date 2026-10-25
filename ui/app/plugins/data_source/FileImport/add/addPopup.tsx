@@ -1,5 +1,5 @@
 import { Button, Field, Modal, TextInput } from '../../../../components/ui';
-import { commissionModels, dataTypes, days, defaultCommission, newInstrument, type CommissionModel, type Swap } from '../fileSymbols';
+import { commissionModels, dataTypes, days, defaultCommission, newSymbol, type CommissionModel, type Swap } from '../fileSymbols';
 import { useFilesAdd, type AddPopupProps } from './DataSourceFilesAddCtrl';
 import '../styles.css';
 
@@ -24,14 +24,14 @@ export function AddPopup(props: AddPopupProps) {
   const { file, all, brokers, page, setPage, symbol, setSymbol, barType, setBarType, broker, setBroker, selected, draft, setDraft, swapDraft, setSwapDraft, error, setError, container, shown, choices, back, choose, help, save } = useFilesAdd(props);
   function numberField(key: typeof numericFields[number][0], label: string, min: number, step: number) {
     const adjustedStep = key === 'tickSize' || key === 'tickStep' ? shown?.type === 'Stock' ? 0.01 : shown?.type === 'Futures' ? 0.1 : step : step;
-    return <Field key={key} label={label}><TextInput disabled={page !== 'instrument'} type="number" min={min} step={adjustedStep} value={shown?.[key] ?? ''} onChange={event => setDraft({ ...draft, [key]: event.target.valueAsNumber })}/></Field>;
+    return <Field key={key} label={label}><TextInput disabled={page !== 'symbolDefinition'} type="number" min={min} step={adjustedStep} value={shown?.[key] ?? ''} onChange={event => setDraft({ ...draft, [key]: event.target.valueAsNumber })}/></Field>;
   }
   return <div className={`file-symbol-flow ${mass ? "file-import-flow" : ""}`} ref={container} onKeyDown={event => {
     if (event.key !== 'Tab') return;
     const controls = Array.from(container.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),select:not(:disabled)') ?? []);
     if (event.shiftKey && document.activeElement === controls[0]) { event.preventDefault(); controls.at(-1)?.focus(); }
     else if (!event.shiftKey && document.activeElement === controls.at(-1)) { event.preventDefault(); controls[0]?.focus(); }
-  }}><Modal key={page} title={page === 'help' ? 'Commission & Swap Explanation' : page === 'instrument' ? 'Add instrument' : mass ? 'Mass import' : 'Add symbol'} onClose={back} width={page === 'help' ? 800 : mass ? 990 : 700} footer={<><Button onClick={back}>Close</Button>{page !== 'help' && <Button className="primary" disabled={mass?.busy} onClick={save}>{mass?.busy ? "Reading…" : "Save"}</Button>}</>}>
+  }}><Modal key={page} title={page === 'help' ? 'Commission & Swap Explanation' : page === 'symbolDefinition' ? 'Add symbol' : mass ? 'Mass import' : 'Add symbol'} onClose={back} width={page === 'help' ? 800 : mass ? 990 : 700} footer={<><Button onClick={back}>Close</Button>{page !== 'help' && <Button className="primary" disabled={mass?.busy} onClick={save}>{mass?.busy ? "Reading…" : "Save"}</Button>}</>}>
     {(error || file.storageError) && <p role="alert" className="file-symbol-error">{error || file.storageError}</p>}
     {page === 'help' ? <div className="file-symbol-help"><p>In MetaTrader 4 and 5, a swap is the interest rate charged or paid for holding a trading position overnight. If the interest rate on the currency you are buying is higher than the interest rate on the currency you are selling, you will earn a positive swap. If the interest rate on the currency you are buying is lower than the interest rate on the currency you are selling, you will incur a negative swap. The swap rate varies depending on the currency pair and broker. It can affect your trading profitability, so it's important to be aware of the swap rates for the currency pairs you trade.</p><p>Positive swap: If you are long on the AUD/JPY currency pair and the interest rate on the Australian dollar is higher than the interest rate on the Japanese yen, you will earn a positive swap. This means that you will receive a small amount of money in your trading account for holding the position overnight.</p><p>Negative swap: If you are short on the EUR/USD currency pair and the interest rate on the euro is lower than the interest rate on the US dollar, you will incur a negative swap. This means that you will have to pay a small amount of money from your trading account for holding the position overnight.</p><p>The swap is calculated on a daily basis at 11pm (Rollover time). If you have any trades that were opened after 11pm, they will not incur any swap charges until the next day's 11pm calculation.</p></div> : <>
       {page === 'symbol' && <>
@@ -41,20 +41,20 @@ export function AddPopup(props: AddPopupProps) {
             <label><input type="radio" name="file-bar-type" checked={barType === 'end'} onChange={() => setBarType('end')}/> Timestamp is end of bar time (NinjaTrader, Tradestation, futures data)</label>
           </div></div>{mass?.postfix}</div>
         </fieldset>
-        <fieldset><legend>Choose instrument</legend><p>Instrument is a specification of this symbol - it contains tick size, point value etc.</p><p>You can have multiple data imported - for example EURUSD_1, EURUSD_2, EURUSD_3, but they share the same instrument specification for EURUSD.</p>
+        <fieldset><legend>Choose symbol</legend><p>Symbol is a specification of this symbol - it contains tick size, point value etc.</p><p>You can have multiple data imported - for example EURUSD_1, EURUSD_2, EURUSD_3, but they share the same symbol specification for EURUSD.</p>
           <div className="file-symbol-chooser"><Field label="Broker profile filter"><select value={broker} onChange={event => { setBroker(event.target.value); choose(all.find(row => !event.target.value || row.broker === event.target.value)?.symbol ?? ''); }}><option value="">All broker profiles</option>{brokers.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select></Field>
-          <Field label="Instrument"><select aria-label="Instrument" value={selected} onChange={event => choose(event.target.value)}>{!choices.length && <option value="">No instruments</option>}{choices.map(row => <option key={row.symbol}>{row.symbol}</option>)}</select></Field>
-          <Button data-add-instrument onClick={() => { setDraft(newInstrument()); setError(''); setPage('instrument'); }}>⊕ Add new instrument</Button></div>
+          <Field label="Symbol"><select aria-label="Symbol" value={selected} onChange={event => choose(event.target.value)}>{!choices.length && <option value="">No symbols</option>}{choices.map(row => <option key={row.symbol}>{row.symbol}</option>)}</select></Field>
+          <Button data-add-symbol onClick={() => { setDraft(newSymbol()); setError(''); setPage('symbolDefinition'); }}>⊕ Add new symbol</Button></div>
         </fieldset>
       </>}
-      <fieldset><legend>Instrument details</legend><div className="file-symbol-grid">
-        <Field label="Broker profile"><select aria-label="Broker profile" disabled={page !== 'instrument'} value={shown?.broker ?? '-1'} onChange={event => setDraft({ ...draft, broker: event.target.value })}>{brokers.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select></Field>
-        <Field label="Instrument name"><TextInput aria-label="Instrument name" disabled={page !== 'instrument'} value={shown?.symbol ?? ''} maxLength={128} onChange={event => setDraft({ ...draft, symbol: event.target.value })}/>{page === 'instrument' && <small>{brokers.find(row => row.id === draft.broker)?.postfix}</small>}</Field>
-        <Field label="Data type"><select aria-label="Data type" disabled={page !== 'instrument'} value={shown?.type ?? 'Forex'} onChange={event => setDraft({ ...draft, type: event.target.value })}>{dataTypes.map(type => <option key={type}>{type}</option>)}</select></Field>
-        <Field label="Description"><TextInput disabled={page !== 'instrument'} value={shown?.name ?? ''} onChange={event => setDraft({ ...draft, name: event.target.value })}/></Field>
+      <fieldset><legend>Symbol details</legend><div className="file-symbol-grid">
+        <Field label="Broker profile"><select aria-label="Broker profile" disabled={page !== 'symbolDefinition'} value={shown?.broker ?? '-1'} onChange={event => setDraft({ ...draft, broker: event.target.value })}>{brokers.map(row => <option value={row.id} key={row.id}>{row.name}</option>)}</select></Field>
+        <Field label="Symbol name"><TextInput aria-label="Symbol name" disabled={page !== 'symbolDefinition'} value={shown?.symbol ?? ''} maxLength={128} onChange={event => setDraft({ ...draft, symbol: event.target.value })}/>{page === 'symbolDefinition' && <small>{brokers.find(row => row.id === draft.broker)?.postfix}</small>}</Field>
+        <Field label="Data type"><select aria-label="Data type" disabled={page !== 'symbolDefinition'} value={shown?.type ?? 'Forex'} onChange={event => setDraft({ ...draft, type: event.target.value })}>{dataTypes.map(type => <option key={type}>{type}</option>)}</select></Field>
+        <Field label="Description"><TextInput disabled={page !== 'symbolDefinition'} value={shown?.name ?? ''} onChange={event => setDraft({ ...draft, name: event.target.value })}/></Field>
         {numericFields.map(([key,label,min,step]) => numberField(key,label,min,step))}
       </div></fieldset>
-      {page === 'instrument' && <fieldset><legend>Default commissions model</legend>
+      {page === 'symbolDefinition' && <fieldset><legend>Default commissions model</legend>
         <Field label="Commission model"><select aria-label="Commission model" value={draft.commission.model} onChange={event => setDraft({ ...draft, commission: defaultCommission(event.target.value as CommissionModel) })}>{commissionModels.map(model => <option key={model}>{model}</option>)}</select></Field>
         {draft.commission.model !== 'None' && <div className="file-symbol-grid">
           <Field label="Commission"><TextInput type="number" min={draft.commission.model === 'Stockpicker' ? 0 : draft.commission.model === 'Percentage based' ? -100 : -100000} max={draft.commission.model === 'Percentage based' ? 100 : 100000} step="any" value={draft.commission.value} onChange={event => setDraft({ ...draft, commission: { ...draft.commission, value: event.target.valueAsNumber } })}/></Field>
@@ -65,7 +65,7 @@ export function AddPopup(props: AddPopupProps) {
           </>}
         </div>}
       </fieldset>}
-      <div data-swap-help><SwapFields value={page === 'instrument' ? draft.swap : swapDraft} onChange={swap => page === 'instrument' ? setDraft({ ...draft, swap }) : setSwapDraft(swap)} onHelp={help}/></div>
+      <div data-swap-help><SwapFields value={page === 'symbolDefinition' ? draft.swap : swapDraft} onChange={swap => page === 'symbolDefinition' ? setDraft({ ...draft, swap }) : setSwapDraft(swap)} onHelp={help}/></div>
     </>}
   </Modal></div>;
 }

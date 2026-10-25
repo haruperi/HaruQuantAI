@@ -2,15 +2,15 @@ import { useSessions } from '../../plugins/data_source/Catalogs/Sessions/session
 import { useState } from 'react';
 import { Button } from '../../components/ui';
 import { brokerCounts, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
-import { type FileInstrument } from '../../plugins/data_source/FileImport/fileSymbols';
+import { type FileSymbol } from '../../plugins/data_source/FileImport/fileSymbols';
 import { type SessionDefinition, type CatalogSession, type SessionBroker } from '../../plugins/data_source/Catalogs/Sessions/sessions';
 import { summarizeGroup, type StockGroupDefinition } from '../../plugins/data_source/Catalogs/StockGroups/stockGroups';
 import { activeExternalLines, externalTypeLabel, externalIndicatorTypes, type ExternalIndicatorDefinition } from '../../plugins/data_source/Indicators/externalIndicators';
 import { useExternalIndicators } from '../../plugins/data_source/Indicators/externalIndicatorsStore';
 import { normalizeRelativePath, useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../../plugins/data_source/Common/dataManagerStore';
 import { useFileSymbols } from '../../plugins/data_source/FileImport/fileSymbolsStore';
-import { commissionInfo, type CatalogInstrument } from '../../plugins/data_source/Catalogs/Instruments/instrumentsApiClient';
-import { useInstruments } from '../../plugins/data_source/Catalogs/Instruments/instrumentsStore';
+import { commissionInfo, type CatalogSymbol } from '../../plugins/data_source/Catalogs/Symbols/symbolsApiClient';
+import { useSymbols } from '../../plugins/data_source/Catalogs/Symbols/symbolsStore';
 import { useFileImports } from '../../plugins/data_source/FileImport/fileImportStore';
 import { useSQData } from '../../plugins/data_source/SQData/sqDataStore';
 import { useDarwinex } from '../../plugins/data_source/Darwinex/darwinexStore';
@@ -21,15 +21,15 @@ import { useDataExports } from '../../plugins/data_source/Export/dataExportStore
 import { useDataTools } from '../../plugins/data_source/Tools/dataToolsStore';
 import { useStockGroups } from '../../plugins/data_source/Catalogs/StockGroups/stockGroupsStore';
 
-export function BrokerProfilesTable({loading,error,profiles,selected,instruments,sessions,onSelect,onEdit}:{loading:boolean;error:string;profiles:BrokerProfile[];selected:string[];instruments:FileInstrument[];sessions:SessionDefinition[];onSelect:(ids:string[])=>void;onEdit:(profile:BrokerProfile)=>void}) {
+export function BrokerProfilesTable({loading,error,profiles,selected,symbols,sessions,onSelect,onEdit}:{loading:boolean;error:string;profiles:BrokerProfile[];selected:string[];symbols:FileSymbol[];sessions:SessionDefinition[];onSelect:(ids:string[])=>void;onEdit:(profile:BrokerProfile)=>void}) {
   const allSelected=profiles.length>0&&profiles.every(row=>selected.includes(row.id));
   return <main className="full dataset-workspace" aria-label="Broker profiles">
     {loading && <p role="status">Loading broker profiles…</p>}{error && <div role="alert" className="broker-error">{error} <Button disabled={loading} onClick={()=>void useDataManagerStore.getState().syncBrokers()}>Retry broker profiles</Button></div>}
     <div className="dataset-grid broker-profiles-grid"><table className="plain-table" aria-label="Broker profiles">
       <colgroup><col style={{ width:26 }}/><col style={{ width:250 }}/><col/><col style={{ width:100 }}/><col style={{ width:100 }}/><col style={{ width:130 }}/><col style={{ width:150 }}/><col style={{ width:140 }}/></colgroup>
       <thead><tr><th><input type="checkbox" aria-label="Select all broker profiles" checked={allSelected} disabled={!profiles.length} onChange={()=>onSelect(allSelected?[]:profiles.map(row=>row.id))}/></th>
-        {['Name', 'Description', 'Postfix', 'Timezone', 'Customized stocks', 'Customized instruments', 'Customized sessions'].map(column => <th key={column}>{column}</th>)}
-      </tr></thead><tbody>{profiles.map(profile=>{const count=brokerCounts(profile,instruments,sessions);return <tr key={profile.id} className={selected.includes(profile.id)?'selected':''} onDoubleClick={()=>onEdit(profile)}><td><input type="checkbox" aria-label={`Select broker ${profile.name}`} checked={selected.includes(profile.id)} onChange={()=>onSelect(selected.includes(profile.id)?selected.filter(id=>id!==profile.id):[...selected,profile.id])}/></td><td>{profile.name}</td><td>{profile.desc}</td><td>{profile.postfix}</td><td>{profile.timezone}</td><td>{count.stocks}</td><td>{count.instruments}</td><td>{count.sessions}</td></tr>;})}{!profiles.length&&<tr><td colSpan={8} className="dataset-empty">{loading ? 'Loading broker profiles…' : error ? 'Broker profiles could not be loaded.' : 'No brokers are defined.'}</td></tr>}</tbody>
+        {['Name', 'Description', 'Postfix', 'Timezone', 'Customized stocks', 'Customized symbols', 'Customized sessions'].map(column => <th key={column}>{column}</th>)}
+      </tr></thead><tbody>{profiles.map(profile=>{const count=brokerCounts(profile,symbols,sessions);return <tr key={profile.id} className={selected.includes(profile.id)?'selected':''} onDoubleClick={()=>onEdit(profile)}><td><input type="checkbox" aria-label={`Select broker ${profile.name}`} checked={selected.includes(profile.id)} onChange={()=>onSelect(selected.includes(profile.id)?selected.filter(id=>id!==profile.id):[...selected,profile.id])}/></td><td>{profile.name}</td><td>{profile.desc}</td><td>{profile.postfix}</td><td>{profile.timezone}</td><td>{count.stocks}</td><td>{count.symbols}</td><td>{count.sessions}</td></tr>;})}{!profiles.length&&<tr><td colSpan={8} className="dataset-empty">{loading ? 'Loading broker profiles…' : error ? 'Broker profiles could not be loaded.' : 'No brokers are defined.'}</td></tr>}</tbody>
     </table></div>
   </main>;
 }
@@ -66,7 +66,7 @@ export function ExternalIndicatorsTable({ rows: allRows, selected, job, onSelect
       <thead><tr><th><input type="checkbox" aria-label="Select all external indicators" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(name => !rows.some(item => item.name === name)) : [...new Set([...selected, ...rows.map(item => item.name)])])}/></th>
         {['Name', 'Values', 'Data type', 'Timeframe', 'Date from', 'Date to', 'Total Days', 'Total Records'].map(column => <th key={column}>{column}</th>)}<th aria-label="Status"/><th aria-label="Row actions"/>
       </tr></thead>
-      <tbody>{rows.map(item => <tr key={item.name} className={selected.includes(item.name) ? 'selected' : ''} onDoubleClick={() => onEdit(item)}><td><input type="checkbox" aria-label={`Select indicator ${item.name}`} checked={selected.includes(item.name)} onChange={() => onSelect(selected.includes(item.name) ? selected.filter(name => name !== item.name) : [...selected, item.name])}/></td><td>{item.name}</td><td>{activeExternalLines(item).length}</td><td>{externalTypeLabel(item.type)}</td><td>{item.timeframe || '—'}</td><td>{item.dateFrom || '—'}</td><td>{item.dateTo || '—'}</td><td>{item.totalDays}</td><td>{item.records.length.toLocaleString()}</td><td className="indicator-status" aria-label={`Status for ${item.name}`}>{job?.indicator === item.name ? job.state === 'completed' ? 'Completed' : `${job.state} ${job.progress}%` : ''}</td><td><button className="instrument-remove" aria-label={`Delete indicator ${item.name}`} onClick={() => onDelete(item)}>×</button></td></tr>)}{!rows.length && <tr><td colSpan={11} className="dataset-empty">No External indicators defined.</td></tr>}</tbody>
+      <tbody>{rows.map(item => <tr key={item.name} className={selected.includes(item.name) ? 'selected' : ''} onDoubleClick={() => onEdit(item)}><td><input type="checkbox" aria-label={`Select indicator ${item.name}`} checked={selected.includes(item.name)} onChange={() => onSelect(selected.includes(item.name) ? selected.filter(name => name !== item.name) : [...selected, item.name])}/></td><td>{item.name}</td><td>{activeExternalLines(item).length}</td><td>{externalTypeLabel(item.type)}</td><td>{item.timeframe || '—'}</td><td>{item.dateFrom || '—'}</td><td>{item.dateTo || '—'}</td><td>{item.totalDays}</td><td>{item.records.length.toLocaleString()}</td><td className="indicator-status" aria-label={`Status for ${item.name}`}>{job?.indicator === item.name ? job.state === 'completed' ? 'Completed' : `${job.state} ${job.progress}%` : ''}</td><td><button className="symbol-remove" aria-label={`Delete indicator ${item.name}`} onClick={() => onDelete(item)}>×</button></td></tr>)}{!rows.length && <tr><td colSpan={11} className="dataset-empty">No External indicators defined.</td></tr>}</tbody>
     </table></div>
   </main>;
 }
@@ -96,53 +96,53 @@ export function SessionTable({ rows:allRows, selected, onSelect, onEdit, onDelet
         <td>{item.name}</td><td>{item.description}</td><td>{item.timezone}</td>
         <td>{item.elements.map((el,index)=><span className="session-calendar-line" key={index}>{el.dayFrom} {el.timeFrom}–{el.dayTo} {el.timeTo}</span>)}</td>
         <td>{item.holidays.map(day=><span className="session-calendar-line" key={day.date_str}>{day.date_str} {day.description}</span>)}</td>
-        <td><button className="instrument-remove" aria-label={`Delete session ${item.name}`} onClick={()=>onDelete(item)}>×</button></td>
+        <td><button className="symbol-remove" aria-label={`Delete session ${item.name}`} onClick={()=>onDelete(item)}>×</button></td>
       </tr>)}{!rows.length && <tr><td colSpan={7} className="dataset-empty">{sessionState.isSyncing ? 'Loading session profiles...' : sessionState.error ? 'Session profiles could not be loaded.' : sessionState.loaded ? 'No matching sessions.' : 'Session profiles have not been loaded.'}</td></tr>}</tbody>
     </table></div>
   </main>;
 }
 
-export function InstrumentTable({ selected, onSelect, onEdit, onRefresh, onDelete, busy }: {
-  onRefresh: () => void; onDelete: (item: CatalogInstrument) => void; busy: boolean;
+export function SymbolTable({ selected, onSelect, onEdit, onRefresh, onDelete, busy }: {
+  onRefresh: () => void; onDelete: (item: CatalogSymbol) => void; busy: boolean;
   selected: string[]; onSelect: (symbols: string[]) => void;
-  onEdit: (item: CatalogInstrument) => void;
+  onEdit: (item: CatalogSymbol) => void;
 }) {
-  const instState = useInstruments();
-  const instruments = instState.instruments;
+  const instState = useSymbols();
+  const symbols = instState.symbols;
   const [query, setQuery] = useState('');
   const [dataType, setDataType] = useState('');
   const [broker, setBroker] = useState('');
   const [descending, setDescending] = useState(false);
-  const rows = instruments.filter(item => (!dataType || item.type === dataType)
+  const rows = symbols.filter(item => (!dataType || item.type === dataType)
     && (!broker || item.broker === broker)
     && (item.symbol + ' ' + item.name).toLowerCase().includes(query.toLowerCase()))
     .sort((a, b) => a.symbol.localeCompare(b.symbol) * (descending ? -1 : 1));
   const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.id));
   const columns = ['Description', 'Broker profile', 'Point value', 'Pip/Tick size', 'Pip/Tick step', 'Default spread', 'Default slippage', 'Commissions', 'Swap', 'Data type', 'Order size mult.', 'Order size step'];
-  return <main className="full dataset-workspace" aria-label="Instruments">
+  return <main className="full dataset-workspace" aria-label="Symbols">
     {instState.error && <p role="alert">{instState.loaded ? 'Showing the last server snapshot. ' : ''}{instState.error}</p>}
-    {instState.isSyncing && <p role="status">Loading instrument catalog…</p>}
+    {instState.isSyncing && <p role="status">Loading symbol catalog…</p>}
     <div className="dataset-filters">
-      <input className="text-input" aria-label="Filter instruments" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
-      <select className="text-input" aria-label="Instrument data type" value={dataType} onChange={event => setDataType(event.target.value)}>
-        <option value="">All data types</option>{[...new Set(instruments.map(item => item.type))].map(type => <option key={type}>{type}</option>)}
+      <input className="text-input" aria-label="Filter symbols" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
+      <select className="text-input" aria-label="Symbol data type" value={dataType} onChange={event => setDataType(event.target.value)}>
+        <option value="">All data types</option>{[...new Set(symbols.map(item => item.type))].map(type => <option key={type}>{type}</option>)}
       </select>
-      <select className="text-input" aria-label="Instrument broker profile" value={broker} onChange={event => setBroker(event.target.value)}><option value="">All broker profiles</option>{[...new Map(instruments.map(item => [item.broker, item.brokerName])).entries()].map(([id, name]) => <option value={id} key={id}>{name}</option>)}</select>
-      <Button disabled={instState.isSyncing || busy} onClick={onRefresh}>Refresh instruments</Button>
+      <select className="text-input" aria-label="Symbol broker profile" value={broker} onChange={event => setBroker(event.target.value)}><option value="">All broker profiles</option>{[...new Map(symbols.map(item => [item.broker, item.brokerName])).entries()].map(([id, name]) => <option value={id} key={id}>{name}</option>)}</select>
+      <Button disabled={instState.isSyncing || busy} onClick={onRefresh}>Refresh symbols</Button>
     </div>
-    <div className="dataset-grid"><table className="plain-table instrument-table" aria-label="Instruments">
+    <div className="dataset-grid"><table className="plain-table symbol-table" aria-label="Symbols">
       <thead><tr>
-        <th><input type="checkbox" aria-label="Select all visible instruments" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(symbol => !rows.some(item => item.id === symbol)) : [...new Set([...selected, ...rows.map(item => item.id)])])}/></th>
-        <th aria-sort={descending ? 'descending' : 'ascending'}><button className="dataset-sort" onClick={() => setDescending(value => !value)}>Instrument <span aria-hidden="true">{descending ? '▾' : '▴'}</span></button></th>
+        <th><input type="checkbox" aria-label="Select all visible symbols" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selected.filter(symbol => !rows.some(item => item.id === symbol)) : [...new Set([...selected, ...rows.map(item => item.id)])])}/></th>
+        <th aria-sort={descending ? 'descending' : 'ascending'}><button className="dataset-sort" onClick={() => setDescending(value => !value)}>Symbol <span aria-hidden="true">{descending ? '▾' : '▴'}</span></button></th>
         {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Row actions"/>
       </tr></thead>
       <tbody>{rows.map(item => { const commission = commissionInfo(item.record.commissions); return <tr key={item.symbol} className={selected.includes(item.id) ? 'selected' : ''} onDoubleClick={() => onEdit(item)}>
-        <td><input type="checkbox" aria-label={`Select instrument ${item.symbol}`} checked={selected.includes(item.id)} onChange={() => onSelect(selected.includes(item.id) ? selected.filter(symbol => symbol !== item.id) : [...selected, item.id])}/></td>
+        <td><input type="checkbox" aria-label={`Select symbol ${item.symbol}`} checked={selected.includes(item.id)} onChange={() => onSelect(selected.includes(item.id) ? selected.filter(symbol => symbol !== item.id) : [...selected, item.id])}/></td>
         <td><strong>{item.symbol}</strong></td><td title={item.name}>{item.name}</td><td>{item.brokerName}</td>
         <td>{item.pointValue.toLocaleString()}</td><td>{item.tickSize}</td><td>{item.tickStep}</td><td>{item.spread}</td>
         <td>{item.slippage}</td><td title={commission.details}>{commission.summary}</td><td>{item.record.swap_settings === null ? `${item.record.swap_long} / ${item.record.swap_short}` : item.swap.use ? item.swap.type : "None"}</td><td>{item.type}</td><td>{item.multiplier}</td><td>{item.sizeStep}</td>
-        <td><button className="instrument-remove" disabled={busy} aria-label={`Delete instrument ${item.symbol}`} onClick={() => onDelete(item)}>×</button></td>
-      </tr>; })}{!rows.length && <tr><td colSpan={15} className="dataset-empty">No matching instruments.</td></tr>}</tbody>
+        <td><button className="symbol-remove" disabled={busy} aria-label={`Delete symbol ${item.symbol}`} onClick={() => onDelete(item)}>×</button></td>
+      </tr>; })}{!rows.length && <tr><td colSpan={15} className="dataset-empty">No matching symbols.</td></tr>}</tbody>
     </table></div>
   </main>;
 }
@@ -195,7 +195,7 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
     && (row.symbol + ' ' + row.source).toLowerCase().includes(query.toLowerCase()))
     .sort((a, b) => a.symbol.localeCompare(b.symbol) * (descending ? -1 : 1));
   const allSelected = rows.length > 0 && rows.every(row => selectedIds.includes(row.id));
-  const columns = ['Instrument', 'Broker profile', 'Underlying Symbol', 'Timeframe', 'Timezone',
+  const columns = ['Symbol', 'Broker profile', 'Underlying Symbol', 'Timeframe', 'Timezone',
     'Date from', 'Date to', 'Total Days', 'Total Records', 'Source', 'Bar type', 'Data type', 'Path'];
   return <main className="full dataset-workspace" aria-label="Historical data" aria-busy={catalogLoading}>
     <div className="dataset-filters">
@@ -241,12 +241,12 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
         const rowPath = 'path' in row && typeof row.path === 'string' ? normalizeRelativePath(row.path) : '';
         return <tr key={row.id} className={selectedIds.includes(row.id) || activeDatasetId === row.id ? 'selected' : ''}>
           <td><input type="checkbox" aria-label={`Select ${row.symbol}`} checked={selectedIds.includes(row.id)} onChange={() => onToggle(row.id)}/></td>
-          <td><button className="dataset-sort" aria-label={`Preview ${row.symbol} ${row.timeframe}`} onPointerDown={event => { if (event.button === 0) onActivate?.(row.id); }} onClick={event => { if (event.detail === 0) onActivate?.(row.id); }}><strong>{row.symbol}</strong></button></td><td>{row.instrument}</td><td>{row.brokerName}</td><td>{row.underlying}</td>
+          <td><button className="dataset-sort" aria-label={`Preview ${row.symbol} ${row.timeframe}`} onPointerDown={event => { if (event.button === 0) onActivate?.(row.id); }} onClick={event => { if (event.detail === 0) onActivate?.(row.id); }}><strong>{row.symbol}</strong></button></td><td>{row.symbolDefinition}</td><td>{row.brokerName}</td><td>{row.underlying}</td>
           <td>{row.timeframe}</td><td>{row.timezone}</td><td>{formatDateOnly(row.from)}</td><td>{formatDateOnly(row.to)}</td><td>{days.toLocaleString()}</td>
           <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row && (row.barType === "end" || row.barType === "End of bar") ? "End of bar" : "Start of bar"}</td><td>{row.category}</td>
           <td title={rowPath || '—'}>{rowPath || '—'}</td>
           <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : ''}</td>
-          <td style={{ textAlign: 'center' }}><button className="instrument-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
+          <td style={{ textAlign: 'center' }}><button className="symbol-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
         </tr>;
       })}{!rows.length && <tr><td colSpan={17} className="dataset-empty">{catalogLoading ? 'Loading saved dataset catalog…' : catalogError ? 'Saved dataset catalog unavailable.' : allDatasets.length ? 'No matching data.' : 'No saved datasets found in catalog.'}</td></tr>}</tbody>
     </table></div>

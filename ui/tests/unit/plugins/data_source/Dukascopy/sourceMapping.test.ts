@@ -53,7 +53,7 @@ describe('Dukascopy structural mapping', () => {
   it('rejects collisions, wrong extensions and absolute paths', () => {
     for (const path of [
       'add/addPopup.tsx',
-      'add/selectInstrumentsPopup.ts',
+      'add/selectSymbolsPopup.ts',
       'C:/machine/screen.tsx',
       '../screen.tsx',
     ]) {

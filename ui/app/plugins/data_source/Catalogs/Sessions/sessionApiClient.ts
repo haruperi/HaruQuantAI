@@ -1,5 +1,6 @@
+import { createSymbolDataClient } from '../../Common/symbolContract';
 /** Confirmed session profile transport; calendar fields round-trip unchanged. */
-import { createDomainClient, type DomainClient } from '../../../../host/transport';
+import {type DomainClient } from '../../../../host/transport';
 import { sessionDays, validateIntervals, type CatalogSession, type SessionDefinition, type SessionElement, type SessionHoliday } from './sessions';
 
 export interface RemoteSessionWindow {
@@ -12,7 +13,7 @@ export interface RemoteSessionDefinition {
 }
 export interface NtTemplateInfo { folder: string; exists: boolean; templates: string[]; count: number }
 export interface NtImportResult { imported: string[]; skipped: string[]; failed: Array<{ template: string; reason: string }>; dropped_holidays: number; dropped_partial_holidays: number; success: string }
-let client: DomainClient = createDomainClient('/data');
+let client: DomainClient = createSymbolDataClient('/data');
 export function setSessionApiClient(value: DomainClient): void { client = value; }
 
 export function toSessionDefinition(record: RemoteSessionDefinition): CatalogSession {

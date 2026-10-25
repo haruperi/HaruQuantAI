@@ -295,7 +295,7 @@ Timeframe selection determines holding period, trade frequency, and strategy cha
 **Best for**
 
 - Full-time traders
-- Scalping, momentum, and mean-reversion setups in liquid instruments
+- Scalping, momentum, and mean-reversion setups in liquid symbols
 - Pattern-based intraday systems
 
 ### 2-8 hour bars
@@ -429,7 +429,7 @@ Liquidity considerations are critical for execution quality and slippage managem
 
 - Target high average volume for minimal slippage
 - Position size should be &lt; 1% of an average 1-minute bar's volume
-- Trade during active times (for example, the first and last hour) and avoid illiquid instruments or sessions
+- Trade during active times (for example, the first and last hour) and avoid illiquid symbols or sessions
 - Test assumed slippage in a live environment
 
 **Minimum standards**

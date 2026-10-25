@@ -44,7 +44,7 @@ test('standalone disclaimer keeps content, Escape and launcher focus across them
   }
 });
 
-test('instrument mapping Back preserves add draft and selection', async ({ page }) => {
+test('symbol mapping Back preserves add draft and selection', async ({ page }) => {
   await page.addInitScript(() =>
     localStorage.setItem(
       'sqx-data-manager-v1',
@@ -58,7 +58,7 @@ test('instrument mapping Back preserves add draft and selection', async ({ page 
             postfix: '_P',
             timezone: 'UTC',
             mtUse: true,
-            instruments: [],
+            symbols: [],
           },
         ],
       }),

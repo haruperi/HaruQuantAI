@@ -96,7 +96,7 @@
       "relation": "UI counterpart by relative filename; behavior independently reimplemented",
       "access_date": "2026-10-06",
       "sha256": "85792926db77b20b8e0ce3f8c214bbe0224024f16610d4a806e5294747e11316",
-      "target": "add/selectInstrumentsPopup.tsx",
+      "target": "add/selectSymbolsPopup.tsx",
       "classification": "counterpart",
       "limitation": "Filename/responsibility mapping does not establish SQX behavioral parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
       "reinspection": {

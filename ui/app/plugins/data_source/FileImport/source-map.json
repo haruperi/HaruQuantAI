@@ -347,7 +347,7 @@
     },
     {
       "path": "fileSymbolsStore.ts",
-      "reason": "Existing shared symbol/instrument persistence capability, retained unchanged."
+      "reason": "Existing shared symbol/symbol persistence capability, retained unchanged."
     },
     {
       "path": "fileImport.ts",

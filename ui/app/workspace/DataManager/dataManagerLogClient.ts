@@ -1,3 +1,4 @@
+import { createSymbolDataClient } from '../../plugins/data_source/Common/symbolContract';
 /**
  * Data Manager Log & Operation Tracking Client
  *
@@ -6,12 +7,9 @@
  * endpoints (/api/v1/data/logs, /api/v1/data/logs/clear).
  */
 
-import {
-  createDomainClient,
-  getAuthToken,
+import {getAuthToken,
   hostBaseUrl,
-  type TransportConfig,
-} from '../../host/transport';
+  type TransportConfig } from '../../host/transport';
 
 export type DataLogStatus =
   | 'idle'
@@ -85,7 +83,7 @@ export interface DataLogStreamOptions {
 }
 
 function client(config: TransportConfig = {}) {
-  return createDomainClient('/data', config);
+  return createSymbolDataClient('/data', config);
 }
 
 /**

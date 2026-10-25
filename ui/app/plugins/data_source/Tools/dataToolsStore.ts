@@ -1,9 +1,11 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
+import { createSymbolDataClient } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
-import { createDomainClient, type DomainClient } from '../../../host/transport';
+import {type DomainClient } from '../../../host/transport';
 import { createCloneDefinitions, validateCloneSettings, validateReviewChange, type CloneDefinition, type CloneSettings, type ReviewMutation, type ReviewRow, type ToolJobState, type ToolTarget } from './dataTools';
 
-let dataClient = createDomainClient('/data');
+let dataClient = createSymbolDataClient('/data');
 
 export function setDataClient(client: DomainClient): void {
   dataClient = client;
@@ -41,7 +43,7 @@ function validateSaved(value: Saved): void {
 
 export const useDataTools = create<Store>((set, get) => {
   let initial: Saved = structuredClone(defaults); let storageError = '';
-  try { const raw = localStorage.getItem(storageKey); if (raw) { const value = normalizeLegacyBranding(JSON.parse(raw)); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
+  try { const raw = localStorage.getItem(storageKey); if (raw) { const value = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw))); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
   catch { storageError = 'Saved Tools state could not be read. Existing storage is preserved.'; }
   function persist(patch: Partial<Saved>): void {
     if (get().storageError) throw new Error(get().storageError);

@@ -7,7 +7,7 @@ import { AddPopup } from '../../../../../app/plugins/data_source/Darwinex/add/mo
 import { ImportPopup } from '../../../../../app/plugins/data_source/Darwinex/import/module';
 import { DownloadPopup } from '../../../../../app/plugins/data_source/Darwinex/download/module';
 import { DarwinexConsent, DarwinexDisclaimerPopup, useDarwinexDisclaimer } from '../../../../../app/plugins/data_source/Darwinex/disclaimer/module';
-import { SelectInstrumentsPopup } from '../../../../../app/plugins/data_source/Darwinex/add/selectInstrumentsPopup';
+import { SelectSymbolsPopup } from '../../../../../app/plugins/data_source/Darwinex/add/selectSymbolsPopup';
 const prefix = '../../../../../app/plugins/data_source/Darwinex/';
 const rawFiles = import.meta.glob('../../../../../app/plugins/data_source/Darwinex/**/*', {
   eager: true,
@@ -73,7 +73,7 @@ describe('Darwinex structural mapping', () => {
       'darwinex-import',
       'darwinex-download',
     ]);
-    for (const component of [AddPopup, ImportPopup, DownloadPopup, SelectInstrumentsPopup, DarwinexConsent, DarwinexDisclaimerPopup, useDarwinexDisclaimer])
+    for (const component of [AddPopup, ImportPopup, DownloadPopup, SelectSymbolsPopup, DarwinexConsent, DarwinexDisclaimerPopup, useDarwinexDisclaimer])
       expect(component).toBeTypeOf('function');
   });
 });

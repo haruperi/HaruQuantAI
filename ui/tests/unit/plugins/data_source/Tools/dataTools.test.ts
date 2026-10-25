@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { analyzeQuality, applyReviewMutation, availableReviewTimeframes, createCloneDefinitions, generateReviewRows, reviewKey, selectCloneTargets, selectReviewTarget, validateReviewChange, type CloneSettings, type ToolTarget } from '../../../../../app/plugins/data_source/Tools/dataTools';
 
-const target: ToolTarget = { id:'d1', symbol:'EURUSD', instrument:'EURUSD', source:'Dukascopy', timeframe:'M1 → H1', timezone:'UTC', from:'2025-01-01', to:'2025-12-31', bars:5000, category:'Forex' };
+const target: ToolTarget = { id:'d1', symbol:'EURUSD', symbolDefinition:'EURUSD', source:'Dukascopy', timeframe:'M1 → H1', timezone:'UTC', from:'2025-01-01', to:'2025-12-31', bars:5000, category:'Forex' };
 const settings: CloneSettings = { postfix:'_{timeframe}_{cloneTime}', timezoneType:'shift', shiftHours:5, timezone:'UTC', removeWeekends:false };
 
 describe('Data Tools contracts', () => {

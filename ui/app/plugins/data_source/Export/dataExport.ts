@@ -6,7 +6,7 @@ export type ExportJobState = 'running' | 'paused' | 'cancelled' | 'completed' | 
 export interface ExportTarget {
   id: string;
   symbol: string;
-  instrument: string;
+  symbolDefinition: string;
   source: string;
   timeframe: string;
   timezone: string;

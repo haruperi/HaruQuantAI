@@ -16,7 +16,7 @@ describe('HaruQuantAI grid test workspace', () => {
 
   it('keeps every row consistent with the column model', () => {
     const rows = buildGridTestRows(24);
-    expect(GRID_TEST_COLUMNS).toEqual(['Row', 'Instrument', 'Session', 'Bid', 'Ask', 'Spread', 'Tick #', 'Status']);
+    expect(GRID_TEST_COLUMNS).toEqual(['Row', 'Symbol', 'Session', 'Bid', 'Ask', 'Spread', 'Tick #', 'Status']);
     expect(rows.map(row => row.row)).toEqual(Array.from({ length: 24 }, (_, index) => index + 1));
     for (const row of rows) {
       expect(row.bid).toBeGreaterThanOrEqual(1);

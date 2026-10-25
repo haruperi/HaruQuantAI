@@ -16,7 +16,7 @@ Success in trading requires distinguishing between market myths and evidence-bas
 ### Dispose of All Myths
 - **Myth**: You need to watch charts all day long on multiple monitors, looking for opportunities to trade
 **Reality**: There is no evidence to support this, personally I have actually made more money from trading without looking at the charts.
-- **Myth**: Forecasting the future price of financial instruments is important to be a profitable trader.
+- **Myth**: Forecasting the future price of financial symbols is important to be a profitable trader.
 **Reality**: This is a major misconception. No one can consistently and accurately predict the future. Profitable trading is not about prediction; it's about probability and risk management. Successful traders use a system that gives them a statistical "edge" over many trades. They know they will be wrong often, but they manage their risk so that their winning trades are (on average) larger than their losing trades.
 - **Myth**: Trading is like gambling with huge luck swings.
 **Reality**: Trading without a plan, a strategy, and risk management is gambling. However, professional trading is a business of probabilities. While luck affects any single trade, a successful trader relies on a tested strategy that has a positive expectancy over the long run. A gambler has a negative expectancy (the house always wins); a skilled trader aims for a positive one.
@@ -48,7 +48,7 @@ Systematic, algorithmic trading in a diversified portfolio is the most reliable 
 
 ### Why Algorithmic Trading
 - **Speed and Accuracy**: Computers can calculate and execute trades in a fraction of a second, significantly faster and more accurately than humans, reducing errors.
-- **Diversification**: Since computers handle all monitoring and calculations, you can trade hundreds of strategies across various instruments, diversifying your portfolio more effectively.
+- **Diversification**: Since computers handle all monitoring and calculations, you can trade hundreds of strategies across various symbols, diversifying your portfolio more effectively.
 - **No Emotions**: Algorithmic trading eliminates emotional biases like fear, greed, or fear of missing out, as the computer strictly follows the predefined rules.
 - **Time Saving**: Once strategies are developed, tested, and deployed, the computer performs the trading, freeing up your time.
 - **Backtesting**: Allows you to test trading ideas faster against historical data to eliminate unprofitable strategies before risking real capital.
@@ -100,7 +100,7 @@ For a given win rate (W), average win (AW), and average loss (AL), the risk of r
 - Maintain positive expectancy (expected value > 0)
 - Use catastrophic stops to prevent single-trade disasters
 - Keep 6-12 months of living expenses separate from trading capital
-- Start with adequate capital for your instrument (discussed more later)
+- Start with adequate capital for your symbol (discussed more later)
 
 ## Trading is a Business
 Treat trading as a professional business with proper planning, infrastructure, record-keeping, and continuous improvement processes, not just a hobby.

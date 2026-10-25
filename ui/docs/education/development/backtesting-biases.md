@@ -15,11 +15,11 @@ Backtests only matter when they mirror live-trading reality. The following biase
 
 ### Survivorship bias
 
-**Definition:** Testing only on instruments that still exist today (survivors) while excluding delisted or bankrupt names.
+**Definition:** Testing only on symbols that still exist today (survivors) while excluding delisted or bankrupt names.
 **Impact:** Inflates returns by 1‑5% annually, especially on small-cap equity universes.
 **Mitigations:**
 - Use survivorship-bias-free data (Norgate, CRSP) that includes delisted tickers.
-- Focus on indices/futures where the instrument itself survives.
+- Focus on indices/futures where the symbol itself survives.
 - Account for bankruptcy risk via wider stops, diversification, and haircutting results by 1‑3% if you cannot obtain bias-free data.
 
 ### Data-snooping bias

@@ -41,7 +41,7 @@ The in-sample (IS) period is where optimization occurs. Good IS results are requ
 
 **Target metrics**
 
-- Net profit: Meaningful for the instrument class (for example, &gt;$50k on futures).
+- Net profit: Meaningful for the symbol class (for example, &gt;$50k on futures).
 - Profit factor: &gt;1.5 minimum, &gt;2.0 preferred.
 - Sharpe ratio: &gt;0.8 minimum, &gt;1.2 preferred.
 - Win rate: 45‑70% depending on style.
@@ -162,4 +162,4 @@ After ranking, remove redundant strategies so the portfolio reflects true divers
 
 - Average pairwise correlation below 0.3.
 - No strategy pair above 0.7 correlation.
-- Blend styles (trend following, mean reversion, breakout), timeframes (intraday, daily, weekly), and instruments (equities, futures, forex) to spread risk.
+- Blend styles (trend following, mean reversion, breakout), timeframes (intraday, daily, weekly), and symbols (equities, futures, forex) to spread risk.

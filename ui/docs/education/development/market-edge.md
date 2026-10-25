@@ -423,7 +423,7 @@ Market Neutral: Long and short positions balanced. Remove market directional ris
 
 ## Statistical Arbitrage
 
-Exploiting temporary pricing inefficiencies between related instruments.
+Exploiting temporary pricing inefficiencies between related symbols.
 Examples:
 Pairs Trading: Long underperformer, short outperformer in correlated pair (e.g., Coke vs Pepsi)
 Index Arbitrage: Exploit pricing differences between index and constituent stocks
@@ -440,7 +440,7 @@ Ultra-low latency infrastructure
 Sophisticated risk management
 Inventory management systems
 Large capital requirements
-Reality: Domain of professionals with institutional resources. Not viable for retail traders in most markets. Some opportunities in crypto or very illiquid instruments but high risk.
+Reality: Domain of professionals with institutional resources. Not viable for retail traders in most markets. Some opportunities in crypto or very illiquid symbols but high risk.
 
 ## Volatility Trading
 

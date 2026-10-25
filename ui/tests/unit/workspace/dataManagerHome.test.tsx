@@ -47,7 +47,7 @@ describe('DataManagerHome component and store wiring', () => {
 
     expect(html).toContain('Total Datasets');
     expect(html).toContain('Historical Bars (M1/Ticks)');
-    expect(html).toContain('Instruments');
+    expect(html).toContain('Symbols');
     expect(html).toContain('Trading Sessions');
     expect(html).toContain('Active Providers');
     expect(html).toContain('Custom Baskets');
@@ -58,7 +58,7 @@ describe('DataManagerHome component and store wiring', () => {
 
     expect(html).toContain('Import Market Data');
     expect(html).toContain('Download Online Data');
-    expect(html).toContain('Configure Instruments');
+    expect(html).toContain('Configure Symbols');
     expect(html).toContain('Trading Sessions');
   });
 
@@ -66,7 +66,7 @@ describe('DataManagerHome component and store wiring', () => {
     const html = renderToString(<DataManagerHome />);
 
     expect(html).toContain('Symbol Name');
-    expect(html).toContain('Instrument');
+    expect(html).toContain('Symbol');
     expect(html).toContain('Broker profile');
     expect(html).toContain('Underlying Symbol');
     expect(html).toContain('Timeframe');
@@ -98,7 +98,7 @@ describe('DataManagerHome component and store wiring', () => {
           total_records: 125000,
           broker_name: 'Dukascopy Broker',
           underlying: 'EUR/USD Spot',
-          instrument: 'EURUSD.fx',
+          symbolDefinition: 'EURUSD.fx',
           path: 'data/history/dukascopy/EURUSD/M1.parquet',
           bar_type: 'end',
         },
@@ -130,7 +130,7 @@ describe('DataManagerHome component and store wiring', () => {
       totalDays: 90,
       brokerName: 'Dukascopy Broker',
       underlying: 'EUR/USD Spot',
-      instrument: 'EURUSD.fx',
+      symbolDefinition: 'EURUSD.fx',
       path: 'data/history/dukascopy/EURUSD/M1.parquet',
       barType: 'end',
     });
@@ -146,7 +146,7 @@ describe('DataManagerHome component and store wiring', () => {
       source: 'dukascopy',
       symbol: 'EURUSD',
       underlying: 'EURUSD',
-      instrument: 'EURUSD',
+      symbolDefinition: 'EURUSD',
       timeframe: 'M1',
       broker: 'Dukascopy',
       brokerName: 'Dukascopy',
@@ -275,7 +275,7 @@ describe('DataManagerHome component and store wiring', () => {
       source: 'test',
       symbol: 'TESTSYM',
       underlying: 'TESTSYM',
-      instrument: 'TESTSYM',
+      symbolDefinition: 'TESTSYM',
       timeframe: 'M1',
       broker: 'default',
       brokerName: 'Default',
@@ -343,7 +343,7 @@ describe('DataManagerHome component and store wiring', () => {
       source: 'Equity',
       symbol: 'AAPL',
       underlying: 'AAPL',
-      instrument: 'AAPL',
+      symbolDefinition: 'AAPL',
       timeframe: 'D1',
       broker: '1',
       brokerName: 'XTB',
@@ -412,7 +412,7 @@ describe('DataManagerHome component and store wiring', () => {
         stockPickerUse: true,
         system: false,
         stocks: ['AAPL', 'MSFT'],
-        instruments: [],
+        symbols: [],
       }],
       brokerJob: {
         brokerIds: ['1'],

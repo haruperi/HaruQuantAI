@@ -32,7 +32,7 @@ test('shell, primary modules and settings dialogs expose HaruQuantAI branding', 
 test('legacy browser data is normalized before it is shown', async ({ page }) => {
   await page.evaluate(() => localStorage.setItem('sqx-data-manager-v1', JSON.stringify({
     version: 2,
-    definitions: [{ id: 'legacy:1', source: 'SQ Futures', symbol: 'LEGACY', underlying: 'LEGACY', instrument: 'LEGACY', timeframe: 'M1', broker: '-1', brokerName: 'SQ default', timezone: 'UTC', category: 'Futures', from: '', to: '', bars: 0 }],
+    definitions: [{ id: 'legacy:1', source: 'SQ Futures', symbol: 'LEGACY', underlying: 'LEGACY', symbolDefinition: 'LEGACY', timeframe: 'M1', broker: '-1', brokerName: 'SQ default', timezone: 'UTC', category: 'Futures', from: '', to: '', bars: 0 }],
     brokers: [],
     brokerJob: null,
   })));

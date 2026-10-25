@@ -55,7 +55,7 @@ test('errors, ignore invalid lines, stop and quota failures do not claim success
   await page.getByRole('button', { name: 'Start Import', exact: true }).click(); await expect(page.getByRole('dialog').getByRole('alert')).toContainText('Unable to save');
 });
 
-test('folder imports, instrument reuse, stock group, skip, numbered copy and overwrite', async ({ page }) => {
+test('folder imports, symbol reuse, stock group, skip, numbered copy and overwrite', async ({ page }) => {
   const folder = await mkdtemp(join(tmpdir(), 'haru-import-'));
   try {
     await writeFile(join(folder, 'ALPHA.csv'), '18092026,1,3,0,2,4\n19092026,2,4,1,3,5');
@@ -67,8 +67,8 @@ test('folder imports, instrument reuse, stock group, skip, numbered copy and ove
     await dialog.getByLabel('Choose source folder').setInputFiles(folder);
     await dialog.getByRole('checkbox', { name: 'Create a new stockgroup from imported symbols' }).check();
     await dialog.getByLabel('Data postfix').fill('_file');
-    await dialog.getByRole('button', { name: /Add new instrument/ }).click(); await page.getByLabel('Instrument name', { exact: true }).fill('FOLDER_INST'); await page.getByRole('dialog').getByRole('button', { name: 'Save', exact: true }).click();
-    await expect(dialog.getByLabel('Instrument', { exact: true })).toHaveValue('FOLDER_INST');
+    await dialog.getByRole('button', { name: /Add new symbol/ }).click(); await page.getByLabel('Symbol name', { exact: true }).fill('FOLDER_INST'); await page.getByRole('dialog').getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(dialog.getByLabel('Symbol', { exact: true })).toHaveValue('FOLDER_INST');
     await dialog.getByRole('button', { name: 'Help', exact: true }).click(); await page.keyboard.press('Escape');
     await dialog.getByLabel('Source data folder').scrollIntoViewIfNeeded();
     await page.screenshot({ path: 'test-results/file-mass-import-dark.png' });

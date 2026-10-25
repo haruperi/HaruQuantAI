@@ -1,7 +1,7 @@
 import { catalogue } from './dukascopy';
 export type DownloadMode = 'standard' | 'cdn' | 'cdn-cn';
 export type Preset = 'sinceLast' | 'sixMonths' | 'year' | 'fiveYears' | 'tenYears' | 'allTime' | 'custom';
-export interface DownloadTarget { id: string; symbol: string; source: string; underlying?: string; instrument?: string; timeframe: string; from: string; to: string; bars: number; sourceDataId?: string; fastDownloadAvailable?: boolean }
+export interface DownloadTarget { id: string; symbol: string; source: string; underlying?: string; symbolDefinition?: string; timeframe: string; from: string; to: string; bars: number; sourceDataId?: string; fastDownloadAvailable?: boolean }
 export interface DownloadRequest { targets: DownloadTarget[]; dateFrom: string; dateTo: string; dateType: Preset; overwrite: boolean; downloadType: DownloadMode }
 export interface Interval { from: string; to: string }
 export interface DownloadJob { request: DownloadRequest; state: 'running' | 'paused' | 'cancelled' | 'completed' | 'failed'; progress: number; error?: string; resolvedModes?: Record<string, DownloadMode> }
@@ -10,7 +10,7 @@ export const emptyDownload: DownloadState = { job: null, ranges: {}, preferred: 
 export function today(): string { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; }
 export function validDate(value: string): boolean { return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value; }
 export function availableStart(target: DownloadTarget, precision = false): string {
-  const item = catalogue.find(row => row.symbol === (target.underlying ?? target.instrument ?? target.symbol));
+  const item = catalogue.find(row => row.symbol === (target.underlying ?? target.symbolDefinition ?? target.symbol));
   return item ? (precision && target.timeframe.startsWith('M1') ? item.dateFromM1 : item.dateFrom) : today();
 }
 export function eligibleTargets(targets: DownloadTarget[], job: DownloadJob | null): DownloadTarget[] {

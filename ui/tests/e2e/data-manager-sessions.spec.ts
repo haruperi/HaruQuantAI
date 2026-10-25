@@ -26,7 +26,7 @@ async function launch(page: Page) {
     else if(path.endsWith('/settings'))data={revision:1,values:{}};
     else if(path.endsWith('/status'))data={cpu_count:4};
     else if(path==='/api/v1/home')data={recent_projects:[]};
-    else if(path.endsWith('/data/workspace'))data={tabs:['data','instruments','sessions','brokers','custom-data','chart','home','stock-groups','log'].map((id,index)=>({id,title:id,core:index<5})),active_tab:'data',layout:{core_group:'catalogs',chart_position:'right'}};
+    else if(path.endsWith('/data/workspace'))data={tabs:['data','symbols','sessions','brokers','custom-data','chart','home','stock-groups','log'].map((id,index)=>({id,title:id,core:index<5})),active_tab:'data',layout:{core_group:'catalogs',chart_position:'right'}};
     else if(path.includes('/workspace/tabs/'))data={active_tab:path.split('/').at(-1),selection:null,preview:{state:'unavailable',reason:'Select a saved dataset.',rows:[],limit:500}};
     else if(path==='/api/v1/data/sessions'&&method==='GET'){
       if(state.failRead){await route.fulfill({status:503,json:{status:'error',error:{code:'UNAVAILABLE',message:'Session catalog unavailable'}}});return;}

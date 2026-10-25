@@ -1,9 +1,11 @@
+import { normalizeSymbolContract } from '../Common/symbolContract';
+import { createSymbolDataClient } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
-import { createDomainClient, type DomainClient } from '../../../host/transport';
+import {type DomainClient } from '../../../host/transport';
 import { builtInCsvFormats, validateCsvFormat, type CsvFormat, type ExportArtifact, type ExportJobState, type ExportKind } from './dataExport';
 
-let dataClient = createDomainClient('/data');
+let dataClient = createSymbolDataClient('/data');
 
 export function setDataClient(client: DomainClient): void {
   dataClient = client;
@@ -63,7 +65,7 @@ export const useDataExports = create<Store>((set, get) => {
   let initial: Saved = { formats: [], history: [], settings: {}, job: null }; let storageError = '';
   try {
     const raw = localStorage.getItem(key);
-    if (raw) { const value = normalizeLegacyBranding(JSON.parse(raw)); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; }
+    if (raw) { const value = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw))); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; }
   } catch { storageError = 'Saved export settings could not be read. Existing storage is preserved.'; }
   function persist(patch: Partial<Saved>): void {
     if (get().storageError) throw new Error(get().storageError);

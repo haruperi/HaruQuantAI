@@ -1,13 +1,14 @@
+import { normalizeSymbolContract } from '../../app/plugins/data_source/Common/symbolContract';
 import { expect, test, type Page } from '@playwright/test';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const layout = {
-  tabs: ['data', 'instruments', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'].map((id, index) => ({ id, title: ['Data', 'Instruments', 'Sessions', 'Brokers', 'Custom Data', 'Chart', 'Home', 'Stock groups', 'Log'][index], core: index < 5 })),
+  tabs: ['data', 'symbols', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'].map((id, index) => ({ id, title: ['Data', 'Symbols', 'Sessions', 'Brokers', 'Custom Data', 'Chart', 'Home', 'Stock groups', 'Log'][index], core: index < 5 })),
   active_tab: 'data', layout: { core_group: 'catalogs', chart_position: 'right' },
 };
 const datasets = ['M1', 'D1'].map((timeframe, index) => ({
-  id: `saved:${timeframe}`, symbol: 'EURUSD', instrument: 'EURUSD', broker: 'b1', broker_name: 'Research', underlying: 'EURUSD', timeframe, timezone: 'UTC',
+  id: `saved:${timeframe}`, symbol: 'EURUSD', symbolDefinition: 'EURUSD', broker: 'b1', broker_name: 'Research', underlying: 'EURUSD', timeframe, timezone: 'UTC',
   date_from: '2026-01-01', date_to: '2026-01-02', total_days: 1, total_records: 2, bars: 2, source: 'recorded', category: 'Forex', data_type: 'Forex',
   path: '', bar_type: 'start',
 }));
@@ -25,20 +26,20 @@ async function connect(page: Page, options: { slowMinute?: boolean; missingHisto
       ? Promise.resolve(new Response(new ReadableStream<Uint8Array>({ start() {} }), { headers: { 'Content-Type': 'text/event-stream' } })) : original(input, init)) as typeof fetch;
   });
   await page.route('**/api/v1/**', async route => {
-    const path = new URL(route.request().url()).pathname;
+    const path = new URL(route.request().url()).pathname.replace(/\/instruments(?=\/|$)/g, '/symbols').replace('/import-instruments', '/import-symbols');
     calls.push(path);
     let data: unknown = [];
     if (path.endsWith('/auth/login')) data = { token: 'workspace-test-session' };
     else if (path.endsWith('/settings')) data = { revision: 1, values: {} };
     else if (path.endsWith('/status')) data = { cpu_count: 4 };
     else if (path === '/api/v1/home') data = { recent_projects: [] };
-    else if (path === '/api/v1/data/home/overview') data = { datasets_count: 2, instruments_count: 1, sessions_count: 1, baskets_count: 1, active_providers_count: 1, total_bars: 4 };
+    else if (path === '/api/v1/data/home/overview') data = { datasets_count: 2, symbols_count: 1, sessions_count: 1, baskets_count: 1, active_providers_count: 1, total_bars: 4 };
     else if (path === '/api/v1/data/home/datasets') data = datasets;
     else if (path === '/api/v1/data/workspace') {
       if (initFailures > 0) { initFailures--; await route.fulfill({ status: 503, json: { status: 'error', error: { code: 'UNAVAILABLE', message: 'Workspace unavailable' } } }); return; }
       data = layout;
     } else if (path.startsWith('/api/v1/data/workspace/tabs/')) {
-      const id = route.request().postDataJSON()?.context?.dataset_id;
+      const id = normalizeSymbolContract(route.request().postDataJSON())?.context?.dataset_id;
       const selection = datasets.find(row => row.id === id) ?? null;
       if (options.slowMinute && id === 'saved:M1') await new Promise(resolve => setTimeout(resolve, 900));
       data = { active_tab: path.split('/').at(-1), selection, preview: {
@@ -65,7 +66,7 @@ test('top navigation activates every panel, Arrange docks/closes without lower t
   await expect(page.getByRole('tab')).toHaveCount(0);
   await expect(page.locator('.dv-tabs-and-actions-container:visible')).toHaveCount(0);
   const host = page.locator('.dm-dock-host');
-  await expect(host).toHaveAttribute('data-open-panels', 'data,instruments,sessions,brokers,custom-data');
+  await expect(host).toHaveAttribute('data-open-panels', 'data,symbols,sessions,brokers,custom-data');
   await expect(page.locator('[data-workspace-panel="data"]')).toBeVisible();
   await nav.getByRole('button', { name: 'Export', exact: true }).click();
   await expect(page.getByLabel('Data export operations')).toBeVisible();
@@ -74,7 +75,7 @@ test('top navigation activates every panel, Arrange docks/closes without lower t
   await expect(page.getByLabel('Data tools')).toBeVisible();
   await expect(page.getByRole('table', { name: 'Historical data', exact: true })).toBeVisible();
   for (const [buttonName, panelId, tableName] of [
-    ['Instruments', 'instruments', 'Instruments'],
+    ['Symbols', 'symbols', 'Symbols'],
     ['Sessions', 'sessions', 'Sessions'],
     ['External indicators', 'custom-data', 'External indicators'],
     ['Stock groups', 'stock-groups', 'Stock groups'],
@@ -88,16 +89,16 @@ test('top navigation activates every panel, Arrange docks/closes without lower t
   await expect(page.locator('[data-workspace-panel="home"]')).toBeVisible();
   await nav.getByRole('button', { name: 'Log', exact: true }).click();
   await expect(page.getByRole('log', { name: 'Data Manager log', exact: true })).toBeVisible();
-  await nav.getByRole('button', { name: 'Instruments', exact: true }).click();
-  await expect(page.getByRole('table', { name: 'Instruments', exact: true })).toBeVisible();
+  await nav.getByRole('button', { name: 'Symbols', exact: true }).click();
+  await expect(page.getByRole('table', { name: 'Symbols', exact: true })).toBeVisible();
   await nav.getByRole('button', { name: 'Arrange', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Close panel', exact: true }).click();
-  await expect(page.locator('[data-workspace-panel="instruments"]')).toHaveCount(0);
-  await expect(host).not.toHaveAttribute('data-open-panels', /instruments/);
-  await nav.getByRole('button', { name: 'Instruments', exact: true }).click();
-  await expect(page.locator('[data-workspace-panel="instruments"]')).toHaveCount(1);
-  await expect(host).toHaveAttribute('data-open-panels', /instruments/);
-  await expect(page.getByRole('table', { name: 'Instruments', exact: true })).toBeVisible();
+  await expect(page.locator('[data-workspace-panel="symbols"]')).toHaveCount(0);
+  await expect(host).not.toHaveAttribute('data-open-panels', /symbols/);
+  await nav.getByRole('button', { name: 'Symbols', exact: true }).click();
+  await expect(page.locator('[data-workspace-panel="symbols"]')).toHaveCount(1);
+  await expect(host).toHaveAttribute('data-open-panels', /symbols/);
+  await expect(page.getByRole('table', { name: 'Symbols', exact: true })).toBeVisible();
   await nav.getByRole('button', { name: 'Data sources', exact: true }).click();
   await page.getByRole('button', { name: 'Preview EURUSD M1', exact: true }).click();
   const preview = page.getByRole('main', { name: 'Linked recorded data preview' });
@@ -122,7 +123,7 @@ test('top navigation activates every panel, Arrange docks/closes without lower t
   }
   await expect.poll(async () => (await page.locator('[data-workspace-panel="chart"]').boundingBox())?.width).not.toBe(chartBox?.width);
   const groupsBefore = await page.locator('.dv-groupview').count();
-  await nav.getByRole('button', { name: 'Instruments', exact: true }).click();
+  await nav.getByRole('button', { name: 'Symbols', exact: true }).click();
   await nav.getByRole('button', { name: 'Arrange', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Move panel below', exact: true }).click();
   await expect(page.locator('.dv-groupview')).toHaveCount(groupsBefore + 1);
