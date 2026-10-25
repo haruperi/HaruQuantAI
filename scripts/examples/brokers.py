@@ -72,7 +72,7 @@ from app.include.enums import (
 from app.include.trading import Trading
 from app.workspace.brokers.base import BridgeError
 from app.workspace.brokers.ctrader import CTraderClient
-from app.workspace.brokers.metatrader import MetaTraderClient
+from app.workspace.brokers.metatrader import create_mt5_client
 from app.workspace.brokers.simulator import SimulatorClient
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = os.getenv("BROKER", "mt5")  # type: ignore[assignment]
@@ -144,10 +144,7 @@ def create_backend(name: str | None = None) -> TradingBackend:
         )
         return backend
     if selected == "mt5":
-        token = os.environ.get(
-            "MT5_BRIDGE_TOKEN", "P8H5yPraTVSz4vkuaMVgWN8qcfeXUswuxIV70QES0Co"
-        )
-        return MetaTraderClient(auth_token=token)
+        return create_mt5_client()
     if selected == "ctrader":
         return CTraderClient()
     raise ValueError("BROKER must be simulator, mt5, or ctrader")

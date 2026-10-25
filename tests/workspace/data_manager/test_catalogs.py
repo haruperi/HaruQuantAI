@@ -13,8 +13,9 @@ from app.workspace.data_manager.brokers import BrokerInfo
 from app.workspace.data_manager.symbols import SymbolInfo
 
 
-def test_symbols_list_success() -> None:
-    service = Symbols()
+def test_symbols_list_success(temp_db) -> None:
+    service = Symbols(temp_db)
+    assert service.add(name="EURUSD", datasource="test")["success"]
     response = service.list()
 
     assert isinstance(response, dict)

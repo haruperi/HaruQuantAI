@@ -343,6 +343,7 @@ export function DataManager() {
   const yahoo = useYahoo();
   const mt5 = useMt5Import();
   const liveSymbols = useSymbols(state => state.symbols);
+  const canImportMt5 = useSymbols(state => state.loaded && !state.isSyncing && !state.error && state.symbols.length === 0);
   const fileDefinitions = useFileSymbols(state => state.definitions);
   const customSessions = useSessions(state => state.sessions);
   const exports = useDataExports();
@@ -775,6 +776,7 @@ export function DataManager() {
       <Button id="datamanager-symbols-clone" className="action-clone" onClick={() => { const rows = requireSymbols(); if (rows?.length === 1) setSymbolDialog({ kind: 'clone', source: rows[0] }); else if (rows) setSelectionMessage('Select exactly one symbol to clone.'); }}><CopyPlus size={26} aria-hidden="true"/>Clone Symbol</Button>
       <Button id="datamanager-symbols-edit" className="action-edit" onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'editor', mode: rows.length === 1 ? 'edit' : 'mass', selected: rows }); }}><Settings2 size={26} aria-hidden="true"/>Mass Edit Symbol</Button>
       <Button id="datamanager-symbols-delete" className="action-delete" disabled={symbolJob?.state === 'running'} onClick={() => { const rows = requireSymbols(); if (rows) setSymbolDialog({ kind: 'delete', selected: rows }); }}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
+      <Button id="datamanager-symbols-update" className="action-update" disabled={symbolJob?.state === 'running' || (!selectedSymbolIds.length && !canImportMt5)} onClick={() => { if (canImportMt5) { void runSymbolJob('Importing all MT5 symbols', async () => `Imported ${await useSymbols.getState().updateFromMt5([])} symbols from MT5.`); return; } const rows = requireSymbols(); if (rows) void runSymbolJob(`Updating ${rows.length} symbols from MT5`, async () => `Updated ${await useSymbols.getState().updateFromMt5(rows.map(row => row.id))} symbols from MT5.`); }}><RefreshCw size={26} aria-hidden="true"/>Update from MT5</Button>
       <Button id="datamanager-symbols-save" className="action-save" onClick={() => { setSymbolDialog({ kind: 'transfer', mode: 'save', selected: symbolRows.filter(row => selectedSymbolIds.includes(row.id)) }); }}><Save size={26} aria-hidden="true"/>Save</Button>
       <Button id="datamanager-symbols-load" className="action-load" onClick={() => setSymbolDialog({ kind: 'transfer', mode: 'load', selected: [] })}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}

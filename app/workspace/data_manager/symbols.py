@@ -10,6 +10,7 @@ Description:
 
 from __future__ import annotations
 
+import asyncio
 import csv
 import json
 import time
@@ -17,10 +18,11 @@ from collections.abc import Mapping, Sequence
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
+from threading import Lock
 from typing import Any, cast
 
 from app.host.logging import get_logger
-from app.host.persistence import HostPersistence, RecordFilter
+from app.host.persistence import HostPersistence, RecordFilter, SQLiteValue
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,
@@ -28,6 +30,7 @@ from app.host.response import (
     StandardResponse,
 )
 from app.include.contracts import (
+    BridgeError,
     SymbolInfo,
     SymbolMargin,
     SymbolPrice,
@@ -55,8 +58,27 @@ __all__ = [
     "Symbols",
 ]
 
+from app.workspace.brokers.metatrader import create_mt5_client
+
 logger = get_logger(__name__)
 persistence = HostPersistence()
+
+_MT5_UPDATE_LOCK = Lock()
+
+_MT5_SPEC_COLUMNS = (
+    "description",
+    "exchange",
+    "data_type",
+    "spread",
+    "margin",
+    "volume",
+    "trade",
+    "price",
+    "swap",
+    "session",
+    "state",
+)
+
 
 CSV_COLUMNS: tuple[str, ...] = (
     "id",
@@ -170,8 +192,6 @@ def _update_direct_columns(fields: Mapping[str, Any], updates: dict[str, Any]) -
     for col in ("name", "description", "exchange", "data_type", "broker_id"):
         if col in fields:
             val = fields[col]
-            if col == "data_type" and isinstance(val, str) and "\\" in val:
-                val = val.split("\\", maxsplit=1)[0]
             updates[col] = val
     if "commission" in fields or "commission_value" in fields:
         raw_comm = fields.get("commission", fields.get("commission_value"))
@@ -263,7 +283,7 @@ def _parse_csv_row(row: Mapping[str, str]) -> tuple[str, str, dict[str, Any]]:
     add_args: dict[str, Any] = {
         "name": raw_name,
         "datasource": raw_ds,
-        "data_type": (row.get("data_type") or "Forex").strip(),
+        "data_type": (row.get("data_type", "Forex") or "").strip(),
         "description": (row.get("description") or "").strip(),
         "exchange": (row.get("exchange") or "XCCY").strip(),
         "commission": float(comm_raw)
@@ -309,7 +329,7 @@ def _row_to_symbol_info(r: Mapping[str, Any]) -> SymbolInfo:
         name=str(r.get("name") or ""),
         description=str(r.get("description") or ""),
         exchange=str(r.get("exchange") or "XCCY"),
-        data_type=str(r.get("data_type") or "Forex"),
+        data_type=str(r.get("data_type") or ""),
         spread=cast("SymbolSpread", _parse_json_dict(r.get("spread"))),
         margin=cast("SymbolMargin", _parse_json_dict(r.get("margin"))),
         volume=cast("SymbolVolume", _parse_json_dict(r.get("volume"))),
@@ -373,8 +393,9 @@ def _build_swap_dict(
 
 def _build_row_dict(inst_name: str, now_utc: str, **kwargs: Any) -> dict[str, Any]:
     """Construct full dictionary ready for database insertion."""
-    dt = kwargs.get("data_type") or "Forex"
-    clean_dt = dt.split("\\", maxsplit=1)[0] if "\\" in dt else dt
+    dt = kwargs.get("data_type")
+    dt = "Forex" if dt is None else dt
+    clean_dt = dt
     spread_d = dict(kwargs.get("spread") or {})
     def_spread = kwargs.get("default_spread")
     if def_spread is not None:
@@ -391,7 +412,7 @@ def _build_row_dict(inst_name: str, now_utc: str, **kwargs: Any) -> dict[str, An
     trade_d = dict(kwargs.get("trade") or {})
     if kwargs.get("min_distance") is not None:
         trade_d["min_distance"] = float(kwargs["min_distance"])
-    trade_d["calculation"] = clean_dt
+    trade_d.setdefault("calculation", clean_dt)
     price_d = _build_price_dict(
         kwargs.get("price"),
         kwargs.get("pip_size"),
@@ -449,6 +470,59 @@ class Symbols:
         return _read_symbols(self.gateway)
 
     _build_row_dict = staticmethod(_build_row_dict)
+
+    def mt5update(self, symbols: str | Sequence[str] | None = None) -> dict[str, Any]:
+        """Refresh named symbols, or import all MT5 symbols into an empty catalog."""
+        start = time.perf_counter()
+        names = (
+            list(dict.fromkeys(_to_sym_list(symbols))) if symbols is not None else []
+        )
+        if symbols is not None and not names:
+            return _fail(
+                "symbols.mt5update",
+                start,
+                "At least one symbol is required",
+                ErrorCode.VALIDATION,
+            )
+        if not _MT5_UPDATE_LOCK.acquire(blocking=False):
+            return _fail(
+                "symbols.mt5update",
+                start,
+                "Another MT5 update is running",
+                ErrorCode.UNAVAILABLE,
+            )
+        try:
+            for name in names:
+                response = self.get(name)
+                if not response["success"]:
+                    return _fail(
+                        "symbols.mt5update",
+                        start,
+                        "Requested catalog symbol was not found",
+                        ErrorCode.NOT_FOUND,
+                        {"symbol": name},
+                    )
+            updated = _mt5_refresh_or_import(self, names, symbols is None)
+            return _ok(
+                "symbols.mt5update",
+                start,
+                f"{'Imported' if symbols is None else 'Updated'} "
+                f"{len(updated)} symbol(s) from MT5",
+                data=updated,
+                side_effects=("Database records changed",),
+            )
+        except BridgeError as error:
+            return _mt5_bridge_failure(error, start)
+        except OSError, RuntimeError, ValueError, TypeError, KeyError:
+            return _fail(
+                "symbols.mt5update",
+                start,
+                "MT5 symbol update failed; "
+                "check bridge configuration and catalog storage",
+                ErrorCode.UNAVAILABLE,
+            )
+        finally:
+            _MT5_UPDATE_LOCK.release()
 
     def list(self) -> dict[str, Any]:
         """Retrieve symbol catalog items wrapped in StandardResponse."""
@@ -776,7 +850,7 @@ class Symbols:
             add_args.update(
                 name=inst_name,
                 datasource=ds,
-                data_type=source.get("data_type") or "Forex",
+                data_type=source.get("data_type", "Forex"),
                 description=source.get("description") or "",
                 exchange=source.get("exchange") or "XCCY",
                 broker_id=int(source.get("broker_id") or 0),
@@ -992,3 +1066,170 @@ class Symbols:
                 str(error) or "Internal error saving symbols to CSV",
                 ErrorCode.INTERNAL,
             )
+
+
+async def _mt5_snapshots(names: list[str] | None) -> dict[str, SymbolInfo]:
+    client = create_mt5_client()
+    try:
+        await client.start()
+        await client.wait_connected(timeout=client.bridge.command_timeout)
+        available = await client.symbol.SymbolsGet()
+        if not isinstance(available, list) or not all(
+            isinstance(name, str) for name in available
+        ):
+            raise ValueError("Invalid MT5 symbol list")
+        result: dict[str, SymbolInfo] = {}
+        if not available:
+            raise ValueError("MT5 returned an empty symbol list")
+        for name in dict.fromkeys(available if names is None else names):
+            candidates = [
+                symbol
+                for symbol in available
+                if name == symbol or name.startswith(symbol + "_")
+            ]
+            if not candidates:
+                raise BridgeError(
+                    "Requested symbol was not found in MT5", code="SYMBOL_NOT_FOUND"
+                )
+            source = max(candidates, key=len)
+            if not await client.symbol.Name(source):
+                raise BridgeError(
+                    "Requested symbol was not found in MT5", code="SYMBOL_NOT_FOUND"
+                )
+            snapshot = await client.symbol.SymbolInfo()
+            if snapshot.name != source:
+                raise ValueError("MT5 returned a different symbol")
+            if not snapshot.path:
+                raise BridgeError(
+                    "Reload the updated PythonBridge Expert in MT5",
+                    code="BRIDGE_OUTDATED",
+                )
+            result[name] = snapshot
+        return result
+    finally:
+        await client.close()
+
+
+def _mt5_fields(row: dict[str, Any], snapshot: SymbolInfo) -> dict[str, Any]:
+    """Retain local configuration that MT5 does not supply."""
+    data = asdict(snapshot)
+    current = asdict(_row_to_symbol_info(row))
+    data["spread"]["slippage"] = current["spread"]["slippage"]
+    data["margin"]["rate"] = current["margin"]["rate"]
+    raw = data["trade"].get("commission_settings")
+    if raw:
+        commissions = json.loads(raw)
+        existing = json.loads(current["trade"].get("commission_settings") or "null")
+        if (
+            isinstance(commissions, dict)
+            and isinstance(existing, dict)
+            and "settings" in existing
+        ):
+            commissions["settings"] = existing["settings"]
+            data["trade"]["commission_settings"] = json.dumps(commissions)
+    return {
+        key: json.dumps(data[key]) if isinstance(data[key], (dict, list)) else data[key]
+        for key in _MT5_SPEC_COLUMNS
+    }
+
+
+def _mt5_persist(
+    service: Symbols, names: list[str], snapshots: dict[str, SymbolInfo]
+) -> list[SymbolInfo]:
+    """Write the fetched specifications in one database transaction."""
+    updated = []
+    with service.gateway.transaction() as tx:
+        for name in names:
+            response = tx.read_records(
+                "datamgr_symbols", filters={"name": name}, limit=1
+            )
+            records = (response.get("data") or {}).get("records") or []
+            if not response["success"] or not records:
+                raise ValueError("Catalog changed during the MT5 update")
+            fields = _mt5_fields(records[0], snapshots[name])
+            fields["updated_at_utc"] = datetime.now(UTC).isoformat()
+            response = tx.update_record(
+                "datamgr_symbols", fields, filters={"name": name}
+            )
+            if not response["success"]:
+                raise ValueError("Unable to persist MT5 symbol specifications")
+            updated.append(_row_to_symbol_info(response["data"]["records"][0]))
+    return updated
+
+
+def _mt5_require_empty(gateway: Any) -> None:
+    response = gateway.read_records("datamgr_symbols", limit=1)
+    if not response["success"]:
+        raise ValueError("Unable to read catalog")
+    if response["data"]["records"]:
+        raise BridgeError(
+            "Catalog is not empty; select symbols to update", code="CONFLICT"
+        )
+
+
+def _mt5_import_all(service: Symbols) -> list[SymbolInfo]:
+    """Import the whole terminal catalog only when the local catalog is empty."""
+    _mt5_require_empty(service.gateway)
+    snapshots = asyncio.run(_mt5_snapshots(None))
+    now = datetime.now(UTC).isoformat()
+    rows: list[dict[str, SQLiteValue]] = []
+    for name, snapshot in snapshots.items():
+        data = asdict(snapshot)
+        fields: dict[str, SQLiteValue] = {}
+        for key in _MT5_SPEC_COLUMNS:
+            value = data[key]
+            fields[key] = (
+                json.dumps(value) if isinstance(value, (dict, list)) else value
+            )
+        rows.append(
+            {
+                **fields,
+                "name": name,
+                "commission": snapshot.commission,
+                "broker_id": 0,
+                "created_at_utc": now,
+                "updated_at_utc": now,
+            }
+        )
+    imported: list[SymbolInfo] = []
+    with service.gateway.transaction() as tx:
+        _mt5_require_empty(tx)
+        for start in range(0, len(rows), 1000):
+            response = tx.create_records("datamgr_symbols", rows[start : start + 1000])
+            if not response["success"]:
+                raise ValueError("Unable to import MT5 catalog")
+            imported.extend(
+                _row_to_symbol_info(row) for row in response["data"]["records"]
+            )
+    return imported
+
+
+def _mt5_refresh_or_import(
+    service: Symbols, names: list[str], import_all: bool
+) -> list[SymbolInfo]:
+    if import_all:
+        return _mt5_import_all(service)
+    return _mt5_persist(service, names, asyncio.run(_mt5_snapshots(names)))
+
+
+def _mt5_bridge_failure(error: BridgeError, start: float) -> dict[str, Any]:
+    """Describe actionable bridge errors without exposing connection details."""
+    if error.code == "BRIDGE_OUTDATED":
+        return _fail(
+            "symbols.mt5update",
+            start,
+            "Reload the updated PythonBridge Expert in MT5 before updating symbols",
+            ErrorCode.UNAVAILABLE,
+        )
+    code = {
+        "SYMBOL_NOT_FOUND": ErrorCode.NOT_FOUND,
+        "CONFLICT": ErrorCode.CONFLICT,
+    }.get(error.code, ErrorCode.UNAVAILABLE)
+    return _fail(
+        "symbols.mt5update",
+        start,
+        "Catalog is not empty; select symbols to update"
+        if code == ErrorCode.CONFLICT
+        else "MT5 update failed; check the terminal, bridge and symbol names",
+        code,
+    )

@@ -116,6 +116,40 @@ The command runs immediately and prints the deleted name and count on success.
 Missing symbols and other service failures return JSON and exit code 1.
 A missing name or unsupported arguments return exit code 2.
 
+## Update symbols from MT5
+
+```powershell
+uv run python -m app.cli data-manager symbol update EURUSD_demo
+uv run python -m app.cli data-manager symbol update EURUSD_demo GBPUSD_demo
+uv run python -m app.cli data-manager symbol update
+```
+
+Reads specifications from the authenticated MT5 Expert bridge and updates existing
+catalog entries. Names may match MT5 exactly or include a datasource suffix; the
+longest matching terminal symbol is used. Catalog names and broker IDs are retained.
+All requested snapshots are fetched before the database transaction starts. A missing
+symbol, bridge failure, or storage failure leaves the batch unchanged.
+
+With no names, `update` imports all available MT5 symbols into an empty catalog.
+The Python equivalent is `Symbols().mt5update()`. Imported entries retain native
+terminal names without a datasource suffix. Imports are batched and atomic; if
+the catalog is no longer empty, the host rejects the import rather than merging
+or replacing records.
+
+The Python API is `Symbols().mt5update("EURUSD_demo")` or
+`Symbols().mt5update(["EURUSD_demo", "GBPUSD_demo"])` and returns a standard response
+with the updated specifications in `data`.
+
+Run the bundled Expert in MT5. Bridge configuration is shared with the trading
+example: `MT5_BRIDGE_TOKEN`, `MT5_BRIDGE_HOST` (default `127.0.0.1`),
+`MT5_BRIDGE_PORT` (default `8765`), and `MT5_BRIDGE_TIMEOUT` (default `10` seconds).
+The bundled development token is the default when no token override is set.
+The listener port must be free; concurrent updates are rejected as unavailable.
+This command reads terminal metadata and does not place orders.
+
+Local slippage, margin rate, and configured numeric commission values are preserved;
+MT5 commission rules are stored with their availability status and any local model.
+
 ## Clone a symbol
 
 ```powershell

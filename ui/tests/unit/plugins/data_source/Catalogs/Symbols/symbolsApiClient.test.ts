@@ -20,6 +20,34 @@ function setup() {
 beforeEach(() => useSymbols.getState().reset());
 
 describe('confirmed symbol transport and state', () => {
+  it('bootstraps a confirmed empty catalog from MT5 but requires selection in a populated catalog', async () => {
+    const fetchFn = setup().mockResolvedValueOnce(response([]));
+    await useSymbols.getState().refreshFromServer();
+    fetchFn.mockResolvedValueOnce(response({ updated_count: 1, symbols: [row] }));
+    expect(await useSymbols.getState().updateFromMt5([])).toBe(1);
+    expect(useSymbols.getState().symbols[0].symbol).toBe(row.symbol);
+    await expect(useSymbols.getState().updateFromMt5([])).rejects.toThrow('select symbols');
+    expect(fetchFn).toHaveBeenCalledTimes(2);
+  });
+  it('does not import before a successful catalog load', async () => {
+    const fetchFn = setup();
+    await expect(useSymbols.getState().updateFromMt5([])).rejects.toThrow('Load the catalog');
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+  it('accepts confirmed MT5 updates and retains the snapshot when the update fails', async () => {
+    const fetchFn = setup().mockResolvedValueOnce(response([row]));
+    await useSymbols.getState().refreshFromServer();
+    fetchFn.mockResolvedValueOnce(response({ updated_count: 1, symbols: [{ ...row, point_value: 999 }] }));
+    expect(await useSymbols.getState().updateFromMt5(['1'])).toBe(1);
+    expect(fetchFn.mock.calls.at(-1)?.[0]).toBe('/api/v1/data/symbols/update');
+    expect(useSymbols.getState().symbols[0].pointValue).toBe(999);
+    fetchFn.mockRejectedValueOnce(new Error('Bridge unavailable'));
+    await expect(useSymbols.getState().updateFromMt5(['1'])).rejects.toThrow('Bridge unavailable');
+    expect(useSymbols.getState().symbols[0].pointValue).toBe(999);
+    fetchFn.mockResolvedValueOnce(response({ updated_count: 1, symbols: [{ ...row, id: '2' }] }));
+    await expect(useSymbols.getState().updateFromMt5(['1'])).rejects.toThrow('different symbol identities');
+    expect(useSymbols.getState().symbols[0].id).toBe('1');
+  });
   it('preserves distinct economics, zero margins and the original raw record', () => {
     const item = toFileSymbol(row);
     expect(item).toMatchObject({ id: '1', broker: '0', marginRate: 0, tickSize: .25, tickStep: .05, contractSize: 50, minVolume: 2, tickValue: 7 });

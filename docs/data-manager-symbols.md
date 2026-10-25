@@ -18,6 +18,15 @@ All endpoints require a UI session and the host's data read/write scopes.
 - Load accepts a CSV upload up to 10 MB. Valid rows are imported and skipped rows
   are reported. Existing names are skipped rather than overwritten.
 - Refresh symbols reloads the persisted catalog.
+- Select one or more rows and choose **Update from MT5** to refresh their saved
+  specifications from the running MT5 Expert bridge. The button is disabled during
+  the update. Updated rows appear after the host confirms the batch; failures retain
+  the previous snapshot and display an error in the progress area.
+- When the successfully loaded catalog contains no symbols, **Update from MT5**
+  imports every symbol returned by the terminal, retaining the native MT5 names.
+  The import is atomic, including catalogs larger than 1,000 entries. A populated
+  catalog still requires selecting rows; an empty search result does not trigger
+  import mode.
 
 CSV imports and exports use the service's existing format, including JSON within
 specification columns. Browser commission and swap settings are retained in the

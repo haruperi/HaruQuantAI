@@ -55,6 +55,11 @@ async function connect(page: Page, initial = [record('1', 'RECORDED_A'), record(
         data = { deleted_count: body.symbol_ids.length };
       } else if (path.endsWith('/refresh')) {
         data = { deleted_count: 0, inserted_count: rows.length };
+      } else if (path.endsWith('/update')) {
+        if (!body.symbol_ids.length && !rows.length) rows = [record('1', 'MT5_IMPORTED_A'), record('2', 'MT5_IMPORTED_B')];
+        rows = rows.map(row => body.symbol_ids.includes(row.id) ? { ...row, point_value: 999, description: 'Updated from MT5' } : row);
+        const updated = body.symbol_ids.length ? rows.filter(row => body.symbol_ids.includes(row.id)) : rows;
+        data = { updated_count: updated.length, symbols: updated };
       } else if (path.endsWith('/mass-edit')) {
         rows = rows.map(row => body.symbol_ids.includes(row.id) ? { ...row, ...body.updates } : row);
         data = { updated_count: body.symbol_ids.length, symbols: rows.filter(row => body.symbol_ids.includes(row.id)) };
@@ -201,4 +206,48 @@ test('downloads CSV, imports with a skipped row report, and deletes multiple sym
   await expect(table(page)).not.toContainText('RECORDED_A');
   await expect(table(page)).not.toContainText('RECORDED_B');
   expect(rows().map(row => row.symbol)).toEqual(['CSV_IMPORTED']);
+});
+
+
+test('updates selected symbols from MT5 and preserves rows on failure', async ({ page }) => {
+  const { state } = await connect(page);
+  const update = operations(page).getByRole('button', { name: 'Update from MT5', exact: true });
+  await expect(update).toBeDisabled();
+  await table(page).getByLabel('Select symbol RECORDED_A', { exact: true }).check();
+  await table(page).getByLabel('Select symbol RECORDED_B', { exact: true }).check();
+  state.delayWrite = true;
+  await update.click();
+  await expect(update).toBeDisabled();
+  await expect(table(page)).not.toContainText('Updated from MT5');
+  await expect(table(page)).toContainText('Updated from MT5');
+  expect(state.writes.at(-1)?.body).toEqual({ symbol_ids: ['1', '2'] });
+  await expect(update).toBeEnabled();
+  state.failWrite = true;
+  await update.click();
+  await expect(page.getByLabel('Data Manager progress')).toContainText('conflict');
+  await expect(table(page)).toContainText('Updated from MT5');
+  await expect(table(page).locator('tbody tr')).toHaveCount(2);
+});
+
+test('imports all MT5 symbols when the catalog is empty', async ({ page }) => {
+  const { state } = await connect(page, []);
+  const update = operations(page).getByRole('button', { name: 'Update from MT5', exact: true });
+  await expect(update).toBeEnabled();
+  state.failWrite = true;
+  await update.click();
+  await expect(page.getByLabel('Data Manager progress')).toContainText('conflict');
+  await expect(table(page)).toContainText('No matching symbols.');
+  state.failWrite = false;
+  await update.click();
+  await expect(table(page)).toContainText('MT5_IMPORTED_A');
+  await expect(table(page)).toContainText('MT5_IMPORTED_B');
+  expect(state.writes.at(-1)?.body).toEqual({ symbol_ids: [] });
+  await expect(update).toBeDisabled();
+});
+
+test('an empty filter result does not enable full import', async ({ page }) => {
+  await connect(page);
+  await page.getByLabel('Filter symbols', { exact: true }).fill('NOT_A_SYMBOL');
+  await expect(table(page)).toContainText('No matching symbols.');
+  await expect(operations(page).getByRole('button', { name: 'Update from MT5', exact: true })).toBeDisabled();
 });

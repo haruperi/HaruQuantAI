@@ -1311,6 +1311,14 @@ string SymbolSessionsJson(const string sym)
    return result+"]";
   }
 
+string SymbolDataTypeFromPath(const string path)
+  {
+   int last=-1;
+   for(int pos=StringFind(path,"\\");pos>=0;pos=StringFind(path,"\\",pos+1))
+      last=pos;
+   return last>=0 ? StringSubstr(path,0,last) : "";
+  }
+
 string SymbolInfoJson(CSymbolInfo *obj, const string explicit_symbol = "")
   {
    if(explicit_symbol!="" && explicit_symbol!=obj.Name()) obj.Name(explicit_symbol);
@@ -1323,7 +1331,9 @@ string SymbolInfoJson(CSymbolInfo *obj, const string explicit_symbol = "")
    string j="{\"name\":"+JsonQuote(sym);
    j+=",\"description\":"+JsonQuote(SymbolInfoString(sym,SYMBOL_DESCRIPTION));
    j+=",\"exchange\":"+JsonQuote(SymbolInfoString(sym,SYMBOL_EXCHANGE));
-   j+=",\"data_type\":"+JsonQuote(obj.TradeCalcModeDescription());
+   string path=SymbolInfoString(sym,SYMBOL_PATH);
+   j+=",\"path\":"+JsonQuote(path);
+   j+=",\"data_type\":"+JsonQuote(SymbolDataTypeFromPath(path));
    j+=",\"spread\":{\"floating\":"+JsonBool((bool)SymbolInfoInteger(sym,SYMBOL_SPREAD_FLOAT));
    j+=",\"default\":"+JsonLong(SymbolInfoInteger(sym,SYMBOL_SPREAD))+",\"slippage\":0}";
    j+=",\"margin\":{\"currency_base\":"+JsonQuote(SymbolInfoString(sym,SYMBOL_CURRENCY_BASE));

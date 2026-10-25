@@ -47,6 +47,8 @@ from __future__ import annotations
 import asyncio
 import contextvars
 import json
+import math
+import os
 import secrets
 import time
 import uuid
@@ -111,11 +113,15 @@ from .base import (
 __all__ = [
     "Bridge",
     "MetaTraderClient",
+    "create_mt5_client",
     "decode_frame",
     "encode_frame",
 ]
 
 logger = get_logger(__name__)
+
+# Development default shared with the bundled EA; deployments override it via env.
+DEFAULT_AUTH_TOKEN = "P8H5yPraTVSz4vkuaMVgWN8qcfeXUswuxIV70QES0Co"  # noqa: S105 -- bundled EA development default
 
 PROTOCOL_VERSION = 1
 MAX_FRAME_BYTES = 1_048_576
@@ -950,6 +956,26 @@ class MetaTraderClient(TradingClient):
         )
         ticks = [row for row in rows if isinstance(row, MarketTick)]
         return ticks_to_dataframe(ticks)
+
+
+def create_mt5_client() -> MetaTraderClient:
+    """Build a client using the same bridge configuration as the examples."""
+    token = os.environ.get("MT5_BRIDGE_TOKEN", DEFAULT_AUTH_TOKEN)
+    port = int(os.environ.get("MT5_BRIDGE_PORT", "8765"))
+    timeout = float(os.environ.get("MT5_BRIDGE_TIMEOUT", "10"))
+    if (
+        len(token) < 16
+        or not 1 <= port <= 65535
+        or not math.isfinite(timeout)
+        or timeout <= 0
+    ):
+        raise ValueError("Invalid MT5 bridge configuration")
+    return MetaTraderClient(
+        auth_token=token,
+        host=os.environ.get("MT5_BRIDGE_HOST", "127.0.0.1"),
+        port=port,
+        command_timeout=timeout,
+    )
 
 
 def main() -> None:

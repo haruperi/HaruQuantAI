@@ -185,6 +185,14 @@ export async function loadSymbolCsv(content: string): Promise<{ loaded_count: nu
   return client.post('/symbols/load', { content });
 }
 
+export async function updateRemoteSymbols(symbolIds: string[]): Promise<RemoteSymbolDefinition[]> {
+  const response = await client.post<{ updated_count: number; symbols: RemoteSymbolDefinition[] }>('/symbols/update', { symbol_ids: symbolIds });
+  if (!response || !Array.isArray(response.symbols) || (symbolIds.length > 0 && response.updated_count !== new Set(symbolIds).size) || !Number.isSafeInteger(response.updated_count) || response.updated_count < 1 || response.symbols.length !== response.updated_count) throw new Error('The host did not confirm all MT5 updates.');
+  const records = response.symbols.map(checked);
+  if (new Set(records.map(row => row.id)).size !== records.length || (symbolIds.length > 0 && records.some(row => !symbolIds.includes(row.id)))) throw new Error('The host returned different symbol identities.');
+  return records;
+}
+
 export async function saveSymbolCsv(symbolIds: string[]): Promise<{ content: string; count: number }> {
   return client.post('/symbols/save', { symbol_ids: symbolIds });
 }

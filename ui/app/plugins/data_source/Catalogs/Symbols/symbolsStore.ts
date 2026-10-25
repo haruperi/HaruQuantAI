@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { FileSymbol, SymbolBroker, SymbolMassPatch } from '../../FileImport/fileSymbols';
-import { cloneRemoteSymbol, deleteRemoteSymbols, fetchRemoteSymbols, refreshRemoteSymbols, symbolPatch, massEditRemoteSymbols, saveRemoteSymbol, toFileSymbol, type CatalogSymbol, type RemoteSymbolDefinition } from './symbolsApiClient';
+import { cloneRemoteSymbol, deleteRemoteSymbols, fetchRemoteSymbols, refreshRemoteSymbols, symbolPatch, massEditRemoteSymbols, saveRemoteSymbol, toFileSymbol, updateRemoteSymbols, type CatalogSymbol, type RemoteSymbolDefinition } from './symbolsApiClient';
 
 export interface SymbolsState {
   symbols: CatalogSymbol[];
@@ -13,6 +13,7 @@ export interface SymbolsState {
   massEditSymbols: (ids: string[], patch: SymbolMassPatch) => Promise<void>;
   refreshSymbols: (symbols?: string[]) => Promise<number>;
   removeSymbols: (ids: string[]) => Promise<number>;
+  updateFromMt5: (ids: string[]) => Promise<number>;
 }
 export const useSymbols = create<SymbolsState>((set, get) => {
   function accept(records: RemoteSymbolDefinition[], generation: number): void {
@@ -67,6 +68,13 @@ export const useSymbols = create<SymbolsState>((set, get) => {
       const count = await deleteRemoteSymbols(ids);
       set(state => ({ requestVersion: state.requestVersion + 1, symbols: state.symbols.filter(row => !ids.includes(row.id)) }));
       return count;
+    },
+    updateFromMt5: async ids => {
+      if (!ids.length && (!get().loaded || get().symbols.length || get().isSyncing || get().error)) throw new Error('Load the catalog and select symbols to update.');
+      const generation = get().generation;
+      const records = await updateRemoteSymbols(ids);
+      accept(records, generation);
+      return records.length;
     },
   };
 });

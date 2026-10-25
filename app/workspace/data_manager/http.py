@@ -85,7 +85,7 @@ def _ui(row: dict[str, Any]) -> dict[str, Any]:
         "symbol": row["name"],
         "description": row.get("description") or "",
         "broker_id": row.get("broker_id") or 0,
-        "data_type": row.get("data_type") or "Forex",
+        "data_type": row.get("data_type") or "",
         "point_value": price.get("point_value")
         if price.get("point_value") is not None
         else price.get("contract_size", 100000),
@@ -299,23 +299,41 @@ def _execute(
         result = service.delete(names)
         if result["success"]:
             return _ok({"deleted_count": len(result["data"])})
-    elif command == "mass-edit":
-        ids = body.get("instrument_ids", body.get("symbol_ids", []))
-        names = _names(rows, ids)
-        result = service.edit(names, updates=_updates(body["updates"]))
-        if result["success"]:
-            return _ok(
-                {
-                    "updated_count": len(result["data"]),
-                    "symbols": [
-                        _ui(row) for row in _rows(gateway) if str(row["id"]) in ids
-                    ],
-                }
-            )
+    elif command in {"mass-edit", "update"}:
+        return _edit_or_update(command, body, service, gateway, rows)
     elif command == "refresh":
         return _ok({"deleted_count": 0, "inserted_count": len(rows)})
     else:
         raise TransportError(ErrorCode.NOT_FOUND, "Unknown symbol command")
+    return _response(result)
+
+
+def _edit_or_update(
+    command: str,
+    body: dict[str, Any],
+    service: Symbols,
+    gateway: HostPersistence,
+    rows: list[dict[str, Any]],
+) -> Any:
+    """Update requested rows, or bootstrap an empty catalog from MT5."""
+    ids = body.get("instrument_ids", body.get("symbol_ids", []))
+    names = _names(rows, ids) if ids or command != "update" else None
+    result = (
+        service.mt5update(names)
+        if command == "update"
+        else service.edit(names or [], updates=_updates(body["updates"]))
+    )
+    if result["success"]:
+        return _ok(
+            {
+                "updated_count": len(result["data"]),
+                "symbols": [
+                    _ui(row)
+                    for row in _rows(gateway)
+                    if not ids or str(row["id"]) in ids
+                ],
+            }
+        )
     return _response(result)
 
 

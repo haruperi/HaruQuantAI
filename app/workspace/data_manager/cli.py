@@ -2,7 +2,6 @@
 
 Description:
     Owns Data Manager headless parsers, service dispatch, output, and exit codes.
-    The main app CLI registers this domain through register_commands().
     Provides ASCII table formatters and dashboard presentation for the
     Data Manager workspace, rendering dataset catalogs and database summaries.
 """
@@ -828,6 +827,12 @@ def _symbol_mutation_parsers(commands: Any) -> None:
     delete.add_argument(
         "symbol_names", nargs="+", help="Exact saved symbol names, including suffixes"
     )
+    update = commands.add_parser("update", help="Update saved symbols from MT5")
+    update.add_argument(
+        "symbol_names",
+        nargs="*",
+        help="Names to update; omit to import into an empty catalog",
+    )
     clone = commands.add_parser("clone", help="Clone a symbol in the local catalog")
     clone.add_argument("source_symbol", help="Exact saved source symbol name")
     clone.add_argument(
@@ -886,7 +891,8 @@ def _run_symbol_command(
 
     service = Symbols()
     file_commands = {
-        "clone": _clone_symbol,
+        "clone": _clone_or_update_symbols,
+        "update": _clone_or_update_symbols,
         "load": _load_symbols,
         "save": _save_symbols,
     }
@@ -929,18 +935,29 @@ def _run_symbol_command(
     return result
 
 
-def _clone_symbol(
+def _clone_or_update_symbols(
     service: Symbols, arguments: argparse.Namespace
 ) -> dict[str, Any] | None:
-    """Clone through the catalog service and display the created symbol."""
-    result = service.clone(
-        arguments.source_symbol,
-        arguments.new_symbol,
-        new_datasource=arguments.new_datasource,
+    """Clone or update through the service and display the saved specifications."""
+    result = (
+        service.mt5update(arguments.symbol_names or None)
+        if arguments.symbol_command == "update"
+        else service.clone(
+            arguments.source_symbol,
+            arguments.new_symbol,
+            new_datasource=arguments.new_datasource,
+        )
     )
     if result["success"]:
         print(result["message"])
-        print(SymbolsCLI.format_symbol_table([result["data"]], limit=None))
+        print(
+            SymbolsCLI.format_symbol_table(
+                result["data"]
+                if arguments.symbol_command == "update"
+                else [result["data"]],
+                limit=None,
+            )
+        )
         return None
     return result
 

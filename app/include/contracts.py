@@ -411,6 +411,7 @@ class SymbolInfo:
     description: str = ""
     exchange: str = "XCCY"
     data_type: str = "Forex"
+    path: str = ""
     spread: SymbolSpread = field(default_factory=SymbolSpread)
     margin: SymbolMargin = field(default_factory=SymbolMargin)
     volume: SymbolVolume = field(default_factory=SymbolVolume)
@@ -423,6 +424,8 @@ class SymbolInfo:
 
     def __post_init__(self) -> None:
         """Coerce dictionary inputs to typed dataclass instances."""
+        if self.path:
+            self.data_type = self.path.rpartition("\\")[0]
         self.spread = _coerce_dataclass(SymbolSpread, self.spread)
         self.margin = _coerce_dataclass(SymbolMargin, self.margin)
         self.volume = _coerce_dataclass(SymbolVolume, self.volume)

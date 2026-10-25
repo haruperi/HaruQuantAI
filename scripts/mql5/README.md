@@ -10,6 +10,11 @@ property commands remain independent of the snapshot format.
 `trade.commission_settings`; they are not reduced to a claimed fixed commission.
 Trading sessions come from `SymbolInfoSessionTrade`.
 
+`path` contains the native `SYMBOL_PATH`. `data_type` is its parent path:
+`Forex\EURJPY` becomes `Forex`, and `Forex\Majors\EURUSD` becomes
+`Forex\Majors`. The profit/margin calculation description is stored separately
+in `trade.calculation`.
+
 After changing the source, compile it with the target terminal's MetaEditor.
 Replace the terminal's installed Expert with the rebuilt `PythonBridge.ex5` and
 reload the Expert on its chart to use the new snapshot format. The compiled
