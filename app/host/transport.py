@@ -72,19 +72,21 @@ def _success(operation: str, data: Any) -> dict[str, Any]:
     return res
 
 
+_STATUS_MAP = {
+    ErrorCode.UNAUTHORIZED: 401,
+    ErrorCode.FORBIDDEN: 403,
+    ErrorCode.NOT_FOUND: 404,
+    ErrorCode.CONFLICT: 409,
+    ErrorCode.VALIDATION: 422,
+}
+
+
 def _failure(code: ErrorCode, message: str, operation: str) -> JSONResponse:
-    status_map = {
-        ErrorCode.UNAUTHORIZED: 401,
-        ErrorCode.FORBIDDEN: 403,
-        ErrorCode.NOT_FOUND: 404,
-        ErrorCode.CONFLICT: 409,
-        ErrorCode.VALIDATION: 422,
-    }
     meta = ResponseMetadata(operation=operation, duration_ms=0)
     err = StandardError(code=code, message=message)
     res = StandardResponse.failure(message=message, error=err, metadata=meta)
     res["status"] = "error"
-    return JSONResponse(res, status_code=status_map.get(code, 503))
+    return JSONResponse(res, status_code=_STATUS_MAP.get(code, 503))
 
 
 class TransportMiddleware:
@@ -169,10 +171,8 @@ class ConnectionMetadata(BaseModel):
 
 def _unwrap(response: dict[str, Any]) -> dict[str, Any]:
     if not response["success"]:
-        err = response["error"]
-        raise TransportError(
-            ErrorCode(err["code"]), "Connection storage operation failed"
-        )
+        code = response["error"]["code"]
+        raise TransportError(ErrorCode(code), "Connection storage operation failed")
     data: dict[str, Any] = response["data"]
     return data
 
@@ -188,9 +188,7 @@ def _endpoint(endpoint: str) -> tuple[str, int]:
         or p.fragment
     )
     if bad:
-        raise ValueError(
-            "Use an HTTP(S) endpoint without credentials, query, or fragment"
-        )
+        raise ValueError("Invalid endpoint URL")
     return p.hostname or "127.0.0.1", p.port or (443 if p.scheme == "https" else 80)
 
 
@@ -214,10 +212,12 @@ class ServletConstants:
         ver = "unknown"
         with suppress(PackageNotFoundError):
             ver = version("HaruQuantAI")
-        meta = ("HaruQuantAI", platform.python_version(), ver, "fastapi+starlette")
-        return dict(
-            zip(("application", "runtime", "version", "transport"), meta, strict=True)
-        )
+        return {
+            "application": "HaruQuantAI",
+            "runtime": platform.python_version(),
+            "version": ver,
+            "transport": "fastapi+starlette",
+        }
 
     @staticmethod
     def get_system_specs() -> dict[str, Any]:
@@ -571,17 +571,18 @@ def _catalogue(snapshot: dict[str, Any]) -> dict[str, Any]:
             type(value), "str"
         )
         val = bool(value) if hidden else _public(value)
-        f = {
-            "scope": scope,
-            "group": group,
-            "key": key,
-            "label": key,
-            "kind": k,
-            "readonly": group == "user_access",
-            "secret": hidden,
-            "configured" if hidden else "value": val,
-        }
-        fields.append(f)
+        fields.append(
+            {
+                "scope": scope,
+                "group": group,
+                "key": key,
+                "label": key,
+                "kind": k,
+                "readonly": group == "user_access",
+                "secret": hidden,
+                "configured" if hidden else "value": val,
+            }
+        )
 
     for group, value in snapshot["values"].get("application", {}).items():
         visit(group.replace("_", ".", 1), group, "", value)
@@ -609,12 +610,21 @@ def extract_bearer_token(
 
 
 def _token(request: Request | WebSocket) -> str:
-    return extract_bearer_token(request) or request.cookies.get(_SESSION_COOKIE, "")
+    return (
+        extract_bearer_token(request)
+        or request.cookies.get(_SESSION_COOKIE, "")
+        or request.query_params.get("token", "")
+    )
 
 
 def _peer(request: Request | WebSocket) -> str:
-    peer = request.cookies.get(_PEER_COOKIE, "")
-    return peer if peer.startswith("ui:") else ""
+    p = request.cookies.get(_PEER_COOKIE, "") or request.headers.get("x-peer-id", "")
+    if p.startswith("ui:"):
+        return p
+    if (tok := _token(request)) and (s := getattr(request.app.state, "sessions", None)):
+        res = s.resolve_peer(tok)
+        return res if res and res.startswith("ui:") else ""
+    return ""
 
 
 def _cookies(response: JSONResponse, request: Request, token: str, peer: str) -> None:
@@ -626,7 +636,7 @@ def _cookies(response: JSONResponse, request: Request, token: str, peer: str) ->
             max_age=86400,
             httponly=True,
             secure=sec,
-            samesite="strict",
+            samesite="lax",
             path="/api/v1",
         )
 
@@ -659,11 +669,11 @@ async def _auth_route(request: Request) -> Any:
         return {"username": s.username, "peer_id": s.peer_id, "expires_at": exp}
     body = await _body(request)
     if body.get("action") == "logout":
-        await run_in_threadpool(_require, request, "session:read")
-        tok, peer = _token(request), _peer(request)
-        await run_in_threadpool(sessions.revoke_session, tok, peer)
+        s = await run_in_threadpool(_require, request, "session:read")
+        await run_in_threadpool(sessions.revoke_session, _token(request), s.peer_id)
         res = JSONResponse(_success("logout", {"revoked": True}))
-        res.delete_cookie(_SESSION_COOKIE, path="/api/v1")
+        for k in (_SESSION_COOKIE, _PEER_COOKIE):
+            res.delete_cookie(k, path="/api/v1")
         return res
     access = await run_in_threadpool(settings.get_scope, "user_access")
     username = body.get("username", access["username"])
@@ -786,16 +796,19 @@ async def _conn_route(request: Request) -> Any:
 
 async def _jobs_route(request: Request) -> Any:
     await run_in_threadpool(_require, request, "jobs:read")
-    sch = getattr(request.app.state, "scheduler", None)
-    jid = request.path_params.get("job_id")
+    sch, jid = (
+        getattr(request.app.state, "scheduler", None),
+        request.path_params.get("job_id"),
+    )
     if request.method == "POST" and request.url.path.endswith("/cancel"):
         await run_in_threadpool(_require, request, "jobs:cancel")
         if sch is None:
             raise TransportError(ErrorCode.UNAVAILABLE, "Scheduler is not running")
         return await run_in_threadpool(sch.cancel_job, str(jid))
     if jid:
-        job = await run_in_threadpool(sch.get_job, str(jid)) if sch else None
-        if job is None:
+        if (
+            job := (await run_in_threadpool(sch.get_job, str(jid)) if sch else None)
+        ) is None:
             raise TransportError(ErrorCode.NOT_FOUND, "Job not found")
         return job
     return await run_in_threadpool(sch.list_jobs) if sch else []
@@ -847,12 +860,10 @@ async def _sse_gen(
 
 async def _sse(request: Request) -> StreamingResponse:
     await run_in_threadpool(_require, request, "events:read")
-    bus = get_global_event_bus()
-    qp = request.query_params
+    bus, qp = get_global_event_bus(), request.query_params
     chan = qp.get("channels") or qp.get("channel") or "*"
     chans = [c.strip() for c in chan.split(",") if c.strip()]
-    since = qp.get("since_cursor")
-    cur = int(since) if since and since.isdigit() else None
+    cur = int(s) if (s := qp.get("since_cursor")) and s.isdigit() else None
     lim = int(qp["limit"]) if "limit" in qp and qp["limit"].isdigit() else None
     sub_id, q, replay, gap = bus.subscribe(chans, since_cursor=cur)
     gen = _sse_gen(request, sub_id, q, replay, gap=gap, limit=lim)
@@ -895,8 +906,8 @@ def _handler(
             response = _success(op, result)
             response["metadata"]["duration_ms"] = (time.perf_counter() - start) * 1000
             res = JSONResponse(response)
-            if getattr(request.state, "authenticated_session", None) is not None:
-                _cookies(res, request, _token(request), _peer(request))
+            if (s := getattr(request.state, "authenticated_session", None)) is not None:
+                _cookies(res, request, _token(request), s.peer_id)
             return res
         except TransportError as error:
             return _failure(error.code, str(error), op)
@@ -914,40 +925,23 @@ def _handler(
 def create_transport_router(*, prefix: str = "/api/v1") -> APIRouter:
     """Create and configure the APIRouter for host transport routes."""
     router = APIRouter(prefix=prefix)
-    spec = (
-        (_auth_route, "GET /auth;POST /auth;POST /auth/login;GET /sessions/me"),
-        (
-            _meta,
-            (
-                "GET /status;GET /readiness;POST /app-loaded;GET /about;"
-                "GET /constants;GET /specs;GET /diagnostics;GET /resources"
-            ),
-        ),
-        (
-            _cfg_route,
-            (
-                "GET /settings;PUT /settings;GET /settings/catalogue;"
-                "PUT /settings/secrets;GET /auth/account;PUT /auth/account"
-            ),
-        ),
-        (
-            _conn_route,
-            (
-                "GET /connections;POST /connections;POST /connections/test;"
-                "DELETE /connections/{connection_id};"
-                "POST /connections/{connection_id}/test"
-            ),
-        ),
-        (_jobs_route, "GET /jobs;GET /jobs/{job_id};POST /jobs/{job_id}/cancel"),
-        (
-            _event_route,
-            "POST /events/publish;GET /events/channels;GET /events/snapshot",
-        ),
-    )
-    for fn, endpoints in spec:
-        for ep in endpoints.split(";"):
+
+    def _add(fn: Any, *eps: str) -> None:
+        for ep in eps:
             m, p = ep.split()
             router.add_api_route(p, _handler(fn), methods=[m], name=fn.__name__)
+
+    _add(_auth_route, "GET /auth", "POST /auth", "POST /auth/login", "GET /sessions/me")
+    _add(_meta, "GET /status", "GET /readiness", "POST /app-loaded", "GET /about")
+    _add(_meta, "GET /constants", "GET /specs", "GET /diagnostics", "GET /resources")
+    _add(_cfg_route, "GET /settings", "PUT /settings", "GET /settings/catalogue")
+    _add(_cfg_route, "PUT /settings/secrets", "GET /auth/account", "PUT /auth/account")
+    _add(_conn_route, "GET /connections", "POST /connections")
+    _add(_conn_route, "POST /connections/test", "DELETE /connections/{connection_id}")
+    _add(_conn_route, "POST /connections/{connection_id}/test")
+    _add(_jobs_route, "GET /jobs", "GET /jobs/{job_id}", "POST /jobs/{job_id}/cancel")
+    _add(_event_route, "POST /events/publish", "GET /events/channels")
+    _add(_event_route, "GET /events/snapshot")
     router.add_api_route("/events", _sse, methods=["GET"], name="_sse")
     router.add_api_websocket_route("/ws", _ws)
     return router
@@ -955,14 +949,14 @@ def create_transport_router(*, prefix: str = "/api/v1") -> APIRouter:
 
 def install_transport(application: FastAPI) -> None:
     """Mount the UI host gateway at /api/v1, including middleware and websocket."""
-    ports = (3000, 8000)
+    ports = (3000, 5173, 8000)
     origins = [f"http://{h}:{p}" for h in ("localhost", "127.0.0.1") for p in ports]
     application.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE"],
-        allow_headers=["Authorization", "Content-Type", "X-Request-Id"],
+        allow_headers=["Authorization", "Content-Type", "X-Request-Id", "X-Peer-Id"],
     )
     application.add_middleware(TransportMiddleware)
     register_transport_exception_handlers(application)

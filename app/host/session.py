@@ -270,6 +270,28 @@ class SessionManager:
         )
         return session
 
+    def resolve_peer(self, token: str) -> str | None:
+        """Resolve the peer identifier bound to a token if valid and active."""
+        if not isinstance(token, str) or not _TOKEN.fullmatch(token):
+            return None
+        digest = hashlib.sha256(token.encode()).hexdigest()
+        try:
+            records = _data(
+                self.persistence.read_records(
+                    "host_session", filters={"token_hash": digest}
+                )
+            ).get("records", [])
+            if (
+                records
+                and records[0].get("status") == "active"
+                and records[0].get("revoked_at_utc") is None
+            ):
+                peer = records[0].get("peer_id")
+                return str(peer) if isinstance(peer, str) and peer else None
+        except SessionPersistenceError, KeyError, ValueError:
+            return None
+        return None
+
     def revoke_session(self, token: str, peer_id: str) -> bool:
         """Log out a browser permanently; repeated logout is idempotent."""
         if not isinstance(token, str) or not _TOKEN.fullmatch(token):

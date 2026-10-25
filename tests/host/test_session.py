@@ -174,3 +174,13 @@ def test_lifecycle_logging_excludes_secrets(authority, monkeypatch):
         "private-browser",
     ):
         assert secret not in calls
+
+
+def test_resolve_peer(authority):
+    manager, _ = authority
+    token = manager.create_session("alice", "ui:browser123")
+    assert manager.resolve_peer(token) == "ui:browser123"
+    assert manager.resolve_peer("invalid") is None
+    assert manager.resolve_peer("a" * 64) is None
+    manager.revoke_session(token, "ui:browser123")
+    assert manager.resolve_peer(token) is None

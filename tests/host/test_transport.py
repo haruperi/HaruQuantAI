@@ -153,6 +153,22 @@ def test_cli_token_cannot_access_ui_gateway(client, gateway):
     assert response.status_code == 401
 
 
+def test_bearer_token_without_cookie_authenticates_ui(gateway):
+    with TestClient(create_app(gateway)) as client:
+        token = SessionManager(gateway).create_session("tester", "ui:testbrowser")
+        res = client.get(
+            "/api/v1/sessions/me", headers={"Authorization": f"Bearer {token}"}
+        )
+        assert res.status_code == 200
+        assert res.json()["data"]["peer_id"] == "ui:testbrowser"
+        # Also verify that CLI tokens without cookies are denied
+        cli_token = SessionManager(gateway).create_session("tester", "cli")
+        res_cli = client.get(
+            "/api/v1/settings", headers={"Authorization": f"Bearer {cli_token}"}
+        )
+        assert res_cli.status_code == 401
+
+
 def test_settings_projection_and_revision_guard(client):
     sign_in(client)
     for path in ("settings", "settings/catalogue", "auth/account"):
