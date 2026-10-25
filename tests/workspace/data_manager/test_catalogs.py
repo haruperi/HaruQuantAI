@@ -25,7 +25,7 @@ def test_symbols_list_success() -> None:
 
     first = response["data"][0]
     assert isinstance(first, dict)
-    assert "symbol" in first
+    assert "name" in first
     assert "description" in first
     assert "price" in first
     assert "margin" in first
@@ -159,8 +159,8 @@ def test_baskets_list_failure() -> None:
 
 
 def test_domain_models_serialization() -> None:
-    sym = SymbolInfo(id=1, symbol="EURUSD", description="Euro")
-    assert sym.to_dict()["symbol"] == "EURUSD"
+    sym = SymbolInfo(name="EURUSD", description="Euro")
+    assert sym.name == "EURUSD"
 
     broker = BrokerInfo(id=1, name="DemoBroker", server_timezone="UTC")
     assert broker.to_dict()["name"] == "DemoBroker"
@@ -171,3 +171,22 @@ def test_domain_models_serialization() -> None:
     basket = BasketInfo(id=1, name="Tech", stocks_count=1, stocks=[stock])
     assert basket.to_dict()["name"] == "Tech"
     assert len(basket.to_dict()["stocks"]) == 1
+
+
+def test_symbol_info_nested_dataclasses() -> None:
+    sym = SymbolInfo(
+        name="EURUSD",
+        price={"digits": 5, "tick_size": 0.0001},
+        spread={"floating": True, "default": 1.5},
+    )
+    assert sym.price.digits == 5
+    assert sym.price.tick_size == 0.0001
+    assert sym.spread.floating is True
+    assert sym.spread.default == 1.5
+    assert sym.margin.initial == 100000.0
+    assert sym.volume.min == 0.01
+    assert sym.trade.mode == "Full access"
+    assert sym.swap.mode == "Points"
+    assert sym.state.selected is True
+    assert len(sym.session) == 7
+    assert sym.session[0].day_of_week == 0

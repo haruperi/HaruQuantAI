@@ -213,6 +213,9 @@ def _extract_field(item: Any, section: str, key: str, default: Any = 0) -> Any:
 
 def _format_commission(item: Any) -> str:
     """Extract human-readable commission summary."""
+    single_comm = _get(item, "commission")
+    if single_comm is not None and isinstance(single_comm, (int, float)):
+        return f"${_fmt_scalar(single_comm)}/lot"
     comm = _get(item, "commissions", {})
     if not isinstance(comm, Mapping):
         return "None"
@@ -243,11 +246,16 @@ def _format_swap(item: Any) -> str:
 def _format_order_size(item: Any) -> str:
     """Extract order size multiplier and step."""
     ord_sz = _get(item, "order_size", {})
-    if not isinstance(ord_sz, Mapping):
-        return "1 / 0"
-    mult = _fmt_scalar(ord_sz.get("multiplier", 1))
-    step = _fmt_scalar(ord_sz.get("step", 0))
-    return f"{mult} / {step}"
+    if isinstance(ord_sz, Mapping) and ord_sz:
+        mult = _fmt_scalar(ord_sz.get("multiplier", 1))
+        step = _fmt_scalar(ord_sz.get("step", 0))
+        return f"{mult} / {step}"
+    vol = _get(item, "volume", {})
+    if isinstance(vol, Mapping) and vol:
+        mult = _fmt_scalar(vol.get("min", 1))
+        step = _fmt_scalar(vol.get("step", 0))
+        return f"{mult} / {step}"
+    return "1 / 0"
 
 
 def format_symbol_table(
@@ -323,13 +331,15 @@ def format_symbol_table(
     lines.append(divider)
 
     for item in displayed_items:
-        sym = str(_get(item, "symbol", ""))
+        sym = str(_get(item, "name", "") or _get(item, "symbol", ""))
         desc = str(_get(item, "description", ""))
         if len(desc) > MAX_DESC_DISPLAY_LEN:
             desc = desc[:DESC_TRUNCATE_LEN] + ".."
 
         brk = str(_get(item, "broker_name") or _get(item, "broker") or "Default")
-        pt_val = _extract_field(item, "contract", "point_value", 0)
+        pt_val = _extract_field(item, "price", "contract_size", None)
+        if pt_val is None or pt_val == 0:
+            pt_val = _extract_field(item, "contract", "point_value", 0)
         if isinstance(pt_val, (int, float)) and pt_val == int(pt_val) and pt_val > 0:
             pt_str = f"{int(pt_val):,}"
         else:

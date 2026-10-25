@@ -265,232 +265,172 @@ class TerminalInfo:
     ping_last: int = 0
     community_balance: float = 0.0
     retransmission: float = 0.0
-def _sync_default_pair(
-    obj: Any, attr_a: str, attr_b: str, default_a: Any, default_b: Any | None = None
-) -> None:
-    """Synchronize two paired attributes when one diverges from its default."""
-    def_b = default_a if default_b is None else default_b
-    val_a, val_b = getattr(obj, attr_a), getattr(obj, attr_b)
-    if val_a != default_a and val_b == def_b:
-        setattr(obj, attr_b, val_a)
-    elif val_b != def_b and val_a == default_a:
-        setattr(obj, attr_a, val_b)
-_SYMBOL_DICT_KEYS = (
-    "id", "connection", "broker_id", "description", "tick_size", "decimals",
-    "tick_value_in_money", "point_value", "default_spread", "default_slippage",
-    "min_volume", "max_volume", "lot_step", "margin_rate", "swap_long", "cot",
-    "swap_short", "commissions", "alias", "exchange", "country", "sector",
-    "order_size_multiplier", "order_size_step", "created_at_utc", "updated_at_utc",
-)
+
+# --- SymbolInfo data structures ---
+@dataclass(slots=True)
+class SymbolSpread:
+    """Spread configuration and default points."""
+
+    floating: bool = True
+    default: float = 0.0
+
+
+@dataclass(slots=True)
+class SymbolMargin:
+    """Margin calculation currencies and requirements."""
+
+    currency_base: str = ""
+    currency_profit: str = ""
+    currency_margin: str = ""
+    initial: float = 100_000.0
+    maintenance: float = 0.0
+    hedged: float = 0.0
+    hedged_use_leg: bool = False
+
+
+@dataclass(slots=True)
+class SymbolVolume:
+    """Volume limits, steps, and real-time deal metrics."""
+
+    min: float = 0.01
+    max: float = 100.0
+    step: float = 0.01
+    limit: float = 0.0
+    current: int = 0
+    high: int = 0
+    low: int = 0
+    real: float = 0.0
+    real_high: float = 0.0
+    real_low: float = 0.0
+
+
+@dataclass(slots=True)
+class SymbolTrade:
+    """Trading policy, orders, and execution parameters."""
+
+    stops_level: int = 0
+    freeze_level: int = 0
+    min_distance: float = 0.0
+    mode: str = "Full access"
+    execution: str = "Market"
+    calculation: str = "Forex"
+    gtc: str = "Good till cancelled"
+    filling: list[str] = field(default_factory=lambda: ["Immediate or Cancel"])
+    expiration: list[str] = field(
+        default_factory=lambda: [
+            "Good till cancelled",
+            "Day",
+            "Specified",
+            "Specified day",
+        ]
+    )
+    orders: list[str] = field(
+        default_factory=lambda: [
+            "Market",
+            "Limit",
+            "Stop",
+            "Stop limit",
+            "Stop Loss",
+            "Take Profit",
+            "Close By",
+        ]
+    )
+
+
+@dataclass(slots=True)
+class SymbolPrice:
+    """Price resolution, contract dimensions, and market depth."""
+
+    digits: int = 5
+    tick_size: float = 0.00001
+    tick_step: float = 0.00001
+    tick_value: float = 1.0
+    contract_size: float = 100_000.0
+    bid: float = 0.0
+    ask: float = 0.0
+    chart_mode: str = "Bid"
+
+
+@dataclass(slots=True)
+class SymbolSwap:
+    """Financing swap rates and triple-swap scheduling."""
+
+    mode: str = "Points"
+    long: float = 0.0
+    short: float = 0.0
+    rollover3days: str = "Wednesday"
+
+
+@dataclass(slots=True)
+class SymbolSessionWindow:
+    """Trading session window for a day of week."""
+
+    day_of_week: int = 0
+    start_time: str = "00:00"
+    end_time: str = "23:59:59"
+
+
+@dataclass(slots=True)
+class SymbolState:
+    """Symbol visibility, selection, and customization flags."""
+
+    custom: bool = False
+    selected: bool = True
+    visible: bool = True
+
+
+def default_session_windows() -> list[SymbolSessionWindow]:
+    """Return standard 7-day default trading session schedule as dataclass instances."""
+    return [
+        SymbolSessionWindow(day_of_week=d, start_time="00:00", end_time="23:59:59")
+        for d in range(7)
+    ]
+
+
+_default_session_windows = default_session_windows
+
+
+def _coerce_dataclass(cls: type[Any], val: Any) -> Any:
+    if isinstance(val, dict):
+        valid = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in val.items() if k in valid})
+    return val
+
+
 @dataclass(slots=True)
 class SymbolInfo:
     """Atomic state of symbol specification, execution modes, rates, and spreads."""
+
     name: str = ""
-    symbol: str = ""
-    id: int | None = None
-    connection: str = ""
-    broker_id: int = 0
-    custom: bool = False
-    chart_mode: int = 0
-    select: bool = True
-    visible: bool = True
-    session_deals: int = 0
-    session_buy_orders: int = 0
-    session_sell_orders: int = 0
-    volume: int = 0
-    volumehigh: int = 0
-    volumelow: int = 0
-    time: int = 0
-    digits: int = 5
-    spread: int = 0
-    spread_float: bool = True
-    ticks_bookdepth: int = 0
-    trade_calc_mode: int = 0
-    trade_calc_mode_description: str = ""
-    trade_mode: int = int(SymbolTradeMode.FULL)
-    trade_mode_description: str = "Full Access"
-    start_time: int = 0
-    expiration_time: int = 0
-    trade_stops_level: int = 0
-    trade_freeze_level: int = 0
-    trade_exemode: int = int(SymbolTradeExecution.MARKET)
-    trade_execution_description: str = "Market"
-    swap_mode: int = 0
-    swap_mode_description: str = ""
-    swap_rollover3days: int = 3
-    swap_rollover3days_description: str = ""
-    margin_hedged_use_leg: bool = False
-    expiration_mode: int = 7
-    filling_mode: int = 1
-    order_mode: int = 127
-    order_gtc_mode: int = 0
-    option_mode: int = 0
-    option_right: int = 0
-    bid: float = 0.0
-    bidhigh: float = 0.0
-    bidlow: float = 0.0
-    ask: float = 0.0
-    askhigh: float = 0.0
-    asklow: float = 0.0
-    last: float = 0.0
-    lasthigh: float = 0.0
-    lastlow: float = 0.0
-    volume_real: float = 0.0
-    volumehigh_real: float = 0.0
-    volumelow_real: float = 0.0
-    option_strike: float = 0.0
-    point: float = 0.00001
-    trade_tick_value: float = 1.0
-    trade_tick_value_profit: float = 1.0
-    trade_tick_value_loss: float = 1.0
-    trade_tick_size: float = 0.00001
-    trade_contract_size: float = 100_000.0
-    trade_accrued_interest: float = 0.0
-    trade_face_value: float = 0.0
-    trade_liquidity_rate: float = 0.0
-    volume_min: float = 0.01
-    volume_max: float = 100.0
-    volume_step: float = 0.01
-    volume_limit: float = 0.0
-    swap_long: float = 0.0
-    swap_short: float = 0.0
-    margin_initial: float = 0.0
-    margin_maintenance: float = 0.0
-    margin_long: float = 1.0
-    margin_short: float = 1.0
-    margin_limit: float = 1.0
-    margin_stop: float = 1.0
-    margin_stop_limit: float = 1.0
-    trade_time_flags: int = 0
-    trade_fill_flags: int = 3
-    session_volume: float = 0.0
-    session_turnover: float = 0.0
-    session_interest: float = 0.0
-    session_buy_orders_volume: float = 0.0
-    session_sell_orders_volume: float = 0.0
-    session_open: float = 0.0
-    session_close: float = 0.0
-    session_aw: float = 0.0
-    session_price_settlement: float = 0.0
-    session_price_limit_min: float = 0.0
-    session_price_limit_max: float = 0.0
-    margin_hedged: float = 0.0
-    price_change: float = 0.0
-    price_volatility: float = 0.0
-    price_theoretical: float = 0.0
-    price_greeks_delta: float = 0.0
-    price_greeks_theta: float = 0.0
-    price_greeks_gamma: float = 0.0
-    price_greeks_vega: float = 0.0
-    price_greeks_rho: float = 0.0
-    price_greeks_omega: float = 0.0
-    price_sensitivity: float = 0.0
-    basis: str = ""
-    category: str = ""
-    currency_base: str = ""
-    currency_profit: str = "USD"
-    currency_margin: str = "USD"
-    bank: str = ""
     description: str = ""
-    exchange: str = ""
-    formula: str = ""
-    isin: str = ""
-    page: str = ""
-    path: str = ""
-    default_spread: float = 0.0
-    default_slippage: float = 0.0
-    commissions: str = _COMMISSION_NOT_RETRIEVED
-    alias: str = ""
-    country: str = ""
-    sector: str = ""
-    order_size_multiplier: float = 1.0
-    order_size_step: float = 0.0
-    cot: str | None = None
-    created_at_utc: str = ""
-    updated_at_utc: str = ""
-    decimals: int = 5
-    tick_size: float = 0.00001
-    tick_step: float = 0.00001
-    point_value: float = 100_000.0
-    tick_value_in_money: float = 1.0
-    min_volume: float = 0.01
-    max_volume: float = 100.0
-    lot_step: float = 0.01
-    margin_rate: float = 0.0
-    data_type: str = ""
-    min_distance: float = 0.0
-    swap_3day_day: int = 3
+    exchange: str = "XCCY"
+    data_type: str = "Forex"
+    spread: SymbolSpread = field(default_factory=SymbolSpread)
+    margin: SymbolMargin = field(default_factory=SymbolMargin)
+    volume: SymbolVolume = field(default_factory=SymbolVolume)
+    trade: SymbolTrade = field(default_factory=SymbolTrade)
+    price: SymbolPrice = field(default_factory=SymbolPrice)
+    swap: SymbolSwap = field(default_factory=SymbolSwap)
+    commission: float = 0.0
+    session: list[SymbolSessionWindow] = field(default_factory=_default_session_windows)
+    state: SymbolState = field(default_factory=SymbolState)
+
     def __post_init__(self) -> None:
-        """Synchronize name/symbol and dual-named instrument attributes."""
-        _sync_default_pair(self, "name", "symbol", "")
-        _sync_default_pair(self, "category", "data_type", "")
-        _sync_default_pair(self, "digits", "decimals", 5)
-        _sync_default_pair(self, "trade_tick_size", "tick_size", 0.00001)
-        _sync_default_pair(self, "tick_size", "tick_step", 0.00001)
-        _sync_default_pair(self, "trade_contract_size", "point_value", 100_000.0)
-        _sync_default_pair(self, "trade_tick_value", "tick_value_in_money", 1.0, 10.0)
-        _sync_default_pair(self, "volume_min", "min_volume", 0.01)
-        _sync_default_pair(self, "volume_max", "max_volume", 100.0)
-        _sync_default_pair(self, "volume_step", "lot_step", 0.01)
-        _sync_default_pair(self, "swap_rollover3days", "swap_3day_day", 3)
-    def round_to_tick_size(self, price: float) -> float:
-        """Round a price to the symbol's minimum tick size."""
-        step = self.trade_tick_size or self.tick_size or 0.00001
-        return round(round(price / step) * step, self.digits or self.decimals)
-    def to_dict(self) -> dict[str, Any]:
-        """Convert specification to dictionary representation."""
-        res = {k: getattr(self, k) for k in _SYMBOL_DICT_KEYS}
-        res["symbol"] = self.symbol or self.name
-        res["tick_step"] = self.tick_step or self.tick_size
-        res["swap_3day_day"] = self.swap_3day_day or self.swap_rollover3days
-        res["data_type"] = self.data_type or self.category or "Forex"
-        res["min_distance"] = self.min_distance or float(self.trade_stops_level)
-        return res
-    @classmethod
-    def from_dict(cls, d: Mapping[str, Any]) -> SymbolInfo:
-        """Construct SymbolInfo from dictionary data."""
-        tsz = float(d.get("tick_size") or d.get("trade_tick_size") or 0.00001)
-        tval = float(d.get("tick_value_in_money") or d.get("trade_tick_value") or 10.0)
-        mrate = float(d.get("margin_rate") or d.get("margin_initial") or 0.05)
-        mdist = float(d.get("min_distance") or d.get("trade_stops_level") or 0.0)
-        return cls(
-            id=d.get("id"), name=str(d.get("symbol") or d.get("name") or ""),
-            digits=int(d.get("decimals") or d.get("digits") or 5),
-            point=tsz, trade_tick_size=tsz, tick_size=tsz,
-            tick_step=float(d.get("tick_step") or tsz),
-            trade_tick_value=tval, tick_value_in_money=tval,
-            trade_contract_size=float(
-                d.get("point_value") or d.get("trade_contract_size") or 1e5
-            ),
-            volume_min=float(d.get("min_volume") or d.get("volume_min") or 0.01),
-            volume_max=float(d.get("max_volume") or d.get("volume_max") or 100.0),
-            volume_step=float(d.get("lot_step") or d.get("volume_step") or 0.01),
-            margin_initial=mrate, margin_rate=mrate,
-            swap_long=float(d.get("swap_long") or 0.0),
-            swap_short=float(d.get("swap_short") or 0.0),
-            swap_rollover3days=int(
-                d.get("swap_3day_day") or d.get("swap_rollover3days") or 3
-            ),
-            trade_stops_level=int(mdist), min_distance=mdist,
-            category=str(d.get("data_type") or d.get("category") or "Forex"),
-            connection=str(d.get("connection", "")),
-            broker_id=int(d.get("broker_id", 0)),
-            description=str(d.get("description", "")),
-            default_spread=float(d.get("default_spread", 0.0)),
-            default_slippage=float(d.get("default_slippage", 0.0)),
-            commissions=str(d.get("commissions", _COMMISSION_NOT_RETRIEVED)),
-            alias=str(d.get("alias", "")), exchange=str(d.get("exchange", "")),
-            country=str(d.get("country", "")), sector=str(d.get("sector", "")),
-            order_size_multiplier=float(d.get("order_size_multiplier", 1.0)),
-            order_size_step=float(d.get("order_size_step", 0.0)),
-            cot=str(d["cot"]) if d.get("cot") is not None else None,
-            created_at_utc=str(d.get("created_at_utc", "")),
-            updated_at_utc=str(d.get("updated_at_utc", "")),
-        )
-    @classmethod
-    def from_row(cls, row: Mapping[str, Any]) -> SymbolInfo:
-        """Construct SymbolInfo from database row mapping."""
-        return cls.from_dict(row)
+        """Coerce dictionary inputs to typed dataclass instances."""
+        self.spread = _coerce_dataclass(SymbolSpread, self.spread)
+        self.margin = _coerce_dataclass(SymbolMargin, self.margin)
+        self.volume = _coerce_dataclass(SymbolVolume, self.volume)
+        self.trade = _coerce_dataclass(SymbolTrade, self.trade)
+        self.price = _coerce_dataclass(SymbolPrice, self.price)
+        self.swap = _coerce_dataclass(SymbolSwap, self.swap)
+        self.state = _coerce_dataclass(SymbolState, self.state)
+        if isinstance(self.session, list):
+            self.session = [
+                _coerce_dataclass(SymbolSessionWindow, w)
+                for w in self.session
+            ]
+
+# --- End of SymbolInfo data structures ---
 
 @dataclass(slots=True)
 class PositionInfo:
@@ -707,6 +647,20 @@ class ChartDef:
         """Construct ChartDef from a dictionary."""
         valid = {f.name for f in fields(cls)}
         return cls(**{k: v for k, v in data.items() if k in valid})
+
+
+def _sync_default_pair(
+    obj: Any, attr_a: str, attr_b: str, default_a: Any, default_b: Any | None = None
+) -> None:
+    """Synchronize two paired attributes when one diverges from its default."""
+    def_b = default_a if default_b is None else default_b
+    val_a, val_b = getattr(obj, attr_a), getattr(obj, attr_b)
+    if val_a != default_a and val_b == def_b:
+        setattr(obj, attr_b, val_a)
+    elif val_b != def_b and val_a == default_a:
+        setattr(obj, attr_a, val_b)
+
+
 @dataclass
 class DataInfo:
     """Historical market dataset catalog metadata record."""

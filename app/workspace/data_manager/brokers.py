@@ -190,12 +190,12 @@ class Brokers:
         return counts
 
     def _read_broker_instruments_counts(self) -> dict[int, int]:
-        """Read count of customized instruments per broker from datamgr_instruments."""
+        """Read count of customized instruments per broker from datamgr_symbols."""
         counts: dict[int, int] = defaultdict(int)
         offset: int | None = 0
         while offset is not None:
             response = persistence.read_records(
-                "datamgr_instruments", limit=1000, offset=offset
+                "datamgr_symbols", limit=1000, offset=offset
             )
             if not response["success"]:
                 break
