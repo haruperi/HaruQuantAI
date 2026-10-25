@@ -909,9 +909,9 @@ class SimulatorClient(TradingClient):
 
     @override
     async def await_request_event(
-        self, req_id: int, timeout: float | None = None
+        self, request_id: int, timeout: float | None = None
     ) -> _c.BridgeEvent:
-        del req_id, timeout
+        del request_id, timeout
         msg = "simulator has no native request event correlation"
         raise BridgeError(msg, code="UNSUPPORTED_OPERATION")
 

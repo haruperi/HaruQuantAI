@@ -26,16 +26,18 @@ Python API Usage:
 
 CLI Usage:
     uv run python -m scripts.examples.brokers
+    uv run python -m scripts.examples.brokers --read-only
     Select BROKER; MT5 requires MT5_BRIDGE_TOKEN and a compiled, attached bridge EA.
 """
 
 from __future__ import annotations
 
+import argparse
 import asyncio
 import math
 import os
 import sys
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -46,34 +48,32 @@ from typing import Any, Literal
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
-from app.services.brokers.base import BridgeError
-from app.services.brokers.ctrader import CTraderClient
-from app.services.brokers.metatrader import MetaTraderClient
-from app.services.brokers.simulator import SimulatorClient
-from app.services.include import format_timestamp
-from app.services.include.contracts import (
+from app.include import format_timestamp
+from app.include.contracts import (
     MarketBar,
     MarketTick,
     SymbolInfo,
     TerminalInfo,
     TradeRequest,
+    TradingBackend,
 )
-from app.services.include.data import (
-    bars_to_dataframe,
+from app.include.data import (
     get_historical_bars,
     get_ticks,
-    ticks_to_dataframe,
 )
-from app.services.include.enums import Timeframe
-from app.services.include.trading import (
+from app.include.enums import (
     MarginMode,
     OrderFilling,
     OrderType,
     ReceiptStatus,
+    Timeframe,
     TradeAction,
-    Trading,
-    TradingBackend,
 )
+from app.include.trading import Trading
+from app.workspace.brokers.base import BridgeError
+from app.workspace.brokers.ctrader import CTraderClient
+from app.workspace.brokers.metatrader import MetaTraderClient
+from app.workspace.brokers.simulator import SimulatorClient
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = os.getenv("BROKER", "mt5")  # type: ignore[assignment]
 ALLOW_LIVE_TRADING = True
@@ -163,6 +163,30 @@ def _report(
     print(
         f"Example {number:02d}/19 - {title} - {'skipped' if skipped else 'passed'}: {summary}"
     )
+
+
+def _symbol_filling(info: SymbolInfo) -> OrderFilling:
+    """Choose an order filling policy from the canonical symbol specification."""
+    if "Fill or Kill" in info.trade.filling:
+        return OrderFilling.FOK
+    if "Immediate or Cancel" in info.trade.filling:
+        return OrderFilling.IOC
+    if info.trade.execution == "Market":
+        raise ExampleError("Symbol filling policy is unavailable")
+    return OrderFilling.RETURN
+
+
+async def _read_history(read: Callable[[], Awaitable[Any]]) -> Any:
+    """Retry only reads while the terminal synchronizes requested history."""
+    for attempt in range(3):
+        try:
+            return await read()
+        except BridgeError as error:
+            if error.code != "DATA_NOT_READY" or attempt == 2:
+                raise
+            print("Terminal history is loading; retrying the read.")
+            await asyncio.sleep(0.5 * (attempt + 1))
+    raise AssertionError("unreachable")
 
 
 def _header(title: str) -> None:
@@ -319,47 +343,51 @@ async def example_04_symbol(ctx: ExampleContext) -> None:
         raise ExampleError("Configured symbol or quote is unavailable")
     info = await symbol.SymbolInfo()
     print(f"Name: {info.name}")
-    print(f"Digits: {info.digits}")
-    print(f"Point: {info.point}")
-    print(f"Tick size: {info.trade_tick_size}")
-    print(f"Bid: {info.bid}")
-    print(f"Ask: {info.ask}")
-    print(f"Last: {info.last}")
-    print(f"Spread: {info.spread}")
-    print(f"Trade mode: {info.trade_mode_description}")
-    print(f"Contract size: {info.trade_contract_size}")
-    print(f"Min lot: {info.volume_min}")
-    print(f"Max lot: {info.volume_max}")
-    print(f"Lot step: {info.volume_step}")
-    print(f"Swap mode: {info.swap_mode}")
-    print(f"Swap long: {info.swap_long}")
-    print(f"Swap short: {info.swap_short}")
+    print(f"Digits: {info.price.digits}")
+    print(f"Point: {info.price.tick_size}")
+    print(f"Tick size: {info.price.tick_step}")
+    print(f"Bid: {info.price.bid}")
+    print(f"Ask: {info.price.ask}")
+    print(
+        f"Last: {last_tick['last'] if isinstance(last_tick, dict) else last_tick.last}"
+    )
+    print(f"Spread: {info.spread.default}")
+    print(f"Trade mode: {info.trade.mode}")
+    print(f"Contract size: {info.price.contract_size}")
+    print(f"Min lot: {info.volume.min}")
+    print(f"Max lot: {info.volume.max}")
+    print(f"Lot step: {info.volume.step}")
+    print(f"Swap mode: {info.swap.mode}")
+    print(f"Swap long: {info.swap.long}")
+    print(f"Swap short: {info.swap.short}")
 
 
 async def example_05_historical_bars(ctx: ExampleContext) -> None:
     """Demonstrate bars by date range converted to a DataFrame."""
     _header("Historical Bars")
     backend = ctx.trading.backend
-    bars = await get_historical_bars(
-        backend, SYMBOL, TIMEFRAME, DATE_FROM, DATE_TO, limit=DATA_LIMIT
+    bars = await _read_history(
+        lambda: get_historical_bars(
+            backend, SYMBOL, TIMEFRAME, DATE_FROM, DATE_TO, limit=DATA_LIMIT
+        )
     )
     print(f"Range count: {len(bars)}")
     print(f"Range sample: {bars[:PREVIEW_LIMIT]}")
-    bars_df = bars_to_dataframe(bars)
     print("Historical Bars DataFrame:")
-    print(bars_df.head())
+    print(bars.head())
 
 
 async def example_06_tick_data(ctx: ExampleContext) -> None:
     """Demonstrate ticks by date range converted to a DataFrame."""
     _header("Historical Ticks")
     backend = ctx.trading.backend
-    ticks = await get_ticks(backend, SYMBOL, TICK_DATE_FROM, DATE_TO, limit=DATA_LIMIT)
+    ticks = await _read_history(
+        lambda: get_ticks(backend, SYMBOL, TICK_DATE_FROM, DATE_TO, limit=DATA_LIMIT)
+    )
     print(f"Range count: {len(ticks)}")
     print(f"Range sample: {ticks[:PREVIEW_LIMIT]}")
-    ticks_df = ticks_to_dataframe(ticks)
     print("Historical Ticks DataFrame:")
-    print(ticks_df.head())
+    print(ticks.head())
 
 
 async def example_07_order_book(ctx: ExampleContext) -> None:
@@ -390,18 +418,12 @@ async def example_08_order_check(ctx: ExampleContext) -> None:
     await trading.symbol.Name(symbol)
     await trading.symbol.RefreshRates()
     sym_info = await trading.symbol.SymbolInfo()
-    ask = float(sym_info.ask)
+    ask = float(sym_info.price.ask)
     await trading.trade.SetExpertMagicNumber(ctx.magic)
     await trading.trade.SetDeviationInPoints(20)
     await trading.trade.SetTypeFillingBySymbol(symbol)
 
-    fill_flags = sym_info.trade_fill_flags
-    if fill_flags & 1:
-        filling = OrderFilling.FOK
-    elif fill_flags & 2:
-        filling = OrderFilling.IOC
-    else:
-        filling = OrderFilling.RETURN
+    filling = _symbol_filling(sym_info)
 
     req = TradeRequest(
         action=TradeAction.DEAL,
@@ -433,9 +455,9 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("A new hedging position is required for this example")
     sym_info = await trading.symbol.SymbolInfo()
-    minimum = float(sym_info.volume_min)
-    maximum = float(sym_info.volume_max)
-    step = float(sym_info.volume_step)
+    minimum = float(sym_info.volume.min)
+    maximum = float(sym_info.volume.max)
+    step = float(sym_info.volume.step)
     if (
         not math.isfinite(VOLUME)
         or step <= 0
@@ -454,11 +476,12 @@ async def example_09_open_position(ctx: ExampleContext) -> None:
         raise ExampleError("Symbol filling policy is unavailable")
     trading.arm()
     req = TradeRequest(
+        type_filling=_symbol_filling(await ctx.trading.symbol.SymbolInfo()),
         action=TradeAction.DEAL,
         symbol=SYMBOL,
         volume=2 * VOLUME,
         order_type=OrderType.BUY,
-        price=float((await trading.symbol.SymbolInfo()).ask),
+        price=float((await trading.symbol.SymbolInfo()).price.ask),
         deviation=20,
         magic=ctx.magic,
     )
@@ -497,8 +520,8 @@ async def example_10_calc_profit_margin(ctx: ExampleContext) -> None:
     """Demonstrate calculating expected profit and required margin using AccountInfo."""
     _header("Calculate Profit and Margin")
     sym_info = await ctx.trading.symbol.SymbolInfo()
-    ask = float(sym_info.ask)
-    point = float(sym_info.point)
+    ask = float(sym_info.price.ask)
+    point = float(sym_info.price.tick_size)
     account = ctx.trading.account
     print(
         f"Margin: {await account.MarginCheck(SYMBOL, OrderType.BUY, 2 * VOLUME, ask)}"
@@ -572,11 +595,11 @@ async def example_12_modify_position(ctx: ExampleContext) -> None:
     await symbol.RefreshRates()
     sym_info = await symbol.SymbolInfo()
     distance = max(
-        max(1000, sym_info.trade_stops_level + 20, sym_info.trade_freeze_level + 20)
-        * float(sym_info.point),
-        0.05 * float(sym_info.bid),
+        max(1000, sym_info.trade.stops_level + 20, sym_info.trade.freeze_level + 20)
+        * float(sym_info.price.tick_size),
+        0.05 * float(sym_info.price.bid),
     )
-    bid, digits = float(sym_info.bid), sym_info.digits
+    bid, digits = float(sym_info.price.bid), sym_info.price.digits
     sl, tp = round(bid - distance, digits), round(bid + distance, digits)
     req = TradeRequest(
         action=TradeAction.SLTP,
@@ -623,12 +646,13 @@ async def example_13_close_partial_position(ctx: ExampleContext) -> None:
         raise ExampleError("Position ownership must be confirmed before partial close")
     before = pos_info.volume
     req = TradeRequest(
+        type_filling=_symbol_filling(await ctx.trading.symbol.SymbolInfo()),
         action=TradeAction.DEAL,
         position=ctx.position_ticket,
         symbol=SYMBOL,
         volume=VOLUME,
         order_type=OrderType.SELL,
-        price=float((await symbol.SymbolInfo()).bid),
+        price=float((await symbol.SymbolInfo()).price.bid),
         deviation=20,
         magic=ctx.magic,
     )
@@ -669,12 +693,13 @@ async def example_14_close_position(ctx: ExampleContext) -> None:
         ctx.trading.disarm()
         raise ExampleError("Position ownership must be confirmed before closing")
     req = TradeRequest(
+        type_filling=_symbol_filling(await ctx.trading.symbol.SymbolInfo()),
         action=TradeAction.DEAL,
         position=ctx.position_ticket,
         symbol=SYMBOL,
         volume=pos_info.volume,
         order_type=OrderType.SELL,
-        price=float((await symbol.SymbolInfo()).bid),
+        price=float((await symbol.SymbolInfo()).price.bid),
         deviation=20,
         magic=ctx.magic,
     )
@@ -701,11 +726,13 @@ async def example_15_pending_orders(ctx: ExampleContext) -> None:
     await symbol.RefreshRates()
     sym_info = await symbol.SymbolInfo()
     distance = max(
-        max(1000, sym_info.trade_stops_level + 20, sym_info.trade_freeze_level + 20)
-        * float(sym_info.point),
-        0.05 * float(sym_info.bid),
+        max(1000, sym_info.trade.stops_level + 20, sym_info.trade.freeze_level + 20)
+        * float(sym_info.price.tick_size),
+        0.05 * float(sym_info.price.bid),
     )
-    ctx.pending_price = round(float(sym_info.bid) - distance, sym_info.digits)
+    ctx.pending_price = round(
+        float(sym_info.price.bid) - distance, sym_info.price.digits
+    )
     req = TradeRequest(
         action=TradeAction.PENDING,
         symbol=SYMBOL,
@@ -784,11 +811,11 @@ async def example_17_modify_pending_orders(ctx: ExampleContext) -> None:
     await symbol.RefreshRates()
     sym_info = await symbol.SymbolInfo()
     distance = max(
-        max(1000, sym_info.trade_stops_level + 20, sym_info.trade_freeze_level + 20)
-        * float(sym_info.point),
-        0.05 * float(sym_info.bid),
+        max(1000, sym_info.trade.stops_level + 20, sym_info.trade.freeze_level + 20)
+        * float(sym_info.price.tick_size),
+        0.05 * float(sym_info.price.bid),
     )
-    price = round(ctx.pending_price - distance, sym_info.digits)
+    price = round(ctx.pending_price - distance, sym_info.price.digits)
     req = TradeRequest(
         action=TradeAction.MODIFY,
         order=ctx.pending_ticket,
@@ -975,14 +1002,18 @@ async def run_examples(
     return ctx.results
 
 
-def main() -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     """Configure CLI logging and run the selected provider."""
+    parser = argparse.ArgumentParser(description="Run the broker trading walkthrough")
+    parser.add_argument("--read-only", action="store_true", help="Skip order writes")
+    arguments = parser.parse_args(argv)
     with TemporaryDirectory(prefix="trading-examples-"):
         try:
             asyncio.run(
                 run_examples(
                     create_backend(BROKER),
-                    allow_writes=BROKER == "simulator" or ALLOW_LIVE_TRADING,
+                    allow_writes=not arguments.read_only
+                    and (BROKER == "simulator" or ALLOW_LIVE_TRADING),
                 )
             )
         except ExampleError as error:
