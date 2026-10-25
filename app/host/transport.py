@@ -355,7 +355,8 @@ class ServletConnection:
 
     def list_connections(self, provider: str | None = None) -> list[dict[str, Any]]:
         """List all saved broker/exchange connection metadata through persistence."""
-        items, offset, filt = [], 0, {"entity_type": _ENTITY}
+        items: list[dict[str, Any]] = []
+        offset, filt = 0, {"entity_type": _ENTITY}
         while True:
             page = _unwrap(
                 self.persistence.read_records(
@@ -476,7 +477,7 @@ class ServletConnection:
             fail: dict[str, Any] = {"authenticated": False, "status": "network_failure"}
             return {**fail, "latency_ms": None}
         lat = (time.perf_counter() - start) * 1000
-        logger.info("Provider credential test completed; authenticated=%s", bool(auth))
+        logger.info("Provider credential test completed; authenticated=%s", auth)
         status = "ok" if auth is True else "invalid_credentials"
         return {"authenticated": auth is True, "status": status, "latency_ms": lat}
 
@@ -569,6 +570,7 @@ def _catalogue(snapshot: dict[str, Any]) -> dict[str, Any]:
         k = {bool: "bool", int: "int", float: "float", list: "list"}.get(
             type(value), "str"
         )
+        val = bool(value) if hidden else _public(value)
         f = {
             "scope": scope,
             "group": group,
@@ -577,9 +579,7 @@ def _catalogue(snapshot: dict[str, Any]) -> dict[str, Any]:
             "kind": k,
             "readonly": group == "user_access",
             "secret": hidden,
-            "configured" if hidden else "value": bool(value)
-            if hidden
-            else _public(value),
+            "configured" if hidden else "value": val,
         }
         fields.append(f)
 
