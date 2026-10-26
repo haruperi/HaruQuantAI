@@ -33,7 +33,7 @@ Owner-approved composition iteration (2026-10-06): fold the original helper
 components into mapped UI files. CDN content belongs to
 `import/cdnDisclaimerPopup.tsx`; fast confirmation stays local to
 `import/importPopup.tsx`. Keep both separately named CDN counterpart boundaries.
-The plugin contains 16 mapped files and 4 declared target-only files. Historical
+The plugin contains 16 mapped files and 5 declared target-only files. Historical
 pilot composition remains documented in its original task walkthrough.
 
 ## Composition and exceptions
@@ -95,3 +95,13 @@ authorizing equivalent work in other plugins; inventory each plugin independentl
 ## SQX145 reference qualification
 
 Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.
+
+
+## Backend download ownership
+
+`downloadStore.ts` submits registered targets to `/data/providers/download`, polls
+`/data/download-jobs/{id}`, and sends pause/resume/stop controls. Only a confirmed
+backend status advances progress or finishes a job. IDs are retained across reload;
+old simulated jobs are discarded. The optional Hong Kong endpoint is disabled until
+configured. Standard mode uses Dukascopy; CDN mode uses StrategyQuant's published
+archives and falls back to standard when unavailable.

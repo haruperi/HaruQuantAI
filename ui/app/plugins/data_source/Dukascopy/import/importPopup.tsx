@@ -12,6 +12,7 @@ export function ImportPopup(props: ImportPopupProps) {
   const { onClose } = props;
   const controller = useImportPopupController(props);
   const {
+    pending,
     minimum,
     from,
     to,
@@ -35,6 +36,7 @@ export function ImportPopup(props: ImportPopupProps) {
   } = controller;
   const presetButton = (value: Preset, label: string) => (
     <Button
+      disabled={pending}
       className={preset === value ? 'primary' : ''}
       aria-pressed={preset === value}
       onClick={() => choose(value)}
@@ -43,7 +45,7 @@ export function ImportPopup(props: ImportPopupProps) {
     </Button>
   );
   return (
-    <div className="modal-backdrop dukas-download-overlay">
+    <div className="modal-backdrop dukas-download-overlay" aria-busy={pending}>
       <div
         ref={root}
         inert={page === 'confirm'}
@@ -55,6 +57,7 @@ export function ImportPopup(props: ImportPopupProps) {
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.stopPropagation();
+            if (pending) return;
             if (page === 'download') onClose();
             else back();
           }
@@ -183,6 +186,7 @@ export function ImportPopup(props: ImportPopupProps) {
                     <input
                       type="radio"
                       name="dukas-mode"
+                      disabled title="Hong Kong endpoint is not configured"
                       checked={mode === 'cdn-cn'}
                       onChange={() => setMode('cdn-cn')}
                     />{' '}
@@ -212,9 +216,9 @@ export function ImportPopup(props: ImportPopupProps) {
           )}
         </div>
         <footer>
-          <Button onClick={page === 'download' ? onClose : back}>Close</Button>
+          <Button disabled={pending} onClick={page === 'download' ? onClose : back}>Close</Button>
           {page !== 'disclaimer' && (
-            <Button data-download-start className="primary" onClick={() => submit()}>
+            <Button data-download-start className="primary" disabled={pending} onClick={() => submit()}>
               Start download
             </Button>
           )}
@@ -226,7 +230,7 @@ export function ImportPopup(props: ImportPopupProps) {
 }
 
 function FastDownloadConfirmation({ controller }: { controller: ImportPopupController }) {
-  const { confirmation, back, trial, submit } = controller;
+  const { confirmation, back, trial, submit, pending } = controller;
   return (
     <div className="modal-backdrop dukas-fast-overlay">
       <div
@@ -258,7 +262,7 @@ function FastDownloadConfirmation({ controller }: { controller: ImportPopupContr
       >
         <header>
           <h2 id="dukas-fast-title">Fast Data Download</h2>
-          <button className="icon-button" aria-label="Close" onClick={back}>
+          <button className="icon-button" aria-label="Close" disabled={pending} onClick={back}>
             ×
           </button>
         </header>
@@ -278,8 +282,8 @@ function FastDownloadConfirmation({ controller }: { controller: ImportPopupContr
           </p>
         </div>
         <footer>
-          <Button onClick={back}>Cancel</Button>
-          <Button className="primary" onClick={() => submit(true)}>
+          <Button disabled={pending} onClick={back}>Cancel</Button>
+          <Button className="primary" disabled={pending} onClick={() => submit(true)}>
             OK
           </Button>
         </footer>

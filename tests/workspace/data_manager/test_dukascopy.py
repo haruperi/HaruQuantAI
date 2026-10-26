@@ -197,8 +197,8 @@ def test_download_m1_parquet(temp_env):
         "datamgr_datasets", filters={"id": "dukascopy:EURUSD:M1"}
     )["data"]["records"][0]
     assert ds_row["bars"] == 5
-    assert ds_row["date_from"] == "2024-12-31"
-    assert ds_row["date_to"] == "2025-01-01"
+    assert ds_row["date_from"].startswith("2024-12-31")
+    assert ds_row["date_to"].startswith("2025-01-01")
 
 
 def test_download_ticks_parquet(temp_env):
@@ -261,3 +261,313 @@ def test_polars_and_duckdb_readers(temp_env):
     ).fetchall()
     assert duck_res[0][0] == 10
     assert duck_res[0][1] == 108550  # int64 tick unit
+
+
+def _bars(dates, prices=None, volume=1):
+    prices = prices or [1.1] * len(dates)
+    return pd.DataFrame(
+        {
+            **dict.fromkeys(("Open", "High", "Low", "Close"), prices),
+            "Volume": [volume] * len(dates),
+        },
+        index=pd.to_datetime(dates, utc=True),
+    )
+
+
+def test_canonical_reader_decodes_exactly_once(temp_env):
+    from app.workspace.brokers.dukascopy import DukascopyClient
+    from app.workspace.brokers.files import read_parquet_bars
+
+    service, gateway, root = temp_env
+    result = service.download("EURUSD", data_frame=_bars(["2025-01-01"]))
+    assert result["success"], result
+    path = result["data"]["partitions_written"][0]
+    assert read_parquet_bars(path)[0]["open"] == pytest.approx(1.1)
+    client = DukascopyClient(
+        data_dir=root, catalog_path=service.catalog_path, gateway=gateway
+    )
+    try:
+        assert client.get_bars("EURUSD", count=1)["Open"].iloc[0] == pytest.approx(1.1)
+    finally:
+        client.disconnect()
+
+
+def test_postfix_and_tick_paths_are_dataset_owned(temp_env):
+    from pathlib import Path
+
+    service, gateway, _ = temp_env
+    ticks = pd.DataFrame(
+        {"Bid": [1.1], "Ask": [1.10001]}, index=pd.to_datetime(["2025-04-01"], utc=True)
+    )
+    result = service.download(
+        "EURUSD_X", underlying="EURUSD", timeframe="TICK", data_frame=ticks
+    )
+    assert result["success"], result
+    row = gateway.read_records(
+        "datamgr_datasets", filters={"id": result["data"]["dataset_id"]}
+    )["data"]["records"][0]
+    assert Path(row["path"]).exists()
+    assert Path(row["path"]).parts[-2:] == ("ticks", "eurusd_x")
+    assert Path(result["data"]["partitions_written"][0]).is_relative_to(row["path"])
+
+
+def test_distinct_same_timestamp_ticks_survive_repeated_import(temp_env):
+    service, _, _ = temp_env
+    frame = pd.DataFrame(
+        {"Bid": [1.1, 1.10001], "Ask": [1.10002, 1.10003], "Flags": [1, 2]},
+        index=pd.to_datetime(["2025-04-01", "2025-04-01"], utc=True),
+    )
+    for _ in range(2):
+        result = service.download("EURUSD", timeframe="TICK", data_frame=frame)
+        assert result["success"], result
+        assert result["data"]["total_bars"] == 2
+
+
+def test_overwrite_preserves_history_outside_requested_interval(temp_env):
+    service, _, _ = temp_env
+    assert service.download("EURUSD", data_frame=_bars(["2025-01-01", "2025-02-01"]))[
+        "success"
+    ]
+    result = service.download(
+        "EURUSD",
+        data_frame=_bars(["2025-02-01"], [1.2]),
+        date_from="2025-02-01",
+        date_to="2025-02-01",
+        overwrite=True,
+    )
+    assert result["success"], result
+    assert result["data"]["total_bars"] == 2
+    assert service.scan_polars("EURUSD").collect()["Open"].to_list() == [110000, 120000]
+
+
+@pytest.mark.parametrize("volume", [-1, 1.5, 2**64, float("nan")])
+def test_invalid_unsigned_values_never_publish(temp_env, volume):
+    service, _, root = temp_env
+    result = service.download("EURUSD", data_frame=_bars(["2025-01-01"], volume=volume))
+    assert not result["success"]
+    assert list(root.rglob("*.parquet")) == []
+
+
+def test_failed_catalog_commit_keeps_old_snapshot_and_cleans_new_parts(
+    temp_env, monkeypatch
+):
+    from pathlib import Path
+
+    service, gateway, root = temp_env
+    first = service.download("EURUSD", data_frame=_bars(["2025-01-01"]))
+    old = Path(first["data"]["partitions_written"][0])
+    original = old.read_bytes()
+    monkeypatch.setattr(
+        HostPersistence,
+        "update_record",
+        lambda *args, **kwargs: {"success": False, "error": {"message": "Rejected"}},
+    )
+    result = service.download("EURUSD", data_frame=_bars(["2025-01-02"]))
+    assert not result["success"]
+    assert old.read_bytes() == original
+    assert list(root.rglob("*.parquet")) == [old]
+    assert gateway.read_records("datamgr_datasets")["data"]["records"][0]["bars"] == 1
+
+
+def test_publication_replaces_one_canonical_file_and_reader_sees_latest(temp_env):
+    from pathlib import Path
+
+    service, _, _ = temp_env
+    first = service.download("EURUSD", data_frame=_bars(["2025-01-01"]))
+    path = Path(first["data"]["partitions_written"][0])
+    original = path.read_bytes()
+    second = service.download("EURUSD", data_frame=_bars(["2025-01-02"]))
+    assert second["success"], second
+    assert path.read_bytes() != original
+    assert path.name == "2025.parquet"
+    assert second["data"]["partitions"] == [str(path)]
+    assert list(path.parent.glob("*.parquet")) == [path]
+    assert service.scan_polars("EURUSD").collect().height == 2
+    assert (
+        pq.read_metadata(second["data"]["partitions_written"][0])
+        .row_group(0)
+        .column(1)
+        .compression
+        == "ZSTD"
+    )
+
+
+def test_concurrent_writers_preserve_both_committed_ranges(temp_env):
+    from concurrent.futures import ThreadPoolExecutor
+
+    service, _, _ = temp_env
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(
+            pool.map(
+                lambda date: service.download("EURUSD", data_frame=_bars([date])),
+                ["2025-01-01", "2025-01-02"],
+            )
+        )
+    assert all(result["success"] for result in results), results
+    assert service.scan_polars("EURUSD").collect().height == 2
+
+
+def test_large_partition_is_one_file_with_batched_row_groups(temp_env):
+    service, _, root = temp_env
+    dates = pd.date_range("2026-01-01", periods=70_000, freq="min", tz="UTC")
+    result = service.download("EURUSD", data_frame=_bars(dates))
+    assert result["success"], result
+    target = root / "m1" / "eurusd" / "2026.parquet"
+    assert result["data"]["partitions"] == [str(target)]
+    metadata = pq.read_metadata(target)
+    assert metadata.num_rows == 70_000
+    assert metadata.num_row_groups == 2
+    assert metadata.row_group(0).num_rows == 65_536
+    assert metadata.schema.to_arrow_schema().remove_metadata().equals(M1_SCHEMA)
+    assert metadata.row_group(0).column(1).compression == "ZSTD"
+    assert list(target.parent.glob("*.parquet")) == [target]
+
+
+@pytest.mark.parametrize("committed", [False, True])
+def test_interrupted_canonical_replacement_recovers_from_journal(temp_env, committed):
+    from app.workspace.data_manager.partition_files import (
+        FilePublication,
+        dataset_lock,
+        recover_publications,
+    )
+
+    service, gateway, root = temp_env
+    result = service.download("EURUSD", data_frame=_bars(["2025-01-01"]))
+    target = root / "m1" / "eurusd" / "2025.parquet"
+    before = target.read_bytes()
+    stage = target.with_name(".2025.test.pending.parquet")
+    stage.write_bytes(before)
+    # Different valid bytes let the test distinguish undo from committed cleanup.
+    table = pq.ParquetFile(target).read()
+    pq.write_table(table, stage, compression="zstd", compression_level=6)
+    after = stage.read_bytes()
+    publication = FilePublication(
+        target.parent, [stage], result["data"]["dataset_id"], "commit-token"
+    )
+    publication.install()
+    if committed:
+        assert gateway.update_record(
+            "datamgr_datasets",
+            {"updated_at": "commit-token"},
+            filters={"id": result["data"]["dataset_id"]},
+        )["success"]
+    with dataset_lock(target.parent):
+        recover_publications(target.parent, gateway)
+    assert target.read_bytes() == (after if committed else before)
+    assert not publication.journal.exists()
+    assert not list(target.parent.glob("*.backup"))
+
+
+def test_old_part_manifest_is_consolidated_without_rescaling(temp_env):
+    import json
+
+    service, gateway, root = temp_env
+    first = service.download("EURUSD", data_frame=_bars(["2025-01-01"]))
+    target = root / "m1" / "eurusd" / "2025.parquet"
+    old = target.parent / "2025" / "part-old.parquet"
+    old.parent.mkdir()
+    target.replace(old)
+    row = gateway.read_records("datamgr_datasets")["data"]["records"][0]
+    lineage = json.loads(row["lineage_json"])
+    lineage["partitions"] = [str(old)]
+    assert gateway.update_record(
+        "datamgr_datasets",
+        {"lineage_json": json.dumps(lineage)},
+        filters={"id": first["data"]["dataset_id"]},
+    )["success"]
+    result = service.download("EURUSD", data_frame=_bars(["2025-01-02"]))
+    assert result["success"], result
+    assert result["data"]["partitions"] == [str(target)]
+    assert service.scan_polars("EURUSD").collect()["Open"].to_list() == [110000, 110000]
+
+
+def test_parquet_preparation_does_not_hold_sqlite_write_lock(temp_env, monkeypatch):
+    from app.workspace.data_manager import storage
+
+    service, gateway, _ = temp_env
+    assert service.download("EURUSD", data_frame=_bars(["2025-01-01"]))["success"]
+    probe = HostPersistence(gateway.database_path, timeout=0.05)
+    original = storage._merge_partition
+    checked = []
+
+    def merge(*args, **kwargs):
+        # Authentication/status requests must be able to write while Parquet
+        # merge/compression is in progress, even with a short SQLite timeout.
+        with probe.transaction() as tx:
+            result = tx.update_record(
+                "datamgr_datasets",
+                {"quality_score": 1.0},
+                filters={"id": "dukascopy:EURUSD:M1"},
+            )
+            assert result["success"]
+        checked.append(True)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(storage, "_merge_partition", merge)
+    result = service.download("EURUSD", data_frame=_bars(["2025-01-02"]))
+    assert result["success"], result
+    assert checked
+    assert result["data"]["total_bars"] == 2
+
+
+def test_legacy_integer_partition_migrates_without_rescaling(temp_env):
+    import json
+    from pathlib import Path
+
+    service, gateway, root = temp_env
+    first = service.download("EURUSD", data_frame=_bars(["2025-01-01"]))
+    legacy = root / "m1" / "eurusd" / "2025.parquet"
+    pq.write_table(
+        pq.read_table(first["data"]["partitions_written"][0]).replace_schema_metadata(
+            None
+        ),
+        legacy,
+    )
+    row = gateway.read_records("datamgr_datasets")["data"]["records"][0]
+    lineage = json.loads(row["lineage_json"])
+    lineage["partitions"] = [str(legacy)]
+    gateway.update_record(
+        "datamgr_datasets",
+        {"lineage_json": json.dumps(lineage)},
+        filters={"id": row["id"]},
+    )
+    before = Path(legacy).read_bytes()
+    result = service.download("EURUSD", data_frame=_bars(["2025-01-02"]))
+    assert result["success"], result
+    assert legacy.read_bytes() != before
+    assert result["data"]["partitions"] == [str(legacy)]
+    assert service.scan_polars("EURUSD").collect()["Open"].to_list() == [110000, 110000]
+
+
+def test_broker_tick_range_visits_every_hour_without_default_limit(
+    temp_env, monkeypatch
+):
+    from datetime import UTC, datetime
+
+    from app.workspace.brokers.dukascopy import DukascopyClient
+
+    service, gateway, root = temp_env
+    client = DukascopyClient(
+        data_dir=root,
+        catalog_path=service.catalog_path,
+        gateway=gateway,
+        use_cache=False,
+    )
+    calls = []
+
+    def fetch(**kwargs):
+        calls.append(kwargs)
+        base = int(kwargs["dt"].timestamp() * 1000)
+        return [{"time_msc": base + i, "bid": 1.1, "ask": 1.10001} for i in range(1200)]
+
+    monkeypatch.setattr(client, "_fetch_datafeed_ticks", fetch)
+    try:
+        result = client.get_ticks(
+            "EURUSD",
+            date_from=datetime(2025, 1, 1, tzinfo=UTC),
+            date_to=datetime(2025, 1, 1, 1, 59, tzinfo=UTC),
+        )
+        assert len(result) == 2400
+        assert len(calls) == 2 and all(call["count"] is None for call in calls)
+    finally:
+        client.disconnect()

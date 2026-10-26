@@ -29,6 +29,7 @@ export function useImportPopupController({ targets, onClose, onStarted }: Import
   const [mode, setMode] = useState<DownloadMode>(trial ? 'standard' : (preferred ?? 'cdn'));
   const [page, setPage] = useState<'download' | 'disclaimer' | 'confirm'>('download');
   const [error, setError] = useState('');
+  const [pending, setPending] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const confirmation = useRef<HTMLDivElement>(null);
   const disclaimerButton = useRef<HTMLButtonElement>(null);
@@ -61,7 +62,8 @@ export function useImportPopupController({ targets, onClose, onStarted }: Import
     setPreset(value);
     setError('');
   }
-  function submit(confirmed = false) {
+  async function submit(confirmed = false) {
+    if (pending) return;
     const request = {
       targets,
       dateFrom: from,
@@ -76,19 +78,21 @@ export function useImportPopupController({ targets, onClose, onStarted }: Import
         setPage('confirm');
         return;
       }
-      start(request);
+      setPending(true);
+      await start(request);
       onStarted();
       onClose();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Unable to start download');
       setPage('download');
-    }
+    } finally { setPending(false); }
   }
   const title =
     page === 'disclaimer'
       ? 'HaruQuantAI CDN Data Disclaimer'
       : `Download Dukascopy data for ${targets.length > 1 ? 'multiple' : `'${targets[0].symbol}'`}`;
   return {
+    pending,
     minimum,
     from,
     to,

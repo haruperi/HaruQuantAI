@@ -4,7 +4,7 @@ Description:
     Manages Dukascopy Bank SA historical market data ingestion according to
     the HaruQuantAI canonical data architecture:
     - Storage: Partitioned Parquet with ZSTD level 6 compression.
-    - Historical writer: PyArrow, batched immutable parts.
+    - Historical writer: PyArrow, batched row groups in canonical partition files.
     - Research/backtest reader: Polars lazy scans.
     - SQL/ad-hoc analytical reader: DuckDB directly over Parquet.
     - Ingestion state & catalog: SQLite datamgr_datasets table.
@@ -16,20 +16,16 @@ Description:
 
 from __future__ import annotations
 
-import calendar
 import json
 import re
 import time
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-import duckdb  # type: ignore[import-untyped]
-import numpy as np
+import duckdb
 import pandas as pd  # type: ignore[import-untyped]
-import polars as pl  # type: ignore[import-untyped]
-import pyarrow as pa  # type: ignore[import-untyped]
-import pyarrow.parquet as pq  # type: ignore[import-untyped]
+import polars as pl
 
 from app.host.logging import get_logger
 from app.host.persistence import HostPersistence
@@ -40,32 +36,20 @@ from app.host.response import (
     StandardResponse,
 )
 from app.include.enums import Timeframe
+from app.include.market_storage import (
+    M1_SCHEMA,
+    TICK_SCHEMA,
+    safe_component,
+    scan_catalog,
+)
 from app.workspace.brokers.base import BridgeError
 from app.workspace.brokers.dukascopy import DukascopyClient
 from app.workspace.data_manager.logs import Logs
+from app.workspace.data_manager.storage import dataset_root, publish_frame, require_data
+
+__all__ = ["M1_SCHEMA", "TICK_SCHEMA", "Dukascopy"]
 
 logger = get_logger(__name__)
-
-# Canonical Schemas: Integer tick units for on-disk prices
-TICK_SCHEMA = pa.schema(
-    [
-        ("DateTime", pa.timestamp("us", tz="UTC")),
-        ("Bid", pa.int64()),
-        ("Ask", pa.int64()),
-        ("Flags", pa.uint16()),
-    ]
-)
-
-M1_SCHEMA = pa.schema(
-    [
-        ("DateTime", pa.timestamp("us", tz="UTC")),
-        ("Open", pa.int64()),
-        ("High", pa.int64()),
-        ("Low", pa.int64()),
-        ("Close", pa.int64()),
-        ("Volume", pa.uint64()),
-    ]
-)
 
 DEFAULT_STORAGE_ROOT = Path("data/market/dukascopy")
 DEFAULT_CATALOG_PATH = DEFAULT_STORAGE_ROOT / "dukascopy.csv"
@@ -109,6 +93,18 @@ DISCLAIMER_PARAGRAPHS = [
 ]
 
 
+def _valid_add_inputs(
+    symbols: Any, data_type: Any, postfix: Any, confirmed: Any
+) -> bool:
+    return (
+        isinstance(data_type, str)
+        and isinstance(postfix, str)
+        and isinstance(confirmed, bool)
+        and isinstance(symbols, (str, list))
+        and (isinstance(symbols, str) or all(isinstance(item, str) for item in symbols))
+    )
+
+
 class Dukascopy:
     """Service managing Dukascopy dataset catalog and historical Parquet ingestion."""
 
@@ -118,11 +114,13 @@ class Dukascopy:
         *,
         storage_root: str | Path | None = None,
         catalog_path: str | Path | None = None,
+        logs: Logs | None = None,
     ) -> None:
         """Initialize Dukascopy service with gateway and storage paths."""
         self.gateway = gateway or HostPersistence()
         self.storage_root = Path(storage_root) if storage_root else DEFAULT_STORAGE_ROOT
         self.catalog_path = Path(catalog_path) if catalog_path else DEFAULT_CATALOG_PATH
+        self.logs = logs
         self._catalog_cache: dict[str, dict[str, Any]] | None = None
 
     def _ensure_catalog(self) -> dict[str, dict[str, Any]]:
@@ -273,7 +271,7 @@ class Dukascopy:
         return raw
 
     @staticmethod
-    def _parse_date_bound(
+    def parse_date_bound(
         val: str | datetime | None, is_end: bool = False
     ) -> datetime | None:
         """Parse string or datetime boundary into UTC datetime."""
@@ -282,15 +280,15 @@ class Dukascopy:
         if isinstance(val, datetime):
             res = val if val.tzinfo is not None else val.replace(tzinfo=UTC)
             if is_end and res.hour == 0 and res.minute == 0 and res.second == 0:
-                res = res.replace(hour=23, minute=59, second=59)
-            return res
+                res = res.replace(hour=23, minute=59, second=59, microsecond=999999)
+            return res.astimezone(UTC)
         if isinstance(val, str) and val.strip():
             try:
                 dt = datetime.fromisoformat(val.strip())
                 res = dt if dt.tzinfo is not None else dt.replace(tzinfo=UTC)
                 if is_end and "T" not in val and " " not in val:
-                    res = res.replace(hour=23, minute=59, second=59)
-                return res
+                    res = res.replace(hour=23, minute=59, second=59, microsecond=999999)
+                return res.astimezone(UTC)
             except ValueError:
                 return None
         return None
@@ -301,7 +299,7 @@ class Dukascopy:
         data_type: str,
         postfix: str,
         disclaimer_confirmed: bool,
-    ) -> tuple[list[str], str, str] | StandardResponse:
+    ) -> tuple[list[str], str, str] | dict[str, Any]:
         """Validate input parameters before creating dataset records."""
         if not disclaimer_confirmed:
             return StandardResponse.failure(
@@ -366,6 +364,8 @@ class Dukascopy:
     ) -> dict[str, Any]:
         """Add Dukascopy symbols to datamgr_datasets catalog."""
         start = time.perf_counter()
+        if not _valid_add_inputs(symbols, data_type, postfix, disclaimer_confirmed):
+            return self._failure("add", ValueError("Invalid add parameters"), start)
         validation = self._validate_add_parameters(
             symbols, data_type, postfix, disclaimer_confirmed
         )
@@ -375,7 +375,7 @@ class Dukascopy:
         symbol_list, norm_type, norm_postfix = validation
         catalog = self._ensure_catalog()
         for sym in symbol_list:
-            if catalog and sym not in catalog:
+            if sym not in catalog:
                 return StandardResponse.failure(
                     message=f"Unknown catalogue symbol '{sym}'",
                     metadata=ResponseMetadata(
@@ -388,84 +388,90 @@ class Dukascopy:
                     ),
                 )
 
-        self.gateway.ensure_datasets_schema()
+        try:
+            require_data(self.gateway.ensure_datasets_schema())
+            with self.gateway.transaction() as tx:
+                # Check for existing datasets to prevent duplicate collision
+                for sym in symbol_list:
+                    target_symbol = safe_component(f"{sym}{norm_postfix}")
+                    dataset_id = f"dukascopy:{target_symbol}:{norm_type}"
+                    existing = tx.read_records(
+                        "datamgr_datasets", filters={"id": dataset_id}, limit=1
+                    )
+                    require_data(existing)
+                    if existing.get("success") and (existing.get("data") or {}).get(
+                        "records"
+                    ):
+                        return StandardResponse.failure(
+                            message=(
+                                f"Data symbol {target_symbol} already exists. "
+                                "Choose a different postfix."
+                            ),
+                            metadata=ResponseMetadata(
+                                operation="dukascopy.add",
+                                duration_ms=(time.perf_counter() - start) * 1000,
+                            ),
+                            error=StandardError(
+                                code=ErrorCode.CONFLICT,
+                                message=f"Dataset {dataset_id} already exists",
+                            ),
+                        )
 
-        # Check for existing datasets to prevent duplicate collision
-        for sym in symbol_list:
-            target_symbol = f"{sym}{norm_postfix}"
-            dataset_id = f"dukascopy:{target_symbol}:{norm_type}"
-            existing = self.gateway.read_records(
-                "datamgr_datasets", filters={"id": dataset_id}, limit=1
-            )
-            if existing.get("success") and (existing.get("data") or {}).get("records"):
-                return StandardResponse.failure(
-                    message=(
-                        f"Data symbol {target_symbol} already exists. "
-                        "Choose a different postfix."
-                    ),
-                    metadata=ResponseMetadata(
-                        operation="dukascopy.add",
-                        duration_ms=(time.perf_counter() - start) * 1000,
-                    ),
-                    error=StandardError(
-                        code=ErrorCode.CONFLICT,
-                        message=f"Dataset {dataset_id} already exists",
-                    ),
-                )
+                now_iso = datetime.now(UTC).isoformat()
+                real_broker = self.resolve_broker_name(broker)
+                created_records: list[dict[str, Any]] = []
 
-        now_iso = datetime.now(UTC).isoformat()
-        real_broker = self.resolve_broker_name(broker)
-        created_records: list[dict[str, Any]] = []
+                for idx, sym in enumerate(symbol_list):
+                    target_symbol = safe_component(f"{sym}{norm_postfix}")
+                    dataset_id = f"dukascopy:{target_symbol}:{norm_type}"
+                    sym_def = (
+                        symbol_definitions[idx]
+                        if symbol_definitions and idx < len(symbol_definitions)
+                        else "-1"
+                    )
+                    cat_entry = catalog.get(sym, {})
+                    tick_sz = cat_entry.get("tick_size", 0.00001)
+                    digits = cat_entry.get("decimals", 5)
+                    category = cat_entry.get("category", "Forex")
+                    from_date = (
+                        cat_entry.get("date_from_m1", "")
+                        if norm_type == "M1"
+                        else cat_entry.get("date_from_tick", "")
+                    )
 
-        for idx, sym in enumerate(symbol_list):
-            target_symbol = f"{sym}{norm_postfix}"
-            dataset_id = f"dukascopy:{target_symbol}:{norm_type}"
-            sym_def = (
-                symbol_definitions[idx]
-                if symbol_definitions and idx < len(symbol_definitions)
-                else "-1"
-            )
-            cat_entry = catalog.get(sym, {})
-            tick_sz = cat_entry.get("tick_size", 0.00001)
-            digits = cat_entry.get("decimals", 5)
-            category = cat_entry.get("category", "Forex")
-            from_date = (
-                cat_entry.get("date_from_m1", "")
-                if norm_type == "M1"
-                else cat_entry.get("date_from_tick", "")
-            )
-
-            record = {
-                "id": dataset_id,
-                "source": "dukascopy",
-                "symbol": target_symbol,
-                "underlying": sym,
-                "timeframe": norm_type,
-                "broker": real_broker,
-                "timezone": "UTC",
-                "category": category,
-                "date_from": from_date,
-                "date_to": "",
-                "bars": 0,
-                "created_at": now_iso,
-                "updated_at": now_iso,
-                "path": str(
-                    self.storage_root / norm_type.lower() / target_symbol.lower()
-                ),
-                "data_kind": "bars" if norm_type == "M1" else "ticks",
-                "quality_score": 1.0,
-                "lineage_json": json.dumps(
-                    {
-                        "tick_size": tick_sz,
-                        "digits": digits,
-                        "symbol_definition": sym_def,
-                        "partitions": [],
+                    record = {
+                        "id": dataset_id,
+                        "source": "dukascopy",
+                        "symbol": target_symbol,
+                        "underlying": sym,
+                        "timeframe": norm_type,
+                        "broker": real_broker,
+                        "timezone": "UTC",
+                        "category": category,
+                        "date_from": from_date,
+                        "date_to": "",
+                        "bars": 0,
+                        "created_at": now_iso,
+                        "updated_at": now_iso,
+                        "path": str(
+                            dataset_root(self.storage_root, target_symbol, norm_type)
+                        ),
+                        "data_kind": "bars" if norm_type == "M1" else "ticks",
+                        "quality_score": 1.0,
+                        "lineage_json": json.dumps(
+                            {
+                                "tick_size": tick_sz,
+                                "digits": digits,
+                                "symbol_definition": sym_def,
+                                "partitions": [],
+                            }
+                        ),
+                        "schema_version": 1,
                     }
-                ),
-                "schema_version": 1,
-            }
-            self.gateway.create_records("datamgr_datasets", record)
-            created_records.append(record)
+                    require_data(tx.create_records("datamgr_datasets", record))
+                    created_records.append(record)
+        except (RuntimeError, ValueError, TypeError, OSError) as error:
+            return self._failure("add", error, start)
 
         return StandardResponse.success(
             message=f"Added {len(created_records)} Dukascopy dataset(s)",
@@ -474,6 +480,68 @@ class Dukascopy:
                 duration_ms=(time.perf_counter() - start) * 1000,
             ),
             data={"records": created_records, "count": len(created_records)},
+        )
+
+    def _prepare_download(
+        self,
+        symbol: str,
+        *,
+        underlying: str | None,
+        timeframe: str,
+        download_type: str,
+        date_from: Any,
+        date_to: Any,
+        overwrite: bool,
+        count: int | None,
+    ) -> Any:
+        target = safe_component(symbol.strip().upper())
+        clean = safe_component((underlying or target).strip().upper())
+        resolution = timeframe.upper()
+        if resolution not in ("M1", "TICK") or download_type not in (
+            "standard",
+            "cdn",
+        ):
+            raise ValueError("Unsupported resolution or download mode")
+        if not isinstance(overwrite, bool) or (
+            count is not None
+            and (isinstance(count, bool) or not isinstance(count, int) or count < 1)
+        ):
+            raise ValueError("Invalid overwrite or count")
+        lower = self.parse_date_bound(date_from)
+        upper = self.parse_date_bound(date_to, is_end=True)
+        if (
+            (date_from is not None and lower is None)
+            or (date_to is not None and upper is None)
+            or (lower and upper and lower > upper)
+        ):
+            raise ValueError("Choose a valid UTC date range")
+        info = self._ensure_catalog().get(clean)
+        if info is None:
+            raise ValueError(f"Unknown Dukascopy catalog symbol: {clean}")
+        return target, clean, resolution, lower, upper, info
+
+    @staticmethod
+    def _failure(operation: str, error: Exception, started: float) -> dict[str, Any]:
+        code = (
+            ErrorCode.UNAVAILABLE
+            if isinstance(error, (RuntimeError, OSError))
+            else ErrorCode.VALIDATION
+        )
+        if isinstance(error, BridgeError):
+            code = (
+                ErrorCode.NOT_FOUND
+                if error.code == "NO_DATA"
+                else ErrorCode.UNAVAILABLE
+            )
+        return StandardResponse.failure(
+            message=str(error)[:1000] or "Download failed",
+            metadata=ResponseMetadata(
+                operation=f"dukascopy.{operation}",
+                duration_ms=(time.perf_counter() - started) * 1000,
+            ),
+            error=StandardError(
+                code=code, message=str(error)[:1000] or "Download failed"
+            ),
         )
 
     def download(
@@ -489,444 +557,137 @@ class Dukascopy:
         download_type: str = "cdn",
         data_frame: pd.DataFrame | None = None,
         count: int | None = None,
-        client: Any | None = None,
+        client: Any = None,
+        context: Any = None,
     ) -> dict[str, Any]:
-        """Download market data and save partitioned Parquet with ZSTD level 6."""
-        start = time.perf_counter()
-        del download_type
-        clean_symbol = (underlying or symbol).strip().upper()
-        norm_tf = timeframe.strip().upper()
-
-        if norm_tf not in ("M1", "TICK"):
-            return StandardResponse.failure(
-                message=f"Timeframe '{timeframe}' not supported. Supported: M1, TICK",
-                metadata=ResponseMetadata(
-                    operation="dukascopy.download",
-                    duration_ms=(time.perf_counter() - start) * 1000,
-                ),
-                error=StandardError(
-                    code=ErrorCode.VALIDATION,
-                    message="Unsupported timeframe",
-                ),
+        """Fetch prices and publish canonical yearly/monthly Parquet files."""
+        started = time.perf_counter()
+        owned = None
+        try:
+            target, clean, resolution, lower, upper, info = self._prepare_download(
+                symbol,
+                underlying=underlying,
+                timeframe=timeframe,
+                download_type=download_type,
+                date_from=date_from,
+                date_to=date_to,
+                overwrite=overwrite,
+                count=count,
             )
-
-        catalog = self._ensure_catalog()
-        cat_info = catalog.get(clean_symbol)
-        digits = cat_info.get("decimals", 5) if cat_info else 5
-        tick_sz = cat_info.get("tick_size", 0.00001) if cat_info else 0.00001
-        scale = 1.0 / tick_sz if tick_sz > 0 else float(10**digits)
-
-        df: pd.DataFrame
-        if data_frame is not None:
-            df = data_frame.copy()
-        else:
-            duk_client = client or DukascopyClient(
-                catalog_path=self.catalog_path, data_dir=self.storage_root
-            )
-            d_from = self._parse_date_bound(date_from)
-            d_to = self._parse_date_bound(date_to, is_end=True)
-            try:
-                if norm_tf == "M1":
-                    df = duk_client.get_bars(
-                        clean_symbol,
+            require_data(self.gateway.ensure_datasets_schema())
+            if context is not None:
+                context.wait_if_paused()
+            if data_frame is None:
+                if client is None:
+                    owned = DukascopyClient(
+                        catalog_path=self.catalog_path,
+                        data_dir=self.storage_root,
+                        use_cache=False,
+                        download_mode=download_type,
+                        gateway=self.gateway,
+                        context=context,
+                    )
+                    client = owned
+                if resolution == "M1":
+                    frame = client.get_bars(
+                        clean,
                         Timeframe.PERIOD_M1,
-                        date_from=d_from,
-                        date_to=d_to,
+                        date_from=lower,
+                        date_to=upper,
                         count=count,
                     )
                 else:
-                    df = duk_client.get_ticks(
-                        clean_symbol,
-                        date_from=d_from,
-                        date_to=d_to,
-                        count=count,
+                    frame = client.get_ticks(
+                        clean, date_from=lower, date_to=upper, count=count
                     )
-            except (
-                BridgeError,
-                OSError,
-                ValueError,
-                RuntimeError,
-                AttributeError,
-            ) as exc:
-                return StandardResponse.failure(
-                    message=(
-                        f"Failed to download Dukascopy data for {clean_symbol}: {exc}"
-                    ),
-                    metadata=ResponseMetadata(
-                        operation="dukascopy.download",
-                        duration_ms=(time.perf_counter() - start) * 1000,
-                    ),
-                    error=StandardError(
-                        code=ErrorCode.INTERNAL,
-                        message=str(exc),
-                    ),
-                )
-
-        if df is None or len(df) == 0:
-            return StandardResponse.failure(
-                message=f"No {norm_tf} data available for {clean_symbol}",
+            else:
+                frame = data_frame
+            self._require_frame(frame)
+            now = datetime.now(UTC).isoformat()
+            record = {
+                "id": f"dukascopy:{target}:{resolution}",
+                "source": "dukascopy",
+                "symbol": target,
+                "underlying": clean,
+                "timeframe": resolution,
+                "broker": self.resolve_broker_name(broker),
+                "timezone": "UTC",
+                "category": info["category"],
+                "data_kind": "bars" if resolution == "M1" else "ticks",
+                "created_at": now,
+            }
+            result = publish_frame(
+                self.gateway,
+                self.storage_root,
+                record,
+                frame,
+                info["tick_size"],
+                overwrite=overwrite,
+                date_from=lower,
+                date_to=upper,
+                context=context,
+            )
+            return StandardResponse.success(
+                message=f"Published {resolution} history for {target}",
                 metadata=ResponseMetadata(
                     operation="dukascopy.download",
-                    duration_ms=(time.perf_counter() - start) * 1000,
+                    duration_ms=(time.perf_counter() - started) * 1000,
                 ),
-                error=StandardError(
-                    code=ErrorCode.NOT_FOUND,
-                    message="Empty dataset returned",
-                ),
-            )
-
-        # Standardize DateTime column and reset index to avoid ambiguity
-        if "DateTime" in df.columns:
-            df["DateTime"] = pd.to_datetime(df["DateTime"], utc=True)
-        else:
-            df["DateTime"] = pd.to_datetime(df.index, utc=True)
-
-        df = df.reset_index(drop=True)
-        df.sort_values("DateTime", inplace=True)
-        written_files: list[Path] = []
-
-        if norm_tf == "M1":
-            written_files = self._write_m1_partitions(
-                df, clean_symbol, scale, overwrite
-            )
-        else:
-            written_files = self._write_tick_partitions(
-                df, clean_symbol, scale, overwrite
-            )
-
-        # Re-compute total bars & range across all partitions
-        total_bars, min_dt, max_dt, all_partitions = self._audit_partitions(
-            clean_symbol, norm_tf
-        )
-        min_date_str = (
-            min_dt.strftime("%Y-%m-%d")
-            if min_dt
-            else (str(date_from or "").split("T")[0])
-        )
-        max_date_str = (
-            max_dt.strftime("%Y-%m-%d")
-            if max_dt
-            else (str(date_to or "").split("T")[0])
-        )
-
-        # Persist ingestion state in SQLite
-        dataset_id = self._record_dataset_catalog(
-            symbol=symbol,
-            underlying=clean_symbol,
-            timeframe=norm_tf,
-            broker=broker,
-            bars=total_bars,
-            date_from=min_date_str,
-            date_to=max_date_str,
-            partitions=[str(p) for p in all_partitions],
-            tick_size=tick_sz,
-            digits=digits,
-        )
-
-        Logs().record_progress(
-            task_id="dukascopy_download",
-            progress=100.0,
-            message=(
-                f"Downloaded {len(df)} {norm_tf} records for {clean_symbol} "
-                f"({total_bars} total)"
-            ),
-            level="info",
-        )
-
-        return StandardResponse.success(
-            message=f"Downloaded and saved {len(df)} {norm_tf} records for {symbol}",
-            metadata=ResponseMetadata(
-                operation="dukascopy.download",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ),
-            data={
-                "symbol": symbol,
-                "underlying": clean_symbol,
-                "timeframe": norm_tf,
-                "downloaded_bars": len(df),
-                "total_bars": total_bars,
-                "date_from": min_date_str,
-                "date_to": max_date_str,
-                "partitions_written": [str(p) for p in written_files],
-                "dataset_id": dataset_id,
-            },
-        )
-
-    def _write_m1_partitions(
-        self,
-        df: pd.DataFrame,
-        symbol: str,
-        scale: float,
-        overwrite: bool,
-    ) -> list[Path]:
-        """Write M1 bars grouped by year as integer tick units."""
-        target_dir = self.storage_root / "m1" / symbol.lower()
-        target_dir.mkdir(parents=True, exist_ok=True)
-        written: list[Path] = []
-
-        # Convert prices to int64 tick units
-        open_ints = (df["Open"] * scale).round().astype(np.int64)
-        high_ints = (df["High"] * scale).round().astype(np.int64)
-        low_ints = (df["Low"] * scale).round().astype(np.int64)
-        close_ints = (df["Close"] * scale).round().astype(np.int64)
-        vol_ints = (
-            df["Volume"].fillna(0).astype(np.uint64)
-            if "Volume" in df.columns
-            else np.zeros(len(df), dtype=np.uint64)
-        )
-
-        transformed = pd.DataFrame(
-            {
-                "DateTime": df["DateTime"],
-                "Open": open_ints,
-                "High": high_ints,
-                "Low": low_ints,
-                "Close": close_ints,
-                "Volume": vol_ints,
-            }
-        )
-
-        for year, group in transformed.groupby(transformed["DateTime"].dt.year):
-            file_path = target_dir / f"{year}.parquet"
-            final_df = group
-            if file_path.exists() and not overwrite:
-                try:
-                    existing = pq.read_table(file_path).to_pandas()
-                    if existing["Open"].dtype.kind == "f":
-                        existing["Open"] = (
-                            (existing["Open"] * scale).round().astype(np.int64)
-                        )
-                        existing["High"] = (
-                            (existing["High"] * scale).round().astype(np.int64)
-                        )
-                        existing["Low"] = (
-                            (existing["Low"] * scale).round().astype(np.int64)
-                        )
-                        existing["Close"] = (
-                            (existing["Close"] * scale).round().astype(np.int64)
-                        )
-                    if "Volume" in existing.columns:
-                        existing["Volume"] = (
-                            existing["Volume"].fillna(0).astype(np.uint64)
-                        )
-                    merged = pd.concat([existing, group], ignore_index=True)
-                    merged.drop_duplicates(subset=["DateTime"], inplace=True)
-                    merged.sort_values("DateTime", inplace=True)
-                    final_df = merged
-                except OSError, ValueError, pa.ArrowInvalid:
-                    final_df = group
-
-            final_df = final_df.copy()
-            final_df["Open"] = final_df["Open"].astype(np.int64)
-            final_df["High"] = final_df["High"].astype(np.int64)
-            final_df["Low"] = final_df["Low"].astype(np.int64)
-            final_df["Close"] = final_df["Close"].astype(np.int64)
-            final_df["Volume"] = final_df["Volume"].astype(np.uint64)
-
-            table = pa.Table.from_pandas(
-                final_df, schema=M1_SCHEMA, preserve_index=False
-            )
-            pq.write_table(table, file_path, compression="ZSTD", compression_level=6)
-            written.append(file_path)
-
-        return written
-
-    def _write_tick_partitions(
-        self,
-        df: pd.DataFrame,
-        symbol: str,
-        scale: float,
-        overwrite: bool,
-    ) -> list[Path]:
-        """Write ticks grouped by year and month as integer tick units."""
-        sym_lower = symbol.lower()
-        written: list[Path] = []
-
-        bid_ints = (df["Bid"] * scale).round().astype(np.int64)
-        ask_ints = (df["Ask"] * scale).round().astype(np.int64)
-        flags = (
-            df["Flags"].fillna(0).astype(np.uint16)
-            if "Flags" in df.columns
-            else np.zeros(len(df), dtype=np.uint16)
-        )
-
-        transformed = pd.DataFrame(
-            {
-                "DateTime": df["DateTime"],
-                "Bid": bid_ints,
-                "Ask": ask_ints,
-                "Flags": flags,
-            }
-        )
-
-        dt_series = transformed["DateTime"]
-        groups = transformed.groupby([dt_series.dt.year, dt_series.dt.month])
-        for (year, month), group in groups:
-            month_abbr = calendar.month_abbr[month].lower()
-            month_filename = f"{month:02d}-{month_abbr}.parquet"
-            month_dir = self.storage_root / "ticks" / sym_lower / str(year)
-            month_dir.mkdir(parents=True, exist_ok=True)
-            file_path = month_dir / month_filename
-            final_df = group
-
-            if file_path.exists() and not overwrite:
-                try:
-                    existing = pq.read_table(file_path).to_pandas()
-                    if "Bid" in existing.columns and existing["Bid"].dtype.kind == "f":
-                        existing["Bid"] = (
-                            (existing["Bid"] * scale).round().astype(np.int64)
-                        )
-                        existing["Ask"] = (
-                            (existing["Ask"] * scale).round().astype(np.int64)
-                        )
-                    if "Flags" in existing.columns:
-                        existing["Flags"] = (
-                            existing["Flags"].fillna(0).astype(np.uint16)
-                        )
-                    merged = pd.concat([existing, group], ignore_index=True)
-                    merged.drop_duplicates(subset=["DateTime"], inplace=True)
-                    merged.sort_values("DateTime", inplace=True)
-                    final_df = merged
-                except OSError, ValueError, pa.ArrowInvalid:
-                    final_df = group
-
-            final_df = final_df.copy()
-            final_df["Bid"] = final_df["Bid"].astype(np.int64)
-            final_df["Ask"] = final_df["Ask"].astype(np.int64)
-            final_df["Flags"] = final_df["Flags"].astype(np.uint16)
-
-            table = pa.Table.from_pandas(
-                final_df, schema=TICK_SCHEMA, preserve_index=False
-            )
-            pq.write_table(table, file_path, compression="ZSTD", compression_level=6)
-            written.append(file_path)
-
-        return written
-
-    def _audit_partitions(
-        self,
-        symbol: str,
-        timeframe: str,
-    ) -> tuple[int, datetime | None, datetime | None, list[Path]]:
-        """Inspect on-disk Parquet partitions and calculate total records and bounds."""
-        sub_dir = "m1" if timeframe == "M1" else "ticks"
-        root = self.storage_root / sub_dir / symbol.lower()
-        if not root.exists():
-            return 0, None, None, []
-
-        parquet_files = sorted(root.rglob("*.parquet"))
-        total_rows = 0
-        min_dt: datetime | None = None
-        max_dt: datetime | None = None
-
-        for p in parquet_files:
-            try:
-                meta = pq.read_metadata(p)
-                total_rows += meta.num_rows
-                if meta.num_rows > 0:
-                    tbl = pq.read_table(p, columns=["DateTime"])
-                    col = tbl.column("DateTime")
-                    p_min = col[0].as_py()
-                    p_max = col[-1].as_py()
-                    if min_dt is None or p_min < min_dt:
-                        min_dt = p_min
-                    if max_dt is None or p_max > max_dt:
-                        max_dt = p_max
-            except (OSError, ValueError, pa.ArrowInvalid) as audit_err:
-                logger.debug("Partition inspect skipped %s: %s", p, audit_err)
-
-        return total_rows, min_dt, max_dt, parquet_files
-
-    def _record_dataset_catalog(
-        self,
-        *,
-        symbol: str,
-        underlying: str,
-        timeframe: str,
-        broker: str,
-        bars: int,
-        date_from: str,
-        date_to: str,
-        partitions: list[str],
-        tick_size: float,
-        digits: int,
-    ) -> str:
-        """Upsert ingestion state into datamgr_datasets table."""
-        self.gateway.ensure_datasets_schema()
-        dataset_id = f"dukascopy:{symbol}:{timeframe}"
-        now_iso = datetime.now(UTC).isoformat()
-        real_broker = self.resolve_broker_name(broker)
-        catalog = self._ensure_catalog()
-        cat_info = catalog.get(underlying, {})
-        category = cat_info.get("category", "Forex")
-        path_str = str(self.storage_root / timeframe.lower() / symbol.lower())
-
-        lineage = json.dumps(
-            {
-                "tick_size": tick_size,
-                "digits": digits,
-                "partitions": partitions,
-                "data_kind": "bars" if timeframe == "M1" else "ticks",
-            }
-        )
-
-        existing = self.gateway.read_records(
-            "datamgr_datasets", filters={"id": dataset_id}, limit=1
-        )
-        if existing.get("success") and (existing.get("data") or {}).get("records"):
-            self.gateway.update_record(
-                "datamgr_datasets",
-                {
-                    "bars": bars,
-                    "date_from": date_from,
-                    "date_to": date_to,
-                    "path": path_str,
-                    "updated_at": now_iso,
-                    "lineage_json": lineage,
-                },
-                filters={"id": dataset_id},
-            )
-        else:
-            self.gateway.create_records(
-                "datamgr_datasets",
-                {
-                    "id": dataset_id,
-                    "source": "dukascopy",
-                    "symbol": symbol,
-                    "underlying": underlying,
-                    "timeframe": timeframe,
-                    "broker": real_broker,
-                    "timezone": "UTC",
-                    "category": category,
-                    "date_from": date_from,
-                    "date_to": date_to,
-                    "bars": bars,
-                    "path": path_str,
-                    "data_kind": "bars" if timeframe == "M1" else "ticks",
-                    "quality_score": 1.0,
-                    "lineage_json": lineage,
-                    "schema_version": 1,
-                    "created_at": now_iso,
-                    "updated_at": now_iso,
+                data={
+                    "symbol": target,
+                    "underlying": clean,
+                    "timeframe": resolution,
+                    "downloaded_bars": len(frame),
+                    **result,
                 },
             )
-        return dataset_id
+        except (
+            BridgeError,
+            RuntimeError,
+            OSError,
+            ValueError,
+            TypeError,
+            KeyError,
+        ) as error:
+            return self._failure("download", error, started)
+        finally:
+            if owned is not None:
+                owned.disconnect()
+
+    @staticmethod
+    def _require_frame(frame: Any) -> None:
+        if frame is None or frame.empty:
+            raise BridgeError(
+                "No observations returned for the requested range", code="NO_DATA"
+            )
+
+    def catalog_record(self, symbol: str, timeframe: str) -> dict[str, Any]:
+        """Resolve a registered dataset by its stable public identity."""
+        rows = require_data(
+            self.gateway.read_records(
+                "datamgr_datasets",
+                filters={"id": f"dukascopy:{symbol.upper()}:{timeframe.upper()}"},
+                limit=1,
+            )
+        )["records"]
+        if not rows:
+            raise ValueError("Dataset is not registered")
+        return cast("dict[str, Any]", rows[0])
 
     def scan_polars(self, symbol: str, timeframe: str = "M1") -> pl.LazyFrame:
-        """Open lazy Polars scan over partitioned Parquet files for research."""
-        sub_dir = "m1" if timeframe.upper() == "M1" else "ticks"
-        target_path = self.storage_root / sub_dir / symbol.lower()
-        glob_pattern = str(target_path / "**" / "*.parquet").replace("\\", "/")
-        return pl.scan_parquet(glob_pattern)
+        """Lazily scan catalog partitions, preserving on-disk integer units."""
+        return scan_catalog(self.catalog_record(symbol, timeframe))
 
     def query_duckdb(
         self, query: str, symbol: str | None = None, timeframe: str = "M1"
     ) -> duckdb.DuckDBPyRelation:
-        """Run SQL directly over partitioned Parquet files using DuckDB."""
-        if symbol:
-            sub_dir = "m1" if timeframe.upper() == "M1" else "ticks"
-            path_str = str(
-                self.storage_root / sub_dir / symbol.lower() / "**" / "*.parquet"
-            ).replace("\\", "/")
-            query = query.replace("$PARQUET", f"'{path_str}'")
-        return duckdb.query(query)
+        """Query an active snapshot using $PARQUET as the registered relation name."""
+        if symbol is None:
+            return duckdb.query(query)
+        from app.include.market_storage import catalog_paths
+
+        connection = duckdb.connect()
+        connection.read_parquet(
+            catalog_paths(self.catalog_record(symbol, timeframe))
+        ).create_view("history")
+        return connection.sql(query.replace("$PARQUET", "history"))

@@ -946,9 +946,16 @@ to `M1` timeframe. Use `--data-type TICK` for tick datasets.
 
 ```powershell
 uv run python -m app.cli data-manager dukascopy download EURUSD --timeframe M1 --from 2025-01-01 --to 2025-04-01
-uv run python -m app.cli data-manager dukascopy download EURUSD --timeframe TICK --count 50000
+uv run python -m app.cli data-manager dukascopy download EURUSD --timeframe TICK --from 2025-04-01 --to 2025-04-02 --download-type standard
 ```
 
-Downloads historical data from Dukascopy, formats on-disk integer tick prices, and writes batched,
-immutable Parquet partitions under `data/market/dukascopy/` (`m1/{symbol}/{year}.parquet` or
-`ticks/{symbol}/{year}/{month:02d}-{month_abbr}.parquet`).
+Downloads historical data from Dukascopy, encodes on-disk integer tick prices, and writes
+ZSTD level 6 Parquet files with batched row groups under `data/market/dukascopy/`:
+`m1/{dataset-symbol}/{year}.parquet` or
+`ticks/{dataset-symbol}/{year}/{month:02d}-{month_abbr}.parquet`.
+The catalog manifest records canonical partition paths.
+`--overwrite` replaces observations only inside the requested range. Without it,
+existing M1 timestamps win; ticks deduplicate by timestamp, bid, ask, and flags.
+`--download-type standard` selects Dukascopy directly; `cdn` selects StrategyQuant
+archives with direct fallback when no archive is available. Synchronous CLI calls
+finish after catalog publication; the UI uses persistent backend jobs.

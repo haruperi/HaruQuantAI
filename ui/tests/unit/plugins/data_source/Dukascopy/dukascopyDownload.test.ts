@@ -40,33 +40,48 @@ it('resolves each fast target independently and uses standard speed for unsuppor
   }
 });
 
-describe('Dukascopy download store lifecycle', () => {
-  it('starts download job and advances to completion with remote sync', async () => {
-    const { vi } = await import('vitest');
-    vi.resetModules();
-    const memory = new Map<string, string>();
-    const storage = {
-      getItem: (key: string) => memory.get(key) ?? null,
-      setItem: (key: string, value: string) => { memory.set(key, value); },
-      removeItem: (key: string) => { memory.delete(key); },
-    };
-    vi.stubGlobal('localStorage', storage);
-
-    const { useDukascopyDownloads } = await import('../../../../../app/plugins/data_source/Common/dataManagerStore');
-    const request = {
-      targets: [target],
-      dateFrom: '2020-01-01',
-      dateTo: '2020-02-01',
-      dateType: 'custom' as const,
-      overwrite: false,
-      downloadType: 'standard' as const,
-    };
-    useDukascopyDownloads.getState().start(request);
-    expect(useDukascopyDownloads.getState().job?.state).toBe('running');
-
-    while (useDukascopyDownloads.getState().job?.state === 'running') {
-      useDukascopyDownloads.getState().advance();
-    }
-    expect(useDukascopyDownloads.getState().job?.state).toBe('completed');
+describe('Dukascopy backend download lifecycle', () => {
+  async function storeWith(records: unknown[]) {
+    const {vi}=await import('vitest');vi.resetModules();
+    const memory=new Map<string,string>();
+    vi.stubGlobal('localStorage',{getItem:(key:string)=>memory.get(key)??null,setItem:(key:string,value:string)=>memory.set(key,value)});
+    const fetch=vi.fn().mockImplementation(async()=>new Response(JSON.stringify({success:true,status:'success',data:records.shift()}),{status:200}));
+    vi.stubGlobal('fetch',fetch);
+    const refresh=vi.fn().mockResolvedValue(undefined);
+    const {createDownloadStore}=await import('../../../../../app/plugins/data_source/Dukascopy/downloadStore');
+    return {store:createDownloadStore(refresh),createDownloadStore,refresh,fetch};
+  }
+  const request={targets:[target],dateFrom:'2020-01-01',dateTo:'2020-02-01',dateType:'custom' as const,overwrite:true,downloadType:'standard' as const};
+  const job=(status:string,progress=0)=>({job_id:'backend-job',status,progress,message:status});
+  it('awaits acceptance, forwards options and completes only from backend status',async()=>{
+    const {store,fetch,refresh}=await storeWith([job('QUEUED'),job('RUNNING',25),job('COMPLETED',100)]);
+    await store.getState().start(request);
+    expect(store.getState().job?.jobId).toBe('backend-job');
+    expect(JSON.parse(fetch.mock.calls[0][1].body)).toMatchObject({overwrite:true,download_type:'standard',targets:[{symbol:'EURUSD',timeframe:'M1'}]});
+    await store.getState().advance();expect(store.getState().job?.progress).toBe(25);
+    expect(refresh).not.toHaveBeenCalled();
+    await store.getState().advance();expect(store.getState().job?.state).toBe('completed');
+    expect(refresh).toHaveBeenCalledOnce();
+  });
+  it('controls and restores the same backend ID without fabricating a paused job',async()=>{
+    const {store,createDownloadStore,fetch}=await storeWith([job('RUNNING',10),job('PAUSED',10),job('RUNNING',10),job('CANCELLED',10)]);
+    await store.getState().start(request);await store.getState().action('pause');
+    expect(store.getState().job?.state).toBe('paused');
+    const restored=createDownloadStore(async()=>{});
+    expect(restored.getState().job?.jobId).toBe('backend-job');
+    await restored.getState().action('resume');await restored.getState().action('stop');
+    expect(restored.getState().job?.state).toBe('cancelled');
+    expect(fetch.mock.calls.map(call=>String(call[0]))).toContain('/api/v1/data/download-jobs/backend-job/stop');
+  });
+  it('retains truthful progress on polling failure and reports submission errors',async()=>{
+    const {store,fetch}=await storeWith([job('RUNNING',10)]);
+    await store.getState().start(request);
+    fetch.mockRejectedValueOnce(new Error('Backend offline'));
+    await store.getState().advance();
+    expect(store.getState().job?.progress).toBe(10);expect(store.getState().job?.state).toBe('running');
+    expect(store.getState().storageError).toContain('Backend offline');
+    const second=await storeWith([]);second.fetch.mockRejectedValueOnce(new Error('Rejected'));
+    await expect(second.store.getState().start(request)).rejects.toThrow('Rejected');
+    expect(second.store.getState().job).toBeNull();
   });
 });

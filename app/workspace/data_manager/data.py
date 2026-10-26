@@ -4,8 +4,8 @@ Description:
     Provides high-level dataset metrics for the Data Manager workspace,
     reading saved datasets catalog entries from the authoritative SQLite database
     (datamgr_datasets table). Exposes saved datasets catalog and summaries.
-    Operates as a read-only database presentation service without physical
-    storage auditing or data reconciliation.
+    Reads active historical snapshots and retires catalog visibility without
+    deleting immutable files used by in-flight readers.
 
 Purpose:
     FEAT-DATAMGR-DATA: Data Manager dataset catalog presentation and overview.
@@ -32,16 +32,10 @@ CLI Usage:
 from __future__ import annotations
 
 import json
-import shutil
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
-
-import pandas as pd  # type: ignore[import-untyped]
-import pyarrow as pa  # type: ignore[import-untyped]
-import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
 from app.host.persistence import HostPersistence
@@ -52,7 +46,9 @@ from app.host.response import (
     StandardResponse,
 )
 from app.include.contracts import DataInfo
+from app.include.market_storage import scan_catalog
 from app.workspace.data_manager.dukascopy import Dukascopy
+from app.workspace.data_manager.storage import require_data
 
 __all__ = [
     "Data",
@@ -64,6 +60,14 @@ persistence = HostPersistence()
 
 OVERVIEW_FR = "FR-DATAMGR-DATA-OVERVIEW"
 DATASETS_CATALOG_FR = "FR-DATAMGR-DATA-CATALOG"
+
+
+_MAX_CHART_ROWS = 10000
+
+
+def _chart_bounds(limit: int, offset: int) -> None:
+    if isinstance(limit, bool) or not 1 <= limit <= _MAX_CHART_ROWS or offset < 0:
+        raise ValueError("Invalid chart pagination")
 
 
 class Data:
@@ -185,8 +189,8 @@ class Data:
                 total_days = 0
                 if date_from and date_to:
                     try:
-                        d_from = datetime.fromisoformat(date_from.replace(".", "-"))
-                        d_to = datetime.fromisoformat(date_to.replace(".", "-"))
+                        d_from = datetime.fromisoformat(date_from)
+                        d_to = datetime.fromisoformat(date_to)
                         total_days = max(0, (d_to - d_from).days)
                     except ValueError:
                         total_days = 0
@@ -265,22 +269,25 @@ class Data:
                     ),
                 )
             row = records[0]
-            path_str = str(row.get("path", "")).strip()
-            if path_str:
-                p = Path(path_str)
-                if p.exists() and p.is_dir():
-                    shutil.rmtree(p, ignore_errors=True)
-
+            # Retire snapshots in the catalog; physical GC is a separate operation.
             now_iso = datetime.now(UTC).isoformat()
-            self.gateway.update_record(
-                "datamgr_datasets",
-                {
-                    "bars": 0,
-                    "date_from": "",
-                    "date_to": "",
-                    "updated_at": now_iso,
-                },
-                filters={"id": dataset_id},
+            require_data(
+                self.gateway.update_record(
+                    "datamgr_datasets",
+                    {
+                        "bars": 0,
+                        "lineage_json": json.dumps(
+                            {
+                                **json.loads(row.get("lineage_json") or "{}"),
+                                "partitions": [],
+                            }
+                        ),
+                        "date_from": "",
+                        "date_to": "",
+                        "updated_at": now_iso,
+                    },
+                    filters={"id": dataset_id},
+                )
             )
             return StandardResponse.success(
                 message=f"Dataset '{dataset_id}' cleared successfully",
@@ -304,7 +311,7 @@ class Data:
             )
 
     def delete(self, dataset_id: str) -> dict[str, Any]:
-        """Remove dataset catalog entry and on-disk files."""
+        """Retire a catalog entry; immutable files await explicit garbage collection."""
         start = time.perf_counter()
         try:
             resp = self.gateway.read_records(
@@ -323,14 +330,12 @@ class Data:
                         message="Dataset not found",
                     ),
                 )
-            row = records[0]
-            path_str = str(row.get("path", "")).strip()
-            if path_str:
-                p = Path(path_str)
-                if p.exists() and p.is_dir():
-                    shutil.rmtree(p, ignore_errors=True)
-
-            self.gateway.delete_record("datamgr_datasets", filters={"id": dataset_id})
+            # Retire snapshots in the catalog; physical GC is a separate operation.
+            require_data(
+                self.gateway.delete_record(
+                    "datamgr_datasets", filters={"id": dataset_id}
+                )
+            )
             return StandardResponse.success(
                 message=f"Dataset '{dataset_id}' deleted successfully",
                 metadata=ResponseMetadata(
@@ -378,53 +383,28 @@ class Data:
                     ),
                 )
             row = records[0]
-            path_str = str(row.get("path", "")).strip()
-            lineage = json.loads(row.get("lineage_json") or "{}")
-            tick_sz = float(lineage.get("tick_size") or 0.00001)
-
+            _chart_bounds(limit, offset)
             bars: list[dict[str, Any]] = []
-            if path_str:
-                p = Path(path_str)
-                parquet_files = sorted(p.rglob("*.parquet")) if p.exists() else []
-                dfs: list[Any] = []
-                for pf in parquet_files:
-                    try:
-                        table = pq.read_table(pf)
-                        dfs.append(table.to_pandas())
-                    except (OSError, ValueError, pa.ArrowInvalid) as read_err:
-                        logger.debug("Skip reading %s: %s", pf, read_err)
-                if dfs:
-                    all_df = pd.concat(dfs, ignore_index=True)
-                    all_df.sort_values("DateTime", inplace=True)
-                    sliced = all_df.iloc[offset : offset + limit]
-                    is_tick = "Bid" in sliced.columns
-                    for _, r in sliced.iterrows():
-                        dt_str = str(r["DateTime"])
-                        if is_tick:
-                            bid = float(r["Bid"]) * tick_sz
-                            ask = float(r["Ask"]) * tick_sz
-                            mid = (bid + ask) / 2.0
-                            bars.append(
-                                {
-                                    "datetime": dt_str,
-                                    "open": mid,
-                                    "high": ask,
-                                    "low": bid,
-                                    "close": mid,
-                                    "volume": 1,
-                                }
-                            )
-                        else:
-                            bars.append(
-                                {
-                                    "datetime": dt_str,
-                                    "open": float(r["Open"]) * tick_sz,
-                                    "high": float(r["High"]) * tick_sz,
-                                    "low": float(r["Low"]) * tick_sz,
-                                    "close": float(r["Close"]) * tick_sz,
-                                    "volume": int(r.get("Volume", 0)),
-                                }
-                            )
+            if row.get("bars"):
+                frame = (
+                    scan_catalog(row, decode=True)
+                    .sort("DateTime")
+                    .slice(offset, limit)
+                    .collect()
+                )
+                for item in frame.iter_rows(named=True):
+                    tick = row["timeframe"] == "TICK"
+                    mid = (item["Bid"] + item["Ask"]) / 2 if tick else item["Close"]
+                    bars.append(
+                        {
+                            "datetime": item["DateTime"].isoformat(),
+                            "open": mid if tick else item["Open"],
+                            "high": item["Ask"] if tick else item["High"],
+                            "low": item["Bid"] if tick else item["Low"],
+                            "close": mid,
+                            "volume": 1 if tick else item["Volume"],
+                        }
+                    )
 
             return StandardResponse.success(
                 message=f"Loaded {len(bars)} chart bars for {dataset_id}",

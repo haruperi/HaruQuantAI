@@ -5,8 +5,6 @@ Description:
     (`FilesClient`) along with shared delimited (CSV, TSV, semicolon-separated),
     columnar (Parquet), and MetaTrader 4 binary (`HST` v400/v401, `FXT` v405)
     parsers, exporters, and deterministic partition discovery helpers.
-Purpose:
-    FEAT-DATA-SOURCE-FILES: Local Filesystem Historical Market Data Ingestion and Codecs.
 Key Capabilities:
     - FR-BROKER-FILES-PARSING: CSV, Parquet, HST, and FXT Bar and Tick Ingestion
       Associated: `[FilesClient.get_bars()]`, `[FilesClient.get_ticks()]`,
@@ -22,15 +20,6 @@ Key Capabilities:
     - FR-BROKER-CODECS-FXT: Decode and encode MT4 FXT tick model files (version 405).
       Associated: `decode_fxt_bytes()`, `encode_fxt_bytes()`
       Logging: Emits DEBUG on parsing FXT header and model records.
-Python API Usage:
-    ```python
-    from app.workspace.brokers.files import FilesClient, parse_delimited_bars
-    from app.include.enums import Timeframe
-
-    client = FilesClient(data_dir="data/market")
-    bars = client.get_bars("EURUSD", Timeframe.PERIOD_M1, count=5)
-    client.disconnect()
-    ```
 """
 
 from __future__ import annotations
@@ -345,7 +334,13 @@ def read_parquet_bars(
     if not p.is_file():
         return []
 
-    df = pq.read_table(p).to_pandas()
+    table = pq.read_table(p)
+    df = table.to_pandas()
+    metadata = table.schema.metadata or {}
+    if metadata.get(b"haruquantai.price_encoding") == b"integer-ticks-v1":
+        step = float(metadata[b"haruquantai.tick_size"])
+        for column in ("Open", "High", "Low", "Close"):
+            df[column] = df[column] * step
     if df.empty:
         return []
     df.columns = [str(c).lower().strip() for c in df.columns]

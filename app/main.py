@@ -23,6 +23,7 @@ from app.host.session import SessionManager
 from app.host.settings import SettingsManager
 from app.host.transport import CredentialTester, Vault, install_transport
 from app.workspace.data_manager.logs import Logs
+from app.workspace.data_manager.partition_files import recover_catalog_publications
 
 logger = get_logger(__name__)
 _MAX_PORT = 65535
@@ -51,6 +52,7 @@ def create_app(
         application.state.persistence = gateway
         application.state.settings = settings
         application.state.data_logs = Logs()
+        await to_thread(recover_catalog_publications, gateway)
 
         def scopes_for(username: str) -> tuple[str, ...]:
             access = settings.get_scope("user_access")
@@ -62,9 +64,10 @@ def create_app(
             yield
         finally:
             logger.info("Backend shutting down")
-            if (jobs := getattr(application.state, "basket_jobs", None)) is not None:
-                await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
-                del application.state.basket_jobs
+            for name in ("basket_jobs", "download_jobs"):
+                if (jobs := getattr(application.state, name, None)) is not None:
+                    await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
+                    delattr(application.state, name)
             del application.state.data_logs
             del application.state.sessions
             del application.state.settings

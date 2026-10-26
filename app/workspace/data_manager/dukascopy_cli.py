@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Callable
 from typing import Any
 
 from app.workspace.data_manager.dukascopy import Dukascopy
@@ -56,6 +57,12 @@ def register_dukascopy_commands(resources: Any) -> None:
     # Download data
     down_cmd = commands.add_parser(
         "download", help="Download historical bars or ticks to partitioned Parquet"
+    )
+    down_cmd.add_argument(
+        "--download-type",
+        choices=["standard", "cdn"],
+        default="cdn",
+        help="Select direct datafeed or CDN with direct fallback",
     )
     down_cmd.add_argument("symbol", help="Target symbol to download (e.g. EURUSD)")
     down_cmd.add_argument(
@@ -116,6 +123,7 @@ def _execute_download(service: Dukascopy, args: argparse.Namespace) -> dict[str,
         underlying=args.underlying,
         overwrite=args.overwrite,
         count=args.count,
+        download_type=args.download_type,
     )
 
 
@@ -130,7 +138,7 @@ def run_dukascopy_command(
     del parser
     service = Dukascopy()
     command = arguments.dukascopy_command
-    dispatch = {
+    dispatch: dict[str, Callable[[], dict[str, Any]]] = {
         "disclaimer": service.disclaimer,
         "catalog": lambda: _execute_catalog(service, arguments),
         "add": lambda: _execute_add(service, arguments),

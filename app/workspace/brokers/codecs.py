@@ -15,6 +15,7 @@ from app.host.logging import get_logger
 logger = get_logger(__name__)
 
 CODEC_FR = "FR-BROKER-CODECS-SQDAT"
+_BAR_MILLISECONDS = 60_000
 SQ_MAGIC_HEADER_V42 = b"SQ42\x01\x00"
 
 __all__ = ["CODEC_FR", "SQ_MAGIC_HEADER_V42", "decode_sq_dat_bytes"]
@@ -62,7 +63,10 @@ def decode_sq_dat_bytes(
         anchor_off = None
         for offset in range(curr, min(curr + 16, next_b_off - 48 + 1)):
             val = struct.unpack_from(">Q", buf, offset)[0]
-            if 500_000_000_000 <= val <= 5_000_000_000_000:
+            if (
+                500_000_000_000 <= val <= 5_000_000_000_000
+                and val % _BAR_MILLISECONDS == 0
+            ):
                 anchor_off = offset
                 break
 
@@ -132,6 +136,8 @@ def decode_sq_dat_bytes(
                 break
 
             ts_ms += deltas[0]
+            if ts_ms % _BAR_MILLISECONDS:
+                break  # Trailer bytes are not a minute-aligned bar record.
             o_raw += deltas[1]
             h_raw += deltas[2]
             l_raw += deltas[3]

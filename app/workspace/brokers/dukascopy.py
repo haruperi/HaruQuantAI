@@ -52,6 +52,7 @@ from typing import Any, override
 import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
+from app.host.persistence import HostPersistence
 from app.include.contracts import (
     MarketBar,
     MarketTick,
@@ -70,6 +71,7 @@ from .base import (
     epoch_seconds,
     execute_bounded_get,
 )
+from .canonical_history import cached_frame, fetch_interval
 from .codecs import decode_sq_dat_bytes
 from .files import (
     find_matching_partitions,
@@ -241,15 +243,24 @@ class DukascopyClient(BrokerClient):
         name: str = "Dukascopy",
         catalog_path: str | Path | None = None,
         data_dir: str | Path | None = None,
+        use_cache: bool = True,
+        download_mode: str = "cdn",
+        gateway: HostPersistence | None = None,
+        context: Any = None,
     ) -> None:
         """Initialize Dukascopy broker client."""
         super().__init__(name=name)
+        if download_mode not in ("standard", "cdn"):
+            raise ValueError("download_mode must be standard or cdn")
         self.catalog_path = Path(catalog_path) if catalog_path else DEFAULT_CATALOG_PATH
         self.data_dir: Path | None = (
             Path(data_dir)
             if data_dir is not None
             else (DEFAULT_DATA_DIR if DEFAULT_DATA_DIR.exists() else None)
         )
+        self.use_cache, self.download_mode = use_cache, download_mode
+        self.gateway = gateway if gateway is not None else HostPersistence()
+        self.context = context
         self._catalog: dict[str, SymbolInfo] | None = None
         self.session = create_http_session(
             USER_AGENT, retries=3, backoff=0.3, pool_size=16
@@ -352,7 +363,7 @@ class DukascopyClient(BrokerClient):
         sym_clean: str,
         dt: datetime,
         decimals: int,
-        count: int = 100,
+        count: int | None = 100,
     ) -> list[dict[str, Any]]:
         """Fetch and decompress daily candles from Dukascopy direct datafeed."""
         feed_url = (
@@ -368,7 +379,7 @@ class DukascopyClient(BrokerClient):
         if resp.status_code != 200 or not resp.content:
             raise BridgeError(
                 f"No bars available for '{sym_clean}' from Dukascopy datafeed (HTTP {resp.status_code})",
-                code="NO_DATA",
+                code="NO_DATA" if resp.status_code == 404 else "NETWORK_ERROR",
             )
         decomp = decompress_bi5(resp.content)
         if not decomp:
@@ -384,7 +395,7 @@ class DukascopyClient(BrokerClient):
         sym_clean: str,
         dt: datetime,
         decimals: int,
-        count: int = 100,
+        count: int | None = 100,
     ) -> list[dict[str, Any]]:
         """Fetch and decompress hourly ticks from Dukascopy direct datafeed."""
         feed_url = (
@@ -400,7 +411,7 @@ class DukascopyClient(BrokerClient):
         if resp.status_code != 200 or not resp.content:
             raise BridgeError(
                 f"No ticks available for '{sym_clean}' from Dukascopy datafeed (HTTP {resp.status_code})",
-                code="NO_DATA",
+                code="NO_DATA" if resp.status_code == 404 else "NETWORK_ERROR",
             )
         decomp = decompress_bi5(resp.content)
         if not decomp:
@@ -482,6 +493,8 @@ class DukascopyClient(BrokerClient):
 
         all_bars: list[dict[str, Any]] = []
         for zname in selected_zips:
+            if self.context is not None:
+                self.context.wait_if_paused()
             zip_url = f"{self.CDN_BASE_URL}/m1/{sym_clean}/{zname}"
             try:
                 zresp = execute_bounded_get(
@@ -491,7 +504,7 @@ class DukascopyClient(BrokerClient):
                     provider="dukascopy",
                 )
                 if zresp.status_code != 200 or not zresp.content:
-                    continue
+                    raise BridgeError("CDN archive unavailable", code="NETWORK_ERROR")
                 with zipfile.ZipFile(io.BytesIO(zresp.content)) as zf:
                     for fname in sorted(zf.namelist()):
                         if fname.endswith(".dat"):
@@ -502,8 +515,9 @@ class DukascopyClient(BrokerClient):
                             )
                             all_bars.extend(file_bars)
             except Exception as exc:
-                self.logger.warning("Error fetching CDN archive %s: %s", zname, exc)
-                continue
+                raise BridgeError(
+                    f"CDN archive failed: {zname}", code="NETWORK_ERROR"
+                ) from exc
 
         all_bars.sort(key=lambda b: b["time"])
         if count and count > 0 and len(all_bars) > count:
@@ -554,9 +568,25 @@ class DukascopyClient(BrokerClient):
             datetime.fromtimestamp(end_sec, tz=UTC) if 0 < end_sec < 2**40 else None
         )
 
+        if self.use_cache:
+            cached = cached_frame(
+                self.gateway,
+                self.data_dir,
+                "dukascopy",
+                sym_clean,
+                "M1",
+                date_from,
+                date_to,
+                target_count,
+            )
+            if cached is not None:
+                return cached
+
         # Check local canonical data directory
         search_dirs = (
-            [self.data_dir] if self.data_dir and self.data_dir.exists() else []
+            [self.data_dir]
+            if self.use_cache and self.data_dir and self.data_dir.exists()
+            else []
         )
         all_local_bars: list[dict[str, Any]] = []
         for sdir in search_dirs:
@@ -609,40 +639,25 @@ class DukascopyClient(BrokerClient):
                 return self._rows_to_market_bars(selected)
 
         # 2. Try StrategyQuant pre-packaged Dukascopy CDN archives
-        cdn_bars = self._fetch_cdn_bars(
-            sym_clean=sym_clean,
-            count=target_count,
-            date_from=date_from,
-            date_to=date_to,
+        cdn_bars = (
+            self._fetch_cdn_bars(
+                sym_clean=sym_clean,
+                count=target_count,
+                date_from=date_from,
+                date_to=date_to,
+            )
+            if self.download_mode != "standard"
+            else []
         )
         if cdn_bars:
             return self._rows_to_market_bars(cdn_bars)
 
-        feed_dt = date_to or (
-            date_from + timedelta(days=1)
-            if date_from
-            else datetime(2023, 1, 2, tzinfo=UTC)
+        rows = fetch_interval(
+            self, sym_clean, "M1", date_from, date_to, target_count, decimals
         )
-        feed_bars = self._fetch_datafeed_bars(
-            sym_clean=sym_clean,
-            dt=feed_dt,
-            decimals=decimals,
-            count=target_count,
-        )
-        feed_bars.sort(key=lambda r: r["time"])
-        filtered = [
-            r
-            for r in feed_bars
-            if (not date_from or r["time"] >= int(date_from.timestamp()))
-            and (not date_to or r["time"] <= int(date_to.timestamp()))
-        ]
-        if not filtered:
-            raise BridgeError(
-                f"No bars available for '{sym_clean}' from Dukascopy",
-                code="NO_DATA",
-            )
-        selected = filtered[-target_count:] if target_count else filtered
-        return self._rows_to_market_bars(selected)
+        if not rows:
+            raise BridgeError("No bars in the requested range", code="NO_DATA")
+        return self._rows_to_market_bars(rows)
 
     @override
     def get_ticks(
@@ -660,74 +675,37 @@ class DukascopyClient(BrokerClient):
         sym_clean = self._clean_symbol(symbol)
         snap = self.get_symbol_info(sym_clean)
         decimals = snap.price.digits
-        target_count = count or limit or 100
         s = date_from if date_from is not None else start
         e = date_to if date_to is not None else end
-        start_ms = epoch_millis(s)
-        end_ms = epoch_millis(e)
-
-        # Check local data_dir if available
-        if self.data_dir is not None and self.data_dir.exists():
-            matched = find_matching_partitions(self.data_dir, sym_clean, "TICK")
-            all_local_ticks: list[dict[str, Any]] = []
-            for p in matched:
-                if p.suffix.lower() == ".bi5":
-                    decomp = decompress_bi5(p.read_bytes())
-                    base_dt = (
-                        datetime.fromtimestamp(start_ms / 1000.0, tz=UTC)
-                        if start_ms > 0
-                        else datetime(2023, 1, 1, tzinfo=UTC)
-                    )
-                    all_local_ticks.extend(
-                        decode_bi5_ticks(
-                            decomp, base_dt, digits=decimals, count=target_count
-                        )
-                    )
-            if all_local_ticks:
-                all_local_ticks.sort(key=lambda r: r["time_msc"])
-                filtered = [
-                    r
-                    for r in all_local_ticks
-                    if (start_ms <= 0 or r["time_msc"] >= start_ms)
-                    and (end_ms <= 0 or r["time_msc"] <= end_ms)
-                ]
-                if filtered:
-                    selected = filtered[-target_count:] if target_count else filtered
-                    local_ticks = [
-                        MarketTick(
-                            time_msc=int(t["time_msc"]),
-                            bid=float(t["bid"]),
-                            ask=float(t["ask"]),
-                            last=float(t.get("last", t["bid"])),
-                            volume=int(t.get("volume", 1)),
-                            flags=int(t.get("flags", 0)),
-                            volume_real=float(t.get("volume_real", 1.0)),
-                        )
-                        for t in selected
-                    ]
-                    return ticks_to_dataframe(local_ticks)
-
-        target_dt = (
-            datetime.fromtimestamp(start_ms / 1000.0, tz=UTC)
-            if 0 < start_ms < 2**50
-            else datetime(2023, 1, 2, 10, tzinfo=UTC)
+        target_count = count if s is not None or e is not None else count or limit
+        begin = (
+            datetime.fromtimestamp(epoch_millis(s) / 1000, tz=UTC)
+            if s is not None
+            else None
         )
-        ticks = self._fetch_datafeed_ticks(
-            sym_clean=sym_clean,
-            dt=target_dt,
-            decimals=decimals,
-            count=target_count,
+        stop = (
+            datetime.fromtimestamp(epoch_millis(e) / 1000, tz=UTC)
+            if e is not None
+            else None
         )
-        ticks.sort(key=lambda r: r["time_msc"])
-        if end_ms > 0:
-            ticks = [t for t in ticks if t["time_msc"] <= end_ms]
-        if not ticks:
-            raise BridgeError(
-                f"No ticks available for '{sym_clean}' from Dukascopy",
-                code="NO_DATA",
+        if self.use_cache:
+            cached = cached_frame(
+                self.gateway,
+                self.data_dir,
+                "dukascopy",
+                sym_clean,
+                "TICK",
+                begin,
+                stop,
+                target_count,
             )
-        if target_count and len(ticks) > target_count:
-            ticks = ticks[-target_count:]
+            if cached is not None:
+                return cached
+        ticks = fetch_interval(
+            self, sym_clean, "TICK", begin, stop, target_count, decimals
+        )
+        if not ticks:
+            raise BridgeError("No ticks in the requested range", code="NO_DATA")
         parsed_ticks = [
             MarketTick(
                 time_msc=int(t["time_msc"]),

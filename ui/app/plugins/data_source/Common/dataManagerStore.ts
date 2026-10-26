@@ -1,3 +1,4 @@
+import {createDownloadStore} from '../Dukascopy/downloadStore';
 import { normalizeSymbolContract } from './symbolContract';
 import { createSymbolDataClient } from './symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
@@ -9,7 +10,7 @@ import { mt5Active, reservedMt5, useMt5Import } from '../MetaTrader/mt5ImportSto
 import { activeImport, useFileImports } from '../FileImport/fileImportStore';
 import { useFileSymbols } from '../FileImport/fileSymbolsStore';
 import { validateTD, type TDJob, type TDRequest } from '../TickDownloader/tickDownloader';
-import { emptyDownload, resolveDownloadModes, downloadStep, validateDownload, availableStart, mergeRanges, validDate, type DownloadState, type DownloadRequest, type Interval } from '../Dukascopy/dukascopyDownload';
+import { validDate } from '../Dukascopy/dukascopyDownload';
 import { create } from 'zustand';
 import { catalogue, type AddDukasRequest } from '../Dukascopy/dukascopy';
 import { normalizeBrokerName, validateBroker, type BrokerProfile, type BrokerUpdateJob } from '../Catalogs/BrokerProfiles/brokerProfiles';
@@ -301,7 +302,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
         }));
         if (!saved || saved.id !== id || saved.symbol !== symbol || saved.underlying !== item.symbol ||
             saved.timeframe !== request.dataType || saved.source !== 'dukascopy' ||
-            ['broker', 'broker_name', 'timezone', 'symbolDefinition', 'path', 'category'].some(key => typeof saved[key] !== 'string') || saved.bars !== 0) {
+            ['broker', 'timezone', 'symbolDefinition', 'path', 'category'].some(key => typeof saved[key] !== 'string') || saved.bars !== 0) {
           throw new Error('The host did not confirm the requested dataset. Refresh before retrying.');
         }
         confirmed.add(item.symbol);
@@ -400,106 +401,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
 function persistData(state:Pick<DataState,'storageError'>,brokers:BrokerProfile[],definitions:MockDefinition[],brokerJob:BrokerUpdateJob|null):void {if(state.storageError)throw new Error(state.storageError);localStorage.setItem(storageKey,JSON.stringify({version:2,definitions,brokers,brokerJob}));}
 
 // Separate versioned mock download metadata preserves existing add-data v1 storage.
-const downloadKey = 'sqx-data-download-v1';
-function readDownloads(): DownloadState {
-  const raw = localStorage.getItem(downloadKey);
-  if (!raw) return { ...emptyDownload, ranges: {} };
-  const saved = normalizeLegacyBranding(normalizeSymbolContract(JSON.parse(raw)));
-  if (saved.version !== 1 || !saved.ranges || typeof saved.ranges !== 'object' || Array.isArray(saved.ranges)
-    || Object.keys(saved.ranges).length > 10000 || ![null, 'standard', 'cdn', 'cdn-cn'].includes(saved.preferred)) throw new Error('Invalid saved downloads');
-  for (const ranges of Object.values(saved.ranges) as Interval[][]) {
-    if (!Array.isArray(ranges) || ranges.length > 1000 || ranges.some(row => !validDate(row.from) || !validDate(row.to) || row.from > row.to)) throw new Error('Invalid saved ranges');
-  }
-  if (saved.job) {
-    if (!['running', 'paused', 'cancelled', 'completed', 'failed'].includes(saved.job.state) || !Number.isFinite(saved.job.progress) || saved.job.progress < 0 || saved.job.progress > 100) throw new Error('Invalid saved job');
-    validateDownload(saved.job.request);
-    saved.job.resolvedModes = resolveDownloadModes(saved.job.request);
-    if (saved.job.state === 'running') saved.job.state = 'paused';
-  }
-  return { job: saved.job ?? null, preferred: saved.preferred, ranges: saved.ranges };
-}
-interface DownloadStore extends DownloadState {
-  storageError: string;
-  start: (request: DownloadRequest) => void;
-  advance: () => void;
-  action: (action: 'pause' | 'resume' | 'stop') => void;
-}
-export const useDukascopyDownloads = create<DownloadStore>((set, get) => {
-  let initial: DownloadState = { ...emptyDownload, ranges: {} };
-  let storageError = '';
-  try { initial = readDownloads(); } catch { storageError = 'Saved mock downloads could not be read. Existing storage is preserved.'; }
-  function persist(next: DownloadState) {
-    if (get().storageError) throw new Error(get().storageError);
-    localStorage.setItem(downloadKey, JSON.stringify({ version: 1, ...next }));
-    set(next);
-  }
-  function snapshot(): DownloadState { const { job, ranges, preferred } = get(); return { job, ranges, preferred }; }
-  return {
-    ...initial, storageError,
-    start: request => {
-      if (yahooActive(useYahoo.getState().job?.state)) throw new Error('Finish or stop the active Yahoo operation first.');
-      if (cryptoActive(useCrypto.getState().job?.state)) throw new Error('Finish or stop the active Crypto operation first.');
-      if (sqActive(useDarwinex.getState().job?.state)) throw new Error('Finish or stop the active Darwinex operation first.');
-      if (sqActive(useSQData.getState().job?.state)) throw new Error('Finish or stop the active market data operation first.');
-      if (mt5Active(useMt5Import.getState().job?.state)) throw new Error('Finish or stop the active MT5 import first.');
-      if (activeImport(useFileImports.getState().job?.state)) throw new Error('Finish or stop the active file import first.');
-      if (get().job && ['running', 'paused'].includes(get().job!.state)) throw new Error('Finish or stop the active mock download first.');
-      if (['running', 'paused'].includes(useTickDownloader.getState().job?.state ?? '')) throw new Error('Finish or stop the active import first.');
-      validateDownload(request);
-      try {
-        persist({
-          ...snapshot(),
-          preferred: request.downloadType,
-          job: {
-            request: structuredClone(request),
-            resolvedModes: resolveDownloadModes(request),
-            state: 'running',
-            progress: 0,
-          },
-        });
-        (async () => {
-          try {
-            for (const target of request.targets) {
-              await dataClient.post<{ job_id?: string; status?: string }>('/providers/download', {
-                provider: 'dukascopy',
-                symbol: target.symbol,
-                underlying: target.underlying || target.symbolDefinition,
-                timeframe: target.timeframe || 'M1',
-                date_from: request.dateFrom,
-                date_to: request.dateTo,
-                async_job: true,
-              });
-            }
-          } catch {
-            // Offline/headless test fallback
-          }
-        })();
-      }
-      catch (cause) { throw new Error(cause instanceof Error && get().storageError ? cause.message : 'Unable to save mock download. No job was started.'); }
-    },
-    advance: () => {
-      const state = snapshot(); if (!state.job || state.job.state !== 'running') return;
-      const job = { ...state.job, progress: Math.min(100, state.job.progress + downloadStep(state.job)) };
-      const ranges = { ...state.ranges };
-      if (job.progress === 100) {
-        job.state = 'completed';
-        for (const target of job.request.targets) {
-          const from = [job.request.dateFrom, availableStart(target, true)].sort().at(-1)!;
-          ranges[target.id] = mergeRanges(ranges[target.id] ?? [], { from, to: job.request.dateTo }, job.request.overwrite);
-        }
-        useDataManagerStore.getState().syncRemoteDatasets().catch(() => {});
-      }
-      try { persist({ ...state, ranges, job }); }
-      catch { set({ job: { ...state.job, state: 'failed', error: 'Unable to persist mock download progress. Previous saved coverage is unchanged.' } }); }
-    },
-    action: action => {
-      const state = snapshot(); if (!state.job || !['running', 'paused'].includes(state.job.state)) return;
-      const job = { ...state.job, state: action === 'pause' ? 'paused' as const : action === 'resume' ? 'running' as const : 'cancelled' as const };
-      try { persist({ ...state, job }); }
-      catch { set({ job: { ...state.job, state: 'failed', error: 'Unable to persist mock download action.' } }); }
-    },
-  };
-});
+export const useDukascopyDownloads = createDownloadStore(() => useDataManagerStore.getState().syncRemoteDatasets());
 
 interface TDState {
   definitions: MockDefinition[]; job: TDJob | null; folder: string; postfix: string; storageError: string;

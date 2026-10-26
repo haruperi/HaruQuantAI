@@ -44,7 +44,14 @@ test('standalone disclaimer keeps content, Escape and launcher focus across them
   }
 });
 
-test('symbol mapping Back preserves add draft and selection', async ({ page }) => {
+test('saved broker postfix is preserved through confirmed registration', async ({ page }) => {
+  const rows:Array<Record<string,unknown>>=[];
+  await page.route('**/api/v1/data/brokers',route=>route.fulfill({json:{status:'success',data:[{id:'1',name:'Pilot broker',description:'',timezone:'UTC',postfix:'_P',stockpicker_use:false,mt_use:true,is_system:false,stocks:[],customized_stocks:0,total_symbols:0,total_sessions:0,spread_model:{model:'inherit'},commission_model:{model:'inherit'}}]}}));
+  await page.route('**/api/v1/data/home/datasets',route=>route.fulfill({json:{status:'success',data:rows}}));
+  await page.route('**/api/v1/data/datasets',async route=>{
+    const body=route.request().postDataJSON();const row={...body,id:`dukascopy:${body.symbol}:${body.timeframe}`,broker:'Pilot broker',timezone:'UTC',category:'Forex',bars:0,date_from:'',date_to:'',symbolDefinition:body.instrument??'-1',path:`data/market/dukascopy/m1/${body.symbol.toLowerCase()}`};rows.push(row);
+    await route.fulfill({json:{status:'success',data:row}});
+  });
   await page.addInitScript(() =>
     localStorage.setItem(
       'sqx-data-manager-v1',
@@ -53,7 +60,7 @@ test('symbol mapping Back preserves add draft and selection', async ({ page }) =
         definitions: [],
         brokers: [
           {
-            id: 'pilot',
+            id: '1',
             name: 'Pilot broker',
             postfix: '_P',
             timezone: 'UTC',
@@ -70,8 +77,10 @@ test('symbol mapping Back preserves add draft and selection', async ({ page }) =
   const add = page.getByRole('dialog', { name: 'Add Dukascopy data', exact: true });
   await add.getByLabel('Filter available symbols').fill('AUDUSD');
   await add.getByRole('checkbox', { name: 'Select symbol AUDUSD', exact: true }).check();
-  await add.getByLabel('Broker profile *', { exact: true }).selectOption('pilot');
+  await add.getByLabel('Broker profile *', { exact: true }).selectOption('1');
   await add.getByRole('switch').check();
   await add.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(page.getByRole('table', { name: 'Historical data' })).toContainText('AUDUSD_P');
+  await expect(add).toHaveCount(0);
+  expect(rows).toHaveLength(1);
+  expect(rows[0]).toMatchObject({symbol:'AUDUSD_P',broker:'Pilot broker'});
 });

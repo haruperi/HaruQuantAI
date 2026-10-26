@@ -9,6 +9,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from app.workspace.data_manager.data import Data
+from app.workspace.data_manager.download_jobs import (
+    register_download_jobs,
+    start_download,
+)
 from app.workspace.data_manager.dukascopy import Dukascopy
 
 
@@ -83,6 +87,19 @@ def _register_dukascopy_provider_routes(router: APIRouter) -> None:
         overwrite = bool(body.get("overwrite", False))
 
         service = Dukascopy(gateway)
+        if body.get("async_job") is True:
+            return _ok(
+                start_download(
+                    request,
+                    {
+                        **body,
+                        "symbol": symbol,
+                        "timeframe": timeframe,
+                        "date_from": date_from,
+                        "date_to": date_to,
+                    },
+                )
+            )
         result = service.download(
             symbol=symbol,
             timeframe=timeframe,
@@ -90,6 +107,7 @@ def _register_dukascopy_provider_routes(router: APIRouter) -> None:
             date_to=date_to,
             underlying=underlying,
             overwrite=overwrite,
+            download_type=body.get("download_type", "cdn"),
         )
         return _response(result)
 
@@ -100,7 +118,7 @@ def _handle_dukascopy_create(gateway: Any, body: dict[str, Any]) -> Any:
     underlying = str(body.get("underlying", symbol)).strip()
     timeframe = str(body.get("timeframe", "M1")).strip().upper()
     broker = str(body.get("broker", "default")).strip()
-    sym_def = str(body.get("symbolDefinition", "-1")).strip()
+    sym_def = str(body.get("symbolDefinition", body.get("instrument", "-1"))).strip()
 
     service = Dukascopy(gateway)
     postfix = ""
@@ -137,7 +155,9 @@ def _register_dataset_lifecycle_routes(router: APIRouter) -> None:
         underlying = str(body.get("underlying", symbol)).strip()
         timeframe = str(body.get("timeframe", "M1")).strip().upper()
         broker = str(body.get("broker", "default")).strip()
-        sym_def = str(body.get("symbolDefinition", "-1")).strip()
+        sym_def = str(
+            body.get("symbolDefinition", body.get("instrument", "-1"))
+        ).strip()
 
         now_iso = "2026-01-01T00:00:00"
         dataset_id = f"{source}:{symbol}:{timeframe}"
@@ -166,26 +186,20 @@ def _register_dataset_lifecycle_routes(router: APIRouter) -> None:
 
     @router.post("/providers/download")
     def provider_download(request: Request, body: dict[str, Any]) -> Any:
-        gateway = request.app.state.persistence
         provider = str(body.get("provider", "")).lower()
-        symbol = str(body.get("symbol", "")).strip()
-        underlying = body.get("underlying")
-        timeframe = str(body.get("timeframe", "M1")).strip().upper()
-        date_from = body.get("date_from")
-        date_to = body.get("date_to")
-
         if provider == "dukascopy":
-            service = Dukascopy(gateway)
-            result = service.download(
-                symbol=symbol,
-                timeframe=timeframe,
-                date_from=date_from,
-                date_to=date_to,
-                underlying=underlying,
-            )
-            return _response(result)
-
-        return _ok({"job_id": f"job_{provider}_{symbol}", "status": "completed"})
+            return _ok(start_download(request, body))
+        return JSONResponse(
+            {
+                "success": False,
+                "status": "error",
+                "error": {
+                    "code": "validation",
+                    "message": "Provider download is not implemented",
+                },
+            },
+            status_code=422,
+        )
 
     @router.post("/datasets/{dataset_id}/clear")
     def clear_dataset(request: Request, dataset_id: str) -> Any:
@@ -211,3 +225,4 @@ def register_dukascopy_routes(router: APIRouter) -> None:
     """Register Dukascopy ingestion and dataset mutation routes."""
     _register_dukascopy_provider_routes(router)
     _register_dataset_lifecycle_routes(router)
+    register_download_jobs(router)

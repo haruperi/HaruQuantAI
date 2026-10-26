@@ -2,7 +2,7 @@ import { useDataManagerStore, useDukascopyDownloads } from '../Common/dataManage
 import type { AddDukasRequest } from './dukascopy';
 import type { DownloadRequest } from './dukascopyDownload';
 
-/** Shared host-backed registration/catalog adapters and simulated downloads. */
+/** Shared host-backed registration/catalog adapters and backend-controlled downloads. */
 export function useDukascopyAddService() {
   const brokers = useDataManagerStore((state) => state.brokers);
   const brokerLoading = useDataManagerStore((state) => state.brokerLoading);
@@ -15,5 +15,5 @@ export function useDukascopyAddService() {
 export function useDukascopyDownloadService() {
   const preferred = useDukascopyDownloads((state) => state.preferred);
   const begin = useDukascopyDownloads((state) => state.start);
-  return { preferred, start: (request: DownloadRequest): void => begin(request) };
+  return { preferred, start: (request: DownloadRequest): Promise<void> => begin(request) };
 }

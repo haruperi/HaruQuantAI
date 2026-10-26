@@ -124,28 +124,28 @@ def test_http_ui_datasets_create_and_provider_download(client):
             "underlying": "GBPUSD",
             "timeframe": "M1",
             "broker": "default",
-            "symbolDefinition": "GBPUSD",
+            "instrument": "GBPUSD",
         },
     )
     assert res.status_code == 200
     assert res.json()["data"]["id"] == "dukascopy:GBPUSD:M1"
+    assert res.json()["data"]["symbolDefinition"] == "GBPUSD"
 
     # Test UI /providers/download fallback
     res_down = client.post(
         "/api/v1/data/providers/download",
         json={"provider": "other", "symbol": "EURUSD"},
     )
-    assert res_down.status_code == 200
+    assert res_down.status_code == 422
 
-    # Test UI /providers/download with dukascopy and string dates
+    # Submission delegates to the backend job owner instead of pretending completion.
     from unittest.mock import patch
 
-    with patch("app.workspace.data_manager.dukascopy.Dukascopy.download") as mock_dl:
-        mock_dl.return_value = {
-            "success": True,
-            "data": {"downloaded_bars": 100, "status": "completed"},
-        }
-        res_duk = client.post(
+    with patch(
+        "app.workspace.data_manager.dukascopy_http.start_download",
+        return_value={"job_id": "job-1", "status": "QUEUED"},
+    ) as submit:
+        response = client.post(
             "/api/v1/data/providers/download",
             json={
                 "provider": "dukascopy",
@@ -155,12 +155,6 @@ def test_http_ui_datasets_create_and_provider_download(client):
                 "date_to": "2025-01-02",
             },
         )
-        assert res_duk.status_code == 200
-        assert res_duk.json()["data"]["downloaded_bars"] == 100
-        mock_dl.assert_called_once_with(
-            symbol="GBPUSD",
-            timeframe="M1",
-            date_from="2025-01-01",
-            date_to="2025-01-02",
-            underlying=None,
-        )
+        assert response.status_code == 200
+        assert response.json()["data"]["job_id"] == "job-1"
+        submit.assert_called_once()

@@ -392,6 +392,10 @@
     {
       "reason": "Structural mapping manifest, not a behavioral evidence ledger.",
       "path": "source-map.json"
+    },
+    {
+      "path": "downloadStore.ts",
+      "reason": "Backend-owned download submission, status polling, recovery and job controls."
     }
   ],
   "reference_cohort": "145-dev1",

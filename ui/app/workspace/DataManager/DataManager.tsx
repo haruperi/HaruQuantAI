@@ -378,10 +378,11 @@ export function DataManager() {
   useEffect(() => { if (imports.job?.state !== 'running') return; const timer = window.setInterval(() => useFileImports.getState().advance(), 250); return () => window.clearInterval(timer); }, [imports.job?.state]);
   const [downloadTargets, setDownloadTargets] = useState<DownloadTarget[]>([]);
   useEffect(() => {
-    if (download.job?.state !== 'running') return;
-    const timer = window.setInterval(() => useDukascopyDownloads.getState().advance(), 250);
+    if (!['running','paused'].includes(download.job?.state ?? '')) return;
+    void useDukascopyDownloads.getState().advance();
+    const timer = window.setInterval(() => { void useDukascopyDownloads.getState().advance(); }, 1000);
     return () => window.clearInterval(timer);
-  }, [download.job?.state]);
+  }, [download.job?.state, download.job?.jobId]);
   const [tab, setTab] = useState('Data sources');
   const { status: hostStatus } = useHostConnection();
   useEffect(() => {
@@ -607,7 +608,7 @@ export function DataManager() {
             selected = allDukas;
           }
         }
-        const eligible = eligibleTargets(selected, download.job).map(row => ({ ...row, ...simulationSummary(row, download.ranges[row.id] ?? []) }));
+        const eligible = eligibleTargets(selected, download.job);
         setDownloadTargets(eligible); setSelectionMessage(''); setDialog({ id: 'dukascopy-download' });
       } catch (cause) {
         const msg = cause instanceof Error ? cause.message : 'Unable to select data';
@@ -713,7 +714,7 @@ export function DataManager() {
   const openExport = (kind: ExportKind) => { try { if (anyDataActive) throw new Error('Finish or stop the active data operation first.'); const targets = selectExportTargets(exportRows, selectedDatasetIds, kind); setExportDialog({ kind, targets }); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to select data for export.'); } };
   const openClone = () => { try { if (anyDataActive) throw new Error('Finish or stop the active data operation first.'); const targets = selectCloneTargets(toolRows, selectedDatasetIds); setCloneTargets(targets); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to select data to clone.'); } };
   const openReview = () => { try { if (anyDataActive) throw new Error('Cannot view data while an operation is in progress.'); const target = selectReviewTarget(toolRows, selectedDatasetIds); setReviewTarget(target); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to view data.'); } };
-  const progressText = selectionMessage || (operationState === 'idle' ? (providerJob ? `${progressOwner === 'symbols' ? symbolJob?.label : progressOwner === 'broker'?'Broker data update':progressOwner === 'stock-groups' ? 'Stock group data update' : progressOwner === 'external' ? `Custom data import for '${externalIndicators.job?.indicator}'` : progressOwner === 'tools' ? 'Clone to timezone' : progressOwner === 'export' ? exports.job?.label : progressOwner === 'mt5' ? 'MT5 mock import' : progressOwner === 'yahoo' ? `Yahoo mock ${yahoo.job?.kind}` : progressOwner === 'crypto' ? `Crypto mock ${crypto.job?.kind}` : progressOwner === 'darwinex' ? `Darwinex mock ${darwinex.job?.kind}` : progressOwner === 'sq' && sq.job ? providerLabel(sq.job.provider) : progressOwner === 'file' ? 'File import' : progressOwner === 'td' ? 'TickDownloader import' : 'Dukascopy download'} ${providerJob.state} ${providerJob.progress}%${providerJob.error ? `: ${providerJob.error}` : progressOwner === 'external' && externalIndicators.job?.state === 'completed' && externalIndicators.job.ignored ? ` — ${externalIndicators.job.ignored} invalid rows ignored` : progressOwner === 'file' && imports.job?.state === 'completed' ? ` — ${imports.job.completed} imported, ${imports.job.skipped} skipped, ${imports.job.tasks.reduce((n, task) => n + task.ignored, 0)} invalid rows ignored` : ''}` : 'No active operations') : operationState === 'paused' ? `${operationLabel} paused at ${progress}%` : operationState === 'cancelled' ? `${operationLabel} cancelled` : operationState === 'completed' ? `${operationLabel} complete` : `${operationLabel}… ${progress}%`);
+  const progressText = selectionMessage || (progressOwner === 'download' ? download.storageError : '') || (operationState === 'idle' ? (providerJob ? `${progressOwner === 'symbols' ? symbolJob?.label : progressOwner === 'broker'?'Broker data update':progressOwner === 'stock-groups' ? 'Stock group data update' : progressOwner === 'external' ? `Custom data import for '${externalIndicators.job?.indicator}'` : progressOwner === 'tools' ? 'Clone to timezone' : progressOwner === 'export' ? exports.job?.label : progressOwner === 'mt5' ? 'MT5 mock import' : progressOwner === 'yahoo' ? `Yahoo mock ${yahoo.job?.kind}` : progressOwner === 'crypto' ? `Crypto mock ${crypto.job?.kind}` : progressOwner === 'darwinex' ? `Darwinex mock ${darwinex.job?.kind}` : progressOwner === 'sq' && sq.job ? providerLabel(sq.job.provider) : progressOwner === 'file' ? 'File import' : progressOwner === 'td' ? 'TickDownloader import' : 'Dukascopy download'} ${providerJob.state} ${providerJob.progress}%${providerJob.error ? `: ${providerJob.error}` : progressOwner === 'external' && externalIndicators.job?.state === 'completed' && externalIndicators.job.ignored ? ` — ${externalIndicators.job.ignored} invalid rows ignored` : progressOwner === 'file' && imports.job?.state === 'completed' ? ` — ${imports.job.completed} imported, ${imports.job.skipped} skipped, ${imports.job.tasks.reduce((n, task) => n + task.ignored, 0)} invalid rows ignored` : ''}` : 'No active operations') : operationState === 'paused' ? `${operationLabel} paused at ${progress}%` : operationState === 'cancelled' ? `${operationLabel} cancelled` : operationState === 'completed' ? `${operationLabel} complete` : `${operationLabel}… ${progress}%`);
 
   const handleDeleteDatasetRow = (id: string) => {
     setSelectedDatasetIds([id]);

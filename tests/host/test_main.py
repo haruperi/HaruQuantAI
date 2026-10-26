@@ -17,10 +17,12 @@ def test_lifespan_initializes_and_cleans_services(monkeypatch):
     settings = Mock()
     monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
     gateway = Mock()
+    gateway.read_records.return_value = {"success": True, "data": {"records": []}}
     application = backend.create_app(gateway)
     settings.reload.assert_not_called()
     with TestClient(application) as client:
         settings.reload.assert_called_once_with()
+        gateway.read_records.assert_called_once_with("datamgr_datasets", offset=0)
         assert application.state.persistence is gateway
         assert application.state.settings is settings
         assert application.state.sessions.persistence is gateway
@@ -85,7 +87,9 @@ def test_shutdown_finishes_with_open_event_stream(monkeypatch):
     unsubscribe = Mock(wraps=bus.unsubscribe)
     monkeypatch.setattr(bus, "unsubscribe", unsubscribe)
     monkeypatch.setattr(transport, "get_global_event_bus", lambda: bus)
-    application = backend.create_app(Mock())
+    gateway = Mock()
+    gateway.read_records.return_value = {"success": True, "data": {"records": []}}
+    application = backend.create_app(gateway)
 
     async def exercise():
         with closing(socket.socket()) as listener:
@@ -131,7 +135,9 @@ def test_shutdown_finishes_with_open_event_stream(monkeypatch):
 
 def test_lifespan_cancels_and_closes_basket_jobs(monkeypatch):
     monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=Mock()))
-    application = backend.create_app(Mock())
+    gateway = Mock()
+    gateway.read_records.return_value = {"success": True, "data": {"records": []}}
+    application = backend.create_app(gateway)
     manager = Mock()
     with TestClient(application):
         application.state.basket_jobs = manager
