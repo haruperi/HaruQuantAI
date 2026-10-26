@@ -23,6 +23,7 @@ from app.workspace.data_manager.baskets import Baskets
 from app.workspace.data_manager.brokers import Brokers
 from app.workspace.data_manager.custom_http import register_custom_routes
 from app.workspace.data_manager.data import Data
+from app.workspace.data_manager.dukascopy_http import register_dukascopy_routes
 from app.workspace.data_manager.help import Help
 from app.workspace.data_manager.http_fields import (
     symbol_to_ui as _ui,
@@ -188,6 +189,7 @@ def create_router() -> APIRouter:
     _log_routes(router)
     register_custom_routes(router)
     _help_routes(router)
+    register_dukascopy_routes(router)
     return router
 
 

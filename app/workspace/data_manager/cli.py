@@ -77,12 +77,14 @@ def register_commands(commands: Any) -> None:
     _profile_parsers(resources, "broker")
     _basket_parsers(resources)
     from app.workspace.data_manager.custom_cli import register_custom_commands
+    from app.workspace.data_manager.dukascopy_cli import register_dukascopy_commands
     from app.workspace.data_manager.help_cli import register_help_commands
     from app.workspace.data_manager.logs_cli import register_log_commands
 
     register_log_commands(resources)
     register_custom_commands(resources)
     register_help_commands(resources)
+    register_dukascopy_commands(resources)
     data_manager.set_defaults(handler=partial(run_command, parser=data_manager))
 
 
@@ -91,6 +93,7 @@ def run_command(
 ) -> int:
     """Execute a Data Manager command, emit errors, and return its exit code."""
     from app.workspace.data_manager.custom_cli import run_custom_command
+    from app.workspace.data_manager.dukascopy_cli import run_dukascopy_command
     from app.workspace.data_manager.help_cli import run_help_command
     from app.workspace.data_manager.logs_cli import run_log_command
 
@@ -102,6 +105,7 @@ def run_command(
         "log": run_log_command,
         "custom": run_custom_command,
         "help": run_help_command,
+        "dukascopy": run_dukascopy_command,
     }
     result = handlers[arguments.resource](arguments, parser)
     if result is None:

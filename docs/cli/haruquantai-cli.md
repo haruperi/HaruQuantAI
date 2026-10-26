@@ -907,3 +907,48 @@ uv run python -m app.cli data-manager help search "cot"
 ```
 
 Searches across all topics, capabilities, tutorials, and documentation articles.
+
+
+### Dukascopy market data commands
+
+The `data-manager dukascopy` subcommands provide market data onboarding and historical downloading
+from Dukascopy Bank SA into partitioned Parquet format (ZSTD level 6, integer tick units).
+
+#### Dukascopy disclaimer and licensing
+
+```powershell
+uv run python -m app.cli data-manager dukascopy disclaimer
+```
+
+Returns the legal terms and requirements for downloading and utilizing Dukascopy market data feeds.
+
+#### Search Dukascopy instrument catalog
+
+```powershell
+uv run python -m app.cli data-manager dukascopy catalog
+uv run python -m app.cli data-manager dukascopy catalog --category Forex
+uv run python -m app.cli data-manager dukascopy catalog --search EUR
+```
+
+Queries the built-in Dukascopy instrument catalog with optional category and keyword filters.
+
+#### Add symbols to local dataset catalog
+
+```powershell
+uv run python -m app.cli data-manager dukascopy add EURUSD GBPUSD
+uv run python -m app.cli data-manager dukascopy add USDJPY --data-type TICK --broker default
+```
+
+Registers one or more Dukascopy symbols into the local `datamgr_datasets` catalog table. Defaults
+to `M1` timeframe. Use `--data-type TICK` for tick datasets.
+
+#### Download historical market data
+
+```powershell
+uv run python -m app.cli data-manager dukascopy download EURUSD --timeframe M1 --from 2025-01-01 --to 2025-04-01
+uv run python -m app.cli data-manager dukascopy download EURUSD --timeframe TICK --count 50000
+```
+
+Downloads historical data from Dukascopy, formats on-disk integer tick prices, and writes batched,
+immutable Parquet partitions under `data/market/dukascopy/` (`m1/{symbol}/{year}.parquet` or
+`ticks/{symbol}/{year}/{month:02d}-{month_abbr}.parquet`).

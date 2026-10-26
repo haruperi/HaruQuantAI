@@ -1,0 +1,55 @@
+"""Unit tests for Data Manager Dukascopy CLI commands."""
+
+import argparse
+
+from app.workspace.data_manager.cli import register_commands
+from app.workspace.data_manager.dukascopy_cli import run_dukascopy_command
+
+
+def _setup_parser():
+    parser = argparse.ArgumentParser()
+    commands = parser.add_subparsers(dest="command", required=True)
+    register_commands(commands)
+    return parser
+
+
+def test_cli_dukascopy_disclaimer():
+    parser = _setup_parser()
+    args = parser.parse_args(["data-manager", "dukascopy", "disclaimer"])
+    res = run_dukascopy_command(args, parser)
+    assert res["success"] is True
+    assert res["data"]["title"] == "Dukascopy data disclaimer"
+
+
+def test_cli_dukascopy_catalog():
+    parser = _setup_parser()
+    args = parser.parse_args(
+        ["data-manager", "dukascopy", "catalog", "--search", "EURUSD"]
+    )
+    res = run_dukascopy_command(args, parser)
+    assert res["success"] is True
+    assert res["data"]["count"] == 1
+    assert res["data"]["symbols"][0]["symbol"] == "EURUSD"
+
+
+def test_cli_dukascopy_add():
+    parser = _setup_parser()
+    args = parser.parse_args(
+        [
+            "data-manager",
+            "dukascopy",
+            "add",
+            "EURUSD",
+            "--data-type",
+            "M1",
+            "--postfix",
+            "_CLITEST",
+        ]
+    )
+    res = run_dukascopy_command(args, parser)
+    # If first time, success
+    if res["success"]:
+        assert res["data"]["count"] == 1
+        assert res["data"]["records"][0]["id"] == "dukascopy:EURUSD_CLITEST:M1"
+    else:
+        assert res["error"]["code"] == "conflict"

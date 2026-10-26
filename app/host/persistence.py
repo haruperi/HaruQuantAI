@@ -181,6 +181,33 @@ class HostPersistence:
 
         return self._run("custom_data.schema", write=True, action=action)
 
+    def ensure_datasets_schema(self) -> dict[str, Any]:
+        """Install additive Data Manager dataset catalog tables atomically."""
+        statements = (
+            (
+                "CREATE TABLE IF NOT EXISTS datamgr_datasets ("
+                "id TEXT PRIMARY KEY, source TEXT NOT NULL, symbol TEXT NOT NULL, "
+                "underlying TEXT NOT NULL, instrument TEXT NOT NULL, "
+                "timeframe TEXT NOT NULL, broker TEXT NOT NULL, "
+                "broker_name TEXT NOT NULL, timezone TEXT NOT NULL, "
+                "category TEXT NOT NULL, date_from TEXT NOT NULL, "
+                "date_to TEXT NOT NULL, bars INTEGER NOT NULL DEFAULT 0, "
+                "created_at TEXT NOT NULL, updated_at TEXT NOT NULL, "
+                "path TEXT NOT NULL DEFAULT '', "
+                "data_kind TEXT NOT NULL DEFAULT 'bars', "
+                "quality_score REAL NOT NULL DEFAULT 1.0, "
+                "lineage_json TEXT NOT NULL DEFAULT '{}', "
+                "schema_version INTEGER NOT NULL DEFAULT 1)"
+            ),
+        )
+
+        def action(connection: sqlite3.Connection) -> dict[str, Any]:
+            for statement in statements:
+                connection.execute(statement)
+            return {"affected_rows": 0, "records": []}
+
+        return self._run("datasets.schema", write=True, action=action)
+
     def _check_scope(self) -> None:
         if self._closed:
             raise _OperationError(ErrorCode.CONFLICT, "Transaction scope is closed")
