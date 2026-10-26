@@ -1,5 +1,7 @@
 """Tests for Dukascopy market data ingestion, partitioning, and catalog service."""
 
+import sqlite3
+
 import pandas as pd  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 import pytest
@@ -76,10 +78,53 @@ def test_add_success(temp_env):
     records = res["data"]["records"]
     assert records[0]["id"] == "dukascopy:EURUSD_DEMO:M1"
     assert records[1]["id"] == "dukascopy:GBPUSD_DEMO:M1"
+    assert records[0]["broker"] == "SQ default"
+    assert "instrument" not in records[0]
+    assert "broker_name" not in records[0]
 
     # Verify persisted in database
     db_recs = gateway.read_records("datamgr_datasets")["data"]["records"]
     assert len(db_recs) == 2
+    assert "instrument" not in db_recs[0]
+    assert "broker_name" not in db_recs[0]
+    assert db_recs[0]["underlying"] == "EURUSD"
+    assert db_recs[0]["broker"] == "SQ default"
+
+
+def test_add_with_numeric_broker_id(temp_env):
+    service, gateway, _ = temp_env
+    conn = sqlite3.connect(gateway.database_path)
+    try:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS datamgr_broker (
+                id INTEGER PRIMARY KEY, name TEXT NOT NULL, is_system INTEGER DEFAULT 0
+            );
+        """)
+        conn.execute(
+            "INSERT INTO datamgr_broker (id, name, is_system) VALUES (3, '[[Dukascopy]]', 1);"
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    res = service.add(
+        symbols=["USDJPY"],
+        data_type="M1",
+        broker="3",
+        postfix="_DUKAS",
+    )
+    assert res["success"] is True
+    rec = res["data"]["records"][0]
+    assert rec["broker"] == "Dukascopy"
+    assert "instrument" not in rec
+    assert "broker_name" not in rec
+
+    db_rec = gateway.read_records(
+        "datamgr_datasets", filters={"id": "dukascopy:USDJPY_DUKAS:M1"}
+    )["data"]["records"][0]
+    assert db_rec["broker"] == "Dukascopy"
+    assert "instrument" not in db_rec
+    assert "broker_name" not in db_rec
 
 
 def test_add_disclaimer_rejected(temp_env):

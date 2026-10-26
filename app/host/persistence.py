@@ -187,9 +187,9 @@ class HostPersistence:
             (
                 "CREATE TABLE IF NOT EXISTS datamgr_datasets ("
                 "id TEXT PRIMARY KEY, source TEXT NOT NULL, symbol TEXT NOT NULL, "
-                "underlying TEXT NOT NULL, instrument TEXT NOT NULL, "
+                "underlying TEXT NOT NULL, "
                 "timeframe TEXT NOT NULL, broker TEXT NOT NULL, "
-                "broker_name TEXT NOT NULL, timezone TEXT NOT NULL, "
+                "timezone TEXT NOT NULL, "
                 "category TEXT NOT NULL, date_from TEXT NOT NULL, "
                 "date_to TEXT NOT NULL, bars INTEGER NOT NULL DEFAULT 0, "
                 "created_at TEXT NOT NULL, updated_at TEXT NOT NULL, "
@@ -204,6 +204,38 @@ class HostPersistence:
         def action(connection: sqlite3.Connection) -> dict[str, Any]:
             for statement in statements:
                 connection.execute(statement)
+
+            # Drop obsolete duplicate columns if present in existing databases
+            cursor = connection.execute("PRAGMA table_info(datamgr_datasets)")
+            existing_cols = {row[1] for row in cursor.fetchall()}
+            if "instrument" in existing_cols:
+                connection.execute(
+                    "ALTER TABLE datamgr_datasets DROP COLUMN instrument"
+                )
+            if "broker_name" in existing_cols:
+                connection.execute(
+                    "ALTER TABLE datamgr_datasets DROP COLUMN broker_name"
+                )
+
+            # Migrate numeric broker IDs in datamgr_datasets to canonical broker names
+            tables = {
+                r[0]
+                for r in connection.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+            if "datamgr_broker" in tables:
+                brokers = connection.execute(
+                    "SELECT id, name FROM datamgr_broker"
+                ).fetchall()
+                for b_id, b_name in brokers:
+                    clean = str(b_name).strip()
+                    if clean.startswith("[[") and clean.endswith("]]"):
+                        clean = clean[2:-2].strip()
+                    connection.execute(
+                        "UPDATE datamgr_datasets SET broker = ? WHERE broker = ?",
+                        (clean, str(b_id)),
+                    )
             return {"affected_rows": 0, "records": []}
 
         return self._run("datasets.schema", write=True, action=action)

@@ -25,8 +25,8 @@ def baskets(tmp_path):
                 FOREIGN KEY(BASKET_ID) REFERENCES datamgr_stock_group(ID));
             CREATE TABLE datamgr_datasets (
                 id TEXT PRIMARY KEY, source TEXT NOT NULL, symbol TEXT NOT NULL,
-                underlying TEXT NOT NULL, instrument TEXT NOT NULL, timeframe TEXT NOT NULL,
-                broker TEXT NOT NULL, broker_name TEXT NOT NULL, timezone TEXT NOT NULL,
+                underlying TEXT NOT NULL, timeframe TEXT NOT NULL,
+                broker TEXT NOT NULL, timezone TEXT NOT NULL,
                 category TEXT NOT NULL, date_from TEXT NOT NULL, date_to TEXT NOT NULL,
                 bars INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL, path TEXT NOT NULL DEFAULT '');

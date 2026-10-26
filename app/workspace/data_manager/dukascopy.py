@@ -246,6 +246,55 @@ class Dukascopy:
             },
         )
 
+    def resolve_broker_name(self, broker_val: Any) -> str:
+        """Resolve a broker identifier, alias, or profile name to real text name."""
+        if broker_val is None:
+            return "SQ default"
+        raw = str(broker_val).strip()
+        if not raw or raw in ("-1", "default", "SQ default", "Default"):
+            return "SQ default"
+        if raw.startswith("[[") and raw.endswith("]]"):
+            return raw[2:-2].strip()
+        return self._lookup_broker_name(raw)
+
+    def _lookup_broker_name(self, raw: str) -> str:
+        """Look up raw identifier or bracketed name from datamgr_broker table."""
+        filters = {"id": int(raw)} if raw.isdigit() else {"name": f"[[{raw}]]"}
+        try:
+            res = self.gateway.read_records("datamgr_broker", filters=filters, limit=1)
+            records = (res.get("data") or {}).get("records") or []
+            if records:
+                name = str(records[0].get("name", "")).strip()
+                if name.startswith("[[") and name.endswith("]]"):
+                    return name[2:-2].strip()
+                return name
+        except KeyError, ValueError, RuntimeError:
+            pass
+        return raw
+
+    @staticmethod
+    def _parse_date_bound(
+        val: str | datetime | None, is_end: bool = False
+    ) -> datetime | None:
+        """Parse string or datetime boundary into UTC datetime."""
+        if val is None:
+            return None
+        if isinstance(val, datetime):
+            res = val if val.tzinfo is not None else val.replace(tzinfo=UTC)
+            if is_end and res.hour == 0 and res.minute == 0 and res.second == 0:
+                res = res.replace(hour=23, minute=59, second=59)
+            return res
+        if isinstance(val, str) and val.strip():
+            try:
+                dt = datetime.fromisoformat(val.strip())
+                res = dt if dt.tzinfo is not None else dt.replace(tzinfo=UTC)
+                if is_end and "T" not in val and " " not in val:
+                    res = res.replace(hour=23, minute=59, second=59)
+                return res
+            except ValueError:
+                return None
+        return None
+
     def _validate_add_parameters(
         self,
         symbols: str | list[str],
@@ -365,7 +414,7 @@ class Dukascopy:
                 )
 
         now_iso = datetime.now(UTC).isoformat()
-        b_name = "SQ default" if broker in ("-1", "default", "SQ default") else broker
+        real_broker = self.resolve_broker_name(broker)
         created_records: list[dict[str, Any]] = []
 
         for idx, sym in enumerate(symbol_list):
@@ -391,10 +440,8 @@ class Dukascopy:
                 "source": "dukascopy",
                 "symbol": target_symbol,
                 "underlying": sym,
-                "instrument": sym_def,
                 "timeframe": norm_type,
-                "broker": broker,
-                "broker_name": b_name,
+                "broker": real_broker,
                 "timezone": "UTC",
                 "category": category,
                 "date_from": from_date,
@@ -476,23 +523,31 @@ class Dukascopy:
             duk_client = client or DukascopyClient(
                 catalog_path=self.catalog_path, data_dir=self.storage_root
             )
+            d_from = self._parse_date_bound(date_from)
+            d_to = self._parse_date_bound(date_to, is_end=True)
             try:
                 if norm_tf == "M1":
                     df = duk_client.get_bars(
                         clean_symbol,
                         Timeframe.PERIOD_M1,
-                        date_from=date_from,
-                        date_to=date_to,
+                        date_from=d_from,
+                        date_to=d_to,
                         count=count,
                     )
                 else:
                     df = duk_client.get_ticks(
                         clean_symbol,
-                        date_from=date_from,
-                        date_to=date_to,
+                        date_from=d_from,
+                        date_to=d_to,
                         count=count,
                     )
-            except (BridgeError, OSError, ValueError, RuntimeError) as exc:
+            except (
+                BridgeError,
+                OSError,
+                ValueError,
+                RuntimeError,
+                AttributeError,
+            ) as exc:
                 return StandardResponse.failure(
                     message=(
                         f"Failed to download Dukascopy data for {clean_symbol}: {exc}"
@@ -520,12 +575,13 @@ class Dukascopy:
                 ),
             )
 
-        # Standardize DateTime index / column
-        if "DateTime" not in df.columns:
-            df["DateTime"] = pd.to_datetime(df.index, utc=True)
-        else:
+        # Standardize DateTime column and reset index to avoid ambiguity
+        if "DateTime" in df.columns:
             df["DateTime"] = pd.to_datetime(df["DateTime"], utc=True)
+        else:
+            df["DateTime"] = pd.to_datetime(df.index, utc=True)
 
+        df = df.reset_index(drop=True)
         df.sort_values("DateTime", inplace=True)
         written_files: list[Path] = []
 
@@ -636,12 +692,36 @@ class Dukascopy:
             if file_path.exists() and not overwrite:
                 try:
                     existing = pq.read_table(file_path).to_pandas()
+                    if existing["Open"].dtype.kind == "f":
+                        existing["Open"] = (
+                            (existing["Open"] * scale).round().astype(np.int64)
+                        )
+                        existing["High"] = (
+                            (existing["High"] * scale).round().astype(np.int64)
+                        )
+                        existing["Low"] = (
+                            (existing["Low"] * scale).round().astype(np.int64)
+                        )
+                        existing["Close"] = (
+                            (existing["Close"] * scale).round().astype(np.int64)
+                        )
+                    if "Volume" in existing.columns:
+                        existing["Volume"] = (
+                            existing["Volume"].fillna(0).astype(np.uint64)
+                        )
                     merged = pd.concat([existing, group], ignore_index=True)
                     merged.drop_duplicates(subset=["DateTime"], inplace=True)
                     merged.sort_values("DateTime", inplace=True)
                     final_df = merged
                 except OSError, ValueError, pa.ArrowInvalid:
                     final_df = group
+
+            final_df = final_df.copy()
+            final_df["Open"] = final_df["Open"].astype(np.int64)
+            final_df["High"] = final_df["High"].astype(np.int64)
+            final_df["Low"] = final_df["Low"].astype(np.int64)
+            final_df["Close"] = final_df["Close"].astype(np.int64)
+            final_df["Volume"] = final_df["Volume"].astype(np.uint64)
 
             table = pa.Table.from_pandas(
                 final_df, schema=M1_SCHEMA, preserve_index=False
@@ -692,12 +772,28 @@ class Dukascopy:
             if file_path.exists() and not overwrite:
                 try:
                     existing = pq.read_table(file_path).to_pandas()
+                    if "Bid" in existing.columns and existing["Bid"].dtype.kind == "f":
+                        existing["Bid"] = (
+                            (existing["Bid"] * scale).round().astype(np.int64)
+                        )
+                        existing["Ask"] = (
+                            (existing["Ask"] * scale).round().astype(np.int64)
+                        )
+                    if "Flags" in existing.columns:
+                        existing["Flags"] = (
+                            existing["Flags"].fillna(0).astype(np.uint16)
+                        )
                     merged = pd.concat([existing, group], ignore_index=True)
                     merged.drop_duplicates(subset=["DateTime"], inplace=True)
                     merged.sort_values("DateTime", inplace=True)
                     final_df = merged
                 except OSError, ValueError, pa.ArrowInvalid:
                     final_df = group
+
+            final_df = final_df.copy()
+            final_df["Bid"] = final_df["Bid"].astype(np.int64)
+            final_df["Ask"] = final_df["Ask"].astype(np.int64)
+            final_df["Flags"] = final_df["Flags"].astype(np.uint16)
 
             table = pa.Table.from_pandas(
                 final_df, schema=TICK_SCHEMA, preserve_index=False
@@ -759,7 +855,7 @@ class Dukascopy:
         self.gateway.ensure_datasets_schema()
         dataset_id = f"dukascopy:{symbol}:{timeframe}"
         now_iso = datetime.now(UTC).isoformat()
-        b_name = "SQ default" if broker in ("-1", "default", "SQ default") else broker
+        real_broker = self.resolve_broker_name(broker)
         catalog = self._ensure_catalog()
         cat_info = catalog.get(underlying, {})
         category = cat_info.get("category", "Forex")
@@ -798,10 +894,8 @@ class Dukascopy:
                     "source": "dukascopy",
                     "symbol": symbol,
                     "underlying": underlying,
-                    "instrument": symbol,
                     "timeframe": timeframe,
-                    "broker": broker,
-                    "broker_name": b_name,
+                    "broker": real_broker,
                     "timezone": "UTC",
                     "category": category,
                     "date_from": date_from,

@@ -41,8 +41,10 @@ CLI Usage:
 
 from __future__ import annotations
 
+import io
 import lzma
 import struct
+import zipfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, override
@@ -68,6 +70,7 @@ from .base import (
     epoch_seconds,
     execute_bounded_get,
 )
+from .codecs import decode_sq_dat_bytes
 from .files import (
     find_matching_partitions,
     parse_delimited_bars,
@@ -359,7 +362,7 @@ class DukascopyClient(BrokerClient):
         resp = execute_bounded_get(
             self.session,
             feed_url,
-            timeout=(5.0, 15.0),
+            timeout=(3.0, 5.0),
             provider="dukascopy",
         )
         if resp.status_code != 200 or not resp.content:
@@ -391,7 +394,7 @@ class DukascopyClient(BrokerClient):
         resp = execute_bounded_get(
             self.session,
             feed_url,
-            timeout=(5.0, 15.0),
+            timeout=(3.0, 5.0),
             provider="dukascopy",
         )
         if resp.status_code != 200 or not resp.content:
@@ -407,6 +410,105 @@ class DukascopyClient(BrokerClient):
             )
         base_dt = datetime(dt.year, dt.month, dt.day, dt.hour, tzinfo=UTC)
         return decode_bi5_ticks(decomp, base_dt, digits=decimals, count=count)
+
+    @staticmethod
+    def _rows_to_market_bars(rows: list[dict[str, Any]]) -> pd.DataFrame:
+        """Convert list of bar dictionaries to a canonical MarketBar DataFrame."""
+        bars = [
+            MarketBar(
+                time=int(r["time"]),
+                open=float(r["open"]),
+                high=float(r["high"]),
+                low=float(r["low"]),
+                close=float(r["close"]),
+                tick_volume=int(r.get("tick_volume", 0)),
+                spread=int(r.get("spread", 0)),
+                real_volume=int(r.get("real_volume", 0)),
+            )
+            for r in rows
+        ]
+        return bars_to_dataframe(bars)
+
+    def _fetch_cdn_bars(
+        self,
+        sym_clean: str,
+        count: int | None = None,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch and decompress M1 candlestick bars from StrategyQuant Dukascopy CDN."""
+        meta_url = f"{self.CDN_BASE_URL}/m1/{sym_clean}/metadata.dat"
+        try:
+            resp = execute_bounded_get(
+                self.session,
+                meta_url,
+                timeout=(3.0, 5.0),
+                provider="dukascopy",
+            )
+            if resp.status_code != 200 or not resp.content:
+                return []
+        except Exception:
+            return []
+
+        available_zips = [
+            z.strip()
+            for z in resp.content.decode("latin1", errors="ignore").split(";")
+            if z.strip().endswith(".zip")
+        ]
+        if not available_zips:
+            return []
+
+        selected_zips: list[str] = []
+        if date_from or date_to:
+            start_yr = date_from.year if date_from else 2003
+            end_yr = date_to.year if date_to else datetime.now(UTC).year
+            for zname in available_zips:
+                stem = zname[:-4]
+                parts = stem.split("_")
+                try:
+                    yr = int(parts[0])
+                    if start_yr <= yr <= end_yr:
+                        if len(parts) > 1:
+                            mo = int(parts[1])
+                            if yr == start_yr and date_from and mo < date_from.month:
+                                continue
+                            if yr == end_yr and date_to and mo > date_to.month:
+                                continue
+                        selected_zips.append(zname)
+                except ValueError:
+                    continue
+        else:
+            selected_zips = available_zips[-1:]
+
+        all_bars: list[dict[str, Any]] = []
+        for zname in selected_zips:
+            zip_url = f"{self.CDN_BASE_URL}/m1/{sym_clean}/{zname}"
+            try:
+                zresp = execute_bounded_get(
+                    self.session,
+                    zip_url,
+                    timeout=(5.0, 15.0),
+                    provider="dukascopy",
+                )
+                if zresp.status_code != 200 or not zresp.content:
+                    continue
+                with zipfile.ZipFile(io.BytesIO(zresp.content)) as zf:
+                    for fname in sorted(zf.namelist()):
+                        if fname.endswith(".dat"):
+                            file_bars = decode_sq_dat_bytes(
+                                zf.read(fname),
+                                date_from=date_from,
+                                date_to=date_to,
+                            )
+                            all_bars.extend(file_bars)
+            except Exception as exc:
+                self.logger.warning("Error fetching CDN archive %s: %s", zname, exc)
+                continue
+
+        all_bars.sort(key=lambda b: b["time"])
+        if count and count > 0 and len(all_bars) > count:
+            all_bars = all_bars[-count:]
+        return all_bars
 
     @override
     def get_bars(
@@ -427,18 +529,22 @@ class DukascopyClient(BrokerClient):
         sym_clean = self._clean_symbol(symbol)
         snap = self.get_symbol_info(sym_clean)
         decimals = snap.price.digits
-        target_count = count or limit or 100
+        s = date_from if date_from is not None else start
+        e = date_to if date_to is not None else end
+        target_count = (
+            count if (s is not None or e is not None) else (count or limit or 100)
+        )
 
-        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
+        tf_name = timeframe.name if isinstance(timeframe, Timeframe) else str(timeframe)
         tf_norm = tf_name.strip().upper()
-        if tf_norm not in ("M1", "PERIOD_M1", "TICK"):
+        if tf_norm in ("M1", "PERIOD_M1"):
+            tf_norm = "M1"
+        elif tf_norm != "TICK":
             raise BridgeError(
                 f"Timeframe '{timeframe}' not supported by Dukascopy. Supported: M1, TICK",
                 code="UNSUPPORTED_TIMEFRAME",
             )
 
-        s = date_from if date_from is not None else start
-        e = date_to if date_to is not None else end
         start_sec = epoch_seconds(s)
         end_sec = epoch_seconds(e)
         date_from = (
@@ -448,11 +554,18 @@ class DukascopyClient(BrokerClient):
             datetime.fromtimestamp(end_sec, tz=UTC) if 0 < end_sec < 2**40 else None
         )
 
-        # Check local data_dir if available
-        if self.data_dir is not None and self.data_dir.exists():
-            matched = find_matching_partitions(self.data_dir, sym_clean, tf_norm)
-            all_local_bars: list[dict[str, Any]] = []
+        # Check local canonical data directory
+        search_dirs = (
+            [self.data_dir] if self.data_dir and self.data_dir.exists() else []
+        )
+        all_local_bars: list[dict[str, Any]] = []
+        for sdir in search_dirs:
+            matched = find_matching_partitions(sdir, sym_clean, tf_norm)
             for p in matched:
+                if p.suffix.lower() == ".dat" and not p.stem.upper().endswith(
+                    f"_{tf_norm}"
+                ):
+                    continue
                 if p.suffix.lower() == ".parquet":
                     all_local_bars.extend(read_parquet_bars(p, count=target_count))
                 elif p.suffix.lower() in (".csv", ".tsv", ".txt"):
@@ -471,30 +584,39 @@ class DukascopyClient(BrokerClient):
                             decomp, base_dt, digits=decimals, count=target_count
                         )
                     )
-            if all_local_bars:
-                all_local_bars.sort(key=lambda r: r["time"])
-                filtered = [
-                    r
-                    for r in all_local_bars
-                    if (not date_from or r["time"] >= int(date_from.timestamp()))
-                    and (not date_to or r["time"] <= int(date_to.timestamp()))
-                ]
-                if filtered:
-                    selected = filtered[-target_count:] if target_count else filtered
-                    bars = [
-                        MarketBar(
-                            time=int(r["time"]),
-                            open=float(r["open"]),
-                            high=float(r["high"]),
-                            low=float(r["low"]),
-                            close=float(r["close"]),
-                            tick_volume=int(r.get("tick_volume", 0)),
-                            spread=int(r.get("spread", 0)),
-                            real_volume=int(r.get("real_volume", 0)),
+                elif p.suffix.lower() == ".dat":
+                    all_local_bars.extend(
+                        decode_sq_dat_bytes(
+                            p.read_bytes(),
+                            count=target_count,
+                            date_from=date_from,
+                            date_to=date_to,
                         )
-                        for r in selected
-                    ]
-                    return bars_to_dataframe(bars)
+                    )
+            if all_local_bars:
+                break
+
+        if all_local_bars:
+            all_local_bars.sort(key=lambda r: r["time"])
+            filtered = [
+                r
+                for r in all_local_bars
+                if (not date_from or r["time"] >= int(date_from.timestamp()))
+                and (not date_to or r["time"] <= int(date_to.timestamp()))
+            ]
+            if filtered:
+                selected = filtered[-target_count:] if target_count else filtered
+                return self._rows_to_market_bars(selected)
+
+        # 2. Try StrategyQuant pre-packaged Dukascopy CDN archives
+        cdn_bars = self._fetch_cdn_bars(
+            sym_clean=sym_clean,
+            count=target_count,
+            date_from=date_from,
+            date_to=date_to,
+        )
+        if cdn_bars:
+            return self._rows_to_market_bars(cdn_bars)
 
         feed_dt = date_to or (
             date_from + timedelta(days=1)
@@ -520,20 +642,7 @@ class DukascopyClient(BrokerClient):
                 code="NO_DATA",
             )
         selected = filtered[-target_count:] if target_count else filtered
-        bars = [
-            MarketBar(
-                time=int(r["time"]),
-                open=float(r["open"]),
-                high=float(r["high"]),
-                low=float(r["low"]),
-                close=float(r["close"]),
-                tick_volume=int(r.get("tick_volume", 0)),
-                spread=int(r.get("spread", 0)),
-                real_volume=int(r.get("real_volume", 0)),
-            )
-            for r in selected
-        ]
-        return bars_to_dataframe(bars)
+        return self._rows_to_market_bars(selected)
 
     @override
     def get_ticks(

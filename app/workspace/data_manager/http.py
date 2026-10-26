@@ -639,10 +639,16 @@ def _broker_stock_routes(router: APIRouter) -> None:
 
 
 def _check_broker_unused(gateway: HostPersistence, row: dict[str, Any]) -> None:
+    broker_name = str(row.get("name", "")).strip()
+    clean_name = (
+        broker_name[2:-2].strip()
+        if broker_name.startswith("[[") and broker_name.endswith("]]")
+        else broker_name
+    )
     for table, column, value in (
         ("datamgr_symbols", "broker_id", row["id"]),
         ("datamgr_sessions", "broker_id", row["id"]),
-        ("datamgr_datasets", "broker", str(row["id"])),
+        ("datamgr_datasets", "broker", clean_name),
     ):
         data = _service_data(
             gateway.read_records(table, filters={column: value}, limit=1)
@@ -652,6 +658,18 @@ def _check_broker_unused(gateway: HostPersistence, row: dict[str, Any]) -> None:
                 ErrorCode.CONFLICT,
                 "Broker is used by symbols, sessions or saved datasets",
             )
+    for alt_val in (str(row["id"]), broker_name):
+        if alt_val and alt_val != clean_name:
+            data = _service_data(
+                gateway.read_records(
+                    "datamgr_datasets", filters={"broker": alt_val}, limit=1
+                )
+            )
+            if data["records"]:
+                raise TransportError(
+                    ErrorCode.CONFLICT,
+                    "Broker is used by symbols, sessions or saved datasets",
+                )
 
 
 def _clear_broker_stocks(gateway: HostPersistence, identifier: int) -> None:
@@ -688,15 +706,24 @@ def _validate_broker_changes(
             )
         timezone = fields.get("server_timezone", row["server_timezone"])
         if timezone != row["server_timezone"]:
-            data = _service_data(
-                gateway.read_records(
-                    "datamgr_datasets", filters={"broker": str(row["id"])}, limit=1
-                )
+            broker_name = str(row.get("name", "")).strip()
+            clean_name = (
+                broker_name[2:-2].strip()
+                if broker_name.startswith("[[") and broker_name.endswith("]]")
+                else broker_name
             )
-            if data["records"]:
-                raise TransportError(
-                    ErrorCode.CONFLICT, "Broker timezone is used by saved datasets"
+            for chk_val in (clean_name, str(row["id"]), broker_name):
+                if not chk_val:
+                    continue
+                data = _service_data(
+                    gateway.read_records(
+                        "datamgr_datasets", filters={"broker": chk_val}, limit=1
+                    )
                 )
+                if data["records"]:
+                    raise TransportError(
+                        ErrorCode.CONFLICT, "Broker timezone is used by saved datasets"
+                    )
 
 
 def _basket_ids(values: Any) -> list[int]:

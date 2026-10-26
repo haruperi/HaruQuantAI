@@ -141,15 +141,15 @@ def _register_dataset_lifecycle_routes(router: APIRouter) -> None:
 
         now_iso = "2026-01-01T00:00:00"
         dataset_id = f"{source}:{symbol}:{timeframe}"
-        rec = {
+        service = Dukascopy(gateway)
+        real_broker = service.resolve_broker_name(broker)
+        db_rec = {
             "id": dataset_id,
             "source": source,
             "symbol": symbol,
             "underlying": underlying,
-            "instrument": sym_def,
             "timeframe": timeframe,
-            "broker": broker,
-            "broker_name": broker,
+            "broker": real_broker,
             "timezone": "UTC",
             "category": "Forex",
             "date_from": "",
@@ -157,13 +157,12 @@ def _register_dataset_lifecycle_routes(router: APIRouter) -> None:
             "bars": 0,
             "path": f"data/market/{source}/{timeframe.lower()}/{symbol.lower()}",
             "data_kind": "bars" if timeframe == "M1" else "ticks",
-            "symbolDefinition": sym_def,
             "created_at": now_iso,
             "updated_at": now_iso,
         }
         gateway.ensure_datasets_schema()
-        gateway.create_records("datamgr_datasets", rec)
-        return _ok(rec)
+        gateway.create_records("datamgr_datasets", db_rec)
+        return _ok({**db_rec, "symbolDefinition": sym_def})
 
     @router.post("/providers/download")
     def provider_download(request: Request, body: dict[str, Any]) -> Any:

@@ -14,7 +14,7 @@ export function availableStart(target: DownloadTarget, precision = false): strin
   return item ? (precision && target.timeframe.startsWith('M1') ? item.dateFromM1 : item.dateFrom) : today();
 }
 export function eligibleTargets(targets: DownloadTarget[], job: DownloadJob | null): DownloadTarget[] {
-  const eligible = targets.filter(row => row.source === 'Dukascopy');
+  const eligible = targets.filter(row => (row.source || '').toLowerCase() === 'dukascopy');
   if (!eligible.length) throw new Error('You must select at least one Dukascopy record.');
   if (eligible.some(row => row.sourceDataId)) throw new Error('You cannot download to cloned data.');
   const available = eligible.filter(row => !job || !['running', 'paused'].includes(job.state) || !job.request.targets.some(active => active.id === row.id));
@@ -31,7 +31,7 @@ export function presetRange(preset: Preset, last: string, minimum: string, from:
   return { from: [minimum, date.toISOString().slice(0, 10)].sort().at(-1)!, to };
 }
 export function validateDownload(request: DownloadRequest, now = today()): void {
-  if (!request.targets.length || request.targets.some(row => row.source !== 'Dukascopy' || row.sourceDataId)) throw new Error('Select eligible Dukascopy records.');
+  if (!request.targets.length || request.targets.some(row => (row.source || '').toLowerCase() !== 'dukascopy' || row.sourceDataId)) throw new Error('Select eligible Dukascopy records.');
   if (!['standard', 'cdn', 'cdn-cn'].includes(request.downloadType)) throw new Error('Choose a download mode.');
   if (!validDate(request.dateFrom) || !validDate(request.dateTo) || request.dateFrom > request.dateTo) throw new Error('Choose a valid date range with From on or before To.');
   if (request.dateFrom < availableStart(request.targets[0]) || request.dateTo > now) throw new Error('Dates must be within the available range and today.');

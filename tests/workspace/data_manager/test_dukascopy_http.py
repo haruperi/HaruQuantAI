@@ -32,8 +32,8 @@ def gateway(tmp_path):
                 PRIMARY KEY(entity_id,entity_type));
             CREATE TABLE datamgr_datasets (
                 id TEXT PRIMARY KEY, source TEXT NOT NULL, symbol TEXT NOT NULL,
-                underlying TEXT NOT NULL, instrument TEXT NOT NULL, timeframe TEXT NOT NULL,
-                broker TEXT NOT NULL, broker_name TEXT NOT NULL, timezone TEXT NOT NULL,
+                underlying TEXT NOT NULL, timeframe TEXT NOT NULL,
+                broker TEXT NOT NULL, timezone TEXT NOT NULL,
                 category TEXT NOT NULL, date_from TEXT NOT NULL, date_to TEXT NOT NULL,
                 bars INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL, path TEXT NOT NULL DEFAULT '',
@@ -136,3 +136,31 @@ def test_http_ui_datasets_create_and_provider_download(client):
         json={"provider": "other", "symbol": "EURUSD"},
     )
     assert res_down.status_code == 200
+
+    # Test UI /providers/download with dukascopy and string dates
+    from unittest.mock import patch
+
+    with patch("app.workspace.data_manager.dukascopy.Dukascopy.download") as mock_dl:
+        mock_dl.return_value = {
+            "success": True,
+            "data": {"downloaded_bars": 100, "status": "completed"},
+        }
+        res_duk = client.post(
+            "/api/v1/data/providers/download",
+            json={
+                "provider": "dukascopy",
+                "symbol": "GBPUSD",
+                "timeframe": "M1",
+                "date_from": "2025-01-01",
+                "date_to": "2025-01-02",
+            },
+        )
+        assert res_duk.status_code == 200
+        assert res_duk.json()["data"]["downloaded_bars"] == 100
+        mock_dl.assert_called_once_with(
+            symbol="GBPUSD",
+            timeframe="M1",
+            date_from="2025-01-01",
+            date_to="2025-01-02",
+            underlying=None,
+        )

@@ -133,24 +133,37 @@ def utc_now() -> datetime:
     return datetime.now(tz=UTC)
 
 
-def epoch_seconds(value: datetime | float | None) -> int:
+def epoch_seconds(value: datetime | float | str | None) -> int:
     """Convert an optional datetime or numeric timestamp to integer epoch seconds."""
     if value is None:
         return 0
+    if isinstance(value, str):
+        v = value.strip()
+        if not v:
+            return 0
+        try:
+            if v.replace(".", "", 1).isdigit():
+                num = float(v)
+                return int(num) if num < 100_000_000_000 else int(num // 1000)
+            parsed = datetime.fromisoformat(v)
+            return int(
+                (
+                    parsed.replace(tzinfo=UTC) if parsed.tzinfo is None else parsed
+                ).timestamp()
+            )
+        except ValueError, TypeError:
+            return 0
     if isinstance(value, (int, float)):
         return int(value) if value < 100_000_000_000 else int(value // 1000)
     dt = value.replace(tzinfo=UTC) if value.tzinfo is None else value
     return int(dt.timestamp())
 
 
-def epoch_millis(value: datetime | float | None) -> int:
+def epoch_millis(value: datetime | float | str | None) -> int:
     """Convert an optional datetime or numeric timestamp to integer epoch milliseconds."""
-    if value is None:
-        return 0
     if isinstance(value, (int, float)):
         return int(value * 1000) if value < 100_000_000_000 else int(value)
-    dt = value.replace(tzinfo=UTC) if value.tzinfo is None else value
-    return int(dt.timestamp() * 1000)
+    return epoch_seconds(value) * 1000
 
 
 def redact_url_or_message(text: str) -> str:
@@ -546,31 +559,21 @@ class TradingClient(BrokerClient):
         self._receipts[cmd_id] = rec
         return cmd_id, rec
 
-    def _resolve_receipt(self, cmd_id: str, rec: Receipt, val: Any) -> None:
-        """Mark receipt as resolved."""
+    def _finalize_receipt(
+        self, cmd_id: str, rec: Receipt, status: ReceiptStatus, **kwargs: Any
+    ) -> None:
         t = time.time()
-        v = asdict(val) if is_dataclass(val) and not isinstance(val, type) else val
         self._receipts[cmd_id] = replace(
-            rec,
-            status=ReceiptStatus.RESOLVED,
-            sent_at=t,
-            acknowledged_at=t,
-            resolved_at=t,
-            value=v,
+            rec, status=status, sent_at=t, acknowledged_at=t, resolved_at=t, **kwargs
         )
 
+    def _resolve_receipt(self, cmd_id: str, rec: Receipt, val: Any) -> None:
+        v = asdict(val) if is_dataclass(val) and not isinstance(val, type) else val
+        self._finalize_receipt(cmd_id, rec, ReceiptStatus.RESOLVED, value=v)
+
     def _reject_receipt(self, cmd_id: str, rec: Receipt, exc: Exception) -> None:
-        """Mark receipt as rejected."""
-        t = time.time()
         err = {"code": str(getattr(exc, "code", "BROKER_ERROR")), "message": str(exc)}
-        self._receipts[cmd_id] = replace(
-            rec,
-            status=ReceiptStatus.REJECTED,
-            sent_at=t,
-            acknowledged_at=t,
-            resolved_at=t,
-            error=err,
-        )
+        self._finalize_receipt(cmd_id, rec, ReceiptStatus.REJECTED, error=err)
 
     def get_account_info(self) -> AccountInfo | Awaitable[AccountInfo]:
         """Retrieve account state info."""
@@ -925,42 +928,32 @@ class TradingClient(BrokerClient):
 
 
 _SINGLETONS: dict[str, Any] = {}
+_FACTORIES_RAW = (
+    "yahoo:yahoo:YahooClient dukascopy:dukascopy:DukascopyClient "
+    "darwinex:darwinex:DarwinexClient sq_equity:sq_equity:SQEquityClient "
+    "sq_futures:sq_futures:SQFuturesClient crypto:crypto:CryptoClient "
+    "binance:crypto:BinanceClient files:files:FilesClient "
+    "tick_downloader:tick_downloader:TickDownloaderClient "
+    "metatrader:metatrader:MetaTraderClient ctrader:ctrader:CTraderClient "
+    "simulator:simulator:SimulatorClient live_test:registry:LiveTest"
+)
 _SINGLETON_FACTORIES: dict[str, tuple[str, str]] = {
-    "yahoo": ("yahoo", "YahooClient"),
-    "dukascopy": ("dukascopy", "DukascopyClient"),
-    "darwinex": ("darwinex", "DarwinexClient"),
-    "sq_equity": ("sq_equity", "SQEquityClient"),
-    "sq_futures": ("sq_futures", "SQFuturesClient"),
-    "crypto": ("crypto", "CryptoClient"),
-    "binance": ("crypto", "BinanceClient"),
-    "files": ("files", "FilesClient"),
-    "tick_downloader": ("tick_downloader", "TickDownloaderClient"),
-    "metatrader": ("metatrader", "MetaTraderClient"),
-    "ctrader": ("ctrader", "CTraderClient"),
-    "simulator": ("simulator", "SimulatorClient"),
-    "live_test": ("registry", "LiveTest"),
+    p[0]: (p[1], p[2]) for p in (item.split(":") for item in _FACTORIES_RAW.split())
 }
+_EXTRA_MAP = (
+    "BrokerClient:base TradingClient:base BridgeError:base "
+    "BitfinexClient:crypto CoinbaseClient:crypto "
+    "PoloniexClient:crypto LiveTestCLI:registry"
+)
 _CLASS_TO_MODULE: dict[str, str] = {
-    cls_name: mod for mod, cls_name in _SINGLETON_FACTORIES.values()
-} | {
-    "BrokerClient": "base",
-    "TradingClient": "base",
-    "BridgeError": "base",
-    "BitfinexClient": "crypto",
-    "CoinbaseClient": "crypto",
-    "PoloniexClient": "crypto",
-    "LiveTestCLI": "registry",
-}
-_PROVIDER_ALIASES = {
-    "strategyquant_equity": "sq_equity",
-    "strategyquant_futures": "sq_futures",
-    "csv": "files",
-    "parquet": "files",
-    "local": "files",
-    "yahoo_finance": "yahoo",
-    "yfinance": "yahoo",
-    "mt5": "metatrader",
-}
+    cls: mod for mod, cls in _SINGLETON_FACTORIES.values()
+} | dict(p.split(":") for p in _EXTRA_MAP.split())
+_ALIASES_RAW = (
+    "strategyquant_equity:sq_equity strategyquant_futures:sq_futures "
+    "csv:files parquet:files local:files "
+    "yahoo_finance:yahoo yfinance:yahoo mt5:metatrader"
+)
+_PROVIDER_ALIASES: dict[str, str] = dict(p.split(":") for p in _ALIASES_RAW.split())
 
 
 def normalize_provider_id(name: str) -> str:

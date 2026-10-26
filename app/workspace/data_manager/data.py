@@ -172,9 +172,8 @@ class Data:
             datasets: list[DataInfo] = []
             for r in rows:
                 symbol = str(r.get("symbol", ""))
-                instrument = str(r.get("instrument", ""))
+                underlying = str(r.get("underlying") or r.get("symbol", ""))
                 broker = str(r.get("broker", "default"))
-                underlying = str(r.get("underlying", ""))
                 timeframe = str(r.get("timeframe", ""))
                 timezone = str(r.get("timezone", "Exchange"))
                 date_from = str(r.get("date_from", ""))
@@ -196,9 +195,9 @@ class Data:
                     DataInfo(
                         id=str(r.get("id", f"{source}:{symbol}")),
                         symbol=symbol,
-                        instrument=instrument,
+                        instrument=underlying,
                         broker=broker,
-                        broker_name=str(r.get("broker_name", broker)),
+                        broker_name=broker,
                         underlying=underlying,
                         timeframe=timeframe,
                         timezone=timezone,
