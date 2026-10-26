@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -82,20 +82,7 @@ def format_dataset_table(saved_datasets: Sequence[Any] | Mapping[str, Any]) -> s
     divider = (
         "|-"
         + "-|-".join(
-            [
-                "-" * 14,
-                "-" * 15,
-                "-" * 12,
-                "-" * 32,
-                "-" * 4,
-                "-" * 8,
-                "-" * 10,
-                "-" * 10,
-                "-" * 6,
-                "-" * 10,
-                "-" * 16,
-                "-" * 8,
-            ]
+            ["-" * width for width in (14, 15, 12, 32, 4, 8, 10, 10, 6, 10, 16, 8)]
         )
         + "-|"
     )
@@ -275,20 +262,7 @@ def format_symbol_table(
     divider = (
         "|-"
         + "-|-".join(
-            [
-                "-" * 10,
-                "-" * 26,
-                "-" * 14,
-                "-" * 12,
-                "-" * 10,
-                "-" * 10,
-                "-" * 14,
-                "-" * 16,
-                "-" * 14,
-                "-" * 16,
-                "-" * 14,
-                "-" * 20,
-            ]
+            ["-" * width for width in (10, 26, 14, 12, 10, 10, 14, 16, 14, 16, 14, 20)]
         )
         + "-|"
     )
@@ -350,18 +324,9 @@ def format_symbol_table(
 
 
 class SymbolsCLI:
-    """Headless CLI formatter and table presentation for Symbols catalog."""
+    """Table formatters for the Data Manager catalog."""
 
-    @classmethod
-    def format_symbol_table(
-        cls,
-        symbols: Sequence[Any] | Mapping[str, Any],
-        *,
-        limit: int | None = 50,
-    ) -> str:
-        """Format ASCII table of symbol catalog entries."""
-        logger.debug("Formatting symbols as ASCII table")
-        return format_symbol_table(symbols, limit=limit)
+    format_symbol_table = staticmethod(format_symbol_table)
 
 
 def _summarize_windows(windows: Sequence[Any]) -> str:
@@ -418,18 +383,7 @@ def format_session_table(
         "| {name:<26} | {brk:<14} | {desc:<36} | {tz:<18} | {wins:<24} | {hols:<12} |"
     )
     divider = (
-        "|-"
-        + "-|-".join(
-            [
-                "-" * 26,
-                "-" * 14,
-                "-" * 36,
-                "-" * 18,
-                "-" * 24,
-                "-" * 12,
-            ]
-        )
-        + "-|"
+        "|-" + "-|-".join(["-" * width for width in (26, 14, 36, 18, 24, 12)]) + "-|"
     )
     lines.append(
         header_fmt.format(
@@ -478,16 +432,9 @@ def format_session_table(
 
 
 class SessionsCLI:
-    """Headless CLI formatter and table presentation for Sessions catalog."""
+    """Table formatters for the Data Manager catalog."""
 
-    @classmethod
-    def format_session_table(
-        cls,
-        sessions: Sequence[Any] | Mapping[str, Any],
-    ) -> str:
-        """Format ASCII table of trading session calendar catalog entries."""
-        logger.debug("Formatting sessions as ASCII table")
-        return format_session_table(sessions)
+    format_session_table = staticmethod(format_session_table)
 
 
 def format_basket_table(
@@ -513,18 +460,7 @@ def format_basket_table(
     )
     divider = (
         "|-"
-        + "-|-".join(
-            [
-                "-" * 32,
-                "-" * 12,
-                "-" * 22,
-                "-" * 17,
-                "-" * 12,
-                "-" * 13,
-                "-" * 10,
-                "-" * 10,
-            ]
-        )
+        + "-|-".join(["-" * width for width in (32, 12, 22, 17, 12, 13, 10, 10)])
         + "-|"
     )
     lines.append(
@@ -580,16 +516,9 @@ def format_basket_table(
 
 
 class BasketsCLI:
-    """Headless CLI formatter and table presentation for Baskets catalog."""
+    """Table formatters for the Data Manager catalog."""
 
-    @classmethod
-    def format_basket_table(
-        cls,
-        baskets: Sequence[Any] | Mapping[str, Any],
-    ) -> str:
-        """Format ASCII table of stock groups / baskets catalog entries."""
-        logger.debug("Formatting stock groups as ASCII table")
-        return format_basket_table(baskets)
+    format_basket_table = staticmethod(format_basket_table)
 
 
 def format_broker_table(
@@ -615,17 +544,7 @@ def format_broker_table(
     )
     divider = (
         "|-"
-        + "-|-".join(
-            [
-                "-" * 26,
-                "-" * 22,
-                "-" * 14,
-                "-" * 16,
-                "-" * 17,
-                "-" * 22,
-                "-" * 19,
-            ]
-        )
+        + "-|-".join(["-" * width for width in (26, 22, 14, 16, 17, 22, 19)])
         + "-|"
     )
     lines.append(
@@ -671,78 +590,20 @@ def format_broker_table(
 
 
 class BrokersCLI:
-    """Headless CLI formatter and table presentation for Brokers catalog."""
+    """Table formatters for the Data Manager catalog."""
 
-    @classmethod
-    def format_broker_table(
-        cls,
-        brokers: Sequence[Any] | Mapping[str, Any],
-    ) -> str:
-        """Format ASCII table of broker profile catalog entries."""
-        logger.debug("Formatting broker profiles as ASCII table")
-        return format_broker_table(brokers)
+    format_broker_table = staticmethod(format_broker_table)
 
 
 class DataCLI:
-    """Headless CLI formatter and table presentation for Data Manager data."""
+    """Table formatters for the Data Manager catalog."""
 
-    MAX_UNDERLYING_DISPLAY_LEN: int = MAX_UNDERLYING_DISPLAY_LEN
-    TRUNCATE_LEN: int = TRUNCATE_LEN
-
-    @classmethod
-    def format_broker_table(
-        cls,
-        brokers: Sequence[Any] | Mapping[str, Any],
-    ) -> str:
-        """Format ASCII table of broker profile catalog entries."""
-        return format_broker_table(brokers)
-
-    @classmethod
-    def format_basket_table(
-        cls,
-        baskets: Sequence[Any] | Mapping[str, Any],
-    ) -> str:
-        """Format ASCII table of stock groups / baskets catalog entries."""
-        return format_basket_table(baskets)
-
-    @classmethod
-    def format_session_table(
-        cls,
-        sessions: Sequence[Any] | Mapping[str, Any],
-    ) -> str:
-        """Format ASCII table of trading session calendar catalog entries."""
-        return format_session_table(sessions)
-
-    @classmethod
-    def format_symbol_table(
-        cls,
-        symbols: Sequence[Any] | Mapping[str, Any],
-        *,
-        limit: int | None = 50,
-    ) -> str:
-        """Format ASCII table of symbol catalog entries."""
-        return format_symbol_table(symbols, limit=limit)
-
-    @classmethod
-    def format_dataset_table(
-        cls,
-        saved_datasets: Sequence[Any] | Mapping[str, Any],
-    ) -> str:
-        """Format ASCII table of saved dataset catalog entries."""
-        logger.debug(
-            "Formatting saved datasets as ASCII table",
-        )
-        return format_dataset_table(saved_datasets)
-
-    @classmethod
-    def format_data_dashboard(
-        cls,
-        overview: Mapping[str, Any],
-        saved_datasets: Sequence[Any] | Mapping[str, Any],
-    ) -> str:
-        """Format complete human-readable dashboard output."""
-        logger.debug("Formatting data overview and dataset table")
-        return format_data_dashboard(overview, saved_datasets)
+    format_broker_table = staticmethod(format_broker_table)
+    format_basket_table = staticmethod(format_basket_table)
+    format_session_table = staticmethod(format_session_table)
+    format_symbol_table = staticmethod(format_symbol_table)
+    format_dataset_table = staticmethod(format_dataset_table)
+    format_data_dashboard: Callable[..., str] = staticmethod(format_data_dashboard)
 
 
 def register_commands(commands: Any) -> None:
@@ -764,6 +625,7 @@ def register_commands(commands: Any) -> None:
         default=50,
         help="Symbols per page (default: 50)",
     )
+    _session_parsers(resources)
     data_manager.set_defaults(handler=partial(run_command, parser=data_manager))
 
 
@@ -771,11 +633,116 @@ def run_command(
     arguments: argparse.Namespace, *, parser: argparse.ArgumentParser
 ) -> int:
     """Execute a Data Manager command, emit errors, and return its exit code."""
-    result = _run_symbol_command(arguments, parser)
+    result = (
+        _run_session_command(arguments, parser)
+        if arguments.resource == "session"
+        else _run_symbol_command(arguments, parser)
+    )
     if result is None:
         return 0
     print(json.dumps(result, allow_nan=False))
     return 0 if result["success"] else 1
+
+
+def _session_json(value: str) -> list[Any]:
+    try:
+        result = json.loads(value)
+    except json.JSONDecodeError as error:
+        raise argparse.ArgumentTypeError("must be a JSON array") from error
+    if not isinstance(result, list):
+        raise argparse.ArgumentTypeError("must be a JSON array")
+    return result
+
+
+def _session_parsers(resources: Any) -> None:
+    session = resources.add_parser("session", help="Manage trading session calendars")
+    commands = session.add_subparsers(dest="session_command", required=True)
+    listing = commands.add_parser("list", help="List sessions by page")
+    listing.add_argument("--page", type=_positive_int, default=1)
+    listing.add_argument("--page-size", type=_positive_int, default=50)
+    for command in ("add", "edit"):
+        parser = commands.add_parser(
+            command, help=f"{command.title()} session profiles"
+        )
+        if command == "edit":
+            parser.add_argument("session_names", nargs="+")
+        parser.add_argument(
+            "--name", required=command == "add", default=argparse.SUPPRESS
+        )
+        for field in ("description", "timezone", "broker-id", "windows", "holidays"):
+            kind = (
+                int
+                if field == "broker-id"
+                else _session_json
+                if field in {"windows", "holidays"}
+                else str
+            )
+            parser.add_argument(f"--{field}", type=kind, default=argparse.SUPPRESS)
+        parser.add_argument(
+            "--is-default",
+            action=argparse.BooleanOptionalAction,
+            default=argparse.SUPPRESS,
+        )
+    delete = commands.add_parser("delete", help="Delete one or more sessions")
+    delete.add_argument("session_names", nargs="+")
+    clone = commands.add_parser("clone", help="Clone a session")
+    clone.add_argument("source_session")
+    clone.add_argument("new_name")
+    for command in ("load", "save"):
+        transfer = commands.add_parser(command, help=f"{command.title()} sessions JSON")
+        transfer.add_argument("json_path")
+
+
+def _run_session_command(
+    arguments: argparse.Namespace, parser: Any
+) -> dict[str, Any] | None:
+    from app.workspace.data_manager.sessions import Sessions
+
+    service = Sessions()
+    command = arguments.session_command
+    if command in {"add", "edit"}:
+        fields = {
+            key: value
+            for key, value in vars(arguments).items()
+            if key
+            not in {
+                "command",
+                "resource",
+                "session_command",
+                "session_names",
+                "handler",
+            }
+        }
+        result = (
+            service.add(**fields)
+            if command == "add"
+            else service.edit(arguments.session_names, fields)
+        )
+    elif command == "clone":
+        result = service.clone(arguments.source_session, arguments.new_name)
+    elif command == "delete":
+        result = service.delete(arguments.session_names)
+    elif command in {"load", "save"}:
+        result = getattr(service, command)(arguments.json_path)
+    else:
+        result = service.list()
+    if not result["success"]:
+        return result
+    if command == "save":
+        print(f"Saved {result['data']['count']} sessions to {result['data']['path']}")
+        return None
+    rows = [result["data"]] if command in {"add", "clone"} else result["data"]
+    if command == "list":
+        pages = max(1, (len(rows) + arguments.page_size - 1) // arguments.page_size)
+        if arguments.page > pages:
+            parser.error("--page exceeds the number of catalog pages")
+        start = (arguments.page - 1) * arguments.page_size
+        print(f"Page {arguments.page} of {pages} | {len(rows)} sessions")
+        rows = rows[start : start + arguments.page_size]
+    else:
+        print(result["message"])
+    print(SessionsCLI.format_session_table(rows))
+    return None
 
 
 def _positive_int(value: str) -> int:

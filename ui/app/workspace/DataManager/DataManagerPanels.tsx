@@ -1,5 +1,5 @@
 import { useSessions } from '../../plugins/data_source/Catalogs/Sessions/sessionStore';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '../../components/ui';
 import { brokerCounts, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
 import { type FileSymbol } from '../../plugins/data_source/FileImport/fileSymbols';
@@ -75,7 +75,14 @@ export function SessionTable({ rows:allRows, selected, onSelect, onEdit, onDelet
   const sessionState=useSessions();
   const [query, setQuery] = useState('');
   const [broker,setBroker]=useState('');
-  const rows=allRows.filter(item=>(!broker||item.broker===broker)&&(item.name+' '+item.brokerName).toLowerCase().includes(query.toLowerCase())).sort((a,b)=>a.name.localeCompare(b.name));
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+  const filtered=allRows.filter(item=>(!broker||item.broker===broker)&&(item.name+' '+item.brokerName).toLowerCase().includes(query.toLowerCase())).sort((a,b)=>a.name.localeCompare(b.name));
+  const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, pages);
+  useEffect(() => setPage(1), [query, broker, pageSize]);
+  useEffect(() => setPage(currentPage), [currentPage]);
+  const rows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
   const allSelected = rows.length > 0 && rows.every(item => selected.includes(item.id));
   return <main className="full dataset-workspace" aria-label="Sessions">
     {sessionState.error&&<p role="alert">{sessionState.loaded?'Showing the last server snapshot. ':''}{sessionState.error}</p>}
@@ -84,6 +91,12 @@ export function SessionTable({ rows:allRows, selected, onSelect, onEdit, onDelet
       <input className="text-input" aria-label="Filter sessions" placeholder="Filter items" value={query} onChange={event => setQuery(event.target.value)}/>
       <select className="text-input" aria-label="Session broker profile" value={broker} onChange={event=>setBroker(event.target.value)}><option value="">All broker profiles</option>{brokers.map(item=><option value={item.id} key={item.id}>{item.name}</option>)}</select>
       <Button disabled={sessionState.isSyncing} onClick={()=>void sessionState.refreshFromServer()}>Refresh sessions</Button>
+    </div>
+    <div className="dataset-filters" aria-label="Session pagination">
+      <Button disabled={currentPage===1} onClick={()=>setPage(currentPage-1)}>Previous</Button>
+      <span>Page {currentPage} of {pages} | {filtered.length} sessions | {selected.length} selected</span>
+      <Button disabled={currentPage===pages} onClick={()=>setPage(currentPage+1)}>Next</Button>
+      <label>Rows per page <select aria-label="Sessions per page" value={pageSize} onChange={event=>setPageSize(Number(event.target.value))}>{[25,50,100,250].map(size=><option key={size} value={size}>{size}</option>)}</select></label>
     </div>
     <div className="dataset-grid session-grid"><table className="plain-table session-table" aria-label="Sessions">
 

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDomainClient } from '../../../../../../app/host/transport';
-import { cloneRemoteSession, fetchRemoteSessions, fromSessionDefinition, saveSessionElement, setSessionApiClient, toSessionDefinition, type RemoteSessionDefinition } from '../../../../../../app/plugins/data_source/Catalogs/Sessions/sessionApiClient';
+import { cloneRemoteSession, deleteRemoteSessions, loadSessionJson, saveSessionJson, fetchRemoteSessions, fromSessionDefinition, saveSessionElement, setSessionApiClient, toSessionDefinition, type RemoteSessionDefinition } from '../../../../../../app/plugins/data_source/Catalogs/Sessions/sessionApiClient';
 import { useSessions } from '../../../../../../app/plugins/data_source/Catalogs/Sessions/sessionStore';
 
 const row: RemoteSessionDefinition = {
@@ -47,12 +47,22 @@ describe('authoritative session contracts', () => {
     await useSessions.getState().refreshFromServer();
     expect(useSessions.getState().sessions).toEqual([]);
   });
-  it('reports individual deletion failures without removing unconfirmed rows', async () => {
+  it('keeps every row on a rejected atomic delete and removes them after confirmation', async () => {
     const other = { ...row, id: '2', name: 'Other' };
-    setup().mockResolvedValueOnce(response([row, other])).mockResolvedValueOnce(response({ id: '1', deleted: true })).mockRejectedValueOnce(new Error('unavailable'));
+    const fetchFn = setup().mockResolvedValueOnce(response([row, other])).mockRejectedValueOnce(new Error('unavailable')).mockResolvedValueOnce(response({ deleted: ['1','2'] }));
     await useSessions.getState().refreshFromServer();
-    expect(await useSessions.getState().remove(['1','2'])).toEqual({ deleted: ['1'], failed: ['2'] });
-    expect(useSessions.getState().sessions.map(item => item.id)).toEqual(['2']);
+    await expect(useSessions.getState().remove(['1','2'])).rejects.toThrow('unavailable');
+    expect(useSessions.getState().sessions.map(item => item.id)).toEqual(['1','2']);
+    expect(await useSessions.getState().remove(['1','2','1'])).toEqual({ deleted: ['1','2'], failed: [] });
+    expect(useSessions.getState().sessions).toEqual([]);
+    expect(JSON.parse(fetchFn.mock.calls[2][1].body)).toEqual({ session_ids: ['1','2'] });
+  });
+  it('uses the shared JSON transfer endpoints and checks deletion confirmation', async () => {
+    const fetchFn = setup().mockResolvedValueOnce(response({ loaded_count: 1 })).mockResolvedValueOnce(response({ content: '[]', count: 0 })).mockResolvedValueOnce(response({ deleted: [] }));
+    expect(await loadSessionJson('[{"name":"Added"}]')).toEqual({ loaded_count: 1 });
+    expect(await saveSessionJson()).toEqual({ content: '[]', count: 0 });
+    expect(JSON.parse(fetchFn.mock.calls[0][1].body)).toEqual({ content: '[{"name":"Added"}]' });
+    await expect(deleteRemoteSessions(['1'])).rejects.toThrow('confirm session deletion');
   });
   it('ignores reads from an old host session and reads older than a confirmed write', async () => {
     let resolve!: (value: Response) => void;

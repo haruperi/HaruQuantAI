@@ -855,6 +855,10 @@ def _parse_json_list(raw: Any) -> list[Any]:
         except (json.JSONDecodeError, TypeError):
             return []
     return []
+def _session_day(window: Mapping[str, Any]) -> str:
+    days = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    return days[int(window.get("day_of_week") or 0) % len(days)]
+
 @dataclass
 class TradingSession:
     """Represents an authoritative trading session calendar."""
@@ -888,10 +892,10 @@ class TradingSession:
         """Construct TradingSession from dictionary or database row."""
         windows = [
             w if isinstance(w, SessionWindow) else SessionWindow(
-                day_from=str(w.get("day_from", "Mon")),
-                day_to=str(w.get("day_to", "Mon")),
-                start_time=str(w.get("start_time", "00:00")),
-                end_time=str(w.get("end_time", "23:59")),
+                day_from=str(w.get("day_from", _session_day(w))),
+                day_to=str(w.get("day_to", w.get("day_from", _session_day(w)))),
+                start_time=str(w.get("start_time", w.get("open_time", "00:00"))),
+                end_time=str(w.get("end_time", w.get("close_time", "23:59"))),
                 eod=bool(w.get("eod", False)),
                 session_type=str(w.get("session_type", "Regular")),
                 day_of_week=w.get("day_of_week"),

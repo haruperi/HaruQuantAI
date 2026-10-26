@@ -68,7 +68,7 @@ export function SessionsModal({ mode, source, brokers, onClose, onSaved }: {
     <fieldset className="session-form-body" disabled={pending}>
     {mode === 'clone' ? <><p>Copy {source?.name}, preserving its broker, timezone and holiday dates.</p><Field label="New session name"><TextInput value={name} onChange={event => setName(event.target.value)}/></Field><Field label="Shift schedule (minutes)"><TextInput type="number" step={1} min={-1440} max={1440} value={Number.isNaN(shift) ? '' : shift} onChange={event => setShift(event.target.valueAsNumber)}/></Field><p>This adjusts recurring local times and weekdays. It does not convert timezones or shift holidays.</p></> : <>
       <div className="session-template-fields">
-        <Field label="Session name"><TextInput disabled={mode === 'edit'} value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })}/></Field>
+        <Field label="Session name"><TextInput value={draft.name} onChange={event => setDraft({ ...draft, name: event.target.value })}/></Field>
         <Field label="Broker profile"><select value={draft.broker} onChange={event => setDraft({ ...draft, broker: event.target.value })}>{choices.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}</select></Field>
         <Field label="Timezone"><TextInput value={draft.timezone ?? 'UTC'} placeholder="America/New_York" onChange={event => setDraft({ ...draft, timezone: event.target.value })}/></Field>
         <Field label="Description"><TextInput value={draft.description ?? ''} onChange={event => setDraft({ ...draft, description: event.target.value })}/></Field>

@@ -781,11 +781,12 @@ export function DataManager() {
       <Button id="datamanager-symbols-load" className="action-load" onClick={() => setSymbolDialog({ kind: 'transfer', mode: 'load', selected: [] })}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
     {tab === 'Sessions' && <div className="management-actions" aria-label="Session operations">
+      <Button disabled={selectedSessions.length!==1} onClick={()=>openSessionEdit(selectedSessions[0])}>Edit Session</Button>
       <Button className="action-add" onClick={()=>{setSessionError('');setSessionDialog({kind:'editor',mode:'add'});}}><CalendarPlus size={26} aria-hidden="true"/>Add Session</Button>
       <Button className="action-clone" onClick={()=>{const rows=requireSessions();if(rows)setSessionDialog({kind:'clone',source:rows[0]});}}><CopyPlus size={26} aria-hidden="true"/>Clone Session</Button>
       <Button className="action-delete" onClick={()=>{const rows=requireSessions();if(rows)openSessionDelete(rows);}}><Trash2 size={26} aria-hidden="true"/>Mass Delete</Button>
-      <Button className="action-save" onClick={()=>{const rows=requireSessions();if(rows)setSessionDialog({kind:'transfer',mode:'save',selected:rows});}}><Save size={26} aria-hidden="true"/>Save</Button>
-      <Button className="action-load" disabled title="Session import is not implemented"><FolderOpen size={26} aria-hidden="true"/>Load</Button>
+      <Button className="action-save" onClick={()=>setSessionDialog({kind:'transfer',mode:'save',selected:[]})}><Save size={26} aria-hidden="true"/>Save</Button>
+      <Button className="action-load" onClick={()=>setSessionDialog({kind:'transfer',mode:'load',selected:[]})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
       <Button id="datamanager-session-import-ninja-trader" className="action-import-nt" disabled title="Session import is not implemented"><Download size={26} aria-hidden="true"/>Import NinjaTrader sessions</Button>
     </div>}
     {tab === 'External indicators' && <div className="management-actions" aria-label="External indicator operations">

@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { readFile } from 'node:fs/promises';
 
 function profile(id: string, name: string) {
   return { id, name, broker_id: 0, description: 'Configured calendar', timezone: 'America/New_York', is_default: true,
@@ -36,8 +37,17 @@ async function launch(page: Page) {
       state.writes.push({path,body});
       if(state.slow)await new Promise(resolve=>setTimeout(resolve,600));
       const id=path.split('/')[5];
-      if(state.failWrite||method==='DELETE'&&state.failDeletes.has(id)){await route.fulfill({status:503,json:{status:'error',error:{code:'WRITE_FAILED',message:'Session was not saved'}}});return;}
-      if(method==='DELETE'){rows=rows.filter(row=>row.id!==id);data={id,deleted:true};}
+      if(state.failWrite||method==='DELETE'&&state.failDeletes.has(id)||path.endsWith('/delete')&&body.session_ids.some((id:string)=>state.failDeletes.has(id))){await route.fulfill({status:503,json:{status:'error',error:{code:'WRITE_FAILED',message:'Session was not saved'}}});return;}
+      if(path.endsWith('/delete')){rows=rows.filter(row=>!body.session_ids.includes(row.id));data={deleted:body.session_ids};}
+      else if(path.endsWith('/save')){data={content:JSON.stringify(rows.map(({id,...row})=>row)),count:rows.length};}
+      else if(path.endsWith('/load')){
+        let imported: any;
+        try { imported=JSON.parse(body.content); } catch { imported=null; }
+        if(!Array.isArray(imported)||imported.some((item:any)=>!item.name||rows.some(row=>row.name===item.name))){await route.fulfill({status:422,json:{status:'error',error:{code:'validation',message:'Invalid sessions JSON or duplicate names'}}});return;}
+        const next=Math.max(0,...rows.map(row=>Number(row.id)))+1;
+        rows.push(...imported.map((item:any,index:number)=>({broker_id:-1,description:'',timezone:'UTC',is_default:false,windows:[],holidays:[],...item,id:String(next+index)})));data={loaded_count:imported.length};
+      }
+      else if(method==='DELETE'){rows=rows.filter(row=>row.id!==id);data={id,deleted:true};}
       else if(path.endsWith('/elements')){
         const row=rows.find(row=>row.id===id)!;
         if(body.action==='add')row.windows.push(body.window);
@@ -159,14 +169,14 @@ test('cancelled drafts and failed saves produce no local success',async({page})=
   await expect(table(page)).toContainText('09:00:15');
 });
 
-test('multi-delete reports partial failure and removes only confirmed IDs',async({page})=>{
+test('multi-delete retains all rows on failure and retries atomically',async({page})=>{
   const {state}=await launch(page);state.failDeletes.add('2');
   await table(page).getByLabel('Select all visible sessions').check();
   await actions(page).getByRole('button',{name:'Mass Delete',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'Removing sessions',exact:true});
   await dialog.getByRole('button',{name:'Yes',exact:true}).click();
-  await expect(dialog.getByRole('alert')).toContainText('1 deleted; 1 could not be deleted');
-  await expect(table(page)).not.toContainText('Day');await expect(table(page)).toContainText('Night');
+  await expect(dialog.getByRole('alert')).toContainText('Session was not saved');
+  await expect(table(page)).toContainText('Day');await expect(table(page)).toContainText('Night');
   state.failDeletes.clear();await dialog.getByRole('button',{name:'Yes',exact:true}).click();await expect(dialog).toHaveCount(0);
   await expect(table(page)).toContainText('No matching sessions.');
 });
@@ -224,4 +234,53 @@ test('catalog shows saved values in the requested column order and keeps compati
   expect(state.writes.at(-1)?.body).not.toHaveProperty('normalizationWarnings');
   expect(state.writes.at(-1)?.body.windows[0]).toMatchObject({day_from:'Mon',start_time:'09:00:15',eod:false});
   await page.screenshot({path:join(tmpdir(),'haru-sessions-simple-catalog.png'),fullPage:true});
+});
+
+
+test('exports all persisted sessions and loads JSON with a visible error on duplicates',async({page})=>{
+  await launch(page);
+  await actions(page).getByRole('button',{name:'Save',exact:true}).click();
+  const save=page.getByRole('dialog',{name:'Save sessions',exact:true});
+  const downloaded=page.waitForEvent('download');
+  await save.getByRole('button',{name:'Download JSON',exact:true}).click();
+  const download=await downloaded;
+  const content=JSON.parse(await readFile((await download.path())!,'utf-8'));
+  expect(content).toHaveLength(2);
+  expect(content[0].windows[0].start_time).toBe('09:00:15');
+  expect(content[0].holidays[0].date_str).toBe('2028-02-29');
+  await actions(page).getByRole('button',{name:'Load',exact:true}).click();
+  const load=page.getByRole('dialog',{name:'Load sessions',exact:true});
+  await load.getByLabel('JSON file').setInputFiles({name:'sessions.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(content))});
+  await load.getByRole('button',{name:'Load JSON',exact:true}).click();
+  await expect(load.getByRole('alert')).toContainText('duplicate names');
+  await load.getByLabel('JSON file').setInputFiles({name:'new.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify([{name:'Imported',timezone:'UTC',windows:[],holidays:[]}]))});
+  await load.getByRole('button',{name:'Load JSON',exact:true}).click();
+  await expect(load.getByRole('status')).toContainText('Loaded 1 sessions');
+  await expect(table(page)).toContainText('Imported');
+  await load.getByRole('button',{name:'Close',exact:true}).last().click();
+  await page.reload();await page.getByRole('button',{name:'Data Manager',exact:true}).click();
+  await page.getByRole('navigation',{name:'Data Manager workspace navigation'}).getByRole('button',{name:'Sessions',exact:true}).click();
+  await expect(table(page)).toContainText('Imported');
+});
+
+test('paginates and filters session catalogs and edits from the toolbar',async({page})=>{
+  const {rows}=await launch(page);
+  for(let index=3;index<=61;index++)rows().push(profile(String(index),`Session ${String(index).padStart(2,'0')}`));
+  await page.getByRole('button',{name:'Refresh sessions',exact:true}).click();
+  const pager=page.getByLabel('Session pagination');
+  await expect(pager).toContainText('Page 1 of 2');
+  await pager.getByRole('button',{name:'Next',exact:true}).click();
+  await expect(pager).toContainText('Page 2 of 2');
+  await expect(table(page).getByRole('row')).toHaveCount(12);
+  await page.getByLabel('Filter sessions').fill('Day');
+  await expect(pager).toContainText('Page 1 of 1');
+  await table(page).getByLabel('Select session Day',{exact:true}).check();
+  await actions(page).getByRole('button',{name:'Edit Session',exact:true}).click();
+  const edit=page.getByRole('dialog',{name:'Edit session template',exact:true});
+  await edit.getByLabel('Session name',{exact:true}).fill('Renamed');
+  await edit.getByRole('button',{name:'Save',exact:true}).click();
+  await expect(edit).toHaveCount(0);
+  await page.getByLabel('Filter sessions').fill('Renamed');
+  await expect(table(page)).toContainText('Renamed');
+  await page.screenshot({path:join(tmpdir(),'haru-sessions-complete.png'),fullPage:true});
 });

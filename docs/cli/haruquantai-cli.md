@@ -2,8 +2,6 @@
 
 Run these commands from the project root in PowerShell. The CLI runs headlessly without starting a Uvicorn HTTP server.
 
-## Command organization
-
 `app/cli.py` is the headless entry point. It registers domain command modules,
 routes parsed arguments to their bound handlers, and manages host commands and
 logging shutdown. Each domain owns its command definitions and execution.
@@ -14,7 +12,9 @@ and binds `run_command` as the handler. That handler owns domain validation,
 service calls, output, and exit codes. Additional domains can follow this same
 registration pattern without adding domain-specific dispatch to `app/cli.py`.
 
-## Login
+## Initialization
+
+### Login
 
 ```powershell
 uv run python -m app.cli login --username YOUR_USERNAME
@@ -22,7 +22,7 @@ uv run python -m app.cli login --username YOUR_USERNAME
 
 Enter your password at the prompt. Login returns a JSON response containing the session token in `data.token`. Use the username and password configured in the application settings.
 
-## Set the session token
+### Set the session token
 
 Copy the token from the login response into the current PowerShell session:
 
@@ -32,7 +32,7 @@ $env:HARUQUANTAI_SESSION_TOKEN = "TOKEN_FROM_LOGIN"
 
 Treat this token as a credential. Do not share it or commit it to source control.
 
-## Check health
+### Check health
 
 ```powershell
 uv run python -m app.cli health
@@ -42,7 +42,37 @@ Checks local settings and session storage and returns a JSON result. When `HARUQ
 
 Without a token, this command performs the basic local health check without authentication. It does not check broker connectivity or HTTP server availability.
 
-## List symbols
+### Logout
+
+```powershell
+uv run python -m app.cli logout
+Remove-Item Env:HARUQUANTAI_SESSION_TOKEN -ErrorAction SilentlyContinue
+```
+
+Logout revokes the token supplied through `HARUQUANTAI_SESSION_TOKEN`. The second command clears it from the current shell. CLI sessions use `peer_id="cli"` in `host_session`; logout does not revoke UI sessions.
+
+### Help
+
+```powershell
+uv run python -m app.cli --help
+```
+
+### Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Command succeeded. |
+| `1` | Command failed, or login was cancelled. |
+| `2` | Invalid or missing command-line arguments. |
+
+Command results are written to standard output: symbol lists and created symbols use an ASCII table;
+other results and errors use JSON. Operational messages use central logging.
+
+## Data Manager
+
+### Symbol Commands
+
+#### List symbols
 
 ```powershell
 uv run python -m app.cli data-manager symbol list
@@ -62,7 +92,7 @@ An empty
 catalog displays a table with zero items. Failures return a JSON error. This read-only
 command does not require a session token or a running HTTP server.
 
-## Add a symbol
+#### Add a symbol
 
 ```powershell
 uv run python -m app.cli data-manager symbol add --name EURUSD --datasource demo
@@ -81,7 +111,7 @@ Optional flags: `--description`, `--exchange`, `--data-type`, `--broker-id`,
 `--triple-swap-on`, `--swap-type`, and `--commission`. Omitted values use service defaults.
 Run `uv run python -m app.cli data-manager symbol add --help` for usage.
 
-## Edit one or more symbols
+#### Edit one or more symbols
 
 ```powershell
 uv run python -m app.cli data-manager symbol edit EURUSD_demo --default-spread 2 --commission 5 --description "Updated description"
@@ -103,7 +133,7 @@ service failures return JSON and exit code 1; invalid CLI arguments return code 
 uv run python -m app.cli data-manager symbol edit --help
 ```
 
-## Delete one or more symbols
+#### Delete one or more symbols
 
 ```powershell
 uv run python -m app.cli data-manager symbol delete EURUSD_demo
@@ -116,7 +146,7 @@ The command runs immediately and prints the deleted name and count on success.
 Missing symbols and other service failures return JSON and exit code 1.
 A missing name or unsupported arguments return exit code 2.
 
-## Update symbols from MT5
+#### Update symbols from MT5
 
 ```powershell
 uv run python -m app.cli data-manager symbol update EURUSD_demo
@@ -150,7 +180,7 @@ This command reads terminal metadata and does not place orders.
 Local slippage, margin rate, and configured numeric commission values are preserved;
 MT5 commission rules are stored with their availability status and any local model.
 
-## Clone a symbol
+#### Clone a symbol
 
 ```powershell
 uv run python -m app.cli data-manager symbol clone EURUSD_demo EURUSD_COPY
@@ -170,7 +200,7 @@ uv run python -m app.cli data-manager symbol clone EURUSD_demo EURUSD --new-data
 This creates `EURUSD_other`. Missing sources and duplicate targets return JSON
 errors and exit code 1. Missing or unsupported arguments return exit code 2.
 
-## Load symbols from CSV
+#### Load symbols from CSV
 
 ```powershell
 uv run python -m app.cli data-manager symbol load "C:\Data\symbols.csv"
@@ -197,7 +227,7 @@ exit code 0 when at least one row loads. Missing files, empty files, and imports
 where every row fails return JSON errors and exit code 1. A missing path returns
 exit code 2. Use `symbol list --page N` to browse the catalog after importing.
 
-## Save symbols to CSV
+#### Save symbols to CSV
 
 ```powershell
 uv run python -m app.cli data-manager symbol save "C:\Data\symbols.csv"
@@ -211,28 +241,205 @@ destination file is replaced. Success prints the exported count and absolute pat
 An empty catalog or a file write failure returns a JSON error and exit code 1.
 A missing path returns exit code 2.
 
-## Logout
+
+#### Symbols tab and HTTP adapter
+
+The Data Manager Symbols tab uses the same `Symbols` service and database as the
+headless CLI. The domain HTTP adapter lives in
+`app/workspace/data_manager/http.py`; `app/main.py` only mounts its router.
+All endpoints require a UI session and the host's data read/write scopes.
+
+- Browse, search, sort, and filter the catalog; use Previous/Next and choose
+  25, 50, or 100 rows per page. Selections persist across pages.
+- Add Symbol opens the specification editor. The datasource suffix follows the
+  CLI naming convention: `EURUSD` with `demo` becomes `EURUSD_demo`.
+- Select one symbol to edit or clone it. Select multiple symbols for Mass Edit;
+  only checked fields change. Double-click a row to edit it.
+- Mass Delete removes selected symbols after confirmation. Each row also has a
+  delete action. Errors are shown without removing unconfirmed rows locally.
+- Save downloads selected symbols as CSV, or the full catalog if nothing is
+  selected. Exports retain nested specification fields and can exceed 1,000 rows.
+- Load accepts a CSV upload up to 10 MB. Valid rows are imported and skipped rows
+  are reported. Existing names are skipped rather than overwritten.
+- Refresh symbols reloads the persisted catalog.
+- Select one or more rows and choose **Update from MT5** to refresh their saved
+  specifications from the running MT5 Expert bridge. The button is disabled during
+  the update. Updated rows appear after the host confirms the batch; failures retain
+  the previous snapshot and display an error in the progress area.
+- When the successfully loaded catalog contains no symbols, **Update from MT5**
+  imports every symbol returned by the terminal, retaining the native MT5 names.
+  The import is atomic, including catalogs larger than 1,000 entries. A populated
+  catalog still requires selecting rows; an empty search result does not trigger
+  import mode.
+
+CSV imports and exports use the service's existing format, including JSON within
+specification columns. Browser commission and swap settings are retained in the
+nested contract fields when saving, cloning, or transferring symbols.
+
+### Session Commands
+
+#### List sessions
 
 ```powershell
-uv run python -m app.cli logout
-Remove-Item Env:HARUQUANTAI_SESSION_TOKEN -ErrorAction SilentlyContinue
+uv run python -m app.cli data-manager session list
+uv run python -m app.cli data-manager session list --page 2
+uv run python -m app.cli data-manager session list --page 1 --page-size 25
 ```
 
-Logout revokes the token supplied through `HARUQUANTAI_SESSION_TOKEN`. The second command clears it from the current shell. CLI sessions use `peer_id="cli"` in `host_session`; logout does not revoke UI sessions.
+Lists calendars from `datamgr_sessions` using the session ASCII table, with 50
+sessions per page by default. Output includes the current page, total pages, and
+total session count. Both options require positive integers. Pages beyond the
+catalog return exit code 2. An empty catalog displays page 1 of 1 with zero items.
 
-## Help
+All session commands use the same `Sessions` service as the Sessions tab and run
+locally without a session token or a running HTTP server. Use exact saved names,
+quoting names containing spaces. Service failures return JSON and exit code 1;
+invalid CLI arguments return exit code 2.
+
+#### Add a session
 
 ```powershell
-uv run python -m app.cli --help
+uv run python -m app.cli data-manager session add --name London --timezone Europe/London --description "London trading hours"
 ```
 
-## Exit codes
+`--name` is required and must be unique. Names are saved exactly as supplied,
+without appending a broker suffix. Successful creation displays the new calendar
+in a table. Optional fields are:
 
-| Code | Meaning |
-| --- | --- |
-| `0` | Command succeeded. |
-| `1` | Command failed, or login was cancelled. |
-| `2` | Invalid or missing command-line arguments. |
+| Flag | Value | Default when adding |
+| --- | --- | --- |
+| `--description` | Description text. | Empty string. |
+| `--timezone` | IANA timezone, such as `UTC` or `America/New_York`. | `UTC`. |
+| `--broker-id` | Integer broker ID. | `-1` (Default). |
+| `--windows` | JSON array of trading intervals. | `[]` (closed calendar). |
+| `--holidays` | JSON array of full-day holidays. | `[]`. |
+| `--is-default` / `--no-is-default` | Set or clear the default-profile flag. | False. |
 
-Command results are written to standard output: symbol lists and created symbols use an ASCII table;
-other results and errors use JSON. Operational messages use central logging.
+To include intervals and holidays, pass each JSON array as one argument:
+
+```powershell
+$windows = '[{"day_from":"Mon","day_to":"Mon","start_time":"08:00","end_time":"17:00","eod":true,"session_type":"Regular"}]'
+$holidays = '[{"date_str":"2026-12-25","description":"Christmas"}]'
+uv run python -m app.cli data-manager session add --name LondonMonday --timezone Europe/London --windows $windows --holidays $holidays
+```
+
+Weekdays accept English short or full names and are stored as `Mon` through `Sun`.
+Times use `HH:MM` or `HH:MM:SS`; holidays use `YYYY-MM-DD`. Use the next day as
+`day_to` for an overnight interval, such as Monday 22:00 to Tuesday 06:00.
+Each profile accepts up to 100 intervals and 1,000 holidays. Duplicate holiday
+dates, unknown fields, invalid timezones, and invalid dates or times are rejected.
+
+#### Edit one or more sessions
+
+```powershell
+uv run python -m app.cli data-manager session edit London --description "Updated London hours"
+uv run python -m app.cli data-manager session edit London LondonMonday --timezone UTC
+uv run python -m app.cli data-manager session edit London --name "London Main"
+uv run python -m app.cli data-manager session edit LondonMonday --no-is-default --holidays '[]'
+```
+
+Supply at least one field option. Edit accepts the same fields as add; omitted
+fields retain their saved values. `--name` renames exactly one target and cannot
+be used when editing multiple sessions. `--windows` and `--holidays` replace the
+whole corresponding list; use `'[]'` to clear it.
+
+Multi-session edits are atomic: missing targets, duplicate destination names, or
+storage failures roll back the whole operation. Repeated target names are applied
+once. Successful edits display the updated calendars in a table. Invalid field
+values, missing sessions, or an empty set of updates return exit code 1.
+
+#### Clone a session
+
+```powershell
+uv run python -m app.cli data-manager session clone London "London Copy"
+```
+
+Copies the source calendar into a new database entry with a fresh ID. Broker,
+timezone, description, intervals, holidays, and the default-profile flag are
+preserved. The source remains unchanged. The target name must be unique.
+Success displays the cloned calendar in a table; missing sources and duplicate
+targets return JSON errors and exit code 1.
+
+#### Delete one or more sessions
+
+```powershell
+uv run python -m app.cli data-manager session delete "London Copy"
+uv run python -m app.cli data-manager session delete London LondonMonday
+```
+
+Deletes the exact saved names immediately, without a confirmation prompt, and
+prints the deleted calendars in a table. Batch deletion is atomic: a missing
+session or a database reference that prevents deletion leaves the whole batch
+unchanged and returns exit code 1. Repeated target names are deleted once.
+
+#### Load sessions from JSON
+
+```powershell
+uv run python -m app.cli data-manager session load "C:\Data\sessions.json"
+```
+
+Accepts an absolute path or a path relative to the current directory. Quote paths
+containing spaces. The file must contain a JSON array of session objects, using
+the same fields as add. For example:
+
+```json
+[
+  {
+    "name": "LondonMonday",
+    "description": "London Monday trading hours",
+    "timezone": "Europe/London",
+    "broker_id": -1,
+    "is_default": false,
+    "windows": [
+      {
+        "day_from": "Mon",
+        "day_to": "Mon",
+        "start_time": "08:00",
+        "end_time": "17:00",
+        "eod": true,
+        "session_type": "Regular",
+        "day_of_week": 0
+      }
+    ],
+    "holidays": [
+      {"date_str": "2026-12-25", "description": "Christmas"}
+    ]
+  }
+]
+```
+
+For each interval, omitted fields default to Monday 00:00-23:59, `eod: false`,
+`session_type: "Regular"`, and `day_of_week: null`. When supplied, `day_of_week`
+is an integer from 0 (Monday) to 6 (Sunday); it is normalized to match `day_from`.
+Holiday descriptions default to an empty string.
+
+Imports add new entries and do not overwrite existing names. A duplicate name in
+the file or database, an invalid entry, or a storage failure rolls back the entire
+import, including imports larger than 1,000 sessions. Optional imported `id` and
+`broker_name` fields are ignored; new database IDs are assigned. Other unknown
+fields are rejected. Success displays the imported calendars in a table. Missing
+files, invalid JSON, or rejected imports return exit code 1.
+
+#### Save sessions to JSON
+
+```powershell
+uv run python -m app.cli data-manager session save "C:\Data\sessions.json"
+```
+
+Exports the full persisted catalog, including catalogs larger than 1,000 sessions,
+as a UTF-8 JSON array accepted by `session load` and the Sessions tab's Load action.
+An empty catalog exports as `[]`. Database IDs and derived broker names are omitted;
+calendar settings, broker IDs, intervals, and holidays are preserved.
+
+Accepts absolute or relative paths; quote paths containing spaces. The parent
+directory must already exist. An existing destination is replaced only after
+successful serialization. Success prints the exported count and destination path.
+File or storage failures return JSON and exit code 1.
+
+For command-specific help:
+
+```powershell
+uv run python -m app.cli data-manager session --help
+uv run python -m app.cli data-manager session add --help
+uv run python -m app.cli data-manager session edit --help
+```

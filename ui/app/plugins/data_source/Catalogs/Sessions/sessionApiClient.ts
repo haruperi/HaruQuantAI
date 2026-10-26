@@ -81,3 +81,16 @@ export async function saveSessionElement(id: string, action: 'add' | 'update' | 
 // These legacy import clients have no workspace entry point in this implementation.
 export async function listNtTemplates(folderPath?: string): Promise<NtTemplateInfo> { return client.get('/sessions/nt-templates' + (folderPath ? '?folder_path=' + encodeURIComponent(folderPath) : '')); }
 export async function importNtRemote(payload: { xml_content?: string; folder_path?: string; conflict_policy?: string }): Promise<NtImportResult> { return client.post('/sessions/import-nt', payload); }
+
+/** The same JSON array used by Sessions.load/save and the headless CLI. */
+export async function loadSessionJson(content: string): Promise<{ loaded_count: number }> {
+  return client.post('/sessions/load', { content });
+}
+export async function saveSessionJson(): Promise<{ content: string; count: number }> {
+  return client.post('/sessions/save', {});
+}
+export async function deleteRemoteSessions(ids: string[]): Promise<void> {
+  const unique = [...new Set(ids)];
+  const result = await client.post<{ deleted: string[] }>('/sessions/delete', { session_ids: unique });
+  if (!result || !Array.isArray(result.deleted) || result.deleted.length !== unique.length || unique.some(id => !result.deleted.includes(id))) throw new Error('The host did not confirm session deletion.');
+}

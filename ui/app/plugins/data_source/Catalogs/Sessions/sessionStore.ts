@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { CatalogSession, SessionDefinition, SessionElement } from './sessions';
-import { cloneRemoteSession, deleteRemoteSession, fetchRemoteSessions, saveRemoteSession, saveSessionElement } from './sessionApiClient';
+import { cloneRemoteSession, deleteRemoteSessions, fetchRemoteSessions, saveRemoteSession, saveSessionElement } from './sessionApiClient';
 
 interface SessionState {
   sessions: CatalogSession[]; error: string; loaded: boolean; isSyncing: boolean; epoch: number; request: number;
@@ -36,19 +36,12 @@ export const useSessions = create<SessionState>((set,get) => {
     remove: async ids => {
       if (!ids.length) throw new Error('Select sessions to delete.');
       const epoch = get().epoch;
-      const result = { deleted: [] as string[], failed: [] as string[] };
-      for (const id of new Set(ids)) {
-        try {
-          await deleteRemoteSession(id);
-          if (epoch !== get().epoch) throw new Error('The host session changed.');
-          set(state => ({ sessions: state.sessions.filter(row => row.id !== id), request: state.request + 1, isSyncing: false }));
-          result.deleted.push(id);
-        } catch (cause) {
-          if (epoch !== get().epoch) throw cause;
-          result.failed.push(id);
-        }
-      }
-      return result;
+      const unique = [...new Set(ids)];
+      await deleteRemoteSessions(unique);
+      if (epoch !== get().epoch) throw new Error('The host session changed.');
+      set(state => ({ sessions: state.sessions.filter(row => !unique.includes(row.id)), request: state.request + 1, isSyncing: false }));
+      return { deleted: unique, failed: [] };
+
     },
   };
 });
