@@ -712,6 +712,131 @@ uv run python -m app.cli data-manager basket update-data --help
 ```
 
 
+### External indicator (Custom data) commands
+
+All 18 `CustomData` methods are available under `data-manager custom`. They
+operate directly on the local database without an HTTP server or session token.
+Commands manage external indicator definitions with up to five named output
+lines (and optional platform-specific MT4, MT5, and EasyLanguage mappings), dated
+numeric and signal observations, CSV/TSV imports, import-format presets, definition
+transfers, and Commitments of Traders (COT) report synchronization.
+
+#### List, add, edit, and delete indicator definitions
+
+```powershell
+uv run python -m app.cli data-manager custom list
+uv run python -m app.cli data-manager custom list --page 2 --page-size 25
+uv run python -m app.cli data-manager custom add --name Sentiment --values "Score" --data-type custom --timeframe D1
+uv run python -m app.cli data-manager custom add --name MACD_Ext --values '[{"name":"Macd","mt4":"0"},{"name":"Signal","mt4":"1"}]'
+uv run python -m app.cli data-manager custom edit Sentiment --timeframe H1
+uv run python -m app.cli data-manager custom edit Sentiment --values "Score,Momentum"
+uv run python -m app.cli data-manager custom clear Sentiment
+uv run python -m app.cli data-manager custom delete Sentiment MACD_Ext
+```
+
+`list` renders an ASCII table with indicator name, type, timeframe, value columns,
+date range, and record count. `add` requires `--name` and `--values` (comma-separated
+or JSON array of objects with `name`, `mt4`, `mt5`, `el`). Up to five output lines
+are supported. `edit` updates metadata and outputs; existing data must be cleared
+before changing the number of output lines. `clear` removes recorded observations
+while preserving definitions; `delete` removes both definitions and observations.
+
+#### Review recorded observations
+
+```powershell
+uv run python -m app.cli data-manager custom review-data Sentiment
+uv run python -m app.cli data-manager custom review-data Sentiment --limit 50 --offset 0
+```
+
+`review-data` displays dated indicator observations in an ASCII table with chronological
+sorting and bounded pagination.
+
+#### Recognize from file
+
+```powershell
+uv run python -m app.cli data-manager custom recognize "C:\Indicators\Sentiment.json"
+uv run python -m app.cli data-manager custom recognize "C:\Indicators\Bands.mq4"
+uv run python -m app.cli data-manager custom recognize "C:\Indicators\CustomOsc.mq5"
+```
+
+Parses JSON indicator definitions or labelled `#property indicator_label` buffers in
+MQ4/MQ5 source code and automatically creates the indicator definition. Source code
+is inspected headlessly as text; it is never compiled or executed.
+
+#### Import data and preview
+
+```powershell
+uv run python -m app.cli data-manager custom import-preview Sentiment "C:\Data\sentiment.csv" --limit 10
+uv run python -m app.cli data-manager custom import-data Sentiment "C:\Data\sentiment.csv" --separator "," --date-format "yyyy-MM-dd HH:mm:ss" --columns "date,Score"
+uv run python -m app.cli data-manager custom import-data Sentiment "C:\Data\sentiment.csv" --format-name "CustomCSV" --replace
+uv run python -m app.cli data-manager custom import-info
+```
+
+`import-preview` previews how the CSV will parse before applying changes.
+`import-data` merges or replaces (`--replace`) observations. Column mapping maps
+date/time and indicator output lines (e.g. `--columns "date,Score"` or JSON list).
+`--error-handling` accepts `abort` (default) or `skip`. `import-info` returns supported
+import separators, date formats, and registered format presets.
+
+#### Manage import format presets
+
+```powershell
+$config = '{"separator":";","skip_rows":1,"skip_columns":0,"date_format":"yyyy-MM-dd","columns":["date","Score"]}'
+uv run python -m app.cli data-manager custom add-format "MyPreset" --config $config
+uv run python -m app.cli data-manager custom edit-format "MyPreset" --config $config
+uv run python -m app.cli data-manager custom delete-format "MyPreset"
+```
+
+Presets allow saving reusable CSV column, separator, and header configurations.
+
+#### Import background job action
+
+```powershell
+uv run python -m app.cli data-manager custom import-action JOB_ID pause
+uv run python -m app.cli data-manager custom import-action JOB_ID resume
+uv run python -m app.cli data-manager custom import-action JOB_ID stop
+```
+
+Controls background import jobs tracked by the host job manager.
+
+#### Export observations to CSV
+
+```powershell
+uv run python -m app.cli data-manager custom export-values Sentiment "C:\Data\sentiment_export.csv"
+```
+
+Exports chronological dated observations for an indicator into standard CSV format.
+
+#### Commitments of Traders (COT) update
+
+```powershell
+uv run python -m app.cli data-manager custom update-cot
+uv run python -m app.cli data-manager custom update-cot --years 2024 2025 2026
+```
+
+Downloads CFTC legacy futures-only annual reports, extracts contract positions (commercial,
+non-commercial, and open interest), and creates or updates system COT indicators and observations.
+
+#### Save and load definitions as JSON
+
+```powershell
+uv run python -m app.cli data-manager custom save "C:\Data\indicators.json"
+uv run python -m app.cli data-manager custom save "C:\Data\selected.json" --indicators Sentiment MACD_Ext
+uv run python -m app.cli data-manager custom load "C:\Data\indicators.json" --on-conflict overwrite
+```
+
+`save` exports definitions (without observations) to JSON. `load` imports definitions
+from JSON with `--on-conflict` policy (`error`, `skip`, or `overwrite`).
+
+#### Help
+
+```powershell
+uv run python -m app.cli data-manager custom --help
+uv run python -m app.cli data-manager custom add --help
+uv run python -m app.cli data-manager custom import-data --help
+```
+
+
 ### Data Manager activity log
 
 These operations access the running backend's shared, in-memory history. Set

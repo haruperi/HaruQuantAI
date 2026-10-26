@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Button, Field, Modal, Select, TextInput } from '../../../components/ui';
 import { activeExternalLines, builtInExternalFormats, detectExternalFormat, externalDateFormats, externalPreview, externalSeparators, parseExternalData, readExternalFile, type ExternalColumnType, type ExternalImportFormat, type ExternalIndicatorDefinition } from './externalIndicators';
 import { useExternalIndicators } from './externalIndicatorsStore';
+import { importExternalIndicatorData } from './externalIndicatorsApiClient';
 import './externalIndicators.css';
 
 const copyFormat = (format: ExternalImportFormat): ExternalImportFormat => structuredClone(format);
@@ -15,7 +16,45 @@ export function ExternalIndicatorImportDialog({ item, externalActive, onClose, o
   function saveAs(): void { try { store.saveFormat({ ...format, name: newName, predefined: false }); setFormat(current => ({ ...current, name: newName.trim(), predefined: false })); setNested(null); setNewName(''); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save data format.'); } }
   function saveCurrent(): void { try { store.saveFormat({ ...format, predefined: false }, true); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save data format.'); } }
   function removeFormat(): void { try { store.deleteFormat(format.name); setFormat(copyFormat(builtInExternalFormats[0])); setNested(null); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to delete data format.'); } }
-  function start(): void { try { if (!file || !text) throw new Error('Choose a data file.'); const parsed = parseExternalData(text, format, count, ignoreErrors); store.startImport(item.name, parsed.records, parsed.timeframe, parsed.ignored, externalActive); onStarted(); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to import indicator data.'); } }
+  async function start(): Promise<void> {
+    try {
+      if (!file || !text) throw new Error('Choose a data file.');
+      const parsed = parseExternalData(text, format, count, ignoreErrors);
+      const active = activeExternalLines(item);
+      const mappedColumns = format.columns.map(col => {
+        if (col === 'Date' || col === 'Date & Time') return 'date';
+        if (col.startsWith('Value ')) {
+          const idx = parseInt(col.replace('Value ', ''), 10) - 1;
+          return active[idx]?.name || 'ignore';
+        }
+        return 'ignore';
+      });
+      try {
+        await importExternalIndicatorData(
+          item.name,
+          text,
+          format.name !== 'Custom' && !format.predefined ? format.name : undefined,
+          false,
+          {
+            separator: format.separator,
+            date_format: format.dateFormat,
+            skip_rows: format.skipRows,
+            skip_columns: format.skipColumns,
+            columns: mappedColumns,
+            error_handling: ignoreErrors ? 'skip' : 'abort',
+          },
+        );
+      } catch (backendError) {
+        console.warn('Backend import error:', backendError);
+      }
+      store.startImport(item.name, parsed.records, parsed.timeframe, parsed.ignored, externalActive);
+      void store.syncRemote();
+      onStarted();
+      onClose();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to import indicator data.');
+    }
+  }
   if (nested === 'save-as') return <div className="external-flow"><Modal title="New data format" width={520} onClose={() => setNested(null)} footer={<><Button onClick={() => setNested(null)}>Close</Button><Button className="primary" onClick={saveAs}>Save</Button></>}><fieldset><p className="external-note">Enter the name of the new data format</p><Field label="Name"><TextInput aria-label="Format name" value={newName} maxLength={80} onChange={event => setNewName(event.target.value)}/></Field></fieldset>{error && <p className="external-error" role="alert">{error}</p>}</Modal></div>;
   if (nested === 'delete') return <div className="external-flow"><Modal title="Delete data format" width={520} onClose={() => setNested(null)} footer={<><Button onClick={() => setNested(null)}>Close</Button><Button className="danger" onClick={removeFormat}>Delete</Button></>}><p>Do you want to delete data format '{format.name}'?</p></Modal></div>;
   return <div className="external-flow"><Modal title={`Custom data import for '${item.name}'`} width={780} onClose={onClose} footer={<><Button onClick={onClose}>Close</Button><Button className="primary" onClick={start}>Start Import</Button></>}>

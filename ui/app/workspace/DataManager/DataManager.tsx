@@ -50,6 +50,7 @@ import { ExternalIndicatorDeleteDialog } from '../../plugins/data_source/Indicat
 import { ExternalIndicatorTransferDialog } from '../../plugins/data_source/Indicators/ExternalIndicatorTransferDialog';
 import { activeExternalLines, externalIndicatorTypes, externalTypeLabel, type ExternalIndicatorDefinition } from '../../plugins/data_source/Indicators/externalIndicators';
 import { externalJobActive, useExternalIndicators } from '../../plugins/data_source/Indicators/externalIndicatorsStore';
+import { updateCotIndicators } from '../../plugins/data_source/Indicators/externalIndicatorsApiClient';
 import { StockGroupsModal } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupsModal';
 import { StockGroupStocksDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupStocksDialog';
 import { StockGroupTransferDialog } from '../../plugins/data_source/Catalogs/StockGroups/StockGroupTransferDialog';
@@ -383,7 +384,12 @@ export function DataManager() {
   }, [download.job?.state]);
   const [tab, setTab] = useState('Data sources');
   const { status: hostStatus } = useHostConnection();
-  useEffect(() => { if(hostStatus==='online')void useStockGroups.getState().syncRemote(); }, [hostStatus]);
+  useEffect(() => {
+    if (hostStatus === 'online') {
+      void useStockGroups.getState().syncRemote();
+      void useExternalIndicators.getState().syncRemote();
+    }
+  }, [hostStatus]);
 
   const [workspace, setWorkspace] = useState<WorkspaceLayout | null>(null);
   const [workspaceError, setWorkspaceError] = useState('');
@@ -745,10 +751,20 @@ export function DataManager() {
       <Button className="action-add" onClick={() => setExternalDialog({ kind: 'editor', mode: 'add' })}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>
       <Button className="action-clone" onClick={() => { const rows = requireExternal(); if (rows) setExternalDialog({ kind: 'import', source: rows[0] }); }}><FileInput size={26} aria-hidden="true"/>Import indicator data</Button>
       <Button className="action-edit" onClick={() => setExternalDialog({ kind: 'recognize' })}><FileSearch size={26} aria-hidden="true"/>Recognize from file</Button>
-      <Button className="action-edit" onClick={() => { const rows = requireExternal(); if (!rows) return; if (!rows[0].records.length) { setSelectionMessage(`Custom indicator '${rows[0].name}' doesn't contain any data`); return; } setExternalDialog({ kind: 'view', source: rows[0] }); }}><ChartCandlestick size={26} aria-hidden="true"/>View &amp; Analyze</Button>
+      <Button className="action-edit" onClick={() => { const rows = requireExternal(); if (!rows) return; const hasData = rows[0].records.length > 0 || rows[0].totalDays > 0 || Boolean(rows[0].dateFrom) || Boolean((rows[0] as any).total_records); if (!hasData) { setSelectionMessage(`Custom indicator '${rows[0].name}' doesn't contain any data`); return; } setExternalDialog({ kind: 'view', source: rows[0] }); }}><ChartCandlestick size={26} aria-hidden="true"/>View &amp; Analyze</Button>
       <Button className="action-delete" onClick={() => { const rows = requireExternal(); if (rows) openExternalDelete(rows); }}><Trash2 size={26} aria-hidden="true"/>Mass delete</Button>
       <Button className="action-save" onClick={() => { const rows = requireExternal(); if (rows) setExternalDialog({ kind: 'transfer', mode: 'save', selected: rows }); }}><Save size={26} aria-hidden="true"/>Save</Button>
       <Button className="action-load" onClick={() => setExternalDialog({ kind: 'transfer', mode: 'load', selected: [] })}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
+      <Button className="action-refresh" onClick={async () => {
+        try {
+          notify('Updating COT data...');
+          const res = await updateCotIndicators();
+          notify(`Updated ${res.updated_count} COT indicators (${res.records} records).`);
+          void useExternalIndicators.getState().syncRemote();
+        } catch (cause) {
+          setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to update COT data.');
+        }
+      }}><RefreshCw size={26} aria-hidden="true"/>Update COT data</Button>
     </div>}
     {tab === 'Stock groups' && <div className="management-actions" aria-label="Stock group operations">
       <Button className="action-add" onClick={() => setStockGroupDialog({ kind:'editor', mode:'add' })}><CirclePlus size={26} aria-hidden="true"/>Add new</Button>

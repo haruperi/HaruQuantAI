@@ -20,13 +20,16 @@ if TYPE_CHECKING:
 from app.workspace.data_manager.cli_formatters import (
     BasketsCLI,
     BrokersCLI,
+    CustomDataCLI,
     DataCLI,
     SessionsCLI,
     SymbolsCLI,
     format_basket_table,
     format_broker_table,
+    format_custom_table,
     format_data_dashboard,
     format_dataset_table,
+    format_review_table,
     format_session_table,
     format_symbol_table,
 )
@@ -34,13 +37,16 @@ from app.workspace.data_manager.cli_formatters import (
 __all__ = [
     "BasketsCLI",
     "BrokersCLI",
+    "CustomDataCLI",
     "DataCLI",
     "SessionsCLI",
     "SymbolsCLI",
     "format_basket_table",
     "format_broker_table",
+    "format_custom_table",
     "format_data_dashboard",
     "format_dataset_table",
+    "format_review_table",
     "format_session_table",
     "format_symbol_table",
     "register_commands",
@@ -70,9 +76,11 @@ def register_commands(commands: Any) -> None:
     _profile_parsers(resources, "session")
     _profile_parsers(resources, "broker")
     _basket_parsers(resources)
+    from app.workspace.data_manager.custom_cli import register_custom_commands
     from app.workspace.data_manager.logs_cli import register_log_commands
 
     register_log_commands(resources)
+    register_custom_commands(resources)
     data_manager.set_defaults(handler=partial(run_command, parser=data_manager))
 
 
@@ -80,6 +88,7 @@ def run_command(
     arguments: argparse.Namespace, *, parser: argparse.ArgumentParser
 ) -> int:
     """Execute a Data Manager command, emit errors, and return its exit code."""
+    from app.workspace.data_manager.custom_cli import run_custom_command
     from app.workspace.data_manager.logs_cli import run_log_command
 
     handlers = {
@@ -88,6 +97,7 @@ def run_command(
         "broker": _run_profile_command,
         "basket": _run_basket_command,
         "log": run_log_command,
+        "custom": run_custom_command,
     }
     result = handlers[arguments.resource](arguments, parser)
     if result is None:

@@ -147,6 +147,40 @@ class HostPersistence:
             connection.close()
             raise
 
+    def ensure_custom_data_schema(self) -> dict[str, Any]:
+        """Install additive Data Manager custom-indicator tables atomically.
+
+        Called explicitly by CustomData operations; never creates a database file.
+        Existing definitions, observations and unrelated tables remain untouched.
+        """
+        statements = (
+            (
+                "CREATE TABLE IF NOT EXISTS datamgr_custom ("
+                "id TEXT PRIMARY KEY, name TEXT NOT NULL COLLATE NOCASE UNIQUE, "
+                "data_type TEXT NOT NULL, timeframe TEXT NOT NULL, "
+                "values_json TEXT NOT NULL, "
+                "system INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL)"
+            ),
+            (
+                "CREATE TABLE IF NOT EXISTS datamgr_custom_values ("
+                "indicator_id TEXT NOT NULL REFERENCES datamgr_custom(id) "
+                "ON DELETE CASCADE, "
+                "timestamp TEXT NOT NULL, values_json TEXT NOT NULL, "
+                "PRIMARY KEY(indicator_id, timestamp))"
+            ),
+            (
+                "CREATE TABLE IF NOT EXISTS datamgr_custom_formats ("
+                "name TEXT PRIMARY KEY COLLATE NOCASE, config_json TEXT NOT NULL)"
+            ),
+        )
+
+        def action(connection: sqlite3.Connection) -> dict[str, Any]:
+            for statement in statements:
+                connection.execute(statement)
+            return {"affected_rows": 0, "records": []}
+
+        return self._run("custom_data.schema", write=True, action=action)
+
     def _check_scope(self) -> None:
         if self._closed:
             raise _OperationError(ErrorCode.CONFLICT, "Transaction scope is closed")

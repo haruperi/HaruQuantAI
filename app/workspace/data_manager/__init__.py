@@ -11,16 +11,20 @@ if TYPE_CHECKING:
     from app.workspace.data_manager.cli import (
         BasketsCLI,
         BrokersCLI,
+        CustomDataCLI,
         DataCLI,
         SessionsCLI,
         SymbolsCLI,
         format_basket_table,
         format_broker_table,
+        format_custom_table,
         format_data_dashboard,
         format_dataset_table,
+        format_review_table,
         format_session_table,
         format_symbol_table,
     )
+    from app.workspace.data_manager.custom import CustomData
     from app.workspace.data_manager.data import Data
     from app.workspace.data_manager.logs import Logs
     from app.workspace.data_manager.sessions import Sessions
@@ -36,19 +40,23 @@ def __getattr__(name: str) -> Any:
         "Brokers": "brokers",
         "Baskets": "baskets",
         "Logs": "logs",
+        "CustomData": "custom",
     }
     if name in services:
         return getattr(import_module(f"{__name__}.{services[name]}"), name)
     if name in {
         "BasketsCLI",
         "BrokersCLI",
+        "CustomDataCLI",
         "DataCLI",
         "SessionsCLI",
         "SymbolsCLI",
         "format_basket_table",
         "format_broker_table",
+        "format_custom_table",
         "format_data_dashboard",
         "format_dataset_table",
+        "format_review_table",
         "format_session_table",
         "format_symbol_table",
     }:
@@ -63,6 +71,8 @@ __all__ = [
     "BasketsCLI",
     "Brokers",
     "BrokersCLI",
+    "CustomData",
+    "CustomDataCLI",
     "Data",
     "DataCLI",
     "Logs",
@@ -72,8 +82,10 @@ __all__ = [
     "SymbolsCLI",
     "format_basket_table",
     "format_broker_table",
+    "format_custom_table",
     "format_data_dashboard",
     "format_dataset_table",
+    "format_review_table",
     "format_session_table",
     "format_symbol_table",
 ]

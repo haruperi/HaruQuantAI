@@ -21,6 +21,7 @@ from app.host.transport import (
 )
 from app.workspace.data_manager.baskets import Baskets
 from app.workspace.data_manager.brokers import Brokers
+from app.workspace.data_manager.custom_http import register_custom_routes
 from app.workspace.data_manager.data import Data
 from app.workspace.data_manager.http_fields import (
     symbol_to_ui as _ui,
@@ -184,6 +185,7 @@ def create_router() -> APIRouter:
     _broker_routes(router)
     _basket_routes(router)
     _log_routes(router)
+    register_custom_routes(router)
     return router
 
 
