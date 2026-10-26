@@ -857,3 +857,53 @@ active tasks. Recording progress is an internal Python operation. Each command
 prints a standard JSON response; exit 0 means success, 1 means authentication,
 backend availability or service failure, and 2 means invalid arguments. Read
 operations require `data:read`; clearing requires `data:write`.
+
+
+### Data Manager help and documentation commands
+
+The `data-manager help` subcommands expose in-app guides, documentation articles,
+and walk-through tutorials across all 11 Data Manager domains (`overview`, `data`,
+`import`, `export`, `symbols`, `sessions`, `brokers`, `custom-data`, `stock-groups`,
+`log`, `chart`). They run locally and do not require an active backend server.
+
+#### Topic overview and details
+
+```powershell
+uv run python -m app.cli data-manager help topic
+uv run python -m app.cli data-manager help topic custom-data
+uv run python -m app.cli data-manager help list-topics
+```
+
+`topic` returns the topic guide, key capabilities, relevant tutorials, documentation links,
+and any configured user notes. If omitted, `topic` defaults to `overview`.
+`list-topics` returns summaries and tabs for all 11 topics.
+
+#### Documentation articles and links
+
+```powershell
+uv run python -m app.cli data-manager help list-articles
+uv run python -m app.cli data-manager help list-articles --topic export
+```
+
+Lists official external documentation guides with donor test IDs (`dm-help-openlink-btn`,
+`dm-help-openlink-btn-2`, `dm-help-openlink-btn-3`), including tick precision testing and
+platform import/export procedures.
+
+#### Tutorials and step-by-step guides
+
+```powershell
+uv run python -m app.cli data-manager help list-tutorials
+uv run python -m app.cli data-manager help list-tutorials --topic custom-data
+uv run python -m app.cli data-manager help get-tutorial external-indicator-setup
+```
+
+Returns step-by-step procedures for complex Data Manager workflows.
+
+#### Search documentation
+
+```powershell
+uv run python -m app.cli data-manager help search "metatrader"
+uv run python -m app.cli data-manager help search "cot"
+```
+
+Searches across all topics, capabilities, tutorials, and documentation articles.

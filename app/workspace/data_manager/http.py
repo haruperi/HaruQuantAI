@@ -23,6 +23,7 @@ from app.workspace.data_manager.baskets import Baskets
 from app.workspace.data_manager.brokers import Brokers
 from app.workspace.data_manager.custom_http import register_custom_routes
 from app.workspace.data_manager.data import Data
+from app.workspace.data_manager.help import Help
 from app.workspace.data_manager.http_fields import (
     symbol_to_ui as _ui,
 )
@@ -186,6 +187,7 @@ def create_router() -> APIRouter:
     _basket_routes(router)
     _log_routes(router)
     register_custom_routes(router)
+    _help_routes(router)
     return router
 
 
@@ -904,3 +906,30 @@ def _log_routes(router: APIRouter) -> None:
     @router.post("/logs/clear")
     def clear_logs(request: Request) -> Any:
         return _response(request.app.state.data_logs.clear())
+
+
+def _help_routes(router: APIRouter) -> None:
+    @router.get("/help")
+    def get_help_guide(request: Request, topic: str = "overview") -> Any:
+        service = Help(request.app.state.persistence)
+        return _response(service.get_topic(topic))
+
+    @router.get("/help/topics")
+    def list_help_topics(request: Request) -> Any:
+        service = Help(request.app.state.persistence)
+        return _response(service.list_topics())
+
+    @router.get("/help/tutorials")
+    def list_help_tutorials(request: Request, topic: str | None = None) -> Any:
+        service = Help(request.app.state.persistence)
+        return _response(service.list_tutorials(topic))
+
+    @router.get("/help/articles")
+    def list_help_articles(request: Request, topic: str | None = None) -> Any:
+        service = Help(request.app.state.persistence)
+        return _response(service.list_articles(topic))
+
+    @router.get("/help/search")
+    def search_help(request: Request, query: str = "") -> Any:
+        service = Help(request.app.state.persistence)
+        return _response(service.search(query))
