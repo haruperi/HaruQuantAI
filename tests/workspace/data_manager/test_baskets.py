@@ -354,6 +354,9 @@ def basket_http(baskets):
 
     application = FastAPI()
     application.state.persistence = baskets.gateway
+    from app.workspace.data_manager.logs import Logs
+
+    application.state.data_logs = Logs()
     application.include_router(http.create_router())
     application.dependency_overrides[http._access] = lambda: None
     register_transport_exception_handlers(application)
@@ -577,6 +580,11 @@ def test_http_update_runs_real_background_worker(
         assert completed.status == "COMPLETED", completed.error_message
         status = basket_http.get(f"/api/v1/data/basket-jobs/{job_id}")
         assert status.json()["data"]["progress"] == 100
+        activity = basket_http.get("/api/v1/data/logs").json()["data"]["entries"]
+        assert activity[0]["progress"] == 100
+        assert activity[0]["task_id"] == job_id
+        assert any("AAPL" in entry["message"] for entry in activity)
+        assert basket_http.get("/api/v1/data/logs/active").json()["data"] == []
         assert baskets.list()["data"][0]["ready"]
         assert len(list((tmp_path / "bars").glob("*.parquet"))) == 1
     finally:

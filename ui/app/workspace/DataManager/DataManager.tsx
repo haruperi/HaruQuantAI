@@ -80,7 +80,7 @@ import { CloneTimezoneDialog } from '../../plugins/data_source/Tools/CloneTimezo
 import { ViewAnalyzeDialog } from '../../plugins/data_source/Tools/ViewAnalyzeDialog';
 import { selectCloneTargets, selectReviewTarget, type ToolTarget } from '../../plugins/data_source/Tools/dataTools';
 import { toolsActive, useDataTools } from '../../plugins/data_source/Tools/dataToolsStore';
-import { cancelLogOperation, clearLogs, fetchLogs, formatDataLogLine, isErrorLogRecord, subscribeDataLogStream } from './dataManagerLogClient';
+import { clearLogs, fetchLogs, fetchActiveLogs, formatDataLogLine, isErrorLogRecord, subscribeDataLogStream } from './dataManagerLogClient';
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import {
   Bitcoin, ChartCandlestick, ChevronDown, ChevronRight, CircleDollarSign,
@@ -479,94 +479,44 @@ export function DataManager() {
   const [selectionMessage, setSelectionMessage] = useState('');
   useEffect(() => { if (selectedDatasetIds.length > 0) setSelectionMessage(''); }, [selectedDatasetIds]);
   const [logEntries, setLogEntries] = useState<string[]>([]);
-  const lastLoggedTransition = useRef('');
-  const lastStockGroupTransition = useRef('');
-  const lastBrokerTransition=useRef('');
-  useEffect(()=>{if(!brokerJob)return;const transition=`${brokerJob.state}:${brokerJob.progress}`;if(lastBrokerTransition.current===transition)return;lastBrokerTransition.current=transition;if(brokerJob.progress%25!==0&&!['paused','failed','cancelled','completed'].includes(brokerJob.state))return;setLogEntries(current=>[...current,`${new Date().toLocaleString()} Broker data update — ${brokerJob.state} ${brokerJob.progress}%`].slice(-500));},[brokerJob]);
+  const [logError, setLogError] = useState('');
+  const logRevision = useRef(0);
+  const [activeLogTasks, setActiveLogTasks] = useState<string[]>([]);
   useEffect(() => {
-    if (!stockGroups.job) return;
-    const transition = `${stockGroups.job.state}:${stockGroups.job.progress}`;
-    if (lastStockGroupTransition.current === transition) return;
-    lastStockGroupTransition.current = transition;
-    if (stockGroups.job.progress % 25 !== 0 && !['paused','failed','cancelled','completed'].includes(stockGroups.job.state)) return;
-    const timestamp = new Date().toLocaleString();
-    setLogEntries(current => [...current, `${timestamp} Stock group data update — ${stockGroups.job!.state} ${stockGroups.job!.progress}%`].slice(-500));
-  }, [stockGroups.job]);
-  useEffect(() => {
-    if (operationState === 'idle') return;
-    const transition = operationLabel + ':' + operationState;
-    if (lastLoggedTransition.current === transition) return;
-    lastLoggedTransition.current = transition;
-    const timestamp = new Date().toLocaleString();
-    setLogEntries(current => [...current, timestamp + ' ' + operationLabel + ' — ' + operationState].slice(-500));
-  }, [operationLabel, operationState]);
-
-  useEffect(() => {
-    if (tab === 'Log') {
-      fetchLogs()
-        .then(records => {
-          if (records && records.length > 0) {
-            const formatted = records.map(formatDataLogLine);
-            setLogEntries(formatted);
-          }
-        })
-        .catch(() => {
-          // preserve existing local entries if fetch fails
-        });
-    }
-  }, [tab]);
-
-  useEffect(() => {
-    if (hostStatus !== 'online') return;
-    return subscribeDataLogStream({
-      onEntry: record => {
-        setLogEntries(current => [...current, formatDataLogLine(record)].slice(-500));
-      },
-      onSnapshot: records => {
-        if (records.length > 0) setLogEntries(records.map(formatDataLogLine).slice(-500));
-      },
-      onCleared: () => {
-        setLogEntries([]);
-        setProgress(0);
-      },
-      onProgress: state => {
-        if (state.status === 'running' || state.status === 'paused') {
-          setProgress(state.progress);
-          setOperationLabel(state.label);
+    if (tab !== 'Log' || hostStatus !== 'online') return;
+    let disposed = false;
+    let pending = false;
+    const refresh = async () => {
+      if (pending) return;
+      pending = true;
+      const revision = logRevision.current;
+      try {
+        const [records, active] = await Promise.all([fetchLogs(1000), fetchActiveLogs()]);
+        if (!disposed && revision === logRevision.current) {
+          setLogEntries(records.map(formatDataLogLine));
+          setActiveLogTasks(active.map(item => `${item.symbol}: ${item.progress ?? 0}% — ${item.message}`));
+          setLogError('');
         }
-      },
-    });
-  }, [hostStatus]);
-
-  const canCancelLogOperation =
-    operationState === 'running' ||
-    operationState === 'paused' ||
-    ['running', 'paused'].includes(providerJob?.state ?? '');
-
-  const handleCancelLogOperation = () => {
-    setSelectionMessage('');
-    if (providerJob && ['running', 'paused'].includes(providerJob.state)) {
-      providerAction('stop');
-    } else if (operationState === 'running' || operationState === 'paused') {
-      setOperationState('cancelled');
-    }
-    void cancelLogOperation('', operationLabel).catch(() => undefined);
-    notify(`${operationLabel} cancelled`);
-  };
+      } catch (error) {
+        if (!disposed) setLogError(error instanceof Error ? error.message : 'Unable to load logs.');
+      } finally { pending = false; }
+    };
+    void refresh();
+    const timer = setInterval(() => { void refresh(); }, 2000);
+    const unsubscribe = subscribeDataLogStream({onEntry: () => { void refresh(); }, onCleared: () => {setLogEntries([]); void refresh();}, onProgress: () => { void refresh(); }});
+    return () => { disposed = true; clearInterval(timer); unsubscribe(); };
+  }, [tab, hostStatus]);
 
   const handleClearLog = async () => {
     try {
       await clearLogs();
-    } catch {
-      // reset local log and completed/cancelled progress even when offline
+      logRevision.current++;
+      setLogEntries([]);
+      setLogError('');
+      notify('Logs cleared.');
+    } catch (error) {
+      setLogError(error instanceof Error ? error.message : 'Unable to clear logs.');
     }
-    setLogEntries([]);
-    setProgress(0);
-    if (operationState === 'completed' || operationState === 'cancelled') {
-      setOperationState('idle');
-      setOperationLabel('No active operations');
-    }
-    notify('Logs cleared.');
   };
   const [lastControlId, setLastControlId] = useState<string | null>(null);
   const ribbonRef = useRef<HTMLDivElement>(null);
@@ -764,7 +714,7 @@ export function DataManager() {
       case 'custom-data': return <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/>;
       case 'symbols': return <SymbolTable selected={selectedSymbolIds} onSelect={setSelectedSymbolIds} onEdit={openSymbolEdit} onRefresh={refreshSelectedSymbols} onDelete={item => setSymbolDialog({ kind: 'delete', selected: [item] })} busy={symbolJob?.state === 'running'} />;
       case 'sessions': return <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/>;
-      case 'log': return <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-log-cancel-btn" className="cancel-log log-cancel-button" disabled={!canCancelLogOperation} onClick={handleCancelLogOperation}>Cancel operation</button><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="dm-log-progress" data-testid="dm-log-progress"><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/></div><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => { const isError = isErrorLogRecord(entry); return <div key={index} className={isError ? 'dm-log-entry log-entry-error' : 'dm-log-entry'} data-error={isError ? 'true' : 'false'}>{entry}</div>; })}</div></div></main>;
+      case 'log': return <main className="dm-log data-manager-log" data-testid="dm-tab-log"><div className="datamanager-help">Here is where you can see the download progress - you can see every symbol / year downloaded by the program.</div><header className="data-manager-log-buttons"><strong className="settings-title">Log</strong><button data-testid="dm-data-log-clear-log-btn" className="clear-log log-clear-button" onClick={handleClearLog}>Clear log</button></header><div className="dm-log-progress" data-testid="dm-log-progress"><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/></div>{logError && <p role="alert">{logError}</p>}<div aria-label="Active log tasks">{activeLogTasks.map(task => <div key={task}>{task}</div>)}</div><div className="log-container"><div className="dm-log-output log-scroll-content" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => { const isError = isErrorLogRecord(entry); return <div key={index} className={isError ? 'dm-log-entry log-entry-error' : 'dm-log-entry'} data-error={isError ? 'true' : 'false'}>{entry}</div>; })}</div></div></main>;
     }
   };
   const triggerArrange = (action: WorkspaceArrangement) => { setArrangeOpen(false); setArrangeRequest(current => ({ seq: (current?.seq ?? 0) + 1, action, targetId: panelForTab[tab] })); };

@@ -1,10 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   buildDataLogWsUrl,
-  cancelLogOperation,
   clearLogs,
-  createLog,
   fetchLogs,
+  fetchActiveLogs,
   formatDataLogLine,
   isErrorLogRecord,
   subscribeDataLogStream,
@@ -102,52 +101,33 @@ describe('DataManagerLog client and real-time WebSocket stream', () => {
     });
   });
 
-  it('calls REST endpoints for fetchLogs, createLog, clearLogs, and cancelLogOperation', async () => {
-    const sample: DataLogRecord = {
-      id: 7,
-      timestamp_utc: '2026-10-21T09:00:00Z',
-      action: 'EXPORT',
-      symbol: 'AAPL',
-      message: 'Exported CSV',
-      details: '',
-      status: 'completed',
-      progress: 100,
-    };
-    const fetchFn = vi
-      .fn()
-      .mockResolvedValueOnce(okResponse([sample]))
-      .mockResolvedValueOnce(okResponse(sample))
-      .mockResolvedValueOnce(okResponse({ cleared: 3, status: 'idle', progress: 0 }))
-      .mockResolvedValueOnce(
-        okResponse({ ...sample, action: 'CANCEL', status: 'cancelled', progress: 0 }),
-      );
-
-    const logs = await fetchLogs(50, { baseUrl: '/api/v1', fetchFn });
-    expect(logs).toEqual([sample]);
+  it('reads shared structured history and active tasks, and confirms clear', async () => {
+    const entry = {id:'entry',timestamp:'2026-10-21T09:00:00Z',task_id:'job',message:'Downloaded',level:'info',progress:50};
+    const fetchFn = vi.fn().mockResolvedValueOnce(okResponse({entries:[entry],total:1}))
+      .mockResolvedValueOnce(okResponse([entry])).mockResolvedValueOnce(okResponse({cleared_count:1}));
+    const config = {baseUrl:'/api/v1',fetchFn};
+    expect(await fetchLogs(50,config)).toMatchObject([{id:'entry',symbol:'job',message:'Downloaded',timestamp_utc:entry.timestamp}]);
     expect(fetchFn.mock.calls[0][0]).toBe('/api/v1/data/logs?limit=50');
+    expect(await fetchActiveLogs(config)).toMatchObject([{symbol:'job',progress:50}]);
+    expect(await clearLogs(config)).toEqual({cleared:1,status:'idle',progress:0});
+  });
 
-    const created = await createLog(
-      { action: 'EXPORT', symbol: 'AAPL', message: 'Exported CSV' },
-      { baseUrl: '/api/v1', fetchFn },
-    );
-    expect(created.symbol).toBe('AAPL');
-    expect(fetchFn.mock.calls[1][0]).toBe('/api/v1/data/logs');
-
-    const cleared = await clearLogs({ baseUrl: '/api/v1', fetchFn });
-    expect(cleared).toEqual({ cleared: 3, status: 'idle', progress: 0 });
-    expect(fetchFn.mock.calls[2][0]).toBe('/api/v1/data/logs/clear');
-
-    const cancelled = await cancelLogOperation('AAPL', 'CSV export', {
-      baseUrl: '/api/v1',
-      fetchFn,
-    });
-    expect(cancelled.status).toBe('cancelled');
-    expect(JSON.parse(fetchFn.mock.calls[3][1].body)).toMatchObject({
-      action: 'CANCEL',
-      symbol: 'AAPL',
-      status: 'cancelled',
-      progress: 0,
-    });
+  it('handles backend progress and clear without fabricating entries for host jobs', () => {
+    let socket: WebSocketLike;
+    const onEntry=vi.fn(),onProgress=vi.fn(),onCleared=vi.fn();
+    const stop=subscribeDataLogStream({webSocketFactory:()=>socket={onmessage:null,onerror:null,onclose:null,close:vi.fn()},onEntry,onProgress,onCleared});
+    const update={task_id:'job',timestamp:'2026-10-21T09:00:00Z',progress:25,message:'AAPL',level:'info'};
+    const emit=(event_type:string,payload:unknown,channel='logs')=>socket.onmessage?.({data:JSON.stringify({channel,event_type,payload})});
+    emit('datamanager.logs.progress',{workspace:'data-manager',update,entry:{id:'a',...update}});
+    expect(onEntry).toHaveBeenCalledWith(expect.objectContaining({id:'a',symbol:'job',progress:25}));
+    emit('datamanager.logs.progress',{workspace:'data-manager',update,entry:null});
+    expect(onEntry).toHaveBeenCalledTimes(1);
+    emit('job.updated',{message:'Unrelated'},'jobs');
+    expect(onEntry).toHaveBeenCalledTimes(1);
+    emit('datamanager.logs.cleared',{workspace:'data-manager',cleared_count:1});
+    expect(onCleared).toHaveBeenCalledWith({cleared:1,status:'idle',progress:0});
+    expect(onProgress).toHaveBeenCalledTimes(2);
+    stop();
   });
 
   it('streams live log entries, snapshots, and clear events over WebSocket', () => {

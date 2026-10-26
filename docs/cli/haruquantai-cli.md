@@ -710,3 +710,25 @@ uv run python -m app.cli data-manager basket --help
 uv run python -m app.cli data-manager basket edit-stocks --help
 uv run python -m app.cli data-manager basket update-data --help
 ```
+
+
+### Data Manager activity log
+
+These operations access the running backend's shared, in-memory history. Set
+`HARUQUANTAI_SESSION_TOKEN` from `uv run python -m app.cli login --username NAME`
+first. The client uses the configured backend host and port, with a 10-second
+request timeout. History resets on backend restart.
+
+```powershell
+uv run python -m app.cli data-manager log list
+uv run python -m app.cli data-manager log list --task-id JOB_ID --limit 50 --offset 0
+uv run python -m app.cli data-manager log list-active
+uv run python -m app.cli data-manager log clear
+```
+
+`list` returns newest-first entries plus total/limit/offset; limits are 1-1000.
+`list-active` returns current tasks. `clear` removes messages while retaining
+active tasks. Recording progress is an internal Python operation. Each command
+prints a standard JSON response; exit 0 means success, 1 means authentication,
+backend availability or service failure, and 2 means invalid arguments. Read
+operations require `data:read`; clearing requires `data:write`.

@@ -1,18 +1,5 @@
 """Data Manager baskets (stock groups) catalog service.
 
-Description:
-    Provides stock groups / baskets and their constituent ticker memberships
-    for the Data Manager workspace, reading from the authoritative SQLite database
-    (datamgr_stock_group and datamgr_stock tables). Exposes basket definitions,
-    constituent counts, and membership items.
-
-Purpose:
-    FEAT-DATAMGR-BASKETS: Data Manager baskets and stock groups catalog service.
-
-Key Capabilities:
-    - Group CRUD, historical membership editing, CSV import/export, JSON save/load.
-    - SQ equity D1 data updates, with optional host background jobs.
-
 Python API Usage:
     ```python
     from app.workspace.data_manager.baskets import Baskets
@@ -573,10 +560,15 @@ class Baskets:
     """Service providing baskets and stock groups catalog presentation."""
 
     def __init__(
-        self, gateway: HostPersistence | None = None, *, jobs: JobManager | None = None
+        self,
+        gateway: HostPersistence | None = None,
+        *,
+        jobs: JobManager | None = None,
+        logs: Any = None,
     ) -> None:
         self.gateway = gateway if gateway is not None else persistence
         self.jobs = jobs
+        self.logs = logs
 
     def _read_stock_groups(self) -> list[dict[str, Any]]:
         return _read_all(self.gateway, "datamgr_stock_group")
@@ -876,7 +868,15 @@ class Baskets:
     def _run_update_job(
         self, context: JobContext, tickers: list[str], client: Any, folder: Path
     ) -> dict[str, Any]:
-        return self._download_data(tickers, client, folder, context=context)
+        from app.workspace.data_manager.logs import run_logged_task
+
+        return run_logged_task(
+            self.logs,
+            context,
+            lambda tracked: self._download_data(
+                tickers, client, folder, context=tracked
+            ),
+        )
 
     def _download_data(
         self,

@@ -22,6 +22,7 @@ from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
 from app.host.settings import SettingsManager
 from app.host.transport import CredentialTester, Vault, install_transport
+from app.workspace.data_manager.logs import Logs
 
 logger = get_logger(__name__)
 _MAX_PORT = 65535
@@ -49,6 +50,7 @@ def create_app(
             raise
         application.state.persistence = gateway
         application.state.settings = settings
+        application.state.data_logs = Logs()
 
         def scopes_for(username: str) -> tuple[str, ...]:
             access = settings.get_scope("user_access")
@@ -63,6 +65,7 @@ def create_app(
             if (jobs := getattr(application.state, "basket_jobs", None)) is not None:
                 await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
                 del application.state.basket_jobs
+            del application.state.data_logs
             del application.state.sessions
             del application.state.settings
             del application.state.persistence

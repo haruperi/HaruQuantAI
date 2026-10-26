@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import math
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -23,6 +22,12 @@ from app.host.transport import (
 from app.workspace.data_manager.baskets import Baskets
 from app.workspace.data_manager.brokers import Brokers
 from app.workspace.data_manager.data import Data
+from app.workspace.data_manager.http_fields import (
+    symbol_to_ui as _ui,
+)
+from app.workspace.data_manager.http_fields import (
+    symbol_updates as _updates,
+)
 from app.workspace.data_manager.sessions import Sessions
 from app.workspace.data_manager.symbols import Symbols
 
@@ -37,7 +42,6 @@ TABS = (
     "stock-groups",
     "log",
 )
-DAYS = ("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
 CORE_TABS = {"data", "symbols", "sessions", "brokers", "custom-data"}
 MAX_CSV_BYTES = 10_000_000
 MAX_BROKER_STOCKS = 10000
@@ -48,7 +52,18 @@ _MAX_BASKET_TRANSFER_BYTES = 20 * 1024 * 1024
 
 def _access(request: Request) -> None:
     """Apply the host's UI session and scope checks to domain requests."""
-    _require(request, "data:read" if request.method == "GET" else "data:write")
+    scope = "data:read" if request.method == "GET" else "data:write"
+    if request.headers.get("x-peer-id") == "cli" and request.url.path.startswith(
+        "/api/v1/data/logs"
+    ):
+        token = request.headers.get("authorization", "").removeprefix("Bearer ")
+        sessions = request.app.state.sessions
+        if sessions.validate_session(token, "cli") is None:
+            raise TransportError(ErrorCode.UNAUTHORIZED, "A CLI session is required")
+        if not sessions.authorize(token, "cli", scope):
+            raise TransportError(ErrorCode.FORBIDDEN, "Capability is not granted")
+    else:
+        _require(request, scope)
 
 
 def _response(result: dict[str, Any]) -> JSONResponse:
@@ -88,139 +103,6 @@ def _rows(
         rows.extend(data["records"])
         offset = data["pagination"].get("next_offset")
     return rows
-
-
-def _ui(row: dict[str, Any]) -> dict[str, Any]:
-    """Translate the persisted nested specification into existing browser fields."""
-    price, volume, spread, swap, margin, trade = (
-        _json(row.get(key))
-        for key in ("price", "volume", "spread", "swap", "margin", "trade")
-    )
-    rollover = str(swap.get("rollover3days", "Wednesday")).upper()
-    return {
-        "id": str(row["id"]),
-        "symbol": row["name"],
-        "description": row.get("description") or "",
-        "broker_id": row.get("broker_id") or 0,
-        "data_type": row.get("data_type") or "",
-        "point_value": price.get("point_value")
-        if price.get("point_value") is not None
-        else price.get("contract_size", 100000),
-        "tick_size": price.get("tick_size", 0.0001),
-        "tick_step": price.get("tick_step", 0.00001),
-        "contract_size": price.get("contract_size", 100000),
-        "pip_size": price.get("pip_size")
-        if price.get("pip_size") is not None
-        else price.get("tick_size", 0.0001),
-        "margin_rate": margin.get("rate", 0),
-        "decimals": price.get("digits", 5),
-        "tick_value_in_money": price.get("tick_value", 0),
-        "min_volume": volume.get("min", 0.01),
-        "max_volume": volume.get("max", 100),
-        "lot_step": volume.get("step", 0.01),
-        "default_spread": spread.get("default", 0),
-        "default_slippage": spread.get("slippage", 0),
-        "min_distance": trade.get("min_distance", 0),
-        "order_size_multiplier": volume.get("min", 0.01),
-        "order_size_step": volume.get("step", 0.01),
-        "commissions": trade.get("commission_settings")
-        or str(row.get("commission") or 0),
-        "swap_long": swap.get("long", 0),
-        "swap_short": swap.get("short", 0),
-        "swap_3day_day": DAYS.index(rollover) if rollover in DAYS else 3,
-        "swap_settings": swap.get("settings"),
-    }
-
-
-def _updates(values: dict[str, Any]) -> dict[str, Any]:
-    """Validate browser field values before invoking the symbol service."""
-    numeric = {
-        "broker_id",
-        "point_value",
-        "contract_size",
-        "tick_size",
-        "pip_size",
-        "tick_step",
-        "decimals",
-        "tick_value_in_money",
-        "min_volume",
-        "max_volume",
-        "lot_step",
-        "margin_rate",
-        "default_spread",
-        "default_slippage",
-        "min_distance",
-        "order_size_multiplier",
-        "order_size_step",
-    }
-    for key in numeric & values.keys():
-        value = values[key]
-        if value is not None and (
-            isinstance(value, bool)
-            or not isinstance(value, (int, float))
-            or not math.isfinite(value)
-        ):
-            raise TransportError(ErrorCode.VALIDATION, f"Invalid numeric field: {key}")
-    try:
-        return _map_updates(values)
-    except (ValueError, TypeError, KeyError, AttributeError) as error:
-        raise TransportError(
-            ErrorCode.VALIDATION, "Invalid symbol field values"
-        ) from error
-
-
-def _map_updates(values: dict[str, Any]) -> dict[str, Any]:
-    """Map explicitly supplied browser fields to service fields."""
-    direct = {
-        "description",
-        "data_type",
-        "broker_id",
-        "default_spread",
-        "min_distance",
-        "order_size_multiplier",
-        "order_size_step",
-    }
-    result = {key: value for key, value in values.items() if key in direct}
-    nested = {
-        "price": {
-            "point_value": "point_value",
-            "contract_size": "contract_size",
-            "tick_size": "tick_size",
-            "pip_size": "pip_size",
-            "tick_step": "tick_step",
-            "decimals": "digits",
-            "tick_value_in_money": "tick_value",
-        },
-        "volume": {"min_volume": "min", "max_volume": "max", "lot_step": "step"},
-        "margin": {"margin_rate": "rate"},
-        "spread": {"default_slippage": "slippage"},
-    }
-    for section, keys in nested.items():
-        data = {
-            target: values[source]
-            for source, target in keys.items()
-            if source in values and values[source] is not None
-        }
-        if data:
-            result[section] = data
-    if "commissions" in values:
-        commission = json.loads(values["commissions"])
-        result["commission"] = float(
-            commission
-            if isinstance(commission, (float, int))
-            else commission["settings"]["value"]
-        )
-        result["trade"] = {"commission_settings": values["commissions"]}
-    if "swap_settings" in values:
-        swap = values["swap_settings"]
-        result["swap"] = {
-            "settings": swap,
-            "long": swap["long"] if swap["use"] else 0,
-            "short": swap["short"] if swap["use"] else 0,
-            "mode": swap["type"],
-            "rollover3days": swap["tripleSwapOn"].capitalize(),
-        }
-    return result
 
 
 def _names(rows: list[dict[str, Any]], ids: list[str]) -> list[str]:
@@ -301,6 +183,7 @@ def create_router() -> APIRouter:
     _session_routes(router)
     _broker_routes(router)
     _basket_routes(router)
+    _log_routes(router)
     return router
 
 
@@ -924,7 +807,9 @@ def _basket_routes(router: APIRouter) -> None:
             ids = _basket_ids(body.get("ids"))
             return _response(
                 Baskets(
-                    service.gateway, jobs=_basket_jobs(request, create=True)
+                    service.gateway,
+                    jobs=_basket_jobs(request, create=True),
+                    logs=request.app.state.data_logs,
                 ).update_data(ids)
             )
         if command in {"load", "save"}:
@@ -997,3 +882,23 @@ def _basket_job_routes(router: APIRouter) -> None:
                 )
             record = jobs.get_job(job_id)
         return _ok(record.to_dict())
+
+
+def _log_routes(router: APIRouter) -> None:
+    @router.get("/logs")
+    def logs(
+        request: Request, task_id: str | None = None, limit: int = 100, offset: int = 0
+    ) -> Any:
+        return _response(
+            request.app.state.data_logs.list(
+                task_id=task_id, limit=limit, offset=offset
+            )
+        )
+
+    @router.get("/logs/active")
+    def active_logs(request: Request) -> Any:
+        return _response(request.app.state.data_logs.list_active())
+
+    @router.post("/logs/clear")
+    def clear_logs(request: Request) -> Any:
+        return _response(request.app.state.data_logs.clear())

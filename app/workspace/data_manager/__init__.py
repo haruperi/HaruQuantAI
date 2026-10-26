@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from importlib import import_module
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -21,32 +22,23 @@ if TYPE_CHECKING:
         format_symbol_table,
     )
     from app.workspace.data_manager.data import Data
+    from app.workspace.data_manager.logs import Logs
     from app.workspace.data_manager.sessions import Sessions
     from app.workspace.data_manager.symbols import Symbols
 
 
 def __getattr__(name: str) -> Any:
     """Lazily import data manager classes and functions on demand."""
-    if name == "Data":
-        from app.workspace.data_manager import data
-
-        return getattr(data, name)
-    if name == "Symbols":
-        from app.workspace.data_manager import symbols
-
-        return getattr(symbols, name)
-    if name == "Sessions":
-        from app.workspace.data_manager import sessions
-
-        return getattr(sessions, name)
-    if name == "Brokers":
-        from app.workspace.data_manager import brokers
-
-        return getattr(brokers, name)
-    if name == "Baskets":
-        from app.workspace.data_manager import baskets
-
-        return getattr(baskets, name)
+    services = {
+        "Data": "data",
+        "Symbols": "symbols",
+        "Sessions": "sessions",
+        "Brokers": "brokers",
+        "Baskets": "baskets",
+        "Logs": "logs",
+    }
+    if name in services:
+        return getattr(import_module(f"{__name__}.{services[name]}"), name)
     if name in {
         "BasketsCLI",
         "BrokersCLI",
@@ -73,6 +65,7 @@ __all__ = [
     "BrokersCLI",
     "Data",
     "DataCLI",
+    "Logs",
     "Sessions",
     "SessionsCLI",
     "Symbols",

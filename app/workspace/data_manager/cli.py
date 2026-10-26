@@ -70,6 +70,9 @@ def register_commands(commands: Any) -> None:
     _profile_parsers(resources, "session")
     _profile_parsers(resources, "broker")
     _basket_parsers(resources)
+    from app.workspace.data_manager.logs_cli import register_log_commands
+
+    register_log_commands(resources)
     data_manager.set_defaults(handler=partial(run_command, parser=data_manager))
 
 
@@ -77,11 +80,14 @@ def run_command(
     arguments: argparse.Namespace, *, parser: argparse.ArgumentParser
 ) -> int:
     """Execute a Data Manager command, emit errors, and return its exit code."""
+    from app.workspace.data_manager.logs_cli import run_log_command
+
     handlers = {
         "session": _run_profile_command,
         "symbol": _run_symbol_command,
         "broker": _run_profile_command,
         "basket": _run_basket_command,
+        "log": run_log_command,
     }
     result = handlers[arguments.resource](arguments, parser)
     if result is None:

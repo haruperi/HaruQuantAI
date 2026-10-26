@@ -1,4 +1,4 @@
-import { createSymbolDataClient } from '../../plugins/data_source/Common/symbolContract';
+import { createDomainClient } from '../../host/transport';
 /**
  * Data Manager Log & Operation Tracking Client
  *
@@ -22,7 +22,7 @@ export type DataLogStatus =
   | 'failed';
 
 export interface DataLogRecord {
-  id: number;
+  id: number | string;
   timestamp_utc: string;
   action: string;
   message: string;
@@ -33,16 +33,6 @@ export interface DataLogRecord {
   is_error?: boolean;
   cancellable?: boolean;
   created_at?: string;
-}
-
-export interface CreateLogPayload {
-  action: string;
-  message: string;
-  symbol?: string;
-  details?: string;
-  status?: DataLogStatus;
-  progress?: number;
-  timestamp_utc?: string;
 }
 
 export interface ClearLogResult {
@@ -83,7 +73,7 @@ export interface DataLogStreamOptions {
 }
 
 function client(config: TransportConfig = {}) {
-  return createSymbolDataClient('/data', config);
+  return createDomainClient('/data', config);
 }
 
 /**
@@ -164,46 +154,23 @@ export async function fetchLogs(
   limit = 100,
   config: TransportConfig = {},
 ): Promise<DataLogRecord[]> {
-  return client(config).get<DataLogRecord[]>(`/logs?limit=${limit}`);
+  const page = await client(config).get<{entries: Record<string, unknown>[]}>(`/logs?limit=${limit}`);
+  return page.entries.map(item => normalizeIncomingRecord(item, String(item.timestamp ?? '')));
+}
+
+export async function fetchActiveLogs(config: TransportConfig = {}): Promise<DataLogRecord[]> {
+  const tasks = await client(config).get<Record<string, unknown>[]>('/logs/active');
+  return tasks.map(item => normalizeIncomingRecord(item, String(item.timestamp ?? '')));
 }
 
 /**
- * Append a new entry to the Data Manager log.
- */
-export async function createLog(
-  payload: CreateLogPayload,
-  config: TransportConfig = {},
-): Promise<DataLogRecord> {
-  return client(config).post<DataLogRecord>('/logs', payload);
-}
-
-/**
- * Clear all Data Manager log entries and reset operation progress state.
+ * Clear Data Manager history while preserving active tasks.
  */
 export async function clearLogs(
   config: TransportConfig = {},
 ): Promise<ClearLogResult> {
-  return client(config).post<ClearLogResult>('/logs/clear', {});
-}
-
-/**
- * Record a cancellation request for an active Data Manager operation.
- */
-export async function cancelLogOperation(
-  symbol = '',
-  label = 'Data operation',
-  config: TransportConfig = {},
-): Promise<DataLogRecord> {
-  return createLog(
-    {
-      action: 'CANCEL',
-      symbol,
-      status: 'cancelled',
-      progress: 0,
-      message: `${label} cancelled`,
-    },
-    config,
-  );
+  const result = await client(config).post<{cleared_count: number}>('/logs/clear', {});
+  return {cleared: result.cleared_count, status: 'idle', progress: 0};
 }
 
 /**
@@ -231,17 +198,17 @@ export function buildDataLogWsUrl(
 function normalizeIncomingRecord(raw: Record<string, unknown>, fallbackTime: string): DataLogRecord {
   const action = String(raw.action ?? raw.operation ?? raw.level ?? 'INFO');
   const status = String(
-    raw.status ?? (action.toUpperCase().includes('ERR') ? 'error' : 'info'),
+    raw.status ?? (typeof raw.progress === 'number' ? raw.progress < 0 ? 'error' : raw.progress === 100 ? 'completed' : 'running' : action.toUpperCase().includes('ERR') ? 'error' : 'info'),
   ).toLowerCase() as DataLogStatus;
   const rawPct = typeof raw.progress === 'number' ? raw.progress : status === 'error' ? -1 : 0;
   const isError =
     Boolean(raw.is_error) || status === 'error' || status === 'failed' || rawPct < 0;
   return {
-    id: typeof raw.id === 'number' ? raw.id : Date.now(),
-    timestamp_utc: String(raw.timestamp_utc ?? fallbackTime),
+    id: typeof raw.id === 'number' || typeof raw.id === 'string' ? raw.id : Date.now(),
+    timestamp_utc: String(raw.timestamp_utc ?? raw.timestamp ?? fallbackTime),
     action,
     message: String(raw.message ?? ''),
-    symbol: String(raw.symbol ?? ''),
+    symbol: String(raw.symbol ?? raw.task_id ?? ''),
     details: String(raw.details ?? ''),
     status,
     progress: rawPct,
@@ -282,6 +249,16 @@ export function subscribeDataLogStream(options: DataLogStreamOptions = {}): () =
       };
       const payload = frame.payload ?? {};
       const stamp = frame.timestamp ?? new Date().toISOString();
+      if (frame.event_type === 'datamanager.logs.progress' && payload.workspace === 'data-manager') {
+        const update = payload.update as Record<string, unknown>;
+        if (payload.entry) options.onEntry?.(normalizeIncomingRecord(payload.entry as Record<string, unknown>, stamp));
+        options.onProgress?.(summarizeLogProgress([normalizeIncomingRecord(update, stamp)]));
+        return;
+      }
+      if (frame.event_type === 'datamanager.logs.cleared') {
+        options.onCleared?.({cleared: Number(payload.cleared_count ?? 0), status: 'idle', progress: 0});
+        return;
+      }
       if (frame.event_type === 'datamgr.log.cleared') {
         const result: ClearLogResult = {
           cleared: typeof payload.cleared === 'number' ? payload.cleared : 0,
@@ -307,7 +284,7 @@ export function subscribeDataLogStream(options: DataLogStreamOptions = {}): () =
         options.onProgress?.(summarizeLogProgress(records));
         return;
       }
-      if (frame.channel === 'logs' || frame.channel === 'jobs') {
+      if (frame.channel === 'logs' && frame.event_type?.startsWith('datamgr.log.')) {
         const record = normalizeIncomingRecord(payload, stamp);
         if (record.message || record.action) {
           options.onEntry?.(record);
