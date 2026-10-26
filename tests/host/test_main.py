@@ -127,3 +127,13 @@ def test_shutdown_finishes_with_open_event_stream(monkeypatch):
                 await asyncio.gather(task, return_exceptions=True)
 
     asyncio.run(exercise())
+
+
+def test_lifespan_cancels_and_closes_basket_jobs(monkeypatch):
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=Mock()))
+    application = backend.create_app(Mock())
+    manager = Mock()
+    with TestClient(application):
+        application.state.basket_jobs = manager
+    manager.shutdown.assert_called_once_with(wait=True, cancel_futures=True)
+    assert not hasattr(application.state, "basket_jobs")

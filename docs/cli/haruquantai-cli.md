@@ -6,8 +6,8 @@ Run these commands from the project root in PowerShell. The CLI runs headlessly 
 routes parsed arguments to their bound handlers, and manages host commands and
 logging shutdown. Each domain owns its command definitions and execution.
 
-Data Manager commands live in `app/workspace/data_manager/cli.py` alongside their
-table formatters. Its `register_commands(commands)` registers the command tree
+Data Manager commands live in `app/workspace/data_manager/cli.py`. ASCII table
+formatters live in `cli_formatters.py` and are re-exported from `cli.py`. Its `register_commands(commands)` registers the command tree
 and binds `run_command` as the handler. That handler owns domain validation,
 service calls, output, and exit codes. Additional domains can follow this same
 registration pattern without adding domain-specific dispatch to `app/cli.py`.
@@ -59,10 +59,10 @@ uv run python -m app.cli --help
 
 ### Exit codes
 
-| Code  | Meaning                                    |
-| ----- | ------------------------------------------ |
-| `0` | Command succeeded.                         |
-| `1` | Command failed, or login was cancelled.    |
+| Code | Meaning |
+| --- | --- |
+| `0` | Command succeeded. |
+| `1` | Command failed, or login was cancelled. |
 | `2` | Invalid or missing command-line arguments. |
 
 Command results are written to standard output: symbol lists and created symbols use an ASCII table;
@@ -305,14 +305,14 @@ uv run python -m app.cli data-manager session add --name London --timezone Europ
 without appending a broker suffix. Successful creation displays the new calendar
 in a table. Optional fields are:
 
-| Flag                                   | Value                                                   | Default when adding       |
-| -------------------------------------- | ------------------------------------------------------- | ------------------------- |
-| `--description`                      | Description text.                                       | Empty string.             |
-| `--timezone`                         | IANA timezone, such as `UTC` or `America/New_York`. | `UTC`.                  |
-| `--broker-id`                        | Integer broker ID.                                      | `-1` (Default).         |
-| `--windows`                          | JSON array of trading intervals.                        | `[]` (closed calendar). |
-| `--holidays`                         | JSON array of full-day holidays.                        | `[]`.                   |
-| `--is-default` / `--no-is-default` | Set or clear the default-profile flag.                  | False.                    |
+| Flag                               | Value                                               | Default when adding     |
+| ---------------------------------- | --------------------------------------------------- | ----------------------- |
+| `--description`                    | Description text.                                   | Empty string.           |
+| `--timezone`                       | IANA timezone, such as `UTC` or `America/New_York`. | `UTC`.                  |
+| `--broker-id`                      | Integer broker ID.                                  | `-1` (Default).         |
+| `--windows`                        | JSON array of trading intervals.                    | `[]` (closed calendar). |
+| `--holidays`                       | JSON array of full-day holidays.                    | `[]`.                   |
+| `--is-default` / `--no-is-default` | Set or clear the default-profile flag.              | False.                  |
 
 To include intervals and holidays, pass each JSON array as one argument:
 
@@ -477,17 +477,17 @@ uv run python -m app.cli data-manager broker add --name Demo --description "Demo
 Names are required and saved without an automatic suffix. The service assigns
 the database ID and UTC creation/update timestamps. Optional flags are:
 
-| Flag                                             | Value                                                        | Default on add |
-| ------------------------------------------------ | ------------------------------------------------------------ | -------------- |
-| `--description`                                | Description string.                                          | Empty string.  |
-| `--server-timezone`                            | IANA timezone or the supported `EETUS` broker clock label. | `UTC`.       |
-| `--postfix`                                    | Symbol/data postfix string.                                  | Empty string.  |
-| `--is-system` / `--no-is-system`             | System profile flag.                                         | False.         |
-| `--stockpicker-use` / `--no-stockpicker-use` | Stock filtering flag.                                        | False.         |
-| `--mt-use` / `--no-mt-use`                   | Symbols and sessions flag.                                   | False.         |
-| `--enabled` / `--no-enabled`                 | Enabled flag.                                                | True.          |
-| `--clock-policy`                               | JSON object with JSON-compatible values.                     | `{}`.        |
-| `--clock-policy-revision`                      | Non-negative integer.                                        | `0`.         |
+| Flag                                         | Value                                                      | Default on add |
+| -------------------------------------------- | ---------------------------------------------------------- | -------------- |
+| `--description`                              | Description string.                                        | Empty string.  |
+| `--server-timezone`                          | IANA timezone or the supported `EETUS` broker clock label. | `UTC`.         |
+| `--postfix`                                  | Symbol/data postfix string.                                | Empty string.  |
+| `--is-system` / `--no-is-system`             | System profile flag.                                       | False.         |
+| `--stockpicker-use` / `--no-stockpicker-use` | Stock filtering flag.                                      | False.         |
+| `--mt-use` / `--no-mt-use`                   | Symbols and sessions flag.                                 | False.         |
+| `--enabled` / `--no-enabled`                 | Enabled flag.                                              | True.          |
+| `--clock-policy`                             | JSON object with JSON-compatible values.                   | `{}`.          |
+| `--clock-policy-revision`                    | Non-negative integer.                                      | `0`.           |
 
 For example, to supply clock metadata in PowerShell:
 
@@ -597,4 +597,116 @@ For command-specific help:
 uv run python -m app.cli data-manager broker --help
 uv run python -m app.cli data-manager broker add --help
 uv run python -m app.cli data-manager broker edit --help
+```
+
+
+### Basket (Stock group) commands
+
+All eleven `Baskets` methods are available under `data-manager basket`. They
+operate directly on the local database without a session token or HTTP server.
+Group names are exact saved names, with no automatically added brackets. Quote
+names and file paths containing spaces.
+
+#### Group catalog, creation, editing, and deletion
+
+```powershell
+uv run python -m app.cli data-manager basket list
+uv run python -m app.cli data-manager basket list --page 2 --page-size 25
+uv run python -m app.cli data-manager basket add --name "My stocks" --description "Watchlist"
+uv run python -m app.cli data-manager basket edit "My stocks" --description "Updated watchlist"
+uv run python -m app.cli data-manager basket edit "My stocks" --name "Technology"
+uv run python -m app.cli data-manager basket edit Technology "Other group" --description "Shared description"
+uv run python -m app.cli data-manager basket delete Technology "Other group"
+```
+
+Listing defaults to 50 groups per page. Pagination options require positive
+integers; an out-of-range page is an argument error. Add requires `--name` and
+accepts `--description` and `--system`/`--no-system` (default false). Edit requires
+at least one field; `--name` can rename only one group. Bulk edits and deletions
+are atomic. Deletion removes membership histories and retains downloaded data.
+System groups are protected from metadata edits, membership changes, and deletion.
+
+#### List and edit memberships
+
+```powershell
+uv run python -m app.cli data-manager basket list-stocks Technology
+uv run python -m app.cli data-manager basket edit-stocks Technology --stocks "AAPL;01.01.2020"
+$stocks = "AAPL;01.01.2020`nMSFT;01.01.2010;31.12.2020"
+uv run python -m app.cli data-manager basket edit-stocks Technology --stocks $stocks
+$members = '[{"ticker":"AAPL","date_from":1577836800000,"date_to":-1}]'
+uv run python -m app.cli data-manager basket edit-stocks Technology --stocks $members
+uv run python -m app.cli data-manager basket edit-stocks Technology --stocks '[]'
+```
+
+`edit-stocks` replaces the complete history. Supply semicolon-separated lines or
+a JSON membership array; `[]` clears it. Fields are `ticker`, `date_from`, and
+`date_to`. Dates accept DD.MM.YYYY, YYYY-MM-DD, or non-negative Unix milliseconds.
+An omitted start becomes 0; an omitted/null end or -1 represents ongoing membership.
+Invalid dates, reversed intervals, duplicate intervals, and storage failures leave
+the previous membership history unchanged.
+
+#### Import and export stock CSV files
+
+```powershell
+uv run python -m app.cli data-manager basket export-stocks Technology "C:\Data\stocks.csv"
+uv run python -m app.cli data-manager basket import-stocks Technology "C:\Data\stocks.csv"
+```
+
+Stock files are UTF-8 CSV without a header: `Ticker;Date from;Date to`.
+Import replaces the group's full membership history atomically. Export normally
+formats dates as DD.MM.YYYY and retains timestamps with time components as
+integer milliseconds. The export parent directory must already exist.
+
+#### Save and load groups as JSON
+
+```powershell
+uv run python -m app.cli data-manager basket save "C:\Data\groups.json"
+uv run python -m app.cli data-manager basket save "C:\Data\selected-groups.json" --baskets Technology "Other group"
+uv run python -m app.cli data-manager basket load "C:\Data\groups.json"
+```
+
+Save exports all groups unless `--baskets` selects names. Group files use JSON,
+not XML, and include the full membership history:
+
+```json
+[
+  {
+    "name": "Technology",
+    "description": "Watchlist",
+    "system": false,
+    "stocks": [
+      {"ticker": "AAPL", "date_from": 1577836800000, "date_to": -1}
+    ]
+  }
+]
+```
+
+Load creates new groups; existing names cause the whole import to roll back.
+IDs are assigned locally. Save/Load preserve system flags. Exports replace an
+existing destination atomically; the parent directory must exist. The Stock
+groups tab uses the same JSON format and CSV membership operations.
+
+#### Update constituent market data
+
+```powershell
+uv run python -m app.cli data-manager basket update-data Technology
+uv run python -m app.cli data-manager basket update-data Technology "Other group" --data-dir "C:\Data\basket-bars"
+```
+
+This command runs synchronously using the SQ equity client. It downloads D1 bars
+for unique tickers across the selected groups, including historical constituents,
+saves versioned Parquet files, and registers them in `datamgr_datasets`. The default
+output directory is `data/baskets`. Completed downloads remain available if other
+tickers fail. Partial failure returns exit code 1 and lists completed and failed
+tickers in `error.details`.
+
+Creation, listing, metadata edits, deletion, and JSON load display an ASCII group
+table. Membership, file-export, and data-update operations print StandardResponse
+JSON. Successful commands return 0, service/file failures return 1, and argument
+errors return 2.
+
+```powershell
+uv run python -m app.cli data-manager basket --help
+uv run python -m app.cli data-manager basket edit-stocks --help
+uv run python -m app.cli data-manager basket update-data --help
 ```

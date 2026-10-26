@@ -1,12 +1,13 @@
 export const stockGroupLimits = { groups: 1_000, members: 50_000, csv: 20 * 1024 * 1024, json: 20 * 1024 * 1024 };
 
-export interface StockMembership { ticker: string; from?: string; to?: string }
+export interface StockMembership { ticker: string; from?: string; to?: string; fromMs?:number; toMs?:number }
 export interface StockGroupDefinition {
   id: string;
   name: string;
   description: string;
   system: boolean;
   members: StockMembership[];
+  statistics?:{active:number;total:number;numberOfSymbols:number;downloaded:number;ready:boolean;from:string;to:string};
   origin?: 'file-import';
   originName?: string;
   originFingerprint?: string;
@@ -17,7 +18,7 @@ export interface StockGroupDataset {
   category: string; from: string; to: string; bars: number; barType: 'start';
 }
 export interface StockGroupUpdateJob {
-  groupIds: string[]; tickers: string[]; state: 'running'|'paused'|'completed'|'failed'|'cancelled';
+  jobId?: string; groupIds: string[]; tickers: string[]; state: 'running'|'paused'|'completed'|'failed'|'cancelled';
   progress: number; completed: number; error?: string;
 }
 export interface DatasetSummaryInput { symbol: string; from?: string; to?: string; bars?: number }
@@ -38,7 +39,7 @@ export function normalizeGroupName(value: string, system = false): string {
 
 export function validateGroup(group: StockGroupDefinition, existing: StockGroupDefinition[] = []): void {
   if (!group.id || group.id.length > 200) throw new Error('Invalid stock group identity.');
-  if (normalizeGroupName(group.name, group.system) !== group.name) throw new Error('Invalid stock group name.');
+  if (!group.name.trim() || group.name !== group.name.trim() || group.name.length>50) throw new Error('Invalid stock group name.');
   if (group.description.length > 250) throw new Error('Description must be 250 characters or fewer.');
   if (existing.some(item => item.id !== group.id && item.name.toLowerCase() === group.name.toLowerCase())) throw new Error('Name must be unique');
   if (group.members.length > stockGroupLimits.members) throw new Error('Stock group exceeds the 50,000-member limit.');
@@ -81,7 +82,14 @@ export function parseStockLines(text: string): StockMembership[] {
     const cells = line.split(';');
     if(cells.length>3)throw new Error('Membership has too many fields.');
     const member: StockMembership = { ticker: cells[0].trim() };
-    const from = parseStockDate(cells[1]), to = parseStockDate(cells[2]);
+    const cellDate=(cell:string|undefined,end:boolean):string|undefined=>{
+      if(cell?.trim()&&/^-?\d+$/.test(cell.trim())) {
+        const ms=Number(cell);if(!Number.isSafeInteger(ms)||ms<0&&!(end&&ms===-1))throw new Error('Invalid membership date.');
+        if(end)member.toMs=ms;else member.fromMs=ms;
+        return ms===(end?-1:0)?undefined:new Date(ms).toISOString().slice(0,10);
+      }return parseStockDate(cell);
+    };
+    const from = cellDate(cells[1],false), to = cellDate(cells[2],true);
     if (from) member.from = from;
     if (to) member.to = to;
     validateMember(member);
@@ -99,6 +107,7 @@ function displayDate(value: string | undefined): string {
 
 export function formatStockLines(members: StockMembership[], exportMode = false): string {
   return members.map(member => {
+    if((member.fromMs!==undefined&&member.fromMs%86400000!==0)||(member.toMs!==undefined&&member.toMs!==-1&&member.toMs%86400000!==0))return `${member.ticker};${member.fromMs??member.from??''};${member.toMs??member.to??''}`;
     if (exportMode) return `${member.ticker};${displayDate(member.from)}${member.to ? `;${displayDate(member.to)}` : ''}`;
     return `${member.ticker}${member.from || member.to ? `;${displayDate(member.from)}` : ''}${member.to ? `;${displayDate(member.to)}` : ''}`;
   }).join('\n');
@@ -109,6 +118,7 @@ export function activeMemberships(group: StockGroupDefinition, today = new Date(
 }
 
 export function summarizeGroup(group: StockGroupDefinition, datasets: DatasetSummaryInput[]) {
+  if(group.statistics)return group.statistics;
   const bySymbol = new Map(datasets.map(row => [row.symbol.toUpperCase(), row]));
   const matching = group.members.map(member => bySymbol.get(member.ticker.toUpperCase()));
   const numberOfSymbols = matching.filter(Boolean).length;

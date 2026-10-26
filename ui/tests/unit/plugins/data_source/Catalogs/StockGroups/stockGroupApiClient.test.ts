@@ -1,6 +1,6 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest';
 import {createDomainClient} from '../../../../../../app/host/transport';
-import {deleteStockGroups,fetchStockGroups,saveStockGroup,saveStockGroupMembers,setStockGroupApiClient,toStockGroupDefinition,type RemoteBasketRecord} from '../../../../../../app/plugins/data_source/Catalogs/StockGroups/stockGroupApiClient';
+import {fetchStockGroupMembers,importStockGroupMembers,exportStockGroupMembers,exportStockGroupCatalog,loadStockGroupCatalog,editStockGroupCatalog,startStockGroupUpdate,fetchStockGroupJob,controlStockGroupJob,deleteStockGroups,fetchStockGroups,saveStockGroup,saveStockGroupMembers,setStockGroupApiClient,toStockGroupDefinition,type RemoteBasketRecord} from '../../../../../../app/plugins/data_source/Catalogs/StockGroups/stockGroupApiClient';
 import {useStockGroups} from '../../../../../../app/plugins/data_source/Catalogs/StockGroups/stockGroupsStore';
 const record:RemoteBasketRecord={id:'1',name:'[Tech]',description:'Technology',system:false,items:[{symbol:'OLD',date_from:'1950-01-01',date_to:'2000-01-01'}]};
 const response=(data:unknown)=>new Response(JSON.stringify({status:'success',data}));
@@ -28,9 +28,9 @@ describe('confirmed baskets',()=>{
   });
   it('retains confirmed state on failure and accepts authoritative empty catalogs',async()=>{
     const fetchFn=setup().mockRejectedValueOnce(new Error('offline'));
-    await expect(useStockGroups.getState().saveGroup('Tech','Technology')).rejects.toThrow('offline');
+    await expect(useStockGroups.getState().saveGroup('[Tech]','Technology')).rejects.toThrow('offline');
     expect(useStockGroups.getState().groups).toEqual([]);
-    fetchFn.mockResolvedValueOnce(response(record));await useStockGroups.getState().saveGroup('Tech','Technology');
+    fetchFn.mockResolvedValueOnce(response(record));await useStockGroups.getState().saveGroup('[Tech]','Technology');
     fetchFn.mockRejectedValueOnce(new Error('failed'));
     await expect(useStockGroups.getState().replaceMembers('1',[])).rejects.toThrow('failed');
     expect(useStockGroups.getState().groups[0].members).toHaveLength(1);
@@ -41,7 +41,7 @@ describe('confirmed baskets',()=>{
     let resolve!:(value:Response)=>void;
     const fetchFn=setup().mockImplementationOnce(()=>new Promise<Response>(done=>{resolve=done;}));
     const read=useStockGroups.getState().syncRemote();
-    fetchFn.mockResolvedValueOnce(response(record));await useStockGroups.getState().saveGroup('Tech','Technology');
+    fetchFn.mockResolvedValueOnce(response(record));await useStockGroups.getState().saveGroup('[Tech]','Technology');
     resolve(response([]));await read;expect(useStockGroups.getState().groups).toHaveLength(1);
     fetchFn.mockRejectedValueOnce(new Error('offline'));await useStockGroups.getState().syncRemote();
     expect(useStockGroups.getState().storageError).toBe('offline');expect(useStockGroups.getState().loading).toBe(false);
@@ -88,5 +88,31 @@ describe('confirmed basket deletion',()=>{
     useStockGroups.setState({groups:[toStockGroupDefinition(record)]});const read=useStockGroups.getState().syncRemote();
     fetchFn.mockResolvedValueOnce(response({deleted_ids:['1'],deleted_count:1}));await useStockGroups.getState().remove(['1']);
     resolve(response([record]));await read;expect(useStockGroups.getState().groups).toEqual([]);expect(useStockGroups.getState().loading).toBe(false);
+  });
+});
+
+
+describe('service-backed stock group operations',()=>{
+  it('accepts raw CLI names and preserves millisecond membership precision',async()=>{
+    const fetchFn=setup().mockResolvedValueOnce(response({...record,name:'CLI name',items:[{symbol:'A',date_from:'1970-01-01',date_to:'1970-01-01',date_from_ms:1001,date_to_ms:2001}]}));
+    const group=await fetchStockGroupMembers('1');expect(group.name).toBe('CLI name');expect(group.members[0].fromMs).toBe(1001);
+    fetchFn.mockResolvedValueOnce(response({...record,name:'CLI name'}));await saveStockGroupMembers('1',group.members);
+    expect(JSON.parse(String(fetchFn.mock.calls[1][1].body)).symbols).toEqual(['A;1001;2001']);
+  });
+  it('uses service load/save and CSV import/export endpoints',async()=>{
+    const fetchFn=setup().mockResolvedValueOnce(response(record));
+    expect((await importStockGroupMembers('1','AAPL')).id).toBe('1');
+    fetchFn.mockResolvedValueOnce(response({content:'AAPL;',count:1}));expect(await exportStockGroupMembers('1')).toBe('AAPL;');
+    fetchFn.mockResolvedValueOnce(response({content:'[]',count:0}));expect(await exportStockGroupCatalog(['1'])).toBe('[]');
+    fetchFn.mockResolvedValueOnce(response({loaded_count:2}));expect(await loadStockGroupCatalog('[{"name":"A"},{"name":"B"}]')).toBe(2);
+    fetchFn.mockResolvedValueOnce(response([{...record,id:'2'}]));await expect(editStockGroupCatalog(['1'],{description:'new'})).rejects.toThrow('Different');
+  });
+  it('confirms backend job identities and controls',async()=>{
+    const running={job_id:'job',kind:'baskets.update_data',status:'RUNNING',progress:10};
+    const fetchFn=setup().mockResolvedValueOnce(response(running));
+    expect((await startStockGroupUpdate(['1'])).status).toBe('RUNNING');
+    fetchFn.mockResolvedValueOnce(response({...running,status:'PAUSED'}));expect((await controlStockGroupJob('job','pause')).status).toBe('PAUSED');
+    fetchFn.mockResolvedValueOnce(response({...running,job_id:'other'}));await expect(fetchStockGroupJob('job')).rejects.toThrow('Different');
+    fetchFn.mockResolvedValueOnce(response({...running,kind:'other'}));await expect(startStockGroupUpdate(['1'])).rejects.toThrow('Invalid');
   });
 });

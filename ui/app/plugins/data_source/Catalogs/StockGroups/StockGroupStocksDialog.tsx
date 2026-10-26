@@ -1,22 +1,25 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from '../../../../components/ui';
-import { formatStockLines, parseStockLines, serializeStockMembersJson, stockGroupLimits, type StockGroupDefinition } from './stockGroups';
+import { formatStockLines, parseStockLines, stockGroupLimits, type StockGroupDefinition } from './stockGroups';
+import { fetchStockGroupMembers, importStockGroupMembers, exportStockGroupMembers } from './stockGroupApiClient';
 import { useStockGroups } from './stockGroupsStore';
 import './stockGroups.css';
 
-function download(filename: string, text: string, mime = 'text/csv;charset=utf-8') { const url = URL.createObjectURL(new Blob([text], { type: mime })); const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url); }
-
-export function StockGroupStocksDialog({ group, onClose, onSaved }: { group: StockGroupDefinition; onClose: () => void; onSaved: (message: string) => void }) {
-  const [text, setText] = useState(formatStockLines(group.members)); const [error, setError] = useState(''); const fileRef = useRef<HTMLInputElement>(null);
-  const [pending,setPending]=useState(false);
-  const replace = async (value: string, message: string) => { if(pending)return;setPending(true);try { await useStockGroups.getState().replaceMembers(group.id, parseStockLines(value)); onSaved(message); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save stocks.'); } finally{setPending(false);} };
-  const choose = () => { if (group.system) { setError("Stocks can't be imported to this group."); return; } fileRef.current?.click(); };
-  const read = async (file?: File) => { if (!file) return; try { if (!/\.(csv|txt)$/i.test(file.name)) throw new Error('Choose a CSV or text file.'); if (file.size > stockGroupLimits.csv) throw new Error('Stock list exceeds the 20 MiB limit.'); await replace(await file.text(), 'Stocks were imported'); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to import stocks.'); } };
-  return <div className="stock-groups-flow"><Modal title={`Edit stocks ${group.name}`} width={700} onClose={()=>{if(!pending)onClose();}} footer={<><Button disabled={pending} onClick={onClose}>Close</Button><Button className="primary" disabled={pending} onClick={() => void replace(text, 'Stocks were saved.')}>Save</Button></>}>
-    <p className="stock-group-help">Use the textarea below to define the individual stocks in this group, separated by lines. You can optionally also add dates of addition and removal from index as the newxt two columns.</p>
-    <p className="stock-group-format"><strong>Format (date format is DD.MM.YYYY):</strong><br/>Ticker;Date from (optional); Date to(optional)<br/><strong>Example:</strong><br/>AAPL<br/>TSLA;01.12.2020<br/>AMZN;15.04.2007;30.05.2015</p>
-    {error && <p className="stock-group-error" role="alert">{error}</p>}
-    <div className="stock-group-file-actions"><Button disabled={pending} onClick={choose}>Import from file</Button><Button disabled={pending} onClick={() => { download(`${group.name.replace(/[[\]]/g, '')}_stocks.csv`, formatStockLines(group.members, true)); onClose(); }}>Export to file</Button><input ref={fileRef} hidden type="file" accept=".csv,.txt,text/csv,text/plain" aria-label="Choose stocks CSV" onChange={event => void read(event.target.files?.[0])}/></div>
-    <textarea className="text-input stock-group-members" aria-label="Stocks" value={text} onChange={event => setText(event.target.value)}/>
+function download(name:string,text:string) {const url=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+export function StockGroupStocksDialog({group,onClose,onSaved}:{group:StockGroupDefinition;onClose:()=>void;onSaved:(message:string)=>void}) {
+  const [text,setText]=useState(formatStockLines(group.members));const [error,setError]=useState('');
+  const [pending,setPending]=useState(false);const [loading,setLoading]=useState(true);const [loadFailed,setLoadFailed]=useState(false);
+  const busy=useRef(false);const fileRef=useRef<HTMLInputElement>(null);
+  useEffect(()=>{let current=true;void fetchStockGroupMembers(group.id).then(saved=>{if(current)setText(formatStockLines(saved.members));}).catch(cause=>{if(current){setError(cause instanceof Error?cause.message:'Unable to load stocks');setLoadFailed(true);}}).finally(()=>{if(current)setLoading(false);});return()=>{current=false;};},[group.id]);
+  function close(){if(!busy.current)onClose();}
+  async function work(action:()=>Promise<void>){if(busy.current)return;busy.current=true;setPending(true);setError('');try{await action();}catch(cause){setError(cause instanceof Error?cause.message:'Unable to save stocks');}finally{busy.current=false;setPending(false);}}
+  async function read(file?:File){if(!file)return;await work(async()=>{if(file.size>stockGroupLimits.csv)throw new Error('Stock list exceeds 20 MiB.');await importStockGroupMembers(group.id,await file.text());await useStockGroups.getState().syncRemote();onSaved('Stocks were imported');onClose();});}
+  const disabled=pending||loading||loadFailed;
+  return <div className="stock-groups-flow"><Modal title={`Edit stocks ${group.name}`} width={700} onClose={close} footer={<><Button disabled={pending} onClick={close}>Close</Button><Button disabled={disabled||group.system} className="primary" onClick={()=>void work(async()=>{await useStockGroups.getState().replaceMembers(group.id,parseStockLines(text));onSaved('Stocks were saved.');onClose();})}>Save</Button></>}>
+    {loading&&<p role="status">Loading stocks…</p>}{error&&<p role="alert" className="stock-group-error">{error}</p>}
+    <p>One membership per line: Ticker;Date from;Date to. Dates are optional and use DD.MM.YYYY or Unix milliseconds.</p>
+    <p>AAPL<br/>TSLA;01.12.2020<br/>AMZN;15.04.2007;30.05.2015</p>
+    <div className="stock-group-file-actions"><Button disabled={disabled||group.system} onClick={()=>fileRef.current?.click()}>Import from file</Button><Button disabled={disabled} onClick={()=>void work(async()=>{download(`${group.name.replace(/[[\]]/g,'')}_stocks.csv`,await exportStockGroupMembers(group.id));onSaved('Stocks were exported');})}>Export to file</Button><input ref={fileRef} hidden type="file" accept=".csv,.txt,text/csv,text/plain" aria-label="Choose stocks CSV" onChange={event=>void read(event.target.files?.[0])}/></div>
+    <textarea aria-label="Stocks" className="text-input stock-group-members" disabled={disabled||group.system} value={text} onChange={event=>{setText(event.target.value);setError('');}}/>
   </Modal></div>;
 }

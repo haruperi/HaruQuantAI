@@ -60,6 +60,9 @@ def create_app(
             yield
         finally:
             logger.info("Backend shutting down")
+            if (jobs := getattr(application.state, "basket_jobs", None)) is not None:
+                await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
+                del application.state.basket_jobs
             del application.state.sessions
             del application.state.settings
             del application.state.persistence

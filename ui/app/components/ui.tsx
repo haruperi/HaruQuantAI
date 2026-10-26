@@ -11,7 +11,6 @@ export function Section({ title, description, children, actions }: { title: stri
 export function Modal({ title, onClose, children, footer, width = 620, className = '', showHeaderClose = true }: { title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; width?: number; className?: string; showHeaderClose?: boolean }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const titleId = `modal-title-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   useEffect(() => {
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const close = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -20,7 +19,7 @@ export function Modal({ title, onClose, children, footer, width = 620, className
     else dialogRef.current?.querySelector<HTMLElement>('button, input, select')?.focus();
     return () => { document.removeEventListener('keydown', close); previousFocus?.focus(); };
   }, [onClose]);
-  return <div className="modal-backdrop" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}><div ref={dialogRef} className={`modal ${className}`} role="dialog" aria-modal="true" aria-labelledby={titleId} style={{ width }}><header><h2 id={titleId}>{title}</h2>{showHeaderClose && <IconButton ref={closeButtonRef} title="Close" onClick={onClose}><X size={16}/></IconButton>}</header><div className="modal-content">{children}</div>{footer && <footer>{footer}</footer>}</div></div>;
+  return <div className="modal-backdrop" role="presentation" onMouseDown={e => e.target === e.currentTarget && onClose()}><div ref={dialogRef} className={`modal ${className}`} role="dialog" aria-modal="true" aria-label={title} style={{ width }}><header><h2>{title}</h2>{showHeaderClose && <IconButton ref={closeButtonRef} title="Close" onClick={onClose}><X size={16}/></IconButton>}</header><div className="modal-content">{children}</div>{footer && <footer>{footer}</footer>}</div></div>;
 }
 export function ProgressBar({ value, label }: { value: number; label?: string }) { return <div className="progress-track"><div style={{ width: `${Math.max(0, Math.min(100, value))}%` }}><span>{label ?? `${Math.round(value)}%`}</span></div></div>; }
 export function Stat({ label, value, tone }: { label: string; value: ReactNode; tone?: 'good' | 'bad' }) { return <div className="stat"><span>{label}</span><strong className={tone}>{value}</strong></div>; }

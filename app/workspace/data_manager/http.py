@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import json
 import math
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any
+from threading import Lock
+from typing import Any, cast
 
 from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
@@ -14,8 +16,13 @@ from fastapi.responses import JSONResponse
 
 from app.host.persistence import HostPersistence, RecordFilter
 from app.host.response import ErrorCode
-from app.host.transport import TransportError, _require
+from app.host.transport import (
+    TransportError,
+    _require,  # pyright: ignore[reportPrivateUsage]
+)
+from app.workspace.data_manager.baskets import Baskets
 from app.workspace.data_manager.brokers import Brokers
+from app.workspace.data_manager.data import Data
 from app.workspace.data_manager.sessions import Sessions
 from app.workspace.data_manager.symbols import Symbols
 
@@ -35,6 +42,8 @@ CORE_TABS = {"data", "symbols", "sessions", "brokers", "custom-data"}
 MAX_CSV_BYTES = 10_000_000
 MAX_BROKER_STOCKS = 10000
 MAX_TICKER_LENGTH = 50
+_BASKET_JOB_LOCK = Lock()
+_MAX_BASKET_TRANSFER_BYTES = 20 * 1024 * 1024
 
 
 def _access(request: Request) -> None:
@@ -49,7 +58,10 @@ def _response(result: dict[str, Any]) -> JSONResponse:
     code = (
         200
         if result["success"]
-        else statuses.get((result.get("error") or {}).get("code", "internal"), 503)
+        else statuses.get(
+            cast("dict[str, Any]", result.get("error") or {}).get("code", "internal"),
+            503,
+        )
     )
     return JSONResponse(jsonable_encoder(body), status_code=code)
 
@@ -62,18 +74,19 @@ def _json(value: Any) -> dict[str, Any]:
     return json.loads(value) if isinstance(value, str) else value or {}
 
 
-def _rows(gateway: HostPersistence) -> list[dict[str, Any]]:
+def _rows(
+    gateway: HostPersistence,
+    table: str = "datamgr_symbols",
+    filters: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     offset: int | None = 0
     while offset is not None:
-        result = gateway.read_records("datamgr_symbols", limit=1000, offset=offset)
-        if not result["success"]:
-            raise TransportError(
-                ErrorCode.UNAVAILABLE, "Unable to read the symbol catalog"
-            )
-        data = result["data"]
+        data = _service_data(
+            gateway.read_records(table, filters=filters, limit=1000, offset=offset)
+        )
         rows.extend(data["records"])
-        offset = data.get("pagination", {}).get("next_offset")
+        offset = data["pagination"].get("next_offset")
     return rows
 
 
@@ -140,8 +153,6 @@ def _updates(values: dict[str, Any]) -> dict[str, Any]:
         "order_size_multiplier",
         "order_size_step",
     }
-    if not isinstance(values, dict):
-        raise TransportError(ErrorCode.VALIDATION, "Invalid symbol field values")
     for key in numeric & values.keys():
         value = values[key]
         if value is not None and (
@@ -223,6 +234,10 @@ def create_router() -> APIRouter:
     """Register browser workspace and symbol commands within their domain."""
     router = APIRouter(prefix="/api/v1/data", dependencies=[Depends(_access)])
 
+    @router.get("/home/datasets")
+    def datasets() -> dict[str, Any]:
+        return _ok(_service_data(Data().list()))
+
     @router.get("/workspace")
     def workspace() -> dict[str, Any]:
         return _ok(
@@ -285,6 +300,7 @@ def create_router() -> APIRouter:
 
     _session_routes(router)
     _broker_routes(router)
+    _basket_routes(router)
     return router
 
 
@@ -383,10 +399,7 @@ def _transfer(
 
 
 def _session_rows(service: Sessions) -> list[dict[str, Any]]:
-    result = service.list()
-    if not result["success"]:
-        raise TransportError(ErrorCode.UNAVAILABLE, "Unable to read session catalog")
-    return [{**row, "id": str(row["id"])} for row in result["data"]]
+    return [{**row, "id": str(row["id"])} for row in _service_data(service.list())]
 
 
 def _session_name(service: Sessions, identifier: Any) -> str:
@@ -399,37 +412,50 @@ def _session_name(service: Sessions, identifier: Any) -> str:
 
 
 def _session_result(result: dict[str, Any]) -> Any:
-    if not result["success"]:
-        return _response(result)
-    return _ok({**result["data"], "id": str(result["data"]["id"])})
+    data = _service_data(result)
+    return _ok({**data, "id": str(data["id"])})
 
 
-def _session_transfer(command: str, body: dict[str, Any], service: Sessions) -> Any:
-    with TemporaryDirectory(prefix="haru-sessions-") as folder:
-        path = Path(folder) / "sessions.json"
-        if command == "load":
+def _catalog_transfer(
+    command: str, body: dict[str, Any], service: Any, identifier: int | None = None
+) -> Any:
+    with TemporaryDirectory(prefix="haru-catalog-") as folder:
+        path = Path(folder) / (
+            "stocks.csv" if identifier is not None else "catalog.json"
+        )
+        if command in {"load", "import-stocks"}:
             content = body.get("content")
-            if (
-                not isinstance(content, str)
-                or len(content.encode("utf-8")) > MAX_CSV_BYTES
-            ):
+            maximum = (
+                _MAX_BASKET_TRANSFER_BYTES
+                if isinstance(service, Baskets)
+                else MAX_CSV_BYTES
+            )
+            if not isinstance(content, str) or len(content.encode("utf-8")) > maximum:
                 raise TransportError(
-                    ErrorCode.VALIDATION, "Choose a JSON file up to 10 MB"
+                    ErrorCode.VALIDATION, f"Choose a file up to {maximum} bytes"
                 )
             path.write_text(content, encoding="utf-8")
-            result = service.load(path)
-            if result["success"]:
-                return _ok({"loaded_count": len(result["data"])})
+            result = (
+                service.load(path)
+                if identifier is None
+                else service.import_stocks(identifier, path)
+            )
+            rows = _service_data(result)
+            return (
+                _ok({"loaded_count": len(rows)})
+                if identifier is None
+                else _ok(_basket_record(service, identifier))
+            )
+        if identifier is not None:
+            result = service.export_stocks(identifier, path)
+        elif isinstance(service, Baskets) and "ids" in body:
+            result = service.save(path, _basket_ids(body["ids"]))
         else:
             result = service.save(path)
-            if result["success"]:
-                return _ok(
-                    {
-                        "content": path.read_text(encoding="utf-8"),
-                        "count": result["data"]["count"],
-                    }
-                )
-        return _response(result)
+        data = _service_data(result)
+        return _ok(
+            {"content": path.read_text(encoding="utf-8"), "count": data["count"]}
+        )
 
 
 def _session_routes(router: APIRouter) -> None:
@@ -468,9 +494,11 @@ def _session_routes(router: APIRouter) -> None:
         ids = body.get("session_ids")
         if not isinstance(ids, list) or not ids:
             raise TransportError(ErrorCode.VALIDATION, "Select sessions to delete")
-        result = service.delete([_session_name(service, item) for item in ids])
+        result = service.delete(
+            [_session_name(service, item) for item in cast("Any", ids)]
+        )
         return (
-            _ok({"deleted": list(dict.fromkeys(ids))})
+            _ok({"deleted": list(dict.fromkeys(cast("Any", ids)))})
             if result["success"]
             else _response(result)
         )
@@ -522,12 +550,12 @@ def _session_transfer_route(router: APIRouter) -> None:
     def session_transfer(command: str, request: Request, body: dict[str, Any]) -> Any:
         if command not in {"load", "save"}:
             raise TransportError(ErrorCode.NOT_FOUND, "Unknown session command")
-        return _session_transfer(command, body, Sessions(request.app.state.persistence))
+        return _catalog_transfer(command, body, Sessions(request.app.state.persistence))
 
 
-def _broker_result(response: dict[str, Any]) -> Any:
+def _service_data(response: dict[str, Any]) -> Any:
     if not response["success"]:
-        error = response.get("error") or {}
+        error: dict[str, Any] = response.get("error") or {}
         raise TransportError(
             ErrorCode(error.get("code", "internal")), response["message"]
         )
@@ -535,20 +563,10 @@ def _broker_result(response: dict[str, Any]) -> Any:
 
 
 def _broker_stocks(gateway: HostPersistence, identifier: int) -> list[str]:
-    rows: list[str] = []
-    offset: int | None = 0
-    while offset is not None:
-        data = _broker_result(
-            gateway.read_records(
-                "datamgr_broker_stock",
-                filters={"BROKER_ID": identifier},
-                limit=1000,
-                offset=offset,
-            )
-        )
-        rows.extend(row["TICKER"] for row in data["records"])
-        offset = data["pagination"].get("next_offset")
-    return rows
+    return [
+        row["TICKER"]
+        for row in _rows(gateway, "datamgr_broker_stock", {"BROKER_ID": identifier})
+    ]
 
 
 def _broker_ui(row: dict[str, Any], gateway: HostPersistence) -> dict[str, Any]:
@@ -571,21 +589,14 @@ def _selected_brokers(service: Brokers, ids: Any) -> list[dict[str, Any]]:
         or not ids
         or any(
             not isinstance(value, str) or not value.isdecimal() or int(value) < 1
-            for value in ids
+            for value in cast("Any", ids)
         )
     ):
         raise TransportError(ErrorCode.VALIDATION, "Choose saved broker profiles")
-    rows = {str(row["id"]): row for row in _broker_result(service.list())}
-    if any(value not in rows for value in ids):
+    rows = {str(row["id"]): row for row in _service_data(service.list())}
+    if any(value not in rows for value in cast("Any", ids)):
         raise TransportError(ErrorCode.NOT_FOUND, "Broker profile not found")
-    return [rows[value] for value in dict.fromkeys(ids)]
-
-
-def _require_custom_brokers(rows: list[dict[str, Any]]) -> None:
-    if any(row["is_system"] for row in rows):
-        raise TransportError(
-            ErrorCode.VALIDATION, "System broker profiles cannot be changed"
-        )
+    return [rows[value] for value in dict.fromkeys(cast("Any", ids))]
 
 
 def _broker_routes(router: APIRouter) -> None:
@@ -595,10 +606,7 @@ def _broker_routes(router: APIRouter) -> None:
     def listing(request: Request) -> Any:
         gateway = request.app.state.persistence
         return _ok(
-            [
-                _broker_ui(row, gateway)
-                for row in _broker_result(Brokers(gateway).list())
-            ]
+            [_broker_ui(row, gateway) for row in _service_data(Brokers(gateway).list())]
         )
 
     _broker_save_route(router)
@@ -612,13 +620,14 @@ def _broker_routes(router: APIRouter) -> None:
         with gateway.transaction() as tx:
             service = Brokers(tx, manage_transactions=False)
             rows = _selected_brokers(service, body.get("ids"))
+            fields = cast("dict[str, Any]", fields)
             _validate_broker_changes(tx, rows, fields)
             result = service.edit([row["name"] for row in rows], fields)
-            _broker_result(result)
+            _service_data(result)
         return _ok(
             [
                 _broker_ui(row, gateway)
-                for row in _broker_result(Brokers(gateway).list())
+                for row in _service_data(Brokers(gateway).list())
                 if str(row["id"]) in body["ids"]
             ]
         )
@@ -632,7 +641,7 @@ def _broker_routes(router: APIRouter) -> None:
             for row in rows:
                 _check_broker_unused(tx, row)
                 _clear_broker_stocks(tx, row["id"])
-            _broker_result(service.delete([row["name"] for row in rows]))
+            _service_data(service.delete([row["name"] for row in rows]))
         ids = [str(row["id"]) for row in rows]
         return _ok({"deleted_ids": ids, "deleted_count": len(ids)})
 
@@ -659,20 +668,16 @@ def _broker_save_route(router: APIRouter) -> None:
                 rows = _selected_brokers(service, [body["id"]])
                 _validate_broker_changes(tx, rows, fields)
                 result = service.edit(rows[0]["name"], fields)
-                row = _broker_result(result)[0]
+                row = _service_data(result)[0]
             else:
                 result = service.add(**fields)
-                row = _broker_result(result)
-        return _ok(
-            _broker_ui(
-                next(
-                    item
-                    for item in _broker_result(Brokers(gateway).list())
-                    if item["id"] == row["id"]
-                ),
-                gateway,
-            )
+                row = _service_data(result)
+        saved = next(
+            item
+            for item in _service_data(Brokers(gateway).list())
+            if item["id"] == row["id"]
         )
+        return _ok(_broker_ui(saved, gateway))
 
 
 def _broker_transfer_routes(router: APIRouter) -> None:
@@ -680,32 +685,7 @@ def _broker_transfer_routes(router: APIRouter) -> None:
     def transfer(command: str, request: Request, body: dict[str, Any]) -> Any:
         if command not in {"load", "save"}:
             raise TransportError(ErrorCode.NOT_FOUND, "Unknown broker operation")
-        service = Brokers(request.app.state.persistence)
-        with TemporaryDirectory(prefix="haru-brokers-") as folder:
-            path = Path(folder) / "brokers.json"
-            if command == "load":
-                content = body.get("content")
-                if (
-                    not isinstance(content, str)
-                    or len(content.encode("utf-8")) > MAX_CSV_BYTES
-                ):
-                    raise TransportError(
-                        ErrorCode.VALIDATION, "Choose a JSON file up to 10 MB"
-                    )
-                path.write_text(content, encoding="utf-8")
-                result = service.load(path)
-                if result["success"]:
-                    return _ok({"loaded_count": len(result["data"])})
-            else:
-                result = service.save(path)
-                if result["success"]:
-                    return _ok(
-                        {
-                            "content": path.read_text(encoding="utf-8"),
-                            "count": result["data"]["count"],
-                        }
-                    )
-            return _response(result)
+        return _catalog_transfer(command, body, Brokers(request.app.state.persistence))
 
 
 def _broker_stock_routes(router: APIRouter) -> None:
@@ -733,26 +713,31 @@ def _broker_stock_routes(router: APIRouter) -> None:
         values = body.get("stocks")
         if (
             not isinstance(values, list)
-            or len(values) > MAX_BROKER_STOCKS
+            or len(cast("Any", values)) > MAX_BROKER_STOCKS
             or any(
                 not isinstance(value, str)
                 or not value.strip()
                 or len(value.strip()) > MAX_TICKER_LENGTH
-                for value in values
+                for value in cast("Any", values)
             )
         ):
             raise TransportError(ErrorCode.VALIDATION, "Choose valid stock tickers")
-        values = list(dict.fromkeys(value.strip() for value in values))
+        values = list(
+            dict.fromkeys(value.strip() for value in cast("list[str]", values))
+        )
         with gateway.transaction() as tx:
             rows = _selected_brokers(Brokers(tx), [identifier])
-            _require_custom_brokers(rows)
+            if rows[0]["is_system"]:
+                raise TransportError(
+                    ErrorCode.VALIDATION, "System broker profiles cannot be changed"
+                )
             if not rows[0]["stockpicker_use"]:
                 raise TransportError(
                     ErrorCode.VALIDATION, "Enable stock filtering first"
                 )
             _clear_broker_stocks(tx, int(identifier))
             for start in range(0, len(values), 1000):
-                _broker_result(
+                _service_data(
                     tx.create_records(
                         "datamgr_broker_stock",
                         [
@@ -770,7 +755,7 @@ def _check_broker_unused(gateway: HostPersistence, row: dict[str, Any]) -> None:
         ("datamgr_sessions", "broker_id", row["id"]),
         ("datamgr_datasets", "broker", str(row["id"])),
     ):
-        data = _broker_result(
+        data = _service_data(
             gateway.read_records(table, filters={column: value}, limit=1)
         )
         if data["records"]:
@@ -782,14 +767,14 @@ def _check_broker_unused(gateway: HostPersistence, row: dict[str, Any]) -> None:
 
 def _clear_broker_stocks(gateway: HostPersistence, identifier: int) -> None:
     while True:
-        records = _broker_result(
+        records = _service_data(
             gateway.read_records(
                 "datamgr_broker_stock", filters={"BROKER_ID": identifier}, limit=1000
             )
         )["records"]
         if not records:
             return
-        _broker_result(
+        _service_data(
             gateway.delete_record(
                 "datamgr_broker_stock",
                 filters=[RecordFilter("ID", "in", [row["ID"] for row in records])],
@@ -814,7 +799,7 @@ def _validate_broker_changes(
             )
         timezone = fields.get("server_timezone", row["server_timezone"])
         if timezone != row["server_timezone"]:
-            data = _broker_result(
+            data = _service_data(
                 gateway.read_records(
                     "datamgr_datasets", filters={"broker": str(row["id"])}, limit=1
                 )
@@ -823,3 +808,192 @@ def _validate_broker_changes(
                 raise TransportError(
                     ErrorCode.CONFLICT, "Broker timezone is used by saved datasets"
                 )
+
+
+def _basket_ids(values: Any) -> list[int]:
+    if (
+        not isinstance(values, list)
+        or not values
+        or any(
+            not isinstance(value, str)
+            or not value.isascii()
+            or not value.isdecimal()
+            or int(value) < 1
+            for value in cast("Any", values)
+        )
+    ):
+        raise TransportError(ErrorCode.VALIDATION, "Select saved stock groups")
+    return list(dict.fromkeys(int(value) for value in cast("list[str]", values)))
+
+
+def _basket_ui(row: dict[str, Any]) -> dict[str, Any]:
+    def date(value: int, missing: int) -> str | None:
+        return (
+            None
+            if value == missing
+            else (datetime(1970, 1, 1, tzinfo=UTC) + timedelta(milliseconds=value))
+            .date()
+            .isoformat()
+        )
+
+    return {
+        **row,
+        "id": str(row["id"]),
+        "items": [
+            {
+                "symbol": item["ticker"],
+                "date_from": date(item["date_from"], 0),
+                "date_to": date(item["date_to"], -1),
+                "date_from_ms": item["date_from"],
+                "date_to_ms": item["date_to"],
+            }
+            for item in row["stocks"]
+        ],
+    }
+
+
+def _basket_record(service: Baskets, identifier: int) -> dict[str, Any]:
+    for row in _service_data(service.list()):
+        if row["id"] == identifier:
+            return _basket_ui(row)
+    raise TransportError(ErrorCode.NOT_FOUND, "Stock group not found")
+
+
+def _basket_jobs(request: Request, *, create: bool = False) -> Any:
+    from app.host.jobs import JobManager
+
+    with _BASKET_JOB_LOCK:
+        jobs = getattr(request.app.state, "basket_jobs", None)
+        if jobs is None and create:
+            jobs = JobManager(
+                persistence=request.app.state.persistence,
+                max_workers=1,
+                use_process_pool=False,
+            )
+            request.app.state.basket_jobs = jobs
+    if jobs is None:
+        raise TransportError(ErrorCode.NOT_FOUND, "No stock group update job")
+    return jobs
+
+
+def _basket_routes(router: APIRouter) -> None:
+    @router.get("/baskets")
+    def listing(request: Request) -> Any:
+        return _ok(
+            [
+                _basket_ui(row)
+                for row in _service_data(Baskets(request.app.state.persistence).list())
+            ]
+        )
+
+    @router.post("/baskets")
+    def save(request: Request, body: dict[str, Any]) -> Any:
+        service = Baskets(request.app.state.persistence)
+        fields = {k: body[k] for k in ("name", "description", "system") if k in body}
+        if "id" in body:
+            result = service.edit(_basket_ids([body["id"]]), fields)
+            row = _service_data(result)[0]
+        else:
+            row = _service_data(service.add(**fields))
+        return _ok(_basket_record(service, row["id"]))
+
+    @router.post("/baskets/{command}")
+    def action(command: str, request: Request, body: dict[str, Any]) -> Any:
+        service = Baskets(request.app.state.persistence)
+        if command == "delete":
+            rows = _service_data(service.delete(_basket_ids(body.get("ids"))))
+            return _ok(
+                {
+                    "deleted_ids": [str(row["id"]) for row in rows],
+                    "deleted_count": len(rows),
+                }
+            )
+        if command == "edit":
+            fields = body.get("updates")
+            if not isinstance(fields, dict):
+                raise TransportError(
+                    ErrorCode.VALIDATION, "Choose group fields to edit"
+                )
+            rows = _service_data(
+                service.edit(
+                    _basket_ids(body.get("ids")), cast("dict[str, Any]", fields)
+                )
+            )
+            return _ok([_basket_record(service, row["id"]) for row in rows])
+        if command == "update-data":
+            ids = _basket_ids(body.get("ids"))
+            return _response(
+                Baskets(
+                    service.gateway, jobs=_basket_jobs(request, create=True)
+                ).update_data(ids)
+            )
+        if command in {"load", "save"}:
+            return _catalog_transfer(command, body, service)
+        raise TransportError(ErrorCode.NOT_FOUND, "Unknown stock group operation")
+
+    _basket_stock_routes(router)
+    _basket_job_routes(router)
+
+
+def _basket_stock_routes(router: APIRouter) -> None:
+    @router.get("/baskets/{identifier}/stocks")
+    def stocks(identifier: str, request: Request) -> Any:
+        service = Baskets(request.app.state.persistence)
+        number = _basket_ids([identifier])[0]
+        _service_data(service.list_stocks(number))
+        return _ok(_basket_record(service, number))
+
+    @router.put("/baskets/{identifier}/stocks")
+    def edit(identifier: str, request: Request, body: dict[str, Any]) -> Any:
+        service = Baskets(request.app.state.persistence)
+        number = _basket_ids([identifier])[0]
+        symbols = body.get("symbols")
+        if not isinstance(symbols, list) or any(
+            not isinstance(row, str) for row in cast("Any", symbols)
+        ):
+            raise TransportError(
+                ErrorCode.VALIDATION, "Supply ticker;from;to membership lines"
+            )
+        _service_data(
+            service.edit_stocks(number, "\n".join(cast("list[str]", symbols)))
+        )
+        return _ok(_basket_record(service, number))
+
+    @router.post("/baskets/{identifier}/{command}")
+    def transfer(
+        identifier: str, command: str, request: Request, body: dict[str, Any]
+    ) -> Any:
+        if command not in {"import-stocks", "export-stocks"}:
+            raise TransportError(ErrorCode.NOT_FOUND, "Unknown stock operation")
+        return _catalog_transfer(
+            command,
+            body,
+            Baskets(request.app.state.persistence),
+            _basket_ids([identifier])[0],
+        )
+
+
+def _basket_job_routes(router: APIRouter) -> None:
+    @router.get("/basket-jobs/{job_id}")
+    @router.post("/basket-jobs/{job_id}/{action}")
+    def job(job_id: str, request: Request, action: str | None = None) -> Any:
+        jobs = _basket_jobs(request)
+        record = jobs.get_job(job_id)
+        if record is None or record.kind != "baskets.update_data":
+            raise TransportError(
+                ErrorCode.NOT_FOUND, "Stock group update job not found"
+            )
+        if request.method == "POST":
+            handlers = {
+                "pause": jobs.pause_job,
+                "resume": jobs.resume_job,
+                "stop": jobs.cancel_job,
+            }
+            if action not in handlers:
+                raise TransportError(ErrorCode.NOT_FOUND, "Unknown job action")
+            if not handlers[action](job_id):
+                raise TransportError(
+                    ErrorCode.CONFLICT, "Job cannot perform that action"
+                )
+            record = jobs.get_job(job_id)
+        return _ok(record.to_dict())
