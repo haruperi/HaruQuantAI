@@ -43,7 +43,7 @@ def safe_component(value: str) -> str:
     """Validate a filesystem/catalog identity without changing its meaning."""
     if (
         not isinstance(value, str)
-        or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", value)
+        or not re.fullmatch(r"[A-Za-z0-9@^$][A-Za-z0-9_.@^$=+-]*", value)
         or ".." in value
         or value.endswith(".")
     ):
@@ -53,8 +53,31 @@ def safe_component(value: str) -> str:
 
 def price_columns(timeframe: str) -> list[str]:
     """Return canonical price columns for a supported historical resolution."""
-    if timeframe not in ("M1", "TICK"):
-        raise ValueError("Supported historical resolutions are M1 and TICK")
+    if timeframe not in (
+        "TICK",
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M10",
+        "M12",
+        "M15",
+        "M20",
+        "M30",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H6",
+        "H8",
+        "H12",
+        "D1",
+        "W1",
+        "MN1",
+    ):
+        raise ValueError("Unsupported historical resolution")
     return ["Bid", "Ask"] if timeframe == "TICK" else ["Open", "High", "Low", "Close"]
 
 
@@ -109,7 +132,7 @@ def encode_frame(frame: pd.DataFrame, timeframe: str, tick_size: float) -> pa.Ta
         if unsigned in frame
         else [0] * len(frame)
     )
-    if timeframe == "M1":
+    if timeframe != "TICK":
         if any(
             not low <= min(open_, close) <= max(open_, close) <= high
             for open_, high, low, close in zip(

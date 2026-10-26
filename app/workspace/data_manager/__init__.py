@@ -30,6 +30,7 @@ if TYPE_CHECKING:
     from app.workspace.data_manager.help import Help
     from app.workspace.data_manager.logs import Logs
     from app.workspace.data_manager.sessions import Sessions
+    from app.workspace.data_manager.sources import Sources
     from app.workspace.data_manager.symbols import Symbols
 
 
@@ -45,6 +46,7 @@ def __getattr__(name: str) -> Any:
         "CustomData": "custom",
         "Help": "help",
         "Dukascopy": "dukascopy",
+        "Sources": "sources",
     }
     if name in services:
         return getattr(import_module(f"{__name__}.{services[name]}"), name)
@@ -84,6 +86,7 @@ __all__ = [
     "Logs",
     "Sessions",
     "SessionsCLI",
+    "Sources",
     "Symbols",
     "SymbolsCLI",
     "format_basket_table",

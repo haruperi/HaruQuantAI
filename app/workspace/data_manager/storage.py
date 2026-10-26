@@ -18,6 +18,10 @@ import pyarrow.parquet as pq
 
 from app.host.persistence import HostPersistence
 from app.include.market_storage import catalog_paths, encode_frame, safe_component
+from app.workspace.data_manager.coverage import (
+    add_completed_range,
+    observation_coverage,
+)
 from app.workspace.data_manager.partition_files import (
     FilePublication,
     canonical_target,
@@ -43,7 +47,7 @@ def dataset_root(storage_root: Path, symbol: str, timeframe: str) -> Path:
     safe_component(symbol)
     return (
         storage_root.resolve()
-        / ("m1" if timeframe == "M1" else "ticks")
+        / ("ticks" if timeframe == "TICK" else timeframe.lower())
         / symbol.lower()
     )
 
@@ -56,7 +60,7 @@ def _checkpoint(context: Any) -> None:
 def _partition_key(date: datetime, timeframe: str) -> str:
     return (
         str(date.year)
-        if timeframe == "M1"
+        if timeframe != "TICK"
         else f"{date.year}/{date.month:02d}-{calendar.month_abbr[date.month].lower()}"
     )
 
@@ -72,6 +76,7 @@ def publish_frame(
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     context: Any = None,
+    coverage: tuple[datetime, datetime] | None = None,
 ) -> dict[str, Any]:
     """Prepare files outside SQLite, then publish with a snapshot check."""
     root = dataset_root(storage_root, record["symbol"], record["timeframe"])
@@ -89,6 +94,7 @@ def publish_frame(
                     date_from=date_from,
                     date_to=date_to,
                     context=context,
+                    coverage=coverage,
                 )
             except _SnapshotChangedError:
                 if attempt == _PUBLICATION_ATTEMPTS - 1:
@@ -116,6 +122,7 @@ def _publish_frame_once(
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     context: Any = None,
+    coverage: tuple[datetime, datetime] | None = None,
 ) -> dict[str, Any]:
     """Publish one consistent dataset snapshot; overwrite affects only its range."""
     table = encode_frame(frame, record["timeframe"], tick_size)
@@ -157,6 +164,14 @@ def _publish_frame_once(
                 "storage": "canonical-partitions-v1",
             }
         )
+        if previous and any(
+            not Path(path).is_file() for path in catalog_paths(previous)
+        ):
+            lineage.pop("covered_ranges", None)
+        if coverage is not None:
+            add_completed_range(
+                lineage, *observation_coverage(table, record["timeframe"], coverage)
+            )
         values = {
             **record,
             "path": str(root),
@@ -234,7 +249,11 @@ def _publish_parts(
     )
     if not incoming.num_rows:
         raise ValueError("No observations in the requested interval")
-    active = catalog_paths(previous) if previous else []
+    active = (
+        [path for path in catalog_paths(previous) if Path(path).is_file()]
+        if previous
+        else []
+    )
     groups: dict[str, list[str]] = {}
     for path in active:
         metadata = pq.read_metadata(path)
@@ -251,7 +270,7 @@ def _publish_parts(
     months = pc.month(utc_values)
     pairs = (
         {(year, 1) for year in pc.unique(years).to_pylist()}
-        if timeframe == "M1"
+        if timeframe != "TICK"
         else set(zip(years.to_pylist(), months.to_pylist(), strict=True))
     )
     keys = {
@@ -309,11 +328,11 @@ def _summary(output: list[str]) -> dict[str, Any]:
 
 def _overlaps(key: str, timeframe: str, lower: datetime, upper: datetime) -> bool:
     year = int(key.split("/", maxsplit=1)[0])
-    month = 1 if timeframe == "M1" else int(key.split("/")[1][:2])
+    month = 1 if timeframe != "TICK" else int(key.split("/")[1][:2])
     start = datetime(year, month, 1, tzinfo=UTC)
     end = (
         datetime(year + 1, 1, 1, tzinfo=UTC)
-        if timeframe == "M1" or month == _MONTHS
+        if timeframe != "TICK" or month == _MONTHS
         else datetime(year, month + 1, 1, tzinfo=UTC)
     )
     return start <= upper and lower < end
@@ -363,7 +382,7 @@ def _merge_partition(
             )
         columns = part.column_names
         quoted = ", ".join(f'"{column}"' for column in columns)
-        identity = '"DateTime"' if timeframe == "M1" else quoted
+        identity = '"DateTime"' if timeframe != "TICK" else quoted
         order = "DESC" if overwrite else "ASC"
         query = (
             f"SELECT {quoted} FROM (SELECT *, row_number() OVER ("  # noqa: S608

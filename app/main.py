@@ -68,6 +68,8 @@ def create_app(
                 if (jobs := getattr(application.state, name, None)) is not None:
                     await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
                     delattr(application.state, name)
+            if (mt5 := getattr(application.state, "data_mt5", None)) is not None:
+                await mt5.close()
             del application.state.data_logs
             del application.state.sessions
             del application.state.settings

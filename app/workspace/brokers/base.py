@@ -976,7 +976,10 @@ def get_broker(name: str, registry: Any = None) -> Any:
     if target not in _SINGLETONS:
         mod_name, cls_name = _SINGLETON_FACTORIES[target]
         mod = importlib.import_module(f"app.workspace.brokers.{mod_name}")
-        _SINGLETONS[target] = getattr(mod, cls_name)()
+        factory = (
+            mod.create_mt5_client if target == "metatrader" else getattr(mod, cls_name)
+        )
+        _SINGLETONS[target] = factory()
     return _SINGLETONS[target]
 
 

@@ -954,8 +954,56 @@ ZSTD level 6 Parquet files with batched row groups under `data/market/dukascopy/
 `m1/{dataset-symbol}/{year}.parquet` or
 `ticks/{dataset-symbol}/{year}/{month:02d}-{month_abbr}.parquet`.
 The catalog manifest records canonical partition paths.
-`--overwrite` replaces observations only inside the requested range. Without it,
-existing M1 timestamps win; ticks deduplicate by timestamp, bid, ask, and flags.
+`--missing-only` (the default) checks physical files and verified download coverage,
+then requests only missing ranges, including internal bar gaps. `--overwrite`
+refetches and replaces observations only inside the requested range. These flags
+are mutually exclusive. Ticks deduplicate by timestamp, bid, ask, and flags.
 `--download-type standard` selects Dukascopy directly; `cdn` selects StrategyQuant
 archives with direct fallback when no archive is available. Synchronous CLI calls
 finish after catalog publication; the UI uses persistent backend jobs.
+
+
+## Other historical data sources
+
+These resources share the real historical ingestion service and canonical Parquet
+writer: `darwinex`, `binance`, `binance_coinm`, `binance_usdtm`, `bitfinex`,
+`coinbase`, `poloniex`, `yahoo`, `sq_equity`, `sq_futures`, and `mt5`.
+Each provides `capabilities`, `list`, `add`, and `download`.
+
+```powershell
+uv run python -m app.cli data-manager yahoo add AAPL --postfix _yahoo --timeframe D1
+uv run python -m app.cli data-manager yahoo download AAPL_yahoo --timeframe D1 --from 2025-01-06 --to 2025-01-07
+uv run python -m app.cli data-manager darwinex add EURUSD --timeframe M1
+uv run python -m app.cli data-manager darwinex download EURUSD --timeframe M1 --from 2025-01-06 --to 2025-01-06
+uv run python -m app.cli data-manager binance add BTCUSDT --timeframe M1
+uv run python -m app.cli data-manager binance_coinm add BTCUSD_PERP --timeframe M1
+uv run python -m app.cli data-manager binance_usdtm add BTCUSDT --timeframe M1
+uv run python -m app.cli data-manager bitfinex add BTCUSD --timeframe M1
+uv run python -m app.cli data-manager coinbase add BTC-USD --timeframe M1
+uv run python -m app.cli data-manager poloniex add BTC_USDT --timeframe M5
+uv run python -m app.cli data-manager coinbase download BTC-USD --timeframe M1 --from 2025-01-06T00:00:00Z --to 2025-01-06T00:09:59Z
+uv run python -m app.cli data-manager sq_equity add AAPL --timeframe D1
+uv run python -m app.cli data-manager sq_equity download AAPL --timeframe D1 --from 2024-01-08 --to 2024-01-09
+uv run python -m app.cli data-manager sq_futures add '@ES' --timeframe D1
+uv run python -m app.cli data-manager sq_futures download '@ES' --timeframe D1 --from 2024-01-08 --to 2024-01-09
+uv run python -m app.cli data-manager mt5 add EURUSD --timeframe M1
+uv run python -m app.cli data-manager mt5 download EURUSD --timeframe M1 --from 2025-01-06 --to 2025-01-06 --wait-seconds 30
+```
+
+`add` accepts `--postfix`, `--broker`, `--timeframe`, and `--tick-size` (storage
+price unit, default `0.00000001`). `download` requires a registered dataset symbol,
+`--from` and `--to`, and accepts mutually exclusive `--missing-only` (default) and
+`--overwrite` for the requested interval. Missing-only skips covered ranges before
+opening a provider connection; overwrite refetches the selected range while
+preserving observations outside it.
+Timeframes remain native: daily data is written under `d1`, minute data under `m1`,
+and other supported bars under their own timeframe, with one `{year}.parquet`.
+Ticks use `ticks/{symbol}/{year}/{month}.parquet`. Integer units are recorded in
+both the catalog and Parquet metadata; decoding is applied only by price readers.
+
+SQ's existing broker supports daily CDN history; its configured sample feed has a
+limited historical range (the live tests used January 2024). MT5 requires an EA
+connection. CLI MT5 settings come from `MT5_BRIDGE_HOST`, `MT5_BRIDGE_PORT`,
+`MT5_BRIDGE_TOKEN`, and `MT5_BRIDGE_TIMEOUT`; its listener must use an available port.
+Source/vendor errors return failure JSON and a nonzero exit code, not simulated
+success. See [historical source behavior](../data-manager/historical-sources.md).

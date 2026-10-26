@@ -90,7 +90,8 @@ def register_dukascopy_commands(resources: Any) -> None:
         default=None,
         help="Underlying catalogue symbol if using custom symbol name",
     )
-    down_cmd.add_argument(
+    modes = down_cmd.add_mutually_exclusive_group()
+    modes.add_argument(
         "--overwrite",
         action="store_true",
         help="Overwrite existing Parquet partitions instead of merging",
@@ -101,6 +102,14 @@ def register_dukascopy_commands(resources: Any) -> None:
         default=None,
         help="Maximum bar/tick count to download (default: all)",
     )
+
+    modes.add_argument(
+        "--missing-only",
+        dest="overwrite",
+        action="store_false",
+        help="Fetch only missing history (default)",
+    )
+    down_cmd.set_defaults(overwrite=False)
 
 
 def _execute_add(service: Dukascopy, args: argparse.Namespace) -> dict[str, Any]:

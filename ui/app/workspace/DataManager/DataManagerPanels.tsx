@@ -1,3 +1,4 @@
+import { useHistoricalSources } from '../../plugins/data_source/Common/historicalSourceStore';
 import { useSessions } from '../../plugins/data_source/Catalogs/Sessions/sessionStore';
 import { useEffect, useState } from 'react';
 import { Button } from '../../components/ui';
@@ -197,6 +198,7 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
   const catalogLoading = useDataManagerStore(state => state.catalogLoading);
   const catalogError = useDataManagerStore(state => state.catalogError);
   const downloadJob = useDukascopyDownloads(state => state.job);
+  const historicalJob = useHistoricalSources(state => state.job);
   const imports = useFileImports();
   const sq = useSQData();
   const darwinex = useDarwinex();
@@ -247,6 +249,7 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
       </tr></thead>
       <tbody>{rows.map(row => {
         const days = row.totalDays ?? 0;
+        const marketStatus = historicalJob?.targets?.includes(row.id) ? `${historicalJob.status} ${historicalJob.progress}%` : '';
         const darwinexIndex = darwinex.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
         const darwinexStatus = darwinexIndex >= 0 ? darwinexIndex < darwinex.job!.completed ? 'Completed' : `${darwinex.job!.state} ${darwinex.job!.progress}%` : darwinex.definitions.some(item => item.id === row.id) ? 'Completed' : '';
         const cryptoIndex = crypto.job?.definitions.findIndex(item => item.id === row.id) ?? -1;
@@ -270,7 +273,7 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
           <td>{row.timeframe}</td><td>{row.timezone}</td><td>{formatDateOnly(row.from)}</td><td>{formatDateOnly(row.to)}</td><td>{days.toLocaleString()}</td>
           <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row && (row.barType === "end" || row.barType === "End of bar") ? "End of bar" : "Start of bar"}</td><td>{row.category}</td>
           <td title={rowPath || '—'}>{rowPath || '—'}</td>
-          <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : ''}</td>
+          <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{marketStatus || (cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : '')}</td>
           <td style={{ textAlign: 'center' }}><button className="symbol-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
         </tr>;
       })}{!rows.length && <tr><td colSpan={17} className="dataset-empty">{catalogLoading ? 'Loading saved dataset catalog…' : catalogError ? 'Saved dataset catalog unavailable.' : allDatasets.length ? 'No matching data.' : 'No saved datasets found in catalog.'}</td></tr>}</tbody>

@@ -32,6 +32,12 @@ Undo copies and a durable journal restore the old files on a failed commit. Back
 startup and the next dataset write resolve journals left by terminated processes.
 A concurrent catalog change causes preparation to retry, up to three attempts.
 
+Verified network ranges are stored in `lineage_json.covered_ranges` with the file
+manifest commit. Missing-only downloads combine this coverage with actual bar
+slots, rather than treating catalog minimum/maximum dates as continuous history.
+Missing files invalidate coverage; clearing data removes it. Legacy tick files
+without verified coverage must be checked against the provider once.
+
 ## Readers and retirement
 
 `lineage_json.partitions` is authoritative. Polars lazy scans and DuckDB queries

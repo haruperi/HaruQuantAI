@@ -85,6 +85,9 @@ def register_commands(commands: Any) -> None:
     register_custom_commands(resources)
     register_help_commands(resources)
     register_dukascopy_commands(resources)
+    from app.workspace.data_manager.sources_cli import register_source_commands
+
+    register_source_commands(resources)
     data_manager.set_defaults(handler=partial(run_command, parser=data_manager))
 
 
@@ -107,6 +110,10 @@ def run_command(
         "help": run_help_command,
         "dukascopy": run_dukascopy_command,
     }
+    from app.workspace.data_manager.sources import PROVIDERS
+    from app.workspace.data_manager.sources_cli import run_source_command
+
+    handlers.update(dict.fromkeys(PROVIDERS, run_source_command))
     result = handlers[arguments.resource](arguments, parser)
     if result is None:
         return 0

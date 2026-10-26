@@ -334,7 +334,14 @@ class SQEquityClient(BrokerClient):
     ) -> pd.DataFrame:
         """Retrieve historical candlestick bars from local storage or StrategyQuant CDN."""
         del start_pos
-        target_count = count or limit or 100
+        target_count = (
+            count
+            if date_from is not None
+            or date_to is not None
+            or start is not None
+            or end is not None
+            else count or limit or 100
+        )
         s = date_from if date_from is not None else start
         e = date_to if date_to is not None else end
         start_sec = epoch_seconds(s)
@@ -347,8 +354,16 @@ class SQEquityClient(BrokerClient):
         tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         self._validate_timeframe(timeframe, tf_name)
 
-        parquet_files = self._find_parquet(self.data_dir, symbol, tf_name)
-        if not parquet_files and self.sqx_history_dir:
+        parquet_files = (
+            self._find_parquet(self.data_dir, symbol, tf_name)
+            if getattr(self, "use_cache", True)
+            else []
+        )
+        if (
+            not parquet_files
+            and self.sqx_history_dir
+            and getattr(self, "use_cache", True)
+        ):
             parquet_files = self._find_parquet(self.sqx_history_dir, symbol, tf_name)
         if parquet_files:
             parquet_bars = load_local_partition_bars(
@@ -357,13 +372,18 @@ class SQEquityClient(BrokerClient):
                 timeframe=tf_name,
                 start=start_sec,
                 end=end_sec,
-                count=target_count,
+                count=target_count or 0,
+                limit=target_count or 0,
             )
             if parquet_bars:
                 return self._rows_to_market_bars(parquet_bars)
 
-        dat_file = self._find_dat(self.data_dir, symbol, tf_name)
-        if not dat_file and self.sqx_history_dir:
+        dat_file = (
+            self._find_dat(self.data_dir, symbol, tf_name)
+            if getattr(self, "use_cache", True)
+            else None
+        )
+        if not dat_file and self.sqx_history_dir and getattr(self, "use_cache", True):
             dat_file = self._find_dat(self.sqx_history_dir, symbol, tf_name)
         if dat_file:
             rows = decode_sq_dat_bytes(

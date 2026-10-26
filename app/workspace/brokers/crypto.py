@@ -506,6 +506,8 @@ class CryptoClient(BrokerClient):
 
     def _normalize_symbol(self, symbol: str) -> str:
         """Normalize symbol string."""
+        if self.api_prefix == "/dapi/v1":
+            return symbol.strip().upper().replace("/", "")
         sym = symbol.strip().upper().replace("/", "").replace("_", "").replace("-", "")
         if sym.endswith(":USDT"):
             sym = sym[:-5] + "USDT"

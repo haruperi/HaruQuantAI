@@ -151,55 +151,28 @@ def _register_dataset_lifecycle_routes(router: APIRouter) -> None:
         if source == "dukascopy":
             return _handle_dukascopy_create(gateway, body)
 
-        symbol = str(body.get("symbol", "")).strip()
-        underlying = str(body.get("underlying", symbol)).strip()
-        timeframe = str(body.get("timeframe", "M1")).strip().upper()
-        broker = str(body.get("broker", "default")).strip()
-        sym_def = str(
-            body.get("symbolDefinition", body.get("instrument", "-1"))
-        ).strip()
+        from app.workspace.data_manager.sources import Sources
 
-        now_iso = "2026-01-01T00:00:00"
-        dataset_id = f"{source}:{symbol}:{timeframe}"
-        service = Dukascopy(gateway)
-        real_broker = service.resolve_broker_name(broker)
-        db_rec = {
-            "id": dataset_id,
-            "source": source,
-            "symbol": symbol,
-            "underlying": underlying,
-            "timeframe": timeframe,
-            "broker": real_broker,
-            "timezone": "UTC",
-            "category": "Forex",
-            "date_from": "",
-            "date_to": "",
-            "bars": 0,
-            "path": f"data/market/{source}/{timeframe.lower()}/{symbol.lower()}",
-            "data_kind": "bars" if timeframe == "M1" else "ticks",
-            "created_at": now_iso,
-            "updated_at": now_iso,
-        }
-        gateway.ensure_datasets_schema()
-        gateway.create_records("datamgr_datasets", db_rec)
-        return _ok({**db_rec, "symbolDefinition": sym_def})
+        try:
+            return _response(Sources(gateway).add(source, [body]))
+        except (ValueError, TypeError) as error:
+            return JSONResponse(
+                {
+                    "success": False,
+                    "status": "error",
+                    "error": {"code": "validation", "message": str(error)},
+                },
+                status_code=422,
+            )
 
     @router.post("/providers/download")
     def provider_download(request: Request, body: dict[str, Any]) -> Any:
         provider = str(body.get("provider", "")).lower()
         if provider == "dukascopy":
             return _ok(start_download(request, body))
-        return JSONResponse(
-            {
-                "success": False,
-                "status": "error",
-                "error": {
-                    "code": "validation",
-                    "message": "Provider download is not implemented",
-                },
-            },
-            status_code=422,
-        )
+        from app.workspace.data_manager.source_jobs import start_source_download
+
+        return _ok(start_source_download(request, body))
 
     @router.post("/datasets/{dataset_id}/clear")
     def clear_dataset(request: Request, dataset_id: str) -> Any:

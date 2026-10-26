@@ -280,6 +280,7 @@ class Data:
                             {
                                 **json.loads(row.get("lineage_json") or "{}"),
                                 "partitions": [],
+                                "covered_ranges": [],
                             }
                         ),
                         "date_from": "",

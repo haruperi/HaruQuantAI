@@ -46,3 +46,14 @@ record or ledger-schema validation is asserted. Manifest does not replace ledger
 ## SQX145 reference qualification
 
 Current donor root: `SQX_145_REFERENCE_ROOT`; source maps bind freshly inspected artifact identities. Retained UI functionality/status is unchanged; source differences and absent counterparts require task-level body/integration research. No runtime or connected backend parity is asserted.
+
+
+## Backend historical ingestion
+
+The Data Manager source-menu entry points now use the shared
+`Common/HistoricalSourceDialog.tsx` and `Common/historicalSourceStore.ts`.
+Registration and downloads use SQLite-backed datasets and real broker requests;
+progress and controls come from backend jobs. Earlier offline/mock modules remain
+for their isolated fixtures, but the live source-menu paths no longer run them.
+See `docs/data-manager/historical-sources.md` for supported native resolutions,
+canonical storage, source limitations, CLI usage and MT5 connection requirements.

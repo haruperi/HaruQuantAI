@@ -23,3 +23,14 @@ FEAT-UI-SQFUTURES-TRACEABILITY owns the Futures mapped UI and existing mock capa
 DEC-UI-SQFUTURES-TRACEABILITY: map DataSourceSQFuturesData to SQData/Futures; retain shared rules/store at the parent. Shared view/hook/conditions/styles are owned by mapped Equity files and composed by distinct Futures counterparts. Empty update template and backend binary are excluded.
 
 Shared exceptions: sqData.ts and sqDataStore.ts retain existing sibling contracts; README.md owns registry/status; source-map.json delegates provider manifests. Provider manifests are declared target-only files. No backend/subscription/network capability added. Donor runtime defaults, remote services and algorithmic parity remain unverified. Canonical behavioral ledger/schema are absent; structural manifests do not replace them.
+
+
+## Backend historical ingestion
+
+The Data Manager source-menu entry points now use the shared
+`Common/HistoricalSourceDialog.tsx` and `Common/historicalSourceStore.ts`.
+Registration and downloads use SQLite-backed datasets and real broker requests;
+progress and controls come from backend jobs. Earlier offline/mock modules remain
+for their isolated fixtures, but the live source-menu paths no longer run them.
+See `docs/data-manager/historical-sources.md` for supported native resolutions,
+canonical storage, source limitations, CLI usage and MT5 connection requirements.

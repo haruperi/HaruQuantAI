@@ -110,6 +110,72 @@ def _start(client):
     return response.json()["data"]["job_id"]
 
 
+def test_other_sources_http_registration_download_and_controls(
+    downloads, monkeypatch, tmp_path
+):
+    from app.workspace.data_manager import source_jobs, sources
+
+    client, jobs, pilot, provider = downloads
+    service = sources.Sources(
+        pilot.gateway,
+        market_root=tmp_path / "sources",
+        client_factory=lambda _: provider(),
+    )
+    monkeypatch.setattr(source_jobs, "Sources", lambda *args, **kwargs: service)
+    monkeypatch.setattr(sources, "Sources", lambda *args, **kwargs: service)
+    response = client.post(
+        "/api/v1/data/sources/yahoo/add",
+        json={"definitions": [{"symbol": "AAPL", "timeframe": "D1"}]},
+    )
+    assert response.status_code == 200, response.text
+    row = response.json()["data"]["records"][0]
+    provider.wait = True
+    response = client.post(
+        "/api/v1/data/providers/download",
+        json={
+            "provider": "market",
+            "targets": [{"id": row["id"]}],
+            "date_from": "2025-01-06",
+            "date_to": "2025-01-06",
+            "overwrite": True,
+        },
+    )
+    assert response.status_code == 200, response.text
+    job_id = response.json()["data"]["job_id"]
+    assert provider.entered.wait(5)
+    assert (
+        client.post(f"/api/v1/data/download-jobs/{job_id}/pause", json={}).json()[
+            "data"
+        ]["status"]
+        == "PAUSED"
+    )
+    assert (
+        client.post(f"/api/v1/data/download-jobs/{job_id}/resume", json={}).status_code
+        == 200
+    )
+    provider.release.set()
+    assert jobs.wait_for_job(job_id, timeout=10).status == "COMPLETED"
+    assert (
+        client.get(f"/api/v1/data/download-jobs/{job_id}").json()["data"]["progress"]
+        == 100
+    )
+    assert service.record(row["id"])["bars"] == 1
+
+
+def test_source_http_rejects_bad_dates_before_starting_job(downloads):
+    client, _, _, _ = downloads
+    response = client.post(
+        "/api/v1/data/providers/download",
+        json={
+            "provider": "market",
+            "targets": [{"id": "yahoo:AAPL:D1"}],
+            "date_from": "invalid",
+            "date_to": "2025-01-06",
+        },
+    )
+    assert response.status_code == 422
+
+
 @pytest.mark.parametrize("status", ["RUNNING", "PAUSED", "QUEUED"])
 def test_restart_interrupts_orphan_download_without_touching_other_jobs(
     downloads, status

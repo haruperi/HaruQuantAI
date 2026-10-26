@@ -274,6 +274,63 @@ def _bars(dates, prices=None, volume=1):
     )
 
 
+def test_dukascopy_network_download_skips_cache_and_overwrite_fetches_again(temp_env):
+    service, _, _ = temp_env
+    calls = []
+
+    class Provider:
+        price = 1.1
+
+        def get_bars(self, symbol, timeframe, *, date_from, date_to, count):
+            calls.append((date_from, date_to))
+            return _bars(
+                ["2025-01-06T00:00:00Z", "2025-01-06T00:01:00Z"], [self.price] * 2
+            )
+
+    provider = Provider()
+    options = {
+        "date_from": "2025-01-06T00:00:00Z",
+        "date_to": "2025-01-06T00:01:59Z",
+        "client": provider,
+    }
+    assert service.download("EURUSD", **options)["success"]
+    cached = service.download("EURUSD", **options)
+    assert cached["success"] and cached["data"]["already_downloaded"]
+    assert len(calls) == 1 and cached["data"]["downloaded_bars"] == 0
+    provider.price = 1.2
+    replaced = service.download("EURUSD", overwrite=True, **options)
+    assert replaced["success"] and len(calls) == 2
+    assert service.scan_polars("EURUSD").collect()["Open"].to_list() == [120000, 120000]
+
+
+def test_dukascopy_download_fills_an_internal_legacy_gap(temp_env):
+    service, _, _ = temp_env
+    assert service.download(
+        "EURUSD", data_frame=_bars(["2025-01-06T00:00:00Z", "2025-01-06T00:02:00Z"])
+    )["success"]
+    calls = []
+
+    class Provider:
+        def get_bars(self, symbol, timeframe, *, date_from, date_to, count):
+            calls.append((date_from, date_to))
+            return _bars(["2025-01-06T00:01:00Z"], [1.2])
+
+    result = service.download(
+        "EURUSD",
+        date_from="2025-01-06T00:00:00Z",
+        date_to="2025-01-06T00:02:59Z",
+        client=Provider(),
+    )
+    assert result["success"], result
+    assert len(calls) == 1 and calls[0][0].minute == 1 and calls[0][1].minute == 1
+    assert result["data"]["downloaded_bars"] == 1 and result["data"]["total_bars"] == 3
+    assert service.scan_polars("EURUSD").collect()["Open"].to_list() == [
+        110000,
+        120000,
+        110000,
+    ]
+
+
 def test_canonical_reader_decodes_exactly_once(temp_env):
     from app.workspace.brokers.dukascopy import DukascopyClient
     from app.workspace.brokers.files import read_parquet_bars

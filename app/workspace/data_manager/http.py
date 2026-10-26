@@ -183,6 +183,8 @@ def create_router() -> APIRouter:
         gateway = request.app.state.persistence
         return _execute(command, body, Symbols(gateway), gateway)
 
+    _source_routes(router)
+
     _session_routes(router)
     _broker_routes(router)
     _basket_routes(router)
@@ -962,3 +964,29 @@ def _help_routes(router: APIRouter) -> None:
     def search_help(request: Request, query: str = "") -> Any:
         service = Help(request.app.state.persistence)
         return _response(service.search(query))
+
+
+def _source_routes(router: APIRouter) -> None:
+    @router.api_route("/sources/{provider}/{action}", methods=["GET", "POST"])
+    async def source_command(
+        provider: str, action: str, request: Request, body: dict[str, Any] | None = None
+    ) -> Any:
+        from app.workspace.data_manager.source_mt5 import bridge_action
+        from app.workspace.data_manager.sources import Sources, capabilities
+
+        try:
+            if action == "capabilities":
+                return _ok(capabilities(provider))
+            if provider == "mt5" and (
+                action == "status" or (action == "connect" and request.method == "POST")
+            ):
+                return _ok(await bridge_action(action, request.app))
+            if action == "add" and request.method == "POST":
+                return _response(
+                    Sources(request.app.state.persistence).add(
+                        provider, (body or {}).get("definitions", [])
+                    )
+                )
+            raise TransportError(ErrorCode.VALIDATION, "Unknown source operation")
+        except (ValueError, TypeError) as error:
+            raise TransportError(ErrorCode.VALIDATION, str(error)) from error

@@ -204,6 +204,19 @@ def decode_darwinex_dat(
     return rows
 
 
+def _tick_archive_names(names: list[str], start_ms: int, end_ms: int) -> list[str]:
+    """Decode only requested archive days, not an entire year for a short range."""
+    lower = datetime.fromtimestamp(start_ms / 1000, UTC).date() if start_ms else None
+    upper = datetime.fromtimestamp(end_ms / 1000, UTC).date() if end_ms else None
+    selected = []
+    for name in names:
+        year, month, day = map(int, Path(name).stem.split("_")[:3])
+        date = datetime(year, month, day, tzinfo=UTC).date()
+        if (lower is None or date >= lower) and (upper is None or date <= upper):
+            selected.append(name)
+    return selected
+
+
 class DarwinexClient(BrokerClient):
     """Darwinex market data and symbol catalog client."""
 
@@ -307,7 +320,14 @@ class DarwinexClient(BrokerClient):
         sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
         snap = self.get_symbol_info(sym_clean)
         decimals = snap.price.digits
-        target_count = count or limit or 100
+        target_count = (
+            count
+            if date_from is not None
+            or date_to is not None
+            or start is not None
+            or end is not None
+            else count or limit or 100
+        )
 
         tf_name = timeframe.name if isinstance(timeframe, Timeframe) else timeframe
         tf_norm = tf_name.strip().upper()
@@ -500,7 +520,14 @@ class DarwinexClient(BrokerClient):
         sym_clean = symbol.upper().replace("/", "").replace("_", "").replace("-", "")
         snap = self.get_symbol_info(sym_clean)
         decimals = snap.price.digits
-        target_count = count or limit or 100
+        target_count = (
+            count
+            if date_from is not None
+            or date_to is not None
+            or start is not None
+            or end is not None
+            else count or limit or 100
+        )
         s = date_from if date_from is not None else start
         e = date_to if date_to is not None else end
         start_ms = epoch_millis(s)
@@ -526,6 +553,7 @@ class DarwinexClient(BrokerClient):
                 url,
                 timeout=(5.0, 30.0),
                 provider="darwinex",
+                max_bytes=100 * 1024 * 1024,
             )
             if resp.status_code != 200 or not resp.content:
                 raise BridgeError(
@@ -535,7 +563,7 @@ class DarwinexClient(BrokerClient):
 
             with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
                 dat_names = sorted([n for n in z.namelist() if n.endswith(".dat")])
-                for name in dat_names:
+                for name in _tick_archive_names(dat_names, start_ms, end_ms):
                     dat_bytes = z.read(name)
                     ticks = decode_darwinex_dat(dat_bytes, digits=decimals)
                     for t in ticks:

@@ -26,32 +26,35 @@ def manager(request: Request) -> JobManager:
             # A new application has no workers for persisted downloads. Reconcile
             # only this manager's jobs, never another workspace's live workers.
             gateway = request.app.state.persistence
-            for status in ("QUEUED", "RUNNING", "PAUSED"):
-                while True:
-                    rows = require_data(
-                        gateway.read_records(
-                            "host_jobs",
-                            filters={"kind": "dukascopy.download", "status": status},
-                        )
-                    )["records"]
-                    if not rows:
-                        break
-                    for row in rows:
-                        require_data(
-                            gateway.update_record(
+            for kind in ("dukascopy.download", "market.download"):
+                for status in ("QUEUED", "RUNNING", "PAUSED"):
+                    while True:
+                        rows = require_data(
+                            gateway.read_records(
                                 "host_jobs",
-                                {
-                                    "status": "INTERRUPTED",
-                                    "message": "Interrupted by host restart",
-                                    "finished_at_utc": datetime.now(UTC).isoformat(),
-                                    "error_message": (
-                                        "Download worker ended when the backend "
-                                        "restarted. Start a new download to continue."
-                                    ),
-                                },
-                                filters={"job_id": row["job_id"]},
+                                filters={"kind": kind, "status": status},
                             )
-                        )
+                        )["records"]
+                        if not rows:
+                            break
+                        for row in rows:
+                            require_data(
+                                gateway.update_record(
+                                    "host_jobs",
+                                    {
+                                        "status": "INTERRUPTED",
+                                        "message": "Interrupted by host restart",
+                                        "finished_at_utc": datetime.now(
+                                            UTC
+                                        ).isoformat(),
+                                        "error_message": (
+                                            "Download worker ended when the backend "
+                                            "restarted. Start a new download."
+                                        ),
+                                    },
+                                    filters={"job_id": row["job_id"]},
+                                )
+                            )
             request.app.state.download_jobs = JobManager(
                 persistence=request.app.state.persistence,
                 max_workers=2,
@@ -238,7 +241,10 @@ def register_download_jobs(router: APIRouter) -> None:
     def job(request: Request, job_id: str, action: str | None = None) -> Any:
         jobs = manager(request)
         record = jobs.get_job(job_id)
-        if record is None or record.kind != "dukascopy.download":
+        if record is None or record.kind not in (
+            "dukascopy.download",
+            "market.download",
+        ):
             raise TransportError(ErrorCode.NOT_FOUND, "Download job not found")
         if request.method == "POST":
             controls = {

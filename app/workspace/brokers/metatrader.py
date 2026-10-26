@@ -249,6 +249,11 @@ class Bridge:
         return secrets.token_urlsafe(32)
 
     @property
+    def listening(self) -> bool:
+        """Return whether the local EA listener is actually serving connections."""
+        return self._server is not None and self._server.is_serving()
+
+    @property
     def connected(self) -> bool:
         """Return True if the bridge TCP socket is connected and authenticated."""
         return self._connected.is_set() and self._authenticated

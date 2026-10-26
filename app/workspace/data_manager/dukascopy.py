@@ -39,11 +39,13 @@ from app.include.enums import Timeframe
 from app.include.market_storage import (
     M1_SCHEMA,
     TICK_SCHEMA,
+    catalog_paths,
     safe_component,
     scan_catalog,
 )
 from app.workspace.brokers.base import BridgeError
 from app.workspace.brokers.dukascopy import DukascopyClient
+from app.workspace.data_manager.coverage import missing_ranges, record_checked_ranges
 from app.workspace.data_manager.logs import Logs
 from app.workspace.data_manager.storage import dataset_root, publish_frame, require_data
 
@@ -577,6 +579,28 @@ class Dukascopy:
             require_data(self.gateway.ensure_datasets_schema())
             if context is not None:
                 context.wait_if_paused()
+            if (
+                data_frame is None
+                and lower is not None
+                and upper is not None
+                and count is None
+                and not overwrite
+            ):
+                cached = self._download_missing(
+                    target,
+                    resolution,
+                    lower,
+                    upper,
+                    {
+                        "underlying": clean,
+                        "broker": broker,
+                        "download_type": download_type,
+                        "client": client,
+                        "context": context,
+                    },
+                )
+                if cached is not None:
+                    return cached
             if data_frame is None:
                 if client is None:
                     owned = DukascopyClient(
@@ -626,6 +650,12 @@ class Dukascopy:
                 date_from=lower,
                 date_to=upper,
                 context=context,
+                coverage=(lower, upper)
+                if data_frame is None
+                and count is None
+                and lower is not None
+                and upper is not None
+                else None,
             )
             return StandardResponse.success(
                 message=f"Published {resolution} history for {target}",
@@ -660,6 +690,78 @@ class Dukascopy:
             raise BridgeError(
                 "No observations returned for the requested range", code="NO_DATA"
             )
+
+    def _download_missing(
+        self,
+        target: str,
+        timeframe: str,
+        lower: datetime,
+        upper: datetime,
+        options: dict[str, Any],
+    ) -> dict[str, Any] | None:
+        started = time.perf_counter()
+        rows = require_data(
+            self.gateway.read_records(
+                "datamgr_datasets",
+                filters={"id": f"dukascopy:{target}:{timeframe}"},
+                limit=1,
+            )
+        )["records"]
+        row = rows[0] if rows else None
+        gaps = missing_ranges(row, lower, upper)
+        if gaps == [(lower, upper)]:
+            return None
+        from app.workspace.data_manager.coverage import RangeProgress
+
+        downloaded, written = 0, []
+        empty = []
+        for index, (start, stop) in enumerate(gaps):
+            result = self.download(
+                target,
+                timeframe=timeframe,
+                date_from=start,
+                date_to=stop,
+                **{
+                    **options,
+                    "context": RangeProgress(options.get("context"), index, len(gaps)),
+                },
+            )
+            if result["success"]:
+                downloaded += result["data"]["downloaded_bars"]
+                written.extend(result["data"]["partitions_written"])
+            elif result.get("error", {}).get("code") != "not_found":
+                require_data(result)
+            else:
+                empty.append((start, stop))
+        row = self.catalog_record(target, timeframe)
+        context = options.get("context")
+        if context is not None:
+            context.raise_if_cancelled()
+        record_checked_ranges(self.gateway, row["id"], empty)
+        if context is not None:
+            context.report_progress(100, "Missing-data download complete")
+        return StandardResponse.success(
+            message="Requested history is already downloaded"
+            if not gaps
+            else "Missing history downloaded",
+            metadata=ResponseMetadata(
+                operation="dukascopy.download",
+                duration_ms=(time.perf_counter() - started) * 1000,
+            ),
+            data={
+                "symbol": target,
+                "underlying": row["underlying"],
+                "timeframe": timeframe,
+                "downloaded_bars": downloaded,
+                "total_bars": row["bars"],
+                "dataset_id": row["id"],
+                "date_from": row["date_from"],
+                "date_to": row["date_to"],
+                "partitions": catalog_paths(row),
+                "partitions_written": written,
+                "already_downloaded": not gaps,
+            },
+        )
 
     def catalog_record(self, symbol: str, timeframe: str) -> dict[str, Any]:
         """Resolve a registered dataset by its stable public identity."""
