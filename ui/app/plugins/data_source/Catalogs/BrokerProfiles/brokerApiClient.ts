@@ -1,9 +1,10 @@
-import { createSymbolDataClient } from '../../Common/symbolContract';
 /** Confirmed host transport for broker profiles, stocks and JSON catalog imports. */
-import {type DomainClient } from '../../../../host/transport';
+import {createDomainClient, type DomainClient } from '../../../../host/transport';
 import { validateBroker, type BrokerProfile } from './brokerProfiles';
 
 export interface RemoteBrokerRecord {
+  created_at_utc?: string; updated_at_utc?: string;
+  enabled?: boolean; clock_policy?: Record<string, unknown>; clock_policy_revision?: number;
   id: string; name: string; description: string; timezone: string; postfix: string;
   stockpicker_use: boolean; mt_use: boolean; is_system: boolean; stocks: string[];
   customized_stocks: number; total_symbols: number; total_sessions: number;
@@ -14,7 +15,7 @@ export interface BrokerImportResult {
   broker_id: string; imported_count: number; created_count: number; updated_count: number;
   records: Array<Record<string, unknown>>; failed: Array<{name: string; reason: string}>; unattempted: string[];
 }
-let client: DomainClient = createSymbolDataClient('/data');
+let client: DomainClient = createDomainClient('/data');
 export function setBrokerApiClient(value: DomainClient): void { client = value; }
 function id(value: string | number): string {
   const text = String(value);
@@ -22,7 +23,10 @@ function id(value: string | number): string {
   return text;
 }
 export function toBrokerProfile(record: RemoteBrokerRecord): BrokerProfile {
-  if (!record || typeof record.id !== 'string' || id(record.id) !== record.id ||
+  if (!record || (record.enabled !== undefined && typeof record.enabled !== 'boolean') ||
+    (record.clock_policy_revision !== undefined && (!Number.isSafeInteger(record.clock_policy_revision) || record.clock_policy_revision < 0)) ||
+    (record.clock_policy !== undefined && (!record.clock_policy || typeof record.clock_policy !== 'object' || Array.isArray(record.clock_policy))) ||
+    typeof record.id !== 'string' || id(record.id) !== record.id ||
     typeof record.name !== 'string' || typeof record.description !== 'string' || typeof record.timezone !== 'string' ||
     typeof record.postfix !== 'string' || [record.stockpicker_use, record.mt_use, record.is_system].some(value => typeof value !== 'boolean') ||
     !Array.isArray(record.stocks) || record.stocks.some(stock => typeof stock !== 'string' || !stock.trim()) ||
@@ -32,6 +36,8 @@ export function toBrokerProfile(record: RemoteBrokerRecord): BrokerProfile {
   }
   return validateBroker({id: record.id, name: record.name, desc: record.description, timezone: record.timezone,
     postfix: record.postfix, mtUse: record.mt_use, stockPickerUse: record.stockpicker_use, system: record.is_system,
+    createdAt:record.created_at_utc, updatedAt:record.updated_at_utc,
+    enabled:record.enabled ?? true, clockPolicy:record.clock_policy ?? {}, clockPolicyRevision:record.clock_policy_revision ?? 0,
     stocks: [...record.stocks], symbols: [], spreadModel: record.spread_model, commissionModel: record.commission_model,
     symbolCount: record.total_symbols, sessionCount: record.total_sessions}, []);
 }
@@ -51,7 +57,8 @@ export async function saveBroker(profile: BrokerProfile): Promise<BrokerProfile>
   const clean = validateBroker(profile, []);
   const record = await client.post<RemoteBrokerRecord>('/brokers', {
     ...(clean.id ? {id: id(clean.id)} : {}), name: clean.name, description: clean.desc,
-    stockpicker_use: clean.stockPickerUse, mt_use: clean.mtUse, timezone: clean.timezone,
+    stockpicker_use: clean.stockPickerUse, mt_use: clean.mtUse, timezone: clean.timezone, is_system:clean.system,
+    enabled:clean.enabled ?? true, clock_policy:clean.clockPolicy ?? {}, clock_policy_revision:clean.clockPolicyRevision ?? 0,
     postfix: clean.postfix, spread_model: clean.spreadModel ?? {model: 'inherit'},
     commission_model: clean.commissionModel ?? {model: 'inherit'},
   });
@@ -99,4 +106,22 @@ export async function deleteBrokers(values: string[]): Promise<string[]> {
     throw new Error('The host did not confirm the selected broker deletions. Refresh before retrying.');
   }
   return result.deleted_ids;
+}
+
+export async function loadBrokerCatalog(content: string): Promise<number> {
+  const result = await client.post<{loaded_count: number}>('/brokers/load', {content});
+  if (!Number.isSafeInteger(result?.loaded_count) || result.loaded_count < 0) throw new Error('Invalid broker import response.');
+  return result.loaded_count;
+}
+export async function saveBrokerCatalog(): Promise<string> {
+  const result = await client.post<{content: string; count: number}>('/brokers/save', {});
+  if (typeof result?.content !== 'string' || !Number.isSafeInteger(result.count)) throw new Error('Invalid broker export response.');
+  return result.content;
+}
+export async function editBrokerCatalog(ids: string[], updates: Record<string, unknown>): Promise<BrokerProfile[]> {
+  const records = await client.post<RemoteBrokerRecord[]>('/brokers/edit', {ids: ids.map(id), updates});
+  if (!Array.isArray(records) || records.length !== new Set(ids).size) throw new Error('Invalid broker edit response.');
+  const profiles=records.map(toBrokerProfile);
+  if(new Set(profiles.map(row=>row.id)).size!==new Set(ids).size || profiles.some(row=>!ids.includes(row.id))) throw new Error('The host returned different broker identities.');
+  return profiles;
 }

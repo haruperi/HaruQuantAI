@@ -59,10 +59,10 @@ uv run python -m app.cli --help
 
 ### Exit codes
 
-| Code | Meaning |
-| --- | --- |
-| `0` | Command succeeded. |
-| `1` | Command failed, or login was cancelled. |
+| Code  | Meaning                                    |
+| ----- | ------------------------------------------ |
+| `0` | Command succeeded.                         |
+| `1` | Command failed, or login was cancelled.    |
 | `2` | Invalid or missing command-line arguments. |
 
 Command results are written to standard output: symbol lists and created symbols use an ASCII table;
@@ -241,7 +241,6 @@ destination file is replaced. Success prints the exported count and absolute pat
 An empty catalog or a file write failure returns a JSON error and exit code 1.
 A missing path returns exit code 2.
 
-
 #### Symbols tab and HTTP adapter
 
 The Data Manager Symbols tab uses the same `Symbols` service and database as the
@@ -306,14 +305,14 @@ uv run python -m app.cli data-manager session add --name London --timezone Europ
 without appending a broker suffix. Successful creation displays the new calendar
 in a table. Optional fields are:
 
-| Flag | Value | Default when adding |
-| --- | --- | --- |
-| `--description` | Description text. | Empty string. |
-| `--timezone` | IANA timezone, such as `UTC` or `America/New_York`. | `UTC`. |
-| `--broker-id` | Integer broker ID. | `-1` (Default). |
-| `--windows` | JSON array of trading intervals. | `[]` (closed calendar). |
-| `--holidays` | JSON array of full-day holidays. | `[]`. |
-| `--is-default` / `--no-is-default` | Set or clear the default-profile flag. | False. |
+| Flag                                   | Value                                                   | Default when adding       |
+| -------------------------------------- | ------------------------------------------------------- | ------------------------- |
+| `--description`                      | Description text.                                       | Empty string.             |
+| `--timezone`                         | IANA timezone, such as `UTC` or `America/New_York`. | `UTC`.                  |
+| `--broker-id`                        | Integer broker ID.                                      | `-1` (Default).         |
+| `--windows`                          | JSON array of trading intervals.                        | `[]` (closed calendar). |
+| `--holidays`                         | JSON array of full-day holidays.                        | `[]`.                   |
+| `--is-default` / `--no-is-default` | Set or clear the default-profile flag.                  | False.                    |
 
 To include intervals and holidays, pass each JSON array as one argument:
 
@@ -442,4 +441,160 @@ For command-specific help:
 uv run python -m app.cli data-manager session --help
 uv run python -m app.cli data-manager session add --help
 uv run python -m app.cli data-manager session edit --help
+```
+
+### Broker profiles
+
+The Brokers tab connects Add new, Edit selected, Mass delete, Save, and Load to
+these same service operations through authenticated HTTP routes. Add and edit
+open field editors; editing multiple selected rows opens a bulk field editor.
+System flags are editable. Record IDs and creation/update timestamps are shown
+read-only because persistence assigns them. Successful operations update the
+catalog automatically. Refresh and automatic broker-update buttons are not
+part of this toolbar.
+
+Broker commands use the `Brokers` service and the `datamgr_broker` table directly.
+They run locally without a session token or a running HTTP server. Targets are
+exact saved broker names; quote names containing spaces.
+
+#### List brokers
+
+```powershell
+uv run python -m app.cli data-manager broker list
+uv run python -m app.cli data-manager broker list --page 2 --page-size 25
+```
+
+Lists broker profiles in an ASCII table, including customization counts. The
+default is page 1 with 50 profiles per page. Both options require positive
+integers; requesting a page beyond the available pages is an argument error.
+
+#### Add a broker
+
+```powershell
+uv run python -m app.cli data-manager broker add --name Demo --description "Demo account" --server-timezone Europe/London --postfix _demo --mt-use
+```
+
+Names are required and saved without an automatic suffix. The service assigns
+the database ID and UTC creation/update timestamps. Optional flags are:
+
+| Flag                                             | Value                                                        | Default on add |
+| ------------------------------------------------ | ------------------------------------------------------------ | -------------- |
+| `--description`                                | Description string.                                          | Empty string.  |
+| `--server-timezone`                            | IANA timezone or the supported `EETUS` broker clock label. | `UTC`.       |
+| `--postfix`                                    | Symbol/data postfix string.                                  | Empty string.  |
+| `--is-system` / `--no-is-system`             | System profile flag.                                         | False.         |
+| `--stockpicker-use` / `--no-stockpicker-use` | Stock filtering flag.                                        | False.         |
+| `--mt-use` / `--no-mt-use`                   | Symbols and sessions flag.                                   | False.         |
+| `--enabled` / `--no-enabled`                 | Enabled flag.                                                | True.          |
+| `--clock-policy`                               | JSON object with JSON-compatible values.                     | `{}`.        |
+| `--clock-policy-revision`                      | Non-negative integer.                                        | `0`.         |
+
+For example, to supply clock metadata in PowerShell:
+
+```powershell
+$policy = '{"mode":"fixed","offset_minutes":120}'
+uv run python -m app.cli data-manager broker add --name "Demo Clock" --server-timezone UTC --clock-policy $policy --clock-policy-revision 1
+```
+
+Clock policy is stored as metadata; these commands do not perform timezone
+conversion. Successful creation displays the saved profile in a table.
+
+#### Edit one or more brokers
+
+```powershell
+uv run python -m app.cli data-manager broker edit Demo --description "Updated account"
+uv run python -m app.cli data-manager broker edit Demo "Demo Clock" --no-enabled
+uv run python -m app.cli data-manager broker edit Demo --name "Demo Main"
+uv run python -m app.cli data-manager broker edit "Demo Clock" --clock-policy '{}'
+```
+
+Accepts the same optional flags as add, plus `--name` to rename one profile.
+At least one update is required. Renaming multiple targets is rejected. Omitted
+fields retain their current values; `--clock-policy` replaces the whole policy
+object. Repeated target names are edited once.
+
+Bulk edits are atomic. A missing target, invalid update, or conflicting name
+leaves all selected profiles unchanged. Creation timestamps are preserved and
+update timestamps are refreshed.
+
+#### Delete one or more brokers
+
+```powershell
+uv run python -m app.cli data-manager broker delete "Demo Main"
+uv run python -m app.cli data-manager broker delete Demo "Demo Clock"
+```
+
+Deletes the named broker records atomically and displays the removed profiles.
+Repeated names are processed once. A missing target or a database reference
+that prevents deletion rolls back the entire batch. This command does not
+cascade deletion to stock memberships, symbols, sessions, or datasets.
+
+The browser adapter additionally checks symbol, session, and dataset usage, and
+removes stock memberships when deleting an unused profile. System profiles can
+be edited or deleted from the browser as well. Usage checks still apply. These
+browser policies are not CLI service checks.
+
+#### Load brokers from JSON
+
+```powershell
+uv run python -m app.cli data-manager broker load "C:\Data\brokers.json"
+```
+
+Imports a JSON array using the service field names, for example:
+
+```json
+[
+  {
+    "name": "Imported Demo",
+    "description": "Demo account",
+    "is_system": false,
+    "stockpicker_use": false,
+    "mt_use": true,
+    "server_timezone": "UTC",
+    "postfix": "_demo",
+    "enabled": true,
+    "clock_policy": {},
+    "clock_policy_revision": 0
+  }
+]
+```
+
+Only `name` is required; omitted fields use the add defaults. Boolean fields
+must be JSON booleans. Imports create new records and do not overwrite existing
+names. A duplicate name, invalid entry, or storage failure rolls back the entire
+import, including files larger than 1,000 profiles. An empty array imports zero
+profiles.
+
+Imported `id`, `created_at_utc`, `updated_at_utc`, `customized_stocks`,
+`customized_instruments`, and `customized_sessions` fields are ignored. IDs and
+timestamps are generated locally; other unknown fields are rejected. Files may
+use UTF-8 with or without a BOM. Success displays the imported profiles.
+
+#### Save brokers to JSON
+
+```powershell
+uv run python -m app.cli data-manager broker save "C:\Data\brokers.json"
+```
+
+Exports the complete catalog as a UTF-8 JSON array accepted by `broker load`
+and the Brokers tab's Load action. An empty catalog exports as `[]`. Exports
+preserve broker settings, including system flags and clock policy metadata, and
+omit database IDs, timestamps, and calculated customization counts. Stock
+memberships, symbol definitions, and session calendars are separate data and
+are not included.
+
+Both transfer commands accept absolute or relative paths. Quote paths containing
+spaces. For save, the parent directory must already exist; an existing file is
+replaced only after successful serialization. Success prints the exported count
+and destination path.
+
+Service and file failures print a JSON error response and return exit code 1.
+Parser errors return exit code 2. Successful commands return exit code 0.
+
+For command-specific help:
+
+```powershell
+uv run python -m app.cli data-manager broker --help
+uv run python -m app.cli data-manager broker add --help
+uv run python -m app.cli data-manager broker edit --help
 ```

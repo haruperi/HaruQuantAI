@@ -8,6 +8,28 @@ uv run python -m app.main --reload
 
 Responses contain the host `StandardResponse` fields and a `status` field (`success` or `error`) for the existing UI client. Invalid requests return 422, missing authentication 401, missing capabilities 403, missing records 404, revision conflicts 409, and unavailable services 503.
 
+## Stopping and restarting
+
+Press Ctrl+C once to stop the backend. The launcher allows five seconds for
+in-flight connections to finish, then cancels remaining request tasks before
+application cleanup. This also applies to restarts triggered by `--reload`.
+The UI's `/api/v1/events` server-sent event connection stays open while the UI is
+connected; without a shutdown deadline, it can keep Uvicorn waiting indefinitely.
+
+When an open stream reaches the deadline, Uvicorn may log
+`timeout graceful shutdown exceeded` as it cancels the request. The stream's
+subscription is released and application shutdown continues. The deadline bounds
+connection draining, not arbitrary synchronous work or application cleanup.
+
+If an older process is already stuck at `Waiting for connections to close`,
+press Ctrl+C a second time to force its exit, then restart with the updated code.
+There is no need to close the terminal. When launching Uvicorn directly instead
+of using `app.main`, supply the equivalent option explicitly:
+
+```powershell
+uv run uvicorn app.main:app --reload --timeout-graceful-shutdown 5
+```
+
 ## Routes
 
 | Handler | Methods and paths, relative to `/api/v1` |

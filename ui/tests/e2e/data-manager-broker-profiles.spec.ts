@@ -1,6 +1,5 @@
 import { normalizeSymbolContract } from '../../app/plugins/data_source/Common/symbolContract';
 import {expect,test,type Page} from '@playwright/test';
-import {newSymbol} from '../../app/plugins/data_source/FileImport/fileSymbols';
 import type {RemoteBrokerRecord} from '../../app/plugins/data_source/Catalogs/BrokerProfiles/brokerApiClient';
 
 const initial:RemoteBrokerRecord={id:'1',name:'Demo',description:'Saved profile',timezone:'UTC',postfix:'_d',stockpicker_use:true,mt_use:true,is_system:false,stocks:['OLD'],customized_stocks:1,total_symbols:0,total_sessions:0,spread_model:{model:'inherit'},commission_model:{model:'inherit'}};
@@ -31,6 +30,21 @@ async function launch(page:Page){
       const saved={...(existing??{...initial,id:String(state.profiles.length+1),stocks:[],customized_stocks:0}),...body};
       if(existing)state.profiles=state.profiles.map(row=>row.id===saved.id?saved:row);else state.profiles.push(saved);
       data=saved;
+    }else if(path==='/api/v1/data/brokers/edit'&&method==='POST'){
+      const body=route.request().postDataJSON();state.writes.push({path,body});
+      state.profiles=state.profiles.map(row=>body.ids.includes(row.id)?{...row,...body.updates}:row);
+      data=state.profiles.filter(row=>body.ids.includes(row.id));
+    }else if(path==='/api/v1/data/brokers/load'&&method==='POST'){
+      const body=route.request().postDataJSON();state.writes.push({path,body});
+      let records:any[];
+      try{records=JSON.parse(body.content);if(!Array.isArray(records))throw new Error();}
+      catch{await route.fulfill({status:422,json:{status:'error',error:{code:'validation',message:'Invalid brokers JSON'}}});return;}
+      if(records.some(item=>state.profiles.some(row=>row.name===item.name))){await route.fulfill({status:409,json:{status:'error',error:{code:'conflict',message:'Broker already exists'}}});return;}
+      state.profiles.push(...records.map((item,index)=>({...structuredClone(initial),...item,id:String(state.profiles.length+index+1),timezone:item.server_timezone??'UTC',stocks:[],customized_stocks:0})));
+      data={loaded_count:records.length};
+    }else if(path==='/api/v1/data/brokers/save'&&method==='POST'){
+      const body=route.request().postDataJSON();state.writes.push({path,body});
+      data={count:state.profiles.length,content:JSON.stringify(state.profiles.map(row=>({name:row.name,server_timezone:row.timezone})))};
     }else if(path==='/api/v1/data/brokers/delete'&&method==='POST'){
       const body=normalizeSymbolContract(route.request().postDataJSON());state.writes.push({path,body});
       await state.deleteGate;
@@ -71,49 +85,51 @@ async function launch(page:Page){
 }
 const actions=(page:Page)=>page.getByLabel('Broker profile operations',{exact:true});
 const table=(page:Page)=>page.getByRole('table',{name:'Broker profiles',exact:true});
-async function browse(page:Page,kind:'symbolDefinition'|'session',records:unknown[]){
-  await actions(page).getByRole('button',{name:`Import broker ${kind==='symbolDefinition'?'symbols':'sessions'} from JSON`,exact:true}).click();
-  const dialog=page.getByRole('dialog',{name:kind==='symbolDefinition'?'Symbols import from JSON':'Session import from JSON',exact:true});
-  const plural=kind==='symbolDefinition'?'symbols':'sessions';
-  await dialog.getByLabel(`${kind} JSON file`).setInputFiles({name:'Catalog.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({version:1,kind:plural,[plural]:records,...(kind==='symbolDefinition'?{brokers:[]}:{} )}))});
-  await dialog.getByLabel('Import broker profile').selectOption('1');
-  return dialog;
-}
-
-test('saves configured costs, reloads confirmed profiles and replaces stocks with empty',async({page})=>{
+test('saves broker fields, reloads confirmed profiles and replaces stocks with empty',async({page})=>{
   const state=await launch(page);
   await actions(page).getByRole('button',{name:'Add new',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'Add Broker profile',exact:true});
-  await dialog.getByLabel('Broker profile name').fill('New');await dialog.getByLabel('Broker spread model').selectOption('fixed');
-  await dialog.getByLabel('Broker spread value').fill('0');await dialog.getByLabel('Broker commission model').selectOption('Per trade');await dialog.getByLabel('Broker commission value').fill('3.5');
+  await dialog.getByLabel('Broker profile name').fill('New');await dialog.getByLabel('Broker enabled').uncheck();
+  await dialog.getByLabel('Clock policy JSON').fill('{"offset":120}');await dialog.getByLabel('Clock policy revision').fill('2');
   await dialog.getByRole('button',{name:'Save',exact:true}).click();await expect(dialog).toHaveCount(0);await expect(table(page)).toContainText('New');
-  expect(state.writes[0].body.spread_model).toEqual({model:'fixed',value:0});expect(state.writes[0].body.commission_model.value).toBe(3.5);
+  expect(state.writes[0].body).toMatchObject({enabled:false,clock_policy:{offset:120},clock_policy_revision:2});
   await page.reload();await page.getByRole('button',{name:'Broker profiles',exact:true}).click();await expect(table(page)).toContainText('New');
   await page.getByRole('checkbox',{name:'Select broker Demo',exact:true}).check();await actions(page).getByRole('button',{name:'Edit stocks',exact:true}).click();
   const stocks=page.getByRole('dialog',{name:'Edit stocks Demo',exact:true});await expect(stocks.getByRole('textbox',{name:'Broker stocks',exact:true})).toHaveValue('OLD');
   await stocks.getByRole('textbox',{name:'Broker stocks',exact:true}).fill('');await stocks.getByRole('button',{name:'Save',exact:true}).click();await expect(stocks).toHaveCount(0);expect(state.profiles[0].stocks).toEqual([]);
   await expect(actions(page).getByRole('button',{name:'Mass delete',exact:true})).toBeEnabled();
-  await expect(actions(page).getByRole('button',{name:'Update data for broker (automatic)',exact:true})).toBeDisabled();
+  await expect(actions(page).getByRole('button',{name:'Update data for broker (automatic)',exact:true})).toHaveCount(0);
+  await expect(actions(page).getByRole('button',{name:'Refresh',exact:true})).toHaveCount(0);
 });
 
-test('imports only selected symbols and sessions and refreshes saved counts',async({page})=>{
+test('edits multiple selected brokers atomically through one request',async({page})=>{
   const state=await launch(page);
-  let dialog=await browse(page,'symbolDefinition',[{...newSymbol(),symbol:'ONE',name:'First'},{...newSymbol(),symbol:'TWO',name:'Second'}]);
-  await dialog.getByLabel('Select ONE',{exact:true}).check();await dialog.getByLabel('Use broker cost defaults').check();await dialog.getByRole('button',{name:'Start Import',exact:true}).click();await expect(dialog).toHaveCount(0);
-  expect(state.symbols.map(row=>row.symbol)).toEqual(['ONE_d']);expect(state.writes[0].body.options.use_profile_costs).toBe(true);
-  dialog=await browse(page,'session',[{name:'Week',broker:'-1',brokerName:'Default',elements:[{dayFrom:'Mon',timeFrom:'09:00',dayTo:'Mon',timeTo:'16:00',eod:true}],holidays:[{date_str:'2026-12-25',description:'Holiday'}]}]);
-  await dialog.getByLabel('Select Week',{exact:true}).check();await dialog.getByRole('button',{name:'Start Import',exact:true}).click();await expect(dialog).toHaveCount(0);
-  expect(state.sessions[0].name).toBe('Week_d');expect(state.sessions[0].holidays).toHaveLength(1);
-  const row=table(page).getByRole('row').filter({has:page.getByRole('checkbox',{name:'Select broker Demo',exact:true})});await expect(row).toContainText('Demo');expect(state.profiles[0].total_sessions).toBe(1);
+  state.profiles.push({...structuredClone(initial),id:'2',name:'Second'});
+  await page.reload();await page.getByRole('button',{name:'Broker profiles',exact:true}).click();
+  await expect(table(page)).toContainText('Second');
+  await page.getByLabel('Select all broker profiles',{exact:true}).check();
+  await actions(page).getByRole('button',{name:'Edit selected',exact:true}).click();
+  const dialog=page.getByRole('dialog',{name:'Edit selected brokers',exact:true});
+  await dialog.getByLabel('Broker field',{exact:true}).selectOption('postfix');
+  await dialog.getByLabel('Broker field value',{exact:true}).fill('_bulk');
+  await dialog.getByRole('button',{name:'Save',exact:true}).click();
+  await expect(dialog).toHaveCount(0);
+  expect(state.profiles.every(row=>row.postfix==='_bulk')).toBe(true);
+  expect(state.writes).toHaveLength(1);
 });
 
-test('keeps partial import results visible and clears stale previews for invalid files',async({page})=>{
-  const state=await launch(page);state.partial=true;
-  const dialog=await browse(page,'symbolDefinition',[{...newSymbol(),symbol:'GOOD',name:'Good'},{...newSymbol(),symbol:'BAD',name:'Bad'}]);
-  await dialog.getByLabel('Select all import records').check();await dialog.getByRole('button',{name:'Start Import',exact:true}).click();
-  await expect(dialog.getByRole('status')).toContainText('1 saved; 1 failed');await expect(dialog.getByLabel('Select GOOD',{exact:true})).not.toBeChecked();await expect(dialog.getByLabel('Select BAD',{exact:true})).toBeChecked();
-  await dialog.getByLabel('symbol JSON file').setInputFiles({name:'Invalid.json',mimeType:'application/json',buffer:Buffer.from('{bad')});
-  await expect(dialog.getByLabel('Select GOOD',{exact:true})).toHaveCount(0);await expect(dialog.getByRole('button',{name:'Start Import',exact:true})).toBeDisabled();await expect(dialog.getByRole('alert')).toBeVisible();
+test('rejects invalid JSON and duplicate names without overwriting brokers',async({page})=>{
+  const state=await launch(page);
+  await actions(page).getByRole('button',{name:'Load',exact:true}).click();
+  const dialog=page.getByRole('dialog',{name:'Load brokers',exact:true});
+  await dialog.getByLabel('Brokers file',{exact:true}).setInputFiles({name:'Invalid.json',mimeType:'application/json',buffer:Buffer.from('{bad')});
+  await dialog.getByRole('button',{name:'Validate and load',exact:true}).click();
+  await expect(dialog.getByRole('alert')).toContainText('Invalid brokers JSON');
+  await dialog.getByLabel('Brokers file',{exact:true}).setInputFiles({name:'Duplicate.json',mimeType:'application/json',buffer:Buffer.from('[{"name":"Demo"}]')});
+  await dialog.getByRole('button',{name:'Validate and load',exact:true}).click();
+  await expect(dialog.getByRole('alert')).toContainText('already exists');
+  expect(state.profiles).toHaveLength(1);
+  expect(state.profiles[0].description).toBe('Saved profile');
 });
 
 test('shows backend save and listing failures without local success',async({page})=>{
@@ -121,17 +137,18 @@ test('shows backend save and listing failures without local success',async({page
   await actions(page).getByRole('button',{name:'Add new',exact:true}).click();const dialog=page.getByRole('dialog',{name:'Add Broker profile',exact:true});await dialog.getByLabel('Broker profile name').fill('Unsaved');await dialog.getByRole('button',{name:'Save',exact:true}).click();await expect(dialog.getByRole('alert')).toContainText('Broker not saved');await expect(table(page)).not.toContainText('Unsaved');
   await dialog.getByLabel('Close',{exact:true}).click();state.failRead=true;await page.reload();await page.getByRole('button',{name:'Broker profiles',exact:true}).click();await expect(page.getByRole('alert')).toContainText('Broker storage unavailable');await expect(table(page)).not.toContainText('Demo');await expect(table(page)).not.toContainText('No brokers are defined.');state.failRead=false;await page.getByRole('button',{name:'Retry broker profiles',exact:true}).click();await expect(table(page)).toContainText('Demo');
 });
-test('loads broker JSON with cost defaults and explicitly overwrites a profile',async({page})=>{
+test('loads canonical broker JSON and downloads the authoritative catalog',async({page})=>{
   const state=await launch(page);
   await actions(page).getByRole('button',{name:'Load',exact:true}).click();
   const dialog=page.getByRole('dialog',{name:'Load brokers',exact:true});
-  const payload={version:1,kind:'brokers',brokers:[{name:'Demo',desc:'Imported defaults',postfix:'_new',timezone:'UTC',mtUse:true,stockPickerUse:true,stocks:[],spreadModel:{model:'fixed',value:0},commissionModel:{model:'Per trade',value:3.5,unit:'share',min:0,minUnit:'money',max:0,maxUnit:'money'}}]};
+  const payload=[{name:'Imported',description:'From CLI',server_timezone:'UTC',enabled:false,clock_policy:{offset:60}}];
   await dialog.getByLabel('Brokers file',{exact:true}).setInputFiles({name:'Brokers.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(payload))});
   await dialog.getByRole('button',{name:'Validate and load',exact:true}).click();
-  const confirm=page.getByRole('dialog',{name:'Overwrite confirm',exact:true});await expect(confirm).toContainText('Demo');await confirm.getByRole('button',{name:'Overwrite',exact:true}).click();await expect(confirm).toHaveCount(0);
-  expect(state.profiles[0].spread_model).toEqual({model:'fixed',value:0});expect(state.profiles[0].stocks).toEqual([]);
-  const brokerRow=table(page).getByRole('row').filter({has:page.getByRole('checkbox',{name:'Select broker Demo',exact:true})});await expect(brokerRow).toContainText('Imported defaults');await brokerRow.dblclick();
-  const editor=page.getByRole('dialog',{name:'Edit Broker profile',exact:true});await expect(editor.getByLabel('Broker commission model')).toHaveValue('Per trade');await expect(editor.getByLabel('Broker commission value')).toHaveValue('3.5');
+  await expect(dialog).toHaveCount(0);await expect(table(page)).toContainText('Imported');
+  const download=page.waitForEvent('download');
+  await actions(page).getByRole('button',{name:'Save',exact:true}).click();
+  expect((await download).suggestedFilename()).toBe('Brokers.json');
+  expect(state.writes.at(-1).path).toBe('/api/v1/data/brokers/save');
 });
 
 test('lists existing system profiles with EETUS after a retry and reload',async({page})=>{
@@ -166,14 +183,23 @@ test('mass delete requires selection and confirmation and retains rows on reject
   await expect(table(page)).not.toContainText('Demo');
 });
 
-test('mass delete rejects protected selections without issuing writes',async({page})=>{
+test('edits database fields and deletes a system broker through the service',async({page})=>{
   const state=await launch(page);state.profiles[0].is_system=true;
   await page.reload();await page.getByRole('button',{name:'Broker profiles',exact:true}).click();
   await page.getByRole('checkbox',{name:'Select broker Demo',exact:true}).check();
+  await actions(page).getByRole('button',{name:'Edit selected',exact:true}).click();
+  const editor=page.getByRole('dialog',{name:'Edit Broker profile',exact:true});
+  await expect(editor.getByLabel('Broker ID',{exact:true})).toHaveValue('1');
+  await expect(editor.getByLabel('System broker profile',{exact:true})).toBeChecked();
+  await editor.getByLabel('Broker description',{exact:true}).fill('Updated system profile');
+  await editor.getByRole('button',{name:'Save',exact:true}).click();
+  await expect(editor).toHaveCount(0);
+  expect(state.profiles[0].description).toBe('Updated system profile');
+  expect(state.writes[0].body).toMatchObject({id:'1',is_system:true,description:'Updated system profile'});
   await actions(page).getByRole('button',{name:'Mass delete',exact:true}).click();
-  await expect(page.getByRole('dialog',{name:'Remove broker',exact:true})).toHaveCount(0);
-  await expect(page.getByText('System broker profiles cannot be deleted.',{exact:true})).toBeVisible();
-  expect(state.writes).toHaveLength(0);
+  const dialog=page.getByRole('dialog',{name:'Remove broker',exact:true});
+  await dialog.getByRole('button',{name:'Yes',exact:true}).click();
+  await expect(dialog).toHaveCount(0);expect(state.profiles).toEqual([]);
 });
 
 

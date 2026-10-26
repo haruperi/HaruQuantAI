@@ -625,7 +625,8 @@ def register_commands(commands: Any) -> None:
         default=50,
         help="Symbols per page (default: 50)",
     )
-    _session_parsers(resources)
+    _profile_parsers(resources, "session")
+    _profile_parsers(resources, "broker")
     data_manager.set_defaults(handler=partial(run_command, parser=data_manager))
 
 
@@ -633,73 +634,101 @@ def run_command(
     arguments: argparse.Namespace, *, parser: argparse.ArgumentParser
 ) -> int:
     """Execute a Data Manager command, emit errors, and return its exit code."""
-    result = (
-        _run_session_command(arguments, parser)
-        if arguments.resource == "session"
-        else _run_symbol_command(arguments, parser)
-    )
+    handlers = {
+        "session": _run_profile_command,
+        "symbol": _run_symbol_command,
+        "broker": _run_profile_command,
+    }
+    result = handlers[arguments.resource](arguments, parser)
     if result is None:
         return 0
     print(json.dumps(result, allow_nan=False))
     return 0 if result["success"] else 1
 
 
-def _session_json(value: str) -> list[Any]:
+def _profile_json(value: str, *, container: type) -> Any:
+    label = "array" if container is list else "object"
     try:
         result = json.loads(value)
     except json.JSONDecodeError as error:
-        raise argparse.ArgumentTypeError("must be a JSON array") from error
-    if not isinstance(result, list):
-        raise argparse.ArgumentTypeError("must be a JSON array")
+        raise argparse.ArgumentTypeError(f"must be a JSON {label}") from error
+    if not isinstance(result, container):
+        raise argparse.ArgumentTypeError(f"must be a JSON {label}")
     return result
 
 
-def _session_parsers(resources: Any) -> None:
-    session = resources.add_parser("session", help="Manage trading session calendars")
-    commands = session.add_subparsers(dest="session_command", required=True)
-    listing = commands.add_parser("list", help="List sessions by page")
+def _profile_parsers(resources: Any, resource: str) -> None:
+    """Register shared broker and session catalog operations."""
+    profile = resources.add_parser(resource, help=f"Manage {resource} profiles")
+    commands = profile.add_subparsers(dest=f"{resource}_command", required=True)
+    listing = commands.add_parser("list", help=f"List {resource} profiles by page")
     listing.add_argument("--page", type=_positive_int, default=1)
     listing.add_argument("--page-size", type=_positive_int, default=50)
+    fields = (
+        {
+            "description": str,
+            "timezone": str,
+            "broker-id": int,
+            "windows": partial(_profile_json, container=list),
+            "holidays": partial(_profile_json, container=list),
+        }
+        if resource == "session"
+        else {
+            "description": str,
+            "server-timezone": str,
+            "postfix": str,
+            "clock-policy": partial(_profile_json, container=dict),
+            "clock-policy-revision": int,
+        }
+    )
+    flags = (
+        ("is-default",)
+        if resource == "session"
+        else ("is-system", "stockpicker-use", "mt-use", "enabled")
+    )
     for command in ("add", "edit"):
         parser = commands.add_parser(
-            command, help=f"{command.title()} session profiles"
+            command, help=f"{command.title()} {resource} profiles"
         )
         if command == "edit":
-            parser.add_argument("session_names", nargs="+")
+            parser.add_argument(f"{resource}_names", nargs="+")
         parser.add_argument(
             "--name", required=command == "add", default=argparse.SUPPRESS
         )
-        for field in ("description", "timezone", "broker-id", "windows", "holidays"):
-            kind = (
-                int
-                if field == "broker-id"
-                else _session_json
-                if field in {"windows", "holidays"}
-                else str
-            )
+        for field, kind in fields.items():
             parser.add_argument(f"--{field}", type=kind, default=argparse.SUPPRESS)
-        parser.add_argument(
-            "--is-default",
-            action=argparse.BooleanOptionalAction,
-            default=argparse.SUPPRESS,
-        )
-    delete = commands.add_parser("delete", help="Delete one or more sessions")
-    delete.add_argument("session_names", nargs="+")
-    clone = commands.add_parser("clone", help="Clone a session")
-    clone.add_argument("source_session")
-    clone.add_argument("new_name")
+        for flag in flags:
+            parser.add_argument(
+                f"--{flag}",
+                action=argparse.BooleanOptionalAction,
+                default=argparse.SUPPRESS,
+            )
+    delete = commands.add_parser(
+        "delete", help=f"Delete one or more {resource} profiles"
+    )
+    delete.add_argument(f"{resource}_names", nargs="+")
+    if resource == "session":
+        clone = commands.add_parser("clone", help="Clone a session")
+        clone.add_argument("source_session")
+        clone.add_argument("new_name")
     for command in ("load", "save"):
-        transfer = commands.add_parser(command, help=f"{command.title()} sessions JSON")
+        transfer = commands.add_parser(
+            command, help=f"{command.title()} {resource} JSON"
+        )
         transfer.add_argument("json_path")
 
 
-def _run_session_command(
+def _run_profile_command(
     arguments: argparse.Namespace, parser: Any
 ) -> dict[str, Any] | None:
+    """Dispatch broker/session commands and render their catalog responses."""
+    from app.workspace.data_manager.brokers import Brokers
     from app.workspace.data_manager.sessions import Sessions
 
-    service = Sessions()
-    command = arguments.session_command
+    resource = arguments.resource
+    service = Sessions() if resource == "session" else Brokers()
+    formatter = format_session_table if resource == "session" else format_broker_table
+    command = getattr(arguments, f"{resource}_command")
     if command in {"add", "edit"}:
         fields = {
             key: value
@@ -708,20 +737,20 @@ def _run_session_command(
             not in {
                 "command",
                 "resource",
-                "session_command",
-                "session_names",
+                f"{resource}_command",
+                f"{resource}_names",
                 "handler",
             }
         }
         result = (
             service.add(**fields)
             if command == "add"
-            else service.edit(arguments.session_names, fields)
+            else service.edit(getattr(arguments, f"{resource}_names"), fields)
         )
-    elif command == "clone":
+    elif command == "clone" and isinstance(service, Sessions):
         result = service.clone(arguments.source_session, arguments.new_name)
     elif command == "delete":
-        result = service.delete(arguments.session_names)
+        result = service.delete(getattr(arguments, f"{resource}_names"))
     elif command in {"load", "save"}:
         result = getattr(service, command)(arguments.json_path)
     else:
@@ -729,7 +758,9 @@ def _run_session_command(
     if not result["success"]:
         return result
     if command == "save":
-        print(f"Saved {result['data']['count']} sessions to {result['data']['path']}")
+        print(
+            f"Saved {result['data']['count']} {resource}s to {result['data']['path']}"
+        )
         return None
     rows = [result["data"]] if command in {"add", "clone"} else result["data"]
     if command == "list":
@@ -737,11 +768,11 @@ def _run_session_command(
         if arguments.page > pages:
             parser.error("--page exceeds the number of catalog pages")
         start = (arguments.page - 1) * arguments.page_size
-        print(f"Page {arguments.page} of {pages} | {len(rows)} sessions")
+        print(f"Page {arguments.page} of {pages} | {len(rows)} {resource}s")
         rows = rows[start : start + arguments.page_size]
     else:
         print(result["message"])
-    print(SessionsCLI.format_session_table(rows))
+    print(formatter(rows))
     return None
 
 

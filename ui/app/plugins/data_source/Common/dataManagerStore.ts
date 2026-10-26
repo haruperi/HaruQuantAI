@@ -175,7 +175,7 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
   },
   removeBrokers: async ids => {
     const selected = ids.map(id => get().brokers.find(row => row.id === id));
-    if (selected.some(row => !row || row.system)) throw new Error('Choose saved custom broker profiles.');
+    if (selected.some(row => !row)) throw new Error('Choose saved broker profiles.');
     const deleted = await deleteBrokers(ids);
     ++brokerRequest;
     set(current => ({brokerLoading:false,brokerError:'',brokers:current.brokers.filter(row => !deleted.includes(row.id))}));

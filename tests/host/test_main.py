@@ -1,9 +1,14 @@
-"""Backend lifecycle and launcher checks without binding a network port."""
+"""Backend lifecycle, launcher, and open-stream shutdown checks."""
 
+import asyncio
+import socket
+from contextlib import closing
 from pathlib import Path
 from unittest.mock import Mock
 
+import httpx
 import pytest
+import uvicorn
 from app import main as backend
 from fastapi.testclient import TestClient
 
@@ -55,6 +60,7 @@ def test_launcher_uses_validated_stored_settings(monkeypatch, port, reload):
             host="127.0.0.1",
             port=8000,
             log_config=None,
+            timeout_graceful_shutdown=5,
             reload=reload,
             reload_dirs=[str(Path(backend.__file__).resolve().parent)]
             if reload
@@ -65,3 +71,59 @@ def test_launcher_uses_validated_stored_settings(monkeypatch, port, reload):
             backend.main([])
         run.assert_not_called()
     shutdown.assert_called_once_with()
+
+
+def test_shutdown_finishes_with_open_event_stream(monkeypatch):
+    """An idle SSE client must not prevent shutdown or service cleanup."""
+    from app.host import transport
+    from app.host.events import EventBus
+
+    settings = Mock()
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    monkeypatch.setattr(transport, "_require", Mock())
+    bus = EventBus()
+    unsubscribe = Mock(wraps=bus.unsubscribe)
+    monkeypatch.setattr(bus, "unsubscribe", unsubscribe)
+    monkeypatch.setattr(transport, "get_global_event_bus", lambda: bus)
+    application = backend.create_app(Mock())
+
+    async def exercise():
+        with closing(socket.socket()) as listener:
+            listener.bind(("127.0.0.1", 0))
+            port = listener.getsockname()[1]
+            server = uvicorn.Server(
+                uvicorn.Config(
+                    application,
+                    log_config=None,
+                    timeout_graceful_shutdown=backend._GRACEFUL_SHUTDOWN_SECONDS,
+                )
+            )
+            task = asyncio.create_task(server.serve(sockets=[listener]))
+            try:
+                async with asyncio.timeout(10):
+                    while not server.started:
+                        if task.done():
+                            await task
+                            pytest.fail("Server stopped before startup")
+                        await asyncio.sleep(0.01)
+                async with httpx.AsyncClient(trust_env=False) as client:
+                    async with client.stream(
+                        "GET", f"http://127.0.0.1:{port}/api/v1/events?channels=system"
+                    ) as response:
+                        assert response.status_code == 200
+                        assert response.headers["content-type"].startswith(
+                            "text/event-stream"
+                        )
+                        assert not task.done()
+                        server.should_exit = True
+                        await asyncio.wait_for(asyncio.shield(task), timeout=8)
+                unsubscribe.assert_called_once()
+                assert not hasattr(application.state, "sessions")
+                assert not server.server_state.connections
+            finally:
+                if not task.done():
+                    server.force_exit = True
+                    task.cancel()
+                await asyncio.gather(task, return_exceptions=True)
+
+    asyncio.run(exercise())

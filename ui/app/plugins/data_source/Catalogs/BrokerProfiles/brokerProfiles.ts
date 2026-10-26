@@ -5,6 +5,8 @@ export type SpreadModel = {model: 'inherit'} | {model: 'fixed'; value: number};
 export type BrokerCommission = {model: 'inherit'} | Commission;
 export interface BrokerProfile {
   id:string; name:string; desc:string; postfix:string; timezone:string; mtUse:boolean;
+  createdAt?:string; updatedAt?:string;
+  enabled?:boolean; clockPolicy?:Record<string,unknown>; clockPolicyRevision?:number;
   stockPickerUse:boolean; system:boolean; stocks:string[]; symbols:string[];
   spreadModel?:SpreadModel; commissionModel?:BrokerCommission; symbolCount?:number; sessionCount?:number;
 }

@@ -1,6 +1,6 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest';
 import {createDomainClient} from '../../../../../../app/host/transport';
-import {deleteBrokers,fetchBrokers,fetchBrokerStocks,saveBroker,saveBrokerStocks,importBrokerRecords,setBrokerApiClient,toBrokerProfile,type RemoteBrokerRecord} from '../../../../../../app/plugins/data_source/Catalogs/BrokerProfiles/brokerApiClient';
+import {editBrokerCatalog,loadBrokerCatalog,saveBrokerCatalog,deleteBrokers,fetchBrokers,fetchBrokerStocks,saveBroker,saveBrokerStocks,importBrokerRecords,setBrokerApiClient,toBrokerProfile,type RemoteBrokerRecord} from '../../../../../../app/plugins/data_source/Catalogs/BrokerProfiles/brokerApiClient';
 import {useDataManagerStore} from '../../../../../../app/plugins/data_source/Common/dataManagerStore';
 
 const row:RemoteBrokerRecord={id:'1',name:'Demo',description:'Saved',timezone:'UTC',postfix:'_d',stockpicker_use:true,mt_use:true,is_system:false,stocks:[],customized_stocks:0,total_symbols:0,total_sessions:0,spread_model:{model:'inherit'},commission_model:{model:'inherit'}};
@@ -30,7 +30,7 @@ describe('confirmed broker transport and state',()=>{
     expect(saved.stocks).toEqual([]);
     const body=JSON.parse(String(fetchFn.mock.calls[0][1].body));
     expect(body).toMatchObject({spread_model:{model:'fixed',value:0},commission_model:{model:'inherit'},timezone:'UTC'});
-    expect(body).not.toHaveProperty('is_system');expect(body).not.toHaveProperty('stocks');expect(body).not.toHaveProperty('id');
+    expect(body.is_system).toBe(false);expect(body).not.toHaveProperty('stocks');expect(body).not.toHaveProperty('id');
     fetchFn.mockResolvedValueOnce(response({...row,id:'2'}));await expect(saveBroker(toBrokerProfile(row))).rejects.toThrow('confirm');
   });
   it('preserves confirmed empty stocks and rejects unconfirmed replacement',async()=>{
@@ -94,7 +94,8 @@ describe('confirmed broker deletion',()=>{
     fetchFn.mockResolvedValueOnce(response({deleted_ids:['1'],deleted_count:1}));
     await useDataManagerStore.getState().removeBrokers(['1']);expect(useDataManagerStore.getState().brokers).toEqual([]);
     useDataManagerStore.setState({brokers:[toBrokerProfile({...row,is_system:true})]});
-    await expect(useDataManagerStore.getState().removeBrokers(['1'])).rejects.toThrow('custom');
+    fetchFn.mockResolvedValueOnce(response({deleted_ids:['1'],deleted_count:1}));
+    await useDataManagerStore.getState().removeBrokers(['1']);expect(useDataManagerStore.getState().brokers).toEqual([]);
   });
   it('prevents an earlier catalog read from restoring deleted rows',async()=>{
     let resolveRead!:(value:Response)=>void;
@@ -106,5 +107,26 @@ describe('confirmed broker deletion',()=>{
     resolveRead(response([row]));await read;
     expect(useDataManagerStore.getState().brokers).toEqual([]);
     expect(useDataManagerStore.getState().brokerLoading).toBe(false);
+  });
+});
+
+
+describe('broker catalog operations',()=>{
+  it('loads and saves canonical JSON through the host',async()=>{
+    const fetchFn=setup().mockResolvedValueOnce(response({loaded_count:1}));
+    const content='[{"name":"Imported"}]';
+    expect(await loadBrokerCatalog(content)).toBe(1);
+    expect(JSON.parse(String(fetchFn.mock.calls[0][1].body))).toEqual({content});
+    fetchFn.mockResolvedValueOnce(response({content,count:1}));
+    expect(await saveBrokerCatalog()).toBe(content);
+    fetchFn.mockResolvedValueOnce(response({loaded_count:-1}));
+    await expect(loadBrokerCatalog(content)).rejects.toThrow();
+  });
+  it('confirms all edited identities and preserves broker clock fields',async()=>{
+    const fetchFn=setup().mockResolvedValueOnce(response([{...row,enabled:false,clock_policy:{offset:120},clock_policy_revision:2}]));
+    expect((await editBrokerCatalog(['1'],{enabled:false}))[0]).toMatchObject({enabled:false,clockPolicy:{offset:120},clockPolicyRevision:2});
+    fetchFn.mockResolvedValueOnce(response([{...row,id:'2'}]));
+    await expect(editBrokerCatalog(['1'],{enabled:false})).rejects.toThrow('different broker identities');
+    expect(()=>toBrokerProfile({...row,enabled:'false' as unknown as boolean})).toThrow();
   });
 });

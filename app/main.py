@@ -25,6 +25,7 @@ from app.host.transport import CredentialTester, Vault, install_transport
 
 logger = get_logger(__name__)
 _MAX_PORT = 65535
+_GRACEFUL_SHUTDOWN_SECONDS = 5
 
 
 def create_app(
@@ -113,6 +114,8 @@ def main(argv: Sequence[str] | None = None) -> None:
             host=host,
             port=port,
             log_config=None,
+            # The UI event stream can remain open indefinitely during shutdown.
+            timeout_graceful_shutdown=_GRACEFUL_SHUTDOWN_SECONDS,
             reload=arguments.reload,
             reload_dirs=[str(Path(__file__).resolve().parent)]
             if arguments.reload

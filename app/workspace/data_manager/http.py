@@ -12,9 +12,10 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-from app.host.persistence import HostPersistence
+from app.host.persistence import HostPersistence, RecordFilter
 from app.host.response import ErrorCode
 from app.host.transport import TransportError, _require
+from app.workspace.data_manager.brokers import Brokers
 from app.workspace.data_manager.sessions import Sessions
 from app.workspace.data_manager.symbols import Symbols
 
@@ -32,6 +33,8 @@ TABS = (
 DAYS = ("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
 CORE_TABS = {"data", "symbols", "sessions", "brokers", "custom-data"}
 MAX_CSV_BYTES = 10_000_000
+MAX_BROKER_STOCKS = 10000
+MAX_TICKER_LENGTH = 50
 
 
 def _access(request: Request) -> None:
@@ -281,6 +284,7 @@ def create_router() -> APIRouter:
         return _execute(command, body, Symbols(gateway), gateway)
 
     _session_routes(router)
+    _broker_routes(router)
     return router
 
 
@@ -519,3 +523,303 @@ def _session_transfer_route(router: APIRouter) -> None:
         if command not in {"load", "save"}:
             raise TransportError(ErrorCode.NOT_FOUND, "Unknown session command")
         return _session_transfer(command, body, Sessions(request.app.state.persistence))
+
+
+def _broker_result(response: dict[str, Any]) -> Any:
+    if not response["success"]:
+        error = response.get("error") or {}
+        raise TransportError(
+            ErrorCode(error.get("code", "internal")), response["message"]
+        )
+    return response["data"]
+
+
+def _broker_stocks(gateway: HostPersistence, identifier: int) -> list[str]:
+    rows: list[str] = []
+    offset: int | None = 0
+    while offset is not None:
+        data = _broker_result(
+            gateway.read_records(
+                "datamgr_broker_stock",
+                filters={"BROKER_ID": identifier},
+                limit=1000,
+                offset=offset,
+            )
+        )
+        rows.extend(row["TICKER"] for row in data["records"])
+        offset = data["pagination"].get("next_offset")
+    return rows
+
+
+def _broker_ui(row: dict[str, Any], gateway: HostPersistence) -> dict[str, Any]:
+    stocks = _broker_stocks(gateway, row["id"]) if row["customized_stocks"] else []
+    return {
+        **row,
+        "id": str(row["id"]),
+        "timezone": row["server_timezone"],
+        "stocks": stocks,
+        "total_symbols": row["customized_instruments"],
+        "total_sessions": row["customized_sessions"],
+        "spread_model": {"model": "inherit"},
+        "commission_model": {"model": "inherit"},
+    }
+
+
+def _selected_brokers(service: Brokers, ids: Any) -> list[dict[str, Any]]:
+    if (
+        not isinstance(ids, list)
+        or not ids
+        or any(
+            not isinstance(value, str) or not value.isdecimal() or int(value) < 1
+            for value in ids
+        )
+    ):
+        raise TransportError(ErrorCode.VALIDATION, "Choose saved broker profiles")
+    rows = {str(row["id"]): row for row in _broker_result(service.list())}
+    if any(value not in rows for value in ids):
+        raise TransportError(ErrorCode.NOT_FOUND, "Broker profile not found")
+    return [rows[value] for value in dict.fromkeys(ids)]
+
+
+def _require_custom_brokers(rows: list[dict[str, Any]]) -> None:
+    if any(row["is_system"] for row in rows):
+        raise TransportError(
+            ErrorCode.VALIDATION, "System broker profiles cannot be changed"
+        )
+
+
+def _broker_routes(router: APIRouter) -> None:
+    """Install listing, CRUD, JSON transfer, and stock membership routes."""
+
+    @router.get("/brokers")
+    def listing(request: Request) -> Any:
+        gateway = request.app.state.persistence
+        return _ok(
+            [
+                _broker_ui(row, gateway)
+                for row in _broker_result(Brokers(gateway).list())
+            ]
+        )
+
+    _broker_save_route(router)
+
+    @router.post("/brokers/edit")
+    def edit(request: Request, body: dict[str, Any]) -> Any:
+        gateway = request.app.state.persistence
+        fields = body.get("updates")
+        if not isinstance(fields, dict):
+            raise TransportError(ErrorCode.VALIDATION, "Choose broker fields to edit")
+        with gateway.transaction() as tx:
+            service = Brokers(tx, manage_transactions=False)
+            rows = _selected_brokers(service, body.get("ids"))
+            _validate_broker_changes(tx, rows, fields)
+            result = service.edit([row["name"] for row in rows], fields)
+            _broker_result(result)
+        return _ok(
+            [
+                _broker_ui(row, gateway)
+                for row in _broker_result(Brokers(gateway).list())
+                if str(row["id"]) in body["ids"]
+            ]
+        )
+
+    @router.post("/brokers/delete")
+    def delete(request: Request, body: dict[str, Any]) -> Any:
+        gateway = request.app.state.persistence
+        with gateway.transaction() as tx:
+            service = Brokers(tx, manage_transactions=False)
+            rows = _selected_brokers(service, body.get("ids"))
+            for row in rows:
+                _check_broker_unused(tx, row)
+                _clear_broker_stocks(tx, row["id"])
+            _broker_result(service.delete([row["name"] for row in rows]))
+        ids = [str(row["id"]) for row in rows]
+        return _ok({"deleted_ids": ids, "deleted_count": len(ids)})
+
+    _broker_transfer_routes(router)
+    _broker_stock_routes(router)
+
+
+def _broker_save_route(router: APIRouter) -> None:
+    @router.post("/brokers")
+    def save(request: Request, body: dict[str, Any]) -> Any:
+        gateway = request.app.state.persistence
+        fields = {key: value for key, value in body.items() if key != "id"}
+        if "timezone" in fields:
+            fields["server_timezone"] = fields.pop("timezone")
+        # Accept inherited costs from older clients; there are no cost columns.
+        for key in ("spread_model", "commission_model"):
+            if fields.pop(key, {"model": "inherit"}) != {"model": "inherit"}:
+                raise TransportError(
+                    ErrorCode.VALIDATION, "Broker cost defaults are unavailable"
+                )
+        with gateway.transaction() as tx:
+            service = Brokers(tx, manage_transactions=False)
+            if "id" in body:
+                rows = _selected_brokers(service, [body["id"]])
+                _validate_broker_changes(tx, rows, fields)
+                result = service.edit(rows[0]["name"], fields)
+                row = _broker_result(result)[0]
+            else:
+                result = service.add(**fields)
+                row = _broker_result(result)
+        return _ok(
+            _broker_ui(
+                next(
+                    item
+                    for item in _broker_result(Brokers(gateway).list())
+                    if item["id"] == row["id"]
+                ),
+                gateway,
+            )
+        )
+
+
+def _broker_transfer_routes(router: APIRouter) -> None:
+    @router.post("/brokers/{command}")
+    def transfer(command: str, request: Request, body: dict[str, Any]) -> Any:
+        if command not in {"load", "save"}:
+            raise TransportError(ErrorCode.NOT_FOUND, "Unknown broker operation")
+        service = Brokers(request.app.state.persistence)
+        with TemporaryDirectory(prefix="haru-brokers-") as folder:
+            path = Path(folder) / "brokers.json"
+            if command == "load":
+                content = body.get("content")
+                if (
+                    not isinstance(content, str)
+                    or len(content.encode("utf-8")) > MAX_CSV_BYTES
+                ):
+                    raise TransportError(
+                        ErrorCode.VALIDATION, "Choose a JSON file up to 10 MB"
+                    )
+                path.write_text(content, encoding="utf-8")
+                result = service.load(path)
+                if result["success"]:
+                    return _ok({"loaded_count": len(result["data"])})
+            else:
+                result = service.save(path)
+                if result["success"]:
+                    return _ok(
+                        {
+                            "content": path.read_text(encoding="utf-8"),
+                            "count": result["data"]["count"],
+                        }
+                    )
+            return _response(result)
+
+
+def _broker_stock_routes(router: APIRouter) -> None:
+    @router.get("/brokers/{identifier}")
+    def get(identifier: str, request: Request) -> Any:
+        gateway = request.app.state.persistence
+        return _ok(
+            _broker_ui(_selected_brokers(Brokers(gateway), [identifier])[0], gateway)
+        )
+
+    @router.get("/brokers/{identifier}/stocks")
+    def stocks(identifier: str, request: Request) -> Any:
+        gateway = request.app.state.persistence
+        _selected_brokers(Brokers(gateway), [identifier])
+        return _ok(
+            {
+                "broker_id": identifier,
+                "stocks": _broker_stocks(gateway, int(identifier)),
+            }
+        )
+
+    @router.put("/brokers/{identifier}/stocks")
+    def save_stocks(identifier: str, request: Request, body: dict[str, Any]) -> Any:
+        gateway = request.app.state.persistence
+        values = body.get("stocks")
+        if (
+            not isinstance(values, list)
+            or len(values) > MAX_BROKER_STOCKS
+            or any(
+                not isinstance(value, str)
+                or not value.strip()
+                or len(value.strip()) > MAX_TICKER_LENGTH
+                for value in values
+            )
+        ):
+            raise TransportError(ErrorCode.VALIDATION, "Choose valid stock tickers")
+        values = list(dict.fromkeys(value.strip() for value in values))
+        with gateway.transaction() as tx:
+            rows = _selected_brokers(Brokers(tx), [identifier])
+            _require_custom_brokers(rows)
+            if not rows[0]["stockpicker_use"]:
+                raise TransportError(
+                    ErrorCode.VALIDATION, "Enable stock filtering first"
+                )
+            _clear_broker_stocks(tx, int(identifier))
+            for start in range(0, len(values), 1000):
+                _broker_result(
+                    tx.create_records(
+                        "datamgr_broker_stock",
+                        [
+                            {"BROKER_ID": int(identifier), "TICKER": value}
+                            for value in values[start : start + 1000]
+                        ],
+                    )
+                )
+        return _ok({"broker_id": identifier, "stocks": values, "count": len(values)})
+
+
+def _check_broker_unused(gateway: HostPersistence, row: dict[str, Any]) -> None:
+    for table, column, value in (
+        ("datamgr_symbols", "broker_id", row["id"]),
+        ("datamgr_sessions", "broker_id", row["id"]),
+        ("datamgr_datasets", "broker", str(row["id"])),
+    ):
+        data = _broker_result(
+            gateway.read_records(table, filters={column: value}, limit=1)
+        )
+        if data["records"]:
+            raise TransportError(
+                ErrorCode.CONFLICT,
+                "Broker is used by symbols, sessions or saved datasets",
+            )
+
+
+def _clear_broker_stocks(gateway: HostPersistence, identifier: int) -> None:
+    while True:
+        records = _broker_result(
+            gateway.read_records(
+                "datamgr_broker_stock", filters={"BROKER_ID": identifier}, limit=1000
+            )
+        )["records"]
+        if not records:
+            return
+        _broker_result(
+            gateway.delete_record(
+                "datamgr_broker_stock",
+                filters=[RecordFilter("ID", "in", [row["ID"] for row in records])],
+            )
+        )
+
+
+def _validate_broker_changes(
+    gateway: HostPersistence, rows: list[dict[str, Any]], fields: dict[str, Any]
+) -> None:
+    for row in rows:
+        if fields.get("stockpicker_use") is False and row["customized_stocks"]:
+            raise TransportError(
+                ErrorCode.CONFLICT,
+                "Remove broker stocks before disabling stock filtering",
+            )
+        if fields.get("mt_use") is False and (
+            row["customized_instruments"] or row["customized_sessions"]
+        ):
+            raise TransportError(
+                ErrorCode.CONFLICT, "Broker is used by symbols or sessions"
+            )
+        timezone = fields.get("server_timezone", row["server_timezone"])
+        if timezone != row["server_timezone"]:
+            data = _broker_result(
+                gateway.read_records(
+                    "datamgr_datasets", filters={"broker": str(row["id"])}, limit=1
+                )
+            )
+            if data["records"]:
+                raise TransportError(
+                    ErrorCode.CONFLICT, "Broker timezone is used by saved datasets"
+                )
