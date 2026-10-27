@@ -12,6 +12,7 @@ from __future__ import annotations
 from app.include.market_storage import M1_SCHEMA, TICK_SCHEMA
 from app.workspace.brokers.dukascopy import DukascopyClient
 
+from ._base import BaseSource, Sources
 from ._cli import (
     register_dukascopy_commands,
     register_source_commands,
@@ -30,8 +31,9 @@ from ._helpers import (
     make_client,
     provider_id,
 )
+from .crypto import Crypto
+from .darwinex import Darwinex
 from .dukascopy import Dukascopy
-from .feature import Sources
 from .http import (
     bridge_action,
     register_dukascopy_routes,
@@ -39,6 +41,11 @@ from .http import (
     start_download,
     start_source_download,
 )
+from .metatrader import MT5, MetaTrader
+from .sq_data import SQData
+from .sq_equity import SQEquity
+from .sq_futures import SQFutures
+from .yahoo import Yahoo
 
 __all__ = [
     "CRYPTO",
@@ -47,11 +54,20 @@ __all__ = [
     "DISCLAIMER_PARAGRAPHS",
     "M1_SCHEMA",
     "MIN_CATALOG_PARTS",
+    "MT5",
     "PROVIDERS",
     "TICK_SCHEMA",
+    "BaseSource",
+    "Crypto",
+    "Darwinex",
     "Dukascopy",
     "DukascopyClient",
+    "MetaTrader",
+    "SQData",
+    "SQEquity",
+    "SQFutures",
     "Sources",
+    "Yahoo",
     "bridge_action",
     "capabilities",
     "intervals",

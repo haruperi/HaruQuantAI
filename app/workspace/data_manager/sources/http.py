@@ -20,9 +20,9 @@ from app.workspace.data_manager.download_jobs import (
     start_download,
 )
 
+from ._base import Sources
 from ._helpers import capabilities, provider_id
 from .dukascopy import Dukascopy
-from .feature import Sources
 
 __all__ = [
     "bridge_action",

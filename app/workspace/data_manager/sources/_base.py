@@ -1,4 +1,4 @@
-"""Register and ingest historical datasets using the existing broker clients."""
+"""Base classes and unified facade for Data Manager historical market data sources."""
 
 from __future__ import annotations
 
@@ -33,11 +33,42 @@ from ._helpers import (
 )
 from .dukascopy import Dukascopy
 
-__all__ = ["Sources"]
+__all__ = ["BaseSource", "Sources"]
 
 
-class Sources:
-    """Persist source definitions and publish actual broker DataFrames to Parquet."""
+def _fetch_frame(
+    client: Any, row: dict[str, Any], start: datetime, stop: datetime
+) -> pd.DataFrame:
+    try:
+        value = (
+            client.get_ticks(
+                row["underlying"], date_from=start, date_to=stop, count=None
+            )
+            if row["timeframe"] == "TICK"
+            else client.get_bars(
+                row["underlying"],
+                row["timeframe"],
+                date_from=start,
+                date_to=stop,
+                count=None,
+                limit=1000,
+            )
+        )
+        frame = resolve_result(value, client)
+    except BridgeError as error:
+        if error.code != "NO_DATA":
+            raise
+        return pd.DataFrame()
+    if not isinstance(frame, pd.DataFrame):
+        raise TypeError("Provider did not return a market DataFrame")
+    return frame
+
+
+class BaseSource:
+    """Base implementation providing registration, bounding, and Parquet storage."""
+
+    source_id: str = ""
+    default_category: str = "Stocks"
 
     def __init__(
         self,
@@ -47,20 +78,40 @@ class Sources:
         client_factory: Any = None,
     ) -> None:
         self.gateway = gateway if gateway is not None else HostPersistence()
-        self.market_root = market_root or Path("data/market")
+        self.market_root = Path(market_root) if market_root else Path("data/market")
         self.client_factory = client_factory or make_client
 
-    def add(self, provider: str, definitions: list[dict[str, Any]]) -> dict[str, Any]:
+    def _get_client(self, source: str) -> Any:
+        return self.client_factory(source)
+
+    def record(self, dataset_id: str) -> dict[str, Any]:
+        """Resolve a persisted identity instead of trusting browser target metadata."""
+        rows = require_data(
+            self.gateway.read_records(
+                "datamgr_datasets", filters={"id": dataset_id}, limit=1
+            )
+        )["records"]
+        if not rows or rows[0]["source"] not in (*PROVIDERS, "dukascopy"):
+            raise ValueError("Choose a registered historical dataset")
+        return cast("dict[str, Any]", rows[0])
+
+    def add(
+        self,
+        provider_or_definitions: str | list[dict[str, Any]],
+        definitions: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         """Atomically register a batch without inventing data or record counts."""
-        source = provider_id(provider)
-        if (
-            not isinstance(definitions, list)
-            or not definitions
-            or len(definitions) > _MAX_DATASETS
-        ):
+        if isinstance(provider_or_definitions, str):
+            source = provider_id(provider_or_definitions)
+            defs = definitions or []
+        else:
+            source = self.source_id or "yahoo"
+            defs = provider_or_definitions
+
+        if not isinstance(defs, list) or not defs or len(defs) > _MAX_DATASETS:
             raise ValueError("Register between one and 1,000 datasets")
         require_data(self.gateway.ensure_datasets_schema())
-        rows = [self._definition(source, definition) for definition in definitions]
+        rows = [self._definition(source, definition) for definition in defs]
         if len({row["id"] for row in rows}) != len(rows):
             raise ValueError("Duplicate dataset in registration")
         with self.gateway.transaction() as tx:
@@ -100,6 +151,18 @@ class Sources:
         if not math.isfinite(step) or step <= 0:
             raise ValueError("Price unit must be finite and positive")
         now = datetime.now(UTC).isoformat()
+        category = str(
+            definition.get("category")
+            or (
+                "Crypto"
+                if source in CRYPTO
+                else "Forex"
+                if source in ("darwinex", "mt5")
+                else "Stocks"
+                if source != "sq_futures"
+                else "Futures"
+            )
+        )
         return {
             "id": f"{source}:{symbol}:{timeframe}",
             "source": source,
@@ -108,18 +171,7 @@ class Sources:
             "timeframe": timeframe,
             "broker": str(definition.get("broker") or "SQ default"),
             "timezone": "UTC",
-            "category": str(
-                definition.get("category")
-                or (
-                    "Crypto"
-                    if source in CRYPTO
-                    else "Forex"
-                    if source in ("darwinex", "mt5")
-                    else "Stocks"
-                    if source != "sq_futures"
-                    else "Futures"
-                )
-            ),
+            "category": category,
             "date_from": "",
             "date_to": "",
             "bars": 0,
@@ -137,17 +189,6 @@ class Sources:
                 }
             ),
         }
-
-    def record(self, dataset_id: str) -> dict[str, Any]:
-        """Resolve a persisted identity instead of trusting browser target metadata."""
-        rows = require_data(
-            self.gateway.read_records(
-                "datamgr_datasets", filters={"id": dataset_id}, limit=1
-            )
-        )["records"]
-        if not rows or rows[0]["source"] not in (*PROVIDERS, "dukascopy"):
-            raise ValueError("Choose a registered historical dataset")
-        return cast("dict[str, Any]", rows[0])
 
     def download(
         self,
@@ -200,7 +241,7 @@ class Sources:
             for start, stop in missing
             for interval in intervals(source, timeframe, start, stop)
         ]
-        client = self.client_factory(source)
+        client = self._get_client(source)
         published, received = 0, 0
         empty = []
         try:
@@ -275,29 +316,19 @@ class Sources:
         return len(frame)
 
 
-def _fetch_frame(
-    client: Any, row: dict[str, Any], start: datetime, stop: datetime
-) -> pd.DataFrame:
-    try:
-        value = (
-            client.get_ticks(
-                row["underlying"], date_from=start, date_to=stop, count=None
-            )
-            if row["timeframe"] == "TICK"
-            else client.get_bars(
-                row["underlying"],
-                row["timeframe"],
-                date_from=start,
-                date_to=stop,
-                count=None,
-                limit=1000,
-            )
-        )
-        frame = resolve_result(value, client)
-    except BridgeError as error:
-        if error.code != "NO_DATA":
-            raise
-        return pd.DataFrame()
-    if not isinstance(frame, pd.DataFrame):
-        raise TypeError("Provider did not return a market DataFrame")
-    return frame
+class Sources(BaseSource):
+    """Unified facade for registrations and downloads across historical sources."""
+
+    def add(
+        self,
+        provider_or_definitions: str | list[dict[str, Any]],
+        definitions: list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
+        """Atomically register a batch for any supported provider."""
+        if isinstance(provider_or_definitions, str):
+            provider = provider_id(provider_or_definitions)
+            defs = definitions or []
+        else:
+            provider = "yahoo"
+            defs = provider_or_definitions
+        return super().add(provider, defs)

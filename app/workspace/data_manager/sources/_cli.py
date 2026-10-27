@@ -8,9 +8,9 @@ import sys
 from collections.abc import Callable
 from typing import Any
 
+from ._base import Sources
 from ._helpers import PROVIDERS, capabilities
 from .dukascopy import Dukascopy
-from .feature import Sources
 
 __all__ = [
     "register_dukascopy_commands",
