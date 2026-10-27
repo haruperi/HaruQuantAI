@@ -20,6 +20,7 @@ from app.workspace.data_manager.custom import register_custom_routes
 from app.workspace.data_manager.data import Data
 from app.workspace.data_manager.dukascopy_http import register_dukascopy_routes
 from app.workspace.data_manager.help import Help
+from app.workspace.data_manager.logs import register_log_routes
 from app.workspace.data_manager.sessions import register_session_routes
 from app.workspace.data_manager.symbols import register_symbol_routes
 
@@ -124,7 +125,7 @@ def create_router() -> APIRouter:
     register_session_routes(router)
     register_broker_routes(router)
     register_basket_routes(router)
-    _log_routes(router)
+    register_log_routes(router)
     register_custom_routes(router)
     _help_routes(router)
     register_dukascopy_routes(router)
@@ -138,26 +139,6 @@ def _service_data(response: dict[str, Any]) -> Any:
             ErrorCode(error.get("code", "internal")), response["message"]
         )
     return response["data"]
-
-
-def _log_routes(router: APIRouter) -> None:
-    @router.get("/logs")
-    def logs(
-        request: Request, task_id: str | None = None, limit: int = 100, offset: int = 0
-    ) -> Any:
-        return _response(
-            request.app.state.data_logs.list(
-                task_id=task_id, limit=limit, offset=offset
-            )
-        )
-
-    @router.get("/logs/active")
-    def active_logs(request: Request) -> Any:
-        return _response(request.app.state.data_logs.list_active())
-
-    @router.post("/logs/clear")
-    def clear_logs(request: Request) -> Any:
-        return _response(request.app.state.data_logs.clear())
 
 
 def _help_routes(router: APIRouter) -> None:

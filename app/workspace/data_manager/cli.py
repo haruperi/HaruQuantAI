@@ -69,7 +69,7 @@ def register_commands(commands: Any) -> None:
     from app.workspace.data_manager.custom import register_custom_commands
     from app.workspace.data_manager.dukascopy_cli import register_dukascopy_commands
     from app.workspace.data_manager.help_cli import register_help_commands
-    from app.workspace.data_manager.logs_cli import register_log_commands
+    from app.workspace.data_manager.logs import register_log_commands
 
     register_log_commands(resources)
     register_custom_commands(resources)
@@ -90,7 +90,7 @@ def run_command(
     from app.workspace.data_manager.custom import run_custom_command
     from app.workspace.data_manager.dukascopy_cli import run_dukascopy_command
     from app.workspace.data_manager.help_cli import run_help_command
-    from app.workspace.data_manager.logs_cli import run_log_command
+    from app.workspace.data_manager.logs import run_log_command
     from app.workspace.data_manager.sessions import run_session_command
     from app.workspace.data_manager.symbols import run_symbol_command
 

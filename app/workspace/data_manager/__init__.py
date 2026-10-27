@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from app.workspace.data_manager.data import Data
     from app.workspace.data_manager.dukascopy import Dukascopy
     from app.workspace.data_manager.help import Help
-    from app.workspace.data_manager.logs import Logs
     from app.workspace.data_manager.sources import Sources
 
 
@@ -22,7 +21,6 @@ def __getattr__(name: str) -> Any:
     """Lazily import data manager classes and functions on demand."""
     services = {
         "Data": "data",
-        "Logs": "logs",
         "Help": "help",
         "Dukascopy": "dukascopy",
         "Sources": "sources",
@@ -45,7 +43,6 @@ __all__ = [
     "DataCLI",
     "Dukascopy",
     "Help",
-    "Logs",
     "Sources",
     "format_data_dashboard",
     "format_dataset_table",

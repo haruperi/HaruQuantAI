@@ -1,16 +1,4 @@
-"""Structured Data Manager activity history and active progress tracking.
-
-Retains a bounded, process-local history and publishes changes through the host
-event bus. Clear removes history only; active tasks and host replay are retained.
-Callers must share one Logs instance across the workspace's producers and readers.
-
-Python API Usage:
-    logs = Logs()
-    logs.record_progress("download:AAPL", progress=25, message="Downloaded 2020")
-    logs.list()
-    logs.list_active()
-    logs.clear()
-"""
+"""Structured Data Manager activity history and active progress tracking."""
 
 from __future__ import annotations
 
@@ -18,7 +6,6 @@ import math
 import time
 import uuid
 from collections import deque
-from collections.abc import Callable
 from datetime import UTC, datetime
 from threading import RLock
 from typing import Any
@@ -32,46 +19,14 @@ from app.host.response import (
 )
 from app.host.transport import get_global_event_bus
 
+from ._helpers import (
+    _COMPLETE,
+    _LEVELS,
+    _MAX_PAGE,
+    _MAX_TASK_ID,
+)
+
 __all__ = ["Logs"]
-
-_LEVELS = frozenset({"debug", "info", "warning", "error", "critical"})
-_COMPLETE = 100
-_MAX_PAGE = 1000
-_MAX_TASK_ID = 256
-
-
-def run_logged_task(
-    logs: Logs | None, context: Any, action: Callable[[Any], dict[str, Any]]
-) -> dict[str, Any]:
-    """Bridge a backend basket job to shared activity history and task progress."""
-    if logs is None:
-        return action(context)
-    activity = logs
-    task_id = context.job_id
-
-    class TrackedContext:
-        def wait_if_paused(self) -> None:
-            context.wait_if_paused()
-
-        def report_progress(self, progress: float, message: str = "") -> None:
-            context.report_progress(progress, message)
-            activity.record_progress(
-                task_id, progress=min(progress, 99), message=f"Updated {message}"
-            )
-
-    logs.record_progress(task_id, progress=0, message="Stock group update started")
-    try:
-        result = action(TrackedContext())
-    except Exception as error:
-        logs.record_progress(
-            task_id,
-            progress=-1,
-            level="error",
-            message=f"Stock group update ended: {type(error).__name__}",
-        )
-        raise
-    logs.record_progress(task_id, progress=100, message="Stock group update completed")
-    return result
 
 
 class Logs:

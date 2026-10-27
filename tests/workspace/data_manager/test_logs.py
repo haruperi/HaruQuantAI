@@ -7,7 +7,7 @@ from unittest.mock import Mock
 import httpx
 import pytest
 from app.host.events import EventBus
-from app.workspace.data_manager import Logs
+from app.workspace.data_manager.logs import Logs
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
@@ -106,7 +106,7 @@ def test_invalid_update_fields(kwargs):
 
 def test_http_and_cli_share_backend_history(monkeypatch):
     from app.host.transport import register_transport_exception_handlers
-    from app.workspace.data_manager import http, logs_cli
+    from app.workspace.data_manager import http, logs
 
     application = FastAPI()
     application.state.data_logs = Logs(EventBus())
@@ -122,7 +122,7 @@ def test_http_and_cli_share_backend_history(monkeypatch):
     monkeypatch.setenv("HARUQUANTAI_SESSION_TOKEN", "test-token")
     settings = Mock()
     settings.get.side_effect = lambda scope, key, default: default
-    monkeypatch.setattr(logs_cli, "SettingsManager", lambda: settings)
+    monkeypatch.setattr(logs, "SettingsManager", lambda: settings)
     real_client = httpx.Client
     with TestClient(application) as backend:
 
@@ -133,21 +133,19 @@ def test_http_and_cli_share_backend_history(monkeypatch):
             return httpx.Response(response.status_code, json=response.json())
 
         monkeypatch.setattr(
-            logs_cli.httpx,
+            logs.httpx,
             "Client",
             lambda **kwargs: real_client(transport=httpx.MockTransport(request)),
         )
         args = Namespace(log_command="list", task_id=None, limit=100, offset=0)
-        assert logs_cli.run_log_command(args, ArgumentParser())["data"]["total"] == 1
+        assert logs.run_log_command(args, ArgumentParser())["data"]["total"] == 1
         args.log_command = "list-active"
         assert (
-            logs_cli.run_log_command(args, ArgumentParser())["data"][0]["task_id"]
-            == "job"
+            logs.run_log_command(args, ArgumentParser())["data"][0]["task_id"] == "job"
         )
         args.log_command = "clear"
         assert (
-            logs_cli.run_log_command(args, ArgumentParser())["data"]["cleared_count"]
-            == 1
+            logs.run_log_command(args, ArgumentParser())["data"]["cleared_count"] == 1
         )
         assert len(application.state.data_logs.list_active()["data"]) == 1
         sessions.authorize.return_value = False
@@ -182,17 +180,15 @@ def test_logged_worker_failure_cleans_active_tasks():
 
 
 def test_cli_reports_missing_session_and_backend(monkeypatch):
-    from app.workspace.data_manager import logs_cli
+    from app.workspace.data_manager import logs
 
     args = Namespace(log_command="list-active")
     monkeypatch.delenv("HARUQUANTAI_SESSION_TOKEN", raising=False)
     assert (
-        logs_cli.run_log_command(args, ArgumentParser())["error"]["code"]
-        == "unauthorized"
+        logs.run_log_command(args, ArgumentParser())["error"]["code"] == "unauthorized"
     )
     monkeypatch.setenv("HARUQUANTAI_SESSION_TOKEN", "test-token")
-    monkeypatch.setattr(logs_cli, "SettingsManager", Mock(side_effect=OSError))
+    monkeypatch.setattr(logs, "SettingsManager", Mock(side_effect=OSError))
     assert (
-        logs_cli.run_log_command(args, ArgumentParser())["error"]["code"]
-        == "unavailable"
+        logs.run_log_command(args, ArgumentParser())["error"]["code"] == "unavailable"
     )

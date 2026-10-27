@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 from typing import Any
 
 import httpx
@@ -17,6 +18,22 @@ from app.host.response import (
 from app.host.settings import SettingsManager
 
 _MAX_PAGE = 1000
+
+__all__ = ["register_log_commands", "run_log_command"]
+
+
+def _get_settings_manager() -> Any:
+    mod = sys.modules.get("app.workspace.data_manager.logs")
+    if mod and hasattr(mod, "SettingsManager"):
+        return mod.SettingsManager
+    return SettingsManager
+
+
+def _get_httpx() -> Any:
+    mod = sys.modules.get("app.workspace.data_manager.logs")
+    if mod and hasattr(mod, "httpx"):
+        return mod.httpx
+    return httpx
 
 
 def register_log_commands(resources: Any) -> None:
@@ -60,7 +77,8 @@ def run_log_command(
         if arguments.task_id is not None:
             params["task_id"] = arguments.task_id
     try:
-        settings = SettingsManager()
+        settings_cls = _get_settings_manager()
+        settings = settings_cls()
         settings.reload()
         host = str(settings.get("host", "host", "127.0.0.1"))
         host = "127.0.0.1" if host == "0.0.0.0" else "::1" if host == "::" else host  # noqa: S104
@@ -68,7 +86,8 @@ def run_log_command(
             host = f"[{host}]"
         port = int(settings.get("host", "port", 8000))
         suffix = {"list": "", "list-active": "/active", "clear": "/clear"}[command]
-        with httpx.Client(timeout=10, trust_env=False) as client:
+        httpx_mod = _get_httpx()
+        with httpx_mod.Client(timeout=10, trust_env=False) as client:
             response = client.request(
                 "POST" if command == "clear" else "GET",
                 f"http://{host}:{port}/api/v1/data/logs{suffix}",

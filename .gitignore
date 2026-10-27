@@ -177,7 +177,9 @@ blob-report/
 # Logs
 # ============================================================================
 artifacts/logs/
+!app/workspace/data_manager/logs/
 logs/
+!app/workspace/data_manager/logs/
 .agents/*
 *.log
 *.log.*
@@ -315,6 +317,7 @@ state/
 # ============================================================================
 .agents/worktrees/
 .agents/logs/
+!app/workspace/data_manager/logs/
 
 # ============================================================================
 # Node / Frontend UI
