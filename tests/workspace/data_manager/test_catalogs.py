@@ -6,11 +6,10 @@ from app.workspace.data_manager import (
     Baskets,
     Brokers,
     Sessions,
-    Symbols,
 )
 from app.workspace.data_manager.baskets import BasketInfo, BasketStockItem
 from app.workspace.data_manager.brokers import BrokerInfo
-from app.workspace.data_manager.symbols import SymbolInfo
+from app.workspace.data_manager.symbols import SymbolInfo, Symbols
 
 
 def test_symbols_list_success(temp_db) -> None:
