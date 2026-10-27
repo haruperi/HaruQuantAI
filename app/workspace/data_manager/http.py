@@ -967,7 +967,8 @@ def _help_routes(router: APIRouter) -> None:
 
 
 def _source_routes(router: APIRouter) -> None:
-    @router.api_route("/sources/{provider}/{action}", methods=["GET", "POST"])
+    @router.get("/sources/{provider}/{action}")
+    @router.post("/sources/{provider}/{action}")
     async def source_command(
         provider: str, action: str, request: Request, body: dict[str, Any] | None = None
     ) -> Any:

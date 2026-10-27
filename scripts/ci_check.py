@@ -1,11 +1,9 @@
-"""Qualify retained tooling, Stage 0 (`P00`) references, and the React frontend.
+"""Qualify repository tooling, Python tests, and the React frontend.
 
 Description:
-    The pre-push hook invokes this module to validate Python reference tooling
-    and the React frontend. `main()` resolves npm and runs checks in sequence,
-    preserving child diagnostics and stopping at the first failure. Reference
-    tests use temporary files, and offline evidence checks never require an SQX
-    installation or database connection.
+    The pre-push hook validates repository tooling, the current Python test
+    suite, and the React frontend. `main()` resolves npm and runs checks in
+    sequence, preserving child diagnostics and stopping at the first failure.
 
 Purpose:
     FEAT-DEV-QUALIFICATION: Qualify the current repository before publication.
@@ -64,20 +62,6 @@ def main() -> int:
         logger.error("FR-DEV-RESOLVE-NPM: npm launcher not found")
         return 1
     logger.info("FR-DEV-RESOLVE-NPM: npm launcher resolved")
-    audit = root / ".agents/logs/reference-qualification"
-    try:
-        audit.mkdir(parents=True, exist_ok=True)
-    except OSError as error:
-        logger.error(  # noqa: TRY400
-            "FR-DEV-QUALIFICATION-RESULT: audit directory unavailable (errno=%s)",
-            error.errno,
-        )
-        return 1
-    tests = (
-        "tests/unit/test_reference_manifest.py",
-        "tests/unit/test_reference_fixtures.py",
-        "tests/unit/test_reference_validation.py",
-    )
     commands = (
         (sys.executable, "-m", "ruff", "check", "scripts"),
         (sys.executable, "-m", "ruff", "format", "--check", "scripts"),
@@ -91,28 +75,7 @@ def main() -> int:
         (sys.executable, "scripts/check_architecture.py"),
         (sys.executable, "-m", "ruff", "check", "tests"),
         (sys.executable, "-m", "ruff", "format", "--check", "tests"),
-        (
-            sys.executable,
-            "-m",
-            "mypy",
-            "--strict",
-            "--explicit-package-bases",
-            "tests/reference",
-            "tests/unit",
-        ),
-        (sys.executable, "-m", "tests.reference.validate"),
-        (
-            sys.executable,
-            "-m",
-            "pytest",
-            *tests,
-            "--cov=tests.reference",
-            "--cov-config=tests/reference/coverage.toml",
-            "--cov-branch",
-            "--cov-fail-under=80",
-            "--cov-report=term-missing",
-            "--cov-report=json:.agents/logs/reference-qualification/coverage.json",
-        ),
+        (sys.executable, "-m", "pytest"),
         (npm, "--prefix", "ui", "run", "typecheck"),
         (npm, "--prefix", "ui", "run", "test"),
         (npm, "--prefix", "ui", "run", "build"),

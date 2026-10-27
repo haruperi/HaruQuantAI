@@ -99,6 +99,11 @@ def metadata(**overrides):
 
 def test_routes_are_installed(client):
     schema = client.get("/openapi.json").json()
+    source_operations = schema["paths"]["/api/v1/data/sources/{provider}/{action}"]
+    assert (
+        source_operations["get"]["operationId"]
+        != source_operations["post"]["operationId"]
+    )
     for path in (
         "auth",
         "auth/login",
