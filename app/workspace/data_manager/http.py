@@ -25,14 +25,8 @@ from app.workspace.data_manager.custom_http import register_custom_routes
 from app.workspace.data_manager.data import Data
 from app.workspace.data_manager.dukascopy_http import register_dukascopy_routes
 from app.workspace.data_manager.help import Help
-from app.workspace.data_manager.http_fields import (
-    symbol_to_ui as _ui,
-)
-from app.workspace.data_manager.http_fields import (
-    symbol_updates as _updates,
-)
-from app.workspace.data_manager.sessions import Sessions
-from app.workspace.data_manager.symbols import Symbols
+from app.workspace.data_manager.sessions import register_session_routes
+from app.workspace.data_manager.symbols import register_symbol_routes
 
 TABS = (
     "data",
@@ -108,13 +102,6 @@ def _rows(
     return rows
 
 
-def _names(rows: list[dict[str, Any]], ids: list[str]) -> list[str]:
-    found = {str(row["id"]): row["name"] for row in rows}
-    if not ids or any(key not in found for key in ids):
-        raise TransportError(ErrorCode.NOT_FOUND, "Select existing symbols")
-    return list(dict.fromkeys(found[key] for key in ids))
-
-
 def create_router() -> APIRouter:
     """Register browser workspace and symbol commands within their domain."""
     router = APIRouter(prefix="/api/v1/data", dependencies=[Depends(_access)])
@@ -158,34 +145,9 @@ def create_router() -> APIRouter:
             }
         )
 
-    @router.get("/instruments")
-    @router.get("/symbols")
-    def list_symbols(request: Request) -> dict[str, Any]:
-        return _ok([_ui(row) for row in _rows(request.app.state.persistence)])
-
-    @router.post("/instruments")
-    @router.post("/symbols")
-    def add_symbol(request: Request, body: dict[str, Any]) -> Any:
-        gateway = request.app.state.persistence
-        name = str(body.get("symbol") or "").strip()
-        datasource = str(body.get("datasource") or "SQ default").strip()
-        result = Symbols(gateway).add(
-            name=name, datasource=datasource, **_updates(body)
-        )
-        if not result["success"]:
-            return _response(result)
-        saved = result["data"]["name"]
-        return _ok(_ui(next(row for row in _rows(gateway) if row["name"] == saved)))
-
-    @router.post("/instruments/{command}")
-    @router.post("/symbols/{command}")
-    def symbol_command(command: str, request: Request, body: dict[str, Any]) -> Any:
-        gateway = request.app.state.persistence
-        return _execute(command, body, Symbols(gateway), gateway)
-
     _source_routes(router)
-
-    _session_routes(router)
+    register_symbol_routes(router)
+    register_session_routes(router)
     _broker_routes(router)
     _basket_routes(router)
     _log_routes(router)
@@ -193,118 +155,6 @@ def create_router() -> APIRouter:
     _help_routes(router)
     register_dukascopy_routes(router)
     return router
-
-
-def _execute(
-    command: str, body: dict[str, Any], service: Symbols, gateway: HostPersistence
-) -> Any:
-    if command in {"load", "save"}:
-        return _transfer(command, body, service, gateway)
-    rows = _rows(gateway)
-    if command == "clone":
-        name = _names(rows, [body["source_id"]])[0]
-        result = service.clone(name, body["new_symbol"])
-        if result["success"]:
-            saved = result["data"]["name"]
-            return _ok(_ui(next(row for row in _rows(gateway) if row["name"] == saved)))
-    elif command == "delete":
-        names = _names(rows, body.get("instrument_ids", body.get("symbol_ids", [])))
-        result = service.delete(names)
-        if result["success"]:
-            return _ok({"deleted_count": len(result["data"])})
-    elif command in {"mass-edit", "update"}:
-        return _edit_or_update(command, body, service, gateway, rows)
-    elif command == "refresh":
-        return _ok({"deleted_count": 0, "inserted_count": len(rows)})
-    else:
-        raise TransportError(ErrorCode.NOT_FOUND, "Unknown symbol command")
-    return _response(result)
-
-
-def _edit_or_update(
-    command: str,
-    body: dict[str, Any],
-    service: Symbols,
-    gateway: HostPersistence,
-    rows: list[dict[str, Any]],
-) -> Any:
-    """Update requested rows, or bootstrap an empty catalog from MT5."""
-    ids = body.get("instrument_ids", body.get("symbol_ids", []))
-    names = _names(rows, ids) if ids or command != "update" else None
-    result = (
-        service.mt5update(names)
-        if command == "update"
-        else service.edit(names or [], updates=_updates(body["updates"]))
-    )
-    if result["success"]:
-        return _ok(
-            {
-                "updated_count": len(result["data"]),
-                "symbols": [
-                    _ui(row)
-                    for row in _rows(gateway)
-                    if not ids or str(row["id"]) in ids
-                ],
-            }
-        )
-    return _response(result)
-
-
-def _transfer(
-    command: str, body: dict[str, Any], service: Symbols, gateway: HostPersistence
-) -> Any:
-    with TemporaryDirectory(prefix="haru-symbols-") as folder:
-        path = Path(folder) / "symbols.csv"
-        if command == "load":
-            content = body.get("content")
-            if (
-                not isinstance(content, str)
-                or len(content.encode("utf-8")) > MAX_CSV_BYTES
-            ):
-                raise TransportError(
-                    ErrorCode.VALIDATION, "Choose a CSV file up to 10 MB"
-                )
-            path.write_text(content, encoding="utf-8-sig")
-            result = service.load(path)
-            if result["success"]:
-                return _ok(
-                    {
-                        "loaded_count": len(result["data"]["loaded"]),
-                        "errors": result["data"]["errors"],
-                        "total": result["data"]["total"],
-                    }
-                )
-        else:
-            rows = _rows(gateway)
-            ids = body.get("instrument_ids", body.get("symbol_ids", []))
-            names = _names(rows, ids) if ids else [row["name"] for row in rows]
-            result = service.save(names, path)
-            if result["success"]:
-                return _ok(
-                    {
-                        "content": path.read_text(encoding="utf-8-sig"),
-                        "count": result["data"]["count"],
-                    }
-                )
-        return _response(result)
-
-
-def _session_rows(service: Sessions) -> list[dict[str, Any]]:
-    return [{**row, "id": str(row["id"])} for row in _service_data(service.list())]
-
-
-def _session_name(service: Sessions, identifier: Any) -> str:
-    if not isinstance(identifier, str):
-        raise TransportError(ErrorCode.VALIDATION, "Session ID must be a string")
-    for row in _session_rows(service):
-        if row["id"] == identifier:
-            return str(row["name"])
-    raise TransportError(ErrorCode.NOT_FOUND, "Session not found")
-
-
-def _session_result(result: dict[str, Any]) -> Any:
-    data = _service_data(result)
-    return _ok({**data, "id": str(data["id"])})
 
 
 def _catalog_transfer(
@@ -347,101 +197,6 @@ def _catalog_transfer(
         return _ok(
             {"content": path.read_text(encoding="utf-8"), "count": data["count"]}
         )
-
-
-def _session_routes(router: APIRouter) -> None:
-    """Expose session service operations using the browser's stable identities."""
-
-    @router.get("/sessions")
-    def list_sessions(request: Request) -> Any:
-        return _ok(_session_rows(Sessions(request.app.state.persistence)))
-
-    @router.post("/sessions")
-    def save_session(request: Request, body: dict[str, Any]) -> Any:
-        service = Sessions(request.app.state.persistence)
-        fields = {key: value for key, value in body.items() if key != "id"}
-        if "id" in body:
-            result = service.edit(_session_name(service, body["id"]), fields)
-            if result["success"]:
-                result = {**result, "data": result["data"][0]}
-        else:
-            result = service.add(**fields)
-        return _session_result(result)
-
-    @router.post("/sessions/clone")
-    def clone_session(request: Request, body: dict[str, Any]) -> Any:
-        service = Sessions(request.app.state.persistence)
-        return _session_result(
-            service.clone(
-                _session_name(service, body.get("session_id")),
-                body.get("new_name", ""),
-                minutes=body.get("timezone_offset", 0),
-            )
-        )
-
-    @router.post("/sessions/delete")
-    def delete_sessions(request: Request, body: dict[str, Any]) -> Any:
-        service = Sessions(request.app.state.persistence)
-        ids = body.get("session_ids")
-        if not isinstance(ids, list) or not ids:
-            raise TransportError(ErrorCode.VALIDATION, "Select sessions to delete")
-        result = service.delete(
-            [_session_name(service, item) for item in cast("Any", ids)]
-        )
-        return (
-            _ok({"deleted": list(dict.fromkeys(cast("Any", ids)))})
-            if result["success"]
-            else _response(result)
-        )
-
-    @router.delete("/sessions/{identifier}")
-    def delete_session(identifier: str, request: Request) -> Any:
-        service = Sessions(request.app.state.persistence)
-        result = service.delete(_session_name(service, identifier))
-        return (
-            _ok({"id": identifier, "deleted": True})
-            if result["success"]
-            else _response(result)
-        )
-
-    _session_element_route(router)
-
-    _session_transfer_route(router)
-
-
-def _session_element_route(router: APIRouter) -> None:
-    @router.post("/sessions/{identifier}/elements")
-    def session_element(identifier: str, request: Request, body: dict[str, Any]) -> Any:
-        service = Sessions(request.app.state.persistence)
-        name = _session_name(service, identifier)
-        row = next(row for row in _session_rows(service) if row["id"] == identifier)
-        windows = list(row["windows"])
-        action, index = body.get("action"), body.get("index")
-        if action == "add":
-            windows.append(body.get("window"))
-        elif action in {"update", "remove"}:
-            if type(index) is not int or not 0 <= index < len(windows):
-                raise TransportError(
-                    ErrorCode.VALIDATION, "Select an existing interval"
-                )
-            if action == "update":
-                windows[index] = body.get("window")
-            else:
-                windows.pop(index)
-        else:
-            raise TransportError(ErrorCode.VALIDATION, "Unknown interval operation")
-        result = service.edit(name, windows=windows)
-        if result["success"]:
-            result = {**result, "data": result["data"][0]}
-        return _session_result(result)
-
-
-def _session_transfer_route(router: APIRouter) -> None:
-    @router.post("/sessions/{command}")
-    def session_transfer(command: str, request: Request, body: dict[str, Any]) -> Any:
-        if command not in {"load", "save"}:
-            raise TransportError(ErrorCode.NOT_FOUND, "Unknown session command")
-        return _catalog_transfer(command, body, Sessions(request.app.state.persistence))
 
 
 def _service_data(response: dict[str, Any]) -> Any:

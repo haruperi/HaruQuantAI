@@ -13,21 +13,18 @@ if TYPE_CHECKING:
         BrokersCLI,
         CustomDataCLI,
         DataCLI,
-        SessionsCLI,
         format_basket_table,
         format_broker_table,
         format_custom_table,
         format_data_dashboard,
         format_dataset_table,
         format_review_table,
-        format_session_table,
     )
     from app.workspace.data_manager.custom import CustomData
     from app.workspace.data_manager.data import Data
     from app.workspace.data_manager.dukascopy import Dukascopy
     from app.workspace.data_manager.help import Help
     from app.workspace.data_manager.logs import Logs
-    from app.workspace.data_manager.sessions import Sessions
     from app.workspace.data_manager.sources import Sources
 
 
@@ -35,7 +32,6 @@ def __getattr__(name: str) -> Any:
     """Lazily import data manager classes and functions on demand."""
     services = {
         "Data": "data",
-        "Sessions": "sessions",
         "Brokers": "brokers",
         "Baskets": "baskets",
         "Logs": "logs",
@@ -51,14 +47,12 @@ def __getattr__(name: str) -> Any:
         "BrokersCLI",
         "CustomDataCLI",
         "DataCLI",
-        "SessionsCLI",
         "format_basket_table",
         "format_broker_table",
         "format_custom_table",
         "format_data_dashboard",
         "format_dataset_table",
         "format_review_table",
-        "format_session_table",
     }:
         from app.workspace.data_manager import cli
 
@@ -78,8 +72,6 @@ __all__ = [
     "Dukascopy",
     "Help",
     "Logs",
-    "Sessions",
-    "SessionsCLI",
     "Sources",
     "format_basket_table",
     "format_broker_table",
@@ -87,5 +79,4 @@ __all__ = [
     "format_data_dashboard",
     "format_dataset_table",
     "format_review_table",
-    "format_session_table",
 ]

@@ -36,6 +36,11 @@ from ._helpers import (
     persistence,
 )
 from .feature import Symbols
+from .http import (
+    register_symbol_routes,
+    symbol_to_ui,
+    symbol_updates,
+)
 
 __all__ = [
     "CSV_COLUMNS",
@@ -56,5 +61,8 @@ __all__ = [
     "format_symbol_table",
     "persistence",
     "register_symbol_commands",
+    "register_symbol_routes",
     "run_symbol_command",
+    "symbol_to_ui",
+    "symbol_updates",
 ]

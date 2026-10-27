@@ -5,10 +5,10 @@ from unittest.mock import patch
 from app.workspace.data_manager import (
     Baskets,
     Brokers,
-    Sessions,
 )
 from app.workspace.data_manager.baskets import BasketInfo, BasketStockItem
 from app.workspace.data_manager.brokers import BrokerInfo
+from app.workspace.data_manager.sessions import Sessions
 from app.workspace.data_manager.symbols import SymbolInfo, Symbols
 
 
