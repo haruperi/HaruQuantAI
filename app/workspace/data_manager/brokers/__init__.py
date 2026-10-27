@@ -8,11 +8,6 @@ Description:
 
 from __future__ import annotations
 
-from app.workspace.data_manager.cli_formatters import (
-    BrokersCLI,
-    format_broker_table,
-)
-
 from ._cli import (
     register_broker_commands,
     run_broker_command,
@@ -20,6 +15,8 @@ from ._cli import (
 from ._helpers import (
     BROKERS_CATALOG_FR,
     BrokerInfo,
+    BrokersCLI,
+    format_broker_table,
     persistence,
 )
 from .feature import Brokers

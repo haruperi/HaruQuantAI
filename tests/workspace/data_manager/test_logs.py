@@ -106,7 +106,7 @@ def test_invalid_update_fields(kwargs):
 
 def test_http_and_cli_share_backend_history(monkeypatch):
     from app.host.transport import register_transport_exception_handlers
-    from app.workspace.data_manager import http, logs
+    from app.workspace.data_manager import create_router, logs
 
     application = FastAPI()
     application.state.data_logs = Logs(EventBus())
@@ -114,7 +114,7 @@ def test_http_and_cli_share_backend_history(monkeypatch):
     sessions.validate_session.return_value = object()
     sessions.authorize.return_value = True
     application.state.sessions = sessions
-    application.include_router(http.create_router())
+    application.include_router(create_router())
     register_transport_exception_handlers(application)
     application.state.data_logs.record_progress(
         "job", progress=30, message="Downloading"

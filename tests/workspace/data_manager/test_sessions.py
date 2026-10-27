@@ -201,14 +201,14 @@ def test_save_failure_preserves_existing_file(sessions, tmp_path):
 @pytest.fixture
 def session_http(sessions):
     from app.host.transport import register_transport_exception_handlers
-    from app.workspace.data_manager import http
+    from app.workspace.data_manager import _access, create_router
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
     application = FastAPI()
     application.state.persistence = sessions.gateway
-    application.include_router(http.create_router())
-    application.dependency_overrides[http._access] = lambda: None
+    application.include_router(create_router())
+    application.dependency_overrides[_access] = lambda: None
     register_transport_exception_handlers(application)
     with TestClient(application) as client:
         yield client
@@ -352,7 +352,7 @@ def test_http_validation_and_atomic_delete(session_http):
 
 def test_http_sessions_require_authentication(sessions):
     from app.host.transport import register_transport_exception_handlers
-    from app.workspace.data_manager.http import create_router
+    from app.workspace.data_manager import create_router
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
@@ -372,12 +372,12 @@ def test_http_sessions_require_authentication(sessions):
 def test_session_cli_lifecycle(sessions, monkeypatch, capsys, tmp_path):
     import argparse
 
-    from app.workspace.data_manager import cli
+    from app.workspace.data_manager import register_commands
     from app.workspace.data_manager import sessions as module
 
     monkeypatch.setattr(module, "persistence", sessions.gateway)
     parser = argparse.ArgumentParser()
-    cli.register_commands(parser.add_subparsers(dest="command", required=True))
+    register_commands(parser.add_subparsers(dest="command", required=True))
 
     def run(*args):
         arguments = parser.parse_args(["data-manager", "session", *args])

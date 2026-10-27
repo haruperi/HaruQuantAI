@@ -8,11 +8,6 @@ Description:
 
 from __future__ import annotations
 
-from app.workspace.data_manager.cli_formatters import (
-    BasketsCLI,
-    format_basket_table,
-)
-
 from ._cli import (
     register_basket_commands,
     run_basket_command,
@@ -20,8 +15,10 @@ from ._cli import (
 from ._helpers import (
     BASKETS_CATALOG_FR,
     BasketInfo,
+    BasketsCLI,
     BasketStockItem,
     BasketTargets,
+    format_basket_table,
     persistence,
 )
 from .feature import Baskets

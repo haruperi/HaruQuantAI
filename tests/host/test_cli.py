@@ -12,7 +12,7 @@ from app.host.session import SessionManager
 
 
 def test_main_routes_registered_domain_handler(monkeypatch, capsys):
-    from app.workspace.data_manager import cli as domain_cli
+    from app.workspace import data_manager as domain_cli
 
     handler = Mock(return_value=7)
 
@@ -103,8 +103,7 @@ def test_invalid_commands_do_not_run_health(monkeypatch, arguments):
     ],
 )
 def test_symbol_list_command(monkeypatch, capsys, result):
-    from app.workspace.data_manager.cli import SymbolsCLI
-    from app.workspace.data_manager.symbols import Symbols
+    from app.workspace.data_manager.symbols import Symbols, SymbolsCLI
 
     list_symbols = Mock(return_value=result)
     monkeypatch.setattr(Symbols, "list", list_symbols)

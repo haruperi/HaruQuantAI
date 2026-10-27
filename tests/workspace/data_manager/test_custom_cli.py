@@ -3,14 +3,16 @@
 import argparse
 from unittest.mock import patch
 
-from app.workspace.data_manager.cli import (
-    CustomDataCLI,
-    format_custom_table,
-    format_review_table,
+from app.workspace.data_manager import (
     register_commands,
     run_command,
 )
-from app.workspace.data_manager.custom import CustomData
+from app.workspace.data_manager.custom import (
+    CustomData,
+    CustomDataCLI,
+    format_custom_table,
+    format_review_table,
+)
 
 
 def _setup_parser():

@@ -33,6 +33,7 @@ from ._helpers import (
 )
 from .crypto import Crypto
 from .darwinex import Darwinex
+from .download_jobs import manager, register_download_jobs
 from .dukascopy import Dukascopy
 from .http import (
     bridge_action,
@@ -72,7 +73,9 @@ __all__ = [
     "capabilities",
     "intervals",
     "make_client",
+    "manager",
     "provider_id",
+    "register_download_jobs",
     "register_dukascopy_commands",
     "register_dukascopy_routes",
     "register_source_commands",

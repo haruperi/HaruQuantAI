@@ -348,7 +348,7 @@ def test_default_provider_is_owned_and_closed(baskets, tmp_path, monkeypatch):
 @pytest.fixture
 def basket_http(baskets):
     from app.host.transport import register_transport_exception_handlers
-    from app.workspace.data_manager import http
+    from app.workspace.data_manager import _access, create_router
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
@@ -357,8 +357,8 @@ def basket_http(baskets):
     from app.workspace.data_manager.logs import Logs
 
     application.state.data_logs = Logs()
-    application.include_router(http.create_router())
-    application.dependency_overrides[http._access] = lambda: None
+    application.include_router(create_router())
+    application.dependency_overrides[_access] = lambda: None
     register_transport_exception_handlers(application)
     with TestClient(application) as client:
         yield client
@@ -484,11 +484,11 @@ def test_basket_http_jobs_and_get_cannot_cancel(basket_http, baskets):
 def test_all_eleven_basket_cli_operations(baskets, monkeypatch, tmp_path, capsys):
     import argparse
 
-    from app.workspace.data_manager import cli
+    from app.workspace.data_manager import register_commands
 
     monkeypatch.setattr("app.workspace.data_manager.baskets.Baskets", lambda: baskets)
     parser = argparse.ArgumentParser()
-    cli.register_commands(parser.add_subparsers(dest="command", required=True))
+    register_commands(parser.add_subparsers(dest="command", required=True))
     csv_path = tmp_path / "stocks.csv"
     json_path = tmp_path / "groups.json"
     monkeypatch.setattr(

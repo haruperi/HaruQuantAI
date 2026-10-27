@@ -288,7 +288,7 @@ async def _mt5_download(
     service: Sources, arguments: argparse.Namespace
 ) -> dict[str, Any]:
     from app.workspace.brokers.metatrader import create_mt5_client
-    from app.workspace.data_manager.coverage import missing_ranges
+    from app.workspace.data_manager.data import missing_ranges
 
     dataset_id = f"mt5:{arguments.symbol.upper()}:{arguments.timeframe.upper()}"
     row = service.record(dataset_id)

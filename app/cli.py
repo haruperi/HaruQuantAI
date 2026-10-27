@@ -167,7 +167,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         login_parser = commands.add_parser("login", help="Authenticate a CLI session")
         login_parser.add_argument("--username", required=True)
         commands.add_parser("logout", help="Revoke the current CLI session")
-        from app.workspace.data_manager.cli import register_commands
+        from app.workspace.data_manager import register_commands
 
         register_commands(commands)
         arguments = parser.parse_args(argv)

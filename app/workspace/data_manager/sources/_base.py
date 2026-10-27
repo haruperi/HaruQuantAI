@@ -14,8 +14,13 @@ import pandas as pd  # type: ignore[import-untyped]
 from app.host.persistence import HostPersistence
 from app.include.contracts import BridgeError
 from app.include.market_storage import price_columns, safe_component
-from app.workspace.data_manager.coverage import missing_ranges, record_checked_ranges
-from app.workspace.data_manager.storage import dataset_root, publish_frame, require_data
+from app.workspace.data_manager.data import (
+    dataset_root,
+    missing_ranges,
+    publish_frame,
+    record_checked_ranges,
+    require_data,
+)
 
 from ._helpers import (
     _CONTROL_LIMIT,

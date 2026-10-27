@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 from app.host.transport import register_transport_exception_handlers
-from app.workspace.data_manager import http as symbols_http
+from app.workspace.data_manager import create_router
 from app.workspace.data_manager.symbols import Symbols
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -155,7 +155,7 @@ def test_symbol_http_requires_ui_session(temp_db):
     application.state.sessions = Mock()
     application.state.sessions.validate_session.return_value = None
     register_transport_exception_handlers(application)
-    application.include_router(symbols_http.create_router())
+    application.include_router(create_router())
     with TestClient(application) as client:
         assert client.get("/api/v1/data/instruments").status_code == 401
         assert (

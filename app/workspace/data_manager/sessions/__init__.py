@@ -8,11 +8,6 @@ Description:
 
 from __future__ import annotations
 
-from app.workspace.data_manager.cli_formatters import (
-    SessionsCLI,
-    format_session_table,
-)
-
 from ._cli import (
     register_session_commands,
     run_session_command,
@@ -21,9 +16,11 @@ from ._helpers import (
     MAX_HOLIDAYS,
     MAX_SHIFT_MINUTES,
     MAX_WINDOWS,
+    SessionsCLI,
     SessionWindow,
     TradingHoliday,
     TradingSession,
+    format_session_table,
     persistence,
 )
 from .feature import Sessions

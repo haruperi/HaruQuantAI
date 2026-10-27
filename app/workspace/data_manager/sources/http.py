@@ -14,14 +14,14 @@ from app.host.response import ErrorCode
 from app.host.transport import TransportError
 from app.workspace.brokers.base import get_broker
 from app.workspace.data_manager.data import Data
-from app.workspace.data_manager.download_jobs import (
+
+from ._base import Sources
+from ._helpers import capabilities, provider_id
+from .download_jobs import (
     manager,
     register_download_jobs,
     start_download,
 )
-
-from ._base import Sources
-from ._helpers import capabilities, provider_id
 from .dukascopy import Dukascopy
 
 __all__ = [

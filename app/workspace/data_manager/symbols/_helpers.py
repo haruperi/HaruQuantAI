@@ -655,3 +655,180 @@ def _mt5_bridge_failure(error: BridgeError, start: float) -> dict[str, Any]:
         else "MT5 update failed; check the terminal, bridge and symbol names",
         code,
     )
+
+
+MAX_DESC_DISPLAY_LEN: int = 26
+DESC_TRUNCATE_LEN: int = 24
+
+
+def _get(item: Any, key: str, default: Any = "") -> Any:
+    if isinstance(item, Mapping):
+        return cast("Mapping[str, Any]", item).get(key, default)
+    return getattr(item, key, default)
+
+
+def _fmt_scalar(val: Any) -> str:
+    """Format scalar number or string cleanly."""
+    if isinstance(val, float):
+        if val.is_integer():
+            return str(int(val))
+        return f"{val:g}"
+    return str(val)
+
+
+def _extract_field(item: Any, section: str, key: str, default: Any = 0) -> Any:
+    """Extract nested dictionary or contract property safely."""
+    sec = _get(item, section, {})
+    if isinstance(sec, Mapping):
+        return cast("Mapping[str, Any]", sec).get(key, default)
+    return getattr(sec, key, default)
+
+
+def _format_commission(item: Any) -> str:
+    """Extract human-readable commission summary."""
+    single_comm = _get(item, "commission")
+    if single_comm is not None and isinstance(single_comm, (int, float)):
+        return f"${_fmt_scalar(single_comm)}/lot"
+    comm = _get(item, "commissions", {})
+    if not isinstance(comm, Mapping):
+        return "None"
+    rules: Any = cast("Mapping[str, Any]", comm).get("rules") or []
+    if isinstance(rules, list) and rules:
+        first_rule = cast("Any", rules)[0]
+        if isinstance(first_rule, Mapping):
+            tiers: Any = cast("Mapping[str, Any]", first_rule).get("tiers") or []
+            if isinstance(tiers, list) and tiers:
+                tier = cast("Any", tiers)[0]
+                if isinstance(tier, Mapping):
+                    val = _fmt_scalar(cast("Mapping[str, Any]", tier).get("value", 0))
+                    curr = str(
+                        cast("Mapping[str, Any]", tier).get("currency", "")
+                    ).strip()
+                    return f"{val} {curr}".strip()
+    return "None"
+
+
+def _format_swap(item: Any) -> str:
+    """Extract swap long/short representation."""
+    swap = _get(item, "swap", {})
+    if not isinstance(swap, Mapping):
+        return "0 / 0"
+    l_val = _fmt_scalar(cast("Mapping[str, Any]", swap).get("long", 0))
+    s_val = _fmt_scalar(cast("Mapping[str, Any]", swap).get("short", 0))
+    return f"{l_val} / {s_val}"
+
+
+def _format_order_size(item: Any) -> str:
+    """Extract order size multiplier and step."""
+    ord_sz = _get(item, "order_size", {})
+    if isinstance(ord_sz, Mapping) and ord_sz:
+        mult = _fmt_scalar(cast("Mapping[str, Any]", ord_sz).get("multiplier", 1))
+        step = _fmt_scalar(cast("Mapping[str, Any]", ord_sz).get("step", 0))
+        return f"{mult} / {step}"
+    vol = _get(item, "volume", {})
+    if isinstance(vol, Mapping) and vol:
+        mult = _fmt_scalar(cast("Mapping[str, Any]", vol).get("min", 1))
+        step = _fmt_scalar(cast("Mapping[str, Any]", vol).get("step", 0))
+        return f"{mult} / {step}"
+    return "1 / 0"
+
+
+def format_symbol_table(
+    symbols: Sequence[Any] | Mapping[str, Any],
+    *,
+    limit: int | None = 50,
+) -> str:
+    """Format ASCII table of symbol catalog entries with StrategyQuant columns."""
+    items: Sequence[Any]
+    if (
+        isinstance(symbols, Mapping)
+        and "data" in symbols
+        and isinstance(symbols["data"], Sequence)
+    ):
+        items = cast("Any", symbols["data"])
+    elif isinstance(symbols, Sequence):
+        items = symbols
+    else:
+        items = ()
+    total_count = len(items)
+    displayed_items = items[:limit] if limit is not None else items
+    count = len(displayed_items)
+    title = (
+        f"=== Symbols Catalog (Showing {count} of {total_count} items) ==="
+        if (limit is not None and total_count > count)
+        else f"=== Symbols Catalog ({total_count} items) ==="
+    )
+    lines: list[str] = [title]
+    header_fmt = (
+        "| {sym:<10} | {desc:<26} | {brk:<14} | {pt:>12} | {ts:>10} "
+        "| {tstep:>10} | {spd:>14} | {slip:>16} | {comm:<14} | {swap:<16} "
+        "| {dtype:<14} | {ord_sz:<20} |"
+    )
+    divider = (
+        "|-"
+        + "-|-".join(
+            ["-" * width for width in (10, 26, 14, 12, 10, 10, 14, 16, 14, 16, 14, 20)]
+        )
+        + "-|"
+    )
+    lines.append(
+        header_fmt.format(
+            sym="Symbol",
+            desc="Description",
+            brk="Broker Profile",
+            pt="Point Value",
+            ts="Tick Size",
+            tstep="Tick Step",
+            spd="Default Spread",
+            slip="Default Slippage",
+            comm="Commissions",
+            swap="Swap (L/S)",
+            dtype="Data Type",
+            ord_sz="Order Size Mult/Step",
+        )
+    )
+    lines.append(divider)
+    for item in displayed_items:
+        sym = str(_get(item, "name", "") or _get(item, "symbol", ""))
+        desc = str(_get(item, "description", ""))
+        if len(desc) > MAX_DESC_DISPLAY_LEN:
+            desc = desc[:DESC_TRUNCATE_LEN] + ".."
+        brk = str(_get(item, "broker_name") or _get(item, "broker") or "Default")
+        pt_val = _extract_field(item, "price", "contract_size", None)
+        if pt_val is None or pt_val == 0:
+            pt_val = _extract_field(item, "contract", "point_value", 0)
+        if isinstance(pt_val, (int, float)) and pt_val == int(pt_val) and pt_val > 0:
+            pt_str = f"{int(pt_val):,}"
+        else:
+            pt_str = _fmt_scalar(pt_val)
+        tick_sz = _fmt_scalar(_extract_field(item, "price", "tick_size", 0))
+        tick_st = _fmt_scalar(_extract_field(item, "price", "tick_step", 0))
+        def_spread = _fmt_scalar(_extract_field(item, "spread", "default", 0))
+        def_slip = _fmt_scalar(_extract_field(item, "spread", "slippage", 0))
+        comm_str = _format_commission(item)
+        swap_str = _format_swap(item)
+        dtype = str(_get(item, "data_type", ""))
+        ord_sz_str = _format_order_size(item)
+        lines.append(
+            header_fmt.format(
+                sym=sym,
+                desc=desc,
+                brk=brk,
+                pt=pt_str,
+                ts=tick_sz,
+                tstep=tick_st,
+                spd=def_spread,
+                slip=def_slip,
+                comm=comm_str,
+                swap=swap_str,
+                dtype=dtype,
+                ord_sz=ord_sz_str,
+            )
+        )
+    return "\n".join(lines)
+
+
+class SymbolsCLI:
+    """Table formatters for the Data Manager catalog."""
+
+    format_symbol_table = staticmethod(format_symbol_table)

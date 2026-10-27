@@ -18,11 +18,12 @@ import pyarrow.parquet as pq
 
 from app.host.persistence import HostPersistence
 from app.include.market_storage import catalog_paths, encode_frame, safe_component
-from app.workspace.data_manager.coverage import (
+
+from .coverage import (
     add_completed_range,
     observation_coverage,
 )
-from app.workspace.data_manager.partition_files import (
+from .partition_files import (
     FilePublication,
     canonical_target,
     dataset_lock,

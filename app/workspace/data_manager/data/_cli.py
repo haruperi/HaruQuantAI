@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from app.workspace.data_manager.cli_formatters import (
+from ._helpers import (
     DataCLI,
     format_data_dashboard,
     format_dataset_table,
 )
-
 from .feature import Data
 
 __all__ = [

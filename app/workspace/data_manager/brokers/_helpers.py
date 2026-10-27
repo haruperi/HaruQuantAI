@@ -229,3 +229,91 @@ def _lookup(gateway: HostPersistence, name: str) -> dict[str, Any]:
     if not rows:
         raise _BrokerError(f"Broker '{name}' not found", ErrorCode.NOT_FOUND)
     return rows[0]
+
+
+MAX_BROKER_DESC_LEN: int = 22
+BROKER_DESC_TRUNCATE_LEN: int = 20
+
+
+def _get(item: Any, key: str, default: Any = "") -> Any:
+    from collections.abc import Mapping
+
+    if isinstance(item, Mapping):
+        return item.get(key, default)
+    return getattr(item, key, default)
+
+
+def format_broker_table(
+    brokers: Sequence[Any] | Mapping[str, Any],
+) -> str:
+    """Format ASCII table of broker profile catalog entries."""
+    from collections.abc import Mapping
+
+    items: Sequence[Any]
+    if (
+        isinstance(brokers, Mapping)
+        and "data" in brokers
+        and isinstance(brokers["data"], Sequence)
+    ):
+        items = cast("Any", brokers["data"])
+    elif isinstance(brokers, Sequence):
+        items = brokers
+    else:
+        items = ()
+    count = len(items)
+    lines: list[str] = [f"=== Broker Profiles Catalog ({count} items) ==="]
+    header_fmt = (
+        "| {name:<26} | {desc:<22} | {pf:<14} | {tz:<16} "
+        "| {stocks:>17} | {insts:>22} | {sess:>19} |"
+    )
+    divider = (
+        "|-"
+        + "-|-".join(["-" * width for width in (26, 22, 14, 16, 17, 22, 19)])
+        + "-|"
+    )
+    lines.append(
+        header_fmt.format(
+            name="Name",
+            desc="Description",
+            pf="Postfix",
+            tz="Timezone",
+            stocks="Customized stocks",
+            insts="Customized instruments",
+            sess="Customized sessions",
+        )
+    )
+    lines.append(divider)
+    for item in items:
+        name = str(_get(item, "name", ""))
+        desc = str(_get(item, "description", ""))
+        if len(desc) > MAX_BROKER_DESC_LEN:
+            desc = desc[:BROKER_DESC_TRUNCATE_LEN] + ".."
+        pf = str(_get(item, "postfix", ""))
+        tz = str(
+            _get(item, "server_timezone", "") or _get(item, "timezone", "") or "UTC"
+        )
+        stocks = _get(item, "customized_stocks", 0)
+        insts = _get(item, "customized_instruments", 0)
+        if insts == 0:
+            insts = _get(item, "total_instruments", 0)
+        sess = _get(item, "customized_sessions", 0)
+        if sess == 0:
+            sess = _get(item, "total_sessions", 0)
+        lines.append(
+            header_fmt.format(
+                name=name,
+                desc=desc,
+                pf=pf,
+                tz=tz,
+                stocks=stocks,
+                insts=insts,
+                sess=sess,
+            )
+        )
+    return "\n".join(lines)
+
+
+class BrokersCLI:
+    """Table formatters for the Data Manager catalog."""
+
+    format_broker_table = staticmethod(format_broker_table)

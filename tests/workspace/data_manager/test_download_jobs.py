@@ -12,7 +12,7 @@ from app.host.persistence import HostPersistence
 from app.host.resources import MemoryObservation, ResourceMonitor
 from app.host.transport import register_transport_exception_handlers
 from app.include.contracts import BridgeError
-from app.workspace.data_manager import http
+from app.workspace import data_manager as http
 from app.workspace.data_manager.logs import Logs
 from app.workspace.data_manager.sources import Dukascopy
 from fastapi import FastAPI
@@ -21,7 +21,8 @@ from fastapi.testclient import TestClient
 
 @pytest.fixture
 def downloads(tmp_path, monkeypatch):
-    from app.workspace.data_manager import download_jobs, sources
+    from app.workspace.data_manager import sources
+    from app.workspace.data_manager.sources import download_jobs
 
     database = tmp_path / "jobs.db"
     with closing(sqlite3.connect(database)) as connection:

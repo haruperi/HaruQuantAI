@@ -135,7 +135,7 @@ def test_invalid_import(brokers, tmp_path, content):
 @pytest.fixture
 def broker_http(brokers, temp_db):
     from app.host.transport import register_transport_exception_handlers
-    from app.workspace.data_manager import http
+    from app.workspace.data_manager import _access, create_router
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
 
@@ -159,8 +159,8 @@ def broker_http(brokers, temp_db):
         connection.commit()
     application = FastAPI()
     application.state.persistence = brokers.gateway
-    application.include_router(http.create_router())
-    application.dependency_overrides[http._access] = lambda: None
+    application.include_router(create_router())
+    application.dependency_overrides[_access] = lambda: None
     register_transport_exception_handlers(application)
     with TestClient(application) as client:
         yield client
@@ -252,11 +252,11 @@ def test_http_bulk_and_protections(broker_http, brokers):
 def test_all_broker_cli_commands(brokers, monkeypatch, capsys, tmp_path):
     import argparse
 
-    from app.workspace.data_manager import cli
+    from app.workspace.data_manager import register_commands
 
     monkeypatch.setattr("app.workspace.data_manager.brokers.Brokers", lambda: brokers)
     parser = argparse.ArgumentParser()
-    cli.register_commands(parser.add_subparsers(dest="command", required=True))
+    register_commands(parser.add_subparsers(dest="command", required=True))
     path = str(tmp_path / "brokers.json")
     commands = [
         ["add", "--name", "A", "--mt-use"],

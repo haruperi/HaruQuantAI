@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from app.host.persistence import HostPersistence
 from app.host.transport import register_transport_exception_handlers
-from app.workspace.data_manager import http as symbols_http
+from app.workspace.data_manager import _access, create_router
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
@@ -15,8 +15,8 @@ from fastapi.testclient import TestClient
 def symbol_http(temp_db):
     application = FastAPI()
     application.state.persistence = temp_db
-    application.include_router(symbols_http.create_router())
-    application.dependency_overrides[symbols_http._access] = lambda: None
+    application.include_router(create_router())
+    application.dependency_overrides[_access] = lambda: None
     register_transport_exception_handlers(application)
     with TestClient(application) as client:
         yield client

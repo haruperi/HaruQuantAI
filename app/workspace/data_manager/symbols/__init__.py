@@ -11,10 +11,6 @@ Description:
 from __future__ import annotations
 
 from app.workspace.brokers.metatrader import create_mt5_client
-from app.workspace.data_manager.cli_formatters import (
-    SymbolsCLI,
-    format_symbol_table,
-)
 
 from ._cli import (
     register_symbol_commands,
@@ -27,12 +23,14 @@ from ._helpers import (
     SymbolInfo,
     SymbolMargin,
     SymbolPrice,
+    SymbolsCLI,
     SymbolSessionWindow,
     SymbolSpread,
     SymbolState,
     SymbolSwap,
     SymbolTrade,
     SymbolVolume,
+    format_symbol_table,
     persistence,
 )
 from .feature import Symbols

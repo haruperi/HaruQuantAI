@@ -546,3 +546,103 @@ def _download_one(
         "bars": len(frame),
         "path": str(target.resolve()),
     }
+
+
+MAX_BASKET_DESC_LEN: int = 22
+BASKET_DESC_TRUNCATE_LEN: int = 20
+MAX_READY_LEN: int = 13
+READY_TRUNCATE_LEN: int = 11
+
+
+def _get(item: Any, key: str, default: Any = "") -> Any:
+    from collections.abc import Mapping
+
+    if isinstance(item, Mapping):
+        return item.get(key, default)
+    return getattr(item, key, default)
+
+
+def format_basket_table(
+    baskets: Sequence[Any] | Mapping[str, Any],
+) -> str:
+    """Format ASCII table of stock groups / baskets catalog entries."""
+    from collections.abc import Mapping
+
+    items: Sequence[Any]
+    if (
+        isinstance(baskets, Mapping)
+        and "data" in baskets
+        and isinstance(baskets["data"], Sequence)
+    ):
+        items = cast("Any", baskets["data"])
+    elif isinstance(baskets, Sequence):
+        items = baskets
+    else:
+        items = ()
+    count = len(items)
+    lines: list[str] = [f"=== Stock Groups / Baskets Catalog ({count} items) ==="]
+    header_fmt = (
+        "| {name:<32} | {cnt:<12} | {desc:<22} | {syms:>17} "
+        "| {down:>12} | {ready:<13} | {d_from:<10} | {d_to:<10} |"
+    )
+    divider = (
+        "|-"
+        + "-|-".join(["-" * width for width in (32, 12, 22, 17, 12, 13, 10, 10)])
+        + "-|"
+    )
+    lines.append(
+        header_fmt.format(
+            name="Name",
+            cnt="Count",
+            desc="Description",
+            syms="Number of symbols",
+            down="Downloaded",
+            ready="Ready to use?",
+            d_from="Date from",
+            d_to="Date to",
+        )
+    )
+    lines.append(divider)
+    for item in items:
+        name = str(_get(item, "name", ""))
+        desc = str(_get(item, "description", ""))
+        if len(desc) > MAX_BASKET_DESC_LEN:
+            desc = desc[:BASKET_DESC_TRUNCATE_LEN] + ".."
+        active = _get(item, "active_count", 0)
+        total = _get(item, "stocks_count", 0)
+        if total == 0:
+            total = _get(item, "total_count", 0)
+        cnt_str = f"{active} / {total}"
+        syms = _get(item, "symbols_count", 0)
+        down = _get(item, "downloaded_count", 0)
+        down_str = f"{down} / {total}"
+        ready_val = _get(item, "ready", False)
+        if isinstance(ready_val, str):
+            ready_str = (
+                ready_val
+                if len(ready_val) <= MAX_READY_LEN
+                else ready_val[:READY_TRUNCATE_LEN].rstrip() + ".."
+            )
+        else:
+            ready_str = "Yes" if ready_val else "No"
+        d_from = str(_get(item, "date_from", "-"))
+        d_to = str(_get(item, "date_to", "-"))
+        lines.append(
+            header_fmt.format(
+                name=name,
+                cnt=cnt_str,
+                desc=desc,
+                syms=syms,
+                down=down_str,
+                ready=ready_str,
+                d_from=d_from,
+                d_to=d_to,
+            )
+        )
+    return "\n".join(lines)
+
+
+class BasketsCLI:
+    """Table formatters for the Data Manager catalog."""
+
+    format_basket_table = staticmethod(format_basket_table)

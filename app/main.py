@@ -22,8 +22,8 @@ from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
 from app.host.settings import SettingsManager
 from app.host.transport import CredentialTester, Vault, install_transport
+from app.workspace.data_manager.data import recover_catalog_publications
 from app.workspace.data_manager.logs import Logs
-from app.workspace.data_manager.partition_files import recover_catalog_publications
 
 logger = get_logger(__name__)
 _MAX_PORT = 65535
@@ -80,7 +80,7 @@ def create_app(
     application.state.vault = vault
     application.state.connection_testers = dict(connection_testers or {})
     install_transport(application)
-    from app.workspace.data_manager.http import create_router
+    from app.workspace.data_manager import create_router
 
     application.include_router(create_router())
 

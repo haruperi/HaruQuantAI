@@ -482,7 +482,7 @@ def test_large_partition_is_one_file_with_batched_row_groups(temp_env):
 
 @pytest.mark.parametrize("committed", [False, True])
 def test_interrupted_canonical_replacement_recovers_from_journal(temp_env, committed):
-    from app.workspace.data_manager.partition_files import (
+    from app.workspace.data_manager.data import (
         FilePublication,
         dataset_lock,
         recover_publications,
@@ -539,7 +539,7 @@ def test_old_part_manifest_is_consolidated_without_rescaling(temp_env):
 
 
 def test_parquet_preparation_does_not_hold_sqlite_write_lock(temp_env, monkeypatch):
-    from app.workspace.data_manager import storage
+    from app.workspace.data_manager.data import storage
 
     service, gateway, _ = temp_env
     assert service.download("EURUSD", data_frame=_bars(["2025-01-01"]))["success"]

@@ -8,11 +8,7 @@ import sys
 from functools import partial
 from typing import Any
 
-from app.workspace.data_manager.cli_formatters import (
-    BrokersCLI,
-    format_broker_table,
-)
-
+from ._helpers import BrokersCLI, format_broker_table
 from .feature import Brokers
 
 __all__ = [

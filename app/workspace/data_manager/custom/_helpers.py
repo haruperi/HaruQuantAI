@@ -12,7 +12,7 @@ import zipfile
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import httpx
 
@@ -334,3 +334,135 @@ __all__ = [
     "validate_name",
     "validate_outputs",
 ]
+
+_MAX_INLINE_OUTPUTS: int = 2
+_MAX_DATE_LEN: int = 10
+
+
+def _get(item: Any, key: str, default: Any = "") -> Any:
+    from collections.abc import Mapping
+
+    if isinstance(item, Mapping):
+        return item.get(key, default)
+    return getattr(item, key, default)
+
+
+def format_custom_table(
+    indicators: Sequence[Any] | Mapping[str, Any], limit: int | None = 50
+) -> str:
+    """Format ASCII table of external indicator catalog entries."""
+    from collections.abc import Mapping
+
+    items: Sequence[Any]
+    if (
+        isinstance(indicators, Mapping)
+        and "data" in indicators
+        and isinstance(indicators["data"], Sequence)
+    ):
+        items = cast("Any", indicators["data"])
+    elif isinstance(indicators, Sequence):
+        items = indicators
+    else:
+        items = ()
+    count = len(items)
+    lines: list[str] = [f"=== External Indicators Catalog ({count} items) ==="]
+    header_fmt = (
+        "| {name:<20} | {values:<16} | {dtype:<12} | {tf:<9} "
+        "| {d_from:<12} | {d_to:<12} | {days:>6} | {recs:>10} |"
+    )
+    divider = (
+        "|-"
+        + "-|-".join(["-" * width for width in (20, 16, 12, 9, 12, 12, 6, 10)])
+        + "-|"
+    )
+    lines.append(
+        header_fmt.format(
+            name="Name",
+            values="Values",
+            dtype="Data type",
+            tf="Timeframe",
+            d_from="Date from",
+            d_to="Date to",
+            days="Days",
+            recs="Records",
+        )
+    )
+    lines.append(divider)
+    visible = items if limit is None else items[:limit]
+    for item in visible:
+        name = str(_get(item, "name", ""))
+        vals = _get(item, "values", [])
+        if isinstance(vals, list):
+            val_names = [
+                v.get("name", "") if isinstance(v, dict) else str(v) for v in vals
+            ]
+            val_str = (
+                ", ".join(val_names)
+                if len(val_names) <= _MAX_INLINE_OUTPUTS
+                else f"{len(val_names)} outputs"
+            )
+        else:
+            val_str = str(vals)
+        dtype = str(_get(item, "data_type", "custom"))
+        tf = str(_get(item, "timeframe", "D1"))
+        d_from = str(_get(item, "date_from", "") or "-")
+        if len(d_from) > _MAX_DATE_LEN:
+            d_from = d_from[:_MAX_DATE_LEN]
+        d_to = str(_get(item, "date_to", "") or "-")
+        if len(d_to) > _MAX_DATE_LEN:
+            d_to = d_to[:_MAX_DATE_LEN]
+        days = _get(item, "total_days", 0)
+        recs = f"{int(_get(item, 'total_records', 0)):,}"
+        lines.append(
+            header_fmt.format(
+                name=name[:20],
+                values=val_str[:16],
+                dtype=dtype[:12],
+                tf=tf[:9],
+                d_from=d_from[:12],
+                d_to=d_to[:12],
+                days=days,
+                recs=recs,
+            )
+        )
+    if limit is not None and count > limit:
+        lines.append(f"... and {count - limit} more items")
+    return "\n".join(lines)
+
+
+def format_review_table(records: Sequence[Any], columns: Sequence[str]) -> str:
+    """Format ASCII table of dated observation records."""
+    if not records:
+        return "No observations recorded."
+    header_cols = ["Timestamp", *columns]
+    col_widths = [max(len(str(c)), 12) for c in header_cols]
+    col_widths[0] = max(col_widths[0], 25)
+    header_fmt = (
+        "| " + " | ".join(f"{{{i}:<{w}}}" for i, w in enumerate(col_widths)) + " |"
+    )
+    divider = "|-" + "-|-".join("-" * w for w in col_widths) + "-|"
+    lines = [
+        header_fmt.format(*header_cols),
+        divider,
+    ]
+    for row in records:
+        ts = str(_get(row, "timestamp", ""))
+        vals = _get(row, "values", {})
+        cells = [
+            ts[: col_widths[0]],
+            *(
+                str(vals.get(c, ""))[: col_widths[i + 1]]
+                if isinstance(vals, dict)
+                else ""
+                for i, c in enumerate(columns)
+            ),
+        ]
+        lines.append(header_fmt.format(*cells))
+    return "\n".join(lines)
+
+
+class CustomDataCLI:
+    """Table formatters for Data Manager custom indicators."""
+
+    format_custom_table = staticmethod(format_custom_table)
+    format_review_table = staticmethod(format_review_table)

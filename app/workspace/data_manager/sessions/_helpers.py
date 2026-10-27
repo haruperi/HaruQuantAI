@@ -231,3 +231,127 @@ def _editable(row: Mapping[str, Any]) -> dict[str, Any]:
     data.pop("id")
     data.pop("broker_name")
     return data
+
+
+DAYS_PER_WEEK: int = 7
+WEEKDAYS_COUNT: int = 5
+MAX_SESSION_DESC_LEN: int = 36
+SESSION_DESC_TRUNCATE_LEN: int = 34
+
+
+def _get(item: Any, key: str, default: Any = "") -> Any:
+    from collections.abc import Mapping
+
+    if isinstance(item, Mapping):
+        return item.get(key, default)
+    return getattr(item, key, default)
+
+
+def _summarize_windows(windows: Sequence[Any]) -> str:
+    """Summarize trading windows schedule concisely."""
+    if not windows:
+        return "None"
+    count = len(windows)
+    times: set[str] = set()
+    for w in windows:
+        s = _get(w, "start_time") or _get(w, "open_time") or "00:00"
+        e = _get(w, "end_time") or _get(w, "close_time") or "23:59"
+        times.add(f"{str(s)[:5]}-{str(e)[:5]}")
+    if len(times) == 1:
+        t = next(iter(times))
+        if count == DAYS_PER_WEEK and ("00:00-23:59" in t or "00:00-24:00" in t):
+            return f"24/7 ({count}d)"
+        if count == WEEKDAYS_COUNT:
+            return f"Mon-Fri {t} ({count}d)"
+        if count == DAYS_PER_WEEK:
+            return f"Daily {t} ({count}d)"
+        return f"{count}d ({t})"
+    return f"{count} windows"
+
+
+def _summarize_holidays(holidays: Sequence[Any]) -> str:
+    """Summarize holidays calendar concisely."""
+    if not holidays:
+        return "-"
+    count = len(holidays)
+    if count == 1:
+        desc = str(_get(holidays[0], "description", ""))
+        return desc or "1 holiday"
+    return f"{count} holidays"
+
+
+def format_session_table(
+    sessions: Sequence[Any] | Mapping[str, Any],
+) -> str:
+    """Format ASCII table of trading session calendar catalog entries."""
+    from collections.abc import Mapping
+
+    items: Sequence[Any]
+    if (
+        isinstance(sessions, Mapping)
+        and "data" in sessions
+        and isinstance(sessions["data"], Sequence)
+    ):
+        items = cast("Any", sessions["data"])
+    elif isinstance(sessions, Sequence):
+        items = sessions
+    else:
+        items = ()
+    count = len(items)
+    lines: list[str] = [f"=== Trading Sessions Catalog ({count} items) ==="]
+    header_fmt = (
+        "| {name:<26} | {brk:<14} | {desc:<36} | {tz:<18} | {wins:<24} | {hols:<12} |"
+    )
+    divider = (
+        "|-" + "-|-".join(["-" * width for width in (26, 14, 36, 18, 24, 12)]) + "-|"
+    )
+    lines.append(
+        header_fmt.format(
+            name="Session Name",
+            brk="Broker Profile",
+            desc="Description",
+            tz="Timezone",
+            wins="Windows",
+            hols="Holidays",
+        )
+    )
+    lines.append(divider)
+    for item in items:
+        name = str(_get(item, "name", ""))
+        desc = str(_get(item, "description", ""))
+        if len(desc) > MAX_SESSION_DESC_LEN:
+            desc = desc[:SESSION_DESC_TRUNCATE_LEN] + ".."
+        brk_name = str(_get(item, "broker_name") or "")
+        brk_id = _get(item, "broker_id", None)
+        if brk_name and brk_name != "Default":
+            brk_display = brk_name
+        elif brk_id is not None and brk_id not in (-1, 0):
+            brk_display = f"Broker {brk_id}"
+        else:
+            brk_display = "SQ default"
+        tz = str(_get(item, "timezone", "UTC"))
+        windows = _get(item, "windows", ())
+        if not isinstance(windows, Sequence):
+            windows = ()
+        wins_str = _summarize_windows(cast("Sequence[Any]", windows))
+        holidays = _get(item, "holidays", ())
+        if not isinstance(holidays, Sequence):
+            holidays = ()
+        hols_str = _summarize_holidays(cast("Sequence[Any]", holidays))
+        lines.append(
+            header_fmt.format(
+                name=name,
+                brk=brk_display,
+                desc=desc,
+                tz=tz,
+                wins=wins_str,
+                hols=hols_str,
+            )
+        )
+    return "\n".join(lines)
+
+
+class SessionsCLI:
+    """Table formatters for the Data Manager catalog."""
+
+    format_session_table = staticmethod(format_session_table)

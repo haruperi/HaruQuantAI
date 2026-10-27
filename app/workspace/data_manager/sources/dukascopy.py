@@ -30,9 +30,15 @@ from app.include.market_storage import (
 )
 from app.workspace.brokers.base import BridgeError
 from app.workspace.brokers.dukascopy import DukascopyClient
-from app.workspace.data_manager.coverage import missing_ranges, record_checked_ranges
+from app.workspace.data_manager.data import (
+    RangeProgress,
+    dataset_root,
+    missing_ranges,
+    publish_frame,
+    record_checked_ranges,
+    require_data,
+)
 from app.workspace.data_manager.logs import Logs
-from app.workspace.data_manager.storage import dataset_root, publish_frame, require_data
 
 from ._helpers import (
     DEFAULT_CATALOG_PATH,
@@ -658,7 +664,6 @@ class Dukascopy:
         gaps = missing_ranges(row, lower, upper)
         if gaps == [(lower, upper)]:
             return None
-        from app.workspace.data_manager.coverage import RangeProgress
 
         downloaded, written = 0, []
         empty = []

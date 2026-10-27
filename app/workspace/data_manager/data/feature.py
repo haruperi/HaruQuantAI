@@ -17,7 +17,6 @@ from app.host.response import (
 )
 from app.include.contracts import DataInfo
 from app.include.market_storage import scan_catalog
-from app.workspace.data_manager.storage import require_data
 
 from ._helpers import (
     DATASETS_CATALOG_FR,
@@ -26,6 +25,7 @@ from ._helpers import (
     logger,
     persistence,
 )
+from .storage import require_data
 
 __all__ = ["Data"]
 

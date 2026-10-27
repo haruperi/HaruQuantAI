@@ -7,20 +7,17 @@ Description:
 
 from __future__ import annotations
 
-from app.workspace.data_manager.cli_formatters import (
-    CustomDataCLI,
-    format_custom_table,
-    format_review_table,
-)
-
 from ._cli import (
     register_custom_commands,
     run_custom_command,
 )
 from ._helpers import (
+    CustomDataCLI,
     CustomDataError,
     definition_file,
     fetch_cot,
+    format_custom_table,
+    format_review_table,
     normalize_format,
     parse_cot_reports,
     parse_csv_row,

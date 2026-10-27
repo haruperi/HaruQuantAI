@@ -9,8 +9,8 @@ import pandas as pd
 import pyarrow.parquet as pq
 import pytest
 from app.host.persistence import HostPersistence
+from app.workspace.data_manager.data import publish_frame
 from app.workspace.data_manager.sources import PROVIDERS, Sources, capabilities
-from app.workspace.data_manager.storage import publish_frame
 
 
 @pytest.fixture

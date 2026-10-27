@@ -7,11 +7,7 @@ import json
 from functools import partial
 from typing import Any
 
-from app.workspace.data_manager.cli_formatters import (
-    SessionsCLI,
-    format_session_table,
-)
-
+from ._helpers import SessionsCLI, format_session_table
 from .feature import Sessions
 
 __all__ = [

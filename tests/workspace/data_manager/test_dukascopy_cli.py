@@ -4,7 +4,7 @@ import argparse
 import sqlite3
 
 import pytest
-from app.workspace.data_manager.cli import register_commands
+from app.workspace.data_manager import register_commands
 from app.workspace.data_manager.sources import run_dukascopy_command
 
 

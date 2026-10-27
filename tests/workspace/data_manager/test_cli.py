@@ -3,23 +3,19 @@ from unittest.mock import Mock
 
 from app.host.response import ResponseMetadata, StandardResponse
 from app.include.contracts import DataInfo
-from app.workspace.data_manager.cli import (
-    BasketsCLI,
-    BrokersCLI,
+from app.workspace.data_manager.baskets import BasketsCLI, format_basket_table
+from app.workspace.data_manager.brokers import BrokersCLI, format_broker_table
+from app.workspace.data_manager.data import (
     DataCLI,
-    SessionsCLI,
-    SymbolsCLI,
-    format_basket_table,
-    format_broker_table,
     format_data_dashboard,
     format_dataset_table,
-    format_session_table,
-    format_symbol_table,
 )
+from app.workspace.data_manager.sessions import SessionsCLI, format_session_table
+from app.workspace.data_manager.symbols import SymbolsCLI, format_symbol_table
 
 
 def test_domain_registers_and_executes_without_app_entry(monkeypatch, capsys):
-    from app.workspace.data_manager import cli as domain_cli
+    from app.workspace import data_manager as domain_cli
     from app.workspace.data_manager.symbols import Symbols
 
     parser = argparse.ArgumentParser()

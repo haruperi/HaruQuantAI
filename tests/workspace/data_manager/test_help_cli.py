@@ -2,7 +2,7 @@
 
 import argparse
 
-from app.workspace.data_manager.cli import register_commands
+from app.workspace.data_manager import register_commands
 from app.workspace.data_manager.help import run_help_command
 
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from typing import TYPE_CHECKING, Any
 
-from app.workspace.data_manager.cli_formatters import SymbolsCLI
+from ._helpers import SymbolsCLI
 
 if TYPE_CHECKING:
     from .feature import Symbols

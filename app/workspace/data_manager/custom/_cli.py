@@ -8,11 +8,10 @@ import sys
 from collections.abc import Callable
 from typing import Any
 
-from app.workspace.data_manager.cli_formatters import (
+from ._helpers import (
     format_custom_table,
     format_review_table,
 )
-
 from .feature import CustomData
 
 __all__ = ["register_custom_commands", "run_custom_command"]
