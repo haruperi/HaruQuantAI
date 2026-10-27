@@ -11,10 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 from functools import partial
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    from app.workspace.data_manager.baskets import Baskets
+from typing import Any
 
 from app.workspace.data_manager.cli_formatters import (
     BasketsCLI,
@@ -66,7 +63,9 @@ def register_commands(commands: Any) -> None:
     from app.workspace.data_manager.brokers import register_broker_commands
 
     register_broker_commands(resources)
-    _basket_parsers(resources)
+    from app.workspace.data_manager.baskets import register_basket_commands
+
+    register_basket_commands(resources)
     from app.workspace.data_manager.custom_cli import register_custom_commands
     from app.workspace.data_manager.dukascopy_cli import register_dukascopy_commands
     from app.workspace.data_manager.help_cli import register_help_commands
@@ -86,6 +85,7 @@ def run_command(
     arguments: argparse.Namespace, *, parser: argparse.ArgumentParser
 ) -> int:
     """Execute a Data Manager command, emit errors, and return its exit code."""
+    from app.workspace.data_manager.baskets import run_basket_command
     from app.workspace.data_manager.brokers import run_broker_command
     from app.workspace.data_manager.custom_cli import run_custom_command
     from app.workspace.data_manager.dukascopy_cli import run_dukascopy_command
@@ -98,7 +98,7 @@ def run_command(
         "session": run_session_command,
         "symbol": run_symbol_command,
         "broker": run_broker_command,
-        "basket": _run_basket_command,
+        "basket": run_basket_command,
         "log": run_log_command,
         "custom": run_custom_command,
         "help": run_help_command,
@@ -113,150 +113,6 @@ def run_command(
         return 0
     print(json.dumps(result, allow_nan=False))
     return 0 if result["success"] else 1
-
-
-def _profile_json(value: str, *, container: type) -> Any:
-    label = "array" if container is list else "object"
-    try:
-        result = json.loads(value)
-    except json.JSONDecodeError as error:
-        raise argparse.ArgumentTypeError(f"must be a JSON {label}") from error
-    if not isinstance(result, container):
-        raise argparse.ArgumentTypeError(f"must be a JSON {label}")
-    return result
-
-
-def _positive_int(value: str) -> int:
-    """Parse a positive pagination argument."""
-    number = int(value)
-    if number < 1:
-        raise argparse.ArgumentTypeError("must be a positive integer")
-    return number
-
-
-def _basket_parsers(resources: Any) -> None:
-    basket = resources.add_parser("basket", help="Manage stock groups and memberships")
-    commands = basket.add_subparsers(dest="basket_command", required=True)
-    listing = commands.add_parser("list", help="List stock groups")
-    listing.add_argument("--page", type=_positive_int, default=1)
-    listing.add_argument("--page-size", type=_positive_int, default=50)
-    for command in ("add", "edit"):
-        parser = commands.add_parser(command)
-        if command == "edit":
-            parser.add_argument("basket_names", nargs="+")
-        parser.add_argument(
-            "--name", required=command == "add", default=argparse.SUPPRESS
-        )
-        parser.add_argument("--description", default=argparse.SUPPRESS)
-        if command == "add":
-            parser.add_argument(
-                "--system", action=argparse.BooleanOptionalAction, default=False
-            )
-    for command in ("delete", "update-data"):
-        parser = commands.add_parser(command)
-        parser.add_argument("basket_names", nargs="+")
-        if command == "update-data":
-            parser.add_argument("--data-dir")
-    commands.add_parser("list-stocks").add_argument("basket_name")
-    edit = commands.add_parser("edit-stocks")
-    edit.add_argument("basket_name")
-    edit.add_argument(
-        "--stocks", required=True, help="Ticker;from;to lines or JSON membership array"
-    )
-    for command in ("import-stocks", "export-stocks"):
-        parser = commands.add_parser(command)
-        parser.add_argument("basket_name")
-        parser.add_argument("csv_path")
-    for command in ("load", "save"):
-        parser = commands.add_parser(command)
-        parser.add_argument("json_path")
-        if command == "save":
-            parser.add_argument("--baskets", nargs="+")
-
-
-def _run_basket_command(
-    arguments: argparse.Namespace, parser: Any
-) -> dict[str, Any] | None:
-    from app.workspace.data_manager.baskets import Baskets
-
-    service = Baskets()
-    command = arguments.basket_command
-    fields = {
-        key: value
-        for key, value in vars(arguments).items()
-        if key in {"name", "description", "system"}
-    }
-    result = _execute_basket(service, arguments, fields, parser)
-    if not result["success"] or command in {
-        "list-stocks",
-        "edit-stocks",
-        "import-stocks",
-        "export-stocks",
-        "update-data",
-        "save",
-    }:
-        return result
-    rows = [result["data"]] if command == "add" else result["data"]
-    if command == "list":
-        pages = max(1, (len(rows) + arguments.page_size - 1) // arguments.page_size)
-        if arguments.page > pages:
-            parser.error("--page exceeds the number of catalog pages")
-        print(f"Page {arguments.page} of {pages} | {len(rows)} stock groups")
-        start = (arguments.page - 1) * arguments.page_size
-        rows = rows[start : start + arguments.page_size]
-    else:
-        print(result["message"])
-    print(format_basket_table(rows))
-    return None
-
-
-def _execute_basket(
-    service: Baskets, arguments: argparse.Namespace, fields: dict[str, Any], parser: Any
-) -> dict[str, Any]:
-    command = arguments.basket_command
-    if command in {"add", "edit"}:
-        result = (
-            service.add(**fields)
-            if command == "add"
-            else service.edit(arguments.basket_names, fields)
-        )
-    elif command == "delete":
-        result = service.delete(arguments.basket_names)
-    else:
-        return _basket_file_or_data(service, arguments, parser)
-    return result
-
-
-def _basket_file_or_data(
-    service: Baskets, arguments: argparse.Namespace, parser: Any
-) -> dict[str, Any]:
-    command = arguments.basket_command
-    result: dict[str, Any]
-    if command == "list-stocks":
-        result = service.list_stocks(arguments.basket_name)
-    elif command == "edit-stocks":
-        stocks = arguments.stocks
-        if stocks.lstrip().startswith("["):
-            try:
-                stocks = _profile_json(stocks, container=list)
-            except argparse.ArgumentTypeError as error:
-                parser.error(str(error))
-        result = service.edit_stocks(arguments.basket_name, stocks)
-    elif command in {"import-stocks", "export-stocks"}:
-        result = getattr(service, command.replace("-", "_"))(
-            arguments.basket_name, arguments.csv_path
-        )
-    elif command == "load":
-        result = service.load(arguments.json_path)
-    elif command == "save":
-        result = service.save(arguments.json_path, arguments.baskets)
-    elif command == "update-data":
-        result = service.update_data(
-            arguments.basket_names, data_dir=arguments.data_dir
-        )
-    else:
-        result = service.list()
-    return result
 
 
 if __name__ == "__main__":
