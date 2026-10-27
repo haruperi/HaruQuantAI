@@ -19,7 +19,7 @@ from app.workspace.data_manager.brokers import register_broker_routes
 from app.workspace.data_manager.custom import register_custom_routes
 from app.workspace.data_manager.data import Data
 from app.workspace.data_manager.dukascopy_http import register_dukascopy_routes
-from app.workspace.data_manager.help import Help
+from app.workspace.data_manager.help import register_help_routes
 from app.workspace.data_manager.logs import register_log_routes
 from app.workspace.data_manager.sessions import register_session_routes
 from app.workspace.data_manager.symbols import register_symbol_routes
@@ -127,7 +127,7 @@ def create_router() -> APIRouter:
     register_basket_routes(router)
     register_log_routes(router)
     register_custom_routes(router)
-    _help_routes(router)
+    register_help_routes(router)
     register_dukascopy_routes(router)
     return router
 
@@ -139,33 +139,6 @@ def _service_data(response: dict[str, Any]) -> Any:
             ErrorCode(error.get("code", "internal")), response["message"]
         )
     return response["data"]
-
-
-def _help_routes(router: APIRouter) -> None:
-    @router.get("/help")
-    def get_help_guide(request: Request, topic: str = "overview") -> Any:
-        service = Help(request.app.state.persistence)
-        return _response(service.get_topic(topic))
-
-    @router.get("/help/topics")
-    def list_help_topics(request: Request) -> Any:
-        service = Help(request.app.state.persistence)
-        return _response(service.list_topics())
-
-    @router.get("/help/tutorials")
-    def list_help_tutorials(request: Request, topic: str | None = None) -> Any:
-        service = Help(request.app.state.persistence)
-        return _response(service.list_tutorials(topic))
-
-    @router.get("/help/articles")
-    def list_help_articles(request: Request, topic: str | None = None) -> Any:
-        service = Help(request.app.state.persistence)
-        return _response(service.list_articles(topic))
-
-    @router.get("/help/search")
-    def search_help(request: Request, query: str = "") -> Any:
-        service = Help(request.app.state.persistence)
-        return _response(service.search(query))
 
 
 def _source_routes(router: APIRouter) -> None:

@@ -3,11 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from typing import Any
 
-from app.workspace.data_manager.help import Help
+from .feature import Help
 
 __all__ = ["register_help_commands", "run_help_command"]
+
+
+def _get_service() -> Any:
+    mod = sys.modules.get("app.workspace.data_manager.help")
+    cls = getattr(mod, "Help", Help) if mod else Help
+    return cls()
 
 
 def register_help_commands(resources: Any) -> None:
@@ -48,7 +55,7 @@ def run_help_command(
     arguments: argparse.Namespace, _parser: argparse.ArgumentParser
 ) -> dict[str, Any]:
     """Execute the parsed help command against the Help service."""
-    service = Help()
+    service = _get_service()
     handlers = {
         "topic": lambda: service.get_topic(arguments.name),
         "list-topics": service.list_topics,
