@@ -6,7 +6,7 @@ from collections.abc import Iterable
 from datetime import datetime
 from typing import Any
 
-import pandas as pd
+import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
 from app.include.contracts import MarketBar, MarketTick
@@ -18,52 +18,52 @@ __all__ = ["BAR_COLUMNS", "TICK_COLUMNS", "bars_to_dataframe", "ticks_to_datafra
 
 
 def _parse_bar_record(
-    bar: MarketBar | dict[str, Any] | Any,
+    record: MarketBar | dict[str, Any] | Any,
 ) -> tuple[datetime | int | float | str, float, float, float, float, int, int]:
     """Extract individual bar fields from record or dictionary."""
-    if isinstance(bar, MarketBar):
+    if isinstance(record, MarketBar):
         return (
-            bar.time,
-            float(bar.open),
-            float(bar.high),
-            float(bar.low),
-            float(bar.close),
-            bar.tick_volume,
-            bar.spread,
+            record.time,
+            float(record.open),
+            float(record.high),
+            float(record.low),
+            float(record.close),
+            record.tick_volume,
+            record.spread,
         )
-    if isinstance(bar, dict):
-        raw_t = bar.get("time")
+    if isinstance(record, dict):
+        raw_t = record.get("time")
         if raw_t is None:
-            raw_t = bar.get("DateTime", 0)
+            raw_t = record.get("DateTime", 0)
         time_val: datetime | int | float | str = (
             raw_t if isinstance(raw_t, (datetime, int, float, str)) else 0
         )
-        raw_o = bar.get("open")
-        open_val = float(raw_o if raw_o is not None else bar.get("Open", 0.0))
-        raw_h = bar.get("high")
-        high_val = float(raw_h if raw_h is not None else bar.get("High", 0.0))
-        raw_l = bar.get("low")
-        low_val = float(raw_l if raw_l is not None else bar.get("Low", 0.0))
-        raw_c = bar.get("close")
-        close_val = float(raw_c if raw_c is not None else bar.get("Close", 0.0))
-        raw_v = bar.get("tick_volume", bar.get("volume"))
-        vol_val = int(raw_v if raw_v is not None else bar.get("Volume", 0))
-        raw_s = bar.get("spread")
-        spread_val = int(raw_s if raw_s is not None else bar.get("Spread", 0))
+        raw_o = record.get("open")
+        open_val = float(raw_o if raw_o is not None else record.get("Open", 0.0))
+        raw_h = record.get("high")
+        high_val = float(raw_h if raw_h is not None else record.get("High", 0.0))
+        raw_l = record.get("low")
+        low_val = float(raw_l if raw_l is not None else record.get("Low", 0.0))
+        raw_c = record.get("close")
+        close_val = float(raw_c if raw_c is not None else record.get("Close", 0.0))
+        raw_v = record.get("tick_volume", record.get("volume"))
+        vol_val = int(raw_v if raw_v is not None else record.get("Volume", 0))
+        raw_s = record.get("spread")
+        spread_val = int(raw_s if raw_s is not None else record.get("Spread", 0))
         return (time_val, open_val, high_val, low_val, close_val, vol_val, spread_val)
 
-    raw_duck_t = getattr(bar, "time", 0)
+    raw_duck_t = getattr(record, "time", 0)
     duck_time: datetime | int | float | str = (
         raw_duck_t if isinstance(raw_duck_t, (datetime, int, float, str)) else 0
     )
     return (
         duck_time,
-        float(getattr(bar, "open", 0.0)),
-        float(getattr(bar, "high", 0.0)),
-        float(getattr(bar, "low", 0.0)),
-        float(getattr(bar, "close", 0.0)),
-        int(getattr(bar, "tick_volume", getattr(bar, "volume", 0))),
-        int(getattr(bar, "spread", 0)),
+        float(getattr(record, "open", 0.0)),
+        float(getattr(record, "high", 0.0)),
+        float(getattr(record, "low", 0.0)),
+        float(getattr(record, "close", 0.0)),
+        int(getattr(record, "tick_volume", getattr(record, "volume", 0))),
+        int(getattr(record, "spread", 0)),
     )
 
 
@@ -114,8 +114,8 @@ def bars_to_dataframe(bars: Iterable[MarketBar | dict[str, Any]]) -> pd.DataFram
     volumes: list[int] = []
     spreads: list[int] = []
 
-    for bar in bars:
-        t, o, h, low, c, v, s = _parse_bar_record(bar)
+    for record in bars:
+        t, o, h, low, c, v, s = _parse_bar_record(record)
         timestamps.append(t)
         opens.append(o)
         highs.append(h)

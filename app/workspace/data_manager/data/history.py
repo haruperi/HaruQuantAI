@@ -8,7 +8,7 @@ from dataclasses import asdict, fields
 from datetime import UTC, datetime
 from typing import Any, Literal
 
-import pandas as pd
+import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
 from app.include.contracts import (
