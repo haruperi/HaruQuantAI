@@ -6,7 +6,7 @@ export type CommissionModel = typeof commissionModels[number];
 export interface Swap { use: boolean; type: 'money' | 'points' | 'percent'; long: number; short: number; tripleSwapOn: string; rolloutHour: string }
 export interface Commission { model: CommissionModel; value: number; unit: string; min: number; minUnit: string; max: number; maxUnit: string }
 export interface FileSymbol {
-  id?: string; contractSize?: number | null; pipSize?: number | null; pointSize?: number; marginRate?: number; decimals?: number;
+  exchange?: string; expiry?: string; id?: string; contractSize?: number | null; pipSize?: number | null; pointSize?: number; marginRate?: number; decimals?: number;
   minVolume?: number; maxVolume?: number; lotStep?: number; tickValue?: number;
   symbol: string; name: string; type: string; broker: string; brokerName: string;
   pointValue: number; tickSize: number; tickStep: number; spread: number; slippage: number;

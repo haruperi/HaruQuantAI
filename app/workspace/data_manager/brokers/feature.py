@@ -52,6 +52,9 @@ class Brokers:
         gw = getattr(pkg, "persistence", persistence) if pkg else persistence
         self.gateway = gateway if gateway is not None else gw
         self.manage_transactions = manage_transactions
+        response = self.gateway.ensure_broker_cost_schema()
+        if not response["success"]:
+            raise RuntimeError(response["message"])
 
     def _transaction(self) -> AbstractContextManager[HostPersistence]:
         return (

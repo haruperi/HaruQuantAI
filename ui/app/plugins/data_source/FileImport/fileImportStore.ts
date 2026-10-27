@@ -2,12 +2,13 @@ import { normalizeSymbolContract } from '../Common/symbolContract';
 import { createSymbolDataClient } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
 
+import { useHistoricalSources, sourceClient } from '../Common/historicalSourceStore';
 import { datasets } from '../Common/fixtures';
 import { validateName } from './fileSymbols';
 import { create } from 'zustand';
-import { builtInFormats, limits, timezones, validateFormat, type ImportFormat, type ImportJob, type ImportRecord, type ImportTask } from './fileImport';
+import { readImportFile, builtInFormats, limits, timezones, validateFormat, type ImportFormat, type ImportJob, type ImportRecord, type ImportTask } from './fileImport';
 interface Saved { formats: ImportFormat[]; records: ImportRecord[]; groups: { name: string; symbols: string[] }[]; timezone: string; job: ImportJob | null }
-interface Store extends Saved { storageError: string; saveFormat: (format: ImportFormat, replace?: boolean) => void; deleteFormat: (name: string) => void; start: (tasks: ImportTask[], timezone: string, group: string, skipped: number, externalActive: boolean) => void; advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void }
+interface Store extends Saved { storageError: string; saveFormat: (format: ImportFormat, replace?: boolean) => void; deleteFormat: (name: string) => void; start: (tasks: ImportTask[], timezone: string, group: string, skipped: number, externalActive: boolean) => Promise<void>; advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void }
 const key = 'sqx-file-import-v1';
 export const activeImport = (state: string | undefined) => state === 'running' || state === 'paused';
 function validateSaved(value: Saved) {
@@ -49,46 +50,16 @@ export const useFileImports = create<Store>((set, get) => {
       persist({ formats: [...formats, { ...format, name, predefined: false }] });
     },
     deleteFormat: name => persist({ formats: get().formats.filter(row => row.name !== name) }),
-    start: (tasks, timezone, group, skipped, externalActive) => {
-      if (externalActive || activeImport(get().job?.state)) throw new Error('Finish or stop the active data operation first.');
-      if (!tasks.length) throw new Error(skipped ? `All ${skipped} files were skipped. No import started.` : 'Choose data to import.');
-      const planned = new Map(get().records.map(row => [row.id, row])); tasks.forEach(task => planned.set(task.record.id, task.record));
-      if ([...planned.values()].reduce((n, row) => n + row.timestamps.length, 0) > limits.timestamps) throw new Error('Browser mock limit: 200,000 tracked timestamps. Import a smaller selection.');
-      let name = group; let n = 2; while (name && get().groups.some(row => row.name === name)) name = `${group} ${n++}`;
-      persist({ timezone, job: { tasks, state: 'running', progress: 0, completed: 0, skipped, group: name } });
-      (async () => {
-        try {
-          const client = createSymbolDataClient('/data');
-          for (const task of tasks) {
-            if (task.error) continue;
-            await client.post('/datasets/import', {
-              symbol: task.record.symbol,
-              timeframe: task.record.timeframe || 'M1',
-              broker: task.record.broker || 'Default',
-              timezone: timezone || 'UTC',
-              async_job: true,
-            });
-          }
-        } catch {
-          // Offline / test fallback
-        }
-      })();
+    start: async (tasks, timezone, group, skipped, externalActive) => {
+      if (externalActive || activeImport(get().job?.state)) throw new Error('Finish or stop the active operation first.');
+      if (!tasks.length || tasks.some(task => !task.content && !task.file)) throw new Error('Select the original price files to import.');
+      if (tasks.reduce((size, task) => size + (task.file?.size ?? new Blob([task.content ?? '']).size),0) > 25_000_000) throw new Error('Select at most 25 MB per import.');
+      const files = await Promise.all(tasks.map(async task => ({ name: task.filename, ...(task.file ? {base64:await readImportFile(task.file,true)} : {content:task.content}), format:task.format, overwrite:task.overwrite ?? true, ignore_errors:task.ignoreErrors, symbol:task.record.symbol, timeframe:task.record.timeframe, broker:task.record.brokerName, timezone, source:task.provider ?? 'files', bar_type:task.record.barType, tick_size:0.00000001 })));
+      const job = await sourceClient.post<import('../Common/historicalSourceStore').SourceJob>('/datasets/import',{files});
+      useHistoricalSources.getState().trackJob(job);
+      set({ job: null });
     },
-    advance: () => {
-      const { job, records, groups } = get(); if (!job || job.state !== 'running') return;
-      const progress = Math.min(100, job.progress + 5);
-      const count = Math.floor(progress * job.tasks.length / 100);
-      let next = [...records]; let completed = job.completed; let error: string | undefined;
-      for (; completed < count; completed++) { const task = job.tasks[completed]; if (task.error) { error = `${task.filename}: ${task.error}`; break; } next = [...next.filter(row => row.id !== task.record.id), task.record]; }
-      const updatedGroups = [...groups];
-      if (job.group && completed > 0) { const symbols = job.tasks.slice(0, completed).map(task => task.record.symbol); const index = updatedGroups.findIndex(row => row.name === job.group); if (index < 0) updatedGroups.push({ name: job.group, symbols }); else updatedGroups[index] = { name: job.group, symbols }; }
-      try {
-        persist({ records: next, groups: updatedGroups, job: { ...job, progress, completed, state: error ? 'failed' : progress === 100 ? 'completed' : 'running', error } });
-        if (progress === 100 && !error) {
-          import('../Common/dataManagerStore').then(m => m.useDataManagerStore.getState().syncRemoteDatasets()).catch(() => {});
-        }
-      } catch (cause) { fail(cause); }
-    },
-    action: action => { const job = get().job; if (!job || !activeImport(job.state)) return; try { persist({ job: { ...job, state: action === 'pause' ? 'paused' : action === 'resume' ? 'running' : 'cancelled' } }); } catch (cause) { fail(cause); } },
+    advance: () => { void useHistoricalSources.getState().poll(); },
+    action: action => { void useHistoricalSources.getState().action(action); },
   };
 });

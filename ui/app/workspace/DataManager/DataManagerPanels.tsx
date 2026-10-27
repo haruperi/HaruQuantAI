@@ -1,7 +1,7 @@
 import { useHistoricalSources } from '../../plugins/data_source/Common/historicalSourceStore';
 import { useSessions } from '../../plugins/data_source/Catalogs/Sessions/sessionStore';
 import { useEffect, useState } from 'react';
-import { Button } from '../../components/ui';
+import { Button, Field, Modal, TextInput } from '../../components/ui';
 import { brokerCounts, type BrokerProfile } from '../../plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
 import { type FileSymbol } from '../../plugins/data_source/FileImport/fileSymbols';
 import { type SessionDefinition, type CatalogSession, type SessionBroker } from '../../plugins/data_source/Catalogs/Sessions/sessions';
@@ -47,7 +47,7 @@ export function StockGroupsTable({ groups, selected, datasets: available, onSele
       <colgroup><col style={{ width:26 }}/><col style={{ width:250 }}/><col style={{ width:100 }}/><col/><col style={{ width:130 }}/><col style={{ width:130 }}/><col style={{ width:110 }}/><col style={{ width:100 }}/><col style={{ width:100 }}/></colgroup>
       <thead><tr><th><input type="checkbox" aria-label="Select all stock groups" checked={allSelected} disabled={!groups.length} onChange={() => onSelect(allSelected ? [] : groups.map(group => group.id))}/></th>
         {['Name', 'Count', 'Description', 'Number of symbols', 'Downloaded', 'Ready to use?', 'Data from', 'Data to'].map(column => <th key={column}>{column}</th>)}
-      </tr></thead><tbody>{groups.map(group => { const summary = summarizeGroup(group, available); return <tr key={group.id} className={selected.includes(group.id) ? 'selected' : ''} onDoubleClick={() => onEdit(group)}><td><input type="checkbox" aria-label={`Select stock group ${group.name}`} checked={selected.includes(group.id)} onChange={() => onSelect(selected.includes(group.id) ? selected.filter(id => id !== group.id) : [...selected, group.id])}/></td><td>{group.name}</td><td>{summary.active} / {summary.total}</td><td>{group.description}</td><td>{summary.numberOfSymbols}</td><td>{summary.downloaded} / {summary.total}</td><td>{summary.ready ? 'Yes' : <Button aria-label={`Update group ${group.name}`} onClick={()=>onUpdate(group)}>No � update data</Button>}</td><td>{summary.from || '-'}</td><td>{summary.to || '-'}</td></tr>; })}{!groups.length && <tr><td colSpan={9} className="dataset-empty">No groups of stocks are defined.</td></tr>}</tbody>
+      </tr></thead><tbody>{groups.map(group => { const summary = summarizeGroup(group, available); return <tr key={group.id} className={selected.includes(group.id) ? 'selected' : ''} onDoubleClick={() => onEdit(group)}><td><input type="checkbox" aria-label={`Select stock group ${group.name}`} checked={selected.includes(group.id)} onChange={() => onSelect(selected.includes(group.id) ? selected.filter(id => id !== group.id) : [...selected, group.id])}/></td><td>{group.name}</td><td>{summary.active} / {summary.total}</td><td>{group.description}</td><td>{summary.numberOfSymbols}</td><td>{summary.downloaded} / {summary.total}</td><td>{summary.ready ? 'Yes' : <Button aria-label={`Update group ${group.name}`} onClick={()=>onUpdate(group)}>No — update data</Button>}</td><td>{summary.from || '-'}</td><td>{summary.to || '-'}</td></tr>; })}{!groups.length && <tr><td colSpan={9} className="dataset-empty">No groups of stocks are defined.</td></tr>}</tbody>
     </table></div>
   </main>;
 }
@@ -208,6 +208,7 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
   const exports = useDataExports();
   const tools = useDataTools();
   const stockGroups = useStockGroups();
+  const [editingDataset,setEditingDataset] = useState<import('../../plugins/data_source/Common/dataManagerStore').MockDefinition | null>(null);
   const [stockGroup, setStockGroup] = useState('');
   const allDatasets = savedDatasets ?? [];
   const [query, setQuery] = useState('');
@@ -245,7 +246,7 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
       <thead><tr>
         <th><input type="checkbox" aria-label="Select all visible datasets" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selectedIds.filter(id => !rows.some(row => row.id === id)) : [...new Set([...selectedIds, ...rows.map(row => row.id)])])}/></th>
         <th aria-sort={descending ? 'descending' : 'ascending'}><button className="dataset-sort" onClick={() => setDescending(value => !value)}>Symbol Name <span aria-hidden="true">{descending ? '▾' : '▴'}</span></button></th>
-        {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Status" style={{ minWidth: 120 }}/><th aria-label="Row actions" style={{ width: 36 }}/>
+        {columns.map(column => <th key={column}>{column}</th>)}<th aria-label="Status" style={{ minWidth: 120 }}/><th aria-label="Row actions" style={{ width: 100 }}/>
       </tr></thead>
       <tbody>{rows.map(row => {
         const days = row.totalDays ?? 0;
@@ -274,9 +275,26 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
           <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row && (row.barType === "end" || row.barType === "End of bar") ? "End of bar" : "Start of bar"}</td><td>{row.category}</td>
           <td title={rowPath || '—'}>{rowPath || '—'}</td>
           <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{marketStatus || (cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : '')}</td>
-          <td style={{ textAlign: 'center' }}><button className="symbol-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
+          <td style={{ textAlign: 'center' }}><button aria-label={`Edit dataset ${row.symbol}`} onClick={event=>{event.stopPropagation();setEditingDataset(row);}}>Edit</button><button className="symbol-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
         </tr>;
       })}{!rows.length && <tr><td colSpan={17} className="dataset-empty">{catalogLoading ? 'Loading saved dataset catalog…' : catalogError ? 'Saved dataset catalog unavailable.' : allDatasets.length ? 'No matching data.' : 'No saved datasets found in catalog.'}</td></tr>}</tbody>
     </table></div>
+  {editingDataset && <DatasetEditDialog row={editingDataset} onClose={()=>setEditingDataset(null)}/>}
   </main>;
+}
+
+
+export function DatasetEditDialog({row,onClose}:{row:import('../../plugins/data_source/Common/dataManagerStore').MockDefinition;onClose:()=>void}) {
+  const [value,setValue] = useState({...row}); const [pending,setPending] = useState(false); const [error,setError] = useState('');
+  const brokers=useDataManagerStore(state=>state.brokers); const symbols=useSymbols(state=>state.symbols); const sessions=useSessions(state=>state.sessions);
+  async function save() {setPending(true);setError('');try{await useDataManagerStore.getState().editDataset(row.id,value);onClose();}catch(cause){setError(String(cause));}finally{setPending(false);}}
+  return <Modal title="Dataset properties" width={600} onClose={onClose} footer={<><Button disabled={pending} onClick={onClose}>Close</Button><Button disabled={pending} onClick={()=>void save()}>Save properties</Button></>}>
+    {error && <p role="alert">{error}</p>}
+    <Field label="Dataset name"><TextInput value={value.symbol} disabled={pending} onChange={event=>setValue({...value,symbol:event.target.value})}/></Field>
+    <Field label="Broker profile"><select value={value.broker} onChange={event=>setValue({...value,broker:event.target.value})}><option value={row.broker}>{row.brokerName}</option>{brokers.map(broker=><option key={broker.id} value={broker.name}>{broker.name}</option>)}</select></Field>
+    <Field label="Symbol specification"><select value={value.symbol_definition_id ?? ''} onChange={event=>setValue({...value,symbol_definition_id:event.target.value ? Number(event.target.value) : null})}><option value="">No specification</option>{symbols.map(symbol=><option key={symbol.id} value={symbol.id}>{symbol.symbol}</option>)}</select></Field>
+    <Field label="Trading session"><select value={value.session_id ?? ''} onChange={event=>setValue({...value,session_id:event.target.value ? Number(event.target.value) : null})}><option value="">No session</option>{sessions.map(session=><option key={session.id} value={session.id}>{session.name}</option>)}</select></Field>
+    <Field label="Category"><TextInput value={value.category} onChange={event=>setValue({...value,category:event.target.value})}/></Field>
+    <Field label="Display timezone"><TextInput value={value.timezone} onChange={event=>setValue({...value,timezone:event.target.value})}/></Field><p>Changing the display timezone preserves recorded instants. Use Clone to shift timestamps.</p>
+  </Modal>;
 }

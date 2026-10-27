@@ -84,11 +84,7 @@ export const useExternalIndicators = create<ExternalIndicatorsState>((set, get) 
     add: async item => {
       const copy = structuredClone(item);
       validateExternalDefinition(copy, get().definitions.map(row => row.name));
-      try {
-        await saveExternalIndicator(copy);
-      } catch (cause) {
-        console.warn('External indicator remote add error:', cause);
-      }
+      await saveExternalIndicator(copy);
       persist({ definitions: [...get().definitions, copy] });
     },
     edit: async (original, item) => {
@@ -101,11 +97,7 @@ export const useExternalIndicators = create<ExternalIndicatorsState>((set, get) 
         throw new Error('Clear existing data before changing the number of indicator values.');
       }
       validateExternalDefinition(copy, get().definitions.filter(row => row.name !== original).map(row => row.name));
-      try {
-        await editExternalIndicator(original, copy);
-      } catch (cause) {
-        console.warn('External indicator remote edit error:', cause);
-      }
+      await editExternalIndicator(original, copy);
       const definitions = [...get().definitions];
       definitions[index] = copy;
       persist({ definitions });
@@ -113,11 +105,7 @@ export const useExternalIndicators = create<ExternalIndicatorsState>((set, get) 
     clear: async names => {
       if (!names.length) throw new Error('You have to select at least one indicator.');
       const selected = new Set(names);
-      try {
-        await clearExternalIndicators(names);
-      } catch (cause) {
-        console.warn('External indicator remote clear error:', cause);
-      }
+      await clearExternalIndicators(names);
       persist({
         definitions: get().definitions.map(item => selected.has(item.name) ? summarizeExternal({ ...item, records: [] }) : item),
         job: selected.has(get().job?.indicator ?? '') ? null : get().job,
@@ -126,11 +114,7 @@ export const useExternalIndicators = create<ExternalIndicatorsState>((set, get) 
     remove: async names => {
       if (!names.length) throw new Error('You have to select at least one indicator.');
       const selected = new Set(names);
-      try {
-        await deleteExternalIndicators(names);
-      } catch (cause) {
-        console.warn('External indicator remote delete error:', cause);
-      }
+      await deleteExternalIndicators(names);
       persist({
         definitions: get().definitions.filter(item => !selected.has(item.name)),
         job: selected.has(get().job?.indicator ?? '') ? null : get().job,
@@ -146,19 +130,11 @@ export const useExternalIndicators = create<ExternalIndicatorsState>((set, get) 
         throw new Error(`Data format with name '${name}' already exists. Please choose another name.`);
       }
       const updatedFormat = { ...structuredClone(format), name, predefined: false };
-      try {
-        await saveExternalImportFormat(updatedFormat, replace);
-      } catch (cause) {
-        console.warn('External format remote save error:', cause);
-      }
+      await saveExternalImportFormat(updatedFormat, replace);
       persist({ formats: [...get().formats.filter(item => item.name.toLowerCase() !== name.toLowerCase()), updatedFormat] });
     },
     deleteFormat: async name => {
-      try {
-        await deleteExternalImportFormat(name);
-      } catch (cause) {
-        console.warn('External format remote delete error:', cause);
-      }
+      await deleteExternalImportFormat(name);
       persist({ formats: get().formats.filter(item => item.name !== name) });
     },
     startImport: (indicator, records, timeframe, ignored, externalActive) => { if (externalActive || externalJobActive(get().job?.state)) throw new Error('Finish or stop the active data operation first.'); if (!get().definitions.some(item => item.name === indicator)) throw new Error('Custom indicator no longer exists.'); persist({ job: { indicator, state: 'running', progress: 0, records: structuredClone(records), timeframe, ignored } }); },

@@ -1,4 +1,5 @@
 import { createSymbolDataClient } from '../../plugins/data_source/Common/symbolContract';
+import { getAuthToken, hostBaseUrl } from '../../host/transport';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Clock,
@@ -23,7 +24,7 @@ export interface DataHomeSummary {
   active_providers_count: number;
   total_bars: number;
   storage_bytes?: number;
-  parquet_files_count?: number;
+  parquet_files_count?: number; disk_free_bytes?: number; storage_missing_files?: number;
 }
 
 export interface DataHomeDashboard {
@@ -59,38 +60,29 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
   const [datasets, setDatasets] = useState<DataHomeDashboard[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [offline,setOffline] = useState(false); const [captured,setCaptured] = useState(''); const [hasSnapshot,setHasSnapshot] = useState(false); const [error,setError] = useState('');
   const fetchOverview = useCallback(async () => {
-    setLoading(true);
+    setLoading(true); setError(''); let cacheKey = '';
     try {
-      const data = await dataClient.get<DataHomeSummary>('/home/overview');
-      if (data) {
-        setOverview(data);
+      const token = getAuthToken();
+      if (token && globalThis.crypto?.subtle) {
+        const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(token));
+        cacheKey = `haru-data-home:${hostBaseUrl()}:${Array.from(new Uint8Array(digest)).map(byte=>byte.toString(16).padStart(2,'0')).join('')}`;
       }
-    } catch {
-      // Keep existing overview on error
-    } finally {
-      setLoading(false);
-    }
+      const [summary,items] = await Promise.all([dataClient.get<DataHomeSummary>('/home/overview'), dataClient.get<DataHomeDashboard[]>('/home/datasets')]);
+      if (!summary || !Number.isFinite(summary.symbols_count) || !Array.isArray(items)) throw new Error('Invalid dashboard response');
+      const time = new Date().toISOString(); setOverview(summary);setDatasets(items);setCaptured(time);setHasSnapshot(true);setOffline(false);
+      if (cacheKey) {try{localStorage.setItem(cacheKey,JSON.stringify({version:1,overview:summary,datasets:items,captured:time}));}catch{/* Live results remain available. */}}
+    } catch(cause) {
+      setOffline(true);setError(cause instanceof Error ? cause.message : 'Backend unavailable');
+      if(cacheKey) {try{const cached=JSON.parse(localStorage.getItem(cacheKey) ?? 'null'); if(cached?.version===1 && Number.isFinite(cached.overview?.symbols_count) && Array.isArray(cached.datasets) && cached.datasets.length<=10000 && Number.isFinite(Date.parse(cached.captured))) {setOverview(cached.overview);setDatasets(cached.datasets);setCaptured(cached.captured);setHasSnapshot(true);}}catch{/* Corrupt cache is not presented as data. */}}
+    } finally {setLoading(false);}
   }, []);
-
-  const fetchDatasets = useCallback(async () => {
-    try {
-      const items = await dataClient.get<DataHomeDashboard[]>('/home/datasets');
-      if (Array.isArray(items)) {
-        setDatasets(items);
-      }
-    } catch {
-      // Keep existing datasets on error
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchOverview();
-    fetchDatasets();
-  }, [fetchOverview, fetchDatasets]);
+  useEffect(() => {void fetchOverview();const refresh=()=>{void fetchOverview();};window.addEventListener('online',refresh);return ()=>window.removeEventListener('online',refresh);},[fetchOverview]);
 
   return (
     <div className="dm-home-container" role="region" aria-label="Data Manager Home">
+      {offline && <p role="status">Backend unavailable. {hasSnapshot ? `Showing a read-only snapshot captured ${new Date(captured).toLocaleString()}.` : 'No saved overview is available for this session.'} {error}</p>}
       {/* Hero Header */}
       <header className="dm-home-header">
         <div className="dm-home-title-group">
@@ -113,7 +105,6 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
             className="dm-refresh-btn"
             onClick={() => {
               fetchOverview();
-              fetchDatasets();
             }}
             disabled={loading}
             aria-label="Refresh overview"
@@ -125,7 +116,7 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
       </header>
 
       {/* Metrics Grid */}
-      <section className="dm-metrics-section" aria-label="Catalog Overview Metrics">
+      <section hidden={!hasSnapshot} className="dm-metrics-section" aria-label="Catalog Overview Metrics">
         <div className="dm-metric-card">
           <div className="dm-metric-icon-wrap" style={{ background: '#1e3a5f', color: '#60a5fa' }}>
             <Database size={22} />
@@ -199,6 +190,7 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
         </div>
       </section>
 
+      {hasSnapshot && <p aria-label="Market storage usage">Stored history: {((overview.storage_bytes ?? 0)/1048576).toLocaleString(undefined,{maximumFractionDigits:2})} MiB in {overview.parquet_files_count ?? 0} files. Free disk: {((overview.disk_free_bytes ?? 0)/1073741824).toLocaleString(undefined,{maximumFractionDigits:1})} GiB. {!!overview.storage_missing_files && `${overview.storage_missing_files} referenced files are unavailable.`}</p>}
       {/* Quick Actions Bar */}
       <section className="dm-quick-actions" aria-label="Quick Actions">
         <h2 className="dm-section-title">Quick Actions</h2>
@@ -247,7 +239,7 @@ export function DataManagerHome({ onNavigateTab, onOpenImport, onOpenDownload }:
       </section>
 
       {/* Saved Datasets Catalog Table */}
-      <section className="dm-datasets-section" aria-label="Saved Datasets Catalog">
+      <section hidden={!hasSnapshot} className="dm-datasets-section" aria-label="Saved Datasets Catalog">
         <div className="dm-datasets-header">
           <h2 className="dm-section-title">Saved Datasets Catalog ({datasets.length})</h2>
           <span className="dm-datasets-caption">Live data partitioned from SQLite datamgr_datasets</span>

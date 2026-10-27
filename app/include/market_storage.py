@@ -190,7 +190,9 @@ def scan_catalog(row: dict[str, Any], *, decode: bool = False) -> pl.LazyFrame:
         schema = lazy.collect_schema()
         lazy = lazy.with_columns(
             [
-                pl.col(column).cast(pl.Float64) * step
+                (pl.col(column).cast(pl.Float64) * step).round(
+                    max(0, -Decimal(str(step)).as_tuple().exponent)
+                )
                 for column in prices
                 if schema[column].is_integer()
             ]

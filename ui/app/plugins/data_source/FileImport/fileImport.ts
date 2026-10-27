@@ -454,10 +454,14 @@ export const customFormat = (): ImportFormat => ({ ...builtInFormats[0], name: '
 export const limits = { file: 10 * 1024 * 1024, folder: 50 * 1024 * 1024, files: 500, rows: 100000, timestamps: 200000 };
 export interface ImportResult { timestamps: number[]; from: string; to: string; bars: number; timeframe: string; ignored: number; duplicates: number; error?: string }
 export interface ImportRecord extends FileDefinition { timestamps: number[]; unknownBars: number }
-export interface ImportTask { filename: string; record: ImportRecord; ignored: number; error?: string }
+export interface ImportTask { overwrite?: boolean; file?: File; provider?: string; content?: string; format?: ImportFormat; ignoreErrors?: boolean; filename: string; record: ImportRecord; ignored: number; error?: string }
 export interface ImportJob { tasks: ImportTask[]; state: 'running' | 'paused' | 'cancelled' | 'failed' | 'completed'; progress: number; completed: number; skipped: number; group: string; error?: string }
 
-export async function readImportFile(file: File): Promise<string> {
+export async function readImportFile(file: File, binary = false): Promise<string> {
+  if (binary) {
+    if (file.size > 25_000_000) throw new Error('Choose a file up to 25 MB.');
+    return new Promise((resolve,reject)=>{const reader=new FileReader(); reader.onload=()=>resolve(String(reader.result).split(',')[1]); reader.onerror=()=>reject(new Error('Unable to read selected file')); reader.readAsDataURL(file);});
+  }
   if (!/\.(csv|tsv|txt)$/i.test(file.name)) throw new Error(`${file.name}: choose a CSV, TSV or text file.`);
   if (file.size > limits.file) throw new Error(`${file.name}: maximum file size is 10 MiB.`);
   const bytes = await file.arrayBuffer();

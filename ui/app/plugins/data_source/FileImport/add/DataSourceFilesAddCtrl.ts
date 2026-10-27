@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { datasets } from '../../Common/fixtures';
 import { useDataManagerStore, useTickDownloader } from '../../Common/dataManagerStore';
+import { useSymbols } from '../../Catalogs/Symbols/symbolsStore';
 import { useFileSymbols } from '../fileSymbolsStore';
 import { effectiveSymbols, newSymbol, validateName, type FileSymbol } from '../fileSymbols';
 import { filesService } from '../DataSourceFilesService';
@@ -10,7 +11,8 @@ export function useFilesAdd({ onClose, onSaved, mass }: AddPopupProps) {
   const file = useFileSymbols();
   const data = useDataManagerStore();
   const td = useTickDownloader();
-  const all = effectiveSymbols(file.symbols, file.overrides, file.removed);
+  const catalog = useSymbols();
+  const all = catalog.loaded ? catalog.symbols : effectiveSymbols(file.symbols, file.overrides, file.removed);
   const brokers = [{ id: '-1', name: 'Default', postfix: '' }, ...data.brokers.filter(row => row.mtUse)];
   const [page, setPage] = useState<'symbol' | 'symbolDefinition' | 'help'>('symbol');
   const [helpOrigin, setHelpOrigin] = useState<'symbol' | 'symbolDefinition'>('symbol');
@@ -47,13 +49,13 @@ export function useFilesAdd({ onClose, onSaved, mass }: AddPopupProps) {
         validateName(draft.symbol, [], 'Symbol');
         const profile = brokers.find(row => row.id === draft.broker);
         const value = { ...draft, symbol: draft.symbol + (profile?.postfix ?? ''), brokerName: profile?.name ?? '' };
-        filesService.addSymbolDefinition(value, brokers.map(row => row.id));
-        setBroker(''); setSelected(value.symbol); setSwapDraft(structuredClone(value.swap));
+        const saved = await filesService.addSymbolDefinition(value, brokers.map(row => row.id));
+        setBroker(''); setSelected(saved.symbol); setSwapDraft(structuredClone(value.swap));
         focusTarget.current = '[data-add-symbol]'; setPage('symbol'); setError('');
       } else {
         if (!item) throw new Error('Choose an symbol.');
         if (mass) { if (!await mass.onSave(item, barType)) return; onSaved(); onClose(); return; }
-        filesService.addSymbol(symbol, item, barType, [...datasets, ...data.definitions, ...td.definitions].map(row => row.symbol));
+        await filesService.addSymbol(symbol, item, barType, [...datasets, ...data.definitions, ...td.definitions].map(row => row.symbol));
         onSaved(); onClose();
       }
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save.'); }

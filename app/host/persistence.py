@@ -205,6 +205,15 @@ class HostPersistence:
             for statement in statements:
                 connection.execute(statement)
 
+            existing = {
+                r[1] for r in connection.execute("PRAGMA table_info(datamgr_datasets)")
+            }
+            for column in ("symbol_definition_id", "session_id"):
+                if column not in existing:
+                    connection.execute(
+                        f"ALTER TABLE datamgr_datasets ADD COLUMN {column} INTEGER"
+                    )
+
             # Drop obsolete duplicate columns if present in existing databases
             cursor = connection.execute("PRAGMA table_info(datamgr_datasets)")
             existing_cols = {row[1] for row in cursor.fetchall()}
@@ -239,6 +248,25 @@ class HostPersistence:
             return {"affected_rows": 0, "records": []}
 
         return self._run("datasets.schema", write=True, action=action)
+
+    def ensure_broker_cost_schema(self) -> dict[str, Any]:
+        """Add inherited profile costs without replacing existing catalog tables."""
+
+        def action(connection: sqlite3.Connection) -> dict[str, Any]:
+            columns = {
+                row[1]
+                for row in connection.execute("PRAGMA table_info(datamgr_broker)")
+            }
+            if columns:
+                for column in ("spread_model_json", "commission_model_json"):
+                    if column not in columns:
+                        connection.execute(
+                            f"ALTER TABLE datamgr_broker ADD COLUMN {column} "
+                            'TEXT NOT NULL DEFAULT \'{"model":"inherit"}\''
+                        )
+            return {"affected_rows": 0, "records": []}
+
+        return self._run("brokers.cost_schema", write=True, action=action)
 
     def _check_scope(self) -> None:
         if self._closed:

@@ -167,7 +167,7 @@ export async function fetchExternalReview(
   name: string,
   limit = 100,
   offset = 0,
-): Promise<{ name: string; columns: string[]; records: Array<{ timestamp: string; values: Record<string, number> }> }> {
+): Promise<{ name: string; columns: string[]; records: Array<{ timestamp: string; values: Record<string, number> }>; pagination?: {has_more: boolean} }> {
   return client.get(`/custom-data/review?name=${encodeURIComponent(name)}&limit=${limit}&offset=${offset}`);
 }
 

@@ -187,6 +187,7 @@ def test_restart_interrupts_orphan_download_without_touching_other_jobs(
             "host_jobs",
             {
                 "job_id": job_id,
+                "owner": "data-manager",
                 "kind": kind,
                 "status": status,
             },
@@ -264,3 +265,31 @@ def test_download_request_rejects_invalid_targets_and_modes(downloads):
         assert (
             client.post("/api/v1/data/providers/download", json=body).status_code == 422
         )
+
+
+def test_restart_releases_staged_import_inputs(downloads):
+    import tempfile
+    import uuid
+    from pathlib import Path
+
+    client, _, service, _ = downloads
+    identifier = "job-" + uuid.uuid4().hex[:20]
+    folder = Path(tempfile.gettempdir()) / ("haru-history-import-" + identifier)
+    folder.mkdir()
+    (folder / "0.input").write_text("staged input")
+    assert service.gateway.create_records(
+        "host_jobs",
+        {
+            "job_id": identifier,
+            "kind": "market.import",
+            "status": "QUEUED",
+            "owner": "data-manager",
+        },
+    )["success"]
+    del client.app.state.download_jobs
+    try:
+        response = client.get(f"/api/v1/data/download-jobs/{identifier}")
+        assert response.json()["data"]["status"] == "INTERRUPTED"
+        assert not folder.exists()
+    finally:
+        client.app.state.download_jobs.shutdown()

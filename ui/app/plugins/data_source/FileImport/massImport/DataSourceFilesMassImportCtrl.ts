@@ -28,11 +28,11 @@ export function useFilesMassImport(onClose: () => void) {
         const parsed = parseImport(text, { name: 'Folder CSV', separator: ',', skipRows: 0, skipColumns: 0, dateFormat, columns: timeframe === 'TICK' ? ['Date & Time', 'Ask', 'Bid', 'Volume'] : ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'] }, timeframe, false);
         const previous = existing.find(row => row.symbol === symbol);
         const base: FileDefinition = { ...emptyFileRecord(symbol, symbolDefinition, barType), id: previous?.id ?? `file:${symbol}` };
-        tasks.push({ filename: file.name, record: importedRecord(base, parsed, timezone, undefined, true), ignored: parsed.ignored, error: parsed.error });
+        tasks.push({ overwrite: policy === 'overwrite', filename: file.name, content: text, format: { name: 'Folder CSV', separator: ',', skipRows: 0, skipColumns: 0, dateFormat, columns: timeframe === 'TICK' ? ['Date & Time', 'Ask', 'Bid', 'Volume'] : ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'] }, record: importedRecord(base, parsed, timezone, undefined, true), ignored: parsed.ignored, error: parsed.error });
         existing.push(base);
       }
       if (cancelled.current) return false;
-      filesService.start(tasks, timezone, group ? folder || 'Imported symbols' : '', skipped);
+      await filesService.start(tasks, timezone, group ? folder || 'Imported symbols' : '', skipped);
       return true;
     } finally { setBusy(false); }
   }

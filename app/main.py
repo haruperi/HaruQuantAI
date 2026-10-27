@@ -77,8 +77,14 @@ def create_app(
             logger.info("Backend shutdown completed")
 
     application = FastAPI(title="HaruQuantAI Backend", lifespan=lifespan)
-    application.state.vault = vault
-    application.state.connection_testers = dict(connection_testers or {})
+    from app.host.vault import WindowsCredentialVault
+    from app.workspace.data_manager.sources.connections import build_provider_testers
+
+    application.state.vault = vault if vault is not None else WindowsCredentialVault()
+    application.state.connection_testers = {
+        **build_provider_testers(),
+        **dict(connection_testers or {}),
+    }
     install_transport(application)
     from app.workspace.data_manager import create_router
 

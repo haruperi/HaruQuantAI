@@ -85,9 +85,14 @@ class BaseSource:
         self.gateway = gateway if gateway is not None else HostPersistence()
         self.market_root = Path(market_root) if market_root else Path("data/market")
         self.client_factory = client_factory or make_client
+        self.connection: dict[str, Any] | None = None
 
     def _get_client(self, source: str) -> Any:
-        return self.client_factory(source)
+        return (
+            self.client_factory(source, self.connection)
+            if self.connection
+            else self.client_factory(source)
+        )
 
     def record(self, dataset_id: str) -> dict[str, Any]:
         """Resolve a persisted identity instead of trusting browser target metadata."""
@@ -191,6 +196,7 @@ class BaseSource:
                     "partitions": [],
                     "price_policy": "round-half-even-to-storage-unit",
                     "provider": source,
+                    "connection_id": definition.get("connection_id"),
                 }
             ),
         }

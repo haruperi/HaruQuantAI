@@ -6,6 +6,7 @@ import calendar
 import json
 import os
 import uuid
+from contextlib import nullcontext
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -74,6 +75,9 @@ def publish_frame(
     tick_size: float,
     *,
     overwrite: bool = False,
+    replace_snapshot: bool = False,
+    metadata_updates: dict[str, Any] | None = None,
+    locked: bool = False,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     context: Any = None,
@@ -81,7 +85,7 @@ def publish_frame(
 ) -> dict[str, Any]:
     """Prepare files outside SQLite, then publish with a snapshot check."""
     root = dataset_root(storage_root, record["symbol"], record["timeframe"])
-    with dataset_lock(root, context):
+    with nullcontext() if locked else dataset_lock(root, context):
         recover_publications(root, gateway)
         for attempt in range(_PUBLICATION_ATTEMPTS):
             try:
@@ -92,6 +96,8 @@ def publish_frame(
                     frame,
                     tick_size,
                     overwrite=overwrite,
+                    replace_snapshot=replace_snapshot,
+                    metadata_updates=metadata_updates,
                     date_from=date_from,
                     date_to=date_to,
                     context=context,
@@ -112,7 +118,7 @@ def _check_snapshot(current: Any, previous: Any) -> None:
         raise _SnapshotChangedError("Dataset changed during file preparation")
 
 
-def _publish_frame_once(
+def _publish_frame_once(  # noqa: C901 - one rollback scope for snapshot publication
     gateway: HostPersistence,
     storage_root: Path,
     record: dict[str, Any],
@@ -120,6 +126,8 @@ def _publish_frame_once(
     tick_size: float,
     *,
     overwrite: bool = False,
+    replace_snapshot: bool = False,
+    metadata_updates: dict[str, Any] | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
     context: Any = None,
@@ -144,7 +152,7 @@ def _publish_frame_once(
         if previous is not None:
             _validate_previous(previous, record, storage_root, tick_size)
         result = _publish_parts(
-            previous,
+            None if replace_snapshot else previous,
             table,
             root,
             record["timeframe"],
@@ -154,7 +162,9 @@ def _publish_frame_once(
             context=context,
             created=created,
         )
-        lineage = json.loads(previous.get("lineage_json") or "{}") if previous else {}
+        lineage = json.loads((previous or record).get("lineage_json") or "{}")
+        if replace_snapshot:
+            lineage.pop("covered_ranges", None)
         lineage.update(
             {
                 "tick_size": tick_size,
@@ -199,6 +209,13 @@ def _publish_frame_once(
             if previous:
                 values["created_at"] = previous["created_at"]
                 values["broker"] = previous["broker"]
+                values.update(
+                    {
+                        key: value
+                        for key, value in (metadata_updates or {}).items()
+                        if key != "updated_at"
+                    }
+                )
                 require_data(
                     tx.update_record(
                         "datamgr_datasets",

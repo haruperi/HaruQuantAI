@@ -50,57 +50,39 @@ describe('file import rules', () => {
   });
 });
 
-// The store is tested with isolated browser storage, without any application files or network.
-describe('file import persistence and lifecycle', () => {
+describe('file import backend lifecycle', () => {
   async function isolated() {
-    const { vi } = await import('vitest'); vi.resetModules();
-    const memory = new Map<string, string>();
-    const storage = { getItem: (key: string) => memory.get(key) ?? null, setItem: (key: string, value: string) => { memory.set(key, value); }, removeItem: (key: string) => { memory.delete(key); } };
-    vi.stubGlobal('localStorage', storage);
+    const {vi} = await import('vitest'); vi.resetModules();
+    const memory = new Map<string,string>();
+    vi.stubGlobal('localStorage',{getItem:(key:string)=>memory.get(key)??null,setItem:(key:string,value:string)=>memory.set(key,value)});
     const store = (await import('../../../../../app/plugins/data_source/FileImport/fileImportStore')).useFileImports;
-    const result = parseImport(csv, detectFormat(csv), 'D1', false);
-    const task = (symbol: string) => ({ filename: symbol + '.csv', ignored: 0, record: importedRecord(emptyFileRecord(symbol, { ...newSymbol(), symbol: 'EURUSD' }, 'start'), result, 'UTC') });
-    return { store, memory, storage, task, vi };
+    const {sourceClient,useHistoricalSources} = await import('../../../../../app/plugins/data_source/Common/historicalSourceStore');
+    const task = {filename:'EURUSD.csv',content:csv,format:detectFormat(csv),ignored:0,record:importedRecord(emptyFileRecord('EURUSD',newSymbol(),'start'),parseImport(csv,detectFormat(csv),'D1',false),'UTC')};
+    return {store,task,sourceClient,useHistoricalSources,vi,memory};
   }
-  it('commits each file atomically, stops without applying the unfinished task, persists groups', async () => {
-    const { store, task } = await isolated();
-    store.getState().start([task('ONE'), task('TWO')], 'UTC', 'Folder', 1, false);
-    expect(() => store.getState().start([task('OTHER')], 'UTC', '', 0, false)).toThrow('active');
-    for (let i = 0; i < 10; i++) store.getState().advance();
-    expect(store.getState().records.map(row => row.symbol)).toEqual(['ONE']);
-    store.getState().action('pause'); store.getState().advance(); expect(store.getState().job?.progress).toBe(50);
-    store.getState().action('stop'); for (let i = 0; i < 10; i++) store.getState().advance();
-    expect(store.getState().records.map(row => row.symbol)).toEqual(['ONE']);
-    expect(store.getState().groups).toEqual([{ name: 'Folder', symbols: ['ONE'] }]);
-    expect(store.getState().job?.state).toBe('cancelled');
+  it('sends actual content and tracks the accepted backend job without inventing records',async()=>{
+    const {store,task,sourceClient,useHistoricalSources,vi}=await isolated();
+    const post=vi.spyOn(sourceClient,'post').mockResolvedValue({job_id:'real-import',status:'QUEUED',progress:0,message:'Queued'});
+    await store.getState().start([task],'UTC','',0,false);
+    expect(post).toHaveBeenCalledWith('/datasets/import',expect.objectContaining({files:[expect.objectContaining({content:csv,symbol:'EURUSD'})]}));
+    expect(useHistoricalSources.getState().job?.job_id).toBe('real-import');
+    expect(store.getState().records).toEqual([]);expect(store.getState().job).toBeNull();
   });
-  it('recovers running jobs paused, resumes and deduplicates saved format names', async () => {
-    const { store, task, vi } = await isolated();
-    store.getState().saveFormat({ ...builtInFormats[0], name: 'Saved', predefined: false });
-    expect(() => store.getState().saveFormat({ ...builtInFormats[0], name: 'Saved' })).toThrow('already exists');
-    store.getState().start([task('ONE')], 'UTC', '', 0, false);
-    vi.resetModules(); const restored = (await import('../../../../../app/plugins/data_source/FileImport/fileImportStore')).useFileImports;
-    expect(restored.getState().job?.state).toBe('paused'); expect(restored.getState().formats[0].name).toBe('Saved');
-    restored.getState().action('resume'); for (let i = 0; i < 20; i++) restored.getState().advance();
-    expect(restored.getState().job?.state).toBe('completed'); expect(restored.getState().records[0].bars).toBe(2);
-    restored.getState().deleteFormat('Saved'); expect(restored.getState().formats).toEqual([]);
+  it('does not claim success when the backend rejects an upload',async()=>{
+    const {store,task,sourceClient,vi}=await isolated();
+    vi.spyOn(sourceClient,'post').mockRejectedValue(new Error('Import rejected'));
+    await expect(store.getState().start([task],'UTC','',0,false)).rejects.toThrow('Import rejected');
+    expect(store.getState().records).toEqual([]);
   });
-  it('fails a bad file without applying its partial rows; retains preceding success', async () => {
-    const { store, task } = await isolated();
-    store.getState().start([task('ONE'), { ...task('BAD'), error: 'Row 5: invalid date' }], 'UTC', '', 0, false);
-    for (let i = 0; i < 20; i++) store.getState().advance();
-    expect(store.getState().job).toMatchObject({ state: 'failed', completed: 1, error: 'BAD.csv: Row 5: invalid date' });
-    expect(store.getState().records.map(row => row.symbol)).toEqual(['ONE']);
+  it('requires original file content rather than restoring synthetic results',async()=>{
+    const {store,task}=await isolated();
+    await expect(store.getState().start([{...task,content:undefined}],'UTC','',0,false)).rejects.toThrow('original');
+    await expect(store.getState().start([task],'UTC','',0,true)).rejects.toThrow('active');
   });
-  it('keeps previous storage on quota failure and fails closed on corrupt saved data', async () => {
-    const { store, task, storage, memory, vi } = await isolated();
-    storage.setItem = () => { throw new Error('Quota'); };
-    expect(() => store.getState().start([task('ONE')], 'UTC', '', 0, false)).toThrow('Unable to save');
-    expect(store.getState().job).toBeNull(); expect(store.getState().records).toEqual([]);
-    memory.set('sqx-file-import-v1', '{bad'); vi.resetModules();
-    const restored = (await import('../../../../../app/plugins/data_source/FileImport/fileImportStore')).useFileImports;
-    expect(restored.getState().storageError).toContain('preserved');
-    expect(() => restored.getState().start([task('ONE')], 'UTC', '', 0, false)).toThrow('preserved');
-    expect(memory.get('sqx-file-import-v1')).toBe('{bad');
+  it('preserves saved format behavior independently of backend jobs',async()=>{
+    const {store}=await isolated();
+    store.getState().saveFormat({...builtInFormats[0],name:'Saved',predefined:false});
+    expect(()=>store.getState().saveFormat({...builtInFormats[0],name:'Saved'})).toThrow('already exists');
+    store.getState().deleteFormat('Saved');expect(store.getState().formats).toEqual([]);
   });
 });

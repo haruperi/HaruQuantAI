@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from typing import Any, cast
@@ -14,6 +15,9 @@ from app.host.response import ErrorCode
 
 logger = get_logger(__name__)
 persistence = HostPersistence()
+
+_MAX_COST_VALUE = 100000
+_MAX_PERCENT = 100
 
 BROKERS_CATALOG_FR = "FR-DATAMGR-BROKERS-CATALOG"
 
@@ -28,6 +32,8 @@ _FIELDS = {
     "enabled",
     "clock_policy",
     "clock_policy_revision",
+    "spread_model",
+    "commission_model",
 }
 
 __all__ = [
@@ -78,6 +84,10 @@ class BrokerInfo:
     created_at_utc: str = ""
     updated_at_utc: str = ""
     clock_policy: dict[str, Any] = field(default_factory=dict[str, Any])
+    spread_model: dict[str, Any] = field(default_factory=lambda: {"model": "inherit"})
+    commission_model: dict[str, Any] = field(
+        default_factory=lambda: {"model": "inherit"}
+    )
     clock_policy_revision: int = 0
     customized_stocks: int = 0
     customized_instruments: int = 0
@@ -133,6 +143,10 @@ class BrokerInfo:
             updated_at_utc=str(row.get("updated_at_utc", "")),
             clock_policy=_parse_json_dict(row.get("clock_policy_json", "{}")),
             clock_policy_revision=int(row.get("clock_policy_revision", 0)),
+            spread_model=_parse_json_dict(row.get("spread_model_json"))
+            or {"model": "inherit"},
+            commission_model=_parse_json_dict(row.get("commission_model_json"))
+            or {"model": "inherit"},
             customized_stocks=c_stocks,
             customized_instruments=c_insts,
             customized_sessions=c_sess,
@@ -214,6 +228,54 @@ def _row(values: Mapping[str, Any]) -> dict[str, Any]:
         raise _BrokerError("clock_policy_revision must be a non-negative integer")
     data["clock_policy_revision"] = revision
     data["clock_policy_json"] = _policy_json(data.pop("clock_policy", {}))
+    data.update(
+        validate_cost_models(
+            {
+                key: data.pop(key, {"model": "inherit"})
+                for key in ("spread_model", "commission_model")
+            }
+        )
+    )
+    return data
+
+
+def validate_cost_models(values: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate inherited/fixed spread and existing commission model shapes."""
+    data: dict[str, Any] = {}
+    for key in ("spread_model", "commission_model"):
+        model = values.get(key, {"model": "inherit"})
+        if not isinstance(model, dict) or "model" not in model:
+            raise _BrokerError(f"Invalid {key}")
+        allowed = (
+            {"inherit", "fixed"}
+            if key == "spread_model"
+            else {
+                "inherit",
+                "None",
+                "Per trade",
+                "Size based",
+                "Percentage based",
+                "Stockpicker",
+            }
+        )
+        if model["model"] not in allowed:
+            raise _BrokerError(f"Unknown {key}")
+        if model["model"] != "inherit":
+            fields = ("value",) if key == "spread_model" else ("value", "min", "max")
+            for field in fields:
+                value = model.get(field, 0)
+                if (
+                    type(value) not in (int, float)
+                    or not math.isfinite(value)
+                    or not 0 <= value <= _MAX_COST_VALUE
+                ):
+                    raise _BrokerError(f"Invalid {key} {field}")
+            if (
+                model["model"] == "Percentage based"
+                and model.get("value", 0) > _MAX_PERCENT
+            ):
+                raise _BrokerError("Commission percentage must not exceed 100")
+        data[key + "_json"] = json.dumps(model, allow_nan=False)
     return data
 
 

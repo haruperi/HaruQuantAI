@@ -54,3 +54,32 @@ def temp_db(tmp_path):
     test_persistence = HostPersistence(db_path)
     with patch("app.workspace.data_manager.symbols.persistence", test_persistence):
         yield test_persistence
+
+
+@pytest.fixture
+def recorded_history(temp_db, tmp_path):
+    """Import known uploaded prices through the real publication pipeline."""
+    from app.host.jobs import JobContext
+    from app.workspace.data_manager.logs import Logs
+    from app.workspace.data_manager.sources.files import import_files
+
+    folder = tmp_path / "uploads"
+    folder.mkdir()
+    content = "DateTime,Open,High,Low,Close,Volume\n" + "".join(
+        f"2025-01-06 09:{minute:02d}:00,1.10,1.13,1.09,1.12,{minute + 10}\n"
+        for minute in (0, 1, 2, 4, 5, 6)
+    )
+    (folder / "0.input").write_text(content)
+    item = {
+        "staged": "0.input",
+        "name": "EURUSD.csv",
+        "symbol": "EURUSD",
+        "source": "files",
+        "timeframe": "M1",
+        "tick_size": 0.0001,
+        "market_root": str(tmp_path / "market"),
+    }
+    context = JobContext("fixture-import", tmp_path / "scratch")
+    result = import_files(context, temp_db, str(folder), [item], Logs())
+    assert result["completed"] == 1
+    return temp_db, result["datasets"][0], tmp_path

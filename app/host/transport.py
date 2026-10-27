@@ -16,15 +16,14 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from http import HTTPStatus
 from importlib.metadata import PackageNotFoundError, version
-from typing import Any, Literal, Protocol
-from urllib.parse import urlsplit
+from typing import Any
 
 import httpx
 import psutil
 from fastapi import APIRouter, FastAPI, HTTPException, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 from starlette.concurrency import run_in_threadpool
 from starlette.types import ASGIApp, Receive, Scope, Send
 from starlette.websockets import WebSocketDisconnect
@@ -40,6 +39,7 @@ from app.host.response import (
 )
 from app.host.session import Session, SessionManager, SessionPersistenceError
 from app.host.settings import RevisionConflictError, SettingsManager
+from app.host.vault import ConnectionMetadata, Vault, _endpoint, prepare_credentials
 
 logger = logging.getLogger("app.access")
 
@@ -51,7 +51,7 @@ _MAX_PROBES = 20
 _SECRET_WORDS = ("password", "secret", "token", "api_key", "private_key", "salt")
 _BUS_HOLDER: list[EventBus | None] = [None]
 
-type CredentialTester = Callable[[Mapping[str, Any]], Awaitable[bool]]
+type CredentialTester = Callable[[Mapping[str, Any]], Awaitable[bool | dict[str, Any]]]
 
 
 def get_global_event_bus() -> EventBus:
@@ -134,18 +134,6 @@ def register_transport_exception_handlers(app: FastAPI) -> None:
         return _failure(ErrorCode.INTERNAL, "Internal server error", "host")
 
 
-class Vault(Protocol):
-    """Injected secret store; revoke must be idempotent and refs independently owned."""
-
-    def resolve(self, reference: str) -> str:
-        """Resolve one opaque reference without logging its secret."""
-        ...
-
-    def revoke(self, reference: str) -> None:
-        """Permanently revoke a reference; repeated revocation must succeed."""
-        ...
-
-
 class TransportError(RuntimeError):
     """Typed domain exception translated directly into a standard error response."""
 
@@ -155,41 +143,12 @@ class TransportError(RuntimeError):
         super().__init__(message)
 
 
-class ConnectionMetadata(BaseModel):
-    """Allowlisted public connection fields; inline credentials cannot be saved."""
-
-    model_config = ConfigDict(extra="forbid", strict=True)
-    connection_id: str = Field(
-        default_factory=lambda: secrets.token_hex(16), min_length=1, max_length=128
-    )
-    name: str = Field(min_length=1, max_length=200)
-    provider: str = Field(min_length=1, max_length=100)
-    kind: Literal["broker", "exchange"] = "broker"
-    endpoint: str
-    vault_refs: dict[str, str] = Field(default_factory=dict)
-
-
 def _unwrap(response: dict[str, Any]) -> dict[str, Any]:
     if not response["success"]:
         code = response["error"]["code"]
         raise TransportError(ErrorCode(code), "Connection storage operation failed")
     data: dict[str, Any] = response["data"]
     return data
-
-
-def _endpoint(endpoint: str) -> tuple[str, int]:
-    p = urlsplit(endpoint)
-    bad = (
-        p.scheme not in {"http", "https"}
-        or not p.hostname
-        or p.username is not None
-        or p.password is not None
-        or p.query
-        or p.fragment
-    )
-    if bad:
-        raise ValueError("Invalid endpoint URL")
-    return p.hostname or "127.0.0.1", p.port or (443 if p.scheme == "https" else 80)
 
 
 def _bounds(timeout: float, probes: int = 1) -> None:
@@ -383,34 +342,61 @@ class ServletConnection:
             raise TransportError(ErrorCode.NOT_FOUND, "Connection not found")
         return ConnectionMetadata.model_validate_json(rows[0]["payload"])
 
-    def save_connection(self, metadata: Mapping[str, Any]) -> dict[str, Any]:
-        """Create public metadata; require a vault for independently owned refs."""
-        record = ConnectionMetadata.model_validate(metadata)
-        _endpoint(record.endpoint)
-        if (v := self.vault) is not None:
-            for ref in record.vault_refs.values():
-                v.resolve(ref)
-        elif record.vault_refs:
-            raise TransportError(
-                ErrorCode.UNAVAILABLE, "Credential vault is not configured"
-            )
-        now = datetime.now(UTC).isoformat()
-        with self.persistence.transaction() as tx:
-            items = ServletConnection(tx).list()
-            owned = {r for it in items for r in it["vault_refs"].values()}
-            if owned.intersection(record.vault_refs.values()):
-                raise TransportError(
-                    ErrorCode.CONFLICT, "Vault reference is already owned"
-                )
-            row = {
-                "entity_id": record.connection_id,
-                "entity_type": _ENTITY,
-                "scope": "host",
-                "payload": record.model_dump_json(),
-                "created_at_utc": now,
-                "updated_at_utc": now,
-            }
-            _unwrap(tx.create_records("host_entities", row))
+    def save_connection(
+        self, metadata: Mapping[str, Any], *, connection_id: str | None = None
+    ) -> dict[str, Any]:
+        """Save public metadata and rotate credentials through the injected OS vault."""
+        values = dict(metadata)
+        previous = self.get(connection_id) if connection_id else None
+        if previous:
+            values = {**previous.model_dump(), **values, "connection_id": connection_id}
+        staged = []
+        try:
+            record, staged = prepare_credentials(self.vault, values)
+            now = datetime.now(UTC).isoformat()
+            with self.persistence.transaction() as tx:
+                items = ServletConnection(tx).list()
+                owned = {
+                    ref
+                    for item in items
+                    if item["connection_id"] != connection_id
+                    for ref in item["vault_refs"].values()
+                }
+                if owned.intersection(record.vault_refs.values()):
+                    raise TransportError(  # noqa: TRY301 - enclosing scope owns rollback
+                        ErrorCode.CONFLICT, "Vault reference is already owned"
+                    )
+                row = {
+                    "entity_id": record.connection_id,
+                    "entity_type": _ENTITY,
+                    "scope": "host",
+                    "payload": record.model_dump_json(),
+                    "created_at_utc": now,
+                    "updated_at_utc": now,
+                }
+                if previous:
+                    _unwrap(
+                        tx.update_record(
+                            "host_entities",
+                            {"payload": row["payload"], "updated_at_utc": now},
+                            filters={
+                                "entity_id": connection_id,
+                                "entity_type": _ENTITY,
+                            },
+                        )
+                    )
+                else:
+                    _unwrap(tx.create_records("host_entities", row))
+        except BaseException:
+            if self.vault is not None:
+                for reference in staged:
+                    self.vault.revoke(reference)
+            raise
+        if previous and self.vault:
+            for reference in set(previous.vault_refs.values()) - set(
+                record.vault_refs.values()
+            ):
+                self.vault.revoke(reference)
         logger.info("Connection metadata saved")
         return record.model_dump()
 
@@ -477,6 +463,8 @@ class ServletConnection:
             fail: dict[str, Any] = {"authenticated": False, "status": "network_failure"}
             return {**fail, "latency_ms": None}
         lat = (time.perf_counter() - start) * 1000
+        if isinstance(auth, dict):
+            return {**auth, "latency_ms": lat}
         logger.info("Provider credential test completed; authenticated=%s", auth)
         status = "ok" if auth is True else "invalid_credentials"
         return {"authenticated": auth is True, "status": status, "latency_ms": lat}
@@ -791,7 +779,11 @@ async def _conn_route(request: Request) -> Any:
     if request.url.path.endswith("/test"):
         inline = None if cid else await _body(request)
         return await service.test_connection(connection_id=cid, inline=inline)
-    return await run_in_threadpool(service.save, await _body(request))
+    return await run_in_threadpool(
+        service.save,
+        await _body(request),
+        connection_id=str(cid) if cid and request.method == "PUT" else None,
+    )
 
 
 async def _jobs_route(request: Request) -> Any:
@@ -938,7 +930,11 @@ def create_transport_router(*, prefix: str = "/api/v1") -> APIRouter:
     _add(_cfg_route, "PUT /settings/secrets", "GET /auth/account", "PUT /auth/account")
     _add(_conn_route, "GET /connections", "POST /connections")
     _add(_conn_route, "POST /connections/test", "DELETE /connections/{connection_id}")
-    _add(_conn_route, "POST /connections/{connection_id}/test")
+    _add(
+        _conn_route,
+        "POST /connections/{connection_id}/test",
+        "PUT /connections/{connection_id}",
+    )
     _add(_jobs_route, "GET /jobs", "GET /jobs/{job_id}", "POST /jobs/{job_id}/cancel")
     _add(_event_route, "POST /events/publish", "GET /events/channels")
     _add(_event_route, "GET /events/snapshot")

@@ -130,7 +130,7 @@ def capabilities(provider: str) -> dict[str, Any]:
     }
 
 
-def make_client(provider: str) -> Any:
+def make_client(provider: str, connection: dict[str, Any] | None = None) -> Any:
     """Construct a data-only client; MT5 reuses its connected native bridge."""
     from app.workspace.brokers import (
         CryptoClient,
@@ -143,7 +143,11 @@ def make_client(provider: str) -> Any:
 
     if provider in CRYPTO:
         exchange, venue = CRYPTO[provider]
-        return CryptoClient(exchange=exchange, venue=venue)
+        return CryptoClient(
+            exchange=exchange,
+            venue=venue,
+            api_key=(connection or {}).get("credentials", {}).get("api_key"),
+        )
     if provider == "mt5":
         client = get_broker("metatrader")
         if not client.bridge.connected:
@@ -156,6 +160,11 @@ def make_client(provider: str) -> Any:
         "sq_futures": SQFuturesClient,
     }
     client = factories[provider]()
+    credentials = (connection or {}).get("credentials") or {}
+    if credentials.get("username") and credentials.get("password"):
+        client.session.auth = (credentials["username"], credentials["password"])
+    if credentials.get("token"):
+        client.session.headers["Authorization"] = "Bearer " + credentials["token"]
     # Ingestion must fetch the source, not rediscover its own cached dataset.
     if provider.startswith("sq_"):
         client.use_cache = False

@@ -39,17 +39,14 @@ def _ok(data: Any) -> dict[str, Any]:
 
 
 def _custom_jobs(request: Request, *, create: bool = False) -> Any:
-    from app.host.jobs import JobManager
+    """Reuse the application-owned data-operation pool, preserving injected managers."""
+    jobs = getattr(request.app.state, "custom_jobs", None) or getattr(
+        request.app.state, "download_jobs", None
+    )
+    if jobs is None and create:
+        from app.workspace.data_manager.sources.download_jobs import manager
 
-    with _CUSTOM_JOB_LOCK:
-        jobs = getattr(request.app.state, "custom_jobs", None)
-        if jobs is None and create:
-            jobs = JobManager(
-                persistence=request.app.state.persistence,
-                max_workers=1,
-                use_process_pool=False,
-            )
-            request.app.state.custom_jobs = jobs
+        jobs = manager(request)
     return jobs
 
 

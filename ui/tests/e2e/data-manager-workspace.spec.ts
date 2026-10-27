@@ -164,3 +164,22 @@ test('missing recorded history is explicit and host initialization can retry', a
   await expect(preview.getByRole('table', { name: 'Recorded bars' })).toHaveCount(0);
   await expect(preview.locator('canvas')).toHaveCount(0);
 });
+
+
+test('dataset properties submits the edited catalog fields to the host', async ({ page }) => {
+  await connect(page);
+  let submitted: Record<string, unknown> | undefined;
+  await page.route('**/api/v1/data/datasets/**', async route => {
+    if (route.request().method() !== 'PUT') return route.fallback();
+    submitted = route.request().postDataJSON();
+    await route.fulfill({json:{status:'success', data:{...datasets[0], ...submitted}}});
+  });
+  await page.getByRole('button', {name:'Edit dataset EURUSD', exact:true}).first().click();
+  const modal = page.getByRole('dialog', {name:'Dataset properties', exact:true});
+  await expect(modal).toBeVisible();
+  await modal.getByLabel('Category', {exact:true}).fill('CFD');
+  await modal.getByRole('button', {name:'Save properties', exact:true}).click();
+  await expect(modal).toHaveCount(0);
+  expect(submitted?.category).toBe('CFD');
+  expect(submitted?.symbol).toBe('EURUSD');
+});

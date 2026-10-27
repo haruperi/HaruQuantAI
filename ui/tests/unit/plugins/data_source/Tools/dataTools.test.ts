@@ -44,17 +44,23 @@ async function isolated() {
 }
 beforeEach(() => vi.unstubAllGlobals());
 
-it('persists clones, restores running work paused, and saves review mutations', async () => {
-  const { store } = await isolated(); store.getState().startClone([target], settings, [], false); store.getState().advance(); vi.resetModules();
-  const restored = (await import('../../../../../app/plugins/data_source/Tools/dataToolsStore')).useDataTools; expect(restored.getState().job?.state).toBe('paused');
-  restored.getState().action('resume'); for (let i=0;i<10;i++) restored.getState().advance();
-  expect(restored.getState().job?.state).toBe('completed'); expect(restored.getState().definitions[0].sourceDataId).toBe('d1');
-  const rows = generateReviewRows(target,'M1','No Session',5); restored.getState().saveReview(reviewKey('d1','M1','No Session'),rows,{ [rows[0].id]:{ close:1.2 } },[rows[1].id],false);
-  expect(restored.getState().reviews['d1|M1|No Session'].deleted).toEqual([rows[1].id]);
+it('submits a real clone job without inventing browser definitions',async()=>{
+  const {store}=await isolated();
+  const module=await import('../../../../../app/plugins/data_source/Tools/dataToolsStore');
+  const post=vi.fn().mockResolvedValue({job_id:'clone-real',status:'QUEUED',progress:0,message:'Queued'});
+  module.setDataClient({post,get:vi.fn(),put:vi.fn(),delete:vi.fn()});
+  await store.getState().startClone([target],settings,[],false);
+  expect(post).toHaveBeenCalledWith('/datasets/clone-timezone',expect.objectContaining({dataset_id:'d1',shift_hours:5}));
+  expect(store.getState().definitions).toEqual([]);expect(store.getState().job).toBeNull();
 });
 
-it('fails closed for conflicts and corrupt persisted state', async () => {
-  const { store, memory } = await isolated(); expect(() => store.getState().startClone([target],settings,[],true)).toThrow('active');
-  memory.set('haru-data-tools-v1','bad'); vi.resetModules(); const corrupt=(await import('../../../../../app/plugins/data_source/Tools/dataToolsStore')).useDataTools;
-  expect(corrupt.getState().storageError).toContain('preserved'); expect(memory.get('haru-data-tools-v1')).toBe('bad');
+it('propagates rejected jobs and refuses conflicting submissions',async()=>{
+  const {store,memory}=await isolated();
+  const module=await import('../../../../../app/plugins/data_source/Tools/dataToolsStore');
+  module.setDataClient({post:vi.fn().mockRejectedValue(new Error('Clone rejected')),get:vi.fn(),put:vi.fn(),delete:vi.fn()});
+  await expect(store.getState().startClone([target],settings,[],false)).rejects.toThrow('Clone rejected');
+  await expect(store.getState().startClone([target],settings,[],true)).rejects.toThrow('active');
+  memory.set('haru-data-tools-v1','bad');vi.resetModules();
+  const corrupt=(await import('../../../../../app/plugins/data_source/Tools/dataToolsStore')).useDataTools;
+  expect(corrupt.getState().storageError).toContain('preserved');expect(memory.get('haru-data-tools-v1')).toBe('bad');
 });

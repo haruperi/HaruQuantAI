@@ -75,6 +75,7 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
     category?: string;
     underlying?: string;
     symbolDefinition?: string;
+    symbol_definition_id?: number | null; session_id?: number | null;
     path?: string;
     bar_type?: string;
   }>>('/home/datasets');
@@ -103,6 +104,7 @@ export async function fetchRemoteDatasets(): Promise<MockDefinition[]> {
       to: (item.date_to || '').split(/[T ]/)[0],
       bars: item.total_records ?? item.bars ?? item.bar_count ?? item.bars_count ?? 0,
       totalDays: item.total_days ?? 0,
+      symbol_definition_id:item.symbol_definition_id, session_id:item.session_id,
       path: normalizeRelativePath(item.path),
       barType: item.bar_type || 'Start of bar',
     };
@@ -113,6 +115,7 @@ export interface MockDefinition {
   id: string; source: string; symbol: string; underlying: string; symbolDefinition: string;
   timeframe: string; broker: string; brokerName: string; timezone: string;
   category: string; from: string; to: string; bars: number;
+  symbol_definition_id?: number | null; session_id?: number | null;
   path?: string;
   barType?: string;
   totalDays?: number;
@@ -365,7 +368,8 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
       broker: updates.broker,
       timezone: updates.timezone,
       category: updates.category,
-      symbolDefinition: updates.symbolDefinition,
+      symbol_definition_id: updates.symbol_definition_id,
+      session_id: updates.session_id,
     });
     const definitions = state.definitions.map(d => (d.id === id ? { ...d, ...updates } : d));
     try { persistData(state, state.brokers, definitions, state.brokerJob); } catch { /* ignore */ }

@@ -88,8 +88,8 @@ def _broker_ui(row: dict[str, Any], gateway: HostPersistence) -> dict[str, Any]:
         "stocks": stocks,
         "total_symbols": row["customized_instruments"],
         "total_sessions": row["customized_sessions"],
-        "spread_model": {"model": "inherit"},
-        "commission_model": {"model": "inherit"},
+        "spread_model": row.get("spread_model", {"model": "inherit"}),
+        "commission_model": row.get("commission_model", {"model": "inherit"}),
     }
 
 
@@ -266,6 +266,9 @@ def register_broker_routes(router: APIRouter) -> None:
         ids = [str(row["id"]) for row in rows]
         return _ok({"deleted_ids": ids, "deleted_count": len(ids)})
 
+    from .imports import register_broker_import_routes
+
+    register_broker_import_routes(router)
     _broker_transfer_routes(router)
     _broker_stock_routes(router)
 
@@ -277,12 +280,6 @@ def _broker_save_route(router: APIRouter) -> None:
         fields = {key: value for key, value in body.items() if key != "id"}
         if "timezone" in fields:
             fields["server_timezone"] = fields.pop("timezone")
-        # Accept inherited costs from older clients; there are no cost columns.
-        for key in ("spread_model", "commission_model"):
-            if fields.pop(key, {"model": "inherit"}) != {"model": "inherit"}:
-                raise TransportError(
-                    ErrorCode.VALIDATION, "Broker cost defaults are unavailable"
-                )
         with gateway.transaction() as tx:
             service = Brokers(tx, manage_transactions=False)
             if "id" in body:

@@ -243,11 +243,33 @@ def parse_csv_row(
     cells = raw[config["skip_columns"] :]
     if len(cells) != len(columns):
         raise CustomDataError("Column count does not match format")
-    date = timestamp(cells[columns.index("date")], config["date_format"])
+    text = cells[columns.index("date")]
+    pattern = config["date_format"]
+    if pattern and "%" not in pattern:
+        for old, new in (
+            ("yyyy", "%Y"),
+            ("MM", "%m"),
+            ("dd", "%d"),
+            ("HH", "%H"),
+            ("mm", "%M"),
+            ("ss", "%S"),
+            ("SSS", "%f"),
+        ):
+            pattern = pattern.replace(old, new)
+    if "time" in columns:
+        clock = cells[columns.index("time")]
+        text += " " + clock
+        if pattern and "%H" not in pattern:
+            pattern += (
+                " %H:%M"
+                + (":%S" if clock.count(":") > 1 else "")
+                + (".%f" if "." in clock else "")
+            )
+    date = timestamp(text, pattern)
     values = {
         column: float(cell)
         for column, cell in zip(columns, cells, strict=True)
-        if column not in {"date", "ignore"}
+        if column not in {"date", "time", "ignore"}
     }
     if not all(math.isfinite(value) for value in values.values()):
         raise CustomDataError("Values must be finite numbers")

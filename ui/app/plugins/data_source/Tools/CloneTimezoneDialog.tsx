@@ -12,8 +12,8 @@ export function CloneTimezoneDialog({ targets, existingNames, externalActive, on
   const [error, setError] = useState('');
   const selectedFor = targets.length === 1 ? targets[0].symbol : 'multiple';
   const patch = (value: Partial<CloneSettings>) => { setSettings(current => ({ ...current, ...value })); setError(''); };
-  function proceed(): void {
-    try { store.startClone(targets, settings, existingNames, externalActive); onStarted(); onClose(); }
+  async function proceed(): Promise<void> {
+    try { await store.startClone(targets, settings, existingNames, externalActive); onStarted(); onClose(); }
     catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to start clone.'); }
   }
   return <div className="data-tools-flow"><Modal title={`Clone to Timezone for '${selectedFor}'`} width={600} onClose={onClose}
@@ -29,6 +29,6 @@ export function CloneTimezoneDialog({ targets, existingNames, externalActive, on
       <label><input type="radio" name="timezone-mode" checked={settings.timezoneType === 'zone'} onChange={() => patch({ timezoneType: 'zone' })}/><span>choose timezone</span><Select disabled={settings.timezoneType !== 'zone'} value={settings.timezone} onChange={timezone => patch({ timezone })}>{toolTimezones.map(item => <option key={item}>{item}</option>)}</Select></label>
       <Checkbox label="Remove weekends" checked={settings.removeWeekends} onChange={removeWeekends => patch({ removeWeekends })}/>
     </div></fieldset>
-    <p className="tools-mock-note">Offline mock clone. Generated rows will use <strong>{cloneTimeLabel(settings)}</strong>; source files are not modified.</p>
+    <p className="tools-mock-note">The saved clone will use <strong>{cloneTimeLabel(settings)}</strong>; source prices are preserved.</p>
   </Modal></div>;
 }

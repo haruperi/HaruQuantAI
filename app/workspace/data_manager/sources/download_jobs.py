@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import tempfile
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from threading import Lock
 from typing import Any, cast
 
@@ -27,7 +29,15 @@ def manager(request: Request) -> JobManager:
             # A new application has no workers for persisted downloads. Reconcile
             # only this manager's jobs, never another workspace's live workers.
             gateway = request.app.state.persistence
-            for kind in ("dukascopy.download", "market.download"):
+            for kind in (
+                "dukascopy.download",
+                "market.download",
+                "market.import",
+                "market.export",
+                "market.clone",
+                "custom.import",
+                "custom.cot",
+            ):
                 for status in ("QUEUED", "RUNNING", "PAUSED"):
                     while True:
                         rows = require_data(
@@ -39,6 +49,18 @@ def manager(request: Request) -> JobManager:
                         if not rows:
                             break
                         for row in rows:
+                            if kind == "market.import":
+                                from .files import _cleanup_inputs
+
+                                _cleanup_inputs(
+                                    str(
+                                        Path(tempfile.gettempdir())
+                                        / (
+                                            "haru-history-import-"
+                                            + safe_component(row["job_id"])
+                                        )
+                                    )
+                                )
                             require_data(
                                 gateway.update_record(
                                     "host_jobs",
@@ -242,9 +264,19 @@ def register_download_jobs(router: APIRouter) -> None:
     def job(request: Request, job_id: str, action: str | None = None) -> Any:
         jobs = manager(request)
         record = jobs.get_job(job_id)
-        if record is None or record.kind not in (
-            "dukascopy.download",
-            "market.download",
+        if (
+            record is None
+            or record.owner != "data-manager"
+            or record.kind
+            not in (
+                "dukascopy.download",
+                "market.download",
+                "market.import",
+                "market.export",
+                "market.clone",
+                "custom.import",
+                "custom.cot",
+            )
         ):
             raise TransportError(ErrorCode.NOT_FOUND, "Download job not found")
         if request.method == "POST":
@@ -262,4 +294,26 @@ def register_download_jobs(router: APIRouter) -> None:
             record = jobs.get_job(job_id)
         if record is None:
             raise TransportError(ErrorCode.NOT_FOUND, "Download job not found")
-        return {"success": True, "status": "success", "data": record.to_dict()}
+        if record.kind == "market.import" and record.status == "CANCELLED":
+            from .files import _cleanup_inputs
+
+            _cleanup_inputs(
+                str(
+                    Path(tempfile.gettempdir())
+                    / ("haru-history-import-" + safe_component(job_id))
+                )
+            )
+        data = record.to_dict()
+        if (
+            record.kind == "market.export"
+            and record.status == "COMPLETED"
+            and data.get("result") is None
+        ):
+            import json
+
+            from app.workspace.data_manager.data.exports import ARTIFACT_ROOT
+
+            manifest = ARTIFACT_ROOT / safe_component(job_id) / "manifest.json"
+            if manifest.is_file():
+                data["result"] = json.loads(manifest.read_text(encoding="utf-8"))
+        return {"success": True, "status": "success", "data": data}

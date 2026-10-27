@@ -125,3 +125,8 @@ export async function editBrokerCatalog(ids: string[], updates: Record<string, u
   if(new Set(profiles.map(row=>row.id)).size!==new Set(ids).size || profiles.some(row=>!ids.includes(row.id))) throw new Error('The host returned different broker identities.');
   return profiles;
 }
+
+
+export async function previewBrokerRecords(content: string, kind: 'symbols' | 'sessions'): Promise<string> {
+  return JSON.stringify(await client.post('/brokers/import-preview', {content, kind}));
+}

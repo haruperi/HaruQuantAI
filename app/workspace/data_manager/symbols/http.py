@@ -168,6 +168,7 @@ def _map_updates(values: dict[str, Any]) -> dict[str, Any]:
     """Map explicitly supplied browser fields to service fields."""
     direct = {
         "description",
+        "exchange",
         "data_type",
         "broker_id",
         "default_spread",
@@ -215,6 +216,12 @@ def _map_updates(values: dict[str, Any]) -> dict[str, Any]:
             "mode": swap["type"],
             "rollover3days": swap["tripleSwapOn"].capitalize(),
         }
+    if values.get("expiry"):
+        from datetime import date
+
+        result.setdefault("trade", {})["contract_expiry"] = date.fromisoformat(
+            values["expiry"]
+        ).isoformat()
     return result
 
 

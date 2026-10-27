@@ -115,6 +115,17 @@ def create_router() -> APIRouter:
     router = APIRouter(prefix="/api/v1/data", dependencies=[Depends(_access)])
 
     register_data_routes(router)
+    from .sources.files import register_file_routes
+
+    register_file_routes(router)
+    from .data.review import register_review_routes
+
+    register_review_routes(router)
+    from .data.exports import register_export_routes
+    from .data.transforms import register_transform_routes
+
+    register_export_routes(router)
+    register_transform_routes(router)
     register_source_routes(router)
     register_symbol_routes(router)
     register_session_routes(router)

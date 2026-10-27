@@ -9,23 +9,23 @@ export function useDataSourceTDImport({ onClose, onStarted }: TDImportCallbacks)
   const [postfix, setPostfix] = useState(saved.postfix);
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState('');
-  const picker = useRef<HTMLInputElement>(null);
+  const picker = useRef<HTMLInputElement>(null); const chosenFiles = useRef<File[]>([]);
   const root = useRef<HTMLDivElement>(null);
   const allCheck = useRef<HTMLInputElement>(null);
   const symbols = manifest?.symbols ?? [];
   const all = symbols.length > 0 && selected.length === symbols.length;
   useEffect(() => { if (allCheck.current) allCheck.current.indeterminate = selected.length > 0 && !all; }, [all, selected]);
   useEffect(() => { const previous = document.activeElement as HTMLElement | null; root.current?.querySelector<HTMLButtonElement>('button')?.focus(); return () => previous?.focus(); }, []);
-  function start() {
+  async function start() {
     try {
       if (!manifest) throw new Error('Select a TickDownloader installation folder.');
-      tdService.importData({ folder: manifest.folder, symbols: selected, postfix }, symbols);
+      await tdService.importData({ folder: manifest.folder, symbols: selected, postfix }, symbols, chosenFiles.current);
       onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to import data.'); }
   }
   function selectFolder(event: ChangeEvent<HTMLInputElement>): void {
             if (!event.target.files?.length) return;
-            setError(''); setSelected([]); setManifest(null);
+            chosenFiles.current=Array.from(event.target.files); setError(''); setSelected([]); setManifest(null);
             try { setManifest(tdService.loadAvailableSymbols(Array.from(event.target.files, file => file.webkitRelativePath))); }
             catch (cause) { setError(cause instanceof Error ? cause.message : 'Cannot load available symbols.'); }
             event.target.value = '';

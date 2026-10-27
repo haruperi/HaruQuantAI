@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import json
+import shutil
 import time
 from collections.abc import Callable
+from dataclasses import asdict
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
-from app.host.persistence import HostPersistence
+from app.host.persistence import HostPersistence, RecordFilter
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,
@@ -16,7 +19,7 @@ from app.host.response import (
     StandardResponse,
 )
 from app.include.contracts import DataInfo
-from app.include.market_storage import scan_catalog
+from app.include.market_storage import catalog_paths, safe_component, scan_catalog
 
 from ._helpers import (
     DATASETS_CATALOG_FR,
@@ -53,6 +56,7 @@ class Data:
 
     def _read_datasets(self) -> list[dict[str, Any]]:
         """Read all dataset catalog items from the datamgr_datasets table."""
+        require_data(self.gateway.ensure_datasets_schema())
         rows: list[dict[str, Any]] = []
         offset: int | None = 0
         while offset is not None:
@@ -80,8 +84,37 @@ class Data:
             dataset_rows = self._read_datasets()
             self.datasets_count = len(dataset_rows)
             self.total_bars = sum(int(r.get("bars", 0)) for r in dataset_rows)
+            counts = []
+            for table in ("datamgr_symbols", "datamgr_sessions", "datamgr_stock_group"):
+                offset, count = 0, 0
+                while True:
+                    response = self.gateway.read_records(
+                        table, offset=offset, limit=1000
+                    )
+                    if (
+                        not response["success"]
+                        and response.get("message") == "Table does not exist"
+                    ):
+                        break
+                    page = require_data(response)
+                    count += len(page["records"])
+                    offset = page["pagination"].get("next_offset")
+                    if offset is None:
+                        break
+                counts.append(count)
+            self.instruments_count, self.sessions_count, self.baskets_count = counts
+            paths = {
+                Path(path).resolve()
+                for row in dataset_rows
+                for path in catalog_paths(row)
+            }
+            present = [path for path in paths if path.is_file()]
+            self.storage_bytes = sum(path.stat().st_size for path in present)
+            self.parquet_files_count = len(present)
             self.active_providers_count = (
-                self._providers_getter() if self._providers_getter is not None else 0
+                self._providers_getter()
+                if self._providers_getter is not None
+                else len({r["source"] for r in dataset_rows if r.get("bars", 0) > 0})
             )
 
             logger.info(
@@ -105,6 +138,9 @@ class Data:
                 data={
                     "datasets_count": self.datasets_count,
                     "instruments_count": self.instruments_count,
+                    "symbols_count": self.instruments_count,
+                    "storage_missing_files": len(paths) - len(present),
+                    "disk_free_bytes": shutil.disk_usage(Path.cwd()).free,
                     "sessions_count": self.sessions_count,
                     "baskets_count": self.baskets_count,
                     "active_providers_count": self.active_providers_count,
@@ -133,7 +169,24 @@ class Data:
         try:
             rows = self._read_datasets()
 
-            datasets: list[DataInfo] = []
+            specifications: dict[int, str] = {}
+            ids = list(
+                {
+                    row["symbol_definition_id"]
+                    for row in rows
+                    if row.get("symbol_definition_id") is not None
+                }
+            )
+            for index in range(0, len(ids), 1000):
+                records = require_data(
+                    self.gateway.read_records(
+                        "datamgr_symbols",
+                        filters=[RecordFilter("id", "in", ids[index : index + 1000])],
+                        limit=1000,
+                    )
+                )["records"]
+                specifications.update({row["id"]: row["name"] for row in records})
+            datasets: list[Any] = []
             for r in rows:
                 symbol = str(r.get("symbol", ""))
                 underlying = str(r.get("underlying") or r.get("symbol", ""))
@@ -159,7 +212,9 @@ class Data:
                     DataInfo(
                         id=str(r.get("id", f"{source}:{symbol}")),
                         symbol=symbol,
-                        instrument=underlying,
+                        instrument=specifications.get(
+                            r.get("symbol_definition_id"), underlying
+                        ),
                         broker=broker,
                         broker_name=broker,
                         underlying=underlying,
@@ -179,6 +234,11 @@ class Data:
                         bar_type=str(r.get("bar_type", "start")),
                     )
                 )
+                datasets[-1] = {
+                    **asdict(datasets[-1]),
+                    "symbol_definition_id": r.get("symbol_definition_id"),
+                    "session_id": r.get("session_id"),
+                }
 
             logger.debug(
                 "%s: Retrieved %d saved dataset catalog items",
@@ -208,6 +268,122 @@ class Data:
                 ),
             )
 
+    def edit(self, dataset_id: str, updates: dict[str, Any]) -> dict[str, Any]:
+        """Persist validated catalog links without relabelling stored timestamps."""
+        allowed = {
+            "symbol",
+            "broker",
+            "category",
+            "symbol_definition_id",
+            "session_id",
+            "timezone",
+        }
+        values = {
+            key: value
+            for key, value in updates.items()
+            if value is not None or key in {"symbol_definition_id", "session_id"}
+        }
+        if not values or values.keys() - allowed:
+            raise ValueError("Supply editable dataset properties")
+        require_data(self.gateway.ensure_datasets_schema())
+        with self.gateway.transaction() as tx:
+            rows = require_data(
+                tx.read_records("datamgr_datasets", filters={"id": dataset_id}, limit=1)
+            )["records"]
+            if not rows:
+                raise ValueError("Dataset not found")
+            row = rows[0]
+            if "symbol" in values:
+                safe_component(values["symbol"])
+
+            from ._helpers import resolve_dataset_links
+
+            resolve_dataset_links(tx, values)
+            values["updated_at"] = datetime.now(UTC).isoformat()
+            renamed = values.get("symbol", row["symbol"]) != row["symbol"]
+            if not renamed or not row["bars"]:
+                if renamed:
+                    from .storage import dataset_root
+
+                    values["path"] = str(
+                        dataset_root(
+                            Path(row["path"]).parent.parent,
+                            values["symbol"],
+                            row["timeframe"],
+                        )
+                    )
+                return require_data(
+                    tx.update_record(
+                        "datamgr_datasets", values, filters={"id": dataset_id}
+                    )
+                )["records"][0]
+        from .partition_files import dataset_lock
+        from .review import DatasetReview
+        from .storage import dataset_root, publish_frame
+
+        root = Path(row["path"])
+        destination = dataset_root(
+            root.parent.parent, values["symbol"], row["timeframe"]
+        )
+        with dataset_lock(root), dataset_lock(destination):
+            latest = DatasetReview(self.gateway, dataset_id)
+            if latest.record["updated_at"] != row["updated_at"]:
+                raise ValueError("Dataset changed; reload before renaming")
+            conflict = require_data(
+                self.gateway.read_records(
+                    "datamgr_datasets",
+                    filters={
+                        "source": row["source"],
+                        "symbol": values["symbol"],
+                        "timeframe": row["timeframe"],
+                    },
+                    limit=1,
+                )
+            )["records"]
+            if conflict:
+                raise ValueError("Another dataset already uses this name")
+            frame = latest.frame()
+            publish_frame(
+                self.gateway,
+                root.parent.parent,
+                {**latest.record, **values},
+                frame,
+                json.loads(row["lineage_json"])["tick_size"],
+                replace_snapshot=True,
+                locked=True,
+                metadata_updates=values,
+            )
+        return require_data(
+            self.gateway.read_records(
+                "datamgr_datasets", filters={"id": dataset_id}, limit=1
+            )
+        )["records"][0]
+
+    def _remove_cached_files(self, row: dict[str, Any]) -> None:
+        """Remove retired canonical files only when no catalog still references them."""
+        from .partition_files import dataset_lock
+
+        lineage = json.loads(row.get("lineage_json") or "{}")
+        if lineage.get("storage") != "canonical-partitions-v1":
+            return
+        root = Path(row["path"]).resolve()
+        with dataset_lock(root):
+            active = require_data(self.gateway.read_records("datamgr_datasets"))[
+                "records"
+            ]
+            referenced = {
+                Path(path).resolve() for item in active for path in catalog_paths(item)
+            }
+            for value in lineage.get("partitions", []):
+                path = Path(value).resolve()
+                if (
+                    path.is_relative_to(root)
+                    and path != root
+                    and path.suffix == ".parquet"
+                    and path not in referenced
+                ):
+                    path.unlink(missing_ok=True)
+
     def clear(self, dataset_id: str) -> dict[str, Any]:
         """Clear recorded dataset observations while retaining catalog record."""
         start = time.perf_counter()
@@ -229,7 +405,7 @@ class Data:
                     ),
                 )
             row = records[0]
-            # Retire snapshots in the catalog; physical GC is a separate operation.
+            # Commit catalog retirement before removing unreferenced canonical files.
             now_iso = datetime.now(UTC).isoformat()
             require_data(
                 self.gateway.update_record(
@@ -250,6 +426,7 @@ class Data:
                     filters={"id": dataset_id},
                 )
             )
+            self._remove_cached_files(row)
             return StandardResponse.success(
                 message=f"Dataset '{dataset_id}' cleared successfully",
                 metadata=ResponseMetadata(
@@ -272,7 +449,7 @@ class Data:
             )
 
     def delete(self, dataset_id: str) -> dict[str, Any]:
-        """Retire a catalog entry; immutable files await explicit garbage collection."""
+        """Retire a catalog entry and remove its unreferenced canonical cache."""
         start = time.perf_counter()
         try:
             resp = self.gateway.read_records(
@@ -291,12 +468,13 @@ class Data:
                         message="Dataset not found",
                     ),
                 )
-            # Retire snapshots in the catalog; physical GC is a separate operation.
+            # Commit catalog retirement before removing unreferenced canonical files.
             require_data(
                 self.gateway.delete_record(
                     "datamgr_datasets", filters={"id": dataset_id}
                 )
             )
+            self._remove_cached_files(records[0])
             return StandardResponse.success(
                 message=f"Dataset '{dataset_id}' deleted successfully",
                 metadata=ResponseMetadata(

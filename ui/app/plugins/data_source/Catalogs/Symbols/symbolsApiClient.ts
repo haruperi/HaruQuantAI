@@ -124,6 +124,7 @@ export const specificationFields = {
 export function fromFileSymbol(item: FileSymbol): Record<string, unknown> {
   if (!/^-?\d+$/.test(item.broker)) throw new Error('Choose a configured numeric broker ID.');
   const values: Record<string, unknown> = {
+    ...(item.exchange ? {exchange:item.exchange} : {}), ...(item.expiry ? {expiry:item.expiry} : {}),
     symbol: item.symbol, description: item.name, broker_id: Number(item.broker), data_type: item.type,
     point_value: item.pointValue, tick_size: item.tickSize, tick_step: item.tickStep,
     default_spread: item.spread, default_slippage: item.slippage, min_distance: item.minDistance,

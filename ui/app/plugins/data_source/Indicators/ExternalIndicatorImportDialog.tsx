@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Button, Field, Modal, Select, TextInput } from '../../../components/ui';
 import { activeExternalLines, builtInExternalFormats, detectExternalFormat, externalDateFormats, externalPreview, externalSeparators, parseExternalData, readExternalFile, type ExternalColumnType, type ExternalImportFormat, type ExternalIndicatorDefinition } from './externalIndicators';
 import { useExternalIndicators } from './externalIndicatorsStore';
+import { useHistoricalSources, type SourceJob } from '../Common/historicalSourceStore';
 import { importExternalIndicatorData } from './externalIndicatorsApiClient';
 import './externalIndicators.css';
 
@@ -13,9 +14,9 @@ export function ExternalIndicatorImportDialog({ item, externalActive, onClose, o
   const maxColumns = Math.max(format.columns.length, ...preview.map(row => row.length), 0); const options: ExternalColumnType[] = ['', 'Date', 'Time', 'Date & Time', 'Unused', ...Array.from({ length: count }, (_, i): ExternalColumnType => `Value ${i + 1}`)];
   function chooseFormat(name: string): void { const found = formats.find(item => item.name === name); if (found) setFormat(copyFormat(found)); }
   async function choose(next: File | null): Promise<void> { setFile(next); setText(''); setError(''); if (!next) return; try { const value = await readExternalFile(next); setText(value); setFormat(detectExternalFormat(value, count)); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to read data file.'); } }
-  function saveAs(): void { try { store.saveFormat({ ...format, name: newName, predefined: false }); setFormat(current => ({ ...current, name: newName.trim(), predefined: false })); setNested(null); setNewName(''); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save data format.'); } }
-  function saveCurrent(): void { try { store.saveFormat({ ...format, predefined: false }, true); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save data format.'); } }
-  function removeFormat(): void { try { store.deleteFormat(format.name); setFormat(copyFormat(builtInExternalFormats[0])); setNested(null); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to delete data format.'); } }
+  async function saveAs(): Promise<void> { try { await store.saveFormat({ ...format, name: newName, predefined: false }); setFormat(current => ({ ...current, name: newName.trim(), predefined: false })); setNested(null); setNewName(''); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save data format.'); } }
+  async function saveCurrent(): Promise<void> { try { await store.saveFormat({ ...format, predefined: false }, true); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save data format.'); } }
+  async function removeFormat(): Promise<void> { try { await store.deleteFormat(format.name); setFormat(copyFormat(builtInExternalFormats[0])); setNested(null); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to delete data format.'); } }
   async function start(): Promise<void> {
     try {
       if (!file || !text) throw new Error('Choose a data file.');
@@ -23,14 +24,14 @@ export function ExternalIndicatorImportDialog({ item, externalActive, onClose, o
       const active = activeExternalLines(item);
       const mappedColumns = format.columns.map(col => {
         if (col === 'Date' || col === 'Date & Time') return 'date';
+        if (col === 'Time') return 'time';
         if (col.startsWith('Value ')) {
           const idx = parseInt(col.replace('Value ', ''), 10) - 1;
           return active[idx]?.name || 'ignore';
         }
         return 'ignore';
       });
-      try {
-        await importExternalIndicatorData(
+      const job = await importExternalIndicatorData(
           item.name,
           text,
           format.name !== 'Custom' && !format.predefined ? format.name : undefined,
@@ -43,12 +44,10 @@ export function ExternalIndicatorImportDialog({ item, externalActive, onClose, o
             columns: mappedColumns,
             error_handling: ignoreErrors ? 'skip' : 'abort',
           },
+          true,
         );
-      } catch (backendError) {
-        console.warn('Backend import error:', backendError);
-      }
-      store.startImport(item.name, parsed.records, parsed.timeframe, parsed.ignored, externalActive);
-      void store.syncRemote();
+      useHistoricalSources.getState().trackJob(job as SourceJob);
+      await store.syncRemote();
       onStarted();
       onClose();
     } catch (cause) {

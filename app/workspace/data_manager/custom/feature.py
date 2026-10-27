@@ -527,9 +527,9 @@ class CustomData:
         context: Any = None,
     ) -> dict[str, Any]:
         columns = config["columns"]
-        if set(columns) - {"date", "ignore", *outputs} or set(outputs) != set(
+        if set(columns) - {"date", "time", "ignore", *outputs} or set(outputs) != set(
             columns
-        ) - {"date", "ignore"}:
+        ) - {"date", "time", "ignore"}:
             raise _CustomError("Map each indicator output exactly once")
         reader = csv.reader(
             io.StringIO(content), delimiter=config["separator"], strict=True

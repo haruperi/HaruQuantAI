@@ -7,7 +7,7 @@ import { fromSessionDefinition } from '../Sessions/sessionApiClient';
 import { useSymbols } from '../Symbols/symbolsStore';
 import { useSessions } from '../Sessions/sessionStore';
 import { useDataManagerStore } from '../../Common/dataManagerStore';
-import { importBrokerRecords, type BrokerImportResult } from './brokerApiClient';
+import { previewBrokerRecords, importBrokerRecords, type BrokerImportResult } from './brokerApiClient';
 import type { BrokerProfile } from './brokerProfiles';
 import './brokerProfiles.css';
 
@@ -32,8 +32,8 @@ export function BrokerRecordImportDialog({kind,brokers,onClose,onSaved}:{kind:'s
     setRows([]);setSelected([]);setResult(null);setError('');setFileName('');setOverwrite(false);
     if (!file) return;
     try {
-      if (file.size > 2_000_000) throw new Error('JSON file exceeds 2 MB.');
-      const text = await file.text();
+      if (file.size > 2_000_000) throw new Error('Definition file exceeds 2 MB.');
+      const text = await previewBrokerRecords(await file.text(), kind === 'symbolDefinition' ? 'symbols' : 'sessions');
       const parsed = kind === 'symbolDefinition' ? parseSymbolsJson(text,choices) : parseSessionsJson(text);
       if (!parsed.length) throw new Error('No records found in JSON file.');
       if (version !== browseVersion.current) return;
@@ -64,10 +64,10 @@ export function BrokerRecordImportDialog({kind,brokers,onClose,onSaved}:{kind:'s
     } catch (cause) {setError(cause instanceof Error ? cause.message : 'Import could not be confirmed. Refresh catalogs before retrying.');}
     finally {busy.current=false;setPending(false);}
   }
-  return <div className="broker-flow"><Modal title={kind === 'symbolDefinition' ? 'Symbols import from JSON' : 'Session import from JSON'} width={730} onClose={close} footer={<><Button disabled={pending} onClick={close}>Close</Button><Button disabled={pending || !rows.length} className="primary" onClick={() => void start()}>{pending ? 'Importingâ€¦' : 'Start Import'}</Button></>}>
+  return <div className="broker-flow"><Modal title={kind === 'symbolDefinition' ? 'Symbols import from JSON/XML' : 'Session import from JSON/XML'} width={730} onClose={close} footer={<><Button disabled={pending} onClick={close}>Close</Button><Button disabled={pending || !rows.length} className="primary" onClick={() => void start()}>{pending ? 'Importingâ€¦' : 'Start Import'}</Button></>}>
     {error && <p className="broker-error" role="alert">{error}</p>}
     {result && <div role="status"><p>{result.imported_count} saved; {result.failed.length} failed; {result.unattempted.length} not attempted.</p>{result.failed.map(row => <p key={row.name}>{row.name}: {row.reason}</p>)}{result.unattempted.length > 0 && <p>Not attempted: {result.unattempted.join(', ')}</p>}</div>}
-    <fieldset disabled={pending}><legend>Choose JSON file</legend><Field label="Data file"><div className="broker-file"><TextInput readOnly value={fileName}/><label className="button">Browse<input aria-label={`${kind} JSON file`} hidden type="file" accept=".json,application/json" onChange={e => void browse(e.target.files?.[0])}/></label></div></Field>
+    <fieldset disabled={pending}><legend>Choose JSON file</legend><Field label="Data file"><div className="broker-file"><TextInput readOnly value={fileName}/><label className="button">Browse<input aria-label={`${kind} JSON file`} hidden type="file" accept=".json,.xml,application/json,application/xml" onChange={e => void browse(e.target.files?.[0])}/></label></div></Field>
       <Field label="Broker profile"><select aria-label="Import broker profile" value={brokerId} onChange={e => {setBrokerId(e.target.value);setPostfix(choices.find(row => row.id === e.target.value)?.postfix ?? '');setOverwrite(false);setResult(null);}}>{choices.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}</select></Field>
       <Field label="Postfix"><TextInput aria-label="Import postfix" maxLength={100} value={postfix} onChange={e => {setPostfix(e.target.value);setOverwrite(false);}}/></Field>
       <label className="broker-check"><input aria-label="Overwrite existing records" type="checkbox" checked={overwrite} onChange={e => setOverwrite(e.target.checked)}/>Overwrite matching records belonging to this broker</label>

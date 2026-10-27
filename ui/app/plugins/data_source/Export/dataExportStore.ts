@@ -1,3 +1,5 @@
+import { useHistoricalSources, type SourceJob } from '../Common/historicalSourceStore';
+import { getAuthToken, hostBaseUrl } from '../../../host/transport';
 import { normalizeSymbolContract } from '../Common/symbolContract';
 import { createSymbolDataClient } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../host/branding';
@@ -24,26 +26,7 @@ interface Store extends Saved {
   fetchRemoteFormats: () => Promise<CsvFormat[]>;
   saveRemoteFormat: (format: CsvFormat) => Promise<unknown>;
   deleteRemoteFormat: (name: string) => Promise<unknown>;
-  exportRemote: (payload: {
-    format: string;
-    series: Array<{
-      source: string;
-      kind: string;
-      symbol: string;
-      timeframe?: string;
-      start?: string;
-      end?: string;
-      session?: string;
-      tz?: string;
-    }>;
-    delimiter?: string;
-    include_header?: boolean;
-    custom_format?: string;
-    properties?: Record<string, string>;
-    mt4_name?: string;
-    spread_mode?: string;
-    fixed_spread?: number;
-  }) => Promise<unknown>;
+  exportRemote: (payload: {format: string; series: Array<{dataset_id: string; timeframe?: string; start?: string; end?: string; session?: string; tz?: string}>; [key: string]: unknown}) => Promise<unknown>;
 }
 
 const key = 'haru-data-export-v1';
@@ -111,7 +94,22 @@ export const useDataExports = create<Store>((set, get) => {
       return dataClient.post('/export/csv/formats/delete', { name });
     },
     exportRemote: async (payload) => {
-      return dataClient.post('/export', payload);
+      const job = await dataClient.post<SourceJob>('/export', payload);
+      useHistoricalSources.getState().trackJob(job);
+      set({job: null});
+      return job;
     },
   };
 });
+
+
+export async function downloadRemoteArtifacts(jobId: string, names: string[]): Promise<void> {
+  for (let index = 0; index < names.length; index++) {
+    const token = getAuthToken();
+    const response = await fetch(`${hostBaseUrl()}/data/export-artifacts/${encodeURIComponent(jobId)}/${index}`, {credentials: 'include', headers: token ? {Authorization: `Bearer ${token}`, 'X-Peer-Id': 'ui'} : {'X-Peer-Id': 'ui'}});
+    if (!response.ok) throw new Error('Export finished but the file download failed. Retry the download.');
+    const url = URL.createObjectURL(await response.blob());
+    const anchor = document.createElement('a'); anchor.href = url; anchor.download = names[index]; anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+}

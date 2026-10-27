@@ -209,42 +209,24 @@ def _register_dataset_lifecycle_routes(router: APIRouter) -> None:
         if source == "dukascopy":
             return _handle_dukascopy_create(gateway, body)
 
-        symbol = str(body.get("symbol", "")).strip()
-        underlying = str(body.get("underlying", symbol)).strip()
-        timeframe = str(body.get("timeframe", "M1")).strip().upper()
-        broker = str(body.get("broker", "default")).strip()
-        sym_def = str(
-            body.get("symbolDefinition")
-            or body.get("instrument")
-            or body.get("symbol_definition")
-            or "-1"
-        ).strip()
+        from app.workspace.data_manager.data._helpers import validate_dataset_updates
+        from app.workspace.data_manager.data.storage import require_data
 
-        now_iso = "2026-01-01T00:00:00"
-        dataset_id = f"{source}:{symbol}:{timeframe}"
-        rec = {
-            "id": dataset_id,
-            "source": source,
-            "symbol": symbol,
-            "underlying": underlying,
-            "instrument": sym_def,
-            "timeframe": timeframe,
-            "broker": broker,
-            "broker_name": broker,
-            "timezone": "UTC",
-            "category": "Forex",
-            "date_from": "",
-            "date_to": "",
-            "bars": 0,
-            "path": f"data/market/{source}/{timeframe.lower()}/{symbol.lower()}",
-            "data_kind": "bars" if timeframe == "M1" else "ticks",
-            "symbolDefinition": sym_def,
-            "created_at": now_iso,
-            "updated_at": now_iso,
-        }
-        gateway.ensure_datasets_schema()
-        gateway.create_records("datamgr_datasets", rec)
-        return _ok(rec)
+        try:
+            record = validate_dataset_updates(
+                {key: value for key, value in body.items() if key != "market_root"}
+            )
+            require_data(gateway.ensure_datasets_schema())
+            with gateway.transaction() as tx:
+                from app.workspace.data_manager.data._helpers import (
+                    resolve_dataset_links,
+                )
+
+                resolve_dataset_links(tx, record)
+                result = require_data(tx.create_records("datamgr_datasets", record))
+            return _ok(result["records"][0])
+        except (ValueError, TypeError) as error:
+            raise TransportError(ErrorCode.VALIDATION, str(error)) from error
 
     @router.post("/providers/download")
     def download_dataset(request: Request, body: dict[str, Any]) -> Any:
@@ -283,6 +265,42 @@ def register_dukascopy_routes(router: APIRouter) -> None:
 # --- Broker Sources Routes ---
 
 
+def _provider_catalog(request: Request, provider: str) -> list[str]:
+    """Read catalog symbols using the selected provider connection and lifecycle."""
+    from app.host.transport import ServletConnection
+
+    from ._helpers import make_client, resolve_result
+
+    connection = None
+    connection_id = request.query_params.get("connection_id")
+    if connection_id:
+        vault = getattr(request.app.state, "vault", None)
+        saved = ServletConnection(request.app.state.persistence, vault=vault).get(
+            connection_id
+        )
+        if saved.provider != provider or (saved.vault_refs and vault is None):
+            raise ValueError("Choose an available connection for this provider")
+        connection = {
+            **saved.model_dump(),
+            "credentials": {
+                key: vault.resolve(ref) for key, ref in saved.vault_refs.items()
+            },
+        }
+    client = make_client(provider, connection)
+    try:
+        return list(
+            resolve_result(
+                client.symbol.SymbolsGet()
+                if provider == "mt5"
+                else client.get_symbols(),
+                client,
+            )
+        )
+    finally:
+        if provider != "mt5":
+            client.disconnect()
+
+
 def register_source_routes(router: APIRouter) -> None:
     """Register generic source commands on the domain router."""
 
@@ -298,6 +316,10 @@ def register_source_routes(router: APIRouter) -> None:
                 action == "status" or (action == "connect" and request.method == "POST")
             ):
                 return _ok(await bridge_action(action, request.app))
+            if action == "catalog" and request.method == "GET":
+                from asyncio import to_thread
+
+                return _ok(await to_thread(_provider_catalog, request, provider))
             if action == "add" and request.method == "POST":
                 return _response(
                     _get_sources()(request.app.state.persistence).add(
@@ -319,6 +341,41 @@ def start_source_download(request: Request, body: dict[str, Any]) -> dict[str, A
     service = _get_sources()(request.app.state.persistence)
     try:
         records, lower, upper, overwrite = _validate_source_job(service, body)
+        import json
+
+        from app.host.transport import ServletConnection
+
+        connection_ids = {
+            json.loads(service.record(identifier).get("lineage_json") or "{}").get(
+                "connection_id"
+            )
+            for identifier in records
+        }
+        connection_id = body.get("connection_id") or next(
+            iter(connection_ids - {None}), None
+        )
+        if len(connection_ids - {None}) > 1 and not body.get("connection_id"):
+            raise ValueError("Download datasets from one saved connection at a time")  # noqa: TRY301 - enclosing scope owns rollback
+        if connection_id:
+            vault = getattr(request.app.state, "vault", None)
+            connection = ServletConnection(
+                request.app.state.persistence, vault=vault
+            ).get(connection_id)
+            if any(
+                service.record(identifier)["source"] != connection.provider
+                for identifier in records
+            ):
+                raise ValueError("Selected connection belongs to another provider")  # noqa: TRY301 - enclosing scope owns rollback
+            if connection.vault_refs and vault is None:
+                raise ValueError("Credential vault is unavailable")  # noqa: TRY301 - enclosing scope owns rollback
+            service.connection = {
+                **connection.model_dump(),
+                "credentials": {
+                    key: vault.resolve(ref)
+                    for key, ref in connection.vault_refs.items()
+                },
+            }
+
     except (ValueError, TypeError) as error:
         raise TransportError(ErrorCode.VALIDATION, str(error)) from error
     return (
