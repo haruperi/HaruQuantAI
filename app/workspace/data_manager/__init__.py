@@ -7,14 +7,11 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from app.workspace.data_manager.baskets import Baskets
-    from app.workspace.data_manager.brokers import Brokers
     from app.workspace.data_manager.cli import (
         BasketsCLI,
-        BrokersCLI,
         CustomDataCLI,
         DataCLI,
         format_basket_table,
-        format_broker_table,
         format_custom_table,
         format_data_dashboard,
         format_dataset_table,
@@ -32,7 +29,6 @@ def __getattr__(name: str) -> Any:
     """Lazily import data manager classes and functions on demand."""
     services = {
         "Data": "data",
-        "Brokers": "brokers",
         "Baskets": "baskets",
         "Logs": "logs",
         "CustomData": "custom",
@@ -44,11 +40,9 @@ def __getattr__(name: str) -> Any:
         return getattr(import_module(f"{__name__}.{services[name]}"), name)
     if name in {
         "BasketsCLI",
-        "BrokersCLI",
         "CustomDataCLI",
         "DataCLI",
         "format_basket_table",
-        "format_broker_table",
         "format_custom_table",
         "format_data_dashboard",
         "format_dataset_table",
@@ -63,8 +57,6 @@ def __getattr__(name: str) -> Any:
 __all__ = [
     "Baskets",
     "BasketsCLI",
-    "Brokers",
-    "BrokersCLI",
     "CustomData",
     "CustomDataCLI",
     "Data",
@@ -74,7 +66,6 @@ __all__ = [
     "Logs",
     "Sources",
     "format_basket_table",
-    "format_broker_table",
     "format_custom_table",
     "format_data_dashboard",
     "format_dataset_table",

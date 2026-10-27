@@ -63,7 +63,9 @@ def register_commands(commands: Any) -> None:
     from app.workspace.data_manager.sessions import register_session_commands
 
     register_session_commands(resources)
-    _profile_parsers(resources, "broker")
+    from app.workspace.data_manager.brokers import register_broker_commands
+
+    register_broker_commands(resources)
     _basket_parsers(resources)
     from app.workspace.data_manager.custom_cli import register_custom_commands
     from app.workspace.data_manager.dukascopy_cli import register_dukascopy_commands
@@ -84,6 +86,7 @@ def run_command(
     arguments: argparse.Namespace, *, parser: argparse.ArgumentParser
 ) -> int:
     """Execute a Data Manager command, emit errors, and return its exit code."""
+    from app.workspace.data_manager.brokers import run_broker_command
     from app.workspace.data_manager.custom_cli import run_custom_command
     from app.workspace.data_manager.dukascopy_cli import run_dukascopy_command
     from app.workspace.data_manager.help_cli import run_help_command
@@ -94,7 +97,7 @@ def run_command(
     handlers = {
         "session": run_session_command,
         "symbol": run_symbol_command,
-        "broker": _run_profile_command,
+        "broker": run_broker_command,
         "basket": _run_basket_command,
         "log": run_log_command,
         "custom": run_custom_command,
@@ -121,104 +124,6 @@ def _profile_json(value: str, *, container: type) -> Any:
     if not isinstance(result, container):
         raise argparse.ArgumentTypeError(f"must be a JSON {label}")
     return result
-
-
-def _profile_parsers(resources: Any, resource: str) -> None:
-    """Register shared broker catalog operations."""
-    profile = resources.add_parser(resource, help=f"Manage {resource} profiles")
-    commands = profile.add_subparsers(dest=f"{resource}_command", required=True)
-    listing = commands.add_parser("list", help=f"List {resource} profiles by page")
-    listing.add_argument("--page", type=_positive_int, default=1)
-    listing.add_argument("--page-size", type=_positive_int, default=50)
-    fields = {
-        "description": str,
-        "server-timezone": str,
-        "postfix": str,
-        "clock-policy": partial(_profile_json, container=dict),
-        "clock-policy-revision": int,
-    }
-    flags = ("is-system", "stockpicker-use", "mt-use", "enabled")
-    for command in ("add", "edit"):
-        parser = commands.add_parser(
-            command, help=f"{command.title()} {resource} profiles"
-        )
-        if command == "edit":
-            parser.add_argument(f"{resource}_names", nargs="+")
-        parser.add_argument(
-            "--name", required=command == "add", default=argparse.SUPPRESS
-        )
-        for field, kind in fields.items():
-            parser.add_argument(f"--{field}", type=kind, default=argparse.SUPPRESS)
-        for flag in flags:
-            parser.add_argument(
-                f"--{flag}",
-                action=argparse.BooleanOptionalAction,
-                default=argparse.SUPPRESS,
-            )
-    delete = commands.add_parser(
-        "delete", help=f"Delete one or more {resource} profiles"
-    )
-    delete.add_argument(f"{resource}_names", nargs="+")
-    for command in ("load", "save"):
-        transfer = commands.add_parser(
-            command, help=f"{command.title()} {resource} JSON"
-        )
-        transfer.add_argument("json_path")
-
-
-def _run_profile_command(
-    arguments: argparse.Namespace, parser: Any
-) -> dict[str, Any] | None:
-    """Dispatch broker commands and render their catalog responses."""
-    from app.workspace.data_manager.brokers import Brokers
-
-    resource = arguments.resource
-    service = Brokers()
-    formatter = format_broker_table
-    command = getattr(arguments, f"{resource}_command")
-    if command in {"add", "edit"}:
-        fields = {
-            key: value
-            for key, value in vars(arguments).items()
-            if key
-            not in {
-                "command",
-                "resource",
-                f"{resource}_command",
-                f"{resource}_names",
-                "handler",
-            }
-        }
-        result = (
-            service.add(**fields)
-            if command == "add"
-            else service.edit(getattr(arguments, f"{resource}_names"), fields)
-        )
-    elif command == "delete":
-        result = service.delete(getattr(arguments, f"{resource}_names"))
-    elif command in {"load", "save"}:
-        result = getattr(service, command)(arguments.json_path)
-    else:
-        result = service.list()
-    if not result["success"]:
-        return result
-    if command == "save":
-        print(
-            f"Saved {result['data']['count']} {resource}s to {result['data']['path']}"
-        )
-        return None
-    rows = [result["data"]] if command == "add" else result["data"]
-    if command == "list":
-        pages = max(1, (len(rows) + arguments.page_size - 1) // arguments.page_size)
-        if arguments.page > pages:
-            parser.error("--page exceeds the number of catalog pages")
-        start = (arguments.page - 1) * arguments.page_size
-        print(f"Page {arguments.page} of {pages} | {len(rows)} {resource}s")
-        rows = rows[start : start + arguments.page_size]
-    else:
-        print(result["message"])
-    print(formatter(rows))
-    return None
 
 
 def _positive_int(value: str) -> int:
