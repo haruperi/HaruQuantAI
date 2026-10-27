@@ -1,23 +1,10 @@
-"""Dukascopy market data ingestion, partitioning, and catalog service.
-
-Description:
-    Manages Dukascopy Bank SA historical market data ingestion according to
-    the HaruQuantAI canonical data architecture:
-    - Storage: Partitioned Parquet with ZSTD level 6 compression.
-    - Historical writer: PyArrow, batched row groups in canonical partition files.
-    - Research/backtest reader: Polars lazy scans.
-    - SQL/ad-hoc analytical reader: DuckDB directly over Parquet.
-    - Ingestion state & catalog: SQLite datamgr_datasets table.
-    - Partitions:
-        - Ticks: source / ticks / symbol / year / month (e.g. 04-apr.parquet)
-        - M1: source / m1 / symbol / year (e.g. 2025.parquet)
-    - On-disk schema: Integer tick units (int64) for prices, not float64.
-"""
+"""Dukascopy market data ingestion, partitioning, and catalog service."""
 
 from __future__ import annotations
 
 import json
 import re
+import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -37,8 +24,6 @@ from app.host.response import (
 )
 from app.include.enums import Timeframe
 from app.include.market_storage import (
-    M1_SCHEMA,
-    TICK_SCHEMA,
     catalog_paths,
     safe_component,
     scan_catalog,
@@ -49,62 +34,24 @@ from app.workspace.data_manager.coverage import missing_ranges, record_checked_r
 from app.workspace.data_manager.logs import Logs
 from app.workspace.data_manager.storage import dataset_root, publish_frame, require_data
 
-__all__ = ["M1_SCHEMA", "TICK_SCHEMA", "Dukascopy"]
+from ._helpers import (
+    DEFAULT_CATALOG_PATH,
+    DEFAULT_STORAGE_ROOT,
+    DISCLAIMER_PARAGRAPHS,
+    MIN_CATALOG_PARTS,
+    _valid_add_inputs,
+)
 
 logger = get_logger(__name__)
 
-DEFAULT_STORAGE_ROOT = Path("data/market/dukascopy")
-DEFAULT_CATALOG_PATH = DEFAULT_STORAGE_ROOT / "dukascopy.csv"
-MIN_CATALOG_PARTS = 11
-
-DISCLAIMER_PARAGRAPHS = [
-    (
-        "The Dukascopy Trading Tools include different financial information. "
-        "Such data are a result of original and unique methods and technology of "
-        "information gathering, compilation, analysis and statistical evaluation "
-        "developed by Dukascopy Bank SA. Therefore, such data reflect the current "
-        "fair value of the respective financial instruments as independently assessed "
-        "by Dukascopy Bank SA and NOT the actual values at a given point in time. "
-        "If you are looking to obtain actual quotes please contact the respective "
-        "entities that provide this information."
-    ),
-    (
-        "The Dukascopy Trading Tools data and/or any other data available as free "
-        "product from Dukascopy Bank's website shall not constitute a forecast of "
-        "the market value of any instruments at any future point either, and is "
-        "not an investment advice or recommendation in any form."
-    ),
-    (
-        "Anyone using and/or putting free web products including all or parts of the "
-        "information taken from the Dukascopy Trading Tools and/or any other data "
-        "available as free product from Dukascopy Bank's website shall put a clear "
-        "note to the public that such data are not meant to indicate the actual value "
-        "at any given point in time but represent a discretionary assessment by "
-        "Dukascopy Bank SA only."
-    ),
-    (
-        "The market data assessment system is in constant development and is provided "
-        "'AS IS', 'AS AVAILABLE', 'WITH ALL ITS FAULTS' and is offered without any "
-        "covenants or any express, implied or statutory warranties including "
-        "(without limitation and qualification) any warranties as to accuracy, "
-        "functionality, performance, merchantability, quiet enjoyment, system "
-        "integration, data accuracy or fitness for any particular purpose and any "
-        "warranties arising from trade usage, course of dealing or course of "
-        "performance."
-    ),
-]
+__all__ = ["Dukascopy"]
 
 
-def _valid_add_inputs(
-    symbols: Any, data_type: Any, postfix: Any, confirmed: Any
-) -> bool:
-    return (
-        isinstance(data_type, str)
-        and isinstance(postfix, str)
-        and isinstance(confirmed, bool)
-        and isinstance(symbols, (str, list))
-        and (isinstance(symbols, str) or all(isinstance(item, str) for item in symbols))
-    )
+def _get_dukascopy_client() -> Any:
+    mod = sys.modules.get("app.workspace.data_manager.sources")
+    if mod and hasattr(mod, "DukascopyClient"):
+        return mod.DukascopyClient
+    return DukascopyClient
 
 
 class Dukascopy:
@@ -603,7 +550,7 @@ class Dukascopy:
                     return cached
             if data_frame is None:
                 if client is None:
-                    owned = DukascopyClient(
+                    owned = _get_dukascopy_client()(
                         catalog_path=self.catalog_path,
                         data_dir=self.storage_root,
                         use_cache=False,

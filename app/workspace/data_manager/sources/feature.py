@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import asyncio
-import inspect
 import json
 import math
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, cast
@@ -15,120 +13,27 @@ import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.persistence import HostPersistence
 from app.include.contracts import BridgeError
-from app.include.enums import Timeframe
 from app.include.market_storage import price_columns, safe_component
 from app.workspace.data_manager.coverage import missing_ranges, record_checked_ranges
-from app.workspace.data_manager.dukascopy import Dukascopy
 from app.workspace.data_manager.storage import dataset_root, publish_frame, require_data
 
-CRYPTO = {
-    "binance": ("binance", "spot"),
-    "binance_coinm": ("binance", "coin-m"),
-    "binance_usdtm": ("binance", "usdt-m"),
-    "bitfinex": ("bitfinex", "spot"),
-    "poloniex": ("poloniex", "spot"),
-    "coinbase": ("coinbase", "spot"),
-}
-_MAX_DATASETS = 1000
-_MAX_SYMBOL = 128
-_CONTROL_LIMIT = 32
+from ._helpers import (
+    _CONTROL_LIMIT,
+    _MAX_DATASETS,
+    _MAX_SYMBOL,
+    CRYPTO,
+    PROVIDERS,
+    Checkpoints,
+    _report_progress,
+    capabilities,
+    intervals,
+    make_client,
+    provider_id,
+    resolve_result,
+)
+from .dukascopy import Dukascopy
 
-PROVIDERS = ("darwinex", *CRYPTO, "yahoo", "sq_equity", "sq_futures", "mt5")
-_CRYPTO_TIMEFRAMES = {
-    "binance": "M1 M3 M5 M15 M30 H1 H2 H4 H6 H8 H12 D1",
-    "binance_coinm": "M1 M3 M5 M15 M30 H1 H2 H4 H6 H8 H12 D1",
-    "binance_usdtm": "M1 M3 M5 M15 M30 H1 H2 H4 H6 H8 H12 D1",
-    "bitfinex": "M1 M5 M15 M30 H1 H3 H6 H12 D1",
-    "coinbase": "M1 M5 M15 H1 H6 D1",
-    "poloniex": "M5 M15 M30 H2 H4 D1",
-}
-
-
-def provider_id(value: str) -> str:
-    """Normalize menu and CLI names without conflating the six crypto markets."""
-    key = value.strip().lower().replace("-", "_")
-    key = {
-        "binancecoinm": "binance_coinm",
-        "binanceusdtm": "binance_usdtm",
-        "equity": "sq_equity",
-        "futures": "sq_futures",
-        "metatrader": "mt5",
-    }.get(key, key)
-    if key not in PROVIDERS:
-        raise ValueError("Unknown historical data source")
-    return key
-
-
-def capabilities(provider: str) -> dict[str, Any]:
-    """Expose supported native resolutions; do not label daily data as M1."""
-    source = provider_id(provider)
-    frames = _CRYPTO_TIMEFRAMES.get(
-        source,
-        {
-            "darwinex": "M1 D1 TICK",
-            "yahoo": "M1 M5 M15 M30 H1 D1 W1 MN1",
-            "sq_equity": "D1",
-            "sq_futures": "D1",
-            "mt5": "M1 M5 M15 M30 H1 H4 D1",
-        }.get(source, ""),
-    )
-    return {
-        "provider": source,
-        "timeframes": frames.split(),
-        "default_timeframe": "D1"
-        if source in ("yahoo", "sq_equity", "sq_futures")
-        else "M5"
-        if source == "poloniex"
-        else "M1",
-    }
-
-
-def make_client(provider: str) -> Any:
-    """Construct a data-only client; MT5 reuses its connected native bridge."""
-    from app.workspace.brokers import (
-        CryptoClient,
-        DarwinexClient,
-        SQEquityClient,
-        SQFuturesClient,
-        YahooClient,
-    )
-    from app.workspace.brokers.base import get_broker
-
-    if provider in CRYPTO:
-        exchange, venue = CRYPTO[provider]
-        return CryptoClient(exchange=exchange, venue=venue)
-    if provider == "mt5":
-        client = get_broker("metatrader")
-        if not client.bridge.connected:
-            raise ValueError("Connect the MT5 terminal EA to the backend bridge first")
-        return client
-    factories = {
-        "darwinex": DarwinexClient,
-        "yahoo": YahooClient,
-        "sq_equity": SQEquityClient,
-        "sq_futures": SQFuturesClient,
-    }
-    client = factories[provider]()
-    # Ingestion must fetch the source, not rediscover its own cached dataset.
-    if provider.startswith("sq_"):
-        client.use_cache = False
-    return client
-
-
-def resolve_result(value: Any, client: Any) -> Any:
-    """Execute asynchronous MT5 reads on their owning bridge event loop."""
-    if not inspect.isawaitable(value):
-        return value
-    loop = getattr(client, "_loop", None)
-    if loop is not None and loop.is_running():
-        return asyncio.run_coroutine_threadsafe(_await_result(value), loop).result(
-            timeout=120
-        )
-    return asyncio.run(_await_result(value))
-
-
-async def _await_result(value: Any) -> Any:
-    return await value
+__all__ = ["Sources"]
 
 
 class Sources:
@@ -396,56 +301,3 @@ def _fetch_frame(
     if not isinstance(frame, pd.DataFrame):
         raise TypeError("Provider did not return a market DataFrame")
     return frame
-
-
-class Checkpoints:
-    """Forward cancellation without restarting overall progress for each file."""
-
-    def __init__(self, context: Any) -> None:
-        self.context = context
-
-    def wait_if_paused(self) -> None:
-        """Wait at a cooperative pause checkpoint."""
-        self.context.wait_if_paused()
-
-    def raise_if_cancelled(self) -> None:
-        """Abort before publishing cancelled work."""
-        self.context.raise_if_cancelled()
-
-    def report_progress(self, progress: float, message: str = "") -> None:
-        """Leave overall progress to the interval coordinator."""
-        del progress, message
-
-
-def intervals(
-    source: str, timeframe: str, lower: datetime, upper: datetime
-) -> list[tuple[datetime, datetime]]:
-    """Bound REST requests below candle limits, and CDN requests to a year."""
-    if source in CRYPTO:
-        step = timedelta(seconds=200 * Timeframe.resolve(timeframe).to_seconds())
-    elif source == "yahoo":
-        step = timedelta(days=5 if timeframe != "D1" else 200)
-    elif source == "mt5":
-        step = (
-            timedelta(hours=1)
-            if timeframe == "TICK"
-            else timedelta(seconds=500 * Timeframe.resolve(timeframe).to_seconds())
-        )
-    else:
-        step = None
-    current, result = lower, []
-    while current <= upper:
-        boundary = (
-            current + step
-            if step is not None
-            else datetime(current.year + 1, 1, 1, tzinfo=UTC)
-        )
-        stop = min(upper, boundary - timedelta(microseconds=1))
-        result.append((current, stop))
-        current = boundary
-    return result
-
-
-def _report_progress(context: Any, progress: float, message: str) -> None:
-    if context is not None:
-        context.report_progress(progress, message)

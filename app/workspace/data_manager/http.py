@@ -18,10 +18,13 @@ from app.workspace.data_manager.baskets import register_basket_routes
 from app.workspace.data_manager.brokers import register_broker_routes
 from app.workspace.data_manager.custom import register_custom_routes
 from app.workspace.data_manager.data import register_data_routes
-from app.workspace.data_manager.dukascopy_http import register_dukascopy_routes
 from app.workspace.data_manager.help import register_help_routes
 from app.workspace.data_manager.logs import register_log_routes
 from app.workspace.data_manager.sessions import register_session_routes
+from app.workspace.data_manager.sources import (
+    register_dukascopy_routes,
+    register_source_routes,
+)
 from app.workspace.data_manager.symbols import register_symbol_routes
 
 TABS = (
@@ -118,7 +121,7 @@ def create_router() -> APIRouter:
             }
         )
 
-    _source_routes(router)
+    register_source_routes(router)
     register_symbol_routes(router)
     register_session_routes(router)
     register_broker_routes(router)
@@ -128,30 +131,3 @@ def create_router() -> APIRouter:
     register_help_routes(router)
     register_dukascopy_routes(router)
     return router
-
-
-def _source_routes(router: APIRouter) -> None:
-    @router.get("/sources/{provider}/{action}")
-    @router.post("/sources/{provider}/{action}")
-    async def source_command(
-        provider: str, action: str, request: Request, body: dict[str, Any] | None = None
-    ) -> Any:
-        from app.workspace.data_manager.source_mt5 import bridge_action
-        from app.workspace.data_manager.sources import Sources, capabilities
-
-        try:
-            if action == "capabilities":
-                return _ok(capabilities(provider))
-            if provider == "mt5" and (
-                action == "status" or (action == "connect" and request.method == "POST")
-            ):
-                return _ok(await bridge_action(action, request.app))
-            if action == "add" and request.method == "POST":
-                return _response(
-                    Sources(request.app.state.persistence).add(
-                        provider, (body or {}).get("definitions", [])
-                    )
-                )
-            raise TransportError(ErrorCode.VALIDATION, "Unknown source operation")
-        except (ValueError, TypeError) as error:
-            raise TransportError(ErrorCode.VALIDATION, str(error)) from error

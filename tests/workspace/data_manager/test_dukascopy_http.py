@@ -142,7 +142,7 @@ def test_http_ui_datasets_create_and_provider_download(client):
     from unittest.mock import patch
 
     with patch(
-        "app.workspace.data_manager.dukascopy_http.start_download",
+        "app.workspace.data_manager.sources.start_download",
         return_value={"job_id": "job-1", "status": "QUEUED"},
     ) as submit:
         response = client.post(

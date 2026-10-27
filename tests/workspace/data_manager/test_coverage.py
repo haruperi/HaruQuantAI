@@ -231,21 +231,21 @@ def test_cached_mt5_cli_does_not_start_or_require_a_terminal_listener(
     import argparse
 
     from app.workspace.brokers import metatrader
-    from app.workspace.data_manager import sources_cli
+    from app.workspace.data_manager import sources
 
     service, calls = environment
     row = service.add("mt5", [{"symbol": "TEST", "timeframe": "M1"}])["data"][
         "records"
     ][0]
     service.download(row["id"], "2025-01-06", "2025-01-06")
-    monkeypatch.setattr(sources_cli, "Sources", lambda: service)
+    monkeypatch.setattr(sources, "Sources", lambda: service)
     monkeypatch.setattr(
         metatrader,
         "create_mt5_client",
         lambda: pytest.fail("Cached CLI opened MT5 listener"),
     )
     calls.clear()
-    result = sources_cli.run_source_command(
+    result = sources.run_source_command(
         argparse.Namespace(
             resource="mt5",
             source_command="download",

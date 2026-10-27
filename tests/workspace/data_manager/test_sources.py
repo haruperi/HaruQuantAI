@@ -247,7 +247,7 @@ def test_mt5_disconnected_status_never_claims_a_download_connection(monkeypatch)
     from types import SimpleNamespace
 
     from app.workspace.brokers import base
-    from app.workspace.data_manager import source_mt5
+    from app.workspace.data_manager import sources
 
     client = SimpleNamespace(
         bridge=SimpleNamespace(
@@ -257,9 +257,9 @@ def test_mt5_disconnected_status_never_claims_a_download_connection(monkeypatch)
             port=8765,
         )
     )
-    monkeypatch.setattr(source_mt5, "get_broker", lambda _: client)
+    monkeypatch.setattr(sources.http, "get_broker", lambda _: client)
     monkeypatch.setattr(base, "get_broker", lambda _: client)
-    result = asyncio.run(source_mt5.bridge_action("status", SimpleNamespace()))
+    result = asyncio.run(sources.bridge_action("status", SimpleNamespace()))
     assert not result["connected"] and not result["listening"]
     assert "auth_token" not in result
     with pytest.raises(ValueError, match="Connect the MT5 terminal"):

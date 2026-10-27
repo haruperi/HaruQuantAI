@@ -12,7 +12,7 @@ from app.host.jobs import JobContext, JobManager
 from app.host.response import ErrorCode
 from app.host.transport import TransportError
 from app.include.market_storage import safe_component
-from app.workspace.data_manager.dukascopy import Dukascopy
+from app.workspace.data_manager.sources import Dukascopy
 from app.workspace.data_manager.storage import require_data
 
 _LOCK = Lock()

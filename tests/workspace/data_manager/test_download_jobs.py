@@ -13,15 +13,15 @@ from app.host.resources import MemoryObservation, ResourceMonitor
 from app.host.transport import register_transport_exception_handlers
 from app.include.contracts import BridgeError
 from app.workspace.data_manager import http
-from app.workspace.data_manager.dukascopy import Dukascopy
 from app.workspace.data_manager.logs import Logs
+from app.workspace.data_manager.sources import Dukascopy
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 
 @pytest.fixture
 def downloads(tmp_path, monkeypatch):
-    from app.workspace.data_manager import download_jobs, dukascopy
+    from app.workspace.data_manager import download_jobs, sources
 
     database = tmp_path / "jobs.db"
     with closing(sqlite3.connect(database)) as connection:
@@ -87,7 +87,7 @@ def downloads(tmp_path, monkeypatch):
         def disconnect(self):
             pass
 
-    monkeypatch.setattr(dukascopy, "DukascopyClient", Provider)
+    monkeypatch.setattr(sources, "DukascopyClient", Provider)
     with TestClient(application) as client:
         yield client, jobs, service, Provider
     Provider.release.set()
@@ -113,7 +113,7 @@ def _start(client):
 def test_other_sources_http_registration_download_and_controls(
     downloads, monkeypatch, tmp_path
 ):
-    from app.workspace.data_manager import source_jobs, sources
+    from app.workspace.data_manager import sources
 
     client, jobs, pilot, provider = downloads
     service = sources.Sources(
@@ -121,7 +121,6 @@ def test_other_sources_http_registration_download_and_controls(
         market_root=tmp_path / "sources",
         client_factory=lambda _: provider(),
     )
-    monkeypatch.setattr(source_jobs, "Sources", lambda *args, **kwargs: service)
     monkeypatch.setattr(sources, "Sources", lambda *args, **kwargs: service)
     response = client.post(
         "/api/v1/data/sources/yahoo/add",

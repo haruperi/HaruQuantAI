@@ -5,19 +5,19 @@ import sqlite3
 
 import pytest
 from app.workspace.data_manager.cli import register_commands
-from app.workspace.data_manager.dukascopy_cli import run_dukascopy_command
+from app.workspace.data_manager.sources import run_dukascopy_command
 
 
 @pytest.fixture(autouse=True)
 def isolated_service(tmp_path, monkeypatch):
     from app.host.persistence import HostPersistence
-    from app.workspace.data_manager import dukascopy_cli
-    from app.workspace.data_manager.dukascopy import Dukascopy
+    from app.workspace.data_manager import sources
+    from app.workspace.data_manager.sources import Dukascopy
 
     database = tmp_path / "cli.db"
     sqlite3.connect(database).close()
     service = Dukascopy(HostPersistence(database), storage_root=tmp_path / "market")
-    monkeypatch.setattr(dukascopy_cli, "Dukascopy", lambda: service)
+    monkeypatch.setattr(sources, "Dukascopy", lambda: service)
 
 
 def _setup_parser():
