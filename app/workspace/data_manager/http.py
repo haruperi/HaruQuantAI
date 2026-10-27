@@ -17,7 +17,7 @@ from app.host.transport import (
 from app.workspace.data_manager.baskets import register_basket_routes
 from app.workspace.data_manager.brokers import register_broker_routes
 from app.workspace.data_manager.custom import register_custom_routes
-from app.workspace.data_manager.data import Data
+from app.workspace.data_manager.data import register_data_routes
 from app.workspace.data_manager.dukascopy_http import register_dukascopy_routes
 from app.workspace.data_manager.help import register_help_routes
 from app.workspace.data_manager.logs import register_log_routes
@@ -81,9 +81,7 @@ def create_router() -> APIRouter:
     """Register browser workspace and symbol commands within their domain."""
     router = APIRouter(prefix="/api/v1/data", dependencies=[Depends(_access)])
 
-    @router.get("/home/datasets")
-    def datasets() -> dict[str, Any]:
-        return _ok(_service_data(Data().list()))
+    register_data_routes(router)
 
     @router.get("/workspace")
     def workspace() -> dict[str, Any]:
@@ -130,15 +128,6 @@ def create_router() -> APIRouter:
     register_help_routes(router)
     register_dukascopy_routes(router)
     return router
-
-
-def _service_data(response: dict[str, Any]) -> Any:
-    if not response["success"]:
-        error: dict[str, Any] = response.get("error") or {}
-        raise TransportError(
-            ErrorCode(error.get("code", "internal")), response["message"]
-        )
-    return response["data"]
 
 
 def _source_routes(router: APIRouter) -> None:

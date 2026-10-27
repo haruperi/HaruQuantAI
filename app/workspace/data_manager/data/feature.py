@@ -1,33 +1,4 @@
-"""Data Manager datasets catalog and overview metrics.
-
-Description:
-    Provides high-level dataset metrics for the Data Manager workspace,
-    reading saved datasets catalog entries from the authoritative SQLite database
-    (datamgr_datasets table). Exposes saved datasets catalog and summaries.
-    Reads active historical snapshots and retires catalog visibility without
-    deleting immutable files used by in-flight readers.
-
-Purpose:
-    FEAT-DATAMGR-DATA: Data Manager dataset catalog presentation and overview.
-
-Key Capabilities:
-    - FR-DATAMGR-DATA-OVERVIEW: Datasets overview metrics (Data.overview -> INFO).
-    - FR-DATAMGR-DATA-CATALOG: Datasets catalog (Data.list -> DEBUG).
-
-Python API Usage:
-    ```python
-    from app.workspace.data_manager.data import Data
-
-    data_service = Data()
-    overview = data_service.overview()
-    datasets = data_service.list()
-    ```
-
-CLI Usage:
-    ```bash
-    uv run python -m app.workspace.data_manager.data
-    ```
-"""
+"""Data Manager datasets catalog and overview metrics."""
 
 from __future__ import annotations
 
@@ -37,7 +8,6 @@ from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Any
 
-from app.host.logging import get_logger
 from app.host.persistence import HostPersistence
 from app.host.response import (
     ErrorCode,
@@ -47,27 +17,17 @@ from app.host.response import (
 )
 from app.include.contracts import DataInfo
 from app.include.market_storage import scan_catalog
-from app.workspace.data_manager.dukascopy import Dukascopy
 from app.workspace.data_manager.storage import require_data
 
-__all__ = [
-    "Data",
-    "Dukascopy",
-]
+from ._helpers import (
+    DATASETS_CATALOG_FR,
+    OVERVIEW_FR,
+    _chart_bounds,
+    logger,
+    persistence,
+)
 
-logger = get_logger(__name__)
-persistence = HostPersistence()
-
-OVERVIEW_FR = "FR-DATAMGR-DATA-OVERVIEW"
-DATASETS_CATALOG_FR = "FR-DATAMGR-DATA-CATALOG"
-
-
-_MAX_CHART_ROWS = 10000
-
-
-def _chart_bounds(limit: int, offset: int) -> None:
-    if isinstance(limit, bool) or not 1 <= limit <= _MAX_CHART_ROWS or offset < 0:
-        raise ValueError("Invalid chart pagination")
+__all__ = ["Data"]
 
 
 class Data:
@@ -427,12 +387,3 @@ class Data:
                     message=str(error),
                 ),
             )
-
-
-if __name__ == "__main__":
-    from app.workspace.data_manager.cli import DataCLI
-
-    data_svc = Data()
-    overview = data_svc.overview()
-    saved_datasets = data_svc.list()
-    print(DataCLI.format_data_dashboard(overview, saved_datasets))

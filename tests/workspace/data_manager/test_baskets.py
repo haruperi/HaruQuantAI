@@ -610,10 +610,10 @@ def test_historical_membership_dates(basket_http, tmp_path):
 
 
 def test_saved_dataset_http_catalog(basket_http, monkeypatch):
-    from app.workspace.data_manager import http
+    from app.workspace.data_manager.data import Data
 
     monkeypatch.setattr(
-        http.Data,
+        Data,
         "list",
         lambda self: {
             "success": True,
