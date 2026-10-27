@@ -103,7 +103,7 @@ from app.include.enums import (
     ReceiptStatus,
     Timeframe,
 )
-from app.include.trading import Trading
+from app.workspace.trading import Trading
 
 from .base import (
     BridgeError,

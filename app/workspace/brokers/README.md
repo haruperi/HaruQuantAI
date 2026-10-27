@@ -1,6 +1,6 @@
 # Broker execution backends
 
-The public trading API lives in app/services/include/trading.py. Strategies compose
+The public trading API lives in `app/workspace/trading` (see its README). Strategies compose
 Trading(backend) and await the same Trade, AccountInfo, SymbolInfo, OrderInfo,
 HistoryOrderInfo, PositionInfo, DealInfo and TerminalInfo methods for either live
 MT5 or local simulation. Backend-specific behavior stays here.
@@ -59,7 +59,7 @@ a pure Python in-memory simulation client implementing `TradingClient`.
 ```python
 import os
 from app.workspace.brokers.metatrader import MT5Backend
-from app.include.trading import Trading
+from app.workspace.trading import Trading
 
 token = os.environ["MT5_BRIDGE_TOKEN"]
 backend = MT5Backend(auth_token=token)
@@ -111,7 +111,7 @@ and map supported operations into this vocabulary, rejecting unavailable feature
 
 ```python
 from app.workspace.brokers.ctrader import CTraderClient
-from app.include.trading import Trading
+from app.workspace.trading import Trading
 
 backend = CTraderClient(
     client_id="...",

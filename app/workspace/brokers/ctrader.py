@@ -54,11 +54,11 @@ from app.host.logging import get_logger
 from app.host.settings import settings
 from app.include import contracts as _c
 from app.include import enums as _e
-from app.include.trading import Trading
 from app.workspace.data_manager.data.conversions import (
     bars_to_dataframe,
     ticks_to_dataframe,
 )
+from app.workspace.trading import Trading
 
 from .base import BridgeError, TradingClient
 

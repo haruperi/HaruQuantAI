@@ -1856,10 +1856,12 @@ void DispatchDeal(const string command_id,const string object_id,const string me
               ",\"price\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_PRICE))+
               ",\"commission\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_COMMISSION))+
               ",\"swap\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_SWAP))+
+              ",\"fee\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_FEE))+
               ",\"profit\":"+JsonDouble(HistoryDealGetDouble(ticket,DEAL_PROFIT))+
               ",\"magic\":"+JsonULong(HistoryDealGetInteger(ticket,DEAL_MAGIC))+
               ",\"comment\":"+JsonQuote(HistoryDealGetString(ticket,DEAL_COMMENT))+
               ",\"time\":"+JsonLong(HistoryDealGetInteger(ticket,DEAL_TIME))+
+              ",\"time_msc\":"+JsonLong(HistoryDealGetInteger(ticket,DEAL_TIME_MSC))+
               "}";
         }
       out+="]";

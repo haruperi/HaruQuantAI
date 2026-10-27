@@ -49,7 +49,6 @@ from __future__ import annotations
 
 import contextlib
 import contextvars
-import fnmatch
 import importlib
 import inspect
 import re
@@ -60,7 +59,7 @@ from collections.abc import Awaitable
 from dataclasses import asdict, is_dataclass, replace
 from datetime import UTC, datetime
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, ClassVar, Self
+from typing import TYPE_CHECKING, Any, Self
 
 if TYPE_CHECKING:
     import pandas as pd  # type: ignore[import-untyped]
@@ -89,13 +88,11 @@ from app.include.contracts import (
     TradeResult,
 )
 from app.include.enums import (
-    OrderFilling,
-    OrderTime,
     OrderType,
     ReceiptStatus,
     Timeframe,
-    TradeAction,
 )
+from app.workspace.brokers.trading_dispatch import TradingDispatcher
 
 logger = get_logger(__name__)
 
@@ -454,55 +451,8 @@ class BrokerClient:
         self.disconnect()
 
 
-_TRADE_NOOP_METHODS = frozenset(
-    "SetExpertMagicNumber SetDeviationInPoints SetTypeFilling SetTypeFillingBySymbol "
-    "SetAsyncMode SetMarginMode LogLevel PrintRequest PrintResult".split()
-)
-
-
 class TradingClient(BrokerClient):
     """Trading-capable broker client supporting account, order, and position operations."""
-
-    _COLLECTION_SPECS: ClassVar[
-        dict[str, tuple[str, str, type[Any], str, tuple[str, ...], tuple[str, ...]]]
-    ] = {
-        "PositionInfo": (
-            "get_positions",
-            "_selected_position",
-            PositionInfo,
-            "PositionsTotal",
-            ("PositionsGet", "positions"),
-            ("PositionGetTicket", "PositionSelectByTicket", "SelectByTicket"),
-        ),
-        "OrderInfo": (
-            "get_orders",
-            "_selected_order",
-            OrderInfo,
-            "OrdersTotal",
-            ("OrdersGet", "orders"),
-            ("OrderGetTicket", "OrderSelect", "Select", "SelectByTicket"),
-        ),
-        "HistoryOrderInfo": (
-            "get_history_orders",
-            "_selected_history_order",
-            OrderInfo,
-            "HistoryOrdersTotal",
-            ("HistoryOrdersGet", "orders"),
-            tuple(
-                "HistoryOrderGetTicket HistoryOrderSelect Select SelectByTicket Ticket".split()
-            ),
-        ),
-        "DealInfo": (
-            "get_deals",
-            "_selected_deal",
-            DealInfo,
-            "HistoryDealsTotal",
-            ("HistoryDealsGet", "deals"),
-            tuple(
-                "HistoryDealGetTicket HistoryDealSelect Select SelectByTicket Ticket".split()
-            ),
-        ),
-    }
 
     def __init__(self, name: str) -> None:
         super().__init__(name)
@@ -512,11 +462,7 @@ class TradingClient(BrokerClient):
         )
         self._last_cmd_id: str | None = None
         self._receipts: dict[str, Receipt] = {}
-        self._current_symbol: str = "EURUSD"
-        self._selected_position: Any = None
-        self._selected_order: Any = None
-        self._selected_history_order: Any = None
-        self._selected_deal: Any = None
+        self._trading_dispatchers: dict[str, TradingDispatcher] = {}
 
     def arm(self) -> None:
         """Arm client for live trade execution."""
@@ -617,8 +563,11 @@ class TradingClient(BrokerClient):
         return []
 
     def get_deals(self) -> list[DealInfo] | Awaitable[list[DealInfo]]:
-        """Retrieve historical execution deals."""
-        return []
+        """Retrieve historical execution deals, or reject unavailable history."""
+        raise BridgeError(
+            f"{self.name} does not support execution history",
+            code="UNSUPPORTED_OPERATION",
+        )
 
     def order_send(self, request: TradeRequest) -> TradeResult | Awaitable[TradeResult]:
         """Execute or place an order transaction against the backend."""
@@ -652,7 +601,10 @@ class TradingClient(BrokerClient):
     ) -> float | Awaitable[float]:
         """Calculate hypothetical floating or realized profit for an order."""
         del order_type, symbol, volume, price_open, price_close
-        return 0.0
+        raise BridgeError(
+            f"{self.name} does not support profit calculation",
+            code="UNSUPPORTED_OPERATION",
+        )
 
     async def next_event(self, timeout: float | None = None) -> BridgeEvent:  # noqa: ASYNC109
         """Default event poll stub."""
@@ -683,10 +635,18 @@ class TradingClient(BrokerClient):
         timeout: float | None = None,  # noqa: ASYNC109
     ) -> Any:
         """Execute a broker command over backend transport with receipt auditing."""
-        del requires_arm, timeout
+        del timeout
         cmd_id, rec = self._record_receipt(object_id, class_name, method_name)
         try:
-            val = self._dispatch(class_name, method_name, args)
+            if (
+                requires_arm or (class_name == "Trade" and method_name == "OrderSend")
+            ) and not self.is_armed:
+                raise BridgeError("Trading client is not armed", code="NOT_ARMED")
+            dispatcher = self._trading_dispatchers.get(object_id)
+            if dispatcher is None:
+                dispatcher = TradingDispatcher(self)
+                self._trading_dispatchers[object_id] = dispatcher
+            val = dispatcher.dispatch(class_name, method_name, args)
             if inspect.isawaitable(val):
                 val = await val
             self._resolve_receipt(cmd_id, rec, val)
@@ -694,237 +654,6 @@ class TradingClient(BrokerClient):
         except Exception as exc:
             self._reject_receipt(cmd_id, rec, exc)
             raise
-
-    @staticmethod
-    def _lookup_case_insensitive_attr(
-        obj: Any, method_name: str, default: Any = None
-    ) -> Any:
-        """Resolve an attribute on `obj` case-insensitively."""
-        target = method_name.lower()
-        for attr in dir(obj):
-            if attr.lower() == target and not attr.startswith("_"):
-                return getattr(obj, attr)
-        return getattr(obj, method_name, default)
-
-    def _dispatch_collection(
-        self, class_name: str, method_name: str, args: list[Any]
-    ) -> Any:
-        """Dispatch collection queries and cursor selections for positions, orders, and deals."""
-        getter_name, sel_attr, default_cls, total_m, list_ms, ticket_ms = (
-            self._COLLECTION_SPECS[class_name]
-        )
-        raw = getattr(self, getter_name)()
-        items = raw if isinstance(raw, list) else []
-
-        if method_name == total_m:
-            return len(items)
-        if method_name in list_ms:
-            if (
-                class_name == "PositionInfo"
-                and args
-                and isinstance(args[0], str)
-                and args[0]
-            ):
-                return [p for p in items if getattr(p, "symbol", "") == args[0]]
-            return items
-        if method_name in (class_name, "info"):
-            selected = getattr(self, sel_attr)
-            return (
-                selected
-                if selected is not None
-                else (items[0] if items else default_cls())
-            )
-        if method_name == "SelectByIndex":
-            idx = int(args[0]) if args else 0
-            if 0 <= idx < len(items):
-                setattr(self, sel_attr, items[idx])
-                return True
-            return False
-        if method_name in ticket_ms:
-            ticket = int(args[0]) if args else 0
-            hit = next((i for i in items if getattr(i, "ticket", 0) == ticket), None)
-            if hit is not None:
-                setattr(self, sel_attr, hit)
-                return True
-            return False
-        if class_name == "PositionInfo" and method_name in ("Select", "SelectByMagic"):
-            sym = str(args[0]) if args else ""
-            magic = int(args[1]) if len(args) > 1 else 0
-            hit = next(
-                (
-                    p
-                    for p in items
-                    if getattr(p, "symbol", "") == sym
-                    and (method_name == "Select" or getattr(p, "magic", 0) == magic)
-                ),
-                None,
-            )
-            if hit is not None:
-                self._selected_position = hit
-                return True
-            return False
-        if class_name in ("PositionInfo", "OrderInfo") and method_name in (
-            "StoreState",
-            "CheckState",
-        ):
-            return True
-        raise BridgeError(
-            f"{self.name} does not support {class_name}.{method_name}",
-            code="UNSUPPORTED_OPERATION",
-        )
-
-    def _dispatch(self, class_name: str, method_name: str, args: list[Any]) -> Any:
-        """Route generic calls directly to TradingClient typed methods."""
-        if class_name == "TerminalInfo":
-            t = self.get_terminal_info()
-            if method_name in ("TerminalInfo", "info"):
-                return t
-            return self._lookup_case_insensitive_attr(t, method_name, default=t)
-
-        if class_name == "AccountInfo":
-            acc = self.get_account_info()
-            if method_name in ("AccountInfo", "info"):
-                return acc
-            if method_name in ("OrderProfitCheck", "MarginCheck"):
-                sym = str(args[0]) if len(args) > 0 else "EURUSD"
-                otype = OrderType(int(args[1])) if len(args) > 1 else OrderType.BUY
-                vol = float(args[2]) if len(args) > 2 else 1.0
-                p1 = float(args[3]) if len(args) > 3 else 0.0
-                if method_name == "MarginCheck":
-                    return self.calc_margin(otype, sym, vol, p1)
-                p2 = float(args[4]) if len(args) > 4 else 0.0
-                return self.calc_profit(otype, sym, vol, p1, p2)
-            if method_name == "FreeMarginCheck":
-                if inspect.isawaitable(acc):
-
-                    async def _free(awaitable: Any) -> float:
-                        return float(getattr(await awaitable, "margin_free", 0.0))
-
-                    return _free(acc)
-                return float(getattr(acc, "margin_free", 0.0))
-            if method_name == "MaxLotCheck":
-                return 100.0
-            return self._lookup_case_insensitive_attr(acc, method_name)
-
-        if class_name == "SymbolInfo":
-            sym = (
-                args[0]
-                if args and isinstance(args[0], str)
-                else getattr(self, "_current_symbol", "EURUSD")
-            )
-            if method_name in ("SymbolInfo", "info"):
-                return self.get_symbol_info(sym)
-            if method_name == "SymbolsTotal":
-                return len(self.get_symbols())
-            if method_name in ("SymbolsGet", "symbols"):
-                all_syms = self.get_symbols()
-                if args and isinstance(args[0], str) and args[0]:
-                    tokens = [p.strip() for p in args[0].split(",") if p.strip()]
-                    inc = [p for p in tokens if not p.startswith("!")]
-                    exc = [p[1:] for p in tokens if p.startswith("!")]
-                    return [
-                        s
-                        for s in all_syms
-                        if (not inc or any(fnmatch.fnmatch(s, p) for p in inc))
-                        and not any(fnmatch.fnmatch(s, p) for p in exc)
-                    ]
-                return all_syms
-            if method_name == "SymbolInfoTick":
-                return self.get_tick(sym)
-            if method_name == "SymbolSelect":
-                return self.select_symbol(sym, bool(args[1]) if len(args) > 1 else True)
-            if method_name in ("MarketBookAdd", "subscribe_book"):
-                return self.subscribe_book(sym)
-            if method_name in ("MarketBookRelease", "release_book"):
-                return self.release_book(sym)
-            if method_name in ("MarketBookGet", "get_book"):
-                return self.get_book(sym)
-            if method_name in ("Refresh", "RefreshRates", "IsSynchronized"):
-                return True
-            if method_name == "NormalizePrice":
-                return round(
-                    float(args[0]) if args else 0.0,
-                    int(args[1]) if len(args) > 1 else 5,
-                )
-            if method_name in ("Name", "Select"):
-                if args and isinstance(args[0], str):
-                    self._current_symbol = args[0]
-                    return self.get_symbol_info(args[0]) is not None
-                return (
-                    getattr(self, "_current_symbol", "EURUSD")
-                    if method_name == "Name"
-                    else True
-                )
-            return self._lookup_case_insensitive_attr(
-                self.get_symbol_info(sym), method_name
-            )
-
-        if class_name in self._COLLECTION_SPECS:
-            return self._dispatch_collection(class_name, method_name, args)
-
-        if class_name == "Trade":
-            if method_name == "OrderSend":
-                return self.order_send(
-                    self._coerce_trade_request(args[0] if args else None)
-                )
-            if method_name == "OrderCheck":
-                return self.order_check(
-                    self._coerce_trade_request(args[0] if args else None)
-                )
-            if method_name in _TRADE_NOOP_METHODS:
-                return True
-            if method_name in ("FormatRequest", "FormatRequestResult"):
-                return ""
-            defaults = {
-                "Request": TradeRequest,
-                "Result": TradeResult,
-                "CheckResult": TradeCheckResult,
-            }
-            if method_name in defaults:
-                return defaults[method_name]()
-
-        if class_name in ("MarketDepth", "Book"):
-            sym = str(args[0]) if args else getattr(self, "_current_symbol", "EURUSD")
-            if method_name in ("Subscribe", "MarketBookAdd"):
-                return self.subscribe_book(sym)
-            if method_name in ("Get", "MarketBookGet"):
-                return self.get_book(sym)
-            if method_name in ("Release", "MarketBookRelease"):
-                return self.release_book(sym)
-
-        raise BridgeError(
-            f"{self.name} does not support {class_name}.{method_name}",
-            code="UNSUPPORTED_OPERATION",
-        )
-
-    def _coerce_trade_request(self, req: Any) -> Any:
-        if req is None:
-            return TradeRequest()
-        if isinstance(req, dict):
-            act = req.get("action", TradeAction.DEAL)
-            otype = req.get("order_type", OrderType.BUY)
-            fill = req.get("type_filling", OrderFilling.FOK)
-            ttime = req.get("type_time", OrderTime.GTC)
-            return TradeRequest(
-                action=TradeAction(act) if isinstance(act, int) else act,
-                magic=int(req.get("magic", 0)),
-                order=int(req.get("order", 0)),
-                symbol=str(req.get("symbol", "")),
-                volume=float(req.get("volume", 0.0)),
-                price=float(req.get("price", 0.0)),
-                stoplimit=float(req.get("stoplimit", 0.0)),
-                sl=float(req.get("sl", 0.0)),
-                tp=float(req.get("tp", 0.0)),
-                deviation=int(req.get("deviation", 0)),
-                order_type=OrderType(otype) if isinstance(otype, int) else otype,
-                type_filling=OrderFilling(fill) if isinstance(fill, int) else fill,
-                type_time=OrderTime(ttime) if isinstance(ttime, int) else ttime,
-                expiration=req.get("expiration"),
-                comment=str(req.get("comment", "")),
-                position=int(req.get("position", 0)),
-                position_by=int(req.get("position_by", 0)),
-            )
-        return req
 
 
 _SINGLETONS: dict[str, Any] = {}

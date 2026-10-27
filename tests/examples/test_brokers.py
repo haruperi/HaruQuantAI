@@ -7,7 +7,7 @@ import pandas as pd
 import pytest
 from app.include.contracts import SymbolInfo, SymbolTrade
 from app.include.enums import OrderFilling
-from app.include.trading import Trading
+from app.workspace.trading import Trading
 from scripts.examples import brokers
 
 

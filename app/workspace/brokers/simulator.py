@@ -39,12 +39,12 @@ import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.include import contracts as _c
 from app.include import enums as _e
-from app.include.trading import Trading
 from app.workspace.data_manager.data.conversions import (
     bars_to_dataframe,
     ticks_to_dataframe,
 )
 from app.workspace.data_manager.data.history import validate_rows
+from app.workspace.trading import Trading
 
 from .base import BridgeError, TradingClient, epoch_seconds, utc_now
 
@@ -666,7 +666,7 @@ class SimulatorClient(TradingClient):
         )
         pos.position_type, pos.type_description = int(side), _label(side)
         pos.volume, pos.price_open, pos.price_current = req.volume, price, price
-        pos.sl, pos.tp, pos.commission = req.sl, req.tp, comm
+        pos.sl, pos.tp, pos.commission = req.sl, req.tp, -comm
         pos.time = pos.time_update = now_sec
         pos.time_msc = pos.time_update_msc = now_msc
         pos.magic, pos.comment = req.magic, req.comment
@@ -698,7 +698,7 @@ class SimulatorClient(TradingClient):
         if req.tp:
             existing.tp = req.tp
         comm = req.volume * self._commission_per_lot
-        existing.commission += comm
+        existing.commission -= comm
         self._account.balance -= comm
         deal = self._record_deal(
             existing, order_ticket, _DE.IN, vol=req.volume, price=price, comm=comm
@@ -747,6 +747,7 @@ class SimulatorClient(TradingClient):
             pos, order_ticket, _DE.OUT, vol=volume, price=cp, comm=comm
         )
         deal.comment, deal.swap, deal.profit = comment, swap, profit
+        pos.commission *= max(0.0, 1.0 - volume / pos.volume)
         pos.volume -= volume
         pos.swap -= swap
         pos.time_update, pos.time_update_msc = self._clock_stamp()

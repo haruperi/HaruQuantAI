@@ -7,7 +7,6 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from app.include.contracts import SymbolInfo, SymbolMargin, SymbolPrice, TradeRequest
 from app.include.enums import OrderFilling, OrderType, TradeAction, TradeRetcode
-from app.include.trading import SymbolProxy
 from app.workspace.brokers import (
     BinanceClient,
     DarwinexClient,
@@ -21,6 +20,7 @@ from app.workspace.brokers import (
 from app.workspace.brokers.ctrader import CTraderClient
 from app.workspace.brokers.metatrader import MetaTraderClient
 from app.workspace.brokers.tick_downloader import TickDownloaderClient
+from app.workspace.trading import SymbolProxy
 
 
 @pytest.mark.parametrize(
