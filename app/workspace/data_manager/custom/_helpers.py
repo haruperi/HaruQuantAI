@@ -323,7 +323,7 @@ def definition_file(path: str | Path, on_conflict: str) -> list[Any]:
         or on_conflict not in ("error", "skip", "overwrite")
     ):
         raise CustomDataError("Invalid definition file or conflict policy")
-    return payload["indicators"]
+    return cast("list[Any]", payload["indicators"])
 
 
 _MAX_ERRORS = 100

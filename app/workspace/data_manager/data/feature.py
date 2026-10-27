@@ -9,7 +9,7 @@ from collections.abc import Callable
 from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from app.host.persistence import HostPersistence, RecordFilter
 from app.host.response import (
@@ -169,7 +169,7 @@ class Data:
         try:
             rows = self._read_datasets()
 
-            specifications: dict[int, str] = {}
+            specifications: dict[Any, str] = {}
             ids = list(
                 {
                     row["symbol_definition_id"]
@@ -312,11 +312,14 @@ class Data:
                             row["timeframe"],
                         )
                     )
-                return require_data(
-                    tx.update_record(
-                        "datamgr_datasets", values, filters={"id": dataset_id}
-                    )
-                )["records"][0]
+                return cast(
+                    "dict[str, Any]",
+                    require_data(
+                        tx.update_record(
+                            "datamgr_datasets", values, filters={"id": dataset_id}
+                        )
+                    )["records"][0],
+                )
         from .partition_files import dataset_lock
         from .review import DatasetReview
         from .storage import dataset_root, publish_frame
@@ -353,11 +356,14 @@ class Data:
                 locked=True,
                 metadata_updates=values,
             )
-        return require_data(
-            self.gateway.read_records(
-                "datamgr_datasets", filters={"id": dataset_id}, limit=1
-            )
-        )["records"][0]
+        return cast(
+            "dict[str, Any]",
+            require_data(
+                self.gateway.read_records(
+                    "datamgr_datasets", filters={"id": dataset_id}, limit=1
+                )
+            )["records"][0],
+        )
 
     def _remove_cached_files(self, row: dict[str, Any]) -> None:
         """Remove retired canonical files only when no catalog still references them."""

@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, cast
 
-import pandas as pd
+import pandas as pd  # type: ignore[import-untyped]
 from fastapi import APIRouter, Request
 
 from app.host.response import ErrorCode
@@ -303,7 +303,10 @@ class DatasetReview:
             if frame.empty:
                 from .feature import Data
 
-                return require_data(Data(self.gateway).clear(self.record["id"]))
+                return cast(
+                    "dict[str, Any]",
+                    require_data(Data(self.gateway).clear(self.record["id"])),
+                )
             step = json.loads(self.record["lineage_json"])["tick_size"]
             return publish_frame(
                 self.gateway,

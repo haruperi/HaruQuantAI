@@ -245,13 +245,19 @@ def _custom_format_routes(router: APIRouter) -> None:
     @router.post("/custom-data/formats")
     def add_format(request: Request, body: dict[str, Any]) -> Any:
         name = str(body.get("name") or "").strip()
-        config = body.get("config") if isinstance(body.get("config"), dict) else body
+        config = cast(
+            "dict[str, Any]",
+            body.get("config") if isinstance(body.get("config"), dict) else body,
+        )
         return _response(_custom_service(request).add_import_format(name, config))
 
     @router.post("/custom-data/formats/edit")
     def edit_format(request: Request, body: dict[str, Any]) -> Any:
         name = str(body.get("name") or "").strip()
-        config = body.get("config") if isinstance(body.get("config"), dict) else body
+        config = cast(
+            "dict[str, Any]",
+            body.get("config") if isinstance(body.get("config"), dict) else body,
+        )
         return _response(_custom_service(request).edit_import_format(name, config))
 
     @router.delete("/custom-data/formats/{name}")

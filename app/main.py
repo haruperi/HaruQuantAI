@@ -21,7 +21,8 @@ from app.host.logging import get_logger, shutdown_logging
 from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
 from app.host.settings import SettingsManager
-from app.host.transport import CredentialTester, Vault, install_transport
+from app.host.transport import CredentialTester, install_transport
+from app.host.vault import Vault
 from app.workspace.data_manager.data.partition_files import recover_catalog_publications
 from app.workspace.data_manager.logs import Logs
 

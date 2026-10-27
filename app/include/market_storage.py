@@ -188,11 +188,11 @@ def scan_catalog(row: dict[str, Any], *, decode: bool = False) -> pl.LazyFrame:
         step = float(lineage["tick_size"])
         prices = price_columns(row["timeframe"])
         schema = lazy.collect_schema()
+        exp = Decimal(str(step)).as_tuple().exponent
+        precision = max(0, -exp if isinstance(exp, int) else 0)
         lazy = lazy.with_columns(
             [
-                (pl.col(column).cast(pl.Float64) * step).round(
-                    max(0, -Decimal(str(step)).as_tuple().exponent)
-                )
+                (pl.col(column).cast(pl.Float64) * step).round(precision)
                 for column in prices
                 if schema[column].is_integer()
             ]

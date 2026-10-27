@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, override
 
 from ._base import BaseSource
 from ._helpers import CRYPTO, provider_id
@@ -28,6 +28,7 @@ class Crypto(BaseSource):
         )
         self.source_id = provider_id(exchange) if exchange in CRYPTO else "binance"
 
+    @override
     def add(
         self,
         definitions_or_provider: list[dict[str, Any]] | str,

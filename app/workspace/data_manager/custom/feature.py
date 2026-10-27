@@ -775,7 +775,10 @@ class CustomData:
                 raise _CustomError(
                     "Import cannot perform that action", ErrorCode.CONFLICT
                 )
-            return self.jobs.get_job(job_id).to_dict()
+            job = self.jobs.get_job(job_id)
+            if job is None:
+                raise _CustomError("Import job not found", ErrorCode.NOT_FOUND)
+            return job.to_dict()
 
         return self._run("import_action", execute)
 

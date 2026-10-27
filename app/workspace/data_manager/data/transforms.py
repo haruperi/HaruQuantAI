@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-import pandas as pd
+import pandas as pd  # type: ignore[import-untyped]
 from fastapi import APIRouter, Request
 
 from app.host.response import ErrorCode

@@ -43,8 +43,10 @@ def _csv_token(
         fmt = fmt.replace("SSS", "__MILLISECONDS__")
         for old, new in patterns.items():
             fmt = fmt.replace(old, new)
-        return stamp.strftime(fmt).replace(
-            "__MILLISECONDS__", f"{stamp.microsecond // 1000:03d}"
+        return str(
+            stamp.strftime(fmt).replace(
+                "__MILLISECONDS__", f"{stamp.microsecond // 1000:03d}"
+            )
         )
     if key == "Text":
         return fmt or ""

@@ -7,7 +7,7 @@ import math
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, cast, override
 
 import pandas as pd  # type: ignore[import-untyped]
 
@@ -332,6 +332,7 @@ class BaseSource:
 class Sources(BaseSource):
     """Unified facade for registrations and downloads across historical sources."""
 
+    @override
     def add(
         self,
         provider_or_definitions: str | list[dict[str, Any]],

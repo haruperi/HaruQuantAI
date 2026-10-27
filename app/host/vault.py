@@ -19,7 +19,7 @@ _ERROR_NOT_FOUND = 1168
 
 
 class _Credential(ctypes.Structure):
-    _fields_ = [
+    _fields_ = [  # type: ignore[mutable-override]
         ("Flags", wintypes.DWORD),
         ("Type", wintypes.DWORD),
         ("TargetName", wintypes.LPWSTR),

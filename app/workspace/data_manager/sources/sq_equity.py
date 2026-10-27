@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, override
 
 from ._base import BaseSource
 
@@ -15,6 +15,7 @@ class SQEquity(BaseSource):
     source_id = "sq_equity"
     default_category = "Stocks"
 
+    @override
     def add(
         self,
         definitions_or_provider: list[dict[str, Any]] | str,

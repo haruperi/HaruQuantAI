@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import Any
+from typing import Any, cast
 
 from .feature import Help
 
@@ -67,4 +67,4 @@ def run_help_command(
     handler = handlers.get(
         arguments.help_command, lambda: service.get_topic("overview")
     )
-    return handler()
+    return cast("dict[str, Any]", handler())

@@ -350,7 +350,7 @@ class ServletConnection:
         previous = self.get(connection_id) if connection_id else None
         if previous:
             values = {**previous.model_dump(), **values, "connection_id": connection_id}
-        staged = []
+        staged: list[str] = []
         try:
             record, staged = prepare_credentials(self.vault, values)
             now = datetime.now(UTC).isoformat()

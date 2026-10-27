@@ -6,7 +6,7 @@ import argparse
 import asyncio
 import sys
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 from ._base import Sources
 from ._helpers import PROVIDERS, capabilities
@@ -252,30 +252,39 @@ def run_source_command(arguments: argparse.Namespace, parser: Any) -> dict[str, 
         if arguments.source_command == "capabilities":
             return {"success": True, "data": capabilities(provider)}
         if arguments.source_command == "list":
-            return service.gateway.read_records(
-                "datamgr_datasets", filters={"source": provider}, limit=1000
+            return cast(
+                "dict[str, Any]",
+                service.gateway.read_records(
+                    "datamgr_datasets", filters={"source": provider}, limit=1000
+                ),
             )
         if arguments.source_command == "add":
-            return service.add(
-                provider,
-                [
-                    {
-                        "symbol": symbol + arguments.postfix,
-                        "underlying": symbol,
-                        "timeframe": arguments.timeframe,
-                        "tick_size": arguments.tick_size,
-                        "broker": arguments.broker,
-                    }
-                    for symbol in arguments.symbols
-                ],
+            return cast(
+                "dict[str, Any]",
+                service.add(
+                    provider,
+                    [
+                        {
+                            "symbol": symbol + arguments.postfix,
+                            "underlying": symbol,
+                            "timeframe": arguments.timeframe,
+                            "tick_size": arguments.tick_size,
+                            "broker": arguments.broker,
+                        }
+                        for symbol in arguments.symbols
+                    ],
+                ),
             )
         if provider == "mt5":
             return asyncio.run(_mt5_download(service, arguments))
-        return service.download(
-            f"{provider}:{arguments.symbol.upper()}:{arguments.timeframe.upper()}",
-            arguments.date_from,
-            arguments.date_to,
-            overwrite=arguments.overwrite,
+        return cast(
+            "dict[str, Any]",
+            service.download(
+                f"{provider}:{arguments.symbol.upper()}:{arguments.timeframe.upper()}",
+                arguments.date_from,
+                arguments.date_to,
+                overwrite=arguments.overwrite,
+            ),
         )
     except (ValueError, RuntimeError, OSError, TimeoutError) as error:
         return {

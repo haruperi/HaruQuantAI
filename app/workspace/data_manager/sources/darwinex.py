@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, override
 
 from ._base import BaseSource
 
@@ -15,6 +15,7 @@ class Darwinex(BaseSource):
     source_id = "darwinex"
     default_category = "Forex"
 
+    @override
     def add(
         self,
         definitions_or_provider: list[dict[str, Any]] | str,

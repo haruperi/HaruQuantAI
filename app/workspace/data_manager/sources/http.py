@@ -82,7 +82,7 @@ def _get_start_download() -> Any:
 def _get_sources() -> type[Sources]:
     mod = sys.modules.get("app.workspace.data_manager.sources")
     if mod and hasattr(mod, "Sources"):
-        return mod.Sources
+        return cast("type[Sources]", mod.Sources)
     return Sources
 
 
@@ -280,11 +280,14 @@ def _provider_catalog(request: Request, provider: str) -> list[str]:
         )
         if saved.provider != provider or (saved.vault_refs and vault is None):
             raise ValueError("Choose an available connection for this provider")
+        credentials = (
+            {key: vault.resolve(ref) for key, ref in saved.vault_refs.items()}
+            if vault is not None
+            else {}
+        )
         connection = {
             **saved.model_dump(),
-            "credentials": {
-                key: vault.resolve(ref) for key, ref in saved.vault_refs.items()
-            },
+            "credentials": credentials,
         }
     client = make_client(provider, connection)
     try:
@@ -368,12 +371,14 @@ def start_source_download(request: Request, body: dict[str, Any]) -> dict[str, A
                 raise ValueError("Selected connection belongs to another provider")  # noqa: TRY301 - enclosing scope owns rollback
             if connection.vault_refs and vault is None:
                 raise ValueError("Credential vault is unavailable")  # noqa: TRY301 - enclosing scope owns rollback
+            credentials = (
+                {key: vault.resolve(ref) for key, ref in connection.vault_refs.items()}
+                if vault is not None
+                else {}
+            )
             service.connection = {
                 **connection.model_dump(),
-                "credentials": {
-                    key: vault.resolve(ref)
-                    for key, ref in connection.vault_refs.items()
-                },
+                "credentials": credentials,
             }
 
     except (ValueError, TypeError) as error:
