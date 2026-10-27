@@ -34,7 +34,7 @@ def test_review_edits_and_deletions_persist(recorded_history):
 
 
 def test_rename_republishes_files_and_preserves_history(recorded_history):
-    from app.workspace.data_manager.data import Data
+    from app.workspace.data_manager.data.feature import Data
 
     gateway, identifier, _ = recorded_history
     before = DatasetReview(gateway, identifier).frame()
@@ -51,7 +51,7 @@ def test_clear_removes_owned_cache_and_preserves_unrelated_files(recorded_histor
     from pathlib import Path
 
     from app.include.market_storage import catalog_paths
-    from app.workspace.data_manager.data import Data
+    from app.workspace.data_manager.data.feature import Data
 
     gateway, identifier, root = recorded_history
     paths = [

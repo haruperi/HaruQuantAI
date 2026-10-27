@@ -40,8 +40,11 @@ import pandas as pd  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
 from app.include.contracts import MarketBar, MarketTick, SymbolInfo, SymbolPrice
-from app.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.include.enums import Timeframe
+from app.workspace.data_manager.data.conversions import (
+    bars_to_dataframe,
+    ticks_to_dataframe,
+)
 
 from .base import (
     BridgeError,

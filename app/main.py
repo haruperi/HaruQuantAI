@@ -22,7 +22,7 @@ from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
 from app.host.settings import SettingsManager
 from app.host.transport import CredentialTester, Vault, install_transport
-from app.workspace.data_manager.data import recover_catalog_publications
+from app.workspace.data_manager.data.partition_files import recover_catalog_publications
 from app.workspace.data_manager.logs import Logs
 
 logger = get_logger(__name__)

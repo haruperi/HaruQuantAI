@@ -39,12 +39,12 @@ import pandas as pd  # type: ignore[import-untyped]
 from app.host.logging import get_logger
 from app.include import contracts as _c
 from app.include import enums as _e
-from app.include.data import (
+from app.include.trading import Trading
+from app.workspace.data_manager.data.conversions import (
     bars_to_dataframe,
     ticks_to_dataframe,
-    validate_rows,
 )
-from app.include.trading import Trading
+from app.workspace.data_manager.data.history import validate_rows
 
 from .base import BridgeError, TradingClient, epoch_seconds, utc_now
 

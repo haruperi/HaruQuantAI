@@ -13,7 +13,7 @@ from app.host.jobs import JobContext
 from app.host.response import ErrorCode
 from app.host.transport import TransportError
 from app.workspace.brokers.base import get_broker
-from app.workspace.data_manager.data import Data
+from app.workspace.data_manager.data.feature import Data
 
 from ._base import Sources
 from ._helpers import capabilities, provider_id

@@ -11,62 +11,13 @@ from __future__ import annotations
 import argparse
 import json
 from functools import partial
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from fastapi import APIRouter, Depends, Request
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from starlette.requests import Request
 
-from app.host.response import ErrorCode
-from app.host.transport import (
-    TransportError,
-    _require,  # pyright: ignore[reportPrivateUsage]
-)
-from app.workspace.data_manager.baskets import (
-    register_basket_commands,
-    register_basket_routes,
-    run_basket_command,
-)
-from app.workspace.data_manager.brokers import (
-    register_broker_commands,
-    register_broker_routes,
-    run_broker_command,
-)
-from app.workspace.data_manager.custom import (
-    register_custom_commands,
-    register_custom_routes,
-    run_custom_command,
-)
-from app.workspace.data_manager.data import register_data_routes
-from app.workspace.data_manager.help import (
-    register_help_commands,
-    register_help_routes,
-    run_help_command,
-)
-from app.workspace.data_manager.logs import (
-    register_log_commands,
-    register_log_routes,
-    run_log_command,
-)
-from app.workspace.data_manager.sessions import (
-    register_session_commands,
-    register_session_routes,
-    run_session_command,
-)
-from app.workspace.data_manager.sources import (
-    PROVIDERS,
-    register_dukascopy_commands,
-    register_dukascopy_routes,
-    register_source_commands,
-    register_source_routes,
-    run_dukascopy_command,
-    run_source_command,
-)
-from app.workspace.data_manager.symbols import (
-    register_symbol_commands,
-    register_symbol_routes,
-    run_symbol_command,
-)
+if TYPE_CHECKING:
+    from fastapi import APIRouter
+    from fastapi.responses import JSONResponse
 
 __all__ = [
     "create_router",
@@ -77,6 +28,9 @@ __all__ = [
 
 def _access(request: Request) -> None:
     """Apply the host's UI session and scope checks to domain requests."""
+    from app.host.response import ErrorCode
+    from app.host.transport import TransportError, _require
+
     scope = "data:read" if request.method == "GET" else "data:write"
     if request.headers.get("x-peer-id") == "cli" and request.url.path.startswith(
         "/api/v1/data/logs"
@@ -93,6 +47,9 @@ def _access(request: Request) -> None:
 
 def _response(result: dict[str, Any]) -> JSONResponse:
     """Keep service errors and HTTP status consistent with the host envelope."""
+    from fastapi.encoders import jsonable_encoder
+    from fastapi.responses import JSONResponse
+
     statuses = {"validation": 422, "not_found": 404, "conflict": 409}
     body = {**result, "status": "success" if result["success"] else "error"}
     code = (
@@ -112,6 +69,18 @@ def _ok(data: Any) -> dict[str, Any]:
 
 def create_router() -> APIRouter:
     """Assemble domain router across all Data Manager feature packages."""
+    from fastapi import APIRouter, Depends
+
+    from .baskets import register_basket_routes
+    from .brokers import register_broker_routes
+    from .custom import register_custom_routes
+    from .data.http import register_data_routes
+    from .help import register_help_routes
+    from .logs import register_log_routes
+    from .sessions import register_session_routes
+    from .sources import register_dukascopy_routes, register_source_routes
+    from .symbols import register_symbol_routes
+
     router = APIRouter(prefix="/api/v1/data", dependencies=[Depends(_access)])
 
     register_data_routes(router)
@@ -140,6 +109,15 @@ def create_router() -> APIRouter:
 
 def register_commands(commands: Any) -> None:
     """Register Data Manager CLI subcommands across all feature packages."""
+    from .baskets import register_basket_commands
+    from .brokers import register_broker_commands
+    from .custom import register_custom_commands
+    from .help import register_help_commands
+    from .logs import register_log_commands
+    from .sessions import register_session_commands
+    from .sources import register_dukascopy_commands, register_source_commands
+    from .symbols import register_symbol_commands
+
     data_manager = commands.add_parser("data-manager", help="Manage workspace data")
     resources = data_manager.add_subparsers(dest="resource", required=True)
 
@@ -160,6 +138,15 @@ def run_command(
     arguments: argparse.Namespace, *, parser: argparse.ArgumentParser
 ) -> int:
     """Execute a Data Manager command, emit errors, and return its exit code."""
+    from .baskets import run_basket_command
+    from .brokers import run_broker_command
+    from .custom import run_custom_command
+    from .help import run_help_command
+    from .logs import run_log_command
+    from .sessions import run_session_command
+    from .sources import PROVIDERS, run_dukascopy_command, run_source_command
+    from .symbols import run_symbol_command
+
     handlers = {
         "session": run_session_command,
         "symbol": run_symbol_command,

@@ -30,12 +30,14 @@ from app.include.market_storage import (
 )
 from app.workspace.brokers.base import BridgeError
 from app.workspace.brokers.dukascopy import DukascopyClient
-from app.workspace.data_manager.data import (
+from app.workspace.data_manager.data.coverage import (
     RangeProgress,
-    dataset_root,
     missing_ranges,
-    publish_frame,
     record_checked_ranges,
+)
+from app.workspace.data_manager.data.storage import (
+    dataset_root,
+    publish_frame,
     require_data,
 )
 from app.workspace.data_manager.logs import Logs

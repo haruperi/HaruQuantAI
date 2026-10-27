@@ -63,8 +63,11 @@ from app.include.contracts import (
     SymbolPrice,
     SymbolState,
 )
-from app.include.data import bars_to_dataframe, ticks_to_dataframe
 from app.include.enums import Timeframe
+from app.workspace.data_manager.data.conversions import (
+    bars_to_dataframe,
+    ticks_to_dataframe,
+)
 
 from .base import (
     BridgeError,

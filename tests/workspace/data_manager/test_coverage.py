@@ -9,7 +9,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 import pytest
 from app.host.persistence import HostPersistence
-from app.workspace.data_manager.data import publish_frame
+from app.workspace.data_manager.data.storage import publish_frame
 from app.workspace.data_manager.sources import PROVIDERS, Sources, capabilities
 
 
@@ -195,7 +195,7 @@ def test_missing_physical_file_is_downloaded_again(environment):
 
 
 def test_clear_invalidates_completed_coverage(environment):
-    from app.workspace.data_manager.data import Data
+    from app.workspace.data_manager.data.feature import Data
 
     service, calls = environment
     row = service.add("coinbase", [{"symbol": "TEST"}])["data"]["records"][0]

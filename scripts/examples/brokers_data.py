@@ -45,10 +45,6 @@ from app.include.contracts import (
     MarketBar,
     SymbolInfo,
 )
-from app.include.data import (
-    get_historical_bars,
-    get_ticks,
-)
 from app.include.enums import Timeframe
 from app.workspace.brokers import (
     BinanceClient,
@@ -60,6 +56,7 @@ from app.workspace.brokers import (
     SQFuturesClient,
     YahooClient,
 )
+from app.workspace.data_manager.data.history import get_historical_bars, get_ticks
 
 logger = get_logger(__name__)
 

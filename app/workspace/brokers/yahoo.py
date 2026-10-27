@@ -51,8 +51,8 @@ from app.include.contracts import (
     SymbolMargin,
     SymbolPrice,
 )
-from app.include.data import bars_to_dataframe
 from app.include.enums import Timeframe
+from app.workspace.data_manager.data.conversions import bars_to_dataframe
 
 from .base import (
     BridgeError,

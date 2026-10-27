@@ -57,10 +57,6 @@ from app.include.contracts import (
     TradeRequest,
     TradingBackend,
 )
-from app.include.data import (
-    get_historical_bars,
-    get_ticks,
-)
 from app.include.enums import (
     MarginMode,
     OrderFilling,
@@ -74,6 +70,7 @@ from app.workspace.brokers.base import BridgeError
 from app.workspace.brokers.ctrader import CTraderClient
 from app.workspace.brokers.metatrader import create_mt5_client
 from app.workspace.brokers.simulator import SimulatorClient
+from app.workspace.data_manager.data.history import get_historical_bars, get_ticks
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = os.getenv("BROKER", "mt5")  # type: ignore[assignment]
 ALLOW_LIVE_TRADING = True

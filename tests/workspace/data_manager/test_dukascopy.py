@@ -482,7 +482,7 @@ def test_large_partition_is_one_file_with_batched_row_groups(temp_env):
 
 @pytest.mark.parametrize("committed", [False, True])
 def test_interrupted_canonical_replacement_recovers_from_journal(temp_env, committed):
-    from app.workspace.data_manager.data import (
+    from app.workspace.data_manager.data.partition_files import (
         FilePublication,
         dataset_lock,
         recover_publications,

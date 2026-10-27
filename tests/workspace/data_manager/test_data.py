@@ -1,4 +1,5 @@
-from app.workspace.data_manager.data import Data, DataCLI
+from app.workspace.data_manager.data._cli import DataCLI
+from app.workspace.data_manager.data.feature import Data
 
 
 def test_data_overview_and_datasets_standard_response() -> None:

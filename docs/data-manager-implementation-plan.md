@@ -559,3 +559,11 @@ Verification: 428 backend tests, TypeScript check, 642 frontend tests, 13 browse
 Current operational bounds: 25 MB uploaded bytes per request; native review pagination stays lazy. Resampling/session filters/edits/clone/export materialize the selected history. MT5 fixed spreads use points; pip conversion is not silently guessed. MT4 output uses supported bar timeframes and existing codec versions, with terminal acceptance still pending.
 
 Commit-hook architecture correction: credential metadata, the vault protocol and `prepare_credentials` reside in the existing `app/host/vault.py`; `ServletConnection` retains connection persistence and diagnostics. This keeps `transport.py` below the enforced 1,000-line ceiling without adding another file.
+
+## Market-data module consolidation
+
+User-approved refactor: reusable market-data requests now live in `app/workspace/data_manager/data/history.py`; record conversion lives in `conversions.py`. `resolve_history_request` replaces the cross-module private `_route` name. CLI formatting moved from `_helpers.py` into existing `_cli.py`.
+
+`app/include/data.py` is removed. All broker, application, example and test callers import their owning modules directly. The unused, inaccurate `DataBackend.call` protocol and unused `bars_to_df`/`ticks_to_df` aliases were removed. There are no old-path shims or legacy re-exports. The data package initializer is documentation-only, and workspace feature registration imports are deferred to router/CLI assembly.
+
+Record columns, timestamps, dtype behavior, validation and backend execution semantics are preserved. Fresh-process tests verify that conversion/history imports do not initialize source packages, dataset services, host transport or FastAPI. Two runtime modules and one focused test module replace the old combined runtime module.

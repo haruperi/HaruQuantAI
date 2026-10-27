@@ -885,9 +885,13 @@ class MetaTraderClient(TradingClient):
             "FR-MT5-MARKET-DATA: requesting bars via terminal bridge",
             extra={"symbol": symbol},
         )
-        from app.include.data import _route, bars_to_dataframe, validate_rows
+        from app.workspace.data_manager.data.conversions import bars_to_dataframe
+        from app.workspace.data_manager.data.history import (
+            resolve_history_request,
+            validate_rows,
+        )
 
-        mode, start, end, number = _route(
+        mode, start, end, number = resolve_history_request(
             date_from, date_to, start_pos, count, limit, scale=1
         )
         clean_sym = symbol.strip().upper()
@@ -943,9 +947,13 @@ class MetaTraderClient(TradingClient):
             "FR-MT5-MARKET-DATA: requesting ticks via terminal bridge",
             extra={"symbol": symbol},
         )
-        from app.include.data import _route, ticks_to_dataframe, validate_rows
+        from app.workspace.data_manager.data.conversions import ticks_to_dataframe
+        from app.workspace.data_manager.data.history import (
+            resolve_history_request,
+            validate_rows,
+        )
 
-        mode, start, end, number = _route(
+        mode, start, end, number = resolve_history_request(
             date_from, date_to, None, count, limit, scale=1000
         )
         clean_sym = symbol.strip().upper()
