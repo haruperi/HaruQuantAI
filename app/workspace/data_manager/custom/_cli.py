@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections.abc import Callable
 from typing import Any
 
@@ -11,7 +12,8 @@ from app.workspace.data_manager.cli_formatters import (
     format_custom_table,
     format_review_table,
 )
-from app.workspace.data_manager.custom import CustomData
+
+from .feature import CustomData
 
 __all__ = ["register_custom_commands", "run_custom_command"]
 
@@ -430,11 +432,17 @@ def _cmd_file_transfer(
     return res
 
 
+def _get_service() -> Any:
+    mod = sys.modules.get("app.workspace.data_manager.custom")
+    cls = getattr(mod, "CustomData", CustomData) if mod else CustomData
+    return cls()
+
+
 def run_custom_command(
     arguments: argparse.Namespace, parser: Any
 ) -> dict[str, Any] | None:
     """Execute custom data indicators command and print formatted output."""
-    service = CustomData()
+    service = _get_service()
     cmd = arguments.custom_command
 
     handlers: dict[str, Callable[[], dict[str, Any] | None]] = {

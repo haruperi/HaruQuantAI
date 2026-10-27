@@ -467,7 +467,7 @@ def test_cot_validation_and_fetch_archive(service):
         "success"
     ]
 
-    from app.workspace.data_manager.custom_io import fetch_cot
+    from app.workspace.data_manager.custom import fetch_cot
 
     zip_bytes = io.BytesIO()
     with zipfile.ZipFile(zip_bytes, "w") as zf:

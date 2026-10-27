@@ -16,7 +16,7 @@ from app.host.transport import (
 )
 from app.workspace.data_manager.baskets import register_basket_routes
 from app.workspace.data_manager.brokers import register_broker_routes
-from app.workspace.data_manager.custom_http import register_custom_routes
+from app.workspace.data_manager.custom import register_custom_routes
 from app.workspace.data_manager.data import Data
 from app.workspace.data_manager.dukascopy_http import register_dukascopy_routes
 from app.workspace.data_manager.help import Help

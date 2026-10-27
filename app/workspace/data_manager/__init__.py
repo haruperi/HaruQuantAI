@@ -7,14 +7,10 @@ from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from app.workspace.data_manager.cli import (
-        CustomDataCLI,
         DataCLI,
-        format_custom_table,
         format_data_dashboard,
         format_dataset_table,
-        format_review_table,
     )
-    from app.workspace.data_manager.custom import CustomData
     from app.workspace.data_manager.data import Data
     from app.workspace.data_manager.dukascopy import Dukascopy
     from app.workspace.data_manager.help import Help
@@ -27,7 +23,6 @@ def __getattr__(name: str) -> Any:
     services = {
         "Data": "data",
         "Logs": "logs",
-        "CustomData": "custom",
         "Help": "help",
         "Dukascopy": "dukascopy",
         "Sources": "sources",
@@ -35,12 +30,9 @@ def __getattr__(name: str) -> Any:
     if name in services:
         return getattr(import_module(f"{__name__}.{services[name]}"), name)
     if name in {
-        "CustomDataCLI",
         "DataCLI",
-        "format_custom_table",
         "format_data_dashboard",
         "format_dataset_table",
-        "format_review_table",
     }:
         from app.workspace.data_manager import cli
 
@@ -49,16 +41,12 @@ def __getattr__(name: str) -> Any:
 
 
 __all__ = [
-    "CustomData",
-    "CustomDataCLI",
     "Data",
     "DataCLI",
     "Dukascopy",
     "Help",
     "Logs",
     "Sources",
-    "format_custom_table",
     "format_data_dashboard",
     "format_dataset_table",
-    "format_review_table",
 ]

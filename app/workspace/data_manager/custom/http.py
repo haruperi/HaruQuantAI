@@ -13,7 +13,8 @@ from fastapi.responses import JSONResponse
 
 from app.host.response import ErrorCode
 from app.host.transport import TransportError
-from app.workspace.data_manager.custom import CustomData
+
+from .feature import CustomData
 
 _CUSTOM_JOB_LOCK = Lock()
 

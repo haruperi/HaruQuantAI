@@ -20,6 +20,7 @@ import csv
 import io
 import json
 import re
+import sys
 import time
 import uuid
 import zipfile
@@ -42,7 +43,7 @@ if TYPE_CHECKING:
     from app.host.jobs import JobContext, JobManager
     from app.workspace.data_manager.logs import Logs
 
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     _BATCH,
     _COT_COLUMNS,
     _DEFINITIONS,
@@ -55,33 +56,40 @@ from app.workspace.data_manager.custom_io import (
     parse_cot_reports,
     parse_csv_row,
 )
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     CustomDataError as _CustomError,
 )
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     atomic_text as _atomic_text,
 )
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     normalize_format as _format,
 )
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     read_all as _read,
 )
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     read_text as _text,
 )
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     response_data as _data,
 )
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     validate_name as _name,
 )
-from app.workspace.data_manager.custom_io import (
+from ._helpers import (
     validate_outputs as _outputs,
 )
 
 __all__ = ["CustomData"]
-_MAX_ERRORS = 100
+from ._helpers import _MAX_ERRORS
+
+
+def _get_parse_cot_reports() -> Any:
+    mod = sys.modules.get("app.workspace.data_manager.custom")
+    if mod and hasattr(mod, "parse_cot_reports"):
+        return mod.parse_cot_reports
+    return parse_cot_reports
 
 
 class CustomData:
@@ -890,7 +898,7 @@ class CustomData:
                 raise _CustomError(
                     "COT years must be between 1986 and the current year"
                 )
-            grouped = parse_cot_reports(selected, fetcher)
+            grouped = _get_parse_cot_reports()(selected, fetcher)
             with self.gateway.transaction() as tx:
                 for name, records in grouped.items():
                     existing = _read(tx, _DEFINITIONS, {"name": name})
