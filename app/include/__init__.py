@@ -18,6 +18,7 @@ from app.include.blocks.comparisons import (
     crosses_above,
     is_greater,
 )
+from app.include.blocks.functions import Functions, convert_price_to_pips
 from app.include.blocks.functions.plus import plus
 from app.include.calculators import (
     AbstractCalculator,
@@ -35,7 +36,6 @@ from app.include.contracts import (
     MarketTick,
 )
 from app.include.enums import Timeframe
-from app.include.functions import Functions, convert_price_to_pips
 from app.include.generators import RandomGenerator
 from app.include.price import (
     BarPrice,

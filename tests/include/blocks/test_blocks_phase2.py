@@ -257,6 +257,7 @@ def test_nested_staging_transactions_preserve_state(tmp_path: Path) -> None:
     # 4. Commit outer transaction
     registry.commit_staging()
     assert registry.staging_depth == 0
+
     assert bool(registry.is_staging) is False
 
     snapshot = registry.snapshot()
@@ -274,12 +275,13 @@ def test_clean_migration_obsolete_implementations_removed() -> None:
     with pytest.raises(ModuleNotFoundError):
         importlib.import_module("app.include.bar_time")
 
-    # 2. functions.py has no top-level plus, and Functions facade has no plus method
-    import app.include.functions as func
+    # 2. functions.py legacy monolith is cleanly removed
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include.functions")
 
-    assert not hasattr(func, "plus")
-    assert not hasattr(func.Functions, "plus")
-    assert "plus" not in func.__all__
+    from app.include.blocks.functions import Functions
+
+    assert not hasattr(Functions, "plus")
 
     # 3. actions/logging.py has no LogToFileAction or log_to_file
     import app.include.actions.logging as act_log
