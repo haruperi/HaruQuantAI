@@ -54,6 +54,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
+from app.include.numerical.ma import sma_kernel
 
 logger = get_logger(__name__)
 
@@ -73,14 +74,7 @@ class MovingAverage(BaseIndicator):
     @classmethod
     def sma(cls, data: np.ndarray, period: int) -> np.ndarray:
         """Calculate Simple Moving Average."""
-        n = len(data)
-        out = np.full(n, np.nan, dtype=np.float64)
-        if n < period:
-            return out
-
-        cumsum = np.cumsum(np.insert(data, 0, 0.0))
-        out[period - 1 :] = (cumsum[period:] - cumsum[:-period]) / period
-        return out
+        return sma_kernel(data, period)
 
     @classmethod
     def ema(cls, data: np.ndarray, period: int) -> np.ndarray:

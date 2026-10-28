@@ -4,33 +4,17 @@ from __future__ import annotations
 
 import inspect
 import symtable
-from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from app.include.indicators.base import BaseIndicator
+from app.include.blocks.indicators.base import BaseIndicator as CanonicalBaseIndicator
+from app.include.blocks.money_management.base import (
+    BasePositionSizer as _BasePositionSizer,
+)
+from app.include.indicators.base import BaseIndicator as LegacyBaseIndicator
+from app.include.metrics.base import BaseMetric as _BaseMetric
 from app.workspace.code_editor._common import INCLUDE_DIR, CodeEditorError
-
-
-class BaseMetric(ABC):
-    """Contract for custom strategy performance columns."""
-
-    @abstractmethod
-    def compute(
-        self, trades: Sequence[dict[str, Any]], initial_capital: float = 10000.0
-    ) -> float:
-        """Compute a scalar metric from executed trades."""
-
-
-class BasePositionSizer(ABC):
-    """Contract for custom trade volume calculation."""
-
-    @abstractmethod
-    def compute_size(
-        self, account_equity: float, stop_loss_pips: float, pip_value: float = 10.0
-    ) -> float:
-        """Calculate lots from account equity and stop distance."""
 
 
 class SnippetRegistry:
@@ -56,15 +40,18 @@ class SnippetRegistry:
             for name, value in vars(module).items()
             if inspect.isclass(value) and value.__module__ == module.__name__
         }
-        base: type[Any] | None = None
+        base: type[Any] | tuple[type[Any], ...] | None = None
         if "indicators" in path.parts:
-            base = BaseIndicator
+            base = (LegacyBaseIndicator, CanonicalBaseIndicator)
         elif "metrics" in path.parts:
-            base = BaseMetric
+            base = _BaseMetric
         elif "money_management" in path.parts:
-            base = BasePositionSizer
+            base = _BasePositionSizer
 
-        if path.resolve() == (INCLUDE_DIR / "indicators/base.py").resolve():
+        if (
+            path.name == "base.py"
+            or path.resolve() == (INCLUDE_DIR / "indicators/base.py").resolve()
+        ):
             classes = {}
             base = None
         if base:
@@ -74,8 +61,11 @@ class SnippetRegistry:
                 if issubclass(cls, base) and not inspect.isabstract(cls)
             }
             if not classes:
+                base_name = (
+                    base[0].__name__ if isinstance(base, tuple) else base.__name__
+                )
                 raise CodeEditorError(
-                    f"Custom {path.parent.name} must implement {base.__name__}"
+                    f"Custom {path.parent.name} must implement {base_name}"
                 )
         tools = {}
         if "ai_tools" in path.parts:

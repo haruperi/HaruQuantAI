@@ -1,0 +1,4363 @@
+{
+  "summary": {
+    "total_indicators": 73,
+    "total_functions_exports": 26,
+    "total_actions_exports": 19,
+    "total_comparisons_exports": 29,
+    "total_price_exports": 4,
+    "total_bar_time_exports": 5,
+    "total_types_exports": 12,
+    "total_selectable_blocks": 144
+  },
+  "manifest": {
+    "indicators": [
+      {
+        "symbol": "ADX",
+        "stable_id": "indicator.trend.adx",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.ADX",
+        "legacy_file": "app/include/indicators/trend/adx.py",
+        "canonical_file": "app/include/blocks/indicators/trend/adx.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "di_plus_crosses_above_di_minus",
+          "di_plus_crosses_below_di_minus",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising",
+          "is_trending"
+        ],
+        "calculation_helpers": [
+          "di_plus_higher_di_minus",
+          "di_plus_lower_di_minus"
+        ],
+        "docstring": "ADX family consolidating Main ADX, +DI, -DI lines and conditions."
+      },
+      {
+        "symbol": "ATR",
+        "stable_id": "indicator.volatility.atr",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.ATR",
+        "legacy_file": "app/include/indicators/volatility/atr.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/atr.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [
+          "true_range"
+        ],
+        "docstring": "Average True Range indicator family consolidating math and conditions."
+      },
+      {
+        "symbol": "AggressiveTradeImbalance",
+        "stable_id": "indicator.volume.order_flow",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.AggressiveTradeImbalance",
+        "legacy_file": "app/include/indicators/volume/order_flow.py",
+        "canonical_file": "app/include/blocks/indicators/volume/order_flow.py",
+        "calculate_parameters": [
+          {
+            "name": "open",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "window",
+            "default": "14",
+            "annotation": "int"
+          },
+          {
+            "name": "buy_volume",
+            "default": "None",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any] | None"
+          },
+          {
+            "name": "sell_volume",
+            "default": "None",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any] | None"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_buyer_dominated",
+          "is_falling",
+          "is_rising",
+          "is_seller_dominated"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Aggressive Trade Imbalance (ATI) normalized ratio in [-1.0, 1.0]."
+      },
+      {
+        "symbol": "AmihudIlliquidity",
+        "stable_id": "indicator.volatility.amihud",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.AmihudIlliquidity",
+        "legacy_file": "app/include/indicators/volatility/amihud.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/amihud.py",
+        "calculate_parameters": [
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "int"
+          },
+          {
+            "name": "multiplier",
+            "default": "1000000.0",
+            "annotation": "float"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_illiquid",
+          "is_liquid",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Amihud illiquidity price impact ratio indicator block."
+      },
+      {
+        "symbol": "AnchoredVWAP",
+        "stable_id": "indicator.volume.anchored_vwap",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.AnchoredVWAP",
+        "legacy_file": "app/include/indicators/volume/anchored_vwap.py",
+        "canonical_file": "app/include/blocks/indicators/volume/anchored_vwap.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "timestamps",
+            "default": "None",
+            "annotation": "numpy.ndarray[Any, Any] | list[Any] | None"
+          },
+          {
+            "name": "session_type",
+            "default": "1",
+            "annotation": "int"
+          },
+          {
+            "name": "std_dev_mult",
+            "default": "1.0",
+            "annotation": "float"
+          },
+          {
+            "name": "anchor_period",
+            "default": "0",
+            "annotation": "int"
+          },
+          {
+            "name": "anchor_indices",
+            "default": "None",
+            "annotation": "list[int] | set[int] | None"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above_upper",
+          "bar_closes_above_vwap",
+          "bar_closes_below_lower",
+          "bar_closes_below_vwap",
+          "bar_crosses_above_lower",
+          "bar_crosses_above_upper",
+          "bar_crosses_below_lower",
+          "bar_crosses_below_upper",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [
+          "fast_above_slow",
+          "fast_below_slow"
+        ],
+        "docstring": "Anchored VWAP indicator with volume-weighted standard deviation bands."
+      },
+      {
+        "symbol": "Aroon",
+        "stable_id": "indicator.trend.aroon",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.Aroon",
+        "legacy_file": "app/include/indicators/trend/aroon.py",
+        "canonical_file": "app/include/blocks/indicators/trend/aroon.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "down_is_falling",
+          "down_is_rising",
+          "up_is_falling",
+          "up_is_rising"
+        ],
+        "calculation_helpers": [
+          "down_falls_from_top",
+          "down_rises_from_bottom",
+          "up_falls_from_top",
+          "up_rises_from_bottom"
+        ],
+        "docstring": "Aroon indicator family."
+      },
+      {
+        "symbol": "AverageDailyRange",
+        "stable_id": "indicator.volatility.adr",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.AverageDailyRange",
+        "legacy_file": "app/include/indicators/volatility/adr.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/adr.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_compressed",
+          "is_falling",
+          "is_rising",
+          "is_stretched"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Average Daily Range (ADR) price travel and stretch ratio block."
+      },
+      {
+        "symbol": "AvgVolume",
+        "stable_id": "indicator.volume.avg_volume",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.AvgVolume",
+        "legacy_file": "app/include/indicators/volume/avg_volume.py",
+        "canonical_file": "app/include/blocks/indicators/volume/avg_volume.py",
+        "calculate_parameters": [
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising",
+          "volume_is_falling",
+          "volume_is_rising"
+        ],
+        "calculation_helpers": [
+          "volume_above_average"
+        ],
+        "docstring": "Average Volume indicator with trend and crossover condition evaluation."
+      },
+      {
+        "symbol": "AwesomeOscillator",
+        "stable_id": "indicator.momentum.awesome_oscillator",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.AwesomeOscillator",
+        "legacy_file": "app/include/indicators/momentum/awesome_oscillator.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/awesome_oscillator.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "fast_period",
+            "default": "5",
+            "annotation": "'int'"
+          },
+          {
+            "name": "slow_period",
+            "default": "34",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Awesome Oscillator indicator family."
+      },
+      {
+        "symbol": "BarRange",
+        "stable_id": "indicator.volatility.bar_range",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.BarRange",
+        "legacy_file": "app/include/indicators/volatility/bar_range.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/bar_range.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          }
+        ],
+        "condition_helpers": [
+          "is_biggest_range",
+          "is_falling",
+          "is_greater",
+          "is_highest_in_range",
+          "is_lower",
+          "is_lowest_in_range",
+          "is_rising",
+          "is_smallest_range"
+        ],
+        "calculation_helpers": [
+          "fixed_pips",
+          "highest_in_range",
+          "in_range_pips",
+          "lowest_in_range"
+        ],
+        "docstring": "Bar Range indicator family."
+      },
+      {
+        "symbol": "BearsPower",
+        "stable_id": "indicator.momentum.bears_power",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.BearsPower",
+        "legacy_file": "app/include/indicators/momentum/bears_power.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/bears_power.py",
+        "calculate_parameters": [
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Bears Power (Elder-Ray) indicator family."
+      },
+      {
+        "symbol": "BollingerBands",
+        "stable_id": "indicator.volatility.bollinger_bands",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.BollingerBands",
+        "legacy_file": "app/include/indicators/volatility/bollinger_bands.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/bollinger_bands.py",
+        "calculate_parameters": [
+          {
+            "name": "data",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "'int'"
+          },
+          {
+            "name": "deviation",
+            "default": "2.0",
+            "annotation": "'float'"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above_lower",
+          "bar_closes_above_upper",
+          "bar_closes_below_lower",
+          "bar_closes_below_upper",
+          "bar_opens_above_lower",
+          "bar_opens_above_lower_after_open_below",
+          "bar_opens_above_upper",
+          "bar_opens_above_upper_after_open_below",
+          "bar_opens_below_lower",
+          "bar_opens_below_lower_after_open_above",
+          "bar_opens_below_upper",
+          "bar_opens_below_upper_after_open_above",
+          "lower_is_falling",
+          "lower_is_rising",
+          "price_crosses_above_upper",
+          "price_crosses_below_lower",
+          "upper_is_falling",
+          "upper_is_rising"
+        ],
+        "calculation_helpers": [
+          "bb_range",
+          "bb_width_ratio",
+          "price_higher_upper",
+          "price_lower_lower"
+        ],
+        "docstring": "Bollinger Bands family consolidating Upper/Middle/Lower bands and conditions."
+      },
+      {
+        "symbol": "BullsPower",
+        "stable_id": "indicator.momentum.bulls_power",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.BullsPower",
+        "legacy_file": "app/include/indicators/momentum/bulls_power.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/bulls_power.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Bulls Power (Elder-Ray) indicator family."
+      },
+      {
+        "symbol": "CCI",
+        "stable_id": "indicator.momentum.cci",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.CCI",
+        "legacy_file": "app/include/indicators/momentum/cci.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/cci.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_greater",
+          "is_higher",
+          "is_lower",
+          "is_lower_level",
+          "is_rising"
+        ],
+        "calculation_helpers": [
+          "woodies_famir_down",
+          "woodies_famir_up",
+          "woodies_trend_down",
+          "woodies_trend_up",
+          "woodies_vegas_trade_down",
+          "woodies_vegas_trade_up",
+          "woodies_zero_line_break_down",
+          "woodies_zero_line_break_up",
+          "woodies_zlr_down",
+          "woodies_zlr_up"
+        ],
+        "docstring": "Commodity Channel Index family consolidating calculation and conditions."
+      },
+      {
+        "symbol": "CMF",
+        "stable_id": "indicator.volume.cmf",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.CMF",
+        "legacy_file": "app/include/indicators/volume/cmf.py",
+        "canonical_file": "app/include/blocks/indicators/volume/cmf.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_above_zero",
+          "is_below_zero",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Chaikin Money Flow volume accumulation/distribution indicator."
+      },
+      {
+        "symbol": "COT",
+        "stable_id": "indicator.volume.cot",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.COT",
+        "legacy_file": "app/include/indicators/volume/cot.py",
+        "canonical_file": "app/include/blocks/indicators/volume/cot.py",
+        "calculate_parameters": [
+          {
+            "name": "commercial_net",
+            "default": "<required>",
+            "annotation": "'_SeriesInput'"
+          },
+          {
+            "name": "speculator_net",
+            "default": "<required>",
+            "annotation": "'_SeriesInput'"
+          },
+          {
+            "name": "small_spec_net",
+            "default": "None",
+            "annotation": "'_SeriesInput | None'"
+          },
+          {
+            "name": "open_interest",
+            "default": "None",
+            "annotation": "'_SeriesInput | None'"
+          },
+          {
+            "name": "period_fast",
+            "default": "52",
+            "annotation": "'int'"
+          },
+          {
+            "name": "period_slow",
+            "default": "156",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_bearish_extreme",
+          "is_bearish_regime",
+          "is_bullish_extreme",
+          "is_bullish_regime",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising",
+          "score_crosses_above_zero",
+          "score_crosses_below_zero"
+        ],
+        "calculation_helpers": [
+          "accumulation_bearish",
+          "accumulation_bullish",
+          "convergence",
+          "cross_field_spread",
+          "crowding_unwind",
+          "extreme_bearish",
+          "extreme_bullish",
+          "extreme_exit_bearish",
+          "extreme_exit_bullish",
+          "extreme_persistence",
+          "extreme_unwind_bearish",
+          "extreme_unwind_bullish",
+          "field_value",
+          "full_cycle_exit_long",
+          "full_cycle_exit_short",
+          "full_cycle_long",
+          "full_cycle_short",
+          "hedger_accel_bearish",
+          "hedger_accel_bullish",
+          "hedger_div_conf_bearish",
+          "hedger_div_conf_bullish",
+          "higher_low",
+          "lower_high",
+          "momentum",
+          "momentum_rev_bearish",
+          "momentum_rev_bullish",
+          "multi_field_combo",
+          "multi_window_bearish",
+          "multi_window_bullish",
+          "neutral_zone",
+          "regime_shift_bearish",
+          "regime_shift_bullish",
+          "roc_bearish",
+          "roc_bullish",
+          "score_above",
+          "score_accel_bearish",
+          "score_accel_bullish",
+          "score_below",
+          "score_momentum_above",
+          "score_momentum_below",
+          "seasonal_bearish",
+          "seasonal_bullish",
+          "shift_52_vs_156_bearish",
+          "shift_52_vs_156_bullish",
+          "small_fade_bearish",
+          "small_fade_bullish",
+          "smart_dumb_bearish",
+          "smart_dumb_bullish",
+          "spec_exhaustion_long",
+          "spec_exhaustion_short",
+          "spec_trend_long",
+          "spec_trend_short",
+          "spread_zscore_bearish",
+          "spread_zscore_bullish",
+          "triple_div_bearish",
+          "triple_div_bullish",
+          "vix_proxy_bearish",
+          "vix_proxy_bullish"
+        ],
+        "docstring": "Commitment of Traders indicator computing CPI/CTI, scores, and conditions."
+      },
+      {
+        "symbol": "CandlestickPatterns",
+        "stable_id": "indicator.price_action.candlestick_patterns",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.CandlestickPatterns",
+        "legacy_file": "app/include/indicators/price_action/candlestick_patterns.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/candlestick_patterns.py",
+        "calculate_parameters": [
+          {
+            "name": "open",
+            "default": "<required>",
+            "annotation": "'list[float] | np.ndarray[Any, Any] | IndicatorSeries'"
+          },
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'list[float] | np.ndarray[Any, Any] | IndicatorSeries'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'list[float] | np.ndarray[Any, Any] | IndicatorSeries'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'list[float] | np.ndarray[Any, Any] | IndicatorSeries'"
+          },
+          {
+            "name": "doji_ratio",
+            "default": "None",
+            "annotation": "'float | None'"
+          },
+          {
+            "name": "tick_size",
+            "default": "0.0001",
+            "annotation": "'float'"
+          },
+          {
+            "name": "digits",
+            "default": "5",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "is_bearish_engulfing",
+          "is_bearish_pinbar",
+          "is_bearish_three_bar",
+          "is_bullish_engulfing",
+          "is_bullish_pinbar",
+          "is_bullish_three_bar",
+          "is_dark_cloud",
+          "is_doji",
+          "is_hammer",
+          "is_inside_bar",
+          "is_piercing_line",
+          "is_shooting_star"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Multi-pattern causal candlestick detector."
+      },
+      {
+        "symbol": "ChartPatterns",
+        "stable_id": "indicator.price_action.chart_patterns",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.ChartPatterns",
+        "legacy_file": "app/include/indicators/price_action/chart_patterns.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/chart_patterns.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "lookback",
+            "default": "50",
+            "annotation": "int"
+          },
+          {
+            "name": "tolerance_pct",
+            "default": "0.03",
+            "annotation": "float"
+          }
+        ],
+        "condition_helpers": [
+          "is_bearish_breakout",
+          "is_bullish_breakout",
+          "is_double_bottom",
+          "is_double_top"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Multi-structural chart pattern recognizer."
+      },
+      {
+        "symbol": "ChoppinessIndex",
+        "stable_id": "indicator.regime.choppiness",
+        "block_type": "indicator",
+        "category": "regime",
+        "legacy_import": "app.include.indicators.ChoppinessIndex",
+        "legacy_file": "app/include/indicators/regime/choppiness.py",
+        "canonical_file": "app/include/blocks/indicators/regime/choppiness.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "int"
+          },
+          {
+            "name": "lower_threshold",
+            "default": "38.2",
+            "annotation": "float"
+          },
+          {
+            "name": "upper_threshold",
+            "default": "61.8",
+            "annotation": "float"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_choppy",
+          "is_in_transition",
+          "is_trending"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Choppiness Index indicator and market trend regime classifier."
+      },
+      {
+        "symbol": "CumulativeVolumeDelta",
+        "stable_id": "indicator.volume.order_flow",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.CumulativeVolumeDelta",
+        "legacy_file": "app/include/indicators/volume/order_flow.py",
+        "canonical_file": "app/include/blocks/indicators/volume/order_flow.py",
+        "calculate_parameters": [
+          {
+            "name": "open",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "window",
+            "default": "14",
+            "annotation": "int"
+          },
+          {
+            "name": "buy_volume",
+            "default": "None",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any] | None"
+          },
+          {
+            "name": "sell_volume",
+            "default": "None",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any] | None"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above_zero",
+          "crosses_below_zero",
+          "is_falling",
+          "is_negative",
+          "is_positive",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Cumulative Volume Delta (CVD) tracking net aggressive buying/selling volume."
+      },
+      {
+        "symbol": "DeMarker",
+        "stable_id": "indicator.momentum.demarker",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.DeMarker",
+        "legacy_file": "app/include/indicators/momentum/demarker.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/demarker.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "DeMarker oscillator indicator family."
+      },
+      {
+        "symbol": "DirectionalIndex",
+        "stable_id": "indicator.trend.directional_index",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.DirectionalIndex",
+        "legacy_file": "app/include/indicators/trend/directional_index.py",
+        "canonical_file": "app/include/blocks/indicators/trend/directional_index.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "di_crosses_above",
+          "di_crosses_below",
+          "di_minus_changes_down",
+          "di_minus_changes_up",
+          "di_plus_changes_down",
+          "di_plus_changes_up"
+        ],
+        "calculation_helpers": [
+          "di_minus_falling",
+          "di_minus_rising",
+          "di_plus_falling",
+          "di_plus_higher",
+          "di_plus_lower",
+          "di_plus_rising"
+        ],
+        "docstring": "Directional Index indicator family."
+      },
+      {
+        "symbol": "DonchianChannels",
+        "stable_id": "indicator.trend.donchian_channel",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.DonchianChannels",
+        "legacy_file": "app/include/indicators/trend/donchian_channel.py",
+        "canonical_file": "app/include/blocks/indicators/trend/donchian_channel.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "int"
+          },
+          {
+            "name": "offset",
+            "default": "0",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above_middle",
+          "crosses_above_upper",
+          "crosses_below_lower",
+          "crosses_below_middle",
+          "is_above_upper",
+          "is_below_lower",
+          "is_squeezed"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Donchian Channels breakout envelope and volatility width block."
+      },
+      {
+        "symbol": "Fibo",
+        "stable_id": "indicator.price_action.fibo",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.Fibo",
+        "legacy_file": "app/include/indicators/price_action/fibo.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/fibo.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "open_prices",
+            "default": "None",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any] | None"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "int"
+          },
+          {
+            "name": "custom_level",
+            "default": "None",
+            "annotation": "float | None"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_above_level",
+          "is_below_level"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Fibonacci Retracement and Extension indicator block."
+      },
+      {
+        "symbol": "Fractal",
+        "stable_id": "indicator.price_action.fractal",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.Fractal",
+        "legacy_file": "app/include/indicators/price_action/fractal.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/fractal.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "fractal_bars",
+            "default": "5",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "is_bearish_fractal",
+          "is_bullish_fractal"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Bill Williams Fractal indicator detecting local peak and trough formations."
+      },
+      {
+        "symbol": "GannHiLo",
+        "stable_id": "indicator.trend.gann_hi_lo",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.GannHiLo",
+        "legacy_file": "app/include/indicators/trend/gann_hi_lo.py",
+        "canonical_file": "app/include/blocks/indicators/trend/gann_hi_lo.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "10",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "is_downtrend",
+          "is_uptrend"
+        ],
+        "calculation_helpers": [
+          "turns_downtrend",
+          "turns_uptrend"
+        ],
+        "docstring": "Gann High-Low Activator indicator with trend regime tracking."
+      },
+      {
+        "symbol": "GarmanKlassVolatility",
+        "stable_id": "indicator.volatility.garman_klass",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.GarmanKlassVolatility",
+        "legacy_file": "app/include/indicators/volatility/garman_klass.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/garman_klass.py",
+        "calculate_parameters": [
+          {
+            "name": "open",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "int"
+          },
+          {
+            "name": "annualize",
+            "default": "False",
+            "annotation": "bool"
+          },
+          {
+            "name": "trading_periods",
+            "default": "252",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_elevated",
+          "is_falling",
+          "is_rising",
+          "is_subdued"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Garman-Klass OHLC volatility estimator block."
+      },
+      {
+        "symbol": "HeikenAshi",
+        "stable_id": "indicator.price_action.heiken_ashi",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.HeikenAshi",
+        "legacy_file": "app/include/indicators/price_action/heiken_ashi.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/heiken_ashi.py",
+        "calculate_parameters": [
+          {
+            "name": "open_prices",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          }
+        ],
+        "condition_helpers": [
+          "is_bearish",
+          "is_bullish"
+        ],
+        "calculation_helpers": [
+          "turns_bearish",
+          "turns_bullish"
+        ],
+        "docstring": "Heiken Ashi smoothed candlestick generator with trend condition helpers."
+      },
+      {
+        "symbol": "HighestLowest",
+        "stable_id": "indicator.price_action.highest_lowest",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.HighestLowest",
+        "legacy_file": "app/include/indicators/price_action/highest_lowest.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/highest_lowest.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "None",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any] | None"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "bar_opens_above_highest",
+          "bar_opens_above_lowest",
+          "bar_opens_below_highest",
+          "bar_opens_below_lowest"
+        ],
+        "calculation_helpers": [
+          "cot_emergency_exit_long",
+          "cot_emergency_exit_short"
+        ],
+        "docstring": "Highest and Lowest price extrema indicator with breakout condition evaluators."
+      },
+      {
+        "symbol": "HullMovingAverage",
+        "stable_id": "indicator.trend.hull_moving_average",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.HullMovingAverage",
+        "legacy_file": "app/include/indicators/trend/hull_moving_average.py",
+        "canonical_file": "app/include/blocks/indicators/trend/hull_moving_average.py",
+        "calculate_parameters": [
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [
+          "faster_above_slower",
+          "faster_below_slower"
+        ],
+        "docstring": "Hull Moving Average indicator family."
+      },
+      {
+        "symbol": "HurstExponent",
+        "stable_id": "indicator.regime.hurst",
+        "block_type": "indicator",
+        "category": "regime",
+        "legacy_import": "app.include.indicators.HurstExponent",
+        "legacy_file": "app/include/indicators/regime/hurst.py",
+        "canonical_file": "app/include/blocks/indicators/regime/hurst.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "window",
+            "default": "100",
+            "annotation": "int"
+          },
+          {
+            "name": "min_scale",
+            "default": "8",
+            "annotation": "int"
+          },
+          {
+            "name": "max_scale",
+            "default": "50",
+            "annotation": "int"
+          },
+          {
+            "name": "scale_count",
+            "default": "5",
+            "annotation": "int"
+          },
+          {
+            "name": "lower_threshold",
+            "default": "0.45",
+            "annotation": "float"
+          },
+          {
+            "name": "upper_threshold",
+            "default": "0.55",
+            "annotation": "float"
+          }
+        ],
+        "condition_helpers": [
+          "is_anti_persistent",
+          "is_persistent",
+          "is_random_walk"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Hurst Exponent statistical persistence regime indicator."
+      },
+      {
+        "symbol": "Ichimoku",
+        "stable_id": "indicator.trend.ichimoku",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.Ichimoku",
+        "legacy_file": "app/include/indicators/trend/ichimoku.py",
+        "canonical_file": "app/include/blocks/indicators/trend/ichimoku.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "tenkan",
+            "default": "9",
+            "annotation": "'int'"
+          },
+          {
+            "name": "kijun",
+            "default": "26",
+            "annotation": "'int'"
+          },
+          {
+            "name": "senkou",
+            "default": "52",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [],
+        "calculation_helpers": [
+          "kijun_sen_cross_bearish",
+          "kijun_sen_cross_bullish",
+          "kumo_breakout_bearish",
+          "kumo_breakout_bullish",
+          "senkou_span_cross_bearish",
+          "senkou_span_cross_bullish",
+          "tenkan_kijun_cross_bearish",
+          "tenkan_kijun_cross_bullish"
+        ],
+        "docstring": "Ichimoku Kinko Hyo indicator block."
+      },
+      {
+        "symbol": "KAMA",
+        "stable_id": "indicator.trend.kama",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.KAMA",
+        "legacy_file": "app/include/indicators/trend/kama.py",
+        "canonical_file": "app/include/blocks/indicators/trend/kama.py",
+        "calculate_parameters": [
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "er_period",
+            "default": "10",
+            "annotation": "'int'"
+          },
+          {
+            "name": "fast_period",
+            "default": "2",
+            "annotation": "'int'"
+          },
+          {
+            "name": "slow_period",
+            "default": "30",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above",
+          "bar_closes_below",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [
+          "fast_above_slow",
+          "fast_below_slow"
+        ],
+        "docstring": "Kaufman's Adaptive Moving Average indicator family."
+      },
+      {
+        "symbol": "KaufmanEfficiencyRatio",
+        "stable_id": "indicator.trend.kaufman_efficiency_ratio",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.KaufmanEfficiencyRatio",
+        "legacy_file": "app/include/indicators/trend/kaufman_efficiency_ratio.py",
+        "canonical_file": "app/include/blocks/indicators/trend/kaufman_efficiency_ratio.py",
+        "calculate_parameters": [
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "10",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "is_above_level",
+          "is_below_level",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Kaufman Efficiency Ratio indicator family."
+      },
+      {
+        "symbol": "KeltnerChannel",
+        "stable_id": "indicator.volatility.keltner_channel",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.KeltnerChannel",
+        "legacy_file": "app/include/indicators/volatility/keltner_channel.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/keltner_channel.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "'int'"
+          },
+          {
+            "name": "deviation",
+            "default": "1.5",
+            "annotation": "'float'"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above_lower",
+          "bar_closes_above_upper",
+          "bar_closes_below_lower",
+          "bar_closes_below_upper",
+          "bar_opens_above_lower",
+          "bar_opens_above_lower_after_open_below",
+          "bar_opens_above_upper",
+          "bar_opens_above_upper_after_open_below",
+          "bar_opens_below_lower",
+          "bar_opens_below_lower_after_open_above",
+          "bar_opens_below_upper",
+          "bar_opens_below_upper_after_open_above",
+          "lower_is_falling",
+          "lower_is_rising",
+          "upper_is_falling",
+          "upper_is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Keltner Channel indicator family."
+      },
+      {
+        "symbol": "LaguerreRSI",
+        "stable_id": "indicator.momentum.laguerre_rsi",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.LaguerreRSI",
+        "legacy_file": "app/include/indicators/momentum/laguerre_rsi.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/laguerre_rsi.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "gamma",
+            "default": "0.5",
+            "annotation": "float"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "John Ehlers' 4-element Laguerre filter Relative Strength Index."
+      },
+      {
+        "symbol": "LevelClustering",
+        "stable_id": "indicator.price_action.level_clustering",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.LevelClustering",
+        "legacy_file": "app/include/indicators/price_action/level_clustering.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/level_clustering.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "lookback",
+            "default": "50",
+            "annotation": "int"
+          },
+          {
+            "name": "tolerance",
+            "default": "1.0",
+            "annotation": "float"
+          }
+        ],
+        "condition_helpers": [
+          "is_at_resistance",
+          "is_at_support",
+          "is_near_cluster"
+        ],
+        "calculation_helpers": [
+          "has_cluster"
+        ],
+        "docstring": "Structural swing pivot level clustering block."
+      },
+      {
+        "symbol": "LinReg",
+        "stable_id": "indicator.trend.lin_reg",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.LinReg",
+        "legacy_file": "app/include/indicators/trend/lin_reg.py",
+        "canonical_file": "app/include/blocks/indicators/trend/lin_reg.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above",
+          "bar_closes_below",
+          "bar_opens_above",
+          "bar_opens_above_after_open_below",
+          "bar_opens_below",
+          "bar_opens_below_after_open_above",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Linear Regression indicator calculating least-squares regression lines."
+      },
+      {
+        "symbol": "MACD",
+        "stable_id": "indicator.momentum.macd",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.MACD",
+        "legacy_file": "app/include/indicators/momentum/macd.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/macd.py",
+        "calculate_parameters": [
+          {
+            "name": "data",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "fast",
+            "default": "12",
+            "annotation": "'int'"
+          },
+          {
+            "name": "slow",
+            "default": "26",
+            "annotation": "'int'"
+          },
+          {
+            "name": "smooth",
+            "default": "9",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "main_changes_down",
+          "main_changes_up",
+          "main_crosses_above",
+          "main_crosses_above_signal",
+          "main_crosses_above_zero",
+          "main_crosses_below",
+          "main_crosses_below_signal",
+          "main_crosses_below_zero",
+          "main_is_falling",
+          "main_is_higher",
+          "main_is_lower",
+          "main_is_rising",
+          "signal_is_falling",
+          "signal_is_rising"
+        ],
+        "calculation_helpers": [
+          "main_higher_signal",
+          "main_higher_zero",
+          "main_lower_signal",
+          "main_lower_zero"
+        ],
+        "docstring": "MACD family consolidating Main/Signal/Histogram and crossover conditions."
+      },
+      {
+        "symbol": "MFI",
+        "stable_id": "indicator.volume.obv",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.MFI",
+        "legacy_file": "app/include/indicators/volume/obv.py",
+        "canonical_file": "app/include/blocks/indicators/volume/obv.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_above_level",
+          "is_below_level",
+          "is_falling",
+          "is_overbought",
+          "is_oversold",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Money Flow Index volume-weighted momentum oscillator."
+      },
+      {
+        "symbol": "MTATR",
+        "stable_id": "indicator.volatility.mt_atr",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.MTATR",
+        "legacy_file": "app/include/indicators/volatility/mt_atr.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/mt_atr.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_greater",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "MetaTrader Average True Range indicator family (SMA-smoothed True Range)."
+      },
+      {
+        "symbol": "MTKeltnerChannel",
+        "stable_id": "indicator.volatility.mt_keltner_channel",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.MTKeltnerChannel",
+        "legacy_file": "app/include/indicators/volatility/mt_keltner_channel.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/mt_keltner_channel.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "'int'"
+          },
+          {
+            "name": "deviation",
+            "default": "1.5",
+            "annotation": "'float'"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above_lower",
+          "bar_closes_above_upper",
+          "bar_closes_below_lower",
+          "bar_closes_below_upper",
+          "lower_is_falling",
+          "lower_is_rising",
+          "upper_is_falling",
+          "upper_is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "MetaTrader Keltner Channel indicator family (Close-based middle band)."
+      },
+      {
+        "symbol": "MarketRegimeResolver",
+        "stable_id": "indicator.regime.regime_resolver",
+        "block_type": "indicator",
+        "category": "regime",
+        "legacy_import": "app.include.indicators.MarketRegimeResolver",
+        "legacy_file": "app/include/indicators/regime/regime_resolver.py",
+        "canonical_file": "app/include/blocks/indicators/regime/regime_resolver.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "None",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any] | None"
+          },
+          {
+            "name": "adx_period",
+            "default": "14",
+            "annotation": "int"
+          },
+          {
+            "name": "adx_threshold",
+            "default": "25.0",
+            "annotation": "float"
+          },
+          {
+            "name": "chop_period",
+            "default": "14",
+            "annotation": "int"
+          },
+          {
+            "name": "chop_lower",
+            "default": "38.2",
+            "annotation": "float"
+          },
+          {
+            "name": "chop_upper",
+            "default": "61.8",
+            "annotation": "float"
+          },
+          {
+            "name": "donchian_period",
+            "default": "20",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "is_breakout",
+          "is_downtrend",
+          "is_ranging",
+          "is_uptrend"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Multi-factor market regime resolver and confidence estimator."
+      },
+      {
+        "symbol": "Momentum",
+        "stable_id": "indicator.momentum.momentum",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.Momentum",
+        "legacy_file": "app/include/indicators/momentum/momentum.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/momentum.py",
+        "calculate_parameters": [
+          {
+            "name": "data",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Momentum indicator family."
+      },
+      {
+        "symbol": "MovingAverage",
+        "stable_id": "indicator.trend.moving_average",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.MovingAverage",
+        "legacy_file": "app/include/indicators/trend/moving_average.py",
+        "canonical_file": "app/include/blocks/indicators/trend/moving_average.py",
+        "calculate_parameters": [
+          {
+            "name": "data",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          },
+          {
+            "name": "method",
+            "default": "0",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above",
+          "bar_closes_below",
+          "bar_opens_above",
+          "bar_opens_above_after_open_below",
+          "bar_opens_below",
+          "bar_opens_below_after_open_above",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_greater",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [
+          "ema",
+          "lwma",
+          "sma",
+          "smma",
+          "tema"
+        ],
+        "docstring": "Moving Average family supporting SMA, EMA, SMMA, LWMA, and TEMA methods."
+      },
+      {
+        "symbol": "OBV",
+        "stable_id": "indicator.volume.obv",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.OBV",
+        "legacy_file": "app/include/indicators/volume/obv.py",
+        "canonical_file": "app/include/blocks/indicators/volume/obv.py",
+        "calculate_parameters": [
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_above_level",
+          "is_below_level",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "On-Balance Volume cumulative volume momentum indicator."
+      },
+      {
+        "symbol": "OSMA",
+        "stable_id": "indicator.momentum.osma",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.OSMA",
+        "legacy_file": "app/include/indicators/momentum/osma.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/osma.py",
+        "calculate_parameters": [
+          {
+            "name": "data",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "fast_ema",
+            "default": "12",
+            "annotation": "'int'"
+          },
+          {
+            "name": "slow_ema",
+            "default": "26",
+            "annotation": "'int'"
+          },
+          {
+            "name": "signal_period",
+            "default": "9",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_greater",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Moving Average of Oscillator (OSMA) indicator family."
+      },
+      {
+        "symbol": "ParabolicSAR",
+        "stable_id": "indicator.trend.parabolic_sar",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.ParabolicSAR",
+        "legacy_file": "app/include/indicators/trend/parabolic_sar.py",
+        "canonical_file": "app/include/blocks/indicators/trend/parabolic_sar.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "step",
+            "default": "0.02",
+            "annotation": "'float'"
+          },
+          {
+            "name": "maximum",
+            "default": "0.2",
+            "annotation": "'float'"
+          }
+        ],
+        "condition_helpers": [
+          "is_bar_higher",
+          "is_bar_lower",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Parabolic SAR indicator family."
+      },
+      {
+        "symbol": "ParkinsonVolatility",
+        "stable_id": "indicator.volatility.parkinson",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.ParkinsonVolatility",
+        "legacy_file": "app/include/indicators/volatility/parkinson.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/parkinson.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "int"
+          },
+          {
+            "name": "annualize",
+            "default": "False",
+            "annotation": "bool"
+          },
+          {
+            "name": "trading_periods",
+            "default": "252",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_elevated",
+          "is_falling",
+          "is_rising",
+          "is_subdued"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Parkinson High-Low extreme value volatility estimator."
+      },
+      {
+        "symbol": "Pivots",
+        "stable_id": "indicator.price_action.pivots",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.Pivots",
+        "legacy_file": "app/include/indicators/price_action/pivots.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/pivots.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "1",
+            "annotation": "int"
+          },
+          {
+            "name": "timestamps",
+            "default": "None",
+            "annotation": "numpy.ndarray[Any, Any] | None"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_above_pp",
+          "is_below_pp"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Floor Trader Pivot Points indicator calculating multi-tier levels."
+      },
+      {
+        "symbol": "PriceGap",
+        "stable_id": "indicator.price_action.price_gap",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.PriceGap",
+        "legacy_file": "app/include/indicators/price_action/price_gap.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/price_gap.py",
+        "calculate_parameters": [
+          {
+            "name": "open",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "list[float] | numpy.ndarray[Any, Any] | app.include.contracts.DataframeSeries"
+          },
+          {
+            "name": "full_gap",
+            "default": "True",
+            "annotation": "bool"
+          }
+        ],
+        "condition_helpers": [
+          "is_gap_down",
+          "is_gap_filled",
+          "is_gap_up"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Price Gap detection and fill tracking block."
+      },
+      {
+        "symbol": "PriceVelocity",
+        "stable_id": "indicator.momentum.price_velocity",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.PriceVelocity",
+        "legacy_file": "app/include/indicators/momentum/price_velocity.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/price_velocity.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "10",
+            "annotation": "int"
+          },
+          {
+            "name": "smooth_period",
+            "default": "1",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above_zero",
+          "crosses_below_zero",
+          "is_accelerating_down",
+          "is_accelerating_up",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Price velocity and momentum acceleration indicator block."
+      },
+      {
+        "symbol": "QQE",
+        "stable_id": "indicator.momentum.qqe",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.QQE",
+        "legacy_file": "app/include/indicators/momentum/qqe.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/qqe.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "rsi_period",
+            "default": "14",
+            "annotation": "'int'"
+          },
+          {
+            "name": "sf",
+            "default": "5",
+            "annotation": "'int'"
+          },
+          {
+            "name": "wf",
+            "default": "4.236",
+            "annotation": "'float'"
+          }
+        ],
+        "condition_helpers": [
+          "value1_changes_down",
+          "value1_changes_up",
+          "value1_crosses_above",
+          "value1_crosses_above_value2",
+          "value1_crosses_below",
+          "value1_crosses_below_value2",
+          "value1_is_falling",
+          "value1_is_higher",
+          "value1_is_lower",
+          "value1_is_rising",
+          "value2_is_falling",
+          "value2_is_rising"
+        ],
+        "calculation_helpers": [
+          "value1_higher_value2",
+          "value1_lower_value2"
+        ],
+        "docstring": "Quantitative Qualitative Estimation indicator block."
+      },
+      {
+        "symbol": "ROC",
+        "stable_id": "indicator.momentum.roc",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.ROC",
+        "legacy_file": "app/include/indicators/momentum/roc.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/roc.py",
+        "calculate_parameters": [
+          {
+            "name": "data",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "5",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_greater",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Rate of Change (ROC) indicator family."
+      },
+      {
+        "symbol": "RSI",
+        "stable_id": "indicator.momentum.rsi",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.RSI",
+        "legacy_file": "app/include/indicators/momentum/rsi.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/rsi.py",
+        "calculate_parameters": [
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Relative Strength Index indicator family consolidating math and conditions."
+      },
+      {
+        "symbol": "Reflex",
+        "stable_id": "indicator.momentum.reflex",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.Reflex",
+        "legacy_file": "app/include/indicators/momentum/reflex.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/reflex.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "int"
+          },
+          {
+            "name": "slow_period",
+            "default": "None",
+            "annotation": "int | None"
+          }
+        ],
+        "condition_helpers": [
+          "changes_direction_down",
+          "changes_direction_up",
+          "fast_crosses_above_slow",
+          "fast_crosses_below_slow",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "John Ehlers' Reflex cycle indicator block."
+      },
+      {
+        "symbol": "RogersSatchellVolatility",
+        "stable_id": "indicator.volatility.rogers_satchell",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.RogersSatchellVolatility",
+        "legacy_file": "app/include/indicators/volatility/rogers_satchell.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/rogers_satchell.py",
+        "calculate_parameters": [
+          {
+            "name": "open",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "int"
+          },
+          {
+            "name": "annualize",
+            "default": "False",
+            "annotation": "bool"
+          },
+          {
+            "name": "trading_periods",
+            "default": "252",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_elevated",
+          "is_falling",
+          "is_rising",
+          "is_subdued"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Rogers-Satchell non-zero drift OHLC volatility estimator block."
+      },
+      {
+        "symbol": "SRPercentRank",
+        "stable_id": "indicator.volatility.sr_percent_rank",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.SRPercentRank",
+        "legacy_file": "app/include/indicators/volatility/sr_percent_rank.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/sr_percent_rank.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "mode",
+            "default": "1",
+            "annotation": "'int'"
+          },
+          {
+            "name": "length",
+            "default": "120",
+            "annotation": "'int'"
+          },
+          {
+            "name": "atr_period",
+            "default": "12",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "is_above_level",
+          "is_above_level_x_bars",
+          "is_below_level",
+          "is_below_level_x_bars",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Support/Resistance Percent Rank indicator family."
+      },
+      {
+        "symbol": "SchaffTrendCycle",
+        "stable_id": "indicator.momentum.schaff_trend_cycle",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.SchaffTrendCycle",
+        "legacy_file": "app/include/indicators/momentum/schaff_trend_cycle.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/schaff_trend_cycle.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "stoch_period",
+            "default": "10",
+            "annotation": "int"
+          },
+          {
+            "name": "fast_period",
+            "default": "20",
+            "annotation": "int"
+          },
+          {
+            "name": "slow_period",
+            "default": "50",
+            "annotation": "int"
+          },
+          {
+            "name": "factor",
+            "default": "0.5",
+            "annotation": "float"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_above_level",
+          "is_below_level",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Doug Schaff's Trend Cycle (STC) double-smoothed stochastic MACD indicator."
+      },
+      {
+        "symbol": "StdDev",
+        "stable_id": "indicator.volatility.std_dev",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.StdDev",
+        "legacy_file": "app/include/indicators/volatility/std_dev.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/std_dev.py",
+        "calculate_parameters": [
+          {
+            "name": "data",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "20",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Standard Deviation indicator family."
+      },
+      {
+        "symbol": "Stochastic",
+        "stable_id": "indicator.momentum.stochastic",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.Stochastic",
+        "legacy_file": "app/include/indicators/momentum/stochastic.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/stochastic.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'np.ndarray | Sequence[float]'"
+          },
+          {
+            "name": "k_period",
+            "default": "14",
+            "annotation": "'int'"
+          },
+          {
+            "name": "d_period",
+            "default": "3",
+            "annotation": "'int'"
+          },
+          {
+            "name": "slowing",
+            "default": "3",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "d_changes_down",
+          "d_changes_up",
+          "d_crosses_above",
+          "d_crosses_below",
+          "d_is_falling",
+          "d_is_higher",
+          "d_is_lower",
+          "d_is_rising",
+          "k_crosses_above",
+          "k_crosses_above_d",
+          "k_crosses_below",
+          "k_crosses_below_d"
+        ],
+        "calculation_helpers": [
+          "k_higher_d",
+          "k_lower_d"
+        ],
+        "docstring": "Stochastic Oscillator family consolidating %K, %D lines and conditions."
+      },
+      {
+        "symbol": "Supertrend",
+        "stable_id": "indicator.trend.supertrend",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.Supertrend",
+        "legacy_file": "app/include/indicators/trend/supertrend.py",
+        "canonical_file": "app/include/blocks/indicators/trend/supertrend.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "mode",
+            "default": "1",
+            "annotation": "'int'"
+          },
+          {
+            "name": "atr_period",
+            "default": "24",
+            "annotation": "'int'"
+          },
+          {
+            "name": "atr_mult",
+            "default": "3.0",
+            "annotation": "'float'"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above",
+          "bar_closes_below",
+          "is_downtrend",
+          "is_in_range",
+          "is_uptrend"
+        ],
+        "calculation_helpers": [],
+        "docstring": "SuperTrend indicator family."
+      },
+      {
+        "symbol": "TEMA",
+        "stable_id": "indicator.trend.tema",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.TEMA",
+        "legacy_file": "app/include/indicators/trend/tema.py",
+        "canonical_file": "app/include/blocks/indicators/trend/tema.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_above_price",
+          "is_below_price",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Triple Exponential Moving Average (TEMA) trend smoothing block."
+      },
+      {
+        "symbol": "TPOProfile",
+        "stable_id": "indicator.volume.tpo_profile",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.TPOProfile",
+        "legacy_file": "app/include/indicators/volume/tpo_profile.py",
+        "canonical_file": "app/include/blocks/indicators/volume/tpo_profile.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "48",
+            "annotation": "int"
+          },
+          {
+            "name": "profile_rows",
+            "default": "40",
+            "annotation": "int"
+          },
+          {
+            "name": "ib_bars",
+            "default": "2",
+            "annotation": "int"
+          },
+          {
+            "name": "value_area_pct",
+            "default": "0.7",
+            "annotation": "float"
+          }
+        ],
+        "condition_helpers": [],
+        "calculation_helpers": [
+          "ib_breakout_down",
+          "ib_breakout_up",
+          "price_above_poc",
+          "price_below_poc",
+          "price_inside_va",
+          "price_outside_va"
+        ],
+        "docstring": "TPO Profile indicator with Initial Balance and Value Area boundaries."
+      },
+      {
+        "symbol": "Trend",
+        "stable_id": "indicator.trend.trend",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.Trend",
+        "legacy_file": "app/include/indicators/trend/trend.py",
+        "canonical_file": "app/include/blocks/indicators/trend/trend.py",
+        "calculate_parameters": [
+          {
+            "name": "price",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "period",
+            "default": "200",
+            "annotation": "int"
+          },
+          {
+            "name": "method",
+            "default": "sma",
+            "annotation": "str"
+          }
+        ],
+        "condition_helpers": [
+          "is_downtrend",
+          "is_uptrend"
+        ],
+        "calculation_helpers": [
+          "turns_downtrend",
+          "turns_uptrend"
+        ],
+        "docstring": "Trend regime classifier evaluating price position relative to baseline."
+      },
+      {
+        "symbol": "TrueRange",
+        "stable_id": "indicator.volatility.true_range",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.TrueRange",
+        "legacy_file": "app/include/indicators/volatility/true_range.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/true_range.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_greater",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "True Range indicator family."
+      },
+      {
+        "symbol": "UlcerIndex",
+        "stable_id": "indicator.volatility.ulcer_index",
+        "block_type": "indicator",
+        "category": "volatility",
+        "legacy_import": "app.include.indicators.UlcerIndex",
+        "legacy_file": "app/include/indicators/volatility/ulcer_index.py",
+        "canonical_file": "app/include/blocks/indicators/volatility/ulcer_index.py",
+        "calculate_parameters": [
+          {
+            "name": "data",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "mode",
+            "default": "1",
+            "annotation": "'int'"
+          },
+          {
+            "name": "period",
+            "default": "24",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_greater",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Ulcer Index indicator family."
+      },
+      {
+        "symbol": "VWAP",
+        "stable_id": "indicator.volume.vwap",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.VWAP",
+        "legacy_file": "app/include/indicators/volume/vwap.py",
+        "canonical_file": "app/include/blocks/indicators/volume/vwap.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "open_prices",
+            "default": "None",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any] | None"
+          },
+          {
+            "name": "period",
+            "default": "10",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "bar_closes_above",
+          "bar_closes_below",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_rising"
+        ],
+        "calculation_helpers": [
+          "fast_above_slow",
+          "fast_below_slow"
+        ],
+        "docstring": "Rolling Volume Weighted Average Price indicator with condition helpers."
+      },
+      {
+        "symbol": "VolumeProfile",
+        "stable_id": "indicator.volume.volume_profile",
+        "block_type": "indicator",
+        "category": "volume",
+        "legacy_import": "app.include.indicators.VolumeProfile",
+        "legacy_file": "app/include/indicators/volume/volume_profile.py",
+        "canonical_file": "app/include/blocks/indicators/volume/volume_profile.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | Sequence[float] | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | Sequence[float] | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | Sequence[float] | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "volume",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | Sequence[float] | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "open_prices",
+            "default": "None",
+            "annotation": "'IndicatorSeries | Sequence[float] | np.ndarray[Any, Any] | None'"
+          },
+          {
+            "name": "period",
+            "default": "50",
+            "annotation": "'int'"
+          },
+          {
+            "name": "profile_rows",
+            "default": "50",
+            "annotation": "'int'"
+          },
+          {
+            "name": "value_area_pct",
+            "default": "0.7",
+            "annotation": "'float'"
+          },
+          {
+            "name": "ib_bars",
+            "default": "4",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "is_narrow_value_area",
+          "is_wide_value_area",
+          "poc_is_falling",
+          "poc_is_rising",
+          "vah_is_falling",
+          "vah_is_rising",
+          "val_is_falling",
+          "val_is_rising"
+        ],
+        "calculation_helpers": [
+          "bear_above_bull",
+          "bottom_heavy_poc",
+          "bull_above_bear",
+          "calculate_custom_hours",
+          "calculate_custom_hours_multi_session",
+          "excess_reversal_long",
+          "excess_reversal_short",
+          "falling_poc",
+          "high_delta",
+          "high_neg_delta",
+          "ib_breakout_down",
+          "ib_breakout_up",
+          "ib_rejection_long",
+          "ib_rejection_short",
+          "late_acceptance_failure_long",
+          "late_acceptance_failure_short",
+          "open_drive_long",
+          "open_drive_short",
+          "poc_at_edge_long",
+          "poc_at_edge_short",
+          "poc_magnet_long",
+          "poc_magnet_short",
+          "price_above_poc",
+          "price_below_poc",
+          "price_inside_va",
+          "price_outside_va",
+          "rising_poc",
+          "top_heavy_poc",
+          "vah_test_rejection",
+          "val_test_rejection",
+          "value_return_long",
+          "value_return_short",
+          "value_shift_down",
+          "value_shift_up",
+          "vwap_cross_down",
+          "vwap_cross_up"
+        ],
+        "docstring": "Volume Profile indicator extracting POC, VAH, VAL, Delta, IB, and conditions."
+      },
+      {
+        "symbol": "Vortex",
+        "stable_id": "indicator.trend.vortex",
+        "block_type": "indicator",
+        "category": "trend",
+        "legacy_import": "app.include.indicators.Vortex",
+        "legacy_file": "app/include/indicators/trend/vortex.py",
+        "canonical_file": "app/include/blocks/indicators/trend/vortex.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_trend_down",
+          "changes_trend_up",
+          "is_downtrend",
+          "is_uptrend"
+        ],
+        "calculation_helpers": [
+          "vi_plus_falling",
+          "vi_plus_rising"
+        ],
+        "docstring": "Vortex indicator family."
+      },
+      {
+        "symbol": "WaveTrend",
+        "stable_id": "indicator.momentum.wave_trend",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.WaveTrend",
+        "legacy_file": "app/include/indicators/momentum/wave_trend.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/wave_trend.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'IndicatorSeries | np.ndarray[Any, Any]'"
+          },
+          {
+            "name": "low",
+            "default": "None",
+            "annotation": "'IndicatorSeries | np.ndarray[Any, Any] | None'"
+          },
+          {
+            "name": "close",
+            "default": "None",
+            "annotation": "'IndicatorSeries | np.ndarray[Any, Any] | None'"
+          },
+          {
+            "name": "channel_length",
+            "default": "10",
+            "annotation": "'int'"
+          },
+          {
+            "name": "average_length",
+            "default": "21",
+            "annotation": "'int'"
+          },
+          {
+            "name": "signal_length",
+            "default": "4",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "wt1_changes_down",
+          "wt1_changes_up",
+          "wt1_crosses_above",
+          "wt1_crosses_above_wt2",
+          "wt1_crosses_above_zero",
+          "wt1_crosses_below",
+          "wt1_crosses_below_wt2",
+          "wt1_crosses_below_zero",
+          "wt1_is_falling",
+          "wt1_is_higher",
+          "wt1_is_lower",
+          "wt1_is_rising",
+          "wt2_is_falling",
+          "wt2_is_rising"
+        ],
+        "calculation_helpers": [
+          "wt1_higher_wt2",
+          "wt1_higher_zero",
+          "wt1_lower_wt2",
+          "wt1_lower_zero"
+        ],
+        "docstring": "WaveTrend oscillator block generating Main (WT1) and Signal (WT2) lines."
+      },
+      {
+        "symbol": "WilliamsPR",
+        "stable_id": "indicator.momentum.williams_pr",
+        "block_type": "indicator",
+        "category": "momentum",
+        "legacy_import": "app.include.indicators.WilliamsPR",
+        "legacy_file": "app/include/indicators/momentum/williams_pr.py",
+        "canonical_file": "app/include/blocks/indicators/momentum/williams_pr.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "close",
+            "default": "<required>",
+            "annotation": "'Sequence[float] | np.ndarray'"
+          },
+          {
+            "name": "period",
+            "default": "14",
+            "annotation": "'int'"
+          }
+        ],
+        "condition_helpers": [
+          "changes_down",
+          "changes_up",
+          "crosses_above",
+          "crosses_below",
+          "is_falling",
+          "is_higher",
+          "is_lower",
+          "is_rising"
+        ],
+        "calculation_helpers": [],
+        "docstring": "Williams Percent Range indicator family."
+      },
+      {
+        "symbol": "ZigZag",
+        "stable_id": "indicator.price_action.zigzag",
+        "block_type": "indicator",
+        "category": "price_action",
+        "legacy_import": "app.include.indicators.ZigZag",
+        "legacy_file": "app/include/indicators/price_action/zigzag.py",
+        "canonical_file": "app/include/blocks/indicators/price_action/zigzag.py",
+        "calculate_parameters": [
+          {
+            "name": "high",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "low",
+            "default": "<required>",
+            "annotation": "app.include.contracts.DataframeSeries | numpy.ndarray[Any, Any]"
+          },
+          {
+            "name": "deviation",
+            "default": "5.0",
+            "annotation": "float"
+          },
+          {
+            "name": "depth",
+            "default": "5",
+            "annotation": "int"
+          }
+        ],
+        "condition_helpers": [
+          "is_falling",
+          "is_peak",
+          "is_rising",
+          "is_swing",
+          "is_trough"
+        ],
+        "calculation_helpers": [
+          "last_swing_direction"
+        ],
+        "docstring": "ZigZag structural swing extrema and trendline segmentation block."
+      }
+    ],
+    "functions": [
+      {
+        "symbol": "DEFAULT_PIP_SIZE",
+        "stable_id": null,
+        "role": "constant",
+        "is_class": false,
+        "legacy_import": "app.include.functions.DEFAULT_PIP_SIZE",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/math_utils.py",
+        "docstring": "Convert a string or number to a floating-point number, if possible."
+      },
+      {
+        "symbol": "FLOAT_MAX_VALUE",
+        "stable_id": null,
+        "role": "constant",
+        "is_class": false,
+        "legacy_import": "app.include.functions.FLOAT_MAX_VALUE",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/math_utils.py",
+        "docstring": "Convert a string or number to a floating-point number, if possible."
+      },
+      {
+        "symbol": "Functions",
+        "stable_id": null,
+        "role": "facade",
+        "is_class": true,
+        "legacy_import": "app.include.functions.Functions",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/facade.py",
+        "docstring": "Consolidated facade for function building blocks."
+      },
+      {
+        "symbol": "MIN_RANK_PERIOD",
+        "stable_id": null,
+        "role": "constant",
+        "is_class": false,
+        "legacy_import": "app.include.functions.MIN_RANK_PERIOD",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/math_utils.py",
+        "docstring": "int([x]) -> integer"
+      },
+      {
+        "symbol": "abs_val",
+        "stable_id": "function.abs_val",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.abs_val",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/abs_val.py",
+        "docstring": "Calculate absolute value for numeric operand."
+      },
+      {
+        "symbol": "convert_pips_to_price",
+        "stable_id": null,
+        "role": "helper",
+        "is_class": false,
+        "legacy_import": "app.include.functions.convert_pips_to_price",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/pip_utils.py",
+        "docstring": "Convert pips to real price level using point resolution."
+      },
+      {
+        "symbol": "convert_pips_to_price_symbol",
+        "stable_id": null,
+        "role": "helper",
+        "is_class": false,
+        "legacy_import": "app.include.functions.convert_pips_to_price_symbol",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/pip_utils.py",
+        "docstring": "Convert pips to real price querying real MT5 broker symbol properties."
+      },
+      {
+        "symbol": "convert_price_to_pips",
+        "stable_id": null,
+        "role": "helper",
+        "is_class": false,
+        "legacy_import": "app.include.functions.convert_price_to_pips",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/pip_utils.py",
+        "docstring": "Convert price difference to pips using point resolution."
+      },
+      {
+        "symbol": "convert_price_to_pips_symbol",
+        "stable_id": null,
+        "role": "helper",
+        "is_class": false,
+        "legacy_import": "app.include.functions.convert_price_to_pips_symbol",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/pip_utils.py",
+        "docstring": "Convert price difference to pips querying real MT5 broker symbol properties."
+      },
+      {
+        "symbol": "custom_function",
+        "stable_id": "function.custom_function",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.custom_function",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/custom_function.py",
+        "docstring": "Execute registered custom function by identifier."
+      },
+      {
+        "symbol": "division",
+        "stable_id": "function.division",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.division",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/division.py",
+        "docstring": "Evaluate division of two operands."
+      },
+      {
+        "symbol": "exponential",
+        "stable_id": "function.exponential",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.exponential",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/exponential.py",
+        "docstring": "Calculate natural exponential (e^x)."
+      },
+      {
+        "symbol": "get_date",
+        "stable_id": "function.get_date",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.get_date",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/get_date.py",
+        "docstring": "Encode date as integer YYYYMMDD."
+      },
+      {
+        "symbol": "get_time",
+        "stable_id": "function.get_time",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.get_time",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/get_time.py",
+        "docstring": "Encode time as integer HHMMSS."
+      },
+      {
+        "symbol": "indicator_highest",
+        "stable_id": "function.indicator_highest",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.indicator_highest",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/indicator_highest.py",
+        "docstring": "Extract Nth highest indicator value in a rolling window."
+      },
+      {
+        "symbol": "indicator_lowest",
+        "stable_id": "function.indicator_lowest",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.indicator_lowest",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/indicator_lowest.py",
+        "docstring": "Extract Nth lowest indicator value in a rolling window."
+      },
+      {
+        "symbol": "logarithm",
+        "stable_id": "function.logarithm",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.logarithm",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/logarithm.py",
+        "docstring": "Calculate natural logarithm ln(x)."
+      },
+      {
+        "symbol": "maximum",
+        "stable_id": "function.maximum",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.maximum",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/maximum.py",
+        "docstring": "Calculate maximum of two operands."
+      },
+      {
+        "symbol": "minimum",
+        "stable_id": "function.minimum",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.minimum",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/minimum.py",
+        "docstring": "Calculate minimum of two operands."
+      },
+      {
+        "symbol": "minus",
+        "stable_id": "function.minus",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.minus",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/minus.py",
+        "docstring": "Evaluate subtraction of two operands at historical bar shift."
+      },
+      {
+        "symbol": "multiplication",
+        "stable_id": "function.multiplication",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.multiplication",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/multiplication.py",
+        "docstring": "Evaluate multiplication of two operands at historical bar shift."
+      },
+      {
+        "symbol": "plus",
+        "stable_id": "function.plus",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.plus",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/plus.py",
+        "docstring": "Evaluate addition of two operands at historical bar shift."
+      },
+      {
+        "symbol": "register_custom_function",
+        "stable_id": null,
+        "role": "helper",
+        "is_class": false,
+        "legacy_import": "app.include.functions.register_custom_function",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/math_utils.py",
+        "docstring": "Register custom function handler for CustomFunction block evaluation."
+      },
+      {
+        "symbol": "resolve_pip_size",
+        "stable_id": null,
+        "role": "helper",
+        "is_class": false,
+        "legacy_import": "app.include.functions.resolve_pip_size",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/pip_utils.py",
+        "docstring": "Resolve effective pip size from point, digits, or explicit pip size."
+      },
+      {
+        "symbol": "round_to_decimals",
+        "stable_id": null,
+        "role": "helper",
+        "is_class": false,
+        "legacy_import": "app.include.functions.round_to_decimals",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/numerical/math_utils.py",
+        "docstring": "Round operand to specified decimal places."
+      },
+      {
+        "symbol": "square_root",
+        "stable_id": "function.square_root",
+        "role": "function_block",
+        "is_class": false,
+        "legacy_import": "app.include.functions.square_root",
+        "legacy_file": "app/include/functions.py",
+        "canonical_file": "app/include/blocks/functions/square_root.py",
+        "docstring": "Calculate square root of numeric operand."
+      }
+    ],
+    "actions": [
+      {
+        "symbol": "ActionRecord",
+        "stable_id": null,
+        "role": "contract",
+        "is_class": true,
+        "legacy_import": "app.include.actions.ActionRecord",
+        "legacy_file": "app/include/actions/base.py",
+        "canonical_file": "app/include/blocks/actions/base.py",
+        "docstring": "Immutable audit record representing an executed action descriptor."
+      },
+      {
+        "symbol": "Actions",
+        "stable_id": null,
+        "role": "facade",
+        "is_class": true,
+        "legacy_import": "app.include.actions.Actions",
+        "legacy_file": "app/include/actions/facade.py",
+        "canonical_file": "app/include/blocks/actions/facade.py",
+        "docstring": "Centralized facade for action building blocks."
+      },
+      {
+        "symbol": "AssignVariableAction",
+        "stable_id": "action.assignvariable",
+        "role": "action",
+        "is_class": true,
+        "legacy_import": "app.include.actions.AssignVariableAction",
+        "legacy_file": "app/include/actions/assign_variable.py",
+        "canonical_file": "app/include/blocks/actions/assignvariable.py",
+        "docstring": "Action block to assign a value or evaluated formula to a variable."
+      },
+      {
+        "symbol": "CustomAction",
+        "stable_id": "action.custom",
+        "role": "action",
+        "is_class": true,
+        "legacy_import": "app.include.actions.CustomAction",
+        "legacy_file": "app/include/actions/custom.py",
+        "canonical_file": "app/include/blocks/actions/custom.py",
+        "docstring": "Action block carrying an arbitrary custom command string."
+      },
+      {
+        "symbol": "DrawDownArrowAction",
+        "stable_id": "action.drawdownarrow",
+        "role": "action",
+        "is_class": true,
+        "legacy_import": "app.include.actions.DrawDownArrowAction",
+        "legacy_file": "app/include/actions/annotations.py",
+        "canonical_file": "app/include/blocks/actions/drawdownarrow.py",
+        "docstring": "Action block to record a down arrow chart annotation."
+      },
+      {
+        "symbol": "DrawUpArrowAction",
+        "stable_id": "action.drawuparrow",
+        "role": "action",
+        "is_class": true,
+        "legacy_import": "app.include.actions.DrawUpArrowAction",
+        "legacy_file": "app/include/actions/annotations.py",
+        "canonical_file": "app/include/blocks/actions/drawuparrow.py",
+        "docstring": "Action block to record an up arrow chart annotation."
+      },
+      {
+        "symbol": "DrawVerticalLineAction",
+        "stable_id": "action.drawverticalline",
+        "role": "action",
+        "is_class": true,
+        "legacy_import": "app.include.actions.DrawVerticalLineAction",
+        "legacy_file": "app/include/actions/annotations.py",
+        "canonical_file": "app/include/blocks/actions/drawverticalline.py",
+        "docstring": "Action block to record a vertical line chart annotation."
+      },
+      {
+        "symbol": "LogToFileAction",
+        "stable_id": "action.logtofile",
+        "role": "action",
+        "is_class": true,
+        "legacy_import": "app.include.actions.LogToFileAction",
+        "legacy_file": "app/include/actions/logging.py",
+        "canonical_file": "app/include/blocks/actions/logtofile.py",
+        "docstring": "Action block to write messages to a file."
+      },
+      {
+        "symbol": "LogToJournalAction",
+        "stable_id": "action.logtojournal",
+        "role": "action",
+        "is_class": true,
+        "legacy_import": "app.include.actions.LogToJournalAction",
+        "legacy_file": "app/include/actions/logging.py",
+        "canonical_file": "app/include/blocks/actions/logtojournal.py",
+        "docstring": "Action block to write messages to the system journal/terminal log."
+      },
+      {
+        "symbol": "ORDER_NOT_DEFINED",
+        "stable_id": null,
+        "role": "contract",
+        "is_class": false,
+        "legacy_import": "app.include.actions.ORDER_NOT_DEFINED",
+        "legacy_file": "app/include/actions.py",
+        "canonical_file": "app/include/blocks/actions/base.py",
+        "docstring": "Convert a string or number to a floating-point number, if possible."
+      },
+      {
+        "symbol": "SendEmailAction",
+        "stable_id": "action.sendemail",
+        "role": "action",
+        "is_class": true,
+        "legacy_import": "app.include.actions.SendEmailAction",
+        "legacy_file": "app/include/actions/logging.py",
+        "canonical_file": "app/include/blocks/actions/sendemail.py",
+        "docstring": "Action block to send an email notification or alert."
+      },
+      {
+        "symbol": "assign_variable",
+        "stable_id": "action.assign_variable",
+        "role": "action",
+        "is_class": false,
+        "legacy_import": "app.include.actions.assign_variable",
+        "legacy_file": "app/include/actions/assign_variable.py",
+        "canonical_file": "app/include/blocks/actions/assign_variable.py",
+        "docstring": "Assign a value or formula result to a variable."
+      },
+      {
+        "symbol": "custom_action",
+        "stable_id": "action.custom_",
+        "role": "action",
+        "is_class": false,
+        "legacy_import": "app.include.actions.custom_action",
+        "legacy_file": "app/include/actions/custom.py",
+        "canonical_file": "app/include/blocks/actions/custom_.py",
+        "docstring": "Execute a custom action command."
+      },
+      {
+        "symbol": "draw_down_arrow",
+        "stable_id": "action.draw_down_arrow",
+        "role": "action",
+        "is_class": false,
+        "legacy_import": "app.include.actions.draw_down_arrow",
+        "legacy_file": "app/include/actions/annotations.py",
+        "canonical_file": "app/include/blocks/actions/draw_down_arrow.py",
+        "docstring": "Record a down arrow annotation descriptor."
+      },
+      {
+        "symbol": "draw_up_arrow",
+        "stable_id": "action.draw_up_arrow",
+        "role": "action",
+        "is_class": false,
+        "legacy_import": "app.include.actions.draw_up_arrow",
+        "legacy_file": "app/include/actions/annotations.py",
+        "canonical_file": "app/include/blocks/actions/draw_up_arrow.py",
+        "docstring": "Record an up arrow annotation descriptor."
+      },
+      {
+        "symbol": "draw_vertical_line",
+        "stable_id": "action.draw_vertical_line",
+        "role": "action",
+        "is_class": false,
+        "legacy_import": "app.include.actions.draw_vertical_line",
+        "legacy_file": "app/include/actions/annotations.py",
+        "canonical_file": "app/include/blocks/actions/draw_vertical_line.py",
+        "docstring": "Record a vertical line annotation descriptor."
+      },
+      {
+        "symbol": "log_to_file",
+        "stable_id": "action.log_to_file",
+        "role": "action",
+        "is_class": false,
+        "legacy_import": "app.include.actions.log_to_file",
+        "legacy_file": "app/include/actions/logging.py",
+        "canonical_file": "app/include/blocks/actions/log_to_file.py",
+        "docstring": "Append a log message to a file."
+      },
+      {
+        "symbol": "log_to_journal",
+        "stable_id": "action.log_to_journal",
+        "role": "action",
+        "is_class": false,
+        "legacy_import": "app.include.actions.log_to_journal",
+        "legacy_file": "app/include/actions/logging.py",
+        "canonical_file": "app/include/blocks/actions/log_to_journal.py",
+        "docstring": "Log a message to the journal / logger sink."
+      },
+      {
+        "symbol": "send_email",
+        "stable_id": "action.send_email",
+        "role": "action",
+        "is_class": false,
+        "legacy_import": "app.include.actions.send_email",
+        "legacy_file": "app/include/actions/logging.py",
+        "canonical_file": "app/include/blocks/actions/send_email.py",
+        "docstring": "Send or record an email notification action."
+      }
+    ],
+    "comparisons": [
+      {
+        "symbol": "Comparisons",
+        "stable_id": null,
+        "role": "facade",
+        "is_class": true,
+        "legacy_import": "app.include.comparisons.Comparisons",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/facade.py",
+        "docstring": "Consolidated facade for evaluating quantitative comparison blocks."
+      },
+      {
+        "symbol": "MAType",
+        "stable_id": null,
+        "role": "enum",
+        "is_class": true,
+        "legacy_import": "app.include.comparisons.MAType",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/enums.py",
+        "docstring": "Moving average type selector for quantitative indicators."
+      },
+      {
+        "symbol": "calculate_ma",
+        "stable_id": null,
+        "role": "infrastructure",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.calculate_ma",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/numerical/ma_kernels.py",
+        "docstring": "Calculate Moving Average (SMA=1, EMA=2, WMA=3, HULL=4) for indicator blocks."
+      },
+      {
+        "symbol": "calculate_wma",
+        "stable_id": null,
+        "role": "infrastructure",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.calculate_wma",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/numerical/ma_kernels.py",
+        "docstring": "Calculate Weighted Moving Average (WMA) for indicator series."
+      },
+      {
+        "symbol": "changes_down",
+        "stable_id": "condition.changes_down",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.changes_down",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/changes_down.py",
+        "docstring": "Evaluate 3-bar downward turn (`v[s+2] < v[s+1] > v[s]`)."
+      },
+      {
+        "symbol": "changes_up",
+        "stable_id": "condition.changes_up",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.changes_up",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/changes_up.py",
+        "docstring": "Evaluate 3-bar upward turn (`v[s+2] > v[s+1] < v[s]`)."
+      },
+      {
+        "symbol": "condition_and",
+        "stable_id": "condition.condition_and",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.condition_and",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/condition_and.py",
+        "docstring": "Evaluate short-circuit logical AND across multiple condition expressions."
+      },
+      {
+        "symbol": "condition_not",
+        "stable_id": "condition.condition_not",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.condition_not",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/condition_not.py",
+        "docstring": "Evaluate logical NOT on a condition expression."
+      },
+      {
+        "symbol": "condition_or",
+        "stable_id": "condition.condition_or",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.condition_or",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/condition_or.py",
+        "docstring": "Evaluate short-circuit logical OR across multiple condition expressions."
+      },
+      {
+        "symbol": "crosses_above",
+        "stable_id": "condition.crosses_above",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.crosses_above",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/crosses_above.py",
+        "docstring": "Evaluate whether left crossed above right between shift + 1 and shift."
+      },
+      {
+        "symbol": "crosses_below",
+        "stable_id": "condition.crosses_below",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.crosses_below",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/crosses_below.py",
+        "docstring": "Evaluate whether left crossed below right between shift + 1 and shift."
+      },
+      {
+        "symbol": "equals",
+        "stable_id": "condition.equals",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.equals",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/equals.py",
+        "docstring": "Evaluate whether left value equals right value within rounding precision."
+      },
+      {
+        "symbol": "indicator_above_ma",
+        "stable_id": "condition.indicator_above_ma",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.indicator_above_ma",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/indicator_above_ma.py",
+        "docstring": "Evaluate whether indicator is above its Moving Average at shift."
+      },
+      {
+        "symbol": "indicator_below_ma",
+        "stable_id": "condition.indicator_below_ma",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.indicator_below_ma",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/indicator_below_ma.py",
+        "docstring": "Evaluate whether indicator is below its Moving Average at shift."
+      },
+      {
+        "symbol": "indicator_crosses_above_ma",
+        "stable_id": "condition.indicator_crosses_above_ma",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.indicator_crosses_above_ma",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/indicator_crosses_above_ma.py",
+        "docstring": "Evaluate whether indicator crosses above its MA from shift + 1 to shift."
+      },
+      {
+        "symbol": "indicator_crosses_below_ma",
+        "stable_id": "condition.indicator_crosses_below_ma",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.indicator_crosses_below_ma",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/indicator_crosses_below_ma.py",
+        "docstring": "Evaluate whether indicator crosses below its MA from shift + 1 to shift."
+      },
+      {
+        "symbol": "is_falling",
+        "stable_id": "condition.is_falling",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_falling",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_falling.py",
+        "docstring": "Evaluate whether indicator is falling monotonically over a bar window."
+      },
+      {
+        "symbol": "is_greater",
+        "stable_id": "condition.is_greater",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_greater",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_greater.py",
+        "docstring": "Evaluate whether left value is strictly greater than right value."
+      },
+      {
+        "symbol": "is_greater_count",
+        "stable_id": "condition.is_greater_count",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_greater_count",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_greater_count.py",
+        "docstring": "Evaluate whether left > right remains true across a window of bars."
+      },
+      {
+        "symbol": "is_greater_or_equal",
+        "stable_id": "condition.is_greater_or_equal",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_greater_or_equal",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_greater_or_equal.py",
+        "docstring": "Evaluate whether left value is greater than or equal to right value."
+      },
+      {
+        "symbol": "is_greater_percentile",
+        "stable_id": "condition.is_greater_percentile",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_greater_percentile",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_greater_percentile.py",
+        "docstring": "Evaluate whether indicator value exceeds percentile rank over past bars."
+      },
+      {
+        "symbol": "is_lower",
+        "stable_id": "condition.is_lower",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_lower",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_lower.py",
+        "docstring": "Evaluate whether left value is strictly lower than right value."
+      },
+      {
+        "symbol": "is_lower_count",
+        "stable_id": "condition.is_lower_count",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_lower_count",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_lower_count.py",
+        "docstring": "Evaluate whether left < right remains true across a window of bars."
+      },
+      {
+        "symbol": "is_lower_or_equal",
+        "stable_id": "condition.is_lower_or_equal",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_lower_or_equal",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_lower_or_equal.py",
+        "docstring": "Evaluate whether left value is lower than or equal to right value."
+      },
+      {
+        "symbol": "is_lower_percentile",
+        "stable_id": "condition.is_lower_percentile",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_lower_percentile",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_lower_percentile.py",
+        "docstring": "Evaluate whether indicator value falls below percentile rank over past bars."
+      },
+      {
+        "symbol": "is_rising",
+        "stable_id": "condition.is_rising",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.is_rising",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/is_rising.py",
+        "docstring": "Evaluate whether indicator is rising monotonically over a bar window."
+      },
+      {
+        "symbol": "not_equals",
+        "stable_id": "condition.not_equals",
+        "role": "condition_block",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.not_equals",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/comparisons/not_equals.py",
+        "docstring": "Evaluate whether left value does not equal right value within precision."
+      },
+      {
+        "symbol": "resolve_shift_value",
+        "stable_id": null,
+        "role": "infrastructure",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.resolve_shift_value",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/series.py",
+        "docstring": "Resolve numerical value from scalar, array, series, or callable at shift."
+      },
+      {
+        "symbol": "round_value",
+        "stable_id": null,
+        "role": "infrastructure",
+        "is_class": false,
+        "legacy_import": "app.include.comparisons.round_value",
+        "legacy_file": "app/include/comparisons.py",
+        "canonical_file": "app/include/blocks/series.py",
+        "docstring": "Round a floating-point value to a specified decimal precision."
+      }
+    ],
+    "prices": [
+      {
+        "symbol": "BarPrice",
+        "stable_id": null,
+        "role": "infrastructure",
+        "is_class": true,
+        "legacy_import": "app.include.price.BarPrice",
+        "legacy_file": "app/include/price.py",
+        "canonical_file": "app/include/contracts.py",
+        "docstring": "OHLCV price block wrapping price arrays with historical bar shifts."
+      },
+      {
+        "symbol": "QuotePrice",
+        "stable_id": "price.quoteprice",
+        "role": "price_block",
+        "is_class": true,
+        "legacy_import": "app.include.price.QuotePrice",
+        "legacy_file": "app/include/price.py",
+        "canonical_file": "app/include/blocks/prices/quoteprice.py",
+        "docstring": "Quote price block wrapping Bid and Ask data with spread calculations."
+      },
+      {
+        "symbol": "SessionPrice",
+        "stable_id": "price.sessionprice",
+        "role": "price_block",
+        "is_class": true,
+        "legacy_import": "app.include.price.SessionPrice",
+        "legacy_file": "app/include/price.py",
+        "canonical_file": "app/include/blocks/prices/sessionprice.py",
+        "docstring": "Intraday trading session OHLC aggregator and shift query block."
+      },
+      {
+        "symbol": "MTFPrice",
+        "stable_id": "price.mtfprice",
+        "role": "price_block",
+        "is_class": true,
+        "legacy_import": "app.include.price.MTFPrice",
+        "legacy_file": "app/include/price.py",
+        "canonical_file": "app/include/blocks/prices/mtfprice.py",
+        "docstring": "Multi-timeframe price aggregator for Daily, Weekly, and Monthly OHLC bars."
+      }
+    ],
+    "bar_time": [
+      {
+        "symbol": "BarTime",
+        "stable_id": "bar_time.bartime",
+        "role": "time_block",
+        "is_class": true,
+        "legacy_import": "app.include.bar_time.BarTime",
+        "legacy_file": "app/include/bar_time.py",
+        "canonical_file": "app/include/blocks/bar_time/bartime.py",
+        "docstring": "Temporal feature extractor for bar and broker timestamps via DateTime."
+      },
+      {
+        "symbol": "DateTime",
+        "stable_id": "bar_time.datetime",
+        "role": "time_block",
+        "is_class": true,
+        "legacy_import": "app.include.bar_time.DateTime",
+        "legacy_file": "app/include/bar_time.py",
+        "canonical_file": "app/include/blocks/bar_time/datetime.py",
+        "docstring": "High-precision financial date/time utilities and timestamp series."
+      },
+      {
+        "symbol": "TimeConditions",
+        "stable_id": "bar_time.timeconditions",
+        "role": "time_block",
+        "is_class": true,
+        "legacy_import": "app.include.bar_time.TimeConditions",
+        "legacy_file": "app/include/bar_time.py",
+        "canonical_file": "app/include/blocks/bar_time/timeconditions.py",
+        "docstring": "Temporal condition evaluator for rule engines."
+      },
+      {
+        "symbol": "format_timestamp",
+        "stable_id": null,
+        "role": "infrastructure",
+        "is_class": false,
+        "legacy_import": "app.include.bar_time.format_timestamp",
+        "legacy_file": "app/include/bar_time.py",
+        "canonical_file": "app/include/contracts.py",
+        "docstring": "Format a POSIX timestamp or datetime into a standardized string."
+      },
+      {
+        "symbol": "normalize_timestamps",
+        "stable_id": null,
+        "role": "infrastructure",
+        "is_class": false,
+        "legacy_import": "app.include.bar_time.normalize_timestamps",
+        "legacy_file": "app/include/bar_time.py",
+        "canonical_file": "app/include/contracts.py",
+        "docstring": "Convert sequence of timestamps to POSIX seconds."
+      }
+    ],
+    "types": [
+      {
+        "symbol": "BooleanConstant",
+        "stable_id": "constant.booleanconstant",
+        "role": "constant_block",
+        "is_class": true,
+        "legacy_import": "app.include.types.BooleanConstant",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/constants/booleanconstant.py",
+        "docstring": "Boolean constant building block."
+      },
+      {
+        "symbol": "BooleanVariable",
+        "stable_id": "variable.booleanvariable",
+        "role": "variable_block",
+        "is_class": true,
+        "legacy_import": "app.include.types.BooleanVariable",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/variables/booleanvariable.py",
+        "docstring": "Boolean variable building block."
+      },
+      {
+        "symbol": "DoubleVariable",
+        "stable_id": "variable.doublevariable",
+        "role": "variable_block",
+        "is_class": true,
+        "legacy_import": "app.include.types.DoubleVariable",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/variables/doublevariable.py",
+        "docstring": "Double variable building block."
+      },
+      {
+        "symbol": "IntVariable",
+        "stable_id": "variable.intvariable",
+        "role": "variable_block",
+        "is_class": true,
+        "legacy_import": "app.include.types.IntVariable",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/variables/intvariable.py",
+        "docstring": "Integer variable building block."
+      },
+      {
+        "symbol": "NumberConstant",
+        "stable_id": "constant.numberconstant",
+        "role": "constant_block",
+        "is_class": true,
+        "legacy_import": "app.include.types.NumberConstant",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/constants/numberconstant.py",
+        "docstring": "Number constant building block."
+      },
+      {
+        "symbol": "Types",
+        "stable_id": null,
+        "role": "facade",
+        "is_class": true,
+        "legacy_import": "app.include.types.Types",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/variables/facade.py",
+        "docstring": "Centralized facade for primitive type and variable blocks."
+      },
+      {
+        "symbol": "Variable",
+        "stable_id": "variable.variable",
+        "role": "variable_block",
+        "is_class": true,
+        "legacy_import": "app.include.types.Variable",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/variables/variable.py",
+        "docstring": "Generic mutable state container for strategy variables."
+      },
+      {
+        "symbol": "boolean_constant",
+        "stable_id": "constant.boolean_constant",
+        "role": "constant_block",
+        "is_class": false,
+        "legacy_import": "app.include.types.boolean_constant",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/constants/boolean_constant.py",
+        "docstring": "Evaluate boolean constant to 1.0 or 0.0."
+      },
+      {
+        "symbol": "boolean_variable",
+        "stable_id": "variable.boolean_variable",
+        "role": "variable_block",
+        "is_class": false,
+        "legacy_import": "app.include.types.boolean_variable",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/variables/boolean_variable.py",
+        "docstring": "Evaluate boolean variable to 1.0 or 0.0."
+      },
+      {
+        "symbol": "double_variable",
+        "stable_id": "variable.double_variable",
+        "role": "variable_block",
+        "is_class": false,
+        "legacy_import": "app.include.types.double_variable",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/variables/double_variable.py",
+        "docstring": "Evaluate double variable to float."
+      },
+      {
+        "symbol": "int_variable",
+        "stable_id": "variable.int_variable",
+        "role": "variable_block",
+        "is_class": false,
+        "legacy_import": "app.include.types.int_variable",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/variables/int_variable.py",
+        "docstring": "Evaluate integer variable to float."
+      },
+      {
+        "symbol": "number_constant",
+        "stable_id": "constant.number_constant",
+        "role": "constant_block",
+        "is_class": false,
+        "legacy_import": "app.include.types.number_constant",
+        "legacy_file": "app/include/types.py",
+        "canonical_file": "app/include/blocks/constants/number_constant.py",
+        "docstring": "Evaluate number constant to float."
+      }
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+"""Trend indicator strategy blocks."""

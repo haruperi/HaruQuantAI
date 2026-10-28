@@ -152,7 +152,7 @@ Computes a strategy performance metric displayed in Databanks.
 
 from dataclasses import dataclass
 from typing import Any, Sequence
-from app.workspace.code_editor.registry import BaseMetric
+from app.include.metrics.base import BaseMetric
 
 
 @dataclass
@@ -205,7 +205,7 @@ Calculates trade order size (lots/contracts) based on risk parameters.
 """
 
 from dataclasses import dataclass
-from app.workspace.code_editor.registry import BasePositionSizer
+from app.include.blocks.money_management.base import BasePositionSizer
 
 
 @dataclass

@@ -145,6 +145,41 @@ class BarPrice:
         logger.info("FR-SERVICES-BAR-PRICE-SERIES: Exporting Volume IndicatorSeries")
         return DataframeSeries(self._volume, name="Volume")
 
+    @property
+    def open_values(self) -> np.ndarray[Any, np.dtype[np.float64]]:
+        """Return 1D read-only view of open price array without copying."""
+        view = self._open.view()
+        view.flags.writeable = False
+        return view
+
+    @property
+    def high_values(self) -> np.ndarray[Any, np.dtype[np.float64]]:
+        """Return 1D read-only view of high price array without copying."""
+        view = self._high.view()
+        view.flags.writeable = False
+        return view
+
+    @property
+    def low_values(self) -> np.ndarray[Any, np.dtype[np.float64]]:
+        """Return 1D read-only view of low price array without copying."""
+        view = self._low.view()
+        view.flags.writeable = False
+        return view
+
+    @property
+    def close_values(self) -> np.ndarray[Any, np.dtype[np.float64]]:
+        """Return 1D read-only view of close price array without copying."""
+        view = self._close.view()
+        view.flags.writeable = False
+        return view
+
+    @property
+    def volume_values(self) -> np.ndarray[Any, np.dtype[np.float64]]:
+        """Return 1D read-only view of volume array without copying."""
+        view = self._volume.view()
+        view.flags.writeable = False
+        return view
+
 
 class QuotePrice:
     """Quote price block wrapping Bid and Ask data with spread calculations."""

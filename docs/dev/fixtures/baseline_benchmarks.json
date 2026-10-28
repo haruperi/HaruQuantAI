@@ -1,0 +1,392 @@
+{
+  "150_bars": {
+    "SMA_20": {
+      "cold_ms": 0.242,
+      "median_ms": 0.056,
+      "p95_ms": 0.081,
+      "peak_memory_kb": 7.0,
+      "output_signatures": {
+        "value": {
+          "length": 150,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386704,
+          "last_val": 93.93546601838534,
+          "sha256_prefix": "c92738bf6b3b3222"
+        }
+      }
+    },
+    "EMA_20": {
+      "cold_ms": 0.195,
+      "median_ms": 0.081,
+      "p95_ms": 0.09,
+      "peak_memory_kb": 5.29,
+      "output_signatures": {
+        "value": {
+          "length": 150,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386703,
+          "last_val": 94.18260035851527,
+          "sha256_prefix": "6512d20dab667636"
+        }
+      }
+    },
+    "RSI_14": {
+      "cold_ms": 0.324,
+      "median_ms": 0.167,
+      "p95_ms": 0.417,
+      "peak_memory_kb": 9.42,
+      "output_signatures": {
+        "value": {
+          "length": 150,
+          "nan_count": 14,
+          "first_valid_idx": 14,
+          "first_valid_val": 49.03666986138148,
+          "last_val": 48.71156011437643,
+          "sha256_prefix": "85dde62ed54c7656"
+        }
+      }
+    },
+    "BollingerBands_20_2": {
+      "cold_ms": 2.475,
+      "median_ms": 1.903,
+      "p95_ms": 2.51,
+      "peak_memory_kb": 17.61,
+      "output_signatures": {
+        "upper": {
+          "length": 150,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 101.0857473934458,
+          "last_val": 97.11309263993104,
+          "sha256_prefix": "9594d63eb5fa53b1"
+        },
+        "middle": {
+          "length": 150,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386704,
+          "last_val": 93.93546601838534,
+          "sha256_prefix": "c92738bf6b3b3222"
+        },
+        "lower": {
+          "length": 150,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 96.76812597428828,
+          "last_val": 90.75783939683964,
+          "sha256_prefix": "cd08fdf910bccf66"
+        },
+        "bandwidth": {
+          "length": 150,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 0.043644547823764104,
+          "last_val": 0.06765552471786883,
+          "sha256_prefix": "067ea753f44ee057"
+        },
+        "range": {
+          "length": 150,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 4.317621419157528,
+          "last_val": 6.3552532430914015,
+          "sha256_prefix": "37d453057f8e77d7"
+        }
+      }
+    },
+    "MACD_12_26_9": {
+      "cold_ms": 0.328,
+      "median_ms": 0.189,
+      "p95_ms": 0.203,
+      "peak_memory_kb": 16.2,
+      "output_signatures": {
+        "main": {
+          "length": 150,
+          "nan_count": 25,
+          "first_valid_idx": 25,
+          "first_valid_val": 0.27061016241707136,
+          "last_val": -0.27959759404922124,
+          "sha256_prefix": "799b6afc871a2a35"
+        },
+        "signal": {
+          "length": 150,
+          "nan_count": 33,
+          "first_valid_idx": 33,
+          "first_valid_val": 0.5245544030605471,
+          "last_val": -0.1399179830571392,
+          "sha256_prefix": "fab4dcb087f6b770"
+        },
+        "histogram": {
+          "length": 150,
+          "nan_count": 33,
+          "first_valid_idx": 33,
+          "first_valid_val": 0.29229818785712935,
+          "last_val": -0.13967961099208204,
+          "sha256_prefix": "0fba818175789232"
+        }
+      }
+    }
+  },
+  "100000_bars": {
+    "SMA_20": {
+      "cold_ms": 2.008,
+      "median_ms": 1.723,
+      "p95_ms": 1.919,
+      "peak_memory_kb": 3127.41,
+      "output_signatures": {
+        "value": {
+          "length": 100000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386704,
+          "last_val": 31828.25375239849,
+          "sha256_prefix": "86191cfe5da2832f"
+        }
+      }
+    },
+    "EMA_20": {
+      "cold_ms": 39.553,
+      "median_ms": 37.876,
+      "p95_ms": 44.76,
+      "peak_memory_kb": 1569.99,
+      "output_signatures": {
+        "value": {
+          "length": 100000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386703,
+          "last_val": 31729.37503205525,
+          "sha256_prefix": "7cd7194aba160dbd"
+        }
+      }
+    },
+    "RSI_14": {
+      "cold_ms": 92.361,
+      "median_ms": 86.92,
+      "p95_ms": 94.53,
+      "peak_memory_kb": 3913.99,
+      "output_signatures": {
+        "value": {
+          "length": 100000,
+          "nan_count": 14,
+          "first_valid_idx": 14,
+          "first_valid_val": 49.03666986138148,
+          "last_val": 53.48700845003255,
+          "sha256_prefix": "f2e5bcb7cda27d59"
+        }
+      }
+    },
+    "BollingerBands_20_2": {
+      "cold_ms": 1354.286,
+      "median_ms": 1389.789,
+      "p95_ms": 1598.754,
+      "peak_memory_kb": 7819.5,
+      "output_signatures": {
+        "upper": {
+          "length": 100000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 101.0857473934458,
+          "last_val": 32892.37223593727,
+          "sha256_prefix": "c626cae963210f29"
+        },
+        "middle": {
+          "length": 100000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386704,
+          "last_val": 31828.25375239849,
+          "sha256_prefix": "86191cfe5da2832f"
+        },
+        "lower": {
+          "length": 100000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 96.76812597428828,
+          "last_val": 30764.135268859714,
+          "sha256_prefix": "9e2ebca76c1bde16"
+        },
+        "bandwidth": {
+          "length": 100000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 0.043644547823764104,
+          "last_val": 0.06686628124916143,
+          "sha256_prefix": "e62e444b91017855"
+        },
+        "range": {
+          "length": 100000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 4.317621419157528,
+          "last_val": 2128.236967077554,
+          "sha256_prefix": "ad04cede707708ca"
+        }
+      }
+    },
+    "MACD_12_26_9": {
+      "cold_ms": 81.316,
+      "median_ms": 84.044,
+      "p95_ms": 108.519,
+      "peak_memory_kb": 8014.42,
+      "output_signatures": {
+        "main": {
+          "length": 100000,
+          "nan_count": 25,
+          "first_valid_idx": 25,
+          "first_valid_val": 0.27061016241707136,
+          "last_val": -63.82648587143558,
+          "sha256_prefix": "e49eead06cec2deb"
+        },
+        "signal": {
+          "length": 100000,
+          "nan_count": 33,
+          "first_valid_idx": 33,
+          "first_valid_val": 0.5245544030605471,
+          "last_val": -50.479931045488534,
+          "sha256_prefix": "3d345267af12cf83"
+        },
+        "histogram": {
+          "length": 100000,
+          "nan_count": 33,
+          "first_valid_idx": 33,
+          "first_valid_val": 0.29229818785712935,
+          "last_val": -13.346554825947045,
+          "sha256_prefix": "ca44589ff504145e"
+        }
+      }
+    }
+  },
+  "1000000_bars": {
+    "SMA_20": {
+      "cold_ms": 19.832,
+      "median_ms": 18.871,
+      "p95_ms": 19.606,
+      "peak_memory_kb": 31252.41,
+      "output_signatures": {
+        "value": {
+          "length": 1000000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386704,
+          "last_val": 7.123066168606023e+45,
+          "sha256_prefix": "f482e78146e14577"
+        }
+      }
+    },
+    "EMA_20": {
+      "cold_ms": 388.392,
+      "median_ms": 386.904,
+      "p95_ms": 391.031,
+      "peak_memory_kb": 15632.49,
+      "output_signatures": {
+        "value": {
+          "length": 1000000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386703,
+          "last_val": 7.11470253788452e+45,
+          "sha256_prefix": "ceec8a05dc737c12"
+        }
+      }
+    },
+    "RSI_14": {
+      "cold_ms": 874.739,
+      "median_ms": 900.18,
+      "p95_ms": 925.165,
+      "peak_memory_kb": 39070.28,
+      "output_signatures": {
+        "value": {
+          "length": 1000000,
+          "nan_count": 14,
+          "first_valid_idx": 14,
+          "first_valid_val": 49.03666986138148,
+          "last_val": 52.63878007997575,
+          "sha256_prefix": "45d3b6a26c1b70f4"
+        }
+      }
+    },
+    "BollingerBands_20_2": {
+      "cold_ms": 13482.474,
+      "median_ms": 13730.314,
+      "p95_ms": 14248.862,
+      "peak_memory_kb": 78132.01,
+      "output_signatures": {
+        "upper": {
+          "length": 1000000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 101.0857473934458,
+          "last_val": 7.285917882396193e+45,
+          "sha256_prefix": "847879085b7198ea"
+        },
+        "middle": {
+          "length": 1000000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 98.92693668386704,
+          "last_val": 7.123066168606023e+45,
+          "sha256_prefix": "f482e78146e14577"
+        },
+        "lower": {
+          "length": 1000000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 96.76812597428828,
+          "last_val": 6.960214454815854e+45,
+          "sha256_prefix": "2ec254fef7891c21"
+        },
+        "bandwidth": {
+          "length": 1000000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 0.043644547823764104,
+          "last_val": 0.04572517226020353,
+          "sha256_prefix": "fe136414f64094ca"
+        },
+        "range": {
+          "length": 1000000,
+          "nan_count": 19,
+          "first_valid_idx": 19,
+          "first_valid_val": 4.317621419157528,
+          "last_val": 3.257034275803391e+44,
+          "sha256_prefix": "2cca39c4cb6e5060"
+        }
+      }
+    },
+    "MACD_12_26_9": {
+      "cold_ms": 799.352,
+      "median_ms": 806.762,
+      "p95_ms": 819.471,
+      "peak_memory_kb": 80084.73,
+      "output_signatures": {
+        "main": {
+          "length": 1000000,
+          "nan_count": 25,
+          "first_valid_idx": 25,
+          "first_valid_val": 0.27061016241707136,
+          "last_val": 4.174444105713793e+43,
+          "sha256_prefix": "3d5b4cc1c07d2b3d"
+        },
+        "signal": {
+          "length": 1000000,
+          "nan_count": 33,
+          "first_valid_idx": 33,
+          "first_valid_val": 0.5245544030605471,
+          "last_val": 6.685219625814654e+43,
+          "sha256_prefix": "6792be34c357b399"
+        },
+        "histogram": {
+          "length": 1000000,
+          "nan_count": 33,
+          "first_valid_idx": 33,
+          "first_valid_val": 0.29229818785712935,
+          "last_val": -2.510775520100861e+43,
+          "sha256_prefix": "618ae02e0150c86b"
+        }
+      }
+    }
+  }
+}

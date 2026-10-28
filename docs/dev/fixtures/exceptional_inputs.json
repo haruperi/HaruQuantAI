@@ -1,0 +1,906 @@
+{
+  "SMA": {
+    "empty_array": {
+      "status": "success",
+      "len": 0,
+      "all_nan": true,
+      "sample": []
+    },
+    "single_element": {
+      "status": "success",
+      "len": 1,
+      "all_nan": true,
+      "sample": [
+        "NaN"
+      ]
+    },
+    "shorter_than_period": {
+      "status": "success",
+      "len": 3,
+      "all_nan": true,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "all_nans": {
+      "status": "success",
+      "len": 50,
+      "all_nan": true,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "with_inf": {
+      "status": "success",
+      "len": 41,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "zero_period": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "negative_period": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "period_1": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        100.0,
+        100.50505050505052,
+        101.01010101010098
+      ]
+    }
+  },
+  "EMA": {
+    "empty_array": {
+      "status": "success",
+      "len": 0,
+      "all_nan": true,
+      "sample": []
+    },
+    "single_element": {
+      "status": "success",
+      "len": 1,
+      "all_nan": true,
+      "sample": [
+        "NaN"
+      ]
+    },
+    "shorter_than_period": {
+      "status": "success",
+      "len": 3,
+      "all_nan": true,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "all_nans": {
+      "status": "success",
+      "len": 50,
+      "all_nan": true,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "with_inf": {
+      "status": "success",
+      "len": 41,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "zero_period": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "negative_period": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "period_1": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        100.0,
+        100.5050505050505,
+        101.01010101010101
+      ]
+    }
+  },
+  "RSI": {
+    "empty_array": {
+      "status": "success",
+      "len": 0,
+      "all_nan": true,
+      "sample": []
+    },
+    "single_element": {
+      "status": "success",
+      "len": 1,
+      "all_nan": true,
+      "sample": [
+        "NaN"
+      ]
+    },
+    "shorter_than_period": {
+      "status": "success",
+      "len": 3,
+      "all_nan": true,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "all_nans": {
+      "status": "success",
+      "len": 50,
+      "all_nan": true,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "with_inf": {
+      "status": "success",
+      "len": 41,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "zero_period": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "negative_period": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        "NaN",
+        "NaN"
+      ]
+    },
+    "period_1": {
+      "status": "success",
+      "len": 100,
+      "all_nan": false,
+      "sample": [
+        "NaN",
+        100.0,
+        100.0
+      ]
+    }
+  },
+  "BollingerBands": {
+    "empty_array": {
+      "status": "success",
+      "outputs": {
+        "upper": {
+          "type": "DataframeSeries",
+          "len": 0,
+          "all_nan": true,
+          "sample": []
+        },
+        "middle": {
+          "type": "DataframeSeries",
+          "len": 0,
+          "all_nan": true,
+          "sample": []
+        },
+        "lower": {
+          "type": "DataframeSeries",
+          "len": 0,
+          "all_nan": true,
+          "sample": []
+        },
+        "bandwidth": {
+          "type": "DataframeSeries",
+          "len": 0,
+          "all_nan": true,
+          "sample": []
+        },
+        "range": {
+          "type": "DataframeSeries",
+          "len": 0,
+          "all_nan": true,
+          "sample": []
+        }
+      }
+    },
+    "single_element": {
+      "status": "success",
+      "outputs": {
+        "upper": {
+          "type": "DataframeSeries",
+          "len": 1,
+          "all_nan": true,
+          "sample": [
+            "NaN"
+          ]
+        },
+        "middle": {
+          "type": "DataframeSeries",
+          "len": 1,
+          "all_nan": true,
+          "sample": [
+            "NaN"
+          ]
+        },
+        "lower": {
+          "type": "DataframeSeries",
+          "len": 1,
+          "all_nan": true,
+          "sample": [
+            "NaN"
+          ]
+        },
+        "bandwidth": {
+          "type": "DataframeSeries",
+          "len": 1,
+          "all_nan": true,
+          "sample": [
+            "NaN"
+          ]
+        },
+        "range": {
+          "type": "DataframeSeries",
+          "len": 1,
+          "all_nan": true,
+          "sample": [
+            "NaN"
+          ]
+        }
+      }
+    },
+    "shorter_than_period": {
+      "status": "success",
+      "outputs": {
+        "upper": {
+          "type": "DataframeSeries",
+          "len": 3,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "middle": {
+          "type": "DataframeSeries",
+          "len": 3,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "lower": {
+          "type": "DataframeSeries",
+          "len": 3,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "bandwidth": {
+          "type": "DataframeSeries",
+          "len": 3,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "range": {
+          "type": "DataframeSeries",
+          "len": 3,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "all_nans": {
+      "status": "success",
+      "outputs": {
+        "upper": {
+          "type": "DataframeSeries",
+          "len": 50,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "middle": {
+          "type": "DataframeSeries",
+          "len": 50,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "lower": {
+          "type": "DataframeSeries",
+          "len": 50,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "bandwidth": {
+          "type": "DataframeSeries",
+          "len": 50,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "range": {
+          "type": "DataframeSeries",
+          "len": 50,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "with_inf": {
+      "status": "success",
+      "outputs": {
+        "upper": {
+          "type": "DataframeSeries",
+          "len": 41,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "middle": {
+          "type": "DataframeSeries",
+          "len": 41,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "lower": {
+          "type": "DataframeSeries",
+          "len": 41,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "bandwidth": {
+          "type": "DataframeSeries",
+          "len": 41,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "range": {
+          "type": "DataframeSeries",
+          "len": 41,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "zero_period": {
+      "status": "success",
+      "outputs": {
+        "upper": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "middle": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "lower": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "bandwidth": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "range": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "negative_period": {
+      "status": "success",
+      "outputs": {
+        "upper": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "middle": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "lower": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "bandwidth": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "range": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "period_1": {
+      "status": "success",
+      "outputs": {
+        "upper": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            100.0,
+            100.50505050505052,
+            101.01010101010098
+          ]
+        },
+        "middle": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            100.0,
+            100.50505050505052,
+            101.01010101010098
+          ]
+        },
+        "lower": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            100.0,
+            100.50505050505052,
+            101.01010101010098
+          ]
+        },
+        "bandwidth": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "range": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    }
+  },
+  "MACD": {
+    "empty_array": {
+      "status": "success",
+      "outputs": {
+        "main": {
+          "type": "DataframeSeries",
+          "len": 0,
+          "all_nan": true,
+          "sample": []
+        },
+        "signal": {
+          "type": "DataframeSeries",
+          "len": 0,
+          "all_nan": true,
+          "sample": []
+        },
+        "histogram": {
+          "type": "DataframeSeries",
+          "len": 0,
+          "all_nan": true,
+          "sample": []
+        }
+      }
+    },
+    "single_element": {
+      "status": "success",
+      "outputs": {
+        "main": {
+          "type": "DataframeSeries",
+          "len": 1,
+          "all_nan": true,
+          "sample": [
+            "NaN"
+          ]
+        },
+        "signal": {
+          "type": "DataframeSeries",
+          "len": 1,
+          "all_nan": true,
+          "sample": [
+            "NaN"
+          ]
+        },
+        "histogram": {
+          "type": "DataframeSeries",
+          "len": 1,
+          "all_nan": true,
+          "sample": [
+            "NaN"
+          ]
+        }
+      }
+    },
+    "shorter_than_period": {
+      "status": "success",
+      "outputs": {
+        "main": {
+          "type": "DataframeSeries",
+          "len": 3,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "signal": {
+          "type": "DataframeSeries",
+          "len": 3,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "histogram": {
+          "type": "DataframeSeries",
+          "len": 3,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "all_nans": {
+      "status": "success",
+      "outputs": {
+        "main": {
+          "type": "DataframeSeries",
+          "len": 50,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "signal": {
+          "type": "DataframeSeries",
+          "len": 50,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "histogram": {
+          "type": "DataframeSeries",
+          "len": 50,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "with_inf": {
+      "status": "success",
+      "outputs": {
+        "main": {
+          "type": "DataframeSeries",
+          "len": 41,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "signal": {
+          "type": "DataframeSeries",
+          "len": 41,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "histogram": {
+          "type": "DataframeSeries",
+          "len": 41,
+          "all_nan": true,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "zero_period": {
+      "status": "success",
+      "outputs": {
+        "main": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "signal": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "histogram": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "negative_period": {
+      "status": "success",
+      "outputs": {
+        "main": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "signal": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "histogram": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    },
+    "period_1": {
+      "status": "success",
+      "outputs": {
+        "main": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "signal": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        },
+        "histogram": {
+          "type": "DataframeSeries",
+          "len": 100,
+          "all_nan": false,
+          "sample": [
+            "NaN",
+            "NaN",
+            "NaN"
+          ]
+        }
+      }
+    }
+  }
+}
