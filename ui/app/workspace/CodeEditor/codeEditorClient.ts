@@ -215,8 +215,8 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
       return client.get<SnippetTemplateDto[]>('/templates');
     },
 
-    async renderTemplatePreview(templateId: string, name: string): Promise<{ content: string; file_path: string }> {
-      return client.post('/templates/render', { template_id: templateId, name });
+    async renderTemplatePreview(templateId: string, name: string, category?: string): Promise<{ content: string; file_path: string }> {
+      return client.post('/templates/render', { template_id: templateId, name, category });
     },
 
     async createFromTemplate(

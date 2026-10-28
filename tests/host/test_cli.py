@@ -6,9 +6,10 @@ from contextlib import closing
 from unittest.mock import Mock
 
 import pytest
-from app import cli
 from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
+
+from app import cli
 
 
 def test_main_routes_registered_domain_handler(monkeypatch, capsys):

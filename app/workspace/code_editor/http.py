@@ -156,6 +156,7 @@ class RenderTemplateRequest(BaseModel):
 
     template_id: str
     name: str
+    category: str | None = None
 
 
 class ExportPackRequest(BaseModel):
@@ -342,7 +343,7 @@ def get_templates() -> dict[str, Any]:
 def render_template_preview(req: RenderTemplateRequest) -> dict[str, Any]:
     """Generate boilerplate code and target path for template preview."""
     try:
-        code, path = render_template(req.template_id, req.name)
+        code, path = render_template(req.template_id, req.name, req.category)
         return _envelope({"content": code, "file_path": path})
     except CodeEditorError as exc:
         raise TransportError(ErrorCode.VALIDATION, str(exc)) from exc

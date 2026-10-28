@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from app.include.indicators.base import BaseIndicator
-from app.workspace.code_editor._common import CodeEditorError
+from app.workspace.code_editor._common import INCLUDE_DIR, CodeEditorError
 
 
 class BaseMetric(ABC):
@@ -56,12 +56,17 @@ class SnippetRegistry:
             for name, value in vars(module).items()
             if inspect.isclass(value) and value.__module__ == module.__name__
         }
-        base = {
-            "indicators": BaseIndicator,
-            "metrics": BaseMetric,
-            "money_management": BasePositionSizer,
-        }.get(path.parent.name)
+        base: type[Any] | None = None
+        if "indicators" in path.parts:
+            base = BaseIndicator
+        elif "metrics" in path.parts:
+            base = BaseMetric
+        elif "money_management" in path.parts:
+            base = BasePositionSizer
 
+        if path.resolve() == (INCLUDE_DIR / "indicators/base.py").resolve():
+            classes = {}
+            base = None
         if base:
             classes = {
                 name: cls
@@ -73,7 +78,11 @@ class SnippetRegistry:
                     f"Custom {path.parent.name} must implement {base.__name__}"
                 )
         tools = {}
-        if path.parent.name == "ai_tools":
+        if "ai_tools" in path.parts:
+            if not classes:
+                raise CodeEditorError(
+                    "AI tool files must declare at least one tool class"
+                )
             for cls in classes.values():
                 tool = cls()
                 if not all(
@@ -120,13 +129,17 @@ def unresolved_symbols(source: str, filename: str) -> list[dict[str, Any]]:
     import builtins
 
     root = symtable.symtable(source, filename, "exec")
-    known = set(dir(builtins)) | {
-        "__name__",
-        "__file__",
-        "__package__",
-        "__doc__",
-        "__builtins__",
-    }
+    known = (
+        set(dir(builtins))
+        | {
+            "__name__",
+            "__file__",
+            "__package__",
+            "__doc__",
+            "__builtins__",
+            "__conditional_annotations__",  # Python 3.14 creates this symbol for annotations.
+        }
+    )
     known.update(
         symbol.get_name()
         for symbol in root.get_symbols()

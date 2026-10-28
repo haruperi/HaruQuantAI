@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import importlib
 import math
-import re
 import time
 from collections.abc import Callable, Mapping
 from typing import Any
@@ -12,17 +10,14 @@ from uuid import uuid4
 
 from app.host.logging import get_logger
 from app.include.price import BarPrice
-from app.workspace.code_editor._common import (
-    SNIPPETS_DIR,
-    CodeEditorError,
-    dynamic_import_from_path,
-)
+from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._indicator_data import (
     calculate_indicator,
     historical_bars,
     indicator_defaults,
     output_series,
 )
+from app.workspace.code_editor._indicator_resolver import resolve_indicator
 from app.workspace.code_editor._storage import StateStore
 
 logger = get_logger(__name__)
@@ -64,48 +59,8 @@ class IndicatorTester:
         return dict(config)
 
     def _resolve_indicator_class(self, indicator_name: str) -> Any:
-        """Locate indicator class in built-in or custom snippet packages."""
-        # 1. Check custom snippets first
-        snake_name = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", indicator_name).lower()
-        snippet_candidates = [
-            SNIPPETS_DIR / "indicators" / f"{snake_name}.py",
-            SNIPPETS_DIR / "indicators" / f"{indicator_name.lower()}.py",
-        ]
-        for custom_p in snippet_candidates:
-            if custom_p.exists():
-                mod = dynamic_import_from_path(custom_p)
-                for attr in dir(mod):
-                    if (
-                        attr.replace("_", "").lower()
-                        == indicator_name.replace("_", "").lower()
-                    ):
-                        return getattr(mod, attr)
-
-        # 2. Check built-in indicator packages
-        builtin_packages = [
-            "app.include.indicators.trend",
-            "app.include.indicators.momentum",
-            "app.include.indicators.volatility",
-            "app.include.indicators.volume",
-            "app.include.indicators.price_action",
-            "app.include.indicators.regime",
-        ]
-        for pkg_name in builtin_packages:
-            try:
-                mod = importlib.import_module(pkg_name)
-                for attr in dir(mod):
-                    if (
-                        attr.replace("_", "").lower()
-                        == indicator_name.replace("_", "").lower()
-                    ):
-                        return getattr(mod, attr)
-            except Exception as exc:
-                logger.debug("Skipping package %s: %s", pkg_name, exc)
-                continue
-
-        raise CodeEditorError(
-            f"Indicator '{indicator_name}' could not be resolved in custom or built-in libraries."
-        )
+        """Resolve the current declared class in the unified indicator library."""
+        return resolve_indicator(indicator_name)
 
     def indicator_tester(
         self,

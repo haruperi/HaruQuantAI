@@ -33,7 +33,6 @@ from app.host.logging import get_logger
 from app.workspace.code_editor._common import (
     INCLUDE_DIR,
     PROJECT_ROOT,
-    SNIPPETS_DIR,
     CodeEditorError,
     dynamic_import_source,
     resolve_safe_path,
@@ -177,7 +176,7 @@ class CodeEditor:
         self, template_type: str, name: str, category: str = "custom"
     ) -> dict[str, Any]:
         """FR-CODEEDITOR-CREATE-NEW: Generate a new snippet from one of 12 templates."""
-        content, rel_path = render_template(template_type, name)
+        content, rel_path = render_template(template_type, name, category=category)
         resolved = resolve_safe_path(rel_path)
         if resolved.exists():
             raise CodeEditorError(
@@ -281,7 +280,7 @@ class CodeEditor:
         search_dir: str | None = None,
     ) -> list[dict[str, Any]]:
         """FR-CODEEDITOR-FIND: Search for text or patterns across snippets."""
-        root = resolve_safe_path(search_dir) if search_dir else SNIPPETS_DIR
+        root = resolve_safe_path(search_dir) if search_dir else INCLUDE_DIR
         flags = 0 if case_sensitive else re.IGNORECASE
         pattern_str = query
         if not regex:
@@ -362,9 +361,9 @@ class CodeEditor:
         for path in list(registry.blocks):
             if not Path(path).exists():
                 registry.unregister(path)
-        if SNIPPETS_DIR.exists():
-            for p in SNIPPETS_DIR.rglob("*.py"):
-                if not p.name.startswith("__"):
+        if INCLUDE_DIR.exists():
+            for p in INCLUDE_DIR.rglob("*.py"):
+                if not p.name.startswith((".", "__")):
                     results.append(self.compile_file(str(p)))
 
         success_count = sum(1 for r in results if r["success"])

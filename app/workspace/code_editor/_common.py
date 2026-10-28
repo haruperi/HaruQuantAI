@@ -22,8 +22,8 @@ logger = get_logger(__name__)
 
 # Canonical roots for user extensions and standard include blocks
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-SNIPPETS_DIR = PROJECT_ROOT / "app" / "include" / "snippets"
 INCLUDE_DIR = PROJECT_ROOT / "app" / "include"
+SNIPPETS_DIR = INCLUDE_DIR
 
 
 class CodeEditorError(Exception):
@@ -129,12 +129,12 @@ def dynamic_import_from_path(file_path: Path) -> Any:
 
 
 def writable_snippet_path(target_path: str | Path) -> Path:
-    """Reject mutations of application sources, package files and the snippet root."""
+    """Reject mutations outside authorized include directory and protected files."""
     resolved = resolve_safe_path(target_path)
     try:
-        parts = resolved.relative_to(SNIPPETS_DIR.resolve()).parts
+        parts = resolved.relative_to(INCLUDE_DIR.resolve()).parts
     except ValueError as exc:
-        raise CodeEditorError("Only custom snippets can be modified") from exc
+        raise CodeEditorError("Only files in app/include can be modified") from exc
     if not parts or any(part.startswith((".", "__")) for part in parts):
         raise CodeEditorError("Protected snippet package path")
     return resolved
@@ -146,6 +146,10 @@ def dynamic_import_source(file_path: Path, source: str) -> Any:
         "dynamic_snippet_"
         + hashlib.sha256(str(file_path.resolve()).encode()).hexdigest()
     )
+    if file_path.resolve().is_relative_to(PROJECT_ROOT):
+        package = ".".join(file_path.resolve().relative_to(PROJECT_ROOT).parent.parts)
+        if package:
+            module_name = f"{package}.{module_name}"
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     if spec is None or spec.loader is None:
         raise CodeEditorError(f"Could not load module spec for {file_path}")

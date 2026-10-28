@@ -36,7 +36,7 @@ export function useCodeEditorWorkspace() {
   const [diagnostics, setDiagnostics] = useState<SyntaxDiagnosticDto[]>([]);
   const [outputLogs, setOutputLogs] = useState<string[]>([
     `[${new Date().toLocaleTimeString()}] Python Extension Runtime ready (3.14.7).`,
-    `[${new Date().toLocaleTimeString()}] Snippets repository loaded at app/include/snippets/.`,
+    `[${new Date().toLocaleTimeString()}] Snippets repository loaded at app/include/.`,
   ]);
   const [searchResults, setSearchResults] = useState<SearchMatchDto[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -292,7 +292,7 @@ export function useCodeEditorWorkspace() {
   // Context Menu Actions
   const handleContextMenuAction = async (action: string) => {
     if (!contextMenu && !['new_file', 'new_dir'].includes(action)) return;
-    const item = contextMenu?.item ?? { id: 'app/include/snippets', name: 'snippets', type: 'directory' as const };
+    const item = contextMenu?.item ?? { id: 'app/include', name: 'snippets', type: 'directory' as const };
     setContextMenu(null);
 
     if (action === 'open') {

@@ -10,34 +10,31 @@ describe('codeEditorClient', () => {
     const fetchFn = vi.fn().mockImplementation(
       mockResponse({
         status: 'initialized',
-        active_file: 'app/include/snippets/example.py',
+        active_file: 'app/include/example.py',
         open_tabs: [],
         layout: { navigator_visible: true, split_mode: 'none', bottom_panel: 'problems' },
-      })
+      }),
     );
 
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
     const res = await client.initWorkspace();
 
-    expect(fetchFn).toHaveBeenCalledWith(
-      '/api/v1/code-editor/init',
-      expect.objectContaining({ method: 'GET' })
-    );
+    expect(fetchFn).toHaveBeenCalledWith('/api/v1/code-editor/init', expect.objectContaining({ method: 'GET' }));
     expect(res.status).toBe('initialized');
-    expect(res.active_file).toBe('app/include/snippets/example.py');
+    expect(res.active_file).toBe('app/include/example.py');
   });
 
   it('calls fetchNavigator with optional rootDir query param', async () => {
-    const fetchFn = vi.fn().mockImplementation(
-      mockResponse({ id: 'root', name: 'snippets', type: 'directory', children: [] })
-    );
+    const fetchFn = vi
+      .fn()
+      .mockImplementation(mockResponse({ id: 'root', name: 'snippets', type: 'directory', children: [] }));
 
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
-    const res = await client.fetchNavigator('app/include/snippets');
+    const res = await client.fetchNavigator('app/include');
 
     expect(fetchFn).toHaveBeenCalledWith(
-      '/api/v1/code-editor/navigator?root_dir=app%2Finclude%2Fsnippets',
-      expect.objectContaining({ method: 'GET' })
+      '/api/v1/code-editor/navigator?root_dir=app%2Finclude',
+      expect.objectContaining({ method: 'GET' }),
     );
     expect(res.id).toBe('root');
   });
@@ -48,7 +45,7 @@ describe('codeEditorClient', () => {
         status: 'opened',
         tab: { file_path: 'test.py', title: 'test.py', is_dirty: false, content: '', mode: 'python' },
         active_file: 'test.py',
-      })
+      }),
     );
 
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
@@ -59,7 +56,7 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ file_path: 'test.py', mode: 'python' }),
-      })
+      }),
     );
 
     await client.closeTab('test.py', true);
@@ -68,14 +65,14 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ file_path: 'test.py', force: true }),
-      })
+      }),
     );
   });
 
   it('calls saveFile, newFile, and compileFile', async () => {
-    const fetchFn = vi.fn().mockImplementation(
-      mockResponse({ status: 'saved', file_path: 'test.py', diagnostics: [] })
-    );
+    const fetchFn = vi
+      .fn()
+      .mockImplementation(mockResponse({ status: 'saved', file_path: 'test.py', diagnostics: [] }));
 
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
     await client.saveFile('test.py', 'x = 1\n');
@@ -85,7 +82,7 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ file_path: 'test.py', content: 'x = 1\n' }),
-      })
+      }),
     );
 
     await client.newFile('test2.py', '# new');
@@ -94,7 +91,7 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ file_path: 'test2.py', content: '# new' }),
-      })
+      }),
     );
 
     await client.compileFile('test2.py', '# new');
@@ -103,7 +100,7 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ file_path: 'test2.py', content: '# new' }),
-      })
+      }),
     );
   });
 
@@ -118,7 +115,7 @@ describe('codeEditorClient', () => {
           default_filename: 'Indicator.py',
           target_subdir: 'indicators',
         },
-      ])
+      ]),
     );
 
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
@@ -131,14 +128,16 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ template_type: 'BlocksIndicators', name: 'CustomIndy', category: 'Blocks' }),
-      })
+      }),
     );
   });
 
   it('calls import/export endpoints with resolution rules', async () => {
-    const fetchFn = vi.fn().mockImplementation(
-      mockResponse({ status: 'success', archive_path: 'export.zip', file_count: 2, files: ['a.py', 'b.py'] })
-    );
+    const fetchFn = vi
+      .fn()
+      .mockImplementation(
+        mockResponse({ status: 'success', archive_path: 'export.zip', file_count: 2, files: ['a.py', 'b.py'] }),
+      );
 
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
     await client.exportPack(['a.py', 'b.py'], 'export.zip', { title: 'Pack' });
@@ -147,7 +146,7 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ file_paths: ['a.py', 'b.py'], archive_path: 'export.zip', metadata: { title: 'Pack' } }),
-      })
+      }),
     );
 
     await client.inspectPack('export.zip');
@@ -156,7 +155,7 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ archive_path: 'export.zip' }),
-      })
+      }),
     );
 
     await client.importPack('export.zip', { 'a.py': 'overwrite' });
@@ -165,7 +164,7 @@ describe('codeEditorClient', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ archive_path: 'export.zip', resolution_rules: { 'a.py': 'overwrite' } }),
-      })
+      }),
     );
   });
 
@@ -181,7 +180,7 @@ describe('codeEditorClient', () => {
         indicator_plots: [],
         table_rows: [],
         discrepancies: [],
-      })
+      }),
     );
 
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
@@ -207,7 +206,27 @@ describe('codeEditorClient', () => {
           bars_to_reserve: 50,
           bar_count: 150,
         }),
-      })
+      }),
+    );
+  });
+  it('passes the indicator category to both preview and creation', async () => {
+    const fetchFn = vi
+      .fn()
+      .mockImplementation(mockResponse({ file_path: 'app/include/indicators/research/research_ma.py', content: '' }));
+    const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
+    await client.renderTemplatePreview('BlocksIndicators', 'ResearchMA', 'research');
+    expect(fetchFn).toHaveBeenLastCalledWith(
+      '/api/v1/code-editor/templates/render',
+      expect.objectContaining({
+        body: JSON.stringify({ template_id: 'BlocksIndicators', name: 'ResearchMA', category: 'research' }),
+      }),
+    );
+    await client.createFromTemplate('BlocksIndicators', 'ResearchMA', 'research');
+    expect(fetchFn).toHaveBeenLastCalledWith(
+      '/api/v1/code-editor/templates/create',
+      expect.objectContaining({
+        body: JSON.stringify({ template_type: 'BlocksIndicators', name: 'ResearchMA', category: 'research' }),
+      }),
     );
   });
 });

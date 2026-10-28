@@ -38,7 +38,7 @@ def test_list_templates_returns_12_templates():
 def test_each_template_renders_valid_python(tmpl_id: str):
     """Verify that rendering each template produces syntactically valid Python code."""
     content, file_path = render_template(tmpl_id, "SampleSnippet")
-    assert file_path.startswith("app/include/snippets/")
+    assert file_path.startswith("app/include/")
     assert file_path.endswith(".py")
     assert len(content) > 50
 
@@ -51,3 +51,14 @@ def test_get_template_unknown_raises():
     """Verify unknown template ID raises CodeEditorError."""
     with pytest.raises(CodeEditorError):
         get_template("NonExistentTemplate")
+
+
+def test_render_indicator_with_custom_category():
+    """Verify indicator template targets selected domain subfolder."""
+    _, path_vol = render_template(
+        "BlocksIndicators", "CustomVol", category="volatility"
+    )
+    assert path_vol == "app/include/indicators/volatility/custom_vol.py"
+
+    _, path_custom = render_template("BlocksIndicators", "CustomAlpha")
+    assert path_custom == "app/include/indicators/custom/custom_alpha.py"

@@ -1,194 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import {
-  BarChart2,
-  Bot,
-  CandlestickChart,
-  Check,
-  Copy,
-  Cpu,
-  Database,
-  FileCode,
-  FlaskConical,
-  Folder,
-  Layers,
-  Network,
-  Search,
-  Settings,
-  Shield,
-  TrendingUp,
-  X,
-  Zap,
-} from 'lucide-react';
-import { createCodeEditorClient, type SnippetTemplateDto } from './codeEditorClient';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Check, Copy, FileCode, Folder, Search, X } from 'lucide-react';
+import { TEMPLATE_METADATA, type TemplateMetadata } from './templateCatalog';
+import { createCodeEditorClient } from './codeEditorClient';
 
 interface CreateFromTemplateModalProps {
   onClose: () => void;
   onSnippetCreated: (tabInfo: { file_path: string; title: string; content: string }) => void;
 }
 
-interface TemplateMetadata {
-  id: string;
-  name: string;
-  categoryName: string;
-  description: string;
-  detailedDoc: string;
-  defaultName: string;
-  targetDir: string;
-  color: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
-
-const TEMPLATE_METADATA: TemplateMetadata[] = [
-  {
-    id: 'BlocksIndicators',
-    name: 'Blocks Indicators',
-    categoryName: 'building_blocks',
-    description: 'Technical indicators and market data',
-    detailedDoc:
-      'Create custom technical indicators using price, volume, and other market data. This template provides a clean structure for building indicators with configurable parameters and easy integration with the HaruQuantAI backtesting framework.',
-    defaultName: 'MyIndicator',
-    targetDir: 'app/include/snippets/indicators/',
-    color: 'bg-blue-600/20 text-blue-400 border-blue-500/30',
-    icon: BarChart2,
-  },
-  {
-    id: 'BlocksSignal',
-    name: 'Blocks Signal',
-    categoryName: 'building_blocks',
-    description: 'Trading signals and entry/exit logic',
-    detailedDoc:
-      'Evaluates conditions across indicator and price series to generate entry or exit triggers for trading strategies.',
-    defaultName: 'MySignalCondition',
-    targetDir: 'app/include/snippets/signals/',
-    color: 'bg-emerald-600/20 text-emerald-400 border-emerald-500/30',
-    icon: Zap,
-  },
-  {
-    id: 'BlocksOrder',
-    name: 'Blocks Order',
-    categoryName: 'building_blocks',
-    description: 'Order execution and position control',
-    detailedDoc:
-      'Custom logic for opening, modifying, and closing trading orders with fine-grained slippage and magic number control.',
-    defaultName: 'MyOrderAction',
-    targetDir: 'app/include/snippets/orders/',
-    color: 'bg-amber-600/20 text-amber-400 border-amber-500/30',
-    icon: Layers,
-  },
-  {
-    id: 'BlocksOtherActions',
-    name: 'Blocks Other Actions',
-    categoryName: 'building_blocks',
-    description: 'Miscellaneous trading actions',
-    detailedDoc:
-      'Side-effect actions triggered on events: logging, sound alerts, email/webhook alerts, and chart markers.',
-    defaultName: 'MyAction',
-    targetDir: 'app/include/snippets/actions/',
-    color: 'bg-purple-600/20 text-purple-400 border-purple-500/30',
-    icon: Settings,
-  },
-  {
-    id: 'ColumnsDatabanks',
-    name: 'Columns Databanks',
-    categoryName: 'databanks',
-    description: 'Market and fundamental data columns',
-    detailedDoc:
-      'Computes custom strategy performance metrics and statistics displayed as filterable columns in Databanks.',
-    defaultName: 'MyDatabankMetric',
-    targetDir: 'app/include/snippets/metrics/',
-    color: 'bg-cyan-600/20 text-cyan-400 border-cyan-500/30',
-    icon: Database,
-  },
-  {
-    id: 'ColumnsTrades',
-    name: 'Columns Trades',
-    categoryName: 'databanks',
-    description: 'Trade and position data columns',
-    detailedDoc:
-      'Computes per-trade analytic columns evaluated over individual historical trade execution records.',
-    defaultName: 'MyTradeColumn',
-    targetDir: 'app/include/snippets/trade_columns/',
-    color: 'bg-pink-600/20 text-pink-400 border-pink-500/30',
-    icon: CandlestickChart,
-  },
-  {
-    id: 'MoneyManagement',
-    name: 'Money Management',
-    categoryName: 'money_management',
-    description: 'Position sizing and risk management',
-    detailedDoc:
-      'Calculates order volume (lots/contracts) dynamically based on risk percentage, equity, and stop-loss distance.',
-    defaultName: 'MyPositionSizer',
-    targetDir: 'app/include/snippets/money_management/',
-    color: 'bg-yellow-600/20 text-yellow-400 border-yellow-500/30',
-    icon: Shield,
-  },
-  {
-    id: 'MonteCarloManipulation',
-    name: 'Monte Carlo Manipulation',
-    categoryName: 'robustness',
-    description: 'Monte Carlo data manipulation',
-    detailedDoc:
-      'Performs trade sequence manipulation: reshuffling, resampling with replacement, randomized skipping, and slippage jitter.',
-    defaultName: 'MyMcManipulation',
-    targetDir: 'app/include/snippets/monte_carlo/manipulation/',
-    color: 'bg-teal-600/20 text-teal-400 border-teal-500/30',
-    icon: Network,
-  },
-  {
-    id: 'MonteCarloRetest',
-    name: 'Monte Carlo Retest',
-    categoryName: 'robustness',
-    description: 'Monte Carlo strategy retest',
-    detailedDoc:
-      'Simulates parameter perturbations to test strategy robustness and sensitivity against overfitting.',
-    defaultName: 'MyMcRetest',
-    targetDir: 'app/include/snippets/monte_carlo/retest/',
-    color: 'bg-indigo-600/20 text-indigo-400 border-indigo-500/30',
-    icon: TrendingUp,
-  },
-  {
-    id: 'WhatIf',
-    name: 'What If',
-    categoryName: 'robustness',
-    description: 'Scenario analysis and parameter testing',
-    detailedDoc:
-      'Hypothetical scenario filtering rule (e.g. drop worst N consecutive trades, filter by day of week or session hours).',
-    defaultName: 'MyWhatIfScenario',
-    targetDir: 'app/include/snippets/what_if/',
-    color: 'bg-red-600/20 text-red-400 border-red-500/30',
-    icon: FlaskConical,
-  },
-  {
-    id: 'CustomAnalysis',
-    name: 'Custom Analysis',
-    categoryName: 'analysis',
-    description: 'Custom research and analysis tools',
-    detailedDoc:
-      'Batch analytical processor and reporting script operating over databanks and multiple strategy results.',
-    defaultName: 'MyCustomAnalysis',
-    targetDir: 'app/include/snippets/analysis/',
-    color: 'bg-sky-600/20 text-sky-400 border-sky-500/30',
-    icon: Search,
-  },
-  {
-    id: 'AITools',
-    name: 'AI Tools',
-    categoryName: 'ai_tools',
-    description: 'AI-powered quant research tools',
-    detailedDoc:
-      'Defines custom tools exposed via Model Context Protocol (MCP) and callable by autonomous AI research agents.',
-    defaultName: 'MyAIAssistantTool',
-    targetDir: 'app/include/snippets/ai_tools/',
-    color: 'bg-fuchsia-600/20 text-fuchsia-400 border-fuchsia-500/30',
-    icon: Cpu,
-  },
-];
-
 export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFromTemplateModalProps) {
-  const client = createCodeEditorClient();
+  const client = useMemo(() => createCodeEditorClient(), []);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateMetadata>(TEMPLATE_METADATA[0]);
   const [snippetName, setSnippetName] = useState<string>(TEMPLATE_METADATA[0].defaultName);
+  const [indicatorCategory, setIndicatorCategory] = useState<string>('custom');
+  const [customCategory, setCustomCategory] = useState('');
+  const [previewPath, setPreviewPath] = useState('');
+  const targetCategory = indicatorCategory === '__new__' ? customCategory.trim() : indicatorCategory;
+  const normalizedName = snippetName.trim().replace(/\.py$/, '') || selectedTemplate.defaultName;
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [previewContent, setPreviewContent] = useState<string>('');
   const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -197,27 +25,38 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
 
   // Filter templates
   const filteredTemplates = TEMPLATE_METADATA.filter(
-    t =>
+    (t) =>
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.description.toLowerCase().includes(searchQuery.toLowerCase())
+      t.description.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Fetch live template preview from backend
   useEffect(() => {
     let active = true;
+    setPreviewPath('');
+    setErrorMsg(null);
     client
-      .renderTemplatePreview(selectedTemplate.id, snippetName || selectedTemplate.defaultName)
-      .then(res => {
-        if (active) setPreviewContent(res.content);
+      .renderTemplatePreview(
+        selectedTemplate.id,
+        normalizedName,
+        selectedTemplate.id === 'BlocksIndicators' ? targetCategory : undefined,
+      )
+      .then((res) => {
+        if (active) {
+          setPreviewContent(res.content);
+          setPreviewPath(res.file_path);
+        }
       })
-      .catch(() => {
-        // Fallback preview
-        if (active) setPreviewContent(`# Boilerplate for ${selectedTemplate.name}\nclass ${snippetName}:\n    pass\n`);
+      .catch((error) => {
+        if (active) {
+          setPreviewContent('');
+          setErrorMsg(error instanceof Error ? error.message : 'Preview failed');
+        }
       });
     return () => {
       active = false;
     };
-  }, [selectedTemplate.id, snippetName]);
+  }, [client, selectedTemplate.id, normalizedName, targetCategory]);
 
   const handleSelectTemplate = (tmpl: TemplateMetadata) => {
     setSelectedTemplate(tmpl);
@@ -232,17 +71,19 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
   };
 
   const handleCreate = async () => {
-    if (!snippetName.trim()) {
+    if (!snippetName.trim() || !previewPath) {
       setErrorMsg('Please enter a snippet name.');
       return;
     }
     setIsCreating(true);
     setErrorMsg(null);
     try {
+      const activeCategory =
+        selectedTemplate.id === 'BlocksIndicators' ? targetCategory : selectedTemplate.categoryName;
       const res = await client.createFromTemplate(
         selectedTemplate.id,
         snippetName.trim().replace(/\.py$/, ''),
-        selectedTemplate.categoryName
+        activeCategory,
       );
       onSnippetCreated({
         file_path: res.file_path,
@@ -270,9 +111,7 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
               <FileCode className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
-                Create New from Template
-              </h2>
+              <h2 className="text-lg font-semibold text-slate-100 flex items-center gap-2">Create New from Template</h2>
               <p className="text-xs text-slate-400">
                 Create a new file from a template to get started quickly with your quantitative trading strategy.
               </p>
@@ -297,14 +136,14 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
                   type="text"
                   placeholder="Search templates..."
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-900/90 border border-slate-700/60 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-2 space-y-1 divide-y divide-transparent">
-              {filteredTemplates.map(tmpl => {
+              {filteredTemplates.map((tmpl) => {
                 const isSelected = tmpl.id === selectedTemplate.id;
                 const Icon = tmpl.icon;
                 return (
@@ -380,25 +219,58 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
                 <input
                   type="text"
                   value={snippetName}
-                  onChange={e => setSnippetName(e.target.value)}
+                  onChange={(e) => setSnippetName(e.target.value)}
                   placeholder="SnippetName"
                   className="w-full px-3 py-1.5 text-xs bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-slate-300 mb-1">Category</label>
-                <div className="px-3 py-1.5 text-xs bg-slate-950/70 border border-slate-800 rounded-lg text-slate-300 flex items-center justify-between">
-                  <span className="truncate">{selectedTemplate.name}</span>
-                  <span className="text-[10px] text-slate-500 uppercase">{selectedTemplate.categoryName}</span>
-                </div>
+                <label htmlFor="indicator-category" className="block text-[11px] font-medium text-slate-300 mb-1">
+                  Category
+                </label>
+                {selectedTemplate.id === 'BlocksIndicators' ? (
+                  <>
+                    <select
+                      id="indicator-category"
+                      value={indicatorCategory}
+                      onChange={(e) => setIndicatorCategory(e.target.value)}
+                      className="w-full px-2 py-1 text-xs bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono"
+                    >
+                      <option value="custom">custom (User Custom)</option>
+                      <option value="trend">trend (Trend Following)</option>
+                      <option value="momentum">momentum (Oscillators)</option>
+                      <option value="volatility">volatility (Bands & Range)</option>
+                      <option value="volume">volume (Volume & Flow)</option>
+                      <option value="price_action">price_action (Patterns & Levels)</option>
+                      <option value="regime">regime (Market Regime)</option>
+                      <option value="__new__">New category...</option>
+                    </select>
+                    {indicatorCategory === '__new__' && (
+                      <label className="block text-xs text-slate-300 mt-2">
+                        New indicator category
+                        <input
+                          value={customCategory}
+                          onChange={(event) => setCustomCategory(event.target.value)}
+                          placeholder="e.g. research"
+                          className="w-full px-2 py-1 bg-slate-950 border border-slate-700 rounded"
+                        />
+                      </label>
+                    )}
+                  </>
+                ) : (
+                  <div className="px-3 py-1.5 text-xs bg-slate-950/70 border border-slate-800 rounded-lg text-slate-300 flex items-center justify-between">
+                    <span className="truncate">{selectedTemplate.name}</span>
+                    <span className="text-[10px] text-slate-500 uppercase">{selectedTemplate.categoryName}</span>
+                  </div>
+                )}
               </div>
 
               <div>
                 <label className="block text-[11px] font-medium text-slate-300 mb-1">Target Path</label>
                 <div className="px-3 py-1.5 text-xs bg-slate-950/70 border border-slate-800 rounded-lg text-slate-400 font-mono flex items-center gap-1.5 truncate">
                   <Folder className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                  <span className="truncate">{selectedTemplate.targetDir}</span>
+                  <span className="truncate">{previewPath || 'Waiting for a valid preview...'}</span>
                 </div>
               </div>
             </div>
@@ -421,7 +293,7 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
           </button>
           <button
             onClick={handleCreate}
-            disabled={isCreating}
+            disabled={isCreating || !previewPath}
             className="px-5 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             <FileCode className="w-4 h-4" />

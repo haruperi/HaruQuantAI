@@ -25,6 +25,26 @@ export function RenderTreeItem({
   const isDir = item.type === 'directory';
   const isCollapsed = collapsed[item.id] ?? false;
   const isSelected = selectedPath === item.id;
+  const parts = item.id.replaceAll('\\', '/').split('/');
+  const domains: Record<string, string> = {
+    indicators: 'Indicator',
+    actions: 'Action',
+    signals: 'Signal',
+    orders: 'Order',
+    metrics: 'Metric',
+    trade_columns: 'Trade',
+    money_management: 'Sizing',
+    monte_carlo: 'Monte Carlo',
+    what_if: 'What-if',
+    analysis: 'Analysis',
+    ai_tools: 'AI tool',
+  };
+  const badge =
+    parts[0] === 'app' && parts[1] === 'include'
+      ? parts[2] === 'indicators' && parts[3] && (isDir || parts.length > 4)
+        ? parts[3]
+        : domains[parts[2]]
+      : undefined;
 
   // Filter matching
   if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -60,6 +80,14 @@ export function RenderTreeItem({
           <FileCode className="w-3.5 h-3.5 text-blue-400 ml-4 flex-shrink-0" />
         )}
         <span className="truncate">{item.name}</span>
+        {badge && (
+          <span
+            title="Building block domain"
+            className="ml-auto px-1 rounded text-[9px] text-slate-400 border border-slate-800"
+          >
+            {badge}
+          </span>
+        )}
       </div>
 
       {isDir && !isCollapsed && item.children && (

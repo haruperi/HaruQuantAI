@@ -27,14 +27,14 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
   );
   const [includeSources, setIncludeSources] = useState<boolean>(true);
   const [includeMetadata, setIncludeMetadata] = useState<boolean>(true);
-  const [outputFilePath, setOutputFilePath] = useState<string>('app/include/snippets/my_pack.zip');
+  const [outputFilePath, setOutputFilePath] = useState<string>('app/include/my_pack.zip');
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
 
   // Import state
-  const [importFilePath, setImportFilePath] = useState<string>('app/include/snippets/my_pack.zip');
+  const [importFilePath, setImportFilePath] = useState<string>('app/include/my_pack.zip');
   const [importOption, setImportOption] = useState<'merge' | 'overwrite' | 'rename'>('overwrite');
-  const [targetDirectory, setTargetDirectory] = useState<string>('app/include/snippets/');
+  const [targetDirectory, setTargetDirectory] = useState<string>('app/include/');
   const [isInspecting, setIsInspecting] = useState<boolean>(false);
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [importPreview, setImportPreview] = useState<ImportedFileRecord[]>([]);
@@ -44,7 +44,7 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
     setIsExporting(true);
     setExportMessage(null);
     try {
-      const filesToExport = openFiles.length > 0 ? openFiles : ['app/include/snippets/indicators/'];
+      const filesToExport = openFiles.length > 0 ? openFiles : ['app/include/indicators/'];
       const res = await client.exportPack(filesToExport, outputFilePath, {
         name: packName,
         description,

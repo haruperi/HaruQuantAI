@@ -9,8 +9,9 @@ from unittest.mock import Mock
 import httpx
 import pytest
 import uvicorn
-from app import main as backend
 from fastapi.testclient import TestClient
+
+from app import main as backend
 
 
 def test_lifespan_initializes_and_cleans_services(monkeypatch):

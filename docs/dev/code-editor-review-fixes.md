@@ -2,8 +2,8 @@
 
 The editor now persists open buffers (including empty and dirty buffers), tab
 selection, and named indicator setups through `HostPersistence`. Destructive
-operations are limited to custom snippets; package files and application sources
-are protected. Renaming a folder remaps its open descendants without dropping edits.
+operations are limited to public files under `app/include/`; private package
+files and application sources outside that root are protected. Renaming a folder remaps its open descendants without dropping edits.
 
 Save stages and flushes a temporary file before replacement. Save All stages the
 entire batch and restores earlier replacements if publication fails. Replacement
