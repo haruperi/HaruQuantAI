@@ -11,8 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import is_falling, is_lower, is_rising
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -103,71 +101,3 @@ class MTKeltnerChannel(BaseIndicator):
             "middle": IndicatorSeries(middle, name="MTKC.Middle"),
             "lower": IndicatorSeries(lower, name="MTKC.Lower"),
         }
-
-    @classmethod
-    def bar_closes_above_upper(
-        cls,
-        close_series: IndicatorSeries,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if Close bar at shift is higher than Upper band."""
-        return is_greater(close_series, kc_dict["upper"], shift=shift)
-
-    @classmethod
-    def bar_closes_below_upper(
-        cls,
-        close_series: IndicatorSeries,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if Close bar at shift is lower than Upper band."""
-        return is_lower(close_series, kc_dict["upper"], shift=shift)
-
-    @classmethod
-    def bar_closes_above_lower(
-        cls,
-        close_series: IndicatorSeries,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if Close bar at shift is higher than Lower band."""
-        return is_greater(close_series, kc_dict["lower"], shift=shift)
-
-    @classmethod
-    def bar_closes_below_lower(
-        cls,
-        close_series: IndicatorSeries,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if Close bar at shift is lower than Lower band."""
-        return is_lower(close_series, kc_dict["lower"], shift=shift)
-
-    @classmethod
-    def upper_is_rising(
-        cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if Upper band is rising."""
-        return is_rising(kc_dict["upper"], shift=shift)
-
-    @classmethod
-    def upper_is_falling(
-        cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if Upper band is falling."""
-        return is_falling(kc_dict["upper"], shift=shift)
-
-    @classmethod
-    def lower_is_rising(
-        cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if Lower band is rising."""
-        return is_rising(kc_dict["lower"], shift=shift)
-
-    @classmethod
-    def lower_is_falling(
-        cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if Lower band is falling."""
-        return is_falling(kc_dict["lower"], shift=shift)

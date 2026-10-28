@@ -11,14 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -30,7 +22,6 @@ from app.include.blocks.metadata import (
 from app.include.blocks.series import BarData, IndicatorSeries
 
 DOWN_MODE = 2
-
 logger = get_logger(__name__)
 
 
@@ -100,44 +91,3 @@ class UlcerIndex(BaseIndicator):
             n,
         )
         return {"value": IndicatorSeries(res, name=f"UlcerIndex(mode={mode},{period})")}
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate Ulcer Index is rising condition."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate Ulcer Index is falling condition."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls, series: IndicatorSeries, level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate Ulcer Index crosses above level."""
-        return crosses_above(series, level, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls, series: IndicatorSeries, level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate Ulcer Index crosses below level (below safe level)."""
-        return crosses_below(series, level, shift=shift)
-
-    @classmethod
-    def is_lower(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
-        """Evaluate Ulcer Index is below safe level threshold."""
-        return is_lower(series, level, shift=shift)
-
-    @classmethod
-    def is_greater(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
-        """Evaluate Ulcer Index is above safe level threshold."""
-        return is_greater(series, level, shift=shift)
-
-    @classmethod
-    def is_higher(
-        cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
-    ) -> bool:
-        """Evaluate Ulcer Index is higher than past value."""
-        return is_greater(series, series, shift1=shift, shift2=shift + lookback)

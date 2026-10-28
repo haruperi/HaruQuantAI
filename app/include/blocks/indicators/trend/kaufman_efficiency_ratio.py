@@ -11,8 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import is_falling, is_lower, is_rising
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -84,27 +82,3 @@ class KaufmanEfficiencyRatio(BaseIndicator):
             "FR-SERVICES-KER-CALCULATE: Computed KER(period=%d) for %d bars", period, n
         )
         return {"value": IndicatorSeries(res, name=f"KER({period})")}
-
-    @classmethod
-    def is_above_level(
-        cls, series: IndicatorSeries, level: float = 0.5, shift: int = 0
-    ) -> bool:
-        """Evaluate if KER at shift is above level threshold."""
-        return is_greater(series, level, shift=shift)
-
-    @classmethod
-    def is_below_level(
-        cls, series: IndicatorSeries, level: float = 0.5, shift: int = 0
-    ) -> bool:
-        """Evaluate if KER at shift is below level threshold."""
-        return is_lower(series, level, shift=shift)
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if KER is rising."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if KER is falling."""
-        return is_falling(series, shift=shift)

@@ -11,16 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -126,89 +116,3 @@ class Stochastic(BaseIndicator):
             "k": IndicatorSeries(slow_k, name="Stoch.K"),
             "d": IndicatorSeries(slow_d, name="Stoch.D"),
         }
-
-    @classmethod
-    def k_crosses_above_d(
-        cls, stoch: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate %K crosses above %D."""
-        return crosses_above(stoch["k"], stoch["d"], shift=shift)
-
-    @classmethod
-    def k_crosses_below_d(
-        cls, stoch: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate %K crosses below %D."""
-        return crosses_below(stoch["k"], stoch["d"], shift=shift)
-
-    @classmethod
-    def k_higher_d(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate StochFastKUp (`%K[shift] > %D[shift]`)."""
-        return is_greater(stoch["k"], stoch["d"], shift=shift)
-
-    @classmethod
-    def k_lower_d(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate StochFastKDown (`%K[shift] < %D[shift]`)."""
-        return is_lower(stoch["k"], stoch["d"], shift=shift)
-
-    @classmethod
-    def k_crosses_above(
-        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate StochFastKCrossUp (`%K` crosses above `level`)."""
-        return crosses_above(stoch["k"], level, shift=shift)
-
-    @classmethod
-    def k_crosses_below(
-        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate StochFastKCrossDown (`%K` crosses below `level`)."""
-        return crosses_below(stoch["k"], level, shift=shift)
-
-    @classmethod
-    def d_changes_up(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate StochSlowDChangesUp (`%D[s+2] > %D[s+1] < %D[s]`)."""
-        return changes_up(stoch["d"], shift=shift)
-
-    @classmethod
-    def d_changes_down(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate StochSlowDChangesDown (`%D[s+2] < %D[s+1] > %D[s]`)."""
-        return changes_down(stoch["d"], shift=shift)
-
-    @classmethod
-    def d_crosses_above(
-        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate StochSlowDCrossUp (`%D` crosses above `level`)."""
-        return crosses_above(stoch["d"], level, shift=shift)
-
-    @classmethod
-    def d_crosses_below(
-        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate StochSlowDCrossDown (`%D` crosses below `level`)."""
-        return crosses_below(stoch["d"], level, shift=shift)
-
-    @classmethod
-    def d_is_rising(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate StochSlowDRising (`%D[shift+1] < %D[shift]`)."""
-        return is_rising(stoch["d"], shift=shift)
-
-    @classmethod
-    def d_is_falling(cls, stoch: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate StochSlowDFalling (`%D[shift+1] > %D[shift]`)."""
-        return is_falling(stoch["d"], shift=shift)
-
-    @classmethod
-    def d_is_higher(
-        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate StochSlowDHigher (`%D[shift] > level`)."""
-        return is_greater(stoch["d"], level, shift=shift)
-
-    @classmethod
-    def d_is_lower(
-        cls, stoch: dict[str, IndicatorSeries], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate StochSlowDLower (`%D[shift] < level`)."""
-        return is_lower(stoch["d"], level, shift=shift)

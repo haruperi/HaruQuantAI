@@ -11,16 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -99,51 +89,3 @@ class AwesomeOscillator(BaseIndicator):
             n,
         )
         return {"value": IndicatorSeries(res, name="AwesomeOscillator")}
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate AWORising condition."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate AWOFalling condition."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate AWOCrossUp condition (crosses above level/zero)."""
-        return crosses_above(series, level, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate AWOCrossDown condition (crosses below level/zero)."""
-        return crosses_below(series, level, shift=shift)
-
-    @classmethod
-    def is_higher(
-        cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
-    ) -> bool:
-        """Evaluate AWOHigher condition."""
-        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
-    def is_lower(
-        cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
-    ) -> bool:
-        """Evaluate AWOLower condition."""
-        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
-    def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate AWOChangesUp turn condition."""
-        return changes_up(series, shift=shift)
-
-    @classmethod
-    def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate AWOChangesDown turn condition."""
-        return changes_down(series, shift=shift)

@@ -5,15 +5,12 @@ FEAT-SERVICES-INDICATOR-KAMA: validated batch calculation.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import ClassVar, override
 
 import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import is_falling, is_lower, is_rising
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.indicators.trend.kaufman_efficiency_ratio import (
     KaufmanEfficiencyRatio,
@@ -112,47 +109,3 @@ class KAMA(BaseIndicator):
                 res, name=f"KAMA({er_period},{fast_period},{slow_period})"
             )
         }
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if KAMA is rising."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if KAMA is falling."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def bar_closes_above(
-        cls,
-        close: IndicatorSeries | Sequence[float] | np.ndarray,
-        kama_series: IndicatorSeries,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if Close bar at shift is above KAMA."""
-        return is_greater(close, kama_series, shift=shift)
-
-    @classmethod
-    def bar_closes_below(
-        cls,
-        close: IndicatorSeries | Sequence[float] | np.ndarray,
-        kama_series: IndicatorSeries,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if Close bar at shift is below KAMA."""
-        return is_lower(close, kama_series, shift=shift)
-
-    @classmethod
-    def fast_above_slow(
-        cls, fast_kama: IndicatorSeries, slow_kama: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate if Fast KAMA is above Slow KAMA."""
-        return is_greater(fast_kama, slow_kama, shift=shift)
-
-    @classmethod
-    def fast_below_slow(
-        cls, fast_kama: IndicatorSeries, slow_kama: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate if Fast KAMA is below Slow KAMA."""
-        return is_lower(fast_kama, slow_kama, shift=shift)

@@ -104,20 +104,6 @@ class HeikenAshi(BaseIndicator):
         }
 
     @classmethod
-    def is_bullish(cls, ha: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Check if Heiken Ashi candle is bullish (Close > Open)."""
-        return is_greater(
-            ha["close"], ha["open"], shift1=shift, shift2=shift, round_digits=8
-        )
-
-    @classmethod
-    def is_bearish(cls, ha: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Check if Heiken Ashi candle is bearish (Close < Open)."""
-        return is_lower(
-            ha["close"], ha["open"], shift1=shift, shift2=shift, round_digits=8
-        )
-
-    @classmethod
     def turns_bullish(cls, ha: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Check if candle turned bullish on current bar from bearish on prior bar."""
         curr_bull = is_greater(

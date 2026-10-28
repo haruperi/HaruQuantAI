@@ -11,14 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.indicators.volatility.atr import ATR
 from app.include.blocks.metadata import (
@@ -31,8 +23,6 @@ from app.include.blocks.metadata import (
 from app.include.blocks.series import BarData, IndicatorSeries
 
 logger = get_logger(__name__)
-
-
 MIN_BARS: int = 2
 
 
@@ -126,57 +116,3 @@ class Vortex(BaseIndicator):
             "vi_minus": IndicatorSeries(vi_minus, name=f"VI-({period})"),
             "oscillator": IndicatorSeries(oscillator, name=f"VortexOsc({period})"),
         }
-
-    @classmethod
-    def is_uptrend(cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate if Vortex is in uptrend (VI+ > VI-)."""
-        return is_greater(
-            vx_dict["vi_plus"],
-            vx_dict["vi_minus"],
-            shift1=shift,
-            shift2=shift,
-            round_digits=8,
-        )
-
-    @classmethod
-    def is_downtrend(cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0) -> bool:
-        """Evaluate if Vortex is in downtrend (VI+ < VI-)."""
-        return is_lower(
-            vx_dict["vi_plus"],
-            vx_dict["vi_minus"],
-            shift1=shift,
-            shift2=shift,
-            round_digits=8,
-        )
-
-    @classmethod
-    def changes_trend_up(
-        cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if VI+ crosses above VI- (bullish reversal)."""
-        return crosses_above(
-            vx_dict["vi_plus"], vx_dict["vi_minus"], shift=shift, round_digits=8
-        )
-
-    @classmethod
-    def changes_trend_down(
-        cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if VI+ crosses below VI- (bearish reversal)."""
-        return crosses_below(
-            vx_dict["vi_plus"], vx_dict["vi_minus"], shift=shift, round_digits=8
-        )
-
-    @classmethod
-    def vi_plus_rising(
-        cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if VI+ is rising."""
-        return is_rising(vx_dict["vi_plus"], shift=shift)
-
-    @classmethod
-    def vi_plus_falling(
-        cls, vx_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if VI+ is falling."""
-        return is_falling(vx_dict["vi_plus"], shift=shift)

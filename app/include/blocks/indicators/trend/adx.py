@@ -5,23 +5,12 @@ FEAT-SERVICES-INDICATOR-ADX: validated batch calculation.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import ClassVar, override
 
 import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.indicators.volatility.atr import ATR
 from app.include.blocks.metadata import (
@@ -150,132 +139,3 @@ class ADX(BaseIndicator):
             "di_plus": IndicatorSeries(di_plus_arr, name="ADX.DIPlus"),
             "di_minus": IndicatorSeries(di_minus_arr, name="ADX.DIMinus"),
         }
-
-    @staticmethod
-    def _extract_main(
-        adx: Mapping[str, IndicatorSeries] | IndicatorSeries,
-    ) -> IndicatorSeries:
-        """Resolve ADX Main series from dictionary or direct IndicatorSeries."""
-        return adx["main"] if isinstance(adx, Mapping) else adx
-
-    @classmethod
-    def is_rising(
-        cls, adx: Mapping[str, IndicatorSeries] | IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate ADXRising condition (`Main[shift + 1] < Main[shift]`)."""
-        return is_rising(cls._extract_main(adx), shift=shift)
-
-    @classmethod
-    def is_falling(
-        cls, adx: Mapping[str, IndicatorSeries] | IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate ADXFalling condition (`Main[shift + 1] > Main[shift]`)."""
-        return is_falling(cls._extract_main(adx), shift=shift)
-
-    @classmethod
-    def is_higher(
-        cls,
-        adx: Mapping[str, IndicatorSeries] | IndicatorSeries,
-        level: float,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate ADXHigher condition (`Main[shift] > level`)."""
-        return is_greater(cls._extract_main(adx), level, shift=shift)
-
-    @classmethod
-    def is_lower(
-        cls,
-        adx: Mapping[str, IndicatorSeries] | IndicatorSeries,
-        level: float,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate ADXLower condition (`Main[shift] < level`)."""
-        return is_lower(cls._extract_main(adx), level, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls,
-        adx: Mapping[str, IndicatorSeries] | IndicatorSeries,
-        level: float,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate ADXCrossUp condition (`Main` crosses above `level`)."""
-        return crosses_above(cls._extract_main(adx), level, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls,
-        adx: Mapping[str, IndicatorSeries] | IndicatorSeries,
-        level: float,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate ADXCrossDown condition (`Main` crosses below `level`)."""
-        return crosses_below(cls._extract_main(adx), level, shift=shift)
-
-    @classmethod
-    def changes_up(
-        cls, adx: Mapping[str, IndicatorSeries] | IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate ADXChangesUp condition (`Main[s+2] > Main[s+1] < Main[s]`)."""
-        return changes_up(cls._extract_main(adx), shift=shift)
-
-    @classmethod
-    def changes_down(
-        cls, adx: Mapping[str, IndicatorSeries] | IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate ADXChangesDown condition (`Main[s+2] < Main[s+1] > Main[s]`)."""
-        return changes_down(cls._extract_main(adx), shift=shift)
-
-    @classmethod
-    def di_plus_crosses_above_di_minus(
-        cls, adx_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate +DI crosses above -DI."""
-        return crosses_above(
-            adx_dict["di_plus"], adx_dict["di_minus"], shift=shift, round_digits=8
-        )
-
-    @classmethod
-    def di_plus_crosses_below_di_minus(
-        cls, adx_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate +DI crosses below -DI."""
-        return crosses_below(
-            adx_dict["di_plus"], adx_dict["di_minus"], shift=shift, round_digits=8
-        )
-
-    @classmethod
-    def di_plus_higher_di_minus(
-        cls, adx_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate +DI is higher than -DI."""
-        return is_greater(
-            adx_dict["di_plus"],
-            adx_dict["di_minus"],
-            shift1=shift,
-            shift2=shift,
-            round_digits=8,
-        )
-
-    @classmethod
-    def di_plus_lower_di_minus(
-        cls, adx_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate +DI is lower than -DI."""
-        return is_lower(
-            adx_dict["di_plus"],
-            adx_dict["di_minus"],
-            shift1=shift,
-            shift2=shift,
-            round_digits=8,
-        )
-
-    @classmethod
-    def is_trending(
-        cls,
-        adx_dict: dict[str, IndicatorSeries],
-        threshold: float = 25.0,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate ADX Main is greater than trend threshold (e.g. 25.0)."""
-        return is_greater(adx_dict["main"], threshold, shift1=shift, round_digits=8)

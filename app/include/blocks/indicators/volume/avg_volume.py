@@ -11,14 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -91,58 +83,3 @@ class AvgVolume(BaseIndicator):
             n,
         )
         return {"value": IndicatorSeries(out, name=f"AvgVolume({period})")}
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Check if average volume is rising at shift compared to shift+1."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Check if average volume is falling at shift compared to shift+1."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls, series1: IndicatorSeries, series2: IndicatorSeries | float, shift: int = 0
-    ) -> bool:
-        """Check if series1 crosses above series2."""
-        return crosses_above(series1, series2, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls, series1: IndicatorSeries, series2: IndicatorSeries | float, shift: int = 0
-    ) -> bool:
-        """Check if series1 crosses below series2."""
-        return crosses_below(series1, series2, shift=shift)
-
-    @classmethod
-    def is_higher(
-        cls, series1: IndicatorSeries, series2: IndicatorSeries | float, shift: int = 0
-    ) -> bool:
-        """Check if series1 is higher than series2."""
-        return is_greater(series1, series2, shift=shift)
-
-    @classmethod
-    def is_lower(
-        cls, series1: IndicatorSeries, series2: IndicatorSeries | float, shift: int = 0
-    ) -> bool:
-        """Check if series1 is lower than series2."""
-        return is_lower(series1, series2, shift=shift)
-
-    @classmethod
-    def volume_is_rising(cls, volume: IndicatorSeries, shift: int = 0) -> bool:
-        """Check if raw bar volume is rising at shift compared to shift+1."""
-        return is_rising(volume, shift=shift)
-
-    @classmethod
-    def volume_is_falling(cls, volume: IndicatorSeries, shift: int = 0) -> bool:
-        """Check if raw bar volume is falling at shift compared to shift+1."""
-        return is_falling(volume, shift=shift)
-
-    @classmethod
-    def volume_above_average(
-        cls, volume: IndicatorSeries, avg_volume: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if raw bar volume is greater than average volume at shift."""
-        return is_greater(volume, avg_volume, shift=shift)

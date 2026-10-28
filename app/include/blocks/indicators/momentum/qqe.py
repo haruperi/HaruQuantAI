@@ -12,8 +12,6 @@ from pydantic import Field, model_validator
 
 from app.host.logging import get_logger
 from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
     crosses_above,
     crosses_below,
     is_falling,
@@ -247,59 +245,3 @@ class QQE(BaseIndicator):
         """Evaluate QQEValue1Falling."""
         logger.info("Evaluating QQE value1_is_falling at shift=%d", shift)
         return is_falling(value1, shift=shift)
-
-    @staticmethod
-    def value1_changes_up(
-        value1: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate QQEValue1ChangesUp."""
-        return changes_up(value1, shift=shift)
-
-    @staticmethod
-    def value1_changes_down(
-        value1: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate QQEValue1ChangesDown."""
-        return changes_down(value1, shift=shift)
-
-    @staticmethod
-    def value1_crosses_above(
-        value1: IndicatorSeries | np.ndarray[Any, Any], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate QQEValue1CrossAbove level."""
-        return crosses_above(value1, level, shift=shift)
-
-    @staticmethod
-    def value1_crosses_below(
-        value1: IndicatorSeries | np.ndarray[Any, Any], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate QQEValue1CrossBelow level."""
-        return crosses_below(value1, level, shift=shift)
-
-    @staticmethod
-    def value1_is_higher(
-        value1: IndicatorSeries | np.ndarray[Any, Any], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate QQEValue1Higher than level."""
-        return is_greater(value1, level, shift=shift)
-
-    @staticmethod
-    def value1_is_lower(
-        value1: IndicatorSeries | np.ndarray[Any, Any], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate QQEValue1Lower than level."""
-        return is_lower(value1, level, shift=shift)
-
-    @staticmethod
-    def value2_is_rising(
-        value2: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate QQEValue2Rising."""
-        return is_rising(value2, shift=shift)
-
-    @staticmethod
-    def value2_is_falling(
-        value2: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate QQEValue2Falling."""
-        return is_falling(value2, shift=shift)

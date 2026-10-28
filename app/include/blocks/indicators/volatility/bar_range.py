@@ -11,7 +11,7 @@ from typing import ClassVar, override
 import numpy as np
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import is_falling, is_lower, is_rising
+from app.include.blocks.comparisons import is_lower
 from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
@@ -229,26 +229,6 @@ class BarRange(BaseIndicator):
         )
 
     @classmethod
-    def is_highest_in_range(
-        cls,
-        series: IndicatorSeries | Sequence[float] | np.ndarray,
-        lookback: int = 1,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if range at shift is higher than range lookback bars ago."""
-        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
-    def is_lowest_in_range(
-        cls,
-        series: IndicatorSeries | Sequence[float] | np.ndarray,
-        lookback: int = 1,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if range at shift is lower than range lookback bars ago."""
-        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
     def in_range_pips(
         cls,
         series: IndicatorSeries,
@@ -264,23 +244,3 @@ class BarRange(BaseIndicator):
             return False
         pips = val / pip_size
         return min_pips <= pips <= max_pips
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate range is rising condition."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate range is falling condition."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def is_greater(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
-        """Evaluate range is greater than level condition."""
-        return is_greater(series, level, shift=shift)
-
-    @classmethod
-    def is_lower(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
-        """Evaluate range is lower than level condition."""
-        return is_lower(series, level, shift=shift)

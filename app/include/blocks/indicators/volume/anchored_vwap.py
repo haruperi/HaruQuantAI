@@ -11,14 +11,6 @@ import numpy as np
 from pydantic import Field, field_validator
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -149,10 +141,8 @@ class AnchoredVWAP(BaseIndicator):
             upper_out[i] = vwap_val + std_dev_mult * std_dev
             lower_out[i] = vwap_val - std_dev_mult * std_dev
         logger.info(
-            (
-                "FR-SERVICES-AVWAP-CALCULATE: Computed AVWAP(session=%d,"
-                " mult=%.2f) for %d bars"
-            ),
+            "FR-SERVICES-AVWAP-CALCULATE: "
+            "Computed AVWAP(session=%d, mult=%.2f) for %d bars",
             session_type,
             std_dev_mult,
             n,
@@ -218,83 +208,3 @@ class AnchoredVWAP(BaseIndicator):
             for i in range(anchor_period, n, anchor_period):
                 is_reset[i] = True
         return is_reset
-
-    @classmethod
-    def is_rising(cls, vwap: IndicatorSeries, shift: int = 0) -> bool:
-        """Check if VWAP is rising at shift compared to shift+1."""
-        return is_rising(vwap, shift=shift)
-
-    @classmethod
-    def is_falling(cls, vwap: IndicatorSeries, shift: int = 0) -> bool:
-        """Check if VWAP is falling at shift compared to shift+1."""
-        return is_falling(vwap, shift=shift)
-
-    @classmethod
-    def bar_closes_above_vwap(
-        cls, close: IndicatorSeries, vwap: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close is above VWAP at specified shift."""
-        return is_greater(close, vwap, shift=shift)
-
-    @classmethod
-    def bar_closes_below_vwap(
-        cls, close: IndicatorSeries, vwap: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close is below VWAP at specified shift."""
-        return is_lower(close, vwap, shift=shift)
-
-    @classmethod
-    def bar_closes_above_upper(
-        cls, close: IndicatorSeries, upper: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close is above upper band at specified shift."""
-        return is_greater(close, upper, shift=shift)
-
-    @classmethod
-    def bar_closes_below_lower(
-        cls, close: IndicatorSeries, lower: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close is below lower band at specified shift."""
-        return is_lower(close, lower, shift=shift)
-
-    @classmethod
-    def bar_crosses_above_lower(
-        cls, close: IndicatorSeries, lower: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close crosses above lower band."""
-        return crosses_above(close, lower, shift=shift)
-
-    @classmethod
-    def bar_crosses_above_upper(
-        cls, close: IndicatorSeries, upper: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close crosses above upper band."""
-        return crosses_above(close, upper, shift=shift)
-
-    @classmethod
-    def bar_crosses_below_lower(
-        cls, close: IndicatorSeries, lower: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close crosses below lower band."""
-        return crosses_below(close, lower, shift=shift)
-
-    @classmethod
-    def bar_crosses_below_upper(
-        cls, close: IndicatorSeries, upper: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close crosses below upper band."""
-        return crosses_below(close, upper, shift=shift)
-
-    @classmethod
-    def fast_above_slow(
-        cls, fast_vwap: IndicatorSeries, slow_vwap: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if fast Anchored VWAP is above slow Anchored VWAP."""
-        return is_greater(fast_vwap, slow_vwap, shift=shift)
-
-    @classmethod
-    def fast_below_slow(
-        cls, fast_vwap: IndicatorSeries, slow_vwap: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if fast Anchored VWAP is below slow Anchored VWAP."""
-        return is_lower(fast_vwap, slow_vwap, shift=shift)

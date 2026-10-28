@@ -11,8 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import is_lower
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -187,34 +185,6 @@ class TPOProfile(BaseIndicator):
         vah = s_low + (hi_idx + 1) * bin_size
         val = s_low + lo_idx * bin_size
         return (poc, vah, val)
-
-    @classmethod
-    def ib_breakout_up(
-        cls, close: IndicatorSeries, ib_high: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if price close has broken above Initial Balance High."""
-        return is_greater(close, ib_high, shift=shift)
-
-    @classmethod
-    def ib_breakout_down(
-        cls, close: IndicatorSeries, ib_low: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if price close has broken below Initial Balance Low."""
-        return is_lower(close, ib_low, shift=shift)
-
-    @classmethod
-    def price_above_poc(
-        cls, close: IndicatorSeries, poc: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if price close is above TPO POC at specified shift."""
-        return is_greater(close, poc, shift=shift)
-
-    @classmethod
-    def price_below_poc(
-        cls, close: IndicatorSeries, poc: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if price close is below TPO POC at specified shift."""
-        return is_lower(close, poc, shift=shift)
 
     @classmethod
     def price_inside_va(

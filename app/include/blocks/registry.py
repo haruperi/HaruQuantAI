@@ -7,7 +7,7 @@ import importlib.util
 import inspect
 import sys
 from collections.abc import Callable, Iterator, Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, get_type_hints
@@ -15,6 +15,7 @@ from typing import Any, get_type_hints
 from pydantic import BaseModel, ConfigDict, ValidationError, create_model
 
 from app.include.blocks.base import BaseBlock
+from app.include.blocks.composition import CompositionSpec
 from app.include.blocks.metadata import BlockSpec, _freeze_mapping
 
 
@@ -101,12 +102,17 @@ class BlockDescriptor:
     parameter_schema: Mapping[str, Any]
     source_file: str | None = None
     is_class: bool = True
+    composition: CompositionSpec | None = None
+    input_bindings: Mapping[str, Any] = field(default_factory=dict)
     _config_model: type[BaseModel] | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
         """Deeply freeze parameter schema and spec metadata."""
         object.__setattr__(
             self, "parameter_schema", _freeze_mapping(dict(self.parameter_schema))
+        )
+        object.__setattr__(
+            self, "input_bindings", _freeze_mapping(dict(self.input_bindings))
         )
         if isinstance(self.spec.parameter_search_space, (dict, Mapping)):
             object.__setattr__(
@@ -135,6 +141,8 @@ class BlockDescriptor:
                 f"{', '.join(sorted(unknown))}"
             )
 
+        self._validate_composition_configuration(parameters)
+
         if not parameters:
             # Validate that any required configuration parameters are satisfied
             if self._config_model is not None:
@@ -158,6 +166,26 @@ class BlockDescriptor:
                 ) from e
 
         return functools.partial(self.target, **parameters)
+
+    def _validate_composition_configuration(
+        self, parameters: Mapping[str, Any]
+    ) -> None:
+        if self.composition is None:
+            return
+        from app.include.blocks.composition_runtime import CompositionExecutor
+
+        if (
+            not isinstance(self.target, CompositionExecutor)
+            or self._config_model is None
+        ):
+            raise BlockRegistryError("Composition descriptor has no validated executor")
+        try:
+            configured = self._config_model(**parameters).model_dump()
+            self.target.validate(configured)
+        except (ValueError, TypeError) as error:
+            raise BlockRegistryError(
+                f"Invalid configuration for composition '{self.spec.id}': {error}"
+            ) from error
 
 
 @dataclass(frozen=True)
@@ -246,6 +274,10 @@ class BlockRegistry:
     ) -> BlockDescriptor:
         """Validate and register a single class or callable block."""
         desc = self._create_descriptor(target, source_file)
+        return self._publish_descriptor(desc)
+
+    def _publish_descriptor(self, desc: BlockDescriptor) -> BlockDescriptor:
+        """Publish one validated descriptor with shared ownership checks."""
         block_id = desc.spec.id
 
         target_blocks = (
@@ -280,7 +312,7 @@ class BlockRegistry:
 
         target_blocks[block_id] = desc
 
-        src_key = _normalize_source_path(source_file)
+        src_key = _normalize_source_path(desc.source_file)
         target_by_source.setdefault(src_key, [])
         if block_id not in target_by_source[src_key]:
             target_by_source[src_key].append(block_id)
@@ -401,6 +433,47 @@ class BlockRegistry:
             self.unregister_source(src_key)
             targets = _load_module_blocks(p)
             registered = [self.register_block(t, source_file=src_key) for t in targets]
+            from app.include.blocks.composition import (
+                bind_composition,
+                owned_compositions,
+                owned_specializations,
+            )
+            from app.include.blocks.indicators.base import BaseIndicator
+
+            for target in targets:
+                if inspect.isclass(target) and issubclass(target, BaseIndicator):
+                    for definition in owned_compositions(target.spec.id):
+                        executable, config_model, composition_spec = bind_composition(
+                            definition,
+                            target,
+                            {
+                                key: descriptor.target
+                                for key, descriptor in (
+                                    self._staging_blocks or self._blocks
+                                ).items()
+                                if descriptor.is_class
+                            },
+                        )
+                        # The generated callable has one shared evaluator; identity and
+                        # configuration are declared by immutable recipe metadata.
+                        descriptor = BlockDescriptor(
+                            spec=composition_spec,
+                            target=executable,
+                            parameter_schema=config_model.model_json_schema(),
+                            source_file=src_key,
+                            is_class=False,
+                            _config_model=config_model,
+                            composition=definition,
+                        )
+                        self._publish_descriptor(descriptor)
+                        registered.append(descriptor)
+                    for helper, helper_spec, bindings in owned_specializations(target):
+                        descriptor = self._create_descriptor(
+                            helper, source_file=src_key, declared_spec=helper_spec
+                        )
+                        descriptor = replace(descriptor, input_bindings=bindings)
+                        self._publish_descriptor(descriptor)
+                        registered.append(descriptor)
             self.commit_staging()
             return registered
         except Exception as e:
@@ -451,6 +524,7 @@ class BlockRegistry:
         self,
         target: type[BaseBlock] | Callable[..., Any],
         source_file: str | Path | None = None,
+        declared_spec: BlockSpec | None = None,
     ) -> BlockDescriptor:
         src = _normalize_source_path(source_file) if source_file is not None else None
 
@@ -472,7 +546,7 @@ class BlockRegistry:
 
         # Case 2: Callable decorated with @block
         if callable(target):
-            spec = getattr(target, "_block_spec", None)
+            spec = declared_spec or getattr(target, "_block_spec", None)
             if not isinstance(spec, BlockSpec):
                 name = getattr(target, "__name__", str(target))
                 raise BlockRegistryError(

@@ -12,14 +12,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -82,37 +74,3 @@ class HullMovingAverage(BaseIndicator):
             "FR-SERVICES-HMA-CALCULATE: Computed HMA(period=%d) for %d bars", period, n
         )
         return {"value": IndicatorSeries(hma, name=f"HMA({period})")}
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if HMA is rising."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if HMA is falling."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if HMA turned upward."""
-        return changes_up(series, shift=shift)
-
-    @classmethod
-    def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if HMA turned downward."""
-        return changes_down(series, shift=shift)
-
-    @classmethod
-    def faster_above_slower(
-        cls, faster_hma: IndicatorSeries, slower_hma: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate if Faster HMA is above Slower HMA."""
-        return is_greater(faster_hma, slower_hma, shift=shift)
-
-    @classmethod
-    def faster_below_slower(
-        cls, faster_hma: IndicatorSeries, slower_hma: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate if Faster HMA is below Slower HMA."""
-        return is_lower(faster_hma, slower_hma, shift=shift)

@@ -12,7 +12,7 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import is_falling, is_lower, is_rising
+from app.include.blocks.comparisons import is_lower
 from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
@@ -107,110 +107,6 @@ class KeltnerChannel(BaseIndicator):
         }
 
     @classmethod
-    def bar_closes_above_upper(
-        cls,
-        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate KCBarClosesAboveUpper (`Close[shift] > Upper[shift]`)."""
-        return is_greater(close_series, kc_dict["upper"], shift=shift)
-
-    @classmethod
-    def bar_closes_below_upper(
-        cls,
-        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate KCBarClosesBelowUpper (`Close[shift] < Upper[shift]`)."""
-        return is_lower(close_series, kc_dict["upper"], shift=shift)
-
-    @classmethod
-    def bar_closes_above_lower(
-        cls,
-        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate KCBarClosesAboveLower (`Close[shift] > Lower[shift]`)."""
-        return is_greater(close_series, kc_dict["lower"], shift=shift)
-
-    @classmethod
-    def bar_closes_below_lower(
-        cls,
-        close_series: IndicatorSeries | Sequence[float] | np.ndarray,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate KCBarClosesBelowLower (`Close[shift] < Lower[shift]`)."""
-        return is_lower(close_series, kc_dict["lower"], shift=shift)
-
-    @classmethod
-    def bar_opens_above_upper(
-        cls,
-        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate KCBarOpensAboveUpper (`Open[shift] > Upper[shift + 1]`)."""
-        return is_greater(
-            open_series,
-            kc_dict["upper"],
-            shift1=shift,
-            shift2=shift + 1,
-            round_digits=8,
-        )
-
-    @classmethod
-    def bar_opens_below_upper(
-        cls,
-        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate KCBarOpensBelowUpper (`Open[shift] < Upper[shift + 1]`)."""
-        return is_lower(
-            open_series,
-            kc_dict["upper"],
-            shift1=shift,
-            shift2=shift + 1,
-            round_digits=8,
-        )
-
-    @classmethod
-    def bar_opens_above_lower(
-        cls,
-        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate KCBarOpensAboveLower (`Open[shift] > Lower[shift + 1]`)."""
-        return is_greater(
-            open_series,
-            kc_dict["lower"],
-            shift1=shift,
-            shift2=shift + 1,
-            round_digits=8,
-        )
-
-    @classmethod
-    def bar_opens_below_lower(
-        cls,
-        open_series: IndicatorSeries | Sequence[float] | np.ndarray,
-        kc_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate KCBarOpensBelowLower (`Open[shift] < Lower[shift + 1]`)."""
-        return is_lower(
-            open_series,
-            kc_dict["lower"],
-            shift1=shift,
-            shift2=shift + 1,
-            round_digits=8,
-        )
-
-    @classmethod
     def bar_opens_above_upper_after_open_below(
         cls,
         open_series: IndicatorSeries | Sequence[float] | np.ndarray,
@@ -297,31 +193,3 @@ class KeltnerChannel(BaseIndicator):
             shift2=shift + 1,
             round_digits=8,
         )
-
-    @classmethod
-    def upper_is_rising(
-        cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if Upper band is rising."""
-        return is_rising(kc_dict["upper"], shift=shift)
-
-    @classmethod
-    def upper_is_falling(
-        cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if Upper band is falling."""
-        return is_falling(kc_dict["upper"], shift=shift)
-
-    @classmethod
-    def lower_is_rising(
-        cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if Lower band is rising."""
-        return is_rising(kc_dict["lower"], shift=shift)
-
-    @classmethod
-    def lower_is_falling(
-        cls, kc_dict: dict[str, IndicatorSeries], shift: int = 0
-    ) -> bool:
-        """Evaluate if Lower band is falling."""
-        return is_falling(kc_dict["lower"], shift=shift)

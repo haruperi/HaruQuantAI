@@ -5,15 +5,12 @@ FEAT-SERVICES-INDICATOR-PARABOLICSAR: validated batch calculation.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import ClassVar, Self, override
 
 import numpy as np
 from pydantic import Field, model_validator
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import is_falling, is_lower, is_rising
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -25,8 +22,6 @@ from app.include.blocks.metadata import (
 from app.include.blocks.series import BarData, IndicatorSeries
 
 logger = get_logger(__name__)
-
-
 MIN_LOOKBACK_BARS: int = 2
 
 
@@ -190,33 +185,3 @@ class ParabolicSAR(BaseIndicator):
             n,
         )
         return {"value": IndicatorSeries(sar, name=f"PSAR({step},{maximum})")}
-
-    @classmethod
-    def is_bar_higher(
-        cls,
-        price: IndicatorSeries | Sequence[float] | np.ndarray,
-        sar_series: IndicatorSeries,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if price at shift is higher than SAR (uptrend position)."""
-        return is_greater(price, sar_series, shift=shift)
-
-    @classmethod
-    def is_bar_lower(
-        cls,
-        price: IndicatorSeries | Sequence[float] | np.ndarray,
-        sar_series: IndicatorSeries,
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if price at shift is lower than SAR (downtrend position)."""
-        return is_lower(price, sar_series, shift=shift)
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if PSAR is rising."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate if PSAR is falling."""
-        return is_falling(series, shift=shift)

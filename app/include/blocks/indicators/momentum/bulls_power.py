@@ -11,16 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -87,51 +77,3 @@ class BullsPower(BaseIndicator):
             n,
         )
         return {"value": IndicatorSeries(res, name=f"BullsPower({period})")}
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate BUPRising condition."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate BUPFalling condition."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate BUPCrossUp condition (crosses above level/zero)."""
-        return crosses_above(series, level, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate BUPCrossDown condition (crosses below level/zero)."""
-        return crosses_below(series, level, shift=shift)
-
-    @classmethod
-    def is_higher(
-        cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
-    ) -> bool:
-        """Evaluate BUPHigher condition."""
-        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
-    def is_lower(
-        cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
-    ) -> bool:
-        """Evaluate BUPLower condition."""
-        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
-    def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate BUPChangesUp turn condition."""
-        return changes_up(series, shift=shift)
-
-    @classmethod
-    def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate BUPChangesDown turn condition."""
-        return changes_down(series, shift=shift)

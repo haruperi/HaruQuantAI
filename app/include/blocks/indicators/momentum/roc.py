@@ -11,14 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -81,41 +73,3 @@ class ROC(BaseIndicator):
             "FR-SERVICES-ROC-CALCULATE: Computed ROC(period=%d) for %d bars", period, n
         )
         return {"value": IndicatorSeries(res, name=f"ROC({period})")}
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate ROCRising condition."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate ROCFalling condition."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate ROCCrossesAboveLevel condition."""
-        return crosses_above(series, level, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate ROCCrossesBelowLevel condition."""
-        return crosses_below(series, level, shift=shift)
-
-    @classmethod
-    def is_greater(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate ROCAboveLevel condition."""
-        return is_greater(series, level, shift=shift)
-
-    @classmethod
-    def is_lower(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate ROCBelowLevel condition."""
-        return is_lower(series, level, shift=shift)

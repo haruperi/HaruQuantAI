@@ -11,18 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_greater_count,
-    is_lower,
-    is_lower_count,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -107,90 +95,6 @@ class CCI(BaseIndicator):
         if any(np.isnan(v) for v in vals):
             return None
         return vals
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate CCIRising condition."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate CCIFalling condition."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate CCIChangesUp condition (`CCI[s+2] > CCI[s+1] < CCI[s]`)."""
-        return changes_up(series, shift=shift)
-
-    @classmethod
-    def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate CCIChangesDown condition (`CCI[s+2] < CCI[s+1] > CCI[s]`)."""
-        return changes_down(series, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls, series: IndicatorSeries, level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate CCICrossUp condition."""
-        return crosses_above(series, level, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls, series: IndicatorSeries, level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate CCICrossDown condition."""
-        return crosses_below(series, level, shift=shift)
-
-    @classmethod
-    def is_higher(
-        cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
-    ) -> bool:
-        """Evaluate CCIHigher condition."""
-        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
-    def is_lower(
-        cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
-    ) -> bool:
-        """Evaluate CCILower condition."""
-        return is_lower(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
-    def is_greater(cls, series: IndicatorSeries, level: float, shift: int = 0) -> bool:
-        """Evaluate CCIHigher than threshold level (`CCI[shift] > level`)."""
-        return is_greater(series, level, shift=shift)
-
-    @classmethod
-    def is_lower_level(
-        cls, series: IndicatorSeries, level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate CCILower than threshold level (`CCI[shift] < level`)."""
-        return is_lower(series, level, shift=shift)
-
-    @classmethod
-    def woodies_zero_line_break_up(
-        cls, series: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate WoodiesCCIZeroLineBreakUP (`CCI[s+1] < 0 and CCI[s] > 0`)."""
-        return crosses_above(series, 0.0, shift=shift)
-
-    @classmethod
-    def woodies_zero_line_break_down(
-        cls, series: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Evaluate WoodiesCCIZeroLineBreakDown (`CCI[s+1] > 0 and CCI[s] < 0`)."""
-        return crosses_below(series, 0.0, shift=shift)
-
-    @classmethod
-    def woodies_trend_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate WoodiesTrendUP (6 consecutive bars `> 0`)."""
-        return is_greater_count(series, 0.0, bars=6, shift=shift)
-
-    @classmethod
-    def woodies_trend_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate WoodiesTrendDown (6 consecutive bars `< 0`)."""
-        return is_lower_count(series, 0.0, bars=6, shift=shift)
 
     @classmethod
     def woodies_zlr_up(

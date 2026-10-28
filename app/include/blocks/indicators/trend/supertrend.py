@@ -5,15 +5,13 @@ FEAT-SERVICES-INDICATOR-SUPERTREND: validated batch calculation.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import ClassVar, Literal, override
 
 import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import equals, is_falling, is_lower, is_rising
-from app.include.blocks.comparisons.is_greater import is_greater
+from app.include.blocks.comparisons import equals, is_falling, is_rising
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.indicators.volatility.atr import ATR
 from app.include.blocks.indicators.volatility.mt_atr import MTATR
@@ -177,23 +175,3 @@ class SuperTrend(BaseIndicator):
             "FR-SERVICES-SUPERTREND-CONDITIONS is_in_range shift=%d res=%s", shift, res
         )
         return res
-
-    @classmethod
-    def bar_closes_above(
-        cls,
-        close: IndicatorSeries | Sequence[float] | np.ndarray,
-        st_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if Close bar at shift is above SuperTrend."""
-        return is_greater(close, st_dict["main"], shift=shift)
-
-    @classmethod
-    def bar_closes_below(
-        cls,
-        close: IndicatorSeries | Sequence[float] | np.ndarray,
-        st_dict: dict[str, IndicatorSeries],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate if Close bar at shift is below SuperTrend."""
-        return is_lower(close, st_dict["main"], shift=shift)

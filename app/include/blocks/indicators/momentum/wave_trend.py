@@ -12,15 +12,11 @@ from pydantic import Field, model_validator
 
 from app.host.logging import get_logger
 from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
     crosses_above,
     crosses_below,
     is_falling,
-    is_lower,
     is_rising,
 )
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -225,91 +221,3 @@ class WaveTrend(BaseIndicator):
         """Evaluate WaveTrendMainFalling."""
         logger.info("Evaluating WaveTrend wt1_is_falling at shift=%d", shift)
         return is_falling(wt1, shift=shift)
-
-    @staticmethod
-    def wt1_changes_up(
-        wt1: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendMainChangesUp."""
-        return changes_up(wt1, shift=shift)
-
-    @staticmethod
-    def wt1_changes_down(
-        wt1: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendMainChangesDown."""
-        return changes_down(wt1, shift=shift)
-
-    @staticmethod
-    def wt1_crosses_above(
-        wt1: IndicatorSeries | np.ndarray[Any, Any], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendMainCrossAbove level."""
-        return crosses_above(wt1, level, shift=shift)
-
-    @staticmethod
-    def wt1_crosses_below(
-        wt1: IndicatorSeries | np.ndarray[Any, Any], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendMainCrossBelow level."""
-        return crosses_below(wt1, level, shift=shift)
-
-    @staticmethod
-    def wt1_is_higher(
-        wt1: IndicatorSeries | np.ndarray[Any, Any], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendMainHigher than level."""
-        return is_greater(wt1, level, shift=shift)
-
-    @staticmethod
-    def wt1_is_lower(
-        wt1: IndicatorSeries | np.ndarray[Any, Any], level: float, shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendMainLower than level."""
-        return is_lower(wt1, level, shift=shift)
-
-    @staticmethod
-    def wt1_higher_wt2(
-        wt1: IndicatorSeries | np.ndarray[Any, Any],
-        wt2: IndicatorSeries | np.ndarray[Any, Any],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate WaveTrendMainHigherSignal (`WT1[shift] > WT2[shift]`)."""
-        return is_greater(wt1, wt2, shift=shift)
-
-    @staticmethod
-    def wt1_lower_wt2(
-        wt1: IndicatorSeries | np.ndarray[Any, Any],
-        wt2: IndicatorSeries | np.ndarray[Any, Any],
-        shift: int = 0,
-    ) -> bool:
-        """Evaluate WaveTrendMainLowerSignal (`WT1[shift] < WT2[shift]`)."""
-        return is_lower(wt1, wt2, shift=shift)
-
-    @staticmethod
-    def wt1_higher_zero(
-        wt1: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendMainHigherZero (`WT1[shift] > 0`)."""
-        return is_greater(wt1, 0.0, shift=shift)
-
-    @staticmethod
-    def wt1_lower_zero(
-        wt1: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendMainLowerZero (`WT1[shift] < 0`)."""
-        return is_lower(wt1, 0.0, shift=shift)
-
-    @staticmethod
-    def wt2_is_rising(
-        wt2: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendSignalRising (`WT2[shift+1] < WT2[shift]`)."""
-        return is_rising(wt2, shift=shift)
-
-    @staticmethod
-    def wt2_is_falling(
-        wt2: IndicatorSeries | np.ndarray[Any, Any], shift: int = 0
-    ) -> bool:
-        """Evaluate WaveTrendSignalFalling (`WT2[shift+1] > WT2[shift]`)."""
-        return is_falling(wt2, shift=shift)

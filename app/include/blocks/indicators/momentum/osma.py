@@ -11,16 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    changes_down,
-    changes_up,
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -102,58 +92,3 @@ class OSMA(BaseIndicator):
                 res, name=f"OSMA({fast_ema},{slow_ema},{signal_period})"
             )
         }
-
-    @classmethod
-    def is_rising(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate OSMARising condition."""
-        return is_rising(series, shift=shift)
-
-    @classmethod
-    def is_falling(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate OSMAFalling condition."""
-        return is_falling(series, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate OSMACrossZeroUp / crosses above level condition."""
-        return crosses_above(series, level, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate OSMACrossZeroDown / crosses below level condition."""
-        return crosses_below(series, level, shift=shift)
-
-    @classmethod
-    def is_greater(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate OSMAHigherZero / greater than level condition."""
-        return is_greater(series, level, shift=shift)
-
-    @classmethod
-    def is_lower(
-        cls, series: IndicatorSeries, level: float = 0.0, shift: int = 0
-    ) -> bool:
-        """Evaluate OSMALowerZero / lower than level condition."""
-        return is_lower(series, level, shift=shift)
-
-    @classmethod
-    def is_higher(
-        cls, series: IndicatorSeries, lookback: int = 1, shift: int = 0
-    ) -> bool:
-        """Evaluate OSMA is higher than past value."""
-        return is_greater(series, series, shift1=shift, shift2=shift + lookback)
-
-    @classmethod
-    def changes_up(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate OSMAChangesUp turn condition."""
-        return changes_up(series, shift=shift)
-
-    @classmethod
-    def changes_down(cls, series: IndicatorSeries, shift: int = 0) -> bool:
-        """Evaluate OSMAChangesDown turn condition."""
-        return changes_down(series, shift=shift)

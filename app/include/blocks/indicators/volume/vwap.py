@@ -11,14 +11,6 @@ import numpy as np
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import (
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -121,55 +113,3 @@ class VWAP(BaseIndicator):
             n,
         )
         return {"value": IndicatorSeries(out, name=f"VWAP({period})")}
-
-    @classmethod
-    def bar_closes_above(
-        cls, close: IndicatorSeries, vwap: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close is above VWAP at specified shift."""
-        return is_greater(close, vwap, shift=shift)
-
-    @classmethod
-    def bar_closes_below(
-        cls, close: IndicatorSeries, vwap: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if bar close is below VWAP at specified shift."""
-        return is_lower(close, vwap, shift=shift)
-
-    @classmethod
-    def is_rising(cls, vwap: IndicatorSeries, shift: int = 0) -> bool:
-        """Check if VWAP is rising at shift compared to shift+1."""
-        return is_rising(vwap, shift=shift)
-
-    @classmethod
-    def is_falling(cls, vwap: IndicatorSeries, shift: int = 0) -> bool:
-        """Check if VWAP is falling at shift compared to shift+1."""
-        return is_falling(vwap, shift=shift)
-
-    @classmethod
-    def fast_above_slow(
-        cls, fast_vwap: IndicatorSeries, slow_vwap: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if fast VWAP is above slow VWAP at shift."""
-        return is_greater(fast_vwap, slow_vwap, shift=shift)
-
-    @classmethod
-    def fast_below_slow(
-        cls, fast_vwap: IndicatorSeries, slow_vwap: IndicatorSeries, shift: int = 0
-    ) -> bool:
-        """Check if fast VWAP is below slow VWAP at shift."""
-        return is_lower(fast_vwap, slow_vwap, shift=shift)
-
-    @classmethod
-    def crosses_above(
-        cls, series1: IndicatorSeries, series2: IndicatorSeries | float, shift: int = 0
-    ) -> bool:
-        """Check if series1 crosses above series2."""
-        return crosses_above(series1, series2, shift=shift)
-
-    @classmethod
-    def crosses_below(
-        cls, series1: IndicatorSeries, series2: IndicatorSeries | float, shift: int = 0
-    ) -> bool:
-        """Check if series1 crosses below series2."""
-        return crosses_below(series1, series2, shift=shift)

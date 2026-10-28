@@ -12,8 +12,6 @@ import numpy as np
 from pydantic import Field, model_validator
 
 from app.host.logging import get_logger
-from app.include.blocks.comparisons import crosses_above as series_crosses_above
-from app.include.blocks.comparisons import crosses_below as series_crosses_below
 from app.include.blocks.comparisons import is_falling as series_is_falling
 from app.include.blocks.comparisons import is_lower as series_is_lower
 from app.include.blocks.comparisons import is_rising as series_is_rising
@@ -475,16 +473,6 @@ def roc_bearish(
     return not (np.isnan(s0) or np.isnan(sp)) and s0 - sp < -roc_threshold
 
 
-def score_above(score: Series, level: float = 0.0, shift: int = 0) -> bool:
-    """Evaluate COTScoreAbove (`score[shift] > level`)."""
-    return is_greater(score, level, shift1=shift)
-
-
-def score_below(score: Series, level: float = 0.0, shift: int = 0) -> bool:
-    """Evaluate COTScoreBelow (`score[shift] < level`)."""
-    return series_is_lower(score, level, shift1=shift)
-
-
 def score_accel_bullish(
     score: Series, mom_period: int = 4, momentum_threshold: float = 0.05, shift: int = 0
 ) -> bool:
@@ -562,20 +550,6 @@ def seasonal_bearish(
         not (np.isnan(cur) or any(np.isnan(x) for x in past))
         and cur < sum(past) / seasonal_lookback - seasonal_threshold
     )
-
-
-def small_fade_bullish(
-    small52: Series, small_threshold: float = 0.2, shift: int = 0
-) -> bool:
-    """Evaluate COTSmallFadeBullish (`small52[shift] < small_threshold`)."""
-    return series_is_lower(small52, small_threshold, shift1=shift)
-
-
-def small_fade_bearish(
-    small52: Series, small_threshold: float = 0.8, shift: int = 0
-) -> bool:
-    """Evaluate COTSmallFadeBearish (`small52[shift] > small_threshold`)."""
-    return is_greater(small52, small_threshold, shift1=shift)
 
 
 def smart_dumb_bullish(
@@ -782,40 +756,6 @@ def multi_field_combo(
         if inv is not None and (not np.isnan(vi := _as_series(inv).get(shift)))
     )
     return float(sum(vals) / len(vals)) if vals else 0.5
-
-
-def is_bullish_extreme(
-    score: Series, threshold: float = BULLISH_EXTREME_DEFAULT, shift: int = 0
-) -> bool:
-    """Check if score is above bullish extreme threshold (default 0.60)."""
-    return is_greater(score, threshold, shift1=shift)
-
-
-def is_bearish_extreme(
-    score: Series, threshold: float = BEARISH_EXTREME_DEFAULT, shift: int = 0
-) -> bool:
-    """Check if score is below bearish extreme threshold (default -0.60)."""
-    return series_is_lower(score, threshold, shift1=shift)
-
-
-def is_bullish_regime(score: Series, shift: int = 0) -> bool:
-    """Check if composite score is in positive/bullish regime (> 0.0)."""
-    return is_greater(score, 0.0, shift1=shift)
-
-
-def is_bearish_regime(score: Series, shift: int = 0) -> bool:
-    """Check if composite score is in negative/bearish regime (< 0.0)."""
-    return series_is_lower(score, 0.0, shift1=shift)
-
-
-def score_crosses_above_zero(score: Series, shift: int = 0) -> bool:
-    """Evaluate COTScoreZeroCrossUp (`score` crosses above `0.0`)."""
-    return series_crosses_above(score, 0.0, shift=shift)
-
-
-def score_crosses_below_zero(score: Series, shift: int = 0) -> bool:
-    """Evaluate COTScoreZeroCrossDown (`score` crosses below `0.0`)."""
-    return series_crosses_below(score, 0.0, shift=shift)
 
 
 def shift_52_vs_156_bullish(
