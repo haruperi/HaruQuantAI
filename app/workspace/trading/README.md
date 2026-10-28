@@ -37,156 +37,43 @@ Run focused verification with:
 uv run pytest tests/workspace/trading tests/workspace/brokers tests/examples/test_brokers.py --no-cov
 ```
 
-## Shared order actions
+## Canonical strategy operations
 
-`Trade` implements the twelve entry, close, cancel, and protection operations:
-
-| Entry | Close/cancel | Protection |
-| --- | --- | --- |
-| `enter_at_market` | `close_position` | `set_stop_loss` |
-| `enter_at_limit` | `close_all_positions` | `set_profit_target` |
-| `enter_at_stop` | `close_best_position` | |
-| `enter_reverse_at_market` | `close_worst_position` | |
-| | `cancel_pending_order` | |
-| | `cancel_all_pending_orders` | |
+Strategy operations now live in `app/include/blocks/order` and
+`app/include/blocks/strategy_control`. The old lowercase helper methods and
+workspace exports of `TradeFilter` / `ClosedTrade` have been removed.
+Import each operation from its owning module:
 
 ```python
-from app.workspace.trading import TradeFilter
-
-result = await trading.trade.enter_at_market(
-    "EURUSD", 1, 0.02, magic=42, comment="entry", sl=1.08, tp=1.14
+from app.include.blocks.order.open.enter_at_market import enter_at_market
+from app.include.blocks.order.close.close_best_position import close_best_position
+from app.include.blocks.order.types import TradeFilter
+from app.include.blocks.strategy_control.market_positions_count import (
+    market_positions_count,
 )
-scope = TradeFilter("EURUSD", magic=42, comment="entry")
-results = await trading.trade.set_stop_loss(scope, 1.09)
-result = await trading.trade.close_position(scope, volume=0.01)
-```
 
-Entry direction is `1` (buy) or `-1` (sell). Matching uses resolved symbol names,
-direction, exact magic number, comment substring, and optional ticket. A filter
-must be supplied for exits and modifications; `None` for symbol/magic means any,
-and direction zero means either side. Magic zero matches zero exactly, unlike
-SQX's wildcard convention. The broker contracts have no strategy-name ownership
-field, so callers must assign and filter by strategy magic numbers explicitly.
-
-Single operations return `TradeResult`, or `None` for no match/a skipped entry.
-Bulk operations return an ordered list and stop at the first unsuccessful result.
-Best/worst selection ranks profit plus swap and commission; ties keep backend
-collection order. Close-position supports full and partial volume. Cancellation
-only touches pending orders; close operations only touch positions. Protection
-updates apply to matching positions and pending orders and preserve the other
-protective level, pending entry price, filling, and expiry. Zero removes a level.
-
-Entry duplicates are scoped to symbol, magic, and comment substring. By default,
-a matching position blocks entry. `allow_duplicate_trades=True` permits additional
-requests; netting or hedging remains a backend account behavior. Pending entries
-replace matching same-direction pending orders by default; `replace_existing=False`
-skips them. The candidate is checked before cancellation, so an invalid replacement
-leaves its predecessor intact. Reversal closes all matching opposite positions and
-verifies their absence before entering. A same-direction position blocks reversal
-when duplicates are disabled. Partial or unconfirmed intermediate results stop
-replacement/reversal; no request is automatically retried or rolled back.
-
-High-level workflows are serialized per `Trade` instance. They call the existing
-`OrderCheck` and `OrderSend`, accepting native check code zero and simulator DONE.
-Arming is still enforced by the execution backend. Multi-request actions are not
-atomic across brokers, other Trade instances, external terminals, or processes.
-An exception after cancellation/closure can leave that completed change in place.
-
-The magic, deviation, and filling setters supply high-level request defaults.
-Explicit low-level requests remain unchanged. Without a filling override, market
-orders choose supported FOK/IOC (or RETURN for non-market execution); pending orders
-use RETURN. Price levels align to the symbol tick step, and volume must satisfy
-symbol limits and step. Brokers remain authoritative for margin and execution.
-
-These are independently implemented action counterparts, not the SQX builder or
-engine-specific export behavior. Strategy formulas must supply evaluated volume,
-price, stop, and target values; resolve Current/Any before entry. For pending expiry,
-pass a timezone-aware `expiration`; a future strategy runtime must translate bar
-validity into an expiry using its chart/calendar. Advanced trade management,
-formula evaluation, bar callbacks, platform-specific pending-to-market fallbacks,
-and exit-index bookkeeping are outside this order-action API. StrategyControl
-queries are described below.
-
-
-## StrategyControl queries
-
-The 25 SQX StrategyControl counterparts are implemented on the shared interfaces:
-
-| Interface | Queries |
-| --- | --- |
-| `account` | `account_balance`, `account_equity` |
-| `position` | `market_position`, `market_position_is_flat`, `market_position_is_long`, `market_position_is_short`, `market_position_is_not_long`, `market_position_is_not_short` |
-| `position` | `market_positions_count`, `market_position_size` |
-| `position` | `open_pl_in_money`, `open_pl_in_pips`, `bars_since_order_open` |
-| `position` / `order` | `order_open_price`, `order_sl`, `order_pt` (position or pending-order view respectively) |
-| `order` | `pending_order_exists`, `pending_order_doesnt_exist` |
-| `history_order` | `closed_pl_in_money`, `closed_pl_in_pips`, `last_order_was`, `last_order_was_not` |
-| `history_order` | `bars_since_order_closed`, `trade_recently_closed`, `no_trade_recently_closed` |
-
-All take the same `TradeFilter` used by actions. Missing prices/levels and bar
-counts return -1; missing P/L, count, and volume return zero. `market_position`
-returns the first matching direction (1, -1, or 0 when flat). Long/short predicates
-check any matching position, so both can be true in a hedged account. Position
-size is the gross sum of matching volumes, not signed net exposure. Pending
-orders do not contribute to position queries.
-
-Open money P/L sums broker-reported profit, swap, and available signed commission.
-An optional `prices={symbol: price}` values positions at explicit strategy decision
-prices through the existing broker profit calculation. Open pip P/L uses current
-position prices unless decision prices are supplied. These queries never mutate
-positions or feed ticks. Every matched symbol must have a supplied decision price;
-missing prices fail rather than silently falling back. Pips use canonical
-`pip_size`, falling back to `tick_size` when no pip size is configured. Pip P/L
-sums directional price changes without volume weighting.
-
-`history_order.closed_trades(scope, as_of=...)` reconstructs immutable `ClosedTrade`
-records from trading deals. It includes all entries and partial exits, emitting a
-completed lifecycle only when flat. Netting INOUT deals close one lifecycle and
-open the next; commissions and fees split by closed/opened volume. Realized money
-P/L sums reported profits, entry/exit commissions, swap, and fees; pip P/L uses
-volume-weighted entry and exit prices. The filter matches original entry identity,
-so manual exit comments/magic do not reassign a trade. Ticket filters refer to
-position identifiers. `trades_ago=0` selects the latest completed lifecycle,
-1 the previous, and so on. Cancelled or expired pending orders are excluded.
-`last_order_was_not` is false when no completed trade exists.
-
-Reconstruction requires complete entry/exit history. Orphan closes, duplicate
-execution tickets, and conflicting netted ownership fail explicitly instead of
-inventing a cost basis or attributing one strategy's trade to another. Backend
-history limits/availability remain authoritative; these queries cannot recover
-missing executions. Non-trading balance/commission account operations are excluded;
-only charges attached to execution deals are attributed to trades.
-
-Time-sensitive queries require explicit aware timestamps. Supply actual chart bar
-starts oldest first to `bars_since_order_open` / `bars_since_order_closed`, plus
-`as_of`; the bars must cover the event. They count strictly later bar starts and
-respect session gaps, rather than dividing elapsed seconds by a timeframe.
-Recent-close checks require `as_of` and, when checking the current bar, `bar_start`.
-The current-minute test uses the calendar minute containing `as_of`. Repeated
-queries are stable and non-consuming; `no_trade_recently_closed` is its complement.
-These rules intentionally omit SQX engine-specific shortcuts and mutable scan
-cursors. History queries accept `as_of` to exclude later completions; open-position
-queries describe the backend's present state and are not historical reconstruction.
-
-```python
+await enter_at_market(trading, "EURUSD", 1, 0.02, magic=42)
 scope = TradeFilter("EURUSD", magic=42)
-flat = await trading.position.market_position_is_flat(scope)
-net_open = await trading.position.open_pl_in_money(scope)
-last_closed = await trading.history_order.closed_pl_in_money(scope)
-recent = await trading.history_order.trade_recently_closed(
-    scope, as_of=decision_time, bar_start=current_bar_start
-)
+count = await market_positions_count(trading, scope)
+result = await close_best_position(trading, scope)
 ```
 
-The MT5 bridge history response now includes `fee` and `time_msc`. Compile and
-reload the updated `scripts/mql5/Experts/PythonBridge.mq5` to receive those fields
-from the live terminal. Existing responses without them have zero fees and
-second-resolution timestamp fallback. Python tests exercise typed and dictionary
-responses; they do not certify a running terminal or compile the MQL5 EA.
+`Trading` structurally implements the foundational `TradingRuntime` protocol.
+Blocks own filtering, ranking, duplicate policies, reversal, replacement, P/L
+aggregation, history reconstruction, and chart-bar predicates. No include module
+imports workspace trading or broker implementations. Package initializers do not
+load sibling blocks; each file is independently discoverable.
 
-Backends without execution history or decision-price profit calculation raise
-`UNSUPPORTED_OPERATION`; an unavailable feature is not interpreted as zero P/L
-or an empty trade history. cTrader currently lacks these inherited capabilities.
+`Trade` retains raw request/result APIs and concrete execution primitives:
+`prepare_entry_request`, `send_checked`, `close(position, volume)`, `cancel(order)`,
+and `modify_protection(item, sl=..., tp=...)`. These operate on explicit requests
+or selected snapshots. They do not select the best/worst position or execute a
+strategy predicate. Symbol normalization, volume constraints, filling selection,
+request checking and broker submission remain here. Blocks share the executor's
+`operation_lock` to serialize complete workflows.
+
+The 12 order and 25 state-query blocks, donor mappings, explicit semantics and
+qualification limits are documented in `docs/dev/trading-block-migration.md`.
 
 
 ## Exit policies
@@ -197,13 +84,13 @@ or an empty trade history. cTrader currently lacks these inherited capabilities.
 strategy actions. No broker-specific implementation or background task is added.
 
 ```python
+from app.include.blocks.order.types import TradeFilter
 from app.workspace.trading import (
     ExitAfterBars,
     ExitPlan,
     MoveSL2BE,
     ProfitTarget,
     StopLoss,
-    TradeFilter,
     TrailingStop,
 )
 

@@ -1,0 +1,224 @@
+[
+  {
+    "donor": "Order/Close/CloseAllPendingOrders.java",
+    "id": "order.close_all_pending_orders",
+    "source": "app/include/blocks/order/close/close_all_pending_orders.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Close/CloseAllPositions.java",
+    "id": "order.close_all_positions",
+    "source": "app/include/blocks/order/close/close_all_positions.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Close/CloseBestPosition.java",
+    "id": "order.close_best_position",
+    "source": "app/include/blocks/order/close/close_best_position.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Close/ClosePendingOrder.java",
+    "id": "order.close_pending_order",
+    "source": "app/include/blocks/order/close/close_pending_order.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Close/ClosePosition.java",
+    "id": "order.close_position",
+    "source": "app/include/blocks/order/close/close_position.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Close/CloseWorstPosition.java",
+    "id": "order.close_worst_position",
+    "source": "app/include/blocks/order/close/close_worst_position.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Modify/SetProfitTarget.java",
+    "id": "order.set_profit_target",
+    "source": "app/include/blocks/order/modify/set_profit_target.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Modify/SetStopLoss.java",
+    "id": "order.set_stop_loss",
+    "source": "app/include/blocks/order/modify/set_stop_loss.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Open/EnterAtLimit.java",
+    "id": "order.enter_at_limit",
+    "source": "app/include/blocks/order/open/enter_at_limit.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Open/EnterAtMarket.java",
+    "id": "order.enter_at_market",
+    "source": "app/include/blocks/order/open/enter_at_market.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Open/EnterAtStop.java",
+    "id": "order.enter_at_stop",
+    "source": "app/include/blocks/order/open/enter_at_stop.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "Order/Open/EnterReverseAtMarket.java",
+    "id": "order.enter_reverse_at_market",
+    "source": "app/include/blocks/order/open/enter_reverse_at_market.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/AccountBalance.java",
+    "id": "strategy_control.account_balance",
+    "source": "app/include/blocks/strategy_control/account_balance.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/AccountEquity.java",
+    "id": "strategy_control.account_equity",
+    "source": "app/include/blocks/strategy_control/account_equity.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/BarsSinceOrderClosed.java",
+    "id": "strategy_control.bars_since_order_closed",
+    "source": "app/include/blocks/strategy_control/bars_since_order_closed.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/BarsSinceOrderOpen.java",
+    "id": "strategy_control.bars_since_order_open",
+    "source": "app/include/blocks/strategy_control/bars_since_order_open.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/ClosedPLInMoney.java",
+    "id": "strategy_control.closed_pl_in_money",
+    "source": "app/include/blocks/strategy_control/closed_pl_in_money.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/ClosedPLInPips.java",
+    "id": "strategy_control.closed_pl_in_pips",
+    "source": "app/include/blocks/strategy_control/closed_pl_in_pips.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/LastOrderWas.java",
+    "id": "strategy_control.last_order_was",
+    "source": "app/include/blocks/strategy_control/last_order_was.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/LastOrderWasNot.java",
+    "id": "strategy_control.last_order_was_not",
+    "source": "app/include/blocks/strategy_control/last_order_was_not.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/MarketPosition.java",
+    "id": "strategy_control.market_position",
+    "source": "app/include/blocks/strategy_control/market_position.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/MarketPositionIsFlat.java",
+    "id": "strategy_control.market_position_is_flat",
+    "source": "app/include/blocks/strategy_control/market_position_is_flat.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/MarketPositionIsLong.java",
+    "id": "strategy_control.market_position_is_long",
+    "source": "app/include/blocks/strategy_control/market_position_is_long.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/MarketPositionIsNotLong.java",
+    "id": "strategy_control.market_position_is_not_long",
+    "source": "app/include/blocks/strategy_control/market_position_is_not_long.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/MarketPositionIsNotShort.java",
+    "id": "strategy_control.market_position_is_not_short",
+    "source": "app/include/blocks/strategy_control/market_position_is_not_short.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/MarketPositionIsShort.java",
+    "id": "strategy_control.market_position_is_short",
+    "source": "app/include/blocks/strategy_control/market_position_is_short.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/MarketPositionsCount.java",
+    "id": "strategy_control.market_positions_count",
+    "source": "app/include/blocks/strategy_control/market_positions_count.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/MarketPositionSize.java",
+    "id": "strategy_control.market_position_size",
+    "source": "app/include/blocks/strategy_control/market_position_size.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/NoTradeRecentlyClosed.java",
+    "id": "strategy_control.no_trade_recently_closed",
+    "source": "app/include/blocks/strategy_control/no_trade_recently_closed.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/OpenPLInMoney.java",
+    "id": "strategy_control.open_pl_in_money",
+    "source": "app/include/blocks/strategy_control/open_pl_in_money.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/OpenPLInPips.java",
+    "id": "strategy_control.open_pl_in_pips",
+    "source": "app/include/blocks/strategy_control/open_pl_in_pips.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/OrderOpenPrice.java",
+    "id": "strategy_control.order_open_price",
+    "source": "app/include/blocks/strategy_control/order_open_price.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/OrderPT.java",
+    "id": "strategy_control.order_pt",
+    "source": "app/include/blocks/strategy_control/order_pt.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/OrderSL.java",
+    "id": "strategy_control.order_sl",
+    "source": "app/include/blocks/strategy_control/order_sl.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/PendingOrderDoesntExist.java",
+    "id": "strategy_control.pending_order_doesnt_exist",
+    "source": "app/include/blocks/strategy_control/pending_order_doesnt_exist.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/PendingOrderExists.java",
+    "id": "strategy_control.pending_order_exists",
+    "source": "app/include/blocks/strategy_control/pending_order_exists.py",
+    "generation_eligible": false
+  },
+  {
+    "donor": "StrategyControl/TradeRecentlyClosed.java",
+    "id": "strategy_control.trade_recently_closed",
+    "source": "app/include/blocks/strategy_control/trade_recently_closed.py",
+    "generation_eligible": false
+  }
+]

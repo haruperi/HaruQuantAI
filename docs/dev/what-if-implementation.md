@@ -11,8 +11,8 @@ execution changes caused by removing trades.
 distinguishes completed trades, unfilled pending orders, and balance entries.
 Timestamps are Unix milliseconds. Profit is gross monetary P/L; commission, swap
 and fee are signed monetary amounts. `net_profit` adds these four components.
-`WhatIfRecord.from_closed_trade()` adapts the existing trading-history
-`ClosedTrade` without an upward dependency from include to workspace.
+`WhatIfRecord.from_closed_trade()` adapts the canonical strategy-history
+`ClosedTrade` in `app/include/blocks/strategy_control/history.py` without an upward dependency from include to workspace.
 
 Each `BaseWhatIf` subclass declares Pydantic configuration in the class and
 implements `filter_trades(records) -> list[WhatIfRecord]`. No source list or record

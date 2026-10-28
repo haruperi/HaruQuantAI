@@ -10,7 +10,7 @@ from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any
+from typing import Any, get_type_hints
 
 from pydantic import BaseModel, ConfigDict, ValidationError, create_model
 
@@ -481,6 +481,7 @@ class BlockRegistry:
             # Exclude runtime input ports from configuration schema
             input_port_names = {p.name for p in spec.inputs}
             sig = inspect.signature(target)
+            annotations = get_type_hints(target, include_extras=True)
             fields: dict[str, Any] = {}
             for pname, param in sig.parameters.items():
                 if pname in ("self", "cls"):
@@ -488,7 +489,7 @@ class BlockRegistry:
                 if pname in input_port_names:
                     continue
                 if param.annotation is not inspect.Parameter.empty:
-                    anno = param.annotation
+                    anno = annotations.get(pname, param.annotation)
                 elif param.default is not inspect.Parameter.empty and type(
                     param.default
                 ) in (int, float, str, bool):

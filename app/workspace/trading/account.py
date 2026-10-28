@@ -44,11 +44,3 @@ class AccountProxy(TradingClass):
     async def MaxLotCheck(self, *args: Any) -> Any:
         """Await the backend AccountInfo.MaxLotCheck operation."""
         return await self._call("MaxLotCheck", *args)
-
-    async def account_balance(self) -> float:
-        """Return account balance in account currency."""
-        return (await self.AccountInfo()).balance
-
-    async def account_equity(self) -> float:
-        """Return account equity in account currency."""
-        return (await self.AccountInfo()).equity

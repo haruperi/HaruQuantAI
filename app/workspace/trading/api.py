@@ -33,16 +33,12 @@ class Trading:
         self.account = AccountProxy(backend)
         self.symbol = SymbolProxy(backend)
         self.order = OrderProxy(backend)
-        self.position = PositionProxy(backend, symbol=self.symbol, account=self.account)
+        self.position = PositionProxy(backend)
         self.deal = DealProxy(backend)
-        self.history_order = HistoryOrderProxy(
-            backend, deal=self.deal, symbol=self.symbol
-        )
+        self.history_order = HistoryOrderProxy(backend)
         self.terminal = TerminalProxy(backend)
-        self.trade = Trade(
-            backend, position=self.position, order=self.order, symbol=self.symbol
-        )
-        self.exits = ExitManager(self.trade, self.position, self.symbol)
+        self.trade = Trade(backend, symbol=self.symbol)
+        self.exits = ExitManager(self)
 
     async def start(self) -> None:
         """Start the selected backend."""

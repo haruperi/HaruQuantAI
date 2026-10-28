@@ -5,6 +5,7 @@ from pathlib import Path
 from types import ModuleType
 
 import pytest
+from app.include.blocks.strategy_control.history import ClosedTrade
 from app.include.what_if import (
     SCENARIOS,
     BaseWhatIf,
@@ -28,7 +29,6 @@ from app.include.what_if import (
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._template_generators import _gen_what_if
 from app.workspace.code_editor.registry import SnippetRegistry
-from app.workspace.trading.history import ClosedTrade
 from pydantic import ValidationError
 
 

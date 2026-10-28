@@ -8,7 +8,7 @@ from typing import Any
 from app.host.logging import get_logger
 from app.include import contracts
 
-from .base import TradeFilter, TradingClass
+from .base import TradingClass
 
 logger = get_logger(__name__)
 
@@ -57,33 +57,3 @@ class OrderProxy(TradingClass):
         """Await the backend OrderInfo.OrdersGet operation."""
         logger.debug("FR-TRADING-ORDERS: querying orders collection")
         return await self._collection("OrdersGet", contracts.OrderInfo, *args, **kwargs)
-
-    async def pending_order_exists(self, scope: TradeFilter) -> bool:
-        """Return whether any matching pending order exists."""
-        return any(
-            scope.matches(order)
-            for order in await self.OrdersGet()
-            if order.order_type in (2, 3, 4, 5, 6, 7)
-        )
-
-    async def pending_order_doesnt_exist(self, scope: TradeFilter) -> bool:
-        """Return whether no matching pending order exists."""
-        return not await self.pending_order_exists(scope)
-
-    async def _order_value(self, scope: TradeFilter, field: str) -> float:
-        for order in await self.OrdersGet():
-            if order.order_type in (2, 3, 4, 5, 6, 7) and scope.matches(order):
-                return float(getattr(order, field))
-        return -1.0
-
-    async def order_open_price(self, scope: TradeFilter) -> float:
-        """Return the first matching pending entry price, or -1 when absent."""
-        return await self._order_value(scope, "price_open")
-
-    async def order_sl(self, scope: TradeFilter) -> float:
-        """Return the first matching pending stop loss, or -1 when absent."""
-        return await self._order_value(scope, "sl")
-
-    async def order_pt(self, scope: TradeFilter) -> float:
-        """Return the first matching pending target, or -1 when absent."""
-        return await self._order_value(scope, "tp")

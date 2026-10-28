@@ -54,7 +54,7 @@ class BaseBlock(BaseModel):
 
 
 def block(spec: BlockSpec) -> Callable[[F], F]:
-    """Decorator for pure callable strategy blocks (functions/conditions).
+    """Decorator for callable strategy blocks, including asynchronous operations.
 
     Attaches the BlockSpec to the callable without mutating the global registry
     during module import.

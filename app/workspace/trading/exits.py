@@ -10,13 +10,13 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal
 
+from app.include.blocks.order.close.close_position import close_position
+from app.include.blocks.order.modify.set_profit_target import set_profit_target
+from app.include.blocks.order.modify.set_stop_loss import set_stop_loss
+from app.include.blocks.order.runtime import TradingRuntime
+from app.include.blocks.order.types import TradeFilter, aware_timestamp, bars_since
 from app.include.contracts import PositionInfo, SymbolInfo, TradeResult
 from app.include.enums import TradeRetcode
-
-from .base import TradeFilter, aware_timestamp, bars_since
-from .positions import PositionProxy
-from .symbol import SymbolProxy
-from .trade import Trade
 
 
 def _nonnegative(value: float, label: str, *, positive: bool = False) -> None:
@@ -140,12 +140,10 @@ class ExitManager:
     each position lifecycle; pending orders must first fill before attachment.
     """
 
-    def __init__(
-        self, trade: Trade, position: PositionProxy, symbol: SymbolProxy
-    ) -> None:
-        self._trade = trade
-        self._position = position
-        self._symbol = symbol
+    def __init__(self, context: TradingRuntime) -> None:
+        self._context = context
+        self._position = context.position
+        self._symbol = context.symbol
         self._bindings: dict[int, _Binding] = {}
         self._lock = asyncio.Lock()
 
@@ -291,7 +289,7 @@ class ExitManager:
     ) -> ExitOutcome:
         binding.last_evaluation = aware_timestamp(as_of)
         try:
-            result = await self._trade.close_position(scope)
+            result = await close_position(self._context, scope)
             if result is None:
                 self._bindings.pop(position.ticket, None)
             elif result.retcode == int(TradeRetcode.DONE):
@@ -387,11 +385,17 @@ class ExitManager:
     ) -> ExitOutcome:
         try:
             results = await (
-                self._trade.set_stop_loss(
-                    scope, price, include_pending=False, tighten_only=True
+                set_stop_loss(
+                    self._context,
+                    scope,
+                    price,
+                    include_pending=False,
+                    tighten_only=True,
                 )
                 if stop
-                else self._trade.set_profit_target(scope, price, include_pending=False)
+                else set_profit_target(
+                    self._context, scope, price, include_pending=False
+                )
             )
             result = results[0] if results else None
             if result is None:

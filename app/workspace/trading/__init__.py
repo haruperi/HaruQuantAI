@@ -2,7 +2,7 @@
 
 from .account import AccountProxy
 from .api import Trading
-from .base import TradeFilter, TradingClass
+from .base import TradingClass
 from .exits import (
     ExitAfterBars,
     ExitManager,
@@ -13,7 +13,7 @@ from .exits import (
     StopLoss,
     TrailingStop,
 )
-from .history import ClosedTrade, DealProxy, HistoryOrderProxy
+from .history import DealProxy, HistoryOrderProxy
 from .orders import OrderProxy
 from .positions import PositionProxy
 from .symbol import SymbolProxy
@@ -22,7 +22,6 @@ from .trade import Trade
 
 __all__ = [
     "AccountProxy",
-    "ClosedTrade",
     "DealProxy",
     "ExitAfterBars",
     "ExitManager",
@@ -37,7 +36,6 @@ __all__ = [
     "SymbolProxy",
     "TerminalProxy",
     "Trade",
-    "TradeFilter",
     "Trading",
     "TradingClass",
     "TrailingStop",
