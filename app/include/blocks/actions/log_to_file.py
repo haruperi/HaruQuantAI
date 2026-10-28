@@ -8,7 +8,7 @@ from typing import ClassVar
 from pydantic import Field
 
 from app.host.logging import get_logger
-from app.include.actions.base import ActionRecord
+from app.include.blocks.actions.base import ActionRecord
 from app.include.blocks.base import BaseBlock
 from app.include.blocks.metadata import (
     BlockSpec,

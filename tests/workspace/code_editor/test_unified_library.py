@@ -106,7 +106,7 @@ def test_compile_all_accepts_the_real_unified_library():
 
 
 def test_dynamic_modules_keep_relative_import_context():
-    result = CodeEditor().compile_file(str(INCLUDE_DIR / "price.py"))
+    result = CodeEditor().compile_file(str(INCLUDE_DIR / "contracts.py"))
     assert result["success"], result
 
 
@@ -138,11 +138,10 @@ def test_invalid_indicator_category_is_rejected(category):
 
 
 def test_modular_actions_preserve_the_public_facade():
-    from app.include.actions.annotations import DrawUpArrowAction
-    from app.include.actions.base import ActionRecord
-    from app.include.actions.facade import Actions
-
-    from app.include import actions
+    from app.include.blocks import actions
+    from app.include.blocks.actions.annotations import DrawUpArrowAction
+    from app.include.blocks.actions.base import ActionRecord
+    from app.include.blocks.actions.facade import Actions
 
     assert len(actions.__all__) == 19
     assert all(hasattr(actions, name) for name in actions.__all__)

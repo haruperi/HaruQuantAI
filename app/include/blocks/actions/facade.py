@@ -3,21 +3,19 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 from app.host.logging import get_logger
-from app.include.actions.annotations import (
-    draw_down_arrow,
-    draw_up_arrow,
-    draw_vertical_line,
-)
-from app.include.actions.assign_variable import assign_variable
-from app.include.actions.base import ActionRecord
-from app.include.actions.custom import custom_action
-from app.include.actions.logging import (
-    log_to_journal,
-    send_email,
-)
+from app.include.blocks.actions.assign_variable import assign_variable
+from app.include.blocks.actions.base import ActionRecord
+from app.include.blocks.actions.custom_action import custom_action
+from app.include.blocks.actions.draw_down_arrow import draw_down_arrow
+from app.include.blocks.actions.draw_up_arrow import draw_up_arrow
+from app.include.blocks.actions.draw_vertical_line import draw_vertical_line
+from app.include.blocks.actions.log_to_file import log_to_file
+from app.include.blocks.actions.log_to_journal import log_to_journal
+from app.include.blocks.actions.send_email import send_email
 from app.include.blocks.types import Variable
 
 logger = get_logger(__name__)
@@ -115,6 +113,28 @@ class Actions:
             shift,
         )
         return draw_vertical_line(shift)
+
+    @staticmethod
+    def log_file(
+        filename: str = "strategy.log",
+        message: str = "",
+        base_dir: Path | str | None = None,
+    ) -> ActionRecord:
+        """Record file log entry.
+
+        Args:
+            filename: Destination file name.
+            message: Message text.
+            base_dir: Optional sandbox base directory.
+
+        Returns:
+            ActionRecord instance.
+        """
+        logger.debug(
+            "FR-SERVICES-ACTIONS-FACADE: Actions.log_file(file='%s')",
+            filename,
+        )
+        return log_to_file(filename, message, base_dir)
 
     @staticmethod
     def log_journal(message: str = "some message") -> ActionRecord:

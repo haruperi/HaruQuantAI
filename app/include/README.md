@@ -5,7 +5,7 @@ This package provides foundational utility modules for temporal features, market
 - `app.include.generators`: Provides `RandomGenerator` for reproducible simulation series (`XorShift`, `SplitMix`).
 - `app.include.contracts`: Provides foundational data contracts, order records, and domain value objects.
 - `app.include.enums`: Provides canonical trading enumerations, execution modes, and statuses.
-- `app.include.actions`: Provides side-effect action blocks, variable assignments, chart annotations, journal/file logging, and email notifications (`Actions`).
+- `app.include.blocks.actions`: Provides side-effect action blocks, variable assignments, chart annotations, journal/file logging, and email notifications (`Actions`).
 - `app.include.blocks.comparisons`: Provides independently maintained comparative condition strategy blocks (arithmetic relations, bar-to-bar crossovers, trend persistence, percentile rankings, moving average conditions, and boolean logic) with `BlockSpec` metadata and `Comparisons` facade.
 - `app.include.blocks.indicators`: Provides canonical single-class indicators with validated parameters, named outputs, and strategy metadata. Indicator-specific helpers remain in their indicator files.
 - `app.include.blocks.functions`: Provides arithmetic operations, mathematical functions, date/time integers, rolling period rankings, and pip conversions (`Functions`).

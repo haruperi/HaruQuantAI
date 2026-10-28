@@ -291,18 +291,9 @@ def test_clean_migration_obsolete_implementations_removed() -> None:
 
     assert not hasattr(Functions, "plus")
 
-    # 3. actions/logging.py has no LogToFileAction or log_to_file
-    import app.include.actions.logging as act_log
-
-    assert not hasattr(act_log, "LogToFileAction")
-    assert not hasattr(act_log, "log_to_file")
-    assert "LogToFileAction" not in act_log.__all__
-    assert "log_to_file" not in act_log.__all__
-
-    # 4. actions facade has no log_file method
-    import app.include.actions.facade as act_facade
-
-    assert not hasattr(act_facade.Actions, "log_file")
+    # 2d. actions legacy folder is cleanly removed
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include.actions")
 
 
 def test_clean_migration_direct_consumer_imports() -> None:
@@ -317,7 +308,7 @@ def test_clean_migration_direct_consumer_imports() -> None:
     assert root_inc.plus is plus
 
     # 2. actions package exposes canonical log_to_file
-    import app.include.actions as root_act
+    import app.include.blocks.actions as root_act
     from app.include.blocks.actions.log_to_file import LogToFileAction, log_to_file
 
     assert root_act.LogToFileAction is LogToFileAction

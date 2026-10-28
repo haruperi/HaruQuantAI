@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.include.actions import ActionRecord, Actions
+from app.include.blocks.actions import ActionRecord, Actions
 from app.include.blocks.bar_time import (
     BarTime,
     DateTime,
