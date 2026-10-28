@@ -1,18 +1,33 @@
-import React, { useMemo, useState } from 'react';
-import { Activity, BarChart2, CheckCircle2, Play, RefreshCw, Sliders } from 'lucide-react';
-import { Button, Field, Modal, Select, TextInput } from '../../components/ui';
+import React from 'react';
+import {
+  Activity,
+  ArrowDown,
+  ArrowUp,
+  BarChart2,
+  Calendar,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Cpu,
+  Download,
+  Folder,
+  Maximize2,
+  Play,
+  Radio,
+  RefreshCw,
+  Search,
+  Settings,
+  Sparkles,
+  Table,
+  Target,
+  Trophy,
+  X,
+  Zap,
+} from 'lucide-react';
+import { useIndicatorTest } from './useIndicatorTest';
 
-interface BarData {
-  bar: number;
-  date: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  indicatorVal: number;
-  upperBand?: number;
-  lowerBand?: number;
-}
+import { IndicatorChart } from './IndicatorChart';
 
 interface IndicatorTesterModalProps {
   onClose: () => void;
@@ -20,296 +35,416 @@ interface IndicatorTesterModalProps {
 }
 
 export function IndicatorTesterModal({ onClose, indicatorName }: IndicatorTesterModalProps) {
-  const [period, setPeriod] = useState<number>(14);
-  const [multiplier, setMultiplier] = useState<number>(2.0);
-  const [symbol, setSymbol] = useState<string>('EURUSD');
-  const [timeframe, setTimeframe] = useState<string>('H1');
-  const [sampleSize, setSampleSize] = useState<number>(40);
-
-  // Generate synthetic price series and calculate indicator values
-  const dataset: BarData[] = useMemo(() => {
-    const bars: BarData[] = [];
-    let currentPrice = 1.1000;
-    const baseDate = new Date(2026, 0, 15, 9, 0);
-
-    for (let i = 0; i < sampleSize; i++) {
-      const date = new Date(baseDate.getTime() + i * 3600000);
-      const delta = (Math.sin(i * 0.35) * 0.0018) + ((i % 5 === 0 ? 1 : -1) * 0.0012) + (Math.random() - 0.5) * 0.0015;
-      const open = Math.round(currentPrice * 100000) / 100000;
-      const close = Math.round((open + delta) * 100000) / 100000;
-      const high = Math.round((Math.max(open, close) + Math.random() * 0.0012) * 100000) / 100000;
-      const low = Math.round((Math.min(open, close) - Math.random() * 0.0012) * 100000) / 100000;
-      currentPrice = close;
-
-      bars.push({
-        bar: i + 1,
-        date: date.toISOString().slice(0, 16).replace('T', ' '),
-        open,
-        high,
-        low,
-        close,
-        indicatorVal: 0,
-      });
-    }
-
-    // Compute SMA / EMA / Keltner bands
-    for (let i = 0; i < bars.length; i++) {
-      const windowStart = Math.max(0, i - period + 1);
-      const windowBars = bars.slice(windowStart, i + 1);
-      const sum = windowBars.reduce((acc, b) => acc + b.close, 0);
-      const sma = sum / windowBars.length;
-
-      // Approximate ATR
-      const trSum = windowBars.reduce((acc, b) => acc + (b.high - b.low), 0);
-      const atr = trSum / windowBars.length;
-
-      bars[i].indicatorVal = Math.round(sma * 100000) / 100000;
-      bars[i].upperBand = Math.round((sma + multiplier * atr) * 100000) / 100000;
-      bars[i].lowerBand = Math.round((sma - multiplier * atr) * 100000) / 100000;
-    }
-
-    return bars;
-  }, [period, multiplier, sampleSize]);
-
-  // Scaler for SVG chart
-  const minPrice = Math.min(...dataset.map(b => b.low), ...dataset.map(b => b.lowerBand ?? b.low));
-  const maxPrice = Math.max(...dataset.map(b => b.high), ...dataset.map(b => b.upperBand ?? b.high));
-  const priceRange = maxPrice - minPrice || 0.001;
-
-  const chartWidth = 720;
-  const chartHeight = 220;
-  const candleWidth = Math.max(3, Math.floor((chartWidth - 40) / dataset.length) - 3);
-
-  const getY = (val: number) => {
-    return chartHeight - 20 - ((val - minPrice) / priceRange) * (chartHeight - 40);
-  };
-
-  const getX = (index: number) => {
-    return 20 + index * ((chartWidth - 40) / (dataset.length - 1 || 1));
-  };
-
-  // Generate SVG polyline path for indicator
-  const indicatorPath = dataset
-    .map((b, i) => `${getX(i)},${getY(b.indicatorVal)}`)
-    .join(' ');
-
-  const upperBandPath = dataset
-    .map((b, i) => `${getX(i)},${getY(b.upperBand ?? b.indicatorVal)}`)
-    .join(' ');
-
-  const lowerBandPath = dataset
-    .map((b, i) => `${getX(i)},${getY(b.lowerBand ?? b.indicatorVal)}`)
-    .join(' ');
+  const {
+    client,
+    activeTab,
+    setActiveTab,
+    bottomTab,
+    setBottomTab,
+    symbol,
+    setSymbol,
+    timeframe,
+    setTimeframe,
+    skipDefaults,
+    setParametersReady,
+    setTestWindow,
+    error,
+    parameters,
+    setParameters,
+    defaults,
+    setDefaults,
+    selectedIndicator,
+    setSelectedIndicator,
+    isRunning,
+    testResult,
+    currentPage,
+    setCurrentPage,
+    rowsPerPage,
+    logs,
+    setLogs,
+    runTest,
+    candlesticks,
+    tableRows,
+    meanVal,
+    minVal,
+    maxVal,
+    signalsCount,
+    dateRange,
+    totalPages,
+    paginatedRows,
+  } = useIndicatorTest(indicatorName);
 
   return (
-    <Modal title={`Indicator Interactive Tester: ${indicatorName}`} onClose={onClose} width={860}>
-      <div className="flex flex-col gap-4">
-        {/* Top Controls Bar */}
-        <div className="grid grid-cols-5 gap-3 p-3 bg-gray-900 rounded border border-gray-700">
-          <Field label="Market Symbol">
-            <Select value={symbol} onChange={setSymbol}>
-              <option>EURUSD</option>
-              <option>GBPUSD</option>
-              <option>USDJPY</option>
-              <option>XAUUSD</option>
-            </Select>
-          </Field>
-
-          <Field label="Timeframe">
-            <Select value={timeframe} onChange={setTimeframe}>
-              <option>M15</option>
-              <option>M30</option>
-              <option>H1</option>
-              <option>H4</option>
-              <option>D1</option>
-            </Select>
-          </Field>
-
-          <Field label="Period">
-            <TextInput
-              type="number"
-              value={period}
-              onChange={e => setPeriod(Math.max(2, Number(e.target.value) || 14))}
-            />
-          </Field>
-
-          <Field label="Multiplier (Bands)">
-            <TextInput
-              type="number"
-              step="0.1"
-              value={multiplier}
-              onChange={e => setMultiplier(Math.max(0.5, Number(e.target.value) || 2.0))}
-            />
-          </Field>
-
-          <Field label="Test Bars Count">
-            <Select value={String(sampleSize)} onChange={v => setSampleSize(Number(v))}>
-              <option value="30">30 bars</option>
-              <option value="40">40 bars</option>
-              <option value="60">60 bars</option>
-            </Select>
-          </Field>
-        </div>
-
-        {/* SVG Chart Preview */}
-        <div className="bg-[#12161b] rounded border border-gray-700 p-2 flex flex-col">
-          <div className="flex items-center justify-between px-2 py-1 text-xs text-gray-300 border-b border-gray-800">
-            <div className="flex items-center gap-3">
-              <span className="font-semibold text-gray-200">
-                {symbol} ({timeframe})
-              </span>
-              <span className="flex items-center gap-1.5 text-cyan-400">
-                <span className="w-2.5 h-0.5 bg-cyan-400 inline-block" />
-                Middle (Period={period})
-              </span>
-              <span className="flex items-center gap-1.5 text-amber-400">
-                <span className="w-2.5 h-0.5 bg-amber-400 inline-block" />
-                Upper/Lower Bands (x{multiplier})
-              </span>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="w-full max-w-6xl h-[92vh] max-h-[920px] rounded-xl border border-slate-700/80 bg-slate-900 text-slate-100 shadow-2xl flex flex-col overflow-hidden">
+        {/* Top Navbar */}
+        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-3.5 bg-slate-900/90">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <Target className="w-5 h-5" />
             </div>
-            <span className="text-[11px] text-gray-500 font-mono">
-              Min: {minPrice.toFixed(4)} | Max: {maxPrice.toFixed(4)}
-            </span>
+            <div>
+              <h2 className="text-base font-semibold text-slate-100 flex items-center gap-2">Indicator Test Studio</h2>
+              <p className="text-xs text-slate-400">Run and verify indicators against stored Data Manager history.</p>
+            </div>
           </div>
 
-          <div className="relative w-full h-[220px] overflow-hidden">
-            <svg
-              viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-              className="w-full h-full select-none"
+          <div className="flex items-center gap-2">
+            <div className="flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-800 text-xs">
+              <button
+                onClick={() => setActiveTab('chart')}
+                className={`px-3 py-1 rounded-md transition-colors ${
+                  activeTab === 'chart'
+                    ? 'bg-blue-600 text-white font-medium shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Chart & Visuals
+              </button>
+              <button
+                onClick={() => setActiveTab('results')}
+                className={`px-3 py-1 rounded-md transition-colors ${
+                  activeTab === 'results'
+                    ? 'bg-blue-600 text-white font-medium shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Results & Metrics
+              </button>
+              <button
+                onClick={() => setActiveTab('data')}
+                className={`px-3 py-1 rounded-md transition-colors ${
+                  activeTab === 'data'
+                    ? 'bg-blue-600 text-white font-medium shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Data Table
+              </button>
+            </div>
+
+            <button
+              onClick={onClose}
+              className="text-slate-400 hover:text-slate-200 hover:bg-slate-800 p-1.5 rounded-lg transition-colors ml-2"
             >
-              {/* Grid Lines */}
-              {[0.2, 0.4, 0.6, 0.8].map(ratio => {
-                const y = 20 + ratio * (chartHeight - 40);
-                return (
-                  <line
-                    key={ratio}
-                    x1="20"
-                    y1={y}
-                    x2={chartWidth - 20}
-                    y2={y}
-                    stroke="#1e2631"
-                    strokeDasharray="4 4"
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Body Split */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left Controls Drawer */}
+          <div className="w-[320px] border-r border-slate-800 bg-slate-950/50 p-5 flex flex-col justify-between overflow-y-auto space-y-4">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Symbol</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={symbol}
+                    onChange={(e) => setSymbol(e.target.value.toUpperCase())}
+                    className="w-full px-3 py-1.5 text-xs bg-slate-900 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500 font-mono"
                   />
-                );
-              })}
+                  <span className="absolute right-2.5 top-1.5 text-[10px] text-slate-400 uppercase">
+                    Forex / Equity
+                  </span>
+                </div>
+              </div>
 
-              {/* Upper & Lower Bands */}
-              <polyline
-                fill="none"
-                stroke="#f59e0b"
-                strokeWidth="1.2"
-                strokeDasharray="3 3"
-                points={upperBandPath}
-              />
-              <polyline
-                fill="none"
-                stroke="#f59e0b"
-                strokeWidth="1.2"
-                strokeDasharray="3 3"
-                points={lowerBandPath}
-              />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Timeframe</label>
+                  <select
+                    value={timeframe}
+                    onChange={(e) => setTimeframe(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs bg-slate-900 border border-slate-700 rounded-lg text-slate-200 focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="M1">M1 (1 Min)</option>
+                    <option value="M5">M5 (5 Min)</option>
+                    <option value="M15">M15 (15 Min)</option>
+                    <option value="H1">H1 (1 Hour)</option>
+                    <option value="H4">H4 (4 Hours)</option>
+                    <option value="D1">D1 (Daily)</option>
+                  </select>
+                </div>
+              </div>
 
-              {/* Candlesticks */}
-              {dataset.map((b, i) => {
-                const x = getX(i);
-                const isBull = b.close >= b.open;
-                const candleColor = isBull ? '#10b981' : '#ef4444';
-                const openY = getY(b.open);
-                const closeY = getY(b.close);
-                const highY = getY(b.high);
-                const lowY = getY(b.low);
-                const top = Math.min(openY, closeY);
-                const height = Math.max(2, Math.abs(closeY - openY));
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Date Range</label>
+                <div className="flex items-center gap-2 px-3 py-1.5 text-xs bg-slate-900 border border-slate-700 rounded-lg text-slate-300">
+                  <Calendar className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                  <span className="truncate">{dateRange}</span>
+                </div>
+              </div>
 
-                return (
-                  <g key={b.bar}>
-                    {/* Wick */}
-                    <line
-                      x1={x}
-                      y1={highY}
-                      x2={x}
-                      y2={lowY}
-                      stroke={candleColor}
-                      strokeWidth="1"
+              <div className="rounded-xl border border-slate-800 p-3 space-y-3">
+                <span className="text-xs font-semibold">Indicator Parameters</span>
+                {Object.entries(parameters).map(([name, value]) => (
+                  <label key={name} className="block text-xs text-slate-300">
+                    {name}
+                    <input
+                      className="block w-full bg-slate-900 border border-slate-700 rounded p-1"
+                      type={typeof value === 'number' ? 'number' : 'text'}
+                      value={String(value ?? '')}
+                      onChange={(event) =>
+                        setParameters((prev) => ({
+                          ...prev,
+                          [name]: typeof value === 'number' ? Number(event.target.value) : event.target.value,
+                        }))
+                      }
                     />
-                    {/* Body */}
-                    <rect
-                      x={x - candleWidth / 2}
-                      y={top}
-                      width={candleWidth}
-                      height={height}
-                      fill={candleColor}
-                      rx="1"
-                    />
-                  </g>
-                );
-              })}
-
-              {/* Main Indicator Overlay Line */}
-              <polyline
-                fill="none"
-                stroke="#22d3ee"
-                strokeWidth="2"
-                points={indicatorPath}
-              />
-            </svg>
-          </div>
-        </div>
-
-        {/* Calculated Series Output Table */}
-        <div className="flex flex-col">
-          <div className="text-xs font-semibold text-gray-300 mb-1 flex items-center justify-between">
-            <span>Calculated Output Buffer Values (Latest 10 Bars)</span>
-            <span className="text-[11px] text-emerald-400 flex items-center gap-1">
-              <CheckCircle2 size={12} />
-              Deterministic execution verified
-            </span>
-          </div>
-
-          <div className="max-h-40 overflow-y-auto border border-gray-700 rounded bg-[#101419]">
-            <table className="w-full text-[11px] font-mono border-collapse">
-              <thead className="bg-gray-800 text-gray-400 sticky top-0">
-                <tr>
-                  <th className="p-1.5 text-left border-b border-gray-700">Bar #</th>
-                  <th className="p-1.5 text-left border-b border-gray-700">Timestamp</th>
-                  <th className="p-1.5 text-right border-b border-gray-700">Open</th>
-                  <th className="p-1.5 text-right border-b border-gray-700">High</th>
-                  <th className="p-1.5 text-right border-b border-gray-700">Low</th>
-                  <th className="p-1.5 text-right border-b border-gray-700">Close</th>
-                  <th className="p-1.5 text-right border-b border-gray-700 text-cyan-400">Indicator</th>
-                  <th className="p-1.5 text-right border-b border-gray-700 text-amber-400">Upper Band</th>
-                  <th className="p-1.5 text-right border-b border-gray-700 text-amber-400">Lower Band</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dataset.slice(-10).map(row => (
-                  <tr key={row.bar} className="hover:bg-gray-800/50 border-b border-gray-800">
-                    <td className="p-1.5 text-gray-500">{row.bar}</td>
-                    <td className="p-1.5 text-gray-400">{row.date}</td>
-                    <td className="p-1.5 text-right text-gray-300">{row.open.toFixed(5)}</td>
-                    <td className="p-1.5 text-right text-emerald-400">{row.high.toFixed(5)}</td>
-                    <td className="p-1.5 text-right text-red-400">{row.low.toFixed(5)}</td>
-                    <td className="p-1.5 text-right text-gray-200">{row.close.toFixed(5)}</td>
-                    <td className="p-1.5 text-right font-bold text-cyan-400">
-                      {row.indicatorVal.toFixed(5)}
-                    </td>
-                    <td className="p-1.5 text-right text-amber-400">{row.upperBand?.toFixed(5)}</td>
-                    <td className="p-1.5 text-right text-amber-400">{row.lowerBand?.toFixed(5)}</td>
-                  </tr>
+                  </label>
                 ))}
-              </tbody>
-            </table>
+              </div>
+              <button
+                onClick={() => runTest()}
+                disabled={isRunning}
+                className="w-full py-2 bg-blue-600 rounded text-xs"
+              >
+                {isRunning ? 'Running...' : 'Run Test'}
+              </button>
+              <button
+                onClick={() => {
+                  setParameters(defaults);
+                }}
+                className="w-full py-2 bg-slate-800 rounded text-xs"
+              >
+                Reset Parameters
+              </button>
+              <button
+                onClick={async () => {
+                  const name = prompt('Save configuration as:');
+                  if (!name || !testResult) return;
+                  try {
+                    const saved = await client.saveTestConfig(testResult.test_id, name);
+                    setLogs((prev) => [`Saved configuration ID: ${saved.config_id}`, ...prev]);
+                  } catch (error) {
+                    setLogs((prev) => [String(error), ...prev]);
+                  }
+                }}
+                disabled={!testResult || testResult.status !== 'success'}
+                className="w-full py-2 bg-slate-800 rounded text-xs"
+              >
+                Save Test Configuration
+              </button>
+              <button
+                onClick={async () => {
+                  const id = prompt('Configuration ID:');
+                  if (!id) return;
+                  try {
+                    const { config } = await client.loadTestConfig(id);
+                    const definition = await client.newIndicatorTest(String(config.indicator_name), String(config.symbol), String(config.timeframe));
+                    setDefaults(definition.params as Record<string, unknown>);
+                    setSymbol(String(config.symbol));
+                    setTimeframe(String(config.timeframe));
+                    if (String(config.indicator_name) !== selectedIndicator) skipDefaults.current = true;
+                    setSelectedIndicator(String(config.indicator_name));
+                    setParameters(config.params as Record<string, unknown>);
+                    setTestWindow({ reserve: Number(config.bars_to_reserve), count: Number(config.bar_count) });
+                    setParametersReady(true);
+                  } catch (error) {
+                    setLogs((prev) => [String(error), ...prev]);
+                  }
+                }}
+                className="w-full py-2 bg-slate-800 rounded text-xs"
+              >
+                Load Test Configuration
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="flex justify-end gap-2 pt-2 border-t border-gray-700">
-          <Button onClick={onClose}>Close</Button>
-          <Button className="primary" onClick={onClose}>
-            Done
-          </Button>
+          {/* Right Main Panel */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-slate-900/40 p-5 space-y-4">
+            {activeTab === 'chart' && (
+              <>
+                <IndicatorChart result={testResult} />
+                {error && (
+                  <p role="alert" className="text-red-400 text-xs">
+                    {error}
+                  </p>
+                )}
+
+                {/* Bottom Sub-Panels (Results / Data / Summary / Logs) */}
+                <div className="flex-1 flex flex-col rounded-xl border border-slate-800 bg-slate-950 overflow-hidden">
+                  <div className="flex items-center justify-between px-4 py-2 border-b border-slate-800 bg-slate-900/80 text-xs">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setBottomTab('results')}
+                        className={`px-2.5 py-1 rounded transition-colors ${
+                          bottomTab === 'results'
+                            ? 'bg-slate-800 text-blue-400 font-medium'
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        Results & Signals
+                      </button>
+                      <button
+                        onClick={() => setBottomTab('data')}
+                        className={`px-2.5 py-1 rounded transition-colors ${
+                          bottomTab === 'data'
+                            ? 'bg-slate-800 text-blue-400 font-medium'
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        Raw Bars
+                      </button>
+                      <button
+                        onClick={() => setBottomTab('logs')}
+                        className={`px-2.5 py-1 rounded transition-colors ${
+                          bottomTab === 'logs'
+                            ? 'bg-slate-800 text-blue-400 font-medium'
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        Execution Logs ({logs.length})
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-slate-400 text-xs">
+                      <span>
+                        Showing {tableRows.length ? (currentPage - 1) * rowsPerPage + 1 : 0} -{' '}
+                        {Math.min(currentPage * rowsPerPage, tableRows.length)} of {tableRows.length}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                          disabled={currentPage === 1}
+                          className="p-1 rounded hover:bg-slate-800 text-slate-400 disabled:opacity-30"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="font-mono text-slate-300">
+                          {currentPage}/{totalPages}
+                        </span>
+                        <button
+                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                          disabled={currentPage === totalPages}
+                          className="p-1 rounded hover:bg-slate-800 text-slate-400 disabled:opacity-30"
+                        >
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-2">
+                    {bottomTab === 'results' && (
+                      <table className="w-full text-left text-xs border-collapse">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-mono text-[11px]">
+                            <th className="py-1.5 px-3">#</th>
+                            <th className="py-1.5 px-3">Time</th>
+                            <th className="py-1.5 px-3">Close</th>
+                            <th className="py-1.5 px-3">Indicator Val</th>
+                            <th className="py-1.5 px-3">Diff / Ref</th>
+                            <th className="py-1.5 px-3">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+                          {paginatedRows.map((row, idx) => (
+                            <tr key={idx} className="hover:bg-slate-900/60 transition-colors">
+                              <td className="py-1.5 px-3 text-slate-500">
+                                {(currentPage - 1) * rowsPerPage + idx + 1}
+                              </td>
+                              <td className="py-1.5 px-3 text-slate-400">
+                                {new Date(row.time * 1000).toISOString().slice(11, 16)}
+                              </td>
+                              <td className="py-1.5 px-3 text-slate-200">{row.close.toFixed(5)}</td>
+                              <td className="py-1.5 px-3 text-blue-400 font-semibold">
+                                {row.indicator_val?.toFixed(5) ?? 'NaN'}
+                              </td>
+                              <td className="py-1.5 px-3 text-slate-400">
+                                {row.diff !== undefined ? `${row.diff.toFixed(5)}` : '—'}
+                              </td>
+                              <td className="py-1.5 px-3">
+                                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400">
+                                  <CheckCircle2 className="w-3 h-3" /> Valid
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+
+                    {bottomTab === 'logs' && (
+                      <div className="p-2 space-y-1 font-mono text-xs text-slate-300">
+                        {logs.map((log, i) => (
+                          <div key={i} className="text-slate-400 leading-relaxed">
+                            {log}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'results' && (
+              <div className="flex-1 flex flex-col space-y-4 overflow-y-auto">
+                {/* Metric Summary Cards */}
+                <div className="grid grid-cols-6 gap-3">
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/70">
+                    <div className="text-[11px] text-slate-400 flex items-center justify-between">
+                      <span>Bars Processed</span>
+                      <BarChart2 className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div className="text-lg font-bold text-slate-100 font-mono mt-1">{candlesticks.length}</div>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/70">
+                    <div className="text-[11px] text-slate-400 flex items-center justify-between">
+                      <span>Mean Value</span>
+                      <Activity className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div className="text-lg font-bold text-purple-300 font-mono mt-1">{meanVal}</div>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/70">
+                    <div className="text-[11px] text-slate-400 flex items-center justify-between">
+                      <span>Min Value</span>
+                      <ArrowDown className="w-4 h-4 text-rose-400" />
+                    </div>
+                    <div className="text-lg font-bold text-rose-300 font-mono mt-1">{minVal}</div>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/70">
+                    <div className="text-[11px] text-slate-400 flex items-center justify-between">
+                      <span>Max Value</span>
+                      <ArrowUp className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <div className="text-lg font-bold text-emerald-300 font-mono mt-1">{maxVal}</div>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/70">
+                    <div className="text-[11px] text-slate-400 flex items-center justify-between">
+                      <span>Signals</span>
+                      <Zap className="w-4 h-4 text-amber-400" />
+                    </div>
+                    <div className="text-lg font-bold text-amber-300 font-mono mt-1">{signalsCount}</div>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/70">
+                    <div className="text-[11px] text-slate-400 flex items-center justify-between">
+                      <span>Discrepancies</span>
+                      <Target className="w-4 h-4 text-teal-400" />
+                    </div>
+                    <div className="text-lg font-bold text-teal-300 font-mono mt-1">
+                      {testResult?.discrepancies.length || 0}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-slate-800 p-4 text-xs text-slate-300">
+                  Current parameters: {JSON.stringify(parameters)}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 }

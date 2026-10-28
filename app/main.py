@@ -91,6 +91,10 @@ def create_app(
 
     application.include_router(create_router())
 
+    from app.workspace.code_editor import code_editor_router
+
+    application.include_router(code_editor_router)
+
     @application.get("/health", tags=["host"])
     async def health() -> dict[str, str]:
         """Report that the backend is running after successful startup."""

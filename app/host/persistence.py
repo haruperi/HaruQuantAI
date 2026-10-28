@@ -147,6 +147,18 @@ class HostPersistence:
             connection.close()
             raise
 
+    def ensure_code_editor_schema(self) -> dict[str, Any]:
+        """Install additive editor session and indicator configuration storage."""
+
+        def action(connection: sqlite3.Connection) -> dict[str, Any]:
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS code_editor_state ("
+                "id TEXT PRIMARY KEY, payload TEXT NOT NULL)"
+            )
+            return {"affected_rows": 0, "records": []}
+
+        return self._run("code_editor.schema", write=True, action=action)
+
     def ensure_custom_data_schema(self) -> dict[str, Any]:
         """Install additive Data Manager custom-indicator tables atomically.
 

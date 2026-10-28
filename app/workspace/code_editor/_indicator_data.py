@@ -1,0 +1,163 @@
+"""Read real Data Manager history and adapt indicator calculation contracts."""
+
+from __future__ import annotations
+
+import inspect
+from collections.abc import Mapping
+from itertools import pairwise
+from typing import Any
+
+import numpy as np
+
+from app.include.price import BarPrice
+from app.workspace.code_editor._common import CodeEditorError
+from app.workspace.data_manager.data.review import DatasetReview
+from app.workspace.data_manager.data.storage import require_data
+
+
+def historical_bars(
+    gateway: Any, symbol: str, timeframe: str, count: int
+) -> tuple[BarPrice, list[int]]:
+    """Read the latest requested bars from one matching stored dataset."""
+    rows = require_data(
+        gateway.read_records(
+            "datamgr_datasets",
+            filters={"symbol": symbol, "timeframe": timeframe},
+            limit=1000,
+        )
+    )["records"]
+    rows = [
+        row
+        for row in rows
+        if row["bars"] >= count and row.get("data_kind", "bars") == "bars"
+    ]
+    if not rows:
+        raise CodeEditorError(
+            f"No stored {symbol} {timeframe} history with {count} bars. Import history in Data Manager first."
+        )
+    if len(rows) != 1:
+        raise CodeEditorError(
+            f"Multiple datasets match {symbol} {timeframe}; keep one source for this test"
+        )
+    review = DatasetReview(gateway, rows[0]["id"])
+    if review.calendar() is None:
+        # Keep large histories lazy; materialize only the test window.
+        from app.include.market_storage import scan_catalog
+
+        lazy = scan_catalog(review.record, decode=True)
+        frame = (
+            lazy.sort("DateTime")
+            .tail(count)
+            .collect()
+            .to_pandas()
+            .set_index("DateTime")
+        )
+    else:
+        frame = review.frame().tail(count)
+    if len(frame) < count:
+        raise CodeEditorError(
+            "Stored history is shorter than the requested test window"
+        )
+    arrays = {
+        name: frame[name.title()].to_numpy(dtype=np.float64)
+        for name in ("open", "high", "low", "close", "volume")
+    }
+    if any(not np.isfinite(values).all() for values in arrays.values()):
+        raise CodeEditorError("Historical bars contain missing or non-finite prices")
+    timestamps = [int(stamp.timestamp()) for stamp in frame.index]
+    if any(right <= left for left, right in pairwise(timestamps)):
+        raise CodeEditorError("Historical bar timestamps must be strictly increasing")
+    return BarPrice(
+        **{name + "_data": value for name, value in arrays.items()}
+    ), timestamps
+
+
+_PRICE_INPUTS = {
+    "bars",
+    "data",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+    "timestamps",
+    "open_prices",
+    "high_prices",
+    "low_prices",
+    "close_prices",
+    "close_data",
+}
+
+
+def indicator_defaults(cls: Any) -> dict[str, Any]:
+    """Derive configurable defaults from the actual indicator signature."""
+    target = (
+        cls
+        if not isinstance(
+            inspect.getattr_static(cls, "calculate"), (classmethod, staticmethod)
+        )
+        else cls.calculate
+    )
+    return {
+        name: param.default
+        for name, param in inspect.signature(target).parameters.items()
+        if name not in _PRICE_INPUTS
+        and param.default is not inspect.Parameter.empty
+        and isinstance(param.default, (str, int, float, bool, type(None)))
+    }
+
+
+def calculate_indicator(
+    cls: Any,
+    bars: BarPrice,
+    params: Mapping[str, Any],
+    timestamps: list[int] | None = None,
+) -> Any:
+    """Invoke each indicator once using its declared inputs, without retrying errors."""
+    instance_method = not isinstance(
+        inspect.getattr_static(cls, "calculate"), (classmethod, staticmethod)
+    )
+    if instance_method:
+        return cls(**params).calculate(bars)
+    signature = inspect.signature(cls.calculate)
+    sources = {
+        "bars": bars,
+        "open": bars.open_series().values,
+        "timestamps": timestamps,
+        "data": bars.close_series().values,
+        "close": bars.close_series().values,
+        "close_data": bars.close_series().values,
+        "high": bars.high_series().values,
+        "low": bars.low_series().values,
+        "volume": bars.volume_series().values,
+    }
+    for name in ("open", "high", "low", "close"):
+        sources[name + "_prices"] = sources[name]
+    unknown = set(params) - set(signature.parameters)
+    if unknown:
+        raise CodeEditorError(
+            f"Unsupported indicator parameters: {', '.join(sorted(unknown))}"
+        )
+    arguments = dict(params)
+    for name, param in signature.parameters.items():
+        if name not in arguments and name in sources:
+            arguments[name] = sources[name]
+        elif name not in arguments and param.default is inspect.Parameter.empty:
+            raise CodeEditorError(f"Missing indicator input: {name}")
+    return cls.calculate(**arguments)
+
+
+def output_series(result: Any, count: int) -> dict[str, np.ndarray[Any, Any]]:
+    """Normalize scalar and multi-output indicators without fabricating values."""
+    outputs = result if isinstance(result, dict) else {"value": result}
+    series = {}
+    for name, value in outputs.items():
+        values = np.asarray(getattr(value, "values", value), dtype=np.float64)
+        if values.ndim != 1 or len(values) != count:
+            raise CodeEditorError(
+                f"Indicator output '{name}' must contain one value per historical bar"
+            )
+        series[str(name)] = values
+    if not series:
+        raise CodeEditorError("Indicator returned no output series")
+    return series

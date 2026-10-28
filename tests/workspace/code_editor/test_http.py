@@ -1,0 +1,144 @@
+"""Integration tests for Code Editor FastAPI HTTP router."""
+
+import pytest
+from app.main import create_app
+from fastapi.testclient import TestClient
+
+
+@pytest.fixture
+def client():
+    app = create_app()
+    return TestClient(app)
+
+
+def test_http_init_and_navigator(client: TestClient):
+    """Verify init workspace and navigator endpoints return successful envelopes."""
+    res_init = client.get("/api/v1/code-editor/init")
+    assert res_init.status_code == 200
+    data = res_init.json()["data"]
+    assert data["status"] == "ready"
+
+    res_nav = client.get("/api/v1/code-editor/navigator")
+    assert res_nav.status_code == 200
+    nav_data = res_nav.json()["data"]
+    assert "children" in nav_data
+
+
+def test_http_templates_list_and_render(client: TestClient):
+    """Verify templates list and render preview endpoints."""
+    res = client.get("/api/v1/code-editor/templates")
+    assert res.status_code == 200
+    templates = res.json()["data"]
+    assert len(templates) == 12
+
+    res_render = client.post(
+        "/api/v1/code-editor/templates/render",
+        json={"template_id": "BlocksIndicators", "name": "SampleTest"},
+    )
+    assert res_render.status_code == 200
+    preview = res_render.json()["data"]
+    assert "class SampleTest(BaseIndicator):" in preview["content"]
+    assert preview["file_path"].endswith("sample_test.py")
+
+
+def test_http_indicator_test_run(client: TestClient):
+    """Verify running indicator test via HTTP returns chart and table data."""
+    res = client.post(
+        "/api/v1/code-editor/indicator-test/run",
+        json={
+            "indicator_name": "MovingAverage",
+            "symbol": "EURUSD",
+            "timeframe": "H1",
+            "params": {"period": 5},
+            "bar_count": 50,
+        },
+    )
+    assert res.status_code == 200
+    data = res.json()["data"]
+    assert data["status"] == "success"
+    assert len(data["candlesticks"]) == 50
+    assert len(data["indicator_plots"]) == 50
+
+
+def test_http_errors_and_session_validation(client: TestClient):
+    response = client.post(
+        "/api/v1/code-editor/file/delete", json={"file_path": "app/main.py"}
+    )
+    assert response.status_code == 422
+    response = client.post(
+        "/api/v1/code-editor/search", json={"query": "[", "regex": True}
+    )
+    assert response.status_code == 422
+    response = client.post(
+        "/api/v1/code-editor/session", json={"tabs": [{"file_path": "a.py"}]}
+    )
+    assert response.status_code == 422
+
+
+def test_http_saved_test_survives_service_restart(client: TestClient, monkeypatch):
+    from app.workspace.code_editor import http
+    from app.workspace.code_editor.indicator_tester import IndicatorTester
+
+    run = client.post(
+        "/api/v1/code-editor/indicator-test/run",
+        json={"indicator_name": "MACD", "bar_count": 10},
+    )
+    result = run.json()["data"]
+    assert result["status"] == "success"
+    identifier = result["test_id"]
+    saved = client.post(
+        "/api/v1/code-editor/indicator-test/save",
+        json={"test_id": identifier, "name": "MACD config"},
+    )
+    assert saved.json()["data"]["config_id"] == identifier
+    monkeypatch.setattr(http, "_indicator_tester", IndicatorTester())
+    loaded = client.get(
+        "/api/v1/code-editor/indicator-test/load", params={"config_id": identifier}
+    )
+    assert loaded.json()["data"]["config"]["bar_count"] == 10
+
+
+def test_http_mcp_discovers_and_calls_compiled_tools(client: TestClient, tmp_path):
+    from app.workspace.code_editor._common import SNIPPETS_DIR
+    from app.workspace.code_editor.routes import CodeEditor
+    from app.workspace.code_editor.templates import render_template
+
+    source, _ = render_template("AITools", "ReviewTool")
+    # Compile the buffer without writing to the snippet repository.
+    result = CodeEditor().compile_file(
+        str(SNIPPETS_DIR / "ai_tools/review_tool.py"), source
+    )
+    assert result["success"], result
+    endpoint = "/api/v1/code-editor/mcp"
+    initialized = client.post(
+        endpoint, json={"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}
+    )
+    assert "tools" in initialized.json()["result"]["capabilities"]
+    listed = client.post(
+        endpoint, json={"jsonrpc": "2.0", "id": 2, "method": "tools/list"}
+    )
+    assert listed.json()["result"]["tools"][0]["name"] == "ext_review_tool"
+    called = client.post(
+        endpoint,
+        json={
+            "jsonrpc": "2.0",
+            "id": 3,
+            "method": "tools/call",
+            "params": {
+                "name": "ext_review_tool",
+                "arguments": {"target_symbol": "EURUSD"},
+            },
+        },
+    )
+    assert not called.json()["result"]["isError"]
+    assert "EURUSD" in called.json()["result"]["content"][0]["text"]
+    invalid = client.post(
+        endpoint,
+        json={
+            "jsonrpc": "2.0",
+            "id": 4,
+            "method": "tools/call",
+            "params": {"name": "ext_review_tool", "arguments": {}},
+        },
+    )
+    assert invalid.json()["result"]["isError"]

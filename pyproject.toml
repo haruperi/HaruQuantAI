@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
+    "jsonschema>=4.26,<5",
     "pydantic>=2.11,<3",
     "fastapi>=0.135,<1",
     "psutil>=7,<8",
@@ -45,7 +46,6 @@ dev = [
     "pre-commit>=4.0.0",
     "httpx2>=2.13.0,<3",
     "types-psutil>=7,<8",
-    "jsonschema>=4.26,<5",
     "types-jsonschema>=4.25,<5",
     "types-requests>=2.33.0.20261006",
 ]
@@ -267,6 +267,39 @@ ignore = [
     "N813",
     "PLR1714",
     "RUF022",
+]
+"app/workspace/code_editor/**/*.py" = [
+    "C901",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR0917",
+    "PLR2004",
+    "BLE001",
+    "TRY",
+    "SIM",
+    "E501",
+    "ANN401",
+    "ARG002",
+    "PLC0415",
+    "PTH",
+    "SLF001",
+    "EM",
+    "S101",
+    "S311",
+    "RUF012",
+    "PERF401",
+    "F841",
+    "UP042",
+    "UP046",
+    "B024",
+    "S110",
+    "E741",
+    "N813",
+    "PLR1714",
+    "RUF022",
+    "G004",
 ]
 "tests/**/*.py" = [
     "S",
