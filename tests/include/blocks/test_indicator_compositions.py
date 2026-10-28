@@ -164,10 +164,13 @@ def test_parameter_and_selector_validation(catalog) -> None:
         catalog.require("signal.parabolic_sar.psar_bar_higher").instantiate(
             step=0.4, maximum=0.2
         )
-    # Stochastic's unimplemented donor smoothing modes are rejected explicitly.
+    # Stochastic supports donor MA methods 0..3 and price fields 0..1; invalid are rejected.
     stochastic = catalog.require("signal.stochastic.stoch_slow_d_rising")
+    stochastic.instantiate(ma_method=1, price_field=1)
     with pytest.raises(BlockRegistryError):
-        stochastic.instantiate(ma_method=1)
+        stochastic.instantiate(ma_method=4)
+    with pytest.raises(BlockRegistryError):
+        stochastic.instantiate(price_field=2)
     # Donor ADX level default 0 violates its declared lower bound 1: require a value.
     adx = catalog.require("signal.adx.adx_higher")
     with pytest.raises(BlockRegistryError):

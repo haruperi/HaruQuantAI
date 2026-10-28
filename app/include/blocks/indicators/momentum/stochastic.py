@@ -5,7 +5,7 @@ FEAT-SERVICES-INDICATOR-STOCHASTIC: validated batch calculation.
 
 from __future__ import annotations
 
-from typing import ClassVar, override
+from typing import Any, ClassVar, override
 
 import numpy as np
 from pydantic import Field
@@ -20,9 +20,37 @@ from app.include.blocks.metadata import (
     PortType,
 )
 from app.include.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.average import sma_kernel
+from app.include.calculators.average import (
+    ema_kernel,
+    lwma_kernel,
+    sma_kernel,
+    smma_kernel,
+)
 
 logger = get_logger(__name__)
+
+MA_SMA: int = 0
+MA_EMA: int = 1
+MA_SMMA: int = 2
+MA_LWMA: int = 3
+
+PRICE_LOW_HIGH: int = 0
+PRICE_CLOSE_CLOSE: int = 1
+
+
+def _apply_ma_kernel(
+    values: np.ndarray[Any, Any], period: int, ma_method: int
+) -> np.ndarray[Any, Any]:
+    """Apply selected moving average kernel to valid numerical slice."""
+    if ma_method == MA_SMA:
+        return sma_kernel(values, period)
+    if ma_method == MA_EMA:
+        return ema_kernel(values, period)
+    if ma_method == MA_SMMA:
+        return smma_kernel(values, period)
+    if ma_method == MA_LWMA:
+        return lwma_kernel(values, period)
+    raise ValueError(f"Unsupported ma_method: {ma_method}")
 
 
 class Stochastic(BaseIndicator):
@@ -34,8 +62,8 @@ class Stochastic(BaseIndicator):
         category="momentum",
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
+            InputPort("high", PortType.SERIES, required=False),
+            InputPort("low", PortType.SERIES, required=False),
             InputPort("close", PortType.SERIES, required=True),
         ),
         outputs=(OutputPort("k", PortType.SERIES), OutputPort("d", PortType.SERIES)),
@@ -44,6 +72,8 @@ class Stochastic(BaseIndicator):
             "k_period": {"type": "int", "min": 1, "max": 56, "default": 14},
             "d_period": {"type": "int", "min": 1, "max": 12, "default": 3},
             "slowing": {"type": "int", "min": 1, "max": 12, "default": 3},
+            "ma_method": {"type": "int", "min": 0, "max": 3, "default": 0},
+            "price_field": {"type": "int", "min": 0, "max": 1, "default": 0},
         },
         is_causal=True,
         is_generation_eligible=True,
@@ -52,6 +82,15 @@ class Stochastic(BaseIndicator):
     k_period: int = Field(default=14, ge=1)
     d_period: int = Field(default=3, ge=1)
     slowing: int = Field(default=3, ge=1)
+    ma_method: int = Field(default=0, ge=0, le=3)
+    price_field: int = Field(default=0, ge=0, le=1)
+
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Resolve market dependencies conditioned on price_field."""
+        if self.price_field == PRICE_CLOSE_CLOSE:
+            return ("close",)
+        return ("high", "low", "close")
 
     @override
     def required_history(self) -> int:
@@ -61,17 +100,22 @@ class Stochastic(BaseIndicator):
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
-        high = bars.high
-        low = bars.low
+        bars.require_inputs(self.required_inputs())
         close = bars.close
+        close_arr = np.asarray(close, dtype=np.float64)
+        n = len(close_arr)
+        if self.price_field == PRICE_LOW_HIGH:
+            high_arr = np.asarray(bars.high, dtype=np.float64)
+            low_arr = np.asarray(bars.low, dtype=np.float64)
+        else:
+            high_arr = close_arr
+            low_arr = close_arr
+
         k_period = self.k_period
         d_period = self.d_period
         slowing = self.slowing
-        high_arr = np.asarray(high, dtype=np.float64)
-        low_arr = np.asarray(low, dtype=np.float64)
-        close_arr = np.asarray(close, dtype=np.float64)
-        n = len(close_arr)
+        ma_method = self.ma_method
+
         if k_period <= 0:
             logger.warning(
                 "FR-SERVICES-STOCH-CALCULATE: Invalid k_period %d, defaulting to 14",
@@ -82,6 +126,7 @@ class Stochastic(BaseIndicator):
             d_period = 3
         if slowing <= 0:
             slowing = 3
+
         raw_k = np.full(n, np.nan, dtype=np.float64)
         for i in range(k_period - 1, n):
             h_win = high_arr[i - k_period + 1 : i + 1]
@@ -93,23 +138,28 @@ class Stochastic(BaseIndicator):
                 raw_k[i] = (close_arr[i] - ll) / diff * 100.0
             else:
                 raw_k[i] = 50.0
+
         valid_k_idx = np.where(~np.isnan(raw_k))[0]
         slow_k = np.full(n, np.nan, dtype=np.float64)
         if len(valid_k_idx) >= slowing:
             first_idx = valid_k_idx[0]
             valid_slice = raw_k[first_idx:]
-            slow_k[first_idx:] = sma_kernel(valid_slice, slowing)
+            slow_k[first_idx:] = _apply_ma_kernel(valid_slice, slowing, ma_method)
+
         valid_d_idx = np.where(~np.isnan(slow_k))[0]
         slow_d = np.full(n, np.nan, dtype=np.float64)
         if len(valid_d_idx) >= d_period:
             first_idx = valid_d_idx[0]
             valid_slice = slow_k[first_idx:]
-            slow_d[first_idx:] = sma_kernel(valid_slice, d_period)
+            slow_d[first_idx:] = _apply_ma_kernel(valid_slice, d_period, ma_method)
+
         logger.info(
-            "FR-SERVICES-STOCH-CALCULATE: Computed Stoch(%d,%d,%d) for %d bars",
+            "FR-SERVICES-STOCH-CALCULATE: Stoch(%d,%d,%d,ma=%d,pf=%d) for %d bars",
             k_period,
             d_period,
             slowing,
+            ma_method,
+            self.price_field,
             n,
         )
         return {

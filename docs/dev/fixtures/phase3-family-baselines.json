@@ -602,7 +602,9 @@
         "parameters": {
           "k_period": 14,
           "d_period": 3,
-          "slowing": 3
+          "slowing": 3,
+          "ma_method": 0,
+          "price_field": 0
         },
         "hashes": {
           "k": "bd3135060d685dc99b322338309f2135c80a4a7569c90721da3e39b9dee5a282",
@@ -619,7 +621,9 @@
         "parameters": {
           "k_period": 7,
           "d_period": 3,
-          "slowing": 3
+          "slowing": 3,
+          "ma_method": 0,
+          "price_field": 0
         },
         "hashes": {
           "k": "3c9d143d24475fa7f5a90f0c28bf9fb9f40eb22f0969ab00f1dfba561198ea16",
