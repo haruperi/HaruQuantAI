@@ -14,6 +14,34 @@ from app.include.blocks.price import BarPrice
 from app.include.contracts import DataframeSeries
 
 IndicatorSeries = DataframeSeries
+COMPUTED_PRICE_INPUTS = (
+    ("close",),
+    ("open",),
+    ("high",),
+    ("low",),
+    ("high", "low"),
+    ("high", "low", "close"),
+    ("high", "low", "close"),
+)
+_MEDIAN_PRICE = 4
+_TYPICAL_PRICE = 5
+
+
+def computed_price(bars: BarData, selector: int) -> np.ndarray[Any, Any]:
+    """Resolve the donor's seven price selectors without fabricating missing feeds."""
+    if type(selector) is not int or selector not in range(len(COMPUTED_PRICE_INPUTS)):
+        raise ValueError("Computed-from selector must be between 0 and 6")
+    fields = COMPUTED_PRICE_INPUTS[selector]
+    bars.require_inputs(fields)
+    if len(fields) == 1:
+        values = getattr(bars, fields[0])
+    elif selector == _MEDIAN_PRICE:
+        values = (bars.high + bars.low) / 2
+    elif selector == _TYPICAL_PRICE:
+        values = (bars.high + bars.low + bars.close) / 3
+    else:
+        values = (bars.high + bars.low + 2 * bars.close) / 4
+    return np.asarray(values, dtype=np.float64)
 
 
 @dataclass(frozen=True)
@@ -210,8 +238,10 @@ def round_value(val: float, precision: int = 6) -> float:
 
 
 __all__ = [
+    "COMPUTED_PRICE_INPUTS",
     "BarData",
     "IndicatorSeries",
+    "computed_price",
     "resolve_shift_value",
     "round_value",
 ]

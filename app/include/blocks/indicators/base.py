@@ -27,6 +27,10 @@ class BaseIndicator(BaseBlock):
         """Return minimum history bars needed before first valid output."""
         return getattr(self.spec, "required_history_lookback", 1)
 
+    def required_inputs(self) -> tuple[str, ...]:
+        """Resolve market dependencies for this validated parameter selection."""
+        return self.spec.required_market_inputs
+
     @abstractmethod
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Execute batch indicator calculation over historical bars.

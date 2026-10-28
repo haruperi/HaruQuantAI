@@ -1,0 +1,5117 @@
+{
+  "sources": {
+    "Calculators/AbstractCalculator.java": "eb8fe671b7a89f6e8aab7b8bf592b6763a9afa673b08799002161e3dde689803",
+    "Calculators/AverageCalculator.java": "0e08da39a08df8f59dbc1a811a68a03202dd8228227e2dd43cfeb7d47a719785",
+    "Calculators/StdDevCalculator.java": "a2c6e30e5255a21ea24f99ae68c4e7ff09584756833f36436cf74f254a79eca3",
+    "Calculators/HighestCalculator.java": "8a09d6f39fef58563880800c046da23ec95845718d747a8976a72163e7f72cb5",
+    "Calculators/LowestCalculator.java": "e30bca39a9cf10c32df67614435187f773982d6c409319e3ea17e5ad547d1d31",
+    "Blocks/Indicators/BarRange/BarRange.java": "16c0d8e573ab4f8812a624188c086a9f3184142e2c4f16083ef41286ffec1851",
+    "Blocks/Indicators/BarRange/BiggestRange.java": "eef76b434916eaa4987a5f97cb44af62625f2bdefcf43b3b633cf82a14eb70f8",
+    "Blocks/Indicators/BarRange/SmallestRange.java": "abadbb9b6d38b3c640af93aa3e0d746de43118f67c0e45d6131e373571d92aa7",
+    "Blocks/Indicators/BarRange/HighestInRange.java": "bb38965364638b1eec609231dcc23adb51162aa57b00e21ca2b1e413a2456805",
+    "Blocks/Indicators/BarRange/LowestInRange.java": "2c88ab617eafa6b03862aa42789da3794500bae6c5ede5a2968eb9c6b76ece58",
+    "Blocks/Indicators/BollingerBands/BBRange.java": "422b595afca06ad7007b89009604ebac10d01aa9ac61530de4b737a2ae904ba0",
+    "Blocks/Indicators/BollingerBands/BBWidthRatio.java": "fe6694740270100e258f381cadf633fb69a83a96280a6c10be8d7b098cf94d2d",
+    "Blocks/Indicators/HighestLowest/Highest.java": "81c069ee8a2b1ca68ab2241c6e27dd6856150e4f6139a0826cd0a28a0eee9b5c",
+    "Blocks/Indicators/HighestLowest/Lowest.java": "9ce7202b66e2c56c19c000be0cfe87bb1242252feccb742f65a99f95cd001170",
+    "Blocks/Indicators/HighestLowest/HighestIndex.java": "376dc8f3c0e111a32c1f6feecf4403dc4d29941c4f365aab2e2e928ee78b7392",
+    "Blocks/Indicators/HighestLowest/LowestIndex.java": "6ad2b3a49dd013ccc4aeb535f3f61b9f8912be7a8e347e9fc03fe5ff1d7422f6"
+  },
+  "protocol": "Capture numeric variant references by executing the donor's Java sources.\n\nOnly the framework/chart/calendar shell is stubbed; calculator source bodies and\nindicator methods are compiled directly. SQUtils.round is supplied as Math.round\nat eight decimal places, so this harness does not certify proprietary utility\nrounding at binary/decimal halfway boundaries.\n",
+  "datasets": {
+    "mixed": [
+      [
+        1704099600000.0,
+        10.0,
+        12.123456789,
+        9.0,
+        11.0
+      ],
+      [
+        1704101400000.0,
+        11.0,
+        14.0,
+        10.0,
+        13.0
+      ],
+      [
+        1704103200000.0,
+        13.0,
+        14.0,
+        11.0,
+        12.0
+      ],
+      [
+        1704106800000.0,
+        12.0,
+        14.0,
+        11.0,
+        13.0
+      ],
+      [
+        1704186000000.0,
+        13.0,
+        13.0,
+        12.0,
+        12.5
+      ],
+      [
+        1704193200000.0,
+        12.0,
+        16.0,
+        10.0,
+        14.0
+      ],
+      [
+        1704272400000.0,
+        14.0,
+        15.0,
+        14.0,
+        14.5
+      ],
+      [
+        1704531600000.0,
+        14.0,
+        17.0,
+        12.0,
+        16.0
+      ]
+    ],
+    "wide": [
+      [
+        1704099600000.0,
+        100000000.0,
+        200000000.0,
+        0.0,
+        100000000.0
+      ],
+      [
+        1704101400000.0,
+        100000000.0,
+        200000000.0,
+        0.0,
+        100000000.0
+      ],
+      [
+        1704103200000.0,
+        100000000.0,
+        200000000.0,
+        0.0,
+        100000000.0
+      ],
+      [
+        1704105000000.0,
+        100000000.0,
+        200000000.0,
+        0.0,
+        100000000.0
+      ],
+      [
+        1704106800000.0,
+        100000000.0,
+        200000000.0,
+        0.0,
+        100000000.0
+      ],
+      [
+        1704108600000.0,
+        100000000.0,
+        200000000.0,
+        0.0,
+        100000000.0
+      ],
+      [
+        1704110400000.0,
+        100000000.0,
+        200000000.0,
+        0.0,
+        100000000.0
+      ],
+      [
+        1704112200000.0,
+        100000000.0,
+        200000000.0,
+        0.0,
+        100000000.0
+      ]
+    ],
+    "flat": [
+      [
+        1704099600000.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      [
+        1704101400000.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      [
+        1704103200000.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      [
+        1704105000000.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      [
+        1704106800000.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      [
+        1704108600000.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      [
+        1704110400000.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ],
+      [
+        1704112200000.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    ],
+    "negative": [
+      [
+        1704099600000.0,
+        -3.0,
+        -1.0,
+        -5.0,
+        0.0
+      ],
+      [
+        1704101400000.0,
+        -3.0,
+        -1.0,
+        -5.0,
+        -2.0
+      ],
+      [
+        1704103200000.0,
+        -3.0,
+        -1.0,
+        -5.0,
+        0.0
+      ],
+      [
+        1704105000000.0,
+        -3.0,
+        -1.0,
+        -5.0,
+        -2.0
+      ],
+      [
+        1704106800000.0,
+        -3.0,
+        -1.0,
+        -5.0,
+        0.0
+      ],
+      [
+        1704108600000.0,
+        -3.0,
+        -1.0,
+        -5.0,
+        -2.0
+      ],
+      [
+        1704110400000.0,
+        -3.0,
+        -1.0,
+        -5.0,
+        0.0
+      ],
+      [
+        1704112200000.0,
+        -3.0,
+        -1.0,
+        -5.0,
+        -2.0
+      ]
+    ],
+    "overnight": [
+      [
+        1704139200000.0,
+        10.0,
+        12.0,
+        8.0,
+        10.0
+      ],
+      [
+        1704142800000.0,
+        10.0,
+        13.0,
+        7.0,
+        10.1
+      ],
+      [
+        1704150000000.0,
+        10.0,
+        14.0,
+        6.0,
+        10.2
+      ],
+      [
+        1704157200000.0,
+        10.0,
+        15.0,
+        5.0,
+        10.3
+      ],
+      [
+        1704175200000.0,
+        10.0,
+        16.0,
+        4.0,
+        10.4
+      ],
+      [
+        1704229200000.0,
+        10.0,
+        17.0,
+        3.0,
+        10.5
+      ],
+      [
+        1704261600000.0,
+        10.0,
+        18.0,
+        2.0,
+        10.6
+      ]
+    ]
+  },
+  "cases": [
+    {
+      "id": "BarRange_mixed_1_0",
+      "block": "BarRange/BarRange",
+      "dataset": "mixed",
+      "parameters": {},
+      "expected": [
+        3.1234567890000005,
+        4.0,
+        3.0,
+        3.0,
+        1.0,
+        6.0,
+        1.0,
+        5.0
+      ]
+    },
+    {
+      "id": "BarRange_mixed_3_0",
+      "block": "BarRange/BarRange",
+      "dataset": "mixed",
+      "parameters": {},
+      "expected": [
+        3.1234567890000005,
+        4.0,
+        3.0,
+        3.0,
+        1.0,
+        6.0,
+        1.0,
+        5.0
+      ]
+    },
+    {
+      "id": "BarRange_mixed_14_0",
+      "block": "BarRange/BarRange",
+      "dataset": "mixed",
+      "parameters": {},
+      "expected": [
+        3.1234567890000005,
+        4.0,
+        3.0,
+        3.0,
+        1.0,
+        6.0,
+        1.0,
+        5.0
+      ]
+    },
+    {
+      "id": "BiggestRange_mixed_1_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        3.12345679,
+        4.0,
+        3.0,
+        3.0,
+        1.0,
+        6.0,
+        1.0,
+        5.0
+      ]
+    },
+    {
+      "id": "BiggestRange_mixed_3_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        3.12345679,
+        4.0,
+        4.0,
+        4.0,
+        3.0,
+        6.0,
+        6.0,
+        6.0
+      ]
+    },
+    {
+      "id": "BiggestRange_mixed_14_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        3.12345679,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        6.0,
+        6.0,
+        6.0
+      ]
+    },
+    {
+      "id": "SmallestRange_mixed_1_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        3.12345679,
+        4.0,
+        3.0,
+        3.0,
+        1.0,
+        6.0,
+        1.0,
+        5.0
+      ]
+    },
+    {
+      "id": "SmallestRange_mixed_3_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        3.12345679,
+        3.12345679,
+        3.0,
+        3.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "SmallestRange_mixed_14_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        3.12345679,
+        3.12345679,
+        3.0,
+        3.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "HighestInRange_mixed_3_0",
+      "block": "BarRange/HighestInRange",
+      "dataset": "mixed",
+      "parameters": {
+        "time_from": 900,
+        "time_to": 1100,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        14.0,
+        14.0,
+        13.0,
+        13.0,
+        15.0
+      ]
+    },
+    {
+      "id": "LowestInRange_mixed_3_0",
+      "block": "BarRange/LowestInRange",
+      "dataset": "mixed",
+      "parameters": {
+        "time_from": 900,
+        "time_to": 1100,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        12.0,
+        12.0,
+        14.0
+      ]
+    },
+    {
+      "id": "BBRange_mixed_3_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        4.0,
+        3.265986323710904,
+        1.8856180831641267,
+        1.632993161855452,
+        2.494438257849294,
+        3.39934634239519,
+        3.39934634239519
+      ]
+    },
+    {
+      "id": "BBRange_mixed_3_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        2.0,
+        4.988876515698588,
+        3.265986323710904,
+        1.8856180831641267,
+        1.8856180831641267,
+        3.265986323710904,
+        3.7712361663282534
+      ]
+    },
+    {
+      "id": "BBRange_mixed_3_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        3.753086421999999,
+        3.5384438125004745,
+        0.0,
+        1.8856180831641267,
+        4.988876515698588,
+        4.988876515698588,
+        3.265986323710904
+      ]
+    },
+    {
+      "id": "BBRange_mixed_3_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        2.0,
+        3.265986323710904,
+        1.8856180831641267,
+        1.8856180831641267,
+        3.265986323710904,
+        6.531972647421808,
+        6.531972647421808
+      ]
+    },
+    {
+      "id": "BBRange_mixed_3_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        2.8765432109999978,
+        3.2864765402411917,
+        0.9428090415820634,
+        0.0,
+        0.9428090415820634,
+        3.39934634239519,
+        2.8284271247461903
+      ]
+    },
+    {
+      "id": "BBRange_mixed_3_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        3.251028807333334,
+        3.0650993539976192,
+        0.6285393610547066,
+        0.5443310539518155,
+        1.4401645996461927,
+        3.281071791162978,
+        2.7932900199947843
+      ]
+    },
+    {
+      "id": "BBRange_mixed_3_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        3.438271605499999,
+        3.033527587983269,
+        0.816496580927726,
+        0.816496580927726,
+        1.699673171197595,
+        3.265986323710904,
+        2.8674417556808756
+      ]
+    },
+    {
+      "id": "BBRange_mixed_14_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        4.0,
+        3.265986323710904,
+        3.3166247903554,
+        2.993325909419153,
+        3.72677996249965,
+        4.370588154508101,
+        5.830951894845301
+      ]
+    },
+    {
+      "id": "BBRange_mixed_14_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        2.0,
+        4.988876515698588,
+        4.47213595499958,
+        4.664761515876241,
+        4.268749491621899,
+        4.981598792617913,
+        5.267826876426369
+      ]
+    },
+    {
+      "id": "BBRange_mixed_14_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        3.753086421999999,
+        3.5384438125004745,
+        3.250268184050443,
+        3.0286706014620477,
+        4.730992779803831,
+        4.664574591990707,
+        5.882502296413732
+      ]
+    },
+    {
+      "id": "BBRange_mixed_14_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        2.0,
+        3.265986323710904,
+        3.3166247903554,
+        4.079215610874227,
+        3.8297084310253524,
+        6.047431568147635,
+        5.809475019311125
+      ]
+    },
+    {
+      "id": "BBRange_mixed_14_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        2.8765432109999978,
+        3.2864765402411917,
+        3.1752824826403447,
+        3.0028589749104295,
+        3.111590096071833,
+        4.344152713598051,
+        4.842634886113467
+      ]
+    },
+    {
+      "id": "BBRange_mixed_14_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        3.251028807333334,
+        3.0650993539976192,
+        3.056779486981002,
+        2.844126259275821,
+        3.1742969074162146,
+        4.244106994680368,
+        5.062864137354718
+      ]
+    },
+    {
+      "id": "BBRange_mixed_14_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        3.438271605499999,
+        3.033527587983269,
+        3.0604384857223734,
+        2.8223917951340534,
+        3.263632001789446,
+        4.234836373150345,
+        5.21765170094994
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_3_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.2721655269759087,
+        0.2721655269759087,
+        0.1488645855129574,
+        0.13063945294843615,
+        0.18945100692526284,
+        0.24873265919964804,
+        0.22916941634124874
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_3_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.15552315827194782,
+        0.4401949866792872,
+        0.2721655269759087,
+        0.1488645855129574,
+        0.15288795268898325,
+        0.2512297172085311,
+        0.282842712474619
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_3_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.234607713384977,
+        0.26456672198821257,
+        0.0,
+        0.13797205486566783,
+        0.348061152258041,
+        0.34015067152490375,
+        0.2041241452319315
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_3_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.171894017037416,
+        0.32659863237109044,
+        0.1767766952966369,
+        0.16637806616154058,
+        0.2969078476100822,
+        0.5443310539518174,
+        0.5443310539518174
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_3_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.208201043431133,
+        0.2812020420040156,
+        0.07644397634449163,
+        0.0,
+        0.0744322927564787,
+        0.25495097567963926,
+        0.20203050891044216
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_3_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.2304098228583639,
+        0.25994153432851547,
+        0.050507627227610354,
+        0.04354648431614524,
+        0.11222061815424877,
+        0.2440466621526182,
+        0.19563898972726115
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_3_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.24117120278750157,
+        0.25613175951555295,
+        0.06531972647421808,
+        0.06531972647421808,
+        0.13158760035078154,
+        0.2419249128674744,
+        0.19889769403566768
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_14_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.1259881576697424,
+        0.1259881576697424,
+        0.1447192261923132,
+        0.1454353156097424,
+        0.19388743171162912,
+        0.2403700850309326,
+        0.3326630430305447
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_14_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.07199323295413851,
+        0.20377068324339734,
+        0.20786584510163367,
+        0.23624815336853205,
+        0.23615936822730316,
+        0.29009007072795184,
+        0.32178608634381195
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_14_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.10860226830674478,
+        0.12247059447381191,
+        0.1283984080771884,
+        0.1348244683857921,
+        0.22355868552868258,
+        0.23530017218082774,
+        0.3090076608126351
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_14_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.07957146800194256,
+        0.15118578920369088,
+        0.1729571239859353,
+        0.22998090574341284,
+        0.23877454115352711,
+        0.38874362459989004,
+        0.3947460969230021
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_14_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.09637835540108043,
+        0.13017125129220145,
+        0.14274164852787133,
+        0.14939226078524565,
+        0.16728434349100532,
+        0.24556914636482316,
+        0.2869391254094594
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_14_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.10665902259365317,
+        0.12032954862352817,
+        0.1360431452552258,
+        0.1403748089761424,
+        0.16877803795849217,
+        0.23770727162240843,
+        0.29617873533164607
+      ]
+    },
+    {
+      "id": "BBWidthRatio_mixed_14_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "mixed",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.11164057351349546,
+        0.1185659655748042,
+        0.13552973486954767,
+        0.13875269235014867,
+        0.17257866016243115,
+        0.2361023493769917,
+        0.30330798317791896
+      ]
+    },
+    {
+      "id": "Highest_mixed_1_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        12.123456789,
+        14.0,
+        14.0,
+        14.0,
+        13.0,
+        16.0,
+        15.0,
+        17.0
+      ]
+    },
+    {
+      "id": "Highest_mixed_3_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        12.123456789,
+        14.0,
+        14.0,
+        14.0,
+        14.0,
+        16.0,
+        16.0,
+        17.0
+      ]
+    },
+    {
+      "id": "Highest_mixed_14_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        12.123456789,
+        14.0,
+        14.0,
+        14.0,
+        14.0,
+        16.0,
+        16.0,
+        17.0
+      ]
+    },
+    {
+      "id": "Lowest_mixed_1_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        9.0,
+        10.0,
+        11.0,
+        11.0,
+        12.0,
+        10.0,
+        14.0,
+        12.0
+      ]
+    },
+    {
+      "id": "Lowest_mixed_3_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        9.0,
+        9.0,
+        9.0,
+        10.0,
+        11.0,
+        10.0,
+        10.0,
+        10.0
+      ]
+    },
+    {
+      "id": "Lowest_mixed_14_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        9.0,
+        9.0,
+        9.0,
+        9.0,
+        9.0,
+        9.0,
+        9.0,
+        9.0
+      ]
+    },
+    {
+      "id": "HighestIndex_mixed_1_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestIndex_mixed_3_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        1.0,
+        2.0,
+        2.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestIndex_mixed_14_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestIndex_mixed_1_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestIndex_mixed_3_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        2.0,
+        2.0,
+        0.0,
+        1.0,
+        2.0
+      ]
+    },
+    {
+      "id": "LowestIndex_mixed_14_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "mixed",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    },
+    {
+      "id": "BarRange_wide_1_0",
+      "block": "BarRange/BarRange",
+      "dataset": "wide",
+      "parameters": {},
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "BarRange_wide_3_0",
+      "block": "BarRange/BarRange",
+      "dataset": "wide",
+      "parameters": {},
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "BarRange_wide_14_0",
+      "block": "BarRange/BarRange",
+      "dataset": "wide",
+      "parameters": {},
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "BiggestRange_wide_1_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "wide",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "BiggestRange_wide_3_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "wide",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "BiggestRange_wide_14_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "wide",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "SmallestRange_wide_1_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "wide",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0
+      ]
+    },
+    {
+      "id": "SmallestRange_wide_3_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "wide",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0
+      ]
+    },
+    {
+      "id": "SmallestRange_wide_14_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "wide",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0,
+        100000000.0
+      ]
+    },
+    {
+      "id": "HighestInRange_wide_3_0",
+      "block": "BarRange/HighestInRange",
+      "dataset": "wide",
+      "parameters": {
+        "time_from": 900,
+        "time_to": 1100,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "LowestInRange_wide_3_0",
+      "block": "BarRange/LowestInRange",
+      "dataset": "wide",
+      "parameters": {
+        "time_from": 900,
+        "time_to": 1100,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_3_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_3_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_3_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_3_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_3_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_3_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_3_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_14_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_14_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_14_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_14_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_14_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_14_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_wide_14_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_3_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_3_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_3_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_3_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_3_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_3_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_3_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_14_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_14_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_14_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_14_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_14_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_14_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_wide_14_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "wide",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "Highest_wide_1_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "wide",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "Highest_wide_3_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "wide",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "Highest_wide_14_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "wide",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0,
+        200000000.0
+      ]
+    },
+    {
+      "id": "Lowest_wide_1_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "wide",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "Lowest_wide_3_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "wide",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "Lowest_wide_14_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "wide",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestIndex_wide_1_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "wide",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestIndex_wide_3_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "wide",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "id": "HighestIndex_wide_14_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "wide",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    },
+    {
+      "id": "LowestIndex_wide_1_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "wide",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestIndex_wide_3_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "wide",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "id": "LowestIndex_wide_14_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "wide",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    },
+    {
+      "id": "BarRange_flat_1_0",
+      "block": "BarRange/BarRange",
+      "dataset": "flat",
+      "parameters": {},
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BarRange_flat_3_0",
+      "block": "BarRange/BarRange",
+      "dataset": "flat",
+      "parameters": {},
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BarRange_flat_14_0",
+      "block": "BarRange/BarRange",
+      "dataset": "flat",
+      "parameters": {},
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BiggestRange_flat_1_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "flat",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BiggestRange_flat_3_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "flat",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BiggestRange_flat_14_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "flat",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SmallestRange_flat_1_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "flat",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SmallestRange_flat_3_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "flat",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "SmallestRange_flat_14_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "flat",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestInRange_flat_3_0",
+      "block": "BarRange/HighestInRange",
+      "dataset": "flat",
+      "parameters": {
+        "time_from": 900,
+        "time_to": 1100,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "LowestInRange_flat_3_0",
+      "block": "BarRange/LowestInRange",
+      "dataset": "flat",
+      "parameters": {
+        "time_from": 900,
+        "time_to": 1100,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_3_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_3_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_3_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_3_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_3_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_3_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_3_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_14_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_14_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_14_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_14_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_14_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_14_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_flat_14_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_3_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_3_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_3_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_3_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_3_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_3_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_3_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_14_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_14_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_14_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_14_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_14_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_14_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_flat_14_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "flat",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "Highest_flat_1_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "flat",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "Highest_flat_3_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "flat",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "Highest_flat_14_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "flat",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "Lowest_flat_1_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "flat",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "Lowest_flat_3_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "flat",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "Lowest_flat_14_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "flat",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "HighestIndex_flat_1_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "flat",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestIndex_flat_3_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "flat",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "id": "HighestIndex_flat_14_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "flat",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    },
+    {
+      "id": "LowestIndex_flat_1_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "flat",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestIndex_flat_3_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "flat",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "id": "LowestIndex_flat_14_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "flat",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    },
+    {
+      "id": "BarRange_negative_1_0",
+      "block": "BarRange/BarRange",
+      "dataset": "negative",
+      "parameters": {},
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "BarRange_negative_3_0",
+      "block": "BarRange/BarRange",
+      "dataset": "negative",
+      "parameters": {},
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "BarRange_negative_14_0",
+      "block": "BarRange/BarRange",
+      "dataset": "negative",
+      "parameters": {},
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "BiggestRange_negative_1_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "negative",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "BiggestRange_negative_3_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "negative",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "BiggestRange_negative_14_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "negative",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SmallestRange_negative_1_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "negative",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SmallestRange_negative_3_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "negative",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "SmallestRange_negative_14_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "negative",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "HighestInRange_negative_3_0",
+      "block": "BarRange/HighestInRange",
+      "dataset": "negative",
+      "parameters": {
+        "time_from": 900,
+        "time_to": 1100,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestInRange_negative_3_0",
+      "block": "BarRange/LowestInRange",
+      "dataset": "negative",
+      "parameters": {
+        "time_from": 900,
+        "time_to": 1100,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_3_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        4.0,
+        3.7712361663282534,
+        3.7712361663282534,
+        3.7712361663282534,
+        3.7712361663282534,
+        3.7712361663282534,
+        3.7712361663282534
+      ]
+    },
+    {
+      "id": "BBRange_negative_3_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_3_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_3_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_3_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_3_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        1.333333333333333,
+        1.2570787221094175,
+        1.2570787221094175,
+        1.2570787221094175,
+        1.2570787221094175,
+        1.2570787221094175,
+        1.2570787221094175
+      ]
+    },
+    {
+      "id": "BBRange_negative_3_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        2.0,
+        1.8856180831641267,
+        1.8856180831641267,
+        1.8856180831641267,
+        1.8856180831641267,
+        1.8856180831641267,
+        1.8856180831641267
+      ]
+    },
+    {
+      "id": "BBRange_negative_14_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        4.0,
+        3.7712361663282534,
+        4.0,
+        3.9191835884530852,
+        4.0,
+        3.9589732744431476,
+        4.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_14_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_14_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_14_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_14_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_negative_14_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        1.333333333333333,
+        1.2570787221094175,
+        1.333333333333333,
+        1.3063945294843613,
+        1.333333333333333,
+        1.3196577581477158,
+        1.333333333333333
+      ]
+    },
+    {
+      "id": "BBRange_negative_14_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        2.0,
+        1.8856180831641267,
+        2.0,
+        1.9595917942265424,
+        2.0,
+        1.979486637221574,
+        2.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_3_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_3_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_3_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_3_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_3_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_3_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_3_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_14_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_14_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_14_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_14_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_14_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_14_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_negative_14_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "negative",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "Highest_negative_1_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "negative",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "Highest_negative_3_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "negative",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "Highest_negative_14_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "negative",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0
+      ]
+    },
+    {
+      "id": "Lowest_negative_1_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "negative",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0
+      ]
+    },
+    {
+      "id": "Lowest_negative_3_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "negative",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0
+      ]
+    },
+    {
+      "id": "Lowest_negative_14_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "negative",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0,
+        -5.0
+      ]
+    },
+    {
+      "id": "HighestIndex_negative_1_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "negative",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestIndex_negative_3_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "negative",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "id": "HighestIndex_negative_14_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "negative",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    },
+    {
+      "id": "LowestIndex_negative_1_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "negative",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestIndex_negative_3_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "negative",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "id": "LowestIndex_negative_14_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "negative",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0
+      ]
+    },
+    {
+      "id": "BarRange_overnight_1_0",
+      "block": "BarRange/BarRange",
+      "dataset": "overnight",
+      "parameters": {},
+      "expected": [
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ]
+    },
+    {
+      "id": "BarRange_overnight_3_0",
+      "block": "BarRange/BarRange",
+      "dataset": "overnight",
+      "parameters": {},
+      "expected": [
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ]
+    },
+    {
+      "id": "BarRange_overnight_14_0",
+      "block": "BarRange/BarRange",
+      "dataset": "overnight",
+      "parameters": {},
+      "expected": [
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ]
+    },
+    {
+      "id": "BiggestRange_overnight_1_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ]
+    },
+    {
+      "id": "BiggestRange_overnight_3_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ]
+    },
+    {
+      "id": "BiggestRange_overnight_14_0",
+      "block": "BarRange/BiggestRange",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ]
+    },
+    {
+      "id": "SmallestRange_overnight_1_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0
+      ]
+    },
+    {
+      "id": "SmallestRange_overnight_3_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0
+      ]
+    },
+    {
+      "id": "SmallestRange_overnight_14_0",
+      "block": "BarRange/SmallestRange",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0,
+        4.0
+      ]
+    },
+    {
+      "id": "HighestInRange_overnight_3_0",
+      "block": "BarRange/HighestInRange",
+      "dataset": "overnight",
+      "parameters": {
+        "time_from": 2100,
+        "time_to": 600,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        15.0,
+        15.0,
+        17.0
+      ]
+    },
+    {
+      "id": "LowestInRange_overnight_3_0",
+      "block": "BarRange/LowestInRange",
+      "dataset": "overnight",
+      "parameters": {
+        "time_from": 2100,
+        "time_to": 600,
+        "timestamp_unit": "milliseconds"
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        5.0,
+        5.0,
+        3.0
+      ]
+    },
+    {
+      "id": "BBRange_overnight_3_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.1999999999999993,
+        0.32659863237108927,
+        0.32659863237109216,
+        0.32659863237109216,
+        0.32659863237108927,
+        0.32659863237108927
+      ]
+    },
+    {
+      "id": "BBRange_overnight_3_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_overnight_3_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        2.0,
+        3.265986323710904,
+        3.265986323710904,
+        3.265986323710904,
+        3.265986323710904,
+        3.265986323710904
+      ]
+    },
+    {
+      "id": "BBRange_overnight_3_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        2.0,
+        3.265986323710904,
+        3.265986323710904,
+        3.265986323710904,
+        3.265986323710904,
+        3.265986323710904
+      ]
+    },
+    {
+      "id": "BBRange_overnight_3_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_overnight_3_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.06666666666666643,
+        0.10886621079036309,
+        0.10886621079036307,
+        0.10886621079036309,
+        0.10886621079036307,
+        0.10886621079036599
+      ]
+    },
+    {
+      "id": "BBRange_overnight_3_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.10000000000000142,
+        0.16329931618554464,
+        0.16329931618554464,
+        0.16329931618554464,
+        0.16329931618554464,
+        0.16329931618554752
+      ]
+    },
+    {
+      "id": "BBRange_overnight_14_0",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.1999999999999993,
+        0.32659863237108927,
+        0.44721359549995876,
+        0.565685424949239,
+        0.683130051063974,
+        0.8000000000000003
+      ]
+    },
+    {
+      "id": "BBRange_overnight_14_1",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_overnight_14_2",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        2.0,
+        3.265986323710904,
+        4.47213595499958,
+        5.656854249492381,
+        6.831300510639732,
+        8.0
+      ]
+    },
+    {
+      "id": "BBRange_overnight_14_3",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        2.0,
+        3.265986323710904,
+        4.47213595499958,
+        5.656854249492381,
+        6.831300510639732,
+        8.0
+      ]
+    },
+    {
+      "id": "BBRange_overnight_14_4",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBRange_overnight_14_5",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.06666666666666643,
+        0.10886621079036309,
+        0.14907119849998546,
+        0.188561808316412,
+        0.2277100170213236,
+        0.2666666666666672
+      ]
+    },
+    {
+      "id": "BBRange_overnight_14_6",
+      "block": "BollingerBands/BBRange",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.10000000000000142,
+        0.16329931618554464,
+        0.22360679774997896,
+        0.282842712474618,
+        0.3415650255319859,
+        0.40000000000000013
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_3_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.016248688177666133,
+        0.03233649825456329,
+        0.03201947376187179,
+        0.031708605084572065,
+        0.03140371465106628,
+        0.031104631654389463
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_3_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_3_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.13063945294843615,
+        0.2512297172085311,
+        0.23328473740792172,
+        0.21773242158072695,
+        0.2041241452319315,
+        0.19211684257122966
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_3_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.21773242158072695,
+        0.46656947481584343,
+        0.5443310539518174,
+        0.6531972647421809,
+        0.816496580927726,
+        1.0886621079036347
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_3_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_3_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.005434253450434097,
+        0.010850452902693996,
+        0.010814524250698317,
+        0.010778832751521094,
+        0.01074337606483846,
+        0.010708151881019602
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_3_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.008144604298531049,
+        0.016248688177666136,
+        0.016168249127281646,
+        0.016088602579856615,
+        0.016009736880935748,
+        0.015931640603468047
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_14_0",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 0,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.007521681054909968,
+        0.014968890020167363,
+        0.02355130264698317,
+        0.03314330410700071,
+        0.04363059468292277,
+        0.054920915043615355
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_14_1",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 1,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_14_2",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 2,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.06047431568147635,
+        0.11629676092591607,
+        0.17707090508657683,
+        0.2414726442081476,
+        0.3084231693103158,
+        0.3771236166328254
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_14_3",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 3,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.10079052613579392,
+        0.21597969886241555,
+        0.3677626490259672,
+        0.563436169819011,
+        0.8131156281817418,
+        1.131370849898476
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_14_4",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 4,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_14_5",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 5,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.002515570535835114,
+        0.005022783694474763,
+        0.007928547988951174,
+        0.011194096089119386,
+        0.014783920512395254,
+        0.01866948597192209
+      ]
+    },
+    {
+      "id": "BBWidthRatio_overnight_14_6",
+      "block": "BollingerBands/BBWidthRatio",
+      "dataset": "overnight",
+      "parameters": {
+        "computed_from": 6,
+        "deviation": 2.0,
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0037702191821369834,
+        0.007521681054909969,
+        0.011863311258902172,
+        0.01673572781640621,
+        0.02208462199999788,
+        0.027866277091095473
+      ]
+    },
+    {
+      "id": "Highest_overnight_1_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        12.0,
+        13.0,
+        14.0,
+        15.0,
+        16.0,
+        17.0,
+        18.0
+      ]
+    },
+    {
+      "id": "Highest_overnight_3_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        12.0,
+        13.0,
+        14.0,
+        15.0,
+        16.0,
+        17.0,
+        18.0
+      ]
+    },
+    {
+      "id": "Highest_overnight_14_0",
+      "block": "HighestLowest/Highest",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        12.0,
+        13.0,
+        14.0,
+        15.0,
+        16.0,
+        17.0,
+        18.0
+      ]
+    },
+    {
+      "id": "Lowest_overnight_1_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        8.0,
+        7.0,
+        6.0,
+        5.0,
+        4.0,
+        3.0,
+        2.0
+      ]
+    },
+    {
+      "id": "Lowest_overnight_3_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        8.0,
+        7.0,
+        6.0,
+        5.0,
+        4.0,
+        3.0,
+        2.0
+      ]
+    },
+    {
+      "id": "Lowest_overnight_14_0",
+      "block": "HighestLowest/Lowest",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        8.0,
+        7.0,
+        6.0,
+        5.0,
+        4.0,
+        3.0,
+        2.0
+      ]
+    },
+    {
+      "id": "HighestIndex_overnight_1_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestIndex_overnight_3_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "HighestIndex_overnight_14_0",
+      "block": "HighestLowest/HighestIndex",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestIndex_overnight_1_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 1
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestIndex_overnight_3_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 3
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "LowestIndex_overnight_14_0",
+      "block": "HighestLowest/LowestIndex",
+      "dataset": "overnight",
+      "parameters": {
+        "period": 14
+      },
+      "expected": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}

@@ -74,11 +74,16 @@ if TYPE_CHECKING:
     from app.include.blocks.indicators.volatility.amihud import AmihudIlliquidity
     from app.include.blocks.indicators.volatility.atr import ATR
     from app.include.blocks.indicators.volatility.bar_range import BarRange
+    from app.include.blocks.indicators.volatility.bb_range import BBRange
+    from app.include.blocks.indicators.volatility.bb_width_ratio import BBWidthRatio
+    from app.include.blocks.indicators.volatility.biggest_range import BiggestRange
     from app.include.blocks.indicators.volatility.bollinger_bands import BollingerBands
     from app.include.blocks.indicators.volatility.garman_klass import (
         GarmanKlassVolatility,
     )
+    from app.include.blocks.indicators.volatility.highest_in_range import HighestInRange
     from app.include.blocks.indicators.volatility.keltner_channel import KeltnerChannel
+    from app.include.blocks.indicators.volatility.lowest_in_range import LowestInRange
     from app.include.blocks.indicators.volatility.mt_atr import MTATR
     from app.include.blocks.indicators.volatility.mt_keltner_channel import (
         MTKeltnerChannel,
@@ -87,6 +92,7 @@ if TYPE_CHECKING:
     from app.include.blocks.indicators.volatility.rogers_satchell import (
         RogersSatchellVolatility,
     )
+    from app.include.blocks.indicators.volatility.smallest_range import SmallestRange
     from app.include.blocks.indicators.volatility.sr_percent_rank import SRPercentRank
     from app.include.blocks.indicators.volatility.std_dev import StdDev
     from app.include.blocks.indicators.volatility.true_range import TrueRange
@@ -108,6 +114,12 @@ if TYPE_CHECKING:
     from app.include.blocks.indicators.volume.vwap import VWAP
 
 _EXPORTS = {
+    "BiggestRange": "app.include.blocks.indicators.volatility.biggest_range",
+    "SmallestRange": "app.include.blocks.indicators.volatility.smallest_range",
+    "HighestInRange": "app.include.blocks.indicators.volatility.highest_in_range",
+    "LowestInRange": "app.include.blocks.indicators.volatility.lowest_in_range",
+    "BBRange": "app.include.blocks.indicators.volatility.bb_range",
+    "BBWidthRatio": "app.include.blocks.indicators.volatility.bb_width_ratio",
     "ADX": "app.include.blocks.indicators.trend.adx",
     "ATR": "app.include.blocks.indicators.volatility.atr",
     ("AggressiveTradeImbalance"): (
@@ -235,8 +247,11 @@ __all__ = [
     "AverageDailyRange",
     "AvgVolume",
     "AwesomeOscillator",
+    "BBRange",
+    "BBWidthRatio",
     "BarRange",
     "BearsPower",
+    "BiggestRange",
     "BollingerBands",
     "BullsPower",
     "CandlestickPatterns",
@@ -251,6 +266,7 @@ __all__ = [
     "GannHiLo",
     "GarmanKlassVolatility",
     "HeikenAshi",
+    "HighestInRange",
     "HighestLowest",
     "HullMovingAverage",
     "HurstExponent",
@@ -260,6 +276,7 @@ __all__ = [
     "LaguerreRSI",
     "LevelClustering",
     "LinReg",
+    "LowestInRange",
     "MTKeltnerChannel",
     "MarketRegimeResolver",
     "Momentum",
@@ -272,6 +289,7 @@ __all__ = [
     "RogersSatchellVolatility",
     "SRPercentRank",
     "SchaffTrendCycle",
+    "SmallestRange",
     "StdDev",
     "Stochastic",
     "SuperTrend",

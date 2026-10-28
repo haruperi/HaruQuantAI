@@ -11,6 +11,9 @@ Subsequent profile work is recorded in `profile-donor-qualification.md`: the
 rolling VP/TPO approximations described below have been replaced with session
 calculations and all numerical outputs, checked against executed donor methods.
 The remaining families and platform/instrument integration still need qualification.
+Numeric range/band implementations and extrema output projections are subsequently
+qualified in `numeric-variants-qualification.md`; the older structural counts below
+are historical, not the current registry count.
 
 **Conclusion: full donor coverage is not complete.** The canonical package is
 healthy and broadly populated, but calculation migration, catalog exposure and

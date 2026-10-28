@@ -17,7 +17,7 @@ from app.include.blocks.comparisons.is_greater_or_equal import is_greater_or_equ
 from app.include.blocks.comparisons.is_lower import is_lower
 from app.include.blocks.comparisons.is_lower_or_equal import is_lower_or_equal
 from app.include.blocks.comparisons.not_equals import not_equals
-from app.include.blocks.series import BarData
+from app.include.blocks.series import COMPUTED_PRICE_INPUTS, BarData, computed_price
 
 _COMPARISONS: Mapping[str, Callable[..., Any]] = MappingProxyType(
     {
@@ -39,18 +39,7 @@ _ARITHMETIC: Mapping[str, Callable[..., Any]] = MappingProxyType(
         "abs": abs,
     }
 )
-_PRICE_FIELDS = (
-    ("close",),
-    ("open",),
-    ("high",),
-    ("low",),
-    ("high", "low"),
-    ("high", "low", "close"),
-    ("high", "low", "close"),
-)
 _MIN_BOOLEAN_NODE_SIZE = 2
-_MEDIAN_PRICE = 4
-_TYPICAL_PRICE = 5
 _MARKET_FIELDS = frozenset(("open", "high", "low", "close", "volume"))
 
 
@@ -171,22 +160,6 @@ def _lookback(expr: Any, shift: int) -> int:
     )
 
 
-def _computed_input(bars: BarData, code: int) -> np.ndarray:
-    if type(code) is not int or code not in range(len(_PRICE_FIELDS)):
-        raise ValueError("Computed-from selector must be between 0 and 6")
-    fields = _PRICE_FIELDS[code]
-    bars.require_inputs(fields)
-    if len(fields) == 1:
-        values = getattr(bars, fields[0])
-    elif code == _MEDIAN_PRICE:
-        values = (bars.high + bars.low) / 2
-    elif code == _TYPICAL_PRICE:
-        values = (bars.high + bars.low + bars.close) / 3
-    else:
-        values = (bars.high + bars.low + 2 * bars.close) / 4
-    return np.asarray(values, dtype=np.float64)
-
-
 @dataclass(frozen=True)
 class _Evaluation:
     outputs: Mapping[str, Any]
@@ -282,7 +255,7 @@ class CompositionExecutor:
     def _source(self, bars: BarData, node: Any, config: Mapping[str, Any]) -> BarData:
         if node.get("input_field") is None:
             return bars
-        values = _computed_input(bars, _binding(node["input_field"], config))
+        values = computed_price(bars, _binding(node["input_field"], config))
         fields = {
             name: getattr(bars, name) for name in _MARKET_FIELDS if bars.has_input(name)
         }
@@ -320,13 +293,17 @@ class CompositionExecutor:
         required = set(_read_inputs(self.definition.recipe["expression"]))
         for node in self.definition.recipe["nodes"].values():
             cls = self.calculations[self._selected_id(node, config)]
-            fields = set(cls.spec.required_market_inputs)
+            settings = {
+                name: _binding(value, config)
+                for name, value in node["parameters"].items()
+            }
+            fields = set(cls(**settings).required_inputs())
             if node.get("input_field") is not None:
                 code = _binding(node["input_field"], config)
                 fields.discard("close")
                 if node.get("output_hint") in ("highest", "lowest"):
                     fields.difference_update(("high", "low"))
-                fields.update(_PRICE_FIELDS[code])
+                fields.update(COMPUTED_PRICE_INPUTS[code])
             required.update(fields)
         return tuple(sorted(required))
 
@@ -347,8 +324,9 @@ class CompositionExecutor:
             )
             if cache_key not in cache:
                 source = self._source(bars, node, config)
-                source.require_inputs(cls.spec.required_market_inputs)
-                cache[cache_key] = cls(**kwargs).calculate(source)
+                indicator = cls(**kwargs)
+                source.require_inputs(indicator.required_inputs())
+                cache[cache_key] = indicator.calculate(source)
             outputs[key] = cache[cache_key]
         return self.evaluate_outputs(outputs, bars, **config)
 

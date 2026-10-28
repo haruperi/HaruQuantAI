@@ -6,9 +6,117 @@ FR-CALC-EXTREMA: Fast incremental peak/trough and bar-lag tracking over rolling 
 
 from __future__ import annotations
 
-from typing import override
+from collections import deque
+from datetime import UTC, datetime
+from typing import Any, override
+from zoneinfo import ZoneInfo
+
+import numpy as np
 
 from app.include.calculators.base import AbstractCalculator
+
+
+def rolling_extreme(
+    values: np.ndarray[Any, Any], period: int, *, highest: bool
+) -> np.ndarray[Any, Any]:
+    """Linear-time numeric extrema over available history, retaining oldest ties."""
+    result = np.empty(len(values), dtype=np.float64)
+    candidates: deque[int] = deque()
+    for i, value in enumerate(values):
+        while candidates and candidates[0] <= i - period:
+            candidates.popleft()
+        while candidates and (
+            value > values[candidates[-1]]
+            if highest
+            else value < values[candidates[-1]]
+        ):
+            candidates.pop()
+        candidates.append(i)
+        result[i] = values[candidates[0]]
+    return result
+
+
+_LAST_HHMM = 2359
+_MINUTES_PER_HOUR = 60
+
+
+def validate_hhmm(value: int) -> int:
+    """Validate an actual clock time rather than accepting an invalid minute."""
+    if not 0 <= value <= _LAST_HHMM or value % 100 >= _MINUTES_PER_HOUR:
+        raise ValueError("Time must be a valid HHMM value")
+    return value
+
+
+# Keep completed-window and carry-forward mutations in the donor order.
+def time_window_extreme(  # noqa: C901, PLR0912
+    timestamps: np.ndarray[Any, Any],
+    values: np.ndarray[Any, Any],
+    *,
+    time_from: int,
+    time_to: int,
+    highest: bool,
+    timestamp_unit: str,
+    timezone: str,
+) -> np.ndarray[Any, Any]:
+    """Replay donor completed-window extrema, including initial/sentinel behavior.
+
+    A window is [start, end). Empty completed windows retain the last usable
+    result. The source starts its lowest accumulator at zero on the first bar;
+    this startup quirk is intentionally preserved and reference-tested.
+    """
+    times = np.asarray(timestamps, dtype=np.int64)
+    if len(times) != len(values):
+        raise ValueError("Time-window extrema require aligned timestamps")
+    if len(times) and (np.any(times <= 0) or np.any(np.diff(times) <= 0)):
+        raise ValueError("Timestamps must be positive and strictly increasing")
+    if not np.isfinite(values).all():
+        raise ValueError("Extrema input must be finite")
+    if timestamp_unit == "seconds":
+        times = times * 1000
+    zone = ZoneInfo(timezone)
+    day_ms = 86_400_000
+    from_offset = (time_from // 100 * 60 + time_from % 100) * 60_000
+    to_offset = (time_to // 100 * 60 + time_to % 100) * 60_000
+    sentinel = 0.0 if highest else np.finfo(np.float64).max
+    current = last = last_usable = 0.0
+    start = end = 0
+    result = np.zeros(len(values))
+    for i, timestamp in enumerate(times):
+        now = int(timestamp)
+        day = (
+            datetime.fromtimestamp(now / 1000, UTC)
+            .astimezone(zone)
+            .replace(hour=0, minute=0, second=0, microsecond=0)
+        )
+        day_start = int(day.timestamp() * 1000)
+        if i == 0:
+            start, end = day_start + from_offset, day_start + to_offset
+            if end < start:
+                end += day_ms
+        if now >= end:
+            start, end = day_start + from_offset, day_start + to_offset
+            last, current = current, sentinel
+            if end <= now:
+                if time_to < time_from:
+                    end += day_ms
+                else:
+                    start += day_ms
+                    end += day_ms
+            if start <= now:
+                current = float(values[i])
+        elif now >= start:
+            current = (
+                max(current, float(values[i]))
+                if highest
+                else min(current, float(values[i]))
+            )
+        else:
+            current = sentinel
+        usable = last > 0 if highest else last < sentinel
+        if usable:
+            last_usable = last
+        result[i] = last if usable else last_usable
+    return result
 
 
 class HighestCalculator(AbstractCalculator):

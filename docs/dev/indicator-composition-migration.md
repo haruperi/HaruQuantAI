@@ -112,8 +112,10 @@ Platform/instrument integration remains separate. External VP predicates require
 session-profile series and never substitute a rolling profile. PSAR predicates
 require a caller-supplied decision-price series; they do not invent live quotes.
 COT raw/derived feed definitions and specialized donor defaults/edge cases still
-need reference fixtures. The numeric range/other consolidated calculation variants
-also need parameter/output-level qualification.
+need reference fixtures. Numeric range/band variants and extrema projections were
+subsequently implemented and source-qualified in `numeric-variants-qualification.md`.
+Moving-average routing is now explicit; its seed/warmup differences and the other
+standalone calculations still need numerical qualification.
 
 The broader strategy-document/compiler and UI integration phases remain separate.
 No CodeEditor UI or automatic generator is claimed to have been completed here.

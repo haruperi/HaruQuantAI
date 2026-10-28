@@ -4274,5 +4274,421 @@
       "title": "VWAP",
       "type": "object"
     }
+  },
+  {
+    "id": "indicator.volatility.biggest_range",
+    "version": "1.0.0",
+    "name": "BiggestRange",
+    "source": "app/include/blocks/indicators/volatility/biggest_range.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Numeric extreme of eight-decimal candle ranges over available history.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "BiggestRange",
+      "type": "object"
+    },
+    "qualification": "docs/dev/numeric-variants-qualification.md"
+  },
+  {
+    "id": "indicator.volatility.smallest_range",
+    "version": "1.0.0",
+    "name": "SmallestRange",
+    "source": "app/include/blocks/indicators/volatility/smallest_range.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Numeric extreme of eight-decimal candle ranges over available history.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "SmallestRange",
+      "type": "object"
+    },
+    "qualification": "docs/dev/numeric-variants-qualification.md"
+  },
+  {
+    "id": "indicator.volatility.highest_in_range",
+    "version": "1.0.0",
+    "name": "HighestInRange",
+    "source": "app/include/blocks/indicators/volatility/highest_in_range.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "timestamps",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "timestamps"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Completed daily HHMM-window extreme with explicit chart time context.",
+      "properties": {
+        "time_from": {
+          "default": 0,
+          "maximum": 2359,
+          "minimum": 0,
+          "title": "Time From",
+          "type": "integer"
+        },
+        "time_to": {
+          "default": 0,
+          "maximum": 2359,
+          "minimum": 0,
+          "title": "Time To",
+          "type": "integer"
+        },
+        "timestamp_unit": {
+          "default": "seconds",
+          "enum": [
+            "seconds",
+            "milliseconds"
+          ],
+          "title": "Timestamp Unit",
+          "type": "string"
+        },
+        "timezone": {
+          "default": "UTC",
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "title": "HighestInRange",
+      "type": "object"
+    },
+    "qualification": "docs/dev/numeric-variants-qualification.md"
+  },
+  {
+    "id": "indicator.volatility.lowest_in_range",
+    "version": "1.0.0",
+    "name": "LowestInRange",
+    "source": "app/include/blocks/indicators/volatility/lowest_in_range.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "timestamps",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "low",
+      "timestamps"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Completed daily HHMM-window extreme with explicit chart time context.",
+      "properties": {
+        "time_from": {
+          "default": 0,
+          "maximum": 2359,
+          "minimum": 0,
+          "title": "Time From",
+          "type": "integer"
+        },
+        "time_to": {
+          "default": 0,
+          "maximum": 2359,
+          "minimum": 0,
+          "title": "Time To",
+          "type": "integer"
+        },
+        "timestamp_unit": {
+          "default": "seconds",
+          "enum": [
+            "seconds",
+            "milliseconds"
+          ],
+          "title": "Timestamp Unit",
+          "type": "string"
+        },
+        "timezone": {
+          "default": "UTC",
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "title": "LowestInRange",
+      "type": "object"
+    },
+    "qualification": "docs/dev/numeric-variants-qualification.md"
+  },
+  {
+    "id": "indicator.volatility.bb_range",
+    "version": "1.0.0",
+    "name": "BBRange",
+    "source": "app/include/blocks/indicators/volatility/bb_range.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": false
+      },
+      {
+        "name": "high",
+        "required": false
+      },
+      {
+        "name": "low",
+        "required": false
+      },
+      {
+        "name": "close",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Population-standard-deviation price range with partial-window startup.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "maximum": 10000,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "deviation": {
+          "default": 2.0,
+          "maximum": 10,
+          "minimum": 0.01,
+          "title": "Deviation",
+          "type": "number"
+        },
+        "computed_from": {
+          "default": 0,
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "title": "Computed From",
+          "type": "integer"
+        }
+      },
+      "title": "BBRange",
+      "type": "object"
+    },
+    "qualification": "docs/dev/numeric-variants-qualification.md",
+    "parameter_market_inputs": {
+      "computed_from": {
+        "0": [
+          "close"
+        ],
+        "1": [
+          "open"
+        ],
+        "2": [
+          "high"
+        ],
+        "3": [
+          "low"
+        ],
+        "4": [
+          "high",
+          "low"
+        ],
+        "5": [
+          "high",
+          "low",
+          "close"
+        ],
+        "6": [
+          "high",
+          "low",
+          "close"
+        ]
+      }
+    }
+  },
+  {
+    "id": "indicator.volatility.bb_width_ratio",
+    "version": "1.0.0",
+    "name": "BBWidthRatio",
+    "source": "app/include/blocks/indicators/volatility/bb_width_ratio.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": false
+      },
+      {
+        "name": "high",
+        "required": false
+      },
+      {
+        "name": "low",
+        "required": false
+      },
+      {
+        "name": "close",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Deviation from the current SMA, divided by period and positive SMA.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "maximum": 10000,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "deviation": {
+          "default": 2.0,
+          "maximum": 10,
+          "minimum": 0.01,
+          "title": "Deviation",
+          "type": "number"
+        },
+        "computed_from": {
+          "default": 0,
+          "enum": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "title": "Computed From",
+          "type": "integer"
+        }
+      },
+      "title": "BBWidthRatio",
+      "type": "object"
+    },
+    "qualification": "docs/dev/numeric-variants-qualification.md",
+    "parameter_market_inputs": {
+      "computed_from": {
+        "0": [
+          "close"
+        ],
+        "1": [
+          "open"
+        ],
+        "2": [
+          "high"
+        ],
+        "3": [
+          "low"
+        ],
+        "4": [
+          "high",
+          "low"
+        ],
+        "5": [
+          "high",
+          "low",
+          "close"
+        ],
+        "6": [
+          "high",
+          "low",
+          "close"
+        ]
+      }
+    }
   }
 ]

@@ -7,9 +7,56 @@ FR-CALC-STDDEV: Rolling standard deviation with intra-bar update support.
 from __future__ import annotations
 
 import math
-from typing import override
+from typing import Any, override
+
+import numpy as np
 
 from app.include.calculators.base import AbstractCalculator
+
+_MAX_WINDOW_ELEMENTS = 1_000_000
+
+
+def centered_deviation(
+    values: np.ndarray[Any, Any],
+    centers: np.ndarray[Any, Any],
+    period: int,
+    *,
+    fixed_divisor: bool = False,
+) -> np.ndarray[Any, Any]:
+    """Batch RMS deviation around supplied centers, with bounded temporary memory.
+
+    BBWidthRatio divides even partial windows by the configured period. Standard
+    population deviation divides partial windows by the available bar count.
+    """
+    result = np.zeros(len(values), dtype=np.float64)
+    for i in range(min(period - 1, len(values))):
+        difference = values[: i + 1] - centers[i]
+        result[i] = np.sqrt(
+            np.sum(difference * difference) / (period if fixed_divisor else i + 1)
+        )
+    if len(values) >= period:
+        windows = np.lib.stride_tricks.sliding_window_view(values, period)
+        chunk = max(1, _MAX_WINDOW_ELEMENTS // period)
+        for start in range(0, len(windows), chunk):
+            end = min(len(windows), start + chunk)
+            difference = (
+                windows[start:end]
+                - centers[period - 1 + start : period - 1 + end, None]
+            )
+            result[period - 1 + start : period - 1 + end] = np.sqrt(
+                np.sum(difference * difference, axis=1) / period
+            )
+    return result
+
+
+def std_dev_kernel(values: np.ndarray[Any, Any], period: int) -> np.ndarray[Any, Any]:
+    """Batch equivalent of the donor StdDevCalculator, including partial warmup."""
+    centers = np.zeros(len(values))
+    total = 0.0
+    for i, value in enumerate(values.tolist()):
+        total = value + total - (float(values[i - period]) if i >= period else 0.0)
+        centers[i] = total / min(i + 1, period)
+    return centered_deviation(values, centers, period)
 
 
 class StdDevCalculator(AbstractCalculator):

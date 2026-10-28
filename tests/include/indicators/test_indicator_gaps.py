@@ -31,7 +31,9 @@ from app.include.blocks.indicators.momentum.wave_trend import WaveTrend
 from app.include.blocks.indicators.trend.adx import ADX
 from app.include.blocks.indicators.trend.ichimoku import Ichimoku
 from app.include.blocks.indicators.volatility.bar_range import BarRange
+from app.include.blocks.indicators.volatility.highest_in_range import HighestInRange
 from app.include.blocks.indicators.volatility.keltner_channel import KeltnerChannel
+from app.include.blocks.indicators.volatility.lowest_in_range import LowestInRange
 from app.include.blocks.indicators.volume.cot import COT
 from app.include.blocks.indicators.volume.volume_profile import VolumeProfile
 from app.include.blocks.price import BarPrice
@@ -98,12 +100,16 @@ def test_bar_range_time_windows_and_conditions() -> None:
     assert is_lower(rng, 2.0, shift=0) is True
     base_sec = 1700006400
     ts = [base_sec + h * 3600 for h in (8, 9, 10, 11, 12, 13)]
-    hi_rng = BarRange.highest_in_range(ts, high, time_from=900, time_to=1100)
-    lo_rng = BarRange.lowest_in_range(ts, low, time_from=900, time_to=1100)
+    hi_rng = HighestInRange(time_from=900, time_to=1100).calculate(
+        BarData.from_arrays(timestamps=ts, high=high)
+    )["value"]
+    lo_rng = LowestInRange(time_from=900, time_to=1100).calculate(
+        BarData.from_arrays(timestamps=ts, low=low)
+    )["value"]
     assert hi_rng.get(0) == pytest.approx(12.0)
     assert lo_rng.get(0) == pytest.approx(10.5)
-    assert len(BarRange.highest_in_range([], [], 900, 1100)) == 0
-    assert len(BarRange.lowest_in_range([], [], 900, 1100)) == 0
+    with pytest.raises(ValueError, match="cannot be empty"):
+        BarData.from_arrays(timestamps=[], high=[])
 
 
 def test_bollinger_bands_value_and_bar_conditions() -> None:
