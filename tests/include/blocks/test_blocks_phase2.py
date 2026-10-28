@@ -270,6 +270,10 @@ def test_clean_migration_obsolete_implementations_removed() -> None:
     with pytest.raises(ModuleNotFoundError):
         importlib.import_module("app.include.comparisons")
 
+    # 1b. bar_time.py legacy monolith is cleanly removed
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include.bar_time")
+
     # 2. functions.py has no top-level plus, and Functions facade has no plus method
     import app.include.functions as func
 

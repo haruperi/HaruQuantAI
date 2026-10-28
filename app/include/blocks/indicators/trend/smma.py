@@ -16,7 +16,7 @@ from app.include.blocks.metadata import (
     PortType,
 )
 from app.include.blocks.series import BarData, IndicatorSeries
-from app.include.numerical.ma import smma_kernel
+from app.include.calculators.average import smma_kernel
 
 
 class SMMA(BaseIndicator):

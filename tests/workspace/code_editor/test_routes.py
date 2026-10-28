@@ -55,9 +55,9 @@ def test_create_new_snippet_and_delete(service: CodeEditor):
 
 def test_clone_and_rename(service: CodeEditor):
     """Verify clone and rename file operations."""
-    src_rel = "app/include/indicators/custom/test_clone_src.py"
-    clone_rel = "app/include/indicators/custom/test_clone_dst.py"
-    renamed_rel = "app/include/indicators/custom/test_clone_renamed.py"
+    src_rel = "app/include/blocks/indicators/custom/test_clone_src.py"
+    clone_rel = "app/include/blocks/indicators/custom/test_clone_dst.py"
+    renamed_rel = "app/include/blocks/indicators/custom/test_clone_renamed.py"
 
     src_abs = PROJECT_ROOT / src_rel
     clone_abs = PROJECT_ROOT / clone_rel

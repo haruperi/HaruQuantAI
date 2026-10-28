@@ -60,7 +60,6 @@ DOCSTRING_RATCHET_ALLOWLIST: dict[str, int] = {}
 FILE_SIZE_EXEMPT_PATHS = frozenset(
     {
         "app/host/_schema.py",
-        "app/include/indicators/volume/cot.py",
         # User-approved: keep each domain's MT5 behavior in its existing module.
         "app/workspace/brokers/metatrader.py",
     }

@@ -1,4 +1,4 @@
-"""Base ring buffer and execution lifecycle for streaming rolling calculators.
+"""Shared array conversion and lifecycle for streaming rolling calculators.
 
 FEAT-INC-CALCULATORS: Stateful streaming window calculators.
 FR-CALC-BUFFER: Circular buffer with intra-bar overwrite and bar advance.
@@ -7,9 +7,12 @@ FR-CALC-BUFFER: Circular buffer with intra-bar overwrite and bar advance.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import ClassVar
+from typing import Any, ClassVar
+
+import numpy as np
 
 from app.host.logging import get_logger
+from app.include.contracts import DataframeSeries
 
 logger = get_logger(__name__)
 
@@ -134,3 +137,10 @@ class AbstractCalculator(ABC):
     def buffer_length(self) -> int:
         """Return the physical length of the circular buffer."""
         return self.period
+
+
+def to_numpy(value: Any) -> np.ndarray[Any, np.dtype[np.float64]]:
+    """Return float64 values from a numerical series or array-like input."""
+    if isinstance(value, DataframeSeries):
+        return value.values
+    return np.asarray(value, dtype=np.float64)

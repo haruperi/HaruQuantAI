@@ -40,7 +40,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Create custom technical indicators using price, volume, and other market data. This template provides a clean structure for building indicators with configurable parameters and easy integration with the HaruQuantAI backtesting framework.',
     defaultName: 'MyIndicator',
-    targetDir: 'app/include/indicators/',
+    targetDir: 'app/include/blocks/indicators/',
     color: 'bg-blue-600/20 text-blue-400 border-blue-500/30',
     icon: BarChart2,
   },

@@ -8,13 +8,12 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from app.include.blocks.indicators.base import BaseIndicator as CanonicalBaseIndicator
+from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.money_management.base import (
     BasePositionSizer as _BasePositionSizer,
 )
-from app.include.indicators.base import BaseIndicator as LegacyBaseIndicator
 from app.include.metrics.base import BaseMetric as _BaseMetric
-from app.workspace.code_editor._common import INCLUDE_DIR, CodeEditorError
+from app.workspace.code_editor._common import CodeEditorError
 
 
 class SnippetRegistry:
@@ -42,7 +41,7 @@ class SnippetRegistry:
         }
         base: type[Any] | tuple[type[Any], ...] | None = None
         if "indicators" in path.parts:
-            base = (LegacyBaseIndicator, CanonicalBaseIndicator)
+            base = BaseIndicator
         elif "metrics" in path.parts:
             base = _BaseMetric
         elif "money_management" in path.parts:
@@ -55,11 +54,7 @@ class SnippetRegistry:
             "series.py",
             "ma.py",
         }
-        if (
-            path.name in internal_block_files
-            or path.name.startswith("__")
-            or path.resolve() == (INCLUDE_DIR / "indicators/base.py").resolve()
-        ):
+        if path.name in internal_block_files or path.name.startswith("__"):
             classes = {}
             base = None
         if base:

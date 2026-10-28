@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import inspect
 from collections.abc import Mapping
 from itertools import pairwise
 from typing import Any
@@ -73,38 +72,12 @@ def historical_bars(
     ), timestamps
 
 
-_PRICE_INPUTS = {
-    "bars",
-    "data",
-    "open",
-    "high",
-    "low",
-    "close",
-    "volume",
-    "timestamps",
-    "open_prices",
-    "high_prices",
-    "low_prices",
-    "close_prices",
-    "close_data",
-}
-
-
 def indicator_defaults(cls: Any) -> dict[str, Any]:
-    """Derive configurable defaults from the actual indicator signature."""
-    target = (
-        cls
-        if not isinstance(
-            inspect.getattr_static(cls, "calculate"), (classmethod, staticmethod)
-        )
-        else cls.calculate
-    )
+    """Read configuration defaults from the canonical indicator model."""
     return {
-        name: param.default
-        for name, param in inspect.signature(target).parameters.items()
-        if name not in _PRICE_INPUTS
-        and param.default is not inspect.Parameter.empty
-        and isinstance(param.default, (str, int, float, bool, type(None)))
+        name: field.default
+        for name, field in cls.model_fields.items()
+        if not field.is_required()
     }
 
 
@@ -114,53 +87,23 @@ def calculate_indicator(
     params: Mapping[str, Any],
     timestamps: list[int] | None = None,
 ) -> Any:
-    """Invoke each indicator once using its declared inputs, without retrying errors."""
-    instance_method = not isinstance(
-        inspect.getattr_static(cls, "calculate"), (classmethod, staticmethod)
+    """Instantiate validated configuration and execute the canonical contract once."""
+    context = (
+        bars
+        if isinstance(bars, BarData)
+        else BarData(
+            prices=bars,
+            timestamps=(
+                np.asarray(timestamps, dtype=np.int64)
+                if timestamps is not None
+                else np.array([], dtype=np.int64)
+            ),
+        )
     )
-    if instance_method:
-        target_bars = (
-            bars
-            if isinstance(bars, BarData)
-            else BarData(
-                prices=bars,
-                timestamps=(
-                    np.asarray(timestamps, dtype=np.int64)
-                    if timestamps is not None
-                    else np.array([], dtype=np.int64)
-                ),
-            )
-        )
-        try:
-            return cls(**params).calculate(target_bars)
-        except Exception as exc:
-            raise CodeEditorError(f"Indicator calculation failed: {exc}") from exc
-    signature = inspect.signature(cls.calculate)
-    sources = {
-        "bars": bars,
-        "open": bars.open_series().values,
-        "timestamps": timestamps,
-        "data": bars.close_series().values,
-        "close": bars.close_series().values,
-        "close_data": bars.close_series().values,
-        "high": bars.high_series().values,
-        "low": bars.low_series().values,
-        "volume": bars.volume_series().values,
-    }
-    for name in ("open", "high", "low", "close"):
-        sources[name + "_prices"] = sources[name]
-    unknown = set(params) - set(signature.parameters)
-    if unknown:
-        raise CodeEditorError(
-            f"Unsupported indicator parameters: {', '.join(sorted(unknown))}"
-        )
-    arguments = dict(params)
-    for name, param in signature.parameters.items():
-        if name not in arguments and name in sources:
-            arguments[name] = sources[name]
-        elif name not in arguments and param.default is inspect.Parameter.empty:
-            raise CodeEditorError(f"Missing indicator input: {name}")
-    return cls.calculate(**arguments)
+    try:
+        return cls(**params).calculate(context)
+    except Exception as exc:
+        raise CodeEditorError(f"Indicator calculation failed: {exc}") from exc
 
 
 def output_series(result: Any, count: int) -> dict[str, np.ndarray[Any, Any]]:

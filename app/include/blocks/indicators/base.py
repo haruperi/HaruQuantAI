@@ -5,6 +5,8 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import ClassVar
 
+from pydantic import ConfigDict
+
 from app.include.blocks.base import BaseBlock
 from app.include.blocks.metadata import BlockSpec
 from app.include.blocks.series import BarData, IndicatorSeries
@@ -19,6 +21,7 @@ class BaseIndicator(BaseBlock):
     """
 
     spec: ClassVar[BlockSpec]
+    model_config = ConfigDict(strict=True, allow_inf_nan=False)
 
     def required_history(self) -> int:
         """Return minimum history bars needed before first valid output."""

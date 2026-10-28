@@ -19,43 +19,38 @@ def _to_pascal_case(name: str) -> str:
 
 def _gen_indicator(name: str) -> str:
     cls_name = _to_pascal_case(name) or "CustomIndicator"
-    return f'''"""Custom Technical Indicator: {cls_name}.
+    block_name = _to_snake_case(name) or "custom_indicator"
+    return f'''"""Custom technical indicator: {cls_name}."""
 
-Inherits from BaseIndicator to calculate custom indicator series over bar data.
-"""
-
-from dataclasses import dataclass
-from typing import Any, Mapping
-import numpy as np
-import polars as pl
-
-from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.price import BarPrice
+from typing import ClassVar, override
+from pydantic import Field
+from app.include.blocks.indicators.base import BaseIndicator
+from app.include.blocks.metadata import BlockSpec, InputPort, OutputPort
+from app.include.blocks.series import BarData, IndicatorSeries
+from app.include.calculators.average import sma_kernel
 
 
-@dataclass
 class {cls_name}(BaseIndicator):
-    """Custom technical indicator."""
+    """Calculate a validated moving average over closing prices."""
 
-    period: int = 14
-    shift: int = 0
+    spec: ClassVar[BlockSpec] = BlockSpec(
+        id="indicator.custom.{block_name}",
+        name="{cls_name}",
+        category="custom",
+        inputs=(InputPort("close"),),
+        outputs=(OutputPort("value"),),
+        required_market_inputs=("close",),
+    )
+    period: int = Field(default=14, ge=1)
 
-    def calculate(self, bars: BarPrice) -> IndicatorSeries:
-        """Calculate indicator values for the input bars."""
-        # Example calculation: Moving Average over close prices
-        closes = bars.close_series().values
-        result = [
-            sum(closes[max(0, i - self.period + 1):i + 1]) / max(1, min(i + 1, self.period))
-            for i in range(len(closes))
-        ]
-        return IndicatorSeries(np.array(result, dtype=np.float64))
+    @override
+    def required_history(self) -> int:
+        return self.period
 
-    def get_metadata(self) -> dict[str, Any]:
-        return {{
-            "name": "{cls_name}",
-            "period": self.period,
-            "shift": self.shift,
-        }}
+    @override
+    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
+        bars.require_inputs(self.spec.required_market_inputs)
+        return {{"value": IndicatorSeries(sma_kernel(bars.close, self.period))}}
 '''
 
 
@@ -68,7 +63,7 @@ Evaluates entry or exit conditions across indicator and price series.
 
 from dataclasses import dataclass
 from app.include.price import BarPrice
-from app.include.indicators.base import IndicatorSeries
+from app.include.blocks.series import IndicatorSeries
 
 
 @dataclass

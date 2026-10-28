@@ -44,7 +44,7 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
     setIsExporting(true);
     setExportMessage(null);
     try {
-      const filesToExport = openFiles.length > 0 ? openFiles : ['app/include/indicators/'];
+      const filesToExport = openFiles.length > 0 ? openFiles : ['app/include/blocks/indicators/'];
       const res = await client.exportPack(filesToExport, outputFilePath, {
         name: packName,
         description,

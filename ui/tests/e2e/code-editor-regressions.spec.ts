@@ -11,7 +11,7 @@ async function mockEditor(page: Page, source = 'value = 1\n') {
       }),
     );
   });
-  let path = 'app/include/indicators/custom/example.py';
+  let path = 'app/include/blocks/indicators/custom/example.py';
   let disk = source;
   let tabs = [{ file_path: path, title: 'example.py', content: disk, is_dirty: false, mode: 'python' }];
   let active: string | null = path;
@@ -71,11 +71,11 @@ async function mockEditor(page: Page, source = 'value = 1\n') {
       const snake = (value: string) => value.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
       data = {
         content: `class ${body.name}: pass`,
-        file_path: `app/include/indicators/${snake(body.category)}/${snake(body.name)}.py`,
+        file_path: `app/include/blocks/indicators/${snake(body.category)}/${snake(body.name)}.py`,
       };
     } else if (endpoint === '/templates/create') {
       creates.push(body);
-      path = `app/include/indicators/${body.category}/my_indicator.py`;
+      path = `app/include/blocks/indicators/${body.category}/my_indicator.py`;
       data = {
         status: 'created',
         file_path: path,
@@ -162,13 +162,13 @@ test('indicator creation supports presets, a custom category and the full target
   const mock = await mockEditor(page);
   await page.goto('/codeeditor');
   await page.getByRole('button', { name: 'Create from Template', exact: true }).click();
-  await expect(page.getByText('app/include/indicators/custom/my_indicator.py', { exact: true })).toBeVisible();
+  await expect(page.getByText('app/include/blocks/indicators/custom/my_indicator.py', { exact: true })).toBeVisible();
   await page.getByLabel('Category', { exact: true }).selectOption('trend');
-  await expect(page.getByText('app/include/indicators/trend/my_indicator.py', { exact: true })).toBeVisible();
+  await expect(page.getByText('app/include/blocks/indicators/trend/my_indicator.py', { exact: true })).toBeVisible();
   await page.getByLabel('Category', { exact: true }).selectOption('__new__');
   await expect(page.getByRole('button', { name: 'Create & Open', exact: true })).toBeDisabled();
   await page.getByLabel('New indicator category').fill('research');
-  await expect(page.getByText('app/include/indicators/research/my_indicator.py', { exact: true })).toBeVisible();
+  await expect(page.getByText('app/include/blocks/indicators/research/my_indicator.py', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Create & Open', exact: true }).click();
   await expect.poll(() => mock.creates.length).toBe(1);
   expect(mock.creates[0]).toEqual({ template_type: 'BlocksIndicators', name: 'MyIndicator', category: 'research' });
@@ -234,8 +234,8 @@ test('Python brackets and four-space indentation work while typing', async ({ pa
 
 test('each tab retains its own undo history', async ({ page }) => {
   await mockEditor(page);
-  const first = 'app/include/indicators/custom/example.py';
-  const second = 'app/include/indicators/custom/other.py';
+  const first = 'app/include/blocks/indicators/custom/example.py';
+  const second = 'app/include/blocks/indicators/custom/other.py';
   await page.route('**/code-editor/navigator', (route) =>
     route.fulfill({
       json: {

@@ -21,7 +21,7 @@ def test_open_save_and_close_tab(tmp_path: Path):
     """Verify document lifecycle: opening, editing, saving, and closing tabs."""
     editor = AppCodeEditor()
     # Create a temporary file relative to project root
-    test_rel = "app/include/indicators/custom/test_snippet_temp.py"
+    test_rel = "app/include/blocks/indicators/custom/test_snippet_temp.py"
     test_abs = PROJECT_ROOT / test_rel
     test_abs.parent.mkdir(parents=True, exist_ok=True)
     test_abs.write_text("x = 42\n", encoding="utf-8")
@@ -65,4 +65,6 @@ def test_open_nonexistent_file_raises():
     """Verify attempting to open a non-existent file raises CodeEditorError."""
     editor = AppCodeEditor()
     with pytest.raises(CodeEditorError):
-        editor.open_file_tab("app/include/indicators/custom/non_existent_file_abc.py")
+        editor.open_file_tab(
+            "app/include/blocks/indicators/custom/non_existent_file_abc.py"
+        )

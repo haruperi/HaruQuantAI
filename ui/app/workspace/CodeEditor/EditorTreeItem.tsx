@@ -29,6 +29,8 @@ export function RenderTreeItem({
   const domains: Record<string, string> = {
     indicators: 'Indicator',
     actions: 'Action',
+    comparisons: 'Condition',
+    functions: 'Function',
     signals: 'Signal',
     orders: 'Order',
     metrics: 'Metric',
@@ -39,11 +41,12 @@ export function RenderTreeItem({
     analysis: 'Analysis',
     ai_tools: 'AI tool',
   };
+  const domainIndex = parts[2] === 'blocks' ? 3 : 2;
   const badge =
     parts[0] === 'app' && parts[1] === 'include'
-      ? parts[2] === 'indicators' && parts[3] && (isDir || parts.length > 4)
-        ? parts[3]
-        : domains[parts[2]]
+      ? parts[domainIndex] === 'indicators' && parts[domainIndex + 1] && (isDir || parts.length > domainIndex + 2)
+        ? parts[domainIndex + 1]
+        : domains[parts[domainIndex]]
       : undefined;
 
   // Filter matching

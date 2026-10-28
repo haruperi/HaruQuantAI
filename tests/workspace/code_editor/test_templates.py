@@ -55,10 +55,12 @@ def test_get_template_unknown_raises():
 
 def test_render_indicator_with_custom_category():
     """Verify indicator template targets selected domain subfolder."""
-    _, path_vol = render_template(
+    content, path_vol = render_template(
         "BlocksIndicators", "CustomVol", category="volatility"
     )
-    assert path_vol == "app/include/indicators/volatility/custom_vol.py"
+    assert path_vol == "app/include/blocks/indicators/volatility/custom_vol.py"
+    assert 'id="indicator.volatility.custom_vol"' in content
+    assert 'category="volatility"' in content
 
     _, path_custom = render_template("BlocksIndicators", "CustomAlpha")
-    assert path_custom == "app/include/indicators/custom/custom_alpha.py"
+    assert path_custom == "app/include/blocks/indicators/custom/custom_alpha.py"

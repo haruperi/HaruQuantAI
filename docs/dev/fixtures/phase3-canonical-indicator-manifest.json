@@ -1,0 +1,3882 @@
+[
+  {
+    "id": "indicator.momentum.awesome_oscillator",
+    "version": "1.0.0",
+    "name": "AwesomeOscillator",
+    "source": "app/include/blocks/indicators/momentum/awesome_oscillator.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 34,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Awesome Oscillator indicator family.",
+      "properties": {
+        "fast_period": {
+          "default": 5,
+          "minimum": 1,
+          "title": "Fast Period",
+          "type": "integer"
+        },
+        "slow_period": {
+          "default": 34,
+          "minimum": 1,
+          "title": "Slow Period",
+          "type": "integer"
+        }
+      },
+      "title": "AwesomeOscillator",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.bears_power",
+    "version": "1.0.0",
+    "name": "BearsPower",
+    "source": "app/include/blocks/indicators/momentum/bears_power.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Bears Power (Elder-Ray) indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "BearsPower",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.bulls_power",
+    "version": "1.0.0",
+    "name": "BullsPower",
+    "source": "app/include/blocks/indicators/momentum/bulls_power.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Bulls Power (Elder-Ray) indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "BullsPower",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.cci",
+    "version": "1.0.0",
+    "name": "CCI",
+    "source": "app/include/blocks/indicators/momentum/cci.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Commodity Channel Index family consolidating calculation and conditions.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "CCI",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.demarker",
+    "version": "1.0.0",
+    "name": "DeMarker",
+    "source": "app/include/blocks/indicators/momentum/demarker.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 15,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "DeMarker oscillator indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "DeMarker",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.laguerre_rsi",
+    "version": "1.0.0",
+    "name": "LaguerreRSI",
+    "source": "app/include/blocks/indicators/momentum/laguerre_rsi.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "John Ehlers' 4-element Laguerre filter Relative Strength Index.",
+      "properties": {
+        "gamma": {
+          "default": 0.5,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Gamma",
+          "type": "number"
+        }
+      },
+      "title": "LaguerreRSI",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.macd",
+    "version": "1.0.0",
+    "name": "MACD",
+    "source": "app/include/blocks/indicators/momentum/macd.py",
+    "category": "momentum",
+    "outputs": [
+      "main",
+      "signal",
+      "histogram"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 34,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Moving Average Convergence Divergence indicator block.",
+      "properties": {
+        "fast": {
+          "default": 12,
+          "description": "Fast EMA smoothing period in bars",
+          "minimum": 1,
+          "title": "Fast Period",
+          "type": "integer"
+        },
+        "slow": {
+          "default": 26,
+          "description": "Slow EMA smoothing period in bars",
+          "minimum": 1,
+          "title": "Slow Period",
+          "type": "integer"
+        },
+        "smooth": {
+          "default": 9,
+          "description": "Signal line SMA smoothing period in bars",
+          "minimum": 1,
+          "title": "Signal Period",
+          "type": "integer"
+        }
+      },
+      "title": "MACD",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.momentum",
+    "version": "1.0.0",
+    "name": "Momentum",
+    "source": "app/include/blocks/indicators/momentum/momentum.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 15,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Momentum indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "Momentum",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.osma",
+    "version": "1.0.0",
+    "name": "OSMA",
+    "source": "app/include/blocks/indicators/momentum/osma.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 34,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Moving Average of Oscillator (OSMA) indicator family.",
+      "properties": {
+        "fast_ema": {
+          "default": 12,
+          "minimum": 1,
+          "title": "Fast Ema",
+          "type": "integer"
+        },
+        "slow_ema": {
+          "default": 26,
+          "minimum": 1,
+          "title": "Slow Ema",
+          "type": "integer"
+        },
+        "signal_period": {
+          "default": 9,
+          "minimum": 1,
+          "title": "Signal Period",
+          "type": "integer"
+        }
+      },
+      "title": "OSMA",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.price_velocity",
+    "version": "1.0.0",
+    "name": "PriceVelocity",
+    "source": "app/include/blocks/indicators/momentum/price_velocity.py",
+    "category": "momentum",
+    "outputs": [
+      "velocity",
+      "normalized"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 11,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Price velocity and momentum acceleration indicator block.",
+      "properties": {
+        "period": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "smooth_period": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Smooth Period",
+          "type": "integer"
+        }
+      },
+      "title": "PriceVelocity",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.qqe",
+    "version": "1.0.0",
+    "name": "QQE",
+    "source": "app/include/blocks/indicators/momentum/qqe.py",
+    "category": "momentum",
+    "outputs": [
+      "value1",
+      "value2"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 19,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Quantitative Qualitative Estimation indicator block.",
+      "properties": {
+        "rsi_period": {
+          "default": 14,
+          "minimum": 2,
+          "title": "Rsi Period",
+          "type": "integer"
+        },
+        "sf": {
+          "default": 5,
+          "minimum": 1,
+          "title": "Sf",
+          "type": "integer"
+        },
+        "wf": {
+          "default": 4.236,
+          "exclusiveMinimum": 0.0,
+          "title": "Wf",
+          "type": "number"
+        }
+      },
+      "title": "QQE",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.reflex",
+    "version": "1.0.0",
+    "name": "Reflex",
+    "source": "app/include/blocks/indicators/momentum/reflex.py",
+    "category": "momentum",
+    "outputs": [
+      "reflex",
+      "fast"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "John Ehlers' Reflex cycle indicator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "slow_period": {
+          "anyOf": [
+            {
+              "minimum": 2,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Slow Period"
+        }
+      },
+      "title": "Reflex",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.roc",
+    "version": "1.0.0",
+    "name": "ROC",
+    "source": "app/include/blocks/indicators/momentum/roc.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 6,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Rate of Change (ROC) indicator family.",
+      "properties": {
+        "period": {
+          "default": 5,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "ROC",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.rsi",
+    "version": "1.0.0",
+    "name": "RSI",
+    "source": "app/include/blocks/indicators/momentum/rsi.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 15,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Relative Strength Index indicator block.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "description": "Smoothing lookback period in bars",
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "RSI",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.schaff_trend_cycle",
+    "version": "1.0.0",
+    "name": "SchaffTrendCycle",
+    "source": "app/include/blocks/indicators/momentum/schaff_trend_cycle.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 70,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Doug Schaff's Trend Cycle (STC) double-smoothed stochastic MACD indicator.",
+      "properties": {
+        "stoch_period": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Stoch Period",
+          "type": "integer"
+        },
+        "fast_period": {
+          "default": 20,
+          "minimum": 1,
+          "title": "Fast Period",
+          "type": "integer"
+        },
+        "slow_period": {
+          "default": 50,
+          "minimum": 1,
+          "title": "Slow Period",
+          "type": "integer"
+        },
+        "factor": {
+          "default": 0.5,
+          "exclusiveMaximum": 1.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Factor",
+          "type": "number"
+        }
+      },
+      "title": "SchaffTrendCycle",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.stochastic",
+    "version": "1.0.0",
+    "name": "Stochastic",
+    "source": "app/include/blocks/indicators/momentum/stochastic.py",
+    "category": "momentum",
+    "outputs": [
+      "k",
+      "d"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 18,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Stochastic Oscillator family consolidating %K, %D lines and conditions.",
+      "properties": {
+        "k_period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "K Period",
+          "type": "integer"
+        },
+        "d_period": {
+          "default": 3,
+          "minimum": 1,
+          "title": "D Period",
+          "type": "integer"
+        },
+        "slowing": {
+          "default": 3,
+          "minimum": 1,
+          "title": "Slowing",
+          "type": "integer"
+        }
+      },
+      "title": "Stochastic",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.wave_trend",
+    "version": "1.0.0",
+    "name": "WaveTrend",
+    "source": "app/include/blocks/indicators/momentum/wave_trend.py",
+    "category": "momentum",
+    "outputs": [
+      "wt1",
+      "wt2"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": false
+      },
+      {
+        "name": "close",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "high"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 33,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "WaveTrend oscillator block generating Main (WT1) and Signal (WT2) lines.",
+      "properties": {
+        "channel_length": {
+          "default": 10,
+          "minimum": 2,
+          "title": "Channel Length",
+          "type": "integer"
+        },
+        "average_length": {
+          "default": 21,
+          "minimum": 2,
+          "title": "Average Length",
+          "type": "integer"
+        },
+        "signal_length": {
+          "default": 4,
+          "minimum": 1,
+          "title": "Signal Length",
+          "type": "integer"
+        }
+      },
+      "title": "WaveTrend",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.momentum.williams_pr",
+    "version": "1.0.0",
+    "name": "WilliamsPR",
+    "source": "app/include/blocks/indicators/momentum/williams_pr.py",
+    "category": "momentum",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Williams Percent Range indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "WilliamsPR",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.candlestick_patterns",
+    "version": "1.0.0",
+    "name": "CandlestickPatterns",
+    "source": "app/include/blocks/indicators/price_action/candlestick_patterns.py",
+    "category": "price_action",
+    "outputs": [
+      "doji",
+      "bullish_engulfing",
+      "bearish_engulfing",
+      "engulfing",
+      "hammer",
+      "shooting_star",
+      "pinbar",
+      "inside_bar",
+      "three_bar",
+      "dark_cloud",
+      "piercing_line"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 3,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Multi-pattern causal candlestick detector.",
+      "properties": {
+        "doji_ratio": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doji Ratio"
+        },
+        "tick_size": {
+          "default": 0.0001,
+          "exclusiveMinimum": 0.0,
+          "title": "Tick Size",
+          "type": "number"
+        },
+        "digits": {
+          "default": 5,
+          "minimum": 0,
+          "title": "Digits",
+          "type": "integer"
+        }
+      },
+      "title": "CandlestickPatterns",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.chart_patterns",
+    "version": "1.0.0",
+    "name": "ChartPatterns",
+    "source": "app/include/blocks/indicators/price_action/chart_patterns.py",
+    "category": "price_action",
+    "outputs": [
+      "double_pattern",
+      "breakout_retest"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 50,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Multi-structural chart pattern recognizer.",
+      "properties": {
+        "lookback": {
+          "default": 50,
+          "minimum": 10,
+          "title": "Lookback",
+          "type": "integer"
+        },
+        "tolerance_pct": {
+          "default": 0.03,
+          "exclusiveMaximum": 1.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Tolerance Pct",
+          "type": "number"
+        }
+      },
+      "title": "ChartPatterns",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.fibo",
+    "version": "1.0.0",
+    "name": "Fibo",
+    "source": "app/include/blocks/indicators/price_action/fibo.py",
+    "category": "price_action",
+    "outputs": [
+      "level_23_6",
+      "level_38_2",
+      "level_50_0",
+      "level_61_8",
+      "level_78_6",
+      "level_100_0",
+      "level_161_8",
+      "custom"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "open",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Fibonacci Retracement and Extension indicator block.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "custom_level": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Custom Level"
+        }
+      },
+      "title": "Fibo",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.fractal",
+    "version": "1.0.0",
+    "name": "Fractal",
+    "source": "app/include/blocks/indicators/price_action/fractal.py",
+    "category": "price_action",
+    "outputs": [
+      "up",
+      "down"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 5,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Bill Williams Fractal indicator detecting local peak and trough formations.",
+      "properties": {
+        "fractal_bars": {
+          "default": 5,
+          "minimum": 3,
+          "title": "Fractal Bars",
+          "type": "integer"
+        }
+      },
+      "title": "Fractal",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.heiken_ashi",
+    "version": "1.0.0",
+    "name": "HeikenAshi",
+    "source": "app/include/blocks/indicators/price_action/heiken_ashi.py",
+    "category": "price_action",
+    "outputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Heiken Ashi smoothed candlestick generator with trend condition helpers.",
+      "properties": {},
+      "title": "HeikenAshi",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.highest_lowest",
+    "version": "1.0.0",
+    "name": "HighestLowest",
+    "source": "app/include/blocks/indicators/price_action/highest_lowest.py",
+    "category": "price_action",
+    "outputs": [
+      "highest",
+      "lowest",
+      "highest_index",
+      "lowest_index"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "high"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Highest and Lowest price extrema indicator with breakout condition evaluators.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "HighestLowest",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.level_clustering",
+    "version": "1.0.0",
+    "name": "LevelClustering",
+    "source": "app/include/blocks/indicators/price_action/level_clustering.py",
+    "category": "price_action",
+    "outputs": [
+      "cluster_price",
+      "cluster_weight",
+      "cluster_found"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 50,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Structural swing pivot level clustering block.",
+      "properties": {
+        "lookback": {
+          "default": 50,
+          "minimum": 5,
+          "title": "Lookback",
+          "type": "integer"
+        },
+        "tolerance": {
+          "default": 1.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Tolerance",
+          "type": "number"
+        }
+      },
+      "title": "LevelClustering",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.pivots",
+    "version": "1.0.0",
+    "name": "Pivots",
+    "source": "app/include/blocks/indicators/price_action/pivots.py",
+    "category": "price_action",
+    "outputs": [
+      "pp",
+      "r1",
+      "r2",
+      "r3",
+      "s1",
+      "s2",
+      "s3"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "timestamps",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 2,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Floor Trader Pivot Points indicator calculating multi-tier levels.",
+      "properties": {
+        "period": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "Pivots",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.price_gap",
+    "version": "1.0.0",
+    "name": "PriceGap",
+    "source": "app/include/blocks/indicators/price_action/price_gap.py",
+    "category": "price_action",
+    "outputs": [
+      "gap_size",
+      "gap_filled"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 2,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Price Gap detection and fill tracking block.",
+      "properties": {
+        "full_gap": {
+          "default": true,
+          "title": "Full Gap",
+          "type": "boolean"
+        }
+      },
+      "title": "PriceGap",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.price_action.zigzag",
+    "version": "1.0.0",
+    "name": "ZigZag",
+    "source": "app/include/blocks/indicators/price_action/zigzag.py",
+    "category": "price_action",
+    "outputs": [
+      "zigzag",
+      "swing_point",
+      "swing_type"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": false,
+    "is_generation_eligible": false,
+    "required_history": 6,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "ZigZag structural swing extrema and trendline segmentation block.",
+      "properties": {
+        "deviation": {
+          "default": 5.0,
+          "minimum": 0.01,
+          "title": "Deviation",
+          "type": "number"
+        },
+        "depth": {
+          "default": 5,
+          "minimum": 1,
+          "title": "Depth",
+          "type": "integer"
+        }
+      },
+      "title": "ZigZag",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.regime.choppiness",
+    "version": "1.0.0",
+    "name": "ChoppinessIndex",
+    "source": "app/include/blocks/indicators/regime/choppiness.py",
+    "category": "regime",
+    "outputs": [
+      "chop",
+      "regime"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Choppiness Index indicator and market trend regime classifier.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "lower_threshold": {
+          "default": 38.2,
+          "title": "Lower Threshold",
+          "type": "number"
+        },
+        "upper_threshold": {
+          "default": 61.8,
+          "title": "Upper Threshold",
+          "type": "number"
+        }
+      },
+      "title": "ChoppinessIndex",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.regime.hurst",
+    "version": "1.0.0",
+    "name": "HurstExponent",
+    "source": "app/include/blocks/indicators/regime/hurst.py",
+    "category": "regime",
+    "outputs": [
+      "hurst",
+      "regime"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 100,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Hurst Exponent statistical persistence regime indicator.",
+      "properties": {
+        "window": {
+          "default": 100,
+          "minimum": 20,
+          "title": "Window",
+          "type": "integer"
+        },
+        "min_scale": {
+          "default": 8,
+          "minimum": 2,
+          "title": "Min Scale",
+          "type": "integer"
+        },
+        "max_scale": {
+          "default": 50,
+          "minimum": 2,
+          "title": "Max Scale",
+          "type": "integer"
+        },
+        "scale_count": {
+          "default": 5,
+          "minimum": 2,
+          "title": "Scale Count",
+          "type": "integer"
+        },
+        "lower_threshold": {
+          "default": 0.45,
+          "title": "Lower Threshold",
+          "type": "number"
+        },
+        "upper_threshold": {
+          "default": 0.55,
+          "title": "Upper Threshold",
+          "type": "number"
+        }
+      },
+      "title": "HurstExponent",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.regime.regime_resolver",
+    "version": "1.0.0",
+    "name": "MarketRegimeResolver",
+    "source": "app/include/blocks/indicators/regime/regime_resolver.py",
+    "category": "regime",
+    "outputs": [
+      "regime",
+      "confidence"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [
+      "indicator.regime.choppiness",
+      "indicator.trend.adx"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 28,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Multi-factor market regime resolver and confidence estimator.",
+      "properties": {
+        "adx_period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Adx Period",
+          "type": "integer"
+        },
+        "adx_threshold": {
+          "default": 25.0,
+          "title": "Adx Threshold",
+          "type": "number"
+        },
+        "chop_period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Chop Period",
+          "type": "integer"
+        },
+        "chop_lower": {
+          "default": 38.2,
+          "title": "Chop Lower",
+          "type": "number"
+        },
+        "chop_upper": {
+          "default": 61.8,
+          "title": "Chop Upper",
+          "type": "number"
+        },
+        "donchian_period": {
+          "default": 20,
+          "minimum": 1,
+          "title": "Donchian Period",
+          "type": "integer"
+        }
+      },
+      "title": "MarketRegimeResolver",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.adx",
+    "version": "1.0.0",
+    "name": "ADX",
+    "source": "app/include/blocks/indicators/trend/adx.py",
+    "category": "trend",
+    "outputs": [
+      "main",
+      "di_plus",
+      "di_minus"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [
+      "indicator.volatility.atr"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 28,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "ADX family consolidating Main ADX, +DI, -DI lines and conditions.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "ADX",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.aroon",
+    "version": "1.0.0",
+    "name": "Aroon",
+    "source": "app/include/blocks/indicators/trend/aroon.py",
+    "category": "trend",
+    "outputs": [
+      "up",
+      "down",
+      "oscillator"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Aroon indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "Aroon",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.directional_index",
+    "version": "1.0.0",
+    "name": "DirectionalIndex",
+    "source": "app/include/blocks/indicators/trend/directional_index.py",
+    "category": "trend",
+    "outputs": [
+      "di_plus",
+      "di_minus",
+      "dx"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [
+      "indicator.trend.adx"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 15,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Directional Index indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "DirectionalIndex",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.donchian_channel",
+    "version": "1.0.0",
+    "name": "DonchianChannels",
+    "source": "app/include/blocks/indicators/trend/donchian_channel.py",
+    "category": "trend",
+    "outputs": [
+      "upper",
+      "lower",
+      "middle",
+      "width"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Donchian Channels breakout envelope and volatility width block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "offset": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        }
+      },
+      "title": "DonchianChannels",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.ema",
+    "version": "1.0.0",
+    "name": "EMA",
+    "source": "app/include/blocks/indicators/trend/ema.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Exponential Moving Average indicator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "description": "Smoothing lookback period in bars",
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "EMA",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.gann_hi_lo",
+    "version": "1.0.0",
+    "name": "GannHiLo",
+    "source": "app/include/blocks/indicators/trend/gann_hi_lo.py",
+    "category": "trend",
+    "outputs": [
+      "gha",
+      "gh_high",
+      "gh_low",
+      "trend"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 11,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Gann High-Low Activator indicator with trend regime tracking.",
+      "properties": {
+        "period": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "GannHiLo",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.hull_moving_average",
+    "version": "1.0.0",
+    "name": "HullMovingAverage",
+    "source": "app/include/blocks/indicators/trend/hull_moving_average.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 16,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Hull Moving Average indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "HullMovingAverage",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.ichimoku",
+    "version": "1.0.0",
+    "name": "Ichimoku",
+    "source": "app/include/blocks/indicators/trend/ichimoku.py",
+    "category": "trend",
+    "outputs": [
+      "tenkan_sen",
+      "kijun_sen",
+      "senkou_span_a",
+      "senkou_span_b",
+      "chikou_span"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": false,
+    "is_generation_eligible": false,
+    "required_history": 78,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Ichimoku Kinko Hyo indicator block.",
+      "properties": {
+        "tenkan": {
+          "default": 9,
+          "minimum": 1,
+          "title": "Tenkan",
+          "type": "integer"
+        },
+        "kijun": {
+          "default": 26,
+          "minimum": 1,
+          "title": "Kijun",
+          "type": "integer"
+        },
+        "senkou": {
+          "default": 52,
+          "minimum": 1,
+          "title": "Senkou",
+          "type": "integer"
+        }
+      },
+      "title": "Ichimoku",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.kama",
+    "version": "1.0.0",
+    "name": "KAMA",
+    "source": "app/include/blocks/indicators/trend/kama.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [
+      "indicator.trend.kaufman_efficiency_ratio"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 11,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Kaufman's Adaptive Moving Average indicator family.",
+      "properties": {
+        "er_period": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Er Period",
+          "type": "integer"
+        },
+        "fast_period": {
+          "default": 2,
+          "minimum": 1,
+          "title": "Fast Period",
+          "type": "integer"
+        },
+        "slow_period": {
+          "default": 30,
+          "minimum": 1,
+          "title": "Slow Period",
+          "type": "integer"
+        }
+      },
+      "title": "KAMA",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.kaufman_efficiency_ratio",
+    "version": "1.0.0",
+    "name": "KaufmanEfficiencyRatio",
+    "source": "app/include/blocks/indicators/trend/kaufman_efficiency_ratio.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 11,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Kaufman Efficiency Ratio indicator family.",
+      "properties": {
+        "period": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "KaufmanEfficiencyRatio",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.lin_reg",
+    "version": "1.0.0",
+    "name": "LinReg",
+    "source": "app/include/blocks/indicators/trend/lin_reg.py",
+    "category": "trend",
+    "outputs": [
+      "lin_reg",
+      "slope",
+      "intercept"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Linear Regression indicator calculating least-squares regression lines.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "LinReg",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.lwma",
+    "version": "1.0.0",
+    "name": "LWMA",
+    "source": "app/include/blocks/indicators/trend/lwma.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Linear Weighted Moving Average indicator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "description": "Rolling window lookback period in bars",
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "LWMA",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.parabolic_sar",
+    "version": "1.0.0",
+    "name": "ParabolicSAR",
+    "source": "app/include/blocks/indicators/trend/parabolic_sar.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 2,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Parabolic SAR indicator family.",
+      "properties": {
+        "step": {
+          "default": 0.02,
+          "exclusiveMinimum": 0.0,
+          "title": "Step",
+          "type": "number"
+        },
+        "maximum": {
+          "default": 0.2,
+          "exclusiveMinimum": 0.0,
+          "title": "Maximum",
+          "type": "number"
+        }
+      },
+      "title": "ParabolicSAR",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.sma",
+    "version": "1.0.0",
+    "name": "SMA",
+    "source": "app/include/blocks/indicators/trend/sma.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Simple Moving Average indicator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "description": "Rolling window lookback period in bars",
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "SMA",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.smma",
+    "version": "1.0.0",
+    "name": "SMMA",
+    "source": "app/include/blocks/indicators/trend/smma.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Smoothed Moving Average (Wilder's MA) indicator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "description": "Smoothing lookback period in bars",
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "SMMA",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.supertrend",
+    "version": "1.0.0",
+    "name": "SuperTrend",
+    "source": "app/include/blocks/indicators/trend/supertrend.py",
+    "category": "trend",
+    "outputs": [
+      "main",
+      "trend",
+      "upper",
+      "lower"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [
+      "indicator.volatility.atr",
+      "indicator.volatility.mt_atr"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 25,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "SuperTrend indicator family.",
+      "properties": {
+        "mode": {
+          "default": 1,
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Mode",
+          "type": "integer"
+        },
+        "atr_period": {
+          "default": 24,
+          "minimum": 1,
+          "title": "Atr Period",
+          "type": "integer"
+        },
+        "atr_mult": {
+          "default": 3.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Atr Mult",
+          "type": "number"
+        }
+      },
+      "title": "SuperTrend",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.tema",
+    "version": "1.0.0",
+    "name": "TEMA",
+    "source": "app/include/blocks/indicators/trend/tema.py",
+    "category": "trend",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 40,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Triple Exponential Moving Average indicator block.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "description": "Smoothing lookback period in bars",
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "TEMA",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.trend",
+    "version": "1.0.0",
+    "name": "Trend",
+    "source": "app/include/blocks/indicators/trend/trend.py",
+    "category": "trend",
+    "outputs": [
+      "trend",
+      "baseline"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 200,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Trend regime classifier evaluating price position relative to baseline.",
+      "properties": {
+        "period": {
+          "default": 200,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "method": {
+          "default": "sma",
+          "enum": [
+            "sma",
+            "ema"
+          ],
+          "title": "Method",
+          "type": "string"
+        }
+      },
+      "title": "Trend",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.trend.vortex",
+    "version": "1.0.0",
+    "name": "Vortex",
+    "source": "app/include/blocks/indicators/trend/vortex.py",
+    "category": "trend",
+    "outputs": [
+      "vi_plus",
+      "vi_minus",
+      "oscillator"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [
+      "indicator.volatility.atr"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 15,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Vortex indicator family.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "Vortex",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.adr",
+    "version": "1.0.0",
+    "name": "AverageDailyRange",
+    "source": "app/include/blocks/indicators/volatility/adr.py",
+    "category": "volatility",
+    "outputs": [
+      "adr",
+      "stretch"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Average Daily Range (ADR) price travel and stretch ratio block.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "AverageDailyRange",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.amihud",
+    "version": "1.0.0",
+    "name": "AmihudIlliquidity",
+    "source": "app/include/blocks/indicators/volatility/amihud.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Amihud illiquidity price impact ratio indicator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "multiplier": {
+          "default": 1000000.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Multiplier",
+          "type": "number"
+        }
+      },
+      "title": "AmihudIlliquidity",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.atr",
+    "version": "1.0.0",
+    "name": "ATR",
+    "source": "app/include/blocks/indicators/volatility/atr.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Average True Range indicator family consolidating math and conditions.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "ATR",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.bar_range",
+    "version": "1.0.0",
+    "name": "BarRange",
+    "source": "app/include/blocks/indicators/volatility/bar_range.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Bar Range indicator family.",
+      "properties": {},
+      "title": "BarRange",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.bollinger_bands",
+    "version": "1.0.0",
+    "name": "BollingerBands",
+    "source": "app/include/blocks/indicators/volatility/bollinger_bands.py",
+    "category": "volatility",
+    "outputs": [
+      "upper",
+      "middle",
+      "lower",
+      "bandwidth",
+      "range"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Bollinger Bands volatility indicator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "description": "Rolling window lookback period in bars",
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "deviation": {
+          "default": 2.0,
+          "description": "Standard deviation multiplier for bands",
+          "exclusiveMinimum": 0.0,
+          "title": "Deviation",
+          "type": "number"
+        }
+      },
+      "title": "BollingerBands",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.garman_klass",
+    "version": "1.0.0",
+    "name": "GarmanKlassVolatility",
+    "source": "app/include/blocks/indicators/volatility/garman_klass.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Garman-Klass OHLC volatility estimator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "annualize": {
+          "default": false,
+          "title": "Annualize",
+          "type": "boolean"
+        },
+        "trading_periods": {
+          "default": 252,
+          "minimum": 1,
+          "title": "Trading Periods",
+          "type": "integer"
+        }
+      },
+      "title": "GarmanKlassVolatility",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.keltner_channel",
+    "version": "1.0.0",
+    "name": "KeltnerChannel",
+    "source": "app/include/blocks/indicators/volatility/keltner_channel.py",
+    "category": "volatility",
+    "outputs": [
+      "upper",
+      "middle",
+      "lower"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Keltner Channel indicator family.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "deviation": {
+          "default": 1.5,
+          "exclusiveMinimum": 0.0,
+          "title": "Deviation",
+          "type": "number"
+        }
+      },
+      "title": "KeltnerChannel",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.mt_atr",
+    "version": "1.0.0",
+    "name": "MTATR",
+    "source": "app/include/blocks/indicators/volatility/mt_atr.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [
+      "indicator.volatility.atr"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "MetaTrader Average True Range indicator family (SMA-smoothed True Range).",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "MTATR",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.mt_keltner_channel",
+    "version": "1.0.0",
+    "name": "MTKeltnerChannel",
+    "source": "app/include/blocks/indicators/volatility/mt_keltner_channel.py",
+    "category": "volatility",
+    "outputs": [
+      "upper",
+      "middle",
+      "lower"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "MetaTrader Keltner Channel indicator family (Close-based middle band).",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "deviation": {
+          "default": 1.5,
+          "exclusiveMinimum": 0.0,
+          "title": "Deviation",
+          "type": "number"
+        }
+      },
+      "title": "MTKeltnerChannel",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.parkinson",
+    "version": "1.0.0",
+    "name": "ParkinsonVolatility",
+    "source": "app/include/blocks/indicators/volatility/parkinson.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Parkinson High-Low extreme value volatility estimator.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "annualize": {
+          "default": false,
+          "title": "Annualize",
+          "type": "boolean"
+        },
+        "trading_periods": {
+          "default": 252,
+          "minimum": 1,
+          "title": "Trading Periods",
+          "type": "integer"
+        }
+      },
+      "title": "ParkinsonVolatility",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.rogers_satchell",
+    "version": "1.0.0",
+    "name": "RogersSatchellVolatility",
+    "source": "app/include/blocks/indicators/volatility/rogers_satchell.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Rogers-Satchell non-zero drift OHLC volatility estimator block.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        },
+        "annualize": {
+          "default": false,
+          "title": "Annualize",
+          "type": "boolean"
+        },
+        "trading_periods": {
+          "default": 252,
+          "minimum": 1,
+          "title": "Trading Periods",
+          "type": "integer"
+        }
+      },
+      "title": "RogersSatchellVolatility",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.sr_percent_rank",
+    "version": "1.0.0",
+    "name": "SRPercentRank",
+    "source": "app/include/blocks/indicators/volatility/sr_percent_rank.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [
+      "indicator.volatility.mt_atr"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 122,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Support/Resistance Percent Rank indicator family.",
+      "properties": {
+        "mode": {
+          "default": 1,
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Mode",
+          "type": "integer"
+        },
+        "length": {
+          "default": 120,
+          "minimum": 1,
+          "title": "Length",
+          "type": "integer"
+        },
+        "atr_period": {
+          "default": 12,
+          "minimum": 1,
+          "title": "Atr Period",
+          "type": "integer"
+        }
+      },
+      "title": "SRPercentRank",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.std_dev",
+    "version": "1.0.0",
+    "name": "StdDev",
+    "source": "app/include/blocks/indicators/volatility/std_dev.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Standard Deviation indicator family.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "StdDev",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.true_range",
+    "version": "1.0.0",
+    "name": "TrueRange",
+    "source": "app/include/blocks/indicators/volatility/true_range.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [
+      "indicator.volatility.atr"
+    ],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "True Range indicator family.",
+      "properties": {},
+      "title": "TrueRange",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volatility.ulcer_index",
+    "version": "1.0.0",
+    "name": "UlcerIndex",
+    "source": "app/include/blocks/indicators/volatility/ulcer_index.py",
+    "category": "volatility",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 24,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Ulcer Index indicator family.",
+      "properties": {
+        "mode": {
+          "default": 1,
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Mode",
+          "type": "integer"
+        },
+        "period": {
+          "default": 24,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "UlcerIndex",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.aggressive_trade_imbalance",
+    "version": "1.0.0",
+    "name": "AggressiveTradeImbalance",
+    "source": "app/include/blocks/indicators/volume/aggressive_trade_imbalance.py",
+    "category": "volume",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      },
+      {
+        "name": "buy_volume",
+        "required": false
+      },
+      {
+        "name": "sell_volume",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "open",
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Aggressive Trade Imbalance (ATI) normalized ratio in [-1.0, 1.0].",
+      "properties": {
+        "window": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Window",
+          "type": "integer"
+        }
+      },
+      "title": "AggressiveTradeImbalance",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.anchored_vwap",
+    "version": "1.0.0",
+    "name": "AnchoredVWAP",
+    "source": "app/include/blocks/indicators/volume/anchored_vwap.py",
+    "category": "volume",
+    "outputs": [
+      "vwap",
+      "upper",
+      "lower"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      },
+      {
+        "name": "timestamps",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Anchored VWAP indicator with volume-weighted standard deviation bands.",
+      "properties": {
+        "session_type": {
+          "default": 1,
+          "enum": [
+            1,
+            2,
+            3
+          ],
+          "title": "Session Type",
+          "type": "integer"
+        },
+        "std_dev_mult": {
+          "default": 1.0,
+          "exclusiveMinimum": 0.0,
+          "title": "Std Dev Mult",
+          "type": "number"
+        },
+        "anchor_period": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Anchor Period",
+          "type": "integer"
+        },
+        "anchor_indices": {
+          "anyOf": [
+            {
+              "items": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Anchor Indices"
+        }
+      },
+      "title": "AnchoredVWAP",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.avg_volume",
+    "version": "1.0.0",
+    "name": "AvgVolume",
+    "source": "app/include/blocks/indicators/volume/avg_volume.py",
+    "category": "volume",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "volume",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Average Volume indicator with trend and crossover condition evaluation.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "AvgVolume",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.cmf",
+    "version": "1.0.0",
+    "name": "CMF",
+    "source": "app/include/blocks/indicators/volume/cmf.py",
+    "category": "volume",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 20,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Chaikin Money Flow volume accumulation/distribution indicator.",
+      "properties": {
+        "period": {
+          "default": 20,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "CMF",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.cot",
+    "version": "1.0.0",
+    "name": "COT",
+    "source": "app/include/blocks/indicators/volume/cot.py",
+    "category": "volume",
+    "outputs": [
+      "composite_score",
+      "cpi_hedger",
+      "cpi_speculator",
+      "cpi_small",
+      "cpi_hedger_slow",
+      "cpi_speculator_slow",
+      "cti_hedger",
+      "cti_speculator",
+      "hedger_spec_spread"
+    ],
+    "inputs": [
+      {
+        "name": "commercial_net",
+        "required": true
+      },
+      {
+        "name": "speculator_net",
+        "required": true
+      },
+      {
+        "name": "small_spec_net",
+        "required": false
+      },
+      {
+        "name": "open_interest",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "commercial_net",
+      "speculator_net"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": false,
+    "required_history": 156,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Commitment of Traders indicator computing CPI/CTI, scores, and conditions.",
+      "properties": {
+        "period_fast": {
+          "default": 52,
+          "minimum": 2,
+          "title": "Period Fast",
+          "type": "integer"
+        },
+        "period_slow": {
+          "default": 156,
+          "minimum": 2,
+          "title": "Period Slow",
+          "type": "integer"
+        }
+      },
+      "title": "COT",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.cumulative_volume_delta",
+    "version": "1.0.0",
+    "name": "CumulativeVolumeDelta",
+    "source": "app/include/blocks/indicators/volume/cumulative_volume_delta.py",
+    "category": "volume",
+    "outputs": [
+      "cvd",
+      "delta"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      },
+      {
+        "name": "buy_volume",
+        "required": false
+      },
+      {
+        "name": "sell_volume",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "open",
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Cumulative Volume Delta (CVD) tracking net aggressive buying/selling volume.",
+      "properties": {
+        "window": {
+          "default": 14,
+          "minimum": 1,
+          "title": "Window",
+          "type": "integer"
+        }
+      },
+      "title": "CumulativeVolumeDelta",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.mfi",
+    "version": "1.0.0",
+    "name": "MFI",
+    "source": "app/include/blocks/indicators/volume/mfi.py",
+    "category": "volume",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 14,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Money Flow Index volume-weighted momentum oscillator.",
+      "properties": {
+        "period": {
+          "default": 14,
+          "minimum": 2,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "MFI",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.obv",
+    "version": "1.0.0",
+    "name": "OBV",
+    "source": "app/include/blocks/indicators/volume/obv.py",
+    "category": "volume",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "On-Balance Volume cumulative volume momentum indicator.",
+      "properties": {},
+      "title": "OBV",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.tpo_profile",
+    "version": "1.0.0",
+    "name": "TPOProfile",
+    "source": "app/include/blocks/indicators/volume/tpo_profile.py",
+    "category": "volume",
+    "outputs": [
+      "poc",
+      "vah",
+      "val",
+      "ib_high",
+      "ib_low"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 48,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "TPO Profile indicator with Initial Balance and Value Area boundaries.",
+      "properties": {
+        "period": {
+          "default": 48,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "profile_rows": {
+          "default": 40,
+          "minimum": 5,
+          "title": "Profile Rows",
+          "type": "integer"
+        },
+        "ib_bars": {
+          "default": 2,
+          "minimum": 1,
+          "title": "Ib Bars",
+          "type": "integer"
+        },
+        "value_area_pct": {
+          "default": 0.7,
+          "maximum": 0.99,
+          "minimum": 0.1,
+          "title": "Value Area Pct",
+          "type": "number"
+        }
+      },
+      "title": "TPOProfile",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.volume_profile",
+    "version": "1.0.0",
+    "name": "VolumeProfile",
+    "source": "app/include/blocks/indicators/volume/volume_profile.py",
+    "category": "volume",
+    "outputs": [
+      "poc",
+      "vah",
+      "val",
+      "bull_poc",
+      "bear_poc",
+      "delta",
+      "poc_pct_up",
+      "poc_pct_down",
+      "ibh",
+      "ibl"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      },
+      {
+        "name": "open",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 50,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Volume Profile indicator extracting POC, VAH, VAL, Delta, IB, and conditions.",
+      "properties": {
+        "period": {
+          "default": 50,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        },
+        "profile_rows": {
+          "default": 50,
+          "minimum": 5,
+          "title": "Profile Rows",
+          "type": "integer"
+        },
+        "value_area_pct": {
+          "default": 0.7,
+          "maximum": 0.99,
+          "minimum": 0.1,
+          "title": "Value Area Pct",
+          "type": "number"
+        },
+        "ib_bars": {
+          "default": 4,
+          "minimum": 1,
+          "title": "Ib Bars",
+          "type": "integer"
+        }
+      },
+      "title": "VolumeProfile",
+      "type": "object"
+    }
+  },
+  {
+    "id": "indicator.volume.vwap",
+    "version": "1.0.0",
+    "name": "VWAP",
+    "source": "app/include/blocks/indicators/volume/vwap.py",
+    "category": "volume",
+    "outputs": [
+      "value"
+    ],
+    "inputs": [
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      },
+      {
+        "name": "open",
+        "required": false
+      }
+    ],
+    "required_market_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": true,
+    "required_history": 10,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Rolling Volume Weighted Average Price indicator with condition helpers.",
+      "properties": {
+        "period": {
+          "default": 10,
+          "minimum": 1,
+          "title": "Period",
+          "type": "integer"
+        }
+      },
+      "title": "VWAP",
+      "type": "object"
+    }
+  }
+]

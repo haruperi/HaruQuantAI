@@ -1,11 +1,12 @@
-"""Unit tests for CandlestickPatterns in app.include.indicators.price_action.candlestick_patterns."""
+"""Unit tests for CandlestickPatterns in app.include.blocks.indicators.price_action.candlestick_patterns."""
 
 from __future__ import annotations
 
 import pytest
-from app.include.indicators.price_action.candlestick_patterns import (
+from app.include.blocks.indicators.price_action.candlestick_patterns import (
     CandlestickPatterns,
 )
+from app.include.blocks.series import BarData
 
 
 def test_doji_tick_size_and_ratio_modes() -> None:
@@ -18,15 +19,17 @@ def test_doji_tick_size_and_ratio_modes() -> None:
     low = [1.09900, 1.09900, 1.10000]
     c = [1.10004, 1.10010, 1.10150]
 
-    res_tick = CandlestickPatterns.calculate(o, h, low, c, tick_size=0.0001, digits=5)
+    res_tick = CandlestickPatterns(tick_size=0.0001, digits=5).calculate(
+        BarData.from_arrays(open=o, high=h, low=low, close=c)
+    )
     assert CandlestickPatterns.is_doji(res_tick["doji"], shift=2) is True
     assert CandlestickPatterns.is_doji(res_tick, shift=1) is False
     assert CandlestickPatterns.is_doji(res_tick, shift=0) is False
     assert CandlestickPatterns.is_doji(res_tick, shift=99) is False
 
-    res_ratio = CandlestickPatterns.calculate(
-        o, h, low, c, doji_ratio=0.10, tick_size=0.0001, digits=5
-    )
+    res_ratio = CandlestickPatterns(
+        doji_ratio=0.1, tick_size=0.0001, digits=5
+    ).calculate(BarData.from_arrays(open=o, high=h, low=low, close=c))
     assert CandlestickPatterns.is_doji(res_ratio["doji"], shift=2) is True
     assert CandlestickPatterns.is_doji(res_ratio["doji"], shift=1) is True
     assert CandlestickPatterns.is_doji(res_ratio["doji"], shift=0) is False
@@ -42,7 +45,9 @@ def test_bullish_and_bearish_engulfing_strict_body_inequality() -> None:
     low = [1.1005, 1.1005, 1.1000, 1.0995]
     c = [1.1010, 1.1020, 1.1005, 1.1030]
 
-    res = CandlestickPatterns.calculate(o, h, low, c, tick_size=0.0001, digits=4)
+    res = CandlestickPatterns(tick_size=0.0001, digits=4).calculate(
+        BarData.from_arrays(open=o, high=h, low=low, close=c)
+    )
     # Shift 2 is Bar 1 (equal body size -> must be False)
     assert CandlestickPatterns.is_bullish_engulfing(res, shift=2) is False
     assert CandlestickPatterns.is_bearish_engulfing(res, shift=2) is False
@@ -79,7 +84,9 @@ def test_hammer_and_shooting_star_four_bar_context() -> None:
     low = [1.1050, 1.1040, 1.1030, 1.1000, 1.1063]
     c = [1.1055, 1.1045, 1.1035, 1.1030, 1.1065]
 
-    res = CandlestickPatterns.calculate(o, h, low, c, tick_size=0.0001, digits=4)
+    res = CandlestickPatterns(tick_size=0.0001, digits=4).calculate(
+        BarData.from_arrays(open=o, high=h, low=low, close=c)
+    )
     # Shift 1 is Bar 3 (Hammer)
     assert CandlestickPatterns.is_hammer(res, shift=1) is True
     assert CandlestickPatterns.is_hammer(res["hammer"], shift=1) is True
@@ -108,7 +115,9 @@ def test_dark_cloud_and_piercing_line_with_min_candle_length() -> None:
     low = [1.0995, 1.1005, 1.0995, 1.0990, 1.1028]
     c = [1.1040, 1.1010, 1.1000, 1.1030, 1.1029]
 
-    res = CandlestickPatterns.calculate(o, h, low, c, tick_size=0.0001, digits=4)
+    res = CandlestickPatterns(tick_size=0.0001, digits=4).calculate(
+        BarData.from_arrays(open=o, high=h, low=low, close=c)
+    )
     assert CandlestickPatterns.is_dark_cloud(res, shift=3) is True
     assert CandlestickPatterns.is_dark_cloud(res["dark_cloud"], shift=3) is True
     assert CandlestickPatterns.is_piercing_line(res, shift=1) is True
@@ -124,7 +133,9 @@ def test_inside_bar_three_bar_and_validation() -> None:
     low = [1.1000, 1.0990, 1.1005, 1.0980]
     c = [1.1010, 1.1000, 1.1045, 1.0985]
 
-    res = CandlestickPatterns.calculate(o, h, low, c)
+    res = CandlestickPatterns().calculate(
+        BarData.from_arrays(open=o, high=h, low=low, close=c)
+    )
     # Bar 2: L1 (1.0990) < L0 (1.1000) and C2 (1.1045) > H1 (1.1020) -> Bullish Three-Bar
     assert CandlestickPatterns.is_bullish_three_bar(res, shift=1) is True
     # Bar 3: H2 (1.1050) > H1 (1.1020) and C3 (1.0985) < L2 (1.1005) -> Bearish Three-Bar
@@ -135,12 +146,20 @@ def test_inside_bar_three_bar_and_validation() -> None:
     h_in = [1.1050, 1.1030]
     l_in = [1.0950, 1.0970]
     c_in = [1.1020, 1.1015]
-    res_in = CandlestickPatterns.calculate(o_in, h_in, l_in, c_in)
+    res_in = CandlestickPatterns().calculate(
+        BarData.from_arrays(open=o_in, high=h_in, low=l_in, close=c_in)
+    )
     assert CandlestickPatterns.is_inside_bar(res_in, shift=0) is True
 
     with pytest.raises(ValueError, match="empty"):
-        CandlestickPatterns.calculate([], [], [], [])
+        CandlestickPatterns().calculate(
+            BarData.from_arrays(open=[], high=[], low=[], close=[])
+        )
     with pytest.raises(ValueError, match="doji_ratio"):
-        CandlestickPatterns.calculate([1.0], [1.1], [0.9], [1.0], doji_ratio=1.5)
+        CandlestickPatterns(doji_ratio=1.5).calculate(
+            BarData.from_arrays(open=[1.0], high=[1.1], low=[0.9], close=[1.0])
+        )
     with pytest.raises(ValueError, match="tick_size"):
-        CandlestickPatterns.calculate([1.0], [1.1], [0.9], [1.0], tick_size=0.0)
+        CandlestickPatterns(tick_size=0.0).calculate(
+            BarData.from_arrays(open=[1.0], high=[1.1], low=[0.9], close=[1.0])
+        )

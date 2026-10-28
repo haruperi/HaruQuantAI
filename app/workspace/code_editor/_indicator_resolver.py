@@ -7,8 +7,7 @@ import inspect
 from pathlib import Path
 from typing import Any
 
-from app.include.blocks.indicators.base import BaseIndicator as CanonicalBaseIndicator
-from app.include.indicators.base import BaseIndicator as LegacyBaseIndicator
+from app.include.blocks.indicators.base import BaseIndicator
 from app.workspace.code_editor._common import (
     INCLUDE_DIR,
     PROJECT_ROOT,
@@ -18,10 +17,7 @@ from app.workspace.code_editor._common import (
 )
 from app.workspace.code_editor.registry import registry
 
-INDICATOR_ROOTS: tuple[Path, ...] = (
-    INCLUDE_DIR / "blocks" / "indicators",
-    INCLUDE_DIR / "indicators",
-)
+INDICATOR_ROOTS: tuple[Path, ...] = (INCLUDE_DIR / "blocks" / "indicators",)
 
 
 def _normalize(name: str) -> str:
@@ -50,7 +46,7 @@ def _safe_indicator_path(path: Path) -> Path:
                         return resolved
                     raise CodeEditorError(f"Indicator file not found: {path}")
         raise CodeEditorError(
-            "Choose a public Python file in app/include/blocks/indicators or app/include/indicators"
+            "Choose a public Python file in app/include/blocks/indicators"
         )
 
     # Relative path without leading app/
@@ -90,8 +86,7 @@ def _classes(path: Path) -> dict[str, type[Any]]:
     return {
         name: cls
         for name, cls in cached.items()
-        if issubclass(cls, (LegacyBaseIndicator, CanonicalBaseIndicator))
-        and not inspect.isabstract(cls)
+        if issubclass(cls, BaseIndicator) and not inspect.isabstract(cls)
     }
 
 

@@ -1,0 +1,3508 @@
+[
+  {
+    "name": "AwesomeOscillator",
+    "old": "app/include/indicators/momentum/awesome_oscillator.py",
+    "new": "app/include/blocks/indicators/momentum/awesome_oscillator.py",
+    "id": "indicator.momentum.awesome_oscillator",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "fast_period": 5,
+          "slow_period": 34
+        },
+        "hashes": {
+          "value": "defe2e8c4ca740fa5458aa9aa6d1509bd75803ac40598903461fcc5b0a38ee1e"
+        },
+        "first_valid": {
+          "value": 33
+        },
+        "causal": true,
+        "baseline_ms": 0.31269999817595817
+      },
+      {
+        "parameters": {
+          "fast_period": 5,
+          "slow_period": 17
+        },
+        "hashes": {
+          "value": "1303e986740795effdd772a8162e295eac613875455cdc080e6d737bfeb9a297"
+        },
+        "first_valid": {
+          "value": 16
+        },
+        "causal": true,
+        "baseline_ms": 0.10639999891282059
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "BearsPower",
+    "old": "app/include/indicators/momentum/bears_power.py",
+    "new": "app/include/blocks/indicators/momentum/bears_power.py",
+    "id": "indicator.momentum.bears_power",
+    "inputs": [
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "d646f909c056e5121a7e5baeedbac2fcbccfb9278edcbfd6110c21d038f848aa"
+        },
+        "first_valid": {
+          "value": 13
+        },
+        "causal": true,
+        "baseline_ms": 0.21080000078654848
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "2ffdc34ba5d139d21a33a7a92977c094268d1cf7a3981e4194f683d0e20a0ac6"
+        },
+        "first_valid": {
+          "value": 6
+        },
+        "causal": true,
+        "baseline_ms": 0.1336999994236976
+      }
+    ],
+    "required_inputs": [
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "BullsPower",
+    "old": "app/include/indicators/momentum/bulls_power.py",
+    "new": "app/include/blocks/indicators/momentum/bulls_power.py",
+    "id": "indicator.momentum.bulls_power",
+    "inputs": [
+      "high",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "8223e07da55f443054125064846a2c44361df20750560f4d33010f896d3051a7"
+        },
+        "first_valid": {
+          "value": 13
+        },
+        "causal": true,
+        "baseline_ms": 0.16400000095018186
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "4be39193a1b43d4cb09012efccd57dc4a4051f511027e3c52bffbf2b00d15605"
+        },
+        "first_valid": {
+          "value": 6
+        },
+        "causal": true,
+        "baseline_ms": 0.13110000145388767
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "close"
+    ]
+  },
+  {
+    "name": "CCI",
+    "old": "app/include/indicators/momentum/cci.py",
+    "new": "app/include/blocks/indicators/momentum/cci.py",
+    "id": "indicator.momentum.cci",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "667aa39fe9b36b210aa569a965d3e1e016facf6c721381c1c77f1b6f0bbd4a25"
+        },
+        "first_valid": {
+          "value": 13
+        },
+        "causal": true,
+        "baseline_ms": 2.8396999987307936
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "794f244fc12dd80eea9c31d45e5fbee0bb660ec87b4642be5b44e1a62c0e018b"
+        },
+        "first_valid": {
+          "value": 6
+        },
+        "causal": true,
+        "baseline_ms": 2.807499997288687
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "DeMarker",
+    "old": "app/include/indicators/momentum/demarker.py",
+    "new": "app/include/blocks/indicators/momentum/demarker.py",
+    "id": "indicator.momentum.demarker",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "5c283f80ba37ebe6b96c4421e15fc62991b22be5cf8853ba6025d4e9d1759391"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.18519999866839498
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "5f84521b17dcde75d587cee7b01e1258efd8ab753bfd9590105c3d68b5610c1f"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.11559999984456226
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "LaguerreRSI",
+    "old": "app/include/indicators/momentum/laguerre_rsi.py",
+    "new": "app/include/blocks/indicators/momentum/laguerre_rsi.py",
+    "id": "indicator.momentum.laguerre_rsi",
+    "inputs": [
+      "price"
+    ],
+    "provided_inputs": [
+      "price"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "gamma": 0.5
+        },
+        "hashes": {
+          "value": "df2f52a135974366ddf4a4cd8d5a8dfb6e864e68b1836590e2167fb77049e4be"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.1541000021679793
+      }
+    ],
+    "required_inputs": [
+      "price"
+    ]
+  },
+  {
+    "name": "Momentum",
+    "old": "app/include/indicators/momentum/momentum.py",
+    "new": "app/include/blocks/indicators/momentum/momentum.py",
+    "id": "indicator.momentum.momentum",
+    "inputs": [
+      "data"
+    ],
+    "provided_inputs": [
+      "data"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "23efbc3fd3e23184fd2d03b16ef0af9758a9d5f0ce4d449d5a85a5da27dd18ee"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.7358000002568588
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "aed5751ce2ed1b99d9c5d35c5baff94d2ab04dd0ab6f0989a49f7f91bfc75634"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.6985999971220735
+      }
+    ],
+    "required_inputs": [
+      "data"
+    ]
+  },
+  {
+    "name": "OSMA",
+    "old": "app/include/indicators/momentum/osma.py",
+    "new": "app/include/blocks/indicators/momentum/osma.py",
+    "id": "indicator.momentum.osma",
+    "inputs": [
+      "data"
+    ],
+    "provided_inputs": [
+      "data"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "fast_ema": 12,
+          "slow_ema": 26,
+          "signal_period": 9
+        },
+        "hashes": {
+          "value": "d8c1b852d1ec80c8248abed5ac6e12ccbb3194cf0ae14beb3684a5bb0db85587"
+        },
+        "first_valid": {
+          "value": 33
+        },
+        "causal": true,
+        "baseline_ms": 0.31939999826136045
+      },
+      {
+        "parameters": {
+          "fast_ema": 6,
+          "slow_ema": 26,
+          "signal_period": 9
+        },
+        "hashes": {
+          "value": "d85af0dcf9d8ebdf948ffc73e1dab7ea33ae3e6c3c90b892f5190510ad9a811d"
+        },
+        "first_valid": {
+          "value": 33
+        },
+        "causal": true,
+        "baseline_ms": 0.24050000138231553
+      }
+    ],
+    "required_inputs": [
+      "data"
+    ]
+  },
+  {
+    "name": "PriceVelocity",
+    "old": "app/include/indicators/momentum/price_velocity.py",
+    "new": "app/include/blocks/indicators/momentum/price_velocity.py",
+    "id": "indicator.momentum.price_velocity",
+    "inputs": [
+      "price"
+    ],
+    "provided_inputs": [
+      "price"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 10,
+          "smooth_period": 1
+        },
+        "hashes": {
+          "velocity": "010bae21fafd98cfe6c41c45cf060685253880df7b7ae67ff06dd9087a145eb4",
+          "normalized": "ebe552b133b039bf5b8c06dda26259027a0d93a0ccf7108324bdc66d7c51d5e0"
+        },
+        "first_valid": {
+          "velocity": 0,
+          "normalized": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.5204000008234289
+      },
+      {
+        "parameters": {
+          "period": 5,
+          "smooth_period": 1
+        },
+        "hashes": {
+          "velocity": "9e1766a6e1db7ef8d5d1e45699f2fed877d8661834ab4f00b68c130b346cdcfd",
+          "normalized": "6f9538f2250aa48a080bf5b4be940c929be7820880e6a1a622aef94e227f0e5c"
+        },
+        "first_valid": {
+          "velocity": 0,
+          "normalized": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.4827999982808251
+      }
+    ],
+    "required_inputs": [
+      "price"
+    ]
+  },
+  {
+    "name": "QQE",
+    "old": "app/include/indicators/momentum/qqe.py",
+    "new": "app/include/blocks/indicators/momentum/qqe.py",
+    "id": "indicator.momentum.qqe",
+    "inputs": [
+      "price"
+    ],
+    "provided_inputs": [
+      "price"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "rsi_period": 14,
+          "sf": 5,
+          "wf": 4.236
+        },
+        "hashes": {
+          "value1": "5f1b2df29dbb5cedbc0e4dc046802e55652f45c5a68c91ec545c5df2cca51194",
+          "value2": "1060f4590901fc14fddaf95b0c5674e7eaf442831db53ee01b2bc8f32106a1a2"
+        },
+        "first_valid": {
+          "value1": 0,
+          "value2": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.556499999423977
+      },
+      {
+        "parameters": {
+          "rsi_period": 7,
+          "sf": 5,
+          "wf": 4.236
+        },
+        "hashes": {
+          "value1": "ab854e00736331f6659a9ed628eb3abdb260b294186ecd6bb69a35963fd3927f",
+          "value2": "942a45e2dcd40fd84a7bf0e26d1cc03a35ef1b43b4ff175ac93bbbabbb729f67"
+        },
+        "first_valid": {
+          "value1": 0,
+          "value2": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.49289999899338
+      }
+    ],
+    "required_inputs": [
+      "price"
+    ]
+  },
+  {
+    "name": "Reflex",
+    "old": "app/include/indicators/momentum/reflex.py",
+    "new": "app/include/blocks/indicators/momentum/reflex.py",
+    "id": "indicator.momentum.reflex",
+    "inputs": [
+      "price"
+    ],
+    "provided_inputs": [
+      "price"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20,
+          "slow_period": null
+        },
+        "hashes": {
+          "reflex": "62df2e194341de0ec3a670460e8a91021f13d59e7db0bbe628ffeb711091b7c6",
+          "fast": "62df2e194341de0ec3a670460e8a91021f13d59e7db0bbe628ffeb711091b7c6"
+        },
+        "first_valid": {
+          "reflex": 0,
+          "fast": 0
+        },
+        "causal": true,
+        "baseline_ms": 4.855499999393942
+      },
+      {
+        "parameters": {
+          "period": 10,
+          "slow_period": null
+        },
+        "hashes": {
+          "reflex": "92fb29a57ab439f0140d78bc7399539819cf2fbbc41af3d0cda2b42ed14b4fa5",
+          "fast": "92fb29a57ab439f0140d78bc7399539819cf2fbbc41af3d0cda2b42ed14b4fa5"
+        },
+        "first_valid": {
+          "reflex": 0,
+          "fast": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.674499999557156
+      }
+    ],
+    "required_inputs": [
+      "price"
+    ]
+  },
+  {
+    "name": "ROC",
+    "old": "app/include/indicators/momentum/roc.py",
+    "new": "app/include/blocks/indicators/momentum/roc.py",
+    "id": "indicator.momentum.roc",
+    "inputs": [
+      "data"
+    ],
+    "provided_inputs": [
+      "data"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 5
+        },
+        "hashes": {
+          "value": "8b33ee92bbccd70494dbcf99198a1766566b3d4622e6d687b68b6b20bd3fddc4"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.6792999993194826
+      }
+    ],
+    "required_inputs": [
+      "data"
+    ]
+  },
+  {
+    "name": "SchaffTrendCycle",
+    "old": "app/include/indicators/momentum/schaff_trend_cycle.py",
+    "new": "app/include/blocks/indicators/momentum/schaff_trend_cycle.py",
+    "id": "indicator.momentum.schaff_trend_cycle",
+    "inputs": [
+      "price"
+    ],
+    "provided_inputs": [
+      "price"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "stoch_period": 10,
+          "fast_period": 20,
+          "slow_period": 50,
+          "factor": 0.5
+        },
+        "hashes": {
+          "value": "ed1ca420af641b95188cdc968578ed00c2b41270c08eb78b45e295c231d04e75"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 4.79540000014822
+      },
+      {
+        "parameters": {
+          "stoch_period": 5,
+          "fast_period": 20,
+          "slow_period": 50,
+          "factor": 0.5
+        },
+        "hashes": {
+          "value": "43de21056b20b40ae0d2d83b974a634493d56a57b71f0fd2e855cdb7bc13abc6"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 4.647300000215182
+      }
+    ],
+    "required_inputs": [
+      "price"
+    ]
+  },
+  {
+    "name": "Stochastic",
+    "old": "app/include/indicators/momentum/stochastic.py",
+    "new": "app/include/blocks/indicators/momentum/stochastic.py",
+    "id": "indicator.momentum.stochastic",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "k_period": 14,
+          "d_period": 3,
+          "slowing": 3
+        },
+        "hashes": {
+          "k": "bd3135060d685dc99b322338309f2135c80a4a7569c90721da3e39b9dee5a282",
+          "d": "c01104ffa66ca4a254c473f0708e19a2e440abc7732c15e63133c0bc16136dd2"
+        },
+        "first_valid": {
+          "k": 15,
+          "d": 17
+        },
+        "causal": true,
+        "baseline_ms": 2.5549999991199
+      },
+      {
+        "parameters": {
+          "k_period": 7,
+          "d_period": 3,
+          "slowing": 3
+        },
+        "hashes": {
+          "k": "3c9d143d24475fa7f5a90f0c28bf9fb9f40eb22f0969ab00f1dfba561198ea16",
+          "d": "a2299684e7dde29d9b006ec4c14e31d9dedc52d45b6628c57babfea4dd51eeab"
+        },
+        "first_valid": {
+          "k": 8,
+          "d": 10
+        },
+        "causal": true,
+        "baseline_ms": 2.391699999861885
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "WaveTrend",
+    "old": "app/include/indicators/momentum/wave_trend.py",
+    "new": "app/include/blocks/indicators/momentum/wave_trend.py",
+    "id": "indicator.momentum.wave_trend",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "channel_length": 10,
+          "average_length": 21,
+          "signal_length": 4
+        },
+        "hashes": {
+          "wt1": "42147cdc78e60d99de3227af12a90d7db940fc28ad0716e0cbe3410bd582b2f7",
+          "wt2": "7f49670e7e8d207fca06c3b30429db3df0df456eb20f8780e88b77f8bfab9b19"
+        },
+        "first_valid": {
+          "wt1": 0,
+          "wt2": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.9924000005412381
+      },
+      {
+        "parameters": {
+          "channel_length": 5,
+          "average_length": 21,
+          "signal_length": 4
+        },
+        "hashes": {
+          "wt1": "62c753b2e14ed6f0ba542eca36439bac3bb7c9d309128366bf75dd7b1dd43b78",
+          "wt2": "47b0754ae1f41794c968b0be7915dafe900214d6dc5a789f3d615eb0f0b8295c"
+        },
+        "first_valid": {
+          "wt1": 0,
+          "wt2": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.1002999999618623
+      }
+    ],
+    "required_inputs": [
+      "high"
+    ]
+  },
+  {
+    "name": "WilliamsPR",
+    "old": "app/include/indicators/momentum/williams_pr.py",
+    "new": "app/include/blocks/indicators/momentum/williams_pr.py",
+    "id": "indicator.momentum.williams_pr",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "133113aa7aebf35c41ae41cc2b62e75ad62235afd95e7f4ac31cfc09c478f4d1"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.408700001979014
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "63085c88aa3150004e4adf1f45bbc94601fd117c23477e8c1dd3171da50a3c34"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.370800000790041
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "CandlestickPatterns",
+    "old": "app/include/indicators/price_action/candlestick_patterns.py",
+    "new": "app/include/blocks/indicators/price_action/candlestick_patterns.py",
+    "id": "indicator.price_action.candlestick_patterns",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "doji_ratio": null,
+          "tick_size": 0.0001,
+          "digits": 5
+        },
+        "hashes": {
+          "doji": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15",
+          "bullish_engulfing": "ac4dd4feb12171db58198b77bace02b9d6ecbc0208960dfbf4ccbb8fae666e9f",
+          "bearish_engulfing": "bded9f55a0e30a4b8777f1b520e25c9a3bb67ec0980f42dc6844e48cb5775104",
+          "engulfing": "74038aca0e52b93fecf7bb5feec0ffc196531f28d23e76b7f4a69f00b3f91bbb",
+          "hammer": "dc5b9be9382435ef7b4ce175aeef3ecf85585f3500dfaef8281458bf734a8ce3",
+          "shooting_star": "864d96001b71e771c346c1509a633fe6aa884d67b3b1a2dcd8d2cac8a6f6345f",
+          "pinbar": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15",
+          "inside_bar": "5d283828daf0814290aba9cb99098e133089f138ae8eb9f35607b1c1957eac02",
+          "three_bar": "20fad874252395981dce57a542f4722d1bd9910efe1ae459e2d515624c97cc89",
+          "dark_cloud": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15",
+          "piercing_line": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+        },
+        "first_valid": {
+          "doji": 0,
+          "bullish_engulfing": 0,
+          "bearish_engulfing": 0,
+          "engulfing": 0,
+          "hammer": 0,
+          "shooting_star": 0,
+          "pinbar": 0,
+          "inside_bar": 0,
+          "three_bar": 0,
+          "dark_cloud": 0,
+          "piercing_line": 0
+        },
+        "causal": true,
+        "baseline_ms": 5.423700000392273
+      }
+    ],
+    "required_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "ChartPatterns",
+    "old": "app/include/indicators/price_action/chart_patterns.py",
+    "new": "app/include/blocks/indicators/price_action/chart_patterns.py",
+    "id": "indicator.price_action.chart_patterns",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "lookback": 50,
+          "tolerance_pct": 0.03
+        },
+        "hashes": {
+          "double_pattern": "4166f09279a72103d267ff4c7b4668b0536aaed6563c8228eb8d1b35d7556718",
+          "breakout_retest": "33be70b9feadde6d34ccca37a2d32c138ab22a1344dc49a141365eb85f38d982"
+        },
+        "first_valid": {
+          "double_pattern": 0,
+          "breakout_retest": 0
+        },
+        "causal": true,
+        "baseline_ms": 7.235299999592826
+      },
+      {
+        "parameters": {
+          "lookback": 25,
+          "tolerance_pct": 0.03
+        },
+        "hashes": {
+          "double_pattern": "e8ab78e088ab2793b740f920f63ab3aea0b5cc8cc71ac3b90935ecf6767a88e7",
+          "breakout_retest": "ad765e73de7c16b2b600114baa5e43f512cb92dc6ccb5dd9a7d93b66ac44d8d4"
+        },
+        "first_valid": {
+          "double_pattern": 0,
+          "breakout_retest": 0
+        },
+        "causal": true,
+        "baseline_ms": 8.098700000118697
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "Fibo",
+    "old": "app/include/indicators/price_action/fibo.py",
+    "new": "app/include/blocks/indicators/price_action/fibo.py",
+    "id": "indicator.price_action.fibo",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "open_prices"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close",
+      "open_prices"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14,
+          "custom_level": null
+        },
+        "hashes": {
+          "level_23_6": "c2a93fdbeca591be3eda43a9de584605dd82adb4017d8f909048b186decf5a8e",
+          "level_38_2": "36b83a4ee5ea1889f7770388b7885cb65682a0a6ef917959286b54f4773d7c28",
+          "level_50_0": "b99e34a70d70c7c0d0b4fef6ca13bf4a05ce9ad97be09f1259d6403407542db7",
+          "level_61_8": "d4b6bb34ad09f0b5996c97fea6170435c9c5b3901654fd4ef4d5fa4f2d156aeb",
+          "level_78_6": "47a042d97234e9d4324ea7a2c3f8374d14f34aa2cf392bc4353e4091c8e7aad1",
+          "level_100_0": "b7c3a6529f82d67317ba92f5dff0a94d2e1ab580ed403a083fcc297a22e5ff1f",
+          "level_161_8": "7ba193221bbd4bd08ff22d93af126ad060ffcbe9bfb0b599719a6f11e201de47"
+        },
+        "first_valid": {
+          "level_23_6": 13,
+          "level_38_2": 13,
+          "level_50_0": 13,
+          "level_61_8": 13,
+          "level_78_6": 13,
+          "level_100_0": 13,
+          "level_161_8": 13
+        },
+        "causal": true,
+        "baseline_ms": 3.4655999988899566
+      },
+      {
+        "parameters": {
+          "period": 7,
+          "custom_level": null
+        },
+        "hashes": {
+          "level_23_6": "6b94d87a0046aadd2c3b6ee12a615238567459bd44825d3b572c7c59c88e0aa0",
+          "level_38_2": "d88454ebaf1acf043506a5ca80a19ca52cd628b855ac8159a91833383ecf4611",
+          "level_50_0": "6f12cde881eeeee59a3edf722186e199530328553cb02b8da77b6a2c17333300",
+          "level_61_8": "328f44a9cac4dc9e131a7a19aa5a81a792f02a8fd58bcecae43301e840bef469",
+          "level_78_6": "d6d2bc90a2990e0eeaef25b9ef248bd3027f931f3c240380ffd28dfe6a4e5856",
+          "level_100_0": "9cf827e52c7c77b4bed2cc1d45ca7a36f6532de5dd59394858a06b1518b84779",
+          "level_161_8": "bc257ebcf46dc123ea9579f37914ed709cb9fc8c8245f5b11aa128aea5a08d54"
+        },
+        "first_valid": {
+          "level_23_6": 6,
+          "level_38_2": 6,
+          "level_50_0": 6,
+          "level_61_8": 6,
+          "level_78_6": 6,
+          "level_100_0": 6,
+          "level_161_8": 6
+        },
+        "causal": true,
+        "baseline_ms": 3.481299998384202
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "added_outputs": [
+      "custom"
+    ]
+  },
+  {
+    "name": "Fractal",
+    "old": "app/include/indicators/price_action/fractal.py",
+    "new": "app/include/blocks/indicators/price_action/fractal.py",
+    "id": "indicator.price_action.fractal",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "fractal_bars": 5
+        },
+        "hashes": {
+          "up": "2edbf533e130b865111b19482fd048803ad34ff827db3fcabe8b70006956dc6f",
+          "down": "a80bcafc8055f89c84a99025ce41358a94c67edbf97ab73d390e9fdedb7f60b0"
+        },
+        "first_valid": {
+          "up": 0,
+          "down": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.9329000022262335
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "HeikenAshi",
+    "old": "app/include/indicators/price_action/heiken_ashi.py",
+    "new": "app/include/blocks/indicators/price_action/heiken_ashi.py",
+    "id": "indicator.price_action.heiken_ashi",
+    "inputs": [
+      "open_prices",
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "open_prices",
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {},
+        "hashes": {
+          "open": "83da6ab6bdc7b47aa2493a185c5d687eb4a584e6241e856c085b5085d9f30f8d",
+          "high": "37294775c78717ce3d32c35a3396308e4aa77877098eff1150288702dd31e5fc",
+          "low": "824f7e055d642e168978c5281d25761790e3bac4b1de9d4cad696159e0522634",
+          "close": "d825e7b249458f75bd7e5efe9adcd6858664e6c0846abfb1862c3f8c708b181b"
+        },
+        "first_valid": {
+          "open": 0,
+          "high": 0,
+          "low": 0,
+          "close": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.8374999997613486
+      }
+    ],
+    "required_inputs": [
+      "open_prices",
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "HighestLowest",
+    "old": "app/include/indicators/price_action/highest_lowest.py",
+    "new": "app/include/blocks/indicators/price_action/highest_lowest.py",
+    "id": "indicator.price_action.highest_lowest",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "highest": "f72957ead11e99ed58866df1dc2e5f2d67cf5907788b40c5682d4fdd2e28716f",
+          "lowest": "9b206237304c2dc69fce08b661e0ab274866b18c4602186bdb30b0b94ef9c3bd",
+          "highest_index": "c43d781b7d11fcfcd8c92b1698aa27990a3e8d6469d85f8f2e8bfed078a04db3",
+          "lowest_index": "fc203856da64634728396584851f4c61248c022bbc47282ac3a98cab0298b5fd"
+        },
+        "first_valid": {
+          "highest": 0,
+          "lowest": 0,
+          "highest_index": 0,
+          "lowest_index": 0
+        },
+        "causal": true,
+        "baseline_ms": 10.459099998115562
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "highest": "f62eeff979d4c321d230c099b976fbbf1225a44144a064191a1311ad8bb473da",
+          "lowest": "ffe4ec2aaeeaf88bd4ee56ea17a638190ff12e8b8d52120ecf976b58998b98d3",
+          "highest_index": "427889cf3f06506ee0327db230ee7083ea1a3ec8dc721dec6f24cd880f6ced4f",
+          "lowest_index": "79df1c02ae81129c44c32c7b4ea62bac3c7563b5afe372e59d5b9b065ba00c86"
+        },
+        "first_valid": {
+          "highest": 0,
+          "lowest": 0,
+          "highest_index": 0,
+          "lowest_index": 0
+        },
+        "causal": true,
+        "baseline_ms": 4.128500000661006
+      }
+    ],
+    "required_inputs": [
+      "high"
+    ]
+  },
+  {
+    "name": "LevelClustering",
+    "old": "app/include/indicators/price_action/level_clustering.py",
+    "new": "app/include/blocks/indicators/price_action/level_clustering.py",
+    "id": "indicator.price_action.level_clustering",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "lookback": 50,
+          "tolerance": 1.0
+        },
+        "hashes": {
+          "cluster_price": "2656a0852d248f27ca2567fe6bc965b6d4b73e71fd1221f47b862181badbf74b",
+          "cluster_weight": "b5616754f528da29584ae3e41e4d6fc0c2aab3ad98528482cff689a0c7dc6c1b",
+          "cluster_found": "a649bcf579631001da25588ae942521a5f4939133bee2541754cb2035916b060"
+        },
+        "first_valid": {
+          "cluster_price": 0,
+          "cluster_weight": 0,
+          "cluster_found": 0
+        },
+        "causal": true,
+        "baseline_ms": 41.53840000071796
+      },
+      {
+        "parameters": {
+          "lookback": 25,
+          "tolerance": 1.0
+        },
+        "hashes": {
+          "cluster_price": "cdc724ddfc1313fe8bde4fa62acab4d361afe4c0b82966e1bb0d981e2548b551",
+          "cluster_weight": "32a68044a0f2800dd715c6cda9466d0b77d76e83510a2e092f940273fb9852f0",
+          "cluster_found": "a649bcf579631001da25588ae942521a5f4939133bee2541754cb2035916b060"
+        },
+        "first_valid": {
+          "cluster_price": 0,
+          "cluster_weight": 0,
+          "cluster_found": 0
+        },
+        "causal": true,
+        "baseline_ms": 21.71280000038678
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "Pivots",
+    "old": "app/include/indicators/price_action/pivots.py",
+    "new": "app/include/blocks/indicators/price_action/pivots.py",
+    "id": "indicator.price_action.pivots",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "timestamps"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close",
+      "timestamps"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 1
+        },
+        "hashes": {
+          "pp": "7e1c5eeca615a428f6b60c1c8d79db2f1dfbd6716741dc13e12b4bbab95d7cf7",
+          "r1": "5975b437cd4f87034f358bfad04430f930c58eff2cb74ad6656dc5c1fbac9d84",
+          "r2": "41ee0bb1ba05e32ac49aa6f6c2d8cc033ecabc1ddd97de695b44d3ddc92c3611",
+          "r3": "079acdc3f3f939be3f7a62072979a9d6ed87d8f865f003a5003866bc5699ec81",
+          "s1": "0829efab34938b5b8bf1b2f176f1d4cd4113a2ce8ce3ed8eb5af2bc08ac0c10b",
+          "s2": "d9fe86eb5890d81088fbdda3b8aa89e3086a560f67c514a633a10b75f9c86ef6",
+          "s3": "75a618096a5050a766b27242d6be665d564840cc81a22a50e11f43e9a7953419"
+        },
+        "first_valid": {
+          "pp": 1,
+          "r1": 1,
+          "r2": 1,
+          "r3": 1,
+          "s1": 1,
+          "s2": 1,
+          "s3": 1
+        },
+        "causal": true,
+        "baseline_ms": 1.220800000737654
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "PriceGap",
+    "old": "app/include/indicators/price_action/price_gap.py",
+    "new": "app/include/blocks/indicators/price_action/price_gap.py",
+    "id": "indicator.price_action.price_gap",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "full_gap": true
+        },
+        "hashes": {
+          "gap_size": "1870f61901d5a7d4fd72a6d0a134cf9f5b49f92a7f631f42bc6d2d2f6d00e0de",
+          "gap_filled": "8ce8ba8e726ee8925e6560d86ac35be1097691d1cfac888e6bd20e804ea9eb15"
+        },
+        "first_valid": {
+          "gap_size": 0,
+          "gap_filled": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.314799999614479
+      }
+    ],
+    "required_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "ZigZag",
+    "old": "app/include/indicators/price_action/zigzag.py",
+    "new": "app/include/blocks/indicators/price_action/zigzag.py",
+    "id": "indicator.price_action.zigzag",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "deviation": 5.0,
+          "depth": 5
+        },
+        "hashes": {
+          "zigzag": "762dc7eb236acd486671640dfb9301dd08ed796f593c337fc06dc5a13da8af26",
+          "swing_point": "e0c71a6ac0b5d775e1ee5b69a0ae3f776f7961023c70ef155e918218b1de5607",
+          "swing_type": "0e0a7a88716d4ceed0186789e84326eaface14f1c9643f077c26adc94fdcf05a"
+        },
+        "first_valid": {
+          "zigzag": 0,
+          "swing_point": 1,
+          "swing_type": 0
+        },
+        "causal": false,
+        "baseline_ms": 0.4704000020865351
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "ChoppinessIndex",
+    "old": "app/include/indicators/regime/choppiness.py",
+    "new": "app/include/blocks/indicators/regime/choppiness.py",
+    "id": "indicator.regime.choppiness",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14,
+          "lower_threshold": 38.2,
+          "upper_threshold": 61.8
+        },
+        "hashes": {
+          "chop": "49067c3f625cf9917b56b1ca7ea8fdc028d9d129387ec3f087b889f4e1997161",
+          "regime": "b86cedc1357ca8e1cad981d2b92ea14d333fbc33f7d0f800cda637238fab966c"
+        },
+        "first_valid": {
+          "chop": 0,
+          "regime": 0
+        },
+        "causal": true,
+        "baseline_ms": 4.16159999804222
+      },
+      {
+        "parameters": {
+          "period": 7,
+          "lower_threshold": 38.2,
+          "upper_threshold": 61.8
+        },
+        "hashes": {
+          "chop": "a18fb3f372ecf262be5f2bcf1d5f46418fff523e738084b4a373b0b87def4450",
+          "regime": "b3e7295861916caab63dd5072840902e3ff96b4da16e3f1acd22b4cd3437f95d"
+        },
+        "first_valid": {
+          "chop": 0,
+          "regime": 0
+        },
+        "causal": true,
+        "baseline_ms": 4.182300002867123
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "HurstExponent",
+    "old": "app/include/indicators/regime/hurst.py",
+    "new": "app/include/blocks/indicators/regime/hurst.py",
+    "id": "indicator.regime.hurst",
+    "inputs": [
+      "price"
+    ],
+    "provided_inputs": [
+      "price"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "window": 100,
+          "min_scale": 8,
+          "max_scale": 50,
+          "scale_count": 5,
+          "lower_threshold": 0.45,
+          "upper_threshold": 0.55
+        },
+        "hashes": {
+          "hurst": "a6661f8504ecc7c88a0be96b1c734d7b7434dce0c027dd42a3c9c5822f42276f",
+          "regime": "30ef12dea96a75098158851000119304b0dea669826e42e4a0e40df7f16f6855"
+        },
+        "first_valid": {
+          "hurst": 0,
+          "regime": 0
+        },
+        "causal": true,
+        "baseline_ms": 232.60409999784315
+      },
+      {
+        "parameters": {
+          "window": 50,
+          "min_scale": 8,
+          "max_scale": 50,
+          "scale_count": 5,
+          "lower_threshold": 0.45,
+          "upper_threshold": 0.55
+        },
+        "hashes": {
+          "hurst": "c92565a1e1a89d1f699de806b8d059683c2510fa4c862a196fb76cad9d3fbe2f",
+          "regime": "d5661e69070eb39309dbdb6843a825f4c02f828d13030dd3bde013eb4745fa8f"
+        },
+        "first_valid": {
+          "hurst": 0,
+          "regime": 0
+        },
+        "causal": true,
+        "baseline_ms": 150.10909999909927
+      }
+    ],
+    "required_inputs": [
+      "price"
+    ]
+  },
+  {
+    "name": "MarketRegimeResolver",
+    "old": "app/include/indicators/regime/regime_resolver.py",
+    "new": "app/include/blocks/indicators/regime/regime_resolver.py",
+    "id": "indicator.regime.regime_resolver",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "adx_period": 14,
+          "adx_threshold": 25.0,
+          "chop_period": 14,
+          "chop_lower": 38.2,
+          "chop_upper": 61.8,
+          "donchian_period": 20
+        },
+        "hashes": {
+          "regime": "674e6339186d4322f0659a50bc32e520c74529f1af98370df5e2b2c506013560",
+          "confidence": "7207a2ba1beb90e82b25c869daca082451cef661cc57af2c7ba63c15690c5d76"
+        },
+        "first_valid": {
+          "regime": 0,
+          "confidence": 0
+        },
+        "causal": true,
+        "baseline_ms": 9.297399999923073
+      },
+      {
+        "parameters": {
+          "adx_period": 7,
+          "adx_threshold": 25.0,
+          "chop_period": 14,
+          "chop_lower": 38.2,
+          "chop_upper": 61.8,
+          "donchian_period": 20
+        },
+        "hashes": {
+          "regime": "41796a6e02f7977e362280a14011314f253f2b15c9cf1eb7aa952d470a415e1e",
+          "confidence": "c165ccd9cc71f8dfc2e5e60b62fe24bad9cc90c6f198cf698aac9385bedf184e"
+        },
+        "first_valid": {
+          "regime": 0,
+          "confidence": 0
+        },
+        "causal": true,
+        "baseline_ms": 10.188600001129089
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "ADX",
+    "old": "app/include/indicators/trend/adx.py",
+    "new": "app/include/blocks/indicators/trend/adx.py",
+    "id": "indicator.trend.adx",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "main": "82e66ba455e02dbbd39749a858393ddd3e031e652352a69c6fd68960a11e9f5f",
+          "di_plus": "7db50855d5044ee7f749a7bd7eb750449367579076ac48138262504bb1540595",
+          "di_minus": "c98fb165f2b77b73544463711206edeab656baed4a406ffba8db916c3fa12c01"
+        },
+        "first_valid": {
+          "main": 27,
+          "di_plus": 14,
+          "di_minus": 14
+        },
+        "causal": true,
+        "baseline_ms": 1.5844000008655712
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "main": "4baa2b4ad7ad1ae57c5b04c159016c703ab0d2ff6c4b36841dd44a569b74cc25",
+          "di_plus": "0e36d7dddc9c7004a0473e33770499f5dfb1f02b1c83e8cd23399b0ee2bfaab6",
+          "di_minus": "456e32d2ad816e9ccebd515d200cdc3fbddaed01971c67371da45979bdfb7d1f"
+        },
+        "first_valid": {
+          "main": 13,
+          "di_plus": 7,
+          "di_minus": 7
+        },
+        "causal": true,
+        "baseline_ms": 1.5344000021286774
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "Aroon",
+    "old": "app/include/indicators/trend/aroon.py",
+    "new": "app/include/blocks/indicators/trend/aroon.py",
+    "id": "indicator.trend.aroon",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "up": "9c68afe7abd2b8c3c995b088f12288ee1b6bc341b370d09ff345ebd871ffa528",
+          "down": "004fda2e5297ab8bcc7e9b5aaf73aa6a2a923697e9ee39fed7ad2b0fbb774d52",
+          "oscillator": "0b7b1efa55c6dccb05ae5c0113ab3c6c4c236ed179827c05e7abbb2b2c59dd58"
+        },
+        "first_valid": {
+          "up": 0,
+          "down": 0,
+          "oscillator": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.8963000002258923
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "up": "dcaa0a2167f0d3a7bdc231fce8c96c9295b4498bbe74e9f21ad5ef4adeedd9be",
+          "down": "dfb9bb0f7ffcbf4fb598d985199c239f406273b03b162f32d47b08ef9082f8ad",
+          "oscillator": "dcd16ab1f9527d6f901ee30f88a1efc95ffd7531dae8ddef26dd0a3ca86c9d30"
+        },
+        "first_valid": {
+          "up": 0,
+          "down": 0,
+          "oscillator": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.1026000031270087
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "DirectionalIndex",
+    "old": "app/include/indicators/trend/directional_index.py",
+    "new": "app/include/blocks/indicators/trend/directional_index.py",
+    "id": "indicator.trend.directional_index",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "di_plus": "7db50855d5044ee7f749a7bd7eb750449367579076ac48138262504bb1540595",
+          "di_minus": "c98fb165f2b77b73544463711206edeab656baed4a406ffba8db916c3fa12c01",
+          "dx": "7f4948e561c104c8d38b6024ff2ae73734241e41a2c0eb5a4b7c0bfca32ac617"
+        },
+        "first_valid": {
+          "di_plus": 14,
+          "di_minus": 14,
+          "dx": 14
+        },
+        "causal": true,
+        "baseline_ms": 1.694300000963267
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "di_plus": "0e36d7dddc9c7004a0473e33770499f5dfb1f02b1c83e8cd23399b0ee2bfaab6",
+          "di_minus": "456e32d2ad816e9ccebd515d200cdc3fbddaed01971c67371da45979bdfb7d1f",
+          "dx": "82e2c96bd54f592110010ee653bde026e79fb0f44cc690c8e2f540173d4025e7"
+        },
+        "first_valid": {
+          "di_plus": 7,
+          "di_minus": 7,
+          "dx": 7
+        },
+        "causal": true,
+        "baseline_ms": 1.853800000390038
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "DonchianChannels",
+    "old": "app/include/indicators/trend/donchian_channel.py",
+    "new": "app/include/blocks/indicators/trend/donchian_channel.py",
+    "id": "indicator.trend.donchian_channel",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20,
+          "offset": 0
+        },
+        "hashes": {
+          "upper": "fc5012974c811b137c2cc5b91288509ec6fa5eb7b76904b339ef571068163eea",
+          "lower": "1c8b41148d59bd44f6de58a1870f6e3587ce3519aa620ce740f79759d2ab09a3",
+          "middle": "6bc6b7043bdada98d0c548a5101085b49efed9c4e733ab2d25cee3ffb9b8694e",
+          "width": "598b6d6b9b9ad4f6896e337994a0b4d984ef4ab467610459c6293b00cac02247"
+        },
+        "first_valid": {
+          "upper": 0,
+          "lower": 0,
+          "middle": 0,
+          "width": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.4291999980050605
+      },
+      {
+        "parameters": {
+          "period": 10,
+          "offset": 0
+        },
+        "hashes": {
+          "upper": "a760f4527ebeda0786dd39bb32e74481c60cac5da78f2a7c42260ff90bed6ea4",
+          "lower": "722038e659e5ec1a6f649612344debed76b87e0548947c1aedf7dd671c0d6b18",
+          "middle": "0f08e1a45f2dc63d3fb471e8239c4efef263748315eddbd0185a8e0618e441ce",
+          "width": "d68b94929572264e49176e252ae2ed61fd2457df8f8c19552bd54d0db6c58f77"
+        },
+        "first_valid": {
+          "upper": 0,
+          "lower": 0,
+          "middle": 0,
+          "width": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.426399998512352
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "GannHiLo",
+    "old": "app/include/indicators/trend/gann_hi_lo.py",
+    "new": "app/include/blocks/indicators/trend/gann_hi_lo.py",
+    "id": "indicator.trend.gann_hi_lo",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 10
+        },
+        "hashes": {
+          "gha": "cfaa165fcda7f010b4ad5f1d4181395637ab1325c2b8e2176e337128f69850eb",
+          "gh_high": "f117f219338e569ead04684bbe308ce9abab31d7c299f3e99996df18ff912a5e",
+          "gh_low": "1646c5e09167c5d3f3ce358505ab7353e0608c30e40cfc83bad145085c385f31",
+          "trend": "f3f77f042cd1eb5c94886a2f225a479c90052ad8958ee32c7a7177c363171a5c"
+        },
+        "first_valid": {
+          "gha": 10,
+          "gh_high": 9,
+          "gh_low": 9,
+          "trend": 0
+        },
+        "causal": true,
+        "baseline_ms": 3.948199999285862
+      },
+      {
+        "parameters": {
+          "period": 5
+        },
+        "hashes": {
+          "gha": "fb97fe17755f220b121783ea19ea1584abb7a6554aa61d9acc5cd215be48b31d",
+          "gh_high": "23cbe06b3bc1c93572399829fb29a2929cb86863e1f4e34baf066cfb88974a2f",
+          "gh_low": "c8508eb091c1a995457669e22043599c448b1faa631f427925138f2b643f64d8",
+          "trend": "bc291e6e3f45ade16bf849ac507bf9aaa31b0b53e44c547ae5061e324dfb1193"
+        },
+        "first_valid": {
+          "gha": 5,
+          "gh_high": 4,
+          "gh_low": 4,
+          "trend": 0
+        },
+        "causal": true,
+        "baseline_ms": 5.132999998750165
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "HullMovingAverage",
+    "old": "app/include/indicators/trend/hull_moving_average.py",
+    "new": "app/include/blocks/indicators/trend/hull_moving_average.py",
+    "id": "indicator.trend.hull_moving_average",
+    "inputs": [
+      "close"
+    ],
+    "provided_inputs": [
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "c17a1daa6e14f0e2599386ed6f45d256dc9fcea9b96f5a6e68c41c56a363218d"
+        },
+        "first_valid": {
+          "value": 15
+        },
+        "causal": true,
+        "baseline_ms": 1.9106999970972538
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "6c22ef7577e23bff2f84144ff4230e3a7731f47455ec375856a6e37c25f67e98"
+        },
+        "first_valid": {
+          "value": 7
+        },
+        "causal": true,
+        "baseline_ms": 1.8049000027531292
+      }
+    ],
+    "required_inputs": [
+      "close"
+    ]
+  },
+  {
+    "name": "Ichimoku",
+    "old": "app/include/indicators/trend/ichimoku.py",
+    "new": "app/include/blocks/indicators/trend/ichimoku.py",
+    "id": "indicator.trend.ichimoku",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "tenkan": 9,
+          "kijun": 26,
+          "senkou": 52
+        },
+        "hashes": {
+          "tenkan_sen": "1f2647bb1f047e2fbb1dc53b1919ccf892746fd33f6c2ac1593a6e6f6458cd41",
+          "kijun_sen": "5ed1bd9d2ce5caf371964c00209c3dd3ae8cbd2b4ad0db54261cfdcf471b027f",
+          "senkou_span_a": "0725d5bfafe36edd6b1c3d5dce0572a72a08d64746f98319a70c503d3cc558a4",
+          "senkou_span_b": "d585511a2069d4a920e00cef2b7057787ae651e69780e7b73e440cf5ba7dad32",
+          "chikou_span": "7e9c654c4cdf7d7f36a271972a2bbb66ba999c4e09e3e214111ddd48aa6cff7e"
+        },
+        "first_valid": {
+          "tenkan_sen": 0,
+          "kijun_sen": 0,
+          "senkou_span_a": 26,
+          "senkou_span_b": 26,
+          "chikou_span": 0
+        },
+        "causal": false,
+        "baseline_ms": 6.957699999475153
+      },
+      {
+        "parameters": {
+          "tenkan": 9,
+          "kijun": 13,
+          "senkou": 52
+        },
+        "hashes": {
+          "tenkan_sen": "1f2647bb1f047e2fbb1dc53b1919ccf892746fd33f6c2ac1593a6e6f6458cd41",
+          "kijun_sen": "982e50d5a452774386e0141b528ec2fef282c47b2cbe6f43cab2dc07b67b4bf5",
+          "senkou_span_a": "9d4f61ba82797e15529faab751a6fd7c91716fb2b1af7d8a4e594a36a7d95e4b",
+          "senkou_span_b": "3bcdc5963cf1e025df75163973bf634d6d69164b2db4f9e86b0311390466d49d",
+          "chikou_span": "27ed8f1c0b340c015e21417477e3d0302d4e67a69b0e22ed332c7e52f5d7dd91"
+        },
+        "first_valid": {
+          "tenkan_sen": 0,
+          "kijun_sen": 0,
+          "senkou_span_a": 13,
+          "senkou_span_b": 13,
+          "chikou_span": 0
+        },
+        "causal": false,
+        "baseline_ms": 6.413500002963701
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "KAMA",
+    "old": "app/include/indicators/trend/kama.py",
+    "new": "app/include/blocks/indicators/trend/kama.py",
+    "id": "indicator.trend.kama",
+    "inputs": [
+      "close"
+    ],
+    "provided_inputs": [
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "er_period": 10,
+          "fast_period": 2,
+          "slow_period": 30
+        },
+        "hashes": {
+          "value": "9ed2b4082ff233b565b15cd121cf9a029cf980b5f179e02eb4ac2f3bb77f14e3"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.7423999997845385
+      },
+      {
+        "parameters": {
+          "er_period": 5,
+          "fast_period": 2,
+          "slow_period": 30
+        },
+        "hashes": {
+          "value": "b95300da4133349ec9e89e4f4fa85a5a88c4502c83fa3701620ac9c36b2dac1a"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.7115000009653158
+      }
+    ],
+    "required_inputs": [
+      "close"
+    ]
+  },
+  {
+    "name": "KaufmanEfficiencyRatio",
+    "old": "app/include/indicators/trend/kaufman_efficiency_ratio.py",
+    "new": "app/include/blocks/indicators/trend/kaufman_efficiency_ratio.py",
+    "id": "indicator.trend.kaufman_efficiency_ratio",
+    "inputs": [
+      "close"
+    ],
+    "provided_inputs": [
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 10
+        },
+        "hashes": {
+          "value": "f8c1a6ba4bbf285722d4d99bf888f61c1f143179bd966633c335c630f8338f68"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.4888000005157664
+      },
+      {
+        "parameters": {
+          "period": 5
+        },
+        "hashes": {
+          "value": "21970f94ced2bdba41220041ebabe3829d9f9b7ee7090c38263c3ccaec76a7a7"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.6709000010450836
+      }
+    ],
+    "required_inputs": [
+      "close"
+    ]
+  },
+  {
+    "name": "LinReg",
+    "old": "app/include/indicators/trend/lin_reg.py",
+    "new": "app/include/blocks/indicators/trend/lin_reg.py",
+    "id": "indicator.trend.lin_reg",
+    "inputs": [
+      "price"
+    ],
+    "provided_inputs": [
+      "price"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "lin_reg": "d865e7fb27763e044a6af920621757faba674ed4414c29a9b83fccf9aab0a222",
+          "slope": "1a201a02ecbcd0f119668b0d04b2336aaadcefb282d08704cdcd1f405a58d8f4",
+          "intercept": "79009a10935172e6d7b9d4e3e9db27a1d34ccdbfdcbf2564763fda16a5ea38af"
+        },
+        "first_valid": {
+          "lin_reg": 13,
+          "slope": 13,
+          "intercept": 13
+        },
+        "causal": true,
+        "baseline_ms": 3.8830000012239907
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "lin_reg": "1d55b1d315091e5749f9f196020c9507da8c54ab5a41d1bb8663524a473931b3",
+          "slope": "e27b853e8b8389563306537c07ad13bd03c3aebcc9ce78b131627158432004cd",
+          "intercept": "3cd2d6688c771b959d6abba517d31bd2d0f5ae80fb5e28e69f6e0c57d9bd89ab"
+        },
+        "first_valid": {
+          "lin_reg": 6,
+          "slope": 6,
+          "intercept": 6
+        },
+        "causal": true,
+        "baseline_ms": 3.9108000019041356
+      }
+    ],
+    "required_inputs": [
+      "price"
+    ]
+  },
+  {
+    "name": "ParabolicSAR",
+    "old": "app/include/indicators/trend/parabolic_sar.py",
+    "new": "app/include/blocks/indicators/trend/parabolic_sar.py",
+    "id": "indicator.trend.parabolic_sar",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "step": 0.02,
+          "maximum": 0.2
+        },
+        "hashes": {
+          "value": "30dfd3de2e6e0b7e26554f7fdf61b964a822f90aee6f38c2b7bbc7a7793e31e8"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.6562000016856473
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "SuperTrend",
+    "old": "app/include/indicators/trend/supertrend.py",
+    "new": "app/include/blocks/indicators/trend/supertrend.py",
+    "id": "indicator.trend.supertrend",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "mode": 1,
+          "atr_period": 24,
+          "atr_mult": 3.0
+        },
+        "hashes": {
+          "main": "4770b2ed6bfd03651650b132cc496cb06301661841e92e884201ada992fd6c98",
+          "trend": "b589657a1d406928816a26932638769bbf1430253fc8232fa830da79edd281b3",
+          "upper": "f8fa03eefe7a0af65f65434ef99bfec6c2216b9716c59322f775528e9a8fdd45",
+          "lower": "cf8b735c283376a9e5cddae5d161d7e04f333f2ea26b9469fcf931d71321cea5"
+        },
+        "first_valid": {
+          "main": 0,
+          "trend": 0,
+          "upper": 0,
+          "lower": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.573500001541106
+      },
+      {
+        "parameters": {
+          "mode": 1,
+          "atr_period": 12,
+          "atr_mult": 3.0
+        },
+        "hashes": {
+          "main": "8d216a9bf061244fa5dee7f46c9510fb547e3f069a60b5661351de8c657199d5",
+          "trend": "531c7a611c428a2c3764550411be8cd0c9b18812dd9054c91c3228977da5615f",
+          "upper": "6d96c059fbe86c0b43b66a05eb61228b6460d729735b717f9dac382b1024a06c",
+          "lower": "ff62e5b0ffec32e4c9b9a2e31589752f8b033f959245b9fce97c014db9839c1d"
+        },
+        "first_valid": {
+          "main": 0,
+          "trend": 0,
+          "upper": 0,
+          "lower": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.8592999986140057
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "Trend",
+    "old": "app/include/indicators/trend/trend.py",
+    "new": "app/include/blocks/indicators/trend/trend.py",
+    "id": "indicator.trend.trend",
+    "inputs": [
+      "price"
+    ],
+    "provided_inputs": [
+      "price"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 200,
+          "method": "sma"
+        },
+        "hashes": {
+          "trend": "2f850229d56b85c97813e7dd6b173a2f71e3738ccd7af7de5984b983b2a16bfb",
+          "baseline": "0eb6c1d1f317e20407218827eefc860fcf1e67a8923c2b1c2e32194d6e3bd37d"
+        },
+        "first_valid": {
+          "trend": 0,
+          "baseline": 199
+        },
+        "causal": true,
+        "baseline_ms": 0.772399998822948
+      },
+      {
+        "parameters": {
+          "period": 100,
+          "method": "sma"
+        },
+        "hashes": {
+          "trend": "c55705e8db5eb55889f69d3d93b0955c253bd4e3c12e4098f4a77c043c14187b",
+          "baseline": "cdb82e12fb05f7a8e7529accc57c8b48b85639088d24616b9e20c6a3e1fbb305"
+        },
+        "first_valid": {
+          "trend": 0,
+          "baseline": 99
+        },
+        "causal": true,
+        "baseline_ms": 1.5375000002677552
+      }
+    ],
+    "required_inputs": [
+      "price"
+    ]
+  },
+  {
+    "name": "Vortex",
+    "old": "app/include/indicators/trend/vortex.py",
+    "new": "app/include/blocks/indicators/trend/vortex.py",
+    "id": "indicator.trend.vortex",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "vi_plus": "3e4a56083d3bbf46e7b29e543945963308477e4a185b5ae726823c41d6100322",
+          "vi_minus": "ba944ee351ce8c4d6d10e78f4eda219059afc6bf763ef9745ce9313c4ed46119",
+          "oscillator": "b798657fd4ef5c68b5d17d60be6675b42cb52e54738f5177b5b0b771fdde7c17"
+        },
+        "first_valid": {
+          "vi_plus": 0,
+          "vi_minus": 0,
+          "oscillator": 0
+        },
+        "causal": true,
+        "baseline_ms": 3.4522999994806014
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "vi_plus": "6b20c3293382cf6bb2000cb2a32d07e4fab41cba8b233c8a4d027f950f5a5be4",
+          "vi_minus": "bdb662f3c4fe7052e5c00d2462844a82e39fd330d8633b7575a6e3c4358cb140",
+          "oscillator": "406acd871fe600c8384df1056faaf35fd593f3bc5b28dc70510658456d80b85f"
+        },
+        "first_valid": {
+          "vi_plus": 0,
+          "vi_minus": 0,
+          "oscillator": 0
+        },
+        "causal": true,
+        "baseline_ms": 3.4354000017629005
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "AverageDailyRange",
+    "old": "app/include/indicators/volatility/adr.py",
+    "new": "app/include/blocks/indicators/volatility/adr.py",
+    "id": "indicator.volatility.adr",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "adr": "c29b0f76b13d9e7d6d7fba890afa32975ce10db3652955ee1fae386ed3d4c230",
+          "stretch": "2eb434486bd42374a7d831585322a9c9a08d755c1a03b2c9f0eddf3c2c887844"
+        },
+        "first_valid": {
+          "adr": 0,
+          "stretch": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.827600000979146
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "adr": "b0f06497f1fb8f0688f8513253a30a72f378134fb7ce5be6df77ec1b4c878f13",
+          "stretch": "0bfdad4427a375beae5a1103178c913fd91a8cfd52b2eede344d61823dd91eab"
+        },
+        "first_valid": {
+          "adr": 0,
+          "stretch": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.786799999536015
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "AmihudIlliquidity",
+    "old": "app/include/indicators/volatility/amihud.py",
+    "new": "app/include/blocks/indicators/volatility/amihud.py",
+    "id": "indicator.volatility.amihud",
+    "inputs": [
+      "close",
+      "volume"
+    ],
+    "provided_inputs": [
+      "close",
+      "volume"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20,
+          "multiplier": 1000000.0
+        },
+        "hashes": {
+          "value": "2886cbc0f795043a7bab7511b465318ca9b493dea39bbaa831c92c62badb98e0"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.518900000519352
+      },
+      {
+        "parameters": {
+          "period": 10,
+          "multiplier": 1000000.0
+        },
+        "hashes": {
+          "value": "bd502190391aebedc370754cb4a2302a0b7b945b2d9eaa198df5a0e34fad32e2"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.4669000011053868
+      }
+    ],
+    "required_inputs": [
+      "close",
+      "volume"
+    ]
+  },
+  {
+    "name": "ATR",
+    "old": "app/include/indicators/volatility/atr.py",
+    "new": "app/include/blocks/indicators/volatility/atr.py",
+    "id": "indicator.volatility.atr",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "a60c6aee14bf1067e452e14557217fe5ab64bc16af86df679ea7b66e3712fd3c"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.3251000016462058
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "781516d170025b440742a014516e5a16ef6fb73137ab15dc3063394b8a565103"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.2835000013874378
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "BarRange",
+    "old": "app/include/indicators/volatility/bar_range.py",
+    "new": "app/include/blocks/indicators/volatility/bar_range.py",
+    "id": "indicator.volatility.bar_range",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {},
+        "hashes": {
+          "value": "b3104edb8d3b52a104ebfd9a358ae87be2631b751db13aff9d8b762dcfbcf400"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.06190000203787349
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "GarmanKlassVolatility",
+    "old": "app/include/indicators/volatility/garman_klass.py",
+    "new": "app/include/blocks/indicators/volatility/garman_klass.py",
+    "id": "indicator.volatility.garman_klass",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20,
+          "annualize": false,
+          "trading_periods": 252
+        },
+        "hashes": {
+          "value": "79bde85cffb5980220f14aad242f6e44eb73b2eb511868affe62ed055cd92562"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.4747999994142447
+      },
+      {
+        "parameters": {
+          "period": 10,
+          "annualize": false,
+          "trading_periods": 252
+        },
+        "hashes": {
+          "value": "cfd928a36feec33ad97bf8110751397fb20541689de92ec0a37f7ee2cf0a02ec"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.4330999983940274
+      }
+    ],
+    "required_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "KeltnerChannel",
+    "old": "app/include/indicators/volatility/keltner_channel.py",
+    "new": "app/include/blocks/indicators/volatility/keltner_channel.py",
+    "id": "indicator.volatility.keltner_channel",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20,
+          "deviation": 1.5
+        },
+        "hashes": {
+          "upper": "3a140999666e58851f08e269bef1423eaaf9e9d7ce63f8ea953f5432a0f754f8",
+          "middle": "0393d40c6465f0935c0d48c49f777ed3c8897cd0e69aeaf5a451d209b0f172c1",
+          "lower": "889c937f62c44150cdd420215a4e68d3ba7a878dcad16ce034cefd5d497f9ed7"
+        },
+        "first_valid": {
+          "upper": 19,
+          "middle": 19,
+          "lower": 19
+        },
+        "causal": true,
+        "baseline_ms": 0.1962000023922883
+      },
+      {
+        "parameters": {
+          "period": 10,
+          "deviation": 1.5
+        },
+        "hashes": {
+          "upper": "a8c1233ae5198b18c7538c6cbad489cd24c85fcb60b4762d12b167a5a46382ca",
+          "middle": "eb1007cd3918ebabbdb699be602a52bdf3845f0d07d13cb0f48d6bf3fb07fa41",
+          "lower": "3abadb2ab85dc4997717b03e2313796b5a1bbbfa4bd99ef851ec8393ff938af2"
+        },
+        "first_valid": {
+          "upper": 9,
+          "middle": 9,
+          "lower": 9
+        },
+        "causal": true,
+        "baseline_ms": 0.14910000027157366
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "MTATR",
+    "old": "app/include/indicators/volatility/mt_atr.py",
+    "new": "app/include/blocks/indicators/volatility/mt_atr.py",
+    "id": "indicator.volatility.mt_atr",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "fedb6b8c33b0c5040828d22dee81eea2947a7a6c1c57ab21f7be59ea6482b151"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.2144999998563435
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "3ea76915313ee0275bd3cf8214ae225ff0517301a07df939e3155c89a4904467"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.13110000145388767
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "MTKeltnerChannel",
+    "old": "app/include/indicators/volatility/mt_keltner_channel.py",
+    "new": "app/include/blocks/indicators/volatility/mt_keltner_channel.py",
+    "id": "indicator.volatility.mt_keltner_channel",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20,
+          "deviation": 1.5
+        },
+        "hashes": {
+          "upper": "718e72ff664f78eb39dc63e0573c5612bdcd2ed09729fe77776f32771e56ee7b",
+          "middle": "3b9778392a4f4cd8ce2862a2e23224502fe2dba761195a0bfc989366b55f226a",
+          "lower": "26901bf1d02c581370ee85401ac61e11ad2087d31dda62d594f1b8552c66bd96"
+        },
+        "first_valid": {
+          "upper": 19,
+          "middle": 19,
+          "lower": 19
+        },
+        "causal": true,
+        "baseline_ms": 0.28959999690414406
+      },
+      {
+        "parameters": {
+          "period": 10,
+          "deviation": 1.5
+        },
+        "hashes": {
+          "upper": "60c130f8f1fdcd035e35042e375b87f3a615f4f2885a0131f4d4542a55a1286c",
+          "middle": "73751e6c1c9f983fc1d97bfd49d43ecedf1376c53167376644e224c4f5933747",
+          "lower": "626609e69d9e1f4f4f6465fe798be9a87cc873052bf8daa691c752dae3162f1a"
+        },
+        "first_valid": {
+          "upper": 9,
+          "middle": 9,
+          "lower": 9
+        },
+        "causal": true,
+        "baseline_ms": 0.13409999883151613
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "ParkinsonVolatility",
+    "old": "app/include/indicators/volatility/parkinson.py",
+    "new": "app/include/blocks/indicators/volatility/parkinson.py",
+    "id": "indicator.volatility.parkinson",
+    "inputs": [
+      "high",
+      "low"
+    ],
+    "provided_inputs": [
+      "high",
+      "low"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20,
+          "annualize": false,
+          "trading_periods": 252
+        },
+        "hashes": {
+          "value": "e80595e4beedd3273a3c6b251685c58ea3c25a5b2be2b10ab289e74ec4271162"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.6288999977405183
+      },
+      {
+        "parameters": {
+          "period": 10,
+          "annualize": false,
+          "trading_periods": 252
+        },
+        "hashes": {
+          "value": "9aa17b1b06fd49eb0c637e616426f8dd8000f3ea0c6ee873f838bf82bda3bc58"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.546500003314577
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low"
+    ]
+  },
+  {
+    "name": "RogersSatchellVolatility",
+    "old": "app/include/indicators/volatility/rogers_satchell.py",
+    "new": "app/include/blocks/indicators/volatility/rogers_satchell.py",
+    "id": "indicator.volatility.rogers_satchell",
+    "inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20,
+          "annualize": false,
+          "trading_periods": 252
+        },
+        "hashes": {
+          "value": "029e684079802bb5d899d3a0e721e0e8283c513e8caebd655f597faa708e06b5"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.5045000000100117
+      },
+      {
+        "parameters": {
+          "period": 10,
+          "annualize": false,
+          "trading_periods": 252
+        },
+        "hashes": {
+          "value": "fcd5c3c2027902213d5ba20ff266f8af986ff4dbdcce295403d7cee300de1853"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.4972999997553416
+      }
+    ],
+    "required_inputs": [
+      "open",
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "SRPercentRank",
+    "old": "app/include/indicators/volatility/sr_percent_rank.py",
+    "new": "app/include/blocks/indicators/volatility/sr_percent_rank.py",
+    "id": "indicator.volatility.sr_percent_rank",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "mode": 1,
+          "length": 120,
+          "atr_period": 12
+        },
+        "hashes": {
+          "value": "21494af6283809b174eeeafd07972fc6d9aa7227a1b0a07a19236473ab4809d2"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.9622999971034005
+      },
+      {
+        "parameters": {
+          "mode": 1,
+          "length": 60,
+          "atr_period": 12
+        },
+        "hashes": {
+          "value": "710126122e5f4af50488c1212e9407a8a6e993d16a4848a93605480a58a9108b"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.8240999999979977
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "StdDev",
+    "old": "app/include/indicators/volatility/std_dev.py",
+    "new": "app/include/blocks/indicators/volatility/std_dev.py",
+    "id": "indicator.volatility.std_dev",
+    "inputs": [
+      "data"
+    ],
+    "provided_inputs": [
+      "data"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20
+        },
+        "hashes": {
+          "value": "f84f04d9ffd4c94cf04d22faaa94d0f1ed283c8f99d6b5b7007585e734a7b08d"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 6.686200002150144
+      },
+      {
+        "parameters": {
+          "period": 10
+        },
+        "hashes": {
+          "value": "080878a3c14d6471e20adc8de05bdc8a2516f15c7a9ed5065ac4533c13b1d131"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 6.725800001731841
+      }
+    ],
+    "required_inputs": [
+      "data"
+    ]
+  },
+  {
+    "name": "TrueRange",
+    "old": "app/include/indicators/volatility/true_range.py",
+    "new": "app/include/blocks/indicators/volatility/true_range.py",
+    "id": "indicator.volatility.true_range",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {},
+        "hashes": {
+          "value": "28cbf9aced9f112c09ba929b01f5d099568467aaf60b5af90f11cd5551bf17b2"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.09240000144927762
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "UlcerIndex",
+    "old": "app/include/indicators/volatility/ulcer_index.py",
+    "new": "app/include/blocks/indicators/volatility/ulcer_index.py",
+    "id": "indicator.volatility.ulcer_index",
+    "inputs": [
+      "data"
+    ],
+    "provided_inputs": [
+      "data"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "mode": 1,
+          "period": 24
+        },
+        "hashes": {
+          "value": "fbbdf7fe76a92528c3f26c30b76b42153239a4acba352681f44e4062bc9e42ed"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 3.465999998297775
+      },
+      {
+        "parameters": {
+          "mode": 1,
+          "period": 12
+        },
+        "hashes": {
+          "value": "bba4c5d7a0de88765887127cae70a08da9d1b0e65f42a0aed0529121c3de3253"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 3.4749000005831476
+      }
+    ],
+    "required_inputs": [
+      "data"
+    ]
+  },
+  {
+    "name": "AnchoredVWAP",
+    "old": "app/include/indicators/volume/anchored_vwap.py",
+    "new": "app/include/blocks/indicators/volume/anchored_vwap.py",
+    "id": "indicator.volume.anchored_vwap",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume",
+      "timestamps"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume",
+      "timestamps"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "session_type": 1,
+          "std_dev_mult": 1.0,
+          "anchor_period": 0,
+          "anchor_indices": null
+        },
+        "hashes": {
+          "vwap": "17cc30e73e2d25d45d3c89dc2a5e0c0836cef680182139ca90e819c9fbb665c5",
+          "upper": "b2d0a3a1cc2999da433ae30d6d21bed925656a6744e6755b9614e86ddbae96d8",
+          "lower": "36fdbfa4a58be82b4c7a521e0d03a969f69bea0923df8b8a1d12953a7225ef0c"
+        },
+        "first_valid": {
+          "vwap": 0,
+          "upper": 0,
+          "lower": 0
+        },
+        "causal": true,
+        "baseline_ms": 7.397499997750856
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  },
+  {
+    "name": "AvgVolume",
+    "old": "app/include/indicators/volume/avg_volume.py",
+    "new": "app/include/blocks/indicators/volume/avg_volume.py",
+    "id": "indicator.volume.avg_volume",
+    "inputs": [
+      "volume"
+    ],
+    "provided_inputs": [
+      "volume"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "e9f725ae059df576862232ac84356a4510d4529fa581a78d176f34a80266d9dc"
+        },
+        "first_valid": {
+          "value": 13
+        },
+        "causal": true,
+        "baseline_ms": 0.2002000001084525
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "7982af4d440fc6c7ea119601457a54f3dc8c3d30357563e49eefb1bdefcae93c"
+        },
+        "first_valid": {
+          "value": 6
+        },
+        "causal": true,
+        "baseline_ms": 0.0932000002649147
+      }
+    ],
+    "required_inputs": [
+      "volume"
+    ]
+  },
+  {
+    "name": "CMF",
+    "old": "app/include/indicators/volume/cmf.py",
+    "new": "app/include/blocks/indicators/volume/cmf.py",
+    "id": "indicator.volume.cmf",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 20
+        },
+        "hashes": {
+          "value": "4f31c9b19ce44a3cf57091bf13909f68a8ccc76626dd5eba92189f5941c4d2d8"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.522599999792874
+      },
+      {
+        "parameters": {
+          "period": 10
+        },
+        "hashes": {
+          "value": "b37a41b0efb92bf7cda6f36703595adf9f1695d8e939770e1aeacc1026217ebe"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.338000002055196
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  },
+  {
+    "name": "COT",
+    "old": "app/include/indicators/volume/cot.py",
+    "new": "app/include/blocks/indicators/volume/cot.py",
+    "id": "indicator.volume.cot",
+    "inputs": [
+      "commercial_net",
+      "speculator_net",
+      "small_spec_net",
+      "open_interest"
+    ],
+    "provided_inputs": [
+      "commercial_net",
+      "speculator_net"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period_fast": 52,
+          "period_slow": 156
+        },
+        "hashes": {
+          "composite_score": "59673e28820a033d8a5ea1b003ae6da87787c504008863db757e7599acb0f112",
+          "cpi_hedger": "3a00c6d501eea3f36c55fc91ea62040d21c4704a256c897f38d354a01185fca2",
+          "cpi_speculator": "2dac2dd8d8cbdfb11d793ced49168e2d7a02ca02d821daf8be961d9b1df53289",
+          "cpi_small": "5e0208ab1cfc45b46dcf6eee5102e51c6afa3595c746c4500db333a735b91c4c",
+          "cpi_hedger_slow": "95b01be837d24fc8a7181f5e030636b06948812fbab36dbc174f25706ef00a6b",
+          "cpi_speculator_slow": "ad6c9378be055e802b2a1444b8781622ea010bf8d3399555d725ffa781b02a70",
+          "cti_hedger": "ca951d5d91d5c7a5619f16c09b586266a07a8e876c93620effe33df1d05e8334",
+          "cti_speculator": "04ea18b01444a49a4c091427ee4ff5b9ec8e842875b3550a5948a9acec21b792",
+          "hedger_spec_spread": "27c3dc396724d5c4355da07c70b5a607da3fbdec95239d13b53b206ffeca0aee"
+        },
+        "first_valid": {
+          "composite_score": 51,
+          "cpi_hedger": 51,
+          "cpi_speculator": 51,
+          "cpi_small": 51,
+          "cpi_hedger_slow": 51,
+          "cpi_speculator_slow": 51,
+          "cti_hedger": 51,
+          "cti_speculator": 51,
+          "hedger_spec_spread": 51
+        },
+        "causal": true,
+        "baseline_ms": 24.955100001534447
+      },
+      {
+        "parameters": {
+          "period_fast": 26,
+          "period_slow": 156
+        },
+        "hashes": {
+          "composite_score": "1eede0a7f8b78a226158a497d9a535bd002b218593d4202dd8298f32a2cac57b",
+          "cpi_hedger": "8751da1362012bb27e46646890c2374ab44db41a626ba321aa7e9e0bfa922786",
+          "cpi_speculator": "5de1638787f4e7477f6ac15346609539c09eff800bd46158c4e6128cdfbb08a1",
+          "cpi_small": "80cb6e877255beb49ff8f97b0abe69867133264de75c20817fbf59f0d476ed1c",
+          "cpi_hedger_slow": "a96cec8cdd324ea300d4eec85fbb24bf96859f0e2b83c7e2de2def5364ec372e",
+          "cpi_speculator_slow": "4ca42cbc1f6a25dd47a7a6d21f605e68a63b991c57cbb82c5a5a998266b288d4",
+          "cti_hedger": "59841585d1171f9ec5478aac9694931545b7e9a8869fa315030a43215c0ee370",
+          "cti_speculator": "3c57a0022d1e2b0298299d191fde78452d40b0eb89f4df898c5cda7da34d8a14",
+          "hedger_spec_spread": "b7373d83d7ac57909722e67857c8a1d9878f745b6f33f21752ee13ba0a6bd756"
+        },
+        "first_valid": {
+          "composite_score": 25,
+          "cpi_hedger": 25,
+          "cpi_speculator": 25,
+          "cpi_small": 25,
+          "cpi_hedger_slow": 25,
+          "cpi_speculator_slow": 25,
+          "cti_hedger": 25,
+          "cti_speculator": 25,
+          "hedger_spec_spread": 25
+        },
+        "causal": true,
+        "baseline_ms": 28.90339999794378
+      }
+    ],
+    "required_inputs": [
+      "commercial_net",
+      "speculator_net"
+    ]
+  },
+  {
+    "name": "OBV",
+    "old": "app/include/indicators/volume/obv.py",
+    "new": "app/include/blocks/indicators/volume/obv.py",
+    "id": "indicator.volume.obv",
+    "inputs": [
+      "close",
+      "volume"
+    ],
+    "provided_inputs": [
+      "close",
+      "volume"
+    ],
+    "cases": [
+      {
+        "parameters": {},
+        "hashes": {
+          "value": "4c49b0854ca3b847a449f0307c4254fbd5184774925ed30c9bf1688206e6673f"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 0.38359999962267466
+      }
+    ],
+    "required_inputs": [
+      "close",
+      "volume"
+    ]
+  },
+  {
+    "name": "MFI",
+    "old": "app/include/indicators/volume/obv.py",
+    "new": "app/include/blocks/indicators/volume/mfi.py",
+    "id": "indicator.volume.mfi",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 14
+        },
+        "hashes": {
+          "value": "1169b7f3ed52c354538184159e111814912b1297ac124dad1fb3bfc870d49da0"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 3.1552999971609097
+      },
+      {
+        "parameters": {
+          "period": 7
+        },
+        "hashes": {
+          "value": "7d96db6dba7f432094ca674bca0e9820c2bb3c4337208fea1909e481fbce7a1d"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 2.473600001394516
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  },
+  {
+    "name": "CumulativeVolumeDelta",
+    "old": "app/include/indicators/volume/order_flow.py",
+    "new": "app/include/blocks/indicators/volume/cumulative_volume_delta.py",
+    "id": "indicator.volume.cumulative_volume_delta",
+    "inputs": [
+      "open",
+      "close",
+      "volume",
+      "buy_volume",
+      "sell_volume"
+    ],
+    "provided_inputs": [
+      "open",
+      "close",
+      "volume"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "window": 14
+        },
+        "hashes": {
+          "cvd": "af2101ddf60bb77e06f9db6caf98199db2df38e61c569fcc3783531fc90d8511",
+          "delta": "b2003656486c04d9dd3cfd04a1fdd112768f82346e586c7a30254bf3e0f0ddf7"
+        },
+        "first_valid": {
+          "cvd": 0,
+          "delta": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.3225000002421439
+      },
+      {
+        "parameters": {
+          "window": 7
+        },
+        "hashes": {
+          "cvd": "af2101ddf60bb77e06f9db6caf98199db2df38e61c569fcc3783531fc90d8511",
+          "delta": "345ac44f578c2100182878e51520df6d040dd96d9fce591a1d2c75f6a293799f"
+        },
+        "first_valid": {
+          "cvd": 0,
+          "delta": 0
+        },
+        "causal": true,
+        "baseline_ms": 1.2490000008256175
+      }
+    ],
+    "required_inputs": [
+      "open",
+      "close",
+      "volume"
+    ]
+  },
+  {
+    "name": "AggressiveTradeImbalance",
+    "old": "app/include/indicators/volume/order_flow.py",
+    "new": "app/include/blocks/indicators/volume/aggressive_trade_imbalance.py",
+    "id": "indicator.volume.aggressive_trade_imbalance",
+    "inputs": [
+      "open",
+      "close",
+      "volume",
+      "buy_volume",
+      "sell_volume"
+    ],
+    "provided_inputs": [
+      "open",
+      "close",
+      "volume"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "window": 14
+        },
+        "hashes": {
+          "value": "26c710a5c66a94f1aeee0eee2f65960a2b5c9b03a6b1b807e2f151bfdbe98a3b"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 4.702500002167653
+      },
+      {
+        "parameters": {
+          "window": 7
+        },
+        "hashes": {
+          "value": "adee54998afeae577a097b4a8b37bec311691214ca965cbbb5c59e0b2fd04086"
+        },
+        "first_valid": {
+          "value": 0
+        },
+        "causal": true,
+        "baseline_ms": 5.577600000833627
+      }
+    ],
+    "required_inputs": [
+      "open",
+      "close",
+      "volume"
+    ]
+  },
+  {
+    "name": "TPOProfile",
+    "old": "app/include/indicators/volume/tpo_profile.py",
+    "new": "app/include/blocks/indicators/volume/tpo_profile.py",
+    "id": "indicator.volume.tpo_profile",
+    "inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 48,
+          "profile_rows": 40,
+          "ib_bars": 2,
+          "value_area_pct": 0.7
+        },
+        "hashes": {
+          "poc": "f096f605fecd8eee523d1d4282a76f89fc879e5c9c4ae0653b3f248af0b1ce6a",
+          "vah": "bf49d86d45ad3c2b2ad0f25ea29b1b038062113db49ef3bf0007649e98c028de",
+          "val": "fc8c01b04dea114baaaffb24e4f381543dbe72962e10d8131ffa67bca4d09a39",
+          "ib_high": "5e803b341f9bf11c50f622a995e1a48be85138824dfe077e6ccde778f48705f3",
+          "ib_low": "80a1769ca54fdb6ce6f348bf995aadd18247fa49d9544cf3996829710a5f433d"
+        },
+        "first_valid": {
+          "poc": 47,
+          "vah": 47,
+          "val": 47,
+          "ib_high": 47,
+          "ib_low": 47
+        },
+        "causal": true,
+        "baseline_ms": 271.0802000001422
+      },
+      {
+        "parameters": {
+          "period": 24,
+          "profile_rows": 40,
+          "ib_bars": 2,
+          "value_area_pct": 0.7
+        },
+        "hashes": {
+          "poc": "3d1e875a7a8da18c631de8ff6b52e524d249ac8c4d4128f5be3603005688dc73",
+          "vah": "c5ddd523fb772ef2ba4398c53022c20fec032330ed4e6b32acc729fb7ae32bfc",
+          "val": "0af8a7a38ff191783e2d9ff9ebe50a6266df4d65f8bcebe47d29c5b69a1bb7e7",
+          "ib_high": "ddb7c7bcb4bc5d4d84548841a75d0b5936372b82c4297332ebde4d704ddca47a",
+          "ib_low": "e50a90eb88013ce6dd0b9ea690b918e178754a01071a0618cf58de7456551372"
+        },
+        "first_valid": {
+          "poc": 23,
+          "vah": 23,
+          "val": 23,
+          "ib_high": 23,
+          "ib_low": 23
+        },
+        "causal": true,
+        "baseline_ms": 154.91560000009486
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close"
+    ]
+  },
+  {
+    "name": "VolumeProfile",
+    "old": "app/include/indicators/volume/volume_profile.py",
+    "new": "app/include/blocks/indicators/volume/volume_profile.py",
+    "id": "indicator.volume.volume_profile",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume",
+      "open_prices"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume",
+      "open_prices"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 50,
+          "profile_rows": 50,
+          "value_area_pct": 0.7,
+          "ib_bars": 4
+        },
+        "hashes": {
+          "poc": "d0ef7c9f84ddbf535b9c1c2c4fa55fe8a049ea6c09af604477a7cdf1899d3f02",
+          "vah": "10eaa7a7356d189514880b6a9b4eeae05a9ccce1e925662e373f5ae7d70156b1",
+          "val": "85e59f9b918f9b0a58b0d2363ae612c2522d45df3ba45f6a2fb0c0549f768972",
+          "bull_poc": "6a18053bfc5cde5f2013b71dd6a6f3715865c5bb6077d5b49202c31396a0cc73",
+          "bear_poc": "31837d70a507f2e90986991164aa1199320c5dbd9a1627559861218a9ef5f134",
+          "delta": "3ed53de7bee4e037d03178f21f98c035c9111c4e147072fa368bb6abcb8b8d94",
+          "poc_pct_up": "8590729178e5e2e066325c7b8f4fc688c91c1887e34c3c39c18a8bfd50482b0a",
+          "poc_pct_down": "619a5ab223f745941e8c8f4e7567775eb8c3467132d3e70de080b3fcf37ac02f",
+          "ibh": "5ad8ab408db364629ef3e2d01e50ff474cf9465490296da729959ef5d73dd1bf",
+          "ibl": "32248c5e139d449d0fdaf66d3f8a7bfd64915405ab4b825a6b0fce7dbb4f27a6"
+        },
+        "first_valid": {
+          "poc": 49,
+          "vah": 49,
+          "val": 49,
+          "bull_poc": 49,
+          "bear_poc": 49,
+          "delta": 49,
+          "poc_pct_up": 49,
+          "poc_pct_down": 49,
+          "ibh": 49,
+          "ibl": 49
+        },
+        "causal": true,
+        "baseline_ms": 316.7326000002504
+      },
+      {
+        "parameters": {
+          "period": 25,
+          "profile_rows": 50,
+          "value_area_pct": 0.7,
+          "ib_bars": 4
+        },
+        "hashes": {
+          "poc": "62f2247672d41ca7e5e6af302a38adab0d405b26e21c60f7c75aca61db5b2904",
+          "vah": "131c43b8b2ced4591e5559523f21c5475187a6a24a6bb7d6518f593c1877b00f",
+          "val": "669eaa8f26867970ffe9a6e6769fe6f0f89ec2e574f3fca3a8c6ec13e6ce6f1e",
+          "bull_poc": "0747cf5f57a6a7250e1f8511ae8ef51146105f9361c9ccf0dcc3749119a2bce3",
+          "bear_poc": "636358fa89a1582b0c014f3dd434716d641ef6562129a6448cfdd28be6e52040",
+          "delta": "1779c914380dce1ccc578422b8f77e0dc67130a703ae0a378a3047f1518364bf",
+          "poc_pct_up": "e882b28a9d17e6175b965ada7b0e32dcb010835a7d6a9d3301974a3d3f874cff",
+          "poc_pct_down": "398cf0bd4c7130ad5d706ba8b21b6ca024750baee01a73b512d65563487d5d69",
+          "ibh": "71229bb857d9f712a356cb0388cb1f9c73d072cb793383b9842012bc2af1b077",
+          "ibl": "9e2f374bc7c377cd2947c5ac2147c71918cdec215051ad5839dca5febf36a750"
+        },
+        "first_valid": {
+          "poc": 24,
+          "vah": 24,
+          "val": 24,
+          "bull_poc": 24,
+          "bear_poc": 24,
+          "delta": 24,
+          "poc_pct_up": 24,
+          "poc_pct_down": 24,
+          "ibh": 24,
+          "ibl": 24
+        },
+        "causal": true,
+        "baseline_ms": 180.12050000106683
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  },
+  {
+    "name": "VWAP",
+    "old": "app/include/indicators/volume/vwap.py",
+    "new": "app/include/blocks/indicators/volume/vwap.py",
+    "id": "indicator.volume.vwap",
+    "inputs": [
+      "high",
+      "low",
+      "close",
+      "volume",
+      "open_prices"
+    ],
+    "provided_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume",
+      "open_prices"
+    ],
+    "cases": [
+      {
+        "parameters": {
+          "period": 10
+        },
+        "hashes": {
+          "value": "010c4c7523fa771089f755328b1ae0ac7090db1efd103b8b572b495b49211c4b"
+        },
+        "first_valid": {
+          "value": 9
+        },
+        "causal": true,
+        "baseline_ms": 0.4158000010647811
+      },
+      {
+        "parameters": {
+          "period": 5
+        },
+        "hashes": {
+          "value": "83e93a60239b6a5d70f49c908140bb52a9de550eead6518d6b7c60e49a625739"
+        },
+        "first_valid": {
+          "value": 4
+        },
+        "causal": true,
+        "baseline_ms": 0.16090000281110406
+      }
+    ],
+    "required_inputs": [
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  }
+]

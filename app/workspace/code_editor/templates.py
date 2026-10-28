@@ -49,7 +49,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Custom indicator inheriting BaseIndicator with calculate(bars)",
         category="building_blocks",
         default_filename="custom_indicator.py",
-        target_subdir="app/include/indicators/custom",
+        target_subdir="app/include/blocks/indicators/custom",
         generator_func_name="_gen_indicator",
     ),
     "BlocksSignal": SnippetTemplate(
@@ -217,7 +217,10 @@ def render_template(
                 "Indicator category must be a public Python identifier"
             )
         cat = _to_snake_case(category).strip("_") or "custom"
-        target_dir = f"app/include/indicators/{cat}"
+        target_dir = f"app/include/blocks/indicators/{cat}"
+        content = content.replace('category="custom"', f'category="{cat}"').replace(
+            'id="indicator.custom.', f'id="indicator.{cat}.'
+        )
     else:
         target_dir = tmpl.target_subdir
     file_path = f"{target_dir}/{snake_name}.py"

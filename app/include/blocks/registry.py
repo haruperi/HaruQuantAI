@@ -5,6 +5,7 @@ from __future__ import annotations
 import functools
 import importlib.util
 import inspect
+import sys
 from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -59,7 +60,17 @@ def _load_module_blocks(p: Path) -> list[type[BaseBlock] | Callable[..., Any]]:
     if spec is None or spec.loader is None:
         raise BlockRegistryError(f"Could not load module spec for '{p}'")
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    previous = sys.modules.get(module_name)
+    sys.modules[module_name] = mod
+    try:
+        # Read current source rather than a potentially stale same-size pyc.
+        exec(compile(p.read_bytes(), str(p), "exec"), mod.__dict__)  # noqa: S102 - explicit source loading
+    except Exception:
+        if previous is None:
+            sys.modules.pop(module_name, None)
+        else:
+            sys.modules[module_name] = previous
+        raise
 
     targets: list[type[BaseBlock] | Callable[..., Any]] = []
     for obj in vars(mod).values():

@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
 from dataclasses import dataclass, field
+from types import MappingProxyType
 from typing import Any
 
 import numpy as np
@@ -35,6 +37,8 @@ class BarData:
     symbol: str = "DEFAULT"
     timeframe: str = "H1"
     dataset_revision: str = "latest"
+    auxiliary: Mapping[str, np.ndarray[Any, Any]] = field(default_factory=dict)
+    available_inputs: frozenset[str] | None = None
 
     def __post_init__(self) -> None:
         """Validate array alignment and enforce immutability on timestamps."""
@@ -48,6 +52,80 @@ class BarData:
         ts_view = ts_arr.view()
         ts_view.flags.writeable = False
         object.__setattr__(self, "timestamps", ts_view)
+        auxiliary = {}
+        for name, values in self.auxiliary.items():
+            array = np.asarray(values, dtype=np.float64)
+            if array.ndim != 1 or len(array) != len(self.prices):
+                raise ValueError(f"Auxiliary input '{name}' must align with bars")
+            view = array.view()
+            view.flags.writeable = False
+            auxiliary[name] = view
+        object.__setattr__(self, "auxiliary", MappingProxyType(auxiliary))
+
+    @classmethod
+    def from_arrays(cls, **inputs: Any) -> BarData:
+        """Build a context from explicitly supplied series; unused OHLCV slots are zero.
+
+        Only supplied inputs are available to indicators. Missing required feeds
+        are rejected, so a COT or order-flow feed cannot be fabricated from prices.
+        """
+        aliases = {"data": "close", "price": "close"}
+        arrays = {
+            aliases.get(name, name.removesuffix("_prices")): np.asarray(
+                getattr(values, "values", values)
+            )
+            for name, values in inputs.items()
+            if values is not None
+        }
+        count = len(next(iter(arrays.values()))) if arrays else 0
+        for name, array in arrays.items():
+            if array.ndim != 1 or len(array) != count:
+                raise ValueError(
+                    f"Input '{name}' must be a one-dimensional aligned series"
+                )
+        prices = BarPrice(
+            **{
+                name + "_data": arrays.get(name, np.zeros(count))
+                for name in ("open", "high", "low", "close", "volume")
+            }
+        )
+        return cls(
+            prices=prices,
+            timestamps=arrays.get("timestamps", np.array([], dtype=np.int64)),
+            auxiliary={
+                name: values
+                for name, values in arrays.items()
+                if name not in ("open", "high", "low", "close", "volume", "timestamps")
+            },
+            available_inputs=frozenset(arrays),
+        )
+
+    def require_inputs(self, names: tuple[str, ...]) -> None:
+        """Reject unavailable market inputs before numerical evaluation."""
+        available = (
+            self.available_inputs
+            if self.available_inputs is not None
+            else frozenset(("open", "high", "low", "close", "volume"))
+            | self.auxiliary.keys()
+        )
+        missing = set(names) - available
+        if missing:
+            raise ValueError(f"Missing indicator inputs: {', '.join(sorted(missing))}")
+
+    def has_input(self, name: str) -> bool:
+        """Distinguish absent optional feeds from explicitly supplied zero values."""
+        if self.available_inputs is not None:
+            return name in self.available_inputs
+        return (
+            name in ("open", "high", "low", "close", "volume") or name in self.auxiliary
+        )
+
+    def input(self, name: str, *, required: bool = True) -> np.ndarray[Any, Any] | None:
+        """Resolve an auxiliary feed without substituting unrelated market data."""
+        result = self.auxiliary.get(name)
+        if result is None and required:
+            raise ValueError(f"Missing indicator input: {name}")
+        return result
 
     @property
     def open(self) -> np.ndarray[Any, np.dtype[np.float64]]:

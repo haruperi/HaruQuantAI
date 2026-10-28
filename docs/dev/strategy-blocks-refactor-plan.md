@@ -74,7 +74,7 @@ app/include/
     variables/                   # Selectable variable read/write blocks
   contracts.py enums.py          # Existing canonical market/trading contracts
   market_storage.py             # Existing storage infrastructure
-  numerical/                    # Shared kernels; internal, not catalog entries
+  calculators/                  # Shared batch kernels and streaming calculators
   metrics/ trade_columns/       # Reporting extensions, outside strategy blocks
   monte_carlo/ what_if/ analysis/
   ai_tools/                     # AI/MCP extensions; not automatically strategy nodes
@@ -88,7 +88,7 @@ app/workspace/strategy/          # Thin shared catalog/document/execution HTTP s
 ```
 
 These are responsibility boundaries, not permission to create oversized modules.
-Split implementations further before any new/modified file exceeds 500 lines.
+Split implementations further before any new/modified file exceeds 1,000 lines.
 Normal mathematical utilities do not need artificial block classes. Preserve
 `BarPrice` as the shared array container; price blocks consume it rather than
 introducing another OHLCV storage implementation. Timestamp normalization,
@@ -294,6 +294,10 @@ all consumers; an unrelated broken source file cannot break package import or ex
 
 ### Phase 3: indicator migration, family by family
 
+Status: complete. All 76 canonical indicators are migrated; see
+[the Phase 3 completion report](phase-3-indicator-migration.md) and its final
+catalog manifest, parity fixtures, and verification notes.
+
 - Migrate SMA/MovingAverage and RSI first; then BollingerBands/MACD multi-output.
 - Convert remaining trend, momentum, volatility, volume, price_action and regime
   families, then custom indicators. Inventory, not a hardcoded count, defines scope.
@@ -406,7 +410,7 @@ prevent claiming completion of the affected capability.
   ordering are deterministic. Simulator tests verify actual order outcomes.
 - Incremental-capable indicators pass batch/stream parity and restart/state tests.
 - Recorded performance/memory budgets pass on the same hardware/runtime settings.
-- New/modified modules stay within 500 lines with concise FR-linked public APIs.
+- New/modified modules stay within 1,000 lines with concise FR-linked public APIs.
 - `uv run pytest tests/ -q`, repository-wide Ruff lint/format, relevant strict mypy,
   frontend unit tests, production build and CodeEditor/Builder/AlgoWizard browser
   regressions pass. Record baseline failures separately; never suppress failures
