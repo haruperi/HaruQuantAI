@@ -3671,7 +3671,7 @@
   },
   {
     "id": "indicator.volume.tpo_profile",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "name": "TPOProfile",
     "source": "app/include/blocks/indicators/volume/tpo_profile.py",
     "category": "volume",
@@ -3679,85 +3679,32 @@
       "poc",
       "vah",
       "val",
+      "poor_high",
+      "poor_low",
+      "excess_high",
+      "excess_low",
+      "single_prints",
+      "buying_tail_len",
+      "selling_tail_len",
+      "profile_shape",
+      "ledge_up",
+      "ledge_down",
       "ib_high",
-      "ib_low"
-    ],
-    "inputs": [
-      {
-        "name": "high",
-        "required": true
-      },
-      {
-        "name": "low",
-        "required": true
-      },
-      {
-        "name": "close",
-        "required": true
-      }
-    ],
-    "required_market_inputs": [
-      "high",
-      "low",
-      "close"
-    ],
-    "dependencies": [],
-    "is_causal": true,
-    "is_generation_eligible": true,
-    "required_history": 48,
-    "parameter_schema": {
-      "additionalProperties": false,
-      "description": "TPO Profile indicator with Initial Balance and Value Area boundaries.",
-      "properties": {
-        "period": {
-          "default": 48,
-          "minimum": 1,
-          "title": "Period",
-          "type": "integer"
-        },
-        "profile_rows": {
-          "default": 40,
-          "minimum": 5,
-          "title": "Profile Rows",
-          "type": "integer"
-        },
-        "ib_bars": {
-          "default": 2,
-          "minimum": 1,
-          "title": "Ib Bars",
-          "type": "integer"
-        },
-        "value_area_pct": {
-          "default": 0.7,
-          "maximum": 0.99,
-          "minimum": 0.1,
-          "title": "Value Area Pct",
-          "type": "number"
-        }
-      },
-      "title": "TPOProfile",
-      "type": "object"
-    }
-  },
-  {
-    "id": "indicator.volume.volume_profile",
-    "version": "1.0.0",
-    "name": "VolumeProfile",
-    "source": "app/include/blocks/indicators/volume/volume_profile.py",
-    "category": "volume",
-    "outputs": [
-      "poc",
-      "vah",
-      "val",
+      "ib_low",
+      "vpoc",
+      "vvah",
+      "vval",
       "bull_poc",
       "bear_poc",
-      "delta",
-      "poc_pct_up",
-      "poc_pct_down",
-      "ibh",
-      "ibl"
+      "total_volume",
+      "total_bull_volume",
+      "total_bear_volume"
     ],
     "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
       {
         "name": "high",
         "required": true
@@ -3775,53 +3722,502 @@
         "required": true
       },
       {
-        "name": "open",
-        "required": false
+        "name": "timestamps",
+        "required": true
       }
     ],
     "required_market_inputs": [
+      "open",
       "high",
       "low",
       "close",
-      "volume"
+      "volume",
+      "timestamps"
     ],
     "dependencies": [],
     "is_causal": true,
-    "is_generation_eligible": true,
-    "required_history": 50,
+    "is_generation_eligible": false,
+    "required_history": 1,
     "parameter_schema": {
       "additionalProperties": false,
-      "description": "Volume Profile indicator extracting POC, VAH, VAL, Delta, IB, and conditions.",
+      "description": "Donor session profiles with validated in-class configuration.",
       "properties": {
-        "period": {
-          "default": 50,
-          "minimum": 1,
-          "title": "Period",
+        "timestamp_unit": {
+          "default": "seconds",
+          "enum": [
+            "seconds",
+            "milliseconds"
+          ],
+          "title": "Timestamp Unit",
+          "type": "string"
+        },
+        "timezone": {
+          "default": "UTC",
+          "title": "Timezone",
+          "type": "string"
+        },
+        "bin_size_mode": {
+          "default": 2,
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Bin Size Mode",
           "type": "integer"
         },
-        "profile_rows": {
-          "default": 50,
-          "minimum": 5,
-          "title": "Profile Rows",
+        "tick_size": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tick Size"
+        },
+        "ticks_per_bin": {
+          "default": 1,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Ticks Per Bin",
           "type": "integer"
         },
         "value_area_pct": {
-          "default": 0.7,
-          "maximum": 0.99,
-          "minimum": 0.1,
+          "default": 70.0,
+          "maximum": 95,
+          "minimum": 30,
           "title": "Value Area Pct",
           "type": "number"
         },
-        "ib_bars": {
-          "default": 4,
+        "session_type": {
+          "default": 1,
+          "maximum": 8,
           "minimum": 1,
-          "title": "Ib Bars",
+          "title": "Session Type",
+          "type": "integer"
+        },
+        "profile_rows": {
+          "default": 150,
+          "maximum": 500,
+          "minimum": 10,
+          "title": "Profile Rows",
+          "type": "integer"
+        },
+        "use_custom_hours": {
+          "default": false,
+          "title": "Use Custom Hours",
+          "type": "boolean"
+        },
+        "session_start": {
+          "default": 0,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "Session Start",
+          "type": "integer"
+        },
+        "session_end": {
+          "default": 1439,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "Session End",
+          "type": "integer"
+        },
+        "bracket_min_daily": {
+          "default": 30,
+          "maximum": 120,
+          "minimum": 1,
+          "title": "Bracket Min Daily",
+          "type": "integer"
+        },
+        "bracket_min_weekly": {
+          "default": 240,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Bracket Min Weekly",
+          "type": "integer"
+        },
+        "bracket_min_monthly": {
+          "default": 720,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Bracket Min Monthly",
+          "type": "integer"
+        },
+        "bracket_min_yearly": {
+          "default": 720,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Bracket Min Yearly",
+          "type": "integer"
+        }
+      },
+      "title": "TPOProfile",
+      "type": "object"
+    },
+    "qualification": "docs/dev/profile-donor-qualification.md"
+  },
+  {
+    "id": "indicator.volume.volume_profile",
+    "version": "2.0.0",
+    "name": "VolumeProfile",
+    "source": "app/include/blocks/indicators/volume/volume_profile.py",
+    "category": "volume",
+    "outputs": [
+      "poc",
+      "vah",
+      "val",
+      "ibh",
+      "ibl",
+      "hvn1",
+      "hvn2",
+      "hvn3",
+      "hvn4",
+      "hvn5",
+      "lvn1",
+      "lvn2",
+      "lvn3",
+      "lvn4",
+      "lvn5",
+      "vpoc",
+      "vvah",
+      "vval",
+      "bull_poc",
+      "bear_poc",
+      "total_volume",
+      "total_bull_volume",
+      "total_bear_volume",
+      "delta",
+      "delta_poc",
+      "delta_va",
+      "profile_range",
+      "poc_pct_up",
+      "poc_pct_down",
+      "london_poc",
+      "london_vah",
+      "london_val",
+      "new_york_poc",
+      "new_york_vah",
+      "new_york_val",
+      "sydney_poc",
+      "sydney_vah",
+      "sydney_val",
+      "tokyo_poc",
+      "tokyo_vah",
+      "tokyo_val"
+    ],
+    "inputs": [
+      {
+        "name": "open",
+        "required": true
+      },
+      {
+        "name": "high",
+        "required": true
+      },
+      {
+        "name": "low",
+        "required": true
+      },
+      {
+        "name": "close",
+        "required": true
+      },
+      {
+        "name": "volume",
+        "required": true
+      },
+      {
+        "name": "timestamps",
+        "required": true
+      }
+    ],
+    "required_market_inputs": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "timestamps"
+    ],
+    "dependencies": [],
+    "is_causal": true,
+    "is_generation_eligible": false,
+    "required_history": 1,
+    "parameter_schema": {
+      "additionalProperties": false,
+      "description": "Donor session profiles with validated in-class configuration.",
+      "properties": {
+        "timestamp_unit": {
+          "default": "seconds",
+          "enum": [
+            "seconds",
+            "milliseconds"
+          ],
+          "title": "Timestamp Unit",
+          "type": "string"
+        },
+        "timezone": {
+          "default": "UTC",
+          "title": "Timezone",
+          "type": "string"
+        },
+        "bin_size_mode": {
+          "default": 2,
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Bin Size Mode",
+          "type": "integer"
+        },
+        "tick_size": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tick Size"
+        },
+        "ticks_per_bin": {
+          "default": 3,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Ticks Per Bin",
+          "type": "integer"
+        },
+        "value_area_pct": {
+          "default": 70.0,
+          "maximum": 75,
+          "minimum": 65,
+          "title": "Value Area Pct",
+          "type": "number"
+        },
+        "session_type": {
+          "default": 2,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Session Type",
+          "type": "integer"
+        },
+        "profile_mode": {
+          "default": "calendar",
+          "enum": [
+            "calendar",
+            "custom",
+            "multi"
+          ],
+          "title": "Profile Mode",
+          "type": "string"
+        },
+        "profile_rows": {
+          "default": 50,
+          "maximum": 100,
+          "minimum": 10,
+          "title": "Profile Rows",
+          "type": "integer"
+        },
+        "session_start": {
+          "default": 480,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "Session Start",
+          "type": "integer"
+        },
+        "session_end": {
+          "default": 960,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "Session End",
+          "type": "integer"
+        },
+        "session_mode": {
+          "default": 1,
+          "enum": [
+            1,
+            2
+          ],
+          "title": "Session Mode",
+          "type": "integer"
+        },
+        "ib_minutes": {
+          "default": 0,
+          "maximum": 14400,
+          "minimum": 0,
+          "title": "Ib Minutes",
+          "type": "integer"
+        },
+        "hvn_count": {
+          "default": 5,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Hvn Count",
+          "type": "integer"
+        },
+        "hvn_threshold_pct": {
+          "default": 20,
+          "maximum": 90,
+          "minimum": 10,
+          "title": "Hvn Threshold Pct",
+          "type": "integer"
+        },
+        "lvn_threshold_pct": {
+          "default": 40,
+          "maximum": 90,
+          "minimum": 10,
+          "title": "Lvn Threshold Pct",
+          "type": "integer"
+        },
+        "enable_lvn": {
+          "default": false,
+          "title": "Enable Lvn",
+          "type": "boolean"
+        },
+        "enable_vcp": {
+          "default": false,
+          "title": "Enable Vcp",
+          "type": "boolean"
+        },
+        "cluster_spread": {
+          "default": 6.0,
+          "maximum": 20,
+          "minimum": 0.5,
+          "title": "Cluster Spread",
+          "type": "number"
+        },
+        "max_cluster_centers": {
+          "default": 2,
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Max Cluster Centers",
+          "type": "integer"
+        },
+        "pivot_method": {
+          "default": 1,
+          "enum": [
+            1,
+            2,
+            3
+          ],
+          "title": "Pivot Method",
+          "type": "integer"
+        },
+        "pivot_pct": {
+          "default": 2.0,
+          "maximum": 10,
+          "minimum": 0.01,
+          "title": "Pivot Pct",
+          "type": "number"
+        },
+        "pivot_ticks": {
+          "default": 50,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Pivot Ticks",
+          "type": "integer"
+        },
+        "pivot_atr_multiple": {
+          "default": 1.5,
+          "maximum": 10,
+          "minimum": 0.1,
+          "title": "Pivot Atr Multiple",
+          "type": "number"
+        },
+        "pivot_atr_period": {
+          "default": 14,
+          "maximum": 200,
+          "minimum": 2,
+          "title": "Pivot Atr Period",
+          "type": "integer"
+        },
+        "enable_london": {
+          "default": true,
+          "title": "Enable London",
+          "type": "boolean"
+        },
+        "london_start": {
+          "default": 420,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "London Start",
+          "type": "integer"
+        },
+        "london_end": {
+          "default": 960,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "London End",
+          "type": "integer"
+        },
+        "enable_new_york": {
+          "default": true,
+          "title": "Enable New York",
+          "type": "boolean"
+        },
+        "new_york_start": {
+          "default": 780,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "New York Start",
+          "type": "integer"
+        },
+        "new_york_end": {
+          "default": 1320,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "New York End",
+          "type": "integer"
+        },
+        "enable_sydney": {
+          "default": false,
+          "title": "Enable Sydney",
+          "type": "boolean"
+        },
+        "sydney_start": {
+          "default": 1260,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "Sydney Start",
+          "type": "integer"
+        },
+        "sydney_end": {
+          "default": 360,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "Sydney End",
+          "type": "integer"
+        },
+        "enable_tokyo": {
+          "default": true,
+          "title": "Enable Tokyo",
+          "type": "boolean"
+        },
+        "tokyo_start": {
+          "default": 0,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "Tokyo Start",
+          "type": "integer"
+        },
+        "tokyo_end": {
+          "default": 540,
+          "maximum": 1439,
+          "minimum": 0,
+          "title": "Tokyo End",
           "type": "integer"
         }
       },
       "title": "VolumeProfile",
       "type": "object"
-    }
+    },
+    "qualification": "docs/dev/profile-donor-qualification.md"
   },
   {
     "id": "indicator.volume.vwap",

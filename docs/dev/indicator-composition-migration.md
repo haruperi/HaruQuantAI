@@ -105,8 +105,10 @@ with their owning calculations.
 ## Remaining calculation/runtime qualification
 
 This change implements catalog exposure and reusable execution; it does not
-claim full donor numerical parity. VolumeProfile/TPOProfile session/binning/output
-features remain incomplete. External VP predicates require explicitly supplied
+claim full donor numerical parity. VolumeProfile/TPOProfile session calculations
+and numerical outputs were subsequently implemented and qualified in
+`profile-donor-qualification.md` (42 numerical cases and 36 donor session replays).
+Platform/instrument integration remains separate. External VP predicates require explicitly supplied
 session-profile series and never substitute a rolling profile. PSAR predicates
 require a caller-supplied decision-price series; they do not invent live quotes.
 COT raw/derived feed definitions and specialized donor defaults/edge cases still

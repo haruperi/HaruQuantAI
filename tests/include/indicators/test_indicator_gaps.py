@@ -811,20 +811,19 @@ def test_volume_profile_custom_hours_and_all_36_conditions() -> None:
     open_p = high - 1.2
     close = high - 0.4
     vol = np.linspace(100.0, 500.0, 15)
-    vp = VolumeProfile(period=5, profile_rows=10).calculate(
-        BarData.from_arrays(
-            high=high, low=low, close=close, volume=vol, open_prices=open_p
-        )
+    bars = BarData.from_arrays(
+        high=high, low=low, close=close, volume=vol, open_prices=open_p, timestamps=ts
     )
+    vp = VolumeProfile(session_type=5, bin_size_mode=1, profile_rows=10).calculate(bars)
     assert {"poc", "vah", "val", "bull_poc", "bear_poc", "delta", "ibh", "ibl"} <= set(
-        vp.keys()
+        vp
     )
-    vp_ch = VolumeProfile.calculate_custom_hours(
-        ts, high, low, close, vol, start_hhmm=800, end_hhmm=1600, period=5
-    )
-    vp_ms = VolumeProfile.calculate_custom_hours_multi_session(
-        ts, high, low, close, vol, sessions=((800, 1200), (1300, 1700)), period=5
-    )
+    vp_ch = VolumeProfile(
+        profile_mode="custom", session_mode=2, bin_size_mode=1
+    ).calculate(bars)
+    vp_ms = VolumeProfile(
+        profile_mode="multi", session_mode=2, bin_size_mode=1
+    ).calculate(bars)
     assert not np.isnan(vp_ch["poc"].get(0))
     assert not np.isnan(vp_ms["poc"].get(0))
     poc = IndicatorSeries([100.0, 101.0, 102.0, 104.0])

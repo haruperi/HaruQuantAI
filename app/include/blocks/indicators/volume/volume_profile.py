@@ -1,17 +1,17 @@
-"""VolumeProfile indicator and related signal helpers.
+"""VolumeProfile session calculation and indicator-specific conditions.
 
-FEAT-SERVICES-INDICATOR-VOLUMEPROFILE: validated batch calculation.
+Epoch timestamps use the explicitly configured unit and chart timezone. Supply
+instrument tick_size for fixed bins; range bins require no instrument metadata.
 """
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Any, ClassVar, override
+from typing import ClassVar, Literal, override
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import numpy as np
-from pydantic import Field
+from pydantic import Field, field_validator
 
-from app.host.logging import get_logger
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -21,350 +21,121 @@ from app.include.blocks.metadata import (
     PortType,
 )
 from app.include.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.base import to_numpy
-
-logger = get_logger(__name__)
-DEFAULT_PERIOD: int = 50
-DEFAULT_PROFILE_ROWS: int = 50
-DEFAULT_VALUE_AREA_PCT: float = 0.7
-_SEC_TO_MS_CUTOFF: float = 100000000000.0
+from app.include.calculators.profile import VOLUME_OUTPUTS
+from app.include.calculators.profile_sessions import calculate_sessions
 
 
 class VolumeProfile(BaseIndicator):
-    """Volume Profile indicator extracting POC, VAH, VAL, Delta, IB, and conditions."""
+    """Donor session profiles with validated in-class configuration."""
 
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.volume_profile",
+        version="2.0.0",
         name="VolumeProfile",
         category="volume",
         chart_pane=ChartPane.MAIN,
-        inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
-            InputPort("volume", PortType.SERIES, required=True),
-            InputPort("open", PortType.SERIES, required=False),
+        inputs=tuple(
+            InputPort(name, PortType.SERIES, required=True)
+            for name in ("open", "high", "low", "close", "volume", "timestamps")
         ),
-        outputs=(
-            OutputPort("poc", PortType.SERIES),
-            OutputPort("vah", PortType.SERIES),
-            OutputPort("val", PortType.SERIES),
-            OutputPort("bull_poc", PortType.SERIES),
-            OutputPort("bear_poc", PortType.SERIES),
-            OutputPort("delta", PortType.SERIES),
-            OutputPort("poc_pct_up", PortType.SERIES),
-            OutputPort("poc_pct_down", PortType.SERIES),
-            OutputPort("ibh", PortType.SERIES),
-            OutputPort("ibl", PortType.SERIES),
+        outputs=tuple(
+            OutputPort(name, PortType.SERIES)
+            for name in VOLUME_OUTPUTS
+            + tuple(
+                f"{session}_{key}"
+                for session in ("london", "new_york", "sydney", "tokyo")
+                for key in ("poc", "vah", "val")
+            )
         ),
-        required_market_inputs=("high", "low", "close", "volume"),
-        parameter_search_space={
-            "period": {"type": "int", "min": 1, "max": 200, "default": 50},
-            "profile_rows": {"type": "int", "min": 5, "max": 200, "default": 50},
-            "value_area_pct": {
-                "type": "float",
-                "min": 0.1,
-                "max": 0.99,
-                "default": 0.7,
-            },
-            "ib_bars": {"type": "int", "min": 1, "max": 16, "default": 4},
-        },
+        required_market_inputs=("open", "high", "low", "close", "volume", "timestamps"),
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=50,
+        is_generation_eligible=False,
+        required_history_lookback=1,
     )
-    period: int = Field(default=DEFAULT_PERIOD, ge=1)
-    profile_rows: int = Field(default=DEFAULT_PROFILE_ROWS, ge=5)
-    value_area_pct: float = Field(default=DEFAULT_VALUE_AREA_PCT, ge=0.1, le=0.99)
-    ib_bars: int = Field(default=4, ge=1)
+    timestamp_unit: Literal["seconds", "milliseconds"] = "seconds"
+    timezone: str = "UTC"
+    bin_size_mode: Literal[1, 2] = 2
+    tick_size: float | None = Field(default=None, gt=0)
+    ticks_per_bin: int = Field(default=3, ge=1, le=1000)
+    value_area_pct: float = Field(default=70.0, ge=65, le=75)
 
-    @override
-    def required_history(self) -> int:
-        """Return the history needed before initialized outputs can be consumed."""
-        return self.period
+    @field_validator("timezone")
+    @classmethod
+    def valid_timezone(cls, value: str) -> str:
+        """Require a real chart timezone rather than guessing broker local time."""
+        try:
+            ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError) as exc:
+            raise ValueError("Unknown chart timezone") from exc
+        return value
+
+    session_type: int = Field(default=2, ge=1, le=10)
+    profile_mode: Literal["calendar", "custom", "multi"] = "calendar"
+    profile_rows: int = Field(default=50, ge=10, le=100)
+    session_start: int = Field(default=480, ge=0, le=1439)
+    session_end: int = Field(default=960, ge=0, le=1439)
+    session_mode: Literal[1, 2] = 1
+    ib_minutes: int = Field(default=0, ge=0, le=14400)
+    hvn_count: int = Field(default=5, ge=1, le=10)
+    hvn_threshold_pct: int = Field(default=20, ge=10, le=90)
+    lvn_threshold_pct: int = Field(default=40, ge=10, le=90)
+    enable_lvn: bool = False
+    enable_vcp: bool = False
+    cluster_spread: float = Field(default=6.0, ge=0.5, le=20)
+    max_cluster_centers: int = Field(default=2, ge=1, le=10)
+    pivot_method: Literal[1, 2, 3] = 1
+    pivot_pct: float = Field(default=2.0, ge=0.01, le=10)
+    pivot_ticks: int = Field(default=50, ge=1, le=10000)
+    pivot_atr_multiple: float = Field(default=1.5, ge=0.1, le=10)
+    pivot_atr_period: int = Field(default=14, ge=2, le=200)
+    enable_london: bool = True
+    london_start: int = Field(default=420, ge=0, le=1439)
+    london_end: int = Field(default=960, ge=0, le=1439)
+    enable_new_york: bool = True
+    new_york_start: int = Field(default=780, ge=0, le=1439)
+    new_york_end: int = Field(default=1320, ge=0, le=1439)
+    enable_sydney: bool = False
+    sydney_start: int = Field(default=1260, ge=0, le=1439)
+    sydney_end: int = Field(default=360, ge=0, le=1439)
+    enable_tokyo: bool = True
+    tokyo_start: int = Field(default=0, ge=0, le=1439)
+    tokyo_end: int = Field(default=540, ge=0, le=1439)
 
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
-        """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
-        high = bars.high
-        low = bars.low
-        close = bars.close
-        volume = bars.volume
-        open_prices = bars.open if bars.has_input("open") else None
-        period = self.period
-        profile_rows = self.profile_rows
-        value_area_pct = self.value_area_pct
-        ib_bars = self.ib_bars
-        h_arr = to_numpy(high)
-        l_arr = to_numpy(low)
-        c_arr = to_numpy(close)
-        v_arr = to_numpy(volume)
-        n = len(c_arr)
-        o_arr = VolumeProfile._open_values(c_arr, open_prices)
-        keys = (
-            "poc",
-            "vah",
-            "val",
-            "bull_poc",
-            "bear_poc",
-            "delta",
-            "poc_pct_up",
-            "poc_pct_down",
-            "ibh",
-            "ibl",
-        )
-        arrays = {k: np.full(n, np.nan, dtype=np.float64) for k in keys}
-        if n < period:
-            logger.info(
-                "FR-SERVICES-VOLUMEPROFILE-CALCULATE: Insufficient bars (%d < %d)",
-                n,
-                period,
-            )
-            return {k: IndicatorSeries(arrays[k], name=k.upper()) for k in keys}
-        profile_rows = max(5, profile_rows)
-        value_area_pct = min(0.99, max(0.1, value_area_pct))
-        ib_len = max(1, min(ib_bars, period))
-        for i in range(period - 1, n):
-            start = i - period + 1
-            h_sl = h_arr[start : i + 1]
-            l_sl = l_arr[start : i + 1]
-            o_sl = o_arr[start : i + 1]
-            c_sl = c_arr[start : i + 1]
-            v_sl = v_arr[start : i + 1]
-            poc_val, vah_val, val_val, bull_poc, bear_poc, delta_val = (
-                VolumeProfile._compute_profile_extended(
-                    h_slice=h_sl,
-                    l_slice=l_sl,
-                    o_slice=o_sl,
-                    c_slice=c_sl,
-                    v_slice=v_sl,
-                    profile_rows=profile_rows,
-                    value_area_pct=value_area_pct,
+        """Calculate calendar, custom-hour or independent named session profiles."""
+        config = self.model_dump()
+        if self.profile_mode == "calendar":
+            result = calculate_sessions(bars, config)
+        else:
+            config["session_type"] = 1 if self.session_mode == 1 else 5
+            if self.profile_mode == "custom":
+                result = calculate_sessions(
+                    bars, config, custom=(self.session_start, self.session_end)
                 )
-            )
-            s_high = float(np.max(h_sl))
-            s_low = float(np.min(l_sl))
-            rng = s_high - s_low
-            pct_down = (poc_val - s_low) / rng * 100.0 if rng > 0.0 else 50.0
-            pct_up = (s_high - poc_val) / rng * 100.0 if rng > 0.0 else 50.0
-            arrays["poc"][i] = poc_val
-            arrays["vah"][i] = vah_val
-            arrays["val"][i] = val_val
-            arrays["bull_poc"][i] = bull_poc
-            arrays["bear_poc"][i] = bear_poc
-            arrays["delta"][i] = delta_val
-            arrays["poc_pct_up"][i] = pct_up
-            arrays["poc_pct_down"][i] = pct_down
-            arrays["ibh"][i] = float(np.max(h_sl[:ib_len]))
-            arrays["ibl"][i] = float(np.min(l_sl[:ib_len]))
-        logger.info(
-            "FR-SERVICES-VOLUMEPROFILE-CALCULATE: VP(p=%d, rows=%d) for %d bars",
-            period,
-            profile_rows,
-            n,
-        )
-        return {k: IndicatorSeries(arrays[k], name=k.upper()) for k in keys}
-
-    @staticmethod
-    def _compute_profile(
-        *,
-        h_slice: np.ndarray[Any, Any],
-        l_slice: np.ndarray[Any, Any],
-        v_slice: np.ndarray[Any, Any],
-        profile_rows: int,
-        value_area_pct: float,
-    ) -> tuple[float, float, float]:
-        """Compute POC, VAH, and VAL for a discrete price slice."""
-        zeros = np.zeros_like(h_slice)
-        poc, vah, val, _, _, _ = VolumeProfile._compute_profile_extended(
-            h_slice=h_slice,
-            l_slice=l_slice,
-            o_slice=zeros,
-            c_slice=zeros,
-            v_slice=v_slice,
-            profile_rows=profile_rows,
-            value_area_pct=value_area_pct,
-        )
-        return (poc, vah, val)
-
-    @staticmethod
-    def _compute_profile_extended(
-        *,
-        h_slice: np.ndarray[Any, Any],
-        l_slice: np.ndarray[Any, Any],
-        o_slice: np.ndarray[Any, Any],
-        c_slice: np.ndarray[Any, Any],
-        v_slice: np.ndarray[Any, Any],
-        profile_rows: int,
-        value_area_pct: float,
-    ) -> tuple[float, float, float, float, float, float]:
-        """Compute POC, VAH, VAL, BullPOC, BearPOC, and Delta."""
-        s_high = float(np.max(h_slice))
-        s_low = float(np.min(l_slice))
-        price_range = s_high - s_low
-        if price_range <= 0.0:
-            return (s_high, s_high, s_low, s_high, s_low, 0.0)
-        bin_size = price_range / profile_rows
-        bins = np.zeros(profile_rows, dtype=np.float64)
-        bull_bins = np.zeros(profile_rows, dtype=np.float64)
-        bear_bins = np.zeros(profile_rows, dtype=np.float64)
-        delta_sum = 0.0
-        for h, lo, op, cl, vol in zip(
-            h_slice, l_slice, o_slice, c_slice, v_slice, strict=True
-        ):
-            safe_vol = max(0.0, float(vol))
-            bin_lo = int(
-                np.clip(np.floor((lo - s_low) / bin_size), 0, profile_rows - 1)
-            )
-            bin_hi = int(np.clip(np.floor((h - s_low) / bin_size), 0, profile_rows - 1))
-            count = bin_hi - bin_lo + 1
-            vol_per_bin = safe_vol / count
-            bins[bin_lo : bin_hi + 1] += vol_per_bin
-            if cl >= op:
-                bull_bins[bin_lo : bin_hi + 1] += vol_per_bin
-                delta_sum += safe_vol
             else:
-                bear_bins[bin_lo : bin_hi + 1] += vol_per_bin
-                delta_sum -= safe_vol
-        poc_idx = int(np.argmax(bins))
-        poc = s_low + (poc_idx + 0.5) * bin_size
-        bull_idx = int(np.argmax(bull_bins)) if np.max(bull_bins) > 0.0 else poc_idx
-        bear_idx = int(np.argmax(bear_bins)) if np.max(bear_bins) > 0.0 else poc_idx
-        bull_poc = s_low + (bull_idx + 0.5) * bin_size
-        bear_poc = s_low + (bear_idx + 0.5) * bin_size
-        vah, val = VolumeProfile._expand_value_area(
-            bins=bins,
-            poc_idx=poc_idx,
-            s_low=s_low,
-            bin_size=bin_size,
-            value_area_pct=value_area_pct,
-            profile_rows=profile_rows,
-        )
-        return (poc, vah, val, bull_poc, bear_poc, delta_sum)
-
-    @staticmethod
-    def _expand_value_area(
-        *,
-        bins: np.ndarray[Any, Any],
-        poc_idx: int,
-        s_low: float,
-        bin_size: float,
-        value_area_pct: float,
-        profile_rows: int,
-    ) -> tuple[float, float]:
-        """Expand outward from POC to identify Value Area High and Low boundaries."""
-        total_volume = float(np.sum(bins))
-        if total_volume <= 0.0:
-            return (s_low + (poc_idx + 1) * bin_size, s_low + poc_idx * bin_size)
-        target_vol = total_volume * value_area_pct
-        current_vol = float(bins[poc_idx])
-        lo_idx = poc_idx
-        hi_idx = poc_idx
-        while current_vol < target_vol and (lo_idx > 0 or hi_idx < profile_rows - 1):
-            next_up = float(bins[hi_idx + 1]) if hi_idx < profile_rows - 1 else -1.0
-            next_dn = float(bins[lo_idx - 1]) if lo_idx > 0 else -1.0
-            if next_up >= next_dn:
-                hi_idx += 1
-                current_vol += next_up
-            else:
-                lo_idx -= 1
-                current_vol += next_dn
-        vah = s_low + (hi_idx + 1) * bin_size
-        val = s_low + lo_idx * bin_size
-        return (vah, val)
-
-    @staticmethod
-    def _as_series(
-        s: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-    ) -> IndicatorSeries:
-        """Resolve a numeric profile series without copying an existing wrapper."""
-        return s if isinstance(s, IndicatorSeries) else IndicatorSeries(s)
-
-    @staticmethod
-    def _open_values(
-        close: np.ndarray[Any, Any], supplied: np.ndarray[Any, Any] | None
-    ) -> np.ndarray[Any, Any]:
-        """Use supplied opens, or derive the original previous-close approximation."""
-        if supplied is not None:
-            return supplied
-        out = np.empty(len(close), dtype=np.float64)
-        if len(close):
-            out[0] = close[0]
-            out[1:] = close[:-1]
-        return out
-
-    @staticmethod
-    def calculate_custom_hours(
-        timestamps: Sequence[int | float] | np.ndarray[Any, Any],
-        high: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-        low: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-        close: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-        volume: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-        *,
-        start_hhmm: int = 800,
-        end_hhmm: int = 1700,
-        period: int = DEFAULT_PERIOD,
-        profile_rows: int = DEFAULT_PROFILE_ROWS,
-        value_area_pct: float = DEFAULT_VALUE_AREA_PCT,
-    ) -> dict[str, IndicatorSeries]:
-        """Compute VolumeProfileCustomHours within `start_hhmm`..`end_hhmm`."""
-        ts = np.asarray(timestamps, dtype=np.float64)
-        if len(ts) > 0 and float(np.max(np.abs(ts))) < _SEC_TO_MS_CUTOFF:
-            ts = ts * 1000.0
-        v_arr = to_numpy(volume).copy()
-        day_ms = 24 * 60 * 60 * 1000
-        start_ms = start_hhmm // 100 * 3600000 + start_hhmm % 100 * 60000
-        end_ms = end_hhmm // 100 * 3600000 + end_hhmm % 100 * 60000
-        for i in range(min(len(ts), len(v_arr))):
-            tod = int(ts[i]) % day_ms
-            in_win = (
-                start_ms <= tod <= end_ms
-                if start_ms <= end_ms
-                else tod >= start_ms or tod <= end_ms
-            )
-            if not in_win:
-                v_arr[i] = 0.0
-        return VolumeProfile(
-            period=period, profile_rows=profile_rows, value_area_pct=value_area_pct
-        ).calculate(BarData.from_arrays(high=high, low=low, close=close, volume=v_arr))
-
-    @staticmethod
-    def calculate_custom_hours_multi_session(
-        timestamps: Sequence[int | float] | np.ndarray[Any, Any],
-        high: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-        low: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-        close: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-        volume: IndicatorSeries | Sequence[float] | np.ndarray[Any, Any],
-        *,
-        sessions: Sequence[tuple[int, int]] = ((800, 1200), (1300, 1700)),
-        period: int = DEFAULT_PERIOD,
-        profile_rows: int = DEFAULT_PROFILE_ROWS,
-        value_area_pct: float = DEFAULT_VALUE_AREA_PCT,
-    ) -> dict[str, IndicatorSeries]:
-        """Compute VolumeProfileCustomHoursMultiSession across session windows."""
-        ts = np.asarray(timestamps, dtype=np.float64)
-        if len(ts) > 0 and float(np.max(np.abs(ts))) < _SEC_TO_MS_CUTOFF:
-            ts = ts * 1000.0
-        v_arr = to_numpy(volume).copy()
-        day_ms = 24 * 60 * 60 * 1000
-        win_bounds = [
-            (s // 100 * 3600000 + s % 100 * 60000, e // 100 * 3600000 + e % 100 * 60000)
-            for s, e in sessions
-        ]
-        for i in range(min(len(ts), len(v_arr))):
-            tod = int(ts[i]) % day_ms
-            matched = any(
-                (
-                    sm <= tod <= em if sm <= em else tod >= sm or tod <= em
-                    for sm, em in win_bounds
+                result = {}
+                for name in ("london", "new_york", "sydney", "tokyo"):
+                    if getattr(self, "enable_" + name):
+                        session = calculate_sessions(
+                            bars,
+                            config,
+                            custom=(
+                                getattr(self, name + "_start"),
+                                getattr(self, name + "_end"),
+                            ),
+                            multi=True,
+                        )
+                        if not result:
+                            result.update(session)
+                        for key in ("poc", "vah", "val"):
+                            result[name + "_" + key] = session[key]
+        for port in self.spec.outputs:
+            if port.name not in result:
+                result[port.name] = IndicatorSeries(
+                    np.zeros(len(bars.close)), name=port.name.upper()
                 )
-            )
-            if not matched:
-                v_arr[i] = 0.0
-        return VolumeProfile(
-            period=period, profile_rows=profile_rows, value_area_pct=value_area_pct
-        ).calculate(BarData.from_arrays(high=high, low=low, close=close, volume=v_arr))
+        return result
 
     @staticmethod
     def price_inside_va(

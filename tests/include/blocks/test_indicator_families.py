@@ -19,9 +19,16 @@ from app.workspace.code_editor._indicator_data import calculate_indicator, outpu
 from pydantic import ValidationError
 
 FIXTURES = Path("docs/dev/fixtures")
-FAMILIES: list[dict[str, Any]] = json.loads(
+HISTORICAL_FAMILIES: list[dict[str, Any]] = json.loads(
     (FIXTURES / "phase3-family-baselines.json").read_text(encoding="utf-8")
 )
+# Rolling profile captures are retained unchanged as historical evidence. Their
+# contracts were replaced by donor session qualification in test_profile_sessions.
+FAMILIES = [
+    entry
+    for entry in HISTORICAL_FAMILIES
+    if entry["name"] not in {"VolumeProfile", "TPOProfile"}
+]
 
 
 @pytest.fixture(scope="module")

@@ -1,16 +1,17 @@
-"""TPOProfile indicator and related signal helpers.
+"""TPOProfile session calculation and indicator-specific conditions.
 
-FEAT-SERVICES-INDICATOR-TPOPROFILE: validated batch calculation.
+Epoch timestamps use the explicitly configured unit and chart timezone. Supply
+instrument tick_size for fixed bins; range bins require no instrument metadata.
 """
 
 from __future__ import annotations
 
-from typing import Any, ClassVar, override
+from typing import ClassVar, Literal, override
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import numpy as np
-from pydantic import Field
+from pydantic import Field, field_validator, model_validator
 
-from app.host.logging import get_logger
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,
@@ -20,171 +21,70 @@ from app.include.blocks.metadata import (
     PortType,
 )
 from app.include.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.base import to_numpy
-
-logger = get_logger(__name__)
-DEFAULT_PERIOD: int = 48
-DEFAULT_PROFILE_ROWS: int = 40
-DEFAULT_IB_BARS: int = 2
-DEFAULT_VALUE_AREA_PCT: float = 0.7
+from app.include.calculators.profile import TPO_OUTPUTS
+from app.include.calculators.profile_sessions import calculate_sessions
 
 
 class TPOProfile(BaseIndicator):
-    """TPO Profile indicator with Initial Balance and Value Area boundaries."""
+    """Donor session profiles with validated in-class configuration."""
 
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.tpo_profile",
+        version="2.0.0",
         name="TPOProfile",
         category="volume",
         chart_pane=ChartPane.MAIN,
-        inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+        inputs=tuple(
+            InputPort(name, PortType.SERIES, required=True)
+            for name in ("open", "high", "low", "close", "volume", "timestamps")
         ),
-        outputs=(
-            OutputPort("poc", PortType.SERIES),
-            OutputPort("vah", PortType.SERIES),
-            OutputPort("val", PortType.SERIES),
-            OutputPort("ib_high", PortType.SERIES),
-            OutputPort("ib_low", PortType.SERIES),
-        ),
-        required_market_inputs=("high", "low", "close"),
-        parameter_search_space={
-            "period": {"type": "int", "min": 1, "max": 192, "default": 48},
-            "profile_rows": {"type": "int", "min": 5, "max": 160, "default": 40},
-            "ib_bars": {"type": "int", "min": 1, "max": 8, "default": 2},
-            "value_area_pct": {
-                "type": "float",
-                "min": 0.1,
-                "max": 0.99,
-                "default": 0.7,
-            },
-        },
+        outputs=tuple(OutputPort(name, PortType.SERIES) for name in TPO_OUTPUTS),
+        required_market_inputs=("open", "high", "low", "close", "volume", "timestamps"),
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=48,
+        is_generation_eligible=False,
+        required_history_lookback=1,
     )
-    period: int = Field(default=DEFAULT_PERIOD, ge=1)
-    profile_rows: int = Field(default=DEFAULT_PROFILE_ROWS, ge=5)
-    ib_bars: int = Field(default=DEFAULT_IB_BARS, ge=1)
-    value_area_pct: float = Field(default=DEFAULT_VALUE_AREA_PCT, ge=0.1, le=0.99)
+    timestamp_unit: Literal["seconds", "milliseconds"] = "seconds"
+    timezone: str = "UTC"
+    bin_size_mode: Literal[1, 2] = 2
+    tick_size: float | None = Field(default=None, gt=0)
+    ticks_per_bin: int = Field(default=1, ge=1, le=1000)
+    value_area_pct: float = Field(default=70.0, ge=30, le=95)
 
-    @override
-    def required_history(self) -> int:
-        """Return the history needed before initialized outputs can be consumed."""
-        return self.period
+    @field_validator("timezone")
+    @classmethod
+    def valid_timezone(cls, value: str) -> str:
+        """Require a real chart timezone rather than guessing broker local time."""
+        try:
+            ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError) as exc:
+            raise ValueError("Unknown chart timezone") from exc
+        return value
+
+    session_type: int = Field(default=1, ge=1, le=8)
+    profile_rows: int = Field(default=150, ge=10, le=500)
+    use_custom_hours: bool = False
+    session_start: int = Field(default=0, ge=0, le=1439)
+    session_end: int = Field(default=1439, ge=0, le=1439)
+    bracket_min_daily: int = Field(default=30, ge=1, le=120)
+    bracket_min_weekly: int = Field(default=240, ge=1, le=10000)
+    bracket_min_monthly: int = Field(default=720, ge=1, le=10000)
+    bracket_min_yearly: int = Field(default=720, ge=1, le=10000)
+
+    @model_validator(mode="after")
+    def custom_daily_only(self) -> TPOProfile:
+        """Reject custom-hour settings when a non-daily calendar is selected."""
+        if self.use_custom_hours and self.session_type not in (1, 5):
+            raise ValueError("Custom hours require a daily TPO session")
+        return self
 
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
-        """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
-        high = bars.high
-        low = bars.low
-        close = bars.close
-        period = self.period
-        profile_rows = self.profile_rows
-        ib_bars = self.ib_bars
-        value_area_pct = self.value_area_pct
-        h_arr = to_numpy(high)
-        l_arr = to_numpy(low)
-        c_arr = to_numpy(close)
-        n = len(c_arr)
-        poc_out = np.full(n, np.nan, dtype=np.float64)
-        vah_out = np.full(n, np.nan, dtype=np.float64)
-        val_out = np.full(n, np.nan, dtype=np.float64)
-        ibh_out = np.full(n, np.nan, dtype=np.float64)
-        ibl_out = np.full(n, np.nan, dtype=np.float64)
-        if n < period:
-            logger.info(
-                "FR-SERVICES-TPOPROFILE-CALCULATE: Insufficient bars (%d < %d)",
-                n,
-                period,
-            )
-            return {
-                "poc": IndicatorSeries(poc_out, name="TPO_POC"),
-                "vah": IndicatorSeries(vah_out, name="TPO_VAH"),
-                "val": IndicatorSeries(val_out, name="TPO_VAL"),
-                "ib_high": IndicatorSeries(ibh_out, name="TPO_IBH"),
-                "ib_low": IndicatorSeries(ibl_out, name="TPO_IBL"),
-            }
-        profile_rows = max(5, profile_rows)
-        ib_bars = max(1, min(ib_bars, period))
-        for i in range(period - 1, n):
-            start = i - period + 1
-            h_slice = h_arr[start : i + 1]
-            l_slice = l_arr[start : i + 1]
-            ibh_out[i] = float(np.max(h_slice[:ib_bars]))
-            ibl_out[i] = float(np.min(l_slice[:ib_bars]))
-            poc_val, vah_val, val_val = self._compute_tpo_slice(
-                h_slice=h_slice,
-                l_slice=l_slice,
-                profile_rows=profile_rows,
-                value_area_pct=value_area_pct,
-            )
-            poc_out[i] = poc_val
-            vah_out[i] = vah_val
-            val_out[i] = val_val
-        logger.info(
-            "FR-SERVICES-TPOPROFILE-CALCULATE: Computed TPO(p=%d, rows=%d) for %d bars",
-            period,
-            profile_rows,
-            n,
+        """Count distinct time brackets at each price within the selected session."""
+        custom = (
+            (self.session_start, self.session_end) if self.use_custom_hours else None
         )
-        return {
-            "poc": IndicatorSeries(poc_out, name="TPO_POC"),
-            "vah": IndicatorSeries(vah_out, name="TPO_VAH"),
-            "val": IndicatorSeries(val_out, name="TPO_VAL"),
-            "ib_high": IndicatorSeries(ibh_out, name="TPO_IBH"),
-            "ib_low": IndicatorSeries(ibl_out, name="TPO_IBL"),
-        }
-
-    @classmethod
-    def _compute_tpo_slice(
-        cls,
-        *,
-        h_slice: np.ndarray[Any, Any],
-        l_slice: np.ndarray[Any, Any],
-        profile_rows: int,
-        value_area_pct: float,
-    ) -> tuple[float, float, float]:
-        """Compute POC, VAH, and VAL for discrete TPO bracket touches."""
-        s_high = float(np.max(h_slice))
-        s_low = float(np.min(l_slice))
-        price_range = s_high - s_low
-        if price_range <= 0.0:
-            return (s_high, s_high, s_low)
-        bin_size = price_range / profile_rows
-        tpo_counts = np.zeros(profile_rows, dtype=np.float64)
-        for h, lo in zip(h_slice, l_slice, strict=True):
-            bin_lo = int(
-                np.clip(np.floor((lo - s_low) / bin_size), 0, profile_rows - 1)
-            )
-            bin_hi = int(np.clip(np.floor((h - s_low) / bin_size), 0, profile_rows - 1))
-            tpo_counts[bin_lo : bin_hi + 1] += 1.0
-        poc_idx = int(np.argmax(tpo_counts))
-        poc = s_low + (poc_idx + 0.5) * bin_size
-        total_tpo = float(np.sum(tpo_counts))
-        if total_tpo <= 0.0:
-            return (poc, s_high, s_low)
-        target_tpo = total_tpo * value_area_pct
-        current_tpo = float(tpo_counts[poc_idx])
-        lo_idx = poc_idx
-        hi_idx = poc_idx
-        while current_tpo < target_tpo and (lo_idx > 0 or hi_idx < profile_rows - 1):
-            next_up = (
-                float(tpo_counts[hi_idx + 1]) if hi_idx < profile_rows - 1 else -1.0
-            )
-            next_dn = float(tpo_counts[lo_idx - 1]) if lo_idx > 0 else -1.0
-            if next_up >= next_dn:
-                hi_idx += 1
-                current_tpo += next_up
-            else:
-                lo_idx -= 1
-                current_tpo += next_dn
-        vah = s_low + (hi_idx + 1) * bin_size
-        val = s_low + lo_idx * bin_size
-        return (poc, vah, val)
+        return calculate_sessions(bars, self.model_dump(), tpo=True, custom=custom)
 
     @classmethod
     def price_inside_va(

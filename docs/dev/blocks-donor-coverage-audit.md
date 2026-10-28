@@ -7,6 +7,11 @@ subsequent catalog-exposure migration is documented in
 `indicator-composition-migration.md`; its 667 registrations address the missing
 signal-mapping layer while the calculation/parity findings below remain relevant.
 
+Subsequent profile work is recorded in `profile-donor-qualification.md`: the
+rolling VP/TPO approximations described below have been replaced with session
+calculations and all numerical outputs, checked against executed donor methods.
+The remaining families and platform/instrument integration still need qualification.
+
 **Conclusion: full donor coverage is not complete.** The canonical package is
 healthy and broadly populated, but calculation migration, catalog exposure and
 SQX behavioral parity are distinct claims. Earlier Phase 3 qualification measured

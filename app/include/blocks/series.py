@@ -108,12 +108,16 @@ class BarData:
             else frozenset(("open", "high", "low", "close", "volume"))
             | self.auxiliary.keys()
         )
+        if len(self.timestamps):
+            available = available | {"timestamps"}
         missing = set(names) - available
         if missing:
             raise ValueError(f"Missing indicator inputs: {', '.join(sorted(missing))}")
 
     def has_input(self, name: str) -> bool:
         """Distinguish absent optional feeds from explicitly supplied zero values."""
+        if name == "timestamps":
+            return bool(len(self.timestamps))
         if self.available_inputs is not None:
             return name in self.available_inputs
         return (
