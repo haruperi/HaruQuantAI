@@ -9,6 +9,7 @@ __all__ = [
     "BookType",
     "DealEntry",
     "DealType",
+    "MAType",
     "MarginMode",
     "OrderFilling",
     "OrderState",
@@ -395,3 +396,12 @@ class Timeframe(StrEnum):
             return cls.from_string(val)
         except ValueError, TypeError:
             return target_default
+
+
+class MAType(IntEnum):
+    """Moving average type selector for quantitative indicators."""
+
+    SMA = 1
+    EMA = 2
+    WMA = 3
+    HULL = 4

@@ -2,8 +2,18 @@
 
 from __future__ import annotations
 
+import app.include.blocks.indicators.volume.cot as cot_signals
 import numpy as np
 import pytest
+from app.include.blocks.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_lower,
+    is_rising,
+)
 from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators import (
     EMA,
@@ -14,27 +24,17 @@ from app.include.blocks.indicators import (
     TEMA,
     BollingerBands,
 )
-from app.include.blocks.series import BarData
-from app.include.comparisons import (
-    changes_down,
-    changes_up,
-    crosses_above,
-    crosses_below,
-    is_falling,
-    is_lower,
-    is_rising,
-)
-from app.include.indicators.base import IndicatorSeries
-from app.include.indicators.momentum.cci import CCI
-from app.include.indicators.momentum.qqe import QQE
-from app.include.indicators.momentum.stochastic import Stochastic
-from app.include.indicators.momentum.wave_trend import WaveTrend
-from app.include.indicators.trend.adx import ADX
-from app.include.indicators.trend.ichimoku import Ichimoku
-from app.include.indicators.volatility.bar_range import BarRange
-from app.include.indicators.volatility.keltner_channel import KeltnerChannel
-from app.include.indicators.volume.cot import COT
-from app.include.indicators.volume.volume_profile import VolumeProfile
+from app.include.blocks.indicators.momentum.cci import CCI
+from app.include.blocks.indicators.momentum.qqe import QQE
+from app.include.blocks.indicators.momentum.stochastic import Stochastic
+from app.include.blocks.indicators.momentum.wave_trend import WaveTrend
+from app.include.blocks.indicators.trend.adx import ADX
+from app.include.blocks.indicators.trend.ichimoku import Ichimoku
+from app.include.blocks.indicators.volatility.bar_range import BarRange
+from app.include.blocks.indicators.volatility.keltner_channel import KeltnerChannel
+from app.include.blocks.indicators.volume.cot import COT
+from app.include.blocks.indicators.volume.volume_profile import VolumeProfile
+from app.include.blocks.series import BarData, IndicatorSeries
 from app.include.price import BarPrice
 
 
@@ -43,12 +43,18 @@ def test_adx_calculate_and_all_conditions() -> None:
     high = np.linspace(10.0, 25.0, 30)
     low = high - 1.5
     close = high - 0.3
-    adx_dict = ADX.calculate(high, low, close, period=5)
+    adx_dict = ADX(period=5).calculate(
+        BarData.from_arrays(high=high, low=low, close=close)
+    )
     assert "main" in adx_dict and "di_plus" in adx_dict and "di_minus" in adx_dict
 
-    # Short series branch & invalid period fallback
-    short_adx = ADX.calculate([1.0, 2.0], [0.5, 1.0], [0.8, 1.5], period=0)
+    # Short series branch and invalid configuration rejection
+    short_adx = ADX(period=14).calculate(
+        BarData.from_arrays(high=[1.0, 2.0], low=[0.5, 1.0], close=[0.8, 1.5])
+    )
     assert np.isnan(short_adx["main"].get(0))
+    with pytest.raises(ValueError):
+        ADX(period=0)
 
     s = IndicatorSeries([15.0, 12.0, 18.0, 22.0])
     d = {
@@ -75,7 +81,7 @@ def test_bar_range_time_windows_and_conditions() -> None:
     """Verify BarRange time-window extrema, fixed_pips, and range conditions."""
     high = np.array([10.0, 12.0, 11.5, 14.0, 13.0, 12.5])
     low = np.array([9.0, 10.5, 10.8, 11.0, 12.0, 11.0])
-    rng = BarRange.calculate(high, low)
+    rng = BarRange().calculate(BarData.from_arrays(high=high, low=low))["value"]
     assert len(rng) == 6
     assert BarRange.fixed_pips(50, 0.0001) == pytest.approx(0.005)
     assert BarRange.is_biggest_range(rng, period=3, shift=2) is True
@@ -175,7 +181,9 @@ def test_cci_and_woodies_patterns() -> None:
     high = np.array([10.0, 11.0, 12.0, 11.5, 13.0, 14.0, 15.0])
     low = high - 1.0
     close = high - 0.2
-    cci = CCI.calculate(high, low, close, period=3)
+    cci = CCI(period=3).calculate(BarData.from_arrays(high=high, low=low, close=close))[
+        "value"
+    ]
     assert len(cci) == 7
 
     s_turn = IndicatorSeries([20.0, 10.0, 30.0])
@@ -226,7 +234,9 @@ def test_ichimoku_kijun_cross_and_strength() -> None:
     high = np.linspace(100.0, 130.0, 60)
     low = high - 2.0
     close = high - 0.5
-    ichi = Ichimoku.calculate(high, low, close, tenkan=9, kijun=26, senkou=52)
+    ichi = Ichimoku(tenkan=9, kijun=26, senkou=52).calculate(
+        BarData.from_arrays(high=high, low=low, close=close)
+    )
     assert set(ichi.keys()) == {
         "tenkan_sen",
         "kijun_sen",
@@ -325,12 +335,16 @@ def test_ichimoku_kijun_cross_and_strength() -> None:
     assert Ichimoku.tenkan_kijun_cross_bearish(ks, ks) is False
     assert Ichimoku.senkou_span_cross_bullish(sa, sa) is False
     assert Ichimoku.senkou_span_cross_bearish(sa, sa) is False
-    with pytest.raises(ValueError, match="All lookback periods"):
-        Ichimoku.calculate(high, low, close, tenkan=0)
+    with pytest.raises(ValueError, match="tenkan"):
+        Ichimoku(tenkan=0).calculate(
+            BarData.from_arrays(high=high, low=low, close=close)
+        )
     with pytest.raises(ValueError, match="empty"):
-        Ichimoku.calculate(np.array([]), np.array([]), np.array([]))
-    with pytest.raises(ValueError, match="lengths must match"):
-        Ichimoku.calculate(high, low[:5], close)
+        Ichimoku().calculate(
+            BarData.from_arrays(high=np.array([]), low=np.array([]), close=np.array([]))
+        )
+    with pytest.raises(ValueError, match="aligned series"):
+        Ichimoku().calculate(BarData.from_arrays(high=high, low=low[:5], close=close))
 
 
 def test_keltner_channel_bar_opens_and_closes() -> None:
@@ -338,7 +352,9 @@ def test_keltner_channel_bar_opens_and_closes() -> None:
     high = np.linspace(10.0, 15.0, 25)
     low = high - 1.0
     close = high - 0.3
-    kc = KeltnerChannel.calculate(high, low, close, period=5, deviation=1.5)
+    kc = KeltnerChannel(period=5, deviation=1.5).calculate(
+        BarData.from_arrays(high=high, low=low, close=close)
+    )
     assert set(kc.keys()) == {"upper", "middle", "lower"}
 
     kc_mock = {
@@ -461,7 +477,7 @@ def test_moving_average_tema_and_bar_conditions() -> None:
 def test_qqe_all_14_conditions() -> None:
     """Verify QQE calculation and all 14 condition helpers."""
     close = np.linspace(100.0, 120.0, 30) + np.sin(np.arange(30))
-    res = QQE.calculate(close, rsi_period=5, sf=3, wf=4.236)
+    res = QQE(rsi_period=5, sf=3, wf=4.236).calculate(BarData.from_arrays(price=close))
     assert "value1" in res and "value2" in res
 
     v1 = IndicatorSeries([50.0, 45.0, 55.0])
@@ -487,7 +503,9 @@ def test_stochastic_all_12_conditions() -> None:
     high = np.linspace(10.0, 20.0, 25)
     low = high - 1.5
     close = high - 0.3
-    st = Stochastic.calculate(high, low, close, k_period=5, d_period=3, slowing=3)
+    st = Stochastic(k_period=5, d_period=3, slowing=3).calculate(
+        BarData.from_arrays(high=high, low=low, close=close)
+    )
     assert "k" in st and "d" in st
 
     mock = {
@@ -515,8 +533,8 @@ def test_wave_trend_all_18_conditions() -> None:
     high = np.linspace(50.0, 70.0, 30)
     low = high - 1.5
     close = high - 0.4
-    wt = WaveTrend.calculate(
-        high, low, close, channel_length=5, average_length=7, signal_length=3
+    wt = WaveTrend(channel_length=5, average_length=7, signal_length=3).calculate(
+        BarData.from_arrays(high=high, low=low, close=close)
     )
     assert "wt1" in wt and "wt2" in wt
 
@@ -548,13 +566,13 @@ def test_cot_calculate_and_all_conditions() -> None:
     spec = -comm
     small = np.linspace(20.0, -20.0, 30)
     oi = np.full(30, 500.0)
-    res = COT.calculate(
-        comm,
-        spec,
-        small_spec_net=small,
-        open_interest=oi,
-        period_fast=5,
-        period_slow=10,
+    res = COT(period_fast=5, period_slow=10).calculate(
+        BarData.from_arrays(
+            commercial_net=comm,
+            speculator_net=spec,
+            small_spec_net=small,
+            open_interest=oi,
+        )
     )
     assert "composite_score" in res and "cpi_small" in res and "cti_hedger" in res
 
@@ -565,37 +583,44 @@ def test_cot_calculate_and_all_conditions() -> None:
     sm52 = IndicatorSeries([0.50, 0.40, 0.30, 0.20, 0.15])
     score = IndicatorSeries([-0.30, -0.20, -0.05, 0.25, 0.70])
 
-    assert COT.field_value(h52) == pytest.approx(0.90)
-    assert COT.cross_field_spread(h52, s52) == pytest.approx(0.80)
-    assert COT.momentum(h52, lookback=2) == pytest.approx(0.10)
-    assert COT.multi_field_combo(h52, s52, sm52, s156) > 0.70
+    assert cot_signals.field_value(h52) == pytest.approx(0.90)
+    assert cot_signals.cross_field_spread(h52, s52) == pytest.approx(0.80)
+    assert cot_signals.momentum(h52, lookback=2) == pytest.approx(0.10)
+    assert cot_signals.multi_field_combo(h52, s52, sm52, s156) > 0.70
 
-    assert COT.is_bullish_extreme(score, 0.60) is True
-    assert COT.is_bearish_extreme(score, -0.20, shift=4) is True
-    assert COT.is_bullish_regime(score) is True
-    assert COT.is_bearish_regime(score, shift=3) is True
-    assert COT.score_crosses_above_zero(score, shift=1) is True
-    assert COT.score_crosses_below_zero(IndicatorSeries([0.2, -0.1])) is True
-    assert COT.is_rising(score) is True
-    assert COT.is_falling(IndicatorSeries([0.5, 0.2])) is True
-    assert COT.changes_up(IndicatorSeries([0.5, 0.2, 0.6])) is True
-    assert COT.changes_down(IndicatorSeries([0.2, 0.6, 0.3])) is True
-    assert COT.crosses_above(score, 0.5) is True
-    assert COT.crosses_below(IndicatorSeries([0.6, 0.3]), 0.5) is True
-    assert COT.is_higher(score, 0.5) is True
-    assert COT.is_lower(score, 0.8) is True
+    assert cot_signals.is_bullish_extreme(score, 0.60) is True
+    assert cot_signals.is_bearish_extreme(score, -0.20, shift=4) is True
+    assert cot_signals.is_bullish_regime(score) is True
+    assert cot_signals.is_bearish_regime(score, shift=3) is True
+    assert cot_signals.score_crosses_above_zero(score, shift=1) is True
+    assert cot_signals.score_crosses_below_zero(IndicatorSeries([0.2, -0.1])) is True
+    assert is_rising(score) is True
+    assert is_falling(IndicatorSeries([0.5, 0.2])) is True
+    assert changes_up(IndicatorSeries([0.5, 0.2, 0.6])) is True
+    assert changes_down(IndicatorSeries([0.2, 0.6, 0.3])) is True
+    assert crosses_above(score, 0.5) is True
+    assert crosses_below(IndicatorSeries([0.6, 0.3]), 0.5) is True
+    assert is_greater(score, 0.5) is True
+    assert is_lower(score, 0.8) is True
 
-    assert COT.shift_52_vs_156_bullish(h52, s52, h156, s156, 0.10) is True
-    assert COT.shift_52_vs_156_bearish(s52, h52, s156, h156, 0.10) is True
-    assert COT.accumulation_bullish(h52, s52, min_weeks=3) is True
-    assert COT.accumulation_bearish(s52, h52, min_weeks=3) is True
-    assert COT.extreme_bullish(h52, s52, 0.80, 0.20, hedg156=h156, spec156=s156) is True
-    assert COT.extreme_bearish(s52, h52, 0.20, 0.80, hedg156=s156, spec156=h156) is True
+    assert cot_signals.shift_52_vs_156_bullish(h52, s52, h156, s156, 0.10) is True
+    assert cot_signals.shift_52_vs_156_bearish(s52, h52, s156, h156, 0.10) is True
+    assert cot_signals.accumulation_bullish(h52, s52, min_weeks=3) is True
+    assert cot_signals.accumulation_bearish(s52, h52, min_weeks=3) is True
     assert (
-        COT.convergence(IndicatorSeries([0.50]), IndicatorSeries([0.55]), 0.10) is True
+        cot_signals.extreme_bullish(h52, s52, 0.80, 0.20, hedg156=h156, spec156=s156)
+        is True
     )
     assert (
-        COT.crowding_unwind(
+        cot_signals.extreme_bearish(s52, h52, 0.20, 0.80, hedg156=s156, spec156=h156)
+        is True
+    )
+    assert (
+        cot_signals.convergence(IndicatorSeries([0.50]), IndicatorSeries([0.55]), 0.10)
+        is True
+    )
+    assert (
+        cot_signals.crowding_unwind(
             IndicatorSeries([0.20, 0.20]),
             IndicatorSeries([0.90, 0.80]),
             direction=1,
@@ -605,20 +630,23 @@ def test_cot_calculate_and_all_conditions() -> None:
         is True
     )
     assert (
-        COT.extreme_exit_bullish(
+        cot_signals.extreme_exit_bullish(
             IndicatorSeries([0.90, 0.65]), extreme_threshold=0.85, exit_threshold=0.70
         )
         is True
     )
     assert (
-        COT.extreme_exit_bearish(
+        cot_signals.extreme_exit_bearish(
             IndicatorSeries([0.90, 0.65]), extreme_threshold=0.85, exit_threshold=0.70
         )
         is True
     )
-    assert COT.extreme_persistence(h52, extreme_threshold=0.75, min_weeks=3) is True
     assert (
-        COT.extreme_unwind_bullish(
+        cot_signals.extreme_persistence(h52, extreme_threshold=0.75, min_weeks=3)
+        is True
+    )
+    assert (
+        cot_signals.extreme_unwind_bullish(
             IndicatorSeries([0.90, 0.80, 0.70]),
             crowded_threshold=0.85,
             normalize_threshold=0.75,
@@ -626,90 +654,103 @@ def test_cot_calculate_and_all_conditions() -> None:
         is True
     )
     assert (
-        COT.extreme_unwind_bearish(
+        cot_signals.extreme_unwind_bearish(
             IndicatorSeries([0.90, 0.80, 0.70]),
             crowded_threshold=0.85,
             normalize_threshold=0.75,
         )
         is True
     )
-    assert COT.full_cycle_long(h52, entry_level=0.88) is True
-    assert COT.full_cycle_short(s52, entry_level=0.12) is True
-    assert COT.full_cycle_exit_long(h52, exit_level=0.50) is True
-    assert COT.full_cycle_exit_short(s52, exit_level=0.50) is True
-    assert COT.hedger_accel_bullish(h52, s52, h156, s156, 0.10) is True
-    assert COT.hedger_accel_bearish(s52, h52, s156, h156, 0.10) is True
-    assert COT.hedger_div_conf_bullish(h52, s52, 0.75, 0.25, mom_lookback=2) is True
-    assert COT.hedger_div_conf_bearish(s52, h52, 0.25, 0.75, mom_lookback=2) is True
-    assert COT.higher_low(score, short_window=2, long_window=5) is True
+    assert cot_signals.full_cycle_long(h52, entry_level=0.88) is True
+    assert cot_signals.full_cycle_short(s52, entry_level=0.12) is True
+    assert cot_signals.full_cycle_exit_long(h52, exit_level=0.50) is True
+    assert cot_signals.full_cycle_exit_short(s52, exit_level=0.50) is True
+    assert cot_signals.hedger_accel_bullish(h52, s52, h156, s156, 0.10) is True
+    assert cot_signals.hedger_accel_bearish(s52, h52, s156, h156, 0.10) is True
     assert (
-        COT.lower_high(
+        cot_signals.hedger_div_conf_bullish(h52, s52, 0.75, 0.25, mom_lookback=2)
+        is True
+    )
+    assert (
+        cot_signals.hedger_div_conf_bearish(s52, h52, 0.25, 0.75, mom_lookback=2)
+        is True
+    )
+    assert cot_signals.higher_low(score, short_window=2, long_window=5) is True
+    assert (
+        cot_signals.lower_high(
             IndicatorSeries([0.4, 0.3, 0.2, 0.1, 0.05]), short_window=2, long_window=5
         )
         is True
     )
     assert (
-        COT.momentum_rev_bullish(
+        cot_signals.momentum_rev_bullish(
             IndicatorSeries([0.5, 0.2, 0.0, 0.1, 0.3]), mom_period=2
         )
         is True
     )
     assert (
-        COT.momentum_rev_bearish(
+        cot_signals.momentum_rev_bearish(
             IndicatorSeries([-0.5, -0.2, 0.1, 0.0, -0.3]), mom_period=2
         )
         is True
     )
-    assert COT.multi_window_bullish(h52, s52, h156, s156) is True
-    assert COT.multi_window_bearish(s52, h52, s156, h156) is True
-    assert COT.neutral_zone(score, neutral_band=0.10, shift=2) is True
+    assert cot_signals.multi_window_bullish(h52, s52, h156, s156) is True
+    assert cot_signals.multi_window_bearish(s52, h52, s156, h156) is True
+    assert cot_signals.neutral_zone(score, neutral_band=0.10, shift=2) is True
     assert (
-        COT.regime_shift_bullish(
+        cot_signals.regime_shift_bullish(
             IndicatorSeries([-0.2, -0.1, 0.0, 0.1, 0.3, 0.5]), shift_weeks=2
         )
         is True
     )
     assert (
-        COT.regime_shift_bearish(
+        cot_signals.regime_shift_bearish(
             IndicatorSeries([0.2, 0.1, 0.0, -0.1, -0.3, -0.5]), shift_weeks=2
         )
         is True
     )
-    assert COT.roc_bullish(score, roc_period=2, roc_threshold=0.20) is True
+    assert cot_signals.roc_bullish(score, roc_period=2, roc_threshold=0.20) is True
     assert (
-        COT.roc_bearish(
+        cot_signals.roc_bearish(
             IndicatorSeries([0.5, 0.2, -0.3]), roc_period=2, roc_threshold=0.20
         )
         is True
     )
-    assert COT.score_above(score, 0.5) is True
-    assert COT.score_below(score, 0.0, shift=3) is True
-    assert COT.score_accel_bullish(score, mom_period=2, momentum_threshold=0.10) is True
+    assert cot_signals.score_above(score, 0.5) is True
+    assert cot_signals.score_below(score, 0.0, shift=3) is True
     assert (
-        COT.score_accel_bearish(
+        cot_signals.score_accel_bullish(score, mom_period=2, momentum_threshold=0.10)
+        is True
+    )
+    assert (
+        cot_signals.score_accel_bearish(
             IndicatorSeries([0.5, 0.4, 0.3, 0.1, -0.4]),
             mom_period=2,
             momentum_threshold=-0.10,
         )
         is True
     )
-    assert COT.score_momentum_above(score, momentum_lookback=2) is True
+    assert cot_signals.score_momentum_above(score, momentum_lookback=2) is True
     assert (
-        COT.score_momentum_below(IndicatorSeries([0.3, 0.0, -0.4]), momentum_lookback=2)
+        cot_signals.score_momentum_below(
+            IndicatorSeries([0.3, 0.0, -0.4]), momentum_lookback=2
+        )
         is True
     )
     assert (
-        COT.seasonal_bullish(h52, seasonal_lookback=3, seasonal_threshold=0.05) is True
+        cot_signals.seasonal_bullish(h52, seasonal_lookback=3, seasonal_threshold=0.05)
+        is True
     )
     assert (
-        COT.seasonal_bearish(s52, seasonal_lookback=3, seasonal_threshold=0.05) is True
+        cot_signals.seasonal_bearish(s52, seasonal_lookback=3, seasonal_threshold=0.05)
+        is True
     )
-    assert COT.small_fade_bullish(sm52, 0.20) is True
-    assert COT.small_fade_bearish(sm52, 0.40, shift=4) is True
-    assert COT.smart_dumb_bullish(h52, sm52) is True
-    assert COT.smart_dumb_bearish(s52, h52) is True
+    assert cot_signals.small_fade_bullish(sm52, 0.20) is True
+    assert cot_signals.small_fade_bearish(sm52, 0.40, shift=4) is True
+    assert cot_signals.smart_dumb_bullish(h52, sm52) is True
+    assert cot_signals.smart_dumb_bearish(s52, h52) is True
     assert (
-        COT.spec_exhaustion_long(
+        cot_signals.spec_exhaustion_long(
             IndicatorSeries([0.80, 0.85]),
             IndicatorSeries([0.05, 0.15]),
             spec_extreme=0.90,
@@ -719,7 +760,7 @@ def test_cot_calculate_and_all_conditions() -> None:
         is True
     )
     assert (
-        COT.spec_exhaustion_short(
+        cot_signals.spec_exhaustion_short(
             IndicatorSeries([0.20, 0.15]),
             IndicatorSeries([0.95, 0.85]),
             spec_extreme=0.90,
@@ -729,7 +770,7 @@ def test_cot_calculate_and_all_conditions() -> None:
         is True
     )
     assert (
-        COT.spec_trend_long(
+        cot_signals.spec_trend_long(
             IndicatorSeries([0.40, 0.50, 0.65]),
             IndicatorSeries([0.55, 0.55, 0.60]),
             lookback=2,
@@ -737,19 +778,23 @@ def test_cot_calculate_and_all_conditions() -> None:
         is True
     )
     assert (
-        COT.spec_trend_short(
+        cot_signals.spec_trend_short(
             IndicatorSeries([0.60, 0.50, 0.35]),
             IndicatorSeries([0.45, 0.45, 0.40]),
             lookback=2,
         )
         is True
     )
-    assert COT.spread_zscore_bullish(h52, s52, period=4, z_threshold=1.0) is True
-    assert COT.spread_zscore_bearish(s52, h52, period=4, z_threshold=1.0) is True
-    assert COT.triple_div_bullish(h52, s52, sm52) is True
-    assert COT.triple_div_bearish(s52, h52, h52) is True
-    assert COT.vix_proxy_bullish(h52, s52) is True
-    assert COT.vix_proxy_bearish(s52, h52) is True
+    assert (
+        cot_signals.spread_zscore_bullish(h52, s52, period=4, z_threshold=1.0) is True
+    )
+    assert (
+        cot_signals.spread_zscore_bearish(s52, h52, period=4, z_threshold=1.0) is True
+    )
+    assert cot_signals.triple_div_bullish(h52, s52, sm52) is True
+    assert cot_signals.triple_div_bearish(s52, h52, h52) is True
+    assert cot_signals.vix_proxy_bullish(h52, s52) is True
+    assert cot_signals.vix_proxy_bearish(s52, h52) is True
 
 
 def test_volume_profile_custom_hours_and_all_36_conditions() -> None:
@@ -762,8 +807,10 @@ def test_volume_profile_custom_hours_and_all_36_conditions() -> None:
     close = high - 0.4
     vol = np.linspace(100.0, 500.0, 15)
 
-    vp = VolumeProfile.calculate(
-        high, low, close, vol, open_prices=open_p, period=5, profile_rows=10
+    vp = VolumeProfile(period=5, profile_rows=10).calculate(
+        BarData.from_arrays(
+            high=high, low=low, close=close, volume=vol, open_prices=open_p
+        )
     )
     assert {"poc", "vah", "val", "bull_poc", "bear_poc", "delta", "ibh", "ibl"} <= set(
         vp.keys()
@@ -841,7 +888,7 @@ def test_volume_profile_custom_hours_and_all_36_conditions() -> None:
             IndicatorSeries([101.0]),
             IndicatorSeries([104.2]),
             vah,
-            val,
+            val=val,
         )
         is True
     )
@@ -852,7 +899,7 @@ def test_volume_profile_custom_hours_and_all_36_conditions() -> None:
             IndicatorSeries([104.0]),
             IndicatorSeries([104.8]),
             vah,
-            val,
+            val=val,
         )
         is True
     )
@@ -954,12 +1001,14 @@ def test_volume_profile_custom_hours_and_all_36_conditions() -> None:
 
 def test_williams_pr_and_series_data_only() -> None:
     """Verify WilliamsPR conditions and that IndicatorSeries has no comparison methods."""
-    from app.include.indicators.momentum.williams_pr import WilliamsPR
+    from app.include.blocks.indicators.momentum.williams_pr import WilliamsPR
 
     high = np.array([12.0, 13.0, 14.0, 13.5, 15.0])
     low = np.array([10.0, 11.0, 12.0, 11.5, 13.0])
     close = np.array([11.5, 12.5, 13.5, 12.0, 14.5])
-    wpr = WilliamsPR.calculate(high, low, close, period=3)
+    wpr = WilliamsPR(period=3).calculate(
+        BarData.from_arrays(high=high, low=low, close=close)
+    )["value"]
     assert len(wpr) == 5
 
     for attr in (

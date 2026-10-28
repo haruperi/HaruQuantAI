@@ -6,6 +6,7 @@ import math
 from typing import Any
 
 from app.include.blocks.base import block
+from app.include.blocks.comparisons._common import resolve_shift_value, round_value
 from app.include.blocks.metadata import (
     BlockSpec,
     ChartPane,
@@ -14,7 +15,6 @@ from app.include.blocks.metadata import (
     OutputPort,
     PortType,
 )
-from app.include.blocks.series import resolve_shift_value, round_value
 
 DEFAULT_COMPARISON_PRECISION: int = 6
 

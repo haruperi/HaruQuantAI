@@ -6,11 +6,12 @@ This package provides foundational utility modules for temporal features, market
 - `app.include.contracts`: Provides foundational data contracts, order records, and domain value objects.
 - `app.include.enums`: Provides canonical trading enumerations, execution modes, and statuses.
 - `app.include.actions`: Provides side-effect action blocks, variable assignments, chart annotations, journal/file logging, and email notifications (`Actions`).
-- `app.include.comparisons`: Provides arithmetic comparisons, bar-to-bar crossovers, trend persistence, percentile rankings, and moving average conditions (`Comparisons`).
+- `app.include.blocks.comparisons`: Provides independently maintained comparative condition strategy blocks (arithmetic relations, bar-to-bar crossovers, trend persistence, percentile rankings, moving average conditions, and boolean logic) with `BlockSpec` metadata and `Comparisons` facade.
 - `app.include.indicators`: Provides technical indicator families (momentum, trend, volatility, volume, price action, regime) built on `BaseIndicator`; outputs are `IndicatorSeries` (alias of `contracts.DataframeSeries`). Restored from commit `013b40e^` (formerly `app/services/indicators`).
 - `app.include.functions`: Provides arithmetic operations, mathematical functions, date/time integers, rolling period rankings, and pip conversions (`Functions`).
 - `app.include.price`: Provides single-bar OHLCV primitives (`BarPrice`), bid/ask spread metrics (`QuotePrice`), multi-timeframe bar resampling (`MTFPrice`), and session windows (`SessionPrice`).
 - `app.include.types`: Provides generic mutable state container (`Variable`), strongly typed variables (`BooleanVariable`, `DoubleVariable`, `IntVariable`), constants, and types facade (`Types`).
+- `app.include.calculators`: Provides streaming stateful rolling-window calculation kernels (`AbstractCalculator`, `AverageCalculator`, `HighestCalculator`, `LowestCalculator`, `RSICalculator`, `StdDevCalculator`, `SumCalculator`) supporting tick-level intra-bar recalculation and bar-advance transitions for indicator execution.
 
 Market-history reads and record conversion live in `app.workspace.data_manager.data.history` and `app.workspace.data_manager.data.conversions`. Import them directly; this foundational package does not re-export workspace operations.
 

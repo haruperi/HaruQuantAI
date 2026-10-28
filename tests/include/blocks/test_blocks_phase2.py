@@ -266,11 +266,9 @@ def test_nested_staging_transactions_preserve_state(tmp_path: Path) -> None:
 
 def test_clean_migration_obsolete_implementations_removed() -> None:
     """Verify obsolete implementations in legacy files are cleanly eliminated."""
-    # 1. comparisons.py has no is_greater
-    import app.include.comparisons as comp
-
-    assert not hasattr(comp, "is_greater")
-    assert "is_greater" not in comp.__all__
+    # 1. comparisons.py legacy monolith is cleanly removed
+    with pytest.raises(ModuleNotFoundError):
+        import app.include.comparisons  # noqa: F401
 
     # 2. functions.py has no top-level plus, and Functions facade has no plus method
     import app.include.functions as func
@@ -318,10 +316,10 @@ def test_clean_migration_direct_consumer_imports() -> None:
 
     # 3. Indicators import is_greater directly from canonical block
     from app.include.blocks.indicators.momentum.rsi import RSI
-    from app.include.indicators.price_action.candlestick_patterns import (
+    from app.include.blocks.indicators.price_action.candlestick_patterns import (
         CandlestickPatterns,
     )
-    from app.include.indicators.trend.kama import KAMA
+    from app.include.blocks.indicators.trend.kama import KAMA
 
     assert inspect.isclass(CandlestickPatterns)
     assert inspect.isclass(KAMA)
