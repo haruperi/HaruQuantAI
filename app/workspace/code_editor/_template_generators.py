@@ -285,19 +285,22 @@ def _gen_what_if(name: str) -> str:
 Filters or modifies historical trades under hypothetical conditions.
 """
 
-from dataclasses import dataclass
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import ClassVar, override
+
+from app.include.what_if.base import BaseWhatIf, WhatIfRecord
 
 
-@dataclass
-class {cls_name}:
+class {cls_name}(BaseWhatIf):
     """Filters trades according to scenario rules."""
 
+    name: ClassVar[str] = "{cls_name}"
     max_loss_filter: float = -500.0
 
-    def filter_trades(self, trades: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+    @override
+    def filter_trades(self, trades: Sequence[WhatIfRecord]) -> list[WhatIfRecord]:
         """Filter out trades that fail the what-if threshold."""
-        return [t for t in trades if t.get("profit", 0.0) >= self.max_loss_filter]
+        return [t for t in trades if t.kind != "trade" or t.profit >= self.max_loss_filter]
 '''
 
 

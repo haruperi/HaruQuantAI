@@ -13,6 +13,7 @@ from app.include.blocks.money_management.base import (
     BasePositionSizer as _BasePositionSizer,
 )
 from app.include.metrics.base import BaseMetric as _BaseMetric
+from app.include.what_if.base import BaseWhatIf
 from app.workspace.code_editor._common import CodeEditorError
 
 
@@ -42,6 +43,8 @@ class SnippetRegistry:
         base: type[Any] | tuple[type[Any], ...] | None = None
         if "indicators" in path.parts:
             base = BaseIndicator
+        elif "what_if" in path.parts:
+            base = BaseWhatIf
         elif "metrics" in path.parts:
             base = _BaseMetric
         elif "money_management" in path.parts:
