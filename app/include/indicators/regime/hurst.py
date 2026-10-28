@@ -36,8 +36,8 @@ from typing import Any, override
 import numpy as np
 
 from app.host.logging import get_logger
+from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.comparisons import (
-    is_greater,
     is_greater_or_equal,
     is_lower,
     is_lower_or_equal,

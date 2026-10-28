@@ -18,13 +18,12 @@ from app.include.actions.base import ORDER_NOT_DEFINED, ActionRecord
 from app.include.actions.custom import CustomAction, custom_action
 from app.include.actions.facade import Actions
 from app.include.actions.logging import (
-    LogToFileAction,
     LogToJournalAction,
     SendEmailAction,
-    log_to_file,
     log_to_journal,
     send_email,
 )
+from app.include.blocks.actions.log_to_file import LogToFileAction, log_to_file
 
 __all__ = [
     "ORDER_NOT_DEFINED",

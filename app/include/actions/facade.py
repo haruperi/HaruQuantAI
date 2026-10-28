@@ -16,10 +16,10 @@ from app.include.actions.assign_variable import assign_variable
 from app.include.actions.base import ActionRecord
 from app.include.actions.custom import custom_action
 from app.include.actions.logging import (
-    log_to_file,
     log_to_journal,
     send_email,
 )
+from app.include.blocks.actions.log_to_file import log_to_file
 from app.include.types import Variable
 
 logger = get_logger(__name__)

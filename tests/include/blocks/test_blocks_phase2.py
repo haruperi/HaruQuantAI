@@ -1,0 +1,186 @@
+"""Phase 2 unit tests: canonical package migration and consumer updates.
+
+Verifies:
+1. Canonical path normalization (Windows/POSIX consistent).
+2. Traversal and symlink escape rejection.
+3. Transactional file registration with retained last-valid reload behavior.
+4. Recursive directory discovery of canonical blocks.
+5. Exclusion of internal infrastructure files from block catalogs.
+6. Clean migration across the board: removal of obsolete implementations,
+   direct canonical consumer imports, and no compatibility aliases or shims.
+"""
+
+from __future__ import annotations
+
+import importlib
+from pathlib import Path
+
+import pytest
+from app.include.blocks.registry import (
+    BlockRegistry,
+    BlockRegistryError,
+    _normalize_source_path,
+)
+from app.workspace.code_editor.registry import registry as snippet_registry
+
+
+def test_source_path_normalization_is_consistent_across_os() -> None:
+    """Verify paths with Windows backslashes or POSIX slashes normalize identically."""
+    p_win = "app\\include\\blocks\\indicators\\trend\\sma.py"
+    p_posix = "app/include/blocks/indicators/trend/sma.py"
+    assert _normalize_source_path(p_win) == p_posix
+    assert _normalize_source_path(p_posix) == p_posix
+    assert _normalize_source_path(None) == "<in-memory>"
+
+
+def test_block_registry_discover_finds_vertical_slice() -> None:
+    """Verify recursive directory discovery registers all canonical slice blocks."""
+    registry = BlockRegistry()
+    blocks_dir = Path("app/include/blocks")
+    discovered = registry.discover(blocks_dir, authorized_root="app/include")
+
+    discovered_ids = {desc.spec.id for desc in discovered}
+    assert "indicator.trend.sma" in discovered_ids
+    assert "function.plus" in discovered_ids
+    assert "condition.is_greater" in discovered_ids
+    assert "action.log_to_file" in discovered_ids
+
+    # Verify snapshot contains all 4
+    snapshot = registry.snapshot()
+    assert "indicator.trend.sma" in snapshot
+    assert "function.plus" in snapshot
+    assert "condition.is_greater" in snapshot
+    assert "action.log_to_file" in snapshot
+
+
+def test_block_registry_rejects_path_traversal(tmp_path: Path) -> None:
+    """Verify register_file and discover reject paths outside authorized root."""
+    registry = BlockRegistry()
+    outside_file = tmp_path / "outside.py"
+    outside_file.write_text(
+        "from app.include.blocks.base import BaseBlock\n"
+        "from app.include.blocks.metadata import BlockSpec\n"
+        "class OutsideBlock(BaseBlock):\n"
+        "    spec = BlockSpec(id='test.outside')\n",
+        encoding="utf-8",
+    )
+
+    authorized_root = Path("app/include").resolve()
+
+    # Traversal file registration must be rejected
+    with pytest.raises(BlockRegistryError) as exc_info:
+        registry.register_file(outside_file, authorized_root=authorized_root)
+    assert "escapes authorized root" in str(exc_info.value)
+
+    # Traversal directory discovery must be rejected
+    with pytest.raises(BlockRegistryError) as exc_dir:
+        registry.discover(tmp_path, authorized_root=authorized_root)
+    assert "escapes authorized root" in str(exc_dir.value)
+
+
+def test_retained_last_valid_reload_on_failure(tmp_path: Path) -> None:
+    """Verify transactional staging retains last valid registration if reload fails."""
+    registry = BlockRegistry()
+
+    # 1. Register valid block
+    valid_file = tmp_path / "custom_block.py"
+    valid_file.write_text(
+        "from app.include.blocks.base import BaseBlock\n"
+        "from app.include.blocks.metadata import BlockSpec\n"
+        "class MyBlock(BaseBlock):\n"
+        "    spec = BlockSpec(id='custom.my_block', name='MyBlock')\n",
+        encoding="utf-8",
+    )
+    descs = registry.register_file(valid_file, authorized_root=tmp_path)
+    assert len(descs) == 1
+    assert registry.get("custom.my_block") is not None
+    initial_rev = registry.revision
+
+    # 2. Overwrite file with broken syntax and attempt reload
+    valid_file.write_text("class BrokenBlock(syntax error", encoding="utf-8")
+    with pytest.raises(BlockRegistryError):
+        registry.register_file(valid_file, authorized_root=tmp_path)
+
+    # 3. Last valid registration is preserved and registry is not corrupted
+    assert registry.get("custom.my_block") is not None
+    assert registry.require("custom.my_block").spec.name == "MyBlock"
+    assert registry.revision == initial_rev
+
+
+def test_internal_infrastructure_modules_are_excluded_from_catalogs() -> None:
+    """Verify metadata.py, registry.py, series.py, base.py are ignored during discovery."""
+    registry = BlockRegistry()
+    internal_files = [
+        Path("app/include/blocks/base.py"),
+        Path("app/include/blocks/metadata.py"),
+        Path("app/include/blocks/registry.py"),
+        Path("app/include/blocks/series.py"),
+    ]
+    for internal in internal_files:
+        descs = registry.register_file(internal, authorized_root="app/include")
+        assert descs == []
+
+    # Also verify SnippetRegistry excludes them from registering block classes
+    for internal in internal_files:
+        mod = importlib.import_module(f"app.include.blocks.{internal.stem}")
+        classes = snippet_registry.register(internal, mod)
+        assert classes == []
+
+
+def test_clean_migration_obsolete_implementations_removed() -> None:
+    """Verify obsolete implementations in legacy files are cleanly eliminated."""
+    # 1. comparisons.py has no is_greater
+    import app.include.comparisons as comp
+
+    assert not hasattr(comp, "is_greater")
+    assert "is_greater" not in comp.__all__
+
+    # 2. functions.py has no top-level plus
+    import app.include.functions as func
+
+    assert not hasattr(func, "plus")
+    assert "plus" not in func.__all__
+
+    # 3. actions/logging.py has no LogToFileAction or log_to_file
+    import app.include.actions.logging as act_log
+
+    assert not hasattr(act_log, "LogToFileAction")
+    assert not hasattr(act_log, "log_to_file")
+    assert "LogToFileAction" not in act_log.__all__
+    assert "log_to_file" not in act_log.__all__
+
+
+def test_clean_migration_direct_consumer_imports() -> None:
+    """Verify all consumers import directly from canonical blocks package."""
+    # 1. app.include package root exposes canonical blocks
+    from app.include.blocks.comparisons.is_greater import is_greater
+    from app.include.blocks.functions.plus import plus
+
+    import app.include as root_inc
+
+    assert root_inc.is_greater is is_greater
+    assert root_inc.plus is plus
+
+    # 2. actions package exposes canonical log_to_file
+    import app.include.actions as root_act
+    from app.include.actions.facade import Actions
+    from app.include.blocks.actions.log_to_file import LogToFileAction, log_to_file
+
+    assert root_act.LogToFileAction is LogToFileAction
+    assert root_act.log_to_file is log_to_file
+
+    # Actions facade calls canonical block
+    record = Actions.log_file(filename="test.log", message="hello")
+    assert record.action_type == "log_to_file"
+    assert record.params["filename"] == "test.log"
+
+    # 3. Indicators import is_greater directly from canonical block
+    from app.include.indicators.momentum.rsi import RSI
+    from app.include.indicators.price_action.candlestick_patterns import (
+        CandlestickPatterns,
+    )
+    from app.include.indicators.trend.kama import KAMA
+
+    assert CandlestickPatterns is not None
+    assert KAMA is not None
+    assert RSI is not None

@@ -48,8 +48,16 @@ class SnippetRegistry:
         elif "money_management" in path.parts:
             base = _BasePositionSizer
 
+        internal_block_files = {
+            "base.py",
+            "metadata.py",
+            "registry.py",
+            "series.py",
+            "ma.py",
+        }
         if (
-            path.name == "base.py"
+            path.name in internal_block_files
+            or path.name.startswith("__")
             or path.resolve() == (INCLUDE_DIR / "indicators/base.py").resolve()
         ):
             classes = {}

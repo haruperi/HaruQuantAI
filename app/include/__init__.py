@@ -10,13 +10,14 @@ from app.include.bar_time import (
     format_timestamp,
     normalize_timestamps,
 )
+from app.include.blocks.comparisons.is_greater import is_greater
+from app.include.blocks.functions.plus import plus
 from app.include.comparisons import (
     Comparisons,
     MAType,
     changes_down,
     changes_up,
     crosses_above,
-    is_greater,
 )
 from app.include.contracts import (
     TIMEFRAME_SECONDS,
@@ -25,7 +26,7 @@ from app.include.contracts import (
     MarketTick,
 )
 from app.include.enums import Timeframe
-from app.include.functions import Functions, convert_price_to_pips, plus
+from app.include.functions import Functions, convert_price_to_pips
 from app.include.generators import RandomGenerator
 from app.include.price import (
     BarPrice,

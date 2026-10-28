@@ -33,7 +33,6 @@ __all__ = [
     "indicator_crosses_above_ma",
     "indicator_crosses_below_ma",
     "is_falling",
-    "is_greater",
     "is_greater_count",
     "is_greater_or_equal",
     "is_greater_percentile",
@@ -103,23 +102,6 @@ def _pair(
         round_value(resolve_shift_value(left, shift if s1 is None else s1), p),
         round_value(resolve_shift_value(right, shift if s2 is None else s2), p),
     )
-
-
-def is_greater(
-    left: Any,
-    right: Any,
-    shift: int = 0,
-    precision: int = DEFAULT_COMPARISON_PRECISION,
-    *,
-    shift1: int | None = None,
-    shift2: int | None = None,
-    round_digits: int | None = None,
-) -> bool:
-    """Evaluate whether left value is strictly greater than right value."""
-    val1, val2 = _pair(
-        left, right, shift, precision, s1=shift1, s2=shift2, rd=round_digits
-    )
-    return not (math.isnan(val1) or math.isnan(val2)) and val1 > val2
 
 
 def is_lower(
@@ -628,7 +610,9 @@ class Comparisons:
     ) -> bool:
         """Evaluate is_greater using instance operands if omitted."""
         l_op, r_op, p = self._ops(left, right, precision)
-        return is_greater(l_op, r_op, shift=shift, precision=p)
+        from app.include.blocks.comparisons.is_greater import is_greater as _is_greater
+
+        return _is_greater(l_op, r_op, shift=shift, precision=p)
 
     def is_lower(
         self,

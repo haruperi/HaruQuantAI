@@ -43,11 +43,11 @@ from typing import Any, override
 import numpy as np
 
 from app.host.logging import get_logger
+from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.comparisons import (
     crosses_above,
     crosses_below,
     is_falling,
-    is_greater,
     is_lower,
     is_rising,
 )

@@ -49,10 +49,10 @@ from typing import override
 import numpy as np
 
 from app.host.logging import get_logger
+from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.comparisons import (
     equals,
     is_falling,
-    is_greater,
     is_lower,
     is_rising,
 )

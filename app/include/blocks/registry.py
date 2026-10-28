@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import functools
+import importlib.util
 import inspect
 from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass, field
@@ -14,6 +15,64 @@ from pydantic import BaseModel, ConfigDict, ValidationError, create_model
 
 from app.include.blocks.base import BaseBlock
 from app.include.blocks.metadata import BlockSpec, _freeze_mapping
+
+
+def _normalize_source_path(source_file: str | Path | None) -> str:
+    """Normalize source file paths to consistent POSIX forward-slash strings."""
+    if not source_file:
+        return "<in-memory>"
+    try:
+        p = Path(source_file)
+        cwd = Path.cwd()
+        if p.is_absolute() and p.is_relative_to(cwd):
+            return p.relative_to(cwd).as_posix()
+        return p.as_posix()
+    except ValueError, OSError:
+        return str(source_file).replace("\\", "/")
+
+
+def _verify_safe_path(p: Path, authorized_root: str | Path | None) -> None:
+    """Confirm path is strictly within the authorized root."""
+    if authorized_root is None:
+        return
+    auth = Path(authorized_root).resolve()
+    try:
+        p.relative_to(auth)
+    except ValueError as err:
+        raise BlockRegistryError(
+            f"Path '{p}' escapes authorized root '{authorized_root}'"
+        ) from err
+    if p.is_symlink():
+        target = p.resolve()
+        try:
+            target.relative_to(auth)
+        except ValueError as err:
+            raise BlockRegistryError(
+                f"Symlink target for '{p}' escapes authorized root"
+            ) from err
+
+
+def _load_module_blocks(p: Path) -> list[type[BaseBlock] | Callable[..., Any]]:
+    """Execute python module and extract BaseBlock classes and @block callables."""
+    module_name = f"haru_blocks_{p.stem}_{abs(hash(str(p))) & 0xFFFFFFFF}"
+    spec = importlib.util.spec_from_file_location(module_name, p)
+    if spec is None or spec.loader is None:
+        raise BlockRegistryError(f"Could not load module spec for '{p}'")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    targets: list[type[BaseBlock] | Callable[..., Any]] = []
+    for obj in vars(mod).values():
+        if (
+            inspect.isclass(obj)
+            and issubclass(obj, BaseBlock)
+            and not inspect.isabstract(obj)
+        ):
+            if hasattr(obj, "spec") and isinstance(obj.spec, BlockSpec):
+                targets.append(obj)
+        elif callable(obj) and hasattr(obj, "_block_spec"):
+            targets.append(obj)
+    return targets
 
 
 class BlockRegistryError(Exception):
@@ -175,7 +234,7 @@ class BlockRegistry:
 
         target_blocks[block_id] = desc
 
-        src_key = str(source_file) if source_file else "<in-memory>"
+        src_key = _normalize_source_path(source_file)
         target_by_source.setdefault(src_key, [])
         if block_id not in target_by_source[src_key]:
             target_by_source[src_key].append(block_id)
@@ -187,7 +246,7 @@ class BlockRegistry:
 
     def unregister_source(self, source_file: str | Path) -> None:
         """Remove all blocks originating from the specified source file."""
-        src_key = str(source_file)
+        src_key = _normalize_source_path(source_file)
         target_blocks = (
             self._staging_blocks if self._staging_blocks is not None else self._blocks
         )
@@ -244,6 +303,79 @@ class BlockRegistry:
         if desc is None:
             raise BlockRegistryError(f"Block '{block_id}' is not registered")
         return desc
+
+    def register_file(
+        self,
+        file_path: str | Path,
+        authorized_root: str | Path | None = None,
+    ) -> list[BlockDescriptor]:
+        """Validate, stage, and atomically register all blocks declared in a file.
+
+        Retains the last valid registration on syntax or runtime failure.
+        """
+        p = Path(file_path).resolve()
+        _verify_safe_path(p, authorized_root)
+
+        if not p.is_file() or not p.name.endswith(".py"):
+            return []
+
+        internal_names = (
+            "__init__.py",
+            "base.py",
+            "metadata.py",
+            "registry.py",
+            "series.py",
+        )
+        if p.name.startswith((".", "_")) or p.name in internal_names:
+            return []
+
+        src_key = _normalize_source_path(p)
+
+        self.begin_staging()
+        try:
+            self.unregister_source(src_key)
+            targets = _load_module_blocks(p)
+            registered = [self.register_block(t, source_file=src_key) for t in targets]
+            self.commit_staging()
+            return registered
+        except Exception as e:
+            self.rollback_staging()
+            raise BlockRegistryError(
+                f"Failed to register block file '{src_key}': {e}"
+            ) from e
+
+    def discover(
+        self,
+        directory: str | Path,
+        authorized_root: str | Path | None = None,
+    ) -> list[BlockDescriptor]:
+        """Recursively scan an authorized directory and register all blocks."""
+        dir_path = Path(directory).resolve()
+        auth_root = Path(authorized_root).resolve() if authorized_root else dir_path
+        try:
+            dir_path.relative_to(auth_root)
+        except ValueError as err:
+            raise BlockRegistryError(
+                f"Discovery directory '{directory}' escapes authorized "
+                f"root '{authorized_root}'"
+            ) from err
+
+        all_registered: list[BlockDescriptor] = []
+        internal_names = (
+            "__init__.py",
+            "base.py",
+            "metadata.py",
+            "registry.py",
+            "series.py",
+        )
+        for file_path in sorted(dir_path.rglob("*.py")):
+            if file_path.name.startswith((".", "_")):
+                continue
+            if file_path.name in internal_names or "test_" in file_path.name:
+                continue
+            descriptors = self.register_file(file_path, authorized_root=auth_root)
+            all_registered.extend(descriptors)
+        return all_registered
 
     def _create_descriptor(
         self,

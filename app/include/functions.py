@@ -35,7 +35,6 @@ __all__ = [
     "minimum",
     "minus",
     "multiplication",
-    "plus",
     "register_custom_function",
     "resolve_pip_size",
     "round_to_decimals",
@@ -55,32 +54,6 @@ POINT_5_DIGIT: float = 1e-5
 POINT_3_DIGIT: float = 1e-3
 
 _CUSTOM_REGISTRY: dict[str, Callable[..., Any]] = {}
-
-
-def plus(left: Any, right: Any, shift: int = 0) -> float:
-    """Evaluate addition of two operands at historical bar shift.
-
-    Args:
-        left: Left operand (scalar, series, array, or callable).
-        right: Right operand (scalar, series, array, or callable).
-        shift: Historical bar offset.
-
-    Returns:
-        Sum as float, or NaN if either operand is invalid.
-    """
-    v1 = resolve_shift_value(left, shift)
-    v2 = resolve_shift_value(right, shift)
-    if math.isnan(v1) or math.isnan(v2):
-        return float("nan")
-    res = v1 + v2
-    logger.debug(
-        "FR-SERVICES-FUNCTION-ARITHMETIC: plus(shift=%d) %s + %s = %s",
-        shift,
-        v1,
-        v2,
-        res,
-    )
-    return res
 
 
 def minus(left: Any, right: Any, shift: int = 0) -> float:
@@ -669,7 +642,9 @@ class Functions:
 
     def plus(self, left: Any, right: Any, shift: int = 0) -> float:
         """Calculate addition of two operands."""
-        return plus(left, right, shift=shift)
+        from app.include.blocks.functions.plus import plus as _plus
+
+        return _plus(left, right, shift=shift)
 
     def minus(self, left: Any, right: Any, shift: int = 0) -> float:
         """Calculate subtraction of two operands."""
