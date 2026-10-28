@@ -63,6 +63,8 @@ def _load_module_blocks(p: Path) -> list[type[BaseBlock] | Callable[..., Any]]:
 
     targets: list[type[BaseBlock] | Callable[..., Any]] = []
     for obj in vars(mod).values():
+        if getattr(obj, "__module__", None) != mod.__name__:
+            continue
         if (
             inspect.isclass(obj)
             and issubclass(obj, BaseBlock)
@@ -196,12 +198,30 @@ class BlockRegistry:
         self._by_source: dict[str, list[str]] = {}
         self._staging_blocks: dict[str, BlockDescriptor] | None = None
         self._staging_by_source: dict[str, list[str]] | None = None
+        self._staging_stack: list[
+            tuple[dict[str, BlockDescriptor], dict[str, list[str]]]
+        ] = []
+        self._diagnostics: list[dict[str, Any]] = []
         self._revision: int = 1
 
     @property
     def is_staging(self) -> bool:
         """Check whether a staging transaction is active."""
-        return self._staging_blocks is not None
+        return len(self._staging_stack) > 0
+
+    @property
+    def staging_depth(self) -> int:
+        """Return nesting depth of active staging transactions."""
+        return len(self._staging_stack)
+
+    @property
+    def diagnostics(self) -> list[dict[str, Any]]:
+        """Return collected discovery and registration diagnostics."""
+        return list(self._diagnostics)
+
+    def clear_diagnostics(self) -> None:
+        """Clear collected diagnostics."""
+        self._diagnostics.clear()
 
     @property
     def revision(self) -> str:
@@ -225,6 +245,21 @@ class BlockRegistry:
             if self._staging_by_source is not None
             else self._by_source
         )
+
+        # Consistent source ownership enforcement
+        if (
+            block_id in target_blocks
+            and target_blocks[block_id].source_file is not None
+            and desc.source_file is not None
+            and target_blocks[block_id].source_file != desc.source_file
+            and target_blocks[block_id].source_file != "<in-memory>"
+            and desc.source_file != "<in-memory>"
+        ):
+            raise BlockRegistryError(
+                f"Block '{block_id}' is already owned by source "
+                f"'{target_blocks[block_id].source_file}'; "
+                f"cannot be re-registered by '{desc.source_file}'"
+            )
 
         # Collision detection (same ID with different target)
         if block_id in target_blocks and target_blocks[block_id].target != desc.target:
@@ -264,24 +299,43 @@ class BlockRegistry:
             self._revision += 1
 
     def begin_staging(self) -> None:
-        """Start a staged transaction."""
-        self._staging_blocks = dict(self._blocks)
-        self._staging_by_source = {k: list(v) for k, v in self._by_source.items()}
+        """Start a staged transaction or push a nested savepoint."""
+        if not self.is_staging:
+            self._staging_blocks = dict(self._blocks)
+            self._staging_by_source = {k: list(v) for k, v in self._by_source.items()}
+        if self._staging_blocks is None or self._staging_by_source is None:
+            raise BlockRegistryError("Staging state is uninitialized")
+        savepoint = (
+            dict(self._staging_blocks),
+            {k: list(v) for k, v in self._staging_by_source.items()},
+        )
+        self._staging_stack.append(savepoint)
 
     def commit_staging(self) -> None:
-        """Commit the staged transaction atomically."""
-        if self._staging_blocks is None or self._staging_by_source is None:
+        """Commit the current staging savepoint or outermost transaction."""
+        if not self._staging_stack:
             raise BlockRegistryError("No active staging transaction to commit")
-        self._blocks = self._staging_blocks
-        self._by_source = self._staging_by_source
-        self._staging_blocks = None
-        self._staging_by_source = None
-        self._revision += 1
+        self._staging_stack.pop()
+        if not self._staging_stack:
+            if self._staging_blocks is None or self._staging_by_source is None:
+                raise BlockRegistryError("Staging state is uninitialized")
+            self._blocks = self._staging_blocks
+            self._by_source = self._staging_by_source
+            self._staging_blocks = None
+            self._staging_by_source = None
+            self._revision += 1
 
     def rollback_staging(self) -> None:
-        """Roll back staged changes without modifying live catalog."""
-        self._staging_blocks = None
-        self._staging_by_source = None
+        """Roll back staged changes to previous savepoint or abort staging."""
+        if not self._staging_stack:
+            return
+        saved_blocks, saved_sources = self._staging_stack.pop()
+        if self._staging_stack:
+            self._staging_blocks = saved_blocks
+            self._staging_by_source = saved_sources
+        else:
+            self._staging_blocks = None
+            self._staging_by_source = None
 
     def snapshot(self) -> CatalogSnapshot:
         """Return an immutable snapshot of current committed registrations."""
@@ -368,13 +422,18 @@ class BlockRegistry:
             "registry.py",
             "series.py",
         )
+        self._diagnostics.clear()
         for file_path in sorted(dir_path.rglob("*.py")):
             if file_path.name.startswith((".", "_")):
                 continue
             if file_path.name in internal_names or "test_" in file_path.name:
                 continue
-            descriptors = self.register_file(file_path, authorized_root=auth_root)
-            all_registered.extend(descriptors)
+            try:
+                descriptors = self.register_file(file_path, authorized_root=auth_root)
+                all_registered.extend(descriptors)
+            except BlockRegistryError as err:
+                src_key = _normalize_source_path(file_path)
+                self._diagnostics.append({"file": src_key, "error": str(err)})
         return all_registered
 
     def _create_descriptor(
@@ -382,7 +441,7 @@ class BlockRegistry:
         target: type[BaseBlock] | Callable[..., Any],
         source_file: str | Path | None = None,
     ) -> BlockDescriptor:
-        src = str(source_file) if source_file else None
+        src = _normalize_source_path(source_file) if source_file is not None else None
 
         # Case 1: BaseBlock subclass
         if inspect.isclass(target) and issubclass(target, BaseBlock):

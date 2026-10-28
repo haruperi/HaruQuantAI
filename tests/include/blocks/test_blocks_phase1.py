@@ -6,7 +6,7 @@ import hashlib
 import time
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
 import numpy as np
 import pytest
@@ -114,7 +114,7 @@ def test_base_block_forbids_extra_parameters_and_freezes_config() -> None:
     assert sma.period == 25
 
     with pytest.raises(ValidationError):
-        sma.period = 30  # type: ignore[misc]
+        sma.period = 30
 
     with pytest.raises(ValidationError) as exc_info:
         SMA(period=20, unknown_param=123)  # type: ignore[call-arg]
@@ -273,7 +273,7 @@ def test_catalog_snapshot_is_deeply_immutable() -> None:
     # 2. Nested parameter schema cannot be mutated
     desc = snapshot.require("indicator.trend.sma")
     with pytest.raises(TypeError):
-        desc.parameter_schema["properties"]["period"] = {}  # type: ignore[index]
+        desc.parameter_schema["properties"]["period"] = {}
 
     # 3. BlockSpec metadata and nested parameter_search_space cannot be mutated
     assert isinstance(desc.spec.parameter_search_space, Mapping)
@@ -284,7 +284,7 @@ def test_catalog_snapshot_is_deeply_immutable() -> None:
         desc.spec.parameter_search_space["new_key"] = "forbidden"  # type: ignore[index]
 
     with pytest.raises(AttributeError):
-        desc.spec.parameter_search_space["period"].append(999)  # type: ignore[attr-defined]
+        desc.spec.parameter_search_space["period"].append(999)
 
     with pytest.raises(AttributeError):
         desc.spec.parameter_search_space.clear()  # type: ignore[attr-defined]
@@ -350,6 +350,7 @@ def test_registry_rejects_duplicate_block_id_with_different_target() -> None:
     class DuplicateSMA(BaseIndicator):
         spec = BlockSpec(id="indicator.trend.sma", name="Duplicate")
 
+        @override
         def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
             return {}
 

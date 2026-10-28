@@ -640,12 +640,6 @@ class Functions:
             default_digits,
         )
 
-    def plus(self, left: Any, right: Any, shift: int = 0) -> float:
-        """Calculate addition of two operands."""
-        from app.include.blocks.functions.plus import plus as _plus
-
-        return _plus(left, right, shift=shift)
-
     def minus(self, left: Any, right: Any, shift: int = 0) -> float:
         """Calculate subtraction of two operands."""
         return minus(left, right, shift=shift)

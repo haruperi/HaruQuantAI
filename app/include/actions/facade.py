@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from pathlib import Path
 from typing import Any
 
 from app.host.logging import get_logger
@@ -19,7 +18,6 @@ from app.include.actions.logging import (
     log_to_journal,
     send_email,
 )
-from app.include.blocks.actions.log_to_file import log_to_file
 from app.include.types import Variable
 
 logger = get_logger(__name__)
@@ -117,28 +115,6 @@ class Actions:
             shift,
         )
         return draw_vertical_line(shift)
-
-    @staticmethod
-    def log_file(
-        filename: str = "some_logfile.txt",
-        message: str = "some message",
-        base_dir: Path | str | None = None,
-    ) -> ActionRecord:
-        """Record file log entry.
-
-        Args:
-            filename: Target file name.
-            message: Message text.
-            base_dir: Optional destination base directory.
-
-        Returns:
-            ActionRecord instance.
-        """
-        logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.log_file(file='%s')",
-            filename,
-        )
-        return log_to_file(filename, message, base_dir)
 
     @staticmethod
     def log_journal(message: str = "some message") -> ActionRecord:
