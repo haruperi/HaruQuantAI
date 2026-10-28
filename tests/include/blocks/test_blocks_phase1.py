@@ -25,6 +25,7 @@ from app.include.blocks.metadata import (
     PortType,
 )
 from app.include.blocks.money_management.base import BasePositionSizer
+from app.include.blocks.price import BarPrice
 from app.include.blocks.registry import (
     BlockRegistry,
     BlockRegistryError,
@@ -32,7 +33,6 @@ from app.include.blocks.registry import (
 )
 from app.include.blocks.series import BarData, IndicatorSeries
 from app.include.metrics.base import BaseMetric
-from app.include.price import BarPrice
 from pydantic import Field, ValidationError
 
 

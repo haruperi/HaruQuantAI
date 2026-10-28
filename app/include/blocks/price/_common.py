@@ -1,8 +1,8 @@
-"""Single-bar, Quote, Multi-timeframe, Session, and Heiken Ashi price blocks."""
+"""Common internal utilities, data structures, and helpers for price blocks."""
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from typing import Any
 
@@ -10,10 +10,16 @@ import numpy as np
 
 from app.host.logging import get_logger
 from app.include.blocks.bar_time import normalize_timestamps
-
-from .contracts import DataframeSeries
+from app.include.contracts import DataframeSeries
 
 logger = get_logger(__name__)
+
+OHLCArrays = tuple[
+    np.ndarray[Any, Any],
+    np.ndarray[Any, Any],
+    np.ndarray[Any, Any],
+    np.ndarray[Any, Any],
+]
 
 DEFAULT_PIP_SIZE: float = 0.0001
 SECONDS_IN_MINUTE: int = 60
@@ -22,6 +28,22 @@ MINUTES_IN_HOUR: int = 60
 HOURS_IN_DAY: int = 24
 
 _normalize_timestamps = normalize_timestamps
+
+__all__ = [
+    "DEFAULT_PIP_SIZE",
+    "HOURS_IN_DAY",
+    "MINUTES_IN_HOUR",
+    "SECONDS_IN_HOUR",
+    "SECONDS_IN_MINUTE",
+    "BarPrice",
+    "MTFPrice",
+    "QuotePrice",
+    "SessionPrice",
+    "_normalize_timestamps",
+    "compute_heiken_ashi",
+    "resolve_chart_field",
+    "resolve_shift_value",
+]
 
 
 class BarPrice:
@@ -35,18 +57,7 @@ class BarPrice:
         close_data: np.ndarray[Any, Any] | Sequence[float],
         volume_data: np.ndarray[Any, Any] | Sequence[float] | None = None,
     ) -> None:
-        """Initialize BarPrice block with OHLC and optional Volume data.
-
-        Args:
-            open_data: Array or sequence of Open prices.
-            high_data: Array or sequence of High prices.
-            low_data: Array or sequence of Low prices.
-            close_data: Array or sequence of Close prices.
-            volume_data: Optional array or sequence of bar volumes.
-
-        Raises:
-            ValueError: If input arrays are empty or lengths do not match.
-        """
+        """Initialize BarPrice block with OHLC and optional Volume data."""
         self._open = np.asarray(open_data, dtype=np.float64)
         self._high = np.asarray(high_data, dtype=np.float64)
         self._low = np.asarray(low_data, dtype=np.float64)
@@ -190,16 +201,7 @@ class QuotePrice:
         ask: np.ndarray[Any, Any] | Sequence[float],
         pip_size: float = DEFAULT_PIP_SIZE,
     ) -> None:
-        """Initialize QuotePrice block.
-
-        Args:
-            bid: Array or sequence of Bid prices.
-            ask: Array or sequence of Ask prices.
-            pip_size: Size of 1 pip for currency or instrument (default 0.0001).
-
-        Raises:
-            ValueError: If arrays are empty, lengths mismatch, or pip_size <= 0.
-        """
+        """Initialize QuotePrice block."""
         self._bid = np.asarray(bid, dtype=np.float64)
         self._ask = np.asarray(ask, dtype=np.float64)
 
@@ -315,18 +317,7 @@ class MTFPrice:
         low_data: np.ndarray[Any, Any] | Sequence[float],
         close_data: np.ndarray[Any, Any] | Sequence[float],
     ) -> None:
-        """Initialize MTFPrice with timestamps and OHLC data.
-
-        Args:
-            timestamps: Array or sequence of bar timestamps.
-            open_data: Array or sequence of Open prices.
-            high_data: Array or sequence of High prices.
-            low_data: Array or sequence of Low prices.
-            close_data: Array or sequence of Close prices.
-
-        Raises:
-            ValueError: If arrays are empty or lengths mismatch.
-        """
+        """Initialize MTFPrice with timestamps and OHLC data."""
         self._ts = _normalize_timestamps(timestamps)
         self._open = np.asarray(open_data, dtype=np.float64)
         self._high = np.asarray(high_data, dtype=np.float64)
@@ -382,9 +373,7 @@ class MTFPrice:
             m_groups
         )
 
-    def _aggregate(
-        self, groups: dict[Any, list[int]]
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def _aggregate(self, groups: dict[Any, list[int]]) -> OHLCArrays:
         """Aggregate grouped indices into OHLC arrays ordered chronologically."""
         opens: list[float] = []
         highs: list[float] = []
@@ -392,8 +381,8 @@ class MTFPrice:
         closes: list[float] = []
         for idxs in groups.values():
             opens.append(self._open[idxs[0]])
-            highs.append(np.max(self._high[idxs]))
-            lows.append(np.min(self._low[idxs]))
+            highs.append(float(np.max(self._high[idxs])))
+            lows.append(float(np.min(self._low[idxs])))
             closes.append(self._close[idxs[-1]])
         return (
             np.array(opens, dtype=np.float64),
@@ -402,13 +391,11 @@ class MTFPrice:
             np.array(closes, dtype=np.float64),
         )
 
-    def _lookup(self, arr: np.ndarray, shift: int) -> float:
+    def _lookup(self, arr: np.ndarray[Any, Any], shift: int) -> float:
         """Lookup historical bar value where shift=0 is current and 1 is previous."""
         if shift < 0 or shift >= len(arr):
             return float("nan")
         return float(arr[-(1 + shift)])
-
-    # --- Daily Bar Lookups ---
 
     def daily_open(self, shift: int = 0) -> float:
         """Get Daily Open price (OpenD) at historical shift."""
@@ -442,8 +429,6 @@ class MTFPrice:
         )
         return val
 
-    # --- Weekly Bar Lookups ---
-
     def weekly_open(self, shift: int = 0) -> float:
         """Get Weekly Open price (OpenW) at historical shift."""
         val = self._lookup(self._w_open, shift)
@@ -475,8 +460,6 @@ class MTFPrice:
             "FR-SERVICES-MTF-PRICE-WEEKLY: weekly_close(shift=%d) = %f", shift, val
         )
         return val
-
-    # --- Monthly Bar Lookups ---
 
     def monthly_open(self, shift: int = 0) -> float:
         """Get Monthly Open price (OpenM) at historical shift."""
@@ -510,8 +493,6 @@ class MTFPrice:
         )
         return val
 
-    # --- IndicatorSeries Exports ---
-
     def daily_close_series(self) -> DataframeSeries:
         """Return Daily Close series as an IndicatorSeries."""
         logger.info("FR-SERVICES-MTF-PRICE-DAILY: Exporting daily close series")
@@ -544,22 +525,7 @@ class SessionPrice:
         end_hour: int = 23,
         end_minute: int = 59,
     ) -> None:
-        """Initialize SessionPrice block with custom session hours.
-
-        Args:
-            timestamps: Array or sequence of bar timestamps.
-            open_data: Array or sequence of Open prices.
-            high_data: Array or sequence of High prices.
-            low_data: Array or sequence of Low prices.
-            close_data: Array or sequence of Close prices.
-            start_hour: Session start hour (0-23).
-            start_minute: Session start minute (0-59).
-            end_hour: Session end hour (0-23).
-            end_minute: Session end minute (0-59).
-
-        Raises:
-            ValueError: If arrays are empty, lengths mismatch, or times invalid.
-        """
+        """Initialize SessionPrice block with custom session hours."""
         self._ts = _normalize_timestamps(timestamps)
         self._open = np.asarray(open_data, dtype=np.float64)
         self._high = np.asarray(high_data, dtype=np.float64)
@@ -627,7 +593,6 @@ class SessionPrice:
             sod = dt.hour * SECONDS_IN_HOUR + dt.minute * SECONDS_IN_MINUTE + dt.second
             day_key = (dt.year, dt.month, dt.day)
 
-            # If we crossed into a new day or session boundary
             if day_key != last_day_key and cur_open is not None:
                 session_opens.append(cur_open)
                 session_highs.append(cur_high)
@@ -658,7 +623,7 @@ class SessionPrice:
         self._session_low = np.array(session_lows, dtype=np.float64)
         self._session_close = np.array(session_closes, dtype=np.float64)
 
-    def _get(self, arr: np.ndarray, days_shift: int) -> float:
+    def _get(self, arr: np.ndarray[Any, Any], days_shift: int) -> float:
         """Lookup session price by days_shift (0=current session, 1=previous)."""
         if days_shift < 0 or days_shift >= len(arr):
             logger.debug(
@@ -726,10 +691,115 @@ class SessionPrice:
         return DataframeSeries(self._session_close, name="SessionClose")
 
 
-__all__ = [
-    "BarPrice",
-    "MTFPrice",
-    "QuotePrice",
-    "SessionPrice",
-    "_normalize_timestamps",
-]
+def resolve_shift_value(target: Any, shift: int = 0) -> float:
+    """Resolve numerical value from scalar, array, series, or callable at shift.
+
+    Shift convention: shift=0 is current/newest bar; shift=k is k bars in past.
+    """
+    if target is None:
+        return float("nan")
+
+    val = target() if callable(target) else target
+
+    if isinstance(val, (int, float, np.integer, np.floating)):
+        return float(val) if shift == 0 else float("nan")
+
+    if isinstance(val, DataframeSeries):
+        return val.get(shift)
+
+    arr = np.asarray(val, dtype=np.float64)
+    n = len(arr)
+    if n == 0 or shift < 0 or shift >= n:
+        return float("nan")
+    return float(arr[n - 1 - shift])
+
+
+def resolve_chart_field(chart: Any, field_name: str, shift: int = 0) -> float:
+    """Resolve price field value from BarPrice, QuotePrice, mapping, or array at shift.
+
+    Args:
+        chart: Chart price container, BarPrice, QuotePrice, series, or mapping.
+        field_name: Price field identifier ('open', 'high', 'low', 'close', etc.).
+        shift: Historical bar offset.
+
+    Returns:
+        Resolved price value as float, or NaN.
+    """
+    if chart is None:
+        return float("nan")
+
+    # Method on BarPrice or QuotePrice: e.g. chart.open(shift) or chart.bid(shift)
+    method = getattr(chart, field_name, None)
+    if callable(method):
+        try:
+            return float(method(shift))
+        except TypeError, ValueError:
+            pass
+
+    # Attribute on BarData or object: e.g. chart.close array
+    if hasattr(chart, field_name):
+        attr = getattr(chart, field_name)
+        return resolve_shift_value(attr, shift)
+
+    # Key in mapping / dict
+    if isinstance(chart, Mapping) and field_name in chart:
+        return resolve_shift_value(chart[field_name], shift)
+
+    # If chart is itself a raw array / series / scalar
+    return resolve_shift_value(chart, shift)
+
+
+def compute_heiken_ashi(chart: Any) -> OHLCArrays | None:
+    """Compute Heiken Ashi (HAOpen, HAHigh, HALow, HAClose) from chart OHLC arrays."""
+    if chart is None:
+        return None
+
+    try:
+        if isinstance(chart, BarPrice):
+            o_arr = chart.open_values
+            h_arr = chart.high_values
+            l_arr = chart.low_values
+            c_arr = chart.close_values
+        elif (
+            hasattr(chart, "open")
+            and hasattr(chart, "high")
+            and hasattr(chart, "low")
+            and hasattr(chart, "close")
+        ):
+            o_arr = np.asarray(chart.open, dtype=np.float64)
+            h_arr = np.asarray(chart.high, dtype=np.float64)
+            l_arr = np.asarray(chart.low, dtype=np.float64)
+            c_arr = np.asarray(chart.close, dtype=np.float64)
+        elif isinstance(chart, Mapping) and "open" in chart and "close" in chart:
+            o_arr = np.asarray(chart["open"], dtype=np.float64)
+            h_arr = np.asarray(chart["high"], dtype=np.float64)
+            l_arr = np.asarray(chart["low"], dtype=np.float64)
+            c_arr = np.asarray(chart["close"], dtype=np.float64)
+        else:
+            return None
+    except TypeError, ValueError, AttributeError:
+        return None
+
+    n = len(c_arr)
+    if n == 0 or not (len(o_arr) == len(h_arr) == len(l_arr) == n):
+        return None
+
+    ha_open = np.empty(n, dtype=np.float64)
+    ha_high = np.empty(n, dtype=np.float64)
+    ha_low = np.empty(n, dtype=np.float64)
+    ha_close = np.empty(n, dtype=np.float64)
+
+    ha_close[0] = (o_arr[0] + h_arr[0] + l_arr[0] + c_arr[0]) / 4.0
+    ha_open[0] = (o_arr[0] + c_arr[0]) / 2.0
+    ha_high[0] = max(h_arr[0], ha_open[0], ha_close[0])
+    ha_low[0] = min(l_arr[0], ha_open[0], ha_close[0])
+
+    for i in range(1, n):
+        c_val = (o_arr[i] + h_arr[i] + l_arr[i] + c_arr[i]) / 4.0
+        o_val = (ha_open[i - 1] + ha_close[i - 1]) / 2.0
+        ha_close[i] = c_val
+        ha_open[i] = o_val
+        ha_high[i] = max(h_arr[i], o_val, c_val)
+        ha_low[i] = min(l_arr[i], o_val, c_val)
+
+    return ha_open, ha_high, ha_low, ha_close

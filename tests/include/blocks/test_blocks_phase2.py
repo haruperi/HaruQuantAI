@@ -279,6 +279,10 @@ def test_clean_migration_obsolete_implementations_removed() -> None:
     with pytest.raises(ModuleNotFoundError):
         importlib.import_module("app.include.functions")
 
+    # 2b. price.py legacy monolith is cleanly removed
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include.price")
+
     from app.include.blocks.functions import Functions
 
     assert not hasattr(Functions, "plus")

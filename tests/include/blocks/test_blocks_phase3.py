@@ -29,9 +29,9 @@ from app.include.blocks.indicators.trend.smma import SMMA
 from app.include.blocks.indicators.trend.tema import TEMA
 from app.include.blocks.indicators.volatility.bollinger_bands import BollingerBands
 from app.include.blocks.metadata import ChartPane
+from app.include.blocks.price import BarPrice
 from app.include.blocks.registry import BlockRegistry, BlockRegistryError
 from app.include.blocks.series import BarData
-from app.include.price import BarPrice
 from pydantic import ValidationError
 from tests.include.blocks.test_blocks_phase1 import hash_array, make_dataset
 

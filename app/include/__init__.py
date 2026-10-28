@@ -20,6 +20,12 @@ from app.include.blocks.comparisons import (
 )
 from app.include.blocks.functions import Functions, convert_price_to_pips
 from app.include.blocks.functions.plus import plus
+from app.include.blocks.price import (
+    BarPrice,
+    MTFPrice,
+    QuotePrice,
+    SessionPrice,
+)
 from app.include.calculators import (
     AbstractCalculator,
     AverageCalculator,
@@ -37,12 +43,6 @@ from app.include.contracts import (
 )
 from app.include.enums import Timeframe
 from app.include.generators import RandomGenerator
-from app.include.price import (
-    BarPrice,
-    MTFPrice,
-    QuotePrice,
-    SessionPrice,
-)
 from app.include.types import BooleanConstant, NumberConstant, Types, Variable
 
 __all__ = [

@@ -62,7 +62,7 @@ Evaluates entry or exit conditions across indicator and price series.
 """
 
 from dataclasses import dataclass
-from app.include.price import BarPrice
+from app.include.blocks.price import BarPrice
 from app.include.blocks.series import IndicatorSeries
 
 

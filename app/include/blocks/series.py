@@ -10,8 +10,8 @@ from typing import Any
 
 import numpy as np
 
+from app.include.blocks.price import BarPrice
 from app.include.contracts import DataframeSeries
-from app.include.price import BarPrice
 
 IndicatorSeries = DataframeSeries
 

@@ -8,8 +8,8 @@ from typing import Any
 
 import numpy as np
 
+from app.include.blocks.price import BarPrice
 from app.include.blocks.series import BarData
-from app.include.price import BarPrice
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.data_manager.data.review import DatasetReview
 from app.workspace.data_manager.data.storage import require_data

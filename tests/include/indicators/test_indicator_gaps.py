@@ -34,8 +34,8 @@ from app.include.blocks.indicators.volatility.bar_range import BarRange
 from app.include.blocks.indicators.volatility.keltner_channel import KeltnerChannel
 from app.include.blocks.indicators.volume.cot import COT
 from app.include.blocks.indicators.volume.volume_profile import VolumeProfile
+from app.include.blocks.price import BarPrice
 from app.include.blocks.series import BarData, IndicatorSeries
-from app.include.price import BarPrice
 
 
 def test_adx_calculate_and_all_conditions() -> None:
