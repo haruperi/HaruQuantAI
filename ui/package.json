@@ -13,8 +13,17 @@
     "format:chart:check": "prettier --config .prettier.chart.json --check \"app/workspace/Chart/**/*.{ts,tsx,css}\" \"tests/unit/workspace/Chart/**/*.ts\" \"tests/e2e/chart-*.spec.ts\""
   },
   "dependencies": {
+    "@codemirror/autocomplete": "^6.20.4",
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
+    "@lezer/highlight": "^1.2.5",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.12",
+    "codemirror": "^6.0.2",
     "dockview": "^4.10.0",
     "lightweight-charts": "^5.0.8",
     "lucide-react": "^0.544.0",

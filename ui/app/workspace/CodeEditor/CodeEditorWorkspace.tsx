@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Copy, FileCode, Folder, FolderPlus, Play, Plus, RefreshCw, Search, Target, Trash2, X } from 'lucide-react';
 
 import { CreateFromTemplateModal } from './CreateFromTemplateModal';
@@ -10,6 +10,10 @@ import { EditorBottomPanel } from './EditorBottomPanel';
 import { EditorInspector } from './EditorInspector';
 import { RenderTreeItem } from './EditorTreeItem';
 import { useCodeEditorWorkspace } from './useCodeEditorWorkspace';
+
+const SourceCodeEditor = lazy(() =>
+  import('./SourceCodeEditor').then((module) => ({ default: module.SourceCodeEditor })),
+);
 
 export function CodeEditorWorkspace() {
   const workspace = useCodeEditorWorkspace();
@@ -35,7 +39,6 @@ export function CodeEditorWorkspace() {
     setShowImportExportModal,
     contextMenu,
     setContextMenu,
-    editorTextareaRef,
     refreshNavigator,
     activeTab,
     activeContent,
@@ -43,7 +46,7 @@ export function CodeEditorWorkspace() {
     handleCloseTab,
     handleContentChange,
     handleContextMenuAction,
-    lineNumbers,
+    diagnostics,
   } = workspace;
 
   return (
@@ -117,7 +120,7 @@ export function CodeEditorWorkspace() {
         </aside>
 
         {/* MIDDLE COLUMN: CODE EDITOR & DOCUMENT TABS (Matching Overview1.png) */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-slate-950">
+        <main className="flex-1 min-w-0 flex flex-col overflow-hidden bg-slate-950">
           {/* Document Tabs Row */}
           <div className="h-9 border-b border-slate-800 bg-slate-900/80 flex items-center px-1 overflow-x-auto flex-shrink-0">
             {tabs.map((tab) => {
@@ -156,48 +159,17 @@ export function CodeEditorWorkspace() {
             </button>
           </div>
 
-          {/* Active Code Area */}
-          <div className="flex-1 flex overflow-hidden relative">
-            {/* Line numbers gutter */}
-            <div className="w-11 bg-slate-950 border-r border-slate-800/80 text-right pr-2 py-3 select-none text-[11px] font-mono text-slate-600 space-y-[2px]">
-              {lineNumbers.map((n) => (
-                <div key={n} className="leading-5">
-                  {n}
-                </div>
-              ))}
-            </div>
-
-            {/* Code Textarea */}
-            <textarea
-              ref={editorTextareaRef}
-              value={activeContent}
-              onChange={(e) => handleContentChange(e.target.value)}
-              onKeyUp={(e) => {
-                const target = e.currentTarget;
-                const textBeforeCursor = target.value.substring(0, target.selectionStart);
-                const lines = textBeforeCursor.split('\n');
-                setCursorPos({
-                  line: lines.length,
-                  col: lines[lines.length - 1].length + 1,
-                });
-              }}
-              onClick={(e) => {
-                const target = e.currentTarget;
-                const textBeforeCursor = target.value.substring(0, target.selectionStart);
-                const lines = textBeforeCursor.split('\n');
-                setCursorPos({
-                  line: lines.length,
-                  col: lines[lines.length - 1].length + 1,
-                });
-              }}
-              spellCheck={false}
-              className="flex-1 h-full p-3 font-mono text-xs leading-5 bg-transparent text-slate-200 focus:outline-none resize-none whitespace-pre overflow-auto selection:bg-blue-600/30"
-              placeholder={
-                activeFilePath
-                  ? '# Write Python code here...'
-                  : 'No file open. Choose a snippet from Navigator or click New.'
-              }
-            />
+          <div className="flex-1 min-h-0 min-w-0 flex overflow-hidden relative">
+            <Suspense fallback={<div className="p-3 text-xs text-slate-400">Loading code editor...</div>}>
+              <SourceCodeEditor
+                filePath={activeFilePath}
+                value={activeContent}
+                openPaths={tabs.map((tab) => tab.file_path)}
+                diagnostics={diagnostics}
+                onChange={handleContentChange}
+                onCursorChange={setCursorPos}
+              />
+            </Suspense>
           </div>
 
           <EditorBottomPanel workspace={workspace} />

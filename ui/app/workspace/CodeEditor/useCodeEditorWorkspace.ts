@@ -34,6 +34,7 @@ export function useCodeEditorWorkspace() {
     'problems',
   );
   const [diagnostics, setDiagnostics] = useState<SyntaxDiagnosticDto[]>([]);
+  const [diagnosticFile, setDiagnosticFile] = useState<string | null>(null);
   const [outputLogs, setOutputLogs] = useState<string[]>([
     `[${new Date().toLocaleTimeString()}] Python Extension Runtime ready (3.14.7).`,
     `[${new Date().toLocaleTimeString()}] Snippets repository loaded at app/include/.`,
@@ -52,7 +53,6 @@ export function useCodeEditorWorkspace() {
     y: number;
     item: NavigatorItemDto;
   } | null>(null);
-  const editorTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Load initial workspace state & navigator
   const refreshNavigator = async () => {
@@ -158,6 +158,7 @@ export function useCodeEditorWorkspace() {
       const res = await client.saveFile(activeFilePath, activeContent);
       setTabs((prev) => prev.map((t) => (t.file_path === activeFilePath ? { ...t, is_dirty: false } : t)));
       setDiagnostics(res.diagnostics || []);
+      setDiagnosticFile(activeFilePath);
       setOutputLogs((prev) => [
         `[${new Date().toLocaleTimeString()}] Saved ${activeFilePath} (${activeContent.length} chars). Diagnostics: ${res.diagnostics?.length || 0}`,
         ...prev,
@@ -198,6 +199,7 @@ export function useCodeEditorWorkspace() {
     try {
       const res = await client.compileFile(activeFilePath, activeContent);
       setDiagnostics(res.errors || []);
+      setDiagnosticFile(activeFilePath);
       if (res.success) {
         setOutputLogs((prev) => [
           `[${new Date().toLocaleTimeString()}] ✓ AST Syntax Check Passed. Module reloaded dynamically.`,
@@ -369,7 +371,6 @@ export function useCodeEditorWorkspace() {
 
   // Line numbers calculation
   const linesCount = activeContent.split('\n').length || 1;
-  const lineNumbers = Array.from({ length: linesCount }, (_, i) => i + 1);
 
   return {
     tabs,
@@ -385,7 +386,7 @@ export function useCodeEditorWorkspace() {
     selectedNavPath,
     bottomTab,
     setBottomTab,
-    diagnostics,
+    diagnostics: diagnosticFile === activeFilePath ? diagnostics : [],
     outputLogs,
     setOutputLogs,
     searchResults,
@@ -399,7 +400,6 @@ export function useCodeEditorWorkspace() {
     setShowImportExportModal,
     contextMenu,
     setContextMenu,
-    editorTextareaRef,
     refreshNavigator,
     activeTab,
     activeContent,
@@ -412,7 +412,6 @@ export function useCodeEditorWorkspace() {
     handleSearchInFiles,
     outlineSymbols,
     handleContextMenuAction,
-    lineNumbers,
   };
 }
 

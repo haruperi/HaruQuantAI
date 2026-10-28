@@ -72,7 +72,18 @@ Send this to `POST /api/v1/code-editor/templates/create`. Preview uses
 
 ## Edit, save, and organize files
 
-The editor uses a text area with line numbers and a textual class/import outline.
+The CodeMirror editor provides Python syntax coloring for keywords, class and
+function definitions, builtins, variables, strings, numbers, and comments. Completion
+suggestions include Python keywords, builtins, and names defined or imported in the
+current file. Suggestions appear while typing; Ctrl+Space opens them explicitly,
+and Enter or Tab accepts a selection. Escape dismisses suggestions. Completion is
+local to the document; external-package type inference requires a language server.
+
+Line numbers, folding, bracket matching, automatic bracket/quote closing,
+four-space indentation, find/replace, and undo/redo are built in. Each open file
+retains its own selection, scroll position, and undo history when switching tabs.
+Compile and save diagnostics appear inline as well as in the Problems panel.
+The right panel retains its textual class/import outline.
 Changes mark the tab dirty. Closing a dirty tab requires confirmation. Reopening
 an already open document preserves its unsaved buffer. Renaming an open file or
 folder remaps its tab paths and retains the edited contents.
