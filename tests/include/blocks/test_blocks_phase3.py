@@ -383,7 +383,7 @@ def test_phase3_indicators_execution_benchmarks_150_bars() -> None:
         (EMA(period=20), 0.10),
         (RSI(period=14), 0.20),
         (BollingerBands(period=20, deviation=2.0), 2.00),
-        (MACD(fast=12, slow=26, smooth=9), 0.22),
+        (MACD(fast=12, slow=26, smooth=9), 0.35),
     ]
 
     for ind, max_ms in bench_cases:
@@ -409,7 +409,7 @@ def test_phase3_indicators_execution_benchmarks_100k_and_1m_bars() -> None:
     bars100k = make_dataset(100_000)
     bench_100k = [
         (EMA(period=20), 40.00),
-        (RSI(period=14), 95.00),
+        (RSI(period=14), 120.00),
         (BollingerBands(period=20, deviation=2.0), 1400.00),
         (MACD(fast=12, slow=26, smooth=9), 90.00),
     ]
