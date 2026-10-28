@@ -9,8 +9,8 @@ from typing import Any
 import numpy as np
 
 from app.host.logging import get_logger
+from app.include.blocks.bar_time import normalize_timestamps
 
-from .bar_time import normalize_timestamps
 from .contracts import DataframeSeries
 
 logger = get_logger(__name__)

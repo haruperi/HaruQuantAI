@@ -1,0 +1,48 @@
+"""Current Hour temporal value strategy block."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from app.include.blocks.bar_time._common import DateTime, resolve_current_time_ms
+from app.include.blocks.base import block
+from app.include.blocks.metadata import (
+    BlockSpec,
+    ChartPane,
+    ExecutionKind,
+    InputPort,
+    OutputPort,
+    PortType,
+)
+
+current_hour_spec = BlockSpec(
+    id="bar_time.current_hour",
+    version="1.0.0",
+    name="Current Hour",
+    description="Retrieve current hour (0-23)",
+    category="bar_time",
+    tags=("time", "hour", "clock"),
+    execution_kind=ExecutionKind.EXPRESSION,
+    chart_pane=ChartPane.MAIN,
+    inputs=(
+        InputPort(
+            "source",
+            PortType.ANY,
+            "Optional temporal context",
+            default=None,
+        ),
+    ),
+    outputs=(OutputPort("hour", PortType.NUMBER, "Current hour (0-23)"),),
+    is_generation_eligible=True,
+    is_deterministic=True,
+    is_causal=True,
+)
+
+
+@block(current_hour_spec)
+def current_hour(source: Any = None) -> int:
+    """Retrieve current hour (0-23)."""
+    if hasattr(source, "current_hour") and callable(source.current_hour):
+        return int(source.current_hour())
+    ms = resolve_current_time_ms(source)
+    return DateTime.get_hour(ms)
