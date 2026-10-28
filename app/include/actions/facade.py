@@ -18,7 +18,7 @@ from app.include.actions.logging import (
     log_to_journal,
     send_email,
 )
-from app.include.types import Variable
+from app.include.blocks.types import Variable
 
 logger = get_logger(__name__)
 

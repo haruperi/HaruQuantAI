@@ -26,6 +26,7 @@ from app.include.blocks.price import (
     QuotePrice,
     SessionPrice,
 )
+from app.include.blocks.types import BooleanConstant, NumberConstant, Types, Variable
 from app.include.calculators import (
     AbstractCalculator,
     AverageCalculator,
@@ -43,7 +44,6 @@ from app.include.contracts import (
 )
 from app.include.enums import Timeframe
 from app.include.generators import RandomGenerator
-from app.include.types import BooleanConstant, NumberConstant, Types, Variable
 
 __all__ = [
     "TIMEFRAME_SECONDS",

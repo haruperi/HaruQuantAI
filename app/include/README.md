@@ -10,7 +10,7 @@ This package provides foundational utility modules for temporal features, market
 - `app.include.blocks.indicators`: Provides canonical single-class indicators with validated parameters, named outputs, and strategy metadata. Indicator-specific helpers remain in their indicator files.
 - `app.include.blocks.functions`: Provides arithmetic operations, mathematical functions, date/time integers, rolling period rankings, and pip conversions (`Functions`).
 - `app.include.blocks.price`: Provides single-bar OHLCV primitives (`BarPrice`), bid/ask spread metrics (`QuotePrice`), multi-timeframe bar resampling (`MTFPrice`), and session windows (`SessionPrice`).
-- `app.include.types`: Provides generic mutable state container (`Variable`), strongly typed variables (`BooleanVariable`, `DoubleVariable`, `IntVariable`), constants, and types facade (`Types`).
+- `app.include.blocks.types`: Provides generic mutable state container (`Variable`), strongly typed variables (`BooleanVariable`, `DoubleVariable`, `IntVariable`), constants, and types facade (`Types`).
 - `app.include.calculators`: Provides stateless batch kernels (`sma_kernel`, `ema_kernel`, `smma_kernel`, `lwma_kernel`, `tema_kernel`, `rsi_kernel`) and streaming stateful rolling-window calculators (`AbstractCalculator`, `AverageCalculator`, `HighestCalculator`, `LowestCalculator`, `RSICalculator`, `StdDevCalculator`, `SumCalculator`) supporting tick-level intra-bar recalculation and bar-advance transitions for indicator execution.
 
 Market-history reads and record conversion live in `app.workspace.data_manager.data.history` and `app.workspace.data_manager.data.conversions`. Import them directly; this foundational package does not re-export workspace operations.

@@ -6,7 +6,7 @@ from typing import Any
 
 from app.host.logging import get_logger
 from app.include.actions.base import ORDER_NOT_DEFINED, ActionRecord
-from app.include.types import Variable
+from app.include.blocks.types import Variable
 
 logger = get_logger(__name__)
 
