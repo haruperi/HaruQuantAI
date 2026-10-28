@@ -4,7 +4,6 @@ from app.include.indicators.volatility.adr import AverageDailyRange
 from app.include.indicators.volatility.amihud import AmihudIlliquidity
 from app.include.indicators.volatility.atr import ATR
 from app.include.indicators.volatility.bar_range import BarRange
-from app.include.indicators.volatility.bollinger_bands import BollingerBands
 from app.include.indicators.volatility.garman_klass import GarmanKlassVolatility
 from app.include.indicators.volatility.keltner_channel import KeltnerChannel
 from app.include.indicators.volatility.mt_atr import MTATR
@@ -24,7 +23,6 @@ __all__ = [
     "AmihudIlliquidity",
     "AverageDailyRange",
     "BarRange",
-    "BollingerBands",
     "GarmanKlassVolatility",
     "KeltnerChannel",
     "MTKeltnerChannel",

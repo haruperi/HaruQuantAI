@@ -1,22 +1,20 @@
 """Analytical Technical Indicators and Market Regime Subpackages.
 
-Re-exports all 73 quantitative indicators across domain subpackages:
-- trend: Trend following, moving averages, and directional systems (16).
-- momentum: Bounded/unbounded oscillators, momentum, cycle filters (18).
-- volatility: Envelopes, bands, ranges, and risk dispersion (15).
-- volume: Volume metrics, session benchmarks, market profiles, and flow (11).
-- price_action: Extrema, candlestick patterns, structural levels, and Fibonacci (10).
-- regime: Market regime classification, persistence, and choppiness (3).
+Re-exports quantitative indicators across domain subpackages:
+- trend: Trend following, moving averages, and directional systems.
+- momentum: Bounded/unbounded oscillators, momentum, cycle filters.
+- volatility: Envelopes, bands, ranges, and risk dispersion.
+- volume: Volume metrics, session benchmarks, market profiles, and flow.
+- price_action: Extrema, candlestick patterns, structural levels, and Fibonacci.
+- regime: Market regime classification, persistence, and choppiness.
 """
 
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
 from app.include.indicators.momentum import (
     CCI,
-    MACD,
     OSMA,
     QQE,
     ROC,
-    RSI,
     AwesomeOscillator,
     BearsPower,
     BullsPower,
@@ -50,7 +48,6 @@ from app.include.indicators.regime import (
 from app.include.indicators.trend import (
     ADX,
     KAMA,
-    TEMA,
     Aroon,
     DirectionalIndex,
     DonchianChannels,
@@ -59,7 +56,6 @@ from app.include.indicators.trend import (
     Ichimoku,
     KaufmanEfficiencyRatio,
     LinReg,
-    MovingAverage,
     ParabolicSAR,
     Supertrend,
     Trend,
@@ -71,7 +67,6 @@ from app.include.indicators.volatility import (
     AmihudIlliquidity,
     AverageDailyRange,
     BarRange,
-    BollingerBands,
     GarmanKlassVolatility,
     KeltnerChannel,
     MTKeltnerChannel,
@@ -97,23 +92,18 @@ from app.include.indicators.volume import (
 )
 
 __all__ = [
-    # Trend (16)
     "ADX",
-    # Volatility (15)
     "ATR",
     "CCI",
     "CMF",
     "COT",
     "KAMA",
-    "MACD",
     "MFI",
     "MTATR",
     "OBV",
     "OSMA",
     "QQE",
     "ROC",
-    "RSI",
-    "TEMA",
     "VWAP",
     "AggressiveTradeImbalance",
     "AmihudIlliquidity",
@@ -125,7 +115,6 @@ __all__ = [
     "BarRange",
     "BaseIndicator",
     "BearsPower",
-    "BollingerBands",
     "BullsPower",
     "CandlestickPatterns",
     "ChartPatterns",
@@ -152,7 +141,6 @@ __all__ = [
     "MTKeltnerChannel",
     "MarketRegimeResolver",
     "Momentum",
-    "MovingAverage",
     "ParabolicSAR",
     "ParkinsonVolatility",
     "Pivots",

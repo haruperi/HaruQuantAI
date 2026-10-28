@@ -12,17 +12,14 @@ from app.include.indicators.trend.kaufman_efficiency_ratio import (
     KaufmanEfficiencyRatio,
 )
 from app.include.indicators.trend.lin_reg import LinReg
-from app.include.indicators.trend.moving_average import MovingAverage
 from app.include.indicators.trend.parabolic_sar import ParabolicSAR
 from app.include.indicators.trend.supertrend import Supertrend
-from app.include.indicators.trend.tema import TEMA
 from app.include.indicators.trend.trend import Trend
 from app.include.indicators.trend.vortex import Vortex
 
 __all__ = [
     "ADX",
     "KAMA",
-    "TEMA",
     "Aroon",
     "DirectionalIndex",
     "DonchianChannels",
@@ -31,7 +28,6 @@ __all__ = [
     "Ichimoku",
     "KaufmanEfficiencyRatio",
     "LinReg",
-    "MovingAverage",
     "ParabolicSAR",
     "Supertrend",
     "Trend",

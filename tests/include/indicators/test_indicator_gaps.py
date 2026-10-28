@@ -4,20 +4,38 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from app.include.blocks.comparisons.is_greater import is_greater
+from app.include.blocks.indicators import (
+    EMA,
+    LWMA,
+    MACD,
+    SMA,
+    SMMA,
+    TEMA,
+    BollingerBands,
+)
+from app.include.blocks.series import BarData
+from app.include.comparisons import (
+    changes_down,
+    changes_up,
+    crosses_above,
+    crosses_below,
+    is_falling,
+    is_lower,
+    is_rising,
+)
 from app.include.indicators.base import IndicatorSeries
 from app.include.indicators.momentum.cci import CCI
-from app.include.indicators.momentum.macd import MACD
 from app.include.indicators.momentum.qqe import QQE
 from app.include.indicators.momentum.stochastic import Stochastic
 from app.include.indicators.momentum.wave_trend import WaveTrend
 from app.include.indicators.trend.adx import ADX
 from app.include.indicators.trend.ichimoku import Ichimoku
-from app.include.indicators.trend.moving_average import MovingAverage
 from app.include.indicators.volatility.bar_range import BarRange
-from app.include.indicators.volatility.bollinger_bands import BollingerBands
 from app.include.indicators.volatility.keltner_channel import KeltnerChannel
 from app.include.indicators.volume.cot import COT
 from app.include.indicators.volume.volume_profile import VolumeProfile
+from app.include.price import BarPrice
 
 
 def test_adx_calculate_and_all_conditions() -> None:
@@ -84,12 +102,19 @@ def test_bar_range_time_windows_and_conditions() -> None:
 def test_bollinger_bands_value_and_bar_conditions() -> None:
     """Verify BollingerBands range, width ratio, slopes, and 12 bar open/close checks."""
     close = np.array([10.0, 10.2, 10.5, 10.3, 10.8, 11.5, 12.2])
-    bb = BollingerBands.calculate(close, period=3, deviation=2.0)
-    assert "range" in bb
-    assert len(BollingerBands.bb_range(close, period=3, deviation=2.0)) == len(close)
-    assert len(BollingerBands.bb_width_ratio(close, period=3, deviation=2.0)) == len(
-        close
+    bp = BarPrice(
+        open_data=close,
+        high_data=close,
+        low_data=close,
+        close_data=close,
+        volume_data=np.ones_like(close),
     )
+    bars = BarData(prices=bp)
+    bb = BollingerBands(period=3, deviation=2.0).calculate(bars)
+    assert "range" in bb
+    assert "bandwidth" in bb
+    assert len(bb["range"].values) == len(close)
+    assert len(bb["bandwidth"].values) == len(close)
 
     bands = {
         "upper": IndicatorSeries([11.0, 12.0, 13.0]),
@@ -99,44 +124,50 @@ def test_bollinger_bands_value_and_bar_conditions() -> None:
     c_ser = IndicatorSeries([10.0, 11.5, 13.5])
     o_ser = IndicatorSeries([10.0, 11.5, 12.5])
 
-    assert BollingerBands.upper_is_rising(bands, shift=0) is True
-    assert BollingerBands.upper_is_falling(bands, shift=0) is False
-    assert BollingerBands.lower_is_falling(bands, shift=0) is True
-    assert BollingerBands.lower_is_rising(bands, shift=0) is False
-    assert BollingerBands.price_crosses_above_upper(c_ser, bands, shift=0) is True
-    assert BollingerBands.price_higher_upper(c_ser, bands, shift=0) is True
-    assert BollingerBands.bar_closes_above_upper(c_ser, bands, shift=0) is True
-    assert BollingerBands.bar_closes_below_upper(c_ser, bands, shift=1) is True
-    assert BollingerBands.bar_closes_above_lower(c_ser, bands, shift=0) is True
+    assert is_rising(bands["upper"], shift=0) is True
+    assert is_falling(bands["upper"], shift=0) is False
+    assert is_falling(bands["lower"], shift=0) is True
+    assert is_rising(bands["lower"], shift=0) is False
+    assert crosses_above(c_ser, bands["upper"], shift=0) is True
+    assert is_greater(c_ser, bands["upper"], shift=0) is True
+    assert is_greater(c_ser, bands["upper"], shift=0) is True
+    assert is_lower(c_ser, bands["upper"], shift=1) is True
+    assert is_greater(c_ser, bands["lower"], shift=0) is True
+    assert is_lower([7.0, 7.5, 7.0], bands["lower"], shift=0) is True
+    assert is_greater(o_ser, bands["upper"], shift1=0, shift2=1, round_digits=8) is True
     assert (
-        BollingerBands.bar_closes_below_lower([7.0, 7.5, 7.0], bands, shift=0) is True
+        is_lower([10.0, 11.0, 11.5], bands["upper"], shift1=0, shift2=1, round_digits=8)
+        is True
     )
-    assert BollingerBands.bar_opens_above_upper(o_ser, bands, shift=0) is True
-    assert BollingerBands.bar_opens_below_upper([10.0, 11.0, 11.5], bands, shift=0)
-    assert BollingerBands.bar_opens_above_lower(o_ser, bands, shift=0) is True
-    assert BollingerBands.bar_opens_below_lower([9.0, 8.0, 7.5], bands, shift=0) is True
+    assert is_greater(o_ser, bands["lower"], shift1=0, shift2=1, round_digits=8) is True
     assert (
-        BollingerBands.bar_opens_above_upper_after_open_below(o_ser, bands, shift=0)
+        is_lower([9.0, 8.0, 7.5], bands["lower"], shift1=0, shift2=1, round_digits=8)
         is True
     )
     assert (
-        BollingerBands.bar_opens_below_upper_after_open_above(
-            [10.0, 12.5, 11.5], bands, shift=0
+        is_lower(o_ser, bands["upper"], shift1=1, shift2=1, round_digits=8)
+        and is_greater(o_ser, bands["upper"], shift1=0, shift2=1, round_digits=8)
+    ) is True
+    assert (
+        is_greater(
+            [10.0, 12.5, 11.5], bands["upper"], shift1=1, shift2=1, round_digits=8
         )
-        is True
-    )
-    assert (
-        BollingerBands.bar_opens_above_lower_after_open_below(
-            [9.0, 8.0, 9.0], bands, shift=0
+        and is_lower(
+            [10.0, 12.5, 11.5], bands["upper"], shift1=0, shift2=1, round_digits=8
         )
-        is True
-    )
+    ) is True
     assert (
-        BollingerBands.bar_opens_below_lower_after_open_above(
-            [9.0, 9.0, 8.0], bands, shift=0
+        is_lower([9.0, 8.0, 9.0], bands["lower"], shift1=1, shift2=1, round_digits=8)
+        and is_greater(
+            [9.0, 8.0, 9.0], bands["lower"], shift1=0, shift2=1, round_digits=8
         )
-        is True
-    )
+    ) is True
+    assert (
+        is_greater([9.0, 9.0, 8.0], bands["lower"], shift1=1, shift2=1, round_digits=8)
+        and is_lower(
+            [9.0, 9.0, 8.0], bands["lower"], shift1=0, shift2=1, round_digits=8
+        )
+    ) is True
 
 
 def test_cci_and_woodies_patterns() -> None:
@@ -352,7 +383,15 @@ def test_keltner_channel_bar_opens_and_closes() -> None:
 def test_macd_all_18_conditions() -> None:
     """Verify MACD calculation and all 18 condition helpers."""
     close = np.linspace(10.0, 30.0, 40)
-    res = MACD.calculate(close, fast=5, slow=10, smooth=3)
+    bp = BarPrice(
+        open_data=close,
+        high_data=close,
+        low_data=close,
+        close_data=close,
+        volume_data=np.ones_like(close),
+    )
+    bars = BarData(prices=bp)
+    res = MACD(fast=5, slow=10, smooth=3).calculate(bars)
     assert set(res.keys()) == {"main", "signal", "histogram"}
 
     d = {
@@ -360,56 +399,63 @@ def test_macd_all_18_conditions() -> None:
         "signal": IndicatorSeries([-0.2, -0.5, 0.1]),
         "histogram": IndicatorSeries([-0.3, -0.5, 0.4]),
     }
-    assert MACD.main_crosses_above_signal(d) is True
-    assert MACD.main_crosses_below_signal(d) is False
-    assert MACD.main_higher_signal(d) is True
-    assert MACD.main_lower_signal(d, shift=1) is True
-    assert MACD.main_crosses_above_zero(d) is True
-    assert MACD.main_crosses_below_zero(d) is False
-    assert MACD.main_changes_up(d) is True
-    assert MACD.main_changes_down(d) is False
-    assert MACD.main_crosses_above(d, 0.2) is True
-    assert MACD.main_crosses_below(d, -0.8, shift=1) is True
-    assert MACD.main_is_rising(d) is True
-    assert MACD.main_is_falling(d, shift=1) is True
-    assert MACD.main_is_higher(d, 0.2) is True
-    assert MACD.main_is_lower(d, 0.0, shift=1) is True
-    assert MACD.main_higher_zero(d) is True
-    assert MACD.main_lower_zero(d, shift=1) is True
-    assert MACD.signal_is_rising(d) is True
-    assert MACD.signal_is_falling(d, shift=1) is True
+    assert crosses_above(d["main"], d["signal"]) is True
+    assert crosses_below(d["main"], d["signal"]) is False
+    assert is_greater(d["main"], d["signal"]) is True
+    assert is_lower(d["main"], d["signal"], shift=1) is True
+    assert crosses_above(d["main"], 0.0) is True
+    assert crosses_below(d["main"], 0.0) is False
+    assert changes_up(d["main"]) is True
+    assert changes_down(d["main"]) is False
+    assert crosses_above(d["main"], 0.2) is True
+    assert crosses_below(d["main"], -0.8, shift=1) is True
+    assert is_rising(d["main"]) is True
+    assert is_falling(d["main"], shift=1) is True
+    assert is_greater(d["main"], 0.2) is True
+    assert is_lower(d["main"], 0.0, shift=1) is True
+    assert is_greater(d["main"], 0.0) is True
+    assert is_lower(d["main"], 0.0, shift=1) is True
+    assert is_rising(d["signal"]) is True
+    assert is_falling(d["signal"], shift=1) is True
 
 
 def test_moving_average_tema_and_bar_conditions() -> None:
-    """Verify MovingAverage TEMA and all 6 bar open/close vs. MA helpers."""
+    """Verify MovingAverage family (SMA, EMA, SMMA, LWMA, TEMA) and bar open/close conditions."""
     data = np.linspace(10.0, 25.0, 20)
-    for m in (
-        MovingAverage.SMA,
-        MovingAverage.EMA,
-        MovingAverage.SMMA,
-        MovingAverage.LWMA,
-        MovingAverage.TEMA,
-    ):
-        s = MovingAverage.calculate(data, period=4, method=m)
+    bp = BarPrice(
+        open_data=data,
+        high_data=data,
+        low_data=data,
+        close_data=data,
+        volume_data=np.ones_like(data),
+    )
+    bars = BarData(prices=bp)
+    for cls in (SMA, EMA, SMMA, LWMA, TEMA):
+        res = cls(period=4).calculate(bars)
+        s = res["value"]
         assert not np.isnan(s.get(0))
 
     ma = IndicatorSeries([10.0, 11.0, 12.0])
-    assert MovingAverage.is_rising(ma) is True
-    assert MovingAverage.is_falling(ma) is False
-    assert MovingAverage.crosses_above(ma, 11.5) is True
-    assert MovingAverage.crosses_below(ma, 11.5) is False
-    assert MovingAverage.is_greater(ma, 11.5) is True
-    assert MovingAverage.is_lower(ma, 12.5) is True
-    assert MovingAverage.bar_closes_above([10.0, 11.0, 12.5], ma) is True
-    assert MovingAverage.bar_closes_below([10.0, 11.0, 11.5], ma) is True
-    assert MovingAverage.bar_opens_above([10.0, 10.5, 11.5], ma) is True
-    assert MovingAverage.bar_opens_below([10.0, 11.5, 10.5], ma) is True
+    assert is_rising(ma) is True
+    assert is_falling(ma) is False
+    assert crosses_above(ma, 11.5) is True
+    assert crosses_below(ma, 11.5) is False
+    assert is_greater(ma, 11.5) is True
+    assert is_lower(ma, 12.5) is True
+    assert is_greater([10.0, 11.0, 12.5], ma, shift=0) is True
+    assert is_lower([10.0, 11.0, 11.5], ma, shift=0) is True
     assert (
-        MovingAverage.bar_opens_above_after_open_below([10.0, 10.5, 11.5], ma) is True
+        is_greater([10.0, 10.5, 11.5], ma, shift1=0, shift2=1, round_digits=8) is True
     )
+    assert is_lower([10.0, 11.5, 10.5], ma, shift1=0, shift2=1, round_digits=8) is True
     assert (
-        MovingAverage.bar_opens_below_after_open_above([10.0, 11.5, 10.5], ma) is True
-    )
+        is_lower([10.0, 10.5, 11.5], ma, shift1=1, shift2=1, round_digits=8)
+        and is_greater([10.0, 10.5, 11.5], ma, shift1=0, shift2=1, round_digits=8)
+    ) is True
+    assert (
+        is_greater([10.0, 11.5, 10.5], ma, shift1=1, shift2=1, round_digits=8)
+        and is_lower([10.0, 11.5, 10.5], ma, shift1=0, shift2=1, round_digits=8)
+    ) is True
 
 
 def test_qqe_all_14_conditions() -> None:

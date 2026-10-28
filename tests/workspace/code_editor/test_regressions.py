@@ -187,18 +187,16 @@ def test_import_preflights_all_paths_before_writing(snippets, tmp_path):
 
 def test_tester_reads_history_and_rejects_missing_symbol():
     tester = IndicatorTester()
-    result = tester.indicator_tester("MovingAverage", params={"period": 5}, bar_count=5)
+    result = tester.indicator_tester("SMA", params={"period": 5}, bar_count=5)
     assert result["data_source"] == "historical"
     assert result["candlesticks"][-1]["close"] == pytest.approx(1.10299)
-    assert (
-        tester.indicator_tester("MovingAverage", symbol="MISSING")["status"] == "failed"
-    )
+    assert tester.indicator_tester("SMA", symbol="MISSING")["status"] == "failed"
 
 
 def test_tester_preserves_nan_gaps_and_multiple_outputs():
     tester = IndicatorTester()
     nan = tester.indicator_tester(
-        "MovingAverage", params={"period": 200}, bars_to_reserve=0, bar_count=10
+        "SMA", params={"period": 200}, bars_to_reserve=0, bar_count=10
     )
     assert nan["status"] == "success"
     assert all("value" not in point for point in nan["indicator_plots"])
@@ -212,7 +210,7 @@ def test_tester_preserves_nan_gaps_and_multiple_outputs():
 def test_config_roundtrip_and_param_edit_preserve_identity_and_history():
     tester = IndicatorTester()
     result = tester.indicator_tester(
-        "MovingAverage", bar_count=10, bars_to_reserve=20, params={"period": 5}
+        "SMA", bar_count=10, bars_to_reserve=20, params={"period": 5}
     )
     identifier = result["test_id"]
     tester.save_test_config(identifier, "Saved")

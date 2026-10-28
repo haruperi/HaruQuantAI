@@ -56,7 +56,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.indicators.trend.moving_average import MovingAverage
+from app.include.numerical.ma import sma_kernel
 
 logger = get_logger(__name__)
 
@@ -93,8 +93,8 @@ class KeltnerChannel(BaseIndicator):
         typical = (high_arr + low_arr + close_arr) / 3.0
         bar_range = high_arr - low_arr
 
-        middle = MovingAverage.sma(typical, period)
-        offset = MovingAverage.sma(bar_range, period) * deviation
+        middle = sma_kernel(typical, period)
+        offset = sma_kernel(bar_range, period) * deviation
 
         upper = middle + offset
         lower = middle - offset

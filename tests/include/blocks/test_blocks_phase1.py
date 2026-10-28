@@ -368,7 +368,7 @@ def test_registry_rejects_duplicate_block_id_with_different_target() -> None:
     ("n_bars", "expected_hash", "max_median_ms"),
     [
         (150, "c92738bf6b3b3222", 0.07),
-        (100_000, "86191cfe5da2832f", 2.15),
+        (100_000, "86191cfe5da2832f", 1.90),
         (1_000_000, "f482e78146e14577", 20.00),
     ],
 )

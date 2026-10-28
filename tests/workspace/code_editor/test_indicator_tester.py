@@ -11,16 +11,16 @@ def tester():
 
 def test_new_indy_test_config(tester: IndicatorTester):
     """Verify new test config creation."""
-    config = tester.new_indy_test("MovingAverage", symbol="EURUSD", timeframe="H1")
+    config = tester.new_indy_test("SMA", symbol="EURUSD", timeframe="H1")
     assert "test_id" in config
-    assert config["indicator_name"] == "MovingAverage"
+    assert config["indicator_name"] == "SMA"
     assert config["symbol"] == "EURUSD"
 
 
 def test_indicator_tester_runs_builtin_moving_average(tester: IndicatorTester):
-    """Verify executing IndicatorTester with built-in MovingAverage indicator."""
+    """Verify executing IndicatorTester with built-in SMA indicator."""
     res = tester.indicator_tester(
-        indicator_name="MovingAverage",
+        indicator_name="SMA",
         symbol="EURUSD",
         timeframe="H1",
         params={"period": 5},
@@ -37,7 +37,7 @@ def test_indicator_tester_with_reference_discrepancy(tester: IndicatorTester):
     """Verify discrepancy detection when comparing against reference values."""
     reference_values = [1.0] * 30
     res = tester.indicator_tester(
-        indicator_name="MovingAverage",
+        indicator_name="SMA",
         symbol="EURUSD",
         timeframe="H1",
         params={"period": 5},
@@ -50,7 +50,7 @@ def test_indicator_tester_with_reference_discrepancy(tester: IndicatorTester):
 
 def test_edit_params_and_save_load_config(tester: IndicatorTester):
     """Verify editing parameters, saving, and loading test configuration."""
-    cfg = tester.new_indy_test("MovingAverage")
+    cfg = tester.new_indy_test("SMA")
     test_id = cfg["test_id"]
 
     # Edit params and re-run

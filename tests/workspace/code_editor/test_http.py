@@ -46,7 +46,7 @@ def test_http_indicator_test_run(client: TestClient):
     res = client.post(
         "/api/v1/code-editor/indicator-test/run",
         json={
-            "indicator_name": "MovingAverage",
+            "indicator_name": "SMA",
             "symbol": "EURUSD",
             "timeframe": "H1",
             "params": {"period": 5},

@@ -9,6 +9,7 @@ from typing import Any
 
 import numpy as np
 
+from app.include.blocks.series import BarData
 from app.include.price import BarPrice
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.data_manager.data.review import DatasetReview
@@ -109,7 +110,7 @@ def indicator_defaults(cls: Any) -> dict[str, Any]:
 
 def calculate_indicator(
     cls: Any,
-    bars: BarPrice,
+    bars: BarPrice | BarData,
     params: Mapping[str, Any],
     timestamps: list[int] | None = None,
 ) -> Any:
@@ -118,7 +119,22 @@ def calculate_indicator(
         inspect.getattr_static(cls, "calculate"), (classmethod, staticmethod)
     )
     if instance_method:
-        return cls(**params).calculate(bars)
+        target_bars = (
+            bars
+            if isinstance(bars, BarData)
+            else BarData(
+                prices=bars,
+                timestamps=(
+                    np.asarray(timestamps, dtype=np.int64)
+                    if timestamps is not None
+                    else np.array([], dtype=np.int64)
+                ),
+            )
+        )
+        try:
+            return cls(**params).calculate(target_bars)
+        except Exception as exc:
+            raise CodeEditorError(f"Indicator calculation failed: {exc}") from exc
     signature = inspect.signature(cls.calculate)
     sources = {
         "bars": bars,

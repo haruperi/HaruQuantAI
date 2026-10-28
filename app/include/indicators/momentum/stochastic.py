@@ -57,7 +57,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.indicators.trend.moving_average import MovingAverage
+from app.include.numerical.ma import sma_kernel
 
 logger = get_logger(__name__)
 
@@ -114,14 +114,14 @@ class Stochastic(BaseIndicator):
         if len(valid_k_idx) >= slowing:
             first_idx = valid_k_idx[0]
             valid_slice = raw_k[first_idx:]
-            slow_k[first_idx:] = MovingAverage.sma(valid_slice, slowing)
+            slow_k[first_idx:] = sma_kernel(valid_slice, slowing)
 
         valid_d_idx = np.where(~np.isnan(slow_k))[0]
         slow_d = np.full(n, np.nan, dtype=np.float64)
         if len(valid_d_idx) >= d_period:
             first_idx = valid_d_idx[0]
             valid_slice = slow_k[first_idx:]
-            slow_d[first_idx:] = MovingAverage.sma(valid_slice, d_period)
+            slow_d[first_idx:] = sma_kernel(valid_slice, d_period)
 
         logger.info(
             "FR-SERVICES-STOCH-CALCULATE: Computed Stoch(%d,%d,%d) for %d bars",

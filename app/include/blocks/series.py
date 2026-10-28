@@ -74,6 +74,26 @@ class BarData:
         """Return 1D read-only view of volume prices without copying."""
         return self.prices.volume_values
 
+    def open_series(self) -> IndicatorSeries:
+        """Return open prices as IndicatorSeries."""
+        return self.prices.open_series()
+
+    def high_series(self) -> IndicatorSeries:
+        """Return high prices as IndicatorSeries."""
+        return self.prices.high_series()
+
+    def low_series(self) -> IndicatorSeries:
+        """Return low prices as IndicatorSeries."""
+        return self.prices.low_series()
+
+    def close_series(self) -> IndicatorSeries:
+        """Return close prices as IndicatorSeries."""
+        return self.prices.close_series()
+
+    def volume_series(self) -> IndicatorSeries:
+        """Return volume prices as IndicatorSeries."""
+        return self.prices.volume_series()
+
     def __len__(self) -> int:
         """Return number of bars in context."""
         return len(self.prices)

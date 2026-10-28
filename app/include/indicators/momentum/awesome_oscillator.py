@@ -53,7 +53,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.indicators.trend.moving_average import MovingAverage
+from app.include.numerical.ma import sma_kernel
 
 logger = get_logger(__name__)
 
@@ -102,8 +102,8 @@ class AwesomeOscillator(BaseIndicator):
             slow_period = 34
 
         median = (high_arr + low_arr) / 2.0
-        fast_sma = MovingAverage.sma(median, fast_period)
-        slow_sma = MovingAverage.sma(median, slow_period)
+        fast_sma = sma_kernel(median, fast_period)
+        slow_sma = sma_kernel(median, slow_period)
         res = fast_sma - slow_sma
 
         logger.info(

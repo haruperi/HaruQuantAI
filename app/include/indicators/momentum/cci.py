@@ -57,7 +57,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.indicators.trend.moving_average import MovingAverage
+from app.include.numerical.ma import sma_kernel
 
 logger = get_logger(__name__)
 
@@ -95,7 +95,7 @@ class CCI(BaseIndicator):
             period = 14
 
         tp = (high_arr + low_arr + close_arr) / 3.0
-        sma_tp = MovingAverage.sma(tp, period)
+        sma_tp = sma_kernel(tp, period)
         cci_vals = np.full(n, np.nan, dtype=np.float64)
 
         for i in range(period - 1, n):

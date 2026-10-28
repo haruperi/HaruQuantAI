@@ -40,19 +40,19 @@ def test_direct_path_ignores_imported_indicator_dependencies():
 
 
 def test_builtin_resolution_uses_current_compiled_buffer():
-    path = INCLUDE_DIR / "indicators/trend/moving_average.py"
+    path = INCLUDE_DIR / "blocks/indicators/trend/sma.py"
     source = (
-        "from app.include.indicators.base import BaseIndicator\n"
-        "class MovingAverage(BaseIndicator):\n"
-        "    revision = 42\n"
-        "    @classmethod\n"
-        "    def calculate(cls, data, period=14): return data\n"
+        "from typing import ClassVar\n"
+        "from app.include.blocks.indicators.base import BaseIndicator\n"
+        "class SMA(BaseIndicator):\n"
+        "    revision: ClassVar[int] = 42\n"
+        "    def calculate(self, bars): return {}\n"
     )
     result = CodeEditor().compile_file(str(path), source)
     assert result["success"], result
     tester = IndicatorTester()
-    cls = tester._resolve_indicator_class("MovingAverage")
-    assert cls is registry.blocks[str(path)]["MovingAverage"]
+    cls = tester._resolve_indicator_class("SMA")
+    assert cls is registry.blocks[str(path)]["SMA"]
     assert cls.revision == 42
     assert tester._resolve_indicator_class(str(path)) is cls
 

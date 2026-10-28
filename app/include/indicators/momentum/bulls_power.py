@@ -53,7 +53,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.indicators.trend.moving_average import MovingAverage
+from app.include.numerical.ma import ema_kernel
 
 logger = get_logger(__name__)
 
@@ -93,7 +93,7 @@ class BullsPower(BaseIndicator):
             )
             period = 14
 
-        ema = MovingAverage.ema(close_arr, period)
+        ema = ema_kernel(close_arr, period)
         res = high_arr - ema
 
         logger.info(

@@ -54,7 +54,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.indicators.trend.moving_average import MovingAverage
+from app.include.numerical.ma import sma_kernel
 
 logger = get_logger(__name__)
 
@@ -103,8 +103,8 @@ class DeMarker(BaseIndicator):
             de_max[1:] = np.maximum(diff_h, 0.0)
             de_min[1:] = np.maximum(diff_l, 0.0)
 
-        avg_de_max = MovingAverage.sma(de_max, period)
-        avg_de_min = MovingAverage.sma(de_min, period)
+        avg_de_max = sma_kernel(de_max, period)
+        avg_de_min = sma_kernel(de_min, period)
 
         denom = avg_de_max + avg_de_min
         res = np.zeros(n, dtype=np.float64)

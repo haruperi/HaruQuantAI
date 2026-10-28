@@ -54,7 +54,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.indicators.trend.moving_average import MovingAverage
+from app.include.numerical.ma import ema_kernel, sma_kernel
 
 logger = get_logger(__name__)
 
@@ -95,8 +95,8 @@ class OSMA(BaseIndicator):
         if signal_period <= 0:
             signal_period = 9
 
-        fast_arr = MovingAverage.ema(arr, fast_ema)
-        slow_arr = MovingAverage.ema(arr, slow_ema)
+        fast_arr = ema_kernel(arr, fast_ema)
+        slow_arr = ema_kernel(arr, slow_ema)
         macd = fast_arr - slow_arr
 
         res = np.full(n, np.nan, dtype=np.float64)
@@ -104,7 +104,7 @@ class OSMA(BaseIndicator):
         if len(valid_indices) >= signal_period:
             first_idx = valid_indices[0]
             valid_macd = macd[first_idx:]
-            sig_part = MovingAverage.sma(valid_macd, signal_period)
+            sig_part = sma_kernel(valid_macd, signal_period)
             res[first_idx:] = valid_macd - sig_part
 
         logger.info(

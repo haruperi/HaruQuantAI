@@ -7,7 +7,8 @@ import inspect
 from pathlib import Path
 from typing import Any
 
-from app.include.indicators.base import BaseIndicator
+from app.include.blocks.indicators.base import BaseIndicator as CanonicalBaseIndicator
+from app.include.indicators.base import BaseIndicator as LegacyBaseIndicator
 from app.workspace.code_editor._common import (
     INCLUDE_DIR,
     PROJECT_ROOT,
@@ -17,21 +18,64 @@ from app.workspace.code_editor._common import (
 )
 from app.workspace.code_editor.registry import registry
 
+INDICATOR_ROOTS: tuple[Path, ...] = (
+    INCLUDE_DIR / "blocks" / "indicators",
+    INCLUDE_DIR / "indicators",
+)
+
 
 def _normalize(name: str) -> str:
     return name.replace("_", "").casefold()
 
 
 def _safe_indicator_path(path: Path) -> Path:
-    root = INCLUDE_DIR / "indicators"
-    resolved = resolve_safe_path(path, root)
-    if resolved.suffix != ".py" or any(
-        part.startswith((".", "__")) for part in resolved.relative_to(root).parts
-    ):
-        raise CodeEditorError("Choose a public Python file in app/include/indicators")
-    if not resolved.is_file():
-        raise CodeEditorError(f"Indicator file not found: {path}")
-    return resolved
+    raw_str = str(path).replace("\\", "/")
+    if path.is_absolute():
+        resolved_candidate = path.resolve()
+    elif raw_str.startswith("app/"):
+        resolved_candidate = (PROJECT_ROOT / path).resolve()
+    else:
+        resolved_candidate = None
+
+    if resolved_candidate is not None:
+        for root in INDICATOR_ROOTS:
+            root_res = root.resolve()
+            if resolved_candidate.is_relative_to(root_res):
+                resolved = resolve_safe_path(resolved_candidate, root_res)
+                if resolved.suffix == ".py" and not any(
+                    part.startswith((".", "__"))
+                    for part in resolved.relative_to(root_res).parts
+                ):
+                    if resolved.is_file():
+                        return resolved
+                    raise CodeEditorError(f"Indicator file not found: {path}")
+        raise CodeEditorError(
+            "Choose a public Python file in app/include/blocks/indicators or app/include/indicators"
+        )
+
+    # Relative path without leading app/
+    found_candidates: list[Path] = []
+    for root in INDICATOR_ROOTS:
+        try:
+            cand = resolve_safe_path(path, root)
+            if (
+                cand.is_file()
+                and cand.suffix == ".py"
+                and not any(
+                    part.startswith((".", "__"))
+                    for part in cand.relative_to(root.resolve()).parts
+                )
+            ):
+                found_candidates.append(cand)
+        except CodeEditorError, ValueError:
+            pass
+
+    if len(found_candidates) == 1:
+        return found_candidates[0]
+    if len(found_candidates) > 1:
+        raise CodeEditorError(f"Multiple indicators match '{path}'")
+
+    raise CodeEditorError(f"Indicator file not found: {path}")
 
 
 def _classes(path: Path) -> dict[str, type[Any]]:
@@ -46,24 +90,17 @@ def _classes(path: Path) -> dict[str, type[Any]]:
     return {
         name: cls
         for name, cls in cached.items()
-        if issubclass(cls, BaseIndicator) and not inspect.isabstract(cls)
+        if issubclass(cls, (LegacyBaseIndicator, CanonicalBaseIndicator))
+        and not inspect.isabstract(cls)
     }
 
 
 def resolve_indicator(name: str) -> type[Any]:
     """Prefer live compiled classes; never execute imports outside indicator roots."""
     clean = name.replace("\\", "/").strip()
-    root = INCLUDE_DIR / "indicators"
     if clean.endswith(".py") or "/" in clean:
         raw = Path(clean)
-        candidate = (
-            raw
-            if raw.is_absolute()
-            else PROJECT_ROOT / raw
-            if clean.startswith("app/")
-            else root / raw
-        )
-        path = _safe_indicator_path(candidate)
+        path = _safe_indicator_path(raw)
         classes = _classes(path)
         matching_classes = list(
             dict.fromkeys(
@@ -85,31 +122,34 @@ def resolve_indicator(name: str) -> type[Any]:
         )
     target = _normalize(clean)
     candidates: dict[Path, list[str]] = {}
-    # Inspect declarations without executing unrelated modules or their dependencies.
-    for raw in root.rglob("*.py"):
-        if any(part.startswith((".", "__")) for part in raw.relative_to(root).parts):
+    for root in INDICATOR_ROOTS:
+        if not root.exists():
             continue
-        try:
-            path = _safe_indicator_path(raw)
-        except CodeEditorError:
-            continue
-        if str(path) in registry.blocks:
-            names = list(registry.blocks[str(path)])
-        else:
-            try:
-                tree = ast.parse(path.read_text(encoding="utf-8-sig"))
-            except (SyntaxError, UnicodeError) as exc:
-                if _normalize(path.stem) == target:
-                    raise CodeEditorError(
-                        f"Invalid indicator source: {path.name}: {exc}"
-                    ) from exc
+        for raw in root.rglob("*.py"):
+            rel_parts = raw.relative_to(root).parts
+            if any(part.startswith((".", "__")) for part in rel_parts):
                 continue
-            names = [node.name for node in tree.body if isinstance(node, ast.ClassDef)]
-        matching = [key for key in names if _normalize(key) == target]
-        if matching:
-            candidates[path] = matching
-        elif _normalize(path.stem) == target:
-            candidates[path] = []
+            path = raw
+            if str(path) in registry.blocks:
+                names = list(registry.blocks[str(path)])
+            else:
+                try:
+                    tree = ast.parse(path.read_text(encoding="utf-8-sig"))
+                except (SyntaxError, UnicodeError) as exc:
+                    if _normalize(path.stem) == target:
+                        raise CodeEditorError(
+                            f"Invalid indicator source: {path.name}: {exc}"
+                        ) from exc
+                    continue
+                names = [
+                    node.name for node in tree.body if isinstance(node, ast.ClassDef)
+                ]
+            matching = [key for key in names if _normalize(key) == target]
+            if matching:
+                candidates[path] = matching
+            elif _normalize(path.stem) == target:
+                candidates[path] = []
+
     if len(candidates) > 1:
         raise CodeEditorError(
             f"Multiple indicators match '{name}'; choose a full indicator file path"

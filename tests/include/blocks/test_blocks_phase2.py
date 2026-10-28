@@ -317,7 +317,7 @@ def test_clean_migration_direct_consumer_imports() -> None:
     assert record.params["filename"] == "test.log"
 
     # 3. Indicators import is_greater directly from canonical block
-    from app.include.indicators.momentum.rsi import RSI
+    from app.include.blocks.indicators.momentum.rsi import RSI
     from app.include.indicators.price_action.candlestick_patterns import (
         CandlestickPatterns,
     )

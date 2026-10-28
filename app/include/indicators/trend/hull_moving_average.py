@@ -52,7 +52,7 @@ from app.include.comparisons import (
     is_rising,
 )
 from app.include.indicators.base import BaseIndicator, IndicatorSeries
-from app.include.indicators.trend.moving_average import MovingAverage
+from app.include.numerical.ma import lwma_kernel
 
 logger = get_logger(__name__)
 
@@ -92,11 +92,11 @@ class HullMovingAverage(BaseIndicator):
         fast_period = max(1, math.floor(period / 2.0))
         sqrt_period = max(1, math.floor(math.sqrt(period)))
 
-        fast_wma = MovingAverage.lwma(c_arr, fast_period)
-        slow_wma = MovingAverage.lwma(c_arr, period)
+        fast_wma = lwma_kernel(c_arr, fast_period)
+        slow_wma = lwma_kernel(c_arr, period)
 
         diff = 2.0 * fast_wma - slow_wma
-        hma = MovingAverage.lwma(diff, sqrt_period)
+        hma = lwma_kernel(diff, sqrt_period)
 
         logger.info(
             "FR-SERVICES-HMA-CALCULATE: Computed HMA(period=%d) for %d bars",
