@@ -14,8 +14,8 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from app.core.host.logging import get_logger
+from app.core.host.transport import TransportError
 from app.host.response import ErrorCode
-from app.host.transport import TransportError
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor.import_export import ImportExport
 from app.workspace.code_editor.indicator_tester import IndicatorTester

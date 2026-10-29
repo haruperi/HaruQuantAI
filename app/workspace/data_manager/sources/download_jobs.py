@@ -10,9 +10,9 @@ from typing import Any, cast
 
 from fastapi import APIRouter, Request
 
+from app.core.host.transport import TransportError
 from app.host.jobs import JobContext, JobManager
 from app.host.response import ErrorCode
-from app.host.transport import TransportError
 from app.include.market_storage import safe_component
 from app.workspace.data_manager.data.storage import require_data
 

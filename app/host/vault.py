@@ -150,8 +150,8 @@ def prepare_credentials(  # noqa: C901 - secret staging and rollback share one s
     vault: Vault | None, values: dict[str, Any]
 ) -> tuple[ConnectionMetadata, list[str]]:
     """Stage and validate owned secrets without exposing plaintext in metadata."""
+    from app.core.host.transport import TransportError
     from app.host.response import ErrorCode
-    from app.host.transport import TransportError
 
     credentials = values.pop("credentials", {})
     if not isinstance(credentials, dict) or any(

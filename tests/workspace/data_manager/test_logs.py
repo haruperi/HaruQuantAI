@@ -105,7 +105,7 @@ def test_invalid_update_fields(kwargs):
 
 
 def test_http_and_cli_share_backend_history(monkeypatch):
-    from app.host.transport import register_transport_exception_handlers
+    from app.core.host.transport import register_transport_exception_handlers
     from app.workspace.data_manager import create_router, logs
 
     application = FastAPI()

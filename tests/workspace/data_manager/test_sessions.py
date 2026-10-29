@@ -200,7 +200,7 @@ def test_save_failure_preserves_existing_file(sessions, tmp_path):
 
 @pytest.fixture
 def session_http(sessions):
-    from app.host.transport import register_transport_exception_handlers
+    from app.core.host.transport import register_transport_exception_handlers
     from app.workspace.data_manager import _access, create_router
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
@@ -351,7 +351,7 @@ def test_http_validation_and_atomic_delete(session_http):
 
 
 def test_http_sessions_require_authentication(sessions):
-    from app.host.transport import register_transport_exception_handlers
+    from app.core.host.transport import register_transport_exception_handlers
     from app.workspace.data_manager import create_router
     from fastapi import FastAPI
     from fastapi.testclient import TestClient

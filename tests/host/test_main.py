@@ -9,9 +9,8 @@ from unittest.mock import Mock
 import httpx
 import pytest
 import uvicorn
-from fastapi.testclient import TestClient
-
 from app import main as backend
+from fastapi.testclient import TestClient
 
 
 def test_lifespan_initializes_and_cleans_services(monkeypatch):
@@ -78,7 +77,7 @@ def test_launcher_uses_validated_stored_settings(monkeypatch, port, reload):
 
 def test_shutdown_finishes_with_open_event_stream(monkeypatch):
     """An idle SSE client must not prevent shutdown or service cleanup."""
-    from app.host import transport
+    from app.core.host import transport
     from app.host.events import EventBus
 
     settings = Mock()

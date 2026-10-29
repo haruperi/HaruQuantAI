@@ -4,8 +4,8 @@ import sqlite3
 from unittest.mock import patch
 
 import pytest
+from app.core.host.transport import register_transport_exception_handlers
 from app.host.persistence import HostPersistence
-from app.host.transport import register_transport_exception_handlers
 from app.workspace.data_manager import _access, create_router
 from fastapi import FastAPI
 from fastapi.testclient import TestClient

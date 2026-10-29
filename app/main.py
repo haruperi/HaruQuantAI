@@ -19,9 +19,9 @@ from fastapi import FastAPI
 
 from app.core.host.logging import get_logger, shutdown_logging
 from app.core.host.settings import SettingsManager
+from app.core.host.transport import CredentialTester, install_transport
 from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
-from app.host.transport import CredentialTester, install_transport
 from app.host.vault import Vault
 from app.workspace.data_manager.data.partition_files import recover_catalog_publications
 from app.workspace.data_manager.logs import Logs

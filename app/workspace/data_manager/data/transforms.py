@@ -11,8 +11,8 @@ from zoneinfo import ZoneInfo
 import pandas as pd  # type: ignore[import-untyped]
 from fastapi import APIRouter, Request
 
+from app.core.host.transport import TransportError
 from app.host.response import ErrorCode
-from app.host.transport import TransportError
 from app.include.market_storage import safe_component
 
 from .partition_files import dataset_lock

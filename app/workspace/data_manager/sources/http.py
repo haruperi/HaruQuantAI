@@ -9,9 +9,9 @@ from fastapi import APIRouter, Query, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
+from app.core.host.transport import TransportError
 from app.host.jobs import JobContext
 from app.host.response import ErrorCode
-from app.host.transport import TransportError
 from app.workspace.brokers.base import get_broker
 from app.workspace.data_manager.data.feature import Data
 
@@ -267,7 +267,7 @@ def register_dukascopy_routes(router: APIRouter) -> None:
 
 def _provider_catalog(request: Request, provider: str) -> list[str]:
     """Read catalog symbols using the selected provider connection and lifecycle."""
-    from app.host.transport import ServletConnection
+    from app.core.host.transport import ServletConnection
 
     from ._helpers import make_client, resolve_result
 
@@ -346,7 +346,7 @@ def start_source_download(request: Request, body: dict[str, Any]) -> dict[str, A
         records, lower, upper, overwrite = _validate_source_job(service, body)
         import json
 
-        from app.host.transport import ServletConnection
+        from app.core.host.transport import ServletConnection
 
         connection_ids = {
             json.loads(service.record(identifier).get("lineage_json") or "{}").get(

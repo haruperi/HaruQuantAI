@@ -347,7 +347,7 @@ def test_default_provider_is_owned_and_closed(baskets, tmp_path, monkeypatch):
 
 @pytest.fixture
 def basket_http(baskets):
-    from app.host.transport import register_transport_exception_handlers
+    from app.core.host.transport import register_transport_exception_handlers
     from app.workspace.data_manager import _access, create_router
     from fastapi import FastAPI
     from fastapi.testclient import TestClient

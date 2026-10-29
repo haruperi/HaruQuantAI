@@ -1,6 +1,6 @@
 # Host transport gateway
 
-The FastAPI application mounts `app.host.transport` at `/api/v1`. Start it with:
+The FastAPI application mounts `app.core.host.transport` at `/api/v1`. Start it with:
 
 ```powershell
 uv run python -m app.main --reload

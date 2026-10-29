@@ -134,7 +134,7 @@ def test_invalid_import(brokers, tmp_path, content):
 
 @pytest.fixture
 def broker_http(brokers, temp_db):
-    from app.host.transport import register_transport_exception_handlers
+    from app.core.host.transport import register_transport_exception_handlers
     from app.workspace.data_manager import _access, create_router
     from fastapi import FastAPI
     from fastapi.testclient import TestClient

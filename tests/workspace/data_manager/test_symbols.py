@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import pytest
-from app.host.transport import register_transport_exception_handlers
+from app.core.host.transport import register_transport_exception_handlers
 from app.workspace.data_manager import create_router
 from app.workspace.data_manager.symbols import Symbols
 from fastapi import FastAPI

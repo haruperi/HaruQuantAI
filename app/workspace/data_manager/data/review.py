@@ -8,8 +8,8 @@ from typing import Any, cast
 import pandas as pd  # type: ignore[import-untyped]
 from fastapi import APIRouter, Request
 
+from app.core.host.transport import TransportError
 from app.host.response import ErrorCode
-from app.host.transport import TransportError
 from app.include.contracts import TradingSession
 from app.include.market_storage import scan_catalog
 

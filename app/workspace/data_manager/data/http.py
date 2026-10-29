@@ -6,8 +6,8 @@ from typing import Any
 
 from fastapi import APIRouter, Request
 
+from app.core.host.transport import TransportError
 from app.host.response import ErrorCode
-from app.host.transport import TransportError
 
 from .feature import Data
 from .storage import require_data

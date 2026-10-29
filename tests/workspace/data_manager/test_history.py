@@ -91,7 +91,7 @@ import importlib
 import sys
 importlib.import_module('app.workspace.data_manager.data.{module}')
 for name in ('app.workspace.data_manager.sources', 'app.workspace.data_manager.data.feature',
-             'app.workspace.data_manager.data.http', 'app.host.transport', 'fastapi'):
+             'app.workspace.data_manager.data.http', 'app.core.host.transport', 'fastapi'):
     assert name not in sys.modules, name
 """
     subprocess.run(

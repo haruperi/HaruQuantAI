@@ -23,7 +23,7 @@ Python API Usage:
     event = bus.publish("settings.changed", payload={"revision": 1})
 
 CLI Usage:
-    uv run python -m app.host.transport --test-bus
+    uv run python -m app.core.host.transport --test-bus
 """
 
 from __future__ import annotations

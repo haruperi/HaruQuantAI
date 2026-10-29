@@ -6,11 +6,11 @@ from contextlib import closing
 
 import pandas as pd
 import pytest
+from app.core.host.transport import register_transport_exception_handlers
 from app.host.events import EventBus
 from app.host.jobs import JobManager
 from app.host.persistence import HostPersistence
 from app.host.resources import MemoryObservation, ResourceMonitor
-from app.host.transport import register_transport_exception_handlers
 from app.include.contracts import BridgeError
 from app.workspace import data_manager as http
 from app.workspace.data_manager.logs import Logs

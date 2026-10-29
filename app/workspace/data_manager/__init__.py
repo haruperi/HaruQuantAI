@@ -28,8 +28,8 @@ __all__ = [
 
 def _access(request: Request) -> None:
     """Apply the host's UI session and scope checks to domain requests."""
+    from app.core.host.transport import TransportError, _require
     from app.host.response import ErrorCode
-    from app.host.transport import TransportError, _require
 
     scope = "data:read" if request.method == "GET" else "data:write"
     if request.headers.get("x-peer-id") == "cli" and request.url.path.startswith(
