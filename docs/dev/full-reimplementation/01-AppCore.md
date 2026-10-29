@@ -540,8 +540,8 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - **Edit:** `app/include/metrics/base.py` into a temporary bridge. **Frontend:** none.
 *Current -> target / action:* `app/include/metrics/base.py` -> `app/core/trading/statistics/base.py`, MOVE unchanged. The audited package has this interface and `__init__.py`; it is not an implemented drawdown/Sharpe/SQN library.
 *Functional Requirements & Implementation:*
-- [ ] `BaseMetric.compute(self, trades: Sequence[dict[str, Any]], initial_capital: float = 10000.0) -> float` -> retain ABC/abstractmethod; retain `name='BaseMetric'`, `category='Metrics'` and `__all__=['BaseMetric']`.
-- [ ] `test_metric_interface_identity_and_abstractness()` -> old/new BaseMetric are identical; constructing BaseMetric raises TypeError; a local subclass implementing compute with `return initial_capital` returns 10000.0 when called with `[]`. This protects the extension contract, not a financial formula.
+- [X] `BaseMetric.compute(self, trades: Sequence[dict[str, Any]], initial_capital: float = 10000.0) -> float` -> retain ABC/abstractmethod; retain `name='BaseMetric'`, `category='Metrics'` and `__all__=['BaseMetric']`.
+- [X] `test_metric_interface_identity_and_abstractness()` -> old/new BaseMetric are identical; constructing BaseMetric raises TypeError; a local subclass implementing compute with `return initial_capital` returns 10000.0 when called with `[]`. This protects the extension contract, not a financial formula.
 *Acceptance:* `uv run python -m pytest tests/core/trading/statistics/test_metric_contract.py -q` exits 0 and collects one test.
 *Commit:* `refactor(core): centralize the existing metric extension interface`.
 *Limitations:* no implemented metrics are inferred from an abstract interface or a donor class name.
